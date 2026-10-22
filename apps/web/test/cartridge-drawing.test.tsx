@@ -4,6 +4,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { combinedRows } from '../src/lib/cartridge-record.ts'
 import { drawable } from '../src/lib/cartridge-sheet.ts'
+import { replaceUntilStable } from './markup.ts'
 import { sheetRecord } from './records.ts'
 
 vi.mock('next/font/local', () => ({ default: () => ({ variable: 'drawing-font', className: '' }) }))
@@ -28,7 +29,7 @@ const render = (file: string, side?: 'cartridge' | 'chamber' | 'designer', unit?
   )
   const all = (tag: string) =>
     [...html.matchAll(new RegExp(`<${tag}[^>]*>(.*?)</${tag}>`, 'gs'))].map(([, t]) =>
-      t.replace(/<[^>]+>/g, '').replaceAll('&#x27;', "'"),
+      replaceUntilStable(t, /<[^>]+>/g).replaceAll('&#x27;', "'"),
     )
   return { html, captions: all('figcaption'), descs: all('desc') }
 }

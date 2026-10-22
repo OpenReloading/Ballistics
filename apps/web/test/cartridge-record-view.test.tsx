@@ -16,6 +16,7 @@ import { packCartridges } from '../src/lib/cartridge-rows.ts'
 import { drawable } from '../src/lib/cartridge-sheet.ts'
 import { parseCountries } from '../src/lib/countries.ts'
 import { type PresetId, presetUnits } from '../src/lib/units.ts'
+import { replaceUntilStable } from './markup.ts'
 import { sheetRecord } from './records.ts'
 
 // the units of the Settings, as a test sets them: `useUnits` reads this preset
@@ -36,13 +37,15 @@ const html = (preset: PresetId, node: ReactNode) => {
   return renderToStaticMarkup(<MantineProvider>{node}</MantineProvider>)
 }
 // the text a reader sees: no style rules, no hidden note descriptions
-const text = (markup: string) =>
-  markup
-    .replace(/<style[^>]*>[\s\S]*?<\/style>/g, '')
-    .replace(/<span id="[^"]*" class="visually-hidden"[^>]*>[\s\S]*?<\/span>/g, '')
-    .replace(/<[^>]+>/g, ' ')
+const text = (markup: string) => {
+  const shown = replaceUntilStable(
+    replaceUntilStable(markup, /<style[^>]*>[\s\S]*?<\/style>/g),
+    /<span id="[^"]*" class="visually-hidden"[^>]*>[\s\S]*?<\/span>/g,
+  )
+  return replaceUntilStable(shown, /<[^>]+>/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
+}
 
 describe('the cartridge list row', () => {
   const row = {
