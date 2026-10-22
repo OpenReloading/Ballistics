@@ -14,7 +14,7 @@
     "@docusaurus/tsconfig": "3.10.2",
     "@docusaurus/types": "3.10.2",
     "typedoc": "^0.28.20",
-    "typescript": "~6.0.0"
+    "typescript": "~7.0.2"
   },
   "dependencies": {
     "@docusaurus/core": "3.10.2",
