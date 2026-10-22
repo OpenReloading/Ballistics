@@ -59,7 +59,7 @@ jobs:
       - run: node tools/src/openapi.ts "$RUNNER_TEMP/openapi.json"
       - name: Breaking changes of the API document (oasdiff)
         run: docker run --rm -v "$PWD:/repo:ro" -v "$RUNNER_TEMP:/doc:ro" -w /repo docker.io/tufin/oasdiff:v1.33.0@sha256:6263a96dd2ef0726c54e21fea9b8e1607eac4841add0079324b424c1f52b819c breaking packages/api/openapi.baseline.json /doc/openapi.json --fail-on ERR
-      - run: npm audit --audit-level=high
+      - run: node tools/src/audit.ts
 
   # Workflow lint and security audit of .github/workflows and dependabot.yml.
   workflows:
