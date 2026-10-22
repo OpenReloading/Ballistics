@@ -20,7 +20,7 @@
     "@docusaurus/core": "3.10.2",
     "@docusaurus/plugin-content-docs": "3.10.2",
     "@docusaurus/preset-classic": "3.10.2",
-    "@openreloading/api": "*",
+    "@openreloading/api": "0.0.1",
     "@scalar/api-reference": "1.75.1",
     "katex": "0.19.0",
     "pagefind": "1.5.2",

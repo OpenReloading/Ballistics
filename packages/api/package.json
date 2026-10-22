@@ -27,9 +27,9 @@
   },
   "dependencies": {
     "@fastify/sensible": "^6.0.7",
-    "@openreloading/core": "*",
-    "@openreloading/data": "*",
-    "@openreloading/schema": "*",
+    "@openreloading/core": "0.0.1",
+    "@openreloading/data": "0.0.1",
+    "@openreloading/schema": "0.0.1",
     "@scalar/fastify-api-reference": "1.75.1",
     "drizzle-orm": "^1.0.0-rc.4",
     "fastify": "^5.12.7",

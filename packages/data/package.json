@@ -22,7 +22,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@openreloading/schema": "*"
+    "@openreloading/schema": "0.0.1"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",
