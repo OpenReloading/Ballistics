@@ -36,7 +36,8 @@ jobs:
       # squashes it once its required checks pass. Enabled with RELEASE_PLEASE_TOKEN (fine-grained token, this
       # repository only, Contents and Pull requests read and write), so the push of that merge starts this workflow
       # again, which tags the release and builds the images; a merge by GITHUB_TOKEN would start no workflow.
-      - if: steps.release.outputs.prs_created == 'true'
+      # Every run, not only when the PR changed: an unchanged release PR may still lack auto-merge.
+      - if: steps.release.outcome == 'success'
         continue-on-error: true   # never blocks the release or the images
         env:
           GH_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
