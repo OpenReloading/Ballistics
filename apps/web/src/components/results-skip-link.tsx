@@ -1,10 +1,10 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
+import { useRoute } from './use-route.ts'
 
 /** Second skip link on the workbench; `Workspace` shows the results (on phones their tab) and focuses them, also when the page opens at #results. */
 export function ResultsSkipLink() {
-  const path = usePathname()
+  const path = useRoute()
   if (path !== '/workbench') return null
   return (
     // biome-ignore lint/a11y/useValidAnchor: a skip link; the handler also opens the Results tab on phones

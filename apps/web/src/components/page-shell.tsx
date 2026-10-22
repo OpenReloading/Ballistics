@@ -1,10 +1,10 @@
 'use client'
 
 import { AppShell } from '@mantine/core'
-import { usePathname } from 'next/navigation'
 import type { ReactNode } from 'react'
 import { isToolRoute } from '../lib/sections.ts'
 import { SiteHeader } from './site-header.tsx'
+import { useRoute } from './use-route.ts'
 
 /**
  * Routes laid out as one window-high frame from 62em: tools, lists whose table scrolls, the
@@ -29,7 +29,7 @@ const frameRoutes = new Set([
  * AppShell stays server-rendered only with the `@mantine/hooks` patch of `patches/`.
  */
 export function PageShell({ children }: { children: ReactNode }) {
-  const route = usePathname()
+  const route = useRoute()
   return (
     <div
       className="page-shell"

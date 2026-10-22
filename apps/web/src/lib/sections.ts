@@ -69,6 +69,9 @@ export const toolRoutes = ['/workbench', '/groups', '/bullets/designer', '/cartr
 
 export const isToolRoute = (route: string) => toolRoutes.includes(route)
 
+/** The route without the trailing slash of the Pages edition's URLs (`trailingSlash`), `/` as is. */
+export const routeOf = (pathname: string) => pathname.replace(/(.)\/$/, '$1')
+
 /** Pages without a link of their own that a listed page links to and that link back to it. */
 const linkedFrom: Record<string, string> = { '/federations': '/disciplines' }
 
