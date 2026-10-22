@@ -1,5 +1,5 @@
 # Build context: repository root (docker build -f apps/web/Dockerfile .)
-FROM docker.io/library/node:26-bookworm-slim AS build
+FROM docker.io/library/node:26-bookworm-slim@sha256:28147155d47dc31abe0a46e0d12b59b2fb3d0a2dcc5dc65fce76a074180b16fe AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY patches patches
@@ -29,7 +29,7 @@ RUN npm run build -w @openreloading/schema && npm run build -w @openreloading/im
 COPY apps/web apps/web
 RUN npm run build -w @openreloading/web && rm -rf apps/web/.next/standalone/node_modules/sharp apps/web/.next/standalone/node_modules/@img
 
-FROM docker.io/library/node:26-bookworm-slim
+FROM docker.io/library/node:26-bookworm-slim@sha256:28147155d47dc31abe0a46e0d12b59b2fb3d0a2dcc5dc65fce76a074180b16fe
 ENV NODE_ENV=production
 WORKDIR /app
 COPY --from=build --chown=node:node /app/apps/web/.next/standalone ./
