@@ -21,7 +21,6 @@ import { useDisclosure, useHotkeys, useMediaQuery } from '@mantine/hooks'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { useContext, useEffect, useId, useRef, useState } from 'react'
 import dark from '../assets/ballistics-dark.svg'
 import light from '../assets/ballistics-light.svg'
@@ -40,6 +39,7 @@ import { searchHost, siteSearchEvent } from './search-host.ts'
 import { SettingsDialog } from './settings-dialog.ts'
 import { openShortcuts, ShortcutsHelp, useShortcuts } from './shortcuts.tsx'
 import { ThemeSwitch } from './theme-switch.tsx'
+import { useRoute } from './use-route.ts'
 
 // the search loads on its first use, so pages ship without it
 const SiteSearch = dynamic(() => import('./site-search.tsx').then((m) => m.SiteSearch), {
@@ -210,7 +210,7 @@ function SectionLinks({
  * the page, so the page and its inputs stay; Ctrl+K opens Search on every page.
  */
 export function SiteHeader() {
-  const route = usePathname()
+  const route = useRoute()
   const [opened, { toggle, close }] = useDisclosure(false)
   // the drawer is only hidden by CSS from 75em: left open, its scroll lock and focus trap would stay
   const wide = useMediaQuery('(min-width: 75em)')

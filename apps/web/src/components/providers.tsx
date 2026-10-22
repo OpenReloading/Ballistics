@@ -2,8 +2,8 @@
 
 import { Button, Group, localStorageColorSchemeManager, MantineProvider } from '@mantine/core'
 import dynamic from 'next/dynamic'
-import { usePathname } from 'next/navigation'
 import { type ReactNode, useCallback, useEffect, useState } from 'react'
+import { useRoute } from './use-route.ts'
 import '../lib/navigation-guard.ts'
 import { colorSchemeKey, theme } from '../lib/theme.ts'
 import { AppModal } from './app-modal.tsx'
@@ -30,7 +30,7 @@ function SettingsDialogProvider({ children }: { children: ReactNode }) {
     setTab(t)
     setOpened(true)
   }, [])
-  const route = usePathname()
+  const route = useRoute()
   // a link inside the dialog leaves the page
   // biome-ignore lint/correctness/useExhaustiveDependencies: runs on a route change only
   useEffect(() => close(), [route])

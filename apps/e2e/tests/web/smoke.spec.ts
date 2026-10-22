@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test'
 import { gotoHydrated, safetyAck } from './nav.ts'
 import { storeUnits } from './units.ts'
-import { applyExampleLoad } from './workbench.ts'
+import { applyExampleLoad, loadForm } from './workbench.ts'
 import { runLine } from './workbench-run.ts'
 
 const pages = [
@@ -88,5 +88,12 @@ test('the Pages workbench runs the example load in the browser as the API does',
   })
   const expected = await exampleResult(server, `${webUrl}/workbench`)
   expect(expected).toMatch(/peak \d+ bar, .* \d+ m\/s/)
-  expect(await exampleResult(page, './workbench')).toBe(expected)
+  await storeUnits(page)
+  await gotoHydrated(page, './workbench')
+  // the start card inside the window: in the frame the workspace keeps its height
+  const example = page.getByRole('button', { name: 'Try the example load' })
+  await expect(example).toBeInViewport()
+  await example.click()
+  await expect(loadForm(page).locator('.field-flag-seating')).toHaveCount(2)
+  expect(await runLine(page)).toBe(expected)
 })

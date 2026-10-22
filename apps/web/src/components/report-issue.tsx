@@ -15,7 +15,6 @@ import {
   useComputedColorScheme,
 } from '@mantine/core'
 import { Bug } from '@phosphor-icons/react'
-import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import web from '../../package.json'
 import { pagesBasePath } from '../lib/edition.ts'
@@ -36,6 +35,7 @@ import { presetNames } from '../lib/units.ts'
 import { AppModal } from './app-modal.tsx'
 import { type ReportOption, reportHost } from './report-host.ts'
 import { useUnits } from './units-settings.tsx'
+import { useRoute } from './use-route.ts'
 
 const label = 'Report an issue'
 
@@ -109,7 +109,7 @@ export function ReportIssueDialog({
   opened: boolean
   onClose: () => void
 }) {
-  const route = usePathname()
+  const route = useRoute()
   const context = useContextNow(opened, route)
   const [area, setArea] = useState<ReportArea>('Other')
   const [type, setType] = useState<ReportType>('Bug')

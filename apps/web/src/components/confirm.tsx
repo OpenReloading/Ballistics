@@ -1,10 +1,10 @@
 'use client'
 
 import { Affix, Button, Group, Notification, Text } from '@mantine/core'
-import { usePathname } from 'next/navigation'
 import { type ReactNode, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { controlSize } from '../lib/theme.ts'
 import { AppModal } from './app-modal.tsx'
+import { useRoute } from './use-route.ts'
 
 type Ask = {
   title: string
@@ -109,7 +109,7 @@ export function ConfirmHost() {
     return () => clearTimeout(t)
   }, [notice, held])
   // an Undo for a page that is gone would do nothing, and a question of that page is answered no
-  const route = usePathname()
+  const route = useRoute()
   // biome-ignore lint/correctness/useExhaustiveDependencies: on a route change only
   useEffect(() => {
     if (!offer && !queue.length) return

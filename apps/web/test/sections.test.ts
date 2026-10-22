@@ -1,6 +1,6 @@
 import { globSync } from 'node:fs'
 import { expect, it } from 'vitest'
-import { isToolRoute, pageCoversRoute, sections, toolRoutes } from '../src/lib/sections.ts'
+import { isToolRoute, pageCoversRoute, routeOf, sections, toolRoutes } from '../src/lib/sections.ts'
 
 const hrefs: string[] = sections.flatMap((s) => s.pages.map((p) => p.href))
 
@@ -50,4 +50,11 @@ it('covers each designer by its database list, not by a link of its own', () => 
     expect(pageCoversRoute(list, `${list}/designer`)).toBe(true)
   }
   expect(pageCoversRoute('/bullets', '/bulletsx')).toBe(false)
+})
+
+it('names a Pages URL by its route: no trailing slash, the root as is', () => {
+  expect(routeOf('/workbench/')).toBe('/workbench')
+  expect(routeOf('/cartridges/308-win/')).toBe('/cartridges/308-win')
+  expect(routeOf('/workbench')).toBe('/workbench')
+  expect(routeOf('/')).toBe('/')
 })
