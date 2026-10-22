@@ -104,3 +104,8 @@ In order, before a change reaches the default branch:
 4. Full verify once, in the dev container: `npm run build`, `npm run typecheck`, `npm run lint`, `npm test`, `npm run test:e2e` and the drawing baseline (`npm run drawing-baseline -w @openreloading/e2e`).
 5. Commits signed (`commit.gpgsign` with an SSH key). Never `git filter-branch` (it drops signatures). Re-sign with `git rebase -f --exec 'git commit --amend --no-edit -S' <base>`. Never `--no-verify`.
 6. Push, then CI green on the pushed commit.
+
+<!-- benchkeeper:project start -->
+- The agent, Git and file edits run on the host. Installs, builds, lint, tests and local MCP or browser tools run in the dev container: prefix `devcontainer exec --workspace-folder .`, compound commands as `devcontainer exec --workspace-folder . sh -lc '...'`. If the container cannot start, report it and stop that command.
+- UI screens and user-facing text: load the designing-technical-uis skill first.
+<!-- benchkeeper:project end -->
