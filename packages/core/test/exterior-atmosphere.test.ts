@@ -1,8 +1,10 @@
+import fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
 import {
   airAt,
   airDensity,
   checkAir,
+  InputError,
   saturationVapourPressure,
   speedOfSound,
   standardAtmosphere,
@@ -78,5 +80,24 @@ describe('limits', () => {
     expect(() => checkAir({ ...ok, pressure: 100 })).toThrow(RangeError)
     expect(() => checkAir({ ...ok, altitude: Number.NaN })).toThrow(RangeError)
     expect(checkAir(ok)).toBe(ok)
+  })
+})
+
+describe('checkAir on any numbers', () => {
+  it('returns the air or throws an InputError', () => {
+    const value = fc.oneof(fc.double(), fc.double({ min: -1000, max: 120000, noNaN: true }))
+    fc.assert(
+      fc.property(
+        fc.record({ altitude: value, pressure: value, temperature: value, humidity: value }),
+        (air) => {
+          try {
+            expect(checkAir(air)).toBe(air)
+          } catch (e) {
+            expect(e).toBeInstanceOf(InputError)
+          }
+        },
+      ),
+      { seed: 20261022, numRuns: 500 },
+    )
   })
 })
