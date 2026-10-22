@@ -64,7 +64,7 @@ Reloading and shooting are done at your own risk. This software comes without wa
 - Questions and ideas: [GitHub Discussions](https://github.com/OpenReloading/Ballistics/discussions) and [Discord](https://discord.gg/KkYJ5fdukR).
 - Bugs, features and record requests: [issues](https://github.com/OpenReloading/Ballistics/issues/new/choose).
 - How to contribute: [CONTRIBUTING.md](CONTRIBUTING.md).
-- Security reports: [SECURITY.md](SECURITY.md).
+- Security reports: [security policy](https://github.com/OpenReloading/.github/blob/main/SECURITY.md).
 - Releases and versions: [release.md](apps/docs/docs/release.md).
 
 ## License

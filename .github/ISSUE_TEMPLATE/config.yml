@@ -8,4 +8,4 @@ contact_links:
     about: Chat with the OpenReloading community.
   - name: Security vulnerability
     url: https://github.com/OpenReloading/Ballistics/security/advisories/new
-    about: Report it privately, not as an issue (SECURITY.md).
+    about: Report it privately, not as an issue (security policy).
