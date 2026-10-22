@@ -31,7 +31,7 @@ async function fromShell(event) {
   const cached =
     (await (await caches.open(shell)).match(event.request, { ignoreSearch: true })) ??
     (await caches.match(event.request, { ignoreSearch: true }))
-  if (cached) return cached
+  if (cached) return shellAnswer(cached, event.request.destination)
   const res = await fetch(event.request)
   store(event, shell, event.request, res)
   return res
