@@ -6,7 +6,7 @@ Playwright tests against a running API and web app, on the CIP cartridge records
 - Project `pages`, only with `PAGES_URL` set (the Pages site with its base path and a trailing slash, `npm run pages:serve` at the root): `web/smoke.spec.ts` against the Pages edition, and its workbench result for the example load against the server edition's at `WEB_URL`. Pages are opened by relative paths (`./workbench`), so the base path stays.
 - One spec per area. No spec needs manufacturer data or load data.
 - Every test has its own browser context and `fullyParallel` is on: the tests of one file run on several workers, so a test never relies on another.
-- A spec that clicks or types right after loading a page opens it with `gotoHydrated` (`web/nav.ts`): it waits for `html[data-hydrated]`, which `Providers` sets after mount. No `toPass` retry for a click before hydration.
+- A spec that clicks or types right after loading a page opens it with `gotoHydrated` (`web/nav.ts`): it waits for `html[data-hydrated]`, which `Providers` sets after mount, and for `data-hydrated` on the `h1` of `PageBar`, set once the page itself has mounted (the page hydrates after the layout). No `toPass` retry for a click before hydration.
 - Values, formats and parsing are checked in Vitest (`apps/web/test/`, `packages/*/test/`). A spec checks what only a browser shows.
 
 ## Specs

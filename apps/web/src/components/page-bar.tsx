@@ -77,6 +77,7 @@ export function PageBar({
   const toggle = useRef<HTMLButtonElement>(null)
   const root = useRef<HTMLDivElement>(null)
   const id = useId()
+  const mounted = useMounted()
   // the phone panel closes on a press outside the bar and the menus and dialogs it opened
   useEffect(() => {
     if (!open) return
@@ -96,7 +97,12 @@ export function PageBar({
       data-single={(actions && single) || undefined}
     >
       <div className="page-bar-title">
-        <h1 title={title} className={titleHidden ? 'visually-hidden' : undefined}>
+        {/* `data-hydrated`: the e2e ready signal of the page, which hydrates after the layout */}
+        <h1
+          title={title}
+          className={titleHidden ? 'visually-hidden' : undefined}
+          data-hydrated={mounted || undefined}
+        >
           {title}
         </h1>
         {after}
