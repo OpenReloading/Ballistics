@@ -1131,10 +1131,11 @@ export function useWorkbenchState() {
   useEffect(() => {
     // a record arriving later marks the load changed and would abort the run: wait for them all
     const loading = Object.values(asked).some((a) => a && !a.failed)
-    if (!runWhenFilled || fields.charge.si === undefined || loading) return
+    // the run keeps the seated figure the chart's barrel strip draws; the example seats its bullet
+    if (!runWhenFilled || fields.charge.si === undefined || loading || !seated.figure) return
     setRunWhenFilled(false)
     run()
-  }, [runWhenFilled, fields, asked])
+  }, [runWhenFilled, fields, asked, seated.figure])
 
   /**
    * The shown result of a load that comes back in its tab: put back once the records of the
