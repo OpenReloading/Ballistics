@@ -1,11 +1,11 @@
 FROM mcr.microsoft.com/devcontainers/typescript-node:26-bookworm@sha256:cdd6d07f8eee8726c7726fad160ba3006f4e6cfb89ff69ed2dc98ea26aac2530
 
 # agent-side tools that run in the container: MCP servers for Mantine docs and Playwright
-# the e2e headless shell too: keep 1.63.0 equal to @playwright/test in package-lock.json (postCreateCommand installs it on a mismatch)
+# the e2e headless shell too: keep 1.64.1 equal to @playwright/test in package-lock.json (postCreateCommand installs it on a mismatch)
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 RUN npm i -g --prefix /usr/local @mantine/mcp-server@9.7.3 @playwright/mcp@0.0.83 \
   && cd /usr/local/lib/node_modules/@playwright/mcp && npx playwright install --with-deps chromium \
-  && npx -y playwright@1.63.0 install --only-shell chromium \
+  && npx -y playwright@1.64.1 install --only-shell chromium \
   && chown -R node:node /ms-playwright \
   && npm cache clean --force && rm -rf /root/.npm/_npx
 
