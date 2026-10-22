@@ -1,0 +1,43 @@
+{
+  "id": "bdmp-dg-4-300m",
+  "federation": "bdmp",
+  "name": "National Rifle Match - B",
+  "number": "DG 4",
+  "section": "D.9",
+  "page": "Teil D, Seite 38 bis 41 von 294, PDF pp. 38 to 41",
+  "distance": {
+    "value": 300000,
+    "raw": "300 m"
+  },
+  "category": "service-rifle",
+  "caliberClasses": {
+    "ids": [
+      "rifle-22-cf",
+      "rifle-6mm",
+      "rifle-25",
+      "rifle-6-5",
+      "rifle-270",
+      "rifle-7mm",
+      "rifle-30",
+      "rifle-30-carbine",
+      "rifle-8mm"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.9, D.9.1, Teil D, Seite 38 von 294, PDF p. 38",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.9.7, D.9.9, Teil D, Seite 39 von 294, PDF p. 39",
+        "fields": ["caliberClasses", "distance"]
+      }
+    ],
+    "note": "The calibre must be one introduced for the rifle in a regular army, the police or customs and may not exceed 8 mm. The discipline is shot at 100 or 300 m at the choice stated in D.9.9."
+  }
+}

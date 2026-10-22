@@ -1,0 +1,32 @@
+{
+  "id": "dsb-50m-pistole",
+  "federation": "dsb",
+  "name": "50 m Pistole",
+  "number": "2.20",
+  "section": "2.15",
+  "page": "Teil 2 Seite 15, PDF p. 149",
+  "distance": {
+    "value": 50000,
+    "raw": "50 m"
+  },
+  "category": "pistol",
+  "caliberClasses": {
+    "ids": ["rimfire-22"],
+    "basis": "stated"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "Teil 2 Seite 15, PDF p. 149",
+        "fields": ["name", "number", "federation", "section", "page", "distance", "category"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "Pistolentabelle, Teil 2 Seite 23, PDF p. 157 (2.20) and 0.21, Teil 0 Seite 80, PDF p. 98 (row 2.20)",
+        "fields": ["caliberClasses"]
+      }
+    ]
+  }
+}

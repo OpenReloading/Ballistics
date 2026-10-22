@@ -1,0 +1,27 @@
+{
+  "id": "bdmp-kk-pist-rev",
+  "federation": "bdmp",
+  "name": "Kleinkaliber Kurzwaffe",
+  "number": "KK-Pist./Rev.",
+  "section": "C.16",
+  "page": "Teil C, Seite 113 bis 115 von 142, PDF pp. 113 to 115",
+  "distance": {
+    "value": 25000,
+    "raw": "25 m"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.16, C.16.1, Teil C, Seite 113 von 142, PDF p. 113",
+        "fields": ["name", "number", "federation", "section", "page"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.16.12, Teil C, Seite 114 von 142, PDF p. 114",
+        "fields": ["distance"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,379 @@
+{
+  "id": "10-3-capra",
+  "name": "10,3 Capra",
+  "table": "I",
+  "country": "Germany",
+  "published": "2018-05-16",
+  "pressureMethod": "transducer",
+  "verification": "unverified",
+  "values": [
+    {
+      "side": "cartridge",
+      "symbol": "L1",
+      "quantity": "length",
+      "value": 53.58,
+      "tolerance": {
+        "lower": -0.2
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L2",
+      "quantity": "length",
+      "value": 54.78,
+      "tolerance": {
+        "lower": -0.2
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L3",
+      "quantity": "length",
+      "value": 68.51,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L5",
+      "quantity": "length",
+      "value": 69.5
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L6",
+      "quantity": "length",
+      "value": 84
+    },
+    {
+      "side": "cartridge",
+      "symbol": "R",
+      "quantity": "length",
+      "value": 1.37
+    },
+    {
+      "side": "cartridge",
+      "symbol": "R1",
+      "quantity": "length",
+      "value": 12.01
+    },
+    {
+      "side": "cartridge",
+      "symbol": "E",
+      "quantity": "length",
+      "value": 4.27
+    },
+    {
+      "side": "cartridge",
+      "symbol": "E1",
+      "quantity": "length",
+      "value": 10.39
+    },
+    {
+      "side": "cartridge",
+      "symbol": "e",
+      "quantity": "length",
+      "value": 1.4,
+      "limit": "min"
+    },
+    {
+      "side": "cartridge",
+      "symbol": "delta",
+      "quantity": "angle",
+      "value": 36,
+      "raw": "36°"
+    },
+    {
+      "side": "cartridge",
+      "symbol": "f",
+      "quantity": "length",
+      "value": 0.38
+    },
+    {
+      "side": "cartridge",
+      "symbol": "beta",
+      "quantity": "angle",
+      "value": 35,
+      "raw": "35°"
+    },
+    {
+      "side": "cartridge",
+      "symbol": "P1",
+      "quantity": "length",
+      "value": 12.57
+    },
+    {
+      "side": "cartridge",
+      "symbol": "P2",
+      "quantity": "length",
+      "value": 12.2,
+      "tolerance": {
+        "lower": -0.2
+      },
+      "basic": true,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "alpha",
+      "quantity": "angle",
+      "value": 49.246944444444445,
+      "raw": "49°14'49\"",
+      "basic": true
+    },
+    {
+      "side": "cartridge",
+      "symbol": "S",
+      "quantity": "length",
+      "value": 66.89,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "r1",
+      "quantity": "length",
+      "value": 0.5,
+      "limit": "min"
+    },
+    {
+      "side": "cartridge",
+      "symbol": "r2",
+      "quantity": "length",
+      "value": 0.5
+    },
+    {
+      "side": "cartridge",
+      "symbol": "H1",
+      "quantity": "length",
+      "value": 11.1
+    },
+    {
+      "side": "cartridge",
+      "symbol": "H2",
+      "quantity": "length",
+      "value": 11.1
+    },
+    {
+      "side": "cartridge",
+      "symbol": "G1",
+      "quantity": "length",
+      "value": 10.54,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L3+G",
+      "quantity": "length",
+      "value": 98.51,
+      "footnotes": ["1"]
+    },
+    {
+      "symbol": "Pmax",
+      "quantity": "pressure",
+      "value": 4100
+    },
+    {
+      "symbol": "PK",
+      "quantity": "pressure",
+      "value": 4715
+    },
+    {
+      "symbol": "PE",
+      "quantity": "pressure",
+      "value": 5125
+    },
+    {
+      "symbol": "M",
+      "quantity": "length",
+      "value": 25
+    },
+    {
+      "symbol": "EE",
+      "quantity": "energy",
+      "value": 6500
+    },
+    {
+      "side": "cartridge",
+      "symbol": "Fe",
+      "quantity": "length",
+      "value": 0.1,
+      "footnotes": ["1", "3"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "L1",
+      "quantity": "length",
+      "value": 53.56
+    },
+    {
+      "side": "chamber",
+      "symbol": "L2",
+      "quantity": "length",
+      "value": 54.72
+    },
+    {
+      "side": "chamber",
+      "symbol": "L3",
+      "quantity": "length",
+      "value": 68.8,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "R",
+      "quantity": "length",
+      "value": 1.3
+    },
+    {
+      "side": "chamber",
+      "symbol": "R1",
+      "quantity": "length",
+      "value": 12.62
+    },
+    {
+      "side": "chamber",
+      "symbol": "E",
+      "quantity": "length",
+      "value": 3.6
+    },
+    {
+      "side": "chamber",
+      "symbol": "P1",
+      "quantity": "length",
+      "value": 12.6,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "P2",
+      "quantity": "length",
+      "value": 12.23,
+      "basic": true
+    },
+    {
+      "side": "chamber",
+      "symbol": "alpha",
+      "quantity": "angle",
+      "value": 49.51888888888889,
+      "raw": "49°31'08\"",
+      "basic": true,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "S",
+      "quantity": "length",
+      "value": 66.82,
+      "basic": true
+    },
+    {
+      "side": "chamber",
+      "symbol": "r1",
+      "quantity": "length",
+      "value": 0.5,
+      "limit": "max"
+    },
+    {
+      "side": "chamber",
+      "symbol": "r2",
+      "quantity": "length",
+      "value": 0.5
+    },
+    {
+      "side": "chamber",
+      "symbol": "H1",
+      "quantity": "length",
+      "value": 11.16,
+      "basic": true
+    },
+    {
+      "side": "chamber",
+      "symbol": "H2",
+      "quantity": "length",
+      "value": 11.11,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "G1",
+      "quantity": "length",
+      "value": 10.65,
+      "basic": true,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "G",
+      "quantity": "length",
+      "value": 30,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "alpha1",
+      "quantity": "angle",
+      "value": 180,
+      "raw": "180°"
+    },
+    {
+      "side": "chamber",
+      "symbol": "i",
+      "quantity": "angle",
+      "value": 0.3819444444444444,
+      "raw": "0°22'55\"",
+      "basic": true,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "F",
+      "quantity": "length",
+      "value": 10.25,
+      "basic": true,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "Z",
+      "quantity": "length",
+      "value": 10.49,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "b",
+      "quantity": "length",
+      "value": 3.6
+    },
+    {
+      "side": "chamber",
+      "symbol": "N",
+      "quantity": "count",
+      "value": 6
+    },
+    {
+      "side": "chamber",
+      "symbol": "u",
+      "quantity": "length",
+      "value": 450
+    },
+    {
+      "side": "chamber",
+      "symbol": "Q",
+      "quantity": "area",
+      "value": 85.16
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cip-tdcc",
+        "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-i/10-3-capra-180313-en.pdf",
+        "sha256": "37160d34cc67017773618b4b38070d31fb786896113a5126362a4e6f3e70c922",
+        "retrieved": "2026-10-08"
+      }
+    ]
+  }
+}

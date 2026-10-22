@@ -1,0 +1,33 @@
+# PROJECT comes from .env (initializeCommand): one compose project per checkout or worktree
+name: ${PROJECT}
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # rootless podman: map host uid to the container user so the bind mount is writable (Docker Engine rejects keep-id)
+    userns_mode: keep-id
+    # an init process reaps the exited children of test runs; with `sleep infinity` as PID 1 they
+    # piled up as zombies until the pids limit stopped builds
+    init: true
+    # WORKSPACE and GIT_COMMON come from .env, written by initializeCommand; host paths are kept so git worktree paths match on both sides
+    volumes:
+      - ${WORKSPACE}:${WORKSPACE}:cached
+      - ${GIT_COMMON}:${GIT_COMMON}
+    command: sleep infinity
+    environment:
+      DATABASE_URL: postgres://ballistics:ballistics@db:5432/ballistics
+      # web builds prerender the sample records only (apps/web/src/lib/prerender-sample.ts); PRERENDER=full for every record
+      PRERENDER: sample
+
+  db:
+    image: docker.io/library/postgres:18-bookworm@sha256:9551dd5bf356409a21b31248f49b33bba9bb1877365f3a7e933aecd9af3cf52d
+    environment:
+      POSTGRES_USER: ballistics
+      POSTGRES_PASSWORD: ballistics
+      POSTGRES_DB: ballistics
+    volumes:
+      - devcontainer-pgdata:/var/lib/postgresql
+
+volumes:
+  devcontainer-pgdata:

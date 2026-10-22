@@ -1,0 +1,21 @@
+{
+  "id": "bdmp-five-targets-kurzwaffen",
+  "federation": "bdmp",
+  "name": "Five Targets - Kurzwaffen auf Zielscheiben",
+  "section": "C.20",
+  "page": "Teil C, Seite 136 bis 137 von 142, PDF pp. 136 to 137",
+  "distance": {
+    "value": 25000,
+    "raw": "25 m"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.20, C.20.3, Teil C, Seite 136 von 142, PDF p. 136",
+        "fields": ["name", "federation", "section", "page", "distance"]
+      }
+    ]
+  }
+}

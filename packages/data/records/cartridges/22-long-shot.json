@@ -1,0 +1,220 @@
+{
+  "id": "22-long-shot",
+  "name": "22 Long Shot",
+  "table": "V",
+  "country": "United states",
+  "published": "1984-06-14",
+  "revised": "2000-06-07",
+  "pressureMethod": "crusher",
+  "verification": "unverified",
+  "values": [
+    {
+      "side": "cartridge",
+      "symbol": "L1",
+      "quantity": "length",
+      "value": 11.34
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L2",
+      "quantity": "length",
+      "value": 12.79
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L3",
+      "quantity": "length",
+      "value": 22.38
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L6",
+      "quantity": "length",
+      "value": 22.38
+    },
+    {
+      "side": "cartridge",
+      "symbol": "R",
+      "quantity": "length",
+      "value": 1.12,
+      "tolerance": {
+        "lower": -0.18
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "R1",
+      "quantity": "length",
+      "value": 7.06
+    },
+    {
+      "side": "cartridge",
+      "symbol": "P1",
+      "quantity": "length",
+      "value": 5.74
+    },
+    {
+      "side": "cartridge",
+      "symbol": "P2",
+      "quantity": "length",
+      "value": 5.74,
+      "basic": true
+    },
+    {
+      "side": "cartridge",
+      "symbol": "alpha",
+      "quantity": "angle",
+      "value": 9,
+      "raw": "9°",
+      "basic": true
+    },
+    {
+      "side": "cartridge",
+      "symbol": "S",
+      "quantity": "length",
+      "value": 47.81,
+      "basic": true
+    },
+    {
+      "side": "cartridge",
+      "symbol": "H1",
+      "quantity": "length",
+      "value": 5.51,
+      "basic": true
+    },
+    {
+      "side": "cartridge",
+      "symbol": "H2",
+      "quantity": "length",
+      "value": 5.51,
+      "footnotes": ["1"]
+    },
+    {
+      "symbol": "Pmax",
+      "quantity": "pressure",
+      "value": 1400
+    },
+    {
+      "symbol": "PK",
+      "quantity": "pressure",
+      "value": 1610
+    },
+    {
+      "symbol": "PE",
+      "quantity": "pressure",
+      "value": 1820
+    },
+    {
+      "symbol": "M",
+      "quantity": "length",
+      "value": 24.18
+    },
+    {
+      "side": "cartridge",
+      "symbol": "Fe",
+      "quantity": "length",
+      "value": 0.2,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "L3",
+      "quantity": "length",
+      "value": 20.45,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "R",
+      "quantity": "length",
+      "value": 1.12,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "R1",
+      "quantity": "length",
+      "value": 7.32
+    },
+    {
+      "side": "chamber",
+      "symbol": "r",
+      "quantity": "length",
+      "value": 0.13
+    },
+    {
+      "side": "chamber",
+      "symbol": "P1",
+      "quantity": "length",
+      "value": 5.78,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "H2",
+      "quantity": "length",
+      "value": 5.68,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "G1",
+      "quantity": "length",
+      "value": 5.51,
+      "basic": true
+    },
+    {
+      "side": "chamber",
+      "symbol": "alpha1",
+      "quantity": "angle",
+      "value": 60,
+      "raw": "60°",
+      "basic": true
+    },
+    {
+      "side": "chamber",
+      "symbol": "h",
+      "quantity": "length",
+      "value": 0.15
+    },
+    {
+      "side": "chamber",
+      "symbol": "F",
+      "quantity": "length",
+      "value": 5.51,
+      "basic": true,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "Z",
+      "quantity": "length",
+      "value": 5.51,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "Q",
+      "quantity": "area",
+      "value": 23.81
+    }
+  ],
+  "exceptions": [
+    {
+      "finding": "case-fits-chamber",
+      "note": "Present on the official CIP sheet at import; not yet checked by hand."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cip-tdcc",
+        "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-v/22-long-shot-en.pdf",
+        "sha256": "c51c1a4af60b99f5f50f5b586e4696572a2815765f1700c2291452feae9d2427",
+        "retrieved": "2026-10-08"
+      }
+    ]
+  }
+}

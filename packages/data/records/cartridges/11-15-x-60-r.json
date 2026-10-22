@@ -1,0 +1,317 @@
+{
+  "id": "11-15-x-60-r",
+  "name": "11,15 x 60 R",
+  "table": "II",
+  "country": "Germany",
+  "published": "1984-06-14",
+  "revised": "2002-05-15",
+  "pressureMethod": "transducer",
+  "verification": "unverified",
+  "values": [
+    {
+      "side": "cartridge",
+      "symbol": "L1",
+      "quantity": "length",
+      "value": 36.4,
+      "basic": true
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L2",
+      "quantity": "length",
+      "value": 40.05,
+      "basic": true
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L3",
+      "quantity": "length",
+      "value": 60.35,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L6",
+      "quantity": "length",
+      "value": 78
+    },
+    {
+      "side": "cartridge",
+      "symbol": "R",
+      "quantity": "length",
+      "value": 2.4,
+      "tolerance": {
+        "lower": -0.25
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "R1",
+      "quantity": "length",
+      "value": 15
+    },
+    {
+      "side": "cartridge",
+      "symbol": "f",
+      "quantity": "length",
+      "value": 1.05
+    },
+    {
+      "side": "cartridge",
+      "symbol": "beta",
+      "quantity": "angle",
+      "value": 45,
+      "raw": "45°"
+    },
+    {
+      "side": "cartridge",
+      "symbol": "P1",
+      "quantity": "length",
+      "value": 13.1
+    },
+    {
+      "side": "cartridge",
+      "symbol": "P2",
+      "quantity": "length",
+      "value": 13,
+      "basic": true
+    },
+    {
+      "side": "cartridge",
+      "symbol": "alpha",
+      "quantity": "angle",
+      "value": 17.904999999999998,
+      "raw": "17°54'18\""
+    },
+    {
+      "side": "cartridge",
+      "symbol": "S",
+      "quantity": "length",
+      "value": 77.66
+    },
+    {
+      "side": "cartridge",
+      "symbol": "H1",
+      "quantity": "length",
+      "value": 11.85,
+      "basic": true
+    },
+    {
+      "side": "cartridge",
+      "symbol": "H2",
+      "quantity": "length",
+      "value": 11.85,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "G1",
+      "quantity": "length",
+      "value": 11.4,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L3+G",
+      "quantity": "length",
+      "value": 87.85,
+      "footnotes": ["1"]
+    },
+    {
+      "symbol": "Pmax",
+      "quantity": "pressure",
+      "value": 2800
+    },
+    {
+      "symbol": "PK",
+      "quantity": "pressure",
+      "value": 3220
+    },
+    {
+      "symbol": "PE",
+      "quantity": "pressure",
+      "value": 3500
+    },
+    {
+      "symbol": "M",
+      "quantity": "length",
+      "value": 25
+    },
+    {
+      "symbol": "EE",
+      "quantity": "energy",
+      "value": 2730
+    },
+    {
+      "side": "cartridge",
+      "symbol": "Fe",
+      "quantity": "length",
+      "value": 0.15,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "L1",
+      "quantity": "length",
+      "value": 36.4,
+      "basic": true
+    },
+    {
+      "side": "chamber",
+      "symbol": "L2",
+      "quantity": "length",
+      "value": 40,
+      "basic": true
+    },
+    {
+      "side": "chamber",
+      "symbol": "L3",
+      "quantity": "length",
+      "value": 60.8,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "R",
+      "quantity": "length",
+      "value": 2.4,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "R1",
+      "quantity": "length",
+      "value": 15.05
+    },
+    {
+      "side": "chamber",
+      "symbol": "P1",
+      "quantity": "length",
+      "value": 13.13,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "P2",
+      "quantity": "length",
+      "value": 13.03,
+      "basic": true
+    },
+    {
+      "side": "chamber",
+      "symbol": "alpha",
+      "quantity": "angle",
+      "value": 17.83888888888889,
+      "raw": "17°50'20\""
+    },
+    {
+      "side": "chamber",
+      "symbol": "S",
+      "quantity": "length",
+      "value": 77.91
+    },
+    {
+      "side": "chamber",
+      "symbol": "H1",
+      "quantity": "length",
+      "value": 11.9,
+      "basic": true
+    },
+    {
+      "side": "chamber",
+      "symbol": "H2",
+      "quantity": "length",
+      "value": 11.88,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "G1",
+      "quantity": "length",
+      "value": 11.5,
+      "basic": true,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "G",
+      "quantity": "length",
+      "value": 27.5,
+      "basic": true,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "alpha1",
+      "quantity": "angle",
+      "value": 90,
+      "raw": "90°"
+    },
+    {
+      "side": "chamber",
+      "symbol": "h",
+      "quantity": "length",
+      "value": 0.19,
+      "basic": true
+    },
+    {
+      "side": "chamber",
+      "symbol": "i",
+      "quantity": "angle",
+      "value": 0.5766666666666667,
+      "raw": "0°34'36\"",
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "F",
+      "quantity": "length",
+      "value": 10.95,
+      "basic": true,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "Z",
+      "quantity": "length",
+      "value": 11.5,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "b",
+      "quantity": "length",
+      "value": 5.6
+    },
+    {
+      "side": "chamber",
+      "symbol": "N",
+      "quantity": "count",
+      "value": 4
+    },
+    {
+      "side": "chamber",
+      "symbol": "u",
+      "quantity": "length",
+      "value": 550
+    },
+    {
+      "side": "chamber",
+      "symbol": "Q",
+      "quantity": "area",
+      "value": 100.62
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cip-tdcc",
+        "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/tabiical-en-page53.pdf",
+        "sha256": "eedd90fec108e54e92b1e4ddd19fc5e78046cccbc47e02492352f0e3cb3e3ef2",
+        "retrieved": "2026-10-08"
+      }
+    ]
+  }
+}

@@ -1,0 +1,1515 @@
+{
+  "id": "issf-25m-precision-50m-pistol",
+  "name": "25m Precision and 50m Pistol Target",
+  "organization": "ISSF",
+  "rings": [
+    {
+      "value": 1,
+      "diameter": {
+        "value": 500
+      }
+    },
+    {
+      "value": 2,
+      "diameter": {
+        "value": 450
+      }
+    },
+    {
+      "value": 3,
+      "diameter": {
+        "value": 400
+      }
+    },
+    {
+      "value": 4,
+      "diameter": {
+        "value": 350
+      }
+    },
+    {
+      "value": 5,
+      "diameter": {
+        "value": 300
+      }
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 250
+      }
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 200
+      }
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 150
+      }
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 100
+      }
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 50
+      }
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 25
+    },
+    "rule": "touch"
+  },
+  "blackDiameter": {
+    "value": 200,
+    "raw": "Black from 7 to 10 rings = 200mm"
+  },
+  "decimal": true,
+  "events": [
+    {
+      "name": "50m Pistol",
+      "distance": {
+        "value": 50000,
+        "raw": "50m"
+      },
+      "gauge": {
+        "value": 5.6,
+        "raw": "5.60mm"
+      },
+      "scoring": "touch"
+    },
+    {
+      "name": "25m Standard Pistol",
+      "distance": {
+        "value": 25000,
+        "raw": "25m"
+      },
+      "gauge": {
+        "value": 5.6,
+        "raw": "5.60mm"
+      },
+      "scoring": "touch"
+    },
+    {
+      "name": "25m Centre Fire Pistol (precision stage)",
+      "distance": {
+        "value": 25000,
+        "raw": "25m"
+      },
+      "gauge": {
+        "value": 9.65,
+        "raw": "9.65mm"
+      },
+      "scoring": "touch"
+    },
+    {
+      "name": "25m Pistol (precision stage)",
+      "distance": {
+        "value": 25000,
+        "raw": "25m"
+      },
+      "gauge": {
+        "value": 5.6,
+        "raw": "5.60mm"
+      },
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB 25 m Pistole Präzision",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB 25 m Standardpistole",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB 50 m Pistole",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB 25 m Zentralfeuerpistole Präzision",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB 25 m Pistole/Revolver 150 Sek. Serie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB Gewehr 100 m",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 3105 100 m Präz. Unterhebelrepetierer",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "BDS",
+      "section": "Anhang 1, Z5",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 3106 100 m Präz. DSG oK",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "BDS",
+      "section": "Anhang 1, Z5",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 3107 100 m Präz. DSG gK und Diopter",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "BDS",
+      "section": "Anhang 1, Z5",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 3109 100 m Präz. DSG Selbstlader oK",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "BDS",
+      "section": "Anhang 1, Z5",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 3110 100 m Präz. DSG Selbstlader gK+Dio",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "BDS",
+      "section": "Anhang 1, Z5",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 3112 100 m Präz. SG SL off. Vis. b. 6,4 mm",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "BDS",
+      "section": "Anhang 1, Z5",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 3113 100 m Präz. SG SL off. Vis. ü. 6,4 mm",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "BDS",
+      "section": "Anhang 1, Z5",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 3311 100 m Zeit. DSG Selbstlader off./geschl.Vis.",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "BDS",
+      "section": "Anhang 1, Z5",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 3312 100 m Zeit. SG SL off. Vis. b. 6,4 mm",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "BDS",
+      "section": "Anhang 1, Z5",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 3313 100 m Zeit. SG SL off. Vis. ü. 6,4 mm",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "BDS",
+      "section": "Anhang 1, Z5",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 3412 100 m Fertigkeit SG SL b. 6,4 mm",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "BDS",
+      "section": "Anhang 1, Z5",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 3413 100 m Fertigkeit SG SL ü. 6,4 mm",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "BDS",
+      "section": "Anhang 1, Z5",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 10xx 25 m Schießen, Teil Präzision",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDS",
+      "section": "Anhang 1, Z9",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 3212 100 m Intervall SG SL off. Vis. HL u. 47 mm",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "BDS",
+      "section": "L 13.02, Z5",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 3213 100 m Intervall SG SL off. Vis. HL mind. 47 mm",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "BDS",
+      "section": "L 13.02, Z5",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP DG 1 Dienstgewehr 1",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.1 and D.6.11, D.6.13 (Teil B, PDF p. 8; Teil D, PDF p. 31)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP DG 3 National Rifle Match - A, 100 m",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.1 and D.8.9, D.8.10 (Teil B, PDF p. 8; Teil D, PDF pp. 35, 36)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP DG 4 National Rifle Match - B, 100 m",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.1 and D.9.8, D.9.9 (Teil B, PDF p. 8; Teil D, PDF p. 39)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP PVDG 1 Perkussions-Vorderlader-DG 1",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.1 and E.1.11, E.1.12 (Teil B, PDF p. 8; Teil E, PDF p. 8)",
+      "scoring": "centre"
+    },
+    {
+      "name": "BDMP PHDG 1 Perkussions-Hinterlader-DG 1",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.1 and E.2.11, E.2.12 (Teil B, PDF p. 8; Teil E, PDF p. 10)",
+      "scoring": "centre"
+    },
+    {
+      "name": "BDMP PFG 1 Perkussions-Freigewehr 1",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.1 and E.4.10, E.4.11 (Teil B, PDF p. 8; Teil E, PDF p. 14)",
+      "scoring": "centre"
+    },
+    {
+      "name": "BDMP SPPDG 1 Schwarzpulverpatronen-DG 1",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.1 and E.7.11 (Teil B, PDF p. 8; Teil E, PDF p. 24)",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSU LEM 2 Einzellader Matchgewehr 100 m",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "DSU",
+      "section": "Kapitel 1, DSU-Scheibe UIT Präzision (Seite 17); Kapitel 3 (PDF p. 60)",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSU SVPG 1 Vorderlader-Perkussionsscheibengewehr 50 m",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "organization": "DSU",
+      "section": "Kapitel 4 (PDF p. 124); Kapitel 9 (PDF p. 233)",
+      "scoring": "centre"
+    },
+    {
+      "name": "DSU SVOG Vorderlader-Ordonanzgewehr 100 m",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "DSU",
+      "section": "Kapitel 4 (PDF p. 124); Kapitel 9 (PDF p. 233)",
+      "scoring": "centre"
+    },
+    {
+      "name": "DSU SVFG Vorderlader-Freigewehr 100 m",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "DSU",
+      "section": "Kapitel 4 (PDF p. 124); Kapitel 9 (PDF p. 233)",
+      "scoring": "centre"
+    },
+    {
+      "name": "DSU SVSG 1 Vorderlader-Steinschlossgewehr 50 m",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "organization": "DSU",
+      "section": "Kapitel 4 (PDF p. 124); Kapitel 9 (PDF p. 233)",
+      "scoring": "centre"
+    },
+    {
+      "name": "DSU SVSG 2 Vorderlader-Steinschlossgewehr 100 m",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "DSU",
+      "section": "Kapitel 4 (PDF p. 124); Kapitel 9 (PDF p. 233)",
+      "scoring": "centre"
+    },
+    {
+      "name": "DSU SHG Schwarzpulver-Hinterladergewehr 50 m",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "organization": "DSU",
+      "section": "Kapitel 4 (PDF p. 124); Kapitel 9 (PDF p. 233)",
+      "scoring": "centre"
+    },
+    {
+      "name": "VdRBw P-D 1 Halbautomatische Dienstpistole Präzision",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "VdRBw",
+      "section": "8.2.5, 8.2.6 (Scheibe 10.3)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw R-D 1 Dienstrevolver Präzision",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "VdRBw",
+      "section": "8.3.5, 8.3.6 (Scheibe 10.3)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw PR-D 1 Halbautomatische Dienstpistole / -revolver Dreistellung",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "VdRBw",
+      "section": "8.4.5, 8.4.6 (Scheibe 10.3)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw P-G 1 Halbautomatische Großkaliberpistole Präzision",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "VdRBw",
+      "section": "8.5.5, 8.5.6 (Scheibe 10.3)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw R-G 1 Großkaliberrevolver Präzision",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "VdRBw",
+      "section": "8.6.5, 8.6.6 (Scheibe 10.3)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw P-K 1 Halbautomatische KK-Pistole Präzision",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "VdRBw",
+      "section": "8.8.5, 8.8.6 (Scheibe 10.3)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw R-K 1 KK-Revolver Präzision",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "VdRBw",
+      "section": "8.9.5, 8.9.6 (Scheibe 10.3)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw P-R 1 Halbautomatische Pistole / Revolver Präzision",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "VdRBw",
+      "section": "8.11.5, 8.11.6 (Scheibe 10.3)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw G-R 1 Repetiergewehr",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "VdRBw",
+      "section": "9.4.4, 9.4.5 (Scheibe 10.1 or 10.3, 50 cm)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw G-H 1 Halbautomatisches Gewehr",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "VdRBw",
+      "section": "9.5.4, 9.5.5 (Scheibe 10.1 or 10.3, 50 cm)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw G-H 2 Halbautomatisches Gewehr",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "VdRBw",
+      "section": "9.6.4, 9.6.5 (Scheibe 10.1 or 10.3, 50 cm)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw G-H 3 Halbautomatisches Gewehr",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "VdRBw",
+      "section": "9.7.4, 9.7.5 (Scheibe 10.3, 50 cm)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw G-RZF 1 Repetier-Zielfernrohrgewehr",
+      "distance": {
+        "value": 300000,
+        "raw": "300 m"
+      },
+      "organization": "VdRBw",
+      "section": "9.9.4, 9.9.5 (Scheibe 10.1 or 10.3, 50 cm)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw G-HZF 1 Halbautomatisches Zielfernrohrgewehr",
+      "distance": {
+        "value": 300000,
+        "raw": "300 m"
+      },
+      "organization": "VdRBw",
+      "section": "9.10.4, 9.10.5 (Scheibe 10.1 or 10.3, 50 cm)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP DP 1 Dienstpistole 1",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.1 and C.3.5, C.3.6 (Teil B, PDF p. 8; Teil C, PDF p. 10)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP DP 2 Dienstpistole 2",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.1 and C.4.5, C.4.6 (Teil B, PDF p. 8; Teil C, PDF p. 13)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP DP 3 Dienstpistole 3",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.1 and C.5.5, C.5.6 (Teil B, PDF p. 8; Teil C, PDF p. 15)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP DP 3 Mod. C.K. Dienstpistole 3 Modifikation Carbine Kit",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDMP",
+      "section": "C.5A.6, C.5A.7 (Teil C, PDF p. 17)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP SAR 1 Single Action Revolver 1",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.1 and C.10.5, C.10.6 (Teil B, PDF p. 8; Teil C, PDF p. 72)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP SAR 2 Single Action Revolver 2",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.1 and C.11.5, C.11.6 (Teil B, PDF p. 8; Teil C, PDF p. 74)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP DR 1 Dienstrevolver 1",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.1 and C.12.5, C.12.6 (Teil B, PDF p. 8; Teil C, PDF p. 76)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP SP 1 Sportpistole 1",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.1 and C.13.5, C.13.6 (Teil B, PDF p. 8; Teil C, PDF p. 79)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP SP 2 Sportpistole 2",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.1 and C.13A.5, C.13A.6 (Teil B, PDF p. 8; Teil C, PDF p. 81)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP SP3 Sportpistole 3 Präzision",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.1 and C.13B.5, C.13B.6 (Teil B, PDF p. 8; Teil C, PDF p. 82)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP SP4 Sportpistole 4 Präzision",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.1 and C.13C.5, C.13C.6 (Teil B, PDF p. 8; Teil C, PDF p. 85)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP KK-Pist./Rev. Kleinkaliber Kurzwaffe Präzision",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.1 and C.16.10, C.16.12 (Teil B, PDF p. 8; Teil C, PDF p. 114)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP LAR 1 Lever Action Rifle 1",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "BDMP",
+      "section": "D.15.12, D.15.13 (Teil D, PDF p. 88)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP LAR 2 Lever Action Rifle 2, 25 m",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDMP",
+      "section": "D.16.10, D.16.11 (Teil D, PDF p. 92)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP LAR 2 Lever Action Rifle 2, 50 m",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "organization": "BDMP",
+      "section": "D.16.10, D.16.11 (Teil D, PDF p. 92)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP PFG 2 Perkussions-Freigewehr 2",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "BDMP",
+      "section": "E.5.10, E.5.11 (Teil E, PDF p. 16)",
+      "scoring": "centre"
+    },
+    {
+      "name": "BDMP VDR 1 Vorderlader-Dienstrevolver 1",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.1 and E.8.5, E.8.6 (Teil B, PDF p. 8; Teil E, PDF p. 25)",
+      "scoring": "centre"
+    },
+    {
+      "name": "BDMP VDR 2 Vorderlader-Dienstrevolver 2",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.1 and E.9.5, E.9.6 (Teil B, PDF p. 8; Teil E, PDF p. 27)",
+      "scoring": "centre"
+    },
+    {
+      "name": "BDMP VP 1 Vorderladerpistole 1",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDMP",
+      "section": "E.10.5, E.10.6 (Teil E, PDF p. 29)",
+      "scoring": "centre"
+    },
+    {
+      "name": "BDMP SDP 1 Steinschloss-Dienstpistole 1",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.1 and E.12.7, E.12.8 (Teil B, PDF p. 8; Teil E, PDF p. 34)",
+      "scoring": "centre"
+    },
+    {
+      "name": "BDMP SDP 2 Steinschloss-Dienstpistole 2",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.1 and E.13.7, E.13.8 (Teil B, PDF p. 8; Teil E, PDF p. 36)",
+      "scoring": "centre"
+    },
+    {
+      "name": "BDMP LRSPFG LR Schwarzpulverfreigewehr, 100 m",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "BDMP",
+      "section": "E.6.8 (Teil E, PDF p. 18)",
+      "scoring": "centre"
+    },
+    {
+      "name": "BDMP ZFSPFG ZF Schwarzpulverfreigewehr, 100 m",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "BDMP",
+      "section": "E.14.8 (Teil E, PDF p. 38)",
+      "scoring": "centre"
+    },
+    {
+      "name": "BDS 2801 25 m Kombi SG SL KW off. Vis., Teil Intervall/Zeitserie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDS",
+      "section": "L 7.02, Z9",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 2802 25 m Kombi SG SL KK opt. Vis., Teil Intervall/Zeitserie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDS",
+      "section": "L 7.02, Z9",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 2803 25 m Kombi RB KW off. Vis., Teil Intervall/Zeitserie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDS",
+      "section": "L 7.02, Z9",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 2804 25 m Kombi RB KK off. Vis., Teil Intervall/Zeitserie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDS",
+      "section": "L 7.02, Z9",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 2810 25 m Kombi SG SL KW opt. Vis., Teil Intervall/Zeitserie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDS",
+      "section": "L 7.02, Z9",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 2811 25 m Kombi RB KW opt. Vis., Teil Intervall/Zeitserie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDS",
+      "section": "L 7.02, Z9",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 2812 25 m Kombi SG SL KK off. Vis., Teil Intervall/Zeitserie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDS",
+      "section": "L 7.02, Z9",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 2814 25 m Kombi RB KK bel. Vis., Teil Intervall/Zeitserie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDS",
+      "section": "L 7.02, Z9",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB 25 m Pistole Nachwuchs Präzision",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB 50 m Pistole Auflage",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB 25 m Sportpistole Auflage Präzision",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB 25 m Großkaliberpistole .30 150 Sek. Serie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB 25 m Großkaliberpistole .32 150 Sek. Serie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB 25 m Großkaliberpistole .38 150 Sek. Serie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB 25 m Großkaliberpistole 10 mm 150 Sek. Serie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB 25 m Großkaliberrevolver .41 150 Sek. Serie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB Perkussionsgewehr 50 m",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4",
+      "scoring": "centre"
+    },
+    {
+      "name": "DSB Perkussionsgewehr 50 m - Auflage",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4",
+      "scoring": "centre"
+    },
+    {
+      "name": "DSB Perkussionsfreigewehr 100 m",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4",
+      "scoring": "centre"
+    },
+    {
+      "name": "DSB Perkussionsdienstgewehr 100 m",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4",
+      "scoring": "centre"
+    },
+    {
+      "name": "DSB Perkussionsdienstgewehr 50 m",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4",
+      "scoring": "centre"
+    },
+    {
+      "name": "DSB Steinschlossgewehr 50 m",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4",
+      "scoring": "centre"
+    },
+    {
+      "name": "DSB Steinschlossgewehr 100 m",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4",
+      "scoring": "centre"
+    },
+    {
+      "name": "DSB 25 m Perkussionsrevolver",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4",
+      "scoring": "centre"
+    },
+    {
+      "name": "DSB 25 m Perkussionspistole",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4",
+      "scoring": "centre"
+    },
+    {
+      "name": "DSB 25 m Perkussionspistole - Auflage",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4",
+      "scoring": "centre"
+    },
+    {
+      "name": "DSB 25 m Steinschlosspistole",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4",
+      "scoring": "centre"
+    },
+    {
+      "name": "DSB 25 m Luntenschlosspistole",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4",
+      "scoring": "centre"
+    },
+    {
+      "name": "DSU SVPP Perkussionspistole 25 m",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSU",
+      "section": "Kapitel 4 (PDF p. 124); Kapitel 9 (PDF p. 233)",
+      "scoring": "centre"
+    },
+    {
+      "name": "DSU SVPR 1 Perkussionsrevolver gR 25 m",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSU",
+      "section": "Kapitel 4 (PDF p. 124); Kapitel 9 (PDF p. 233)",
+      "scoring": "centre"
+    },
+    {
+      "name": "DSU SVPR 2 Perkussionsrevolver oR 25 m",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSU",
+      "section": "Kapitel 4 (PDF p. 124); Kapitel 9 (PDF p. 233)",
+      "scoring": "centre"
+    },
+    {
+      "name": "DSU SVSP Steinschlosspistole 25 m",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSU",
+      "section": "Kapitel 4 (PDF p. 124); Kapitel 9 (PDF p. 233)",
+      "scoring": "centre"
+    },
+    {
+      "name": "DSU SHKE 1 Schwarzpulver Klassisches Einzelladergewehr, geschlossene Visierung 100 m",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "DSU",
+      "section": "Kapitel 4 (PDF p. 124); Kapitel 9 (PDF p. 233)",
+      "scoring": "centre"
+    },
+    {
+      "name": "DSB Unterhebelrepetierer 50 m",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "scoring": "touch",
+      "organization": "DSB",
+      "section": "0.21 Scheibe Nr. 4 (rows 1.56, 1.57); 1.7.4",
+      "category": "lever-action"
+    },
+    {
+      "name": "DSB Ordonnanzgewehr 100 m",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "scoring": "centre",
+      "organization": "DSB",
+      "section": "0.21 Scheibe Nr. 4 (rows 1.58 O, 1.58 G); 1.8.5",
+      "category": "service-rifle"
+    },
+    {
+      "name": "DSB Gewehr 100 m GK",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "gauge": {
+        "value": 8,
+        "raw": "8,00 mm Gewehr Kaliber > .22 lfb"
+      },
+      "scoring": "touch",
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 4; 0.11.3.2"
+    },
+    {
+      "name": "DSB Luntenschlossgewehr 50 m",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "scoring": "centre",
+      "organization": "DSB",
+      "section": "0.21 Scheibe Nr. 4 (row 7.32)"
+    }
+  ],
+  "numerals": true,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "issf-rules-2025-third-print",
+        "fields": ["name", "rings", "innerTen.diameter", "blackDiameter", "numerals"],
+        "page": "Rule 6.3.4.5, p. 199 (PDF p. 199)"
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 3.3.1, p. 39 (PDF p. 39)",
+        "fields": ["events.name", "events.distance"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rules 6.3.3.1 to 6.3.3.3, pp. 194 to 195 (PDF pp. 194 to 195)",
+        "fields": ["decimal"],
+        "note": "Tenth-ring values where electronic targets or scoring machines are used, else whole rings."
+      },
+      {
+        "source": "issf-paper-target-scoring-2022",
+        "fields": ["events.gauge", "events.scoring", "innerTen.rule"],
+        "page": "Rules 1.4.1 and 1.4.3, p. 321 (PDF p. 2); rule 5.2.1, p. 330 (PDF p. 11)"
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "0.20 Scheibe Nr. 4, Teil 0 Seite 65 (PDF p. 83)"
+      },
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "Anhang 1 (printed Z-22 to Z-24, PDF pp. 23 to 25), Zielscheibe Z5, Z9"
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "B.11.1 (Register 7 Teil B, 8 von 70, PDF p. 8)"
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "D.6.11, D.6.13 (Teil D, PDF p. 31); D.8.9, D.8.10 (Teil D, PDF pp. 35, 36); D.9.8, D.9.9 (Teil D, PDF p. 39)"
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "E.1.11, E.1.12 (Teil E, PDF p. 8); E.2.11, E.2.12 (Teil E, PDF p. 10); E.4.10, E.4.11 (Teil E, PDF p. 14); E.7.11 (Teil E, PDF p. 24)"
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "fields": [
+          "events.name",
+          "events.distance",
+          "events.organization",
+          "events.section",
+          "events.scoring"
+        ],
+        "page": "Kapitel 1, DSU-Scheibe UIT Präzision (Seite 17, PDF p. 19); Kapitel 1, Auswertung der Scheiben (Seite 27, PDF p. 29); Kapitel 3 (PDF p. 60); Kapitel 4 (PDF p. 124); Besondere Auswertungsregeln (PDF p. 126); Kapitel 9 (PDF p. 233)"
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "10.3 (Seite 98, PDF p. 98); 8.2 to 8.11, 9.2 to 9.10 (sections named in the events)"
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 13.02 (Seite L-74, PDF p. 74), Zielscheibe Z5",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.1 (Teil B, PDF p. 8)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.3.5, C.3.6 (Teil C, PDF p. 10)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.4.5, C.4.6 (Teil C, PDF p. 13)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.5.5, C.5.6 (Teil C, PDF p. 15)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.5A.6, C.5A.7 (Teil C, PDF p. 17)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.10.5, C.10.6 (Teil C, PDF p. 72)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.11.5, C.11.6 (Teil C, PDF p. 74)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.12.5, C.12.6 (Teil C, PDF p. 76)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13.5, C.13.6 (Teil C, PDF p. 79)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13A.5, C.13A.6 (Teil C, PDF p. 81)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13B.5, C.13B.6 (Teil C, PDF p. 82)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13C.5, C.13C.6 (Teil C, PDF p. 85)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.16.10, C.16.12 (Teil C, PDF p. 114)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.15.12, D.15.13 (Teil D, PDF p. 88)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16.10, D.16.11 (Teil D, PDF p. 92)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.5.10, E.5.11 (Teil E, PDF p. 16)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-6",
+        "page": "A.3.21.4.1 (Teil A, PDF p. 15)",
+        "fields": ["events.scoring"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.8.5, E.8.6 (Teil E, PDF p. 25)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.9.5, E.9.6 (Teil E, PDF p. 27)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.10.5, E.10.6 (Teil E, PDF p. 29)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.12.7, E.12.8 (Teil E, PDF p. 34)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.13.7, E.13.8 (Teil E, PDF p. 36)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.6.8 (Teil E, PDF p. 18)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.14.8 (Teil E, PDF p. 38)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "L 7.02, Seite L-39 and L-40, PDF pp. 39 and 40; L 7.04, Seite L-41, PDF p. 41"
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "0.20 Scheibe Nr. 4 (Teil 0 Seite 65, PDF p. 83); rows of 0.21 (Teil 0 Seite 80 to 89, PDF pp. 98 to 107)"
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "fields": ["events.scoring"],
+        "page": "7.7.5, Teil 7 Seite 8, PDF p. 344"
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "fields": [
+          "events.name",
+          "events.distance",
+          "events.organization",
+          "events.section",
+          "events.scoring"
+        ],
+        "page": "Kapitel 4: SVPP Seite 6 (PDF p. 128), SVPR 1 Seite 7 (PDF p. 129), SVPR 2 Seite 8 (PDF p. 130), SVSP Seite 9 (PDF p. 131), SHKE 1 Seite 19 (PDF p. 141); Besondere Auswertungsregeln (PDF p. 126); Kapitel 9 (PDF p. 233)"
+      },
+      {
+        "source": "bds-sporthandbuch-allgemein-2026",
+        "fields": ["events.scoring"],
+        "page": "A 9.02, Seite A-22, PDF p. 22"
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "Nr. 519 (Seite 24, PDF p. 24)",
+        "fields": ["events.scoring"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-6",
+        "page": "A.3.21.1.3, Teil A, Seite 14 von 32, PDF p. 14",
+        "fields": ["events.scoring"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.21, Teil 0 Seite 78, PDF p. 96 (rows 1.56 to 1.58); 1.7.4, Teil 1 Seite 14, PDF p. 126",
+        "fields": [
+          "events.name",
+          "events.distance",
+          "events.organization",
+          "events.section",
+          "events.category"
+        ]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "1.7.7, Teil 1 Seite 15, PDF p. 127; 0.11.3, Teil 0 Seite 39, PDF p. 57",
+        "fields": ["events.scoring"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "1.8.5, Teil 1 Seite 17, PDF p. 129; 0.11.3, Teil 0 Seite 39, PDF p. 57",
+        "fields": ["events.scoring"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.20 Scheibe Nr. 4, Teil 0 Seite 65 (PDF p. 83); 0.11.3.2, Teil 0 Seite 40 (PDF p. 58)",
+        "fields": [
+          "events.name",
+          "events.distance",
+          "events.organization",
+          "events.section",
+          "events.gauge"
+        ]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.11.3, Teil 0 Seite 39, PDF p. 57",
+        "fields": ["events.scoring"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.21, Teil 0 Seite 89, PDF p. 107 (row 7.32)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "7.7.5, Teil 7 Seite 8, PDF p. 344",
+        "fields": ["events.scoring"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.11.3, Teil 0 Seite 39, PDF p. 57",
+        "fields": ["events.scoring"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 1, Auswertung der Scheiben, Seite 27, PDF p. 29",
+        "fields": ["events.scoring"]
+      }
+    ]
+  }
+}

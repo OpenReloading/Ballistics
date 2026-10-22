@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# AI review of pull requests (CodeRabbit OSS plan, apps/docs/docs/ci-tools.md). Below 10 stars a review starts
+# with the comment `@coderabbitai review`.
+language: en-US
+reviews:
+  profile: chill
+  high_level_summary: true
+  poem: false
+  path_filters:
+    - '!packages/data/records/**'
+    - '!**/*-snapshots/**'
+    - '!**/__snapshots__/**'
+    - '!apps/web/test/golden/**'
+    - '!packages/api/openapi.baseline.json'
+    - '!package-lock.json'
+  path_instructions:
+    - path: '**'
+      instructions: >-
+        Follow AGENTS.md. Results are simulations, not load data: flag any wording that calls a load
+        or result safe.

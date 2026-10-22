@@ -1,0 +1,233 @@
+{
+  "id": "8-mm-blanc",
+  "name": "8 mm Blanc",
+  "table": "VIII",
+  "country": "Germany",
+  "published": "1991-07-29",
+  "revised": "2008-09-23",
+  "pressureMethod": "transducer",
+  "verification": "unverified",
+  "values": [
+    {
+      "side": "cartridge",
+      "symbol": "L1",
+      "quantity": "length",
+      "value": 20,
+      "basic": true
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L2",
+      "quantity": "length",
+      "value": 20,
+      "basic": true
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L3",
+      "quantity": "length",
+      "value": 20.3,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L6",
+      "quantity": "length",
+      "value": 20.6,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "R",
+      "quantity": "length",
+      "value": 1.27
+    },
+    {
+      "side": "cartridge",
+      "symbol": "R1",
+      "quantity": "length",
+      "value": 8
+    },
+    {
+      "side": "cartridge",
+      "symbol": "E",
+      "quantity": "length",
+      "value": 3.33
+    },
+    {
+      "side": "cartridge",
+      "symbol": "E1",
+      "quantity": "length",
+      "value": 6.55
+    },
+    {
+      "side": "cartridge",
+      "symbol": "e",
+      "quantity": "length",
+      "value": 0.8,
+      "limit": "min"
+    },
+    {
+      "side": "cartridge",
+      "symbol": "delta",
+      "quantity": "angle",
+      "value": 30,
+      "raw": "30°"
+    },
+    {
+      "side": "cartridge",
+      "symbol": "f",
+      "quantity": "length",
+      "value": 0.2
+    },
+    {
+      "side": "cartridge",
+      "symbol": "beta",
+      "quantity": "angle",
+      "value": 45,
+      "raw": "45°"
+    },
+    {
+      "side": "cartridge",
+      "symbol": "P1",
+      "quantity": "length",
+      "value": 8
+    },
+    {
+      "side": "cartridge",
+      "symbol": "H2",
+      "quantity": "length",
+      "value": 8,
+      "footnotes": ["1"]
+    },
+    {
+      "symbol": "Pmax",
+      "quantity": "pressure",
+      "value": 450
+    },
+    {
+      "symbol": "PK",
+      "quantity": "pressure",
+      "value": 518
+    },
+    {
+      "symbol": "PE",
+      "quantity": "pressure",
+      "value": 585
+    },
+    {
+      "symbol": "M",
+      "quantity": "length",
+      "value": 7
+    },
+    {
+      "side": "chamber",
+      "symbol": "L3",
+      "quantity": "length",
+      "value": 19.2,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "P1",
+      "quantity": "length",
+      "value": 8.02,
+      "tolerance": {
+        "upper": 0.25
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "H2",
+      "quantity": "length",
+      "value": 8.02,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "G1",
+      "quantity": "length",
+      "value": 6,
+      "basic": true,
+      "footnotes": ["2"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "G",
+      "quantity": "length",
+      "value": 10.85,
+      "basic": true,
+      "footnotes": ["2"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "alpha1",
+      "quantity": "angle",
+      "value": 90,
+      "raw": "90°"
+    },
+    {
+      "side": "chamber",
+      "symbol": "h",
+      "quantity": "length",
+      "value": 1.01
+    },
+    {
+      "side": "chamber",
+      "symbol": "s",
+      "quantity": "length",
+      "value": 10,
+      "basic": true
+    },
+    {
+      "side": "chamber",
+      "symbol": "i",
+      "quantity": "angle",
+      "value": 45,
+      "raw": "45°"
+    },
+    {
+      "side": "chamber",
+      "symbol": "F",
+      "quantity": "length",
+      "value": 4.3,
+      "basic": true,
+      "footnotes": ["2"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "Z",
+      "quantity": "length",
+      "value": 4.3
+    },
+    {
+      "side": "chamber",
+      "symbol": "Q",
+      "quantity": "area",
+      "value": 14.52,
+      "footnotes": ["2"]
+    }
+  ],
+  "exceptions": [
+    {
+      "finding": "length-order:L1-L2",
+      "note": "Present on the official CIP sheet at import; not yet checked by hand."
+    },
+    {
+      "finding": "case-fits-chamber",
+      "note": "Present on the official CIP sheet at import; not yet checked by hand."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cip-tdcc",
+        "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-viii/tabviiical-en-page6.pdf",
+        "sha256": "e8f862234b480c54ac9b653ae6a7301c12955f24e5a85deb3770221a2de4bbba",
+        "retrieved": "2026-10-08"
+      }
+    ]
+  }
+}

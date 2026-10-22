@@ -1,0 +1,27 @@
+{
+  "id": "bdmp-sports-carbine-zg",
+  "federation": "bdmp",
+  "name": "Sports Carbine ZG",
+  "section": "D.29",
+  "page": "Teil D, Seite 258 bis 259 von 294, PDF pp. 258 to 259",
+  "distance": {
+    "value": 50000,
+    "raw": "50 m"
+  },
+  "category": "rifle",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.29, D.29.1, Teil D, Seite 258 von 294, PDF p. 258",
+        "fields": ["name", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.29.12, Teil D, Seite 259 von 294, PDF p. 259",
+        "fields": ["distance"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,303 @@
+---
+title: Hole detection
+description: Bullet hole proposals on a target photo from a colour axis, a multi-scale blob detector, a top-hat shape test and a count per connected part.
+---
+
+# Hole detection
+
+Hole detection proposes bullet holes on a target photo, inside a region or the printed face found on the photo:
+
+1. A colour axis separates the colour seen through a hole from its surroundings.
+2. A scale-normalised Hessian detector finds blobs on the projection onto that axis, at scales tied to the expected hole diameter.
+3. A top-hat against a morphological opening gives the hole shape. Three tests keep the real peaks.
+4. Each connected part of the hole mask counts as many shots as it holds peaks.
+
+The proposals stay apart from the shots until the user accepts them. The code is in `apps/web/src/lib/hole-detection.ts` and `apps/web/src/lib/hole-proposals.ts`.
+
+Cancelling detection, changing the photo, sheet or group, or rotating the photo invalidates pending photo and face reads. Their results and errors cannot start a worker, apply a face or change the detection status.
+
+## Equations
+
+### Working image
+
+The expected hole diameter in photo pixels is the bullet diameter (or a typed or learned hole size) times the local photo scale and the visible-hole factor $h$:
+
+$$
+D_\mathrm{px} = d_b \, k_\mathrm{px}\, h
+$$
+
+Code: `apps/web/src/lib/hole-detection.ts`, `validateInput` (`holePx`), `prepare`.
+
+The region with a margin of $3 D_\mathrm{px}$ is averaged over square blocks of $b$ pixels, so a hole is about 16 working pixels across and the working image holds at most $2 \times 10^6$ pixels:
+
+$$
+b = \max\left(1,\, \operatorname{round}\frac{D_\mathrm{px}}{16},\, \left\lceil \sqrt{\frac{W H}{2 \times 10^6}} \right\rceil\right), \qquad D = \frac{D_\mathrm{px}}{b} \ge 4
+$$
+
+Code: `apps/web/src/lib/hole-detection.ts`, `workBlockSize`, `WORK_DIAMETER`, `MAX_WORK_PIXELS`.
+
+Each block holds the logarithm of its mean colour per channel $c \in \{R, G, B\}$:
+
+$$
+F_c = \ln(\bar I_c + 8)
+$$
+
+Code: `apps/web/src/lib/hole-detection.ts`, `prepare`, `blockAverageLogRgb`.
+
+The local photo scale is the mean photo length of 1 mm along the target $x$ and $y$ axes at the middle of the region, so a perspective calibration gives the scale near the holes:
+
+$$
+k_\mathrm{px} = 1000 \cdot \frac{\lvert T(q + e_x) - T(q) \rvert + \lvert T(q + e_y) - T(q) \rvert}{2}, \qquad \lvert e_x \rvert = \lvert e_y \rvert = 10^{-3}\ \text{m}
+$$
+
+Code: `apps/web/src/lib/hole-proposals.ts`, `localPxPerM`.
+
+### Colour axis
+
+The axis is Fisher's linear discriminant of the hole against the ring around it, in log RGB. The hole colour $\mu$ is the mean of the disc of radius $0.4 D$ at the picked hole ($0.28 D$ while the size is not known yet: $0.4$ times the smallest size $0.7 D$), or the logarithm of a backing colour the user picked. The surroundings are the pixels from $1.0 D$ to $2.4 D$ around the pick on the same kind of surface (black area or paper), or a sample of the region. With their per-channel median $m$ and covariance $\Sigma$ (regularised on the diagonal):
+
+$$
+w = \frac{(\Sigma + \epsilon I)^{-1} (\mu - m)}{\lVert (\Sigma + \epsilon I)^{-1} (\mu - m) \rVert}, \qquad \epsilon = \frac{0.02 \operatorname{tr}\Sigma}{3} + 10^{-5}
+$$
+
+Code: `apps/web/src/lib/colour-axis.ts`, `axisOf`, `fisherAxis`. `apps/web/src/lib/hole-detection.ts`, `MIN_SEP`.
+
+The axis is refused when the separation $\Delta = w^\top (\mu - m)$ is below 0.02 (scaled by the contrast setting) or when fewer than 30 surrounding pixels are sampled.
+
+Each working pixel is projected onto the axis, with the surroundings at 64 and a hole as separated as the picked one at 192:
+
+$$
+P = \operatorname{clamp}\left(64 + 128\, \frac{w^\top F - w^\top m}{\Delta},\, 0,\, 255\right)
+$$
+
+Code: `apps/web/src/lib/colour-axis.ts`, `project`.
+
+### Blob response
+
+Three passes of a box filter of radius $r$ approximate a Gaussian of standard deviation
+
+$$
+\sigma = \sqrt{\frac{(2r + 1)^2 - 1}{4}}
+$$
+
+Code: `apps/web/src/lib/blob-detector.ts`, `sigmaOf`, `radiiOf`.
+
+The scales are $\sigma = f D$, with $f \in \{0.12, 0.17, 0.24, 0.34\}$ to find peaks plus $0.48$ to size holes, each realised by the nearest whole box radius of at least 1 (repeats dropped). The Hessian of the smoothed image $B$ comes from central differences. The scale-normalised response keeps blobs brighter than their surroundings in both directions. A ring line, with one eigenvalue near 0, gives none:
+
+$$
+\lambda_\mathrm{max} = \frac{L_{xx} + L_{yy}}{2} + \sqrt{\left(\frac{L_{xx} - L_{yy}}{2}\right)^2 + L_{xy}^2}, \qquad \mathcal{R} = \begin{cases} -\sigma^2 \lambda_\mathrm{max} & \lambda_\mathrm{max} \lt 0 \\ 0 & \text{otherwise} \end{cases}
+$$
+
+Code: `apps/web/src/lib/blob-detector.ts`, `response`, `space`.
+
+Peaks are local maxima over space of the largest response over the scales, one per $0.8 D$, placed to sub-pixel by a parabola through the neighbours. A disc of radius $\rho$ gives its strongest response at $\sigma = \rho / \sqrt 2$, so the hole diameter at a peak is
+
+$$
+D_\mathrm{hole} = 2\sqrt{2}\, \sigma^\ast
+$$
+
+Code: `apps/web/src/lib/blob-detector.ts`, `peaksOf`, `sigmaAt`. `apps/web/src/lib/hole-detection.ts`, `D_OVER_SIGMA`.
+
+with $\sigma^\ast$ the scale of the strongest response, refined by a parabola in $\ln\sigma$ through the neighbouring scales.
+
+### Hole shape and tests
+
+The top-hat is the projection blurred by a box of radius 1 ($P_\mathrm{s}$) minus its opening by a square of side about $2D$, computed on a copy shrunk by 2:
+
+$$
+\mathrm{hat} = P_\mathrm{s} - (P_\mathrm{s} \ominus Q) \oplus Q
+$$
+
+Code: `apps/web/src/lib/hole-detection.ts`, `pipeline` (`topHat`). `apps/web/src/lib/raster-ops.ts`, `open`, `morph`, `minMax`.
+
+with erosion $\ominus$ and dilation $\oplus$ by the square $Q$, each a running minimum or maximum with three comparisons per pixel whatever the size.
+
+With the median response $r_5$ and the median top-hat contrast $c_5$ (mean over $0.25 D$) of the five strongest peaks, the hole mask and the tests on a peak are
+
+$$
+\mathrm{mask} = \mathrm{hat} \gt 0.35\, c_5, \qquad \mathcal{R} \ge \kappa\, r_5, \qquad \sqrt{\max_{0.3 D} \delta^2} \ge 0.2 D, \qquad \frac{A_\mathrm{mask}(0.5 D)}{A(0.5 D)} \ge 0.3
+$$
+
+Code: `apps/web/src/lib/hole-detection.ts`, `pipeline` (`testPeaks`, `threshold`, `standsOut`), `KEEP`, `INSCRIBED`, `FILL`, `HAT`, `FLOOR`. `apps/web/src/lib/raster-ops.ts`, `distanceSquared`.
+
+with:
+
+- $\kappa = 0.35$ at the default contrast setting
+- $\delta$ the inscribed radius: Euclidean distance of a mask pixel to the nearest pixel outside the mask
+- the last ratio: filled share of the disc of radius $0.5 D$
+
+Only peaks with a top-hat contrast of at least 40 count.
+
+### Count per part
+
+The kept peaks of one 8-connected part of the mask are its shots, each with the diameter of a disc of the part's area $A$ shared by its $k$ peaks. A part with more area than its peaks explain is print and is dropped:
+
+$$
+D_\mathrm{part} = \sqrt{\frac{4 A}{\pi k}}, \qquad D_\mathrm{part} \gt 3 D \Rightarrow \text{dropped}, \qquad \text{confidence} = \operatorname{clamp}\left(\frac{\mathcal{R}}{r_5}, 0, 1\right)
+$$
+
+Code: `apps/web/src/lib/hole-detection.ts`, `pipeline`, `shotsFromParts`, `MAX_PART`. `apps/web/src/lib/raster-ops.ts`, `components`.
+
+### Hole size
+
+From a picked hole, the size is the hole diameter at the strongest wide-scale peak within $D$ of the pick, clamped to 0.7 to 1.4 of the expected size. The median diameter of the five strongest kept peaks then refines it once, when it differs by more than 12 %:
+
+$$
+D' = \operatorname{clamp}\left(\operatorname{median}_{5} D_\mathrm{hole},\, 0.7 D_0,\, 1.4 D_0\right)
+$$
+
+Code: `apps/web/src/lib/hole-detection.ts`, `estimateHoleSize`, `pickedSize`, `estimateSize`, `SIZE_MIN`, `SIZE_MAX`.
+
+The expected hole size, first match:
+
+$$
+D_0 = \begin{cases} D_\mathrm{typed} & \text{typed} \\ \operatorname{median}(D_\mathrm{confirmed}) & \text{at least 3 confirmed holes} \\ d_b & \text{bullet known} \\ d_\mathrm{marker} & \text{otherwise} \end{cases}
+$$
+
+Code: `apps/web/src/lib/hole-proposals.ts`, `expectedHoleSize`, `MIN_HOLES_TO_LEARN_SIZE`.
+
+An accepted proposal that is the only shot of its part keeps its measured diameter:
+
+$$
+d_\mathrm{hole} = \frac{b\, D_\mathrm{part}}{k_\mathrm{px}}
+$$
+
+Code: `apps/web/src/lib/hole-proposals.ts`, `acceptProposals`.
+
+### Strays
+
+With four or more proposals, a proposal is dropped as print, stain or background when its nearest other proposal lies farther than four times the median of these nearest distances plus two hole diameters:
+
+$$
+\min_{j \ne i} \lvert p_i - p_j \rvert \gt 4\, \operatorname{median}_k \min_{j \ne k} \lvert p_k - p_j \rvert + 2 b D
+$$
+
+Code: `apps/web/src/lib/hole-detection.ts`, `dropStrays`, `toProposals`.
+
+With a found face and no region drawn, the region is the face, and a flier on it is a shot: no proposal is dropped as a stray. A drawn region keeps the stray rule.
+
+### Print on the face
+
+A mark within half a hole of the working image's edge leaves a run: a ring line or the sheet's edge meets the photo's edge there. With a found face, these marks are print and leave it too:
+
+- a dark mark on the black area or a light one on the paper whose confidence is below 0.8;
+- the marks where the ring numerals stand, when the run or the seed runs hold three or more there. They stand on the face's axes, between two ring lines, within $\min(6\ \text{mm}, 0.3 g)$ of an axis, with $g$ the ring spacing.
+
+The face plane is found without a turn of its own, so the axes are turned by the angle $\phi$ from the nearest axis that most marks in the numeral rings share within 2 degrees, the axes repeating every quarter turn. It needs three marks at least, two of them at one radius (within 3 %) on two axes as the numerals of a ring stand, else it is 0:
+
+$$
+\phi = \arg\max_{\phi_i} \#\left\{ j : \left\lvert \phi_j - \phi_i \right\rvert_{\mathrm{mod}\ 90^\circ} \le 2^\circ \right\}
+$$
+
+Code: `apps/web/src/lib/hole-detection.ts`, `dropPrintMarks`, `numeralRoll`, `ROLL_SPREAD`, `polar`, `PRINT_CONFIDENCE`, `NUMERALS_MIN`. `apps/web/src/lib/target-face.ts`, `faceLabel`.
+
+### Target area
+
+Without a marked region or a found face, the target is the convex hull of the largest light part of the photo. The luma of blocks of about 1/256 of the longer side is split at Otsu's threshold, the bin $t$ that maximises the between-class variance:
+
+$$
+Y = 0.299 R + 0.587 G + 0.114 B, \qquad t = \arg\max_t\, \omega_0(t)\, \omega_1(t) \left(\mu_0(t) - \mu_1(t)\right)^2
+$$
+
+Code: `apps/web/src/lib/target-paper.ts`, `paperOutline`, `otsu`, `luminance`, `convexHull`.
+
+The whole photo is used when the light part covers less than a tenth of it or the class means differ by less than 40.
+
+With a found face and no marked region, the target is the face's outer ring grown by half a hole, without the parts that lie neither on its black area nor in that hull: the outer rings of a face on an insert card run past the card onto the table. A hull that leaves more than 5 % of the black area out is the lit part of a sheet in a shadow and cuts nothing.
+
+Code: `apps/web/src/lib/hole-detection.ts`, `offSheet`.
+
+### Target face
+
+The face search runs on the whole photo before a detection (`findFace`) and gives the scale, the centre and the face record:
+
+1. Black area: the grey levels on a grid of about 500 pixels on the longer side are cut at nine thresholds between their 2nd and 98th percentile. Each compact grey component is filled and fitted by a robust ellipse through its outline. A component the photo's edge cuts is fitted to its outline inside the photo only, and is kept when half of the ellipse and its centre lie in the photo. A candidate needs paper about it: at least 60 % of the points 1.1 to 1.3 times out from its ellipse that lie in the photo are lighter than its threshold, so a disc inside the black area bounded by a light ring line is no candidate.
+2. Ring lines: Hessian ridges on a crop of up to 2.8 black radii, averaged so the black area is at most about 500 pixels across (a zoomed photo's thick lines stay lines), grouped by their radius relative to the black edge, one robust ellipse per group. When the black edge's ellipse is flatter than 0.9 (a sheet seen at a slant), the outer rings are not concentric with it on the photo and their relative radii run into each other: the conic pencil of the black edge and the ring farthest from it in radius (its ratio within 6 % of the mean radii's) maps the photo onto the face's plane, and the ridges are grouped again by their radius there.
+3. Faces: a face record with `photoSearch: false` is skipped. The black edge is the face's black diameter, which fixes a scale $s$ per face. A ring found at radius $\rho_j$ matches the face ring $r_i$ when $\lvert s r_i / \rho_j - 1 \rvert \le 0.03$, closest pairs first. A face ring is expected when it lies between 0.15 and 2.9 black radii and half of its line falls inside the photo: outer rings cut off by the photo's edge or beyond an insert card do not count against a face. With $a_j$ the share of the ring's ellipse its line covers, $e_j$ that relative error, $n_\mathrm{miss}$ the face rings expected and not found and $n_\mathrm{extra}$ the rings found that match none:
+
+$$
+S = \sum_j \left(0.6 + 0.4\, a_j\right) \left(1 - \frac{e_j}{0.06}\right) - 0.3\, n_\mathrm{miss} - 0.1\, n_\mathrm{extra}
+$$
+
+Code: `apps/web/src/lib/target-face.ts`, `matchFaces`, `scoreMatch`, `shareInFrame`.
+
+4. Every face within 0.5 of the best score with at least 3 rings matched is offered. Faces whose rings the photo shows in the same ratios (an insert card shows rings shared by several faces) are a choice for the user.
+5. The plane: the pair of matched ellipses farthest apart in radius gives the face plane by the conic pencil of two concentric circles, which removes the perspective. A plane whose ellipses do not rectify to circles of the face's radii within 1.5 % of the black radius (rms) drops its worst ring and tries again.
+
+One face with at least 4 rings matched and a score of 2.5 calibrates the sheet without a question. Otherwise the editor shows what was found and opens the scale step: the user chooses the face, types the black diameter or marks a ring of known size in Calibrate.
+
+The active group takes the face for ring scoring with the event the user chose, else the event of its discipline on this face, else the face's event at the group's distance: of the federation chosen for the Discipline list, else of the organization that publishes the face, else of the one organization that shoots the face there. Otherwise the group has no event and the Discipline list stays empty: no federation is guessed (`apps/web/src/lib/face-sheet.ts`, `calibrateSheetOnFace`).
+
+Code: `apps/web/src/lib/target-face.ts`, `findFace`, `ringLines`, `ringPlane`, `matchFaces`, `scoreMatch`, `shareInFrame`, `fitFace`, `TIE`, `BLACK_PX`. `apps/web/src/lib/face-image.ts`, `blackAreas`, `blobOf`, `shareInside`, `paperAround`. `apps/web/src/lib/ellipse.ts`, `ransacEllipse`, `concentricPlane`.
+
+### Detection without a picked hole
+
+1. The log luma is rescaled from its 0.5th to its 99.8th percentile in the region. Its four strongest blobs of each polarity each seed a colour axis and a run.
+2. A run is kept when it finds at least two shots of alike size: no more than a quarter of the sizes lie off their median by more than 35 %.
+3. The run whose shots the other runs find again most often (within $0.5 D$) is proposed, then run again on the full working image. The seed runs use a working image with holes of about 12 pixels (0.75 times 16).
+
+Code: `apps/web/src/lib/hole-detection.ts`, `autoDetect`. `apps/web/src/lib/colour-axis.ts`, `rescale`, `logLuma`.
+
+## Symbols
+
+| Symbol | Meaning | Stored unit | Unit in `apps/web` |
+| --- | --- | --- | --- |
+| $d_b$ | Bullet diameter or expected hole diameter | mm | m |
+| $k_\mathrm{px}$ | Photo pixels per m of the target near the region | no kind | px/m |
+| $h$ | Visible hole diameter over the bullet diameter | 1 | 1 |
+| $D_\mathrm{px}$, $D$ | Expected hole diameter in photo and in working pixels | no kind | px |
+| $b$ | Block size, photo pixels per working pixel | 1 | 1 |
+| $W$, $H$ | Width and height of the region with its margin | no kind | px |
+| $\bar I_c$, $F_c$ | Mean colour of a block (0 to 255) and its logarithm | no kind | 1 |
+| $\mu$, $m$, $\Sigma$ | Hole colour, median and covariance of the surroundings in log RGB | no kind | 1 |
+| $w$, $\Delta$ | Unit colour axis and the separation of hole and surroundings along it | no kind | 1 |
+| $P$ | Projection onto the colour axis, 0 to 255 | no kind | 1 |
+| $r$, $\sigma$, $f$ | Box radius, scale, scale over hole diameter | no kind | px, px, 1 |
+| $L_{xx}, L_{yy}, L_{xy}$ | Second differences of the smoothed projection | no kind | 1/px² |
+| $\mathcal{R}$ | Scale-normalised blob response | no kind | 1 |
+| $D_\mathrm{hole}$, $D_\mathrm{part}$ | Hole diameter at a peak, disc diameter per shot of a part | no kind | px |
+| $r_5$, $c_5$ | Median response and median top-hat contrast of the five strongest peaks | no kind | 1 |
+| $\kappa$ | Share of $r_5$ a peak must reach | 1 | 1 |
+| $\delta$ | Distance of a mask pixel to the nearest pixel outside the mask | no kind | px |
+| $A$, $k$ | Area of a part, peaks in it | no kind, 1 | px², 1 |
+| $D_0$, $D'$ | Expected hole size, refined size of a run | mm, no kind | m, px |
+| $d_\mathrm{hole}$ | Measured hole diameter of an accepted shot | mm | m |
+| $Y$, $t$ | Luma, Otsu threshold | no kind | 0 to 255 |
+| $\omega_0, \omega_1$, $\mu_0, \mu_1$ | Class weights and mean lumas below and above $t$ | no kind | 1 |
+| $s$ | Photo pixels per mm of a face, from its black diameter | no kind | px/mm |
+| $\rho_j$, $r_i$ | Mean radius of a ring found and radius of a face ring | no kind, mm | px, mm |
+| $a_j$, $e_j$ | Share of a ring's ellipse its line covers, relative radius error of a match | 1 | 1 |
+| $n_\mathrm{miss}$, $n_\mathrm{extra}$ | Face rings expected and not found, rings found that match none | 1 | 1 |
+| $S$ | Score of a face | 1 | 1 |
+| $g$, $\phi$ | Ring spacing, turn of the face's axes on the photo | mm, degree | mm, rad |
+
+## Assumptions
+
+- A hole shows one colour, the backing seen through it, that differs from the paper or the black area around it along one direction in log RGB.
+- Holes are round blobs about the expected size, within 0.7 to 1.4 of it.
+- Overlapping holes form one connected part whose area is shared equally by its peaks.
+- With a found face, a dark mark on the black area and a light mark on the paper are print unless their confidence reaches 0.8, and marks where the ring numerals stand are print when they appear at three or more places (section Print on the face).
+
+## Limits
+
+- The thresholds and scale sets are the app's own values from a prototype, without a published source.
+- Torn or elongated holes, holes in a printed line and very close holes may be missed or miscounted. The user confirms, moves or deletes each proposal.
+- A hole within half a hole of the photo's edge is not proposed.
+- A shadow confined to the outer paper can be mistaken for the sheet edge while the black area stays lit, so holes in that shadow can be omitted. Marking a region bypasses the automatic sheet boundary.
+- A hole whose backing is about as dark as the black area around it, with light torn rims, is often missed there.
+- A hole under 4 photo pixels across is refused. So is a region whose working image would leave a hole fewer than 4 working pixels.
+- The face search does not read the ring numerals: on a photo of an insert card the faces whose inner rings stand in the same ratios are offered for the user to choose.
+- The photo scale comes from the sheet's calibration near the middle of the region. Perspective across the region is not corrected per hole.
+
+## Sources
+
+- [Fisher 1936](../bibliography.md#fisher-1936): linear discriminant of two classes, pp. 179 to 188, equation numbers unverified.
+- [Lindeberg 1998](../bibliography.md#lindeberg-1998): scale-normalised derivatives and blob detection with automatic scale selection, section numbers unverified.
+- [Serra 1982](../bibliography.md#serra-1982): erosion, dilation, opening and the top-hat, chapter numbers unverified.
+- [van Herk 1992](../bibliography.md#van-herk-1992), pp. 517 to 521, and [Gil 1993](../bibliography.md#gil-1993), pp. 504 to 507: running minimum and maximum with three comparisons per pixel.
+- [Felzenszwalb 2012](../bibliography.md#felzenszwalb-2012), pp. 415 to 428: Euclidean distance transform by the lower envelope of parabolas.
+- [Otsu 1979](../bibliography.md#otsu-1979), pp. 62 to 66: threshold that maximises the between-class variance.
+- [Andrew 1979](../bibliography.md#andrew-1979), pp. 216 to 219: convex hull by the monotone chain.
+- [ITU-R BT.601](../bibliography.md#itu-r-bt-601): luma weights, section number unverified.
+- [Fitzgibbon 1999](../bibliography.md#fitzgibbon-1999), pp. 476 to 480, in the form of [Halir 1998](../bibliography.md#halir-1998), pp. 125 to 132: direct least-squares ellipse fit.
+- [Gurdjos 2006](../bibliography.md#gurdjos-2006), pp. 238 to 252, and [Gurdjos 2002](../bibliography.md#gurdjos-2002), pp. 252 to 266: the centre and the plane of concentric circles seen in perspective.

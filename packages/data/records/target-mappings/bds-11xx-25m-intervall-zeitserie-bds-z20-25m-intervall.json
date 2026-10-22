@@ -1,0 +1,23 @@
+{
+  "id": "bds-11xx-25m-intervall-zeitserie-bds-z20-25m-intervall",
+  "discipline": "bds-11xx-25m-intervall-zeitserie",
+  "face": "bds-z20-25m-intervall",
+  "event": "11xx 25 m Schießen, Teil Intervall/Zeitserie",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "page": "Anhang 1, Seite Z-22, PDF p. 23",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "page": "K 3.03, K 3.04, Seite K-14, PDF p. 14",
+        "fields": ["shotCount"],
+        "note": "Ten interval shots and ten time-series shots on the Intervallscheibe."
+      }
+    ]
+  }
+}

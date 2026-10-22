@@ -1,0 +1,17 @@
+{
+  "id": "vdrbw-g-ek-1-issf-50m-rifle",
+  "discipline": "vdrbw-g-ek-1",
+  "face": "issf-50m-rifle",
+  "event": "VdRBw G-EK 1 Einzellader-KK-Sportgewehr",
+  "shotCount": 30,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.11.9, Seite 78, PDF p. 78; Scheibe 10.4, Seite 99, PDF p. 99",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

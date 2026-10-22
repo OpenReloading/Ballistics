@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-dr-1",
+  "federation": "bdmp",
+  "name": "Dienstrevolver 1",
+  "number": "DR 1",
+  "section": "C.12",
+  "page": "Teil C, Seite 76 bis 77 von 142, PDF pp. 76 to 77",
+  "distance": {
+    "value": 25000,
+    "raw": "25 m"
+  },
+  "category": "revolver",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.12, C.12.1, Teil C, Seite 76 von 142, PDF p. 76",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.12.6, Teil C, Seite 76 von 142, PDF p. 76",
+        "fields": ["distance"]
+      }
+    ]
+  }
+}

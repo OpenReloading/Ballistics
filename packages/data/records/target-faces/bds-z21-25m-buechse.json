@@ -1,0 +1,153 @@
+{
+  "id": "bds-z21-25m-buechse",
+  "name": "BDS-25m-Präzisionsscheibe Büchse (Z21)",
+  "organization": "BDS",
+  "rings": [
+    {
+      "value": 6,
+      "diameter": {
+        "value": 250
+      }
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 200
+      }
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 150
+      }
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 100
+      }
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 50
+      }
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 25
+    }
+  },
+  "blackDiameter": {
+    "value": 200
+  },
+  "events": [
+    {
+      "name": "20xx 25 m Präzisionsschießen Büchse",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "section": "Anhang 1, Z 21",
+      "scoring": "touch"
+    },
+    {
+      "name": "2801 25 m Kombi SG SL KW off. Vis., Teil Präzision",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "section": "L 7.02, Z21",
+      "scoring": "touch"
+    },
+    {
+      "name": "2802 25 m Kombi SG SL KK opt. Vis., Teil Präzision",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "section": "L 7.02, Z21",
+      "scoring": "touch"
+    },
+    {
+      "name": "2803 25 m Kombi RB KW off. Vis., Teil Präzision",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "section": "L 7.02, Z21",
+      "scoring": "touch"
+    },
+    {
+      "name": "2804 25 m Kombi RB KK off. Vis., Teil Präzision",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "section": "L 7.02, Z21",
+      "scoring": "touch"
+    },
+    {
+      "name": "2810 25 m Kombi SG SL KW opt. Vis., Teil Präzision",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "section": "L 7.02, Z21",
+      "scoring": "touch"
+    },
+    {
+      "name": "2811 25 m Kombi RB KW opt. Vis., Teil Präzision",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "section": "L 7.02, Z21",
+      "scoring": "touch"
+    },
+    {
+      "name": "2812 25 m Kombi SG SL KK off. Vis., Teil Präzision",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "section": "L 7.02, Z21",
+      "scoring": "touch"
+    },
+    {
+      "name": "2814 25 m Kombi RB KK bel. Vis., Teil Präzision",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "section": "L 7.02, Z21",
+      "scoring": "touch"
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "fields": ["name", "rings", "innerTen.diameter", "blackDiameter"],
+        "page": "Z21 (printed Z-21, PDF p. 22)"
+      },
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "fields": ["events.name", "events.distance", "events.section"],
+        "page": "Anhang 1 (printed Z-22 to Z-24, PDF pp. 23 to 25), Zielscheibe Z21"
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "fields": ["events.name", "events.distance", "events.section"],
+        "page": "L 7.02, Seite L-39 and L-40, PDF pp. 39 and 40; L 7.04, Seite L-41, PDF p. 41"
+      },
+      {
+        "source": "bds-sporthandbuch-allgemein-2026",
+        "fields": ["events.scoring"],
+        "page": "A 9.02, Seite A-22, PDF p. 22"
+      }
+    ]
+  }
+}

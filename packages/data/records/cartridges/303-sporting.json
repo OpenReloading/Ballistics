@@ -1,0 +1,330 @@
+{
+  "id": "303-sporting",
+  "name": "303 Sporting",
+  "table": "II",
+  "country": "France",
+  "published": "2000-11-13",
+  "revised": "2006-09-19",
+  "pressureMethod": "transducer",
+  "verification": "unverified",
+  "values": [
+    {
+      "side": "cartridge",
+      "symbol": "L1",
+      "quantity": "length",
+      "value": 41.85,
+      "basic": true
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L2",
+      "quantity": "length",
+      "value": 44.39,
+      "basic": true
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L3",
+      "quantity": "length",
+      "value": 52.82,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L6",
+      "quantity": "length",
+      "value": 74.49
+    },
+    {
+      "side": "cartridge",
+      "symbol": "R",
+      "quantity": "length",
+      "value": 1.63,
+      "tolerance": {
+        "lower": -0.25
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "R1",
+      "quantity": "length",
+      "value": 13.92
+    },
+    {
+      "side": "cartridge",
+      "symbol": "f",
+      "quantity": "length",
+      "value": 0.4
+    },
+    {
+      "side": "cartridge",
+      "symbol": "beta",
+      "quantity": "angle",
+      "value": 45,
+      "raw": "45°"
+    },
+    {
+      "side": "cartridge",
+      "symbol": "P1",
+      "quantity": "length",
+      "value": 11.7
+    },
+    {
+      "side": "cartridge",
+      "symbol": "P2",
+      "quantity": "length",
+      "value": 10.19,
+      "basic": true
+    },
+    {
+      "side": "cartridge",
+      "symbol": "alpha",
+      "quantity": "angle",
+      "value": 33.93555555555555,
+      "raw": "33°56'08\""
+    },
+    {
+      "side": "cartridge",
+      "symbol": "S",
+      "quantity": "length",
+      "value": 58.55
+    },
+    {
+      "side": "cartridge",
+      "symbol": "r1",
+      "quantity": "length",
+      "value": 2.29,
+      "limit": "min"
+    },
+    {
+      "side": "cartridge",
+      "symbol": "r2",
+      "quantity": "length",
+      "value": 2.29
+    },
+    {
+      "side": "cartridge",
+      "symbol": "H1",
+      "quantity": "length",
+      "value": 8.64,
+      "basic": true
+    },
+    {
+      "side": "cartridge",
+      "symbol": "H2",
+      "quantity": "length",
+      "value": 8.59,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "G1",
+      "quantity": "length",
+      "value": 7.92,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L3+G",
+      "quantity": "length",
+      "value": 67.45,
+      "footnotes": ["1"]
+    },
+    {
+      "symbol": "Pmax",
+      "quantity": "pressure",
+      "value": 3300
+    },
+    {
+      "symbol": "PK",
+      "quantity": "pressure",
+      "value": 3795
+    },
+    {
+      "symbol": "PE",
+      "quantity": "pressure",
+      "value": 4125
+    },
+    {
+      "symbol": "M",
+      "quantity": "length",
+      "value": 25
+    },
+    {
+      "symbol": "EE",
+      "quantity": "energy",
+      "value": 2800
+    },
+    {
+      "side": "cartridge",
+      "symbol": "Fe",
+      "quantity": "length",
+      "value": 0.15,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "L1",
+      "quantity": "length",
+      "value": 42.42,
+      "basic": true
+    },
+    {
+      "side": "chamber",
+      "symbol": "L2",
+      "quantity": "length",
+      "value": 44.44,
+      "basic": true
+    },
+    {
+      "side": "chamber",
+      "symbol": "L3",
+      "quantity": "length",
+      "value": 52.82,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "R",
+      "quantity": "length",
+      "value": 1.63,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "R1",
+      "quantity": "length",
+      "value": 13.97
+    },
+    {
+      "side": "chamber",
+      "symbol": "P1",
+      "quantity": "length",
+      "value": 11.74,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "P2",
+      "quantity": "length",
+      "value": 10.25,
+      "basic": true
+    },
+    {
+      "side": "chamber",
+      "symbol": "alpha",
+      "quantity": "angle",
+      "value": 40.48888888888889,
+      "raw": "40°29'20\""
+    },
+    {
+      "side": "chamber",
+      "symbol": "S",
+      "quantity": "length",
+      "value": 56.32
+    },
+    {
+      "side": "chamber",
+      "symbol": "H1",
+      "quantity": "length",
+      "value": 8.76,
+      "basic": true
+    },
+    {
+      "side": "chamber",
+      "symbol": "H2",
+      "quantity": "length",
+      "value": 8.66,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "G1",
+      "quantity": "length",
+      "value": 7.93,
+      "basic": true,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "G",
+      "quantity": "length",
+      "value": 14.63,
+      "basic": true,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "alpha1",
+      "quantity": "angle",
+      "value": 19.01,
+      "raw": "19°00'36\""
+    },
+    {
+      "side": "chamber",
+      "symbol": "h",
+      "quantity": "length",
+      "value": 2.18,
+      "basic": true
+    },
+    {
+      "side": "chamber",
+      "symbol": "i",
+      "quantity": "angle",
+      "value": 0.5291666666666667,
+      "raw": "0°31'45\"",
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "F",
+      "quantity": "length",
+      "value": 7.7,
+      "basic": true,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "Z",
+      "quantity": "length",
+      "value": 7.98,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "b",
+      "quantity": "length",
+      "value": 2.12
+    },
+    {
+      "side": "chamber",
+      "symbol": "N",
+      "quantity": "count",
+      "value": 5
+    },
+    {
+      "side": "chamber",
+      "symbol": "u",
+      "quantity": "length",
+      "value": 254
+    },
+    {
+      "side": "chamber",
+      "symbol": "Q",
+      "quantity": "area",
+      "value": 48.07
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cip-tdcc",
+        "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/tabiical-en-page76.pdf",
+        "sha256": "3a37344fe510f2133e265112ea6708c22faf082e9f2223be2867383867f2c468",
+        "retrieved": "2026-10-08"
+      }
+    ]
+  }
+}

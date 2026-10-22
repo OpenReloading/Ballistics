@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-lar-1",
+  "federation": "bdmp",
+  "name": "Lever Action Rifle 1",
+  "number": "LAR 1",
+  "section": "D.15",
+  "page": "Teil D, Seite 87 bis 90 von 294, PDF pp. 87 to 90",
+  "distance": {
+    "value": 100000,
+    "raw": "100 m"
+  },
+  "category": "lever-action",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.15, D.15.1, Teil D, Seite 87 von 294, PDF p. 87",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.15.13, Teil D, Seite 88 von 294, PDF p. 88",
+        "fields": ["distance"]
+      }
+    ]
+  }
+}

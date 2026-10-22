@@ -1,0 +1,109 @@
+{
+  "id": "demo-bullet-168",
+  "manufacturer": "demo-bullets",
+  "productNumber": "B168",
+  "name": "30 Cal 168 gr HPBT Demo",
+  "productLine": "Demo Match",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 10.886
+  },
+  "length": {
+    "value": 30.5
+  },
+  "base": {
+    "type": "boat-tail",
+    "length": {
+      "value": 3.8
+    },
+    "diameter": {
+      "value": 6.62
+    },
+    "angle": {
+      "value": 9
+    }
+  },
+  "ogive": {
+    "form": "secant",
+    "radius": {
+      "value": 77.62
+    },
+    "radiusRatio": {
+      "value": 0.55
+    }
+  },
+  "tip": {
+    "type": "hollow-point",
+    "mouthDiameter": {
+      "value": 1.0
+    }
+  },
+  "meplatDiameter": {
+    "value": 1.6
+  },
+  "noseLength": {
+    "value": 16.0
+  },
+  "baseToOgive": {
+    "value": 14.5
+  },
+  "bearingLength": {
+    "value": 10.7
+  },
+  "construction": {
+    "raw": "Cup-and-core, gilding metal jacket, lead core",
+    "structure": "cup-and-core",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {
+      "material": "gilding-metal"
+    }
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.455,
+      "note": "Invented value."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.221
+    }
+  ],
+  "recommendedTwist": {
+    "value": 254
+  },
+  "slowestTwist": {
+    "value": 305
+  },
+  "provenance": {
+    "kind": "computed",
+    "sources": [
+      {
+        "source": "synthetic-test-data",
+        "kind": "computed",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "base",
+          "tip",
+          "ogive",
+          "meplatDiameter",
+          "noseLength",
+          "baseToOgive",
+          "bearingLength",
+          "construction",
+          "ballisticCoefficients",
+          "recommendedTwist",
+          "slowestTwist"
+        ],
+        "note": "Invented values for tests and the example; not a real product."
+      }
+    ]
+  }
+}

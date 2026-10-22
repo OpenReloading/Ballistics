@@ -1,0 +1,25 @@
+{
+  "id": "dsb-gewehr-300m-issf-300m-rifle",
+  "discipline": "dsb-gewehr-300m",
+  "face": "issf-300m-rifle",
+  "event": "DSB Gewehr 300 m",
+  "gauge": {
+    "value": 8,
+    "raw": "8,00 mm Gewehr Kaliber > .22 lfb"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.20 Scheibe Nr. 5, Teil 0 Seite 65, PDF p. 83",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.11.3.2, Teil 0 Seite 40, PDF p. 58",
+        "fields": ["gauge"]
+      }
+    ]
+  }
+}

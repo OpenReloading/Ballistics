@@ -1,0 +1,18 @@
+{
+  "id": "vdrbw-g-rzf-1-issf-25m-precision-50m-pistol",
+  "discipline": "vdrbw-g-rzf-1",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "VdRBw G-RZF 1 Repetier-Zielfernrohrgewehr",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.9.9, Seite 74, PDF p. 74; Scheibe 10.3, Seite 98, PDF p. 98",
+        "fields": ["discipline", "face", "event", "shotCount"],
+        "note": "The book allows 10 record shots (9.9.15)."
+      }
+    ]
+  }
+}

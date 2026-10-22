@@ -1,0 +1,32 @@
+---
+slug: /
+title: OpenReloading Ballistics
+sidebar_label: Overview
+---
+
+import Link from '@docusaurus/Link'
+
+A ballistics database with interior and exterior ballistics simulations. This site documents its models, its data, its TypeScript packages and its REST API.
+
+<div className="cards">
+  <Link className="card" to="/models/interior-m3">
+    <strong>Models</strong>
+    <span>How each result is computed: equations, inputs, limits and sources.</span>
+  </Link>
+  <Link className="card" to="/data/federations">
+    <strong>Data</strong>
+    <span>Record formats, the sources of the values and their licenses.</span>
+  </Link>
+  <Link className="card" to="pathname:///library/" target="_self">
+    <strong>Library</strong>
+    <span>The TypeScript packages.</span>
+  </Link>
+  <Link className="card" to="pathname:///rest/" target="_self">
+    <strong>REST API</strong>
+    <span>The HTTP routes under <code>/v1</code>.</span>
+  </Link>
+  <Link className="card" to="/release">
+    <strong>Contributing</strong>
+    <span>Releases, versions and the CI tools.</span>
+  </Link>
+</div>

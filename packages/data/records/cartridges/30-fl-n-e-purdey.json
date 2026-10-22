@@ -1,0 +1,323 @@
+{
+  "id": "30-fl-n-e-purdey",
+  "name": "30 Fl. N.E. Purdey",
+  "table": "II",
+  "country": "United kingdom",
+  "published": "1984-06-14",
+  "revised": "2011-05-25",
+  "pressureMethod": "transducer",
+  "verification": "unverified",
+  "values": [
+    {
+      "side": "cartridge",
+      "symbol": "L1",
+      "quantity": "length",
+      "value": 43.03,
+      "basic": true
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L2",
+      "quantity": "length",
+      "value": 47.09,
+      "basic": true
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L3",
+      "quantity": "length",
+      "value": 58.78,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L6",
+      "quantity": "length",
+      "value": 75.69
+    },
+    {
+      "side": "cartridge",
+      "symbol": "R",
+      "quantity": "length",
+      "value": 1.63,
+      "tolerance": {
+        "lower": -0.25
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "R1",
+      "quantity": "length",
+      "value": 13.84
+    },
+    {
+      "side": "cartridge",
+      "symbol": "P1",
+      "quantity": "length",
+      "value": 11.73
+    },
+    {
+      "side": "cartridge",
+      "symbol": "P2",
+      "quantity": "length",
+      "value": 10.69,
+      "basic": true
+    },
+    {
+      "side": "cartridge",
+      "symbol": "alpha",
+      "quantity": "angle",
+      "value": 29.00027777777778,
+      "raw": "29°00'01\""
+    },
+    {
+      "side": "cartridge",
+      "symbol": "S",
+      "quantity": "length",
+      "value": 63.7
+    },
+    {
+      "side": "cartridge",
+      "symbol": "r1",
+      "quantity": "length",
+      "value": 3.81,
+      "limit": "min"
+    },
+    {
+      "side": "cartridge",
+      "symbol": "r2",
+      "quantity": "length",
+      "value": 3.81
+    },
+    {
+      "side": "cartridge",
+      "symbol": "H1",
+      "quantity": "length",
+      "value": 8.59,
+      "basic": true
+    },
+    {
+      "side": "cartridge",
+      "symbol": "H2",
+      "quantity": "length",
+      "value": 8.51,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "G1",
+      "quantity": "length",
+      "value": 7.82,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L3+G",
+      "quantity": "length",
+      "value": 65.73,
+      "footnotes": ["1"]
+    },
+    {
+      "symbol": "Pmax",
+      "quantity": "pressure",
+      "value": 3200
+    },
+    {
+      "symbol": "PK",
+      "quantity": "pressure",
+      "value": 3680
+    },
+    {
+      "symbol": "PE",
+      "quantity": "pressure",
+      "value": 4000
+    },
+    {
+      "symbol": "M",
+      "quantity": "length",
+      "value": 25
+    },
+    {
+      "symbol": "EE",
+      "quantity": "energy",
+      "value": 3455
+    },
+    {
+      "side": "cartridge",
+      "symbol": "Fe",
+      "quantity": "length",
+      "value": 0.15,
+      "footnotes": ["1", "4"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "L1",
+      "quantity": "length",
+      "value": 43.05,
+      "basic": true
+    },
+    {
+      "side": "chamber",
+      "symbol": "L2",
+      "quantity": "length",
+      "value": 47.12,
+      "basic": true
+    },
+    {
+      "side": "chamber",
+      "symbol": "L3",
+      "quantity": "length",
+      "value": 59.03,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "R",
+      "quantity": "length",
+      "value": 1.65,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "R1",
+      "quantity": "length",
+      "value": 14.1
+    },
+    {
+      "side": "chamber",
+      "symbol": "P1",
+      "quantity": "length",
+      "value": 11.76,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "P2",
+      "quantity": "length",
+      "value": 10.72,
+      "basic": true
+    },
+    {
+      "side": "chamber",
+      "symbol": "alpha",
+      "quantity": "angle",
+      "value": 28.931944444444447,
+      "raw": "28°55'55\""
+    },
+    {
+      "side": "chamber",
+      "symbol": "S",
+      "quantity": "length",
+      "value": 63.83
+    },
+    {
+      "side": "chamber",
+      "symbol": "r1",
+      "quantity": "length",
+      "value": 3.81,
+      "limit": "max"
+    },
+    {
+      "side": "chamber",
+      "symbol": "r2",
+      "quantity": "length",
+      "value": 3.81
+    },
+    {
+      "side": "chamber",
+      "symbol": "H1",
+      "quantity": "length",
+      "value": 8.62,
+      "basic": true
+    },
+    {
+      "side": "chamber",
+      "symbol": "H2",
+      "quantity": "length",
+      "value": 8.53,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "G1",
+      "quantity": "length",
+      "value": 7.89,
+      "basic": true,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "G",
+      "quantity": "length",
+      "value": 6.95,
+      "basic": true,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "alpha1",
+      "quantity": "angle",
+      "value": 180,
+      "raw": "180°"
+    },
+    {
+      "side": "chamber",
+      "symbol": "i",
+      "quantity": "angle",
+      "value": 1.1127777777777779,
+      "raw": "1°06'46\"",
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "F",
+      "quantity": "length",
+      "value": 7.62,
+      "basic": true,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "Z",
+      "quantity": "length",
+      "value": 7.82,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "b",
+      "quantity": "length",
+      "value": 2.72
+    },
+    {
+      "side": "chamber",
+      "symbol": "N",
+      "quantity": "count",
+      "value": 6
+    },
+    {
+      "side": "chamber",
+      "symbol": "u",
+      "quantity": "length",
+      "value": 254
+    },
+    {
+      "side": "chamber",
+      "symbol": "Q",
+      "quantity": "area",
+      "value": 47.27
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cip-tdcc",
+        "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-ii/30-fi-ne-purdey-en.pdf",
+        "sha256": "c2720e3e1419e8483447bd94236a9d3e3482c79716679822fbedd34be58ab91f",
+        "retrieved": "2026-10-08"
+      }
+    ]
+  }
+}

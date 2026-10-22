@@ -1,0 +1,42 @@
+{
+  "id": "vdrbw-pr-d-1",
+  "federation": "vdrbw",
+  "name": "Halbautomatische Dienstpistole / -revolver",
+  "number": "PR-D 1",
+  "section": "8.4",
+  "page": "Seite 38, PDF p. 38",
+  "distance": {
+    "value": 25000,
+    "raw": "25 m"
+  },
+  "caliberClasses": {
+    "ids": [
+      "pistol-7-65",
+      "pistol-9mm",
+      "pistol-9x18",
+      "pistol-40-10mm",
+      "pistol-45",
+      "revolver-32",
+      "revolver-357-38",
+      "revolver-41",
+      "revolver-44",
+      "revolver-45-colt"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "Kapitel 8, Inhaltsübersicht, Seite 31, PDF p. 31",
+        "fields": ["name", "number"]
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "8.4, Seite 38, PDF p. 38",
+        "fields": ["federation", "section", "page", "distance", "caliberClasses"]
+      }
+    ]
+  }
+}

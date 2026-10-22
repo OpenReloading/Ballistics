@@ -1,0 +1,22 @@
+{
+  "id": "dsb-luftgewehr-10m-sh3-issf-10m-air-pistol",
+  "discipline": "dsb-luftgewehr-10m-sh3",
+  "face": "issf-10m-air-pistol",
+  "event": "DSB Luftgewehr 10 m SH3",
+  "shotCount": 60,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "10.4.1, Teil 10 Seite 4, PDF p. 422 (SH3 shoot on air pistol faces); 10.12, Teil 10 Seite 15, PDF p. 433 (row 1.10 SH3, LP Scheibe)",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "10.12, Teil 10 Seite 15, PDF p. 433 (row 1.10 Luftgewehr SH3, Schusszahl 60)",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "id": "bds-3315",
+  "federation": "bds",
+  "name": "100 m Zeit. SG SL opt. Vis. ü. 6,4 mm",
+  "number": "3315",
+  "section": "Anhang 1",
+  "page": "Seite Z-23, PDF p. 24",
+  "distance": {
+    "value": 100000,
+    "raw": "100 m"
+  },
+  "category": "rifle",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "page": "Anhang 1, Seite Z-23, PDF p. 24",
+        "fields": ["name", "number", "federation", "section", "page", "distance"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 3.02, Seite L-22, PDF p. 22",
+        "fields": ["number", "distance", "category"],
+        "note": "The table bounds the cartridge by case length (47 mm), not by calibre."
+      }
+    ]
+  }
+}

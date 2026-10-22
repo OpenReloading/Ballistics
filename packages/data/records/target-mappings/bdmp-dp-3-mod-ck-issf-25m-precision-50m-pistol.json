@@ -1,0 +1,22 @@
+{
+  "id": "bdmp-dp-3-mod-ck-issf-25m-precision-50m-pistol",
+  "discipline": "bdmp-dp-3-mod-ck",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "BDMP DP 3 Mod. C.K. Dienstpistole 3 Modifikation Carbine Kit",
+  "shotCount": 15,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.5A.6, Teil C, Seite 17 von 142, PDF p. 17",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.5A.8, Teil C, Seite 17 von 142, PDF p. 17",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

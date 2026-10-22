@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "mantine": {
+      "type": "stdio",
+      "command": "devcontainer",
+      "args": ["exec", "--docker-path", "podman", "--workspace-folder", ".", "mcp-server"]
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "devcontainer",
+      "args": ["exec", "--docker-path", "podman", "--workspace-folder", ".", "playwright-mcp", "--browser", "chromium", "--headless"]
+    }
+  }
+}

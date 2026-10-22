@@ -1,0 +1,27 @@
+{
+  "id": "bdmp-sp-2-issf-25m-precision-50m-pistol",
+  "discipline": "bdmp-sp-2",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "BDMP SP 2 Sportpistole 2",
+  "shotCount": 30,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.1, Teil B, Seite 8 von 70, PDF p. 8",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13A.5, Teil C, Seite 81 von 142, PDF p. 81",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13A.7, Teil C, Seite 81 von 142, PDF p. 81",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

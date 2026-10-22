@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-cism-300m-issf-300m-rifle",
+  "discipline": "bdmp-cism-300m",
+  "face": "issf-300m-rifle",
+  "event": "BDMP CISM-Gewehr 300 m",
+  "shotCount": 30,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.3, Teil B, Seite 18 von 70, PDF p. 18",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.5.12, Teil D, Seite 28 von 294, PDF p. 28",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.5.10, Teil D, Seite 27 von 294, PDF p. 27",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "Three passes of 10 shots (D.5.10)."
+  }
+}

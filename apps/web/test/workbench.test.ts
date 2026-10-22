@@ -1,0 +1,276 @@
+import { describe, expect, it } from 'vitest'
+import type { InteriorResponse } from '../src/lib/api-types.ts'
+import { presetUnits } from '../src/lib/units.ts'
+import {
+  bulletLeadTime,
+  mmLength,
+  percentOfPressureLimit,
+  rangeCardNote,
+  rangeHero,
+  resultTabsFit,
+  shownLength,
+  shownWarnings,
+  solidFillWarning,
+  statusText,
+  stepLabel,
+  warningCountText,
+} from '../src/lib/workbench.ts'
+
+type Limit = NonNullable<InteriorResponse['limits']>[number]
+const limit = (l: Partial<Limit>): Limit => ({
+  cartridge: '308-win',
+  revised: '2008-09-23',
+  symbol: 'Pmax',
+  method: 'transducer',
+  compared: true,
+  ...l,
+})
+
+describe('percentOfMax', () => {
+  it('divides the peak pressure by the first compared limit', () => {
+    const limits = [
+      limit({ compared: false, reason: 'crusher', pressure: 3.0e8 }),
+      limit({ pressure: 4.15e8 }),
+      limit({ pressure: 5e8 }),
+    ]
+    const p = percentOfPressureLimit(3.81e8, limits)
+    expect(p?.percent).toBeCloseTo(91.807, 3)
+    expect(p?.limit.pressure).toBe(4.15e8)
+  })
+
+  it('is undefined without a compared limit', () => {
+    expect(percentOfPressureLimit(3.81e8, undefined)).toBeUndefined()
+    expect(
+      percentOfPressureLimit(3.81e8, [limit({ compared: false, reason: 'noValue' })]),
+    ).toBeUndefined()
+  })
+})
+
+describe('leadTime', () => {
+  it('is the muzzle time less the 10 % pressure time, both from ignition', () => {
+    expect(bulletLeadTime({ muzzleTime: 1.2e-3, tenPercentPressureTime: 0.25e-3 })).toBeCloseTo(
+      0.95e-3,
+      12,
+    )
+  })
+
+  it('is undefined when the 10 % pressure time is 0', () => {
+    expect(bulletLeadTime({ muzzleTime: 1.2e-3, tenPercentPressureTime: 0 })).toBeUndefined()
+  })
+})
+
+describe('solidFillWarning', () => {
+  const volume = 3.4e-6
+  const at = (fill: number) => fill * 1600 * volume
+
+  it('warns above the solid fill limit only', () => {
+    expect(solidFillWarning(at(0.639), 1600, 900, volume)).toBeUndefined()
+    expect(solidFillWarning(at(0.65), 1600, undefined, volume)).toEqual({
+      text: 'Simulation: solid fill 0.65 is above 0.64; the model is outside the range it was built for.',
+      name: 'solid fill above 0.64',
+    })
+  })
+
+  it('gives the load ratio and its limit for the powder with a bulk density', () => {
+    expect(solidFillWarning(at(0.65), 1600, 900, volume)?.text).toBe(
+      'Simulation: load ratio 1.16 is above 1.14, solid fill 0.64 for this powder; the model is outside the range it was built for.',
+    )
+  })
+})
+
+describe('warningsSummary', () => {
+  it('counts the warnings as simulation warnings', () => {
+    expect(warningCountText(0)).toBe('')
+    expect(warningCountText(1)).toBe('1 simulation warning')
+    expect(warningCountText(2)).toBe('2 simulation warnings')
+  })
+})
+
+describe('shownWarnings', () => {
+  const psi = 0.45359237 * 9.80665 * 0.0254 ** -2
+  /** An answer whose peak and range are above or across CIP Pmax 4150 bar (60191 psi). */
+  const body = (nominal: number, low: number, high: number) =>
+    ({
+      pressureRange: { nominalPressure: nominal, lowPressure: low, highPressure: high },
+      limits: [
+        limit({
+          pressure: 4150e5,
+          exceeded: high > 4150e5,
+          nominalExceeded: nominal > 4150e5,
+        }),
+      ],
+      warnings: [
+        {
+          code: 'limitExceeded',
+          spec: 'cip-308-win-2008-09-23',
+          symbol: 'Pmax',
+          method: 'transducer',
+          message: 'in bar',
+        },
+        {
+          code: 'chargeTooSmall',
+          message:
+            'Charge too small for the model: the simulated peak mean pressure, 250 bar, is low',
+        },
+        { code: 'test', message: 'Other warning.' },
+      ],
+    }) as unknown as InteriorResponse
+
+  it('writes an exceeded limit in the page unit with the sheet date and method, and names it', () => {
+    const [line, small, other] = shownWarnings(body(4766e5, 4174e5, 5460e5), presetUnits('us'))
+    expect(line).toEqual({
+      text: 'Simulated peak pressure 69125 psi (range 60539 to 79191 psi) is above CIP Pmax 60191 psi, source CIP (2008-09-23, transducer).',
+      name: 'above CIP Pmax',
+    })
+    expect(small).toEqual({
+      text: 'Charge too small for the model: the simulated peak mean pressure, 3626 psi, is low',
+      name: 'charge too small for the model',
+    })
+    expect(other).toEqual({ text: 'Other warning.', name: undefined })
+  })
+
+  it('keeps bar with the record decimals and names a range above the limit', () => {
+    const [line, small] = shownWarnings(body(4000e5, 3600e5, 4400e5), presetUnits('metric-grains'))
+    expect(line).toEqual({
+      text: 'The upper end of the simulated peak pressure range, 4400 bar, is above CIP Pmax 4150 bar, source CIP (2008-09-23, transducer); the nominal value is 4000 bar.',
+      name: 'range above CIP Pmax',
+    })
+    expect(small.text).toContain('250 bar')
+  })
+
+  it('writes each exceeded limit with its own variant and value', () => {
+    const exceeded = (variant: string, pressure: number) => ({
+      limit: limit({ variant, pressure, exceeded: true, nominalExceeded: true }),
+      warning: {
+        code: 'limitExceeded',
+        spec: 'cip-308-win-2008-09-23',
+        symbol: 'Pmax',
+        variant,
+        method: 'transducer',
+        message: 'in bar',
+      },
+    })
+    const [a, b] = [exceeded('A', 4150e5), exceeded('B', 3800e5)]
+    const lines = shownWarnings(
+      {
+        pressureRange: { nominalPressure: 4500e5, lowPressure: 4300e5, highPressure: 4700e5 },
+        limits: [limit({ variant: 'A', compared: false, reason: 'noValue' }), a.limit, b.limit],
+        warnings: [a.warning, b.warning],
+      } as unknown as InteriorResponse,
+      presetUnits('metric-grains'),
+    )
+    expect(lines.map((l) => l.name)).toEqual(['above CIP Pmax (A)', 'above CIP Pmax (B)'])
+    expect(lines[0].text).toContain('above CIP Pmax (A) 4150 bar')
+    expect(lines[1].text).toContain('above CIP Pmax (B) 3800 bar')
+  })
+
+  it('adds decimals while rounding would put a pressure on the limit', () => {
+    // 60190.8 psi rounds to the limit's 60191 psi: one decimal keeps it above 60190.7 psi
+    const [line] = shownWarnings(body(60190.8 * psi, 4000e5, 4400e5), presetUnits('us'))
+    expect(line.text).toMatch(
+      /^Simulated peak pressure 60190\.8 psi \(range \d+ to 63816\.6 psi\) is above CIP Pmax 60190\.7 psi,/,
+    )
+  })
+})
+
+describe('shownLength', () => {
+  it('gives travels to 0.1 mm or 0.01 in and diameters to 0.01 mm or 0.001 in', () => {
+    const [metric, us] = [presetUnits('metric-grains'), presetUnits('us')]
+    expect(shownLength('travel', us, 22.5028 * 0.0254)).toBe('22.50 in')
+    expect(shownLength('travel', metric, 0.334621)).toBe('334.6 mm')
+    expect(shownLength('diameter', us, 0.308 * 0.0254)).toBe('.308 in')
+    expect(shownLength('diameter', metric, 7.823e-3)).toBe('7.82 mm')
+  })
+})
+
+describe('mmLength', () => {
+  it('shows a length given in mm in the Settings unit', () => {
+    const [metric, us] = [presetUnits('metric-grains'), presetUnits('us')]
+    expect(mmLength(metric, 7.82)).toBe('7.82 mm')
+    expect(mmLength(us, 7.82)).toBe('.308 in')
+    expect(mmLength(metric, 0.03)).toBe('0.03 mm')
+    expect(mmLength(us, 0.03)).toBe('.001 in')
+  })
+})
+
+describe('stepLabel', () => {
+  // the main charge is 0, lower charges count down, higher ones up
+  const labels = (n: number, d: 'up' | 'down' | 'around') =>
+    Array.from({ length: n }, (_, i) => stepLabel(i, n, d))
+  it('counts up from the main charge', () => {
+    expect(labels(3, 'up')).toEqual(['0', '+1', '+2'])
+  })
+  it('counts down from the main charge', () => {
+    expect(labels(3, 'down')).toEqual(['0', '−1', '−2'])
+  })
+  it('centres around the main charge, lowest first', () => {
+    expect(labels(5, 'around')).toEqual(['−2', '−1', '0', '+1', '+2'])
+  })
+  it('gives the one step 0', () => {
+    expect(labels(1, 'up')).toEqual(['0'])
+    expect(labels(1, 'around')).toEqual(['0'])
+  })
+})
+
+describe('tabsThatFit', () => {
+  // the result tabs that fit their row; the rest go into the More menu
+  it('keeps every tab that fits', () => {
+    expect(resultTabsFit([50, 60, 70], 180)).toBe(3)
+  })
+  it('stops at the first tab past the room', () => {
+    expect(resultTabsFit([50, 60, 70], 179)).toBe(2)
+    expect(resultTabsFit([50, 60, 70], 49)).toBe(0)
+  })
+  it('keeps every tab before the row is measured', () => {
+    expect(resultTabsFit([50, 60], 0)).toBe(2)
+  })
+})
+
+describe('rangeHero', () => {
+  const grain = 0.06479891e-3
+  const fps = 0.3048
+  it('gives charge and velocity in the preset units, the step only on a ladder', () => {
+    const us = presetUnits('us')
+    expect(rangeHero(us, 42.5 * grain, 2511 * fps, undefined)).toEqual({
+      step: undefined,
+      charge: { value: '42.5', unit: 'gr' },
+      velocity: { value: '2511', unit: 'ft/s' },
+    })
+    expect(rangeHero(us, 42.5 * grain, 2511 * fps, '−1').step).toBe('Step −1')
+  })
+  it('follows the metric velocity unit', () => {
+    expect(rangeHero(presetUnits('metric-grains'), 42.5 * grain, 765.3, '0').velocity).toEqual({
+      value: '765',
+      unit: 'm/s',
+    })
+  })
+})
+
+describe('rangeCardNote', () => {
+  it('names a missing bullet record at once, never while the trajectory result computes', () => {
+    expect(rangeCardNote(true, 'bravo-168', false)).toBe('')
+    expect(rangeCardNote(true, undefined, false)).toBe('The range card needs a bullet record.')
+    expect(rangeCardNote(false, undefined, true)).toBe('')
+  })
+
+  it('points at the Trajectory tab once the result stays away with a bullet record chosen', () => {
+    expect(rangeCardNote(true, 'bravo-168', true)).toBe(
+      'The range card needs a Trajectory result: see the Trajectory tab.',
+    )
+  })
+})
+
+describe('statusText', () => {
+  it('writes a result status from the line of the units shown now, with its prefix', () => {
+    expect(statusText({ prefix: '' }, 'Peak 4 bar.')).toBe('Peak 4 bar.')
+    expect(statusText({ prefix: 'Simulation done. ' }, 'Peak 58 psi.')).toBe(
+      'Simulation done. Peak 58 psi.',
+    )
+  })
+
+  it('shows another status as it is, and no result status without a result', () => {
+    expect(statusText('Simulating', 'Peak 4 bar.')).toBe('Simulating')
+    expect(statusText('The API answered 502.', undefined)).toBe('The API answered 502.')
+    expect(statusText({ prefix: '' }, undefined)).toBe('')
+  })
+})

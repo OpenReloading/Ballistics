@@ -1,0 +1,28 @@
+{
+  "id": "bds-2105-bdmp-nr1-100m",
+  "discipline": "bds-2105",
+  "face": "bdmp-nr1-100m",
+  "event": "BDS 2105 50 m Präz. DSG oK KK",
+  "shotCount": 30,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "page": "Anhang 1, Seite Z-22, PDF p. 23",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 2.01, Seite L-9, PDF p. 9",
+        "fields": ["face"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 2.04, Seite L-17, PDF p. 17",
+        "fields": ["shotCount"],
+        "note": "Deutsche Meisterschaft and Landesmeisterschaft 30 shots; below Landesmeisterschaft the program may be halved to 15."
+      }
+    ]
+  }
+}

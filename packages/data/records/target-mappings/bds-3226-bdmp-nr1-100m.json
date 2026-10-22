@@ -1,0 +1,23 @@
+{
+  "id": "bds-3226-bdmp-nr1-100m",
+  "discipline": "bds-3226",
+  "face": "bdmp-nr1-100m",
+  "event": "BDS 3226 100 m Intervall SG SL opt. Vis.",
+  "shotCount": 30,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 13.02, Seite L-74, PDF p. 74",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 13.04, Seite L-75, PDF p. 75",
+        "fields": ["shotCount"],
+        "note": "Deutsche Meisterschaft 30 shots; Landesmeisterschaft 20; below 15."
+      }
+    ]
+  }
+}

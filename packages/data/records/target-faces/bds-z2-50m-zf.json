@@ -1,0 +1,208 @@
+{
+  "id": "bds-z2-50m-zf",
+  "name": "BDS-50m-ZF-Scheibe (Z2)",
+  "organization": "BDS",
+  "rings": [
+    {
+      "value": 1,
+      "diameter": {
+        "value": 127
+      }
+    },
+    {
+      "value": 2,
+      "diameter": {
+        "value": 115
+      }
+    },
+    {
+      "value": 3,
+      "diameter": {
+        "value": 103
+      }
+    },
+    {
+      "value": 4,
+      "diameter": {
+        "value": 91
+      }
+    },
+    {
+      "value": 5,
+      "diameter": {
+        "value": 79
+      }
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 67
+      }
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 55
+      }
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 43
+      }
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 31
+      }
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 19
+      }
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 9
+    }
+  },
+  "blackDiameter": {
+    "value": 79
+  },
+  "events": [
+    {
+      "name": "2102 50 m Präz. SG SL KK opt. Vis.",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "section": "Anhang 1, Z2",
+      "scoring": "touch"
+    },
+    {
+      "name": "2108 50 m Präz. PSG KK",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "section": "Anhang 1, Z2",
+      "scoring": "touch"
+    },
+    {
+      "name": "2115 50 m Präz. ZG 50 KW",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "section": "Anhang 1, Z2",
+      "scoring": "touch"
+    },
+    {
+      "name": "2302 50 m Zeit. SG SL KK opt. Vis.",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "section": "Anhang 1, Z2",
+      "scoring": "touch"
+    },
+    {
+      "name": "2402 50m Fertigkeit SG SL KK opt. Vis.",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "section": "Anhang 1, Z2",
+      "scoring": "touch"
+    },
+    {
+      "name": "2410 50m Fertigkeit SG SL KW opt. Vis.",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "section": "Anhang 1, Z2",
+      "scoring": "touch"
+    },
+    {
+      "name": "3118 100 m Präz. ZF-Gewehr 100 b. 7 mm",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "section": "Anhang 1, Z2",
+      "scoring": "touch"
+    },
+    {
+      "name": "3117 100 m Präz. ZF-Gewehr 100 ü. 7 mm",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "section": "Anhang 1, Z2",
+      "scoring": "touch"
+    },
+    {
+      "name": "3123 100 m Präz. ZF-Gewehr Selbstlader",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "section": "Anhang 1, Z2",
+      "scoring": "touch"
+    },
+    {
+      "name": "3124 100 m Präz. ZF-Gewehr Kleinkaliber",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "section": "Anhang 1, Z2",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSU LPER 3 Zielfernrohrgewehr Präzision 100 m KK",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "DSU",
+      "section": "Kapitel 1, DSU-Scheibe 100 Meter KK Präzision (Seite 26); Kapitel 3 Langwaffenübungen (PDF p. 61)",
+      "scoring": "touch"
+    }
+  ],
+  "note": "The BDS prints five symbols per sheet (Z2), the DSU six (DSU-Scheibe 100 Meter KK Präzision); the ring dimensions are the same.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "fields": ["name", "rings", "innerTen.diameter", "blackDiameter"],
+        "page": "Z2 (printed Z-2, PDF p. 3)"
+      },
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "Anhang 1 (printed Z-22 to Z-24, PDF pp. 23 to 25), Zielscheibe Z2"
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "Kapitel 1, DSU-Scheibe 100 Meter KK Präzision (Seite 26, PDF p. 28); Kapitel 3 Langwaffenübungen (PDF p. 61)"
+      },
+      {
+        "source": "bds-sporthandbuch-allgemein-2026",
+        "fields": ["events.scoring"],
+        "page": "A 9.02, Seite A-22, PDF p. 22"
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 1, Auswertung der Scheiben, Seite 27, PDF p. 29",
+        "fields": ["events.scoring"]
+      }
+    ]
+  }
+}

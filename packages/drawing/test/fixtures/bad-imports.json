@@ -1,0 +1,14 @@
+{
+  "core/a.ts": "import { profile } from '../cartridge/profile.ts'",
+  "core/b.ts": "import type { Seating } from '../seating/seating.ts'",
+  "cartridge/a.ts": "import { outline } from '../bullet/outline.ts'",
+  "cartridge/b.ts": "import { seat } from '../seating/seating.ts'",
+  "bullet/a.ts": "export { profile } from '../cartridge/profile.ts'",
+  "bullet/b.ts": "import { seat } from '../seating/seating.ts'",
+  "seating/a.ts": "import { useMemo } from 'react'",
+  "seating/b.ts": "import Link from 'next/link'",
+  "seating/c.ts": "import { readFileSync } from 'node:fs'",
+  "seating/d.ts": "import { waterDensity } from '@openreloading/core'",
+  "seating/e.ts": "import type { SpecValue } from '../../../../apps/web/src/lib/api-types.ts'",
+  "index.ts": "const dom = await import('react-dom')"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dsb-unterhebelrepetierer-50m-issf-25m-precision-50m-pistol",
+  "discipline": "dsb-unterhebelrepetierer-50m",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "DSB Unterhebelrepetierer 50 m",
+  "shotCount": 40,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.21, Teil 0 Seite 78, PDF p. 96 (rows 1.56 and 1.57, column Scheibe Nr.); 1.7.4, Teil 1 Seite 14, PDF p. 126",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "1.7.5, Teil 1 Seite 14, PDF p. 126; 0.21, Teil 0 Seite 78, PDF p. 96 (column Wettkampfschüsse)",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

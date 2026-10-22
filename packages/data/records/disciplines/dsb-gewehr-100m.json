@@ -1,0 +1,22 @@
+{
+  "id": "dsb-gewehr-100m",
+  "federation": "dsb",
+  "name": "Gewehr 100 m",
+  "section": "0.20",
+  "page": "Seite 62 and 65, PDF pp. 80 and 83",
+  "distance": {
+    "value": 100000,
+    "raw": "100 m"
+  },
+  "category": "rifle",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "Seite 62 and 65, PDF pp. 80 and 83",
+        "fields": ["name", "federation", "section", "page", "distance", "category"]
+      }
+    ]
+  }
+}

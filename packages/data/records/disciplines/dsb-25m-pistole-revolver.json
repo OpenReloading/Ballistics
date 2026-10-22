@@ -1,0 +1,32 @@
+{
+  "id": "dsb-25m-pistole-revolver",
+  "federation": "dsb",
+  "name": "25 m Pistole/Revolver",
+  "number": "2.53/2.59/2.55/2.58",
+  "section": "2.21",
+  "page": "Teil 2 Seite 20, PDF p. 154",
+  "distance": {
+    "value": 25000,
+    "raw": "25 m"
+  },
+  "caliberClasses": {
+    "ids": ["pistol-9mm", "revolver-357-38", "revolver-44", "pistol-45"],
+    "basis": "stated"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "Teil 2 Seite 20, PDF p. 154",
+        "fields": ["name", "number", "federation", "section", "page", "distance"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "2.21.1, Teil 2 Seite 20, PDF p. 154 (calibers 9x19, .357 Magnum, .44 Magnum, .45 ACP)",
+        "fields": ["caliberClasses"]
+      }
+    ],
+    "note": "The rule book prints \"(2.50)\" at the target sheet."
+  }
+}

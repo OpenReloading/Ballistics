@@ -1,0 +1,13 @@
+{
+  "id": "test-face",
+  "name": "Test face",
+  "organization": "Test",
+  "rings": [
+    { "value": 9, "diameter": { "value": 20 } },
+    { "value": 10, "diameter": { "value": 10 } }
+  ],
+  "blackDiameter": { "value": 20 },
+  "decimal": false,
+  "events": [{ "name": "Test event", "distance": { "value": 10000 } }],
+  "provenance": { "kind": "published", "sources": [{ "source": "test-rule-book" }] }
+}

@@ -1,0 +1,16 @@
+{
+  "id": "dsb-gewehr-100m-issf-25m-precision-50m-pistol",
+  "discipline": "dsb-gewehr-100m",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "DSB Gewehr 100 m",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.20 Scheibe Nr. 4, Teil 0 Seite 65, PDF p. 83",
+        "fields": ["discipline", "face", "event"]
+      }
+    ]
+  }
+}

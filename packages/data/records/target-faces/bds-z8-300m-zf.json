@@ -1,0 +1,133 @@
+{
+  "id": "bds-z8-300m-zf",
+  "name": "BDS-300m-ZF-Scheibe (Z8)",
+  "organization": "BDS",
+  "rings": [
+    {
+      "value": 1,
+      "diameter": {
+        "value": 536
+      }
+    },
+    {
+      "value": 2,
+      "diameter": {
+        "value": 486
+      }
+    },
+    {
+      "value": 3,
+      "diameter": {
+        "value": 436
+      }
+    },
+    {
+      "value": 4,
+      "diameter": {
+        "value": 386
+      }
+    },
+    {
+      "value": 5,
+      "diameter": {
+        "value": 336
+      }
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 286
+      }
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 236
+      }
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 186
+      }
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 136
+      }
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 86
+      }
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 35
+    }
+  },
+  "blackDiameter": {
+    "value": 336
+  },
+  "events": [
+    {
+      "name": "4105 300 m Präz. Hochleistungsgewehr",
+      "distance": {
+        "value": 300000,
+        "raw": "300 m"
+      },
+      "section": "Anhang 1, Z8",
+      "scoring": "touch"
+    },
+    {
+      "name": "4106 300 m Präz. ZF-Gewehr SL",
+      "distance": {
+        "value": 300000,
+        "raw": "300 m"
+      },
+      "section": "Anhang 1, Z8",
+      "scoring": "touch"
+    },
+    {
+      "name": "4110 300 m Präz. ZF Gewehr 300 b. 7 mm",
+      "distance": {
+        "value": 300000,
+        "raw": "300 m"
+      },
+      "section": "Anhang 1, Z8",
+      "scoring": "touch"
+    },
+    {
+      "name": "4107 300 m Präz. ZF Gewehr 300 ü. 7 mm",
+      "distance": {
+        "value": 300000,
+        "raw": "300 m"
+      },
+      "section": "Anhang 1, Z8",
+      "scoring": "touch"
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "fields": ["name", "rings", "innerTen.diameter", "blackDiameter"],
+        "page": "Z8 (printed Z-8, PDF p. 9)"
+      },
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "fields": ["events.name", "events.distance", "events.section"],
+        "page": "Anhang 1 (printed Z-22 to Z-24, PDF pp. 23 to 25), Zielscheibe Z8"
+      },
+      {
+        "source": "bds-sporthandbuch-allgemein-2026",
+        "fields": ["events.scoring"],
+        "page": "A 9.02, Seite A-22, PDF p. 22"
+      }
+    ]
+  }
+}

@@ -1,0 +1,226 @@
+{
+  "id": "5-6-mm-flobert-plombs-sc",
+  "name": "5,6 mm Flobert à plombs SC",
+  "table": "V",
+  "country": "Italy, Germany",
+  "published": "1984-06-14",
+  "revised": "2000-06-07",
+  "verification": "unverified",
+  "values": [
+    {
+      "side": "cartridge",
+      "symbol": "L1",
+      "quantity": "length",
+      "value": 7.6,
+      "basic": true
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L2",
+      "quantity": "length",
+      "value": 8.6,
+      "basic": true
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L3",
+      "quantity": "length",
+      "value": 22.3,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L6",
+      "quantity": "length",
+      "value": 22.1
+    },
+    {
+      "side": "cartridge",
+      "symbol": "R",
+      "quantity": "length",
+      "value": 1.12,
+      "tolerance": {
+        "lower": -0.18
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "R1",
+      "quantity": "length",
+      "value": 7.06
+    },
+    {
+      "side": "cartridge",
+      "symbol": "P1",
+      "quantity": "length",
+      "value": 5.74
+    },
+    {
+      "side": "cartridge",
+      "symbol": "P2",
+      "quantity": "length",
+      "value": 5.72,
+      "basic": true
+    },
+    {
+      "side": "cartridge",
+      "symbol": "alpha",
+      "quantity": "angle",
+      "value": 20.9625,
+      "raw": "20°57'45\""
+    },
+    {
+      "side": "cartridge",
+      "symbol": "S",
+      "quantity": "length",
+      "value": 23.06
+    },
+    {
+      "side": "cartridge",
+      "symbol": "H1",
+      "quantity": "length",
+      "value": 5.35,
+      "basic": true
+    },
+    {
+      "side": "cartridge",
+      "symbol": "H2",
+      "quantity": "length",
+      "value": 5.33,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "F",
+      "quantity": "length",
+      "value": 5.5
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L1+G",
+      "quantity": "length",
+      "value": 9,
+      "footnotes": ["1"]
+    },
+    {
+      "symbol": "Emax",
+      "quantity": "energy",
+      "value": 100
+    },
+    {
+      "symbol": "EK",
+      "quantity": "energy",
+      "value": 107
+    },
+    {
+      "symbol": "EE",
+      "quantity": "energy",
+      "value": 110
+    },
+    {
+      "side": "cartridge",
+      "symbol": "Fe",
+      "quantity": "length",
+      "value": 0.2,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "L3",
+      "quantity": "length",
+      "value": 7.8,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "R",
+      "quantity": "length",
+      "value": 1.12,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "R1",
+      "quantity": "length",
+      "value": 7.3
+    },
+    {
+      "side": "chamber",
+      "symbol": "P1",
+      "quantity": "length",
+      "value": 5.76,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "H2",
+      "quantity": "length",
+      "value": 5.73,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "G1",
+      "quantity": "length",
+      "value": 5.73,
+      "basic": true
+    },
+    {
+      "side": "chamber",
+      "symbol": "G",
+      "quantity": "length",
+      "value": 1.4,
+      "basic": true
+    },
+    {
+      "side": "chamber",
+      "symbol": "i",
+      "quantity": "angle",
+      "value": 4.695555555555556,
+      "raw": "4°41'44\""
+    },
+    {
+      "side": "chamber",
+      "symbol": "F",
+      "quantity": "length",
+      "value": 5.5,
+      "basic": true,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "Z",
+      "quantity": "length",
+      "value": 5.5,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "Q",
+      "quantity": "area",
+      "value": 23.76
+    }
+  ],
+  "exceptions": [
+    {
+      "finding": "length-order:L3-L6",
+      "note": "Present on the official CIP sheet at import; not yet checked by hand."
+    },
+    {
+      "finding": "case-fits-chamber",
+      "note": "Present on the official CIP sheet at import; not yet checked by hand."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cip-tdcc",
+        "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-v/tabvcal-en-page5.pdf",
+        "sha256": "f2cf47125494ef44c7a64af1247fd1e35b537d8231e49d6a4988f13bfabc80c8",
+        "retrieved": "2026-10-08"
+      }
+    ]
+  }
+}

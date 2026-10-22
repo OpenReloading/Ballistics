@@ -1,0 +1,254 @@
+{
+  "id": "9-x-18",
+  "name": "9 x 18",
+  "aliases": ["9 x 18 Ultra", "9mm Police"],
+  "table": "IV",
+  "country": "Germany, Austria",
+  "published": "1984-06-14",
+  "revised": "2008-09-23",
+  "pressureMethod": "transducer",
+  "verification": "unverified",
+  "values": [
+    {
+      "side": "cartridge",
+      "symbol": "L3",
+      "quantity": "length",
+      "value": 18,
+      "tolerance": {
+        "lower": -0.25
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L6",
+      "quantity": "length",
+      "value": 25.5
+    },
+    {
+      "side": "cartridge",
+      "symbol": "R",
+      "quantity": "length",
+      "value": 1.25
+    },
+    {
+      "side": "cartridge",
+      "symbol": "R1",
+      "quantity": "length",
+      "value": 9.5
+    },
+    {
+      "side": "cartridge",
+      "symbol": "E",
+      "quantity": "length",
+      "value": 2.93
+    },
+    {
+      "side": "cartridge",
+      "symbol": "E1",
+      "quantity": "length",
+      "value": 8.25
+    },
+    {
+      "side": "cartridge",
+      "symbol": "e",
+      "quantity": "length",
+      "value": 1,
+      "limit": "min"
+    },
+    {
+      "side": "cartridge",
+      "symbol": "delta",
+      "quantity": "angle",
+      "value": 49.99,
+      "raw": "49°59'24\""
+    },
+    {
+      "side": "cartridge",
+      "symbol": "f",
+      "quantity": "length",
+      "value": 0.6
+    },
+    {
+      "side": "cartridge",
+      "symbol": "beta",
+      "quantity": "angle",
+      "value": 45,
+      "raw": "45°"
+    },
+    {
+      "side": "cartridge",
+      "symbol": "P1",
+      "quantity": "length",
+      "value": 9.87
+    },
+    {
+      "side": "cartridge",
+      "symbol": "H2",
+      "quantity": "length",
+      "value": 9.68,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "G1",
+      "quantity": "length",
+      "value": 9.02,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L3+G",
+      "quantity": "length",
+      "value": 20.58,
+      "footnotes": ["1"]
+    },
+    {
+      "symbol": "Pmax",
+      "quantity": "pressure",
+      "value": 1800
+    },
+    {
+      "symbol": "PK",
+      "quantity": "pressure",
+      "value": 2070
+    },
+    {
+      "symbol": "PE",
+      "quantity": "pressure",
+      "value": 2340
+    },
+    {
+      "symbol": "M",
+      "quantity": "length",
+      "value": 9
+    },
+    {
+      "side": "cartridge",
+      "symbol": "Fe",
+      "quantity": "length",
+      "value": 0.3,
+      "footnotes": ["1", "6"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "L3",
+      "quantity": "length",
+      "value": 17.95,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "R1",
+      "quantity": "length",
+      "value": 9.97
+    },
+    {
+      "side": "chamber",
+      "symbol": "E",
+      "quantity": "length",
+      "value": 2.93
+    },
+    {
+      "side": "chamber",
+      "symbol": "P1",
+      "quantity": "length",
+      "value": 9.93,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "H2",
+      "quantity": "length",
+      "value": 9.7,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "G1",
+      "quantity": "length",
+      "value": 9.09,
+      "basic": true,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "G",
+      "quantity": "length",
+      "value": 2.58,
+      "basic": true,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "alpha1",
+      "quantity": "angle",
+      "value": 180,
+      "raw": "180°"
+    },
+    {
+      "side": "chamber",
+      "symbol": "i",
+      "quantity": "angle",
+      "value": 2.995277777777778,
+      "raw": "2°59'43\"",
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "F",
+      "quantity": "length",
+      "value": 8.82,
+      "basic": true,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "Z",
+      "quantity": "length",
+      "value": 9.02,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "b",
+      "quantity": "length",
+      "value": 2.49
+    },
+    {
+      "side": "chamber",
+      "symbol": "N",
+      "quantity": "count",
+      "value": 6
+    },
+    {
+      "side": "chamber",
+      "symbol": "u",
+      "quantity": "length",
+      "value": 250
+    },
+    {
+      "side": "chamber",
+      "symbol": "Q",
+      "quantity": "area",
+      "value": 62.61
+    }
+  ],
+  "exceptions": [
+    {
+      "finding": "case-fits-chamber",
+      "note": "Present on the official CIP sheet at import; not yet checked by hand."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cip-tdcc",
+        "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/tabivcal-en-page18.pdf",
+        "sha256": "3d881ab462938af72c1e11ba8dfeb68eaf4acc3063e5a2f5c3794928796aee6b",
+        "retrieved": "2026-10-08"
+      }
+    ]
+  }
+}

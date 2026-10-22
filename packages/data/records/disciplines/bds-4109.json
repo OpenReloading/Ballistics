@@ -1,0 +1,32 @@
+{
+  "id": "bds-4109",
+  "federation": "bds",
+  "name": "300 m Präz. Präzisionsgewehr ü. 7 mm",
+  "number": "4109",
+  "section": "Anhang 1",
+  "page": "Seite Z-23, PDF p. 24",
+  "distance": {
+    "value": 300000,
+    "raw": "300 m"
+  },
+  "category": "precision-rifle",
+  "caliberClasses": {
+    "ids": ["rifle-30", "rifle-30-carbine", "rifle-8mm"],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "page": "Anhang 1, Seite Z-23, PDF p. 24",
+        "fields": ["name", "number", "federation", "section", "page", "distance"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 6.01, Seite L-33, PDF p. 33",
+        "fields": ["number", "distance", "category", "caliberClasses"]
+      }
+    ]
+  }
+}

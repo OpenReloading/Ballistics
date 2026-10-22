@@ -1,0 +1,23 @@
+{
+  "id": "bds-2804-bds-z21-25m-buechse",
+  "discipline": "bds-2804",
+  "face": "bds-z21-25m-buechse",
+  "event": "2804 25 m Kombi RB KK off. Vis., Teil Präzision",
+  "stage": "Präzision",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 7.02, Seite L-39, PDF p. 39",
+        "fields": ["discipline", "face", "event", "stage"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 7.03.1, Seite L-41, PDF p. 41",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "id": "dsb-10m-pistole-schnellfeuerteil",
+  "federation": "dsb",
+  "name": "10 m Pistole Schnellfeuerteil",
+  "section": "0.20",
+  "page": "Seite 62 and 67, PDF pp. 80 and 85",
+  "distance": {
+    "value": 10000,
+    "raw": "10 m"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "Seite 62 and 67, PDF pp. 80 and 85",
+        "fields": ["name", "federation", "section", "page", "distance"]
+      }
+    ]
+  }
+}

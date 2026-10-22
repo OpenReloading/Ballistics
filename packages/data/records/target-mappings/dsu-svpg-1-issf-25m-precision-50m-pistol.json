@@ -1,0 +1,18 @@
+{
+  "id": "dsu-svpg-1-issf-25m-precision-50m-pistol",
+  "discipline": "dsu-svpg-1",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "DSU SVPG 1 Vorderlader-Perkussionsscheibengewehr 50 m",
+  "shotCount": 10,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 4, Seite 10, PDF p. 132",
+        "fields": ["discipline", "face", "event", "shotCount"],
+        "note": "13 shots are fired and the best 10 count."
+      }
+    ]
+  }
+}

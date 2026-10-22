@@ -1,0 +1,23 @@
+{
+  "id": "dsb-25m-grosskaliber-38",
+  "federation": "dsb",
+  "name": "Großkaliberpistole .38",
+  "number": "2.54",
+  "section": "0.21",
+  "page": "Teil 0 Seite 82, PDF p. 100",
+  "distance": {
+    "value": 25000,
+    "raw": "25 m"
+  },
+  "category": "pistol",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.21, Teil 0 Seite 82, PDF p. 100",
+        "fields": ["name", "number", "federation", "section", "page", "distance", "category"]
+      }
+    ]
+  }
+}

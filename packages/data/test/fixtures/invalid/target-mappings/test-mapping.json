@@ -1,0 +1,7 @@
+{
+  "id": "test-mapping",
+  "discipline": "missing-discipline",
+  "face": "missing-face",
+  "event": "Test event",
+  "provenance": { "kind": "published", "sources": [{ "title": "Test rule book" }] }
+}

@@ -1,0 +1,34 @@
+{
+  "id": "test-range",
+  "projectile": "Test bullet",
+  "bulletDiameter": {
+    "value": 7.82
+  },
+  "bulletMass": {
+    "value": 11.27
+  },
+  "rounds": [
+    {
+      "label": "1",
+      "mach": {
+        "value": 2.191
+      },
+      "totalYaw": {
+        "value": 2.6
+      },
+      "dragCoefficient": {
+        "value": 0.329
+      }
+    }
+  ],
+  "provenance": {
+    "kind": "measured",
+    "sources": [
+      {
+        "title": "Test fixture",
+        "url": "https://example.org/report",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    ]
+  }
+}

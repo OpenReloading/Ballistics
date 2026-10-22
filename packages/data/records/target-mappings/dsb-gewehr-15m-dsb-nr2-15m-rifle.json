@@ -1,0 +1,16 @@
+{
+  "id": "dsb-gewehr-15m-dsb-nr2-15m-rifle",
+  "discipline": "dsb-gewehr-15m",
+  "face": "dsb-nr2-15m-rifle",
+  "event": "Gewehr 15 m",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.20 Scheibe Nr. 2, Teil 0 Seite 64, PDF p. 82",
+        "fields": ["discipline", "face", "event"]
+      }
+    ]
+  }
+}

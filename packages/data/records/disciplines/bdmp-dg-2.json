@@ -1,0 +1,48 @@
+{
+  "id": "bdmp-dg-2",
+  "federation": "bdmp",
+  "name": "Dienstgewehr 2",
+  "number": "DG 2",
+  "section": "D.7",
+  "page": "Teil D, Seite 32 bis 34 von 294, PDF pp. 32 to 34",
+  "distance": {
+    "value": 300000,
+    "raw": "300 m"
+  },
+  "category": "service-rifle",
+  "caliberClasses": {
+    "ids": [
+      "rifle-22-cf",
+      "rifle-6mm",
+      "rifle-25",
+      "rifle-6-5",
+      "rifle-270",
+      "rifle-7mm",
+      "rifle-30",
+      "rifle-30-carbine",
+      "rifle-8mm"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.7, D.7.1, Teil D, Seite 32 von 294, PDF p. 32",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.7.7, Teil D, Seite 33 von 294, PDF p. 33",
+        "fields": ["caliberClasses"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.7.13, Teil D, Seite 34 von 294, PDF p. 34",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "The calibre must be one introduced for the rifle in a regular army, the police or customs and may not exceed 8 mm."
+  }
+}

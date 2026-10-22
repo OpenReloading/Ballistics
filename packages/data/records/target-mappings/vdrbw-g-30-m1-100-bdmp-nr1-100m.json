@@ -1,0 +1,17 @@
+{
+  "id": "vdrbw-g-30-m1-100-bdmp-nr1-100m",
+  "discipline": "vdrbw-g-30-m1-100",
+  "face": "bdmp-nr1-100m",
+  "event": "VdRBw G-.30 M1 Halbautomatisches Gewehr 100 m",
+  "shotCount": 15,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.8.9, Seite 72, PDF p. 72; Scheibe 10.5, Seite 100, PDF p. 100",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

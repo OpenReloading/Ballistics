@@ -1,0 +1,23 @@
+{
+  "id": "bds-2812-bds-z21-25m-buechse",
+  "discipline": "bds-2812",
+  "face": "bds-z21-25m-buechse",
+  "event": "2812 25 m Kombi SG SL KK off. Vis., Teil Präzision",
+  "stage": "Präzision",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 7.02, Seite L-40, PDF p. 40",
+        "fields": ["discipline", "face", "event", "stage"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 7.03.1, Seite L-41, PDF p. 41",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

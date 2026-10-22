@@ -1,0 +1,15 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "extends": ["../typedoc.base.json"],
+  "entryPoints": [
+    "src/app.ts",
+    "src/bundle.ts",
+    "src/openapi.ts",
+    "src/version.ts",
+    "src/compute/*.ts",
+    "src/db/*.ts",
+    "src/routes/*.ts"
+  ],
+  "tsconfig": "tsconfig.build.json",
+  "externalSymbolLinkMappings": { "@openreloading/schema": { "Provenance": "#" } }
+}

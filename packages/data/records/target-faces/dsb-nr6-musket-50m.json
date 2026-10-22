@@ -1,0 +1,102 @@
+{
+  "id": "dsb-nr6-musket-50m",
+  "name": "Scheibe Nr. 6 (Muskete 50 m)",
+  "organization": "DSB",
+  "rings": [
+    {
+      "value": 5,
+      "diameter": {
+        "value": 480
+      }
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 400
+      }
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 320
+      }
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 240
+      }
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 160
+      }
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 80
+      }
+    }
+  ],
+  "blackDiameter": {
+    "value": 400
+  },
+  "events": [
+    {
+      "name": "DSB Muskete 50 m",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 6",
+      "scoring": "centre"
+    },
+    {
+      "name": "DSB Luntenschlossgewehr 50 m",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "scoring": "centre",
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 6"
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "fields": [
+          "name",
+          "rings",
+          "blackDiameter",
+          "events.name",
+          "events.distance",
+          "events.organization",
+          "events.section",
+          "events.scoring"
+        ],
+        "page": "0.20 Scheibe Nr. 6, Teil 0 Seite 66 (PDF p. 84); table row Teil 0 Seite 62 (PDF p. 80)"
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "fields": ["events.scoring"],
+        "page": "7.7.5, Teil 7 Seite 8, PDF p. 344"
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.20 Scheibe Nr. 6, Teil 0 Seite 66, PDF p. 84",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "7.7.5, Teil 7 Seite 8, PDF p. 344",
+        "fields": ["events.scoring"]
+      }
+    ]
+  }
+}

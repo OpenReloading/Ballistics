@@ -1,0 +1,6 @@
+{
+  "id": "test-manufacturer",
+  "name": "Test Manufacturer",
+  "aliases": ["Test Brand"],
+  "provenance": { "kind": "published", "sources": [{ "title": "Test product page" }] }
+}

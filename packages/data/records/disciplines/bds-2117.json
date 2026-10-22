@@ -1,0 +1,32 @@
+{
+  "id": "bds-2117",
+  "federation": "bds",
+  "name": "50 m Präz. PG KK HV",
+  "number": "2117",
+  "section": "Anhang 1",
+  "page": "Seite Z-22, PDF p. 23",
+  "distance": {
+    "value": 50000,
+    "raw": "50 m"
+  },
+  "category": "precision-rifle",
+  "caliberClasses": {
+    "ids": ["rimfire-22"],
+    "basis": "stated"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "page": "Anhang 1, Seite Z-22, PDF p. 23",
+        "fields": ["name", "number", "federation", "section", "page", "distance"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 2.01, Seite L-11, PDF p. 11",
+        "fields": ["number", "distance", "category", "caliberClasses"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id": "dsb-muskete-50m",
+  "federation": "dsb",
+  "name": "Muskete 50 m",
+  "number": "7.35",
+  "section": "0.21",
+  "page": "Teil 0 Seite 89, PDF p. 107",
+  "distance": {
+    "value": 50000,
+    "raw": "50 m"
+  },
+  "category": "muzzle-loader",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.21, Teil 0 Seite 89, PDF p. 107",
+        "fields": ["name", "number", "federation", "section", "page", "distance"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "Teil 7 Seite 1, PDF p. 337 (title: Regeln für das Schießen mit Vorderladerwaffen)",
+        "fields": ["category"]
+      }
+    ]
+  }
+}

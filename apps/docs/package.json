@@ -1,0 +1,45 @@
+{
+  "name": "@openreloading/docs",
+  "version": "0.0.1",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "check": "node check.mjs",
+    "site:build": "npm run site:openapi && npm run site:library && docusaurus build",
+    "site:library": "typedoc",
+    "site:openapi": "node scripts/openapi.mts",
+    "test": "node --test scripts/*.test.mts"
+  },
+  "devDependencies": {
+    "@docusaurus/tsconfig": "3.10.2",
+    "@docusaurus/types": "3.10.2",
+    "typedoc": "^0.28.20",
+    "typescript": "~6.0.0"
+  },
+  "dependencies": {
+    "@docusaurus/core": "3.10.2",
+    "@docusaurus/plugin-content-docs": "3.10.2",
+    "@docusaurus/preset-classic": "3.10.2",
+    "@openreloading/api": "*",
+    "@scalar/api-reference": "1.75.1",
+    "katex": "0.16.47",
+    "pagefind": "1.5.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "rehype-katex": "7.0.1",
+    "remark-math": "6.0.0"
+  },
+  "browserslist": {
+    "production": [
+      "last 2 chrome version",
+      "last 2 firefox version",
+      "last 2 safari version",
+      "last 2 edge version"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

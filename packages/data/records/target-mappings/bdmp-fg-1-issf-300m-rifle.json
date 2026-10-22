@@ -1,0 +1,27 @@
+{
+  "id": "bdmp-fg-1-issf-300m-rifle",
+  "discipline": "bdmp-fg-1",
+  "face": "issf-300m-rifle",
+  "event": "BDMP FG 1 Freigewehr 1",
+  "shotCount": 60,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.3, Teil B, Seite 18 von 70, PDF p. 18",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.21.13, Teil D, Seite 198 von 294, PDF p. 198",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.21.11, Teil D, Seite 197 von 294, PDF p. 197",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

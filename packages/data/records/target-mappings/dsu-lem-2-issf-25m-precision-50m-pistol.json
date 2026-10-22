@@ -1,0 +1,17 @@
+{
+  "id": "dsu-lem-2-issf-25m-precision-50m-pistol",
+  "discipline": "dsu-lem-2",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "DSU LEM 2 Einzellader Matchgewehr 100 m",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 18, PDF p. 76",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

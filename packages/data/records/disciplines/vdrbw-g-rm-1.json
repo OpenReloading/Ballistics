@@ -1,0 +1,32 @@
+{
+  "id": "vdrbw-g-rm-1",
+  "federation": "vdrbw",
+  "name": "Militär-Repetiergewehr",
+  "number": "G-RM 1",
+  "section": "9.2",
+  "page": "Seite 60, PDF p. 60",
+  "distance": {
+    "value": 100000,
+    "raw": "100 m"
+  },
+  "category": "service-rifle",
+  "caliberClasses": {
+    "ids": ["rifle-6-5", "rifle-270", "rifle-7mm", "rifle-30", "rifle-30-carbine", "rifle-8mm"],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "Kapitel 9, Inhaltsübersicht, Seite 57, PDF p. 57",
+        "fields": ["name", "number"]
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.2, Seite 60, PDF p. 60",
+        "fields": ["federation", "section", "page", "distance", "caliberClasses", "category"]
+      }
+    ]
+  }
+}

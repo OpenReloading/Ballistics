@@ -1,0 +1,28 @@
+{
+  "id": "dsu-svpr-1",
+  "federation": "dsu",
+  "name": "Perkussionsrevolver gR",
+  "number": "SVPR 1",
+  "section": "Kapitel 4, A) Vorderlader, I. Kurzwaffen, SVPR 1",
+  "page": "Seite 7, PDF p. 129",
+  "distance": {
+    "value": 25000,
+    "raw": "25 Meter"
+  },
+  "category": "muzzle-loader",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 4, Seite 7, PDF p. 129",
+        "fields": ["federation", "section", "page", "distance", "category"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 9, Schwarzpulver und Vorderlader, Seite 1 (PDF p. 233)",
+        "fields": ["name", "number"]
+      }
+    ]
+  }
+}

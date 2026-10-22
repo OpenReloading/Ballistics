@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-30-m1-carbine-25m-bdmp-nr1-25m",
+  "discipline": "bdmp-30-m1-carbine-25m",
+  "face": "bdmp-nr1-25m",
+  "event": ".30 M1 Carbine 25 m",
+  "shotCount": 30,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.2, Teil B, Seite 16 von 70, PDF p. 16",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10.7, Teil D, Seite 42 von 294, PDF p. 42",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10.10, Teil D, Seite 43 von 294, PDF p. 43",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "15 shots prone and 15 kneeling, or 30 shots prone (D.10.10)."
+  }
+}

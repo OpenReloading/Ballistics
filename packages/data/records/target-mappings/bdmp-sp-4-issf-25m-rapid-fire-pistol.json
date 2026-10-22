@@ -1,0 +1,29 @@
+{
+  "id": "bdmp-sp-4-issf-25m-rapid-fire-pistol",
+  "discipline": "bdmp-sp-4",
+  "face": "issf-25m-rapid-fire-pistol",
+  "event": "BDMP SP4 Sportpistole 4 Duell",
+  "stage": "Duell",
+  "shotCount": 15,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.1.1, Teil B, Seite 10 von 70, PDF p. 10",
+        "fields": ["discipline", "face", "event", "stage"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13C.5, Teil C, Seite 85 von 142, PDF p. 85",
+        "fields": ["discipline", "face", "event", "stage"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13C.7, Teil C, Seite 85 von 142, PDF p. 85",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "B.11.1.1 prints a ring spacing of 5 cm."
+  }
+}

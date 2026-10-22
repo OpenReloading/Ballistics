@@ -1,0 +1,10 @@
+{
+  "packages/schema": "0.0.0",
+  "packages/core": "0.0.0",
+  "packages/drawing": "0.0.0",
+  "packages/importers": "0.0.0",
+  "packages/data": "0.0.0",
+  "packages/api": "0.0.0",
+  "apps/web": "0.0.0",
+  "apps/docs": "0.0.0"
+}

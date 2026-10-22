@@ -1,0 +1,27 @@
+{
+  "id": "bdmp-sg-1-bdmp-nr1-100m",
+  "discipline": "bdmp-sg-1",
+  "face": "bdmp-nr1-100m",
+  "event": "SG 1 Standardgewehr 1",
+  "shotCount": 30,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.2, Teil B, Seite 12 von 70, PDF p. 12",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.2.13, Teil D, Seite 13 von 294, PDF p. 13",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.2.11, Teil D, Seite 12 von 294, PDF p. 12",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

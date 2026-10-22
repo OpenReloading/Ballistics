@@ -1,0 +1,38 @@
+{
+  "id": "bds-2814",
+  "federation": "bds",
+  "name": "25 m Kombi RB KK bel. Vis.",
+  "number": "2814",
+  "section": "L 7.02",
+  "page": "Seite L-40, PDF p. 40",
+  "distance": {
+    "value": 25000,
+    "raw": "25 m"
+  },
+  "category": "rifle",
+  "caliberClasses": {
+    "ids": ["rimfire-22"],
+    "basis": "stated"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 7.02, Seite L-40, PDF p. 40",
+        "fields": ["name", "number", "federation", "section", "page"],
+        "note": "The handbook marks the discipline optional (O)."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 7.04, Seite L-41, PDF p. 41",
+        "fields": ["distance"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 7.02, Seite L-40, PDF p. 40",
+        "fields": ["category", "caliberClasses"]
+      }
+    ]
+  }
+}

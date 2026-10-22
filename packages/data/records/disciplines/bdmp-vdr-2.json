@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-vdr-2",
+  "federation": "bdmp",
+  "name": "Vorderlader-Dienstrevolver 2",
+  "number": "VDR 2",
+  "section": "E.9",
+  "page": "Teil E, Seite 27 bis 28 von 42, PDF pp. 27 to 28",
+  "distance": {
+    "value": 25000,
+    "raw": "25 m"
+  },
+  "category": "muzzle-loader",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.9, E.9.1, Teil E, Seite 27 von 42, PDF p. 27",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.9.6, Teil E, Seite 27 von 42, PDF p. 27",
+        "fields": ["distance"]
+      }
+    ]
+  }
+}

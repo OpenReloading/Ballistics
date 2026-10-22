@@ -1,0 +1,11 @@
+.part-cartridge use.section: rgb(22, 22, 22); none; 1px; none
+.part-cartridge use.outline: none; rgb(236, 236, 236); 0.24px; none
+.part-cartridge path.edge: none; rgb(143, 143, 143); 0.12px; none
+.part-cartridge path.axis: none; rgb(128, 128, 128); 0.042px; 2px, 1px, 0.4px, 1px
+.dims-cartridge path.rule: none; rgb(156, 196, 234); 0.06px; none
+.dims-cartridge path.thin: none; rgb(128, 128, 128); 0.042px; none
+.dims-cartridge path.tips: rgb(156, 196, 234); none; 1px; none
+.dims-cartridge text: rgb(156, 196, 234); none; 1px; none; drawingFont, "drawingFont Fallback", sans-serif; 1.8px
+.part-chamber use.steel: rgb(43, 46, 49); none; 1px; none
+.part-chamber use.gap: rgb(29, 50, 71); none; 1px; none
+.part-chamber path.outline: none; rgb(236, 236, 236); 0.24px; none

@@ -1,0 +1,18 @@
+{
+  "id": "dsu-svsm-dsu-french-military-200m",
+  "discipline": "dsu-svsm",
+  "face": "dsu-french-military-200m",
+  "event": "SVSM Vorderlader-Steinschlossmuskete 50 m",
+  "shotCount": 10,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 4, Seite 16, PDF p. 138",
+        "fields": ["discipline", "face", "event", "shotCount"],
+        "note": "13 shots are fired and the best 10 count."
+      }
+    ]
+  }
+}

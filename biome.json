@@ -1,0 +1,106 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "includes": [
+      "**",
+      "!.claude",
+      "!.codex",
+      "!.mcp.json",
+      "!**/.next",
+      "!**/dist",
+      "!**/next-env.d.ts",
+      "!packages/data/test/fixtures/invalid/chrono/broken.json"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended",
+      "complexity": {
+        "noUselessUndefined": "error",
+        "useMaxParams": "warn",
+        "noExcessiveCognitiveComplexity": "warn"
+      },
+      "correctness": {
+        "noUnusedVariables": "error",
+        "noUnusedImports": "error",
+        "noUndeclaredDependencies": "error"
+      },
+      "style": {
+        "noParameterAssign": "error",
+        "useForOf": "error",
+        "noExcessiveLinesPerFile": "warn"
+      },
+      "suspicious": {
+        "noUnusedExpressions": "error",
+        "noNestedPromises": "error",
+        "useArraySortCompare": "error",
+        "useAwait": "error"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "jsxQuoteStyle": "double",
+      "semicolons": "asNeeded"
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["apps/web/test/golden/**"],
+      "linter": { "enabled": false }
+    },
+    {
+      "includes": ["packages/drawing/src/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "react": "The drawing library is pure: render in apps/web/src/components.",
+                  "next": "The drawing library is pure: render in apps/web/src/components."
+                },
+                "patterns": [
+                  {
+                    "group": [
+                      "next/**",
+                      "node:*",
+                      "node:*/**",
+                      "react/**",
+                      "react-dom",
+                      "react-dom/**"
+                    ],
+                    "message": "The drawing library is pure: no framework or Node imports."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  }
+}

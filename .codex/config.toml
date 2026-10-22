@@ -1,0 +1,7 @@
+[mcp_servers.mantine]
+command = "devcontainer"
+args = ["exec", "--docker-path", "podman", "--workspace-folder", ".", "mcp-server"]
+
+[mcp_servers.playwright]
+command = "devcontainer"
+args = ["exec", "--docker-path", "podman", "--workspace-folder", ".", "playwright-mcp", "--browser", "chromium", "--headless"]

@@ -1,0 +1,17 @@
+{
+  "id": "vdrbw-g-hzf-1-vdrbw-bw-nr2-klein",
+  "discipline": "vdrbw-g-hzf-1",
+  "face": "vdrbw-bw-nr2-klein",
+  "event": "VdRBw G-HZF 1 Halbautomatisches Zielfernrohrgewehr",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.10.9, Seite 76, PDF p. 76; Scheibe 10.1, Seite 96, PDF p. 96",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

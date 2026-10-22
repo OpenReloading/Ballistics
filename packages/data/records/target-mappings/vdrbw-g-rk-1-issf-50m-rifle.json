@@ -1,0 +1,17 @@
+{
+  "id": "vdrbw-g-rk-1-issf-50m-rifle",
+  "discipline": "vdrbw-g-rk-1",
+  "face": "issf-50m-rifle",
+  "event": "VdRBw G-RK 1 Repetier-KK-Sportgewehr",
+  "shotCount": 30,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.12.9, Seite 80, PDF p. 80; Scheibe 10.4, Seite 99, PDF p. 99",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

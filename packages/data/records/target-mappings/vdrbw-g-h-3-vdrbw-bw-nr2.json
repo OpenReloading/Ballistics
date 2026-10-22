@@ -1,0 +1,18 @@
+{
+  "id": "vdrbw-g-h-3-vdrbw-bw-nr2",
+  "discipline": "vdrbw-g-h-3",
+  "face": "vdrbw-bw-nr2",
+  "event": "VdRBw G-H 3 Halbautomatisches Gewehr",
+  "shotCount": 30,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.7.9, Seite 70, PDF p. 70; Scheibe 10.1, Seite 96, PDF p. 96",
+        "fields": ["discipline", "face", "event", "shotCount"],
+        "note": "The book allows 15 record shots (9.7.15)."
+      }
+    ]
+  }
+}

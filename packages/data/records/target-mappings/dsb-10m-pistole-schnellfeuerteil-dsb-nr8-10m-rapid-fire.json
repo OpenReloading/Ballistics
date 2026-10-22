@@ -1,0 +1,22 @@
+{
+  "id": "dsb-10m-pistole-schnellfeuerteil-dsb-nr8-10m-rapid-fire",
+  "discipline": "dsb-10m-pistole-schnellfeuerteil",
+  "face": "dsb-nr8-10m-rapid-fire",
+  "event": "10 m Pistole Schnellfeuerteil",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.20 Scheibe Nr. 8, Teil 0 Seite 67, PDF p. 85",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "2.13.3, Teil 2 Seite 14, PDF p. 148",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "vdrbw-r-g-1",
+  "federation": "vdrbw",
+  "name": "Großkaliberrevolver",
+  "number": "R-G 1",
+  "section": "8.6",
+  "page": "Seite 42, PDF p. 42",
+  "distance": {
+    "value": 25000,
+    "raw": "25 m"
+  },
+  "category": "revolver",
+  "caliberClasses": {
+    "ids": ["revolver-32", "revolver-357-38", "revolver-41", "revolver-44", "revolver-45-colt"],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "Kapitel 8, Inhaltsübersicht, Seite 31, PDF p. 31",
+        "fields": ["name", "number"]
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "8.6, Seite 42, PDF p. 42",
+        "fields": ["federation", "section", "page", "distance", "caliberClasses", "category"]
+      }
+    ]
+  }
+}

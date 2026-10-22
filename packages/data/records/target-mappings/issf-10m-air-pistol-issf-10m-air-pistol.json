@@ -1,0 +1,30 @@
+{
+  "id": "issf-10m-air-pistol-issf-10m-air-pistol",
+  "discipline": "issf-10m-air-pistol",
+  "face": "issf-10m-air-pistol",
+  "event": "10m Air Pistol",
+  "gauge": {
+    "value": 4.5
+  },
+  "shotCount": 60,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 3.3.1, p. 39 (PDF p. 39), rule 6.3.4.6, p. 200 (PDF p. 200)",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "issf-paper-target-scoring-2022",
+        "page": "Rule 1.4.4, p. 321 (PDF p. 2)",
+        "fields": ["gauge"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 8.11, p. 374 (PDF p. 374)",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

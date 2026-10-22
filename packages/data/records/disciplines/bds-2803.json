@@ -1,0 +1,47 @@
+{
+  "id": "bds-2803",
+  "federation": "bds",
+  "name": "25 m Kombi RB KW off. Vis.",
+  "number": "2803",
+  "section": "L 7.02",
+  "page": "Seite L-39, PDF p. 39",
+  "distance": {
+    "value": 25000,
+    "raw": "25 m"
+  },
+  "category": "carbine",
+  "caliberClasses": {
+    "ids": [
+      "revolver-32",
+      "revolver-357-38",
+      "pistol-40-10mm",
+      "revolver-44",
+      "pistol-45",
+      "revolver-45-colt",
+      "pistol-7-65",
+      "pistol-9mm"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 7.02, Seite L-39, PDF p. 39",
+        "fields": ["name", "number", "federation", "section", "page"],
+        "note": "The handbook marks the discipline optional (O)."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 7.04, Seite L-41, PDF p. 41",
+        "fields": ["distance"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 7.02, Seite L-39, PDF p. 39",
+        "fields": ["category", "caliberClasses"]
+      }
+    ]
+  }
+}

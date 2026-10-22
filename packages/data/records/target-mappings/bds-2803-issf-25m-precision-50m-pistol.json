@@ -1,0 +1,23 @@
+{
+  "id": "bds-2803-issf-25m-precision-50m-pistol",
+  "discipline": "bds-2803",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "BDS 2803 25 m Kombi RB KW off. Vis., Teil Intervall/Zeitserie",
+  "stage": "Intervall/Zeitserie",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 7.02, Seite L-39, PDF p. 39",
+        "fields": ["discipline", "face", "event", "stage"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 7.03.2, Seite L-41, PDF p. 41",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

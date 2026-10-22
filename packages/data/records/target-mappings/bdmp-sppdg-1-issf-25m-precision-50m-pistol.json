@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-sppdg-1-issf-25m-precision-50m-pistol",
+  "discipline": "bdmp-sppdg-1",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "BDMP SPPDG 1 Schwarzpulverpatronen-DG 1",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.1, Teil B, Seite 8 von 70, PDF p. 8",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.7.11, Teil E, Seite 24 von 42, PDF p. 24",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.7.9, Teil E, Seite 24 von 42, PDF p. 24",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "The organizer may announce 15 record shots instead of 20 (E.7.9)."
+  }
+}

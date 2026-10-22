@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-f-class-tr-300m-bdmp-nr7",
+  "discipline": "bdmp-f-class-tr-300m",
+  "face": "bdmp-nr7",
+  "event": "BDMP F-Class TR 300 m",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.16, Teil B, Seite 58 von 70, PDF p. 58",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.13B.11, Teil D, Seite 81 von 294, PDF p. 81",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.13B.9, Teil D, Seite 81 von 294, PDF p. 81",
+        "fields": ["shotCount"],
+        "note": "Twenty counted shots, any number of sighters."
+      }
+    ]
+  }
+}

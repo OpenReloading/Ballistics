@@ -1,0 +1,16 @@
+name: Data or record request
+description: A missing or wrong cartridge, bullet, powder or target face record.
+labels: [data, needs-triage]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: Record and values
+      description: The record and the values to add or correct, with units.
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Source
+      description: Document or URL and its terms of use. Every record cites its source, so values without one cannot be added.

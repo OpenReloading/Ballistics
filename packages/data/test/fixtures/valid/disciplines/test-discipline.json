@@ -1,0 +1,13 @@
+{
+  "id": "test-discipline",
+  "federation": "test-federation",
+  "name": "Test discipline",
+  "section": "1.1",
+  "page": "p. 1",
+  "distance": { "value": 10000 },
+  "caliberClasses": { "ids": ["air-4-5"], "basis": "stated" },
+  "provenance": {
+    "kind": "published",
+    "sources": [{ "source": "test-rule-book", "note": "Discipline note." }]
+  }
+}

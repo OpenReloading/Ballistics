@@ -1,0 +1,16 @@
+{
+  "id": "fixture-flat-base",
+  "manufacturer": "fixture",
+  "productNumber": "flat-base",
+  "name": "Test fixture, flat base",
+  "diameter": { "value": 7.82 },
+  "mass": { "value": 9.72 },
+  "length": { "value": 28 },
+  "base": { "type": "flat" },
+  "ogive": { "form": "tangent" },
+  "meplatDiameter": { "value": 1.5 },
+  "noseLength": { "value": 16 },
+  "bearingLength": { "value": 12 },
+  "note": "Synthetic test fixture, not a product: no committed record has a flat base type.",
+  "provenance": { "kind": "derived", "sources": [{ "title": "Test fixture" }] }
+}

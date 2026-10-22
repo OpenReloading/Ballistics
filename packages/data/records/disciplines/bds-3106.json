@@ -1,0 +1,41 @@
+{
+  "id": "bds-3106",
+  "federation": "bds",
+  "name": "100 m Präz. DSG oK",
+  "number": "3106",
+  "section": "Anhang 1",
+  "page": "Seite Z-23, PDF p. 24",
+  "distance": {
+    "value": 100000,
+    "raw": "100 m"
+  },
+  "category": "service-rifle",
+  "caliberClasses": {
+    "ids": [
+      "rifle-25",
+      "rifle-6-5",
+      "rifle-270",
+      "rifle-7mm",
+      "rifle-30",
+      "rifle-30-carbine",
+      "rifle-8mm"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "page": "Anhang 1, Seite Z-23, PDF p. 24",
+        "fields": ["name", "number", "federation", "section", "page", "distance"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 2.02, Seite L-12, PDF p. 12",
+        "fields": ["number", "distance", "category", "caliberClasses"],
+        "note": "The table further limits the calibre to an original version of the rifle type."
+      }
+    ]
+  }
+}

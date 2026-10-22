@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-sar-2",
+  "federation": "bdmp",
+  "name": "Single Action Revolver 2",
+  "number": "SAR 2",
+  "section": "C.11",
+  "page": "Teil C, Seite 74 bis 75 von 142, PDF pp. 74 to 75",
+  "distance": {
+    "value": 25000,
+    "raw": "25 m"
+  },
+  "category": "revolver",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.11, C.11.1, Teil C, Seite 74 von 142, PDF p. 74",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.11.6, Teil C, Seite 74 von 142, PDF p. 74",
+        "fields": ["distance"]
+      }
+    ]
+  }
+}

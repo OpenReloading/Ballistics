@@ -1,0 +1,30 @@
+{
+  "id": "dsb-10m-pistole",
+  "federation": "dsb",
+  "name": "10 m Pistole",
+  "section": "0.20",
+  "page": "Seite 62 and 66, PDF pp. 80 and 84",
+  "distance": {
+    "value": 10000,
+    "raw": "10 m"
+  },
+  "caliberClasses": {
+    "ids": ["air-4-5"],
+    "basis": "stated"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "Seite 62 and 66, PDF pp. 80 and 84",
+        "fields": ["name", "federation", "section", "page", "distance"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "2.11 to 2.14, Teil 2 Seite 12 to 14, PDF pp. 146 to 148",
+        "fields": ["caliberClasses"]
+      }
+    ]
+  }
+}

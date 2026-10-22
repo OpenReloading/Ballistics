@@ -1,0 +1,8 @@
+{
+  "id": "test-session",
+  "date": "2026-10-08",
+  "device": { "kind": "doppler-radar", "manufacturerName": "Manufacturer", "model": "Model" },
+  "conditions": { "airTemperature": { "value": 15 } },
+  "strings": [{ "load": "missing-load", "shots": [{ "velocity": { "value": 800 } }] }],
+  "provenance": { "kind": "measured", "sources": [{ "title": "Test fixture" }] }
+}

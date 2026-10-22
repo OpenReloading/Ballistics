@@ -1,0 +1,32 @@
+{
+  "id": "bds-3125",
+  "federation": "bds",
+  "name": "100 m Präz. Büchse KK off./geschl. Vis.",
+  "number": "3125",
+  "section": "L 2.02",
+  "page": "Seite L-16, PDF p. 16",
+  "distance": {
+    "value": 100000,
+    "raw": "100 m"
+  },
+  "category": "rifle",
+  "caliberClasses": {
+    "ids": ["rimfire-22"],
+    "basis": "stated"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 2.02, Seite L-16, PDF p. 16",
+        "fields": ["name", "number", "federation", "section", "page", "distance"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 2.02, Seite L-16, PDF p. 16",
+        "fields": ["category", "caliberClasses"]
+      }
+    ]
+  }
+}

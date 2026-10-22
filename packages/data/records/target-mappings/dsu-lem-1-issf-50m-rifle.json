@@ -1,0 +1,17 @@
+{
+  "id": "dsu-lem-1-issf-50m-rifle",
+  "discipline": "dsu-lem-1",
+  "face": "issf-50m-rifle",
+  "event": "DSU LEM 1 Einzellader Matchgewehr 50 m",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 17, PDF p. 75",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

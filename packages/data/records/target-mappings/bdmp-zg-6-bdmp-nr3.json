@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-zg-6-bdmp-nr3",
+  "discipline": "bdmp-zg-6",
+  "face": "bdmp-nr3",
+  "event": "BDMP ZG 6 50 m",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.4, Teil B, Seite 20 von 70, PDF p. 20",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.14A.11, Teil D, Seite 86 von 294, PDF p. 86",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.14A.9, Teil D, Seite 86 von 294, PDF p. 86",
+        "fields": ["shotCount"],
+        "note": "Twenty counted shots in four series of five. Sighting shots are unlimited."
+      }
+    ]
+  }
+}

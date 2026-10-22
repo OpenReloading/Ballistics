@@ -1,0 +1,153 @@
+{
+  "id": "6-mm-flobert-blanc",
+  "name": "6 mm Flobert Blanc",
+  "table": "VIII",
+  "country": "France",
+  "published": "1991-08-02",
+  "revised": "2008-04-15",
+  "verification": "unverified",
+  "values": [
+    {
+      "side": "cartridge",
+      "symbol": "L3",
+      "quantity": "length",
+      "value": 7.6,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L6",
+      "quantity": "length",
+      "value": 6.6,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "R",
+      "quantity": "length",
+      "value": 1.15
+    },
+    {
+      "side": "cartridge",
+      "symbol": "R1",
+      "quantity": "length",
+      "value": 7.15
+    },
+    {
+      "side": "cartridge",
+      "symbol": "P1",
+      "quantity": "length",
+      "value": 5.75,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "H2",
+      "quantity": "length",
+      "value": 5.75,
+      "footnotes": ["1"]
+    },
+    {
+      "symbol": "Emax",
+      "quantity": "energy",
+      "value": 42
+    },
+    {
+      "symbol": "EK",
+      "quantity": "energy",
+      "value": 44.9
+    },
+    {
+      "symbol": "EE",
+      "quantity": "energy",
+      "value": 46.2
+    },
+    {
+      "side": "chamber",
+      "symbol": "L3",
+      "quantity": "length",
+      "value": 7.8,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "R",
+      "quantity": "length",
+      "value": 1.15,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "R1",
+      "quantity": "length",
+      "value": 7.3
+    },
+    {
+      "side": "chamber",
+      "symbol": "P1",
+      "quantity": "length",
+      "value": 5.76,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "H2",
+      "quantity": "length",
+      "value": 5.76,
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "G1",
+      "quantity": "length",
+      "value": 6,
+      "basic": true,
+      "footnotes": ["2"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "alpha1",
+      "quantity": "angle",
+      "value": 180,
+      "raw": "180°"
+    },
+    {
+      "side": "chamber",
+      "symbol": "F",
+      "quantity": "length",
+      "value": 6,
+      "basic": true,
+      "footnotes": ["2"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "Z",
+      "quantity": "length",
+      "value": 6
+    },
+    {
+      "side": "chamber",
+      "symbol": "Q",
+      "quantity": "area",
+      "value": 28.27,
+      "footnotes": ["2"]
+    }
+  ],
+  "exceptions": [
+    {
+      "finding": "length-order:L3-L6",
+      "note": "Present on the official CIP sheet at import; not yet checked by hand."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cip-tdcc",
+        "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-viii/tabviiical-en-page4.pdf",
+        "sha256": "49ee89db9b0eff0d9a5726f47e6ff5dff83f8d9386293541cea4075c19a3fe9a",
+        "retrieved": "2026-10-08"
+      }
+    ]
+  }
+}

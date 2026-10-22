@@ -1,0 +1,17 @@
+{
+  "id": "vdrbw-pr-d-1-issf-25m-precision-50m-pistol",
+  "discipline": "vdrbw-pr-d-1",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "VdRBw PR-D 1 Halbautomatische Dienstpistole / -revolver Dreistellung",
+  "shotCount": 15,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "8.4.8, Seite 38, PDF p. 38; Scheibe 10.3, Seite 98, PDF p. 98",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

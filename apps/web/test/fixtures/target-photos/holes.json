@@ -1,0 +1,136 @@
+{
+  "photos": {
+    "scan-light.jpg": {
+      "about": "scan of a light face with black rings and a black centre, dark backing, 0.8 of the bullet",
+      "size": [560, 560],
+      "pxPerMm": 8,
+      "caliberMm": 5.56,
+      "visibleDiameterPx": 35.583999999999996,
+      "holes": [
+        {
+          "x": 200,
+          "y": 210
+        },
+        {
+          "x": 330,
+          "y": 190
+        },
+        {
+          "x": 240,
+          "y": 150
+        },
+        {
+          "x": 272,
+          "y": 150
+        },
+        {
+          "x": 180,
+          "y": 360
+        },
+        {
+          "x": 380,
+          "y": 350
+        },
+        {
+          "x": 300,
+          "y": 410
+        }
+      ]
+    },
+    "phone-light.jpg": {
+      "about": "phone photo of a light face: tilt, uneven light, blur, JPEG, 0.7 of the bullet",
+      "size": [640, 640],
+      "pxPerMm": 6,
+      "caliberMm": 7.62,
+      "visibleDiameterPx": 32.004,
+      "holes": [
+        {
+          "x": 224.6,
+          "y": 246.5
+        },
+        {
+          "x": 393.5,
+          "y": 224.6
+        },
+        {
+          "x": 276.1,
+          "y": 264.9
+        },
+        {
+          "x": 305,
+          "y": 262.9
+        },
+        {
+          "x": 227.2,
+          "y": 426.7
+        },
+        {
+          "x": 435.3,
+          "y": 392.1
+        }
+      ]
+    },
+    "phone-dark.jpg": {
+      "about": "phone photo of a dark face: holes show the light board, as light as the paper, 0.7 of the bullet",
+      "size": [640, 640],
+      "pxPerMm": 6,
+      "caliberMm": 7.62,
+      "visibleDiameterPx": 32.004,
+      "holes": [
+        {
+          "x": 263.2,
+          "y": 256.9
+        },
+        {
+          "x": 383.6,
+          "y": 253.2
+        },
+        {
+          "x": 320,
+          "y": 320
+        },
+        {
+          "x": 247,
+          "y": 376.3
+        },
+        {
+          "x": 386.2,
+          "y": 393.6
+        },
+        {
+          "x": 311.7,
+          "y": 439.7
+        }
+      ]
+    },
+    "scan-orange.jpg": {
+      "about": "scan of an orange face on a black diamond: light holes with burnt dark rims, 0.8 of the bullet",
+      "size": [520, 520],
+      "pxPerMm": 8,
+      "caliberMm": 5.7,
+      "visibleDiameterPx": 36.480000000000004,
+      "holes": [
+        {
+          "x": 230,
+          "y": 220
+        },
+        {
+          "x": 300,
+          "y": 235
+        },
+        {
+          "x": 255,
+          "y": 290
+        },
+        {
+          "x": 320,
+          "y": 310
+        },
+        {
+          "x": 215,
+          "y": 330
+        }
+      ]
+    }
+  }
+}

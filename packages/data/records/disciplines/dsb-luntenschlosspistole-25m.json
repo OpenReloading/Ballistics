@@ -1,0 +1,28 @@
+{
+  "id": "dsb-luntenschlosspistole-25m",
+  "federation": "dsb",
+  "name": "25 m Luntenschlosspistole",
+  "number": "7.61",
+  "section": "0.21",
+  "page": "Teil 0 Seite 89, PDF p. 107",
+  "distance": {
+    "value": 25000,
+    "raw": "25 m"
+  },
+  "category": "muzzle-loader",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.21, Teil 0 Seite 89, PDF p. 107",
+        "fields": ["name", "number", "federation", "section", "page", "distance"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "Teil 7 Seite 1, PDF p. 337 (title: Regeln für das Schießen mit Vorderladerwaffen)",
+        "fields": ["category"]
+      }
+    ]
+  }
+}

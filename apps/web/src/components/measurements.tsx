@@ -1,0 +1,420 @@
+'use client'
+
+import { Button } from '@mantine/core'
+import type { VelocityUnit } from '@openreloading/importers'
+import { type Dispatch, type ReactNode, type SetStateAction, useState } from 'react'
+import { chronoFileBytes, readChrono } from '../lib/chrono.ts'
+import { errorText } from '../lib/error-text.ts'
+import {
+  type ChargeRow,
+  chargeRows,
+  type IdentifiedSeries,
+  type SimulatedStep,
+  seriesId,
+  seriesOf,
+  simulatedCurve,
+} from '../lib/measurements.ts'
+import { controlSize } from '../lib/theme.ts'
+import { formatNumber, type UnitSystem, withUnit } from '../lib/units.ts'
+import { ChronoFileInput } from './chrono-file-input.tsx'
+import { LineChart, useChartScale } from './line-chart.tsx'
+import { PanelTable } from './scroll-region.tsx'
+import { ErrorNote } from './states.tsx'
+
+/** A step of the last run as the Measurements tab needs it. */
+/** `label`: the step relative to the main charge. */
+type MeasuredStep = SimulatedStep & { n: number; label?: string }
+
+const columns = [
+  'Series',
+  'Charge',
+  'Shots',
+  'Excluded',
+  'Mean',
+  'SD',
+  'ES',
+  'Simulated',
+  'Difference',
+  'Difference %',
+] as const
+const tableName = 'Measured against simulated velocity per charge'
+const chartName = 'Measured mean velocity and simulated muzzle velocity against charge'
+
+/** Marker shapes per series, so series differ by more than colour. */
+const shapes = ['circle', 'square', 'triangle', 'diamond'] as const
+type Shape = (typeof shapes)[number]
+
+function Marker({ shape, x, y, r = 5 }: { shape: Shape; x: number; y: number; r?: number }) {
+  if (shape === 'circle') return <circle cx={x} cy={y} r={r} />
+  if (shape === 'square') return <rect x={x - r} y={y - r} width={2 * r} height={2 * r} />
+  const points =
+    shape === 'triangle'
+      ? [x, y - r - 1, x + r + 1, y + r, x - r - 1, y + r]
+      : [x, y - r - 1, x + r + 1, y, x, y + r + 1, x - r - 1, y]
+  return <polygon points={points.join(' ')} />
+}
+
+/** Series colour beside the shape: the chart palette after the first colour. */
+const colour = (k: number) => `var(--series-${(k % shapes.length) + 2})`
+
+function LegendShape({ shape, k }: { shape: Shape; k: number }) {
+  return (
+    <svg
+      viewBox="0 0 14 14"
+      width="14"
+      height="14"
+      aria-hidden="true"
+      focusable="false"
+      className="series-shape"
+      style={{ color: colour(k) }}
+    >
+      <Marker shape={shape} x={7} y={7} r={4} />
+    </svg>
+  )
+}
+
+type Plotted = { shape: Shape; rows: ChargeRow[] }
+
+/** Means with one-SD bars and excluded shots as crosses, drawn on the chart's scales in display units. */
+function Marks({ series, system }: { series: Plotted[]; system: UnitSystem }) {
+  const sc = useChartScale()
+  const xs = sc?.x
+  const ys = sc?.y
+  if (!xs || !ys) return null
+  const px = (kg: number) => xs(system.charge.fromSi(kg)) ?? Number.NaN
+  const py = (ms: number) => ys(system.velocity.fromSi(ms)) ?? Number.NaN
+  return (
+    <g className="measured-marks">
+      {series.map(({ shape, rows }, k) =>
+        rows.map((r) => {
+          const x = px(r.charge)
+          const st = r.velocityStats
+          return (
+            // biome-ignore lint/suspicious/noArrayIndexKey: series keep their order of reading
+            <g key={`${k} ${r.charge}`} data-shape={shape} style={{ color: colour(k) }}>
+              {st?.standardDeviation !== undefined && (
+                <g className="error-bar">
+                  <line
+                    x1={x}
+                    x2={x}
+                    y1={py(st.mean - st.standardDeviation)}
+                    y2={py(st.mean + st.standardDeviation)}
+                  />
+                  <line
+                    x1={x - 4}
+                    x2={x + 4}
+                    y1={py(st.mean - st.standardDeviation)}
+                    y2={py(st.mean - st.standardDeviation)}
+                  />
+                  <line
+                    x1={x - 4}
+                    x2={x + 4}
+                    y1={py(st.mean + st.standardDeviation)}
+                    y2={py(st.mean + st.standardDeviation)}
+                  />
+                </g>
+              )}
+              {st && <Marker shape={shape} x={x} y={py(st.mean)} />}
+              {r.excludedShots.map((e, i) => {
+                const y = py(e.velocity)
+                return (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: shots keep the file order
+                  <path key={i} className="excluded-mark" d={`M${x - 4} ${y - 4}l8 8m0 -8l-8 8`} />
+                )
+              })}
+            </g>
+          )
+        }),
+      )}
+    </g>
+  )
+}
+
+/**
+ * The Measurements tab: chronograph files read in the browser, strings mapped to the charges of the
+ * last run, a table per series and charge and one chart over charge. `steps` is undefined before a
+ * run. The load keeps `series`, so a load file saves them.
+ */
+export function Measurements({
+  steps,
+  system,
+  series,
+  setSeries,
+  idPrefix = 'measurements',
+}: {
+  /** Ids of the controls; the phone range view shows a second copy. */
+  idPrefix?: string
+  steps: MeasuredStep[] | undefined
+  system: UnitSystem
+  series: IdentifiedSeries[]
+  setSeries: Dispatch<SetStateAction<IdentifiedSeries[]>>
+}) {
+  const [unit, setUnit] = useState<VelocityUnit | ''>('')
+  const [error, setError] = useState('')
+  const [status, setStatus] = useState('')
+
+  async function readFiles(files: File[]) {
+    setError('')
+    setStatus('')
+    const read: IdentifiedSeries[] = []
+    const failed: string[] = []
+    for (const file of files) {
+      // taken before the first await, so reads that overlap never share an id
+      const id = seriesId()
+      try {
+        const data = await readChrono(await chronoFileBytes(file), {
+          fileName: file.name,
+          ...(unit ? { velocityUnit: unit } : {}),
+        })
+        // string k takes step k's charge; the selects show the guess
+        const charges = data.session.strings.map((_, i) => steps?.[i]?.charge)
+        read.push({ id, ...seriesOf(file.name, data, charges) })
+      } catch (err) {
+        failed.push(`${file.name}: ${errorText(err)}`)
+      }
+    }
+    setSeries((s) => [...s, ...read])
+    if (read.length > 0)
+      setStatus(`Read ${read.map((r) => `${r.name}, ${r.strings.length} strings`).join('; ')}.`)
+    if (failed.length > 0) setError(failed.join(' '))
+  }
+
+  const charge = (kg: number) => withUnit('charge', system, kg)
+  const v = system.velocity
+  const speed = (ms: number) => formatNumber(v.fromSi(ms), 1)
+  const runSteps = steps ?? []
+  const curve = simulatedCurve(runSteps)
+  const plotted = series.map((s, k) => ({
+    s,
+    shape: shapes[k % shapes.length],
+    rows: chargeRows(
+      s.strings.map((str) => ({ charge: str.charge, shots: str.shots })),
+      runSteps,
+    ),
+  }))
+  const seriesName = (s: IdentifiedSeries) => [s.name, s.date, s.device].filter(Boolean).join(', ')
+  const distances = series.flatMap((s) => {
+    const d = s.muzzleDistance
+    return d !== undefined ? [`${withUnit('length', system, d)} (${s.name})`] : []
+  })
+
+  function mapString(id: number, i: number, value: string) {
+    setSeries((all) =>
+      all.map((s) => {
+        if (s.id !== id) return s
+        const strings = [...s.strings]
+        strings[i] = { ...strings[i], charge: value === '' ? undefined : Number(value) }
+        return { ...s, strings }
+      }),
+    )
+  }
+
+  let table: ReactNode = null
+  if (plotted.some((p) => p.rows.length > 0))
+    table = (
+      <PanelTable
+        label="Measured against simulated velocity"
+        className="limits"
+        caption={
+          <>
+            {tableName} ({v.symbol})
+          </>
+        }
+        columns={columns}
+      >
+        {plotted.flatMap(({ s, shape, rows }, k) =>
+          rows.map((r) => (
+            <tr key={`${s.id} ${r.charge}`}>
+              <td data-label={columns[0]}>
+                <span className="series-name">
+                  <LegendShape shape={shape} k={k} />
+                  {s.name}
+                </span>
+              </td>
+              <td data-label={columns[1]} className="num">
+                {charge(r.charge)}
+              </td>
+              <td data-label={columns[2]} className="num">
+                {r.velocityStats?.count ?? 0}
+              </td>
+              <td data-label={columns[3]} className="num">
+                {r.excludedShots.length}
+              </td>
+              <td data-label={columns[4]} className="num">
+                {r.velocityStats ? speed(r.velocityStats.mean) : ''}
+              </td>
+              <td data-label={columns[5]} className="num">
+                {r.velocityStats?.standardDeviation !== undefined
+                  ? speed(r.velocityStats.standardDeviation)
+                  : ''}
+              </td>
+              <td data-label={columns[6]} className="num">
+                {r.velocityStats ? speed(r.velocityStats.extremeSpread) : ''}
+              </td>
+              <td data-label={columns[7]} className="num">
+                {r.simulatedVelocity !== undefined ? speed(r.simulatedVelocity) : 'no step'}
+              </td>
+              <td data-label={columns[8]} className="num">
+                {r.velocityDifference !== undefined ? speed(r.velocityDifference) : ''}
+              </td>
+              <td data-label={columns[9]} className="num">
+                {r.differencePercent !== undefined
+                  ? `${formatNumber(r.differencePercent, 1)} %`
+                  : ''}
+              </td>
+            </tr>
+          )),
+        )}
+      </PanelTable>
+    )
+
+  const excluded = plotted.flatMap(({ s, rows }) =>
+    rows.flatMap((r) =>
+      r.excludedShots.map(
+        (e) => `${s.name}, ${charge(r.charge)}: ${speed(e.velocity)} ${v.symbol}, ${e.reason}`,
+      ),
+    ),
+  )
+  const drawn = plotted.map((p) => ({
+    ...p,
+    rows: p.rows.filter((r) => r.simulatedVelocity !== undefined),
+  }))
+  const marks = drawn.flatMap((p) =>
+    p.rows.flatMap((r) => [
+      ...(r.velocityStats
+        ? [
+            r.velocityStats.mean - (r.velocityStats.standardDeviation ?? 0),
+            r.velocityStats.mean + (r.velocityStats.standardDeviation ?? 0),
+          ]
+        : []),
+      ...r.excludedShots.map((e) => e.velocity),
+    ]),
+  )
+
+  return (
+    <div className="measurements">
+      <p className="note">
+        Strings are saved with the load file (Save), not in copied links. Chronograph velocities are
+        not corrected to the muzzle
+        {distances.length > 0 ? `; measured at ${distances.join(', ')} from the muzzle` : ''}.
+      </p>
+      <ChronoFileInput
+        id={`${idPrefix}-file`}
+        unitId={`${idPrefix}-unit`}
+        label="Chronograph files, one series each"
+        multiple
+        unit={unit}
+        onUnit={setUnit}
+        onFiles={readFiles}
+      />
+      <p role="status">{status}</p>
+      {error && <ErrorNote title="The file was not read.">{error}</ErrorNote>}
+      {series.length === 0 && (
+        <p className="prompt empty-state">
+          Read a chronograph file to compare its strings with the simulated velocity per charge.
+          Nothing is sent; the file is read in this browser.
+        </p>
+      )}
+      {series.length > 0 && !steps && (
+        <p className="prompt empty-state">
+          Run the simulation, with a charge ladder for several charges, to map the strings to
+          charges.
+        </p>
+      )}
+      {table}
+      {table &&
+        (curve.length < 2 ? (
+          <p className="note">The chart needs a charge ladder of two steps or more.</p>
+        ) : (
+          <figure className="measurements-chart">
+            <LineChart
+              x={curve.map((s) => system.charge.fromSi(s.charge))}
+              y={curve.map((s) => v.fromSi(s.muzzleVelocity ?? 0))}
+              xLabel={`Charge (${system.charge.symbol})`}
+              yLabel={`Velocity (${v.symbol})`}
+              title={chartName}
+              description={`The line is the simulated muzzle velocity of the ladder steps; each series' measured mean is a marker with a bar of one standard deviation, excluded shots are crosses. The table "${tableName}" gives the values.`}
+              include={marks.map((ms) => v.fromSi(ms))}
+            >
+              <Marks series={drawn} system={system} />
+            </LineChart>
+            <ul className="chart-legend" aria-label="Chart legend">
+              <li>
+                <span className="legend-line" aria-hidden="true" /> Simulated muzzle velocity
+              </li>
+              {drawn.map(({ s, shape }, k) => (
+                <li key={s.id}>
+                  <LegendShape shape={shape} k={k} /> {s.name}: measured mean, bar one SD
+                </li>
+              ))}
+              {excluded.length > 0 && (
+                <li>
+                  <svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true">
+                    <path className="excluded-mark" d="M3 3l8 8m0 -8l-8 8" />
+                  </svg>{' '}
+                  Excluded shot
+                </li>
+              )}
+            </ul>
+          </figure>
+        ))}
+      {excluded.length > 0 && (
+        <>
+          <h3>Excluded shots</h3>
+          <ul>
+            {excluded.map((t, k) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: shots keep the file order and may repeat
+              <li key={k}>{t}</li>
+            ))}
+          </ul>
+        </>
+      )}
+      {series.length > 0 && <h3>Strings and charges</h3>}
+      {plotted.map(({ s, shape }, k) => (
+        <fieldset key={s.id} className="measured-series">
+          <legend className="series-name">
+            <LegendShape shape={shape} k={k} /> {seriesName(s)}
+          </legend>
+          {s.strings.map((str, i) => {
+            const label = str.label
+            const name = `String ${i + 1}${label ? `: ${label}` : ''}`
+            const at = str.charge
+            const step =
+              at === undefined ? undefined : runSteps.find((st) => Math.abs(st.charge - at) < 1e-7)
+            return (
+              // biome-ignore lint/suspicious/noArrayIndexKey: strings keep the file order and have no id
+              <div key={i} className="field">
+                <label htmlFor={`${idPrefix}-series-${s.id}-${i}`}>
+                  {name} ({str.shots.length} shots)
+                </label>
+                <select
+                  id={`${idPrefix}-series-${s.id}-${i}`}
+                  value={at === undefined ? '' : String(step?.charge ?? at)}
+                  disabled={!steps}
+                  onChange={(e) => mapString(s.id, i, e.target.value)}
+                >
+                  <option value="">Not used</option>
+                  {runSteps.map((st) => (
+                    <option key={st.n} value={String(st.charge)}>
+                      Step {st.label ?? st.n}, {charge(st.charge)}
+                    </option>
+                  ))}
+                  {at !== undefined && !step && (
+                    <option value={String(at)}>{charge(at)} (not in this run)</option>
+                  )}
+                </select>
+              </div>
+            )
+          })}
+          <Button
+            variant="subtle"
+            size={controlSize.row.button}
+            onClick={() => setSeries((all) => all.filter((x) => x.id !== s.id))}
+          >
+            Remove {s.name}
+          </Button>
+        </fieldset>
+      ))}
+    </div>
+  )
+}

@@ -1,0 +1,217 @@
+'use client'
+
+import { createPortal } from 'react-dom'
+import { localDay } from '../lib/dates.ts'
+import { printAlone, usePortalBody } from './print.ts'
+
+/** One charge of the load as the sheets show it: display texts, simulated values. */
+type SheetStep = {
+  n: number
+  /** The step relative to the main charge, 0. */
+  label: string
+  charge: string
+  pressure?: string
+  ofMax?: string
+  velocity?: string
+  energy?: string
+  flag?: string
+}
+
+/**
+ * The load to take to the bench: an overview page with the components and
+ * every charge, then one page per charge with blanks to fill while loading and at the range. Rendered
+ * into `body` and printed alone while `<html data-print="sheets">` is set (`printSheets`).
+ */
+export function LoadSheets({
+  title,
+  components,
+  note,
+  by = 'Charge',
+  steps,
+}: {
+  title: string
+  /** Printed after the date: that inputs changed since the run, values that are approximate. */
+  note?: string
+  /** Label and value rows: cartridge, bullet, powder, seating, firearm. */
+  components: [string, string][]
+  /** What the steps vary: the charge, or the length the bullet is seated by. */
+  by?: string
+  steps: SheetStep[]
+}) {
+  // the portal target exists after mounting only (server render has no document)
+  const body = usePortalBody()
+  if (!body) return null
+  const simulated = steps.some((s) => s.pressure)
+  // the components in two columns: half the height of one long table
+  const half = Math.ceil(components.length / 2)
+  const table = (
+    <div className="sheet-components">
+      {[components.slice(0, half), components.slice(half)].map((part) => (
+        <table key={part[0]?.[0] ?? 'none'} className="sheet-table">
+          <tbody>
+            {part.map(([k, v]) => (
+              <tr key={k}>
+                <th scope="row">{k}</th>
+                <td>{v}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ))}
+    </div>
+  )
+  const lines = (n: number) => Array.from({ length: n }, (_, i) => i)
+  return createPortal(
+    <div className="load-sheets">
+      <section className="load-sheet">
+        <h1>{title}</h1>
+        <p className="sheet-date">
+          Printed {localDay(new Date())}.{note && ` ${note}`}
+        </p>
+        {table}
+        <h2>{by === 'Charge' ? 'Charges' : `${by} steps`}</h2>
+        <table className="sheet-table sheet-steps">
+          <thead>
+            <tr>
+              <th scope="col">Step</th>
+              <th scope="col">{by}</th>
+              {simulated && (
+                <>
+                  <th scope="col">Peak pressure, simulated (range)</th>
+                  <th scope="col">Of max.</th>
+                  <th scope="col">Velocity, simulated</th>
+                  <th scope="col">Flag</th>
+                </>
+              )}
+              {/* blanks: the one page holds the bench and the range */}
+              <th scope="col">Rounds</th>
+              <th scope="col">Loaded</th>
+              <th scope="col">Velocity, measured</th>
+              <th scope="col">SD / ES</th>
+              <th scope="col">Group</th>
+              <th scope="col">Pressure signs, notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {steps.map((s) => (
+              <tr key={s.n}>
+                <td>
+                  {s.label}
+                  {s.label === '0' && ' main'}
+                </td>
+                <td className="num">{s.charge}</td>
+                {simulated && (
+                  <>
+                    <td className="num">{s.pressure}</td>
+                    <td className="num">{s.ofMax}</td>
+                    <td className="num">{s.velocity}</td>
+                    <td>{s.flag}</td>
+                  </>
+                )}
+                <td className="blank" />
+                <td className="blank">
+                  <span className="box" />
+                </td>
+                <td className="blank" />
+                <td className="blank" />
+                <td className="blank" />
+                <td className="blank wide-blank" />
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+      {steps.map((s) => (
+        <section key={s.n} className="load-sheet step">
+          <h1>
+            Step {s.label}
+            {s.label === '0' && ', main'}: {s.charge}
+          </h1>
+          <p className="sheet-sub">{title}</p>
+          {table}
+          {s.pressure && (
+            <p className="sheet-sim">
+              Simulated peak {s.pressure}
+              {s.ofMax && ` (${s.ofMax} of maximum)`}, velocity {s.velocity}
+              {s.flag && `, ${s.flag}`}.
+            </p>
+          )}
+          <h2>Loading</h2>
+          <table className="sheet-table">
+            <tbody>
+              {[
+                'Date',
+                'Rounds loaded',
+                'Charge weights thrown',
+                'COAL measured',
+                'Case lot, primer lot',
+              ].map((k) => (
+                <tr key={k}>
+                  <th scope="row">{k}</th>
+                  <td className="blank" />
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <h2>At the range</h2>
+          <table className="sheet-table">
+            <tbody>
+              {['Date, temperature', 'Group size', 'Point of impact'].map((k) => (
+                <tr key={k}>
+                  <th scope="row">{k}</th>
+                  <td className="blank" />
+                </tr>
+              ))}
+              <tr>
+                <th scope="row">Pressure signs</th>
+                <td>
+                  {[
+                    'flattened or cratered primer',
+                    'ejector mark',
+                    'hard bolt lift',
+                    'case head expansion',
+                  ].map((k) => (
+                    <span key={k} className="sheet-check">
+                      <span className="box" /> {k}
+                    </span>
+                  ))}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <table className="sheet-table sheet-chrono">
+            <thead>
+              <tr>
+                <th scope="col">Shot</th>
+                {lines(10).map((i) => (
+                  <th key={i} scope="col">
+                    {i + 1}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Velocity</th>
+                {lines(10).map((i) => (
+                  <td key={i} className="blank" />
+                ))}
+              </tr>
+            </tbody>
+          </table>
+          <h2>Notes</h2>
+          {lines(5).map((i) => (
+            <div key={i} className="sheet-line" />
+          ))}
+        </section>
+      ))}
+    </div>,
+    body,
+  )
+}
+
+/**
+ * Prints the sheets alone, the overview only or with a page per charge (`steps`): the attribute
+ * switches the print rules until the dialog closes.
+ */
+export const printSheets = (steps: boolean) => printAlone(steps ? 'sheets-steps' : 'sheets')

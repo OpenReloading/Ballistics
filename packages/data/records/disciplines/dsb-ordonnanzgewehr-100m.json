@@ -1,0 +1,28 @@
+{
+  "id": "dsb-ordonnanzgewehr-100m",
+  "federation": "dsb",
+  "name": "Ordonnanzgewehr 100 m",
+  "number": "1.58",
+  "section": "1.8",
+  "page": "Teil 1 Seite 16, PDF p. 128",
+  "distance": {
+    "value": 100000,
+    "raw": "100 m"
+  },
+  "category": "service-rifle",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "1.8, Teil 1 Seite 16, PDF p. 128 (heading with 1.58.O and 1.58.G; 1.8.3 distance 100 m)",
+        "fields": ["name", "federation", "section", "page", "distance", "category"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.21, Teil 0 Seite 78, PDF p. 96 (rows 1.58 O and 1.58 G)",
+        "fields": ["number"]
+      }
+    ]
+  }
+}

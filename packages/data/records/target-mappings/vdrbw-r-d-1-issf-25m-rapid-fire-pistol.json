@@ -1,0 +1,18 @@
+{
+  "id": "vdrbw-r-d-1-issf-25m-rapid-fire-pistol",
+  "discipline": "vdrbw-r-d-1",
+  "face": "issf-25m-rapid-fire-pistol",
+  "event": "VdRBw R-D 1 Dienstrevolver Zeitserie",
+  "stage": "Zeitserie",
+  "shotCount": 15,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "8.3.8, Seite 36, PDF p. 36; Scheibe 10.2, Seite 97, PDF p. 97",
+        "fields": ["discipline", "face", "event", "stage", "shotCount"]
+      }
+    ]
+  }
+}

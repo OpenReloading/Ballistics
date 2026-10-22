@@ -1,0 +1,46 @@
+{
+  "id": "dsu-lem-2",
+  "federation": "dsu",
+  "name": "Einzellader Matchgewehr 100 m",
+  "number": "LEM 2",
+  "section": "Kapitel 3, Langwaffenübungen, LEM 2",
+  "page": "Seite 18, PDF p. 76",
+  "distance": {
+    "value": 100000,
+    "raw": "100 Meter"
+  },
+  "caliberClasses": {
+    "ids": [
+      "rifle-22-cf",
+      "rifle-6mm",
+      "rifle-25",
+      "rifle-6-5",
+      "rifle-270",
+      "rifle-7mm",
+      "rifle-30",
+      "rifle-8mm"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 18, PDF p. 76",
+        "fields": ["federation", "section", "page", "distance", "caliberClasses"],
+        "note": "Groups 1 (.22 Zentralfeuer) and 2 (6 to 8 mm) are scored separately. .30 Carbine is excluded (listed under Kurzpatronen)."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Inhaltsverzeichnis Langwaffen, Seite 2 (PDF p. 60)",
+        "fields": ["name", "number"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 9, Kurzbezeichnungen Langwaffen, Seite 1 (PDF p. 227)",
+        "fields": ["caliberClasses"]
+      }
+    ]
+  }
+}

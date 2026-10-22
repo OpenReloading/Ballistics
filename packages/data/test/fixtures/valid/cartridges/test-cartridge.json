@@ -1,0 +1,73 @@
+{
+  "id": "test-cartridge",
+  "name": "Test Cartridge",
+  "aliases": ["Test Alias"],
+  "table": "I",
+  "published": "2020-01-01",
+  "pressureMethod": "transducer",
+  "verification": "unverified",
+  "values": [
+    {
+      "side": "cartridge",
+      "symbol": "L1",
+      "quantity": "length",
+      "value": 30,
+      "tolerance": {
+        "lower": -0.2
+      }
+    },
+    {
+      "side": "cartridge",
+      "symbol": "L3",
+      "quantity": "length",
+      "value": 50
+    },
+    {
+      "side": "chamber",
+      "symbol": "L3",
+      "quantity": "length",
+      "value": 50.2
+    },
+    {
+      "side": "cartridge",
+      "symbol": "P1",
+      "quantity": "length",
+      "value": 12
+    },
+    {
+      "side": "chamber",
+      "symbol": "P1",
+      "quantity": "length",
+      "value": 12.05
+    },
+    {
+      "symbol": "Pmax",
+      "quantity": "pressure",
+      "value": 4000
+    },
+    {
+      "symbol": "PK",
+      "quantity": "pressure",
+      "value": 4500
+    },
+    {
+      "symbol": "PE",
+      "quantity": "pressure",
+      "value": 5000
+    }
+  ],
+  "exceptions": [
+    {
+      "finding": "pk-ratio",
+      "note": "Test fixture"
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "test-fixture"
+      }
+    ]
+  }
+}

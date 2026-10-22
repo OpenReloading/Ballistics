@@ -1,0 +1,41 @@
+{
+  "id": "broken-cartridge",
+  "name": "Broken",
+  "table": "I",
+  "published": "2020-01-01",
+  "verification": "unverified",
+  "values": [
+    {
+      "side": "cartridge",
+      "symbol": "P1",
+      "quantity": "length",
+      "value": 12.1
+    },
+    {
+      "side": "cartridge",
+      "symbol": "P1",
+      "quantity": "length",
+      "value": 12.1
+    },
+    {
+      "side": "chamber",
+      "symbol": "P1",
+      "quantity": "length",
+      "value": 12
+    }
+  ],
+  "exceptions": [
+    {
+      "finding": "pk-ratio",
+      "note": "Test fixture"
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Test fixture"
+      }
+    ]
+  }
+}

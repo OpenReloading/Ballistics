@@ -1,0 +1,37 @@
+{
+  "id": "dsb-25m-schnellfeuerpistole-nachwuchs",
+  "federation": "dsb",
+  "name": "25 m Schnellfeuerpistole - Nachwuchswettbewerb",
+  "number": "2.31",
+  "section": "2.17",
+  "page": "Teil 2 Seite 17, PDF p. 151",
+  "distance": {
+    "value": 25000,
+    "raw": "25 m"
+  },
+  "category": "pistol",
+  "caliberClasses": {
+    "ids": ["rimfire-22"],
+    "basis": "stated"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "2.17, Teil 2 Seite 17, PDF p. 151",
+        "fields": ["name", "federation", "section", "page", "distance", "category"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.21, Teil 0 Seite 81, PDF p. 99 (row 2.31)",
+        "fields": ["number"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.21, row 2.31, Teil 0 Seite 81, PDF p. 99",
+        "fields": ["caliberClasses"]
+      }
+    ]
+  }
+}

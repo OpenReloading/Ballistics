@@ -1,0 +1,31 @@
+{
+  "id": "issf-25m-standard-pistol-issf-25m-precision-50m-pistol",
+  "discipline": "issf-25m-standard-pistol",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "25m Standard Pistol",
+  "gauge": {
+    "value": 5.6,
+    "raw": "5.60mm"
+  },
+  "shotCount": 60,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 3.3.1, p. 39 (PDF p. 39), rule 6.3.4.5, p. 199 (PDF p. 199)",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 8.7.6.5, p. 365 (PDF p. 365)",
+        "fields": ["shotCount"]
+      },
+      {
+        "source": "issf-paper-target-scoring-2022",
+        "page": "Rule 1.4.3, p. 321 (PDF p. 2)",
+        "fields": ["gauge"]
+      }
+    ]
+  }
+}

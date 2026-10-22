@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-phdg-1",
+  "federation": "bdmp",
+  "name": "Perkussions-Hinterlader-DG 1",
+  "number": "PHDG 1",
+  "section": "E.2",
+  "page": "Teil E, Seite 9 bis 10 von 42, PDF pp. 9 to 10",
+  "distance": {
+    "value": 100000,
+    "raw": "100 m"
+  },
+  "category": "service-rifle",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.2, E.2.1, Teil E, Seite 9 von 42, PDF p. 9",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.2.12, Teil E, Seite 10 von 42, PDF p. 10",
+        "fields": ["distance"]
+      }
+    ]
+  }
+}

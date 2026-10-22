@@ -1,0 +1,42 @@
+{
+  "name": "@openreloading/web",
+  "version": "0.0.1",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "predev": "node ../../patches/apply.mjs --check",
+    "dev": "next dev",
+    "prebuild": "node ../../patches/apply.mjs --check && node -e \"fs.rmSync('.next/cache/fetch-cache', { recursive: true, force: true })\"",
+    "build": "next build && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/service-worker.mts",
+    "start": "next start",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "vitest run --dir test"
+  },
+  "dependencies": {
+    "@mantine/core": "9.7.2",
+    "@mantine/form": "9.7.2",
+    "@mantine/hooks": "9.7.2",
+    "@mantine/spotlight": "9.7.2",
+    "@openreloading/api": "*",
+    "@openreloading/core": "*",
+    "@openreloading/data": "*",
+    "@openreloading/drawing": "*",
+    "@openreloading/importers": "*",
+    "@openreloading/schema": "*",
+    "@phosphor-icons/react": "2.1.10",
+    "country-flag-icons": "1.6.20",
+    "echarts": "6.1.0",
+    "next": "16.4.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "sharp": "^0.35.5",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.3"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "id": "vdrbw-g-rm-1-vdrbw-bw-nr2-klein",
+  "discipline": "vdrbw-g-rm-1",
+  "face": "vdrbw-bw-nr2-klein",
+  "event": "VdRBw G-RM 1 Militär-Repetiergewehr",
+  "shotCount": 30,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.2.9, Seite 60, PDF p. 60; Scheibe 10.1, Seite 96, PDF p. 96",
+        "fields": ["discipline", "face", "event", "shotCount"],
+        "note": "The book also allows 15 record shots, printed in brackets."
+      }
+    ]
+  }
+}

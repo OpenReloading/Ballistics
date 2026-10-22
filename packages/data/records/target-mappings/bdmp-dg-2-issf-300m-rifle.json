@@ -1,0 +1,27 @@
+{
+  "id": "bdmp-dg-2-issf-300m-rifle",
+  "discipline": "bdmp-dg-2",
+  "face": "issf-300m-rifle",
+  "event": "BDMP DG 2 Dienstgewehr 2",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.3, Teil B, Seite 18 von 70, PDF p. 18",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.7.11, Teil D, Seite 34 von 294, PDF p. 34",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.7.9, Teil D, Seite 33 von 294, PDF p. 33",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

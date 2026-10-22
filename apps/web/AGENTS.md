@@ -1,0 +1,200 @@
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
+
+# @openreloading/web
+
+Next.js App Router (TypeScript, React). API at `API_URL` (default `http://localhost:3000`). May import `@openreloading/core` for computation in the browser. Package rules: root `AGENTS.md`.
+
+## Records and lists
+
+- `/cartridges`, `/cartridges/[id]`: server components reading the API through `apiGet` in `src/lib/api.ts` (`'use cache'`, `cacheLife('days')`).
+  - With the API reachable during `next build`, every cartridge page is prerendered. Without it the build passes and pages render on first request.
+  - `PRERENDER=sample` (root `AGENTS.md`) limits that to the records of `src/lib/prerender-sample.ts` (`sampleIds`, `pickIds`, read by `staticIds` in `src/lib/api.ts`). At least one id per route: the ids the e2e specs and the smoke set open. Every other id renders on its first visit. An unknown id answers 404 (`ensureStatic = 'navigation'` in `[id]/layout.server.tsx`).
+  - At run time an unreachable API throws, so cached pages stay.
+- Home (`src/app/page.tsx`): the page bar's h1 visually hidden (`titleHidden`), the top bar shows the whole wordmark there (`Brand` `full` in `site-header.tsx`; other pages cut it to its mark), the Tools and Data panels from `sections` as cards in one row each (stacked below 48em), the record counts of the Data cards from the list routes at build time.
+- `/bullets`, `/bullets/[id]`, `/powders`, `/powders/[id]`: prerendered like the cartridge pages, from `GET /bullets` and `GET /powders`.
+- `/targets`, `/targets/[id]`: the target face records, prerendered like the cartridge pages, from `GET /target-faces`, each face record, `GET /target-mappings`, `GET /disciplines` and `GET /federations` (rows and value groups in `src/lib/target-faces.ts`).
+  - List (`target-face-list.tsx`): name, federation, distances, outer diameter, rings and the count of disciplines mapped to the face; search and the Federation filter (`?org=`).
+  - Record: the strip (federation, distances, outer diameter, black area, rings), the face drawn from the record (`target-face-drawing.tsx`, server SVG), the Rings panel (`FieldTable`: scoring values, ring diameters, inner ten), the Events panel (one row per face event with its target mapping, `faceEventRows`: federation, number, discipline or else the event name, stage, distance, gauge, shots, kind and scoring where an event has them, section, else the page the mapping's source cites) and the Sources.
+  - The Events panel links each listed discipline to `/disciplines/[id]`.
+  - "Open in shot groups" links to `/groups?face=<id>`: a new sheet whose first group is scored on that face (`linkedFace` in `target-editor.tsx`). An id no face record has (`isFaceId` in `src/lib/face-records.ts`) opens the last sheet. With `&event=<name>` the group also takes that face event, so the group panel shows the discipline of its mapping and its federation.
+- `/disciplines`, `/disciplines/[id]`, `/federations`, `/federations/[id]`: the discipline and federation records, prerendered like the cartridge pages, from `GET /disciplines`, `GET /federations`, each record (caliber classes, rule books), `GET /target-mappings` and the face records of the stages (rows, filters and value groups in `src/lib/disciplines.ts`, lists in `discipline-list.tsx`). The navigation has one Disciplines entry. `/federations` is reached from the discipline list and records and counts as under it (`linkedFrom` in `src/lib/sections.ts`).
+  - Discipline list: name, number, federation, distance, category, caliber classes, faces; search and the filters Federation (`?org=`), Category (`?cat=`), Distance in m (`?dist=`) and Caliber class (`?class=`).
+  - Discipline record: the strip (federation, distance, category), number, section, page and caliber classes (`FieldTable`), the links to the federation, the rule book (the source of the record's `section`) and the international discipline, the Faces panel (one row per target mapping: the face drawn small and linked, event, stage, gauge, shots) and the Sources. "Open in shot groups" opens the first mapping's face and event. With two or more mappings each row of the Faces panel opens its own (Shot groups column).
+  - Federation list: name, abbreviation, country, rule books, disciplines and faces. Federation record: abbreviation, country, member of, the rule books, its disciplines (linked, and the discipline list filtered by `?org=`) and the faces they use.
+- Lists: directory tables fed with every summary, searched, filtered and sorted in the browser (`directory-table.tsx`, `src/lib/directory.ts`: filters in the URL, windowed rows. The rows of each list are in `src/lib/bullet-rows.ts`, `cartridge-rows.ts` and `powder-rows.ts`).
+  - `bullet-list.tsx`: row checkboxes and Compare to `/bullets/compare?ids=` (`bullet-compare-view.tsx` reads `ids` and the records in the browser, `bullet-compare.tsx`: the drawings panel with the unit switch and the bullet data table in the groups of `bulletDataGroups`, from `src/lib/bullet-compare.ts`, the `ids` parameter in `src/lib/compare-ids.ts`). Its `fits` parameter keeps the bullets that fit a cartridge by the CIP rule (`bulletFits` of core, "Fits cartridge" under More filters).
+  - `cartridge-list.tsx`, and `powder-list.tsx` with the burn-rate order. `/powders/burn-rates` keeps the overlay in `burn-rate-compare.tsx`.
+  - Shared parts: `DirectoryTable` (`unit`, `dim`, `breakBefore`, `phoneAction`, `onOpen`), `FilterGroup`, `ExtraField`, `ListLoading`, `EmptyList` (names the filters set, `filterText` in `src/lib/lists.ts`). Filters, kept in the URL: country, ranges (`numberRange` in `src/lib/directory.ts`, `range-filter.tsx`), tip type and BC behind "More filters" (a `Popover` in `DirectoryFilters`'s `extra`).
+  - Filter row: search, source, facets, then More filters and Clear filters at its end. A set filter has the link-coloured border. Below 48em: search, Source, a Sort select (`sorting` of `DirectoryFilters`, the only sort there) and More filters and Clear filters as icons. The facets marked `more-filter` show with More filters.
+- List sources: the bullet and cartridge lists add the browser's design records as Mine rows (`useUserRecords`, `list-sources.tsx`, rows in `src/lib/sources.ts`).
+  - `SourceFilter` (a button with a checkbox per source and its count) in the URL as `?src=`, on every list. Powders have the one source OpenReloading (no user record holds a powder). Firearms: the example is OpenReloading, the firearms of this browser Mine. The bullet and cartridge lists show a Source column only with Mine rows: a Mine row's badge and Delete, a catalogue row blank. A cell without a value shows n/a. Below 48em Delete is at the end of the row (`phoneAction`).
+  - The designers open `?record=<id>` from the browser store (`use-record-link.ts`).
+- Cartridge record (`components/cartridge-record.tsx`, rows from `src/lib/cartridge-record.ts`):
+  - Four fact cards (`RecordFacts`). The mm or in switch in the heads of the Cartridge and Chamber panels.
+  - A shotshell's Variants panel, with the variant select in its title row (`VariantSelect`).
+  - Two panels, Cartridge and Chamber, always shown (`CartridgeSides`), each its drawing left of its dimension table, linked by `data-symbol` within a panel. No view switch, no search or group filter. Descriptions are the tooltip of the symbol, one tab stop per table. A side without a drawing takes its table's width with the reason under it. A drawing keeps the room of the other length unit's.
+  - The button link "Bullets (n)" to `/bullets?fits=<id>` (`cartridge-bullets.tsx`), not printed.
+  - A record without values shows the Gap badge (`GapBadge` in `standard-badge.tsx`, also in the cartridge list) and the line "No dimensions or pressures in this record". No unit switch, no Open in designer.
+- Record frame (`components/record-page.tsx`): page bar with badges and the actions of `record-actions.tsx`, grid of figure (optional), values and side, then the Sources section (`components/sources.tsx`: `Sources` in full, `SourceTitles` for the lines of the workbench and the trajectory form).
+- `FieldTable` (`components/field-table.tsx`): one value column in the Settings preset, the text as printed and the method on hover. Rows from `src/lib/record-fields.ts`.
+- Bullet record: the Drawing panel (mm or in switch in its head), the Ballistic coefficients table (`CoefficientTable`) and the Cartridges panel (`bullet-cartridges.tsx`, filter over the names) left, the Bullet data panel whole at the right (`FieldPanel`: symbol, quantity, value and unit per row, a group filter, search over 20 rows, groups from `bulletDataGroups`). On a phone the data comes before the cartridges. `RecordScope` (`cartridge-record.tsx`) holds the unit switch of a record page.
+- A filter or search hides rows on screen only: print has every row and no filter, search or switch.
+- Powder record: the Burn rate panel (`BurnRateSummary` in `burn-rate-section.tsx`) over the Dynamic vivacity panel (`vivacity-panel.tsx`: the curve, `z1` marked, the curve values behind a button, printed open) left, the Model parameters panel (`FieldPanel`, groups from `powderParameterGroups`: fitted first, then fixed inputs and burn form) right, then Properties and Model fit where the record has them.
+- Sources: a table of source, origin, retrieved, license, the fields it covers and note. A column no source fills is left out. Below 48em each source is a stacked block, its values labelled with the column names.
+- The template's `Panel`: `components/panel.tsx`. Fact cards of every record page: `components/fact-cards.tsx`. Bullet and powder records' cards: `components/field-strip.tsx`, items from `bulletStrip` and `powderStrip` in `src/lib/record-fields.ts`, then the manufacturer's country as `components/countries.tsx`.
+- "Use in workbench" links to `/workbench?cartridge=<id>`, `?bullet=<id>` or `?powder=<id>` (`linkedLoad`, `workbenchHref` in `src/lib/query.ts`).
+- Bullet and powder records print on the named page `record-sheet` of `globals.css`: the browser's paper, the bullet drawing at 1:1.
+- Page scroll: from a window of 1280 x 650 CSS px the workbench has no page scroll, no scrolling inputs column and no cut control (button, tab, field, label, unit, number). In a lower window, and from 62em to 75em wide, the frame stays and only the inputs column scrolls: the page never scrolls. Result tabs other than Chart (Trajectory, Ladder table, Measurements) may scroll inside their own panel, the ladder steps sideways. `workbench-no-scroll.spec.ts` checks 1280 x 650, 1366 x 657, 1536 x 730, 1280 x 800, 1920 x 1080 and 1100 x 800. Other pages may scroll, secondary content (related records, sources) below the main content.
+- Cartridge drawing (`src/components/cartridge-drawing.tsx`, `technical-drawing.tsx`): server-rendered SVG of the technical face, laid out by `@openreloading/drawing` (`packages/drawing`). A record page draws the cartridge and the chamber as two figures (`side`).
+  - In the cartridge designer the Cartridge, Chamber and Combined views switch with a `SegmentedControl` and the figure's `data-view`. Combined comes first once both sides draw and carries the region differences of `packages/drawing/src/cartridge/regions.ts`.
+  - Dimension values are in the SVG `desc` and the values tables (no dimension focus). Angles in decimal degrees in both (`angleText` of `@openreloading/drawing`).
+  - The drawing font is Inter (`src/app/fonts/`). After changing it run `node scripts/glyph-advances.mts`.
+
+## Workbench and designers
+
+- `/workbench` and the designers: calculator workspaces (`src/components/workspace.tsx`): input panels, results with readouts and tabs. Below 48em tabs Inputs (workbench: Load) and Results. Designers: no tabs, their drawing sticky above a property grid (`property-grid.tsx`).
+- `/workbench` files in `src/components/`:
+  - `workbench.tsx`: composition.
+  - `use-workbench-load.ts`: the state and actions (records, seating, ladder, run). The cards read them through `LoadContext`, the result side through `ResultContext` and `InputEcho` (`workbench-context.ts`).
+  - `workbench-inputs.tsx`: the input cards, start card and checklist. `workbench-figure.tsx`: the cartridge figure. `workbench-readouts.tsx`: readouts, warnings, limits, the ladder strip and table.
+  - `workbench-results.tsx`: the result tabs. `workbench-outcome.ts`: result types and helpers.
+- Workbench: a full-window frame from 62em with the cards Cartridge, Powder, Bullet and Gun. From 75em Cartridge and the cartridge figure in the first column, Powder, Bullet and Gun in the second. The figure's drawing fills the card's free height and width. In a window lower than 45em (`shortFrame`) the burn-rate figure (`BurnFigure`) takes the figure's place under Cartridge, and the cartridge figure is the result tab Cartridge (`FigureTab` of `workbench-figure.tsx`, `panelColumns` in `workbench-inputs.tsx`). Below 75em one flow in the order of the markup: Cartridge, figure, Powder, Bullet, Gun. Start card "Start a load" for a new load. Below 48em a third tab "Range" (`workbench-range.tsx`).
+- The results start with one line: the load, the notice and a fixed slot for the warnings (notice and slot not printed). Then the key tiles (peak pressure with its share of the limit and a bar, muzzle velocity, energy), the other readouts as a two-column list beside the burn-rate figure (in a low window, `shortFrame`, three columns, the figure in the inputs' second column), the ladder steps as one row that scrolls sideways. An error takes the place of the tiles and the list.
+- Chart: the toolbar holds the quantity switch, the x axis switch and Data. Reference lines at 85 % and 75 % of the limit (`referenceLines`). The y axes share one count of intervals (`alignedAxes`).
+- Page bar of the workbench (`workbench.tsx`, `Toolbar` in `workspace.tsx`): the load switcher (a menu of the open loads, Rename this load and Saved loads) and New load, Run, a status block of fixed width (the result, the file state), then Open, Save, Search, Copy link, Print and the Safety icon. From 75em Search, Copy link and Print are icons named by their text.
+- Result tabs: Chart, Cartridge (the figure, only in a low window, `shortFrame`), Ladder table, Trajectory, Measurements, Groups, Notes, Barrel length (`barrel-length.tsx`, `use-barrel-study.ts`, `src/lib/barrel-length.ts`) and Powders (`powder-compare.tsx`, `use-powder-compare.ts`, `src/lib/powder-compare.ts`, the HTTP client in `src/lib/api-client.ts`, `src/lib/batch.ts`). Those that do not fit go in a More menu (no aside).
+- Open and Save in every page bar with user records (`file-menu.tsx`, `FileMenu`): Open lists This browser (the saved records, on the workbench the Saved loads drawer), File (Open file, Import, Paste JSON) and the page's Examples (workbench: Example load, Reset load). Save saves in one click; its chevron "Save options" holds Save as, Copy share link, Copy JSON, Export all and the workspace folder. Below 75em both are rows of the Page actions panel.
+- Open loads in the page bar's load switcher and the Saved loads drawer (`use-load-tabs.ts`, `load-tabs.tsx`, `saved-loads.tsx`, `src/lib/load-tabs.ts`).
+- Record search with `@mantine/spotlight` on Ctrl+K (`workbench-search.tsx`), which also lists the shell's pages and commands.
+- Run: the workbench posts an `m3` load (`src/lib/interior-input.ts`) to `/api/interior` on Run (the page bar from 75em), Enter or Ctrl+Enter. A later input change marks the result "Inputs changed since this result".
+  - It shows the notice: the API warnings first, the pressure range and the limits. It never states that a load is safe or within limits.
+- Trajectory: the workbench's Trajectory tab is the only trajectory UI (`/trajectory` answers 404).
+  - Client form `src/components/trajectory-form.tsx`. Core `trajectory()` runs in the browser 150 ms after the last valid change, no submit button. Bullets come from `/api/bullets` (`src/lib/bullet.ts` builds the drag from a record).
+- Interior chart playback (`src/components/chart-playback.tsx`, helpers in `src/lib/playback.ts`):
+  - One 28 px row under the chart, always shown: the barrel strip, which is also the slider, then Play (an icon button) and the speed (a menu button, thousands as k) at its right end. They sit in the plot's right gutter, at least 72 px on either x axis (`plotEdges` in `src/lib/interior-chart.ts`).
+  - The barrel strip: the run's chamber, case and seated bullet from the drawing models (`src/lib/barrel-strip.ts`, from the preview's `Seated.figure`), with the bore to the muzzle. The slider uses the chart's x mapping. On the travel axis: linear in travel, the strip to scale from travel 0 (the bullet's base at the plot's left edge) to the muzzle, the case and chamber behind it to the row's left edge (the thumb is the bullet's base under the marker). On the time axis: linear in time.
+  - A marker with the values on the chart.
+  - Frames land on the event times, so the dot is on the peak at the peak time. Playback writes the page through refs, not React state.
+  - The powder and energy split at the muzzle are in the chart's Data modal.
+- Seated-bullet preview (`src/components/seating-preview.tsx`) in the inputs' "Cartridge figure": its Cartridge view is the record page's cartridge drawing with the seated COAL in place of L6 and the seated CBTO added (`figureViews` in `src/lib/figure-views.ts`), at the selected step of a seating ladder while the result is current. Where its panel is wider than tall (the figure's size container), the figure is drawn level, head left (the drawing's print layout on screen, `level` of `TechnicalDrawing`); Full view stays upright:
+  - Loaded with `next/dynamic` once a cartridge is chosen. Geometry in `@openreloading/drawing/seating`. Draws the bullet in the chamber through `TechnicalDrawing`'s overlay slot and can fill volume and travel.
+  - Its workbench controls go into the named `SeatingSlot`s of the cards (`cartridge`, `gun`, and `more` and `moreValues` in the Cartridge card's More), registered through `LoadContext`. A slot the figure needs that is not mounted throws in development.
+- Charge for a target: that command of the workbench's Ctrl+K palette opens `src/components/charge-target-dialog.tsx` (`AppModal`).
+  - Request and wording in `src/lib/charge-target.ts`. The load comes from `loadRequest()` of `use-workbench-load.ts`, the same as Run.
+  - Apply writes the charge field through `applyCharge`.
+
+## Other pages and routes
+
+- `/groups`: the target photo editor (`src/components/target-editor.tsx`, `target-canvas.tsx`, helpers in `src/lib/target-editor.ts`).
+  - Target sheets are user records. Photos are in the IndexedDB store `files`, never uploaded.
+  - An autosave, File > Save, the close-the-page copy and the Undo of a delete write a sheet only over the version the editor read or last wrote (`putRecordIf` in `src/lib/user-store.ts`). A sheet another tab saved since stays, the edit is kept as `<name> (copy)`.
+  - Notes with value placeholders, image exports and a print sheet (`target-notes.tsx`, `target-export.tsx`, `target-print.tsx`). Open and Save for one sheet with its photo.
+  - The same editor is the workbench tab Groups (`groups-tab.tsx`) for the sheets of the saved load.
+- Hole detection in a Web Worker (`src/components/hole-detection.tsx`, `src/lib/hole-detection.worker.ts`, `apps/docs/docs/models/hole-detection.md`):
+  - One-click auto detection, and guided steps from one example hole and the photo turn. Recall test on the synthetic photos of `test/fixtures/target-photos/`.
+  - The target found without a region, the hole size from all holes of the photo, auto detection on dark faces.
+  - The click-calibrated colour axis with a multi-scale blob detector, run on a photo resized as it loads.
+  - The target face found on the photo from its black area and ring lines sets the scale, the centre and the group's face, and marks the face's print, numerals included, for the detector (`src/lib/target-face.ts`, `ellipse.ts`, `face-image.ts`, `face-sheet.ts`). Tests are drawn from the face records by `test/face-render.ts`. `test/face-photos.ts` draws the photos people take (whole sheet, insert card, zoomed, off centre, cut, skewed, poor) with known holes, one test file per face.
+- Ring scores on rule-book target faces (`src/components/ring-scoring.tsx`, `src/lib/ring-scoring.ts`, faces from `/api/target-faces`, `apps/docs/docs/models/ring-scoring.md`):
+  - Federation, then Discipline (the disciplines of `/api/disciplines`, with All also the face events no target mapping names), then Face (the faces of the discipline's mappings). The Event list only for a face no mapping names.
+  - The group stores face and event (`src/lib/face-disciplines.ts`, `apps/docs/docs/data/federations.md`).
+- `/firearms`: the firearm library (`src/components/firearm-library.tsx`, the editor in `firearm-editor.tsx`, the data card in `firearm-data-card.tsx`). Firearm user records with optics and configurations, saved and opened through Open and Save.
+  - A directory table (cells from `firearmCells` in `src/lib/firearm.ts`) across the page. A row's link opens the firearm in the editor (`onOpen`, `?record=<id>` in a new tab). With a firearm open, cards beside the editor from 62em.
+  - The example load's rifle (`exampleFirearm` in `src/lib/example-data.ts`) is listed last, counted. Its link opens its data card read-only with Copy to edit. Copy to edit and Duplicate make an editable copy. The trajectory form's "Firearm and sight" choice fills its rifle fields from them.
+- Settings: one modal over the current page (`providers.tsx`, context `SettingsDialog` in `settings-dialog.ts`, opened on a tab). No route: `/settings` answers 404.
+  - Tabs of `src/components/settings-sections.tsx` (vertical, horizontal below 36em, loaded with `next/dynamic` on first open):
+    - Units: the unit preset and per-quantity overrides (`UnitsForm` in `src/components/units-settings.tsx`, stored in `localStorage`).
+    - Workbench defaults (`src/components/workbench-defaults.tsx`, storage in `src/lib/workbench-defaults.ts`): the defaults of new workbench loads, with the barrel length. The defaults of volume, bore diameter, twist and barrel length from the gun, the cartridge record, Settings and the cartridge class: `src/lib/input-defaults.ts`.
+    - Appearance (theme System, Light, Dark) and Offline (install help).
+  - Opened by Settings in the sidebar rail and the drawer, the search's commands, and `UnitsIconButton` in the page bar of the records, the bullet and cartridge lists, the session summary and the firearm library. Print in a page bar is `PrintButton` (`record-actions.tsx`).
+- Browser API calls go through `apiFetch` (`src/lib/api-fetch.ts`, paths without the version prefix), never `fetch('/api/...')`.
+- `/api/[...path]` (`src/app/api/[...path]/route.server.ts`, server edition only) forwards to `API_URL`, read per request, under the version prefix `API_PREFIX` of `src/lib/api-version.ts` (also used by `apiGet` and `scripts/check-prerender.mts`). The browser cannot reach the compose API host and the API sends no CORS headers.
+  - GET: `cartridges`, `bullets`, `powders`, `manufacturers`, `target-faces`, `federations`, `disciplines`, `target-mappings`, and `<id>` of each.
+  - POST: `interior` and `interior/charge-target`. Other paths 404. Unreachable API: 502.
+- Offline layer (manifest `src/app/manifest.ts`):
+  - `npm run build` writes the service worker to `public/sw.js` (not tracked) from `src/lib/offline.ts` (pure rules, Vitest) and `src/service-worker.js`.
+  - Pages edition: `out/sw.js`, its URLs under the base path (`appUrl`), `<base>/docs/` left to the network.
+  - `src/components/offline-layer.tsx` registers it in production builds only (and unregisters a leftover one under `next dev`) and shows "New version".
+  - `install-button.tsx` shows Install while the browser offers it. `/offline` answers pages never opened while offline. Playwright blocks the worker.
+- Safety: the README Safety text (`src/lib/safety.ts`, checked against `README.md` by `test/safety.test.ts`) is on screen in the Safety dialog (`src/components/safety-dialog.tsx`).
+  - Accepted on the first visit (value `3` in `safety-ack`), opened again by `SafetyBarButton`, the light yellow and only Safety button of the top bar: labelled with its icon in the page bar from 75em (on the workbench an icon only), an icon in the phone top bar.
+  - Printed pages and downloaded files: root `AGENTS.md`, Conventions. On-screen notes keep their notice.
+
+## Pages edition
+
+A static site without a server for GitHub Pages: the web app with the records as data files and the simulations in the browser, the docs site, the licenses. `pages.yml` builds it from `main` and deploys it. `ci.yml` does not build it.
+
+- `PAGES_BASE_PATH` (`''` or a path such as `/Ballistics`) set (`next.config.ts`): `output: 'export'` under that base path with `trailingSlash`, without Cache Components and Partial Prefetching (Next 16.4 exports only without them, `'use cache'` through `experimental.useCache`), no redirects.
+  - `pageExtensions` leaves out the `*.server.ts(x)` route files: the forwarding route and the record pages' `ensureStatic` layouts. A route-segment option one edition rejects goes into such a file.
+  - `NEXT_PUBLIC_PAGES_BASE_PATH` is the base path in the browser (`src/lib/edition.ts`: `pagesBasePath`, `basePath`). A plain `<a href>` or asset URL to an app path takes `basePath`. `Link` and the router add it themselves.
+  - `staticIds` prerenders every record and fails without the API.
+- `apiFetch` of this edition: `src/lib/static-api.ts`. The server edition aliases it to `src/lib/no-static-api.ts` (`next.config.ts`), so its chunks hold neither the data file reader nor the compute worker.
+  - GET from the data files under `<base>/api/`: `<kind>/index.json`, `<kind>/<id>.json`, `<kind>/search.json` (the texts `q` matches), `bullets/cartridge/<id>.json`. Paging, `q`, `cartridge` and the refusals as the API answers them, checked against the API on PGlite by `test/static-api.test.ts`.
+  - POST `interior` and `interior/charge-target`: validation, runs and answers of `@openreloading/api/compute`, each compute task in a Web Worker of its own (`src/lib/compute.worker.ts`), terminated at the API's task deadline (503 `timeout`). The 64 KiB body cap of the forwarding route.
+- `PAGES_URL`: the site's origin (docs `url`, the web app's `metadataBase` and social image, which the server edition leaves out).
+- Root `PAGES_BASE_PATH=<path> npm run pages:build` (`tools/src/pages.ts`, after the root `npm run build`): starts the API on PGlite from the data bundle (`@openreloading/api/static`), builds this edition against it with `PRERENDER=full`, deletes each page's `__next._full.txt` (a copy of its `index.txt`, never requested by the export's client), writes the data files (`writeStaticApi`), builds the docs site into `docs/` (its code reference under `docs/library/`), copies LICENSE, NOTICE and `data/LICENSE` and writes `.nojekyll`. Output: `pages/` at the repository root (git-ignored). It deletes `.next` before and after the build: a Turbopack cache of one edition fails the build of the other, so the server edition builds from nothing afterwards.
+- Root `npm run pages:serve` (`tools/src/pages-serve.ts`): `pages/` under `PAGES_BASE_PATH` on `PORT` (default 3003), directories with their `index.html`, a missing file the site's `404.html`.
+- E2E: project `pages` with `PAGES_URL` (`apps/e2e/AGENTS.md`).
+- Size: about 300 MB, the cartridge pages about 265 MB of it.
+
+## UI
+
+- Stack: Mantine v9 (`@mantine/core`, `@mantine/hooks`, `@mantine/form`). Charts on Apache ECharts through `src/components/echart.tsx`, used by `line-chart.tsx`, `interior-chart.tsx`, `vivacity-chart.tsx` and `barrel-chart.tsx` and loaded through `lazy-chart.tsx`. Docs: root `AGENTS.md`. `MantineProvider` in `src/components/providers.tsx`, theme in `src/lib/theme.ts`.
+- Shell:
+  - Top bar across the window, sidebar, navigation drawer, the site search (Ctrl+K on every page, `site-search.tsx`, `shell-actions.ts`, loaded on first use, opened from the offline page's Search button through `openSiteSearch` of `search-host.ts`) and theme switch: `src/components/site-header.tsx` and `theme-switch.tsx`.
+  - Repository link (`src/components/repository-link.tsx`): GitHub mark left of the theme switch from 75em, a row in the drawer below. URL `NEXT_PUBLIC_REPOSITORY_URL` through `repositoryUrl` in `src/lib/repository-url.ts`. Nothing rendered when unset.
+  - Report an issue (`src/components/report-issue.tsx`, with the repository link, hidden without its URL): a dialog that opens the issue form `.github/ISSUE_TEMPLATE/user-report.yml` prefilled by field id (`src/lib/report-issue.ts`: title `Report: <area>: <type>: `, the type and area dropdowns, the text, context and data fields, cut to 7000 characters; the form adds the `user-report` label). Pages offer their data as unticked boxes through `useReportOptions` (`report-host.ts`): workbench load link, designer share link, the `/groups` sheet settings and shot positions.
+  - Docs link (`src/components/docs-link.tsx`): an icon at the sidebar's foot, a row in the drawer above the repository row. URL `NEXT_PUBLIC_DOCS_URL` (inlined at build, no Dockerfile `ARG`), in the Pages edition `<base>/docs/` (`src/lib/docs-url.ts`). Nothing rendered when neither is set.
+  - Every page opens with `PageBar` (`src/components/page-bar.tsx`): its only `h1`, the status line and the page's actions.
+- Mantine CSS:
+  - Imported per component in `src/app/layout.tsx` from the `*.layer.css` files. Add the file of every new Mantine component there, after the files it builds on.
+  - `layers.css` (imported first) puts the layer `base` below `mantine`. The element defaults of `globals.css` (links, headings in `main`, tables, form fonts) sit in `base`, so Mantine components and their props win over them. Every other rule of `globals.css` is unlayered and wins over Mantine.
+- Tokens: font sizes, headings and breakpoints in `theme.ts`. Spacing steps 0.25, 0.5, 0.75, 1 and 1.5rem in `globals.css`.
+  - Screen text takes the theme sizes (`--mantine-font-size-*`, `--mantine-h*-font-size`). Outside them: sub text in `em` of its line, print sizes in `pt`, 16 px inputs on touch screens (smaller ones zoom the page on focus in iOS Safari) and the shot groups toolbar's 16 px icon slot, SVG text scaled with its figure, the ECharts text in px (11 and 12), and the Range tab's 2rem hero number.
+  - Media queries take the theme breakpoints (`max-width` one step below, as 47.99em). Outside them: the workbench fit widths 80em and 108em and its low window under 45em (`shortFrame`), and the rail's low window under 40em. Container queries size a component by its box, not the window.
+- Rows: the dense property rows of the workbench input cards are 28 px, the theme's `row` controls elsewhere 30 px (`controlSize` in `theme.ts`).
+- Ellipsis (the full text on hover): record names and the load title only. Labels, units, numbers and buttons are never cut.
+- Corners: square (radius 0 in `theme.ts`, no `border-radius` or `radius` prop else). A circle only where it is the shape: round icons, slider thumbs, the target face, status dots and colour swatches.
+- The drawing stays a custom SVG renderer, no Mantine inside the SVG.
+- Theme: the system setting until the header switch or Settings, Appearance stores `light` or `dark` (System stores `auto`) in `localStorage` (`theme`).
+  - An inline head script (`colorSchemeScript`) sets `<html data-mantine-color-scheme>` before the first paint.
+  - Colours are the tokens of `globals.css`. Mantine's body, text, anchor and default colours read them. Drawing colours are `--draw-*` tokens. The dark rule is screen-only, so print stays light.
+- Shared states: `src/components/states.tsx` (`EmptyNote`, `Loading` with skeleton rows, `ErrorNote` for every inline failure or warning block, Retry with `onRetry`, `DataError` with Retry, `EmptyList`).
+- Questions: `confirmDialog` in `src/components/confirm.tsx`, never `window.confirm` (`test/confirm.test.ts`).
+  - A Mantine `Modal` with the focus on Cancel. Escape cancels and leaves a dialog under it open. The host is mounted first in `providers.tsx`.
+  - A delete that can be taken back (a firearm, a target sheet, a group) asks nothing and calls `offerUndo`.
+- Units and number formatting: `src/lib/units.ts` (values held in SI, fixed decimals, no grouping).
+- Unit suffix of a field: `NumberField` switches that field only, in memory (`src/lib/field-unit.ts`).
+  - A button for two units, a menu for three or more. Nothing is stored. The Settings (`UnitsForm`) store units. A change of the Settings or a reload resets the field.
+  - A numeric `placeholder` and a message, mark or help that names a unit (`error`, `mark`, `help`, `action.text`, `fieldError(spec, value, shown)`) are functions of the units shown. `unit="text"` or `"none"` leaves a page without switches.
+
+## Streamed pages and the Mantine patch
+
+- In a build made without the API the list pages stream. React 19.3 reveals a streamed boundary up to about 300 ms after the first paint.
+- A provider above the page whose context value changes after mounting (Mantine's `AppShell` does, `UnitsProvider` did) makes React client-render the waiting boundary. A hidden `div#S:n` copy of the page stays until the reveal.
+- Providers above `main` keep one context value for the page's life. `useUnits` reads a store behind a constant context.
+- The page sits in `AppShell.Main` only because `patches/apply.mjs` (root `postinstall`, the Dockerfiles copy `patches/` before `npm ci`) memoizes AppShell's context value in `@mantine/core` 9.7.2.
+- A Mantine upgrade that changes `AppShell.mjs` or `AppShell.cjs` stops the install. Check whether Mantine fixed the context value (upstream links in `patches/apply.mjs`), then remove the patch or adapt it.
+- `npm run dev` and `npm run build` here run `node ../../patches/apply.mjs --check` first and stop when the installed files lack the patch (after a rebase onto the patch without `npm ci`).
+
+## Commands (this directory, or `-w @openreloading/web` from the root)
+
+- Dev server: `npm run dev`
+- Build: `npm run build` (standalone output in `.next/standalone`)
+- Type check: `npm run typecheck` (generates route types first)
+- Test: `npm test` (Vitest, `test/`)
+- Prerender check after a build against a running API: `node scripts/check-prerender.mts`, with the `PRERENDER` value of the build. `sample` checks the lists and the sample records, else every record.
+- Build workers: `next.config.ts` caps the static generation workers at 8 (`experimental.cpus`, `BUILD_WORKERS` for another number). The default is one per hardware thread but one.
+- What a CI run or a local run must build, from the changed files: `node scripts/ci-plan.mts`. It prints `check=`, `e2e=`, `web=` and `prerender=`. Rules in the script, test `test/ci-plan.test.ts`.
+  - CI: `EVENT_NAME`, `BASE_SHA`. Local: `--stamp apps/web/.next/ci-plan-stamp`, `--require full`.
+  - After a build on a clean tree: `--write-stamp apps/web/.next/ci-plan-stamp --prerender <mode>`.
+- Build cache: `.next/cache/turbopack` is reusable between builds. `.next/cache/fetch-cache` holds API responses (`cacheLife('days')`: a warm build would serve old record data), so `prebuild` deletes it and CI never caches it.
+- Image: `docker build -f apps/web/Dockerfile .`

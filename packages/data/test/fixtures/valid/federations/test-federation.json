@@ -1,0 +1,15 @@
+{
+  "id": "test-federation",
+  "name": "Test Federation",
+  "abbreviation": "Test",
+  "country": "DE",
+  "ruleBooks": ["test-rule-book"],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "test-rule-book"
+      }
+    ]
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "id": "vdrbw-g-hzf-1",
+  "federation": "vdrbw",
+  "name": "Halbautomatisches Zielfernrohrgewehr",
+  "number": "G-HZF 1",
+  "section": "9.10",
+  "page": "Seite 76, PDF p. 76",
+  "distance": {
+    "value": 300000,
+    "raw": "300 m"
+  },
+  "category": "rifle",
+  "caliberClasses": {
+    "ids": [
+      "rifle-22-cf",
+      "rifle-6mm",
+      "rifle-25",
+      "rifle-6-5",
+      "rifle-270",
+      "rifle-7mm",
+      "rifle-30",
+      "rifle-30-carbine",
+      "rifle-8mm"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "Kapitel 9, Inhaltsübersicht, Seite 57, PDF p. 57",
+        "fields": ["name", "number"]
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.10, Seite 76, PDF p. 76",
+        "fields": ["federation", "section", "page", "distance", "caliberClasses", "category"],
+        "note": "The book excludes .222 Rem (9.10.3)."
+      }
+    ]
+  }
+}

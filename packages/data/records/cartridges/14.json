@@ -1,0 +1,275 @@
+{
+  "id": "14",
+  "name": "Cal. 14",
+  "table": "VII",
+  "published": "1984-06-14",
+  "revised": "2006-09-19",
+  "pressureMethod": "transducer",
+  "verification": "unverified",
+  "values": [
+    {
+      "side": "cartridge",
+      "symbol": "d",
+      "quantity": "length",
+      "value": 19.65,
+      "tolerance": {
+        "lower": -0.25
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "g",
+      "quantity": "length",
+      "value": 21.45,
+      "tolerance": {
+        "lower": -0.45
+      }
+    },
+    {
+      "side": "cartridge",
+      "symbol": "t",
+      "quantity": "length",
+      "value": 1.75,
+      "tolerance": {
+        "lower": -0.35
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "h",
+      "quantity": "length",
+      "value": 19.3,
+      "tolerance": {
+        "lower": -0.5
+      }
+    },
+    {
+      "side": "cartridge",
+      "symbol": "l",
+      "quantity": "length",
+      "value": 65,
+      "tolerance": {
+        "lower": -2.5
+      },
+      "variant": "14/65"
+    },
+    {
+      "side": "cartridge",
+      "symbol": "l",
+      "quantity": "length",
+      "value": 67.5,
+      "tolerance": {
+        "lower": -2.5
+      },
+      "variant": "14/67"
+    },
+    {
+      "side": "cartridge",
+      "symbol": "l",
+      "quantity": "length",
+      "value": 69.8,
+      "tolerance": {
+        "lower": -2.5
+      },
+      "variant": "14/70"
+    },
+    {
+      "side": "chamber",
+      "symbol": "D",
+      "quantity": "length",
+      "value": 19.7,
+      "tolerance": {
+        "upper": 0.1
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "G",
+      "quantity": "length",
+      "value": 21.55,
+      "tolerance": {
+        "upper": 0.1
+      }
+    },
+    {
+      "side": "chamber",
+      "symbol": "T",
+      "quantity": "length",
+      "value": 1.75,
+      "tolerance": {
+        "upper": 0.1
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "H",
+      "quantity": "length",
+      "value": 19.35,
+      "tolerance": {
+        "upper": 0.1
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "B",
+      "quantity": "length",
+      "value": 17.2,
+      "tolerance": {
+        "upper": 0.5
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "alpha1",
+      "quantity": "angle",
+      "value": 10.5,
+      "raw": "10°30'",
+      "limit": "max",
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "L",
+      "quantity": "length",
+      "value": 65.1,
+      "tolerance": {
+        "upper": 2
+      },
+      "variant": "14/65",
+      "footnotes": ["1"]
+    },
+    {
+      "symbol": "Pmax",
+      "quantity": "pressure",
+      "value": 740,
+      "variant": "14/65"
+    },
+    {
+      "symbol": "PK",
+      "quantity": "pressure",
+      "value": 850,
+      "variant": "14/65"
+    },
+    {
+      "symbol": "PE",
+      "quantity": "pressure",
+      "value": 930,
+      "variant": "14/65"
+    },
+    {
+      "symbol": "M",
+      "quantity": "length",
+      "raw": "25/30",
+      "variant": "14/65"
+    },
+    {
+      "side": "chamber",
+      "symbol": "L",
+      "quantity": "length",
+      "value": 67.6,
+      "tolerance": {
+        "upper": 2
+      },
+      "variant": "14/67",
+      "footnotes": ["1"]
+    },
+    {
+      "symbol": "Pmax",
+      "quantity": "pressure",
+      "value": 740,
+      "variant": "14/67"
+    },
+    {
+      "symbol": "PK",
+      "quantity": "pressure",
+      "value": 850,
+      "variant": "14/67"
+    },
+    {
+      "symbol": "PE",
+      "quantity": "pressure",
+      "value": 930,
+      "variant": "14/67"
+    },
+    {
+      "symbol": "M",
+      "quantity": "length",
+      "raw": "25/30",
+      "variant": "14/67"
+    },
+    {
+      "side": "chamber",
+      "symbol": "L",
+      "quantity": "length",
+      "value": 69.9,
+      "tolerance": {
+        "upper": 2
+      },
+      "variant": "14/70",
+      "footnotes": ["1"]
+    },
+    {
+      "symbol": "Pmax",
+      "quantity": "pressure",
+      "value": 740,
+      "variant": "14/70"
+    },
+    {
+      "symbol": "PK",
+      "quantity": "pressure",
+      "value": 850,
+      "variant": "14/70"
+    },
+    {
+      "symbol": "PE",
+      "quantity": "pressure",
+      "value": 930,
+      "variant": "14/70"
+    },
+    {
+      "symbol": "M",
+      "quantity": "length",
+      "raw": "25/30",
+      "variant": "14/70"
+    },
+    {
+      "side": "chamber",
+      "symbol": "Fe",
+      "quantity": "length",
+      "value": 0.1
+    },
+    {
+      "side": "chamber",
+      "symbol": "Fe",
+      "quantity": "length",
+      "value": 0.2,
+      "variant": "bascule",
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "Fe",
+      "quantity": "length",
+      "value": 0.35,
+      "variant": "automatic",
+      "footnotes": ["1"]
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cip-tdcc",
+        "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-vii/tabviical-en-page5.pdf",
+        "sha256": "68254f5458be91d8ba3782b5c0f545205c0bfaa97df58c9382f9729b76ac6713",
+        "retrieved": "2026-10-08"
+      }
+    ]
+  }
+}

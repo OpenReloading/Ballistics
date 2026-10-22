@@ -1,0 +1,31 @@
+{
+  "id": "dsb-25m-standardpistole-issf-25m-precision-50m-pistol",
+  "discipline": "dsb-25m-standardpistole",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "DSB 25 m Standardpistole",
+  "gauge": {
+    "value": 5.6,
+    "raw": "5,60 mm"
+  },
+  "shotCount": 60,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.20 Scheibe Nr. 4, Teil 0 Seite 65, PDF p. 83",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.11.3.2, Teil 0 Seite 40, PDF p. 58",
+        "fields": ["gauge"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "Teil 2 Seite 25, PDF p. 159 (2.22, 60 shots, 12 series of five shots)",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

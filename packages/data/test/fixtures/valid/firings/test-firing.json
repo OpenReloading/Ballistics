@@ -1,0 +1,21 @@
+{
+  "id": "test-firing",
+  "cartridge": "test-cartridge",
+  "ammunition": "Test ammunition",
+  "roundCount": 2,
+  "velocity": {
+    "point": "at the muzzle",
+    "shots": [{ "value": 800 }, { "value": 802 }]
+  },
+  "pressure": {
+    "method": "piezo",
+    "position": "25 mm from the case rim",
+    "meanPeak": { "value": 3000 }
+  },
+  "provenance": {
+    "kind": "measured",
+    "sources": [
+      { "title": "Test fixture", "url": "https://example.org/paper", "license": "CC-BY-4.0" }
+    ]
+  }
+}

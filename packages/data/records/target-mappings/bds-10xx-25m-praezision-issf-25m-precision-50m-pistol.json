@@ -1,0 +1,22 @@
+{
+  "id": "bds-10xx-25m-praezision-issf-25m-precision-50m-pistol",
+  "discipline": "bds-10xx-25m-praezision",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "BDS 10xx 25 m Schießen, Teil Präzision",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "page": "Anhang 1, Seite Z-22, PDF p. 23",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "page": "K 3.03, K 3.04, Seite K-14, PDF p. 14",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

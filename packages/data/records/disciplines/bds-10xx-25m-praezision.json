@@ -1,0 +1,43 @@
+{
+  "id": "bds-10xx-25m-praezision",
+  "federation": "bds",
+  "name": "25 m Schießen, Teil Präzision",
+  "number": "10xx",
+  "section": "Anhang 1",
+  "page": "Seite Z-22, PDF p. 23",
+  "distance": {
+    "value": 25000,
+    "raw": "25 m"
+  },
+  "caliberClasses": {
+    "ids": [
+      "rimfire-22",
+      "pistol-7-65",
+      "revolver-32",
+      "pistol-9mm",
+      "revolver-357-38",
+      "pistol-9x18",
+      "pistol-40-10mm",
+      "revolver-41",
+      "revolver-44",
+      "pistol-45",
+      "revolver-45-colt"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "page": "Anhang 1, Seite Z-22, PDF p. 23",
+        "fields": ["name", "number", "federation", "section", "page", "distance"]
+      },
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "page": "K 3.01, Seite K-13, PDF p. 13",
+        "fields": ["caliberClasses"]
+      }
+    ]
+  }
+}

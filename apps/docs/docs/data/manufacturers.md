@@ -1,0 +1,37 @@
+---
+title: Manufacturers
+description: The manufacturer records that powder, bullet, case capacity and load table records name by id.
+---
+
+# Manufacturers
+
+A powder or bullet record names its manufacturer by the id of a manufacturer record (`manufacturer`). A case capacity record names the case manufacturer the same way (`caseManufacturer`), and so does a load table (`manufacturer`). Text that a user types, such as the manufacturer of a chronograph, a firearm or a bullet design, stays free text in `manufacturerName`. Schema: `packages/schema/src/manufacturer.ts`. Records: `packages/data/records/manufacturers/`.
+
+## Record
+
+`records/manufacturers/<id>.json`, schema `manufacturer`.
+
+| Field | Meaning |
+|---|---|
+| `id` | Record id, the file name |
+| `name` | Name as the manufacturer prints it on its products |
+| `website` | URL of the manufacturer's website |
+| `aliases` | Former names and other names the products are sold under |
+| `provenance` | Sources of the name and the aliases |
+
+## Id
+
+The id is the slug of the name without the legal form: "Demo Powder Co." becomes `demo-powder`. An id never changes. When a manufacturer changes its name, `name` takes the new one and the old one goes to `aliases`, so records and saved files that name the id keep working. Examples in records, tests and docs use invented names only.
+
+## Validation
+
+`npm run data:validate` (`packages/data/src/references.ts`, `checkManufacturerReferences`) reports a powder or bullet `manufacturer`, a case capacity `caseManufacturer` or a load table `manufacturer` that names no manufacturer record. Names and aliases of manufacturers are unique. Powder and bullet names are unique per manufacturer.
+
+## API
+
+Served under `/v1` (`packages/api/src/routes/components.ts`):
+
+- `GET /manufacturers`: `{ total, items: [{ id, name, aliases?, website? }] }`, ordered by name; `GET /manufacturers/:id`: the record.
+- `GET /powders` and `GET /bullets` filter by `manufacturer=<id>` and order by manufacturer name, product name and id; `q` matches the manufacturer name or one of its aliases followed by the product name.
+
+The web app reads the names once per page and shows a powder or bullet as its manufacturer name followed by its product name.

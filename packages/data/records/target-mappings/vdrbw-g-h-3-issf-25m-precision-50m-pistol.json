@@ -1,0 +1,18 @@
+{
+  "id": "vdrbw-g-h-3-issf-25m-precision-50m-pistol",
+  "discipline": "vdrbw-g-h-3",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "VdRBw G-H 3 Halbautomatisches Gewehr",
+  "shotCount": 30,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.7.9, Seite 70, PDF p. 70; Scheibe 10.3, Seite 98, PDF p. 98",
+        "fields": ["discipline", "face", "event", "shotCount"],
+        "note": "The book allows 15 record shots (9.7.15)."
+      }
+    ]
+  }
+}

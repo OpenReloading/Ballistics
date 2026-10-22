@@ -1,0 +1,48 @@
+{
+  "id": "bdmp-sg-1",
+  "federation": "bdmp",
+  "name": "Standardgewehr 1",
+  "number": "SG 1",
+  "section": "D.2",
+  "page": "Teil D, Seite 11 bis 13 von 294, PDF pp. 11 to 13",
+  "distance": {
+    "value": 100000,
+    "raw": "100 m"
+  },
+  "category": "rifle",
+  "caliberClasses": {
+    "ids": [
+      "rifle-22-cf",
+      "rifle-6mm",
+      "rifle-25",
+      "rifle-6-5",
+      "rifle-270",
+      "rifle-7mm",
+      "rifle-30",
+      "rifle-30-carbine",
+      "rifle-8mm"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.2, D.2.1, Teil D, Seite 11 von 294, PDF p. 11",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.2.9, Teil D, Seite 12 von 294, PDF p. 12",
+        "fields": ["caliberClasses"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.2.15, Teil D, Seite 13 von 294, PDF p. 13",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "The book prints Kaliber bis 8 mm."
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "dsb-25m-pistole",
+  "federation": "dsb",
+  "name": "25 m Pistole",
+  "number": "2.40",
+  "section": "2.18",
+  "page": "Teil 2 Seite 17, PDF p. 151",
+  "distance": {
+    "value": 25000,
+    "raw": "25 m"
+  },
+  "caliberClasses": {
+    "ids": ["rimfire-22"],
+    "basis": "stated"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "Teil 2 Seite 17, PDF p. 151",
+        "fields": ["name", "number", "federation", "section", "page", "distance"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "Pistolentabelle, Teil 2 Seite 23, PDF p. 157 (2.40) and 0.21, Teil 0 Seite 81, PDF p. 99 (row 2.40)",
+        "fields": ["caliberClasses"]
+      }
+    ],
+    "note": "The name prints Pistole. The rule admits revolvers and self-loading pistols."
+  }
+}

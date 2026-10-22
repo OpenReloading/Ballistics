@@ -1,0 +1,40 @@
+{
+  "name": "openreloading",
+  "version": "0.0.1",
+  "private": true,
+  "license": "MIT",
+  "workspaces": [
+    "packages/schema",
+    "packages/importers",
+    "packages/core",
+    "packages/data",
+    "packages/api",
+    "packages/drawing",
+    "apps/docs",
+    "apps/web",
+    "tools",
+    "apps/e2e"
+  ],
+  "engines": {
+    "node": ">=26"
+  },
+  "scripts": {
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm test -w @openreloading/schema -w @openreloading/core -w @openreloading/importers -w @openreloading/drawing -w @openreloading/data -w @openreloading/api -w @openreloading/web -w @openreloading/docs -w @openreloading/tools && npm run test:unit -w @openreloading/e2e",
+    "test:e2e": "npm test -w @openreloading/e2e",
+    "e2e:smoke": "npm run smoke -w @openreloading/e2e",
+    "pages:build": "npm run pages -w @openreloading/tools",
+    "pages:serve": "npm run pages:serve -w @openreloading/tools",
+    "data:validate": "npm run validate -w @openreloading/data",
+    "api:check": "npm run api-check -w @openreloading/tools",
+    "api:conformance": "npm run api-conformance -w @openreloading/tools",
+    "docs:check": "npm run check -w @openreloading/docs",
+    "postinstall": "node patches/apply.mjs"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.15"
+  }
+}

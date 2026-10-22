@@ -1,0 +1,17 @@
+{
+  "id": "dsu-lper-3-bds-z2-50m-zf",
+  "discipline": "dsu-lper-3",
+  "face": "bds-z2-50m-zf",
+  "event": "DSU LPER 3 Zielfernrohrgewehr Präzision 100 m KK",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 63, PDF p. 121",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

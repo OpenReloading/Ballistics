@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-zg-1-bdmp-nr3",
+  "discipline": "bdmp-zg-1",
+  "face": "bdmp-nr3",
+  "event": "BDMP ZG 1 100 m",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.4, Teil B, Seite 20 von 70, PDF p. 20",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.11.11, Teil D, Seite 68 von 294, PDF p. 68",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.11.9, Teil D, Seite 68 von 294, PDF p. 68",
+        "fields": ["shotCount"],
+        "note": "Twenty counted shots on four scoring fields, five each. Sighting shots are unlimited."
+      }
+    ]
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "id": "bdmp-30-m1-carbine-50m",
+  "federation": "bdmp",
+  "name": ".30 M1 Carbine",
+  "section": "D.10",
+  "page": "Teil D, Seite 42 bis 44 von 294, PDF pp. 42 to 44",
+  "distance": {
+    "value": 50000,
+    "raw": "50 m"
+  },
+  "category": "carbine",
+  "caliberClasses": {
+    "ids": ["rifle-30-carbine"],
+    "basis": "stated"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10, D.10.1, D.10.6, D.10.8, Teil D, Seite 42 von 294, PDF p. 42",
+        "fields": [
+          "name",
+          "federation",
+          "section",
+          "page",
+          "category",
+          "caliberClasses",
+          "distance"
+        ]
+      }
+    ]
+  }
+}

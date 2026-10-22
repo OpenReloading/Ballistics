@@ -1,0 +1,85 @@
+{
+  "id": "dsb-nr8-10m-rapid-fire",
+  "name": "Scheibe Nr. 8 (10 m Pistole, Schnellfeuerteil)",
+  "organization": "DSB",
+  "rings": [
+    {
+      "value": 5,
+      "diameter": {
+        "value": 154.5
+      }
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 128
+      }
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 101.5
+      }
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 75
+      }
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 48.5
+      }
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 22
+      }
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 11
+    }
+  },
+  "blackDiameter": {
+    "value": 154.5
+  },
+  "events": [
+    {
+      "name": "10 m Pistole Schnellfeuerteil",
+      "distance": {
+        "value": 10000,
+        "raw": "10 m"
+      },
+      "section": "0.20 Scheibe Nr. 8 (Teil 0 Seite 67)",
+      "scoring": "touch"
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "fields": [
+          "name",
+          "rings",
+          "innerTen.diameter",
+          "blackDiameter",
+          "events.name",
+          "events.distance",
+          "events.section"
+        ],
+        "page": "0.20 Scheibe Nr. 8, Teil 0 Seite 67 (PDF p. 85); table row Teil 0 Seite 62 (PDF p. 80)"
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.11.3, Teil 0 Seite 39, PDF p. 57",
+        "fields": ["events.scoring"]
+      }
+    ]
+  }
+}

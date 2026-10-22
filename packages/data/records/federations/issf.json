@@ -1,0 +1,28 @@
+{
+  "id": "issf",
+  "name": "International Shooting Sport Federation",
+  "abbreviation": "ISSF",
+  "country": "international",
+  "ruleBooks": ["issf-rules-2025-third-print", "issf-paper-target-scoring-2022"],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Constitution (rule 1), p. 7 (PDF p. 7), title page (PDF p. 1)",
+        "fields": ["name", "abbreviation", "country"],
+        "note": "The constitution names the ISSF the controlling body of the shooting sport at world level."
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Title page and edition notice, PDF pp. 1 and 2",
+        "fields": ["ruleBooks"]
+      },
+      {
+        "source": "issf-paper-target-scoring-2022",
+        "page": "Heading and footer, p. 320 (PDF p. 1)",
+        "fields": ["ruleBooks"]
+      }
+    ]
+  }
+}

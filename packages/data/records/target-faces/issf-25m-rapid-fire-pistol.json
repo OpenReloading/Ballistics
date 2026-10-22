@@ -1,0 +1,406 @@
+{
+  "id": "issf-25m-rapid-fire-pistol",
+  "name": "25m Rapid-Fire Pistol Target",
+  "organization": "ISSF",
+  "rings": [
+    {
+      "value": 5,
+      "diameter": {
+        "value": 500
+      }
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 420
+      }
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 340
+      }
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 260
+      }
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 180
+      }
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 100
+      }
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 50
+    },
+    "rule": "touch"
+  },
+  "blackDiameter": {
+    "value": 500,
+    "raw": "Black from 5 to 10 rings = 500mm"
+  },
+  "decimal": true,
+  "events": [
+    {
+      "name": "25m Rapid-Fire Pistol",
+      "distance": {
+        "value": 25000,
+        "raw": "25m"
+      },
+      "gauge": {
+        "value": 5.6,
+        "raw": "5.60mm"
+      },
+      "scoring": "touch"
+    },
+    {
+      "name": "25m Centre Fire Pistol (rapid-fire stage)",
+      "distance": {
+        "value": 25000,
+        "raw": "25m"
+      },
+      "gauge": {
+        "value": 9.65,
+        "raw": "9.65mm"
+      },
+      "scoring": "touch"
+    },
+    {
+      "name": "25m Pistol (rapid-fire stage)",
+      "distance": {
+        "value": 25000,
+        "raw": "25m"
+      },
+      "gauge": {
+        "value": 5.6,
+        "raw": "5.60mm"
+      },
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB 25 m Schnellfeuerpistole",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 10",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB 25 m Zentralfeuerpistole (Duell)",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 10",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB 25 m Pistole (Duell)",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 10",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB 25 m Pistole/Revolver 20 Sek. Serie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 10",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw P-D 1 Halbautomatische Dienstpistole Zeitserie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "VdRBw",
+      "section": "8.2.5, 8.2.6 (Scheibe 10.2)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw R-D 1 Dienstrevolver Zeitserie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "VdRBw",
+      "section": "8.3.5, 8.3.6 (Scheibe 10.2)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw P-G 1 Halbautomatische Großkaliberpistole Zeitserie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "VdRBw",
+      "section": "8.5.5, 8.5.6 (Scheibe 10.2)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw R-G 1 Großkaliberrevolver Zeitserie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "VdRBw",
+      "section": "8.6.5, 8.6.6 (Scheibe 10.2)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw P-K 1 Halbautomatische KK-Pistole Zeitserie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "VdRBw",
+      "section": "8.8.5, 8.8.6 (Scheibe 10.2)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw R-K 1 KK-Revolver Zeitserie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "VdRBw",
+      "section": "8.9.5, 8.9.6 (Scheibe 10.2)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP SP3 Sportpistole 3 Duell",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.1.1 and C.13B.5, C.13B.6 (Teil B, PDF p. 10; Teil C, PDF p. 82)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP SP4 Sportpistole 4 Duell",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.1.1 and C.13C.5, C.13C.6 (Teil B, PDF p. 10; Teil C, PDF p. 85)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP KK-Pist./Rev. Kleinkaliber Kurzwaffe Duell",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.1.1 and C.16.10, C.16.12 (Teil B, PDF p. 10; Teil C, PDF p. 114)",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB 25 m Schnellfeuerpistole Nachwuchs",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 10",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB 25 m Pistole Nachwuchs (Duell)",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 10",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB 25 m Großkaliberpistole .30 20 Sek. Serie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 10",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB 25 m Großkaliberpistole .32 20 Sek. Serie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 10",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB 25 m Großkaliberpistole .38 20 Sek. Serie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 10",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB 25 m Großkaliberpistole 10 mm 20 Sek. Serie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 10",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB 25 m Großkaliberrevolver .41 20 Sek. Serie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 10",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw G-H 6 Halbautomatisches Gewehr 200 m",
+      "distance": {
+        "value": 200000,
+        "raw": "200 m"
+      },
+      "organization": "VdRBw",
+      "section": "9.16.5, 9.16.6 (Scheibe 10.2, two faces)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw G-H 6 Halbautomatisches Gewehr 150 m",
+      "distance": {
+        "value": 150000,
+        "raw": "150 m"
+      },
+      "organization": "VdRBw",
+      "section": "9.16.5, 9.16.6 (Scheibe 10.2, two faces)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw G-H 6 Halbautomatisches Gewehr 100 m",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "VdRBw",
+      "section": "9.16.5, 9.16.6 (Scheibe 10.2, two faces)",
+      "scoring": "touch"
+    }
+  ],
+  "numerals": true,
+  "note": "Finals are hit or miss: a shot of 9.7 or more is a hit in the 25m Rapid-Fire Pistol final, 10.2 or more in the 25m Pistol Women final.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "issf-rules-2025-third-print",
+        "fields": ["name", "rings", "innerTen.diameter", "blackDiameter", "numerals"],
+        "page": "Rule 6.3.4.4, p. 198 (PDF p. 198)"
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 3.3.1, p. 39 (PDF p. 39)",
+        "fields": ["events.name", "events.distance"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rules 6.3.3.1 to 6.3.3.3, pp. 194 to 195 (PDF pp. 194 to 195)",
+        "fields": ["decimal"],
+        "note": "Tenth-ring values where electronic targets or scoring machines are used, else whole rings."
+      },
+      {
+        "source": "issf-paper-target-scoring-2022",
+        "fields": ["events.gauge", "events.scoring", "innerTen.rule"],
+        "page": "Rules 1.4.1 and 1.4.3, p. 321 (PDF p. 2); rule 5.2.1, p. 330 (PDF p. 11)"
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "0.20 Scheibe Nr. 10, Teil 0 Seite 68 (PDF p. 86)"
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "10.2 (Seite 97, PDF p. 97); 8.2 to 8.9 (sections named in the events)"
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.1.1 (Teil B, PDF p. 10)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "note": "B.11.1.1 prints a ring spacing of 5 cm."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13B.5, C.13B.6 (Teil C, PDF p. 82)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13C.5, C.13C.6 (Teil C, PDF p. 85)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.16.10, C.16.12 (Teil C, PDF p. 114)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "0.20 Scheibe Nr. 10 (Teil 0 Seite 68, PDF p. 86); rows of 0.21 (Teil 0 Seite 80 to 89, PDF pp. 98 to 107)"
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "9.16.5, 9.16.6 (Seite 89, PDF p. 89); 10.2 (Seite 97, PDF p. 97)"
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "Nr. 519 (Seite 24, PDF p. 24)",
+        "fields": ["events.scoring"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-6",
+        "page": "A.3.21.1.3, Teil A, Seite 14 von 32, PDF p. 14",
+        "fields": ["events.scoring"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.11.3, Teil 0 Seite 39, PDF p. 57",
+        "fields": ["events.scoring"]
+      }
+    ]
+  }
+}

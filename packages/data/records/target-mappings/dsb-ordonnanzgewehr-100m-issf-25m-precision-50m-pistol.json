@@ -1,0 +1,22 @@
+{
+  "id": "dsb-ordonnanzgewehr-100m-issf-25m-precision-50m-pistol",
+  "discipline": "dsb-ordonnanzgewehr-100m",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "DSB Ordonnanzgewehr 100 m",
+  "shotCount": 40,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.21, Teil 0 Seite 78, PDF p. 96 (rows 1.58 O and 1.58 G, column Scheibe Nr.)",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "1.8.4, Teil 1 Seite 16, PDF p. 128 (Vorkampf 40 shots); 0.21, Teil 0 Seite 78, PDF p. 96 (column Wettkampfschüsse)",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "id": "bdmp-f-class-tr-300m",
+  "federation": "bdmp",
+  "name": "F-Class Target Rifle 300 m",
+  "number": "F-Class TR 300 m",
+  "section": "D.13B",
+  "page": "Teil D, Seite 80 bis 81 von 294, PDF pp. 80 to 81",
+  "distance": {
+    "value": 300000,
+    "raw": "300 m"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.13B, D.13B.1, Teil D, Seite 80 von 294, PDF p. 80",
+        "fields": ["name", "number", "federation", "section", "page"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.13B.13, Teil D, Seite 81 von 294, PDF p. 81",
+        "fields": ["distance"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "id": "dsu-svsg-2-issf-25m-precision-50m-pistol",
+  "discipline": "dsu-svsg-2",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "DSU SVSG 2 Vorderlader-Steinschlossgewehr 100 m",
+  "shotCount": 10,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 4, Seite 15, PDF p. 137",
+        "fields": ["discipline", "face", "event", "shotCount"],
+        "note": "13 shots are fired and the best 10 count."
+      }
+    ]
+  }
+}

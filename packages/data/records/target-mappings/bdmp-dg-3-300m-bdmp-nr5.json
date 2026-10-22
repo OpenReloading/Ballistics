@@ -1,0 +1,21 @@
+{
+  "id": "bdmp-dg-3-300m-bdmp-nr5",
+  "discipline": "bdmp-dg-3-300m",
+  "face": "bdmp-nr5",
+  "event": "DG 3 National Rifle Match - A, 300 m",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.6, Teil B, Seite 24 von 70, PDF p. 24",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.8.9, Teil D, Seite 35 von 294, PDF p. 35",
+        "fields": ["discipline", "face", "event"]
+      }
+    ]
+  }
+}

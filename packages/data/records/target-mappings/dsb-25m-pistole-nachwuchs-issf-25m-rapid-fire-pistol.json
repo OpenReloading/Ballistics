@@ -1,0 +1,32 @@
+{
+  "id": "dsb-25m-pistole-nachwuchs-issf-25m-rapid-fire-pistol",
+  "discipline": "dsb-25m-pistole-nachwuchs",
+  "face": "issf-25m-rapid-fire-pistol",
+  "event": "DSB 25 m Pistole Nachwuchs (Duell)",
+  "stage": "Duell",
+  "gauge": {
+    "value": 5.6,
+    "raw": "5,60 mm"
+  },
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.20 Scheibe Nr. 10, Teil 0 Seite 68, PDF p. 86; row 2.41 of 0.21, Teil 0 Seite 81, PDF p. 99",
+        "fields": ["discipline", "face", "event", "stage"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "2.19.2, Teil 2 Seite 19, PDF p. 153 (one round of 20 shots each, precision and duel)",
+        "fields": ["shotCount"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.11.3.2, Teil 0 Seite 40, PDF p. 58",
+        "fields": ["gauge"]
+      }
+    ]
+  }
+}

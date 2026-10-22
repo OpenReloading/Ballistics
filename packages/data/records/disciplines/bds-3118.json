@@ -1,0 +1,32 @@
+{
+  "id": "bds-3118",
+  "federation": "bds",
+  "name": "100 m Präz. ZF-Gewehr 100 b. 7 mm",
+  "number": "3118",
+  "section": "Anhang 1",
+  "page": "Seite Z-23, PDF p. 24",
+  "distance": {
+    "value": 100000,
+    "raw": "100 m"
+  },
+  "category": "precision-rifle",
+  "caliberClasses": {
+    "ids": ["rifle-22-cf", "rifle-6mm", "rifle-25", "rifle-6-5", "rifle-270", "rifle-7mm"],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "page": "Anhang 1, Seite Z-23, PDF p. 24",
+        "fields": ["name", "number", "federation", "section", "page", "distance"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 2.02, Seite L-15, PDF p. 15",
+        "fields": ["number", "distance", "category", "caliberClasses"]
+      }
+    ]
+  }
+}

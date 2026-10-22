@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-pfg-2",
+  "federation": "bdmp",
+  "name": "Perkussions-Freigewehr 2",
+  "number": "PFG 2",
+  "section": "E.5",
+  "page": "Teil E, Seite 15 bis 16 von 42, PDF pp. 15 to 16",
+  "distance": {
+    "value": 100000,
+    "raw": "100 m"
+  },
+  "category": "rifle",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.5, E.5.1, Teil E, Seite 15 von 42, PDF p. 15",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.5.11, Teil E, Seite 16 von 42, PDF p. 16",
+        "fields": ["distance"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id": "dsu-svfg",
+  "federation": "dsu",
+  "name": "Vorderlader-Freigewehr 100 m",
+  "number": "SVFG",
+  "section": "Kapitel 4, A) Vorderlader, II. Langwaffen, SVFG",
+  "page": "Seite 13, PDF p. 135",
+  "distance": {
+    "value": 100000,
+    "raw": "100 Meter"
+  },
+  "category": "muzzle-loader",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 4, Seite 13, PDF p. 135",
+        "fields": ["federation", "section", "page", "distance", "category"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 9, Schwarzpulver und Vorderlader, Seite 1 (PDF p. 233)",
+        "fields": ["name", "number"]
+      }
+    ]
+  }
+}

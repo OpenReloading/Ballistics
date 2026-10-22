@@ -1,0 +1,9 @@
+{
+  "id": "test-discipline",
+  "federation": "missing-federation",
+  "name": "Test discipline",
+  "section": "1.1",
+  "page": "p. 1",
+  "distance": { "value": 10000 },
+  "provenance": { "kind": "published", "sources": [{ "title": "Test rule book" }] }
+}

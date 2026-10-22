@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-dp-1",
+  "federation": "bdmp",
+  "name": "Dienstpistole 1",
+  "number": "DP 1",
+  "section": "C.3",
+  "page": "Teil C, Seite 9 bis 11 von 142, PDF pp. 9 to 11",
+  "distance": {
+    "value": 25000,
+    "raw": "25 m"
+  },
+  "category": "service-pistol",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.3, C.3.1, Teil C, Seite 9 von 142, PDF p. 9",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.3.6, Teil C, Seite 10 von 142, PDF p. 10",
+        "fields": ["distance"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id": "bdmp-lar-2-25m-issf-25m-precision-50m-pistol",
+  "discipline": "bdmp-lar-2-25m",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "BDMP LAR 2 Lever Action Rifle 2, 25 m",
+  "shotCount": 40,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16.10, Teil D, Seite 92 von 294, PDF p. 92",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16.8, Teil D, Seite 92 von 294, PDF p. 92",
+        "fields": ["shotCount"],
+        "note": "Two stations of two series of ten shots."
+      }
+    ],
+    "note": "The announcement fixes 25 m or 50 m (D.16.11)."
+  }
+}

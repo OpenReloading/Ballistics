@@ -1,0 +1,49 @@
+{
+  "id": "bdmp-zg-3",
+  "federation": "bdmp",
+  "name": "Zielfernrohrgewehr 3",
+  "number": "ZG 3",
+  "section": "D.13",
+  "page": "Teil D, Seite 74 bis 75 von 294, PDF pp. 74 to 75",
+  "distance": {
+    "value": 300000,
+    "raw": "300 m"
+  },
+  "category": "rifle",
+  "caliberClasses": {
+    "ids": [
+      "rifle-22-cf",
+      "rifle-6mm",
+      "rifle-25",
+      "rifle-6-5",
+      "rifle-270",
+      "rifle-7mm",
+      "rifle-30",
+      "rifle-30-carbine",
+      "rifle-8mm",
+      "rifle-338"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.13, D.13.1, Teil D, Seite 74 von 294, PDF p. 74",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.13.6, Teil D, Seite 74 von 294, PDF p. 74",
+        "fields": ["caliberClasses"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.13.13, Teil D, Seite 75 von 294, PDF p. 75",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "The book prints Kaliber bis .338."
+  }
+}

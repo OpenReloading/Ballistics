@@ -1,0 +1,230 @@
+{
+  "id": "4",
+  "name": "Cal. 4",
+  "table": "VII",
+  "published": "1989-01-19",
+  "revised": "2006-09-19",
+  "pressureMethod": "transducer",
+  "verification": "unverified",
+  "values": [
+    {
+      "side": "cartridge",
+      "symbol": "d",
+      "quantity": "length",
+      "value": 27.6,
+      "tolerance": {
+        "lower": -0.25
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "g",
+      "quantity": "length",
+      "value": 30.45,
+      "tolerance": {
+        "lower": -0.45
+      }
+    },
+    {
+      "side": "cartridge",
+      "symbol": "t",
+      "quantity": "length",
+      "value": 3.25,
+      "tolerance": {
+        "lower": -0.4
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "h",
+      "quantity": "length",
+      "value": 26.2,
+      "tolerance": {
+        "lower": -0.45
+      }
+    },
+    {
+      "side": "cartridge",
+      "symbol": "l",
+      "quantity": "length",
+      "value": 82.4,
+      "tolerance": {
+        "lower": -2.5
+      },
+      "variant": "4/82"
+    },
+    {
+      "side": "cartridge",
+      "symbol": "l",
+      "quantity": "length",
+      "value": 101,
+      "tolerance": {
+        "lower": -2.5
+      },
+      "variant": "4/101"
+    },
+    {
+      "side": "chamber",
+      "symbol": "D",
+      "quantity": "length",
+      "value": 27.7,
+      "tolerance": {
+        "upper": 0.1
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "G",
+      "quantity": "length",
+      "value": 30.5,
+      "tolerance": {
+        "upper": 0.1
+      }
+    },
+    {
+      "side": "chamber",
+      "symbol": "T",
+      "quantity": "length",
+      "value": 3.3,
+      "tolerance": {
+        "upper": 0.1
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "H",
+      "quantity": "length",
+      "value": 26.3,
+      "tolerance": {
+        "upper": 0.1
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "B",
+      "quantity": "length",
+      "value": 23.35,
+      "tolerance": {
+        "upper": 0.7
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "alpha1",
+      "quantity": "angle",
+      "value": 10.5,
+      "raw": "10°30'",
+      "limit": "max",
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "L",
+      "quantity": "length",
+      "value": 82.6,
+      "tolerance": {
+        "upper": 2
+      },
+      "variant": "4/82",
+      "footnotes": ["1"]
+    },
+    {
+      "symbol": "Pmax",
+      "quantity": "pressure",
+      "value": 1050,
+      "variant": "4/82"
+    },
+    {
+      "symbol": "PK",
+      "quantity": "pressure",
+      "value": 1200,
+      "variant": "4/82"
+    },
+    {
+      "symbol": "PE",
+      "quantity": "pressure",
+      "value": 1320,
+      "variant": "4/82"
+    },
+    {
+      "symbol": "M",
+      "quantity": "length",
+      "raw": "25/30",
+      "variant": "4/82"
+    },
+    {
+      "side": "chamber",
+      "symbol": "L",
+      "quantity": "length",
+      "value": 101.2,
+      "tolerance": {
+        "upper": 2
+      },
+      "variant": "4/101",
+      "footnotes": ["1"]
+    },
+    {
+      "symbol": "Pmax",
+      "quantity": "pressure",
+      "value": 1050,
+      "variant": "4/101"
+    },
+    {
+      "symbol": "PK",
+      "quantity": "pressure",
+      "value": 1200,
+      "variant": "4/101"
+    },
+    {
+      "symbol": "PE",
+      "quantity": "pressure",
+      "value": 1320,
+      "variant": "4/101"
+    },
+    {
+      "symbol": "M",
+      "quantity": "length",
+      "raw": "25/30",
+      "variant": "4/101"
+    },
+    {
+      "side": "chamber",
+      "symbol": "Fe",
+      "quantity": "length",
+      "value": 0.1
+    },
+    {
+      "side": "chamber",
+      "symbol": "Fe",
+      "quantity": "length",
+      "value": 0.2,
+      "variant": "bascule",
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "Fe",
+      "quantity": "length",
+      "value": 0.35,
+      "variant": "automatic",
+      "footnotes": ["1"]
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cip-tdcc",
+        "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-vii/tabviical-en-page1.pdf",
+        "sha256": "b8b05f3a3a03bbe9be90b612b1f12c2abd0a1166a5915c4931358c332d98105a",
+        "retrieved": "2026-10-08"
+      }
+    ]
+  }
+}

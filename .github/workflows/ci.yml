@@ -1,0 +1,211 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  # release tags and images: release.yml
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  # Which jobs run and what the e2e job builds: only a pull request may skip `check` (prose only), `e2e` (no
+  # change to what the API, the web app or the e2e specs read) or the web build, or prerender a sample of the
+  # records. Every other event (the default branch) and every doubt runs everything; see apps/web/scripts/ci-plan.mts.
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      check: ${{ steps.plan.outputs.check }}
+      e2e: ${{ steps.plan.outputs.e2e }}
+      web: ${{ steps.plan.outputs.web }}
+      prerender: ${{ steps.plan.outputs.prerender }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # the base commit of a pull request must be present for the file list
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+      - id: plan
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON apps/web/scripts/ci-plan.mts >> "$GITHUB_OUTPUT"
+
+  check:
+    needs: changes
+    # a failed `changes` job leaves the outputs empty, so the job runs
+    if: ${{ !cancelled() && needs.changes.outputs.check != 'false' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: npm run typecheck
+      - run: npm run docs:check
+      - run: npm test
+      - run: npm run data:validate
+      # `npm run api:check` in the dev container; the same oasdiff version as .devcontainer/Dockerfile
+      - run: node tools/src/openapi.ts "$RUNNER_TEMP/openapi.json"
+      - name: Breaking changes of the API document (oasdiff)
+        run: docker run --rm -v "$PWD:/repo:ro" -v "$RUNNER_TEMP:/doc:ro" -w /repo docker.io/tufin/oasdiff:v1.33.0@sha256:6263a96dd2ef0726c54e21fea9b8e1607eac4841add0079324b424c1f52b819c breaking packages/api/openapi.baseline.json /doc/openapi.json --fail-on ERR
+      - run: npm audit --audit-level=high
+
+  # Workflow lint and security audit of .github/workflows and dependabot.yml.
+  workflows:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: actionlint
+        run: docker run --rm -v "$PWD:/repo" -w /repo docker.io/rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667 -color
+      - uses: zizmorcore/zizmor-action@85b2b9fb8e3325e7a23d7d0a9d7ba5ae0f999e3e # v0.7.1
+        with:
+          version: 1.31.1
+          advanced-security: false
+
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: high
+
+  e2e:
+    needs: changes
+    # a failed `changes` job still runs e2e, with empty outputs: the web app and every record page are built
+    if: ${{ !cancelled() && needs.changes.outputs.e2e != 'false' }}
+    runs-on: ubuntu-latest
+    env:
+      # only a pull request with outputs that say so skips the web build
+      BUILD_WEB: ${{ github.event_name != 'pull_request' || needs.changes.outputs.web != 'false' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # the drawing contact sheet compares with the base commit
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+        working-directory: apps/e2e
+      # specs import web sources, which import the workspace packages from their dist/
+      - run: npm run build -w @openreloading/schema && npm run build -w @openreloading/importers && npm run build -w @openreloading/core && npm run build -w @openreloading/drawing
+      - run: docker compose up --detach --build db api web
+      - name: Wait for the API and the web app
+        run: |
+          for _ in $(seq 1 60); do
+            curl --silent --fail http://localhost:3000/ && curl --silent --fail http://localhost:3001/ && exit 0
+            sleep 2
+          done
+          docker compose logs
+          exit 1
+      # `npm run api:conformance` in the dev container; the same Schemathesis version and checks
+      - name: API conformance to its document (Schemathesis)
+        run: |
+          npm run build -w @openreloading/data -w @openreloading/api
+          node tools/src/openapi.ts "$RUNNER_TEMP/openapi.json"
+          docker run --rm --network=host -v "$RUNNER_TEMP:/doc:ro" docker.io/schemathesis/schemathesis:v4.29.4@sha256:16d21ecba0097fc8a3ca71b8d1db3797d2a057610d808715871216450e63f0a6 \
+            run /doc/openapi.json --url http://localhost:3000 --checks not_a_server_error,status_code_conformance,content_type_conformance,response_schema_conformance
+      - run: npm run test:e2e
+      - name: Drawing baseline in the Playwright image
+        run: npm run drawing-baseline -w @openreloading/e2e
+      - name: Paired contact sheet of the baseline drawings when drawing code changed
+        id: sheet
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          git cat-file -e "$BASE^{commit}" 2>/dev/null || { echo "no base commit"; exit 0; }
+          if git diff --quiet "$BASE" HEAD -- packages/drawing/src 'apps/web/src/components/*drawing*'; then
+            echo "no drawing change"; exit 0
+          fi
+          snaps='apps/e2e/tests/web/drawing-baseline.spec.ts-snapshots/'
+          # the committed baseline images of a revision as <stem>__none__<theme>__<width>.png
+          put() {
+            mkdir -p "sheet/$1/drawings"
+            git ls-tree --name-only "$2" $snaps | grep '\.png$' | while read -r f; do
+              n=$(basename "$f" -linux.png); w=390
+              case $n in *-1280) w=1280; n=${n%-1280} ;; esac
+              git show "$2:$f" > "sheet/$1/drawings/${n%-*}__none__${n##*-}__$w.png"
+            done
+          }
+          put before "$BASE"
+          put after HEAD
+          npm run pair-sheets -w @openreloading/e2e -- "$PWD/sheet/before" "$PWD/sheet/after" "$PWD/sheet/out"
+          echo "made=1" >> "$GITHUB_OUTPUT"
+      - name: Keep the paired contact sheet for review
+        if: steps.sheet.outputs.made == '1'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: drawing-contact-sheet
+          path: sheet/out
+      - name: Keep the e2e results (actual and diff images) of a failed run
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: e2e-test-results
+          path: apps/e2e/test-results
+      # The Turbopack compile cache only (.next/cache/fetch-cache holds API responses, so it never leaves the run).
+      # A pull request restores the newest cache of its own branch or of the default branch (GitHub scopes caches
+      # that way, so a fork's cache cannot reach another branch); a push to the default branch
+      # builds from nothing and saves the cache that pull requests start from.
+      - name: Key of the Turbopack cache
+        id: next
+        if: env.BUILD_WEB == 'true'
+        run: |
+          next=$(node -p "require('./apps/web/package.json').dependencies.next")
+          echo "prefix=next-$RUNNER_OS-$RUNNER_ARCH-$next" >> "$GITHUB_OUTPUT"
+      - name: Restore the Turbopack cache
+        id: cache
+        if: env.BUILD_WEB == 'true' && github.event_name == 'pull_request'
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: apps/web/.next/cache/turbopack
+          key: ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'package-lock.json', 'patches/**', 'apps/web/next.config.ts') }}-${{ hashFiles('apps/web/src/**', 'packages/*/src/**') }}
+          restore-keys: |
+            ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'package-lock.json', 'patches/**', 'apps/web/next.config.ts') }}-
+      - name: Build the web app against the API
+        if: env.BUILD_WEB == 'true'
+        run: npm run build -w @openreloading/web
+        env:
+          API_URL: http://localhost:3000
+          PRERENDER: ${{ github.event_name == 'pull_request' && needs.changes.outputs.prerender == 'sample' && 'sample' || 'full' }}
+      - name: Save the Turbopack cache
+        if: env.BUILD_WEB == 'true' && steps.cache.outputs.cache-hit != 'true' && (github.event_name == 'pull_request' || github.ref == format('refs/heads/{0}', github.event.repository.default_branch))
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: apps/web/.next/cache/turbopack
+          key: ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'package-lock.json', 'patches/**', 'apps/web/next.config.ts') }}-${{ hashFiles('apps/web/src/**', 'packages/*/src/**') }}
+      - run: node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON apps/web/scripts/check-prerender.mts
+        if: env.BUILD_WEB == 'true'
+        env:
+          API_URL: http://localhost:3000
+          PRERENDER: ${{ github.event_name == 'pull_request' && needs.changes.outputs.prerender == 'sample' && 'sample' || 'full' }}
+      - name: Smoke check of the build against the API
+        if: env.BUILD_WEB == 'true'
+        run: |
+          cp -r apps/web/.next/static apps/web/.next/standalone/apps/web/.next/static
+          node apps/web/.next/standalone/apps/web/server.js &
+          for _ in $(seq 1 30); do curl --silent --fail http://localhost:3002/ > /dev/null && break; sleep 1; done
+          npm run e2e:smoke
+        env:
+          API_URL: http://localhost:3000
+          PORT: '3002'
+          WEB_URL: http://localhost:3002
+      - if: always()
+        run: docker compose down --volumes

@@ -1,0 +1,27 @@
+{
+  "id": "bdmp-zg-7-magnum-300m",
+  "federation": "bdmp",
+  "name": "Zielfernrohrgewehr 7 Magnum TRIA",
+  "number": "ZG 7 Magnum",
+  "section": "D.34",
+  "page": "Teil D, Seite 272 bis 274 von 294, PDF pp. 272 to 274",
+  "distance": {
+    "value": 300000,
+    "raw": "300 Meter"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.34, D.34.1, Teil D, Seite 272 von 294, PDF p. 272",
+        "fields": ["name", "number", "federation", "section", "page"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.34.13, Teil D, Seite 274 von 294, PDF p. 274",
+        "fields": ["distance"]
+      }
+    ]
+  }
+}

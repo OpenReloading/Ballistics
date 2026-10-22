@@ -1,0 +1,178 @@
+{
+  "id": "issf-10m-air-rifle",
+  "name": "10m Air Rifle Target",
+  "organization": "ISSF",
+  "rings": [
+    {
+      "value": 1,
+      "diameter": {
+        "value": 45.5
+      }
+    },
+    {
+      "value": 2,
+      "diameter": {
+        "value": 40.5
+      }
+    },
+    {
+      "value": 3,
+      "diameter": {
+        "value": 35.5
+      }
+    },
+    {
+      "value": 4,
+      "diameter": {
+        "value": 30.5
+      }
+    },
+    {
+      "value": 5,
+      "diameter": {
+        "value": 25.5
+      }
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 20.5
+      }
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 15.5
+      }
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 10.5
+      }
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 5.5
+      }
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 0.5
+      }
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 0.5
+    },
+    "rule": "cover"
+  },
+  "blackDiameter": {
+    "value": 30.5,
+    "raw": "Black from 4 to 9 rings = 30.5mm"
+  },
+  "decimal": true,
+  "events": [
+    {
+      "name": "10m Air Rifle",
+      "distance": {
+        "value": 10000,
+        "raw": "10m"
+      },
+      "gauge": {
+        "value": 4.5
+      },
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB Gewehr 10 m",
+      "distance": {
+        "value": 10000,
+        "raw": "10 m"
+      },
+      "gauge": {
+        "value": 4.5,
+        "raw": "5,50 mm Außenlehre"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 1; 0.11.3.2",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 75xx 10 m Präz. Luftgewehr",
+      "distance": {
+        "value": 10000,
+        "raw": "10 m"
+      },
+      "organization": "BDS",
+      "section": "Anhang 1, Z 13",
+      "scoring": "touch"
+    }
+  ],
+  "numerals": true,
+  "note": "The 10 ring is a white dot of 0.5 mm. A 4.5 mm hole is scored with the inward gauge on rings 1 and 2 and the 5.50 mm outward gauge on rings 3 to 10; the inner ten (dot shot out completely) is judged with the air pistol outward gauge inside the 7 ring.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "issf-rules-2025-third-print",
+        "fields": [
+          "name",
+          "rings",
+          "innerTen.diameter",
+          "blackDiameter",
+          "numerals",
+          "innerTen.rule"
+        ],
+        "page": "Rule 6.3.4.3, p. 197 (PDF p. 197)"
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 3.3.1, p. 39 (PDF p. 39)",
+        "fields": ["events.name", "events.distance"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rules 6.3.3.1 to 6.3.3.3, pp. 194 to 195 (PDF pp. 194 to 195)",
+        "fields": ["decimal"],
+        "note": "Tenth-ring values where electronic targets or scoring machines are used, else whole rings."
+      },
+      {
+        "source": "issf-paper-target-scoring-2022",
+        "fields": ["events.gauge", "events.scoring"],
+        "page": "Rules 1.4.4, 1.4.5, 1.4.7 and 1.4.8, pp. 321 to 323 (PDF pp. 2 to 4); rule 5.2.1, p. 330 (PDF p. 11)",
+        "kind": "derived"
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "fields": [
+          "events.name",
+          "events.distance",
+          "events.organization",
+          "events.section",
+          "events.gauge"
+        ],
+        "page": "0.20 Scheibe Nr. 1, Teil 0 Seite 63 (PDF p. 81); 0.11.3.2 and 0.11.3.3, Teil 0 Seite 40 (PDF p. 58)",
+        "note": "The air rifle outer gauge (measuring ring 5.50 mm) is read two lines out (0.11.3.3)."
+      },
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "Anhang 1 (printed Z-22 to Z-24, PDF pp. 23 to 25), Zielscheibe Z13"
+      },
+      {
+        "source": "bds-sporthandbuch-allgemein-2026",
+        "fields": ["events.scoring"],
+        "page": "A 9.02, Seite A-22, PDF p. 22"
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.11.3, Teil 0 Seite 39, PDF p. 57",
+        "fields": ["events.scoring"]
+      }
+    ]
+  }
+}

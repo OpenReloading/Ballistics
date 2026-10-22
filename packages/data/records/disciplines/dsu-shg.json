@@ -1,0 +1,41 @@
+{
+  "id": "dsu-shg",
+  "federation": "dsu",
+  "name": "Schwarzpulver-Hinterladergewehr 50 m",
+  "number": "SHG",
+  "section": "Kapitel 4, B) Hinterladungssysteme, SHG",
+  "page": "Seite 17, PDF p. 139",
+  "distance": {
+    "value": 50000,
+    "raw": "50 Meter"
+  },
+  "caliberClasses": {
+    "ids": [
+      "rifle-25",
+      "rifle-6-5",
+      "rifle-270",
+      "rifle-7mm",
+      "rifle-30",
+      "rifle-30-carbine",
+      "rifle-8mm",
+      "rifle-338"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 4, Seite 17, PDF p. 139",
+        "fields": ["federation", "section", "page", "distance", "caliberClasses"],
+        "note": "The book prints a bore range of .25 to .90 inch."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 9, Schwarzpulver und Vorderlader, Seite 1 (PDF p. 233)",
+        "fields": ["name", "number"]
+      }
+    ]
+  }
+}

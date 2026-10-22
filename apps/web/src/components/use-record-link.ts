@@ -1,0 +1,33 @@
+import { type UserRecordKind, userRecord } from '@openreloading/schema'
+import { type RefObject, useEffect } from 'react'
+import { storedRecord } from '../lib/user-store.ts'
+import type { FileMenuHandle } from './file-menu.tsx'
+
+/**
+ * `?record=<id>` of a designer: the browser record is read, checked against the schema and
+ * the designer's kind, and opened as the saved records listed by Open do, so Save
+ * writes that record. Read once on mount; `say` gets the status message, undefined to clear it.
+ */
+export function useRecordLink(
+  kind: UserRecordKind,
+  menu: RefObject<FileMenuHandle | null>,
+  say: (message: string | undefined) => void,
+) {
+  // biome-ignore lint/correctness/useExhaustiveDependencies: once on mount
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get('record')
+    if (!id) return
+    say('Loading the record…')
+    storedRecord(id).then(
+      async (raw) => {
+        if (raw === undefined) return say('That record is not in this browser.')
+        const r = userRecord.safeParse(raw)
+        if (!r.success || r.data.kind !== kind)
+          return say('That record is not a design of this kind.')
+        say(undefined)
+        await menu.current?.open(r.data)
+      },
+      () => say('The records of this browser could not be read.'),
+    )
+  }, [])
+}

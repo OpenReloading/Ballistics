@@ -1,0 +1,32 @@
+{
+  "id": "dsb-luftgewehr-10m-sh3",
+  "federation": "dsb",
+  "name": "Luftgewehr 10 m SH3",
+  "number": "1.10",
+  "section": "10.12",
+  "page": "Teil 10 Seite 15, PDF p. 433",
+  "distance": {
+    "value": 10000,
+    "raw": "10 m"
+  },
+  "category": "air-rifle",
+  "caliberClasses": {
+    "ids": ["air-4-5"],
+    "basis": "stated"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "10.12, Teil 10 Seite 15, PDF p. 433 (row 1.10 Luftgewehr SH3)",
+        "fields": ["name", "number", "federation", "section", "page"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.21, Teil 0 Seite 76, PDF p. 94 (row 1.10: Luftgewehr, 4,5 mm, 10 m)",
+        "fields": ["distance", "category", "caliberClasses"]
+      }
+    ]
+  }
+}

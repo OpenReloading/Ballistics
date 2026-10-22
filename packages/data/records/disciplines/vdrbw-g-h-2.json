@@ -1,0 +1,32 @@
+{
+  "id": "vdrbw-g-h-2",
+  "federation": "vdrbw",
+  "name": "Halbautomatisches Gewehr",
+  "number": "G-H 2",
+  "section": "9.6",
+  "page": "Seite 68, PDF p. 68",
+  "distance": {
+    "value": 100000,
+    "raw": "100 m"
+  },
+  "category": "rifle",
+  "caliberClasses": {
+    "ids": ["rifle-6-5", "rifle-270", "rifle-7mm", "rifle-30", "rifle-30-carbine", "rifle-8mm"],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "Kapitel 9, Inhaltsübersicht, Seite 57, PDF p. 57",
+        "fields": ["name", "number"]
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.6, Seite 68, PDF p. 68",
+        "fields": ["federation", "section", "page", "distance", "caliberClasses", "category"]
+      }
+    ]
+  }
+}

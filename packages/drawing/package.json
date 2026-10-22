@@ -1,0 +1,40 @@
+{
+  "name": "@openreloading/drawing",
+  "version": "0.0.1",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./cartridge": {
+      "types": "./dist/cartridge/index.d.ts",
+      "default": "./dist/cartridge/index.js"
+    },
+    "./bullet": {
+      "types": "./dist/bullet/index.d.ts",
+      "default": "./dist/bullet/index.js"
+    },
+    "./seating": {
+      "types": "./dist/seating/index.d.ts",
+      "default": "./dist/seating/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.0",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.3"
+  }
+}

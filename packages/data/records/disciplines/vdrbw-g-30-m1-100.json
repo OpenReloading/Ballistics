@@ -1,0 +1,38 @@
+{
+  "id": "vdrbw-g-30-m1-100",
+  "federation": "vdrbw",
+  "name": "Halbautomatisches Gewehr",
+  "number": "G-.30 M1",
+  "section": "9.8",
+  "page": "Seite 72, PDF p. 72",
+  "distance": {
+    "value": 100000,
+    "raw": "100 m"
+  },
+  "category": "rifle",
+  "caliberClasses": {
+    "ids": ["rifle-30-carbine"],
+    "basis": "stated"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "Kapitel 9, Inhaltsübersicht, Seite 57, PDF p. 57",
+        "fields": ["name", "number"]
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.8, Seite 72, PDF p. 72",
+        "fields": ["federation", "section", "page", "caliberClasses", "category"]
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.8.15, Seite 73, PDF p. 73",
+        "fields": ["distance"],
+        "note": "The book allows 50 m and 100 m besides 25 m (9.8.15)."
+      }
+    ]
+  }
+}

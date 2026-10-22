@@ -1,0 +1,18 @@
+{
+  "id": "vdrbw-g-h-1-issf-25m-precision-50m-pistol",
+  "discipline": "vdrbw-g-h-1",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "VdRBw G-H 1 Halbautomatisches Gewehr",
+  "shotCount": 60,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.5.9, Seite 66, PDF p. 66; Scheibe 10.3, Seite 98, PDF p. 98",
+        "fields": ["discipline", "face", "event", "shotCount"],
+        "note": "30 Präzision and 30 Zeitserie record shots, or 15 and 15 at championships or on need (9.5.9)."
+      }
+    ]
+  }
+}

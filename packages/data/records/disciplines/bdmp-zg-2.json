@@ -1,0 +1,48 @@
+{
+  "id": "bdmp-zg-2",
+  "federation": "bdmp",
+  "name": "Zielfernrohrgewehr 2",
+  "number": "ZG 2",
+  "section": "D.12",
+  "page": "Teil D, Seite 71 bis 73 von 294, PDF pp. 71 to 73",
+  "distance": {
+    "value": 300000,
+    "raw": "300 m"
+  },
+  "category": "rifle",
+  "caliberClasses": {
+    "ids": [
+      "rifle-22-cf",
+      "rifle-6mm",
+      "rifle-25",
+      "rifle-6-5",
+      "rifle-270",
+      "rifle-7mm",
+      "rifle-30",
+      "rifle-30-carbine",
+      "rifle-8mm"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.12, D.12.1, Teil D, Seite 71 von 294, PDF p. 71",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.12.6, Teil D, Seite 72 von 294, PDF p. 72",
+        "fields": ["caliberClasses"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.12.13, Teil D, Seite 73 von 294, PDF p. 73",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "The calibre must be one introduced for the rifle in a regular army, the police or customs and may not exceed 8 mm."
+  }
+}

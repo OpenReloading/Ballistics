@@ -1,0 +1,24 @@
+'use client'
+
+import { usePathname } from 'next/navigation'
+
+/** Second skip link on the workbench; `Workspace` shows the results (on phones their tab) and focuses them, also when the page opens at #results. */
+export function ResultsSkipLink() {
+  const path = usePathname()
+  if (path !== '/workbench') return null
+  return (
+    // biome-ignore lint/a11y/useValidAnchor: a skip link; the handler also opens the Results tab on phones
+    <a
+      className="skip-link"
+      href="#results"
+      onClick={(e) => {
+        // unhandled until `Workspace` hydrates (after the layout): then the link goes to #results
+        // and `Workspace` shows the results on mount
+        if (!window.dispatchEvent(new Event('show-results', { cancelable: true })))
+          e.preventDefault()
+      }}
+    >
+      Skip to results
+    </a>
+  )
+}

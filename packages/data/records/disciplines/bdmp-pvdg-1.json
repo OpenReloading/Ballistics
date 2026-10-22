@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-pvdg-1",
+  "federation": "bdmp",
+  "name": "Perkussions-Vorderlader-DG 1",
+  "number": "PVDG 1",
+  "section": "E.1",
+  "page": "Teil E, Seite 7 bis 8 von 42, PDF pp. 7 to 8",
+  "distance": {
+    "value": 100000,
+    "raw": "100 m"
+  },
+  "category": "service-rifle",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.1, E.1.1, Teil E, Seite 7 von 42, PDF p. 7",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.1.12, Teil E, Seite 8 von 42, PDF p. 8",
+        "fields": ["distance"]
+      }
+    ]
+  }
+}

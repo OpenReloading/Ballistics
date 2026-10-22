@@ -1,0 +1,33 @@
+{
+  "id": "bdmp-sdg-1",
+  "federation": "bdmp",
+  "name": "Steinschloss-Dienstgewehr 1",
+  "number": "SDG 1",
+  "section": "E.3",
+  "page": "Teil E, Seite 11 bis 12 von 42, PDF pp. 11 to 12",
+  "distance": {
+    "value": 50000,
+    "raw": "50 m"
+  },
+  "category": "service-rifle",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "Teil E Inhaltsverzeichnis, Teil E, Seite 1 von 42, PDF p. 1",
+        "fields": ["name", "number"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.3, E.3.1, Teil E, Seite 11 von 42, PDF p. 11",
+        "fields": ["federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.3.12, Teil E, Seite 12 von 42, PDF p. 12",
+        "fields": ["distance"]
+      }
+    ]
+  }
+}

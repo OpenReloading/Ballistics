@@ -1,0 +1,144 @@
+{
+  "id": "vdrbw-bw-nr2",
+  "name": "Scheibe Bundeswehr Nr. 2",
+  "organization": "VdRBw",
+  "rings": [
+    {
+      "value": 1,
+      "diameter": {
+        "value": 1000
+      },
+      "fill": "white"
+    },
+    {
+      "value": 2,
+      "diameter": {
+        "value": 900
+      },
+      "fill": "white"
+    },
+    {
+      "value": 3,
+      "diameter": {
+        "value": 800
+      },
+      "fill": "white"
+    },
+    {
+      "value": 4,
+      "diameter": {
+        "value": 700
+      },
+      "fill": "white"
+    },
+    {
+      "value": 5,
+      "diameter": {
+        "value": 600
+      },
+      "fill": "white"
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 500
+      },
+      "fill": "white"
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 400
+      },
+      "fill": "white"
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 300
+      },
+      "fill": "black"
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 200
+      },
+      "fill": "black"
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 100
+      },
+      "fill": "white"
+    }
+  ],
+  "blackDiameter": {
+    "value": 300
+  },
+  "events": [
+    {
+      "name": "VdRBw G-RM 1 Militär-Repetiergewehr",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "VdRBw",
+      "section": "9.2.4, 9.2.5 (Scheibe 10.1, Nr. 2, 100 cm)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw G-RM 2 Militär-Repetiergewehr",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "VdRBw",
+      "section": "9.3.4, 9.3.5 (Scheibe 10.1, Nr. 2, 100 cm)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw G-H 3 Halbautomatisches Gewehr",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "VdRBw",
+      "section": "9.7.4, 9.7.5 (Scheibe 10.1, Nr. 2, 100 cm)",
+      "scoring": "touch"
+    }
+  ],
+  "paper": {
+    "format": "other",
+    "width": {
+      "value": 1200,
+      "raw": "120 cm"
+    },
+    "height": {
+      "value": 1200,
+      "raw": "120 cm"
+    }
+  },
+  "numerals": true,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "fields": ["name", "rings", "blackDiameter", "numerals", "paper"],
+        "page": "10.1 (Seite 96, PDF p. 96)"
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "9.2.4, 9.2.5; 9.3.4, 9.3.5; 9.7.4, 9.7.5 (sections named in the events)"
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "Nr. 519 (Seite 24, PDF p. 24)",
+        "fields": ["events.scoring"]
+      }
+    ]
+  }
+}

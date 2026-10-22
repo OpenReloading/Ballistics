@@ -1,0 +1,222 @@
+// Synthetic photos of the target faces of packages/data/records/target-faces for the face search:
+// the face drawn from its record, seen by a pinhole camera.
+import { readdirSync, readFileSync } from 'node:fs'
+import type { TargetFace } from '@openreloading/schema'
+import type { RgbaImage } from '../src/lib/image.ts'
+import type { Point } from '../src/lib/target-geometry.ts'
+
+const dir = new URL('../../../packages/data/records/target-faces/', import.meta.url)
+export const faces: TargetFace[] = readdirSync(dir)
+  .sort()
+  .map((f) => JSON.parse(readFileSync(new URL(f, dir), 'utf8')) as TargetFace)
+export const faceById = (id: string) => {
+  const f = faces.find((x) => x.id === id)
+  if (!f) throw new Error(`No face ${id}`)
+  return f
+}
+
+/** Face mm (x right, y up) to image px, a 3 x 3 matrix. */
+type Homography = number[]
+
+export type Camera = {
+  width: number
+  height: number
+  /** Image px per face mm at the face centre, seen from the front. */
+  pxPerMm: number
+  /** Tilt of the face about the horizontal axis, degrees. */
+  tilt?: number
+  /** Turn about the vertical axis, degrees. */
+  yaw?: number
+  /** Roll of the photo, degrees. */
+  roll?: number
+  /** Image position of the face centre, px; default the middle. */
+  at?: Point
+  /** Distance of the camera in focal lengths of the 1 px/mm view: smaller is more perspective. */
+  depth?: number
+}
+
+/** The homography of a pinhole camera that looks at the face centre. */
+function camera(c: Camera): Homography {
+  const rad = Math.PI / 180
+  const [tx, ty, tz] = [(c.tilt ?? 0) * rad, (c.yaw ?? 0) * rad, (c.roll ?? 0) * rad]
+  // rotation of the face plane: yaw about y, then tilt about x, then roll about z
+  const rx = [1, 0, 0, 0, Math.cos(tx), -Math.sin(tx), 0, Math.sin(tx), Math.cos(tx)]
+  const ry = [Math.cos(ty), 0, Math.sin(ty), 0, 1, 0, -Math.sin(ty), 0, Math.cos(ty)]
+  const rz = [Math.cos(tz), -Math.sin(tz), 0, Math.sin(tz), Math.cos(tz), 0, 0, 0, 1]
+  const mul = (a: number[], b: number[]) => {
+    const o: number[] = []
+    for (let r = 0; r < 3; r++)
+      for (let k = 0; k < 3; k++)
+        o.push(a[3 * r] * b[k] + a[3 * r + 1] * b[3 + k] + a[3 * r + 2] * b[6 + k])
+    return o
+  }
+  const R = mul(rz, mul(rx, ry))
+  // the camera looks along z; the face plane lies `d` mm in front, a focal length of f px
+  const depth = c.depth ?? 6
+  const f = c.pxPerMm * 1000 * depth
+  const d = 1000 * depth
+  const at = c.at ?? { x: c.width / 2, y: c.height / 2 }
+  // face (X, Y, 0) with Y up becomes camera coordinates (X, -Y, 0) then R, then z + d
+  const cols = [
+    [R[0], R[3], R[6]],
+    [-R[1], -R[4], -R[7]],
+  ]
+  const t = [0, 0, d]
+  const P = [
+    [
+      f * cols[0][0] + at.x * cols[0][2],
+      f * cols[1][0] + at.x * cols[1][2],
+      f * t[0] + at.x * t[2],
+    ],
+    [
+      f * cols[0][1] + at.y * cols[0][2],
+      f * cols[1][1] + at.y * cols[1][2],
+      f * t[1] + at.y * t[2],
+    ],
+    [cols[0][2], cols[1][2], t[2]],
+  ]
+  return P.flat()
+}
+
+export const project = (h: Homography, p: Point): Point => {
+  const w = h[6] * p.x + h[7] * p.y + h[8]
+  return { x: (h[0] * p.x + h[1] * p.y + h[2]) / w, y: (h[3] * p.x + h[4] * p.y + h[5]) / w }
+}
+
+export function invert(m: number[]): number[] {
+  const [a, b, c, d, e, f, g, h, i] = m
+  const adj = [
+    e * i - f * h,
+    c * h - b * i,
+    b * f - c * e,
+    f * g - d * i,
+    a * i - c * g,
+    c * d - a * f,
+    d * h - e * g,
+    b * g - a * h,
+    a * e - b * d,
+  ]
+  const det = a * adj[0] + b * adj[3] + c * adj[6]
+  return adj.map((v) => v / det)
+}
+
+export type Scene = {
+  camera: Camera
+  face: TargetFace
+  /** Line width, mm. */
+  line?: number
+  /** Grey of the paper and of the black area. */
+  paper?: number
+  black?: number
+  /** Gaussian noise (grey levels), blur radius (px). */
+  noise?: number
+  /** Holes: face mm, diameter mm; drawn with this grey (default the paper's). */
+  holes?: Array<{ x: number; y: number; diameter: number }>
+  holeGrey?: number
+  /** Print marks (numerals): boxes centred at face mm, width and height in mm, drawn with this grey. */
+  marks?: Array<{ x: number; y: number; width: number; height: number; grey: number }>
+  /** Dark patches in image px: [x0, y0, x1, y1], grey. */
+  patches?: Array<{ box: [number, number, number, number]; grey: number }>
+  /** Brightness falling by this share across the image width. */
+  gradient?: number
+  /** Draw the ring lines (default true). */
+  rings?: boolean
+  /** The sheet's paper as a box of face mm [x0, y0, x1, y1]; outside it the background grey. */
+  sheet?: { box: [number, number, number, number]; background: number }
+  /** Brightness factor at image px (uneven light, a shadow). */
+  light?: (x: number, y: number) => number
+  /** Box blur radius, px, before the noise. */
+  blur?: number
+}
+
+const rng = (seed: number) => {
+  let s = seed >>> 0
+  return () => {
+    s = (Math.imul(s, 1664525) + 1013904223) >>> 0
+    return s / 4294967296
+  }
+}
+
+/** The scene as RGBA, drawn per pixel through the inverse homography with 2 x 2 samples. */
+export function render(scene: Scene): { image: RgbaImage; h: Homography } {
+  const { width, height } = scene.camera
+  const h = camera(scene.camera)
+  const inv = invert(h)
+  const { face } = scene
+  const line = scene.line ?? 0.5
+  const paper = scene.paper ?? 226
+  const black = scene.black ?? 30
+  const radii = face.rings.map((r) => r.diameter.value / 2)
+  if (face.innerTen) radii.push(face.innerTen.diameter.value / 2)
+  const blackR = face.blackDiameter.value / 2
+  const grey = new Float32Array(width * height)
+  const rand = rng(11)
+  for (let y = 0; y < height; y++)
+    for (let x = 0; x < width; x++) {
+      let sum = 0
+      for (let sy = 0; sy < 2; sy++)
+        for (let sx = 0; sx < 2; sx++) {
+          const px = x + 0.25 + 0.5 * sx
+          const py = y + 0.25 + 0.5 * sy
+          const w = inv[6] * px + inv[7] * py + inv[8]
+          const X = (inv[0] * px + inv[1] * py + inv[2]) / w
+          const Y = (inv[3] * px + inv[4] * py + inv[5]) / w
+          const r = Math.hypot(X, Y)
+          const sh = scene.sheet?.box
+          if (sh && (X < sh[0] || X > sh[2] || Y < sh[1] || Y > sh[3])) {
+            sum += scene.sheet?.background ?? paper
+            continue
+          }
+          let v = r <= blackR ? black : paper
+          if (scene.rings !== false)
+            for (const rr of radii)
+              if (Math.abs(r - rr) <= line / 2) {
+                v = r <= blackR + line / 2 ? paper - 30 : black
+                break
+              }
+          for (const m of scene.marks ?? [])
+            if (Math.abs(X - m.x) <= m.width / 2 && Math.abs(Y - m.y) <= m.height / 2) v = m.grey
+          for (const hole of scene.holes ?? [])
+            if (Math.hypot(X - hole.x, Y - hole.y) <= hole.diameter / 2) v = scene.holeGrey ?? paper
+          sum += v
+        }
+      let v = sum / 4
+      for (const p of scene.patches ?? [])
+        if (x >= p.box[0] && x < p.box[2] && y >= p.box[1] && y < p.box[3]) v = p.grey
+      v *= (1 - (scene.gradient ?? 0) * (x / width)) * (scene.light?.(x, y) ?? 1)
+      grey[y * width + x] = v
+    }
+  if (scene.blur) boxBlur(grey, width, height, scene.blur)
+  if (scene.noise)
+    for (let i = 0; i < width * height; i++) {
+      // Box-Muller
+      const g = Math.sqrt(-2 * Math.log(rand() + 1e-9)) * Math.cos(2 * Math.PI * rand())
+      grey[i] += scene.noise * g
+    }
+  const data = new Uint8ClampedArray(width * height * 4)
+  for (let i = 0; i < width * height; i++) {
+    data[4 * i] = data[4 * i + 1] = data[4 * i + 2] = grey[i]
+    data[4 * i + 3] = 255
+  }
+  return { image: { width, height, data }, h }
+}
+
+/** Three passes of a box blur of radius `r` px over rows and columns, in place. */
+function boxBlur(g: Float32Array, w: number, h: number, r: number) {
+  const k = Math.max(1, Math.round(r))
+  const pass = (n: number, len: number, at: (i: number, j: number) => number) => {
+    const line = new Float32Array(len)
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < len; j++) line[j] = g[at(i, j)]
+      for (let j = 0; j < len; j++) {
+        let s = 0
+        for (let d = -k; d <= k; d++) s += line[Math.min(len - 1, Math.max(0, j + d))]
+        g[at(i, j)] = s / (2 * k + 1)
+      }
+    }
+  }
+  for (let t = 0; t < 3; t++) {
+    pass(h, w, (y, x) => y * w + x)
+    pass(w, h, (x, y) => y * w + x)
+  }
+}

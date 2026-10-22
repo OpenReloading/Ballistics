@@ -1,0 +1,32 @@
+{
+  "id": "vdrbw-r-k-1",
+  "federation": "vdrbw",
+  "name": "KK-Revolver",
+  "number": "R-K 1",
+  "section": "8.9",
+  "page": "Seite 48, PDF p. 48",
+  "distance": {
+    "value": 25000,
+    "raw": "25 m"
+  },
+  "category": "revolver",
+  "caliberClasses": {
+    "ids": ["rimfire-22"],
+    "basis": "stated"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "Kapitel 8, Inhaltsübersicht, Seite 31, PDF p. 31",
+        "fields": ["name", "number"]
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "8.9, Seite 48, PDF p. 48",
+        "fields": ["federation", "section", "page", "distance", "caliberClasses", "category"]
+      }
+    ]
+  }
+}

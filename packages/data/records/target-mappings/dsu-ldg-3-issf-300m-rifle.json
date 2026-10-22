@@ -1,0 +1,17 @@
+{
+  "id": "dsu-ldg-3-issf-300m-rifle",
+  "discipline": "dsu-ldg-3",
+  "face": "issf-300m-rifle",
+  "event": "DSU LDG 3 Dienstsportgewehr aufgerüstet 300 m",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 13, PDF p. 71",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

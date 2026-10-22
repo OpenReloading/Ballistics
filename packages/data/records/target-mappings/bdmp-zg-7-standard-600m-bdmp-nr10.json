@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-zg-7-standard-600m-bdmp-nr10",
+  "discipline": "bdmp-zg-7-standard-600m",
+  "face": "bdmp-nr10",
+  "event": "BDMP ZG 7 Standard TRIA 600 m",
+  "shotCount": 10,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.19, Teil B, Seite 64 von 70, PDF p. 64",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.33.11, Teil D, Seite 271 von 294, PDF p. 271",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.33.9, Teil D, Seite 271 von 294, PDF p. 271",
+        "fields": ["shotCount"],
+        "note": "Ten counted shots per distance."
+      }
+    ]
+  }
+}

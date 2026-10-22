@@ -1,0 +1,22 @@
+{
+  "id": "dsb-perkussionsgewehr-50m-auflage-issf-25m-precision-50m-pistol",
+  "discipline": "dsb-perkussionsgewehr-50m-auflage",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "DSB Perkussionsgewehr 50 m - Auflage",
+  "shotCount": 15,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.20 Scheibe Nr. 4, Teil 0 Seite 65, PDF p. 83; row 7.11 of 0.21, Teil 0 Seite 88, PDF p. 106",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.21, Teil 0 Seite 88, PDF p. 106 (row 7.11, column Wettkampfschüsse)",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

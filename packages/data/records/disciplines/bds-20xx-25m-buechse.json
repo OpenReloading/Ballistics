@@ -1,0 +1,42 @@
+{
+  "id": "bds-20xx-25m-buechse",
+  "federation": "bds",
+  "name": "25 m Präzisionsschießen Büchse",
+  "number": "20xx",
+  "section": "Anhang 1",
+  "page": "Seite Z-22, PDF p. 23",
+  "distance": {
+    "value": 25000,
+    "raw": "25 m"
+  },
+  "caliberClasses": {
+    "ids": [
+      "rifle-30-carbine",
+      "revolver-32",
+      "revolver-357-38",
+      "pistol-40-10mm",
+      "revolver-44",
+      "pistol-45",
+      "revolver-45-colt",
+      "pistol-7-65",
+      "pistol-9mm",
+      "rimfire-22"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "page": "Anhang 1, Seite Z-22, PDF p. 23",
+        "fields": ["name", "number", "federation", "section", "page", "distance"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 7.01, Seite L-37, PDF p. 37",
+        "fields": ["caliberClasses"]
+      }
+    ]
+  }
+}

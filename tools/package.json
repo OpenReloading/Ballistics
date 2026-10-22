@@ -1,0 +1,24 @@
+{
+  "name": "@openreloading/tools",
+  "version": "0.0.1",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "api-check": "f=\"${TMPDIR:-/tmp}/openapi.json\" && node src/openapi.ts \"$f\" && oasdiff breaking ../packages/api/openapi.baseline.json \"$f\" --fail-on ERR",
+    "api-baseline": "node src/openapi.ts ../packages/api/openapi.baseline.json && biome format --write ../packages/api/openapi.baseline.json",
+    "api-conformance": "f=\"${TMPDIR:-/tmp}/openapi.json\" && node src/openapi.ts \"$f\" && schemathesis run \"$f\" --url \"${API_URL:-http://localhost:3000}\" --checks not_a_server_error,status_code_conformance,content_type_conformance,response_schema_conformance",
+    "pages": "node src/pages.ts",
+    "pages:serve": "node src/pages-serve.ts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@openreloading/api": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.0",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.3"
+  }
+}

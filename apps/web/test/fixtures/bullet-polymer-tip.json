@@ -1,0 +1,16 @@
+{
+  "id": "fixture-polymer-tip",
+  "manufacturer": "fixture",
+  "productNumber": "polymer-tip",
+  "name": "Test fixture, polymer tip",
+  "diameter": { "value": 6.71 },
+  "mass": { "value": 9.07 },
+  "length": { "value": 34.5 },
+  "base": { "type": "boat-tail", "length": { "value": 4.2 }, "diameter": { "value": 5.5 } },
+  "ogive": { "form": "secant", "radiusRatio": { "value": 0.6 } },
+  "tip": { "type": "polymer-tip", "length": { "value": 4.5 } },
+  "noseLength": { "value": 20 },
+  "bearingLength": { "value": 10.3 },
+  "note": "Synthetic test fixture, not a product: no committed record has a polymer tip.",
+  "provenance": { "kind": "derived", "sources": [{ "title": "Test fixture" }] }
+}

@@ -1,0 +1,4 @@
+build
+.docusaurus
+static/library
+static/rest

@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-sdg-1-issf-300m-rifle",
+  "discipline": "bdmp-sdg-1",
+  "face": "issf-300m-rifle",
+  "event": "BDMP SDG 1 Steinschloss-Dienstgewehr 1",
+  "shotCount": 10,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.3, Teil B, Seite 18 von 70, PDF p. 18",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.3.11, Teil E, Seite 12 von 42, PDF p. 12",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.3.9, Teil E, Seite 12 von 42, PDF p. 12",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "13 shots are fired and the best 10 count."
+  }
+}

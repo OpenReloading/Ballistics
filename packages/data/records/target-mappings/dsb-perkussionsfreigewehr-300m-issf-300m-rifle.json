@@ -1,0 +1,22 @@
+{
+  "id": "dsb-perkussionsfreigewehr-300m-issf-300m-rifle",
+  "discipline": "dsb-perkussionsfreigewehr-300m",
+  "face": "issf-300m-rifle",
+  "event": "DSB Perkussionsfreigewehr 300 m",
+  "shotCount": 15,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.20 Scheibe Nr. 5, Teil 0 Seite 65, PDF p. 83; row 7.16 of 0.21, Teil 0 Seite 88, PDF p. 106",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.21, Teil 0 Seite 88, PDF p. 106 (row 7.16, column Wettkampfschüsse)",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "id": "dsu-french-military-200m",
+  "name": "DSU-Scheibe 200 Meter Präzision (Französische Militärscheibe)",
+  "organization": "DSU",
+  "rings": [
+    {
+      "value": 1,
+      "diameter": {
+        "value": 800
+      }
+    },
+    {
+      "value": 2,
+      "diameter": {
+        "value": 720
+      }
+    },
+    {
+      "value": 3,
+      "diameter": {
+        "value": 640
+      }
+    },
+    {
+      "value": 4,
+      "diameter": {
+        "value": 560
+      }
+    },
+    {
+      "value": 5,
+      "diameter": {
+        "value": 480
+      }
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 400
+      }
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 320
+      }
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 240
+      }
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 160
+      }
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 80
+      }
+    }
+  ],
+  "blackDiameter": {
+    "value": 400
+  },
+  "events": [
+    {
+      "name": "SVSM Vorderlader-Steinschlossmuskete 50 m",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "section": "Kapitel 1, Scheibe (Seite 19, PDF p. 21); Kapitel 4 Vorderlader (PDF p. 124)",
+      "scoring": "centre"
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "fields": ["name", "rings", "blackDiameter"],
+        "page": "Kapitel 1, DSU-Scheibe 200 Meter Präzision (Seite 19, PDF p. 21)"
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "fields": ["events.name", "events.distance", "events.section", "events.scoring"],
+        "page": "Kapitel 4, Vorderlader-Disziplinen (PDF p. 124); Besondere Auswertungsregeln (PDF p. 126); Kapitel 1, Auswertung der Scheiben (Seite 27, PDF p. 29); Kapitel 9, Vorderlader table (PDF p. 233)"
+      }
+    ]
+  }
+}

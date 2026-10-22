@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or idea
+    url: https://github.com/OpenReloading/Ballistics/discussions
+    about: Ask and discuss in GitHub Discussions.
+  - name: Discord
+    url: https://discord.gg/KkYJ5fdukR
+    about: Chat with the OpenReloading community.
+  - name: Security vulnerability
+    url: https://github.com/OpenReloading/Ballistics/security/advisories/new
+    about: Report it privately, not as an issue (SECURITY.md).

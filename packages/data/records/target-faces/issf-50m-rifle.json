@@ -1,0 +1,282 @@
+{
+  "id": "issf-50m-rifle",
+  "name": "50m Rifle Target",
+  "organization": "ISSF",
+  "rings": [
+    {
+      "value": 1,
+      "diameter": {
+        "value": 154.4
+      }
+    },
+    {
+      "value": 2,
+      "diameter": {
+        "value": 138.4
+      }
+    },
+    {
+      "value": 3,
+      "diameter": {
+        "value": 122.4
+      }
+    },
+    {
+      "value": 4,
+      "diameter": {
+        "value": 106.4
+      }
+    },
+    {
+      "value": 5,
+      "diameter": {
+        "value": 90.4
+      }
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 74.4
+      }
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 58.4
+      }
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 42.4
+      }
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 26.4
+      }
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 10.4
+      }
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 5
+    },
+    "rule": "touch"
+  },
+  "blackDiameter": {
+    "value": 112.4,
+    "raw": "Black from part of 3 to 10 rings = 112.4mm"
+  },
+  "decimal": true,
+  "events": [
+    {
+      "name": "50m Rifle 3 Positions",
+      "distance": {
+        "value": 50000,
+        "raw": "50m"
+      },
+      "gauge": {
+        "value": 5.6,
+        "raw": "5.60mm"
+      },
+      "scoring": "touch"
+    },
+    {
+      "name": "50m Rifle Prone",
+      "distance": {
+        "value": 50000,
+        "raw": "50m"
+      },
+      "gauge": {
+        "value": 5.6,
+        "raw": "5.60mm"
+      },
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB Gewehr 50 m (.22)",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "gauge": {
+        "value": 5.6,
+        "raw": "5,60 mm Kleinkaliber .22"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 3; 0.11.3.2",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 2106 50 m Präz. DSG gK und Diopter KK",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "organization": "BDS",
+      "section": "Anhang 1, Z3",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 2107 50 m Präz. MSG KK",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "organization": "BDS",
+      "section": "Anhang 1, Z3",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSU LEM 1 Einzellader Matchgewehr 50 m",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "organization": "DSU",
+      "section": "Kapitel 1, DSU-Scheibe KK International (Seite 18); Kapitel 3 (PDF p. 60)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw G-EK 1 Einzellader-KK-Sportgewehr",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "organization": "VdRBw",
+      "section": "9.11.4, 9.11.5 (PDF p. 78)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw G-RK 1 Repetier-KK-Sportgewehr",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "organization": "VdRBw",
+      "section": "9.12.4, 9.12.5 (PDF p. 80)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw G-HK 1 Halbautomatisches KK-Sportgewehr",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "organization": "VdRBw",
+      "section": "9.13.4, 9.13.5 (PDF p. 82)",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB Gewehr 50 m GK",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "gauge": {
+        "value": 8,
+        "raw": "8,00 mm Gewehr Kaliber > .22 lfb"
+      },
+      "scoring": "touch",
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 3; 0.11.3.2"
+    }
+  ],
+  "numerals": true,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "issf-rules-2025-third-print",
+        "fields": ["name", "rings", "innerTen.diameter", "blackDiameter", "numerals"],
+        "page": "Rule 6.3.4.2, p. 196 (PDF p. 196)"
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 3.3.1, p. 39 (PDF p. 39)",
+        "fields": ["events.name", "events.distance"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rules 6.3.3.1 to 6.3.3.3, pp. 194 to 195 (PDF pp. 194 to 195)",
+        "fields": ["decimal"],
+        "note": "Tenth-ring values where electronic targets or scoring machines are used, else whole rings."
+      },
+      {
+        "source": "issf-paper-target-scoring-2022",
+        "fields": ["events.gauge", "events.scoring", "innerTen.rule"],
+        "page": "Rule 1.4.3, p. 321 (PDF p. 2); rule 5.2.1, p. 330 (PDF p. 11)"
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "fields": [
+          "events.name",
+          "events.distance",
+          "events.organization",
+          "events.section",
+          "events.gauge"
+        ],
+        "page": "0.20 Scheibe Nr. 3, Teil 0 Seite 64 (PDF p. 82); 0.11.3.2, Teil 0 Seite 40 (PDF p. 58)"
+      },
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "Anhang 1 (printed Z-22 to Z-24, PDF pp. 23 to 25), Zielscheibe Z3"
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "Kapitel 1, DSU-Scheibe KK International (Seite 18, PDF p. 20); Kapitel 3 Langwaffenübungen (PDF p. 60)"
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "10.4 (Seite 99); 9.11.4 to 9.13.5 (PDF pp. 78 to 82)",
+        "note": "VdRBw 10.4 (Seite 99) names the face equal to the ISSF face and prints the black area as rings 4 to 10 (106.4 mm)."
+      },
+      {
+        "source": "bds-sporthandbuch-allgemein-2026",
+        "fields": ["events.scoring"],
+        "page": "A 9.02, Seite A-22, PDF p. 22"
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "Nr. 519 (Seite 24, PDF p. 24)",
+        "fields": ["events.scoring"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.20 Scheibe Nr. 3, Teil 0 Seite 64 (PDF p. 82); 0.11.3.2, Teil 0 Seite 40 (PDF p. 58)",
+        "fields": [
+          "events.name",
+          "events.distance",
+          "events.organization",
+          "events.section",
+          "events.gauge"
+        ]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.11.3, Teil 0 Seite 39, PDF p. 57",
+        "fields": ["events.scoring"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.11.3, Teil 0 Seite 39, PDF p. 57",
+        "fields": ["events.scoring"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 1, Auswertung der Scheiben, Seite 27, PDF p. 29",
+        "fields": ["events.scoring"]
+      }
+    ]
+  }
+}

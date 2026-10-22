@@ -1,0 +1,23 @@
+{
+  "id": "dsb-gewehr-100m-gk",
+  "federation": "dsb",
+  "name": "Gewehr 100 m GK",
+  "number": "1.38/1.52/1.55/1.72/1.92/1.97",
+  "section": "0.21",
+  "page": "Teil 0 Seite 76 to 80, PDF pp. 94 to 98",
+  "distance": {
+    "value": 100000,
+    "raw": "100 m"
+  },
+  "category": "rifle",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.21, Teil 0 Seite 76 to 80, PDF pp. 94 to 98 (rows 1.38, 1.52, 1.55, 1.72, 1.92, 1.97)",
+        "fields": ["name", "number", "federation", "section", "page", "distance", "category"]
+      }
+    ]
+  }
+}

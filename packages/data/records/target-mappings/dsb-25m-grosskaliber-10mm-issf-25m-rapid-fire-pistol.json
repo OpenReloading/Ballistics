@@ -1,0 +1,26 @@
+{
+  "id": "dsb-25m-grosskaliber-10mm-issf-25m-rapid-fire-pistol",
+  "discipline": "dsb-25m-grosskaliber-10mm",
+  "face": "issf-25m-rapid-fire-pistol",
+  "event": "DSB 25 m Großkaliberpistole 10 mm 20 Sek. Serie",
+  "stage": "20 Sek. Serie",
+  "gauge": {
+    "value": 11.58,
+    "raw": "11,58 mm"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.20 Scheibe Nr. 10, Teil 0 Seite 68, PDF p. 86; row 2.56 of 0.21, Teil 0 Seite 82, PDF p. 100",
+        "fields": ["discipline", "face", "event", "stage"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.11.3.2, Teil 0 Seite 40, PDF p. 58",
+        "fields": ["gauge"]
+      }
+    ]
+  }
+}

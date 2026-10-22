@@ -1,0 +1,32 @@
+{
+  "id": "dsb-50m-pistole-auflage",
+  "federation": "dsb",
+  "name": "50 m Pistole Auflage",
+  "number": "2.21",
+  "section": "0.21",
+  "page": "Teil 0 Seite 81, PDF p. 99",
+  "distance": {
+    "value": 50000,
+    "raw": "50 m"
+  },
+  "category": "pistol",
+  "caliberClasses": {
+    "ids": ["rimfire-22"],
+    "basis": "stated"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.21, Teil 0 Seite 81, PDF p. 99",
+        "fields": ["name", "number", "federation", "section", "page", "distance", "category"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.21, row 2.21, Teil 0 Seite 80, PDF p. 98",
+        "fields": ["caliberClasses"]
+      }
+    ]
+  }
+}

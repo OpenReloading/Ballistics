@@ -1,0 +1,60 @@
+{
+  "id": "bdmp",
+  "name": "BDMP e.V.",
+  "abbreviation": "BDMP",
+  "country": "DE",
+  "ruleBooks": [
+    "bdmp-sportordnung-2026-register-6",
+    "bdmp-sportordnung-2026-register-7",
+    "bdmp-sportordnung-2026-register-8",
+    "bdmp-sportordnung-2026-register-9",
+    "bdmp-sportordnung-2026-register-10",
+    "bdmp-sportordnung-2026-teile-b-c-d"
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-6",
+        "page": "A.5.7.6.2, Teil A, Seite 31 von 32, PDF p. 31",
+        "fields": ["name"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-teile-b-c-d",
+        "page": "Titelseite, Teil A, Seite 1 von 32, PDF p. 1",
+        "fields": ["ruleBooks"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-6",
+        "page": "Titelseite, Teil A, Seite 1 von 32, PDF p. 1",
+        "fields": ["ruleBooks"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-6",
+        "page": "A.0, A.3.3, A.5.6, Teil A, Seiten 3, 9 und 30 von 32, PDF pp. 3, 9, 30",
+        "fields": ["abbreviation", "country"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "Titelseite und Fußzeile, Register 7, PDF p. 1",
+        "fields": ["ruleBooks"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "Titelseite und Fußzeile, Register 8, PDF p. 1",
+        "fields": ["ruleBooks"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "Titelseite und Fußzeile, Register 9, PDF p. 1",
+        "fields": ["ruleBooks"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "Titelseite und Fußzeile, Register 10, PDF p. 1",
+        "fields": ["ruleBooks"]
+      }
+    ],
+    "note": "The document names no international federation as a parent or membership."
+  }
+}

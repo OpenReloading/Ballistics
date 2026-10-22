@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-sppdg-1",
+  "federation": "bdmp",
+  "name": "Schwarzpulverpatronen DG 1",
+  "number": "SPPDG 1",
+  "section": "E.7",
+  "page": "Teil E, Seite 23 bis 24 von 42, PDF pp. 23 to 24",
+  "distance": {
+    "value": 100000,
+    "raw": "100 m"
+  },
+  "category": "service-rifle",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.7, E.7.1, Teil E, Seite 23 von 42, PDF p. 23",
+        "fields": ["name", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.7.11, Teil E, Seite 24 von 42, PDF p. 24",
+        "fields": ["number", "distance"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+node_modules
+dist
+.env
+test-results
+playwright-report
+.pnpm-store/
+.playwright-mcp/
+visual-check-out
+.schemathesis/
+/pages/

@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-zg-7-magnum-300m-bdmp-nr9",
+  "discipline": "bdmp-zg-7-magnum-300m",
+  "face": "bdmp-nr9",
+  "event": "BDMP ZG 7 Magnum TRIA 300 m",
+  "shotCount": 10,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.18, Teil B, Seite 62 von 70, PDF p. 62",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.34.11, Teil D, Seite 274 von 294, PDF p. 274",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.34.9, Teil D, Seite 273 von 294, PDF p. 273",
+        "fields": ["shotCount"],
+        "note": "Ten counted shots per distance."
+      }
+    ]
+  }
+}

@@ -1,0 +1,235 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`adds the detail letters on screen without changing the frame or any other mark 1`] = `
+{
+  "cartridge A 10": 168,
+  "cartridge A 2": 9,
+  "cartridge A 20": 26,
+  "cartridge A 5": 318,
+  "chamber A 10": 335,
+  "chamber A 2": 40,
+  "chamber A 20": 56,
+  "chamber A 5": 116,
+  "chamber B 10": 48,
+  "chamber B 2": 91,
+  "chamber B 20": 206,
+  "chamber B 5": 99,
+  "chamber B 50": 98,
+}
+`;
+
+exports[`counts the chamber recess steps and lists the other outline features under 1 px at 390 px 1`] = `
+{
+  "recess": 211,
+  "small": [
+    [
+      "cip-10-3-x-60-r-2025-05-13",
+      "chamber",
+      0.92,
+    ],
+    [
+      "cip-30-super-carry-2025-05-13",
+      "chamber",
+      0.48,
+    ],
+    [
+      "cip-310-cadet-rifle-2002-05-15",
+      "chamber",
+      0.32,
+    ],
+    [
+      "cip-366-tkm-2020-11-10",
+      "chamber",
+      0.08,
+    ],
+    [
+      "cip-380-long-rifle-2002-05-15",
+      "chamber",
+      0.76,
+    ],
+    [
+      "cip-45-120-sharps-3-1-4-2018-10-17",
+      "chamber",
+      0.11,
+    ],
+    [
+      "cip-50-70-govt-2017-05-17",
+      "chamber",
+      0.77,
+    ],
+    [
+      "cip-50-90-sharps-2-1-2-2017-05-17",
+      "chamber",
+      0.57,
+    ],
+    [
+      "cip-505-mag-gibbs-2002-05-15",
+      "chamber",
+      0.14,
+    ],
+    [
+      "cip-6-mm-centrale-falco-2014-05-20",
+      "chamber",
+      0.2,
+    ],
+    [
+      "cip-6-mm-d-b-g-2016-05-18",
+      "chamber",
+      0.14,
+    ],
+    [
+      "cip-6-mm-flobert-blanc-2008-04-15",
+      "chamber",
+      0.96,
+    ],
+    [
+      "cip-9-3-x-72-r-2002-05-15",
+      "chamber",
+      0.72,
+    ],
+    [
+      "cip-9-x-39-2018-05-16",
+      "chamber",
+      0.52,
+    ],
+  ],
+}
+`;
+
+exports[`counts the drawn sides per table and bounds text size, scale and frame 1`] = `
+{
+  "em": [
+    [
+      "cip-10-2006-09-19 10/76",
+      1.8,
+    ],
+    [
+      "cip-4-bore-rifle-2002-05-15",
+      2.331,
+    ],
+  ],
+  "height": [
+    [
+      "cip-6-mm-flobert-blanc-2008-04-15",
+      30.8,
+    ],
+    [
+      "cip-12-7-x-108-2017-05-17",
+      176.2,
+    ],
+  ],
+  "print": [
+    [
+      "cip-4-mm-randz-court-blanc-1992-06-10",
+      30.7,
+    ],
+    [
+      "cip-12-7-x-108-2017-05-17",
+      172.1,
+    ],
+  ],
+  "px": [
+    [
+      "cip-4-bore-rifle-2002-05-15",
+      4.72,
+    ],
+    [
+      "cip-9mm-flobert-plombs-metal-2000-06-07",
+      8,
+    ],
+  ],
+}
+`;
+
+exports[`dimensions every stored symbol or lists it as undimensioned 1`] = `
+{
+  "VII chamber": "Fe",
+  "cartridge": "F, Fe, G2, L1+G, L3+G, L4, L5, delta L",
+  "chamber": "N, Q, R2, Z, b, r, u, w",
+}
+`;
+
+exports[`dimensions every stored symbol or lists it as undimensioned 2`] = `
+{
+  "VII chamber: B": 1,
+  "VII chamber: alpha1": 1,
+  "cartridge: E1": 2,
+  "cartridge: H1": 10,
+  "cartridge: L1": 1,
+  "cartridge: L2": 15,
+  "cartridge: beta": 18,
+  "cartridge: delta": 11,
+  "cartridge: e": 1,
+  "cartridge: f": 3,
+  "cartridge: r2": 1,
+  "chamber: F": 13,
+  "chamber: G": 1,
+  "chamber: H1": 12,
+  "chamber: L1": 2,
+  "chamber: L2": 11,
+  "chamber: P2": 2,
+  "chamber: R": 103,
+  "chamber: alpha1": 121,
+  "chamber: i": 1,
+}
+`;
+
+exports[`lays out every layer of every figure in both media clear of overlaps, inside the frame 1`] = `
+{
+  "acrossAxis": [
+    "cip-17-hornet-2014-05-20 cartridge print r2",
+    "cip-17-mach-2-2012-09-25 chamber print r2",
+    "cip-17-rem-fireball-2011-05-25 cartridge print r2",
+    "cip-204-ruger-2006-05-16 cartridge print r2",
+    "cip-26-nosler-2021-11-09 cartridge print r2",
+    "cip-260-rem-2002-05-15 cartridge print r2",
+    "cip-28-nosler-2023-05-09 cartridge print r2",
+    "cip-300-savage-2002-05-15 cartridge print r2",
+    "cip-357-sig-2008-09-23 chamber print r2",
+    "cip-5-56-mm-fx-2017-05-17 cartridge print r2",
+    "cip-5-6-x-57-2002-05-15 cartridge print r2",
+    "cip-6-5-284-norma-2008-04-15 cartridge print r2",
+    "cip-6-5-x-68-2002-05-15 cartridge print r2",
+    "cip-6-mm-creedmoor-2021-11-09 cartridge print r2",
+    "cip-7-5-fk-2020-11-10 cartridge screen r2",
+    "cip-7-62-x-25-tokarev-2006-09-19 cartridge print r2",
+    "cip-7-62-x-39-2013-05-22 cartridge print r2",
+  ],
+  "arrowheads": [
+    "cip-11-mm-73-2013-05-22 cartridge print L6 on beta",
+    "cip-22-long-rifle-shot-claybirding-2000-06-07 chamber screen G1 on alpha1",
+    "cip-22-long-rifle-shot-claybirding-2000-06-07 chamber print G1 on alpha1",
+    "cip-22-long-shot-2000-06-07 chamber screen G1 on alpha1",
+    "cip-22-long-shot-2000-06-07 chamber print G1 on alpha1",
+    "cip-240-weath-mag-2002-05-15 cartridge screen P2 on alpha",
+    "cip-240-weath-mag-2002-05-15 chamber screen P2 on alpha",
+    "cip-240-weath-mag-2002-05-15 chamber print P2 on alpha",
+    "cip-257-weath-mag-2018-10-17 cartridge screen r1 on alpha",
+    "cip-257-weath-mag-2018-10-17 cartridge print r1 on alpha",
+    "cip-30-40-krag-2011-05-25 chamber screen F on i",
+    "cip-320-short-2000-06-07 chamber screen G1 on alpha1",
+    "cip-320-short-2000-06-07 cartridge print L6 on beta",
+    "cip-320-short-2000-06-07 chamber print G1 on alpha1",
+    "cip-338-378-weath-mag-2009-05-05 chamber print r1 on alpha",
+    "cip-450-short-2000-06-07 cartridge print L6 on beta",
+    "cip-56-50-spencer-2006-09-19 cartridge screen H1 on H2",
+    "cip-56-50-spencer-2006-09-19 cartridge print H1 on H2",
+  ],
+  "longLeaders": [
+    "cip-17-libra-2002-05-15 cartridge screen r2 3.40",
+    "cip-17-mach-2-2012-09-25 chamber print r2 3.40",
+    "cip-219-zipper-2002-05-15 cartridge print r2 3.40",
+    "cip-221-rem-fireball-2006-09-19 cartridge screen r2 3.40",
+    "cip-243-win-super-short-mag-2008-09-23 chamber print r2 3.40",
+    "cip-25-20-win-2002-05-15 cartridge print r2 3.40",
+    "cip-300-h-h-mag-2011-05-25 chamber print r2 4.63",
+    "cip-357-sig-2008-09-23 chamber screen r1 3.40",
+    "cip-357-sig-2008-09-23 chamber print r2 3.40",
+    "cip-38-45-acp-2000-06-07 chamber screen r1 3.40",
+    "cip-5-6-x-57-2002-05-15 cartridge print r2 3.40",
+    "cip-50-95-win-2009-05-05 cartridge print r2 3.40",
+    "cip-7-63-mauser-2006-09-19 chamber screen r1 3.40",
+    "cip-9-45-vac-2021-04-07 chamber screen r1 3.40",
+  ],
+}
+`;

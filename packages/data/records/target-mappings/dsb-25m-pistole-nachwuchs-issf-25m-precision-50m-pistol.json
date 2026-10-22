@@ -1,0 +1,32 @@
+{
+  "id": "dsb-25m-pistole-nachwuchs-issf-25m-precision-50m-pistol",
+  "discipline": "dsb-25m-pistole-nachwuchs",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "DSB 25 m Pistole Nachwuchs Präzision",
+  "stage": "Präzision",
+  "gauge": {
+    "value": 5.6,
+    "raw": "5,60 mm"
+  },
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.20 Scheibe Nr. 4, Teil 0 Seite 65, PDF p. 83; row 2.41 of 0.21, Teil 0 Seite 81, PDF p. 99",
+        "fields": ["discipline", "face", "event", "stage"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "2.19.2, Teil 2 Seite 19, PDF p. 153 (one round of 20 shots each, precision and duel)",
+        "fields": ["shotCount"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.11.3.2, Teil 0 Seite 40, PDF p. 58",
+        "fields": ["gauge"]
+      }
+    ]
+  }
+}

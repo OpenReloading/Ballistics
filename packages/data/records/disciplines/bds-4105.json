@@ -1,0 +1,29 @@
+{
+  "id": "bds-4105",
+  "federation": "bds",
+  "name": "300 m Präz. Hochleistungsgewehr",
+  "number": "4105",
+  "section": "Anhang 1",
+  "page": "Seite Z-23, PDF p. 24",
+  "distance": {
+    "value": 300000,
+    "raw": "300 m"
+  },
+  "category": "precision-rifle",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "page": "Anhang 1, Seite Z-23, PDF p. 24",
+        "fields": ["name", "number", "federation", "section", "page", "distance"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 6.01, Seite L-32, PDF p. 32",
+        "fields": ["number", "distance", "category"],
+        "note": "The table admits magnum cartridges as defined in L 14.01.3, not a calibre range."
+      }
+    ]
+  }
+}

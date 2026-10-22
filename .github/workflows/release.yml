@@ -1,0 +1,118 @@
+name: Release
+
+# release-please keeps one release pull request open from the Conventional Commits on main; merging it
+# tags each changed component <component>-vX.Y.Z, writes its CHANGELOG.md and GitHub Release, and the
+# images job publishes the api and web images of the components released.
+# Steps and versioning: apps/docs/docs/release.md.
+on:
+  push:
+    branches: [main]
+
+permissions: {}
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release-please:
+    if: github.repository == 'OpenReloading/Ballistics'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    outputs:
+      images: ${{ steps.images.outputs.matrix }}
+    steps:
+      - id: release
+        uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+      # per-path outputs exist only for the components released in this run
+      - id: images
+        env:
+          API_VERSION: ${{ steps.release.outputs['packages/api--version'] }}
+          API_TAG: ${{ steps.release.outputs['packages/api--tag_name'] }}
+          WEB_VERSION: ${{ steps.release.outputs['apps/web--version'] }}
+          WEB_TAG: ${{ steps.release.outputs['apps/web--tag_name'] }}
+        run: |
+          matrix=$(jq -nc \
+            --arg av "$API_VERSION" --arg at "$API_TAG" --arg wv "$WEB_VERSION" --arg wt "$WEB_TAG" \
+            '[{name: "api", dockerfile: "packages/api/Dockerfile", version: $av, tag: $at,
+               licenses: "MIT AND CC-BY-4.0 AND Apache-2.0"},
+              {name: "web", dockerfile: "apps/web/Dockerfile", version: $wv, tag: $wt,
+               licenses: "MIT AND CC-BY-4.0 AND Apache-2.0 AND BSD-3-Clause AND OFL-1.1"}]
+             | map(select(.version != ""))')
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+
+  # A release made with GITHUB_TOKEN starts no other workflow, so the images are built here.
+  images:
+    needs: release-please
+    if: needs.release-please.outputs.images != '[]' && needs.release-please.outputs.images != ''
+    runs-on: ubuntu-latest
+    permissions:
+      attestations: write
+      contents: read
+      id-token: write
+      packages: write
+      security-events: write
+    strategy:
+      matrix:
+        include: ${{ fromJSON(needs.release-please.outputs.images) }}
+    env:
+      IMAGE: ghcr.io/openreloading/ballistics-${{ matrix.name }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ matrix.tag }}
+          persist-credentials: false
+      - id: meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=semver,pattern={{version}},value=${{ matrix.version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ matrix.version }}
+            type=sha
+          labels: |
+            org.opencontainers.image.title=OpenReloading Ballistics ${{ matrix.name }}
+            org.opencontainers.image.licenses=${{ matrix.licenses }}
+      # built into the local image store first, so a failed scan publishes nothing
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          load: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+      - id: scan
+        uses: anchore/scan-action@27805bf3b4e84b4a5c980df22ed233c00390a439 # v7.4.2
+        with:
+          image: ${{ env.IMAGE }}:${{ steps.meta.outputs.version }}
+          severity-cutoff: critical
+          only-fixed: true
+          output-format: sarif
+      - if: ${{ !cancelled() && steps.scan.outputs.sarif != '' }}
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif }}
+          category: image-${{ matrix.name }}
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: push
+        run: |
+          docker push --all-tags "$IMAGE"
+          digest=$(docker image inspect --format '{{index .RepoDigests 0}}' "$IMAGE:$VERSION")
+          echo "digest=${digest#*@}" >> "$GITHUB_OUTPUT"
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+      - uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-name: ${{ env.IMAGE }}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true

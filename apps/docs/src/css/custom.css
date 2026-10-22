@@ -1,0 +1,92 @@
+/* the math of the model pages, its fonts bundled from the package */
+@import "katex/dist/katex.min.css";
+
+/* the two entry cards of the overview */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0 2rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-global-radius);
+  color: inherit;
+}
+
+.card:hover {
+  border-color: var(--ifm-color-primary);
+  color: inherit;
+  text-decoration: none;
+}
+
+.card strong {
+  font-size: 1.1rem;
+}
+
+.card span {
+  color: var(--ifm-color-emphasis-700);
+}
+
+/* sidebar categories in bold */
+.menu__link--sublist-caret > .menu__link,
+.theme-doc-sidebar-item-category-level-1 > .menu__list-item-collapsible > .menu__link {
+  font-weight: 600;
+}
+
+/* room for the package names in the sidebar */
+:root {
+  --doc-sidebar-width: 21rem;
+}
+
+/* the colours of the web app (apps/web/src/app/globals.css): link blue, text, page and surface */
+:root {
+  --ifm-color-primary: #0b57d0;
+  --ifm-color-primary-dark: #0a4ebb;
+  --ifm-color-primary-darker: #094ab1;
+  --ifm-color-primary-darkest: #083d92;
+  --ifm-color-primary-light: #0c63ec;
+  --ifm-color-primary-lighter: #146af3;
+  --ifm-color-primary-lightest: #3e84f5;
+  --ifm-font-color-base: #1a1a1a;
+}
+
+[data-theme="dark"] {
+  --ifm-color-primary: #8ab4f8;
+  --ifm-color-primary-dark: #669df6;
+  --ifm-color-primary-darker: #5391f5;
+  --ifm-color-primary-darkest: #1d6ef1;
+  --ifm-color-primary-light: #96bbf9;
+  --ifm-color-primary-lighter: #9cbff9;
+  --ifm-color-primary-lightest: #adcafa;
+  --ifm-font-color-base: #ececec;
+  --ifm-background-color: #161616;
+  --ifm-background-surface-color: #20242b;
+}
+
+/* a wide formula scrolls on its own at phone width, not the page */
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* the search modal (src/theme/SearchBar.tsx) in the site's colours, light and dark */
+html[data-theme] {
+  --pf-background: var(--ifm-background-surface-color);
+  --pf-text: var(--ifm-font-color-base);
+  --pf-text-secondary: var(--ifm-color-emphasis-700);
+  --pf-text-muted: var(--ifm-color-emphasis-700);
+  --pf-border: var(--ifm-color-emphasis-300);
+  --pf-border-focus: var(--ifm-color-primary);
+  --pf-outline-focus: var(--ifm-color-primary);
+  --pf-hover: var(--ifm-color-emphasis-100);
+  --pf-mark: var(--ifm-font-color-base);
+  --pf-skeleton: var(--ifm-color-emphasis-200);
+  --pf-skeleton-shine: var(--ifm-color-emphasis-100);
+  --pf-font: var(--ifm-font-family-base);
+}

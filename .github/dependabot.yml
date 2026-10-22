@@ -1,0 +1,42 @@
+# Weekly version updates, minor and patch grouped per ecosystem; security updates come at once
+# (repository settings). Seven days of cooldown let a broken or malicious release be pulled first.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      npm:
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ['*']
+  - package-ecosystem: docker
+    directories: [/packages/api, /apps/web]
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    ignore:
+      # Node major follows .nvmrc and engines, changed by hand
+      - dependency-name: node
+        update-types: [version-update:semver-major]
+  - package-ecosystem: docker-compose
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    ignore:
+      # a PostgreSQL major needs a dump and restore of the volume
+      - dependency-name: postgres
+        update-types: [version-update:semver-major]

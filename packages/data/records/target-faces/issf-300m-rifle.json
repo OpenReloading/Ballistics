@@ -1,0 +1,394 @@
+{
+  "id": "issf-300m-rifle",
+  "name": "300m Rifle Target",
+  "organization": "ISSF",
+  "rings": [
+    {
+      "value": 1,
+      "diameter": {
+        "value": 1000
+      }
+    },
+    {
+      "value": 2,
+      "diameter": {
+        "value": 900
+      }
+    },
+    {
+      "value": 3,
+      "diameter": {
+        "value": 800
+      }
+    },
+    {
+      "value": 4,
+      "diameter": {
+        "value": 700
+      }
+    },
+    {
+      "value": 5,
+      "diameter": {
+        "value": 600
+      }
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 500
+      }
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 400
+      }
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 300
+      }
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 200
+      }
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 100
+      }
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 50
+    },
+    "rule": "touch"
+  },
+  "blackDiameter": {
+    "value": 600,
+    "raw": "Black from 5 to 10 rings = 600mm"
+  },
+  "decimal": true,
+  "events": [
+    {
+      "name": "300m Rifle 3 Positions",
+      "distance": {
+        "value": 300000,
+        "raw": "300m"
+      },
+      "gauge": {
+        "value": 8,
+        "raw": "8.00mm"
+      },
+      "scoring": "touch"
+    },
+    {
+      "name": "300m Rifle Prone",
+      "distance": {
+        "value": 300000,
+        "raw": "300m"
+      },
+      "gauge": {
+        "value": 8,
+        "raw": "8.00mm"
+      },
+      "scoring": "touch"
+    },
+    {
+      "name": "300m Standard Rifle",
+      "distance": {
+        "value": 300000,
+        "raw": "300m"
+      },
+      "gauge": {
+        "value": 8,
+        "raw": "8.00mm"
+      },
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB Gewehr 300 m",
+      "distance": {
+        "value": 300000,
+        "raw": "300 m"
+      },
+      "gauge": {
+        "value": 8,
+        "raw": "8,00 mm Gewehr Kaliber > .22 lfb"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 5; 0.11.3.2",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 4101 300 m Präz. MSG",
+      "distance": {
+        "value": 300000,
+        "raw": "300 m"
+      },
+      "organization": "BDS",
+      "section": "Anhang 1, Z7",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 4102 300 m Präz. DSG oK",
+      "distance": {
+        "value": 300000,
+        "raw": "300 m"
+      },
+      "organization": "BDS",
+      "section": "Anhang 1, Z7",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 4103 300 m Präz. DSG gK und Diopter",
+      "distance": {
+        "value": 300000,
+        "raw": "300 m"
+      },
+      "organization": "BDS",
+      "section": "Anhang 1, Z7",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP SG 2 Standardgewehr 2",
+      "distance": {
+        "value": 300000,
+        "raw": "300 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.3 and D.3.13, D.3.15 (Teil B, PDF p. 18; Teil D, PDF p. 16)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP CISM-Gewehr 300 m",
+      "distance": {
+        "value": 300000,
+        "raw": "300 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.3 and D.5.12 (Teil B, PDF p. 18; Teil D, PDF p. 28)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP DG 2 Dienstgewehr 2",
+      "distance": {
+        "value": 300000,
+        "raw": "300 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.3 and D.7.11, D.7.13 (Teil B, PDF p. 18; Teil D, PDF p. 34)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP FG 1 Freigewehr 1",
+      "distance": {
+        "value": 300000,
+        "raw": "300 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.3 and D.21.13, D.21.15 (Teil B, PDF p. 18; Teil D, PDF p. 198)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP SDG 1 Steinschloss-Dienstgewehr 1",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "organization": "BDMP",
+      "section": "B.11.3 and E.3.11, E.3.12 (Teil B, PDF p. 18; Teil E, PDF p. 12)",
+      "scoring": "centre"
+    },
+    {
+      "name": "DSU LDG 2 Dienstsportgewehr 300 m",
+      "distance": {
+        "value": 300000,
+        "raw": "300 m"
+      },
+      "organization": "DSU",
+      "section": "Kapitel 1, DSU-Scheibe ISSF 300 Meter Präzision (Seite 25); Kapitel 3 (PDF p. 60)",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSU LDG 3 Dienstsportgewehr aufgerüstet 300 m",
+      "distance": {
+        "value": 300000,
+        "raw": "300 m"
+      },
+      "organization": "DSU",
+      "section": "Kapitel 1, DSU-Scheibe ISSF 300 Meter Präzision (Seite 25); Kapitel 3 (PDF p. 60)",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSU LEM 3 Einzellader Matchgewehr 300 m",
+      "distance": {
+        "value": 300000,
+        "raw": "300 m"
+      },
+      "organization": "DSU",
+      "section": "Kapitel 1, DSU-Scheibe ISSF 300 Meter Präzision (Seite 25); Kapitel 3 (PDF p. 60)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP LRSPFG LR Schwarzpulverfreigewehr, 300 m",
+      "distance": {
+        "value": 300000,
+        "raw": "300 m"
+      },
+      "organization": "BDMP",
+      "section": "E.6.8 (Teil E, PDF p. 18)",
+      "scoring": "centre"
+    },
+    {
+      "name": "BDMP ZFSPFG ZF Schwarzpulverfreigewehr, 300 m",
+      "distance": {
+        "value": 300000,
+        "raw": "300 m"
+      },
+      "organization": "BDMP",
+      "section": "E.14.8 (Teil E, PDF p. 38)",
+      "scoring": "centre"
+    },
+    {
+      "name": "BDMP SPPDG 2 Schwarzpulverpatronen-DG 2",
+      "distance": {
+        "value": 300000,
+        "raw": "300 m"
+      },
+      "organization": "BDMP",
+      "section": "E.7.11 (Teil E, PDF p. 24)",
+      "scoring": "centre"
+    },
+    {
+      "name": "DSB Perkussionsfreigewehr 300 m",
+      "distance": {
+        "value": 300000,
+        "raw": "300 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 5",
+      "scoring": "centre"
+    }
+  ],
+  "numerals": true,
+  "note": "The gauge edge is 8.00 mm for every calibre.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "issf-rules-2025-third-print",
+        "fields": ["name", "rings", "innerTen.diameter", "blackDiameter", "numerals"],
+        "page": "Rule 6.3.4.1, p. 195 (PDF p. 195)"
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 3.3.1, p. 39 (PDF p. 39)",
+        "fields": ["events.name", "events.distance"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rules 6.3.3.1 to 6.3.3.3, pp. 194 to 195 (PDF pp. 194 to 195)",
+        "fields": ["decimal"],
+        "note": "Tenth-ring values where electronic targets or scoring machines are used, else whole rings."
+      },
+      {
+        "source": "issf-paper-target-scoring-2022",
+        "fields": ["events.gauge", "events.scoring", "innerTen.rule"],
+        "page": "Rule 1.4.2, p. 321 (PDF p. 2); rule 5.2.1, p. 330 (PDF p. 11)"
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "fields": [
+          "events.name",
+          "events.distance",
+          "events.organization",
+          "events.section",
+          "events.gauge"
+        ],
+        "page": "0.20 Scheibe Nr. 5, Teil 0 Seite 65 (PDF p. 83); 0.11.3.2, Teil 0 Seite 40 (PDF p. 58)"
+      },
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "Anhang 1 (printed Z-22 to Z-24, PDF pp. 23 to 25), Zielscheibe Z7"
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "B.11.3 (Register 7 Teil B, 18 von 70, PDF p. 18)"
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "D.3.13, D.3.15 (Teil D, PDF p. 16); D.5.12 (Teil D, PDF p. 28); D.7.11, D.7.13 (Teil D, PDF p. 34); D.21.13, D.21.15 (Teil D, PDF p. 198)"
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "E.3.11, E.3.12 (Teil E, PDF p. 12)"
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "Kapitel 1, DSU-Scheibe ISSF 300 Meter Präzision (Seite 25, PDF p. 27); Kapitel 3 (PDF p. 60)"
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.6.8 (Teil E, PDF p. 18)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-6",
+        "page": "A.3.21.4.1 (Teil A, PDF p. 15)",
+        "fields": ["events.scoring"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.14.8 (Teil E, PDF p. 38)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.7.11 (Teil E, PDF p. 24)",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "0.20 Scheibe Nr. 5 (Teil 0 Seite 65, PDF p. 83); rows of 0.21 (Teil 0 Seite 80 to 89, PDF pp. 98 to 107)"
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "fields": ["events.scoring"],
+        "page": "7.7.5, Teil 7 Seite 8, PDF p. 344"
+      },
+      {
+        "source": "bds-sporthandbuch-allgemein-2026",
+        "fields": ["events.scoring"],
+        "page": "A 9.02, Seite A-22, PDF p. 22"
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-6",
+        "page": "A.3.21.1.3, Teil A, Seite 14 von 32, PDF p. 14",
+        "fields": ["events.scoring"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.11.3, Teil 0 Seite 39, PDF p. 57",
+        "fields": ["events.scoring"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 1, Auswertung der Scheiben, Seite 27, PDF p. 29",
+        "fields": ["events.scoring"]
+      }
+    ]
+  }
+}

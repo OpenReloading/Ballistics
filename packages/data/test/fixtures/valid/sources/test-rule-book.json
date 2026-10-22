@@ -1,0 +1,8 @@
+{
+  "id": "test-rule-book",
+  "title": "Test rule book",
+  "edition": "2026",
+  "note": "Rule book note.",
+  "url": "https://example.org/rules.pdf",
+  "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+}

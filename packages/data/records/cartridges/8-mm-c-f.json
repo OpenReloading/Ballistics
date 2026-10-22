@@ -1,0 +1,179 @@
+{
+  "id": "8-mm-c-f",
+  "name": "Cal. 8 mm C.F.",
+  "table": "VII",
+  "published": "1989-01-19",
+  "revised": "2006-09-19",
+  "pressureMethod": "transducer",
+  "verification": "unverified",
+  "values": [
+    {
+      "side": "cartridge",
+      "symbol": "d",
+      "quantity": "length",
+      "value": 9.8,
+      "tolerance": {
+        "lower": -0.1
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "g",
+      "quantity": "length",
+      "value": 12.2,
+      "tolerance": {
+        "lower": -0.3
+      }
+    },
+    {
+      "side": "cartridge",
+      "symbol": "t",
+      "quantity": "length",
+      "value": 1.45,
+      "tolerance": {
+        "lower": -0.2
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "cartridge",
+      "symbol": "h",
+      "quantity": "length",
+      "value": 9,
+      "tolerance": {
+        "lower": -0.2
+      }
+    },
+    {
+      "side": "cartridge",
+      "symbol": "l",
+      "quantity": "length",
+      "value": 44.3,
+      "tolerance": {
+        "lower": -0.7
+      }
+    },
+    {
+      "side": "chamber",
+      "symbol": "D",
+      "quantity": "length",
+      "value": 9.85,
+      "tolerance": {
+        "upper": 0.1
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "G",
+      "quantity": "length",
+      "value": 12.3,
+      "tolerance": {
+        "upper": 0.2
+      }
+    },
+    {
+      "side": "chamber",
+      "symbol": "T",
+      "quantity": "length",
+      "value": 1.45,
+      "tolerance": {
+        "upper": 0.1
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "H",
+      "quantity": "length",
+      "value": 9.05,
+      "tolerance": {
+        "upper": 0.1
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "B",
+      "quantity": "length",
+      "value": 7.9,
+      "tolerance": {
+        "upper": 0.5
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "alpha1",
+      "quantity": "angle",
+      "value": 10.5,
+      "raw": "10°30'",
+      "limit": "max",
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "L",
+      "quantity": "length",
+      "value": 44.5,
+      "tolerance": {
+        "upper": 2
+      },
+      "footnotes": ["1"]
+    },
+    {
+      "symbol": "Pmax",
+      "quantity": "pressure",
+      "value": 830
+    },
+    {
+      "symbol": "PK",
+      "quantity": "pressure",
+      "value": 950
+    },
+    {
+      "symbol": "PE",
+      "quantity": "pressure",
+      "value": 1040
+    },
+    {
+      "symbol": "M",
+      "quantity": "length",
+      "value": 12.5
+    },
+    {
+      "side": "chamber",
+      "symbol": "Fe",
+      "quantity": "length",
+      "value": 0.1
+    },
+    {
+      "side": "chamber",
+      "symbol": "Fe",
+      "quantity": "length",
+      "value": 0.2,
+      "variant": "bascule",
+      "footnotes": ["1"]
+    },
+    {
+      "side": "chamber",
+      "symbol": "Fe",
+      "quantity": "length",
+      "value": 0.35,
+      "variant": "automatic",
+      "footnotes": ["1"]
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cip-tdcc",
+        "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-vii/tabviical-en-page13.pdf",
+        "sha256": "64449a883dd3b06984edde6af151f3d15016f35700a5d9cc6fc19633eaf76f4b",
+        "retrieved": "2026-10-08"
+      }
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "id": "dsu-lem-1",
+  "federation": "dsu",
+  "name": "Einzellader Matchgewehr 50 m",
+  "number": "LEM 1",
+  "section": "Kapitel 3, Langwaffenübungen, LEM 1",
+  "page": "Seite 17, PDF p. 75",
+  "distance": {
+    "value": 50000,
+    "raw": "50 Meter"
+  },
+  "caliberClasses": {
+    "ids": ["rimfire-22"],
+    "basis": "stated"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 17, PDF p. 75",
+        "fields": ["federation", "section", "page", "distance", "caliberClasses"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Inhaltsverzeichnis Langwaffen, Seite 2 (PDF p. 60)",
+        "fields": ["name", "number"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 9, Kurzbezeichnungen Langwaffen, Seite 1 (PDF p. 227)",
+        "fields": ["caliberClasses"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "id": "test-load",
+  "cartridge": "test-cartridge",
+  "firearm": { "name": "Test rifle", "barrelLength": { "value": 600 } },
+  "bullet": { "manufacturerName": "Manufacturer", "model": "Model", "bulletMass": { "value": 10 } },
+  "powder": { "manufacturerName": "Manufacturer", "name": "Powder" },
+  "charge": { "value": 3 },
+  "primer": { "manufacturerName": "Manufacturer", "model": "LR" },
+  "case": { "manufacturerName": "Manufacturer" },
+  "provenance": { "kind": "measured", "sources": [{ "title": "Test fixture" }] }
+}

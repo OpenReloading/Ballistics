@@ -1,0 +1,31 @@
+{
+  "id": "issf-300m-rifle-3-positions-issf-300m-rifle",
+  "discipline": "issf-300m-rifle-3-positions",
+  "face": "issf-300m-rifle",
+  "event": "300m Rifle 3 Positions",
+  "gauge": {
+    "value": 8,
+    "raw": "8.00mm"
+  },
+  "shotCount": 60,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 3.3.1, p. 39 (PDF p. 39), rule 6.3.4.1, p. 195 (PDF p. 195)",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "issf-paper-target-scoring-2022",
+        "page": "Rule 1.4.2, p. 321 (PDF p. 2)",
+        "fields": ["gauge"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 7.7.4, p. 342 (PDF p. 342)",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "id": "test-discipline-test-face",
+  "discipline": "test-discipline",
+  "face": "test-face",
+  "event": "Test event",
+  "shotCount": 40,
+  "provenance": { "kind": "published", "sources": [{ "source": "test-rule-book" }] }
+}

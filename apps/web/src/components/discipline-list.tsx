@@ -1,0 +1,276 @@
+'use client'
+
+import { Select } from '@mantine/core'
+import { useDeferredValue, useMemo } from 'react'
+import {
+  caliberClassLabel,
+  type DisciplineRow,
+  disciplineMatches,
+  type FederationRow,
+  federationMatches,
+} from '../lib/disciplines.ts'
+import { listTitles } from '../lib/list-titles.ts'
+import { countText, filterText } from '../lib/lists.ts'
+import { titleFromKebab } from '../lib/record-fields.ts'
+import type { Origin } from '../lib/sources.ts'
+import { controlSize } from '../lib/theme.ts'
+import {
+  type DirectoryColumn,
+  DirectoryFilters,
+  DirectoryTable,
+  useListState,
+} from './directory-table.tsx'
+import { SourceFilter } from './list-sources.tsx'
+import { BarCount, PageBar } from './page-bar.tsx'
+import { LinkButton } from './record-actions.tsx'
+import { EmptyList } from './states.tsx'
+
+/** Disciplines and federations are rule-book records only: the catalogue is the lists' one source. */
+const ruleBookSources: readonly Origin[] = ['openreloading']
+
+const sortedSet = <T,>(values: (T | undefined)[], compare?: (a: T, b: T) => number) =>
+  [...new Set(values.filter((v): v is T => v !== undefined))].sort(compare)
+
+/** The discipline directory: name, number, federation, distance, category, caliber classes, faces. */
+export function DisciplineList({ items }: { items: DisciplineRow[] }) {
+  const [state, set, clear] = useListState()
+  const filters = useDeferredValue(state)
+  const options = useMemo(
+    () => ({
+      federations: sortedSet(items.map((r) => r.federation)),
+      categories: sortedSet(items.map((r) => r.category)).map((c) => ({
+        value: c,
+        label: titleFromKebab(c),
+      })),
+      distances: sortedSet(
+        items.map((r) => r.distance),
+        (a, b) => a - b,
+      ).map((d) => ({ value: String(d), label: `${d} m` })),
+      classes: sortedSet(items.flatMap((r) => r.classes)).map((c) => ({
+        value: c,
+        label: caliberClassLabel(c),
+      })),
+    }),
+    [items],
+  )
+  const shown = useMemo(() => items.filter((r) => disciplineMatches(r, filters)), [items, filters])
+  const named = [
+    state.organization,
+    state.category && titleFromKebab(state.category),
+    state.distance && `${state.distance} m`,
+    state.caliberClass && caliberClassLabel(state.caliberClass),
+    state.query.trim() && `matching "${state.query.trim()}"`,
+  ]
+  const classes = (r: DisciplineRow) => r.classes.map(caliberClassLabel).join(', ')
+  const columns: DirectoryColumn<DisciplineRow>[] = [
+    { key: 'name', label: 'Name', value: (r) => r.name, cell: (r) => r.name },
+    {
+      key: 'number',
+      label: 'Number',
+      width: '8rem',
+      value: (r) => r.number ?? '',
+      cell: (r) => r.number,
+    },
+    {
+      key: 'federation',
+      label: 'Federation',
+      width: '7rem',
+      value: (r) => r.federation,
+      cell: (r) => r.federation,
+    },
+    {
+      key: 'distance',
+      label: 'Distance',
+      unit: 'm',
+      num: true,
+      width: '6rem',
+      value: (r) => r.distance,
+      cell: (r) => r.distance,
+    },
+    {
+      key: 'category',
+      label: 'Category',
+      width: '9rem',
+      value: (r) => r.category ?? '',
+      cell: (r) => r.category && titleFromKebab(r.category),
+    },
+    { key: 'classes', label: 'Caliber classes', width: '14rem', value: classes, cell: classes },
+    {
+      key: 'faces',
+      label: 'Faces',
+      num: true,
+      width: '5rem',
+      value: (r) => r.faces,
+      cell: (r) => r.faces,
+    },
+  ]
+  const facts = (r: DisciplineRow) =>
+    [r.federation, r.number, `${r.distance} m`, r.category && titleFromKebab(r.category)]
+      .filter(Boolean)
+      .join(' · ')
+  const select = (
+    label: string,
+    data: (string | { value: string; label: string })[],
+    value: string | undefined,
+    onChange: (v: string) => void,
+  ) => (
+    <Select
+      aria-label={label}
+      placeholder={label}
+      size={controlSize.row.input}
+      clearable
+      searchable
+      data={data}
+      value={value || null}
+      onChange={(v) => onChange(v ?? '')}
+    />
+  )
+  return (
+    <>
+      <PageBar
+        title={listTitles.disciplines}
+        status={
+          <BarCount
+            widest={`${items.length} of ${countText(items.length, items.length, 'disciplines')}`}
+          >
+            {countText(shown.length, items.length, 'disciplines')}
+          </BarCount>
+        }
+        actions={<LinkButton href="/federations">Federations</LinkButton>}
+      />
+      <div className="directory">
+        <DirectoryFilters
+          query={state.query}
+          onQuery={(q) => set({ query: q })}
+          placeholder="Name, number, federation or caliber, 2.53…"
+          active={Boolean(
+            state.query ||
+              state.organization ||
+              state.category ||
+              state.distance ||
+              state.caliberClass,
+          )}
+          onClear={clear}
+          sorting={{ columns, sort: state.sort, onSort: (sort) => set({ sort }) }}
+        >
+          <SourceFilter
+            src={state.sources}
+            counts={{ openreloading: items.length, user: 0 }}
+            sources={ruleBookSources}
+            onChange={(src) => set({ sources: src })}
+          />
+          {select('Federation', options.federations, state.organization, (v) =>
+            set({ organization: v }),
+          )}
+          {select('Category', options.categories, state.category, (v) => set({ category: v }))}
+          {select('Distance', options.distances, state.distance, (v) => set({ distance: v }))}
+          {select('Caliber class', options.classes, state.caliberClass, (v) =>
+            set({ caliberClass: v }),
+          )}
+        </DirectoryFilters>
+        <DirectoryTable
+          rows={shown}
+          columns={columns}
+          link="name"
+          href={(r) => `/disciplines/${r.id}`}
+          facts={facts}
+          label={(r) => r.name}
+          caption={
+            named.filter(Boolean).length === 0
+              ? 'All disciplines'
+              : `Disciplines, ${named.filter(Boolean).join(', ')}`
+          }
+          noun="disciplines"
+          sort={state.sort}
+          onSort={(sort) => set({ sort })}
+          empty={<EmptyList noun="disciplines" filters={filterText(named)} />}
+        />
+      </div>
+    </>
+  )
+}
+
+/** The federation directory: name, abbreviation, country, rule books, disciplines and faces. */
+export function FederationList({ items }: { items: FederationRow[] }) {
+  const [state, set, clear] = useListState()
+  const filters = useDeferredValue(state)
+  const shown = useMemo(() => items.filter((r) => federationMatches(r, filters)), [items, filters])
+  const query = state.query.trim()
+  const count = (key: 'ruleBooks' | 'disciplines' | 'faces', label: string) => ({
+    key,
+    label,
+    num: true,
+    width: '7rem',
+    value: (r: FederationRow) => r[key],
+    cell: (r: FederationRow) => r[key],
+  })
+  const columns: DirectoryColumn<FederationRow>[] = [
+    { key: 'name', label: 'Name', value: (r) => r.name, cell: (r) => r.name },
+    {
+      key: 'abbreviation',
+      label: 'Abbreviation',
+      width: '8rem',
+      value: (r) => r.abbreviation,
+      cell: (r) => r.abbreviation,
+    },
+    {
+      key: 'country',
+      label: 'Country',
+      width: '8rem',
+      value: (r) => r.country,
+      cell: (r) => r.country,
+    },
+    count('ruleBooks', 'Rule books'),
+    count('disciplines', 'Disciplines'),
+    count('faces', 'Faces'),
+  ]
+  const facts = (r: FederationRow) =>
+    [r.abbreviation, r.country, countText(r.disciplines, r.disciplines, 'disciplines')].join(' · ')
+  return (
+    <>
+      <PageBar
+        title={listTitles.federations}
+        status={
+          <BarCount
+            widest={`${items.length} of ${countText(items.length, items.length, 'federations')}`}
+          >
+            {countText(shown.length, items.length, 'federations')}
+          </BarCount>
+        }
+        actions={<LinkButton href="/disciplines">Disciplines</LinkButton>}
+      />
+      <div className="directory">
+        <DirectoryFilters
+          query={state.query}
+          onQuery={(q) => set({ query: q })}
+          placeholder="Name, abbreviation or country, DSB…"
+          active={Boolean(state.query)}
+          onClear={clear}
+          sorting={{ columns, sort: state.sort, onSort: (sort) => set({ sort }) }}
+        >
+          <SourceFilter
+            src={state.sources}
+            counts={{ openreloading: items.length, user: 0 }}
+            sources={ruleBookSources}
+            onChange={(src) => set({ sources: src })}
+          />
+        </DirectoryFilters>
+        <DirectoryTable
+          rows={shown}
+          columns={columns}
+          link="name"
+          href={(r) => `/federations/${r.id}`}
+          facts={facts}
+          label={(r) => r.name}
+          caption={query ? `Federations, matching "${query}"` : 'All federations'}
+          noun="federations"
+          sort={state.sort}
+          onSort={(sort) => set({ sort })}
+          empty={
+            <EmptyList noun="federations" filters={filterText([query && `matching "${query}"`])} />
+          }
+        />
+      </div>
+    </>
+  )
+}

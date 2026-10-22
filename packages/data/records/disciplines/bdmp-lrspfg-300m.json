@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-lrspfg-300m",
+  "federation": "bdmp",
+  "name": "LR Schwarzpulverfreigewehr",
+  "number": "LRSPFG",
+  "section": "E.6",
+  "page": "Teil E, Seite 17 bis 22 von 42, PDF pp. 17 to 22",
+  "distance": {
+    "value": 300000,
+    "raw": "300 m"
+  },
+  "category": "rifle",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.6, E.6.1, Teil E, Seite 17 von 42, PDF p. 17",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.6.8, Teil E, Seite 18 von 42, PDF p. 18",
+        "fields": ["distance"]
+      }
+    ]
+  }
+}

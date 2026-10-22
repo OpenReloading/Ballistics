@@ -1,0 +1,42 @@
+{
+  "id": "bds-2410",
+  "federation": "bds",
+  "name": "50m Fertigkeit SG SL KW opt. Vis.",
+  "number": "2410",
+  "section": "Anhang 1",
+  "page": "Seite Z-22, PDF p. 23",
+  "distance": {
+    "value": 50000,
+    "raw": "50m"
+  },
+  "category": "carbine",
+  "caliberClasses": {
+    "ids": [
+      "rifle-30-carbine",
+      "revolver-32",
+      "revolver-357-38",
+      "pistol-40-10mm",
+      "revolver-44",
+      "pistol-45",
+      "revolver-45-colt",
+      "pistol-7-65",
+      "pistol-9mm"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "page": "Anhang 1, Seite Z-22, PDF p. 23",
+        "fields": ["name", "number", "federation", "section", "page", "distance"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 5.01, Seite L-27, PDF p. 27",
+        "fields": ["number", "distance", "category", "caliberClasses"]
+      }
+    ]
+  }
+}

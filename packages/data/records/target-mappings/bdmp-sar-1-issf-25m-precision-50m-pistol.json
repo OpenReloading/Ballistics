@@ -1,0 +1,27 @@
+{
+  "id": "bdmp-sar-1-issf-25m-precision-50m-pistol",
+  "discipline": "bdmp-sar-1",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "BDMP SAR 1 Single Action Revolver 1",
+  "shotCount": 15,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.1, Teil B, Seite 8 von 70, PDF p. 8",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.10.5, Teil C, Seite 72 von 142, PDF p. 72",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.10.7, Teil C, Seite 73 von 142, PDF p. 73",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

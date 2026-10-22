@@ -1,0 +1,52 @@
+name: Report from the app
+description: Opened by Report an issue in the web app, with the page and browser filled in.
+labels: [user-report]
+body:
+  - type: dropdown
+    id: report-type
+    attributes:
+      label: Type
+      options:
+        - Bug
+        - Wrong data
+        - Idea
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Workbench
+        - Shot groups
+        - Session summary
+        - Cartridges
+        - Bullets
+        - Powders
+        - Targets
+        - Disciplines
+        - Federations
+        - Firearms
+        - Cartridge designer
+        - Bullet designer
+        - Settings
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, what you saw. For an idea, what you need.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Page, version, browser, window, colour scheme and units.
+  - type: textarea
+    id: data
+    attributes:
+      label: Data
+      description: Load link, share link, sheet settings or shot positions, where ticked in the app.

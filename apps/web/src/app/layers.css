@@ -1,0 +1,2 @@
+/* layer order: the element defaults of globals.css below Mantine; unlayered rules above both */
+@layer base, mantine;

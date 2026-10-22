@@ -1,0 +1,13 @@
+{
+  "name": "openreloading",
+  "initializeCommand": [
+    "sh",
+    "-c",
+    "printf 'WORKSPACE=%s\\nGIT_COMMON=%s\\nPROJECT=openreloading-%s\\n' \"$PWD\" \"$(cd \"$(git rev-parse --git-common-dir)\" && pwd)\" \"$(basename \"$PWD\" | tr A-Z a-z | tr -c 'a-z0-9\\n' -)\" > .devcontainer/.env"
+  ],
+  "dockerComposeFile": "compose.yaml",
+  "service": "app",
+  "workspaceFolder": "${localWorkspaceFolder}",
+  "forwardPorts": [3000, 3001, 5432],
+  "postCreateCommand": "npm ci && cd apps/e2e && npx playwright install --only-shell chromium"
+}

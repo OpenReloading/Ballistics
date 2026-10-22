@@ -1,0 +1,27 @@
+{
+  "id": "bdmp-sp-4",
+  "federation": "bdmp",
+  "name": "Sportpistole 4",
+  "number": "SP4",
+  "section": "C.13C",
+  "page": "Teil C, Seite 84 bis 85 von 142, PDF pp. 84 to 85",
+  "distance": {
+    "value": 25000,
+    "raw": "25 m"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13C, C.13C.1, Teil C, Seite 84 von 142, PDF p. 84",
+        "fields": ["name", "number", "federation", "section", "page"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13C.6, Teil C, Seite 85 von 142, PDF p. 85",
+        "fields": ["distance"]
+      }
+    ]
+  }
+}

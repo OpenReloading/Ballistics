@@ -1,0 +1,13 @@
+{
+  "id": "test-firing",
+  "cartridge": "missing-cartridge",
+  "ammunition": "Test ammunition",
+  "roundCount": 1,
+  "velocity": { "point": "at the muzzle", "mean": { "value": 800 } },
+  "provenance": {
+    "kind": "measured",
+    "sources": [
+      { "title": "Test fixture", "url": "https://example.org/paper", "license": "CC-BY-4.0" }
+    ]
+  }
+}

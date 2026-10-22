@@ -1,0 +1,20 @@
+{
+  "name": "@openreloading/e2e",
+  "version": "0.0.1",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "test": "playwright test",
+    "smoke": "playwright test --project=full tests/web/smoke.spec.ts",
+    "pair-sheets": "node scripts/pair-sheets.mts",
+    "drawing-baseline": "sh scripts/baseline.sh",
+    "drawing-baseline:full": "DRAWING_BASELINE=full sh scripts/baseline.sh",
+    "visual-check": "node scripts/visual-check.mts",
+    "test:unit": "vitest run --dir scripts"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.63.0",
+    "vitest": "^5.0.3"
+  }
+}

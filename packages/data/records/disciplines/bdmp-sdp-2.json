@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-sdp-2",
+  "federation": "bdmp",
+  "name": "Steinschloss-Dienstpistole 2",
+  "number": "SDP 2",
+  "section": "E.13",
+  "page": "Teil E, Seite 35 bis 36 von 42, PDF pp. 35 to 36",
+  "distance": {
+    "value": 25000,
+    "raw": "25 m"
+  },
+  "category": "muzzle-loader",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.13, E.13.1, Teil E, Seite 35 von 42, PDF p. 35",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.13.8, Teil E, Seite 36 von 42, PDF p. 36",
+        "fields": ["distance"]
+      }
+    ]
+  }
+}

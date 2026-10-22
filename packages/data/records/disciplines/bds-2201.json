@@ -1,0 +1,42 @@
+{
+  "id": "bds-2201",
+  "federation": "bds",
+  "name": "50 m Intervall SG SL KW off. Vis.",
+  "number": "2201",
+  "section": "L 13.01",
+  "page": "Seite L-73, PDF p. 73",
+  "distance": {
+    "value": 50000,
+    "raw": "50 m"
+  },
+  "category": "carbine",
+  "caliberClasses": {
+    "ids": [
+      "rifle-30-carbine",
+      "revolver-32",
+      "revolver-357-38",
+      "pistol-40-10mm",
+      "revolver-44",
+      "pistol-45",
+      "revolver-45-colt",
+      "pistol-7-65",
+      "pistol-9mm"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 13.01, Seite L-73, PDF p. 73",
+        "fields": ["name", "number", "federation", "section", "page", "distance"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 13.01, Seite L-73, PDF p. 73",
+        "fields": ["category", "caliberClasses"]
+      }
+    ]
+  }
+}

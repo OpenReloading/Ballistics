@@ -1,0 +1,32 @@
+{
+  "id": "vdrbw-g-hk-1",
+  "federation": "vdrbw",
+  "name": "Halbautomatisches KK-Sportgewehr",
+  "number": "G-HK 1",
+  "section": "9.13",
+  "page": "Seite 82, PDF p. 82",
+  "distance": {
+    "value": 50000,
+    "raw": "50 m"
+  },
+  "category": "rifle",
+  "caliberClasses": {
+    "ids": ["rimfire-22"],
+    "basis": "stated"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "Kapitel 9, Inhaltsübersicht, Seite 57, PDF p. 57",
+        "fields": ["name", "number"]
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.13, Seite 82, PDF p. 82",
+        "fields": ["federation", "section", "page", "distance", "caliberClasses", "category"]
+      }
+    ]
+  }
+}

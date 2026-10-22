@@ -1,0 +1,28 @@
+{
+  "id": "dsu-svog",
+  "federation": "dsu",
+  "name": "Vorderlader-Ordonanzgewehr 100 m",
+  "number": "SVOG",
+  "section": "Kapitel 4, A) Vorderlader, II. Langwaffen, SVOG",
+  "page": "Seite 12, PDF p. 134",
+  "distance": {
+    "value": 100000,
+    "raw": "100 Meter"
+  },
+  "category": "muzzle-loader",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 4, Seite 12, PDF p. 134",
+        "fields": ["federation", "section", "page", "distance", "category"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 9, Schwarzpulver und Vorderlader, Seite 1 (PDF p. 233)",
+        "fields": ["name", "number"]
+      }
+    ]
+  }
+}

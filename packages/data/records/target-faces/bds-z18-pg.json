@@ -1,0 +1,118 @@
+{
+  "id": "bds-z18-pg",
+  "name": "BDS-PG-Scheibe (Z18)",
+  "organization": "BDS",
+  "rings": [
+    {
+      "value": 5,
+      "diameter": {
+        "value": 38.1
+      }
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 31.75
+      }
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 25.4
+      }
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 19.05
+      }
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 12.7
+      }
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 6.35
+      }
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 0.792
+    }
+  },
+  "blackDiameter": {
+    "value": 38.1
+  },
+  "events": [
+    {
+      "name": "2113 50 m Präz. ZG 50 KK",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "section": "Anhang 1, Z 18",
+      "scoring": "touch"
+    },
+    {
+      "name": "2116 50 m Präz. PG KK LV",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "section": "Anhang 1, Z 18",
+      "scoring": "touch"
+    },
+    {
+      "name": "2117 50 m Präz. PG KK HV",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "section": "Anhang 1, Z 18",
+      "scoring": "touch"
+    },
+    {
+      "name": "3108 100 m Präz. Präzisionsgewehr b. 7 mm",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "section": "Anhang 1, Z 18",
+      "scoring": "touch"
+    },
+    {
+      "name": "3119 100 m Präz. Präzisionsgewehr ü. 7 mm",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "section": "Anhang 1, Z 18",
+      "scoring": "touch"
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "fields": ["name", "rings", "innerTen.diameter", "blackDiameter"],
+        "page": "Z18 (printed Z-18, PDF p. 19)"
+      },
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "fields": ["events.name", "events.distance", "events.section"],
+        "page": "Anhang 1 (printed Z-22 to Z-24, PDF pp. 23 to 25), Zielscheibe Z18"
+      },
+      {
+        "source": "bds-sporthandbuch-allgemein-2026",
+        "fields": ["events.scoring"],
+        "page": "A 9.02, Seite A-22, PDF p. 22"
+      }
+    ]
+  }
+}

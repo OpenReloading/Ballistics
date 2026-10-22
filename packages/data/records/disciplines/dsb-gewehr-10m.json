@@ -1,0 +1,30 @@
+{
+  "id": "dsb-gewehr-10m",
+  "federation": "dsb",
+  "name": "Gewehr 10 m",
+  "section": "0.20",
+  "page": "Seite 62 and 63, PDF pp. 80 and 81",
+  "distance": {
+    "value": 10000,
+    "raw": "10 m"
+  },
+  "caliberClasses": {
+    "ids": ["air-4-5"],
+    "basis": "stated"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "Seite 62 and 63, PDF pp. 80 and 81",
+        "fields": ["name", "federation", "section", "page", "distance"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.21, Teil 0 Seite 76, PDF p. 94 (rows 1.10, 1.11 and 1.20, the 10 m rifle disciplines on Scheibe Nr. 1)",
+        "fields": ["caliberClasses"]
+      }
+    ]
+  }
+}

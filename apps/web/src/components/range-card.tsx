@@ -1,0 +1,73 @@
+'use client'
+
+import type { TrajectoryPoint } from '@openreloading/core'
+import { createPortal } from 'react-dom'
+import { localDay } from '../lib/dates.ts'
+import { rangeCardColumns, rangeCardFacts, rangeCardRows } from '../lib/range-card.ts'
+import type { UnitSystem } from '../lib/units.ts'
+import { printAlone, usePortalBody } from './print.ts'
+
+/**
+ * The range card of a trajectory result: rendered into `body`, never on
+ * screen, printed alone while `<html data-print="range-card">` is set (`printRangeCard`).
+ */
+export function RangeCard({
+  result,
+  system,
+}: {
+  result: {
+    bullet: string
+    zeroRange: number
+    si: Record<string, number | undefined>
+    manual: boolean
+    tablePoints: TrajectoryPoint[]
+  }
+  system: UnitSystem
+}) {
+  // the portal target exists after mounting only (server render has no document)
+  const body = usePortalBody()
+  if (!body) return null
+  const columns = rangeCardColumns(system)
+  return createPortal(
+    <div className="range-card">
+      <h1>Range card: {result.bullet}</h1>
+      <p className="sheet-date">Printed {localDay(new Date())}</p>
+      <dl className="range-card-facts">
+        {rangeCardFacts(result.si, result.zeroRange, system, result.manual).map(([k, v]) => (
+          <div key={k}>
+            <dt>{k}</dt>
+            <dd>{v}</dd>
+          </div>
+        ))}
+      </dl>
+      <table className="sheet-table">
+        <thead>
+          <tr>
+            {columns.map((c, i) => (
+              <th key={c} scope="col" className={i < columns.length - 1 ? 'num' : undefined}>
+                {c}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rangeCardRows(result.tablePoints, system).map((cells) => (
+            <tr key={cells[0]}>
+              {cells.map((c, i) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: the columns are fixed
+                <td key={i} className="num">
+                  {c}
+                </td>
+              ))}
+              <td className="blank notes" />
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>,
+    body,
+  )
+}
+
+/** Prints the range card alone: the attribute switches the print rules until the dialog closes. */
+export const printRangeCard = () => printAlone('range-card')

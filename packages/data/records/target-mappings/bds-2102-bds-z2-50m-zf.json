@@ -1,0 +1,28 @@
+{
+  "id": "bds-2102-bds-z2-50m-zf",
+  "discipline": "bds-2102",
+  "face": "bds-z2-50m-zf",
+  "event": "2102 50 m Präz. SG SL KK opt. Vis.",
+  "shotCount": 30,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "page": "Anhang 1, Seite Z-22, PDF p. 23",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 2.01, Seite L-8, PDF p. 8",
+        "fields": ["face"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 2.04, Seite L-17, PDF p. 17",
+        "fields": ["shotCount"],
+        "note": "Deutsche Meisterschaft and Landesmeisterschaft 30 shots; below Landesmeisterschaft the program may be halved to 15."
+      }
+    ]
+  }
+}

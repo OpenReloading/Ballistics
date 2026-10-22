@@ -1,0 +1,32 @@
+{
+  "id": "vdrbw-p-d-1",
+  "federation": "vdrbw",
+  "name": "Halbautomatische Dienstpistole",
+  "number": "P-D 1",
+  "section": "8.2",
+  "page": "Seite 34, PDF p. 34",
+  "distance": {
+    "value": 25000,
+    "raw": "25 m"
+  },
+  "category": "service-pistol",
+  "caliberClasses": {
+    "ids": ["pistol-7-65", "pistol-9mm", "pistol-9x18", "pistol-40-10mm", "pistol-45"],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "Kapitel 8, Inhaltsübersicht, Seite 31, PDF p. 31",
+        "fields": ["name", "number"]
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "8.2, Seite 34, PDF p. 34",
+        "fields": ["federation", "section", "page", "distance", "caliberClasses", "category"]
+      }
+    ]
+  }
+}

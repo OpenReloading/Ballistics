@@ -1,0 +1,23 @@
+{
+  "id": "bdmp-sports-carbine-zg-bdmp-nr4",
+  "discipline": "bdmp-sports-carbine-zg",
+  "face": "bdmp-nr4",
+  "event": "BDMP Sports Carbine ZG 50 m",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.29.10, Teil D, Seite 259 von 294, PDF p. 259",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.29.8, Teil D, Seite 259 von 294, PDF p. 259",
+        "fields": ["shotCount"],
+        "note": "Twenty counted shots in four series of five. Sighting shots are unlimited."
+      }
+    ]
+  }
+}

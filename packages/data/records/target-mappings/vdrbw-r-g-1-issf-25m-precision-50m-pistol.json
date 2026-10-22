@@ -1,0 +1,18 @@
+{
+  "id": "vdrbw-r-g-1-issf-25m-precision-50m-pistol",
+  "discipline": "vdrbw-r-g-1",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "VdRBw R-G 1 Großkaliberrevolver Präzision",
+  "stage": "Präzision",
+  "shotCount": 15,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "8.6.8, Seite 42, PDF p. 42; Scheibe 10.3, Seite 98, PDF p. 98",
+        "fields": ["discipline", "face", "event", "stage", "shotCount"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "id": "dsu-lem-3",
+  "federation": "dsu",
+  "name": "Einzellader Matchgewehr 300 m",
+  "number": "LEM 3",
+  "section": "Kapitel 3, Langwaffenübungen, LEM 3",
+  "page": "Seite 19, PDF p. 77",
+  "distance": {
+    "value": 300000,
+    "raw": "300 Meter"
+  },
+  "caliberClasses": {
+    "ids": [
+      "rifle-22-cf",
+      "rifle-6mm",
+      "rifle-25",
+      "rifle-6-5",
+      "rifle-270",
+      "rifle-7mm",
+      "rifle-30",
+      "rifle-30-carbine",
+      "rifle-8mm"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 19, PDF p. 77",
+        "fields": ["federation", "section", "page", "distance", "caliberClasses"],
+        "note": "Groups 1 (.22 Zentralfeuer up to 6 mm) and 2 (over 6 up to 8 mm) are scored separately. The book adds rifle cartridges under 50 mm case length."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Inhaltsverzeichnis Langwaffen, Seite 2 (PDF p. 60)",
+        "fields": ["name", "number"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 9, Kurzbezeichnungen Langwaffen, Seite 1 (PDF p. 227)",
+        "fields": ["caliberClasses"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "id": "bds-z19-300m-pg",
+  "name": "BDS-300m-PG-Scheibe (Z19)",
+  "organization": "BDS",
+  "rings": [
+    {
+      "value": 6,
+      "diameter": {
+        "value": 170
+      }
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 136
+      }
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 102
+      }
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 68
+      }
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 34
+      }
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 17
+    }
+  },
+  "blackDiameter": {
+    "value": 170
+  },
+  "events": [
+    {
+      "name": "4108 300 m Präz. Präzisionsgewehr b. 7 mm",
+      "distance": {
+        "value": 300000,
+        "raw": "300 m"
+      },
+      "section": "Anhang 1, Z 19",
+      "scoring": "touch"
+    },
+    {
+      "name": "4109 300 m Präz. Präzisionsgewehr ü. 7 mm",
+      "distance": {
+        "value": 300000,
+        "raw": "300 m"
+      },
+      "section": "Anhang 1, Z 19",
+      "scoring": "touch"
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "fields": ["name", "rings", "innerTen.diameter", "blackDiameter"],
+        "page": "Z19 (printed Z-19, PDF p. 20)"
+      },
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "fields": ["events.name", "events.distance", "events.section"],
+        "page": "Anhang 1 (printed Z-22 to Z-24, PDF pp. 23 to 25), Zielscheibe Z19"
+      },
+      {
+        "source": "bds-sporthandbuch-allgemein-2026",
+        "fields": ["events.scoring"],
+        "page": "A 9.02, Seite A-22, PDF p. 22"
+      }
+    ]
+  }
+}

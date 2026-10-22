@@ -1,0 +1,28 @@
+{
+  "id": "vdrbw",
+  "name": "Verband der Reservisten der Deutschen Bundeswehr e.V.",
+  "abbreviation": "VdRBw",
+  "country": "DE",
+  "ruleBooks": ["vdrbw-schiesssportordnung-2023"],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "Titelseite, PDF p. 1",
+        "fields": ["name", "ruleBooks"]
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "Kapitel 1, Nr. 101, Seite 4, PDF p. 4",
+        "fields": ["abbreviation"]
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "Präambel, Seite 2, PDF p. 2; Kapitel 12, Seite 106, PDF p. 106",
+        "fields": ["country"],
+        "note": "The Präambel is an image without a text layer. It names the Deutscher Bundestag and the Bundesrepublik Deutschland. Kapitel 12 lists the 16 German Landesgruppen. No seat is stated. The document names no international federation membership."
+      }
+    ]
+  }
+}

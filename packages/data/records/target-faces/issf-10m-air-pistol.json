@@ -1,0 +1,187 @@
+{
+  "id": "issf-10m-air-pistol",
+  "name": "10m Air Pistol Target",
+  "organization": "ISSF",
+  "rings": [
+    {
+      "value": 1,
+      "diameter": {
+        "value": 155.5
+      }
+    },
+    {
+      "value": 2,
+      "diameter": {
+        "value": 139.5
+      }
+    },
+    {
+      "value": 3,
+      "diameter": {
+        "value": 123.5
+      }
+    },
+    {
+      "value": 4,
+      "diameter": {
+        "value": 107.5
+      }
+    },
+    {
+      "value": 5,
+      "diameter": {
+        "value": 91.5
+      }
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 75.5
+      }
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 59.5
+      }
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 43.5
+      }
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 27.5
+      }
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 11.5
+      }
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 5
+    },
+    "rule": "touch"
+  },
+  "blackDiameter": {
+    "value": 59.5,
+    "raw": "Black from 7 to 10 rings = 59.5mm"
+  },
+  "decimal": true,
+  "events": [
+    {
+      "name": "10m Air Pistol",
+      "distance": {
+        "value": 10000,
+        "raw": "10m"
+      },
+      "gauge": {
+        "value": 4.5
+      },
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB 10 m Pistole",
+      "distance": {
+        "value": 10000,
+        "raw": "10 m"
+      },
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 7",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDS 73xx 10 m Präz. Luftpistole",
+      "distance": {
+        "value": 10000,
+        "raw": "10 m"
+      },
+      "organization": "BDS",
+      "section": "Anhang 1, Z 14",
+      "scoring": "touch"
+    },
+    {
+      "name": "DSB Luftgewehr 10 m SH3",
+      "distance": {
+        "value": 10000,
+        "raw": "10 m"
+      },
+      "scoring": "touch",
+      "organization": "DSB",
+      "section": "10.4.1; 10.12 (row 1.10 SH3, LP Scheibe)",
+      "category": "air-rifle"
+    }
+  ],
+  "numerals": true,
+  "note": "A 4.5 mm hole is scored with the inward gauge (4.50 mm edge) on ring 1, the outward gauge (11.50 mm edge) on rings 2 to 10 and the 18.0 mm gauge for the inner ten.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "issf-rules-2025-third-print",
+        "fields": ["name", "rings", "innerTen.diameter", "blackDiameter", "numerals"],
+        "page": "Rule 6.3.4.6, p. 200 (PDF p. 200)"
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 3.3.1, p. 39 (PDF p. 39)",
+        "fields": ["events.name", "events.distance"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rules 6.3.3.1 to 6.3.3.3, pp. 194 to 195 (PDF pp. 194 to 195)",
+        "fields": ["decimal"],
+        "note": "Tenth-ring values where electronic targets or scoring machines are used, else whole rings."
+      },
+      {
+        "source": "issf-paper-target-scoring-2022",
+        "fields": ["events.gauge", "events.scoring", "innerTen.rule"],
+        "page": "Rules 1.4.4, 1.4.6, 1.4.9 and 1.4.10, pp. 321 to 324 (PDF pp. 2 to 5); rule 5.2.1, p. 330 (PDF p. 11)",
+        "kind": "derived"
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "0.20 Scheibe Nr. 7, Teil 0 Seite 66 (PDF p. 84)"
+      },
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "Anhang 1 (printed Z-22 to Z-24, PDF pp. 23 to 25), Zielscheibe Z14"
+      },
+      {
+        "source": "bds-sporthandbuch-allgemein-2026",
+        "fields": ["events.scoring"],
+        "page": "A 9.02, Seite A-22, PDF p. 22"
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "10.4.1, Teil 10 Seite 4, PDF p. 422; 10.12, Teil 10 Seite 15, PDF p. 433",
+        "fields": [
+          "events.name",
+          "events.distance",
+          "events.organization",
+          "events.section",
+          "events.category"
+        ]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.11.3, Teil 0 Seite 39, PDF p. 57",
+        "fields": ["events.scoring"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.11.3, Teil 0 Seite 39, PDF p. 57",
+        "fields": ["events.scoring"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dsb-steinschlossgewehr-50m-issf-25m-precision-50m-pistol",
+  "discipline": "dsb-steinschlossgewehr-50m",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "DSB Steinschlossgewehr 50 m",
+  "shotCount": 15,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.20 Scheibe Nr. 4, Teil 0 Seite 65, PDF p. 83; row 7.30 of 0.21, Teil 0 Seite 89, PDF p. 107",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.21, Teil 0 Seite 89, PDF p. 107 (row 7.30, column Wettkampfschüsse)",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

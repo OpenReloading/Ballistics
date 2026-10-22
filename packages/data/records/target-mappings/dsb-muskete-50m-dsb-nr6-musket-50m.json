@@ -1,0 +1,22 @@
+{
+  "id": "dsb-muskete-50m-dsb-nr6-musket-50m",
+  "discipline": "dsb-muskete-50m",
+  "face": "dsb-nr6-musket-50m",
+  "event": "DSB Muskete 50 m",
+  "shotCount": 15,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.20 Scheibe Nr. 6, Teil 0 Seite 66, PDF p. 84; row 7.35 of 0.21, Teil 0 Seite 89, PDF p. 107",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.21, Teil 0 Seite 89, PDF p. 107 (row 7.35, column Wettkampfschüsse)",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

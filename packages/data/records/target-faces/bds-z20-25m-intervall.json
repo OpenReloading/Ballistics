@@ -1,0 +1,93 @@
+{
+  "id": "bds-z20-25m-intervall",
+  "name": "BDS-25m-Intervallscheibe (Z20)",
+  "organization": "BDS",
+  "rings": [
+    {
+      "value": 5,
+      "diameter": {
+        "value": 500
+      }
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 420
+      }
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 340
+      }
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 260
+      }
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 180
+      }
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 100
+      }
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 50
+    }
+  },
+  "blackDiameter": {
+    "value": 200
+  },
+  "events": [
+    {
+      "name": "11xx 25 m Schießen, Teil Intervall/Zeitserie",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "section": "Anhang 1, Z 20",
+      "scoring": "touch"
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "fields": ["name", "rings", "innerTen.diameter", "blackDiameter"],
+        "page": "Z20 (printed Z-20, PDF p. 21)"
+      },
+      {
+        "source": "bds-sporthandbuch-kommentar-2026",
+        "fields": ["blackDiameter"],
+        "page": "Zu Nr. K3.04, Seite 20 and 21 von 76, PDF pp. 20 and 21",
+        "note": "The black disc reaches about 10 mm past the ring 9 line into ring 8."
+      },
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "fields": ["events.name", "events.distance", "events.section"],
+        "page": "Anhang 1 (printed Z-22, PDF p. 23), Zielscheibe Z20"
+      },
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "fields": ["events.distance"],
+        "page": "K 3.04, Seite K-14, PDF p. 14"
+      },
+      {
+        "source": "bds-sporthandbuch-allgemein-2026",
+        "fields": ["events.scoring"],
+        "page": "A 9.02, Seite A-22, PDF p. 22"
+      }
+    ]
+  }
+}

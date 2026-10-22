@@ -1,0 +1,32 @@
+{
+  "id": "vdrbw-g-h-1",
+  "federation": "vdrbw",
+  "name": "Halbautomatisches Gewehr",
+  "number": "G-H 1",
+  "section": "9.5",
+  "page": "Seite 66, PDF p. 66",
+  "distance": {
+    "value": 100000,
+    "raw": "100 m"
+  },
+  "category": "rifle",
+  "caliberClasses": {
+    "ids": ["rifle-22-cf", "rifle-6mm", "rifle-25"],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "Kapitel 9, Inhaltsübersicht, Seite 57, PDF p. 57",
+        "fields": ["name", "number"]
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.5, Seite 66, PDF p. 66",
+        "fields": ["federation", "section", "page", "distance", "caliberClasses", "category"]
+      }
+    ]
+  }
+}

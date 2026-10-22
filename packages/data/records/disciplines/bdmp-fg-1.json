@@ -1,0 +1,48 @@
+{
+  "id": "bdmp-fg-1",
+  "federation": "bdmp",
+  "name": "Freigewehr 1",
+  "number": "FG 1",
+  "section": "D.21",
+  "page": "Teil D, Seite 196 bis 198 von 294, PDF pp. 196 to 198",
+  "distance": {
+    "value": 300000,
+    "raw": "300 m"
+  },
+  "category": "rifle",
+  "caliberClasses": {
+    "ids": [
+      "rifle-22-cf",
+      "rifle-6mm",
+      "rifle-25",
+      "rifle-6-5",
+      "rifle-270",
+      "rifle-7mm",
+      "rifle-30",
+      "rifle-30-carbine",
+      "rifle-8mm"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.21, D.21.1, Teil D, Seite 196 von 294, PDF p. 196",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.21.9, Teil D, Seite 197 von 294, PDF p. 197",
+        "fields": ["caliberClasses"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.21.15, Teil D, Seite 198 von 294, PDF p. 198",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "The book prints Kaliber bis 8 mm."
+  }
+}

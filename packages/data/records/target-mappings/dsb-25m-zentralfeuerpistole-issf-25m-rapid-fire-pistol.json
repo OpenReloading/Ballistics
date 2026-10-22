@@ -1,0 +1,32 @@
+{
+  "id": "dsb-25m-zentralfeuerpistole-issf-25m-rapid-fire-pistol",
+  "discipline": "dsb-25m-zentralfeuerpistole",
+  "face": "issf-25m-rapid-fire-pistol",
+  "event": "DSB 25 m Zentralfeuerpistole (Duell)",
+  "stage": "Duell",
+  "gauge": {
+    "value": 9.65,
+    "raw": "9,65 mm"
+  },
+  "shotCount": 30,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.20 Scheibe Nr. 10, Teil 0 Seite 68, PDF p. 86",
+        "fields": ["discipline", "face", "event", "stage"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.11.3.2, Teil 0 Seite 40, PDF p. 58",
+        "fields": ["gauge"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "Teil 2 Seite 24, PDF p. 158 (2.20, six series of five shots)",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

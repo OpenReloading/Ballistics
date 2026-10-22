@@ -1,0 +1,184 @@
+{
+  "id": "vdrbw-bw-nr2-klein",
+  "name": "Scheibe Bundeswehr Nr. 2 klein",
+  "organization": "VdRBw",
+  "rings": [
+    {
+      "value": 1,
+      "diameter": {
+        "value": 500
+      },
+      "fill": "white"
+    },
+    {
+      "value": 2,
+      "diameter": {
+        "value": 450
+      },
+      "fill": "white"
+    },
+    {
+      "value": 3,
+      "diameter": {
+        "value": 400
+      },
+      "fill": "white"
+    },
+    {
+      "value": 4,
+      "diameter": {
+        "value": 350
+      },
+      "fill": "white"
+    },
+    {
+      "value": 5,
+      "diameter": {
+        "value": 300
+      },
+      "fill": "white"
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 250
+      },
+      "fill": "white"
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 200
+      },
+      "fill": "white"
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 150
+      },
+      "fill": "black"
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 100
+      },
+      "fill": "black"
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 50
+      },
+      "fill": "white"
+    }
+  ],
+  "blackDiameter": {
+    "value": 150
+  },
+  "events": [
+    {
+      "name": "VdRBw G-RM 1 Militär-Repetiergewehr",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "VdRBw",
+      "section": "9.2.4, 9.2.5 (Scheibe 10.1, Nr. 2 klein, 50 cm)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw G-RM 2 Militär-Repetiergewehr",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "VdRBw",
+      "section": "9.3.4, 9.3.5 (Scheibe 10.1, Nr. 2 klein, 50 cm)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw G-R 1 Repetiergewehr",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "VdRBw",
+      "section": "9.4.4, 9.4.5 (Scheibe 10.1, Nr. 2 klein, 50 cm)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw G-H 1 Halbautomatisches Gewehr",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "VdRBw",
+      "section": "9.5.4, 9.5.5 (Scheibe 10.1, Nr. 2 klein, 50 cm)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw G-H 2 Halbautomatisches Gewehr",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "organization": "VdRBw",
+      "section": "9.6.4, 9.6.5 (Scheibe 10.1, Nr. 2 klein, 50 cm)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw G-RZF 1 Repetier-Zielfernrohrgewehr",
+      "distance": {
+        "value": 300000,
+        "raw": "300 m"
+      },
+      "organization": "VdRBw",
+      "section": "9.9.4, 9.9.5 (Scheibe 10.1, Nr. 2 klein, 50 cm)",
+      "scoring": "touch"
+    },
+    {
+      "name": "VdRBw G-HZF 1 Halbautomatisches Zielfernrohrgewehr",
+      "distance": {
+        "value": 300000,
+        "raw": "300 m"
+      },
+      "organization": "VdRBw",
+      "section": "9.10.4, 9.10.5 (Scheibe 10.1, Nr. 2 klein, 50 cm)",
+      "scoring": "touch"
+    }
+  ],
+  "paper": {
+    "format": "other",
+    "width": {
+      "value": 600,
+      "raw": "60 cm"
+    },
+    "height": {
+      "value": 600,
+      "raw": "60 cm"
+    }
+  },
+  "numerals": true,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "fields": ["name", "rings", "blackDiameter", "numerals", "paper"],
+        "page": "10.1 (Seite 96, PDF p. 96)"
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"],
+        "page": "9.2.4, 9.2.5; 9.3.4, 9.3.5; 9.4.4, 9.4.5; 9.5.4, 9.5.5; 9.6.4, 9.6.5; 9.9.4, 9.9.5; 9.10.4, 9.10.5 (sections named in the events)"
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "Nr. 519 (Seite 24, PDF p. 24)",
+        "fields": ["events.scoring"]
+      }
+    ]
+  }
+}

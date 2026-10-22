@@ -1,0 +1,175 @@
+import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { describe, expect, it } from 'vitest'
+import { readLoadTables, readRecords } from '../src/records.ts'
+
+const fixtures = join(import.meta.dirname, 'fixtures')
+
+/** The errors of a copy of the valid fixtures after `change`, which gets the root and a JSON writer. */
+function errorsAfter(change: (root: string, write: (path: string, json: object) => void) => void) {
+  const root = mkdtempSync(join(tmpdir(), 'records-'))
+  cpSync(join(fixtures, 'valid'), root, { recursive: true })
+  try {
+    change(root, (path, json) => writeFileSync(join(root, path), JSON.stringify(json)))
+    return readRecords(root).errors
+  } finally {
+    rmSync(root, { recursive: true })
+  }
+}
+
+describe('readRecords', () => {
+  const invalid = readRecords(join(fixtures, 'invalid')).errors
+
+  it('reads valid records into a bundle', () => {
+    const { bundle, errors } = readRecords(join(fixtures, 'valid'))
+    expect(errors).toEqual([])
+    expect(bundle.cartridges.map((c) => c.id)).toEqual(['test-cartridge'])
+    expect(bundle.manufacturers.map((m) => m.id)).toEqual(['test-manufacturer'])
+    expect(bundle.loads.map((l) => l.id)).toEqual(['test-load'])
+    expect(bundle.chronoSessions.map((s) => s.id)).toEqual(['test-session'])
+    expect(bundle.firings.map((f) => f.id)).toEqual(['test-firing'])
+    expect(bundle.rangeFirings.map((r) => r.id)).toEqual(['test-range'])
+    expect(bundle.targetFaces.map((f) => f.id)).toEqual(['test-face'])
+    expect(bundle.federations.map((f) => f.id)).toEqual(['test-federation'])
+    expect(bundle.disciplines.map((d) => d.id)).toEqual(['test-discipline'])
+    expect(bundle.targetMappings.map((m) => m.id)).toEqual(['test-discipline-test-face'])
+  })
+
+  it('reports invalid JSON, id mismatches, unknown references and missing directories', () => {
+    const errors = invalid
+    expect(errors.some((e) => e.startsWith('chrono/broken.json: invalid JSON'))).toBe(true)
+    expect(errors).toContain('loads/other-name.json: id "test-load" does not match the file name')
+    expect(errors).toContain('loads/test-load.json: unknown cartridge "test-cartridge"')
+    expect(errors).toContain('chrono/test-session.json: unknown load "missing-load"')
+    expect(errors).toContain('firings/test-firing.json: unknown cartridge "missing-cartridge"')
+    expect(errors).toContain('range/test-range-b.json: round 1(b)* is also in test-range-a')
+    expect(errors).toContain(
+      'disciplines/test-discipline.json: unknown federation "missing-federation"',
+    )
+    expect(errors).toContain(
+      'target-mappings/test-mapping.json: unknown discipline "missing-discipline"',
+    )
+    expect(errors).toContain('target-mappings/test-mapping.json: unknown face "missing-face"')
+    expect(errors).toContain('disciplines/test-discipline.json: no target mapping names it')
+    expect(errors).toContain('bullets/: missing directory')
+    expect(errors).toContain('powders/: missing directory')
+    expect(errors).not.toContain('cartridges/: missing directory')
+  })
+
+  it('reports duplicate values, unacknowledged findings and stale exceptions', () => {
+    const where = 'cartridges/broken-cartridge.json'
+    const spec = invalid.filter((e) => e.startsWith(where))
+    expect(spec).toContain(`${where}: duplicate value cartridge P1 -`)
+    expect(spec).toContain(
+      `${where}: diameter-fit:P1: cartridge P1 = 12.1 mm exceeds chamber P1 = 12 mm`,
+    )
+    expect(spec).toContain(`${where}: exception "pk-ratio" no longer applies; remove it`)
+  })
+
+  it('accepts the committed records', () => {
+    expect(readRecords().errors).toEqual([])
+  })
+
+  it('reports an unknown or missing manufacturer of a powder, a case capacity and a load table', () => {
+    const provenance = { kind: 'published', sources: [{ title: 'Test' }] }
+    const errors = errorsAfter((_root, write) => {
+      write('powders/test-powder.json', {
+        id: 'test-powder',
+        manufacturer: 'missing-manufacturer',
+        name: 'Test',
+        provenance,
+      })
+      write('capacities/test-capacity.json', {
+        id: 'test-capacity',
+        cartridge: 'test-cartridge',
+        waterCapacity: { value: 3.5 },
+        caseManufacturer: 'missing-case-manufacturer',
+        provenance,
+      })
+      write('load-tables.json', {
+        'test.csv': {
+          manufacturer: 'missing-table-manufacturer',
+          title: 'T',
+          retrieved: '2026-01-01',
+        },
+        'old.csv': { maker: 'test-manufacturer', title: 'O', retrieved: '2026-01-01' },
+      })
+    })
+    expect(errors).toContain(
+      'powders/test-powder.json: unknown manufacturer "missing-manufacturer"',
+    )
+    expect(errors).toContain(
+      'capacities/test-capacity.json: unknown caseManufacturer "missing-case-manufacturer"',
+    )
+    expect(errors).toContain(
+      'load-tables.json: test.csv: unknown manufacturer "missing-table-manufacturer"',
+    )
+    expect(errors).toContain('load-tables.json: old.csv: needs a manufacturer id')
+  })
+
+  it('resolves source references with the parts of the record', () => {
+    const { bundle } = readRecords(join(fixtures, 'valid'))
+    expect(bundle.federations[0].ruleBooks[0]).toEqual({
+      title: 'Test rule book',
+      edition: '2026',
+      url: 'https://example.org/rules.pdf',
+      sha256: '0'.repeat(64),
+    })
+    expect(bundle.disciplines[0].provenance.sources[0]).toMatchObject({
+      title: 'Test rule book',
+      edition: '2026',
+      note: 'Discipline note. Rule book note.',
+    })
+  })
+
+  it('reports unknown, uncited and shared embedded sources and mixed references', () => {
+    const errors = errorsAfter((root, write) => {
+      const path = join(root, 'chrono', 'test-session.json')
+      const session = JSON.parse(readFileSync(path, 'utf8'))
+      session.provenance.sources = [
+        { source: 'missing-source' },
+        { source: 'test-fixture', title: 'X' },
+      ]
+      writeFileSync(path, JSON.stringify(session))
+      write('sources/uncited.json', { id: 'uncited', title: 'Uncited' })
+      const provenance = { kind: 'published', sources: [{ title: 'Shared' }] }
+      write('manufacturers/a.json', { id: 'a', name: 'A', provenance })
+      write('manufacturers/b.json', { id: 'b', name: 'B', provenance })
+    })
+    expect(errors).toContain(
+      'chrono/test-session.json: provenance.sources.0: unknown source "missing-source"',
+    )
+    expect(errors).toContain(
+      'chrono/test-session.json: provenance.sources.1: Unrecognized key: "title"',
+    )
+    expect(errors).toContain('sources/uncited.json: no record cites it')
+    expect(errors).toContain(
+      'manufacturers/a.json: source also in manufacturers/b.json, make it a source record',
+    )
+  })
+
+  it('reports a finding of a non-spec record with file and rule', () => {
+    const errors = errorsAfter((root) => {
+      const path = join(root, 'chrono', 'test-session.json')
+      const session = JSON.parse(readFileSync(path, 'utf8'))
+      session.conditions.relativeHumidity = { value: 120 }
+      writeFileSync(path, JSON.stringify(session))
+    })
+    expect(errors).toEqual([
+      'chrono/test-session.json: humidity-range: relative humidity 120 % is outside 0 to 100 %',
+    ])
+  })
+})
+
+describe('readLoadTables', () => {
+  it('names load-tables.json when it is not JSON', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'load-tables-'))
+    try {
+      writeFileSync(join(dir, 'load-tables.json'), '{ "a": ')
+      expect(() => readLoadTables(dir)).toThrow(`${join(dir, 'load-tables.json')}: invalid JSON`)
+    } finally {
+      rmSync(dir, { recursive: true })
+    }
+  })
+})

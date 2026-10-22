@@ -1,0 +1,11 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "extends": ["../typedoc.base.json"],
+  "entryPoints": [
+    "src/index.ts",
+    "src/cartridge/index.ts",
+    "src/bullet/index.ts",
+    "src/seating/index.ts"
+  ],
+  "tsconfig": "tsconfig.build.json"
+}

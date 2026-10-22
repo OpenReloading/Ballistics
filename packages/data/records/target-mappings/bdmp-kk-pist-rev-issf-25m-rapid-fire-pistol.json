@@ -1,0 +1,30 @@
+{
+  "id": "bdmp-kk-pist-rev-issf-25m-rapid-fire-pistol",
+  "discipline": "bdmp-kk-pist-rev",
+  "face": "issf-25m-rapid-fire-pistol",
+  "event": "BDMP KK-Pist./Rev. Kleinkaliber Kurzwaffe Duell",
+  "stage": "Duell",
+  "shotCount": 12,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.1.1, Teil B, Seite 10 von 70, PDF p. 10",
+        "fields": ["discipline", "face", "event", "stage"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.16.10, Teil C, Seite 114 von 142, PDF p. 114",
+        "fields": ["discipline", "face", "event", "stage"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.16.9, Teil C, Seite 113 von 142, PDF p. 113",
+        "fields": ["shotCount"],
+        "note": "Two series of three pairs of shots."
+      }
+    ],
+    "note": "B.11.1.1 prints a ring spacing of 5 cm."
+  }
+}

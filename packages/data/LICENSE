@@ -1,0 +1,16 @@
+The data records in this package (`records/`) are licensed under the Creative Commons
+Attribution 4.0 International License (CC BY 4.0):
+https://creativecommons.org/licenses/by/4.0/legalcode
+
+Exceptions: a source with its own reuse terms names them in its `license` field (SPDX id) and
+keeps them.
+
+Third-party facts: CC BY 4.0 covers only the project's own selection, structure and drawings.
+The project claims no rights in facts taken from third-party sources (C.I.P. sheets, federation
+rule books). The project is not affiliated with or endorsed by the Bundesverwaltungsamt (BVA),
+the shooting sport federations or the C.I.P.
+
+Attribution: "OpenReloading data records", with a link to the repository and the source named in
+each record's provenance where the source requires it.
+
+The code of this repository is licensed under the MIT license (../../LICENSE).

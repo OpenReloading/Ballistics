@@ -1,0 +1,28 @@
+{
+  "id": "dsu-svsm",
+  "federation": "dsu",
+  "name": "Vorderlader-Steinschlossmuskete 50 m",
+  "number": "SVSM",
+  "section": "Kapitel 4, A) Vorderlader, II. Langwaffen, SVSM",
+  "page": "Seite 16, PDF p. 138",
+  "distance": {
+    "value": 50000,
+    "raw": "50 Meter"
+  },
+  "category": "muzzle-loader",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 4, Seite 16, PDF p. 138",
+        "fields": ["federation", "section", "page", "distance", "category"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 9, Schwarzpulver und Vorderlader, Seite 1 (PDF p. 233)",
+        "fields": ["name", "number"]
+      }
+    ]
+  }
+}

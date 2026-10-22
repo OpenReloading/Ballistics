@@ -1,0 +1,23 @@
+{
+  "id": "bds-3212-issf-25m-precision-50m-pistol",
+  "discipline": "bds-3212",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "BDS 3212 100 m Intervall SG SL off. Vis. HL u. 47 mm",
+  "shotCount": 30,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 13.02, Seite L-74, PDF p. 74",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 13.04, Seite L-75, PDF p. 75",
+        "fields": ["shotCount"],
+        "note": "Deutsche Meisterschaft 30 shots; Landesmeisterschaft 20; below 15."
+      }
+    ]
+  }
+}

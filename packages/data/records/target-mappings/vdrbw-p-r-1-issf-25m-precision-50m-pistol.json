@@ -1,0 +1,17 @@
+{
+  "id": "vdrbw-p-r-1-issf-25m-precision-50m-pistol",
+  "discipline": "vdrbw-p-r-1",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "VdRBw P-R 1 Halbautomatische Pistole / Revolver Präzision",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "8.11.8, Seite 53, PDF p. 53; Scheibe 10.3, Seite 98, PDF p. 98",
+        "fields": ["discipline", "face", "event"],
+        "note": "The book states 15 or 30 record shots by magazine capacity (8.11.8)."
+      }
+    ]
+  }
+}

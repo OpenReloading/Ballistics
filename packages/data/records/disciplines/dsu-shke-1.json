@@ -1,0 +1,27 @@
+{
+  "id": "dsu-shke-1",
+  "federation": "dsu",
+  "name": "Schwarzpulver Klassisches Einzelladergewehr, geschlossene Visierung 100 m",
+  "number": "SHKE 1",
+  "section": "Kapitel 4, C) Hinterlader Schwarzpulverpatronen, II. Langwaffen, SHKE 1",
+  "page": "Seite 19, PDF p. 141",
+  "distance": {
+    "value": 100000,
+    "raw": "100 Meter"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 4, Seite 19, PDF p. 141",
+        "fields": ["federation", "section", "page", "distance"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 9, Schwarzpulver und Vorderlader, Seite 1 (PDF p. 233)",
+        "fields": ["name", "number"]
+      }
+    ]
+  }
+}

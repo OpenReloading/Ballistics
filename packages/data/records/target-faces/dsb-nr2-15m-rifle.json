@@ -1,0 +1,112 @@
+{
+  "id": "dsb-nr2-15m-rifle",
+  "name": "Scheibe Nr. 2 (15 m Gewehr)",
+  "organization": "DSB",
+  "rings": [
+    {
+      "value": 1,
+      "diameter": {
+        "value": 85.5
+      }
+    },
+    {
+      "value": 2,
+      "diameter": {
+        "value": 76.5
+      }
+    },
+    {
+      "value": 3,
+      "diameter": {
+        "value": 67.5
+      }
+    },
+    {
+      "value": 4,
+      "diameter": {
+        "value": 58.5
+      }
+    },
+    {
+      "value": 5,
+      "diameter": {
+        "value": 49.5
+      }
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 40.5
+      }
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 31.5
+      }
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 22.5
+      }
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 13.5
+      }
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 4.5
+      }
+    }
+  ],
+  "blackDiameter": {
+    "value": 40.5
+  },
+  "events": [
+    {
+      "name": "Gewehr 15 m",
+      "distance": {
+        "value": 15000,
+        "raw": "15 m"
+      },
+      "section": "0.20 Scheibe Nr. 2 (Teil 0 Seite 64)",
+      "gauge": {
+        "value": 4.65,
+        "raw": "4,65 mm"
+      },
+      "scoring": "touch"
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "fields": [
+          "name",
+          "rings",
+          "blackDiameter",
+          "events.name",
+          "events.distance",
+          "events.section"
+        ],
+        "page": "0.20 Scheibe Nr. 2, Teil 0 Seite 64 (PDF p. 82); table row Teil 0 Seite 62 (PDF p. 80)"
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.11.3.2, Teil 0 Seite 40, PDF p. 58",
+        "fields": ["events.gauge"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.11.3, Teil 0 Seite 39, PDF p. 57",
+        "fields": ["events.scoring"]
+      }
+    ]
+  }
+}

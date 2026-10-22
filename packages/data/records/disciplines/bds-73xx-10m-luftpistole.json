@@ -1,0 +1,22 @@
+{
+  "id": "bds-73xx-10m-luftpistole",
+  "federation": "bds",
+  "name": "10 m Präz. Luftpistole",
+  "number": "73xx",
+  "section": "Anhang 1",
+  "page": "Seite Z-24, PDF p. 25",
+  "distance": {
+    "value": 10000,
+    "raw": "10 m"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "page": "Anhang 1, Seite Z-24, PDF p. 25",
+        "fields": ["name", "number", "federation", "section", "page", "distance"]
+      }
+    ]
+  }
+}

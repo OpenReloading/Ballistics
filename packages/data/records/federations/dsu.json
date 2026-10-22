@@ -1,0 +1,18 @@
+{
+  "id": "dsu",
+  "name": "Deutsche Schießsport Union e.V.",
+  "abbreviation": "DSU",
+  "country": "DE",
+  "ruleBooks": ["dsu-sporthandbuch-2018"],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Titelseite (PDF p. 1), Inhalt (PDF p. 2)",
+        "fields": ["name", "abbreviation", "country", "ruleBooks"],
+        "note": "Seat Weißenthurm, Amtsgericht Koblenz VR 11284, recognised under § 15 WaffG as printed on the title page. The document names no international federation membership."
+      }
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "bds-2814-issf-25m-precision-50m-pistol",
+  "discipline": "bds-2814",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "BDS 2814 25 m Kombi RB KK bel. Vis., Teil Intervall/Zeitserie",
+  "stage": "Intervall/Zeitserie",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 7.02, Seite L-40, PDF p. 40",
+        "fields": ["discipline", "face", "event", "stage"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 7.03.2, Seite L-41, PDF p. 41",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

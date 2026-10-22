@@ -1,0 +1,37 @@
+{
+  "id": "issf-25m-centre-fire-pistol",
+  "federation": "issf",
+  "name": "25m Centre Fire Pistol",
+  "section": "8.7.6.4",
+  "page": "p. 364 (PDF p. 364)",
+  "distance": {
+    "value": 25000,
+    "raw": "25m"
+  },
+  "category": "pistol",
+  "caliberClasses": {
+    "ids": ["pistol-7-65", "revolver-32", "pistol-9mm", "revolver-357-38", "pistol-9x18"],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 3.3.1, p. 39 (PDF p. 39)",
+        "fields": ["name", "federation", "distance", "category"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 8.7.6.4, p. 364 (PDF p. 364)",
+        "fields": ["section", "page"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rules 8.4.3.3 and 8.4.4, p. 358 (PDF p. 358)",
+        "fields": ["caliberClasses"],
+        "note": "The rule prints a calibre range of 7.62 to 9.65 mm."
+      }
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id": "dsb-perkussionsfreigewehr-300m",
+  "federation": "dsb",
+  "name": "Perkussionsfreigewehr 300 m",
+  "number": "7.16",
+  "section": "0.21",
+  "page": "Teil 0 Seite 88, PDF p. 106",
+  "distance": {
+    "value": 300000,
+    "raw": "300 m"
+  },
+  "category": "muzzle-loader",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.21, Teil 0 Seite 88, PDF p. 106",
+        "fields": ["name", "number", "federation", "section", "page", "distance"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "Teil 7 Seite 1, PDF p. 337 (title: Regeln für das Schießen mit Vorderladerwaffen)",
+        "fields": ["category"]
+      }
+    ]
+  }
+}

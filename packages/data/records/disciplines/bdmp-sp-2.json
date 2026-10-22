@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-sp-2",
+  "federation": "bdmp",
+  "name": "Sportpistole 2",
+  "number": "SP 2",
+  "section": "C.13A",
+  "page": "Teil C, Seite 80 bis 81 von 142, PDF pp. 80 to 81",
+  "distance": {
+    "value": 25000,
+    "raw": "25 m"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13A, C.13A.1, Teil C, Seite 80 von 142, PDF p. 80",
+        "fields": ["name", "number", "federation", "section", "page"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13A.6, Teil C, Seite 81 von 142, PDF p. 81",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "The rule admits revolvers and self-loading pistols."
+  }
+}

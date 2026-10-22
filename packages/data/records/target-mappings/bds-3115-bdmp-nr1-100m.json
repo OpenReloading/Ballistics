@@ -1,0 +1,28 @@
+{
+  "id": "bds-3115-bdmp-nr1-100m",
+  "discipline": "bds-3115",
+  "face": "bdmp-nr1-100m",
+  "event": "BDS 3115 100 m Präz. SG SL opt. Vis. ü. 6,4 mm",
+  "shotCount": 30,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-zielscheiben-2025",
+        "page": "Anhang 1, Seite Z-23, PDF p. 24",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 2.02, Seite L-15, PDF p. 15",
+        "fields": ["face"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 2.04, Seite L-17, PDF p. 17",
+        "fields": ["shotCount"],
+        "note": "Deutsche Meisterschaft 30 shots; Landesmeisterschaft 20; Bezirksmeisterschaft 15."
+      }
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "id": "issf-50m-rifle-3-positions-issf-50m-rifle",
+  "discipline": "issf-50m-rifle-3-positions",
+  "face": "issf-50m-rifle",
+  "event": "50m Rifle 3 Positions",
+  "gauge": {
+    "value": 5.6,
+    "raw": "5.60mm"
+  },
+  "shotCount": 60,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 3.3.1, p. 39 (PDF p. 39), rule 6.3.4.2, p. 196 (PDF p. 196)",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "issf-paper-target-scoring-2022",
+        "page": "Rule 1.4.3, p. 321 (PDF p. 2)",
+        "fields": ["gauge"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 7.7.4, p. 342 (PDF p. 342)",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "id": "issf-25m-pistol",
+  "federation": "issf",
+  "name": "25m Pistol",
+  "section": "8.7.6.4",
+  "page": "p. 364 (PDF p. 364)",
+  "distance": {
+    "value": 25000,
+    "raw": "25m"
+  },
+  "category": "pistol",
+  "caliberClasses": {
+    "ids": ["rimfire-22"],
+    "basis": "stated"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 3.3.1, p. 39 (PDF p. 39)",
+        "fields": ["name", "federation", "distance", "category"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 8.7.6.4, p. 364 (PDF p. 364)",
+        "fields": ["section", "page"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rules 8.4.3.2 and 8.4.4, p. 358 (PDF p. 358)",
+        "fields": ["caliberClasses"]
+      },
+      {
+        "source": "issf-paper-target-scoring-2022",
+        "page": "Rule 1.4.11 b, p. 324 (PDF p. 5); rule 5.3.1 a and c, p. 331 (PDF p. 12)",
+        "fields": ["caliberClasses"]
+      }
+    ]
+  }
+}

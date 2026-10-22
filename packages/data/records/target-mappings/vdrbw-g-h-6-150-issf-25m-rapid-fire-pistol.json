@@ -1,0 +1,18 @@
+{
+  "id": "vdrbw-g-h-6-150-issf-25m-rapid-fire-pistol",
+  "discipline": "vdrbw-g-h-6-150",
+  "face": "issf-25m-rapid-fire-pistol",
+  "event": "VdRBw G-H 6 Halbautomatisches Gewehr 150 m",
+  "shotCount": 10,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.16.5, 9.16.6, 9.16.10, Seite 89, 90, PDF pp. 89, 90; Scheibe 10.2, Seite 97, PDF p. 97",
+        "fields": ["discipline", "face", "event", "shotCount"],
+        "note": "The course of 30 record shots is shot in three stations at 200, 150 and 100 m."
+      }
+    ]
+  }
+}

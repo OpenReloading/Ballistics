@@ -1,0 +1,97 @@
+{
+  "id": "demo-bullet-150",
+  "manufacturer": "demo-bullets",
+  "productNumber": "F150",
+  "name": "30 Cal 150 gr Flat Base Demo",
+  "productLine": "Demo Hunt",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 9.72
+  },
+  "length": {
+    "value": 28.2
+  },
+  "base": {
+    "type": "flat"
+  },
+  "ogive": {
+    "form": "tangent",
+    "radius": {
+      "value": 42.85
+    },
+    "radiusRatio": {
+      "value": 1
+    }
+  },
+  "tip": {
+    "type": "soft-point"
+  },
+  "meplatDiameter": {
+    "value": 2.4
+  },
+  "noseLength": {
+    "value": 15.0
+  },
+  "baseToOgive": {
+    "value": 13.2
+  },
+  "bearingLength": {
+    "value": 13.2
+  },
+  "construction": {
+    "raw": "Cup-and-core, gilding metal jacket, lead core",
+    "structure": "cup-and-core",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {
+      "material": "gilding-metal"
+    }
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.392,
+      "note": "Invented value."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.195
+    }
+  ],
+  "recommendedTwist": {
+    "value": 254
+  },
+  "slowestTwist": {
+    "value": 356
+  },
+  "provenance": {
+    "kind": "computed",
+    "sources": [
+      {
+        "source": "synthetic-test-data",
+        "kind": "computed",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "base",
+          "tip",
+          "ogive",
+          "meplatDiameter",
+          "noseLength",
+          "baseToOgive",
+          "bearingLength",
+          "construction",
+          "ballisticCoefficients",
+          "recommendedTwist",
+          "slowestTwist"
+        ],
+        "note": "Invented values for tests and the example; not a real product."
+      }
+    ]
+  }
+}

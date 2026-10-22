@@ -1,0 +1,18 @@
+{
+  "id": "vdrbw-r-k-1-issf-25m-rapid-fire-pistol",
+  "discipline": "vdrbw-r-k-1",
+  "face": "issf-25m-rapid-fire-pistol",
+  "event": "VdRBw R-K 1 KK-Revolver Zeitserie",
+  "stage": "Zeitserie",
+  "shotCount": 15,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "8.9.8, Seite 48, PDF p. 48; Scheibe 10.2, Seite 97, PDF p. 97",
+        "fields": ["discipline", "face", "event", "stage", "shotCount"]
+      }
+    ]
+  }
+}

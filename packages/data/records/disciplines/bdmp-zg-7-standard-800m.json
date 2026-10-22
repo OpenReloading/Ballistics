@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-zg-7-standard-800m",
+  "federation": "bdmp",
+  "name": "Zielfernrohrgewehr 7 Standard TRIA",
+  "number": "ZG 7 Standard",
+  "section": "D.33",
+  "page": "Teil D, Seite 270 bis 272 von 294, PDF pp. 270 to 272",
+  "distance": {
+    "value": 800000,
+    "raw": "800 Meter"
+  },
+  "category": "rifle",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.33, D.33.1, Teil D, Seite 270 von 294, PDF p. 270",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.33.13, Teil D, Seite 272 von 294, PDF p. 272",
+        "fields": ["distance"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id": "dsu-svpg-1",
+  "federation": "dsu",
+  "name": "Vorderlader-Perkussionsscheibengewehr 50 m",
+  "number": "SVPG 1",
+  "section": "Kapitel 4, A) Vorderlader, II. Langwaffen, SVPG 1",
+  "page": "Seite 10, PDF p. 132",
+  "distance": {
+    "value": 50000,
+    "raw": "50 Meter"
+  },
+  "category": "muzzle-loader",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 4, Seite 10, PDF p. 132",
+        "fields": ["federation", "section", "page", "distance", "category"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 9, Schwarzpulver und Vorderlader, Seite 1 (PDF p. 233)",
+        "fields": ["name", "number"]
+      }
+    ]
+  }
+}

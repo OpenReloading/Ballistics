@@ -1,0 +1,48 @@
+{
+  "id": "issf-300m-rifle-3-positions",
+  "federation": "issf",
+  "name": "300m Rifle 3 Positions",
+  "section": "7.7.4",
+  "page": "p. 342 (PDF p. 342)",
+  "distance": {
+    "value": 300000,
+    "raw": "300m"
+  },
+  "category": "rifle",
+  "caliberClasses": {
+    "ids": [
+      "rimfire-17",
+      "rimfire-22",
+      "rifle-22-cf",
+      "rifle-6mm",
+      "rifle-25",
+      "rifle-6-5",
+      "rifle-270",
+      "rifle-7mm",
+      "rifle-30",
+      "rifle-30-carbine"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 3.3.1, p. 39 (PDF p. 39)",
+        "fields": ["name", "federation", "distance", "category"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 7.7.4, p. 342 (PDF p. 342)",
+        "fields": ["section", "page"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 7.4.6, p. 330 (PDF p. 330)",
+        "fields": ["caliberClasses"],
+        "note": "The rule prints a maximum calibre of 8 mm."
+      }
+    ]
+  }
+}

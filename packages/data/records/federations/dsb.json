@@ -1,0 +1,28 @@
+{
+  "id": "dsb",
+  "name": "Deutscher Schützenbund e.V.",
+  "abbreviation": "DSB",
+  "country": "DE",
+  "internationalFederation": "issf",
+  "ruleBooks": ["dsb-sportordnung-2026"],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "Impressum, Seite 8, PDF p. 10 (name, seat in Wiesbaden, list \"Mitglied in\" names the ISSF)",
+        "fields": ["name", "country", "internationalFederation"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "Impressum, Seite 1, PDF p. 3 (title, edition 01.01.2026)",
+        "fields": ["ruleBooks"]
+      },
+      {
+        "source": "dsb-sportordnung-2026",
+        "page": "0.11.3.2, Teil 0 Seite 40, PDF p. 58 (technische Kommission des DSB)",
+        "fields": ["abbreviation"]
+      }
+    ]
+  }
+}

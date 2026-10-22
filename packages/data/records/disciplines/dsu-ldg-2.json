@@ -1,0 +1,38 @@
+{
+  "id": "dsu-ldg-2",
+  "federation": "dsu",
+  "name": "Dienstsportgewehr 300 m",
+  "number": "LDG 2",
+  "section": "Kapitel 3, Langwaffenübungen, LDG 2",
+  "page": "Seite 12, PDF p. 70",
+  "distance": {
+    "value": 300000,
+    "raw": "300 Meter"
+  },
+  "category": "service-rifle",
+  "caliberClasses": {
+    "ids": ["rifle-6-5", "rifle-270", "rifle-7mm", "rifle-30", "rifle-30-carbine", "rifle-8mm"],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 12, PDF p. 70",
+        "fields": ["federation", "section", "page", "distance", "category", "caliberClasses"],
+        "note": "The book prints a calibre range of 6.5 to 8 mm."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Inhaltsverzeichnis Langwaffen, Seite 2 (PDF p. 60)",
+        "fields": ["name", "number"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 9, Kurzbezeichnungen Langwaffen, Seite 1 (PDF p. 227)",
+        "fields": ["caliberClasses"]
+      }
+    ]
+  }
+}
