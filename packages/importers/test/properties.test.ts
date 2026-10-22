@@ -1,6 +1,12 @@
 import fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
-import { chronoFormats, decodeText, parseChrono, readWorkbook } from '../src/index.ts'
+import {
+  type ChronoFormatId,
+  chronoFormats,
+  decodeText,
+  parseChrono,
+  readWorkbook,
+} from '../src/index.ts'
 
 // fixed seed: the same inputs on every run
 const runs = { seed: 20261022, numRuns: 200 }
@@ -55,7 +61,11 @@ describe('the importers on any input', () => {
       await fc.assert(
         fc.asyncProperty(text, (t) =>
           readsOrRefuses(() =>
-            parseChrono(t, { columns: { string: 1, velocity: 2 }, velocityUnit: 'ft/s' }, f.id),
+            parseChrono(
+              t,
+              { columns: { string: 1, velocity: 2 }, velocityUnit: 'ft/s' },
+              f.id as ChronoFormatId,
+            ),
           ),
         ),
         runs,
