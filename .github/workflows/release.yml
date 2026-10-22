@@ -32,29 +32,24 @@ jobs:
           # API commits are unsigned)
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
-      # A pull request opened or updated with GITHUB_TOKEN starts no CI. Closing and reopening it with RELEASE_PLEASE_TOKEN
-      # (fine-grained token, this repository only, Contents and Pull requests read and write) starts CI on the signed
-      # head. GitHub holds those runs for a maintainer's approval, because github-actions opened the PR.
+      # The release PR's CI runs wait for a maintainer's approval, because github-actions opened the PR. Auto-merge
+      # squashes it once its required checks pass. Enabled with RELEASE_PLEASE_TOKEN (fine-grained token, this
+      # repository only, Contents and Pull requests read and write), so the push of that merge starts this workflow
+      # again, which tags the release and builds the images; a merge by GITHUB_TOKEN would start no workflow.
       - if: steps.release.outputs.prs_created == 'true'
         continue-on-error: true   # never blocks the release or the images
         env:
           GH_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          PR: ${{ steps.release.outputs.pr && fromJSON(steps.release.outputs.pr).number || '' }}
         run: |
-          if [ -z "$GH_TOKEN" ]; then echo "::warning::RELEASE_PLEASE_TOKEN not set: close and reopen the release PR"; exit 0; fi
-          for pr in $(gh pr list -R "$GITHUB_REPOSITORY" --state open --label 'autorelease: pending' --json number --jq '.[].number'); do
-            gh pr close "$pr" -R "$GITHUB_REPOSITORY"
-            gh pr reopen "$pr" -R "$GITHUB_REPOSITORY"
+          if [ -z "$GH_TOKEN" ]; then echo "::warning::RELEASE_PLEASE_TOKEN not set: merge the release pull request by hand"; exit 0; fi
+          prs=$PR
+          # the action's pr output can be empty after an update; the label search lags a few seconds behind the PR
+          for _ in $(seq 6); do
+            [ -n "$prs" ] && break
+            sleep 5
+            prs=$(gh pr list -R "$GITHUB_REPOSITORY" --state open --label 'autorelease: pending' --json number --jq '.[].number')
           done
-      # Auto-merge squashes the release pull request once its required checks pass; enabled after the reopen, because
-      # closing a PR turns it off. Enabled with RELEASE_PLEASE_TOKEN, so the push of that merge starts this workflow
-      # again, which tags the release and builds the images; a merge by GITHUB_TOKEN would start no workflow. The pull
-      # request is found by its label: the action's `pr` output can be empty after it updates an existing one.
-      - if: steps.release.outputs.prs_created == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
-        run: |
-          if [ -z "$GH_TOKEN" ]; then echo "RELEASE_PLEASE_TOKEN not set: merge the release pull request by hand"; exit 0; fi
-          prs=$(gh pr list -R "$GITHUB_REPOSITORY" --state open --label 'autorelease: pending' --json number --jq '.[].number')
           for pr in $prs; do
             gh pr merge "$pr" --auto --squash -R "$GITHUB_REPOSITORY"
           done
