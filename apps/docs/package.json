@@ -22,10 +22,10 @@
     "@docusaurus/preset-classic": "3.10.2",
     "@openreloading/api": "*",
     "@scalar/api-reference": "1.75.1",
-    "katex": "0.18.2",
+    "katex": "0.19.0",
     "pagefind": "1.5.2",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "rehype-katex": "7.0.1",
     "remark-math": "6.0.0"
   },
