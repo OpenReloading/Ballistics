@@ -22,7 +22,7 @@
     "@docusaurus/preset-classic": "3.10.2",
     "@openreloading/api": "*",
     "@scalar/api-reference": "1.75.1",
-    "katex": "0.16.47",
+    "katex": "0.18.2",
     "pagefind": "1.5.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
