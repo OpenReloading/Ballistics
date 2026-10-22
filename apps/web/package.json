@@ -26,7 +26,7 @@
     "@phosphor-icons/react": "2.1.10",
     "country-flag-icons": "1.6.20",
     "echarts": "6.1.0",
-    "next": "16.4.0",
+    "next": "16.4.1",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "zod": "^4.6.5"
