@@ -33,25 +33,17 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
       # A pull request opened or updated with GITHUB_TOKEN starts no CI. Closing and reopening it with RELEASE_PLEASE_TOKEN
-      # (fine-grained token, this repository only, Contents, Pull requests and Actions read and write) starts CI on the
-      # signed head; those runs wait for approval because github-actions opened the PR, so the step approves them.
+      # (fine-grained token, this repository only, Contents and Pull requests read and write) starts CI on the signed
+      # head. GitHub holds those runs for a maintainer's approval, because github-actions opened the PR.
       - if: steps.release.outputs.prs_created == 'true'
         continue-on-error: true   # never blocks the release or the images
         env:
           GH_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
         run: |
-          if [ -z "$GH_TOKEN" ]; then echo "::warning::RELEASE_PLEASE_TOKEN not set: close and reopen the release PR, approve its runs"; exit 0; fi
+          if [ -z "$GH_TOKEN" ]; then echo "::warning::RELEASE_PLEASE_TOKEN not set: close and reopen the release PR"; exit 0; fi
           for pr in $(gh pr list -R "$GITHUB_REPOSITORY" --state open --label 'autorelease: pending' --json number --jq '.[].number'); do
-            sha=$(gh pr view "$pr" -R "$GITHUB_REPOSITORY" --json headRefOid --jq .headRefOid)
             gh pr close "$pr" -R "$GITHUB_REPOSITORY"
             gh pr reopen "$pr" -R "$GITHUB_REPOSITORY"
-            for _ in $(seq 12); do   # the runs appear within seconds of the reopen
-              sleep 10
-              for run in $(gh api "repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$sha&status=action_required" --jq '.workflow_runs[].id'); do
-                gh api -X POST "repos/$GITHUB_REPOSITORY/actions/runs/$run/approve" \
-                  || echo "::warning::could not approve run $run: the token needs Actions read and write"
-              done
-            done
           done
       # Auto-merge squashes the release pull request once its required checks pass; enabled after the reopen, because
       # closing a PR turns it off. Enabled with RELEASE_PLEASE_TOKEN, so the push of that merge starts this workflow
