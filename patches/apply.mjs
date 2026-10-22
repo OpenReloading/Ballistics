@@ -1,6 +1,6 @@
 // Patches of installed packages, applied after `npm ci` and `npm install` (root `postinstall`).
-// Plain find and replace instead of patch-package: its dependencies (braces, no fixed version) fail
-// `npm audit --audit-level=high`. A file that holds neither the old nor the new text (a Mantine
+// Plain find and replace instead of patch-package: its dependencies add another path to braces,
+// which has no fixed version. A file that holds neither the old nor the new text (a Mantine
 // upgrade) stops the install: check whether upstream fixed the problem, then drop or adapt the edit.
 // A package that is not installed (the API image has no Mantine) is skipped.
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
