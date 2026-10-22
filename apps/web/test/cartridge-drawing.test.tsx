@@ -77,9 +77,9 @@ describe('CartridgeDrawing', () => {
     expect(win.captions[1]).toContain('the drawing is at 1:1.25 (80 % of life size)')
   })
 
-  it('fits the sides drawn in sections of their own to the window at one scale (308 Win.)', () => {
-    const sized = (side: 'cartridge' | 'chamber') => {
-      const svg = render('cip-308-win-2008-09-23', side).html.match(
+  it('fits the sides drawn in sections of their own to the window at one scale in either length unit (308 Win.)', () => {
+    const sized = (side: 'cartridge' | 'chamber', unit?: 'mm' | 'in') => {
+      const svg = render('cip-308-win-2008-09-23', side, unit).html.match(
         /<svg[^>]*screen-only[^>]*viewBox="[\d.-]+ [\d.-]+ ([\d.]+) [\d.]+"[^>]*style="([^"]+)"/,
       )
       // the room kept for the other length unit is each figure's own height
@@ -88,6 +88,9 @@ describe('CartridgeDrawing', () => {
     }
     expect(sized('cartridge')).toBeDefined()
     expect(sized('chamber')).toEqual(sized('cartridge'))
+    // a unit switch, or the Settings unit read after hydration, keeps the scale
+    for (const side of ['cartridge', 'chamber'] as const)
+      expect(sized(side, 'in')).toEqual(sized('cartridge'))
   })
 
   it('flags the chamber notes of 32-40 Win. with the numbers of its caption', () => {
