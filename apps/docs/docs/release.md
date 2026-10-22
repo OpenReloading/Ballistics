@@ -23,7 +23,7 @@ sidebar_position: 2
    - pushes the tags `X.Y.Z`, `X.Y` and `sha-<commit>` (the version of that component)
    - attests its build provenance (`gh attestation verify oci://ghcr.io/openreloading/ballistics-api:X.Y.Z -R OpenReloading/Ballistics`)
 
-release-please writes the release pull request with the workflow token, so GitHub signs its commits (`main` requires signed commits). A pull request from the workflow token starts no CI, so the workflow then closes and reopens it with the `RELEASE_PLEASE_TOKEN` secret (a fine-grained token for this repository with Contents and Pull requests read and write). The resulting CI runs wait for a maintainer's approval (Approve workflows to run on the pull request); auto-merge then squashes it once its checks pass. Without the secret, close and reopen the pull request by hand, approve its runs and merge it once its checks pass. It changes only versions and changelogs.
+release-please writes the release pull request with the workflow token, so GitHub signs its commits (`main` requires signed commits). Its CI runs wait for a maintainer's approval (Approve workflows to run on the pull request), because github-actions opened it; auto-merge, turned on with the `RELEASE_PLEASE_TOKEN` secret (a fine-grained token for this repository with Contents and Pull requests read and write), then squashes it once its checks pass. Without the secret, merge it by hand once its checks pass. It changes only versions and changelogs.
 
 ## API contract
 
