@@ -21,7 +21,7 @@ services:
       PRERENDER: sample
 
   db:
-    image: docker.io/library/postgres:18-bookworm@sha256:9551dd5bf356409a21b31248f49b33bba9bb1877365f3a7e933aecd9af3cf52d
+    image: docker.io/library/postgres:18-bookworm@sha256:bbf83594798e144bff365a9c191c5d779f181fb3135902064ab8ff11918020fc
     environment:
       POSTGRES_USER: ballistics
       POSTGRES_PASSWORD: ballistics

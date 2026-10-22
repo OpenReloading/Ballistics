@@ -123,17 +123,24 @@ export function CartridgeDrawing({
     (f) => f.side === side && (variant === undefined || f.variant === variant),
   )
   if (shown.length === 0) return <Undrawn list={list} side={side} />
-  const layout = (u: LengthUnit) => {
-    const em = screenEm(
+  const units = ['mm', 'in'] as const
+  const ems = units.map((u) =>
+    screenEm(
       all.map((f) => f.drawn),
       u,
-    )
-    const across = Math.max(...all.map((f) => screenWidth(f.drawn, em, u)))
-    const model = (f: { drawn: Drawn }) => sideModel(f.drawn[0], em, across, u)
-    // the figures of a record fit the window at one scale, the tallest's, the sides not shown here too
-    return { models: shown.map(model), tallest: Math.max(...split.map((f) => model(f).frame[3])) }
-  }
-  const { models, tallest } = layout(unit)
+    ),
+  )
+  // one frame width and one height in both length units: the scale stays when the unit changes
+  // (a switch, or the Settings unit read after hydration)
+  const across = Math.max(
+    ...units.flatMap((u, i) => all.map((f) => screenWidth(f.drawn, ems[i], u))),
+  )
+  const model = (f: { drawn: Drawn }, u: LengthUnit) =>
+    sideModel(f.drawn[0], ems[units.indexOf(u)], across, u)
+  // the figures of a record fit the window at one scale, the tallest's, the sides not shown here too
+  const tallest = Math.max(...units.flatMap((u) => split.map((f) => model(f, u).frame[3])))
+  const layout = (u: LengthUnit) => ({ models: shown.map((f) => model(f, u)), tallest })
+  const { models } = layout(unit)
   // the record page's other length unit: its drawing's room is kept
   const other = layout(unit === 'mm' ? 'in' : 'mm')
   const scale = printScale(split)

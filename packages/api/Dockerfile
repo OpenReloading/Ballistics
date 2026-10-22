@@ -1,5 +1,5 @@
 # Build context: repository root (docker build -f packages/api/Dockerfile .)
-FROM docker.io/library/node:26-bookworm-slim AS build
+FROM docker.io/library/node:26-bookworm-slim@sha256:28147155d47dc31abe0a46e0d12b59b2fb3d0a2dcc5dc65fce76a074180b16fe AS build
 WORKDIR /app
 COPY package.json package-lock.json tsconfig.base.json ./
 COPY patches patches
@@ -20,7 +20,7 @@ COPY packages/data packages/data
 COPY packages/api packages/api
 RUN npm run build -w @openreloading/schema -w @openreloading/core -w @openreloading/data -w @openreloading/api
 
-FROM docker.io/library/node:26-bookworm-slim
+FROM docker.io/library/node:26-bookworm-slim@sha256:28147155d47dc31abe0a46e0d12b59b2fb3d0a2dcc5dc65fce76a074180b16fe
 ENV NODE_ENV=production
 WORKDIR /app
 COPY package.json package-lock.json ./
