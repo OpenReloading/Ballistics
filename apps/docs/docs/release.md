@@ -23,7 +23,7 @@ sidebar_position: 2
    - pushes the tags `X.Y.Z`, `X.Y` and `sha-<commit>` (the version of that component)
    - attests its build provenance (`gh attestation verify oci://ghcr.io/openreloading/ballistics-api:X.Y.Z -R OpenReloading/Ballistics`)
 
-The release pull request is opened with the workflow token, so CI does not run on it. It changes only versions and changelogs.
+The release pull request is opened with the `RELEASE_PLEASE_TOKEN` secret (a fine-grained token for this repository with Contents and Pull requests read and write), so CI runs on it like on any pull request. Without the secret it is opened with the workflow token, and its CI waits for approval. It changes only versions and changelogs.
 
 ## API contract
 
