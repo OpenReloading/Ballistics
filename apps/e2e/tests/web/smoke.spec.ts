@@ -89,8 +89,7 @@ test('the Pages workbench runs the example load in the browser as the API does',
   const expected = await exampleResult(server, `${webUrl}/workbench`)
   expect(expected).toMatch(/peak \d+ bar, .* \d+ m\/s/)
   await storeUnits(page)
-  await page.goto('./workbench')
-  await page.locator('html[data-hydrated]').waitFor({ state: 'attached' })
+  await gotoHydrated(page, './workbench')
   // the start card inside the window: in the frame the workspace keeps its height
   const example = page.getByRole('button', { name: 'Try the example load' })
   await expect(example).toBeInViewport()
