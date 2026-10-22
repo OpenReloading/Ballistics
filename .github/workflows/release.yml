@@ -36,14 +36,16 @@ jobs:
           manifest-file: .release-please-manifest.json
       # Auto-merge squashes the release pull request once its required checks pass. Enabled with
       # RELEASE_PLEASE_TOKEN, so the push of that merge starts this workflow again, which tags the release
-      # and builds the images; a merge by GITHUB_TOKEN would start no workflow.
+      # and builds the images; a merge by GITHUB_TOKEN would start no workflow. The pull request is found
+      # by its label: the action's `pr` output can be empty after it updates an existing one.
       - if: steps.release.outputs.prs_created == 'true'
         env:
           GH_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
-          PR: ${{ fromJSON(steps.release.outputs.pr).number }}
         run: |
           if [ -z "$GH_TOKEN" ]; then echo "RELEASE_PLEASE_TOKEN not set: merge the release pull request by hand"; exit 0; fi
-          gh pr merge "$PR" --auto --squash -R "$GITHUB_REPOSITORY"
+          for pr in $(gh pr list -R "$GITHUB_REPOSITORY" --state open --label 'autorelease: pending' --json number --jq '.[].number'); do
+            gh pr merge "$pr" --auto --squash -R "$GITHUB_REPOSITORY"
+          done
       # per-path outputs exist only for the components released in this run
       - id: images
         env:
