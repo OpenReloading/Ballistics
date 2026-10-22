@@ -5,6 +5,7 @@ import {
   pageKey,
   precacheList,
   recordsCache,
+  shellAnswer,
   shellCache,
   shellFiles,
   shellPages,
@@ -149,4 +150,15 @@ it('a client navigation (RSC, not a prefetch) keeps its page; a prefetch does no
 it('the page key drops the RSC parameter and keeps the query', () => {
   expect(pageKey(`${origin}/cartridges/308-win?_rsc=1x`)).toBe('/cartridges/308-win')
   expect(pageKey(`${origin}/workbench?units=metric&_rsc=1x`)).toBe('/workbench?units=metric')
+})
+
+it('answers a worker script from the cache with a copy that has no URL of its own', async () => {
+  const cached = new Response('postMessage(1)', { headers: { 'content-type': 'text/javascript' } })
+  expect(shellAnswer(cached, 'script')).toBe(cached)
+  const copy = shellAnswer(cached, 'worker')
+  expect(copy).not.toBe(cached)
+  expect(copy.url).toBe('')
+  expect(copy.status).toBe(200)
+  expect(copy.headers.get('content-type')).toBe('text/javascript')
+  expect(await copy.text()).toBe('postMessage(1)')
 })

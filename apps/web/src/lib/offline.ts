@@ -79,6 +79,15 @@ export const pageKey = (url: string) => {
 }
 
 /**
+ * The shell cache's answer to a request for `destination`. A cached response carries its key without
+ * query and fragment, and a worker takes its script response's URL as `location`, so a worker script
+ * gets a copy without a URL: the worker keeps the URL it was started with (its bootstrap reads the
+ * `#params=` fragment).
+ */
+export const shellAnswer = (cached: Response, destination: string) =>
+  destination === 'worker' ? new Response(cached.body, cached) : cached
+
+/**
  * How the worker answers a request: `static` from the shell cache, `records` network-first with
  * the cached record behind it, `page` network-first with the cached page and the offline page
  * behind it, `navigation` (a client navigation fetching RSC) from the network while the page's HTML
