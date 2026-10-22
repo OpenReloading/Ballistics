@@ -21,7 +21,7 @@ updates:
       actions:
         patterns: ['*']
   - package-ecosystem: docker
-    directories: [/packages/api, /apps/web]
+    directories: [/packages/api, /apps/web, /apps/docs, /.devcontainer]
     schedule:
       interval: weekly
     cooldown:
@@ -30,8 +30,10 @@ updates:
       # Node major follows .nvmrc and engines, changed by hand
       - dependency-name: node
         update-types: [version-update:semver-major]
+      - dependency-name: '*typescript-node'
+        update-types: [version-update:semver-major]
   - package-ecosystem: docker-compose
-    directory: /
+    directories: [/, /.devcontainer]
     schedule:
       interval: weekly
     cooldown:
