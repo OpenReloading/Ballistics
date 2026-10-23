@@ -9,10 +9,17 @@ import type { UnitSystem } from '../lib/units.ts'
 import { NumberField } from './number-field.tsx'
 import type { LotRows } from './use-lot-rows.ts'
 
-const LotChart = dynamic(() => import('./lot-chart.tsx').then((m) => m.LotChart), {
+const loadChart = () => import('./lot-chart.tsx').then((m) => m.LotChart)
+
+const LotChart = dynamic(loadChart, {
   ssr: false,
   loading: () => <div className="chart lot-chart" />,
 })
+
+/** Fetches the chart's code, so a print asked before the tab was opened finds it loaded. */
+export function preloadLotChart() {
+  loadChart().catch(() => {})
+}
 
 export const fractionSpec: FieldSpec = {
   key: 'lotFraction',

@@ -2944,8 +2944,10 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 /* the lot rows of a charge: the slower lot first, set off from the charge before it */
-.ladder-table tr[data-lot="low"] td {
-  border-top: 1px solid var(--border);
+@media (min-width: 48em) {
+  .ladder-table tr[data-lot="low"] td {
+    border-top: 1px solid var(--border);
+  }
 }
 
 .ladder-table tr[data-lot] td {

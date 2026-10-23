@@ -721,7 +721,7 @@ export function LadderTable({
     >
       <td data-label="Step">
         {s.label}
-        {s.label === '0' && ' main'}
+        {s.label === '0' && !which && ' main'}
       </td>
       <td data-label={lead[0]} className="num">
         {value(s)}

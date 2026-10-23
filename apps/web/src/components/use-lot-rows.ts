@@ -79,6 +79,8 @@ export function useLotRows({
     steps?: Record<Lot, Step[]>
     message?: string
   }>()
+  const current = got && ok && got.run === ok.id ? got : undefined
+  const pause = current ? 300 : 0
   // the request reads the run it was made for: a step change does not send it again
   // biome-ignore lint/correctness/useExhaustiveDependencies: `key` names the run, the change and the attempt
   useEffect(() => {
@@ -128,15 +130,14 @@ export function useLotRows({
       } finally {
         clearTimeout(late)
       }
-      // typing into the field waits for a pause
-    }, 300)
+      // typing into the field waits for a pause; the first request does not
+    }, pause)
     return () => {
       clearTimeout(timer)
       clearTimeout(late)
       controller.abort()
     }
   }, [enabled, key])
-  const current = got && ok && got.run === ok.id ? got : undefined
   const pending = enabled && key !== undefined && got?.key !== key
   const rows = useMemo(() => {
     if (!ok || !current?.steps) return

@@ -28,7 +28,7 @@ import { FileMenu } from './file-menu.tsx'
 import { preloadInteriorChart } from './lazy-chart.tsx'
 import { LoadSheets, printSheets } from './load-sheets.tsx'
 import { LoadTabs } from './load-tabs.tsx'
-import { LotChartBlock } from './lot-rows.tsx'
+import { LotChartBlock, preloadLotChart } from './lot-rows.tsx'
 import { PageBar } from './page-bar.tsx'
 import { PrintReport } from './print-report.tsx'
 import { useReportOptions } from './report-host.ts'
@@ -217,7 +217,10 @@ export function Workbench() {
   })
   // the lot rows are requested once the Ladder table was opened or a print asked for them
   const [lotWanted, setLotWanted] = useState(false)
-  if (!lotWanted && (tab === 'ladder' || printAsked)) setLotWanted(true)
+  if (!lotWanted && (tab === 'ladder' || printAsked)) {
+    setLotWanted(true)
+    preloadLotChart()
+  }
   const lot = useLotRows({ ok, system, enabled: lotWanted })
   // one request at a time, tied to the longer run it waits for and to the inputs it was asked at
   const printReport = useCallback(
@@ -373,6 +376,7 @@ export function Workbench() {
               <>
                 <h2>{ladderTitle(ok.ladder.kind)} ladder</h2>
                 {ladderTable}
+                {lot.message && <p>Lot rows not computed: {lot.message}</p>}
                 <LotChartBlock lot={lot} system={system} note={false} />
               </>
             )}
