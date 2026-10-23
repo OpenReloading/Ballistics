@@ -13,6 +13,7 @@ import type {
   TargetFace,
   TargetMapping,
 } from '@openreloading/schema'
+import { compareDisciplines, compareFederations, compareNames } from './face-order.ts'
 
 export type FederationSummary = Pick<Federation, 'id' | 'name' | 'abbreviation'>
 export type DisciplineSummary = Pick<
@@ -70,9 +71,11 @@ export function disciplineOptions(faces: TargetFace[], data?: FederationData, fe
   const { federations = [], disciplines: all = [], mappings = [] } = data ?? {}
   const listed = federations
     .filter((f) => !federation || f.id === federation)
+    .toSorted(compareFederations)
     .flatMap((f) =>
       all
         .filter((d) => d.federation === f.id)
+        .toSorted(compareDisciplines)
         .map((d) => ({ value: d.id, label: disciplineLabel(f, d) })),
     )
   if (federation) return listed
@@ -103,11 +106,14 @@ function unmappedFaceEntries(faces: TargetFace[], mappings: MappingSummary[]) {
       .map((e) => e.label),
   )
   for (const e of entries) if (twice.has(e.label)) e.label = `${e.label} (${e.face})`
-  return [...new Set(entries.map((e) => e.organization))].flatMap((organization) =>
-    entries
-      .filter((e) => e.organization === organization)
-      .map(({ value, label }) => ({ value, label })),
-  )
+  return [...new Set(entries.map((e) => e.organization))]
+    .toSorted(compareNames)
+    .flatMap((organization) =>
+      entries
+        .filter((e) => e.organization === organization)
+        .toSorted((a, b) => compareNames(a.label, b.label))
+        .map(({ value, label }) => ({ value, label })),
+    )
 }
 
 /** The faces of a discipline's mappings, each with its stage, in mapping order. */

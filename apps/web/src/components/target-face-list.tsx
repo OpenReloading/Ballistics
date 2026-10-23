@@ -2,6 +2,7 @@
 
 import { Select } from '@mantine/core'
 import { useDeferredValue, useMemo } from 'react'
+import { compareNames } from '../lib/face-order.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { countText, filterText } from '../lib/lists.ts'
 import type { Origin } from '../lib/sources.ts'
@@ -28,7 +29,7 @@ export function TargetFaceList({ items }: { items: TargetFaceRow[] }) {
   const [state, set, clear] = useListState()
   const filters = useDeferredValue(state)
   const organizations = useMemo(
-    () => [...new Set(items.map((r) => r.organization))].sort(),
+    () => [...new Set(items.map((r) => r.organization))].sort(compareNames),
     [items],
   )
   const shown = useMemo(() => items.filter((r) => targetFaceMatches(r, filters)), [items, filters])
