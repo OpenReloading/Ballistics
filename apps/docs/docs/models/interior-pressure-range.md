@@ -64,6 +64,18 @@ The minimum and maximum run over the cases $c$ with a valid, finite peak pressur
 
 Code: `packages/core/src/interior/range.ts`, `pressureToleranceDefaults`.
 
+### Powder lot rows
+
+The workbench's Ladder table runs every charge of a charge ladder at the burn coefficient moved to both ends by one stated fraction $t_b$ (3 % unless changed), with every other input at its nominal value:
+
+$$
+b^{\pm} = b\,(1 \pm t_b)
+$$
+
+Code: `apps/web/src/lib/lot-rows.ts`, `lotLoad` (the burn-coefficient move of `interiorApply` in `packages/core/src/interior/range.ts`).
+
+The rows show the simulated effect of a powder lot that burns faster or slower than the record. They are not a prediction of a lot, and barrel time is a computed value of the model.
+
 ## Symbols
 
 | Symbol | Meaning | Stored unit | Unit in `core` |
@@ -76,6 +88,8 @@ Code: `packages/core/src/interior/range.ts`, `pressureToleranceDefaults`.
 | $p_\text{nom}$ | Nominal peak pressure | bar | Pa |
 | $p_\text{low}$, $p_\text{high}$ | Lowest and highest peak pressure of the range | bar | Pa |
 | $s_q$ | Side that raises the pressure | 1 | 1 |
+| $b$, $b^{\pm}$ | Burn coefficient (vivacity or geometric coefficient) and its values at the two lots | as the burn law | as the burn law |
+| $t_b$ | Burn-rate change of the lot rows | 1 | 1 |
 
 ## Assumptions
 

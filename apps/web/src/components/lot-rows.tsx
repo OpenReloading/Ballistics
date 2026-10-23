@@ -1,0 +1,95 @@
+'use client'
+
+import { Button, NumberInput, Text } from '@mantine/core'
+import dynamic from 'next/dynamic'
+import type { FieldSpec } from '../lib/field-spec.ts'
+import { defaultLotFraction, maxLotFraction } from '../lib/lot-rows.ts'
+import { controlSize } from '../lib/theme.ts'
+import type { UnitSystem } from '../lib/units.ts'
+import { NumberField } from './number-field.tsx'
+import type { LotRows } from './use-lot-rows.ts'
+
+const LotChart = dynamic(() => import('./lot-chart.tsx').then((m) => m.LotChart), {
+  ssr: false,
+  loading: () => <div className="chart lot-chart" />,
+})
+
+const fractionSpec: FieldSpec = {
+  key: 'lotFraction',
+  label: 'Lot burn rate change',
+  help: 'The two extra rows of each charge burn this much faster and slower than the powder record.',
+  quantity: 'percent',
+  required: true,
+  min: 0,
+  max: maxLotFraction * 100,
+  positive: true,
+  initial: defaultLotFraction,
+}
+
+/** What the lot rows say about barrel time: a computed value of the simulation. */
+export const lotNote =
+  'Lot rows: the burn rate of each charge raised and lowered. Barrel time is a computed value of the simulation, not a measurement.'
+
+/** The chart of the lot rows' barrel times, with the note under it; nothing before the rows arrive. */
+export function LotChartBlock({ lot, system }: { lot: LotRows; system: UnitSystem }) {
+  if (!lot.rows) return null
+  return (
+    <>
+      <LotChart
+        times={lot.rows.times}
+        fraction={lot.rows.fraction}
+        target={lot.targetSeconds}
+        system={system}
+      />
+      <p className="note lot-note">{lotNote}</p>
+    </>
+  )
+}
+
+/** The fields of the lot rows, the status of their request and the chart. */
+export function LotPanel({ lot, system }: { lot: LotRows; system: UnitSystem }) {
+  const first = lot.error
+  const failed = lot.message && `Lot rows failed: ${lot.message}`
+  const text = first ?? (lot.pending ? 'Lot rows pending' : failed)
+  return (
+    <section className="lot-rows" aria-labelledby="lot-rows-title">
+      <h3 id="lot-rows-title">Powder lot rows</h3>
+      <div className="lot-fields">
+        <NumberField
+          spec={fractionSpec}
+          system={system}
+          value={lot.percent}
+          onChange={lot.setPercent}
+          error={first}
+          hiddenError
+        />
+        <NumberInput
+          label="Target barrel time"
+          description="Optional: a line on the chart."
+          hideControls
+          min={0}
+          decimalScale={3}
+          value={lot.target}
+          onChange={lot.setTarget}
+          rightSection={
+            <Text size="xs" c="dimmed" pr="xs">
+              ms
+            </Text>
+          }
+          rightSectionWidth={36}
+        />
+      </div>
+      <p className="barrel-status" data-error={first ? '' : undefined} role="status">
+        <span className="barrel-status-text" title={text}>
+          {text}
+        </span>
+        {!first && !lot.pending && lot.message && (
+          <Button size={controlSize.row.button} variant="default" ml="xs" onClick={lot.retry}>
+            Retry
+          </Button>
+        )}
+      </p>
+      <LotChartBlock lot={lot} system={system} />
+    </section>
+  )
+}
