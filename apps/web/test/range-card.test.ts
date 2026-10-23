@@ -29,9 +29,38 @@ describe('range card', () => {
       'Velocity (ft/s)',
       'Energy (ft·lbf)',
       'Time (s)',
-      'Clicks, notes',
+      'Notes',
     ])
     expect(rangeCardColumns(presetUnits('metric-grains'))[2]).toBe('Elevation (mrad)')
+  })
+
+  it('gives the holds in clicks and the wind brackets per 1 m/s and per 1 mph', () => {
+    const us = presetUnits('us')
+    // a quarter MOA click: the elevation of 1 MOA is 4 clicks
+    const extras = { click: moa / 4, wind: { mps: [0.5 * moa], mph: [0.2 * moa] } }
+    expect(rangeCardColumns(us, extras)).toEqual([
+      'Range (yd)',
+      'Height (in)',
+      'Elevation (MOA / clicks)',
+      'Windage (MOA)',
+      'Velocity (ft/s)',
+      'Energy (ft·lbf)',
+      'Time (s)',
+      'Wind per 1 m/s (MOA / clicks)',
+      'Wind per 1 mph (MOA / clicks)',
+      'Notes',
+    ])
+    expect(rangeCardRows([point], us, extras)[0]).toEqual([
+      '100',
+      '-1.0',
+      '1.00 / 4.0',
+      '-2.00',
+      '2625',
+      '2213',
+      '0.123',
+      '0.50 / 2.0',
+      '0.20 / 0.8',
+    ])
   })
 
   it('heads the card with the inputs of the result', () => {

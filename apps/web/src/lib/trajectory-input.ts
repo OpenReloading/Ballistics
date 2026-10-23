@@ -10,6 +10,7 @@ import {
   trajectory,
 } from '@openreloading/core'
 import type { FieldSpec } from './field-spec.ts'
+import { metersPerSecondPerMph } from './units.ts'
 
 /** Points of the chart, evenly spaced from 0 to the largest range. */
 const chartPoints = 101
@@ -188,6 +189,36 @@ export function manualProjectile(values: Values, model: DragModel): Projectile {
   }
 }
 
+/**
+ * The windage hold the shot needs per 1 m/s and per 1 mph of wind from the right at each of
+ * `points`, as a difference to the shot without wind, rad. Magnitudes: wind from the left holds the
+ * other way.
+ */
+function windPerUnit(shot: TrajectoryInput, points: readonly TrajectoryPoint[]) {
+  const ranges = points.map((p) => p.range)
+  const { wind: _, ...calm } = shot
+  const hold = (speed: number) => {
+    const t = trajectory(
+      speed > 0
+        ? {
+            ...calm,
+            wind: [
+              { endDistance: 2 * (ranges.at(-1) ?? 0) + 1, speed, fromDirection: Math.PI / 2 },
+            ],
+          }
+        : calm,
+      ranges,
+    )
+    return new Map(t.points.map((p) => [p.range, p.windageHold]))
+  }
+  const base = hold(0)
+  const per = (speed: number) => {
+    const run = hold(speed)
+    return ranges.map((r) => Math.abs((run.get(r) ?? 0) - (base.get(r) ?? 0)))
+  }
+  return { mps: per(1), mph: per(metersPerSecondPerMph) }
+}
+
 export type TrajectoryResult = {
   trajectory: Trajectory
   /** Points at the table ranges. */
@@ -196,6 +227,8 @@ export type TrajectoryResult = {
   chartPoints: TrajectoryPoint[]
   /** Zero range used, m. */
   zeroRange: number
+  /** Windage hold per 1 m/s and per 1 mph of crosswind at each table point, rad. */
+  windPerUnit: { mps: number[]; mph: number[] }
   /** Density altitude of the shot's air, m. */
   densityAltitude: number
   /** Where Miller's factor first falls below `minStability` along the flight; none without length and twist. */
@@ -226,11 +259,13 @@ export function trajectoryResult(
   const byRange = new Map(t.points.map((pt) => [pt.range, pt]))
   // an early stop leaves out the ranges past it
   const pick = (ranges: number[]) => ranges.flatMap((r) => byRange.get(r) ?? [])
+  const tablePoints = pick(table)
   return {
     trajectory: t,
-    tablePoints: pick(table),
+    tablePoints,
     chartPoints: pick(chart),
     zeroRange: requireValue(values, shotFields, 'zeroRange'),
+    windPerUnit: windPerUnit(shot, tablePoints),
     densityAltitude: densityAltitude(shot.air),
     ...(low && { lowStability: low }),
   }

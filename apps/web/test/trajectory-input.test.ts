@@ -89,6 +89,23 @@ describe('trajectoryResult', () => {
     expect(Math.abs(r.tablePoints[1].height)).toBeLessThan(1e-5)
   })
 
+  it('gives the windage hold per 1 m/s and per 1 mph of crosswind at each table point', () => {
+    const r = trajectoryResult(values, projectile, 'right')
+    const { mps, mph } = r.windPerUnit
+    expect(mps).toHaveLength(r.tablePoints.length)
+    expect(mps[0]).toBeCloseTo(0, 9)
+    // wind drift grows with range, and 1 mph is 0.44704 m/s of the same effect
+    expect(mps[5]).toBeGreaterThan(mps[2])
+    expect(mph[5] / mps[5]).toBeCloseTo(0.44704, 2)
+    // the wind of the shot itself is not part of the bracket
+    const windy = trajectoryResult(
+      { ...values, windSpeed: 5, windFrom: Math.PI / 2 },
+      projectile,
+      'right',
+    )
+    expect(windy.windPerUnit.mps[5]).toBeCloseTo(mps[5], 9)
+  })
+
   it('gives the density altitude of the standard sea-level air as 0', () => {
     expect(trajectoryResult(values, projectile, 'right').densityAltitude).toBeCloseTo(0, 6)
   })
