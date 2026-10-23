@@ -122,6 +122,8 @@ test('a federation narrows the disciplines, a discipline its faces, and a face s
   const federation = page.getByRole('combobox', { name: 'Federation', exact: true })
   await expect(federation.locator('option[value="dsb"]')).toBeAttached()
   await federation.selectOption('dsb')
+  // a federation alone narrows the face list to its faces
+  await expect(scoreFace(page).locator('option[value="bdmp-nr1-100m"]')).toHaveCount(0)
   const discipline = page.getByRole('combobox', { name: 'Discipline', exact: true })
   await discipline.fill('Zentralfeuer')
   await page
@@ -133,6 +135,7 @@ test('a federation narrows the disciplines, a discipline its faces, and a face s
   await expect(page.getByRole('combobox', { name: 'Event', exact: true })).toHaveCount(0)
   // a face picked from every face shows the federation of its discipline
   await scoreFace(page).selectOption('')
+  await federation.selectOption('')
   await scoreFace(page).selectOption('bdmp-nr1-100m')
   await expect(federation).toHaveValue('bdmp')
 })

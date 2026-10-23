@@ -158,3 +158,25 @@ test('the Trajectory tab keeps its inputs when another tab is opened and it is o
   await page.getByRole('tab', { name: 'Trajectory', exact: true }).click()
   await expect(step).toHaveValue('50')
 })
+
+test('the Gun card keeps its weight error, firearm query and focus when the window height crosses 45em', async ({
+  page,
+}) => {
+  test.setTimeout(60_000)
+  await page.setViewportSize({ width: 1280, height: 800 })
+  await runExample(page)
+  const weight = page.getByLabel(/^Gun weight/)
+  await weight.fill('0')
+  await weight.blur()
+  await expect(weight).toHaveAttribute('aria-invalid', 'true')
+  const firearm = page.getByRole('combobox', { name: 'Firearm from your library' })
+  await firearm.fill('rifle')
+  await firearm.focus()
+  for (const height of [650, 800]) {
+    await page.setViewportSize({ width: 1280, height })
+    await expect(page.locator('.panels')).toBeVisible()
+    await expect(weight).toHaveAttribute('aria-invalid', 'true')
+    await expect(firearm).toHaveValue('rifle')
+    await expect(firearm).toBeFocused()
+  }
+})

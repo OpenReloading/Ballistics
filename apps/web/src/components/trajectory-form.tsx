@@ -415,14 +415,17 @@ function ResultDetail({
         {chartEl}
       </div>
       {tableEl}
-      <MovingTarget points={rows} system={system} />
-      <HitProbability
-        points={rows}
-        windPerUnit={result.windPerUnit.mps}
-        wind={{ speed: result.si.windSpeed ?? 0, from: result.si.windFrom ?? Math.PI / 2 }}
-        bulletDiameter={result.bulletDiameter}
-        system={system}
-      />
+      <details className="values-details">
+        <summary>Moving target and hit probability</summary>
+        <MovingTarget points={rows} system={system} />
+        <HitProbability
+          points={rows}
+          windPerUnit={result.windPerUnit.mps}
+          wind={{ speed: result.si.windSpeed ?? 0, from: result.si.windFrom ?? Math.PI / 2 }}
+          bulletDiameter={result.bulletDiameter}
+          system={system}
+        />
+      </details>
     </>
   )
 }
