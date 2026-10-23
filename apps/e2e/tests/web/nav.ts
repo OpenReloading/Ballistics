@@ -3,6 +3,9 @@ import type { Page } from '@playwright/test'
 /** The `safety-ack` value of an accepted Safety dialog (`apps/web/src/components/safety-dialog.tsx`). */
 export const safetyAck = '3'
 
+/** The `first-run-done` value of a finished first-run step (`apps/web/src/components/first-run-dialog.tsx`). */
+export const firstRunDone = '1'
+
 /**
  * Opens `path` and waits for `html[data-hydrated]` and the page bar's `h1[data-hydrated]`: a click or
  * a key before React hydrates the page does nothing, and the page hydrates after the layout.

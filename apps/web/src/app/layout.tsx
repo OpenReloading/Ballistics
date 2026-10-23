@@ -61,6 +61,7 @@ import '@mantine/spotlight/styles.layer.css'
 import './globals.css'
 import { Container, mantineHtmlProps } from '@mantine/core'
 import type { Metadata, Viewport } from 'next'
+import { FirstRunDialog } from '../components/first-run-dialog.tsx'
 import { OfflineLayer } from '../components/offline-layer.tsx'
 import { PageShell } from '../components/page-shell.tsx'
 import { Providers } from '../components/providers.tsx'
@@ -110,6 +111,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
           </a>
           <ResultsSkipLink />
           <SafetyDialog />
+          <FirstRunDialog />
           <OfflineLayer />
           {/* Mantine AppShell for the header and sidebar; the workbench makes .page-top a full-height column (globals.css) */}
           <PageShell>

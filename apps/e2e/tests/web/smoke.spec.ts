@@ -1,5 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
-import { gotoHydrated, safetyAck } from './nav.ts'
+import { firstRunDone, gotoHydrated, safetyAck } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { applyExampleLoad, loadForm } from './workbench.ts'
 import { runLine } from './workbench-run.ts'
@@ -83,7 +83,15 @@ test('the Pages workbench runs the example load in the browser as the API does',
     serviceWorkers: 'block',
     storageState: {
       cookies: [],
-      origins: [{ origin: webUrl, localStorage: [{ name: 'safety-ack', value: safetyAck }] }],
+      origins: [
+        {
+          origin: webUrl,
+          localStorage: [
+            { name: 'safety-ack', value: safetyAck },
+            { name: 'first-run-done', value: firstRunDone },
+          ],
+        },
+      ],
     },
   })
   const expected = await exampleResult(server, `${webUrl}/workbench`)
