@@ -34,6 +34,7 @@ Fastify HTTP API (TypeScript, ESM) exposing `@openreloading/core` and the data r
   - Absent without a value: `country` (ISO code of the manufacturer's country) of a powder or bullet, the bullet's `tipType` (the record's tip type) and `construction` (the record's construction structure, else the core material as `<material>-core`).
   - `GET /powders/:id`, `GET /bullets/:id`: the whole record.
 - `GET /target-faces`: `{ total, items: [{ id, organization, name, caliberClasses, categories }] }`, every face. `caliberClasses`: the caliber classes of the disciplines mapped to it. `categories`: those of its events and those disciplines. `GET /target-faces/:id`: the whole record.
+- The competition lists (`GET /federations`, `/disciplines`, `/target-faces`, `/target-mappings`) are sorted in `src/db/competition-queries.ts` with the comparators of `@openreloading/schema` (`src/competition-order.ts`), so the order is part of the answer.
 - `GET /federations`, `GET /disciplines?federation=`, `GET /target-mappings?discipline=&face=` and their `/:id` routes (`src/routes/federations.ts`): summaries and records as `apps/docs/docs/data/federations.md` lists them. An unknown filter id gives no items.
 
 Compute (`src/routes/compute.ts`):

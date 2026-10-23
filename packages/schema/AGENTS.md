@@ -6,6 +6,7 @@ Zod schemas for records, ESM. The build writes JSON Schema files to `dist/json-s
 - `TargetFace`: rule-book target faces for ring scoring. Optional ring colours, paper size, bulls, ovals and event category. Strict events.
 - `Federation`, `Discipline` and `TargetMapping` (`src/federation.ts`): strict objects, `apps/docs/docs/data/federations.md`.
 - `Manufacturer` (`src/manufacturer.ts`): strict object, referenced by id from powders and bullets, `apps/docs/docs/data/manufacturers.md`.
+- Default order of federations, disciplines, target faces, face events and mappings (`src/competition-order.ts`): the API sorts its lists with it and the web app imports it, rules in `apps/docs/docs/data/federations.md`.
 - Caliber class vocabulary `caliberClasses` (`src/caliber-class.ts`).
 
 ## Commands (this directory, or `-w @openreloading/schema` from the root)

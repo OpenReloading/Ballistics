@@ -19,7 +19,7 @@ import {
   mappedFace,
   mappingOf,
 } from '../lib/face-disciplines.ts'
-import { compareEvents, compareNames, federationFaceIds } from '../lib/face-order.ts'
+import { compareEvents, compareTargetFaces, federationFaceIds } from '../lib/face-order.ts'
 import {
   type FaceSummary,
   fetchAllFaces,
@@ -384,8 +384,8 @@ export function useRingScoring({
                 : []
               : list
                   .filter((f) => !inFederation || inFederation.has(f.id) || f.id === choice?.id)
-                  .map((f) => ({ value: f.id, label: `${f.organization} ${f.name}` }))
-                  .toSorted((a, b) => compareNames(a.label, b.label))),
+                  .toSorted(compareTargetFaces)
+                  .map((f) => ({ value: f.id, label: `${f.organization} ${f.name}` }))),
         ]
 
   const panel = group && (

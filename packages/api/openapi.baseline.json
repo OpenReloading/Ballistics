@@ -1495,7 +1495,7 @@
         "operationId": "getDisciplines",
         "tags": ["Competition"],
         "summary": "List disciplines",
-        "description": "The disciplines of every federation, or of one, with number, category and shooting distance (mm).",
+        "description": "The disciplines of every federation, or of one, with number, category and shooting distance (mm), ordered by federation, then the federation's own number (first code, numeric parts in numeric order), then distance and name. Disciplines without a number follow, by category, distance and name.",
         "parameters": [
           {
             "name": "federation",
@@ -8963,7 +8963,7 @@
         "operationId": "getFederations",
         "tags": ["Competition"],
         "summary": "List federations",
-        "description": "Every shooting federation with its abbreviation, country and international federation.",
+        "description": "Every shooting federation with its abbreviation, country and international federation, ordered by abbreviation.",
         "parameters": [],
         "responses": {
           "200": {
@@ -17077,7 +17077,7 @@
         "operationId": "getTargetFaces",
         "tags": ["Competition"],
         "summary": "List target faces",
-        "description": "Every target face with its organization, the caliber classes of the disciplines mapped to it and the categories of its events and those disciplines.",
+        "description": "Every target face with its organization, the caliber classes of the disciplines mapped to it and the categories of its events and those disciplines. Ordered by organization, then the code printed in the name, then name.",
         "parameters": [],
         "responses": {
           "200": {
@@ -17732,7 +17732,7 @@
         "operationId": "getTargetMappings",
         "tags": ["Competition"],
         "summary": "List target mappings",
-        "description": "Which target face a discipline shoots, per event and stage, with the scoring gauge diameter (mm) where one applies.",
+        "description": "Which target face a discipline shoots, per event and stage, with the scoring gauge diameter (mm) where one applies, in the order of the disciplines.",
         "parameters": [
           {
             "name": "discipline",

@@ -78,18 +78,41 @@ Served under `/v1` (`packages/api/src/routes/federations.ts`). Each `/:id` route
 | `GET /disciplines?federation=` | `{ id, federation, name, number?, distanceMm, category? }` |
 | `GET /target-mappings?discipline=&face=` | `{ id, discipline, face, event, stage?, gaugeMm? }`, `gaugeMm` in mm |
 
-Each list answers `{ total, items }`. `GET /target-faces` lists per face the caliber classes of the disciplines mapped to it (`caliberClasses`) and the categories of its events and those disciplines (`categories`).
+Each list answers `{ total, items }` in the default order below. `GET /target-faces` lists per face the caliber classes of the disciplines mapped to it (`caliberClasses`) and the categories of its events and those disciplines (`categories`).
+
+## Default order
+
+One set of comparators (`packages/schema/src/competition-order.ts`) orders every list: the REST lists, the discipline and target face directories, the discipline table of a face page, the face table of a discipline page and the pickers of the group panel. The directories show the API's order until a column header is clicked, which sorts by that column instead.
+
+| Entity | Order |
+|---|---|
+| Federation | Abbreviation |
+| Discipline | Federation, then its own code (below), then distance, then name |
+| Target face | Organization, then the code printed in the name (BDS `(Z2)` before `(Z18)`; faces with a code first), then name |
+| Face event | Distance ascending, then name |
+| Target mapping | Order of its discipline, then face id, then id |
+
+Names are alphabetical with numbers in numeric order (25 before 100). The code of a discipline, per federation:
+
+| Federation | Numbers | Order |
+|---|---|---|
+| BDS | `2101`, group codes `10xx`, `73xx` | By value, `x` read as `0`: `73xx` is 7300, after `4110` |
+| DSB | Section and item, `1.10`, several codes joined by `/` | The first code, each dotted segment numeric: `1.9`, `1.10`, `1.37/1.51/1.54`, `2.20` |
+| DSU, BDMP, VdRBw | Prefix and number, `LDG 2`, `G-H 6`, `SP3` | Prefix, then the number, then any text after it. Several codes by the first. Some BDMP and DSB records have no number |
+| ISSF | None | By category (the order of `disciplineCategory`: air rifle, air pistol, rifle, pistol, ...), then distance, then name |
+
+A discipline without a number follows the numbered ones of its federation and is ordered like ISSF.
 
 ## Ring scoring
 
 The group panel of `/groups` (`apps/web/src/components/ring-scoring.tsx`, `apps/web/src/lib/face-disciplines.ts`) has these lists:
 
 1. Federation: All, or one federation, by abbreviation.
-2. Discipline: the disciplines of that federation, by number then name. With All, every federation in turn, then the face events no mapping names by organization and name.
+2. Discipline: the disciplines of that federation in the default order. With All, every federation in turn, then the face events no mapping names by organization and name.
 3. Face: the faces of the discipline's mappings with their stage, in the order of the stages, else every face by name. With only a federation chosen, the faces its disciplines map to and the faces it publishes.
 4. Event: only for a face no mapping names, by distance ascending, then name.
 
-Names are alphabetical with numbers in numeric order (25 before 100). The same comparators order the filters of the discipline and target face directories (`apps/web/src/lib/face-order.ts`).
+The lists use the default order above (`apps/web/src/lib/face-order.ts` re-exports the comparators). The faces of one federation in the face list are in the order of target faces.
 
 A group stores the face id and the face event name, so the discipline follows from its mapping when the sheet is opened again.
 

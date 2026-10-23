@@ -1,5 +1,11 @@
 /** The target face list's rows and filter, and a face record's value groups and event rows. */
-import type { TargetFace, TargetMapping } from '@openreloading/schema'
+import {
+  compareDisciplines,
+  compareNames,
+  type DisciplineKey,
+  type TargetFace,
+  type TargetMapping,
+} from '@openreloading/schema'
 import type { DirectoryState } from './directory.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
 import { matchesQuery } from './lists.ts'
@@ -148,7 +154,7 @@ type FaceEventRow = {
   section?: string
 }
 
-/** One row per event of the face (one per mapping where several map it), by federation, number and name. */
+/** One row per event of the face (one per mapping where several map it), in the order of `compareDisciplines`, then by stage. */
 export function faceEventRows(
   f: Pick<TargetFace, 'organization' | 'events'>,
   mappings: readonly (Pick<
@@ -161,7 +167,6 @@ export function faceEventRows(
 ): FaceEventRow[] {
   const byId = new Map(disciplines.map((d) => [d.id, d]))
   const abbreviation = new Map(federations.map((x) => [x.id, x.abbreviation]))
-  const collator = new Intl.Collator('en', { numeric: true })
   return f.events
     .flatMap((e) => {
       const own = mappings.filter((m) => m.event === e.name)
@@ -176,12 +181,21 @@ export function faceEventRows(
         // an event without its section: the page the mapping's source cites for it
         const section =
           e.section ?? m?.provenance?.sources.find((x) => x.fields?.includes('event'))?.page
+        const federation = d
+          ? (abbreviation.get(d.federation) ?? d.federation)
+          : (e.organization ?? f.organization)
+        const key: DisciplineKey = {
+          federation,
+          number: d?.number,
+          name: d?.name ?? e.name,
+          category: d?.category ?? e.category,
+          distanceMm: d?.distanceMm ?? e.distance.value,
+        }
         return {
+          key,
           id: m?.id ?? e.name,
           ...(d && { disciplineId: d.id }),
-          federation: d
-            ? (abbreviation.get(d.federation) ?? d.federation)
-            : (e.organization ?? f.organization),
+          federation,
           ...(d?.number && { number: d.number }),
           discipline: d?.name ?? e.name,
           ...(m?.stage && { stage: m.stage }),
@@ -192,11 +206,6 @@ export function faceEventRows(
         }
       })
     })
-    .sort(
-      (a, b) =>
-        collator.compare(a.federation, b.federation) ||
-        collator.compare(a.number ?? '', b.number ?? '') ||
-        collator.compare(a.discipline, b.discipline) ||
-        collator.compare(a.stage ?? '', b.stage ?? ''),
-    )
+    .sort((a, b) => compareDisciplines(a.key, b.key) || compareNames(a.stage ?? '', b.stage ?? ''))
+    .map(({ key: _, ...row }) => row)
 }
