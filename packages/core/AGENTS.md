@@ -26,6 +26,7 @@ Pure TypeScript ballistics solver, ESM. Must stay headless: no runtime dependenc
   - Gas leakage (`leakage`, `leakFlowFactor`) and the heat-loss defaults (`convectiveDefaults`): `apps/docs/docs/models/interior-leakage-heat.md`.
 - `src/interior/form.ts`: burn laws and form functions (`apps/docs/docs/models/interior-burn-forms.md`), one entry per grain shape and per vivacity form with its form function and its shape-specific checks.
 - `src/interior/fit.ts`: `fitPowder`, `PowderFitError` (`apps/docs/docs/models/interior-powder-fit.md`). Weighted least-squares fit of the M3 burn coefficient and, on request, the start pressure to a chronograph ladder (mean muzzle velocities, optional peak pressures), with optional Gaussian priors and a Huber loss. One `interior` run per distinct charge and evaluation.
+  - `predictPowder`: muzzle velocity and peak pressure of a fit at any charge with standard uncertainty and interval from the log-parameter covariance (`PowderFit.covariance`); `extrapolation` outside `chargeRange`. Parameter uncertainty only.
 - `src/least-squares.ts`:
   - `logLeastSquares`: the Levenberg-Marquardt loop on log parameters with the conditioning check and covariance, shared by truing and the powder fit.
   - `huber.ts`: the Huber loss and its reweighting for `logLeastSquares` (`huber` input; the powder fit's `huberThreshold`).

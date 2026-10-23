@@ -1,10 +1,13 @@
 /**
  * Powder fit: fits the burn coefficient and, on request, the start pressure of the M3 interior
  * model to a chronograph ladder by weighted least squares, with optional Gaussian priors and a
- * Huber loss, `apps/docs/docs/models/interior-powder-fit.md`.
+ * Huber loss, and the prediction band of the fitted load at any charge,
+ * `apps/docs/docs/models/interior-powder-fit.md`.
  * Every evaluation runs `interior` once per distinct charge. SI in and out.
  */
 import { InputError, need } from '../errors.ts'
+import { chiSquareQuantile } from '../groups/chi-square.ts'
+import { studentTwoSidedQuantile } from '../groups/student-t.ts'
 import { logLeastSquares } from '../least-squares.ts'
 import {
   type InteriorInvalid,
@@ -110,6 +113,13 @@ export interface PowderFit {
   parameters: FittedPowderParameter[]
   /** Absent like `standardUncertainty`. */
   correlation?: number[][]
+  /**
+   * Covariance of the log parameters of `PowderParameter` order (the fit's theta, relative to each
+   * parameter's initial value); absent like `standardUncertainty`. `predictPowder` propagates it.
+   */
+  covariance?: number[][]
+  /** Whether the ladder carried velocity uncertainties; without them the covariance is scaled by the residual. */
+  weighted: boolean
   /** One row per velocity, then pressure, of each ladder point in input order. */
   residuals: PowderFitResidual[]
   /** Sum of squared residuals over sigma (sigma 1 where the ladder has none), plus `priorChiSquare`. */
@@ -426,6 +436,8 @@ export function fitPowder(
         : {}),
     })),
     ...(fit.correlation ? { correlation: fit.correlation } : {}),
+    ...(fit.covariance ? { covariance: fit.covariance } : {}),
+    weighted: withSigma > 0,
     residuals: rows.map((o, i) => ({
       kind: o.kind,
       charge: o.charge,
@@ -444,6 +456,104 @@ export function fitPowder(
     conditionNumber: fit.conditionNumber,
     chargeRange: { min: Math.min(...charges), max: Math.max(...charges) },
     iterations: fit.iterations,
+    runCount,
+  }
+}
+
+/** Options of `predictPowder`. */
+export interface PowderPredictionOptions {
+  /** Coverage of the interval, in (0, 1); default 0.9. */
+  level?: number
+  /** Integration settings of the `interior` runs; use the fit's own, default `interiorDefaults`. */
+  options?: Partial<InteriorOptions>
+}
+
+/** A predicted value with its parameter uncertainty and interval. */
+export interface PowderPredictionBand {
+  /** Value of `interior` at the fitted parameters: m/s or Pa. */
+  value: number
+  /** Standard uncertainty from the parameter covariance only, same unit. */
+  standardUncertainty: number
+  /** Lower end of the interval, same unit. */
+  lower: number
+  /** Upper end of the interval, same unit. */
+  upper: number
+}
+
+/** Prediction of the fitted load at one charge; parameter uncertainty only, no model error. */
+export interface PowderPrediction {
+  /** Charge mass, kg. */
+  charge: number
+  /** Coverage of the intervals. */
+  level: number
+  /** Muzzle velocity. */
+  velocity: PowderPredictionBand
+  /** Peak breech pressure. */
+  pressure: PowderPredictionBand
+  /** Set where the charge lies outside the ladder's `chargeRange`: below or above it. */
+  extrapolation?: 'below' | 'above'
+  /** `interior` runs of the prediction. */
+  runCount: number
+}
+
+/**
+ * Muzzle velocity and peak breech pressure of a fitted powder at `charge`, with the standard
+ * uncertainty and the interval that the covariance of the fitted parameters gives
+ * (`apps/docs/docs/models/interior-powder-fit.md`, "Prediction at a charge"). Needs the covariance
+ * of the fit: a ladder with more rows than parameters or with velocity sigmas.
+ */
+export function predictPowder(
+  fit: PowderFit,
+  charge: number,
+  options: PowderPredictionOptions = {},
+): PowderPrediction {
+  const { level = 0.9 } = options
+  need(Number.isFinite(charge) && charge > 0, 'charge must be positive')
+  need(level > 0 && level < 1, 'level must lie in (0, 1)')
+  const { covariance } = fit
+  if (!covariance) throw new InputError('the fit has no covariance: add rows or velocity sigmas')
+  const names = fit.parameters.map((p) => p.name)
+  const { apply, q } = powderParameterMap(fit.load, names, startPressureFloor(fit.load))
+  let runCount = 0
+  const run = (theta: number[]) => {
+    runCount++
+    const r = interior({ ...apply(q(theta)), charge }, options.options)
+    if (!r.valid) throw new PowderFitError('invalid', { charge, result: r })
+    return [r.muzzleVelocity, r.peakBreechPressure]
+  }
+  const zero = names.map(() => 0)
+  const [velocity, pressure] = run(zero)
+  // gradient of both outputs in the log parameters, by central differences
+  const gradient = names.map((_, j) => {
+    const at = (d: number) => run(zero.map((x, k) => (k === j ? x + d : x)))
+    const [vu, pu] = at(1e-3)
+    const [vd, pd] = at(-1e-3)
+    return [(vu - vd) / 2e-3, (pu - pd) / 2e-3]
+  })
+  const quantile = fit.weighted
+    ? Math.sqrt(chiSquareQuantile(level, 1))
+    : studentTwoSidedQuantile(level, fit.degreesOfFreedom)
+  const band = (value: number, i: number): PowderPredictionBand => {
+    const variance = gradient.reduce(
+      (sum, gj, j) => sum + gj[i] * gradient.reduce((s, gk, k) => s + covariance[j][k] * gk[i], 0),
+      0,
+    )
+    const standardUncertainty = Math.sqrt(Math.max(variance, 0))
+    return {
+      value,
+      standardUncertainty,
+      lower: value - quantile * standardUncertainty,
+      upper: value + quantile * standardUncertainty,
+    }
+  }
+  const { min, max } = fit.chargeRange
+  return {
+    charge,
+    level,
+    velocity: band(velocity, 0),
+    pressure: band(pressure, 1),
+    ...(charge < min ? { extrapolation: 'below' as const } : {}),
+    ...(charge > max ? { extrapolation: 'above' as const } : {}),
     runCount,
   }
 }
