@@ -321,7 +321,13 @@
                       "properties": {
                         "type": {
                           "type": "string",
-                          "enum": ["flat", "boat-tail", "rebated-boat-tail"]
+                          "enum": [
+                            "flat",
+                            "boat-tail",
+                            "rebated-boat-tail",
+                            "conical-hollow-base",
+                            "rounded-hollow-base"
+                          ]
                         },
                         "length": {
                           "type": "object",
@@ -376,6 +382,24 @@
                           "required": ["value"],
                           "additionalProperties": false,
                           "unit": "deg"
+                        },
+                        "cavityDiameter": {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "description": "In mm."
+                            },
+                            "raw": {
+                              "type": "string",
+                              "minLength": 1,
+                              "description": "The value as written in the source, when it differed."
+                            }
+                          },
+                          "required": ["value"],
+                          "additionalProperties": false,
+                          "unit": "mm"
                         }
                       },
                       "additionalProperties": false
@@ -14907,7 +14931,7 @@
                                     "base.type": {
                                       "type": "string",
                                       "maxLength": 64,
-                                      "description": "Base type: `flat`, `boat-tail` or `rebated-boat-tail`. Empty: not chosen."
+                                      "description": "Base type: `flat`, `boat-tail`, `rebated-boat-tail`, `conical-hollow-base` or `rounded-hollow-base`. Empty: not chosen."
                                     },
                                     "ogive.form": {
                                       "type": "string",

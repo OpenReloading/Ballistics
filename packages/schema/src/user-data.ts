@@ -30,7 +30,7 @@ export const bulletDesign = z.object({
   choices: z
     .object({
       'base.type': text(64).describe(
-        'Base type: `flat`, `boat-tail` or `rebated-boat-tail`. Empty: not chosen.',
+        'Base type: `flat`, `boat-tail`, `rebated-boat-tail`, `conical-hollow-base` or `rounded-hollow-base`. Empty: not chosen.',
       ),
       'ogive.form': text(64).describe(
         'Ogive form: `tangent`, `secant`, `hybrid`, `round-nose` or `flat-nose`. Empty: not chosen.',

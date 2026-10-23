@@ -178,6 +178,7 @@ export function bulletDataGroups(b: BulletRecord): FieldGroup[] {
         ...text('Base type', b.base?.type),
         ...length('Base length', b.base?.length, 't'),
         ...length('Base diameter', b.base?.diameter, 'db'),
+        ...length('Cavity diameter', b.base?.cavityDiameter, 'dc'),
         // degrees and minutes on manufacturer sheets: the stored decimal degrees, not rounded to whole degrees
         ...(angle
           ? [

@@ -294,6 +294,44 @@ describe('bullet', () => {
     accepts({ base: { type: 'rebated-boat-tail', diameter: { value: 6.6 } } })
   })
 
+  it('takes a hollow base with its cavity diameter, alone or on a tail', () => {
+    const hollow = (type: string, fields: Record<string, unknown> = {}) => ({
+      length: { value: 30 },
+      base: { type, cavityDiameter: { value: 5 }, ...fields },
+    })
+    for (const type of ['conical-hollow-base', 'rounded-hollow-base']) {
+      accepts(hollow(type))
+      accepts(hollow(type, { length: { value: 3 }, diameter: { value: 6.6 }, angle: { value: 8 } }))
+      rejectsAt({ base: { type } }, 'base.cavityDiameter')
+    }
+    rejectsAt({ base: { type: 'flat', cavityDiameter: { value: 5 } } }, 'base.cavityDiameter')
+    rejectsAt({ base: { cavityDiameter: { value: 5 } } }, 'base.cavityDiameter')
+    rejectsAt({ base: { type: 'boat-tail', cavityDiameter: { value: 5 } } }, 'base.cavityDiameter')
+  })
+
+  it('keeps the cavity inside the base face and the tail inside the bullet', () => {
+    const hollow = (fields: Record<string, unknown>) => ({
+      length: { value: 30 },
+      base: { type: 'conical-hollow-base', ...fields },
+    })
+    rejectsAt(hollow({ cavityDiameter: { value: 7.823 } }), 'base.cavityDiameter')
+    rejectsAt(
+      hollow({ cavityDiameter: { value: 6.6 }, diameter: { value: 6.6 } }),
+      'base.cavityDiameter',
+    )
+    accepts(hollow({ cavityDiameter: { value: 6 }, diameter: { value: 6.6 } }))
+    rejectsAt(
+      {
+        length: { value: 5 },
+        base: { type: 'conical-hollow-base', cavityDiameter: { value: 12 } },
+      },
+      'base.cavityDiameter',
+    )
+    rejectsAt({ length: { value: 30 }, ...tail({ length: { value: 30 } }) }, 'base.length')
+    rejectsAt({ length: { value: 30 }, ...tail({ length: { value: 31 } }) }, 'base.length')
+    accepts({ length: { value: 30 }, ...tail({ length: { value: 5 } }) })
+  })
+
   it('rejects geometry values out of range', () => {
     rejectsAt({ meplatDiameter: { value: -0.1 } }, 'meplatDiameter')
     accepts({ meplatDiameter: { value: 0 } })
@@ -338,6 +376,7 @@ describe('bullet', () => {
       exclusiveMinimum: 0,
       exclusiveMaximum: 90,
     })
+    expect(value(base.properties?.cavityDiameter)).toMatchObject({ exclusiveMinimum: 0 })
     expect(value(ogive.properties?.radius)).toMatchObject({ exclusiveMinimum: 0 })
     expect(value(ogive.properties?.radiusRatio)).toMatchObject({ minimum: 0, maximum: 1 })
     expect(value(tip.properties?.length)).toMatchObject({ exclusiveMinimum: 0 })

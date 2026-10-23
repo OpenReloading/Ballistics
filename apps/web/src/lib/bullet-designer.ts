@@ -70,6 +70,7 @@ export const designerSpecs: DesignerSpec[] = [
   len('cannelure.depth', 'Cannelure depth', 'shank'),
   len('base.length', 'Boat-tail length', 'base'),
   len('base.diameter', 'Base diameter', 'base'),
+  len('base.cavityDiameter', 'Cavity diameter', 'base'),
   {
     key: 'base.angle',
     label: 'Boat-tail angle',
@@ -84,7 +85,13 @@ export const designerSpecs: DesignerSpec[] = [
 
 /** The choices, keyed by record path, with their options ('' for not given). */
 export const choiceOptions = {
-  'base.type': ['flat', 'boat-tail', 'rebated-boat-tail'],
+  'base.type': [
+    'flat',
+    'boat-tail',
+    'rebated-boat-tail',
+    'conical-hollow-base',
+    'rounded-hollow-base',
+  ],
   'ogive.form': ['tangent', 'secant', 'hybrid', 'round-nose', 'flat-nose'],
   'tip.type': ['hollow-point', 'polymer-tip', 'soft-point', 'full-metal-jacket', 'open-meplat'],
 } as const
@@ -127,8 +134,11 @@ export function fieldInUse(
 ) {
   // a value, or one in the catalogue record, keeps the field while it is cleared
   if (fields[key]?.text.trim() || origin?.si[key] !== undefined) return true
+  const hollow =
+    c['base.type'] === 'conical-hollow-base' || c['base.type'] === 'rounded-hollow-base'
   const tail = c['base.type'] === 'boat-tail' || c['base.type'] === 'rebated-boat-tail'
-  if (key.startsWith('base.')) return tail
+  if (key === 'base.cavityDiameter') return hollow
+  if (key.startsWith('base.')) return tail || hollow
   if (key.startsWith('ogive.'))
     return c['ogive.form'] !== 'round-nose' && c['ogive.form'] !== 'flat-nose'
   if (key === 'tip.length') return c['tip.type'] === 'polymer-tip'
@@ -408,6 +418,7 @@ function shapeFromValues(
       ...(v['base.length'] !== undefined && { length: v['base.length'] }),
       ...(v['base.diameter'] !== undefined && { diameter: v['base.diameter'] }),
       ...(v['base.angle'] !== undefined && { angle: v['base.angle'] }),
+      ...(v['base.cavityDiameter'] !== undefined && { cavityDiameter: v['base.cavityDiameter'] }),
     },
     ogive: {
       ...(form && { form }),
@@ -448,8 +459,9 @@ function derivedFills(
   const ratio = v['ogive.radiusRatio']
   const tag = (i: number) => (o.tags[i] === 'approximate' ? 'assumed' : 'derived')
   // a boat tail starts at a base edge inside the shank radius; its top is the next point
-  const tail = o.points[1][0] < d / 2 - 1e-12
-  const t = tail ? o.points[2][1] : 0
+  const e = o.baseEdge
+  const tail = o.points[e][0] < d / 2 - 1e-12
+  const t = tail ? o.points[e + 1][1] : 0
   const baseAssumed = o.approximate.some(([z]) => z === 0)
   const tipIndex = o.points.findIndex(([, z]) => z === L)
   const m = o.points[tipIndex][0]
@@ -465,13 +477,13 @@ function derivedFills(
     meplatDiameter: [2 * m, tag(tipIndex)],
   }
   if (tail) {
-    const tagT = tag(2)
-    const tagB = tag(1)
+    const tagT = tag(e + 1)
+    const tagB = tag(e)
     fill['base.length'] = [t, tagT]
-    fill['base.diameter'] = [2 * o.points[1][0], tagB]
-    const top = o.points[2]
+    fill['base.diameter'] = [2 * o.points[e][0], tagB]
+    const top = o.points[e + 1]
     fill['base.angle'] = [
-      (Math.atan((top[0] - o.points[1][0]) / t) * 180) / Math.PI,
+      (Math.atan((top[0] - o.points[e][0]) / t) * 180) / Math.PI,
       tagT === 'assumed' || tagB === 'assumed' ? 'assumed' : 'derived',
     ]
   }
@@ -560,6 +572,7 @@ export function sliderMax(key: string, design: Design): number {
     'ogive.radiusRatio': 1,
     meplatDiameter: d,
     'base.diameter': d,
+    'base.cavityDiameter': d,
     'tip.mouthDiameter': d,
     'base.angle': (30 * Math.PI) / 180,
     'cannelure.width': d,

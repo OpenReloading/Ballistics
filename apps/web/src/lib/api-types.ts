@@ -143,10 +143,16 @@ export interface BulletRecord {
   baseToOgive?: QuantityValue
   bearingLength?: QuantityValue
   base?: {
-    type?: 'flat' | 'boat-tail' | 'rebated-boat-tail'
+    type?:
+      | 'flat'
+      | 'boat-tail'
+      | 'rebated-boat-tail'
+      | 'conical-hollow-base'
+      | 'rounded-hollow-base'
     length?: QuantityValue
     diameter?: QuantityValue
     angle?: QuantityValue
+    cavityDiameter?: QuantityValue
   }
   ogive?: { form?: string; radius?: QuantityValue; radiusRatio?: QuantityValue }
   tip?: { type: string; length?: QuantityValue; mouthDiameter?: QuantityValue }

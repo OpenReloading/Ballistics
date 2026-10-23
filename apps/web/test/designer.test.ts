@@ -1,5 +1,5 @@
 import { face } from '@openreloading/drawing'
-import { bulletFigureModel } from '@openreloading/drawing/bullet'
+import { bulletFigureModel, bulletOutline } from '@openreloading/drawing/bullet'
 import { describe, expect, it } from 'vitest'
 import { computedBulletRows } from '../src/lib/bullet.ts'
 import {
@@ -380,5 +380,52 @@ describe('drafts', () => {
     expect(
       designShape({ ...d, siValues: { diameter: d.siValues.diameter } }, metric),
     ).toBeUndefined()
+  })
+})
+
+describe('hollow base', () => {
+  const hollow = () => {
+    const start = newDesign(metric)
+    return run(
+      { ...start, choices: { ...start.choices, 'base.type': 'conical-hollow-base' } },
+      type('length', '30'),
+      type('base.cavityDiameter', '5'),
+    ).present
+  }
+
+  it('shows the cavity diameter and the tail fields for a hollow base only', () => {
+    const d = hollow()
+    for (const key of ['base.cavityDiameter', 'base.length', 'base.diameter', 'base.angle'])
+      expect(fieldInUse(key, d)).toBe(true)
+    const flat = newDesign(metric)
+    expect(
+      fieldInUse('base.cavityDiameter', {
+        ...flat,
+        choices: { ...flat.choices, 'base.type': 'boat-tail' },
+      }),
+    ).toBe(false)
+  })
+
+  it('draws the cavity and seats the design with it', () => {
+    const d = hollow()
+    const e = evaluate(d, metric)
+    expect(e.drawing).toBeDefined()
+    expect(e.drawing?.given).toContain('base.cavityDiameter')
+    const shape = designShape(fileData(d), metric)
+    expect(shape?.base).toMatchObject({ type: 'conical-hollow-base' })
+    expect(shape?.base?.cavityDiameter).toBeCloseTo(5, 9)
+    const o = shape && bulletOutline(shape)
+    expect(o && !('reason' in o) && o.cavity).toMatchObject({ radius: 2.5 })
+  })
+
+  it('refuses a cavity as wide as the base at the cavity field', () => {
+    const d = hollow()
+    const e = evaluate(
+      reduce(historyOf(d), type('base.cavityDiameter', '9')).present,
+      metric,
+      'base.cavityDiameter',
+    )
+    expect(e.drawing).toBeUndefined()
+    expect(e.refusal?.field).toBe('base.cavityDiameter')
   })
 })
