@@ -162,17 +162,36 @@ describe('compareTargetFaces', () => {
   })
 })
 
-describe('compareMappings', () => {
-  it('follows the discipline order, then face id, then id', () => {
-    const m = (id: string, face: string, number: string) => ({
+describe('compareTargetFaces per organization', () => {
+  it.each([
+    ['BDMP', ['BDMP-Scheibe Nr. 1', 'BDMP-Scheibe Nr. 3', 'BDMP-Scheibe Nr. 10']],
+    ['BDS', ['BDS-50m-ZF-Scheibe (Z2)', 'BDS-300m-ZF-Scheibe (Z8)', 'BDS-PG-Scheibe (Z18)']],
+    ['DSB', ['Scheibe Nr. 2 (15 m Gewehr)', 'Scheibe Nr. 6 (Muskete 50 m)', 'Scheibe Nr. 10']],
+    ['DSU', ['DSU-Scheibe 25 Meter', 'DSU-Scheibe 200 Meter Präzision']],
+    ['ISSF', ['10m Air Rifle Target', '50m Rifle Target', '300m Rifle Target']],
+    ['VdRBw', ['Scheibe Bundeswehr Nr. 2', 'Scheibe Bundeswehr Nr. 2 klein']],
+  ])('%s', (organization, names) => {
+    const faces = names.map((name) => ({ organization, name }))
+    expect(faces.toReversed().sort(compareTargetFaces)).toEqual(faces)
+  })
+})
+
+describe('compareMappings per federation', () => {
+  it.each([
+    ['bdmp', ['SG 2', 'SG 10']],
+    ['bds', ['2101', '4110', '73xx']],
+    ['dsb', ['1.9', '1.10', '2.53/2.59/2.55']],
+    ['dsu', ['LDG 2', 'LDG 10']],
+    ['issf', [undefined]],
+    ['vdrbw', ['G-H 6', 'G-H 10']],
+  ])('%s: by discipline, then face, then id', (federation, codes) => {
+    const m = (id: string, face: string, number: string | undefined) => ({
       id,
       face,
-      discipline: d('bds', number),
+      discipline: d(federation, number),
     })
-    expect(
-      [m('c', 'f1', '4110'), m('b', 'f2', '2101'), m('a', 'f1', '2101'), m('d', 'f1', '73xx')]
-        .sort(compareMappings)
-        .map((x) => x.id),
-    ).toEqual(['a', 'b', 'c', 'd'])
+    const first = codes.map((c, i) => m(`a${i}`, 'f1', c))
+    const expected = [...first, m('b', 'f2', codes.at(-1)), m('c', 'f2', codes.at(-1))]
+    expect(expected.toReversed().sort(compareMappings)).toEqual(expected)
   })
 })
