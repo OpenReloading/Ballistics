@@ -200,6 +200,8 @@ Code: `packages/core/src/interior/model.ts`, `scaleInteriorLoad` (`tauT`, `coef`
 
 Without temperature sensitivities, $\tau_T = 1$.
 
+A powder record carries them as `temperatureSensitivity`: `reference` in K, `cold` and `hot` in 1/K (`packages/schema/src/powder.ts`). The workbench passes them to the run and offers the temperature ladder for such a powder; a powder without the field has none, so $\tau_T = 1$ for it.
+
 ### Scaled state and integration
 
 The state is scaled so that one absolute tolerance fits every component:

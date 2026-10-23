@@ -36,16 +36,16 @@ export const measuredSeries = z.object({
 })
 
 const ladderKind = z
-  .enum(['charge', 'seating'])
+  .enum(['charge', 'seating', 'temperature'])
   .describe(
-    'What the ladder varies: the charge, or the length the bullet is seated by (`seating.by`). Absent: the charge.',
+    'What the ladder varies: the charge, the length the bullet is seated by (`seating.by`) or the propellant temperature. Absent: the charge.',
   )
   .optional()
 const ladderStep = z
   .number()
   .positive()
   .describe(
-    'Step between ladder steps: kg for a charge ladder, m for a seating ladder. Absent until entered.',
+    'Step between ladder steps: kg for a charge ladder, m for a seating ladder, K for a temperature ladder. Absent until entered.',
   )
   .optional()
 

@@ -10,18 +10,57 @@ export const ladderKinds: readonly { value: LadderKind; label: string }[] = [
   { value: 'temperature', label: 'Temperature' },
 ]
 
-/** The kinds a ladder can run; the temperature kind is listed but unavailable. */
-export type RunnableLadderKind = Exclude<LadderKind, 'temperature'>
+/** The kinds a ladder can run. */
+export type RunnableLadderKind = LadderKind
+
+/** What a ladder of `kind` varies, as the page names it: "Charge", "Seating" or "Temperature". */
+export const ladderTitle = (kind: LadderKind) => ladderKinds.find((k) => k.value === kind)?.label
 
 /** A link's or file's ladder kind; anything else is the charge. */
 export const runKindOf = (v: string | null | undefined): RunnableLadderKind =>
-  v === 'seating' ? v : 'charge'
+  v === 'seating' || v === 'temperature' ? v : 'charge'
 
-/** Reason the temperature ladder is unavailable. Always set: no powder record has a temperature coefficient. */
-export function temperatureLadderBlockReason(powderLabel: string | undefined) {
+/**
+ * Why the temperature ladder cannot run, or undefined when it can: the model varies the burn rate
+ * with temperature only through the temperature sensitivity of the powder record.
+ */
+export function temperatureLadderBlockReason(
+  powderLabel: string | undefined,
+  hasSensitivity: boolean,
+) {
+  if (hasSensitivity) return
   return powderLabel
-    ? `${powderLabel} has no temperature coefficient, so the model cannot vary its burn rate with temperature.`
-    : 'No powder is chosen. The model varies the burn rate with temperature only through a temperature coefficient of the powder record, and no record has one yet.'
+    ? `${powderLabel} has no temperature sensitivity, so the model cannot vary its burn rate with temperature.`
+    : 'No powder is chosen. The model varies the burn rate with temperature only through the temperature sensitivity of the powder record.'
+}
+
+/** The values of a ladder: `start + i * step` up or down, or an odd count centred on `start`, lowest first. */
+function ladderValues(start: number, step: number, steps: number, direction: LadderDirection) {
+  return Array.from({ length: steps }, (_, i) =>
+    direction === 'around'
+      ? start + (i - (steps - 1) / 2) * step
+      : start + (direction === 'up' ? 1 : -1) * i * step,
+  )
+}
+
+/**
+ * The propellant temperatures of a temperature ladder from `start` (the Powder temperature field),
+ * K, or the reason it cannot run. `show` writes a temperature in the page's unit with its symbol.
+ */
+export function temperatureLadder(
+  start: number | undefined,
+  step: number,
+  steps: number,
+  direction: LadderDirection,
+  show: (k: number) => string,
+): { steps: number[] } | { error: string } {
+  if (start === undefined)
+    return { error: 'Powder temperature is empty: the temperature ladder starts from it.' }
+  const values = ladderValues(start, step, steps, direction)
+  const lo = Math.min(...values)
+  if (!(lo > 0))
+    return { error: `The ladder reaches ${show(lo)}: a temperature of 0 K or less is no state.` }
+  return { steps: values }
 }
 
 /** The length a bullet is seated by: the `seating.by` values of a saved workbench state. */
@@ -49,19 +88,6 @@ export type SeatingLengths = {
 export type SeatingStep = { value: number; volume: number; travel: number }
 
 /**
- * The lengths of a seating ladder, m: `start + i * step` up or down, or an odd count centred on
- * `start`, lowest first (the rule of the charge ladder, `chargeLadder` of core). Up is a longer COAL
- * or CBTO: a shallower seating and more volume behind the bullet.
- */
-function ladderLengths(start: number, step: number, steps: number, direction: LadderDirection) {
-  return Array.from({ length: steps }, (_, i) =>
-    direction === 'around'
-      ? start + (i - (steps - 1) / 2) * step
-      : start + (direction === 'up' ? 1 : -1) * i * step,
-  )
-}
-
-/**
  * The steps of a seating ladder from `start`, or the reason it cannot run. `show` writes a length
  * in the page's unit with its symbol, so the messages name the unit the fields show.
  */
@@ -75,7 +101,7 @@ export function seatingLadder(
 ): { steps: SeatingStep[] } | { error: string } {
   const name = seatingLengthName[seat.lengthKind]
   if (start === undefined) return { error: `${name} is empty: the seating ladder starts from it.` }
-  const lengths = ladderLengths(start, step, steps, direction)
+  const lengths = ladderValues(start, step, steps, direction)
   const [lo, hi] = [Math.min(...lengths), Math.max(...lengths)]
   const [from, to] = seat.range
   // a millionth of a millimetre: a step that lands on the range's end is inside it

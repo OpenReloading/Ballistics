@@ -11,7 +11,7 @@ import {
   type UnfittedPowder,
 } from '../lib/burn-rate.ts'
 import { ipscPowerFactor, powerFactor } from '../lib/power-factor.ts'
-import { seatingLengthName } from '../lib/seating-ladder.ts'
+import { ladderTitle, seatingLengthName } from '../lib/seating-ladder.ts'
 import { controlSize } from '../lib/theme.ts'
 import { niceTicks } from '../lib/ticks.ts'
 import {
@@ -551,7 +551,7 @@ export const flagView = (text: string, title = text) => (
 
 /** What the run's ladder varies, for its legend and table name. */
 const ladderName = (ok: Extract<Outcome, { kind: 'ok' }> | undefined) =>
-  ok?.ladder.kind === 'seating' ? 'Seating' : 'Charge'
+  ladderTitle(ok?.ladder.kind ?? 'charge')
 
 /** The charge ladder strip of the shown run: a step selector, or the one step as text. */
 export function LadderStrip({
@@ -666,7 +666,7 @@ export function LadderTable({
   ok: Extract<Outcome, { kind: 'ok' }> | undefined
   steps: ShownStep[]
   system: UnitSystem
-  /** What a step varies: its charge, or its seating length. */
+  /** What a step varies: its charge, its seating length or its powder temperature. */
   value: (s: ShownStep) => string
   velocity: (r: InteriorResponse['result']) => string
 }) {
@@ -677,7 +677,9 @@ export function LadderTable({
   const seating = ok?.ladder.kind === 'seating'
   const lead = seating
     ? [seatingLengthName[ok.ladder.seatingBy ?? 'overallLength'], 'Usable case volume']
-    : ['Charge']
+    : ok?.ladder.kind === 'temperature'
+      ? ['Powder temperature']
+      : ['Charge']
   const columns = ladderColumns
     .flatMap((c) => (c === 'Charge' ? lead : [c]))
     .filter((c) => ratioShown || c !== 'Case fill')

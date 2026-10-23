@@ -108,6 +108,15 @@ export const seatingStepSpec = {
   min: 0,
 } as const satisfies FieldSpec
 
+/** Temperature ladder step size, a difference of temperatures; the Powder temperature field is the first step. */
+export const temperatureStepSpec = {
+  key: 'tempStep',
+  label: 'Step size',
+  quantity: 'temperatureDifference',
+  required: true,
+  min: 0,
+} as const satisfies FieldSpec
+
 /** Steps the API accepts at most (`caps.ladderSteps`). */
 export const maxLadderSteps = 21
 /** A link's or file's direction; anything else is up. */
@@ -222,10 +231,13 @@ function LadderInputs() {
     ladderError,
     ladderKind,
     seatStep,
+    tempStep,
     seatingBlock,
     powderLabel,
+    powder,
     setLadderKind,
     setSeatStep,
+    setTempStep,
     setStepsDraft,
     markChanged,
     setLadderSteps,
@@ -275,15 +287,28 @@ function LadderInputs() {
         />
         {ladderSteps > 1 && (
           <NumberField
-            spec={ladderKind === 'seating' ? seatingStepSpec : ladderSpec}
+            spec={
+              ladderKind === 'seating'
+                ? seatingStepSpec
+                : ladderKind === 'temperature'
+                  ? temperatureStepSpec
+                  : ladderSpec
+            }
             system={system}
-            value={ladderKind === 'seating' ? seatStep.seatStep : ladder.ladderStep}
+            value={
+              ladderKind === 'seating'
+                ? seatStep.seatStep
+                : ladderKind === 'temperature'
+                  ? tempStep.tempStep
+                  : ladder.ladderStep
+            }
             // shown once a run or blur found one, and gone as soon as the cause is fixed
             error={ladderError && stepError}
             onBlur={() => setLadderError(stepError())}
             onChange={(value) => {
               markChanged()
               if (ladderKind === 'seating') setSeatStep({ seatStep: value })
+              else if (ladderKind === 'temperature') setTempStep({ tempStep: value })
               else setLadder({ ladderStep: value })
               if (ladderError) setLadderError(undefined)
             }}
@@ -299,8 +324,11 @@ function LadderInputs() {
             segments={ladderKinds.map((k) => ({
               ...k,
               reason:
-                k.value === 'temperature'
-                  ? temperatureLadderBlockReason(powderLabel)
+                k.value === 'temperature' && ladderKind !== 'temperature'
+                  ? temperatureLadderBlockReason(
+                      powderLabel,
+                      powder?.temperatureSensitivity !== undefined,
+                    )
                   : k.value === 'seating' && ladderKind !== 'seating'
                     ? seatingBlock
                     : undefined,
