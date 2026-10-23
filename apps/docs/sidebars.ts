@@ -31,7 +31,7 @@ const sidebars: SidebarsConfig = {
       'exterior-truing',
       'exterior-truing-strings',
     ]),
-    category('Targets and groups', ['groups', 'ring-scoring', 'hole-detection']),
+    category('Targets and groups', ['groups', 'hit-probability', 'ring-scoring', 'hole-detection']),
     category('Case and firearm', ['case-capacity', 'bullet-fit', 'free-recoil']),
     'models/least-squares',
   ],
