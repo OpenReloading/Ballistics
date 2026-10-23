@@ -591,9 +591,38 @@ export function Workbench() {
   )
   const [muzzleVelocity, bulletId] = [ok?.body.result.muzzleVelocity, bullet?.id]
   const [sightHeight, zeroRange] = [sight?.sightHeight, sight?.zeroRange]
+  const [zeroTemperature, zeroPressure, zeroHumidity, dragFactor, dragFactorSource] = [
+    sight?.zeroTemperature,
+    sight?.zeroPressure,
+    sight?.zeroHumidity,
+    sight?.dragFactor,
+    sight?.dragFactorSource,
+  ]
   const trajectoryLoad = useMemo(
-    () => ({ muzzleVelocity, bullet: bulletId, twist: twistSi, sightHeight, zeroRange }),
-    [muzzleVelocity, bulletId, twistSi, sightHeight, zeroRange],
+    () => ({
+      muzzleVelocity,
+      bullet: bulletId,
+      twist: twistSi,
+      sightHeight,
+      zeroRange,
+      zeroTemperature,
+      zeroPressure,
+      zeroHumidity,
+      dragFactor,
+      dragFactorSource,
+    }),
+    [
+      muzzleVelocity,
+      bulletId,
+      twistSi,
+      sightHeight,
+      zeroRange,
+      zeroTemperature,
+      zeroPressure,
+      zeroHumidity,
+      dragFactor,
+      dragFactorSource,
+    ],
   )
   const echo = useMemo(
     () => ({ chargeText, groupsLadder, trajectoryLoad }),

@@ -1,41 +1,48 @@
+import AxeBuilder from '@axe-core/playwright'
 import { expect, type Page, test } from '@playwright/test'
+import { storeUnits } from './units.ts'
+import { runExample } from './workbench-run.ts'
 
-/** Two firearms in the browser store, as the library saves them. */
-async function seed(page: Page, names: string[]) {
-  await page.evaluate(async (names) => {
-    const db: IDBDatabase = await new Promise((ok, no) => {
-      const r = indexedDB.open('openreloading-user-data', 1)
-      r.onupgradeneeded = () => {
-        for (const n of ['records', 'handles', 'files'])
-          if (!r.result.objectStoreNames.contains(n))
-            r.result.createObjectStore(n, n === 'records' ? { keyPath: 'id' } : undefined)
-      }
-      r.onsuccess = () => ok(r.result)
-      r.onerror = () => no(r.error)
-    })
-    const tx = db.transaction('records', 'readwrite')
-    names.forEach((name, i) => {
-      tx.objectStore('records').put({
-        kind: 'firearm',
-        id: `firearm-${i}`,
-        name,
-        saved: '2026-10-20T00:00:00.000Z',
-        data: {
-          name,
-          cartridge: '308-win',
-          barrelLength: 0.61,
-          twist: 0.254,
-          twistHand: 'right',
-          optics: [],
-          configurations: [],
-        },
+/** Firearms in the browser store, as the library saves them; ids `firearm-<first>` on. */
+async function seed(page: Page, names: string[], extra: object = {}, first = 0) {
+  await page.evaluate(
+    async ([names, extra, first]) => {
+      const db: IDBDatabase = await new Promise((ok, no) => {
+        const r = indexedDB.open('openreloading-user-data', 1)
+        r.onupgradeneeded = () => {
+          for (const n of ['records', 'handles', 'files'])
+            if (!r.result.objectStoreNames.contains(n))
+              r.result.createObjectStore(n, n === 'records' ? { keyPath: 'id' } : undefined)
+        }
+        r.onsuccess = () => ok(r.result)
+        r.onerror = () => no(r.error)
       })
-    })
-    await new Promise((ok) => {
-      tx.oncomplete = ok
-    })
-    db.close()
-  }, names)
+      const tx = db.transaction('records', 'readwrite')
+      names.forEach((name, i) => {
+        tx.objectStore('records').put({
+          kind: 'firearm',
+          id: `firearm-${first + i}`,
+          name,
+          saved: '2026-10-20T00:00:00.000Z',
+          data: {
+            name,
+            cartridge: '308-win',
+            barrelLength: 0.61,
+            twist: 0.254,
+            twistHand: 'right',
+            optics: [],
+            configurations: [],
+            ...extra,
+          },
+        })
+      })
+      await new Promise((ok) => {
+        tx.oncomplete = ok
+      })
+      db.close()
+    },
+    [names, extra, first] as const,
+  )
 }
 
 const status = (page: Page) => page.locator('.page-bar-status .bar-count')
@@ -114,4 +121,83 @@ test('a record link does not put its loading status in the alert line', async ({
   expect(
     await page.evaluate(() => (window as unknown as { seen: { loading: boolean } }).seen.loading),
   ).toBe(false)
+})
+
+test('the zero air and drag factor of a mount fill the trajectory form with the factor shown with its source', async ({
+  page,
+}) => {
+  test.setTimeout(90_000)
+  await storeUnits(page)
+  await page.addInitScript(() => {
+    localStorage.setItem('safety-ack', '3')
+    localStorage.setItem('first-run-done', '1')
+  })
+  await page.goto('/firearms')
+  await seed(page, ['Truing rifle'], {
+    optics: [{ id: 'o1', kind: 'scope', name: 'Scope' }],
+    configurations: [
+      {
+        id: 'c1',
+        name: 'Summer',
+        mounts: [
+          {
+            optic: 'o1',
+            sightHeight: 0.05,
+            zeroRange: 100,
+            zeroTemperature: 308.15,
+            zeroPressure: 95000,
+            zeroHumidity: 0.4,
+            dragFactor: 1.034,
+            dragFactorSource: 'Truing session of 2026-09-14',
+          },
+        ],
+      },
+    ],
+    active: 'c1',
+  })
+  await seed(
+    page,
+    ['Plain rifle'],
+    {
+      optics: [{ id: 'o1', kind: 'scope', name: 'Scope' }],
+      configurations: [
+        { id: 'c1', name: 'Summer', mounts: [{ optic: 'o1', sightHeight: 0.05, zeroRange: 100 }] },
+      ],
+    },
+    1,
+  )
+  await runExample(page)
+  await page.getByRole('tab', { name: 'Trajectory', exact: true }).click()
+  await expect(page.getByRole('table', { name: /^Trajectory: / })).toBeVisible()
+  // the load's firearm fills the trajectory form's sight, zero air and drag factor
+  // anchored: the unit switch of a field is named after it too
+  const field = (name: string) => page.getByLabel(new RegExp(`^${name.replace(/[()]/g, '\\$&')}`))
+  const gun = page.getByRole('combobox', { name: 'Firearm from your library' })
+  await gun.click()
+  await page.getByRole('option', { name: 'Truing rifle' }).click()
+  await expect(field('Zero temperature')).toHaveValue('35')
+  await expect(field('Zero pressure')).toHaveValue('950')
+  await expect(field('Zero humidity')).toHaveValue('40')
+  await expect(field('Drag factor')).toHaveValue('103.4')
+  await expect(page.getByText('Drag factor source: Truing session of 2026-09-14')).toBeVisible()
+  // the result names what it applied, on screen and on the printed range card
+  await expect(page.getByText(/^Drag factor applied: 103.4 %, Truing session/)).toBeVisible()
+  await expect(
+    page.getByText(/^Zero air: 35 °C, station pressure 950 hPa, humidity 40 %/),
+  ).toBeVisible()
+  await expect(page.locator('.range-card')).toContainText('103.4 %, Truing session of 2026-09-14')
+  // an edited factor is no longer the one the source names
+  await field('Drag factor').fill('105')
+  await expect(page.getByText('Drag factor source:')).toHaveCount(0)
+  await expect(page.getByText(/^Drag factor applied: 105 %$/)).toBeVisible()
+  // a firearm without them empties the fields
+  await gun.click()
+  await page.getByRole('option', { name: 'Plain rifle' }).click()
+  await expect(field('Drag factor')).toHaveValue('')
+  await expect(field('Zero temperature')).toHaveValue('')
+  for (const scheme of ['light', 'dark'] as const) {
+    await page.emulateMedia({ colorScheme: scheme })
+    const { violations } = await new AxeBuilder({ page }).include('.trajectory-view form').analyze()
+    expect(violations).toEqual([])
+  }
 })

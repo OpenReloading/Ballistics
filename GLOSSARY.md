@@ -627,7 +627,7 @@ _Avoid_: click
 One entry of `configurations`: the optics mounted on a firearm between `mounted` and `removed` (ISO dates), with `id`, `name` and 1 to 4 `mounts`.
 
 **Optic mount**:
-One entry of `mounts`: `optic` (local id), `sightHeight` (m), `lateralOffset` (optic centre right of the bore, m), `cant` (clockwise as seen from behind, rad), `zeroRange` (m) and `zeroNotes`.
+One entry of `mounts`: `optic` (local id), `sightHeight` (m), `lateralOffset` (optic centre right of the bore, m), `cant` (clockwise as seen from behind, rad), `zeroRange` (m), `zeroNotes`, the optional air of the zero (`zeroTemperature` K, `zeroPressure` Pa, `zeroHumidity` fraction) and an optional `dragFactor` with its `dragFactorSource`.
 _Avoid_: `offset` (of a mount)
 
 **Sight height**:
@@ -810,7 +810,7 @@ _Avoid_: level, residualLevel, solver
 `priors`: Gaussian priors on the fitted parameters: `muzzleVelocity`, `dragFactor` and `clickValue` as the standard deviation of their logarithm, `zeroOffset` in rad (needs `fitZeroOffset`).
 
 **Drag factor**:
-`dragFactor`: constant multiplier on the drag curve fitted by truing.
+`dragFactor`: constant multiplier on the drag curve fitted by truing. An optic mount can store one (1 is the drag of the bullet as given), shown as a percentage.
 
 **Zero offset**:
 `zeroOffset`: angle by which the impacts at the zero setting lie above the nominal zero, rad. `fitZeroOffset` fits it.
