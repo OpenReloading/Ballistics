@@ -3,6 +3,9 @@ import { type RefObject, useEffect } from 'react'
 import { storedRecord } from '../lib/user-store.ts'
 import type { FileMenuHandle } from './file-menu.tsx'
 
+/** The status while a linked record is read. */
+export const recordLoadingText = 'Loading the record…'
+
 /**
  * `?record=<id>` of a designer: the browser record is read, checked against the schema and
  * the designer's kind, and opened as the saved records listed by Open do, so Save
@@ -17,7 +20,7 @@ export function useRecordLink(
   useEffect(() => {
     const id = new URLSearchParams(window.location.search).get('record')
     if (!id) return
-    say('Loading the record…')
+    say(recordLoadingText)
     storedRecord(id).then(
       async (raw) => {
         if (raw === undefined) return say('That record is not in this browser.')

@@ -182,12 +182,18 @@ test('prints the summary and every chart without the import strip', async ({ pag
     await expect(chart).toBeVisible()
     await expect(page.getByRole('table', { name: `Shots of ${name}` })).toBeVisible()
     // the chart takes the print width on its next resize; main is read in the same poll, as the
-    // print layout may settle after the media change
+    // print layout may settle after the media change; a cold server also loads the chart code
     await expect
-      .poll(async () => {
-        const [box, width] = [await chart.boundingBox(), await main.evaluate((m) => m.clientWidth)]
-        return (box?.width ?? Number.POSITIVE_INFINITY) - width
-      })
+      .poll(
+        async () => {
+          const [box, width] = [
+            await chart.boundingBox(),
+            await main.evaluate((m) => m.clientWidth),
+          ]
+          return (box?.width ?? Number.POSITIVE_INFINITY) - width
+        },
+        { timeout: 15_000 },
+      )
       .toBeLessThanOrEqual(0)
   }
   await expect(page.locator('body')).not.toContainText(/simulation|Load example/)
