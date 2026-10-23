@@ -112,7 +112,7 @@ $\rho$ is the density of moist air of the entered temperature, station pressure 
 ## Limits
 
 - Altitudes from -5000 m (`minAltitude`) to 11000 m (the tropopause). A trajectory that leaves this band stops with the reason `atmosphere`.
-- `checkAir` rejects a temperature at or below 0 K, a relative humidity outside 0 to 1, a pressure at or below the vapour pressure, and non-finite values.
+- `checkAir` rejects a temperature at or below 0 K, a relative humidity outside 0 to 1, a pressure at or below the vapour pressure, non-finite values, and a pressure and temperature whose air density is not above 0 and at most 1000 kg/m³, `maxDensity` (the density overflows for a temperature near the smallest floating-point number and underflows for a pressure near it).
 - The Magnus constants are those for water. Below 0 degC the formula still gives the pressure over water, not over ice.
 
 ## Sources
