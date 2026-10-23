@@ -286,12 +286,15 @@ export interface InteriorResponse {
     tolerances: {
       chargeFraction: number
       volumeFraction: number
+      massFraction: number
       burnRateFraction: number
       temperatureKelvin: number
       startPressureFraction: number
     }
     cases: { maxPressure: number | null }[]
   }
+  /** The sampled band of the run (`sampling`), `POST /interior`; `failed` is set by the web app when its request did not answer. */
+  sampled?: SampledBand
   limits?: {
     cartridge: string
     /** Date of the sheet revision, `revised` or else `published`. */
@@ -321,6 +324,28 @@ export interface InteriorResponse {
       provenance: Provenance
     }
   }
+}
+
+/** The answer's `sampled`, or the web app's own `failed` for a sampling request that gave none. */
+export type SampledBand =
+  | { status: 'failed' }
+  | {
+      status: 'sampled' | 'overBudget' | 'invalid'
+      samples: number
+      seed: number
+      failed: number
+      budgetMs: number
+      /** Peak breech pressure, Pa; with status `sampled`. */
+      pressure?: SampledPercentiles
+      /** Muzzle velocity, m/s; with status `sampled`. */
+      velocity?: SampledPercentiles
+    }
+
+/** The 5th, 50th and 95th percentile of a sampled quantity. */
+export interface SampledPercentiles {
+  p05: number
+  p50: number
+  p95: number
 }
 
 /**

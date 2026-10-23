@@ -862,7 +862,9 @@ _Avoid_: perforation
 _Avoid_: config
 
 **Pressure tolerances**:
-`tolerances`: the input variations of the pressure range, `chargeFraction`, `volumeFraction`, `burnRateFraction`, `temperatureKelvin` (K) and `startPressureFraction`. Absent keys take the core defaults.
+`tolerances`: the input variations of the pressure range, `chargeFraction`, `volumeFraction`, `massFraction` (default 0), `burnRateFraction`, `temperatureKelvin` (K) and `startPressureFraction`. Absent keys take the core defaults.
+
+`sampling`: the request field of a single interior run that asks for the sampled band (`samples`, `seed`, `budgetMs`). The answer's `sampled` holds the 5th, 50th and 95th percentile of the peak pressure and the muzzle velocity, or the status `overBudget` or `invalid`.
 
 **Charge target**:
 `target` of `POST /v1/interior/charge-target`: `kind` (`peakPressure` Pa, `muzzleVelocity` m/s, `loadRatio`, `barrelTime` s, `bulletLeadTime` s), `value` and `unit` (`percentOfLimit` for a percentage of the first compared limit).

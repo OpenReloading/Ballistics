@@ -1,11 +1,11 @@
 ---
 title: Peak-pressure range over input tolerances
-description: The spread of the simulated peak pressure when charge, chamber volume, burn coefficient, temperature and start pressure move within their tolerances.
+description: The spread of the simulated peak pressure when charge, chamber volume, bullet mass, burn coefficient, temperature and start pressure move within their tolerances.
 ---
 
 # Peak-pressure range over input tolerances
 
-`interiorPressureRange` runs the [M3 model](interior-m3.md) at the ends of the tolerances of five inputs. It reports the lowest and highest peak pressure next to the nominal one.
+`interiorPressureRange` runs the [M3 model](interior-m3.md) at the ends of the tolerances of six inputs. It reports the lowest and highest peak pressure next to the nominal one. The [sampled band](interior-sampled-band.md) draws the same inputs from distributions instead of moving them to their ends. The limit check of a result reads this range, not the sampled band.
 
 1. Each input moves alone to both ends of its tolerance.
 2. All inputs move together, to the ends that raise the pressure and to the ends that lower it.
@@ -16,7 +16,7 @@ The range covers input tolerances only and is not a confidence interval.
 
 ### Moving one input
 
-Charge, chamber volume, burn coefficient and start pressure move by a relative tolerance, the propellant temperature by an absolute one:
+Charge, chamber volume, bullet mass, burn coefficient and start pressure move by a relative tolerance, the propellant temperature by an absolute one:
 
 $$
 q^{\pm} = q\,(1 \pm t_q), \qquad T^{\pm} = T \pm t_T
@@ -38,7 +38,7 @@ Code: `packages/core/src/interior/range.ts`, `toleranceRange` (`sides`).
 
 - $s_q = 0$ when both ends are invalid or the tolerance is 0.
 - The two combined cases move every input at once: to the side $s_q$ for the pressure-raising case, to $-s_q$ for the pressure-lowering case.
-- Inputs are applied in the order charge, volume, burn coefficient, temperature, start pressure. Once one move leaves the model, the remaining inputs are not applied and are reported with side 0.
+- Inputs are applied in the order charge, volume, bullet mass, burn coefficient, temperature, start pressure. Once one move leaves the model, the remaining inputs are not applied and are reported with side 0.
 
 ### Range
 
@@ -57,6 +57,7 @@ The minimum and maximum run over the cases $c$ with a valid, finite peak pressur
 | --- | --- |
 | Charge | 0.5 % |
 | Chamber volume | 1 % |
+| Bullet mass | 0 % |
 | Burn coefficient | 3 % |
 | Propellant temperature | 5 K |
 | Start pressure | 20 % |
@@ -85,7 +86,7 @@ Code: `packages/core/src/interior/range.ts`, `pressureToleranceDefaults`.
 ## Limits
 
 - Model error is not part of the range: the range of an input that the model gets wrong is wrong as well.
-- Inputs without a tolerance (bullet mass, bore area, energy, form function, resistance and others) do not move.
+- The bullet mass tolerance is 0 by default, so the input does not move until a caller sets it. The seating depth changes the chamber volume and the bullet travel and has no tolerance of its own. Inputs without a tolerance (bore area, energy, form function, resistance and others) do not move.
 - The range is not a probability statement.
 
 ## Sources

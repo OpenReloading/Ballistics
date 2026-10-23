@@ -1,12 +1,17 @@
 import { describe, expect, it } from 'vitest'
+import type { Outcome } from '../src/components/workbench-outcome.ts'
+import { peakFacts } from '../src/components/workbench-readouts.tsx'
 import type { InteriorResponse } from '../src/lib/api-types.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import {
+  bandLine,
+  bandNotice,
   bulletLeadTime,
   mmLength,
   percentOfPressureLimit,
   rangeCardNote,
   rangeHero,
+  resultBand,
   resultTabsFit,
   shownLength,
   shownWarnings,
@@ -272,5 +277,96 @@ describe('statusText', () => {
     expect(statusText('Simulating', 'Peak 4 bar.')).toBe('Simulating')
     expect(statusText('The API answered 502.', undefined)).toBe('The API answered 502.')
     expect(statusText({ prefix: '' }, undefined)).toBe('')
+  })
+})
+
+describe('sampled band', () => {
+  const pressureRange = {
+    nominalPressure: 3e8,
+    lowPressure: 2.8e8,
+    highPressure: 3.3e8,
+    complete: true,
+    tolerances: {
+      chargeFraction: 0.005,
+      volumeFraction: 0.01,
+      massFraction: 0,
+      burnRateFraction: 0.03,
+      temperatureKelvin: 5,
+      startPressureFraction: 0.2,
+    },
+    cases: [],
+  }
+  const sampled = {
+    status: 'sampled' as const,
+    samples: 500,
+    seed: 1,
+    failed: 0,
+    budgetMs: 2500,
+    pressure: { p05: 2.9e8, p50: 3e8, p95: 3.2e8 },
+    velocity: { p05: 830, p50: 840, p95: 850 },
+  }
+  const body = (extra: Partial<InteriorResponse>) =>
+    ({ pressureRange, ...extra }) as InteriorResponse
+
+  it('shows the percentiles of a sampled band', () => {
+    expect(resultBand(body({ sampled }))).toEqual({
+      sampled: true,
+      pressure: { low: 2.9e8, high: 3.2e8 },
+      velocity: { low: 830, high: 850 },
+    })
+    expect(bandNotice(sampled)).toBe('input tolerances only')
+  })
+
+  it('keeps the printed report on the corner-case range whether or not the sampling answered', () => {
+    expect(resultBand(body({ sampled }), true)).toEqual(resultBand(body({}), true))
+    expect(resultBand(body({}), true).pressure).toEqual({ low: 2.8e8, high: 3.3e8 })
+  })
+
+  it('shows the corner-case range and says so when the sampling went over budget', () => {
+    const over = { status: 'overBudget' as const, samples: 500, seed: 1, failed: 0, budgetMs: 2500 }
+    expect(resultBand(body({ sampled: over }))).toEqual({
+      sampled: false,
+      pressure: { low: 2.8e8, high: 3.3e8 },
+      velocity: undefined,
+    })
+    expect(bandNotice(over)).toBe('over budget')
+  })
+
+  it('says what each sampling answer covers, and why the corner-case range stands in for a band', () => {
+    const units = presetUnits('metric-grains')
+    expect(bandLine(body({ sampled }), units)).toBe(
+      'Velocity 830 to 850 m/s. 5th to 95th percentile, input tolerances only.',
+    )
+    for (const [status, word] of [
+      ['overBudget', 'over budget'],
+      ['invalid', 'no valid draw'],
+    ] as const)
+      expect(
+        bandLine(
+          body({ sampled: { ...sampled, status, pressure: undefined, velocity: undefined } }),
+          units,
+        ),
+      ).toBe(`Sampled bands ${word}: corner-case range shown.`)
+    expect(bandLine(body({ sampled: { status: 'failed' } }), units)).toBe(
+      'Sampled bands not finished: corner-case range shown.',
+    )
+    expect(bandLine(body({}), units)).toBeUndefined()
+  })
+
+  it('shows the corner-case range without a word for a result that did not ask for sampling', () => {
+    expect(resultBand(body({})).sampled).toBe(false)
+    expect(bandNotice(undefined)).toBeUndefined()
+  })
+
+  it('states the sample count, the seed and that the band covers the input tolerances only', () => {
+    const ok = {
+      body: body({
+        sampled,
+        result: { maxPressureTime: 1e-4, maxPressureTravel: 0.01 } as InteriorResponse['result'],
+      }),
+    } as Extract<Outcome, { kind: 'ok' }>
+    const text = peakFacts(ok, presetUnits('metric-grains'))
+    expect(text).toContain('500 draws (seed 1)')
+    expect(text).toContain('The band covers the input tolerances only, no model error')
   })
 })

@@ -104,6 +104,10 @@ for (const [width, height, shown] of [
       await page.setViewportSize({ width, height })
       await runExample(page)
       if (ladder) await runLadder(page, ...ladder)
+      // the sampled band and its line follow the result
+      await expect(page.locator('.band-line')).toBeVisible({
+        timeout: 10_000,
+      })
       await expect.poll(() => overflowing(page)).toEqual([])
       expect(await cut(page)).toEqual([])
     })
