@@ -4,6 +4,7 @@ import {
   Accordion,
   ActionIcon,
   Button,
+  Menu,
   NativeSelect,
   Radio,
   SegmentedControl,
@@ -29,6 +30,7 @@ import {
   useRef,
   useState,
 } from 'react'
+import { flushSync } from 'react-dom'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { BulletRecord, BulletSummary } from '../lib/api-types.ts'
 import { bulletDrag } from '../lib/bullet.ts'
@@ -64,7 +66,7 @@ import { storedRecords } from '../lib/user-store.ts'
 import { LazyLineChart as LineChart, preloadChart } from './lazy-chart.tsx'
 import { MovingTarget } from './moving-target.tsx'
 import { NumberField } from './number-field.tsx'
-import { printRangeCard, RangeCard } from './range-card.tsx'
+import { type PaperSize, paperSizes, printRangeCard, RangeCard } from './range-card.tsx'
 import { RecordSearch } from './record-search.tsx'
 import { PanelTable } from './scroll-region.tsx'
 import { SourceTitles } from './sources.tsx'
@@ -123,6 +125,8 @@ type Result = TrajectoryResult & {
   si: Record<string, number | undefined>
   /** The bullet values came from the manual fields, so the card lists mass and BC. */
   manual: boolean
+  /** The chosen optic's turret click: the card gives the holds in clicks too. */
+  click?: { value: number; unit?: 'MOA' | 'mrad' }
 }
 
 type RecordState =
@@ -144,6 +148,7 @@ type Inputs = {
   choice: number | undefined
   twistHand: 'right' | 'left'
   design: string | undefined
+  click: Result['click']
 }
 
 type Attempt =
@@ -208,6 +213,7 @@ function evaluate(i: Inputs): { errors: Record<string, string>; attempt: Attempt
           bullet,
           si,
           manual: i.source === 'manual',
+          ...(i.click && { click: i.click }),
           ...(i.source === 'manual' && i.design && { design: i.design }),
         },
       },
@@ -454,6 +460,7 @@ export function TrajectoryForm({
   const [last, setLast] = useState<Result | undefined>(undefined)
   const [sights, setSights] = useState<ReturnType<typeof sightOptions>>([])
   const [sight, setSight] = useState('')
+  const [paper, setPaper] = useState<PaperSize>('a4')
   /** The chosen firearm was gone when the list was read again. */
   const [sightGone, setSightGone] = useState(false)
   const [designs, setDesigns] = useState<BulletDesignRecord[]>([])
@@ -497,6 +504,7 @@ export function TrajectoryForm({
       choice,
       twistHand,
       design: design?.name,
+      click: sights.find((o) => o.value === sight)?.fill.click,
     }),
     [
       fields,
@@ -510,6 +518,8 @@ export function TrajectoryForm({
       choice,
       twistHand,
       design,
+      sights,
+      sight,
     ],
   )
   const [debounced] = useDebouncedValue(inputs, 150)
@@ -1018,16 +1028,33 @@ export function TrajectoryForm({
   const staleLine = stale && <p className="stale-line">{staleText}</p>
   const printButton = (
     // an icon at the end of the holds row, so the hold labels keep their width
-    <ActionIcon
-      variant="default"
-      size={controlSize.row.icon}
-      className="range-card-button"
-      aria-label="Print range card"
-      title="Print range card"
-      onClick={printRangeCard}
-    >
-      <Printer aria-hidden="true" />
-    </ActionIcon>
+    <Menu position="bottom-end" withinPortal shadow="sm">
+      <Menu.Target>
+        <ActionIcon
+          variant="default"
+          size={controlSize.row.icon}
+          className="range-card-button"
+          aria-label="Print range card"
+          title="Print range card"
+        >
+          <Printer aria-hidden="true" />
+        </ActionIcon>
+      </Menu.Target>
+      <Menu.Dropdown>
+        {paperSizes.map((size) => (
+          <Menu.Item
+            key={size}
+            onClick={() => {
+              // the card is drawn for the paper before the dialog takes its snapshot
+              flushSync(() => setPaper(size))
+              printRangeCard()
+            }}
+          >
+            Print on {size.toUpperCase()}
+          </Menu.Item>
+        ))}
+      </Menu.Dropdown>
+    </Menu>
   )
 
   // one view at every width: the holds and Print range card, the inputs, then the notes,
@@ -1058,7 +1085,7 @@ export function TrajectoryForm({
             chartHeight={wide ? undefined : 200}
             staleLine={staleLine}
           />
-          <RangeCard result={result} system={system} />
+          <RangeCard result={result} system={system} paper={paper} />
         </div>
       )}
     </div>

@@ -124,6 +124,8 @@ export function freeId(prefix: string, taken: string[]) {
 type SightFill = {
   sightHeight: number
   zeroRange: number
+  /** The mounted optic's turret click, rad, with how the turrets are marked. */
+  click?: { value: number; unit?: 'MOA' | 'mrad' }
   twist?: number
   twistHand: 'right' | 'left'
 }
@@ -157,16 +159,20 @@ const mountOption = (
  * active configuration of each firearm first.
  */
 export function sightOptions(records: UserRecord[]) {
-  return [...mountedOptics(records)].map((x) => ({
-    ...mountOption(x, x.f.optics.find((o) => o.id === x.m.optic)?.name ?? x.m.optic),
-    fill: {
-      sightHeight: x.m.sightHeight,
-      zeroRange: x.m.zeroRange,
-      // a twist of 0 is no twist
-      ...(x.f.twist && { twist: x.f.twist }),
-      twistHand: x.f.twistHand,
-    } as SightFill,
-  }))
+  return [...mountedOptics(records)].map((x) => {
+    const optic = x.f.optics.find((o) => o.id === x.m.optic)
+    return {
+      ...mountOption(x, optic?.name ?? x.m.optic),
+      fill: {
+        sightHeight: x.m.sightHeight,
+        zeroRange: x.m.zeroRange,
+        ...(optic?.clickValue && { click: { value: optic.clickValue, unit: optic.clickUnit } }),
+        // a twist of 0 is no twist
+        ...(x.f.twist && { twist: x.f.twist }),
+        twistHand: x.f.twistHand,
+      } as SightFill,
+    }
+  })
 }
 
 /**
@@ -193,7 +199,7 @@ export const twistText = (f: Firearm, system: UnitSystem) =>
   f.twist ? `1:${withUnit('twist', system, f.twist)}, ${f.twistHand}` : undefined
 
 /** An optic's click value in its turret marking, else in the units of `system`. */
-export function clickText(o: Optic, system: UnitSystem) {
+export function clickText(o: Pick<Optic, 'clickValue' | 'clickUnit'>, system: UnitSystem) {
   if (!o.clickValue) return
   const unit =
     o.clickUnit === 'MOA'

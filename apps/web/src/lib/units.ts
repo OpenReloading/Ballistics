@@ -55,7 +55,8 @@ export const metersPerInch = 0.0254
 export const metersPerFoot = 0.3048
 const metersPerYard = 0.9144
 export const kilogramsPerGrain = 6.479891e-5
-const metersPerSecondPerMph = 0.44704
+/** 1 mph in m/s. */
+export const metersPerSecondPerMph = 0.44704
 export const pascalsPerInHg = 3386.389
 /** Water density, g/cm³ (defined in core): turns a water capacity in g or gr into a volume. */
 export { waterDensityGramsPerCm3 }

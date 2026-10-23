@@ -46,30 +46,52 @@ export function rangeCardFacts(
   ]
 }
 
+/** What the card adds to a trajectory table: the optic's turret click and the wind brackets. */
+export interface RangeCardExtras {
+  /** Angle of one turret click, rad: the elevation and wind holds are also given in clicks. */
+  click?: number
+  /** Windage hold per 1 m/s and per 1 mph of crosswind at each point, rad. */
+  wind?: { mps: number[]; mph: number[] }
+}
+
 /** Column headings of the card's table, units included; the last column stays blank for notes. */
-export function rangeCardColumns(system: UnitSystem): string[] {
+export function rangeCardColumns(system: UnitSystem, extras: RangeCardExtras = {}): string[] {
   const u = (q: Quantity) => system[q].symbol
+  const withClicks = (name: string) =>
+    extras.click ? `${name} (${u('correction')} / clicks)` : `${name} (${u('correction')})`
   return [
     `Range (${u('range')})`,
     `Height (${u('lineOfSightOffset')})`,
-    `Elevation (${u('correction')})`,
+    withClicks('Elevation'),
     `Windage (${u('correction')})`,
     `Velocity (${u('velocity')})`,
     `Energy (${u('energy')})`,
     'Time (s)',
-    'Clicks, notes',
+    ...(extras.wind ? [withClicks('Wind per 1 m/s'), withClicks('Wind per 1 mph')] : []),
+    'Notes',
   ]
 }
 
 /** One row of display texts per table point, in the order of `rangeCardColumns` without the notes. */
-export function rangeCardRows(rows: TrajectoryPoint[], system: UnitSystem): string[][] {
-  return rows.map((p) => [
+export function rangeCardRows(
+  rows: TrajectoryPoint[],
+  system: UnitSystem,
+  extras: RangeCardExtras = {},
+): string[][] {
+  const { click, wind } = extras
+  /** A hold in the correction unit, with its clicks when the optic is known. */
+  const hold = (rad: number) =>
+    click
+      ? `${formatQuantity('correction', system, rad)} / ${formatNumber(rad / click, 1)}`
+      : formatQuantity('correction', system, rad)
+  return rows.map((p, i) => [
     formatQuantity('range', system, p.range),
     formatQuantity('lineOfSightOffset', system, p.height),
-    formatQuantity('correction', system, p.elevationHold),
+    hold(p.elevationHold),
     formatQuantity('correction', system, p.windageHold),
     formatQuantity('velocity', system, p.velocity),
     formatQuantity('energy', system, p.energy),
     formatNumber(p.time, 3),
+    ...(wind ? [hold(wind.mps[i] ?? 0), hold(wind.mph[i] ?? 0)] : []),
   ])
 }
