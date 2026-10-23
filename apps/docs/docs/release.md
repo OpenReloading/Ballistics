@@ -15,7 +15,7 @@ sidebar_position: 2
 
 ## Flow
 
-1. Pull requests are squash-merged into `main` with a Conventional Commits title (CONTRIBUTING.md).
+1. Work lands on `develop`. The pull request from `develop` is squash-merged into `main` with a Conventional Commits title (CONTRIBUTING.md); its title is the changelog line.
 2. On every push to `main`, `release.yml` runs release-please: it opens or updates one release pull request with the next version of each changed component, its `CHANGELOG.md` section and the versions in `package.json` and `package-lock.json`. Only `feat`, `fix`, `perf`, `revert` and `docs` commits appear in the changelogs.
 3. The workflow turns on auto-merge for the release pull request, so it is squashed once its required checks pass. Merging the release pull request tags each released component `<component>-vX.Y.Z` and publishes its GitHub Release with that changelog section, marked as a pre-release while the version is below 1.0.0.
 4. When `api` or `web` is released, the same workflow builds `ghcr.io/openreloading/ballistics-api` or `ghcr.io/openreloading/ballistics-web` from that tag, then:

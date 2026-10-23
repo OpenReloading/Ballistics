@@ -37,7 +37,7 @@
 
 ## Conventions
 
-- Changes start from a GitHub issue.
+- Changes start from a GitHub issue. Branches are cut from `develop` and merged back into it; `main` only receives the pull request from `develop` and the release pull request.
 - Package rules:
   - `packages/core`: no runtime dependencies, no I/O, no database, no HTTP.
   - `packages/importers`: no I/O. Depends on `@openreloading/schema` for types only.
