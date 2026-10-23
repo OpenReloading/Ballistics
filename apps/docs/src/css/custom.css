@@ -90,3 +90,97 @@ html[data-theme] {
   --pf-skeleton-shine: var(--ifm-color-emphasis-100);
   --pf-font: var(--ifm-font-family-base);
 }
+
+/* the repository widget (src/components/RepoWidget.tsx): icon, name, release, stars and forks */
+.repo-widget {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+  max-width: 14rem;
+  color: var(--ifm-navbar-link-color);
+  font-size: 0.8rem;
+  line-height: 1.2;
+}
+
+.repo-widget:hover {
+  color: var(--ifm-navbar-link-hover-color);
+  text-decoration: none;
+}
+
+.repo-widget:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+  border-radius: var(--ifm-global-radius);
+}
+
+.repo-widget svg {
+  display: block;
+  fill: currentColor;
+}
+
+.repo-widget__icon svg {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+.repo-widget__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.repo-widget__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: var(--ifm-font-weight-semibold);
+}
+
+.repo-widget__facts {
+  display: flex;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--ifm-color-emphasis-700);
+  font-size: 0.65rem;
+  white-space: nowrap;
+}
+
+.repo-widget__facts li {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.repo-widget__facts svg {
+  width: 0.8rem;
+  height: 0.8rem;
+}
+
+/* narrower desktop navbars: the title and the section links come first, so the facts go, then
+   the name (visually hidden, the link keeps its text) */
+@media (min-width: 997px) and (max-width: 1250px) {
+  .repo-widget {
+    max-width: 9rem;
+  }
+
+  .repo-widget__facts {
+    display: none;
+  }
+}
+
+@media (min-width: 997px) and (max-width: 1100px) {
+  .repo-widget {
+    gap: 0;
+  }
+
+  .repo-widget__name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+}

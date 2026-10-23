@@ -3,12 +3,16 @@ import type * as Preset from '@docusaurus/preset-classic'
 import type { Config } from '@docusaurus/types'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
+import { repoFacts } from './scripts/repo-facts.mts'
 
 const baseUrl = process.env.DOCS_BASE_URL ?? '/'
 // the web app the navbar links to: a full URL (a path would resolve under baseUrl); no link when unset
 const appUrl = process.env.APP_URL
 
-const config: Config = {
+// the navbar's repository widget: read once per build, the browser makes no request to GitHub
+const repo = 'OpenReloading/Ballistics'
+
+const config = async (): Promise<Config> => ({
   title: 'OpenReloading Ballistics',
   tagline: 'Documentation',
   // GitHub Pages: DOCS_URL is the site origin, DOCS_BASE_URL the path of the docs ("/repository/docs/")
@@ -64,12 +68,13 @@ const config: Config = {
         ...(appUrl
           ? [{ href: appUrl, label: 'Web app', position: 'right' as const, target: '_self' }]
           : []),
+        { type: 'custom-repo', repo, facts: await repoFacts(repo), position: 'right' },
         { type: 'search', position: 'right' },
       ],
     },
     docs: { sidebar: { hideable: true, autoCollapseCategories: true } },
     colorMode: { respectPrefersColorScheme: true },
   } satisfies Preset.ThemeConfig,
-}
+})
 
 export default config

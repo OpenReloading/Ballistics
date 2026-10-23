@@ -36,6 +36,8 @@ jobs:
           PAGES_BASE_PATH: ${{ steps.pages.outputs.base_path }}
           PAGES_URL: ${{ steps.pages.outputs.origin }}
           NEXT_PUBLIC_REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
+          # the docs navbar's repository widget reads stars, forks and the release at build time
+          GITHUB_TOKEN: ${{ github.token }}
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: pages
