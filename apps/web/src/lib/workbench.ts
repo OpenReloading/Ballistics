@@ -232,3 +232,26 @@ export function rangeHero(
     velocity: { value: formatQuantity('velocity', system, velocity), unit: system.velocity.symbol },
   }
 }
+
+/**
+ * The band of the peak pressure (Pa) and the muzzle velocity (m/s) a result shows: the 5th and 95th
+ * percentile of the sampled band, else the corner-case range of the pressure and no velocity band.
+ */
+export function resultBand(body: InteriorResponse) {
+  const { sampled, pressureRange: range } = body
+  const sample = sampled?.status === 'sampled' ? sampled : undefined
+  return {
+    sampled: sample !== undefined,
+    pressure: sample?.pressure
+      ? { low: sample.pressure.p05, high: sample.pressure.p95 }
+      : { low: range.lowPressure, high: range.highPressure },
+    velocity: sample?.velocity && { low: sample.velocity.p05, high: sample.velocity.p95 },
+  }
+}
+
+/** What the sampled band of a result says: its reach, or why the corner-case range stands in (shown instead); undefined without one. */
+export function bandNotice(sampled: InteriorResponse['sampled']): string | undefined {
+  if (sampled === undefined) return
+  if (sampled.status === 'sampled') return 'input tolerances only'
+  return sampled.status === 'overBudget' ? 'over budget' : 'no valid draw'
+}

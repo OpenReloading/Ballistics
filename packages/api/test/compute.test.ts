@@ -4,6 +4,7 @@ import {
   icao,
   interior,
   interiorPressureRange,
+  interiorSampledBand,
   lbPerSqInToKgPerSqM,
   millerStability,
   type Projectile,
@@ -689,6 +690,40 @@ describe('POST /interior pressure range and limits', () => {
       expect(body.issues.length).toBeGreaterThan(0)
       expect(body.notice).toBe('simulation, not load data')
     }
+  })
+})
+
+describe('POST /interior sampled band', () => {
+  const run = (extra: object) =>
+    post(`${API_PREFIX}/interior`, { model: 'm3', load: m3Load, ...extra })
+
+  it('returns the percentiles of the core sampler for the seed, and none without sampling', async () => {
+    const { status, body } = await run({ sampling: { samples: 20, seed: 3 } })
+    expect(status).toBe(200)
+    const core = interiorSampledBand(
+      m3Load,
+      pressureToleranceDefaults,
+      { samples: 20, seed: 3, budgetMs: 3500, now: Date.now },
+      m3Config,
+    )
+    expect(body.sampled).toEqual(json(core))
+    expect(body.sampled.status).toBe('sampled')
+    expect(body.sampled.pressure.p05).toBeLessThan(body.pressureRange.nominalPressure)
+    expect((await run({})).body.sampled).toBeUndefined()
+  })
+
+  it('answers with the corner-case range and the over-budget status when the budget is spent', async () => {
+    const { status, body } = await run({ sampling: { samples: 2000, budgetMs: 1 } })
+    expect(status).toBe(200)
+    expect(body.sampled).toMatchObject({ status: 'overBudget', samples: 2000, budgetMs: 1 })
+    expect(body.sampled.pressure).toBeUndefined()
+    expect(body.pressureRange.highPressure).toBeGreaterThan(body.pressureRange.nominalPressure)
+  })
+
+  it('rejects sampling with a ladder and a sample count outside its bounds', async () => {
+    const ladder = { chargeStep: 0.0001, stepCount: 3 }
+    expect((await run({ ladder, sampling: {} })).status).toBe(400)
+    expect((await run({ sampling: { samples: 5 } })).status).toBe(400)
   })
 })
 

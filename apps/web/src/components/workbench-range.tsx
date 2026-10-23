@@ -4,7 +4,7 @@ import { ActionIcon, Button, Popover } from '@mantine/core'
 import { Info } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import { formatNumber, formatQuantity, withUnit } from '../lib/units.ts'
-import { rangeCardNote, rangeHero } from '../lib/workbench.ts'
+import { rangeCardNote, rangeHero, resultBand } from '../lib/workbench.ts'
 import { AppPopover, popoverWidth } from './app-popover.tsx'
 import { printRangeCard } from './range-card.tsx'
 import { useInputEcho, useLoad, useResult } from './workbench-context.ts'
@@ -87,9 +87,11 @@ export function RangeView() {
                 <dt>Peak pressure</dt>
                 <dd>{p(ok.body.pressureRange.nominalPressure)}</dd>
                 <dd className="readout-note">
-                  <span className="visually-hidden">range </span>
-                  {formatQuantity('pressure', system, ok.body.pressureRange.lowPressure)} to{' '}
-                  {p(ok.body.pressureRange.highPressure)}
+                  <span className="visually-hidden">
+                    {resultBand(ok.body).sampled ? '5th to 95th percentile ' : 'range '}
+                  </span>
+                  {formatQuantity('pressure', system, resultBand(ok.body).pressure.low)} to{' '}
+                  {p(resultBand(ok.body).pressure.high)}
                 </dd>
               </div>
               {ofMax?.limit.pressure && (

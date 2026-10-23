@@ -2693,6 +2693,12 @@ main .library-head.page-panel-head > .page-panel-title {
   white-space: nowrap;
 }
 
+.band-line {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+  font-size: var(--mantine-font-size-xs);
+}
+
 .warnings-summary .mantine-Button-label {
   min-width: 0;
 }

@@ -101,6 +101,7 @@ const tolerances = z
   .strictObject({
     chargeFraction: fraction('the charge mass', 0.2, tol.chargeFraction),
     volumeFraction: fraction('the chamber volume', 0.2, tol.volumeFraction),
+    massFraction: fraction('the bullet mass', 0.1, tol.massFraction),
     burnRateFraction: fraction('the burn rate', 0.5, tol.burnRateFraction),
     temperatureKelvin: within(
       0,
@@ -114,6 +115,37 @@ const tolerances = z
   })
   .describe(
     'Input tolerances of the peak-pressure range. Absent keys take their defaults, one must be above 0.',
+  )
+/** Defaults of `sampling`: the draws, the seed and the time budget in ms. */
+export const samplingDefaults = { samples: 300, seed: 1, budgetMs: 3500 } as const
+/** Draws of the sampled band: each is one model run. */
+const sampling = z
+  .strictObject({
+    samples: z
+      .int()
+      .min(10)
+      .max(2000)
+      .optional()
+      .describe(`Number of draws, 10 to 2000. Default ${samplingDefaults.samples}.`),
+    seed: z
+      .int()
+      .min(0)
+      .max(2 ** 32 - 1)
+      .optional()
+      .describe(
+        `Seed of the generator: the same seed gives the same band. Default ${samplingDefaults.seed}.`,
+      ),
+    budgetMs: z
+      .int()
+      .min(1)
+      .max(4000)
+      .optional()
+      .describe(
+        `Time in ms after which the run gives the corner-case range only. Default ${samplingDefaults.budgetMs}.`,
+      ),
+  })
+  .describe(
+    'The 5th, 50th and 95th percentiles of the peak pressure and the muzzle velocity over draws of the tolerances, as sampled. A single run only, not with a ladder.',
   )
 /** A charge ladder from `load.charge`: `stepCount` charges `chargeStep` kg apart. */
 const ladder = z
@@ -306,11 +338,11 @@ const m3Load = z
   .describe('The load: chamber, barrel, bullet, charge and propellant, SI units.')
 
 /**
- * Body of `POST /interior` for the M3 model (`apps/docs/docs/models/interior-m3.md`): SI,
+ * The fields of the M3 interior body and of the charge-target body (`apps/docs/docs/models/interior-m3.md`): SI,
  * `load.propellantTemperature` in K.
- * Inferred type: {@link InteriorBody}. Request type: {@link InteriorRequest}.
+ * `interiorBody` adds the sampling field.
  */
-export const interiorBody = z
+export const interiorBase = z
   .strictObject({
     model: z.literal('m3').describe('Interior model: m3, one gas state with a Noble-Abel gas.'),
     load: m3Load,
@@ -356,6 +388,21 @@ export const interiorBody = z
   })
   .describe(
     'One run of the M3 interior model, or a charge ladder, in SI units. Results are simulations, not load data.',
+  )
+
+/**
+ * Body of `POST /interior` for the M3 model (`apps/docs/docs/models/interior-m3.md`): SI,
+ * `load.propellantTemperature` in K.
+ * Inferred type: {@link InteriorBody}. Request type: {@link InteriorRequest}.
+ */
+export const interiorBody = interiorBase
+  .extend({ sampling: sampling.optional() })
+  .refine((b) => !(b.ladder && b.sampling), {
+    message: 'sampling applies to a single run, not to a ladder',
+    path: ['sampling'],
+  })
+  .describe(
+    'One run of the M3 interior model with an optional sampled band, or a charge ladder, in SI units. Results are simulations, not load data.',
   )
 
 /** Above 0 and at most `max`. */

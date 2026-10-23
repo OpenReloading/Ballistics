@@ -11,6 +11,7 @@ const range: PressureRange = {
   tolerances: {
     chargeFraction: 0.005,
     volumeFraction: 0.01,
+    massFraction: 0,
     burnRateFraction: 0.03,
     temperatureKelvin: 5,
     startPressureFraction: 0.2,

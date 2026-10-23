@@ -91,6 +91,7 @@ const result = z
 const pressureInputs = [
   'chargeFraction',
   'volumeFraction',
+  'massFraction',
   'burnRateFraction',
   'temperatureKelvin',
   'startPressureFraction',
@@ -108,6 +109,7 @@ const pressureRange = z
       .looseObject({
         chargeFraction: num('Tolerance of the charge mass, relative, 1'),
         volumeFraction: num('Tolerance of the chamber volume, relative, 1'),
+        massFraction: num('Tolerance of the bullet mass, relative, 1'),
         burnRateFraction: num('Tolerance of the burn rate, relative, 1'),
         temperatureKelvin: num('Tolerance of the propellant temperature, K'),
         startPressureFraction: num('Tolerance of the shot-start pressure, relative, 1'),
@@ -138,6 +140,35 @@ const pressureRange = z
       .describe('Each input at both ends, then every input together at both ends'),
   })
   .describe('Peak pressure over the input tolerances of the load')
+
+const percentiles = (what: string) =>
+  z
+    .looseObject({
+      p05: num(`5th percentile of the ${what}`),
+      p50: num(`Median of the ${what}`),
+      p95: num(`95th percentile of the ${what}`),
+    })
+    .optional()
+    .describe(`Percentiles of the ${what}, present with status sampled`)
+
+const sampled = z
+  .looseObject({
+    status: z
+      .enum(['sampled', 'overBudget', 'invalid'])
+      .describe(
+        'sampled: percentiles present. overBudget: the draws did not finish in the time budget, use pressureRange. invalid: no draw stayed in the model.',
+      ),
+    samples: int('Number of draws asked for'),
+    seed: int('Seed of the generator'),
+    failed: int('Draws that left the model, left out of the percentiles'),
+    budgetMs: num('Time budget, ms'),
+    pressure: percentiles('peak breech pressure, Pa'),
+    velocity: percentiles('muzzle velocity, m/s'),
+  })
+  .optional()
+  .describe(
+    'Percentiles of the peak pressure and muzzle velocity over draws of the input tolerances. Absent unless the request has sampling.',
+  )
 
 const limits = z
   .array(
@@ -216,7 +247,7 @@ const error = z
 const charge = num('Charge mass, kg')
 
 /** The fields of a valid run shared by the interior answers. */
-const checked = { pressureRange, limits, warnings }
+const checked = { pressureRange, sampled, limits, warnings }
 
 /** 200 body of `POST /interior`: one M3 run, or the steps of a charge ladder. */
 export const interiorResponse = z.union([

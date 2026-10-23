@@ -18,6 +18,7 @@ const sidebars: SidebarsConfig = {
       'interior-powder-fit',
       'interior-charge-solver',
       'interior-pressure-range',
+      'interior-sampled-band',
       'interior-velocity-ladder',
     ]),
     category('Exterior', [

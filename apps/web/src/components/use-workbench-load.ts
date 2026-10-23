@@ -1140,6 +1140,25 @@ export function useWorkbenchState() {
         showChart(undefined)
         setOutcome(ok)
         setStatus({ prefix: 'Simulation done. ' })
+        // the sampled band of the step shown first follows the result: it takes up to its time budget
+        post({ ...body, load: stepLoad(body.load, steps[first]), sampling: {} })
+          .then((r) => (r.ok ? r.json() : undefined))
+          .then((answer: { sampled?: InteriorResponse['sampled'] } | undefined) => {
+            if (controller.signal.aborted || !answer?.sampled) return
+            const { sampled } = answer
+            setOutcome((o) =>
+              o?.kind === 'ok' && o.id === ok.id
+                ? {
+                    ...o,
+                    body: o.selected === first ? { ...o.body, sampled } : o.body,
+                    steps: o.steps.map((s, i) =>
+                      i === first && s.body ? { ...s, body: { ...s.body, sampled } } : s,
+                    ),
+                  }
+                : o,
+            )
+          })
+          .catch(() => {})
       } else {
         // a ladder whose every step the model reports as invalid shows the first step's error
         const error = steps[0]?.error

@@ -76,6 +76,7 @@ Next.js App Router (TypeScript, React). API at `API_URL` (default `http://localh
 - Record search with `@mantine/spotlight` on Ctrl+K (`workbench-search.tsx`), which also lists the shell's pages and commands.
 - Run: the workbench posts an `m3` load (`src/lib/interior-input.ts`) to `/api/interior` on Run (the page bar from 75em), Enter or Ctrl+Enter. A later input change marks the result "Inputs changed since this result".
   - It shows the notice: the API warnings first, the pressure range and the limits. It never states that a load is safe or within limits.
+  - After the result a second request asks for the sampled band of the step shown first (`sampling`, `apps/docs/docs/models/interior-sampled-band.md`). The peak pressure's note and the line under the tiles (screen only, `band-line`) then show the 5th to 95th percentile of pressure and velocity and that they cover input tolerances only. Over budget, the corner-case range stays and the line says so. The limit check keeps the corner-case range.
 - Trajectory: the workbench's Trajectory tab is the only trajectory UI (`/trajectory` answers 404).
   - Client form `src/components/trajectory-form.tsx`. Core `trajectory()` runs in the browser 150 ms after the last valid change, no submit button. Bullets come from `/api/bullets` (`src/lib/bullet.ts` builds the drag from a record).
 - Interior chart playback (`src/components/chart-playback.tsx`, helpers in `src/lib/playback.ts`):

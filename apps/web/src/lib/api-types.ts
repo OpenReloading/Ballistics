@@ -286,11 +286,24 @@ export interface InteriorResponse {
     tolerances: {
       chargeFraction: number
       volumeFraction: number
+      massFraction: number
       burnRateFraction: number
       temperatureKelvin: number
       startPressureFraction: number
     }
     cases: { maxPressure: number | null }[]
+  }
+  /** The sampled band of a single run that asked for it (`sampling`), `POST /interior`. */
+  sampled?: {
+    status: 'sampled' | 'overBudget' | 'invalid'
+    samples: number
+    seed: number
+    failed: number
+    budgetMs: number
+    /** Peak breech pressure, Pa; with status `sampled`. */
+    pressure?: SampledPercentiles
+    /** Muzzle velocity, m/s; with status `sampled`. */
+    velocity?: SampledPercentiles
   }
   limits?: {
     cartridge: string
@@ -321,6 +334,13 @@ export interface InteriorResponse {
       provenance: Provenance
     }
   }
+}
+
+/** The 5th, 50th and 95th percentile of a sampled quantity. */
+export interface SampledPercentiles {
+  p05: number
+  p50: number
+  p95: number
 }
 
 /**

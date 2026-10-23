@@ -25,7 +25,13 @@ import {
   unitsOf,
   withUnit,
 } from '../lib/units.ts'
-import { firstPressureLimit, lengthText, shownLength } from '../lib/workbench.ts'
+import {
+  bandNotice,
+  firstPressureLimit,
+  lengthText,
+  resultBand,
+  shownLength,
+} from '../lib/workbench.ts'
 import { AppPopover, popoverWidth } from './app-popover.tsx'
 import { LazyVivacityChart } from './lazy-vivacity-chart.tsx'
 import { NavIcon } from './nav-icons.tsx'
@@ -153,10 +159,16 @@ export function WarningsBlock({
 
 /** The facts of the peak pressure readout: its time and travel and what the range covers. */
 export function peakFacts(ok: Extract<Outcome, { kind: 'ok' }>, system: UnitSystem) {
-  const { result: r, pressureRange: range } = ok.body
+  const { result: r, pressureRange: range, sampled } = ok.body
   const t = range.tolerances
   const failed = range.cases.filter((c) => c.maxPressure === null).length
-  return `At ${msText(r.maxPressureTime)} and ${shownLength('travel', system, r.maxPressureTravel)} of travel. The range covers the input tolerances only, no model error: charge ${percentText(t.chargeFraction)}, volume ${percentText(t.volumeFraction)}, burn rate ${percentText(t.burnRateFraction)}, temperature ${
+  const sample =
+    sampled?.status === 'sampled'
+      ? ` The band is the 5th to 95th percentile of ${sampled.samples} draws (seed ${sampled.seed}${sampled.failed ? `, ${sampled.failed} left the model` : ''}) of the inputs, normal around their nominal values with the tolerance as the 90 % half width. The limit check uses the corner-case range ${formatQuantity('pressure', system, range.lowPressure)} to ${formatQuantity('pressure', system, range.highPressure)} ${system.pressure.symbol}.`
+      : sampled
+        ? ` The sampled bands are ${bandNotice(sampled)}: the corner-case range is shown.`
+        : ''
+  return `At ${msText(r.maxPressureTime)} and ${shownLength('travel', system, r.maxPressureTravel)} of travel.${sample} The ${sampled?.status === 'sampled' ? 'band' : 'range'} covers the input tolerances only, no model error: charge ${percentText(t.chargeFraction)}, volume ${percentText(t.volumeFraction)}, ${t.massFraction > 0 ? `bullet mass ${percentText(t.massFraction)}, ` : ''}burn rate ${percentText(t.burnRateFraction)}, temperature ${
     system.temperature === unitsOf.temperature.degF
       ? `${formatNumber((t.temperatureKelvin * 9) / 5, 1)} °F`
       : `${formatNumber(t.temperatureKelvin, 1)} K`
@@ -184,6 +196,7 @@ export function Readouts({
   printed?: boolean
 }) {
   const { result: r, pressureRange: range } = ok.body
+  const band = resultBand(ok.body)
   const { ofMax, lead, ratio } = derived(ok)
   /** A value and its unit, the unit in the muted small type of the readout units. */
   const unit = (value: string, symbol: string) => (
@@ -252,6 +265,10 @@ export function Readouts({
       )}
     </span>
   )
+  // under the tiles, screen only: the velocity band and what the bands cover or why they are not shown
+  const bandLine = band.velocity
+    ? `Velocity ${formatQuantity('velocity', system, band.velocity.low)} to ${formatQuantity('velocity', system, band.velocity.high)} ${system.velocity.symbol}. 5th to 95th percentile, ${bandNotice(ok.body.sampled)}.`
+    : `Sampled bands ${bandNotice(ok.body.sampled)}: corner-case range shown.`
   const big = (value: string, unit: string) => (
     <>
       <span className="readout-value">{value}</span> <span className="readout-unit">{unit}</span>
@@ -269,9 +286,11 @@ export function Readouts({
             {big(formatQuantity('pressure', system, range.nominalPressure), system.pressure.symbol)}
           </dd>
           <dd className="readout-note">
-            <span className="visually-hidden">range </span>
-            {formatQuantity('pressure', system, range.lowPressure)} to{' '}
-            {formatQuantity('pressure', system, range.highPressure)}
+            <span className="visually-hidden">
+              {band.sampled ? '5th to 95th percentile ' : 'range '}
+            </span>
+            {formatQuantity('pressure', system, band.pressure.low)} to{' '}
+            {formatQuantity('pressure', system, band.pressure.high)}
           </dd>
           <dd className="readout-share">
             {ofMax ? limits : <span className="readout-phrase">no comparable limit</span>}
@@ -303,6 +322,7 @@ export function Readouts({
           </dd>
         </div>
       </dl>
+      {!printed && ok.body.sampled && <p className="band-line screen-only">{bandLine}</p>}
       <dl className="readouts readout-list" data-stale={stale || undefined}>
         <div>
           <dt>Muzzle pressure</dt>
