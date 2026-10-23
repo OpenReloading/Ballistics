@@ -37,6 +37,18 @@ Code: `packages/core/src/least-squares.ts`, `logLeastSquares` (`residuals`, `chi
 
 $\sigma_i = 1$ for unweighted observations.
 
+### Huber loss
+
+A caller can ask for a Huber loss on its first $n_h$ observations. A weighted residual beyond the threshold $k$ then counts linearly, so one far outlier pulls the fit less than a square would. The other observations, such as priors, stay quadratic:
+
+$$
+L_k(r) = \begin{cases} r^2 & \lvert r \rvert \le k \\ 2k\lvert r \rvert - k^2 & \lvert r \rvert \gt k \end{cases}, \qquad \text{cost} = \sum_{i \le n_h} L_k(r_i) + \sum_{i \gt n_h} r_i^2
+$$
+
+Code: `packages/core/src/huber.ts`, `huberLoss`, `huberCost`.
+
+Both pieces join at $\lvert r \rvert = k$ with the same value and slope, and $L_k = r^2$ without outliers. The step below minimizes this cost: the candidate must lower it to be accepted. `LogFitResult.chiSquare` stays the sum of $r_i^2$ and `loss` is the cost. The loss needs weighted observations, since $k$ is in units of $\sigma_i$.
+
 ### Jacobian
 
 Central differences with step $h = 10^{-3}$ in each $\theta_j$:
@@ -52,13 +64,15 @@ The observations can be stacked from several runs (sessions). A parameter that d
 ### Levenberg-Marquardt step
 
 $$
-\left(J^\top J + \lambda\, \operatorname{diag}\!\left(J^\top J\right)\right)\delta = -J^\top r
+\left(J^\top W J + \lambda\, \operatorname{diag}\!\left(J^\top W J\right)\right)\delta = -J^\top W r, \qquad W_{ii} = \begin{cases} k / \lvert r_i \rvert & i \le n_h,\ \lvert r_i \rvert \gt k \\ 1 & \text{otherwise} \end{cases}
 $$
 
-Code: `packages/core/src/least-squares.ts`, `logLeastSquares` (`damped`, `delta`, `lambda0`).
+Code: `packages/core/src/least-squares.ts`, `logLeastSquares` (`damped`, `delta`, `lambda0`), `packages/core/src/huber.ts`, `huberRoots`.
+
+Without a Huber loss $W$ is the identity. With it, $W$ is the weight of iteratively reweighted least squares at the current residuals: it is the slope of the loss over $2r$, so the step uses the gradient of the cost.
 
 - The damping starts at $\lambda = 10^{-3}$.
-- A candidate $\theta + \delta$ that lowers $\chi^2$ is accepted, and $\lambda$ is divided by 10.
+- A candidate $\theta + \delta$ that lowers the cost ($\chi^2$ without a Huber loss) is accepted, and $\lambda$ is divided by 10.
 - A candidate with a higher $\chi^2$, or one the caller rejects (no predicted values), multiplies $\lambda$ by 10.
 
 The loop stops on
@@ -119,7 +133,7 @@ The caller sets the floor of each row. The check runs at the start, at the solut
 ### Covariance at the solution
 
 $$
-C_\theta = s^2 \left(J^\top J\right)^{-1}, \qquad s^2 = \begin{cases} 1 & \text{every observation has its own } \sigma_i \\ \chi^2 / (n - p) & \text{otherwise} \end{cases}
+C_\theta = s^2 \left(J^\top W J\right)^{-1}, \qquad s^2 = \begin{cases} 1 & \text{every observation has its own } \sigma_i \\ \chi^2 / (n - p) & \text{otherwise} \end{cases}
 $$
 
 Code: `packages/core/src/least-squares.ts`, `logLeastSquares` (`scale`, `covariance`).
@@ -130,7 +144,7 @@ $$
 
 Code: `packages/core/src/least-squares.ts`, `logLeastSquares` (`standardUncertainty`, `correlation`).
 
-The Jacobian is formed again at the solution unless the last iteration already holds it. Without weights and with $n \le p$ there is no covariance. Because $\theta_j$ is a logarithm, $\sigma_{\theta_j}$ is the relative standard error of $q_j$, and the callers report $q_j\,\sigma_{\theta_j}$ (for the start pressure of the powder fit, its excess over the floor times $\sigma_{\theta_j}$).
+With a Huber loss, $W$ is taken at the solution, so a residual beyond the threshold adds less information. This is the Laplace approximation of the posterior for a likelihood proportional to $e^{-L_k/2}$, with $W$ standing for the curvature of $L_k$. The Jacobian is formed again at the solution unless the last iteration already holds it. Without weights and with $n \le p$ there is no covariance. Because $\theta_j$ is a logarithm, $\sigma_{\theta_j}$ is the relative standard error of $q_j$, and the callers report $q_j\,\sigma_{\theta_j}$ (for the start pressure of the powder fit, its excess over the floor times $\sigma_{\theta_j}$).
 
 ### Identifiability of a weighted Jacobian
 
@@ -177,6 +191,9 @@ The design is singular when $\mu_\text{min} \le 10^{-12}\mu_\text{max}$. Then $\
 | $\sigma_i$ | Standard deviation of observation $i$ | unit of the observation | unit of the observation |
 | $r_i$ | Weighted residual | 1 | 1 |
 | $\chi^2$ | Sum of squared weighted residuals | 1 | 1 |
+| $k$, $n_h$ | Huber threshold in sigmas, number of observations under the Huber loss | 1 | 1 |
+| $L_k$ | Huber loss of a weighted residual | 1 | 1 |
+| $W$ | Diagonal weights of the Huber loss, 1 without it | 1 | 1 |
 | $n$, $p$ | Observations, parameters | 1 | 1 |
 | $J$ | Weighted Jacobian, per unit $\theta$ | no kind | 1 over the unit of $\theta$ |
 | $h$ | Difference step in $\theta$ | 1 | 1 |
@@ -194,6 +211,7 @@ The design is singular when $\mu_\text{min} \le 10^{-12}\mu_\text{max}$. Then $\
 
 - Observations are independent. With weights, $\sigma_i$ is the true standard deviation of observation $i$. Without weights, all observations share one variance, estimated from $\chi^2/(n - p)$.
 - The model is close to linear in $\theta$ over the uncertainty of the estimate, so the inverse information describes the covariance.
+- Under a Huber loss the observations beyond the threshold are outliers of the same model, not a second population. The covariance with $W$ is approximate.
 - The prediction of a candidate is deterministic, so the values of the last accepted step are those at the solution and no prediction runs again.
 
 ## Limits
@@ -210,4 +228,5 @@ The design is singular when $\mu_\text{min} \le 10^{-12}\mu_\text{max}$. Then $\
 - [Bard 1974](../bibliography.md#bard-1974) (chapter unverified): the covariance of a nonlinear least-squares estimate as the inverse of the Jacobian information.
 - [Marquardt 1970](../bibliography.md#marquardt-1970): variance inflation factors as the diagonal of the inverse correlation matrix.
 - [Belsley 1980](../bibliography.md#belsley-1980), chapter 3 (unverified): the condition number of the column-scaled design as a collinearity measure.
+- [Huber 1964](../bibliography.md#huber-1964): the loss that is quadratic near zero and linear beyond a threshold.
 - [Bates 1988](../bibliography.md#bates-1988) (chapter unverified): the limits of the linear approximation of a nonlinear least-squares estimate.

@@ -4,6 +4,8 @@
  * fit: `apps/docs/docs/models/least-squares.md`.
  */
 
+import { type HuberLoss, huberCost, huberRoots } from './huber.ts'
+
 /** Cyclic Jacobi eigen decomposition of a symmetric matrix; vectors[i][k]: entry i of vector k. */
 function eigen(a: number[][]): { values: number[]; vectors: number[][] } {
   const n = a.length
@@ -133,6 +135,12 @@ export interface LogFitInput {
   runs?: readonly number[]
   /** Whether parameter `j` moves run `run`'s predictions; its Jacobian entries elsewhere are 0. */
   moves?: (j: number, run: number) => boolean
+  /**
+   * Huber loss on the first `count` observations (the rest stay quadratic): residuals beyond
+   * `threshold` sigmas count linearly, `apps/docs/docs/models/least-squares.md`, "Huber loss".
+   * Needs `weighted`.
+   */
+  huber?: HuberLoss
   /** Iterations before the fit fails with `'not-converged'`. */
   maxIterations: number
   /** Largest condition number of the column-scaled Jacobian before `'ill-conditioned'`. */
@@ -149,8 +157,10 @@ export interface LogFitInput {
 export interface LogFitResult {
   /** Log parameters at the solution. */
   theta: number[]
-  /** Chi-square at the solution. */
+  /** Sum of squared weighted residuals at the solution, whatever the loss. */
   chiSquare: number
+  /** The minimized cost: `chiSquare`, or with `huber` the sum of the Huber losses. */
+  loss: number
   /** Predicted values at the solution: the last accepted candidate's, or `first` without one. */
   predicted: readonly number[]
   /** Condition number of the column-scaled Jacobian at the solution. */
@@ -232,6 +242,10 @@ export function logLeastSquares(fit: LogFitInput): LogFitResult {
   const residuals = (values: readonly number[]) =>
     values.map((v, i) => (v - observed[i]) / sigma[i])
   const chi2 = (r: number[]) => r.reduce((s, x) => s + x * x, 0)
+  const { huber } = fit
+  const cost2 = (r: number[]) => (huber ? huberCost(r, huber) : chi2(r))
+  const roots = (r: number[]) => huberRoots(r, huber)
+  const scaled = (m: number[][], w: number[]) => m.map((row, i) => row.map((x) => x * w[i]))
 
   const { runs = [n], moves = () => true } = fit
   const start = runs.map((_, k) => runs.slice(0, k).reduce((t, c) => t + c, 0))
@@ -240,7 +254,7 @@ export function logLeastSquares(fit: LogFitInput): LogFitResult {
   let theta = Array.from({ length: parameterCount }, () => 0)
   let predicted = fit.first
   let r = residuals(predicted)
-  let cost = chi2(r)
+  let cost = cost2(r)
   let j = jacobian(fit, stacking, theta)
   /** Whether `j` belongs to the current `theta`. */
   let current = true
@@ -254,10 +268,12 @@ export function logLeastSquares(fit: LogFitInput): LogFitResult {
       fail('not-converged', theta)
     }
     iterations++
-    const a = transposeTimes(j, j)
+    const w = roots(r)
+    const jw = scaled(j, w)
+    const a = transposeTimes(jw, jw)
     const g = transposeTimes(
-      j,
-      r.map((x) => [x]),
+      jw,
+      r.map((x, i) => [x * w[i]]),
     ).map((row) => row[0])
     const damped = a.map((row, k) => row.map((x, l) => (k === l ? x * (1 + lambda) : x)))
     const inv = inverse(damped)
@@ -265,7 +281,7 @@ export function logLeastSquares(fit: LogFitInput): LogFitResult {
     const small = Math.max(...delta.map(Math.abs)) < 1e-8
     const candidate = theta.map((x, k) => x + delta[k])
     const p = small ? null : predict(candidate, theta)
-    const next = p ? chi2(residuals(p)) : Infinity
+    const next = p ? cost2(residuals(p)) : Infinity
     if (p && next < cost) {
       const drop = (cost - next) / cost
       theta = candidate
@@ -285,12 +301,20 @@ export function logLeastSquares(fit: LogFitInput): LogFitResult {
   const condition = checkConditioning(fit, j, theta)
   const dof = n - parameterCount
   if (!(fit.weighted || dof > 0))
-    return { theta, chiSquare: cost, predicted, conditionNumber: condition, iterations }
+    return {
+      theta,
+      chiSquare: chi2(r),
+      loss: cost,
+      predicted,
+      conditionNumber: condition,
+      iterations,
+    }
   const scale = fit.weighted ? 1 : cost / dof
-  const covariance = parameterCovariance(j, scale)
+  const covariance = parameterCovariance(scaled(j, roots(r)), scale)
   return {
     theta,
-    chiSquare: cost,
+    chiSquare: chi2(r),
+    loss: cost,
     predicted,
     conditionNumber: condition,
     iterations,
