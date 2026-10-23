@@ -10,6 +10,7 @@ import {
   isFitted,
   type UnfittedPowder,
 } from '../lib/burn-rate.ts'
+import { burnRateLabel, type Lot } from '../lib/lot-rows.ts'
 import { ipscPowerFactor, powerFactor } from '../lib/power-factor.ts'
 import { ladderTitle, seatingLengthName } from '../lib/seating-ladder.ts'
 import { controlSize } from '../lib/theme.ts'
@@ -673,13 +674,14 @@ export function LadderStrip({
   )
 }
 
-/** The steps of the shown run as a table, one row per charge. */
+/** The steps of the shown run as a table, one row per charge, with the lot rows under each charge when there are any. */
 export function LadderTable({
   ok,
   steps,
   system,
   value,
   velocity,
+  lot,
 }: {
   ok: Extract<Outcome, { kind: 'ok' }> | undefined
   steps: ShownStep[]
@@ -687,6 +689,8 @@ export function LadderTable({
   /** What a step varies: its charge, its seating length or its powder temperature. */
   value: (s: ShownStep) => string
   velocity: (r: InteriorResponse['result']) => string
+  /** The rows at a burn rate above and below, in step order, and the change they were run at. */
+  lot?: { fraction: number; steps: Record<Lot, ShownStep[]> }
 }) {
   const pressure = system.pressure
   // without a load ratio on any step the column would repeat the load ratio readout's phrase
@@ -699,8 +703,72 @@ export function LadderTable({
       ? ['Powder temperature']
       : ['Charge']
   const columns = ladderColumns
-    .flatMap((c) => (c === 'Charge' ? lead : [c]))
+    .flatMap((c) =>
+      c === 'Charge'
+        ? lead.concat(lot ? ['Burn rate'] : [])
+        : c === 'Burnt at the muzzle' && lot
+          ? ['Barrel time', c]
+          : [c],
+    )
     .filter((c) => ratioShown || c !== 'Case fill')
+  // the cells before the result's: the step, what it varies, the seating volume, the burn rate and the flags
+  const before = 3 + (seating ? 1 : 0) + (lot ? 1 : 0)
+  const row = (s: ShownStep, which?: Lot) => (
+    <tr
+      key={`${s.n}${which ?? ''}`}
+      aria-current={!which && ok && s.n - 1 === ok.selected ? 'true' : undefined}
+      data-lot={which}
+    >
+      <td data-label="Step">
+        {s.label}
+        {s.label === '0' && !which && ' main'}
+      </td>
+      <td data-label={lead[0]} className="num">
+        {value(s)}
+      </td>
+      {s.seating && (
+        <td data-label={lead[1]} className="num">
+          {formatQuantity('capacity', system, s.seating.volume)} {system.capacity.symbol}
+        </td>
+      )}
+      {lot && (
+        <td data-label="Burn rate" className="num">
+          {burnRateLabel(which, lot.fraction)}
+        </td>
+      )}
+      <td data-label="Flags">{s.flag || s.error ? flagView(s.flag ?? 'model error') : 'none'}</td>
+      {s.body && s.d && s.at ? (
+        <>
+          <td data-label="Peak pressure" className="num">
+            {formatQuantity('pressure', system, s.body.pressureRange.nominalPressure)}{' '}
+            {pressure.symbol}
+          </td>
+          <td data-label="Percent of maximum" className="num">
+            {s.d.ofMax ? `${formatNumber(s.d.ofMax.percent, 0)} %` : 'no limit'}
+          </td>
+          <td data-label="Muzzle velocity" className="num">
+            {velocity(s.body.result)}
+          </td>
+          <td data-label="Muzzle energy" className="num">
+            {formatQuantity('energy', system, s.body.result.muzzleEnergy)} {system.energy.symbol}
+          </td>
+          {ratioShown && <td data-label="Case fill">{loadRatioText(s.at, s.d.ratio)}</td>}
+          {lot && (
+            <td data-label="Barrel time" className="num">
+              {msText(s.body.result.barrelTime)}
+            </td>
+          )}
+          <td data-label="Burnt at the muzzle" className="num">
+            {formatNumber(s.body.result.muzzleBurntFraction * 100, 0)} %
+          </td>
+        </>
+      ) : (
+        <td data-label="Result" colSpan={columns.length - before}>
+          Not computed: {s.error?.message}
+        </td>
+      )}
+    </tr>
+  )
   return (
     <PanelTable
       label={`${ladderName(ok)} ladder steps`}
@@ -708,51 +776,11 @@ export function LadderTable({
       caption={`${ladderName(ok)} ladder steps`}
       columns={columns}
     >
-      {steps.map((s) => (
-        <tr key={s.n} aria-current={ok && s.n - 1 === ok.selected ? 'true' : undefined}>
-          <td data-label="Step">
-            {s.label}
-            {s.label === '0' && ' main'}
-          </td>
-          <td data-label={lead[0]} className="num">
-            {value(s)}
-          </td>
-          {s.seating && (
-            <td data-label={lead[1]} className="num">
-              {formatQuantity('capacity', system, s.seating.volume)} {system.capacity.symbol}
-            </td>
-          )}
-          <td data-label="Flags">
-            {s.flag || s.error ? flagView(s.flag ?? 'model error') : 'none'}
-          </td>
-          {s.body && s.d && s.at ? (
-            <>
-              <td data-label="Peak pressure" className="num">
-                {formatQuantity('pressure', system, s.body.pressureRange.nominalPressure)}{' '}
-                {pressure.symbol}
-              </td>
-              <td data-label="Percent of maximum" className="num">
-                {s.d.ofMax ? `${formatNumber(s.d.ofMax.percent, 0)} %` : 'no limit'}
-              </td>
-              <td data-label="Muzzle velocity" className="num">
-                {velocity(s.body.result)}
-              </td>
-              <td data-label="Muzzle energy" className="num">
-                {formatQuantity('energy', system, s.body.result.muzzleEnergy)}{' '}
-                {system.energy.symbol}
-              </td>
-              {ratioShown && <td data-label="Case fill">{loadRatioText(s.at, s.d.ratio)}</td>}
-              <td data-label="Burnt at the muzzle" className="num">
-                {formatNumber(s.body.result.muzzleBurntFraction * 100, 0)} %
-              </td>
-            </>
-          ) : (
-            <td data-label="Result" colSpan={columns.length - (seating ? 4 : 3)}>
-              Not computed: {s.error?.message}
-            </td>
-          )}
-        </tr>
-      ))}
+      {steps.flatMap((s, i) => [
+        ...(lot?.steps.low[i] ? [row(lot.steps.low[i], 'low')] : []),
+        row(s),
+        ...(lot?.steps.high[i] ? [row(lot.steps.high[i], 'high')] : []),
+      ])}
     </PanelTable>
   )
 }

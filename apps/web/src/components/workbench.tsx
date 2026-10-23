@@ -28,6 +28,7 @@ import { FileMenu } from './file-menu.tsx'
 import { preloadInteriorChart } from './lazy-chart.tsx'
 import { LoadSheets, printSheets } from './load-sheets.tsx'
 import { LoadTabs } from './load-tabs.tsx'
+import { LotChartBlock, preloadLotChart } from './lot-rows.tsx'
 import { PageBar } from './page-bar.tsx'
 import { PrintReport } from './print-report.tsx'
 import { useReportOptions } from './report-host.ts'
@@ -35,6 +36,7 @@ import { SavedLoads, useExportReminder } from './saved-loads.tsx'
 import { useShortcuts } from './shortcuts.tsx'
 import { useBarrelStudy } from './use-barrel-study.ts'
 import { useLoadTabs } from './use-load-tabs.ts'
+import { useLotRows } from './use-lot-rows.ts'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 import { useWorkbenchState } from './use-workbench-load.ts'
 import { InputEcho, LoadContext, ResultContext, type ResultState } from './workbench-context.ts'
@@ -203,7 +205,7 @@ export function Workbench() {
   )
   const steps = useMemo(() => shownSteps(ok), [ok])
   // the longer run is requested once the tab was opened or a print asked for it
-  const [printAsked, setPrintAsked] = useState<{ key?: string; edits: number }>()
+  const [printAsked, setPrintAsked] = useState<{ key?: string; lot?: string; edits: number }>()
   const [barrelWanted, setBarrelWanted] = useState(false)
   if (!barrelWanted && (tab === 'barrel' || printAsked)) setBarrelWanted(true)
   // a seating ladder's study is the shown step's: the longer run has one charge and one seating
@@ -213,10 +215,17 @@ export function Workbench() {
     system,
     enabled: barrelWanted,
   })
+  // the lot rows are requested once the Ladder table was opened or a print asked for them
+  const [lotWanted, setLotWanted] = useState(false)
+  if (!lotWanted && (tab === 'ladder' || printAsked)) {
+    setLotWanted(true)
+    preloadLotChart()
+  }
+  const lot = useLotRows({ ok, system, enabled: lotWanted })
   // one request at a time, tied to the longer run it waits for and to the inputs it was asked at
   const printReport = useCallback(
-    () => setPrintAsked((asked) => asked ?? { key: barrel.key, edits }),
-    [barrel.key, edits],
+    () => setPrintAsked((asked) => asked ?? { key: barrel.key, lot: lot.key, edits }),
+    [barrel.key, lot.key, edits],
   )
   // The report is printed once the longer run has answered, with its values or its reason. A new
   // run, load, range or edit of the inputs drops the request. `print()` is called from a frame, not from this effect:
@@ -224,8 +233,9 @@ export function Workbench() {
   // (every tab, the print-only fields) must be in the document when the browser takes its snapshot.
   useEffect(() => {
     if (!printAsked) return
-    if (printAsked.key !== barrel.key || printAsked.edits !== edits) return setPrintAsked(undefined)
-    if (barrel.pending) return
+    if (printAsked.key !== barrel.key || printAsked.lot !== lot.key || printAsked.edits !== edits)
+      return setPrintAsked(undefined)
+    if (barrel.pending || lot.pending) return
     setPrinting(true)
     let frame = requestAnimationFrame(() => {
       frame = requestAnimationFrame(() => {
@@ -238,7 +248,7 @@ export function Workbench() {
       cancelAnimationFrame(frame)
       setPrinting(false)
     }
-  }, [printAsked, barrel.key, barrel.pending, edits, setPrinting])
+  }, [printAsked, barrel.key, barrel.pending, lot.key, lot.pending, edits, setPrinting])
   const barrelError = barrel.errors && Object.values(barrel.errors).join(' ')
   const oneFlag = ok && stepFlag(ok)
   /** The report's and the load sheets' title: cartridge, bullet and powder of the run. */
@@ -366,6 +376,8 @@ export function Workbench() {
               <>
                 <h2>{ladderTitle(ok.ladder.kind)} ladder</h2>
                 {ladderTable}
+                {lot.message && <p>Lot rows not computed: {lot.message}</p>}
+                <LotChartBlock lot={lot} system={system} note={false} />
               </>
             )}
             <h2>Barrel length</h2>
@@ -465,7 +477,14 @@ export function Workbench() {
     />
   )
   const ladderTable = (
-    <LadderTable ok={ok} steps={steps} system={system} value={stepValue} velocity={velocity} />
+    <LadderTable
+      ok={ok}
+      steps={steps}
+      system={system}
+      value={stepValue}
+      velocity={velocity}
+      lot={lot.rows}
+    />
   )
 
   // the result side's values, each the same object while a keystroke leaves it unchanged
@@ -533,6 +552,7 @@ export function Workbench() {
       chronoSeries,
       setChronoSeries,
       barrel,
+      lot,
       chartView,
       setChartView,
       showChart,
@@ -573,6 +593,7 @@ export function Workbench() {
       chronoSeries,
       setChronoSeries,
       barrel,
+      lot,
       chartView,
       setChartView,
       showChart,

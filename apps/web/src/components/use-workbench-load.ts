@@ -1116,6 +1116,7 @@ export function useWorkbenchState() {
           at: new Date().toLocaleTimeString('en-GB'),
           id: runs.current,
           bulkDensity,
+          cartridge: body.cartridge,
           powderChosen: powder !== undefined || linkedPowder !== undefined,
           resistanceMissing,
           design: bulletDesign?.name,
