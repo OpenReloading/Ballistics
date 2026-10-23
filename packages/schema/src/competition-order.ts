@@ -41,7 +41,11 @@ export type DisciplineKey = Pick<Discipline, 'federation' | 'name' | 'number' | 
  */
 function codeParts(number: string) {
   const first = number.split('/')[0] ?? ''
-  const [, prefix = '', digits = '', rest = ''] = /^(\D*)(\d+(?:\.\d+)*)?(.*)$/.exec(first) ?? []
+  // Three anchored steps: one pattern with `\D*` and a trailing `.*` backtracks quadratically.
+  const prefix = /^\D*/.exec(first)?.[0] ?? ''
+  const afterPrefix = first.slice(prefix.length)
+  const digits = /^\d+(?:\.\d+)*/.exec(afterPrefix)?.[0] ?? ''
+  const rest = afterPrefix.slice(digits.length)
   const pad = digits && /^x+$/i.test(rest.trim()) ? rest.trim().length : 0
   return {
     prefix: prefix.trim(),

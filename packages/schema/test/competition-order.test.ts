@@ -59,6 +59,13 @@ describe('compareDisciplines', () => {
     ).toEqual(['10xx', '2101', '2101/2102', '3101', '4110', '73xx'])
   })
 
+  it.each(['', '1\n'])('reads a long code of "!" followed by %j in linear time', (tail) => {
+    const long = d('dsb', '!'.repeat(50000) + tail)
+    const start = performance.now()
+    expect(compareDisciplines(long, d('dsb', '1'))).toBeTypeOf('number')
+    expect(performance.now() - start).toBeLessThan(200)
+  })
+
   it('DSB: dotted section and item by segment, several codes by the first', () => {
     expect(
       numbers([
