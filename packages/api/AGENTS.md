@@ -49,7 +49,7 @@ Compute (`src/routes/compute.ts`):
 - 503: a compute deadline (`reason` `timeout`), a full queue or a worker that cannot be created (`reason` `busy`).
 - 500: other errors.
 - Documented NaN result fields are written as `null`.
-- Interior 200 responses carry `pressureRange` and `warnings`. A `limitExceeded` warning names its limit: the sheet id (`spec`), `symbol`, `variant` and `method`. A `ladder` (`chargeStep` kg, `stepCount`) answers `ladderSteps`. An optional `cartridge` id adds `limits` (the Pmax values of its sheet, `src/compute/limits.ts`): each carries `cartridge` (its id) and `revised` (the date of the sheet revision, `revised` or else `published`). `resolved.cartridge` is `{ id, name, provenance }`.
+- Interior 200 responses carry `pressureRange` and `warnings`; a single run with `sampling` also carries `sampled` (`apps/docs/docs/models/interior-sampled-band.md`; a ladder takes no sampling). A `limitExceeded` warning names its limit: the sheet id (`spec`), `symbol`, `variant` and `method`. A `ladder` (`chargeStep` kg, `stepCount`) answers `ladderSteps`. An optional `cartridge` id adds `limits` (the Pmax values of its sheet, `src/compute/limits.ts`): each carries `cartridge` (its id) and `revised` (the date of the sheet revision, `revised` or else `published`). `resolved.cartridge` is `{ id, name, provenance }`.
 - Interior responses with status 200, 422, 503 or a schema 400 carry `notice: "simulation, not load data"`.
 
 `POST /interior/charge-target` (`src/routes/charge-target.ts`, the run in `src/compute/charge-run.ts`, `src/compute/charge-schema.ts`):

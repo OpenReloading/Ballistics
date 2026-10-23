@@ -11575,10 +11575,10 @@
                         "maximum": 4294967295
                       },
                       "budgetMs": {
-                        "description": "Time in ms after which the run gives the corner-case range only. Default 3500.",
+                        "description": "Time in ms after which the run gives the corner-case range only. Default 3000.",
                         "type": "integer",
                         "minimum": 1,
-                        "maximum": 4000
+                        "maximum": 3000
                       }
                     },
                     "additionalProperties": false,

@@ -317,6 +317,11 @@ describe('sampled band', () => {
     expect(bandNotice(sampled)).toBe('input tolerances only')
   })
 
+  it('keeps the printed report on the corner-case range whether or not the sampling answered', () => {
+    expect(resultBand(body({ sampled }), true)).toEqual(resultBand(body({}), true))
+    expect(resultBand(body({}), true).pressure).toEqual({ low: 2.8e8, high: 3.3e8 })
+  })
+
   it('shows the corner-case range and says so when the sampling went over budget', () => {
     const over = { status: 'overBudget' as const, samples: 500, seed: 1, failed: 0, budgetMs: 2500 }
     expect(resultBand(body({ sampled: over }))).toEqual({

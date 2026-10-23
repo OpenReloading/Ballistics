@@ -117,7 +117,7 @@ const tolerances = z
     'Input tolerances of the peak-pressure range. Absent keys take their defaults, one must be above 0.',
   )
 /** Defaults of `sampling`: the draws, the seed and the time budget in ms. */
-export const samplingDefaults = { samples: 300, seed: 1, budgetMs: 3500 } as const
+export const samplingDefaults = { samples: 300, seed: 1, budgetMs: 3000 } as const
 /** Draws of the sampled band: each is one model run. */
 const sampling = z
   .strictObject({
@@ -138,7 +138,7 @@ const sampling = z
     budgetMs: z
       .int()
       .min(1)
-      .max(4000)
+      .max(3000)
       .optional()
       .describe(
         `Time in ms after which the run gives the corner-case range only. Default ${samplingDefaults.budgetMs}.`,

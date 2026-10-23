@@ -197,7 +197,7 @@ export function Readouts({
   printed?: boolean
 }) {
   const { result: r, pressureRange: range } = ok.body
-  const band = resultBand(ok.body)
+  const band = resultBand(ok.body, printed)
   const { ofMax, lead, ratio } = derived(ok)
   /** A value and its unit, the unit in the muted small type of the readout units. */
   const unit = (value: string, symbol: string) => (

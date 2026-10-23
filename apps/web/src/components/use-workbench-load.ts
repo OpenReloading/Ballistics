@@ -420,6 +420,8 @@ export function useWorkbenchState() {
   const [chartView, setChartView] = useState<ChartView>({ x: 'travel', quantity: 'all' })
   const framed = useMediaQuery('screen and (min-width: 62em)')
   const running = useRef<AbortController | null>(null)
+  // the sampled band request of the shown result: an edit leaves it running, a new run ends it
+  const bandRequest = useRef<AbortController | null>(null)
   /** Bullet and powder record requests; only the latest of each kind may set its record. */
   const picking = useRef<Partial<Record<'cartridges' | 'bullets' | 'powders', AbortController>>>({})
   const runs = useRef(0)
@@ -616,6 +618,7 @@ export function useWorkbenchState() {
     setLinked({})
     setByHand(false)
     running.current?.abort()
+    bandRequest.current?.abort()
     picking.current.cartridges?.abort()
     picking.current.bullets?.abort()
     picking.current.powders?.abort()
@@ -985,6 +988,7 @@ export function useWorkbenchState() {
 
   async function send() {
     running.current?.abort()
+    bandRequest.current?.abort()
     let req: ReturnType<typeof loadRequest>
     try {
       req = loadRequest()
@@ -1155,13 +1159,24 @@ export function useWorkbenchState() {
               : o,
           )
         // a request that gives no band (busy, past its deadline, unreachable) is said so
-        post({ ...body, load: stepLoad(body.load, steps[first]), sampling: {} })
+        const bandController = new AbortController()
+        bandRequest.current = bandController
+        apiFetch('interior', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            ...body,
+            load: stepLoad(body.load, steps[first]),
+            sampling: {},
+          }),
+          signal: bandController.signal,
+        })
           .then((r) => (r.ok ? r.json() : undefined))
           .then((answer: { sampled?: SampledBand } | undefined) => {
-            if (!controller.signal.aborted) attach(answer?.sampled ?? { status: 'failed' })
+            if (!bandController.signal.aborted) attach(answer?.sampled ?? { status: 'failed' })
           })
           .catch(() => {
-            if (!controller.signal.aborted) attach({ status: 'failed' })
+            if (!bandController.signal.aborted) attach({ status: 'failed' })
           })
       } else {
         // a ladder whose every step the model reports as invalid shows the first step's error

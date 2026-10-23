@@ -236,10 +236,12 @@ export function rangeHero(
 /**
  * The band of the peak pressure (Pa) and the muzzle velocity (m/s) a result shows: the 5th and 95th
  * percentile of the sampled band, else the corner-case range of the pressure and no velocity band.
+ * `cornerOnly` (the printed report) always takes the corner-case range, so a print does not depend on
+ * whether the sampling had answered.
  */
-export function resultBand(body: InteriorResponse) {
+export function resultBand(body: InteriorResponse, cornerOnly = false) {
   const { sampled, pressureRange: range } = body
-  const sample = sampled?.status === 'sampled' ? sampled : undefined
+  const sample = sampled?.status === 'sampled' && !cornerOnly ? sampled : undefined
   return {
     sampled: sample !== undefined,
     pressure: sample?.pressure

@@ -56,7 +56,7 @@ With $p$ = 0.05, 0.5 and 0.95 these are the reported `p05`, `p50` and `p95`. The
 
 ## Request and answer
 
-`POST /interior` takes `sampling` with `samples` (10 to 2000), `seed` and `budgetMs`, each optional, for a single run. Defaults: 300 draws, seed 1, 3500 ms. A ladder request takes no sampling. With sampling the answer holds `sampled` with `status`:
+`POST /interior` takes `sampling` with `samples` (10 to 2000), `seed` and `budgetMs`, each optional, for a single run. Defaults: 300 draws, seed 1, 3000 ms. A ladder request takes no sampling. With sampling the answer holds `sampled` with `status`:
 
 | Status | Meaning |
 | --- | --- |
