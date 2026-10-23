@@ -13,7 +13,7 @@ import { foldAccents } from './lists.ts'
 import { formatNumber, inchText, kilogramsPerGrain, type UnitSystem } from './units.ts'
 
 /** Whether `word` occurs in `hay` at a word start (after no letter or digit): "7.8" not in "17.80". */
-function atWordStart(hay: string, word: string) {
+export function atWordStart(hay: string, word: string) {
   for (let i = hay.indexOf(word); i >= 0; i = hay.indexOf(word, i + 1))
     if (i === 0 || !/[a-z0-9]/.test(hay[i - 1])) return true
   return false
