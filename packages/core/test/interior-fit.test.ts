@@ -354,3 +354,105 @@ describe('powder fit failures', () => {
     )
   })
 })
+
+describe('powder fit prior and robust loss', () => {
+  const both = ['burnRate', 'startPressure'] as const
+  const priors = {
+    burnRate: { value: 0.45, sigma: 0.3 },
+    startPressure: { value: 30e6, sigma: 0.5 },
+  }
+  // 0.005 g apart: the velocities barely separate the two parameters
+  const narrow = ladder(load(), 3, 0)
+    .slice(1, 3)
+    .map((x, i) => ({ ...x, charge: 2.8e-3 + i * 5e-6 }))
+  const narrowTruth = narrow.map((x) => {
+    const r = interior({ ...load(), charge: x.charge })
+    if (!r.valid) throw new Error(r.reason)
+    return { ...x, muzzleVelocity: r.muzzleVelocity }
+  })
+
+  it('fits a two-charge velocity ladder with a prior and reports its uncertainty', () => {
+    const e = failure(() => fitPowder(load(0.38, 20e6), narrowTruth, { parameters: both }))
+    expect(e.reason).toBe('ill-conditioned')
+    const r = fitPowder(load(0.38, 20e6), narrowTruth, { parameters: both, priors })
+    expect(r.degreesOfFreedom).toBe(0)
+    expect(rel(r.parameters[0].value, 0.45)).toBeLessThan(1e-3)
+    expect(r.parameters[0].standardUncertainty).toBeGreaterThan(0)
+    expect(r.parameters[0].standardUncertainty).toBeLessThan(0.3 * 0.45)
+    expect(r.parameters[1].standardUncertainty).toBeGreaterThan(0)
+    expect(r.priorChiSquare).toBeLessThan(1e-6)
+  })
+
+  it('matches the fit without a prior under a very wide prior', () => {
+    const points = ladder(load(), 3, 5e6, 1)
+    const plain = fitPowder(load(0.38, 20e6), points, { parameters: both })
+    const wide = fitPowder(load(0.38, 20e6), points, {
+      parameters: both,
+      priors: { burnRate: { value: 0.1, sigma: 1e5 }, startPressure: { value: 9e6, sigma: 1e5 } },
+    })
+    plain.parameters.forEach((p, k) => {
+      expect(rel(wide.parameters[k].value, p.value)).toBeLessThan(1e-6)
+      expect(
+        rel(wide.parameters[k].standardUncertainty ?? 0, p.standardUncertainty ?? 1),
+      ).toBeLessThan(1e-6)
+    })
+    expect(rel(wide.chiSquare, plain.chiSquare)).toBeLessThan(1e-6)
+  })
+
+  it('splits chi-square into the data and the prior', () => {
+    const points = ladder(load(), 3, 0, 1)
+    const r = fitPowder(load(0.38), points, { priors: { burnRate: { value: 0.3, sigma: 0.2 } } })
+    expect(r.priorChiSquare).toBeGreaterThan(0)
+    expect(r.dataChiSquare + r.priorChiSquare).toBeCloseTo(r.chiSquare, 9)
+    expect(r.loss).toBe(r.chiSquare)
+    const none = fitPowder(load(0.38), points)
+    expect([none.priorChiSquare, none.dataChiSquare]).toEqual([0, none.chiSquare])
+    // a prior pulls the fit toward its centre
+    expect(Math.abs(Math.log(r.parameters[0].value / 0.3))).toBeLessThan(
+      Math.abs(Math.log(none.parameters[0].value / 0.3)),
+    )
+  })
+
+  it('limits the pull of a string 5 sigma off with the Huber loss', () => {
+    const points = ladder(load(), 3, 0)
+    const bad = points.map((x, i) =>
+      i === 2 ? { ...x, muzzleVelocity: x.muzzleVelocity + 15 } : x,
+    )
+    const error = (r: { parameters: { value: number }[] }) =>
+      Math.abs(Math.log(r.parameters[0].value / 0.45))
+    const plain = fitPowder(load(0.38), bad)
+    const robust = fitPowder(load(0.38), bad, { huberThreshold: 1.5 })
+    expect(error(robust)).toBeLessThan(error(plain))
+    expect(robust.loss).toBeLessThan(robust.chiSquare)
+    expect(robust.dataChiSquare).toBeGreaterThanOrEqual(plain.dataChiSquare)
+    // a threshold above every residual is the quadratic loss
+    const loose = fitPowder(load(0.38), bad, { huberThreshold: 100 })
+    expect(loose.parameters[0].value).toBe(plain.parameters[0].value)
+  })
+
+  it('rejects malformed priors and a Huber loss without sigmas', () => {
+    const points = ladder(load(), 3, 0)
+    const bare = points.map(({ velocitySigma: _, ...x }) => x)
+    const prior = { burnRate: { value: 0.45, sigma: 0.3 } }
+    expect(() => fitPowder(load(), bare, { priors: prior })).toThrow(InputError)
+    expect(() => fitPowder(load(), bare, { huberThreshold: 2 })).toThrow(InputError)
+    expect(() => fitPowder(load(), points, { huberThreshold: 0 })).toThrow(InputError)
+    expect(() =>
+      fitPowder(load(), points, { priors: { burnRate: { value: -1, sigma: 1 } } }),
+    ).toThrow(InputError)
+    expect(() =>
+      fitPowder(load(), points, { priors: { burnRate: { value: 1, sigma: 0 } } }),
+    ).toThrow(InputError)
+    expect(() => fitPowder(load(), points, { priors: { burnRate: undefined } })).not.toThrow()
+    // the start pressure is not fitted
+    expect(() =>
+      fitPowder(load(), points, { priors: { startPressure: { value: 30e6, sigma: 1 } } }),
+    ).toThrow(InputError)
+    expect(() =>
+      fitPowder(load(0.38, 20e6), points, {
+        parameters: both,
+        priors: { startPressure: { value: 4e6, sigma: 1 } },
+      }),
+    ).toThrow(InputError)
+  })
+})

@@ -1,11 +1,11 @@
 ---
 title: Powder fit from a chronograph ladder
-description: Weighted least-squares fit of the burn coefficient and, on request, the start pressure of the M3 interior model to measured muzzle velocities and peak pressures of a charge ladder.
+description: Weighted least-squares fit of the burn coefficient and, on request, the start pressure of the M3 interior model to measured muzzle velocities and peak pressures of a charge ladder, with optional Gaussian priors and a Huber loss.
 ---
 
 # Powder fit from a chronograph ladder
 
-`fitPowder` fits the burn coefficient of one [M3](interior-m3.md) load and, on request, its shot-start pressure to a ladder: charges with their mean muzzle velocities and, optionally, measured peak pressures. The fit works on log parameters with the Levenberg-Marquardt loop of the [least-squares page](least-squares.md). It reports the fitted values, their uncertainty and correlation, the residuals, $\chi^2$, the degrees of freedom and the condition number. The fitted values describe the ladder's rifle, powder lot, components and model version over the ladder's charge range. They are not powder data and not load data.
+`fitPowder` fits the burn coefficient of one [M3](interior-m3.md) load and, on request, its shot-start pressure to a ladder: charges with their mean muzzle velocities and, optionally, measured peak pressures. The fit works on log parameters with the Levenberg-Marquardt loop of the [least-squares page](least-squares.md). It reports the fitted values, their uncertainty and correlation, the residuals, $\chi^2$ split into the ladder's and the priors' share, the degrees of freedom and the condition number. Optional Gaussian priors on the log parameters turn the fit into a maximum a posteriori estimate, and an optional Huber loss limits the pull of one outlying string. The fitted values describe the ladder's rifle, powder lot, components and model version over the ladder's charge range. They are not powder data and not load data.
 
 ## Equations
 
@@ -76,9 +76,32 @@ Code: `packages/core/src/interior/fit.ts`, `fitPowder` (the `floor` field of the
 
 A candidate with an invalid run at any charge is a rejected step.
 
+### Prior and robust loss
+
+A prior on a fitted parameter is a Gaussian on its log parameter with centre $\mu_j$ and standard deviation $s_j$. The centre is given as a value $q_j^\ast$ of the parameter, for example from the powder's record or its family, and mapped like the fit's own start value. It enters the fit as one pseudo-row after the ladder rows, with observed value $\mu_j$, predicted value $\theta_j$ and standard deviation $s_j$. The fit then minimizes the negative log posterior up to a constant, the maximum a posteriori estimate ([Gelman 2013](../bibliography.md#gelman-2013), chapter unverified):
+
+$$
+\mu_j = \ln\frac{q_j^\ast - o_j}{q_{j,0} - o_j}, \qquad
+\chi^2 = \underbrace{\sum_i r_i^2}_{\chi^2_\text{data}} + \underbrace{\sum_{j \in P} \frac{(\theta_j - \mu_j)^2}{s_j^2}}_{\chi^2_\text{prior}}
+$$
+
+Code: `packages/core/src/interior/fit.ts`, `fitPowder` (`priorRows`, `priorChiSquare`, `dataChiSquare`).
+
+The burn coefficient needs $q_j^\ast \gt 0$ and the start pressure $q_j^\ast \gt p_\text{floor}$, with $s_j \gt 0$ in both. A prior on a parameter that is not fitted is refused. The checks for unresolved and ill-conditioned parameters see the prior rows too. A ladder whose velocities barely separate the burn coefficient and the start pressure therefore fits with priors where it fails as `ill-conditioned` without them, and a prior keeps its parameter from counting as `unresolved`. The reported uncertainty is then the posterior one, and its size against $s_j$ shows how much the ladder added. The degrees of freedom still count the ladder rows only. A prior with a very large $s_j$ leaves the fit unchanged.
+
+The Huber loss of the [least-squares page](least-squares.md) with threshold $k$ (option `huberThreshold`, in sigmas of the rows) applies to the ladder rows only, not to the prior rows. $\chi^2$ in the result stays the plain sum, so a downweighted string still shows its full residual, and `loss` holds the minimized cost:
+
+$$
+\text{loss} = \sum_{i \in \text{ladder}} L_k(r_i) + \chi^2_\text{prior}
+$$
+
+Code: `packages/core/src/interior/fit.ts`, `fitPowder` (`huber`, `loss`), `packages/core/src/huber.ts`, `huberLoss`.
+
+Priors and the Huber loss need uncertainties on every velocity, since $s_j$ and $k$ are in absolute and in sigma units. Without `huberThreshold` the loss is quadratic ([Huber 1964](../bibliography.md#huber-1964)).
+
 ### Uncertainty
 
-With $C_\theta$ the covariance of the log parameters at the solution (scaled by $\chi^2/\nu$ when no uncertainties are given), the standard uncertainty of a fitted value is
+With $C_\theta$ the covariance of the log parameters at the solution (scaled by $\chi^2/\nu$ when no uncertainties are given; with priors it is the posterior covariance, from the ladder rows and the prior rows, and with a Huber loss the weights $W$ of the [least-squares page](least-squares.md) are taken at the solution), the standard uncertainty of a fitted value is
 
 $$
 \sigma_{q_j} = (q_j - o_j)\sqrt{C_{\theta,jj}}, \qquad o_j = \begin{cases} p_\text{floor} & \text{start pressure} \\ 0 & \text{burn coefficient} \end{cases}
@@ -122,6 +145,10 @@ Malformed input (an empty ladder, a value that is not finite and above 0, uncert
 | $p_f$ | Bore friction pressure | bar | Pa |
 | $p_e(0)$ | Engraving pressure at travel 0 | bar | Pa |
 | $\theta_j$ | Log parameter | 1 | 1 |
+| $q_j^\ast$, $\mu_j$, $s_j$ | Prior centre as a value, in log parameter, and its standard deviation | as the parameter, 1, 1 | as the parameter, 1, 1 |
+| $L_k$, $k$ | Huber loss of a weighted residual, its threshold in sigmas | 1 | 1 |
+| $\chi^2_\text{data}$, $\chi^2_\text{prior}$ | Shares of $\chi^2$ of the ladder rows and of the priors | 1 | 1 |
+| $P$ | Parameters with a prior | no kind | no kind |
 | $q_j$, $o_j$ | Fitted value and its offset | as the parameter | as the parameter |
 | $r_i$ | Weighted residual | 1 | 1 |
 | $\chi^2$ | Sum of squared weighted residuals | 1 | 1 |
@@ -135,16 +162,20 @@ Malformed input (an empty ladder, a value that is not finite and above 0, uncert
 - Velocities are mean muzzle velocities. A chronograph reading at a distance from the muzzle is converted to the muzzle by the caller, for example with [truing](exterior-truing.md).
 - A pressure row is compared with the peak breech pressure. The gauge position is not modelled.
 - Observations are independent, with the stated standard uncertainties.
+- A prior describes the powder's parameter, not this ladder: it comes from a record or a family of powders. A prior far from the data drags the fit, and the result then shows a large $\chi^2_\text{prior}$.
 
 ## Limits
 
 - The fit is local: from a start far from the solution the steps can end at the start-pressure floor with `unresolved`.
 - The peak pressure has a kink in the parameters where the peak moves between a located interior peak and burnout. A Jacobian taken across it mixes both sides.
 - Charges outside the ladder's range are extrapolations. The result holds no charge recommendation and no limit.
+- The posterior uncertainty is the first-order Laplace approximation, no sampling. With a Huber loss it is approximate. Several sessions in one fit are not supported.
 - Only the burn coefficient and the start pressure are fitted. Exponent, energy, form parameters and temperature coefficients stay as given. One ladder, one barrel and one temperature per fit.
 - Each prediction costs one `interior` run per distinct charge, and each Jacobian two predictions per parameter.
 
 ## Sources
 
 - [Levenberg 1944](../bibliography.md#levenberg-1944) and [Marquardt 1963](../bibliography.md#marquardt-1963): the damped least-squares iteration.
+- [Gelman 2013](../bibliography.md#gelman-2013): the maximum a posteriori estimate and the Laplace approximation of a posterior.
+- [Huber 1964](../bibliography.md#huber-1964): the Huber loss.
 - [JCGM 100:2008](../bibliography.md#jcgm-100-2008), section 4.2.3 (section number unverified): the standard uncertainty of a mean of $N$ readings, the sample standard deviation over $\sqrt N$, which a caller uses as the velocity uncertainty of a string.
