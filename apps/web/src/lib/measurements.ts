@@ -1,3 +1,4 @@
+import { type LadderFlatSpots, ladderFlatSpots } from '@openreloading/core'
 import type { ChronoImport } from '@openreloading/importers'
 import type { MeasuredSeries } from '@openreloading/schema'
 import { type Shot, type StringStats, stringStats } from './chrono.ts'
@@ -38,6 +39,16 @@ export function seriesOf(
 type MappedString = { charge: number | undefined; shots: Shot[] }
 /** A ladder step of the last run: charge, kg, and muzzle velocity, m/s; no velocity for an invalid step. */
 export type SimulatedStep = { charge: number; muzzleVelocity: number | undefined }
+
+/** The flat spots over the charges of one series; undefined below two charges with two or more shots. */
+export function seriesFlatSpots(rows: readonly ChargeRow[]): LadderFlatSpots | undefined {
+  const steps = rows.flatMap(({ charge, velocityStats: st }) =>
+    st?.standardDeviation === undefined
+      ? []
+      : [{ charge, mean: st.mean, standardDeviation: st.standardDeviation, count: st.count }],
+  )
+  return steps.length >= 2 ? ladderFlatSpots(steps) : undefined
+}
 
 export interface ChargeRow {
   /** kg. */
