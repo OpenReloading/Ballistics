@@ -372,6 +372,7 @@ export function useRingScoring({
       ? [{ value: choice?.id ?? '', label: choice?.id ?? offline }]
       : [
           { value: '', label: 'None' },
+          // the stages of a discipline keep the order of the rule book
           ...(discipline
             ? ofDiscipline.map((m) => ({
                 value: m.face,
@@ -384,7 +385,7 @@ export function useRingScoring({
               : list
                   .filter((f) => !inFederation || inFederation.has(f.id) || f.id === choice?.id)
                   .map((f) => ({ value: f.id, label: `${f.organization} ${f.name}` }))
-          ).toSorted((a, b) => compareNames(a.label, b.label)),
+                  .toSorted((a, b) => compareNames(a.label, b.label))),
         ]
 
   const panel = group && (
@@ -449,6 +450,8 @@ export function useRingScoring({
             return
           }
           setFace(() => (id ? { id } : undefined))
+          // a face from the federation's or every face shows the federation of its own discipline
+          setFederation(undefined)
           // the first event: its gauge scores, as the rule book says
           if (id)
             fetchFace(id).then(

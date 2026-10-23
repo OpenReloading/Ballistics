@@ -86,7 +86,7 @@ The group panel of `/groups` (`apps/web/src/components/ring-scoring.tsx`, `apps/
 
 1. Federation: All, or one federation, by abbreviation.
 2. Discipline: the disciplines of that federation, by number then name. With All, every federation in turn, then the face events no mapping names by organization and name.
-3. Face: the faces of the discipline's mappings with their stage, else every face. With only a federation chosen, the faces its disciplines map to and the faces it publishes.
+3. Face: the faces of the discipline's mappings with their stage, in the order of the stages, else every face by name. With only a federation chosen, the faces its disciplines map to and the faces it publishes.
 4. Event: only for a face no mapping names, by distance ascending, then name.
 
 Names are alphabetical with numbers in numeric order (25 before 100). The same comparators order the filters of the discipline and target face directories (`apps/web/src/lib/face-order.ts`).
