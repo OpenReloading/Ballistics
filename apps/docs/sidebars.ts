@@ -25,6 +25,7 @@ const sidebars: SidebarsConfig = {
       'exterior-point-mass',
       'exterior-stability',
       'exterior-modified-point-mass',
+      'exterior-moving-target',
       'exterior-outline-drag',
       'exterior-truing',
       'exterior-truing-strings',

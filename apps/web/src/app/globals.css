@@ -2938,6 +2938,14 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 /* the Barrel length tab: the range fields and the table or chart switch in one row */
+.moving-target-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 12rem));
+  align-items: end;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
 .barrel-range {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 9rem)) auto;

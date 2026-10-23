@@ -61,6 +61,7 @@ import {
 } from '../lib/units.ts'
 import { storedRecords } from '../lib/user-store.ts'
 import { LazyLineChart as LineChart, preloadChart } from './lazy-chart.tsx'
+import { MovingTarget } from './moving-target.tsx'
 import { NumberField } from './number-field.tsx'
 import { printRangeCard, RangeCard } from './range-card.tsx'
 import { RecordSearch } from './record-search.tsx'
@@ -394,6 +395,7 @@ function ResultDetail({
         {chartEl}
       </div>
       {tableEl}
+      <MovingTarget points={rows} system={system} />
     </>
   )
 }
