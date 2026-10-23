@@ -319,7 +319,9 @@ export function fitPowder(
     'huberThreshold must be positive',
   )
   const priors = options.priors ?? {}
-  const priorNames = Object.keys(priors) as PowderParameter[]
+  const priorNames = (Object.keys(priors) as PowderParameter[]).filter(
+    (n) => priors[n] !== undefined,
+  )
   need(
     priorNames.every((name) => parameters.includes(name)),
     'a prior needs its parameter in parameters',

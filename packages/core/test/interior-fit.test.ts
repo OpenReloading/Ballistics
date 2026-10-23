@@ -443,6 +443,7 @@ describe('powder fit prior and robust loss', () => {
     expect(() =>
       fitPowder(load(), points, { priors: { burnRate: { value: 1, sigma: 0 } } }),
     ).toThrow(InputError)
+    expect(() => fitPowder(load(), points, { priors: { burnRate: undefined } })).not.toThrow()
     // the start pressure is not fitted
     expect(() =>
       fitPowder(load(), points, { priors: { startPressure: { value: 30e6, sigma: 1 } } }),
