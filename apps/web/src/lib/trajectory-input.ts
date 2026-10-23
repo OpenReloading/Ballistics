@@ -229,6 +229,8 @@ export type TrajectoryResult = {
   zeroRange: number
   /** Windage hold per 1 m/s and per 1 mph of crosswind at each table point, rad. */
   windPerUnit: { mps: number[]; mph: number[] }
+  /** Bullet diameter, m. */
+  bulletDiameter: number
   /** Density altitude of the shot's air, m. */
   densityAltitude: number
   /** Where Miller's factor first falls below `minStability` along the flight; none without length and twist. */
@@ -266,6 +268,7 @@ export function trajectoryResult(
     chartPoints: pick(chart),
     zeroRange: requireValue(values, shotFields, 'zeroRange'),
     windPerUnit: windPerUnit(shot, tablePoints),
+    bulletDiameter: projectile.diameter,
     densityAltitude: densityAltitude(shot.air),
     ...(low && { lowStability: low }),
   }

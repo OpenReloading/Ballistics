@@ -2938,6 +2938,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 /* the Barrel length tab: the range fields and the table or chart switch in one row */
+.hit-probability-fields,
 .moving-target-fields {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(9rem, 12rem));

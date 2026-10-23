@@ -63,6 +63,7 @@ import {
   withUnit,
 } from '../lib/units.ts'
 import { storedRecords } from '../lib/user-store.ts'
+import { HitProbability } from './hit-probability.tsx'
 import { LazyLineChart as LineChart, preloadChart } from './lazy-chart.tsx'
 import { MovingTarget } from './moving-target.tsx'
 import { NumberField } from './number-field.tsx'
@@ -415,6 +416,13 @@ function ResultDetail({
       </div>
       {tableEl}
       <MovingTarget points={rows} system={system} />
+      <HitProbability
+        points={rows}
+        windPerUnit={result.windPerUnit.mps}
+        wind={{ speed: result.si.windSpeed ?? 0, from: result.si.windFrom ?? Math.PI / 2 }}
+        bulletDiameter={result.bulletDiameter}
+        system={system}
+      />
     </>
   )
 }
