@@ -25,6 +25,7 @@ import type {
   ErrorBody,
   InteriorResponse,
   PowderRecord,
+  SampledBand,
 } from '../lib/api-types.ts'
 import { runBatch } from '../lib/batch.ts'
 import { fitOf } from '../lib/bullet-fit.ts'
@@ -1141,24 +1142,27 @@ export function useWorkbenchState() {
         setOutcome(ok)
         setStatus({ prefix: 'Simulation done. ' })
         // the sampled band of the step shown first follows the result: it takes up to its time budget
+        const attach = (sampled: SampledBand) =>
+          setOutcome((o) =>
+            o?.kind === 'ok' && o.id === ok.id
+              ? {
+                  ...o,
+                  body: o.selected === first ? { ...o.body, sampled } : o.body,
+                  steps: o.steps.map((s, i) =>
+                    i === first && s.body ? { ...s, body: { ...s.body, sampled } } : s,
+                  ),
+                }
+              : o,
+          )
+        // a request that gives no band (busy, past its deadline, unreachable) is said so
         post({ ...body, load: stepLoad(body.load, steps[first]), sampling: {} })
           .then((r) => (r.ok ? r.json() : undefined))
-          .then((answer: { sampled?: InteriorResponse['sampled'] } | undefined) => {
-            if (controller.signal.aborted || !answer?.sampled) return
-            const { sampled } = answer
-            setOutcome((o) =>
-              o?.kind === 'ok' && o.id === ok.id
-                ? {
-                    ...o,
-                    body: o.selected === first ? { ...o.body, sampled } : o.body,
-                    steps: o.steps.map((s, i) =>
-                      i === first && s.body ? { ...s, body: { ...s.body, sampled } } : s,
-                    ),
-                  }
-                : o,
-            )
+          .then((answer: { sampled?: SampledBand } | undefined) => {
+            if (!controller.signal.aborted) attach(answer?.sampled ?? { status: 'failed' })
           })
-          .catch(() => {})
+          .catch(() => {
+            if (!controller.signal.aborted) attach({ status: 'failed' })
+          })
       } else {
         // a ladder whose every step the model reports as invalid shows the first step's error
         const error = steps[0]?.error

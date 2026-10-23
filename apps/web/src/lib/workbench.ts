@@ -253,5 +253,20 @@ export function resultBand(body: InteriorResponse) {
 export function bandNotice(sampled: InteriorResponse['sampled']): string | undefined {
   if (sampled === undefined) return
   if (sampled.status === 'sampled') return 'input tolerances only'
-  return sampled.status === 'overBudget' ? 'over budget' : 'no valid draw'
+  return { overBudget: 'over budget', invalid: 'no valid draw', failed: 'not finished' }[
+    sampled.status
+  ]
+}
+
+/**
+ * The line under the key tiles of a result with a sampling answer: the velocity band and what the
+ * bands cover, or why the corner-case range is shown instead; undefined without a sampling answer.
+ */
+export function bandLine(body: InteriorResponse, system: UnitSystem): string | undefined {
+  const notice = bandNotice(body.sampled)
+  if (notice === undefined) return
+  const { velocity } = resultBand(body)
+  if (!velocity) return `Sampled bands ${notice}: corner-case range shown.`
+  const v = (si: number) => formatQuantity('velocity', system, si)
+  return `Velocity ${v(velocity.low)} to ${v(velocity.high)} ${system.velocity.symbol}. 5th to 95th percentile, ${notice}.`
 }

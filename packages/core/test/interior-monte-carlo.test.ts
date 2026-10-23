@@ -79,6 +79,20 @@ describe('sampledBand', () => {
     expect(band.failed).toBe(0)
   })
 
+  it('matches the corner cases of the M3 model with one input varied, within the sampling error', () => {
+    const t = { ...none, chargeFraction: 0.05 }
+    const samples = 1000
+    const nominal = interiorSampledBand(m3Load, none, sampling({ samples: 1 })).pressure?.p50 ?? 0
+    const corners = interiorPressureRange(m3Load, nominal, t)
+    const band = interiorSampledBand(m3Load, t, sampling({ samples }))
+    // standard error of the 5th and 95th percentile of draws whose 90 % interval is the tolerance
+    const density = Math.exp(-(1.6448536269514722 ** 2) / 2) / Math.sqrt(2 * Math.PI)
+    const sigmas = Math.sqrt((0.05 * 0.95) / samples) / density
+    const error = ((sigmas / 1.6448536269514722) * (corners.highPressure - corners.lowPressure)) / 2
+    expect(Math.abs((band.pressure?.p05 ?? 0) - corners.lowPressure)).toBeLessThan(4 * error)
+    expect(Math.abs((band.pressure?.p95 ?? 0) - corners.highPressure)).toBeLessThan(4 * error)
+  })
+
   it('lies inside the corner band of the M3 model when inputs combine', () => {
     const nominal = interiorSampledBand(m3Load, none, sampling({ samples: 1 })).pressure?.p50 ?? 0
     const corners = interiorPressureRange(m3Load, nominal, pressureToleranceDefaults)

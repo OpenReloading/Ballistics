@@ -4,6 +4,7 @@ import { peakFacts } from '../src/components/workbench-readouts.tsx'
 import type { InteriorResponse } from '../src/lib/api-types.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import {
+  bandLine,
   bandNotice,
   bulletLeadTime,
   mmLength,
@@ -324,6 +325,27 @@ describe('sampled band', () => {
       velocity: undefined,
     })
     expect(bandNotice(over)).toBe('over budget')
+  })
+
+  it('says what each sampling answer covers, and why the corner-case range stands in for a band', () => {
+    const units = presetUnits('metric-grains')
+    expect(bandLine(body({ sampled }), units)).toBe(
+      'Velocity 830 to 850 m/s. 5th to 95th percentile, input tolerances only.',
+    )
+    for (const [status, word] of [
+      ['overBudget', 'over budget'],
+      ['invalid', 'no valid draw'],
+    ] as const)
+      expect(
+        bandLine(
+          body({ sampled: { ...sampled, status, pressure: undefined, velocity: undefined } }),
+          units,
+        ),
+      ).toBe(`Sampled bands ${word}: corner-case range shown.`)
+    expect(bandLine(body({ sampled: { status: 'failed' } }), units)).toBe(
+      'Sampled bands not finished: corner-case range shown.',
+    )
+    expect(bandLine(body({}), units)).toBeUndefined()
   })
 
   it('shows the corner-case range without a word for a result that did not ask for sampling', () => {

@@ -86,7 +86,7 @@ Code: `packages/core/src/interior/range.ts`, `pressureToleranceDefaults`.
 ## Limits
 
 - Model error is not part of the range: the range of an input that the model gets wrong is wrong as well.
-- The bullet mass tolerance is 0 by default, so the input does not move until a caller sets it. The seating depth acts through the chamber volume and has no tolerance of its own. Inputs without a tolerance (bore area, energy, form function, resistance and others) do not move.
+- The bullet mass tolerance is 0 by default, so the input does not move until a caller sets it. The seating depth changes the chamber volume and the bullet travel and has no tolerance of its own. Inputs without a tolerance (bore area, energy, form function, resistance and others) do not move.
 - The range is not a probability statement.
 
 ## Sources

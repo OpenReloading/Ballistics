@@ -4,7 +4,7 @@ import { ActionIcon, Button, Popover } from '@mantine/core'
 import { Info } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import { formatNumber, formatQuantity, withUnit } from '../lib/units.ts'
-import { rangeCardNote, rangeHero, resultBand } from '../lib/workbench.ts'
+import { bandLine, rangeCardNote, rangeHero, resultBand } from '../lib/workbench.ts'
 import { AppPopover, popoverWidth } from './app-popover.tsx'
 import { printRangeCard } from './range-card.tsx'
 import { useInputEcho, useLoad, useResult } from './workbench-context.ts'
@@ -117,6 +117,9 @@ export function RangeView() {
           </>
         )}
       </div>
+      {ok && bandLine(ok.body, system) && (
+        <p className="range-needs band-line screen-only">{bandLine(ok.body, system)}</p>
+      )}
       <div id="range-chrono" hidden={!chrono}>
         {chrono && (
           <Measurements

@@ -25,6 +25,8 @@ $$
 
 Code: `packages/core/src/interior/monte-carlo.ts`, `sampledBand` (`side`), `toleranceSigmas`; `packages/core/src/interior/range.ts`, `interiorApply`.
 
+JCGM 101:2008 gives an input known only by its bounds a rectangular distribution. Here the tolerance is read as the central 90 % interval of a normal distribution instead, so that the 5th and 95th percentile of the output coincide with the corner cases of a single varied input.
+
 The constant $c$ is the 95th percentile of the standard normal distribution. A tolerance is therefore the half width of the central 90 % interval of its input, so for a response that rises or falls steadily with one input the 5th and 95th percentile of the output are the values at the two ends of the tolerance, the values of the corner cases.
 
 ### Standard normal numbers
@@ -88,7 +90,7 @@ The workbench asks for the band of the step it shows first, in a second request 
 ## Limits
 
 - Model error is not part of the band: the band of an input that the model gets wrong is wrong as well.
-- Inputs without a tolerance do not move. The seating depth acts through the chamber volume.
+- Inputs without a tolerance do not move. The seating depth changes the chamber volume and the bullet travel and has no tolerance of its own.
 - The band is not a confidence interval and not a statement about a real load.
 - A ladder request takes no sampling. The workbench shows the sampled band of the step shown first; another step of a ladder shows the corner-case range.
 

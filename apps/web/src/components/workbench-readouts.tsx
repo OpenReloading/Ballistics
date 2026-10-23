@@ -26,6 +26,7 @@ import {
   withUnit,
 } from '../lib/units.ts'
 import {
+  bandLine,
   bandNotice,
   firstPressureLimit,
   lengthText,
@@ -265,10 +266,7 @@ export function Readouts({
       )}
     </span>
   )
-  // under the tiles, screen only: the velocity band and what the bands cover or why they are not shown
-  const bandLine = band.velocity
-    ? `Velocity ${formatQuantity('velocity', system, band.velocity.low)} to ${formatQuantity('velocity', system, band.velocity.high)} ${system.velocity.symbol}. 5th to 95th percentile, ${bandNotice(ok.body.sampled)}.`
-    : `Sampled bands ${bandNotice(ok.body.sampled)}: corner-case range shown.`
+  const bandText = bandLine(ok.body, system)
   const big = (value: string, unit: string) => (
     <>
       <span className="readout-value">{value}</span> <span className="readout-unit">{unit}</span>
@@ -322,7 +320,7 @@ export function Readouts({
           </dd>
         </div>
       </dl>
-      {!printed && ok.body.sampled && <p className="band-line screen-only">{bandLine}</p>}
+      {!printed && bandText && <p className="band-line screen-only">{bandText}</p>}
       <dl className="readouts readout-list" data-stale={stale || undefined}>
         <div>
           <dt>Muzzle pressure</dt>
