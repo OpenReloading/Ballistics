@@ -233,6 +233,96 @@ describe('base', () => {
   })
 })
 
+describe('hollow base', () => {
+  const body: BulletDimensions = {
+    diameter: 8,
+    length: 30,
+    noseLength: 12,
+    meplatDiameter: 0,
+    ogive: { radiusRatio: 0 },
+  }
+  const hollow = (type: 'conical-hollow-base' | 'rounded-hollow-base', cavityDiameter = 5) => ({
+    ...body,
+    base: { type, cavityDiameter },
+  })
+  const solid = drawn({ ...body, base: { type: 'flat' } })
+
+  it('conical cavity: the cone as deep as it is wide at the opening comes off the volume', () => {
+    const o = drawn(hollow('conical-hollow-base'), 'entered')
+    expect(o.cavity).toEqual({ radius: 2.5, depth: 2.5 })
+    expect(o.points.slice(0, o.baseEdge + 1)).toEqual([
+      [0, 2.5],
+      [2.5, 0],
+      [4, 0],
+    ])
+    expect(o.volume).toBeCloseTo(solid.volume - (Math.PI * 2.5 ** 2 * 2.5) / 3, 9)
+    // the full section loses the triangle of base 2 rc and height rc
+    expect(o.area).toBeCloseTo(solid.area - 2.5 ** 2, 9)
+    expect(profileCrossesItself(o.points)).toBe(false)
+  })
+
+  it('rounded cavity: a hemisphere of the opening radius, within the sampling error of its volume', () => {
+    const o = drawn(hollow('rounded-hollow-base'), 'entered')
+    expect(o.cavity).toEqual({ radius: 2.5, depth: 2.5 })
+    for (const [r, z] of o.points.slice(0, o.baseEdge - 1))
+      expect(Math.hypot(r, z)).toBeCloseTo(2.5, 12)
+    const hemisphere = (2 / 3) * Math.PI * 2.5 ** 3
+    const cut = solid.volume - o.volume
+    expect(cut).toBeLessThan(hemisphere)
+    expect(cut).toBeGreaterThan(hemisphere * 0.997)
+  })
+
+  it('draws the cavity as an assumed shape and the base face as given', () => {
+    const o = drawn(hollow('conical-hollow-base'), 'entered')
+    expect(o.tags.slice(0, 3)).toEqual(['approximate', 'entered', 'entered'])
+    expect(o.segments[0]).toEqual({
+      points: [
+        [0, 2.5],
+        [2.5, 0],
+      ],
+      approximate: true,
+    })
+    expect(o.segments[1].approximate).toBe(false)
+    expect(o.notes.join(' ')).toMatch(/cavity depth is assumed/)
+  })
+
+  it('takes the boat-tail dimensions of a hollow base that gives them', () => {
+    const o = drawn(
+      {
+        ...hollow('conical-hollow-base'),
+        base: { type: 'conical-hollow-base', length: 3, diameter: 6.5, cavityDiameter: 4 },
+      },
+      'entered',
+    )
+    expect(o.points[o.baseEdge]).toEqual([3.25, 0])
+    expect(o.points[o.baseEdge + 1]).toEqual([4, 3])
+    expect(o.cavity?.radius).toBe(2)
+  })
+
+  it('without a cavity diameter the base is flat and the notes say so', () => {
+    const o = drawn({ ...body, base: { type: 'rounded-hollow-base' } })
+    const flat = drawn({ ...body, base: { type: 'flat' } })
+    expect(o.points).toEqual(flat.points)
+    expect(o.volume).toBe(flat.volume)
+    expect(o.cavity).toBeUndefined()
+    expect(o.baseEdge).toBe(1)
+    expect(o.notes.join(' ')).toMatch(/no cavity diameter/)
+  })
+
+  it('refuses a cavity as wide as the base face or as deep as the bullet is long', () => {
+    expect(reason(hollow('conical-hollow-base', 8))).toMatch(/cavity diameter/)
+    expect(
+      reason({
+        ...hollow('conical-hollow-base', 5),
+        base: { type: 'conical-hollow-base', length: 3, diameter: 5, cavityDiameter: 5 },
+      }),
+    ).toMatch(/cavity diameter/)
+    expect(
+      reason({ ...hollow('rounded-hollow-base', 5), length: 2.5, noseLength: 1 }),
+    ).toBeDefined()
+  })
+})
+
 describe('lengths, tips and cannelure', () => {
   it('derives the nose length from tail, bearing and length', () => {
     const o = drawn({
