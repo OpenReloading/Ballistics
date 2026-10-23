@@ -32,12 +32,18 @@ export type Step = {
   error?: { message: string; reason?: string }
   /** A seating ladder's step: the length the bullet is seated by and what follows from it. */
   seating?: SeatingStep
+  /** A temperature ladder's step: the propellant temperature, K. */
+  temperature?: number
 }
 
-/** The run's load at step `s`: its charge, and with a seating ladder its volume and travel. */
+/**
+ * The run's load at step `s`: its charge, with a seating ladder its volume and travel, with a
+ * temperature ladder its propellant temperature.
+ */
 export const stepLoad = (load: InteriorBody['load'], s: Step): InteriorBody['load'] => ({
   ...load,
   charge: s.charge,
+  ...(s.temperature !== undefined && { propellantTemperature: s.temperature }),
   ...(s.seating && {
     chamber: { ...load.chamber, volume: s.seating.volume },
     barrel: { ...load.barrel, length: s.seating.travel },
@@ -114,6 +120,13 @@ export function stripFigureOf(ok: Extract<Outcome, { kind: 'ok' }>) {
   return { ...figure, base: (barrel - travel) * 1e3 }
 }
 
+/**
+ * A seating or temperature ladder varies one thing at one charge, so what follows the charge (the
+ * longer barrel run, the measured strings, the groups) reads the shown step alone.
+ */
+export const singleCharge = (ok: Extract<Outcome, { kind: 'ok' }> | undefined) =>
+  ok !== undefined && ok.ladder.kind !== 'charge'
+
 /** What a result's derived values and flag read; the Powders tab builds it per powder. */
 type Shown = Pick<
   Extract<Outcome, { kind: 'ok' }>,
@@ -177,10 +190,12 @@ export function resultLine(ok: Extract<Outcome, { kind: 'ok' }>, system: UnitSys
     withUnit('velocity', system, ok.body.result.muzzleVelocity),
   ].join(', ')
   if (ok.steps.length < 2) return `${values.replace(/^p/, 'P')}.`
-  const seating = ok.steps[ok.selected]?.seating
+  const { seating, temperature } = ok.steps[ok.selected] ?? {}
   const at = seating
     ? withUnit('length', system, seating.value)
-    : withUnit('charge', system, ok.load.charge)
+    : temperature !== undefined
+      ? withUnit('temperature', system, temperature)
+      : withUnit('charge', system, ok.load.charge)
   return `Step ${selectedLabel(ok)}, ${at}: ${values}.`
 }
 

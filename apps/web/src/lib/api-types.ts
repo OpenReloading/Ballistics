@@ -215,6 +215,12 @@ export interface PowderRecord {
     molarMass: ComputedRange
     covolume: ComputedRange
   }
+  /** Burn-rate sensitivity to the propellant temperature: reference in K, cold and hot in 1/K. */
+  temperatureSensitivity?: {
+    reference: QuantityValue
+    cold: QuantityValue
+    hot: QuantityValue
+  }
   /** Fitted M3 parameters (`packages/schema/src/powder.ts`), only the fields the web app reads. */
   interior?: {
     fitted: string[]

@@ -20,6 +20,8 @@ export interface StoredUnits {
   specificVolume: 'm3/kg'
   /** Vivacity of a burn law in the M3 interior model. */
   burnRate: '1/s'
+  /** Burn-rate sensitivity of a propellant to its temperature. */
+  inverseTemperature: '1/K'
   /** Ingredient content as safety data sheets print it. */
   massFraction: '%'
   relativeHumidity: '%'
@@ -46,6 +48,7 @@ export const units: StoredUnits = {
   molarMass: 'kg/kmol',
   specificVolume: 'm3/kg',
   burnRate: '1/s',
+  inverseTemperature: '1/K',
   massFraction: '%',
   relativeHumidity: '%',
   count: '1',

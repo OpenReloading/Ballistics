@@ -22,6 +22,7 @@ import {
   notReached,
   type Outcome,
   type ShownStep,
+  singleCharge,
   stepsOf,
   stripFigureOf,
 } from './workbench-outcome.ts'
@@ -89,7 +90,7 @@ export function useBarrelStudy({
   )
   const lengths = 'lengths' in planned ? planned.lengths : undefined
   const figure = ok && stripFigureOf(ok)
-  const bySeating = ok?.ladder.kind === 'seating'
+  const single = singleCharge(ok)
   const base = figure && figure.base * 1e-3
   const runTravel = ok?.load.barrel.length
   const travel =
@@ -99,7 +100,7 @@ export function useBarrelStudy({
   const [attempt, setAttempt] = useState(0)
   const key =
     ok && travel !== undefined
-      ? `${ok.id}|${bySeating ? `${ok.selected}|` : ''}${travel}|${attempt}`
+      ? `${ok.id}|${single ? `${ok.selected}|` : ''}${travel}|${attempt}`
       : undefined
   const [longer, setLonger] = useState<{
     key: string
@@ -125,7 +126,7 @@ export function useBarrelStudy({
           body: JSON.stringify(
             longerBody(
               ok.load,
-              bySeating ? [ok.load.charge] : ok.steps.map((s) => s.charge),
+              single ? [ok.load.charge] : ok.steps.map((s) => s.charge),
               ok.direction,
               travel,
             ),
@@ -194,10 +195,7 @@ export function useBarrelStudy({
     Math.abs(base + runTravel - seatedBarrel) < 5e-5
   const retry = useCallback(() => setAttempt((a) => a + 1), [])
   // a seating ladder's study holds the shown step alone (`workbench.tsx`)
-  const [selected, message] = [
-    ok?.ladder.kind === 'seating' ? 0 : (ok?.selected ?? 0),
-    got?.message,
-  ]
+  const [selected, message] = [single ? 0 : (ok?.selected ?? 0), got?.message]
   return useMemo(
     () => ({
       range,

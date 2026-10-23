@@ -24,6 +24,7 @@ export type Quantity =
   | 'charge'
   | 'energy'
   | 'temperature'
+  | 'temperatureDifference'
   | 'airPressure'
   | 'pressure'
   | 'area'
@@ -96,6 +97,11 @@ export const unitsOf = {
       decimals: 1,
     },
   },
+  // a step between temperatures: no offset, and the unit follows the temperature's (`resolveUnits`)
+  temperatureDifference: {
+    degC: linear('°C', 1, 1, 0.5),
+    degF: linear('°F', 5 / 9, 1, 1),
+  },
   airPressure: { hPa: linear('hPa', 100, 1), inHg: linear('inHg', pascalsPerInHg, 2) },
   pressure: { bar: linear('bar', 1e5, 0), psi: linear('psi', psi, 0) },
   area: { mm2: linear('mm²', 1e-6, 2), in2: linear('in²', metersPerInch ** 2, 5) },
@@ -143,6 +149,7 @@ const metricBase = {
   windSpeed: 'm/s',
   energy: 'J',
   temperature: 'degC',
+  temperatureDifference: 'degC',
   airPressure: 'hPa',
   pressure: 'bar',
   area: 'mm2',
@@ -183,6 +190,7 @@ export const presetUnitIds: { [P in PresetId]: { [Q in Quantity]: UnitId<Q> } } 
     windSpeed: 'mph',
     energy: 'ft-lbf',
     temperature: 'degF',
+    temperatureDifference: 'degF',
     airPressure: 'inHg',
     pressure: 'psi',
     area: 'in2',
@@ -219,6 +227,7 @@ export type UnitSystem = Readonly<Record<Quantity, Unit>>
 
 export function resolveUnits({ preset, overrides }: UnitChoice): UnitSystem {
   const ids = { ...presetUnitIds[preset], ...overrides } as Record<Quantity, string>
+  ids.temperatureDifference = ids.temperature
   return Object.fromEntries(
     Object.entries(ids).map(([q, id]) => [q, (unitsOf[q as Quantity] as Record<string, Unit>)[id]]),
   ) as Record<Quantity, Unit>

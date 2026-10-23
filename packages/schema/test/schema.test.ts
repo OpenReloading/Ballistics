@@ -435,6 +435,22 @@ describe('powder', () => {
     expect(powder.safeParse(valid).success).toBe(true)
   })
 
+  it('accepts a temperature sensitivity and rejects a reference temperature of 0 K or less', () => {
+    const temperatureSensitivity = {
+      reference: { value: 294.15 },
+      cold: { value: 0.004 },
+      hot: { value: 0.002 },
+    }
+    expect(powder.safeParse({ ...valid, temperatureSensitivity }).success).toBe(true)
+    for (const value of [0, -1]) {
+      expectIssueAt(
+        powder,
+        { ...valid, temperatureSensitivity: { ...temperatureSensitivity, reference: { value } } },
+        'temperatureSensitivity.reference.value',
+      )
+    }
+  })
+
   it('rejects a composition range with min above max or outside 0 to 100 %', () => {
     for (const [entry, path] of [
       [{ name: 'A', min: 5, max: 1 }, 'composition.0'],

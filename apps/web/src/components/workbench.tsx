@@ -17,7 +17,7 @@ import { interiorFields } from '../lib/interior-input.ts'
 import { shortName } from '../lib/load-tabs.ts'
 import { sampler } from '../lib/playback.ts'
 import { inputsQuery, withRecordValues, withTab } from '../lib/query.ts'
-import { seatingLengthName } from '../lib/seating-ladder.ts'
+import { ladderTitle, seatingLengthName } from '../lib/seating-ladder.ts'
 import { shortcutAriaKeys, shortcutLabel, shortcuts } from '../lib/shortcuts.ts'
 import { formatNumber, formatQuantity, withUnit } from '../lib/units.ts'
 import { mmLength, shownLength } from '../lib/workbench.ts'
@@ -42,6 +42,7 @@ import {
   type ShownStep,
   selectedLabel,
   shownSteps,
+  singleCharge,
   stepFlag,
   warningLines,
 } from './workbench-outcome.ts'
@@ -107,6 +108,7 @@ export function Workbench() {
     ladderSteps,
     ladderKind,
     seatStep,
+    tempStep,
     seatAt,
     measured,
     measuredFor,
@@ -172,10 +174,15 @@ export function Workbench() {
     : (shown('charge', 'charge') ?? 'no charge')
   const charge = useCallback((kg: number) => withUnit('charge', system, kg), [system])
   const length = useCallback((m: number) => withUnit('length', system, m), [system])
-  /** What a ladder step varies, as the strip and the table show it: its seating, else its charge. */
+  /** What a ladder step varies, as the strip and the table show it: its seating, its temperature, else its charge. */
   const stepValue = useCallback(
-    (s: ShownStep) => (s.seating ? length(s.seating.value) : charge(s.charge)),
-    [charge, length],
+    (s: ShownStep) =>
+      s.seating
+        ? length(s.seating.value)
+        : s.temperature !== undefined
+          ? withUnit('temperature', system, s.temperature)
+          : charge(s.charge),
+    [charge, length, system],
   )
   /** The load of the shown result: cartridge, bullet, mass, powder with charge. */
   const identity = useMemo(
@@ -201,7 +208,7 @@ export function Workbench() {
   // a seating ladder's study is the shown step's: the longer run has one charge and one seating
   const barrel = useBarrelStudy({
     ok,
-    steps: ok?.ladder.kind === 'seating' ? steps.filter((s) => s.n - 1 === ok.selected) : steps,
+    steps: ok && singleCharge(ok) ? steps.filter((s) => s.n - 1 === ok.selected) : steps,
     system,
     enabled: barrelWanted,
   })
@@ -316,7 +323,9 @@ export function Workbench() {
           ladderSteps > 1
             ? ladderKind === 'seating'
               ? `${ladderSteps} ${seatAt ? seatingLengthName[seatAt.lengthKind] : 'seating'} values, ${direction}, ${seatStep.seatStep.text} ${system.length.symbol} apart`
-              : `${ladderSteps} charges, ${direction}, ${ladder.ladderStep.text} ${system.charge.symbol} apart`
+              : ladderKind === 'temperature'
+                ? `${ladderSteps} powder temperatures, ${direction}, ${tempStep.tempStep.text} ${system.temperatureDifference.symbol} apart`
+                : `${ladderSteps} charges, ${direction}, ${ladder.ladderStep.text} ${system.charge.symbol} apart`
             : undefined,
         ],
         ...modelFields.map(printRow),
@@ -354,7 +363,7 @@ export function Workbench() {
           <>
             {steps.length > 1 && (
               <>
-                <h2>{ok.ladder.kind === 'seating' ? 'Seating ladder' : 'Charge ladder'}</h2>
+                <h2>{ladderTitle(ok.ladder.kind)} ladder</h2>
                 {ladderTable}
               </>
             )}
@@ -426,8 +435,8 @@ export function Workbench() {
           ],
           ['Powder', ok.identity.powder],
           ...seatingRows,
-          // a seating ladder's charge is one for all steps; volume and travel are those of the shown step
-          ...(ok.ladder.kind === 'seating' ? [['Charge', charge(ok.load.charge)]] : []),
+          // a seating or temperature ladder's charge is one for all steps; the other values are those of the shown step
+          ...(singleCharge(ok) ? [['Charge', charge(ok.load.charge)]] : []),
           ['Usable case volume', withUnit('capacity', system, ok.load.chamber.volume)],
           ['Bullet travel', shownLength('travel', system, ok.load.barrel.length)],
           ['Firearm', ok.printed.firearm],
@@ -598,7 +607,9 @@ export function Workbench() {
         ...(ladderSteps > 1
           ? ladderKind === 'seating'
             ? { ...fields, ladderStep: seatStep.seatStep }
-            : { ...fields, ...ladder }
+            : ladderKind === 'temperature'
+              ? { ...fields, ladderStep: tempStep.tempStep }
+              : { ...fields, ...ladder }
           : fields),
         firearmMass: gunWeightUsed,
       },
@@ -608,7 +619,7 @@ export function Workbench() {
         powder: recordLink.powderId,
         ladderSteps: ladderSteps > 1 ? String(ladderSteps) : undefined,
         ladderDirection: ladderSteps > 1 ? direction : undefined,
-        ladderKind: ladderSteps > 1 && ladderKind === 'seating' ? ladderKind : undefined,
+        ladderKind: ladderSteps > 1 && ladderKind !== 'charge' ? ladderKind : undefined,
         firearm,
         measuredWaterCapacity:
           measuredWaterCapacity === undefined ? undefined : String(measuredWaterCapacity),

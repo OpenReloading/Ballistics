@@ -1095,6 +1095,7 @@
                               "molarMass",
                               "specificVolume",
                               "burnRate",
+                              "inverseTemperature",
                               "massFraction",
                               "relativeHumidity",
                               "count",
@@ -14555,6 +14556,7 @@
                                           "molarMass",
                                           "specificVolume",
                                           "burnRate",
+                                          "inverseTemperature",
                                           "massFraction",
                                           "relativeHumidity",
                                           "count",
@@ -14739,8 +14741,8 @@
                                       "properties": {
                                         "kind": {
                                           "type": "string",
-                                          "enum": ["charge", "seating"],
-                                          "description": "What the ladder varies: the charge, or the length the bullet is seated by (`seating.by`). Absent: the charge."
+                                          "enum": ["charge", "seating", "temperature"],
+                                          "description": "What the ladder varies: the charge, the length the bullet is seated by (`seating.by`) or the propellant temperature. Absent: the charge."
                                         },
                                         "stepCount": {
                                           "type": "integer",
@@ -14751,7 +14753,7 @@
                                         "chargeStep": {
                                           "type": "number",
                                           "exclusiveMinimum": 0,
-                                          "description": "Step between ladder steps: kg for a charge ladder, m for a seating ladder. Absent until entered."
+                                          "description": "Step between ladder steps: kg for a charge ladder, m for a seating ladder, K for a temperature ladder. Absent until entered."
                                         },
                                         "direction": {
                                           "type": "string",
@@ -14766,8 +14768,8 @@
                                       "properties": {
                                         "kind": {
                                           "type": "string",
-                                          "enum": ["charge", "seating"],
-                                          "description": "What the ladder varies: the charge, or the length the bullet is seated by (`seating.by`). Absent: the charge."
+                                          "enum": ["charge", "seating", "temperature"],
+                                          "description": "What the ladder varies: the charge, the length the bullet is seated by (`seating.by`) or the propellant temperature. Absent: the charge."
                                         },
                                         "stepCount": {
                                           "type": "number",
@@ -14777,7 +14779,7 @@
                                         "chargeStep": {
                                           "type": "number",
                                           "exclusiveMinimum": 0,
-                                          "description": "Step between ladder steps: kg for a charge ladder, m for a seating ladder. Absent until entered."
+                                          "description": "Step between ladder steps: kg for a charge ladder, m for a seating ladder, K for a temperature ladder. Absent until entered."
                                         },
                                         "direction": {
                                           "type": "string",
@@ -16857,6 +16859,65 @@
                         "propellantTemperature",
                         "burnForm"
                       ],
+                      "additionalProperties": false
+                    },
+                    "temperatureSensitivity": {
+                      "type": "object",
+                      "properties": {
+                        "reference": {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "description": "In K."
+                            },
+                            "raw": {
+                              "type": "string",
+                              "minLength": 1,
+                              "description": "The value as written in the source, when it differed."
+                            }
+                          },
+                          "required": ["value"],
+                          "additionalProperties": false,
+                          "unit": "K"
+                        },
+                        "cold": {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": "number",
+                              "description": "In 1/K."
+                            },
+                            "raw": {
+                              "type": "string",
+                              "minLength": 1,
+                              "description": "The value as written in the source, when it differed."
+                            }
+                          },
+                          "required": ["value"],
+                          "additionalProperties": false,
+                          "unit": "1/K"
+                        },
+                        "hot": {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": "number",
+                              "description": "In 1/K."
+                            },
+                            "raw": {
+                              "type": "string",
+                              "minLength": 1,
+                              "description": "The value as written in the source, when it differed."
+                            }
+                          },
+                          "required": ["value"],
+                          "additionalProperties": false,
+                          "unit": "1/K"
+                        }
+                      },
+                      "required": ["reference", "cold", "hot"],
                       "additionalProperties": false
                     },
                     "note": {

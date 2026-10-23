@@ -101,7 +101,7 @@ $$
 \ell_i = \begin{cases} \ell_0 + i\,\Delta & \text{up} \\ \ell_0 - i\,\Delta & \text{down} \\ \ell_0 + \left(i - \frac{N - 1}{2}\right) \Delta & \text{around} \end{cases} \qquad i = 0, \dots, N - 1
 $$
 
-Code: `apps/web/src/lib/seating-ladder.ts`, `ladderLengths`, `seatingLadder`.
+Code: `apps/web/src/lib/seating-ladder.ts`, `ladderValues`, `seatingLadder`.
 
 A step outside the seating range of the cartridge and bullet, or one with $V_c \le 0$, refuses the whole ladder with an error. No step runs.
 
