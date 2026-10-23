@@ -10,6 +10,7 @@ import { toCsv } from '../lib/csv.ts'
 import { controlSize } from '../lib/theme.ts'
 import { resultTabsFit } from '../lib/workbench.ts'
 import { BarrelLength } from './barrel-length.tsx'
+import { LadderTarget } from './ladder-target.tsx'
 import { LazyInteriorChart } from './lazy-chart.tsx'
 import { NavIcon } from './nav-icons.tsx'
 import { PowderCompare } from './powder-compare.tsx'
@@ -478,6 +479,7 @@ export const ResultsArea = memo(function ResultsArea() {
                 >
                   {csvCopied === 'failed' ? 'Copy failed' : csvCopied ? 'Copied' : 'Copy as CSV'}
                 </Button>
+                <LadderTarget labels={steps.map(stepValue)} system={system} />
                 <LadderTable
                   ok={ok}
                   steps={steps}

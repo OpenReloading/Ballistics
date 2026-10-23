@@ -7424,6 +7424,63 @@ main .field-table tr.field-group > th {
   }
 }
 
+/* ladder target: the controls on the Ladder tab and the print sheet */
+.ladder-target-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 12rem));
+  align-items: end;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.ladder-target {
+  display: none;
+}
+
+@media print {
+  html[data-print="ladder-target"] body > :not(.ladder-target) {
+    display: none !important;
+  }
+
+  html[data-print="ladder-target"] .ladder-target {
+    display: block;
+    color: #000;
+    font-size: 10pt;
+  }
+
+  .ladder-target h1 {
+    margin: 0 0 1mm;
+    font-size: 14pt;
+  }
+
+  .ladder-marks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8mm;
+    margin: 6mm 0;
+  }
+
+  .ladder-marks figure {
+    margin: 0;
+    break-inside: avoid;
+    text-align: center;
+  }
+
+  .ladder-marks svg {
+    display: block;
+    margin: 0 auto 1mm;
+  }
+
+  .ladder-ruler {
+    box-sizing: border-box;
+    height: 5mm;
+    border: 0.3mm solid #000;
+    border-top: 0;
+    font-size: 8pt;
+    text-align: center;
+  }
+}
+
 /* session, firearms, settings, validation */
 /* settings: one body height for every tab, so switching moves nothing; Close in a footer line */
 @media screen and (min-width: 36em) {
