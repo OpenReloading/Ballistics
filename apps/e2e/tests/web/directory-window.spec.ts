@@ -1,0 +1,40 @@
+import AxeBuilder from '@axe-core/playwright'
+import { expect, type Page, test } from '@playwright/test'
+import { gotoHydrated } from './nav.ts'
+
+// the directory lists render the rows in view: the DOM stays bounded, the table stays accessible
+const rows = (page: Page) => page.locator('tbody tr[data-row]')
+
+test('the lists have no axe violation in light and dark', async ({ page }) => {
+  for (const colorScheme of ['light', 'dark'] as const) {
+    await page.emulateMedia({ colorScheme })
+    for (const path of ['/cartridges', '/bullets', '/powders']) {
+      await gotoHydrated(page, path)
+      await expect(rows(page).first()).toBeVisible()
+      const { violations } = await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+        .analyze()
+      expect(
+        violations.map((v) => `${colorScheme} ${path} ${v.id} ${v.nodes.map((n) => n.target)}`),
+      ).toEqual([])
+    }
+  }
+})
+
+test('scrolled to the end, the cartridge list renders the last row and still a bounded number', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/cartridges')
+  const status = page.locator('.page-bar-status [role="status"]')
+  await expect(status).toHaveText(/^\d+ cartridges$/)
+  const n = Number((await status.textContent())?.split(' ')[0])
+  const first = await rows(page).first().getAttribute('data-id')
+  await page.locator('.directory-scroll').evaluate((el) => {
+    el.scrollTop = el.scrollHeight
+    window.scrollTo(0, document.documentElement.scrollHeight)
+  })
+  const last = page.locator(`tbody tr[data-row][aria-rowindex="${n + 1}"]`)
+  await expect(last).toBeAttached()
+  await expect(page.locator(`tbody tr[data-row][data-id="${first}"]`)).toHaveCount(0)
+  expect(await rows(page).count()).toBeLessThan(100)
+})
