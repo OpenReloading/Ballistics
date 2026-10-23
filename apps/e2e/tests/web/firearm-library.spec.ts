@@ -43,7 +43,10 @@ const status = (page: Page) => page.locator('.page-bar-status .bar-count')
 test('the firearm library searches its table, counts the example and offers to clear a search without a match', async ({
   page,
 }) => {
-  await page.addInitScript(() => localStorage.setItem('safety-ack', '3'))
+  await page.addInitScript(() => {
+    localStorage.setItem('safety-ack', '3')
+    localStorage.setItem('first-run-done', '1')
+  })
   await page.goto('/firearms')
   await seed(page, ['Bench rifle', 'Hunting rifle'])
   await page.reload()

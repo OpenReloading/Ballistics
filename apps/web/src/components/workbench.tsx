@@ -19,6 +19,7 @@ import { sampler } from '../lib/playback.ts'
 import { inputsQuery, withRecordValues, withTab } from '../lib/query.ts'
 import { ladderTitle, seatingLengthName } from '../lib/seating-ladder.ts'
 import { shortcutAriaKeys, shortcutLabel, shortcuts } from '../lib/shortcuts.ts'
+import { startIntentEvent, takeStartIntent } from '../lib/start-intent.ts'
 import { formatNumber, formatQuantity, withUnit } from '../lib/units.ts'
 import { mmLength, shownLength } from '../lib/workbench.ts'
 import { BarrelTable } from './barrel-length.tsx'
@@ -649,6 +650,16 @@ export function Workbench() {
   // actions of the latest render
   const starts = useRef({ asNewLoad, fillExample, reset })
   starts.current = { asNewLoad, fillExample, reset }
+  // the first-run step's choice, from this page or the one that opened the workbench
+  useEffect(() => {
+    const start = () => {
+      const intent = takeStartIntent()
+      if (intent === 'example') starts.current.asNewLoad(starts.current.fillExample)()
+    }
+    start()
+    window.addEventListener(startIntentEvent, start)
+    return () => window.removeEventListener(startIntentEvent, start)
+  }, [])
   const examples = useMemo(() => {
     const run = (k: 'fillExample' | 'reset') => () => starts.current.asNewLoad(starts.current[k])()
     return [

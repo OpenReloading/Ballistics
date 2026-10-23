@@ -7424,6 +7424,23 @@ main .field-table tr.field-group > th {
   }
 }
 
+.first-run-preview {
+  display: grid;
+  gap: 0.25rem;
+  margin: 1rem 0 0;
+}
+
+.first-run-preview > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.first-run-preview dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
 /* ladder target: the controls on the Ladder tab and the print sheet */
 .ladder-target-fields {
   display: grid;
