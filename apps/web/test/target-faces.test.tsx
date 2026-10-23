@@ -161,3 +161,29 @@ it('draws recorded zone colours: a white ten inside a black ring, its lines whit
     out.match(new RegExp(`<ellipse rx="${rx}"[^>]*stroke="(\\w+)"`))?.[1]
   expect([stroke(150), stroke(100), stroke(50)]).toEqual(['black', 'white', 'white'])
 })
+
+it('orders the discipline rows by federation, then the federation code, then distance', () => {
+  const [a] = precision.events
+  const event = (name: string, metres: number) => ({
+    ...a,
+    name,
+    distance: { value: metres * 1000 },
+  })
+  const events = [event('e1', 25), event('e2', 50), event('e3', 25), event('e4', 25)]
+  const disciplines = [
+    { id: 'd1', federation: 'bds', name: 'Hoch', number: '73xx', distanceMm: 25000 },
+    { id: 'd2', federation: 'bds', name: 'Tief', number: '4110', distanceMm: 25000 },
+    { id: 'd3', federation: 'dsb', name: 'Drei', number: '1.37/1.51', distanceMm: 50000 },
+    { id: 'd4', federation: 'dsb', name: 'Zwei', number: '1.9', distanceMm: 25000 },
+  ]
+  const rows = faceEventRows(
+    { organization: 'ISSF', events },
+    events.map((e, i) => ({ id: `m${i}`, discipline: `d${i + 1}`, event: e.name })),
+    disciplines,
+    [
+      { id: 'bds', name: 'BDS', abbreviation: 'BDS' },
+      { id: 'dsb', name: 'DSB', abbreviation: 'DSB' },
+    ],
+  )
+  expect(rows.map((r) => r.discipline)).toEqual(['Tief', 'Hoch', 'Zwei', 'Drei'])
+})

@@ -76,7 +76,7 @@ export const federationRoutes: FastifyPluginAsync<{ db: Db }> = async (app, { db
         response: targetFaceList,
         summary: 'List target faces',
         description:
-          'Every target face with its organization, the caliber classes of the disciplines mapped to it and the categories of its events and those disciplines.',
+          'Every target face with its organization, the caliber classes of the disciplines mapped to it and the categories of its events and those disciplines. Ordered by organization, then the code printed in the name, then name.',
       },
     },
     async () => listTargetFaces(db),
@@ -106,7 +106,7 @@ export const federationRoutes: FastifyPluginAsync<{ db: Db }> = async (app, { db
         response: federationList,
         summary: 'List federations',
         description:
-          'Every shooting federation with its abbreviation, country and international federation.',
+          'Every shooting federation with its abbreviation, country and international federation, ordered by abbreviation.',
       },
     },
     async () => listFederations(db),
@@ -119,7 +119,7 @@ export const federationRoutes: FastifyPluginAsync<{ db: Db }> = async (app, { db
         response: disciplineList,
         summary: 'List disciplines',
         description:
-          'The disciplines of every federation, or of one, with number, category and shooting distance (mm).',
+          "The disciplines of every federation, or of one, with number, category and shooting distance (mm), ordered by federation, then the federation's own number (first code, numeric parts in numeric order), then distance and name. Disciplines without a number follow, by category, distance and name.",
       },
     },
     async (request) => listDisciplines(db, request.query),
@@ -137,7 +137,7 @@ export const federationRoutes: FastifyPluginAsync<{ db: Db }> = async (app, { db
         response: mappingList,
         summary: 'List target mappings',
         description:
-          'Which target face a discipline shoots, per event and stage, with the scoring gauge diameter (mm) where one applies.',
+          'Which target face a discipline shoots, per event and stage, with the scoring gauge diameter (mm) where one applies, in the order of the disciplines.',
       },
     },
     async (request) => listTargetMappings(db, request.query),
