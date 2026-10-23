@@ -4,6 +4,7 @@ import {
   airAt,
   airDensity,
   checkAir,
+  densityAltitude,
   InputError,
   saturationVapourPressure,
   speedOfSound,
@@ -99,5 +100,20 @@ describe('checkAir on any numbers', () => {
       ),
       { seed: 20261022, numRuns: 500 },
     )
+  })
+})
+
+describe('density altitude', () => {
+  it('is 0 in the standard atmosphere at sea level and the altitude elsewhere in it', () => {
+    expect(densityAltitude(standardAtmosphere(0))).toBeCloseTo(0, 6)
+    for (const h of [-2000, 1500, 4000, 11000])
+      expect(densityAltitude(standardAtmosphere(h))).toBeCloseTo(h, 6)
+  })
+
+  it('rises with temperature and with humidity at one pressure', () => {
+    const sea = standardAtmosphere(0)
+    const warm = { ...sea, temperature: sea.temperature + 15 }
+    expect(densityAltitude(warm)).toBeGreaterThan(500)
+    expect(densityAltitude({ ...warm, humidity: 0.8 })).toBeGreaterThan(densityAltitude(warm))
   })
 })
