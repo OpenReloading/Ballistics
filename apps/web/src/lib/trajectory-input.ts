@@ -220,6 +220,8 @@ function windPerUnit(shot: TrajectoryInput, points: readonly TrajectoryPoint[]) 
 }
 
 export type TrajectoryResult = {
+  /** The shot the result is of: what the truing section takes as its nominal shot. */
+  shot: TrajectoryInput
   trajectory: Trajectory
   /** Points at the table ranges. */
   tablePoints: TrajectoryPoint[]
@@ -263,6 +265,7 @@ export function trajectoryResult(
   const pick = (ranges: number[]) => ranges.flatMap((r) => byRange.get(r) ?? [])
   const tablePoints = pick(table)
   return {
+    shot,
     trajectory: t,
     tablePoints,
     chartPoints: pick(chart),

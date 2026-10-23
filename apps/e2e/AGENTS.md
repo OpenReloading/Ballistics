@@ -26,6 +26,7 @@ Playwright tests against a running API and web app, on the CIP cartridge records
 | `web/firearm-library.spec.ts` | the firearm library's search, source filter, count and no-match note over records in the browser store, a row's link opening the editor, the example opened read-only and copied |
 | `web/workbench-no-scroll.spec.ts` | no scroll container overflows and no button, tab, field, label, unit or value is cut at 1280 x 650 and 1536 x 730 (example run and ladders, with the band line shown), 1366 x 657 (example run, 21-step ladder), 1280 x 800 and 1920 x 1080 (example run); at 1100 x 800 only the inputs column scrolls; the ladder steps scroll sideways only. The Trajectory tab as one view (only the results column scrolls) |
 | `web/workbench-band.spec.ts` | the example run's band line (velocity band, percentiles, input tolerances only), axe on the tiles, the list and that line in light and dark |
+| `web/truing.spec.ts` | the truing section of the Trajectory tab: plan statuses, entered rows, a fit with an interval for an identified parameter and a named, valueless one for another, started from the keyboard, axe clean in light and dark |
 | `web/workbench-playback.spec.ts` | the interior chart's playback: the bullet flies out of the chart box past the muzzle, slider and values at the muzzle, replay, reduced motion |
 | `web/workbench-link.spec.ts` | a copied workbench link (fragment) runs the same load with its bullet and powder records missing. Older query links open |
 

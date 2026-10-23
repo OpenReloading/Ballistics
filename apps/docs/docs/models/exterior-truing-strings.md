@@ -11,6 +11,8 @@ A range string is a set of measurements at known distances: the mean impact abov
 - `planTruingStrings` gives the statuses and standard errors of a planned string before any shot.
 - `comparePlanCandidates` does so for several candidate strings.
 
+The workbench's Trajectory tab has the section Truing from range strings: the plan from distances, shots and the dispersion of one shot, the entry of measured rows, each with its number of shots and standard deviation, and the fit with its intervals and residual check. Its nominal shot is the tab's result.
+
 Every prediction is an ordinary `trajectory` call. The iteration is the [least squares on log parameters](least-squares.md).
 
 ## Equations
