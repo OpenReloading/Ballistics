@@ -31,6 +31,10 @@ describe('default order of the competition lists, on the real records', () => {
       body.items.filter((d: { federation: string }) => d.federation === federation)
     const place = (federation: string, number: string) =>
       numbered(federation).findIndex((d: { number?: string }) => d.number === number)
+    // not derived from the comparators: the first and last BDS numbers of the records
+    const bdsNumbers = numbered('bds').map((d: { number?: string }) => d.number)
+    expect(bdsNumbers.slice(0, 4)).toEqual(['10xx', '11xx', '20xx', '2101'])
+    expect(bdsNumbers.slice(-2)).toEqual(['73xx', '75xx'])
     expect(place('bds', '2101')).toBeLessThan(place('bds', '4110'))
     expect(place('bds', '4110')).toBeLessThan(place('bds', '73xx'))
     expect(place('dsb', '1.10')).toBeLessThan(place('dsb', '2.20'))
