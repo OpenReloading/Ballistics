@@ -1,6 +1,7 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
+import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 
 // Metric (SI): lengths in mm
@@ -237,4 +238,58 @@ test('the designer shows no load-data notice; the caption says how changes are d
   await expect(page.locator('.designer-drawing figcaption').first()).toContainText(
     "Changed values are drawn as entered, without the record's tolerances.",
   )
+})
+
+test('a chosen bullet seats at the entered COAL in the designed case, and the seating moves the volume', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/cartridges/designer?from=308-win')
+  await expect(field(page, 'Cartridge L3')).toHaveValue('51.18')
+  const row = (term: string) =>
+    page.locator('.seating-row').filter({ has: page.getByText(term, { exact: true }) })
+  const number = async (term: string) =>
+    Number.parseFloat((await row(term).locator('.num').textContent()) ?? '')
+  const seated = page.locator('.seating-figure svg')
+  // no bullet and no length: nothing seated, no default filled in
+  await expect(seated).toHaveCount(0)
+  await page.getByRole('combobox', { name: 'Search bullets by manufacturer or name' }).fill('168')
+  await page.getByRole('option', { name: /168 gr/ }).click()
+  await expect(page.getByText('Bullet: Demo Bullets 30 Cal 168 gr HPBT Demo')).toBeVisible()
+  await expect(seated).toHaveCount(0)
+  await page.getByRole('textbox', { name: /^COAL/ }).fill('71')
+  await expect(seated).toBeVisible()
+  await expect(seated).toHaveAccessibleDescription(/seated at COAL 71\.00 mm/)
+  // from the design's case length: 51.18 - (71 - 30.5)
+  expect(await number('Seating depth')).toBeCloseTo(10.68, 2)
+  // what the design or the inputs lack is not given, with no number
+  for (const term of ['Case volume to the mouth', 'Volume behind the bullet'])
+    await expect(row(term)).toContainText('not given')
+  await expect(row('Travel to the muzzle')).toContainText('not given')
+  // a measured capacity gives the volume, and deeper seating takes more of it
+  await page.getByRole('textbox', { name: /^Case capacity/ }).fill('3.5')
+  const shallow = await number('Volume behind the bullet')
+  expect(shallow).toBeGreaterThan(0)
+  await page.getByRole('slider', { name: 'Slide to change COAL' }).press('Home')
+  await expect.poll(() => number('Volume behind the bullet')).toBeLessThan(shallow)
+  // the figure takes the case from the design, not from the record
+  await page.getByRole('textbox', { name: /^COAL/ }).fill('71')
+  await field(page, 'Cartridge L3').fill('52.18')
+  await expect.poll(() => number('Seating depth')).toBeCloseTo(11.68, 2)
+  // a chamber without the leade gives no jump, and says what it lacks
+  await field(page, 'Chamber s').fill('')
+  await field(page, 'Chamber G').fill('')
+  await expect(row('Jump to the leade')).toContainText('not given')
+  await expect(row('Jump to the leade')).toContainText('chamber')
+  for (const colorScheme of ['light', 'dark'] as const) {
+    await page.emulateMedia({ colorScheme })
+    // retried: the controls' colours fade to the new scheme
+    await expect
+      .poll(async () => {
+        const { violations } = await new AxeBuilder({ page })
+          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+          .analyze()
+        return violations.map((v) => `${colorScheme} ${v.id} ${v.nodes.map((n) => n.target)}`)
+      })
+      .toEqual([])
+  }
 })

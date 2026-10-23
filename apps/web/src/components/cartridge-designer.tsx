@@ -2,8 +2,10 @@
 
 import { NativeSelect, Text } from '@mantine/core'
 import { useDebouncedValue } from '@mantine/hooks'
+import { chamberOf } from '@openreloading/drawing/seating'
 import type { CartridgeDesign } from '@openreloading/schema'
 import { Ruler } from '@phosphor-icons/react'
+import dynamic from 'next/dynamic'
 import { memo, useCallback, useDeferredValue, useMemo, useRef, useState } from 'react'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { CartridgeDetail, CartridgeSummary } from '../lib/api-types.ts'
@@ -28,9 +30,15 @@ import {
   tables,
 } from '../lib/cartridge-designer.ts'
 import { symbolText } from '../lib/cartridge-record.ts'
-import { fieldError } from '../lib/field-spec.ts'
+import { type FieldValue, fieldError } from '../lib/field-spec.ts'
 import type { FieldRow } from '../lib/record-fields.ts'
-import { drawingLengthUnit, formatNumber, formatQuantity, type UnitSystem } from '../lib/units.ts'
+import {
+  drawingLengthUnit,
+  fixedFieldText,
+  formatNumber,
+  formatQuantity,
+  type UnitSystem,
+} from '../lib/units.ts'
 import { CartridgeDrawing, type View } from './cartridge-drawing.tsx'
 import { DesignerField } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
@@ -40,9 +48,19 @@ import type { FieldFlag } from './number-field.tsx'
 import { PageBar } from './page-bar.tsx'
 import { PropertyGrid } from './property-grid.tsx'
 import { RecordSearch } from './record-search.tsx'
-import { EmptyNote } from './states.tsx'
+import { EmptyNote, Loading } from './states.tsx'
+import { useFieldUnits } from './units-settings.tsx'
 import { useDesigner } from './use-designer.ts'
+import { measuredWaterCapacitySpec } from './workbench-inputs.tsx'
 import { Workspace } from './workspace.tsx'
+
+const SeatingPreview = dynamic(
+  () => import('./seating-preview.tsx').then((m) => m.SeatingPreview),
+  { ssr: false, loading: () => <Loading what="the preview" inline /> },
+)
+
+const noSeated = () => {}
+const noCapacity: FieldValue = { text: '', si: undefined }
 
 const valueText = (q: Derived['quantity'], system: UnitSystem, si: number) => {
   const { symbol, fromSi } = system[q]
@@ -195,6 +213,25 @@ export function CartridgeDesigner() {
   const drawn = useDeferredValue(e.spec ? e : lastGood.current)
   const label = (key: string) => fieldSpecs.find((s) => s.key === key)?.label ?? key
 
+  // the bullet seats in the drawing shown, its values the case and chamber; the controls portal
+  // into the Seat a bullet section, the user's measured capacity stays here through a redraw
+  const [seatSlot, setSeatSlot] = useState<HTMLElement | null>(null)
+  const [capacity, setCapacity] = useState<FieldValue>(noCapacity)
+  useFieldUnits(
+    [measuredWaterCapacitySpec],
+    system,
+    (update) => setCapacity((f) => update({ measuredWaterCapacity: f }).measuredWaterCapacity),
+    fixedFieldText,
+  )
+  const designName = design.origin ? `design from ${design.origin.title}` : 'new cartridge'
+  const title = `Outline, ${designName}`
+  const seatSpec = drawn?.spec?.table === 'VII' ? undefined : drawn?.spec
+  const canSeat = seatSpec !== undefined && chamberOf(seatSpec.values) !== undefined
+  const draft = useMemo(
+    () => (seatSpec && canSeat ? { spec: seatSpec, title: designName } : undefined),
+    [seatSpec, canSeat, designName],
+  )
+
   // one polite line 500 ms after the last change, with the derived values
   const changed = history.last && fieldSpecs.find((s) => s.key === history.last)
   const derivedText = e.derived
@@ -251,8 +288,6 @@ export function CartridgeDesigner() {
       ))}
     </div>
   )
-
-  const title = `Outline, ${design.origin ? `design from ${design.origin.title}` : 'new cartridge'}`
 
   // the File menu renders after an edit's drawing, from the deferred design
   const fileDesign = useDeferredValue(design)
@@ -318,11 +353,22 @@ export function CartridgeDesigner() {
         sections={
           shotshell
             ? []
-            : (Object.keys(groups) as Group[]).map((g) => ({
-                key: g,
-                title: groups[g],
-                content: groupFields(g),
-              }))
+            : [
+                ...(Object.keys(groups) as Group[]).map((g) => ({
+                  key: g,
+                  title: groups[g],
+                  content: groupFields(g),
+                })),
+                {
+                  key: 'seat',
+                  title: 'Seat a bullet',
+                  content: canSeat ? (
+                    <div ref={setSeatSlot} className="seating-slot" />
+                  ) : (
+                    <p className="note">Not given: the cartridge L3, which the seating needs.</p>
+                  ),
+                },
+              ]
         }
       />
     </form>
@@ -364,6 +410,17 @@ export function CartridgeDesigner() {
             description={missingHint}
           />
         )
+      )}
+      {draft && (
+        <SeatingPreview
+          draft={draft}
+          system={system}
+          view="combined"
+          slots={{ cartridge: seatSlot, gun: null }}
+          onSeated={noSeated}
+          measuredWaterCapacity={capacity}
+          onMeasuredWaterCapacity={setCapacity}
+        />
       )}
       {/* of the drawing shown: a refusal keeps them with the earlier drawing */}
       <DerivedLine rows={drawn?.derived ?? []} system={system} />

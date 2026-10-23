@@ -9,6 +9,8 @@ description: Case volume from the water capacity, the volume the seated bullet t
 2. Seating a bullet by its cartridge overall length (COAL) or its cartridge base to ogive length (CBTO) places its base in the case. The volume of revolution of the bullet outline below the mouth comes off the case volume.
 3. What is left is the chamber volume behind the bullet, in which the [M3 interior model](interior-m3.md) burns the charge. The distance from the base to the muzzle is the bullet travel.
 
+The cartridge designer seats a bullet in the case and chamber of its own values: the case length and the chamber values come from the design, the case volume only from a case capacity the user measured. Without it the volumes are not given.
+
 The seating geometry is in `packages/drawing/src/seating/seating.ts`, the outline in `packages/drawing/src/bullet/outline.ts`.
 
 ## Equations
