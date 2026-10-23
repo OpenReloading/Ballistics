@@ -167,7 +167,9 @@ export interface LogFitResult {
   conditionNumber: number
   /** Iterations taken. */
   iterations: number
-  /** Square roots of the covariance diagonal of theta; absent with n = p and no standard uncertainties. */
+  /** Covariance of theta; absent with n = p and no standard uncertainties. */
+  covariance?: number[][]
+  /** Square roots of the covariance diagonal of theta; absent like `covariance`. */
   standardUncertainty?: number[]
   /** Correlation matrix of theta; absent like `standardUncertainty`. */
   correlation?: number[][]
@@ -318,6 +320,7 @@ export function logLeastSquares(fit: LogFitInput): LogFitResult {
     predicted,
     conditionNumber: condition,
     iterations,
+    covariance,
     standardUncertainty: covariance.map((row, k) => Math.sqrt(row[k])),
     correlation: covariance.map((row, k) =>
       row.map((x, l) => x / Math.sqrt(covariance[k][k] * covariance[l][l])),

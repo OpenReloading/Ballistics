@@ -6,7 +6,9 @@ import {
   interior,
   type LadderPoint,
   PowderFitError,
+  predictPowder,
 } from '../src/index.ts'
+import { normals } from './random.ts'
 
 /** Synthetic rifle load (apps/docs/docs/models/interior-powder-fit.md): truth B_a 0.45 1/s, p_st 30 MPa. */
 const load = (vivacity = 0.45, startPressure = 30e6): InteriorLoad => ({
@@ -454,5 +456,119 @@ describe('powder fit prior and robust loss', () => {
         priors: { startPressure: { value: 4e6, sigma: 1 } },
       }),
     ).toThrow(InputError)
+  })
+})
+
+describe('powder fit prediction bands', () => {
+  const truth = load()
+  const parameters = ['burnRate', 'startPressure'] as const
+
+  it('covers the true value at held-out charges in 85 to 95 % of noisy repeats', () => {
+    // coarser integration than the default keeps 1000 fits quick; the true values use it too
+    const coarse = { relativeTolerance: 1e-8, absoluteTolerance: 1e-10, outputStep: 1e-5 }
+    const truthAt = (charge: number) => {
+      const r = interior({ ...truth, charge }, coarse)
+      if (!r.valid) throw new Error(r.reason)
+      return r
+    }
+    const rows = [2.6e-3, 2.8e-3, 3e-3].map((charge) => ({ charge, ...truthAt(charge) }))
+    // inside the fired range, and just above it (an extrapolation)
+    const held = [2.7e-3, 3.1e-3].map((charge) => ({ charge, ...truthAt(charge) }))
+    const covered = held.map(() => ({ velocity: 0, pressure: 0 }))
+    const draw = normals(58)
+    const repeats = 1000
+    for (let n = 0; n < repeats; n++) {
+      const noisy = rows.map((r) => ({
+        charge: r.charge,
+        muzzleVelocity: r.muzzleVelocity + 3 * draw(),
+        velocitySigma: 3,
+      }))
+      const fit = fitPowder(load(0.43), noisy, { options: coarse })
+      held.forEach((t, i) => {
+        const p = predictPowder(fit, t.charge, { options: coarse })
+        if (p.velocity.lower <= t.muzzleVelocity && t.muzzleVelocity <= p.velocity.upper)
+          covered[i].velocity++
+        if (p.pressure.lower <= t.peakBreechPressure && t.peakBreechPressure <= p.pressure.upper)
+          covered[i].pressure++
+      })
+    }
+    for (const c of covered) {
+      expect(c.velocity / repeats).toBeGreaterThan(0.85)
+      expect(c.velocity / repeats).toBeLessThan(0.95)
+      expect(c.pressure / repeats).toBeGreaterThan(0.85)
+      expect(c.pressure / repeats).toBeLessThan(0.95)
+    }
+  }, 120_000)
+
+  it('is wider outside the fired range than at its centre and marks the extrapolation', () => {
+    const fit = fitPowder(load(0.4), ladder(truth, 3, 2e6, 1), { parameters: [...parameters] })
+    const centre = predictPowder(fit, 2.8e-3)
+    const below = predictPowder(fit, 2.4e-3)
+    const above = predictPowder(fit, 3.2e-3)
+    expect(centre.extrapolation).toBeUndefined()
+    expect(predictPowder(fit, 2.6e-3).extrapolation).toBeUndefined()
+    expect(predictPowder(fit, 3e-3).extrapolation).toBeUndefined()
+    expect(below.extrapolation).toBe('below')
+    expect(above.extrapolation).toBe('above')
+    for (const outside of [below, above]) {
+      expect(outside.velocity.standardUncertainty).toBeGreaterThan(
+        centre.velocity.standardUncertainty,
+      )
+      expect(outside.pressure.standardUncertainty).toBeGreaterThan(
+        centre.pressure.standardUncertainty,
+      )
+    }
+    // farther out is wider still
+    expect(predictPowder(fit, 3.3e-3).pressure.standardUncertainty).toBeGreaterThan(
+      above.pressure.standardUncertainty,
+    )
+    expect(predictPowder(fit, 2.2e-3).velocity.standardUncertainty).toBeGreaterThan(
+      below.velocity.standardUncertainty,
+    )
+  })
+
+  it('returns the model value, a symmetric interval and the chosen coverage', () => {
+    const fit = fitPowder(load(0.4), ladder(truth, 3, 2e6, 1), { parameters: [...parameters] })
+    const p = predictPowder(fit, 2.85e-3)
+    const r = interior({ ...fit.load, charge: 2.85e-3 })
+    if (!r.valid) throw new Error(r.reason)
+    expect(p.velocity.value).toBe(r.muzzleVelocity)
+    expect(p.pressure.value).toBe(r.peakBreechPressure)
+    expect(p.velocity.value - p.velocity.lower).toBeCloseTo(p.velocity.upper - p.velocity.value, 9)
+    expect(p.level).toBe(0.9)
+    // 90 % of a normal: 1.645 standard uncertainties
+    expect((p.velocity.upper - p.velocity.value) / p.velocity.standardUncertainty).toBeCloseTo(
+      1.6449,
+      3,
+    )
+    const wide = predictPowder(fit, 2.85e-3, { level: 0.99 })
+    expect(wide.velocity.upper - wide.velocity.lower).toBeGreaterThan(
+      p.velocity.upper - p.velocity.lower,
+    )
+    expect(wide.velocity.standardUncertainty).toBe(p.velocity.standardUncertainty)
+  })
+
+  it('uses the Student quantile when the ladder has no uncertainties', () => {
+    const fit = fitPowder(load(0.4), ladder(truth, 0, 0, 0.5))
+    expect(fit.weighted).toBe(false)
+    const p = predictPowder(fit, 2.8e-3)
+    // four degrees of freedom: the 90 % quantile is 2.132, above the normal 1.645
+    expect((p.velocity.upper - p.velocity.value) / p.velocity.standardUncertainty).toBeCloseTo(
+      2.1318,
+      3,
+    )
+  })
+
+  it('refuses a fit without covariance, a bad charge or level, and an invalid run', () => {
+    const rows = ladder(truth, 0, 0).slice(0, 1)
+    const exact = fitPowder(load(0.4), rows)
+    expect(exact.covariance).toBeUndefined()
+    expect(() => predictPowder(exact, 2.8e-3)).toThrow(InputError)
+    const fit = fitPowder(load(0.4), ladder(truth, 3, 0))
+    expect(() => predictPowder(fit, 0)).toThrow(InputError)
+    expect(() => predictPowder(fit, 2.8e-3, { level: 1 })).toThrow(InputError)
+    const e = failure(() => predictPowder(fit, 3.6e-3))
+    expect(e.reason).toBe('invalid')
+    expect(e.charge).toBe(3.6e-3)
   })
 })
