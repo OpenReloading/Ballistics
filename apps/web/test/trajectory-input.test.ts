@@ -89,6 +89,23 @@ describe('trajectoryResult', () => {
     expect(Math.abs(r.tablePoints[1].height)).toBeLessThan(1e-5)
   })
 
+  it('gives the density altitude of the standard sea-level air as 0', () => {
+    expect(trajectoryResult(values, projectile, 'right').densityAltitude).toBeCloseTo(0, 6)
+  })
+
+  it('flags low stability along the flight only for a slow twist and a known length', () => {
+    const long = { ...projectile, length: 0.0315 }
+    expect(
+      trajectoryResult({ ...values, twist: 0.178 }, long, 'right').lowStability,
+    ).toBeUndefined()
+    const slow = trajectoryResult({ ...values, twist: 0.36 }, long, 'right').lowStability
+    expect(slow?.stability).toBeLessThan(1)
+    expect(slow?.range).toBeGreaterThan(0)
+    expect(
+      trajectoryResult({ ...values, twist: 0.36 }, projectile, 'right').lowStability,
+    ).toBeUndefined()
+  })
+
   it('throws the range and input errors', () => {
     expect(() =>
       trajectoryResult({ ...values, rangeStep: 1, maxRange: 1000 }, projectile, 'right'),

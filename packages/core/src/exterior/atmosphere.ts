@@ -88,6 +88,17 @@ export function airAt(station: Air, height: number): Air {
   }
 }
 
+/**
+ * Density altitude, m: the altitude of the ICAO standard atmosphere that has the density of `air`
+ * (`apps/docs/docs/models/exterior-atmosphere.md`, "Density altitude"). Its tropospheric law is
+ * extended past the tropopause.
+ */
+export function densityAltitude(air: Air): number {
+  const ratio = airDensity(air) / airDensity(standardAtmosphere(0))
+  // density follows (T / T0) ** (n - 1) in the troposphere
+  return (icao.temperature * (1 - ratio ** (1 / (pressureExponent - 1)))) / icao.lapseRate
+}
+
 /** Density of moist air as an ideal mixture of dry air and water vapour, kg/m3. */
 export function airDensity(air: Air): number {
   const e = air.humidity * saturationVapourPressure(air.temperature)

@@ -1,5 +1,7 @@
 import {
   type DragModel,
+  densityAltitude,
+  firstLowStability,
   icao,
   type Projectile,
   type Trajectory,
@@ -194,6 +196,10 @@ export type TrajectoryResult = {
   chartPoints: TrajectoryPoint[]
   /** Zero range used, m. */
   zeroRange: number
+  /** Density altitude of the shot's air, m. */
+  densityAltitude: number
+  /** Where Miller's factor first falls below `minStability` along the flight; none without length and twist. */
+  lowStability?: { range: number; stability: number }
 }
 
 /** Table and chart points of one shot from SI field values; throws the input and core errors. */
@@ -205,7 +211,18 @@ export function trajectoryResult(
   const table = rangeSteps(values.maxRange ?? Number.NaN, values.rangeStep ?? Number.NaN)
   const max = table[table.length - 1]
   const chart = Array.from({ length: chartPoints }, (_, k) => (k * max) / (chartPoints - 1))
-  const t = trajectory(shotFromValues(values, projectile, twistHand), [...table, ...chart])
+  const shot = shotFromValues(values, projectile, twistHand)
+  const t = trajectory(shot, [...table, ...chart])
+  const { length } = projectile
+  const { twist } = shot.firearm
+  const low =
+    length !== undefined && twist !== undefined
+      ? firstLowStability(
+          { mass: projectile.mass, diameter: projectile.diameter, length, twist },
+          shot.air,
+          t.points,
+        )
+      : undefined
   const byRange = new Map(t.points.map((pt) => [pt.range, pt]))
   // an early stop leaves out the ranges past it
   const pick = (ranges: number[]) => ranges.flatMap((r) => byRange.get(r) ?? [])
@@ -214,5 +231,7 @@ export function trajectoryResult(
     tablePoints: pick(table),
     chartPoints: pick(chart),
     zeroRange: requireValue(values, shotFields, 'zeroRange'),
+    densityAltitude: densityAltitude(shot.air),
+    ...(low && { lowStability: low }),
   }
 }
