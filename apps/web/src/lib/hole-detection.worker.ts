@@ -118,7 +118,11 @@ async function handleFace(r: Extract<WorkerRequest, { kind: 'face' }>): Promise<
   const fk = Math.min(1, FACE_LONG / Math.max(fx1 - fx0, fy1 - fy0))
   const shot = await pixels(r, fx0, fy0, fx1, fy1, fk)
   post({ kind: 'progress', done: 0.3 })
-  const found = findFace({ width: shot.width, height: shot.height, data: shot.data }, r.faces)
+  const found = findFace(
+    { width: shot.width, height: shot.height, data: shot.data },
+    r.faces,
+    r.pxPerMm && r.pxPerMm * fk,
+  )
   return { kind: 'face', search: onPhoto(found, fk, fx0, fy0) }
 }
 

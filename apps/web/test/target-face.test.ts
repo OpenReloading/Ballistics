@@ -205,6 +205,41 @@ describe('findFace on drawn faces', () => {
   })
 })
 
+describe('findFace with a known scale', () => {
+  const base = faceById('issf-25m-precision-50m-pistol')
+  const times = (v: { value: number }, k: number) => ({ ...v, value: v.value * k })
+  // the same ring ratios at three times the size
+  const large: TargetFace = {
+    ...base,
+    id: 'large',
+    name: 'Large',
+    blackDiameter: times(base.blackDiameter, 3),
+    rings: base.rings.map((r) => ({ ...r, diameter: times(r.diameter, 3) })),
+    ...(base.innerTen && {
+      innerTen: { ...base.innerTen, diameter: times(base.innerTen.diameter, 3) },
+    }),
+  }
+  const sc = scene(base, views[0])
+  const { image } = render(sc)
+  const ids = (f: ReturnType<typeof findFace>) => f.fits.map((x) => x.face.id).sort()
+
+  it('offers faces of equal ring ratios and different size as a tie without a scale', () => {
+    const found = findFace(image, [base, large])
+    expect(ids(found)).toEqual(['issf-25m-precision-50m-pistol', 'large'])
+    expect(found.sure).toBe(false)
+  })
+
+  it('takes the face of the scale of the photo', () => {
+    const found = findFace(image, [base, large], sc.camera.pxPerMm)
+    expect(ids(found)).toEqual(['issf-25m-precision-50m-pistol'])
+    expect(ids(findFace(image, [base, large], sc.camera.pxPerMm / 3))).toEqual(['large'])
+  })
+
+  it('proposes the ISSF 25 m precision face, or a tie that contains it, among all faces', () => {
+    expect(ids(findFace(image, faces))).toContain('issf-25m-precision-50m-pistol')
+  })
+})
+
 describe('findFace without a face', () => {
   it('finds nothing on blank paper with noise and a gradient', () => {
     const face = faceById('issf-25m-precision-50m-pistol')
