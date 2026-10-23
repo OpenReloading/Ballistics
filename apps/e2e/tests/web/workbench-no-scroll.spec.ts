@@ -1,6 +1,6 @@
 import { expect, type Page, test } from '@playwright/test'
 import { storeUnits } from './units.ts'
-import { loadForm } from './workbench.ts'
+import { applyExampleLoad, loadForm } from './workbench.ts'
 import { runExample } from './workbench-run.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
@@ -180,3 +180,30 @@ test('the Gun card keeps its weight error, firearm query and focus when the wind
     await expect(firearm).toBeFocused()
   }
 })
+
+// a run the API refuses leaves its message in the results area, which keeps the no-scroll rule
+for (const [width, height] of [
+  [1280, 650],
+  [1920, 1080],
+] as const)
+  test(`at ${width} x ${height} the workbench with a refused run scrolls and cuts nothing`, async ({
+    page,
+  }) => {
+    test.setTimeout(60_000)
+    await page.setViewportSize({ width, height })
+    await page.route('**/api/interior', (route) =>
+      route.fulfill({
+        status: 422,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: 'The charge is above what the case holds.' }),
+      }),
+    )
+    await page.goto('/workbench')
+    await applyExampleLoad(page)
+    await loadForm(page)
+      .getByLabel(/^Charge mass/)
+      .press('Control+Enter')
+    await expect(page.getByText('The simulation did not run.')).toBeVisible()
+    await expect.poll(() => overflowing(page)).toEqual([])
+    expect(await cut(page)).toEqual([])
+  })

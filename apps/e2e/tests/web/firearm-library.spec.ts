@@ -96,3 +96,22 @@ test('the firearm library searches its table, counts the example and offers to c
     'Example rifle, 308 Win. copy',
   )
 })
+
+test('a record link does not put its loading status in the alert line', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('safety-ack', '3')
+    localStorage.setItem('first-run-done', '1')
+    const seen = { loading: false }
+    Object.assign(window, { seen })
+    new MutationObserver(() => {
+      if (document.body?.innerText.includes('Loading the record')) seen.loading = true
+    }).observe(document, { subtree: true, childList: true, characterData: true })
+  })
+  await page.goto('/firearms')
+  await seed(page, ['Bench rifle'])
+  await page.goto('/firearms?record=firearm-0')
+  await expect(page.getByRole('textbox', { name: 'Name' }).first()).toHaveValue('Bench rifle')
+  expect(
+    await page.evaluate(() => (window as unknown as { seen: { loading: boolean } }).seen.loading),
+  ).toBe(false)
+})

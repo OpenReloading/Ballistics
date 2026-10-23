@@ -8708,10 +8708,17 @@ main .session-shots th:nth-child(-n + 2) {
   text-align: right;
 }
 
-/* the coordinates share the side column's width, so the table fits it */
+/* the coordinates share the side column's width, so the table fits it; the arrow keys step a
+   value, so no spin buttons take room from the digits */
 .shot-table input[type="number"] {
   width: 100%;
-  min-width: 3.75rem;
+  min-width: 4rem;
+  appearance: textfield;
+}
+
+.shot-table input[type="number"]::-webkit-inner-spin-button,
+.shot-table input[type="number"]::-webkit-outer-spin-button {
+  appearance: none;
 }
 
 /* the point of aim's x and y share the value column */
