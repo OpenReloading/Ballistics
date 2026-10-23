@@ -27,6 +27,8 @@ export function RangeCard({
     zeroRange: number
     si: Record<string, number | undefined>
     manual: boolean
+    /** Where the drag factor of the result comes from. */
+    dragSource?: string
     tablePoints: TrajectoryPoint[]
     windPerUnit: { mps: number[]; mph: number[] }
     click?: { value: number; unit?: 'MOA' | 'mrad' }
@@ -39,7 +41,13 @@ export function RangeCard({
   if (!body) return null
   const extras = { click: result.click?.value, wind: result.windPerUnit }
   const columns = rangeCardColumns(system, extras)
-  const facts = rangeCardFacts(result.si, result.zeroRange, system, result.manual)
+  const facts = rangeCardFacts(
+    result.si,
+    result.zeroRange,
+    system,
+    result.manual,
+    result.dragSource,
+  )
   if (result.click)
     facts.push([
       'Click value',

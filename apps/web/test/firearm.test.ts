@@ -84,6 +84,32 @@ describe('sightOptions', () => {
     expect(options[3].fill).toEqual({ sightHeight: 0.07, zeroRange: 25, twistHand: 'right' })
   })
 
+  it('fills the zero air and the drag factor with its source of a mount that has them', () => {
+    const zeroed = {
+      zeroTemperature: 303.15,
+      zeroPressure: 98000,
+      zeroHumidity: 0.4,
+      dragFactor: 1.034,
+      dragFactorSource: 'Truing session of 2026-09-14',
+    }
+    const data = (rifle as Extract<UserRecord, { kind: 'firearm' }>).data
+    const [scope, dot] = data.configurations[1].mounts
+    const withZero = {
+      ...rifle,
+      data: {
+        ...data,
+        configurations: [
+          data.configurations[0],
+          { ...data.configurations[1], mounts: [{ ...scope, ...zeroed }, dot] },
+        ],
+      },
+    } as UserRecord
+    const [first, second] = sightOptions([withZero])
+    expect(first.fill).toMatchObject({ sightHeight: 0.055, ...zeroed })
+    // a mount without them leaves the keys out, so a choice empties the fields
+    for (const key of Object.keys(zeroed)) expect(second.fill).not.toHaveProperty(key)
+  })
+
   it('does not fill a twist of 0', () => {
     const flat = { ...rifle, data: { ...rifle.data, twist: 0 } } as UserRecord
     expect(sightOptions([flat])[0].fill).not.toHaveProperty('twist')
@@ -117,6 +143,15 @@ describe('firearm helpers', () => {
         configurations: [winter, { ...summer, mounts: [summer.mounts[0], { optic: 'o2' }] }],
       }),
     ).toBe('Sight height above the bore in configuration Summer, mount 2: enter a number.')
+    const zeroed = (m: object) => ({
+      configurations: [winter, { ...summer, mounts: [{ ...summer.mounts[0], ...m }, dot] }],
+    })
+    expect(problem(zeroed({ dragFactor: 0 }))).toBe(
+      'Drag factor in configuration Summer, mount 1: must be greater than 0.',
+    )
+    expect(problem(zeroed({ zeroHumidity: 1.2 }))).toBe(
+      'Zero humidity in configuration Summer, mount 1: must be from 0 to 100 %.',
+    )
     expect(problem({ roundCount: 1.5 })).toBe('Round count: must be a whole number.')
     expect(problem({ firearmMass: 0 })).toBe('Mass: must be greater than 0.')
     expect(

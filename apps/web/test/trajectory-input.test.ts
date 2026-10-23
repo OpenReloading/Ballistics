@@ -62,6 +62,36 @@ describe('shotFrom', () => {
     )
   })
 
+  it('leaves the zero in the shot air without zero air fields and with an empty factor', () => {
+    const shot = shotFromValues(defaults, projectile, 'right')
+    expect(shot.zero).toEqual({ range: 100 })
+    expect(shot.projectile).toBe(projectile)
+  })
+
+  it('takes each zero air component the fields set and the rest from the shot', () => {
+    const shot = shotFromValues({ ...defaults, zeroTemperature: 308.15 }, projectile, 'right')
+    expect(shot.zero).toEqual({ range: 100, air: { ...shot.air, temperature: 308.15 } })
+    const all = shotFromValues(
+      { ...defaults, zeroTemperature: 268.15, zeroPressure: 90000, zeroHumidity: 0.8 },
+      projectile,
+      'right',
+    )
+    expect(all.zero).toMatchObject({
+      air: { temperature: 268.15, pressure: 90000, humidity: 0.8, altitude: 0 },
+    })
+    expect(all.air.temperature).toBe(288.15)
+  })
+
+  it('applies a drag factor to the projectile, and a factor of 1 changes nothing', () => {
+    const slow = shotFromValues({ ...defaults, dragFactor: 1.05 }, projectile, 'right')
+    expect(slow.projectile.drag).toMatchObject({
+      kind: 'bc',
+      bands: [{ ballisticCoefficient: (0.243 * lbPerSqInToKgPerSqM) / 1.05 }],
+    })
+    const same = shotFromValues({ ...defaults, dragFactor: 1 }, projectile, 'right')
+    expect(same.projectile.drag).toEqual(projectile.drag)
+  })
+
   it('names a missing field', () => {
     expect(() =>
       shotFromValues({ ...defaults, muzzleVelocity: undefined }, projectile, 'right'),
@@ -87,6 +117,23 @@ describe('trajectoryResult', () => {
     expect(r.chartPoints[100].range).toBe(1000)
     expect(r.zeroRange).toBe(100)
     expect(Math.abs(r.tablePoints[1].height)).toBeLessThan(1e-5)
+  })
+
+  it('zeroes in the zero air, which moves the bore and the far holds when it differs from the shot air', () => {
+    const base = trajectoryResult(values, projectile, 'right')
+    const hot = { zeroTemperature: 308.15, zeroPressure: 95000 }
+    const r = trajectoryResult({ ...values, ...hot }, projectile, 'right')
+    expect(r.trajectory.bore.elevationAngle).not.toBeCloseTo(base.trajectory.bore.elevationAngle, 7)
+    expect(Math.abs(r.tablePoints[1].height)).toBeGreaterThan(1e-5)
+    expect(r.tablePoints[10].height).not.toBeCloseTo(base.tablePoints[10].height, 3)
+    // the shot's own air as the zero air is the default zero
+    const same = trajectoryResult(
+      { ...values, zeroTemperature: 288.15, zeroPressure: 101325 },
+      projectile,
+      'right',
+    )
+    expect(same.trajectory.bore.elevationAngle).toBe(base.trajectory.bore.elevationAngle)
+    expect(same.tablePoints[10].height).toBe(base.tablePoints[10].height)
   })
 
   it('gives the windage hold per 1 m/s and per 1 mph of crosswind at each table point', () => {

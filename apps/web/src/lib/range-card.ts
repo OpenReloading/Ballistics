@@ -8,21 +8,59 @@ import {
   type UnitSystem,
 } from './units.ts'
 
+/** A quantity as the fields show it, with its unit; 'not given' without a value. */
+function valueText(system: UnitSystem, q: Quantity, x: number | undefined) {
+  return x === undefined
+    ? 'not given'
+    : `${inchText(roundedFieldText(q, system, x), system[q].symbol)} ${system[q].symbol}`
+}
+
+/**
+ * The zero air and the drag factor a result was computed with, as texts; a key is missing when
+ * its fields were empty. A zero air field left empty shows the shot's value it took.
+ */
+export function zeroConditions(
+  si: {
+    zeroTemperature?: number
+    zeroPressure?: number
+    zeroHumidity?: number
+    dragFactor?: number
+    temperature?: number
+    pressure?: number
+    humidity?: number
+  },
+  system: UnitSystem,
+  dragSource?: string,
+): { zeroAir?: string; dragFactor?: string } {
+  const v = (q: Quantity, x: number | undefined) => valueText(system, q, x)
+  const zeroSet = [si.zeroTemperature, si.zeroPressure, si.zeroHumidity].some(
+    (x) => x !== undefined,
+  )
+  return {
+    ...(zeroSet && {
+      zeroAir: `${v('temperature', si.zeroTemperature ?? si.temperature)}, station pressure ${v('airPressure', si.zeroPressure ?? si.pressure)}, humidity ${v('percent', si.zeroHumidity ?? si.humidity)}`,
+    }),
+    ...(si.dragFactor !== undefined && {
+      dragFactor: `${v('dragFactor', si.dragFactor)}${dragSource ? `, ${dragSource}` : ''}`,
+    }),
+  }
+}
+
 /**
  * The heading of a printed range card: label and value pairs from the SI inputs a trajectory result
  * was computed with (`si`, keys of `shotFields`) and its zero range (m), written as the fields show
  * them (`roundedFieldText`). `manual`: the bullet came from the manual fields; its mass and BC lead.
+ * `dragSource` names where the drag factor comes from.
  */
 export function rangeCardFacts(
   si: Record<string, number | undefined>,
   zero: number,
   system: UnitSystem,
   manual = false,
+  dragSource?: string,
 ): [string, string][] {
-  const v = (q: Quantity, x: number | undefined) =>
-    x === undefined
-      ? 'not given'
-      : `${inchText(roundedFieldText(q, system, x), system[q].symbol)} ${system[q].symbol}`
+  const v = (q: Quantity, x: number | undefined) => valueText(system, q, x)
+  const { zeroAir, dragFactor } = zeroConditions(si, system, dragSource)
   return [
     ...(manual
       ? [
@@ -34,6 +72,8 @@ export function rangeCardFacts(
       : []),
     ['Muzzle velocity', v('velocity', si.muzzleVelocity)],
     ['Zero', v('range', zero)],
+    ...(zeroAir ? [['Zero air', zeroAir] as [string, string]] : []),
+    ...(dragFactor ? [['Drag factor', dragFactor] as [string, string]] : []),
     ['Sight height', v('length', si.sightHeight)],
     [
       'Conditions',

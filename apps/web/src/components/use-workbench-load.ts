@@ -227,6 +227,7 @@ export function useWorkbenchState() {
   const sight =
     firearm === loadExample.firearm.id && chosenSight
       ? {
+          ...chosenSight,
           sightHeight: system.length.toSi(
             Math.round(system.length.fromSi(chosenSight.sightHeight)),
           ),
