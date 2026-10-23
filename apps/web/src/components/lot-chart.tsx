@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { type BarrelTimes, barrelTimeBand, lotLabel } from '../lib/lot-rows.ts'
+import { type BarrelTimes, barrelTimeBand, lotChartDescription, lotLabel } from '../lib/lot-rows.ts'
 import { niceTicks } from '../lib/ticks.ts'
 import { formatNumber, type UnitSystem } from '../lib/units.ts'
 import { EChart, useChartTokens } from './echart.tsx'
@@ -181,7 +181,7 @@ export function LotChart({
         option={option}
         height={height}
         title="Simulated barrel time against charge"
-        description={`The line is the nominal run. The shaded band spans the barrel times of the nominal row and the rows at a burn rate ${lotLabel('high', fraction)} and ${lotLabel('low', fraction)}.${target === undefined ? '' : ' The dashed line is the target barrel time.'} The table gives the values.`}
+        description={lotChartDescription(fraction, target !== undefined)}
         focus={2}
         readout={(i) => {
           const t = times[Math.min(i, times.length - 1)]

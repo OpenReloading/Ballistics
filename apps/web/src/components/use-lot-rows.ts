@@ -155,18 +155,24 @@ export function useLotRows({
   }, [ok, current])
   const retry = useCallback(() => setAttempt((a) => a + 1), [])
   const seconds = Number(target) * 1e-3
-  return {
-    applies,
-    percent,
-    setPercent,
-    error,
-    target,
-    setTarget,
-    targetSeconds: target !== '' && seconds > 0 ? seconds : undefined,
-    key,
-    pending,
-    message: got?.key === key ? got?.message : undefined,
-    retry,
-    rows,
-  }
+  const targetSeconds = target !== '' && seconds > 0 ? seconds : undefined
+  const message = got?.key === key ? got?.message : undefined
+  // one value while nothing changed: the result context holds it, and a keystroke in the inputs must not render the results again
+  return useMemo(
+    () => ({
+      applies,
+      percent,
+      setPercent,
+      error,
+      target,
+      setTarget,
+      targetSeconds,
+      key,
+      pending,
+      message,
+      retry,
+      rows,
+    }),
+    [applies, percent, error, target, targetSeconds, key, pending, message, retry, rows],
+  )
 }

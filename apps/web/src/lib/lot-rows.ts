@@ -53,6 +53,10 @@ export function lotFractionError(fraction: number | undefined) {
 export const lotLabel = (lot: Lot, fraction: number) =>
   `${lot === 'high' ? '+' : '−'}${formatNumber(fraction * 100, 1).replace(/\.0$/, '')} %`
 
+/** What a screen reader hears of the chart before its values. */
+export const lotChartDescription = (fraction: number, target: boolean) =>
+  `The line is the nominal run. The shaded band spans the barrel times of the nominal row and the rows at a burn rate ${lotLabel('high', fraction)} and ${lotLabel('low', fraction)}.${target ? ' The dashed line is the target barrel time.' : ''} The table gives the values.`
+
 /** The row's burn-rate cell: "nominal", or the lot's change. */
 export const burnRateLabel = (lot: Lot | undefined, fraction: number) =>
   lot ? lotLabel(lot, fraction) : 'nominal'

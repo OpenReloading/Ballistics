@@ -14,7 +14,7 @@ const LotChart = dynamic(() => import('./lot-chart.tsx').then((m) => m.LotChart)
   loading: () => <div className="chart lot-chart" />,
 })
 
-const fractionSpec: FieldSpec = {
+export const fractionSpec: FieldSpec = {
   key: 'lotFraction',
   label: 'Lot burn rate change',
   help: 'The two extra rows of each charge burn this much faster and slower than the powder record.',
@@ -31,7 +31,16 @@ export const lotNote =
   'Lot rows: the burn rate of each charge raised and lowered. Barrel time is a computed value of the simulation, not a measurement.'
 
 /** The chart of the lot rows' barrel times, with the note under it; nothing before the rows arrive. */
-export function LotChartBlock({ lot, system }: { lot: LotRows; system: UnitSystem }) {
+export function LotChartBlock({
+  lot,
+  system,
+  note = true,
+}: {
+  lot: LotRows
+  system: UnitSystem
+  /** The note under the chart; the printed report carries none. */
+  note?: boolean
+}) {
   if (!lot.rows) return null
   return (
     <>
@@ -41,7 +50,7 @@ export function LotChartBlock({ lot, system }: { lot: LotRows; system: UnitSyste
         target={lot.targetSeconds}
         system={system}
       />
-      <p className="note lot-note">{lotNote}</p>
+      {note && <p className="note lot-note">{lotNote}</p>}
     </>
   )
 }

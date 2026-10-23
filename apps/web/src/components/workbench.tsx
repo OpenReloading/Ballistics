@@ -373,7 +373,7 @@ export function Workbench() {
               <>
                 <h2>{ladderTitle(ok.ladder.kind)} ladder</h2>
                 {ladderTable}
-                <LotChartBlock lot={lot} system={system} />
+                <LotChartBlock lot={lot} system={system} note={false} />
               </>
             )}
             <h2>Barrel length</h2>

@@ -2,6 +2,7 @@ import { MantineProvider } from '@mantine/core'
 import { chargeLadder, interior } from '@openreloading/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
+import { fractionSpec, LotPanel, lotNote } from '../src/components/lot-rows.tsx'
 import { type Outcome, type Step, shownSteps } from '../src/components/workbench-outcome.ts'
 import { LadderTable } from '../src/components/workbench-readouts.tsx'
 import type { InteriorResponse } from '../src/lib/api-types.ts'
@@ -9,7 +10,7 @@ import { exampleInterior, exampleRecords, loadExample } from '../src/lib/example
 import { exampleFields } from '../src/lib/examples.ts'
 import { siValues } from '../src/lib/field-spec.ts'
 import { interiorBody, interiorFields } from '../src/lib/interior-input.ts'
-import { lotLoad } from '../src/lib/lot-rows.ts'
+import { lotChartDescription, lotFractionError, lotLoad } from '../src/lib/lot-rows.ts'
 import { presetUnits } from '../src/lib/units.ts'
 
 const system = presetUnits('us')
@@ -100,6 +101,30 @@ it('labels each cell of a row with a column header, a failed lot row spanning th
   expect(html.match(new RegExp(`colSpan="${span}"`, 'g'))).toHaveLength(2)
 })
 
-it('states no charge as safe or optimal', () => {
-  expect(table(true)).not.toMatch(/\b(safe|optimal|best|ideal)\b/i)
+it('states no charge as safe or optimal in the table, the fields, the notes or the chart text', () => {
+  const lot = {
+    applies: true,
+    percent: { text: '3', si: 0.03 },
+    setPercent: () => {},
+    target: '',
+    setTarget: () => {},
+    pending: false,
+    retry: () => {},
+  }
+  const panel = renderToStaticMarkup(
+    <MantineProvider>
+      <LotPanel lot={lot} system={system} />
+    </MantineProvider>,
+  )
+  const texts = [
+    table(true),
+    panel,
+    lotNote,
+    fractionSpec.help,
+    lotChartDescription(0.03, true),
+    lotFractionError(0),
+    lotFractionError(1),
+  ]
+  for (const text of texts) expect(text).not.toMatch(/\b(safe|safely|optimal|best|ideal|node)\b/i)
+  expect(lotNote).toMatch(/computed value of the simulation/)
 })

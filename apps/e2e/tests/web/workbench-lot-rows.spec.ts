@@ -35,18 +35,19 @@ test('the Ladder table adds a slower and a faster lot row to every charge and fo
   await expect(page.locator('.lot-rows .lot-note')).toBeVisible()
 })
 
-for (const colorScheme of ['light', 'dark'] as const)
-  test(`the lot rows, axe clean in ${colorScheme}`, async ({ page }) => {
-    test.setTimeout(60_000)
-    await page.setViewportSize({ width: 1280, height: 650 })
+test('the lot rows are axe clean in light and dark', async ({ page }) => {
+  test.setTimeout(60_000)
+  await page.setViewportSize({ width: 1280, height: 650 })
+  await openLotRows(page)
+  for (const colorScheme of ['light', 'dark'] as const) {
     await page.emulateMedia({ colorScheme })
-    await openLotRows(page)
     const { violations } = await new AxeBuilder({ page })
       .include('.lot-rows')
       .include('.ladder-table')
       .analyze()
     expect(violations.map((v) => v.id)).toEqual([])
-  })
+  }
+})
 
 test('at phone width the chart fits the window and the table is cards', async ({ page }) => {
   test.setTimeout(60_000)
