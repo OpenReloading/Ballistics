@@ -30,6 +30,8 @@ jobs:
         with:
           # GITHUB_TOKEN, so GitHub signs the release commits (main requires signed commits; a personal token's
           # API commits are unsigned)
+          # the release pull request targets main; the default is the repository's default branch, develop
+          target-branch: main
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
       # The release PR's CI runs wait for a maintainer's approval, because github-actions opened the PR. Auto-merge
