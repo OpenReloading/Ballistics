@@ -19,6 +19,7 @@ import {
   mappedFace,
   mappingOf,
 } from '../lib/face-disciplines.ts'
+import { compareEvents, compareNames, federationFaceIds } from '../lib/face-order.ts'
 import {
   type FaceSummary,
   fetchAllFaces,
@@ -365,6 +366,7 @@ export function useRingScoring({
   }
   /** The faces of the discipline with their stages, else every face. */
   const ofDiscipline = discipline ? disciplineFaces(mappings, discipline) : []
+  const inFederation = fed && !discipline && data ? federationFaceIds(all, data, fed) : undefined
   const faceOptions =
     list === 'error'
       ? [{ value: choice?.id ?? '', label: choice?.id ?? offline }]
@@ -379,7 +381,10 @@ export function useRingScoring({
               ? choice
                 ? [{ value: choice.id, label: choice.id }]
                 : []
-              : list.map((f) => ({ value: f.id, label: `${f.organization} ${f.name}` }))),
+              : list
+                  .filter((f) => !inFederation || inFederation.has(f.id) || f.id === choice?.id)
+                  .map((f) => ({ value: f.id, label: `${f.organization} ${f.name}` }))
+          ).toSorted((a, b) => compareNames(a.label, b.label)),
         ]
 
   const panel = group && (
@@ -465,10 +470,17 @@ export function useRingScoring({
             description={eventHelp}
             labelProps={{ title: eventHelp }}
             data={[
-              ...(record?.events ?? []).map((e) => ({
-                value: e.name,
-                label: `${e.name}${e.gauge ? `, ${mmLength(system, e.gauge.value)}` : ''}`,
-              })),
+              ...(record?.events ?? [])
+                .toSorted((a, b) =>
+                  compareEvents(
+                    { distance: a.distance.value, name: a.name },
+                    { distance: b.distance.value, name: b.name },
+                  ),
+                )
+                .map((e) => ({
+                  value: e.name,
+                  label: `${e.name}${e.gauge ? `, ${mmLength(system, e.gauge.value)}` : ''}`,
+                })),
               { value: '', label: 'Bullet' },
             ]}
             value={choice?.event ?? ''}
