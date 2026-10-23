@@ -57,18 +57,21 @@ export default function RepoWidget({ repo, facts = {}, mobile }: Props): ReactNo
             {facts.tag && (
               <li title="Latest release">
                 {tag}
+                <span className="repo-widget__label">Latest release </span>
                 {facts.tag}
               </li>
             )}
             {facts.stars !== undefined && (
               <li title="Stars">
                 {star}
+                <span className="repo-widget__label">Stars </span>
                 {count(facts.stars)}
               </li>
             )}
             {facts.forks !== undefined && (
               <li title="Forks">
                 {fork}
+                <span className="repo-widget__label">Forks </span>
                 {count(facts.forks)}
               </li>
             )}

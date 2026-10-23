@@ -159,6 +159,16 @@ html[data-theme] {
   height: 0.8rem;
 }
 
+/* spoken label of a fact: the icon is hidden from assistive technology, the count alone says nothing */
+.repo-widget__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* narrower desktop navbars: the title and the section links come first, so the facts go, then
    the name (visually hidden, the link keeps its text) */
 @media (min-width: 997px) and (max-width: 1250px) {
