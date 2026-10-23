@@ -72,6 +72,7 @@ import { RecordSearch } from './record-search.tsx'
 import { PanelTable } from './scroll-region.tsx'
 import { SourceTitles } from './sources.tsx'
 import { ErrorNote, Loading } from './states.tsx'
+import { TruingSession } from './truing-session.tsx'
 import { useFieldUnits, useUnits } from './units-settings.tsx'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 
@@ -423,6 +424,18 @@ function ResultDetail({
           windPerUnit={result.windPerUnit.mps}
           wind={{ speed: result.si.windSpeed ?? 0, from: result.si.windFrom ?? Math.PI / 2 }}
           bulletDiameter={result.bulletDiameter}
+          system={system}
+        />
+      </details>
+      <details className="values-details screen-only">
+        <summary>Truing from range strings</summary>
+        <TruingSession
+          nominal={{
+            shot: result.shot,
+            bullet: result.bullet,
+            zeroRange: result.zeroRange,
+            click: result.click?.value,
+          }}
           system={system}
         />
       </details>
