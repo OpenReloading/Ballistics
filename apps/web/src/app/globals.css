@@ -1296,6 +1296,60 @@ td.nowrap {
   }
 }
 
+/* the cartridge designer's seated bullet: its controls and values are rows of the Seat a bullet
+   section; the level figure goes under the drawing, which keeps its room */
+.designer .seating-preview {
+  display: block;
+  flex: none;
+  margin-top: 0.75rem;
+}
+
+.designer .seating-figure .drawing {
+  margin: 0;
+}
+
+.designer .seating-legend {
+  max-width: none;
+}
+
+@media screen and (min-width: 62em) {
+  .designer .workspace-scroll {
+    overflow-y: auto;
+  }
+
+  .designer div.designer-drawing {
+    flex: 1 0 20rem;
+  }
+
+  .designer div.designer-drawing:has(+ .seating-preview .seating-figure .drawing) {
+    flex-grow: 0;
+  }
+}
+
+@media screen and (max-width: 47.99em) {
+  .designer .workspace-scroll:has(.seating-figure .drawing) {
+    max-height: 44svh;
+  }
+
+  .designer .workspace-scroll:has(.seating-figure .drawing) .designer-drawing .drawing.screen-only {
+    max-height: 14svh;
+  }
+
+  /* the long caption is still the figure's name for screen readers */
+  .designer .workspace-scroll:has(.seating-figure .drawing) .designer-drawing figcaption {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+.designer .seating-slot .seating-row {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 /* a value changed against the record, as a bar inside the input's edge so nothing moves; the flag
    and the description say so in words */
 .designer-field[data-changed] .mantine-Input-input {
