@@ -1,6 +1,12 @@
 import 'fake-indexeddb/auto'
 import { expect, it } from 'vitest'
-import { putPhoto, putRecords, storedPhoto, storedRecords } from '../src/lib/user-store.ts'
+import {
+  putPhoto,
+  putRecords,
+  storedPhoto,
+  storedPhotoIds,
+  storedRecords,
+} from '../src/lib/user-store.ts'
 
 const name = 'openreloading-user-data'
 const saved = '2026-10-13T10:00:00.000Z'
@@ -47,4 +53,17 @@ it('opens a version 1 database without the later stores and keeps its records', 
   expect(db.version).toBe(2)
   expect([...db.objectStoreNames].sort()).toEqual(['files', 'handles', 'records'])
   db.close()
+})
+
+it('counts the photo of an invalid target sheet as used', async () => {
+  const sheet = {
+    kind: 'targetSheet',
+    id: 's1',
+    name: 'Sheet',
+    saved,
+    data: { photo: 'p-invalid' },
+  }
+  await putRecords([sheet as never])
+  expect((await storedRecords()).invalid.map((i) => i.id)).toContain('s1')
+  expect([...(await storedPhotoIds())]).toContain('p-invalid')
 })

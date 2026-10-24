@@ -60,7 +60,7 @@ test('an invalid record of an older store is listed, downloadable and in Export 
 
   await (await barButton(page, 'Save options')).click()
   await page.getByRole('menuitem', { name: 'Export all…' }).click()
-  await expect(page.getByText('1 invalid records are in it as stored.')).toBeVisible()
+  await expect(page.getByText('1 invalid record is in it as stored.')).toBeVisible()
   const text = await page.evaluate(async () => {
     const dir = await navigator.storage.getDirectory()
     return (await (await dir.getFileHandle('export.json')).getFile()).text()

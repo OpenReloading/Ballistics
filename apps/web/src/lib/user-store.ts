@@ -4,6 +4,7 @@
  */
 import type { UserRecord } from '@openreloading/schema'
 import { validRecords } from './user-data.ts'
+import { photoIds } from './user-photos.ts'
 
 const request = <T>(r: IDBRequest<T>) =>
   new Promise<T>((resolve, reject) => {
@@ -66,6 +67,19 @@ export async function inStore<T>(
 /** The schema-valid records of the browser store and the invalid ones, as stored: none is dropped. */
 export const storedRecords = async () =>
   validRecords((await inStore('records', 'readonly', (s) => s.getAll())) ?? [])
+
+/**
+ * Ids of the photos a stored target sheet points at, an invalid sheet's too: its photo stays
+ * with it.
+ */
+export async function storedPhotoIds() {
+  const { records, invalid } = await storedRecords()
+  const raw = invalid.flatMap((i) => {
+    const photo = (i.raw as { data?: { photo?: unknown } } | null)?.data?.photo
+    return typeof photo === 'string' ? [photo] : []
+  })
+  return new Set([...photoIds(records), ...raw])
+}
 
 /** The stored record `id` as written, unvalidated; undefined when absent. */
 export const storedRecord = (id: string) =>

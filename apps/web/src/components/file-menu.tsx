@@ -43,6 +43,7 @@ import {
   putRecords,
   requestPersistentStorage,
   storedPhoto,
+  storedPhotoIds,
   storedRecord,
   storedRecords,
 } from '../lib/user-store.ts'
@@ -776,7 +777,9 @@ function FileMenuOf<K extends UserRecordKind>({
     const day = localDay(new Date())
     const r = await saveAs(checked.text, `openreloading-data-${day}.json`, ready)
     if (r) {
-      const raw = invalid.length ? ` ${invalid.length} invalid records are in it as stored.` : ''
+      const raw = invalid.length
+        ? ` ${invalid.length} invalid ${invalid.length === 1 ? 'record is' : 'records are'} in it as stored.`
+        : ''
       setMessage(`Exported ${records.length} records to ${r.name}.${raw}${photos}`)
       onExported?.()
     }
@@ -839,10 +842,11 @@ function FileMenuOf<K extends UserRecordKind>({
     await putRecords(incoming)
     // a target sheet replaced with another photo leaves its old photo unreferenced; the page's
     // record keeps its photo until the page shows the replaced one (`onStored`)
+    const used = await storedPhotoIds()
     const left = droppedPhotos(
       report.conflicts.map((c) => c.stored),
-      [...(await storedRecords()).records, current()],
-    )
+      [current()],
+    ).filter((p) => !used.has(p))
     for (const p of left) deletePhoto(p).catch(() => {})
     onStored?.()
     setReport(undefined)
@@ -1081,7 +1085,7 @@ function FileMenuOf<K extends UserRecordKind>({
         </p>
         <ul className="file-records">
           {invalidList?.map((r) => (
-            <li key={r.id}>
+            <li key={String((r.raw as { id?: unknown } | null)?.id)}>
               <strong>{r.name ?? r.id ?? 'Unnamed record'}</strong>{' '}
               <span className="file-reason">{[r.kind, r.id].filter(Boolean).join(', ')}</span>{' '}
               <Button
