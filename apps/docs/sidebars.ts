@@ -37,7 +37,7 @@ const sidebars: SidebarsConfig = {
     'models/least-squares',
   ],
   data: ['data/federations', 'data/manufacturers', 'data/record-model', 'bibliography'],
-  contributing: ['release', 'ci-tools'],
+  contributing: ['release', 'ci-tools', 'workbench-search'],
 }
 
 export default sidebars

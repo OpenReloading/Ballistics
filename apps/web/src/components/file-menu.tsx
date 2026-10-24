@@ -47,8 +47,10 @@ import { droppedPhotos, embeddedFileBlob, embedFiles, photoIds } from '../lib/us
 import {
   deletePhoto,
   deleteRecords,
+  putInvalid,
   putPhoto,
   putRecords,
+  rawPhotoId,
   requestPersistentStorage,
   storedPhoto,
   storedPhotoIds,
@@ -158,6 +160,8 @@ type Report = {
   /** Warnings and fields not read of the files read. */
   notes: { name: string; note: string }[]
   conflicts: { incoming: UserRecord; stored: UserRecord }[]
+  /** The `invalid` entries of the files: stored as invalid records, left out for an id the browser has, or unstorable. */
+  invalid: { added: number; kept: number; unstorable: number }
   /** Photos the files carry, stored with the records that are replaced. */
   files: EmbeddedFile[]
 }
@@ -814,6 +818,7 @@ function FileMenuOf<K extends UserRecordKind>({
       skipped: [],
       notes: [],
       conflicts: [],
+      invalid: { added: 0, kept: 0, unstorable: 0 },
       files: [],
     }
     let count = 0
@@ -822,6 +827,7 @@ function FileMenuOf<K extends UserRecordKind>({
       const {
         records,
         files: photos,
+        invalid,
         skipped,
         notes,
       } = parseFiles([{ name: f.name, text: await f.text() }])
@@ -831,6 +837,9 @@ function FileMenuOf<K extends UserRecordKind>({
         // an equal record may come to a browser without its photo
         await storePhotos(photos, [...plan.added, ...plan.equal])
         await putRecords(plan.added)
+        // after the valid records, and never over a record with its id
+        const stored = await putInvalid(invalid)
+        for (const k of ['added', 'kept', 'unstorable'] as const) total.invalid[k] += stored[k]
       } catch (e) {
         setFailure(`Import read ${count} records; the browser store write failed: ${errorText(e)}`)
         if (total.added) onStored?.()
@@ -885,6 +894,25 @@ function FileMenuOf<K extends UserRecordKind>({
 
   async function invalidRecords() {
     setInvalidList((await storedRecords()).invalid)
+  }
+
+  async function removeInvalid(r: InvalidRecord) {
+    const label = r.name ?? r.id ?? 'Unnamed record'
+    if (
+      !(await ask(
+        `Delete the invalid record ${label} from this browser? This cannot be undone.`,
+        'Delete',
+      ))
+    )
+      return
+    // the store's key may be no text: only a record with a text id shows an `id`
+    await deleteRecords([(r.raw as { id: string }).id])
+    // an invalid sheet's photo leaves with it unless another record points at it
+    const photo = rawPhotoId(r.raw)
+    if (photo && !(await storedPhotoIds()).has(photo)) deletePhoto(photo).catch(() => {})
+    setInvalidList((l) => l?.filter((i) => i !== r))
+    setInvalidCount((n) => n - 1)
+    setMessage(`Deleted the invalid record ${label} from this browser.`)
   }
 
   async function pickFolder() {
@@ -1013,6 +1041,17 @@ function FileMenuOf<K extends UserRecordKind>({
               {report.added} records added, {report.equal} already in this browser,{' '}
               {report.skipped.length} files skipped.
             </p>
+            {report.invalid.added + report.invalid.kept + report.invalid.unstorable > 0 && (
+              <p>
+                {report.invalid.added} invalid {report.invalid.added === 1 ? 'record' : 'records'}{' '}
+                restored
+                {report.invalid.kept > 0 &&
+                  `, ${report.invalid.kept} left out because a browser record has their id`}
+                {report.invalid.unstorable > 0 &&
+                  `, ${report.invalid.unstorable} left out without a text id`}
+                .
+              </p>
+            )}
             {report.skipped.length > 0 && (
               <ul className="file-skipped">
                 {report.skipped.map((s) => (
@@ -1102,7 +1141,7 @@ function FileMenuOf<K extends UserRecordKind>({
       >
         <p>
           These records do not pass the current format. They stay in this browser, are not shown
-          elsewhere and are in Export all as stored.
+          elsewhere and are in Export all as stored, which Import restores as invalid records.
         </p>
         <ul className="file-records">
           {invalidList?.map((r) => (
@@ -1120,6 +1159,14 @@ function FileMenuOf<K extends UserRecordKind>({
                 }
               >
                 Download raw
+              </Button>{' '}
+              <Button
+                variant="subtle"
+                color="red"
+                size={controlSize.row.button}
+                onClick={act('Delete', () => removeInvalid(r))}
+              >
+                Delete
               </Button>
               <pre className="file-error">{r.error}</pre>
             </li>
