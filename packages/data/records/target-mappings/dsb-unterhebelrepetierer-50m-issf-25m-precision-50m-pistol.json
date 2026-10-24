@@ -8,13 +8,13 @@
     "kind": "published",
     "sources": [
       {
-        "source": "dsb-sportordnung-2026",
-        "page": "0.21, Teil 0 Seite 78, PDF p. 96 (rows 1.56 and 1.57, column Scheibe Nr.); 1.7.4, Teil 1 Seite 14, PDF p. 126",
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 78, PDF p. 96 (rows 1.56 and 1.57, column Scheibe Nr.); 1.7.4, Teil 1 Seite 15, PDF p. 127",
         "fields": ["discipline", "face", "event"]
       },
       {
-        "source": "dsb-sportordnung-2026",
-        "page": "1.7.5, Teil 1 Seite 14, PDF p. 126; 0.21, Teil 0 Seite 78, PDF p. 96 (column Wettkampfschüsse)",
+        "source": "dsb-sportordnung-2027",
+        "page": "1.7.5, Teil 1 Seite 15, PDF p. 127; 0.21, Teil 0 Seite 78, PDF p. 96 (column Wettkampfschüsse)",
         "fields": ["shotCount"]
       }
     ]

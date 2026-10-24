@@ -4,7 +4,7 @@
   "name": "25 m Standardpistole",
   "number": "2.60",
   "section": "2.22",
-  "page": "Teil 2 Seite 22, PDF p. 156",
+  "page": "Teil 2 Seite 22, PDF p. 158",
   "distance": {
     "value": 25000,
     "raw": "25 m"
@@ -17,13 +17,13 @@
     "kind": "published",
     "sources": [
       {
-        "source": "dsb-sportordnung-2026",
-        "page": "Teil 2 Seite 22, PDF p. 156",
+        "source": "dsb-sportordnung-2027",
+        "page": "Teil 2 Seite 22, PDF p. 158",
         "fields": ["name", "number", "federation", "section", "page", "distance"]
       },
       {
-        "source": "dsb-sportordnung-2026",
-        "page": "Pistolentabelle, Teil 2 Seite 23, PDF p. 157 (2.60) and 0.21, Teil 0 Seite 82, PDF p. 100 (row 2.60)",
+        "source": "dsb-sportordnung-2027",
+        "page": "Pistolentabelle, Teil 2 Seite 23, PDF p. 159 (2.60) and 0.21, Teil 0 Seite 82, PDF p. 100 (row 2.60)",
         "fields": ["caliberClasses"]
       }
     ],

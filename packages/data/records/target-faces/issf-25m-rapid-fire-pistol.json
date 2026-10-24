@@ -346,7 +346,7 @@
         "page": "Rules 1.4.1 and 1.4.3, p. 321 (PDF p. 2); rule 5.2.1, p. 330 (PDF p. 11)"
       },
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "fields": ["events.name", "events.distance", "events.organization", "events.section"],
         "page": "0.20 Scheibe Nr. 10, Teil 0 Seite 68 (PDF p. 86)"
       },
@@ -378,7 +378,7 @@
         "fields": ["events.name", "events.distance", "events.organization", "events.section"]
       },
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "fields": ["events.name", "events.distance", "events.organization", "events.section"],
         "page": "0.20 Scheibe Nr. 10 (Teil 0 Seite 68, PDF p. 86); rows of 0.21 (Teil 0 Seite 80 to 89, PDF pp. 98 to 107)"
       },
@@ -398,7 +398,7 @@
         "fields": ["events.scoring"]
       },
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "page": "0.11.3, Teil 0 Seite 39, PDF p. 57",
         "fields": ["events.scoring"]
       }
