@@ -16,6 +16,7 @@ Canonical records in git, validated against `@openreloading/schema`, bundled for
 | `records/chrono/<id>.json` | `ChronoSession` records. Every `load` of a shot string must name a load record. |
 | `records/range/<id>.json` | `RangeFirings`, spark-range rounds of one projectile from a report (Mach, total yaw, drag coefficient at that yaw). Not served by the API yet. |
 | `records/firings/<id>.json` | `FiringSeries`, rounds fired and measured by others as a publication reports them. `cartridge` must exist. Every source names its URL and `license`. |
+| `load-tables.json` of a records root | The manufacturer load tables the powder fit reads (`loadTables` in `@openreloading/schema`): by row file name, `manufacturer` (a record id), `title`, `url?`, `retrieved`. A file or entry that breaks the schema fails validation. Optional. |
 | `records/renames.json` | Old ids by kind directory, each with the id that replaced it (`renames` in `@openreloading/schema`, `{}` while none). A reference to an old id resolves. |
 | `records/sources/<id>.json` | `SourceRecord`, a source that several records cite (the C.I.P. TDCC, rule books, the synthetic demo data), see Provenance below |
 | `records/target-faces/<id>.json` | `TargetFace`, see below |

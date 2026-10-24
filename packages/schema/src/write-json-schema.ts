@@ -8,6 +8,7 @@ import { chronoSession } from './chrono-session.ts'
 import { discipline, federation, targetMapping } from './federation.ts'
 import { firingSeries } from './firing.ts'
 import { load } from './load.ts'
+import { loadTables } from './load-tables.ts'
 import { manufacturer } from './manufacturer.ts'
 import { powder } from './powder.ts'
 import { sourceRecord } from './provenance.ts'
@@ -27,6 +28,7 @@ for (const [name, schema] of Object.entries({
   'case-capacity': caseCapacity,
   'source-record': sourceRecord,
   'firing-series': firingSeries,
+  'load-tables': loadTables,
   'range-firings': rangeFirings,
   'user-data-file': userDataFile,
   'target-sheet': targetSheet,
