@@ -2,7 +2,7 @@
   "id": "bdmp-npa-pocket-gun-bdmp-npa",
   "discipline": "bdmp-npa-pocket-gun",
   "face": "bdmp-npa",
-  "event": "BDMP NPA Service Pistol - Pocket Gun",
+  "event": "bdmp-npa-service-pistol-pocket-gun",
   "shotCount": 24,
   "provenance": {
     "kind": "published",

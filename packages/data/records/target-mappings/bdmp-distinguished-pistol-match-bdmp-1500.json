@@ -2,7 +2,7 @@
   "id": "bdmp-distinguished-pistol-match-bdmp-1500",
   "discipline": "bdmp-distinguished-pistol-match",
   "face": "bdmp-1500",
-  "event": "BDMP Distinguished Pistol Match",
+  "event": "bdmp-distinguished-pistol-match",
   "shotCount": 60,
   "provenance": {
     "kind": "published",

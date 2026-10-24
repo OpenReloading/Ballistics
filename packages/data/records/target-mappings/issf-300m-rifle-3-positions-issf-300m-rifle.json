@@ -2,7 +2,7 @@
   "id": "issf-300m-rifle-3-positions-issf-300m-rifle",
   "discipline": "issf-300m-rifle-3-positions",
   "face": "issf-300m-rifle",
-  "event": "300m Rifle 3 Positions",
+  "event": "300m-rifle-3-positions",
   "gauge": {
     "value": 8,
     "raw": "8.00mm"

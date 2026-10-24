@@ -17817,7 +17817,7 @@
                                             "type": "string",
                                             "minLength": 1,
                                             "maxLength": 200,
-                                            "description": "Name of the face's event whose gauge is the scored hole. Absent: the bullet diameter."
+                                            "description": "Id of the face's event whose gauge is the scored hole. Absent: the bullet diameter."
                                           },
                                           "marks": {
                                             "minItems": 4,
@@ -19392,7 +19392,7 @@
         "operationId": "getTargetFaces",
         "tags": ["Competition"],
         "summary": "List target faces",
-        "description": "Every target face with its organization, the caliber classes of the disciplines mapped to it and the categories of its events and those disciplines. Ordered by organization, then the code printed in the name, then name.",
+        "description": "Every target face with its federation, the caliber classes of the disciplines mapped to it and the categories of its events and those disciplines. Ordered by federation, then the code printed in the name, then name.",
         "parameters": [],
         "responses": {
           "200": {
@@ -19414,9 +19414,13 @@
                             "type": "string",
                             "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
                           },
-                          "organization": {
+                          "federation": {
                             "type": "string",
-                            "minLength": 1
+                            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                          },
+                          "organization": {
+                            "description": "Abbreviation of the face's federation, as the rule books print it.",
+                            "type": "string"
                           },
                           "name": {
                             "type": "string",
@@ -19449,7 +19453,7 @@
                             }
                           }
                         },
-                        "required": ["id", "organization", "name", "caliberClasses", "categories"],
+                        "required": ["id", "name", "caliberClasses", "categories"],
                         "additionalProperties": false
                       }
                     }
@@ -19478,7 +19482,7 @@
         "operationId": "getTargetFacesById",
         "tags": ["Competition"],
         "summary": "Get a target face",
-        "description": "The target face record: ring diameters (mm), inner ten, events and provenance.",
+        "description": "The target face record: federation id, ring diameters (mm), inner ten, events with their ids and provenance.",
         "parameters": [
           {
             "name": "id",
@@ -19507,9 +19511,9 @@
                       "type": "string",
                       "minLength": 1
                     },
-                    "organization": {
+                    "federation": {
                       "type": "string",
-                      "minLength": 1
+                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
                     },
                     "rings": {
                       "minItems": 2,
@@ -19687,6 +19691,10 @@
                       "items": {
                         "type": "object",
                         "properties": {
+                          "id": {
+                            "type": "string",
+                            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                          },
                           "name": {
                             "type": "string",
                             "minLength": 1
@@ -19731,9 +19739,9 @@
                             "type": "string",
                             "enum": ["touch", "centre"]
                           },
-                          "organization": {
+                          "federation": {
                             "type": "string",
-                            "minLength": 1
+                            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
                           },
                           "section": {
                             "type": "string",
@@ -19756,7 +19764,7 @@
                             ]
                           }
                         },
-                        "required": ["name", "distance"],
+                        "required": ["id", "name", "distance"],
                         "additionalProperties": false
                       }
                     },
@@ -19965,15 +19973,7 @@
                       "additionalProperties": false
                     }
                   },
-                  "required": [
-                    "id",
-                    "name",
-                    "organization",
-                    "rings",
-                    "blackDiameter",
-                    "events",
-                    "provenance"
-                  ],
+                  "required": ["id", "name", "rings", "blackDiameter", "events", "provenance"],
                   "additionalProperties": false
                 }
               }
@@ -20092,7 +20092,7 @@
                           },
                           "event": {
                             "type": "string",
-                            "minLength": 1
+                            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
                           },
                           "stage": {
                             "type": "string",
@@ -20177,7 +20177,7 @@
                     },
                     "event": {
                       "type": "string",
-                      "minLength": 1
+                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
                     },
                     "stage": {
                       "type": "string",

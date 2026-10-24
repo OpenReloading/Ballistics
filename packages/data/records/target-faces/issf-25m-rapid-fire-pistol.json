@@ -1,7 +1,7 @@
 {
   "id": "issf-25m-rapid-fire-pistol",
   "name": "25m Rapid-Fire Pistol Target",
-  "organization": "ISSF",
+  "federation": "issf",
   "rings": [
     {
       "value": 5,
@@ -53,6 +53,7 @@
   "decimal": true,
   "events": [
     {
+      "id": "25m-rapid-fire-pistol",
       "name": "25m Rapid-Fire Pistol",
       "distance": {
         "value": 25000,
@@ -65,6 +66,7 @@
       "scoring": "touch"
     },
     {
+      "id": "25m-centre-fire-pistol-rapid-fire-stage",
       "name": "25m Centre Fire Pistol (rapid-fire stage)",
       "distance": {
         "value": 25000,
@@ -77,6 +79,7 @@
       "scoring": "touch"
     },
     {
+      "id": "25m-pistol-rapid-fire-stage",
       "name": "25m Pistol (rapid-fire stage)",
       "distance": {
         "value": 25000,
@@ -89,232 +92,255 @@
       "scoring": "touch"
     },
     {
+      "id": "dsb-25-m-schnellfeuerpistole",
       "name": "DSB 25 m Schnellfeuerpistole",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 10",
       "scoring": "touch"
     },
     {
+      "id": "dsb-25-m-zentralfeuerpistole-duell",
       "name": "DSB 25 m Zentralfeuerpistole (Duell)",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 10",
       "scoring": "touch"
     },
     {
+      "id": "dsb-25-m-pistole-duell",
       "name": "DSB 25 m Pistole (Duell)",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 10",
       "scoring": "touch"
     },
     {
+      "id": "dsb-25-m-pistole-revolver-20-sek-serie",
       "name": "DSB 25 m Pistole/Revolver 20 Sek. Serie",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 10",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-p-d-1-halbautomatische-dienstpistole-zeitserie",
       "name": "VdRBw P-D 1 Halbautomatische Dienstpistole Zeitserie",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "8.2.5, 8.2.6 (Scheibe 10.2)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-r-d-1-dienstrevolver-zeitserie",
       "name": "VdRBw R-D 1 Dienstrevolver Zeitserie",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "8.3.5, 8.3.6 (Scheibe 10.2)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-p-g-1-halbautomatische-grosskaliberpistole-zeitserie",
       "name": "VdRBw P-G 1 Halbautomatische Großkaliberpistole Zeitserie",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "8.5.5, 8.5.6 (Scheibe 10.2)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-r-g-1-grosskaliberrevolver-zeitserie",
       "name": "VdRBw R-G 1 Großkaliberrevolver Zeitserie",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "8.6.5, 8.6.6 (Scheibe 10.2)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-p-k-1-halbautomatische-kk-pistole-zeitserie",
       "name": "VdRBw P-K 1 Halbautomatische KK-Pistole Zeitserie",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "8.8.5, 8.8.6 (Scheibe 10.2)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-r-k-1-kk-revolver-zeitserie",
       "name": "VdRBw R-K 1 KK-Revolver Zeitserie",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "8.9.5, 8.9.6 (Scheibe 10.2)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-sp3-sportpistole-3-duell",
       "name": "BDMP SP3 Sportpistole 3 Duell",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.1.1 and C.13B.5, C.13B.6 (Teil B, PDF p. 10; Teil C, PDF p. 82)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-sp4-sportpistole-4-duell",
       "name": "BDMP SP4 Sportpistole 4 Duell",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.1.1 and C.13C.5, C.13C.6 (Teil B, PDF p. 10; Teil C, PDF p. 85)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-kk-pist-rev-kleinkaliber-kurzwaffe-duell",
       "name": "BDMP KK-Pist./Rev. Kleinkaliber Kurzwaffe Duell",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.1.1 and C.16.10, C.16.12 (Teil B, PDF p. 10; Teil C, PDF p. 114)",
       "scoring": "touch"
     },
     {
+      "id": "dsb-25-m-schnellfeuerpistole-nachwuchs",
       "name": "DSB 25 m Schnellfeuerpistole Nachwuchs",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 10",
       "scoring": "touch"
     },
     {
+      "id": "dsb-25-m-pistole-nachwuchs-duell",
       "name": "DSB 25 m Pistole Nachwuchs (Duell)",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 10",
       "scoring": "touch"
     },
     {
+      "id": "dsb-25-m-grosskaliberpistole-30-20-sek-serie",
       "name": "DSB 25 m Großkaliberpistole .30 20 Sek. Serie",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 10",
       "scoring": "touch"
     },
     {
+      "id": "dsb-25-m-grosskaliberpistole-32-20-sek-serie",
       "name": "DSB 25 m Großkaliberpistole .32 20 Sek. Serie",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 10",
       "scoring": "touch"
     },
     {
+      "id": "dsb-25-m-grosskaliberpistole-38-20-sek-serie",
       "name": "DSB 25 m Großkaliberpistole .38 20 Sek. Serie",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 10",
       "scoring": "touch"
     },
     {
+      "id": "dsb-25-m-grosskaliberpistole-10-mm-20-sek-serie",
       "name": "DSB 25 m Großkaliberpistole 10 mm 20 Sek. Serie",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 10",
       "scoring": "touch"
     },
     {
+      "id": "dsb-25-m-grosskaliberrevolver-41-20-sek-serie",
       "name": "DSB 25 m Großkaliberrevolver .41 20 Sek. Serie",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 10",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-g-h-6-halbautomatisches-gewehr-200-m",
       "name": "VdRBw G-H 6 Halbautomatisches Gewehr 200 m",
       "distance": {
         "value": 200000,
         "raw": "200 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "9.16.5, 9.16.6 (Scheibe 10.2, two faces)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-g-h-6-halbautomatisches-gewehr-150-m",
       "name": "VdRBw G-H 6 Halbautomatisches Gewehr 150 m",
       "distance": {
         "value": 150000,
         "raw": "150 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "9.16.5, 9.16.6 (Scheibe 10.2, two faces)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-g-h-6-halbautomatisches-gewehr-100-m",
       "name": "VdRBw G-H 6 Halbautomatisches Gewehr 100 m",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "9.16.5, 9.16.6 (Scheibe 10.2, two faces)",
       "scoring": "touch"
     }

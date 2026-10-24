@@ -2,7 +2,7 @@
   "id": "bdmp-vp-1-issf-25m-precision-50m-pistol",
   "discipline": "bdmp-vp-1",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDMP VP 1 Vorderladerpistole 1",
+  "event": "bdmp-vp-1-vorderladerpistole-1",
   "shotCount": 10,
   "provenance": {
     "kind": "published",

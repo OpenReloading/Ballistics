@@ -2,7 +2,7 @@
   "id": "bds-3109-issf-25m-precision-50m-pistol",
   "discipline": "bds-3109",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDS 3109 100 m Präz. DSG Selbstlader oK",
+  "event": "bds-3109-100-m-praz-dsg-selbstlader-ok",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

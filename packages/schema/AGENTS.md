@@ -3,7 +3,7 @@
 Zod schemas for records, ESM. The build writes JSON Schema files to `dist/json-schema/` (generated, not committed).
 
 - Units, provenance, `Load`, `ChronoSession`, `FiringSeries`, `RangeFirings`, standards and components, user data files, `TargetSheet` (shot groups on a target, m).
-- `TargetFace`: rule-book target faces for ring scoring. Optional ring colours, paper size, bulls, ovals, square rings and event category. Strict events.
+- `TargetFace`: rule-book target faces for ring scoring. `federation` is a federation record id (absent: a user's own design). Events carry an `id` unique within the face and an optional `federation`. Optional ring colours, paper size, bulls, ovals, square rings and event category. Strict events.
 - `TargetFaceDesign` (user record kind `targetFaceDesign`, `src/user-data.ts`): the draft of the web app's face designer, every field optional. The designer builds a `TargetFace` from it and checks that against `targetFace`.
 - `Federation`, `Discipline` and `TargetMapping` (`src/federation.ts`): strict objects, `apps/docs/docs/data/federations.md`.
 - `Manufacturer` (`src/manufacturer.ts`): strict object, referenced by id from powders and bullets, `apps/docs/docs/data/manufacturers.md`.

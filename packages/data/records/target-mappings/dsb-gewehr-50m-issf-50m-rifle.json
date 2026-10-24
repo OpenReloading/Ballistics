@@ -2,7 +2,7 @@
   "id": "dsb-gewehr-50m-issf-50m-rifle",
   "discipline": "dsb-gewehr-50m",
   "face": "issf-50m-rifle",
-  "event": "DSB Gewehr 50 m (.22)",
+  "event": "dsb-gewehr-50-m-22",
   "gauge": {
     "value": 5.6,
     "raw": "5,60 mm Kleinkaliber .22"

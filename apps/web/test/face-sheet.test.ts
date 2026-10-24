@@ -230,8 +230,8 @@ describe('faceSheet events', () => {
     ],
     outer: 250,
     events: [
-      { name: '50m', distance: 50 },
-      { name: '25m', distance: 25 },
+      { id: '50m', distance: 50 },
+      { id: '25m', distance: 25 },
     ],
   }
   const s = (d: number) => ({ ...sheet0(), groups: [{ ...group('g1'), distance: d }] })
@@ -252,11 +252,11 @@ describe('faceSheet events', () => {
   const pistol = {
     ...found,
     id: face.id,
-    organization: face.organization,
+    federation: face.federation,
     events: face.events.map((e) => ({
-      name: e.name,
+      id: e.id,
       distance: e.distance.value / 1000,
-      ...(e.organization && { organization: e.organization }),
+      ...(e.federation && { federation: e.federation }),
     })),
   }
   const data = {
@@ -266,8 +266,8 @@ describe('faceSheet events', () => {
     ],
     disciplines: [],
     mappings: [
-      { id: 'm1', discipline: 'd1', face: 'issf-10m-air-pistol', event: '10m Air Pistol' },
-      { id: 'm2', discipline: 'd1', face: face.id, event: 'DSB 25 m Standardpistole' },
+      { id: 'm1', discipline: 'd1', face: 'issf-10m-air-pistol', event: '10m-air-pistol' },
+      { id: 'm2', discipline: 'd1', face: face.id, event: 'dsb-25-m-standardpistole' },
     ],
   }
   const at = (d: number, g = {}) => ({
@@ -282,27 +282,27 @@ describe('faceSheet events', () => {
     })
     expect(
       calibrateSheetOnFace(at(100), 'g1', pistol, { federation: 'dsb', data }).groups[0].face,
-    ).toEqual({ id: face.id, event: 'DSB Gewehr 100 m' })
+    ).toEqual({ id: face.id, event: 'dsb-gewehr-100-m' })
     expect(
       calibrateSheetOnFace(at(100), 'g1', pistol, { federation: 'issf', data }).groups[0].face,
     ).toEqual({ id: face.id })
     // the face's own organization at its distance
     expect(calibrateSheetOnFace(at(25), 'g1', pistol, { data }).groups[0].face).toEqual({
       id: face.id,
-      event: '25m Standard Pistol',
+      event: '25m-standard-pistol',
     })
     // the group's discipline scores on this face too
-    const before = { face: { id: 'issf-10m-air-pistol', event: '10m Air Pistol' } }
+    const before = { face: { id: 'issf-10m-air-pistol', event: '10m-air-pistol' } }
     expect(
       calibrateSheetOnFace(at(100, before), 'g1', pistol, { federation: 'dsb', data }).groups[0]
         .face,
-    ).toEqual({ id: face.id, event: 'DSB 25 m Standardpistole' })
+    ).toEqual({ id: face.id, event: 'dsb-25-m-standardpistole' })
     // one other organization shoots the face at the distance
     const one = {
       ...found,
-      organization: 'ISSF',
-      events: [{ name: 'B', distance: 50, organization: 'BDS' }],
+      federation: 'issf',
+      events: [{ id: 'b', distance: 50, federation: 'bds' }],
     }
-    expect(calibrateSheetOnFace(at(50), 'g1', one).groups[0].face).toEqual({ id: 'f', event: 'B' })
+    expect(calibrateSheetOnFace(at(50), 'g1', one).groups[0].face).toEqual({ id: 'f', event: 'b' })
   })
 })

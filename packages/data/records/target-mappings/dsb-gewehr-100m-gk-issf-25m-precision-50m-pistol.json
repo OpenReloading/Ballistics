@@ -2,7 +2,7 @@
   "id": "dsb-gewehr-100m-gk-issf-25m-precision-50m-pistol",
   "discipline": "dsb-gewehr-100m-gk",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "DSB Gewehr 100 m GK",
+  "event": "dsb-gewehr-100-m-gk",
   "gauge": {
     "value": 8,
     "raw": "8,00 mm Gewehr Kaliber > .22 lfb"

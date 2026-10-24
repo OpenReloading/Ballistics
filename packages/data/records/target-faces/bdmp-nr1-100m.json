@@ -1,7 +1,7 @@
 {
   "id": "bdmp-nr1-100m",
   "name": "BDMP-Scheibe Nr. 1, 100 m (BDS-100m-Scheibe Z1)",
-  "organization": "BDMP",
+  "federation": "bdmp",
   "rings": [
     {
       "value": 1,
@@ -74,6 +74,7 @@
   },
   "events": [
     {
+      "id": "sg-1-standardgewehr-1",
       "name": "SG 1 Standardgewehr 1",
       "distance": {
         "value": 100000,
@@ -83,6 +84,7 @@
       "scoring": "touch"
     },
     {
+      "id": "cism-gewehr-100-m",
       "name": "CISM-Gewehr 100 m",
       "distance": {
         "value": 100000,
@@ -92,6 +94,7 @@
       "scoring": "touch"
     },
     {
+      "id": "30-m1-carbine-100-m",
       "name": ".30 M1 Carbine 100 m",
       "distance": {
         "value": 100000,
@@ -101,272 +104,299 @@
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-g-30-m1-halbautomatisches-gewehr-100-m",
       "name": "VdRBw G-.30 M1 Halbautomatisches Gewehr 100 m",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "9.8.4 and 9.8.15 (PDF pp. 72, 73)",
       "scoring": "touch"
     },
     {
+      "id": "bds-2101-50-m-praz-sg-sl-kw-off-vis",
       "name": "BDS 2101 50 m Präz. SG SL KW off. Vis.",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z1",
       "scoring": "touch"
     },
     {
+      "id": "bds-2103-50-m-praz-la-kw-off-vis",
       "name": "BDS 2103 50 m Präz. LA KW off. Vis.",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z1",
       "scoring": "touch"
     },
     {
+      "id": "bds-2104-50-m-praz-la-kk-off-vis",
       "name": "BDS 2104 50 m Präz. LA KK off. Vis.",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z1",
       "scoring": "touch"
     },
     {
+      "id": "bds-2105-50-m-praz-dsg-ok-kk",
       "name": "BDS 2105 50 m Präz. DSG oK KK",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z1",
       "scoring": "touch"
     },
     {
+      "id": "bds-2109-50-m-praz-freie-klasse-fsg",
       "name": "BDS 2109 50 m Präz. Freie Klasse FSG",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z1",
       "scoring": "touch"
     },
     {
+      "id": "bds-2110-50-m-praz-sg-sl-kw-opt-vis",
       "name": "BDS 2110 50 m Präz. SG SL KW opt. Vis.",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z1",
       "scoring": "touch"
     },
     {
+      "id": "bds-2111-50-m-praz-la-kw-opt-vis",
       "name": "BDS 2111 50 m Präz. LA KW opt. Vis.",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z1",
       "scoring": "touch"
     },
     {
+      "id": "bds-2112-50-m-praz-sg-sl-kk-off-vis",
       "name": "BDS 2112 50 m Präz. SG SL KK off. Vis.",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z1",
       "scoring": "touch"
     },
     {
+      "id": "bds-2114-50-m-praz-la-kk-opt-vis",
       "name": "BDS 2114 50 m Präz. LA KK opt. Vis.",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z1",
       "scoring": "touch"
     },
     {
+      "id": "bds-2301-50-m-zeit-sg-sl-kw-off-vis",
       "name": "BDS 2301 50 m Zeit. SG SL KW off. Vis.",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z1",
       "scoring": "touch"
     },
     {
+      "id": "bds-2310-50-m-zeit-sg-sl-kw-opt-vis",
       "name": "BDS 2310 50 m Zeit. SG SL KW opt. Vis.",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z1",
       "scoring": "touch"
     },
     {
+      "id": "bds-2312-50-m-zeit-sg-sl-kk-off-vis",
       "name": "BDS 2312 50 m Zeit. SG SL KK off. Vis.",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z1",
       "scoring": "touch"
     },
     {
+      "id": "bds-2401-50m-fertigkeit-sg-sl-kw-off-vis",
       "name": "BDS 2401 50m Fertigkeit SG SL KW off. Vis.",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z1",
       "scoring": "touch"
     },
     {
+      "id": "bds-2412-50m-fertigkeit-sg-sl-kk-off-vis",
       "name": "BDS 2412 50m Fertigkeit SG SL KK off. Vis.",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z1",
       "scoring": "touch"
     },
     {
+      "id": "bds-3101-100-m-praz-msg",
       "name": "BDS 3101 100 m Präz. MSG",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z1",
       "scoring": "touch"
     },
     {
+      "id": "bds-3103-100-m-praz-jagdgewehr-b-6-4-mm",
       "name": "BDS 3103 100 m Präz. Jagdgewehr b. 6,4 mm",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z1",
       "scoring": "touch"
     },
     {
+      "id": "bds-3104-100-m-praz-jagdgewehr-u-6-4-mm",
       "name": "BDS 3104 100 m Präz. Jagdgewehr ü. 6,4 mm",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z1",
       "scoring": "touch"
     },
     {
+      "id": "bds-3111-100-m-praz-dsg-zf",
       "name": "BDS 3111 100 m Präz. DSG ZF",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z1",
       "scoring": "touch"
     },
     {
+      "id": "bds-3114-100-m-praz-sg-sl-opt-vis-b-6-4-mm",
       "name": "BDS 3114 100 m Präz. SG SL opt. Vis. b. 6,4 mm",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z1",
       "scoring": "touch"
     },
     {
+      "id": "bds-3115-100-m-praz-sg-sl-opt-vis-u-6-4-mm",
       "name": "BDS 3115 100 m Präz. SG SL opt. Vis. ü. 6,4 mm",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z1",
       "scoring": "touch"
     },
     {
+      "id": "bds-3314-100-m-zeit-sg-sl-opt-vis-b-6-4-mm",
       "name": "BDS 3314 100 m Zeit. SG SL opt. Vis. b. 6,4 mm",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z1",
       "scoring": "touch"
     },
     {
+      "id": "bds-3315-100-m-zeit-sg-sl-opt-vis-u-6-4-mm",
       "name": "BDS 3315 100 m Zeit. SG SL opt. Vis. ü. 6,4 mm",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z1",
       "scoring": "touch"
     },
     {
+      "id": "bds-3125-100-m-praz-buchse-kk-off-geschl-vis",
       "name": "BDS 3125 100 m Präz. Büchse KK off./geschl. Vis.",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "L 2.02, Z1",
       "scoring": "touch"
     },
     {
+      "id": "bds-2201-50-m-intervall-sg-sl-kw-off-vis",
       "name": "BDS 2201 50 m Intervall SG SL KW off. Vis.",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "L 13.01, Z1",
       "scoring": "touch"
     },
     {
+      "id": "bds-2210-50-m-intervall-sg-sl-kw-opt-vis",
       "name": "BDS 2210 50 m Intervall SG SL KW opt. Vis.",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "L 13.01, Z1",
       "scoring": "touch"
     },
     {
+      "id": "bds-3226-100-m-intervall-sg-sl-opt-vis",
       "name": "BDS 3226 100 m Intervall SG SL opt. Vis.",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "L 13.02, Z1",
       "scoring": "touch"
     }

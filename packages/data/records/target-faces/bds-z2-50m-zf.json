@@ -1,7 +1,7 @@
 {
   "id": "bds-z2-50m-zf",
   "name": "BDS-50m-ZF-Scheibe (Z2)",
-  "organization": "BDS",
+  "federation": "bds",
   "rings": [
     {
       "value": 1,
@@ -74,6 +74,7 @@
   },
   "events": [
     {
+      "id": "2102-50-m-praz-sg-sl-kk-opt-vis",
       "name": "2102 50 m Präz. SG SL KK opt. Vis.",
       "distance": {
         "value": 50000,
@@ -83,6 +84,7 @@
       "scoring": "touch"
     },
     {
+      "id": "2108-50-m-praz-psg-kk",
       "name": "2108 50 m Präz. PSG KK",
       "distance": {
         "value": 50000,
@@ -92,6 +94,7 @@
       "scoring": "touch"
     },
     {
+      "id": "2115-50-m-praz-zg-50-kw",
       "name": "2115 50 m Präz. ZG 50 KW",
       "distance": {
         "value": 50000,
@@ -101,6 +104,7 @@
       "scoring": "touch"
     },
     {
+      "id": "2302-50-m-zeit-sg-sl-kk-opt-vis",
       "name": "2302 50 m Zeit. SG SL KK opt. Vis.",
       "distance": {
         "value": 50000,
@@ -110,6 +114,7 @@
       "scoring": "touch"
     },
     {
+      "id": "2402-50m-fertigkeit-sg-sl-kk-opt-vis",
       "name": "2402 50m Fertigkeit SG SL KK opt. Vis.",
       "distance": {
         "value": 50000,
@@ -119,6 +124,7 @@
       "scoring": "touch"
     },
     {
+      "id": "2410-50m-fertigkeit-sg-sl-kw-opt-vis",
       "name": "2410 50m Fertigkeit SG SL KW opt. Vis.",
       "distance": {
         "value": 50000,
@@ -128,6 +134,7 @@
       "scoring": "touch"
     },
     {
+      "id": "3118-100-m-praz-zf-gewehr-100-b-7-mm",
       "name": "3118 100 m Präz. ZF-Gewehr 100 b. 7 mm",
       "distance": {
         "value": 100000,
@@ -137,6 +144,7 @@
       "scoring": "touch"
     },
     {
+      "id": "3117-100-m-praz-zf-gewehr-100-u-7-mm",
       "name": "3117 100 m Präz. ZF-Gewehr 100 ü. 7 mm",
       "distance": {
         "value": 100000,
@@ -146,6 +154,7 @@
       "scoring": "touch"
     },
     {
+      "id": "3123-100-m-praz-zf-gewehr-selbstlader",
       "name": "3123 100 m Präz. ZF-Gewehr Selbstlader",
       "distance": {
         "value": 100000,
@@ -155,6 +164,7 @@
       "scoring": "touch"
     },
     {
+      "id": "3124-100-m-praz-zf-gewehr-kleinkaliber",
       "name": "3124 100 m Präz. ZF-Gewehr Kleinkaliber",
       "distance": {
         "value": 100000,
@@ -164,12 +174,13 @@
       "scoring": "touch"
     },
     {
+      "id": "dsu-lper-3-zielfernrohrgewehr-prazision-100-m-kk",
       "name": "DSU LPER 3 Zielfernrohrgewehr Präzision 100 m KK",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "DSU",
+      "federation": "dsu",
       "section": "Kapitel 1, DSU-Scheibe 100 Meter KK Präzision (Seite 26); Kapitel 3 Langwaffenübungen (PDF p. 61)",
       "scoring": "touch"
     }

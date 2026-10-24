@@ -2,7 +2,7 @@
   "id": "bds-1210-issf-25m-precision-50m-pistol",
   "discipline": "bds-1210",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDS 1210 MD Freie Klasse Pistole/Revolver .22/5,6 mm offene Visierung",
+  "event": "bds-1210-md-freie-klasse-pistole-revolver-22-5-6-mm-offene-visierung",
   "shotCount": 40,
   "provenance": {
     "kind": "published",

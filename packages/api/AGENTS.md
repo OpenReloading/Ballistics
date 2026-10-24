@@ -34,7 +34,7 @@ Fastify HTTP API (TypeScript, ESM) exposing `@openreloading/core` and the data r
   - `ballisticCoefficientG1` and `ballisticCoefficientG7` of a bullet: the record's first coefficient of that drag model, null without one.
   - Absent without a value: `country` (ISO code of the manufacturer's country) of a powder or bullet, the bullet's `tipType` (the record's tip type) and `construction` (the record's construction structure, else the core material as `<material>-core`).
   - `GET /powders/:id`, `GET /bullets/:id`: the whole record.
-- `GET /target-faces`: `{ total, items: [{ id, organization, name, caliberClasses, categories }] }`, every face. `caliberClasses`: the caliber classes of the disciplines mapped to it. `categories`: those of its events and those disciplines. `GET /target-faces/:id`: the whole record.
+- `GET /target-faces`: `{ total, items: [{ id, federation?, organization?, name, caliberClasses, categories }] }`, every face. `caliberClasses`: the caliber classes of the disciplines mapped to it. `categories`: those of its events and those disciplines. `GET /target-faces/:id`: the whole record.
 - Order and search are the catalogue's (`apps/docs/docs/data/catalogue-storage.md`), so the order is part of the answer:
   - The default order of cartridges, manufacturers, powders and bullets is the `sortKey` of `@openreloading/schema` (case and accent folded, every digit run by value), ties by id.
   - `q` keeps the rows that hold every word of it, in any order, also as written without spaces and hyphens, and ranks them by `score` of the schema package (a word starting a word of the name first); equal ranks keep the default order.

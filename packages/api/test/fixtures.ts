@@ -108,7 +108,7 @@ export const bundle: Bundle = {
     {
       id: 'test-face',
       name: 'Test Face',
-      organization: 'Test',
+      federation: 'test-federation',
       rings: [
         { value: 9, diameter: { value: 20 } },
         { value: 10, diameter: { value: 10 } },
@@ -118,6 +118,7 @@ export const bundle: Bundle = {
       decimal: true,
       events: [
         {
+          id: 'test-event',
           name: 'Test event',
           distance: { value: 10000 },
           gauge: { value: 4.5 },
@@ -172,7 +173,7 @@ export const bundle: Bundle = {
       id: 'test-discipline-test-face',
       discipline: 'test-discipline',
       face: 'test-face',
-      event: 'Test event',
+      event: 'test-event',
       gauge: { value: 4.5 },
       shotCount: 60,
       provenance: published,

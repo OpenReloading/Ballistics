@@ -2,7 +2,7 @@
   "id": "bdmp-standard-revolver-2-75-5-shot-bdmp-1500",
   "discipline": "bdmp-standard-revolver-2-75-5-shot",
   "face": "bdmp-1500",
-  "event": "BDMP Standard Revolver 2,75“ 5 shot",
+  "event": "bdmp-standard-revolver-2-75-5-shot",
   "shotCount": 40,
   "provenance": {
     "kind": "published",

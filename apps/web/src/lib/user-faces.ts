@@ -35,17 +35,35 @@ export const userFaceId = (recordId: string) =>
           .replace(/^-|-$/g, '') || 'design'
       }-${hash(recordId)}`
 
+/**
+ * The ids of a design's events: the name in lowercase letters and digits in groups joined by
+ * hyphens, `event` where that is empty, and a number after a repeat so that every id is unique.
+ */
+function eventIds(names: readonly string[]) {
+  const seen = new Map<string, number>()
+  return names.map((name) => {
+    const base =
+      name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '') || 'event'
+    const n = (seen.get(base) ?? 0) + 1
+    seen.set(base, n)
+    return n === 1 ? base : `${base}-${n}`
+  })
+}
+
 /** The face the data builds, or why it is none, as issues of the face schema by path. */
 export function buildFace(
   data: TargetFaceDesign,
   id: string,
   name: string,
 ): { face: TargetFace } | { issues: { path: PropertyKey[]; message: string }[] } {
+  const ids = eventIds(data.events.map((e) => e.name))
   const mm = (value: number | undefined) => (value === undefined ? undefined : { value })
   const candidate = {
     id,
     name,
-    organization: userOrganization,
     rings: data.rings.map((r) => ({
       value: r.value,
       diameter: mm(r.diameter),
@@ -61,7 +79,8 @@ export function buildFace(
     blackDiameter: mm(data.blackDiameter),
     blackHeight: mm(data.blackHeight),
     decimal: data.decimal,
-    events: data.events.map((e) => ({
+    events: data.events.map((e, i) => ({
+      id: ids[i],
       name: e.name,
       distance: mm(e.distance),
       gauge: mm(e.gauge),

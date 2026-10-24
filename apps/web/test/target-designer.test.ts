@@ -15,7 +15,6 @@ import {
 } from '../src/lib/target-designer.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import { parseUserDataFile, userDataText } from '../src/lib/user-data.ts'
-import { userOrganization } from '../src/lib/user-faces.ts'
 
 const metric = presetUnits('metric-grams')
 const us = presetUnits('us')
@@ -47,7 +46,6 @@ describe('faceOf', () => {
     expect(built.face).toMatchObject({
       id: 'user-a1',
       name: 'Club face',
-      organization: userOrganization,
       blackDiameter: { value: 90 },
       decimal: true,
     })

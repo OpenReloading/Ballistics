@@ -41,7 +41,7 @@ const validMapping = {
   id: 'test-mapping',
   discipline: 'test-discipline',
   face: 'test-face',
-  event: 'Test event',
+  event: 'test-event',
   stage: 'precision stage',
   gauge: mm(5.6),
   shotCount: 30,

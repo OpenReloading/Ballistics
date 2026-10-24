@@ -2,7 +2,7 @@
   "id": "dsu-svog-issf-25m-precision-50m-pistol",
   "discipline": "dsu-svog",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "DSU SVOG Vorderlader-Ordonanzgewehr 100 m",
+  "event": "dsu-svog-vorderlader-ordonanzgewehr-100-m",
   "shotCount": 10,
   "provenance": {
     "kind": "published",

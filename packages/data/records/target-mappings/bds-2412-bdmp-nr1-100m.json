@@ -2,7 +2,7 @@
   "id": "bds-2412-bdmp-nr1-100m",
   "discipline": "bds-2412",
   "face": "bdmp-nr1-100m",
-  "event": "BDS 2412 50m Fertigkeit SG SL KK off. Vis.",
+  "event": "bds-2412-50m-fertigkeit-sg-sl-kk-off-vis",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

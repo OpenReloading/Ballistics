@@ -1,7 +1,7 @@
 {
   "id": "bdmp-nr3",
   "name": "BDMP-Scheibe Nr. 3",
-  "organization": "BDMP",
+  "federation": "bdmp",
   "rings": [
     {
       "value": 2,
@@ -39,6 +39,7 @@
   },
   "events": [
     {
+      "id": "bdmp-zg-1-100-m",
       "name": "BDMP ZG 1 100 m",
       "distance": {
         "value": 100000,
@@ -48,6 +49,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-zg-6-50-m",
       "name": "BDMP ZG 6 50 m",
       "distance": {
         "value": 50000,

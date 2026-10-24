@@ -2,7 +2,7 @@
   "id": "bdmp-pfg-2-issf-25m-precision-50m-pistol",
   "discipline": "bdmp-pfg-2",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDMP PFG 2 Perkussions-Freigewehr 2",
+  "event": "bdmp-pfg-2-perkussions-freigewehr-2",
   "shotCount": 10,
   "provenance": {
     "kind": "published",

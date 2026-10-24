@@ -2,7 +2,7 @@
   "id": "bdmp-zfspfg-100m-issf-25m-precision-50m-pistol",
   "discipline": "bdmp-zfspfg-100m",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDMP ZFSPFG ZF Schwarzpulverfreigewehr, 100 m",
+  "event": "bdmp-zfspfg-zf-schwarzpulverfreigewehr-100-m",
   "shotCount": 10,
   "provenance": {
     "kind": "published",

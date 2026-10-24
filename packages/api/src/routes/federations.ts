@@ -31,7 +31,11 @@ const query = <K extends string>(filters: Record<K, string>) =>
 const targetFaceList = page(
   z.object({
     id: targetFace.shape.id,
-    organization: targetFace.shape.organization,
+    federation: targetFace.shape.federation,
+    organization: z
+      .string()
+      .optional()
+      .describe("Abbreviation of the face's federation, as the rule books print it."),
     name: targetFace.shape.name,
     caliberClasses: z.array(recordId),
     categories: z.array(disciplineCategory),
@@ -73,7 +77,7 @@ export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = as
         response: targetFaceList,
         summary: 'List target faces',
         description:
-          'Every target face with its organization, the caliber classes of the disciplines mapped to it and the categories of its events and those disciplines. Ordered by organization, then the code printed in the name, then name.',
+          'Every target face with its federation, the caliber classes of the disciplines mapped to it and the categories of its events and those disciplines. Ordered by federation, then the code printed in the name, then name.',
       },
     },
     (_request, reply) => reply.send(catalogue.targetFaces()),
@@ -88,7 +92,7 @@ export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = as
         moved: true,
         summary: 'Get a target face',
         description:
-          'The target face record: ring diameters (mm), inner ten, events and provenance.',
+          'The target face record: federation id, ring diameters (mm), inner ten, events with their ids and provenance.',
       },
     },
     (request, reply) => {

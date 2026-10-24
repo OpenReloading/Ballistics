@@ -227,6 +227,7 @@ describe('GET /target-faces', () => {
       items: [
         {
           id: 'test-face',
+          federation: 'test-federation',
           organization: 'Test',
           name: 'Test Face',
           caliberClasses: ['air-4-5'],
@@ -268,7 +269,7 @@ describe('GET /federations, /disciplines, /target-mappings and /caliber-classes'
       id: 'test-discipline-test-face',
       discipline: 'test-discipline',
       face: 'test-face',
-      event: 'Test event',
+      event: 'test-event',
       gaugeMm: 4.5,
     }
     expect((await get(`${API_PREFIX}/target-mappings`)).body).toEqual({

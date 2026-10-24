@@ -137,7 +137,7 @@ export default async function DisciplinePage({ params }: PageProps<'/disciplines
                         <span>{f?.name ?? m.face}</span>
                       </Link>
                     </th>
-                    <td>{m.event}</td>
+                    <td>{f?.events.find((e) => e.id === m.event)?.name ?? m.event}</td>
                     <td>{m.stage}</td>
                     <td className="num">{m.gauge && shownLength(m.gauge.value)}</td>
                     <td className="num">{m.shotCount}</td>

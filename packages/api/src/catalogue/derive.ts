@@ -189,20 +189,21 @@ export const bulletRow = (b: Bullet, m: Manufacturer): IndexRow<BulletItem> => (
 const distinct = (values: (string | undefined)[]) =>
   [...new Set(values.filter((v) => v !== undefined))].sort()
 
-/** The index row of a target face, with the disciplines mapped to it (their caliber classes and categories). */
+/** The index row of a target face, with the disciplines mapped to it (their caliber classes and categories) and its federation. */
 export const targetFaceRow = (
   f: TargetFace,
   disciplines: readonly Discipline[],
+  federation?: Federation,
 ): IndexRow<TargetFaceItem> => ({
   item: {
     id: f.id,
-    organization: f.organization,
+    ...compact({ federation: f.federation, organization: federation?.abbreviation }),
     name: f.name,
     caliberClasses: distinct(disciplines.flatMap((d) => d.caliberClasses?.ids ?? [])),
     categories: distinct([...f.events, ...disciplines].map((e) => e.category)),
   },
-  sortKey: sortKey(f.organization, f.name),
-  search: searchKey([f.organization, f.name], f.name),
+  sortKey: sortKey(f.federation ?? '', f.name),
+  search: searchKey([federation?.abbreviation, f.name], f.name),
 })
 
 /** The index row of a federation. */

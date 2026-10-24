@@ -30,7 +30,7 @@ export const federation = z.strictObject({
   id: recordId,
   /** Full name as the rule book prints it. */
   name: z.string().min(1),
-  /** Short name as faces and events name it in `organization` ("ISSF", "DSB"). */
+  /** Short name as the rule books and faces print it ("ISSF", "DSB"). */
   abbreviation: z.string().min(1),
   /** ISO 3166-1 alpha-2 code of the federation's country, `international` for a world body. */
   country: z.union([z.literal('international'), countryCode]),
@@ -104,8 +104,8 @@ export const targetMapping = z.strictObject({
   discipline: recordId,
   /** Id of the target face record. */
   face: recordId,
-  /** Name of the face's event that scores the discipline on this face. */
-  event: z.string().min(1),
+  /** Id of the face's event (`events[].id` of the face record) that scores the discipline on this face. */
+  event: recordId,
   /** Part of the discipline shot on this face ("precision stage"); absent: the whole discipline. */
   stage: z.string().min(1).optional(),
   /** Diameter of the hole as scored, where the rule book fixes one for the discipline. */

@@ -2,7 +2,7 @@
   "id": "bdmp-sppdg-2-issf-300m-rifle",
   "discipline": "bdmp-sppdg-2",
   "face": "issf-300m-rifle",
-  "event": "BDMP SPPDG 2 Schwarzpulverpatronen-DG 2",
+  "event": "bdmp-sppdg-2-schwarzpulverpatronen-dg-2",
   "shotCount": 20,
   "provenance": {
     "kind": "published",

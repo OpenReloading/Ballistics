@@ -1,7 +1,7 @@
 {
   "id": "bdmp-nr12",
   "name": "BDMP-Scheibe Nr. 12",
-  "organization": "BDMP",
+  "federation": "bdmp",
   "rings": [
     {
       "value": 6,
@@ -44,6 +44,7 @@
   },
   "events": [
     {
+      "id": "bdmp-zg-7-supermagnum-tria-1200-m",
       "name": "BDMP ZG 7 Supermagnum TRIA 1200 m",
       "distance": {
         "value": 1200000,

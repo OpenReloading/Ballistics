@@ -2,7 +2,7 @@
   "id": "dsb-perkussionsdienstgewehr-100m-issf-25m-precision-50m-pistol",
   "discipline": "dsb-perkussionsdienstgewehr-100m",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "DSB Perkussionsdienstgewehr 100 m",
+  "event": "dsb-perkussionsdienstgewehr-100-m",
   "shotCount": 15,
   "provenance": {
     "kind": "published",

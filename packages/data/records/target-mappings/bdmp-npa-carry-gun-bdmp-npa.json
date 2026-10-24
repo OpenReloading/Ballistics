@@ -2,7 +2,7 @@
   "id": "bdmp-npa-carry-gun-bdmp-npa",
   "discipline": "bdmp-npa-carry-gun",
   "face": "bdmp-npa",
-  "event": "BDMP NPA Service Pistol - Carry Gun",
+  "event": "bdmp-npa-service-pistol-carry-gun",
   "shotCount": 24,
   "provenance": {
     "kind": "published",

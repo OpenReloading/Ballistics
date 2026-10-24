@@ -1,7 +1,7 @@
 {
   "id": "bds-z8-300m-zf",
   "name": "BDS-300m-ZF-Scheibe (Z8)",
-  "organization": "BDS",
+  "federation": "bds",
   "rings": [
     {
       "value": 1,
@@ -74,6 +74,7 @@
   },
   "events": [
     {
+      "id": "4105-300-m-praz-hochleistungsgewehr",
       "name": "4105 300 m Präz. Hochleistungsgewehr",
       "distance": {
         "value": 300000,
@@ -83,6 +84,7 @@
       "scoring": "touch"
     },
     {
+      "id": "4106-300-m-praz-zf-gewehr-sl",
       "name": "4106 300 m Präz. ZF-Gewehr SL",
       "distance": {
         "value": 300000,
@@ -92,6 +94,7 @@
       "scoring": "touch"
     },
     {
+      "id": "4110-300-m-praz-zf-gewehr-300-b-7-mm",
       "name": "4110 300 m Präz. ZF Gewehr 300 b. 7 mm",
       "distance": {
         "value": 300000,
@@ -101,6 +104,7 @@
       "scoring": "touch"
     },
     {
+      "id": "4107-300-m-praz-zf-gewehr-300-u-7-mm",
       "name": "4107 300 m Präz. ZF Gewehr 300 ü. 7 mm",
       "distance": {
         "value": 300000,

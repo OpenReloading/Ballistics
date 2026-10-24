@@ -1,7 +1,7 @@
 {
   "id": "issf-10m-moving-target",
   "name": "10m Moving Target",
-  "organization": "ISSF",
+  "federation": "issf",
   "rings": [
     {
       "value": 1,
@@ -77,6 +77,7 @@
   "decimal": true,
   "events": [
     {
+      "id": "10m-moving-target",
       "name": "10m Moving Target",
       "distance": {
         "value": 10000,
@@ -88,6 +89,7 @@
       "scoring": "touch"
     },
     {
+      "id": "10m-moving-target-mixed",
       "name": "10m Moving Target Mixed",
       "distance": {
         "value": 10000,

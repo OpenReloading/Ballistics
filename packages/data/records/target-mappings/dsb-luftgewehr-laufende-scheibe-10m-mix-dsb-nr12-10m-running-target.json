@@ -2,7 +2,7 @@
   "id": "dsb-luftgewehr-laufende-scheibe-10m-mix-dsb-nr12-10m-running-target",
   "discipline": "dsb-luftgewehr-laufende-scheibe-10m-mix",
   "face": "dsb-nr12-10m-running-target",
-  "event": "DSB Laufende Scheibe 10 m MIX",
+  "event": "dsb-laufende-scheibe-10-m-mix",
   "shotCount": 40,
   "provenance": {
     "kind": "published",

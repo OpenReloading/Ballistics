@@ -2,7 +2,7 @@
   "id": "bdmp-zg-7-standard-800m-bdmp-nr11",
   "discipline": "bdmp-zg-7-standard-800m",
   "face": "bdmp-nr11",
-  "event": "BDMP ZG 7 Standard TRIA 800 m",
+  "event": "bdmp-zg-7-standard-tria-800-m",
   "shotCount": 10,
   "provenance": {
     "kind": "published",

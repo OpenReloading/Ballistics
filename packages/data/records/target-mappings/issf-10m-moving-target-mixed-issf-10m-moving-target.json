@@ -2,7 +2,7 @@
   "id": "issf-10m-moving-target-mixed-issf-10m-moving-target",
   "discipline": "issf-10m-moving-target-mixed",
   "face": "issf-10m-moving-target",
-  "event": "10m Moving Target Mixed",
+  "event": "10m-moving-target-mixed",
   "gauge": {
     "value": 4.5
   },

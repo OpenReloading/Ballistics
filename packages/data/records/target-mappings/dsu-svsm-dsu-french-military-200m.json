@@ -2,7 +2,7 @@
   "id": "dsu-svsm-dsu-french-military-200m",
   "discipline": "dsu-svsm",
   "face": "dsu-french-military-200m",
-  "event": "SVSM Vorderlader-Steinschlossmuskete 50 m",
+  "event": "svsm-vorderlader-steinschlossmuskete-50-m",
   "shotCount": 10,
   "provenance": {
     "kind": "published",

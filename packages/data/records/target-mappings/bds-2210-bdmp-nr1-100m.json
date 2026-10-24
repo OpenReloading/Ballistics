@@ -2,7 +2,7 @@
   "id": "bds-2210-bdmp-nr1-100m",
   "discipline": "bds-2210",
   "face": "bdmp-nr1-100m",
-  "event": "BDS 2210 50 m Intervall SG SL KW opt. Vis.",
+  "event": "bds-2210-50-m-intervall-sg-sl-kw-opt-vis",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

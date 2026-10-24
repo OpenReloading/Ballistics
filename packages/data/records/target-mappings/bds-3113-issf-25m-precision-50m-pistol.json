@@ -2,7 +2,7 @@
   "id": "bds-3113-issf-25m-precision-50m-pistol",
   "discipline": "bds-3113",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDS 3113 100 m Präz. SG SL off. Vis. ü. 6,4 mm",
+  "event": "bds-3113-100-m-praz-sg-sl-off-vis-u-6-4-mm",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

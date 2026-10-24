@@ -2,7 +2,7 @@
   "id": "issf-300m-rifle-prone-issf-300m-rifle",
   "discipline": "issf-300m-rifle-prone",
   "face": "issf-300m-rifle",
-  "event": "300m Rifle Prone",
+  "event": "300m-rifle-prone",
   "gauge": {
     "value": 8,
     "raw": "8.00mm"

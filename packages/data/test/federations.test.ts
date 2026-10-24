@@ -36,7 +36,7 @@ const disc = (id: string, federation: string, internationalDiscipline?: string):
 const face: TargetFace = {
   id: 'face',
   name: 'Face',
-  organization: 'W',
+  federation: 'world',
   rings: [
     { value: 9, diameter: { value: 20 } },
     { value: 10, diameter: { value: 10 } },
@@ -44,8 +44,13 @@ const face: TargetFace = {
   blackDiameter: { value: 20 },
   decimal: false,
   events: [
-    { name: 'World event', distance: { value: 25000 }, gauge: { value: 5.6 } },
-    { name: 'National event', distance: { value: 25000 }, organization: 'N' },
+    { id: 'world-event', name: 'World event', distance: { value: 25000 }, gauge: { value: 5.6 } },
+    {
+      id: 'national-event',
+      name: 'National event',
+      distance: { value: 25000 },
+      federation: 'nation',
+    },
   ],
   provenance,
 }
@@ -63,13 +68,42 @@ const valid = {
   federations,
   disciplines,
   targetMappings: [
-    map('m1', 'world-d', 'World event', 5.6),
-    map('m2', 'nation-d', 'National event'),
+    map('m1', 'world-d', 'world-event', 5.6),
+    map('m2', 'nation-d', 'national-event'),
   ],
   targetFaces: [face],
 }
 
 describe('checkFederations', () => {
+  it('reports a face or event federation that is no record, and a face without one', () => {
+    const events = [{ ...face.events[0], federation: 'gone' }, face.events[1]]
+    expect(
+      checkFederations({
+        ...valid,
+        targetFaces: [
+          { ...face, federation: 'missing', events },
+          { ...face, id: 'other', federation: undefined },
+        ],
+      }),
+    ).toEqual(
+      expect.arrayContaining([
+        'target-faces/face.json: unknown federation "missing"',
+        'target-faces/face.json: event "world-event": unknown federation "gone"',
+        'target-faces/other.json: needs a federation',
+      ]),
+    )
+  })
+
+  it('resolves a renamed federation of a face', () => {
+    expect(
+      checkFederations({
+        ...valid,
+        renames: { federations: { old: 'world' } },
+        targetFaces: [{ ...face, federation: 'old' }],
+      }),
+    ).toEqual([])
+  })
+
   it('accepts consistent references', () => {
     expect(checkFederations(valid)).toEqual([])
   })
@@ -98,18 +132,18 @@ describe('checkFederations', () => {
       checkFederations({
         ...valid,
         targetMappings: [
-          map('m1', 'world-d', 'World event', 4.5),
-          map('m2', 'world-d', 'National event'),
-          map('m3', 'nation-d', 'World event'),
-          map('m4', 'nation-d', 'No event'),
+          map('m1', 'world-d', 'world-event', 4.5),
+          map('m2', 'world-d', 'national-event'),
+          map('m3', 'nation-d', 'world-event'),
+          map('m4', 'nation-d', 'no-event'),
         ],
       }),
     ).toEqual([
       "target-mappings/m1.json: gauge 4.5 mm differs from the event's 5.6 mm",
-      'target-mappings/m2.json: event "National event" is not one of W',
-      'target-mappings/m3.json: event "World event" is also in m1',
-      'target-mappings/m3.json: event "World event" is not one of N',
-      'target-mappings/m4.json: face "face" has no event "No event"',
+      'target-mappings/m2.json: event "national-event" is not one of federation "world"',
+      'target-mappings/m3.json: event "world-event" is also in m1',
+      'target-mappings/m3.json: event "world-event" is not one of federation "nation"',
+      'target-mappings/m4.json: face "face" has no event "no-event"',
     ])
   })
 })

@@ -1,7 +1,7 @@
 {
   "id": "bds-z19-300m-pg",
   "name": "BDS-300m-PG-Scheibe (Z19)",
-  "organization": "BDS",
+  "federation": "bds",
   "rings": [
     {
       "value": 6,
@@ -44,6 +44,7 @@
   },
   "events": [
     {
+      "id": "4108-300-m-praz-prazisionsgewehr-b-7-mm",
       "name": "4108 300 m Präz. Präzisionsgewehr b. 7 mm",
       "distance": {
         "value": 300000,
@@ -53,6 +54,7 @@
       "scoring": "touch"
     },
     {
+      "id": "4109-300-m-praz-prazisionsgewehr-u-7-mm",
       "name": "4109 300 m Präz. Präzisionsgewehr ü. 7 mm",
       "distance": {
         "value": 300000,

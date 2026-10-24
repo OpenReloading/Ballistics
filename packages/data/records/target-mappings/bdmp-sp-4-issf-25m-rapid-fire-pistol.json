@@ -2,7 +2,7 @@
   "id": "bdmp-sp-4-issf-25m-rapid-fire-pistol",
   "discipline": "bdmp-sp-4",
   "face": "issf-25m-rapid-fire-pistol",
-  "event": "BDMP SP4 Sportpistole 4 Duell",
+  "event": "bdmp-sp4-sportpistole-4-duell",
   "stage": "Duell",
   "shotCount": 15,
   "provenance": {

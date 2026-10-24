@@ -2,7 +2,7 @@
   "id": "bdmp-sdp-1-issf-25m-precision-50m-pistol",
   "discipline": "bdmp-sdp-1",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDMP SDP 1 Steinschloss-Dienstpistole 1",
+  "event": "bdmp-sdp-1-steinschloss-dienstpistole-1",
   "shotCount": 10,
   "provenance": {
     "kind": "published",

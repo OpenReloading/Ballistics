@@ -2,7 +2,7 @@
   "id": "bds-4103-issf-300m-rifle",
   "discipline": "bds-4103",
   "face": "issf-300m-rifle",
-  "event": "BDS 4103 300 m Präz. DSG gK und Diopter",
+  "event": "bds-4103-300-m-praz-dsg-gk-und-diopter",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

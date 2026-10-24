@@ -2,7 +2,7 @@
   "id": "bds-3125-bdmp-nr1-100m",
   "discipline": "bds-3125",
   "face": "bdmp-nr1-100m",
-  "event": "BDS 3125 100 m Präz. Büchse KK off./geschl. Vis.",
+  "event": "bds-3125-100-m-praz-buchse-kk-off-geschl-vis",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

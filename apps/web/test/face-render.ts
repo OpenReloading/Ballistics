@@ -1,14 +1,21 @@
 // Synthetic photos of the target faces of packages/data/records/target-faces for the face search:
 // the face drawn from its record, seen by a pinhole camera.
 import { readdirSync, readFileSync } from 'node:fs'
-import type { TargetFace } from '@openreloading/schema'
+import type { Federation, TargetFace } from '@openreloading/schema'
+import { type Face, withOrganization } from '../src/lib/face-organization.ts'
 import type { RgbaImage } from '../src/lib/image.ts'
 import type { Point } from '../src/lib/target-geometry.ts'
 
 const dir = new URL('../../../packages/data/records/target-faces/', import.meta.url)
-export const faces: TargetFace[] = readdirSync(dir)
+const federationDir = new URL('../../../packages/data/records/federations/', import.meta.url)
+const federations = readdirSync(federationDir).map(
+  (f) => JSON.parse(readFileSync(new URL(f, federationDir), 'utf8')) as Federation,
+)
+export const faces: Face[] = readdirSync(dir)
   .sort()
-  .map((f) => JSON.parse(readFileSync(new URL(f, dir), 'utf8')) as TargetFace)
+  .map((f) =>
+    withOrganization(JSON.parse(readFileSync(new URL(f, dir), 'utf8')) as TargetFace, federations),
+  )
 export const faceById = (id: string) => {
   const f = faces.find((x) => x.id === id)
   if (!f) throw new Error(`No face ${id}`)

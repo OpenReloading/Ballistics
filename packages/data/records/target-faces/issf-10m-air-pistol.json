@@ -1,7 +1,7 @@
 {
   "id": "issf-10m-air-pistol",
   "name": "10m Air Pistol Target",
-  "organization": "ISSF",
+  "federation": "issf",
   "rings": [
     {
       "value": 1,
@@ -77,6 +77,7 @@
   "decimal": true,
   "events": [
     {
+      "id": "10m-air-pistol",
       "name": "10m Air Pistol",
       "distance": {
         "value": 10000,
@@ -88,33 +89,36 @@
       "scoring": "touch"
     },
     {
+      "id": "dsb-10-m-pistole",
       "name": "DSB 10 m Pistole",
       "distance": {
         "value": 10000,
         "raw": "10 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 7",
       "scoring": "touch"
     },
     {
+      "id": "bds-73xx-10-m-praz-luftpistole",
       "name": "BDS 73xx 10 m Präz. Luftpistole",
       "distance": {
         "value": 10000,
         "raw": "10 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z 14",
       "scoring": "touch"
     },
     {
+      "id": "dsb-luftgewehr-10-m-sh3",
       "name": "DSB Luftgewehr 10 m SH3",
       "distance": {
         "value": 10000,
         "raw": "10 m"
       },
       "scoring": "touch",
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "10.4.1; 10.12 (row 1.10 SH3, LP Scheibe)",
       "category": "air-rifle"
     }

@@ -130,7 +130,7 @@ export const shotGroup = z.object({
         .min(1)
         .max(200)
         .describe(
-          "Name of the face's event whose gauge is the scored hole. Absent: the bullet diameter.",
+          "Id of the face's event whose gauge is the scored hole. Absent: the bullet diameter.",
         )
         .optional(),
       marks: z

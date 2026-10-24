@@ -2,7 +2,7 @@
   "id": "bds-4101-issf-300m-rifle",
   "discipline": "bds-4101",
   "face": "issf-300m-rifle",
-  "event": "BDS 4101 300 m Präz. MSG",
+  "event": "bds-4101-300-m-praz-msg",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

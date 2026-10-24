@@ -1,7 +1,7 @@
 {
   "id": "bdmp-nr9",
   "name": "BDMP-Scheibe Nr. 9",
-  "organization": "BDMP",
+  "federation": "bdmp",
   "rings": [
     {
       "value": 5,
@@ -50,6 +50,7 @@
   },
   "events": [
     {
+      "id": "bdmp-zg-7-standard-tria-300-m",
       "name": "BDMP ZG 7 Standard TRIA 300 m",
       "distance": {
         "value": 300000,
@@ -59,6 +60,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-zg-7-magnum-tria-300-m",
       "name": "BDMP ZG 7 Magnum TRIA 300 m",
       "distance": {
         "value": 300000,
@@ -68,6 +70,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-zg-7-supermagnum-tria-1000-m",
       "name": "BDMP ZG 7 Supermagnum TRIA 1000 m",
       "distance": {
         "value": 1000000,

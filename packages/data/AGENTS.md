@@ -28,6 +28,7 @@ Canonical records in git, validated against `@openreloading/schema`, bundled for
   - Served by `GET /target-faces`, scored by `apps/web/src/lib/ring-scoring.ts` (`apps/docs/docs/models/ring-scoring.md`).
   - Only faces whose numbers were read in the cited rule book.
   - An event key the schema does not define (such as `caliber`) rejects the face.
+  - `federation` of a face (required in records) and of an event, and `targetMapping.event` (the event id), are checked in `src/federations.ts` (`checkFaceFederations`, `checkMappings`).
 - Federations, disciplines and target mappings: fields, reference rules (`src/federations.ts`) and source rules in `apps/docs/docs/data/federations.md`. Served by `GET /federations`, `/disciplines`, `/target-mappings`.
 - Provenance: each source names the actual source in `title` (site and table, report, publication). It may state who stands behind it in `origin`:
   - `manufacturer`: data a manufacturer supplied or published, used with its permission.

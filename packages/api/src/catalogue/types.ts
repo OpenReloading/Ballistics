@@ -138,10 +138,14 @@ export interface BulletItem {
   construction?: string
 }
 
-/** A target face of the list, with the caliber classes and categories it is used for. */
+/**
+ * A target face of the list, with the caliber classes and categories it is used for. `organization`
+ * is the abbreviation of the face's federation, for display and search.
+ */
 export interface TargetFaceItem {
   id: string
-  organization: string
+  federation?: string
+  organization?: string
   name: string
   caliberClasses: string[]
   categories: string[]

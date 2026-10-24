@@ -2,7 +2,7 @@
   "id": "bdmp-epp-pistol-bdmp-epp",
   "discipline": "bdmp-epp-pistol",
   "face": "bdmp-epp",
-  "event": "BDMP EPP Europäischer Präzisions Parcours",
+  "event": "bdmp-epp-europaischer-prazisions-parcours",
   "shotCount": 50,
   "provenance": {
     "kind": "published",

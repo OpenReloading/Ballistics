@@ -33,8 +33,11 @@ const targetFaceFields = z.object({
   id: recordId,
   /** The face as the rule book names it. */
   name: z.string().min(1),
-  /** Body that publishes the rule book ("ISSF"). */
-  organization: z.string().min(1),
+  /**
+   * Id of the federation record whose rule book publishes the face. Absent: no federation, a face
+   * a user draws for their own use.
+   */
+  federation: recordId.optional(),
   /**
    * Outer to inner; values rise by one ring to ring. `diameter` is the width of the ring; for an
    * oval ring `height` is its height (axis-aligned, the face upright; absent: a circle). A
@@ -79,6 +82,8 @@ const targetFaceFields = z.object({
     .array(
       // strict: an event key this schema does not know rejects the record
       z.strictObject({
+        /** Id of the event within its face; a target mapping names the event by it. */
+        id: recordId,
         name: z.string().min(1),
         distance: positiveLength(),
         /** Diameter of the hole as scored: a gauge's measuring edge, or its equivalent hole. */
@@ -89,9 +94,9 @@ const targetFaceFields = z.object({
          * ignored. Absent: the rule book does not state it; scored as `touch`.
          */
         scoring: z.enum(['touch', 'centre']).optional(),
-        /** The organization whose rule book lists the event, where it is not the face's. */
-        organization: z.string().min(1).optional(),
-        /** Section of that organization's rule book that lists the event. */
+        /** Id of the federation whose rule book lists the event, where it is not the face's. */
+        federation: recordId.optional(),
+        /** Section of that federation's rule book that lists the event. */
         section: z.string().min(1).optional(),
         /** Kind of firearm the event is shot with, for example `rifle` or `service-pistol`. */
         category: disciplineCategory.optional(),
@@ -168,6 +173,15 @@ function checkRings(f: z.infer<typeof targetFaceFields>, issue: Issue) {
   })
 }
 
+/** Event ids are unique within the face. */
+function checkEvents(f: z.infer<typeof targetFaceFields>, issue: Issue) {
+  const seen = new Set<string>()
+  f.events.forEach((e, i) => {
+    if (seen.has(e.id)) issue(['events', i, 'id'], 'must be unique within the face')
+    seen.add(e.id)
+  })
+}
+
 /** Black zones on adjacent rings, the outermost one as wide as `blackDiameter`. */
 function checkBlack(f: z.infer<typeof targetFaceFields>, issue: Issue) {
   const fills = f.rings.map((r, i) => ({ r, i })).filter(({ r }) => r.fill === 'black')
@@ -202,6 +216,7 @@ function checkSheet(f: z.infer<typeof targetFaceFields>, issue: Issue) {
 export const targetFace = targetFaceFields.superRefine((f, ctx) => {
   const issue: Issue = (path, message) => ctx.addIssue({ code: 'custom', path, message })
   checkRings(f, issue)
+  checkEvents(f, issue)
   checkBlack(f, issue)
   checkSheet(f, issue)
 })

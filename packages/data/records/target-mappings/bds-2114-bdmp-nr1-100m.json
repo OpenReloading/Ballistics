@@ -2,7 +2,7 @@
   "id": "bds-2114-bdmp-nr1-100m",
   "discipline": "bds-2114",
   "face": "bdmp-nr1-100m",
-  "event": "BDS 2114 50 m Präz. LA KK opt. Vis.",
+  "event": "bds-2114-50-m-praz-la-kk-opt-vis",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

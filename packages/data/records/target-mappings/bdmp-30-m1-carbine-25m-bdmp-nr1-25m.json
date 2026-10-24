@@ -2,7 +2,7 @@
   "id": "bdmp-30-m1-carbine-25m-bdmp-nr1-25m",
   "discipline": "bdmp-30-m1-carbine-25m",
   "face": "bdmp-nr1-25m",
-  "event": ".30 M1 Carbine 25 m",
+  "event": "30-m1-carbine-25-m",
   "shotCount": 30,
   "provenance": {
     "kind": "published",
