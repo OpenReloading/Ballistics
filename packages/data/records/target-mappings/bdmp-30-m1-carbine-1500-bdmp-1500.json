@@ -1,0 +1,25 @@
+{
+  "id": "bdmp-30-m1-carbine-1500-bdmp-1500",
+  "discipline": "bdmp-30-m1-carbine-1500",
+  "face": "bdmp-1500",
+  "event": "BDMP .30 M1 Carbine 1500",
+  "shotCount": 150,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10A.7, Teil D, Seite 45 bis 46 von 294, PDF pp. 45 to 46",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10A.12, Teil D, Seite 48 bis 49 von 294, PDF pp. 48 to 49",
+        "fields": ["shotCount"],
+        "kind": "derived",
+        "note": "The book prints no total; the figure is the sum of the shots of the course table."
+      }
+    ],
+    "note": "The five matches of D.10A.12 add up to 150 shots (24, 18, 24, 24 and 60), the book prints no total. The 50 m parts may be shot at 25 m on the face \"BDMP 1500 .30M1 reduziert\", for which the book prints no dimensions and no record exists."
+  }
+}

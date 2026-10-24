@@ -1,0 +1,23 @@
+{
+  "id": "bdmp-lar-6-bdmp-pp1",
+  "discipline": "bdmp-lar-6",
+  "face": "bdmp-pp1",
+  "event": "BDMP LAR 6 Lever Action Rifle 6 (LAR - PP 2)",
+  "shotCount": 60,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16D.8, Teil D, Seite 114 von 294, PDF p. 114",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16D.6, Teil D, Seite 114 von 294, PDF p. 114",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "Full-size PP 1 face at every station, number of faces by scorability (D.16D.8). 12 shots at 10 m, 24 at 50 m, 24 at 25 m (D.16D.11). No sighters (D.16D.14)."
+  }
+}

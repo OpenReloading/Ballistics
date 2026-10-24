@@ -23,6 +23,7 @@
         "page": "E.6.8, Teil E, Seite 18 von 42, PDF p. 18",
         "fields": ["distance"]
       }
-    ]
+    ],
+    "note": "E.6.8 (Teil E) names class SPFG 2 for this distance; class SPFG 3 (300 to 900 m) is bdmp-lrspfg-3."
   }
 }

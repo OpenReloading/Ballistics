@@ -1,0 +1,23 @@
+{
+  "id": "bdmp-f-class-bdmp-f-class",
+  "discipline": "bdmp-f-class",
+  "face": "bdmp-f-class",
+  "event": "BDMP F-Class Rifle",
+  "shotCount": 15,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.23.1.13, Teil D, Seite 214 von 294, PDF p. 214",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.23.1.17, Teil D, Seite 215 von 294, PDF p. 215",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "At least 15 scored shots per distance (D.23.1.17, the announcement may differ), 2 sighters (D.23.1.16). The book prints the face table for 700 to 1000 m (800 to 1200 yd) only; it names no face for shorter distances and leaves 5-ring or 10-ring faces to the announcement."
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-lr-bdmp-long-range",
+  "discipline": "bdmp-lr",
+  "face": "bdmp-long-range",
+  "event": "BDMP LR Long Range - Target Rifle",
+  "shotCount": 15,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.8.6, Teil B, Seite 38 von 70, PDF p. 38",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.4.12, Teil D, Seite 20 von 294, PDF p. 20",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.4.16, Teil D, Seite 21 von 294, PDF p. 21",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "D.4.12 names no face and says different faces are used for the different distances. B.11.8.6 lists the Long Range face for the Long Range rifle; the Bisley faces of B.11.8.1 to B.11.8.5 have their own records. 15 scored shots per distance (D.4.16), 2 sighters (D.4.15)."
+  }
+}
