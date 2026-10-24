@@ -4,6 +4,8 @@ import { z } from 'zod'
 export interface StoredUnits {
   length: 'mm'
   area: 'mm2'
+  /** Case capacity as a volume. */
+  volume: 'cm3'
   mass: 'g'
   density: 'g/cm3'
   pressure: 'bar'
@@ -36,6 +38,7 @@ export interface StoredUnits {
 export const units: StoredUnits = {
   length: 'mm',
   area: 'mm2',
+  volume: 'cm3',
   mass: 'g',
   density: 'g/cm3',
   pressure: 'bar',
@@ -77,6 +80,7 @@ const scale = (factor: number): SiMap => ({ factor, offset: 0 })
 export const siMaps: Record<QuantityKind, SiMap> = {
   length: scale(1e-3),
   area: scale(1e-6),
+  volume: scale(1e-6),
   mass: scale(1e-3),
   density: scale(1e3),
   pressure: scale(1e5),

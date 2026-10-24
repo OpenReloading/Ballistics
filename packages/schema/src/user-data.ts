@@ -1,11 +1,11 @@
 import { z } from 'zod'
 import { firearm } from './firearm.ts'
 import { catalogueRef, parseRef, ref } from './ids.ts'
+import { load } from './load.ts'
 import { bulletOverrides, cartridgeOverrides } from './overrides.ts'
 import { text } from './shared.ts'
 import { faceColour } from './target-face.ts'
 import { targetSheet } from './target-sheet.ts'
-import { workbenchState } from './workbench.ts'
 
 /** Value of `format` in every user data file, telling it apart from other JSON. */
 export const userDataFormat = 'openreloading-user-data'
@@ -118,19 +118,32 @@ const record = <K extends string, D extends z.ZodType>(kind: K, description: str
     data: data.describe(description),
   })
 
+/** Why a record of kind `workbenchState`, the load of the format before kind `load`, is refused. */
+export const legacyLoadProblem: string =
+  'A record of kind "workbenchState" is a load in the format of an earlier version, which this app no longer reads. Kind "load" replaces it.'
+
 /**
  * One record of a user data file: its `kind`, id, name, save time and the `data` of that kind.
  * Inferred type: {@link UserRecord}.
  */
-export const userRecord = z.discriminatedUnion('kind', [
-  record('manufacturer', 'A manufacturer typed by the user.', userManufacturer),
-  record('bullet', 'A bullet of the bullet designer.', userBullet),
-  record('cartridge', 'A cartridge of the cartridge designer.', userCartridge),
-  record('workbenchState', 'A load of the workbench.', workbenchState),
-  record('firearm', 'A firearm of the library, in stored units.', firearm),
-  record('targetSheet', 'A target sheet with its calibration and shot groups.', targetSheet),
-  record('targetFaceDesign', 'A target face of the face designer.', targetFaceDesign),
-])
+export const userRecord = z.discriminatedUnion(
+  'kind',
+  [
+    record('manufacturer', 'A manufacturer typed by the user.', userManufacturer),
+    record('bullet', 'A bullet of the bullet designer.', userBullet),
+    record('cartridge', 'A cartridge of the cartridge designer.', userCartridge),
+    record('load', 'A load of the workbench, in stored units.', load),
+    record('firearm', 'A firearm of the library, in stored units.', firearm),
+    record('targetSheet', 'A target sheet with its calibration and shot groups.', targetSheet),
+    record('targetFaceDesign', 'A target face of the face designer.', targetFaceDesign),
+  ],
+  {
+    error: (issue) =>
+      (issue.input as { kind?: unknown } | null)?.kind === 'workbenchState'
+        ? legacyLoadProblem
+        : undefined,
+  },
+)
 
 /** Media type of a stored photo: a raster image (an SVG can carry script). */
 export type PhotoType =
@@ -197,11 +210,10 @@ export interface DanglingRef {
 }
 
 /**
- * The references of `records` to user records that no record of `records` answers: a workbench
- * state's `firearm`, `cartridge` and `bullet` (the last two only as `user:<id>`), a bullet's and a
- * firearm's `manufacturer` (only as `user:<id>`) and a target sheet's `load`. An old id and a
- * `user:<id>` reference name a record by its id, a `catalogue:` reference is not checked here.
- * Reports only: nothing is dropped.
+ * The references of `records` to user records that no record of `records` answers: a load's
+ * `firearm`, `cartridge` and `bullet`, a bullet's and a firearm's `manufacturer` (only as
+ * `user:<id>`) and a target sheet's `load`. A `user:<id>` reference names a record by its id, a
+ * `catalogue:` reference is not checked here. Reports only: nothing is dropped.
  */
 export function checkUserRefs(records: UserRecords): DanglingRef[] {
   const kindOf = new Map(records.map((r) => [r.id, r.kind]))
@@ -224,14 +236,14 @@ export function checkUserRefs(records: UserRecords): DanglingRef[] {
  */
 function userRefsOf(r: UserRecord): [string, string | undefined, UserRecordKind, boolean][] {
   switch (r.kind) {
-    case 'workbenchState':
+    case 'load':
       return [
-        ['firearm', r.data.firearm, 'firearm', false],
+        ['firearm', r.data.firearm, 'firearm', true],
         ['cartridge', r.data.cartridge, 'cartridge', true],
-        ['bullet', r.data.bullet, 'bullet', true],
+        ['bullet', typeof r.data.bullet === 'string' ? r.data.bullet : undefined, 'bullet', true],
       ]
     case 'targetSheet':
-      return [['load', r.data.load, 'workbenchState', false]]
+      return [['load', r.data.load, 'load', false]]
     case 'bullet':
     case 'firearm':
       return [['manufacturer', r.data.manufacturer, 'manufacturer', true]]
@@ -262,7 +274,7 @@ export interface TargetFaceDesign extends z.infer<typeof targetFaceDesign> {}
 export type TargetSheetRecord = Extract<UserRecord, { kind: 'targetSheet' }>
 /** One record of a user data file: `kind`, id, name, save time and `data`. */
 export type UserRecord = z.infer<typeof userRecord>
-/** Discriminator of a user record: `manufacturer`, `bullet`, `cartridge`, `workbenchState`, `firearm`, `targetSheet` or `targetFaceDesign`. */
+/** Discriminator of a user record: `manufacturer`, `bullet`, `cartridge`, `load`, `firearm`, `targetSheet` or `targetFaceDesign`. */
 export type UserRecordKind = UserRecord['kind']
 /** A base64 photo stored in a user data file, referenced by id. */
 export interface EmbeddedFile extends z.infer<typeof embeddedFile> {}

@@ -1,12 +1,14 @@
 import type { ChronoImport } from '@openreloading/importers'
-import { measuredSeries } from '@openreloading/schema'
+import { measurementSeries } from '@openreloading/schema'
 import { describe, expect, it } from 'vitest'
 import type { Shot } from '../src/lib/chrono.ts'
 import {
   chargeRows,
   type SimulatedStep,
   seriesFlatSpots,
+  seriesFromLoad,
   seriesOf,
+  seriesToLoad,
   simulatedCurve,
 } from '../src/lib/measurements.ts'
 
@@ -123,14 +125,21 @@ describe('seriesOf', () => {
         { shots: [shot(810)] },
       ],
     })
-    // a reopened file serializes as it was saved, so it opens without unsaved changes
-    expect(JSON.stringify(measuredSeries.parse(s))).toBe(JSON.stringify(s))
+    // a reopened load serializes as it was saved, so it opens without unsaved changes
+    const stored = seriesToLoad(s)
+    expect(JSON.stringify(measurementSeries.parse(stored))).toBe(JSON.stringify(stored))
+    expect(stored.muzzleDistance).toEqual({ value: 3000 })
+    expect(stored.strings[0].charge?.value).toBeCloseTo(40 * (gr * 1000), 9)
+    const back = seriesFromLoad(stored)
+    expect(back.muzzleDistance).toBe(3)
+    expect(back.strings[0].charge).toBeCloseTo(40 * gr, 12)
+    expect(JSON.stringify(seriesToLoad(back))).toBe(JSON.stringify(stored))
   })
 
   it('cuts texts to the caps of the file', () => {
     const long = 'x'.repeat(300)
     const s = seriesOf(long, { ...data, stringLabels: [long] }, [])
-    expect(measuredSeries.safeParse(s).success).toBe(true)
+    expect(measurementSeries.safeParse(seriesToLoad(s)).success).toBe(true)
   })
 })
 

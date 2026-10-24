@@ -1,10 +1,36 @@
 import { type LadderFlatSpots, ladderFlatSpots } from '@openreloading/core'
 import type { ChronoImport } from '@openreloading/importers'
-import { type MeasuredSeries, toSi } from '@openreloading/schema'
+import { fromSi, type MeasurementSeries, toSi } from '@openreloading/schema'
 import { type Shot, type StringStats, stringStats } from './chrono.ts'
 
-/** A chronograph file on the Measurements tab: the load file's entry and an id for this page. */
+/** One chronograph file as the Measurements tab holds it: the muzzle distance in m, the charges in kg. */
+export interface MeasuredSeries extends Omit<MeasurementSeries, 'muzzleDistance' | 'strings'> {
+  muzzleDistance?: number
+  strings: (Omit<MeasurementSeries['strings'][number], 'charge'> & { charge?: number })[]
+}
+
+/** A chronograph file on the Measurements tab with an id for this page. */
 export type IdentifiedSeries = MeasuredSeries & { id: number }
+
+const stored = (kind: 'length' | 'mass', si: number) => Number(fromSi(kind, si).toPrecision(12))
+
+/** `s` as the load keeps it: the muzzle distance in mm, the charges in g. */
+export const seriesToLoad = (s: MeasuredSeries): MeasurementSeries => ({
+  ...s,
+  muzzleDistance:
+    s.muzzleDistance === undefined ? undefined : { value: stored('length', s.muzzleDistance) },
+  strings: s.strings.map((x) => ({
+    ...x,
+    charge: x.charge === undefined ? undefined : { value: stored('mass', x.charge) },
+  })),
+})
+
+/** The series of a load as the Measurements tab holds it: the inverse of {@link seriesToLoad}. */
+export const seriesFromLoad = (s: MeasurementSeries): MeasuredSeries => ({
+  ...s,
+  muzzleDistance: s.muzzleDistance && toSi('length', s.muzzleDistance.value),
+  strings: s.strings.map((x) => ({ ...x, charge: x.charge && toSi('mass', x.charge.value) })),
+})
 
 let lastId = 0
 /** Next integer id for an `IdentifiedSeries`, counted from 1 per page load. */

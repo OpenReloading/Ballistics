@@ -120,7 +120,7 @@ _Avoid_: maker
 A record of kind `cartridges`, one per C.I.P. sheet: `id`, `name`, `aliases`, `table`, `country`, `published`, `revised`, `pressureMethod`, `verification`, `values`, `exceptions`, `provenance` (the C.I.P. TDCC with the sheet's URL, SHA-256 and retrieval date). Served by `GET /v1/cartridges` and `GET /v1/cartridges/{id}`.
 
 **Cartridge reference**:
-`cartridge`: record id of a cartridge on case capacities, loads and firing series, a reference (`catalogue:<id>` or `user:<UUID>`) on a firearm, a plain id or reference on workbench states of the user data, and in interior bodies (the cartridge whose pressure limits the answer compares). Also the bullet list filter `?cartridge=`.
+`cartridge`: record id of a cartridge on case capacities, loads and firing series, a reference (`catalogue:<id>` or `user:<UUID>`) on a firearm, a reference on loads, and in interior bodies (the cartridge whose pressure limits the answer compares). Also the bullet list filter `?cartridge=`.
 
 **Sheet id**:
 `sheetId`: `cip-<id>-<revised or published>`, the id of a cartridge's sheet revision. Figure ids and drawing baselines are named after it.
@@ -210,7 +210,7 @@ A record of kind `capacities`: one water capacity of a case of one cartridge fro
 _Avoid_: capacity
 
 **Measured water capacity**:
-`measuredWaterCapacity`: the case capacity (water to the mouth) the user measured, m3, on a workbench state.
+`measuredWaterCapacity`: the case capacity (water to the mouth) the user measured, m3, as a workbench link carries it. A load keeps it as `case.waterCapacity` (g).
 _Avoid_: ownCapacity
 
 **Case condition**:
@@ -352,7 +352,7 @@ _Avoid_: `tip` (on a bullet list item)
 `noseLength`: length of the bullet nose, mm.
 
 **Base to ogive**:
-`baseToOgive`: on a bullet, base to the start of the ogive (mm). On a load, cartridge base to the bullet ogive of the loaded round (mm), and a `seating.by` value of a workbench state.
+`baseToOgive`: on a bullet, base to the start of the ogive (mm). On a load, cartridge base to the bullet ogive of the loaded round (mm), and a `seating.by` value of a load.
 _Avoid_: cbto
 
 **Bearing length**:
@@ -389,20 +389,20 @@ _Avoid_: twistLength
 ### Loads
 
 **Load**:
-A record of kind `loads`: one cartridge recipe fired from one firearm, with `cartridge`, `firearm` (a reference to a firearm, optional), `bullet`, `powder`, `charge`, `primer`, `case`, `overallLength`, `baseToOgive`. Its components hold `manufacturerName` and `lot`, the bullet `model` and `bulletMass`, the powder `name`, the primer `model`, the case `firingCount` and `waterCapacity`.
+One cartridge recipe fired from one firearm, one shape for the catalogue (a record of kind `loads`), the user record of kind `load` and the load file, in stored units: `origin`, `cartridge`, `firearm`, `bullet` and `powder` (references, a measured catalogue load may describe the bullet and powder instead), `charge` (g), `primer`, `case` (`firingCount`, `waterCapacity`), `seating`, `note`, `analysis` (`overrides`, the solver values the user typed, and `ladder`) and `measurements`. A catalogue load also has `id`, `name` and `provenance`; a user load is named by its record. Its components hold `manufacturerName` and `lot`, the bullet `model` and `bulletMass`, the powder `name` and the primer `model`.
 
 **Lot**:
 `lot`: lot number of a load component as printed on the package.
 
 **Charge**:
-`charge`: propellant mass of one round. Load record (g), measured series strings (kg), interior and charge-target bodies (kg), and the `charge` of each interior answer and ladder step (kg).
+`charge`: propellant mass of one round. Load (g), measured series strings (g), interior and charge-target bodies (kg), and the `charge` of each interior answer and ladder step (kg).
 
 **Case firings**:
 `firingCount`: times the case of a load was fired before this load.
 _Avoid_: firings
 
 **Overall length**:
-`overallLength`: cartridge overall length of the loaded round, mm on a load, and a `seating.by` value of a workbench state.
+`overallLength`: cartridge overall length of the loaded round, mm on a load, and a `seating.by` value of a load.
 _Avoid_: coal
 
 **Barrel length**:
@@ -410,11 +410,11 @@ _Avoid_: coal
 _Avoid_: `travel` (of an M3 barrel)
 
 **Bullet travel**:
-`travel`: seated bullet base to the muzzle, m, a workbench field and load-file key of `siValues`, sent as the M3 `barrel.length`.
+`travel`: seated bullet base to the muzzle, m, a workbench field and key of a load's `analysis.overrides` (mm), sent as the M3 `barrel.length`.
 _Avoid_: `barrelLength` (of the workbench field)
 
 **Bullet seating**:
-`seating`: the length a bullet is seated by in a workbench state, `by` (`overallLength` or `baseToOgive`) and its `value` (m). The other length is derived.
+`seating`: the length a bullet is seated by in a load, `by` (`overallLength` or `baseToOgive`) and its `value` (mm). The other length is derived.
 
 ### Chronograph sessions
 
@@ -431,10 +431,10 @@ A record of kind `chrono`: one device, one place, one day, with `date`, `device`
 `conditions`: `airTemperature` (degC), `stationPressure` (absolute air pressure at the site, bar) and `relativeHumidity` (%) of a session. The truing nominal holds the same three.
 
 **Shot string**:
-One entry of a session's `strings`: the shots of one load, with `load`, `propellantTemperature` and `shots`. A measured series of a workbench state holds `strings` with a `label`, the `charge` they are mapped to and `shots`.
+One entry of a session's `strings`: the shots of one load, with `load`, `propellantTemperature` and `shots`. A measured series of a load holds `strings` with a `label`, the `charge` they are mapped to and `shots`.
 
 **Load reference**:
-`load`: on a shot string the record id of the load it was fired with. On a target sheet the local id of the saved workbench state its groups belong to.
+`load`: on a shot string the record id of the load it was fired with. On a target sheet the local id of the saved load its groups belong to.
 _Avoid_: loadId
 
 **Chronograph shot**:
@@ -571,7 +571,7 @@ _Avoid_: `shots` (as a count), n
 A JSON file of the web app with `format` (`openreloading-user-data`), `version` (a file of another version is refused), `records` and the photos of its target sheets in `files`.
 
 **User record**:
-One entry of `records`: `kind` (`bullet`, `cartridge`, `workbenchState`, `firearm`, `targetSheet`, `targetFaceDesign`), `id`, `name`, `saved` (ISO date and time of the save) and the `data` of that kind.
+One entry of `records`: `kind` (`bullet`, `cartridge`, `load`, `firearm`, `targetSheet`, `targetFaceDesign`), `id`, `name`, `saved` (ISO date and time of the save) and the `data` of that kind.
 _Avoid_: workbenchLoad
 
 **Embedded file**:
@@ -596,19 +596,15 @@ A user record of kind `targetFaceDesign`: the `rings`, `innerTen`, `blackDiamete
 `siValues`: SI value per field key of a designer or the workbench, as the share link carries them.
 _Avoid_: si
 
-**Workbench state**:
-A user record of kind `workbenchState`: `siValues`, the `cartridge`, `bullet` (a record id or a reference, `user:<UUID>` for a design) and `powder` record ids, `notes`, `measuredWaterCapacity`, the library `firearm`, `seating`, `ladder` and `measurements`. Saved alone it is the load file of `POST /v1/interior/load-file`.
-_Avoid_: workbenchLoad
-
 **Notes**:
-`notes`: free text of a workbench state or a firearm. On a target sheet the list of sheet notes.
+`notes`: free text of a firearm; a load's is `note`. On a target sheet the list of sheet notes.
 
 **Ladder**:
-`ladder`: a series of runs around or beyond a base value. On a workbench state `kind` (`charge` or `seating`), `stepCount` (2 to 21), `chargeStep` (kg, m for seating) and `direction` (`up`, `down`, `around`). In interior bodies a charge ladder from `load.charge` with `chargeStep` (kg), `stepCount` and `direction`, one interior run each.
+`ladder`: a series of runs around or beyond a base value. On a load, `analysis.ladder`: `kind` (`charge`, `seating` or `temperature`), `stepCount` (2 to 21), `step` (g for a charge ladder, mm for seating, K for temperature) and `direction` (`up`, `down`, `around`). In interior bodies a charge ladder from `load.charge` with `chargeStep` (kg), `stepCount` and `direction`, one interior run each.
 _Avoid_: `step`, `steps` (of a ladder)
 
 **Measured series**:
-One entry of `measurements` of a workbench state: one imported chronograph file with `name`, `date`, `device`, `muzzleDistance` (m) and `strings` mapped to charges.
+One entry of `measurements` of a load: one imported chronograph file with `name`, `date`, `device`, `muzzleDistance` (mm) and `strings` mapped to charges (g).
 
 **Firearm**:
 A firearm, one shape for every origin, in stored units (mm, g, degrees; the zero air in degC, bar and %). The user record of kind `firearm` holds `origin`, `name`, `manufacturer` (a reference), `model`, `cartridge` (a reference), `barrelLength`, `twist`, `twistHand`, `grooveDiameter`, `boreDiameter`, `freebore`, `baseToOgiveAtLands`, `firearmMass`, `roundCount`, `notes`, `optics`, `configurations`, `active` (the configuration on the firearm now). A workbench state names one by its local id in `firearm`, a load by a reference. The `firearm` of exterior bodies is the sight and rifling of one shot.
@@ -622,7 +618,7 @@ _Avoid_: rifle, gun
 _Avoid_: lands
 
 **Firearm mass**:
-`firearmMass`: mass of a firearm, g. The workbench state's `siValues` entry of that name is kg.
+`firearmMass`: mass of a firearm, g. A load's `analysis.overrides` entry of that name is g too.
 _Avoid_: `mass` (of a firearm), gunMass
 
 **Optic**:
@@ -843,7 +839,7 @@ Query of `GET /v1/exterior/stability`: `bullet` or `mass`, `diameter` and `lengt
 `barrel` of interior bodies: `length` and `twist`.
 
 **Interior bullet**:
-`bullet` of interior bodies: `mass`, with `gyrationRadius` (axial radius of gyration, m). In exterior bodies, the stability query and workbench states `bullet` is a bullet record id.
+`bullet` of interior bodies: `mass`, with `gyrationRadius` (axial radius of gyration, m). In exterior bodies and the stability query `bullet` is a bullet record id; on a load it is a bullet reference.
 
 **Propellant**:
 `propellant` of interior bodies: `specificEnergy`, `gamma`, `density`, `covolume`, `burn` and `temperatureSensitivity`.
@@ -880,7 +876,7 @@ _Avoid_: config
 `target` of `POST /v1/interior/charge-target`: `kind` (`peakPressure` Pa, `muzzleVelocity` m/s, `loadRatio`, `barrelTime` s, `bulletLeadTime` s), `value` and `unit` (`percentOfLimit` for a percentage of the first compared limit).
 
 **Load file**:
-The body of `POST /v1/interior/load-file`: a user data file with exactly one workbench state. Query `curves` (`true` adds the curve `points`).
+The body of `POST /v1/interior/load-file`: a user data file with exactly one record of kind `load`. Query `curves` (`true` adds the curve `points`).
 
 ### API compute answers
 
@@ -918,7 +914,7 @@ One entry of `limits`: one CIP Pmax of the cartridge's sheet (`cartridge`, `revi
 _Avoid_: steps
 
 **Load name**:
-`loadName`: name of the workbench state of a load file.
+`loadName`: name of the load record of a load file.
 _Avoid_: `name` (of a load-file answer)
 
 **Summary**:

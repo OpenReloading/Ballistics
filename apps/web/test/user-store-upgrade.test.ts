@@ -11,11 +11,11 @@ import {
 const name = 'openreloading-user-data'
 const saved = '2026-10-13T10:00:00.000Z'
 const load = {
-  kind: 'workbenchState',
+  kind: 'load',
   id: 'w1',
   name: '308 Win.',
   saved,
-  data: { siValues: { charge: 0.0028 }, cartridge: '308-win' },
+  data: { origin: 'user', charge: { value: 2.8 }, cartridge: 'catalogue:308-win' },
 }
 const old = { kind: 'bulletDesign', id: 'o1', name: 'Old', saved, data: 'not an object' }
 

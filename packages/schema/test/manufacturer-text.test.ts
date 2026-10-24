@@ -38,8 +38,14 @@ const entities = {
   load,
 }
 
-/** Entities that still hold a manufacturer name text: the components of a load. */
-const withNameText = ['load']
+/** Paths that still hold a manufacturer name text: the components of a load, also in its user record. */
+const withNameText = [
+  'load.',
+  'userRecord.data.bullet.',
+  'userRecord.data.powder.',
+  'userRecord.data.primer.',
+  'userRecord.data.case.',
+]
 
 type Node = { properties?: Record<string, Node>; type?: string; pattern?: string } & Record<
   string,
@@ -76,9 +82,9 @@ describe('manufacturers in entity schemas', () => {
     const named = found.flatMap(([name, props]) =>
       props.filter(([, key]) => key === 'manufacturerName').map(([path]) => `${name}${path}`),
     )
-    expect(named.filter((p) => !withNameText.some((n) => p.startsWith(`${n}.`)))).toEqual([])
-    // the exception list holds only entities that still have the text
-    for (const name of withNameText) expect(named.some((p) => p.startsWith(`${name}.`))).toBe(true)
+    expect(named.filter((p) => !withNameText.some((n) => p.startsWith(n)))).toEqual([])
+    // the exception list holds only paths that still have the text
+    for (const name of withNameText) expect(named.some((p) => p.startsWith(name))).toBe(true)
   })
 
   it('name a manufacturer by an id or a reference, never by free text', () => {

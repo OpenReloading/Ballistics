@@ -12,7 +12,7 @@ Canonical records in git, validated against `@openreloading/schema`, bundled for
 | `records/manufacturers/<id>.json` | `Manufacturer` (name, website, aliases). The id is the slug of the name without the legal form and never changes (`apps/docs/docs/data/manufacturers.md`). |
 | `records/powders/<id>.json`, `records/bullets/<id>.json` | Components as their manufacturers sell them. `manufacturer` must exist. |
 | `records/capacities/<id>.json` | `CaseCapacity`, one figure from one source. `cartridge` must exist, and `caseManufacturer` where set. |
-| `records/loads/<id>.json` | `Load` records. `cartridge` must exist. |
+| `records/loads/<id>.json` | `Load` records (`origin` `catalogue`, records named by `catalogue:<id>` references). `cartridge`, `bullet` and `powder` must exist, except a bullet or powder a measured load describes by maker and name. |
 | `records/chrono/<id>.json` | `ChronoSession` records. Every `load` of a shot string must name a load record. |
 | `records/range/<id>.json` | `RangeFirings`, spark-range rounds of one projectile from a report (Mach, total yaw, drag coefficient at that yaw). Not served by the API yet. |
 | `records/firings/<id>.json` | `FiringSeries`, rounds fired and measured by others as a publication reports them. `cartridge` must exist. Every source names its URL and `license`. |
