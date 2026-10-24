@@ -1,3 +1,4 @@
+import { fromSi } from '@open-reloading/schema'
 import { kilogramsPerGrain, metersPerFoot } from './units.ts'
 
 /**
@@ -5,7 +6,7 @@ import { kilogramsPerGrain, metersPerFoot } from './units.ts'
  * of the result is 10 g m/s. `massKg` is the stored bullet mass, kg.
  */
 export function powerFactor(massKg: number, velocity: number): number {
-  return 0.1 * (massKg * 1000) * velocity
+  return 0.1 * fromSi('mass', massKg) * velocity
 }
 
 /** IPSC power factor: bullet mass in grains times muzzle velocity in ft/s over 1000. */

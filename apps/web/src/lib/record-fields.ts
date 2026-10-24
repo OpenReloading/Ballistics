@@ -1,4 +1,4 @@
-import type { Bullet, Powder, QuantityValue } from '@open-reloading/schema'
+import { type Bullet, type Powder, type QuantityValue, toSi } from '@open-reloading/schema'
 import { computedBulletRows } from './bullet.ts'
 import {
   degreeText,
@@ -343,7 +343,14 @@ export function modelInputRows(p: Powder): FieldRow[] {
   if (!i) return []
   // stored in bar
   const bar = (label: string, s: QuantityValue | undefined): FieldRow[] =>
-    s ? [{ label, value: { quantity: 'pressure', si: s.value * 1e5, significantDigits: 3 } }] : []
+    s
+      ? [
+          {
+            label,
+            value: { quantity: 'pressure', si: toSi('pressure', s.value), significantDigits: 3 },
+          },
+        ]
+      : []
   const r = i.resistance
   return [
     { label: 'Ratio of specific heats', text: formatSignificant(i.gamma, 4) },
@@ -354,7 +361,7 @@ export function modelInputRows(p: Powder): FieldRow[] {
     // stored in g/cm³
     {
       label: 'Solid density',
-      value: { quantity: 'density', si: i.density.value * 1e3, significantDigits: 3 },
+      value: { quantity: 'density', si: toSi('density', i.density.value), significantDigits: 3 },
     },
     ...bar('Reference pressure', i.referencePressure),
     ...bar('Ignition pressure', i.ignitionPressure),
@@ -370,7 +377,7 @@ export function modelInputRows(p: Powder): FieldRow[] {
     // stored in °C
     {
       label: 'Propellant temperature',
-      value: { quantity: 'temperature', si: i.propellantTemperature.value + 273.15 },
+      value: { quantity: 'temperature', si: toSi('temperature', i.propellantTemperature.value) },
     },
     { label: 'Pressure exponent', text: String(i.pressureExponent) },
     ...(r
@@ -506,7 +513,7 @@ export function powderStrip(
               // stored in g/cm³
               value: {
                 quantity: 'density' as const,
-                si: p.interior.density.value * 1e3,
+                si: toSi('density', p.interior.density.value),
                 significantDigits: 3,
               },
             },

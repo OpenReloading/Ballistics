@@ -1,5 +1,5 @@
 import { fillLoadRatioLimit, loadRatio, solidFill, solidFillLimit } from '@open-reloading/core'
-import { sheetId } from '@open-reloading/schema'
+import { fromSi, sheetId, toSi } from '@open-reloading/schema'
 import type { InteriorResponse } from './api-types.ts'
 import type { LadderDirection } from './seating-ladder.ts'
 import { formatNumber, formatQuantity, inchText, type UnitSystem } from './units.ts'
@@ -97,7 +97,7 @@ const warningNames: Record<string, string> = {
 function limitNumber(pa: number, system: UnitSystem, d: number) {
   const u = system.pressure
   return u.symbol === 'bar' && d === u.decimals
-    ? +(pa / 1e5).toPrecision(12)
+    ? +fromSi('pressure', pa).toPrecision(12)
     : +u.fromSi(pa).toFixed(d)
 }
 
@@ -121,7 +121,8 @@ function convertBarMessage(message: string, system: UnitSystem) {
     ? message
     : message.replace(
         /(\d+(?:\.\d+)?) bar\b/g,
-        (_, v: string) => `${formatNumber(u.fromSi(Number(v) * 1e5), u.decimals)} ${u.symbol}`,
+        (_, v: string) =>
+          `${formatNumber(u.fromSi(toSi('pressure', Number(v))), u.decimals)} ${u.symbol}`,
       )
 }
 
@@ -201,7 +202,7 @@ export function shownLength(kind: keyof typeof lengthDigits, system: UnitSystem,
 
 /** A length given in mm in the display unit of `system`, with the symbol. */
 export const mmLength = (system: UnitSystem, mm: number) =>
-  shownLength('diameter', system, mm * 1e-3)
+  shownLength('diameter', system, toSi('length', mm))
 
 /**
  * Why the range card is out of reach after a run: a missing bullet record at once; any other

@@ -19,7 +19,7 @@ import {
   type OmittedEffect,
   type Trajectory,
 } from '@open-reloading/core'
-import type { Bullet, UserRecord } from '@open-reloading/schema'
+import { type Bullet, toSi, type UserRecord } from '@open-reloading/schema'
 import { Printer } from '@phosphor-icons/react'
 import {
   type ReactNode,
@@ -244,12 +244,13 @@ function RecordDetails({
   names: ManufacturerNames
   system: UnitSystem
 }) {
-  const mm = (x: number) => withUnit('length', system, x * 1e-3)
+  const mm = (x: number) => withUnit('length', system, toSi('length', x))
   return (
     <div className="record">
       <p>
-        {productLabel(record, names)}: {formatQuantity('mass', system, record.mass.value * 1e-3)}{' '}
-        {system.mass.symbol}, diameter {mm(record.diameter.value)}
+        {productLabel(record, names)}:{' '}
+        {formatQuantity('mass', system, toSi('mass', record.mass.value))} {system.mass.symbol},
+        diameter {mm(record.diameter.value)}
         {record.length && `, length ${mm(record.length.value)}`}
       </p>
       <ul>
@@ -908,7 +909,7 @@ export function TrajectoryForm({
                             : 'Search bullets'
                         }
                         describe={(b) =>
-                          `${productLabel(b, names)}, ${formatQuantity('mass', system, b.mass * 1e-3)} ${u('mass')}`
+                          `${productLabel(b, names)}, ${formatQuantity('mass', system, toSi('mass', b.mass))} ${u('mass')}`
                         }
                         onSelect={(b) => chooseRecord(b.id)}
                         noneText="No bullet found"

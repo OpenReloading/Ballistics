@@ -12,12 +12,13 @@ import {
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { boreArea } from '@open-reloading/core'
-import type { Bullet } from '@open-reloading/schema'
+import { type Bullet, toSi } from '@open-reloading/schema'
 import { DotsThree } from '@phosphor-icons/react'
-import { type ReactNode, useEffect, useId, useState } from 'react'
+import dynamic from 'next/dynamic'
+import { type ReactNode, useEffect, useId, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import type { BulletSummary, CartridgeSummary, PowderSummary } from '../lib/api-types.ts'
-import { summaryFitSource } from '../lib/bullet-fit.ts'
+import { fitOf, summaryFitSource } from '../lib/bullet-fit.ts'
 import { quickCartridges } from '../lib/examples.ts'
 import { type FieldSpec, type FieldValue, fieldError, siValues } from '../lib/field-spec.ts'
 import { type FollowKey, followKeys } from '../lib/input-defaults.ts'
@@ -32,6 +33,7 @@ import {
   temperatureLadderBlockReason,
 } from '../lib/seating-ladder.ts'
 import { shortcutAriaKeys, shortcutLabel } from '../lib/shortcuts.ts'
+import { userBulletRows, userRecordId } from '../lib/sources.ts'
 import { cartridgeOptionText } from '../lib/standards.ts'
 import { controlSize } from '../lib/theme.ts'
 import { formatQuantity, inchText, type UnitSystem } from '../lib/units.ts'
@@ -188,7 +190,7 @@ const recordRow = (label: string, value: ReactNode, unit?: string) =>
 
 /** A length in mm as the cards show it: the number in the length unit, inches below 1 as ".3". */
 const lengthCell = (system: UnitSystem, mm: number) =>
-  inchText(lengthText('diameter', system, mm * 1e-3), system.length.symbol)
+  inchText(lengthText('diameter', system, toSi('length', mm)), system.length.symbol)
 
 /** Diameter and length on one row, or the diameter alone. */
 function sizeRow(b: Bullet | undefined, system: UnitSystem) {
@@ -707,7 +709,9 @@ function CardBody({ panel }: { panel: InputPanel }) {
       <div className="panel-fields">
         {recordRow(
           'CIP Pmax',
-          pmax === undefined ? undefined : formatQuantity('pressure', system, pmax * 1e5),
+          pmax === undefined
+            ? undefined
+            : formatQuantity('pressure', system, toSi('pressure', pmax)),
           system.pressure.symbol,
         )}
         {recordRow(
@@ -736,7 +740,8 @@ function CardBody({ panel }: { panel: InputPanel }) {
       <div className="panel-fields">
         {recordRow(
           'Bulk density',
-          powder?.bulkDensity && formatQuantity('density', system, powder.bulkDensity.value * 1e3),
+          powder?.bulkDensity &&
+            formatQuantity('density', system, toSi('density', powder.bulkDensity.value)),
           system.density.symbol,
         )}
         {fieldsOf(panelFields.powder)}
@@ -777,6 +782,80 @@ function CardBody({ panel }: { panel: InputPanel }) {
   )
 }
 
+const BulletSearchDialog = dynamic(
+  () => import('./bullet-search-dialog.tsx').then((m) => m.BulletSearchDialog),
+  { ssr: false },
+)
+
+/** The Bullet card's picker: the inline quick search, and a button that opens the search dialog. */
+function BulletPicker() {
+  const {
+    bulletLabel,
+    bulletDesign,
+    designs,
+    bulletParams,
+    describeBullet,
+    chooseBullet,
+    chooseDesign,
+    readDesigns,
+    linkedBullet,
+    cartridge,
+    system,
+  } = useLoad()
+  // mounted from the start: the first closing returns the focus to the button as the later ones do
+  const [dialog, setDialog] = useState({ text: '', opened: false })
+  const designRows = useMemo(() => userBulletRows(designs), [designs])
+  return (
+    <>
+      <RecordSearch<BulletSummary>
+        size={controlSize.row.input}
+        chevron
+        kind="bullets"
+        label="Search bullets by manufacturer and name"
+        chosen={
+          bulletLabel
+            ? bulletLabel
+            : bulletDesign
+              ? `${bulletDesign.name} (your design)`
+              : linkedBullet?.name
+                ? `${linkedBullet.name} (from the link)`
+                : 'Search bullets'
+        }
+        describe={describeBullet}
+        onSelect={(b) => chooseBullet(b.id)}
+        // the browser's bullet designs in the same list, first
+        extra={designs.map((d) => ({ id: d.id, label: `${d.name} (your design)` }))}
+        onExtra={chooseDesign}
+        noneText="No bullet found"
+        unreachableText={notReached}
+        params={bulletParams}
+        browse={{
+          label: 'Browse bullets',
+          onOpen: (typed) => {
+            readDesigns()
+            setDialog({ text: typed, opened: true })
+          },
+        }}
+      />
+      <BulletSearchDialog
+        opened={dialog.opened}
+        onClose={() => setDialog({ ...dialog, opened: false })}
+        text={dialog.text}
+        designs={designRows}
+        fit={bulletParams ? fitOf(cartridge) : undefined}
+        fitName={cartridge?.name}
+        system={system}
+        onChoose={(row) => {
+          const design = userRecordId(row.id)
+          if (design) chooseDesign(design)
+          else chooseBullet(row.id)
+          setDialog({ ...dialog, opened: false })
+        }}
+      />
+    </>
+  )
+}
+
 /** A card's record picker, its heading: the chosen record shows in the field. */
 function CardPicker({ panel }: { panel: InputPanel }) {
   const {
@@ -785,22 +864,14 @@ function CardPicker({ panel }: { panel: InputPanel }) {
     cartridgeDesign,
     cartridgeDesigns,
     chooseCartridgeDesign,
-    bulletLabel,
-    bulletDesign,
     powderLabel,
-    designs,
     searchKey,
-    bulletParams,
-    describeBullet,
     chooseCartridge,
-    chooseBullet,
-    chooseDesign,
     choosePowder,
     chooseFirearm,
     firearm,
     firearmList,
     readDesigns,
-    linkedBullet,
     linkedPowder,
   } = useLoad()
   const names = useManufacturerNames()
@@ -833,32 +904,7 @@ function CardPicker({ panel }: { panel: InputPanel }) {
         unreachableText={notReached}
       />
     )
-  if (panel === 'bullet')
-    return (
-      <RecordSearch<BulletSummary>
-        size={controlSize.row.input}
-        chevron
-        kind="bullets"
-        label="Search bullets by manufacturer and name"
-        chosen={
-          bulletLabel
-            ? bulletLabel
-            : bulletDesign
-              ? `${bulletDesign.name} (your design)`
-              : linkedBullet?.name
-                ? `${linkedBullet.name} (from the link)`
-                : 'Search bullets'
-        }
-        describe={describeBullet}
-        onSelect={(b) => chooseBullet(b.id)}
-        // the browser's bullet designs in the same list, first
-        extra={designs.map((d) => ({ id: d.id, label: `${d.name} (your design)` }))}
-        onExtra={chooseDesign}
-        noneText="No bullet found"
-        unreachableText={notReached}
-        params={bulletParams}
-      />
-    )
+  if (panel === 'bullet') return <BulletPicker />
   if (panel === 'powder')
     return (
       <RecordSearch<PowderSummary>

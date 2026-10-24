@@ -591,7 +591,7 @@
         "raw": "100 m"
       },
       "organization": "VdRBw",
-      "section": "9.7.4, 9.7.5 (Scheibe 10.3, 50 cm)",
+      "section": "9.7.4, 9.7.5 (Scheibe 10.3, 50 cm, or 10.1, 100 cm)",
       "scoring": "touch"
     },
     {
@@ -1367,7 +1367,7 @@
         "page": "Rules 1.4.1 and 1.4.3, p. 321 (PDF p. 2); rule 5.2.1, p. 330 (PDF p. 11)"
       },
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "fields": ["events.name", "events.distance", "events.organization", "events.section"],
         "page": "0.20 Scheibe Nr. 4, Teil 0 Seite 65 (PDF p. 83)"
       },
@@ -1405,7 +1405,8 @@
       {
         "source": "vdrbw-schiesssportordnung-2023",
         "fields": ["events.name", "events.distance", "events.organization", "events.section"],
-        "page": "10.3 (Seite 98, PDF p. 98); 8.2 to 8.11, 9.2 to 9.10 (sections named in the events)"
+        "page": "10.3 (Seite 98, PDF p. 98); 8.2 to 8.11, 9.2 to 9.10 (sections named in the events)",
+        "note": "VdRBw 10.3 prints a ten of 5 cm, a ring spacing of 2.5 cm, an outer circle of 50 cm and black on rings 7 to 10, as the rings and black area here. G-H 3 (9.7.4) may also use 10.1, 100 cm: record vdrbw-bw-nr2."
       },
       {
         "source": "bds-sporthandbuch-langwaffen-2026",
@@ -1538,14 +1539,14 @@
         "page": "L 7.02, Seite L-39 and L-40, PDF pp. 39 and 40; L 7.04, Seite L-41, PDF p. 41"
       },
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "fields": ["events.name", "events.distance", "events.organization", "events.section"],
         "page": "0.20 Scheibe Nr. 4 (Teil 0 Seite 65, PDF p. 83); rows of 0.21 (Teil 0 Seite 80 to 89, PDF pp. 98 to 107)"
       },
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "fields": ["events.scoring"],
-        "page": "7.7.5, Teil 7 Seite 8, PDF p. 344"
+        "page": "7.7.5, Teil 7 Seite 8, PDF p. 346"
       },
       {
         "source": "dsu-sporthandbuch-2018",
@@ -1574,8 +1575,8 @@
         "fields": ["events.scoring"]
       },
       {
-        "source": "dsb-sportordnung-2026",
-        "page": "0.21, Teil 0 Seite 78, PDF p. 96 (rows 1.56 to 1.58); 1.7.4, Teil 1 Seite 14, PDF p. 126",
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 78, PDF p. 96 (rows 1.56 to 1.58); 1.7.4, Teil 1 Seite 15, PDF p. 127",
         "fields": [
           "events.name",
           "events.distance",
@@ -1585,17 +1586,17 @@
         ]
       },
       {
-        "source": "dsb-sportordnung-2026",
-        "page": "1.7.7, Teil 1 Seite 15, PDF p. 127; 0.11.3, Teil 0 Seite 39, PDF p. 57",
+        "source": "dsb-sportordnung-2027",
+        "page": "1.7.7, Teil 1 Seite 16, PDF p. 128; 0.11.3, Teil 0 Seite 39, PDF p. 57",
         "fields": ["events.scoring"]
       },
       {
-        "source": "dsb-sportordnung-2026",
-        "page": "1.8.5, Teil 1 Seite 17, PDF p. 129; 0.11.3, Teil 0 Seite 39, PDF p. 57",
+        "source": "dsb-sportordnung-2027",
+        "page": "1.8.5, Teil 1 Seite 18, PDF p. 130; 0.11.3, Teil 0 Seite 39, PDF p. 57",
         "fields": ["events.scoring"]
       },
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "page": "0.20 Scheibe Nr. 4, Teil 0 Seite 65 (PDF p. 83); 0.11.3.2, Teil 0 Seite 40 (PDF p. 58)",
         "fields": [
           "events.name",
@@ -1606,22 +1607,22 @@
         ]
       },
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "page": "0.11.3, Teil 0 Seite 39, PDF p. 57",
         "fields": ["events.scoring"]
       },
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "page": "0.21, Teil 0 Seite 89, PDF p. 107 (row 7.32)",
         "fields": ["events.name", "events.distance", "events.organization", "events.section"]
       },
       {
-        "source": "dsb-sportordnung-2026",
-        "page": "7.7.5, Teil 7 Seite 8, PDF p. 344",
+        "source": "dsb-sportordnung-2027",
+        "page": "7.7.5, Teil 7 Seite 8, PDF p. 346",
         "fields": ["events.scoring"]
       },
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "page": "0.11.3, Teil 0 Seite 39, PDF p. 57",
         "fields": ["events.scoring"]
       },

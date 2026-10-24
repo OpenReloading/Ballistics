@@ -1,5 +1,6 @@
 /** The user data file: its text, parsing and validation, and import planning against the browser store. */
 import {
+  checkUserRefs,
   type EmbeddedFile,
   type UserRecord,
   userDataFile,
@@ -20,7 +21,7 @@ const fileBytes = (text: string) => new TextEncoder().encode(text).byteLength
 /**
  * The text of a user data file holding `records` and the photos they point at (`files`). The
  * `invalid` records of the browser, as stored, are added under `invalid` (not part of the format
- * the schema reads: Import ignores them).
+ * the schema reads: `parseUserDataFile` hands them on as they are).
  */
 export const userDataText = (
   records: UserRecord[],
@@ -44,6 +45,8 @@ export type ParsedUserFile =
       ok: true
       records: UserRecord[]
       files?: EmbeddedFile[]
+      /** The `invalid` entries of an Export all file, as written: not checked, not part of the format. */
+      invalid?: unknown[]
       /** Fields of the file mapped to no record field, as the format names them. */
       unmapped?: string[]
       warnings?: string[]
@@ -62,8 +65,14 @@ export function parseUserDataFile(text: string): ParsedUserFile {
   const problem = versionProblem(json)
   if (problem) return { ok: false, reason: problem }
   const r = userDataFile.safeParse(json)
+  const invalid = (json as { invalid?: unknown }).invalid
   return r.success
-    ? { ok: true, records: r.data.records, files: r.data.files }
+    ? {
+        ok: true,
+        records: r.data.records,
+        files: r.data.files,
+        ...(Array.isArray(invalid) && invalid.length > 0 && { invalid }),
+      }
     : { ok: false, reason: z.prettifyError(r.error) }
 }
 
@@ -176,4 +185,18 @@ export function planImport(incoming: UserRecord[], stored: UserRecord[]) {
     else conflicts.push({ incoming: r, stored: s })
   }
   return { added, equal, conflicts }
+}
+
+/**
+ * The references of `opened` that point at no record of `opened` and `stored` (browser records
+ * with another id), as one sentence; empty when all resolve.
+ */
+export function refNote(opened: UserRecord[], stored: UserRecord[]): string {
+  const ids = new Set(opened.map((r) => r.id))
+  const name = new Map(opened.map((r) => [r.id, r.name]))
+  const all = [...opened, ...stored.filter((r) => !ids.has(r.id))]
+  const lines = checkUserRefs(all)
+    .filter((d) => ids.has(d.record))
+    .map((d) => `${name.get(d.record)}: the ${d.field} ${d.target} is not in this browser`)
+  return lines.length ? `Not found: ${lines.join('; ')}.` : ''
 }

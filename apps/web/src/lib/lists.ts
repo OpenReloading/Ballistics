@@ -1,9 +1,7 @@
 /** Filtering and sorting of the data lists (cartridges, bullets, powders) in the browser. */
+import { compareKeys, score, searchKey, sortKey } from '@open-reloading/schema'
 
 export type SortDirection = 'ascending' | 'descending'
-
-/** Search key of `s`: Unicode NFD, combining marks removed, lower case. */
-export const foldAccents = (s: string) => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase()
 
 /**
  * The count of a list's page bar: "n bullets", or "n of m bullets" while a filter hides rows;
@@ -20,41 +18,33 @@ export function filterText(named: readonly (string | false | undefined)[]) {
   return text && `${text[0].toUpperCase()}${text.slice(1)}.`
 }
 
-const compact = (s: string) => s.replace(/[\s-]+/g, '')
-
 /**
- * True when every word of `query` occurs in one of `texts`, ignoring case and accents, or in the
- * texts with spaces and hyphens removed ("8x57" finds "8 x 57 IS"); an empty query matches.
+ * True when every word of `query` occurs in one of `texts`, in any order, ignoring case and
+ * accents, with spaces, hyphens and decimal separators as the schema's matcher reads them
+ * ("8x57" finds "8 x 57 IS"); an empty query matches.
  */
-export function matchesQuery(texts: (string | undefined)[], query: string): boolean {
-  const hay = foldAccents(texts.join(' '))
-  const flat = compact(hay)
-  return foldAccents(query)
-    .split(/\s+/)
-    .every((word) => {
-      const bare = compact(word)
-      return !bare || hay.includes(word) || flat.includes(bare)
-    })
-}
+export const matchesQuery = (texts: (string | undefined)[], query: string) =>
+  score(searchKey(texts), query) !== undefined
 
-const collator = new Intl.Collator('en', { numeric: true, sensitivity: 'base' })
-
-/** A sorted copy; rows without a value come last in either order. */
+/** A sorted copy, texts in the order of the schema's `sortKey`; rows without a value come last in either order. */
 export function sortRows<T>(
   rows: readonly T[],
   value: (row: T) => string | number | undefined,
   dir: SortDirection,
 ): T[] {
   const sign = dir === 'ascending' ? 1 : -1
-  return [...rows].sort((a, b) => {
-    const x = value(a)
-    const y = value(b)
-    if (x === undefined || y === undefined) return x === y ? 0 : x === undefined ? 1 : -1
-    return (
-      sign *
-      (typeof x === 'number' && typeof y === 'number'
-        ? x - y
-        : collator.compare(String(x), String(y)))
-    )
+  const keyed = rows.map((row) => {
+    const v = value(row)
+    return { row, v, key: typeof v === 'string' ? sortKey(v) : '' }
   })
+  return keyed
+    .sort((a, b) => {
+      if (a.v === undefined || b.v === undefined)
+        return a.v === b.v ? 0 : a.v === undefined ? 1 : -1
+      return (
+        sign *
+        (typeof a.v === 'number' && typeof b.v === 'number' ? a.v - b.v : compareKeys(a.key, b.key))
+      )
+    })
+    .map((r) => r.row)
 }

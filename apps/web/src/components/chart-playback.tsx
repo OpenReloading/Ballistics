@@ -2,6 +2,7 @@
 
 import { ActionIcon, Button, Menu } from '@mantine/core'
 import { useReducedMotion } from '@mantine/hooks'
+import { toSi } from '@open-reloading/schema'
 import type { ECharts } from 'echarts/core'
 import {
   type CSSProperties,
@@ -229,7 +230,7 @@ export function ChartPlayback({
     set('--track-w', t1 - t0)
     if (strip && travelX) {
       // the strip's drawing runs from 1 mm behind the head to 1 mm past the muzzle
-      const [a, b] = [-1, strip.muzzle + 1].map((z) => px(travelX((z - strip.base) / 1e3)))
+      const [a, b] = [-1, strip.muzzle + 1].map((z) => px(travelX(toSi('length', z - strip.base))))
       set('--strip-x', a)
       set('--strip-w', b - a)
     } else {

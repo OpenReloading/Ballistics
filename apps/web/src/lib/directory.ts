@@ -1,4 +1,5 @@
 /** Directory lists: filters and sort kept in the URL, number ranges and the units they compare in. */
+import { fromSi } from '@open-reloading/schema'
 import type { SortDirection } from './lists.ts'
 import { kilogramsPerGrain, metersPerInch, psi } from './units.ts'
 
@@ -174,7 +175,7 @@ export const inRange = (
     (range.min === undefined || x >= range.min) &&
     (range.max === undefined || x <= range.max))
 
-const gramsPer = { g: 1, gr: kilogramsPerGrain * 1e3 }
+const gramsPer = { g: 1, gr: fromSi('mass', kilogramsPerGrain) }
 /** Decimals a mass shows with, and is compared at, in the list. */
 const massDigits = { gr: 1, g: 2 }
 
@@ -182,8 +183,8 @@ const massDigits = { gr: 1, g: 2 }
 export const convertMass = (x: number, from: 'gr' | 'g', to: 'gr' | 'g') =>
   Number(((x * gramsPer[from]) / gramsPer[to]).toFixed(massDigits[to]))
 
-const boreMm = { in: metersPerInch * 1e3, mm: 1 }
-const pressureBar = { bar: 1, psi: psi / 1e5 }
+const boreMm = { in: fromSi('length', metersPerInch), mm: 1 }
+const pressureBar = { bar: 1, psi: fromSi('pressure', psi) }
 
 /** A bullet diameter G1 in `from` as the list shows it in `to`, rounded to its decimals (`caliberLabel`). */
 export const convertBulletDiameter = (x: number, from: 'in' | 'mm', to: 'in' | 'mm') =>

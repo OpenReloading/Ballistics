@@ -1,4 +1,4 @@
-import { compareDisciplines, compareTargetFaces } from '@open-reloading/schema'
+import { compareDisciplines, compareTargetFaces, toSi } from '@open-reloading/schema'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -157,7 +157,7 @@ export default async function FederationPage({ params }: PageProps<'/federations
                     <th scope="row">
                       <Link href={`/disciplines/${d.id}`}>{d.name}</Link>
                     </th>
-                    <td className="nowrap">{`${d.distanceMm / 1e3} m`}</td>
+                    <td className="nowrap">{`${toSi('length', d.distanceMm)} m`}</td>
                     <td>{d.category && titleFromKebab(d.category)}</td>
                     <td className="num">{disciplineFaceIds(mappings.data, d.id).length}</td>
                   </tr>

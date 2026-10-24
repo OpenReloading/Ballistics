@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-epp-rifle-bdmp-epp",
+  "discipline": "bdmp-epp-rifle",
+  "face": "bdmp-epp",
+  "event": "BDMP EPP Rifle Europäischer Präzisions Parcours .223 Rem.",
+  "shotCount": 50,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.15, Teil B, Seite 56 von 70, PDF p. 56",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.25.10, Teil D, Seite 234 von 294, PDF p. 234",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.25.8, Teil D, Seite 233 von 294, PDF p. 233",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "50 shots in 5:30 min, no sighters (D.25.8). D.25.10 prints \"Eine Scheibe EPP\" without a B.11 number."
+  }
+}

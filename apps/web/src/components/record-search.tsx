@@ -1,7 +1,15 @@
 'use client'
 
-import { Combobox, Loader, TextInput, type TextInputProps, useCombobox } from '@mantine/core'
-import { MagnifyingGlass } from '@phosphor-icons/react'
+import {
+  ActionIcon,
+  Combobox,
+  Group,
+  Loader,
+  TextInput,
+  type TextInputProps,
+  useCombobox,
+} from '@mantine/core'
+import { ListMagnifyingGlass, MagnifyingGlass } from '@phosphor-icons/react'
 import { useEffect, useRef, useState } from 'react'
 import { apiFetch } from '../lib/api-fetch.ts'
 import type { ListOf } from '../lib/api-types.ts'
@@ -46,6 +54,7 @@ export function RecordSearch<T extends { id: string }>({
   onExtra,
   size,
   chevron = false,
+  browse,
 }: {
   kind: 'bullets' | 'cartridges' | 'powders'
   label: string
@@ -69,6 +78,8 @@ export function RecordSearch<T extends { id: string }>({
   size?: TextInputProps['size']
   /** Drawn as a select: a chevron at the end, no search icon. */
   chevron?: boolean
+  /** A button at the end of the field that opens a browsing dialog with the typed text. */
+  browse?: { label: string; onOpen: (typed: string) => void }
 }) {
   const [q, setQ] = useState('')
   const [state, setState] = useState<State<T>>({ status: 'idle' })
@@ -141,13 +152,29 @@ export function RecordSearch<T extends { id: string }>({
             autoComplete="off"
             value={q}
             rightSection={
-              state.status === 'loading' ? (
+              browse ? (
+                <Group gap={4} wrap="nowrap">
+                  {state.status === 'loading' && <Loader size="xs" />}
+                  <ActionIcon
+                    variant="subtle"
+                    size={size === 'xs' ? 'input-xs' : 'input-sm'}
+                    aria-label={browse.label}
+                    onClick={() => {
+                      // the typed text moves into the dialog
+                      browse.onOpen(q)
+                      setQ('')
+                    }}
+                  >
+                    <ListMagnifyingGlass size={16} aria-hidden="true" />
+                  </ActionIcon>
+                </Group>
+              ) : state.status === 'loading' ? (
                 <Loader size="xs" />
               ) : chevron ? (
                 <Combobox.Chevron />
               ) : undefined
             }
-            rightSectionPointerEvents="none"
+            rightSectionPointerEvents={browse ? 'all' : 'none'}
             onChange={(e) => {
               setQ(e.currentTarget.value)
               combobox.openDropdown()

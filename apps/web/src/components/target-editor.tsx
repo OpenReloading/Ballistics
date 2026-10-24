@@ -75,6 +75,7 @@ import { fieldValueFromText } from '../lib/field-spec.ts'
 import { clickOptions, freeId } from '../lib/firearm.ts'
 import { type Interval, keyReadouts, readouts, statLines } from '../lib/group-readouts.ts'
 import { editHistory, historyOf, pushHistory, redo, undo } from '../lib/history.ts'
+import { newId } from '../lib/new-id.ts'
 import { shortcutAriaKeys, shortcutLabel, shortcutMatches } from '../lib/shortcuts.ts'
 import {
   clicksToAim,
@@ -114,7 +115,7 @@ import {
   withoutWaitingCopy,
 } from '../lib/waiting-copies.ts'
 import { confirmDialog, offered, offerUndo } from './confirm.tsx'
-import { FileMenu, FileMenuPlaceholder, newId } from './file-menu.tsx'
+import { FileMenu, FileMenuPlaceholder } from './file-menu.tsx'
 import { useHoleDetection } from './hole-detection.tsx'
 import { LazyLineChart } from './lazy-chart.tsx'
 import { PageBar } from './page-bar.tsx'

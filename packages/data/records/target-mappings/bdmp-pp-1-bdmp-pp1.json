@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-pp-1-bdmp-pp1",
+  "discipline": "bdmp-pp-1",
+  "face": "bdmp-pp1",
+  "event": "BDMP PP 1 Police Pistol 1",
+  "shotCount": 30,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.9, Teil B, Seite 42 von 70, PDF p. 42",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6A.4, Teil C, Seite 25 von 142, PDF p. 25",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6A.3, Teil C, Seite 25 von 142, PDF p. 25",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "12 shots at 25 m, 12 at 15 m and 6 at 10 m (C.6A.5). No sighters (C.6.6, Teil C, PDF p. 18)."
+  }
+}

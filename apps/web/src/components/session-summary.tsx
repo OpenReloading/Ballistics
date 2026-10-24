@@ -2,6 +2,7 @@
 
 import { Alert, Badge, Button, Flex, Group, NativeSelect, Tabs } from '@mantine/core'
 import type { ChronoImport, VelocityUnit } from '@open-reloading/importers'
+import { toSi } from '@open-reloading/schema'
 import { FileArrowUp } from '@phosphor-icons/react'
 import { useEffect, useRef, useState } from 'react'
 import {
@@ -198,7 +199,9 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
       .map((u) => `${u.unit}, ${u.source === 'file' ? 'from the file' : 'named at import'}`)
       .join('; ')}`,
     ...(session.muzzleDistance
-      ? [`Muzzle distance: ${withUnit('length', system, session.muzzleDistance.value / 1000)}`]
+      ? [
+          `Muzzle distance: ${withUnit('length', system, toSi('length', session.muzzleDistance.value))}`,
+        ]
       : []),
     ...(session.note ? [`Note: ${session.note}`] : []),
   ]

@@ -2,6 +2,7 @@
  * The view of a target sheet as exported, printed and zoomed by touch. View units are photo px,
  * or target mm on a drawn target. No React, DOM or Next.js.
  */
+import { fromSi } from '@open-reloading/schema'
 
 export type ViewBox = { x: number; y: number; w: number; h: number }
 type Pt = { x: number; y: number }
@@ -36,10 +37,10 @@ export function printLayout(
   maxW = printArea.width,
   maxH = printArea.height,
 ) {
-  const w = box.w * mPerUnit * 1e3
-  const h = box.h * mPerUnit * 1e3
+  const w = fromSi('length', box.w * mPerUnit)
+  const h = fromSi('length', box.h * mPerUnit)
   const scale = round(-4, 1).find((s) => w * s <= maxW + 1e-9 && h * s <= maxH + 1e-9) ?? 1e-4
-  const perUnit = unit * 1e3 * scale
+  const perUnit = fromSi('length', unit) * scale
   const length = round(-3, 4).find((l) => l * perUnit <= Math.min(60, w * scale) + 1e-9) ?? 1e-3
   return { scale, width: w * scale, height: h * scale, ruler: { length, mm: length * perUnit } }
 }

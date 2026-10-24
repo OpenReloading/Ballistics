@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-standard-semi-automatic-pistol",
+  "federation": "bdmp",
+  "name": "Standard Semi-Automatic Pistol",
+  "section": "C.9.8",
+  "page": "Teil C, Seite 69 bis 70 von 142, PDF pp. 69 to 70",
+  "distance": {
+    "value": 25000,
+    "raw": "25 Meter/Yards"
+  },
+  "category": "pistol",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.9.8, C.9.8.1, Teil C, Seite 69 von 142, PDF p. 69",
+        "fields": ["name", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.2, Teil C, Seite 42 bis 43 von 142, PDF pp. 42 to 43",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "Metres or yards."
+  }
+}

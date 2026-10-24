@@ -30,7 +30,7 @@
         "source": "issf-rules-2025-third-print",
         "page": "Rules 8.4.3.3 and 8.4.4, p. 358 (PDF p. 358)",
         "fields": ["caliberClasses"],
-        "note": "The rule prints a calibre range of 7.62 to 9.65 mm."
+        "note": "The rule prints a calibre range of 7.62 to 9.65 mm (.30 to .38). The classes are those whose diameter lies in that range. The rule also excludes high-power or Magnum ammunition, which the class list does not model."
       }
     ]
   }

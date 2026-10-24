@@ -5,7 +5,7 @@
  * the group's ring scoring choice; and the face of a group as the detection takes it. Pure: no
  * React, DOM or Next.js.
  */
-import type { ShotGroup, TargetFace, TargetSheet } from '@open-reloading/schema'
+import { type ShotGroup, type TargetFace, type TargetSheet, toSi } from '@open-reloading/schema'
 import { type FederationData, mappingOf } from './face-disciplines.ts'
 import { faceAlignment } from './ring-scoring.ts'
 import type { FaceGeometry, FacePlane } from './target-face.ts'
@@ -43,7 +43,7 @@ export function calibrateSheetOnFace(
 
 /** The square about the outer ring as the rectangle reference, its side in m. */
 function faceReference(found: FoundFace): TargetSheet['references'][number] {
-  const size = (2 * found.outer) / 1000
+  const size = toSi('length', 2 * found.outer)
   const [a, b, c, d] = found.corners
   const corner = (p: Point) => ({ x: p.x, y: p.y })
   return {
@@ -106,7 +106,7 @@ export function faceGeometry(o: {
   const choice = group?.face
   if (!toTarget || !group || !choice || !record || record.id !== choice.id) return undefined
   const outer = record.rings[0].diameter.value / 2
-  const size = (2 * outer) / 1000
+  const size = toSi('length', 2 * outer)
   const onFace = sheet.references.some(
     (r) =>
       r.kind === 'rectangle' && Math.abs(r.width - size) < 1e-9 && Math.abs(r.height - size) < 1e-9,
@@ -114,7 +114,7 @@ export function faceGeometry(o: {
   if (!choice.marks && !onFace && !group.aim) return undefined
   try {
     const a = faceAlignment(record, choice.marks, choice.marks || !onFace ? group.aim : undefined)
-    const k = 1000 / a.scale
+    const k = 1 / toSi('length', a.scale)
     return {
       toFace: mul3([k, 0, -k * a.centre.x, 0, k, -k * a.centre.y, 0, 0, 1], toTarget),
       outer,

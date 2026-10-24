@@ -6,12 +6,13 @@
  * id and the event name. A group stores the face and the event either way. A flat list: Mantine's
  * group headings are no listbox children, which axe reports (aria-required-children).
  */
-import type {
-  Discipline,
-  Federation,
-  GroupFace,
-  TargetFace,
-  TargetMapping,
+import {
+  type Discipline,
+  type Federation,
+  type GroupFace,
+  type TargetFace,
+  type TargetMapping,
+  toSi,
 } from '@open-reloading/schema'
 import { compareDisciplines, compareFederations, compareNames } from './face-order.ts'
 
@@ -84,7 +85,7 @@ export function disciplineOptions(faces: TargetFace[], data?: FederationData, fe
 
 /** Federation abbreviation, number (unless the name starts with it), name and distance (unless the name holds it). */
 function disciplineLabel(f: FederationSummary, d: DisciplineSummary): string {
-  return `${f.abbreviation} ${d.number && !d.name.startsWith(d.number) ? `${d.number} ` : ''}${d.name}${d.name.includes(`${d.distanceMm / 1000}`) ? '' : `, ${d.distanceMm / 1000} m`}`
+  return `${f.abbreviation} ${d.number && !d.name.startsWith(d.number) ? `${d.number} ` : ''}${d.name}${d.name.includes(`${toSi('length', d.distanceMm)}`) ? '' : `, ${toSi('length', d.distanceMm)} m`}`
 }
 
 /** The face events no mapping names, by organization (an event of another organization than its face names that organization itself, an event on two faces its face). */

@@ -1,4 +1,4 @@
-import { compareTargetFaces } from '@open-reloading/schema'
+import { compareTargetFaces, toSi } from '@open-reloading/schema'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -44,8 +44,8 @@ export async function generateMetadata({
 /** A length in mm in the Settings length unit, both laid out on the server. */
 const shownLength = (mm: number) => (
   <ByLengthUnit
-    mm={withUnit('length', presetUnits('metric-grams'), mm * 1e-3)}
-    inch={withUnit('length', presetUnits('us'), mm * 1e-3)}
+    mm={withUnit('length', presetUnits('metric-grams'), toSi('length', mm))}
+    inch={withUnit('length', presetUnits('us'), toSi('length', mm))}
   />
 )
 

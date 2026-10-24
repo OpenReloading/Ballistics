@@ -2,12 +2,14 @@
 
 import { Button, NativeSelect, Select } from '@mantine/core'
 import { useWindowEvent } from '@mantine/hooks'
-import type {
-  CalibrationReference,
-  GroupFace,
-  ShotGroup,
-  TargetFace,
-  TargetSheet,
+import {
+  type CalibrationReference,
+  fromSi,
+  type GroupFace,
+  type ShotGroup,
+  type TargetFace,
+  type TargetSheet,
+  toSi,
 } from '@open-reloading/schema'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -214,7 +216,9 @@ export function useRingScoring({
     try {
       const a = faceAlignment(record, marks, undefined)
       setFace((x) => x && { ...x, marks })
-      say(`Face fitted to ${marks.length} marks, misfit ${mmLength(system, (a.rms ?? 0) * 1e3)}.`)
+      say(
+        `Face fitted to ${marks.length} marks, misfit ${mmLength(system, fromSi('length', a.rms ?? 0))}.`,
+      )
       startTool('select')
       // the Fit button turns disabled: the focus goes back to Mark
       requestAnimationFrame(() => markButton.current?.focus())
@@ -234,8 +238,8 @@ export function useRingScoring({
     onReference({
       kind: 'ringCentre',
       centre: targetToView(frame, a.centre),
-      edge: targetToView(frame, onSheet(a, { x: d * 5e-4, y: 0 })),
-      diameter: d * 1e-3,
+      edge: targetToView(frame, onSheet(a, { x: toSi('length', d / 2), y: 0 })),
+      diameter: toSi('length', d),
     })
   }
 
@@ -356,7 +360,7 @@ export function useRingScoring({
             ? current.error
             : result
               ? choice.marks
-                ? `Fitted to ${choice.marks.length} marks, misfit ${mmLength(system, (result.alignment.rms ?? 0) * 1e3)}, scale ${(result.alignment.scale * 100).toFixed(1)} %.`
+                ? `Fitted to ${choice.marks.length} marks, misfit ${mmLength(system, fromSi('length', result.alignment.rms ?? 0))}, scale ${(result.alignment.scale * 100).toFixed(1)} %.`
                 : 'Centred on the point of aim (or the origin) at the sheet scale.'
               : 'Loading the face…'
 

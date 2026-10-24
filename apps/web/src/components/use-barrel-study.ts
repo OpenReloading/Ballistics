@@ -1,5 +1,6 @@
 'use client'
 
+import { toSi } from '@open-reloading/schema'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { requestTimeout } from '../lib/api-client.ts'
 import { apiFetch } from '../lib/api-fetch.ts'
@@ -91,7 +92,7 @@ export function useBarrelStudy({
   const lengths = 'lengths' in planned ? planned.lengths : undefined
   const figure = ok && stripFigureOf(ok)
   const single = singleCharge(ok)
-  const base = figure && figure.base * 1e-3
+  const base = figure && toSi('length', figure.base)
   const runTravel = ok?.load.barrel.length
   const travel =
     lengths && base !== undefined && runTravel !== undefined

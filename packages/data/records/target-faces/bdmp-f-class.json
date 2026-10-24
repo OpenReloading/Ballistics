@@ -1,0 +1,93 @@
+{
+  "id": "bdmp-f-class",
+  "name": "International F-Class Target (Long Range)",
+  "organization": "BDMP",
+  "rings": [
+    {
+      "value": 1,
+      "diameter": {
+        "value": 1524
+      }
+    },
+    {
+      "value": 2,
+      "diameter": {
+        "value": 1144
+      }
+    },
+    {
+      "value": 3,
+      "diameter": {
+        "value": 815
+      }
+    },
+    {
+      "value": 4,
+      "diameter": {
+        "value": 508
+      }
+    },
+    {
+      "value": 5,
+      "diameter": {
+        "value": 254
+      }
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 128
+    }
+  },
+  "blackDiameter": {
+    "value": 1524
+  },
+  "events": [
+    {
+      "name": "BDMP F-Class Rifle",
+      "distance": {
+        "value": 1000000,
+        "raw": "1000 m"
+      },
+      "section": "D.23.1.13 (Teil D, PDF p. 214)",
+      "scoring": "touch"
+    }
+  ],
+  "paper": {
+    "width": {
+      "value": 1800
+    },
+    "height": {
+      "value": 1800
+    }
+  },
+  "photoSearch": false,
+  "note": "The table prints diameters in mm for the V bull (inner five) and rings 5 to 1, and a minimum sheet of 1.8 x 1.8 m (800 to 1200 yd, 700 to 1000 m). The book prints no ten-ring table and no face for shorter distances.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.23.1.13, Teil D, Seite 214 von 294, PDF p. 214",
+        "fields": ["name", "rings", "innerTen.diameter", "paper"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.23.1.13, Teil D, Seite 214 von 294, PDF p. 214",
+        "fields": ["blackDiameter"],
+        "kind": "derived",
+        "note": "The book prints no separate aiming black; the value is the width of the outermost ring."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.23.1.13, Teil D, Seite 214 von 294, PDF p. 214",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-6",
+        "page": "A.3.21.1.3, Teil A, Seite 14 von 32, PDF p. 14",
+        "fields": ["events.scoring"]
+      }
+    ]
+  }
+}

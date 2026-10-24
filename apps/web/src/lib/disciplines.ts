@@ -5,6 +5,7 @@ import {
   type Federation,
   type Provenance,
   type Source,
+  toSi,
 } from '@open-reloading/schema'
 import type { DirectoryState } from './directory.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
@@ -55,7 +56,7 @@ export function disciplineRow(
     name: d.name,
     ...(d.number && { number: d.number }),
     federation: federations.find((f) => f.id === d.federation)?.abbreviation ?? d.federation,
-    distance: d.distance.value / 1e3,
+    distance: toSi('length', d.distance.value),
     ...(d.category && { category: d.category }),
     classes: d.caliberClasses?.ids ?? [],
     faces: disciplineFaceIds(mappings, d.id).length,
@@ -86,7 +87,7 @@ export function disciplineStrip(d: DisciplineRecord, federation = d.federation):
     {
       icon: 'distance',
       label: 'Distance',
-      row: { label: 'Distance', text: String(d.distance.value / 1e3), unit: 'm' },
+      row: { label: 'Distance', text: String(toSi('length', d.distance.value)), unit: 'm' },
     },
     ...(d.category
       ? [

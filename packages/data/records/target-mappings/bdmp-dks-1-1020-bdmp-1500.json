@@ -1,0 +1,25 @@
+{
+  "id": "bdmp-dks-1-1020-bdmp-1500",
+  "discipline": "bdmp-dks-1-1020",
+  "face": "bdmp-1500",
+  "event": "BDMP DKS 1 - 1020 Dynamisches Kleinkaliberschießen 1 1020",
+  "shotCount": 102,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.15A.4, Teil C, Seite 110 von 142, PDF p. 110",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.15A.11, Teil C, Seite 111 von 142, PDF p. 111",
+        "fields": ["shotCount"],
+        "kind": "derived",
+        "note": "The book prints no total; the figure is the sum of the shots of the course table."
+      }
+    ],
+    "note": "The five matches of C.15A.11 (Teil C, PDF p. 111) add up to 102 shots, the book prints no total. B.11.11 does not list this discipline, C.15A.4 names the BDMP 1500 face."
+  }
+}

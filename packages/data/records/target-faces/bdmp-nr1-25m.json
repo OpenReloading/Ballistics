@@ -91,6 +91,24 @@
       "organization": "VdRBw",
       "section": "9.8.4, 9.8.5 (Seite 72, PDF p. 72)",
       "scoring": "touch"
+    },
+    {
+      "name": "BDMP ZG 1 mod. A Zielfernrohrgewehr 1 modifiziert A",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "section": "B.11.2 and D.11.15 (Teil B, PDF p. 16; Teil D, PDF p. 69)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP ZG 1 mod. B Zielfernrohrgewehr 1 modifiziert B",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "section": "B.11.2 and D.11.16 (Teil B, PDF p. 16; Teil D, PDF p. 70)",
+      "scoring": "touch"
     }
   ],
   "provenance": {
@@ -110,7 +128,7 @@
         "source": "vdrbw-schiesssportordnung-2023",
         "fields": ["events.name", "events.distance", "events.organization", "events.section"],
         "page": "9.8.4, 9.8.5 (Seite 72); 10.5 (Seite 100)",
-        "note": "VdRBw 10.5 (Seite 100) prints an outer circle of 8.325 cm for this face."
+        "note": "VdRBw 10.5 (Seite 100) prints a ten of 0.85 cm and a ring spacing of 0.425 cm (8.5 mm steps, 85 mm outside), which agree, and an outer circle of 8.325 cm, which does not. VdRBw 9.8.4 names the BDMP face reduced to 25 %, so the record keeps the BDMP rings."
       },
       {
         "source": "vdrbw-schiesssportordnung-2023",
@@ -121,6 +139,16 @@
         "source": "bdmp-sportordnung-2026-register-6",
         "page": "A.3.21.1.3, Teil A, Seite 14 von 32, PDF p. 14",
         "fields": ["events.scoring"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.11.15, Teil D, Seite 69 von 294, PDF p. 69",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.11.16, Teil D, Seite 70 von 294, PDF p. 70",
+        "fields": ["events.name", "events.distance", "events.section"]
       }
     ]
   }

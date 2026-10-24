@@ -1,6 +1,7 @@
 'use client'
 
 import { Select } from '@mantine/core'
+import { toSi } from '@open-reloading/schema'
 import { useMemo } from 'react'
 import { caliberDiameters, caliberOptions } from '../lib/caliber.ts'
 import { controlSize } from '../lib/theme.ts'
@@ -33,7 +34,7 @@ export function CaliberSelect({
     const mm = common.get(name)
     if (mm === undefined) return ''
     const text = inchText(
-      formatNumber(system.length.fromSi(mm * 1e-3), symbol === 'in' ? 3 : 2),
+      formatNumber(system.length.fromSi(toSi('length', mm)), symbol === 'in' ? 3 : 2),
       symbol,
     )
     // the name already says it when its own value is in the Settings unit and equals the diameter

@@ -13,13 +13,18 @@
       "types": "./dist/compute/browser.d.ts",
       "default": "./dist/compute/browser.js"
     },
+    "./catalogue": {
+      "types": "./dist/catalogue/browser.d.ts",
+      "default": "./dist/catalogue/browser.js"
+    },
+    "./catalogue/*.json": "./dist/catalogue/*.json",
     "./static": {
       "types": "./dist/static.d.ts",
       "default": "./dist/static.js"
     }
   },
   "scripts": {
-    "build": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.build.json && drizzle-kit export --dialect=postgresql --schema=./src/db/schema.ts --output json > dist/schema.json",
+    "build": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.build.json && drizzle-kit export --dialect=postgresql --schema=./src/db/schema.ts --output json > dist/schema.json && node dist/catalogue/write.js",
     "start": "node --env-file-if-exists=../../.env dist/server.js",
     "dev": "node --watch src/server.ts",
     "test": "vitest run",

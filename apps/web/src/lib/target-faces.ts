@@ -5,6 +5,7 @@ import {
   type DisciplineKey,
   type TargetFace,
   type TargetMapping,
+  toSi,
 } from '@open-reloading/schema'
 import type { DirectoryState } from './directory.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
@@ -26,7 +27,7 @@ export type TargetFaceRow = {
 
 /** The distances of a face's events in m, each once, ascending. */
 const faceDistances = (f: TargetFace) =>
-  [...new Set(f.events.map((e) => e.distance.value / 1e3))].sort((a, b) => a - b)
+  [...new Set(f.events.map((e) => toSi('length', e.distance.value)))].sort((a, b) => a - b)
 
 /** The distances as one text: "25, 50 m". */
 export const distanceText = (metres: readonly number[]) =>
@@ -57,7 +58,7 @@ const length = (label: string, mm: number | undefined, printed?: string): FieldR
     : [
         {
           label,
-          value: { quantity: 'length', si: mm * 1e-3 },
+          value: { quantity: 'length', si: toSi('length', mm) },
           ...(printed && { printed }),
         },
       ]
@@ -171,7 +172,7 @@ export function faceEventRows(
     .flatMap((e) => {
       const own = mappings.filter((m) => m.event === e.name)
       const event = {
-        distance: e.distance.raw ?? `${e.distance.value / 1e3} m`,
+        distance: e.distance.raw ?? `${toSi('length', e.distance.value)} m`,
         ...(e.category && { category: e.category }),
         ...(e.scoring && { scoring: e.scoring }),
       }

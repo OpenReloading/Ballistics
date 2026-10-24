@@ -4,7 +4,7 @@
  */
 
 import { dynamicVivacity, meanDynamicVivacity, type VivacityBurn } from '@open-reloading/core'
-import type { Powder } from '@open-reloading/schema'
+import { type Powder, toSi } from '@open-reloading/schema'
 import type { PowderSummary } from './api-types.ts'
 import { type ManufacturerNames, productLabel } from './manufacturers.ts'
 import { formatNumber } from './units.ts'
@@ -107,7 +107,7 @@ export function classifyPowder(
     form: p.grainForm,
     base: p.propellantBase,
     // stored in bar
-    burn: burnLawOf(value, i.referencePressure.value * 1e5, {
+    burn: burnLawOf(value, toSi('pressure', i.referencePressure.value), {
       kind: 'twoStage',
       a: a.value,
       m,

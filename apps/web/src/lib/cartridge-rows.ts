@@ -1,4 +1,5 @@
 /** The cartridge list's rows: search text, filters, cells and the packed page props. */
+import { toSi } from '@open-reloading/schema'
 import type { CartridgeSummary } from './api-types.ts'
 import { caliberLabel, commonCaliber } from './caliber.ts'
 import { countryKeys } from './countries.ts'
@@ -69,7 +70,10 @@ export function cartridgeCells(c: CartridgeRow, system: UnitSystem) {
     mm === undefined
       ? ''
       : inchText(
-          formatNumber(system.length.fromSi(mm * 1e-3), system.length.symbol === 'in' ? 3 : 2),
+          formatNumber(
+            system.length.fromSi(toSi('length', mm)),
+            system.length.symbol === 'in' ? 3 : 2,
+          ),
           system.length.symbol,
         )
   return {
@@ -81,7 +85,7 @@ export function cartridgeCells(c: CartridgeRow, system: UnitSystem) {
     pmax:
       c.pmax === undefined
         ? ''
-        : formatNumber(system.pressure.fromSi(c.pmax * 1e5), system.pressure.decimals),
+        : formatNumber(system.pressure.fromSi(toSi('pressure', c.pmax)), system.pressure.decimals),
   }
 }
 

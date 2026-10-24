@@ -48,7 +48,9 @@ it('filters by federation, category, distance and caliber class, and keeps them 
     pistol.id,
   )
   expect(ids({ distance: '50', caliberClass: 'revolver-44' })).not.toContain(pistol.id)
-  expect(ids({ category: 'air-rifle' }).every((id) => /luft|air/i.test(id))).toBe(true)
+  expect(ids({ category: 'air-rifle' })).toEqual(
+    records.filter((d) => d.category === 'air-rifle').map((d) => d.id),
+  )
   expect(ids({ query: '.44 revolver' })).toContain(pistol.id)
   expect(ids({ query: '2.53' })).toEqual([pistol.id])
   const state = { ...emptyDirectory, category: 'rifle', distance: '300', caliberClass: 'rifle-6mm' }
@@ -83,9 +85,9 @@ it('gives the strip, the number, section, page and caliber classes, and the rule
   ])
   expect(rowsOf[3].text).toBe('9 mm pistol, .357 and .38 revolver, .44 revolver, .45 ACP pistol')
   expect(disciplineRuleBook(pistol)).toMatchObject({
-    title: 'Sportordnung des Deutschen Schützenbundes, Stand 01.01.2026',
+    title: 'Sportordnung des Deutschen Schützenbundes, Stand 01.01.2027',
     section: '2.21',
-    page: 'Teil 2 Seite 20, PDF p. 154',
+    page: 'Teil 2 Seite 20, PDF p. 156',
   })
 })
 

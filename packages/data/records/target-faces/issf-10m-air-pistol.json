@@ -147,7 +147,7 @@
         "kind": "derived"
       },
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "fields": ["events.name", "events.distance", "events.organization", "events.section"],
         "page": "0.20 Scheibe Nr. 7, Teil 0 Seite 66 (PDF p. 84)"
       },
@@ -162,8 +162,8 @@
         "page": "A 9.02, Seite A-22, PDF p. 22"
       },
       {
-        "source": "dsb-sportordnung-2026",
-        "page": "10.4.1, Teil 10 Seite 4, PDF p. 422; 10.12, Teil 10 Seite 15, PDF p. 433",
+        "source": "dsb-sportordnung-2027",
+        "page": "10.4.1, Teil 10 Seite 4, PDF p. 424; 10.12, Teil 10 Seite 15, PDF p. 435",
         "fields": [
           "events.name",
           "events.distance",
@@ -173,12 +173,12 @@
         ]
       },
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "page": "0.11.3, Teil 0 Seite 39, PDF p. 57",
         "fields": ["events.scoring"]
       },
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "page": "0.11.3, Teil 0 Seite 39, PDF p. 57",
         "fields": ["events.scoring"]
       }

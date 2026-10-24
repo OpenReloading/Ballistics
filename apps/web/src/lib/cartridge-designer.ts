@@ -12,7 +12,7 @@ import {
   storedValue,
 } from '@open-reloading/drawing/cartridge'
 import { chamberOf } from '@open-reloading/drawing/seating'
-import type { CartridgeDesign, SpecValue } from '@open-reloading/schema'
+import { type CartridgeDesign, type SpecValue, toSi } from '@open-reloading/schema'
 import type { CartridgeDetail } from './api-types.ts'
 import { drawable } from './cartridge-sheet.ts'
 import {
@@ -22,6 +22,7 @@ import {
   type FieldValue,
   fieldError,
   fieldOf,
+  siToStored,
   storedToSi,
 } from './field-spec.ts'
 import { designReduce, type History as H, historyOf, pushHistory } from './history.ts'
@@ -116,12 +117,12 @@ export const fieldSpecs: CartridgeFieldSpec[] = symbols.flatMap(
       min: 0,
       ...(q === 'angle'
         ? { max: 180 }
-        : { limit: range === 35 ? 50e-3 : 2.5 * range * storedToSi[q] }),
+        : { limit: range === 35 ? 50e-3 : storedToSi(q, 2.5 * range) }),
       side,
       symbol,
       meaning,
       group,
-      range: range * storedToSi[q],
+      range: storedToSi(q, range),
     })),
 )
 
@@ -171,7 +172,7 @@ function fromValues(origin: Omit<Origin, 'si'>, system: UnitSystem): Design {
     const key = keyOf(v)
     const s = key && specOf.get(key)
     if (s && v.value !== undefined)
-      si[s.key] = v.value * storedToSi[s.quantity as 'length' | 'angle']
+      si[s.key] = storedToSi(s.quantity as 'length' | 'angle', v.value)
   }
   return fromOrigin({ ...origin, si }, system)
 }
@@ -218,7 +219,7 @@ export function newDesign(from?: Design): Design {
 
 /** A field value in stored units (mm, degrees); 12 significant digits drop the SI round-trip noise. */
 const storedFieldValue = (s: CartridgeFieldSpec, si: number) =>
-  Number((si / storedToSi[s.quantity as 'length' | 'angle']).toPrecision(12))
+  Number(siToStored(s.quantity as 'length' | 'angle', si).toPrecision(12))
 
 /**
  * The values of a design: a value still equal to the record's is the record's own object (printed
@@ -499,7 +500,7 @@ export function evaluate(design: Design, system: UnitSystem, last?: string): Eva
       p.derivedE !== undefined &&
       design.fields['cartridge.e']?.si === undefined
     )
-      states['cartridge.e'] = { kind: 'derived', si: p.derivedE * 1e-3 }
+      states['cartridge.e'] = { kind: 'derived', si: toSi('length', p.derivedE) }
   return { spec, figures: list, states, checks, notes, derived }
 }
 
@@ -516,7 +517,7 @@ function derivedAngles(figure: Figure, values: SpecValue[]): Derived[] {
         label: `${name} neck length`,
         basis: 'L3 - L2',
         quantity: 'length',
-        si: (L3 - L2) * 1e-3,
+        si: toSi('length', L3 - L2),
       })
     if (P2 !== undefined && H1 !== undefined && L1 !== undefined && L2 !== undefined && L2 > L1)
       out.push({
@@ -567,7 +568,8 @@ function approximateCaseVolume(figure: Figure, values: SpecValue[]): Derived | u
     key: 'volume',
     label: 'Case volume (approximate)',
     quantity: 'capacity',
-    si: mm3 * 1e-9,
+    // mm3 is mm2 times mm
+    si: toSi('length', toSi('area', mm3)),
     basis: `the cartridge outline less a wall of ${fromNeck ? `(H2 - G1) / 2 = ${Number(wall.toFixed(3))} mm` : '0.3 mm (assumed, no G1)'} everywhere, from the head end (E, else R) at ${head} mm to the mouth; cartridge maxima, not a measured capacity`,
   }
 }

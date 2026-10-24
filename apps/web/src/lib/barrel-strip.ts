@@ -6,6 +6,7 @@ import {
   svgPath,
 } from '@open-reloading/drawing'
 import { previewDrawn } from '@open-reloading/drawing/seating'
+import { fromSi } from '@open-reloading/schema'
 
 /**
  * What the barrel strip of the interior chart draws, taken from the seated preview at the
@@ -43,7 +44,7 @@ const em = 2.5
  * simulation ends; undefined when the record lacks a value the outlines need.
  */
 export function stripModel(f: StripFigure, travel: number): StripModel | undefined {
-  const muzzle = f.base + travel * 1e3
+  const muzzle = f.base + fromSi('length', travel)
   const drawn = previewDrawn(f.values, f.table, muzzle)
   if ('missing' in drawn) return
   const [cartridge, chamber] = [drawn[0].p.points, drawn[1].p.points]
@@ -62,17 +63,17 @@ export function stripModel(f: StripFigure, travel: number): StripModel | undefin
 }
 
 /** z of the bullet base from the head at the simulated travel (m), mm. */
-export const baseAt = (m: StripModel, travel: number) => m.base + travel * 1e3
+export const baseAt = (m: StripModel, travel: number) => m.base + fromSi('length', travel)
 
 /**
  * z of the bullet base (mm) `dt` s after muzzle exit: from the base at the muzzle sample's
  * travel (m) on at its velocity (m/s), to the strip's scale.
  */
 export const flightAt = (m: StripModel, muzzle: { travel: number; velocity: number }, dt: number) =>
-  baseAt(m, muzzle.travel) + muzzle.velocity * dt * 1e3
+  baseAt(m, muzzle.travel) + fromSi('length', muzzle.velocity * dt)
 
 /** Seconds after muzzle exit until the bullet base reaches z (mm); 0 for a z behind it or no velocity. */
 export function flightTime(m: StripModel, muzzle: { travel: number; velocity: number }, z: number) {
   const d = z - baseAt(m, muzzle.travel)
-  return d > 0 && muzzle.velocity > 0 ? d / (muzzle.velocity * 1e3) : 0
+  return d > 0 && muzzle.velocity > 0 ? d / fromSi('length', muzzle.velocity) : 0
 }

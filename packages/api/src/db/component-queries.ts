@@ -1,7 +1,8 @@
 import { bulletWindow } from '@open-reloading/core'
 import { and, asc, count, eq, type SQL, sql } from 'drizzle-orm'
+import { compact } from '../catalogue/derive.ts'
 import type { Db } from './index.ts'
-import { cartridgeFit, compact, escapeLike, type ListPage, recordById } from './queries.ts'
+import { cartridgeFit, escapeLike, type ListPage, recordById } from './queries.ts'
 import { bullets, manufacturers, powders } from './schema.ts'
 
 /**

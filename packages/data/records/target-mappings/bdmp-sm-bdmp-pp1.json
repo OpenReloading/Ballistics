@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-sm-bdmp-pp1",
+  "discipline": "bdmp-sm",
+  "face": "bdmp-pp1",
+  "event": "BDMP SM Super Magnum",
+  "shotCount": 30,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.9, Teil B, Seite 42 von 70, PDF p. 42",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6C.4, Teil C, Seite 30 von 142, PDF p. 30",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6C.3, Teil C, Seite 30 von 142, PDF p. 30",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "10 shots at each of 25, 15 and 10 m (C.6C.5)."
+  }
+}

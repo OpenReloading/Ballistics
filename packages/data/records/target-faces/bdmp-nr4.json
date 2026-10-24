@@ -89,7 +89,7 @@
       "value": 297
     }
   },
-  "note": "The black area is a square of 18 cm side.",
+  "note": "The black area is a square of 18 cm side. B.11.5 prints only ring 6 = 3.0 cm, ring 5 = 6.0 cm, ring spacing 2.0 cm and outer circle 18.0 cm. The record reads the spacing as radial: after ring 5 at 60 mm the diameters 100, 140 and 180 mm step by 40 mm, which gives the printed outer circle. Ring 6 = 30 mm and ring 5 = 60 mm are the printed values.",
   "provenance": {
     "kind": "published",
     "sources": [

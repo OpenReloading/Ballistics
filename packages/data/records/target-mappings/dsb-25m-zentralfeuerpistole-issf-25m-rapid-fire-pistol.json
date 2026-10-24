@@ -13,18 +13,18 @@
     "kind": "published",
     "sources": [
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "page": "0.20 Scheibe Nr. 10, Teil 0 Seite 68, PDF p. 86",
         "fields": ["discipline", "face", "event", "stage"]
       },
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "page": "0.11.3.2, Teil 0 Seite 40, PDF p. 58",
         "fields": ["gauge"]
       },
       {
-        "source": "dsb-sportordnung-2026",
-        "page": "Teil 2 Seite 24, PDF p. 158 (2.20, six series of five shots)",
+        "source": "dsb-sportordnung-2027",
+        "page": "Teil 2 Seite 24, PDF p. 160 (2.20, six series of five shots)",
         "fields": ["shotCount"]
       }
     ]

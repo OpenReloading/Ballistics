@@ -1,5 +1,5 @@
-import { lbPerSqInToKgPerSqM, millerStability, type Projectile } from '@open-reloading/core'
-import type { Bullet } from '@open-reloading/schema'
+import { millerStability, type Projectile } from '@open-reloading/core'
+import { type Bullet, toSi } from '@open-reloading/schema'
 import type { FieldRow } from './record-fields.ts'
 import { metersPerFoot, pascalsPerInHg } from './units.ts'
 
@@ -20,7 +20,7 @@ export function bulletDrag(record: Bullet, model: 'G1' | 'G7', choice?: number):
   const bcs = (record.ballisticCoefficients ?? []).filter((c) => c.dragModel === model)
   if (bcs.length === 0) return { kind: 'none' }
   let bands = bcs.map((c) => ({
-    ballisticCoefficient: c.value * lbPerSqInToKgPerSqM,
+    ballisticCoefficient: toSi('ballisticCoefficient', c.value),
     minVelocity: c.minVelocity?.value ?? 0,
   }))
   if (new Set(bands.map((b) => b.minVelocity)).size < bands.length) {
@@ -33,14 +33,16 @@ export function bulletDrag(record: Bullet, model: 'G1' | 'G7', choice?: number):
           note: c.note,
         })),
       }
-    bands = [{ ballisticCoefficient: bcs[choice].value * lbPerSqInToKgPerSqM, minVelocity: 0 }]
+    bands = [
+      { ballisticCoefficient: toSi('ballisticCoefficient', bcs[choice].value), minVelocity: 0 },
+    ]
   }
   return {
     kind: 'bands',
     projectile: {
-      mass: record.mass.value * 1e-3,
-      diameter: record.diameter.value * 1e-3,
-      ...(record.length && { length: record.length.value * 1e-3 }),
+      mass: toSi('mass', record.mass.value),
+      diameter: toSi('length', record.diameter.value),
+      ...(record.length && { length: toSi('length', record.length.value) }),
       drag: { kind: 'bc', model, bands },
     },
   }
@@ -48,7 +50,7 @@ export function bulletDrag(record: Bullet, model: 'G1' | 'G7', choice?: number):
 
 /** Sectional density, mass over diameter squared, kg/m2. */
 const sectionalDensity = (r: Pick<Bullet, 'mass' | 'diameter'>) =>
-  (r.mass.value * 1e-3) / (r.diameter.value * 1e-3) ** 2
+  toSi('mass', r.mass.value) / toSi('length', r.diameter.value) ** 2
 
 /**
  * Gyroscopic stability factor the Miller twist gives (Litz's recommended minimum, B. Litz, Applied
@@ -66,9 +68,9 @@ export function millerTwist(r: Pick<Bullet, 'mass' | 'diameter' | 'length'>): nu
   if (!r.length) return
   const reference = 0.254
   const sg = millerStability({
-    mass: r.mass.value * 1e-3,
-    diameter: r.diameter.value * 1e-3,
-    length: r.length.value * 1e-3,
+    mass: toSi('mass', r.mass.value),
+    diameter: toSi('length', r.diameter.value),
+    length: toSi('length', r.length.value),
     twist: reference,
     velocity: 2800 * metersPerFoot,
     air: { altitude: 0, pressure: 29.92 * pascalsPerInHg, temperature: 288.15, humidity: 0 },

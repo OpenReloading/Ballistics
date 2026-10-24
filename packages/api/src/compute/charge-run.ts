@@ -5,7 +5,7 @@ import {
   type PressureRange,
   pressureToleranceDefaults,
 } from '@open-reloading/core'
-import type { Powder } from '@open-reloading/schema'
+import { type Powder, toSi } from '@open-reloading/schema'
 import { notice, resolvedRecord, unprocessable } from './answer.ts'
 import type { ChargeBody } from './charge-schema.ts'
 import { bulkDensityBound, m3Options } from './interior-schema.ts'
@@ -157,10 +157,10 @@ async function resolvePowder(
   return { bulkDensity: density, powder }
 }
 
-/** Bulk density in kg/m3 (record g/cm3 times 1000); undefined when the record has none or 0. */
+/** Bulk density in kg/m3 (record g/cm3); undefined when the record has none or 0. */
 export function powderBulkDensity(record: Powder): number | undefined {
   const value = record.bulkDensity?.value
-  return value ? value * 1e3 : undefined
+  return value ? toSi('density', value) : undefined
 }
 
 /** One charge-target request (`body` parsed by `chargeBody`): the status and body of the answer. */
