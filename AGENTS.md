@@ -102,6 +102,7 @@ In order, before a change reaches the default branch:
    - Look at `apps/e2e/visual-check-out/sheet.png` (git-ignored, 390 and 1280 px, light and dark).
    - The dev container image holds the e2e Chromium. An older container needs `cd apps/e2e && npx playwright install --only-shell chromium` once.
 4. Full verify once, in the dev container: `npm run build`, `npm run typecheck`, `npm run lint`, `npm test`, `npm run test:e2e` and the drawing baseline (`npm run drawing-baseline -w @openreloading/e2e`).
+   - A change to the `exports` of a package the web app imports, to the web app's imports of a package, or to a Dockerfile: also the image build on the host, `podman compose build web` (or `docker compose build web`). CI builds the web image from the Dockerfile with only the files it copies, so a local build over the whole workspace does not show a missing one.
 5. Commits signed (`commit.gpgsign` with an SSH key). Never `git filter-branch` (it drops signatures). Re-sign with `git rebase -f --exec 'git commit --amend --no-edit -S' <base>`. Never `--no-verify`.
 6. Push, then CI green on the pushed commit.
 
