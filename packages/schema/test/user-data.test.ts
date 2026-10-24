@@ -9,26 +9,35 @@ import {
 } from '../src/index.ts'
 
 const saved = '2026-10-13T10:00:00.000Z'
+const uuid = '3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13'
 const bulletRecord = {
-  kind: 'bulletDesign',
+  kind: 'bullet',
   id: 'a1b2',
   name: 'Manufacturer 168 gr',
   saved,
   data: {
+    origin: 'user',
     manufacturerName: 'Manufacturer',
-    name: '168 gr',
-    choices: { 'base.type': 'boat-tail', 'ogive.form': '', 'tip.type': '' },
-    siValues: { diameter: 7.82e-3, mass: 0.010886 },
+    basedOn: 'catalogue:alpha-30425',
+    overrides: {
+      name: '168 gr',
+      diameter: { value: 7.82 },
+      mass: { value: 10.886 },
+      base: { type: 'boat-tail', angle: null },
+    },
   },
 } as const
 const cartridgeRecord = {
-  kind: 'cartridgeDesign',
+  kind: 'cartridge',
   id: 'c3',
   name: 'Design',
   saved,
   data: {
-    table: 'I',
-    values: [{ side: 'cartridge', symbol: 'L3', quantity: 'length', value: 51.18 }],
+    origin: 'user',
+    overrides: {
+      table: 'I',
+      values: [{ side: 'cartridge', symbol: 'L3', quantity: 'length', value: 51.18 }],
+    },
   },
 } as const
 const loadRecord = {
@@ -108,41 +117,55 @@ describe('userDataFile', () => {
     ).toBe(true)
   })
 
-  it('takes a catalogue id as the parent of a design and refuses another text', () => {
-    const withParent = (id: string) =>
-      userRecord.safeParse({
-        ...bulletRecord,
-        data: { ...bulletRecord.data, parent: { id, title: 'Alpha' } },
-      }).success
-    expect(withParent('alpha-30425')).toBe(true)
-    expect(withParent('Alpha 30425')).toBe(false)
+  it('takes a catalogue reference as the base of a variant and refuses another text', () => {
+    const basedOn = (text: string) =>
+      userRecord.safeParse({ ...bulletRecord, data: { ...bulletRecord.data, basedOn: text } })
+        .success
+    expect(basedOn('catalogue:alpha-30425')).toBe(true)
+    for (const bad of ['alpha-30425', 'Alpha 30425', `user:${uuid}`, 'catalogue:Alpha 30425'])
+      expect(basedOn(bad)).toBe(false)
+  })
+
+  it('saves a variant of a bullet without a base, a mass or a manufacturer id', () => {
+    const alone = {
+      ...bulletRecord,
+      data: { origin: 'user', manufacturerName: '', overrides: { diameter: { value: 7.82 } } },
+    }
+    expect(userRecord.parse(alone)).toEqual(alone)
+    const bare = { ...cartridgeRecord, data: { origin: 'user' } }
+    expect(userRecord.parse(bare)).toEqual(bare)
   })
 
   it('opens records with an old browser id and with a UUID', () => {
-    const uuid = '3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13'
     const ids = ['lk3j2h1g-a8s7d6f5', uuid]
     expect(userDataFile.safeParse(file(ids.map((id) => ({ ...loadRecord, id })))).success).toBe(
       true,
     )
   })
 
-  it('keeps the parent record of a design and caps its texts', () => {
-    const parent = { id: 'alpha-30425', title: 'Alpha 30425' }
-    const withParent = (r: typeof bulletRecord | typeof cartridgeRecord, p: unknown) => ({
-      ...r,
-      data: { ...r.data, parent: p },
-    })
-    expect(
-      userDataFile.safeParse(
-        file([withParent(bulletRecord, parent), withParent(cartridgeRecord, parent)]),
-      ).success,
-    ).toBe(true)
-    expect(
-      userRecord.safeParse(withParent(bulletRecord, { id: '', title: 'x' })).error?.issues[0].path,
-    ).toEqual(['data', 'parent', 'id'])
-    expect(
-      userRecord.safeParse(withParent(bulletRecord, { ...parent, title: 'x'.repeat(201) })).success,
-    ).toBe(false)
+  it('keeps the overrides through a round trip, including a null and a removed value', () => {
+    const removed = {
+      ...cartridgeRecord,
+      data: {
+        origin: 'user',
+        basedOn: 'catalogue:308-win',
+        overrides: {
+          table: null,
+          values: [{ side: 'chamber', symbol: 'L3', quantity: 'length', value: null }],
+        },
+      },
+    }
+    expect(userDataFile.parse(file([bulletRecord, removed])).records).toEqual([
+      bulletRecord,
+      removed,
+    ])
+  })
+
+  it('refuses the design kinds of the older format', () => {
+    for (const kind of ['bulletDesign', 'cartridgeDesign'])
+      expect(userRecord.safeParse({ ...bulletRecord, kind }).error?.issues[0].path).toEqual([
+        'kind',
+      ])
   })
 
   it('rejects two records with one id', () => {
@@ -162,14 +185,20 @@ describe('userDataFile', () => {
     expect(paths({ ...bulletRecord, kind: 'powder' })).toEqual(['kind'])
     expect(paths({ ...bulletRecord, saved: 'yesterday' })).toEqual(['saved'])
     expect(
-      paths({ ...bulletRecord, data: { ...bulletRecord.data, siValues: { mass: 'x' } } }),
-    ).toEqual(['data.siValues.mass'])
+      paths({
+        ...bulletRecord,
+        data: { ...bulletRecord.data, overrides: { mass: { value: 'x' } } },
+      }),
+    ).toEqual(['data.overrides.mass.value'])
     expect(
       paths({
         ...cartridgeRecord,
-        data: { table: 'I', values: [{ symbol: 'L3', quantity: 'length' }] },
+        data: {
+          origin: 'user',
+          overrides: { values: [{ symbol: 'L3', quantity: 'length' }] },
+        },
       }),
-    ).toEqual(['data.values.0'])
+    ).toEqual(['data.overrides.values.0'])
   })
 
   it('caps text lengths', () => {
@@ -460,7 +489,6 @@ describe('checkUserRefs', () => {
 
   it('reports nothing for a firearm that is there, as an old id or a user reference', () => {
     expect(checkUserRefs([withFirearm('f5'), firearm])).toEqual([])
-    const uuid = '3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13'
     const own = { ...firearm, id: uuid }
     expect(checkUserRefs([withFirearm(`user:${uuid}`), own])).toEqual([])
     expect(checkUserRefs([withFirearm(`user:${uuid}`)])).toHaveLength(1)
@@ -471,6 +499,36 @@ describe('checkUserRefs', () => {
     expect(checkUserRefs([userRecord.parse(loadRecord), userRecord.parse(bulletRecord)])).toEqual(
       [],
     )
+  })
+
+  it('reports a load whose cartridge or bullet is a user reference nobody answers', () => {
+    const withRefs = (cartridge: string, bullet: string) =>
+      userRecord.parse({ ...loadRecord, data: { ...loadRecord.data, cartridge, bullet } })
+    const own = [
+      { ...userRecord.parse(cartridgeRecord), id: uuid },
+      { ...userRecord.parse(bulletRecord), id: crypto.randomUUID() },
+    ]
+    expect(checkUserRefs([withRefs(`user:${uuid}`, `user:${own[1]?.id}`), ...own])).toEqual([])
+    expect(checkUserRefs([withRefs(`user:${uuid}`, 'catalogue:alpha-30425')])).toEqual([
+      { record: 'w4', kind: 'workbenchState', field: 'cartridge', target: `user:${uuid}` },
+    ])
+    // a design of the other kind under that id does not answer
+    expect(checkUserRefs([withRefs('308-win', `user:${uuid}`), own[0] as never])).toHaveLength(1)
+  })
+
+  it('opens a load that names its cartridge and bullet by plain id or by reference', () => {
+    for (const [cartridge, bullet] of [
+      ['308-win', 'alpha-30425'],
+      ['catalogue:308-win', `user:${uuid}`],
+    ])
+      expect(
+        userRecord.safeParse({ ...loadRecord, data: { ...loadRecord.data, cartridge, bullet } })
+          .success,
+      ).toBe(true)
+    expect(
+      userRecord.safeParse({ ...loadRecord, data: { ...loadRecord.data, bullet: 'user:1' } })
+        .success,
+    ).toBe(false)
   })
 
   it('reports a target sheet whose load is missing', () => {
