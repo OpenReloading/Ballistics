@@ -2,7 +2,7 @@
   "id": "bds-2801-issf-25m-precision-50m-pistol",
   "discipline": "bds-2801",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDS 2801 25 m Kombi SG SL KW off. Vis., Teil Intervall/Zeitserie",
+  "event": "bds-2801-25-m-kombi-sg-sl-kw-off-vis-teil-intervall-zeitserie",
   "stage": "Intervall/Zeitserie",
   "shotCount": 20,
   "provenance": {

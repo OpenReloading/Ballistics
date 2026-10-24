@@ -276,7 +276,7 @@ export function scoreGroupOnFace(
 ):
   | { alignment: FaceAlignment; hole: number; usesOwnTenthRule: boolean; score: GroupScore }
   | { error: string } {
-  const event = face.events.find((e) => e.name === choice.event)
+  const event = face.events.find((e) => e.id === choice.event)
   const hole = scoredHoleDiameter(event, bullet, choice.gauge)
   if (hole === undefined || (!hole && event?.scoring !== 'centre'))
     return { error: 'No hole size: set Marker, or choose a discipline or event with a gauge.' }

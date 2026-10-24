@@ -1,7 +1,7 @@
 {
   "id": "bdmp-nr5",
   "name": "BDMP-Scheibe Nr. 5",
-  "organization": "BDMP",
+  "federation": "bdmp",
   "rings": [
     {
       "value": 5,
@@ -50,6 +50,7 @@
   },
   "events": [
     {
+      "id": "dg-3-national-rifle-match-a-300-m",
       "name": "DG 3 National Rifle Match - A, 300 m",
       "distance": {
         "value": 300000,
@@ -59,6 +60,7 @@
       "scoring": "touch"
     },
     {
+      "id": "dg-4-national-rifle-match-b-300-m",
       "name": "DG 4 National Rifle Match - B, 300 m",
       "distance": {
         "value": 300000,

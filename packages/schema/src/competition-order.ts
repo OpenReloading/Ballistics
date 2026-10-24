@@ -99,17 +99,17 @@ export function compareDisciplines(a: DisciplineKey, b: DisciplineKey): number {
 const faceCode = (name: string) => /\(Z(\d+)\)$/.exec(name)?.[1]
 
 /**
- * Target faces by organization, then the code the organization prints in the name (BDS: `(Z4)`
+ * Target faces by federation id, then the code the federation prints in the name (BDS: `(Z4)`
  * before `(Z18)`; faces with a code come first), then name.
  */
 export function compareTargetFaces(
-  a: Pick<TargetFace, 'organization' | 'name'>,
-  b: Pick<TargetFace, 'organization' | 'name'>,
+  a: Pick<TargetFace, 'federation' | 'name'>,
+  b: Pick<TargetFace, 'federation' | 'name'>,
 ): number {
   const x = faceCode(a.name)
   const y = faceCode(b.name)
   return (
-    compareNames(a.organization, b.organization) ||
+    compareNames(a.federation ?? '', b.federation ?? '') ||
     (x === undefined ? (y === undefined ? 0 : 1) : y === undefined ? -1 : Number(x) - Number(y)) ||
     compareNames(a.name, b.name)
   )

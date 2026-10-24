@@ -1,7 +1,7 @@
 {
   "id": "bdmp-bisley-200yd",
   "name": "BDMP-Bisley-Scheibe 200 Yards",
-  "organization": "BDMP",
+  "federation": "bdmp",
   "rings": [
     {
       "value": 2,
@@ -42,6 +42,7 @@
   },
   "events": [
     {
+      "id": "bdmp-gewehr-200-yards",
       "name": "BDMP Gewehr 200 yards",
       "distance": {
         "value": 182880,

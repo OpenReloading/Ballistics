@@ -2,7 +2,7 @@
   "id": "bdmp-pp-4-bdmp-pp1",
   "discipline": "bdmp-pp-4",
   "face": "bdmp-pp1",
-  "event": "BDMP Police Pistol 4 (Pocket Gun)",
+  "event": "bdmp-police-pistol-4-pocket-gun",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

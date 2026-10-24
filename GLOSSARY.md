@@ -122,7 +122,7 @@ A record of kind `cartridges`, one per C.I.P. sheet: `id`, `name`, `aliases`, `t
 `sheetId`: `cip-<id>-<revised or published>`, the id of a cartridge's sheet revision. Figure ids and drawing baselines are named after it.
 
 **Organization**:
-`organization`: on a target face and its events, the abbreviation of the federation whose rule book defines it.
+`organization`: on a target face list item, the abbreviation of the federation the face's `federation` names, derived. The records hold `federation`, a federation id.
 _Avoid_: maker (as an organization value)
 
 **Publication date**:
@@ -213,7 +213,7 @@ _Avoid_: ownCapacity
 `caseCondition`: state of the case when its capacity was measured: `new`, `fired` or `sized`.
 
 **Caliber class**:
-`caliberClasses`: classes of bullet diameter from the code table `packages/schema/src/caliber-class.ts`. On a discipline an object with the class `ids` it allows and its `basis` (`stated` by the rule book or `derived` from a stated range). On a target face list item the ids of the classes of its events.
+A record of kind `caliber-classes`: a class of bullet diameter with `name`, `diameter` and the member `cartridges`. `caliberClasses`: on a discipline an object with the ids of the class records it allows and its `basis` (`stated` by the rule book or `derived` from a stated range). On a target face list item the ids of the classes of its events.
 _Avoid_: calibers, classes
 
 ### Powders
@@ -484,7 +484,7 @@ _Avoid_: cd
 ### Target faces and federations
 
 **Target face**:
-A record of kind `target-faces`: a printed face as a rule book defines it, with `name`, `organization`, `rings`, `innerTen`, `blackDiameter`, `blackHeight`, `decimal`, `events`, `paper`, `bulls`, `numerals`. Its list item carries `caliberClasses` and `categories`.
+A record of kind `target-faces`: a printed face as a rule book defines it, with `name`, `federation`, `rings`, `innerTen`, `blackDiameter`, `blackHeight`, `decimal`, `events`, `paper`, `bulls`, `numerals`. Its list item carries `caliberClasses` and `categories`.
 
 **Ring**:
 One entry of `rings`, outer to inner: `value` (the score, one above the ring outside it), `diameter` (width to the outside edge of the ring line, mm), `height` of an oval ring (mm), `fill` (colour of the zone the ring line bounds outside) and `line` (colour of the ring line). `rings` is also an overlay switch.
@@ -500,7 +500,7 @@ _Avoid_: black
 `decimal`: the rule book allows tenth-ring values on the face.
 
 **Face event**:
-One entry of `events` of a face: `name`, `distance`, `gauge`, `scoring`, `organization`, `section` and `category`. `event` on a target mapping or a shot group's `face` names one.
+One entry of `events` of a face: `id`, `name`, `distance`, `gauge`, `scoring`, `federation`, `section` and `category`. `event` on a target mapping or a shot group's `face` holds its `id`.
 
 **Gauge**:
 `gauge`: diameter of the hole as scored, mm: a face event's gauge, or the one a target mapping fixes for a discipline. A target mapping list item carries `gaugeMm`.
@@ -522,7 +522,7 @@ One entry of `bulls`: a scoring centre of a face with several, `x` and `y` from 
 `numerals`: the ring values are printed on the face.
 
 **Federation**:
-A record of kind `federations`: a shooting sport federation with `name`, `abbreviation` (as faces and events name it in `organization`), `country`, `internationalFederation` and `ruleBooks`.
+A record of kind `federations`: a shooting sport federation with `name`, `abbreviation` (shown as the organization of faces and events), `country`, `internationalFederation` and `ruleBooks`.
 
 **International federation**:
 `internationalFederation`: record id of the international federation a federation is a member of.

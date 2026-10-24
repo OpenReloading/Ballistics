@@ -2,7 +2,7 @@
   "id": "vdrbw-g-r-1-issf-25m-precision-50m-pistol",
   "discipline": "vdrbw-g-r-1",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "VdRBw G-R 1 Repetiergewehr",
+  "event": "vdrbw-g-r-1-repetiergewehr",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

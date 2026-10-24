@@ -41,6 +41,19 @@ function checkDisciplineReferences(disciplines: Discipline[], lookup: Lookup, er
   }
 }
 
+/** A face and each of its events that names a federation name a federation record. */
+function checkFaceFederations(faces: TargetFace[], lookup: Lookup, errors: string[]) {
+  for (const f of faces) {
+    const where = `target-faces/${f.id}.json`
+    if (!f.federation) errors.push(`${where}: needs a federation`)
+    else if (!lookup.federations.has(lookup.now('federations', f.federation)))
+      errors.push(`${where}: unknown federation "${f.federation}"`)
+    for (const e of f.events)
+      if (e.federation && !lookup.federations.has(lookup.now('federations', e.federation)))
+        errors.push(`${where}: event "${e.id}": unknown federation "${e.federation}"`)
+  }
+}
+
 /**
  * A mapping names a known discipline and an event of a known face, listed by the discipline's
  * federation, with the event's gauge; every face event has at most one mapping.
@@ -56,7 +69,7 @@ function checkMappings(mappings: Bundle['targetMappings'], lookup: Lookup, error
       errors.push(`${where}: unknown face "${m.face}"`)
       continue
     }
-    const event = face.events.find((e) => e.name === m.event)
+    const event = face.events.find((e) => e.id === m.event)
     if (!event) {
       errors.push(`${where}: face "${m.face}" has no event "${m.event}"`)
       continue
@@ -64,10 +77,13 @@ function checkMappings(mappings: Bundle['targetMappings'], lookup: Lookup, error
     const key = `${face.id} ${m.event}`
     if (mapped.has(key)) errors.push(`${where}: event "${m.event}" is also in ${mapped.get(key)}`)
     else mapped.set(key, m.id)
-    const abbreviation =
-      d && lookup.federations.get(lookup.now('federations', d.federation))?.abbreviation
-    if (abbreviation && (event.organization ?? face.organization) !== abbreviation)
-      errors.push(`${where}: event "${m.event}" is not one of ${abbreviation}`)
+    const listedBy = event.federation ?? face.federation
+    if (
+      d &&
+      listedBy &&
+      lookup.now('federations', listedBy) !== lookup.now('federations', d.federation)
+    )
+      errors.push(`${where}: event "${m.event}" is not one of federation "${d.federation}"`)
     if (m.gauge && event.gauge && m.gauge.value !== event.gauge.value)
       errors.push(
         `${where}: gauge ${m.gauge.value} mm differs from the event's ${event.gauge.value} mm`,
@@ -76,7 +92,7 @@ function checkMappings(mappings: Bundle['targetMappings'], lookup: Lookup, error
 }
 
 /**
- * The references of federations, disciplines and target mappings: every id names a record, a
+ * The references of federations, disciplines, target faces and target mappings: every id names a record, a
  * discipline's international equivalent belongs to an international federation, a mapping names an
  * event of its face listed by the discipline's federation, with the event's gauge, every face
  * event has at most one mapping and every discipline at least one.
@@ -98,6 +114,7 @@ export function checkFederations(
     now: (kind, id) => resolveId(bundle.renames, kind, id),
   }
   checkFederationReferences(bundle.federations, lookup, errors)
+  checkFaceFederations(bundle.targetFaces, lookup, errors)
   checkDisciplineReferences(bundle.disciplines, lookup, errors)
   checkMappings(bundle.targetMappings, lookup, errors)
   const used = new Set(bundle.targetMappings.map((m) => lookup.now('disciplines', m.discipline)))

@@ -1,0 +1,18 @@
+{
+  "id": "pistol-7-65",
+  "name": "7.65 mm (.32) pistol",
+  "diameter": {
+    "value": 7.85
+  },
+  "cartridges": ["7-65-mm-browning", "7-65-parabellum"],
+  "provenance": {
+    "kind": "derived",
+    "sources": [
+      {
+        "source": "cip-tdcc",
+        "fields": ["diameter", "cartridges"],
+        "note": "Grouped by the maximum projectile diameter G1 of the cartridge side of the sheets; the nominal diameter lies within 0.15 mm of G1 of every member."
+      }
+    ]
+  }
+}

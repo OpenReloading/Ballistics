@@ -10,7 +10,7 @@ import type {
   PowderSummary,
 } from './api-types.ts'
 import { API_PREFIX } from './api-version.ts'
-import type { DisciplineRecord, FederationRecord } from './disciplines.ts'
+import type { CaliberClassSummary, DisciplineRecord, FederationRecord } from './disciplines.ts'
 import { pagesBasePath } from './edition.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
 import { type ManufacturerNames, manufacturerNames } from './manufacturers.ts'
@@ -100,6 +100,7 @@ export const listTargetMappings = (face?: string) =>
   )
 export const listDisciplines = () => listItems<DisciplineSummary>('/disciplines')
 export const listFederations = () => listItems<FederationSummary>('/federations')
+export const listCaliberClasses = () => listItems<CaliberClassSummary>('/caliber-classes')
 
 /** Param returned when the API is unreachable at build: Cache Components reject an empty list. */
 export const buildPlaceholderId = '_build'

@@ -2,7 +2,7 @@
   "id": "bds-3311-issf-25m-precision-50m-pistol",
   "discipline": "bds-3311",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDS 3311 100 m Zeit. DSG Selbstlader off./geschl.Vis.",
+  "event": "bds-3311-100-m-zeit-dsg-selbstlader-off-geschl-vis",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

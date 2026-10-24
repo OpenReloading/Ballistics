@@ -1,8 +1,9 @@
 import {
-  caliberClassId,
+  caliberClass,
   discipline,
   disciplineCategory,
   federation,
+  recordId,
   targetFace,
   targetMapping,
 } from '@open-reloading/schema'
@@ -30,9 +31,13 @@ const query = <K extends string>(filters: Record<K, string>) =>
 const targetFaceList = page(
   z.object({
     id: targetFace.shape.id,
-    organization: targetFace.shape.organization,
+    federation: targetFace.shape.federation,
+    organization: z
+      .string()
+      .optional()
+      .describe("Abbreviation of the face's federation, as the rule books print it."),
     name: targetFace.shape.name,
-    caliberClasses: z.array(caliberClassId),
+    caliberClasses: z.array(recordId),
     categories: z.array(disciplineCategory),
   }),
 )
@@ -50,13 +55,16 @@ const disciplineList = page(
     distanceMm: z.number(),
   }),
 )
+const caliberClassList = page(
+  caliberClass.pick({ id: true, name: true }).extend({ diameterMm: z.number() }),
+)
 const mappingList = page(
   targetMapping.pick({ id: true, discipline: true, face: true, event: true, stage: true }).extend({
     gaugeMm: z.number().optional(),
   }),
 )
 
-/** `GET /target-faces`, `GET /federations`, `GET /disciplines`, `GET /target-mappings` and their `/:id` routes. */
+/** `GET /target-faces`, `GET /federations`, `GET /disciplines`, `GET /target-mappings`, `GET /caliber-classes` and their `/:id` routes. */
 // biome-ignore lint/suspicious/useAwait: FastifyPluginAsync returns a promise
 export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = async (
   app,
@@ -69,7 +77,7 @@ export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = as
         response: targetFaceList,
         summary: 'List target faces',
         description:
-          'Every target face with its organization, the caliber classes of the disciplines mapped to it and the categories of its events and those disciplines. Ordered by organization, then the code printed in the name, then name.',
+          'Every target face with its federation, the caliber classes of the disciplines mapped to it and the categories of its events and those disciplines. Ordered by federation, then the code printed in the name, then name.',
       },
     },
     (_request, reply) => reply.send(catalogue.targetFaces()),
@@ -84,7 +92,7 @@ export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = as
         moved: true,
         summary: 'Get a target face',
         description:
-          'The target face record: ring diameters (mm), inner ten, events and provenance.',
+          'The target face record: federation id, ring diameters (mm), inner ten, events with their ids and provenance.',
       },
     },
     (request, reply) => {
@@ -137,10 +145,23 @@ export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = as
     },
     (request, reply) => reply.send(catalogue.targetMappings(request.query)),
   )
+  app.get(
+    '/caliber-classes',
+    {
+      config: {
+        response: caliberClassList,
+        summary: 'List caliber classes',
+        description:
+          'The caliber classes the disciplines name: groups of cartridges whose bullets have the same diameter, with the nominal diameter (mm), ordered by diameter.',
+      },
+    },
+    (_request, reply) => reply.send(catalogue.caliberClasses()),
+  )
   for (const [path, kind, noun, record] of [
     ['/federations', 'federation', 'federation', federation],
     ['/disciplines', 'discipline', 'discipline', discipline],
     ['/target-mappings', 'targetMapping', 'target mapping', targetMapping],
+    ['/caliber-classes', 'caliberClass', 'caliber class', caliberClass],
   ] as const) {
     app.get<{ Params: { id: string } }>(
       `${path}/:id`,

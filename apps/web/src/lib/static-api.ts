@@ -32,6 +32,7 @@ const listKinds = new Set([
   'federations',
   'disciplines',
   'target-mappings',
+  'caliber-classes',
 ])
 const searchKinds = new Set(['cartridges', 'bullets', 'powders'])
 const recordId = /^[a-z0-9]+(-[a-z0-9]+)*$/
@@ -147,6 +148,8 @@ async function list(kind: string, query: URLSearchParams) {
       return answer(200, c.federations())
     case 'disciplines':
       return answer(200, c.disciplines({ federation }))
+    case 'caliber-classes':
+      return answer(200, c.caliberClasses())
     default:
       return answer(200, c.targetMappings({ discipline, face }))
   }

@@ -3,9 +3,11 @@ import { join } from 'node:path'
 import {
   type Bullet,
   bullet,
+  type CaliberClass,
   type Cartridge,
   type CaseCapacity,
   type ChronoSession,
+  caliberClass,
   cartridge,
   caseCapacity,
   chronoSession,
@@ -16,7 +18,9 @@ import {
   federation,
   firingSeries,
   type Load,
+  type LoadTables,
   load,
+  loadTable,
   type Manufacturer,
   manufacturer,
   type Powder,
@@ -30,10 +34,11 @@ import {
   targetFace,
   targetMapping,
 } from '@open-reloading/schema'
-import type { z } from 'zod'
+import { z } from 'zod'
+import { checkCaliberClasses } from './caliber-classes.ts'
 import { checkCoverage } from './coverage.ts'
 import { checkFederations } from './federations.ts'
-import { checkFittedSources, type LoadTables } from './load-tables.ts'
+import { checkFittedSources } from './load-tables.ts'
 import { checkNames, type LocatedFinding } from './names.ts'
 import {
   checkBullet,
@@ -55,20 +60,39 @@ import { checkSources, sourceIndex } from './sources.ts'
 /** Directory `records/` of the data package, the default root of {@link readRecords}. */
 const recordsDir = join(import.meta.dirname, '..', 'records')
 
-/** The load tables listed in `load-tables.json` of a records folder (none without it). */
-export function readLoadTables(dir: string): LoadTables {
+/**
+ * The load tables listed in `load-tables.json` of a records folder (none without it). An entry
+ * that breaks `loadTable` is left out and adds its issues to `errors`; without `errors` it throws.
+ */
+export function readLoadTables(dir: string, errors?: string[]): LoadTables {
   const path = join(dir, 'load-tables.json')
   if (!existsSync(path)) return {}
+  let json: unknown
   try {
-    return JSON.parse(readFileSync(path, 'utf8')) as LoadTables
+    json = JSON.parse(readFileSync(path, 'utf8'))
   } catch (e) {
     throw new Error(`${path}: invalid JSON: ${(e as Error).message}`)
   }
+  const listed = z.record(z.string(), z.unknown()).safeParse(json)
+  const found: string[] = errors ?? []
+  const tables: LoadTables = {}
+  if (!listed.success) found.push('load-tables.json: not an object of tables by row file')
+  else
+    for (const [file, entry] of Object.entries(listed.data)) {
+      const parsed = loadTable.safeParse(entry)
+      if (parsed.success) tables[file] = parsed.data
+      else
+        for (const issue of parsed.error.issues)
+          found.push(`load-tables.json: ${[file, ...issue.path].join('.')}: ${issue.message}`)
+    }
+  if (!errors && found.length) throw new Error(found.join('\n'))
+  return tables
 }
 
 /** The records of a records root, one array per kind. */
 export type Bundle = {
   cartridges: Cartridge[]
+  caliberClasses: CaliberClass[]
   manufacturers: Manufacturer[]
   powders: Powder[]
   bullets: Bullet[]
@@ -100,6 +124,7 @@ function readBundle(roots: string[], errors: string[]): Bundle {
     readKind(roots, dir, schema, { errors, sources, optional })
   const bundle = {
     cartridges: read('cartridges', cartridge),
+    caliberClasses: read('caliber-classes', caliberClass),
     manufacturers: read('manufacturers', manufacturer),
     powders: read('powders', powder),
     bullets: read('bullets', bullet),
@@ -150,6 +175,7 @@ function applyExceptions(spec: Cartridge, errors: string[]) {
 function checkSourceCoverage(bundle: Bundle, errors: string[]) {
   for (const [dir, records] of [
     ['manufacturers', bundle.manufacturers],
+    ['caliber-classes', bundle.caliberClasses],
     ['powders', bundle.powders],
     ['bullets', bundle.bullets],
     ['capacities', bundle.capacities],
@@ -210,8 +236,9 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
   }
   checkSourceCoverage(bundle, errors)
   errors.push(...checkFederations(bundle))
+  errors.push(...checkCaliberClasses(bundle))
   checkRenames(bundle, errors)
-  const loadTables = readLoadTables(roots[1] ?? roots[0])
+  const loadTables = readLoadTables(roots[1] ?? roots[0], errors)
   for (const p of bundle.powders) {
     for (const error of checkFittedSources(p, loadTables))
       errors.push(`powders/${p.id}.json: ${error}`)

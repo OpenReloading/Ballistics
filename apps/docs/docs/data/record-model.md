@@ -23,8 +23,8 @@ Writers: catalogue (git records, checked by `readRecords`), user (browser, `pack
 | Firing series, range firings | `firing.ts`, `range.ts` | no folder, bundle only | catalogue |
 | Source record | `provenance.ts` | `records/sources`, inlined into records on read | catalogue |
 | Federation, discipline, target mapping, target face | `federation.ts`, `target-face.ts` | one folder each | catalogue |
-| Caliber class | `caliber-class.ts` | code only (a constant) | developer |
-| Load tables | none | `load-tables.json` of a records root | catalogue |
+| Caliber class | `caliber-class.ts` | `records/caliber-classes` | catalogue |
+| Load tables | `load-tables.ts` | `load-tables.json` of a records root | catalogue |
 | Firearm | `firearm.ts` | user record `firearm`, in the stored units (step 5) | user |
 | Workbench state | `workbench.ts` | user record `workbenchState`, called "loads" in the UI | user |
 | User bullet | `user-data.ts` (`bullet`) | user record: `basedOn` and `overrides` of a Bullet (step 4) | user |
@@ -49,7 +49,7 @@ Ranked by how much code and visible behavior depends on them.
 
 **Case capacity (medium).** The record (g), `Load.case.waterCapacity` (g) and `workbenchState.measuredWaterCapacity` (m³) describe one measurement.
 
-**Manufacturer (medium).** Catalogue records name a manufacturer by id; loads, sessions, firearms and designs carry free text, merged for display by `productLabel` in `apps/web/src/lib/manufacturers.ts`. `targetFace.organization` is a third form, compared with `federation.abbreviation` by hand.
+**Manufacturer (medium).** Catalogue records name a manufacturer by id; loads, sessions, firearms and designs carry free text, merged for display by `productLabel` in `apps/web/src/lib/manufacturers.ts`. `targetFace.federation` and the events' `federation` name a federation by id.
 
 **Units (high).** Catalogue records and cartridge designs use the stored units of `packages/schema/src/units.ts`. Firearm, workbench state, bullet design, target sheet, measured series and every solver body use SI. The same quantity then differs by a factor in different entities: charge in g or kg, barrel length in mm or m, muzzle distance in mm or m. `units` held labels only, so conversion factors were written by hand in many files (one named table, `storedToSi` in `apps/web/src/lib/field-spec.ts`). Step 2 removes this.
 
@@ -57,7 +57,7 @@ Ranked by how much code and visible behavior depends on them.
 
 **Types and enums (medium).** `apps/web/src/lib/api-types.ts` re-declared the record types of the schema, and the case type list existed in the API route and in the web app. Drift showed in `productNumber` (optional in the copy, required in the schema) and in `ogive.form` (a string). Step 1 removes this.
 
-**Low:** inline bullet, firearm and ammunition descriptions in publication records (`firing.ts`, `range.ts`) repeat part of Bullet and Firearm; caliber classes are a constant while the discipline schema enumerates their ids; `targetMapping.event` points at a face event by name, and `gauge` is stored on both.
+**Low:** inline bullet, firearm and ammunition descriptions in publication records (`firing.ts`, `range.ts`) repeat part of Bullet and Firearm; `targetMapping.gauge` is stored on the mapping and on the face event.
 
 ## Target model
 
@@ -87,7 +87,7 @@ The finer standing of a citation (manufacturer, public, community) stays in `pro
 | CaseCapacity | catalogue, user | one unit, g |
 | Load | catalogue, user, shared | references to cartridge, firearm, bullet, powder and capacity; primer and case as component descriptions; seating; charge; a typed `analysis` with `overrides` and the ladder |
 | Session | catalogue, user, shared | an event: strings of `{load, variation, shots}`, conditions, device, provenance with the imported file's SHA-256 |
-| TargetFace, Federation, Discipline, TargetMapping | catalogue, user (faces) | `organization` becomes a federation reference |
+| TargetFace, Federation, Discipline, TargetMapping | catalogue, user (faces) | `organization` is a federation reference |
 | TargetSheet | user, shared | the photo stays a file; `load` and `session` are references |
 
 Session stays separate from Load: a session is an event fixed in time, a load is a recipe reused over many sessions, and merging them would copy recipe data into every event. A target sheet is an event of its own that references both. Solver bodies stay derived SI inputs built from resolved entities and are never stored. The designers stay separate screens but edit the same entities.
@@ -137,7 +137,7 @@ Ranked by impact.
 5. Schema, designer and web types drifted apart where copied (step 1).
 6. `Load`, `ChronoSession`, `FiringSeries` and `RangeFirings` are validated and bundled but nothing reads them, so they can drift unseen.
 7. Id rules and the generator, and no id stability beyond manufacturers.
-8. Catalogue reference checks stop at ids that exist: loads name components in text, `load-tables.json` has no schema, caliber class membership is a test only.
+8. Catalogue reference checks stop at ids that exist: loads name components in text. (`load-tables.json` has a schema and caliber class membership is a data check since step 12.)
 9. Powder numbers mix `quantity` objects and plain numbers with a unit in the metadata.
 
 ## Steps
@@ -157,7 +157,7 @@ Each step lands alone with its model page updated in the same commit. Steps 4 to
 | 9 | Manufacturer references | 3 |
 | 10 | Replaced by the catalogue storage steps D0 to D6 (`catalogue-storage.md`) | |
 | 11 | Browser store hardening: versioned IndexedDB, keep and list invalid records | before 3 and 4 |
-| 12 | Catalogue loose ends: schema for load tables, caliber classes as records (the renames map is part of the catalogue storage, `catalogue-storage.md`) | |
+| 12 | Catalogue loose ends: schema for load tables (done, below), caliber classes as records (done, below), federation reference of target faces (the renames map is part of the catalogue storage, `catalogue-storage.md`) | |
 
 Steps 1, 2 and 11 go first, then 3, then 4 to 6, then 7 to 9. Steps 10 and 12 fit any time; 10 does not run together with other changes to the cartridge routes.
 
@@ -198,6 +198,14 @@ Steps 1, 2 and 11 go first, then 3, then 4 to 6, then 7 to 9. Steps 10 and 12 fi
 - `manufacturer` is a `catalogue:<id>` reference to a manufacturer record, `cartridge` a reference (`catalogue:<id>` or `user:<UUID>`). `manufacturerName` stays as free text for a maker no record exists for, until step 9 makes user manufacturers. A `user:` manufacturer reference is refused, since no record kind answers it.
 - `Load` drops its inline `firearm` (name, barrel length, twist, hand) for an optional `firearm` reference. No catalogue firearm kind exists yet, so no reference check reads it.
 - The web app converts at its edges: `siOf`, `storedOf`, `fieldSi` and `fieldStored` (`apps/web/src/lib/firearm.ts`) go through `toSi` and `fromSi`, the sight, click and Gun card values stay SI where the solver forms read them, and the editor stores a field only when it is edited, so values the user did not touch keep the exact stored number. Not part of this step: the workbench state's `firearm` (a local id until step 6) and its `siValues` entry `firearmMass` (kg).
+
+### Step 12: what changed
+
+- `loadTables` (`packages/schema/src/load-tables.ts`) is the schema of `load-tables.json`: row file name to `{ manufacturer, title, url?, retrieved }`, strict, `manufacturer` a record id and `retrieved` an ISO date. `readLoadTables` parses each entry: one that breaks the schema is left out and `data:validate` reports each issue with the row file and field. The manufacturer must still be a record (`checkManufacturerReferences`).
+
+- Caliber classes are records (`records/caliber-classes`, `caliberClass` in `packages/schema/src/caliber-class.ts`), served by `GET /caliber-classes` and `/:id`. `Discipline.caliberClasses.ids` and the `caliberClasses` of a target face list item are record ids, checked by `data:validate` (`packages/data/src/caliber-classes.ts`), which also holds the membership rules the former test checked. The `caliberClasses` constant of the schema package is gone: the web app reads class names from the API.
+
+- `TargetFace.federation` and the face events' `federation` are federation record ids (`organization` is gone from the records), a face without `federation` is a user's own design. Every face event has an `id` (a record id, unique within the face) and `TargetMapping.event` holds it. `data:validate` checks the federation references, the mapping against the event's federation and the uniqueness (`checkFaceFederations`, `checkMappings`). The target faces API list derives `organization` from the federation. The web app keys the event choice by id, and a target sheet's `face.event` is a record id: a saved sheet that holds an event name is rejected like any record of an older format.
 
 ## Decisions
 

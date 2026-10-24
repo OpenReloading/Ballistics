@@ -2,7 +2,7 @@
   "id": "bds-1208-issf-25m-precision-50m-pistol",
   "discipline": "bds-1208",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDS 1208 MD Revolver Magnum bis .357",
+  "event": "bds-1208-md-revolver-magnum-bis-357",
   "shotCount": 40,
   "provenance": {
     "kind": "published",

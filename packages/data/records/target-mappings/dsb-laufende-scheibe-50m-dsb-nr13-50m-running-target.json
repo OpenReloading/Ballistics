@@ -2,7 +2,7 @@
   "id": "dsb-laufende-scheibe-50m-dsb-nr13-50m-running-target",
   "discipline": "dsb-laufende-scheibe-50m",
   "face": "dsb-nr13-50m-running-target",
-  "event": "DSB Laufende Scheibe 50 m",
+  "event": "dsb-laufende-scheibe-50-m",
   "shotCount": 60,
   "provenance": {
     "kind": "published",

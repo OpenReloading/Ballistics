@@ -2,7 +2,7 @@
   "id": "dsb-ordonnanzgewehr-100m-issf-25m-precision-50m-pistol",
   "discipline": "dsb-ordonnanzgewehr-100m",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "DSB Ordonnanzgewehr 100 m",
+  "event": "dsb-ordonnanzgewehr-100-m",
   "shotCount": 40,
   "provenance": {
     "kind": "published",

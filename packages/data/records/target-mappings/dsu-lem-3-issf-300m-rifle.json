@@ -2,7 +2,7 @@
   "id": "dsu-lem-3-issf-300m-rifle",
   "discipline": "dsu-lem-3",
   "face": "issf-300m-rifle",
-  "event": "DSU LEM 3 Einzellader Matchgewehr 300 m",
+  "event": "dsu-lem-3-einzellader-matchgewehr-300-m",
   "shotCount": 20,
   "provenance": {
     "kind": "published",

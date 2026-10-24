@@ -2,7 +2,7 @@
   "id": "bdmp-pp-3-bdmp-pp1",
   "discipline": "bdmp-pp-3",
   "face": "bdmp-pp1",
-  "event": "BDMP Police Pistol 3 (Carry Gun)",
+  "event": "bdmp-police-pistol-3-carry-gun",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

@@ -2,7 +2,7 @@
   "id": "dsb-25m-grosskaliber-30-issf-25m-precision-50m-pistol",
   "discipline": "dsb-25m-grosskaliber-30",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "DSB 25 m Großkaliberpistole .30 150 Sek. Serie",
+  "event": "dsb-25-m-grosskaliberpistole-30-150-sek-serie",
   "stage": "150 Sek. Serie",
   "gauge": {
     "value": 9.65,

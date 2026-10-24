@@ -2,7 +2,7 @@
   "id": "dsb-luntenschlossgewehr-50m-dsb-nr6-musket-50m",
   "discipline": "dsb-luntenschlossgewehr-50m",
   "face": "dsb-nr6-musket-50m",
-  "event": "DSB Luntenschlossgewehr 50 m",
+  "event": "dsb-luntenschlossgewehr-50-m",
   "shotCount": 15,
   "provenance": {
     "kind": "published",

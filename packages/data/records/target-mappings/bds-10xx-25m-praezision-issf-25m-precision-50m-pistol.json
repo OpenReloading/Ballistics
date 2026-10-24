@@ -2,7 +2,7 @@
   "id": "bds-10xx-25m-praezision-issf-25m-precision-50m-pistol",
   "discipline": "bds-10xx-25m-praezision",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDS 10xx 25 m Schießen, Teil Präzision",
+  "event": "bds-10xx-25-m-schiessen-teil-prazision",
   "shotCount": 20,
   "provenance": {
     "kind": "published",

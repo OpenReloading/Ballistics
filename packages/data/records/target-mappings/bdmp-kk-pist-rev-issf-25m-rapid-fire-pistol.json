@@ -2,7 +2,7 @@
   "id": "bdmp-kk-pist-rev-issf-25m-rapid-fire-pistol",
   "discipline": "bdmp-kk-pist-rev",
   "face": "issf-25m-rapid-fire-pistol",
-  "event": "BDMP KK-Pist./Rev. Kleinkaliber Kurzwaffe Duell",
+  "event": "bdmp-kk-pist-rev-kleinkaliber-kurzwaffe-duell",
   "stage": "Duell",
   "shotCount": 12,
   "provenance": {

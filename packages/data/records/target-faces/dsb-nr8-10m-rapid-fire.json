@@ -1,7 +1,7 @@
 {
   "id": "dsb-nr8-10m-rapid-fire",
   "name": "Scheibe Nr. 8 (10 m Pistole, Schnellfeuerteil)",
-  "organization": "DSB",
+  "federation": "dsb",
   "rings": [
     {
       "value": 5,
@@ -50,6 +50,7 @@
   },
   "events": [
     {
+      "id": "10-m-pistole-schnellfeuerteil",
       "name": "10 m Pistole Schnellfeuerteil",
       "distance": {
         "value": 10000,

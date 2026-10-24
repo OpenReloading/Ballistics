@@ -190,6 +190,7 @@ describe('open', () => {
     ])
     expect(catalogue.targetFaces().items[0]).toEqual({
       id: 'test-face',
+      federation: 'test-federation',
       organization: 'Test',
       name: 'Test Face',
       caliberClasses: ['air-4-5'],

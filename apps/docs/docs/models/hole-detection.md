@@ -226,7 +226,7 @@ Code: `apps/web/src/lib/target-face.ts`, `matchFaces`, `scoreMatch`, `shareInFra
 
 One face with at least 4 rings matched and a score of 2.5 calibrates the sheet without a question. Otherwise the editor shows what was found and opens the scale step: the user chooses the face, types the black diameter or marks a ring of known size in Calibrate.
 
-The active group takes the face for ring scoring with the event the user chose, else the event of its discipline on this face, else the face's event at the group's distance: of the federation chosen for the Discipline list, else of the organization that publishes the face, else of the one organization that shoots the face there. Otherwise the group has no event and the Discipline list stays empty: no federation is guessed (`apps/web/src/lib/face-sheet.ts`, `calibrateSheetOnFace`).
+The active group takes the face for ring scoring with the event the user chose, else the event of its discipline on this face, else the face's event at the group's distance: of the federation chosen for the Discipline list, else of the federation that publishes the face, else of the one federation that shoots the face there. Otherwise the group has no event and the Discipline list stays empty: no federation is guessed (`apps/web/src/lib/face-sheet.ts`, `calibrateSheetOnFace`).
 
 Code: `apps/web/src/lib/target-face.ts`, `findFace`, `ringLines`, `ringPlane`, `matchFaces`, `scoreMatch`, `shareInFrame`, `fitFace`, `TIE`, `SCALE_TOLERANCE`, `BLACK_PX`. `apps/web/src/lib/face-image.ts`, `blackAreas`, `blobOf`, `shareInside`, `paperAround`. `apps/web/src/lib/ellipse.ts`, `ransacEllipse`, `concentricPlane`.
 

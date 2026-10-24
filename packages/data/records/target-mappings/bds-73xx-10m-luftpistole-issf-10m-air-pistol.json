@@ -2,7 +2,7 @@
   "id": "bds-73xx-10m-luftpistole-issf-10m-air-pistol",
   "discipline": "bds-73xx-10m-luftpistole",
   "face": "issf-10m-air-pistol",
-  "event": "BDS 73xx 10 m Präz. Luftpistole",
+  "event": "bds-73xx-10-m-praz-luftpistole",
   "provenance": {
     "kind": "published",
     "sources": [

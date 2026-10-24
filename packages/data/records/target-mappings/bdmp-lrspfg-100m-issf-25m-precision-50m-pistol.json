@@ -2,7 +2,7 @@
   "id": "bdmp-lrspfg-100m-issf-25m-precision-50m-pistol",
   "discipline": "bdmp-lrspfg-100m",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDMP LRSPFG LR Schwarzpulverfreigewehr, 100 m",
+  "event": "bdmp-lrspfg-lr-schwarzpulverfreigewehr-100-m",
   "shotCount": 10,
   "provenance": {
     "kind": "published",

@@ -227,6 +227,7 @@ describe('GET /target-faces', () => {
       items: [
         {
           id: 'test-face',
+          federation: 'test-federation',
           organization: 'Test',
           name: 'Test Face',
           caliberClasses: ['air-4-5'],
@@ -240,7 +241,7 @@ describe('GET /target-faces', () => {
   })
 })
 
-describe('GET /federations, /disciplines and /target-mappings', () => {
+describe('GET /federations, /disciplines, /target-mappings and /caliber-classes', () => {
   it('lists summaries and returns whole records', async () => {
     expect((await get(`${API_PREFIX}/federations`)).body).toEqual({
       total: 1,
@@ -268,7 +269,7 @@ describe('GET /federations, /disciplines and /target-mappings', () => {
       id: 'test-discipline-test-face',
       discipline: 'test-discipline',
       face: 'test-face',
-      event: 'Test event',
+      event: 'test-event',
       gaugeMm: 4.5,
     }
     expect((await get(`${API_PREFIX}/target-mappings`)).body).toEqual({
@@ -280,13 +281,18 @@ describe('GET /federations, /disciplines and /target-mappings', () => {
         .total,
     ).toBe(1)
     expect((await get(`${API_PREFIX}/target-mappings?face=other`)).body.total).toBe(0)
+    expect((await get(`${API_PREFIX}/caliber-classes`)).body).toEqual({
+      total: 1,
+      items: [{ id: 'air-4-5', name: '4.5 mm (.177) air', diameterMm: 4.5 }],
+    })
     for (const [path, record] of [
       ['federations/test-federation', bundle.federations[0]],
       ['disciplines/test-discipline', bundle.disciplines[0]],
       ['target-mappings/test-discipline-test-face', bundle.targetMappings[0]],
+      ['caliber-classes/air-4-5', bundle.caliberClasses[0]],
     ] as const)
       expect((await get(`${API_PREFIX}/${path}`)).body).toEqual(record)
-    for (const path of ['federations', 'disciplines', 'target-mappings']) {
+    for (const path of ['federations', 'disciplines', 'target-mappings', 'caliber-classes']) {
       expect((await get(`${API_PREFIX}/${path}/unknown`)).status).toBe(404)
       expect((await get(`${API_PREFIX}/${path}/Not_An_Id`)).status).toBe(400)
     }

@@ -1,7 +1,7 @@
 {
   "id": "bdmp-nr7",
   "name": "BDMP-Scheibe Nr. 7",
-  "organization": "BDMP",
+  "federation": "bdmp",
   "rings": [
     {
       "value": 1,
@@ -51,6 +51,7 @@
   },
   "events": [
     {
+      "id": "bdmp-f-class-tr-300-m",
       "name": "BDMP F-Class TR 300 m",
       "distance": {
         "value": 300000,

@@ -2,7 +2,7 @@
   "id": "dsb-25m-zentralfeuerpistole-issf-25m-precision-50m-pistol",
   "discipline": "dsb-25m-zentralfeuerpistole",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "DSB 25 m Zentralfeuerpistole Präzision",
+  "event": "dsb-25-m-zentralfeuerpistole-prazision",
   "stage": "Präzision",
   "gauge": {
     "value": 9.65,

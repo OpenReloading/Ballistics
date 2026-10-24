@@ -2,7 +2,7 @@
   "id": "dsb-steinschlossgewehr-100m-issf-25m-precision-50m-pistol",
   "discipline": "dsb-steinschlossgewehr-100m",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "DSB Steinschlossgewehr 100 m",
+  "event": "dsb-steinschlossgewehr-100-m",
   "shotCount": 15,
   "provenance": {
     "kind": "published",

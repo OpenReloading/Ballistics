@@ -3,18 +3,18 @@
  * events that score it (target mappings); its entry's value is the discipline id. A face event that
  * no mapping names is an entry of its own, labelled with the organization that publishes the face
  * (an event of another organization carries that organization in its name); its value is the face
- * id and the event name. A group stores the face and the event either way. A flat list: Mantine's
+ * id and the event id. A group stores the face and the event either way. A flat list: Mantine's
  * group headings are no listbox children, which axe reports (aria-required-children).
  */
 import {
   type Discipline,
   type Federation,
   type GroupFace,
-  type TargetFace,
   type TargetMapping,
   toSi,
 } from '@open-reloading/schema'
 import { compareDisciplines, compareFederations, compareNames } from './face-order.ts'
+import type { Face } from './face-organization.ts'
 
 export type FederationSummary = Pick<Federation, 'id' | 'name' | 'abbreviation'>
 export type DisciplineSummary = Pick<
@@ -68,7 +68,7 @@ export const mappedFace = (mappings: MappingSummary[], id: string) =>
  * The entries of the Discipline list: the disciplines of `federation`, else of every federation
  * (by federation) followed by the face events no mapping names (by organization).
  */
-export function disciplineOptions(faces: TargetFace[], data?: FederationData, federation?: string) {
+export function disciplineOptions(faces: Face[], data?: FederationData, federation?: string) {
   const { federations = [], disciplines: all = [], mappings = [] } = data ?? {}
   const listed = federations
     .filter((f) => !federation || f.id === federation)
@@ -89,13 +89,13 @@ function disciplineLabel(f: FederationSummary, d: DisciplineSummary): string {
 }
 
 /** The face events no mapping names, by organization (an event of another organization than its face names that organization itself, an event on two faces its face). */
-function unmappedFaceEntries(faces: TargetFace[], mappings: MappingSummary[]) {
+function unmappedFaceEntries(faces: Face[], mappings: MappingSummary[]) {
   const entries = faces.flatMap((f) =>
     f.events
-      .filter((e) => !mappings.some((m) => m.face === f.id && m.event === e.name))
+      .filter((e) => !mappings.some((m) => m.face === f.id && m.event === e.id))
       .map((e) => ({
         organization: e.organization ?? f.organization,
-        value: `${f.id}|${e.name}`,
+        value: `${f.id}|${e.id}`,
         label: e.organization ? e.name : `${f.organization} ${e.name}`,
         face: f.name,
       })),

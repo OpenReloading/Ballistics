@@ -1,7 +1,7 @@
 {
   "id": "issf-25m-precision-50m-pistol",
   "name": "25m Precision and 50m Pistol Target",
-  "organization": "ISSF",
+  "federation": "issf",
   "rings": [
     {
       "value": 1,
@@ -77,6 +77,7 @@
   "decimal": true,
   "events": [
     {
+      "id": "50m-pistol",
       "name": "50m Pistol",
       "distance": {
         "value": 50000,
@@ -89,6 +90,7 @@
       "scoring": "touch"
     },
     {
+      "id": "25m-standard-pistol",
       "name": "25m Standard Pistol",
       "distance": {
         "value": 25000,
@@ -101,6 +103,7 @@
       "scoring": "touch"
     },
     {
+      "id": "25m-centre-fire-pistol-precision-stage",
       "name": "25m Centre Fire Pistol (precision stage)",
       "distance": {
         "value": 25000,
@@ -113,6 +116,7 @@
       "scoring": "touch"
     },
     {
+      "id": "25m-pistol-precision-stage",
       "name": "25m Pistol (precision stage)",
       "distance": {
         "value": 25000,
@@ -125,1078 +129,1186 @@
       "scoring": "touch"
     },
     {
+      "id": "dsb-25-m-pistole-prazision",
       "name": "DSB 25 m Pistole Präzision",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4",
       "scoring": "touch"
     },
     {
+      "id": "dsb-25-m-standardpistole",
       "name": "DSB 25 m Standardpistole",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4",
       "scoring": "touch"
     },
     {
+      "id": "dsb-50-m-pistole",
       "name": "DSB 50 m Pistole",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4",
       "scoring": "touch"
     },
     {
+      "id": "dsb-25-m-zentralfeuerpistole-prazision",
       "name": "DSB 25 m Zentralfeuerpistole Präzision",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4",
       "scoring": "touch"
     },
     {
+      "id": "dsb-25-m-pistole-revolver-150-sek-serie",
       "name": "DSB 25 m Pistole/Revolver 150 Sek. Serie",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4",
       "scoring": "touch"
     },
     {
+      "id": "dsb-gewehr-100-m",
       "name": "DSB Gewehr 100 m",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4",
       "scoring": "touch"
     },
     {
+      "id": "bds-3105-100-m-praz-unterhebelrepetierer",
       "name": "BDS 3105 100 m Präz. Unterhebelrepetierer",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z5",
       "scoring": "touch"
     },
     {
+      "id": "bds-3106-100-m-praz-dsg-ok",
       "name": "BDS 3106 100 m Präz. DSG oK",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z5",
       "scoring": "touch"
     },
     {
+      "id": "bds-3107-100-m-praz-dsg-gk-und-diopter",
       "name": "BDS 3107 100 m Präz. DSG gK und Diopter",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z5",
       "scoring": "touch"
     },
     {
+      "id": "bds-3109-100-m-praz-dsg-selbstlader-ok",
       "name": "BDS 3109 100 m Präz. DSG Selbstlader oK",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z5",
       "scoring": "touch"
     },
     {
+      "id": "bds-3110-100-m-praz-dsg-selbstlader-gk-dio",
       "name": "BDS 3110 100 m Präz. DSG Selbstlader gK+Dio",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z5",
       "scoring": "touch"
     },
     {
+      "id": "bds-3112-100-m-praz-sg-sl-off-vis-b-6-4-mm",
       "name": "BDS 3112 100 m Präz. SG SL off. Vis. b. 6,4 mm",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z5",
       "scoring": "touch"
     },
     {
+      "id": "bds-3113-100-m-praz-sg-sl-off-vis-u-6-4-mm",
       "name": "BDS 3113 100 m Präz. SG SL off. Vis. ü. 6,4 mm",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z5",
       "scoring": "touch"
     },
     {
+      "id": "bds-3311-100-m-zeit-dsg-selbstlader-off-geschl-vis",
       "name": "BDS 3311 100 m Zeit. DSG Selbstlader off./geschl.Vis.",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z5",
       "scoring": "touch"
     },
     {
+      "id": "bds-3312-100-m-zeit-sg-sl-off-vis-b-6-4-mm",
       "name": "BDS 3312 100 m Zeit. SG SL off. Vis. b. 6,4 mm",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z5",
       "scoring": "touch"
     },
     {
+      "id": "bds-3313-100-m-zeit-sg-sl-off-vis-u-6-4-mm",
       "name": "BDS 3313 100 m Zeit. SG SL off. Vis. ü. 6,4 mm",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z5",
       "scoring": "touch"
     },
     {
+      "id": "bds-3412-100-m-fertigkeit-sg-sl-b-6-4-mm",
       "name": "BDS 3412 100 m Fertigkeit SG SL b. 6,4 mm",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z5",
       "scoring": "touch"
     },
     {
+      "id": "bds-3413-100-m-fertigkeit-sg-sl-u-6-4-mm",
       "name": "BDS 3413 100 m Fertigkeit SG SL ü. 6,4 mm",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z5",
       "scoring": "touch"
     },
     {
+      "id": "bds-10xx-25-m-schiessen-teil-prazision",
       "name": "BDS 10xx 25 m Schießen, Teil Präzision",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z9",
       "scoring": "touch"
     },
     {
+      "id": "bds-3212-100-m-intervall-sg-sl-off-vis-hl-u-47-mm",
       "name": "BDS 3212 100 m Intervall SG SL off. Vis. HL u. 47 mm",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "L 13.02, Z5",
       "scoring": "touch"
     },
     {
+      "id": "bds-3213-100-m-intervall-sg-sl-off-vis-hl-mind-47-mm",
       "name": "BDS 3213 100 m Intervall SG SL off. Vis. HL mind. 47 mm",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "L 13.02, Z5",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-dg-1-dienstgewehr-1",
       "name": "BDMP DG 1 Dienstgewehr 1",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.1 and D.6.11, D.6.13 (Teil B, PDF p. 8; Teil D, PDF p. 31)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-dg-3-national-rifle-match-a-100-m",
       "name": "BDMP DG 3 National Rifle Match - A, 100 m",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.1 and D.8.9, D.8.10 (Teil B, PDF p. 8; Teil D, PDF pp. 35, 36)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-dg-4-national-rifle-match-b-100-m",
       "name": "BDMP DG 4 National Rifle Match - B, 100 m",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.1 and D.9.8, D.9.9 (Teil B, PDF p. 8; Teil D, PDF p. 39)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-pvdg-1-perkussions-vorderlader-dg-1",
       "name": "BDMP PVDG 1 Perkussions-Vorderlader-DG 1",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.1 and E.1.11, E.1.12 (Teil B, PDF p. 8; Teil E, PDF p. 8)",
       "scoring": "centre"
     },
     {
+      "id": "bdmp-phdg-1-perkussions-hinterlader-dg-1",
       "name": "BDMP PHDG 1 Perkussions-Hinterlader-DG 1",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.1 and E.2.11, E.2.12 (Teil B, PDF p. 8; Teil E, PDF p. 10)",
       "scoring": "centre"
     },
     {
+      "id": "bdmp-pfg-1-perkussions-freigewehr-1",
       "name": "BDMP PFG 1 Perkussions-Freigewehr 1",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.1 and E.4.10, E.4.11 (Teil B, PDF p. 8; Teil E, PDF p. 14)",
       "scoring": "centre"
     },
     {
+      "id": "bdmp-sppdg-1-schwarzpulverpatronen-dg-1",
       "name": "BDMP SPPDG 1 Schwarzpulverpatronen-DG 1",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.1 and E.7.11 (Teil B, PDF p. 8; Teil E, PDF p. 24)",
       "scoring": "touch"
     },
     {
+      "id": "dsu-lem-2-einzellader-matchgewehr-100-m",
       "name": "DSU LEM 2 Einzellader Matchgewehr 100 m",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "DSU",
+      "federation": "dsu",
       "section": "Kapitel 1, DSU-Scheibe UIT Präzision (Seite 17); Kapitel 3 (PDF p. 60)",
       "scoring": "touch"
     },
     {
+      "id": "dsu-svpg-1-vorderlader-perkussionsscheibengewehr-50-m",
       "name": "DSU SVPG 1 Vorderlader-Perkussionsscheibengewehr 50 m",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "DSU",
+      "federation": "dsu",
       "section": "Kapitel 4 (PDF p. 124); Kapitel 9 (PDF p. 233)",
       "scoring": "centre"
     },
     {
+      "id": "dsu-svog-vorderlader-ordonanzgewehr-100-m",
       "name": "DSU SVOG Vorderlader-Ordonanzgewehr 100 m",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "DSU",
+      "federation": "dsu",
       "section": "Kapitel 4 (PDF p. 124); Kapitel 9 (PDF p. 233)",
       "scoring": "centre"
     },
     {
+      "id": "dsu-svfg-vorderlader-freigewehr-100-m",
       "name": "DSU SVFG Vorderlader-Freigewehr 100 m",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "DSU",
+      "federation": "dsu",
       "section": "Kapitel 4 (PDF p. 124); Kapitel 9 (PDF p. 233)",
       "scoring": "centre"
     },
     {
+      "id": "dsu-svsg-1-vorderlader-steinschlossgewehr-50-m",
       "name": "DSU SVSG 1 Vorderlader-Steinschlossgewehr 50 m",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "DSU",
+      "federation": "dsu",
       "section": "Kapitel 4 (PDF p. 124); Kapitel 9 (PDF p. 233)",
       "scoring": "centre"
     },
     {
+      "id": "dsu-svsg-2-vorderlader-steinschlossgewehr-100-m",
       "name": "DSU SVSG 2 Vorderlader-Steinschlossgewehr 100 m",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "DSU",
+      "federation": "dsu",
       "section": "Kapitel 4 (PDF p. 124); Kapitel 9 (PDF p. 233)",
       "scoring": "centre"
     },
     {
+      "id": "dsu-shg-schwarzpulver-hinterladergewehr-50-m",
       "name": "DSU SHG Schwarzpulver-Hinterladergewehr 50 m",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "DSU",
+      "federation": "dsu",
       "section": "Kapitel 4 (PDF p. 124); Kapitel 9 (PDF p. 233)",
       "scoring": "centre"
     },
     {
+      "id": "vdrbw-p-d-1-halbautomatische-dienstpistole-prazision",
       "name": "VdRBw P-D 1 Halbautomatische Dienstpistole Präzision",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "8.2.5, 8.2.6 (Scheibe 10.3)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-r-d-1-dienstrevolver-prazision",
       "name": "VdRBw R-D 1 Dienstrevolver Präzision",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "8.3.5, 8.3.6 (Scheibe 10.3)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-pr-d-1-halbautomatische-dienstpistole-revolver-dreistellung",
       "name": "VdRBw PR-D 1 Halbautomatische Dienstpistole / -revolver Dreistellung",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "8.4.5, 8.4.6 (Scheibe 10.3)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-p-g-1-halbautomatische-grosskaliberpistole-prazision",
       "name": "VdRBw P-G 1 Halbautomatische Großkaliberpistole Präzision",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "8.5.5, 8.5.6 (Scheibe 10.3)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-r-g-1-grosskaliberrevolver-prazision",
       "name": "VdRBw R-G 1 Großkaliberrevolver Präzision",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "8.6.5, 8.6.6 (Scheibe 10.3)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-p-k-1-halbautomatische-kk-pistole-prazision",
       "name": "VdRBw P-K 1 Halbautomatische KK-Pistole Präzision",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "8.8.5, 8.8.6 (Scheibe 10.3)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-r-k-1-kk-revolver-prazision",
       "name": "VdRBw R-K 1 KK-Revolver Präzision",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "8.9.5, 8.9.6 (Scheibe 10.3)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-p-r-1-halbautomatische-pistole-revolver-prazision",
       "name": "VdRBw P-R 1 Halbautomatische Pistole / Revolver Präzision",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "8.11.5, 8.11.6 (Scheibe 10.3)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-g-r-1-repetiergewehr",
       "name": "VdRBw G-R 1 Repetiergewehr",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "9.4.4, 9.4.5 (Scheibe 10.1 or 10.3, 50 cm)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-g-h-1-halbautomatisches-gewehr",
       "name": "VdRBw G-H 1 Halbautomatisches Gewehr",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "9.5.4, 9.5.5 (Scheibe 10.1 or 10.3, 50 cm)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-g-h-2-halbautomatisches-gewehr",
       "name": "VdRBw G-H 2 Halbautomatisches Gewehr",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "9.6.4, 9.6.5 (Scheibe 10.1 or 10.3, 50 cm)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-g-h-3-halbautomatisches-gewehr",
       "name": "VdRBw G-H 3 Halbautomatisches Gewehr",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "9.7.4, 9.7.5 (Scheibe 10.3, 50 cm, or 10.1, 100 cm)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-g-rzf-1-repetier-zielfernrohrgewehr",
       "name": "VdRBw G-RZF 1 Repetier-Zielfernrohrgewehr",
       "distance": {
         "value": 300000,
         "raw": "300 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "9.9.4, 9.9.5 (Scheibe 10.1 or 10.3, 50 cm)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-g-hzf-1-halbautomatisches-zielfernrohrgewehr",
       "name": "VdRBw G-HZF 1 Halbautomatisches Zielfernrohrgewehr",
       "distance": {
         "value": 300000,
         "raw": "300 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "9.10.4, 9.10.5 (Scheibe 10.1 or 10.3, 50 cm)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-dp-1-dienstpistole-1",
       "name": "BDMP DP 1 Dienstpistole 1",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.1 and C.3.5, C.3.6 (Teil B, PDF p. 8; Teil C, PDF p. 10)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-dp-2-dienstpistole-2",
       "name": "BDMP DP 2 Dienstpistole 2",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.1 and C.4.5, C.4.6 (Teil B, PDF p. 8; Teil C, PDF p. 13)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-dp-3-dienstpistole-3",
       "name": "BDMP DP 3 Dienstpistole 3",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.1 and C.5.5, C.5.6 (Teil B, PDF p. 8; Teil C, PDF p. 15)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-dp-3-mod-c-k-dienstpistole-3-modifikation-carbine-kit",
       "name": "BDMP DP 3 Mod. C.K. Dienstpistole 3 Modifikation Carbine Kit",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "C.5A.6, C.5A.7 (Teil C, PDF p. 17)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-sar-1-single-action-revolver-1",
       "name": "BDMP SAR 1 Single Action Revolver 1",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.1 and C.10.5, C.10.6 (Teil B, PDF p. 8; Teil C, PDF p. 72)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-sar-2-single-action-revolver-2",
       "name": "BDMP SAR 2 Single Action Revolver 2",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.1 and C.11.5, C.11.6 (Teil B, PDF p. 8; Teil C, PDF p. 74)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-dr-1-dienstrevolver-1",
       "name": "BDMP DR 1 Dienstrevolver 1",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.1 and C.12.5, C.12.6 (Teil B, PDF p. 8; Teil C, PDF p. 76)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-sp-1-sportpistole-1",
       "name": "BDMP SP 1 Sportpistole 1",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.1 and C.13.5, C.13.6 (Teil B, PDF p. 8; Teil C, PDF p. 79)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-sp-2-sportpistole-2",
       "name": "BDMP SP 2 Sportpistole 2",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.1 and C.13A.5, C.13A.6 (Teil B, PDF p. 8; Teil C, PDF p. 81)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-sp3-sportpistole-3-prazision",
       "name": "BDMP SP3 Sportpistole 3 Präzision",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.1 and C.13B.5, C.13B.6 (Teil B, PDF p. 8; Teil C, PDF p. 82)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-sp4-sportpistole-4-prazision",
       "name": "BDMP SP4 Sportpistole 4 Präzision",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.1 and C.13C.5, C.13C.6 (Teil B, PDF p. 8; Teil C, PDF p. 85)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-kk-pist-rev-kleinkaliber-kurzwaffe-prazision",
       "name": "BDMP KK-Pist./Rev. Kleinkaliber Kurzwaffe Präzision",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.1 and C.16.10, C.16.12 (Teil B, PDF p. 8; Teil C, PDF p. 114)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-lar-1-lever-action-rifle-1",
       "name": "BDMP LAR 1 Lever Action Rifle 1",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "D.15.12, D.15.13 (Teil D, PDF p. 88)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-lar-2-lever-action-rifle-2-25-m",
       "name": "BDMP LAR 2 Lever Action Rifle 2, 25 m",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "D.16.10, D.16.11 (Teil D, PDF p. 92)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-lar-2-lever-action-rifle-2-50-m",
       "name": "BDMP LAR 2 Lever Action Rifle 2, 50 m",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "D.16.10, D.16.11 (Teil D, PDF p. 92)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-pfg-2-perkussions-freigewehr-2",
       "name": "BDMP PFG 2 Perkussions-Freigewehr 2",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "E.5.10, E.5.11 (Teil E, PDF p. 16)",
       "scoring": "centre"
     },
     {
+      "id": "bdmp-vdr-1-vorderlader-dienstrevolver-1",
       "name": "BDMP VDR 1 Vorderlader-Dienstrevolver 1",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.1 and E.8.5, E.8.6 (Teil B, PDF p. 8; Teil E, PDF p. 25)",
       "scoring": "centre"
     },
     {
+      "id": "bdmp-vdr-2-vorderlader-dienstrevolver-2",
       "name": "BDMP VDR 2 Vorderlader-Dienstrevolver 2",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.1 and E.9.5, E.9.6 (Teil B, PDF p. 8; Teil E, PDF p. 27)",
       "scoring": "centre"
     },
     {
+      "id": "bdmp-vp-1-vorderladerpistole-1",
       "name": "BDMP VP 1 Vorderladerpistole 1",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "E.10.5, E.10.6 (Teil E, PDF p. 29)",
       "scoring": "centre"
     },
     {
+      "id": "bdmp-sdp-1-steinschloss-dienstpistole-1",
       "name": "BDMP SDP 1 Steinschloss-Dienstpistole 1",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.1 and E.12.7, E.12.8 (Teil B, PDF p. 8; Teil E, PDF p. 34)",
       "scoring": "centre"
     },
     {
+      "id": "bdmp-sdp-2-steinschloss-dienstpistole-2",
       "name": "BDMP SDP 2 Steinschloss-Dienstpistole 2",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.1 and E.13.7, E.13.8 (Teil B, PDF p. 8; Teil E, PDF p. 36)",
       "scoring": "centre"
     },
     {
+      "id": "bdmp-lrspfg-lr-schwarzpulverfreigewehr-100-m",
       "name": "BDMP LRSPFG LR Schwarzpulverfreigewehr, 100 m",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "E.6.8 (Teil E, PDF p. 18)",
       "scoring": "centre"
     },
     {
+      "id": "bdmp-zfspfg-zf-schwarzpulverfreigewehr-100-m",
       "name": "BDMP ZFSPFG ZF Schwarzpulverfreigewehr, 100 m",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "E.14.8 (Teil E, PDF p. 38)",
       "scoring": "centre"
     },
     {
+      "id": "bds-2801-25-m-kombi-sg-sl-kw-off-vis-teil-intervall-zeitserie",
       "name": "BDS 2801 25 m Kombi SG SL KW off. Vis., Teil Intervall/Zeitserie",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "L 7.02, Z9",
       "scoring": "touch"
     },
     {
+      "id": "bds-2802-25-m-kombi-sg-sl-kk-opt-vis-teil-intervall-zeitserie",
       "name": "BDS 2802 25 m Kombi SG SL KK opt. Vis., Teil Intervall/Zeitserie",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "L 7.02, Z9",
       "scoring": "touch"
     },
     {
+      "id": "bds-2803-25-m-kombi-rb-kw-off-vis-teil-intervall-zeitserie",
       "name": "BDS 2803 25 m Kombi RB KW off. Vis., Teil Intervall/Zeitserie",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "L 7.02, Z9",
       "scoring": "touch"
     },
     {
+      "id": "bds-2804-25-m-kombi-rb-kk-off-vis-teil-intervall-zeitserie",
       "name": "BDS 2804 25 m Kombi RB KK off. Vis., Teil Intervall/Zeitserie",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "L 7.02, Z9",
       "scoring": "touch"
     },
     {
+      "id": "bds-2810-25-m-kombi-sg-sl-kw-opt-vis-teil-intervall-zeitserie",
       "name": "BDS 2810 25 m Kombi SG SL KW opt. Vis., Teil Intervall/Zeitserie",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "L 7.02, Z9",
       "scoring": "touch"
     },
     {
+      "id": "bds-2811-25-m-kombi-rb-kw-opt-vis-teil-intervall-zeitserie",
       "name": "BDS 2811 25 m Kombi RB KW opt. Vis., Teil Intervall/Zeitserie",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "L 7.02, Z9",
       "scoring": "touch"
     },
     {
+      "id": "bds-2812-25-m-kombi-sg-sl-kk-off-vis-teil-intervall-zeitserie",
       "name": "BDS 2812 25 m Kombi SG SL KK off. Vis., Teil Intervall/Zeitserie",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "L 7.02, Z9",
       "scoring": "touch"
     },
     {
+      "id": "bds-2814-25-m-kombi-rb-kk-bel-vis-teil-intervall-zeitserie",
       "name": "BDS 2814 25 m Kombi RB KK bel. Vis., Teil Intervall/Zeitserie",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "L 7.02, Z9",
       "scoring": "touch"
     },
     {
+      "id": "dsb-25-m-pistole-nachwuchs-prazision",
       "name": "DSB 25 m Pistole Nachwuchs Präzision",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4",
       "scoring": "touch"
     },
     {
+      "id": "dsb-50-m-pistole-auflage",
       "name": "DSB 50 m Pistole Auflage",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4",
       "scoring": "touch"
     },
     {
+      "id": "dsb-25-m-sportpistole-auflage-prazision",
       "name": "DSB 25 m Sportpistole Auflage Präzision",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4",
       "scoring": "touch"
     },
     {
+      "id": "dsb-25-m-grosskaliberpistole-30-150-sek-serie",
       "name": "DSB 25 m Großkaliberpistole .30 150 Sek. Serie",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4",
       "scoring": "touch"
     },
     {
+      "id": "dsb-25-m-grosskaliberpistole-32-150-sek-serie",
       "name": "DSB 25 m Großkaliberpistole .32 150 Sek. Serie",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4",
       "scoring": "touch"
     },
     {
+      "id": "dsb-25-m-grosskaliberpistole-38-150-sek-serie",
       "name": "DSB 25 m Großkaliberpistole .38 150 Sek. Serie",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4",
       "scoring": "touch"
     },
     {
+      "id": "dsb-25-m-grosskaliberpistole-10-mm-150-sek-serie",
       "name": "DSB 25 m Großkaliberpistole 10 mm 150 Sek. Serie",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4",
       "scoring": "touch"
     },
     {
+      "id": "dsb-25-m-grosskaliberrevolver-41-150-sek-serie",
       "name": "DSB 25 m Großkaliberrevolver .41 150 Sek. Serie",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4",
       "scoring": "touch"
     },
     {
+      "id": "dsb-perkussionsgewehr-50-m",
       "name": "DSB Perkussionsgewehr 50 m",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4",
       "scoring": "centre"
     },
     {
+      "id": "dsb-perkussionsgewehr-50-m-auflage",
       "name": "DSB Perkussionsgewehr 50 m - Auflage",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4",
       "scoring": "centre"
     },
     {
+      "id": "dsb-perkussionsfreigewehr-100-m",
       "name": "DSB Perkussionsfreigewehr 100 m",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4",
       "scoring": "centre"
     },
     {
+      "id": "dsb-perkussionsdienstgewehr-100-m",
       "name": "DSB Perkussionsdienstgewehr 100 m",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4",
       "scoring": "centre"
     },
     {
+      "id": "dsb-perkussionsdienstgewehr-50-m",
       "name": "DSB Perkussionsdienstgewehr 50 m",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4",
       "scoring": "centre"
     },
     {
+      "id": "dsb-steinschlossgewehr-50-m",
       "name": "DSB Steinschlossgewehr 50 m",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4",
       "scoring": "centre"
     },
     {
+      "id": "dsb-steinschlossgewehr-100-m",
       "name": "DSB Steinschlossgewehr 100 m",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4",
       "scoring": "centre"
     },
     {
+      "id": "dsb-25-m-perkussionsrevolver",
       "name": "DSB 25 m Perkussionsrevolver",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4",
       "scoring": "centre"
     },
     {
+      "id": "dsb-25-m-perkussionspistole",
       "name": "DSB 25 m Perkussionspistole",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4",
       "scoring": "centre"
     },
     {
+      "id": "dsb-25-m-perkussionspistole-auflage",
       "name": "DSB 25 m Perkussionspistole - Auflage",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4",
       "scoring": "centre"
     },
     {
+      "id": "dsb-25-m-steinschlosspistole",
       "name": "DSB 25 m Steinschlosspistole",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4",
       "scoring": "centre"
     },
     {
+      "id": "dsb-25-m-luntenschlosspistole",
       "name": "DSB 25 m Luntenschlosspistole",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4",
       "scoring": "centre"
     },
     {
+      "id": "dsu-svpp-perkussionspistole-25-m",
       "name": "DSU SVPP Perkussionspistole 25 m",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSU",
+      "federation": "dsu",
       "section": "Kapitel 4 (PDF p. 124); Kapitel 9 (PDF p. 233)",
       "scoring": "centre"
     },
     {
+      "id": "dsu-svpr-1-perkussionsrevolver-gr-25-m",
       "name": "DSU SVPR 1 Perkussionsrevolver gR 25 m",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSU",
+      "federation": "dsu",
       "section": "Kapitel 4 (PDF p. 124); Kapitel 9 (PDF p. 233)",
       "scoring": "centre"
     },
     {
+      "id": "dsu-svpr-2-perkussionsrevolver-or-25-m",
       "name": "DSU SVPR 2 Perkussionsrevolver oR 25 m",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSU",
+      "federation": "dsu",
       "section": "Kapitel 4 (PDF p. 124); Kapitel 9 (PDF p. 233)",
       "scoring": "centre"
     },
     {
+      "id": "dsu-svsp-steinschlosspistole-25-m",
       "name": "DSU SVSP Steinschlosspistole 25 m",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "DSU",
+      "federation": "dsu",
       "section": "Kapitel 4 (PDF p. 124); Kapitel 9 (PDF p. 233)",
       "scoring": "centre"
     },
     {
+      "id": "dsu-shke-1-schwarzpulver-klassisches-einzelladergewehr-geschlossene-visierung-100-m",
       "name": "DSU SHKE 1 Schwarzpulver Klassisches Einzelladergewehr, geschlossene Visierung 100 m",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "DSU",
+      "federation": "dsu",
       "section": "Kapitel 4 (PDF p. 124); Kapitel 9 (PDF p. 233)",
       "scoring": "centre"
     },
     {
+      "id": "dsb-unterhebelrepetierer-50-m",
       "name": "DSB Unterhebelrepetierer 50 m",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
       "scoring": "touch",
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.21 Scheibe Nr. 4 (rows 1.56, 1.57); 1.7.4",
       "category": "lever-action"
     },
     {
+      "id": "dsb-ordonnanzgewehr-100-m",
       "name": "DSB Ordonnanzgewehr 100 m",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
       "scoring": "centre",
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.21 Scheibe Nr. 4 (rows 1.58 O, 1.58 G); 1.8.5",
       "category": "service-rifle"
     },
     {
+      "id": "dsb-gewehr-100-m-gk",
       "name": "DSB Gewehr 100 m GK",
       "distance": {
         "value": 100000,
@@ -1207,137 +1319,150 @@
         "raw": "8,00 mm Gewehr Kaliber > .22 lfb"
       },
       "scoring": "touch",
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 4; 0.11.3.2"
     },
     {
+      "id": "dsb-luntenschlossgewehr-50-m",
       "name": "DSB Luntenschlossgewehr 50 m",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
       "scoring": "centre",
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.21 Scheibe Nr. 4 (row 7.32)"
     },
     {
+      "id": "bds-1201-md-pistole-bis-9-mm",
       "name": "BDS 1201 MD Pistole bis 9 mm",
       "distance": {
         "value": 20000,
         "raw": "5, 10, 15, 20 m"
       },
       "scoring": "touch",
-      "organization": "BDS",
+      "federation": "bds",
       "section": "K 4.04, Z9"
     },
     {
+      "id": "bds-1202-md-pistole-uber-9-mm",
       "name": "BDS 1202 MD Pistole über 9 mm",
       "distance": {
         "value": 20000,
         "raw": "5, 10, 15, 20 m"
       },
       "scoring": "touch",
-      "organization": "BDS",
+      "federation": "bds",
       "section": "K 4.04, Z9"
     },
     {
+      "id": "bds-1205-md-revolver-unter-4-zoll",
       "name": "BDS 1205 MD Revolver unter 4 Zoll",
       "distance": {
         "value": 20000,
         "raw": "5, 10, 15, 20 m"
       },
       "scoring": "touch",
-      "organization": "BDS",
+      "federation": "bds",
       "section": "K 4.04, Z9"
     },
     {
+      "id": "bds-1206-md-revolver-bis-38",
       "name": "BDS 1206 MD Revolver bis .38",
       "distance": {
         "value": 20000,
         "raw": "5, 10, 15, 20 m"
       },
       "scoring": "touch",
-      "organization": "BDS",
+      "federation": "bds",
       "section": "K 4.04, Z9"
     },
     {
+      "id": "bds-1207-md-revolver-uber-38",
       "name": "BDS 1207 MD Revolver über .38",
       "distance": {
         "value": 20000,
         "raw": "5, 10, 15, 20 m"
       },
       "scoring": "touch",
-      "organization": "BDS",
+      "federation": "bds",
       "section": "K 4.04, Z9"
     },
     {
+      "id": "bds-1208-md-revolver-magnum-bis-357",
       "name": "BDS 1208 MD Revolver Magnum bis .357",
       "distance": {
         "value": 20000,
         "raw": "5, 10, 15, 20 m"
       },
       "scoring": "touch",
-      "organization": "BDS",
+      "federation": "bds",
       "section": "K 4.04, Z9"
     },
     {
+      "id": "bds-1209-md-revolver-magnum-uber-357",
       "name": "BDS 1209 MD Revolver Magnum über .357",
       "distance": {
         "value": 20000,
         "raw": "5, 10, 15, 20 m"
       },
       "scoring": "touch",
-      "organization": "BDS",
+      "federation": "bds",
       "section": "K 4.04, Z9"
     },
     {
+      "id": "bds-1210-md-freie-klasse-pistole-revolver-22-5-6-mm-offene-visierung",
       "name": "BDS 1210 MD Freie Klasse Pistole/Revolver .22/5,6 mm offene Visierung",
       "distance": {
         "value": 20000,
         "raw": "5, 10, 15, 20 m"
       },
       "scoring": "touch",
-      "organization": "BDS",
+      "federation": "bds",
       "section": "K 4.04, Z9"
     },
     {
+      "id": "bds-1211-md-freie-klasse-pistole-revolver-mind-30-7-62-mm",
       "name": "BDS 1211 MD Freie Klasse Pistole/Revolver mind. .30/7,62 mm",
       "distance": {
         "value": 20000,
         "raw": "5, 10, 15, 20 m"
       },
       "scoring": "touch",
-      "organization": "BDS",
+      "federation": "bds",
       "section": "K 4.04, Z9"
     },
     {
+      "id": "bds-1212-md-freie-klasse-pistole-revolver-22-5-6-mm-mit-optik",
       "name": "BDS 1212 MD Freie Klasse Pistole/Revolver .22/5,6 mm mit Optik",
       "distance": {
         "value": 20000,
         "raw": "5, 10, 15, 20 m"
       },
       "scoring": "touch",
-      "organization": "BDS",
+      "federation": "bds",
       "section": "K 4.04, Z9"
     },
     {
+      "id": "bds-1214-md-dienst-sportpistole-revolver",
       "name": "BDS 1214 MD Dienst-Sportpistole/-revolver",
       "distance": {
         "value": 20000,
         "raw": "5, 10, 15, 20 m"
       },
       "scoring": "touch",
-      "organization": "BDS",
+      "federation": "bds",
       "section": "K 4.04, Z9"
     },
     {
+      "id": "bds-1224-md-dienstpistole-2",
       "name": "BDS 1224 MD Dienstpistole 2",
       "distance": {
         "value": 20000,
         "raw": "5, 10, 15, 20 m"
       },
       "scoring": "touch",
-      "organization": "BDS",
+      "federation": "bds",
       "section": "K 4.04, Z9"
     }
   ],

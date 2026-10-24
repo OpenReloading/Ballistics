@@ -2,7 +2,7 @@
   "id": "issf-300m-standard-rifle-issf-300m-rifle",
   "discipline": "issf-300m-standard-rifle",
   "face": "issf-300m-rifle",
-  "event": "300m Standard Rifle",
+  "event": "300m-standard-rifle",
   "gauge": {
     "value": 8,
     "raw": "8.00mm"

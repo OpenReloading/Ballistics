@@ -1,7 +1,7 @@
 {
   "id": "dsb-nr12-10m-running-target",
   "name": "Scheibe Nr. 12 a/b (10 m Laufende Scheibe)",
-  "organization": "DSB",
+  "federation": "dsb",
   "rings": [
     {
       "value": 1,
@@ -74,24 +74,26 @@
   },
   "events": [
     {
+      "id": "dsb-laufende-scheibe-10-m",
       "name": "DSB Laufende Scheibe 10 m",
       "distance": {
         "value": 10000,
         "raw": "10 m"
       },
       "scoring": "touch",
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 12 a/b (Teil 0 Seite 69 to 70)",
       "category": "air-rifle"
     },
     {
+      "id": "dsb-laufende-scheibe-10-m-mix",
       "name": "DSB Laufende Scheibe 10 m MIX",
       "distance": {
         "value": 10000,
         "raw": "10 m"
       },
       "scoring": "touch",
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 12 a/b (Teil 0 Seite 69 to 70)",
       "category": "air-rifle"
     }

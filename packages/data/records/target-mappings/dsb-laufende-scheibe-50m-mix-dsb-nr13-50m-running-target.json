@@ -2,7 +2,7 @@
   "id": "dsb-laufende-scheibe-50m-mix-dsb-nr13-50m-running-target",
   "discipline": "dsb-laufende-scheibe-50m-mix",
   "face": "dsb-nr13-50m-running-target",
-  "event": "DSB Laufende Scheibe 50 m MIX",
+  "event": "dsb-laufende-scheibe-50-m-mix",
   "shotCount": 40,
   "provenance": {
     "kind": "published",

@@ -1,7 +1,7 @@
 {
   "id": "bds-z20-25m-intervall",
   "name": "BDS-25m-Intervallscheibe (Z20)",
-  "organization": "BDS",
+  "federation": "bds",
   "rings": [
     {
       "value": 5,
@@ -50,6 +50,7 @@
   },
   "events": [
     {
+      "id": "11xx-25-m-schiessen-teil-intervall-zeitserie",
       "name": "11xx 25 m Schießen, Teil Intervall/Zeitserie",
       "distance": {
         "value": 25000,

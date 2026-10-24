@@ -15,6 +15,7 @@ function currentIds(bundle: Bundle): Record<RenameKind, Set<string>> {
     federations: ids(bundle.federations),
     disciplines: ids(bundle.disciplines),
     'target-mappings': ids(bundle.targetMappings),
+    'caliber-classes': ids(bundle.caliberClasses),
   }
 }
 

@@ -164,7 +164,7 @@ test('one click finds the face: scale, centre and face are set and the holes are
   })
   await goStep(page, 'Scale')
   await expect(page.locator('.detect-step')).toContainText('1 reference')
-  await expect(faceSelect(page)).toHaveValue('issf-10m-air-pistol|10m Air Pistol')
+  await expect(faceSelect(page)).toHaveValue('issf-10m-air-pistol|10m-air-pistol')
   await expect(scoreFace(page)).toHaveValue('issf-10m-air-pistol')
   // the recognised face and event are the same entry of the discipline list
   await expect(page.getByRole('combobox', { name: 'Discipline', exact: true })).toHaveValue(

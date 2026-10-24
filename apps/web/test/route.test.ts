@@ -34,7 +34,13 @@ describe('forwarding route', () => {
     ],
     [
       'the federation, discipline and target mapping lists for ring scoring',
-      ['federations', 'disciplines', 'target-mappings', 'disciplines/issf-50m-pistol'],
+      [
+        'federations',
+        'disciplines',
+        'target-mappings',
+        'caliber-classes',
+        'disciplines/issf-50m-pistol',
+      ],
     ],
     [
       'the manufacturer list and record that label powders and bullets',

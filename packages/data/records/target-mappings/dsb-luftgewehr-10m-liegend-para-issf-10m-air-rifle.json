@@ -2,7 +2,7 @@
   "id": "dsb-luftgewehr-10m-liegend-para-issf-10m-air-rifle",
   "discipline": "dsb-luftgewehr-10m-liegend-para",
   "face": "issf-10m-air-rifle",
-  "event": "DSB Luftgewehr 10 m liegend (Para)",
+  "event": "dsb-luftgewehr-10-m-liegend-para",
   "shotCount": 60,
   "provenance": {
     "kind": "published",

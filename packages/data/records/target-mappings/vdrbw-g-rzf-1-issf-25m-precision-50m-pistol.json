@@ -2,7 +2,7 @@
   "id": "vdrbw-g-rzf-1-issf-25m-precision-50m-pistol",
   "discipline": "vdrbw-g-rzf-1",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "VdRBw G-RZF 1 Repetier-Zielfernrohrgewehr",
+  "event": "vdrbw-g-rzf-1-repetier-zielfernrohrgewehr",
   "shotCount": 20,
   "provenance": {
     "kind": "published",

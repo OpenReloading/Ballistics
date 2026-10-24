@@ -2,7 +2,7 @@
   "id": "bdmp-zfspfg-300m-issf-300m-rifle",
   "discipline": "bdmp-zfspfg-300m",
   "face": "issf-300m-rifle",
-  "event": "BDMP ZFSPFG ZF Schwarzpulverfreigewehr, 300 m",
+  "event": "bdmp-zfspfg-zf-schwarzpulverfreigewehr-300-m",
   "shotCount": 10,
   "provenance": {
     "kind": "published",

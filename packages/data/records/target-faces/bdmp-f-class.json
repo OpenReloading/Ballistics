@@ -1,7 +1,7 @@
 {
   "id": "bdmp-f-class",
   "name": "International F-Class Target (Long Range)",
-  "organization": "BDMP",
+  "federation": "bdmp",
   "rings": [
     {
       "value": 1,
@@ -44,6 +44,7 @@
   },
   "events": [
     {
+      "id": "bdmp-f-class-rifle",
       "name": "BDMP F-Class Rifle",
       "distance": {
         "value": 1000000,

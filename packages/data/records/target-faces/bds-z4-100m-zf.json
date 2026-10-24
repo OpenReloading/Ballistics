@@ -1,7 +1,7 @@
 {
   "id": "bds-z4-100m-zf",
   "name": "BDS-100m-ZF-Scheibe (Z4)",
-  "organization": "BDS",
+  "federation": "bds",
   "rings": [
     {
       "value": 1,
@@ -74,6 +74,7 @@
   },
   "events": [
     {
+      "id": "3102-100-m-praz-psg",
       "name": "3102 100 m Präz. PSG",
       "distance": {
         "value": 100000,
@@ -83,6 +84,7 @@
       "scoring": "touch"
     },
     {
+      "id": "3416-100-m-fertigkeit-zf-gewehr-sl-b-6-4-mm",
       "name": "3416 100 m Fertigkeit ZF-Gewehr SL b. 6,4 mm",
       "distance": {
         "value": 100000,
@@ -92,6 +94,7 @@
       "scoring": "touch"
     },
     {
+      "id": "3420-100-m-fertigkeit-zf-gewehr-sl-u-6-4-mm",
       "name": "3420 100 m Fertigkeit ZF-Gewehr SL ü. 6,4 mm",
       "distance": {
         "value": 100000,

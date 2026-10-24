@@ -14,11 +14,11 @@ export {
 } from '@open-reloading/schema'
 
 /**
- * The ids of the faces of one federation: the faces its disciplines map to and the faces its
- * abbreviation publishes.
+ * The ids of the faces of one federation: the faces its disciplines map to and the faces it
+ * publishes.
  */
 export function federationFaceIds(
-  faces: readonly Pick<TargetFace, 'id' | 'organization'>[],
+  faces: readonly Pick<TargetFace, 'id' | 'federation'>[],
   data: {
     federations: FederationSummary[]
     disciplines: DisciplineSummary[]
@@ -26,12 +26,11 @@ export function federationFaceIds(
   },
   federation: string,
 ): Set<string> {
-  const abbreviation = data.federations.find((f) => f.id === federation)?.abbreviation
   const disciplines = new Set(
     data.disciplines.filter((d) => d.federation === federation).map((d) => d.id),
   )
   return new Set([
     ...data.mappings.filter((m) => disciplines.has(m.discipline)).map((m) => m.face),
-    ...faces.filter((f) => f.organization === abbreviation).map((f) => f.id),
+    ...faces.filter((f) => f.federation === federation).map((f) => f.id),
   ])
 }

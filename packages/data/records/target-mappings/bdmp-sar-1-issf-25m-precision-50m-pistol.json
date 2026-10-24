@@ -2,7 +2,7 @@
   "id": "bdmp-sar-1-issf-25m-precision-50m-pistol",
   "discipline": "bdmp-sar-1",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDMP SAR 1 Single Action Revolver 1",
+  "event": "bdmp-sar-1-single-action-revolver-1",
   "shotCount": 15,
   "provenance": {
     "kind": "published",

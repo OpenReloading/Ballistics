@@ -2,12 +2,14 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { z } from 'zod'
 import { bullet } from './bullet.ts'
+import { caliberClass } from './caliber-class.ts'
 import { cartridge } from './cartridge.ts'
 import { caseCapacity } from './case-capacity.ts'
 import { chronoSession } from './chrono-session.ts'
 import { discipline, federation, targetMapping } from './federation.ts'
 import { firingSeries } from './firing.ts'
 import { load } from './load.ts'
+import { loadTables } from './load-tables.ts'
 import { manufacturer } from './manufacturer.ts'
 import { powder } from './powder.ts'
 import { sourceRecord } from './provenance.ts'
@@ -27,10 +29,12 @@ for (const [name, schema] of Object.entries({
   'case-capacity': caseCapacity,
   'source-record': sourceRecord,
   'firing-series': firingSeries,
+  'load-tables': loadTables,
   'range-firings': rangeFirings,
   'user-data-file': userDataFile,
   'target-sheet': targetSheet,
   'target-face': targetFace,
+  'caliber-class': caliberClass,
   federation,
   discipline,
   manufacturer,

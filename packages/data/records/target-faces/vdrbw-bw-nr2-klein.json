@@ -1,7 +1,7 @@
 {
   "id": "vdrbw-bw-nr2-klein",
   "name": "Scheibe Bundeswehr Nr. 2 klein",
-  "organization": "VdRBw",
+  "federation": "vdrbw",
   "rings": [
     {
       "value": 1,
@@ -79,72 +79,79 @@
   },
   "events": [
     {
+      "id": "vdrbw-g-rm-1-militar-repetiergewehr",
       "name": "VdRBw G-RM 1 Militär-Repetiergewehr",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "9.2.4, 9.2.5 (Scheibe 10.1, Nr. 2 klein, 50 cm)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-g-rm-2-militar-repetiergewehr",
       "name": "VdRBw G-RM 2 Militär-Repetiergewehr",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "9.3.4, 9.3.5 (Scheibe 10.1, Nr. 2 klein, 50 cm)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-g-r-1-repetiergewehr",
       "name": "VdRBw G-R 1 Repetiergewehr",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "9.4.4, 9.4.5 (Scheibe 10.1, Nr. 2 klein, 50 cm)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-g-h-1-halbautomatisches-gewehr",
       "name": "VdRBw G-H 1 Halbautomatisches Gewehr",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "9.5.4, 9.5.5 (Scheibe 10.1, Nr. 2 klein, 50 cm)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-g-h-2-halbautomatisches-gewehr",
       "name": "VdRBw G-H 2 Halbautomatisches Gewehr",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "9.6.4, 9.6.5 (Scheibe 10.1, Nr. 2 klein, 50 cm)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-g-rzf-1-repetier-zielfernrohrgewehr",
       "name": "VdRBw G-RZF 1 Repetier-Zielfernrohrgewehr",
       "distance": {
         "value": 300000,
         "raw": "300 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "9.9.4, 9.9.5 (Scheibe 10.1, Nr. 2 klein, 50 cm)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-g-hzf-1-halbautomatisches-zielfernrohrgewehr",
       "name": "VdRBw G-HZF 1 Halbautomatisches Zielfernrohrgewehr",
       "distance": {
         "value": 300000,
         "raw": "300 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "9.10.4, 9.10.5 (Scheibe 10.1, Nr. 2 klein, 50 cm)",
       "scoring": "touch"
     }

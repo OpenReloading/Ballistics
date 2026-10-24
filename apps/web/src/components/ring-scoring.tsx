@@ -7,7 +7,6 @@ import {
   fromSi,
   type GroupFace,
   type ShotGroup,
-  type TargetFace,
   type TargetSheet,
   toSi,
 } from '@open-reloading/schema'
@@ -22,6 +21,7 @@ import {
   mappingOf,
 } from '../lib/face-disciplines.ts'
 import { compareEvents, compareTargetFaces, federationFaceIds } from '../lib/face-order.ts'
+import type { Face } from '../lib/face-organization.ts'
 import {
   type FaceSummary,
   fetchAllFaces,
@@ -112,11 +112,11 @@ export function useRingScoring({
 }) {
   const { system } = useUnits()
   const [list, setList] = useState<FaceSummary[] | 'loading' | 'error'>('loading')
-  const [all, setAll] = useState<TargetFace[]>([])
+  const [all, setAll] = useState<Face[]>([])
   const [data, setData] = useState<FederationData>()
   /** The federation picked for the Discipline list; undefined: the one of the group's discipline. */
   const [federation, setFederation] = useState<string>()
-  const [faces, setFaces] = useState<Record<string, TargetFace | 'error'>>({})
+  const [faces, setFaces] = useState<Record<string, Face | 'error'>>({})
   /** Ring value of the next mark, and the marks so far, target m. */
   const [ring, setRing] = useState<number>()
   const [marks, setMarks] = useState<FaceMark[]>([])
@@ -463,7 +463,7 @@ export function useRingScoring({
           if (id)
             fetchFace(id).then(
               (f) => {
-                const event = f.events[0]?.name
+                const event = f.events[0]?.id
                 if (event) setFace((x) => (x && x.id === id && !x.event ? { ...x, event } : x))
               },
               () => {},
@@ -488,7 +488,7 @@ export function useRingScoring({
                   ),
                 )
                 .map((e) => ({
-                  value: e.name,
+                  value: e.id,
                   label: `${e.name}${e.gauge ? `, ${mmLength(system, e.gauge.value)}` : ''}`,
                 })),
               { value: '', label: 'Bullet' },

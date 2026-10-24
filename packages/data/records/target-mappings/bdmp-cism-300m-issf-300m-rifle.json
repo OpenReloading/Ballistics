@@ -2,7 +2,7 @@
   "id": "bdmp-cism-300m-issf-300m-rifle",
   "discipline": "bdmp-cism-300m",
   "face": "issf-300m-rifle",
-  "event": "BDMP CISM-Gewehr 300 m",
+  "event": "bdmp-cism-gewehr-300-m",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

@@ -2,7 +2,7 @@
   "id": "bdmp-standard-semi-automatic-pistol-bdmp-1500",
   "discipline": "bdmp-standard-semi-automatic-pistol",
   "face": "bdmp-1500",
-  "event": "BDMP Standard Semi-Automatic Pistol",
+  "event": "bdmp-standard-semi-automatic-pistol",
   "shotCount": 48,
   "provenance": {
     "kind": "published",

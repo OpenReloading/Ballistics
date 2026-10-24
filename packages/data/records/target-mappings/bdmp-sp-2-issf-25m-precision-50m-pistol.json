@@ -2,7 +2,7 @@
   "id": "bdmp-sp-2-issf-25m-precision-50m-pistol",
   "discipline": "bdmp-sp-2",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDMP SP 2 Sportpistole 2",
+  "event": "bdmp-sp-2-sportpistole-2",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

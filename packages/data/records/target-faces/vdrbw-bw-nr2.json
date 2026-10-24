@@ -1,7 +1,7 @@
 {
   "id": "vdrbw-bw-nr2",
   "name": "Scheibe Bundeswehr Nr. 2",
-  "organization": "VdRBw",
+  "federation": "vdrbw",
   "rings": [
     {
       "value": 1,
@@ -79,32 +79,35 @@
   },
   "events": [
     {
+      "id": "vdrbw-g-rm-1-militar-repetiergewehr",
       "name": "VdRBw G-RM 1 Militär-Repetiergewehr",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "9.2.4, 9.2.5 (Scheibe 10.1, Nr. 2, 100 cm)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-g-rm-2-militar-repetiergewehr",
       "name": "VdRBw G-RM 2 Militär-Repetiergewehr",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "9.3.4, 9.3.5 (Scheibe 10.1, Nr. 2, 100 cm)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-g-h-3-halbautomatisches-gewehr",
       "name": "VdRBw G-H 3 Halbautomatisches Gewehr",
       "distance": {
         "value": 100000,
         "raw": "100 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "9.7.4, 9.7.5 (Scheibe 10.1, Nr. 2, 100 cm)",
       "scoring": "touch"
     }

@@ -2,7 +2,7 @@
   "id": "bds-3226-bdmp-nr1-100m",
   "discipline": "bds-3226",
   "face": "bdmp-nr1-100m",
-  "event": "BDS 3226 100 m Intervall SG SL opt. Vis.",
+  "event": "bds-3226-100-m-intervall-sg-sl-opt-vis",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

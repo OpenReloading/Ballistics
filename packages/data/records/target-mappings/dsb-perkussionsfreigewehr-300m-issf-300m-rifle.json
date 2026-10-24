@@ -2,7 +2,7 @@
   "id": "dsb-perkussionsfreigewehr-300m-issf-300m-rifle",
   "discipline": "dsb-perkussionsfreigewehr-300m",
   "face": "issf-300m-rifle",
-  "event": "DSB Perkussionsfreigewehr 300 m",
+  "event": "dsb-perkussionsfreigewehr-300-m",
   "shotCount": 15,
   "provenance": {
     "kind": "published",

@@ -1,7 +1,7 @@
 {
   "id": "bdmp-npa",
   "name": "BDMP-Scheibe Service Pistol NPA",
-  "organization": "BDMP",
+  "federation": "bdmp",
   "rings": [
     {
       "value": 3,
@@ -32,6 +32,7 @@
   },
   "events": [
     {
+      "id": "bdmp-npa-npa-service-pistol",
       "name": "BDMP NPA NPA Service Pistol",
       "distance": {
         "value": 25000,
@@ -41,6 +42,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-npa-service-pistol-carry-gun",
       "name": "BDMP NPA Service Pistol - Carry Gun",
       "distance": {
         "value": 20000,
@@ -50,6 +52,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-npa-service-pistol-pocket-gun",
       "name": "BDMP NPA Service Pistol - Pocket Gun",
       "distance": {
         "value": 15000,
@@ -59,6 +62,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-lar-5-lever-action-rifle-5-lar-npa-b",
       "name": "BDMP LAR 5 Lever Action Rifle 5 (LAR - NPA-B)",
       "distance": {
         "value": 25000,

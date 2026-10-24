@@ -3,7 +3,8 @@ import type { TargetFace } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { scoredHoleDiameter, scoreGroupOnFace, scoreShot } from '../src/lib/ring-scoring.ts'
 
-const faces = readRecords().bundle.targetFaces
+const { bundle } = readRecords()
+const faces = bundle.targetFaces
 const face = (id: string) => faces.find((f) => f.id === id) as TargetFace
 
 const mm = 1e-3
@@ -51,7 +52,7 @@ describe('DSB Sportordnung 01.01.2026, 0.20 Scheibe Nr. 2 and Nr. 8', () => {
     const event = rifle.events.find((e) => e.name === 'DSB Gewehr 300 m')
     // measuring ring 8.00 mm for rifles above .22 lfb
     expect(event?.gauge?.value).toBe(8)
-    expect(event?.organization).toBe('DSB')
+    expect(event?.federation).toBe('dsb')
     expect(scoreShot(rifle, at(50 + 4), 8 * mm).value).toBe(10)
     expect(scoreShot(rifle, at(50 + 4 + off), 8 * mm).value).toBe(9)
   })
@@ -144,7 +145,7 @@ describe('DSU Sporthandbuch 2018, DSU-Scheibe 200 Meter Präzision (Seite 19, PD
     // no bullet size needed: the hole size does not enter
     const scored = scoreGroupOnFace(
       f,
-      { id: f.id, event: event?.name },
+      { id: f.id, event: event?.id },
       { shots: [at(47.5)] },
       undefined,
     )
@@ -222,7 +223,7 @@ describe('VdRBw Schießsportordnung, 10.3 Pistolen- und Gewehrscheibe (Seite 98,
     const event = face('issf-25m-precision-50m-pistol').events.find(
       (e) => e.name === 'VdRBw P-D 1 Halbautomatische Dienstpistole Präzision',
     )
-    expect(event).toMatchObject({ organization: 'VdRBw', section: '8.2.5, 8.2.6 (Scheibe 10.3)' })
+    expect(event).toMatchObject({ federation: 'vdrbw', section: '8.2.5, 8.2.6 (Scheibe 10.3)' })
     expect(event?.distance.value).toBe(25000)
   })
 })
@@ -235,12 +236,14 @@ describe('national events', () => {
           expect(f.id).toMatch(/^vdrbw-bw-nr2/)
   })
 
-  it('have names unique within a face, and one of another organization carries that organization', () => {
+  it('have names and ids unique within a face, and one of another federation carries its abbreviation', () => {
+    const abbreviation = new Map(bundle.federations.map((x) => [x.id, x.abbreviation]))
     for (const f of faces) {
       expect(new Set(f.events.map((e) => e.name)).size).toBe(f.events.length)
+      expect(new Set(f.events.map((e) => e.id)).size).toBe(f.events.length)
       for (const e of f.events) {
-        if (e.organization) expect(e.name.startsWith(`${e.organization} `)).toBe(true)
-        if (e.organization && e.organization !== f.organization) expect(e.section).toBeDefined()
+        if (e.federation) expect(e.name.startsWith(`${abbreviation.get(e.federation)} `)).toBe(true)
+        if (e.federation && e.federation !== f.federation) expect(e.section).toBeDefined()
       }
     }
   })

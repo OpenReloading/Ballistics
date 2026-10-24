@@ -2,7 +2,7 @@
   "id": "dsb-muskete-50m-dsb-nr6-musket-50m",
   "discipline": "dsb-muskete-50m",
   "face": "dsb-nr6-musket-50m",
-  "event": "DSB Muskete 50 m",
+  "event": "dsb-muskete-50-m",
   "shotCount": 15,
   "provenance": {
     "kind": "published",

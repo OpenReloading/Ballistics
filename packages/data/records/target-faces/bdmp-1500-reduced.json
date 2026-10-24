@@ -1,7 +1,7 @@
 {
   "id": "bdmp-1500-reduced",
   "name": "BDMP-Scheibe BDMP 1500 reduziert",
-  "organization": "BDMP",
+  "federation": "bdmp",
   "rings": [
     {
       "value": 7,
@@ -56,6 +56,7 @@
   },
   "events": [
     {
+      "id": "bdmp-dks-2-1020-dynamisches-kleinkaliberschiessen-2-1020",
       "name": "BDMP DKS 2 1020 Dynamisches Kleinkaliberschießen 2 1020",
       "distance": {
         "value": 25000,
@@ -65,6 +66,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-bdmp-1500-carbine",
       "name": "BDMP BDMP 1500 Carbine",
       "distance": {
         "value": 50000,

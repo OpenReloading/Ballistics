@@ -93,7 +93,6 @@ describe('readRecords', () => {
           title: 'T',
           retrieved: '2026-01-01',
         },
-        'old.csv': { maker: 'test-manufacturer', title: 'O', retrieved: '2026-01-01' },
       })
     })
     expect(errors).toContain(
@@ -105,7 +104,6 @@ describe('readRecords', () => {
     expect(errors).toContain(
       'load-tables.json: test.csv: unknown manufacturer "missing-table-manufacturer"',
     )
-    expect(errors).toContain('load-tables.json: old.csv: needs a manufacturer id')
   })
 
   it('resolves source references with the parts of the record', () => {
@@ -163,6 +161,54 @@ describe('readRecords', () => {
 })
 
 describe('readLoadTables', () => {
+  const read = (file: unknown) => {
+    const dir = mkdtempSync(join(tmpdir(), 'load-tables-'))
+    try {
+      writeFileSync(join(dir, 'load-tables.json'), JSON.stringify(file))
+      const errors: string[] = []
+      const tables = readLoadTables(dir, errors)
+      let thrown: string | undefined
+      try {
+        readLoadTables(dir)
+      } catch (e) {
+        thrown = (e as Error).message
+      }
+      return { errors, tables, thrown }
+    } finally {
+      rmSync(dir, { recursive: true })
+    }
+  }
+  const table = {
+    manufacturer: 'example',
+    title: 'T',
+    url: 'https://example.com',
+    retrieved: '2026-01-01',
+  }
+
+  it('keeps the entries that match the schema and reports the others by row file and field', () => {
+    const { errors, tables, thrown } = read({
+      'good.csv': table,
+      'no-maker.csv': { title: 'O', retrieved: '2026-01-01' },
+      'extra.csv': { ...table, maker: 'example' },
+      'bad-date.csv': { ...table, retrieved: 'January' },
+      'bad-url.csv': { ...table, url: 'not a url' },
+      'bad-id.csv': { ...table, manufacturer: 'Example Inc' },
+    })
+    expect(Object.keys(tables)).toEqual(['good.csv'])
+    expect(errors.map((e) => e.split(': ').slice(0, 2).join(': '))).toEqual([
+      'load-tables.json: no-maker.csv.manufacturer',
+      'load-tables.json: extra.csv',
+      'load-tables.json: bad-date.csv.retrieved',
+      'load-tables.json: bad-url.csv.url',
+      'load-tables.json: bad-id.csv.manufacturer',
+    ])
+    expect(thrown).toContain('load-tables.json: no-maker.csv.manufacturer')
+  })
+
+  it('rejects a file that is no object of tables', () => {
+    expect(read([table]).errors).toEqual(['load-tables.json: not an object of tables by row file'])
+  })
+
   it('names load-tables.json when it is not JSON', () => {
     const dir = mkdtempSync(join(tmpdir(), 'load-tables-'))
     try {

@@ -11,6 +11,7 @@ export const renameKind = z.enum([
   'federations',
   'disciplines',
   'target-mappings',
+  'caliber-classes',
 ])
 
 /** A kind directory of {@link renameKind}. */

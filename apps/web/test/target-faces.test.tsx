@@ -133,12 +133,12 @@ it('gives one row per face event: its discipline where a mapping names it, else 
 it('keeps an event without a mapping and one row per mapping of an event mapped twice', () => {
   const [a, b] = precision.events
   const twice = [
-    { id: 'x', discipline: 'x', event: a.name },
-    { id: 'y', discipline: 'y', event: a.name },
+    { id: 'x', discipline: 'x', event: a.id },
+    { id: 'y', discipline: 'y', event: a.id },
   ]
   const rows = faceEventRows({ organization: 'ISSF', events: [a, b] }, twice, [], [])
   expect(rows.map((r) => [r.id, r.discipline])).toEqual([
-    [b.name, b.name],
+    [b.id, b.name],
     ['x', a.name],
     ['y', a.name],
   ])
@@ -175,6 +175,7 @@ it('orders the discipline rows by federation, then the federation code, then dis
   const [a] = precision.events
   const event = (name: string, metres: number) => ({
     ...a,
+    id: name,
     name,
     distance: { value: metres * 1000 },
   })
@@ -187,7 +188,7 @@ it('orders the discipline rows by federation, then the federation code, then dis
   ]
   const rows = faceEventRows(
     { organization: 'ISSF', events },
-    events.map((e, i) => ({ id: `m${i}`, discipline: `d${i + 1}`, event: e.name })),
+    events.map((e, i) => ({ id: `m${i}`, discipline: `d${i + 1}`, event: e.id })),
     disciplines,
     [
       { id: 'bds', name: 'BDS', abbreviation: 'BDS' },

@@ -2,7 +2,7 @@
   "id": "bds-2106-issf-50m-rifle",
   "discipline": "bds-2106",
   "face": "issf-50m-rifle",
-  "event": "BDS 2106 50 m Präz. DSG gK und Diopter KK",
+  "event": "bds-2106-50-m-praz-dsg-gk-und-diopter-kk",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

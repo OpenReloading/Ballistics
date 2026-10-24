@@ -1,6 +1,7 @@
 import { leastSpecValue } from '@open-reloading/core'
 import {
   type Bullet,
+  type CaliberClass,
   type Cartridge,
   type CaseType,
   compareKeys,
@@ -15,6 +16,7 @@ import {
 } from '@open-reloading/schema'
 import type {
   BulletItem,
+  CaliberClassItem,
   CartridgeItem,
   DisciplineItem,
   FederationItem,
@@ -187,20 +189,21 @@ export const bulletRow = (b: Bullet, m: Manufacturer): IndexRow<BulletItem> => (
 const distinct = (values: (string | undefined)[]) =>
   [...new Set(values.filter((v) => v !== undefined))].sort()
 
-/** The index row of a target face, with the disciplines mapped to it (their caliber classes and categories). */
+/** The index row of a target face, with the disciplines mapped to it (their caliber classes and categories) and its federation. */
 export const targetFaceRow = (
   f: TargetFace,
   disciplines: readonly Discipline[],
+  federation?: Federation,
 ): IndexRow<TargetFaceItem> => ({
   item: {
     id: f.id,
-    organization: f.organization,
+    ...compact({ federation: f.federation, organization: federation?.abbreviation }),
     name: f.name,
     caliberClasses: distinct(disciplines.flatMap((d) => d.caliberClasses?.ids ?? [])),
     categories: distinct([...f.events, ...disciplines].map((e) => e.category)),
   },
-  sortKey: sortKey(f.organization, f.name),
-  search: searchKey([f.organization, f.name], f.name),
+  sortKey: sortKey(f.federation ?? '', f.name),
+  search: searchKey([federation?.abbreviation, f.name], f.name),
 })
 
 /** The index row of a federation. */
@@ -238,6 +241,13 @@ export const targetMappingRow = (m: TargetMapping): IndexRow<TargetMappingItem> 
   },
   sortKey: sortKey(m.id),
   search: searchKey([m.id, m.event]),
+})
+
+/** The index row of a caliber class. */
+export const caliberClassRow = (c: CaliberClass): IndexRow<CaliberClassItem> => ({
+  item: { id: c.id, name: c.name, diameterMm: c.diameter.value },
+  sortKey: sortKey(c.name),
+  search: searchKey([c.name]),
 })
 
 /** Rows in the order of their sort keys, ties by id. */
