@@ -134,6 +134,9 @@ export const userDataFile = z.object({
     .optional(),
 })
 
+/** Records of a user data file, as {@link checkUserRefs} takes them. */
+export type UserRecords = UserRecord[]
+
 /** A reference of a user record that points at no record of the set given to {@link checkUserRefs}. */
 export interface DanglingRef {
   /** Id of the record that holds the reference. */
@@ -151,7 +154,7 @@ export interface DanglingRef {
  * state's `firearm` and a target sheet's `load`. An old id and a `user:<id>` reference name a
  * record by its id, a `catalogue:` reference is not checked here. Reports only: nothing is dropped.
  */
-export function checkUserRefs(records: UserRecord[]): DanglingRef[] {
+export function checkUserRefs(records: UserRecords): DanglingRef[] {
   const kindOf = new Map(records.map((r) => [r.id, r.kind]))
   const dangling: DanglingRef[] = []
   const check = (
