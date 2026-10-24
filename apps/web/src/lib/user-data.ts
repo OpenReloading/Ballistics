@@ -1,5 +1,6 @@
 /** The user data file: its text, parsing and validation, and import planning against the browser store. */
 import {
+  checkUserRefs,
   type EmbeddedFile,
   type UserRecord,
   userDataFile,
@@ -176,4 +177,18 @@ export function planImport(incoming: UserRecord[], stored: UserRecord[]) {
     else conflicts.push({ incoming: r, stored: s })
   }
   return { added, equal, conflicts }
+}
+
+/**
+ * The references of `opened` that point at no record of `opened` and `stored` (browser records
+ * with another id), as one sentence; empty when all resolve.
+ */
+export function refNote(opened: UserRecord[], stored: UserRecord[]): string {
+  const ids = new Set(opened.map((r) => r.id))
+  const name = new Map(opened.map((r) => [r.id, r.name]))
+  const all = [...opened, ...stored.filter((r) => !ids.has(r.id))]
+  const lines = checkUserRefs(all)
+    .filter((d) => ids.has(d.record))
+    .map((d) => `${name.get(d.record)}: the ${d.field} ${d.target} is not in this browser`)
+  return lines.length ? `Not found: ${lines.join('; ')}.` : ''
 }
