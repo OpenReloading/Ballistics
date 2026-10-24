@@ -1,6 +1,8 @@
 /**
- * `POST /interior/load-file` input: the workbench load file as Save writes it, read
- * to the `POST /interior` body. The field mapping is `interiorLoad` of core, the one the
+ * `POST /interior/load-file` input: a load file (one record of kind `load`), read
+ * to the `POST /interior` body. A value the workbench leaves out because its Settings, followed
+ * defaults or seating give it (temperature, volume, bore diameter, twist, travel) is not
+ * filled here: the route answers 400 at its path. The field mapping is `interiorLoad` of core, the one the
  * workbench uses; this module adds the file check, the values the referenced records give and
  * the record lookups.
  */
