@@ -34,7 +34,7 @@
         "source": "bds-sporthandbuch-langwaffen-2026",
         "page": "L 3.02, Seite L-21, PDF p. 21",
         "fields": ["number", "distance", "category", "caliberClasses"],
-        "note": "The table further limits the calibre to an original version of the rifle type."
+        "note": "The table further limits the calibre to an original version of the rifle type. The handbook marks the discipline optional (O) (L 1.23)."
       }
     ]
   }

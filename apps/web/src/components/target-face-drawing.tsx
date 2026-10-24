@@ -1,5 +1,15 @@
-import { type FaceShape, targetFaceFigure } from '@openreloading/drawing/target'
+import { type FaceEllipse, type FaceShape, targetFaceFigure } from '@openreloading/drawing/target'
 import type { TargetFace } from '@openreloading/schema'
+
+type Paint = { fill?: string; stroke?: string; vectorEffect?: 'non-scaling-stroke' }
+
+// a square ring is a rectangle, any other an ellipse
+const Outline = ({ e, ...paint }: { e: FaceEllipse } & Paint) =>
+  e.square ? (
+    <rect x={-e.rx} y={-e.ry} width={2 * e.rx} height={2 * e.ry} {...paint} />
+  ) : (
+    <ellipse rx={e.rx} ry={e.ry} {...paint} />
+  )
 
 /**
  * A face drawn from `targetFaceFigure`, face mm as SVG units. Paper colours in both themes: it
@@ -16,18 +26,12 @@ export function TargetFaceFigure({ shape, label }: { shape: FaceShape; label: st
     >
       {zones.map((z, i) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: a fixed list in drawing order, rings may share a size
-        <ellipse key={i} rx={z.rx} ry={z.ry} fill={z.colour} />
+        <Outline key={i} e={z} fill={z.colour} />
       ))}
       <g fill="none" strokeWidth={1}>
         {lines.map((l, i) => (
-          <ellipse
-            // biome-ignore lint/suspicious/noArrayIndexKey: a fixed list in drawing order, rings may share a size
-            key={i}
-            rx={l.rx}
-            ry={l.ry}
-            stroke={l.colour}
-            vectorEffect="non-scaling-stroke"
-          />
+          // biome-ignore lint/suspicious/noArrayIndexKey: a fixed list in drawing order, rings may share a size
+          <Outline key={i} e={l} stroke={l.colour} vectorEffect="non-scaling-stroke" />
         ))}
       </g>
     </svg>

@@ -133,6 +133,17 @@ describe('the draft file', () => {
     const bad = { ...d, fields: { ...d.fields, [key]: fieldValueFromText('length', metric, '-3') } }
     expect(fileData(bad).rings[0]).not.toHaveProperty('diameter')
   })
+
+  it('leaves out a ring value that is not a whole number, as the schema requires', () => {
+    const d = draft()
+    const key = `ring.${d.rows[0].id}.value`
+    const set = (text: string) => ({
+      ...d,
+      fields: { ...d.fields, [key]: fieldValueFromText('ratio', metric, text) },
+    })
+    expect(fileData(set('1.5')).rings[0]).not.toHaveProperty('value')
+    expect(fileData(set('7')).rings[0].value).toBe(7)
+  })
 })
 
 describe('the drawing', () => {

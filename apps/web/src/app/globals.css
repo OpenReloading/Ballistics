@@ -2601,6 +2601,13 @@ td.nowrap {
   font-size: var(--mantine-font-size-sm);
 }
 
+.file-error {
+  margin: 0.25rem 0 0.75rem;
+  color: var(--muted);
+  font-size: var(--mantine-font-size-sm);
+  white-space: pre-wrap;
+}
+
 .file-state[data-dirty] {
   color: var(--mantine-color-text);
   font-weight: 600;

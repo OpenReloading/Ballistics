@@ -65,7 +65,8 @@
       {
         "source": "bds-sporthandbuch-zielscheiben-2025",
         "fields": ["name", "rings", "innerTen.diameter", "blackDiameter"],
-        "page": "Z20 (printed Z-20, PDF p. 21)"
+        "page": "Z20 (printed Z-20, PDF p. 21)",
+        "note": "Ten 100 mm and ring width 40 mm give ring 9 at 180 mm, but the printed mirror (rings 9 to 10) is 200 mm. The record keeps the ring computed from the width and stores the printed mirror as the black diameter."
       },
       {
         "source": "bds-sporthandbuch-kommentar-2026",

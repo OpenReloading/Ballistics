@@ -1,0 +1,48 @@
+{
+  "id": "bds-1211",
+  "federation": "bds",
+  "name": "MD Freie Klasse Pistole/Revolver mind. .30/7,62 mm",
+  "number": "1211",
+  "section": "K 4.01",
+  "page": "Seite K-16, PDF p. 16",
+  "distance": {
+    "value": 20000,
+    "raw": "5, 10, 15, 20 m"
+  },
+  "caliberClasses": {
+    "ids": [
+      "pistol-7-65",
+      "revolver-32",
+      "pistol-9mm",
+      "revolver-357-38",
+      "pistol-9x18",
+      "pistol-40-10mm",
+      "revolver-41",
+      "revolver-44",
+      "pistol-45",
+      "revolver-45-colt"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "page": "K 4.01, Seite K-16, PDF p. 16",
+        "fields": ["name", "number", "federation", "section", "page"]
+      },
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "page": "K 4.06, K 4.07, Seite K-17 and K-18, PDF pp. 17 and 18",
+        "fields": ["distance"],
+        "note": "The discipline is shot at 5, 10, 15 and 20 m; the record holds the farthest distance and the raw text lists all."
+      },
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "page": "K 4.01, Seite K-16, PDF p. 16",
+        "fields": ["caliberClasses"]
+      }
+    ]
+  }
+}

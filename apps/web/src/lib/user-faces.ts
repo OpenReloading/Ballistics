@@ -1,5 +1,10 @@
 /** The face a user's design builds for the tools: its id, organization and the face schema's checks. */
-import { type TargetFace, type TargetFaceDesign, targetFace } from '@openreloading/schema'
+import {
+  recordIdRegex,
+  type TargetFace,
+  type TargetFaceDesign,
+  targetFace,
+} from '@openreloading/schema'
 
 /** The owner of a built face: it names the face as the user's own in the tools' lists. */
 export const userOrganization = 'User design'
@@ -7,17 +12,28 @@ export const userOrganization = 'User design'
 /** The prefix of the id a design's face has in the tools. */
 export const faceIdPrefix = 'user-'
 
+/** A 32-bit FNV-1a hash of `text` in base 36. */
+const hash = (text: string) => {
+  let h = 0x811c9dc5
+  for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 0x01000193)
+  return (h >>> 0).toString(36)
+}
+
 /**
- * The id of the face a record builds: `user-` and the record id as a face id, lowercase letters and
- * digits in groups joined by hyphens (the face schema's rule; a record id may hold any character).
+ * The id of the face a record builds: `user-` and the record id. An id that is no record id (a
+ * record id may hold any character) is cut to lowercase letters and digits in groups joined by
+ * hyphens, as the face schema requires, and gets a hash of the whole id so that `a_b` and `a-b`
+ * keep two faces.
  */
 export const userFaceId = (recordId: string) =>
-  `${faceIdPrefix}${
-    recordId
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '') || 'design'
-  }`
+  recordIdRegex.test(recordId)
+    ? `${faceIdPrefix}${recordId}`
+    : `${faceIdPrefix}${
+        recordId
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-|-$/g, '') || 'design'
+      }-${hash(recordId)}`
 
 /** The face the data builds, or why it is none, as issues of the face schema by path. */
 export function buildFace(

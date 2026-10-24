@@ -29,6 +29,7 @@ export interface BulletValues {
     cavityDiameter?: StoredQuantity
   }
   ogive?: { form?: string; radius?: StoredQuantity; radiusRatio?: StoredQuantity }
+  cannelure?: { start: StoredQuantity; width: StoredQuantity; depth?: StoredQuantity }
   tip?: { type: string; length?: StoredQuantity; mouthDiameter?: StoredQuantity }
   provenance: { sources: { title: string; fields?: string[] }[] }
 }
@@ -80,6 +81,11 @@ export function bulletDimensions(r: BulletValues): BulletDimensions | undefined 
     ...(r.ogive.radius && { radius: r.ogive.radius.value }),
     ...(r.ogive.radiusRatio && { radiusRatio: r.ogive.radiusRatio.value }),
   }
+  const cannelure = r.cannelure && {
+    start: r.cannelure.start.value,
+    width: r.cannelure.width.value,
+    ...(r.cannelure.depth && { depth: r.cannelure.depth.value }),
+  }
   const tip = r.tip && {
     type: r.tip.type,
     ...(r.tip.length && { length: r.tip.length.value }),
@@ -94,6 +100,7 @@ export function bulletDimensions(r: BulletValues): BulletDimensions | undefined 
     ...(r.meplatDiameter && { meplatDiameter: r.meplatDiameter.value }),
     ...(base && { base }),
     ...(ogive && { ogive }),
+    ...(cannelure && { cannelure }),
     ...(tip && { tip }),
   }
 }

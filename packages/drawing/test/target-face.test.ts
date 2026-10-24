@@ -32,6 +32,16 @@ describe('targetFaceFigure', () => {
     expect(lines[1]).toMatchObject({ rx: 40, ry: 60 })
   })
 
+  it('draws a square ring as a rectangle of half its edge', () => {
+    const { zones, lines } = targetFaceFigure({
+      ...flat,
+      rings: flat.rings.map((r) => ({ ...r, shape: 'square' as const })),
+    })
+    expect(lines[0]).toMatchObject({ rx: 50, ry: 50, square: true })
+    expect(zones[0]).toMatchObject({ square: true })
+    expect(targetFaceFigure(flat).lines[0]).not.toHaveProperty('square')
+  })
+
   it('fills the black area, or each ring in its colour when the rings have one', () => {
     expect(targetFaceFigure(flat).zones.map((z) => [z.colour, z.rx])).toEqual([
       ['white', 50],

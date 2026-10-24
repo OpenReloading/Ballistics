@@ -1,9 +1,11 @@
 import { face } from '@openreloading/drawing'
 import { bulletFigureModel, bulletOutline } from '@openreloading/drawing/bullet'
+import { bullet } from '@openreloading/schema'
 import { describe, expect, it } from 'vitest'
 import { computedBulletRows } from '../src/lib/bullet.ts'
 import {
   type Action,
+  choiceOptions,
   type Design,
   designerSpecs,
   designShape,
@@ -22,6 +24,21 @@ import { seededRandom } from '../src/lib/ellipse.ts'
 import { fieldValueFromText } from '../src/lib/field-spec.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import { matchBullet, targetBullet } from './fixtures/bullets.ts'
+
+describe('choice lists', () => {
+  it('are subsets of the record schema enums', () => {
+    const schema = {
+      'base.type': bullet.shape.base.unwrap().shape.type.unwrap().options,
+      'ogive.form': bullet.shape.ogive.unwrap().shape.form.unwrap().options,
+      'tip.type': bullet.shape.tip.unwrap().shape.type.options,
+    }
+    for (const [key, options] of Object.entries(choiceOptions)) {
+      expect(options.length).toBeGreaterThan(0)
+      for (const o of options) expect(schema[key as keyof typeof schema]).toContain(o)
+    }
+    expect(Object.keys(choiceOptions)).toEqual(Object.keys(schema))
+  })
+})
 
 const metric = presetUnits('metric-grams')
 const us = presetUnits('us')

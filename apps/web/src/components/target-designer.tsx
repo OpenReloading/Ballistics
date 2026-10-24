@@ -106,7 +106,7 @@ export function TargetDesigner() {
       () => current.current === p.record.id && setKept('failed'),
     )
   }, [])
-  // saved 400 ms after the last change, and when the page goes
+  // saved 400 ms after the last change, and when the page is hidden or goes
   // biome-ignore lint/correctness/useExhaustiveDependencies: the key stands for the name and the data
   useEffect(() => {
     if (key === stored.current.key) {
@@ -129,8 +129,12 @@ export function TargetDesigner() {
     return () => clearTimeout(timer.current)
   }, [key, recordId])
   useEffect(() => {
+    // a write begun in pagehide can be aborted with the page: hidden comes while it is still live
+    const hidden = () => document.visibilityState === 'hidden' && flush()
+    document.addEventListener('visibilitychange', hidden)
     window.addEventListener('pagehide', flush)
     return () => {
+      document.removeEventListener('visibilitychange', hidden)
       window.removeEventListener('pagehide', flush)
       flush()
     }

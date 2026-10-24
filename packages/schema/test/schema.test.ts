@@ -3,6 +3,7 @@ import { z } from 'zod'
 import {
   bullet,
   cartridge,
+  caseTypes,
   chronoSession,
   firingSeries,
   load,
@@ -178,6 +179,12 @@ describe('rangeFirings', () => {
   })
 })
 
+describe('caseTypes', () => {
+  it('lists the case heads of the API', () => {
+    expect(caseTypes.options).toEqual(['rimless', 'semi-rimmed', 'rimmed', 'rebated', 'belted'])
+  })
+})
+
 describe('bullet', () => {
   const base = {
     id: 'test-bullet-1',
@@ -214,6 +221,24 @@ describe('bullet', () => {
     const unnamed = { ...base, ogive: { radiusRatio: { value: 0.5 } } }
     expect(bullet.parse(unnamed)).toEqual(unnamed)
     expect(bullet.parse(hollow)).toEqual(hollow)
+  })
+
+  it('accepts the round and flat nose forms and a cannelure', () => {
+    for (const form of ['round-nose', 'flat-nose']) {
+      expect(bullet.safeParse({ ...base, ogive: { form } }).success).toBe(true)
+    }
+    const grooved = { ...base, cannelure: { start: { value: 9 }, width: { value: 1.2 } } }
+    expect(bullet.parse(grooved)).toEqual(grooved)
+    const deep = {
+      ...base,
+      cannelure: { start: { value: 9 }, width: { value: 1.2 }, depth: { value: 0.2 } },
+    }
+    expect(bullet.parse(deep)).toEqual(deep)
+    expect(bullet.safeParse({ ...base, cannelure: { start: { value: 9 } } }).success).toBe(false)
+    expect(
+      bullet.safeParse({ ...base, cannelure: { start: { value: 9 }, width: { value: 0 } } })
+        .success,
+    ).toBe(false)
   })
 
   it('carries the unit of each geometry field in the JSON Schema', () => {

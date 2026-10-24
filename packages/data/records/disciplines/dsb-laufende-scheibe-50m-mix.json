@@ -1,0 +1,36 @@
+{
+  "id": "dsb-laufende-scheibe-50m-mix",
+  "federation": "dsb",
+  "name": "Laufende Scheibe 50 m MIX",
+  "number": "4.25",
+  "section": "0.21",
+  "page": "Teil 0 Seite 84, PDF p. 102",
+  "distance": {
+    "value": 50000,
+    "raw": "50 m"
+  },
+  "category": "rifle",
+  "caliberClasses": {
+    "ids": ["rimfire-22"],
+    "basis": "stated"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 84, PDF p. 102 (row 4.25)",
+        "fields": [
+          "name",
+          "number",
+          "federation",
+          "section",
+          "page",
+          "distance",
+          "category",
+          "caliberClasses"
+        ]
+      }
+    ]
+  }
+}

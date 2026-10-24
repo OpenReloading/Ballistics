@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-epp-polymer-pistol",
+  "federation": "bdmp",
+  "name": "EPP - Polymerpistole",
+  "section": "C.17.A",
+  "page": "Teil C, Seite 123 bis 129 von 142, PDF pp. 123 to 129",
+  "distance": {
+    "value": 25000,
+    "raw": "25 m"
+  },
+  "category": "pistol",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.17.A, C.17.A.1, Teil C, Seite 123 von 142, PDF p. 123",
+        "fields": ["name", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.17.A.14, Teil C, Seite 125 von 142, PDF p. 125",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "Series polymer pistols in 9 mm Luger. The course is that of EPP, with station 2 at 25 m standing instead of 30 m prone (C.17.A.14). EPP Polymer Optical Sight (C.17.A.19, Teil C, PDF p. 129) is scored separately. The record holds the longest distance."
+  }
+}

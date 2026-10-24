@@ -2,8 +2,9 @@
   "id": "dsb-gewehr-300m",
   "federation": "dsb",
   "name": "Gewehr 300 m",
-  "section": "0.20",
-  "page": "Seite 62 and 65, PDF pp. 80 and 83",
+  "number": "1.50/1.53/1.59/1.70/1.90/1.95",
+  "section": "0.21",
+  "page": "Teil 0 Seite 77 to 79, PDF pp. 95 to 97",
   "distance": {
     "value": 300000,
     "raw": "300 m"
@@ -13,9 +14,14 @@
     "kind": "published",
     "sources": [
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "page": "Seite 62 and 65, PDF pp. 80 and 83",
-        "fields": ["name", "federation", "section", "page", "distance", "category"]
+        "fields": ["name", "federation", "category"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "Teil 0 Seite 77 to 79, PDF pp. 95 to 97 (rows 1.50, 1.53, 1.59, 1.70, 1.90 and 1.95, the 300 m rifle disciplines on Scheibe Nr. 5)",
+        "fields": ["number", "section", "page", "distance"]
       }
     ]
   }

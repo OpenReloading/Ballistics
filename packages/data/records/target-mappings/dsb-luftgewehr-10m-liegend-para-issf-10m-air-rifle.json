@@ -1,0 +1,23 @@
+{
+  "id": "dsb-luftgewehr-10m-liegend-para-issf-10m-air-rifle",
+  "discipline": "dsb-luftgewehr-10m-liegend-para",
+  "face": "issf-10m-air-rifle",
+  "event": "DSB Luftgewehr 10 m liegend (Para)",
+  "shotCount": 60,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 76, PDF p. 94 (row 1.10, column Scheibe Nr.: 1); 0.20 Scheibe Nr. 1, Teil 0 Seite 63, PDF p. 81",
+        "fields": ["discipline", "face", "event"],
+        "note": "Row 1.18 of 10.12 names no face; the air rifle row 1.10 uses Scheibe Nr. 1."
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "10.12, Teil 10 Seite 15, PDF p. 435 (row 1.18, Schusszahl 60)",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

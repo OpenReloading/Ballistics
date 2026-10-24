@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-distinguished-revolver-match",
+  "federation": "bdmp",
+  "name": "Distinguished Revolver Match",
+  "section": "C.9.5",
+  "page": "Teil C, Seite 63 bis 64 von 142, PDF pp. 63 to 64",
+  "distance": {
+    "value": 50000,
+    "raw": "50 Meter/Yards"
+  },
+  "category": "revolver",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.9.5, C.9.5.1, Teil C, Seite 63 von 142, PDF p. 63",
+        "fields": ["name", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.2, Teil C, Seite 42 bis 43 von 142, PDF pp. 42 to 43",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "Metres or yards."
+  }
+}

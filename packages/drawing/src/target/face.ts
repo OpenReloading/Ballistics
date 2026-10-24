@@ -9,6 +9,8 @@ export interface FaceRing {
   diameter: FaceLength
   /** Height of an oval ring; absent: a circle. */
   height?: FaceLength
+  /** `square`: a square of edge `diameter`; absent or `circle`: a circle or oval. */
+  shape?: 'circle' | 'square'
   fill?: string
   line?: string
 }
@@ -22,10 +24,12 @@ export interface FaceShape {
   blackHeight?: FaceLength
 }
 
-/** An ellipse centred on the scoring centre, radii in mm. */
+/** An ellipse, or a rectangle when `square`, centred on the scoring centre, radii in mm. */
 export interface FaceEllipse {
   rx: number
   ry: number
+  /** The shape is a rectangle of half-width `rx` and half-height `ry`, not an ellipse. */
+  square?: true
   /** Ring value of the ring the ellipse is drawn for; absent for the paper, the black area and the inner ten. */
   ring?: number
   /** A colour name of the face record, or `white` and `black`. */
@@ -42,11 +46,18 @@ export interface FaceFigure {
   lines: FaceEllipse[]
 }
 
-const ellipse = (d: number, height: number | undefined, colour: string, ring?: number) => ({
+const ellipse = (
+  d: number,
+  height: number | undefined,
+  colour: string,
+  ring?: number,
+  square?: boolean,
+) => ({
   rx: d / 2,
   ry: (height ?? d) / 2,
   colour,
   ...(ring !== undefined && { ring }),
+  ...(square && { square: true as const }),
 })
 
 /**
@@ -73,16 +84,28 @@ export function targetFaceFigure(face: FaceShape): FaceFigure {
   return {
     frame: { x: -w / 2 - pad, y: -h / 2 - pad, width: w + 2 * pad, height: h + 2 * pad },
     zones: [
-      ellipse(w, outer.height?.value, 'white'),
+      ellipse(w, outer.height?.value, 'white', undefined, outer.shape === 'square'),
       ...(fills
         ? face.rings.map((r) =>
-            ellipse(r.diameter.value, r.height?.value, r.fill ?? 'white', r.value),
+            ellipse(
+              r.diameter.value,
+              r.height?.value,
+              r.fill ?? 'white',
+              r.value,
+              r.shape === 'square',
+            ),
           )
         : [ellipse(black, face.blackHeight?.value, 'black')]),
     ],
     lines: [
       ...face.rings.map((r, i) =>
-        ellipse(r.diameter.value, r.height?.value, line(i, r.diameter.value, r.line), r.value),
+        ellipse(
+          r.diameter.value,
+          r.height?.value,
+          line(i, r.diameter.value, r.line),
+          r.value,
+          r.shape === 'square',
+        ),
       ),
       ...(inner
         ? [

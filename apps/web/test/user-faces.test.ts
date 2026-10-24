@@ -28,7 +28,7 @@ beforeEach(() => {
       design('a1', 'Club face', complete),
       design('b2', 'Half done', { rings: [{}], events: [] }),
     ],
-    invalid: 0,
+    invalid: [],
   })
   vi.mocked(apiFetch).mockResolvedValue(Response.json({ items: [listed] }))
 })
@@ -45,10 +45,18 @@ it('lists the designs that build a face after the catalogue faces, as the user o
 it('gives a design with any record id a valid face id', async () => {
   vi.mocked(storedRecords).mockResolvedValue({
     records: [design('My_Face 2', 'Odd id', complete)],
-    invalid: 0,
+    invalid: [],
   })
-  expect(userFaceId('My_Face 2')).toBe('user-my-face-2')
-  expect((await fetchFaceSummaries()).map((f) => f.id)).toContain('user-my-face-2')
+  const id = userFaceId('My_Face 2')
+  expect(id).toMatch(/^user-my-face-2-[a-z0-9]+$/)
+  expect((await fetchFaceSummaries()).map((f) => f.id)).toContain(id)
+})
+
+it('keeps a record id as it is and gives ids that cut alike different faces', () => {
+  expect(userFaceId('a-b')).toBe('user-a-b')
+  expect(userFaceId('a_b')).not.toBe(userFaceId('a-b'))
+  expect(userFaceId('a_b')).not.toBe(userFaceId('a b'))
+  expect(userFaceId('___')).toMatch(/^user-design-/)
 })
 
 it('loads a design as a face of the tools that the photo search skips', async () => {
@@ -64,6 +72,6 @@ it('keeps the designs when the catalogue cannot be fetched', async () => {
   vi.mocked(apiFetch).mockResolvedValue(new Response(null, { status: 503 }))
   expect((await faces.fetchFaceSummaries()).map((f) => f.id)).toEqual(['user-a1'])
   expect((await faces.fetchAllFaces()).map((f) => f.id)).toEqual(['user-a1'])
-  vi.mocked(storedRecords).mockResolvedValue({ records: [], invalid: 0 })
+  vi.mocked(storedRecords).mockResolvedValue({ records: [], invalid: [] })
   await expect(faces.fetchFaceSummaries()).rejects.toThrow('HTTP 503')
 })

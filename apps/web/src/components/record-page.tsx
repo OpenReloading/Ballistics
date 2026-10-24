@@ -1,5 +1,5 @@
+import type { Provenance } from '@openreloading/schema'
 import type { ReactNode } from 'react'
-import type { Provenance } from '../lib/api-types.ts'
 import { PageBar } from './page-bar.tsx'
 import { Panel } from './panel.tsx'
 import { RecordActions } from './record-actions.tsx'

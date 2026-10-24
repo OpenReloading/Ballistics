@@ -8,34 +8,31 @@ import {
   bulletSymbols,
   recordProfile,
 } from '@openreloading/drawing/bullet'
+import type { Bullet } from '@openreloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { bullet } from '../../../packages/schema/src/index.ts'
-import type { BulletRecord } from '../src/lib/api-types.ts'
 import { type Laid, sideRules, textSize } from './drawing-rules.ts'
 
 // next/font is compiled by Next; here the drawing font class is a fixed name
 vi.mock('next/font/local', () => ({ default: () => ({ variable: 'drawing-font', className: '' }) }))
 const { TechnicalDrawing } = await import('../src/components/technical-drawing.tsx')
 
-const records = readRecords().bundle.bullets as BulletRecord[]
+const records = readRecords().bundle.bullets as Bullet[]
 
 /** No committed record has a polymer tip, and only an invented one a flat base: these two are test fixtures. */
 const fixtures = ['bullet-flat-base', 'bullet-polymer-tip'].map(
-  (f) =>
-    JSON.parse(
-      readFileSync(new URL(`fixtures/${f}.json`, import.meta.url), 'utf8'),
-    ) as BulletRecord,
+  (f) => JSON.parse(readFileSync(new URL(`fixtures/${f}.json`, import.meta.url), 'utf8')) as Bullet,
 )
 
 /** The record's stored value of a field by its dot path. */
-const stored = (r: BulletRecord, path: string) =>
+const stored = (r: Bullet, path: string) =>
   path.split('.').reduce<unknown>((o, k) => (o as Record<string, unknown> | undefined)?.[k], r) as
     | { value: number }
     | undefined
 
 /** One laid-out medium of a record's drawing, as the layout rules read it. */
-function laid(r: BulletRecord, p: BulletProfile, medium: 'screen' | 'print') {
+function laid(r: Bullet, p: BulletProfile, medium: 'screen' | 'print') {
   const model = bulletFigureModel(p, medium, medium === 'screen' ? bulletScreenEm(p) : face.printEm)
   const side: Laid = {
     side: 'cartridge',

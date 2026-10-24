@@ -1,0 +1,29 @@
+{
+  "id": "bdmp-epp-pistol",
+  "federation": "bdmp",
+  "name": "Europäischer Präzisions Parcours",
+  "number": "EPP",
+  "section": "C.17",
+  "page": "Teil C, Seite 116 bis 122 von 142, PDF pp. 116 to 122",
+  "distance": {
+    "value": 30000,
+    "raw": "30 m"
+  },
+  "category": "pistol",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.17, C.17.1, Teil C, Seite 116 von 142, PDF p. 116",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.17.14, Teil C, Seite 118 von 142, PDF p. 118",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "Pistols in 9 mm Luger and revolvers in .38 Special or .357 Magnum. EPP Production (C.17.B, Teil C, PDF p. 129) is the same course for unchanged service pistols of the DP 1 list, EPP Optical Sight (C.17.19, Teil C, PDF p. 122) is scored separately. Seven stations at 7 to 30 m, the record holds the longest distance."
+  }
+}

@@ -14,7 +14,7 @@
     "kind": "published",
     "sources": [
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "page": "0.21, Teil 0 Seite 78, PDF p. 96 (rows 1.56 and 1.57)",
         "fields": ["name", "number", "federation", "section", "page", "distance", "category"]
       }

@@ -101,12 +101,14 @@ export function newDesign(): Design {
   }
 }
 
-/** The number of field `key` in the stored unit (mm, or the ring value), when it is a positive number. */
+/** The number of field `key` in the stored unit (mm, or the ring value), when it is a positive number (a whole one for a ring value). */
 const stored = (d: Design, key: string) => {
   const si = fieldAt(d, key).si
   if (si === undefined || si <= 0) return
+  // the schema's ring value is an integer: a decimal is left out, the field shows its error
+  if (key.endsWith('.value')) return Number.isInteger(si) ? si : undefined
   // a decimal typed in mm or in comes back from SI without the noise of the division
-  return key.endsWith('.value') ? si : Number((si / storedToSi.length).toPrecision(12))
+  return Number((si / storedToSi.length).toPrecision(12))
 }
 
 const optional = <T>(entries: Record<string, T | undefined>) =>

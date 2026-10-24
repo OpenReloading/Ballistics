@@ -22,7 +22,7 @@
         "source": "bds-sporthandbuch-langwaffen-2026",
         "page": "L 3.02, Seite L-21, PDF p. 21",
         "fields": ["number", "distance", "category"],
-        "note": "The table bounds the cartridge by case length (47 mm), not by calibre."
+        "note": "The table bounds the cartridge by case length (47 mm), not by calibre. The handbook marks the discipline optional (O) (L 1.23)."
       }
     ]
   }

@@ -20,7 +20,8 @@
       {
         "source": "bds-sporthandbuch-langwaffen-2026",
         "page": "L 2.02, Seite L-16, PDF p. 16",
-        "fields": ["name", "number", "federation", "section", "page", "distance"]
+        "fields": ["name", "number", "federation", "section", "page", "distance"],
+        "note": "The handbook marks the discipline optional (O) (L 1.23)."
       },
       {
         "source": "bds-sporthandbuch-langwaffen-2026",
