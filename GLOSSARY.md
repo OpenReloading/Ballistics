@@ -93,7 +93,7 @@ A company that makes powders or bullets, a record of kind `manufacturers` with `
 _Avoid_: maker, brand
 
 **Manufacturer reference**:
-`manufacturer`: record id of a manufacturer on powder and bullet records, their list items, the `resolved` parts of compute answers and the list filter `?manufacturer=`. On a user bullet and a firearm it is a reference `catalogue:<id>` or `user:<id>`.
+`manufacturer`: record id of a manufacturer on powder and bullet records, their list items, the `resolved` parts of compute answers and the list filter `?manufacturer=`. On a user bullet and a firearm it is a reference `catalogue:<id>` or `user:<id>`, on a chronograph `device` a `catalogue:` reference.
 _Avoid_: maker
 
 **User manufacturer**:
@@ -105,7 +105,7 @@ _Avoid_: custom manufacturer
 _Avoid_: caseMaker
 
 **Manufacturer name**:
-`manufacturerName`: the manufacturer as free text on the components of a load (`bullet`, `powder`, `primer`, `case`) and on a chronograph `device`. A bullet design and a firearm hold a reference.
+`manufacturerName`: the manufacturer as free text on the components of a load (`bullet`, `powder`, `primer`, `case`) and, as the text a chronograph file gives, on an imported session's `device`. A bullet design, a firearm and a stored session hold a reference.
 _Avoid_: maker
 
 **Website**:
@@ -422,7 +422,7 @@ _Avoid_: `barrelLength` (of the workbench field)
 A record of kind `chrono`: one device, one place, one day, with `date`, `device`, `muzzleDistance`, `conditions`, `strings`. Its provenance kind is `measured`.
 
 **Device**:
-`device`: the chronograph of a session, `kind` (`doppler-radar`, `optical`, `magnetic`, `other`), `manufacturerName`, `model` and `firmware`. In a measured series of the user data, the manufacturer and model as one text.
+`device`: the chronograph of a session, `kind` (`doppler-radar`, `optical`, `magnetic`, `other`), `manufacturer` (a `catalogue:` reference), `model` and `firmware`. In a measured series of the user data, the manufacturer and model as one text.
 
 **Muzzle distance**:
 `muzzleDistance`: muzzle to the measuring point of a chronograph, mm in a session, m in a measured series.

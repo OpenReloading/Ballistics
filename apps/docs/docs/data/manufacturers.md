@@ -5,7 +5,7 @@ description: The manufacturer records that powder, bullet, case capacity and loa
 
 # Manufacturers
 
-A powder or bullet record names its manufacturer by the id of a manufacturer record (`manufacturer`). A case capacity record names the case manufacturer the same way (`caseManufacturer`), and so does a load table (`manufacturer`). A user bullet and a firearm name their manufacturer by a reference, `catalogue:<id>` or `user:<id>`. A name a user types that no manufacturer has becomes a user manufacturer, a record kept in the browser with the name as its `name`; the same name typed again finds it, and a name or alias of a catalogue manufacturer finds the catalogue record first. Schema: `packages/schema/src/manufacturer.ts`. Records: `packages/data/records/manufacturers/`.
+A powder or bullet record names its manufacturer by the id of a manufacturer record (`manufacturer`). A case capacity record names the case manufacturer the same way (`caseManufacturer`), and so does a load table (`manufacturer`). A chronograph session names the maker of its device by a `catalogue:<id>` reference (`device.manufacturer`). A user bullet and a firearm name their manufacturer by a reference, `catalogue:<id>` or `user:<id>`. A name a user types that no manufacturer has becomes a user manufacturer, a record kept in the browser with the name as its `name`; the same name typed again finds it, and a name or alias of a catalogue manufacturer finds the catalogue record first. Schema: `packages/schema/src/manufacturer.ts`. Records: `packages/data/records/manufacturers/`.
 
 ## Record
 
@@ -25,7 +25,7 @@ The id is the slug of the name without the legal form: "Demo Powder Co." becomes
 
 ## Validation
 
-`npm run data:validate` (`packages/data/src/references.ts`, `checkManufacturerReferences`) reports a powder or bullet `manufacturer`, a case capacity `caseManufacturer` or a load table `manufacturer` that names no manufacturer record. Names and aliases of manufacturers are unique. Powder and bullet names are unique per manufacturer.
+`npm run data:validate` (`packages/data/src/references.ts`, `checkManufacturerReferences`) reports a powder or bullet `manufacturer`, a case capacity `caseManufacturer`, a load table `manufacturer` or a chronograph session's `device.manufacturer` that names no manufacturer record. Names and aliases of manufacturers are unique. Powder and bullet names are unique per manufacturer.
 
 ## API
 

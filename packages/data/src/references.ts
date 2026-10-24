@@ -1,3 +1,4 @@
+import { parseRef } from '@openreloading/schema'
 import type { LoadTables } from './load-tables.ts'
 import type { Bundle } from './records.ts'
 
@@ -58,9 +59,12 @@ export function checkLoadReferences(
   }
 }
 
-/** The manufacturer of every powder, bullet and listed load table, and the case manufacturer of a capacity. */
+/**
+ * The manufacturer of every powder, bullet and listed load table, the case manufacturer of a
+ * capacity and the device manufacturer of a chronograph session.
+ */
 export function checkManufacturerReferences(
-  bundle: Pick<Bundle, 'powders' | 'bullets' | 'capacities'>,
+  bundle: Pick<Bundle, 'powders' | 'bullets' | 'capacities' | 'chronoSessions'>,
   loadTables: LoadTables,
   ids: RecordIds,
   errors: string[],
@@ -73,6 +77,8 @@ export function checkManufacturerReferences(
   for (const b of bundle.bullets) check(`bullets/${b.id}.json`, 'manufacturer', b.manufacturer)
   for (const c of bundle.capacities)
     check(`capacities/${c.id}.json`, 'caseManufacturer', c.caseManufacturer)
+  for (const s of bundle.chronoSessions)
+    check(`chrono/${s.id}.json`, 'device.manufacturer', parseRef(s.device.manufacturer)?.id)
   for (const [file, table] of Object.entries(loadTables))
     check(`load-tables.json: ${file}`, 'manufacturer', table.manufacturer)
 }
