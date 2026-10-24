@@ -40,6 +40,7 @@ const sidebars: SidebarsConfig = {
     'data/federations',
     'data/manufacturers',
     'data/record-model',
+    'data/firearm-records',
     'data/catalogue-storage',
     'bibliography',
   ],
