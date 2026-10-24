@@ -4,6 +4,7 @@
  * whole catalogue read once per page load.
  */
 import { bulletFits, type CartridgeDiameters } from '@openreloading/core'
+import { toSi } from '@openreloading/schema'
 import { apiFetch } from './api-fetch.ts'
 import type { BulletSummary, ListOf, ManufacturerSummary } from './api-types.ts'
 import {
@@ -45,7 +46,7 @@ const massWord = /^(\d+(?:\.\d+)?)(gr|g)?$/
 function sameMass(b: BulletRow, number: string, unit: string | undefined) {
   if (b.mass === null) return false
   const half = 0.5 * 10 ** -(number.split('.')[1]?.length ?? 0)
-  const typed = unit === 'g' ? b.mass : (b.mass * 1e-3) / kilogramsPerGrain
+  const typed = unit === 'g' ? b.mass : toSi('mass', b.mass) / kilogramsPerGrain
   return Math.abs(typed - Number(number)) <= half + 1e-9
 }
 
