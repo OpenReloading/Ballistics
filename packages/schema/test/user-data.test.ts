@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  checkUserRefs,
   userDataFile,
   userDataFormat,
   userDataVersion,
@@ -105,6 +106,14 @@ describe('userDataFile', () => {
         file([bulletRecord, cartridgeRecord, loadRecord, firearmRecord, sheetRecord]),
       ).success,
     ).toBe(true)
+  })
+
+  it('opens records with an old browser id and with a UUID', () => {
+    const uuid = '3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13'
+    const ids = ['lk3j2h1g-a8s7d6f5', uuid]
+    expect(userDataFile.safeParse(file(ids.map((id) => ({ ...loadRecord, id })))).success).toBe(
+      true,
+    )
   })
 
   it('keeps the parent record of a design and caps its texts', () => {
@@ -420,5 +429,45 @@ describe('versionProblem', () => {
   it('leaves the current version and other formats to the schema', () => {
     for (const x of [file([firearmRecord]), { format: 'x', version: 1 }, null, 'text'])
       expect(versionProblem(x)).toBeUndefined()
+  })
+})
+
+describe('checkUserRefs', () => {
+  const withFirearm = (firearm: string) =>
+    userRecord.parse({ ...loadRecord, data: { ...loadRecord.data, firearm } })
+  const firearm = userRecord.parse(firearmRecord)
+
+  it('reports a workbench that points at a missing firearm', () => {
+    expect(checkUserRefs([withFirearm('gone')])).toEqual([
+      { record: 'w4', kind: 'workbenchState', field: 'firearm', target: 'gone' },
+    ])
+  })
+
+  it('reports a firearm id that names a record of another kind', () => {
+    const other = userRecord.parse({ ...bulletRecord, id: 'f5' })
+    expect(checkUserRefs([withFirearm('f5'), other])).toHaveLength(1)
+  })
+
+  it('reports nothing for a firearm that is there, as an old id or a user reference', () => {
+    expect(checkUserRefs([withFirearm('f5'), firearm])).toEqual([])
+    const uuid = '3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13'
+    const own = { ...firearm, id: uuid }
+    expect(checkUserRefs([withFirearm(`user:${uuid}`), own])).toEqual([])
+    expect(checkUserRefs([withFirearm(`user:${uuid}`)])).toHaveLength(1)
+  })
+
+  it('leaves a catalogue reference and a record without references alone', () => {
+    expect(checkUserRefs([withFirearm('catalogue:some-rifle')])).toEqual([])
+    expect(checkUserRefs([userRecord.parse(loadRecord), userRecord.parse(bulletRecord)])).toEqual(
+      [],
+    )
+  })
+
+  it('reports a target sheet whose load is missing', () => {
+    const sheet = userRecord.parse({ ...sheetRecord, data: { ...sheetRecord.data, load: 'gone' } })
+    expect(checkUserRefs([sheet])).toEqual([
+      { record: 't1', kind: 'targetSheet', field: 'load', target: 'gone' },
+    ])
+    expect(checkUserRefs([sheet, userRecord.parse({ ...loadRecord, id: 'gone' })])).toEqual([])
   })
 })
