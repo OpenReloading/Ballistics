@@ -12,7 +12,9 @@ import {
   recordResistance,
   solidFill,
   solidFillLimit,
+  unknownValueKeys,
   ValueError,
+  workbenchValueKeys,
 } from '../src/index.ts'
 
 const values: Record<string, number> = {
@@ -235,5 +237,15 @@ describe('boreArea', () => {
     const q = (value?: number) => ({ values: [{ side: 'chamber', symbol: 'Q', value }] })
     expect(cartridgeBoreAreaMm2(q(47.51))).toBe(47.51)
     expect(cartridgeBoreAreaMm2(q())).toBeUndefined()
+  })
+})
+
+describe('unknownValueKeys', () => {
+  it('lists the keys the workbench never saves', () => {
+    expect(unknownValueKeys({ charge: 1, firearmMass: 2, extra: 3, other: 4 })).toEqual([
+      'extra',
+      'other',
+    ])
+    expect(unknownValueKeys(Object.fromEntries(workbenchValueKeys.map((k) => [k, 1])))).toEqual([])
   })
 })

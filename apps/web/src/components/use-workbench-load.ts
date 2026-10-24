@@ -11,6 +11,7 @@ import {
   cartridgeGrooveDiameterMm,
   gasVelocityFactor,
   overrideResistance,
+  powderModelValues,
   recordResistance,
   ValueError,
 } from '@openreloading/core'
@@ -63,7 +64,7 @@ import { generatedName, loadName } from '../lib/load-tabs.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import { type IdentifiedSeries, seriesId } from '../lib/measurements.ts'
 import { powderValues } from '../lib/powder-compare.ts'
-import { powderModelValues, unchangedFromRecord } from '../lib/powder-record.ts'
+import { unchangedFromRecord } from '../lib/powder-record.ts'
 import {
   droppedIds,
   linkedId,

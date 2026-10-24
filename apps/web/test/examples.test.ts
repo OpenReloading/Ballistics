@@ -1,6 +1,7 @@
 import {
   interior,
   interiorPressureRange,
+  powderModelValues,
   pressureToleranceDefaults,
   recordResistance,
   trajectory,
@@ -25,7 +26,6 @@ import { siValues } from '../src/lib/field-spec.ts'
 import { gunValues, siOf } from '../src/lib/firearm.ts'
 import { interiorBody, interiorFields } from '../src/lib/interior-input.ts'
 import { productLabel } from '../src/lib/manufacturers.ts'
-import { powderModelValues } from '../src/lib/powder-record.ts'
 import {
   manualBulletFields,
   manualProjectile,

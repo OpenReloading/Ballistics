@@ -120,7 +120,7 @@ export const exampleInterior = {
   bulletMass: toSi('mass', bullet.mass),
   charge: toSi('mass', choices.charge),
   propellantTemperature: icao.temperature,
-  // the powder record's fit, as the workbench fills it (`powderModelValues` in powder-record.ts)
+  // the powder record's fit, as the workbench fills it (`powderModelValues` of core)
   propellantEnergy: powder.interior.energy,
   gamma: powder.interior.gamma,
   density: toSi('density', powder.interior.density),
