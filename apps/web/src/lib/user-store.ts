@@ -13,17 +13,25 @@ const request = <T>(r: IDBRequest<T>) =>
 
 type Store = 'records' | 'handles' | 'files'
 
+/**
+ * The database version. 1: the first databases, whose stores were not checked on open. 2: every
+ * store exists. A change of the stores adds a version and a step in `upgrade`.
+ */
+const version = 2
+
+/** Brings a new or older database to `version`: adds the stores it lacks, touches no record. */
+function upgrade(db: IDBDatabase) {
+  for (const name of ['records', 'handles', 'files'] as const)
+    if (!db.objectStoreNames.contains(name))
+      db.createObjectStore(name, name === 'records' ? { keyPath: 'id' } : undefined)
+}
+
 let opened: Promise<IDBDatabase> | undefined
-/** Opens the database at the version it has; a new one gets every store (no upgrades before 1.0). */
+/** Opens the database at `version`, upgrading an older one in place. */
 const database = () =>
   (opened ??= new Promise<IDBDatabase>((resolve, reject) => {
-    const r = indexedDB.open('openreloading-user-data')
-    r.onupgradeneeded = () => {
-      const db = r.result
-      db.createObjectStore('records', { keyPath: 'id' })
-      db.createObjectStore('handles')
-      db.createObjectStore('files')
-    }
+    const r = indexedDB.open('openreloading-user-data', version)
+    r.onupgradeneeded = () => upgrade(r.result)
     r.onsuccess = () => {
       // another tab deletes the database: close, the next call opens again
       r.result.onversionchange = () => {
@@ -55,7 +63,7 @@ export async function inStore<T>(
   return result
 }
 
-/** The schema-valid records of the browser store, and the count of invalid ones left out. */
+/** The schema-valid records of the browser store and the invalid ones, as stored: none is dropped. */
 export const storedRecords = async () =>
   validRecords((await inStore('records', 'readonly', (s) => s.getAll())) ?? [])
 
