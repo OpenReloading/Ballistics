@@ -11,9 +11,9 @@ import {
   TableTr,
   Text,
 } from '@mantine/core'
+import type { Bullet } from '@openreloading/schema'
 import Link from 'next/link'
 import type { CSSProperties, ReactNode } from 'react'
-import type { BulletRecord } from '../lib/api-types.ts'
 import { compareGroups, differenceMarks, rowDiffers } from '../lib/bullet-compare.ts'
 import { caliberLabel, caliberUnit } from '../lib/caliber.ts'
 import { compareHref } from '../lib/compare-ids.ts'
@@ -36,7 +36,7 @@ export function BulletCompare({
   bullets,
   drawings,
 }: {
-  bullets: (BulletRecord & { manufacturerName: string })[]
+  bullets: (Bullet & { manufacturerName: string })[]
   drawings: ReactNode[]
 }) {
   return (
@@ -50,7 +50,7 @@ function Values({
   bullets,
   drawings,
 }: {
-  bullets: (BulletRecord & { manufacturerName: string })[]
+  bullets: (Bullet & { manufacturerName: string })[]
   drawings: ReactNode[]
 }) {
   const { system } = useUnits()
