@@ -21,7 +21,7 @@ const fileBytes = (text: string) => new TextEncoder().encode(text).byteLength
 /**
  * The text of a user data file holding `records` and the photos they point at (`files`). The
  * `invalid` records of the browser, as stored, are added under `invalid` (not part of the format
- * the schema reads: Import ignores them).
+ * the schema reads: `parseUserDataFile` hands them on as they are).
  */
 export const userDataText = (
   records: UserRecord[],
@@ -45,6 +45,8 @@ export type ParsedUserFile =
       ok: true
       records: UserRecord[]
       files?: EmbeddedFile[]
+      /** The `invalid` entries of an Export all file, as written: not checked, not part of the format. */
+      invalid?: unknown[]
       /** Fields of the file mapped to no record field, as the format names them. */
       unmapped?: string[]
       warnings?: string[]
@@ -63,8 +65,14 @@ export function parseUserDataFile(text: string): ParsedUserFile {
   const problem = versionProblem(json)
   if (problem) return { ok: false, reason: problem }
   const r = userDataFile.safeParse(json)
+  const invalid = (json as { invalid?: unknown }).invalid
   return r.success
-    ? { ok: true, records: r.data.records, files: r.data.files }
+    ? {
+        ok: true,
+        records: r.data.records,
+        files: r.data.files,
+        ...(Array.isArray(invalid) && invalid.length > 0 && { invalid }),
+      }
     : { ok: false, reason: z.prettifyError(r.error) }
 }
 
