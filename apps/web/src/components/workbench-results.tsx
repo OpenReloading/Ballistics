@@ -425,6 +425,11 @@ export const ResultsArea = memo(function ResultsArea() {
             )}
             {!short && <BurnFigure />}
           </div>
+          {ok?.cartridgeDesign && (
+            <p className="note user-design">
+              Case values from the user design {ok.cartridgeDesign}, not a catalogue record.
+            </p>
+          )}
           {ok?.design && (
             <p className="note user-design">
               Computed with the bullet mass of the user design {ok.design}, not a catalogue record.

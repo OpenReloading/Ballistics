@@ -76,6 +76,12 @@ export interface DraftCartridge {
   spec: ReturnType<typeof drawable>
   /** Names the design in the drawing's title and description. */
   title: string
+  /**
+   * The workbench's card: the page's fields show what the rows leave out and the figure draws the
+   * design itself, with the cartridge and chamber views. Without it the page is the designer, whose
+   * own drawing is above.
+   */
+  card?: true
 }
 
 /** The seated bullet's volume (m³), travel, COAL and CBTO (m), for the page's fields and print. */
@@ -288,6 +294,8 @@ export function SeatingPreview({
   )
   const draftSpec = draft?.spec
   const designed = draft !== undefined
+  /** The designer page: its own drawing is above, its controls in one section. */
+  const designer = designed && !draft.card
   const name = draft?.title ?? cartridge?.name ?? ''
   const [bulletId, setBulletId] = useState(initial?.bullet)
   const names = useManufacturerNames()
@@ -462,11 +470,11 @@ export function SeatingPreview({
   const [coal, cbto, inCard] = [
     figureSeating?.coal.value,
     figureSeating?.cbto?.value,
-    Boolean(slots) && !designed,
+    Boolean(slots) && !designer,
   ]
   const models = useMemo(
     () =>
-      spec && !designed
+      spec && !designer
         ? figureViews(
             spec,
             fixed?.drawn,
@@ -474,14 +482,14 @@ export function SeatingPreview({
             inCard && coal !== undefined ? { coal, cbto } : undefined,
           )
         : {},
-    [spec, fixed, unit, inCard, designed, coal, cbto],
+    [spec, fixed, unit, inCard, designer, coal, cbto],
   )
   const model = models[view]
   // the workbench card also draws the figure level, shown where its panel is wider than tall; a
   // design draws it level only, in the room under its own drawing
   const levelModels = useMemo(
     () =>
-      spec && (inCard || designed)
+      spec && (inCard || designer)
         ? figureViews(
             spec,
             fixed?.drawn,
@@ -489,10 +497,10 @@ export function SeatingPreview({
             coal === undefined ? undefined : { coal, cbto },
             'print',
             // the design's own drawing above shows its sides: the frame fits the combined view
-            designed ? ['combined'] : undefined,
+            designer ? ['combined'] : undefined,
           )
         : {},
-    [spec, fixed, unit, inCard, designed, coal, cbto],
+    [spec, fixed, unit, inCard, designer, coal, cbto],
   )
   const levelModel = levelModels[view]
   // the slider's range in the mode's length, for the seating ladder
@@ -581,7 +589,7 @@ export function SeatingPreview({
     seating?.contact &&
     `Contact with leade (${seating.jump.tag}): the bullet reaches the leade at ${mm(seating.contactCoal as number)} COAL; it is not moved back.`
   /** The workbench's cards: the fields there show what the rows below leave out. */
-  const card = Boolean(slots) && !designed
+  const card = Boolean(slots) && !designer
   const warnings = [
     seating?.aboveL6 &&
       chamber?.cartridgeL6 !== undefined &&
@@ -879,7 +887,7 @@ export function SeatingPreview({
         {view !== 'combined' && !model && <p>No {view} drawing for this record.</p>}
         {model && drawing('drawing')}
         {/* a design's own drawing is above: this one shows once a bullet is seated in it */}
-        {levelModel && (!designed || drawnSeating) && drawing('level', levelModel)}
+        {levelModel && (!designer || drawnSeating) && drawing('level', levelModel)}
         {model && fullView && (
           <AppModal
             opened={fullView.opened}
@@ -897,7 +905,7 @@ export function SeatingPreview({
             inside the case. Dashed ticks: leade contact, approximate.
           </p>
         )}
-        {!shape && view === 'combined' && !designed && (
+        {!shape && view === 'combined' && !designer && (
           <p>Choose a bullet with a length to seat it.</p>
         )}
       </div>

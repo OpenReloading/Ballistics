@@ -85,6 +85,7 @@ export function Workbench() {
     bulletDesign,
     bulletLabel,
     cartridge,
+    cartridgeDesign,
     changed,
     chartSlot,
     chartView,
@@ -283,6 +284,10 @@ export function Workbench() {
     ok && ok.printed.fromSeating.length > 0
       ? `${ok.printed.fromSeating.map((k) => (k === 'volume' ? 'Usable case volume' : 'Bullet travel')).join(' and ')} from the seated bullet: derived from approximate bullet and case geometry.`
       : undefined
+  /** Said on every print and result that took values from a user cartridge design. */
+  const fromDesign = ok?.cartridgeDesign
+    ? `Case values from the user design ${ok.cartridgeDesign}, not a catalogue record.`
+    : undefined
   /** A field as the print shows it: its label and its value with the unit; none while empty. */
   const printRow = (key: string): [string, string | undefined] => {
     const spec = interiorFields.find((f) => f.key === key)
@@ -292,7 +297,10 @@ export function Workbench() {
     [
       'Cartridge',
       [
-        ['Cartridge', cartridge?.name],
+        [
+          'Cartridge',
+          cartridge?.name ?? (cartridgeDesign && `${cartridgeDesign.name} (user design)`),
+        ],
         ['CIP Pmax', pmax === undefined ? undefined : withUnit('pressure', system, pmax * 1e5)],
         ['Case length, CIP L3', mmText(specValue('cartridge', 'L3'))],
         printRow('volume'),
@@ -401,6 +409,7 @@ export function Workbench() {
         <h1>{loadTitle}</h1>
         <p className="report-sub">
           Printed {localDay(new Date())}.{stale && ' Inputs changed since this result.'}
+          {fromDesign && ` ${fromDesign}`}
           {approximate && ` ${approximate}`}
         </p>
         <div className="report-inputs">
@@ -456,7 +465,9 @@ export function Workbench() {
           ['Powder temperature', runTemperature],
         ] as [string, string | undefined][]
       ).filter((r): r is [string, string] => Boolean(r[1]))}
-      note={[stale && 'Inputs changed since this result.', approximate].filter(Boolean).join(' ')}
+      note={[stale && 'Inputs changed since this result.', fromDesign, approximate]
+        .filter(Boolean)
+        .join(' ')}
       by={
         ok.ladder.kind === 'seating'
           ? seatingLengthName[ok.ladder.seatingBy ?? 'overallLength']
