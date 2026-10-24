@@ -6,6 +6,7 @@ import {
   type Fields,
   type FieldValue,
   fieldOf,
+  siToStored,
   storedToSi,
   switchFields,
 } from './field-spec.ts'
@@ -108,7 +109,7 @@ const stored = (d: Design, key: string) => {
   // the schema's ring value is an integer: a decimal is left out, the field shows its error
   if (key.endsWith('.value')) return Number.isInteger(si) ? si : undefined
   // a decimal typed in mm or in comes back from SI without the noise of the division
-  return Number((si / storedToSi.length).toPrecision(12))
+  return Number(siToStored('length', si).toPrecision(12))
 }
 
 const optional = <T>(entries: Record<string, T | undefined>) =>
@@ -152,7 +153,7 @@ export function fromFile(data: TargetFaceDesign, name: string, system: UnitSyste
       fields[key] = fieldOf(
         system,
         specOf(key),
-        key.endsWith('.value') ? mm : mm * storedToSi.length,
+        key.endsWith('.value') ? mm : storedToSi('length', mm),
       )
   }
   const rows = data.rings.map((r) => {

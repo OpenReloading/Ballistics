@@ -134,6 +134,15 @@ describe('the draft file', () => {
     expect(fileData(bad).rings[0]).not.toHaveProperty('diameter')
   })
 
+  it('stores a diameter typed in mm or in inches as millimetres', () => {
+    const d = draft()
+    const key = `ring.${d.rows[0].id}.diameter`
+    const typed = (system: typeof metric, text: string) =>
+      fileData({ ...d, fields: { ...d.fields, [key]: fieldValueFromText('length', system, text) } })
+    expect(typed(metric, '150').rings[0].diameter).toBe(150)
+    expect(typed(us, '2').rings[0].diameter).toBe(50.8)
+  })
+
   it('leaves out a ring value that is not a whole number, as the schema requires', () => {
     const d = draft()
     const key = `ring.${d.rows[0].id}.value`
