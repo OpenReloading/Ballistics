@@ -217,4 +217,4 @@ A static site without a server for GitHub Pages: the web app with the records as
   - CI: `EVENT_NAME`, `BASE_SHA`. Local: `--stamp apps/web/.next/ci-plan-stamp`, `--require full`.
   - After a build on a clean tree: `--write-stamp apps/web/.next/ci-plan-stamp --prerender <mode>`.
 - Build cache: `.next/cache/turbopack` is reusable between builds. `.next/cache/fetch-cache` holds API responses (`cacheLife('days')`: a warm build would serve old record data), so `prebuild` deletes it and CI never caches it.
-- Image: `docker build -f apps/web/Dockerfile .`
+- Image: `docker build -f apps/web/Dockerfile .`, or `docker compose build web`. It builds the packages the web app imports, the API package and `@openreloading/data` only as far as their entries (`tsconfig.browser.json`, `tsconfig.plausibility.json`), and copies the sources they reach. `test/dockerfile.test.ts` fails when a web import has no build or copy line there. A new import of one of those entries, or a file one of them reaches outside the copied folders, needs the Dockerfile's `COPY` lines.
