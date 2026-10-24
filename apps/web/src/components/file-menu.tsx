@@ -204,6 +204,7 @@ function FileMenuOf<K extends UserRecordKind>({
   kept,
   idle,
   onList,
+  browserList,
   examples,
   reportBox,
   ref,
@@ -250,6 +251,8 @@ function FileMenuOf<K extends UserRecordKind>({
   idle?: boolean
   /** Opens the page's own list of browser records (the workbench's Saved loads) in place of the menu's. */
   onList?: () => void
+  /** With `autosaved` and no `onList`: the menu's own list of the browser's records (the page has none). */
+  browserList?: boolean
   /** The Open menu's Examples section: the page's starting points. Stable, so the memo holds. */
   examples?: FileMenuItem[]
   /** The label of the Report issue box that adds the record's share link (the designers). */
@@ -964,7 +967,7 @@ function FileMenuOf<K extends UserRecordKind>({
           </Button>
         </Menu.Target>
         <Menu.Dropdown>
-          {(onList || !autosaved) && (
+          {(onList || browserList || !autosaved) && (
             <>
               <Menu.Label>This browser</Menu.Label>
               <Menu.Item onClick={onList ?? act('Listing', browserRecords)}>

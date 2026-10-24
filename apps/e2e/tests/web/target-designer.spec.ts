@@ -45,9 +45,18 @@ test('draws the rings at the entered diameters and reports the face usable', asy
   await expect(page.getByText('Usable in the shot groups')).toBeHidden()
 })
 
-test('keeps the draft in the browser and offers the face in the shot groups', async ({ page }) => {
+test('keeps the draft in the browser, reopens it and offers the face in the shot groups', async ({
+  page,
+}) => {
   await design(page)
   await expect(page.getByText('Saved in this browser')).toBeVisible()
+  await gotoHydrated(page, '/targets/designer')
+  await expect(page.getByLabel('Name', { exact: true })).toHaveValue('')
+  await page.getByRole('button', { name: 'Open' }).click()
+  await page.getByRole('menuitem', { name: /Saved target face designs/ }).click()
+  await page.getByRole('button', { name: 'Club face', exact: true }).click()
+  await expect(page.getByLabel('Name', { exact: true })).toHaveValue('Club face')
+  await expect(page.getByLabel('Ring 4 diameter')).toHaveValue('60')
   await gotoHydrated(page, '/groups')
   await page.getByLabel('Face', { exact: true }).selectOption({ label: 'User design Club face' })
   await expect(page.getByLabel('Event', { exact: true })).toHaveValue('25 m')

@@ -386,6 +386,7 @@ export function TargetDesigner() {
               nameKey={design.name}
               data={data}
               autosaved={recordId}
+              browserList
               kept={kept}
               onOpen={(opened, openedName, record) => {
                 flush()
