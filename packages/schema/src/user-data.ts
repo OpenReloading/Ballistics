@@ -51,6 +51,15 @@ export const userCartridge = z.object({
     .optional(),
 })
 
+/**
+ * A manufacturer of the user: a company typed where no catalogue manufacturer matched. The name is
+ * the record's `name`; bullets and firearms of the user name it by `user:<id>`.
+ * Inferred type: {@link UserManufacturer}.
+ */
+export const userManufacturer = z.object({
+  origin: z.literal('user').describe('Where the record lives: `user`.'),
+})
+
 const designLength = z.number().positive()
 
 /**
@@ -116,6 +125,7 @@ const record = <K extends string, D extends z.ZodType>(kind: K, description: str
  * Inferred type: {@link UserRecord}.
  */
 export const userRecord = z.discriminatedUnion('kind', [
+  record('manufacturer', 'A manufacturer typed by the user.', userManufacturer),
   record('bullet', 'A bullet of the bullet designer.', userBullet),
   record('cartridge', 'A cartridge of the cartridge designer.', userCartridge),
   record('workbenchState', 'A load of the workbench.', workbenchState),
@@ -232,6 +242,8 @@ export function versionProblem(json: unknown): string | undefined {
     return `The file has format version ${JSON.stringify(f.version)}; this app reads version ${userDataVersion}.`
 }
 
+/** A user manufacturer: its `name` is the record's name. */
+export interface UserManufacturer extends z.infer<typeof userManufacturer> {}
 /** A user bullet: a variant of a catalogue bullet, or a bullet of its own. */
 export interface UserBullet extends z.infer<typeof userBullet> {}
 /** A user cartridge: a variant of a catalogue cartridge, or a cartridge of its own. */
@@ -242,7 +254,7 @@ export interface TargetFaceDesign extends z.infer<typeof targetFaceDesign> {}
 export type TargetSheetRecord = Extract<UserRecord, { kind: 'targetSheet' }>
 /** One record of a user data file: `kind`, id, name, save time and `data`. */
 export type UserRecord = z.infer<typeof userRecord>
-/** Discriminator of a user record: `bullet`, `cartridge`, `workbenchState`, `firearm`, `targetSheet` or `targetFaceDesign`. */
+/** Discriminator of a user record: `manufacturer`, `bullet`, `cartridge`, `workbenchState`, `firearm`, `targetSheet` or `targetFaceDesign`. */
 export type UserRecordKind = UserRecord['kind']
 /** A base64 photo stored in a user data file, referenced by id. */
 export interface EmbeddedFile extends z.infer<typeof embeddedFile> {}

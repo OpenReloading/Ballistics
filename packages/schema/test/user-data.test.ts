@@ -30,6 +30,13 @@ const bulletRecord = {
     },
   },
 } as const
+const manufacturerRecord = {
+  kind: 'manufacturer',
+  id: uuid,
+  name: 'Home Loader',
+  saved,
+  data: { origin: 'user' },
+} as const
 const cartridgeRecord = {
   kind: 'cartridge',
   id: 'c3',
@@ -146,9 +153,23 @@ describe('userDataFile', () => {
   it('accepts every record kind', () => {
     expect(
       userDataFile.safeParse(
-        file([bulletRecord, cartridgeRecord, loadRecord, firearmRecord, sheetRecord, faceRecord]),
+        file([
+          manufacturerRecord,
+          bulletRecord,
+          cartridgeRecord,
+          loadRecord,
+          firearmRecord,
+          sheetRecord,
+          faceRecord,
+        ]),
       ).success,
     ).toBe(true)
+  })
+
+  it('takes a user manufacturer as a name and refuses another origin', () => {
+    expect(userRecord.parse(manufacturerRecord)).toEqual(manufacturerRecord)
+    const shared = { ...manufacturerRecord, data: { origin: 'shared' } }
+    expect(userRecord.safeParse(shared).error?.issues[0].path).toEqual(['data', 'origin'])
   })
 
   it('takes a face draft with missing values and rejects a non-positive size', () => {
