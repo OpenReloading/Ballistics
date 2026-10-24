@@ -8,7 +8,7 @@
 import type { TargetFace } from '@openreloading/schema'
 import { apiFetch } from './api-fetch.ts'
 import type { FederationData } from './face-disciplines.ts'
-import { buildFace, faceIdPrefix, userFaceId } from './target-designer.ts'
+import { buildFace, faceIdPrefix, userFaceId } from './user-faces.ts'
 import { storedRecords } from './user-store.ts'
 
 export type FaceSummary = { id: string; organization: string; name: string }
@@ -37,12 +37,19 @@ async function withDesigns<T>(
   catalogue: () => Promise<T[]>,
   designs: (faces: TargetFace[]) => T[],
 ): Promise<T[]> {
-  const mine = designs(await designFaces())
-  const listed = await catalogue().catch((e: unknown) => {
-    if (mine.length === 0) throw e
-    return []
-  })
-  return [...listed, ...mine]
+  // both reads start at once
+  const [mine, listed] = await Promise.all([
+    designFaces().then(designs),
+    catalogue().then(
+      (list) => ({ list }),
+      (error: unknown) => ({ error }),
+    ),
+  ])
+  if ('error' in listed) {
+    if (mine.length === 0) throw listed.error
+    return mine
+  }
+  return [...listed.list, ...mine]
 }
 
 const catalogueSummaries = () => {

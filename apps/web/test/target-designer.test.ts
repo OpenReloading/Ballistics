@@ -12,10 +12,10 @@ import {
   newDesign,
   reduce,
   shapeOf,
-  userOrganization,
 } from '../src/lib/target-designer.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import { parseUserDataFile, userDataText } from '../src/lib/user-data.ts'
+import { userOrganization } from '../src/lib/user-faces.ts'
 
 const metric = presetUnits('metric-grams')
 const us = presetUnits('us')
@@ -162,11 +162,23 @@ describe('the drawing', () => {
 describe('reduce', () => {
   it('adds a ring one value above the last and removes a ring with its numbers', () => {
     const d = draft()
-    const added = reduce(historyOf(d), { type: 'addRing' }).present
-    const id = added.rows.at(-1)?.id ?? ''
+    const id = 'added'
+    const added = reduce(historyOf(d), { type: 'addRing', id }).present
+    expect(added.rows.at(-1)?.id).toBe(id)
     expect(added.fields[`ring.${id}.value`]?.si).toBe(5)
     const removed = reduce(historyOf(added), { type: 'removeRing', id }).present
     expect(Object.keys(removed.fields).some((k) => k.includes(id))).toBe(false)
+  })
+
+  it('gives back every size to the hundredth of a millimetre, in either unit', () => {
+    // 0.05 mm steps, as entered in mm and as the same size entered in inches
+    for (let i = 1; i <= 6000; i++) {
+      const mm = Number((i * 0.05).toFixed(2))
+      for (const system of [metric, us]) {
+        const data = { rings: [{ value: 1, diameter: mm }], events: [] }
+        expect(fileData(fromFile(data, 'x', system)).rings[0].diameter).toBe(mm)
+      }
+    }
   })
 
   it('keeps the entered values when the units change', () => {

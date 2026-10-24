@@ -14,13 +14,15 @@ export function TargetFaceFigure({ shape, label }: { shape: FaceShape; label: st
       role="img"
       aria-label={label}
     >
-      {zones.map((z) => (
-        <ellipse key={`${z.ring}-${z.rx}`} rx={z.rx} ry={z.ry} fill={z.colour} />
+      {zones.map((z, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: a fixed list in drawing order, rings may share a size
+        <ellipse key={i} rx={z.rx} ry={z.ry} fill={z.colour} />
       ))}
       <g fill="none" strokeWidth={1}>
-        {lines.map((l) => (
+        {lines.map((l, i) => (
           <ellipse
-            key={`${l.ring}-${l.rx}`}
+            // biome-ignore lint/suspicious/noArrayIndexKey: a fixed list in drawing order, rings may share a size
+            key={i}
             rx={l.rx}
             ry={l.ry}
             stroke={l.colour}

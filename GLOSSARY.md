@@ -580,7 +580,7 @@ A user record of kind `bulletDesign`: `manufacturerName`, `name`, the `choices` 
 A user record of kind `cartridgeDesign`: the `table` and spec `values` the cartridge drawing reads, and `parent`.
 
 **Target face design**:
-A user record of kind `targetFaceDesign`: the `rings`, `innerTen`, `blackDiameter`, `blackHeight`, `decimal` and `events` of a face in mm, each optional while the draft is unfinished, and `parent`. The shot group and hit probability tools offer a design that builds a valid `TargetFace` as `User design <name>` (face id `user-<record id>`).
+A user record of kind `targetFaceDesign`: the `rings`, `innerTen`, `blackDiameter`, `blackHeight`, `decimal` and `events` of a face in mm, each optional while the draft is unfinished. The shot group and hit probability tools offer a design that builds a valid `TargetFace` as `User design <name>` (face id `user-<record id>`).
 
 **Parent record**:
 `parent`: the catalogue record a design started from, `id` and `title`.

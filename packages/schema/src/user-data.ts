@@ -105,7 +105,6 @@ export const targetFaceDesign = z.object({
     )
     .max(40)
     .describe('Events shot on the face.'),
-  parent,
 })
 
 const base = {

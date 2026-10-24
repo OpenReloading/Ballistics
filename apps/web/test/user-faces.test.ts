@@ -2,6 +2,7 @@ import type { UserRecord } from '@openreloading/schema'
 import { beforeEach, expect, it, vi } from 'vitest'
 import { apiFetch } from '../src/lib/api-fetch.ts'
 import { fetchFace, fetchFaceSummaries, isFaceId } from '../src/lib/face-records.ts'
+import { userFaceId } from '../src/lib/user-faces.ts'
 import { storedRecords } from '../src/lib/user-store.ts'
 
 vi.mock('../src/lib/api-fetch.ts', () => ({ apiFetch: vi.fn() }))
@@ -39,6 +40,15 @@ it('lists the designs that build a face after the catalogue faces, as the user o
   ])
   expect(await isFaceId('user-a1')).toBe(true)
   expect(await isFaceId('user-b2')).toBe(false)
+})
+
+it('gives a design with any record id a valid face id', async () => {
+  vi.mocked(storedRecords).mockResolvedValue({
+    records: [design('My_Face 2', 'Odd id', complete)],
+    invalid: 0,
+  })
+  expect(userFaceId('My_Face 2')).toBe('user-my-face-2')
+  expect((await fetchFaceSummaries()).map((f) => f.id)).toContain('user-my-face-2')
 })
 
 it('loads a design as a face of the tools that the photo search skips', async () => {

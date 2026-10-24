@@ -1,11 +1,6 @@
 /** The target face designer: the draft, its file data, the face it builds and the problems it reports. */
 import type { FaceShape } from '@openreloading/drawing/target'
-import {
-  faceColour,
-  type TargetFace,
-  type TargetFaceDesign,
-  targetFace,
-} from '@openreloading/schema'
+import { faceColour, type TargetFace, type TargetFaceDesign } from '@openreloading/schema'
 import {
   type FieldSpec,
   type Fields,
@@ -24,6 +19,7 @@ import {
   undo,
 } from './history.ts'
 import { roundedFieldText, type UnitSystem } from './units.ts'
+import { buildFace } from './user-faces.ts'
 
 /** Colours a ring zone or line can take, the face schema's. */
 export const colours = faceColour.options
@@ -53,15 +49,9 @@ export interface Design {
   fields: Fields
 }
 
-/** The owner of a built face: it names the face as the user's own in the tools' lists. */
-export const userOrganization = 'User design'
-
-/** The prefix of the id a design's face has in the tools: `user-<record id>`. */
-export const faceIdPrefix = 'user-'
-export const userFaceId = (recordId: string) => `${faceIdPrefix}${recordId}`
-
 let counter = 0
-const rowId = () => `r${++counter}`
+/** A row id, unique in this page: the actions that add a row carry one, so the reducer stays pure. */
+export const rowId = () => `r${++counter}`
 
 /** The spec of the field `key`: the quantity and the label as the grid names it. */
 export function specOf(key: string): FieldSpec {
@@ -115,7 +105,8 @@ export function newDesign(): Design {
 const stored = (d: Design, key: string) => {
   const si = fieldAt(d, key).si
   if (si === undefined || si <= 0) return
-  return key.endsWith('.value') ? si : si / storedToSi.length
+  // a decimal typed in mm or in comes back from SI without the noise of the division
+  return key.endsWith('.value') ? si : Number((si / storedToSi.length).toPrecision(12))
 }
 
 const optional = <T>(entries: Record<string, T | undefined>) =>
@@ -195,58 +186,6 @@ export interface Problem {
   message: string
 }
 
-/** The face the data builds, or why it is none, as issues of the face schema by path. */
-export function buildFace(
-  data: TargetFaceDesign,
-  id: string,
-  name: string,
-): { face: TargetFace } | { issues: { path: PropertyKey[]; message: string }[] } {
-  const mm = (value: number | undefined) => (value === undefined ? undefined : { value })
-  const candidate = {
-    id,
-    name,
-    organization: userOrganization,
-    rings: data.rings.map((r) => ({
-      value: r.value,
-      diameter: mm(r.diameter),
-      height: mm(r.height),
-      fill: r.fill,
-      line: r.line,
-    })),
-    innerTen: data.innerTen && {
-      diameter: mm(data.innerTen.diameter),
-      height: mm(data.innerTen.height),
-      rule: data.innerTen.rule,
-    },
-    blackDiameter: mm(data.blackDiameter),
-    blackHeight: mm(data.blackHeight),
-    decimal: data.decimal,
-    events: data.events.map((e) => ({
-      name: e.name,
-      distance: mm(e.distance),
-      gauge: mm(e.gauge),
-    })),
-    // a design is not a catalogue face: the photo face search skips it, the user picks it
-    photoSearch: false,
-    provenance: { kind: 'measured', sources: [{ title: 'Entered in the face designer' }] },
-  }
-  const r = targetFace.safeParse(candidate)
-  if (r.success) return { face: r.data }
-  const at = (path: PropertyKey[]) =>
-    path.reduce<unknown>((o, k) => (o as Record<PropertyKey, unknown> | undefined)?.[k], candidate)
-  return {
-    issues: r.error.issues.map((i) => ({
-      path: i.path,
-      message:
-        at(i.path) === undefined || at(i.path) === ''
-          ? 'Required.'
-          : i.code === 'too_small' && Array.isArray(at(i.path))
-            ? `at least ${i.minimum} needed.`
-            : i.message,
-    })),
-  }
-}
-
 const fieldKeyOf = (d: Design, path: PropertyKey[]): string | undefined => {
   const [head, index, field] = path
   const part = (list: { id: string }[], prefix: string) =>
@@ -324,9 +263,9 @@ export type Action =
   | { type: 'rule'; value: InnerRule }
   | { type: 'decimal'; value: boolean }
   | { type: 'eventName'; id: string; value: string }
-  | { type: 'addRing' }
+  | { type: 'addRing'; id: string }
   | { type: 'removeRing'; id: string }
-  | { type: 'addEvent' }
+  | { type: 'addEvent'; id: string }
   | { type: 'removeEvent'; id: string }
   | { type: 'start'; design: Design }
   | { type: 'new' }
@@ -362,7 +301,7 @@ export function reduce(h: History<Design>, a: Action): History<Design> {
     case 'decimal':
       return pushHistory(h, { ...d, decimal: a.value }, 'decimal')
     case 'addRing': {
-      const id = rowId()
+      const { id } = a
       // the next ring inward is one above the last one's value
       const last = d.rows.at(-1)
       const value = last && fieldAt(d, `ring.${last.id}.value`).si
@@ -383,7 +322,7 @@ export function reduce(h: History<Design>, a: Action): History<Design> {
         fields: without(d.fields, ringKeys(a.id)),
       })
     case 'addEvent':
-      return pushHistory(h, { ...d, events: [...d.events, { id: rowId(), name: '' }] })
+      return pushHistory(h, { ...d, events: [...d.events, { id: a.id, name: '' }] })
     case 'removeEvent':
       return pushHistory(h, {
         ...d,

@@ -24,13 +24,13 @@ import {
   type InnerRule,
   newDesign,
   reduce,
+  rowId,
   shapeOf,
   specOf,
-  userFaceId,
-  userOrganization,
 } from '../lib/target-designer.ts'
 import { controlSize } from '../lib/theme.ts'
 import { namedKey } from '../lib/user-data.ts'
+import { userFaceId, userOrganization } from '../lib/user-faces.ts'
 import { putRecords, requestPersistentStorage } from '../lib/user-store.ts'
 import { DesignerField } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
@@ -225,6 +225,7 @@ export function TargetDesigner() {
         maxLength={200}
         value={e.name}
         error={edited && keyed.has(`event.${e.id}.name`)}
+        title={edited ? keyed.get(`event.${e.id}.name`) : undefined}
         onChange={(ev) => dispatch({ type: 'eventName', id: e.id, value: ev.currentTarget.value })}
       />
       {field(`event.${e.id}.distance`, `Event ${i + 1} distance`, 'Shooting distance.')}
@@ -276,7 +277,7 @@ export function TargetDesigner() {
             variant="default"
             size={controlSize.row.button}
             leftSection={<Plus aria-hidden="true" />}
-            onClick={() => dispatch({ type: 'addRing' })}
+            onClick={() => dispatch({ type: 'addRing', id: rowId() })}
           >
             Add ring
           </Button>
@@ -311,7 +312,7 @@ export function TargetDesigner() {
             variant="default"
             size={controlSize.row.button}
             leftSection={<Plus aria-hidden="true" />}
-            onClick={() => dispatch({ type: 'addEvent' })}
+            onClick={() => dispatch({ type: 'addEvent', id: rowId() })}
           >
             Add event
           </Button>
@@ -384,8 +385,10 @@ export function TargetDesigner() {
               onOpen={(opened, openedName, record) => {
                 flush()
                 setRecordId(record.id)
-                stored.current = { key: namedKey(opened, openedName), written: true }
-                dispatch({ type: 'start', design: fromFile(opened, openedName, system) })
+                const next = fromFile(opened, openedName, system)
+                // the draft as the designer keeps it, so opening a record is no change to save
+                stored.current = { key: namedKey(fileData(next), next.name), written: true }
+                dispatch({ type: 'start', design: next })
               }}
             />
           </>
