@@ -18,7 +18,6 @@ const uuid = '3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13'
 const other = '7a2d9c10-5b3e-4f68-9d41-0c8e2b6a1f57'
 const userLoad = {
   origin: 'user',
-  name: 'Range load',
   cartridge: 'catalogue:308-win',
   firearm: `user:${uuid}`,
   bullet: `user:${other}`,
@@ -68,7 +67,7 @@ describe('Load', () => {
 
   it('keeps a user load through a round trip and takes one without references', () => {
     expect(load.parse(userLoad)).toEqual(userLoad)
-    const bare = { origin: 'user', name: 'New load' }
+    const bare = { origin: 'user' }
     expect(load.parse(bare)).toEqual(bare)
   })
 
@@ -89,7 +88,7 @@ describe('Load', () => {
   })
 
   it('needs an id, provenance, cartridge, bullet, powder and charge in a catalogue load', () => {
-    for (const k of ['id', 'provenance', 'cartridge', 'bullet', 'powder', 'charge'])
+    for (const k of ['id', 'name', 'provenance', 'cartridge', 'bullet', 'powder', 'charge'])
       expectIssueAt(load, { ...catalogueLoad, [k]: undefined }, k)
   })
 

@@ -162,8 +162,9 @@ const powderDescription = z
  * One cartridge recipe fired from one firearm, for every origin. The cartridge, firearm, bullet and
  * powder are references; a catalogue load of publication data (provenance `measured`) may describe
  * its bullet and powder by maker and name where no record exists. A catalogue load carries its `id`
- * (the file name), `provenance`, cartridge, bullet, powder and charge; a user load keeps what the
- * workbench had. Charge and masses in g, lengths in mm, the typed solver values in `analysis`.
+ * (the file name), `name`, `provenance`, cartridge, bullet, powder and charge; a user load keeps
+ * what the workbench had and takes its name from its record. Charge and masses in g, lengths in mm,
+ * the typed solver values in `analysis`.
  * Inferred type: {@link Load}.
  */
 export const load = z
@@ -172,7 +173,10 @@ export const load = z
     origin: z
       .enum(['catalogue', 'user', 'shared'])
       .describe('Where the record lives: the git catalogue, this browser, or a received file.'),
-    name: text(200).min(1).describe('Name of the load as the library lists it.'),
+    name: text(200)
+      .min(1)
+      .describe('Name of a catalogue load. A user load is named by its record.')
+      .optional(),
     cartridge: ref('cartridge').optional(),
     firearm: ref('firearm').optional(),
     bullet: z
@@ -238,6 +242,7 @@ export const load = z
     const measured = catalogue && l.provenance?.kind === 'measured'
     if (catalogue) {
       if (l.id === undefined) issue(['id'], 'A catalogue load needs an id')
+      if (l.name === undefined) issue(['name'], 'A catalogue load needs a name')
       if (l.provenance === undefined) issue(['provenance'], 'A catalogue load needs provenance')
       for (const k of ['cartridge', 'bullet', 'powder', 'charge'] as const)
         if (l[k] === undefined) issue([k], `A catalogue load needs a ${k}`)
@@ -275,6 +280,7 @@ export interface Load extends z.infer<typeof load> {}
 /** A load of the catalogue: the fields {@link load} requires of one are present. */
 export interface CatalogueLoad extends Load {
   id: string
+  name: string
   origin: 'catalogue'
   cartridge: string
   bullet: NonNullable<Load['bullet']>

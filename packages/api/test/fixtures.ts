@@ -257,7 +257,6 @@ export function loadData(data: {
   const step = chargeStep && fromSi(ladderStepKinds[shape.kind ?? 'charge'], chargeStep)
   return {
     origin: 'user',
-    name: 'Load',
     ...(charge !== undefined && { charge: { value: fromSi('mass', charge) } }),
     ...(cartridge && { cartridge: reference(cartridge) }),
     ...(bullet && { bullet: reference(bullet) }),
