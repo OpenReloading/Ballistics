@@ -34,17 +34,14 @@ Records in `packages/data/records/`: one cartridge record per C.I.P. sheet, targ
 
 ## Run
 
-Requires Node (version in `.nvmrc`) and PostgreSQL, or a container engine.
+Requires Node (version in `.nvmrc`), or a container engine.
 
 ```sh
 npm ci
 npm run build
-cp .env.example .env                              # DATABASE_URL of your PostgreSQL database
-npm start -w @openreloading/api                   # API on port 3000 (PORT), reads .env
+npm start -w @openreloading/api                   # API on port 3000 (PORT), from the catalogue files of the build
 npm start -w @openreloading/web -- -p 3001        # web app on port 3001, API at API_URL (default http://localhost:3000)
 ```
-
-- `DATABASE_URL`: the API start script loads `.env` from the repository root (`node --env-file-if-exists`). A `DATABASE_URL` exported in the shell takes precedence. When the database was built from another schema, the API drops the tables it creates at start and builds them again, other tables stay (`ensureTables`, `packages/api/src/db/build.ts`).
 
 - Containers: `docker compose up` (or `podman compose up`) starts the database, the API, the web app and the documentation site.
 - Documentation site: `npm run site:build -w @openreloading/docs` builds the model pages, the library and the REST reference.
