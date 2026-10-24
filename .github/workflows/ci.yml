@@ -1,9 +1,10 @@
 name: CI
 
 on:
+  # main only receives the promotion merge, whose commits passed here on develop, and the release pull request,
+  # which runs on pull_request. Release tags and images: release.yml.
   push:
-    branches: [main, develop]
-  # release tags and images: release.yml
+    branches: [develop]
   pull_request:
 
 permissions: {}
@@ -23,12 +24,18 @@ jobs:
   # Which jobs run and what the e2e job builds: only a pull request may skip `check` (prose only), `e2e` (no
   # change to what the API, the web app or the e2e specs read) or the web build, or prerender a sample of the
   # records. Every other event (the default branch) and every doubt runs everything; see apps/web/scripts/ci-plan.mts.
+  #
+  # `promote` is true only for the promotion pull request (develop into main, from this repository). The push to
+  # develop already ran every check on that commit, so its pull_request run would repeat them; the jobs skip, and
+  # a skipped required check passes. A fork's branch named develop does not match, and a failed `changes` job
+  # leaves `promote` empty, so every job runs. The jobs without `needs` repeat the expression.
   changes:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
       contents: read
     outputs:
+      promote: ${{ github.head_ref == 'develop' && github.base_ref == 'main' && github.event.pull_request.head.repo.full_name == github.repository }}
       check: ${{ steps.plan.outputs.check }}
       e2e: ${{ steps.plan.outputs.e2e }}
       web: ${{ steps.plan.outputs.web }}
@@ -51,7 +58,7 @@ jobs:
   check:
     needs: changes
     # a failed `changes` job leaves the outputs empty, so the job runs
-    if: ${{ !cancelled() && needs.changes.outputs.check != 'false' }}
+    if: ${{ !cancelled() && needs.changes.outputs.promote != 'true' && needs.changes.outputs.check != 'false' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -79,6 +86,7 @@ jobs:
 
   # Workflow lint and security audit of .github/workflows and dependabot.yml.
   workflows:
+    if: ${{ !(github.head_ref == 'develop' && github.base_ref == 'main' && github.event.pull_request.head.repo.full_name == github.repository) }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -95,7 +103,7 @@ jobs:
           advanced-security: false
 
   dependency-review:
-    if: github.event_name == 'pull_request'
+    if: ${{ github.event_name == 'pull_request' && !(github.head_ref == 'develop' && github.base_ref == 'main' && github.event.pull_request.head.repo.full_name == github.repository) }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -109,7 +117,7 @@ jobs:
   e2e:
     needs: changes
     # a failed `changes` job still runs e2e, with empty outputs: the web app and every record page are built
-    if: ${{ !cancelled() && needs.changes.outputs.e2e != 'false' }}
+    if: ${{ !cancelled() && needs.changes.outputs.promote != 'true' && needs.changes.outputs.e2e != 'false' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:

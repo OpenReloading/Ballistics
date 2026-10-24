@@ -4,8 +4,6 @@ name: Scorecard
 # permissions (https://github.com/ossf/scorecard-action#workflow-restrictions).
 on:
   branch_protection_rule:
-  push:
-    branches: [develop]
   schedule:
     - cron: '17 5 * * 1'
 
