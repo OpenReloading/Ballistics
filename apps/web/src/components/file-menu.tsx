@@ -1,13 +1,19 @@
 'use client'
 
 import { Button, Group, Kbd, Menu, Textarea } from '@mantine/core'
-import type { EmbeddedFile, UserRecord, UserRecordKind } from '@openreloading/schema'
+import {
+  type EmbeddedFile,
+  type UserRecord,
+  type UserRecordKind,
+  userRecord,
+} from '@openreloading/schema'
 import { CaretDown, FloppyDisk, FolderOpen } from '@phosphor-icons/react'
 import { memo, type Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { localDay } from '../lib/dates.ts'
 import { download } from '../lib/download.ts'
 import { errorText } from '../lib/error-text.ts'
+import { exampleFirearm } from '../lib/example-data.ts'
 import {
   pickFiles,
   readHandleText,
@@ -65,6 +71,9 @@ import { useShortcuts } from './shortcuts.tsx'
 /** A question that drops what the page holds, answered in the app's confirm dialog. */
 const ask = (title: string, confirmLabel: string) =>
   confirmDialog({ title, confirmLabel, danger: true })
+
+/** The records the pages resolve themselves, never stored. */
+const builtIn = userRecord.parse(exampleFirearm)
 
 type Of<K extends UserRecordKind> = Extract<UserRecord, { kind: K }>
 
@@ -697,6 +706,12 @@ function FileMenuOf<K extends UserRecordKind>({
     )
   }
 
+  /** `refNote` of `opened` against the browser store and the built-in example rifle; empty when the store cannot be read. */
+  async function refsOf(opened: UserRecord[]) {
+    const stored = await storedRecords().catch(() => undefined)
+    return stored ? refNote(opened, [builtIn, ...stored.records]) : ''
+  }
+
   /** Shows `record` unless the user keeps the unsaved changes; false when kept. */
   async function use(record: Of<K>, file: string, h?: FileSystemFileHandle, note?: string) {
     if (unsaved && !(await ask('Replace the unsaved changes with the opened record?', 'Replace')))
@@ -706,8 +721,7 @@ function FileMenuOf<K extends UserRecordKind>({
     handle.current = h
     known.current = record.saved
     setSaved({ file, json: keyOf(record.data, record.name) })
-    const stored = (await storedRecords().catch(() => undefined))?.records ?? []
-    const text = [note, refNote([record], stored)].filter(Boolean).join(' ')
+    const text = [note, await refsOf([record])].filter(Boolean).join(' ')
     if (text) setMessage(`${file} opened. ${text}`)
     return true
   }
@@ -832,7 +846,7 @@ function FileMenuOf<K extends UserRecordKind>({
       total.files.push(...photos.filter((p) => wanted.has(p.id)))
     }
     // once all files are stored, so a reference to a record of a later file resolves
-    const refs = refNote(added, (await storedRecords()).records)
+    const refs = await refsOf(added)
     if (refs) total.notes.push({ name: 'References', note: refs })
     onStored?.()
     noteStorage()
@@ -854,7 +868,9 @@ function FileMenuOf<K extends UserRecordKind>({
     for (const p of left) deletePhoto(p).catch(() => {})
     onStored?.()
     setReport(undefined)
-    setMessage(`Replaced ${report.conflicts.length} browser records.`)
+    setMessage(
+      `Replaced ${report.conflicts.length} browser records. ${await refsOf(incoming)}`.trimEnd(),
+    )
   }
 
   async function browserRecords() {

@@ -1,5 +1,6 @@
-import type { UserRecord } from '@openreloading/schema'
+import { type UserRecord, userRecord } from '@openreloading/schema'
 import { describe, expect, it } from 'vitest'
+import { exampleFirearm } from '../src/lib/example-data.ts'
 import { parseFiles } from '../src/lib/load-file-formats.ts'
 import { maxLinkChars, readLink, shareLink } from '../src/lib/share-link.ts'
 import {
@@ -345,6 +346,10 @@ describe('refNote', () => {
   it('is empty when the browser holds the referenced record, or the opened ones do', () => {
     expect(refNote([withFirearm('f1')], [rifle])).toBe('')
     expect(refNote([withFirearm('f1'), rifle], [])).toBe('')
+  })
+
+  it('finds the built-in example rifle where it is passed with the stored records', () => {
+    expect(refNote([withFirearm(exampleFirearm.id)], [userRecord.parse(exampleFirearm)])).toBe('')
   })
 
   it('does not report a stored record that is not opened', () => {
