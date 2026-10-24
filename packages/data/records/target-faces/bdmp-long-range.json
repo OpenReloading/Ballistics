@@ -51,7 +51,7 @@
       "scoring": "touch"
     },
     {
-      "name": "BDMP LRSPFG 3 LR Schwarzpulverfreigewehr (SPFG 3)",
+      "name": "BDMP SPFG3 LR Schwarzpulverfreigewehr, 300 bis 900 m",
       "distance": {
         "value": 900000,
         "raw": "300 bis 900m"
@@ -60,7 +60,7 @@
       "scoring": "centre"
     },
     {
-      "name": "BDMP ZFSPFG 3 ZF Schwarzpulverfreigewehr (SPFG 3)",
+      "name": "BDMP SPFG3 ZF Schwarzpulverfreigewehr, 300 bis 900 m",
       "distance": {
         "value": 900000,
         "raw": "300 bis 900m"

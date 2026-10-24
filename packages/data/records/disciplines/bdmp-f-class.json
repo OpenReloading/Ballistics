@@ -2,7 +2,6 @@
   "id": "bdmp-f-class",
   "federation": "bdmp",
   "name": "F-Class Rifle",
-  "number": "F-Class",
   "section": "D.23",
   "page": "Teil D, Seite 210 bis 221 von 294, PDF pp. 210 to 221",
   "distance": {
@@ -16,7 +15,7 @@
       {
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.23, D.23.1, Teil D, Seite 210 von 294, PDF p. 210",
-        "fields": ["name", "number", "federation", "section", "page", "category"]
+        "fields": ["name", "federation", "section", "page", "category"]
       },
       {
         "source": "bdmp-sportordnung-2026-register-9",

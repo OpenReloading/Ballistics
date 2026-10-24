@@ -14,7 +14,7 @@
     "sources": [
       {
         "source": "bdmp-sportordnung-2026-register-8",
-        "page": "C.9, C.9.3, C.9.3.1, Teil C, Seite 61 von 142, PDF p. 61",
+        "page": "C.9.3, C.9.3.1, Teil C, Seite 61 von 142, PDF p. 61",
         "fields": ["name", "federation", "section", "page", "category"]
       },
       {

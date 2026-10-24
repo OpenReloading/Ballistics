@@ -44,7 +44,7 @@
   },
   "events": [
     {
-      "name": "BDMP F-Class F-Class Rifle",
+      "name": "BDMP F-Class Rifle",
       "distance": {
         "value": 1000000,
         "raw": "1000 m"

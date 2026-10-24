@@ -86,7 +86,7 @@
       "scoring": "touch"
     },
     {
-      "name": "BDMP PP 3 Police Pistol 3 (Carry Gun)",
+      "name": "BDMP Police Pistol 3 (Carry Gun)",
       "distance": {
         "value": 20000,
         "raw": "20 m"
@@ -95,7 +95,7 @@
       "scoring": "touch"
     },
     {
-      "name": "BDMP PP 4 Police Pistol 4 (Pocket Gun)",
+      "name": "BDMP Police Pistol 4 (Pocket Gun)",
       "distance": {
         "value": 15000,
         "raw": "15 m"
@@ -104,7 +104,7 @@
       "scoring": "touch"
     },
     {
-      "name": "BDMP .30 M 1 Carbine \"PP 2\"",
+      "name": "BDMP .30 M1 Carbine PP 2",
       "distance": {
         "value": 50000,
         "raw": "50 m"
@@ -131,7 +131,7 @@
       "scoring": "touch"
     },
     {
-      "name": "BDMP SC PP 2 Sports Carbine PP2",
+      "name": "BDMP Sports Carbine PP2",
       "distance": {
         "value": 50000,
         "raw": "50 Meter/Yards"

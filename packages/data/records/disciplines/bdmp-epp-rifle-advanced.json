@@ -2,7 +2,6 @@
   "id": "bdmp-epp-rifle-advanced",
   "federation": "bdmp",
   "name": "EPP Rifle Advanced",
-  "number": "EPP Rifle Advanced",
   "section": "D.25.B",
   "page": "Teil D, Seite 241 von 294, PDF p. 241",
   "distance": {
@@ -16,7 +15,7 @@
       {
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.25.B, Teil D, Seite 241 von 294, PDF p. 241",
-        "fields": ["name", "number", "federation", "section", "page", "category"]
+        "fields": ["name", "federation", "section", "page", "category"]
       },
       {
         "source": "bdmp-sportordnung-2026-register-9",

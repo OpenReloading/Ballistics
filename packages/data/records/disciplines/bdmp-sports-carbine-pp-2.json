@@ -2,7 +2,6 @@
   "id": "bdmp-sports-carbine-pp-2",
   "federation": "bdmp",
   "name": "Sports Carbine PP2",
-  "number": "SC PP 2",
   "section": "D.36",
   "page": "Teil D, Seite 277 bis 284 von 294, PDF pp. 277 to 284",
   "distance": {
@@ -16,7 +15,7 @@
       {
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.36, D.36.1, Teil D, Seite 277 von 294, PDF p. 277",
-        "fields": ["name", "number", "federation", "section", "page", "category"]
+        "fields": ["name", "federation", "section", "page", "category"]
       },
       {
         "source": "bdmp-sportordnung-2026-register-9",

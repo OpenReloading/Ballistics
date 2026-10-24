@@ -2,7 +2,6 @@
   "id": "bdmp-pp-3",
   "federation": "bdmp",
   "name": "Police Pistol 3 (Carry Gun)",
-  "number": "PP 3",
   "section": "C.6D",
   "page": "Teil C, Seite 32 bis 33 von 142, PDF pp. 32 to 33",
   "distance": {
@@ -16,7 +15,7 @@
       {
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.6D, C.6D.1, Teil C, Seite 32 von 142, PDF p. 32",
-        "fields": ["name", "number", "federation", "section", "page", "category"]
+        "fields": ["name", "federation", "section", "page", "category"]
       },
       {
         "source": "bdmp-sportordnung-2026-register-8",

@@ -2,7 +2,6 @@
   "id": "bdmp-epp-polymer-pistol",
   "federation": "bdmp",
   "name": "EPP - Polymerpistole",
-  "number": "EPP Polymer",
   "section": "C.17.A",
   "page": "Teil C, Seite 123 bis 129 von 142, PDF pp. 123 to 129",
   "distance": {
@@ -16,7 +15,7 @@
       {
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.17.A, C.17.A.1, Teil C, Seite 123 von 142, PDF p. 123",
-        "fields": ["name", "number", "federation", "section", "page", "category"]
+        "fields": ["name", "federation", "section", "page", "category"]
       },
       {
         "source": "bdmp-sportordnung-2026-register-8",

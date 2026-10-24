@@ -49,7 +49,7 @@
   },
   "events": [
     {
-      "name": "BDMP ZFSPFG 3 ZF Schwarzpulverfreigewehr (SPFG 3)",
+      "name": "BDMP SPFG3 ZF Schwarzpulverfreigewehr, 300 bis 900 m",
       "distance": {
         "value": 900000,
         "raw": "300 bis 900m"

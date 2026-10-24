@@ -2,8 +2,7 @@
   "id": "bdmp-zfspfg-3-bdmp-long-range-palma",
   "discipline": "bdmp-zfspfg-3",
   "face": "bdmp-long-range-palma",
-  "event": "BDMP ZFSPFG 3 ZF Schwarzpulverfreigewehr (SPFG 3)",
-  "stage": "Alternative face",
+  "event": "BDMP SPFG3 ZF Schwarzpulverfreigewehr, 300 bis 900 m",
   "shotCount": 10,
   "provenance": {
     "kind": "published",
@@ -16,7 +15,7 @@
       {
         "source": "bdmp-sportordnung-2026-register-10",
         "page": "E.14.8, Teil E, Seite 38 von 42, PDF p. 38",
-        "fields": ["discipline", "face", "event", "stage"]
+        "fields": ["discipline", "face", "event"]
       },
       {
         "source": "bdmp-sportordnung-2026-register-10",

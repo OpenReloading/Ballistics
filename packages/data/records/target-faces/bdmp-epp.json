@@ -61,7 +61,7 @@
       "scoring": "touch"
     },
     {
-      "name": "BDMP EPP Polymer EPP - Polymerpistole",
+      "name": "BDMP EPP - Polymerpistole",
       "distance": {
         "value": 25000,
         "raw": "25 m"
@@ -79,7 +79,7 @@
       "scoring": "touch"
     },
     {
-      "name": "BDMP EPP Rifle Advanced EPP Rifle Advanced",
+      "name": "BDMP EPP Rifle Advanced",
       "distance": {
         "value": 50000,
         "raw": "50 m"
