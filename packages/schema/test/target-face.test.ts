@@ -65,7 +65,13 @@ describe('targetFace extended geometry', () => {
     { value: 9, diameter: mm(20), fill: 'black', line: 'white' },
     { value: 10, diameter: mm(10), fill: 'black', line: 'white' },
   ]
-  const faceWith = (extra: object) => ({ ...face, rings, blackDiameter: mm(20), ...extra })
+  const faceWith = (extra: object) => ({
+    ...face,
+    rings,
+    blackDiameter: mm(20),
+    decimal: false,
+    ...extra,
+  })
   const ok = (extra: object) => targetFace.safeParse(faceWith(extra))
 
   it('accepts colours, a sheet, bulls and the numerals flag', () => {
@@ -111,6 +117,29 @@ describe('targetFace extended geometry', () => {
       'rings.1.height',
     )
     expectIssueAt(targetFace, faceWith({ blackHeight: mm(26) }), 'rings')
+  })
+
+  it('accepts a square ring and refuses a square with a height', () => {
+    const square = [{ ...rings[0], shape: 'square' }, rings[1], rings[2]]
+    expect(ok({ rings: square }).success).toBe(true)
+    const tall = [{ ...square[0], height: mm(40) }, rings[1], rings[2]]
+    expectIssueAt(targetFace, faceWith({ rings: tall }), 'rings.0.height')
+    expectIssueAt(
+      targetFace,
+      faceWith({ rings: [{ ...rings[0], shape: 'round' }] }),
+      'rings.0.shape',
+    )
+  })
+
+  it('refuses tenth-ring values on a square or oval face, and a cover rule on an oval inner ten', () => {
+    const square = [{ ...rings[0], shape: 'square' }, rings[1], rings[2]]
+    expectIssueAt(targetFace, faceWith({ rings: square, decimal: true }), 'decimal')
+    const oval = rings.map((r, i) => ({ ...r, height: mm([40, 26, 12][i]) }))
+    expectIssueAt(targetFace, faceWith({ rings: oval, decimal: true }), 'decimal')
+    expect(ok({ rings: square, decimal: false }).success).toBe(true)
+    const inner = { diameter: mm(5), height: mm(4), rule: 'cover' }
+    expectIssueAt(targetFace, faceWith({ rings: oval, innerTen: inner }), 'innerTen.rule')
+    expect(ok({ rings: oval, innerTen: { ...inner, rule: 'touch' } }).success).toBe(true)
   })
 
   it('accepts an event with a category and refuses an event with caliber classes', () => {
