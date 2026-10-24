@@ -157,7 +157,7 @@ Each step lands alone with its model page updated in the same commit. Steps 4 to
 | 9 | Manufacturer references | 3 |
 | 10 | Replaced by the catalogue storage steps D0 to D6 (`catalogue-storage.md`) | |
 | 11 | Browser store hardening: versioned IndexedDB, keep and list invalid records | before 3 and 4 |
-| 12 | Catalogue loose ends: schema for load tables, caliber classes as records, renames map | |
+| 12 | Catalogue loose ends: schema for load tables, caliber classes as records (the renames map is part of the catalogue storage, `catalogue-storage.md`) | |
 
 Steps 1, 2 and 11 go first, then 3, then 4 to 6, then 7 to 9. Steps 10 and 12 fit any time; 10 does not run together with other changes to the cartridge routes.
 

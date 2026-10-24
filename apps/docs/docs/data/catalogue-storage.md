@@ -5,7 +5,7 @@ description: Why the read-only catalogue needs no server database, the single se
 
 # Catalogue storage
 
-The catalogue (the records of `packages/data`) is read only, rebuilt from git on every build and small: about 1.2 thousand records in the public data. This page records how it is stored and queried, what was measured, and which part is already in code: the one search matcher and the one sort order in `packages/schema` (`src/search.ts`, `src/order.ts`) and the in-process catalogue module in `packages/api` (`src/catalogue/`), which the API's routes and compute lookups read. Paths are relative to the repository root. The steps D0 to D6 of the epic "Data model: one entity per concept" carry the rest out.
+The catalogue (the records of `packages/data`) is read only, rebuilt from git on every build and small: about 1.2 thousand records in the public data. This page records how it is stored and queried, what was measured, and which part is already in code: the one search matcher and the one sort order in `packages/schema` (`src/search.ts`, `src/order.ts`) and the in-process catalogue module in `packages/api` (`src/catalogue/`), which the API's routes and compute lookups read. Paths are relative to the repository root. The steps D0 to D6 of the epic "Data model: one entity per concept" carry the rest out; the renames map and the format guard are described below.
 
 ## Decision
 
@@ -33,14 +33,25 @@ Ranked search over a generated 20,000 bullet index in plain JavaScript takes 1 t
 `packages/api/src/catalogue/`. The routes, the compute record lookups, the server and the static build read it.:
 
 - `derive.ts`: one index row per record, `{ item, sortKey, search }`. `item` is the list item the route answers today (the cartridge's sheet minima and case head, a bullet's first G1 and G7 coefficient, a target face's caliber classes), `sortKey` and `search` come from the schema package's `sortKey` and `searchKey`. Also the revision: a synchronous 53-bit hash of the record's JSON text, the same in Node and the browser, for change detection only.
-- `build.ts`: `buildCatalogue(records)` returns the typed index (`CatalogueIndex`, every list in its default order, format 1) and the record file (every record by id, one map per kind). Pure, so the build, the tests and a browser can all run it. The files hold the records as they are: `kind`, `origin` and `revision` are added when a record is read.
-- `open.ts`: `openCatalogue({ index, records })` returns the `Catalogue` interface: `cartridges`, `powders`, `bullets` (with `q`, `table`, `manufacturer`, `cartridge`, `limit`, `offset`), `manufacturers`, `targetFaces`, `federations`, `disciplines`, `targetMappings`, `capacities` and `get(kind, id)`. The record file may be a function, read on the first `get`. An index of another format is rejected.
+- `build.ts`: `buildCatalogue(records)` returns the typed index (`CatalogueIndex`, every list in its default order, the renames) and the record file (every record by id, one map per kind). Both start with the header `format` and `derive`, see below. Pure, so the build, the tests and a browser can all run it. The files hold the records as they are: `kind`, `origin` and `revision` are added when a record is read.
+- `open.ts`: `openCatalogue({ index, records })` returns the `Catalogue` interface: `cartridges`, `powders`, `bullets` (with `q`, `table`, `manufacturer`, `cartridge`, `limit`, `offset`), `manufacturers`, `targetFaces`, `federations`, `disciplines`, `targetMappings`, `capacities` and `get(kind, id)`. The record file may be a function, read on the first `get`. `renamed(kind, id)` answers the id that replaced an old one. A file whose header does not match is refused.
 - `list.ts`: the one filter, rank and page step. A query ranks by `score` and keeps the default order between equal ranks.
 - `browser.ts`: the entry `@openreloading/api/catalogue`. It imports core and schema only, no Node API (`test/compute-imports.test.ts`). `node.ts` reads and writes the two files (`index.json`, `records.json`), `write.ts` is the build step (`npm run build` writes them into `dist/catalogue/`, also exported as `@openreloading/api/catalogue/*.json`). The server opens them at start (`loadCatalogue`, no database, no wait) and answers a record as stored, without the added `kind`, `origin` and `revision`; the API image gets the files from the same build.
 
 Checks in `packages/api/test/`: `catalogue.test.ts` (derive, build, open, files) and `catalogue-budget.test.ts`; `app.test.ts` and `competition-order.test.ts` hold the answers of the routes.
 
 The budgets, tested as the best of fifteen runs after a warm-up (other test files share the CPU): the index of the public bundle from its records in under 50 ms, from the prebuilt index text in under 9 ms, a ranked page of 50 cartridges in under 5 ms. Measured on the public bundle (577 cartridges, one machine): about 10 ms from the records, 1 ms from the prebuilt index (460 kB, the record file is 3.6 MB and read on the first `get`).
+
+## Renames and the format guard
+
+`packages/data/records/renames.json` lists, per kind directory that has an id route (`cartridges`, `manufacturers`, `powders`, `bullets`, `target-faces`, `federations`, `disciplines`, `target-mappings`), the ids that no longer name a record, each with the id of the record that replaced it (`renames` in `packages/schema/src/renames.ts`). A record that was removed names its successor. The file is `{}` until an id changes.
+
+- `data:validate` (`src/renames.ts`, `src/references.ts`, `src/federations.ts`): a reference to an unknown id fails, unless the id is an old id of `renames.json`. An old id must be no current record, and its replacement must be one, so a rename never chains. A kind without an id route, an id that is no record id or a file that is not JSON fails.
+- The catalogue carries the renames in its index. A reference to an old id joins the record that replaced it (a component's manufacturer, a capacity's cartridge, a mapping's discipline and face). A record is answered as stored, so the reference in its body keeps the old id.
+- The id routes answer a request for an old id with a 308 and the `Location` of the current record under the same version prefix. An unknown id stays a 404. The compute routes take current ids.
+- The Pages edition has no server to redirect from and writes no file for an old id.
+
+The index and the record file begin with two numbers. `format` is the layout of the files (`catalogueFormat`), `derive` the version of what `derive.ts` computes (`deriveVersion`: list items, sort and search keys, revisions). `openCatalogue` checks the index when it opens and the record file when it first reads it, and refuses a file with another number or none: `catalogue index derive version 0 is not 1: rebuild it`. Raise `derive` with any change to what `derive.ts` writes, so files built by older code are never read as current. A build writes both files together, so only a stale file in `dist/catalogue/` can trigger it.
 
 ## Triggers for the fallback
 

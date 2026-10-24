@@ -3,7 +3,7 @@ import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
 import { cartridgeItem } from '../catalogue/derive.ts'
 import type { CartridgeQuery, Catalogue } from '../catalogue/types.ts'
-import { idParams, listQuery, noNul, stored } from './common.ts'
+import { idParams, listQuery, missing, noNul, stored } from './common.ts'
 
 const cartridgeQuery = listQuery({
   table: {
@@ -73,6 +73,7 @@ export const cartridgeRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
       config: {
         response: cartridgeResponse,
         errors: [404],
+        moved: true,
         summary: 'Get a cartridge',
         description:
           'The cartridge record of its C.I.P. sheet with its values, provenance, case type and case capacities.',
@@ -80,7 +81,7 @@ export const cartridgeRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
     },
     (request, reply) => {
       const found = catalogue.get('cartridge', request.params.id)
-      if (!found) return reply.notFound(`cartridge ${request.params.id} not found`)
+      if (!found) return missing(reply, catalogue, 'cartridges', request.params.id, 'cartridge')
       const record = stored(found)
       const { caseType } = cartridgeItem(record)
       return reply.send({
