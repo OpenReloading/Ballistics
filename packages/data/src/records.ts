@@ -50,6 +50,7 @@ import {
 import { readKind } from './read-kind.ts'
 import {
   checkCartridgeReferences,
+  checkLoadCapacityReferences,
   checkLoadComponentReferences,
   checkLoadReferences,
   checkManufacturerReferences,
@@ -252,6 +253,7 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
   checkRangeRounds(bundle.rangeFirings, errors)
   checkLoadReferences(bundle, ids, errors)
   checkLoadComponentReferences(bundle, errors)
+  checkLoadCapacityReferences(bundle, errors)
   for (const f of collectFindings(bundle, new Map(bundle.cartridges.map((c) => [c.id, c]))))
     errors.push(`${f.file}: ${f.finding}: ${f.message}`)
   return { bundle, errors }

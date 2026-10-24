@@ -237,6 +237,8 @@ export function SeatingPreview({
   onSeatLadder,
   measuredWaterCapacity = { text: '', si: undefined },
   onMeasuredWaterCapacity,
+  capacityId: chosenId,
+  onCapacityId,
   linked,
   slots,
   view = 'combined',
@@ -268,6 +270,9 @@ export function SeatingPreview({
    */
   measuredWaterCapacity?: FieldValue
   onMeasuredWaterCapacity?: (value: FieldValue) => void
+  /** The capacity record chosen, held by the page so a load keeps it; without it the choice is the figure's own. */
+  capacityId?: string
+  onCapacityId?: (id: string) => void
   /**
    * The bullet record or design of the page's own bullet input: the preview seats it and
    * shows no bullet search or design choice of its own.
@@ -321,7 +326,9 @@ export function SeatingPreview({
     setDesign(linkedDesign ? designs.find((d) => d.id === linkedDesign) : undefined)
   }, [isLinked, linkedBullet, linkedDesign, designs])
   const record = useRecord<Bullet>(bulletId ? `bullets/${encodeURIComponent(bulletId)}` : undefined)
-  const [capacityId, setCapacityId] = useState<string | undefined>(undefined)
+  const [ownCapacityId, setOwnCapacityId] = useState<string | undefined>(undefined)
+  const capacityId = onCapacityId ? chosenId : ownCapacityId
+  const setCapacityId = onCapacityId ?? setOwnCapacityId
   const [barrel, setBarrel] = useState<FieldValue>(() => {
     const m = barrelLength ?? initial?.barrel
     return m === undefined

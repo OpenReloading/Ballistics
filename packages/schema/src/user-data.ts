@@ -213,7 +213,7 @@ export interface DanglingRef {
 
 /**
  * The references of `records` to user records that no record of `records` answers: a load's
- * `firearm`, `cartridge` and `bullet`, a bullet's and a firearm's `manufacturer`, a capacity's
+ * `firearm`, `cartridge`, `bullet` and `capacity`, a bullet's and a firearm's `manufacturer`, a capacity's
  * `cartridge` and `caseManufacturer` (only as `user:<id>`) and a target sheet's `load`. A
  * `user:<id>` reference names a record by its id, a
  * `catalogue:` reference is not checked here. Reports only: nothing is dropped.
@@ -244,6 +244,7 @@ function userRefsOf(r: UserRecord): [string, string | undefined, UserRecordKind,
         ['firearm', r.data.firearm, 'firearm', true],
         ['cartridge', r.data.cartridge, 'cartridge', true],
         ['bullet', typeof r.data.bullet === 'string' ? r.data.bullet : undefined, 'bullet', true],
+        ['capacity', r.data.capacity, 'caseCapacity', true],
       ]
     case 'caseCapacity':
       return [
