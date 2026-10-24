@@ -31,7 +31,7 @@ Where questions, ideas, bugs and record requests go: [README](README.md#communit
 - Branches:
   - `main` holds released code. It takes only the pull request from `develop` and the release pull request.
   - `develop` is where work lands. Cut a branch from it, named `<type>/<issue>-<slug>` (for example `fix/123-powder-search`), and open the pull request against `develop`. `develop` cannot be deleted or force-pushed.
-- Pull requests are squash-merged into `main`. The title becomes the commit on `main` and the changelog line, so the `PR title` check enforces the format.
+- Pull requests are squash-merged into `develop`; the promotion pull request from `develop` to `main` takes a merge commit. The title becomes the commit on `develop` and the changelog line, so the `PR title` check enforces the format.
 - Reference the issue in the description (`Closes #123`).
 
 ## Releases

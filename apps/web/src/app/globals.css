@@ -2943,6 +2943,34 @@ main .library-head.page-panel-head > .page-panel-title {
   font-weight: 600;
 }
 
+/* the lot rows of a charge: the slower lot first, set off from the charge before it */
+@media (min-width: 48em) {
+  .ladder-table tr[data-lot="low"] td {
+    border-top: 1px solid var(--border);
+  }
+}
+
+.ladder-table tr[data-lot] td {
+  color: var(--muted);
+}
+
+/* the Ladder table tab's lot rows: the fields in one row, the chart under them */
+.lot-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 12rem));
+  align-items: end;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.lot-rows h3 {
+  margin: 0.5rem 0;
+}
+
+.lot-note {
+  margin: 0 0 1rem;
+}
+
 /* the Barrel length tab: the range fields and the table or chart switch in one row */
 .hit-probability-fields,
 .moving-target-fields {

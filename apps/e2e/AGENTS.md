@@ -28,6 +28,7 @@ Playwright tests against a running API and web app, on the CIP cartridge records
 | `web/workbench-band.spec.ts` | the example run's band line (velocity band, percentiles, input tolerances only), axe on the tiles, the list and that line in light and dark |
 | `web/truing.spec.ts` | the truing section of the Trajectory tab: plan statuses, entered rows, a fit with an interval for an identified parameter and a named, valueless one for another, started from the keyboard, axe clean in light and dark |
 | `web/workbench-playback.spec.ts` | the interior chart's playback: the bullet flies out of the chart box past the muzzle, slider and values at the muzzle, replay, reduced motion |
+| `web/workbench-lot-rows.spec.ts` | the Ladder table's lot rows follow the percentage, the barrel-time chart with the target line, axe in light and dark, the chart at 390 px, the chart and lot rows in the printed report |
 | `web/workbench-link.spec.ts` | a copied workbench link (fragment) runs the same load with its bullet and powder records missing. Older query links open |
 
 ## Commands (this directory, or `-w @openreloading/e2e` from the root)
