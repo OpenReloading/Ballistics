@@ -22,7 +22,7 @@ import { Plus, Trash, X } from '@phosphor-icons/react'
 import { type Dispatch, type ReactElement, type SetStateAction, useState } from 'react'
 import type { CartridgeSummary } from '../lib/api-types.ts'
 import { type FieldSpec, fieldError } from '../lib/field-spec.ts'
-import { firearmFields, freeId, mountFields, opticFields } from '../lib/firearm.ts'
+import { firearmFields, freeId, mountFields, opticFields, zeroFields } from '../lib/firearm.ts'
 import { controlSize, tipEvents } from '../lib/theme.ts'
 import { roundedFieldText, type UnitSystem } from '../lib/units.ts'
 import { NumberField } from './number-field.tsx'
@@ -474,6 +474,56 @@ export function FirearmEditor({
                             >
                               <Trash size={16} aria-hidden="true" />
                             </ActionIcon>
+                          </Table.Td>
+                        </Table.Tr>
+                      ))}
+                    </Table.Tbody>
+                  </Table>
+                </Table.ScrollContainer>
+                <Table.ScrollContainer minWidth={720}>
+                  <Table
+                    className="firearm-table"
+                    withRowBorders={false}
+                    aria-label={`Zero air and drag factor of ${title}`}
+                  >
+                    <Table.Thead>
+                      <Table.Tr>
+                        <Table.Th>Optic</Table.Th>
+                        {zeroFields.map((spec) => (
+                          <Table.Th key={spec.key}>{spec.label}</Table.Th>
+                        ))}
+                        <Table.Th>Drag factor source</Table.Th>
+                      </Table.Tr>
+                    </Table.Thead>
+                    <Table.Tbody>
+                      {c.mounts.map((m, k) => (
+                        // biome-ignore lint/suspicious/noArrayIndexKey: mounts have no id and keep their order
+                        <Table.Tr key={k}>
+                          <Table.Th scope="row">{opticName(m.optic)}</Table.Th>
+                          {zeroFields.map((spec) => (
+                            <Table.Td key={spec.key}>
+                              <SiField
+                                spec={{
+                                  ...spec,
+                                  label: `${spec.label}, ${title} mount ${k + 1}`,
+                                }}
+                                system={system}
+                                si={m[spec.key]}
+                                onChange={(si) => setMount(i, k, { [spec.key]: si })}
+                              />
+                            </Table.Td>
+                          ))}
+                          <Table.Td>
+                            <TextInput
+                              label={`Drag factor source, ${title} mount ${k + 1}`}
+                              maxLength={200}
+                              value={m.dragFactorSource ?? ''}
+                              onChange={(e) =>
+                                setMount(i, k, {
+                                  dragFactorSource: e.currentTarget.value || undefined,
+                                })
+                              }
+                            />
                           </Table.Td>
                         </Table.Tr>
                       ))}

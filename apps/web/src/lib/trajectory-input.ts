@@ -1,6 +1,8 @@
 import {
+  type Air,
   type DragModel,
   densityAltitude,
+  dragCorrection,
   firstLowStability,
   icao,
   type Projectile,
@@ -41,6 +43,35 @@ export const shotFields = [
     required: true,
     min: 0,
     initial: 100,
+  },
+  {
+    key: 'zeroTemperature',
+    label: 'Zero temperature',
+    help: 'Optional, the air of the zero: an empty field takes the shot value. The zero always takes the altitude of the shot.',
+    quantity: 'temperature',
+  },
+  {
+    key: 'zeroPressure',
+    label: 'Zero pressure',
+    help: 'Optional. Absolute station pressure of the zero, not reduced to sea level; empty takes the shot value.',
+    quantity: 'airPressure',
+    min: 0,
+  },
+  {
+    key: 'zeroHumidity',
+    label: 'Zero humidity',
+    help: 'Optional. Empty takes the shot value.',
+    quantity: 'percent',
+    min: 0,
+    max: 100,
+  },
+  {
+    key: 'dragFactor',
+    label: 'Drag factor',
+    help: 'Optional. Multiplies the drag of the bullet: 100 % is the bullet as given, 103 % has 3 % more drag.',
+    quantity: 'dragFactor',
+    min: 0,
+    positive: true,
   },
   {
     key: 'temperature',
@@ -117,6 +148,8 @@ export const manualBulletFields = [
   },
 ] as const satisfies readonly FieldSpec[]
 
+/** The optional fields of the zero air and the drag factor, which the example leaves empty. */
+export const zeroKeys = ['zeroTemperature', 'zeroPressure', 'zeroHumidity', 'dragFactor'] as const
 export type ShotKey = (typeof shotFields)[number]['key']
 export type ManualKey = (typeof manualBulletFields)[number]['key']
 
@@ -147,7 +180,22 @@ export function rangeSteps(max: number, step: number): number[] {
   return list
 }
 
-/** Core `TrajectoryInput` from SI field values; zero air is the shot air and the zero has no wind (core defaults). */
+/** The zero air of the fields set, each other component the shot's; none when no field is set. */
+function zeroAir(values: Values, air: Air): Air | undefined {
+  const { zeroTemperature: temperature, zeroPressure: pressure, zeroHumidity: humidity } = values
+  if (temperature === undefined && pressure === undefined && humidity === undefined) return
+  return {
+    ...air,
+    ...(temperature !== undefined && { temperature }),
+    ...(pressure !== undefined && { pressure }),
+    ...(humidity !== undefined && { humidity }),
+  }
+}
+
+/**
+ * Core `TrajectoryInput` from SI field values. The zero has no wind and the air of the shot unless
+ * a zero air field is set; a drag factor multiplies the drag of the projectile, in the zero too.
+ */
 export function shotFromValues(
   values: Values,
   projectile: Projectile,
@@ -156,20 +204,26 @@ export function shotFromValues(
   const v = (key: string) => requireValue(values, shotFields, key)
   const twist = values.twist
   const windSpeed = v('windSpeed')
+  const air = {
+    temperature: v('temperature'),
+    pressure: v('pressure'),
+    altitude: v('altitude'),
+    humidity: v('humidity'),
+  }
+  const factor = values.dragFactor
+  const zeroAt = zeroAir(values, air)
   return {
-    projectile,
+    projectile:
+      factor === undefined
+        ? projectile
+        : { ...projectile, drag: dragCorrection(projectile)([factor]) },
     muzzleVelocity: v('muzzleVelocity'),
     firearm: { sightHeight: v('sightHeight'), ...(twist !== undefined && { twist }), twistHand },
-    air: {
-      temperature: v('temperature'),
-      pressure: v('pressure'),
-      altitude: v('altitude'),
-      humidity: v('humidity'),
-    },
+    air,
     ...(windSpeed > 0 && {
       wind: [{ endDistance: v('maxRange'), speed: windSpeed, fromDirection: v('windFrom') }],
     }),
-    zero: { range: v('zeroRange') },
+    zero: { range: v('zeroRange'), ...(zeroAt && { air: zeroAt }) },
   }
 }
 

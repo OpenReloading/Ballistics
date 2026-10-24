@@ -39,6 +39,7 @@ export type Quantity =
   | 'angle'
   | 'correction'
   | 'percent'
+  | 'dragFactor'
   | 'sectionalDensity'
 
 export interface Unit {
@@ -124,6 +125,8 @@ export const unitsOf = {
     mrad: linear('mrad', radPerMrad, 2),
   },
   percent: { '%': linear('%', 0.01, 0) },
+  // a multiplier on the drag, 100 % the nominal drag; one decimal keeps a fitted 1.034
+  dragFactor: { '%': linear('%', 0.01, 1) },
   // a bullet's mass over its diameter squared, kg/m² in SI; makers print lb/in²
   sectionalDensity: {
     'kg/m2': linear('kg/m²', 1, 1),
@@ -166,6 +169,7 @@ const single = {
   ballisticCoefficient: 'lb/in2',
   angle: 'deg',
   percent: '%',
+  dragFactor: '%',
 } as const
 
 /** The unit of each quantity per preset. */

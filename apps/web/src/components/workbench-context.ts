@@ -103,6 +103,11 @@ type InputEchoState = {
     twist?: number
     sightHeight?: number
     zeroRange?: number
+    zeroTemperature?: number
+    zeroPressure?: number
+    zeroHumidity?: number
+    dragFactor?: number
+    dragFactorSource?: string
   }
 }
 export const InputEcho = createContext<InputEchoState | null>(null)

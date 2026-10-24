@@ -15608,6 +15608,36 @@
                                               "type": "string",
                                               "maxLength": 1000,
                                               "description": "Notes on the zero."
+                                            },
+                                            "zeroTemperature": {
+                                              "type": "number",
+                                              "exclusiveMinimum": 0,
+                                              "unit": "K",
+                                              "description": "Air temperature of the zero, K."
+                                            },
+                                            "zeroPressure": {
+                                              "type": "number",
+                                              "exclusiveMinimum": 0,
+                                              "unit": "Pa",
+                                              "description": "Absolute station pressure of the zero, Pa."
+                                            },
+                                            "zeroHumidity": {
+                                              "type": "number",
+                                              "minimum": 0,
+                                              "maximum": 1,
+                                              "unit": "1",
+                                              "description": "Relative humidity of the zero, fraction from 0 to 1."
+                                            },
+                                            "dragFactor": {
+                                              "type": "number",
+                                              "exclusiveMinimum": 0,
+                                              "unit": "1",
+                                              "description": "Factor on the drag of the bullet from truing, 1 for the nominal drag."
+                                            },
+                                            "dragFactorSource": {
+                                              "type": "string",
+                                              "maxLength": 200,
+                                              "description": "Where the drag factor comes from, for example the truing session."
                                             }
                                           },
                                           "required": ["optic", "sightHeight", "zeroRange"]

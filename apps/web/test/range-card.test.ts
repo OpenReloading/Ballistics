@@ -80,6 +80,23 @@ describe('range card', () => {
     )
   })
 
+  it('adds the zero air and the drag factor with its source, only when set', () => {
+    const system = presetUnits('metric-grains')
+    const shot = { temperature: 288.15, pressure: 101325, humidity: 0.5 }
+    const names = (si: Record<string, number>, source?: string) =>
+      Object.fromEntries(rangeCardFacts(si, 100, system, false, source))
+    expect(names(shot)).not.toHaveProperty(['Zero air'])
+    expect(names(shot)).not.toHaveProperty(['Drag factor'])
+    const set = names(
+      { ...shot, zeroTemperature: 308.15, dragFactor: 1.034 },
+      'Truing session of 2026-09-14',
+    )
+    // the zero air fields left empty show the shot's values
+    expect(set['Zero air']).toBe('35 °C, station pressure 1013.3 hPa, humidity 50 %')
+    expect(set['Drag factor']).toBe('103.4 %, Truing session of 2026-09-14')
+    expect(names({ ...shot, dragFactor: 0.97 })['Drag factor']).toBe('97 %')
+  })
+
   it('leads with mass and BC for a manual bullet', () => {
     const facts = rangeCardFacts(
       { mass: 0.0108864, ballisticCoefficient: 0.243 * lbPerSqInToKgPerSqM },
