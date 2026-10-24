@@ -11,7 +11,7 @@ Ring scoring gives each shot on a target face:
 - the tenth-ring value, where the face's rules allow it
 - whether it is an inner ten
 
-A face is placed on the target sheet by fitting its centre and scale to points marked on two or more of its rings. Face records hold ring diameters in mm. Shots are hole centres in target m from the face centre. The face and event of a group come from the target mapping of the discipline picked ([Federations, disciplines and target mappings](../data/federations.md)). The code is in `apps/web/src/lib/ring-scoring.ts`.
+A face is placed on the target sheet by fitting its centre and scale to points marked on two or more of its rings. Face records hold ring diameters in mm. Shots are hole centres in target m from the face centre. The face and event of a group come from the target mapping of the discipline picked ([Federations, disciplines and target mappings](../data/federations.md)). A face from the browser's face designer scores like a record: its events have no target mapping, so each is listed under User design and its gauge is the scored hole. The code is in `apps/web/src/lib/ring-scoring.ts`.
 
 ## Equations
 

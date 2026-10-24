@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { firearm } from './firearm.ts'
 import { siValues, text } from './shared.ts'
 import { specValue } from './standards.ts'
+import { faceColour } from './target-face.ts'
 import { targetSheet } from './target-sheet.ts'
 import { workbenchState } from './workbench.ts'
 
@@ -59,6 +60,53 @@ export const cartridgeDesign = z.object({
   parent,
 })
 
+const designLength = z.number().positive()
+
+/**
+ * A target face in the face designer: the face fields a rule book gives, without id, name and
+ * provenance, and each of them optional (a draft). The face designer builds the face from it and
+ * checks it against `TargetFace`. Lengths in mm.
+ * Inferred type: {@link TargetFaceDesign}.
+ */
+export const targetFaceDesign = z.object({
+  rings: z
+    .array(
+      z.object({
+        value: z.int().positive().optional().describe('Ring value.'),
+        diameter: designLength.optional().describe('Width of the ring, mm.'),
+        height: designLength.optional().describe('Height of an oval ring, mm.'),
+        fill: faceColour.optional().describe('Colour of the zone the ring line bounds outside.'),
+        line: faceColour.optional().describe('Colour of the ring line.'),
+      }),
+    )
+    .max(40)
+    .describe('Rings from outer to inner.'),
+  innerTen: z
+    .object({
+      diameter: designLength.optional().describe('Width of the inner ten, mm.'),
+      height: designLength.optional().describe('Height of an oval inner ten, mm.'),
+      rule: z
+        .enum(['touch', 'cover'])
+        .optional()
+        .describe('Whether a touch or only a cover counts.'),
+    })
+    .describe('The inner ten.')
+    .optional(),
+  blackDiameter: designLength.optional().describe('Width of the black aiming area, mm.'),
+  blackHeight: designLength.optional().describe('Height of an oval black aiming area, mm.'),
+  decimal: z.boolean().optional().describe('Decimal (tenth-ring) scoring.'),
+  events: z
+    .array(
+      z.object({
+        name: text(200).describe('Name of the event. Empty: not named yet.'),
+        distance: designLength.optional().describe('Shooting distance, mm.'),
+        gauge: designLength.optional().describe('Diameter of the scored hole, mm.'),
+      }),
+    )
+    .max(40)
+    .describe('Events shot on the face.'),
+})
+
 const base = {
   id: z.string().min(1).max(64).describe('Id of the record in the browser library.'),
   name: z.string().min(1).max(200).describe('Name of the record. Save names the file after it.'),
@@ -82,6 +130,7 @@ export const userRecord = z.discriminatedUnion('kind', [
   record('workbenchState', 'A load of the workbench.', workbenchState),
   record('firearm', 'A firearm of the library: lengths in m, mass in kg, angles in rad.', firearm),
   record('targetSheet', 'A target sheet with its calibration and shot groups.', targetSheet),
+  record('targetFaceDesign', 'A target face of the face designer.', targetFaceDesign),
 ])
 
 /** Media type of a stored photo: a raster image (an SVG can carry script). */
@@ -147,11 +196,13 @@ export function versionProblem(json: unknown): string | undefined {
 export interface BulletDesign extends z.infer<typeof bulletDesign> {}
 /** A saved cartridge drawing: table and spec values in stored units. */
 export interface CartridgeDesign extends z.infer<typeof cartridgeDesign> {}
+/** A target face of the face designer: rings, inner ten, black area and events, each optional. */
+export interface TargetFaceDesign extends z.infer<typeof targetFaceDesign> {}
 /** The user record of kind `targetSheet`. */
 export type TargetSheetRecord = Extract<UserRecord, { kind: 'targetSheet' }>
 /** One record of a user data file: `kind`, id, name, save time and `data`. */
 export type UserRecord = z.infer<typeof userRecord>
-/** Discriminator of a user record: `bulletDesign`, `cartridgeDesign`, `workbenchState`, `firearm` or `targetSheet`. */
+/** Discriminator of a user record: `bulletDesign`, `cartridgeDesign`, `workbenchState`, `firearm`, `targetSheet` or `targetFaceDesign`. */
 export type UserRecordKind = UserRecord['kind']
 /** A base64 photo stored in a user data file, referenced by id. */
 export interface EmbeddedFile extends z.infer<typeof embeddedFile> {}

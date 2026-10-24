@@ -9,6 +9,7 @@ const allowed: Record<string, string[]> = {
   cartridge: ['core', 'cartridge'],
   bullet: ['core', 'bullet'],
   seating: ['core', 'cartridge', 'bullet', 'seating'],
+  target: ['target'],
 }
 
 const folder = (file: string) => (file.includes('/') ? file.split('/')[0] : 'core')

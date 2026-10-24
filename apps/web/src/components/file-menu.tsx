@@ -84,6 +84,7 @@ const kindNames: Record<UserRecordKind, string> = {
   workbenchState: 'loads',
   firearm: 'firearms',
   targetSheet: 'target sheets',
+  targetFaceDesign: 'target face designs',
 }
 
 /** Kinds a share link carries: the designs and the workbench load. */
