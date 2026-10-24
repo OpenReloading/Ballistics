@@ -488,6 +488,8 @@ export function SeatingPreview({
             unit,
             coal === undefined ? undefined : { coal, cbto },
             'print',
+            // the design's own drawing above shows its sides: the frame fits the combined view
+            designed ? ['combined'] : undefined,
           )
         : {},
     [spec, fixed, unit, inCard, designed, coal, cbto],

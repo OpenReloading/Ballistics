@@ -365,7 +365,11 @@ export function CartridgeDesigner() {
                   content: canSeat ? (
                     <div ref={setSeatSlot} className="seating-slot" />
                   ) : (
-                    <p className="note">Not given: the cartridge L3, which the seating needs.</p>
+                    <p className="note">
+                      {drawn?.spec
+                        ? 'Not given: the cartridge L3, which the seating needs.'
+                        : 'Not given: a drawing of the cartridge, which the seating needs.'}
+                    </p>
                   ),
                 },
               ]

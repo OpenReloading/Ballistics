@@ -16,7 +16,8 @@ export type FigureView = 'cartridge' | 'chamber' | 'combined'
  * with `seated` the Cartridge side's L6 replaced by the seated COAL and the seated CBTO added.
  * All share the text size of the record figure and one frame, the union of their frames, and the
  * scale bar of the lowest, so the outline keeps its place and scale when a view hides or shows the
- * dimensions. Laid out for `medium`: upright on screen, level (head left) for print.
+ * dimensions. Laid out for `medium`: upright on screen, level (head left) for print. Only the
+ * `views` are built, and the shared frame is theirs.
  */
 export function figureViews(
   spec: Parameters<typeof recordFigures>[0],
@@ -24,24 +25,28 @@ export function figureViews(
   unit: LengthUnit,
   seated?: SeatedLengths,
   medium: Medium = 'screen',
+  views: readonly FigureView[] = ['cartridge', 'chamber', 'combined'],
 ): Partial<Record<FigureView, FigureModel>> {
   const record = recordFigures(spec).find((f) => f.drawn.length)?.drawn
   const shown = record ?? preview
   if (!shown) return {}
   const em = screenEm([shown], unit)
   const models: Partial<Record<FigureView, FigureModel>> = {}
-  if (preview) models.combined = figureModel(preview, medium, em, 0, [], false, unit)
+  if (preview && views.includes('combined'))
+    models.combined = figureModel(preview, medium, em, 0, [], false, unit)
   for (const d of record ?? [])
-    models[d.side] = figureModel(
-      [seated && d.side === 'cartridge' ? seatedSide(d, seated, unit) : d],
-      medium,
-      em,
-      0,
-      [],
-      false,
-      unit,
-    )
+    if (views.includes(d.side))
+      models[d.side] = figureModel(
+        [seated && d.side === 'cartridge' ? seatedSide(d, seated, unit) : d],
+        medium,
+        em,
+        0,
+        [],
+        false,
+        unit,
+      )
   const all = Object.values(models)
+  if (all.length === 0) return {}
   const left = Math.min(...all.map((m) => m.frame[0]))
   const top = Math.min(...all.map((m) => m.frame[1]))
   const right = Math.max(...all.map((m) => m.frame[0] + m.frame[2]))

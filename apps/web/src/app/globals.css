@@ -1312,17 +1312,32 @@ td.nowrap {
   max-width: none;
 }
 
+/* a seated bullet takes room under the drawing: on screen the long caption stays the figure's
+   name for screen readers only, and from 62em the drawing keeps a fixed height and the column scrolls */
+@media screen {
+  .designer .workspace-scroll:has(.seating-figure .drawing) .designer-drawing figcaption {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
 @media screen and (min-width: 62em) {
-  .designer .workspace-scroll {
+  .designer .workspace-scroll:has(.seating-figure .drawing) {
     overflow-y: auto;
   }
 
-  .designer div.designer-drawing {
-    flex: 1 0 20rem;
+  .designer .workspace-scroll:has(.seating-figure .drawing) div.designer-drawing {
+    flex: 0 0 16rem;
   }
+}
 
-  .designer div.designer-drawing:has(+ .seating-preview .seating-figure .drawing) {
-    flex-grow: 0;
+@media print {
+  .designer .seating-preview {
+    display: none;
   }
 }
 
@@ -1333,16 +1348,6 @@ td.nowrap {
 
   .designer .workspace-scroll:has(.seating-figure .drawing) .designer-drawing .drawing.screen-only {
     max-height: 14svh;
-  }
-
-  /* the long caption is still the figure's name for screen readers */
-  .designer .workspace-scroll:has(.seating-figure .drawing) .designer-drawing figcaption {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
   }
 }
 
