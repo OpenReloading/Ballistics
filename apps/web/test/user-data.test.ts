@@ -20,15 +20,20 @@ import { droppedPhotos, embeddedFileBlob, embedFiles, photoIds } from '../src/li
 
 const saved = '2026-10-13T10:00:00.000Z'
 const bullet: UserRecord = {
-  kind: 'bulletDesign',
+  kind: 'bullet',
   id: 'b1',
   name: 'Example 168 gr',
   saved,
   data: {
+    origin: 'user',
     manufacturerName: 'Example',
-    name: '168 gr',
-    choices: { 'base.type': 'boat-tail', 'ogive.form': 'tangent', 'tip.type': '' },
-    siValues: { diameter: 7.82e-3, mass: 0.0108862 },
+    overrides: {
+      name: '168 gr',
+      diameter: { value: 7.82 },
+      mass: { value: 10.8862 },
+      base: { type: 'boat-tail' },
+      ogive: { form: 'tangent' },
+    },
   },
 }
 const load: UserRecord = {
@@ -68,7 +73,7 @@ describe('user data files', () => {
   })
 
   it('skips a file with one invalid record as a whole and names the field', () => {
-    const bad = { ...bullet, data: { ...bullet.data, siValues: { mass: 'heavy' } } }
+    const bad = { ...bullet, data: { ...bullet.data, overrides: { mass: { value: 'heavy' } } } }
     const { records, skipped } = parseFiles([
       { name: 'good.json', text: userDataText([load]) },
       { name: 'bad.json', text: userDataText([load, bad as unknown as UserRecord]) },
@@ -76,7 +81,7 @@ describe('user data files', () => {
     expect(records).toEqual([load])
     expect(skipped).toHaveLength(1)
     expect(skipped[0].name).toBe('bad.json')
-    expect(skipped[0].reason).toContain('records[1].data.siValues.mass')
+    expect(skipped[0].reason).toContain('records[1].data.overrides.mass.value')
   })
 
   it('skips a file over the size limit', () => {
@@ -276,7 +281,7 @@ describe('user data files', () => {
     // kept as stored, with the schema's error and what names it
     expect(invalid.map((i) => i.raw)).toEqual([bad, null, old])
     expect(invalid[2]).toMatchObject({ id: 'o1', name: 'Old', kind: 'bulletDesign' })
-    expect(invalid[2].error).toContain('data')
+    expect(invalid[2].error).toContain('kind')
     expect(invalid[1]).toMatchObject({ id: undefined, name: undefined, kind: undefined })
   })
 
@@ -315,11 +320,14 @@ describe('share links', () => {
 
   it('rejects a damaged or invalid fragment with a reason', async () => {
     expect(await readLink('#record=@@@')).toEqual({ ok: false, reason: 'The link is damaged.' })
-    const invalid = { ...bullet, data: { ...bullet.data, siValues: { mass: 'heavy' } } } as never
+    const invalid = {
+      ...bullet,
+      data: { ...bullet.data, overrides: { mass: { value: 'heavy' } } },
+    } as never
     const link = await shareLink(invalid, base)
     const read = await readLink(new URL(link as string).hash)
     expect(read?.ok).toBe(false)
-    expect(read && !read.ok && read.reason).toContain('data.siValues.mass')
+    expect(read && !read.ok && read.reason).toContain('data.overrides.mass.value')
   })
 
   it('ignores a fragment without a record', async () => {

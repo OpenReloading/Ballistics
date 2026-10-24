@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { chronoShot } from './chrono-session.ts'
-import { recordId } from './ids.ts'
+import { recordId, ref } from './ids.ts'
 import { siValues, text } from './shared.ts'
 
 /**
@@ -58,8 +58,18 @@ export const workbenchState = z.object({
   siValues: siValues.describe(
     'Workbench field values in SI units by field key. m³: volume. m: boreDiameter, travel, twist (length per turn), engravingLength. m²: boreArea, leakArea. kg: bulletMass, charge, firearmMass. J/kg: propellantEnergy. kg/m³: density. m³/kg: covolume. 1/s: vivacity. Pa: referencePressure, ignitionPressure, startPressure, boreFriction, engravingPressure. K: propellantTemperature. 1: gamma, exponent, sebert, formA, formM, formQ, formZ1.',
   ),
-  cartridge: recordId.describe('Id of the cartridge record.').optional(),
-  bullet: recordId.describe('Id of the bullet record.').optional(),
+  cartridge: z
+    .union([recordId, ref('cartridge')])
+    .describe(
+      'The cartridge: `catalogue:<record id>` or `user:<UUID>` of a `cartridge` user record. A plain record id is a catalogue record.',
+    )
+    .optional(),
+  bullet: z
+    .union([recordId, ref('bullet')])
+    .describe(
+      'The bullet: `catalogue:<record id>` or `user:<UUID>` of a `bullet` user record. A plain record id is a catalogue record.',
+    )
+    .optional(),
   powder: recordId.describe('Id of the powder record.').optional(),
   notes: text(10000).describe('Notes of the load, plain text.').optional(),
   measuredWaterCapacity: z

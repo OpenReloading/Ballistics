@@ -886,6 +886,16 @@
               }
             }
           },
+          "308": {
+            "description": "Permanent Redirect: the id was renamed, `Location` is the record that replaced it.",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -1532,6 +1542,16 @@
               }
             }
           },
+          "308": {
+            "description": "Permanent Redirect: the id was renamed, `Location` is the record that replaced it.",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -1921,6 +1941,16 @@
                     "provenance"
                   ],
                   "additionalProperties": false
+                }
+              }
+            }
+          },
+          "308": {
+            "description": "Permanent Redirect: the id was renamed, `Location` is the record that replaced it.",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -9306,6 +9336,16 @@
               }
             }
           },
+          "308": {
+            "description": "Permanent Redirect: the id was renamed, `Location` is the record that replaced it.",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -14952,8 +14992,8 @@
                           "properties": {
                             "kind": {
                               "type": "string",
-                              "const": "bulletDesign",
-                              "description": "Kind of the record: `bulletDesign`."
+                              "const": "bullet",
+                              "description": "Kind of the record: `bullet`."
                             },
                             "id": {
                               "type": "string",
@@ -14976,70 +15016,1182 @@
                             "data": {
                               "type": "object",
                               "properties": {
+                                "origin": {
+                                  "type": "string",
+                                  "const": "user",
+                                  "description": "Where the record lives: `user`."
+                                },
                                 "manufacturerName": {
                                   "type": "string",
                                   "maxLength": 200,
-                                  "description": "Manufacturer name of the design."
+                                  "description": "Manufacturer name, free text until manufacturers are records."
                                 },
-                                "name": {
+                                "basedOn": {
                                   "type": "string",
-                                  "maxLength": 200,
-                                  "description": "Product name of the design."
+                                  "allOf": [
+                                    {
+                                      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$"
+                                    },
+                                    {
+                                      "pattern": "^catalogue:"
+                                    }
+                                  ],
+                                  "description": "Reference `catalogue:<record id>` to the catalogue bullet the record is based on. Its fields not in `overrides` follow that record."
                                 },
-                                "choices": {
+                                "overrides": {
                                   "type": "object",
                                   "properties": {
-                                    "base.type": {
-                                      "type": "string",
-                                      "maxLength": 64,
-                                      "description": "Base type: `flat`, `boat-tail`, `rebated-boat-tail`, `conical-hollow-base` or `rounded-hollow-base`. Empty: not chosen."
+                                    "manufacturer": {
+                                      "description": "The `manufacturer` of the bullet record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "string",
+                                          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
                                     },
-                                    "ogive.form": {
-                                      "type": "string",
-                                      "maxLength": 64,
-                                      "description": "Ogive form: `tangent`, `secant`, `hybrid`, `round-nose` or `flat-nose`. Empty: not chosen."
+                                    "productNumber": {
+                                      "description": "The `productNumber` of the bullet record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "string",
+                                          "minLength": 1
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
                                     },
-                                    "tip.type": {
-                                      "type": "string",
-                                      "maxLength": 64,
-                                      "description": "Tip type: `hollow-point`, `polymer-tip`, `soft-point`, `full-metal-jacket` or `open-meplat`. Empty: not chosen."
+                                    "name": {
+                                      "description": "The `name` of the bullet record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "string",
+                                          "minLength": 1
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "country": {
+                                      "description": "The `country` of the bullet record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "string",
+                                          "pattern": "^[A-Z]{2}$"
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "productLine": {
+                                      "description": "The `productLine` of the bullet record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "string",
+                                          "minLength": 1
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "caliber": {
+                                      "description": "The `caliber` of the bullet record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "string",
+                                          "minLength": 1
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "diameter": {
+                                      "description": "The `diameter` of the bullet record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "value": {
+                                              "description": "In mm.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "number",
+                                                  "description": "In mm."
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "raw": {
+                                              "description": "The value as written in the source, when it differed.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "string",
+                                                  "minLength": 1,
+                                                  "description": "The value as written in the source, when it differed."
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "mass": {
+                                      "description": "The `mass` of the bullet record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "value": {
+                                              "description": "In g.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "number",
+                                                  "description": "In g."
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "raw": {
+                                              "description": "The value as written in the source, when it differed.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "string",
+                                                  "minLength": 1,
+                                                  "description": "The value as written in the source, when it differed."
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "length": {
+                                      "description": "The `length` of the bullet record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "value": {
+                                              "description": "In mm.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "number",
+                                                  "description": "In mm."
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "raw": {
+                                              "description": "The value as written in the source, when it differed.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "string",
+                                                  "minLength": 1,
+                                                  "description": "The value as written in the source, when it differed."
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "base": {
+                                      "description": "The `base` of the bullet record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "type": {
+                                              "description": "The `base.type` of the bullet record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "string",
+                                                  "enum": [
+                                                    "flat",
+                                                    "boat-tail",
+                                                    "rebated-boat-tail",
+                                                    "conical-hollow-base",
+                                                    "rounded-hollow-base"
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "length": {
+                                              "description": "The `base.length` of the bullet record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In mm.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "number",
+                                                          "description": "In mm."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "diameter": {
+                                              "description": "The `base.diameter` of the bullet record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In mm.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "number",
+                                                          "exclusiveMinimum": 0,
+                                                          "description": "In mm."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "angle": {
+                                              "description": "The `base.angle` of the bullet record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In deg.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "number",
+                                                          "exclusiveMinimum": 0,
+                                                          "exclusiveMaximum": 90,
+                                                          "description": "In deg."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "cavityDiameter": {
+                                              "description": "The `base.cavityDiameter` of the bullet record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In mm.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "number",
+                                                          "exclusiveMinimum": 0,
+                                                          "description": "In mm."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "ogive": {
+                                      "description": "The `ogive` of the bullet record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "form": {
+                                              "description": "The `ogive.form` of the bullet record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "string",
+                                                  "enum": [
+                                                    "tangent",
+                                                    "secant",
+                                                    "hybrid",
+                                                    "round-nose",
+                                                    "flat-nose"
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "radius": {
+                                              "description": "The `ogive.radius` of the bullet record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In mm.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "number",
+                                                          "exclusiveMinimum": 0,
+                                                          "description": "In mm."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "radiusRatio": {
+                                              "description": "The `ogive.radiusRatio` of the bullet record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In 1.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "number",
+                                                          "minimum": 0,
+                                                          "maximum": 1,
+                                                          "description": "In 1."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "cannelure": {
+                                      "description": "The `cannelure` of the bullet record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "start": {
+                                              "description": "The `cannelure.start` of the bullet record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In mm.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "number",
+                                                          "exclusiveMinimum": 0,
+                                                          "description": "In mm."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "width": {
+                                              "description": "The `cannelure.width` of the bullet record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In mm.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "number",
+                                                          "exclusiveMinimum": 0,
+                                                          "description": "In mm."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "depth": {
+                                              "description": "The `cannelure.depth` of the bullet record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In mm.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "number",
+                                                          "exclusiveMinimum": 0,
+                                                          "description": "In mm."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "tip": {
+                                      "description": "The `tip` of the bullet record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "type": {
+                                              "description": "The `tip.type` of the bullet record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "string",
+                                                  "enum": [
+                                                    "hollow-point",
+                                                    "polymer-tip",
+                                                    "soft-point",
+                                                    "full-metal-jacket",
+                                                    "open-meplat"
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "length": {
+                                              "description": "The `tip.length` of the bullet record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In mm.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "number",
+                                                          "exclusiveMinimum": 0,
+                                                          "description": "In mm."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "mouthDiameter": {
+                                              "description": "The `tip.mouthDiameter` of the bullet record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In mm.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "number",
+                                                          "exclusiveMinimum": 0,
+                                                          "description": "In mm."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "meplatDiameter": {
+                                      "description": "The `meplatDiameter` of the bullet record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "value": {
+                                              "description": "In mm.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "number",
+                                                  "minimum": 0,
+                                                  "description": "In mm."
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "raw": {
+                                              "description": "The value as written in the source, when it differed.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "string",
+                                                  "minLength": 1,
+                                                  "description": "The value as written in the source, when it differed."
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "noseLength": {
+                                      "description": "The `noseLength` of the bullet record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "value": {
+                                              "description": "In mm.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "number",
+                                                  "description": "In mm."
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "raw": {
+                                              "description": "The value as written in the source, when it differed.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "string",
+                                                  "minLength": 1,
+                                                  "description": "The value as written in the source, when it differed."
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "baseToOgive": {
+                                      "description": "The `baseToOgive` of the bullet record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "value": {
+                                              "description": "In mm.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "number",
+                                                  "description": "In mm."
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "raw": {
+                                              "description": "The value as written in the source, when it differed.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "string",
+                                                  "minLength": 1,
+                                                  "description": "The value as written in the source, when it differed."
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "bearingLength": {
+                                      "description": "The `bearingLength` of the bullet record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "value": {
+                                              "description": "In mm.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "number",
+                                                  "description": "In mm."
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "raw": {
+                                              "description": "The value as written in the source, when it differed.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "string",
+                                                  "minLength": 1,
+                                                  "description": "The value as written in the source, when it differed."
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "construction": {
+                                      "description": "The `construction` of the bullet record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "raw": {
+                                              "description": "The `construction.raw` of the bullet record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "string",
+                                                  "minLength": 1
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "structure": {
+                                              "description": "The `construction.structure` of the bullet record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "string",
+                                                  "enum": [
+                                                    "cup-and-core",
+                                                    "bonded",
+                                                    "partitioned",
+                                                    "monolithic",
+                                                    "cast",
+                                                    "swaged",
+                                                    "plated"
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "core": {
+                                              "description": "The `construction.core` of the bullet record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "material": {
+                                                      "description": "The `construction.core.material` of the bullet record. `null` removes it.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "enum": [
+                                                            "lead",
+                                                            "lead-alloy",
+                                                            "copper",
+                                                            "copper-alloy"
+                                                          ]
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "jacket": {
+                                              "description": "The `construction.jacket` of the bullet record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "material": {
+                                                      "description": "The `construction.jacket.material` of the bullet record. `null` removes it.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "enum": [
+                                                            "copper",
+                                                            "gilding-metal",
+                                                            "copper-clad-steel",
+                                                            "copper-plated-steel"
+                                                          ]
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "surface": {
+                                              "description": "The `construction.surface` of the bullet record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "minItems": 1,
+                                                  "type": "array",
+                                                  "items": {
+                                                    "type": "string",
+                                                    "enum": ["moly", "black-oxide"]
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "unmapped": {
+                                              "description": "The `construction.unmapped` of the bullet record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "boolean",
+                                                  "const": true
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "ballisticCoefficients": {
+                                      "description": "The `ballisticCoefficients` of the bullet record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "dragModel": {
+                                                "type": "string",
+                                                "enum": ["G1", "G7"],
+                                                "description": "The `ballisticCoefficients.[].dragModel` of the bullet record. `null` removes it."
+                                              },
+                                              "value": {
+                                                "type": "number",
+                                                "exclusiveMinimum": 0,
+                                                "description": "The `ballisticCoefficients.[].value` of the bullet record. `null` removes it."
+                                              },
+                                              "minVelocity": {
+                                                "description": "The `ballisticCoefficients.[].minVelocity` of the bullet record. `null` removes it.",
+                                                "type": "object",
+                                                "properties": {
+                                                  "value": {
+                                                    "type": "number",
+                                                    "description": "In m/s."
+                                                  },
+                                                  "raw": {
+                                                    "type": "string",
+                                                    "minLength": 1,
+                                                    "description": "The value as written in the source, when it differed."
+                                                  }
+                                                },
+                                                "required": ["value"],
+                                                "unit": "m/s"
+                                              },
+                                              "note": {
+                                                "description": "The `ballisticCoefficients.[].note` of the bullet record. `null` removes it.",
+                                                "type": "string",
+                                                "minLength": 1
+                                              }
+                                            },
+                                            "required": ["dragModel", "value"]
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "recommendedTwist": {
+                                      "description": "The `recommendedTwist` of the bullet record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "value": {
+                                              "description": "In mm.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "number",
+                                                  "description": "In mm."
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "raw": {
+                                              "description": "The value as written in the source, when it differed.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "string",
+                                                  "minLength": 1,
+                                                  "description": "The value as written in the source, when it differed."
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "slowestTwist": {
+                                      "description": "The `slowestTwist` of the bullet record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "value": {
+                                              "description": "In mm.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "number",
+                                                  "description": "In mm."
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "raw": {
+                                              "description": "The value as written in the source, when it differed.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "string",
+                                                  "minLength": 1,
+                                                  "description": "The value as written in the source, when it differed."
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "note": {
+                                      "description": "The `note` of the bullet record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "string",
+                                          "minLength": 1
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
                                     }
                                   },
-                                  "required": ["base.type", "ogive.form", "tip.type"],
-                                  "description": "The choices of the designer."
-                                },
-                                "siValues": {
-                                  "type": "object",
-                                  "propertyNames": {
-                                    "type": "string",
-                                    "minLength": 1,
-                                    "maxLength": 64
-                                  },
-                                  "additionalProperties": {
-                                    "type": "number"
-                                  },
-                                  "description": "Designer field values in SI units by field key: lengths and diameters in m, mass in kg, ratios in 1."
-                                },
-                                "parent": {
-                                  "type": "object",
-                                  "properties": {
-                                    "id": {
-                                      "type": "string",
-                                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
-                                      "description": "Id of the catalogue record."
-                                    },
-                                    "title": {
-                                      "type": "string",
-                                      "maxLength": 200,
-                                      "description": "Title of the catalogue record as shown when the design was saved."
-                                    }
-                                  },
-                                  "required": ["id", "title"],
-                                  "description": "The catalogue record the design started from."
+                                  "description": "The fields that differ from the base record, or all fields without one. A `null` removes a field of the base."
                                 }
                               },
-                              "required": ["manufacturerName", "name", "choices", "siValues"],
-                              "description": "A bullet design of the bullet designer."
+                              "required": ["origin", "manufacturerName"],
+                              "description": "A bullet of the bullet designer."
                             }
                           },
                           "required": ["kind", "id", "name", "saved", "data"]
@@ -15049,8 +16201,8 @@
                           "properties": {
                             "kind": {
                               "type": "string",
-                              "const": "cartridgeDesign",
-                              "description": "Kind of the record: `cartridgeDesign`."
+                              "const": "cartridge",
+                              "description": "Kind of the record: `cartridge`."
                             },
                             "id": {
                               "type": "string",
@@ -15073,127 +16225,262 @@
                             "data": {
                               "type": "object",
                               "properties": {
-                                "table": {
+                                "origin": {
                                   "type": "string",
-                                  "minLength": 1,
-                                  "maxLength": 8,
-                                  "description": "C.I.P. table of the cartridge (`I` to `XI`)."
+                                  "const": "user",
+                                  "description": "Where the record lives: `user`."
                                 },
-                                "values": {
-                                  "maxItems": 500,
-                                  "type": "array",
-                                  "items": {
-                                    "type": "object",
-                                    "properties": {
-                                      "side": {
-                                        "type": "string",
-                                        "enum": ["cartridge", "chamber"],
-                                        "description": "Column the value is printed in. Absent for pressures, energies and measuring positions."
-                                      },
-                                      "symbol": {
-                                        "type": "string",
-                                        "minLength": 1,
-                                        "description": "The standard's symbol, for example `L3` or `P1`."
-                                      },
-                                      "quantity": {
-                                        "type": "string",
-                                        "enum": [
-                                          "length",
-                                          "area",
-                                          "mass",
-                                          "density",
-                                          "pressure",
-                                          "energy",
-                                          "velocity",
-                                          "angle",
-                                          "temperature",
-                                          "absoluteTemperature",
-                                          "specificEnergy",
-                                          "molarMass",
-                                          "specificVolume",
-                                          "burnRate",
-                                          "inverseTemperature",
-                                          "massFraction",
-                                          "relativeHumidity",
-                                          "count",
-                                          "dimensionless",
-                                          "ballisticCoefficient"
-                                        ],
-                                        "description": "Quantity of the value. `value` is in its stored unit."
-                                      },
-                                      "value": {
-                                        "type": "number",
-                                        "description": "In the stored unit of `quantity`. Absent when the source prints no single number."
-                                      },
-                                      "raw": {
-                                        "type": "string",
-                                        "minLength": 1,
-                                        "description": "The value as written when it differs from `value`, for example `1°30'0\"` or `25/30`."
-                                      },
-                                      "limit": {
-                                        "type": "string",
-                                        "enum": ["max", "min"],
-                                        "description": "Set when the standard qualifies the value itself (`e min`, `r1 max`). Otherwise the column applies: cartridge values are maxima, chamber values minima."
-                                      },
-                                      "tolerance": {
-                                        "type": "object",
-                                        "properties": {
-                                          "lower": {
-                                            "type": "number",
-                                            "maximum": 0,
-                                            "description": "Lower deviation, 0 or below."
-                                          },
-                                          "upper": {
-                                            "type": "number",
-                                            "minimum": 0,
-                                            "description": "Upper deviation, 0 or above."
-                                          }
-                                        },
-                                        "description": "Signed deviations from `value` as printed, in its unit, for example `{ lower: -0.2 }`."
-                                      },
-                                      "variant": {
-                                        "type": "string",
-                                        "minLength": 1,
-                                        "description": "Sub-case the standard distinguishes, such as a chamber length marking (`12/70`)."
-                                      },
-                                      "basic": {
-                                        "type": "boolean",
-                                        "description": "Printed as a basic dimension."
-                                      },
-                                      "footnotes": {
-                                        "minItems": 1,
-                                        "type": "array",
-                                        "items": {
+                                "basedOn": {
+                                  "type": "string",
+                                  "allOf": [
+                                    {
+                                      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$"
+                                    },
+                                    {
+                                      "pattern": "^catalogue:"
+                                    }
+                                  ],
+                                  "description": "Reference `catalogue:<record id>` to the catalogue cartridge the record is based on. Its fields not in `overrides` follow that record."
+                                },
+                                "overrides": {
+                                  "type": "object",
+                                  "properties": {
+                                    "name": {
+                                      "description": "The `name` of the cartridge record. `null` removes it.",
+                                      "anyOf": [
+                                        {
                                           "type": "string",
                                           "minLength": 1
                                         },
-                                        "description": "Footnote numbers printed next to the symbol."
-                                      }
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
                                     },
-                                    "required": ["symbol", "quantity"]
-                                  },
-                                  "description": "Spec values the drawing reads, each in the stored unit of its quantity."
-                                },
-                                "parent": {
-                                  "type": "object",
-                                  "properties": {
-                                    "id": {
-                                      "type": "string",
-                                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
-                                      "description": "Id of the catalogue record."
+                                    "aliases": {
+                                      "description": "The `aliases` of the cartridge record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "minItems": 1,
+                                          "type": "array",
+                                          "items": {
+                                            "type": "string",
+                                            "minLength": 1
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
                                     },
-                                    "title": {
-                                      "type": "string",
-                                      "maxLength": 200,
-                                      "description": "Title of the catalogue record as shown when the design was saved."
+                                    "table": {
+                                      "description": "The `table` of the cartridge record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "string",
+                                          "minLength": 1
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "country": {
+                                      "description": "The `country` of the cartridge record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "string",
+                                          "minLength": 1
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "published": {
+                                      "description": "The `published` of the cartridge record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "string",
+                                          "format": "date",
+                                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "revised": {
+                                      "description": "The `revised` of the cartridge record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "string",
+                                          "format": "date",
+                                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "pressureMethod": {
+                                      "description": "The `pressureMethod` of the cartridge record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "string",
+                                          "enum": ["transducer", "piezo", "crusher", "energy"]
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "verification": {
+                                      "description": "The `verification` of the cartridge record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "string",
+                                          "enum": ["verified", "unverified"]
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "exceptions": {
+                                      "description": "The `exceptions` of the cartridge record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "finding": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "description": "The `exceptions.[].finding` of the cartridge record. `null` removes it."
+                                              },
+                                              "note": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "description": "The `exceptions.[].note` of the cartridge record. `null` removes it."
+                                              }
+                                            },
+                                            "required": ["finding", "note"]
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "values": {
+                                      "description": "The `values` of the cartridge record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "side": {
+                                                "type": "string",
+                                                "enum": ["cartridge", "chamber"],
+                                                "description": "Column the value is printed in. Absent for pressures, energies and measuring positions."
+                                              },
+                                              "symbol": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "description": "The standard's symbol, for example `L3` or `P1`."
+                                              },
+                                              "quantity": {
+                                                "type": "string",
+                                                "enum": [
+                                                  "length",
+                                                  "area",
+                                                  "mass",
+                                                  "density",
+                                                  "pressure",
+                                                  "energy",
+                                                  "velocity",
+                                                  "angle",
+                                                  "temperature",
+                                                  "absoluteTemperature",
+                                                  "specificEnergy",
+                                                  "molarMass",
+                                                  "specificVolume",
+                                                  "burnRate",
+                                                  "inverseTemperature",
+                                                  "massFraction",
+                                                  "relativeHumidity",
+                                                  "count",
+                                                  "dimensionless",
+                                                  "ballisticCoefficient"
+                                                ],
+                                                "description": "Quantity of the value. `value` is in its stored unit."
+                                              },
+                                              "value": {
+                                                "description": "In the stored unit of `quantity`. `null` removes the value of this side, symbol and variant.",
+                                                "type": ["number", "null"]
+                                              },
+                                              "raw": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "description": "The value as written when it differs from `value`, for example `1°30'0\"` or `25/30`."
+                                              },
+                                              "limit": {
+                                                "type": "string",
+                                                "enum": ["max", "min"],
+                                                "description": "Set when the standard qualifies the value itself (`e min`, `r1 max`). Otherwise the column applies: cartridge values are maxima, chamber values minima."
+                                              },
+                                              "tolerance": {
+                                                "type": "object",
+                                                "properties": {
+                                                  "lower": {
+                                                    "type": "number",
+                                                    "maximum": 0,
+                                                    "description": "Lower deviation, 0 or below."
+                                                  },
+                                                  "upper": {
+                                                    "type": "number",
+                                                    "minimum": 0,
+                                                    "description": "Upper deviation, 0 or above."
+                                                  }
+                                                },
+                                                "description": "Signed deviations from `value` as printed, in its unit, for example `{ lower: -0.2 }`."
+                                              },
+                                              "variant": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "description": "Sub-case the standard distinguishes, such as a chamber length marking (`12/70`)."
+                                              },
+                                              "basic": {
+                                                "type": "boolean",
+                                                "description": "Printed as a basic dimension."
+                                              },
+                                              "footnotes": {
+                                                "minItems": 1,
+                                                "type": "array",
+                                                "items": {
+                                                  "type": "string",
+                                                  "minLength": 1
+                                                },
+                                                "description": "Footnote numbers printed next to the symbol."
+                                              }
+                                            },
+                                            "required": ["symbol", "quantity"]
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
                                     }
                                   },
-                                  "required": ["id", "title"],
-                                  "description": "The catalogue record the design started from."
+                                  "description": "The fields and spec values that differ from the base record, or all of them without one. A value with `null` removes the base value of its side, symbol and variant."
                                 }
                               },
-                              "required": ["table", "values"],
-                              "description": "A cartridge drawing of the cartridge designer."
+                              "required": ["origin"],
+                              "description": "A cartridge of the cartridge designer."
                             }
                           },
                           "required": ["kind", "id", "name", "saved", "data"]
@@ -15240,14 +16527,32 @@
                                   "description": "Workbench field values in SI units by field key. m³: volume. m: boreDiameter, travel, twist (length per turn), engravingLength. m²: boreArea, leakArea. kg: bulletMass, charge, firearmMass. J/kg: propellantEnergy. kg/m³: density. m³/kg: covolume. 1/s: vivacity. Pa: referencePressure, ignitionPressure, startPressure, boreFriction, engravingPressure. K: propellantTemperature. 1: gamma, exponent, sebert, formA, formM, formQ, formZ1."
                                 },
                                 "cartridge": {
-                                  "type": "string",
-                                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
-                                  "description": "Id of the cartridge record."
+                                  "anyOf": [
+                                    {
+                                      "type": "string",
+                                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                                    },
+                                    {
+                                      "type": "string",
+                                      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                      "description": "Reference to a cartridge: `catalogue:<record id>` or `user:<UUID>`."
+                                    }
+                                  ],
+                                  "description": "The cartridge: `catalogue:<record id>` or `user:<UUID>` of a `cartridge` user record. A plain record id is a catalogue record."
                                 },
                                 "bullet": {
-                                  "type": "string",
-                                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
-                                  "description": "Id of the bullet record."
+                                  "anyOf": [
+                                    {
+                                      "type": "string",
+                                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                                    },
+                                    {
+                                      "type": "string",
+                                      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                      "description": "Reference to a bullet: `catalogue:<record id>` or `user:<UUID>`."
+                                    }
+                                  ],
+                                  "description": "The bullet: `catalogue:<record id>` or `user:<UUID>` of a `bullet` user record. A plain record id is a catalogue record."
                                 },
                                 "powder": {
                                   "type": "string",
@@ -16702,6 +18007,16 @@
               }
             }
           },
+          "308": {
+            "description": "Permanent Redirect: the id was renamed, `Location` is the record that replaced it.",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -17613,6 +18928,16 @@
               }
             }
           },
+          "308": {
+            "description": "Permanent Redirect: the id was renamed, `Location` is the record that replaced it.",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -18272,6 +19597,16 @@
               }
             }
           },
+          "308": {
+            "description": "Permanent Redirect: the id was renamed, `Location` is the record that replaced it.",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -18590,6 +19925,16 @@
                   },
                   "required": ["id", "discipline", "face", "event", "provenance"],
                   "additionalProperties": false
+                }
+              }
+            }
+          },
+          "308": {
+            "description": "Permanent Redirect: the id was renamed, `Location` is the record that replaced it.",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
                 }
               }
             }

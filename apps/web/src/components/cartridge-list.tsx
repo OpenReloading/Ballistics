@@ -30,6 +30,7 @@ import {
   userCartridgeRows,
 } from '../lib/sources.ts'
 import { controlSize } from '../lib/theme.ts'
+import { userCartridges } from '../lib/variants.ts'
 import { CaliberSelect } from './caliber-select.tsx'
 import {
   CountryFilter,
@@ -38,7 +39,13 @@ import {
   DirectoryTable,
   useListState,
 } from './directory-table.tsx'
-import { DeleteRow, SourceFilter, sourceColumn, useUserRecords } from './list-sources.tsx'
+import {
+  DeleteRow,
+  SourceFilter,
+  sourceColumn,
+  useResolved,
+  useUserRecords,
+} from './list-sources.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
 import { RangeFilter } from './range-filter.tsx'
 import { GapBadge } from './standard-badge.tsx'
@@ -48,10 +55,11 @@ import { UnitsIconButton, useUnits } from './units-settings.tsx'
 /** The cartridge directory: page bar with the count, filter row, windowed table. */
 export function CartridgeList({ packed }: { packed: PackedCartridge[] }) {
   const [records, removeRow] = useUserRecords()
+  const mine = useResolved(records, userCartridges)
   // the browser's designs first: a few rows would sit unseen behind the catalogue rows
   const items = useMemo(
-    () => [...userCartridgeRows(records), ...unpackCartridges(packed)],
-    [records, packed],
+    () => [...userCartridgeRows(mine), ...unpackCartridges(packed)],
+    [mine, packed],
   )
   const counts = useMemo(() => countOrigins(items), [items])
   const { system } = useUnits()

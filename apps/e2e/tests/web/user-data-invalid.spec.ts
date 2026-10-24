@@ -53,7 +53,7 @@ test('an invalid record of an older store is listed, downloadable and in Export 
   await page.getByRole('menuitem', { name: 'Invalid records (1)…' }).click()
   const dialog = page.getByRole('dialog', { name: 'Invalid records in this browser' })
   await expect(dialog.getByText('Old design')).toBeVisible()
-  await expect(dialog.getByText('data')).toBeVisible()
+  await expect(dialog.getByText(/Invalid discriminator value/)).toBeVisible()
   const download = page.waitForEvent('download')
   await dialog.getByRole('button', { name: 'Download raw' }).click()
   const file = await download

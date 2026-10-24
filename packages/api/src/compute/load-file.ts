@@ -11,7 +11,7 @@ import {
   ValueError,
   workbenchValueKeys,
 } from '@openreloading/core'
-import { userDataFile, versionProblem, type WorkbenchState } from '@openreloading/schema'
+import { parseRef, userDataFile, versionProblem, type WorkbenchState } from '@openreloading/schema'
 import { z } from 'zod'
 
 type Path = PropertyKey[]
@@ -55,11 +55,25 @@ export function readLoadFile(json: unknown): { path: Path; record: WorkbenchStat
     for (const k of Object.keys(r.data.siValues))
       if (!(workbenchValueKeys as readonly string[]).includes(k))
         unknown.push(issue(['records', i, 'data', 'siValues', k], 'Unknown field'))
+    // user data stays in the browser: the server resolves catalogue records only
+    for (const k of ['cartridge', 'bullet'] as const) {
+      const target = r.data[k]
+      if (target && parseRef(target)?.scope === 'user')
+        unknown.push(
+          issue(
+            ['records', i, 'data', k],
+            'A user record is not on the server, name a catalogue record',
+          ),
+        )
+    }
   }
   if (unknown.length > 0) throw new z.ZodError(unknown)
   const [i, r] = loads[0] as [number, { data: WorkbenchState; name: string }]
   return { path: ['records', i, 'data'], record: r.data, name: r.name }
 }
+
+/** The catalogue record id of a `cartridge` or `bullet` of a load file: a plain id or a `catalogue:` reference. */
+export const catalogueIdOf = (target: string) => parseRef(target)?.id ?? target
 
 /** The issues of a strict-object error with one issue per unknown key, at the key's path. */
 export function unknownKeyIssues(error: z.ZodError) {
