@@ -18030,8 +18030,7 @@
                                           },
                                           "event": {
                                             "type": "string",
-                                            "minLength": 1,
-                                            "maxLength": 200,
+                                            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
                                             "description": "Id of the face's event whose gauge is the scored hole. Absent: the bullet diameter."
                                           },
                                           "marks": {
