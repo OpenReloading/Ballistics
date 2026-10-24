@@ -12,7 +12,7 @@ import {
 import { m3Load } from './fixtures.ts'
 
 type Toy = { q: number; b: number; v: number }
-const scale = (key: keyof Toy) => (l: Toy, s: 1 | -1, t: number) => ({
+const scale = (key: keyof Toy) => (l: Toy, s: number, t: number) => ({
   ...l,
   [key]: l[key] * (1 + s * t),
 })
@@ -20,6 +20,7 @@ const same = (l: Toy) => l
 const toyApply: Record<PressureInput, ApplyTolerance<Toy>> = {
   chargeFraction: scale('q'),
   volumeFraction: scale('v'),
+  massFraction: same,
   burnRateFraction: scale('b'),
   temperatureKelvin: same,
   startPressureFraction: same,
@@ -27,6 +28,7 @@ const toyApply: Record<PressureInput, ApplyTolerance<Toy>> = {
 const toyTolerances: PressureTolerances = {
   chargeFraction: 0.01,
   volumeFraction: 0.02,
+  massFraction: 0,
   burnRateFraction: 0.05,
   temperatureKelvin: 0,
   startPressureFraction: 0,
@@ -49,6 +51,7 @@ describe('toleranceRange', () => {
     expect(r.cases.at(-2)?.sides).toEqual({
       chargeFraction: 1,
       volumeFraction: -1,
+      massFraction: 0,
       burnRateFraction: 1,
       temperatureKelvin: 0,
       startPressureFraction: 0,
@@ -56,6 +59,7 @@ describe('toleranceRange', () => {
     expect(r.cases.at(-1)?.sides).toEqual({
       chargeFraction: -1,
       volumeFraction: 1,
+      massFraction: 0,
       burnRateFraction: -1,
       temperatureKelvin: 0,
       startPressureFraction: 0,
@@ -71,6 +75,7 @@ describe('toleranceRange', () => {
     const r = toleranceRange(one, 1, toyApply, hill, {
       ...toyTolerances,
       volumeFraction: 0,
+      massFraction: 0,
       burnRateFraction: 0,
     })
     expect(r.cases.at(-1)?.sides?.chargeFraction).toBe(0)
@@ -83,7 +88,7 @@ describe('toleranceRange', () => {
     const p0 = closed(toy)
     const capped = {
       ...toyApply,
-      chargeFraction: (l: Toy, s: 1 | -1, t: number) =>
+      chargeFraction: (l: Toy, s: number, t: number) =>
         s === 1 ? 'outsideModel' : scale('q')(l, s, t),
     }
     const r = toleranceRange(toy, p0, capped, closed, toyTolerances)
@@ -178,6 +183,7 @@ describe('interiorPressureRange', () => {
     expect(high?.sides).toEqual({
       chargeFraction: 1,
       volumeFraction: -1,
+      massFraction: 0,
       burnRateFraction: 1,
       temperatureKelvin: 1,
       startPressureFraction: 1,

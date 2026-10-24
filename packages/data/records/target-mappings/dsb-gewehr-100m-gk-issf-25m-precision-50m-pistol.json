@@ -11,12 +11,12 @@
     "kind": "published",
     "sources": [
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "page": "0.20 Scheibe Nr. 4, Teil 0 Seite 65 (PDF p. 83); rows of 0.21, Teil 0 Seite 76 to 80, PDF pp. 94 to 98",
         "fields": ["discipline", "face", "event"]
       },
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "page": "0.11.3.2, Teil 0 Seite 40, PDF p. 58",
         "fields": ["gauge"]
       }

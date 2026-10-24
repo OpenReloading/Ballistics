@@ -9,6 +9,7 @@
     "bdmp-sportordnung-2026-register-8",
     "bdmp-sportordnung-2026-register-9",
     "bdmp-sportordnung-2026-register-10",
+    "bdmp-sportordnung-2026-register-11",
     "bdmp-sportordnung-2026-teile-b-c-d"
   ],
   "provenance": {
@@ -52,6 +53,11 @@
       {
         "source": "bdmp-sportordnung-2026-register-10",
         "page": "Titelseite und Fußzeile, Register 10, PDF p. 1",
+        "fields": ["ruleBooks"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-11",
+        "page": "Titelseite und Fußzeile, Register 11, PDF p. 1",
         "fields": ["ruleBooks"]
       }
     ],

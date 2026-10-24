@@ -4,6 +4,7 @@ import {
   airAt,
   airDensity,
   checkAir,
+  densityAltitude,
   InputError,
   saturationVapourPressure,
   speedOfSound,
@@ -99,5 +100,30 @@ describe('checkAir on any numbers', () => {
       ),
       { seed: 20261022, numRuns: 500 },
     )
+  })
+})
+
+describe('checkAir density', () => {
+  it('rejects a temperature and pressure whose density is not above 0 and at most 1000 kg/m3', () => {
+    const air = { altitude: 0, pressure: 2.5e-13, temperature: 5e-324, humidity: 0 }
+    expect(() => checkAir(air)).toThrow(InputError)
+    expect(() => checkAir({ ...air, humidity: 0.5 })).toThrow(InputError)
+    expect(() => checkAir({ ...air, pressure: 1e-320, temperature: 1e10 })).toThrow(/density/)
+    expect(checkAir({ ...air, pressure: 101325, temperature: 288.15 }).pressure).toBe(101325)
+  })
+})
+
+describe('density altitude', () => {
+  it('is 0 in the standard atmosphere at sea level and the altitude elsewhere in it', () => {
+    expect(densityAltitude(standardAtmosphere(0))).toBeCloseTo(0, 6)
+    for (const h of [-2000, 1500, 4000, 11000])
+      expect(densityAltitude(standardAtmosphere(h))).toBeCloseTo(h, 6)
+  })
+
+  it('rises with temperature and with humidity at one pressure', () => {
+    const sea = standardAtmosphere(0)
+    const warm = { ...sea, temperature: sea.temperature + 15 }
+    expect(densityAltitude(warm)).toBeGreaterThan(500)
+    expect(densityAltitude({ ...warm, humidity: 0.8 })).toBeGreaterThan(densityAltitude(warm))
   })
 })

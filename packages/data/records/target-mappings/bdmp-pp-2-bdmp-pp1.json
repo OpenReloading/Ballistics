@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-pp-2-bdmp-pp1",
+  "discipline": "bdmp-pp-2",
+  "face": "bdmp-pp1",
+  "event": "BDMP PP 2 Police Pistol 2",
+  "shotCount": 60,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.9, Teil B, Seite 42 von 70, PDF p. 42",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6B.4, Teil C, Seite 27 von 142, PDF p. 27",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6B.3, Teil C, Seite 27 von 142, PDF p. 27",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "Stations A (2 x 6 shots at 10 m), B (24 shots at 50 m) and C (24 shots at 25 m) add up to 60 scored shots. C.6B.3 prints \"60 Patronen, 6 Schüsse Probe\" without saying whether the 6 sighters (50 m, 2 min) are part of the 60."
+  }
+}

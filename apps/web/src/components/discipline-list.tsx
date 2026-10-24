@@ -9,6 +9,7 @@ import {
   type FederationRow,
   federationMatches,
 } from '../lib/disciplines.ts'
+import { compareNames } from '../lib/face-order.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { countText, filterText } from '../lib/lists.ts'
 import { titleFromKebab } from '../lib/record-fields.ts'
@@ -37,8 +38,14 @@ export function DisciplineList({ items }: { items: DisciplineRow[] }) {
   const filters = useDeferredValue(state)
   const options = useMemo(
     () => ({
-      federations: sortedSet(items.map((r) => r.federation)),
-      categories: sortedSet(items.map((r) => r.category)).map((c) => ({
+      federations: sortedSet(
+        items.map((r) => r.federation),
+        compareNames,
+      ),
+      categories: sortedSet(
+        items.map((r) => r.category),
+        compareNames,
+      ).map((c) => ({
         value: c,
         label: titleFromKebab(c),
       })),
@@ -46,7 +53,10 @@ export function DisciplineList({ items }: { items: DisciplineRow[] }) {
         items.map((r) => r.distance),
         (a, b) => a - b,
       ).map((d) => ({ value: String(d), label: `${d} m` })),
-      classes: sortedSet(items.flatMap((r) => r.classes)).map((c) => ({
+      classes: sortedSet(
+        items.flatMap((r) => r.classes),
+        compareNames,
+      ).map((c) => ({
         value: c,
         label: caliberClassLabel(c),
       })),

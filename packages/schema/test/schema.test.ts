@@ -3,6 +3,7 @@ import { z } from 'zod'
 import {
   bullet,
   cartridge,
+  caseTypes,
   chronoSession,
   firingSeries,
   load,
@@ -178,6 +179,12 @@ describe('rangeFirings', () => {
   })
 })
 
+describe('caseTypes', () => {
+  it('lists the case heads of the API', () => {
+    expect(caseTypes.options).toEqual(['rimless', 'semi-rimmed', 'rimmed', 'rebated', 'belted'])
+  })
+})
+
 describe('bullet', () => {
   const base = {
     id: 'test-bullet-1',
@@ -214,6 +221,24 @@ describe('bullet', () => {
     const unnamed = { ...base, ogive: { radiusRatio: { value: 0.5 } } }
     expect(bullet.parse(unnamed)).toEqual(unnamed)
     expect(bullet.parse(hollow)).toEqual(hollow)
+  })
+
+  it('accepts the round and flat nose forms and a cannelure', () => {
+    for (const form of ['round-nose', 'flat-nose']) {
+      expect(bullet.safeParse({ ...base, ogive: { form } }).success).toBe(true)
+    }
+    const grooved = { ...base, cannelure: { start: { value: 9 }, width: { value: 1.2 } } }
+    expect(bullet.parse(grooved)).toEqual(grooved)
+    const deep = {
+      ...base,
+      cannelure: { start: { value: 9 }, width: { value: 1.2 }, depth: { value: 0.2 } },
+    }
+    expect(bullet.parse(deep)).toEqual(deep)
+    expect(bullet.safeParse({ ...base, cannelure: { start: { value: 9 } } }).success).toBe(false)
+    expect(
+      bullet.safeParse({ ...base, cannelure: { start: { value: 9 }, width: { value: 0 } } })
+        .success,
+    ).toBe(false)
   })
 
   it('carries the unit of each geometry field in the JSON Schema', () => {
@@ -294,6 +319,44 @@ describe('bullet', () => {
     accepts({ base: { type: 'rebated-boat-tail', diameter: { value: 6.6 } } })
   })
 
+  it('takes a hollow base with its cavity diameter, alone or on a tail', () => {
+    const hollow = (type: string, fields: Record<string, unknown> = {}) => ({
+      length: { value: 30 },
+      base: { type, cavityDiameter: { value: 5 }, ...fields },
+    })
+    for (const type of ['conical-hollow-base', 'rounded-hollow-base']) {
+      accepts(hollow(type))
+      accepts(hollow(type, { length: { value: 3 }, diameter: { value: 6.6 }, angle: { value: 8 } }))
+      rejectsAt({ base: { type } }, 'base.cavityDiameter')
+    }
+    rejectsAt({ base: { type: 'flat', cavityDiameter: { value: 5 } } }, 'base.cavityDiameter')
+    rejectsAt({ base: { cavityDiameter: { value: 5 } } }, 'base.cavityDiameter')
+    rejectsAt({ base: { type: 'boat-tail', cavityDiameter: { value: 5 } } }, 'base.cavityDiameter')
+  })
+
+  it('keeps the cavity inside the base face and the tail inside the bullet', () => {
+    const hollow = (fields: Record<string, unknown>) => ({
+      length: { value: 30 },
+      base: { type: 'conical-hollow-base', ...fields },
+    })
+    rejectsAt(hollow({ cavityDiameter: { value: 7.823 } }), 'base.cavityDiameter')
+    rejectsAt(
+      hollow({ cavityDiameter: { value: 6.6 }, diameter: { value: 6.6 } }),
+      'base.cavityDiameter',
+    )
+    accepts(hollow({ cavityDiameter: { value: 6 }, diameter: { value: 6.6 } }))
+    rejectsAt(
+      {
+        length: { value: 5 },
+        base: { type: 'conical-hollow-base', cavityDiameter: { value: 12 } },
+      },
+      'base.cavityDiameter',
+    )
+    rejectsAt({ length: { value: 30 }, ...tail({ length: { value: 30 } }) }, 'base.length')
+    rejectsAt({ length: { value: 30 }, ...tail({ length: { value: 31 } }) }, 'base.length')
+    accepts({ length: { value: 30 }, ...tail({ length: { value: 5 } }) })
+  })
+
   it('rejects geometry values out of range', () => {
     rejectsAt({ meplatDiameter: { value: -0.1 } }, 'meplatDiameter')
     accepts({ meplatDiameter: { value: 0 } })
@@ -338,6 +401,7 @@ describe('bullet', () => {
       exclusiveMinimum: 0,
       exclusiveMaximum: 90,
     })
+    expect(value(base.properties?.cavityDiameter)).toMatchObject({ exclusiveMinimum: 0 })
     expect(value(ogive.properties?.radius)).toMatchObject({ exclusiveMinimum: 0 })
     expect(value(ogive.properties?.radiusRatio)).toMatchObject({ minimum: 0, maximum: 1 })
     expect(value(tip.properties?.length)).toMatchObject({ exclusiveMinimum: 0 })
@@ -433,6 +497,22 @@ describe('powder', () => {
 
   it('accepts a composition and computed thermochemistry', () => {
     expect(powder.safeParse(valid).success).toBe(true)
+  })
+
+  it('accepts a temperature sensitivity and rejects a reference temperature of 0 K or less', () => {
+    const temperatureSensitivity = {
+      reference: { value: 294.15 },
+      cold: { value: 0.004 },
+      hot: { value: 0.002 },
+    }
+    expect(powder.safeParse({ ...valid, temperatureSensitivity }).success).toBe(true)
+    for (const value of [0, -1]) {
+      expectIssueAt(
+        powder,
+        { ...valid, temperatureSensitivity: { ...temperatureSensitivity, reference: { value } } },
+        'temperatureSensitivity.reference.value',
+      )
+    }
   })
 
   it('rejects a composition range with min above max or outside 0 to 100 %', () => {

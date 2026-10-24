@@ -55,6 +55,23 @@ export const opticMount = z.object({
   cant: si('rad').describe('Cant of the optic, clockwise as seen from behind, rad.').optional(),
   zeroRange: si('m').positive().describe('Range of the zero, m.'),
   zeroNotes: text(1000).describe('Notes on the zero.').optional(),
+  zeroTemperature: si('K').positive().describe('Air temperature of the zero, K.').optional(),
+  zeroPressure: si('Pa')
+    .positive()
+    .describe('Absolute station pressure of the zero, Pa.')
+    .optional(),
+  zeroHumidity: si('1')
+    .min(0)
+    .max(1)
+    .describe('Relative humidity of the zero, fraction from 0 to 1.')
+    .optional(),
+  dragFactor: si('1')
+    .positive()
+    .describe('Factor on the drag of the bullet from truing, 1 for the nominal drag.')
+    .optional(),
+  dragFactorSource: text(200)
+    .describe('Where the drag factor comes from, for example the truing session.')
+    .optional(),
 })
 
 /**
@@ -146,5 +163,5 @@ export interface Firearm extends z.infer<typeof firearm> {}
 export interface Optic extends z.infer<typeof optic> {}
 /** The optics mounted on a firearm between a mount date and a removal date. */
 export interface OpticConfiguration extends z.infer<typeof opticConfiguration> {}
-/** One optic as mounted, with sight height and zero range in m. */
+/** One optic as mounted, with sight height and zero range in m, zero air and drag factor. */
 export interface OpticMount extends z.infer<typeof opticMount> {}

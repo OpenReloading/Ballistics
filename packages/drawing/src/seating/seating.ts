@@ -1,4 +1,5 @@
 import {
+  assumedBelow,
   type BulletDimensions,
   bulletOutline,
   type Outline,
@@ -175,12 +176,11 @@ function seatVolumes(
   water: number | undefined,
   waterDensity: number,
 ) {
-  const touchesShape = outline.approximate.some(([z0, z1]) => z1 > z0 && z0 < cut)
   const caseVolume: Tagged | undefined =
     water === undefined ? undefined : { value: water / waterDensity, tag: 'derived' }
   const volume: Tagged | undefined = caseVolume && {
     value: caseVolume.value - revolutionVolume(outline.points, cut) / 1000,
-    tag: touchesShape ? 'approximate' : 'derived',
+    tag: assumedBelow(outline, cut) ? 'approximate' : 'derived',
   }
   return { caseVolume, volume }
 }
@@ -260,7 +260,7 @@ export function intrusion({ bullet, caseLength, coal, lengthSource }: IntrusionI
   const cut = Math.min(Math.max(depth, 0), bullet.length)
   const estimated = lengthSource === 'estimated'
   if (estimated) notes.push('The bullet length is estimated: measure it for the volume.')
-  const assumed = outline.approximate.some(([z0, z1]) => z1 > z0 && z0 < cut)
+  const assumed = assumedBelow(outline, cut)
   const value = revolutionVolume(outline.points, cut) / 1000
   const dL = estimated
     ? bulletLengthTolerance.estimated * bullet.length

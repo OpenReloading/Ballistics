@@ -36,8 +36,8 @@ export type WorkerRequest =
         auto?: boolean
       })
   | (Photo & { kind: 'colour'; at: Point; radius: number })
-  /** The face search over the whole turned photo against `faces`. */
-  | (Photo & { kind: 'face'; faces: TargetFace[] })
+  /** The face search over the whole turned photo against `faces`; `pxPerMm` is the photo's known scale. */
+  | (Photo & { kind: 'face'; faces: TargetFace[]; pxPerMm?: number })
   /** Detection from the hole under `at` (`detectFromExample`); `holeDiameter` sets the sizes it tries. */
   | (Photo & Search & { kind: 'example'; at: Point })
 

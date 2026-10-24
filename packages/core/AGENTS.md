@@ -25,9 +25,11 @@ Pure TypeScript ballistics solver, ESM. Must stay headless: no runtime dependenc
   - SI in and out, temperatures in K. Integrates with `src/exterior/rk45.ts` in scaled time.
   - Gas leakage (`leakage`, `leakFlowFactor`) and the heat-loss defaults (`convectiveDefaults`): `apps/docs/docs/models/interior-leakage-heat.md`.
 - `src/interior/form.ts`: burn laws and form functions (`apps/docs/docs/models/interior-burn-forms.md`), one entry per grain shape and per vivacity form with its form function and its shape-specific checks.
-- `src/interior/fit.ts`: `fitPowder`, `PowderFitError` (`apps/docs/docs/models/interior-powder-fit.md`). Weighted least-squares fit of the M3 burn coefficient and, on request, the start pressure to a chronograph ladder (mean muzzle velocities, optional peak pressures). One `interior` run per distinct charge and evaluation.
+- `src/interior/fit.ts`: `fitPowder`, `PowderFitError` (`apps/docs/docs/models/interior-powder-fit.md`). Weighted least-squares fit of the M3 burn coefficient and, on request, the start pressure to a chronograph ladder (mean muzzle velocities, optional peak pressures), with optional Gaussian priors and a Huber loss. One `interior` run per distinct charge and evaluation.
+  - `predictPowder`: muzzle velocity and peak pressure of a fit at any charge with standard uncertainty and interval from the log-parameter covariance (`PowderFit.covariance`); `extrapolation` outside `chargeRange`. Parameter uncertainty only.
 - `src/least-squares.ts`:
   - `logLeastSquares`: the Levenberg-Marquardt loop on log parameters with the conditioning check and covariance, shared by truing and the powder fit.
+  - `huber.ts`: the Huber loss and its reweighting for `logLeastSquares` (`huber` input; the powder fit's `huberThreshold`).
   - `identifiability`: covariance, variance inflation and condition number of a weighted Jacobian, used by the range string plan and fit.
 - `src/bisect.ts`: `bisect`, the bisection loop. Internal, not exported from `src/index.ts`.
   - Shared by the seven-perforation burnout (`interior/form.ts`), the ignition burnt fraction (`interior/model.ts`), `chiSquareQuantile`, `studentTwoSidedQuantile` and the CEP (`groups/`).
@@ -40,6 +42,7 @@ Pure TypeScript ballistics solver, ESM. Must stay headless: no runtime dependenc
 - `src/interior/shotshell.ts`: `shotshellInterior`, `shotshellInteriorLoad` (`apps/docs/docs/models/interior-shotshell.md`). Experimental: a shotshell load (shot, wad, crimp opening pressure, smooth bore) mapped onto `interior`. Every result carries `experimental: true`.
 - `src/interior/range.ts`:
   - `toleranceRange`, `interiorPressureRange` (`apps/docs/docs/models/interior-pressure-range.md`): the peak-pressure range over input tolerances. Each input alone at both ends, then all together at the two combined ends. Input tolerances only, no model error.
+- `src/interior/monte-carlo.ts`: `sampledBand`, `interiorSampledBand` (`apps/docs/docs/models/interior-sampled-band.md`): fixed-seed normal draws of the same inputs, percentiles of peak pressure and muzzle velocity, no band when the injected clock passes the budget. No clock of its own.
 - `src/exterior/`: SI in and out, angles in rad. Pages: M2 point mass `apps/docs/docs/models/exterior-point-mass.md`, truing `apps/docs/docs/models/exterior-truing.md`, M2b (modified point mass) `apps/docs/docs/models/exterior-modified-point-mass.md`, least squares `apps/docs/docs/models/least-squares.md`.
   - `atmosphere.ts`: ICAO troposphere, humid air.
   - `drag.ts`: `dragModels`, the one list of drag models, a literal in the key order of the generated `dragTables` (a test pins it). A new model is its table in a regenerated `drag-tables.ts` and its name in `dragModels`, read by the API drag schema and the web trajectory form. Also `dragTableOf`, table lookup (linear or monotone cubic, `apps/docs/docs/models/exterior-drag.md`), BC bands, custom Cd curves.

@@ -16,6 +16,7 @@
   - Generated, git-ignored: the TypeDoc site of the six packages (`static/library/`, configured by `apps/docs/typedoc.config.mjs` with the landing page `apps/docs/library.md`), served at `/library/`, the REST API page (`static/rest/`: the API document, the Scalar viewer and its page, `scripts/openapi.mts`), served at `/rest/`. Its link to the API's own reference (`/v1/reference/`) uses `API_URL`, no link when it is unset.
   - Search: after the build, `scripts/search.mts` writes the Pagefind index of the docs pages, the TypeDoc pages and one record per REST operation to `build/pagefind/` (the TypeDoc pages in `build/pagefind-library/`, merged with a lower weight). The navbar search (`src/theme/SearchBar.tsx`) reads it, so `docusaurus start` has no search.
   - Hand-written pages go in `apps/docs/docs/`. Navbar sections are the sidebars of `sidebars.ts`: Models, Data, Contributing.
+  - The navbar's repository widget (`src/components/RepoWidget.tsx`) shows the release tag, stars and forks that `scripts/repo-facts.mts` reads from the GitHub API once per build (`GITHUB_TOKEN` lifts the rate limit, `pages.yml` sets it). The browser makes no request to GitHub. A failed request leaves the facts out of the build, they are as fresh as the last deploy.
   - `DOCS_URL` and `DOCS_BASE_URL` set the origin and the path for a sub directory on GitHub Pages.
 - API contract (after `build`, details in `tools/AGENTS.md`):
   - Both need the dev container, which installs oasdiff and Schemathesis.
@@ -37,7 +38,7 @@
 
 ## Conventions
 
-- Changes start from a GitHub issue.
+- Changes start from a GitHub issue. Branches are cut from `develop` and merged back into it; `main` only receives the pull request from `develop` and the release pull request.
 - Package rules:
   - `packages/core`: no runtime dependencies, no I/O, no database, no HTTP.
   - `packages/importers`: no I/O. Depends on `@openreloading/schema` for types only.

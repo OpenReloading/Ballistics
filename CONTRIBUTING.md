@@ -28,8 +28,10 @@ Where questions, ideas, bugs and record requests go: [README](README.md#communit
   - Scope (optional): the workspace or area, for example `core`, `api`, `web`, `data`, `schema`, `drawing`, `importers`, `tools`, `e2e`.
   - Breaking change: no marker before 1.0.0. From 1.0.0 on, `!` after the type or scope, or a `BREAKING CHANGE:` footer.
 - Commits are signed (`git commit -S`, or `commit.gpgsign` with an SSH or GPG key).
-- Pull requests are squash-merged. The title becomes the commit on `main` and the changelog line, so the `PR title` check enforces the format.
-- Branch names: `<type>/<issue>-<slug>`, for example `fix/123-powder-search`.
+- Branches:
+  - `main` holds released code. It takes only the pull request from `develop` and the release pull request.
+  - `develop` is where work lands. Cut a branch from it, named `<type>/<issue>-<slug>` (for example `fix/123-powder-search`), and open the pull request against `develop`. `develop` cannot be deleted or force-pushed.
+- Pull requests are squash-merged into `develop`; the promotion pull request from `develop` to `main` takes a merge commit. The title becomes the commit on `develop` and the changelog line, so the `PR title` check enforces the format.
 - Reference the issue in the description (`Closes #123`).
 
 ## Releases

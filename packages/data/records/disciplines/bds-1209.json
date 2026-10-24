@@ -1,0 +1,40 @@
+{
+  "id": "bds-1209",
+  "federation": "bds",
+  "name": "MD Revolver Magnum über .357",
+  "number": "1209",
+  "section": "K 4.01",
+  "page": "Seite K-16, PDF p. 16",
+  "distance": {
+    "value": 20000,
+    "raw": "5, 10, 15, 20 m"
+  },
+  "category": "revolver",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "page": "K 4.01, Seite K-16, PDF p. 16",
+        "fields": ["name", "number", "federation", "section", "page"]
+      },
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "page": "K 4.06, K 4.07, Seite K-17 and K-18, PDF pp. 17 and 18",
+        "fields": ["distance"],
+        "note": "The discipline is shot at 5, 10, 15 and 20 m; the record holds the farthest distance and the raw text lists all."
+      },
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "page": "K 4.01, Seite K-16, PDF p. 16",
+        "fields": ["category"]
+      },
+      {
+        "source": "bds-sporthandbuch-kommentar-2026",
+        "page": "A3.01, Seite 7 von 76, PDF p. 7",
+        "fields": ["number"],
+        "note": "Not held at Deutsche Meisterschaften until further notice; the Kommentar names such disciplines optional (O)."
+      }
+    ]
+  }
+}

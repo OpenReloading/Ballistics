@@ -1,5 +1,11 @@
 import type { Dimension, Profile, RadiusMark } from '../core/types.ts'
-import { type BulletDimensions, bulletOutline, type Outline, type Refusal } from './outline.ts'
+import {
+  type BaseType,
+  type BulletDimensions,
+  bulletOutline,
+  type Outline,
+  type Refusal,
+} from './outline.ts'
 
 /** A stored quantity: the value in the stored unit and the text as printed. */
 interface StoredQuantity {
@@ -16,12 +22,14 @@ export interface BulletValues {
   bearingLength?: StoredQuantity
   meplatDiameter?: StoredQuantity
   base?: {
-    type?: 'flat' | 'boat-tail' | 'rebated-boat-tail'
+    type?: BaseType
     length?: StoredQuantity
     diameter?: StoredQuantity
     angle?: StoredQuantity
+    cavityDiameter?: StoredQuantity
   }
   ogive?: { form?: string; radius?: StoredQuantity; radiusRatio?: StoredQuantity }
+  cannelure?: { start: StoredQuantity; width: StoredQuantity; depth?: StoredQuantity }
   tip?: { type: string; length?: StoredQuantity; mouthDiameter?: StoredQuantity }
   provenance: { sources: { title: string; fields?: string[] }[] }
 }
@@ -44,6 +52,7 @@ export const bulletSymbols: readonly BulletSymbol[] = [
   { symbol: 'b', path: 'bearingLength', name: 'bearing length' },
   { symbol: 't', path: 'base.length', name: 'boat-tail length' },
   { symbol: 'db', path: 'base.diameter', name: 'base diameter' },
+  { symbol: 'dc', path: 'base.cavityDiameter', name: 'cavity diameter' },
   { symbol: 'dm', path: 'meplatDiameter', name: 'meplat diameter' },
   { symbol: 'dh', path: 'tip.mouthDiameter', name: 'hollow-point mouth diameter' },
   { symbol: 'R', path: 'ogive.radius', name: 'ogive radius' },
@@ -65,11 +74,17 @@ export function bulletDimensions(r: BulletValues): BulletDimensions | undefined 
     ...(r.base.length && { length: r.base.length.value }),
     ...(r.base.diameter && { diameter: r.base.diameter.value }),
     ...(r.base.angle && { angle: r.base.angle.value }),
+    ...(r.base.cavityDiameter && { cavityDiameter: r.base.cavityDiameter.value }),
   }
   const ogive = r.ogive && {
     ...(r.ogive.form && { form: r.ogive.form }),
     ...(r.ogive.radius && { radius: r.ogive.radius.value }),
     ...(r.ogive.radiusRatio && { radiusRatio: r.ogive.radiusRatio.value }),
+  }
+  const cannelure = r.cannelure && {
+    start: r.cannelure.start.value,
+    width: r.cannelure.width.value,
+    ...(r.cannelure.depth && { depth: r.cannelure.depth.value }),
   }
   const tip = r.tip && {
     type: r.tip.type,
@@ -85,6 +100,7 @@ export function bulletDimensions(r: BulletValues): BulletDimensions | undefined 
     ...(r.meplatDiameter && { meplatDiameter: r.meplatDiameter.value }),
     ...(base && { base }),
     ...(ogive && { ogive }),
+    ...(cannelure && { cannelure }),
     ...(tip && { tip }),
   }
 }
@@ -151,7 +167,7 @@ function dimensionsOf(
   const a = diameter / 2
   const z0 = L - o.noseLength
   const t = z0 - o.bearingLength
-  const rb = o.points[1][0]
+  const rb = o.points[o.baseEdge][0]
   const tip = shape.tip?.type
   const groove = shape.cannelure
   const dimensions: Dimension[] = []
@@ -198,6 +214,15 @@ function dimensionsOf(
     radius: rb,
     behindHeadFace: true,
   })
+  const cavityDiameter = shape.base?.cavityDiameter
+  add(
+    'dc',
+    cavityDiameter,
+    o.cavity !== undefined &&
+      cavityDiameter !== undefined &&
+      Math.abs(2 * o.cavity.radius - cavityDiameter) < 1e-9,
+    { kind: 'diameter', from: 0, to: 0, radius: o.cavity?.radius, behindHeadFace: true },
+  )
   const meplat = shape.meplatDiameter
   add('dm', meplat, (meplat ?? 0) > 0, {
     kind: 'diameter',

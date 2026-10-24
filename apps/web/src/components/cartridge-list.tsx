@@ -2,10 +2,10 @@
 
 import { Button, Select } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
+import { caseTypes } from '@openreloading/schema'
 import { Plus } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useDeferredValue, useMemo } from 'react'
-import { caseTypes } from '../lib/api-types.ts'
 import { caliberUnit } from '../lib/caliber.ts'
 import {
   type CartridgeRow,
@@ -270,7 +270,7 @@ export function CartridgeList({ packed }: { packed: PackedCartridge[] }) {
             placeholder="Case type"
             size={controlSize.row.input}
             clearable
-            data={[...caseTypes]}
+            data={[...caseTypes.options]}
             value={state.caseType || null}
             onChange={(v) => set({ caseType: v ?? '' })}
           />

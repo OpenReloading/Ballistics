@@ -12,15 +12,11 @@ import {
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { boreArea } from '@openreloading/core'
+import type { Bullet } from '@openreloading/schema'
 import { DotsThree } from '@phosphor-icons/react'
 import { type ReactNode, useEffect, useId, useState } from 'react'
 import { createPortal } from 'react-dom'
-import type {
-  BulletRecord,
-  BulletSummary,
-  CartridgeSummary,
-  PowderSummary,
-} from '../lib/api-types.ts'
+import type { BulletSummary, CartridgeSummary, PowderSummary } from '../lib/api-types.ts'
 import { summaryFitSource } from '../lib/bullet-fit.ts'
 import { quickCartridges } from '../lib/examples.ts'
 import { type FieldSpec, type FieldValue, fieldError, siValues } from '../lib/field-spec.ts'
@@ -108,6 +104,15 @@ export const seatingStepSpec = {
   min: 0,
 } as const satisfies FieldSpec
 
+/** Temperature ladder step size, a difference of temperatures; the Powder temperature field is the first step. */
+export const temperatureStepSpec = {
+  key: 'tempStep',
+  label: 'Step size',
+  quantity: 'temperatureDifference',
+  required: true,
+  min: 0,
+} as const satisfies FieldSpec
+
 /** Steps the API accepts at most (`caps.ladderSteps`). */
 export const maxLadderSteps = 21
 /** A link's or file's direction; anything else is up. */
@@ -186,7 +191,7 @@ const lengthCell = (system: UnitSystem, mm: number) =>
   inchText(lengthText('diameter', system, mm * 1e-3), system.length.symbol)
 
 /** Diameter and length on one row, or the diameter alone. */
-function sizeRow(b: BulletRecord | undefined, system: UnitSystem) {
+function sizeRow(b: Bullet | undefined, system: UnitSystem) {
   if (!b) return false
   const d = lengthCell(system, b.diameter.value)
   return b.length
@@ -199,7 +204,7 @@ function sizeRow(b: BulletRecord | undefined, system: UnitSystem) {
 }
 
 /** The construction on one line: the structure, the full wording on hover; else the wording. */
-function constructionCell(c: BulletRecord['construction']) {
+function constructionCell(c: Bullet['construction']) {
   const text = constructionRows(c)[0]?.text
   const short = c?.structure && titleFromKebab(c.structure)
   return short && short !== text ? <Noted value={short} notes={[text as string]} inline /> : text
@@ -222,10 +227,13 @@ function LadderInputs() {
     ladderError,
     ladderKind,
     seatStep,
+    tempStep,
     seatingBlock,
     powderLabel,
+    powder,
     setLadderKind,
     setSeatStep,
+    setTempStep,
     setStepsDraft,
     markChanged,
     setLadderSteps,
@@ -275,15 +283,28 @@ function LadderInputs() {
         />
         {ladderSteps > 1 && (
           <NumberField
-            spec={ladderKind === 'seating' ? seatingStepSpec : ladderSpec}
+            spec={
+              ladderKind === 'seating'
+                ? seatingStepSpec
+                : ladderKind === 'temperature'
+                  ? temperatureStepSpec
+                  : ladderSpec
+            }
             system={system}
-            value={ladderKind === 'seating' ? seatStep.seatStep : ladder.ladderStep}
+            value={
+              ladderKind === 'seating'
+                ? seatStep.seatStep
+                : ladderKind === 'temperature'
+                  ? tempStep.tempStep
+                  : ladder.ladderStep
+            }
             // shown once a run or blur found one, and gone as soon as the cause is fixed
             error={ladderError && stepError}
             onBlur={() => setLadderError(stepError())}
             onChange={(value) => {
               markChanged()
               if (ladderKind === 'seating') setSeatStep({ seatStep: value })
+              else if (ladderKind === 'temperature') setTempStep({ tempStep: value })
               else setLadder({ ladderStep: value })
               if (ladderError) setLadderError(undefined)
             }}
@@ -299,8 +320,11 @@ function LadderInputs() {
             segments={ladderKinds.map((k) => ({
               ...k,
               reason:
-                k.value === 'temperature'
-                  ? temperatureLadderBlockReason(powderLabel)
+                k.value === 'temperature' && ladderKind !== 'temperature'
+                  ? temperatureLadderBlockReason(
+                      powderLabel,
+                      powder?.temperatureSensitivity !== undefined,
+                    )
                   : k.value === 'seating' && ladderKind !== 'seating'
                     ? seatingBlock
                     : undefined,
@@ -405,6 +429,7 @@ export function InputCards() {
     online,
     pending,
     cartridge,
+    cartridgeDesign,
     bullet,
     bulletDesign,
     powder,
@@ -418,7 +443,7 @@ export function InputCards() {
   const { figureTab } = useLoad()
   /** The card's record is chosen: the head shows its name as text. */
   const chosen: Record<InputPanel, boolean> = {
-    cartridge: !!cartridge,
+    cartridge: !!(cartridge || cartridgeDesign),
     bullet: !!(bullet || bulletDesign || linkedBullet?.name),
     powder: !!(powder || linkedPowder?.name),
     firearm: !!firearm,
@@ -757,6 +782,9 @@ function CardPicker({ panel }: { panel: InputPanel }) {
   const {
     fields,
     cartridge,
+    cartridgeDesign,
+    cartridgeDesigns,
+    chooseCartridgeDesign,
     bulletLabel,
     bulletDesign,
     powderLabel,
@@ -784,7 +812,12 @@ function CardPicker({ panel }: { panel: InputPanel }) {
         key={searchKey}
         kind="cartridges"
         label="Search cartridges by name"
-        chosen={cartridge?.name ?? 'Search cartridges (optional)'}
+        chosen={
+          cartridge?.name ??
+          (cartridgeDesign
+            ? `${cartridgeDesign.name} (your design)`
+            : 'Search cartridges (optional)')
+        }
         describe={cartridgeOptionText}
         onSelect={(c) =>
           chooseCartridge({
@@ -793,6 +826,9 @@ function CardPicker({ panel }: { panel: InputPanel }) {
             ...summaryFitSource(c),
           })
         }
+        // the browser's cartridge designs in the same list, first
+        extra={cartridgeDesigns.map((d) => ({ id: d.id, label: `${d.name} (your design)` }))}
+        onExtra={chooseCartridgeDesign}
         noneText="No cartridge found"
         unreachableText={notReached}
       />
@@ -897,6 +933,8 @@ function CardMore({ panel }: { panel: InputPanel }) {
 function LoadFigure({ host }: { host: HTMLElement | null }) {
   const {
     cartridge,
+    cartridgeDesign,
+    designLoad,
     figureView,
     setFigureView,
     searchKey,
@@ -936,7 +974,7 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
   useEffect(() => {
     if (node && host) host.append(node)
   }, [node, host])
-  const shown = cartridge !== undefined
+  const shown = cartridge !== undefined || cartridgeDesign !== undefined
   const moreOpen = more === 'cartridge'
   useEffect(() => {
     if (process.env.NODE_ENV === 'production' || !shown) return
@@ -948,13 +986,15 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
     throw new Error(
       `Seating slot not mounted: ${missing.join(', ')}. Every slot the seating preview fills needs its <SeatingSlot> in a card.`,
     )
-  if (!cartridge || !node) return null
+  if (!(cartridge || cartridgeDesign) || !node) return null
+  const measuredId = cartridge?.id ?? (cartridgeDesign as { id: string }).id
   return createPortal(
     <CartridgeFigure
       view={figureView}
       onView={setFigureView}
-      previewKey={`${cartridge.id} ${searchKey}`}
+      previewKey={`${measuredId} ${searchKey}`}
       cartridge={cartridge}
+      draft={designLoad && { spec: designLoad.spec, title: designLoad.title, card: true }}
       system={system}
       initial={previewInitial}
       barrelLength={firearmList.find((f) => f.id === firearm)?.data.barrelLength}
@@ -970,11 +1010,11 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
       onSeatLadder={setSeatAt}
       ladderStep={ladderStep}
       measuredWaterCapacity={
-        measuredFor === cartridge.id ? measured.measuredWaterCapacity : emptyStep
+        measuredFor === measuredId ? measured.measuredWaterCapacity : emptyStep
       }
       onMeasuredWaterCapacity={(v) => {
         setMeasured({ measuredWaterCapacity: v })
-        setMeasuredFor(cartridge.id)
+        setMeasuredFor(measuredId)
       }}
     />,
     node,

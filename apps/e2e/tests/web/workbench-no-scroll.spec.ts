@@ -1,6 +1,6 @@
 import { expect, type Page, test } from '@playwright/test'
 import { storeUnits } from './units.ts'
-import { loadForm } from './workbench.ts'
+import { applyExampleLoad, loadForm } from './workbench.ts'
 import { runExample } from './workbench-run.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
@@ -104,6 +104,10 @@ for (const [width, height, shown] of [
       await page.setViewportSize({ width, height })
       await runExample(page)
       if (ladder) await runLadder(page, ...ladder)
+      // the sampled band and its line follow the result
+      await expect(page.locator('.band-line')).toBeVisible({
+        timeout: 10_000,
+      })
       await expect.poll(() => overflowing(page)).toEqual([])
       expect(await cut(page)).toEqual([])
     })
@@ -158,3 +162,52 @@ test('the Trajectory tab keeps its inputs when another tab is opened and it is o
   await page.getByRole('tab', { name: 'Trajectory', exact: true }).click()
   await expect(step).toHaveValue('50')
 })
+
+test('the Gun card keeps its weight error, firearm query and focus when the window height crosses 45em', async ({
+  page,
+}) => {
+  test.setTimeout(60_000)
+  await page.setViewportSize({ width: 1280, height: 800 })
+  await runExample(page)
+  const weight = page.getByLabel(/^Gun weight/)
+  await weight.fill('0')
+  await weight.blur()
+  await expect(weight).toHaveAttribute('aria-invalid', 'true')
+  const firearm = page.getByRole('combobox', { name: 'Firearm from your library' })
+  await firearm.fill('rifle')
+  await firearm.focus()
+  for (const height of [650, 800]) {
+    await page.setViewportSize({ width: 1280, height })
+    await expect(page.locator('.panels')).toBeVisible()
+    await expect(weight).toHaveAttribute('aria-invalid', 'true')
+    await expect(firearm).toHaveValue('rifle')
+    await expect(firearm).toBeFocused()
+  }
+})
+
+// a run the API refuses leaves its message in the results area, which keeps the no-scroll rule
+for (const [width, height] of [
+  [1280, 650],
+  [1920, 1080],
+] as const)
+  test(`at ${width} x ${height} the workbench with a refused run scrolls and cuts nothing`, async ({
+    page,
+  }) => {
+    test.setTimeout(60_000)
+    await page.setViewportSize({ width, height })
+    await page.route('**/api/interior', (route) =>
+      route.fulfill({
+        status: 422,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: 'The charge is above what the case holds.' }),
+      }),
+    )
+    await page.goto('/workbench')
+    await applyExampleLoad(page)
+    await loadForm(page)
+      .getByLabel(/^Charge mass/)
+      .press('Control+Enter')
+    await expect(page.getByText('The simulation did not run.')).toBeVisible()
+    await expect.poll(() => overflowing(page)).toEqual([])
+    expect(await cut(page)).toEqual([])
+  })

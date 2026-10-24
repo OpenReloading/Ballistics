@@ -1,6 +1,7 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
+import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 
 // Metric (SI): lengths in mm
@@ -237,4 +238,111 @@ test('the designer shows no load-data notice; the caption says how changes are d
   await expect(page.locator('.designer-drawing figcaption').first()).toContainText(
     "Changed values are drawn as entered, without the record's tolerances.",
   )
+})
+
+/** A bullet design with a hollow base in the browser store, as the bullet designer saves it. */
+async function seedHollowBaseDesign(page: Page) {
+  await page.evaluate(async () => {
+    const db: IDBDatabase = await new Promise((ok, no) => {
+      const r = indexedDB.open('openreloading-user-data')
+      r.onupgradeneeded = () => {
+        for (const n of ['records', 'handles', 'files'])
+          if (!r.result.objectStoreNames.contains(n))
+            r.result.createObjectStore(n, n === 'records' ? { keyPath: 'id' } : undefined)
+      }
+      r.onsuccess = () => ok(r.result)
+      r.onerror = () => no(r.error)
+    })
+    const tx = db.transaction('records', 'readwrite')
+    tx.objectStore('records').put({
+      kind: 'bulletDesign',
+      id: 'bullet-hollow',
+      name: 'Hollow base',
+      saved: '2026-10-20T00:00:00.000Z',
+      data: {
+        manufacturerName: '',
+        name: 'Hollow base',
+        choices: { 'base.type': 'conical-hollow-base', 'ogive.form': 'tangent', 'tip.type': '' },
+        siValues: {
+          diameter: 0.007823,
+          mass: 0.010886,
+          length: 0.0305,
+          noseLength: 0.016,
+          bearingLength: 0.0107,
+          baseToOgive: 0.0145,
+          'base.length': 0.0038,
+          'base.diameter': 0.00662,
+          'base.angle': (9 * Math.PI) / 180,
+          'base.cavityDiameter': 0.004,
+        },
+      },
+    })
+    await new Promise((ok) => {
+      tx.oncomplete = ok
+    })
+    db.close()
+  })
+}
+
+test('a chosen bullet seats at the entered COAL in the designed case, and the seating moves the volume', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/cartridges/designer?from=308-win')
+  await expect(field(page, 'Cartridge L3')).toHaveValue('51.18')
+  const row = (term: string) =>
+    page.locator('.seating-row').filter({ has: page.getByText(term, { exact: true }) })
+  const number = async (term: string) =>
+    Number.parseFloat((await row(term).locator('.num').textContent()) ?? '')
+  const seated = page.locator('.seating-figure svg')
+  // no bullet and no length: nothing seated, no default filled in
+  await expect(seated).toHaveCount(0)
+  await page.getByRole('combobox', { name: 'Search bullets by manufacturer or name' }).fill('168')
+  await page.getByRole('option', { name: /168 gr/ }).click()
+  await expect(page.getByText('Bullet: Demo Bullets 30 Cal 168 gr HPBT Demo')).toBeVisible()
+  await expect(seated).toHaveCount(0)
+  await page.getByRole('textbox', { name: /^COAL/ }).fill('71')
+  await expect(seated).toBeVisible()
+  await expect(seated).toHaveAccessibleDescription(/seated at COAL 71\.00 mm/)
+  // from the design's case length: 51.18 - (71 - 30.5)
+  expect(await number('Seating depth')).toBeCloseTo(10.68, 2)
+  // what the design or the inputs lack is not given, with no number
+  for (const term of ['Case volume to the mouth', 'Volume behind the bullet'])
+    await expect(row(term)).toContainText('not given')
+  await expect(row('Travel to the muzzle')).toContainText('not given')
+  // a measured capacity gives the volume, and deeper seating takes more of it
+  await page.getByRole('textbox', { name: /^Case capacity/ }).fill('3.5')
+  const shallow = await number('Volume behind the bullet')
+  expect(shallow).toBeGreaterThan(0)
+  await page.getByRole('slider', { name: 'Slide to change COAL' }).press('Home')
+  await expect.poll(() => number('Volume behind the bullet')).toBeLessThan(shallow)
+  // the figure takes the case from the design, not from the record
+  await page.getByRole('textbox', { name: /^COAL/ }).fill('71')
+  await field(page, 'Cartridge L3').fill('52.18')
+  await expect.poll(() => number('Seating depth')).toBeCloseTo(11.68, 2)
+  // a chamber without the leade gives no jump, and says what it lacks
+  await field(page, 'Chamber s').fill('')
+  await field(page, 'Chamber G').fill('')
+  await expect(row('Jump to the leade')).toContainText('not given')
+  await expect(row('Jump to the leade')).toContainText('chamber')
+  // a bullet design of this browser seats too: its hollow base makes the volume approximate
+  await seedHollowBaseDesign(page)
+  // the list is read when the select takes the focus
+  const designs = page.getByRole('combobox', { name: 'Or a bullet design' })
+  await designs.focus()
+  await designs.selectOption({ label: 'Hollow base' })
+  await expect(page.getByText('Bullet: Hollow base (user design')).toBeVisible()
+  await expect(row('Volume behind the bullet')).toContainText('approximate')
+  await expect(seated).toHaveAccessibleDescription(/seated at COAL 71\.00 mm/)
+  for (const colorScheme of ['light', 'dark'] as const) {
+    await page.emulateMedia({ colorScheme })
+    // retried: the controls' colours fade to the new scheme
+    await expect
+      .poll(async () => {
+        const { violations } = await new AxeBuilder({ page })
+          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+          .analyze()
+        return violations.map((v) => `${colorScheme} ${v.id} ${v.nodes.map((n) => n.target)}`)
+      })
+      .toEqual([])
+  }
 })

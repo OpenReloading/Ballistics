@@ -1296,6 +1296,65 @@ td.nowrap {
   }
 }
 
+/* the cartridge designer's seated bullet: its controls and values are rows of the Seat a bullet
+   section; the level figure goes under the drawing, which keeps its room */
+.designer .seating-preview {
+  display: block;
+  flex: none;
+  margin-top: 0.75rem;
+}
+
+.designer .seating-figure .drawing {
+  margin: 0;
+}
+
+.designer .seating-legend {
+  max-width: none;
+}
+
+/* a seated bullet takes room under the drawing: on screen the long caption stays the figure's
+   name for screen readers only, and from 62em the drawing keeps a fixed height and the column scrolls */
+@media screen {
+  .designer .workspace-scroll:has(.seating-figure .drawing) .designer-drawing figcaption {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+@media screen and (min-width: 62em) {
+  .designer .workspace-scroll:has(.seating-figure .drawing) {
+    overflow-y: auto;
+  }
+
+  .designer .workspace-scroll:has(.seating-figure .drawing) div.designer-drawing {
+    flex: 0 0 16rem;
+  }
+}
+
+@media print {
+  .designer .seating-preview {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 47.99em) {
+  .designer .workspace-scroll:has(.seating-figure .drawing) {
+    max-height: 44svh;
+  }
+
+  .designer .workspace-scroll:has(.seating-figure .drawing) .designer-drawing .drawing.screen-only {
+    max-height: 14svh;
+  }
+}
+
+.designer .seating-slot .seating-row {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 /* a value changed against the record, as a bar inside the input's edge so nothing moves; the flag
    and the description say so in words */
 .designer-field[data-changed] .mantine-Input-input {
@@ -2490,6 +2549,13 @@ td.nowrap {
   font-size: var(--mantine-font-size-sm);
 }
 
+.file-error {
+  margin: 0.25rem 0 0.75rem;
+  color: var(--muted);
+  font-size: var(--mantine-font-size-sm);
+  white-space: pre-wrap;
+}
+
 .file-state[data-dirty] {
   color: var(--mantine-color-text);
   font-weight: 600;
@@ -2691,6 +2757,12 @@ main .library-head.page-panel-head > .page-panel-title {
   align-items: center;
   gap: 0.375rem;
   white-space: nowrap;
+}
+
+.band-line {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+  font-size: var(--mantine-font-size-xs);
 }
 
 .warnings-summary .mantine-Button-label {
@@ -2937,7 +3009,44 @@ main .library-head.page-panel-head > .page-panel-title {
   font-weight: 600;
 }
 
+/* the lot rows of a charge: the slower lot first, set off from the charge before it */
+@media (min-width: 48em) {
+  .ladder-table tr[data-lot="low"] td {
+    border-top: 1px solid var(--border);
+  }
+}
+
+.ladder-table tr[data-lot] td {
+  color: var(--muted);
+}
+
+/* the Ladder table tab's lot rows: the fields in one row, the chart under them */
+.lot-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 12rem));
+  align-items: end;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.lot-rows h3 {
+  margin: 0.5rem 0;
+}
+
+.lot-note {
+  margin: 0 0 1rem;
+}
+
 /* the Barrel length tab: the range fields and the table or chart switch in one row */
+.hit-probability-fields,
+.moving-target-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 12rem));
+  align-items: end;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
 .barrel-range {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 9rem)) auto;
@@ -7360,7 +7469,133 @@ main .field-table tr.field-group > th {
   }
 
   .range-card .sheet-table .notes {
-    width: 25%;
+    width: 15%;
+  }
+
+  /* a second page repeats the headings, and a row stays whole */
+  .range-card .sheet-table thead {
+    display: table-header-group;
+  }
+
+  .range-card .sheet-table tr {
+    break-inside: avoid;
+  }
+
+  /* the paper of the card: A6 and A5 across, A4 upright, each with its own named page */
+  @page range-a6 {
+    size: A6 landscape;
+    margin: 5mm;
+  }
+
+  @page range-a5 {
+    size: A5 landscape;
+    margin: 7mm;
+  }
+
+  @page range-a4 {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
+  .range-card[data-paper="a6"] {
+    page: range-a6;
+    font-size: 6.5pt;
+  }
+
+  .range-card[data-paper="a6"] h1 {
+    font-size: 10pt;
+  }
+
+  .range-card[data-paper="a6"] .sheet-table td {
+    height: 4.5mm;
+    padding-block: 0.3mm;
+  }
+
+  .range-card[data-paper="a5"] {
+    page: range-a5;
+    font-size: 8pt;
+  }
+
+  .range-card[data-paper="a5"] .sheet-table td {
+    height: 5.5mm;
+  }
+
+  .range-card[data-paper="a4"] {
+    page: range-a4;
+  }
+}
+
+.first-run-preview {
+  display: grid;
+  gap: 0.25rem;
+  margin: 1rem 0 0;
+}
+
+.first-run-preview > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.first-run-preview dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ladder target: the controls on the Ladder tab and the print sheet */
+.ladder-target-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 12rem));
+  align-items: end;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.ladder-target {
+  display: none;
+}
+
+@media print {
+  html[data-print="ladder-target"] body > :not(.ladder-target) {
+    display: none !important;
+  }
+
+  html[data-print="ladder-target"] .ladder-target {
+    display: block;
+    color: #000;
+    font-size: 10pt;
+  }
+
+  .ladder-target h1 {
+    margin: 0 0 1mm;
+    font-size: 14pt;
+  }
+
+  .ladder-marks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8mm;
+    margin: 6mm 0;
+  }
+
+  .ladder-marks figure {
+    margin: 0;
+    break-inside: avoid;
+    text-align: center;
+  }
+
+  .ladder-marks svg {
+    display: block;
+    margin: 0 auto 1mm;
+  }
+
+  .ladder-ruler {
+    box-sizing: border-box;
+    height: 5mm;
+    border: 0.3mm solid #000;
+    border-top: 0;
+    font-size: 8pt;
+    text-align: center;
   }
 }
 
@@ -8573,10 +8808,17 @@ main .session-shots th:nth-child(-n + 2) {
   text-align: right;
 }
 
-/* the coordinates share the side column's width, so the table fits it */
+/* the coordinates share the side column's width, so the table fits it; the arrow keys step a
+   value, so no spin buttons take room from the digits */
 .shot-table input[type="number"] {
   width: 100%;
-  min-width: 3.75rem;
+  min-width: 4rem;
+  appearance: textfield;
+}
+
+.shot-table input[type="number"]::-webkit-inner-spin-button,
+.shot-table input[type="number"]::-webkit-outer-spin-button {
+  appearance: none;
 }
 
 /* the point of aim's x and y share the value column */
@@ -9853,6 +10095,34 @@ main .page-bar h1 {
 
 .values-details > summary {
   cursor: pointer;
+}
+
+.truing-session {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.5rem;
+  padding-block: 0.5rem;
+}
+
+.truing-fields,
+.truing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.5rem 1rem;
+}
+
+.truing-table td {
+  padding: 0 0.25rem 0.25rem 0;
+}
+
+/* the calculator grid puts a field's label beside it: here a field stands alone in its cell */
+.workbench .embedded-calculator .truing-session .mantine-InputWrapper-root {
+  display: block;
+}
+
+.truing-table .mantine-Input-wrapper {
+  min-width: 5rem;
 }
 
 /* phones scroll the page: the header sticks under the top bar */

@@ -6,8 +6,8 @@ import {
   bulletSymbols,
   recordProfile,
 } from '@openreloading/drawing/bullet'
+import type { Bullet } from '@openreloading/schema'
 import { Ruler } from '@phosphor-icons/react/ssr'
-import type { BulletRecord } from '../lib/api-types.ts'
 import { DrawingNotes } from './record-actions.tsx'
 import { EmptyNote } from './states.tsx'
 import { TechnicalDrawing } from './technical-drawing.tsx'
@@ -37,7 +37,7 @@ export function BulletDrawing({
   label,
   unit = 'mm',
 }: {
-  record: BulletRecord
+  record: Bullet
   label: string
   unit?: LengthUnit
 }) {

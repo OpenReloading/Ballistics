@@ -1,5 +1,5 @@
+import type { Powder } from '@openreloading/schema'
 import Link from 'next/link'
-import type { PowderRecord } from '../lib/api-types.ts'
 import {
   classifyPowder,
   isFitted,
@@ -64,7 +64,7 @@ export function BurnRateSummary({
   place,
   names,
 }: {
-  powder: PowderRecord
+  powder: Powder
   place?: BurnRatePlace
   names: ManufacturerNames
 }) {

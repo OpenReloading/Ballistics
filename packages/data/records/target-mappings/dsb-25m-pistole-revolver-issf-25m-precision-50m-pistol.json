@@ -9,13 +9,13 @@
     "kind": "published",
     "sources": [
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "page": "0.20 Scheibe Nr. 4, Teil 0 Seite 65, PDF p. 83",
         "fields": ["discipline", "face", "event", "stage"]
       },
       {
-        "source": "dsb-sportordnung-2026",
-        "page": "2.21.2, Teil 2 Seite 21, PDF p. 155 (four series of five shots on the precision face)",
+        "source": "dsb-sportordnung-2027",
+        "page": "2.21.2, Teil 2 Seite 21, PDF p. 157 (four series of five shots on the precision face)",
         "fields": ["shotCount"]
       }
     ]

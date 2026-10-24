@@ -4,10 +4,10 @@ import { NativeSelect, Text, TextInput } from '@mantine/core'
 import { useDebouncedValue } from '@mantine/hooks'
 import { face, type LengthUnit } from '@openreloading/drawing'
 import { bulletFigureModel, bulletSymbols } from '@openreloading/drawing/bullet'
-import type { BulletDesign } from '@openreloading/schema'
+import type { Bullet, BulletDesign } from '@openreloading/schema'
 import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef } from 'react'
 import { fetchRecord } from '../lib/api-fetch.ts'
-import type { BulletRecord, BulletSummary } from '../lib/api-types.ts'
+import type { BulletSummary } from '../lib/api-types.ts'
 import {
   type Action,
   type ChoiceKey,
@@ -52,7 +52,14 @@ const choiceLabels: Record<ChoiceKey, [string, Group]> = {
   'tip.type': ['Tip', 'tip'],
 }
 
-const optionLabel = (o: string) => (o === '' ? 'Not given' : o.replaceAll('-', ' '))
+/** Hollow bases get shorter names: the select is too narrow for the full type name. */
+const shortLabels: Record<string, string> = {
+  'conical-hollow-base': 'hollow cone',
+  'rounded-hollow-base': 'hollow round',
+}
+
+const optionLabel = (o: string) =>
+  o === '' ? 'Not given' : (shortLabels[o] ?? o.replaceAll('-', ' '))
 
 /** The field's state line: where its value comes from. */
 function stateText(s: DesignerSpec, state: FieldState, system: UnitSystem) {
@@ -185,7 +192,7 @@ export function BulletDesigner() {
       kind: 'bulletDesign',
       fileData,
       load: async (id, system) => {
-        const record = await fetchRecord<BulletRecord>('bullets', id)
+        const record = await fetchRecord<Bullet>('bullets', id)
         if (!record) throw new Error('No such bullet')
         // without names the design starts with an empty manufacturer
         const names = await fetchManufacturerNames().catch(() => noManufacturerNames)

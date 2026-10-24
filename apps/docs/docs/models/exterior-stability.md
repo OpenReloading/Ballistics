@@ -29,6 +29,18 @@ Code: `packages/core/src/exterior/stability.ts`, `millerStability` (`fv`, `fa`).
 
 The function takes SI inputs and converts them. The trajectory evaluates $S_g$ once, at the muzzle, with the station air of the shot (the zero with the air of the zero).
 
+### Stability along the trajectory
+
+The trajectory reports where Miller's factor falls below a threshold. At each point the same rule is evaluated with the speed of the point and the air at its height above the firing point (`airAt` of the station air), the mass, diameter, length and twist unchanged. The first point below the threshold gives the range of the warning and the factor there:
+
+$$
+S_g(x) = S_{g,0}\left(\frac{v(x)}{2800\ \mathrm{ft/s}}\right)^{1/3}\frac{T(x)}{288.15\ \mathrm{K}}\,\frac{29.92\ \mathrm{inHg}}{p(x)}
+$$
+
+Code: `packages/core/src/exterior/stability.ts`, `firstLowStability`; the threshold is `minStability`, 1.
+
+At 1 the linear-theory criterion ($S_g \gt 1$, below) is lost. The slowdown lowers the factor through the velocity term, and the drag rise at Mach 1 is where the bullet slows fastest, so the flagged range usually lies in the transonic range or beyond.
+
 ### Dynamic stability
 
 From linear theory, with the lift-force slope $C_{L_\alpha}$, the drag coefficient $C_D$, the Magnus-moment slope $C_{mp_\alpha}$ and the pitch-damping sum $C_{m_q} + C_{m_{\dot\alpha}}$:
@@ -103,12 +115,13 @@ The upper sign holds for right-hand twist: wind from the left lowers the shot, w
 ## Assumptions
 
 - Miller's rule describes ordinary jacketed rifle bullets.
-- $S_g$ is evaluated at the muzzle and held. It rises along the real trajectory.
+- $S_g$ of the trajectory result is evaluated at the muzzle. Along the path Miller's velocity and air terms are applied to the local speed and air, which stands in for the loss of margin as the bullet slows. The overturning moment rise at Mach 1 and the decay of the spin are not modelled.
 - Spin drift and jump are corrections outside the integration, from fits to flat-fire rifle trajectories.
 
 ## Limits
 
 - Plastic tips and very long or very short bullets lie outside Miller's fit.
+- The flagged range is the first computed point below the threshold, so it is as fine as the requested ranges.
 - $S_g \lt 1$ predicts a tumbling bullet. The trajectory is still computed, and the caller shows the value.
 - The point mass cannot detect a dynamically unstable bullet. Dynamic stability needs the aerodynamic coefficients.
 - Steep and very long flights lie outside the spin drift fit.

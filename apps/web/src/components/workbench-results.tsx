@@ -10,7 +10,9 @@ import { toCsv } from '../lib/csv.ts'
 import { controlSize } from '../lib/theme.ts'
 import { resultTabsFit } from '../lib/workbench.ts'
 import { BarrelLength } from './barrel-length.tsx'
+import { LadderTarget } from './ladder-target.tsx'
 import { LazyInteriorChart } from './lazy-chart.tsx'
+import { LotPanel } from './lot-rows.tsx'
 import { NavIcon } from './nav-icons.tsx'
 import { PowderCompare } from './powder-compare.tsx'
 import { chartCopy } from './print-report.tsx'
@@ -23,6 +25,7 @@ import {
   type Outcome,
   resultLine,
   type ShownStep,
+  singleCharge,
   stripFigureOf,
   warningsLine,
 } from './workbench-outcome.ts'
@@ -100,14 +103,12 @@ export const measuredSteps = (
 ) =>
   // a seating ladder has one charge: the strings map to the shown step alone
   ok
-    ? (ok.ladder.kind === 'seating' ? steps.filter((s) => s.n - 1 === ok.selected) : steps).map(
-        (s) => ({
-          n: s.n,
-          label: s.label,
-          charge: s.charge,
-          muzzleVelocity: s.body?.result.muzzleVelocity,
-        }),
-      )
+    ? (singleCharge(ok) ? steps.filter((s) => s.n - 1 === ok.selected) : steps).map((s) => ({
+        n: s.n,
+        label: s.label,
+        charge: s.charge,
+        muzzleVelocity: s.body?.result.muzzleVelocity,
+      }))
     : undefined
 
 /** The ladder bar; before a run it shows the charge field's value. */
@@ -173,9 +174,9 @@ function GroupsPanel() {
   const { ok, identity, steps, velocity, fileId, storedTick, bulletDiameter, optic } = useResult()
   const { groupsLadder } = useInputEcho()
   // a seating ladder has one charge: the sheets see the shown step alone, as a run without a ladder
-  const bySeating = ok?.ladder.kind === 'seating'
-  const step = bySeating ? undefined : ok?.selected
-  const velocitySteps = bySeating ? steps.filter((s) => s.n - 1 === ok?.selected) : steps
+  const single = singleCharge(ok)
+  const step = single ? undefined : ok?.selected
+  const velocitySteps = single ? steps.filter((s) => s.n - 1 === ok?.selected) : steps
   return useMemo(
     () => (
       <GroupsTab
@@ -247,6 +248,7 @@ export const ResultsArea = memo(function ResultsArea() {
     chronoSeries,
     setChronoSeries,
     barrel,
+    lot,
     status,
     online,
     pending,
@@ -423,6 +425,11 @@ export const ResultsArea = memo(function ResultsArea() {
             )}
             {!short && <BurnFigure />}
           </div>
+          {ok?.cartridgeDesign && (
+            <p className="note user-design">
+              Case values from the user design {ok.cartridgeDesign}, not a catalogue record.
+            </p>
+          )}
           {ok?.design && (
             <p className="note user-design">
               Computed with the bullet mass of the user design {ok.design}, not a catalogue record.
@@ -479,12 +486,15 @@ export const ResultsArea = memo(function ResultsArea() {
                 >
                   {csvCopied === 'failed' ? 'Copy failed' : csvCopied ? 'Copied' : 'Copy as CSV'}
                 </Button>
+                {lot.applies && <LotPanel lot={lot} system={system} />}
+                <LadderTarget labels={steps.map(stepValue)} system={system} />
                 <LadderTable
                   ok={ok}
                   steps={steps}
                   system={system}
                   value={stepValue}
                   velocity={velocity}
+                  lot={lot.rows}
                 />
               </>
             ) : (

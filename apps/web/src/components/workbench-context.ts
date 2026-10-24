@@ -1,8 +1,9 @@
 'use client'
 
+import type { Powder } from '@openreloading/schema'
 import type { Context, Dispatch, RefObject, SetStateAction } from 'react'
 import { createContext, useContext } from 'react'
-import type { InteriorResponse, PowderRecord } from '../lib/api-types.ts'
+import type { InteriorResponse } from '../lib/api-types.ts'
 import type { FittedPowder, UnfittedPowder } from '../lib/burn-rate.ts'
 import type { activeClick } from '../lib/firearm.ts'
 import type { IdentifiedSeries } from '../lib/measurements.ts'
@@ -11,6 +12,7 @@ import type { UnitSystem } from '../lib/units.ts'
 import type { ChartView } from './interior-chart.tsx'
 import type { TrajectoryHandle } from './trajectory-form.tsx'
 import type { BarrelStudy } from './use-barrel-study.ts'
+import type { LotRows } from './use-lot-rows.ts'
 import type { UseWorkbenchStateResult } from './use-workbench-load.ts'
 import type { Outcome, ShownStep } from './workbench-outcome.ts'
 import type { ResultTab } from './workbench-results.tsx'
@@ -38,7 +40,7 @@ export type ResultState = {
   todo: { label: string; done: boolean; value?: string }[]
   /** The burn law of the chart: the powder record's fit, else the typed model parameters. */
   burn: FittedPowder | UnfittedPowder | undefined
-  powder: PowderRecord | undefined
+  powder: Powder | undefined
   /** The powder record as "<manufacturer name> <product name>". */
   powderLabel: string | undefined
   /** Where the shown run starts, peaks and leaves the barrel on the burnt-fraction axis. */
@@ -75,6 +77,8 @@ export type ResultState = {
   setChronoSeries: Dispatch<SetStateAction<IdentifiedSeries[]>>
   /** The Barrel length tab's range and rows; the report prints the same rows. */
   barrel: BarrelStudy
+  /** The Ladder table tab's lot rows; the report prints the same rows. */
+  lot: LotRows
   chartView: ChartView
   setChartView: (view: ChartView) => void
   /** Keeps the report's copy of the chart. */
@@ -100,6 +104,11 @@ type InputEchoState = {
     twist?: number
     sightHeight?: number
     zeroRange?: number
+    zeroTemperature?: number
+    zeroPressure?: number
+    zeroHumidity?: number
+    dragFactor?: number
+    dragFactorSource?: string
   }
 }
 export const InputEcho = createContext<InputEchoState | null>(null)

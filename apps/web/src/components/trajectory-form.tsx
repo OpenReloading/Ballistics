@@ -4,6 +4,7 @@ import {
   Accordion,
   ActionIcon,
   Button,
+  Menu,
   NativeSelect,
   Radio,
   SegmentedControl,
@@ -14,10 +15,11 @@ import { useDebouncedValue, useMediaQuery } from '@mantine/hooks'
 import {
   type DragModel,
   dragModels,
+  minStability,
   type OmittedEffect,
   type Trajectory,
 } from '@openreloading/core'
-import type { UserRecord } from '@openreloading/schema'
+import type { Bullet, UserRecord } from '@openreloading/schema'
 import { Printer } from '@phosphor-icons/react'
 import {
   type ReactNode,
@@ -28,8 +30,9 @@ import {
   useRef,
   useState,
 } from 'react'
+import { flushSync } from 'react-dom'
 import { fetchRecord } from '../lib/api-fetch.ts'
-import type { BulletRecord, BulletSummary } from '../lib/api-types.ts'
+import type { BulletSummary } from '../lib/api-types.ts'
 import { bulletDrag } from '../lib/bullet.ts'
 import { errorText } from '../lib/error-text.ts'
 import { loadExample as exampleData } from '../lib/example-data.ts'
@@ -44,6 +47,7 @@ import {
 import { sightOptions } from '../lib/firearm.ts'
 import { type ManufacturerNames, productLabel } from '../lib/manufacturers.ts'
 import { inputsQuery, linkParams, queryFields, tabQuery } from '../lib/query.ts'
+import { zeroConditions } from '../lib/range-card.ts'
 import { controlSize } from '../lib/theme.ts'
 import {
   manualBulletFields,
@@ -51,6 +55,7 @@ import {
   shotFields,
   type TrajectoryResult,
   trajectoryResult,
+  zeroKeys,
 } from '../lib/trajectory-input.ts'
 import {
   formatNumber,
@@ -60,13 +65,16 @@ import {
   withUnit,
 } from '../lib/units.ts'
 import { storedRecords } from '../lib/user-store.ts'
+import { HitProbability } from './hit-probability.tsx'
 import { LazyLineChart as LineChart, preloadChart } from './lazy-chart.tsx'
+import { MovingTarget } from './moving-target.tsx'
 import { NumberField } from './number-field.tsx'
-import { printRangeCard, RangeCard } from './range-card.tsx'
+import { type PaperSize, paperSizes, printRangeCard, RangeCard } from './range-card.tsx'
 import { RecordSearch } from './record-search.tsx'
 import { PanelTable } from './scroll-region.tsx'
 import { SourceTitles } from './sources.tsx'
 import { ErrorNote, Loading } from './states.tsx'
+import { TruingSession } from './truing-session.tsx'
 import { useFieldUnits, useUnits } from './units-settings.tsx'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 
@@ -92,8 +100,9 @@ function startFields(system: UnitSystem): Fields {
 /** The fields a bullet design fills. */
 const designKeys = ['mass', 'diameter', 'length']
 type BulletDesignRecord = Extract<UserRecord, { kind: 'bulletDesign' }>
+/** The panels open at the start; the zero air and drag panel opens when a value fills it. */
 const panels = ['bullet', 'load', 'rifle', 'conditions', 'output']
-/** The fields a firearm choice fills. */
+/** The fields a firearm choice fills and an edit leaves; the zero air and drag factor stay editable per run. */
 const sightKeys = ['sightHeight', 'twist', 'zeroRange']
 const omittedText: Record<OmittedEffect, string> = {
   coriolis: 'Coriolis',
@@ -121,12 +130,16 @@ type Result = TrajectoryResult & {
   si: Record<string, number | undefined>
   /** The bullet values came from the manual fields, so the card lists mass and BC. */
   manual: boolean
+  /** The chosen optic's turret click: the card gives the holds in clicks too. */
+  click?: { value: number; unit?: 'MOA' | 'mrad' }
+  /** Where the applied drag factor comes from: the mount it was filled from. */
+  dragSource?: string
 }
 
 type RecordState =
   | { status: 'none' }
   | { status: 'loading' }
-  | { status: 'ok'; record: BulletRecord }
+  | { status: 'ok'; record: Bullet }
   | { status: 'error'; message: string }
 
 /** Everything a computation reads; debounced as one value. */
@@ -142,6 +155,8 @@ type Inputs = {
   choice: number | undefined
   twistHand: 'right' | 'left'
   design: string | undefined
+  click: Result['click']
+  dragSource: string | undefined
 }
 
 type Attempt =
@@ -206,6 +221,8 @@ function evaluate(i: Inputs): { errors: Record<string, string>; attempt: Attempt
           bullet,
           si,
           manual: i.source === 'manual',
+          ...(i.click && { click: i.click }),
+          ...(i.dragSource && { dragSource: i.dragSource }),
           ...(i.source === 'manual' && i.design && { design: i.design }),
         },
       },
@@ -223,7 +240,7 @@ function RecordDetails({
   names,
   system,
 }: {
-  record: BulletRecord
+  record: Bullet
   names: ManufacturerNames
   system: UnitSystem
 }) {
@@ -311,11 +328,26 @@ function ResultDetail({
   const { trajectory: t, tablePoints: rows, chartPoints: chart } = result
   const last = rows[rows.length - 1]
   const transonic = rows.find((p) => p.transonic || p.subsonic)
+  const zero = zeroConditions(result.si, system, result.dragSource)
   const notes = (
     <ul className="summary">
       <li>Bore elevation above the line of sight: {angle(system, t.bore.elevationAngle)}</li>
+      <li>
+        Density altitude: {formatQuantity('altitude', system, result.densityAltitude)}{' '}
+        {u('altitude')}
+      </li>
+      {zero.zeroAir && <li>Zero air: {zero.zeroAir}</li>}
+      {zero.dragFactor && <li>Drag factor applied: {zero.dragFactor}</li>}
       {t.stability !== undefined && (
         <li>Gyroscopic stability (Miller): {formatNumber(t.stability, 2)}</li>
+      )}
+      {t.stability !== undefined && result.lowStability && (
+        <li className="exceeded">
+          Gyroscopic stability falls below {formatNumber(minStability, 1)} from{' '}
+          {formatQuantity('range', system, result.lowStability.range)} {u('range')} (
+          {formatNumber(result.lowStability.stability, 2)} there, Miller's rule with the speed and
+          air along the flight). Check the twist.
+        </li>
       )}
       {transonic && (
         <li>
@@ -394,6 +426,29 @@ function ResultDetail({
         {chartEl}
       </div>
       {tableEl}
+      <details className="values-details">
+        <summary>Moving target and hit probability</summary>
+        <MovingTarget points={rows} system={system} />
+        <HitProbability
+          points={rows}
+          windPerUnit={result.windPerUnit.mps}
+          wind={{ speed: result.si.windSpeed ?? 0, from: result.si.windFrom ?? Math.PI / 2 }}
+          bulletDiameter={result.bulletDiameter}
+          system={system}
+        />
+      </details>
+      <details className="values-details screen-only">
+        <summary>Truing from range strings</summary>
+        <TruingSession
+          nominal={{
+            shot: result.shot,
+            bullet: result.bullet,
+            zeroRange: result.zeroRange,
+            click: result.click?.value,
+          }}
+          system={system}
+        />
+      </details>
     </>
   )
 }
@@ -418,6 +473,12 @@ export function TrajectoryForm({
     /** The chosen firearm's sight, SI. */
     sightHeight?: number
     zeroRange?: number
+    /** The chosen firearm's zero air and drag factor with its source, SI. */
+    zeroTemperature?: number
+    zeroPressure?: number
+    zeroHumidity?: number
+    dragFactor?: number
+    dragFactorSource?: string
   }
   ref?: Ref<TrajectoryHandle>
 }) {
@@ -439,8 +500,13 @@ export function TrajectoryForm({
   const [last, setLast] = useState<Result | undefined>(undefined)
   const [sights, setSights] = useState<ReturnType<typeof sightOptions>>([])
   const [sight, setSight] = useState('')
+  const [paper, setPaper] = useState<PaperSize>('a4')
   /** The chosen firearm was gone when the list was read again. */
   const [sightGone, setSightGone] = useState(false)
+  /** The drag factor as a firearm's mount filled it and that mount's source note. */
+  const [dragFrom, setDragFrom] = useState<{ factor: number; source: string }>()
+  const [openPanels, setOpenPanels] = useState(panels)
+  const showZero = () => setOpenPanels((o) => (o.includes('zero') ? o : [...o, 'zero']))
   const [designs, setDesigns] = useState<BulletDesignRecord[]>([])
   /** The bullet design the manual bullet values came from; an edit of one of them leaves it. */
   const [design, setDesign] = useState<BulletDesignRecord>()
@@ -482,6 +548,8 @@ export function TrajectoryForm({
       choice,
       twistHand,
       design: design?.name,
+      click: sights.find((o) => o.value === sight)?.fill.click,
+      dragSource: dragFrom?.factor === fields.dragFactor?.si ? dragFrom?.source : undefined,
     }),
     [
       fields,
@@ -495,6 +563,9 @@ export function TrajectoryForm({
       choice,
       twistHand,
       design,
+      sights,
+      sight,
+      dragFrom,
     ],
   )
   const [debounced] = useDebouncedValue(inputs, 150)
@@ -541,6 +612,8 @@ export function TrajectoryForm({
         // the choice names the filled values; an edit of one leaves it
         if (sightKeys.includes(spec.key)) setSight('')
         if (designKeys.includes(spec.key)) setDesign(undefined)
+        // an edited factor is no longer the one the source names
+        if (spec.key === 'dragFactor') setDragFrom(undefined)
       }}
       error={
         errors[spec.key]
@@ -564,7 +637,28 @@ export function TrajectoryForm({
     setLast(undefined)
     setSight('')
     setSightGone(false)
+    setDragFrom(undefined)
     setDesign(undefined)
+  }
+
+  /**
+   * Sets the zero air and drag factor fields from a firearm's mount; a mount without them empties
+   * the fields, so no other firearm's factor stays applied.
+   */
+  function fillZero(get: (key: (typeof zeroKeys)[number]) => number | undefined, source?: string) {
+    for (const key of zeroKeys) {
+      const si = get(key)
+      const q = (allFields as readonly FieldSpec[]).find((f) => f.key === key)?.quantity
+      form.setFieldValue(
+        key,
+        si === undefined || !q
+          ? { text: '', si: undefined }
+          : { text: roundedFieldText(q, system, si), si },
+      )
+    }
+    if (zeroKeys.some((k) => get(k) !== undefined)) showZero()
+    const factor = get('dragFactor')
+    setDragFrom(factor !== undefined && source ? { factor, source } : undefined)
   }
 
   /** The browser's bullet designs, read again on focus as the firearms are. */
@@ -620,6 +714,7 @@ export function TrajectoryForm({
     if (s.fill.twist !== undefined) set('twist', 'twist', s.fill.twist)
     else form.setFieldValue('twist', { text: '', si: undefined })
     setTwistHand(s.fill.twistHand)
+    fillZero((key) => s.fill[key], s.fill.dragFactorSource)
   }
 
   function fillExample() {
@@ -644,7 +739,7 @@ export function TrajectoryForm({
     setRecord({ status: 'loading' })
     setChoice(undefined)
     try {
-      const body = await fetchRecord<BulletRecord>('bullets', id, controller.signal)
+      const body = await fetchRecord<Bullet>('bullets', id, controller.signal)
       if (!body) throw new Error('No such bullet')
       if (controller.signal.aborted) return
       setRecord({ status: 'ok', record: body })
@@ -669,6 +764,7 @@ export function TrajectoryForm({
     if (!query) return
     const linked = queryFields(query, allFields, system, roundedFieldText)
     form.setValues(linked)
+    if (zeroKeys.some((k) => linked[k].text)) showZero()
     // linked values count as edited, so one outside its bounds shows its error
     form.setTouched(
       Object.fromEntries(allFields.filter((s) => linked[s.key].text).map((s) => [s.key, true])),
@@ -718,6 +814,24 @@ export function TrajectoryForm({
         si: loadZero,
       })
   }, [loadSight, loadZero])
+  /** The zero air and drag factor fields hold a firearm of the load's values. */
+  const zeroFromLoad = useRef(false)
+  const loadZeroAir = [load.zeroTemperature, load.zeroPressure, load.zeroHumidity]
+  const [loadFactor, loadFactorSource] = [load.dragFactor, load.dragFactorSource]
+  // biome-ignore lint/correctness/useExhaustiveDependencies: follows the load's firearm, not a unit switch
+  useEffect(() => {
+    if (loadSight !== undefined) {
+      // a firearm without them leaves typed or linked values alone, unless they are another
+      // firearm's
+      const has = zeroKeys.some((key) => load[key] !== undefined)
+      if (has || zeroFromLoad.current) fillZero((key) => load[key], loadFactorSource)
+      zeroFromLoad.current = has
+    } else if (zeroFromLoad.current) {
+      // the load's firearm has no mount or was cleared: its zero air and factor go with it
+      zeroFromLoad.current = false
+      fillZero(() => undefined)
+    }
+  }, [loadSight, ...loadZeroAir, loadFactor, loadFactorSource])
   const loadBullet = load.bullet
   /** The load has no bullet record: the tab offers its own bullet, as the former page did. */
   const own = !loadBullet
@@ -760,7 +874,7 @@ export function TrajectoryForm({
 
   const inputsPanel = (
     <form noValidate onSubmit={(e) => e.preventDefault()}>
-      <Accordion multiple defaultValue={panels} order={2} className="panels">
+      <Accordion multiple value={openPanels} onChange={setOpenPanels} order={2} className="panels">
         <Accordion.Item value="bullet">
           {/* the Bullet card of the workbench is a region "Bullet" too: one name per landmark */}
           <Accordion.Control aria-label="Bullet of the trajectory">Bullet</Accordion.Control>
@@ -900,7 +1014,7 @@ export function TrajectoryForm({
                   description={
                     sightGone
                       ? 'The chosen firearm is no longer in this browser; its values stay.'
-                      : 'From your firearm library; fills sight height, twist and zero range.'
+                      : 'From your firearm library; fills sight height, twist, zero range, zero air and drag factor.'
                   }
                   value={sight}
                   onFocus={readSights}
@@ -931,6 +1045,17 @@ export function TrajectoryForm({
                 />
               </div>
               {group(['zeroRange'])}
+            </div>
+          </Accordion.Panel>
+        </Accordion.Item>
+        <Accordion.Item value="zero">
+          <Accordion.Control>Zero air and drag</Accordion.Control>
+          <Accordion.Panel>
+            <div className="panel-fields">
+              {group(['zeroTemperature', 'zeroPressure', 'zeroHumidity', 'dragFactor'])}
+              {inputs.dragSource && (
+                <p className="note from-load">Drag factor source: {inputs.dragSource}</p>
+              )}
             </div>
           </Accordion.Panel>
         </Accordion.Item>
@@ -1003,16 +1128,33 @@ export function TrajectoryForm({
   const staleLine = stale && <p className="stale-line">{staleText}</p>
   const printButton = (
     // an icon at the end of the holds row, so the hold labels keep their width
-    <ActionIcon
-      variant="default"
-      size={controlSize.row.icon}
-      className="range-card-button"
-      aria-label="Print range card"
-      title="Print range card"
-      onClick={printRangeCard}
-    >
-      <Printer aria-hidden="true" />
-    </ActionIcon>
+    <Menu position="bottom-end" withinPortal shadow="sm">
+      <Menu.Target>
+        <ActionIcon
+          variant="default"
+          size={controlSize.row.icon}
+          className="range-card-button"
+          aria-label="Print range card"
+          title="Print range card"
+        >
+          <Printer aria-hidden="true" />
+        </ActionIcon>
+      </Menu.Target>
+      <Menu.Dropdown>
+        {paperSizes.map((size) => (
+          <Menu.Item
+            key={size}
+            onClick={() => {
+              // the card is drawn for the paper before the dialog takes its snapshot
+              flushSync(() => setPaper(size))
+              printRangeCard()
+            }}
+          >
+            Print on {size.toUpperCase()}
+          </Menu.Item>
+        ))}
+      </Menu.Dropdown>
+    </Menu>
   )
 
   // one view at every width: the holds and Print range card, the inputs, then the notes,
@@ -1043,7 +1185,7 @@ export function TrajectoryForm({
             chartHeight={wide ? undefined : 200}
             staleLine={staleLine}
           />
-          <RangeCard result={result} system={system} />
+          <RangeCard result={result} system={system} paper={paper} />
         </div>
       )}
     </div>

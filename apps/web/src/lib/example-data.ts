@@ -7,7 +7,7 @@ import {
 import { seat } from '@openreloading/drawing/seating'
 import type { InteriorKey } from './interior-input.ts'
 import type { LadderDirection } from './seating-ladder.ts'
-import type { ManualKey, ShotKey } from './trajectory-input.ts'
+import type { ManualKey, ShotKey, zeroKeys } from './trajectory-input.ts'
 import { kilogramsPerGrain, waterDensityGramsPerCm3 } from './units.ts'
 
 /**
@@ -164,7 +164,7 @@ export const exampleTrajectory = {
   windFrom: Math.PI / 2,
   maxRange: 1000,
   rangeStep: 100,
-} satisfies Record<ShotKey | ManualKey, number>
+} satisfies Record<Exclude<ShotKey, (typeof zeroKeys)[number]> | ManualKey, number>
 
 /** Source lines shown next to each button. */
 export const trajectorySources = [
@@ -233,7 +233,7 @@ type LoadExample = {
   >
   interiorSources: readonly string[]
   /** Trajectory form values, SI, keyed like `shotFields` and `manualBulletFields`. */
-  trajectory: Record<ShotKey | ManualKey, number>
+  trajectory: Record<Exclude<ShotKey, (typeof zeroKeys)[number]> | ManualKey, number>
   trajectorySources: readonly string[]
   ladder: { steps: number; step: number; direction: LadderDirection }
   seating: { bullet: string; barrel: number; seating: { by: 'overallLength'; value: number } }

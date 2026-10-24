@@ -4,6 +4,7 @@ import { Table } from '@mantine/core'
 import type { Firearm, Optic } from '@openreloading/schema'
 import type { FieldSpec } from '../lib/field-spec.ts'
 import { clickText, firearmFields, twistText } from '../lib/firearm.ts'
+import { zeroConditions } from '../lib/range-card.ts'
 import { type UnitSystem, withUnit } from '../lib/units.ts'
 import { opticKinds } from './firearm-editor.tsx'
 
@@ -104,21 +105,39 @@ export function DataCard({
                 <Table.Th>Offset</Table.Th>
                 <Table.Th>Cant</Table.Th>
                 <Table.Th>Zero range</Table.Th>
+                <Table.Th>Zero air</Table.Th>
+                <Table.Th>Drag factor</Table.Th>
                 <Table.Th>Zero notes</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-              {c.mounts.map((m, k) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: mounts have no id and keep their order
-                <Table.Tr key={k}>
-                  <Table.Td>{opticName(m.optic)}</Table.Td>
-                  <Table.Td>{opt(m.sightHeight, 'length')}</Table.Td>
-                  <Table.Td>{opt(m.lateralOffset, 'length')}</Table.Td>
-                  <Table.Td>{opt(m.cant, 'angle')}</Table.Td>
-                  <Table.Td>{opt(m.zeroRange, 'range')}</Table.Td>
-                  <Table.Td>{m.zeroNotes || 'n/a'}</Table.Td>
-                </Table.Tr>
-              ))}
+              {c.mounts.map((m, k) => {
+                const zero = zeroConditions(m, system, m.dragFactorSource)
+                const air = [
+                  m.zeroTemperature === undefined
+                    ? ''
+                    : withUnit('temperature', system, m.zeroTemperature),
+                  m.zeroPressure === undefined
+                    ? ''
+                    : withUnit('airPressure', system, m.zeroPressure),
+                  m.zeroHumidity === undefined ? '' : withUnit('percent', system, m.zeroHumidity),
+                ]
+                  .filter(Boolean)
+                  .join(', ')
+                return (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: mounts have no id and keep their order
+                  <Table.Tr key={k}>
+                    <Table.Td>{opticName(m.optic)}</Table.Td>
+                    <Table.Td>{opt(m.sightHeight, 'length')}</Table.Td>
+                    <Table.Td>{opt(m.lateralOffset, 'length')}</Table.Td>
+                    <Table.Td>{opt(m.cant, 'angle')}</Table.Td>
+                    <Table.Td>{opt(m.zeroRange, 'range')}</Table.Td>
+                    <Table.Td>{air || 'n/a'}</Table.Td>
+                    <Table.Td>{zero.dragFactor ?? 'n/a'}</Table.Td>
+                    <Table.Td>{m.zeroNotes || 'n/a'}</Table.Td>
+                  </Table.Tr>
+                )
+              })}
             </Table.Tbody>
           </Table>
         </div>

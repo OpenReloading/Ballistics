@@ -203,7 +203,10 @@ if (import.meta.main) {
     // no offline worker, as in playwright.config.ts
     const page = await browser.newPage({ baseURL: base, serviceWorkers: 'block' })
     // the Safety notice accepted, as in playwright.config.ts, so no dialog covers the pages
-    await page.addInitScript((value) => localStorage.setItem('safety-ack', value), safetyAck)
+    await page.addInitScript((value) => {
+      localStorage.setItem('safety-ack', value)
+      localStorage.setItem('first-run-done', '1')
+    }, safetyAck)
     const tiles: { file: string; caption: string }[] = []
     for (const url of pages)
       for (const width of widths)

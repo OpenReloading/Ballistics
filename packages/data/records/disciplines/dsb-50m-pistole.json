@@ -4,7 +4,7 @@
   "name": "50 m Pistole",
   "number": "2.20",
   "section": "2.15",
-  "page": "Teil 2 Seite 15, PDF p. 149",
+  "page": "Teil 2 Seite 15, PDF p. 151",
   "distance": {
     "value": 50000,
     "raw": "50 m"
@@ -18,13 +18,13 @@
     "kind": "published",
     "sources": [
       {
-        "source": "dsb-sportordnung-2026",
-        "page": "Teil 2 Seite 15, PDF p. 149",
+        "source": "dsb-sportordnung-2027",
+        "page": "Teil 2 Seite 15, PDF p. 151",
         "fields": ["name", "number", "federation", "section", "page", "distance", "category"]
       },
       {
-        "source": "dsb-sportordnung-2026",
-        "page": "Pistolentabelle, Teil 2 Seite 23, PDF p. 157 (2.20) and 0.21, Teil 0 Seite 80, PDF p. 98 (row 2.20)",
+        "source": "dsb-sportordnung-2027",
+        "page": "Pistolentabelle, Teil 2 Seite 23, PDF p. 159 (2.20) and 0.21, Teil 0 Seite 80, PDF p. 98 (row 2.20)",
         "fields": ["caliberClasses"]
       }
     ]

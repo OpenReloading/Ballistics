@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-pp-3",
+  "federation": "bdmp",
+  "name": "Police Pistol 3 (Carry Gun)",
+  "section": "C.6D",
+  "page": "Teil C, Seite 32 bis 33 von 142, PDF pp. 32 to 33",
+  "distance": {
+    "value": 20000,
+    "raw": "20 m"
+  },
+  "category": "pistol",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6D, C.6D.1, Teil C, Seite 32 von 142, PDF p. 32",
+        "fields": ["name", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6D.5, Teil C, Seite 33 von 142, PDF p. 33",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "Revolvers with a barrel up to 4.25 in and pistols that fit the 220 x 140 x 40 mm box (C.6D.1). The course runs at 20, 15 and 10 m, the record holds the longest distance."
+  }
+}

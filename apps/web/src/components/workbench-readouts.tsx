@@ -10,8 +10,9 @@ import {
   isFitted,
   type UnfittedPowder,
 } from '../lib/burn-rate.ts'
+import { burnRateLabel, type Lot } from '../lib/lot-rows.ts'
 import { ipscPowerFactor, powerFactor } from '../lib/power-factor.ts'
-import { seatingLengthName } from '../lib/seating-ladder.ts'
+import { ladderTitle, seatingLengthName } from '../lib/seating-ladder.ts'
 import { controlSize } from '../lib/theme.ts'
 import { niceTicks } from '../lib/ticks.ts'
 import {
@@ -25,7 +26,14 @@ import {
   unitsOf,
   withUnit,
 } from '../lib/units.ts'
-import { firstPressureLimit, lengthText, shownLength } from '../lib/workbench.ts'
+import {
+  bandLine,
+  bandNotice,
+  firstPressureLimit,
+  lengthText,
+  resultBand,
+  shownLength,
+} from '../lib/workbench.ts'
 import { AppPopover, popoverWidth } from './app-popover.tsx'
 import { LazyVivacityChart } from './lazy-vivacity-chart.tsx'
 import { NavIcon } from './nav-icons.tsx'
@@ -153,10 +161,16 @@ export function WarningsBlock({
 
 /** The facts of the peak pressure readout: its time and travel and what the range covers. */
 export function peakFacts(ok: Extract<Outcome, { kind: 'ok' }>, system: UnitSystem) {
-  const { result: r, pressureRange: range } = ok.body
+  const { result: r, pressureRange: range, sampled } = ok.body
   const t = range.tolerances
   const failed = range.cases.filter((c) => c.maxPressure === null).length
-  return `At ${msText(r.maxPressureTime)} and ${shownLength('travel', system, r.maxPressureTravel)} of travel. The range covers the input tolerances only, no model error: charge ${percentText(t.chargeFraction)}, volume ${percentText(t.volumeFraction)}, burn rate ${percentText(t.burnRateFraction)}, temperature ${
+  const sample =
+    sampled?.status === 'sampled'
+      ? ` The band is the 5th to 95th percentile of ${sampled.samples} draws (seed ${sampled.seed}${sampled.failed ? `, ${sampled.failed} left the model` : ''}) of the inputs, normal around their nominal values with the tolerance as the 90 % half width. The limit check uses the corner-case range ${formatQuantity('pressure', system, range.lowPressure)} to ${formatQuantity('pressure', system, range.highPressure)} ${system.pressure.symbol}.`
+      : sampled
+        ? ` The sampled bands are ${bandNotice(sampled)}: the corner-case range is shown.`
+        : ''
+  return `At ${msText(r.maxPressureTime)} and ${shownLength('travel', system, r.maxPressureTravel)} of travel.${sample} The ${sampled?.status === 'sampled' ? 'band' : 'range'} covers the input tolerances only, no model error: charge ${percentText(t.chargeFraction)}, volume ${percentText(t.volumeFraction)}, ${t.massFraction > 0 ? `bullet mass ${percentText(t.massFraction)}, ` : ''}burn rate ${percentText(t.burnRateFraction)}, temperature ${
     system.temperature === unitsOf.temperature.degF
       ? `${formatNumber((t.temperatureKelvin * 9) / 5, 1)} °F`
       : `${formatNumber(t.temperatureKelvin, 1)} K`
@@ -184,6 +198,7 @@ export function Readouts({
   printed?: boolean
 }) {
   const { result: r, pressureRange: range } = ok.body
+  const band = resultBand(ok.body, printed)
   const { ofMax, lead, ratio } = derived(ok)
   /** A value and its unit, the unit in the muted small type of the readout units. */
   const unit = (value: string, symbol: string) => (
@@ -252,6 +267,7 @@ export function Readouts({
       )}
     </span>
   )
+  const bandText = bandLine(ok.body, system)
   const big = (value: string, unit: string) => (
     <>
       <span className="readout-value">{value}</span> <span className="readout-unit">{unit}</span>
@@ -269,9 +285,11 @@ export function Readouts({
             {big(formatQuantity('pressure', system, range.nominalPressure), system.pressure.symbol)}
           </dd>
           <dd className="readout-note">
-            <span className="visually-hidden">range </span>
-            {formatQuantity('pressure', system, range.lowPressure)} to{' '}
-            {formatQuantity('pressure', system, range.highPressure)}
+            <span className="visually-hidden">
+              {band.sampled ? '5th to 95th percentile ' : 'range '}
+            </span>
+            {formatQuantity('pressure', system, band.pressure.low)} to{' '}
+            {formatQuantity('pressure', system, band.pressure.high)}
           </dd>
           <dd className="readout-share">
             {ofMax ? limits : <span className="readout-phrase">no comparable limit</span>}
@@ -303,6 +321,7 @@ export function Readouts({
           </dd>
         </div>
       </dl>
+      {!printed && bandText && <p className="band-line screen-only">{bandText}</p>}
       <dl className="readouts readout-list" data-stale={stale || undefined}>
         <div>
           <dt>Muzzle pressure</dt>
@@ -551,7 +570,7 @@ export const flagView = (text: string, title = text) => (
 
 /** What the run's ladder varies, for its legend and table name. */
 const ladderName = (ok: Extract<Outcome, { kind: 'ok' }> | undefined) =>
-  ok?.ladder.kind === 'seating' ? 'Seating' : 'Charge'
+  ladderTitle(ok?.ladder.kind ?? 'charge')
 
 /** The charge ladder strip of the shown run: a step selector, or the one step as text. */
 export function LadderStrip({
@@ -655,20 +674,23 @@ export function LadderStrip({
   )
 }
 
-/** The steps of the shown run as a table, one row per charge. */
+/** The steps of the shown run as a table, one row per charge, with the lot rows under each charge when there are any. */
 export function LadderTable({
   ok,
   steps,
   system,
   value,
   velocity,
+  lot,
 }: {
   ok: Extract<Outcome, { kind: 'ok' }> | undefined
   steps: ShownStep[]
   system: UnitSystem
-  /** What a step varies: its charge, or its seating length. */
+  /** What a step varies: its charge, its seating length or its powder temperature. */
   value: (s: ShownStep) => string
   velocity: (r: InteriorResponse['result']) => string
+  /** The rows at a burn rate above and below, in step order, and the change they were run at. */
+  lot?: { fraction: number; steps: Record<Lot, ShownStep[]> }
 }) {
   const pressure = system.pressure
   // without a load ratio on any step the column would repeat the load ratio readout's phrase
@@ -677,10 +699,76 @@ export function LadderTable({
   const seating = ok?.ladder.kind === 'seating'
   const lead = seating
     ? [seatingLengthName[ok.ladder.seatingBy ?? 'overallLength'], 'Usable case volume']
-    : ['Charge']
+    : ok?.ladder.kind === 'temperature'
+      ? ['Powder temperature']
+      : ['Charge']
   const columns = ladderColumns
-    .flatMap((c) => (c === 'Charge' ? lead : [c]))
+    .flatMap((c) =>
+      c === 'Charge'
+        ? lead.concat(lot ? ['Burn rate'] : [])
+        : c === 'Burnt at the muzzle' && lot
+          ? ['Barrel time', c]
+          : [c],
+    )
     .filter((c) => ratioShown || c !== 'Case fill')
+  // the cells before the result's: the step, what it varies, the seating volume, the burn rate and the flags
+  const before = 3 + (seating ? 1 : 0) + (lot ? 1 : 0)
+  const row = (s: ShownStep, which?: Lot) => (
+    <tr
+      key={`${s.n}${which ?? ''}`}
+      aria-current={!which && ok && s.n - 1 === ok.selected ? 'true' : undefined}
+      data-lot={which}
+    >
+      <td data-label="Step">
+        {s.label}
+        {s.label === '0' && !which && ' main'}
+      </td>
+      <td data-label={lead[0]} className="num">
+        {value(s)}
+      </td>
+      {s.seating && (
+        <td data-label={lead[1]} className="num">
+          {formatQuantity('capacity', system, s.seating.volume)} {system.capacity.symbol}
+        </td>
+      )}
+      {lot && (
+        <td data-label="Burn rate" className="num">
+          {burnRateLabel(which, lot.fraction)}
+        </td>
+      )}
+      <td data-label="Flags">{s.flag || s.error ? flagView(s.flag ?? 'model error') : 'none'}</td>
+      {s.body && s.d && s.at ? (
+        <>
+          <td data-label="Peak pressure" className="num">
+            {formatQuantity('pressure', system, s.body.pressureRange.nominalPressure)}{' '}
+            {pressure.symbol}
+          </td>
+          <td data-label="Percent of maximum" className="num">
+            {s.d.ofMax ? `${formatNumber(s.d.ofMax.percent, 0)} %` : 'no limit'}
+          </td>
+          <td data-label="Muzzle velocity" className="num">
+            {velocity(s.body.result)}
+          </td>
+          <td data-label="Muzzle energy" className="num">
+            {formatQuantity('energy', system, s.body.result.muzzleEnergy)} {system.energy.symbol}
+          </td>
+          {ratioShown && <td data-label="Case fill">{loadRatioText(s.at, s.d.ratio)}</td>}
+          {lot && (
+            <td data-label="Barrel time" className="num">
+              {msText(s.body.result.barrelTime)}
+            </td>
+          )}
+          <td data-label="Burnt at the muzzle" className="num">
+            {formatNumber(s.body.result.muzzleBurntFraction * 100, 0)} %
+          </td>
+        </>
+      ) : (
+        <td data-label="Result" colSpan={columns.length - before}>
+          Not computed: {s.error?.message}
+        </td>
+      )}
+    </tr>
+  )
   return (
     <PanelTable
       label={`${ladderName(ok)} ladder steps`}
@@ -688,51 +776,11 @@ export function LadderTable({
       caption={`${ladderName(ok)} ladder steps`}
       columns={columns}
     >
-      {steps.map((s) => (
-        <tr key={s.n} aria-current={ok && s.n - 1 === ok.selected ? 'true' : undefined}>
-          <td data-label="Step">
-            {s.label}
-            {s.label === '0' && ' main'}
-          </td>
-          <td data-label={lead[0]} className="num">
-            {value(s)}
-          </td>
-          {s.seating && (
-            <td data-label={lead[1]} className="num">
-              {formatQuantity('capacity', system, s.seating.volume)} {system.capacity.symbol}
-            </td>
-          )}
-          <td data-label="Flags">
-            {s.flag || s.error ? flagView(s.flag ?? 'model error') : 'none'}
-          </td>
-          {s.body && s.d && s.at ? (
-            <>
-              <td data-label="Peak pressure" className="num">
-                {formatQuantity('pressure', system, s.body.pressureRange.nominalPressure)}{' '}
-                {pressure.symbol}
-              </td>
-              <td data-label="Percent of maximum" className="num">
-                {s.d.ofMax ? `${formatNumber(s.d.ofMax.percent, 0)} %` : 'no limit'}
-              </td>
-              <td data-label="Muzzle velocity" className="num">
-                {velocity(s.body.result)}
-              </td>
-              <td data-label="Muzzle energy" className="num">
-                {formatQuantity('energy', system, s.body.result.muzzleEnergy)}{' '}
-                {system.energy.symbol}
-              </td>
-              {ratioShown && <td data-label="Case fill">{loadRatioText(s.at, s.d.ratio)}</td>}
-              <td data-label="Burnt at the muzzle" className="num">
-                {formatNumber(s.body.result.muzzleBurntFraction * 100, 0)} %
-              </td>
-            </>
-          ) : (
-            <td data-label="Result" colSpan={columns.length - (seating ? 4 : 3)}>
-              Not computed: {s.error?.message}
-            </td>
-          )}
-        </tr>
-      ))}
+      {steps.flatMap((s, i) => [
+        ...(lot?.steps.low[i] ? [row(lot.steps.low[i], 'low')] : []),
+        row(s),
+        ...(lot?.steps.high[i] ? [row(lot.steps.high[i], 'high')] : []),
+      ])}
     </PanelTable>
   )
 }

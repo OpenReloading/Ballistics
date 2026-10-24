@@ -108,6 +108,17 @@ const powderInterior = z.object({
 })
 
 /**
+ * Burn-rate temperature sensitivity of the M3 interior model (`apps/docs/docs/models/interior-m3.md`,
+ * "Temperature of the propellant"): the burn rate is scaled by exp(sensitivity (T - reference)), with
+ * `cold` below the reference temperature and `hot` at and above it.
+ */
+const powderTemperatureSensitivity = z.object({
+  reference: quantity('absoluteTemperature', z.number().positive()),
+  cold: quantity('inverseTemperature'),
+  hot: quantity('inverseTemperature'),
+})
+
+/**
  * A propellant as its manufacturer sells it, with M3 interior parameters where fitted.
  * Inferred type: {@link Powder}.
  */
@@ -132,6 +143,8 @@ export const powder = z
     composition: powderComposition.optional(),
     thermochemistry: powderThermochemistry.optional(),
     interior: powderInterior.optional(),
+    /** Burn-rate sensitivity to the propellant temperature; absent: the burn rate does not depend on it. */
+    temperatureSensitivity: powderTemperatureSensitivity.optional(),
     note: z.string().min(1).optional(),
     provenance,
   })

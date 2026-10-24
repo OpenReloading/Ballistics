@@ -19,6 +19,7 @@ import {
   mappedFace,
   mappingOf,
 } from '../lib/face-disciplines.ts'
+import { compareEvents, compareTargetFaces, federationFaceIds } from '../lib/face-order.ts'
 import {
   type FaceSummary,
   fetchAllFaces,
@@ -365,11 +366,13 @@ export function useRingScoring({
   }
   /** The faces of the discipline with their stages, else every face. */
   const ofDiscipline = discipline ? disciplineFaces(mappings, discipline) : []
+  const inFederation = fed && !discipline && data ? federationFaceIds(all, data, fed) : undefined
   const faceOptions =
     list === 'error'
       ? [{ value: choice?.id ?? '', label: choice?.id ?? offline }]
       : [
           { value: '', label: 'None' },
+          // the stages of a discipline keep the order of the rule book
           ...(discipline
             ? ofDiscipline.map((m) => ({
                 value: m.face,
@@ -379,7 +382,10 @@ export function useRingScoring({
               ? choice
                 ? [{ value: choice.id, label: choice.id }]
                 : []
-              : list.map((f) => ({ value: f.id, label: `${f.organization} ${f.name}` }))),
+              : list
+                  .filter((f) => !inFederation || inFederation.has(f.id) || f.id === choice?.id)
+                  .toSorted(compareTargetFaces)
+                  .map((f) => ({ value: f.id, label: `${f.organization} ${f.name}` }))),
         ]
 
   const panel = group && (
@@ -444,6 +450,8 @@ export function useRingScoring({
             return
           }
           setFace(() => (id ? { id } : undefined))
+          // a face from the federation's or every face shows the federation of its own discipline
+          setFederation(undefined)
           // the first event: its gauge scores, as the rule book says
           if (id)
             fetchFace(id).then(
@@ -465,10 +473,17 @@ export function useRingScoring({
             description={eventHelp}
             labelProps={{ title: eventHelp }}
             data={[
-              ...(record?.events ?? []).map((e) => ({
-                value: e.name,
-                label: `${e.name}${e.gauge ? `, ${mmLength(system, e.gauge.value)}` : ''}`,
-              })),
+              ...(record?.events ?? [])
+                .toSorted((a, b) =>
+                  compareEvents(
+                    { distance: a.distance.value, name: a.name },
+                    { distance: b.distance.value, name: b.name },
+                  ),
+                )
+                .map((e) => ({
+                  value: e.name,
+                  label: `${e.name}${e.gauge ? `, ${mmLength(system, e.gauge.value)}` : ''}`,
+                })),
               { value: '', label: 'Bullet' },
             ]}
             value={choice?.event ?? ''}

@@ -122,6 +122,8 @@ test('a federation narrows the disciplines, a discipline its faces, and a face s
   const federation = page.getByRole('combobox', { name: 'Federation', exact: true })
   await expect(federation.locator('option[value="dsb"]')).toBeAttached()
   await federation.selectOption('dsb')
+  // a federation alone narrows the face list to its faces
+  await expect(scoreFace(page).locator('option[value="bdmp-nr1-100m"]')).toHaveCount(0)
   const discipline = page.getByRole('combobox', { name: 'Discipline', exact: true })
   await discipline.fill('Zentralfeuer')
   await page
@@ -133,6 +135,7 @@ test('a federation narrows the disciplines, a discipline its faces, and a face s
   await expect(page.getByRole('combobox', { name: 'Event', exact: true })).toHaveCount(0)
   // a face picked from every face shows the federation of its discipline
   await scoreFace(page).selectOption('')
+  await federation.selectOption('')
   await scoreFace(page).selectOption('bdmp-nr1-100m')
   await expect(federation).toHaveValue('bdmp')
 })
@@ -191,6 +194,24 @@ test('one click finds the face: scale, centre and face are set and the holes are
       shots.some(([sx, sy]) => Math.hypot(sx - x, sy - y) < 1.5),
       `${x} ${y} in ${JSON.stringify(shots)}`,
     ).toBe(true)
+  // a coordinate shows in full: the text is not wider than its field
+  const clipped = await page
+    .getByRole('spinbutton', { name: /^Shot \d+ [xy]$/ })
+    .evaluateAll((inputs) =>
+      inputs.filter((i) => i.scrollWidth > i.clientWidth).map((i) => i.getAttribute('aria-label')),
+    )
+  expect(clipped).toEqual([])
+  // the shots table fits its box at the lowest window of the side layout and a wide one
+  for (const width of [1000, 1030, 1100, 1400]) {
+    await page.setViewportSize({ width, height: 900 })
+    await expect
+      .poll(() =>
+        page
+          .locator('.shots-scroll')
+          .evaluateAll((e) => e.filter((x) => x.scrollWidth > x.clientWidth).length),
+      )
+      .toBe(0)
+  }
 })
 
 test('a face chosen for scoring on a sheet calibrated by a line does not move the detection', async ({

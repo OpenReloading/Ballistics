@@ -17,6 +17,7 @@ import {
 import { controlSize } from '../lib/theme.ts'
 import { formatNumber, type UnitSystem, withUnit } from '../lib/units.ts'
 import { ChronoFileInput } from './chrono-file-input.tsx'
+import { LadderFlatSpots } from './ladder-flat-spots.tsx'
 import { LineChart, useChartScale } from './line-chart.tsx'
 import { PanelTable } from './scroll-region.tsx'
 import { ErrorNote } from './states.tsx'
@@ -358,6 +359,10 @@ export function Measurements({
             </ul>
           </figure>
         ))}
+      <LadderFlatSpots
+        series={plotted.map(({ s, rows }) => ({ id: s.id, name: s.name, rows }))}
+        system={system}
+      />
       {excluded.length > 0 && (
         <>
           <h3>Excluded shots</h3>

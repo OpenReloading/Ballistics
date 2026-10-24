@@ -10,8 +10,9 @@ Ring scoring gives each shot on a target face:
 - the value of the highest ring its hole touches
 - the tenth-ring value, where the face's rules allow it
 - whether it is an inner ten
+- the zone label of the bull it belongs to, on a face with several bulls
 
-A face is placed on the target sheet by fitting its centre and scale to points marked on two or more of its rings. Face records hold ring diameters in mm. Shots are hole centres in target m from the face centre. The face and event of a group come from the target mapping of the discipline picked ([Federations, disciplines and target mappings](../data/federations.md)). The code is in `apps/web/src/lib/ring-scoring.ts`.
+A face is placed on the target sheet by fitting its centre and scale to points marked on two or more of its rings. Face records hold ring diameters in mm. Shots are hole centres in target m from the face centre (the sheet centre on a face with several bulls). The face and event of a group come from the target mapping of the discipline picked ([Federations, disciplines and target mappings](../data/federations.md)). The code is in `apps/web/src/lib/ring-scoring.ts`.
 
 ## Equations
 
@@ -25,24 +26,44 @@ $$
 
 Code: `apps/web/src/lib/ring-scoring.ts`, `scoredHoleDiameter`.
 
+### Bull
+
+A face with the list `bulls` has several scoring centres $c_k$ on one sheet, positions in mm from the sheet centre, all with the rings of the record. A shot belongs to the nearest bull, and the rings, the inner ten and the tenths are measured from that bull's centre. A shot at the same distance from two bulls belongs to the one listed first in the record. The shot carries the `zone` label of its bull, where the bull has one: two scoring zones on one card are two bulls with a label each. A face without `bulls` has one bull at the face centre.
+
+$$
+k^\ast = \arg\min_k \lvert p - c_k \rvert, \qquad p' = p - c_{k^\ast}
+$$
+
+Code: `apps/web/src/lib/ring-scoring.ts`, `nearestBull`, `scoreShot`.
+
 ### Ring value
 
-A hole centred at distance $d$ from the face centre touches ring $n$ (radius $R_n$, half its diameter) when
+Ring $n$ bounds an area $A_n$ about the bull centre: a circle of radius $R_n$ (half its diameter), an axis-aligned oval of semi-axes $R_n$ (width) and $H_n$ (height, half the `height` of the record), or a square of half edge $R_n$ (`shape: square`). The hole of radius $g$ centred at $p'$ touches ring $n$ when its distance to the area is within $g$:
 
 $$
-d \le R_n + g + \varepsilon
+\delta_n(p') \le g + \varepsilon, \qquad \delta_n(p') = \min_{q \in A_n} \lvert p' - q \rvert
 $$
 
-Code: `apps/web/src/lib/ring-scoring.ts`, `scoreShot` (`touch`).
+Code: `apps/web/src/lib/ring-scoring.ts`, `touches`, `scoreShot`.
 
-with $\varepsilon = 10^{-12}$ m ($10^{-9}$ mm), so a hole edge on a ring line counts as touching it despite binary rounding. The shot scores the value $v_n$ of the innermost ring touched, 0 when it touches none.
+The distance $\delta_n$ is
+
+$$
+\delta_n = \begin{cases} \max(\lvert p' \rvert - R_n,\, 0) & \text{circle} \\ \text{distance to the ellipse} & \text{oval} \\ \sqrt{\max(\lvert x \rvert - R_n, 0)^2 + \max(\lvert y \rvert - R_n, 0)^2} & \text{square} \end{cases}
+$$
+
+Code: `apps/web/src/lib/ring-scoring.ts`, `touches`, `ellipseGap`.
+
+For a circle the condition is $\lvert p' \rvert \le R_n + g + \varepsilon$. The distance to an ellipse has no closed form. The code finds the closest point on the ellipse as the root of a monotone function by bisection ([Eberly 2013](../bibliography.md#eberly-2013)) and is 0 inside. Along both axes of an oval the condition reads $\lvert x \rvert \le R_n + g$ and $\lvert y \rvert \le H_n + g$. Away from the axes the hole is a disc, so its reach round an oval ring is the parallel curve of the ellipse, not an ellipse with the axes grown by $g$. A square scores by its edge: a hole centre on the edge is inside, and the hole's reach is rounded at the corners. With $g = 0$ the square is the condition $\max(\lvert x \rvert, \lvert y \rvert) \le R_n$.
+
+Here $\varepsilon = 10^{-12}$ m ($10^{-9}$ mm), so a hole edge on a ring line counts as touching it despite binary rounding. The shot scores the value $v_n$ of the innermost ring touched, 0 when it touches none.
 
 ### Inner ten
 
-The inner ten counts only for a shot in the innermost ring. With the inner-ten radius $R_X$:
+The inner ten counts only for a shot in the innermost ring. With the inner-ten radius $R_X$ and $d = \lvert p' \rvert$:
 
 - `cover`: the hole covers the inner-ten circle completely.
-- `touch`, or no rule on the record (the rule book does not state one): the hole touches it.
+- `touch`, or no rule on the record (the rule book does not state one): the hole touches it. An oval inner ten (`height`) uses the oval distance above.
 
 $$
 \text{cover: } d + R_X \le g + \varepsilon, \qquad \text{touch: } d \le R_X + g + \varepsilon
@@ -52,7 +73,7 @@ Code: `apps/web/src/lib/ring-scoring.ts`, `scoreShot`.
 
 ### Tenth-ring value
 
-On faces whose rule book allows decimal scoring (`decimal: true`), each ring's scoring area is divided into ten equal parts counted inward from the touching position. For a hole in ring $n$ with ring width $w_n = R_n - R_{n+1}$ (for the innermost ring $w = R_{n-1} - R_n$):
+On faces whose rule book allows decimal scoring (`decimal: true`; the record then has circular rings only), each ring's scoring area is divided into ten equal parts counted inward from the touching position. For a hole in ring $n$ with ring width $w_n = R_n - R_{n+1}$ (for the innermost ring $w = R_{n-1} - R_n$):
 
 $$
 \text{decimal} = v_n + \frac{1}{10} \min\left(9,\, \max\left(0,\, \left\lfloor 10\, \frac{R_n + g - d}{w_n} + 10^{-9} \right\rfloor\right)\right)
@@ -112,7 +133,11 @@ Without marks the face is centred on the group's point of aim, or on the sheet o
 
 | Symbol | Meaning | Stored unit | Unit in `apps/web` |
 | --- | --- | --- | --- |
-| $d$ | Distance of the hole centre from the face centre | mm | m |
+| $d$ | Distance of the hole centre from the bull centre | mm | m |
+| $c_k$ | Centre of bull $k$ from the sheet centre | mm | m |
+| $p'$ | Hole centre relative to its bull | mm | m |
+| $A_n$, $\delta_n$ | Area ring $n$ bounds, distance of the hole centre from it | mm | m |
+| $H_n$ | Half the height of an oval ring | mm (stored as height) | m |
 | $R_n$ | Radius of ring $n$ to the outside edge of its line | mm (stored as diameter) | m |
 | $R_X$ | Radius of the inner-ten circle | mm (stored as diameter) | m |
 | $v_n$ | Value of ring $n$ | 1 | 1 |
@@ -131,13 +156,17 @@ Without marks the face is centred on the group's point of aim, or on the sheet o
 
 ## Assumptions
 
-- Rings are concentric circles. Ring diameters run to the outside edge of the ring line, as the rule books measure them.
+- Rings about one bull are concentric: circles, axis-aligned ovals (face upright) or squares (a square outer area with circles inside it, ovals on all rings or on none). The inner ten is a circle or an oval. Ring widths and heights run to the outside edge of the ring line, as the rule books measure them.
+- Every bull of a face has the rings of the record, and a shot belongs to the bull whose centre is nearest, not to the bull whose rings it touches.
 - A hole is a disc of the gauge or bullet diameter centred on the shot. The touch rule then is the distance condition above.
 - The face fit has no perspective, rotation or ring-line thickness. Noise-free marks give the exact centre and scale.
 
 ## Limits
 
-- Scoring reads only the ring diameters about one centre: the height of an oval ring and the several bulls of a face are not used.
+- Tenth-ring values need circular rings: a record with `decimal: true` and oval or square rings is refused, and an oval inner ten counts only by touch.
+- Fitting a face to ring marks needs one bull and circular rings. On another face the marks are refused and the group shows the error. A group without marks is placed by its point of aim, or the sheet origin without one; with several bulls that point is taken as the sheet centre the bull positions are measured from, so a group aimed at one bull is offset by that bull's position.
+- Zones with polygon outlines and targets that are hit or miss (symbols, plates) are not scored.
+- The drawing of a face shows one bull, draws a square ring as a square but its black area and inner ten as ovals, and the ring overlay on the photo draws every ring as a circle.
 - Gauges are recorded only where the rule book gives one diameter for the event. Other events score with the bullet diameter, else the marker diameter.
 - Excluded shots are scored and shown but not counted in the totals.
 
@@ -145,9 +174,10 @@ Without marks the face is centred on the group's point of aim, or on the sheet o
 
 - [ISSF 2022](../bibliography.md#issf-2022), pp. 320 to 330: ring diameters to the outside edge of the line (rule 1.1.2), plug gauges and their measuring edges (rules 1.4.1 to 1.4.10), the higher value for a hole touching a ring line (rule 5.2.1).
 - [ISSF 2025, Third Print](../bibliography.md#issf-2025-third), pp. 194 to 200: decimal scoring (rule 6.3.3.1, p. 194), inner ten (rules 6.3.4.1 to 6.3.4.6), the 10 m air rifle inner ten only when the dot is shot out (rule 6.3.4.3).
-- [DSB 2026](../bibliography.md#dsb-2026): touch rule and measuring rings by calibre, Teil 0, 0.11.3 and 0.11.3.2 (Seite 40), faces in 0.20 (Teil 0, Seiten 62 to 68), hole centre for the muzzle-loader ball events, 7.7.5 (Teil 7, Seite 8).
+- [DSB 2027](../bibliography.md#dsb-2027): touch rule and measuring rings by calibre, Teil 0, 0.11.3 and 0.11.3.2 (Seite 40), faces in 0.20 (Teil 0, Seiten 62 to 70), hole centre for the muzzle-loader ball events, 7.7.5 (Teil 7, Seite 8).
 - [BDMP 2026](../bibliography.md#bdmp-2026): touch rule, A.3.21.1.3, hole centre for black powder, A.3.21.4.1, faces in B.11.
 - [DSU 2018](../bibliography.md#dsu-2018): touch rule, Kapitel 1 (Seite 27), hole centre for black powder, Kapitel 4 (Besondere Auswertungsregeln, PDF p. 126).
 - [VdRBw](../bibliography.md#vdrbw): touch rule, rule 519, faces in Kapitel 8 to 10.
 - [BDS 2025](../bibliography.md#bds-2025): faces Z1 to Z21 and Anhang 1, no scoring rule stated.
+- [Eberly 2013](../bibliography.md#eberly-2013): distance from a point to an ellipse, closest-point condition and its bisection.
 - [Kasa 1976](../bibliography.md#kasa-1976): algebraic circle fit, pp. 8 to 14.

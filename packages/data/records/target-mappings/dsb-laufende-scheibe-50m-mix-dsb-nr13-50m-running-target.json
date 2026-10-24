@@ -1,0 +1,22 @@
+{
+  "id": "dsb-laufende-scheibe-50m-mix-dsb-nr13-50m-running-target",
+  "discipline": "dsb-laufende-scheibe-50m-mix",
+  "face": "dsb-nr13-50m-running-target",
+  "event": "DSB Laufende Scheibe 50 m MIX",
+  "shotCount": 40,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 84, PDF p. 102 (row 4.25, column Scheibe Nr.: 13)",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 84, PDF p. 102 (row 4.25, column Wettkampfschüsse)",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

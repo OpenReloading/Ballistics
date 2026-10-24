@@ -1,6 +1,6 @@
 import { bulletProfile } from '@openreloading/drawing/bullet'
+import type { Bullet } from '@openreloading/schema'
 import { expect, it } from 'vitest'
-import type { BulletRecord } from '../src/lib/api-types.ts'
 import {
   compareGroups,
   differenceMarks,
@@ -49,7 +49,7 @@ it('marks nothing where fewer than two values are shown or all are the same', ()
   expect(differenceMarks([undefined, undefined])).toEqual([undefined, undefined])
 })
 
-const record = (over: Partial<BulletRecord>): BulletRecord =>
+const record = (over: Partial<Bullet>): Bullet =>
   ({
     id: 'x',
     manufacturer: 'example',
@@ -58,7 +58,7 @@ const record = (over: Partial<BulletRecord>): BulletRecord =>
     mass: { value: 10.886 },
     provenance: { kind: 'published' },
     ...over,
-  }) as BulletRecord
+  }) as Bullet
 
 it('merges the data tables in the record groups, values in the preset, a missing one undefined', () => {
   const a = record({
@@ -68,8 +68,8 @@ it('merges the data tables in the record groups, values in the preset, a missing
       { dragModel: 'G7', value: 0.26 },
       { dragModel: 'G1', value: 0.507 },
     ],
-  } as Partial<BulletRecord>)
-  const b = record({ id: 'y', noseLength: { value: 15 } } as Partial<BulletRecord>)
+  } as Partial<Bullet>)
+  const b = record({ id: 'y', noseLength: { value: 15 } } as Partial<Bullet>)
   const us = compareGroups([a, b], presetUnits('us'))
   expect(us.map((g) => g.title)).toEqual([
     'Size',
@@ -106,7 +106,7 @@ it('keeps a repeated label once per repeat', () => {
       { dragModel: 'G1', value: 0.507 },
       { dragModel: 'G1', value: 0.49 },
     ],
-  } as Partial<BulletRecord>)
+  } as Partial<Bullet>)
   const bc = compareGroups([b], presetUnits('us')).at(-1)
   expect(bc?.rows.map((r) => r.values[0])).toEqual(['0.507', '0.490'])
 })

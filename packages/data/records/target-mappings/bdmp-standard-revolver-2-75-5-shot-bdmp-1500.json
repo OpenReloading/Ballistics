@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-standard-revolver-2-75-5-shot-bdmp-1500",
+  "discipline": "bdmp-standard-revolver-2-75-5-shot",
+  "face": "bdmp-1500",
+  "event": "BDMP Standard Revolver 2,75“ 5 shot",
+  "shotCount": 40,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.11, Teil B, Seite 46 von 70, PDF p. 46",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.3, Teil C, Seite 44 von 142, PDF p. 44",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.9.7.6, Teil C, Seite 68 von 142, PDF p. 68",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "C.9.7.6 reduces the shots of each station or position to five and prints the total of 40; the 40-shot values of the course of C.8.2 (Teil C, PDF p. 43) are 5, 10, 10 and 15 at 3, 7, 15 and 25 m or yd."
+  }
+}

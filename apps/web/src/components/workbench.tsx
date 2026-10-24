@@ -17,8 +17,9 @@ import { interiorFields } from '../lib/interior-input.ts'
 import { shortName } from '../lib/load-tabs.ts'
 import { sampler } from '../lib/playback.ts'
 import { inputsQuery, withRecordValues, withTab } from '../lib/query.ts'
-import { seatingLengthName } from '../lib/seating-ladder.ts'
+import { ladderTitle, seatingLengthName } from '../lib/seating-ladder.ts'
 import { shortcutAriaKeys, shortcutLabel, shortcuts } from '../lib/shortcuts.ts'
+import { startIntentEvent, takeStartIntent } from '../lib/start-intent.ts'
 import { formatNumber, formatQuantity, withUnit } from '../lib/units.ts'
 import { mmLength, shownLength } from '../lib/workbench.ts'
 import { BarrelTable } from './barrel-length.tsx'
@@ -27,6 +28,7 @@ import { FileMenu } from './file-menu.tsx'
 import { preloadInteriorChart } from './lazy-chart.tsx'
 import { LoadSheets, printSheets } from './load-sheets.tsx'
 import { LoadTabs } from './load-tabs.tsx'
+import { LotChartBlock, preloadLotChart } from './lot-rows.tsx'
 import { PageBar } from './page-bar.tsx'
 import { PrintReport } from './print-report.tsx'
 import { useReportOptions } from './report-host.ts'
@@ -34,6 +36,7 @@ import { SavedLoads, useExportReminder } from './saved-loads.tsx'
 import { useShortcuts } from './shortcuts.tsx'
 import { useBarrelStudy } from './use-barrel-study.ts'
 import { useLoadTabs } from './use-load-tabs.ts'
+import { useLotRows } from './use-lot-rows.ts'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 import { useWorkbenchState } from './use-workbench-load.ts'
 import { InputEcho, LoadContext, ResultContext, type ResultState } from './workbench-context.ts'
@@ -42,6 +45,7 @@ import {
   type ShownStep,
   selectedLabel,
   shownSteps,
+  singleCharge,
   stepFlag,
   warningLines,
 } from './workbench-outcome.ts'
@@ -81,6 +85,7 @@ export function Workbench() {
     bulletDesign,
     bulletLabel,
     cartridge,
+    cartridgeDesign,
     changed,
     chartSlot,
     chartView,
@@ -107,6 +112,7 @@ export function Workbench() {
     ladderSteps,
     ladderKind,
     seatStep,
+    tempStep,
     seatAt,
     measured,
     measuredFor,
@@ -172,10 +178,15 @@ export function Workbench() {
     : (shown('charge', 'charge') ?? 'no charge')
   const charge = useCallback((kg: number) => withUnit('charge', system, kg), [system])
   const length = useCallback((m: number) => withUnit('length', system, m), [system])
-  /** What a ladder step varies, as the strip and the table show it: its seating, else its charge. */
+  /** What a ladder step varies, as the strip and the table show it: its seating, its temperature, else its charge. */
   const stepValue = useCallback(
-    (s: ShownStep) => (s.seating ? length(s.seating.value) : charge(s.charge)),
-    [charge, length],
+    (s: ShownStep) =>
+      s.seating
+        ? length(s.seating.value)
+        : s.temperature !== undefined
+          ? withUnit('temperature', system, s.temperature)
+          : charge(s.charge),
+    [charge, length, system],
   )
   /** The load of the shown result: cartridge, bullet, mass, powder with charge. */
   const identity = useMemo(
@@ -195,20 +206,27 @@ export function Workbench() {
   )
   const steps = useMemo(() => shownSteps(ok), [ok])
   // the longer run is requested once the tab was opened or a print asked for it
-  const [printAsked, setPrintAsked] = useState<{ key?: string; edits: number }>()
+  const [printAsked, setPrintAsked] = useState<{ key?: string; lot?: string; edits: number }>()
   const [barrelWanted, setBarrelWanted] = useState(false)
   if (!barrelWanted && (tab === 'barrel' || printAsked)) setBarrelWanted(true)
   // a seating ladder's study is the shown step's: the longer run has one charge and one seating
   const barrel = useBarrelStudy({
     ok,
-    steps: ok?.ladder.kind === 'seating' ? steps.filter((s) => s.n - 1 === ok.selected) : steps,
+    steps: ok && singleCharge(ok) ? steps.filter((s) => s.n - 1 === ok.selected) : steps,
     system,
     enabled: barrelWanted,
   })
+  // the lot rows are requested once the Ladder table was opened or a print asked for them
+  const [lotWanted, setLotWanted] = useState(false)
+  if (!lotWanted && (tab === 'ladder' || printAsked)) {
+    setLotWanted(true)
+    preloadLotChart()
+  }
+  const lot = useLotRows({ ok, system, enabled: lotWanted })
   // one request at a time, tied to the longer run it waits for and to the inputs it was asked at
   const printReport = useCallback(
-    () => setPrintAsked((asked) => asked ?? { key: barrel.key, edits }),
-    [barrel.key, edits],
+    () => setPrintAsked((asked) => asked ?? { key: barrel.key, lot: lot.key, edits }),
+    [barrel.key, lot.key, edits],
   )
   // The report is printed once the longer run has answered, with its values or its reason. A new
   // run, load, range or edit of the inputs drops the request. `print()` is called from a frame, not from this effect:
@@ -216,8 +234,9 @@ export function Workbench() {
   // (every tab, the print-only fields) must be in the document when the browser takes its snapshot.
   useEffect(() => {
     if (!printAsked) return
-    if (printAsked.key !== barrel.key || printAsked.edits !== edits) return setPrintAsked(undefined)
-    if (barrel.pending) return
+    if (printAsked.key !== barrel.key || printAsked.lot !== lot.key || printAsked.edits !== edits)
+      return setPrintAsked(undefined)
+    if (barrel.pending || lot.pending) return
     setPrinting(true)
     let frame = requestAnimationFrame(() => {
       frame = requestAnimationFrame(() => {
@@ -230,7 +249,7 @@ export function Workbench() {
       cancelAnimationFrame(frame)
       setPrinting(false)
     }
-  }, [printAsked, barrel.key, barrel.pending, edits, setPrinting])
+  }, [printAsked, barrel.key, barrel.pending, lot.key, lot.pending, edits, setPrinting])
   const barrelError = barrel.errors && Object.values(barrel.errors).join(' ')
   const oneFlag = ok && stepFlag(ok)
   /** The report's and the load sheets' title: cartridge, bullet and powder of the run. */
@@ -265,6 +284,10 @@ export function Workbench() {
     ok && ok.printed.fromSeating.length > 0
       ? `${ok.printed.fromSeating.map((k) => (k === 'volume' ? 'Usable case volume' : 'Bullet travel')).join(' and ')} from the seated bullet: derived from approximate bullet and case geometry.`
       : undefined
+  /** Said on every print and result that took values from a user cartridge design. */
+  const fromDesign = ok?.cartridgeDesign
+    ? `Case values from the user design ${ok.cartridgeDesign}, not a catalogue record.`
+    : undefined
   /** A field as the print shows it: its label and its value with the unit; none while empty. */
   const printRow = (key: string): [string, string | undefined] => {
     const spec = interiorFields.find((f) => f.key === key)
@@ -274,7 +297,10 @@ export function Workbench() {
     [
       'Cartridge',
       [
-        ['Cartridge', cartridge?.name],
+        [
+          'Cartridge',
+          cartridge?.name ?? (cartridgeDesign && `${cartridgeDesign.name} (user design)`),
+        ],
         ['CIP Pmax', pmax === undefined ? undefined : withUnit('pressure', system, pmax * 1e5)],
         ['Case length, CIP L3', mmText(specValue('cartridge', 'L3'))],
         printRow('volume'),
@@ -316,7 +342,9 @@ export function Workbench() {
           ladderSteps > 1
             ? ladderKind === 'seating'
               ? `${ladderSteps} ${seatAt ? seatingLengthName[seatAt.lengthKind] : 'seating'} values, ${direction}, ${seatStep.seatStep.text} ${system.length.symbol} apart`
-              : `${ladderSteps} charges, ${direction}, ${ladder.ladderStep.text} ${system.charge.symbol} apart`
+              : ladderKind === 'temperature'
+                ? `${ladderSteps} powder temperatures, ${direction}, ${tempStep.tempStep.text} ${system.temperatureDifference.symbol} apart`
+                : `${ladderSteps} charges, ${direction}, ${ladder.ladderStep.text} ${system.charge.symbol} apart`
             : undefined,
         ],
         ...modelFields.map(printRow),
@@ -354,8 +382,10 @@ export function Workbench() {
           <>
             {steps.length > 1 && (
               <>
-                <h2>{ok.ladder.kind === 'seating' ? 'Seating ladder' : 'Charge ladder'}</h2>
+                <h2>{ladderTitle(ok.ladder.kind)} ladder</h2>
                 {ladderTable}
+                {lot.message && <p>Lot rows not computed: {lot.message}</p>}
+                <LotChartBlock lot={lot} system={system} note={false} />
               </>
             )}
             <h2>Barrel length</h2>
@@ -379,6 +409,7 @@ export function Workbench() {
         <h1>{loadTitle}</h1>
         <p className="report-sub">
           Printed {localDay(new Date())}.{stale && ' Inputs changed since this result.'}
+          {fromDesign && ` ${fromDesign}`}
           {approximate && ` ${approximate}`}
         </p>
         <div className="report-inputs">
@@ -426,15 +457,17 @@ export function Workbench() {
           ],
           ['Powder', ok.identity.powder],
           ...seatingRows,
-          // a seating ladder's charge is one for all steps; volume and travel are those of the shown step
-          ...(ok.ladder.kind === 'seating' ? [['Charge', charge(ok.load.charge)]] : []),
+          // a seating or temperature ladder's charge is one for all steps; the other values are those of the shown step
+          ...(singleCharge(ok) ? [['Charge', charge(ok.load.charge)]] : []),
           ['Usable case volume', withUnit('capacity', system, ok.load.chamber.volume)],
           ['Bullet travel', shownLength('travel', system, ok.load.barrel.length)],
           ['Firearm', ok.printed.firearm],
           ['Powder temperature', runTemperature],
         ] as [string, string | undefined][]
       ).filter((r): r is [string, string] => Boolean(r[1]))}
-      note={[stale && 'Inputs changed since this result.', approximate].filter(Boolean).join(' ')}
+      note={[stale && 'Inputs changed since this result.', fromDesign, approximate]
+        .filter(Boolean)
+        .join(' ')}
       by={
         ok.ladder.kind === 'seating'
           ? seatingLengthName[ok.ladder.seatingBy ?? 'overallLength']
@@ -455,7 +488,14 @@ export function Workbench() {
     />
   )
   const ladderTable = (
-    <LadderTable ok={ok} steps={steps} system={system} value={stepValue} velocity={velocity} />
+    <LadderTable
+      ok={ok}
+      steps={steps}
+      system={system}
+      value={stepValue}
+      velocity={velocity}
+      lot={lot.rows}
+    />
   )
 
   // the result side's values, each the same object while a keystroke leaves it unchanged
@@ -523,6 +563,7 @@ export function Workbench() {
       chronoSeries,
       setChronoSeries,
       barrel,
+      lot,
       chartView,
       setChartView,
       showChart,
@@ -563,6 +604,7 @@ export function Workbench() {
       chronoSeries,
       setChronoSeries,
       barrel,
+      lot,
       chartView,
       setChartView,
       showChart,
@@ -581,9 +623,38 @@ export function Workbench() {
   )
   const [muzzleVelocity, bulletId] = [ok?.body.result.muzzleVelocity, bullet?.id]
   const [sightHeight, zeroRange] = [sight?.sightHeight, sight?.zeroRange]
+  const [zeroTemperature, zeroPressure, zeroHumidity, dragFactor, dragFactorSource] = [
+    sight?.zeroTemperature,
+    sight?.zeroPressure,
+    sight?.zeroHumidity,
+    sight?.dragFactor,
+    sight?.dragFactorSource,
+  ]
   const trajectoryLoad = useMemo(
-    () => ({ muzzleVelocity, bullet: bulletId, twist: twistSi, sightHeight, zeroRange }),
-    [muzzleVelocity, bulletId, twistSi, sightHeight, zeroRange],
+    () => ({
+      muzzleVelocity,
+      bullet: bulletId,
+      twist: twistSi,
+      sightHeight,
+      zeroRange,
+      zeroTemperature,
+      zeroPressure,
+      zeroHumidity,
+      dragFactor,
+      dragFactorSource,
+    }),
+    [
+      muzzleVelocity,
+      bulletId,
+      twistSi,
+      sightHeight,
+      zeroRange,
+      zeroTemperature,
+      zeroPressure,
+      zeroHumidity,
+      dragFactor,
+      dragFactorSource,
+    ],
   )
   const echo = useMemo(
     () => ({ chargeText, groupsLadder, trajectoryLoad }),
@@ -598,7 +669,9 @@ export function Workbench() {
         ...(ladderSteps > 1
           ? ladderKind === 'seating'
             ? { ...fields, ladderStep: seatStep.seatStep }
-            : { ...fields, ...ladder }
+            : ladderKind === 'temperature'
+              ? { ...fields, ladderStep: tempStep.tempStep }
+              : { ...fields, ...ladder }
           : fields),
         firearmMass: gunWeightUsed,
       },
@@ -608,7 +681,7 @@ export function Workbench() {
         powder: recordLink.powderId,
         ladderSteps: ladderSteps > 1 ? String(ladderSteps) : undefined,
         ladderDirection: ladderSteps > 1 ? direction : undefined,
-        ladderKind: ladderSteps > 1 && ladderKind === 'seating' ? ladderKind : undefined,
+        ladderKind: ladderSteps > 1 && ladderKind !== 'charge' ? ladderKind : undefined,
         firearm,
         measuredWaterCapacity:
           measuredWaterCapacity === undefined ? undefined : String(measuredWaterCapacity),
@@ -638,6 +711,16 @@ export function Workbench() {
   // actions of the latest render
   const starts = useRef({ asNewLoad, fillExample, reset })
   starts.current = { asNewLoad, fillExample, reset }
+  // the first-run step's choice, from this page or the one that opened the workbench
+  useEffect(() => {
+    const start = () => {
+      const intent = takeStartIntent()
+      if (intent === 'example') starts.current.asNewLoad(starts.current.fillExample)()
+    }
+    start()
+    window.addEventListener(startIntentEvent, start)
+    return () => window.removeEventListener(startIntentEvent, start)
+  }, [])
   const examples = useMemo(() => {
     const run = (k: 'fillExample' | 'reset') => () => starts.current.asNewLoad(starts.current[k])()
     return [

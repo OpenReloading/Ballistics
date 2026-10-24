@@ -27,7 +27,7 @@ const precision = faceById('issf-25m-precision-50m-pistol')
 it('lists every face with its distances, outer diameter, rings and the disciplines mapped to it', () => {
   const row = targetFaceRow(precision, mappings)
   expect(row).toMatchObject({ organization: 'ISSF', outer: 500, rings: 10 })
-  expect(row.distances).toEqual([25, 50, 100, 300])
+  expect(row.distances).toEqual([20, 25, 50, 100, 300])
   const mapped = new Set(mappings.filter((m) => m.face === precision.id).map((m) => m.discipline))
   expect(mapped).toContain('dsb-25m-pistole-revolver')
   expect(row.disciplines).toBe(mapped.size)
@@ -160,4 +160,39 @@ it('draws recorded zone colours: a white ten inside a black ring, its lines whit
   const stroke = (rx: number) =>
     out.match(new RegExp(`<ellipse rx="${rx}"[^>]*stroke="(\\w+)"`))?.[1]
   expect([stroke(150), stroke(100), stroke(50)]).toEqual(['black', 'white', 'white'])
+})
+
+it('draws a square ring as a rectangle of its edge and a circle ring as an ellipse', () => {
+  const [outer, inner] = precision.rings.slice(0, 2)
+  const rings = [{ ...outer, shape: 'square' as const }, inner]
+  const out = renderToStaticMarkup(<TargetFaceDrawing face={{ ...precision, rings }} />)
+  const edge = outer.diameter.value
+  expect(out).toContain(`<rect x="${-edge / 2}" y="${-edge / 2}" width="${edge}" height="${edge}"`)
+  expect(out).toContain(`<ellipse rx="${inner.diameter.value / 2}"`)
+})
+
+it('orders the discipline rows by federation, then the federation code, then distance', () => {
+  const [a] = precision.events
+  const event = (name: string, metres: number) => ({
+    ...a,
+    name,
+    distance: { value: metres * 1000 },
+  })
+  const events = [event('e1', 25), event('e2', 50), event('e3', 25), event('e4', 25)]
+  const disciplines = [
+    { id: 'd1', federation: 'bds', name: 'Hoch', number: '73xx', distanceMm: 25000 },
+    { id: 'd2', federation: 'bds', name: 'Tief', number: '4110', distanceMm: 25000 },
+    { id: 'd3', federation: 'dsb', name: 'Drei', number: '1.37/1.51', distanceMm: 50000 },
+    { id: 'd4', federation: 'dsb', name: 'Zwei', number: '1.9', distanceMm: 25000 },
+  ]
+  const rows = faceEventRows(
+    { organization: 'ISSF', events },
+    events.map((e, i) => ({ id: `m${i}`, discipline: `d${i + 1}`, event: e.name })),
+    disciplines,
+    [
+      { id: 'bds', name: 'BDS', abbreviation: 'BDS' },
+      { id: 'dsb', name: 'DSB', abbreviation: 'DSB' },
+    ],
+  )
+  expect(rows.map((r) => r.discipline)).toEqual(['Tief', 'Hoch', 'Zwei', 'Drei'])
 })

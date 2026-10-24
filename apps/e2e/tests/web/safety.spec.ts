@@ -5,6 +5,11 @@ import { safetyAck } from './nav.ts'
 // a first visit: nothing accepted yet
 test.use({ storageState: { cookies: [], origins: [] } })
 
+// the first-run step follows the notice and has its own spec
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('first-run-done', '1'))
+})
+
 test('the Safety notice must be accepted on the first visit and stays accepted', async ({
   page,
 }) => {

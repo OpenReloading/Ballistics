@@ -1,5 +1,4 @@
-import type { QuantityValue } from '@openreloading/schema'
-import type { BulletRecord, ComputedRange, PowderRecord } from './api-types.ts'
+import type { Bullet, Powder, QuantityValue } from '@openreloading/schema'
 import { computedBulletRows } from './bullet.ts'
 import {
   degreeText,
@@ -87,7 +86,7 @@ export const titleFromKebab = (value: string) =>
  * The construction in a few words: the structure, the core and jacket materials, the surface; a
  * wording with no structured field as printed. The manufacturer's wording shows as the printed text.
  */
-export function constructionRows(c: BulletRecord['construction']): FieldRow[] {
+export function constructionRows(c: Bullet['construction']): FieldRow[] {
   if (!c) return []
   const parts = [
     c.structure,
@@ -127,7 +126,7 @@ const twist = stored('twist', 'mm')
  * The build as one row per structured field (structure, jacket, core, surface), the manufacturer's
  * wording as printed on the first; the wording alone where nothing is structured.
  */
-export function buildRows(c: BulletRecord['construction']): FieldRow[] {
+export function buildRows(c: Bullet['construction']): FieldRow[] {
   if (!c) return []
   const material = (m: string) => m.replaceAll('-', ' ')
   const rows = [
@@ -146,7 +145,7 @@ export function buildRows(c: BulletRecord['construction']): FieldRow[] {
  * each dimension with its drawing symbol; absent fields and empty groups are left out. The
  * manufacturer, product number, line and caliber are the page's title and badges.
  */
-export function bulletDataGroups(b: BulletRecord): FieldGroup[] {
+export function bulletDataGroups(b: Bullet): FieldGroup[] {
   const angle = b.base?.angle
   return [
     {
@@ -178,6 +177,7 @@ export function bulletDataGroups(b: BulletRecord): FieldGroup[] {
         ...text('Base type', b.base?.type),
         ...length('Base length', b.base?.length, 't'),
         ...length('Base diameter', b.base?.diameter, 'db'),
+        ...length('Cavity diameter', b.base?.cavityDiameter, 'dc'),
         // degrees and minutes on manufacturer sheets: the stored decimal degrees, not rounded to whole degrees
         ...(angle
           ? [
@@ -204,9 +204,7 @@ export function bulletDataGroups(b: BulletRecord): FieldGroup[] {
 }
 
 /** The ballistic coefficient rows of a bullet page: drag model, band and note in record order. */
-export function ballisticCoefficientRows(
-  b: Pick<BulletRecord, 'ballisticCoefficients'>,
-): FieldRow[] {
+export function ballisticCoefficientRows(b: Pick<Bullet, 'ballisticCoefficients'>): FieldRow[] {
   return (b.ballisticCoefficients ?? []).map((bc) => ({
     label: bc.dragModel,
     value: {
@@ -218,6 +216,9 @@ export function ballisticCoefficientRows(
   }))
 }
 
+/** A thermochemistry value with its extremes over the composition ranges. */
+type ComputedRange = NonNullable<Powder['thermochemistry']>['gamma']
+
 const computed = (label: string, unit: string, r: ComputedRange): FieldRow => ({
   label,
   text: `${r.value}${unit}`,
@@ -228,7 +229,7 @@ const computed = (label: string, unit: string, r: ComputedRange): FieldRow => ({
  * The groups of a powder page's Properties table, in record order; absent fields are left out.
  * Manufacturer, form, base, bulk density and country are the cards of `powderStrip`.
  */
-export function powderRowGroups(p: PowderRecord): FieldGroup[] {
+export function powderRowGroups(p: Powder): FieldGroup[] {
   const t = p.thermochemistry
   return [
     { rows: text('Aliases', p.aliases?.join('; ')) },
@@ -279,7 +280,7 @@ const fittedNote = (k: number) =>
  * median of the powders that have one.
  */
 export function fittedParameterRows(
-  p: PowderRecord,
+  p: Powder,
   k: number,
   ratio?: { value: number; median?: number; powders?: number },
 ): FieldRow[] {
@@ -337,7 +338,7 @@ export function fittedParameterRows(
 }
 
 /** The fixed inputs of a powder's model fit from their stored units, at 3 significant digits. */
-export function modelInputRows(p: PowderRecord): FieldRow[] {
+export function modelInputRows(p: Powder): FieldRow[] {
   const i = p.interior
   if (!i) return []
   // stored in bar
@@ -382,7 +383,7 @@ export function modelInputRows(p: PowderRecord): FieldRow[] {
 }
 
 /** The burn form's constants with their symbols; `a` only where it was not fitted. */
-export function burnFormRows(p: PowderRecord): FieldRow[] {
+export function burnFormRows(p: Powder): FieldRow[] {
   const f = p.interior?.burnForm
   if (!f) return []
   const row = (symbol: string, value: number): FieldRow => ({
@@ -403,7 +404,7 @@ export function burnFormRows(p: PowderRecord): FieldRow[] {
  * with `k` and `ratio`), then the fixed inputs and the burn form, both under the filter Fixed inputs.
  */
 export function powderParameterGroups(
-  p: PowderRecord,
+  p: Powder,
   k: number,
   ratio?: { value: number; median?: number; powders?: number },
 ): FieldGroup[] {
@@ -445,7 +446,7 @@ export type StripItem = {
  * The bullet strip: diameter, mass, length, the BC (G7 where given, else G1, its drag model in the
  * label) and the sectional density; only what the record has.
  */
-export function bulletStrip(b: BulletRecord): StripItem[] {
+export function bulletStrip(b: Bullet): StripItem[] {
   const bcs = b.ballisticCoefficients ?? []
   const bc =
     bcs.find((c) => c.dragModel === 'G7') ?? bcs.find((c) => c.dragModel === 'G1') ?? bcs[0]
@@ -472,7 +473,7 @@ export function bulletStrip(b: BulletRecord): StripItem[] {
  * fitted), the solid density of the model and the bulk density.
  */
 export function powderStrip(
-  p: PowderRecord,
+  p: Powder,
   place?: { order: number; total: number },
   manufacturerName?: string,
 ): StripItem[] {

@@ -24,6 +24,7 @@ export type Quantity =
   | 'charge'
   | 'energy'
   | 'temperature'
+  | 'temperatureDifference'
   | 'airPressure'
   | 'pressure'
   | 'area'
@@ -38,6 +39,7 @@ export type Quantity =
   | 'angle'
   | 'correction'
   | 'percent'
+  | 'dragFactor'
   | 'sectionalDensity'
 
 export interface Unit {
@@ -54,7 +56,8 @@ export const metersPerInch = 0.0254
 export const metersPerFoot = 0.3048
 const metersPerYard = 0.9144
 export const kilogramsPerGrain = 6.479891e-5
-const metersPerSecondPerMph = 0.44704
+/** 1 mph in m/s. */
+export const metersPerSecondPerMph = 0.44704
 export const pascalsPerInHg = 3386.389
 /** Water density, g/cm³ (defined in core): turns a water capacity in g or gr into a volume. */
 export { waterDensityGramsPerCm3 }
@@ -96,6 +99,11 @@ export const unitsOf = {
       decimals: 1,
     },
   },
+  // a step between temperatures: no offset, and the unit follows the temperature's (`resolveUnits`)
+  temperatureDifference: {
+    degC: linear('°C', 1, 1, 0.5),
+    degF: linear('°F', 5 / 9, 1, 1),
+  },
   airPressure: { hPa: linear('hPa', 100, 1), inHg: linear('inHg', pascalsPerInHg, 2) },
   pressure: { bar: linear('bar', 1e5, 0), psi: linear('psi', psi, 0) },
   area: { mm2: linear('mm²', 1e-6, 2), in2: linear('in²', metersPerInch ** 2, 5) },
@@ -117,6 +125,8 @@ export const unitsOf = {
     mrad: linear('mrad', radPerMrad, 2),
   },
   percent: { '%': linear('%', 0.01, 0) },
+  // a multiplier on the drag, 100 % the nominal drag; one decimal keeps a fitted 1.034
+  dragFactor: { '%': linear('%', 0.01, 1) },
   // a bullet's mass over its diameter squared, kg/m² in SI; makers print lb/in²
   sectionalDensity: {
     'kg/m2': linear('kg/m²', 1, 1),
@@ -143,6 +153,7 @@ const metricBase = {
   windSpeed: 'm/s',
   energy: 'J',
   temperature: 'degC',
+  temperatureDifference: 'degC',
   airPressure: 'hPa',
   pressure: 'bar',
   area: 'mm2',
@@ -158,6 +169,7 @@ const single = {
   ballisticCoefficient: 'lb/in2',
   angle: 'deg',
   percent: '%',
+  dragFactor: '%',
 } as const
 
 /** The unit of each quantity per preset. */
@@ -183,6 +195,7 @@ export const presetUnitIds: { [P in PresetId]: { [Q in Quantity]: UnitId<Q> } } 
     windSpeed: 'mph',
     energy: 'ft-lbf',
     temperature: 'degF',
+    temperatureDifference: 'degF',
     airPressure: 'inHg',
     pressure: 'psi',
     area: 'in2',
@@ -219,6 +232,7 @@ export type UnitSystem = Readonly<Record<Quantity, Unit>>
 
 export function resolveUnits({ preset, overrides }: UnitChoice): UnitSystem {
   const ids = { ...presetUnitIds[preset], ...overrides } as Record<Quantity, string>
+  ids.temperatureDifference = ids.temperature
   return Object.fromEntries(
     Object.entries(ids).map(([q, id]) => [q, (unitsOf[q as Quantity] as Record<string, Unit>)[id]]),
   ) as Record<Quantity, Unit>

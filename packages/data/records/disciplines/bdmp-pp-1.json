@@ -1,0 +1,29 @@
+{
+  "id": "bdmp-pp-1",
+  "federation": "bdmp",
+  "name": "Police Pistol 1",
+  "number": "PP 1",
+  "section": "C.6A",
+  "page": "Teil C, Seite 25 bis 26 von 142, PDF pp. 25 to 26",
+  "distance": {
+    "value": 25000,
+    "raw": "25 m"
+  },
+  "category": "pistol",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6A, C.6AA.0, C.6AB.0, Teil C, Seite 25 von 142, PDF p. 25",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6A.5, Teil C, Seite 25 von 142, PDF p. 25",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "PP 1 A (9 mm Luger pistols, C.6AA.1) and PP 1 B (pistols and revolvers .354 to .455, C.6AB.1) shoot one course. PP 1 B may also be shot with optical sights as PP 1 Optical Sight, scored separately (C.6A.7, Teil C, PDF p. 26). The course runs at 25, 15 and 10 m, the record holds the longest distance."
+  }
+}

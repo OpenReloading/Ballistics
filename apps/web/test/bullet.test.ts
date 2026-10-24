@@ -1,15 +1,16 @@
 import { lbPerSqInToKgPerSqM, millerStability } from '@openreloading/core'
+import type { Bullet } from '@openreloading/schema'
 import { expect, it } from 'vitest'
-import type { BulletRecord } from '../src/lib/api-types.ts'
 import { bulletDrag, computedBulletRows, millerTwist } from '../src/lib/bullet.ts'
 import { rowValue } from '../src/lib/record-fields.ts'
 import { metersPerFoot, pascalsPerInHg, presetUnits } from '../src/lib/units.ts'
 import { targetBullet } from './fixtures/bullets.ts'
 
 /** Synthetic record; the numbers are made up. */
-const record = (bcs: BulletRecord['ballisticCoefficients']): BulletRecord => ({
+const record = (bcs: Bullet['ballisticCoefficients']): Bullet => ({
   id: 'example-a-1',
   manufacturer: 'example-a',
+  productNumber: '1',
   name: 'Test 175',
   diameter: { value: 7.82 },
   mass: { value: 11.34 },

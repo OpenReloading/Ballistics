@@ -56,39 +56,72 @@ export const constructionFields = z
 /** Bullet construction read from the manufacturer's wording, with `raw` kept as printed. */
 export interface ConstructionFields extends z.infer<typeof constructionFields> {}
 
-/** Base of a bullet: type, length, and for a boat tail the base face diameter and the tail angle. */
+/**
+ * Base types of a bullet. `conical-hollow-base` and `rounded-hollow-base`: a cavity open at the base,
+ * a cone or a hemisphere whose depth follows from its diameter (`cavityDiameter`), on a flat base or
+ * on the boat tail the other fields describe.
+ */
+export const baseTypes = z.enum([
+  'flat',
+  'boat-tail',
+  'rebated-boat-tail',
+  'conical-hollow-base',
+  'rounded-hollow-base',
+])
+
+/**
+ * Ogive forms of a bullet: `tangent`, `secant` and `hybrid` by the head-shape ratio Rt/R,
+ * `round-nose` and `flat-nose` for a nose that is no ogive of revolution.
+ */
+export const ogiveForms = z.enum(['tangent', 'secant', 'hybrid', 'round-nose', 'flat-nose'])
+
+/** Tip types of a bullet: the nose construction. */
+export const tipTypes = z.enum([
+  'hollow-point',
+  'polymer-tip',
+  'soft-point',
+  'full-metal-jacket',
+  'open-meplat',
+])
+
+/**
+ * Base of a bullet: type, length, for a boat tail the base face diameter and the tail angle, and
+ * for a hollow base the diameter of the cavity.
+ */
 const bulletBase = z
   .object({
-    type: z.enum(['flat', 'boat-tail', 'rebated-boat-tail']).optional(),
+    type: baseTypes.optional(),
     length: quantity('length').optional(),
     /**
      * Diameter of the base face at the end of the boat tail (McCoy, ARBRL-TR-02293, 1981, PDF p. 21).
-     * Only with a boat-tail base type.
+     * Only with a boat-tail or hollow base type.
      */
     diameter: quantity('length', z.number().positive()).optional(),
     /**
      * Boat-tail angle: half-angle of the conical boat tail, between its surface and the bullet axis
-     * (McCoy, ARBRL-TR-02293, 1981, PDF p. 17). Only with a boat-tail base type.
+     * (McCoy, ARBRL-TR-02293, 1981, PDF p. 17). Only with a boat-tail or hollow base type.
      */
     angle: quantity('angle', z.number().gt(0).lt(90)).optional(),
+    /** Diameter of the cavity where it opens in the base face. Needed by, and only with, a hollow base type. */
+    cavityDiameter: quantity('length', z.number().positive()).optional(),
   })
   .superRefine((base, ctx) => {
-    const tail = base.type === 'boat-tail' || base.type === 'rebated-boat-tail'
+    const hollow = base.type === 'conical-hollow-base' || base.type === 'rounded-hollow-base'
+    const tail = base.type === 'boat-tail' || base.type === 'rebated-boat-tail' || hollow
+    const issue = (path: string, message: string) =>
+      ctx.addIssue({ code: 'custom', path: [path], message })
     for (const key of ['diameter', 'angle'] as const) {
-      if (base[key] && !tail)
-        ctx.addIssue({
-          code: 'custom',
-          path: [key],
-          message: 'only with a boat-tail base type',
-        })
+      if (base[key] && !tail) issue(key, 'only with a boat-tail or hollow base type')
     }
+    if (base.cavityDiameter && !hollow) issue('cavityDiameter', 'only with a hollow base type')
+    if (hollow && !base.cavityDiameter) issue('cavityDiameter', 'needed by a hollow base type')
   })
 
 /** Ogive of a bullet: form, radius or Rt/R, at least one of them. */
 const bulletOgive = z
   .object({
     /** Optional: a source may give the radius or Rt/R without naming the form. */
-    form: z.enum(['tangent', 'secant', 'hybrid']).optional(),
+    form: ogiveForms.optional(),
     /** Ogive radius R: radius of the nose arc in an axial section (McCoy, ARBRL-TR-02293, 1981, PDF p. 13). */
     radius: quantity('length', z.number().positive()).optional(),
     /**
@@ -102,10 +135,20 @@ const bulletOgive = z
     message: 'needs a form, a radius or Rt/R',
   })
 
+/**
+ * Cannelure, a groove around the shank: `start` is the distance of its rear edge from the base, `width`
+ * its axial extent and `depth` its radial depth where the source gives one.
+ */
+const bulletCannelure = z.object({
+  start: quantity('length', z.number().positive()),
+  width: quantity('length', z.number().positive()),
+  depth: quantity('length', z.number().positive()).optional(),
+})
+
 /** Tip of a bullet: type, and the polymer tip length or the hollow-point mouth diameter. */
 const bulletTip = z
   .object({
-    type: z.enum(['hollow-point', 'polymer-tip', 'soft-point', 'full-metal-jacket', 'open-meplat']),
+    type: tipTypes,
     /**
      * Polymer tip: axial length of the part forward of the jacket opening (the head), without the
      * shank seated in the jacket cavity. Mann 1997, p. 1, describes tips as a head and a shaft;
@@ -148,6 +191,7 @@ export const bullet = z
     length: quantity('length').optional(),
     base: bulletBase.optional(),
     ogive: bulletOgive.optional(),
+    cannelure: bulletCannelure.optional(),
     tip: bulletTip.optional(),
     /** Diameter of the flat at the nose (McCoy, ARBRL-TR-02293, 1981, PDF p. 14); 0 for a sharp point. */
     meplatDiameter: quantity('length', z.number().min(0)).optional(),
@@ -183,6 +227,20 @@ export const bullet = z
     below(['tip', 'mouthDiameter'], b.tip?.mouthDiameter?.value, d, 'the diameter')
     below(['tip', 'length'], b.tip?.length?.value, b.length?.value, 'the length')
     below(['tip', 'length'], b.tip?.length?.value, b.noseLength?.value, 'the nose length')
+    below(['base', 'length'], b.base?.length?.value, b.length?.value, 'the length')
+    const cavity = b.base?.cavityDiameter?.value
+    below(
+      ['base', 'cavityDiameter'],
+      cavity,
+      b.base?.diameter?.value ?? d,
+      b.base?.diameter ? 'the base diameter' : 'the diameter',
+    )
+    // The depth is not stored: it is half the opening (`bulletOutline`).
+    if (cavity !== undefined && b.length && !(cavity / 2 < b.length.value))
+      issue(
+        ['base', 'cavityDiameter'],
+        'half of it, the cavity depth, must be smaller than the length',
+      )
   })
 
 /** One published coefficient: G1 or G7, value in lb/in2, optional velocity band. */

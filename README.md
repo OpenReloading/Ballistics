@@ -3,12 +3,20 @@
 # OpenReloading
 
 [![CI](https://github.com/OpenReloading/Ballistics/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenReloading/Ballistics/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/OpenReloading/Ballistics?include_prereleases&sort=semver)](https://github.com/OpenReloading/Ballistics/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D26-339933?logo=nodedotjs&logoColor=white)](.nvmrc)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/OpenReloading/Ballistics/badge)](https://scorecard.dev/viewer/?uri=github.com/OpenReloading/Ballistics)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-fe5196?logo=conventionalcommits&logoColor=white)](https://www.conventionalcommits.org/en/v1.0.0/)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/KkYJ5fdukR)
+
+[![web](https://img.shields.io/github/v/release/OpenReloading/Ballistics?filter=web-v*&include_prereleases&label=web)](https://github.com/OpenReloading/Ballistics/releases?q=web-v&expanded=true)
+[![api](https://img.shields.io/github/v/release/OpenReloading/Ballistics?filter=api-v*&include_prereleases&label=api)](https://github.com/OpenReloading/Ballistics/releases?q=api-v&expanded=true)
+[![core](https://img.shields.io/github/v/release/OpenReloading/Ballistics?filter=core-v*&include_prereleases&label=core)](https://github.com/OpenReloading/Ballistics/releases?q=core-v&expanded=true)
+[![schema](https://img.shields.io/github/v/release/OpenReloading/Ballistics?filter=schema-v*&include_prereleases&label=schema)](https://github.com/OpenReloading/Ballistics/releases?q=schema-v&expanded=true)
+[![data](https://img.shields.io/github/v/release/OpenReloading/Ballistics?filter=data-v*&include_prereleases&label=data)](https://github.com/OpenReloading/Ballistics/releases?q=data-v&expanded=true)
+[![drawing](https://img.shields.io/github/v/release/OpenReloading/Ballistics?filter=drawing-v*&include_prereleases&label=drawing)](https://github.com/OpenReloading/Ballistics/releases?q=drawing-v&expanded=true)
+[![importers](https://img.shields.io/github/v/release/OpenReloading/Ballistics?filter=importers-v*&include_prereleases&label=importers)](https://github.com/OpenReloading/Ballistics/releases?q=importers-v&expanded=true)
+[![docs](https://img.shields.io/github/v/release/OpenReloading/Ballistics?filter=docs-v*&include_prereleases&label=docs)](https://github.com/OpenReloading/Ballistics/releases?q=docs-v&expanded=true)
 
 **Alpha version:** breaking changes are to be expected in pages, features, data and file formats. The version is 0.0.1 until the first public release.
 

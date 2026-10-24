@@ -5,7 +5,7 @@
  * at `caps.chargeSteps`: the solver runs up to 152 times in one compute task.
  */
 import { z } from 'zod'
-import { bulkDensityBound, interiorBody, interiorExample } from './interior-schema.ts'
+import { bulkDensityBound, interiorBase, interiorExample } from './interior-schema.ts'
 import { caps } from './schemas.ts'
 
 /** Target quantities with their units: `peakPressure` Pa, `muzzleVelocity` m/s, `loadRatio` 1, `barrelTime` s, `bulletLeadTime` s. */
@@ -43,13 +43,13 @@ const target = z
   })
   .describe('The quantity the run reaches at the solved charge and its value.')
 
-const m3Load = interiorBody.shape.load
+const m3Load = interiorBase.shape.load
 
 /**
  * Body of `POST /interior/charge-target`; `target.value` is in SI (Pa, m/s, s) or a ratio.
  * Inferred type: {@link ChargeBody}. Request type: {@link ChargeTargetRequest}.
  */
-export const chargeBody = interiorBody
+export const chargeBody = interiorBase
   .omit({ model: true, ladder: true })
   .extend({
     load: m3Load
@@ -67,7 +67,7 @@ export const chargeBody = interiorBody
       })
       .describe('The load: chamber, barrel, bullet and propellant, SI units.'),
     target,
-    powder: interiorBody.shape.cartridge.describe(
+    powder: interiorBase.shape.cartridge.describe(
       'Powder record id. Its bulk density applies when load.propellant.bulkDensity is absent.',
     ),
   })

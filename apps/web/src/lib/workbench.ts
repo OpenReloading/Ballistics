@@ -232,3 +232,43 @@ export function rangeHero(
     velocity: { value: formatQuantity('velocity', system, velocity), unit: system.velocity.symbol },
   }
 }
+
+/**
+ * The band of the peak pressure (Pa) and the muzzle velocity (m/s) a result shows: the 5th and 95th
+ * percentile of the sampled band, else the corner-case range of the pressure and no velocity band.
+ * `cornerOnly` (the printed report) always takes the corner-case range, so a print does not depend on
+ * whether the sampling had answered.
+ */
+export function resultBand(body: InteriorResponse, cornerOnly = false) {
+  const { sampled, pressureRange: range } = body
+  const sample = sampled?.status === 'sampled' && !cornerOnly ? sampled : undefined
+  return {
+    sampled: sample !== undefined,
+    pressure: sample?.pressure
+      ? { low: sample.pressure.p05, high: sample.pressure.p95 }
+      : { low: range.lowPressure, high: range.highPressure },
+    velocity: sample?.velocity && { low: sample.velocity.p05, high: sample.velocity.p95 },
+  }
+}
+
+/** What the sampled band of a result says: its reach, or why the corner-case range stands in (shown instead); undefined without one. */
+export function bandNotice(sampled: InteriorResponse['sampled']): string | undefined {
+  if (sampled === undefined) return
+  if (sampled.status === 'sampled') return 'input tolerances only'
+  return { overBudget: 'over budget', invalid: 'no valid draw', failed: 'not finished' }[
+    sampled.status
+  ]
+}
+
+/**
+ * The line under the key tiles of a result with a sampling answer: the velocity band and what the
+ * bands cover, or why the corner-case range is shown instead; undefined without a sampling answer.
+ */
+export function bandLine(body: InteriorResponse, system: UnitSystem): string | undefined {
+  const notice = bandNotice(body.sampled)
+  if (notice === undefined) return
+  const { velocity } = resultBand(body)
+  if (!velocity) return `Sampled bands ${notice}: corner-case range shown.`
+  const v = (si: number) => formatQuantity('velocity', system, si)
+  return `Velocity ${v(velocity.low)} to ${v(velocity.high)} ${system.velocity.symbol}. 5th to 95th percentile, ${notice}.`
+}

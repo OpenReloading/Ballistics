@@ -1,3 +1,4 @@
+import { compareDisciplines, compareTargetFaces } from '@openreloading/schema'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -66,9 +67,9 @@ export default async function FederationPage({ params }: PageProps<'/federations
     return <ServerDataError what="Federation" />
   const f = r.data
   const international = federations.data.find((x) => x.id === f.internationalFederation)
-  const collator = new Intl.Collator('en', { numeric: true })
-  const own = [...scope.disciplines].sort(
-    (a, b) => collator.compare(a.number ?? '', b.number ?? '') || collator.compare(a.name, b.name),
+  const own = scope.disciplines.toSorted(compareDisciplines)
+  const ordered = faces.toSorted((a, b) =>
+    a.status === 'ok' && b.status === 'ok' ? compareTargetFaces(a.data, b.data) : 0,
   )
   const usedBy = (face: string) =>
     own.filter((d) => disciplineFaceIds(mappings.data, d.id).includes(face)).length
@@ -176,7 +177,7 @@ export default async function FederationPage({ params }: PageProps<'/federations
                 }
                 columns={['Face', 'Disciplines']}
               >
-                {faces.flatMap((x) =>
+                {ordered.flatMap((x) =>
                   x.status === 'ok'
                     ? [
                         <tr key={x.data.id}>

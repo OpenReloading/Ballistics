@@ -8,6 +8,14 @@ import { deg } from '../core/units.ts'
  */
 export type Tag = 'sourced' | 'entered' | 'derived' | 'approximate'
 
+/** The base types: a hollow base has a cone or a hemisphere cut into its base face. */
+export type BaseType =
+  | 'flat'
+  | 'boat-tail'
+  | 'rebated-boat-tail'
+  | 'conical-hollow-base'
+  | 'rounded-hollow-base'
+
 /** Bullet dimensions, mm and degrees: the record fields of the same names, plain numbers. */
 export interface BulletDimensions {
   diameter: number
@@ -18,12 +26,14 @@ export interface BulletDimensions {
   /** 0 for a sharp point. */
   meplatDiameter?: number
   base?: {
-    type?: 'flat' | 'boat-tail' | 'rebated-boat-tail'
+    type?: BaseType
     length?: number
     /** Diameter of the base face at the end of the boat tail. */
     diameter?: number
     /** Half angle of the boat-tail cone to the axis. */
     angle?: number
+    /** Diameter of the cavity of a hollow base where it opens in the base face. */
+    cavityDiameter?: number
   }
   /**
    * `form`: `tangent`, `secant`, `hybrid`, or for designer input `round-nose` and `flat-nose`.
@@ -33,8 +43,8 @@ export interface BulletDimensions {
   /** `length`: polymer tip forward of the jacket opening; `mouthDiameter`: hollow-point opening. */
   tip?: { type: string; length?: number; mouthDiameter?: number }
   /**
-   * Designer input, no record field: `start` is the z of the groove's rear edge from the base,
-   * `width` its axial width, `depth` its radial depth.
+   * `start` is the z of the groove's rear edge from the base, `width` its axial width, `depth`
+   * its radial depth.
    */
   cannelure?: { start: number; width: number; depth?: number }
 }
@@ -47,19 +57,27 @@ export interface Refusal {
 
 /** The half profile of a bullet with the quantities derived from it, in mm, mm², mm³ and degrees. */
 export interface Outline {
-  /** Half profile [r, z] from the base centre (z = 0) to the tip on the axis; z never falls. */
+  /**
+   * Half profile [r, z] to the tip on the axis, closed along the axis. It starts at the base
+   * centre (z = 0), or at the apex of a hollow base's cavity, which the profile follows down to the
+   * base face (`baseEdge`); from there z never falls.
+   */
   points: SectionPoint[]
   /** The tag of each point of `points`. */
   tags: Tag[]
   /** Stroked runs of the outline; approximate ones rest on an assumed shape. */
   segments: { points: SectionPoint[]; approximate: boolean }[]
-  /** z ranges of the outline drawn from an assumed shape. */
+  /** z ranges of the outline drawn from an assumed shape, the cavity of a hollow base apart. */
   approximate: [number, number][]
+  /** Index in `points` of the edge of the base face. */
+  baseEdge: number
+  /** The cavity of a hollow base: its radius at the base face and its depth, an assumed shape. */
+  cavity?: { radius: number; depth: number }
   noseLength: number
   noseAssumed: boolean
   /** Shank length between the boat tail and the nose, mm. */
   bearingLength: number
-  /** Volume of revolution, mm³. */
+  /** Volume of revolution, mm³, less the cavity. */
   volume: number
   /** Area of the full axial section, mm². */
   area: number
@@ -72,6 +90,10 @@ export interface Outline {
 
 /** Assumed boat-tail half angle, degrees, when the bullet gives only the tail length. */
 export const assumedBoatTailAngle = 8
+
+/** Whether the base type has a cavity. */
+const isHollow = (type: string | undefined) =>
+  type === 'conical-hollow-base' || type === 'rounded-hollow-base'
 
 const flatTips = new Set(['hollow-point', 'open-meplat', 'soft-point'])
 const forms = new Set(['tangent', 'secant', 'hybrid', 'round-nose', 'flat-nose'])
@@ -172,14 +194,17 @@ export function bulletOutline(
   if ('reason' in mouth) return mouth
   const groove = cannelureGeometry(b, base.t, z0, notes)
   if (groove && 'reason' in groove) return groove
+  const cavity = cavityGeometry(b, base.rb, notes)
+  if (cavity && 'reason' in cavity) return cavity
   const samples = new Map<number, Tag>(curve.zs.map((z) => [z, noseTag]))
   for (const [z, tag] of [...curve.extra, ...(tip ? [[tip.tipStart, tip.tag] as const] : [])])
     samples.set(z, tag)
-  const { points, tags, segments, approximate } = assemblePoints({
+  const { points, tags, segments, approximate, baseEdge } = assemblePoints({
     given,
     a: d / 2,
     L,
     base,
+    cavity,
     groove,
     z0,
     nTag,
@@ -205,6 +230,8 @@ export function bulletOutline(
     tags,
     segments,
     approximate,
+    baseEdge,
+    ...(cavity && { cavity: { radius: cavity.radius, depth: cavity.depth } }),
     noseLength: n,
     noseAssumed: nTag === 'approximate',
     bearingLength: z0 - base.t,
@@ -241,10 +268,15 @@ function baseGeometry(
   const a = d / 2
   // base: tail length t, base edge radius rb, cone top radius ac (below a for a rebate)
   const type = b.base?.type
-  const tailType = type === 'boat-tail' || type === 'rebated-boat-tail'
   const gl = b.base?.length
   const gd = b.base?.diameter
   const ga = b.base?.angle
+  // a hollow base takes the boat-tail dimensions where it gives any, else its face is flat
+  const tailType =
+    type === 'boat-tail' ||
+    type === 'rebated-boat-tail' ||
+    (isHollow(type) && (gl !== undefined || gd !== undefined || ga !== undefined))
+  const flatFaced = type === 'flat' || (isHollow(type) && !tailType)
   if (gd !== undefined && !(gd > 0 && gd < d))
     return fail(
       `The base diameter ${mm(gd)} is not between 0 and the diameter ${mm(d)}.`,
@@ -258,7 +290,7 @@ function baseGeometry(
   let t = 0
   let rb = a
   let tTag: Tag = given
-  let rbTag: Tag = type === 'flat' ? given : 'approximate'
+  let rbTag: Tag = flatFaced ? given : 'approximate'
   let s = 0
   if (tailType) {
     if (type === 'rebated-boat-tail') {
@@ -306,7 +338,7 @@ function baseGeometry(
       )
     } else notes.push('The record has no boat tail length: the base is drawn flat.')
     if (t === 0) [rb, s] = [a, 0]
-  } else if (type !== 'flat')
+  } else if (!flatFaced)
     notes.push(
       gl === undefined
         ? 'The record has no base type: the base is drawn flat.'
@@ -318,9 +350,68 @@ function baseGeometry(
       'base.length',
       'length',
     )
-  const tailKnown = type === 'flat' || (tailType && t > 0 && tTag !== 'approximate')
+  const tailKnown = flatFaced || (tailType && t > 0 && tTag !== 'approximate')
   const baseKnown = tailKnown && rbTag !== 'approximate' && s === 0
   return { t, rb, s, tTag, rbTag, tailKnown, baseKnown }
+}
+
+/**
+ * The cavity of a hollow base, from its apex on the axis to its edge on the base face: a cone or a
+ * hemisphere whose depth is its radius, the cone at a half angle of 45 degrees. Without a stated
+ * depth the shape is assumed, so the cavity is always drawn as an assumed one.
+ */
+interface Cavity {
+  radius: number
+  depth: number
+  points: SectionPoint[]
+}
+
+/** The cavity of a hollow base type with a cavity diameter; none otherwise. */
+function cavityGeometry(
+  b: BulletDimensions,
+  rb: number,
+  notes: string[],
+): Cavity | Refusal | undefined {
+  const type = b.base?.type
+  if (!isHollow(type)) return
+  const cd = b.base?.cavityDiameter
+  if (cd === undefined) {
+    notes.push('The record has no cavity diameter: the base is drawn without a cavity.')
+    return
+  }
+  const r = cd / 2
+  if (!(r > 0 && r < rb))
+    return fail(
+      `The cavity diameter ${mm(cd)} is not between 0 and the base diameter ${mm(2 * rb)}.`,
+      'base.cavityDiameter',
+      'base.diameter',
+      'diameter',
+    )
+  if (!(r < b.length))
+    return fail(
+      `The cavity depth ${mm(r)} is not below the length ${mm(b.length)}.`,
+      'base.cavityDiameter',
+      'length',
+    )
+  const shape = type === 'conical-hollow-base' ? 'cone' : 'hemisphere'
+  notes.push(
+    `The cavity depth is assumed: a ${shape} as deep as its opening is wide at its radius, ${mm(r)}.`,
+  )
+  const points: SectionPoint[] =
+    type === 'conical-hollow-base'
+      ? [
+          [0, r],
+          [r, 0],
+        ]
+      : Array.from({ length: steps + 1 }, (_, j) =>
+          j === steps
+            ? [r, 0]
+            : [
+                r * Math.sin(((j / steps) * Math.PI) / 2),
+                r * Math.cos(((j / steps) * Math.PI) / 2),
+              ],
+        )
+  return { radius: r, depth: r, points }
 }
 
 /** The nose length n: given, else the length less tail and bearing, else assumed. */
@@ -608,6 +699,7 @@ interface Parts {
   a: number
   L: number
   base: BaseGeometry
+  cavity?: Cavity
   groove?: Groove
   z0: number
   nTag: Tag
@@ -622,12 +714,12 @@ interface Parts {
 }
 
 /**
- * The outline points from the base centre to the tip on the axis, each with its tag and whether
- * the edge reaching it is approximate, the stroked runs and the z ranges drawn from an assumed
- * shape.
+ * The outline points from the base centre (or the apex of the cavity) to the tip on the axis, each
+ * with its tag and whether the edge reaching it is approximate, the stroked runs, the z ranges
+ * drawn from an assumed shape and the index of the base face's edge.
  */
 function assemblePoints(parts: Parts) {
-  const { given, a, L, base, groove, z0, nTag, noseTag, samples, rAt, m, mTag } = parts
+  const { given, a, L, base, cavity, groove, z0, nTag, noseTag, samples, rAt, m, mTag } = parts
   const { mouth, mouthTag } = parts
   const { t, rb, s, tTag, rbTag } = base
   const points: SectionPoint[] = []
@@ -639,7 +731,12 @@ function assemblePoints(parts: Parts) {
     edges.push(approx)
   }
   const baseApprox = !base.baseKnown
-  add([0, 0], given, false)
+  // a cavity's wall runs down from its apex to the base face: the profile starts on the axis at the apex
+  if (cavity)
+    for (const [j, p] of cavity.points.entries())
+      add(p, j === cavity.points.length - 1 ? given : 'approximate', j > 0)
+  else add([0, 0], given, false)
+  const baseEdge = points.length
   add([rb, 0], rbTag, baseApprox)
   if (t > 0) {
     add([a - s, t], s > 0 ? 'approximate' : tTag, baseApprox)
@@ -678,7 +775,7 @@ function assemblePoints(parts: Parts) {
     ...(groove?.assumed ? [[groove.start, groove.start + groove.width] as [number, number]] : []),
     ...(noseApprox ? [[z0, L] as [number, number]] : []),
   ]
-  return { points, tags, segments, approximate }
+  return { points, tags, segments, approximate, baseEdge }
 }
 
 /** Area of the full axial section, mm², and the z of its centre, mm, of a half profile closed along the axis. */
@@ -695,15 +792,24 @@ function sectionProperties(points: SectionPoint[]) {
   return { area: 2 * Math.abs(half), areaCentreZ: moment / half }
 }
 
-/** Volume of the solid of revolution of a half profile (z rising) from z = 0 to `cut`, mm³. */
+/**
+ * Volume of the solid of revolution of a half profile closed along the axis, from z = 0 to `cut`,
+ * mm³: each segment adds its frustum going up and takes it off going down, so the wall of a
+ * cavity subtracts.
+ */
 export function revolutionVolume(points: SectionPoint[], cut: number): number {
   let v = 0
   for (let k = 1; k < points.length; k++) {
-    const [[r0, z0], [r1, z1]] = [points[k - 1], points[k]]
+    const up = points[k - 1][1] < points[k][1]
+    const [[r0, z0], [r1, z1]] = up ? [points[k - 1], points[k]] : [points[k], points[k - 1]]
     if (z1 <= z0 || z0 >= cut) continue
     const z = Math.min(z1, cut)
     const r = r0 + ((r1 - r0) * (z - z0)) / (z1 - z0)
-    v += (Math.PI * (z - z0) * (r0 ** 2 + r0 * r + r ** 2)) / 3
+    v += ((up ? 1 : -1) * (Math.PI * (z - z0) * (r0 ** 2 + r0 * r + r ** 2))) / 3
   }
   return v
 }
+
+/** Whether the bullet below `cut` mm rests on an assumed shape: an assumed range or a cavity. */
+export const assumedBelow = (o: Outline, cut: number): boolean =>
+  (o.cavity !== undefined && cut > 0) || o.approximate.some(([z0, z1]) => z1 > z0 && z0 < cut)

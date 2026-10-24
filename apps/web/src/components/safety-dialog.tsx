@@ -12,6 +12,17 @@ const ackValue = '3'
 /** Where Decline leads: away from the site to the browser's empty page, naming no other site. */
 const declineUrl = 'about:blank'
 const openEvent = 'safety-open'
+/** Dispatched on `window` when the notice is accepted, for the first-run step that follows. */
+export const safetyAcceptedEvent = 'safety-accepted'
+
+/** Whether this browser has accepted the current text of the notice. */
+export function isSafetyAccepted() {
+  try {
+    return localStorage.getItem(ackKey) === ackValue
+  } catch {
+    return false
+  }
+}
 
 /** Opens the Safety dialog from anywhere on the page. */
 export const openSafety = () => window.dispatchEvent(new Event(openEvent))
@@ -24,11 +35,7 @@ export function SafetyDialog() {
   const [opened, setOpened] = useState(false)
   const [required, setRequired] = useState(false)
   useEffect(() => {
-    let acked = false
-    try {
-      acked = localStorage.getItem(ackKey) === ackValue
-    } catch {}
-    if (!acked) {
+    if (!isSafetyAccepted()) {
       setRequired(true)
       setOpened(true)
     }
@@ -42,6 +49,7 @@ export function SafetyDialog() {
     } catch {}
     setRequired(false)
     setOpened(false)
+    window.dispatchEvent(new Event(safetyAcceptedEvent))
   }
   const decline = () => {
     try {

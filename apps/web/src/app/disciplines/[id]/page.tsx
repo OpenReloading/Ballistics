@@ -1,3 +1,4 @@
+import { compareTargetFaces } from '@openreloading/schema'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -78,7 +79,14 @@ export default async function DisciplinePage({ params }: PageProps<'/disciplines
   const international = disciplines.data.find((x) => x.id === d.internationalDiscipline)
   const book = disciplineRuleBook(d)
   const faceOf = new Map(faces.flatMap((f) => (f.status === 'ok' ? [[f.data.id, f.data]] : [])))
-  const stages = mappings.flatMap((m) => (m.status === 'ok' ? [m.data] : []))
+  // by face in the default face order; the stages of one face keep the mappings' order
+  const stages = mappings
+    .flatMap((m) => (m.status === 'ok' ? [m.data] : []))
+    .toSorted((a, b) => {
+      const x = faceOf.get(a.face)
+      const y = faceOf.get(b.face)
+      return x && y ? compareTargetFaces(x, y) : 0
+    })
   const first = stages[0]
   const groupsHref = (m: { face: string; event: string }) =>
     `/groups?face=${encodeURIComponent(m.face)}&event=${encodeURIComponent(m.event)}`

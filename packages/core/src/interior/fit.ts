@@ -1,9 +1,13 @@
 /**
  * Powder fit: fits the burn coefficient and, on request, the start pressure of the M3 interior
- * model to a chronograph ladder by weighted least squares, `apps/docs/docs/models/interior-powder-fit.md`.
+ * model to a chronograph ladder by weighted least squares, with optional Gaussian priors and a
+ * Huber loss, and the prediction band of the fitted load at any charge,
+ * `apps/docs/docs/models/interior-powder-fit.md`.
  * Every evaluation runs `interior` once per distinct charge. SI in and out.
  */
 import { InputError, need } from '../errors.ts'
+import { chiSquareQuantile } from '../groups/chi-square.ts'
+import { studentTwoSidedQuantile } from '../groups/student-t.ts'
 import { logLeastSquares } from '../least-squares.ts'
 import {
   type InteriorInvalid,
@@ -33,6 +37,20 @@ export interface LadderPoint {
  */
 export type PowderParameter = 'burnRate' | 'startPressure'
 
+/**
+ * Gaussian prior of one fitted parameter in its log parameter
+ * (`apps/docs/docs/models/interior-powder-fit.md`, "Prior and robust loss").
+ */
+export interface PowderPrior {
+  /**
+   * Centre of the prior, in the unit of the parameter. Burn coefficient: above 0. Start pressure:
+   * above the floor of the shot start, as the fitted value is.
+   */
+  value: number
+  /** Standard deviation of the log parameter: of ln(value) for the burn coefficient, of ln(value - floor) for the start pressure. */
+  sigma: number
+}
+
 /** Options of `fitPowder`. */
 export interface PowderFitOptions {
   /**
@@ -47,6 +65,16 @@ export interface PowderFitOptions {
   maxIterations?: number
   /** Largest condition number of the column-scaled Jacobian; default 1e3. */
   maxCondition?: number
+  /**
+   * Priors on fitted parameters; none by default. The fit then returns the maximum of the
+   * posterior. Needs `velocitySigma` on the ladder.
+   */
+  priors?: Partial<Record<PowderParameter, PowderPrior>>
+  /**
+   * Threshold of a Huber loss in sigmas of the ladder rows; none by default, quadratic loss. Needs
+   * `velocitySigma` on the ladder.
+   */
+  huberThreshold?: number
   /** Integration settings of every `interior` run; default `interiorDefaults`. */
   options?: Partial<InteriorOptions>
 }
@@ -85,10 +113,23 @@ export interface PowderFit {
   parameters: FittedPowderParameter[]
   /** Absent like `standardUncertainty`. */
   correlation?: number[][]
+  /**
+   * Covariance of the log parameters of `PowderParameter` order (the fit's theta, relative to each
+   * parameter's initial value); absent like `standardUncertainty`. `predictPowder` propagates it.
+   */
+  covariance?: number[][]
+  /** Whether the ladder carried velocity uncertainties; without them the covariance is scaled by the residual. */
+  weighted: boolean
   /** One row per velocity, then pressure, of each ladder point in input order. */
   residuals: PowderFitResidual[]
-  /** Sum of squared residuals over sigma (sigma 1 where the ladder has none). */
+  /** Sum of squared residuals over sigma (sigma 1 where the ladder has none), plus `priorChiSquare`. */
   chiSquare: number
+  /** The ladder rows' share of `chiSquare`, whatever the loss. */
+  dataChiSquare: number
+  /** The priors' share of `chiSquare`: the squared distance of each log parameter from its prior centre in prior sigmas; 0 without priors. */
+  priorChiSquare: number
+  /** The minimized cost: `chiSquare`, or with `huberThreshold` the Huber loss of the rows plus `priorChiSquare`. */
+  loss: number
   /** Degrees of freedom: rows minus parameters. */
   degreesOfFreedom: number
   /** Condition number of the column-scaled Jacobian at the solution. */
@@ -282,6 +323,23 @@ export function fitPowder(
     'maxIterations must be a positive integer',
   )
   need(maxCondition > 0, 'maxCondition must be positive')
+  need(
+    options.huberThreshold === undefined ||
+      (Number.isFinite(options.huberThreshold) && options.huberThreshold > 0),
+    'huberThreshold must be positive',
+  )
+  const priors = options.priors ?? {}
+  const priorNames = (Object.keys(priors) as PowderParameter[]).filter(
+    (n) => priors[n] !== undefined,
+  )
+  need(
+    priorNames.every((name) => parameters.includes(name)),
+    'a prior needs its parameter in parameters',
+  )
+  need(
+    withSigma > 0 || (priorNames.length === 0 && options.huberThreshold === undefined),
+    'priors and huberThreshold need velocity sigmas',
+  )
   const floor = startPressureFloor(load)
   need(
     !parameters.includes('startPressure') || load.startPressure > floor,
@@ -291,6 +349,24 @@ export function fitPowder(
   const rows = ladderRows(ladder)
   if (rows.length < parameters.length) throw new PowderFitError('underdetermined')
   const { initial, apply, offset, q, estimate } = powderParameterMap(load, parameters, floor)
+
+  // a prior is a pseudo-row after the data: observed log centre, predicted theta, its sigma
+  const priorRows = priorNames.map((name) => {
+    const prior = priors[name] as PowderPrior
+    const k = parameters.indexOf(name)
+    need(
+      Number.isFinite(prior.value) &&
+        prior.value > offset[k] &&
+        Number.isFinite(prior.sigma) &&
+        prior.sigma > 0,
+      `prior ${name}: value above ${offset[k] === 0 ? '0' : 'the floor'}, sigma above 0`,
+    )
+    return {
+      k,
+      sigma: prior.sigma,
+      centre: Math.log((prior.value - offset[k]) / (initial[k] - offset[k])),
+    }
+  })
 
   const charges = [...new Set(ladder.map((x) => x.charge))]
   const index = rows.map((o) => charges.indexOf(o.charge))
@@ -322,13 +398,19 @@ export function fitPowder(
   if (!first) throw new PowderFitError('invalid', rejected)
   const fit = logLeastSquares({
     parameterCount: parameters.length,
-    observed: rows.map((o) => o.value),
-    standardUncertainty: rows.map((o) => o.sigma),
+    observed: [...rows.map((o) => o.value), ...priorRows.map((x) => x.centre)],
+    standardUncertainty: [...rows.map((o) => o.sigma), ...priorRows.map((x) => x.sigma)],
     weighted: withSigma > 0,
-    // a Jacobian entry below 1e-6 of the observation per unit log parameter is noise
-    floor: rows.map((o) => (1e-6 * o.value) / o.sigma),
-    first,
-    predict: (trial) => evaluate(q(trial)),
+    // a Jacobian entry below 1e-6 of the observation per unit log parameter is noise; a prior row never is
+    floor: [...rows.map((o) => (1e-6 * o.value) / o.sigma), ...priorRows.map(() => 0)],
+    first: [...first, ...priorRows.map(() => 0)],
+    predict: (trial) => {
+      const out = evaluate(q(trial))
+      return out && [...out, ...priorRows.map((x) => trial[x.k])]
+    },
+    ...(options.huberThreshold === undefined
+      ? {}
+      : { huber: { threshold: options.huberThreshold, count: rows.length } }),
     maxIterations,
     maxCondition,
     fail: (reason, theta, extra = {}) => {
@@ -339,6 +421,10 @@ export function fitPowder(
     },
   })
   const values = q(fit.theta)
+  const priorChiSquare = priorRows.reduce(
+    (sum, x) => sum + ((fit.theta[x.k] - x.centre) / x.sigma) ** 2,
+    0,
+  )
   return {
     load: apply(values),
     parameters: parameters.map((name, k) => ({
@@ -350,6 +436,8 @@ export function fitPowder(
         : {}),
     })),
     ...(fit.correlation ? { correlation: fit.correlation } : {}),
+    ...(fit.covariance ? { covariance: fit.covariance } : {}),
+    weighted: withSigma > 0,
     residuals: rows.map((o, i) => ({
       kind: o.kind,
       charge: o.charge,
@@ -358,10 +446,114 @@ export function fitPowder(
       residual: fit.predicted[i] - o.value,
     })),
     chiSquare: fit.chiSquare,
+    dataChiSquare: rows.reduce(
+      (sum, o, i) => sum + ((fit.predicted[i] - o.value) / o.sigma) ** 2,
+      0,
+    ),
+    priorChiSquare,
+    loss: fit.loss,
     degreesOfFreedom: rows.length - parameters.length,
     conditionNumber: fit.conditionNumber,
     chargeRange: { min: Math.min(...charges), max: Math.max(...charges) },
     iterations: fit.iterations,
+    runCount,
+  }
+}
+
+/** Options of `predictPowder`. */
+export interface PowderPredictionOptions {
+  /** Coverage of the interval, in (0, 1); default 0.9. */
+  level?: number
+  /** Integration settings of the `interior` runs; use the fit's own, default `interiorDefaults`. */
+  options?: Partial<InteriorOptions>
+}
+
+/** A predicted value with its parameter uncertainty and interval. */
+export interface PowderPredictionBand {
+  /** Value of `interior` at the fitted parameters: m/s or Pa. */
+  value: number
+  /** Standard uncertainty from the parameter covariance only, same unit. */
+  standardUncertainty: number
+  /** Lower end of the interval, same unit. */
+  lower: number
+  /** Upper end of the interval, same unit. */
+  upper: number
+}
+
+/** Prediction of the fitted load at one charge; parameter uncertainty only, no model error. */
+export interface PowderPrediction {
+  /** Charge mass, kg. */
+  charge: number
+  /** Coverage of the intervals. */
+  level: number
+  /** Muzzle velocity. */
+  velocity: PowderPredictionBand
+  /** Peak breech pressure. */
+  pressure: PowderPredictionBand
+  /** Set where the charge lies outside the ladder's `chargeRange`: below or above it. */
+  extrapolation?: 'below' | 'above'
+  /** `interior` runs of the prediction. */
+  runCount: number
+}
+
+/**
+ * Muzzle velocity and peak breech pressure of a fitted powder at `charge`, with the standard
+ * uncertainty and the interval that the covariance of the fitted parameters gives
+ * (`apps/docs/docs/models/interior-powder-fit.md`, "Prediction at a charge"). Needs the covariance
+ * of the fit: a ladder with more rows than parameters or with velocity sigmas.
+ */
+export function predictPowder(
+  fit: PowderFit,
+  charge: number,
+  options: PowderPredictionOptions = {},
+): PowderPrediction {
+  const { level = 0.9 } = options
+  need(Number.isFinite(charge) && charge > 0, 'charge must be positive')
+  need(level > 0 && level < 1, 'level must lie in (0, 1)')
+  const { covariance } = fit
+  if (!covariance) throw new InputError('the fit has no covariance: add rows or velocity sigmas')
+  const names = fit.parameters.map((p) => p.name)
+  const { apply, q } = powderParameterMap(fit.load, names, startPressureFloor(fit.load))
+  let runCount = 0
+  const run = (theta: number[]) => {
+    runCount++
+    const r = interior({ ...apply(q(theta)), charge }, options.options)
+    if (!r.valid) throw new PowderFitError('invalid', { charge, result: r })
+    return [r.muzzleVelocity, r.peakBreechPressure]
+  }
+  const zero = names.map(() => 0)
+  const [velocity, pressure] = run(zero)
+  // gradient of both outputs in the log parameters, by central differences
+  const gradient = names.map((_, j) => {
+    const at = (d: number) => run(zero.map((x, k) => (k === j ? x + d : x)))
+    const [vu, pu] = at(1e-3)
+    const [vd, pd] = at(-1e-3)
+    return [(vu - vd) / 2e-3, (pu - pd) / 2e-3]
+  })
+  const quantile = fit.weighted
+    ? Math.sqrt(chiSquareQuantile(level, 1))
+    : studentTwoSidedQuantile(level, fit.degreesOfFreedom)
+  const band = (value: number, i: number): PowderPredictionBand => {
+    const variance = gradient.reduce(
+      (sum, gj, j) => sum + gj[i] * gradient.reduce((s, gk, k) => s + covariance[j][k] * gk[i], 0),
+      0,
+    )
+    const standardUncertainty = Math.sqrt(Math.max(variance, 0))
+    return {
+      value,
+      standardUncertainty,
+      lower: value - quantile * standardUncertainty,
+      upper: value + quantile * standardUncertainty,
+    }
+  }
+  const { min, max } = fit.chargeRange
+  return {
+    charge,
+    level,
+    velocity: band(velocity, 0),
+    pressure: band(pressure, 1),
+    ...(charge < min ? { extrapolation: 'below' as const } : {}),
+    ...(charge > max ? { extrapolation: 'above' as const } : {}),
     runCount,
   }
 }

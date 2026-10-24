@@ -1,4 +1,10 @@
-import { type Firearm, firearm, type Optic, type UserRecord } from '@openreloading/schema'
+import {
+  type Firearm,
+  firearm,
+  type Optic,
+  type OpticMount,
+  type UserRecord,
+} from '@openreloading/schema'
 import type { FieldSpec } from './field-spec.ts'
 import { formatNumber, formatQuantity, type UnitSystem, unitsOf, withUnit } from './units.ts'
 
@@ -70,10 +76,33 @@ export const mountFields = [
   },
 ] as const satisfies readonly FieldSpec[]
 
+/** The zero air and the drag factor of a mount, all optional. */
+export const zeroFields = [
+  { key: 'zeroTemperature', label: 'Zero temperature', quantity: 'temperature' },
+  {
+    key: 'zeroPressure',
+    label: 'Zero pressure',
+    help: 'Absolute station pressure, not reduced to sea level.',
+    quantity: 'airPressure',
+    min: 0,
+    positive: true,
+  },
+  { key: 'zeroHumidity', label: 'Zero humidity', quantity: 'percent', min: 0, max: 100 },
+  {
+    key: 'dragFactor',
+    label: 'Drag factor',
+    help: 'From truing: 100 % is the drag of the bullet as given.',
+    quantity: 'dragFactor',
+    min: 0,
+    positive: true,
+  },
+] as const satisfies readonly FieldSpec[]
+
 const labels: Record<string, string> = {
   ...Object.fromEntries(
-    [...firearmFields, ...opticFields, ...mountFields].map((s) => [s.key, s.label]),
+    [...firearmFields, ...opticFields, ...mountFields, ...zeroFields].map((s) => [s.key, s.label]),
   ),
+  dragFactorSource: 'Drag factor source',
   mounted: 'Mounted on',
   removed: 'Removed on',
 }
@@ -102,6 +131,7 @@ export function firearmProblem(name: string, f: Firearm): string | undefined {
   if (issue.code === 'custom') reason = issue.message[0].toLowerCase() + issue.message.slice(1)
   else if (issue.code === 'too_small' && issue.origin === 'number')
     reason = `must be ${issue.inclusive ? 'at least' : 'greater than'} ${issue.minimum}`
+  else if (issue.code === 'too_big' && field === 'zeroHumidity') reason = 'must be from 0 to 100 %'
   else if (issue.code === 'invalid_type')
     reason = issue.expected === 'int' ? 'must be a whole number' : 'enter a number'
   return `${labels[field] ?? field}${where}: ${reason}.`
@@ -124,9 +154,20 @@ export function freeId(prefix: string, taken: string[]) {
 type SightFill = {
   sightHeight: number
   zeroRange: number
+  /** The mounted optic's turret click, rad, with how the turrets are marked. */
+  click?: { value: number; unit?: 'MOA' | 'mrad' }
   twist?: number
   twistHand: 'right' | 'left'
-}
+} & Pick<OpticMount, (typeof zeroFillKeys)[number]>
+
+/** The mount values a choice fills beside sight height and zero range. */
+export const zeroFillKeys = [
+  'zeroTemperature',
+  'zeroPressure',
+  'zeroHumidity',
+  'dragFactor',
+  'dragFactorSource',
+] as const
 
 /**
  * Every mounted optic of the firearms among `records`, configuration by configuration, the active
@@ -157,16 +198,23 @@ const mountOption = (
  * active configuration of each firearm first.
  */
 export function sightOptions(records: UserRecord[]) {
-  return [...mountedOptics(records)].map((x) => ({
-    ...mountOption(x, x.f.optics.find((o) => o.id === x.m.optic)?.name ?? x.m.optic),
-    fill: {
-      sightHeight: x.m.sightHeight,
-      zeroRange: x.m.zeroRange,
-      // a twist of 0 is no twist
-      ...(x.f.twist && { twist: x.f.twist }),
-      twistHand: x.f.twistHand,
-    } as SightFill,
-  }))
+  return [...mountedOptics(records)].map((x) => {
+    const optic = x.f.optics.find((o) => o.id === x.m.optic)
+    return {
+      ...mountOption(x, optic?.name ?? x.m.optic),
+      fill: {
+        sightHeight: x.m.sightHeight,
+        zeroRange: x.m.zeroRange,
+        ...(optic?.clickValue && { click: { value: optic.clickValue, unit: optic.clickUnit } }),
+        ...Object.fromEntries(
+          zeroFillKeys.flatMap((k) => (x.m[k] === undefined ? [] : [[k, x.m[k]]])),
+        ),
+        // a twist of 0 is no twist
+        ...(x.f.twist && { twist: x.f.twist }),
+        twistHand: x.f.twistHand,
+      } as SightFill,
+    }
+  })
 }
 
 /**
@@ -193,7 +241,7 @@ export const twistText = (f: Firearm, system: UnitSystem) =>
   f.twist ? `1:${withUnit('twist', system, f.twist)}, ${f.twistHand}` : undefined
 
 /** An optic's click value in its turret marking, else in the units of `system`. */
-export function clickText(o: Optic, system: UnitSystem) {
+export function clickText(o: Pick<Optic, 'clickValue' | 'clickUnit'>, system: UnitSystem) {
   if (!o.clickValue) return
   const unit =
     o.clickUnit === 'MOA'

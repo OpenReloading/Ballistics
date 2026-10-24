@@ -34,6 +34,7 @@ Fastify HTTP API (TypeScript, ESM) exposing `@openreloading/core` and the data r
   - Absent without a value: `country` (ISO code of the manufacturer's country) of a powder or bullet, the bullet's `tipType` (the record's tip type) and `construction` (the record's construction structure, else the core material as `<material>-core`).
   - `GET /powders/:id`, `GET /bullets/:id`: the whole record.
 - `GET /target-faces`: `{ total, items: [{ id, organization, name, caliberClasses, categories }] }`, every face. `caliberClasses`: the caliber classes of the disciplines mapped to it. `categories`: those of its events and those disciplines. `GET /target-faces/:id`: the whole record.
+- The competition lists (`GET /federations`, `/disciplines`, `/target-faces`, `/target-mappings`) are sorted in `src/db/competition-queries.ts` with the comparators of `@openreloading/schema` (`src/competition-order.ts`), so the order is part of the answer.
 - `GET /federations`, `GET /disciplines?federation=`, `GET /target-mappings?discipline=&face=` and their `/:id` routes (`src/routes/federations.ts`): summaries and records as `apps/docs/docs/data/federations.md` lists them. An unknown filter id gives no items.
 
 Compute (`src/routes/compute.ts`):
@@ -49,7 +50,7 @@ Compute (`src/routes/compute.ts`):
 - 503: a compute deadline (`reason` `timeout`), a full queue or a worker that cannot be created (`reason` `busy`).
 - 500: other errors.
 - Documented NaN result fields are written as `null`.
-- Interior 200 responses carry `pressureRange` and `warnings`. A `limitExceeded` warning names its limit: the sheet id (`spec`), `symbol`, `variant` and `method`. A `ladder` (`chargeStep` kg, `stepCount`) answers `ladderSteps`. An optional `cartridge` id adds `limits` (the Pmax values of its sheet, `src/compute/limits.ts`): each carries `cartridge` (its id) and `revised` (the date of the sheet revision, `revised` or else `published`). `resolved.cartridge` is `{ id, name, provenance }`.
+- Interior 200 responses carry `pressureRange` and `warnings`; a single run with `sampling` also carries `sampled` (`apps/docs/docs/models/interior-sampled-band.md`; a ladder takes no sampling). A `limitExceeded` warning names its limit: the sheet id (`spec`), `symbol`, `variant` and `method`. A `ladder` (`chargeStep` kg, `stepCount`) answers `ladderSteps`. An optional `cartridge` id adds `limits` (the Pmax values of its sheet, `src/compute/limits.ts`): each carries `cartridge` (its id) and `revised` (the date of the sheet revision, `revised` or else `published`). `resolved.cartridge` is `{ id, name, provenance }`.
 - Interior responses with status 200, 422, 503 or a schema 400 carry `notice: "simulation, not load data"`.
 
 `POST /interior/charge-target` (`src/routes/charge-target.ts`, the run in `src/compute/charge-run.ts`, `src/compute/charge-schema.ts`):

@@ -11,8 +11,9 @@ import {
   sideName,
   storedValue,
 } from '@openreloading/drawing/cartridge'
-import type { CartridgeDesign } from '@openreloading/schema'
-import type { CartridgeDetail, SpecValue } from './api-types.ts'
+import { chamberOf } from '@openreloading/drawing/seating'
+import type { CartridgeDesign, SpecValue } from '@openreloading/schema'
+import type { CartridgeDetail } from './api-types.ts'
 import { drawable } from './cartridge-sheet.ts'
 import {
   close,
@@ -230,7 +231,7 @@ function draftValues({ fields, origin }: Design): SpecValue[] {
   const entered = (s: CartridgeFieldSpec, si: number): SpecValue => ({
     side: s.side,
     symbol: s.symbol,
-    quantity: s.quantity,
+    quantity: s.quantity as 'length' | 'angle',
     value: storedFieldValue(s, si),
   })
   for (const v of origin?.values ?? []) {
@@ -583,3 +584,21 @@ function derive(figure: Figure, values: SpecValue[]): Derived[] {
 /** Slider range of a field, SI: fixed per symbol, widened by a larger value. */
 export const sliderMax = (s: CartridgeFieldSpec, design: Design) =>
   Math.max(s.range, design.fields[s.key]?.si ?? 0)
+
+/**
+ * What a saved cartridge design gives the workbench: the spec its preview draws and seats in, the
+ * bore diameter (chamber F) and the approximate case volume, SI. Nothing comes from the catalogue
+ * record the design started from. Undefined where the design does not draw, is a shotshell (table
+ * VII) or lacks the cartridge L3 the seating needs.
+ */
+export function workbenchDesign(d: CartridgeDesign, name: string, system: UnitSystem) {
+  const design = fromFile(d, name, system)
+  const { spec, derived } = evaluate(design, system)
+  if (!spec || spec.table === 'VII' || !chamberOf(spec.values)) return
+  return {
+    spec,
+    title: `user design ${name}`,
+    boreDiameter: design.fields['chamber.F']?.si,
+    caseVolume: derived.find((x) => x.key === 'volume')?.si,
+  }
+}
