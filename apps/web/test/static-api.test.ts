@@ -1,8 +1,9 @@
-import { mkdtemp, readFile, rm } from 'node:fs/promises'
+import { mkdtemp, readdir, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { runTask, serializeError, type Task } from '@openreloading/api/compute'
 import { startBundleApi, writeStaticApi } from '@openreloading/api/static'
+import { sortKey } from '@openreloading/schema'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { chargeTargetExample } from '../../../packages/api/src/compute/charge-schema.ts'
 import { interiorExample } from '../../../packages/api/src/compute/interior-schema.ts'
@@ -30,7 +31,7 @@ class InlineWorker {
 beforeAll(async () => {
   api = await startBundleApi()
   dir = await mkdtemp(path.join(tmpdir(), 'static-api-'))
-  await writeStaticApi(api.app, dir)
+  await writeStaticApi(api.data, dir)
   // the data files as a static host serves them under the server edition's base path ''
   vi.stubGlobal('fetch', async (url: string) => {
     const file = path.join(dir, url.replace(/^\/api\//, ''))
@@ -121,6 +122,64 @@ describe('the Pages edition answers reads as the API', () => {
       }
   })
 
+  it('ranks a query in any word order the same, as the API does', async () => {
+    for (const [kind, words] of [
+      ['cartridges', ['win', '308']],
+      ['cartridges', ['7.62', 'x51']],
+      ['bullets', ['demo', '168']],
+      ['powders', ['powder', 'dp40']],
+    ] as const) {
+      const forward = await both(`${kind}?q=${words.join('%20')}&limit=200`)
+      const backward = await both(`${kind}?q=${[...words].reverse().join('%20')}&limit=200`)
+      expect(forward.file, kind).toEqual(forward.live)
+      expect(backward.file, kind).toEqual(backward.live)
+      expect(forward.file.body.items.length, kind).toBeGreaterThan(0)
+      expect(forward.file.body, kind).toEqual(backward.file.body)
+    }
+  })
+
+  it('lists every kind in the order of its sort key, as the API does', async () => {
+    for (const kind of ['cartridges', 'bullets', 'powders', 'manufacturers']) {
+      const { live, file } = await both(`${kind}?limit=200`)
+      expect(
+        file.body.items.map((i: { id: string }) => i.id),
+        kind,
+      ).toEqual(live.body.items.map((i: { id: string }) => i.id))
+    }
+    const { items } = (await both('cartridges?limit=200')).file.body as {
+      items: { name: string; id: string }[]
+    }
+    const keys = items.map((c) => sortKey(c.name))
+    expect(keys).toEqual(keys.toSorted((a, b) => (a < b ? -1 : a > b ? 1 : 0)))
+  })
+
+  it('filters cartridges by table, disciplines by federation and target mappings by discipline and face', async () => {
+    const tables = new Set(
+      ((await both('cartridges?limit=200')).live.body.items as { table: string }[]).map(
+        (c) => c.table,
+      ),
+    )
+    for (const table of [...tables, 'XX']) {
+      const { live, file } = await both(`cartridges?table=${table}&limit=200`)
+      expect(file, table).toEqual(live)
+    }
+    const federations = (await both('federations')).live.body.items as { id: string }[]
+    for (const { id } of [...federations, { id: 'unknown' }]) {
+      const { live, file } = await both(`disciplines?federation=${id}`)
+      expect(file, id).toEqual(live)
+    }
+    const mappings = (await both('target-mappings')).live.body.items as {
+      discipline: string
+      face: string
+    }[]
+    for (const m of mappings.slice(0, 20))
+      for (const query of [`discipline=${m.discipline}`, `face=${m.face}`, `both`]) {
+        const q = query === 'both' ? `discipline=${m.discipline}&face=${m.face}` : query
+        const { live, file } = await both(`target-mappings?${q}`)
+        expect(file, q).toEqual(live)
+      }
+  })
+
   it('keeps the bullets that fit each cartridge as the API does', async () => {
     const { items } = (await both('cartridges?limit=200')).live.body as {
       total: number
@@ -154,10 +213,27 @@ describe('the Pages edition answers reads as the API', () => {
       'bullets?cartridge=..%2F..%2Fx',
       'bullets?manufacturer=Not_An_Id',
       'powders?manufacturer=Not_An_Id',
+      'cartridges?table=',
+      'cartridges?table=toolongvalue',
+      'disciplines?federation=Not_An_Id',
+      'target-mappings?face=Not_An_Id',
+      'target-mappings?discipline=Not_An_Id',
     ]) {
       const { live, file } = await both(query)
       expect([file.status, query]).toEqual([live.status, query])
     }
+  })
+})
+
+describe('the data files of the Pages edition', () => {
+  it('are the catalogue index and one file per record, no list, search or per-cartridge file', async () => {
+    const files = await readdir(dir, { recursive: true })
+    expect(files).toContain(path.join('catalogue', 'index.json'))
+    expect(files).toContain(path.join('cartridges', '308-win.json'))
+    expect(files.filter((f) => /search\.json$|(^|\/)index\.json$/.test(f))).toEqual([
+      path.join('catalogue', 'index.json'),
+    ])
+    expect(files.some((f) => f.startsWith(path.join('bullets', 'cartridge')))).toBe(false)
   })
 })
 

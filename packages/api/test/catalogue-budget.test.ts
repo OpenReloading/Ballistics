@@ -1,4 +1,5 @@
 import { performance } from 'node:perf_hooks'
+import { gzipSync } from 'node:zlib'
 import { describe, expect, it } from 'vitest'
 import { loadBundle } from '../src/bundle.ts'
 import { buildCatalogue } from '../src/catalogue/build.ts'
@@ -37,5 +38,11 @@ describe('catalogue budgets', () => {
     const catalogue = openCatalogue(buildCatalogue(bundle))
     expect(catalogue.cartridges({ q: 'win 308', limit: 50 }).total).toBeGreaterThan(0)
     expect(best(() => catalogue.cartridges({ q: 'win 308', limit: 50 }))).toBeLessThan(5)
+  })
+
+  it('keeps the index the Pages edition downloads under 600 KB, 80 KB gzipped', () => {
+    const text = Buffer.from(JSON.stringify(buildCatalogue(bundle).index))
+    expect(text.length).toBeLessThan(600_000)
+    expect(gzipSync(text).length).toBeLessThan(80_000)
   })
 })
