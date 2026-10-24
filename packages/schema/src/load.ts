@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { recordId } from './ids.ts'
+import { recordId, ref } from './ids.ts'
 import { provenance } from './provenance.ts'
 import { quantity } from './units.ts'
 
@@ -14,12 +14,7 @@ const component = {
 export const load = z.object({
   id: recordId,
   cartridge: recordId,
-  firearm: z.object({
-    name: z.string().min(1),
-    barrelLength: quantity('length'),
-    twist: quantity('length').optional(),
-    twistHand: z.enum(['right', 'left']).optional(),
-  }),
+  firearm: ref('firearm').optional(),
   bullet: z.object({ ...component, model: z.string().min(1), bulletMass: quantity('mass') }),
   powder: z.object({ ...component, name: z.string().min(1) }),
   /** Powder mass of one round. */

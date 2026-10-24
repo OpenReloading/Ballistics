@@ -346,7 +346,15 @@ describe('refNote', () => {
     id: 'f1',
     name: 'Rifle',
     saved,
-    data: { name: 'Rifle', barrelLength: 0.6, twist: 0.25, twistHand: 'right' },
+    data: {
+      origin: 'user',
+      name: 'Rifle',
+      barrelLength: { value: 600 },
+      twist: { value: 250 },
+      twistHand: 'right',
+      optics: [],
+      configurations: [],
+    },
   } as UserRecord
 
   it('names the records whose reference points at no record', () => {

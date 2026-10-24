@@ -39,3 +39,9 @@ export function parseRef(text: string): { scope: RefScope; id: string } | undefi
   const i = text.indexOf(':')
   return { scope: text.slice(0, i) as RefScope, id: text.slice(i + 1) }
 }
+
+/** A reference to a catalogue record only: `"catalogue:<record id>"`. */
+export const catalogueRef = (kind: string) =>
+  ref(kind)
+    .regex(/^catalogue:/, `Not a catalogue ${kind}`)
+    .describe(`Reference \`catalogue:<record id>\` to a catalogue ${kind}.`)

@@ -6,7 +6,7 @@ import {
   trajectory,
 } from '@open-reloading/core'
 import { bulletDimensions } from '@open-reloading/drawing/bullet'
-import { sheetId, userRecord } from '@open-reloading/schema'
+import { firearm, sheetId, userRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import {
   exampleChamberVolume,
@@ -22,6 +22,7 @@ import {
 } from '../src/lib/example-data.ts'
 import { exampleFields, quickCartridges } from '../src/lib/examples.ts'
 import { siValues } from '../src/lib/field-spec.ts'
+import { gunValues, siOf } from '../src/lib/firearm.ts'
 import { interiorBody, interiorFields } from '../src/lib/interior-input.ts'
 import { productLabel } from '../src/lib/manufacturers.ts'
 import { powderModelValues } from '../src/lib/powder-record.ts'
@@ -169,16 +170,17 @@ describe('start-card cartridges', () => {
 describe('example rifle', () => {
   it('is a valid firearm record with the example cartridge, barrel, twist, sight height and zero', () => {
     expect(userRecord.safeParse(exampleFirearm).success).toBe(true)
-    expect(exampleFirearm.data.cartridge).toBe(loadExample?.cartridge.id)
+    expect(exampleFirearm.data.cartridge).toBe(`catalogue:${loadExample?.cartridge.id}`)
     expect(loadExample?.firearm).toBe(exampleFirearm)
     const [mount] = exampleFirearm.data.configurations[0].mounts
-    expect(mount.sightHeight).toBe(exampleTrajectory.sightHeight)
-    expect(mount.zeroRange).toBe(exampleTrajectory.zeroRange)
-    expect(exampleFirearm.data.twist).toBe(exampleTrajectory.twist)
-    expect(exampleFirearm.data.twist).toBe(exampleInterior.twist)
-    expect(exampleFirearm.data.barrelLength).toBeCloseTo(exampleSeating.barrel, 9)
-    expect(exampleFirearm.data.firearmMass).toBe(7)
-    expect(loadExample?.firearmMass).toBe(exampleFirearm.data.firearmMass)
+    const gun = gunValues(firearm.parse(exampleFirearm.data))
+    expect(siOf('length', mount.sightHeight)).toBeCloseTo(exampleTrajectory.sightHeight, 12)
+    expect(siOf('length', mount.zeroRange)).toBeCloseTo(exampleTrajectory.zeroRange, 12)
+    expect(gun.twist).toBeCloseTo(exampleTrajectory.twist, 12)
+    expect(gun.twist).toBeCloseTo(exampleInterior.twist, 12)
+    expect(gun.barrelLength).toBeCloseTo(exampleSeating.barrel, 9)
+    expect(gun.firearmMass).toBeCloseTo(7, 12)
+    expect(loadExample?.firearmMass).toBeCloseTo(gun.firearmMass as number, 12)
     // the measured case capacity (water, m³) and the seating ladder step the example fills
     expect(loadExample?.waterCapacity).toBeCloseTo(
       (exampleRecords.capacity.water / waterDensityGramsPerCm3) * 1e-6,

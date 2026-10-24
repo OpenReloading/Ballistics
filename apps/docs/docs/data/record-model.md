@@ -25,7 +25,7 @@ Writers: catalogue (git records, checked by `readRecords`), user (browser, `pack
 | Federation, discipline, target mapping, target face | `federation.ts`, `target-face.ts` | one folder each | catalogue |
 | Caliber class | `caliber-class.ts` | code only (a constant) | developer |
 | Load tables | none | `load-tables.json` of a records root | catalogue |
-| Firearm | `firearm.ts` | user record `firearm` | user |
+| Firearm | `firearm.ts` | user record `firearm`, in the stored units (step 5) | user |
 | Workbench state | `workbench.ts` | user record `workbenchState`, called "loads" in the UI | user |
 | User bullet | `user-data.ts` (`bullet`) | user record: `basedOn` and `overrides` of a Bullet (step 4) | user |
 | User cartridge | `user-data.ts` (`cartridge`) | user record: `basedOn` and `overrides` of a Cartridge (step 4) | user |
@@ -43,7 +43,7 @@ Ranked by how much code and visible behavior depends on them.
 
 **Load and workbench state (high).** Both are a recipe: cartridge, firearm, bullet, powder, charge, seating, notes. `Load` is validated and bundled but nothing creates or reads one. The workbench state references catalogue ids and keeps a snapshot of every resolved solver value in `siValues`, a record that accepts any key (the API checks the keys, `packages/api/src/compute/load-file.ts`). Whether the catalogue or the snapshot wins on reopening depends on call order in `openLoad`.
 
-**Firearm (medium).** Barrel length, twist and twist hand exist in `Load.firearm` (mm), in the user firearm record (m, twist hand required) and as free text in `firing.ts`.
+**Firearm (medium).** Barrel length, twist and twist hand existed in `Load.firearm` (mm), in the user firearm record (m, twist hand required) and as free text in `firing.ts`. Step 5 leaves one shape; the free text of a firing series stays.
 
 **Measured series and chronograph session (medium).** Both hold the same `chronoShot`. `apps/web/src/lib/measurements.ts` reshapes a session into a series and drops device kind, firmware, conditions, propellant temperature and provenance. A string in a ladder varies charge, seating depth or temperature while `shotString.load` has no place for the variation. `groupShot.chrono.session` in `target-sheet.ts` names a session that no user record kind holds.
 
@@ -83,7 +83,7 @@ The finer standing of a citation (manufacturer, public, community) stays in `pro
 | Cartridge | catalogue, user | a user cartridge is `basedOn` plus `overrides` of the `values`, or standalone |
 | Bullet | catalogue, user, shared | the designer edits a Bullet |
 | Powder | catalogue, user, shared | a user powder overrides `interior` and `temperatureSensitivity`, which replaces the powder values hidden in `siValues` |
-| Firearm | catalogue (later), user, shared | optics and configurations stay embedded |
+| Firearm | catalogue (later), user, shared | `manufacturer` is a `catalogue:` reference; optics and configurations stay embedded |
 | CaseCapacity | catalogue, user | one unit, g |
 | Load | catalogue, user, shared | references to cartridge, firearm, bullet, powder and capacity; primer and case as component descriptions; seating; charge; a typed `analysis` with `overrides` and the ladder |
 | Session | catalogue, user, shared | an event: strings of `{load, variation, shots}`, conditions, device, provenance with the imported file's SHA-256 |
@@ -150,7 +150,7 @@ Each step lands alone with its model page updated in the same commit. Steps 4 to
 | 2 | One unit table: `toSi` and `fromSi` per quantity kind (done, below) | |
 | 3 | Id and reference primitives, `checkUserRefs` (done, below) | |
 | 4 | Designs become overrides of Bullet and Cartridge (done, below) | 1, 3 |
-| 5 | Firearm in one shape | 2 |
+| 5 | Firearm in one shape (done, below) | 2 |
 | 6 | Load unification: the workbench state becomes Load | 2 to 5 |
 | 7 | Session unification | 3, 6 |
 | 8 | CaseCapacity references | 6 |
@@ -191,6 +191,13 @@ Steps 1, 2 and 11 go first, then 3, then 4 to 6, then 7 to 9. Steps 10 and 12 fi
 - A workbench state's `cartridge` and `bullet` take a plain catalogue id (as before) or a reference. A load saved on a design keeps `user:<UUID>` and reopens with the design resolved against its base. `checkUserRefs` also reports such a reference when no user record answers it. A design whose id is no UUID (an older record) cannot be referenced and a load made on it keeps no design.
 - A load file sent to `POST /v1/interior/load-file` and the compute routes take the catalogue reference of a cartridge or bullet and refuse a `user:` reference (400 at `records[i].data.cartridge` or `.bullet`): a user record is resolved in the browser, never on the server. The OpenAPI baseline is rewritten for this.
 - Not part of this step: the "base changed" display and the build hash in `basedOn` (the API answers records without a `revision`), and share links that carry `user:` references.
+
+### Step 5: what changed
+
+- `firearm` (`packages/schema/src/firearm.ts`) is the one firearm shape. Lengths are `quantity('length')` objects in mm, the mass `quantity('mass')` in g, click value, travel and cant `quantity('angle')` in degrees, a mount's zero air `quantity('temperature')` in degC, `quantity('pressure')` in bar and `quantity('relativeHumidity')` in %. The drag factor, magnifications and round count are plain numbers. The envelope field `origin` (`catalogue`, `user`, `shared`) is required, so a firearm of the old SI format fails the schema instead of reading as a firearm 1000 times too short. The user record of kind `firearm` carries it as `data`; no migration, an old record stays in the store as an invalid one.
+- `manufacturer` is a `catalogue:<id>` reference to a manufacturer record, `cartridge` a reference (`catalogue:<id>` or `user:<UUID>`). `manufacturerName` stays as free text for a maker no record exists for, until step 9 makes user manufacturers. A `user:` manufacturer reference is refused, since no record kind answers it.
+- `Load` drops its inline `firearm` (name, barrel length, twist, hand) for an optional `firearm` reference. No catalogue firearm kind exists yet, so no reference check reads it.
+- The web app converts at its edges: `siOf`, `storedOf`, `fieldSi` and `fieldStored` (`apps/web/src/lib/firearm.ts`) go through `toSi` and `fromSi`, the sight, click and Gun card values stay SI where the solver forms read them, and the editor stores a field only when it is edited, so values the user did not touch keep the exact stored number. Not part of this step: the workbench state's `firearm` (a local id until step 6) and its `siValues` entry `firearmMass` (kg).
 
 ## Decisions
 

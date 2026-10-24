@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
+import { z } from 'zod'
 import {
   checkUserRefs,
+  firearm,
+  units,
   userDataFile,
   userDataFormat,
   userDataVersion,
@@ -54,15 +57,23 @@ const firearmRecord = {
   name: 'Range rifle',
   saved,
   data: {
+    origin: 'user',
     name: 'Range rifle',
+    manufacturer: 'catalogue:test-maker',
     manufacturerName: 'Manufacturer',
-    cartridge: '308-win',
-    barrelLength: 0.61,
-    twist: 0.254,
+    cartridge: 'catalogue:308-win',
+    barrelLength: { value: 610 },
+    twist: { value: 254 },
     twistHand: 'right',
     roundCount: 1200,
     optics: [
-      { id: 'o1', kind: 'scope', name: '5-25x56', clickUnit: 'mrad', clickValue: 1e-4 },
+      {
+        id: 'o1',
+        kind: 'scope',
+        name: '5-25x56',
+        clickUnit: 'mrad',
+        clickValue: { value: 0.00573 },
+      },
       { id: 'o2', kind: 'redDot', name: 'Offset dot' },
     ],
     configurations: [
@@ -70,8 +81,14 @@ const firearmRecord = {
         id: 'c1',
         name: 'Scope and dot',
         mounts: [
-          { optic: 'o1', sightHeight: 0.055, zeroRange: 100 },
-          { optic: 'o2', sightHeight: 0.04, lateralOffset: 0.03, cant: Math.PI / 4, zeroRange: 50 },
+          { optic: 'o1', sightHeight: { value: 55 }, zeroRange: { value: 100000 } },
+          {
+            optic: 'o2',
+            sightHeight: { value: 40 },
+            lateralOffset: { value: 30 },
+            cant: { value: 45 },
+            zeroRange: { value: 50000 },
+          },
         ],
         mounted: '2026-04-01',
       },
@@ -393,7 +410,7 @@ describe('firearm', () => {
     expect(paths({ configurations: [{ ...config, mounts: [] }] })).toEqual([
       'data.configurations.0.mounts',
     ])
-    expect(paths({ twist: Number.POSITIVE_INFINITY })).toEqual(['data.twist'])
+    expect(paths({ twist: { value: Number.POSITIVE_INFINITY } })).toEqual(['data.twist.value'])
     expect(paths({ twistHand: 'up' })).toEqual(['data.twistHand'])
     expect(paths({ roundCount: 1.5 })).toEqual(['data.roundCount'])
   })
@@ -418,14 +435,14 @@ describe('firearm', () => {
     expect(paths(dated('2026-05-01', '2026-04-30'))).toEqual(['data.configurations.0.removed'])
     expect(paths(dated('2026-05-01', '2026-05-01'))).toBeUndefined()
     // also while another field of the configuration is not valid
-    const unzeroed = { ...config.mounts[0], zeroRange: 0 }
+    const unzeroed = { ...config.mounts[0], zeroRange: { value: 0 } }
     expect(
       paths({
         configurations: [
           { ...config, mounts: [unzeroed], mounted: '2026-05-01', removed: '2026-04-30' },
         ],
       }),
-    ).toEqual(['data.configurations.0.mounts.0.zeroRange', 'data.configurations.0.removed'])
+    ).toEqual(['data.configurations.0.mounts.0.zeroRange.value', 'data.configurations.0.removed'])
   })
 
   it('rejects a null optic or configuration without running their checks on it', () => {
@@ -440,9 +457,9 @@ describe('firearm', () => {
       configurations: [{ ...config, mounts: [{ ...config.mounts[0], ...m }] }],
     })
     const zero = {
-      zeroTemperature: 288.15,
-      zeroPressure: 101325,
-      zeroHumidity: 0.5,
+      zeroTemperature: { value: 15 },
+      zeroPressure: { value: 1013.25 },
+      zeroHumidity: { value: 50 },
       dragFactor: 1.034,
       dragFactorSource: 'Truing session of 2026-09-14',
     }
@@ -454,24 +471,56 @@ describe('firearm', () => {
       expect(JSON.parse(JSON.stringify(parsed))).toEqual(parsed)
     })
 
-    it('rejects a non-positive factor, a humidity outside 0 to 1 and a non-positive air', () => {
-      const at = (key: string) => `data.configurations.0.mounts.0.${key}`
+    it('rejects a non-positive factor, a humidity outside 0 to 100 and an air below its floor', () => {
+      const at = (key: string, leaf = '.value') => `data.configurations.0.mounts.0.${key}${leaf}`
       for (const [key, bad] of [
-        ['dragFactor', 0],
-        ['dragFactor', -1],
         ['zeroHumidity', -0.01],
-        ['zeroHumidity', 1.01],
-        ['zeroTemperature', 0],
+        ['zeroHumidity', 100.01],
+        ['zeroTemperature', -273.15],
         ['zeroPressure', -1],
       ] as const)
-        expect(paths(mountWith({ [key]: bad }))).toEqual([at(key)])
-      expect(paths(mountWith({ zeroHumidity: 0 }))).toBeUndefined()
-      expect(paths(mountWith({ zeroHumidity: 1 }))).toBeUndefined()
+        expect(paths(mountWith({ [key]: { value: bad } }))).toEqual([at(key)])
+      for (const bad of [0, -1])
+        expect(paths(mountWith({ dragFactor: bad }))).toEqual([at('dragFactor', '')])
+      expect(paths(mountWith({ zeroHumidity: { value: 0 } }))).toBeUndefined()
+      expect(paths(mountWith({ zeroHumidity: { value: 100 } }))).toBeUndefined()
+      // below 0 degC is a valid zero
+      expect(paths(mountWith({ zeroTemperature: { value: -20 } }))).toBeUndefined()
     })
   })
 
   it('keeps a firearm without optics', () => {
     expect(paths({ optics: [], configurations: [], active: undefined })).toBeUndefined()
+  })
+
+  it('refuses the old SI shape: plain numbers in m and no origin', () => {
+    const { origin: _, ...rest } = firearmRecord.data
+    expect(paths({ barrelLength: 0.61 })).toEqual(['data.barrelLength'])
+    expect(paths({ cartridge: '308-win' })).toEqual(['data.cartridge'])
+    expect(userRecord.safeParse({ ...firearmRecord, data: rest }).success).toBe(false)
+  })
+
+  it('takes a catalogue maker only, and one schema for every origin', () => {
+    expect(paths({ manufacturer: 'user:2f6c1f3e-9b5a-4a8e-8f21-3c1d7a5b9e10' })).toEqual([
+      'data.manufacturer',
+    ])
+    for (const origin of ['catalogue', 'user', 'shared'])
+      expect(firearm.safeParse({ ...firearmRecord.data, origin }).success).toBe(true)
+    expect(paths({ origin: 'cloud' })).toEqual(['data.origin'])
+  })
+
+  it('stores every quantity in the one unit of its kind', () => {
+    const props = z.toJSONSchema(firearm).properties as Record<string, { unit?: string }>
+    expect(
+      Object.fromEntries(
+        ['barrelLength', 'twist', 'grooveDiameter', 'firearmMass'].map((k) => [k, props[k].unit]),
+      ),
+    ).toEqual({
+      barrelLength: units.length,
+      twist: units.length,
+      grooveDiameter: units.length,
+      firearmMass: units.mass,
+    })
   })
 })
 

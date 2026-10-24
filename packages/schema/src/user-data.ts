@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { firearm } from './firearm.ts'
-import { parseRef, ref } from './ids.ts'
+import { catalogueRef, parseRef } from './ids.ts'
 import { bulletOverrides, cartridgeOverrides } from './overrides.ts'
 import { text } from './shared.ts'
 import { faceColour } from './target-face.ts'
@@ -13,12 +13,10 @@ export const userDataFormat = 'openreloading-user-data'
 export const userDataVersion = 1
 
 /** A reference to the catalogue record a user variant is based on. */
-const catalogueRef = (kind: string) =>
-  ref(kind)
-    .regex(/^catalogue:/, 'A user variant is based on a catalogue record')
-    .describe(
-      `Reference \`catalogue:<record id>\` to the catalogue ${kind} the record is based on. Its fields not in \`overrides\` follow that record.`,
-    )
+const basedOnRef = (kind: string) =>
+  catalogueRef(kind).describe(
+    `Reference \`catalogue:<record id>\` to the catalogue ${kind} the record is based on. Its fields not in \`overrides\` follow that record.`,
+  )
 
 /**
  * A bullet of the user: the catalogue bullet it is based on and the fields it overrides, or the
@@ -30,7 +28,7 @@ export const userBullet = z.object({
   manufacturerName: text(200).describe(
     'Manufacturer name, free text until manufacturers are records.',
   ),
-  basedOn: catalogueRef('bullet').optional(),
+  basedOn: basedOnRef('bullet').optional(),
   overrides: bulletOverrides
     .describe(
       'The fields that differ from the base record, or all fields without one. A `null` removes a field of the base.',
@@ -45,7 +43,7 @@ export const userBullet = z.object({
  */
 export const userCartridge = z.object({
   origin: z.literal('user').describe('Where the record lives: `user`.'),
-  basedOn: catalogueRef('cartridge').optional(),
+  basedOn: basedOnRef('cartridge').optional(),
   overrides: cartridgeOverrides
     .describe(
       'The fields and spec values that differ from the base record, or all of them without one. A value with `null` removes the base value of its side, symbol and variant.',
@@ -121,7 +119,7 @@ export const userRecord = z.discriminatedUnion('kind', [
   record('bullet', 'A bullet of the bullet designer.', userBullet),
   record('cartridge', 'A cartridge of the cartridge designer.', userCartridge),
   record('workbenchState', 'A load of the workbench.', workbenchState),
-  record('firearm', 'A firearm of the library: lengths in m, mass in kg, angles in rad.', firearm),
+  record('firearm', 'A firearm of the library, in stored units.', firearm),
   record('targetSheet', 'A target sheet with its calibration and shot groups.', targetSheet),
   record('targetFaceDesign', 'A target face of the face designer.', targetFaceDesign),
 ])

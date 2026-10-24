@@ -49,7 +49,7 @@ import {
   siValues,
 } from '../lib/field-spec.ts'
 import type { FigureView } from '../lib/figure-views.ts'
-import { sightOptions } from '../lib/firearm.ts'
+import { gunValues, sightOptions } from '../lib/firearm.ts'
 import {
   cartridgeClass,
   type FollowKey,
@@ -172,6 +172,8 @@ const cartridgeChoice = (c: CartridgeDetail): CartridgeChoice => ({
 })
 
 /** An answer of `POST /interior`: the response and its body, a result or an error body. */
+type FirearmRecord = Extract<UserRecord, { kind: 'firearm' }>
+
 type Answer = { res: Response; json: (InteriorResponse & ErrorBody) | undefined }
 
 /** The load workbench's state and actions: inputs, records, seating, ladder, run and result. */
@@ -244,17 +246,15 @@ export function useWorkbenchState() {
   /** The browser's cartridge designs that draw a case and chamber. */
   const [cartridgeDesigns, setCartridgeDesigns] = useState<UserCartridgeView[]>([])
   /** The firearm library of this browser, for the Gun and barrel picker. */
-  const [firearms, setFirearms] = useState<Extract<UserRecord, { kind: 'firearm' }>[]>([])
+  const [firearms, setFirearms] = useState<FirearmRecord[]>([])
   const [firearm, setFirearm] = useState<string>()
   /** The name the user typed; undefined: the generated name follows the load. */
   const [customName, setCustomName] = useState<string>()
   const [figureView, setFigureView] = useState<FigureView>('cartridge')
   /** The library, with the example's built-in rifle while the example is loaded. */
-  const firearmList: {
-    id: string
-    name: string
-    data: { twist?: number; barrelLength?: number; firearmMass?: number }
-  }[] = firearm === loadExample.firearm.id ? [loadExample.firearm, ...firearms] : firearms
+  const firearmList = (
+    firearm === loadExample.firearm.id ? [loadExample.firearm, ...firearms] : firearms
+  ).map((r) => ({ id: r.id, name: r.name, data: gunValues((r as FirearmRecord).data) }))
   /** The chosen firearm's active sight, for the Trajectory tab. */
   const chosenSight = sightOptions(
     [loadExample.firearm, ...firearms].filter((r) => r.id === firearm) as UserRecord[],

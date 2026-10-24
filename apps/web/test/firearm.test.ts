@@ -1,15 +1,19 @@
 import type { UserRecord } from '@open-reloading/schema'
-import { userRecord } from '@open-reloading/schema'
+import { toSi, userRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import {
   activeClick,
   blankFirearm,
   cardFacts,
+  catalogueCartridgeId,
   clickOptions,
   clickText,
+  fieldSi,
+  fieldStored,
   firearmCells,
   firearmProblem,
   freeId,
+  gunValues,
   sightOptions,
 } from '../src/lib/firearm.ts'
 import { presetUnits } from '../src/lib/units.ts'
@@ -21,21 +25,26 @@ const rifle: UserRecord = {
   name: 'Range rifle',
   saved,
   data: {
+    origin: 'user',
     name: 'Range rifle',
-    twist: 0.254,
+    twist: { value: 254 },
     twistHand: 'left',
     optics: [
       { id: 'o1', kind: 'scope', name: 'Scope' },
       { id: 'o2', kind: 'redDot', name: 'Dot' },
     ],
     configurations: [
-      { id: 'c1', name: 'Winter', mounts: [{ optic: 'o1', sightHeight: 0.05, zeroRange: 200 }] },
+      {
+        id: 'c1',
+        name: 'Winter',
+        mounts: [{ optic: 'o1', sightHeight: { value: 50 }, zeroRange: { value: 200000 } }],
+      },
       {
         id: 'c2',
         name: 'Summer',
         mounts: [
-          { optic: 'o1', sightHeight: 0.055, zeroRange: 100 },
-          { optic: 'o2', sightHeight: 0.04, zeroRange: 50 },
+          { optic: 'o1', sightHeight: { value: 55 }, zeroRange: { value: 100000 } },
+          { optic: 'o2', sightHeight: { value: 40 }, zeroRange: { value: 50000 } },
         ],
       },
     ],
@@ -48,11 +57,16 @@ const carbine: UserRecord = {
   name: 'Carbine',
   saved,
   data: {
+    origin: 'user',
     name: 'Carbine',
     twistHand: 'right',
     optics: [{ id: 'o1', kind: 'ironSights', name: 'Irons' }],
     configurations: [
-      { id: 'c1', name: 'Irons', mounts: [{ optic: 'o1', sightHeight: 0.07, zeroRange: 25 }] },
+      {
+        id: 'c1',
+        name: 'Irons',
+        mounts: [{ optic: 'o1', sightHeight: { value: 70 }, zeroRange: { value: 25000 } }],
+      },
     ],
   },
 }
@@ -74,7 +88,7 @@ describe('sightOptions', () => {
     expect(new Set(options.map((o) => o.value)).size).toBe(4)
   })
 
-  it('fills sight height and zero range of the mount and the twist of the firearm', () => {
+  it('fills sight height and zero range of the mount and the twist of the firearm, in SI', () => {
     expect(options[1].fill).toEqual({
       sightHeight: 0.04,
       zeroRange: 50,
@@ -85,13 +99,23 @@ describe('sightOptions', () => {
   })
 
   it('fills the zero air and the drag factor with its source of a mount that has them', () => {
-    const zeroed = {
-      zeroTemperature: 303.15,
-      zeroPressure: 98000,
-      zeroHumidity: 0.4,
+    const stored = {
+      zeroTemperature: { value: 30 },
+      zeroPressure: { value: 0.98 },
+      zeroHumidity: { value: 40 },
       dragFactor: 1.034,
       dragFactorSource: 'Truing session of 2026-09-14',
     }
+    const zeroed = {
+      zeroTemperature: toSi('temperature', 30),
+      zeroPressure: toSi('pressure', 0.98),
+      zeroHumidity: toSi('relativeHumidity', 40),
+      dragFactor: 1.034,
+      dragFactorSource: 'Truing session of 2026-09-14',
+    }
+    expect(zeroed.zeroTemperature).toBeCloseTo(303.15, 9)
+    expect(zeroed.zeroPressure).toBeCloseTo(98000, 6)
+    expect(zeroed.zeroHumidity).toBeCloseTo(0.4, 12)
     const data = (rifle as Extract<UserRecord, { kind: 'firearm' }>).data
     const [scope, dot] = data.configurations[1].mounts
     const withZero = {
@@ -100,7 +124,7 @@ describe('sightOptions', () => {
         ...data,
         configurations: [
           data.configurations[0],
-          { ...data.configurations[1], mounts: [{ ...scope, ...zeroed }, dot] },
+          { ...data.configurations[1], mounts: [{ ...scope, ...stored }, dot] },
         ],
       },
     } as UserRecord
@@ -111,7 +135,7 @@ describe('sightOptions', () => {
   })
 
   it('does not fill a twist of 0', () => {
-    const flat = { ...rifle, data: { ...rifle.data, twist: 0 } } as UserRecord
+    const flat = { ...rifle, data: { ...rifle.data, twist: { value: 0 } } } as UserRecord
     expect(sightOptions([flat])[0].fill).not.toHaveProperty('twist')
   })
 })
@@ -134,7 +158,7 @@ describe('firearm helpers', () => {
       problem({
         configurations: [
           winter,
-          { ...summer, mounts: [summer.mounts[0], { ...dot, zeroRange: 0 }] },
+          { ...summer, mounts: [summer.mounts[0], { ...dot, zeroRange: { value: 0 } }] },
         ],
       }),
     ).toBe('Zero range in configuration Summer, mount 2: must be greater than 0.')
@@ -149,11 +173,11 @@ describe('firearm helpers', () => {
     expect(problem(zeroed({ dragFactor: 0 }))).toBe(
       'Drag factor in configuration Summer, mount 1: must be greater than 0.',
     )
-    expect(problem(zeroed({ zeroHumidity: 1.2 }))).toBe(
+    expect(problem(zeroed({ zeroHumidity: { value: 120 } }))).toBe(
       'Zero humidity in configuration Summer, mount 1: must be from 0 to 100 %.',
     )
     expect(problem({ roundCount: 1.5 })).toBe('Round count: must be a whole number.')
-    expect(problem({ firearmMass: 0 })).toBe('Mass: must be greater than 0.')
+    expect(problem({ firearmMass: { value: 0 } })).toBe('Mass: must be greater than 0.')
     expect(
       problem({
         optics: [{ ...data.optics[0], minMagnification: 25, maxMagnification: 5 }, data.optics[1]],
@@ -171,6 +195,42 @@ describe('firearm helpers', () => {
   })
 })
 
+describe('stored units at the form edge', () => {
+  it('converts a stored field to SI and back, a plain number as it is', () => {
+    const barrel = { quantity: 'barrelLength' } as const
+    expect(fieldSi(barrel, { value: 610 })).toBe(0.61)
+    expect(fieldStored(barrel, 0.61)).toEqual({ value: 610 })
+    // no noise from the round trip in what is saved
+    expect(fieldStored(barrel, 0.055)).toEqual({ value: 55 })
+    const humidity = { quantity: 'percent' } as const
+    expect(fieldSi(humidity, { value: 40 })).toBeCloseTo(0.4, 12)
+    expect(fieldStored(humidity, 0.4)).toEqual({ value: expect.closeTo(40, 9) })
+    const factor = { quantity: 'dragFactor' } as const
+    expect(fieldSi(factor, 1.034)).toBe(1.034)
+    expect(fieldStored(factor, 1.034)).toBe(1.034)
+    expect(fieldSi(barrel, undefined)).toBeUndefined()
+    expect(fieldStored(barrel, undefined)).toBeUndefined()
+  })
+
+  it('gives the Gun card twist, barrel length and mass in SI', () => {
+    const data = (rifle as Extract<UserRecord, { kind: 'firearm' }>).data
+    expect(
+      gunValues({ ...data, barrelLength: { value: 610 }, firearmMass: { value: 4200 } }),
+    ).toEqual({ twist: 0.254, barrelLength: 0.61, firearmMass: 4.2 })
+    expect(gunValues(blankFirearm())).toEqual({
+      twist: undefined,
+      barrelLength: undefined,
+      firearmMass: undefined,
+    })
+  })
+
+  it('names the catalogue record of a cartridge reference only', () => {
+    expect(catalogueCartridgeId('catalogue:308-win')).toBe('308-win')
+    expect(catalogueCartridgeId('user:3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13')).toBeUndefined()
+    expect(catalogueCartridgeId(undefined)).toBeUndefined()
+  })
+})
+
 describe('clickOptions', () => {
   it('lists mounted optics with a click value, the active configuration first', () => {
     const scoped = {
@@ -178,7 +238,13 @@ describe('clickOptions', () => {
       data: {
         ...rifle.data,
         optics: [
-          { id: 'o1', kind: 'scope', name: 'Scope', clickUnit: 'mrad', clickValue: 1e-4 },
+          {
+            id: 'o1',
+            kind: 'scope',
+            name: 'Scope',
+            clickUnit: 'mrad',
+            clickValue: { value: 0.00573 },
+          },
           { id: 'o2', kind: 'redDot', name: 'Dot' },
         ],
       },
@@ -187,17 +253,22 @@ describe('clickOptions', () => {
       {
         value: 'r1/c2/0',
         label: 'Range rifle, Summer, Scope (active)',
-        click: 1e-4,
+        click: toSi('angle', 0.00573),
         unit: 'mrad',
       },
-      { value: 'r1/c1/0', label: 'Range rifle, Winter, Scope', click: 1e-4, unit: 'mrad' },
+      {
+        value: 'r1/c1/0',
+        label: 'Range rifle, Winter, Scope',
+        click: toSi('angle', 0.00573),
+        unit: 'mrad',
+      },
     ])
   })
 })
 
 describe('activeClick', () => {
   it('takes the active configuration only', () => {
-    const scoped = (click: number | undefined) =>
+    const scoped = (click: { value: number } | undefined) =>
       ({
         ...rifle,
         data: {
@@ -211,17 +282,19 @@ describe('activeClick', () => {
             {
               id: 'c2',
               name: 'Summer',
-              mounts: [{ optic: 'o2', sightHeight: 0.04, zeroRange: 50 }],
+              mounts: [{ optic: 'o2', sightHeight: { value: 40 }, zeroRange: { value: 50000 } }],
             },
           ],
         },
       }) as UserRecord
     // the active Summer configuration mounts only the dot, which has no click value
-    expect(activeClick(scoped(1e-4))).toBeUndefined()
+    expect(activeClick(scoped({ value: 0.00573 }))).toBeUndefined()
     expect(activeClick(carbine)).toBeUndefined()
     // without an active configuration the first one counts: Winter mounts the scope
-    const first = scoped(1e-4) as Extract<UserRecord, { kind: 'firearm' }>
-    expect(activeClick({ ...first, data: { ...first.data, active: undefined } })?.click).toBe(1e-4)
+    const first = scoped({ value: 0.00573 }) as Extract<UserRecord, { kind: 'firearm' }>
+    expect(activeClick({ ...first, data: { ...first.data, active: undefined } })?.click).toBe(
+      toSi('angle', 0.00573),
+    )
     expect(
       activeClick({ ...rifle, data: { ...rifle.data, active: undefined } } as UserRecord),
     ).toBeUndefined()
@@ -233,20 +306,20 @@ describe('cardFacts and clickText', () => {
   const us = presetUnits('us')
   const f = rifle.kind === 'firearm' ? rifle.data : blankFirearm()
   it('names barrel, twist and the first optic of the active configuration with its zero', () => {
-    expect(cardFacts({ ...f, barrelLength: 0.61 }, metric)).toEqual({
+    expect(cardFacts({ ...f, barrelLength: { value: 610 } }, metric)).toEqual({
       barrel: '610 mm barrel, 1:254 mm, left',
       sight: 'Scope, zero 100 m',
     })
     expect(cardFacts(f, us).barrel).toBe('1:10.0 in, left')
-    expect(cardFacts({ ...f, barrelLength: 0.6096 }, presetUnits('metric-grains')).barrel).toBe(
-      '24.00 in barrel, 1:10.0 in, left',
-    )
+    expect(
+      cardFacts({ ...f, barrelLength: { value: 609.6 } }, presetUnits('metric-grains')).barrel,
+    ).toBe('24.00 in barrel, 1:10.0 in, left')
     // no active configuration: the first one; nothing entered: nothing shown
     expect(cardFacts({ ...f, active: undefined }, metric).sight).toBe('Scope, zero 200 m')
     expect(cardFacts(blankFirearm(), metric)).toEqual({ barrel: undefined, sight: undefined })
   })
   it('gives the table cells without units, those of the active configuration', () => {
-    expect(firearmCells({ ...f, barrelLength: 0.61 }, metric)).toEqual({
+    expect(firearmCells({ ...f, barrelLength: { value: 610 } }, metric)).toEqual({
       barrel: '610',
       twist: '254',
       hand: 'left',
@@ -268,7 +341,7 @@ describe('cardFacts and clickText', () => {
     })
   })
   it('gives the click value in the turret marking, else in the chosen unit', () => {
-    const o = { id: 'o1', kind: 'scope' as const, name: 'Scope', clickValue: 1e-4 }
+    const o = { clickValue: 1e-4 }
     expect(clickText({ ...o, clickUnit: 'mrad' }, us)).toBe('0.10 mrad')
     expect(clickText({ ...o, clickUnit: 'MOA' }, metric)).toBe('0.34 MOA')
     expect(clickText({ ...o, clickValue: undefined }, metric)).toBeUndefined()
