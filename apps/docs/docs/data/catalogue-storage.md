@@ -42,7 +42,7 @@ Checks in `packages/api/test/`: `catalogue.test.ts` (derive, build, open, files)
 
 The parity test runs sixteen queries on the SQL layer (PGlite) and on the catalogue, over synthetic records and the public bundle: the cartridge list (all, `q`, `table`, paged), the powder list (all, `q`, `manufacturer`), the bullet list (all, `q`, `manufacturer`, `cartridge`), manufacturers, target faces, federations, disciplines and target mappings. It compares the totals and the sorted ids, not the order (the two orders differ on purpose) and not the paged ids. Where the catalogue finds more than `ilike`, a second test names the difference: words in any order and a number in another printed form.
 
-The budgets, tested as the median of five runs after a warm-up: the index of the public bundle from its records in under 50 ms, from the prebuilt index text in under 9 ms, a ranked page of 50 cartridges in under 5 ms. Measured on the public bundle (577 cartridges, one machine): about 10 ms from the records, 1 ms from the prebuilt index (460 kB, the record file is 3.6 MB and read on the first `get`).
+The budgets, tested as the best of fifteen runs after a warm-up (other test files share the CPU): the index of the public bundle from its records in under 50 ms, from the prebuilt index text in under 9 ms, a ranked page of 50 cartridges in under 5 ms. Measured on the public bundle (577 cartridges, one machine): about 10 ms from the records, 1 ms from the prebuilt index (460 kB, the record file is 3.6 MB and read on the first `get`).
 
 ## Triggers for the fallback
 
