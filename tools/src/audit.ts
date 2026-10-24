@@ -7,10 +7,7 @@ import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 
 /** Advisories without a fix, by GHSA id, with why they cannot reach users. */
-export const allowed: Record<string, string> = {
-  'GHSA-vfj7-8cjw-p6xm':
-    'braces, every version: only the docs site build (Docusaurus, through micromatch and chokidar) uses it, on patterns from this repository',
-}
+export const allowed: Record<string, string> = {}
 
 /** The parts of an `npm audit --json` report the check reads. */
 export interface AuditReport {
