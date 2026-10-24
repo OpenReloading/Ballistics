@@ -80,7 +80,7 @@ export function openCatalogue({ index, records }: CatalogueData): Catalogue {
       ),
     get,
     renamed: (kind, id) => {
-      const map = index.renames[kind]
+      const map = (index.renames as Record<string, Record<string, string> | undefined>)[kind]
       return map && Object.hasOwn(map, id) ? map[id] : undefined
     },
     capacities: (cartridge) =>

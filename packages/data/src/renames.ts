@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { type RenameKind, type Renames, renameKinds, renames } from '@openreloading/schema'
+import { type RenameKind, type Renames, renameKind, renames } from '@openreloading/schema'
 import type { Bundle } from './records.ts'
 
 /** The record ids of `bundle` per kind directory that has an id route. */
@@ -40,7 +40,7 @@ export function readRenames(roots: readonly string[], errors: string[]): Renames
         errors.push(`renames.json: ${issue.path.join('.')}: ${issue.message}`)
       continue
     }
-    for (const kind of renameKinds)
+    for (const kind of renameKind.options)
       if (parsed.data[kind]) merged[kind] = { ...merged[kind], ...parsed.data[kind] }
   }
   return merged
@@ -56,7 +56,7 @@ export const resolveId = (map: Renames | undefined, kind: RenameKind, id: string
  */
 export function checkRenames(bundle: Bundle, errors: string[]) {
   const ids = currentIds(bundle)
-  for (const kind of renameKinds) {
+  for (const kind of renameKind.options) {
     for (const [old, now] of Object.entries(bundle.renames?.[kind] ?? {})) {
       const where = `renames.json: ${kind}.${old}`
       if (ids[kind].has(old)) errors.push(`${where}: "${old}" is still a record`)

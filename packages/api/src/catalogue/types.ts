@@ -7,7 +7,6 @@ import type {
   Federation,
   Manufacturer,
   Powder,
-  RenameKind,
   Renames,
   TargetFace,
   TargetMapping,
@@ -263,7 +262,7 @@ export interface Catalogue {
   /** The record `id` of `kind`; undefined if unknown. */
   get<K extends CatalogueKind>(kind: K, id: string): Catalogued<K> | undefined
   /** The id that replaces `id` of a route kind where it was renamed or removed; undefined otherwise. */
-  renamed(kind: RenameKind, id: string): string | undefined
+  renamed(kind: string, id: string): string | undefined
   /** The case capacity records of a cartridge, ordered by id. */
   capacities(cartridge: string): Catalogued<'caseCapacity'>[]
 }

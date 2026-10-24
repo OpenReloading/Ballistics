@@ -1,4 +1,4 @@
-import { type RenameKind, recordIdRegex } from '@openreloading/schema'
+import { recordIdRegex } from '@openreloading/schema'
 import type { FastifyReply } from 'fastify'
 import { z } from 'zod'
 import type { Catalogue, Catalogued, CatalogueKind } from '../catalogue/types.ts'
@@ -27,10 +27,10 @@ export function stored<K extends CatalogueKind>(record: Catalogued<K>) {
 export function missing(
   reply: FastifyReply,
   catalogue: Catalogue,
-  kind: RenameKind,
+  kind: string,
   id: string,
   noun: string,
-) {
+): FastifyReply {
   const now = catalogue.renamed(kind, id)
   return now
     ? reply.redirect(`${API_PREFIX}/${kind}/${now}`, 308)

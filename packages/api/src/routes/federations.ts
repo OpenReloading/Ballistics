@@ -3,7 +3,6 @@ import {
   discipline,
   disciplineCategory,
   federation,
-  type RenameKind,
   targetFace,
   targetMapping,
 } from '@openreloading/schema'
@@ -157,8 +156,7 @@ export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = as
       },
       (request, reply) => {
         const found = catalogue.get(kind, request.params.id)
-        if (!found)
-          return missing(reply, catalogue, path.slice(1) as RenameKind, request.params.id, noun)
+        if (!found) return missing(reply, catalogue, path.slice(1), request.params.id, noun)
         return reply.send(stored(found))
       },
     )
