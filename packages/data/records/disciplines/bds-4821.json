@@ -1,0 +1,55 @@
+{
+  "id": "bds-4821",
+  "federation": "bds",
+  "name": "MD Büchse Pistole mit Anschlagschaft, offene Visierung",
+  "number": "4821",
+  "section": "L 12.01",
+  "page": "Seite L-66, PDF p. 66",
+  "distance": {
+    "value": 25000,
+    "raw": "15, 20, 25 m"
+  },
+  "category": "pistol",
+  "caliberClasses": {
+    "ids": [
+      "rifle-30-carbine",
+      "revolver-32",
+      "revolver-357-38",
+      "pistol-40-10mm",
+      "revolver-44",
+      "pistol-45",
+      "revolver-45-colt",
+      "pistol-7-65",
+      "pistol-9mm"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 12.01, Seite L-66, PDF p. 66",
+        "fields": ["name", "number", "federation", "section", "page"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 12.07, L 12.08, Seite L-69 to L-71, PDF pp. 69 to 71",
+        "fields": ["distance"],
+        "note": "The discipline is shot at 15, 20 and 25 m; the record holds the farthest distance and the raw text lists all."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 12.01, Seite L-66, PDF p. 66",
+        "fields": ["category", "caliberClasses"],
+        "note": "Anhang 1 Kurzwaffenpatronen (L 17), expanded to caliber classes."
+      },
+      {
+        "source": "bds-sporthandbuch-kommentar-2026",
+        "page": "A3.01, Seite 7 von 76, PDF p. 7",
+        "fields": ["number"],
+        "note": "Not held at Deutsche Meisterschaften until further notice; the Kommentar names such disciplines optional (O)."
+      }
+    ]
+  }
+}

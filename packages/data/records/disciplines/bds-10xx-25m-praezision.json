@@ -36,7 +36,8 @@
       {
         "source": "bds-sporthandbuch-kurzwaffen-2026",
         "page": "K 3.01, Seite K-13, PDF p. 13",
-        "fields": ["caliberClasses"]
+        "fields": ["caliberClasses"],
+        "note": "The code stands for the numbers 1001, 1002, 1003 (O), 1004 (O), 1006, 1007 (O), 1008 to 1012, 1014 (O) and 1015. Caliber class, minimum impulse, weight and sight differ per number in K 3.01; the classes stored are those of all numbers together."
       }
     ]
   }

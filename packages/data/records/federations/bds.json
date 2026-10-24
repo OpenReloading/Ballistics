@@ -7,7 +7,8 @@
     "bds-sporthandbuch-zielscheiben-2025",
     "bds-sporthandbuch-kurzwaffen-2026",
     "bds-sporthandbuch-langwaffen-2026",
-    "bds-sporthandbuch-allgemein-2026"
+    "bds-sporthandbuch-allgemein-2026",
+    "bds-sporthandbuch-kommentar-2026"
   ],
   "provenance": {
     "kind": "published",
@@ -31,6 +32,11 @@
       {
         "source": "bds-sporthandbuch-allgemein-2026",
         "page": "Titelseite, Seite A-1, PDF p. 1",
+        "fields": ["ruleBooks"]
+      },
+      {
+        "source": "bds-sporthandbuch-kommentar-2026",
+        "page": "Titelseite, Seite 1 von 76, PDF p. 1",
         "fields": ["ruleBooks"]
       }
     ]

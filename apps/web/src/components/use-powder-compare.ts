@@ -1,8 +1,9 @@
 'use client'
 
+import type { Powder } from '@openreloading/schema'
 import { useEffect, useRef, useState } from 'react'
 import { fetchPowder, fetchPowderList, postInteriorRun, postJson } from '../lib/api-client.ts'
-import type { InteriorResponse, PowderRecord, PowderSummary } from '../lib/api-types.ts'
+import type { InteriorResponse, PowderSummary } from '../lib/api-types.ts'
 import { runBatch } from '../lib/batch.ts'
 import {
   type ChargeTargetRefusal,
@@ -145,7 +146,7 @@ export async function computeRows(
   const computeOne = async (s: PowderSummary): Promise<CompareRow | undefined> => {
     const head = headOf(s)
     if (!s.interior) return { ...head, reason: 'No fitted model parameters' }
-    let record: PowderRecord | undefined
+    let record: Powder | undefined
     try {
       record = await fetchPowder(s.id, batch)
     } catch {

@@ -244,7 +244,7 @@ test('the designer shows no load-data notice; the caption says how changes are d
 async function seedHollowBaseDesign(page: Page) {
   await page.evaluate(async () => {
     const db: IDBDatabase = await new Promise((ok, no) => {
-      const r = indexedDB.open('openreloading-user-data', 1)
+      const r = indexedDB.open('openreloading-user-data')
       r.onupgradeneeded = () => {
         for (const n of ['records', 'handles', 'files'])
           if (!r.result.objectStoreNames.contains(n))

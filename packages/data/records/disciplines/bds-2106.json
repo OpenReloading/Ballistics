@@ -25,7 +25,8 @@
       {
         "source": "bds-sporthandbuch-langwaffen-2026",
         "page": "L 2.01, Seite L-9, PDF p. 9",
-        "fields": ["number", "distance", "category", "caliberClasses"]
+        "fields": ["number", "distance", "category", "caliberClasses"],
+        "note": "The handbook marks the discipline optional (O) (L 1.23)."
       }
     ]
   }

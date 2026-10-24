@@ -121,3 +121,22 @@ it('logs an idle client error of the server pool instead of throwing it', async 
     await pool.end()
   }
 })
+
+it('sets jit off on the server pool', () => {
+  const pool = (createDb('postgres://u@127.0.0.1:1/x') as unknown as { $client: pg.Pool }).$client
+  expect(pool.options.options).toBe('-c jit=off')
+  return pool.end()
+})
+
+it.skipIf(!process.env.DATABASE_URL)(
+  'shows jit off on a connection of the server pool',
+  async () => {
+    const pool = (createDb(process.env.DATABASE_URL as string) as unknown as { $client: pg.Pool })
+      .$client
+    try {
+      expect((await pool.query('show jit')).rows).toEqual([{ jit: 'off' }])
+    } finally {
+      await pool.end()
+    }
+  },
+)

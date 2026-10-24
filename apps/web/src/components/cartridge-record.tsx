@@ -11,6 +11,7 @@ import {
   TableTr,
   Tooltip,
 } from '@mantine/core'
+import type { SpecValue } from '@openreloading/schema'
 import { Certificate, Crosshair, Cylinder, Gauge } from '@phosphor-icons/react'
 import {
   type CSSProperties,
@@ -22,7 +23,6 @@ import {
   useRef,
   useState,
 } from 'react'
-import type { SpecValue } from '../lib/api-types.ts'
 import {
   type CombinedRow,
   clearanceMeaning,

@@ -1,26 +1,24 @@
 /** Requests of the Powders tab through `apiFetch`: powder records and summaries, runs. */
 
+import type { Powder } from '@openreloading/schema'
 import { apiFetch, fetchRecord } from './api-fetch.ts'
-import type { ErrorBody, InteriorResponse, PowderRecord, PowderSummary } from './api-types.ts'
+import type { ErrorBody, InteriorResponse, PowderSummary } from './api-types.ts'
 
 /** Answers of a busy pool (503) are asked again this often before the powder counts as failed. */
 const busyRetries = 5
 /** A request that has not answered after this many ms counts as failed (the proxy gives up at 15 s). */
 export const requestTimeout = 20_000
 
-const records = new Map<string, PowderRecord>()
+const records = new Map<string, Powder>()
 
 /**
  * A powder record through `apiFetch`, kept for the session; undefined when not found
  * (404), a throw for any other refusal.
  */
-export async function fetchPowder(
-  id: string,
-  signal?: AbortSignal,
-): Promise<PowderRecord | undefined> {
+export async function fetchPowder(id: string, signal?: AbortSignal): Promise<Powder | undefined> {
   const known = records.get(id)
   if (known) return known
-  const record = await fetchRecord<PowderRecord>('powders', id, signal)
+  const record = await fetchRecord<Powder>('powders', id, signal)
   if (record) records.set(id, record)
   return record
 }
