@@ -348,6 +348,8 @@ export function useWorkbenchState() {
     setCartridgeRecord(undefined)
     setCartridgeDesign(d)
     setBulletNote('')
+    // an opened file keeps the seating it holds
+    if (!fill) return
     setPreviewInitial(undefined)
     setSeated({})
     setSeatingStart(undefined)
@@ -1559,8 +1561,11 @@ export function useWorkbenchState() {
     previewInitial?.seating || moved ? (seatedNow ?? previewInitial?.seating) : undefined
   // the cartridge asked for counts while its record loads or stays offline, as in `cartridge` below
   const measuredWaterCapacity =
-    measuredFor === (cartridge?.id ?? cartridgeDesign?.id ?? asked.cartridge?.id) &&
-    (measured.measuredWaterCapacity.si ?? 0) > 0
+    measuredFor ===
+      (cartridge?.id ??
+        cartridgeDesign?.id ??
+        parseRef(asked.cartridge?.id ?? '')?.id ??
+        asked.cartridge?.id) && (measured.measuredWaterCapacity.si ?? 0) > 0
       ? measured.measuredWaterCapacity.si
       : undefined
 
@@ -1570,17 +1575,24 @@ export function useWorkbenchState() {
       : ladderKind === 'temperature'
         ? tempStep.tempStep
         : ladder.ladderStep
-  /** The reference a load keeps: a user design of this browser, else the catalogue record `id`. */
-  const savedRef = (design: string | undefined, id: string | undefined) =>
-    (design && userRef(design)) || (id ? catalogueRef(id) : undefined)
+  /**
+   * The reference a load keeps: the record being loaded (`asked`, kept too when it did not resolve),
+   * else a user design of this browser, else the catalogue record `id`.
+   */
+  const savedRef = (
+    asked: string | undefined,
+    design: string | undefined,
+    id: string | undefined,
+  ) =>
+    asked ? catalogueRef(asked) : (design && userRef(design)) || (id ? catalogueRef(id) : undefined)
   const loadFile: WorkbenchState = {
     siValues: Object.fromEntries(
       Object.entries({ ...fields, firearmMass: gunWeightUsed }).flatMap(([k, f]) =>
         f.si === undefined ? [] : [[k, f.si]],
       ),
     ),
-    cartridge: savedRef(cartridgeDesign?.id, cartridge?.id ?? asked.cartridge?.id),
-    bullet: savedRef(bulletDesign?.id, asked.bullet?.id ?? bullet?.id),
+    cartridge: savedRef(asked.cartridge?.id, cartridgeDesign?.id, cartridge?.id),
+    bullet: savedRef(asked.bullet?.id, bulletDesign?.id, bullet?.id),
     powder: asked.powder?.id ?? powder?.id,
     notes,
     measuredWaterCapacity,

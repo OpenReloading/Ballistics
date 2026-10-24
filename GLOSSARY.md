@@ -47,7 +47,7 @@ A record of kind `sources`: a source several records cite (the C.I.P. TDCC, a ru
 `edition`: edition, print or date of a source or rule book as the document states it.
 
 **Source title**:
-`title`: names the actual source, such as the site and the table or the report. Rule books (`ruleBooks`) and a design's `parent` carry a `title` too.
+`title`: names the actual source, such as the site and the table or the report. Rule books (`ruleBooks`) carry a `title` too.
 
 **Publisher**:
 `publisher`: who issued the data of a source, free text: a manufacturer, a standards body or the authors.
