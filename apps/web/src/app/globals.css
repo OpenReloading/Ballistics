@@ -1296,6 +1296,65 @@ td.nowrap {
   }
 }
 
+/* the cartridge designer's seated bullet: its controls and values are rows of the Seat a bullet
+   section; the level figure goes under the drawing, which keeps its room */
+.designer .seating-preview {
+  display: block;
+  flex: none;
+  margin-top: 0.75rem;
+}
+
+.designer .seating-figure .drawing {
+  margin: 0;
+}
+
+.designer .seating-legend {
+  max-width: none;
+}
+
+/* a seated bullet takes room under the drawing: on screen the long caption stays the figure's
+   name for screen readers only, and from 62em the drawing keeps a fixed height and the column scrolls */
+@media screen {
+  .designer .workspace-scroll:has(.seating-figure .drawing) .designer-drawing figcaption {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+@media screen and (min-width: 62em) {
+  .designer .workspace-scroll:has(.seating-figure .drawing) {
+    overflow-y: auto;
+  }
+
+  .designer .workspace-scroll:has(.seating-figure .drawing) div.designer-drawing {
+    flex: 0 0 16rem;
+  }
+}
+
+@media print {
+  .designer .seating-preview {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 47.99em) {
+  .designer .workspace-scroll:has(.seating-figure .drawing) {
+    max-height: 44svh;
+  }
+
+  .designer .workspace-scroll:has(.seating-figure .drawing) .designer-drawing .drawing.screen-only {
+    max-height: 14svh;
+  }
+}
+
+.designer .seating-slot .seating-row {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 /* a value changed against the record, as a bar inside the input's edge so nothing moves; the flag
    and the description say so in words */
 .designer-field[data-changed] .mantine-Input-input {
