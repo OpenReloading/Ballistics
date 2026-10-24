@@ -13,10 +13,10 @@
     "test": "vitest run --dir test"
   },
   "dependencies": {
-    "@mantine/core": "9.7.2",
-    "@mantine/form": "9.7.2",
-    "@mantine/hooks": "9.7.2",
-    "@mantine/spotlight": "9.7.2",
+    "@mantine/core": "9.7.3",
+    "@mantine/form": "9.7.3",
+    "@mantine/hooks": "9.7.3",
+    "@mantine/spotlight": "9.7.3",
     "@openreloading/api": "0.0.1",
     "@openreloading/core": "0.0.1",
     "@openreloading/data": "0.0.1",
