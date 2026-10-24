@@ -6,7 +6,7 @@ import {
   trajectory,
 } from '@openreloading/core'
 import { bulletDimensions } from '@openreloading/drawing/bullet'
-import { type Firearm, sheetId, userRecord } from '@openreloading/schema'
+import { firearm, sheetId, userRecord } from '@openreloading/schema'
 import { describe, expect, it } from 'vitest'
 import {
   exampleChamberVolume,
@@ -173,7 +173,7 @@ describe('example rifle', () => {
     expect(exampleFirearm.data.cartridge).toBe(`catalogue:${loadExample?.cartridge.id}`)
     expect(loadExample?.firearm).toBe(exampleFirearm)
     const [mount] = exampleFirearm.data.configurations[0].mounts
-    const gun = gunValues(exampleFirearm.data as Firearm)
+    const gun = gunValues(firearm.parse(exampleFirearm.data))
     expect(siOf('length', mount.sightHeight)).toBeCloseTo(exampleTrajectory.sightHeight, 12)
     expect(siOf('length', mount.zeroRange)).toBeCloseTo(exampleTrajectory.zeroRange, 12)
     expect(gun.twist).toBeCloseTo(exampleTrajectory.twist, 12)
