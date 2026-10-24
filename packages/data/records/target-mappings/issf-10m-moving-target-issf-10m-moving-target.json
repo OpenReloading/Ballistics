@@ -1,0 +1,31 @@
+{
+  "id": "issf-10m-moving-target-issf-10m-moving-target",
+  "discipline": "issf-10m-moving-target",
+  "face": "issf-10m-moving-target",
+  "event": "10m Moving Target",
+  "gauge": {
+    "value": 4.5
+  },
+  "shotCount": 60,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 3.3.1, p. 39 (PDF p. 39), rule 6.3.4.8, p. 202 (PDF p. 202)",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "issf-paper-target-scoring-2022",
+        "page": "Rule 1.4.4, p. 321 (PDF p. 2)",
+        "fields": ["gauge"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 10.14, p. 476 (PDF p. 476)",
+        "fields": ["shotCount"],
+        "note": "30 slow and 30 fast shots"
+      }
+    ]
+  }
+}
