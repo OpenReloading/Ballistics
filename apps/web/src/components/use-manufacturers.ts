@@ -5,9 +5,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ManufacturerSummary } from '../lib/api-types.ts'
 import {
   fetchManufacturers,
-  type KnownManufacturer,
   knownManufacturers,
   manufacturerNames,
+  newManufacturerRecord,
   referTo,
   refName,
   withUserManufacturers,
@@ -45,26 +45,32 @@ export function useManufacturers() {
   )
   const latest = useRef(known)
   latest.current = known
-  /** The reference `typed` stands for, `id` the UUID of a new manufacturer; nothing is stored. */
-  const preview = useCallback(
-    (typed: string, id: string) => referTo(latest.current, typed, () => id, new Date())?.ref,
-    [],
-  )
-  /** As `preview`, and stores the new user manufacturer under `id`. */
-  const ensure = useCallback((typed: string, id: string): string | undefined => {
-    const to = referTo(latest.current, typed, () => id, new Date())
-    if (to?.created) {
-      const record = to.created
-      latest.current = [
-        ...latest.current,
-        { ref: to.ref, name: record.name, aliases: [] } satisfies KnownManufacturer,
-      ]
-      setMine((m) => [...m, record])
-      // a store that refuses leaves the reference to be reported as missing on the next open
-      putRecords([record]).catch(() => {})
-    }
+  /**
+   * The reference `typed` stands for, `id` the UUID of a new manufacturer. A new one is kept as a
+   * draft (its name is known to `nameOf`, nothing is stored) that the next call for `id` replaces
+   * or drops.
+   */
+  const preview = useCallback((typed: string, id: string) => {
+    const to = referTo(
+      latest.current.filter((m) => m.ref !== `user:${id}`),
+      typed,
+      () => id,
+      new Date(),
+    )
+    setMine((m) => [...m.filter((r) => r.id !== id), ...(to?.created ? [to.created] : [])])
     return to?.ref
   }, [])
+  /** As `preview`, and stores the new user manufacturer under `id`. */
+  const ensure = useCallback(
+    (typed: string, id: string) => {
+      const ref = preview(typed, id)
+      const created = ref === `user:${id}`
+      // a store that refuses leaves the reference to be reported as missing on the next open
+      if (created) putRecords([newManufacturerRecord(id, typed, new Date())]).catch(() => {})
+      return ref
+    },
+    [preview],
+  )
   return {
     known,
     names,

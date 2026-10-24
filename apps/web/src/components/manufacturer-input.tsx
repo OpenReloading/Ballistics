@@ -8,8 +8,8 @@ import type { useManufacturers } from './use-manufacturers.ts'
  * A manufacturer field. `value` and `onChange` are the reference (`catalogue:<id>` or
  * `user:<id>`), reported with every keystroke so a save never lags the text: the manufacturer the
  * text names, else the reference of a new user manufacturer whose id is chosen when typing starts.
- * The record of a new one is stored when the field is left or an option is chosen, and the next
- * typed name finds it.
+ * The record of a new one is stored when the field is left, an option is chosen or a save
+ * shortcut is pressed in it, and the next typed name finds it.
  */
 export const ManufacturerInput = memo(function ManufacturerInput({
   label,
@@ -49,6 +49,11 @@ export const ManufacturerInput = memo(function ManufacturerInput({
         report(text)
       }}
       onOptionSubmit={commit}
+      // the save shortcut works inside fields: the record goes into the store before the save does
+      onKeyDown={(e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's' && typed !== undefined)
+          commit(typed)
+      }}
       onBlur={() => typed !== undefined && commit(typed)}
     />
   )

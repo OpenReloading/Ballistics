@@ -89,7 +89,7 @@ _Avoid_: maker
 ### Manufacturers
 
 **Manufacturer**:
-A company that makes powders or bullets, a record of kind `manufacturers` with `id`, `name`, `website`, `aliases` and `provenance`. Its id is the slug of its name without the legal form and never changes. Served by `GET /v1/manufacturers` and `GET /v1/manufacturers/{id}`.
+A company that makes powders or bullets, or whose products other records name (a chronograph), a record of kind `manufacturers` with `id`, `name`, `website`, `aliases` and `provenance`. Its id is the slug of its name without the legal form and never changes. Served by `GET /v1/manufacturers` and `GET /v1/manufacturers/{id}`.
 _Avoid_: maker, brand
 
 **Manufacturer reference**:

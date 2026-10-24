@@ -22,12 +22,34 @@ async function folderItem(page: Page, item: string) {
   await page.getByRole('menuitem', { name: item, exact: true }).click()
 }
 
-async function saveInFolder(page: Page) {
+/** The user manufacturers in the browser store. */
+const storedManufacturers = (page: Page) =>
+  page.evaluate(
+    () =>
+      new Promise<{ id: string; name: string }[]>((ok, no) => {
+        const open = indexedDB.open('openreloading-user-data')
+        open.onerror = () => no(open.error)
+        open.onsuccess = () => {
+          const all = open.result.transaction('records').objectStore('records').getAll()
+          all.onsuccess = () => ok(all.result.filter((r) => r.kind === 'manufacturer'))
+        }
+      }),
+  )
+
+/** Types a manufacturer and saves with the button, or with the save shortcut while the field has focus. */
+async function saveInFolder(page: Page, by: 'button' | 'shortcut' = 'button') {
   await page.goto('/bullets/designer')
   await folderItem(page, 'Choose workspace folder…')
   await expect(state(page)).toHaveText('Not saved to a file, folder workspace')
   await page.getByRole('combobox', { name: 'Manufacturer' }).fill('Folder')
-  await (await barButton(page, 'Save')).click()
+  if (by === 'button') await (await barButton(page, 'Save')).click()
+  else {
+    // the File menu reads the design after a deferred render: a person presses the keys later
+    await page.evaluate(
+      () => new Promise((ok) => requestAnimationFrame(() => requestAnimationFrame(ok))),
+    )
+    await page.keyboard.press('Control+S')
+  }
   await expect(state(page)).toHaveText('Saved: folder.json, folder workspace')
 }
 
@@ -39,25 +61,17 @@ test('saves go into the folder without a picker; the folder can be forgotten', a
   })
   const { manufacturer } = JSON.parse(text).records[0].data
   // the typed name became a user manufacturer of the browser, which the bullet references
-  const stored = await page.evaluate(
-    () =>
-      new Promise<{ kind: string; id: string; name: string }[]>((ok, no) => {
-        const open = indexedDB.open('openreloading-user-data')
-        open.onerror = () => no(open.error)
-        open.onsuccess = () => {
-          const all = open.result.transaction('records').objectStore('records').getAll()
-          all.onsuccess = () => ok(all.result)
-        }
-      }),
-  )
-  expect(stored.find((r) => r.kind === 'manufacturer')).toMatchObject({ name: 'Folder' })
-  expect(manufacturer).toBe(`user:${stored.find((r) => r.kind === 'manufacturer')?.id}`)
+  const stored = await storedManufacturers(page)
+  expect(stored).toMatchObject([{ name: 'Folder' }])
+  expect(manufacturer).toBe(`user:${stored[0]?.id}`)
   await folderItem(page, 'Forget workspace folder')
   await expect(state(page)).toHaveText('Saved: folder.json')
 })
 
 test('a folder whose reading crashed the last load is forgotten unread', async ({ page }) => {
-  await saveInFolder(page)
+  await saveInFolder(page, 'shortcut')
+  // the shortcut stored the typed manufacturer before it saved the bullet
+  expect(await storedManufacturers(page)).toMatchObject([{ name: 'Folder' }])
   // as left by a load that crashed while reading the stored folder
   await page.evaluate(() => localStorage.setItem('user-data-folder-restoring', '1'))
   await page.reload()
