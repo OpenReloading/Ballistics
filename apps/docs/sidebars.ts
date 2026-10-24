@@ -36,7 +36,7 @@ const sidebars: SidebarsConfig = {
     category('Case and firearm', ['case-capacity', 'bullet-fit', 'free-recoil']),
     'models/least-squares',
   ],
-  data: ['data/federations', 'data/manufacturers', 'bibliography'],
+  data: ['data/federations', 'data/manufacturers', 'data/firearm-records', 'bibliography'],
   contributing: ['release', 'ci-tools'],
 }
 
