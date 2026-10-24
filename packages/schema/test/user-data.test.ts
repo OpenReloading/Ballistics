@@ -93,6 +93,23 @@ const sheetRecord = {
   },
 } as const
 
+const faceRecord = {
+  kind: 'targetFaceDesign',
+  id: 'f1',
+  name: 'Club face',
+  saved,
+  data: {
+    rings: [
+      { value: 1, diameter: 100, fill: 'white', line: 'black' },
+      { value: 2, diameter: 50 },
+    ],
+    innerTen: { diameter: 10, rule: 'cover' },
+    blackDiameter: 50,
+    decimal: true,
+    events: [{ name: '25 m', distance: 25000, gauge: 5.6 }],
+  },
+} as const
+
 const file = (records: unknown[], version: unknown = userDataVersion) => ({
   format: userDataFormat,
   version,
@@ -103,9 +120,16 @@ describe('userDataFile', () => {
   it('accepts every record kind', () => {
     expect(
       userDataFile.safeParse(
-        file([bulletRecord, cartridgeRecord, loadRecord, firearmRecord, sheetRecord]),
+        file([bulletRecord, cartridgeRecord, loadRecord, firearmRecord, sheetRecord, faceRecord]),
       ).success,
     ).toBe(true)
+  })
+
+  it('takes a face draft with missing values and rejects a non-positive size', () => {
+    const draft = { ...faceRecord, data: { rings: [{}], events: [{ name: '' }] } }
+    expect(userRecord.safeParse(draft).success).toBe(true)
+    const zero = { ...faceRecord, data: { ...faceRecord.data, blackDiameter: 0 } }
+    expect(userRecord.safeParse(zero).error?.issues[0].path).toEqual(['data', 'blackDiameter'])
   })
 
   it('takes a catalogue id as the parent of a design and refuses another text', () => {
