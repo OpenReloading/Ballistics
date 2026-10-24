@@ -1,7 +1,9 @@
-import { recordIdRegex } from '@openreloading/schema'
+import { type RenameKind, recordIdRegex } from '@openreloading/schema'
+import type { FastifyReply } from 'fastify'
 import { z } from 'zod'
 import type { Catalogue, Catalogued, CatalogueKind } from '../catalogue/types.ts'
 import type { ComputeRunner } from '../compute/tasks.ts'
+import { API_PREFIX } from '../version.ts'
 
 /** `pattern` of a query string value without a NUL character: the SQL layer's text holds none, so a query with one would fail with 500 there. */
 export const noNul = '^[^\\u0000]*$'
@@ -16,6 +18,23 @@ export type ComputeContext = { catalogue: Catalogue; compute: ComputeRunner }
 export function stored<K extends CatalogueKind>(record: Catalogued<K>) {
   const { kind, origin, revision, ...rest } = record
   return rest
+}
+
+/**
+ * The answer for an id no record has: a permanent redirect to the record that replaced it in
+ * `renames.json`, else 404 naming the `noun`.
+ */
+export function missing(
+  reply: FastifyReply,
+  catalogue: Catalogue,
+  kind: RenameKind,
+  id: string,
+  noun: string,
+) {
+  const now = catalogue.renamed(kind, id)
+  return now
+    ? reply.redirect(`${API_PREFIX}/${kind}/${now}`, 308)
+    : reply.notFound(`${noun} ${id} not found`)
 }
 
 /** The JSON Schema of a route's path parameters or query string. */

@@ -25,6 +25,7 @@ Fastify HTTP API (TypeScript, ESM) exposing `@openreloading/core` and the data r
   - `caseLength` and `cartridgeLength` (mm): the smallest cartridge-side L3 and L6 (the shortest variant). `pmax` (bar): the highest Pmax.
   - `caseType` (`rimless`, `semi-rimmed`, `rimmed`, `rebated`, `belted`) from its cartridge R1, P1 and R3 (`caseType` in `src/catalogue/derive.ts`): an R3 is a belt, R1 more than 0.7 mm over P1 a rim, more than 0.3 mm a semi-rim, more than 0.25 mm under it a rebated rim. Absent without R1 and P1 (the table VII shotshells among them).
   - `country`: the sheet's `country` text, as printed.
+- Every `/:id` record route below answers an id that `records/renames.json` replaces with 308 and the `Location` of the current record (`missing` in `src/routes/common.ts`), an unknown id with 404.
 - `GET /cartridges/:id`: the cartridge record (`id`, `name`, `aliases`, `table`, `country?`, `published`, `revised?`, `pressureMethod?`, `verification`, `exceptions?`, `values` in file order, `provenance`), its `caseType` (as in the list) and its case capacities. 404 when unknown.
 - `GET /manufacturers`: `{ total, items: [{ id, name, aliases?, website? }] }` ordered by name. `GET /manufacturers/:id`: the whole record (`apps/docs/docs/data/manufacturers.md`).
 - `GET /powders?q=&manufacturer=&limit=&offset=`, `GET /bullets?...&cartridge=`: summaries with `manufacturer` (the manufacturer id), ordered by manufacturer name and name.

@@ -19,6 +19,8 @@ declare module 'fastify' {
      * the statuses of Fastify (400, 413, 414, 415) and 500.
      */
     errors?: number[]
+    /** The route answers an unknown id that `renames.json` replaces with 308 and a `Location`. */
+    moved?: boolean
     /** One line on what the route answers, read by `buildOpenApi`. */
     summary?: string
     /** What the route reads or computes and how, read by `buildOpenApi`. */
@@ -63,7 +65,11 @@ interface OpenApiOperation {
   }
   responses: Record<
     string,
-    { description: string; content?: { 'application/json': { schema: JsonSchema } } }
+    {
+      description: string
+      headers?: Record<string, { schema: JsonSchema }>
+      content?: { 'application/json': { schema: JsonSchema } }
+    }
   >
 }
 
@@ -178,6 +184,7 @@ function responses(
   const statuses = [
     ...([...inputs, config.body].some(Boolean) ? [400] : []),
     ...(config.errors ?? []),
+    ...(config.moved ? [308] : []),
     ...(url.includes('{') ? [414] : []),
     ...(config.body ? [413, 415] : []),
     500,
@@ -191,10 +198,16 @@ function responses(
     ...Object.fromEntries(
       statuses.map((s) => [
         s,
-        {
-          description: STATUS_CODES[s] ?? String(s),
-          content: json({ $ref: '#/components/schemas/Error' }),
-        },
+        s === 308
+          ? {
+              description:
+                'Permanent Redirect: the id was renamed, `Location` is the record that replaced it.',
+              headers: { Location: { schema: { type: 'string' } } },
+            }
+          : {
+              description: STATUS_CODES[s] ?? String(s),
+              content: json({ $ref: '#/components/schemas/Error' }),
+            },
       ]),
     ),
   }

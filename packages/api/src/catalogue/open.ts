@@ -5,10 +5,22 @@ import {
   type Catalogue,
   type CatalogueData,
   type Catalogued,
+  type CatalogueHeader,
   type CatalogueKind,
   catalogueFormat,
+  deriveVersion,
   type RecordFile,
 } from './types.ts'
+
+/** Refuses a file that another format or another version of the derivation built. */
+function checkHeader(what: string, file: Partial<CatalogueHeader>) {
+  if (file.format !== catalogueFormat)
+    throw new Error(`catalogue ${what} format ${file.format} is not ${catalogueFormat}: rebuild it`)
+  if (file.derive !== deriveVersion)
+    throw new Error(
+      `catalogue ${what} derive version ${file.derive} is not ${deriveVersion}: rebuild it`,
+    )
+}
 
 /**
  * Opens a catalogue on an index and a record file: no I/O, the index is used as it is (a few
@@ -16,11 +28,14 @@ import {
  * `get`, so a page that only lists never loads it.
  */
 export function openCatalogue({ index, records }: CatalogueData): Catalogue {
-  if (index.format !== catalogueFormat)
-    throw new Error(`catalogue index format ${index.format} is not ${catalogueFormat}`)
+  checkHeader('index', index)
   let file: RecordFile | undefined
   const load = () => {
-    file ??= typeof records === 'function' ? records() : records
+    if (!file) {
+      const read = typeof records === 'function' ? records() : records
+      checkHeader('record file', read)
+      file = read
+    }
     return file
   }
   const get = <K extends CatalogueKind>(kind: K, id: string): Catalogued<K> | undefined => {
@@ -64,6 +79,10 @@ export function openCatalogue({ index, records }: CatalogueData): Catalogue {
         (m) => (!discipline || m.discipline === discipline) && (!face || m.face === face),
       ),
     get,
+    renamed: (kind, id) => {
+      const map = index.renames[kind]
+      return map && Object.hasOwn(map, id) ? map[id] : undefined
+    },
     capacities: (cartridge) =>
       (Object.hasOwn(index.capacities, cartridge) ? index.capacities[cartridge] : []).flatMap(
         (id) => get('caseCapacity', id) ?? [],

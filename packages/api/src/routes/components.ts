@@ -2,7 +2,7 @@ import { bullet, constructionFields, manufacturer, powder } from '@openreloading
 import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
 import type { BulletQuery, Catalogue } from '../catalogue/types.ts'
-import { idParams, listQuery, page, recordIdPattern, stored } from './common.ts'
+import { idParams, listQuery, missing, page, recordIdPattern, stored } from './common.ts'
 
 const powderQuery = listQuery({
   manufacturer: {
@@ -92,13 +92,15 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
       config: {
         response: manufacturer,
         errors: [404],
+        moved: true,
         summary: 'Get a manufacturer',
         description: 'The manufacturer record with its provenance.',
       },
     },
     (request, reply) => {
       const record = catalogue.get('manufacturer', request.params.id)
-      if (!record) return reply.notFound(`manufacturer ${request.params.id} not found`)
+      if (!record)
+        return missing(reply, catalogue, 'manufacturers', request.params.id, 'manufacturer')
       return reply.send(stored(record))
     },
   )
@@ -142,13 +144,14 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
         config: {
           response: record,
           errors: [404],
+          moved: true,
           summary: `Get a ${noun}`,
           description: `The whole ${noun} record with its provenance.`,
         },
       },
       (request, reply) => {
         const found = catalogue.get(noun, request.params.id)
-        if (!found) return reply.notFound(`${noun} ${request.params.id} not found`)
+        if (!found) return missing(reply, catalogue, `${noun}s` as const, request.params.id, noun)
         return reply.send(stored(found))
       },
     )
