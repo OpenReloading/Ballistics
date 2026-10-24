@@ -4,7 +4,7 @@
   "name": "Ordonnanzgewehr 100 m",
   "number": "1.58",
   "section": "1.8",
-  "page": "Teil 1 Seite 16, PDF p. 128",
+  "page": "Teil 1 Seite 17, PDF p. 129",
   "distance": {
     "value": 100000,
     "raw": "100 m"
@@ -14,12 +14,12 @@
     "kind": "published",
     "sources": [
       {
-        "source": "dsb-sportordnung-2026",
-        "page": "1.8, Teil 1 Seite 16, PDF p. 128 (heading with 1.58.O and 1.58.G; 1.8.3 distance 100 m)",
+        "source": "dsb-sportordnung-2027",
+        "page": "1.8, Teil 1 Seite 17, PDF p. 129 (heading with 1.58.O and 1.58.G; 1.8.3 distance 100 m)",
         "fields": ["name", "federation", "section", "page", "distance", "category"]
       },
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "page": "0.21, Teil 0 Seite 78, PDF p. 96 (rows 1.58 O and 1.58 G)",
         "fields": ["number"]
       }

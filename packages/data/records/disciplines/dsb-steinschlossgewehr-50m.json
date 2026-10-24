@@ -14,13 +14,13 @@
     "kind": "published",
     "sources": [
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "page": "0.21, Teil 0 Seite 89, PDF p. 107",
         "fields": ["name", "number", "federation", "section", "page", "distance"]
       },
       {
-        "source": "dsb-sportordnung-2026",
-        "page": "Teil 7 Seite 1, PDF p. 337 (title: Regeln für das Schießen mit Vorderladerwaffen)",
+        "source": "dsb-sportordnung-2027",
+        "page": "Teil 7 Seite 1, PDF p. 339 (title: Regeln für das Schießen mit Vorderladerwaffen)",
         "fields": ["category"]
       }
     ]
