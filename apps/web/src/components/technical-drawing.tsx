@@ -11,6 +11,7 @@ import {
 } from '@openreloading/drawing'
 import type { BulletModel } from '@openreloading/drawing/bullet'
 import type { FigureModel, Side } from '@openreloading/drawing/cartridge'
+import { fromSi, toSi } from '@openreloading/schema'
 import type { CSSProperties, ReactNode } from 'react'
 import { drawingFont } from '../app/fonts/drawing.ts'
 
@@ -31,10 +32,11 @@ const arcPath = ({ c, r, from, to }: Arc) => {
 
 /** The text's rotation in the part frame so it reads left to right or bottom to top on the medium. */
 function rotation({ dir: [ux, uy] }: Label, turn: number) {
-  const t = (turn * Math.PI) / 180
-  let a =
-    (Math.atan2(ux * Math.sin(t) + uy * Math.cos(t), ux * Math.cos(t) - uy * Math.sin(t)) * 180) /
-    Math.PI
+  const t = toSi('angle', turn)
+  let a = fromSi(
+    'angle',
+    Math.atan2(ux * Math.sin(t) + uy * Math.cos(t), ux * Math.cos(t) - uy * Math.sin(t)),
+  )
   if (a >= 90 - 1e-9) a -= 180
   if (a < -90 - 1e-9) a += 180
   return n(a - turn)

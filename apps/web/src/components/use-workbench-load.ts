@@ -14,12 +14,14 @@ import {
   recordResistance,
   ValueError,
 } from '@openreloading/core'
-import type {
-  Bullet,
-  CartridgeDesign,
-  Powder,
-  UserRecord,
-  WorkbenchState,
+import {
+  type Bullet,
+  type CartridgeDesign,
+  fromSi,
+  type Powder,
+  toSi,
+  type UserRecord,
+  type WorkbenchState,
 } from '@openreloading/schema'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
@@ -215,12 +217,16 @@ export function useWorkbenchState() {
     { id: string; z?: number; record?: CartridgeDetail } | undefined
   >(undefined)
   /** Groove diameter Z of the chosen cartridge once its record is loaded, m: the bore area's fallback. */
-  const grooveM = cartridge && groove?.id === cartridge.id && groove.z ? groove.z * 1e-3 : undefined
+  const grooveM =
+    cartridge && groove?.id === cartridge.id && groove.z ? toSi('length', groove.z) : undefined
   /** Bore area Q of the chosen cartridge once its record is loaded, m2: what an empty Bore area takes first. */
   const qM =
     cartridge && groove?.id === cartridge.id
-      ? (groove.record?.values.find((v) => v.side === 'chamber' && v.symbol === 'Q' && !v.variant)
-          ?.value ?? 0) * 1e-6 || undefined
+      ? toSi(
+          'area',
+          groove.record?.values.find((v) => v.side === 'chamber' && v.symbol === 'Q' && !v.variant)
+            ?.value ?? 0,
+        ) || undefined
       : undefined
   const [allDiameters, setAllDiameters] = useState(false)
   const [designs, setDesigns] = useState<Extract<UserRecord, { kind: 'bulletDesign' }>[]>([])
@@ -653,7 +659,8 @@ export function useWorkbenchState() {
   const linkedBullet = !bullet && asked.bullet?.id === linked.bullet?.id ? linked.bullet : undefined
   const linkedPowder = !powder && asked.powder?.id === linked.powder?.id ? linked.powder : undefined
   /** The bullet length a run reads, mm: the record's, else the link's. */
-  const bulletLength = bullet?.length?.value ?? (linkedBullet?.length && linkedBullet.length * 1e3)
+  const bulletLength =
+    bullet?.length?.value ?? (linkedBullet?.length && fromSi('length', linkedBullet.length))
 
   function reset() {
     setCustomName(undefined)
@@ -807,7 +814,7 @@ export function useWorkbenchState() {
         setBulletNote('')
         if (!fill) return
         markChanged()
-        const mass = b.mass.value * 1e-3
+        const mass = toSi('mass', b.mass.value)
         form.setFieldValue('bulletMass', {
           text: fixedFieldText('mass', unitsNow.current, mass),
           si: mass,
@@ -979,7 +986,9 @@ export function useWorkbenchState() {
     )
     // a missing powder record: the bulk density (kg/m3) and the bore resistance its link carried
     const fromLink = as ? undefined : linkedPowder
-    const bulkDensity = chosen?.bulkDensity ? chosen.bulkDensity.value * 1e3 : fromLink?.bulkDensity
+    const bulkDensity = chosen?.bulkDensity
+      ? toSi('density', chosen.bulkDensity.value)
+      : fromLink?.bulkDensity
     const { resistance, missing } = !chosen?.interior?.resistance
       ? {
           resistance:
@@ -1561,7 +1570,7 @@ export function useWorkbenchState() {
   const bulletParams =
     bulletFit && cartridge ? `&cartridge=${encodeURIComponent(cartridge.id)}` : ''
   const describeBullet = (b: BulletSummary) =>
-    `${productLabel(b, names)}, ${withUnit('mass', system, b.mass * 1e-3)}, ${withUnit('length', system, b.diameter * 1e-3)}`
+    `${productLabel(b, names)}, ${withUnit('mass', system, toSi('mass', b.mass))}, ${withUnit('length', system, toSi('length', b.diameter))}`
 
   const specValue = (side: string | undefined, symbol: string) =>
     cartridge && groove?.id === cartridge.id
@@ -1569,14 +1578,14 @@ export function useWorkbenchState() {
           ?.value
       : undefined
   const mmText = (mm: number | undefined) =>
-    mm === undefined ? undefined : shownLength('diameter', system, mm * 1e-3)
+    mm === undefined ? undefined : shownLength('diameter', system, toSi('length', mm))
   const pmax = specValue(undefined, 'Pmax')
 
   // the defaults of volume, bore diameter, twist and barrel length from what is chosen
   const gun = firearmList.find((f) => f.id === firearm)
   const recordTable = cartridge && groove?.id === cartridge.id ? groove.record?.table : undefined
-  const mmToM = (mm: number | undefined) => (mm === undefined ? undefined : mm * 1e-3)
-  const mm2ToM2 = (mm2: number | undefined) => (mm2 === undefined ? undefined : mm2 * 1e-6)
+  const mmToM = (mm: number | undefined) => (mm === undefined ? undefined : toSi('length', mm))
+  const mm2ToM2 = (mm2: number | undefined) => (mm2 === undefined ? undefined : toSi('area', mm2))
   /** What the chosen cartridge design gives; the design's own values only. */
   const designLoad = useMemo(
     () => cartridgeDesign && workbenchDesign(cartridgeDesign.data, cartridgeDesign.name, system),
@@ -1618,7 +1627,7 @@ export function useWorkbenchState() {
         },
     bullet: bullet && {
       name: productLabel(bullet, names),
-      diameter: bullet.diameter.value * 1e-3,
+      diameter: toSi('length', bullet.diameter.value),
     },
     settingsBarrelLength: defaults.barrelLength,
   })
@@ -1751,13 +1760,13 @@ export function useWorkbenchState() {
       bullet: bullet
         ? {
             name: productLabel(bullet, names),
-            length: bullet.length && bullet.length.value * 1e-3,
+            length: bullet.length && toSi('length', bullet.length.value),
           }
         : linkedBullet,
       powder: powder
         ? {
             name: productLabel(powder, names),
-            bulkDensity: powder.bulkDensity && powder.bulkDensity.value * 1e3,
+            bulkDensity: powder.bulkDensity && toSi('density', powder.bulkDensity.value),
             ...recordBore,
           }
         : linkedPowder,

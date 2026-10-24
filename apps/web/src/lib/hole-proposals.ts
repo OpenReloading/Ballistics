@@ -2,7 +2,7 @@
  * Hole proposals in the target editor (`apps/docs/docs/models/hole-detection.md`): kept apart from
  * the sheet, in photo px, until the user accepts them as shots. No React, DOM or Next.js.
  */
-import type { ShotGroup } from '@openreloading/schema'
+import { type ShotGroup, toSi } from '@openreloading/schema'
 import type { HoleProposal } from './hole-detection.ts'
 import { type Frame, targetToView, viewToTarget } from './target-editor.ts'
 import type { Point } from './target-geometry.ts'
@@ -66,9 +66,10 @@ export function localPxPerM(frame: Frame, region: readonly Point[]): number {
   }
   const q = viewToTarget(frame, c)
   const o = targetToView(frame, q)
-  const ex = targetToView(frame, { x: q.x + 1e-3, y: q.y })
-  const ey = targetToView(frame, { x: q.x, y: q.y + 1e-3 })
-  return ((Math.hypot(ex.x - o.x, ex.y - o.y) + Math.hypot(ey.x - o.x, ey.y - o.y)) / 2) * 1000
+  const mm = toSi('length', 1)
+  const ex = targetToView(frame, { x: q.x + mm, y: q.y })
+  const ey = targetToView(frame, { x: q.x, y: q.y + mm })
+  return (Math.hypot(ex.x - o.x, ex.y - o.y) + Math.hypot(ey.x - o.x, ey.y - o.y)) / 2 / mm
 }
 
 /** `list` without the proposals closer than half a hole (`holePx`) to a shot of `group`. */

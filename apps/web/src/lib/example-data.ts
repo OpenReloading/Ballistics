@@ -1,14 +1,10 @@
-import {
-  defaultStartPressure,
-  handgunBarrelLengthLimit,
-  icao,
-  lbPerSqInToKgPerSqM,
-} from '@openreloading/core'
+import { defaultStartPressure, handgunBarrelLengthLimit, icao } from '@openreloading/core'
 import { seat } from '@openreloading/drawing/seating'
+import { toSi } from '@openreloading/schema'
 import type { InteriorKey } from './interior-input.ts'
 import type { LadderDirection } from './seating-ladder.ts'
 import type { ManualKey, ShotKey, zeroKeys } from './trajectory-input.ts'
-import { kilogramsPerGrain, waterDensityGramsPerCm3 } from './units.ts'
+import { kilogramsPerGrain, unitsOf, waterDensityGramsPerCm3, waterVolume } from './units.ts'
 
 /**
  * The .308 Win. example of both forms: an invented load, the demo powder under the demo
@@ -83,7 +79,7 @@ const choices = {
 /** The example's charge ladder (SI): 5 steps of 0.2 gr down from the start charge. */
 const exampleLadder = {
   steps: 5,
-  step: 0.2 * (kilogramsPerGrain * 1e3) * 1e-3,
+  step: 0.2 * kilogramsPerGrain,
   direction: 'down',
 } as const
 
@@ -101,11 +97,11 @@ const travel = seated.travel?.value as number
 /** The seated-bullet preview of the example: bullet id, barrel length (m) and COAL (m), at L6. */
 export const exampleSeating = {
   bullet: bullet.id,
-  barrel: choices.barrel * 1e-3,
-  seating: { by: 'overallLength' as const, value: spec.L6 * 1e-3 },
+  barrel: toSi('length', choices.barrel),
+  seating: { by: 'overallLength' as const, value: toSi('length', spec.L6) },
 }
 /** The example's measured case capacity (H₂O) in m³, as the Cartridge card holds it: the capacity figure above. */
-const exampleCapacity = (capacity.water / waterDensityGramsPerCm3) * 1e-6
+const exampleCapacity = waterVolume(capacity.water)
 /** Mass of the example rifle, kg. */
 const exampleFirearmMass = 7
 /** The example's seating ladder step size, m (an example choice). */
@@ -116,23 +112,23 @@ export const exampleMuzzleVelocity = 729
 
 /** Interior form values, SI, keyed like `interiorFields`. */
 export const exampleInterior = {
-  volume: exampleChamberVolume * 1e-6,
-  boreDiameter: spec.F * 1e-3,
-  boreArea: spec.Q * 1e-6,
-  travel: travel * 1e-3,
-  twist: spec.u * 1e-3,
-  bulletMass: bullet.mass * 1e-3,
-  charge: choices.charge * 1e-3,
+  volume: unitsOf.capacity.cm3.toSi(exampleChamberVolume),
+  boreDiameter: toSi('length', spec.F),
+  boreArea: toSi('area', spec.Q),
+  travel: toSi('length', travel),
+  twist: toSi('length', spec.u),
+  bulletMass: toSi('mass', bullet.mass),
+  charge: toSi('mass', choices.charge),
   propellantTemperature: icao.temperature,
   // the powder record's fit, as the workbench fills it (`powderModelValues` in powder-record.ts)
   propellantEnergy: powder.interior.energy,
   gamma: powder.interior.gamma,
-  density: powder.interior.density * 1e3,
+  density: toSi('density', powder.interior.density),
   covolume: powder.interior.covolume,
   vivacity: powder.interior.vivacity,
   exponent: powder.interior.pressureExponent,
-  referencePressure: powder.interior.referencePressure * 1e5,
-  ignitionPressure: powder.interior.ignitionPressure * 1e5,
+  referencePressure: toSi('pressure', powder.interior.referencePressure),
+  ignitionPressure: toSi('pressure', powder.interior.ignitionPressure),
   startPressure: defaultStartPressure(handgunBarrelLengthLimit).value,
   formA: powder.interior.burnForm.a,
   formM: powder.interior.burnForm.m,
@@ -148,13 +144,13 @@ export const exampleInterior = {
 
 /** Trajectory form values, SI, keyed like `shotFields` and `manualBulletFields` (manual G7 drag). */
 export const exampleTrajectory = {
-  mass: bullet.mass * 1e-3,
-  diameter: bullet.diameter * 1e-3,
-  length: bullet.length * 1e-3,
-  ballisticCoefficient: bullet.g7 * lbPerSqInToKgPerSqM,
+  mass: toSi('mass', bullet.mass),
+  diameter: toSi('length', bullet.diameter),
+  length: toSi('length', bullet.length),
+  ballisticCoefficient: toSi('ballisticCoefficient', bullet.g7),
   muzzleVelocity: exampleMuzzleVelocity,
-  sightHeight: choices.sightHeight * 1e-3,
-  twist: spec.u * 1e-3,
+  sightHeight: toSi('length', choices.sightHeight),
+  twist: toSi('length', spec.u),
   zeroRange: choices.zero,
   temperature: icao.temperature,
   pressure: icao.pressure,
@@ -198,8 +194,8 @@ export const exampleFirearm = {
   data: {
     name: 'Example rifle, 308 Win.',
     cartridge: exampleRecords.cartridge.id,
-    barrelLength: choices.barrel * 1e-3,
-    twist: spec.u * 1e-3,
+    barrelLength: toSi('length', choices.barrel),
+    twist: toSi('length', spec.u),
     twistHand: 'right',
     firearmMass: exampleFirearmMass,
     // a scope at the example's sight height and zero, so the Trajectory tab has a result
@@ -209,7 +205,11 @@ export const exampleFirearm = {
         id: 'example',
         name: 'Example',
         mounts: [
-          { optic: 'scope', sightHeight: choices.sightHeight * 1e-3, zeroRange: choices.zero },
+          {
+            optic: 'scope',
+            sightHeight: toSi('length', choices.sightHeight),
+            zeroRange: choices.zero,
+          },
         ],
       },
     ],

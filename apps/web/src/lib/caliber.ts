@@ -2,6 +2,7 @@
  * Common caliber names of the lists:
  * a bullet diameter (a bullet's, or a cartridge's G1) falls in the group whose span holds it.
  */
+import { toSi } from '@openreloading/schema'
 import { inchText, metersPerInch, type UnitSystem } from './units.ts'
 
 /** Name and span [from, to) in inches, by size; set by hand over the bullets and CIP G1 values. */
@@ -33,7 +34,7 @@ const commonCalibers: readonly [string, number, number][] = [
   ['.510', 0.507, 0.516],
 ]
 
-const inches = (mm: number) => mm / 1e3 / metersPerInch
+const inches = (mm: number) => toSi('length', mm) / metersPerInch
 
 /** A diameter (mm) as a caliber group: ".308" in inches (3 decimals), "7.82" in mm. */
 export function caliberLabel(mm: number, unit: 'in' | 'mm'): string {

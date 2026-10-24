@@ -1,5 +1,5 @@
 import type { ScoringZone, TrajectoryPoint } from '@openreloading/core'
-import type { TargetFace } from '@openreloading/schema'
+import { type TargetFace, toSi } from '@openreloading/schema'
 
 /**
  * The scoring zones of a face for a hole of diameter `hole` m, outermost first: each ring grown by
@@ -8,8 +8,8 @@ import type { TargetFace } from '@openreloading/schema'
 export function faceZones(face: TargetFace, hole: number): ScoringZone[] {
   const g = hole / 2
   return face.rings.map((r) => ({
-    halfWidth: r.diameter.value * 5e-4 + g,
-    halfHeight: (r.height ?? r.diameter).value * 5e-4 + g,
+    halfWidth: toSi('length', r.diameter.value / 2) + g,
+    halfHeight: toSi('length', (r.height ?? r.diameter).value / 2) + g,
     value: r.value,
   }))
 }

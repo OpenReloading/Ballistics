@@ -1,4 +1,5 @@
 import { loadRatio } from '@openreloading/core'
+import { fromSi } from '@openreloading/schema'
 import type { ErrorBody, InteriorLadderResponse, InteriorResponse } from '../lib/api-types.ts'
 import { pagesBasePath } from '../lib/edition.ts'
 import type { InteriorBody } from '../lib/interior-input.ts'
@@ -121,7 +122,7 @@ export function stripFigureOf(ok: Extract<Outcome, { kind: 'ok' }>) {
   const travel = ok.load.barrel.length
   if (ok.ladder.kind !== 'seating' || !figure || barrel === undefined || travel === undefined)
     return figure
-  return { ...figure, base: (barrel - travel) * 1e3 }
+  return { ...figure, base: fromSi('length', barrel - travel) }
 }
 
 /**
