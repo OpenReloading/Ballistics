@@ -24,18 +24,16 @@ jobs:
   # Which jobs run and what the e2e job builds: only a pull request may skip `check` (prose only), `e2e` (no
   # change to what the API, the web app or the e2e specs read) or the web build, or prerender a sample of the
   # records. Every other event (the default branch) and every doubt runs everything; see apps/web/scripts/ci-plan.mts.
-  #
-  # `promote` is true only for the promotion pull request (develop into main, from this repository). The push to
-  # develop already ran every check on that commit, so its pull_request run would repeat them; the jobs skip, and
-  # a skipped required check passes. A fork's branch named develop does not match, and a failed `changes` job
-  # leaves `promote` empty, so every job runs. The jobs without `needs` repeat the expression.
   changes:
+    # Skips only the promotion pull request (develop into main, from this repository): the push to develop already
+    # ran every check on that commit, and a skipped required check passes. A fork's branch named develop does not
+    # match. Every job repeats this condition.
+    if: ${{ !(github.event_name == 'pull_request' && github.head_ref == 'develop' && github.base_ref == 'main' && github.event.pull_request.head.repo.full_name == github.repository) }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
       contents: read
     outputs:
-      promote: ${{ github.head_ref == 'develop' && github.base_ref == 'main' && github.event.pull_request.head.repo.full_name == github.repository }}
       check: ${{ steps.plan.outputs.check }}
       e2e: ${{ steps.plan.outputs.e2e }}
       web: ${{ steps.plan.outputs.web }}
@@ -61,7 +59,7 @@ jobs:
   static:
     needs: changes
     # a failed `changes` job leaves the outputs empty, so the job runs
-    if: ${{ !cancelled() && needs.changes.outputs.promote != 'true' && needs.changes.outputs.check != 'false' }}
+    if: ${{ !cancelled() && !(github.event_name == 'pull_request' && github.head_ref == 'develop' && github.base_ref == 'main' && github.event.pull_request.head.repo.full_name == github.repository) && needs.changes.outputs.check != 'false' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -90,7 +88,7 @@ jobs:
   test:
     name: test (${{ matrix.name }})
     needs: changes
-    if: ${{ !cancelled() && needs.changes.outputs.promote != 'true' && needs.changes.outputs.check != 'false' }}
+    if: ${{ !cancelled() && !(github.event_name == 'pull_request' && github.head_ref == 'develop' && github.base_ref == 'main' && github.event.pull_request.head.repo.full_name == github.repository) && needs.changes.outputs.check != 'false' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -127,8 +125,8 @@ jobs:
   # Fails when a part failed or was cancelled; a skipped part (the plan, the promotion pull request) passes, as the
   # old single job did when skipped. Stays the name the rulesets require.
   check:
-    needs: [changes, static, test]
-    if: ${{ always() && needs.changes.outputs.promote != 'true' }}
+    needs: [static, test]
+    if: ${{ always() && !(github.event_name == 'pull_request' && github.head_ref == 'develop' && github.base_ref == 'main' && github.event.pull_request.head.repo.full_name == github.repository) }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions: {}
@@ -141,7 +139,7 @@ jobs:
 
   # Workflow lint and security audit of .github/workflows and dependabot.yml.
   workflows:
-    if: ${{ !(github.head_ref == 'develop' && github.base_ref == 'main' && github.event.pull_request.head.repo.full_name == github.repository) }}
+    if: ${{ !(github.event_name == 'pull_request' && github.head_ref == 'develop' && github.base_ref == 'main' && github.event.pull_request.head.repo.full_name == github.repository) }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -172,7 +170,7 @@ jobs:
   e2e:
     needs: changes
     # a failed `changes` job still runs e2e, with empty outputs: the web app and every record page are built
-    if: ${{ !cancelled() && needs.changes.outputs.promote != 'true' && needs.changes.outputs.e2e != 'false' }}
+    if: ${{ !cancelled() && !(github.event_name == 'pull_request' && github.head_ref == 'develop' && github.base_ref == 'main' && github.event.pull_request.head.repo.full_name == github.repository) && needs.changes.outputs.e2e != 'false' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
