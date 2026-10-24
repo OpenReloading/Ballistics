@@ -64,12 +64,18 @@ export const networkOr = <T extends { status: number }>(
 export const appUrl = (base: string, path: string, slash = '') =>
   base + (path === '/' ? '/' : path + slash)
 
-/** URLs of the files under `.next/static` (paths relative to it) without maps. */
-export const precacheList = (files: string[], base = '') =>
-  files
-    .filter((f) => !/\.map$/.test(f))
-    .map((f) => `${base}/_next/static/${f}`)
-    .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))
+/** The Pages edition's catalogue index (`writeStaticApi`), which every list reads: precached, so lists work offline. */
+export const catalogueFile = '/api/catalogue/index.json'
+
+/**
+ * URLs of the files under `.next/static` (paths relative to it) without maps, in the Pages edition
+ * (`pages`) also the catalogue index.
+ */
+export const precacheList = (files: string[], base = '', pages = false) =>
+  [
+    ...files.filter((f) => !/\.map$/.test(f)).map((f) => `${base}/_next/static/${f}`),
+    ...(pages ? [base + catalogueFile] : []),
+  ].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))
 
 /** The cache key of a page: its path and query without Next's `_rsc` parameter. */
 export const pageKey = (url: string) => {
@@ -88,7 +94,8 @@ export const shellAnswer = (cached: Response, destination: string) =>
   destination === 'worker' ? new Response(cached.body, cached) : cached
 
 /**
- * How the worker answers a request: `static` from the shell cache, `records` network-first with
+ * How the worker answers a request: `static` from the shell cache (the chunks, the manifest and
+ * icons, the Pages catalogue index), `records` network-first with
  * the cached record behind it, `page` network-first with the cached page and the offline page
  * behind it, `navigation` (a client navigation fetching RSC) from the network while the page's HTML
  * is stored; undefined leaves the request to the network (POST /interior, searches, prefetches,
@@ -108,7 +115,9 @@ export const strategyOf = (
   if (request.method !== 'GET' || u.origin !== origin || !u.pathname.startsWith(`${base}/`)) return
   const path = u.pathname.slice(base.length)
   if (path.startsWith('/docs/')) return
-  if (path.startsWith('/_next/static/') || shellFiles.includes(path)) return 'static'
+  // the catalogue index is as old as its build, so it comes from the build's shell cache
+  if (path.startsWith('/_next/static/') || shellFiles.includes(path) || path === catalogueFile)
+    return 'static'
   // search as you type (`q`) would fill the records cache without limit
   if (path.startsWith('/api/')) return u.searchParams.has('q') ? undefined : 'records'
   if (request.mode === 'navigate') return 'page'

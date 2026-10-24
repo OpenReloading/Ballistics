@@ -1,7 +1,7 @@
 /**
  * Writes public/sw.js after `next build` (out/sw.js in the Pages edition, `PAGES_BASE_PATH` set):
- * the build id as `version`, the files of .next/static as `precache`, the base path as `base` and
- * the pages' trailing slash as `slash`, every export of src/lib/offline.ts (Node strips their
+ * the build id as `version`, the files of .next/static (in the Pages edition also the catalogue
+ * index) as `precache`, the base path as `base` and the pages' trailing slash as `slash`, every export of src/lib/offline.ts (Node strips their
  * types, so their source is JavaScript), then src/service-worker.js.
  */
 import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
@@ -16,7 +16,7 @@ const base = process.env.PAGES_BASE_PATH
 const dir = base === undefined ? 'public' : 'out'
 const constants = {
   version,
-  precache: offline.precacheList(files, base),
+  precache: offline.precacheList(files, base, base !== undefined),
   base: base ?? '',
   slash: base === undefined ? '' : '/',
 }

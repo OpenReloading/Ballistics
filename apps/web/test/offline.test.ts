@@ -74,6 +74,20 @@ it('precaches the static output as /_next/static URLs, sorted, without maps', ()
   ])
 })
 
+it('precaches the catalogue index in the Pages edition only, and answers it from the shell cache', () => {
+  expect(precacheList(['chunks/a.js'])).toEqual(['/_next/static/chunks/a.js'])
+  expect(precacheList(['chunks/a.js'], '/OpenReloading', true)).toEqual([
+    '/OpenReloading/_next/static/chunks/a.js',
+    '/OpenReloading/api/catalogue/index.json',
+  ])
+  expect(precacheList([], '', true)).toEqual(['/api/catalogue/index.json'])
+  const index = req('/OpenReloading/api/catalogue/index.json')
+  expect(strategyOf(index, origin, '/OpenReloading')).toBe('static')
+  expect(
+    strategyOf(req('/OpenReloading/api/cartridges/308-win.json'), origin, '/OpenReloading'),
+  ).toBe('records')
+})
+
 it('the shell holds the offline page, the tools, the manifest and its icons', () => {
   for (const u of ['/', '/offline', '/workbench', '/groups', '/session'])
     expect(shellPages).toContain(u)
