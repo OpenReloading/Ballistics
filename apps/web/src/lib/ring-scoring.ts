@@ -89,7 +89,7 @@ function nearestBull(face: TargetFace, shot: Point): { centre: Point; zone?: str
   let best = { centre: { x: 0, y: 0 }, zone: undefined as string | undefined }
   let bestD = Number.POSITIVE_INFINITY
   for (const b of face.bulls ?? []) {
-    const centre = { x: b.x.value * 1e-3, y: b.y.value * 1e-3 }
+    const centre = { x: toSi('length', b.x.value), y: toSi('length', b.y.value) }
     const d = Math.hypot(shot.x - centre.x, shot.y - centre.y)
     if (d < bestD) [best, bestD] = [{ centre, zone: b.zone }, d]
   }
