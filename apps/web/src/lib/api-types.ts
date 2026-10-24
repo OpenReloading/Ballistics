@@ -143,10 +143,16 @@ export interface BulletRecord {
   baseToOgive?: QuantityValue
   bearingLength?: QuantityValue
   base?: {
-    type?: 'flat' | 'boat-tail' | 'rebated-boat-tail'
+    type?:
+      | 'flat'
+      | 'boat-tail'
+      | 'rebated-boat-tail'
+      | 'conical-hollow-base'
+      | 'rounded-hollow-base'
     length?: QuantityValue
     diameter?: QuantityValue
     angle?: QuantityValue
+    cavityDiameter?: QuantityValue
   }
   ogive?: { form?: string; radius?: QuantityValue; radiusRatio?: QuantityValue }
   tip?: { type: string; length?: QuantityValue; mouthDiameter?: QuantityValue }
@@ -215,6 +221,12 @@ export interface PowderRecord {
     molarMass: ComputedRange
     covolume: ComputedRange
   }
+  /** Burn-rate sensitivity to the propellant temperature: reference in K, cold and hot in 1/K. */
+  temperatureSensitivity?: {
+    reference: QuantityValue
+    cold: QuantityValue
+    hot: QuantityValue
+  }
   /** Fitted M3 parameters (`packages/schema/src/powder.ts`), only the fields the web app reads. */
   interior?: {
     fitted: string[]
@@ -280,12 +292,15 @@ export interface InteriorResponse {
     tolerances: {
       chargeFraction: number
       volumeFraction: number
+      massFraction: number
       burnRateFraction: number
       temperatureKelvin: number
       startPressureFraction: number
     }
     cases: { maxPressure: number | null }[]
   }
+  /** The sampled band of the run (`sampling`), `POST /interior`; `failed` is set by the web app when its request did not answer. */
+  sampled?: SampledBand
   limits?: {
     cartridge: string
     /** Date of the sheet revision, `revised` or else `published`. */
@@ -315,6 +330,28 @@ export interface InteriorResponse {
       provenance: Provenance
     }
   }
+}
+
+/** The answer's `sampled`, or the web app's own `failed` for a sampling request that gave none. */
+export type SampledBand =
+  | { status: 'failed' }
+  | {
+      status: 'sampled' | 'overBudget' | 'invalid'
+      samples: number
+      seed: number
+      failed: number
+      budgetMs: number
+      /** Peak breech pressure, Pa; with status `sampled`. */
+      pressure?: SampledPercentiles
+      /** Muzzle velocity, m/s; with status `sampled`. */
+      velocity?: SampledPercentiles
+    }
+
+/** The 5th, 50th and 95th percentile of a sampled quantity. */
+export interface SampledPercentiles {
+  p05: number
+  p50: number
+  p95: number
 }
 
 /**

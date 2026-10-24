@@ -63,6 +63,18 @@ Code: `packages/core/src/exterior/atmosphere.ts`, `speedOfSound` (`vapourRatio`)
 
 With $\phi = 0$ both reduce to the dry-air ICAO formulas.
 
+### Density altitude
+
+The density altitude of an air is the altitude at which the standard atmosphere has the density $\rho$ of that air. In the troposphere $\rho \propto (T/T_0)^{g_0/(R_d L) - 1}$, so with the sea-level density $\rho_0$ of the standard atmosphere:
+
+$$
+H_\rho = \frac{T_0}{L}\left(1 - \left(\frac{\rho}{\rho_0}\right)^{1/(g_0/(R_d L) - 1)}\right)
+$$
+
+Code: `packages/core/src/exterior/atmosphere.ts`, `densityAltitude`.
+
+$\rho$ is the density of moist air of the entered temperature, station pressure and humidity, so a warmer, lower-pressure or more humid air has a higher density altitude. The station altitude does not enter.
+
 ## Symbols
 
 | Symbol | Meaning | Stored unit | Unit in `core` |
@@ -84,7 +96,8 @@ With $\phi = 0$ both reduce to the dry-air ICAO formulas.
 | $e_s$, $e$ | Saturation vapour pressure, vapour pressure | bar | Pa |
 | $x_v$ | Mole fraction of water vapour | 1 | 1 |
 | $c_p$ | Molar heat capacity of the mixture at constant pressure | no kind | J/(mol K) |
-| $\rho$ | Air density | g/cm3 | kg/m³ |
+| $\rho$, $\rho_0$ | Air density, ICAO sea-level density | g/cm3 | kg/m³ |
+| $H_\rho$ | Density altitude | mm | m |
 | $a$ | Speed of sound | m/s | m/s |
 
 ## Assumptions
@@ -93,12 +106,13 @@ With $\phi = 0$ both reduce to the dry-air ICAO formulas.
 - Moist air is an ideal mixture of ideal gases. The compressibility factor of the CIPM-2007 density formula (close to 1 at ambient conditions) is left out.
 - Water vapour and dry air have the heat capacities of rigid molecules, independent of temperature.
 - The enhancement factor of water vapour in air is left out of the saturation vapour pressure.
+- The density altitude extends the tropospheric law above the tropopause and below `minAltitude`.
 - Along the path the relative humidity is held, not the mixing ratio. The hydrostatic pressure uses the dry-air gas constant (no virtual-temperature correction).
 
 ## Limits
 
 - Altitudes from -5000 m (`minAltitude`) to 11000 m (the tropopause). A trajectory that leaves this band stops with the reason `atmosphere`.
-- `checkAir` rejects a temperature at or below 0 K, a relative humidity outside 0 to 1, a pressure at or below the vapour pressure, and non-finite values.
+- `checkAir` rejects a temperature at or below 0 K, a relative humidity outside 0 to 1, a pressure at or below the vapour pressure, non-finite values, and a pressure and temperature whose air density is not above 0 and at most 1000 kg/m³, `maxDensity` (the density overflows for a temperature near the smallest floating-point number and underflows for a pressure near it).
 - The Magnus constants are those for water. Below 0 degC the formula still gives the pressure over water, not over ice.
 
 ## Sources

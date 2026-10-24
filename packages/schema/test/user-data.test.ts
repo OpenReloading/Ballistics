@@ -210,9 +210,9 @@ describe('workbenchState ladder', () => {
     expect(userRecord.parse(withLadder(seating))).toEqual(withLadder(seating))
     const { kind: _, ...older } = seating
     expect(userRecord.parse(withLadder(older)).data).not.toHaveProperty('ladder.kind')
-    expect(userRecord.safeParse(withLadder({ ...seating, kind: 'temperature' })).success).toBe(
-      false,
-    )
+    const temperature = { ...seating, kind: 'temperature', chargeStep: 5 }
+    expect(userRecord.parse(withLadder(temperature))).toEqual(withLadder(temperature))
+    expect(userRecord.safeParse(withLadder({ ...seating, kind: 'Seating' })).success).toBe(false)
   })
 
   it('rejects a step count outside 2 to 21, a step of 0, an unknown direction and an even count around', () => {
@@ -361,6 +361,41 @@ describe('firearm', () => {
       'data.optics.0',
       'data.configurations.0',
     ])
+  })
+
+  describe('zero air and drag factor of a mount', () => {
+    const mountWith = (m: object) => ({
+      configurations: [{ ...config, mounts: [{ ...config.mounts[0], ...m }] }],
+    })
+    const zero = {
+      zeroTemperature: 288.15,
+      zeroPressure: 101325,
+      zeroHumidity: 0.5,
+      dragFactor: 1.034,
+      dragFactorSource: 'Truing session of 2026-09-14',
+    }
+
+    it('round-trips through a user data file', () => {
+      const record = { ...firearmRecord, data: { ...firearmRecord.data, ...mountWith(zero) } }
+      const parsed = userDataFile.parse(file([record]))
+      expect(parsed.records[0]).toEqual(record)
+      expect(JSON.parse(JSON.stringify(parsed))).toEqual(parsed)
+    })
+
+    it('rejects a non-positive factor, a humidity outside 0 to 1 and a non-positive air', () => {
+      const at = (key: string) => `data.configurations.0.mounts.0.${key}`
+      for (const [key, bad] of [
+        ['dragFactor', 0],
+        ['dragFactor', -1],
+        ['zeroHumidity', -0.01],
+        ['zeroHumidity', 1.01],
+        ['zeroTemperature', 0],
+        ['zeroPressure', -1],
+      ] as const)
+        expect(paths(mountWith({ [key]: bad }))).toEqual([at(key)])
+      expect(paths(mountWith({ zeroHumidity: 0 }))).toBeUndefined()
+      expect(paths(mountWith({ zeroHumidity: 1 }))).toBeUndefined()
+    })
   })
 
   it('keeps a firearm without optics', () => {

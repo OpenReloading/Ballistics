@@ -1,5 +1,9 @@
 import {
+  type Air,
   type DragModel,
+  densityAltitude,
+  dragCorrection,
+  firstLowStability,
   icao,
   type Projectile,
   type Trajectory,
@@ -8,6 +12,7 @@ import {
   trajectory,
 } from '@openreloading/core'
 import type { FieldSpec } from './field-spec.ts'
+import { metersPerSecondPerMph } from './units.ts'
 
 /** Points of the chart, evenly spaced from 0 to the largest range. */
 const chartPoints = 101
@@ -38,6 +43,35 @@ export const shotFields = [
     required: true,
     min: 0,
     initial: 100,
+  },
+  {
+    key: 'zeroTemperature',
+    label: 'Zero temperature',
+    help: 'Optional, the air of the zero: an empty field takes the shot value. The zero always takes the altitude of the shot.',
+    quantity: 'temperature',
+  },
+  {
+    key: 'zeroPressure',
+    label: 'Zero pressure',
+    help: 'Optional. Absolute station pressure of the zero, not reduced to sea level; empty takes the shot value.',
+    quantity: 'airPressure',
+    min: 0,
+  },
+  {
+    key: 'zeroHumidity',
+    label: 'Zero humidity',
+    help: 'Optional. Empty takes the shot value.',
+    quantity: 'percent',
+    min: 0,
+    max: 100,
+  },
+  {
+    key: 'dragFactor',
+    label: 'Drag factor',
+    help: 'Optional. Multiplies the drag of the bullet: 100 % is the bullet as given, 103 % has 3 % more drag.',
+    quantity: 'dragFactor',
+    min: 0,
+    positive: true,
   },
   {
     key: 'temperature',
@@ -114,6 +148,8 @@ export const manualBulletFields = [
   },
 ] as const satisfies readonly FieldSpec[]
 
+/** The optional fields of the zero air and the drag factor, which the example leaves empty. */
+export const zeroKeys = ['zeroTemperature', 'zeroPressure', 'zeroHumidity', 'dragFactor'] as const
 export type ShotKey = (typeof shotFields)[number]['key']
 export type ManualKey = (typeof manualBulletFields)[number]['key']
 
@@ -144,7 +180,22 @@ export function rangeSteps(max: number, step: number): number[] {
   return list
 }
 
-/** Core `TrajectoryInput` from SI field values; zero air is the shot air and the zero has no wind (core defaults). */
+/** The zero air of the fields set, each other component the shot's; none when no field is set. */
+function zeroAir(values: Values, air: Air): Air | undefined {
+  const { zeroTemperature: temperature, zeroPressure: pressure, zeroHumidity: humidity } = values
+  if (temperature === undefined && pressure === undefined && humidity === undefined) return
+  return {
+    ...air,
+    ...(temperature !== undefined && { temperature }),
+    ...(pressure !== undefined && { pressure }),
+    ...(humidity !== undefined && { humidity }),
+  }
+}
+
+/**
+ * Core `TrajectoryInput` from SI field values. The zero has no wind and the air of the shot unless
+ * a zero air field is set; a drag factor multiplies the drag of the projectile, in the zero too.
+ */
 export function shotFromValues(
   values: Values,
   projectile: Projectile,
@@ -153,20 +204,26 @@ export function shotFromValues(
   const v = (key: string) => requireValue(values, shotFields, key)
   const twist = values.twist
   const windSpeed = v('windSpeed')
+  const air = {
+    temperature: v('temperature'),
+    pressure: v('pressure'),
+    altitude: v('altitude'),
+    humidity: v('humidity'),
+  }
+  const factor = values.dragFactor
+  const zeroAt = zeroAir(values, air)
   return {
-    projectile,
+    projectile:
+      factor === undefined
+        ? projectile
+        : { ...projectile, drag: dragCorrection(projectile)([factor]) },
     muzzleVelocity: v('muzzleVelocity'),
     firearm: { sightHeight: v('sightHeight'), ...(twist !== undefined && { twist }), twistHand },
-    air: {
-      temperature: v('temperature'),
-      pressure: v('pressure'),
-      altitude: v('altitude'),
-      humidity: v('humidity'),
-    },
+    air,
     ...(windSpeed > 0 && {
       wind: [{ endDistance: v('maxRange'), speed: windSpeed, fromDirection: v('windFrom') }],
     }),
-    zero: { range: v('zeroRange') },
+    zero: { range: v('zeroRange'), ...(zeroAt && { air: zeroAt }) },
   }
 }
 
@@ -186,7 +243,39 @@ export function manualProjectile(values: Values, model: DragModel): Projectile {
   }
 }
 
+/**
+ * The windage hold the shot needs per 1 m/s and per 1 mph of wind from the right at each of
+ * `points`, as a difference to the shot without wind, rad. Magnitudes: wind from the left holds the
+ * other way.
+ */
+function windPerUnit(shot: TrajectoryInput, points: readonly TrajectoryPoint[]) {
+  const ranges = points.map((p) => p.range)
+  const { wind: _, ...calm } = shot
+  const hold = (speed: number) => {
+    const t = trajectory(
+      speed > 0
+        ? {
+            ...calm,
+            wind: [
+              { endDistance: 2 * (ranges.at(-1) ?? 0) + 1, speed, fromDirection: Math.PI / 2 },
+            ],
+          }
+        : calm,
+      ranges,
+    )
+    return new Map(t.points.map((p) => [p.range, p.windageHold]))
+  }
+  const base = hold(0)
+  const per = (speed: number) => {
+    const run = hold(speed)
+    return ranges.map((r) => Math.abs((run.get(r) ?? 0) - (base.get(r) ?? 0)))
+  }
+  return { mps: per(1), mph: per(metersPerSecondPerMph) }
+}
+
 export type TrajectoryResult = {
+  /** The shot the result is of: what the truing section takes as its nominal shot. */
+  shot: TrajectoryInput
   trajectory: Trajectory
   /** Points at the table ranges. */
   tablePoints: TrajectoryPoint[]
@@ -194,6 +283,14 @@ export type TrajectoryResult = {
   chartPoints: TrajectoryPoint[]
   /** Zero range used, m. */
   zeroRange: number
+  /** Windage hold per 1 m/s and per 1 mph of crosswind at each table point, rad. */
+  windPerUnit: { mps: number[]; mph: number[] }
+  /** Bullet diameter, m. */
+  bulletDiameter: number
+  /** Density altitude of the shot's air, m. */
+  densityAltitude: number
+  /** Where Miller's factor first falls below `minStability` along the flight; none without length and twist. */
+  lowStability?: { range: number; stability: number }
 }
 
 /** Table and chart points of one shot from SI field values; throws the input and core errors. */
@@ -205,14 +302,31 @@ export function trajectoryResult(
   const table = rangeSteps(values.maxRange ?? Number.NaN, values.rangeStep ?? Number.NaN)
   const max = table[table.length - 1]
   const chart = Array.from({ length: chartPoints }, (_, k) => (k * max) / (chartPoints - 1))
-  const t = trajectory(shotFromValues(values, projectile, twistHand), [...table, ...chart])
+  const shot = shotFromValues(values, projectile, twistHand)
+  const t = trajectory(shot, [...table, ...chart])
+  const { length } = projectile
+  const { twist } = shot.firearm
+  const low =
+    length !== undefined && twist !== undefined
+      ? firstLowStability(
+          { mass: projectile.mass, diameter: projectile.diameter, length, twist },
+          shot.air,
+          t.points,
+        )
+      : undefined
   const byRange = new Map(t.points.map((pt) => [pt.range, pt]))
   // an early stop leaves out the ranges past it
   const pick = (ranges: number[]) => ranges.flatMap((r) => byRange.get(r) ?? [])
+  const tablePoints = pick(table)
   return {
+    shot,
     trajectory: t,
-    tablePoints: pick(table),
+    tablePoints,
     chartPoints: pick(chart),
     zeroRange: requireValue(values, shotFields, 'zeroRange'),
+    windPerUnit: windPerUnit(shot, tablePoints),
+    bulletDiameter: projectile.diameter,
+    densityAltitude: densityAltitude(shot.air),
+    ...(low && { lowStability: low }),
   }
 }

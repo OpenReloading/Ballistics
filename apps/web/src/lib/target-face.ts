@@ -50,6 +50,8 @@ const REACH = 2.8
 const TOLERANCE = 0.03
 /** Faces within this score of the best (half a ring) are ratio twins: a ring the photo misses or a false one can make another face fit as well. */
 const TIE = 0.5
+/** A known scale and the scale a face needs for the black area found differ by at most this share. */
+const SCALE_TOLERANCE = 0.2
 /** A face needs the black edge and at least this many matched rings. */
 const MIN_RINGS = 3
 /** The search stops at a fit this good (score), else it tries every black area candidate. */
@@ -289,12 +291,15 @@ type FaceMatch = {
  * nearest ring of the face within 4 % of its radius, and rings expected between 0.15 and 2.9 black
  * radii that are not found count against a face a little. With the photo's `frame` (px), only a
  * ring with half its line in the photo is expected. A face with `photoSearch: false` is skipped.
+ * With a known `scale` (image px per mm along the black area's long axis) a face whose black area
+ * would have another size is skipped too.
  */
 export function matchFaces(
   black: Ellipse,
   rings: readonly Ring[],
   faces: readonly TargetFace[],
   frame?: { width: number; height: number },
+  scale?: number,
 ): FaceMatch[] {
   const rho = meanRadius(black)
   const found = concentric(black, rings)
@@ -302,6 +307,11 @@ export function matchFaces(
   for (const face of faces) {
     if (face.photoSearch === false) continue
     const s = rho / (face.blackDiameter.value / 2)
+    if (
+      scale &&
+      Math.abs(black.semiMajor / (face.blackDiameter.value / 2) / scale - 1) > SCALE_TOLERANCE
+    )
+      continue
     const list = faceRings(face)
     const matched = matchGreedily(pairCandidates(found, list, s), list)
     const expected = list.filter(
@@ -612,16 +622,20 @@ export type FaceSearch = {
  * Finds the target face in a photo. `image` may be any size: the search runs on a grid of about
  * 700 px and a crop of about 1400 px. `fits` is empty when no face is proposed (no black area, or
  * fewer than two rings match): `ellipses` and `ranked` are then what the editor shows. More than
- * one fit means ratio twins: the user's event or distance tells them apart.
+ * one fit means ratio twins: the user's event or distance tells them apart. A known `scale` (image px per mm) drops the faces of another size first.
  */
-export function findFace(image: RgbaImage, faces: readonly TargetFace[]): FaceSearch {
+export function findFace(
+  image: RgbaImage,
+  faces: readonly TargetFace[],
+  scale?: number,
+): FaceSearch {
   const s0 = Math.max(1, Math.ceil(Math.max(image.width, image.height) / COARSE))
   const coarse = grayGrid(image, s0)
   let result: FaceSearch = { ellipses: [], rings: [], ranked: [], fits: [], sure: false }
   let bestScore = Number.NEGATIVE_INFINITY
   for (const cand of blackAreas(coarse)) {
     const { black, rings } = ringLines(image, toImageEllipse(coarse, cand.ellipse))
-    const ranked = matchFaces(black, rings, faces, image)
+    const ranked = matchFaces(black, rings, faces, image, scale)
     const search: FaceSearch = {
       black,
       ellipses: [black, ...concentric(black, rings).map((r) => r.ellipse)],

@@ -13,7 +13,9 @@ import {
   type InteriorOptions,
   interior,
   interiorPressureRange,
+  interiorSampledBand,
   type PressureTolerances,
+  type SamplingOptions,
   solveCharge,
   type TruedParameter,
   TruingError,
@@ -51,6 +53,8 @@ export type Task =
       load: InteriorLoad
       options: Partial<InteriorOptions>
       tolerances: PressureTolerances
+      /** With it the answer also holds the sampled band (the clock is the runner's). */
+      sampling?: Omit<SamplingOptions, 'now'>
     }
   | { kind: 'chargeSolve'; load: InteriorLoad; target: ChargeTarget; options: ChargeSolverOptions }
 
@@ -68,7 +72,11 @@ const runners = {
     const range = result.valid
       ? interiorPressureRange(t.load, result.peakBreechPressure, t.tolerances, t.options)
       : undefined
-    return { result, range }
+    const sampled =
+      result.valid && t.sampling
+        ? interiorSampledBand(t.load, t.tolerances, { ...t.sampling, now: Date.now }, t.options)
+        : undefined
+    return { result, range, sampled }
   },
   chargeSolve: (t: Extract<Task, { kind: 'chargeSolve' }>) =>
     solveCharge(t.load, t.target, t.options),

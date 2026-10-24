@@ -45,6 +45,9 @@ export const icao: Readonly<IcaoConstants> = {
   tropopause: 11000,
 }
 
+/** Largest air density the model accepts, kg/m3: that of water, far above any air. */
+export const maxDensity = 1000
+
 /** Lowest altitude the model accepts, m. */
 export const minAltitude = -5000
 
@@ -88,6 +91,17 @@ export function airAt(station: Air, height: number): Air {
   }
 }
 
+/**
+ * Density altitude, m: the altitude of the ICAO standard atmosphere that has the density of `air`
+ * (`apps/docs/docs/models/exterior-atmosphere.md`, "Density altitude"). Its tropospheric law is
+ * extended past the tropopause.
+ */
+export function densityAltitude(air: Air): number {
+  const ratio = airDensity(air) / airDensity(standardAtmosphere(0))
+  // density follows (T / T0) ** (n - 1) in the troposphere
+  return (icao.temperature * (1 - ratio ** (1 / (pressureExponent - 1)))) / icao.lapseRate
+}
+
 /** Density of moist air as an ideal mixture of dry air and water vapour, kg/m3. */
 export function airDensity(air: Air): number {
   const e = air.humidity * saturationVapourPressure(air.temperature)
@@ -118,5 +132,10 @@ export function checkAir(air: Air): Air {
   if (!(humidity >= 0 && humidity <= 1)) throw new InputError(`humidity ${humidity} outside 0..1`)
   if (!(pressure > humidity * saturationVapourPressure(temperature) && Number.isFinite(pressure)))
     throw new InputError(`pressure ${pressure} Pa`)
+  const density = airDensity(air)
+  if (!(density > 0 && density <= maxDensity))
+    throw new InputError(
+      `pressure ${pressure} Pa at temperature ${temperature} K gives an air density of ${density} kg/m3, outside 0 to ${maxDensity} kg/m3`,
+    )
   return air
 }

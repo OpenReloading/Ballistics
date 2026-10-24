@@ -52,7 +52,14 @@ const choiceLabels: Record<ChoiceKey, [string, Group]> = {
   'tip.type': ['Tip', 'tip'],
 }
 
-const optionLabel = (o: string) => (o === '' ? 'Not given' : o.replaceAll('-', ' '))
+/** Hollow bases get shorter names: the select is too narrow for the full type name. */
+const shortLabels: Record<string, string> = {
+  'conical-hollow-base': 'hollow cone',
+  'rounded-hollow-base': 'hollow round',
+}
+
+const optionLabel = (o: string) =>
+  o === '' ? 'Not given' : (shortLabels[o] ?? o.replaceAll('-', ' '))
 
 /** The field's state line: where its value comes from. */
 function stateText(s: DesignerSpec, state: FieldState, system: UnitSystem) {

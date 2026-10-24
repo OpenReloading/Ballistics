@@ -38,6 +38,8 @@ export type DefaultSources = {
   /** The chosen cartridge with its record's values: land diameter F, bore area Q, twist u, case capacity as a volume. */
   cartridge?: {
     name: string
+    /** A user design: its values are not CIP values, and it has no class. */
+    design?: true
     class?: CartridgeClass
     boreDiameter?: number
     boreArea?: number
@@ -64,7 +66,9 @@ export function suggestDefaults({
   if (positive(cartridge?.boreDiameter))
     out.boreDiameter = {
       si: cartridge.boreDiameter,
-      source: `CIP land diameter F of ${cartridge.name}`,
+      source: cartridge.design
+        ? `chamber F of the user design ${cartridge.name}`
+        : `CIP land diameter F of ${cartridge.name}`,
     }
   else if (bullet && positive(bullet.diameter))
     out.boreDiameter = {

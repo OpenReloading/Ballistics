@@ -106,6 +106,86 @@ describe('seatedVolume', () => {
   })
 })
 
+describe('hollow base', () => {
+  /** A flat-faced cylinder under a sharp cone, a cavity of diameter 5 in the base: depth 2.5. */
+  const hollow = (type: 'conical-hollow-base' | 'rounded-hollow-base'): BulletDimensions => ({
+    diameter: 8,
+    length: 30,
+    noseLength: 12,
+    meplatDiameter: 0,
+    ogive: { radiusRatio: 0 },
+    base: { type, cavityDiameter: 5 },
+  })
+  const solid: BulletDimensions = { ...hollow('conical-hollow-base'), base: { type: 'flat' } }
+  const [rc, a] = [2.5, 4]
+  /** The cone cavity below z = c, 0 <= c <= its depth rc. */
+  const coneBelow = (c: number) => (Math.PI * rc ** 3 * (1 - (1 - c / rc) ** 3)) / 3
+  const below = (bullet: BulletDimensions, depth: number, caseLength = 50) =>
+    intrusion({
+      bullet,
+      caseLength,
+      coal: caseLength - depth + bullet.length,
+      lengthSource: 'measured',
+    })
+
+  it('cylinder with a conical cavity: the cylinder less the cone, once the mouth is past the cavity', () => {
+    const i = below(hollow('conical-hollow-base'), 10)
+    expect(i.volume.value).toBeCloseTo((cylinder(8, 10) - (Math.PI * rc ** 3) / 3) / 1000, 12)
+  })
+
+  it('cylinder with a spherical-cap cavity: the cylinder less the hemisphere, within the sampling error', () => {
+    const hemisphere = (2 / 3) * Math.PI * rc ** 3
+    const i = below(hollow('rounded-hollow-base'), 10)
+    const taken = cylinder(8, 10) - i.volume.value * 1000
+    expect(taken).toBeLessThan(hemisphere)
+    expect(taken).toBeGreaterThan(hemisphere * 0.997)
+  })
+
+  it('counts only the cavity below the mouth when the mouth is inside the cavity', () => {
+    const i = below(hollow('conical-hollow-base'), 1)
+    expect(i.volume.value).toBeCloseTo((cylinder(8, 1) - coneBelow(1)) / 1000, 12)
+  })
+
+  it('1.5 mm more length at fixed COAL adds the cylinder of that length, solid or hollow, past the cavity', () => {
+    for (const bullet of [solid, hollow('conical-hollow-base'), hollow('rounded-hollow-base')]) {
+      const [short, long] = [10, 11.5].map((depth) => below(bullet, depth).volume.value)
+      expect(long - short).toBeCloseTo((Math.PI * a ** 2 * 1.5) / 1000, 12)
+    }
+  })
+
+  it('1.5 mm more length at fixed COAL adds less when the mouth is inside the cavity', () => {
+    const [short, long] = [0.5, 2].map(
+      (depth) => below(hollow('conical-hollow-base'), depth).volume.value,
+    )
+    const expected = cylinder(8, 1.5) - (coneBelow(2) - coneBelow(0.5))
+    expect(long - short).toBeCloseTo(expected / 1000, 12)
+    expect(expected).toBeLessThan(cylinder(8, 1.5))
+  })
+
+  it('flags the volume approximate once the mouth passes the base, whatever the length source', () => {
+    expect(below(hollow('conical-hollow-base'), 10).volume.tag).toBe('approximate')
+    expect(below(solid, 10).volume.tag).toBe('derived')
+    expect(below(hollow('conical-hollow-base'), -2).volume.tag).toBe('derived')
+  })
+
+  it('leaves the volume behind the bullet to the free volume of the cavity', () => {
+    const water = 40
+    const [h, s] = [hollow('conical-hollow-base'), solid].map((bullet) =>
+      seat({
+        bullet,
+        chamber,
+        waterCapacity: water,
+        waterDensity,
+        by: { kind: 'overallLength', value: 60 },
+      }),
+    )
+    const [vh, vs] = [h.volumeBehindBullet?.value, s.volumeBehindBullet?.value] as [number, number]
+    expect(vh - vs).toBeCloseTo((Math.PI * rc ** 3) / 3 / 1000, 9)
+    expect(h.volumeBehindBullet?.tag).toBe('approximate')
+    expect(s.volumeBehindBullet?.tag).toBe('derived')
+  })
+})
+
 describe('intrusion', () => {
   /** A flat base with a sharp conical nose (Rt/R 0): every outline point is given. */
   const cone: BulletDimensions = {

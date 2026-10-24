@@ -350,6 +350,8 @@ export function useHoleDetection({
         height: photo.height,
         photoRotation: turn,
         faces,
+        // a calibrated sheet gives the size, so faces of another size drop out of the search
+        ...(frame?.calibration && region && { pxPerMm: localPxPerM(frame, region) / 1000 }),
       },
       (m) => {
         if (m.kind !== 'face') return

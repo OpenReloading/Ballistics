@@ -14,7 +14,7 @@ import {
   recordResistance,
   ValueError,
 } from '@openreloading/core'
-import type { UserRecord, WorkbenchState } from '@openreloading/schema'
+import type { CartridgeDesign, UserRecord, WorkbenchState } from '@openreloading/schema'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { apiFetch, fetchRecord } from '../lib/api-fetch.ts'
@@ -25,9 +25,11 @@ import type {
   ErrorBody,
   InteriorResponse,
   PowderRecord,
+  SampledBand,
 } from '../lib/api-types.ts'
 import { runBatch } from '../lib/batch.ts'
 import { fitOf } from '../lib/bullet-fit.ts'
+import { workbenchDesign } from '../lib/cartridge-designer.ts'
 import { pagesBasePath } from '../lib/edition.ts'
 import { errorText } from '../lib/error-text.ts'
 import { loadExample } from '../lib/example-data.ts'
@@ -45,6 +47,7 @@ import {
   cartridgeClass,
   type FollowKey,
   followKeys,
+  type Suggestion,
   type Suggestions,
   suggestDefaults,
 } from '../lib/input-defaults.ts'
@@ -68,7 +71,10 @@ import {
   type RunnableLadderKind,
   runKindOf,
   type SeatingLengths,
+  type SeatingStep,
   seatingLadder,
+  temperatureLadder,
+  temperatureLadderBlockReason,
 } from '../lib/seating-ladder.ts'
 import { exactFieldText, fixedFieldText, formatQuantity, withUnit } from '../lib/units.ts'
 import { storedRecords } from '../lib/user-store.ts'
@@ -109,6 +115,7 @@ import {
   type SeatingSlotName,
   seatingSlotNames,
   seatingStepSpec,
+  temperatureStepSpec,
 } from './workbench-inputs.tsx'
 import {
   atStep,
@@ -175,7 +182,19 @@ export function useWorkbenchState() {
     validateInputOnBlur: true,
     validate,
   })
-  const [cartridge, setCartridge] = useState<CartridgeChoice | undefined>(undefined)
+  const [cartridge, setCartridgeRecord] = useState<CartridgeChoice | undefined>(undefined)
+  // shortcut: the design is not kept in load files or links; add a design id to `workbenchState` when a load should reopen it
+  /** The user cartridge design chosen in place of a record: it fills what its values give, nothing from a catalogue record. */
+  const [cartridgeDesign, setCartridgeDesign] = useState<{
+    id: string
+    name: string
+    data: CartridgeDesign
+  }>()
+  /** A catalogue cartridge replaces the design. */
+  const setCartridge = (c: CartridgeChoice | undefined) => {
+    setCartridgeRecord(c)
+    if (c) setCartridgeDesign(undefined)
+  }
   const [bullet, setBullet] = useState<BulletRecord | undefined>(undefined)
   const [powder, setPowder] = useState<PowderRecord | undefined>(undefined)
   const names = useManufacturerNames()
@@ -201,6 +220,10 @@ export function useWorkbenchState() {
       : undefined
   const [allDiameters, setAllDiameters] = useState(false)
   const [designs, setDesigns] = useState<Extract<UserRecord, { kind: 'bulletDesign' }>[]>([])
+  /** The browser's cartridge designs that draw a case and chamber. */
+  const [cartridgeDesigns, setCartridgeDesigns] = useState<
+    Extract<UserRecord, { kind: 'cartridgeDesign' }>[]
+  >([])
   /** The firearm library of this browser, for the Gun and barrel picker. */
   const [firearms, setFirearms] = useState<Extract<UserRecord, { kind: 'firearm' }>[]>([])
   const [firearm, setFirearm] = useState<string>()
@@ -222,6 +245,7 @@ export function useWorkbenchState() {
   const sight =
     firearm === loadExample.firearm.id && chosenSight
       ? {
+          ...chosenSight,
           sightHeight: system.length.toSi(
             Math.round(system.length.fromSi(chosenSight.sightHeight)),
           ),
@@ -269,6 +293,13 @@ export function useWorkbenchState() {
               r.kind === 'bulletDesign' && r.data.siValues.mass !== undefined,
           ),
         )
+        setCartridgeDesigns(
+          records.filter(
+            (r): r is (typeof cartridgeDesigns)[number] =>
+              r.kind === 'cartridgeDesign' &&
+              workbenchDesign(r.data, r.name, unitsNow.current) !== undefined,
+          ),
+        )
         setFirearms(records.filter((r): r is (typeof firearms)[number] => r.kind === 'firearm'))
       })
       .catch(() => {})
@@ -287,6 +318,20 @@ export function useWorkbenchState() {
     const mass = d.data.siValues.mass
     if (mass !== undefined)
       form.setFieldValue('bulletMass', { text: fixedFieldText('mass', system, mass), si: mass })
+  }
+  /** A cartridge design of this browser in place of a record. */
+  function chooseCartridgeDesign(id: string) {
+    const d = cartridgeDesigns.find((r) => r.id === id)
+    if (!d) return
+    picking.current.cartridges?.abort()
+    got('cartridge')
+    markChanged()
+    setCartridgeRecord(undefined)
+    setCartridgeDesign({ id: d.id, name: d.name, data: d.data })
+    setBulletNote('')
+    setPreviewInitial(undefined)
+    setSeated({})
+    setSeatingStart(undefined)
   }
   /** A firearm of the library: its twist fills the twist, its barrel length the seating's. */
   function chooseFirearm(id: string | null) {
@@ -393,6 +438,8 @@ export function useWorkbenchState() {
   /** What the ladder varies, the seating ladder's step size and the seating the preview reports. */
   const [ladderKind, setLadderKind] = useState<RunnableLadderKind>('charge')
   const [seatStep, setSeatStep] = useState<Fields>({ seatStep: emptyStep })
+  /** The temperature ladder's step size, a difference of temperatures. */
+  const [tempStep, setTempStep] = useState<Fields>({ tempStep: emptyStep })
   const [seatAt, setSeatAt] = useState<SeatingLengths>()
   /** The measured case capacity typed in the Cartridge card, kept for the cartridge it was typed for. */
   const [measured, setMeasured] = useState<Fields>({ measuredWaterCapacity: emptyStep })
@@ -413,6 +460,8 @@ export function useWorkbenchState() {
   const [chartView, setChartView] = useState<ChartView>({ x: 'travel', quantity: 'all' })
   const framed = useMediaQuery('screen and (min-width: 62em)')
   const running = useRef<AbortController | null>(null)
+  // the sampled band request of the shown result: an edit leaves it running, a new run ends it
+  const bandRequest = useRef<AbortController | null>(null)
   /** Bullet and powder record requests; only the latest of each kind may set its record. */
   const picking = useRef<Partial<Record<'cartridges' | 'bullets' | 'powders', AbortController>>>({})
   const runs = useRef(0)
@@ -438,6 +487,12 @@ export function useWorkbenchState() {
     [seatingStepSpec],
     system,
     (update) => setSeatStep((f) => update(f)),
+    fixedFieldText,
+  )
+  useFieldUnits(
+    [temperatureStepSpec],
+    system,
+    (update) => setTempStep((f) => update(f)),
     fixedFieldText,
   )
   useFieldUnits(
@@ -603,6 +658,7 @@ export function useWorkbenchState() {
     setLinked({})
     setByHand(false)
     running.current?.abort()
+    bandRequest.current?.abort()
     picking.current.cartridges?.abort()
     picking.current.bullets?.abort()
     picking.current.powders?.abort()
@@ -614,7 +670,8 @@ export function useWorkbenchState() {
     setFollowed(new Set(followKeys))
     written.current = {}
     form.setValues(exampleFields(interiorFields, d, system, fixedFieldText))
-    setCartridge(undefined)
+    setCartridgeRecord(undefined)
+    setCartridgeDesign(undefined)
     setBullet(undefined)
     setBulletDesign(undefined)
     setBulletNote('')
@@ -638,6 +695,7 @@ export function useWorkbenchState() {
     setLadder({ ladderStep: emptyStep })
     setLadderKind('charge')
     setSeatStep({ seatStep: emptyStep })
+    setTempStep({ tempStep: emptyStep })
     setLadderError(undefined)
     setDirection('up')
     setChronoSeries([])
@@ -831,16 +889,39 @@ export function useWorkbenchState() {
     return seatingLadder(seatAt, start, step, ladderSteps, direction, show)
   }
 
+  /** Why a temperature ladder cannot run: the powder record has no temperature sensitivity. */
+  const temperatureBlock = temperatureLadderBlockReason(
+    powderLabel,
+    powder?.temperatureSensitivity !== undefined,
+  )
+
+  /** The propellant temperatures of the temperature ladder from the Powder temperature field, or what stops it. */
+  function temperaturePlan(shown = system) {
+    const step = tempStep.tempStep.si
+    if (step === undefined) return { error: `${temperatureStepSpec.label} is empty.` }
+    return temperatureLadder(fields.propellantTemperature.si, step, ladderSteps, direction, (k) =>
+      withUnit('temperature', shown, k),
+    )
+  }
+
   /** The ladder step size's error; none while the charge runs alone. */
   function stepError(shown = system) {
     if (ladderSteps < 2) return
-    const seating = ladderKind === 'seating'
-    const spec = seating ? seatingStepSpec : ladderSpec
-    const v = seating ? seatStep.seatStep : ladder.ladderStep
+    const [spec, v] =
+      ladderKind === 'seating'
+        ? ([seatingStepSpec, seatStep.seatStep] as const)
+        : ladderKind === 'temperature'
+          ? ([temperatureStepSpec, tempStep.tempStep] as const)
+          : ([ladderSpec, ladder.ladderStep] as const)
     const own =
       fieldError(spec, v, shown) ??
       (v.si === undefined || v.si > 0 ? undefined : `${spec.label} must be above 0.`)
-    if (own || !seating) return own
+    if (own || ladderKind === 'charge') return own
+    if (ladderKind === 'temperature') {
+      if (temperatureBlock) return temperatureBlock
+      const plan = temperaturePlan(shown)
+      return 'error' in plan ? plan.error : undefined
+    }
     if (seatingBlock) return seatingBlock
     const plan = seatingPlan(shown)
     return 'error' in plan ? plan.error : undefined
@@ -857,7 +938,7 @@ export function useWorkbenchState() {
       const ladderInvalid = stepError()
       setLadderError(ladderInvalid)
       // the seating ladder's reasons are about the seating, not about one field: the status line names them too
-      if (ladderInvalid && ladderKind === 'seating') setStatus(ladderInvalid)
+      if (ladderInvalid && ladderKind !== 'charge') setStatus(ladderInvalid)
       invalid = hasErrors || ladderInvalid !== undefined
       // on phones the field sits in the Load tab, which is hidden while Results is open
       if (invalid) workspace.current?.showInputs()
@@ -921,6 +1002,13 @@ export function useWorkbenchState() {
     // the typed friction and engraving values replace the record's terms
     const applied = overrideResistance(resistance, values)
     if (applied) body.load.resistance = applied
+    const sensitivity = chosen?.temperatureSensitivity
+    if (sensitivity)
+      body.load.propellant.temperatureSensitivity = {
+        reference: sensitivity.reference.value,
+        cold: sensitivity.cold.value,
+        hot: sensitivity.hot.value,
+      }
     const resistanceMissing =
       chosen && missing.length > 0 ? { powder: productLabel(chosen, names), missing } : undefined
     const recordInputs = [
@@ -941,6 +1029,7 @@ export function useWorkbenchState() {
 
   async function send() {
     running.current?.abort()
+    bandRequest.current?.abort()
     let req: ReturnType<typeof loadRequest>
     try {
       req = loadRequest()
@@ -956,13 +1045,28 @@ export function useWorkbenchState() {
     }
     const { body, bulkDensity, resistanceMissing } = req
     const step = ladder.ladderStep.si
-    // a seating ladder is one single run per step, each with its own volume and travel
-    const plan = ladderKind === 'seating' && ladderSteps > 1 ? seatingPlan() : undefined
-    if (plan && 'error' in plan) {
+    // a seating or temperature ladder is one single run per step, each with its own volume and
+    // travel, or its own propellant temperature
+    const planned =
+      ladderSteps < 2
+        ? undefined
+        : ladderKind === 'seating'
+          ? seatingPlan()
+          : ladderKind === 'temperature'
+            ? temperatureBlock
+              ? { error: temperatureBlock }
+              : temperaturePlan()
+            : undefined
+    if (planned && 'error' in planned) {
       setOutcome(undefined)
-      setStatus(plan.error)
+      setStatus(planned.error)
       return
     }
+    const plan: Partial<Step>[] | undefined =
+      planned &&
+      (ladderKind === 'seating'
+        ? (planned.steps as SeatingStep[]).map((seating) => ({ seating }))
+        : (planned.steps as number[]).map((temperature) => ({ temperature })))
     const request =
       !plan && ladderSteps > 1 && step !== undefined
         ? { ...body, ladder: { chargeStep: step, stepCount: ladderSteps, direction } }
@@ -1002,10 +1106,10 @@ export function useWorkbenchState() {
       if (plan) {
         // at most 4 in flight, as the API runs the steps of a charge ladder
         const answers: Answer[] = []
-        await runBatch(plan.steps, 4, controller.signal, async (row, i) => {
+        await runBatch(plan, 4, controller.signal, async (row, i) => {
           const r = await post({
             ...body,
-            load: stepLoad(body.load, { charge: body.load.charge, seating: row }),
+            load: stepLoad(body.load, { charge: body.load.charge, ...row }),
           })
           answers[i] = { res: r, json: await r.json().catch(() => undefined) }
         })
@@ -1014,15 +1118,15 @@ export function useWorkbenchState() {
         const busy = answers.find((a) => a.res.status === 503)
         steps = busy
           ? []
-          : plan.steps.map((row, i) => {
+          : plan.map((row, i) => {
               const { res: r, json: j } = answers[i]
               const error = {
                 message: j?.message ?? `The API answered ${r.status}.`,
                 reason: j?.reason,
               }
               return r.ok && j !== undefined
-                ? { charge: body.load.charge, body: j, seating: row }
-                : { charge: body.load.charge, error, seating: row }
+                ? { charge: body.load.charge, body: j, ...row }
+                : { charge: body.load.charge, error, ...row }
             })
         // the first answer stands for the run's status when no step has a result
         ;({ res, json } = busy ?? answers.find((a) => !a.res.ok) ?? answers[0])
@@ -1047,17 +1151,20 @@ export function useWorkbenchState() {
           selected: first,
           direction,
           ladder: {
-            kind: plan ? ('seating' as const) : ('charge' as const),
-            seatingBy: plan && seatAt?.lengthKind,
+            kind: plan ? ladderKind : ('charge' as const),
+            seatingBy: plan && ladderKind === 'seating' ? seatAt?.lengthKind : undefined,
           },
           at: new Date().toLocaleTimeString('en-GB'),
           id: runs.current,
           bulkDensity,
+          cartridge: body.cartridge,
           powderChosen: powder !== undefined || linkedPowder !== undefined,
           resistanceMissing,
           design: bulletDesign?.name,
+          cartridgeDesign: cartridgeDesign?.name,
           identity: {
-            cartridge: cartridge?.name,
+            cartridge:
+              cartridge?.name ?? (cartridgeDesign && `${cartridgeDesign.name} (user design)`),
             bullet: bulletLabel ?? bulletDesign?.name ?? linkedBullet?.name,
             powder: powderLabel ?? linkedPowder?.name,
           },
@@ -1082,6 +1189,39 @@ export function useWorkbenchState() {
         showChart(undefined)
         setOutcome(ok)
         setStatus({ prefix: 'Simulation done. ' })
+        // the sampled band of the step shown first follows the result: it takes up to its time budget
+        const attach = (sampled: SampledBand) =>
+          setOutcome((o) =>
+            o?.kind === 'ok' && o.id === ok.id
+              ? {
+                  ...o,
+                  body: o.selected === first ? { ...o.body, sampled } : o.body,
+                  steps: o.steps.map((s, i) =>
+                    i === first && s.body ? { ...s, body: { ...s.body, sampled } } : s,
+                  ),
+                }
+              : o,
+          )
+        // a request that gives no band (busy, past its deadline, unreachable) is said so
+        const bandController = new AbortController()
+        bandRequest.current = bandController
+        apiFetch('interior', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            ...body,
+            load: stepLoad(body.load, steps[first]),
+            sampling: {},
+          }),
+          signal: bandController.signal,
+        })
+          .then((r) => (r.ok ? r.json() : undefined))
+          .then((answer: { sampled?: SampledBand } | undefined) => {
+            if (!bandController.signal.aborted) attach(answer?.sampled ?? { status: 'failed' })
+          })
+          .catch(() => {
+            if (!bandController.signal.aborted) attach({ status: 'failed' })
+          })
       } else {
         // a ladder whose every step the model reports as invalid shows the first step's error
         const error = steps[0]?.error
@@ -1237,12 +1377,24 @@ export function useWorkbenchState() {
       (linkedDirection !== 'around' || steps % 2 === 1)
     ) {
       setLadderSteps(steps)
-      // the step is a length for a seating ladder, a charge otherwise; both travel as `ladderStep`
+      // the step is a length for a seating ladder, a temperature difference for a temperature
+      // ladder, a charge otherwise; all travel as `ladderStep`
       const kind = runKindOf(query.get('ladderKind'))
-      const spec = { ...(kind === 'seating' ? seatingStepSpec : ladderSpec), key: 'ladderStep' }
-      const { ladderStep } = queryFields(query, [spec], system, fixedFieldText)
+      const stepSpec =
+        kind === 'seating'
+          ? seatingStepSpec
+          : kind === 'temperature'
+            ? temperatureStepSpec
+            : ladderSpec
+      const { ladderStep } = queryFields(
+        query,
+        [{ ...stepSpec, key: 'ladderStep' }],
+        system,
+        fixedFieldText,
+      )
       setLadderKind(kind)
       if (kind === 'seating') setSeatStep({ seatStep: ladderStep })
+      else if (kind === 'temperature') setTempStep({ tempStep: ladderStep })
       else setLadder({ ladderStep })
       setDirection(linkedDirection)
     }
@@ -1329,12 +1481,17 @@ export function useWorkbenchState() {
     previewInitial?.seating || moved ? (seatedNow ?? previewInitial?.seating) : undefined
   // the cartridge asked for counts while its record loads or stays offline, as in `cartridge` below
   const measuredWaterCapacity =
-    measuredFor === (cartridge?.id ?? asked.cartridge?.id) &&
+    measuredFor === (cartridge?.id ?? cartridgeDesign?.id ?? asked.cartridge?.id) &&
     (measured.measuredWaterCapacity.si ?? 0) > 0
       ? measured.measuredWaterCapacity.si
       : undefined
 
-  const activeStep = ladderKind === 'seating' ? seatStep.seatStep : ladder.ladderStep
+  const activeStep =
+    ladderKind === 'seating'
+      ? seatStep.seatStep
+      : ladderKind === 'temperature'
+        ? tempStep.tempStep
+        : ladder.ladderStep
   const loadFile: WorkbenchState = {
     siValues: Object.fromEntries(
       Object.entries({ ...fields, firearmMass: gunWeightUsed }).flatMap(([k, f]) =>
@@ -1353,7 +1510,7 @@ export function useWorkbenchState() {
       ladderSteps > 1
         ? ({
             // the charge is the default kind and stays out, so an older file opens unchanged
-            ...(ladderKind === 'seating' && { kind: ladderKind }),
+            ...(ladderKind !== 'charge' && { kind: ladderKind }),
             stepCount: ladderSteps,
             // a step of 0 or less stays out: the schema would reject the file on open
             chargeStep: (activeStep.si ?? 0) > 0 ? activeStep.si : undefined,
@@ -1387,7 +1544,7 @@ export function useWorkbenchState() {
   }
 
   const generated = generatedName({
-    cartridge: cartridge?.name,
+    cartridge: cartridge?.name ?? cartridgeDesign?.name,
     bullet: bulletLabel ?? bulletDesign?.name,
     powder: powderLabel,
     charge: shown('charge', 'mass'),
@@ -1416,24 +1573,45 @@ export function useWorkbenchState() {
   const recordTable = cartridge && groove?.id === cartridge.id ? groove.record?.table : undefined
   const mmToM = (mm: number | undefined) => (mm === undefined ? undefined : mm * 1e-3)
   const mm2ToM2 = (mm2: number | undefined) => (mm2 === undefined ? undefined : mm2 * 1e-6)
+  /** What the chosen cartridge design gives; the design's own values only. */
+  const designLoad = useMemo(
+    () => cartridgeDesign && workbenchDesign(cartridgeDesign.data, cartridgeDesign.name, system),
+    [cartridgeDesign, system],
+  )
+  const designCapacity: Suggestion | undefined =
+    seated.caseVolume !== undefined
+      ? { si: seated.caseVolume, source: 'your measured case capacity, without the bullet' }
+      : designLoad?.caseVolume !== undefined
+        ? {
+            si: designLoad.caseVolume,
+            source: `outline of the user design ${cartridgeDesign?.name} less a wall, approximate, without the bullet`,
+          }
+        : undefined
   const suggestions: Suggestions = suggestDefaults({
     firearm: gun && { name: gun.name, twist: gun.data.twist, barrelLength: gun.data.barrelLength },
-    cartridge: cartridge && {
-      name: cartridge.name,
-      class: cartridgeClass(recordTable),
-      boreDiameter: mmToM(specValue('chamber', 'F')),
-      boreArea: mm2ToM2(specValue('chamber', 'Q')),
-      twist: mmToM(specValue('chamber', 'u')),
-      capacity:
-        seated.caseVolume === undefined
-          ? undefined
-          : {
-              si: seated.caseVolume,
-              source: measuredWaterCapacity
-                ? 'your measured case capacity, without the bullet'
-                : `case capacity record of ${cartridge.name}, without the bullet`,
-            },
-    },
+    cartridge: cartridgeDesign
+      ? {
+          name: cartridgeDesign.name,
+          design: true,
+          boreDiameter: designLoad?.boreDiameter,
+          capacity: designCapacity,
+        }
+      : cartridge && {
+          name: cartridge.name,
+          class: cartridgeClass(recordTable),
+          boreDiameter: mmToM(specValue('chamber', 'F')),
+          boreArea: mm2ToM2(specValue('chamber', 'Q')),
+          twist: mmToM(specValue('chamber', 'u')),
+          capacity:
+            seated.caseVolume === undefined
+              ? undefined
+              : {
+                  si: seated.caseVolume,
+                  source: measuredWaterCapacity
+                    ? 'your measured case capacity, without the bullet'
+                    : `case capacity record of ${cartridge.name}, without the bullet`,
+                },
+        },
     bullet: bullet && {
       name: productLabel(bullet, names),
       diameter: bullet.diameter.value * 1e-3,
@@ -1486,6 +1664,7 @@ export function useWorkbenchState() {
   /** A new load with nothing chosen or typed: the start card replaces the cards. */
   const fresh =
     !cartridge &&
+    !cartridgeDesign &&
     !bullet &&
     !bulletDesign &&
     !powder &&
@@ -1495,7 +1674,11 @@ export function useWorkbenchState() {
   const has = (keys: readonly string[]) => keys.every((k) => fields[k]?.si !== undefined)
   /** What a run still needs, in the order of the cards; the first open one is next. */
   const todo = [
-    { label: 'Cartridge (optional)', done: !!cartridge, value: cartridge?.name },
+    {
+      label: 'Cartridge (optional)',
+      done: !!(cartridge || cartridgeDesign),
+      value: cartridge?.name ?? (cartridgeDesign && `${cartridgeDesign.name} (your design)`),
+    },
     {
       label: 'Bullet',
       done: has(['bulletMass']),
@@ -1597,6 +1780,10 @@ export function useWorkbenchState() {
     bulletDesign,
     bulletNote,
     cartridge,
+    cartridgeDesign,
+    cartridgeDesigns,
+    chooseCartridgeDesign,
+    designLoad,
     changed,
     chartSlot,
     chartView,
@@ -1687,8 +1874,11 @@ export function useWorkbenchState() {
     setLadderKind,
     setSeatAt,
     setSeatStep,
+    setTempStep,
     seatingBlock,
     seatStep,
+    tempStep,
+    temperatureBlock,
     setLadderSteps,
     setMeasured,
     setMeasuredFor,

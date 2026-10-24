@@ -1046,3 +1046,18 @@ describe('chargeTooSmall', () => {
     expect(elasticity).toBeLessThan(0.55)
   })
 })
+
+describe('propellant temperature', () => {
+  it('peak pressure and muzzle velocity rise with it for positive sensitivities', () => {
+    const run = (propellantTemperature: number) => {
+      const r = interior({ ...full(), propellantTemperature })
+      if (!r.valid) throw new Error(r.reason)
+      return r
+    }
+    const [cold, mid, hot] = [250, 294.15, 330].map(run)
+    expect(cold.peakBreechPressure).toBeLessThan(mid.peakBreechPressure)
+    expect(mid.peakBreechPressure).toBeLessThan(hot.peakBreechPressure)
+    expect(cold.muzzleVelocity).toBeLessThan(mid.muzzleVelocity)
+    expect(mid.muzzleVelocity).toBeLessThan(hot.muzzleVelocity)
+  })
+})

@@ -627,7 +627,7 @@ _Avoid_: click
 One entry of `configurations`: the optics mounted on a firearm between `mounted` and `removed` (ISO dates), with `id`, `name` and 1 to 4 `mounts`.
 
 **Optic mount**:
-One entry of `mounts`: `optic` (local id), `sightHeight` (m), `lateralOffset` (optic centre right of the bore, m), `cant` (clockwise as seen from behind, rad), `zeroRange` (m) and `zeroNotes`.
+One entry of `mounts`: `optic` (local id), `sightHeight` (m), `lateralOffset` (optic centre right of the bore, m), `cant` (clockwise as seen from behind, rad), `zeroRange` (m), `zeroNotes`, the optional air of the zero (`zeroTemperature` K, `zeroPressure` Pa, `zeroHumidity` fraction) and an optional `dragFactor` with its `dragFactorSource`.
 _Avoid_: `offset` (of a mount)
 
 **Sight height**:
@@ -810,7 +810,7 @@ _Avoid_: level, residualLevel, solver
 `priors`: Gaussian priors on the fitted parameters: `muzzleVelocity`, `dragFactor` and `clickValue` as the standard deviation of their logarithm, `zeroOffset` in rad (needs `fitZeroOffset`).
 
 **Drag factor**:
-`dragFactor`: constant multiplier on the drag curve fitted by truing.
+`dragFactor`: constant multiplier on the drag curve fitted by truing. An optic mount can store one (1 is the drag of the bullet as given), shown as a percentage.
 
 **Zero offset**:
 `zeroOffset`: angle by which the impacts at the zero setting lie above the nominal zero, rad. `fitZeroOffset` fits it.
@@ -862,7 +862,9 @@ _Avoid_: perforation
 _Avoid_: config
 
 **Pressure tolerances**:
-`tolerances`: the input variations of the pressure range, `chargeFraction`, `volumeFraction`, `burnRateFraction`, `temperatureKelvin` (K) and `startPressureFraction`. Absent keys take the core defaults.
+`tolerances`: the input variations of the pressure range, `chargeFraction`, `volumeFraction`, `massFraction` (default 0), `burnRateFraction`, `temperatureKelvin` (K) and `startPressureFraction`. Absent keys take the core defaults.
+
+`sampling`: the request field of a single interior run that asks for the sampled band (`samples`, `seed`, `budgetMs`). The answer's `sampled` holds the 5th, 50th and 95th percentile of the peak pressure and the muzzle velocity, or the status `overBudget` or `invalid`.
 
 **Charge target**:
 `target` of `POST /v1/interior/charge-target`: `kind` (`peakPressure` Pa, `muzzleVelocity` m/s, `loadRatio`, `barrelTime` s, `bulletLeadTime` s), `value` and `unit` (`percentOfLimit` for a percentage of the first compared limit).

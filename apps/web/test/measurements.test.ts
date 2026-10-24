@@ -5,6 +5,7 @@ import type { Shot } from '../src/lib/chrono.ts'
 import {
   chargeRows,
   type SimulatedStep,
+  seriesFlatSpots,
   seriesOf,
   simulatedCurve,
 } from '../src/lib/measurements.ts'
@@ -130,5 +131,34 @@ describe('seriesOf', () => {
     const long = 'x'.repeat(300)
     const s = seriesOf(long, { ...data, stringLabels: [long] }, [])
     expect(measuredSeries.safeParse(s).success).toBe(true)
+  })
+})
+
+describe('seriesFlatSpots', () => {
+  const string = (n: number, velocities: number[]) => ({
+    charge: n * gr,
+    shots: velocities.map((v) => shot(v)),
+  })
+
+  it('finds a flat spot over charges whose strings differ by less than their scatter', () => {
+    const rows = chargeRows(
+      [
+        string(40, [700, 710, 705, 695, 700]),
+        string(41, [702, 712, 707, 697, 702]),
+        string(42, [704, 714, 709, 699, 704]),
+        string(43, [760, 770, 765, 755, 760]),
+      ],
+      [],
+    )
+    const r = seriesFlatSpots(rows)
+    expect(r?.flatSpots).toHaveLength(1)
+    expect(r?.flatSpots[0].counts).toEqual([5, 5, 5])
+  })
+
+  it('needs two charges with two shots each', () => {
+    expect(seriesFlatSpots(chargeRows([string(40, [700, 710, 705])], []))).toBeUndefined()
+    expect(
+      seriesFlatSpots(chargeRows([string(40, [700, 710]), string(41, [705])], [])),
+    ).toBeUndefined()
   })
 })

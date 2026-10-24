@@ -56,32 +56,50 @@ export const constructionFields = z
 /** Bullet construction read from the manufacturer's wording, with `raw` kept as printed. */
 export interface ConstructionFields extends z.infer<typeof constructionFields> {}
 
-/** Base of a bullet: type, length, and for a boat tail the base face diameter and the tail angle. */
+/**
+ * Base of a bullet: type, length, for a boat tail the base face diameter and the tail angle, and
+ * for a hollow base the diameter of the cavity.
+ */
 const bulletBase = z
   .object({
-    type: z.enum(['flat', 'boat-tail', 'rebated-boat-tail']).optional(),
+    /**
+     * `conical-hollow-base` and `rounded-hollow-base`: a cavity open at the base, a cone or a
+     * hemisphere whose depth follows from its diameter (`cavityDiameter`), on a flat base or on
+     * the boat tail the other fields describe.
+     */
+    type: z
+      .enum([
+        'flat',
+        'boat-tail',
+        'rebated-boat-tail',
+        'conical-hollow-base',
+        'rounded-hollow-base',
+      ])
+      .optional(),
     length: quantity('length').optional(),
     /**
      * Diameter of the base face at the end of the boat tail (McCoy, ARBRL-TR-02293, 1981, PDF p. 21).
-     * Only with a boat-tail base type.
+     * Only with a boat-tail or hollow base type.
      */
     diameter: quantity('length', z.number().positive()).optional(),
     /**
      * Boat-tail angle: half-angle of the conical boat tail, between its surface and the bullet axis
-     * (McCoy, ARBRL-TR-02293, 1981, PDF p. 17). Only with a boat-tail base type.
+     * (McCoy, ARBRL-TR-02293, 1981, PDF p. 17). Only with a boat-tail or hollow base type.
      */
     angle: quantity('angle', z.number().gt(0).lt(90)).optional(),
+    /** Diameter of the cavity where it opens in the base face. Needed by, and only with, a hollow base type. */
+    cavityDiameter: quantity('length', z.number().positive()).optional(),
   })
   .superRefine((base, ctx) => {
-    const tail = base.type === 'boat-tail' || base.type === 'rebated-boat-tail'
+    const hollow = base.type === 'conical-hollow-base' || base.type === 'rounded-hollow-base'
+    const tail = base.type === 'boat-tail' || base.type === 'rebated-boat-tail' || hollow
+    const issue = (path: string, message: string) =>
+      ctx.addIssue({ code: 'custom', path: [path], message })
     for (const key of ['diameter', 'angle'] as const) {
-      if (base[key] && !tail)
-        ctx.addIssue({
-          code: 'custom',
-          path: [key],
-          message: 'only with a boat-tail base type',
-        })
+      if (base[key] && !tail) issue(key, 'only with a boat-tail or hollow base type')
     }
+    if (base.cavityDiameter && !hollow) issue('cavityDiameter', 'only with a hollow base type')
+    if (hollow && !base.cavityDiameter) issue('cavityDiameter', 'needed by a hollow base type')
   })
 
 /** Ogive of a bullet: form, radius or Rt/R, at least one of them. */
@@ -183,6 +201,20 @@ export const bullet = z
     below(['tip', 'mouthDiameter'], b.tip?.mouthDiameter?.value, d, 'the diameter')
     below(['tip', 'length'], b.tip?.length?.value, b.length?.value, 'the length')
     below(['tip', 'length'], b.tip?.length?.value, b.noseLength?.value, 'the nose length')
+    below(['base', 'length'], b.base?.length?.value, b.length?.value, 'the length')
+    const cavity = b.base?.cavityDiameter?.value
+    below(
+      ['base', 'cavityDiameter'],
+      cavity,
+      b.base?.diameter?.value ?? d,
+      b.base?.diameter ? 'the base diameter' : 'the diameter',
+    )
+    // The depth is not stored: it is half the opening (`bulletOutline`).
+    if (cavity !== undefined && b.length && !(cavity / 2 < b.length.value))
+      issue(
+        ['base', 'cavityDiameter'],
+        'half of it, the cavity depth, must be smaller than the length',
+      )
   })
 
 /** One published coefficient: G1 or G7, value in lb/in2, optional velocity band. */

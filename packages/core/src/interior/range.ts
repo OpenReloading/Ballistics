@@ -12,6 +12,8 @@ export interface PressureTolerances {
   chargeFraction: number
   /** Relative; `chamber.volume`. */
   volumeFraction: number
+  /** Relative; `bullet.mass`. */
+  massFraction: number
   /** Relative; `burn.coefficient` or `burn.vivacity`. */
   burnRateFraction: number
   /** Absolute, K (a difference, equal in degC). */
@@ -27,14 +29,18 @@ type Side = -1 | 0 | 1
 export const pressureToleranceDefaults: Readonly<PressureTolerances> = Object.freeze({
   chargeFraction: 0.005,
   volumeFraction: 0.01,
+  // no tolerance without a source: the input stays at its nominal value until a caller sets one
+  massFraction: 0,
   burnRateFraction: 0.03,
   temperatureKelvin: 5,
   startPressureFraction: 0.2,
 })
 
-const inputs: PressureInput[] = [
+/** Every input with a tolerance, in the order the range and the sampled band apply them. */
+export const pressureInputs: readonly PressureInput[] = [
   'chargeFraction',
   'volumeFraction',
+  'massFraction',
   'burnRateFraction',
   'temperatureKelvin',
   'startPressureFraction',
@@ -75,8 +81,11 @@ export interface PressureRange {
   cases: PressureCase[]
 }
 
-/** Moves one input of a load by its tolerance to one side, or returns a reason when that leaves the model. */
-export type ApplyTolerance<L> = (load: L, side: 1 | -1, tolerance: number) => L | string
+/**
+ * Moves one input of a load by `side` times its tolerance, or returns a reason when that leaves
+ * the model. The range passes 1 or -1 (the ends of the tolerance), the sampling any number.
+ */
+export type ApplyTolerance<L> = (load: L, side: number, tolerance: number) => L | string
 
 /**
  * The range of `peak` over the tolerance box of `load`. `peak` returns Pa or a reason for an
@@ -96,7 +105,7 @@ export function toleranceRange<L>(
     return Number.isFinite(p) ? { maxPressure: p } : { maxPressure: null, reason: 'nonFinite' }
   }
   const sides = {} as Record<PressureInput, Side>
-  for (const input of inputs) {
+  for (const input of pressureInputs) {
     const t = tolerances[input]
     sides[input] = 0
     if (t === 0) continue
@@ -111,7 +120,7 @@ export function toleranceRange<L>(
   for (const side of [1, -1] as const) {
     let moved: L | string = load
     const used = {} as Record<PressureInput, Side>
-    for (const input of inputs) {
+    for (const input of pressureInputs) {
       const s = sides[input] === 0 ? 0 : ((sides[input] * side) as 1 | -1)
       // inputs after one that left the model are not applied, so they are reported as 0
       used[input] = typeof moved === 'string' ? 0 : s
@@ -131,12 +140,17 @@ export function toleranceRange<L>(
   }
 }
 
-const relative = (value: number, side: 1 | -1, t: number) => value * (1 + side * t)
-const interiorApply: Record<PressureInput, ApplyTolerance<InteriorLoad>> = {
+const relative = (value: number, side: number, t: number) => value * (1 + side * t)
+/** How each input of an `InteriorLoad` moves, shared by the range and the sampled band. */
+export const interiorApply: Record<PressureInput, ApplyTolerance<InteriorLoad>> = {
   chargeFraction: (l, s, t) => ({ ...l, charge: relative(l.charge, s, t) }),
   volumeFraction: (l, s, t) => ({
     ...l,
     chamber: { ...l.chamber, volume: relative(l.chamber.volume, s, t) },
+  }),
+  massFraction: (l, s, t) => ({
+    ...l,
+    bullet: { ...l.bullet, mass: relative(l.bullet.mass, s, t) },
   }),
   burnRateFraction: (l, s, t) => {
     const b = l.propellant.burn

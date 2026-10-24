@@ -30,6 +30,7 @@ import {
   manualProjectile,
   shotFields,
   shotFromValues,
+  zeroKeys,
 } from '../src/lib/trajectory-input.ts'
 import { presetUnits, waterDensityGramsPerCm3 } from '../src/lib/units.ts'
 import { readRecord } from './read-record.ts'
@@ -131,13 +132,14 @@ describe('interior example', () => {
 })
 
 describe('trajectory example', () => {
-  it('fills every field and computes with manual G7 drag', () => {
+  it('fills every field but the optional zero air and drag factor, and computes with manual G7 drag', () => {
     const filled = exampleFields(
       [...shotFields, ...manualBulletFields],
       exampleTrajectory,
       presetUnits('metric-grams'),
     )
-    for (const f of [...shotFields, ...manualBulletFields]) expect(filled[f.key].text).not.toBe('')
+    for (const f of [...shotFields, ...manualBulletFields])
+      if (!(zeroKeys as readonly string[]).includes(f.key)) expect(filled[f.key].text).not.toBe('')
     expect(filled.ballisticCoefficient.text).toBe('0.221')
     const si = siValues(filled)
     const t = trajectory(shotFromValues(si, manualProjectile(si, 'G7'), 'right'), [100, 1000])

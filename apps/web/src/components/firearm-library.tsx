@@ -52,7 +52,7 @@ import { BarCount, PageBar } from './page-bar.tsx'
 import { PrintButton } from './record-actions.tsx'
 import { EmptyList, ErrorNote, Loading } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
-import { useRecordLink } from './use-record-link.ts'
+import { recordLoadingText, useRecordLink } from './use-record-link.ts'
 
 type FirearmRecord = Extract<UserRecord, { kind: 'firearm' }>
 
@@ -84,7 +84,8 @@ export function FirearmLibrary() {
   const asked = useRef(new Set<string>())
   const menu = useRef<FileMenuHandle>(null)
   // a row's link in a new tab: `?record=<id>` opens that firearm
-  useRecordLink('firearm', menu, (m) => setFailure(m ?? ''))
+  // the alert line shows alerts only, not the reading of the linked record
+  useRecordLink('firearm', menu, (m) => setFailure(m && m !== recordLoadingText ? m : ''))
 
   /** The latest read: an older answer that arrives later is dropped. */
   const reads = useRef(0)

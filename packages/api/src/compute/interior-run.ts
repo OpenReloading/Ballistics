@@ -4,9 +4,10 @@ import {
   type PressureRange,
   type PressureTolerances,
   pressureToleranceDefaults,
+  type SampledBand,
 } from '@openreloading/core'
 import { assertFinite, notice, unprocessable } from './answer.ts'
-import { type InteriorBody, m3Options, maxPoints } from './interior-schema.ts'
+import { type InteriorBody, m3Options, maxPoints, samplingDefaults } from './interior-schema.ts'
 import { type CartridgeWithSpecs, limitCheck } from './limits.ts'
 import { caps } from './schemas.ts'
 import { type ComputeRunner, ComputeTimeout, taskTimeoutMs } from './tasks.ts'
@@ -36,7 +37,13 @@ type ResolvedCartridge = ReturnType<typeof limitCheck>['cartridge']
 
 /** One interior run: the fields of a 200 answer, or the fields of a 422 for an invalid result. */
 type Run =
-  | { result: unknown; pressureRange: PressureRange; limits?: unknown; warnings: unknown }
+  | {
+      result: unknown
+      pressureRange: PressureRange
+      sampled?: SampledBand
+      limits?: unknown
+      warnings: unknown
+    }
   | { error: { message: string; reason?: string; field?: string; flags?: unknown } }
 
 /** The `resolved` part of an interior answer, set by a valid run. */
@@ -64,9 +71,16 @@ type RunSetup = {
 /** The runs of an M3 body by charge. */
 function m3Runner(body: InteriorBody, { compute, cartridge, tolerances, resolved }: RunSetup) {
   const options = m3Options(caps.interiorSteps, body.options)
+  const sampling = body.sampling && { ...samplingDefaults, ...body.sampling }
   return async (charge: number): Promise<Run> => {
     const load = { ...body.load, charge }
-    const { result, range } = await compute.run({ kind: 'interiorM3', load, options, tolerances })
+    const { result, range, sampled } = await compute.run({
+      kind: 'interiorM3',
+      load,
+      options,
+      tolerances,
+      sampling,
+    })
     if (!result.valid)
       return {
         error: {
@@ -77,7 +91,7 @@ function m3Runner(body: InteriorBody, { compute, cartridge, tolerances, resolved
       }
     const { resolvedCartridge, ...checked } = checkPressureRange(range, cartridge, { result, load })
     resolved.cartridge = resolvedCartridge
-    return { result, ...checked }
+    return { result, ...checked, sampled }
   }
 }
 
