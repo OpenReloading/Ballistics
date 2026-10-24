@@ -8,7 +8,7 @@ async function seed(page: Page, names: string[], extra: object = {}, first = 0) 
   await page.evaluate(
     async ([names, extra, first]) => {
       const db: IDBDatabase = await new Promise((ok, no) => {
-        const r = indexedDB.open('openreloading-user-data', 1)
+        const r = indexedDB.open('openreloading-user-data')
         r.onupgradeneeded = () => {
           for (const n of ['records', 'handles', 'files'])
             if (!r.result.objectStoreNames.contains(n))
