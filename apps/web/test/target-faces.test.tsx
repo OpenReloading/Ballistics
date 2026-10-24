@@ -162,6 +162,15 @@ it('draws recorded zone colours: a white ten inside a black ring, its lines whit
   expect([stroke(150), stroke(100), stroke(50)]).toEqual(['black', 'white', 'white'])
 })
 
+it('draws a square ring as a rectangle of its edge and a circle ring as an ellipse', () => {
+  const [outer, inner] = precision.rings.slice(0, 2)
+  const rings = [{ ...outer, shape: 'square' as const }, inner]
+  const out = renderToStaticMarkup(<TargetFaceDrawing face={{ ...precision, rings }} />)
+  const edge = outer.diameter.value
+  expect(out).toContain(`<rect x="${-edge / 2}" y="${-edge / 2}" width="${edge}" height="${edge}"`)
+  expect(out).toContain(`<ellipse rx="${inner.diameter.value / 2}"`)
+})
+
 it('orders the discipline rows by federation, then the federation code, then distance', () => {
   const [a] = precision.events
   const event = (name: string, metres: number) => ({
