@@ -1,6 +1,7 @@
 import { type CartridgeDiameters, leastSpecValue } from '@openreloading/core'
-import type { CaseCapacity, CaseType } from '@openreloading/schema'
+import type { CaseCapacity } from '@openreloading/schema'
 import { and, asc, count, eq, ilike, or, type SQL, sql } from 'drizzle-orm'
+import { caseType, compact } from '../catalogue/derive.ts'
 import type { Db } from './index.ts'
 import {
   type bullets,
@@ -21,11 +22,6 @@ export type CartridgeListParams = {
   table?: string
   limit: number
   offset: number
-}
-
-/** Drops null and undefined fields, so responses match the records' "absent means unknown". */
-export function compact<T extends Record<string, unknown>>(row: T) {
-  return Object.fromEntries(Object.entries(row).filter(([, v]) => v !== null && v !== undefined))
 }
 
 /** A table of whole records: the record id in `id`, the record in `record`. */
@@ -123,26 +119,6 @@ export async function listCartridges(db: Db, params: CartridgeListParams) {
     total,
     items: items.map(({ r1, p1, r3, ...c }) => compact({ ...c, caseType: caseType(r1, p1, r3) })),
   }
-}
-
-/**
- * The case head from the cartridge R1 (rim), P1 (body at the head) and R3 (belt), mm: belted with
- * an R3, rimmed with the rim more than 0.7 mm wider than the body, semi-rimmed with it more than
- * 0.3 mm and at most 0.7 mm wider, rebated with it more than 0.25 mm narrower, rimless between.
- * Bounds set by hand.
- */
-export function caseType(
-  r1: number | null,
-  p1: number | null,
-  r3: number | null,
-): CaseType | undefined {
-  if (r3 !== null) return 'belted'
-  if (r1 === null || p1 === null) return
-  // to 0.01 mm, the records' resolution, so a difference on a bound stays on its side
-  const d = Math.round((r1 - p1) * 100) / 100
-  if (d > 0.7) return 'rimmed'
-  if (d > 0.3) return 'semi-rimmed'
-  return d < -0.25 ? 'rebated' : 'rimless'
 }
 
 type SpecValueRow = typeof specValues.$inferSelect
