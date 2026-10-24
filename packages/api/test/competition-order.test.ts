@@ -3,7 +3,7 @@ import {
   compareFederations,
   compareTargetFaces,
   type DisciplineKey,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { loadBundle } from '../src/bundle.ts'
 import { API_PREFIX } from '../src/version.ts'

@@ -1,5 +1,5 @@
 /** List sources: OpenReloading records and the user records of the browser. */
-import type { UserRecord } from '@openreloading/schema'
+import type { UserRecord } from '@open-reloading/schema'
 import type { BulletRow } from './bullet-rows.ts'
 import type { CartridgeRow } from './cartridge-rows.ts'
 

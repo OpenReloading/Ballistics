@@ -1,4 +1,4 @@
-import type { Discipline, Federation, TargetFace, TargetMapping } from '@openreloading/schema'
+import type { Discipline, Federation, TargetFace, TargetMapping } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { checkFederations } from '../src/federations.ts'
 

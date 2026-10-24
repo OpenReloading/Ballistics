@@ -1,10 +1,10 @@
-# @openreloading/tools
+# @open-reloading/tools
 
 Command line tools of the application. Never imported by the API or the web app. ESM, run with Node directly (no build).
 
-## Commands (this directory, or `-w @openreloading/tools` from the root)
+## Commands (this directory, or `-w @open-reloading/tools` from the root)
 
-All of them need `npm run build` at the root (`src/openapi.ts` imports `@openreloading/api/openapi` from `dist`). They run in the dev container, which has `oasdiff` and `schemathesis` (`.devcontainer/Dockerfile`).
+All of them need `npm run build` at the root (`src/openapi.ts` imports `@open-reloading/api/openapi` from `dist`). They run in the dev container, which has `oasdiff` and `schemathesis` (`.devcontainer/Dockerfile`).
 
 - `node src/openapi.ts <file>`: writes the API document of the current routes (`buildOpenApi`).
 - API contract check: `npm run api-check` (root: `npm run api:check`)

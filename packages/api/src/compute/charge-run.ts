@@ -4,8 +4,8 @@ import {
   InputError,
   type PressureRange,
   pressureToleranceDefaults,
-} from '@openreloading/core'
-import type { Powder } from '@openreloading/schema'
+} from '@open-reloading/core'
+import type { Powder } from '@open-reloading/schema'
 import { notice, resolvedRecord, unprocessable } from './answer.ts'
 import type { ChargeBody } from './charge-schema.ts'
 import { bulkDensityBound, m3Options } from './interior-schema.ts'

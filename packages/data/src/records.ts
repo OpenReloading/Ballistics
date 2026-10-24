@@ -28,7 +28,7 @@ import {
   type TargetMapping,
   targetFace,
   targetMapping,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import type { z } from 'zod'
 import { checkCoverage } from './coverage.ts'
 import { checkFederations } from './federations.ts'

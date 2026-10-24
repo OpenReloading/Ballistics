@@ -1,4 +1,4 @@
-import type { TrajectoryPoint } from '@openreloading/core'
+import type { TrajectoryPoint } from '@open-reloading/core'
 import {
   formatNumber,
   formatQuantity,

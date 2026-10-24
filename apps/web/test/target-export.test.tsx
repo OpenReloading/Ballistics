@@ -1,4 +1,4 @@
-import type { ShotGroup } from '@openreloading/schema'
+import type { ShotGroup } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { StatsBlock } from '../src/components/target-export.tsx'

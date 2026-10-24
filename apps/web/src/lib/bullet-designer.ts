@@ -5,8 +5,8 @@ import {
   bulletFigureModel,
   bulletProfile,
   bulletScreenEm,
-} from '@openreloading/drawing/bullet'
-import type { BulletDesign } from '@openreloading/schema'
+} from '@open-reloading/drawing/bullet'
+import type { BulletDesign } from '@open-reloading/schema'
 import type { BulletRecord } from './api-types.ts'
 import { computedBulletRows } from './bullet.ts'
 import {

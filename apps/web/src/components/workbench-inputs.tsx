@@ -11,7 +11,7 @@ import {
   Switch,
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
-import { boreArea } from '@openreloading/core'
+import { boreArea } from '@open-reloading/core'
 import { DotsThree } from '@phosphor-icons/react'
 import { type ReactNode, useEffect, useId, useState } from 'react'
 import { createPortal } from 'react-dom'

@@ -3,7 +3,7 @@ import {
   interiorValueKeys,
   overrideResistance,
   recordResistance,
-} from '@openreloading/core'
+} from '@open-reloading/core'
 import { describe, expect, it } from 'vitest'
 import { maxPoints } from '../src/compute/interior-schema.ts'
 import { filePath } from '../src/compute/load-file.ts'

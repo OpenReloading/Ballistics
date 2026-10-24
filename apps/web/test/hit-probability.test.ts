@@ -1,5 +1,5 @@
-import type { TrajectoryPoint } from '@openreloading/core'
-import type { TargetFace } from '@openreloading/schema'
+import type { TrajectoryPoint } from '@open-reloading/core'
+import type { TargetFace } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { faceZones, impactSensitivity } from '../src/lib/hit-probability.ts'
 

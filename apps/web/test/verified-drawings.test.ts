@@ -1,5 +1,5 @@
-import type { Layout, LengthUnit } from '@openreloading/drawing'
-import { face } from '@openreloading/drawing'
+import type { Layout, LengthUnit } from '@open-reloading/drawing'
+import { face } from '@open-reloading/drawing'
 import {
   type FigureModel,
   figureModel,
@@ -7,7 +7,7 @@ import {
   regions,
   screenEm,
   screenWidth,
-} from '@openreloading/drawing/cartridge'
+} from '@open-reloading/drawing/cartridge'
 import { describe, expect, it } from 'vitest'
 import {
   arrowheadsClear,

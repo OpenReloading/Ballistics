@@ -1,4 +1,4 @@
-import type { UserRecord } from '@openreloading/schema'
+import type { UserRecord } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
 import { bulletMatches } from '../src/lib/bullet-rows.ts'
 import { emptyDirectory, readDirectory, writeDirectory } from '../src/lib/directory.ts'

@@ -1,5 +1,5 @@
-import { bulletFits, cartridgeDiameters } from '@openreloading/core'
-import { recordFigures } from '@openreloading/drawing/cartridge'
+import { bulletFits, cartridgeDiameters } from '@open-reloading/core'
+import { recordFigures } from '@open-reloading/drawing/cartridge'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { ByLengthUnit } from '../../../components/by-length-unit.tsx'

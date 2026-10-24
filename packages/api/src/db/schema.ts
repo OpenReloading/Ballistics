@@ -10,7 +10,7 @@ import {
   specValue,
   type TargetFace,
   type TargetMapping,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import { type SQLWrapper, sql } from 'drizzle-orm'
 import {
   boolean,

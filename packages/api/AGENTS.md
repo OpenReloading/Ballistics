@@ -1,6 +1,6 @@
-# @openreloading/api
+# @open-reloading/api
 
-Fastify HTTP API (TypeScript, ESM) exposing `@openreloading/core` and the data records, with PostgreSQL through Drizzle ORM.
+Fastify HTTP API (TypeScript, ESM) exposing `@open-reloading/core` and the data records, with PostgreSQL through Drizzle ORM.
 
 - `src/app.ts` builds the app (plugins and routes registered explicitly).
 - `src/server.ts` waits for the database, builds the tables (`src/db/build.ts`), loads the data bundle (skipped when its hash is unchanged) and starts listening.
@@ -10,7 +10,7 @@ Fastify HTTP API (TypeScript, ESM) exposing `@openreloading/core` and the data r
 - Every route below is served under `API_PREFIX` (`/v1`, `src/version.ts`) except the liveness probe `GET /`. Paths below omit the prefix. `src/app.ts` registers the route plugins under it.
 - `buildOpenApi` (`src/openapi.ts`) reads the route's `config`:
   - `body`, `query`: the zod schema of a request, every field with a `.describe()` text and its unit. A query number is parsed from its text and documented as the number.
-  - `response`: the zod schema of the 200 body. The read routes build theirs from the record schemas of `@openreloading/schema`, the compute routes from `src/compute/*-response.ts` (loose objects: a field core adds does not break the document).
+  - `response`: the zod schema of the 200 body. The read routes build theirs from the record schemas of `@open-reloading/schema`, the compute routes from `src/compute/*-response.ts` (loose objects: a field core adds does not break the document).
   - `errors`: the error statuses of the route's own code.
   - `summary`, `description`: what the route answers. `example`: a valid request body.
   - Fastify JSON-schema parameters carry their `description` in the property schema.
@@ -34,7 +34,7 @@ Fastify HTTP API (TypeScript, ESM) exposing `@openreloading/core` and the data r
   - Absent without a value: `country` (ISO code of the manufacturer's country) of a powder or bullet, the bullet's `tipType` (the record's tip type) and `construction` (the record's construction structure, else the core material as `<material>-core`).
   - `GET /powders/:id`, `GET /bullets/:id`: the whole record.
 - `GET /target-faces`: `{ total, items: [{ id, organization, name, caliberClasses, categories }] }`, every face. `caliberClasses`: the caliber classes of the disciplines mapped to it. `categories`: those of its events and those disciplines. `GET /target-faces/:id`: the whole record.
-- The competition lists (`GET /federations`, `/disciplines`, `/target-faces`, `/target-mappings`) are sorted in `src/db/competition-queries.ts` with the comparators of `@openreloading/schema` (`src/competition-order.ts`), so the order is part of the answer.
+- The competition lists (`GET /federations`, `/disciplines`, `/target-faces`, `/target-mappings`) are sorted in `src/db/competition-queries.ts` with the comparators of `@open-reloading/schema` (`src/competition-order.ts`), so the order is part of the answer.
 - `GET /federations`, `GET /disciplines?federation=`, `GET /target-mappings?discipline=&face=` and their `/:id` routes (`src/routes/federations.ts`): summaries and records as `apps/docs/docs/data/federations.md` lists them. An unknown filter id gives no items.
 
 Compute (`src/routes/compute.ts`):
@@ -45,7 +45,7 @@ Compute (`src/routes/compute.ts`):
 - `POST /interior/load-file`: the workbench load file as body, results as JSON (`src/compute/load-file.ts`, `src/compute/simulate.ts`). The field mapping is `interiorLoad` of core, shared with the workbench. 400 issues carry the path in the file.
 - `GET /exterior/stability` (`muzzleVelocity` in the query).
 - A compute answer carries its result under `result`, except `POST /interior` with a `ladder` (each of `ladderSteps` has its `result`) and `POST /interior/load-file` (`summary`, `points`, `ladderSteps`).
-- Bodies are the `@openreloading/core` arguments in SI, validated by the strict zod schemas in `src/compute/*-schema.ts` (400). `bullet` and `powder` ids are resolved in `src/compute/resolve.ts` and echoed under `resolved` with `suppliedFields`, the request values the record supplied.
+- Bodies are the `@open-reloading/core` arguments in SI, validated by the strict zod schemas in `src/compute/*-schema.ts` (400). `bullet` and `powder` ids are resolved in `src/compute/resolve.ts` and echoed under `resolved` with `suppliedFields`, the request values the record supplied.
 - 422: core `InputError` (and its subclass `TruingError`), unusable records and invalid interior results.
 - 503: a compute deadline (`reason` `timeout`), a full queue or a worker that cannot be created (`reason` `busy`).
 - 500: other errors.
@@ -62,7 +62,7 @@ Compute (`src/routes/compute.ts`):
 - `options.maxSteps` is capped at `caps.chargeSteps` (the solver runs up to 152 times in one task).
 - Every answer carries the notice.
 
-## Commands (this directory, or `-w @openreloading/api` from the root)
+## Commands (this directory, or `-w @open-reloading/api` from the root)
 
 - Build: `npm run build` (output `dist/`, with `dist/schema.json`: the DDL of `src/db/schema.ts` from `drizzle-kit export --output json`)
 - Dev server: `npm run dev` (Node runs `src/server.ts` directly, restarts on change)
@@ -77,10 +77,10 @@ Compute (`src/routes/compute.ts`):
 - Requires `DATABASE_URL` in the process environment. `npm start` loads it from the root `.env` when the environment does not set it.
 - Errors (`src/app.ts`): a 4xx answer keeps its message. Any other error answers 500 `{ statusCode, error, message: 'internal server error', requestId }`, without the error's text. The error goes to the server log under that `reqId`.
 - Schema: `src/db/schema.ts`. Client: `src/db/index.ts`. At start `ensureTables` (`src/db/build.ts`) compares the sha256 of the statements in `dist/schema.json` with the one in `bundle_state`. On a mismatch, or a database without it, it drops the tables the statements create (other tables stay) and runs the statements in one transaction. The seed loads the bundle. After a schema change, run the root `npm run build`. Nothing else is committed.
-- The tables are a query layer: `src/db/seed.ts` replaces them from `@openreloading/data/bundle.json`. Edit records in `packages/data`, never rows.
+- The tables are a query layer: `src/db/seed.ts` replaces them from `@open-reloading/data/bundle.json`. Edit records in `packages/data`, never rows.
 - Read endpoints leave out null fields, as records do (absent means unknown). Compute responses keep the core result shape, where `null` means "not defined".
 - Trajectory, truing and interior run on a `node:worker_threads` pool (`src/compute/pool.ts`, tasks in `src/compute/tasks.ts`, entry `src/compute/worker.ts`) with a 5 s deadline per task from submit. The worker of a task past its deadline is terminated. Stability runs on the main thread. Errors cross the thread boundary as plain objects and are rebuilt into `TruingError`, `InputError` or `Error`. Tests that mock core pass `buildApp({ db, compute: inlineRunner })`.
 - The step and count caps in `src/compute/schemas.ts` (per integration, for truing also the iteration cap and the step total over all its trajectories) bound the work of a request. An interior run is at most 13 model runs with its range. A ladder runs that per step, up to 21 steps, in batches of 4 within 14 s and at most 100000 output points: no batch starts once the steps run so far are above it (`compute/interior-run.ts`).
-- `@openreloading/api/compute` (`src/compute/browser.ts`): `runInterior`, `runChargeTarget` (record lookups passed in), the body schemas, `errorAnswer` and the task runner without Fastify, the database or Node APIs. The web app's Pages edition runs it in the browser. At run time it imports only core, schema and zod (`test/compute-imports.test.ts`). The web image builds only it (`tsconfig.compute.json`).
-- `@openreloading/api/static` (`src/static.ts`, build time only, PGlite is a dev dependency): `startBundleApi` (this API on PGlite seeded from the bundle, compute in its thread) and `writeStaticApi` (the read answers as the Pages edition's data files).
+- `@open-reloading/api/compute` (`src/compute/browser.ts`): `runInterior`, `runChargeTarget` (record lookups passed in), the body schemas, `errorAnswer` and the task runner without Fastify, the database or Node APIs. The web app's Pages edition runs it in the browser. At run time it imports only core, schema and zod (`test/compute-imports.test.ts`). The web image builds only it (`tsconfig.compute.json`).
+- `@open-reloading/api/static` (`src/static.ts`, build time only, PGlite is a dev dependency): `startBundleApi` (this API on PGlite seeded from the bundle, compute in its thread) and `writeStaticApi` (the read answers as the Pages edition's data files).
 - Dockerfile build context is the repository root: `docker build -f packages/api/Dockerfile .`

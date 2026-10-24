@@ -12,7 +12,7 @@ import type {
   GroupFace,
   TargetFace,
   TargetMapping,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import { compareDisciplines, compareFederations, compareNames } from './face-order.ts'
 
 export type FederationSummary = Pick<Federation, 'id' | 'name' | 'abbreviation'>

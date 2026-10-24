@@ -1,4 +1,4 @@
-import type { Powder, Source } from '@openreloading/schema'
+import type { Powder, Source } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { checkFittedSources, type LoadTables } from '../src/load-tables.ts'
 

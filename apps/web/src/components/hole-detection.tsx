@@ -1,7 +1,7 @@
 'use client'
 
 import { ActionIcon, Button, Flex, NativeSelect, Popover } from '@mantine/core'
-import type { ShotGroup, TargetFace, TargetSheet } from '@openreloading/schema'
+import type { ShotGroup, TargetFace, TargetSheet } from '@open-reloading/schema'
 import { ArrowClockwise, ArrowCounterClockwise, GearSix, X } from '@phosphor-icons/react'
 import { type KeyboardEvent, type PointerEvent, useEffect, useRef, useState } from 'react'
 import { ellipsePoint } from '../lib/ellipse.ts'

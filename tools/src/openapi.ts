@@ -4,7 +4,7 @@
  * Needs `npm run build` at the root.
  */
 import { writeFileSync } from 'node:fs'
-import { buildOpenApi } from '@openreloading/api/openapi'
+import { buildOpenApi } from '@open-reloading/api/openapi'
 
 const out = process.argv[2]
 if (!out) throw new Error('usage: node src/openapi.ts <file>')

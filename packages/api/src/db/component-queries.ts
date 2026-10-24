@@ -1,4 +1,4 @@
-import { bulletWindow } from '@openreloading/core'
+import { bulletWindow } from '@open-reloading/core'
 import { and, asc, count, eq, type SQL, sql } from 'drizzle-orm'
 import type { Db } from './index.ts'
 import { cartridgeFit, compact, escapeLike, type ListPage, recordById } from './queries.ts'

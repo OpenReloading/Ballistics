@@ -1,7 +1,7 @@
 // Synthetic photos of the target faces of packages/data/records/target-faces for the face search:
 // the face drawn from its record, seen by a pinhole camera.
 import { readdirSync, readFileSync } from 'node:fs'
-import type { TargetFace } from '@openreloading/schema'
+import type { TargetFace } from '@open-reloading/schema'
 import type { RgbaImage } from '../src/lib/image.ts'
 import type { Point } from '../src/lib/target-geometry.ts'
 

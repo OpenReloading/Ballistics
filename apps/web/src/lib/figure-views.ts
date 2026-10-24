@@ -1,11 +1,11 @@
-import type { Dimension, LengthUnit, Medium } from '@openreloading/drawing'
+import type { Dimension, LengthUnit, Medium } from '@open-reloading/drawing'
 import {
   type Drawn,
   type FigureModel,
   figureModel,
   recordFigures,
   screenEm,
-} from '@openreloading/drawing/cartridge'
+} from '@open-reloading/drawing/cartridge'
 
 /** The views of the workbench's cartridge figure: Combined has no dimensions. */
 export type FigureView = 'cartridge' | 'chamber' | 'combined'

@@ -1,5 +1,5 @@
 import { PGlite } from '@electric-sql/pglite'
-import type { Bundle } from '@openreloading/data'
+import type { Bundle } from '@open-reloading/data'
 import { Ajv2020 } from 'ajv/dist/2020.js'
 import { drizzle } from 'drizzle-orm/pglite'
 import type { InjectOptions } from 'fastify'

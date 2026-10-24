@@ -1,5 +1,5 @@
-import { readRecords } from '@openreloading/data'
-import type { TargetFace } from '@openreloading/schema'
+import { readRecords } from '@open-reloading/data'
+import type { TargetFace } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import {
   disciplineChoice,

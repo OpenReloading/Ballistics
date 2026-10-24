@@ -1,4 +1,4 @@
-import { cartridge, caseCapacity } from '@openreloading/schema'
+import { cartridge, caseCapacity } from '@open-reloading/schema'
 import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
 import type { Db } from '../db/index.ts'

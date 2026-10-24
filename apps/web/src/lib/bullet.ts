@@ -1,4 +1,4 @@
-import { lbPerSqInToKgPerSqM, millerStability, type Projectile } from '@openreloading/core'
+import { lbPerSqInToKgPerSqM, millerStability, type Projectile } from '@open-reloading/core'
 import type { BulletRecord } from './api-types.ts'
 import type { FieldRow } from './record-fields.ts'
 import { metersPerFoot, pascalsPerInHg } from './units.ts'

@@ -4,9 +4,9 @@ import {
   pressureToleranceDefaults,
   recordResistance,
   trajectory,
-} from '@openreloading/core'
-import { bulletDimensions } from '@openreloading/drawing/bullet'
-import { sheetId, userRecord } from '@openreloading/schema'
+} from '@open-reloading/core'
+import { bulletDimensions } from '@open-reloading/drawing/bullet'
+import { sheetId, userRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import {
   exampleChamberVolume,

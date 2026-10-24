@@ -2,9 +2,9 @@
 
 import { NativeSelect, Text, TextInput } from '@mantine/core'
 import { useDebouncedValue } from '@mantine/hooks'
-import { face, type LengthUnit } from '@openreloading/drawing'
-import { bulletFigureModel, bulletSymbols } from '@openreloading/drawing/bullet'
-import type { BulletDesign } from '@openreloading/schema'
+import { face, type LengthUnit } from '@open-reloading/drawing'
+import { bulletFigureModel, bulletSymbols } from '@open-reloading/drawing/bullet'
+import type { BulletDesign } from '@open-reloading/schema'
 import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef } from 'react'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { BulletRecord, BulletSummary } from '../lib/api-types.ts'

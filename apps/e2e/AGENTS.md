@@ -1,4 +1,4 @@
-# @openreloading/e2e
+# @open-reloading/e2e
 
 Playwright tests against a running API and web app, on the CIP cartridge records, the target faces and the invented example records.
 
@@ -32,9 +32,9 @@ Playwright tests against a running API and web app, on the CIP cartridge records
 | `web/workbench-cartridge-design.spec.ts` | a cartridge design of the browser chosen in the Cartridge card: its volume filled and marked, bore area and twist left empty after a record's values, the figure named for the design, the run's note and the printed report naming it |
 | `web/workbench-link.spec.ts` | a copied workbench link (fragment) runs the same load with its bullet and powder records missing. Older query links open |
 
-## Commands (this directory, or `-w @openreloading/e2e` from the root)
+## Commands (this directory, or `-w @open-reloading/e2e` from the root)
 
-- Run the API on `API_URL` and the web app on `WEB_URL` first (the compose stack, or `node packages/api/dist/server.js` and `next start` on a web build made by `npm run build -w @openreloading/web`)
+- Run the API on `API_URL` and the web app on `WEB_URL` first (the compose stack, or `node packages/api/dist/server.js` and `next start` on a web build made by `npm run build -w @open-reloading/web`)
 - Browser, once: `npx playwright install --with-deps chromium`
 - Specs that import web sources (`../../apps/web/src/...`) load the workspace packages from their `dist/`. Run `npm run build` at the root first (CI builds schema, importers, core and drawing before `npm run test:e2e`).
 - Web pages and the web app's `/api/*` forwarding route carry no version prefix. HTTP requests and responses of the API are tested in `packages/api/test/` and with Schemathesis (`npm run api:conformance`).

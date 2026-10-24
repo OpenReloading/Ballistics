@@ -1,4 +1,4 @@
-import { interiorValueKeys } from '@openreloading/core'
+import { interiorValueKeys } from '@open-reloading/core'
 import { expect, it } from 'vitest'
 import { fieldError, fieldValueFromText } from '../src/lib/field-spec.ts'
 import { burnFormError, interiorBody, interiorFields } from '../src/lib/interior-input.ts'

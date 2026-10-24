@@ -2,7 +2,7 @@
  * Hole proposals in the target editor (`apps/docs/docs/models/hole-detection.md`): kept apart from
  * the sheet, in photo px, until the user accepts them as shots. No React, DOM or Next.js.
  */
-import type { ShotGroup } from '@openreloading/schema'
+import type { ShotGroup } from '@open-reloading/schema'
 import type { HoleProposal } from './hole-detection.ts'
 import { type Frame, targetToView, viewToTarget } from './target-editor.ts'
 import type { Point } from './target-geometry.ts'

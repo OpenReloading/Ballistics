@@ -1,4 +1,4 @@
-import type { Discipline, Federation, TargetFace } from '@openreloading/schema'
+import type { Discipline, Federation, TargetFace } from '@open-reloading/schema'
 import type { Bundle } from './records.ts'
 
 /** The federations, disciplines and faces by id. */

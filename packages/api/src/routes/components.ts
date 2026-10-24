@@ -1,4 +1,4 @@
-import { bullet, constructionFields, manufacturer, powder } from '@openreloading/schema'
+import { bullet, constructionFields, manufacturer, powder } from '@open-reloading/schema'
 import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
 import {

@@ -1,6 +1,6 @@
 'use client'
 
-import type { WorkbenchState } from '@openreloading/schema'
+import type { WorkbenchState } from '@open-reloading/schema'
 import { useEffect, useRef, useState } from 'react'
 import {
   type LoadRecord,

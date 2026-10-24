@@ -1,7 +1,7 @@
 'use client'
 
 import { ActionIcon, Button, Menu } from '@mantine/core'
-import type { ShotGroup } from '@openreloading/schema'
+import type { ShotGroup } from '@open-reloading/schema'
 import { Export } from '@phosphor-icons/react'
 import { type ReactNode, useState } from 'react'
 import { createPortal, flushSync } from 'react-dom'

@@ -5,7 +5,7 @@
  * the group's ring scoring choice; and the face of a group as the detection takes it. Pure: no
  * React, DOM or Next.js.
  */
-import type { ShotGroup, TargetFace, TargetSheet } from '@openreloading/schema'
+import type { ShotGroup, TargetFace, TargetSheet } from '@open-reloading/schema'
 import { type FederationData, mappingOf } from './face-disciplines.ts'
 import { faceAlignment } from './ring-scoring.ts'
 import type { FaceGeometry, FacePlane } from './target-face.ts'

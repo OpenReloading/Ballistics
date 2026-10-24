@@ -5,7 +5,7 @@ import {
   compareTargetFaces,
   type Discipline,
   type DisciplineKey,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import { and, asc, eq } from 'drizzle-orm'
 import type { Db } from './index.ts'
 import { compact, type ListPage, recordById } from './queries.ts'

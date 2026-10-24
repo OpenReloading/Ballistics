@@ -5,7 +5,7 @@ import type {
   ChronoSession,
   Powder,
   SpecValue,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 
 /** A rule violation, identified by `finding` so that a record can acknowledge it. */
 export type Finding = {

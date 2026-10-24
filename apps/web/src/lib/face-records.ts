@@ -3,7 +3,7 @@
  * disciplines and target mappings that ring scoring picks them by: a few records, fetched once per
  * page load. Shared by ring scoring and the face search of hole detection.
  */
-import type { TargetFace } from '@openreloading/schema'
+import type { TargetFace } from '@open-reloading/schema'
 import { apiFetch } from './api-fetch.ts'
 import type { FederationData } from './face-disciplines.ts'
 

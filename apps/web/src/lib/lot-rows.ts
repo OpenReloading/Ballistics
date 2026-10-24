@@ -1,4 +1,4 @@
-import { type InteriorLoad, interiorApply } from '@openreloading/core'
+import { type InteriorLoad, interiorApply } from '@open-reloading/core'
 import { longerBody } from './barrel-length.ts'
 import type { LadderDirection } from './seating-ladder.ts'
 import { formatNumber } from './units.ts'

@@ -3,7 +3,7 @@ import {
   radPerMoa,
   radPerMrad,
   waterDensityGramsPerCm3,
-} from '@openreloading/core'
+} from '@open-reloading/core'
 
 /**
  * Display units. Every value is held in SI; a unit converts to and from SI and has a fixed number

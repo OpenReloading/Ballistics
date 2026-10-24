@@ -17,7 +17,7 @@ import type {
   OpticConfiguration,
   OpticMount,
   UserRecord,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import { DotsThreeVertical, Plus } from '@phosphor-icons/react'
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { fetchRecord } from '../lib/api-fetch.ts'

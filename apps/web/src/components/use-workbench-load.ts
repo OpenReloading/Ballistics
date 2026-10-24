@@ -13,8 +13,8 @@ import {
   overrideResistance,
   recordResistance,
   ValueError,
-} from '@openreloading/core'
-import type { CartridgeDesign, UserRecord, WorkbenchState } from '@openreloading/schema'
+} from '@open-reloading/core'
+import type { CartridgeDesign, UserRecord, WorkbenchState } from '@open-reloading/schema'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { apiFetch, fetchRecord } from '../lib/api-fetch.ts'

@@ -1,5 +1,5 @@
-import type { ChronoImport } from '@openreloading/importers'
-import { measuredSeries } from '@openreloading/schema'
+import type { ChronoImport } from '@open-reloading/importers'
+import { measuredSeries } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import type { Shot } from '../src/lib/chrono.ts'
 import {

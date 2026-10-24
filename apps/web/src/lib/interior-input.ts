@@ -1,4 +1,4 @@
-import { burnFormKeys, type InteriorLoad, interiorLoad } from '@openreloading/core'
+import { burnFormKeys, type InteriorLoad, interiorLoad } from '@open-reloading/core'
 import type { FieldSpec } from './field-spec.ts'
 
 /**

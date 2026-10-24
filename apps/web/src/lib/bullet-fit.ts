@@ -1,4 +1,4 @@
-import { bulletFits, type CartridgeDiameters } from '@openreloading/core'
+import { bulletFits, type CartridgeDiameters } from '@open-reloading/core'
 import type { CartridgeSummary } from './api-types.ts'
 
 /** The fit rule in words, the hover help of the cartridge lists of a bullet and the bullet lists of a cartridge. */

@@ -1,5 +1,5 @@
-import type { BulletDimensions } from '@openreloading/drawing/seating'
-import { chamberOf, jumpNote, seat } from '@openreloading/drawing/seating'
+import type { BulletDimensions } from '@open-reloading/drawing/seating'
+import { chamberOf, jumpNote, seat } from '@open-reloading/drawing/seating'
 import { describe, expect, it } from 'vitest'
 import {
   type Action,

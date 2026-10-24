@@ -1,5 +1,5 @@
 import { Table, TableTbody, TableTd, TableTh, TableThead, TableTr } from '@mantine/core'
-import { isWebLink } from '@openreloading/schema'
+import { isWebLink } from '@open-reloading/schema'
 import type { Provenance, Source } from '../lib/api-types.ts'
 import { dayText } from '../lib/dates.ts'
 import { Noted } from './field-table.tsx'

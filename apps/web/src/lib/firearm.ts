@@ -4,7 +4,7 @@ import {
   type Optic,
   type OpticMount,
   type UserRecord,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import type { FieldSpec } from './field-spec.ts'
 import { formatNumber, formatQuantity, type UnitSystem, unitsOf, withUnit } from './units.ts'
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { Button, Group, Kbd, Menu, Textarea } from '@mantine/core'
-import type { EmbeddedFile, UserRecord, UserRecordKind } from '@openreloading/schema'
+import type { EmbeddedFile, UserRecord, UserRecordKind } from '@open-reloading/schema'
 import { CaretDown, FloppyDisk, FolderOpen } from '@phosphor-icons/react'
 import { memo, type Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'

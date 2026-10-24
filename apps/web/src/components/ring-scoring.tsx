@@ -8,7 +8,7 @@ import type {
   ShotGroup,
   TargetFace,
   TargetSheet,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   disciplineChoice,

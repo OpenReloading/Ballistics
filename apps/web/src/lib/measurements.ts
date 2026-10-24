@@ -1,6 +1,6 @@
-import { type LadderFlatSpots, ladderFlatSpots } from '@openreloading/core'
-import type { ChronoImport } from '@openreloading/importers'
-import type { MeasuredSeries } from '@openreloading/schema'
+import { type LadderFlatSpots, ladderFlatSpots } from '@open-reloading/core'
+import type { ChronoImport } from '@open-reloading/importers'
+import type { MeasuredSeries } from '@open-reloading/schema'
 import { type Shot, type StringStats, stringStats } from './chrono.ts'
 
 /** A chronograph file on the Measurements tab: the load file's entry and an id for this page. */

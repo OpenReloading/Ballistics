@@ -1,5 +1,5 @@
-import { type CartridgeDiameters, leastSpecValue } from '@openreloading/core'
-import type { CaseCapacity } from '@openreloading/schema'
+import { type CartridgeDiameters, leastSpecValue } from '@open-reloading/core'
+import type { CaseCapacity } from '@open-reloading/schema'
 import { and, asc, count, eq, ilike, or, type SQL, sql } from 'drizzle-orm'
 import type { Db } from './index.ts'
 import {

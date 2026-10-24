@@ -1,4 +1,4 @@
-import { sheetId } from '@openreloading/schema'
+import { sheetId } from '@open-reloading/schema'
 import type { CartridgeDetail } from '../src/lib/api-types.ts'
 import { readRecord } from './read-record.ts'
 

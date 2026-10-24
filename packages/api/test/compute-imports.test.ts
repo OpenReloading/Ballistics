@@ -2,8 +2,8 @@ import { readFileSync } from 'node:fs'
 import { posix } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-/** The packages `@openreloading/api/compute` may import: it runs in the browser. */
-const allowed = ['@openreloading/core', '@openreloading/schema', 'zod']
+/** The packages `@open-reloading/api/compute` may import: it runs in the browser. */
+const allowed = ['@open-reloading/core', '@open-reloading/schema', 'zod']
 
 /** The files below `src/` that `entry` reaches by relative imports, and their other imports. */
 function imports(entry: string) {

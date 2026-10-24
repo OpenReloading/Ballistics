@@ -9,7 +9,7 @@ import {
   readWorkbook,
   stringifyOpenReloadingJson,
   type VelocityUnit,
-} from '@openreloading/importers'
+} from '@open-reloading/importers'
 
 import { toCsv } from './csv.ts'
 import { formatNumber, type Unit } from './units.ts'

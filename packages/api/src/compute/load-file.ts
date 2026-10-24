@@ -10,8 +10,8 @@ import {
   overrideResistance,
   ValueError,
   workbenchValueKeys,
-} from '@openreloading/core'
-import { userDataFile, versionProblem, type WorkbenchState } from '@openreloading/schema'
+} from '@open-reloading/core'
+import { userDataFile, versionProblem, type WorkbenchState } from '@open-reloading/schema'
 import { z } from 'zod'
 
 type Path = PropertyKey[]

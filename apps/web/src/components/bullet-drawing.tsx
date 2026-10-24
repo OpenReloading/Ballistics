@@ -1,11 +1,11 @@
-import { face, type LengthUnit, lengthText } from '@openreloading/drawing'
+import { face, type LengthUnit, lengthText } from '@open-reloading/drawing'
 import {
   type BulletProfile,
   bulletFigureModel,
   bulletScreenEm,
   bulletSymbols,
   recordProfile,
-} from '@openreloading/drawing/bullet'
+} from '@open-reloading/drawing/bullet'
 import { Ruler } from '@phosphor-icons/react/ssr'
 import type { BulletRecord } from '../lib/api-types.ts'
 import { DrawingNotes } from './record-actions.tsx'

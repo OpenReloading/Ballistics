@@ -11,8 +11,8 @@ import {
   recordResistance,
   solidFill,
   solidFillLimit,
-} from '@openreloading/core'
-import type { Bullet, Powder, WorkbenchState } from '@openreloading/schema'
+} from '@open-reloading/core'
+import type { Bullet, Powder, WorkbenchState } from '@open-reloading/schema'
 import { z } from 'zod'
 import { getManufacturer } from '../db/component-queries.ts'
 import type { Db } from '../db/index.ts'

@@ -1,4 +1,4 @@
-import type { Powder, Source } from '@openreloading/schema'
+import type { Powder, Source } from '@open-reloading/schema'
 
 /**
  * A manufacturer load table the powder fit reads, as `load-tables.json` of a records folder lists

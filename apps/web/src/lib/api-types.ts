@@ -1,6 +1,6 @@
 /** The fields of API responses the pages read (`packages/api/src/db/`, `packages/api/src/compute/`, `packages/api/src/routes/`). */
-import type { InteriorResult } from '@openreloading/core'
-import type { QuantityValue } from '@openreloading/schema'
+import type { InteriorResult } from '@open-reloading/core'
+import type { QuantityValue } from '@open-reloading/schema'
 
 /** A source of a record or of some of its fields. */
 export interface Source {

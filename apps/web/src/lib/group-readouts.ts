@@ -1,5 +1,5 @@
 /** Readout rows of a group's statistics: sizes in m with their angles and intervals. */
-import { type GroupStatistics, subtendedAngle } from '@openreloading/core'
+import { type GroupStatistics, subtendedAngle } from '@open-reloading/core'
 import { type UnitSystem, withUnit } from './units.ts'
 
 /**

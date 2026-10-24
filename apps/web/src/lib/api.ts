@@ -1,4 +1,4 @@
-import type { TargetFace, TargetMapping } from '@openreloading/schema'
+import type { TargetFace, TargetMapping } from '@open-reloading/schema'
 import { cacheLife } from 'next/cache'
 import { PHASE_PRODUCTION_BUILD } from 'next/constants'
 import type {
