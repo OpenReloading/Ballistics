@@ -124,6 +124,27 @@ describe('GET /cartridges', () => {
     expect((await get(`${API_PREFIX}/cartridges?q=_`)).body.total).toBe(0)
   })
 
+  it('orders digit runs by value and finds words in any order, best match first', async () => {
+    const named = (id: string, name: string) => ({ ...bundle.cartridges[0], id, name, aliases: [] })
+    await otherApi.load({
+      ...bundle,
+      cartridges: [
+        named('c-10', '10 mm Auto'),
+        named('c-9', '9 mm Luger'),
+        named('c-lug', 'Luger Carbine 9 mm'),
+      ],
+    })
+    const ids = async (query: string) =>
+      (await otherApi.app.inject({ url: `${API_PREFIX}/cartridges${query}` }))
+        .json()
+        .items.map((c: { id: string }) => c.id)
+    expect(await ids('')).toEqual(['c-9', 'c-10', 'c-lug'])
+    // a word that starts a word of the name outranks one inside it, ties keep the default order
+    expect(await ids('?q=mm luger')).toEqual(['c-9', 'c-lug'])
+    expect(await ids('?q=luger mm')).toEqual(['c-9', 'c-lug'])
+    expect(await ids('?q=9 mm&limit=1&offset=1')).toEqual(['c-lug'])
+  })
+
   it('filters by table and pages', async () => {
     expect((await get(`${API_PREFIX}/cartridges?table=IV`)).body.total).toBe(1)
     const page = await get(`${API_PREFIX}/cartridges?limit=1&offset=1`)

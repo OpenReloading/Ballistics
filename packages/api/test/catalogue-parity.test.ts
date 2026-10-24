@@ -1,20 +1,33 @@
 import type { Bundle } from '@openreloading/data'
 import { type Cartridge, compareKeys, type Provenance } from '@openreloading/schema'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { buildApp } from '../src/app.ts'
 import { loadBundle } from '../src/bundle.ts'
 import { buildCatalogue } from '../src/catalogue/build.ts'
 import { openCatalogue } from '../src/catalogue/open.ts'
 import type { Catalogue } from '../src/catalogue/types.ts'
 import {
+  getDiscipline,
+  getFederation,
+  getTargetFace,
+  getTargetMapping,
   listDisciplines,
   listFederations,
   listTargetFaces,
   listTargetMappings,
 } from '../src/db/competition-queries.ts'
-import { listBullets, listManufacturers, listPowders } from '../src/db/component-queries.ts'
+import {
+  getBullet,
+  getManufacturer,
+  getPowder,
+  listBullets,
+  listManufacturers,
+  listPowders,
+} from '../src/db/component-queries.ts'
 import type { Db } from '../src/db/index.ts'
-import { listCartridges } from '../src/db/queries.ts'
+import { getCartridge, listCartridges } from '../src/db/queries.ts'
 import { seedBundle } from '../src/db/seed.ts'
+import { API_PREFIX } from '../src/version.ts'
 import { bundle as synthetic } from './fixtures.ts'
 import { closeTestDb, createTestDb } from './setup.ts'
 
@@ -228,6 +241,49 @@ for (const set of sets)
         const ids = (a: Answer) => a.items.map((i) => (i as { id: string }).id)
         expect(sql.total).toBeGreaterThan(0)
         expect(ids(mine)).toEqual(ids(sql))
+      })
+  })
+
+/** The record routes of each kind with the SQL layer's answer for an id. */
+const recordRoutes: {
+  path: string
+  ids: (b: Bundle) => string[]
+  sql: (db: Db, id: string) => unknown
+}[] = [
+  { path: 'cartridges', ids: (b) => b.cartridges.map((r) => r.id), sql: getCartridge },
+  { path: 'manufacturers', ids: (b) => b.manufacturers.map((r) => r.id), sql: getManufacturer },
+  { path: 'powders', ids: (b) => b.powders.map((r) => r.id), sql: getPowder },
+  { path: 'bullets', ids: (b) => b.bullets.map((r) => r.id), sql: getBullet },
+  { path: 'target-faces', ids: (b) => b.targetFaces.map((r) => r.id), sql: getTargetFace },
+  { path: 'federations', ids: (b) => b.federations.map((r) => r.id), sql: getFederation },
+  { path: 'disciplines', ids: (b) => b.disciplines.map((r) => r.id), sql: getDiscipline },
+  { path: 'target-mappings', ids: (b) => b.targetMappings.map((r) => r.id), sql: getTargetMapping },
+]
+
+for (const set of sets)
+  describe(`the record routes answer as the SQL layer did, ${set.name}`, () => {
+    let db: Db
+    let app: ReturnType<typeof buildApp>
+    beforeAll(async () => {
+      const data = set.bundle()
+      db = await createTestDb()
+      await seedBundle(db, data)
+      app = buildApp({ catalogue: openCatalogue(buildCatalogue(data)) })
+    })
+    afterAll(async () => {
+      await app.close()
+      await closeTestDb(db)
+    })
+
+    for (const { path, ids, sql } of recordRoutes)
+      it(`answers every ${path} record with the same body`, async () => {
+        const all = ids(set.bundle())
+        expect(all.length).toBeGreaterThan(0)
+        for (const id of all) {
+          const res = await app.inject({ url: `${API_PREFIX}/${path}/${id}` })
+          expect(res.statusCode).toBe(200)
+          expect(res.json(), id).toEqual(JSON.parse(JSON.stringify(await sql(db, id))))
+        }
       })
   })
 
