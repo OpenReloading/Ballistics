@@ -170,7 +170,6 @@ describe('DSU Sporthandbuch 2018, DSU-Scheibe 200 Meter Präzision (Seite 19, PD
       'BDMP SPFG3 ZF Schwarzpulverfreigewehr, 300 bis 900 m',
       'BDMP SPFG3 ZF Schwarzpulverfreigewehr, 300 bis 900 m',
       'BDMP SPPDG 2 Schwarzpulverpatronen-DG 2',
-      'BDMP SPPDR 1 Schwarzpulverpatronen-DR 1',
       'BDMP VDR 1 Vorderlader-Dienstrevolver 1',
       'BDMP VDR 2 Vorderlader-Dienstrevolver 2',
       'BDMP VP 1 Vorderladerpistole 1',

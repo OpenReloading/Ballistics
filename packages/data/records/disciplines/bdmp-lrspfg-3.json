@@ -16,7 +16,12 @@
       {
         "source": "bdmp-sportordnung-2026-register-10",
         "page": "E.6, E.6.1, Teil E, Seite 17 von 42, PDF p. 17",
-        "fields": ["name", "number", "federation", "section", "page", "category"]
+        "fields": ["name", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.6.8, Teil E, Seite 18 von 42, PDF p. 18",
+        "fields": ["number"]
       },
       {
         "source": "bdmp-sportordnung-2026-register-10",

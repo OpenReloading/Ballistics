@@ -146,7 +146,7 @@
         "raw": "25 m"
       },
       "section": "B.11.9 and E.11.5 (Teil B, PDF p. 42; Teil E, PDF p. 31)",
-      "scoring": "centre"
+      "scoring": "touch"
     }
   ],
   "paper": {
@@ -223,11 +223,6 @@
         "source": "bdmp-sportordnung-2026-register-10",
         "page": "E.11.5, Teil E, Seite 31 von 42, PDF p. 31",
         "fields": ["events.name", "events.distance", "events.section"]
-      },
-      {
-        "source": "bdmp-sportordnung-2026-register-6",
-        "page": "A.3.21.4.1, Teil A, Seite 15 von 32, PDF p. 15",
-        "fields": ["events.scoring"]
       },
       {
         "source": "bdmp-sportordnung-2026-register-6",
