@@ -99,7 +99,8 @@ export const bundle: Bundle = {
   capacities: [
     {
       id: 'alpha-rifle-test',
-      cartridge: 'alpha-rifle',
+      origin: 'catalogue',
+      cartridge: 'catalogue:alpha-rifle',
       waterCapacity: { value: 3.6, raw: '55.6 gr H2O' },
       provenance: published,
     },

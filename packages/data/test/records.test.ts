@@ -109,9 +109,10 @@ describe('readRecords', () => {
       })
       write('capacities/test-capacity.json', {
         id: 'test-capacity',
-        cartridge: 'test-cartridge',
+        origin: 'catalogue',
+        cartridge: 'catalogue:test-cartridge',
         waterCapacity: { value: 3.5 },
-        caseManufacturer: 'missing-case-manufacturer',
+        caseManufacturer: 'catalogue:missing-case-manufacturer',
         provenance,
       })
       write('load-tables.json', {

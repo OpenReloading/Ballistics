@@ -203,10 +203,10 @@ _Avoid_: l3
 _Avoid_: l6
 
 **Case capacity**:
-A record of kind `capacities`: one water capacity of a case of one cartridge from one source, with `cartridge`, `waterCapacity`, `caseManufacturer`, `caseCondition`, `note`. The cartridge record answer lists them in `capacities`.
+One entity for every `origin`: the catalogue record (`records/capacities`) and the user record of kind `caseCapacity`, a capacity the user measured. One water capacity of a case of one cartridge from one source, with `origin`, `cartridge` and `caseManufacturer` (references), `waterCapacity` (g), `caseCondition`, `note`. A catalogue capacity also has `id` and `provenance`. The cartridge record answer lists the catalogue ones in `capacities`.
 
 **Water capacity**:
-`waterCapacity`: mass of water filling a case to the mouth, g, on case capacities and the `case` of a load.
+`waterCapacity`: mass of water filling a case to the mouth, g, on a case capacity.
 _Avoid_: capacity
 
 **Measured water capacity**:

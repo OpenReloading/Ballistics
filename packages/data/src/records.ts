@@ -5,12 +5,12 @@ import {
   bullet,
   type CaliberClass,
   type Cartridge,
-  type CaseCapacity,
+  type CatalogueCaseCapacity,
   type CatalogueLoad,
   type ChronoSession,
   caliberClass,
   cartridge,
-  caseCapacity,
+  catalogueCaseCapacity,
   catalogueLoad,
   chronoSession,
   type Discipline,
@@ -97,7 +97,7 @@ export type Bundle = {
   manufacturers: Manufacturer[]
   powders: Powder[]
   bullets: Bullet[]
-  capacities: CaseCapacity[]
+  capacities: CatalogueCaseCapacity[]
   loads: CatalogueLoad[]
   chronoSessions: ChronoSession[]
   firings: FiringSeries[]
@@ -129,7 +129,7 @@ function readBundle(roots: string[], errors: string[]): Bundle {
     manufacturers: read('manufacturers', manufacturer),
     powders: read('powders', powder),
     bullets: read('bullets', bullet),
-    capacities: read('capacities', caseCapacity),
+    capacities: read('capacities', catalogueCaseCapacity),
     loads: read('loads', catalogueLoad),
     chronoSessions: read('chrono', chronoSession),
     firings: read('firings', firingSeries, true),

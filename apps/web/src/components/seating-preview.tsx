@@ -26,7 +26,7 @@ import { drawable } from '../lib/cartridge-sheet.ts'
 import type { FieldValue } from '../lib/field-spec.ts'
 import { figureViews } from '../lib/figure-views.ts'
 import type { Suggestion } from '../lib/input-defaults.ts'
-import { productLabel } from '../lib/manufacturers.ts'
+import { productLabel, refName } from '../lib/manufacturers.ts'
 import { type SeatingLengths, seatingLengthName } from '../lib/seating-ladder.ts'
 import {
   drawingLengthUnit,
@@ -780,7 +780,7 @@ export function SeatingPreview({
                 onChange={(e) => setCapacityId(e.currentTarget.value)}
                 data={capacities.map((c) => ({
                   value: c.id,
-                  label: `${c.id}: ${c.waterCapacity.value} g water${c.caseManufacturer ? `, ${names.get(c.caseManufacturer) ?? c.caseManufacturer}` : ''}`,
+                  label: `${c.id}: ${c.waterCapacity.value} g water${c.caseManufacturer ? `, ${refName(names, c.caseManufacturer) || c.caseManufacturer}` : ''}`,
                 }))}
               />
             ) : (
@@ -814,7 +814,7 @@ export function SeatingPreview({
               capacity && measuredWaterCapacity.si === undefined
                 ? {
                     kind: 'record',
-                    text: `From the capacity record ${capacity.id}: ${capacity.waterCapacity.value} g water${capacity.caseManufacturer ? `, ${names.get(capacity.caseManufacturer) ?? capacity.caseManufacturer}` : ''}. Type a measured capacity to replace it.`,
+                    text: `From the capacity record ${capacity.id}: ${capacity.waterCapacity.value} g water${capacity.caseManufacturer ? `, ${refName(names, capacity.caseManufacturer) || capacity.caseManufacturer}` : ''}. Type a measured capacity to replace it.`,
                   }
                 : undefined
             }
