@@ -31,6 +31,7 @@ describe('catalogue budgets', () => {
 
   it('answers a ranked page of cartridges in under 5 ms', () => {
     const catalogue = openCatalogue(buildCatalogue(bundle))
+    expect(catalogue.cartridges({ q: 'win 308', limit: 50 }).total).toBeGreaterThan(0)
     expect(median(() => catalogue.cartridges({ q: 'win 308', limit: 50 }))).toBeLessThan(5)
   })
 })

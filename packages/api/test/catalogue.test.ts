@@ -38,6 +38,14 @@ describe('derive', () => {
     expect(contentHash('a')).toMatch(/^[0-9a-f]{14}$/)
     expect(contentHash('a')).toBe(contentHash('a'))
     expect(contentHash('a')).not.toBe(contentHash('b'))
+    // all 53 bits vary: the middle bits take many values over many texts
+    const middle = new Set(
+      Array.from(
+        { length: 2000 },
+        (_, i) => (BigInt(`0x${contentHash(`text ${i}`)}`) >> 11n) & 1023n,
+      ),
+    )
+    expect(middle.size).toBeGreaterThan(500)
     expect(revisionOf({ id: 'x', name: 'one' })).not.toBe(revisionOf({ id: 'x', name: 'two' }))
   })
 })
@@ -83,6 +91,32 @@ describe('open', () => {
     expect(ids(catalogue.cartridges({ q: 'alpha 7.62' }))).toEqual(['alpha-rifle'])
     expect(ids(catalogue.cartridges({ q: 'pistol' }))).toEqual(['beta-pistol'])
     expect(catalogue.cartridges({ q: 'nothing' })).toEqual({ total: 0, items: [] })
+  })
+
+  it('ranks a name above a word start above an infix, and keeps the default order between equal ranks', () => {
+    const named = (id: string, name: string) => ({ ...bundle.cartridges[2], id, name })
+    const ranked = openCatalogue(
+      buildCatalogue({
+        ...bundle,
+        cartridges: [
+          named('swin', 'Swin Rifle'),
+          named('win-mag', 'Win Mag'),
+          named('win', 'Win'),
+          named('alpha-win', 'Alpha Win'),
+        ],
+      }),
+    )
+    expect(ids(ranked.cartridges({ q: 'win' }))).toEqual(['win', 'alpha-win', 'win-mag', 'swin'])
+    expect(ids(ranked.cartridges())).toEqual(['alpha-win', 'swin', 'win', 'win-mag'])
+    expect(ranked.cartridges({ q: 'win', limit: 2, offset: 1 })).toMatchObject({
+      total: 4,
+      items: [{ id: 'alpha-win' }, { id: 'win-mag' }],
+    })
+  })
+
+  it('ignores an empty filter, as the SQL layer does', () => {
+    expect(catalogue.cartridges({ table: '' }).total).toBe(3)
+    expect(catalogue.powders({ manufacturer: '' }).total).toBe(2)
   })
 
   it('searches a component by its manufacturer name or alias and the product name', () => {

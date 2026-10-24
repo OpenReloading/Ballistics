@@ -64,7 +64,7 @@ export function contentHash(text: string): string {
   }
   h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909)
   h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909)
-  return (2097152 * (h2 >>> 0) + (h1 >>> 21)).toString(16).padStart(14, '0')
+  return (4294967296 * (h2 & 2097151) + (h1 >>> 0)).toString(16).padStart(14, '0')
 }
 
 /** The revision of a stored record: the hash of its JSON text. */

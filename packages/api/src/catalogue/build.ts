@@ -68,9 +68,9 @@ export function buildCatalogue(source: CatalogueSource): CatalogueData & { recor
     const d = disciplines.get(m.discipline)
     if (d) mappedFaces.set(m.face, [...(mappedFaces.get(m.face) ?? []), d])
   }
-  const capacities: Record<string, string[]> = {}
+  const capacities = new Map<string, string[]>()
   for (const c of source.capacities.toSorted((a, b) => compareKeys(a.id, b.id)))
-    capacities[c.cartridge] = [...(capacities[c.cartridge] ?? []), c.id]
+    capacities.set(c.cartridge, [...(capacities.get(c.cartridge) ?? []), c.id])
 
   return {
     index: {
@@ -102,7 +102,7 @@ export function buildCatalogue(source: CatalogueSource): CatalogueData & { recor
           ),
         (m) => m.id,
       ),
-      capacities,
+      capacities: Object.fromEntries(capacities),
     },
     records: {
       cartridge: byId(source.cartridges),

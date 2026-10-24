@@ -187,7 +187,12 @@ for (const set of sets)
         expect(sql.total).toBeGreaterThan(0)
         expect(mine.total).toBe(sql.total)
         if (name === 'cartridges paged') expect(mine.items).toHaveLength(sql.items.length)
-        else expect(sorted(mine)).toEqual(sorted(sql))
+        else {
+          expect(sorted(mine)).toEqual(sorted(sql))
+          // the items too: what the route answers today is what the catalogue lists
+          const byId = (a: Answer) => new Map(a.items.map((i) => [(i as { id: string }).id, i]))
+          expect(byId(mine)).toEqual(byId(sql))
+        }
       })
   })
 

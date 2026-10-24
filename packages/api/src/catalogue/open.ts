@@ -32,17 +32,13 @@ export function openCatalogue({ index, records }: CatalogueData): Catalogue {
   const cartridgeItems = new Map(index.cartridges.map((r) => [r.item.id, r.item]))
   return {
     cartridges: ({ table, ...paging } = {}) =>
-      select(index.cartridges, paging, (c) => table === undefined || c.table === table),
+      select(index.cartridges, paging, (c) => !table || c.table === table),
     manufacturers: () => select(index.manufacturers, {}),
     powders: ({ manufacturer, ...paging } = {}) =>
-      select(
-        index.powders,
-        paging,
-        (p) => manufacturer === undefined || p.manufacturer === manufacturer,
-      ),
+      select(index.powders, paging, (p) => !manufacturer || p.manufacturer === manufacturer),
     bullets: ({ manufacturer, cartridge, ...paging } = {}) => {
       let window: ReturnType<typeof bulletWindow> | undefined
-      if (cartridge !== undefined) {
+      if (cartridge) {
         const c = cartridgeItems.get(cartridge)
         const { maxBulletDiameter: g1, boreDiameter: land, grooveDiameter: groove } = c ?? {}
         if (g1 === undefined || land === undefined || groove === undefined)
@@ -53,21 +49,19 @@ export function openCatalogue({ index, records }: CatalogueData): Catalogue {
         index.bullets,
         paging,
         (b) =>
-          (manufacturer === undefined || b.manufacturer === manufacturer) &&
+          (!manufacturer || b.manufacturer === manufacturer) &&
           (window === undefined || (b.diameter > window.above && b.diameter <= window.upTo)),
       )
     },
     targetFaces: () => select(index.targetFaces, {}),
     federations: () => select(index.federations, {}),
     disciplines: ({ federation } = {}) =>
-      select(index.disciplines, {}, (d) => federation === undefined || d.federation === federation),
+      select(index.disciplines, {}, (d) => !federation || d.federation === federation),
     targetMappings: ({ discipline, face } = {}) =>
       select(
         index.targetMappings,
         {},
-        (m) =>
-          (discipline === undefined || m.discipline === discipline) &&
-          (face === undefined || m.face === face),
+        (m) => (!discipline || m.discipline === discipline) && (!face || m.face === face),
       ),
     get,
     capacities: (cartridge) =>
