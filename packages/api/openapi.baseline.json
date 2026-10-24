@@ -409,7 +409,7 @@
                       "properties": {
                         "form": {
                           "type": "string",
-                          "enum": ["tangent", "secant", "hybrid"]
+                          "enum": ["tangent", "secant", "hybrid", "round-nose", "flat-nose"]
                         },
                         "radius": {
                           "type": "object",
@@ -449,6 +449,67 @@
                           "unit": "1"
                         }
                       },
+                      "additionalProperties": false
+                    },
+                    "cannelure": {
+                      "type": "object",
+                      "properties": {
+                        "start": {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "description": "In mm."
+                            },
+                            "raw": {
+                              "type": "string",
+                              "minLength": 1,
+                              "description": "The value as written in the source, when it differed."
+                            }
+                          },
+                          "required": ["value"],
+                          "additionalProperties": false,
+                          "unit": "mm"
+                        },
+                        "width": {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "description": "In mm."
+                            },
+                            "raw": {
+                              "type": "string",
+                              "minLength": 1,
+                              "description": "The value as written in the source, when it differed."
+                            }
+                          },
+                          "required": ["value"],
+                          "additionalProperties": false,
+                          "unit": "mm"
+                        },
+                        "depth": {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "description": "In mm."
+                            },
+                            "raw": {
+                              "type": "string",
+                              "minLength": 1,
+                              "description": "The value as written in the source, when it differed."
+                            }
+                          },
+                          "required": ["value"],
+                          "additionalProperties": false,
+                          "unit": "mm"
+                        }
+                      },
+                      "required": ["start", "width"],
                       "additionalProperties": false
                     },
                     "tip": {

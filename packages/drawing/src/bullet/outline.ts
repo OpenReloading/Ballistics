@@ -43,8 +43,8 @@ export interface BulletDimensions {
   /** `length`: polymer tip forward of the jacket opening; `mouthDiameter`: hollow-point opening. */
   tip?: { type: string; length?: number; mouthDiameter?: number }
   /**
-   * Designer input, no record field: `start` is the z of the groove's rear edge from the base,
-   * `width` its axial width, `depth` its radial depth.
+   * `start` is the z of the groove's rear edge from the base, `width` its axial width, `depth`
+   * its radial depth.
    */
   cannelure?: { start: number; width: number; depth?: number }
 }

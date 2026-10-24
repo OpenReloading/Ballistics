@@ -1,14 +1,12 @@
-import type { TargetFace, TargetMapping } from '@openreloading/schema'
+import type { Bullet, Powder, TargetFace, TargetMapping } from '@openreloading/schema'
 import { cacheLife } from 'next/cache'
 import { PHASE_PRODUCTION_BUILD } from 'next/constants'
 import type {
-  BulletRecord,
   BulletSummary,
   CartridgeDetail,
   CartridgeSummary,
   ListOf,
   ManufacturerSummary,
-  PowderRecord,
   PowderSummary,
 } from './api-types.ts'
 import { API_PREFIX } from './api-version.ts'
@@ -81,8 +79,8 @@ const getOne =
     apiGet<T>(`${path}/${encodeURIComponent(id)}`)
 
 export const getCartridge = getOne<CartridgeDetail>('/cartridges')
-export const getBullet = getOne<BulletRecord>('/bullets')
-export const getPowder = getOne<PowderRecord>('/powders')
+export const getBullet = getOne<Bullet>('/bullets')
+export const getPowder = getOne<Powder>('/powders')
 export const getTargetFace = getOne<TargetFace>('/target-faces')
 export const getTargetMapping = getOne<TargetMapping>('/target-mappings')
 export const getDiscipline = getOne<DisciplineRecord>('/disciplines')

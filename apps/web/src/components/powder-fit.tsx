@@ -1,11 +1,11 @@
 import { Table, TableTbody, TableTd, TableTh, TableThead, TableTr } from '@mantine/core'
-import type { PowderRecord } from '../lib/api-types.ts'
+import type { Powder } from '@openreloading/schema'
 import { fitTables } from '../lib/powder-record.ts'
 import { Panel } from './panel.tsx'
 import { ScrollRegion } from './scroll-region.tsx'
 
 /** The load tables a powder's model was fitted to, with their training rows; none without a row count. */
-export function PowderFit({ powder }: { powder: PowderRecord }) {
+export function PowderFit({ powder }: { powder: Powder }) {
   if (!powder.interior) return null
   const tables = fitTables(powder)
   if (!tables.some((t) => t.trainingRows !== undefined)) return null

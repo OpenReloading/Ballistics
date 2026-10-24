@@ -51,6 +51,16 @@ describe('bullet record to shape', () => {
     })
   })
 
+  it('maps a record cannelure', () => {
+    expect(
+      bulletDimensions(
+        synthetic({
+          cannelure: { start: { value: 9 }, width: { value: 1.2 }, depth: { value: 0.2 } },
+        }),
+      )?.cannelure,
+    ).toEqual({ start: 9, width: 1.2, depth: 0.2 })
+  })
+
   it('gives no shape and a reason without a length', () => {
     const r = synthetic({ length: undefined })
     expect(bulletDimensions(r)).toBeUndefined()

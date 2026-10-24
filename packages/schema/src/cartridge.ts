@@ -4,6 +4,16 @@ import { provenance } from './provenance.ts'
 import { plausibilityException, pressureMethod, specValue } from './standards.ts'
 
 /**
+ * The case head of a cartridge, derived from the sheet's R1 (rim), P1 (body at the head) and R3 (belt):
+ * the API answers it as `caseType`, the web app lists it as a filter.
+ * Inferred type: {@link CaseType}.
+ */
+export const caseTypes = z.enum(['rimless', 'semi-rimmed', 'rimmed', 'rebated', 'belted'])
+
+/** The case head of a cartridge: `rimless`, `semi-rimmed`, `rimmed`, `rebated` or `belted`. */
+export type CaseType = z.infer<typeof caseTypes>
+
+/**
  * A cartridge as its C.I.P. sheet defines it: the names, the table, the dates and the values the
  * sheet prints. Inferred type: {@link Cartridge}.
  */
