@@ -3,7 +3,7 @@
 import { Table } from '@mantine/core'
 import type { Firearm, Optic } from '@openreloading/schema'
 import type { FieldSpec } from '../lib/field-spec.ts'
-import { clickText, firearmFields, twistText } from '../lib/firearm.ts'
+import { clickText, fieldSi, firearmFields, siOf, twistText, zeroFill } from '../lib/firearm.ts'
 import { zeroConditions } from '../lib/range-card.ts'
 import { type UnitSystem, withUnit } from '../lib/units.ts'
 import { opticKinds } from './firearm-editor.tsx'
@@ -32,10 +32,11 @@ export function DataCard({
       [f.manufacturerName, f.model].filter(Boolean).join(' ') || undefined,
     ],
     ...firearmFields.map((s): [string, string | undefined] => {
-      const v = f[s.key]
       if (s.key === 'twist') return [s.label, twistText(f, system)]
-      if (s.key === 'roundCount') return [s.label, v === undefined ? undefined : String(v)]
-      return [s.label, v === undefined ? undefined : withUnit(s.quantity, system, v)]
+      if (s.key === 'roundCount')
+        return [s.label, f.roundCount === undefined ? undefined : String(f.roundCount)]
+      const si = fieldSi(s, f[s.key])
+      return [s.label, si === undefined ? undefined : withUnit(s.quantity, system, si)]
     }),
     ['Notes', f.notes || undefined],
   ]
@@ -79,8 +80,13 @@ export function DataCard({
                 <Table.Tr key={o.id}>
                   <Table.Td>{opticName(o.id)}</Table.Td>
                   <Table.Td>{kindLabel(o.kind)}</Table.Td>
-                  <Table.Td>{clickText(o, system) ?? 'n/a'}</Table.Td>
-                  <Table.Td>{opt(o.travel, 'correction')}</Table.Td>
+                  <Table.Td>
+                    {clickText(
+                      { clickValue: siOf('angle', o.clickValue), clickUnit: o.clickUnit },
+                      system,
+                    ) ?? 'n/a'}
+                  </Table.Td>
+                  <Table.Td>{opt(siOf('angle', o.travel), 'correction')}</Table.Td>
                   <Table.Td>{magnification(o)}</Table.Td>
                   <Table.Td>{o.reticle || 'n/a'}</Table.Td>
                 </Table.Tr>
@@ -112,15 +118,16 @@ export function DataCard({
             </Table.Thead>
             <Table.Tbody>
               {c.mounts.map((m, k) => {
-                const zero = zeroConditions(m, system, m.dragFactorSource)
+                const si = zeroFill(m)
+                const zero = zeroConditions(si, system, m.dragFactorSource)
                 const air = [
-                  m.zeroTemperature === undefined
+                  si.zeroTemperature === undefined
                     ? ''
-                    : withUnit('temperature', system, m.zeroTemperature),
-                  m.zeroPressure === undefined
+                    : withUnit('temperature', system, si.zeroTemperature),
+                  si.zeroPressure === undefined
                     ? ''
-                    : withUnit('airPressure', system, m.zeroPressure),
-                  m.zeroHumidity === undefined ? '' : withUnit('percent', system, m.zeroHumidity),
+                    : withUnit('airPressure', system, si.zeroPressure),
+                  si.zeroHumidity === undefined ? '' : withUnit('percent', system, si.zeroHumidity),
                 ]
                   .filter(Boolean)
                   .join(', ')
@@ -128,10 +135,10 @@ export function DataCard({
                   // biome-ignore lint/suspicious/noArrayIndexKey: mounts have no id and keep their order
                   <Table.Tr key={k}>
                     <Table.Td>{opticName(m.optic)}</Table.Td>
-                    <Table.Td>{opt(m.sightHeight, 'length')}</Table.Td>
-                    <Table.Td>{opt(m.lateralOffset, 'length')}</Table.Td>
-                    <Table.Td>{opt(m.cant, 'angle')}</Table.Td>
-                    <Table.Td>{opt(m.zeroRange, 'range')}</Table.Td>
+                    <Table.Td>{opt(siOf('length', m.sightHeight), 'length')}</Table.Td>
+                    <Table.Td>{opt(siOf('length', m.lateralOffset), 'length')}</Table.Td>
+                    <Table.Td>{opt(siOf('angle', m.cant), 'angle')}</Table.Td>
+                    <Table.Td>{opt(siOf('length', m.zeroRange), 'range')}</Table.Td>
                     <Table.Td>{air || 'n/a'}</Table.Td>
                     <Table.Td>{zero.dragFactor ?? 'n/a'}</Table.Td>
                     <Table.Td>{m.zeroNotes || 'n/a'}</Table.Td>

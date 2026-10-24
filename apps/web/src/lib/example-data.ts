@@ -1,6 +1,6 @@
 import { defaultStartPressure, handgunBarrelLengthLimit, icao } from '@openreloading/core'
 import { seat } from '@openreloading/drawing/seating'
-import { toSi } from '@openreloading/schema'
+import { fromSi, toSi } from '@openreloading/schema'
 import type { InteriorKey } from './interior-input.ts'
 import type { LadderDirection } from './seating-ladder.ts'
 import type { ManualKey, ShotKey, zeroKeys } from './trajectory-input.ts'
@@ -192,12 +192,13 @@ export const exampleFirearm = {
   name: 'Example rifle, 308 Win.',
   saved: '2026-10-14T00:00:00.000Z',
   data: {
+    origin: 'user',
     name: 'Example rifle, 308 Win.',
-    cartridge: exampleRecords.cartridge.id,
-    barrelLength: toSi('length', choices.barrel),
-    twist: toSi('length', spec.u),
+    cartridge: `catalogue:${exampleRecords.cartridge.id}`,
+    barrelLength: { value: choices.barrel },
+    twist: { value: spec.u },
     twistHand: 'right',
-    firearmMass: exampleFirearmMass,
+    firearmMass: { value: fromSi('mass', exampleFirearmMass) },
     // a scope at the example's sight height and zero, so the Trajectory tab has a result
     optics: [{ id: 'scope', kind: 'scope', name: 'Example scope' }],
     configurations: [
@@ -207,8 +208,8 @@ export const exampleFirearm = {
         mounts: [
           {
             optic: 'scope',
-            sightHeight: toSi('length', choices.sightHeight),
-            zeroRange: choices.zero,
+            sightHeight: { value: choices.sightHeight },
+            zeroRange: { value: fromSi('length', choices.zero) },
           },
         ],
       },
