@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { firearm } from './firearm.ts'
-import { catalogueRef, parseRef } from './ids.ts'
+import { catalogueRef, parseRef, ref } from './ids.ts'
 import { bulletOverrides, cartridgeOverrides } from './overrides.ts'
 import { text } from './shared.ts'
 import { faceColour } from './target-face.ts'
@@ -23,11 +23,9 @@ const basedOnRef = (kind: string) =>
  * fields it gives alone. Lengths in mm, mass in g, angles in degrees.
  * Inferred type: {@link UserBullet}.
  */
-export const userBullet = z.object({
+export const userBullet = z.strictObject({
   origin: z.literal('user').describe('Where the record lives: `user`.'),
-  manufacturerName: text(200).describe(
-    'Manufacturer name, free text until manufacturers are records.',
-  ),
+  manufacturer: ref('manufacturer').optional(),
   basedOn: basedOnRef('bullet').optional(),
   overrides: bulletOverrides
     .describe(
@@ -200,36 +198,46 @@ export interface DanglingRef {
 
 /**
  * The references of `records` to user records that no record of `records` answers: a workbench
- * state's `firearm`, `cartridge` and `bullet` (the last two only as `user:<id>`) and a target
- * sheet's `load`. An old id and a `user:<id>` reference name a
- * record by its id, a `catalogue:` reference is not checked here. Reports only: nothing is dropped.
+ * state's `firearm`, `cartridge` and `bullet` (the last two only as `user:<id>`), a bullet's and a
+ * firearm's `manufacturer` (only as `user:<id>`) and a target sheet's `load`. An old id and a
+ * `user:<id>` reference name a record by its id, a `catalogue:` reference is not checked here.
+ * Reports only: nothing is dropped.
  */
 export function checkUserRefs(records: UserRecords): DanglingRef[] {
   const kindOf = new Map(records.map((r) => [r.id, r.kind]))
   const dangling: DanglingRef[] = []
-  const check = (
-    r: UserRecord,
-    field: string,
-    target: string | undefined,
-    kind: UserRecordKind,
-  ) => {
-    if (target === undefined) return
-    const parsed = parseRef(target)
-    if (parsed?.scope === 'catalogue') return
-    if (kindOf.get(parsed?.id ?? target) !== kind)
-      dangling.push({ record: r.id, kind: r.kind, field, target })
-  }
   for (const r of records) {
-    if (r.kind === 'workbenchState') {
-      check(r, 'firearm', r.data.firearm, 'firearm')
-      // a plain id names a catalogue record: only a `user:` reference points at a user record
-      for (const kind of ['cartridge', 'bullet'] as const) {
-        const target = r.data[kind]
-        if (target && parseRef(target)?.scope === 'user') check(r, kind, target, kind)
-      }
-    } else if (r.kind === 'targetSheet') check(r, 'load', r.data.load, 'workbenchState')
+    for (const [field, target, kind, userOnly] of userRefsOf(r)) {
+      if (target === undefined) continue
+      const parsed = parseRef(target)
+      if (parsed?.scope === 'catalogue' || (userOnly && parsed?.scope !== 'user')) continue
+      if (kindOf.get(parsed?.id ?? target) !== kind)
+        dangling.push({ record: r.id, kind: r.kind, field, target })
+    }
   }
   return dangling
+}
+
+/**
+ * The references of a record to other user records: the field, its text, the kind the record must
+ * have and whether only a `user:` reference counts (a plain text names a catalogue record).
+ */
+function userRefsOf(r: UserRecord): [string, string | undefined, UserRecordKind, boolean][] {
+  switch (r.kind) {
+    case 'workbenchState':
+      return [
+        ['firearm', r.data.firearm, 'firearm', false],
+        ['cartridge', r.data.cartridge, 'cartridge', true],
+        ['bullet', r.data.bullet, 'bullet', true],
+      ]
+    case 'targetSheet':
+      return [['load', r.data.load, 'workbenchState', false]]
+    case 'bullet':
+    case 'firearm':
+      return [['manufacturer', r.data.manufacturer, 'manufacturer', true]]
+    default:
+      return []
+  }
 }
 
 /**

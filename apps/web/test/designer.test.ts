@@ -87,10 +87,7 @@ describe('start', () => {
     // shown rounded, held as recorded
     expect(d.fields.noseLength.text).toBe('20')
     expect(d.fields.noseLength.si).toBeCloseTo(20e-3, 12)
-    expect(
-      fromRecord(targetBullet, metric, new Map([['example-a', 'Example A']])).manufacturerName,
-    ).toBe('Example A')
-    expect(d.manufacturerName).toBe('')
+    expect(d.manufacturer).toBe(`catalogue:${targetBullet.manufacturer}`)
     const e = evaluate(d, metric)
     for (const k of ['diameter', 'mass', 'length', 'noseLength', 'bearingLength', 'baseToOgive'])
       expect(e.states[k]).toEqual({ kind: 'record' })
@@ -422,7 +419,6 @@ describe('drafts', () => {
     const d = run(newDesign(metric), type('length', '30')).present
     expect(fileData(d)).toEqual({
       origin: 'user',
-      manufacturerName: '',
       overrides: {
         diameter: { value: 7.8232 },
         mass: { value: 10.88621688 },
@@ -434,7 +430,7 @@ describe('drafts', () => {
   it('opens a design whose base is gone read only and saves its data as stored', () => {
     const data: UserBullet = {
       origin: 'user',
-      manufacturerName: 'Me',
+      manufacturer: 'catalogue:example-a',
       basedOn: 'catalogue:gone',
       overrides: { mass: { value: 9 } },
     }

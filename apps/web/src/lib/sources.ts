@@ -68,14 +68,14 @@ export const designerHref = (kind: 'bullets' | 'cartridges', rowId: string) =>
 
 /** User bullets with a diameter as list rows: lengths in mm, mass in g; absent values stay absent. */
 export function userBulletRows(views: readonly UserBulletView[]): BulletRow[] {
-  return views.flatMap(({ id, name, data, resolved: { record } }) => {
+  return views.flatMap(({ id, name, manufacturerName, resolved: { record } }) => {
     // the diameter is the designer's one required value: a bullet without it has no caliber to list
     if (record.diameter === undefined) return []
     return [
       {
         id: userRowId(id),
         origin: 'user' as const,
-        manufacturerName: data.manufacturerName,
+        manufacturerName,
         name: record.name || name,
         diameter: record.diameter.value,
         mass: record.mass?.value ?? null,

@@ -264,7 +264,6 @@ async function seedHollowBaseDesign(page: Page) {
       saved: '2026-10-20T00:00:00.000Z',
       data: {
         origin: 'user',
-        manufacturerName: '',
         overrides: {
           name: 'Hollow base',
           diameter: { value: 7.823 },

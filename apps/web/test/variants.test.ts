@@ -33,7 +33,7 @@ function stubApi(records: Record<string, unknown>, down = false) {
 
 const bulletData = (basedOn?: string): UserBullet => ({
   origin: 'user',
-  manufacturerName: 'Me',
+  manufacturer: 'catalogue:example-a',
   ...(basedOn && { basedOn }),
   overrides: { name: 'My 168', mass: { value: 11 } },
 })

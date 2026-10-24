@@ -37,7 +37,7 @@ test('saves go into the folder without a picker; the folder can be forgotten', a
     const dir = await (await navigator.storage.getDirectory()).getDirectoryHandle('workspace')
     return (await (await dir.getFileHandle('folder.json')).getFile()).text()
   })
-  expect(JSON.parse(text).records[0].data.manufacturerName).toBe('Folder')
+  expect(JSON.parse(text).records[0].data.manufacturer).toMatch(/^user:/)
   await folderItem(page, 'Forget workspace folder')
   await expect(state(page)).toHaveText('Saved: folder.json')
 })

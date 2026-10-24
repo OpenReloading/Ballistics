@@ -5,7 +5,7 @@ description: The manufacturer records that powder, bullet, case capacity and loa
 
 # Manufacturers
 
-A powder or bullet record names its manufacturer by the id of a manufacturer record (`manufacturer`). A case capacity record names the case manufacturer the same way (`caseManufacturer`), and so does a load table (`manufacturer`). Text that a user types, such as the manufacturer of a chronograph, a firearm or a bullet design, stays free text in `manufacturerName`. Schema: `packages/schema/src/manufacturer.ts`. Records: `packages/data/records/manufacturers/`.
+A powder or bullet record names its manufacturer by the id of a manufacturer record (`manufacturer`). A case capacity record names the case manufacturer the same way (`caseManufacturer`), and so does a load table (`manufacturer`). A user bullet and a firearm name their manufacturer by a reference, `catalogue:<id>` or `user:<id>`. A name a user types that no manufacturer has becomes a user manufacturer, a record kept in the browser with the name as its `name`; the same name typed again finds it, and a name or alias of a catalogue manufacturer finds the catalogue record first. Schema: `packages/schema/src/manufacturer.ts`. Records: `packages/data/records/manufacturers/`.
 
 ## Record
 

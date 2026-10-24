@@ -17,7 +17,7 @@ No source found can be imported in bulk: every source with firearm models, barre
 
 ## What exists today
 
-- A firearm is one schema, `firearm`, for every origin: lengths in mm, mass in g, angles in degrees, each as a `quantity` object, with the maker as a `catalogue:` reference and free text `manufacturerName` beside it, and `model` (`packages/schema/src/firearm.ts`). Optics are children of it (`optic`). The optic as mounted carries the sight height and zero (`opticMount`, `opticConfiguration`). The browser keeps it as the user record `firearm` (`packages/schema/src/user-data.ts`).
+- A firearm is one schema, `firearm`, for every origin: lengths in mm, mass in g, angles in degrees, each as a `quantity` object, with the maker as a manufacturer reference (`catalogue:` or `user:`), and `model` (`packages/schema/src/firearm.ts`). Optics are children of it (`optic`). The optic as mounted carries the sight height and zero (`opticMount`, `opticConfiguration`). The browser keeps it as the user record `firearm` (`packages/schema/src/user-data.ts`).
 - The workbench stores only the id of such a user record (`packages/schema/src/workbench.ts:73`). A `Load` holds an optional reference to a firearm (`packages/schema/src/load.ts`), no copy.
 - The Gun card is a select over the browser library (`apps/web/src/components/workbench-inputs.tsx:889`). `chooseFirearm` copies twist and mass into the form (`apps/web/src/components/use-workbench-load.ts:337`). The barrel length reaches the seating preview through the record (`workbench-inputs.tsx:1004`) and the defaults (`apps/web/src/lib/input-defaults.ts:80`), not through the form.
 - Catalogue records are one JSON file per record, the id equals the file name, ids are unique across roots (`packages/data/src/read-kind.ts:26`). Every record has `provenance` (`packages/schema/src/provenance.ts:106`), whose sources carry `origin` (`:17`), `license`, `terms`, `page`, `retrieved` and `sha256` (`:27`). A source cited by several records is stored once in `records/sources/`. Kinds are read in `packages/data/src/records.ts:99`. Stored units: length mm, mass g, angle deg, count 1 (`packages/schema/src/units.ts:36`).
@@ -67,7 +67,7 @@ User records (browser and files) use the same shape and stored units as catalogu
 | Field | Type, unit | Notes |
 |---|---|---|
 | `catalogue` | `{ variant: id, retrieved: date }`, optional | where the values were copied from; nothing reads it back |
-| `parts` | array of `{ kind, name, manufacturerName?, mass? }`, at most 20, optional | `kind`: receiver, barrel, gasSystem, handguard, stock, muzzleDevice, other; `mass` a quantity in g; descriptive, no solver reads it |
+| `parts` | array of `{ kind, name, manufacturer?, mass? }`, at most 20, optional | `kind`: receiver, barrel, gasSystem, handguard, stock, muzzleDevice, other; `mass` a quantity in g; descriptive, no solver reads it |
 | `barrelLength`, `twist`, `twistHand`, `grooveDiameter`, `boreDiameter`, `firearmMass`, `cartridge`, optics | unchanged | these stay the only values the solvers read; the solvers get them in SI |
 
 Properties that matter for ballistics: barrel length, twist and hand, chamber (through the cartridge), bore and groove diameter where known, mass (recoil), sight height (optic mount, typed by the user). The gas system length matters for nothing the app computes, so it is a descriptive part, not a number. Receiver, handguard and stock are descriptive text.
