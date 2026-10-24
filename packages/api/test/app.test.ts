@@ -143,6 +143,8 @@ describe('GET /cartridges', () => {
     expect(await ids('?q=mm luger')).toEqual(['c-9', 'c-lug'])
     expect(await ids('?q=luger mm')).toEqual(['c-9', 'c-lug'])
     expect(await ids('?q=9 mm&limit=1&offset=1')).toEqual(['c-lug'])
+    // spaces only are no query
+    expect(await ids('?q=%20')).toEqual(['c-9', 'c-10', 'c-lug'])
   })
 
   it('filters by table and pages', async () => {

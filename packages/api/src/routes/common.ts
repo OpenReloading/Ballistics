@@ -3,7 +3,7 @@ import { z } from 'zod'
 import type { Catalogue, Catalogued, CatalogueKind } from '../catalogue/types.ts'
 import type { ComputeRunner } from '../compute/tasks.ts'
 
-/** `pattern` of a query string value without a NUL character: PostgreSQL text holds none, so the query would fail with 500. */
+/** `pattern` of a query string value without a NUL character: the SQL layer's text holds none, so a query with one would fail with 500 there. */
 export const noNul = '^[^\\u0000]*$'
 
 /** `pattern` of a record id, as `recordId` of `@openreloading/schema`. */

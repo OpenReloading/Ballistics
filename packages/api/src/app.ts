@@ -59,7 +59,7 @@ export function buildApp({
   if (!compute) app.addHook('onClose', () => runner.close())
   app.register(sensible)
   // the route handlers rethrow what they do not answer: a 4xx keeps Fastify's answer, anything
-  // else is a 500 without the error's text (driver messages carry SQL), logged with the request id
+  // else is a 500 without the error's text (a read error carries file paths), logged with the request id
   app.setErrorHandler<FastifyError>((error, request, reply) => {
     const status = error.statusCode ?? 500
     if (status >= 400 && status < 500) throw error
