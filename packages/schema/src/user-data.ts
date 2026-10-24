@@ -6,7 +6,6 @@ import { bulletOverrides, cartridgeOverrides } from './overrides.ts'
 import { text } from './shared.ts'
 import { faceColour } from './target-face.ts'
 import { targetSheet } from './target-sheet.ts'
-import { workbenchState } from './workbench.ts'
 
 /** Value of `format` in every user data file, telling it apart from other JSON. */
 export const userDataFormat = 'openreloading-user-data'
@@ -125,7 +124,6 @@ export const userRecord = z.discriminatedUnion(
   [
     record('bullet', 'A bullet of the bullet designer.', userBullet),
     record('cartridge', 'A cartridge of the cartridge designer.', userCartridge),
-    record('workbenchState', 'A load of the workbench.', workbenchState),
     record('load', 'A load of the workbench, in stored units.', load),
     record('firearm', 'A firearm of the library, in stored units.', firearm),
     record('targetSheet', 'A target sheet with its calibration and shot groups.', targetSheet),
@@ -230,14 +228,7 @@ export function checkUserRefs(records: UserRecords): DanglingRef[] {
       check(r, 'firearm', r.data.firearm, 'firearm')
       check(r, 'cartridge', r.data.cartridge, 'cartridge')
       if (typeof r.data.bullet === 'string') check(r, 'bullet', r.data.bullet, 'bullet')
-    } else if (r.kind === 'workbenchState') {
-      check(r, 'firearm', r.data.firearm, 'firearm')
-      // a plain id names a catalogue record: only a `user:` reference points at a user record
-      for (const kind of ['cartridge', 'bullet'] as const) {
-        const target = r.data[kind]
-        if (target && parseRef(target)?.scope === 'user') check(r, kind, target, kind)
-      }
-    } else if (r.kind === 'targetSheet') check(r, 'load', r.data.load, 'load', 'workbenchState')
+    } else if (r.kind === 'targetSheet') check(r, 'load', r.data.load, 'load')
   }
   return dangling
 }
@@ -262,7 +253,7 @@ export interface TargetFaceDesign extends z.infer<typeof targetFaceDesign> {}
 export type TargetSheetRecord = Extract<UserRecord, { kind: 'targetSheet' }>
 /** One record of a user data file: `kind`, id, name, save time and `data`. */
 export type UserRecord = z.infer<typeof userRecord>
-/** Discriminator of a user record: `bullet`, `cartridge`, `workbenchState`, `load`, `firearm`, `targetSheet` or `targetFaceDesign`. */
+/** Discriminator of a user record: `bullet`, `cartridge`, `load`, `firearm`, `targetSheet` or `targetFaceDesign`. */
 export type UserRecordKind = UserRecord['kind']
 /** A base64 photo stored in a user data file, referenced by id. */
 export interface EmbeddedFile extends z.infer<typeof embeddedFile> {}

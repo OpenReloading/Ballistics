@@ -33,10 +33,10 @@ const interiorKeys = [
 /** The SI field values `interiorLoad` reads, one per key of {@link interiorValueKeys}. */
 export interface InteriorValues extends Record<(typeof interiorKeys)[number], number> {}
 
-/** Field keys of the `values` of `interiorLoad`, as the workbench saves them in `siValues`. */
+/** Field keys of the `values` of `interiorLoad`, the workbench fields a load keeps (`charge` and `analysis.overrides`). */
 export const interiorValueKeys: readonly (keyof InteriorValues)[] = interiorKeys
 
-/** Every key the workbench saves in `siValues`: `interiorValueKeys` and `firearmMass` (kg, for the free recoil). */
+/** Every key a load keeps: `interiorValueKeys` and `firearmMass` (kg, for the free recoil). */
 export const workbenchValueKeys: readonly (keyof InteriorValues | 'firearmMass')[] = [
   ...interiorKeys,
   'firearmMass',
