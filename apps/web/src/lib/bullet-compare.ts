@@ -1,11 +1,11 @@
 /** Bullets side by side: the rows in the preset, the difference marks, one drawing scale. */
-import { face, type LengthUnit } from '@openreloading/drawing'
+import { face, type LengthUnit } from '@open-reloading/drawing'
 import {
   type BulletModel,
   type BulletProfile,
   bulletFigureModel,
   bulletScreenEm,
-} from '@openreloading/drawing/bullet'
+} from '@open-reloading/drawing/bullet'
 import type { BulletRecord } from './api-types.ts'
 import {
   ballisticCoefficientRows,

@@ -1,7 +1,7 @@
 'use client'
 
 import { ActionIcon, Badge, Button, Checkbox, Group, Popover, Stack, Tooltip } from '@mantine/core'
-import type { UserRecord } from '@openreloading/schema'
+import type { UserRecord } from '@open-reloading/schema'
 import { CaretDown, Trash } from '@phosphor-icons/react'
 import { useCallback, useEffect, useState } from 'react'
 import {

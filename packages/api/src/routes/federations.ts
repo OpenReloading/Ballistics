@@ -5,7 +5,7 @@ import {
   federation,
   targetFace,
   targetMapping,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
 import {

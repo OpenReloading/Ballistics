@@ -1,5 +1,5 @@
 /** The load-file formats the File menu opens, and reading files with them. */
-import type { EmbeddedFile, UserRecord } from '@openreloading/schema'
+import type { EmbeddedFile, UserRecord } from '@open-reloading/schema'
 import {
   maxFileBytes,
   type ParsedUserFile,
@@ -9,7 +9,7 @@ import {
 
 /**
  * A load-file format the File menu opens and imports: told by `detect`, read by `parse` into user
- * records that passed `@openreloading/schema`. A new format is its module plus one entry in
+ * records that passed `@open-reloading/schema`. A new format is its module plus one entry in
  * `loadFileFormats`.
  */
 export interface LoadFileFormat {

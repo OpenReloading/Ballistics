@@ -1,4 +1,4 @@
-import { recordResistance } from '@openreloading/core'
+import { recordResistance } from '@open-reloading/core'
 import { expect, it } from 'vitest'
 import type { PowderRecord } from '../src/lib/api-types.ts'
 import {

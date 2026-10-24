@@ -1,4 +1,4 @@
-import type { TargetSheet } from '@openreloading/schema'
+import type { TargetSheet } from '@open-reloading/schema'
 import { useEffect, useRef } from 'react'
 import { fetchFederationData } from '../lib/face-records.ts'
 import { sheetSettings, shotPositions } from '../lib/report-issue.ts'

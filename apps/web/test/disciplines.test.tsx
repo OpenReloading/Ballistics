@@ -1,5 +1,5 @@
 import { MantineProvider } from '@mantine/core'
-import { readRecords } from '@openreloading/data'
+import { readRecords } from '@open-reloading/data'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { DisciplineList, FederationList } from '../src/components/discipline-list.tsx'

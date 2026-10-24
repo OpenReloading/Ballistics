@@ -4,7 +4,7 @@ import {
   InputError,
   trajectory,
   trueMuzzleVelocity,
-} from '@openreloading/core'
+} from '@open-reloading/core'
 import { describe, expect, it, vi } from 'vitest'
 import { buildApp } from '../src/app.ts'
 import { caps } from '../src/compute/schemas.ts'
@@ -14,8 +14,8 @@ import { m3Load, flatShot as shot } from './fixtures.ts'
 import { withApi } from './setup.ts'
 
 // millerStability by velocity: 1 throws an engine RangeError, 2 an InputError, 3 returns NaN
-vi.mock('@openreloading/core', async (importOriginal) => {
-  const core = await importOriginal<typeof import('@openreloading/core')>()
+vi.mock('@open-reloading/core', async (importOriginal) => {
+  const core = await importOriginal<typeof import('@open-reloading/core')>()
   return {
     ...core,
     millerStability: (input: Parameters<typeof core.millerStability>[0]) => {

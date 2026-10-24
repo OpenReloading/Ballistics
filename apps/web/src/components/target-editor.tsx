@@ -31,7 +31,7 @@ import {
   type TargetSheetRecord,
   targetSheet,
   type UserRecord,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import {
   ArrowClockwise,
   ArrowCounterClockwise,

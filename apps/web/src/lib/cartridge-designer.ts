@@ -1,4 +1,4 @@
-import { checkSpec } from '@openreloading/data/plausibility'
+import { checkSpec } from '@open-reloading/data/plausibility'
 import {
   drawnTables,
   type Figure,
@@ -10,9 +10,9 @@ import {
   screenWidth,
   sideName,
   storedValue,
-} from '@openreloading/drawing/cartridge'
-import { chamberOf } from '@openreloading/drawing/seating'
-import type { CartridgeDesign } from '@openreloading/schema'
+} from '@open-reloading/drawing/cartridge'
+import { chamberOf } from '@open-reloading/drawing/seating'
+import type { CartridgeDesign } from '@open-reloading/schema'
 import type { CartridgeDetail, SpecValue } from './api-types.ts'
 import { drawable } from './cartridge-sheet.ts'
 import {
@@ -43,7 +43,7 @@ const cartridge: Side[] = ['cartridge']
 const chamber: Side[] = ['chamber']
 
 /**
- * The CIP symbols the outline reads (`cipProfile` of `@openreloading/drawing/cartridge`), outside
+ * The CIP symbols the outline reads (`cipProfile` of `@open-reloading/drawing/cartridge`), outside
  * table VII: meaning, sides, group and the end of the slider range in mm or degrees.
  */
 const symbols: [string, string, Side[], Group, number, 'length' | 'angle'][] = [

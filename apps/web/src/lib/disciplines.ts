@@ -1,5 +1,5 @@
 /** The discipline and federation lists' rows and filters, and a discipline record's rule book and stages. */
-import { caliberClasses, type Discipline, type Federation } from '@openreloading/schema'
+import { caliberClasses, type Discipline, type Federation } from '@open-reloading/schema'
 import type { Provenance, Source } from './api-types.ts'
 import type { DirectoryState } from './directory.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'

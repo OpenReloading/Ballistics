@@ -1,4 +1,4 @@
-import { defaultStartPressure, handgunBarrelLengthLimit } from '@openreloading/core'
+import { defaultStartPressure, handgunBarrelLengthLimit } from '@open-reloading/core'
 import type { PowderRecord } from './api-types.ts'
 
 /**

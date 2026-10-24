@@ -1,7 +1,7 @@
 import { createRequire } from 'node:module'
 
 /**
- * Contract version of the API: the version of `@openreloading/api` (`packages/api/package.json`,
+ * Contract version of the API: the version of `@open-reloading/api` (`packages/api/package.json`,
  * set by release-please). The API document carries it as `info.version`.
  */
 export const API_VERSION: string = createRequire(import.meta.url)('../package.json').version

@@ -1,4 +1,4 @@
-import type { TargetFace } from '@openreloading/schema'
+import type { TargetFace } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { meanRadius } from '../src/lib/ellipse.ts'
 import {

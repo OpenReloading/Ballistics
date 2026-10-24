@@ -1,7 +1,7 @@
 /**
  * The API on an in-memory PostgreSQL (PGlite) seeded from the data bundle, and the files of its
  * read answers that the web app's Pages edition serves instead of an API
- * (`@openreloading/api/static`, used at build time only). The server never imports it: PGlite is a
+ * (`@open-reloading/api/static`, used at build time only). The server never imports it: PGlite is a
  * devDependency.
  */
 import { mkdir, writeFile } from 'node:fs/promises'

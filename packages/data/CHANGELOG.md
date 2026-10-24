@@ -12,4 +12,4 @@
 
 * The following workspace dependencies were updated
   * dependencies
-    * @openreloading/schema bumped from * to 0.0.1
+    * @open-reloading/schema bumped from * to 0.0.1

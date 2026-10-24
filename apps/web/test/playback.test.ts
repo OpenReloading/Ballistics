@@ -1,4 +1,4 @@
-import { interior } from '@openreloading/core'
+import { interior } from '@open-reloading/core'
 import { expect, it } from 'vitest'
 import { baseAt, flightAt, flightTime, type StripModel } from '../src/lib/barrel-strip.ts'
 import { exampleInterior } from '../src/lib/example-data.ts'

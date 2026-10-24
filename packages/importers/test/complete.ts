@@ -1,4 +1,4 @@
-import { type ChronoSession, chronoSession } from '@openreloading/schema'
+import { type ChronoSession, chronoSession } from '@open-reloading/schema'
 import type { ChronoImport } from '../src/index.ts'
 
 const fill: Record<string, unknown> = {

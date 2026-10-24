@@ -10,7 +10,7 @@ import {
   type TrajectoryInput,
   type TrajectoryPoint,
   trajectory,
-} from '@openreloading/core'
+} from '@open-reloading/core'
 import type { FieldSpec } from './field-spec.ts'
 import { metersPerSecondPerMph } from './units.ts'
 

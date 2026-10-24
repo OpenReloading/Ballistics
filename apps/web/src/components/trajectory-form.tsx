@@ -18,8 +18,8 @@ import {
   minStability,
   type OmittedEffect,
   type Trajectory,
-} from '@openreloading/core'
-import type { UserRecord } from '@openreloading/schema'
+} from '@open-reloading/core'
+import type { UserRecord } from '@open-reloading/schema'
 import { Printer } from '@phosphor-icons/react'
 import {
   type ReactNode,

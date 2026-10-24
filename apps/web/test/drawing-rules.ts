@@ -16,8 +16,8 @@ import {
   type Profile,
   polygonsOverlap,
   steelBand,
-} from '@openreloading/drawing'
-import type { FigureModel } from '@openreloading/drawing/cartridge'
+} from '@open-reloading/drawing'
+import type { FigureModel } from '@open-reloading/drawing/cartridge'
 import type { CartridgeDetail, SpecValue } from '../src/lib/api-types.ts'
 import { drawable } from '../src/lib/cartridge-sheet.ts'
 

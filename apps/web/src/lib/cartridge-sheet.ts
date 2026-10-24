@@ -1,4 +1,4 @@
-import { sheetId } from '@openreloading/schema'
+import { sheetId } from '@open-reloading/schema'
 import type { CartridgeDetail } from './api-types.ts'
 
 /**

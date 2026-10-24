@@ -1,5 +1,5 @@
-import { face } from '@openreloading/drawing'
-import { bulletFigureModel, bulletOutline } from '@openreloading/drawing/bullet'
+import { face } from '@open-reloading/drawing'
+import { bulletFigureModel, bulletOutline } from '@open-reloading/drawing/bullet'
 import { describe, expect, it } from 'vitest'
 import { computedBulletRows } from '../src/lib/bullet.ts'
 import {

@@ -1,4 +1,4 @@
-import type { ShotGroup } from '@openreloading/schema'
+import type { ShotGroup } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { groupStatisticsInput } from '../src/lib/target-groups.ts'
 

@@ -1,4 +1,4 @@
-import type { UserRecord } from '@openreloading/schema'
+import type { UserRecord } from '@open-reloading/schema'
 import { expect, it, vi } from 'vitest'
 import { afterChange, afterExport, reminderText } from '../src/lib/export-reminder.ts'
 import {

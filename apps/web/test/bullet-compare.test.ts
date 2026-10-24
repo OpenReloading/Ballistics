@@ -1,4 +1,4 @@
-import { bulletProfile } from '@openreloading/drawing/bullet'
+import { bulletProfile } from '@open-reloading/drawing/bullet'
 import { expect, it } from 'vitest'
 import type { BulletRecord } from '../src/lib/api-types.ts'
 import {

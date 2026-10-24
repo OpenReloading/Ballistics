@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import type { Bundle } from '@openreloading/data'
+import type { Bundle } from '@open-reloading/data'
 import type {
   Bullet,
   Cartridge,
@@ -10,7 +10,7 @@ import type {
   Powder,
   TargetFace,
   TargetMapping,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import type { InferInsertModel } from 'drizzle-orm'
 import type { PgTable } from 'drizzle-orm/pg-core'
 import type { Db } from './index.ts'

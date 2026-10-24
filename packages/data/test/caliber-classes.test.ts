@@ -1,4 +1,4 @@
-import { caliberClasses } from '@openreloading/schema'
+import { caliberClasses } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { readRecords } from '../src/records.ts'
 

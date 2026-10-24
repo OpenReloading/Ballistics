@@ -1,7 +1,7 @@
 'use client'
 
-import { dispersionEllipse, predictionEllipse } from '@openreloading/core'
-import type { CalibrationReference, TargetSheet } from '@openreloading/schema'
+import { dispersionEllipse, predictionEllipse } from '@open-reloading/core'
+import type { CalibrationReference, TargetSheet } from '@open-reloading/schema'
 import {
   type KeyboardEvent,
   type PointerEvent,

@@ -1,4 +1,4 @@
-import type { ChargeRange, ChargeTargetKind } from '@openreloading/core'
+import type { ChargeRange, ChargeTargetKind } from '@open-reloading/core'
 import type { ErrorBody, InteriorResponse } from './api-types.ts'
 import { formatNumber, type UnitSystem, withUnit } from './units.ts'
 

@@ -3,7 +3,7 @@ import {
   icao,
   interiorDefaults,
   pressureToleranceDefaults,
-} from '@openreloading/core'
+} from '@open-reloading/core'
 import { z } from 'zod'
 import { caps, recordId, steps } from './schemas.ts'
 

@@ -1,4 +1,4 @@
-import { compareTargetFaces } from '@openreloading/schema'
+import { compareTargetFaces } from '@open-reloading/schema'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'

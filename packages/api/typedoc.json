@@ -11,5 +11,5 @@
     "src/routes/*.ts"
   ],
   "tsconfig": "tsconfig.build.json",
-  "externalSymbolLinkMappings": { "@openreloading/schema": { "Provenance": "#" } }
+  "externalSymbolLinkMappings": { "@open-reloading/schema": { "Provenance": "#" } }
 }

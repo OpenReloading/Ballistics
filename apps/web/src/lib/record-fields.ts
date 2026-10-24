@@ -1,4 +1,4 @@
-import type { QuantityValue } from '@openreloading/schema'
+import type { QuantityValue } from '@open-reloading/schema'
 import type { BulletRecord, ComputedRange, PowderRecord } from './api-types.ts'
 import { computedBulletRows } from './bullet.ts'
 import {

@@ -1,10 +1,10 @@
-import { recordIdRegex } from '@openreloading/schema'
+import { recordIdRegex } from '@open-reloading/schema'
 import { z } from 'zod'
 
 /** `pattern` of a query string value without a NUL character: PostgreSQL text holds none, so the query would fail with 500. */
 export const noNul = '^[^\\u0000]*$'
 
-/** `pattern` of a record id, as `recordId` of `@openreloading/schema`. */
+/** `pattern` of a record id, as `recordId` of `@open-reloading/schema`. */
 export const recordIdPattern = recordIdRegex.source
 
 /** The JSON Schema of a route's path parameters or query string. */

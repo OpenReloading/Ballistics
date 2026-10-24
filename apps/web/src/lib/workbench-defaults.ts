@@ -1,4 +1,4 @@
-import { defaultStartPressure, handgunBarrelLengthLimit } from '@openreloading/core'
+import { defaultStartPressure, handgunBarrelLengthLimit } from '@open-reloading/core'
 import { interiorFields } from './interior-input.ts'
 
 /** `localStorage` key of the user's workbench defaults: JSON of the tuned values, SI. */

@@ -9,7 +9,7 @@ import {
   type TrajectoryInput,
   type TruingPlan,
   type WeakReason,
-} from '@openreloading/core'
+} from '@open-reloading/core'
 import { errorText } from './error-text.ts'
 import { formatNumber, type UnitSystem, withUnit } from './units.ts'
 

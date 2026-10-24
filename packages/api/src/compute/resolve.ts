@@ -5,8 +5,8 @@ import {
   InputError,
   lbPerSqInToKgPerSqM,
   type Projectile,
-} from '@openreloading/core'
-import type { Bullet } from '@openreloading/schema'
+} from '@open-reloading/core'
+import type { Bullet } from '@open-reloading/schema'
 import { getBullet, getPowder } from '../db/component-queries.ts'
 import type { Db } from '../db/index.ts'
 import { getCartridge } from '../db/queries.ts'

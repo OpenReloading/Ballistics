@@ -3,8 +3,8 @@ import {
   handgunBarrelLengthLimit,
   icao,
   lbPerSqInToKgPerSqM,
-} from '@openreloading/core'
-import { seat } from '@openreloading/drawing/seating'
+} from '@open-reloading/core'
+import { seat } from '@open-reloading/drawing/seating'
 import type { InteriorKey } from './interior-input.ts'
 import type { LadderDirection } from './seating-ladder.ts'
 import type { ManualKey, ShotKey, zeroKeys } from './trajectory-input.ts'
@@ -87,7 +87,7 @@ const exampleLadder = {
   direction: 'down',
 } as const
 
-/** The bullet seated to L6 (`@openreloading/drawing/seating`): volume behind it, cm³, and travel, mm. */
+/** The bullet seated to L6 (`@open-reloading/drawing/seating`): volume behind it, cm³, and travel, mm. */
 const seated = seat({
   bullet,
   chamber: { caseLength: spec.L3, cartridgeL6: spec.L6 },

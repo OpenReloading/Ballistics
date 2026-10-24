@@ -1,4 +1,4 @@
-import { lbPerSqInToKgPerSqM, type TrajectoryPoint } from '@openreloading/core'
+import { lbPerSqInToKgPerSqM, type TrajectoryPoint } from '@open-reloading/core'
 import { describe, expect, it } from 'vitest'
 import { rangeCardColumns, rangeCardFacts, rangeCardRows } from '../src/lib/range-card.ts'
 import { presetUnits } from '../src/lib/units.ts'

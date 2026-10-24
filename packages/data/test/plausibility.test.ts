@@ -1,4 +1,4 @@
-import type { Bullet, CaseCapacity, ChronoSession, Powder, SpecValue } from '@openreloading/schema'
+import type { Bullet, CaseCapacity, ChronoSession, Powder, SpecValue } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import {
   checkBullet,

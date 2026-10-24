@@ -1,7 +1,7 @@
 'use client'
 
 import { Button, Popover, UnstyledButton } from '@mantine/core'
-import { freeRecoil } from '@openreloading/core'
+import { freeRecoil } from '@open-reloading/core'
 import { memo, useEffect, useRef } from 'react'
 import type { InteriorResponse } from '../lib/api-types.ts'
 import {

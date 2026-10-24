@@ -1,5 +1,5 @@
 /** Report issue: the area of a page, the record it shows, and the prefilled new-issue link of the repository. */
-import type { TargetSheet } from '@openreloading/schema'
+import type { TargetSheet } from '@open-reloading/schema'
 import type { FederationData } from './face-disciplines.ts'
 
 /** Areas of the app, the second part of a report title. */

@@ -1,4 +1,4 @@
-import type { TargetFace } from '@openreloading/schema'
+import type { TargetFace } from '@open-reloading/schema'
 
 /**
  * A target face drawn from its record, face mm as SVG units: the paper inside the outer ring, the

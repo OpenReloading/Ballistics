@@ -5,7 +5,7 @@ import {
   type DisciplineKey,
   type TargetFace,
   type TargetMapping,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import type { DirectoryState } from './directory.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
 import { matchesQuery } from './lists.ts'

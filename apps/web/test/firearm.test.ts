@@ -1,5 +1,5 @@
-import type { UserRecord } from '@openreloading/schema'
-import { userRecord } from '@openreloading/schema'
+import type { UserRecord } from '@open-reloading/schema'
+import { userRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import {
   activeClick,

@@ -17,7 +17,7 @@ import {
   Title,
   Tooltip,
 } from '@mantine/core'
-import type { Firearm, Optic, OpticConfiguration, OpticMount } from '@openreloading/schema'
+import type { Firearm, Optic, OpticConfiguration, OpticMount } from '@open-reloading/schema'
 import { Plus, Trash, X } from '@phosphor-icons/react'
 import { type Dispatch, type ReactElement, type SetStateAction, useState } from 'react'
 import type { CartridgeSummary } from '../lib/api-types.ts'

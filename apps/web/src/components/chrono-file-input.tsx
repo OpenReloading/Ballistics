@@ -1,7 +1,7 @@
 'use client'
 
 import { NativeSelect } from '@mantine/core'
-import type { VelocityUnit } from '@openreloading/importers'
+import type { VelocityUnit } from '@open-reloading/importers'
 import type { ReactNode } from 'react'
 import { formatNames, templateCsv, templateJson } from '../lib/chrono.ts'
 import { ChronoDropZone } from './chrono-drop-zone.tsx'

@@ -1,8 +1,8 @@
-# @openreloading/core
+# @open-reloading/core
 
 Pure TypeScript ballistics solver, ESM. Must stay headless: no runtime dependencies, no I/O, no network, no database.
 
-## Commands (this directory, or `-w @openreloading/core` from the root)
+## Commands (this directory, or `-w @open-reloading/core` from the root)
 
 - Build: `npm run build` (output `dist/`)
 - Test: `npm test` (Vitest)
@@ -13,7 +13,7 @@ Pure TypeScript ballistics solver, ESM. Must stay headless: no runtime dependenc
 
 - Model pages: `apps/docs/docs/models/` describes each model of this package with its equations.
   - The `Code:` line under each equation names the file and function that compute it. After renaming or moving such a function, update the line.
-  - `npm test -w @openreloading/docs` (`apps/docs/scripts/bibliography.test.mts`) fails on a file or name that no longer exists and on a source file no page names.
+  - `npm test -w @open-reloading/docs` (`apps/docs/scripts/bibliography.test.mts`) fails on a file or name that no longer exists and on a source file no page names.
   - A change to a model's code updates its model page in the same commit.
 - `src/errors.ts`:
   - `InputError` (extends `RangeError`): thrown on purpose for inputs outside the model and for computations that do not finish within their limits. `TruingError`, `PowderFitError` and `ValueError` (`interior/load-file.ts`) extend it.

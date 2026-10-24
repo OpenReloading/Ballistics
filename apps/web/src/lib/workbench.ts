@@ -1,5 +1,5 @@
-import { fillLoadRatioLimit, loadRatio, solidFill, solidFillLimit } from '@openreloading/core'
-import { sheetId } from '@openreloading/schema'
+import { fillLoadRatioLimit, loadRatio, solidFill, solidFillLimit } from '@open-reloading/core'
+import { sheetId } from '@open-reloading/schema'
 import type { InteriorResponse } from './api-types.ts'
 import type { LadderDirection } from './seating-ladder.ts'
 import { formatNumber, formatQuantity, inchText, type UnitSystem } from './units.ts'

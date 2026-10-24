@@ -8,9 +8,9 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
-# @openreloading/web
+# @open-reloading/web
 
-Next.js App Router (TypeScript, React). API at `API_URL` (default `http://localhost:3000`). May import `@openreloading/core` for computation in the browser. Package rules: root `AGENTS.md`.
+Next.js App Router (TypeScript, React). API at `API_URL` (default `http://localhost:3000`). May import `@open-reloading/core` for computation in the browser. Package rules: root `AGENTS.md`.
 
 ## Records and lists
 
@@ -53,9 +53,9 @@ Next.js App Router (TypeScript, React). API at `API_URL` (default `http://localh
 - "Use in workbench" links to `/workbench?cartridge=<id>`, `?bullet=<id>` or `?powder=<id>` (`linkedLoad`, `workbenchHref` in `src/lib/query.ts`).
 - Bullet and powder records print on the named page `record-sheet` of `globals.css`: the browser's paper, the bullet drawing at 1:1.
 - Page scroll: from a window of 1280 x 650 CSS px the workbench has no page scroll, no scrolling inputs column and no cut control (button, tab, field, label, unit, number). In a lower window, and from 62em to 75em wide, the frame stays and only the inputs column scrolls: the page never scrolls. Result tabs other than Chart (Trajectory, Ladder table, Measurements) may scroll inside their own panel, the ladder steps sideways. `workbench-no-scroll.spec.ts` checks 1280 x 650, 1366 x 657, 1536 x 730, 1280 x 800, 1920 x 1080 and 1100 x 800. Other pages may scroll, secondary content (related records, sources) below the main content.
-- Cartridge drawing (`src/components/cartridge-drawing.tsx`, `technical-drawing.tsx`): server-rendered SVG of the technical face, laid out by `@openreloading/drawing` (`packages/drawing`). A record page draws the cartridge and the chamber as two figures (`side`).
+- Cartridge drawing (`src/components/cartridge-drawing.tsx`, `technical-drawing.tsx`): server-rendered SVG of the technical face, laid out by `@open-reloading/drawing` (`packages/drawing`). A record page draws the cartridge and the chamber as two figures (`side`).
   - In the cartridge designer the Cartridge, Chamber and Combined views switch with a `SegmentedControl` and the figure's `data-view`. Combined comes first once both sides draw and carries the region differences of `packages/drawing/src/cartridge/regions.ts`.
-  - Dimension values are in the SVG `desc` and the values tables (no dimension focus). Angles in decimal degrees in both (`angleText` of `@openreloading/drawing`).
+  - Dimension values are in the SVG `desc` and the values tables (no dimension focus). Angles in decimal degrees in both (`angleText` of `@open-reloading/drawing`).
   - The drawing font is Inter (`src/app/fonts/`). After changing it run `node scripts/glyph-advances.mts`.
 
 ## Workbench and designers
@@ -88,7 +88,7 @@ Next.js App Router (TypeScript, React). API at `API_URL` (default `http://localh
   - Frames land on the event times, so the dot is on the peak at the peak time. Playback writes the page through refs, not React state.
   - The powder and energy split at the muzzle are in the chart's Data modal.
 - Seated-bullet preview (`src/components/seating-preview.tsx`) in the inputs' "Cartridge figure": its Cartridge view is the record page's cartridge drawing with the seated COAL in place of L6 and the seated CBTO added (`figureViews` in `src/lib/figure-views.ts`), at the selected step of a seating ladder while the result is current. Where its panel is wider than tall (the figure's size container), the figure is drawn level, head left (the drawing's print layout on screen, `level` of `TechnicalDrawing`); Full view stays upright:
-  - Loaded with `next/dynamic` once a cartridge is chosen. Geometry in `@openreloading/drawing/seating`. Draws the bullet in the chamber through `TechnicalDrawing`'s overlay slot and can fill volume and travel.
+  - Loaded with `next/dynamic` once a cartridge is chosen. Geometry in `@open-reloading/drawing/seating`. Draws the bullet in the chamber through `TechnicalDrawing`'s overlay slot and can fill volume and travel.
   - Its workbench controls go into the named `SeatingSlot`s of the cards (`cartridge`, `gun`, and `more` and `moreValues` in the Cartridge card's More), registered through `LoadContext`. A slot the figure needs that is not mounted throws in development.
 - Cartridge designs in the workbench: the Cartridge card's search lists the browser's cartridge designs that draw a case with its cartridge L3 (`workbenchDesign` in `src/lib/cartridge-designer.ts`) as "<name> (your design)", like bullet designs. A design replaces the record and a record replaces the design (`cartridgeDesign` in `use-workbench-load.ts`); it is not kept in load files or links.
   - It fills only what its own values give: the bore diameter (chamber F) and, as the usable case volume, your measured case capacity or else the design's approximate case volume (outline less a wall, without the bullet). Bore area, twist, class, limits and capacity records stay empty, nothing is read from the record the design started from. The fields' marks say "user design".
@@ -146,9 +146,9 @@ A static site without a server for GitHub Pages: the web app with the records as
   - `staticIds` prerenders every record and fails without the API.
 - `apiFetch` of this edition: `src/lib/static-api.ts`. The server edition aliases it to `src/lib/no-static-api.ts` (`next.config.ts`), so its chunks hold neither the data file reader nor the compute worker.
   - GET from the data files under `<base>/api/`: `<kind>/index.json`, `<kind>/<id>.json`, `<kind>/search.json` (the texts `q` matches), `bullets/cartridge/<id>.json`. Paging, `q`, `cartridge` and the refusals as the API answers them, checked against the API on PGlite by `test/static-api.test.ts`.
-  - POST `interior` and `interior/charge-target`: validation, runs and answers of `@openreloading/api/compute`, each compute task in a Web Worker of its own (`src/lib/compute.worker.ts`), terminated at the API's task deadline (503 `timeout`). The 64 KiB body cap of the forwarding route.
+  - POST `interior` and `interior/charge-target`: validation, runs and answers of `@open-reloading/api/compute`, each compute task in a Web Worker of its own (`src/lib/compute.worker.ts`), terminated at the API's task deadline (503 `timeout`). The 64 KiB body cap of the forwarding route.
 - `PAGES_URL`: the site's origin (docs `url`, the web app's `metadataBase` and social image, which the server edition leaves out).
-- Root `PAGES_BASE_PATH=<path> npm run pages:build` (`tools/src/pages.ts`, after the root `npm run build`): starts the API on PGlite from the data bundle (`@openreloading/api/static`), builds this edition against it with `PRERENDER=full`, deletes each page's `__next._full.txt` (a copy of its `index.txt`, never requested by the export's client), writes the data files (`writeStaticApi`), builds the docs site into `docs/` (its code reference under `docs/library/`), copies LICENSE, NOTICE and `data/LICENSE` and writes `.nojekyll`. Output: `pages/` at the repository root (git-ignored). It deletes `.next` before and after the build: a Turbopack cache of one edition fails the build of the other, so the server edition builds from nothing afterwards.
+- Root `PAGES_BASE_PATH=<path> npm run pages:build` (`tools/src/pages.ts`, after the root `npm run build`): starts the API on PGlite from the data bundle (`@open-reloading/api/static`), builds this edition against it with `PRERENDER=full`, deletes each page's `__next._full.txt` (a copy of its `index.txt`, never requested by the export's client), writes the data files (`writeStaticApi`), builds the docs site into `docs/` (its code reference under `docs/library/`), copies LICENSE, NOTICE and `data/LICENSE` and writes `.nojekyll`. Output: `pages/` at the repository root (git-ignored). It deletes `.next` before and after the build: a Turbopack cache of one edition fails the build of the other, so the server edition builds from nothing afterwards.
 - Root `npm run pages:serve` (`tools/src/pages-serve.ts`): `pages/` under `PAGES_BASE_PATH` on `PORT` (default 3003), directories with their `index.html`, a missing file the site's `404.html`.
 - E2E: project `pages` with `PAGES_URL` (`apps/e2e/AGENTS.md`).
 - Size: about 300 MB, the cartridge pages about 265 MB of it.
@@ -193,7 +193,7 @@ A static site without a server for GitHub Pages: the web app with the records as
 - A Mantine upgrade that changes `AppShell.mjs` or `AppShell.cjs` stops the install. Check whether Mantine fixed the context value (upstream links in `patches/apply.mjs`), then remove the patch or adapt it.
 - `npm run dev` and `npm run build` here run `node ../../patches/apply.mjs --check` first and stop when the installed files lack the patch (after a rebase onto the patch without `npm ci`).
 
-## Commands (this directory, or `-w @openreloading/web` from the root)
+## Commands (this directory, or `-w @open-reloading/web` from the root)
 
 - Dev server: `npm run dev`
 - Build: `npm run build` (standalone output in `.next/standalone`)

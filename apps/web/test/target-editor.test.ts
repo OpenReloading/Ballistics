@@ -1,5 +1,5 @@
-import { dispersionEllipse, predictionEllipse, subtendedAngle } from '@openreloading/core'
-import type { ShotGroup, TargetSheet } from '@openreloading/schema'
+import { dispersionEllipse, predictionEllipse, subtendedAngle } from '@open-reloading/core'
+import type { ShotGroup, TargetSheet } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { readouts } from '../src/lib/group-readouts.ts'
 import { type LabelBox, type LabelScene, placeLabel } from '../src/lib/label-placement.ts'

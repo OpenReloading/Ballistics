@@ -1,6 +1,6 @@
 // Shot rows of the ShotView layout, read by the ShotView CSV and workbook parsers and by other
 // workbook layouts of the same shape.
-import type { ChronoShot } from '@openreloading/schema'
+import type { ChronoShot } from '@open-reloading/schema'
 import { parseNumber } from './text.ts'
 import { parseVelocity, type VelocityUnit } from './units.ts'
 

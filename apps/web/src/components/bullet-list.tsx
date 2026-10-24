@@ -2,7 +2,7 @@
 
 import { Button, SegmentedControl, Select, Tooltip } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
-import { bulletFits, type CartridgeDiameters } from '@openreloading/core'
+import { bulletFits, type CartridgeDiameters } from '@open-reloading/core'
 import { Plus } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useDeferredValue, useMemo } from 'react'

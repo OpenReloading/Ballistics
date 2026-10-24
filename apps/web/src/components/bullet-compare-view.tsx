@@ -1,8 +1,8 @@
 'use client'
 
 import { Text } from '@mantine/core'
-import type { LengthUnit } from '@openreloading/drawing'
-import { type BulletProfile, recordProfile } from '@openreloading/drawing/bullet'
+import type { LengthUnit } from '@open-reloading/drawing'
+import { type BulletProfile, recordProfile } from '@open-reloading/drawing/bullet'
 import { WarningCircle } from '@phosphor-icons/react'
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'

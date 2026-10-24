@@ -1,9 +1,9 @@
 'use client'
 
 import { NativeSelect } from '@mantine/core'
-import { fullSection, svgPath, toPartFrame } from '@openreloading/drawing'
-import { bulletDimensions } from '@openreloading/drawing/bullet'
-import { drawnTables } from '@openreloading/drawing/cartridge'
+import { fullSection, svgPath, toPartFrame } from '@open-reloading/drawing'
+import { bulletDimensions } from '@open-reloading/drawing/bullet'
+import { drawnTables } from '@open-reloading/drawing/cartridge'
 import {
   bulletOutline,
   chamberOf,
@@ -14,8 +14,8 @@ import {
   type Seating,
   seat,
   type Tagged,
-} from '@openreloading/drawing/seating'
-import type { UserRecord } from '@openreloading/schema'
+} from '@open-reloading/drawing/seating'
+import type { UserRecord } from '@open-reloading/schema'
 import { type ReactNode, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { apiFetch } from '../lib/api-fetch.ts'
@@ -221,7 +221,7 @@ function SeatedBullet({
 /**
  * Live half-section of the chosen cartridge's case (CIP maximum, interior not shown) in its
  * chamber (CIP minimum) with the bullet seated by COAL or CBTO; seating depth, volume behind the
- * bullet, travel and jump follow the slider and the number field (`@openreloading/drawing/seating`).
+ * bullet, travel and jump follow the slider and the number field (`@open-reloading/drawing/seating`).
  */
 export function SeatingPreview({
   cartridge,

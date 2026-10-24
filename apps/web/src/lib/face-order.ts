@@ -1,8 +1,8 @@
 /**
  * The order of the target face picker's lists and of the list pages. The comparators live in
- * `@openreloading/schema` (`competition-order.ts`), which the API sorts its lists with too.
+ * `@open-reloading/schema` (`competition-order.ts`), which the API sorts its lists with too.
  */
-import type { TargetFace } from '@openreloading/schema'
+import type { TargetFace } from '@open-reloading/schema'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
 
 export {
@@ -11,7 +11,7 @@ export {
   compareFederations,
   compareNames,
   compareTargetFaces,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 
 /**
  * The ids of the faces of one federation: the faces its disciplines map to and the faces its
