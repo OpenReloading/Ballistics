@@ -227,7 +227,7 @@ const blank = (
 }
 
 /**
- * The face and event of `/groups?face=<id>&event=<name>` (Open in shot groups of a face or a
+ * The face and event of `/groups?face=<id>&event=<event id>` (Open in shot groups of a face or a
  * discipline page), which opens a new sheet on them; none in the workbench tab (no `heading`) or
  * for a malformed id. An event name longer than any record's or with control characters is left out.
  */

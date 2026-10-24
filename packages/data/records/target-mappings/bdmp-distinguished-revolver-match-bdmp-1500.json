@@ -2,7 +2,7 @@
   "id": "bdmp-distinguished-revolver-match-bdmp-1500",
   "discipline": "bdmp-distinguished-revolver-match",
   "face": "bdmp-1500",
-  "event": "BDMP Distinguished Revolver Match",
+  "event": "bdmp-distinguished-revolver-match",
   "shotCount": 60,
   "provenance": {
     "kind": "published",

@@ -73,10 +73,6 @@ export function checkManufacturerReferences(
   for (const b of bundle.bullets) check(`bullets/${b.id}.json`, 'manufacturer', b.manufacturer)
   for (const c of bundle.capacities)
     check(`capacities/${c.id}.json`, 'caseManufacturer', c.caseManufacturer)
-  // load-tables.json is read without a schema: a table without the id is an error, not skipped
-  for (const [file, table] of Object.entries(loadTables)) {
-    const where = `load-tables.json: ${file}`
-    if (typeof table.manufacturer !== 'string') errors.push(`${where}: needs a manufacturer id`)
-    else check(where, 'manufacturer', table.manufacturer)
-  }
+  for (const [file, table] of Object.entries(loadTables))
+    check(`load-tables.json: ${file}`, 'manufacturer', table.manufacturer)
 }

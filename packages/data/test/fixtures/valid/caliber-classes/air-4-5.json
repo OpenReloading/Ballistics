@@ -1,0 +1,10 @@
+{
+  "id": "air-4-5",
+  "name": "4.5 mm (.177) air",
+  "diameter": { "value": 4.5 },
+  "cartridges": [],
+  "provenance": {
+    "kind": "derived",
+    "sources": [{ "source": "test-rule-book", "fields": ["diameter", "cartridges"] }]
+  }
+}

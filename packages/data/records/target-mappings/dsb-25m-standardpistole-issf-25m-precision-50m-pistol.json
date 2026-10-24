@@ -2,7 +2,7 @@
   "id": "dsb-25m-standardpistole-issf-25m-precision-50m-pistol",
   "discipline": "dsb-25m-standardpistole",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "DSB 25 m Standardpistole",
+  "event": "dsb-25-m-standardpistole",
   "gauge": {
     "value": 5.6,
     "raw": "5,60 mm"

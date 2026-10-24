@@ -2,7 +2,7 @@
   "id": "issf-50m-rifle-prone-issf-50m-rifle",
   "discipline": "issf-50m-rifle-prone",
   "face": "issf-50m-rifle",
-  "event": "50m Rifle Prone",
+  "event": "50m-rifle-prone",
   "gauge": {
     "value": 5.6,
     "raw": "5.60mm"

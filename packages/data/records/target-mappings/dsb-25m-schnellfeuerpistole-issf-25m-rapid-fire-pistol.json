@@ -2,7 +2,7 @@
   "id": "dsb-25m-schnellfeuerpistole-issf-25m-rapid-fire-pistol",
   "discipline": "dsb-25m-schnellfeuerpistole",
   "face": "issf-25m-rapid-fire-pistol",
-  "event": "DSB 25 m Schnellfeuerpistole",
+  "event": "dsb-25-m-schnellfeuerpistole",
   "gauge": {
     "value": 5.6,
     "raw": "5,60 mm"

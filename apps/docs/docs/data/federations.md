@@ -9,7 +9,11 @@ Three record kinds describe who defines a discipline, what the discipline is and
 
 - Every value is read from a rule book that the target face records already cite, with its section and page. A value the rule book does not state stays absent.
 - Schemas: `packages/schema/src/federation.ts`.
-- Records: `packages/data/records/federations/`, `disciplines/` and `target-mappings/`.
+- Records: `packages/data/records/federations/`, `disciplines/`, `target-mappings/` and `caliber-classes/`.
+
+## Caliber class
+
+`records/caliber-classes/<id>.json`, schema `caliberClass`: `id`, `name` (as a shooter says it), `diameter` (nominal bullet diameter, mm), `cartridges` (ids of the member cartridge records, empty where the class has no C.I.P. cartridge) and `provenance`. A class groups cartridges whose bullets have the same diameter, so a hole size separates .22, 9 mm and .45 and cannot separate classes of one diameter (9 mm Luger and .357 Magnum). `data:validate` (`src/caliber-classes.ts`) checks that every member is a cartridge record in one class only, that G1 of the cartridge side of its sheet lies within 0.15 mm of the class's diameter, and that every class id a discipline names is a record. The diameter is G1 of the sheet; .22 rimfire takes the calibre 5.6 mm of the rule books, since G1 of the .22 Long Rifle sheet equals the case diameter (heeled bullet), and the air class takes the calibre of the rule book. `GET /caliber-classes/:id` answers the record.
 
 ## Federation
 
@@ -19,7 +23,7 @@ Three record kinds describe who defines a discipline, what the discipline is and
 |---|---|
 | `id` | Record id, the file name |
 | `name` | Full name as the rule book prints it |
-| `abbreviation` | Short name, the `organization` of the faces and face events ("ISSF", "DSB") |
+| `abbreviation` | Short name ("ISSF", "DSB"), shown as the organization of a face and of a face event |
 | `country` | ISO 3166-1 alpha-2 code, or `international` for a world body |
 | `internationalFederation` | Id of the international federation the rule book names this one a member of |
 | `ruleBooks` | Ids of the source records of the rule books the records cite. The API returns title, edition, URL and SHA-256 |
@@ -36,7 +40,7 @@ Three record kinds describe who defines a discipline, what the discipline is and
 | `section`, `page` | Rule-book section that defines it, printed page and PDF page |
 | `distance` | mm |
 | `category` | Kind of firearm (`disciplineCategory`), where the rule book states it |
-| `caliberClasses` | `ids` of caliber classes of `caliberClasses` with `basis`: `stated` (the rule book names them) or `derived` (a stated range or bound expanded to the classes whose diameter lies in it) |
+| `caliberClasses` | `ids` of caliber class records (`records/caliber-classes/`) with `basis`: `stated` (the rule book names them) or `derived` (a stated range or bound expanded to the classes whose diameter lies in it) |
 | `internationalDiscipline` | Id of the discipline of an international federation the rule book names as equivalent |
 
 A discipline shot over several distances in one match (BDS Mehrdistanzschießen) is one record: `distance.value` is the farthest distance, `distance.raw` lists all of them. Its mapping holds the shots of the whole discipline.
@@ -47,12 +51,12 @@ Muzzle-loading disciplines carry no caliber classes: the classes group cartridge
 
 `records/target-mappings/<id>.json`, schema `targetMapping`. One record per face event:
 
-- the discipline, the face and the face event that scores it
+- the discipline, the face and the id of the face event that scores it
 - where the rule book states them: the `stage` (a discipline with a precision and a rapid-fire part has one mapping per face), the scoring `gauge` and the number of record shots `shotCount` (sighters not counted)
 
 A mapping gauge equals the event's where both are given. Which gauge scores a group: [Ring scoring](../models/ring-scoring.md).
 
-The face record keeps its `events` (name, distance, gauge, scoring, organization, section, category). A face event has no caliber classes: a face file with `events[].caliber` is rejected.
+A face names its federation by `federation` (a federation record id). A face without one is a user's own design. The face record keeps its `events` (`id`, name, distance, gauge, scoring, `federation`, section, category). An event `id` is a record id, unique within the face. An event of another federation than the face's names that federation by id and cites its `section`. `GET /target-faces` items carry `federation` and, derived from it, the `organization` abbreviation. A face event has no caliber classes: a face file with `events[].caliber` is rejected.
 
 The scoring rules of a face (`decimal`, `innerTen.rule`, `events[].scoring`) are set only where a cited rule book states them, with its page in the provenance. Absent means not stated: the face page shows "Not stated", and the app scores whole rings and counts the hole edge.
 
@@ -64,11 +68,12 @@ A face with `photoSearch: false` is skipped by the photo face search. The user p
 
 - a discipline whose `federation` names no record
 - an `internationalFederation` or `internationalDiscipline` link to a record that is not of an international federation, or to no record
-- a mapping whose discipline, face or face event does not exist, whose event belongs to another organization than the discipline's federation, or whose gauge differs from the event's
+- a mapping whose discipline, face or face event does not exist, whose event belongs to another federation than the discipline's, or whose gauge differs from the event's
 - a second mapping of one face event
+- a face without a federation, a face or face event whose `federation` names no record, and a face event id used twice in one face
 - a discipline no mapping names
 
-The schemas reject an unknown caliber class id and any key they do not define. Every data field of the three kinds is covered by a provenance source (`checkCoverage`). The records list `fields` on every source.
+The schemas reject any key they do not define, and `data:validate` an unknown caliber class id. Every data field of the three kinds is covered by a provenance source (`checkCoverage`). The records list `fields` on every source.
 
 ## API
 
@@ -79,6 +84,7 @@ Served under `/v1` (`packages/api/src/routes/federations.ts`). Each `/:id` route
 | `GET /federations` | `{ id, name, abbreviation, country, internationalFederation? }` |
 | `GET /disciplines?federation=` | `{ id, federation, name, number?, distanceMm, category? }` |
 | `GET /target-mappings?discipline=&face=` | `{ id, discipline, face, event, stage?, gaugeMm? }`, `gaugeMm` in mm |
+| `GET /caliber-classes` | `{ id, name, diameterMm }`, by diameter |
 
 Each list answers `{ total, items }` in the default order below. `GET /target-faces` lists per face the caliber classes of the disciplines mapped to it (`caliberClasses`) and the categories of its events and those disciplines (`categories`).
 
@@ -110,13 +116,13 @@ A discipline without a number follows the numbered ones of its federation and is
 The group panel of `/groups` (`apps/web/src/components/ring-scoring.tsx`, `apps/web/src/lib/face-disciplines.ts`) has these lists:
 
 1. Federation: All, or one federation, by abbreviation.
-2. Discipline: the disciplines of that federation in the default order. With All, every federation in turn, then the face events no mapping names by organization and name.
+2. Discipline: the disciplines of that federation in the default order. With All, every federation in turn, then the face events no mapping names by federation and name.
 3. Face: the faces of the discipline's mappings with their stage, in the order of the stages, else every face by name. With only a federation chosen, the faces its disciplines map to and the faces it publishes.
 4. Event: only for a face no mapping names, by distance ascending, then name.
 
 The lists use the default order above (`apps/web/src/lib/face-order.ts` re-exports the comparators). The faces of one federation in the face list are in the order of target faces.
 
-A group stores the face id and the face event name, so the discipline follows from its mapping when the sheet is opened again.
+A group stores the face id and the face event id, so the discipline follows from its mapping when the sheet is opened again.
 
 ## Sources
 

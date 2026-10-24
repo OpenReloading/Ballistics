@@ -5,6 +5,7 @@ import { PageBar } from '../../components/page-bar.tsx'
 import { ListLoading, ServerDataError } from '../../components/states.tsx'
 import {
   getDiscipline,
+  listCaliberClasses,
   listDisciplines,
   listFederations,
   listTargetMappings,
@@ -19,10 +20,11 @@ export const metadata: Metadata = {
 }
 
 async function Disciplines() {
-  const [list, federations, mappings] = await Promise.all([
+  const [list, federations, mappings, classes] = await Promise.all([
     listDisciplines(),
     listFederations(),
     listTargetMappings(),
+    listCaliberClasses(),
   ])
   // the list leaves out the caliber classes: the records hold them
   const records =
@@ -31,6 +33,7 @@ async function Disciplines() {
     list.status !== 'ok' ||
     federations.status !== 'ok' ||
     mappings.status !== 'ok' ||
+    classes.status !== 'ok' ||
     records.some((r) => r.status !== 'ok')
   )
     return (
@@ -40,7 +43,7 @@ async function Disciplines() {
       </>
     )
   const rows = records.flatMap((r) =>
-    r.status === 'ok' ? [disciplineRow(r.data, federations.data, mappings.data)] : [],
+    r.status === 'ok' ? [disciplineRow(r.data, federations.data, mappings.data, classes.data)] : [],
   )
   return <DisciplineList items={rows} />
 }

@@ -15,7 +15,6 @@ import {
 } from '../src/lib/target-designer.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import { parseUserDataFile, userDataText } from '../src/lib/user-data.ts'
-import { userOrganization } from '../src/lib/user-faces.ts'
 
 const metric = presetUnits('metric-grams')
 const us = presetUnits('us')
@@ -47,7 +46,6 @@ describe('faceOf', () => {
     expect(built.face).toMatchObject({
       id: 'user-a1',
       name: 'Club face',
-      organization: userOrganization,
       blackDiameter: { value: 90 },
       decimal: true,
     })
@@ -61,6 +59,17 @@ describe('faceOf', () => {
       distance: { value: 25_000 },
       gauge: { value: 5.6 },
     })
+  })
+
+  it('gives every event an id the schema accepts, also for punctuation, umlauts and repeats', () => {
+    const names = ['Präz. 25 m', '???', 'Präz. 25 m', 'a', 'a', 'a-2']
+    const data = { ...club, events: names.map((name) => ({ name, distance: 25_000 })) }
+    const built = faceOf(draft(data), 'user-a1')
+    if (!('face' in built)) throw new Error(JSON.stringify(built.problems))
+    expect(targetFace.safeParse(built.face).success).toBe(true)
+    const ids = built.face.events.map((e) => e.id)
+    expect(new Set(ids).size).toBe(names.length)
+    expect(ids.slice(0, 3)).toEqual(['pr-z-25-m', 'event', 'pr-z-25-m-2'])
   })
 
   it('builds the same face from numbers entered in inches', () => {

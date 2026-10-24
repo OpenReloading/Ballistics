@@ -2,7 +2,7 @@
   "id": "bds-3105-issf-25m-precision-50m-pistol",
   "discipline": "bds-3105",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDS 3105 100 m Präz. Unterhebelrepetierer",
+  "event": "bds-3105-100-m-praz-unterhebelrepetierer",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

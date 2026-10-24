@@ -2,7 +2,7 @@
   "id": "bds-11xx-25m-intervall-zeitserie-bds-z20-25m-intervall",
   "discipline": "bds-11xx-25m-intervall-zeitserie",
   "face": "bds-z20-25m-intervall",
-  "event": "11xx 25 m Schießen, Teil Intervall/Zeitserie",
+  "event": "11xx-25-m-schiessen-teil-intervall-zeitserie",
   "shotCount": 20,
   "provenance": {
     "kind": "published",

@@ -2,7 +2,7 @@
   "id": "bdmp-fg-1-issf-300m-rifle",
   "discipline": "bdmp-fg-1",
   "face": "issf-300m-rifle",
-  "event": "BDMP FG 1 Freigewehr 1",
+  "event": "bdmp-fg-1-freigewehr-1",
   "shotCount": 60,
   "provenance": {
     "kind": "published",

@@ -2,7 +2,7 @@
   "id": "bdmp-npa-bdmp-npa",
   "discipline": "bdmp-npa",
   "face": "bdmp-npa",
-  "event": "BDMP NPA NPA Service Pistol",
+  "event": "bdmp-npa-npa-service-pistol",
   "shotCount": 24,
   "provenance": {
     "kind": "published",

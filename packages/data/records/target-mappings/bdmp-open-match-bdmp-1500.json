@@ -2,7 +2,7 @@
   "id": "bdmp-open-match-bdmp-1500",
   "discipline": "bdmp-open-match",
   "face": "bdmp-1500",
-  "event": "BDMP Open Match",
+  "event": "bdmp-open-match",
   "shotCount": 60,
   "provenance": {
     "kind": "published",

@@ -23,6 +23,7 @@ const recordFiles = [
   ['federations', 'federation', 'federations'],
   ['disciplines', 'discipline', 'disciplines'],
   ['target-mappings', 'targetMapping', 'targetMappings'],
+  ['caliber-classes', 'caliberClass', 'caliberClasses'],
 ] as const satisfies readonly (readonly [string, CatalogueKind, keyof CatalogueData['index']])[]
 
 /**

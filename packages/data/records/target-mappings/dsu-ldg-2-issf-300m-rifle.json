@@ -2,7 +2,7 @@
   "id": "dsu-ldg-2-issf-300m-rifle",
   "discipline": "dsu-ldg-2",
   "face": "issf-300m-rifle",
-  "event": "DSU LDG 2 Dienstsportgewehr 300 m",
+  "event": "dsu-ldg-2-dienstsportgewehr-300-m",
   "shotCount": 20,
   "provenance": {
     "kind": "published",

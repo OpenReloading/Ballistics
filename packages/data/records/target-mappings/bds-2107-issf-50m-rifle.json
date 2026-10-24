@@ -2,7 +2,7 @@
   "id": "bds-2107-issf-50m-rifle",
   "discipline": "bds-2107",
   "face": "issf-50m-rifle",
-  "event": "BDS 2107 50 m Präz. MSG KK",
+  "event": "bds-2107-50-m-praz-msg-kk",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

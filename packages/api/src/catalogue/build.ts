@@ -12,6 +12,7 @@ import {
 import {
   bulletRow,
   byKey,
+  caliberClassRow,
   cartridgeRow,
   disciplineRow,
   federationRow,
@@ -68,6 +69,7 @@ function maker(
  */
 export function buildCatalogue(source: CatalogueSource): CatalogueData & { records: RecordFile } {
   const manufacturers = new Map(source.manufacturers.map((m) => [m.id, m]))
+  const federations = new Map(source.federations.map((f) => [f.id, f]))
   const renames = source.renames ?? {}
   // a reference to an old id joins the record that replaced it
   const now = (kind: RenameKind, id: string) => renames[kind]?.[id] ?? id
@@ -94,7 +96,12 @@ export function buildCatalogue(source: CatalogueSource): CatalogueData & { recor
       bullets: byKey(source.bullets.map((b) => bulletRow(b, maker(manufacturers, b, now)))),
       targetFaces: ordered(
         source.targetFaces,
-        (f) => targetFaceRow(f, mappedFaces.get(f.id) ?? []),
+        (f) =>
+          targetFaceRow(
+            f,
+            mappedFaces.get(f.id) ?? [],
+            f.federation ? federations.get(now('federations', f.federation)) : undefined,
+          ),
         compareTargetFaces,
         (f) => f.id,
       ),
@@ -123,6 +130,12 @@ export function buildCatalogue(source: CatalogueSource): CatalogueData & { recor
           ),
         (m) => m.id,
       ),
+      caliberClasses: ordered(
+        source.caliberClasses,
+        caliberClassRow,
+        (a, b) => a.diameter.value - b.diameter.value,
+        (c) => c.id,
+      ),
       capacities: Object.fromEntries(capacities),
       renames,
     },
@@ -138,6 +151,7 @@ export function buildCatalogue(source: CatalogueSource): CatalogueData & { recor
       federation: byId(source.federations),
       discipline: byId(source.disciplines),
       targetMapping: byId(source.targetMappings),
+      caliberClass: byId(source.caliberClasses),
     },
   }
 }

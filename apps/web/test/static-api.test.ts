@@ -85,6 +85,7 @@ describe('the Pages edition answers reads as the API', () => {
     'federations',
     'disciplines',
     'target-mappings',
+    'caliber-classes',
   ]
 
   it('gives every list, paged, as the API does', async () => {

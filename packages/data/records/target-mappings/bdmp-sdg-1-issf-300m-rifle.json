@@ -2,7 +2,7 @@
   "id": "bdmp-sdg-1-issf-300m-rifle",
   "discipline": "bdmp-sdg-1",
   "face": "issf-300m-rifle",
-  "event": "BDMP SDG 1 Steinschloss-Dienstgewehr 1",
+  "event": "bdmp-sdg-1-steinschloss-dienstgewehr-1",
   "shotCount": 10,
   "provenance": {
     "kind": "published",

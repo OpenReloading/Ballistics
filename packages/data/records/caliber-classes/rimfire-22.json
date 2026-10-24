@@ -1,0 +1,18 @@
+{
+  "id": "rimfire-22",
+  "name": ".22 rimfire",
+  "diameter": {
+    "value": 5.6
+  },
+  "cartridges": ["22-long-rifle", "22-long", "22-win-mag-r-f"],
+  "provenance": {
+    "kind": "derived",
+    "sources": [
+      {
+        "source": "cip-tdcc",
+        "fields": ["diameter", "cartridges"],
+        "note": "Grouped by the maximum projectile diameter G1 of the cartridge side of the sheets; the nominal diameter lies within 0.15 mm of G1 of every member."
+      }
+    ]
+  }
+}

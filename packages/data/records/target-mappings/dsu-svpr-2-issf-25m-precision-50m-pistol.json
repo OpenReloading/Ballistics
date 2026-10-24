@@ -2,7 +2,7 @@
   "id": "dsu-svpr-2-issf-25m-precision-50m-pistol",
   "discipline": "dsu-svpr-2",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "DSU SVPR 2 Perkussionsrevolver oR 25 m",
+  "event": "dsu-svpr-2-perkussionsrevolver-or-25-m",
   "shotCount": 10,
   "provenance": {
     "kind": "published",

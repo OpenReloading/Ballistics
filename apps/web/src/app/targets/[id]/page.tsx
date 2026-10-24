@@ -20,6 +20,7 @@ import {
   listTargetMappings,
   staticIds,
 } from '../../../lib/api.ts'
+import { withOrganization } from '../../../lib/face-organization.ts'
 import { titleFromKebab } from '../../../lib/record-fields.ts'
 import { faceEventRows, targetFaceGroups, targetFaceStrip } from '../../../lib/target-faces.ts'
 import { presetUnits, withUnit } from '../../../lib/units.ts'
@@ -72,7 +73,7 @@ export default async function TargetFacePage({ params }: PageProps<'/targets/[id
     mappings.some((m) => m.status !== 'ok')
   )
     return <ServerDataError what="Target face" />
-  const f = r.data
+  const f = withOrganization(r.data, federations.data)
   const rows = faceEventRows(
     f,
     mappings.flatMap((m) => (m.status === 'ok' ? [m.data] : [])),

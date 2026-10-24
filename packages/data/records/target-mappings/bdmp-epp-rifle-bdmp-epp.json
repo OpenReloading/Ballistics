@@ -2,7 +2,7 @@
   "id": "bdmp-epp-rifle-bdmp-epp",
   "discipline": "bdmp-epp-rifle",
   "face": "bdmp-epp",
-  "event": "BDMP EPP Rifle Europäischer Präzisions Parcours .223 Rem.",
+  "event": "bdmp-epp-rifle-europaischer-prazisions-parcours-223-rem",
   "shotCount": 50,
   "provenance": {
     "kind": "published",

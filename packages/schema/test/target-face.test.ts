@@ -6,7 +6,7 @@ const mm = (value: number) => ({ value })
 const face = {
   id: 'test-face',
   name: 'Test face',
-  organization: 'Test',
+  federation: 'test',
   rings: [
     { value: 9, diameter: mm(20) },
     { value: 10, diameter: mm(10) },
@@ -14,7 +14,7 @@ const face = {
   innerTen: { diameter: mm(5), rule: 'touch' },
   blackDiameter: mm(20),
   decimal: true,
-  events: [{ name: 'Test event', distance: mm(10000), gauge: mm(4.5) }],
+  events: [{ id: 'test-event', name: 'Test event', distance: mm(10000), gauge: mm(4.5) }],
   provenance: { kind: 'published', sources: [{ title: 'Test rule book' }] },
 }
 
@@ -37,16 +37,26 @@ describe('targetFace', () => {
     expectIssueAt(targetFace, { ...face, innerTen }, 'innerTen.diameter')
   })
 
+  it('refuses an event id used twice in a face and one that is no record id', () => {
+    const second = { ...face.events[0], name: 'Other' }
+    expectIssueAt(targetFace, { ...face, events: [face.events[0], second] }, 'events.1.id')
+    expectIssueAt(
+      targetFace,
+      { ...face, events: [{ ...face.events[0], id: 'Test Event' }] },
+      'events.0.id',
+    )
+  })
+
   it('refuses a face without events or with a non-positive gauge', () => {
     expectIssueAt(targetFace, { ...face, events: [] }, 'events')
-    const events = [{ name: 'Test event', distance: mm(10000), gauge: mm(0) }]
+    const events = [{ id: 'test-event', name: 'Test event', distance: mm(10000), gauge: mm(0) }]
     expectIssueAt(targetFace, { ...face, events }, 'events.0.gauge')
   })
 
-  it('accepts an inner ten without a rule and an event of another organization with its section', () => {
+  it('accepts an inner ten without a rule and an event of another federation with its section', () => {
     const events = [
-      { ...face.events[0], organization: 'Other', section: '1.2' },
-      { name: 'Second', distance: mm(10000) },
+      { ...face.events[0], federation: 'other', section: '1.2' },
+      { id: 'second', name: 'Second', distance: mm(10000) },
     ]
     expect(targetFace.safeParse({ ...face, innerTen: { diameter: mm(5) }, events }).success).toBe(
       true,

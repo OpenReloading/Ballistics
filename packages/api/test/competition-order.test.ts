@@ -42,11 +42,11 @@ describe('default order of the competition lists, on the real records', () => {
     expect(ids(filtered)).toEqual(ids({ items: numbered('bds') }))
   })
 
-  it('lists target faces by organization, then the printed code, then name', async () => {
+  it('lists target faces by federation, then the printed code, then name', async () => {
     const { body } = await api.get(`${API_PREFIX}/target-faces`)
     expect(ids(body)).toEqual(ids({ items: real.targetFaces.toSorted(compareTargetFaces) }))
     const bds = body.items
-      .filter((f: { organization: string }) => f.organization === 'BDS')
+      .filter((f: { federation: string }) => f.federation === 'bds')
       .map((f: { name: string }) => f.name)
     expect(bds.indexOf('BDS-50m-ZF-Scheibe (Z2)')).toBeLessThan(bds.indexOf('BDS-PG-Scheibe (Z18)'))
   })

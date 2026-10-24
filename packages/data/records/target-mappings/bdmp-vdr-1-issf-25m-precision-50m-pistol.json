@@ -2,7 +2,7 @@
   "id": "bdmp-vdr-1-issf-25m-precision-50m-pistol",
   "discipline": "bdmp-vdr-1",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDMP VDR 1 Vorderlader-Dienstrevolver 1",
+  "event": "bdmp-vdr-1-vorderlader-dienstrevolver-1",
   "shotCount": 10,
   "provenance": {
     "kind": "published",

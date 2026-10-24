@@ -2,7 +2,7 @@
   "id": "bdmp-lrspfg-300m-issf-300m-rifle",
   "discipline": "bdmp-lrspfg-300m",
   "face": "issf-300m-rifle",
-  "event": "BDMP LRSPFG LR Schwarzpulverfreigewehr, 300 m",
+  "event": "bdmp-lrspfg-lr-schwarzpulverfreigewehr-300-m",
   "shotCount": 10,
   "provenance": {
     "kind": "published",

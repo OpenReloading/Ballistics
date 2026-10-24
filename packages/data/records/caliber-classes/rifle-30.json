@@ -1,0 +1,18 @@
+{
+  "id": "rifle-30",
+  "name": ".30 rifle (7.62 mm)",
+  "diameter": {
+    "value": 7.85
+  },
+  "cartridges": ["308-win", "30-06-spring", "300-win-mag", "30-30-win", "7-62-x-54-r", "7-62-x-39"],
+  "provenance": {
+    "kind": "derived",
+    "sources": [
+      {
+        "source": "cip-tdcc",
+        "fields": ["diameter", "cartridges"],
+        "note": "Grouped by the maximum projectile diameter G1 of the cartridge side of the sheets; the nominal diameter lies within 0.15 mm of G1 of every member."
+      }
+    ]
+  }
+}

@@ -2,7 +2,7 @@
   "id": "dsb-25m-pistole-issf-25m-rapid-fire-pistol",
   "discipline": "dsb-25m-pistole",
   "face": "issf-25m-rapid-fire-pistol",
-  "event": "DSB 25 m Pistole (Duell)",
+  "event": "dsb-25-m-pistole-duell",
   "stage": "Duell",
   "gauge": {
     "value": 5.6,

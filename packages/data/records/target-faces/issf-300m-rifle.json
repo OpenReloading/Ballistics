@@ -1,7 +1,7 @@
 {
   "id": "issf-300m-rifle",
   "name": "300m Rifle Target",
-  "organization": "ISSF",
+  "federation": "issf",
   "rings": [
     {
       "value": 1,
@@ -77,6 +77,7 @@
   "decimal": true,
   "events": [
     {
+      "id": "300m-rifle-3-positions",
       "name": "300m Rifle 3 Positions",
       "distance": {
         "value": 300000,
@@ -89,6 +90,7 @@
       "scoring": "touch"
     },
     {
+      "id": "300m-rifle-prone",
       "name": "300m Rifle Prone",
       "distance": {
         "value": 300000,
@@ -101,6 +103,7 @@
       "scoring": "touch"
     },
     {
+      "id": "300m-standard-rifle",
       "name": "300m Standard Rifle",
       "distance": {
         "value": 300000,
@@ -113,6 +116,7 @@
       "scoring": "touch"
     },
     {
+      "id": "dsb-gewehr-300-m",
       "name": "DSB Gewehr 300 m",
       "distance": {
         "value": 300000,
@@ -122,157 +126,172 @@
         "value": 8,
         "raw": "8,00 mm Gewehr Kaliber > .22 lfb"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 5; 0.11.3.2",
       "scoring": "touch"
     },
     {
+      "id": "bds-4101-300-m-praz-msg",
       "name": "BDS 4101 300 m Präz. MSG",
       "distance": {
         "value": 300000,
         "raw": "300 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z7",
       "scoring": "touch"
     },
     {
+      "id": "bds-4102-300-m-praz-dsg-ok",
       "name": "BDS 4102 300 m Präz. DSG oK",
       "distance": {
         "value": 300000,
         "raw": "300 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z7",
       "scoring": "touch"
     },
     {
+      "id": "bds-4103-300-m-praz-dsg-gk-und-diopter",
       "name": "BDS 4103 300 m Präz. DSG gK und Diopter",
       "distance": {
         "value": 300000,
         "raw": "300 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z7",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-sg-2-standardgewehr-2",
       "name": "BDMP SG 2 Standardgewehr 2",
       "distance": {
         "value": 300000,
         "raw": "300 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.3 and D.3.13, D.3.15 (Teil B, PDF p. 18; Teil D, PDF p. 16)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-cism-gewehr-300-m",
       "name": "BDMP CISM-Gewehr 300 m",
       "distance": {
         "value": 300000,
         "raw": "300 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.3 and D.5.12 (Teil B, PDF p. 18; Teil D, PDF p. 28)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-dg-2-dienstgewehr-2",
       "name": "BDMP DG 2 Dienstgewehr 2",
       "distance": {
         "value": 300000,
         "raw": "300 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.3 and D.7.11, D.7.13 (Teil B, PDF p. 18; Teil D, PDF p. 34)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-fg-1-freigewehr-1",
       "name": "BDMP FG 1 Freigewehr 1",
       "distance": {
         "value": 300000,
         "raw": "300 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.3 and D.21.13, D.21.15 (Teil B, PDF p. 18; Teil D, PDF p. 198)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-sdg-1-steinschloss-dienstgewehr-1",
       "name": "BDMP SDG 1 Steinschloss-Dienstgewehr 1",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "B.11.3 and E.3.11, E.3.12 (Teil B, PDF p. 18; Teil E, PDF p. 12)",
       "scoring": "centre"
     },
     {
+      "id": "dsu-ldg-2-dienstsportgewehr-300-m",
       "name": "DSU LDG 2 Dienstsportgewehr 300 m",
       "distance": {
         "value": 300000,
         "raw": "300 m"
       },
-      "organization": "DSU",
+      "federation": "dsu",
       "section": "Kapitel 1, DSU-Scheibe ISSF 300 Meter Präzision (Seite 25); Kapitel 3 (PDF p. 60)",
       "scoring": "touch"
     },
     {
+      "id": "dsu-ldg-3-dienstsportgewehr-aufgerustet-300-m",
       "name": "DSU LDG 3 Dienstsportgewehr aufgerüstet 300 m",
       "distance": {
         "value": 300000,
         "raw": "300 m"
       },
-      "organization": "DSU",
+      "federation": "dsu",
       "section": "Kapitel 1, DSU-Scheibe ISSF 300 Meter Präzision (Seite 25); Kapitel 3 (PDF p. 60)",
       "scoring": "touch"
     },
     {
+      "id": "dsu-lem-3-einzellader-matchgewehr-300-m",
       "name": "DSU LEM 3 Einzellader Matchgewehr 300 m",
       "distance": {
         "value": 300000,
         "raw": "300 m"
       },
-      "organization": "DSU",
+      "federation": "dsu",
       "section": "Kapitel 1, DSU-Scheibe ISSF 300 Meter Präzision (Seite 25); Kapitel 3 (PDF p. 60)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-lrspfg-lr-schwarzpulverfreigewehr-300-m",
       "name": "BDMP LRSPFG LR Schwarzpulverfreigewehr, 300 m",
       "distance": {
         "value": 300000,
         "raw": "300 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "E.6.8 (Teil E, PDF p. 18)",
       "scoring": "centre"
     },
     {
+      "id": "bdmp-zfspfg-zf-schwarzpulverfreigewehr-300-m",
       "name": "BDMP ZFSPFG ZF Schwarzpulverfreigewehr, 300 m",
       "distance": {
         "value": 300000,
         "raw": "300 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "E.14.8 (Teil E, PDF p. 38)",
       "scoring": "centre"
     },
     {
+      "id": "bdmp-sppdg-2-schwarzpulverpatronen-dg-2",
       "name": "BDMP SPPDG 2 Schwarzpulverpatronen-DG 2",
       "distance": {
         "value": 300000,
         "raw": "300 m"
       },
-      "organization": "BDMP",
+      "federation": "bdmp",
       "section": "E.7.11 (Teil E, PDF p. 24)",
       "scoring": "centre"
     },
     {
+      "id": "dsb-perkussionsfreigewehr-300-m",
       "name": "DSB Perkussionsfreigewehr 300 m",
       "distance": {
         "value": 300000,
         "raw": "300 m"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 5",
       "scoring": "centre"
     }

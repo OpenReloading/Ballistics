@@ -1,7 +1,7 @@
 {
   "id": "bds-z18-pg",
   "name": "BDS-PG-Scheibe (Z18)",
-  "organization": "BDS",
+  "federation": "bds",
   "rings": [
     {
       "value": 5,
@@ -50,6 +50,7 @@
   },
   "events": [
     {
+      "id": "2113-50-m-praz-zg-50-kk",
       "name": "2113 50 m Präz. ZG 50 KK",
       "distance": {
         "value": 50000,
@@ -59,6 +60,7 @@
       "scoring": "touch"
     },
     {
+      "id": "2116-50-m-praz-pg-kk-lv",
       "name": "2116 50 m Präz. PG KK LV",
       "distance": {
         "value": 50000,
@@ -68,6 +70,7 @@
       "scoring": "touch"
     },
     {
+      "id": "2117-50-m-praz-pg-kk-hv",
       "name": "2117 50 m Präz. PG KK HV",
       "distance": {
         "value": 50000,
@@ -77,6 +80,7 @@
       "scoring": "touch"
     },
     {
+      "id": "3108-100-m-praz-prazisionsgewehr-b-7-mm",
       "name": "3108 100 m Präz. Präzisionsgewehr b. 7 mm",
       "distance": {
         "value": 100000,
@@ -86,6 +90,7 @@
       "scoring": "touch"
     },
     {
+      "id": "3119-100-m-praz-prazisionsgewehr-u-7-mm",
       "name": "3119 100 m Präz. Präzisionsgewehr ü. 7 mm",
       "distance": {
         "value": 100000,

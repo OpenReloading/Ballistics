@@ -78,6 +78,7 @@ export function openCatalogue({ index, records }: CatalogueData): Catalogue {
         {},
         (m) => (!discipline || m.discipline === discipline) && (!face || m.face === face),
       ),
+    caliberClasses: () => select(index.caliberClasses, {}),
     get,
     renamed: (kind, id) => {
       const map = (index.renames as Record<string, Record<string, string> | undefined>)[kind]

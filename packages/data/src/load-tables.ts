@@ -1,13 +1,6 @@
-import type { Powder, Source } from '@openreloading/schema'
+import type { LoadTables, Powder, Source } from '@openreloading/schema'
 
-/**
- * A manufacturer load table the powder fit reads, as `load-tables.json` of a records folder lists
- * it; `manufacturer` is the id of a manufacturer record.
- */
-export type LoadTable = { manufacturer: string; title: string; url?: string; retrieved: string }
-
-/** The listed load tables by row file. */
-export type LoadTables = Record<string, LoadTable>
+export type { LoadTable, LoadTables } from '@openreloading/schema'
 
 /** Whether `loadTables` lists a table with the source's title, URL and retrieval date. */
 function isListedLoadTable(source: Source, loadTables: LoadTables) {

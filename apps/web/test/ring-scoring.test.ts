@@ -77,13 +77,17 @@ describe('scoreShot', () => {
   it('uses the gauge diameter, not the bullet, where the event fixes one', () => {
     const gauge = scoredHoleDiameter(rifle300.events[0], 6.7 * mm)
     expect(gauge).toBeCloseTo(8 * mm, 12)
-    expect(scoredHoleDiameter({ name: 'No gauge', distance: { value: 1 } }, 6.7 * mm)).toBe(
-      6.7 * mm,
-    )
+    expect(
+      scoredHoleDiameter({ id: 'no-gauge', name: 'No gauge', distance: { value: 1 } }, 6.7 * mm),
+    ).toBe(6.7 * mm)
     // the gauge of the discipline's mapping where the event has none; the event's gauge first
-    expect(scoredHoleDiameter({ name: 'No gauge', distance: { value: 1 } }, 6.7 * mm, 9.65)).toBe(
-      9.65 * mm,
-    )
+    expect(
+      scoredHoleDiameter(
+        { id: 'no-gauge', name: 'No gauge', distance: { value: 1 } },
+        6.7 * mm,
+        9.65,
+      ),
+    ).toBe(9.65 * mm)
     expect(scoredHoleDiameter(rifle300.events[0], 6.7 * mm, 9.65)).toBeCloseTo(8 * mm, 12)
     // 50 mm 10 ring radius + 4 mm gauge radius; inner ten 25 + 4
     expect(scoreShot(rifle300, at(54), gauge).value).toBe(10)
@@ -242,7 +246,7 @@ describe('scoreGroupOnFace', () => {
   it('scores every shot with the event gauge; the totals leave excluded shots out', () => {
     const s = scoreGroupOnFace(
       rifle50,
-      { id: rifle50.id, event: '50m Rifle Prone' },
+      { id: rifle50.id, event: '50m-rifle-prone' },
       group,
       undefined,
     )

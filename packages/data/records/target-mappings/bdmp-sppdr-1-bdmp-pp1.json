@@ -2,7 +2,7 @@
   "id": "bdmp-sppdr-1-bdmp-pp1",
   "discipline": "bdmp-sppdr-1",
   "face": "bdmp-pp1",
-  "event": "BDMP SPPDR 1 Schwarzpulverpatronen-DR 1",
+  "event": "bdmp-sppdr-1-schwarzpulverpatronen-dr-1",
   "shotCount": 15,
   "provenance": {
     "kind": "published",

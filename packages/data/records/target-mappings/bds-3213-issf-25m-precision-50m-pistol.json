@@ -2,7 +2,7 @@
   "id": "bds-3213-issf-25m-precision-50m-pistol",
   "discipline": "bds-3213",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDS 3213 100 m Intervall SG SL off. Vis. HL mind. 47 mm",
+  "event": "bds-3213-100-m-intervall-sg-sl-off-vis-hl-mind-47-mm",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

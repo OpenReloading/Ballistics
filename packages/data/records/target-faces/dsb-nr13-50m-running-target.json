@@ -1,7 +1,7 @@
 {
   "id": "dsb-nr13-50m-running-target",
   "name": "Scheibe Nr. 13 (50 m Laufende Scheibe)",
-  "organization": "DSB",
+  "federation": "dsb",
   "rings": [
     {
       "value": 1,
@@ -74,24 +74,26 @@
   },
   "events": [
     {
+      "id": "dsb-laufende-scheibe-50-m",
       "name": "DSB Laufende Scheibe 50 m",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
       "scoring": "touch",
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 13 (Teil 0 Seite 70)",
       "category": "rifle"
     },
     {
+      "id": "dsb-laufende-scheibe-50-m-mix",
       "name": "DSB Laufende Scheibe 50 m MIX",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
       "scoring": "touch",
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 13 (Teil 0 Seite 70)",
       "category": "rifle"
     }

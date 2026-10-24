@@ -14,12 +14,12 @@ import { type Matrix, mul3, type Point } from './target-geometry.ts'
 export type FoundFace = Pick<FacePlane, 'centre' | 'corners' | 'outer'> & {
   /** Id of the face record; absent for a plane from a typed diameter. */
   id?: string
-  /** The event the user chose; absent: the group's discipline, else an event at the group's distance. */
+  /** Id of the event the user chose; absent: the group's discipline, else an event at the group's distance. */
   event?: string
-  /** The organization that publishes the face. */
-  organization?: string
-  /** The events of the face with their distances, m, and the organization of an event of another one. */
-  events?: ReadonlyArray<{ name: string; distance: number; organization?: string }>
+  /** Id of the federation that publishes the face. */
+  federation?: string
+  /** The events of the face with their distances, m, and the federation of an event of another one. */
+  events?: ReadonlyArray<{ id: string; distance: number; federation?: string }>
 }
 
 /** The federation the user chose for the Discipline list, and the federations' disciplines and mappings. */
@@ -72,19 +72,16 @@ function groupFaceChoice(g: ShotGroup, found: FoundFace, scope: FaceScope): Shot
 
 /**
  * The face's event at `distance` (m): of the federation the user chose, else of the face's own
- * organization, else of the one organization that shoots the face there. Undefined when none is,
- * or when several other organizations are: no federation is guessed.
+ * federation, else of the one federation that shoots the face there. Undefined when none is,
+ * or when several other federations are: no federation is guessed.
  */
-function eventAt(distance: number, found: FoundFace, { federation, data }: FaceScope) {
+function eventAt(distance: number, found: FoundFace, { federation }: FaceScope) {
   const near = (found.events ?? []).filter((e) => Math.abs(e.distance - distance) < 0.5)
-  const of = (e: (typeof near)[number]) => e.organization ?? found.organization
-  if (federation) {
-    const name = data?.federations.find((f) => f.id === federation)?.abbreviation
-    return near.find((e) => name !== undefined && of(e) === name)?.name
-  }
-  const own = near.find((e) => !e.organization)
-  if (own) return own.name
-  return new Set(near.map(of)).size === 1 ? near[0].name : undefined
+  const of = (e: (typeof near)[number]) => e.federation ?? found.federation
+  if (federation) return near.find((e) => of(e) === federation)?.id
+  const own = near.find((e) => !e.federation)
+  if (own) return own.id
+  return new Set(near.map(of)).size === 1 ? near[0].id : undefined
 }
 
 /**

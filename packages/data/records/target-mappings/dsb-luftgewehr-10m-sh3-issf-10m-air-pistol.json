@@ -2,7 +2,7 @@
   "id": "dsb-luftgewehr-10m-sh3-issf-10m-air-pistol",
   "discipline": "dsb-luftgewehr-10m-sh3",
   "face": "issf-10m-air-pistol",
-  "event": "DSB Luftgewehr 10 m SH3",
+  "event": "dsb-luftgewehr-10-m-sh3",
   "shotCount": 60,
   "provenance": {
     "kind": "published",

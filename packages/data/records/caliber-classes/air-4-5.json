@@ -1,0 +1,19 @@
+{
+  "id": "air-4-5",
+  "name": "4.5 mm (.177) air",
+  "diameter": {
+    "value": 4.5
+  },
+  "cartridges": [],
+  "provenance": {
+    "kind": "derived",
+    "sources": [
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 7.4.6, p. 330 (PDF p. 330)",
+        "fields": ["diameter", "cartridges"],
+        "note": "Airgun pellets carry the calibre of the rule book; no C.I.P. cartridge belongs to the class."
+      }
+    ]
+  }
+}

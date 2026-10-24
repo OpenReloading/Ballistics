@@ -1,7 +1,7 @@
 {
   "id": "dsu-french-military-200m",
   "name": "DSU-Scheibe 200 Meter Präzision (Französische Militärscheibe)",
-  "organization": "DSU",
+  "federation": "dsu",
   "rings": [
     {
       "value": 1,
@@ -69,6 +69,7 @@
   },
   "events": [
     {
+      "id": "svsm-vorderlader-steinschlossmuskete-50-m",
       "name": "SVSM Vorderlader-Steinschlossmuskete 50 m",
       "distance": {
         "value": 50000,

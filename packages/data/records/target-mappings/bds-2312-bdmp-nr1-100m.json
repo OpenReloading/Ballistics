@@ -2,7 +2,7 @@
   "id": "bds-2312-bdmp-nr1-100m",
   "discipline": "bds-2312",
   "face": "bdmp-nr1-100m",
-  "event": "BDS 2312 50 m Zeit. SG SL KK off. Vis.",
+  "event": "bds-2312-50-m-zeit-sg-sl-kk-off-vis",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

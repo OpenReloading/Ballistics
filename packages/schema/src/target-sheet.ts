@@ -125,12 +125,9 @@ export const shotGroup = z.object({
   face: z
     .object({
       id: recordId.describe('Id of the `TargetFace` record.'),
-      event: z
-        .string()
-        .min(1)
-        .max(200)
+      event: recordId
         .describe(
-          "Name of the face's event whose gauge is the scored hole. Absent: the bullet diameter.",
+          "Id of the face's event whose gauge is the scored hole. Absent: the bullet diameter.",
         )
         .optional(),
       marks: z

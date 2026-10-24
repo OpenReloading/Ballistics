@@ -2,7 +2,7 @@
   "id": "bdmp-lr-bdmp-long-range",
   "discipline": "bdmp-lr",
   "face": "bdmp-long-range",
-  "event": "BDMP LR Long Range - Target Rifle",
+  "event": "bdmp-lr-long-range-target-rifle",
   "shotCount": 15,
   "provenance": {
     "kind": "published",

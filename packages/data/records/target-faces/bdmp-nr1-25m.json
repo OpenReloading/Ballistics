@@ -1,7 +1,7 @@
 {
   "id": "bdmp-nr1-25m",
   "name": "BDMP-Scheibe Nr. 1, reduziert für 25 m",
-  "organization": "BDMP",
+  "federation": "bdmp",
   "rings": [
     {
       "value": 1,
@@ -74,6 +74,7 @@
   },
   "events": [
     {
+      "id": "30-m1-carbine-25-m",
       "name": ".30 M1 Carbine 25 m",
       "distance": {
         "value": 25000,
@@ -83,16 +84,18 @@
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-g-30-m1-halbautomatisches-gewehr-25-m",
       "name": "VdRBw G-.30 M1 Halbautomatisches Gewehr 25 m",
       "distance": {
         "value": 25000,
         "raw": "25 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "9.8.4, 9.8.5 (Seite 72, PDF p. 72)",
       "scoring": "touch"
     },
     {
+      "id": "bdmp-zg-1-mod-a-zielfernrohrgewehr-1-modifiziert-a",
       "name": "BDMP ZG 1 mod. A Zielfernrohrgewehr 1 modifiziert A",
       "distance": {
         "value": 100000,
@@ -102,6 +105,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-zg-1-mod-b-zielfernrohrgewehr-1-modifiziert-b",
       "name": "BDMP ZG 1 mod. B Zielfernrohrgewehr 1 modifiziert B",
       "distance": {
         "value": 100000,

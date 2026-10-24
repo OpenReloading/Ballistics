@@ -2,7 +2,7 @@
   "id": "dsu-svfg-issf-25m-precision-50m-pistol",
   "discipline": "dsu-svfg",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "DSU SVFG Vorderlader-Freigewehr 100 m",
+  "event": "dsu-svfg-vorderlader-freigewehr-100-m",
   "shotCount": 10,
   "provenance": {
     "kind": "published",

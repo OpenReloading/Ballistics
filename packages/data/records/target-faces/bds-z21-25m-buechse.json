@@ -1,7 +1,7 @@
 {
   "id": "bds-z21-25m-buechse",
   "name": "BDS-25m-Präzisionsscheibe Büchse (Z21)",
-  "organization": "BDS",
+  "federation": "bds",
   "rings": [
     {
       "value": 6,
@@ -44,6 +44,7 @@
   },
   "events": [
     {
+      "id": "20xx-25-m-prazisionsschiessen-buchse",
       "name": "20xx 25 m Präzisionsschießen Büchse",
       "distance": {
         "value": 25000,
@@ -53,6 +54,7 @@
       "scoring": "touch"
     },
     {
+      "id": "2801-25-m-kombi-sg-sl-kw-off-vis-teil-prazision",
       "name": "2801 25 m Kombi SG SL KW off. Vis., Teil Präzision",
       "distance": {
         "value": 25000,
@@ -62,6 +64,7 @@
       "scoring": "touch"
     },
     {
+      "id": "2802-25-m-kombi-sg-sl-kk-opt-vis-teil-prazision",
       "name": "2802 25 m Kombi SG SL KK opt. Vis., Teil Präzision",
       "distance": {
         "value": 25000,
@@ -71,6 +74,7 @@
       "scoring": "touch"
     },
     {
+      "id": "2803-25-m-kombi-rb-kw-off-vis-teil-prazision",
       "name": "2803 25 m Kombi RB KW off. Vis., Teil Präzision",
       "distance": {
         "value": 25000,
@@ -80,6 +84,7 @@
       "scoring": "touch"
     },
     {
+      "id": "2804-25-m-kombi-rb-kk-off-vis-teil-prazision",
       "name": "2804 25 m Kombi RB KK off. Vis., Teil Präzision",
       "distance": {
         "value": 25000,
@@ -89,6 +94,7 @@
       "scoring": "touch"
     },
     {
+      "id": "2810-25-m-kombi-sg-sl-kw-opt-vis-teil-prazision",
       "name": "2810 25 m Kombi SG SL KW opt. Vis., Teil Präzision",
       "distance": {
         "value": 25000,
@@ -98,6 +104,7 @@
       "scoring": "touch"
     },
     {
+      "id": "2811-25-m-kombi-rb-kw-opt-vis-teil-prazision",
       "name": "2811 25 m Kombi RB KW opt. Vis., Teil Präzision",
       "distance": {
         "value": 25000,
@@ -107,6 +114,7 @@
       "scoring": "touch"
     },
     {
+      "id": "2812-25-m-kombi-sg-sl-kk-off-vis-teil-prazision",
       "name": "2812 25 m Kombi SG SL KK off. Vis., Teil Präzision",
       "distance": {
         "value": 25000,
@@ -116,6 +124,7 @@
       "scoring": "touch"
     },
     {
+      "id": "2814-25-m-kombi-rb-kk-bel-vis-teil-prazision",
       "name": "2814 25 m Kombi RB KK bel. Vis., Teil Präzision",
       "distance": {
         "value": 25000,
@@ -125,6 +134,7 @@
       "scoring": "touch"
     },
     {
+      "id": "3812-md-buchse-langwaffenkaliber-sg-sl-off-vis-hl-u-47-mm",
       "name": "3812 MD Büchse Langwaffenkaliber SG SL off. Vis. HL u. 47 mm",
       "distance": {
         "value": 50000,
@@ -134,6 +144,7 @@
       "scoring": "touch"
     },
     {
+      "id": "3813-md-buchse-sg-sl-off-vis-hl-mind-47-mm",
       "name": "3813 MD Büchse SG SL off. Vis. HL mind. 47 mm",
       "distance": {
         "value": 50000,
@@ -143,6 +154,7 @@
       "scoring": "touch"
     },
     {
+      "id": "3814-md-buchse-sg-sl-opt-vis-hl-u-47-mm",
       "name": "3814 MD Büchse SG SL opt. Vis. HL u. 47 mm",
       "distance": {
         "value": 50000,
@@ -152,6 +164,7 @@
       "scoring": "touch"
     },
     {
+      "id": "3815-md-buchse-sg-sl-opt-vis-hl-mind-47-mm",
       "name": "3815 MD Büchse SG SL opt. Vis. HL mind. 47 mm",
       "distance": {
         "value": 50000,
@@ -161,6 +174,7 @@
       "scoring": "touch"
     },
     {
+      "id": "4801-md-buchse-sg-sl-kw-off-vis",
       "name": "4801 MD Büchse SG SL KW off. Vis.",
       "distance": {
         "value": 25000,
@@ -170,6 +184,7 @@
       "scoring": "touch"
     },
     {
+      "id": "4802-md-buchse-sg-sl-kk-opt-vis",
       "name": "4802 MD Büchse SG SL KK opt. Vis.",
       "distance": {
         "value": 25000,
@@ -179,6 +194,7 @@
       "scoring": "touch"
     },
     {
+      "id": "4803-md-buchse-rb-kw-off-vis",
       "name": "4803 MD Büchse RB KW off. Vis.",
       "distance": {
         "value": 25000,
@@ -188,6 +204,7 @@
       "scoring": "touch"
     },
     {
+      "id": "4810-md-buchse-sg-sl-kw-opt-vis",
       "name": "4810 MD Büchse SG SL KW opt. Vis.",
       "distance": {
         "value": 25000,
@@ -197,6 +214,7 @@
       "scoring": "touch"
     },
     {
+      "id": "4812-md-buchse-sg-sl-kk-off-vis",
       "name": "4812 MD Büchse SG SL KK off. Vis.",
       "distance": {
         "value": 25000,
@@ -206,6 +224,7 @@
       "scoring": "touch"
     },
     {
+      "id": "4814-md-buchse-rb-kk-beliebige-optik",
       "name": "4814 MD Büchse RB KK beliebige Optik",
       "distance": {
         "value": 25000,
@@ -215,6 +234,7 @@
       "scoring": "touch"
     },
     {
+      "id": "4821-md-buchse-pistole-mit-anschlagschaft-offene-visierung",
       "name": "4821 MD Büchse Pistole mit Anschlagschaft, offene Visierung",
       "distance": {
         "value": 25000,
@@ -224,6 +244,7 @@
       "scoring": "touch"
     },
     {
+      "id": "4822-md-buchse-pistole-mit-anschlagschaft-optische-visierung",
       "name": "4822 MD Büchse Pistole mit Anschlagschaft, optische Visierung",
       "distance": {
         "value": 25000,

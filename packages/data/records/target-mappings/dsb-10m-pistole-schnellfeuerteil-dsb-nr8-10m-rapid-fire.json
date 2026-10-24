@@ -2,7 +2,7 @@
   "id": "dsb-10m-pistole-schnellfeuerteil-dsb-nr8-10m-rapid-fire",
   "discipline": "dsb-10m-pistole-schnellfeuerteil",
   "face": "dsb-nr8-10m-rapid-fire",
-  "event": "10 m Pistole Schnellfeuerteil",
+  "event": "10-m-pistole-schnellfeuerteil",
   "shotCount": 20,
   "provenance": {
     "kind": "published",

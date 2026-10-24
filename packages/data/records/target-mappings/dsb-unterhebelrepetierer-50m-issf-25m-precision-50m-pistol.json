@@ -2,7 +2,7 @@
   "id": "dsb-unterhebelrepetierer-50m-issf-25m-precision-50m-pistol",
   "discipline": "dsb-unterhebelrepetierer-50m",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "DSB Unterhebelrepetierer 50 m",
+  "event": "dsb-unterhebelrepetierer-50-m",
   "shotCount": 40,
   "provenance": {
     "kind": "published",

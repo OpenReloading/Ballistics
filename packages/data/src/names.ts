@@ -54,7 +54,7 @@ function duplicates(records: Named[]): LocatedFinding[] {
  * Reports records that share a name, exactly or after `normaliseName`, with an earlier record of
  * their kind and scope. Scopes: none for cartridges, manufacturers and powder aliases, manufacturer id
  * for powders and bullets, the report for range
- * records, organization for target faces.
+ * records, federation id for target faces.
  */
 export function checkNames(
   bundle: Pick<
@@ -110,7 +110,7 @@ export function checkNames(
     ...duplicates(
       bundle.targetFaces.map((f) => ({
         file: at('target-faces', f.id),
-        scope: f.organization,
+        scope: f.federation ?? '',
         names: [f.name],
       })),
     ),

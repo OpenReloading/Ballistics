@@ -2,7 +2,7 @@
   "id": "bdmp-sg-2-issf-300m-rifle",
   "discipline": "bdmp-sg-2",
   "face": "issf-300m-rifle",
-  "event": "BDMP SG 2 Standardgewehr 2",
+  "event": "bdmp-sg-2-standardgewehr-2",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

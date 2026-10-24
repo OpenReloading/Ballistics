@@ -2,7 +2,7 @@
   "id": "bdmp-epp-polymer-pistol-bdmp-epp",
   "discipline": "bdmp-epp-polymer-pistol",
   "face": "bdmp-epp",
-  "event": "BDMP EPP - Polymerpistole",
+  "event": "bdmp-epp-polymerpistole",
   "shotCount": 50,
   "provenance": {
     "kind": "published",

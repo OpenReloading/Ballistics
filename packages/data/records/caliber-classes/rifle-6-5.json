@@ -1,0 +1,18 @@
+{
+  "id": "rifle-6-5",
+  "name": "6.5 mm rifle",
+  "diameter": {
+    "value": 6.72
+  },
+  "cartridges": ["6-5-creedmoor", "6-5-x-55-se", "260-rem", "6-5-prc", "6-5-x-57", "6-5-grendel"],
+  "provenance": {
+    "kind": "derived",
+    "sources": [
+      {
+        "source": "cip-tdcc",
+        "fields": ["diameter", "cartridges"],
+        "note": "Grouped by the maximum projectile diameter G1 of the cartridge side of the sheets; the nominal diameter lies within 0.15 mm of G1 of every member."
+      }
+    ]
+  }
+}

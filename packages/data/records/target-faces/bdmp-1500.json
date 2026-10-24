@@ -1,7 +1,7 @@
 {
   "id": "bdmp-1500",
   "name": "BDMP-Scheibe BDMP 1500",
-  "organization": "BDMP",
+  "federation": "bdmp",
   "rings": [
     {
       "value": 7,
@@ -56,6 +56,7 @@
   },
   "events": [
     {
+      "id": "bdmp-revolver-1500",
       "name": "BDMP Revolver 1500",
       "distance": {
         "value": 50000,
@@ -65,6 +66,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-pistol-1500",
       "name": "BDMP Pistol 1500",
       "distance": {
         "value": 50000,
@@ -74,6 +76,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-distinguished-pistol-match",
       "name": "BDMP Distinguished Pistol Match",
       "distance": {
         "value": 50000,
@@ -83,6 +86,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-open-match",
       "name": "BDMP Open Match",
       "distance": {
         "value": 50000,
@@ -92,6 +96,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-distinguished-revolver-match",
       "name": "BDMP Distinguished Revolver Match",
       "distance": {
         "value": 50000,
@@ -101,6 +106,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-standard-revolver-4-25",
       "name": "BDMP Standard Revolver 4,25“",
       "distance": {
         "value": 25000,
@@ -110,6 +116,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-standard-revolver-2-75",
       "name": "BDMP Standard Revolver 2,75“",
       "distance": {
         "value": 25000,
@@ -119,6 +126,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-standard-revolver-2-75-5-shot",
       "name": "BDMP Standard Revolver 2,75“ 5 shot",
       "distance": {
         "value": 25000,
@@ -128,6 +136,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-standard-semi-automatic-pistol",
       "name": "BDMP Standard Semi-Automatic Pistol",
       "distance": {
         "value": 25000,
@@ -137,6 +146,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-standard-semi-automatic-pistol-production",
       "name": "BDMP Standard Semi-Automatic Pistol Production",
       "distance": {
         "value": 25000,
@@ -146,6 +156,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-standard-semi-automatic-pistol-3-7",
       "name": "BDMP Standard Semi-Automatic Pistol 3,7“",
       "distance": {
         "value": 25000,
@@ -155,6 +166,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-revolver-1020",
       "name": "BDMP Revolver 1020",
       "distance": {
         "value": 25000,
@@ -164,6 +176,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-pistol-1020",
       "name": "BDMP Pistol 1020",
       "distance": {
         "value": 25000,
@@ -173,6 +186,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-distinguished-pistol-1020",
       "name": "BDMP Distinguished Pistol 1020",
       "distance": {
         "value": 25000,
@@ -182,6 +196,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-distinguished-revolver-1020",
       "name": "BDMP Distinguished Revolver 1020",
       "distance": {
         "value": 25000,
@@ -191,6 +206,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-standard-revolver-4-25-1020",
       "name": "BDMP Standard Revolver 4,25“ 1020",
       "distance": {
         "value": 25000,
@@ -200,6 +216,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-standard-semi-automatic-pistol-1020",
       "name": "BDMP Standard Semi-Automatic Pistol 1020",
       "distance": {
         "value": 25000,
@@ -209,6 +226,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-dks-1-1020-dynamisches-kleinkaliberschiessen-1-1020",
       "name": "BDMP DKS 1 - 1020 Dynamisches Kleinkaliberschießen 1 1020",
       "distance": {
         "value": 25000,
@@ -218,6 +236,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-30-m1-carbine-1500",
       "name": "BDMP .30 M1 Carbine 1500",
       "distance": {
         "value": 50000,
@@ -227,6 +246,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-lar-3-lever-action-rifle-3-lar-1500",
       "name": "BDMP LAR 3 Lever Action Rifle 3 (LAR - 1500)",
       "distance": {
         "value": 50000,

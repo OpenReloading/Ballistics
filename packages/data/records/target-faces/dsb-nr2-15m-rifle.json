@@ -1,7 +1,7 @@
 {
   "id": "dsb-nr2-15m-rifle",
   "name": "Scheibe Nr. 2 (15 m Gewehr)",
-  "organization": "DSB",
+  "federation": "dsb",
   "rings": [
     {
       "value": 1,
@@ -69,6 +69,7 @@
   },
   "events": [
     {
+      "id": "gewehr-15-m",
       "name": "Gewehr 15 m",
       "distance": {
         "value": 15000,

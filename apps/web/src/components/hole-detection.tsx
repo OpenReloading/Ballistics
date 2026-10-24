@@ -391,11 +391,11 @@ export function useHoleDetection({
       ...(face && {
         id: face.id,
         ...(event && { event }),
-        organization: face.organization,
+        federation: face.federation,
         events: face.events.map((e) => ({
-          name: e.name,
+          id: e.id,
           distance: toSi('length', e.distance.value),
-          ...(e.organization && { organization: e.organization }),
+          ...(e.federation && { federation: e.federation }),
         })),
       }),
       centre: fit.centre,
@@ -653,7 +653,7 @@ export function useHoleDetection({
     : found.fits.length
       ? found.fits.flatMap((f) =>
           f.face.events.map((e) => ({
-            value: `${f.face.id}|${e.name}`,
+            value: `${f.face.id}|${e.id}`,
             label: `${f.face.name}: ${e.name}, ${formatQuantity('range', system, toSi('length', e.distance.value))}`,
           })),
         )

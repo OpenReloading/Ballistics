@@ -2,7 +2,7 @@
   "id": "issf-25m-pistol-issf-25m-precision-50m-pistol",
   "discipline": "issf-25m-pistol",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "25m Pistol (precision stage)",
+  "event": "25m-pistol-precision-stage",
   "stage": "precision stage",
   "gauge": {
     "value": 5.6,

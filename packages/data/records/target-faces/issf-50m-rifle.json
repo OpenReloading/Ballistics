@@ -1,7 +1,7 @@
 {
   "id": "issf-50m-rifle",
   "name": "50m Rifle Target",
-  "organization": "ISSF",
+  "federation": "issf",
   "rings": [
     {
       "value": 1,
@@ -77,6 +77,7 @@
   "decimal": true,
   "events": [
     {
+      "id": "50m-rifle-3-positions",
       "name": "50m Rifle 3 Positions",
       "distance": {
         "value": 50000,
@@ -89,6 +90,7 @@
       "scoring": "touch"
     },
     {
+      "id": "50m-rifle-prone",
       "name": "50m Rifle Prone",
       "distance": {
         "value": 50000,
@@ -101,6 +103,7 @@
       "scoring": "touch"
     },
     {
+      "id": "dsb-gewehr-50-m-22",
       "name": "DSB Gewehr 50 m (.22)",
       "distance": {
         "value": 50000,
@@ -110,71 +113,78 @@
         "value": 5.6,
         "raw": "5,60 mm Kleinkaliber .22"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 3; 0.11.3.2",
       "scoring": "touch"
     },
     {
+      "id": "bds-2106-50-m-praz-dsg-gk-und-diopter-kk",
       "name": "BDS 2106 50 m Präz. DSG gK und Diopter KK",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z3",
       "scoring": "touch"
     },
     {
+      "id": "bds-2107-50-m-praz-msg-kk",
       "name": "BDS 2107 50 m Präz. MSG KK",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z3",
       "scoring": "touch"
     },
     {
+      "id": "dsu-lem-1-einzellader-matchgewehr-50-m",
       "name": "DSU LEM 1 Einzellader Matchgewehr 50 m",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "DSU",
+      "federation": "dsu",
       "section": "Kapitel 1, DSU-Scheibe KK International (Seite 18); Kapitel 3 (PDF p. 60)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-g-ek-1-einzellader-kk-sportgewehr",
       "name": "VdRBw G-EK 1 Einzellader-KK-Sportgewehr",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "9.11.4, 9.11.5 (PDF p. 78)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-g-rk-1-repetier-kk-sportgewehr",
       "name": "VdRBw G-RK 1 Repetier-KK-Sportgewehr",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "9.12.4, 9.12.5 (PDF p. 80)",
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-g-hk-1-halbautomatisches-kk-sportgewehr",
       "name": "VdRBw G-HK 1 Halbautomatisches KK-Sportgewehr",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "9.13.4, 9.13.5 (PDF p. 82)",
       "scoring": "touch"
     },
     {
+      "id": "dsb-gewehr-50-m-gk",
       "name": "DSB Gewehr 50 m GK",
       "distance": {
         "value": 50000,
@@ -185,7 +195,7 @@
         "raw": "8,00 mm Gewehr Kaliber > .22 lfb"
       },
       "scoring": "touch",
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 3; 0.11.3.2"
     }
   ],

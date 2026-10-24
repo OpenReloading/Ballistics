@@ -2,7 +2,7 @@
   "id": "dsb-25m-grosskaliber-41-issf-25m-precision-50m-pistol",
   "discipline": "dsb-25m-grosskaliber-41",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "DSB 25 m Großkaliberrevolver .41 150 Sek. Serie",
+  "event": "dsb-25-m-grosskaliberrevolver-41-150-sek-serie",
   "stage": "150 Sek. Serie",
   "gauge": {
     "value": 11.58,

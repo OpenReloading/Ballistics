@@ -2,7 +2,7 @@
   "id": "dsu-svsg-1-issf-25m-precision-50m-pistol",
   "discipline": "dsu-svsg-1",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "DSU SVSG 1 Vorderlader-Steinschlossgewehr 50 m",
+  "event": "dsu-svsg-1-vorderlader-steinschlossgewehr-50-m",
   "shotCount": 10,
   "provenance": {
     "kind": "published",

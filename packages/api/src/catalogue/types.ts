@@ -1,5 +1,6 @@
 import type {
   Bullet,
+  CaliberClass,
   Cartridge,
   CaseCapacity,
   CaseType,
@@ -23,6 +24,7 @@ export type CatalogueKind =
   | 'federation'
   | 'discipline'
   | 'targetMapping'
+  | 'caliberClass'
 
 /** The record type of each {@link CatalogueKind}. */
 export interface RecordOfKind {
@@ -35,6 +37,7 @@ export interface RecordOfKind {
   federation: Federation
   discipline: Discipline
   targetMapping: TargetMapping
+  caliberClass: CaliberClass
 }
 
 /**
@@ -135,10 +138,14 @@ export interface BulletItem {
   construction?: string
 }
 
-/** A target face of the list, with the caliber classes and categories it is used for. */
+/**
+ * A target face of the list, with the caliber classes and categories it is used for. `organization`
+ * is the abbreviation of the face's federation, for display and search.
+ */
 export interface TargetFaceItem {
   id: string
-  organization: string
+  federation?: string
+  organization?: string
   name: string
   caliberClasses: string[]
   categories: string[]
@@ -173,6 +180,13 @@ export interface TargetMappingItem {
   gaugeMm?: number
 }
 
+/** A caliber class of the list. Diameter in mm. */
+export interface CaliberClassItem {
+  id: string
+  name: string
+  diameterMm: number
+}
+
 /**
  * A row of the index: the list item, the key it is ordered by (`sortKey` of the schema package)
  * and the key it is searched by (`searchKey`). Rows are stored in the default order of their list.
@@ -190,7 +204,7 @@ export const catalogueFormat = 1
  * The version of what `derive.ts` computes (list items, sort and search keys, revisions). Raise it
  * with any change to those, so a build made by older code is refused instead of read as current.
  */
-export const deriveVersion = 1
+export const deriveVersion = 2
 
 /** The first fields of the index and of the record file: what built them. */
 export interface CatalogueHeader {
@@ -208,6 +222,7 @@ export interface CatalogueIndex extends CatalogueHeader {
   federations: IndexRow<FederationItem>[]
   disciplines: IndexRow<DisciplineItem>[]
   targetMappings: IndexRow<TargetMappingItem>[]
+  caliberClasses: IndexRow<CaliberClassItem>[]
   /** The capacity record ids of each cartridge that has any, ordered by id. */
   capacities: Record<string, string[]>
   /** The ids that no longer name a record, by kind, each with the id that replaces it. */
@@ -230,6 +245,7 @@ export interface CatalogueSource {
   federations: Federation[]
   disciplines: Discipline[]
   targetMappings: TargetMapping[]
+  caliberClasses: CaliberClass[]
   /** `renames.json` of the records; absent: none. */
   renames?: Renames
 }
@@ -259,6 +275,8 @@ export interface Catalogue {
   disciplines(query?: { federation?: string }): CataloguePage<DisciplineItem>
   /** Target mappings, of one discipline and one face where set. */
   targetMappings(query?: { discipline?: string; face?: string }): CataloguePage<TargetMappingItem>
+  /** Caliber classes by nominal diameter. */
+  caliberClasses(): CataloguePage<CaliberClassItem>
   /** The record `id` of `kind`; undefined if unknown. */
   get<K extends CatalogueKind>(kind: K, id: string): Catalogued<K> | undefined
   /** The id that replaces `id` of a route kind where it was renamed or removed; undefined otherwise. */

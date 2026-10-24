@@ -1,7 +1,7 @@
 {
   "id": "bdmp-nr1-50m",
   "name": "BDMP-Scheibe Nr. 1, reduziert für 50 m",
-  "organization": "BDMP",
+  "federation": "bdmp",
   "rings": [
     {
       "value": 1,
@@ -74,6 +74,7 @@
   },
   "events": [
     {
+      "id": "30-m1-carbine-50-m",
       "name": ".30 M1 Carbine 50 m",
       "distance": {
         "value": 50000,
@@ -83,12 +84,13 @@
       "scoring": "touch"
     },
     {
+      "id": "vdrbw-g-30-m1-halbautomatisches-gewehr-50-m",
       "name": "VdRBw G-.30 M1 Halbautomatisches Gewehr 50 m",
       "distance": {
         "value": 50000,
         "raw": "50 m"
       },
-      "organization": "VdRBw",
+      "federation": "vdrbw",
       "section": "9.8.4 and 9.8.15 (PDF pp. 72, 73)",
       "scoring": "touch"
     }

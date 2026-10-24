@@ -1,7 +1,7 @@
 {
   "id": "bdmp-nr8",
   "name": "BDMP-Scheibe Nr. 8 (Five Targets)",
-  "organization": "BDMP",
+  "federation": "bdmp",
   "rings": [
     {
       "value": 1,
@@ -44,6 +44,7 @@
   },
   "events": [
     {
+      "id": "five-targets-kurzwaffen-auf-zielscheiben",
       "name": "Five Targets Kurzwaffen auf Zielscheiben",
       "distance": {
         "value": 25000,
@@ -53,6 +54,7 @@
       "scoring": "touch"
     },
     {
+      "id": "five-targets-langwaffen-auf-zielscheiben",
       "name": "Five Targets Langwaffen auf Zielscheiben",
       "distance": {
         "value": 25000,

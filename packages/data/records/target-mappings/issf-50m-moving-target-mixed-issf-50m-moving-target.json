@@ -2,7 +2,7 @@
   "id": "issf-50m-moving-target-mixed-issf-50m-moving-target",
   "discipline": "issf-50m-moving-target-mixed",
   "face": "issf-50m-moving-target",
-  "event": "50m Moving Target Mixed",
+  "event": "50m-moving-target-mixed",
   "gauge": {
     "value": 5.6,
     "raw": "5.60mm"

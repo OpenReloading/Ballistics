@@ -2,7 +2,7 @@
   "id": "bdmp-f-class-bdmp-f-class",
   "discipline": "bdmp-f-class",
   "face": "bdmp-f-class",
-  "event": "BDMP F-Class Rifle",
+  "event": "bdmp-f-class-rifle",
   "shotCount": 15,
   "provenance": {
     "kind": "published",

@@ -2,7 +2,7 @@
   "id": "bdmp-cism-100m-bdmp-nr1-100m",
   "discipline": "bdmp-cism-100m",
   "face": "bdmp-nr1-100m",
-  "event": "CISM-Gewehr 100 m",
+  "event": "cism-gewehr-100-m",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

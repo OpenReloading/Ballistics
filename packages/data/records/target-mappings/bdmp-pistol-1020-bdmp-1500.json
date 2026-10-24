@@ -2,7 +2,7 @@
   "id": "bdmp-pistol-1020-bdmp-1500",
   "discipline": "bdmp-pistol-1020",
   "face": "bdmp-1500",
-  "event": "BDMP Pistol 1020",
+  "event": "bdmp-pistol-1020",
   "shotCount": 102,
   "provenance": {
     "kind": "published",

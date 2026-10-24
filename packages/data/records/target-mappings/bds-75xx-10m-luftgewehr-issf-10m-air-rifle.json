@@ -2,7 +2,7 @@
   "id": "bds-75xx-10m-luftgewehr-issf-10m-air-rifle",
   "discipline": "bds-75xx-10m-luftgewehr",
   "face": "issf-10m-air-rifle",
-  "event": "BDS 75xx 10 m Präz. Luftgewehr",
+  "event": "bds-75xx-10-m-praz-luftgewehr",
   "provenance": {
     "kind": "published",
     "sources": [

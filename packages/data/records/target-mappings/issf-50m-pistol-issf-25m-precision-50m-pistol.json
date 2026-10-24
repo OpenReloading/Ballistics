@@ -2,7 +2,7 @@
   "id": "issf-50m-pistol-issf-25m-precision-50m-pistol",
   "discipline": "issf-50m-pistol",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "50m Pistol",
+  "event": "50m-pistol",
   "gauge": {
     "value": 5.6,
     "raw": "5.60mm"
