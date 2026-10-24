@@ -22,6 +22,7 @@ import {
   type Powder,
   powder,
   type RangeFirings,
+  type Renames,
   rangeFirings,
   sourceRecord,
   type TargetFace,
@@ -48,6 +49,7 @@ import {
   checkManufacturerReferences,
   recordIds,
 } from './references.ts'
+import { checkRenames, readRenames } from './renames.ts'
 import { checkSources, sourceIndex } from './sources.ts'
 
 /** Directory `records/` of the data package, the default root of {@link readRecords}. */
@@ -79,6 +81,8 @@ export type Bundle = {
   federations: Federation[]
   disciplines: Discipline[]
   targetMappings: TargetMapping[]
+  /** `renames.json` of the records roots; absent: none. */
+  renames?: Renames
 }
 
 /**
@@ -108,6 +112,7 @@ function readBundle(roots: string[], errors: string[]): Bundle {
     federations: read('federations', federation),
     disciplines: read('disciplines', discipline),
     targetMappings: read('target-mappings', targetMapping),
+    renames: readRenames(roots, errors),
   }
   checkSources(sources, errors)
   return bundle
@@ -205,6 +210,7 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
   }
   checkSourceCoverage(bundle, errors)
   errors.push(...checkFederations(bundle))
+  checkRenames(bundle, errors)
   const loadTables = readLoadTables(roots[1] ?? roots[0])
   for (const p of bundle.powders) {
     for (const error of checkFittedSources(p, loadTables))

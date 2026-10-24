@@ -1,5 +1,6 @@
 import type { Discipline, Federation, TargetFace } from '@openreloading/schema'
 import type { Bundle } from './records.ts'
+import { resolveId } from './renames.ts'
 
 /** The federations, disciplines and faces by id. */
 type Lookup = {
@@ -7,6 +8,8 @@ type Lookup = {
   disciplines: Map<string, Discipline>
   faces: Map<string, TargetFace>
   worldBody: (id: string) => boolean
+  /** The id that replaces `id` of a kind in `renames.json`, else `id`. */
+  now: (kind: 'federations' | 'disciplines' | 'target-faces', id: string) => string
 }
 
 /** A federation's international federation is a world body. */
@@ -24,10 +27,10 @@ function checkFederationReferences(federations: Federation[], lookup: Lookup, er
 function checkDisciplineReferences(disciplines: Discipline[], lookup: Lookup, errors: string[]) {
   for (const d of disciplines) {
     const where = `disciplines/${d.id}.json`
-    if (!lookup.federations.has(d.federation))
+    if (!lookup.federations.has(lookup.now('federations', d.federation)))
       errors.push(`${where}: unknown federation "${d.federation}"`)
     if (d.internationalDiscipline) {
-      const other = lookup.disciplines.get(d.internationalDiscipline)
+      const other = lookup.disciplines.get(lookup.now('disciplines', d.internationalDiscipline))
       if (!other)
         errors.push(`${where}: unknown international discipline "${d.internationalDiscipline}"`)
       else if (!lookup.worldBody(other.federation))
@@ -46,8 +49,8 @@ function checkMappings(mappings: Bundle['targetMappings'], lookup: Lookup, error
   const mapped = new Map<string, string>()
   for (const m of mappings) {
     const where = `target-mappings/${m.id}.json`
-    const d = lookup.disciplines.get(m.discipline)
-    const face = lookup.faces.get(m.face)
+    const d = lookup.disciplines.get(lookup.now('disciplines', m.discipline))
+    const face = lookup.faces.get(lookup.now('target-faces', m.face))
     if (!d) errors.push(`${where}: unknown discipline "${m.discipline}"`)
     if (!face) {
       errors.push(`${where}: unknown face "${m.face}"`)
@@ -58,10 +61,11 @@ function checkMappings(mappings: Bundle['targetMappings'], lookup: Lookup, error
       errors.push(`${where}: face "${m.face}" has no event "${m.event}"`)
       continue
     }
-    const key = `${m.face} ${m.event}`
+    const key = `${face.id} ${m.event}`
     if (mapped.has(key)) errors.push(`${where}: event "${m.event}" is also in ${mapped.get(key)}`)
     else mapped.set(key, m.id)
-    const abbreviation = d && lookup.federations.get(d.federation)?.abbreviation
+    const abbreviation =
+      d && lookup.federations.get(lookup.now('federations', d.federation))?.abbreviation
     if (abbreviation && (event.organization ?? face.organization) !== abbreviation)
       errors.push(`${where}: event "${m.event}" is not one of ${abbreviation}`)
     if (m.gauge && event.gauge && m.gauge.value !== event.gauge.value)
@@ -78,7 +82,10 @@ function checkMappings(mappings: Bundle['targetMappings'], lookup: Lookup, error
  * event has at most one mapping and every discipline at least one.
  */
 export function checkFederations(
-  bundle: Pick<Bundle, 'federations' | 'disciplines' | 'targetMappings' | 'targetFaces'>,
+  bundle: Pick<
+    Bundle,
+    'federations' | 'disciplines' | 'targetMappings' | 'targetFaces' | 'renames'
+  >,
 ): string[] {
   const errors: string[] = []
   const federations = new Map(bundle.federations.map((f) => [f.id, f]))
@@ -86,12 +93,14 @@ export function checkFederations(
     federations,
     disciplines: new Map(bundle.disciplines.map((d) => [d.id, d])),
     faces: new Map(bundle.targetFaces.map((f) => [f.id, f])),
-    worldBody: (id) => federations.get(id)?.country === 'international',
+    worldBody: (id) =>
+      federations.get(resolveId(bundle.renames, 'federations', id))?.country === 'international',
+    now: (kind, id) => resolveId(bundle.renames, kind, id),
   }
   checkFederationReferences(bundle.federations, lookup, errors)
   checkDisciplineReferences(bundle.disciplines, lookup, errors)
   checkMappings(bundle.targetMappings, lookup, errors)
-  const used = new Set(bundle.targetMappings.map((m) => m.discipline))
+  const used = new Set(bundle.targetMappings.map((m) => lookup.now('disciplines', m.discipline)))
   for (const d of bundle.disciplines)
     if (!used.has(d.id)) errors.push(`disciplines/${d.id}.json: no target mapping names it`)
   return errors

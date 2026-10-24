@@ -4,7 +4,7 @@ import type { Bundle } from './records.ts'
 // Federation, discipline and target mapping references are checked with their other rules in
 // checkFederations (federations.ts).
 
-/** The ids a record may reference, by kind. */
+/** The ids a record may reference, by kind: the records and the ids `renames.json` replaces. */
 type RecordIds = {
   cartridges: Set<string>
   loads: Set<string>
@@ -13,12 +13,14 @@ type RecordIds = {
 
 /** The ids of the referenced kinds in `bundle`. */
 export function recordIds(
-  bundle: Pick<Bundle, 'cartridges' | 'loads' | 'manufacturers'>,
+  bundle: Pick<Bundle, 'cartridges' | 'loads' | 'manufacturers' | 'renames'>,
 ): RecordIds {
+  const renamed = (kind: 'cartridges' | 'manufacturers') =>
+    Object.keys(bundle.renames?.[kind] ?? {})
   return {
-    cartridges: new Set(bundle.cartridges.map((c) => c.id)),
+    cartridges: new Set([...bundle.cartridges.map((c) => c.id), ...renamed('cartridges')]),
     loads: new Set(bundle.loads.map((l) => l.id)),
-    manufacturers: new Set(bundle.manufacturers.map((m) => m.id)),
+    manufacturers: new Set([...bundle.manufacturers.map((m) => m.id), ...renamed('manufacturers')]),
   }
 }
 
