@@ -113,6 +113,17 @@ export function DataCard({
             <Table.Tbody>
               {c.mounts.map((m, k) => {
                 const zero = zeroConditions(m, system, m.dragFactorSource)
+                const air = [
+                  m.zeroTemperature === undefined
+                    ? ''
+                    : withUnit('temperature', system, m.zeroTemperature),
+                  m.zeroPressure === undefined
+                    ? ''
+                    : withUnit('airPressure', system, m.zeroPressure),
+                  m.zeroHumidity === undefined ? '' : withUnit('percent', system, m.zeroHumidity),
+                ]
+                  .filter(Boolean)
+                  .join(', ')
                 return (
                   // biome-ignore lint/suspicious/noArrayIndexKey: mounts have no id and keep their order
                   <Table.Tr key={k}>
@@ -121,7 +132,7 @@ export function DataCard({
                     <Table.Td>{opt(m.lateralOffset, 'length')}</Table.Td>
                     <Table.Td>{opt(m.cant, 'angle')}</Table.Td>
                     <Table.Td>{opt(m.zeroRange, 'range')}</Table.Td>
-                    <Table.Td>{zero.zeroAir ?? 'n/a'}</Table.Td>
+                    <Table.Td>{air || 'n/a'}</Table.Td>
                     <Table.Td>{zero.dragFactor ?? 'n/a'}</Table.Td>
                     <Table.Td>{m.zeroNotes || 'n/a'}</Table.Td>
                   </Table.Tr>

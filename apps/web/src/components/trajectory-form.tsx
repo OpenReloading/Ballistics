@@ -102,8 +102,8 @@ const designKeys = ['mass', 'diameter', 'length']
 type BulletDesignRecord = Extract<UserRecord, { kind: 'bulletDesign' }>
 /** The panels open at the start; the zero air and drag panel opens when a value fills it. */
 const panels = ['bullet', 'load', 'rifle', 'conditions', 'output']
-/** The fields a firearm choice fills. */
-const sightKeys: string[] = ['sightHeight', 'twist', 'zeroRange', ...zeroKeys]
+/** The fields a firearm choice fills and an edit leaves; the zero air and drag factor stay editable per run. */
+const sightKeys = ['sightHeight', 'twist', 'zeroRange']
 const omittedText: Record<OmittedEffect, string> = {
   coriolis: 'Coriolis',
   coriolisVertical: 'vertical Coriolis',
@@ -821,8 +821,11 @@ export function TrajectoryForm({
   // biome-ignore lint/correctness/useExhaustiveDependencies: follows the load's firearm, not a unit switch
   useEffect(() => {
     if (loadSight !== undefined) {
-      zeroFromLoad.current = true
-      fillZero((key) => load[key], loadFactorSource)
+      // a firearm without them leaves typed or linked values alone, unless they are another
+      // firearm's
+      const has = zeroKeys.some((key) => load[key] !== undefined)
+      if (has || zeroFromLoad.current) fillZero((key) => load[key], loadFactorSource)
+      zeroFromLoad.current = has
     } else if (zeroFromLoad.current) {
       // the load's firearm has no mount or was cleared: its zero air and factor go with it
       zeroFromLoad.current = false
@@ -1011,7 +1014,7 @@ export function TrajectoryForm({
                   description={
                     sightGone
                       ? 'The chosen firearm is no longer in this browser; its values stay.'
-                      : 'From your firearm library; fills sight height, twist and zero range.'
+                      : 'From your firearm library; fills sight height, twist, zero range, zero air and drag factor.'
                   }
                   value={sight}
                   onFocus={readSights}
