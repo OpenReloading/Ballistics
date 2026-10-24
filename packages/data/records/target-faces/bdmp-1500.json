@@ -1,0 +1,364 @@
+{
+  "id": "bdmp-1500",
+  "name": "BDMP-Scheibe BDMP 1500",
+  "organization": "BDMP",
+  "rings": [
+    {
+      "value": 7,
+      "diameter": {
+        "value": 400
+      },
+      "height": {
+        "value": 600
+      }
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 300
+      },
+      "height": {
+        "value": 450
+      }
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 200
+      },
+      "height": {
+        "value": 300
+      }
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 100
+      },
+      "height": {
+        "value": 150
+      }
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 50
+    },
+    "height": {
+      "value": 75
+    }
+  },
+  "blackDiameter": {
+    "value": 560
+  },
+  "blackHeight": {
+    "value": 840
+  },
+  "events": [
+    {
+      "name": "BDMP Revolver 1500",
+      "distance": {
+        "value": 50000,
+        "raw": "50 Meter/Yards"
+      },
+      "section": "B.11.11 and C.8.3 (Teil B, PDF p. 46; Teil C, PDF p. 44)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP Pistol 1500",
+      "distance": {
+        "value": 50000,
+        "raw": "50 Meter/Yards"
+      },
+      "section": "B.11.11 and C.8.3 (Teil B, PDF p. 46; Teil C, PDF p. 44)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP Distinguished Pistol Match",
+      "distance": {
+        "value": 50000,
+        "raw": "50 Meter/Yards"
+      },
+      "section": "B.11.11 and C.8.3 (Teil B, PDF p. 46; Teil C, PDF p. 44)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP Open Match",
+      "distance": {
+        "value": 50000,
+        "raw": "50 Meter/Yards"
+      },
+      "section": "B.11.11 and C.8.3 (Teil B, PDF p. 46; Teil C, PDF p. 44)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP Distinguished Revolver Match",
+      "distance": {
+        "value": 50000,
+        "raw": "50 Meter/Yards"
+      },
+      "section": "B.11.11 and C.8.3 (Teil B, PDF p. 46; Teil C, PDF p. 44)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP Standard Revolver 4,25“",
+      "distance": {
+        "value": 25000,
+        "raw": "25 Meter/Yards"
+      },
+      "section": "B.11.11 and C.8.3 (Teil B, PDF p. 46; Teil C, PDF p. 44)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP Standard Revolver 2,75“",
+      "distance": {
+        "value": 25000,
+        "raw": "25 Meter/Yards"
+      },
+      "section": "B.11.11 and C.8.3 (Teil B, PDF p. 46; Teil C, PDF p. 44)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP Standard Revolver 2,75“ 5 shot",
+      "distance": {
+        "value": 25000,
+        "raw": "25 Meter/Yards"
+      },
+      "section": "B.11.11 and C.8.3 (Teil B, PDF p. 46; Teil C, PDF p. 44)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP Standard Semi-Automatic Pistol",
+      "distance": {
+        "value": 25000,
+        "raw": "25 Meter/Yards"
+      },
+      "section": "B.11.11 and C.8.3 (Teil B, PDF p. 46; Teil C, PDF p. 44)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP Standard Semi-Automatic Pistol Production",
+      "distance": {
+        "value": 25000,
+        "raw": "25 Meter/Yards"
+      },
+      "section": "B.11.11 and C.8.3 (Teil B, PDF p. 46; Teil C, PDF p. 44)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP Standard Semi-Automatic Pistol 3,7“",
+      "distance": {
+        "value": 25000,
+        "raw": "25 Meter/Yards"
+      },
+      "section": "B.11.11 and C.8.3 (Teil B, PDF p. 46; Teil C, PDF p. 44)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP Revolver 1020",
+      "distance": {
+        "value": 25000,
+        "raw": "25 Meter/ Yard"
+      },
+      "section": "B.11.11 and C.21 (Teil B, PDF p. 46; Teil C, PDF pp. 138 to 139)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP Pistol 1020",
+      "distance": {
+        "value": 25000,
+        "raw": "25 Meter/ Yard"
+      },
+      "section": "B.11.11 and C.21 (Teil B, PDF p. 46; Teil C, PDF pp. 138 to 139)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP Distinguished Pistol 1020",
+      "distance": {
+        "value": 25000,
+        "raw": "25 Meter/ Yard"
+      },
+      "section": "B.11.11 and C.21 (Teil B, PDF p. 46; Teil C, PDF pp. 138 to 139)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP Distinguished Revolver 1020",
+      "distance": {
+        "value": 25000,
+        "raw": "25 Meter/ Yard"
+      },
+      "section": "B.11.11 and C.21 (Teil B, PDF p. 46; Teil C, PDF pp. 138 to 139)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP Standard Revolver 4,25“ 1020",
+      "distance": {
+        "value": 25000,
+        "raw": "25 Meter/ Yard"
+      },
+      "section": "B.11.11 and C.21 (Teil B, PDF p. 46; Teil C, PDF pp. 138 to 139)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP Standard Semi-Automatic Pistol 1020",
+      "distance": {
+        "value": 25000,
+        "raw": "25 Meter/ Yard"
+      },
+      "section": "B.11.11 and C.21 (Teil B, PDF p. 46; Teil C, PDF pp. 138 to 139)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP DKS 1 - 1020 Dynamisches Kleinkaliberschießen 1 1020",
+      "distance": {
+        "value": 25000,
+        "raw": "25 Meter"
+      },
+      "section": "B.11.11 and C.15A.4 (Teil B, PDF p. 46; Teil C, PDF p. 110)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP .30 M1 Carbine 1500",
+      "distance": {
+        "value": 50000,
+        "raw": "50 Meter"
+      },
+      "section": "B.11.11 and D.10A.7 (Teil B, PDF p. 46; Teil D, PDF pp. 45 to 46)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP LAR 3 Lever Action Rifle 3 (LAR - 1500)",
+      "distance": {
+        "value": 50000,
+        "raw": "50 Meter"
+      },
+      "section": "B.11.11 and D.16A.8 (Teil B, PDF p. 46; Teil D, PDF p. 95)",
+      "scoring": "touch"
+    }
+  ],
+  "paper": {
+    "width": {
+      "value": 580
+    },
+    "height": {
+      "value": 1120
+    }
+  },
+  "photoSearch": false,
+  "note": "Oval ring face, black on white, with an arrow mark (shaft 150 x 155 mm, head 250 x 100 mm). The book describes no ring below 7 inside the black area (560 x 840 mm).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.11, Teil B, Seite 46 von 70, PDF p. 46",
+        "fields": ["name", "rings", "innerTen.diameter", "paper", "blackDiameter", "blackHeight"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.3, Teil C, Seite 44 von 142, PDF p. 44",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.3, Teil C, Seite 44 von 142, PDF p. 44",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.3, Teil C, Seite 44 von 142, PDF p. 44",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.3, Teil C, Seite 44 von 142, PDF p. 44",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.3, Teil C, Seite 44 von 142, PDF p. 44",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.3, Teil C, Seite 44 von 142, PDF p. 44",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.3, Teil C, Seite 44 von 142, PDF p. 44",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.3, Teil C, Seite 44 von 142, PDF p. 44",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.3, Teil C, Seite 44 von 142, PDF p. 44",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.3, Teil C, Seite 44 von 142, PDF p. 44",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.3, Teil C, Seite 44 von 142, PDF p. 44",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.21, Teil C, Seite 138 bis 139 von 142, PDF pp. 138 to 139",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.21, Teil C, Seite 138 bis 139 von 142, PDF pp. 138 to 139",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.21, Teil C, Seite 138 bis 139 von 142, PDF pp. 138 to 139",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.21, Teil C, Seite 138 bis 139 von 142, PDF pp. 138 to 139",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.21, Teil C, Seite 138 bis 139 von 142, PDF pp. 138 to 139",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.21, Teil C, Seite 138 bis 139 von 142, PDF pp. 138 to 139",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.15A.4, Teil C, Seite 110 von 142, PDF p. 110",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10A.7, Teil D, Seite 45 bis 46 von 294, PDF pp. 45 to 46",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16A.8, Teil D, Seite 95 von 294, PDF p. 95",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-6",
+        "page": "A.3.21.1.3, Teil A, Seite 14 von 32, PDF p. 14",
+        "fields": ["events.scoring"]
+      }
+    ]
+  }
+}

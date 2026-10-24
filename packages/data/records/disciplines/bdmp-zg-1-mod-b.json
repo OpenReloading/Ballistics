@@ -1,0 +1,29 @@
+{
+  "id": "bdmp-zg-1-mod-b",
+  "federation": "bdmp",
+  "name": "Zielfernrohrgewehr 1 modifiziert B",
+  "number": "ZG 1 mod. B",
+  "section": "D.11.16",
+  "page": "Teil D, Seite 70 von 294, PDF p. 70",
+  "distance": {
+    "value": 100000,
+    "raw": "100 m"
+  },
+  "category": "rifle",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.11.16, Teil D, Seite 70 von 294, PDF p. 70",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.11.13, Teil D, Seite 68 von 294, PDF p. 68",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "Sniper rifles of an army, police or customs introduced at any date, with a bipod allowed; split into ZG 1 mod. B1 (before 1 January 1965) and B2 (after) where needed. D.11.16 restates no distance, the record takes the 100 m of ZG 1 (D.11.13)."
+  }
+}

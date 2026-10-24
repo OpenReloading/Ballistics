@@ -1,0 +1,112 @@
+{
+  "id": "bdmp-1500-reduced",
+  "name": "BDMP-Scheibe BDMP 1500 reduziert",
+  "organization": "BDMP",
+  "rings": [
+    {
+      "value": 7,
+      "diameter": {
+        "value": 200
+      },
+      "height": {
+        "value": 300
+      }
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 150
+      },
+      "height": {
+        "value": 225
+      }
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 100
+      },
+      "height": {
+        "value": 150
+      }
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 50
+      },
+      "height": {
+        "value": 75
+      }
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 27
+    },
+    "height": {
+      "value": 40
+    }
+  },
+  "blackDiameter": {
+    "value": 285
+  },
+  "blackHeight": {
+    "value": 420
+  },
+  "events": [
+    {
+      "name": "BDMP DKS 2 1020 Dynamisches Kleinkaliberschießen 2 1020",
+      "distance": {
+        "value": 25000,
+        "raw": "25 Meter"
+      },
+      "section": "B.11.11 and D.22.A.5 (Teil B, PDF p. 46; Teil D, PDF p. 203)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP BDMP 1500 Carbine",
+      "distance": {
+        "value": 50000,
+        "raw": "50 Meter/Yards"
+      },
+      "section": "B.11.11 and D.37.8 (Teil B, PDF p. 46; Teil D, PDF p. 288)",
+      "scoring": "touch"
+    }
+  ],
+  "paper": {
+    "width": {
+      "value": 300
+    },
+    "height": {
+      "value": 630
+    }
+  },
+  "photoSearch": false,
+  "note": "Reduced face for the 50 m parts shot at 25 m, with an arrow mark (shaft 75 x 78 mm, head 125 x 50 mm). The book describes no ring below 7 inside the black area (285 x 420 mm).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.11, Teil B, Seite 46 von 70, PDF p. 46",
+        "fields": ["name", "rings", "innerTen.diameter", "paper", "blackDiameter", "blackHeight"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.22.A.5, Teil D, Seite 203 von 294, PDF p. 203",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.37.8, Teil D, Seite 288 von 294, PDF p. 288",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-6",
+        "page": "A.3.21.1.3, Teil A, Seite 14 von 32, PDF p. 14",
+        "fields": ["events.scoring"]
+      }
+    ]
+  }
+}

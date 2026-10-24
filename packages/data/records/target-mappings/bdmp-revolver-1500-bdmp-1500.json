@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-revolver-1500-bdmp-1500",
+  "discipline": "bdmp-revolver-1500",
+  "face": "bdmp-1500",
+  "event": "BDMP Revolver 1500",
+  "shotCount": 150,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.11, Teil B, Seite 46 von 70, PDF p. 46",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.3, Teil C, Seite 44 von 142, PDF p. 44",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.9.1.4, Teil C, Seite 59 von 142, PDF p. 59",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "Matches 1 to 5 of C.8.2 (Teil C, PDF pp. 42 to 43) at 7 (10), 15, 25 and 50 m or yd. The book allows the reduced face for the 50 m parts shot at 25 m (C.8.3, Teil C, PDF p. 44), which has its own record."
+  }
+}

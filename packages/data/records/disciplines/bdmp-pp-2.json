@@ -1,0 +1,29 @@
+{
+  "id": "bdmp-pp-2",
+  "federation": "bdmp",
+  "name": "Police Pistol 2",
+  "number": "PP 2",
+  "section": "C.6B",
+  "page": "Teil C, Seite 27 bis 29 von 142, PDF pp. 27 to 29",
+  "distance": {
+    "value": 50000,
+    "raw": "50 m / y"
+  },
+  "category": "pistol",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6B, C.6B.1, Teil C, Seite 27 von 142, PDF p. 27",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6B.5, Teil C, Seite 27 von 142, PDF p. 27",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "The course runs at 10, 50 and 25 m or yd, the record holds the longest distance. PP 2 may also be shot with optical sights as PP 2 Optical Sight, scored separately (C.6B.7, Teil C, PDF p. 29)."
+  }
+}
