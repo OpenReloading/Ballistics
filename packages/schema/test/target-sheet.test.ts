@@ -63,7 +63,7 @@ const sheet = {
       },
       face: {
         id: 'issf-50m-rifle',
-        event: '50m Rifle Prone',
+        event: '50m-rifle-prone',
         marks: [
           { ring: 8, x: 0.0212, y: 0 },
           { ring: 8, x: -0.0212, y: 0 },
@@ -154,6 +154,7 @@ describe('targetSheet', () => {
         'marks.0.ring',
       ],
       [{ id: '' }, 'id'],
+      [{ id: 'issf-50m-rifle', event: '50m Rifle Prone' }, 'event'],
     ] as const)
       expectIssueAt(targetSheet, { ...sheet, groups: [{ ...g, face }] }, `groups.0.face.${path}`)
   })

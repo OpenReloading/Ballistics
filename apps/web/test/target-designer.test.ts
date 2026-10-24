@@ -61,6 +61,17 @@ describe('faceOf', () => {
     })
   })
 
+  it('gives every event an id the schema accepts, also for punctuation, umlauts and repeats', () => {
+    const names = ['Präz. 25 m', '???', 'Präz. 25 m', 'a', 'a', 'a-2']
+    const data = { ...club, events: names.map((name) => ({ name, distance: 25_000 })) }
+    const built = faceOf(draft(data), 'user-a1')
+    if (!('face' in built)) throw new Error(JSON.stringify(built.problems))
+    expect(targetFace.safeParse(built.face).success).toBe(true)
+    const ids = built.face.events.map((e) => e.id)
+    expect(new Set(ids).size).toBe(names.length)
+    expect(ids.slice(0, 3)).toEqual(['pr-z-25-m', 'event', 'pr-z-25-m-2'])
+  })
+
   it('builds the same face from numbers entered in inches', () => {
     const inches = fromFile(club, 'Club face', us)
     expect(faceOf(inches, 'user-a1')).toEqual(faceOf(draft(), 'user-a1'))

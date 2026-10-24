@@ -40,16 +40,17 @@ export const userFaceId = (recordId: string) =>
  * hyphens, `event` where that is empty, and a number after a repeat so that every id is unique.
  */
 function eventIds(names: readonly string[]) {
-  const seen = new Map<string, number>()
+  const used = new Set<string>()
   return names.map((name) => {
     const base =
       name
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-|-$/g, '') || 'event'
-    const n = (seen.get(base) ?? 0) + 1
-    seen.set(base, n)
-    return n === 1 ? base : `${base}-${n}`
+    let id = base
+    for (let n = 2; used.has(id); n++) id = `${base}-${n}`
+    used.add(id)
+    return id
   })
 }
 
