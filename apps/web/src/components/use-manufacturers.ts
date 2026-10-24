@@ -45,8 +45,14 @@ export function useManufacturers() {
   )
   const latest = useRef(known)
   latest.current = known
-  const ensure = useCallback((typed: string): string | undefined => {
-    const to = referTo(latest.current, typed, newId, new Date())
+  /** The reference `typed` stands for, `id` the UUID of a new manufacturer; nothing is stored. */
+  const preview = useCallback(
+    (typed: string, id: string) => referTo(latest.current, typed, () => id, new Date())?.ref,
+    [],
+  )
+  /** As `preview`, and stores the new user manufacturer under `id`. */
+  const ensure = useCallback((typed: string, id: string): string | undefined => {
+    const to = referTo(latest.current, typed, () => id, new Date())
     if (to?.created) {
       const record = to.created
       latest.current = [
@@ -59,5 +65,12 @@ export function useManufacturers() {
     }
     return to?.ref
   }, [])
-  return { known, names, ensure, nameOf: (ref: string | undefined) => refName(names, ref) }
+  return {
+    known,
+    names,
+    preview,
+    ensure,
+    newId,
+    nameOf: (ref: string | undefined) => refName(names, ref),
+  }
 }

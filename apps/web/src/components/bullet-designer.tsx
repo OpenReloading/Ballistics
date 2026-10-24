@@ -267,7 +267,9 @@ export function BulletDesigner() {
     </div>
   )
 
-  const title = `Outline, ${productLabel(design) || 'new bullet'}`
+  const labelOf = (d: Design) =>
+    productLabel({ name: d.name, manufacturerName: manufacturers.nameOf(d.manufacturer) })
+  const title = `Outline, ${labelOf(design) || 'new bullet'}`
   const symbols =
     drawing &&
     [...drawing.profile.annotation.dimensions, ...drawing.profile.annotation.radii].map(
@@ -329,7 +331,7 @@ export function BulletDesigner() {
       <FileMenu
         ref={fileMenu}
         kind="bullet"
-        name={productLabel(fileDesign) || 'New bullet'}
+        name={labelOf(fileDesign) || 'New bullet'}
         data={fileValue}
         problem={fileDesign.locked?.reason}
         onOpen={openFile}

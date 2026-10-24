@@ -318,7 +318,7 @@ export function reduce(h: History, a: Action): History {
     case 'text':
       return editHistory(h, { ...h.present, [a.key]: a.value }, a.key)
     case 'manufacturer':
-      return pushHistory(h, { ...h.present, manufacturer: a.value }, 'manufacturer')
+      return editHistory(h, { ...h.present, manufacturer: a.value }, 'manufacturer')
     case 'choice':
       // one step per choice; the choice is the field edited last, where a refusal naming it shows
       return pushHistory(

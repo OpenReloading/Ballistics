@@ -26,7 +26,7 @@ async function saveInFolder(page: Page) {
   await page.goto('/bullets/designer')
   await folderItem(page, 'Choose workspace folder…')
   await expect(state(page)).toHaveText('Not saved to a file, folder workspace')
-  await page.getByLabel('Manufacturer').fill('Folder')
+  await page.getByRole('combobox', { name: 'Manufacturer' }).fill('Folder')
   await (await barButton(page, 'Save')).click()
   await expect(state(page)).toHaveText('Saved: folder.json, folder workspace')
 }
@@ -37,7 +37,21 @@ test('saves go into the folder without a picker; the folder can be forgotten', a
     const dir = await (await navigator.storage.getDirectory()).getDirectoryHandle('workspace')
     return (await (await dir.getFileHandle('folder.json')).getFile()).text()
   })
-  expect(JSON.parse(text).records[0].data.manufacturer).toMatch(/^user:/)
+  const { manufacturer } = JSON.parse(text).records[0].data
+  // the typed name became a user manufacturer of the browser, which the bullet references
+  const stored = await page.evaluate(
+    () =>
+      new Promise<{ kind: string; id: string; name: string }[]>((ok, no) => {
+        const open = indexedDB.open('openreloading-user-data')
+        open.onerror = () => no(open.error)
+        open.onsuccess = () => {
+          const all = open.result.transaction('records').objectStore('records').getAll()
+          all.onsuccess = () => ok(all.result)
+        }
+      }),
+  )
+  expect(stored.find((r) => r.kind === 'manufacturer')).toMatchObject({ name: 'Folder' })
+  expect(manufacturer).toBe(`user:${stored.find((r) => r.kind === 'manufacturer')?.id}`)
   await folderItem(page, 'Forget workspace folder')
   await expect(state(page)).toHaveText('Saved: folder.json')
 })
