@@ -1,4 +1,4 @@
-import type { UserRecord } from '@openreloading/schema'
+import { fromSi, type UserBullet, type UserCartridge } from '@openreloading/schema'
 import { expect, it } from 'vitest'
 import { bulletMatches } from '../src/lib/bullet-rows.ts'
 import { emptyDirectory, readDirectory, writeDirectory } from '../src/lib/directory.ts'
@@ -13,23 +13,37 @@ import {
   userRecordId,
   writeOrigins,
 } from '../src/lib/sources.ts'
+import type { UserCartridgeView } from '../src/lib/variants.ts'
+import { resolvedBullet, resolvedCartridge } from './resolved.ts'
 
-const saved = '2026-10-19T08:00:00.000Z'
-const bullet = (id: string, si: Record<string, number>, manufacturerName = 'Me', name = 'Draft') =>
-  ({
-    kind: 'bulletDesign',
-    id,
-    name: `${manufacturerName} ${name}`,
-    saved,
-    data: {
-      manufacturerName,
+const quantityOf = (kind: 'length' | 'mass', si: number | undefined) =>
+  si === undefined ? undefined : { value: fromSi(kind, si) }
+/** A bullet view with the SI values given as overrides of no base. */
+const bullet = (
+  id: string,
+  si: Record<string, number>,
+  manufacturerName = 'Me',
+  name = 'Draft',
+) => {
+  const data: UserBullet = {
+    origin: 'user',
+    manufacturerName,
+    overrides: {
       name,
-      choices: { 'base.type': '', 'ogive.form': '', 'tip.type': '' },
-      siValues: si,
+      ...(si.diameter !== undefined && { diameter: quantityOf('length', si.diameter) }),
+      ...(si.mass !== undefined && { mass: quantityOf('mass', si.mass) }),
+      ...(si.length !== undefined && { length: quantityOf('length', si.length) }),
     },
-  }) as UserRecord
-const cartridge = (id: string, name: string, values: object[]) =>
-  ({ kind: 'cartridgeDesign', id, name, saved, data: { table: 'I', values } }) as UserRecord
+  }
+  return { id, name: `${manufacturerName} ${name}`, data, resolved: resolvedBullet(data), si }
+}
+const cartridge = (id: string, name: string, values: object[]): UserCartridgeView => {
+  const data = {
+    origin: 'user',
+    overrides: { table: 'I', values },
+  } as UserCartridge
+  return { id, name, data, resolved: resolvedCartridge(data) }
+}
 
 it('reads the sources that are on: absent, empty or unknown names mean all', () => {
   expect(readOrigins(undefined)).toEqual(['openreloading', 'user'])
@@ -80,10 +94,9 @@ it('counts rows per source and filters rows by the sources on', () => {
   expect(rows.filter((r) => inOrigins(r, 'openreloading'))).toHaveLength(3)
 })
 
-it('lists bullet designs as rows in mm and g, other kinds left out', () => {
+it('lists bullet designs as rows in mm and g', () => {
   const rows = userBulletRows([
     bullet('a1', { diameter: 0.007823, mass: 0.010886, length: 0.0315 }, 'Me', 'Test 168'),
-    cartridge('c1', 'x', []),
   ])
   expect(rows).toHaveLength(1)
   const [r] = rows
@@ -118,15 +131,14 @@ it('lists cartridge designs with the smallest cartridge G1, L3, L6 and the Pmax'
   const [r] = userCartridgeRows([
     cartridge('c1', 'My .308', [
       { side: 'cartridge', symbol: 'G1', quantity: 'length', value: 7.85 },
-      { side: 'cartridge', symbol: 'G1', quantity: 'length', value: 7.9 },
+      { side: 'cartridge', symbol: 'G1', variant: 'a', quantity: 'length', value: 7.9 },
       { side: 'chamber', symbol: 'G1', quantity: 'length', value: 7.8 },
       { side: 'cartridge', symbol: 'L3', quantity: 'length', value: 51.18 },
       { side: 'cartridge', symbol: 'L6', quantity: 'length', value: 71.12 },
       { symbol: 'Pmax', quantity: 'pressure', value: 4150 },
-      { symbol: 'Pmax', quantity: 'pressure', value: 4000 },
-      { side: 'cartridge', symbol: 'L6', quantity: 'length' },
+      { symbol: 'Pmax', variant: 'a', quantity: 'pressure', value: 4000 },
+      { side: 'cartridge', symbol: 'L6', variant: 'a', quantity: 'length' },
     ]),
-    bullet('a1', {}),
   ])
   expect(r).toEqual({
     id: 'user:c1',

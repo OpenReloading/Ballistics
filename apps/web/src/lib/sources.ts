@@ -1,7 +1,7 @@
 /** List sources: OpenReloading records and the user records of the browser. */
-import { fromSi, type UserRecord } from '@openreloading/schema'
 import type { BulletRow } from './bullet-rows.ts'
 import type { CartridgeRow } from './cartridge-rows.ts'
+import type { UserBulletView, UserCartridgeView } from './variants.ts'
 
 export const origins = ['openreloading', 'user'] as const
 export type Origin = (typeof origins)[number]
@@ -66,22 +66,20 @@ export const userRecordId = (rowId: string) =>
 export const designerHref = (kind: 'bullets' | 'cartridges', rowId: string) =>
   `/${kind}/designer?record=${encodeURIComponent(userRecordId(rowId) ?? rowId)}`
 
-/** Bullet designs with a diameter as list rows: lengths in mm, mass in g; absent values stay absent. */
-export function userBulletRows(records: readonly UserRecord[]): BulletRow[] {
-  return records.flatMap((r) => {
-    if (r.kind !== 'bulletDesign') return []
-    const { diameter, mass, length } = r.data.siValues
-    // the diameter is the designer's one required value: a design without it has no caliber to list
-    if (diameter === undefined) return []
+/** User bullets with a diameter as list rows: lengths in mm, mass in g; absent values stay absent. */
+export function userBulletRows(views: readonly UserBulletView[]): BulletRow[] {
+  return views.flatMap(({ id, name, data, resolved: { record } }) => {
+    // the diameter is the designer's one required value: a bullet without it has no caliber to list
+    if (record.diameter === undefined) return []
     return [
       {
-        id: userRowId(r.id),
+        id: userRowId(id),
         origin: 'user' as const,
-        manufacturerName: r.data.manufacturerName,
-        name: r.data.name || r.name,
-        diameter: fromSi('length', diameter),
-        mass: mass === undefined ? null : fromSi('mass', mass),
-        length: length === undefined ? null : fromSi('length', length),
+        manufacturerName: data.manufacturerName,
+        name: record.name || name,
+        diameter: record.diameter.value,
+        mass: record.mass?.value ?? null,
+        length: record.length?.value ?? null,
         ballisticCoefficientG1: null,
         ballisticCoefficientG7: null,
       },
@@ -89,12 +87,11 @@ export function userBulletRows(records: readonly UserRecord[]): BulletRow[] {
   })
 }
 
-/** Cartridge designs as list rows: the smallest cartridge-side G1, L3, L6 and the largest Pmax. */
-export function userCartridgeRows(records: readonly UserRecord[]): CartridgeRow[] {
-  return records.flatMap((r) => {
-    if (r.kind !== 'cartridgeDesign') return []
+/** User cartridges as list rows: the smallest cartridge-side G1, L3, L6 and the largest Pmax. */
+export function userCartridgeRows(views: readonly UserCartridgeView[]): CartridgeRow[] {
+  return views.map(({ id, name, resolved: { record } }) => {
     const of = (symbol: string, side: 'cartridge' | undefined) =>
-      r.data.values
+      record.values
         .filter((v) => v.symbol === symbol && v.side === side && v.value !== undefined)
         .map((v) => v.value as number)
     const smallest = (symbol: string) => {
@@ -103,17 +100,15 @@ export function userCartridgeRows(records: readonly UserRecord[]): CartridgeRow[
     }
     const [g1, l3, l6] = [smallest('G1'), smallest('L3'), smallest('L6')]
     const pmax = of('Pmax', undefined)
-    return [
-      {
-        id: userRowId(r.id),
-        origin: 'user' as const,
-        name: r.name,
-        aliases: [],
-        ...(g1 !== undefined && { maxBulletDiameter: g1 }),
-        ...(l3 !== undefined && { caseLength: l3 }),
-        ...(l6 !== undefined && { cartridgeLength: l6 }),
-        ...(pmax.length > 0 && { pmax: Math.max(...pmax) }),
-      },
-    ]
+    return {
+      id: userRowId(id),
+      origin: 'user' as const,
+      name,
+      aliases: [],
+      ...(g1 !== undefined && { maxBulletDiameter: g1 }),
+      ...(l3 !== undefined && { caseLength: l3 }),
+      ...(l6 !== undefined && { cartridgeLength: l6 }),
+      ...(pmax.length > 0 && { pmax: Math.max(...pmax) }),
+    }
   })
 }

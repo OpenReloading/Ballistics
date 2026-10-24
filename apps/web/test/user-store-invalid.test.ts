@@ -13,15 +13,20 @@ import {
 
 const saved = '2026-10-13T10:00:00.000Z'
 const valid: UserRecord = {
-  kind: 'bulletDesign',
+  kind: 'bullet',
   id: 'b1',
   name: 'Valid design',
   saved,
   data: {
+    origin: 'user',
     manufacturerName: 'Example',
-    name: '168 gr',
-    choices: { 'base.type': 'boat-tail', 'ogive.form': 'tangent', 'tip.type': '' },
-    siValues: { diameter: 7.82e-3, mass: 0.0108862 },
+    overrides: {
+      name: '168 gr',
+      diameter: { value: 7.82 },
+      mass: { value: 10.8862 },
+      base: { type: 'boat-tail' },
+      ogive: { form: 'tangent' },
+    },
   },
 }
 const bad = { kind: 'bulletDesign', id: 'old-1', name: 'Old design', saved, data: 'not an object' }

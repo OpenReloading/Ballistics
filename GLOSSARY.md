@@ -567,27 +567,30 @@ _Avoid_: `shots` (as a count), n
 A JSON file of the web app with `format` (`openreloading-user-data`), `version` (a file of another version is refused), `records` and the photos of its target sheets in `files`.
 
 **User record**:
-One entry of `records`: `kind` (`bulletDesign`, `cartridgeDesign`, `workbenchState`, `firearm`, `targetSheet`), `id`, `name`, `saved` (ISO date and time of the save) and the `data` of that kind.
+One entry of `records`: `kind` (`bullet`, `cartridge`, `workbenchState`, `firearm`, `targetSheet`), `id`, `name`, `saved` (ISO date and time of the save) and the `data` of that kind.
 _Avoid_: workbenchLoad
 
 **Embedded file**:
 One entry of `files`: a photo with `id`, media `type` and base64 `data`.
 
 **Bullet design**:
-A user record of kind `bulletDesign`: `manufacturerName`, `name`, the `choices` of `base.type`, `ogive.form` and `tip.type`, `siValues` and `parent`.
+A user record of kind `bullet`: `origin` (`user`), `manufacturerName`, the `basedOn` catalogue reference and the `overrides` of the bullet fields, in stored units.
 
 **Cartridge design**:
-A user record of kind `cartridgeDesign`: the `table` and spec `values` the cartridge drawing reads, and `parent`.
+A user record of kind `cartridge`: `origin` (`user`), the `basedOn` catalogue reference and `overrides` of the `table` and the spec `values`.
 
-**Parent record**:
-`parent`: the catalogue record a design started from, `id` and `title`.
+**Base record**:
+`basedOn`: the catalogue record a design is a variant of, as `catalogue:<id>`. The resolved record is the base with the `overrides` applied (`applyOverrides`).
+
+**Overrides**:
+`overrides`: the fields of a design that differ from its base record. An object merges by key, an array replaces, a cartridge value merges by side, symbol and variant, `null` removes.
 
 **SI values**:
 `siValues`: SI value per field key of a designer or the workbench, as the share link carries them.
 _Avoid_: si
 
 **Workbench state**:
-A user record of kind `workbenchState`: `siValues`, the record ids `cartridge`, `bullet` and `powder`, `notes`, `measuredWaterCapacity`, the library `firearm`, `seating`, `ladder` and `measurements`. Saved alone it is the load file of `POST /v1/interior/load-file`.
+A user record of kind `workbenchState`: `siValues`, the `cartridge`, `bullet` (a record id or a reference, `user:<UUID>` for a design) and `powder` record ids, `notes`, `measuredWaterCapacity`, the library `firearm`, `seating`, `ladder` and `measurements`. Saved alone it is the load file of `POST /v1/interior/load-file`.
 _Avoid_: workbenchLoad
 
 **Notes**:

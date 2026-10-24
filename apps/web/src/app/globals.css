@@ -1426,6 +1426,13 @@ td.nowrap {
   margin-bottom: 0.25rem;
 }
 
+.designer-fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
 /* the designers' rows: label left, a 9rem field, about 28 px */
 .designer-grid > .mantine-InputWrapper-root,
 .designer-grid > .designer-field > .mantine-InputWrapper-root {

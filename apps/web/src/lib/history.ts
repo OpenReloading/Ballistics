@@ -54,7 +54,7 @@ export type DesignAction<D> =
   | { type: 'units'; system: UnitSystem }
 
 /** The designer actions of `DesignAction`; `fromOrigin` is the design of the record it started from. */
-export function designReduce<D extends { fields: Fields; origin?: O; parent?: unknown }, O>(
+export function designReduce<D extends { fields: Fields; origin?: O }, O>(
   h: History<D>,
   a: DesignAction<D>,
   specs: readonly FieldSpec[],
@@ -71,9 +71,7 @@ export function designReduce<D extends { fields: Fields; origin?: O; parent?: un
       // a new record: undo never crosses into the record before
       return historyOf(a.design)
     case 'reset':
-      return h.present.origin
-        ? pushHistory(h, { ...fromOrigin(h.present.origin, a.system), parent: h.present.parent })
-        : h
+      return h.present.origin ? pushHistory(h, fromOrigin(h.present.origin, a.system)) : h
     case 'undo':
       return undo(h)
     case 'redo':
