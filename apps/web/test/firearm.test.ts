@@ -75,7 +75,7 @@ describe('sightOptions', () => {
   const options = sightOptions([
     rifle,
     carbine,
-    { ...carbine, kind: 'workbenchState', data: { siValues: {} } } as UserRecord,
+    { ...carbine, kind: 'load', data: { origin: 'user' } } as UserRecord,
   ])
 
   it('lists every mount of every configuration, the active configuration of a firearm first', () => {

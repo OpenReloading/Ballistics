@@ -104,7 +104,7 @@ const kindNames: Record<UserRecordKind, string> = {
 }
 
 /** Kinds a share link carries: the designs and the workbench load. */
-const shareable: UserRecordKind[] = ['bullet', 'cartridge', 'workbenchState', 'load']
+const shareable: UserRecordKind[] = ['bullet', 'cartridge', 'load']
 
 const basedOnOf = (r: UserRecord) =>
   r.kind === 'bullet' || r.kind === 'cartridge' ? r.data.basedOn : undefined

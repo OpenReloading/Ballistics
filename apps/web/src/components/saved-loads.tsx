@@ -143,9 +143,7 @@ export function SavedLoads({
   useEffect(() => {
     if (!opened) return
     storedRecords()
-      .then(({ records }) =>
-        setRecords(records.filter((r): r is LoadRecord => r.kind === 'workbenchState')),
-      )
+      .then(({ records }) => setRecords(records.filter((r): r is LoadRecord => r.kind === 'load')))
       .catch(() => setMessage('The saved loads could not be read from this browser.'))
   }, [opened, tick])
 

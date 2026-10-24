@@ -37,11 +37,16 @@ const bullet: UserRecord = {
   },
 }
 const load: UserRecord = {
-  kind: 'workbenchState',
+  kind: 'load',
   id: 'w1',
   name: '308 Win.',
   saved,
-  data: { siValues: { charge: 0.0028 }, cartridge: '308-win', notes: 'first ladder' },
+  data: {
+    origin: 'user',
+    charge: { value: 2.8 },
+    cartridge: 'catalogue:308-win',
+    note: 'first ladder',
+  },
 }
 
 describe('user data files', () => {
@@ -99,7 +104,7 @@ describe('user data files', () => {
     const hostile = {
       ...load,
       name: '<img src=x onerror=alert(1)>',
-      data: { siValues: {}, notes: '"};' },
+      data: { origin: 'user', note: '"};' },
     }
     const parsed = parseUserDataFile(userDataText([hostile as UserRecord]))
     expect(parsed.ok && parsed.records[0].name).toBe('<img src=x onerror=alert(1)>')
@@ -113,10 +118,10 @@ describe('user data files', () => {
   })
 
   it('plans an import: new records added, equal ones left, other content asked', () => {
-    const changed = {
+    const changed: UserRecord = {
       ...load,
       saved: '2026-10-14T10:00:00.000Z',
-      data: { siValues: { charge: 0.003 } },
+      data: { origin: 'user', charge: { value: 3 } },
     }
     const sameData = { ...bullet, saved: '2026-10-14T10:00:00.000Z' }
     const fresh = { ...load, id: 'w2' }
@@ -270,7 +275,7 @@ describe('user data files', () => {
   })
 
   it('treats an empty text like an absent one when comparing', () => {
-    expect(canonicalJson({ siValues: {}, notes: '' })).toBe(canonicalJson({ siValues: {} }))
+    expect(canonicalJson({ origin: 'user', note: '' })).toBe(canonicalJson({ origin: 'user' }))
   })
 
   it('keeps only schema-valid records read from the browser store', () => {
