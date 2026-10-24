@@ -64,6 +64,7 @@ describe('parseShotView', () => {
     expect(r.missingPaths).toContain('provenance.sources.0.title')
     expect(r.warnings).toEqual([])
     expect(r.session.device.manufacturerName).toBe('Garmin')
+    expect(complete(r).device.manufacturer).toBe('catalogue:test-maker')
     expect(r.missingPaths).toContain('device.manufacturer')
   })
 

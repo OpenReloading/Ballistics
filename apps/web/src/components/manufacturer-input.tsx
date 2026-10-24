@@ -25,6 +25,8 @@ export const ManufacturerInput = memo(function ManufacturerInput({
   // undefined: not being edited, the field shows the name of `value`
   const [typed, setTyped] = useState<string>()
   const pending = useRef<string>(undefined)
+  // Mantine calls onChange with the option's text right after onOptionSubmit
+  const picked = useRef(false)
   const report = (text: string) => {
     pending.current ??= newId()
     const ref = preview(text, pending.current)
@@ -45,10 +47,17 @@ export const ManufacturerInput = memo(function ManufacturerInput({
       data={[...new Set(known.map((m) => m.name))]}
       limit={20}
       onChange={(text) => {
+        if (picked.current) return
         setTyped(text)
         report(text)
       }}
-      onOptionSubmit={commit}
+      onOptionSubmit={(text) => {
+        picked.current = true
+        queueMicrotask(() => {
+          picked.current = false
+        })
+        commit(text)
+      }}
       // the save shortcut works inside fields: the record goes into the store before the save does
       onKeyDown={(e) => {
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's' && typed !== undefined)
