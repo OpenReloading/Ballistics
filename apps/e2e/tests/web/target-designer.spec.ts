@@ -59,7 +59,7 @@ test('keeps the draft in the browser, reopens it and offers the face in the shot
   await expect(page.getByLabel('Ring 4 diameter')).toHaveValue('60')
   await gotoHydrated(page, '/groups')
   await page.getByLabel('Face', { exact: true }).selectOption({ label: 'User design Club face' })
-  await expect(page.getByLabel('Event', { exact: true })).toHaveValue('25 m')
+  await expect(page.getByLabel('Event', { exact: true })).toHaveValue('25-m')
 })
 
 for (const scheme of ['light', 'dark'] as const) {
