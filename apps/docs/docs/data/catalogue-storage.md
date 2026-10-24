@@ -5,7 +5,7 @@ description: Why the read-only catalogue needs no server database, the single se
 
 # Catalogue storage
 
-The catalogue (the records of `packages/data`) is read only, rebuilt from git on every build and small: about 1.2 thousand records in the public data. This page records how it is stored and queried, what was measured, and which part is already in code: the one search matcher and the one sort order in `packages/schema` (`src/search.ts`, `src/order.ts`) and the in-process catalogue module in `packages/api` (`src/catalogue/`), not yet used by the routes. Paths are relative to the repository root. The steps D0 to D6 of the epic "Data model: one entity per concept" carry the rest out.
+The catalogue (the records of `packages/data`) is read only, rebuilt from git on every build and small: about 1.2 thousand records in the public data. This page records how it is stored and queried, what was measured, and which part is already in code: the one search matcher and the one sort order in `packages/schema` (`src/search.ts`, `src/order.ts`) and the in-process catalogue module in `packages/api` (`src/catalogue/`), which the API's routes and compute lookups read. Paths are relative to the repository root. The steps D0 to D6 of the epic "Data model: one entity per concept" carry the rest out.
 
 ## Decision
 
@@ -13,7 +13,7 @@ No server database for the catalogue. A typed index and a record file are built 
 
 What decides it is not speed, since every option answers in under 3 ms at this size, but:
 
-1. **Parity.** One implementation of list, filter, search, ranking and order runs in Node and in the browser. The server answers `q` with SQL `ilike` (`packages/api/src/db/queries.ts`, `component-queries.ts`), the Pages edition with a lower-case `includes` over `search.json` (`apps/web/src/lib/static-api.ts`) and the web lists with `matchesQuery` (`apps/web/src/lib/lists.ts`): three matchers that disagree. `matchesQuery` now calls the schema's matcher; the API and the static edition move over in the later steps, and the bullet list's own word-start rule (`bulletMatches`) stays until the record pickers use the ranker.
+1. **Parity.** One implementation of list, filter, search, ranking and order runs in Node and in the browser. The server answered `q` with SQL `ilike` (`packages/api/src/db/queries.ts`, `component-queries.ts`), the Pages edition with a lower-case `includes` over `search.json` (`apps/web/src/lib/static-api.ts`) and the web lists with `matchesQuery` (`apps/web/src/lib/lists.ts`): three matchers that disagreed. All three now use the schema's matcher: the API through the catalogue, the Pages edition over the search keys of the index that `search.json` holds, the lists through `matchesQuery`. A `q` of spaces only is no query. The bullet list's own word-start rule (`bulletMatches`) stays until the record pickers use the ranker.
 2. **Three defects a database does not fix.** The JIT cost of PostgreSQL at default settings, two sort orders between the editions, and word-order dependent search.
 3. **Deletion.** The SQL layer (`packages/api/src/db/`), the PGlite path of the static build, the seed lock, the `db` service of `compose.yaml` and the database packages go away.
 
@@ -30,17 +30,17 @@ Ranked search over a generated 20,000 bullet index in plain JavaScript takes 1 t
 
 ## The module
 
-`packages/api/src/catalogue/` next to the SQL layer, which stays until the routes move over:
+`packages/api/src/catalogue/`. The routes, the compute record lookups, the server and the static build read it. The SQL layer next to it (`packages/api/src/db/`) answers nothing and stays only for the parity tests until it is removed:
 
 - `derive.ts`: one index row per record, `{ item, sortKey, search }`. `item` is the list item the route answers today (the cartridge's sheet minima and case head, a bullet's first G1 and G7 coefficient, a target face's caliber classes), `sortKey` and `search` come from the schema package's `sortKey` and `searchKey`. Also the revision: a synchronous 53-bit hash of the record's JSON text, the same in Node and the browser, for change detection only.
 - `build.ts`: `buildCatalogue(records)` returns the typed index (`CatalogueIndex`, every list in its default order, format 1) and the record file (every record by id, one map per kind). Pure, so the build, the tests and a browser can all run it. The files hold the records as they are: `kind`, `origin` and `revision` are added when a record is read.
 - `open.ts`: `openCatalogue({ index, records })` returns the `Catalogue` interface: `cartridges`, `powders`, `bullets` (with `q`, `table`, `manufacturer`, `cartridge`, `limit`, `offset`), `manufacturers`, `targetFaces`, `federations`, `disciplines`, `targetMappings`, `capacities` and `get(kind, id)`. The record file may be a function, read on the first `get`. An index of another format is rejected.
 - `list.ts`: the one filter, rank and page step. A query ranks by `score` and keeps the default order between equal ranks.
-- `browser.ts`: the entry `@openreloading/api/catalogue`. It imports core and schema only, no Node API (`test/compute-imports.test.ts`). `node.ts` reads and writes the two files (`index.json`, `records.json`), `write.ts` is the build step (`npm run build` writes them into `dist/catalogue/`, also exported as `@openreloading/api/catalogue/*.json`).
+- `browser.ts`: the entry `@openreloading/api/catalogue`. It imports core and schema only, no Node API (`test/compute-imports.test.ts`). `node.ts` reads and writes the two files (`index.json`, `records.json`), `write.ts` is the build step (`npm run build` writes them into `dist/catalogue/`, also exported as `@openreloading/api/catalogue/*.json`). The server opens them at start (`loadCatalogue`, no database, no wait) and answers a record as stored, without the added `kind`, `origin` and `revision`; the API image gets the files from the same build.
 
 Checks in `packages/api/test/`: `catalogue.test.ts` (derive, build, open, files), `catalogue-parity.test.ts` and `catalogue-budget.test.ts`.
 
-The parity test runs sixteen queries on the SQL layer (PGlite) and on the catalogue, over synthetic records and the public bundle: the cartridge list (all, `q`, `table`, paged), the powder list (all, `q`, `manufacturer`), the bullet list (all, `q`, `manufacturer`, `cartridge`), manufacturers, target faces, federations, disciplines and target mappings. It compares the totals and the sorted ids, not the order (the two orders differ on purpose) and not the paged ids. Where the catalogue finds more than `ilike`, a second test names the difference: words in any order and a number in another printed form.
+The parity test runs sixteen queries on the SQL layer (PGlite) and on the catalogue, over synthetic records and the public bundle: the cartridge list (all, `q`, `table`, paged), the powder list (all, `q`, `manufacturer`), the bullet list (all, `q`, `manufacturer`, `cartridge`), manufacturers, target faces, federations, disciplines and target mappings. It compares the totals, the sorted ids and the items, not the order of the name-sorted lists (the two orders differ on purpose) and not the paged ids. Further checks: the competition lists keep the same order in both layers (federations, disciplines, target faces, target mappings, both data sets), and every record route answers a body equal to the SQL layer's for every record of both data sets. Where the catalogue finds more than `ilike`, a second test names the difference: words in any order and a number in another printed form.
 
 The budgets, tested as the best of fifteen runs after a warm-up (other test files share the CPU): the index of the public bundle from its records in under 50 ms, from the prebuilt index text in under 9 ms, a ranked page of 50 cartridges in under 5 ms. Measured on the public bundle (577 cartridges, one machine): about 10 ms from the records, 1 ms from the prebuilt index (460 kB, the record file is 3.6 MB and read on the first `get`).
 
@@ -52,7 +52,7 @@ The interface stays, only the module that opens the catalogue changes: user enti
 
 Each row has one `sortKey` string, compared by UTF-16 code unit (`compareKeys` in `packages/schema/src/order.ts`). It is the folded names joined by U+001F, every run of digits padded to 8 digits, so "9 mm" sorts before "10 mm" without locale data. The key is identical in Node, the browser and SQL (`collate "C"`).
 
-The server edition orders by `name, id` under the container's locale, the Pages edition's data files come from PGlite (`C`), and for the 577 cartridges 501 positions differ between the two. The web tables sorted by `Intl.Collator`, a third order that depends on the browser's ICU data; they now sort text by `sortKey` too (`sortRows` in `apps/web/src/lib/lists.ts`); the API default order and the static edition follow in the later steps.
+The server edition orders by `name, id` under the container's locale, the Pages edition's data files come from PGlite (`C`), and for the 577 cartridges 501 positions differ between the two. The web tables sorted by `Intl.Collator`, a third order that depends on the browser's ICU data; they now sort text by `sortKey` too (`sortRows` in `apps/web/src/lib/lists.ts`); the API default order follows it now, and so do the Pages edition's data files, which `writeStaticApi` writes from the API.
 
 ## One matcher and ranker
 
@@ -66,7 +66,7 @@ So `win 308` and `308 win` give the same rows with the same scores, and `.308`, 
 
 ## Behaviour changes for the editions
 
-Non-breaking for the schema, visible in data: the default list order changes from the locale collation to `sortKey` order on the server edition, `q` becomes ranked and independent of word order, and `q` matches the compact form ("8x57"). The contract version does not change.
+In effect on the server edition and, through its data files, on the Pages edition. Non-breaking for the schema, visible in data: the default list order changes from the locale collation to `sortKey` order on the server edition, `q` becomes ranked and independent of word order, and `q` matches the compact form ("8x57"). The contract version does not change.
 
 ## Fallback schema (PostgreSQL 18, also PGlite)
 

@@ -15,15 +15,15 @@ import type { ComputeRunner, Results } from './tasks.ts'
 import { responseUnits } from './units.ts'
 
 /**
- * The compute runner and the record lookups a charge-target request reads. Each lookup rejects an
+ * The compute runner and the record lookups a charge-target request reads. Each lookup fails an
  * unknown id with a 404 error.
  */
 export type ChargeContext = {
   compute: ComputeRunner
   /** The cartridge record `id` with its values. */
-  findCartridge: (id: string) => Promise<CartridgeWithSpecs>
+  findCartridge: (id: string) => CartridgeWithSpecs | Promise<CartridgeWithSpecs>
   /** The powder record `id`. */
-  findPowder: (id: string) => Promise<Powder>
+  findPowder: (id: string) => Powder | Promise<Powder>
 }
 
 /** A range with no case, to read the limits of a cartridge without a run. */
@@ -141,7 +141,7 @@ function chargeAnswer({
  * `InputError`; a request value has passed that bound already.
  */
 async function resolvePowder(
-  findPowder: (id: string) => Promise<Powder>,
+  findPowder: (id: string) => Powder | Promise<Powder>,
   id: string | undefined,
   bulkDensity?: number,
 ) {

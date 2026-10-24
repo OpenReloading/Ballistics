@@ -1,7 +1,7 @@
 /**
  * The API of the Pages edition, in the browser. Reads answer from the data files the Pages build
  * writes under `<base>/api/` (`writeStaticApi` of `@openreloading/api/static`): lists filtered and
- * paged here as the API does, `q` over the texts of `<kind>/search.json`. `POST interior` and
+ * paged here as the API does, `q` ranked over the keys of `<kind>/search.json`. `POST interior` and
  * `interior/charge-target` run the API's own validation and runs (`@openreloading/api/compute`),
  * each compute task in a Web Worker of its own, terminated at the API's task deadline.
  */
@@ -17,7 +17,7 @@ import {
   runInterior,
   taskTimeoutMs,
 } from '@openreloading/api/compute'
-import type { Powder } from '@openreloading/schema'
+import { type Powder, score } from '@openreloading/schema'
 import { basePath } from './edition.ts'
 
 type List = { total: number; items: { id: string; manufacturer?: string }[] }
@@ -66,8 +66,8 @@ function integer(value: string | null, fallback: number, min: number, max: numbe
 }
 
 /**
- * A list answer. Cartridges, bullets and powders page (`limit`, `offset`) and search (`q` as the
- * API's `ilike '%q%'`), bullets and powders also by `manufacturer`, bullets by `cartridge`. The other lists answer every item. Other keys
+ * A list answer. Cartridges, bullets and powders page (`limit`, `offset`) and search (`q` ranked by
+ * `score` of the schema package over the `search` keys of the data files), bullets and powders also by `manufacturer`, bullets by `cartridge`. The other lists answer every item. Other keys
  * are dropped, as the API drops them. The filters of the federation lists (`federation`,
  * `discipline`, `face`) have no data files: 400.
  */
@@ -95,10 +95,16 @@ async function list(kind: string, query: URLSearchParams) {
   const source = cartridge === null ? `${kind}/index` : `bullets/cartridge/${cartridge}`
   let items = (await dataFile<List>(source))?.items ?? []
   if (manufacturer !== null) items = items.filter((i) => i.manufacturer === manufacturer)
-  if (q !== null) {
-    const texts = (await dataFile<Record<string, string[]>>(`${kind}/search`)) ?? {}
-    const needle = q.toLowerCase()
-    items = items.filter((i) => texts[i.id]?.some((t) => t.toLowerCase().includes(needle)))
+  if (q?.trim()) {
+    const keys = (await dataFile<Record<string, string>>(`${kind}/search`)) ?? {}
+    // the API's `select` (`packages/api/src/catalogue/list.ts`): ranked, equal ranks in list order
+    items = items
+      .flatMap((i) => {
+        const rank = score(keys[i.id] ?? '', q)
+        return rank === undefined ? [] : [{ i, rank }]
+      })
+      .sort((a, b) => b.rank - a.rank)
+      .map(({ i }) => i)
   }
   return answer(200, { total: items.length, items: items.slice(offset, offset + limit) })
 }

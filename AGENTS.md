@@ -63,7 +63,7 @@
 
 ## Environment
 
-- `DATABASE_URL`: PostgreSQL connection string (`.env.example` holds the local one). The API server reads it from the process environment. `npm start -w @openreloading/api` also loads the root `.env`, where the environment does not set it.
+- `DATABASE_URL`: PostgreSQL connection string (`.env.example` holds the local one). The API server does not read it (it answers from the catalogue files of the build); only the SQL layer's code and its tests remain until it is removed.
 - `API_URL`: base URL of the API for e2e tests, the web app (read at build time for static pages and at run time) and the link of the docs REST API page (site build).
 - `WEB_URL`: base URL of the web app for the e2e browser tests.
 - `NEXT_PUBLIC_REPOSITORY_URL`: URL of the public source repository, inlined at web build time (no Dockerfile `ARG`). Unset (`apps/web/src/lib/repository-url.ts`): no repository link in the header or the drawer. Set only by `pages.yml`, to the repository the workflow runs in.

@@ -1,6 +1,6 @@
 /**
  * Builds the Pages site into `pages/` at the repository root (README, Pages edition): the web app
- * as a static export under `PAGES_BASE_PATH`, every record page prerendered from the API on PGlite
+ * as a static export under `PAGES_BASE_PATH`, every record page prerendered from the API over the catalogue
  * seeded from the data bundle (`@openreloading/api/static`), its read answers as data files under
  * `api/`, the docs site under `docs/`, LICENSE, NOTICE, the data license (`data/LICENSE`) and
  * `.nojekyll`.

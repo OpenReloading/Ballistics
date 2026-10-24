@@ -1,27 +1,25 @@
 import { Writable } from 'node:stream'
 import { describe, expect, it } from 'vitest'
 import { buildApp } from '../src/app.ts'
+import type { Catalogue } from '../src/catalogue/types.ts'
 import { inlineRunner } from '../src/compute/tasks.ts'
-import type { Db } from '../src/db/index.ts'
 import { API_PREFIX } from '../src/version.ts'
-import { closeTestDb, createTestDb } from './setup.ts'
+import { bundle } from './fixtures.ts'
+import { testCatalogue } from './setup.ts'
 
-const sql = 'select "id", "name" from "cartridges" where "cartridges"."id" = $1'
+const reason = 'cannot read /app/packages/api/dist/catalogue/records.json: EACCES'
 
-/** A database whose every query fails as the driver reports it: SQL, parameters, a code and a stack. */
-const failingDb = {
-  select: () => {
-    const error = Object.assign(new Error(`Failed query: ${sql}\nparams: alpha`), {
-      code: '42P01',
-      detail: 'relation "cartridges" does not exist',
-    })
-    error.stack = `${error.message}\n    at query (/app/packages/api/dist/db/queries.js:12:3)`
+/** A catalogue whose record file cannot be read: the error carries a path, a code and a stack. */
+const failingCatalogue = {
+  get: () => {
+    const error = Object.assign(new Error(reason), { code: 'EACCES' })
+    error.stack = `${error.message}\n    at readFileSync (node:fs:441:20)`
     throw error
   },
-} as unknown as Db
+} as unknown as Catalogue
 
-/** An app on `db` whose log lines are collected in `lines`. */
-function withLog(db: Db) {
+/** An app on `catalogue` whose log lines are collected in `lines`. */
+function withLog(catalogue: Catalogue) {
   const lines: string[] = []
   const stream = new Writable({
     write(chunk, _encoding, done) {
@@ -29,12 +27,12 @@ function withLog(db: Db) {
       done()
     },
   })
-  return { app: buildApp({ db, logger: { level: 'info', stream } }), lines }
+  return { app: buildApp({ catalogue, logger: { level: 'info', stream } }), lines }
 }
 
 describe('error bodies', () => {
   it('answers 500 with a fixed message and the request id, and logs the error', async () => {
-    const { app, lines } = withLog(failingDb)
+    const { app, lines } = withLog(failingCatalogue)
     try {
       const res = await app.inject({ url: `${API_PREFIX}/cartridges/alpha` })
       expect(res.statusCode).toBe(500)
@@ -45,19 +43,18 @@ describe('error bodies', () => {
         message: 'internal server error',
         requestId: expect.any(String),
       })
-      for (const leak of ['select', 'cartridges', 'alpha', '42P01', 'relation', '/app/', 'queries'])
+      for (const leak of ['alpha', 'EACCES', '/app/', 'records.json', 'readFileSync'])
         expect(res.body).not.toContain(leak)
       const logged = lines.map((l) => JSON.parse(l)).find((l) => l.err)
       expect(logged).toMatchObject({ level: 50, reqId: body.requestId })
-      expect(logged.err.message).toContain(sql)
+      expect(logged.err.message).toContain(reason)
     } finally {
       await app.close()
     }
   })
 
   it('keeps the message of a 4xx, also through the error handler of a compute route', async () => {
-    const db = await createTestDb()
-    const app = buildApp({ db, compute: inlineRunner })
+    const app = buildApp({ catalogue: testCatalogue(bundle), compute: inlineRunner })
     try {
       const invalid = await app.inject({ url: `${API_PREFIX}/cartridges?limit=999` })
       expect(invalid.statusCode).toBe(400)
@@ -78,7 +75,6 @@ describe('error bodies', () => {
       })
     } finally {
       await app.close()
-      await closeTestDb(db)
     }
   })
 })

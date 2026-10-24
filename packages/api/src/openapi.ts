@@ -2,8 +2,8 @@ import { STATUS_CODES } from 'node:http'
 import type { RouteOptions } from 'fastify'
 import { z } from 'zod'
 import { buildApp } from './app.ts'
+import type { Catalogue } from './catalogue/types.ts'
 import { inlineRunner } from './compute/tasks.ts'
-import type { Db } from './db/index.ts'
 import { API_VERSION } from './version.ts'
 
 declare module 'fastify' {
@@ -221,7 +221,11 @@ function parameters(where: 'query' | 'path', schema: JsonSchema) {
  */
 export async function buildOpenApi(): Promise<OpenApiDocument> {
   const routes: RouteOptions[] = []
-  const app = buildApp({ db: {} as Db, compute: inlineRunner, onRoute: (r) => routes.push(r) })
+  const app = buildApp({
+    catalogue: {} as Catalogue,
+    compute: inlineRunner,
+    onRoute: (r) => routes.push(r),
+  })
   await app.ready()
   await app.close()
   const paths: OpenApiDocument['paths'] = {}

@@ -31,10 +31,9 @@ import {
   rangeStringsPlanBody,
   rangeStringsPlanExample,
 } from '../compute/strings-schema.ts'
-import type { ComputeRunner } from '../compute/tasks.ts'
 import { responseUnits } from '../compute/units.ts'
-import type { Db } from '../db/index.ts'
 import { API_PREFIX } from '../version.ts'
+import type { ComputeContext } from './common.ts'
 
 /** Result paths where core can return NaN; JSON writes null. */
 const nanPaths = {
@@ -102,9 +101,9 @@ const loadFileBody = userDataFile
  * calls run on `compute` (a worker pool), stability runs here (closed form).
  */
 // biome-ignore lint/suspicious/useAwait: FastifyPluginAsync returns a promise
-export const computeRoutes: FastifyPluginAsync<{ db: Db; compute: ComputeRunner }> = async (
+export const computeRoutes: FastifyPluginAsync<ComputeContext> = async (
   app,
-  { db, compute },
+  { catalogue, compute },
 ) => {
   const interiorUrls = [`${API_PREFIX}/interior`, `${API_PREFIX}/interior/load-file`]
   app.setErrorHandler<FastifyError>(
@@ -117,7 +116,10 @@ export const computeRoutes: FastifyPluginAsync<{ db: Db; compute: ComputeRunner 
   async function resolveShot<S extends z.infer<typeof trajectoryBody>['shot']>(shot: S) {
     const p = shot.projectile
     if (!('bullet' in p)) return { shot: { ...shot, projectile: p }, resolved: undefined }
-    const { projectile, bullet: echoed } = bulletProjectile(await findBullet(db, p.bullet), p)
+    const { projectile, bullet: echoed } = bulletProjectile(
+      await findBullet(catalogue, p.bullet),
+      p,
+    )
     return { shot: { ...shot, projectile }, resolved: { bullet: echoed, projectile } }
   }
 
@@ -252,7 +254,7 @@ export const computeRoutes: FastifyPluginAsync<{ db: Db; compute: ComputeRunner 
   }
   app.post('/interior', options(interiorBody, interiorDoc), async (request, reply) => {
     const { status, payload } = await runInterior(
-      { compute, findCartridge: (id) => findCartridge(db, id) },
+      { compute, findCartridge: (id) => findCartridge(catalogue, id) },
       interiorBody.parse(request.body),
     )
     return status === 200 ? payload : reply.code(status).send(payload)
@@ -274,7 +276,11 @@ export const computeRoutes: FastifyPluginAsync<{ db: Db; compute: ComputeRunner 
       },
     },
     async (request, reply) => {
-      const { status, payload } = await simulate({ db, compute }, request.query, request.body)
+      const { status, payload } = await simulate(
+        { catalogue, compute },
+        request.query,
+        request.body,
+      )
       return status === 200 ? payload : reply.code(status).send(payload)
     },
   )
@@ -292,7 +298,7 @@ export const computeRoutes: FastifyPluginAsync<{ db: Db; compute: ComputeRunner 
   }
   app.get('/exterior/stability', stabilityOptions, async (request) => {
     const q = stabilityQuery.parse(request.query)
-    const record = q.bullet === undefined ? undefined : await findBullet(db, q.bullet)
+    const record = q.bullet === undefined ? undefined : await findBullet(catalogue, q.bullet)
     const { mass, diameter, length, resolved } = stabilityInputs(q, record)
     const result = millerStability({
       mass,

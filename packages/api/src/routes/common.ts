@@ -1,11 +1,22 @@
 import { recordIdRegex } from '@openreloading/schema'
 import { z } from 'zod'
+import type { Catalogue, Catalogued, CatalogueKind } from '../catalogue/types.ts'
+import type { ComputeRunner } from '../compute/tasks.ts'
 
-/** `pattern` of a query string value without a NUL character: PostgreSQL text holds none, so the query would fail with 500. */
+/** `pattern` of a query string value without a NUL character: the SQL layer's text holds none, so a query with one would fail with 500 there. */
 export const noNul = '^[^\\u0000]*$'
 
 /** `pattern` of a record id, as `recordId` of `@openreloading/schema`. */
 export const recordIdPattern = recordIdRegex.source
+
+/** What the compute routes read: the records to resolve ids against and the runner of the solver tasks. */
+export type ComputeContext = { catalogue: Catalogue; compute: ComputeRunner }
+
+/** A record as the routes answer it: the stored record, without the `kind`, `origin` and `revision` that `Catalogue.get` adds. */
+export function stored<K extends CatalogueKind>(record: Catalogued<K>) {
+  const { kind, origin, revision, ...rest } = record
+  return rest
+}
 
 /** The JSON Schema of a route's path parameters or query string. */
 interface ObjectSchema {
