@@ -4,7 +4,7 @@ import { NativeSelect, Text, TextInput } from '@mantine/core'
 import { useDebouncedValue } from '@mantine/hooks'
 import { face, type LengthUnit } from '@openreloading/drawing'
 import { bulletFigureModel, bulletSymbols } from '@openreloading/drawing/bullet'
-import type { Bullet, BulletDesign } from '@openreloading/schema'
+import { type Bullet, type BulletDesign, toSi } from '@openreloading/schema'
 import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef } from 'react'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { BulletSummary } from '../lib/api-types.ts'
@@ -105,7 +105,9 @@ const StartSearch = memo(function StartSearch({
       label="Start from a record"
       chosen={chosen ?? 'Start from a record'}
       picked={chosen !== undefined}
-      describe={(b) => `${productLabel(b, names)}, ${withUnit('mass', system, b.mass * 1e-3)}`}
+      describe={(b) =>
+        `${productLabel(b, names)}, ${withUnit('mass', system, toSi('mass', b.mass))}`
+      }
       onSelect={(b) => start(b.id)}
       noneText="No bullet found"
       unreachableText="The database is unreachable. The designer still works."

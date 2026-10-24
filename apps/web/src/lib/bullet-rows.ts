@@ -1,4 +1,5 @@
 /** The bullet list's rows: search text, filters, cells, the BC column and the packed page props. */
+import { toSi } from '@openreloading/schema'
 import type { BulletSummary } from './api-types.ts'
 import { caliberLabel, commonCaliber } from './caliber.ts'
 import {
@@ -37,7 +38,7 @@ export type BulletRow = Omit<BulletItem, 'mass' | 'manufacturer'> & {
 
 /** Search text of a bullet: manufacturer, name, diameter in mm and inches, mass in grains and grams. */
 export function bulletSearchText(b: BulletRow): string {
-  const gr = b.mass === null ? undefined : (b.mass * 1e-3) / kilogramsPerGrain
+  const gr = b.mass === null ? undefined : toSi('mass', b.mass) / kilogramsPerGrain
   return [
     b.manufacturerName,
     ...(b.manufacturerAliases ?? []),
@@ -91,14 +92,16 @@ export function bulletCells(b: BulletRow, system: UnitSystem) {
   return {
     caliber: commonCaliber(b.diameter),
     // the exact diameter, on hover
-    diameter: `${inchText(formatNumber(system.length.fromSi(b.diameter * 1e-3), lengthIn ? 4 : 3), system.length.symbol)} ${system.length.symbol}`,
+    diameter: `${inchText(formatNumber(system.length.fromSi(toSi('length', b.diameter)), lengthIn ? 4 : 3), system.length.symbol)} ${system.length.symbol}`,
     mass:
-      b.mass === null ? '' : formatNumber(system.mass.fromSi(b.mass * 1e-3), system.mass.decimals),
+      b.mass === null
+        ? ''
+        : formatNumber(system.mass.fromSi(toSi('mass', b.mass)), system.mass.decimals),
     length:
       b.length === null
         ? ''
         : inchText(
-            formatNumber(system.length.fromSi(b.length * 1e-3), lengthIn ? 3 : 2),
+            formatNumber(system.length.fromSi(toSi('length', b.length)), lengthIn ? 3 : 2),
             system.length.symbol,
           ),
   }

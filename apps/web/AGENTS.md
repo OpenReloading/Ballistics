@@ -181,6 +181,7 @@ A static site without a server for GitHub Pages: the web app with the records as
   - A Mantine `Modal` with the focus on Cancel. Escape cancels and leaves a dialog under it open. The host is mounted first in `providers.tsx`.
   - A delete that can be taken back (a firearm, a target sheet, a group) asks nothing and calls `offerUndo`.
 - Units and number formatting: `src/lib/units.ts` (values held in SI, fixed decimals, no grouping).
+  - Stored units (mm, g, bar, degC) to SI and back: `toSi` and `fromSi` of `@openreloading/schema`, never a factor written in place. `test/unit-literals.test.ts` fails on a factor literal in the API or web sources, except the time, byte and pixel lines it lists.
 - Unit suffix of a field: `NumberField` switches that field only, in memory (`src/lib/field-unit.ts`).
   - A button for two units, a menu for three or more. Nothing is stored. The Settings (`UnitsForm`) store units. A change of the Settings or a reload resets the field.
   - A numeric `placeholder` and a message, mark or help that names a unit (`error`, `mark`, `help`, `action.text`, `fieldError(spec, value, shown)`) are functions of the units shown. `unit="text"` or `"none"` leaves a page without switches.

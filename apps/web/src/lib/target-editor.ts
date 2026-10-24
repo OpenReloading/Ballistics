@@ -10,7 +10,12 @@ import {
   type GroupStatistics,
   subtendedAngle,
 } from '@openreloading/core'
-import type { CalibrationReference, ShotGroup, TargetSheet } from '@openreloading/schema'
+import {
+  type CalibrationReference,
+  type ShotGroup,
+  type TargetSheet,
+  toSi,
+} from '@openreloading/schema'
 import {
   applyMatrix,
   type Calibration,
@@ -25,9 +30,10 @@ import { groupStatisticsOf } from './target-groups.ts'
 /** Image px to target m and back; for a drawn target the view is target mm with y down. */
 export type Frame = { toTarget: Matrix; toImage: Matrix; calibration?: Calibration }
 
+const mm = toSi('length', 1)
 const drawn: Frame = {
-  toTarget: [1e-3, 0, 0, 0, -1e-3, 0, 0, 0, 1],
-  toImage: [1e3, 0, 0, 0, -1e3, 0, 0, 0, 1],
+  toTarget: [mm, 0, 0, 0, -mm, 0, 0, 0, 1],
+  toImage: [1 / mm, 0, 0, 0, -1 / mm, 0, 0, 0, 1],
 }
 
 /**

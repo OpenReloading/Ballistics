@@ -1,11 +1,13 @@
 /** Length of the check ruler on the printed ladder target, mm. */
+import { fromSi } from '@openreloading/schema'
 export const rulerMm = 100
 
 /** Widest mark that fits across the narrowest usual sheet (A5 upright less its margins), mm. */
 export const maxMarkMm = 120
 
 /** The printed diameter of a mark of angular size `angle` rad at `distance` m, mm. */
-export const markDiameterMm = (distance: number, angle: number) => 1000 * distance * Math.tan(angle)
+export const markDiameterMm = (distance: number, angle: number) =>
+  fromSi('length', distance * Math.tan(angle))
 
 /** A CSS length that prints as `mm` millimetres at 100 % print scale. */
 export const cssMm = (mm: number) => `${Math.round(mm * 100) / 100}mm`

@@ -12,7 +12,7 @@ import {
   solidFill,
   solidFillLimit,
 } from '@openreloading/core'
-import type { Bullet, Powder, WorkbenchState } from '@openreloading/schema'
+import { type Bullet, fromSi, type Powder, toSi, type WorkbenchState } from '@openreloading/schema'
 import { z } from 'zod'
 import { getManufacturer } from '../db/component-queries.ts'
 import type { Db } from '../db/index.ts'
@@ -233,12 +233,14 @@ export async function simulate(
   const { cartridge, bullet, powder, powderLabel } = await loadFileRecords(context.db, record)
   // an empty bore area is the cartridge record's, as the workbench fills it
   if (cartridge && record.siValues.boreArea === undefined)
-    load.chamber.boreArea =
+    load.chamber.boreArea = toSi(
+      'area',
       boreArea({
         area: cartridgeBoreAreaMm2(cartridge),
-        boreDiameter: load.chamber.boreDiameter * 1e3,
+        boreDiameter: fromSi('length', load.chamber.boreDiameter),
         grooveDiameter: cartridgeGrooveDiameterMm(cartridge),
-      }) * 1e-6
+      }),
+    )
   // the bore resistance of the powder record's fit, as the workbench adds it to a run
   const { resistance, missing } = recordResistance(powder ?? {}, {
     boreDiameter: load.chamber.boreDiameter,
