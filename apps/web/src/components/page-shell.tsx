@@ -19,6 +19,7 @@ const frameRoutes = new Set([
   '/powders/burn-rates',
   '/bullets/designer',
   '/cartridges/designer',
+  '/targets/designer',
 ])
 
 /**

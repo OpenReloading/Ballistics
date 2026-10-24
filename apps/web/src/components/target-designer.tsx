@@ -329,7 +329,7 @@ export function TargetDesigner() {
 
   const inputs = (
     <form noValidate onSubmit={(ev) => ev.preventDefault()}>
-      <PropertyGrid title="Parameters" sections={sections} message={general[0]} />
+      <PropertyGrid title="Parameters" sections={sections} message={edited ? general[0] : undefined} />
     </form>
   )
   const results = (
@@ -337,7 +337,7 @@ export function TargetDesigner() {
       <div className="page-panel-head designer-panel-head">
         <h2 className="page-panel-title record-heading">Drawing</h2>
       </div>
-      <Text component="p" inherit fz="sm" m={0} className="stale-line" title={status}>
+      <Text component="p" inherit fz="sm" m={0} className="derived-line" title={status}>
         {status}
       </Text>
       {shown ? (

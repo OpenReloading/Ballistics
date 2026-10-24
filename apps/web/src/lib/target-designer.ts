@@ -237,7 +237,12 @@ export function buildFace(
   return {
     issues: r.error.issues.map((i) => ({
       path: i.path,
-      message: at(i.path) === undefined || at(i.path) === '' ? 'Required.' : i.message,
+      message:
+        at(i.path) === undefined || at(i.path) === ''
+          ? 'Required.'
+          : i.code === 'too_small' && Array.isArray(at(i.path))
+            ? `at least ${i.minimum} needed.`
+            : i.message,
     })),
   }
 }
