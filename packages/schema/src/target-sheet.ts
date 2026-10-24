@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { recordId } from './ids.ts'
 import { hexColour, localId } from './shared.ts'
 
 /** A pixel of the photo as the browser shows it (orientation applied), x right, y down. */
@@ -123,7 +124,7 @@ export const shotGroup = z.object({
     .optional(),
   face: z
     .object({
-      id: z.string().min(1).max(200).describe('Id of the `TargetFace` record.'),
+      id: recordId.describe('Id of the `TargetFace` record.'),
       event: z
         .string()
         .min(1)

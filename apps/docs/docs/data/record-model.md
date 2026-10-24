@@ -176,8 +176,9 @@ Steps 1, 2 and 11 go first, then 3, then 4 to 6, then 7 to 9. Steps 10 and 12 fi
 ### Step 3: what changed
 
 - `userId` (`packages/schema/src/ids.ts`) is a lowercase UUID, `ref(kind)` a reference `"catalogue:<record id>"` or `"user:<UUID>"`, `parseRef` splits one into scope and id. The kind only names the entity in the description: the text carries no kind.
-- The browser creates the id of every new user record and photo with `crypto.randomUUID()` (`newId` in `apps/web/src/components/file-menu.tsx`). The record `id` of a user data file keeps its bound (1 to 64 characters), so records saved with an older id open as before.
+- The browser creates the id of every new user record and photo with `crypto.randomUUID()` (`newId` in `apps/web/src/lib/new-id.ts`, with a `crypto.getRandomValues` fallback for origins that are not secure). The record `id` of a user data file keeps its bound (1 to 64 characters), so records saved with an older id open as before.
 - `checkUserRefs(records)` (`packages/schema/src/user-data.ts`) returns the references between user records that no record answers: a workbench state's `firearm` (an old id or `user:<id>`) and a target sheet's `load`. Open and Import report them in the status line or the import report, `refNote` in `apps/web/src/lib/user-data.ts`, and drop nothing. A `catalogue:` reference, a catalogue id (`cartridge`, `bullet`, `powder`, a design's `parent`) and a group's chronograph session (no user record holds one before step 7) are not checked.
+- A design's `parent.id` and a target sheet's `face.id` name catalogue records and use `recordId`. The API path pattern already is `recordIdRegex`.
 - Existing fields keep their type: the references of the workbench state and the sheet stay plain ids until the steps that reshape those entities.
 
 ## Decisions

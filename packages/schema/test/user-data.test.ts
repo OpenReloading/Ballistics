@@ -108,6 +108,16 @@ describe('userDataFile', () => {
     ).toBe(true)
   })
 
+  it('takes a catalogue id as the parent of a design and refuses another text', () => {
+    const withParent = (id: string) =>
+      userRecord.safeParse({
+        ...bulletRecord,
+        data: { ...bulletRecord.data, parent: { id, title: 'Alpha' } },
+      }).success
+    expect(withParent('alpha-30425')).toBe(true)
+    expect(withParent('Alpha 30425')).toBe(false)
+  })
+
   it('opens records with an old browser id and with a UUID', () => {
     const uuid = '3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13'
     const ids = ['lk3j2h1g-a8s7d6f5', uuid]

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { firearm } from './firearm.ts'
-import { parseRef } from './ids.ts'
+import { parseRef, recordId } from './ids.ts'
 import { siValues, text } from './shared.ts'
 import { specValue } from './standards.ts'
 import { targetSheet } from './target-sheet.ts'
@@ -14,7 +14,7 @@ export const userDataVersion = 1
 /** The catalogue record a design started from. */
 const parent = z
   .object({
-    id: z.string().min(1).max(200).describe('Id of the catalogue record.'),
+    id: recordId.describe('Id of the catalogue record.'),
     title: text(200).describe('Title of the catalogue record as shown when the design was saved.'),
   })
   .describe('The catalogue record the design started from.')

@@ -17,6 +17,7 @@ import {
 } from '../lib/file-access.ts'
 import { parseFiles, readLoadFile, readNote } from '../lib/load-file-formats.ts'
 import { guardNavigation, guardPop } from '../lib/navigation-guard.ts'
+import { newId } from '../lib/new-id.ts'
 import { maxLinkChars, readLink, shareLink } from '../lib/share-link.ts'
 import { type ShortcutId, shortcutAriaKeys, shortcutLabel } from '../lib/shortcuts.ts'
 import { controlSize } from '../lib/theme.ts'
@@ -66,8 +67,6 @@ const ask = (title: string, confirmLabel: string) =>
   confirmDialog({ title, confirmLabel, danger: true })
 
 type Of<K extends UserRecordKind> = Extract<UserRecord, { kind: K }>
-
-export const newId = () => crypto.randomUUID()
 
 /** A file's text; undefined for a file over the size limit, which is not read. */
 const read = async (file: File) => (file.size > maxFileBytes ? undefined : file.text())
