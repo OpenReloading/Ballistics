@@ -6,8 +6,18 @@ on:
   # release tags and images: release.yml
   pull_request:
 
-permissions:
-  contents: read
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# Tool images of the `docker run` steps below. Dependabot does not read them: bump them by hand, oasdiff and
+# Schemathesis together with .devcontainer/Dockerfile.
+env:
+  ACTIONLINT_IMAGE: docker.io/rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
+  OASDIFF_IMAGE: docker.io/tufin/oasdiff:v1.33.0@sha256:6263a96dd2ef0726c54e21fea9b8e1607eac4841add0079324b424c1f52b819c
+  SCHEMATHESIS_IMAGE: docker.io/schemathesis/schemathesis:v4.29.4@sha256:16d21ecba0097fc8a3ca71b8d1db3797d2a057610d808715871216450e63f0a6
 
 jobs:
   # Which jobs run and what the e2e job builds: only a pull request may skip `check` (prose only), `e2e` (no
@@ -15,6 +25,9 @@ jobs:
   # records. Every other event (the default branch) and every doubt runs everything; see apps/web/scripts/ci-plan.mts.
   changes:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
     outputs:
       check: ${{ steps.plan.outputs.check }}
       e2e: ${{ steps.plan.outputs.e2e }}
@@ -40,6 +53,9 @@ jobs:
     # a failed `changes` job leaves the outputs empty, so the job runs
     if: ${{ !cancelled() && needs.changes.outputs.check != 'false' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -58,18 +74,21 @@ jobs:
       # `npm run api:check` in the dev container; the same oasdiff version as .devcontainer/Dockerfile
       - run: node tools/src/openapi.ts "$RUNNER_TEMP/openapi.json"
       - name: Breaking changes of the API document (oasdiff)
-        run: docker run --rm -v "$PWD:/repo:ro" -v "$RUNNER_TEMP:/doc:ro" -w /repo docker.io/tufin/oasdiff:v1.33.0@sha256:6263a96dd2ef0726c54e21fea9b8e1607eac4841add0079324b424c1f52b819c breaking packages/api/openapi.baseline.json /doc/openapi.json --fail-on ERR
+        run: docker run --rm -v "$PWD:/repo:ro" -v "$RUNNER_TEMP:/doc:ro" -w /repo "$OASDIFF_IMAGE" breaking packages/api/openapi.baseline.json /doc/openapi.json --fail-on ERR
       - run: node tools/src/audit.ts
 
   # Workflow lint and security audit of .github/workflows and dependabot.yml.
   workflows:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: actionlint
-        run: docker run --rm -v "$PWD:/repo" -w /repo docker.io/rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667 -color
+        run: docker run --rm -v "$PWD:/repo" -w /repo "$ACTIONLINT_IMAGE" -color
       - uses: zizmorcore/zizmor-action@85b2b9fb8e3325e7a23d7d0a9d7ba5ae0f999e3e # v0.7.1
         with:
           version: 1.31.1
@@ -78,6 +97,9 @@ jobs:
   dependency-review:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
     steps:
       - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
         with:
@@ -89,6 +111,9 @@ jobs:
     # a failed `changes` job still runs e2e, with empty outputs: the web app and every record page are built
     if: ${{ !cancelled() && needs.changes.outputs.e2e != 'false' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
     env:
       # only a pull request with outputs that say so skips the web build
       BUILD_WEB: ${{ github.event_name != 'pull_request' || needs.changes.outputs.web != 'false' }}
@@ -121,7 +146,7 @@ jobs:
         run: |
           npm run build -w @openreloading/data -w @openreloading/api
           node tools/src/openapi.ts "$RUNNER_TEMP/openapi.json"
-          docker run --rm --network=host -v "$RUNNER_TEMP:/doc:ro" docker.io/schemathesis/schemathesis:v4.29.4@sha256:16d21ecba0097fc8a3ca71b8d1db3797d2a057610d808715871216450e63f0a6 \
+          docker run --rm --network=host -v "$RUNNER_TEMP:/doc:ro" "$SCHEMATHESIS_IMAGE" \
             run /doc/openapi.json --url http://localhost:3000 --checks not_a_server_error,status_code_conformance,content_type_conformance,response_schema_conformance
       - run: npm run test:e2e
       - name: Drawing baseline in the Playwright image
