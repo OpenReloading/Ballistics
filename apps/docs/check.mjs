@@ -13,7 +13,7 @@ import {
 import { tooLong } from './scripts/type-length.mts'
 
 const packages = ['schema', 'core', 'drawing', 'importers', 'data', 'api']
-// the library's own generics, linked from the doc comment to the inferred record type
+// the library's own generics, linked from the doc comment to the inferred type
 const exempt = /^(Zod|PgTableWithColumns$)/
 
 /** The value type, return types and parameter types of a variable or function, by name. */

@@ -114,7 +114,7 @@ describe('open', () => {
     })
   })
 
-  it('ignores an empty filter, as the SQL layer does', () => {
+  it('ignores an empty filter', () => {
     expect(catalogue.cartridges({ table: '' }).total).toBe(3)
     expect(catalogue.powders({ manufacturer: '' }).total).toBe(2)
   })
