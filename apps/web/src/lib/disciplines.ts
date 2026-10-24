@@ -1,6 +1,11 @@
 /** The discipline and federation lists' rows and filters, and a discipline record's rule book and stages. */
-import { caliberClasses, type Discipline, type Federation } from '@openreloading/schema'
-import type { Provenance, Source } from './api-types.ts'
+import {
+  caliberClasses,
+  type Discipline,
+  type Federation,
+  type Provenance,
+  type Source,
+} from '@openreloading/schema'
 import type { DirectoryState } from './directory.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
 import { matchesQuery } from './lists.ts'

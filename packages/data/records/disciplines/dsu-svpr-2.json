@@ -21,7 +21,8 @@
       {
         "source": "dsu-sporthandbuch-2018",
         "page": "Kapitel 9, Schwarzpulver und Vorderlader, Seite 1 (PDF p. 233)",
-        "fields": ["name", "number"]
+        "fields": ["name", "number"],
+        "note": "The table of contents of Kapitel 4 (PDF p. 124) prints the code \"SVPP 2\" for this discipline; the discipline page (PDF p. 130) and this table print SVPR 2, which is the number recorded."
       }
     ]
   }

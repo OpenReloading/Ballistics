@@ -1,5 +1,5 @@
 import { defaultStartPressure, handgunBarrelLengthLimit } from '@openreloading/core'
-import type { PowderRecord } from './api-types.ts'
+import type { Powder } from '@openreloading/schema'
 
 /**
  * A powder record's M3 parameters in the workbench: the fill, the field marks, the fit summary
@@ -7,7 +7,7 @@ import type { PowderRecord } from './api-types.ts'
  */
 
 /** SI field values of the record's model parameters; undefined for a record without them. */
-export function powderModelValues(p: PowderRecord): Record<string, number> | undefined {
+export function powderModelValues(p: Powder): Record<string, number> | undefined {
   const i = p.interior
   if (!i) return undefined
   return {
@@ -40,8 +40,10 @@ export const unchangedFromRecord = (
   values: Record<string, number | undefined>,
 ) => Object.keys(origin).filter((k) => matchesRecordValue(origin[k], values[k]))
 
+type FittedKey = NonNullable<Powder['interior']>['fitted'][number]
+
 /** The record's names of the fitted fields, by workbench field key. */
-const fittedKey: Record<string, string> = {
+const fittedKey: Record<string, FittedKey> = {
   vivacity: 'vivacity',
   propellantEnergy: 'energy',
   formA: 'form.a',
@@ -52,7 +54,7 @@ const fittedKey: Record<string, string> = {
  * the fit), or changed from the record value; undefined for a field the record does not fill.
  */
 export function recordMark(
-  p: PowderRecord,
+  p: Powder,
   origin: Record<string, number>,
   key: string,
   si: number | undefined,
@@ -71,7 +73,7 @@ export function recordMark(
  * Plausibility of the fitted energy: fitted over the thermochemistry energy, impetus / (gamma - 1),
  * at the record's mean composition; undefined without thermochemistry or a fit.
  */
-export function fittedEnergyRatio(p: PowderRecord) {
+export function fittedEnergyRatio(p: Powder) {
   const t = p.thermochemistry
   if (!t || !p.interior || !(t.gamma.value > 1)) return
   return p.interior.energy.value / (t.impetus.value / (t.gamma.value - 1))
@@ -85,7 +87,7 @@ interface FitTable {
 }
 
 /** The fitted sources of a record with their training rows. */
-export function fitTables(p: PowderRecord): FitTable[] {
+export function fitTables(p: Powder): FitTable[] {
   return p.provenance.sources
     .filter(
       (s) =>

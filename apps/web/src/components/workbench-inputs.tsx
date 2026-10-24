@@ -12,16 +12,12 @@ import {
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { boreArea } from '@openreloading/core'
+import type { Bullet } from '@openreloading/schema'
 import { DotsThree } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
 import { type ReactNode, useEffect, useId, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
-import type {
-  BulletRecord,
-  BulletSummary,
-  CartridgeSummary,
-  PowderSummary,
-} from '../lib/api-types.ts'
+import type { BulletSummary, CartridgeSummary, PowderSummary } from '../lib/api-types.ts'
 import { fitOf, summaryFitSource } from '../lib/bullet-fit.ts'
 import { quickCartridges } from '../lib/examples.ts'
 import { type FieldSpec, type FieldValue, fieldError, siValues } from '../lib/field-spec.ts'
@@ -197,7 +193,7 @@ const lengthCell = (system: UnitSystem, mm: number) =>
   inchText(lengthText('diameter', system, mm * 1e-3), system.length.symbol)
 
 /** Diameter and length on one row, or the diameter alone. */
-function sizeRow(b: BulletRecord | undefined, system: UnitSystem) {
+function sizeRow(b: Bullet | undefined, system: UnitSystem) {
   if (!b) return false
   const d = lengthCell(system, b.diameter.value)
   return b.length
@@ -210,7 +206,7 @@ function sizeRow(b: BulletRecord | undefined, system: UnitSystem) {
 }
 
 /** The construction on one line: the structure, the full wording on hover; else the wording. */
-function constructionCell(c: BulletRecord['construction']) {
+function constructionCell(c: Bullet['construction']) {
   const text = constructionRows(c)[0]?.text
   const short = c?.structure && titleFromKebab(c.structure)
   return short && short !== text ? <Noted value={short} notes={[text as string]} inline /> : text

@@ -2,10 +2,10 @@
 
 import { Group, MultiSelect, Pill } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
+import type { Powder } from '@openreloading/schema'
 import { ChartLine } from '@phosphor-icons/react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { fetchPowder } from '../lib/api-client.ts'
-import type { PowderRecord } from '../lib/api-types.ts'
 import {
   classifyPowder,
   dashes,
@@ -51,7 +51,7 @@ export function BurnRateCompare({ options }: { options: { value: string; label: 
   const wide = useMediaQuery('(min-width: 88em)')
   const [picks, setPicks] = useState<OverlayPick[]>([])
   const [read, setRead] = useState(false)
-  const [records, setRecords] = useState<Record<string, PowderRecord | 'error'>>({})
+  const [records, setRecords] = useState<Record<string, Powder | 'error'>>({})
   const names = useManufacturerNames()
   // classified at render, so the labels get the manufacturer names when they arrive after a record
   const laws = useMemo(

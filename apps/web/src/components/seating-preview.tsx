@@ -15,11 +15,11 @@ import {
   seat,
   type Tagged,
 } from '@openreloading/drawing/seating'
-import type { UserRecord } from '@openreloading/schema'
+import type { Bullet, UserRecord } from '@openreloading/schema'
 import { type ReactNode, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { apiFetch } from '../lib/api-fetch.ts'
-import type { BulletRecord, BulletSummary, CartridgeDetail } from '../lib/api-types.ts'
+import type { BulletSummary, CartridgeDetail } from '../lib/api-types.ts'
 import type { StripFigure } from '../lib/barrel-strip.ts'
 import { designShape } from '../lib/bullet-designer.ts'
 import { drawable } from '../lib/cartridge-sheet.ts'
@@ -318,9 +318,7 @@ export function SeatingPreview({
     if (linkedBullet) setBulletId(linkedBullet)
     setDesign(linkedDesign ? designs.find((d) => d.id === linkedDesign) : undefined)
   }, [isLinked, linkedBullet, linkedDesign, designs])
-  const record = useRecord<BulletRecord>(
-    bulletId ? `bullets/${encodeURIComponent(bulletId)}` : undefined,
-  )
+  const record = useRecord<Bullet>(bulletId ? `bullets/${encodeURIComponent(bulletId)}` : undefined)
   const [capacityId, setCapacityId] = useState<string | undefined>(undefined)
   const [barrel, setBarrel] = useState<FieldValue>(() => {
     const m = barrelLength ?? initial?.barrel

@@ -6,6 +6,7 @@ import { CaretDown, FloppyDisk, FolderOpen } from '@phosphor-icons/react'
 import { memo, type Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { localDay } from '../lib/dates.ts'
+import { download } from '../lib/download.ts'
 import { errorText } from '../lib/error-text.ts'
 import {
   pickFiles,
@@ -23,6 +24,7 @@ import {
   canonicalJson,
   checkedUserDataText,
   exportAllText,
+  type InvalidRecord,
   maxFileBytes,
   namedKey,
   type ParsedUserFile,
@@ -41,6 +43,7 @@ import {
   putRecords,
   requestPersistentStorage,
   storedPhoto,
+  storedPhotoIds,
   storedRecord,
   storedRecords,
 } from '../lib/user-store.ts'
@@ -250,6 +253,9 @@ function FileMenuOf<K extends UserRecordKind>({
   const [folder, setFolder] = useState<{ handle: FileSystemDirectoryHandle; allowed: boolean }>()
   const [report, setReport] = useState<Report>()
   const [list, setList] = useState<Of<K>[]>()
+  /** The invalid browser records the Open menu last found, and the open list of them. */
+  const [invalidCount, setInvalidCount] = useState(0)
+  const [invalidList, setInvalidList] = useState<InvalidRecord[]>()
   /** Text to copy by hand where the clipboard refused it. */
   const [copyText, setCopyText] = useState<{ title: string; text: string }>()
   const [pasted, setPasted] = useState<string>()
@@ -753,12 +759,11 @@ function FileMenuOf<K extends UserRecordKind>({
   /** True when a file was written. */
   async function exportAll() {
     const { records, invalid } = await storedRecords()
-    const left = invalid ? ` ${invalid} invalid browser records were left out.` : ''
-    if (!records.length) {
-      setMessage(`No records in this browser yet; Save keeps a record here.${left}`)
+    if (!records.length && !invalid.length) {
+      setMessage('No records in this browser yet; Save keeps a record here.')
       return false
     }
-    const checked = exportAllText(records, await photosOf(records))
+    const checked = exportAllText(records, await photosOf(records), invalid)
     if (!checked.ok) {
       setFailure(`Not exported: ${checked.reason}`)
       return false
@@ -772,7 +777,10 @@ function FileMenuOf<K extends UserRecordKind>({
     const day = localDay(new Date())
     const r = await saveAs(checked.text, `openreloading-data-${day}.json`, ready)
     if (r) {
-      setMessage(`Exported ${records.length} records to ${r.name}.${left}${photos}`)
+      const raw = invalid.length
+        ? ` ${invalid.length} invalid ${invalid.length === 1 ? 'record is' : 'records are'} in it as stored.`
+        : ''
+      setMessage(`Exported ${records.length} records to ${r.name}.${raw}${photos}`)
       onExported?.()
     }
     return r !== undefined
@@ -834,10 +842,11 @@ function FileMenuOf<K extends UserRecordKind>({
     await putRecords(incoming)
     // a target sheet replaced with another photo leaves its old photo unreferenced; the page's
     // record keeps its photo until the page shows the replaced one (`onStored`)
+    const used = await storedPhotoIds()
     const left = droppedPhotos(
       report.conflicts.map((c) => c.stored),
-      [...(await storedRecords()).records, current()],
-    )
+      [current()],
+    ).filter((p) => !used.has(p))
     for (const p of left) deletePhoto(p).catch(() => {})
     onStored?.()
     setReport(undefined)
@@ -846,6 +855,15 @@ function FileMenuOf<K extends UserRecordKind>({
 
   async function browserRecords() {
     setList((await storedRecords()).records.filter((r): r is Of<K> => r.kind === kind))
+  }
+
+  /** Counts the invalid records when the Open menu opens, so its entry shows only when there are some. */
+  async function countInvalid() {
+    setInvalidCount((await storedRecords().catch(() => undefined))?.invalid.length ?? 0)
+  }
+
+  async function invalidRecords() {
+    setInvalidList((await storedRecords()).invalid)
   }
 
   async function pickFolder() {
@@ -886,7 +904,7 @@ function FileMenuOf<K extends UserRecordKind>({
   return (
     <Group gap="xs" className="file-menu">
       {/* the focus placeholder is a focusable role="presentation" child of the menu, which axe rejects */}
-      <Menu position="bottom-end" withInitialFocusPlaceholder={false}>
+      <Menu position="bottom-end" withInitialFocusPlaceholder={false} onOpen={countInvalid}>
         <Menu.Target>
           <Button
             variant="default"
@@ -904,6 +922,11 @@ function FileMenuOf<K extends UserRecordKind>({
                 Saved {kindNames[kind]}…
               </Menu.Item>
             </>
+          )}
+          {invalidCount > 0 && (
+            <Menu.Item onClick={act('Listing', invalidRecords)}>
+              Invalid records ({invalidCount})…
+            </Menu.Item>
           )}
           <Menu.Label>File</Menu.Label>
           <Menu.Item onClick={act('Open', open)} {...keyed('open')}>
@@ -1050,6 +1073,37 @@ function FileMenuOf<K extends UserRecordKind>({
             Delete all {kindNames[kind]}…
           </Button>
         )}
+      </AppModal>
+      <AppModal
+        opened={invalidList !== undefined}
+        onClose={() => setInvalidList(undefined)}
+        title="Invalid records in this browser"
+      >
+        <p>
+          These records do not pass the current format. They stay in this browser, are not shown
+          elsewhere and are in Export all as stored.
+        </p>
+        <ul className="file-records">
+          {invalidList?.map((r) => (
+            <li key={String((r.raw as { id?: unknown } | null)?.id)}>
+              <strong>{r.name ?? r.id ?? 'Unnamed record'}</strong>{' '}
+              <span className="file-reason">{[r.kind, r.id].filter(Boolean).join(', ')}</span>{' '}
+              <Button
+                variant="subtle"
+                size={controlSize.row.button}
+                onClick={() =>
+                  download(
+                    new Blob([`${JSON.stringify(r.raw, null, 2)}\n`], { type: 'application/json' }),
+                    recordFileName(`invalid ${r.id ?? r.name ?? 'record'}`),
+                  )
+                }
+              >
+                Download raw
+              </Button>
+              <pre className="file-error">{r.error}</pre>
+            </li>
+          ))}
+        </ul>
       </AppModal>
       <AppModal
         opened={copyText !== undefined}

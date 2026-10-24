@@ -12,8 +12,8 @@ import {
   storedValue,
 } from '@openreloading/drawing/cartridge'
 import { chamberOf } from '@openreloading/drawing/seating'
-import type { CartridgeDesign } from '@openreloading/schema'
-import type { CartridgeDetail, SpecValue } from './api-types.ts'
+import type { CartridgeDesign, SpecValue } from '@openreloading/schema'
+import type { CartridgeDetail } from './api-types.ts'
 import { drawable } from './cartridge-sheet.ts'
 import {
   close,
@@ -231,7 +231,7 @@ function draftValues({ fields, origin }: Design): SpecValue[] {
   const entered = (s: CartridgeFieldSpec, si: number): SpecValue => ({
     side: s.side,
     symbol: s.symbol,
-    quantity: s.quantity,
+    quantity: s.quantity as 'length' | 'angle',
     value: storedFieldValue(s, si),
   })
   for (const v of origin?.values ?? []) {

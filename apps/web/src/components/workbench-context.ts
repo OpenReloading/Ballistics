@@ -1,8 +1,9 @@
 'use client'
 
+import type { Powder } from '@openreloading/schema'
 import type { Context, Dispatch, RefObject, SetStateAction } from 'react'
 import { createContext, useContext } from 'react'
-import type { InteriorResponse, PowderRecord } from '../lib/api-types.ts'
+import type { InteriorResponse } from '../lib/api-types.ts'
 import type { FittedPowder, UnfittedPowder } from '../lib/burn-rate.ts'
 import type { activeClick } from '../lib/firearm.ts'
 import type { IdentifiedSeries } from '../lib/measurements.ts'
@@ -39,7 +40,7 @@ export type ResultState = {
   todo: { label: string; done: boolean; value?: string }[]
   /** The burn law of the chart: the powder record's fit, else the typed model parameters. */
   burn: FittedPowder | UnfittedPowder | undefined
-  powder: PowderRecord | undefined
+  powder: Powder | undefined
   /** The powder record as "<manufacturer name> <product name>". */
   powderLabel: string | undefined
   /** Where the shown run starts, peaks and leaves the barrel on the burnt-fraction axis. */

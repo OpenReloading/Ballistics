@@ -1,0 +1,23 @@
+{
+  "id": "bds-1224-issf-25m-precision-50m-pistol",
+  "discipline": "bds-1224",
+  "face": "issf-25m-precision-50m-pistol",
+  "event": "BDS 1224 MD Dienstpistole 2",
+  "shotCount": 40,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "page": "K 4.04, Seite K-17, PDF p. 17",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "page": "K 4.03, Seite K-16 and K-17, PDF pp. 16 and 17",
+        "fields": ["shotCount"],
+        "note": "20 shots Fertigkeitsschießen and 20 shots Parcoursschießen."
+      }
+    ]
+  }
+}
