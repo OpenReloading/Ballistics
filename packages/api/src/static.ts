@@ -25,7 +25,7 @@ const staticKinds = [
 ] as const
 
 type App = ReturnType<typeof buildApp>
-type Item = { id: string; name: string; manufacturer?: string; aliases?: string[] }
+type Item = { id: string }
 type List = { total: number; items: Item[] }
 
 /**
@@ -62,9 +62,8 @@ async function listAll(app: App, url: string): Promise<List> {
 /**
  * Writes the read answers of `app` under `dir`, as the Pages edition reads them:
  * `<kind>/index.json` (every item of the list), `<kind>/<id>.json` (each record),
- * `<kind>/search.json` for cartridges, bullets and powders (by id, the texts `q` matches: name,
- * aliases, or the manufacturer name or an alias with the product
- * name) and `bullets/cartridge/<cartridge id>.json` (the bullets that fit it, none written when
+ * `<kind>/search.json` for cartridges, bullets and powders (by id, the search key of the
+ * catalogue's index that `q` is ranked against) and `bullets/cartridge/<cartridge id>.json` (the bullets that fit it, none written when
  * none fits).
  */
 export async function writeStaticApi(app: App, dir: string) {
@@ -74,35 +73,21 @@ export async function writeStaticApi(app: App, dir: string) {
     await writeFile(to, JSON.stringify(value))
   }
   const lists = new Map<string, List>()
-  const records = new Map<string, Map<string, Record<string, unknown>>>()
   for (const kind of staticKinds) {
     const list = await listAll(app, `/${kind}`)
     lists.set(kind, list)
     await write(`${kind}/index`, list)
-    const byId = new Map<string, Record<string, unknown>>()
-    for (const { id } of list.items) {
-      const record = await get<Record<string, unknown>>(app, `/${kind}/${id}`)
-      byId.set(id, record)
-      await write(`${kind}/${id}`, record)
-    }
-    records.set(kind, byId)
+    for (const { id } of list.items)
+      await write(`${kind}/${id}`, await get<Record<string, unknown>>(app, `/${kind}/${id}`))
   }
 
-  const cartridges = lists.get('cartridges')?.items ?? []
-  await write(
-    'cartridges/search',
-    Object.fromEntries(cartridges.map((c) => [c.id, [c.name, (c.aliases ?? []).join(' ')]])),
-  )
-  const makers = records.get('manufacturers') ?? new Map()
-  for (const kind of ['bullets', 'powders']) {
-    const texts = (lists.get(kind)?.items ?? []).map((item) => {
-      const maker = makers.get(item.manufacturer ?? '') as Item | undefined
-      const names = maker ? [maker.name, ...(maker.aliases ?? [])] : []
-      return [item.id, names.map((n) => `${n} ${item.name}`)]
-    })
-    await write(`${kind}/search`, Object.fromEntries(texts))
-  }
-  for (const { id } of cartridges) {
+  const { index } = buildCatalogue(loadBundle())
+  for (const kind of ['cartridges', 'bullets', 'powders'] as const)
+    await write(
+      `${kind}/search`,
+      Object.fromEntries(index[kind].map((row) => [row.item.id, row.search])),
+    )
+  for (const { id } of lists.get('cartridges')?.items ?? []) {
     const fits = await listAll(app, `/bullets?cartridge=${id}`)
     if (fits.items.length > 0) await write(`bullets/cartridge/${id}`, fits)
   }
