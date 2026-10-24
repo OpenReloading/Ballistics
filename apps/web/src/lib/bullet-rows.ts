@@ -50,10 +50,10 @@ export const bulletKey = (b: BulletRow) => searchKey([bulletSearchText(b)], b.na
 /** A number with an optional unit as typed: "168", "168gr", "10.9g". */
 export const massWord = /^(\d+(?:\.\d+)?)(gr|g)?$/
 
-/** The typed words, folded; a number and its unit apart ("168 gr") count as one word ("168gr"). */
+/** The typed words, folded; a number and grains apart ("168 gr") count as one word ("168gr"). */
 export const typedWords = (query: string) =>
   fold(query)
-    .replace(/(\d)\s+(gr|g)(?=\s|$)/g, '$1$2')
+    .replace(/(\d)\s+gr(?=\s|$)/g, '$1gr')
     .split(/\s+/)
     .filter(Boolean)
 

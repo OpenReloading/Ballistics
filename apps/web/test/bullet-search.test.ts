@@ -1,6 +1,11 @@
 import { expect, it } from 'vitest'
 import type { BulletRow } from '../src/lib/bullet-rows.ts'
-import { type BulletFilters, bulletRelevance, searchBullets } from '../src/lib/bullet-search.ts'
+import {
+  type BulletFilters,
+  bulletRelevance,
+  findBullets,
+  searchBullets,
+} from '../src/lib/bullet-search.ts'
 
 // invented bullets: mass in g (168 gr = 10.886 g), diameter in mm
 const row = (over: Partial<BulletRow> & Pick<BulletRow, 'id' | 'name'>): BulletRow => ({
@@ -53,7 +58,6 @@ it('finds what the API search of the card missed: words in any order, spacing, a
   expect(ids('acme 168')).toEqual(['a-168-match', 'a-168-tipped'])
   expect(ids('308 168gr')).toEqual(['own-1', 'a-168-match', 'a-168-tipped'])
   expect(ids('168 gr')).toEqual(['own-1', 'a-168-match', 'a-168-tipped'])
-  expect(ids('10.9 g')).toEqual(['own-1', 'a-168-match', 'a-168-tipped'])
   expect(ids('30 cal')).toEqual(['a-168-match', 'a-168-tipped', 'a-175-match'])
   // the caliber with or without its space, the decimal comma as a point
   expect(ids('6.5mm')).toEqual(['b-140-match'])
@@ -113,4 +117,10 @@ it('sorts by mass or coefficient, rows without a value last', () => {
     'b-140-match',
     'own-1',
   ])
+})
+
+it('lists the designs for a first key without reading the catalogue', async () => {
+  const designs = rows.filter((r) => r.origin === 'user')
+  expect(await findBullets(designs, '', 20)).toEqual({ total: 1, items: designs })
+  expect(await findBullets(designs, 'x', 20)).toEqual({ total: 0, items: [] })
 })

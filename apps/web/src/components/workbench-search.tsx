@@ -107,7 +107,9 @@ export function WorkbenchSearch({
     }
     const controller = new AbortController()
     search(text, bulletFit, controller.signal)
-      .then(setFound)
+      .then((f) => {
+        if (!controller.signal.aborted) setFound(f)
+      })
       .catch(() => {
         if (!controller.signal.aborted) setFound('error')
       })

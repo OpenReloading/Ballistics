@@ -141,7 +141,8 @@ export const bc = (b: Pick<BulletSummary, 'ballisticCoefficientG1' | 'ballisticC
 /**
  * The first `limit` bullets that match `text` best among `designs` and the catalogue, with the
  * count of all that match: the answer of the card's field, in the shape of the API's lists. `fit`
- * keeps the bullets of the cartridge.
+ * keeps the bullets of the cartridge. Under 2 characters only `designs` are searched, so the
+ * catalogue is not read for a first key.
  */
 export async function findBullets(
   designs: readonly BulletRow[],
@@ -149,7 +150,7 @@ export async function findBullets(
   limit: number,
   fit?: CartridgeDiameters,
 ): Promise<ListOf<BulletRow>> {
-  const rows = [...designs, ...(await fetchBulletCatalogue())]
+  const rows = text.trim().length < 2 ? designs : [...designs, ...(await fetchBulletCatalogue())]
   const found = searchBullets(rows, text, { manufacturer: '', caliber: '', mass: '', fit })
   return { total: found.length, items: found.slice(0, limit) }
 }

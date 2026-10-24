@@ -97,19 +97,24 @@ export function RecordSearch<T extends { id: string }>({
       setState({ status: 'idle' })
     }
     const text = q.trim()
-    if (text.length < 2) {
+    if (text.length < 2 && !find) {
       setState({ status: 'idle' })
       return
     }
     const controller = new AbortController()
     const timer = setTimeout(
       async () => {
-        setState({ status: 'loading' })
+        // a first key lists what `find` has for it; with nothing, the field stays quiet
+        if (text.length >= 2) setState({ status: 'loading' })
         try {
           const body = await (find?.(text, 20) ??
             searchRecords<T>(kind, text, 20, params, controller.signal))
           if (!controller.signal.aborted)
-            setState({ status: 'ok', items: body.items, total: body.total })
+            setState(
+              text.length < 2 && body.items.length === 0
+                ? { status: 'idle' }
+                : { status: 'ok', items: body.items, total: body.total },
+            )
         } catch {
           if (!controller.signal.aborted) setState({ status: 'error' })
         }
