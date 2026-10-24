@@ -1,0 +1,36 @@
+{
+  "id": "dsb-luftgewehr-laufende-scheibe-10m-mix",
+  "federation": "dsb",
+  "name": "Laufende Scheibe 10 m MIX",
+  "number": "4.15",
+  "section": "0.21",
+  "page": "Teil 0 Seite 84, PDF p. 102",
+  "distance": {
+    "value": 10000,
+    "raw": "10 m"
+  },
+  "category": "air-rifle",
+  "caliberClasses": {
+    "ids": ["air-4-5"],
+    "basis": "stated"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 84, PDF p. 102 (row 4.15)",
+        "fields": [
+          "name",
+          "number",
+          "federation",
+          "section",
+          "page",
+          "distance",
+          "category",
+          "caliberClasses"
+        ]
+      }
+    ]
+  }
+}

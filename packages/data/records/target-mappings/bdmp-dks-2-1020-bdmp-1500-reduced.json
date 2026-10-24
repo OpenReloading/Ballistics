@@ -1,0 +1,23 @@
+{
+  "id": "bdmp-dks-2-1020-bdmp-1500-reduced",
+  "discipline": "bdmp-dks-2-1020",
+  "face": "bdmp-1500-reduced",
+  "event": "BDMP DKS 2 1020 Dynamisches Kleinkaliberschießen 2 1020",
+  "shotCount": 102,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.22.A.5, Teil D, Seite 203 von 294, PDF p. 203",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.22.A.3, Teil D, Seite 203 von 294, PDF p. 203",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "D.22.A.5 names the face \"BDMP 1500 reduziert\" without a B.11 number. The face of B.11.11 (Teil B, PDF p. 46) carries that name."
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "dsb-luftgewehr-10m-liegend-para",
+  "federation": "dsb",
+  "name": "Luftgewehr 10 m liegend, sitzend mit Tisch (Para)",
+  "number": "1.18",
+  "section": "10.12",
+  "page": "Teil 10 Seite 15, PDF p. 435",
+  "distance": {
+    "value": 10000,
+    "raw": "10 m"
+  },
+  "category": "air-rifle",
+  "caliberClasses": {
+    "ids": ["air-4-5"],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "10.12, Teil 10 Seite 15, PDF p. 435 (row 1.18 Luftgewehr liegend, Anmerkung sitzend mit Tisch)",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 76, PDF p. 94 (row 1.10: Luftgewehr, 4,5 mm, 10 m)",
+        "fields": ["distance", "caliberClasses"]
+      }
+    ],
+    "note": "Row 1.18 prints no distance, caliber or face. The record takes them from the air rifle row 1.10 of 0.21 (Scheibe Nr. 1)."
+  }
+}

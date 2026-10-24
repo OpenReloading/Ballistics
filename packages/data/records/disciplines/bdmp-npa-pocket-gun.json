@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-npa-pocket-gun",
+  "federation": "bdmp",
+  "name": "NPA Service Pistol - Pocket Gun",
+  "section": "C.7D",
+  "page": "Teil C, Seite 39 bis 40 von 142, PDF pp. 39 to 40",
+  "distance": {
+    "value": 15000,
+    "raw": "15 m"
+  },
+  "category": "pistol",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.7D.0, C.7D.1, Teil C, Seite 39 von 142, PDF p. 39",
+        "fields": ["name", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.7D.5, Teil C, Seite 40 von 142, PDF p. 40",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "Revolvers with a 3 in barrel and pistols that fit the 180 x 140 x 40 mm box (C.7D.1). The course runs at 15, 10, 7 and 3 m on one or two NPA faces, the book does not say who chooses. The record holds the longest distance."
+  }
+}

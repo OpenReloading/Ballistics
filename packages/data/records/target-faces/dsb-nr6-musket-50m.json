@@ -69,7 +69,7 @@
     "kind": "published",
     "sources": [
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "fields": [
           "name",
           "rings",
@@ -83,18 +83,18 @@
         "page": "0.20 Scheibe Nr. 6, Teil 0 Seite 66 (PDF p. 84); table row Teil 0 Seite 62 (PDF p. 80)"
       },
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "fields": ["events.scoring"],
-        "page": "7.7.5, Teil 7 Seite 8, PDF p. 344"
+        "page": "7.7.5, Teil 7 Seite 8, PDF p. 346"
       },
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "page": "0.20 Scheibe Nr. 6, Teil 0 Seite 66, PDF p. 84",
         "fields": ["events.name", "events.distance", "events.organization", "events.section"]
       },
       {
-        "source": "dsb-sportordnung-2026",
-        "page": "7.7.5, Teil 7 Seite 8, PDF p. 344",
+        "source": "dsb-sportordnung-2027",
+        "page": "7.7.5, Teil 7 Seite 8, PDF p. 346",
         "fields": ["events.scoring"]
       }
     ]

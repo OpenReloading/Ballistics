@@ -1,3 +1,4 @@
+import { fromSi } from '@openreloading/schema'
 import type { InteriorResponse } from './api-types.ts'
 import { firstIndexBeyondTravel } from './interior-chart.ts'
 import type { InteriorBody } from './interior-input.ts'
@@ -76,7 +77,7 @@ export function rangeLengths(
   from: number | undefined,
   to: number | undefined,
   step: number | undefined,
-  shown: (length: number) => string = (m) => `${m * 1e3} mm`,
+  shown: (length: number) => string = (m) => `${fromSi('length', m)} mm`,
 ): { lengths: number[] } | { errors: RangeErrors } {
   const errors: RangeErrors = {}
   if (from === undefined) errors.from = 'Enter From.'

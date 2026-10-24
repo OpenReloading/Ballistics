@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-epp-pistol-bdmp-epp",
+  "discipline": "bdmp-epp-pistol",
+  "face": "bdmp-epp",
+  "event": "BDMP EPP Europäischer Präzisions Parcours",
+  "shotCount": 50,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.15, Teil B, Seite 56 von 70, PDF p. 56",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.17.10, Teil C, Seite 118 von 142, PDF p. 118",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.17.8, Teil C, Seite 117 von 142, PDF p. 117",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "50 shots in 5:30 min, no sighters (C.17.8)."
+  }
+}

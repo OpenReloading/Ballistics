@@ -8,6 +8,13 @@ it('matches every word of the query in any text, ignoring case', () => {
   expect(matchesQuery(['308 Win.', undefined], '  ')).toBe(true)
 })
 
+it('matches the words in any order and a number in any of its writings', () => {
+  expect(matchesQuery(['308 Win.'], 'win 308')).toBe(true)
+  expect(matchesQuery(['308 Win.', '.308 Winchester'], '.308')).toBe(true)
+  expect(matchesQuery(['7,62 x 51 NATO'], '7.62x51')).toBe(true)
+  expect(matchesQuery(['30-06 Springfield'], '30 06')).toBe(true)
+})
+
 it('sorts by text or number, missing values last in both orders', () => {
   const rows = [{ v: 'b' }, { v: undefined }, { v: '10 a' }, { v: '9 a' }]
   expect(sortRows(rows, (r) => r.v, 'ascending').map((r) => r.v)).toEqual([

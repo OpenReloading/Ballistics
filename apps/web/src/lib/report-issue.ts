@@ -1,5 +1,5 @@
 /** Report issue: the area of a page, the record it shows, and the prefilled new-issue link of the repository. */
-import type { TargetSheet } from '@openreloading/schema'
+import { fromSi, type TargetSheet } from '@openreloading/schema'
 import type { FederationData } from './face-disciplines.ts'
 
 /** Areas of the app, the second part of a report title. */
@@ -194,7 +194,7 @@ export function reportSent(url: string) {
     .join('\n\n')
 }
 
-const mm = (m: number) => (m * 1e3).toFixed(1)
+const mm = (m: number) => fromSi('length', m).toFixed(1)
 
 /** The sheet's settings per group: distance, face, event, discipline and federation where mapped, shot count. */
 export function sheetSettings(sheet: Pick<TargetSheet, 'groups'>, data?: FederationData) {

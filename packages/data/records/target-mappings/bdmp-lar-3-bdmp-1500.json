@@ -1,0 +1,23 @@
+{
+  "id": "bdmp-lar-3-bdmp-1500",
+  "discipline": "bdmp-lar-3",
+  "face": "bdmp-1500",
+  "event": "BDMP LAR 3 Lever Action Rifle 3 (LAR - 1500)",
+  "shotCount": 150,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16A.8, Teil D, Seite 95 von 294, PDF p. 95",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16A.6, Teil D, Seite 95 von 294, PDF p. 95",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "The 50 m parts may be shot at 25 m on the face \"BDMP 1500 .30M1 reduziert\", for which the book prints no dimensions and no record exists."
+  }
+}

@@ -41,9 +41,10 @@ const sidebars: SidebarsConfig = {
     'data/manufacturers',
     'data/record-model',
     'data/firearm-records',
+    'data/catalogue-storage',
     'bibliography',
   ],
-  contributing: ['release', 'ci-tools'],
+  contributing: ['release', 'ci-tools', 'workbench-search'],
 }
 
 export default sidebars

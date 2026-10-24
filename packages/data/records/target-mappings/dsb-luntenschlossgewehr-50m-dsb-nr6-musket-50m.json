@@ -8,14 +8,14 @@
     "kind": "published",
     "sources": [
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "page": "0.20 Scheibe Nr. 6 (heading Muskete, Luntenschlossgewehr), Teil 0 Seite 66, PDF p. 84; the heading of Scheibe Nr. 4, Teil 0 Seite 65, PDF p. 83, excludes the Luntenschlossgewehr",
         "fields": ["discipline", "face", "event"],
         "note": "0.20 lists the Luntenschlossgewehr under Scheibe Nr. 6; row 7.32 of 0.21 names Scheibe Nr. 4."
       },
       {
-        "source": "dsb-sportordnung-2026",
-        "page": "0.21, Teil 0 Seite 89, PDF p. 107 (row 7.32, column Wettkampfschüsse); 7.7.5, Teil 7 Seite 8, PDF p. 344",
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 89, PDF p. 107 (row 7.32, column Wettkampfschüsse); 7.7.5, Teil 7 Seite 8, PDF p. 346",
         "fields": ["shotCount"]
       }
     ]

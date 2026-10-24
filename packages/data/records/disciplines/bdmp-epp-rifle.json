@@ -1,0 +1,29 @@
+{
+  "id": "bdmp-epp-rifle",
+  "federation": "bdmp",
+  "name": "Europäischer Präzisions Parcours .223 Rem.",
+  "number": "EPP Rifle",
+  "section": "D.25",
+  "page": "Teil D, Seite 232 bis 239 von 294, PDF pp. 232 to 239",
+  "distance": {
+    "value": 30000,
+    "raw": "30 m"
+  },
+  "category": "rifle",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.25, D.25.1, Teil D, Seite 232 von 294, PDF p. 232",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.25.14, Teil D, Seite 235 von 294, PDF p. 235",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "Semi-automatic rifles in .223 Rem. EPP Carbine (D.25.A, Teil D, PDF p. 240) shoots the same course with 9 mm Luger long guns and may shoot station 2 at 25 m standing. Six stations at 7 to 30 m, the record holds the longest distance."
+  }
+}

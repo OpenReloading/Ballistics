@@ -174,7 +174,7 @@ Without marks the face is centred on the group's point of aim, or on the sheet o
 
 - [ISSF 2022](../bibliography.md#issf-2022), pp. 320 to 330: ring diameters to the outside edge of the line (rule 1.1.2), plug gauges and their measuring edges (rules 1.4.1 to 1.4.10), the higher value for a hole touching a ring line (rule 5.2.1).
 - [ISSF 2025, Third Print](../bibliography.md#issf-2025-third), pp. 194 to 200: decimal scoring (rule 6.3.3.1, p. 194), inner ten (rules 6.3.4.1 to 6.3.4.6), the 10 m air rifle inner ten only when the dot is shot out (rule 6.3.4.3).
-- [DSB 2026](../bibliography.md#dsb-2026): touch rule and measuring rings by calibre, Teil 0, 0.11.3 and 0.11.3.2 (Seite 40), faces in 0.20 (Teil 0, Seiten 62 to 68), hole centre for the muzzle-loader ball events, 7.7.5 (Teil 7, Seite 8).
+- [DSB 2027](../bibliography.md#dsb-2027): touch rule and measuring rings by calibre, Teil 0, 0.11.3 and 0.11.3.2 (Seite 40), faces in 0.20 (Teil 0, Seiten 62 to 70), hole centre for the muzzle-loader ball events, 7.7.5 (Teil 7, Seite 8).
 - [BDMP 2026](../bibliography.md#bdmp-2026): touch rule, A.3.21.1.3, hole centre for black powder, A.3.21.4.1, faces in B.11.
 - [DSU 2018](../bibliography.md#dsu-2018): touch rule, Kapitel 1 (Seite 27), hole centre for black powder, Kapitel 4 (Besondere Auswertungsregeln, PDF p. 126).
 - [VdRBw](../bibliography.md#vdrbw): touch rule, rule 519, faces in Kapitel 8 to 10.

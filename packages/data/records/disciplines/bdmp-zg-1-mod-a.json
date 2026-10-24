@@ -1,0 +1,29 @@
+{
+  "id": "bdmp-zg-1-mod-a",
+  "federation": "bdmp",
+  "name": "Zielfernrohrgewehr 1 modifiziert A",
+  "number": "ZG 1 mod. A",
+  "section": "D.11.15",
+  "page": "Teil D, Seite 69 von 294, PDF p. 69",
+  "distance": {
+    "value": 100000,
+    "raw": "100 m"
+  },
+  "category": "rifle",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.11.15, Teil D, Seite 69 von 294, PDF p. 69",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.11.13, Teil D, Seite 68 von 294, PDF p. 68",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "Service rifles with a scope introduced after 1 January 1965 and civil versions of service rifles. D.11.15 restates no distance, the record takes the 100 m of ZG 1 (D.11.13). Scored in its own class."
+  }
+}

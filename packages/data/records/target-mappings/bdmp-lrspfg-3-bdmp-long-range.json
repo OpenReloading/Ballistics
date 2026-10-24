@@ -1,0 +1,23 @@
+{
+  "id": "bdmp-lrspfg-3-bdmp-long-range",
+  "discipline": "bdmp-lrspfg-3",
+  "face": "bdmp-long-range",
+  "event": "BDMP SPFG3 LR Schwarzpulverfreigewehr, 300 bis 900 m",
+  "shotCount": 10,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.6.8, Teil E, Seite 18 von 42, PDF p. 18",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.6.7, Teil E, Seite 18 von 42, PDF p. 18",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "E.6.8 names \"Long Range Scheiben (B.10.5.7.2 bis B.10.5.7.6)\"; Teil B has no such numbers, the Long Range faces are B.11.8.2 to B.11.8.6. 5 sighters and 10 scoring shots in 30 min, or 5 sighters and 15 scoring shots in 45 min as announced (E.6.7); the book gives one shot clause for all classes."
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-npa-pocket-gun-bdmp-npa",
+  "discipline": "bdmp-npa-pocket-gun",
+  "face": "bdmp-npa",
+  "event": "BDMP NPA Service Pistol - Pocket Gun",
+  "shotCount": 24,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.10, Teil B, Seite 44 von 70, PDF p. 44",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.7D.4, Teil C, Seite 40 von 142, PDF p. 40",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.7D.3, Teil C, Seite 40 von 142, PDF p. 40",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "4 stations of 6 shots (C.7D.5)."
+  }
+}

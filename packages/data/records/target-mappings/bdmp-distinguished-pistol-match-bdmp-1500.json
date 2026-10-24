@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-distinguished-pistol-match-bdmp-1500",
+  "discipline": "bdmp-distinguished-pistol-match",
+  "face": "bdmp-1500",
+  "event": "BDMP Distinguished Pistol Match",
+  "shotCount": 60,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.11, Teil B, Seite 46 von 70, PDF p. 46",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.3, Teil C, Seite 44 von 142, PDF p. 44",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.9.3.4, Teil C, Seite 61 von 142, PDF p. 61",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "The match is Match 5 of C.8.2 (Teil C, PDF pp. 42 to 43): 7 (10), 25, 50 and 25 m or yd, 60 shots."
+  }
+}

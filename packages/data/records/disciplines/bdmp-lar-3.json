@@ -1,0 +1,29 @@
+{
+  "id": "bdmp-lar-3",
+  "federation": "bdmp",
+  "name": "Lever Action Rifle 3 (LAR - 1500)",
+  "number": "LAR 3",
+  "section": "D.16A",
+  "page": "Teil D, Seite 94 bis 102 von 294, PDF pp. 94 to 102",
+  "distance": {
+    "value": 50000,
+    "raw": "50 Meter"
+  },
+  "category": "lever-action",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16A, D.16A.1, Teil D, Seite 94 von 294, PDF p. 94",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16A.13, Teil D, Seite 97 bis 98 von 294, PDF pp. 97 to 98",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "Lever-action rifle, calibers from 6.5 mm that count as handgun cartridges, Standard class with open sights and Open class with aperture, red-dot or telescopic sights. The course runs at 10, 15, 25 and 50 m, the record holds the longest distance."
+  }
+}

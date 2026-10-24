@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { firearm } from './firearm.ts'
+import { parseRef, recordId } from './ids.ts'
 import { siValues, text } from './shared.ts'
 import { specValue } from './standards.ts'
 import { targetSheet } from './target-sheet.ts'
@@ -13,7 +14,7 @@ export const userDataVersion = 1
 /** The catalogue record a design started from. */
 const parent = z
   .object({
-    id: z.string().min(1).max(200).describe('Id of the catalogue record.'),
+    id: recordId.describe('Id of the catalogue record.'),
     title: text(200).describe('Title of the catalogue record as shown when the design was saved.'),
   })
   .describe('The catalogue record the design started from.')
@@ -132,6 +133,48 @@ export const userDataFile = z.object({
     .describe('Photos of the target sheets, base64.')
     .optional(),
 })
+
+/** Records of a user data file, as {@link checkUserRefs} takes them. */
+export type UserRecords = UserRecord[]
+
+/** A reference of a user record that points at no record of the set given to {@link checkUserRefs}. */
+export interface DanglingRef {
+  /** Id of the record that holds the reference. */
+  record: string
+  /** Kind of that record. */
+  kind: UserRecordKind
+  /** The field of its `data` that holds the reference. */
+  field: string
+  /** The reference as stored. */
+  target: string
+}
+
+/**
+ * The references of `records` to user records that no record of `records` answers: a workbench
+ * state's `firearm` and a target sheet's `load`. An old id and a `user:<id>` reference name a
+ * record by its id, a `catalogue:` reference is not checked here. Reports only: nothing is dropped.
+ */
+export function checkUserRefs(records: UserRecords): DanglingRef[] {
+  const kindOf = new Map(records.map((r) => [r.id, r.kind]))
+  const dangling: DanglingRef[] = []
+  const check = (
+    r: UserRecord,
+    field: string,
+    target: string | undefined,
+    kind: UserRecordKind,
+  ) => {
+    if (target === undefined) return
+    const parsed = parseRef(target)
+    if (parsed?.scope === 'catalogue') return
+    if (kindOf.get(parsed?.id ?? target) !== kind)
+      dangling.push({ record: r.id, kind: r.kind, field, target })
+  }
+  for (const r of records) {
+    if (r.kind === 'workbenchState') check(r, 'firearm', r.data.firearm, 'firearm')
+    else if (r.kind === 'targetSheet') check(r, 'load', r.data.load, 'workbenchState')
+  }
+  return dangling
+}
 
 /**
  * Why a user data file of another format version is refused, naming the version this build reads;

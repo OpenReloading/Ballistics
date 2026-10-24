@@ -10,8 +10,10 @@ import {
   type Bullet,
   type BulletDesign,
   baseTypes,
+  fromSi,
   ogiveForms,
   tipTypes,
+  toSi,
 } from '@openreloading/schema'
 import { computedBulletRows } from './bullet.ts'
 import {
@@ -21,6 +23,7 @@ import {
   type FieldValue,
   fieldError,
   fieldOf,
+  siToStored,
   storedToSi,
 } from './field-spec.ts'
 import { designReduce, editHistory, type History as H, historyOf, pushHistory } from './history.ts'
@@ -120,7 +123,7 @@ export interface Design {
   parent?: BulletDesign['parent']
 }
 
-const factor = (s: FieldSpec) => storedToSi[s.quantity as keyof typeof storedToSi]
+const stored = (s: FieldSpec) => s.quantity as Parameters<typeof storedToSi>[0]
 
 /** A value of `o` by its dot path. */
 const at = (o: unknown, path: string): unknown =>
@@ -157,7 +160,7 @@ export function fromRecord(
   const si: Origin['si'] = {}
   for (const s of designerSpecs) {
     const q = at(r, s.key) as { value: number } | undefined
-    si[s.key] = q && q.value * factor(s)
+    si[s.key] = q && storedToSi(stored(s), q.value)
   }
   const choices: Choices = {
     'base.type': r.base?.type ?? '',
@@ -328,8 +331,8 @@ function fieldStates({ fields, origin }: Design): {
   const v: StoredValues = {}
   for (const s of designerSpecs) {
     const si = fields[s.key]?.si
-    // 12 significant digits drop the noise of the SI round trip (7.823e-3 / 1e-3)
-    v[s.key] = si === undefined ? undefined : Number((si / factor(s)).toPrecision(12))
+    // 12 significant digits drop the noise of the SI round trip (7.823 mm in m and back)
+    v[s.key] = si === undefined ? undefined : Number(siToStored(stored(s), si).toPrecision(12))
     if (si === undefined) states[s.key] = { kind: 'empty' }
     else if (origin && close(si, origin.si[s.key])) states[s.key] = { kind: 'record' }
     else
@@ -482,7 +485,7 @@ function derivedFills(
     fill['base.diameter'] = [2 * o.points[e][0], tagB]
     const top = o.points[e + 1]
     fill['base.angle'] = [
-      (Math.atan((top[0] - o.points[e][0]) / t) * 180) / Math.PI,
+      fromSi('angle', Math.atan((top[0] - o.points[e][0]) / t)),
       tagT === 'assumed' || tagB === 'assumed' ? 'assumed' : 'derived',
     ]
   }
@@ -539,7 +542,7 @@ export function evaluate(design: Design, system: UnitSystem, last?: string): Eva
   for (const s of designerSpecs) {
     const f = fill[s.key]
     if (v[s.key] === undefined && f && fieldInUse(s.key, design) && Number.isFinite(f[0]))
-      states[s.key] = { kind: f[1], si: f[0] * factor(s), ...(f[2] && { basis: f[2] }) }
+      states[s.key] = { kind: f[1], si: storedToSi(stored(s), f[0]), ...(f[2] && { basis: f[2] }) }
   }
 
   const unit = drawingLengthUnit(system)
@@ -562,7 +565,10 @@ export function evaluate(design: Design, system: UnitSystem, last?: string): Eva
  */
 export function sliderMax(key: string, design: Design): number {
   // the diameter rounded up to whole mm, so the ranges also hold while the diameter is typed
-  const d = Math.ceil((design.fields.diameter?.si ?? newBulletStart.diameter) * 1e3) * 1e-3
+  const d = toSi(
+    'length',
+    Math.ceil(fromSi('length', design.fields.diameter?.si ?? newBulletStart.diameter)),
+  )
   const max: Record<string, number> = {
     diameter: 20e-3,
     mass: 60e-3,
@@ -573,7 +579,7 @@ export function sliderMax(key: string, design: Design): number {
     'base.diameter': d,
     'base.cavityDiameter': d,
     'tip.mouthDiameter': d,
-    'base.angle': (30 * Math.PI) / 180,
+    'base.angle': toSi('angle', 30),
     'cannelure.width': d,
     'cannelure.depth': d / 10,
   }

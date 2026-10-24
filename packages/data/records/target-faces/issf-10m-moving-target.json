@@ -1,0 +1,168 @@
+{
+  "id": "issf-10m-moving-target",
+  "name": "10m Moving Target",
+  "organization": "ISSF",
+  "rings": [
+    {
+      "value": 1,
+      "diameter": {
+        "value": 50.5
+      }
+    },
+    {
+      "value": 2,
+      "diameter": {
+        "value": 45.5
+      }
+    },
+    {
+      "value": 3,
+      "diameter": {
+        "value": 40.5
+      }
+    },
+    {
+      "value": 4,
+      "diameter": {
+        "value": 35.5
+      }
+    },
+    {
+      "value": 5,
+      "diameter": {
+        "value": 30.5
+      }
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 25.5
+      }
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 20.5
+      }
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 15.5
+      }
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 10.5
+      }
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 5.5
+      }
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 0.5
+    },
+    "rule": "touch"
+  },
+  "blackDiameter": {
+    "value": 30.5,
+    "raw": "Black from 5 to 10 rings = 30.5mm"
+  },
+  "decimal": true,
+  "events": [
+    {
+      "name": "10m Moving Target",
+      "distance": {
+        "value": 10000,
+        "raw": "10m"
+      },
+      "gauge": {
+        "value": 4.5
+      },
+      "scoring": "touch"
+    },
+    {
+      "name": "10m Moving Target Mixed",
+      "distance": {
+        "value": 10000,
+        "raw": "10m"
+      },
+      "gauge": {
+        "value": 4.5
+      },
+      "scoring": "touch"
+    }
+  ],
+  "paper": {
+    "width": {
+      "value": 260
+    },
+    "height": {
+      "value": 150
+    }
+  },
+  "bulls": [
+    {
+      "x": {
+        "value": -70
+      },
+      "y": {
+        "value": 0
+      },
+      "zone": "left"
+    },
+    {
+      "x": {
+        "value": 70
+      },
+      "y": {
+        "value": 0
+      },
+      "zone": "right"
+    }
+  ],
+  "numerals": true,
+  "photoSearch": false,
+  "note": "One card with two scoring zones, the centres of the 10 rings 70 mm left and right of the single aiming mark at the card centre (15.5 mm black, white rings of 5.5 and 10.5 mm, 0.5 mm dot). The card size is the recommended one (minimum 260 mm by 140 mm). Ring values 1 to 9 are printed in the zones. The inner ten is the white 0.5 mm dot, gauged like rings 3 to 10. A 4.5 mm hole is scored with the inward gauge on rings 1 and 2 and the 5.50 mm outward gauge on rings 3 to 10.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 6.3.4.8, pp. 202 to 203 (PDF pp. 202 to 203)",
+        "fields": [
+          "name",
+          "rings",
+          "innerTen.diameter",
+          "blackDiameter",
+          "numerals",
+          "bulls",
+          "paper"
+        ]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 3.3.1, p. 39 (PDF p. 39)",
+        "fields": ["events.name", "events.distance"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rules 6.3.3.1 to 6.3.3.3, pp. 194 to 195 (PDF pp. 194 to 195)",
+        "fields": ["decimal"],
+        "note": "Tenth-ring values where electronic targets or scoring machines are used, else whole rings."
+      },
+      {
+        "source": "issf-paper-target-scoring-2022",
+        "page": "Rules 1.4.4 and 1.4.7, pp. 321 to 322 (PDF pp. 2 to 3); rule 5.2.1, p. 330 (PDF p. 11)",
+        "fields": ["events.gauge", "events.scoring", "innerTen.rule"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

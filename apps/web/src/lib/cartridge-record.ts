@@ -1,6 +1,6 @@
 import { greek } from '@openreloading/drawing'
 import { conflictWording, type Figure, shotshellVariants } from '@openreloading/drawing/cartridge'
-import type { SpecValue } from '@openreloading/schema'
+import { type SpecValue, toSi } from '@openreloading/schema'
 import type { CartridgeDetail } from './api-types.ts'
 import { fieldSpecs, type Group, groups } from './cartridge-designer.ts'
 import { degreeText, formatNumber, inchText, type UnitSystem } from './units.ts'
@@ -129,13 +129,8 @@ const readingOrder: RowGroup[] = ['neck', 'shoulder', 'body', 'head', 'throat', 
 export const inReadingOrder = <T extends { group: RowGroup }>(rows: T[]): T[] =>
   [...rows].sort((a, b) => readingOrder.indexOf(a.group) - readingOrder.indexOf(b.group))
 
-/** The records' units (`packages/schema/src/units.ts`) as factors to SI and symbols. */
-const stored = {
-  length: [1e-3, 'mm'],
-  pressure: [1e5, 'bar'],
-  energy: [1, 'J'],
-  area: [1e-6, 'mm²'],
-} as const
+/** The symbol of each quantity's stored unit (`packages/schema/src/units.ts`). */
+const stored = { length: 'mm', pressure: 'bar', energy: 'J', area: 'mm²' } as const
 type Converted = keyof typeof stored
 export const converted = (q: string): q is Converted => Object.hasOwn(stored, q)
 
@@ -143,10 +138,10 @@ export const converted = (q: string): q is Converted => Object.hasOwn(stored, q)
 export function specValueText(q: string, x: number, system: UnitSystem) {
   if (q === 'angle') return `${degreeText(x)}°`
   if (!converted(q)) return String(x)
-  const [factor, symbol] = stored[q]
+  const symbol = stored[q]
   const unit = system[q]
   return inchText(
-    unit.symbol === symbol ? String(x) : formatNumber(unit.fromSi(x * factor), unit.decimals),
+    unit.symbol === symbol ? String(x) : formatNumber(unit.fromSi(toSi(q, x)), unit.decimals),
     unit.symbol,
   )
 }

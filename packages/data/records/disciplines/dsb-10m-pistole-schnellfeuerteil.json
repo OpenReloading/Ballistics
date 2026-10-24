@@ -2,8 +2,9 @@
   "id": "dsb-10m-pistole-schnellfeuerteil",
   "federation": "dsb",
   "name": "10 m Pistole Schnellfeuerteil",
-  "section": "0.20",
-  "page": "Seite 62 and 67, PDF pp. 80 and 85",
+  "number": "2.17",
+  "section": "0.21",
+  "page": "Teil 0 Seite 80, PDF p. 98",
   "distance": {
     "value": 10000,
     "raw": "10 m"
@@ -12,9 +13,14 @@
     "kind": "published",
     "sources": [
       {
-        "source": "dsb-sportordnung-2026",
+        "source": "dsb-sportordnung-2027",
         "page": "Seite 62 and 67, PDF pp. 80 and 85",
-        "fields": ["name", "federation", "section", "page", "distance"]
+        "fields": ["name", "federation"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "Teil 0 Seite 80, PDF p. 98 (row 2.17, the rapid-fire part of the 10 m air pistol multi-event on Scheibe Nr. 7/8)",
+        "fields": ["number", "section", "page", "distance"]
       }
     ]
   }

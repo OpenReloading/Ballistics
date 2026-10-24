@@ -1,13 +1,19 @@
 'use client'
 
 import { Button, Group, Kbd, Menu, Textarea } from '@mantine/core'
-import type { EmbeddedFile, UserRecord, UserRecordKind } from '@openreloading/schema'
+import {
+  type EmbeddedFile,
+  type UserRecord,
+  type UserRecordKind,
+  userRecord,
+} from '@openreloading/schema'
 import { CaretDown, FloppyDisk, FolderOpen } from '@phosphor-icons/react'
 import { memo, type Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { localDay } from '../lib/dates.ts'
 import { download } from '../lib/download.ts'
 import { errorText } from '../lib/error-text.ts'
+import { exampleFirearm } from '../lib/example-data.ts'
 import {
   pickFiles,
   readHandleText,
@@ -17,6 +23,7 @@ import {
 } from '../lib/file-access.ts'
 import { parseFiles, readLoadFile, readNote } from '../lib/load-file-formats.ts'
 import { guardNavigation, guardPop } from '../lib/navigation-guard.ts'
+import { newId } from '../lib/new-id.ts'
 import { maxLinkChars, readLink, shareLink } from '../lib/share-link.ts'
 import { type ShortcutId, shortcutAriaKeys, shortcutLabel } from '../lib/shortcuts.ts'
 import { controlSize } from '../lib/theme.ts'
@@ -30,6 +37,7 @@ import {
   type ParsedUserFile,
   parseUserDataFile,
   planImport,
+  refNote,
   renamedKey,
   tooLargeMessage,
   userDataText,
@@ -39,8 +47,10 @@ import { droppedPhotos, embeddedFileBlob, embedFiles, photoIds } from '../lib/us
 import {
   deletePhoto,
   deleteRecords,
+  putInvalid,
   putPhoto,
   putRecords,
+  rawPhotoId,
   requestPersistentStorage,
   storedPhoto,
   storedPhotoIds,
@@ -64,9 +74,10 @@ import { useShortcuts } from './shortcuts.tsx'
 const ask = (title: string, confirmLabel: string) =>
   confirmDialog({ title, confirmLabel, danger: true })
 
-type Of<K extends UserRecordKind> = Extract<UserRecord, { kind: K }>
+/** The records the pages resolve themselves, never stored. */
+const builtIn = userRecord.parse(exampleFirearm)
 
-export const newId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`
+type Of<K extends UserRecordKind> = Extract<UserRecord, { kind: K }>
 
 /** A file's text; undefined for a file over the size limit, which is not read. */
 const read = async (file: File) => (file.size > maxFileBytes ? undefined : file.text())
@@ -148,6 +159,8 @@ type Report = {
   /** Warnings and fields not read of the files read. */
   notes: { name: string; note: string }[]
   conflicts: { incoming: UserRecord; stored: UserRecord }[]
+  /** The `invalid` entries of the files: stored as invalid records, left out for an id the browser has, or unstorable. */
+  invalid: { added: number; kept: number; unstorable: number }
   /** Photos the files carry, stored with the records that are replaced. */
   files: EmbeddedFile[]
 }
@@ -697,8 +710,14 @@ function FileMenuOf<K extends UserRecordKind>({
     )
   }
 
+  /** `refNote` of `opened` against the browser store and the built-in example rifle; empty when the store cannot be read. */
+  async function refsOf(opened: UserRecord[]) {
+    const stored = await storedRecords().catch(() => undefined)
+    return stored ? refNote(opened, [builtIn, ...stored.records]) : ''
+  }
+
   /** Shows `record` unless the user keeps the unsaved changes; false when kept. */
-  async function use(record: Of<K>, file: string, h?: FileSystemFileHandle) {
+  async function use(record: Of<K>, file: string, h?: FileSystemFileHandle, note?: string) {
     if (unsaved && !(await ask('Replace the unsaved changes with the opened record?', 'Replace')))
       return false
     onOpen(record.data as Of<K>['data'], record.name, record)
@@ -706,6 +725,8 @@ function FileMenuOf<K extends UserRecordKind>({
     handle.current = h
     known.current = record.saved
     setSaved({ file, json: keyOf(record.data, record.name) })
+    const text = [note, await refsOf([record])].filter(Boolean).join(' ')
+    if (text) setMessage(`${file} opened. ${text}`)
     return true
   }
 
@@ -744,16 +765,12 @@ function FileMenuOf<K extends UserRecordKind>({
       onStored?.()
     }
     // Save writes back only to a file of this record alone
-    const note = readNote(parsed)
-    if (
-      (await use(
-        mine[0],
-        picked.file.name,
-        ownsFile(text, mine[0].id) ? picked.handle : undefined,
-      )) &&
-      note
+    await use(
+      mine[0],
+      picked.file.name,
+      ownsFile(text, mine[0].id) ? picked.handle : undefined,
+      readNote(parsed),
     )
-      setMessage(`${picked.file.name} opened. ${note}`)
   }
 
   /** True when a file was written. */
@@ -800,13 +817,16 @@ function FileMenuOf<K extends UserRecordKind>({
       skipped: [],
       notes: [],
       conflicts: [],
+      invalid: { added: 0, kept: 0, unstorable: 0 },
       files: [],
     }
     let count = 0
+    const added: UserRecord[] = []
     for (const f of files) {
       const {
         records,
         files: photos,
+        invalid,
         skipped,
         notes,
       } = parseFiles([{ name: f.name, text: await f.text() }])
@@ -816,11 +836,15 @@ function FileMenuOf<K extends UserRecordKind>({
         // an equal record may come to a browser without its photo
         await storePhotos(photos, [...plan.added, ...plan.equal])
         await putRecords(plan.added)
+        // after the valid records, and never over a record with its id
+        const stored = await putInvalid(invalid)
+        for (const k of ['added', 'kept', 'unstorable'] as const) total.invalid[k] += stored[k]
       } catch (e) {
         setFailure(`Import read ${count} records; the browser store write failed: ${errorText(e)}`)
         if (total.added) onStored?.()
         return
       }
+      added.push(...plan.added)
       total.added += plan.added.length
       total.equal += plan.equal.length
       total.skipped.push(...skipped)
@@ -830,6 +854,9 @@ function FileMenuOf<K extends UserRecordKind>({
       const wanted = new Set(photoIds(plan.conflicts.map((c) => c.incoming)))
       total.files.push(...photos.filter((p) => wanted.has(p.id)))
     }
+    // once all files are stored, so a reference to a record of a later file resolves
+    const refs = await refsOf(added)
+    if (refs) total.notes.push({ name: 'References', note: refs })
     onStored?.()
     noteStorage()
     setReport(total)
@@ -850,7 +877,9 @@ function FileMenuOf<K extends UserRecordKind>({
     for (const p of left) deletePhoto(p).catch(() => {})
     onStored?.()
     setReport(undefined)
-    setMessage(`Replaced ${report.conflicts.length} browser records.`)
+    setMessage(
+      `Replaced ${report.conflicts.length} browser records. ${await refsOf(incoming)}`.trimEnd(),
+    )
   }
 
   async function browserRecords() {
@@ -864,6 +893,25 @@ function FileMenuOf<K extends UserRecordKind>({
 
   async function invalidRecords() {
     setInvalidList((await storedRecords()).invalid)
+  }
+
+  async function removeInvalid(r: InvalidRecord) {
+    const label = r.name ?? r.id ?? 'Unnamed record'
+    if (
+      !(await ask(
+        `Delete the invalid record ${label} from this browser? This cannot be undone.`,
+        'Delete',
+      ))
+    )
+      return
+    // the store's key may be no text: only a record with a text id shows an `id`
+    await deleteRecords([(r.raw as { id: string }).id])
+    // an invalid sheet's photo leaves with it unless another record points at it
+    const photo = rawPhotoId(r.raw)
+    if (photo && !(await storedPhotoIds()).has(photo)) deletePhoto(photo).catch(() => {})
+    setInvalidList((l) => l?.filter((i) => i !== r))
+    setInvalidCount((n) => n - 1)
+    setMessage(`Deleted the invalid record ${label} from this browser.`)
   }
 
   async function pickFolder() {
@@ -992,6 +1040,17 @@ function FileMenuOf<K extends UserRecordKind>({
               {report.added} records added, {report.equal} already in this browser,{' '}
               {report.skipped.length} files skipped.
             </p>
+            {report.invalid.added + report.invalid.kept + report.invalid.unstorable > 0 && (
+              <p>
+                {report.invalid.added} invalid {report.invalid.added === 1 ? 'record' : 'records'}{' '}
+                restored
+                {report.invalid.kept > 0 &&
+                  `, ${report.invalid.kept} left out because a browser record has their id`}
+                {report.invalid.unstorable > 0 &&
+                  `, ${report.invalid.unstorable} left out without a text id`}
+                .
+              </p>
+            )}
             {report.skipped.length > 0 && (
               <ul className="file-skipped">
                 {report.skipped.map((s) => (
@@ -1081,7 +1140,7 @@ function FileMenuOf<K extends UserRecordKind>({
       >
         <p>
           These records do not pass the current format. They stay in this browser, are not shown
-          elsewhere and are in Export all as stored.
+          elsewhere and are in Export all as stored, which Import restores as invalid records.
         </p>
         <ul className="file-records">
           {invalidList?.map((r) => (
@@ -1099,6 +1158,14 @@ function FileMenuOf<K extends UserRecordKind>({
                 }
               >
                 Download raw
+              </Button>{' '}
+              <Button
+                variant="subtle"
+                color="red"
+                size={controlSize.row.button}
+                onClick={act('Delete', () => removeInvalid(r))}
+              >
+                Delete
               </Button>
               <pre className="file-error">{r.error}</pre>
             </li>

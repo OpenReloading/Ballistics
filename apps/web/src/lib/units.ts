@@ -1,9 +1,5 @@
-import {
-  lbPerSqInToKgPerSqM,
-  radPerMoa,
-  radPerMrad,
-  waterDensityGramsPerCm3,
-} from '@openreloading/core'
+import { radPerMoa, radPerMrad, waterDensityGramsPerCm3 } from '@openreloading/core'
+import { fromSi, type QuantityKind, toSi } from '@openreloading/schema'
 
 /**
  * Display units. Every value is held in SI; a unit converts to and from SI and has a fixed number
@@ -52,6 +48,14 @@ export interface Unit {
   step?: number
 }
 
+/** The volume in m3 of `grams` of water: a water capacity as the records store it. */
+export const waterVolume = (grams: number) =>
+  toSi('mass', grams) / toSi('density', waterDensityGramsPerCm3)
+
+/** The mass in g of the water that fills `m3`: the inverse of {@link waterVolume}. */
+export const waterGrams = (m3: number) =>
+  fromSi('mass', m3 * toSi('density', waterDensityGramsPerCm3))
+
 export const metersPerInch = 0.0254
 export const metersPerFoot = 0.3048
 const metersPerYard = 0.9144
@@ -66,6 +70,11 @@ const poundForce = 0.45359237 * 9.80665
 export const psi = poundForce / metersPerInch ** 2
 export const footPound = metersPerFoot * poundForce
 
+/** A unit that is the stored unit of the quantity `kind`, converted by the schema's unit table. */
+function stored(kind: QuantityKind, symbol: string, decimals: number, step?: number): Unit {
+  return { symbol, toSi: (x) => toSi(kind, x), fromSi: (si) => fromSi(kind, si), decimals, step }
+}
+
 function linear(symbol: string, factor: number, decimals: number, step?: number): Unit {
   return { symbol, toSi: (x) => x * factor, fromSi: (si) => si / factor, decimals, step }
 }
@@ -73,29 +82,29 @@ function linear(symbol: string, factor: number, decimals: number, step?: number)
 /** The display units of each quantity, by unit id; the first is the SI-based one. */
 export const unitsOf = {
   range: { m: linear('m', 1, 0), yd: linear('yd', metersPerYard, 0) },
-  length: { mm: linear('mm', 1e-3, 2, 0.01), in: linear('in', metersPerInch, 4, 0.0005) },
+  length: { mm: stored('length', 'mm', 2, 0.01), in: linear('in', metersPerInch, 4, 0.0005) },
   // barrel twist, length per turn: 1:10 in on rifles and in load data, 254 mm from barrel makers and C.I.P.
-  twist: { mm: linear('mm', 1e-3, 0), in: linear('in', metersPerInch, 1) },
+  twist: { mm: stored('length', 'mm', 0), in: linear('in', metersPerInch, 1) },
   // a firearm's barrel length: 24 in on rifles in common metric use, 610 mm in SI
-  barrelLength: { mm: linear('mm', 1e-3, 0, 1), in: linear('in', metersPerInch, 2, 0.25) },
+  barrelLength: { mm: stored('length', 'mm', 0, 1), in: linear('in', metersPerInch, 2, 0.25) },
   lineOfSightOffset: {
     cm: linear('cm', 1e-2, 1),
-    mm: linear('mm', 1e-3, 0),
+    mm: stored('length', 'mm', 0),
     in: linear('in', metersPerInch, 1),
   },
   velocity: { 'm/s': linear('m/s', 1, 0), 'ft/s': linear('ft/s', metersPerFoot, 0) },
   windSpeed: { 'm/s': linear('m/s', 1, 1), mph: linear('mph', metersPerSecondPerMph, 1) },
-  mass: { g: linear('g', 1e-3, 2), gr: linear('gr', kilogramsPerGrain, 1) },
+  mass: { g: stored('mass', 'g', 2), gr: linear('gr', kilogramsPerGrain, 1) },
   // a firearm's mass: bullet mass units do not fit it
   firearmMass: { kg: linear('kg', 1, 2), lb: linear('lb', 0.45359237, 2) },
-  charge: { g: linear('g', 1e-3, 2, 0.01), gr: linear('gr', kilogramsPerGrain, 1, 0.1) },
+  charge: { g: stored('mass', 'g', 2, 0.01), gr: linear('gr', kilogramsPerGrain, 1, 0.1) },
   energy: { J: linear('J', 1, 0), 'ft-lbf': linear('ft·lbf', footPound, 0) },
   temperature: {
-    degC: { symbol: '°C', toSi: (t) => t + 273.15, fromSi: (k) => k - 273.15, decimals: 1 },
+    degC: stored('temperature', '°C', 1),
     degF: {
       symbol: '°F',
-      toSi: (t) => ((t - 32) * 5) / 9 + 273.15,
-      fromSi: (k) => ((k - 273.15) * 9) / 5 + 32,
+      toSi: (t) => toSi('temperature', ((t - 32) * 5) / 9),
+      fromSi: (k) => (fromSi('temperature', k) * 9) / 5 + 32,
       decimals: 1,
     },
   },
@@ -105,21 +114,21 @@ export const unitsOf = {
     degF: linear('°F', 5 / 9, 1, 1),
   },
   airPressure: { hPa: linear('hPa', 100, 1), inHg: linear('inHg', pascalsPerInHg, 2) },
-  pressure: { bar: linear('bar', 1e5, 0), psi: linear('psi', psi, 0) },
-  area: { mm2: linear('mm²', 1e-6, 2), in2: linear('in²', metersPerInch ** 2, 5) },
+  pressure: { bar: stored('pressure', 'bar', 0), psi: linear('psi', psi, 0) },
+  area: { mm2: stored('area', 'mm²', 2), in2: linear('in²', metersPerInch ** 2, 5) },
   altitude: { m: linear('m', 1, 0), ft: linear('ft', metersPerFoot, 0) },
   // gr H2O: the volume of that mass of water
   capacity: {
     cm3: linear('cm³', 1e-6, 3),
-    grH2O: linear('gr H₂O', kilogramsPerGrain / (waterDensityGramsPerCm3 * 1e3), 1),
+    grH2O: linear('gr H₂O', kilogramsPerGrain / toSi('density', waterDensityGramsPerCm3), 1),
   },
   specificEnergy: { 'MJ/kg': linear('MJ/kg', 1e6, 3) },
   ratio: { '1': linear('', 1, 3) },
-  density: { 'g/cm3': linear('g/cm³', 1e3, 3) },
+  density: { 'g/cm3': stored('density', 'g/cm³', 3) },
   covolume: { 'cm3/g': linear('cm³/g', 1e-3, 3) },
   vivacity: { '1/s': linear('1/s', 1, 3) },
-  ballisticCoefficient: { 'lb/in2': linear('lb/in²', lbPerSqInToKgPerSqM, 3) },
-  angle: { deg: linear('deg', Math.PI / 180, 0) },
+  ballisticCoefficient: { 'lb/in2': stored('ballisticCoefficient', 'lb/in²', 3) },
+  angle: { deg: stored('angle', 'deg', 0) },
   correction: {
     MOA: linear('MOA', radPerMoa, 2),
     mrad: linear('mrad', radPerMrad, 2),
@@ -130,7 +139,7 @@ export const unitsOf = {
   // a bullet's mass over its diameter squared, kg/m² in SI; makers print lb/in²
   sectionalDensity: {
     'kg/m2': linear('kg/m²', 1, 1),
-    'lb/in2': linear('lb/in²', 0.45359237 / metersPerInch ** 2, 3),
+    'lb/in2': stored('ballisticCoefficient', 'lb/in²', 3),
   },
 } as const satisfies Record<Quantity, Record<string, Unit>>
 

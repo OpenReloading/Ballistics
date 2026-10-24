@@ -1,7 +1,7 @@
 'use client'
 
 import { dispersionEllipse, predictionEllipse } from '@openreloading/core'
-import type { CalibrationReference, TargetSheet } from '@openreloading/schema'
+import { type CalibrationReference, fromSi, type TargetSheet, toSi } from '@openreloading/schema'
 import {
   type KeyboardEvent,
   type PointerEvent,
@@ -89,7 +89,7 @@ type Drag =
 
 /** The SVG transform that turns the photo by `turn` (rad, counter-clockwise) about its middle. */
 const photoTransform = (photo: { width: number; height: number }, turn = 0) =>
-  turn ? `rotate(${(-turn * 180) / Math.PI} ${photo.width / 2} ${photo.height / 2})` : undefined
+  turn ? `rotate(${fromSi('angle', -turn)} ${photo.width / 2} ${photo.height / 2})` : undefined
 
 const polyline = (pts: Point[]) => pts.map((p) => `${p.x},${p.y}`).join(' ')
 
@@ -499,8 +499,8 @@ export function TargetCanvas({
             {(() => {
               const o = v({ x: 0, y: 0 })
               const len = 40 * k
-              const ux = v({ x: 1e-3, y: 0 })
-              const uy = v({ x: 0, y: 1e-3 })
+              const ux = v({ x: toSi('length', 1), y: 0 })
+              const uy = v({ x: 0, y: toSi('length', 1) })
               const dir = (u: Point) => {
                 const d = Math.hypot(u.x - o.x, u.y - o.y) || 1
                 return { x: o.x + ((u.x - o.x) / d) * len, y: o.y + ((u.y - o.y) / d) * len }
