@@ -13,16 +13,16 @@ Writers: catalogue (git records, checked by `readRecords`), user (browser, `pack
 
 | Entity | Schema | Stored | Written by |
 |---|---|---|---|
-| Manufacturer | `manufacturer.ts` | `records/manufacturers`, table `manufacturers` | catalogue |
-| Cartridge | `cartridge.ts` | `records/cartridges`, tables `cartridges` and `spec_values` (columns, no `record` blob) | catalogue, generated from the C.I.P. sheets |
-| Bullet | `bullet.ts` | `records/bullets`, table `bullets` (`record` jsonb) | catalogue |
-| Powder | `powder.ts` | `records/powders`, table `powders` (`record` jsonb) | catalogue |
-| Case capacity | `case-capacity.ts` | `records/capacities`, table `case_capacities`, embedded in `GET /cartridges/:id` | catalogue |
-| Load | `load.ts` | `records/loads` (empty), bundle only: no table, route or web reader | catalogue |
+| Manufacturer | `manufacturer.ts` | `records/manufacturers` | catalogue |
+| Cartridge | `cartridge.ts` | `records/cartridges` | catalogue, generated from the C.I.P. sheets |
+| Bullet | `bullet.ts` | `records/bullets` | catalogue |
+| Powder | `powder.ts` | `records/powders` | catalogue |
+| Case capacity | `case-capacity.ts` | `records/capacities`, embedded in `GET /cartridges/:id` | catalogue |
+| Load | `load.ts` | `records/loads` (empty), bundle only: no route or web reader | catalogue |
 | Chronograph session | `chrono-session.ts` | `records/chrono` (empty), bundle only | catalogue, importers |
 | Firing series, range firings | `firing.ts`, `range.ts` | no folder, bundle only | catalogue |
 | Source record | `provenance.ts` | `records/sources`, inlined into records on read | catalogue |
-| Federation, discipline, target mapping, target face | `federation.ts`, `target-face.ts` | one folder and one table each | catalogue |
+| Federation, discipline, target mapping, target face | `federation.ts`, `target-face.ts` | one folder each | catalogue |
 | Caliber class | `caliber-class.ts` | code only (a constant) | developer |
 | Load tables | none | `load-tables.json` of a records root | catalogue |
 | Firearm | `firearm.ts` | user record `firearm` | user |
@@ -120,9 +120,9 @@ A `{manufacturerName, model}` description is allowed only in catalogue records o
 
 A saved recipe keeps only the solver keys the user typed, under `analysis.overrides`, validated against `workbenchValueKeys`.
 
-### Database and API
+### Catalogue and API
 
-- One table per entity: `id`, index columns and a `record` jsonb with the whole entity, as manufacturers, powders and bullets already have. Cartridge gets the same, with `spec_values` as a derived index, so `GET /cartridges/:id` answers the record plus computed fields.
+- The catalogue holds one record per entity and an index row per record, read in process (`apps/docs/docs/data/catalogue-storage.md`).
 - User data stays client side. The server holds catalogue records only and needs no `origin` column.
 - Compute routes accept a reference or an entity (`bullet: Ref | Bullet`, and the same for powder, cartridge and firearm): a catalogue reference for a catalogue record, the resolved entity inline for a user record.
 
@@ -138,12 +138,7 @@ Ranked by impact.
 6. `Load`, `ChronoSession`, `FiringSeries` and `RangeFirings` are validated and bundled but nothing reads them, so they can drift unseen.
 7. Id rules and the generator, and no id stability beyond manufacturers.
 8. Catalogue reference checks stop at ids that exist: loads name components in text, `load-tables.json` has no schema, caliber class membership is a test only.
-9. Cartridge is stored in columns, every other kind as a blob, so the cartridge answer differs from the stored record.
-10. List and search routes lack indexes on the manufacturer keys, `bullets.diameter` and `cartridges.cip_table`, and `q` uses `ilike '%...%'`. Harmless at hundreds of records, relevant at thousands.
-11. `spec_values.quantity` has no check constraint although `quantityKind` is an enum.
-12. Two API replicas that start together can both seed, because the state row is read without a lock.
-13. Search logic exists three times: SQL, the static `search.json` and the client lists.
-14. Powder numbers mix `quantity` objects and plain numbers with a unit in the metadata.
+9. Powder numbers mix `quantity` objects and plain numbers with a unit in the metadata.
 
 ## Steps
 
@@ -160,7 +155,7 @@ Each step lands alone with its model page updated in the same commit. Steps 4 to
 | 7 | Session unification | 3, 6 |
 | 8 | CaseCapacity references | 6 |
 | 9 | Manufacturer references | 3 |
-| 10 | Database tidy: `record` jsonb on cartridges, indexes, check constraint, seed lock | |
+| 10 | Replaced by the catalogue storage steps D0 to D6 (`catalogue-storage.md`) | |
 | 11 | Browser store hardening: versioned IndexedDB, keep and list invalid records | before 3 and 4 |
 | 12 | Catalogue loose ends: schema for load tables, caliber classes as records, renames map | |
 

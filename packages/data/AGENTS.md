@@ -44,7 +44,7 @@ Canonical records in git, validated against `@openreloading/schema`, bundled for
 ## Facts
 
 - The file name without `.json` equals the record `id` (lowercase kebab-case).
-- Edits happen only in these records. PostgreSQL is rebuilt from the bundle.
+- Edits happen only in these records. The API catalogue is rebuilt from the bundle.
 - Cartridge records are generated from the official CIP TDCC sheets: do not hand-edit them.
   - `verification: verified` marks a record whose every value was checked by hand against the sheet.
   - Figure ids name the sheet revision: `sheetId` (`@openreloading/schema`), `cip-<id>-<revised or published>`.

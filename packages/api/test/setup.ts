@@ -1,7 +1,5 @@
-import { PGlite } from '@electric-sql/pglite'
 import type { Bundle } from '@openreloading/data'
 import { Ajv2020 } from 'ajv/dist/2020.js'
-import { drizzle } from 'drizzle-orm/pglite'
 import type { InjectOptions } from 'fastify'
 import { beforeAll, expect } from 'vitest'
 import { z } from 'zod'
@@ -10,21 +8,7 @@ import { buildCatalogue } from '../src/catalogue/build.ts'
 import { openCatalogue } from '../src/catalogue/open.ts'
 import type { Catalogue } from '../src/catalogue/types.ts'
 import type { ComputeRunner } from '../src/compute/tasks.ts'
-import { ensureTables } from '../src/db/build.ts'
-import type { Db } from '../src/db/index.ts'
 import { bundle } from './fixtures.ts'
-
-/** An in-memory PostgreSQL (PGlite) with the tables built. */
-export async function createTestDb(): Promise<Db> {
-  const db = drizzle({ client: new PGlite() })
-  await ensureTables(db)
-  return db
-}
-
-/** Closes a database from `createTestDb`. */
-export async function closeTestDb(db: Db) {
-  await (db as unknown as { $client: PGlite }).$client.close()
-}
 
 /** A data set without records. */
 export const emptyBundle: Bundle = {

@@ -100,8 +100,7 @@ License, whose text is the same as above, with these copyright notices:
 - pagefind 1.5.2, the search script and index of the docs site (https://github.com/Pagefind/pagefind):
   Copyright (c) Pagefind
 
-The web app bundles @swc/helpers 0.5.23 (https://github.com/swc-project/swc), and the API image
-holds drizzle-orm 1.0.0-rc.4 (https://github.com/drizzle-team/drizzle-orm), both under the
+The web app bundles @swc/helpers 0.5.23 (https://github.com/swc-project/swc) under the
 Apache License, Version 2.0 (https://www.apache.org/licenses/LICENSE-2.0).
 
 ---

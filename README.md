@@ -43,7 +43,7 @@ npm start -w @openreloading/api                   # API on port 3000 (PORT), fro
 npm start -w @openreloading/web -- -p 3001        # web app on port 3001, API at API_URL (default http://localhost:3000)
 ```
 
-- Containers: `docker compose up` (or `podman compose up`) starts the database, the API, the web app and the documentation site.
+- Containers: `docker compose up` (or `podman compose up`) starts the API, the web app and the documentation site.
 - Documentation site: `npm run site:build -w @openreloading/docs` builds the model pages, the library and the REST reference.
 - Pages edition (a static site without a server), after `npm run build` ([apps/web/AGENTS.md](apps/web/AGENTS.md#pages-edition)):
   - `PAGES_BASE_PATH=<path> npm run pages:build` writes `pages/`. `PAGES_BASE_PATH=<path> npm run pages:serve` serves it on port 3003 (`PORT`).
