@@ -12,8 +12,8 @@ import {
   bulletBallisticCoefficient,
   bulletBallisticCoefficientSort,
   bulletCells,
+  bulletKey,
   bulletMatches,
-  bulletSearchText,
   type PackedBullet,
   unpackBullets,
 } from '../lib/bullet-rows.ts'
@@ -99,7 +99,7 @@ export function BulletList({
   )
   const counts = useMemo(() => countOrigins(items), [items])
   const diameters = useMemo(() => items.map((b) => b.diameter), [items])
-  const texts = useMemo(() => items.map(bulletSearchText), [items])
+  const keys = useMemo(() => items.map(bulletKey), [items])
   const fitting = useMemo(() => new Map(cartridges.map((c) => [c.id, c])), [cartridges])
   // a cartridge id the list does not know filters nothing and shows as no filter
   const fits = fitting.get(state.fits ?? '')
@@ -109,10 +109,10 @@ export function BulletList({
       items.filter(
         (b, i) =>
           inOrigins(b, filters.sources) &&
-          bulletMatches(b, filters, texts[i]) &&
+          bulletMatches(b, filters, keys[i]) &&
           (!fit || bulletFits(b.diameter, fit)),
       ),
-    [items, texts, filters, fit],
+    [items, keys, filters, fit],
   )
   const cells = useMemo(
     () => new Map(items.map((b) => [b.id, bulletCells(b, system)])),

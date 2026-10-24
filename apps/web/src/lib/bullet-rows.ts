@@ -1,5 +1,5 @@
 /** The bullet list's rows: search text, filters, cells, the BC column and the packed page props. */
-import { fold, toSi } from '@openreloading/schema'
+import { fold, score, searchKey, toSi } from '@openreloading/schema'
 import type { BulletSummary } from './api-types.ts'
 import { caliberLabel, commonCaliber } from './caliber.ts'
 import {
@@ -11,13 +11,6 @@ import {
   present,
 } from './directory.ts'
 import { formatNumber, inchText, kilogramsPerGrain, type UnitSystem } from './units.ts'
-
-/** Whether `word` occurs in `hay` at a word start (after no letter or digit): "7.8" not in "17.80". */
-export function atWordStart(hay: string, word: string) {
-  for (let i = hay.indexOf(word); i >= 0; i = hay.indexOf(word, i + 1))
-    if (i === 0 || !/[a-z0-9]/.test(hay[i - 1])) return true
-  return false
-}
 
 /** A catalogue bullet of the list: the summary with the name of its manufacturer. */
 export type BulletItem = BulletSummary & {
@@ -51,11 +44,46 @@ export function bulletSearchText(b: BulletRow): string {
   ].join(' ')
 }
 
-/** Whether a bullet passes every filter of `s` (the sort aside); `text` precomputed for speed. */
+/** The key a bullet is searched by: its search text, its name for an exact match (`searchKey` of the schema). */
+export const bulletKey = (b: BulletRow) => searchKey([bulletSearchText(b)], b.name)
+
+/** A number with an optional unit as typed: "168", "168gr", "10.9g". */
+export const massWord = /^(\d+(?:\.\d+)?)(gr|g)?$/
+
+/** The typed words, folded; a number and its unit apart ("168 gr") count as one word ("168gr"). */
+export const typedWords = (query: string) =>
+  fold(query)
+    .replace(/(\d)\s+(gr|g)(?=\s|$)/g, '$1$2')
+    .split(/\s+/)
+    .filter(Boolean)
+
+/**
+ * Whether a bullet weighs what a typed number says: "168" and "168gr" grains, "10.9g" grams,
+ * within half a unit of the last typed digit.
+ */
+export function sameMass(b: BulletRow, number: string, unit: string | undefined) {
+  if (b.mass === null) return false
+  const half = 0.5 * 10 ** -(number.split('.')[1]?.length ?? 0)
+  const typed = unit === 'g' ? b.mass : toSi('mass', b.mass) / kilogramsPerGrain
+  return Math.abs(typed - Number(number)) <= half + 1e-9
+}
+
+/**
+ * The schema's rank of the typed words in a bullet (`score`), `undefined` where a word is nowhere
+ * in its `key`. A number with a unit is a weight the text does not hold: it must be the mass.
+ */
+export function bulletScore(b: BulletRow, key: string, query: string): number | undefined {
+  const words = typedWords(query)
+  const weights = words.map((w) => massWord.exec(w)).filter((m) => m?.[2])
+  if (!weights.every((w) => w && sameMass(b, w[1], w[2]))) return undefined
+  return score(key, words.filter((w) => !massWord.exec(w)?.[2]).join(' '))
+}
+
+/** Whether a bullet passes every filter of `s` (the sort aside); `key` precomputed for speed. */
 export function bulletMatches(
   b: BulletRow,
   s: DirectoryState,
-  text: string = bulletSearchText(b),
+  key: string = bulletKey(b),
 ): boolean {
   if (s.manufacturer && b.manufacturer !== s.manufacturer) return false
   if (s.caliber && commonCaliber(b.diameter) !== s.caliber) return false
@@ -79,10 +107,7 @@ export function bulletMatches(
     if (range.min !== undefined && shown < range.min) return false
     if (range.max !== undefined && shown > range.max) return false
   }
-  const hay = fold(text)
-  return fold(s.query)
-    .split(/\s+/)
-    .every((word) => atWordStart(hay, word))
+  return bulletScore(b, key, s.query) !== undefined
 }
 
 /** A bullet's cells in the preset's units, rounded for display; empty without a value. */

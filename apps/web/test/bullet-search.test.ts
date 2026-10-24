@@ -46,6 +46,29 @@ it('finds a bullet by caliber and weight although its name says neither as typed
   expect(ids('10.9g')).toEqual(['own-1', 'a-168-match', 'a-168-tipped'])
 })
 
+it('finds what the API search of the card missed: words in any order, spacing, a unit apart', () => {
+  // a manufacturer and a word of a name that starts with its caliber and weight words
+  expect(ids('acme tipped')).toEqual(['a-168-tipped'])
+  expect(ids('tipped acme')).toEqual(['a-168-tipped'])
+  expect(ids('acme 168')).toEqual(['a-168-match', 'a-168-tipped'])
+  expect(ids('308 168gr')).toEqual(['own-1', 'a-168-match', 'a-168-tipped'])
+  expect(ids('168 gr')).toEqual(['own-1', 'a-168-match', 'a-168-tipped'])
+  expect(ids('10.9 g')).toEqual(['own-1', 'a-168-match', 'a-168-tipped'])
+  expect(ids('30 cal')).toEqual(['a-168-match', 'a-168-tipped', 'a-175-match'])
+  // the caliber with or without its space, the decimal comma as a point
+  expect(ids('6.5mm')).toEqual(['b-140-match'])
+  expect(ids('beta 6,5')).toEqual(['b-140-match'])
+})
+
+it('ranks a number at the start of a word above one inside a word', () => {
+  const inside = [
+    row({ id: 'in', name: 'Plain', diameter: 6.1, mass: 17.82 }),
+    row({ id: 'start', name: 'Plain', diameter: 6.1, mass: 7.82 }),
+  ]
+  // 7.8 in 17.82 g, at the start of 7.82 g
+  expect(searchBullets(inside, '7.8', none).map((b) => b.id)).toEqual(['start', 'in'])
+})
+
 it('matches a fractional weight at the digits typed', () => {
   const heavy = [row({ id: 'frac', name: 'Heavy', mass: 77.5 * 0.06479891 })]
   expect(searchBullets(heavy, '77.5gr', none).map((b) => b.id)).toEqual(['frac'])
