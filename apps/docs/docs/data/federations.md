@@ -39,6 +39,8 @@ Three record kinds describe who defines a discipline, what the discipline is and
 | `caliberClasses` | `ids` of caliber classes of `caliberClasses` with `basis`: `stated` (the rule book names them) or `derived` (a stated range or bound expanded to the classes whose diameter lies in it) |
 | `internationalDiscipline` | Id of the discipline of an international federation the rule book names as equivalent |
 
+A discipline shot over several distances in one match (BDS Mehrdistanzschießen) is one record: `distance.value` is the farthest distance, `distance.raw` lists all of them. Its mapping holds the shots of the whole discipline.
+
 Muzzle-loading disciplines carry no caliber classes: the classes group cartridges, and a bore given in inches is no cartridge.
 
 ## Target mapping

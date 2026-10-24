@@ -1,0 +1,23 @@
+{
+  "id": "bds-4812-bds-z21-25m-buechse",
+  "discipline": "bds-4812",
+  "face": "bds-z21-25m-buechse",
+  "event": "4812 MD Büchse SG SL KK off. Vis.",
+  "shotCount": 30,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 12.05, Seite L-69, PDF p. 69",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 12.04, Seite L-69, PDF p. 69",
+        "fields": ["shotCount"],
+        "note": "15 shots Fertigkeitsschießen and 15 shots Parcoursschießen. L 12.05 allows the insert of the BDS-Kurzwaffenscheibe (Z9, rings from 6) in place of Z21."
+      }
+    ]
+  }
+}

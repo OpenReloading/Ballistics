@@ -1,0 +1,35 @@
+{
+  "id": "bds-3814",
+  "federation": "bds",
+  "name": "MD Büchse SG SL opt. Vis. HL u. 47 mm",
+  "number": "3814",
+  "section": "L 12.01",
+  "page": "Seite L-67, PDF p. 67",
+  "distance": {
+    "value": 50000,
+    "raw": "30, 40, 50 m"
+  },
+  "category": "rifle",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 12.01, Seite L-67, PDF p. 67",
+        "fields": ["name", "number", "federation", "section", "page"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 12.07, L 12.08, Seite L-69 to L-71, PDF pp. 69 to 71",
+        "fields": ["distance"],
+        "note": "The discipline is shot at 30, 40 and 50 m; the record holds the farthest distance and the raw text lists all."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 12.01, Seite L-67, PDF p. 67",
+        "fields": ["category"],
+        "note": "The table bounds the cartridge by case length (47 mm), not by calibre."
+      }
+    ]
+  }
+}
