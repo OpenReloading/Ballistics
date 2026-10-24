@@ -20,7 +20,9 @@ const measured = { kind: 'measured', sources: [{ title: 'Range log' }] } as cons
 
 const validLoad = {
   id: 'test-load',
-  cartridge: 'test-cartridge',
+  origin: 'catalogue',
+  name: 'Test load',
+  cartridge: 'catalogue:test-cartridge',
   bullet: {
     manufacturerName: 'Manufacturer',
     model: 'Model',
