@@ -7,8 +7,9 @@ import {
   type DisciplineKey,
 } from '@openreloading/schema'
 import { and, asc, eq } from 'drizzle-orm'
+import { compact } from '../catalogue/derive.ts'
 import type { Db } from './index.ts'
-import { compact, type ListPage, recordById } from './queries.ts'
+import { type ListPage, recordById } from './queries.ts'
 import { disciplines, federations, targetFaces, targetMappings } from './schema.ts'
 
 /** A target face of {@link listTargetFaces}, with the caliber classes and categories it is used for. */
