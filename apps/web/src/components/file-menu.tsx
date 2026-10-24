@@ -1,13 +1,19 @@
 'use client'
 
 import { Button, Group, Kbd, Menu, Textarea } from '@mantine/core'
-import type { EmbeddedFile, UserRecord, UserRecordKind } from '@openreloading/schema'
+import {
+  type EmbeddedFile,
+  type UserRecord,
+  type UserRecordKind,
+  userRecord,
+} from '@openreloading/schema'
 import { CaretDown, FloppyDisk, FolderOpen } from '@phosphor-icons/react'
 import { memo, type Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { localDay } from '../lib/dates.ts'
 import { download } from '../lib/download.ts'
 import { errorText } from '../lib/error-text.ts'
+import { exampleFirearm } from '../lib/example-data.ts'
 import {
   pickFiles,
   readHandleText,
@@ -17,6 +23,7 @@ import {
 } from '../lib/file-access.ts'
 import { parseFiles, readLoadFile, readNote } from '../lib/load-file-formats.ts'
 import { guardNavigation, guardPop } from '../lib/navigation-guard.ts'
+import { newId } from '../lib/new-id.ts'
 import { maxLinkChars, readLink, shareLink } from '../lib/share-link.ts'
 import { type ShortcutId, shortcutAriaKeys, shortcutLabel } from '../lib/shortcuts.ts'
 import { controlSize } from '../lib/theme.ts'
@@ -30,6 +37,7 @@ import {
   type ParsedUserFile,
   parseUserDataFile,
   planImport,
+  refNote,
   renamedKey,
   tooLargeMessage,
   userDataText,
@@ -64,9 +72,10 @@ import { useShortcuts } from './shortcuts.tsx'
 const ask = (title: string, confirmLabel: string) =>
   confirmDialog({ title, confirmLabel, danger: true })
 
-type Of<K extends UserRecordKind> = Extract<UserRecord, { kind: K }>
+/** The records the pages resolve themselves, never stored. */
+const builtIn = userRecord.parse(exampleFirearm)
 
-export const newId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`
+type Of<K extends UserRecordKind> = Extract<UserRecord, { kind: K }>
 
 /** A file's text; undefined for a file over the size limit, which is not read. */
 const read = async (file: File) => (file.size > maxFileBytes ? undefined : file.text())
@@ -698,8 +707,14 @@ function FileMenuOf<K extends UserRecordKind>({
     )
   }
 
+  /** `refNote` of `opened` against the browser store and the built-in example rifle; empty when the store cannot be read. */
+  async function refsOf(opened: UserRecord[]) {
+    const stored = await storedRecords().catch(() => undefined)
+    return stored ? refNote(opened, [builtIn, ...stored.records]) : ''
+  }
+
   /** Shows `record` unless the user keeps the unsaved changes; false when kept. */
-  async function use(record: Of<K>, file: string, h?: FileSystemFileHandle) {
+  async function use(record: Of<K>, file: string, h?: FileSystemFileHandle, note?: string) {
     if (unsaved && !(await ask('Replace the unsaved changes with the opened record?', 'Replace')))
       return false
     onOpen(record.data as Of<K>['data'], record.name, record)
@@ -707,6 +722,8 @@ function FileMenuOf<K extends UserRecordKind>({
     handle.current = h
     known.current = record.saved
     setSaved({ file, json: keyOf(record.data, record.name) })
+    const text = [note, await refsOf([record])].filter(Boolean).join(' ')
+    if (text) setMessage(`${file} opened. ${text}`)
     return true
   }
 
@@ -745,16 +762,12 @@ function FileMenuOf<K extends UserRecordKind>({
       onStored?.()
     }
     // Save writes back only to a file of this record alone
-    const note = readNote(parsed)
-    if (
-      (await use(
-        mine[0],
-        picked.file.name,
-        ownsFile(text, mine[0].id) ? picked.handle : undefined,
-      )) &&
-      note
+    await use(
+      mine[0],
+      picked.file.name,
+      ownsFile(text, mine[0].id) ? picked.handle : undefined,
+      readNote(parsed),
     )
-      setMessage(`${picked.file.name} opened. ${note}`)
   }
 
   /** True when a file was written. */
@@ -804,6 +817,7 @@ function FileMenuOf<K extends UserRecordKind>({
       files: [],
     }
     let count = 0
+    const added: UserRecord[] = []
     for (const f of files) {
       const {
         records,
@@ -822,6 +836,7 @@ function FileMenuOf<K extends UserRecordKind>({
         if (total.added) onStored?.()
         return
       }
+      added.push(...plan.added)
       total.added += plan.added.length
       total.equal += plan.equal.length
       total.skipped.push(...skipped)
@@ -831,6 +846,9 @@ function FileMenuOf<K extends UserRecordKind>({
       const wanted = new Set(photoIds(plan.conflicts.map((c) => c.incoming)))
       total.files.push(...photos.filter((p) => wanted.has(p.id)))
     }
+    // once all files are stored, so a reference to a record of a later file resolves
+    const refs = await refsOf(added)
+    if (refs) total.notes.push({ name: 'References', note: refs })
     onStored?.()
     noteStorage()
     setReport(total)
@@ -851,7 +869,9 @@ function FileMenuOf<K extends UserRecordKind>({
     for (const p of left) deletePhoto(p).catch(() => {})
     onStored?.()
     setReport(undefined)
-    setMessage(`Replaced ${report.conflicts.length} browser records.`)
+    setMessage(
+      `Replaced ${report.conflicts.length} browser records. ${await refsOf(incoming)}`.trimEnd(),
+    )
   }
 
   async function browserRecords() {

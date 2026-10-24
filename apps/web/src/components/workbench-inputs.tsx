@@ -12,7 +12,7 @@ import {
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { boreArea } from '@openreloading/core'
-import type { Bullet } from '@openreloading/schema'
+import { type Bullet, toSi } from '@openreloading/schema'
 import { DotsThree } from '@phosphor-icons/react'
 import { type ReactNode, useEffect, useId, useState } from 'react'
 import { createPortal } from 'react-dom'
@@ -188,7 +188,7 @@ const recordRow = (label: string, value: ReactNode, unit?: string) =>
 
 /** A length in mm as the cards show it: the number in the length unit, inches below 1 as ".3". */
 const lengthCell = (system: UnitSystem, mm: number) =>
-  inchText(lengthText('diameter', system, mm * 1e-3), system.length.symbol)
+  inchText(lengthText('diameter', system, toSi('length', mm)), system.length.symbol)
 
 /** Diameter and length on one row, or the diameter alone. */
 function sizeRow(b: Bullet | undefined, system: UnitSystem) {
@@ -707,7 +707,9 @@ function CardBody({ panel }: { panel: InputPanel }) {
       <div className="panel-fields">
         {recordRow(
           'CIP Pmax',
-          pmax === undefined ? undefined : formatQuantity('pressure', system, pmax * 1e5),
+          pmax === undefined
+            ? undefined
+            : formatQuantity('pressure', system, toSi('pressure', pmax)),
           system.pressure.symbol,
         )}
         {recordRow(
@@ -736,7 +738,8 @@ function CardBody({ panel }: { panel: InputPanel }) {
       <div className="panel-fields">
         {recordRow(
           'Bulk density',
-          powder?.bulkDensity && formatQuantity('density', system, powder.bulkDensity.value * 1e3),
+          powder?.bulkDensity &&
+            formatQuantity('density', system, toSi('density', powder.bulkDensity.value)),
           system.density.symbol,
         )}
         {fieldsOf(panelFields.powder)}

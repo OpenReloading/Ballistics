@@ -2,6 +2,7 @@
 
 import { Button, Popover, UnstyledButton } from '@mantine/core'
 import { freeRecoil } from '@openreloading/core'
+import { fromSi } from '@openreloading/schema'
 import { memo, useEffect, useRef } from 'react'
 import type { InteriorResponse } from '../lib/api-types.ts'
 import {
@@ -54,7 +55,7 @@ const reasonText: Record<string, string> = { noValue: 'no value' }
 /** A limit as stored: bar with the record's decimals, and psi. */
 function limitValue(l: NonNullable<InteriorResponse['limits']>[number]) {
   if (l.pressure === undefined) return ''
-  return `${+(l.pressure / 1e5).toPrecision(12)} bar (${formatNumber(l.pressure / psi, 0)} psi)`
+  return `${+fromSi('pressure', l.pressure).toPrecision(12)} bar (${formatNumber(l.pressure / psi, 0)} psi)`
 }
 
 function yesNo(value: boolean | undefined) {

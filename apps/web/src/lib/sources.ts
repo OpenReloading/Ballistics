@@ -1,5 +1,5 @@
 /** List sources: OpenReloading records and the user records of the browser. */
-import type { UserRecord } from '@openreloading/schema'
+import { fromSi, type UserRecord } from '@openreloading/schema'
 import type { BulletRow } from './bullet-rows.ts'
 import type { CartridgeRow } from './cartridge-rows.ts'
 
@@ -79,9 +79,9 @@ export function userBulletRows(records: readonly UserRecord[]): BulletRow[] {
         origin: 'user' as const,
         manufacturerName: r.data.manufacturerName,
         name: r.data.name || r.name,
-        diameter: diameter * 1e3,
-        mass: mass === undefined ? null : mass * 1e3,
-        length: length === undefined ? null : length * 1e3,
+        diameter: fromSi('length', diameter),
+        mass: mass === undefined ? null : fromSi('mass', mass),
+        length: length === undefined ? null : fromSi('length', length),
         ballisticCoefficientG1: null,
         ballisticCoefficientG7: null,
       },

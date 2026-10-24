@@ -1,4 +1,5 @@
 /** Form fields: specs, typed text and SI values, validation messages. */
+import { fromSi, type QuantityKind, toSi } from '@openreloading/schema'
 import {
   exactFieldText,
   parseTwist,
@@ -30,8 +31,20 @@ export interface FieldSpec {
 
 export type Fields = Record<string, FieldValue>
 
-/** Stored unit (mm, g, degrees, 1) to SI, per quantity of a designer field. */
-export const storedToSi = { length: 1e-3, mass: 1e-3, angle: Math.PI / 180, ratio: 1 }
+/** The stored quantity (mm, g, degrees, 1) of each quantity of a designer field. */
+const storedKind = {
+  length: 'length',
+  mass: 'mass',
+  angle: 'angle',
+  ratio: 'dimensionless',
+} as const satisfies Partial<Record<Quantity, QuantityKind>>
+
+/** A designer field value in its stored unit, in SI. */
+export const storedToSi = (q: keyof typeof storedKind, stored: number) =>
+  toSi(storedKind[q], stored)
+
+/** A designer field value in SI, in its stored unit. */
+export const siToStored = (q: keyof typeof storedKind, si: number) => fromSi(storedKind[q], si)
 
 /** A designer field of SI value `si`, its text rounded; empty without a value. */
 export const fieldOf = (system: UnitSystem, s: FieldSpec, si: number | undefined): FieldValue => ({

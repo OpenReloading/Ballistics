@@ -1,6 +1,7 @@
 'use client'
 
 import { Button, Select } from '@mantine/core'
+import { toSi } from '@openreloading/schema'
 import { Plus } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useDeferredValue, useMemo } from 'react'
@@ -36,7 +37,7 @@ export function TargetFaceList({ items }: { items: TargetFaceRow[] }) {
   )
   const shown = useMemo(() => items.filter((r) => targetFaceMatches(r, filters)), [items, filters])
   const named = [state.organization, state.query.trim() && `matching "${state.query.trim()}"`]
-  const outer = (r: TargetFaceRow) => formatQuantity('length', system, r.outer * 1e-3)
+  const outer = (r: TargetFaceRow) => formatQuantity('length', system, toSi('length', r.outer))
   const columns: DirectoryColumn<TargetFaceRow>[] = [
     { key: 'name', label: 'Name', value: (r) => r.name, cell: (r) => r.name },
     {

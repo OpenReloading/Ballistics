@@ -15025,8 +15025,7 @@
                                   "properties": {
                                     "id": {
                                       "type": "string",
-                                      "minLength": 1,
-                                      "maxLength": 200,
+                                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
                                       "description": "Id of the catalogue record."
                                     },
                                     "title": {
@@ -15180,8 +15179,7 @@
                                   "properties": {
                                     "id": {
                                       "type": "string",
-                                      "minLength": 1,
-                                      "maxLength": 200,
+                                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
                                       "description": "Id of the catalogue record."
                                     },
                                     "title": {
@@ -16254,8 +16252,7 @@
                                         "properties": {
                                           "id": {
                                             "type": "string",
-                                            "minLength": 1,
-                                            "maxLength": 200,
+                                            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
                                             "description": "Id of the `TargetFace` record."
                                           },
                                           "event": {
@@ -17853,6 +17850,10 @@
                             "required": ["value"],
                             "additionalProperties": false,
                             "unit": "mm"
+                          },
+                          "shape": {
+                            "type": "string",
+                            "enum": ["circle", "square"]
                           },
                           "fill": {
                             "type": "string",

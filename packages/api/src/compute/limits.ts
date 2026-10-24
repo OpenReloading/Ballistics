@@ -3,7 +3,7 @@
  * compared; crusher values are listed, never compared. No message says or implies that a load is safe.
  */
 import { chargeTooSmall, chargeTooSmallRatio, type PressureRange } from '@openreloading/core'
-import { type Cartridge, type SpecValue, sheetId } from '@openreloading/schema'
+import { type Cartridge, fromSi, type SpecValue, sheetId, toSi } from '@openreloading/schema'
 
 /** The fields of a `getCartridge` record that the limit check reads. */
 export type CartridgeWithSpecs = Pick<
@@ -54,9 +54,9 @@ export type Warning = {
 const compared = new Set(['transducer', 'piezo', null])
 /** A simulated pressure in whole bar, with more decimals while rounding would put it on or across the limit. */
 function bar(pa: number, limit: number) {
-  const p = pa / 1e5
+  const p = fromSi('pressure', pa)
   let d = 0
-  while (d < 5 && Math.sign(+p.toFixed(d) * 1e5 - limit) !== Math.sign(pa - limit)) d++
+  while (d < 5 && Math.sign(toSi('pressure', +p.toFixed(d)) - limit) !== Math.sign(pa - limit)) d++
   return `${p.toFixed(d)} bar`
 }
 
@@ -74,7 +74,7 @@ function limit(
     ...(v.variant !== undefined && { variant: v.variant }),
   }
   if (v.value === undefined) return { ...base, compared: false, reason: 'noValue' }
-  const pressure = v.value * 1e5
+  const pressure = toSi('pressure', v.value)
   if (!compared.has(method)) return { ...base, pressure, compared: false, reason: String(method) }
   return {
     ...base,
@@ -90,10 +90,10 @@ function exceededMessage(l: Limit, range: PressureRange) {
   const where = `${sheetId({ id: l.cartridge, published: l.revised })}; ${l.method ?? 'measuring method not stated in the record'}`
   const limit = l.pressure as number
   // the limit with the decimals stored in the record
-  const limitText = `${name} ${+(limit / 1e5).toPrecision(12)} bar (${where})`
+  const limitText = `${name} ${+fromSi('pressure', limit).toPrecision(12)} bar (${where})`
   const { nominalPressure: p0, lowPressure: low, highPressure: high } = range
   return l.nominalExceeded
-    ? `Simulated peak pressure ${bar(p0, limit)} (range ${Math.round(low / 1e5)} to ${bar(high, limit)}) is above ${limitText}.`
+    ? `Simulated peak pressure ${bar(p0, limit)} (range ${Math.round(fromSi('pressure', low))} to ${bar(high, limit)}) is above ${limitText}.`
     : `The upper end of the simulated peak pressure range, ${bar(high, limit)}, is above ${limitText}; the nominal value is ${bar(p0, limit)}.`
 }
 

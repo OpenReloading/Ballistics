@@ -1,12 +1,7 @@
 /** Database records to core inputs, with exact unit conversions. */
 import { httpErrors } from '@fastify/sensible'
-import {
-  type Aerodynamics,
-  InputError,
-  lbPerSqInToKgPerSqM,
-  type Projectile,
-} from '@openreloading/core'
-import type { Bullet } from '@openreloading/schema'
+import { type Aerodynamics, InputError, type Projectile } from '@openreloading/core'
+import { type Bullet, toSi } from '@openreloading/schema'
 import { getBullet, getPowder } from '../db/component-queries.ts'
 import type { Db } from '../db/index.ts'
 import { getCartridge } from '../db/queries.ts'
@@ -32,9 +27,9 @@ export const findPowder = async (db: Db, id: string) => found(await getPowder(db
 /** Record values in SI: mass kg, diameter and length m. */
 export function bulletSi(record: Bullet) {
   return {
-    mass: record.mass.value * 1e-3,
-    diameter: record.diameter.value * 1e-3,
-    length: record.length && record.length.value * 1e-3,
+    mass: toSi('mass', record.mass.value),
+    diameter: toSi('length', record.diameter.value),
+    length: record.length && toSi('length', record.length.value),
   }
 }
 
@@ -56,7 +51,7 @@ export function bulletProjectile(
   const bands = (record.ballisticCoefficients ?? [])
     .filter((c) => c.dragModel === ref.dragModel)
     .map((c) => ({
-      ballisticCoefficient: c.value * lbPerSqInToKgPerSqM,
+      ballisticCoefficient: toSi('ballisticCoefficient', c.value),
       minVelocity: c.minVelocity?.value ?? 0,
     }))
   if (bands.length === 0)

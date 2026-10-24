@@ -1,6 +1,6 @@
 import { type LadderFlatSpots, ladderFlatSpots } from '@openreloading/core'
 import type { ChronoImport } from '@openreloading/importers'
-import type { MeasuredSeries } from '@openreloading/schema'
+import { type MeasuredSeries, toSi } from '@openreloading/schema'
 import { type Shot, type StringStats, stringStats } from './chrono.ts'
 
 /** A chronograph file on the Measurements tab: the load file's entry and an id for this page. */
@@ -26,7 +26,7 @@ export function seriesOf(
     date: session.date?.slice(0, 64) || undefined,
     device: device.slice(0, 400) || undefined,
     // mm in the session, m in the load file
-    muzzleDistance: session.muzzleDistance && session.muzzleDistance.value / 1000,
+    muzzleDistance: session.muzzleDistance && toSi('length', session.muzzleDistance.value),
     strings: session.strings.map((s, i) => ({
       label: data.stringLabels[i]?.slice(0, 200) || undefined,
       charge: charges[i],

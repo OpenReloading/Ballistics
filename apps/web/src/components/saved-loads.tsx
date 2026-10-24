@@ -15,12 +15,12 @@ import {
 } from '../lib/export-reminder.ts'
 import { saveAs } from '../lib/file-access.ts'
 import { duplicateStored, type LoadRecord, loadGroups, renameStored } from '../lib/load-tabs.ts'
+import { newId } from '../lib/new-id.ts'
 import { controlSize } from '../lib/theme.ts'
 import { userDataText } from '../lib/user-data.ts'
 import { recordFileName } from '../lib/user-file-names.ts'
 import { deleteRecord, storedRecords } from '../lib/user-store.ts'
 import { confirmDialog } from './confirm.tsx'
-import { newId } from './file-menu.tsx'
 
 /** Saves since the last export (`localStorage` `exportReminder`), counted by the File menu's callbacks. */
 export function useExportReminder() {

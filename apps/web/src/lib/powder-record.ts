@@ -1,5 +1,5 @@
 import { defaultStartPressure, handgunBarrelLengthLimit } from '@openreloading/core'
-import type { Powder } from '@openreloading/schema'
+import { type Powder, toSi } from '@openreloading/schema'
 
 /**
  * A powder record's M3 parameters in the workbench: the fill, the field marks, the fit summary
@@ -13,15 +13,15 @@ export function powderModelValues(p: Powder): Record<string, number> | undefined
   return {
     propellantEnergy: i.energy.value,
     gamma: i.gamma,
-    density: i.density.value * 1e3,
+    density: toSi('density', i.density.value),
     covolume: i.covolume.value,
     vivacity: i.vivacity.value,
     exponent: i.pressureExponent,
-    referencePressure: i.referencePressure.value * 1e5,
-    ignitionPressure: i.ignitionPressure.value * 1e5,
+    referencePressure: toSi('pressure', i.referencePressure.value),
+    ignitionPressure: toSi('pressure', i.ignitionPressure.value),
     // without its own value each load had the rule's default: the one from 300 mm, as the workbench has no barrel length
     startPressure: i.startPressure
-      ? i.startPressure.value * 1e5
+      ? toSi('pressure', i.startPressure.value)
       : defaultStartPressure(handgunBarrelLengthLimit).value,
     formA: i.burnForm.a.value,
     formM: i.burnForm.m,

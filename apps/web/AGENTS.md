@@ -38,6 +38,7 @@ Next.js App Router (TypeScript, React). API at `API_URL` (default `http://localh
 - List sources: the bullet and cartridge lists add the browser's design records as Mine rows (`useUserRecords`, `list-sources.tsx`, rows in `src/lib/sources.ts`).
   - `SourceFilter` (a button with a checkbox per source and its count) in the URL as `?src=`, on every list. Powders have the one source OpenReloading (no user record holds a powder). Firearms: the example is OpenReloading, the firearms of this browser Mine. The bullet and cartridge lists show a Source column only with Mine rows: a Mine row's badge and Delete, a catalogue row blank. A cell without a value shows n/a. Below 48em Delete is at the end of the row (`phoneAction`).
   - The designers open `?record=<id>` from the browser store (`use-record-link.ts`).
+  - New records and photos get `crypto.randomUUID()` ids (`newId` in `src/lib/new-id.ts`); older ids stay valid. Open and Import report references to missing user records with `refNote` (`src/lib/user-data.ts`, `checkUserRefs` of the schema) and keep the records.
 - Cartridge record (`components/cartridge-record.tsx`, rows from `src/lib/cartridge-record.ts`):
   - Four fact cards (`RecordFacts`). The mm or in switch in the heads of the Cartridge and Chamber panels.
   - A shotshell's Variants panel, with the variant select in its title row (`VariantSelect`).
@@ -188,6 +189,7 @@ A static site without a server for GitHub Pages: the web app with the records as
   - A Mantine `Modal` with the focus on Cancel. Escape cancels and leaves a dialog under it open. The host is mounted first in `providers.tsx`.
   - A delete that can be taken back (a firearm, a target sheet, a group) asks nothing and calls `offerUndo`.
 - Units and number formatting: `src/lib/units.ts` (values held in SI, fixed decimals, no grouping).
+  - Stored units (mm, g, bar, degC) to SI and back: `toSi` and `fromSi` of `@openreloading/schema`, never a factor written in place. `test/unit-literals.test.ts` fails on a factor literal in the API or web sources, except the time, byte and pixel lines it lists.
 - Unit suffix of a field: `NumberField` switches that field only, in memory (`src/lib/field-unit.ts`).
   - A button for two units, a menu for three or more. Nothing is stored. The Settings (`UnitsForm`) store units. A change of the Settings or a reload resets the field.
   - A numeric `placeholder` and a message, mark or help that names a unit (`error`, `mark`, `help`, `action.text`, `fieldError(spec, value, shown)`) are functions of the units shown. `unit="text"` or `"none"` leaves a page without switches.

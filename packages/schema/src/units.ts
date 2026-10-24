@@ -62,6 +62,49 @@ export type QuantityKind = keyof StoredUnits
 /** Schema of a {@link QuantityKind}: one of the keys of {@link units}, such as `length` or `pressure`. */
 export const quantityKind = z.enum(Object.keys(units) as [QuantityKind, ...QuantityKind[]])
 
+/** Map from the stored unit of a quantity to its SI unit: `si = stored * factor + offset`. */
+export interface SiMap {
+  factor: number
+  offset: number
+}
+
+const scale = (factor: number): SiMap => ({ factor, offset: 0 })
+
+/**
+ * The map to SI of each quantity's stored unit. Percent is a fraction in SI, the ballistic
+ * coefficient kg/m2 (1 lb = 0.45359237 kg, 1 in = 0.0254 m), temperature K.
+ */
+export const siMaps: Record<QuantityKind, SiMap> = {
+  length: scale(1e-3),
+  area: scale(1e-6),
+  mass: scale(1e-3),
+  density: scale(1e3),
+  pressure: scale(1e5),
+  energy: scale(1),
+  velocity: scale(1),
+  angle: scale(Math.PI / 180),
+  temperature: { factor: 1, offset: 273.15 },
+  absoluteTemperature: scale(1),
+  specificEnergy: scale(1),
+  molarMass: scale(1),
+  specificVolume: scale(1),
+  burnRate: scale(1),
+  inverseTemperature: scale(1),
+  massFraction: scale(0.01),
+  relativeHumidity: scale(0.01),
+  count: scale(1),
+  dimensionless: scale(1),
+  ballisticCoefficient: scale(0.45359237 / 0.0254 ** 2),
+}
+
+/** A value of quantity `kind` in its stored unit, in SI. */
+export const toSi = (kind: QuantityKind, stored: number) =>
+  stored * siMaps[kind].factor + siMaps[kind].offset
+
+/** A value of quantity `kind` in SI, in its stored unit: the inverse of {@link toSi}. */
+export const fromSi = (kind: QuantityKind, si: number) =>
+  (si - siMaps[kind].offset) / siMaps[kind].factor
+
 /**
  * A value in the unit of its quantity, plus the value as written in the source when it differed.
  * `value` may carry bounds (`z.number().positive()`), which the JSON Schema keeps.

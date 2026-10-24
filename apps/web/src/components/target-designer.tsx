@@ -14,6 +14,7 @@ import {
 } from 'react'
 import { fieldError } from '../lib/field-spec.ts'
 import { historyOf } from '../lib/history.ts'
+import { newId } from '../lib/new-id.ts'
 import {
   type Action,
   colours,
@@ -34,7 +35,7 @@ import { userFaceId, userOrganization } from '../lib/user-faces.ts'
 import { putRecords, requestPersistentStorage } from '../lib/user-store.ts'
 import { DesignerField } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
-import { FileMenu, newId } from './file-menu.tsx'
+import { FileMenu } from './file-menu.tsx'
 import { PageBar } from './page-bar.tsx'
 import { PropertyGrid } from './property-grid.tsx'
 import { useShortcuts } from './shortcuts.tsx'
