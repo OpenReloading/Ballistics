@@ -55,12 +55,15 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON apps/web/scripts/ci-plan.mts >> "$GITHUB_OUTPUT"
 
-  check:
+  # `check` is the required status check. It stands for the two jobs below, which run in parallel: `static` and
+  # `test` (one job per group of workspaces, the drawing and web suites being the slow ones). Their conditions are
+  # the old single job's, so the plan skips all of them together.
+  static:
     needs: changes
     # a failed `changes` job leaves the outputs empty, so the job runs
     if: ${{ !cancelled() && needs.changes.outputs.promote != 'true' && needs.changes.outputs.check != 'false' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
     permissions:
       contents: read
     steps:
@@ -76,13 +79,65 @@ jobs:
       - run: npm run build
       - run: npm run typecheck
       - run: npm run docs:check
-      - run: npm test
       - run: npm run data:validate
       # `npm run api:check` in the dev container; the same oasdiff version as .devcontainer/Dockerfile
       - run: node tools/src/openapi.ts "$RUNNER_TEMP/openapi.json"
       - name: Breaking changes of the API document (oasdiff)
         run: docker run --rm -v "$PWD:/repo:ro" -v "$RUNNER_TEMP:/doc:ro" -w /repo "$OASDIFF_IMAGE" breaking packages/api/openapi.baseline.json /doc/openapi.json --fail-on ERR
       - run: node tools/src/audit.ts
+
+  # Together the groups are what the root `npm test` runs. The workspaces import each other's dist/, so each job builds.
+  test:
+    name: test (${{ matrix.name }})
+    needs: changes
+    if: ${{ !cancelled() && needs.changes.outputs.promote != 'true' && needs.changes.outputs.check != 'false' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: drawing
+            workspaces: -w @openreloading/drawing
+          - name: web
+            workspaces: -w @openreloading/web
+          - name: packages
+            workspaces: -w @openreloading/schema -w @openreloading/core -w @openreloading/importers -w @openreloading/data -w @openreloading/api -w @openreloading/docs -w @openreloading/tools
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: |
+          # unquoted on purpose: the value is several `-w name` words
+          # shellcheck disable=SC2086
+          npm test $WORKSPACES
+        env:
+          WORKSPACES: ${{ matrix.workspaces }}
+      - if: matrix.name == 'packages'
+        run: npm run test:unit -w @openreloading/e2e
+
+  # Fails when a part failed or was cancelled; a skipped part (the plan, the promotion pull request) passes, as the
+  # old single job did when skipped. Stays the name the rulesets require.
+  check:
+    needs: [changes, static, test]
+    if: ${{ always() && needs.changes.outputs.promote != 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - env:
+          RESULTS: ${{ needs.static.result }} ${{ needs.test.result }}
+        run: |
+          echo "static and test: $RESULTS"
+          case " $RESULTS " in *" failure "* | *" cancelled "*) exit 1 ;; esac
 
   # Workflow lint and security audit of .github/workflows and dependabot.yml.
   workflows:

@@ -30,6 +30,7 @@
 - Pages edition (GitHub Pages, no server): `apps/web/AGENTS.md`, Pages edition.
 - One workspace: `npm run <script> -w @openreloading/<name>`
 - CI (`.github/workflows/ci.yml`) runs the checks above except the docs site build and the Pages edition.
+  - The required check `check` is the job that waits for `static` (lint, build, typecheck, docs check, data validation, API breaking changes, audit) and `test (drawing)`, `test (web)`, `test (packages)`, which run in parallel and together run what `npm test` runs. Add a workspace's tests to one of the `test` groups in `ci.yml` when the root `test` script gains it.
   - `e2e` runs against `docker compose up api web`, runs the drawing pixel baseline in the Playwright image (`npm run drawing-baseline -w @openreloading/e2e`), builds the web app against that API, then runs `node apps/web/scripts/check-prerender.mts` and `npm run e2e:smoke` against that build.
   - On a pull request the `changes` job (`apps/web/scripts/ci-plan.mts`) can skip the `check` job (only prose changed), the `e2e` job (no change to what the API, the web app or the e2e specs read) or that web build (no change to the web app or what it builds from). It can build with `PRERENDER=sample` (no change to record data, record page code or the packages they read). The Turbopack cache (`apps/web/.next/cache/turbopack`) is restored.
   - A push to the default branch or any doubt builds from nothing, every record page prerendered and checked in full.
