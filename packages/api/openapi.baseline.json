@@ -29,7 +29,7 @@
         "operationId": "getBullets",
         "tags": ["Records"],
         "summary": "List bullets",
-        "description": "A page of bullets ordered by manufacturer name, name and id. `q` matches the manufacturer name or an alias followed by the product name. Each item carries diameter (mm), mass (g), length (mm), the first G1 and G7 ballistic coefficients, tip type and construction.",
+        "description": "A page of bullets ordered by manufacturer name and name, digit runs in numeric order. `q` keeps the bullets whose manufacturer name or alias followed by the product name holds every word of it, in any order, and ranks them by match, ties in the default order. Each item carries diameter (mm), mass (g), length (mm), the first G1 and G7 ballistic coefficients, tip type and construction.",
         "parameters": [
           {
             "name": "q",
@@ -934,7 +934,7 @@
         "operationId": "getCartridges",
         "tags": ["Records"],
         "summary": "List cartridges",
-        "description": "A page of cartridges ordered by name. `q` matches names and aliases. Each item carries its smallest CIP bullet, bore and groove diameters, case and cartridge lengths (mm), its highest Pmax (bar) and the case type from its rim and belt dimensions.",
+        "description": "A page of cartridges ordered by name, digit runs in numeric order. `q` keeps the cartridges whose name or alias holds every word of it, in any order, and ranks them by match (a word that starts a word of the name first), ties in the default order. Each item carries its smallest CIP bullet, bore and groove diameters, case and cartridge lengths (mm), its highest Pmax (bar) and the case type from its rim and belt dimensions.",
         "parameters": [
           {
             "name": "q",
@@ -16488,7 +16488,7 @@
         "operationId": "getManufacturers",
         "tags": ["Records"],
         "summary": "List manufacturers",
-        "description": "Every manufacturer with its aliases and website, ordered by name.",
+        "description": "Every manufacturer with its aliases and website, ordered by name, digit runs in numeric order.",
         "parameters": [],
         "responses": {
           "200": {
@@ -16750,7 +16750,7 @@
         "operationId": "getPowders",
         "tags": ["Records"],
         "summary": "List powders",
-        "description": "A page of powders ordered by manufacturer name, name and id. `q` matches the manufacturer name or an alias followed by the product name. Each item carries the burn parameters of its interior model where the record has them.",
+        "description": "A page of powders ordered by manufacturer name and name, digit runs in numeric order. `q` keeps the powders whose manufacturer name or alias followed by the product name holds every word of it, in any order, and ranks them by match, ties in the default order. Each item carries the burn parameters of its interior model where the record has them.",
         "parameters": [
           {
             "name": "q",
