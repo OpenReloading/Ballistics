@@ -1468,6 +1468,58 @@ td.nowrap {
   font-size: var(--mantine-font-size-sm);
 }
 
+/* the target face designer: a ring is its numbers, then its two colours; the column header names
+   the fields */
+.face-row {
+  display: grid;
+  grid-template-columns: 3.25rem repeat(2, minmax(0, 1fr)) 1.75rem;
+  gap: 0 0.5rem;
+  align-items: center;
+  min-height: 1.75rem;
+}
+
+.face-event {
+  grid-template-columns: minmax(0, 1.5fr) repeat(2, minmax(0, 1fr)) 1.75rem;
+}
+
+.face-head {
+  background: var(--bg);
+  color: var(--muted);
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 600;
+}
+
+.face-colours {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 0.5rem;
+  margin: 0.125rem 2.25rem 0.5rem 3.75rem;
+}
+
+.face-designer .side-grid > button {
+  margin-top: 0.25rem;
+}
+
+@media screen and (min-width: 62em) {
+  .face-designer .workspace-tabs {
+    grid-template-columns: 26rem minmax(0, 1fr);
+  }
+
+  /* the face fills the room under the status line, as the designers' figures do */
+  .face-designer .target-face-drawing {
+    flex: 1 1 0;
+    max-width: none;
+    height: 100%;
+    min-height: 0;
+  }
+}
+
+@media screen and (max-width: 47.99em) {
+  .face-designer .target-face-drawing {
+    max-height: 26svh;
+  }
+}
+
 @media print {
   /* the drawing and the values, not the form */
   .designer .workspace-tabs > .workspace-inputs {

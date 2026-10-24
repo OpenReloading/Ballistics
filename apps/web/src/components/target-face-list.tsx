@@ -1,6 +1,8 @@
 'use client'
 
-import { Select } from '@mantine/core'
+import { Button, Select } from '@mantine/core'
+import { Plus } from '@phosphor-icons/react'
+import Link from 'next/link'
 import { useDeferredValue, useMemo } from 'react'
 import { compareNames } from '../lib/face-order.ts'
 import { listTitles } from '../lib/list-titles.ts'
@@ -94,7 +96,18 @@ export function TargetFaceList({ items }: { items: TargetFaceRow[] }) {
             {countText(shown.length, items.length, 'faces')}
           </BarCount>
         }
-        actions={<UnitsIconButton />}
+        actions={
+          <>
+            <Button
+              component={Link}
+              href="/targets/designer"
+              leftSection={<Plus aria-hidden="true" />}
+            >
+              New face
+            </Button>
+            <UnitsIconButton />
+          </>
+        }
       />
       <div className="directory">
         <DirectoryFilters

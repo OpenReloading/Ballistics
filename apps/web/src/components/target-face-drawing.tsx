@@ -1,19 +1,18 @@
-import { targetFaceFigure } from '@openreloading/drawing/target'
+import { type FaceShape, targetFaceFigure } from '@openreloading/drawing/target'
 import type { TargetFace } from '@openreloading/schema'
 
 /**
- * A target face drawn from its record by `targetFaceFigure`, face mm as SVG units. Paper colours
- * in both themes: it shows the printed face.
+ * A face drawn from `targetFaceFigure`, face mm as SVG units. Paper colours in both themes: it
+ * shows the printed face.
  */
-export function TargetFaceDrawing({ face }: { face: TargetFace }) {
-  const { frame, zones, lines } = targetFaceFigure(face)
-  const w = face.rings[0].diameter.value
+export function TargetFaceFigure({ shape, label }: { shape: FaceShape; label: string }) {
+  const { frame, zones, lines } = targetFaceFigure(shape)
   return (
     <svg
       className="target-face-drawing"
       viewBox={`${frame.x} ${frame.y} ${frame.width} ${frame.height}`}
       role="img"
-      aria-label={`${face.name}: ${face.rings.length} rings, ${w} mm across`}
+      aria-label={label}
     >
       {zones.map((z) => (
         <ellipse key={`${z.ring}-${z.rx}`} rx={z.rx} ry={z.ry} fill={z.colour} />
@@ -32,3 +31,11 @@ export function TargetFaceDrawing({ face }: { face: TargetFace }) {
     </svg>
   )
 }
+
+/** A target face record drawn, named by its rings and width. */
+export const TargetFaceDrawing = ({ face }: { face: TargetFace }) => (
+  <TargetFaceFigure
+    shape={face}
+    label={`${face.name}: ${face.rings.length} rings, ${face.rings[0].diameter.value} mm across`}
+  />
+)
