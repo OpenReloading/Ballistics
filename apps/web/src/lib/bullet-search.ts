@@ -41,13 +41,12 @@ const words = (s: string) =>
 /** A number with an optional unit as typed: "168", "168gr", "10.9g". */
 const massWord = /^(\d+(?:\.\d+)?)(gr|g)?$/
 
-/** Whether a bullet weighs what a typed number says: "168" and "168gr" grains, "10.9g" grams at the one decimal it is typed with. */
+/** Whether a bullet weighs what a typed number says: "168" and "168gr" grains, "10.9g" grams, within half a unit of the last typed digit. */
 function sameMass(b: BulletRow, number: string, unit: string | undefined) {
   if (b.mass === null) return false
-  const n = Number(number)
-  return unit === 'g'
-    ? Math.abs(b.mass - n) < 0.05
-    : Math.round((b.mass * 1e-3) / kilogramsPerGrain) === n
+  const half = 0.5 * 10 ** -(number.split('.')[1]?.length ?? 0)
+  const typed = unit === 'g' ? b.mass : (b.mass * 1e-3) / kilogramsPerGrain
+  return Math.abs(typed - Number(number)) <= half + 1e-9
 }
 
 /** What a typed word is worth for one bullet: its best field, 0 where it is in none. */
@@ -150,6 +149,9 @@ export function searchBullets(
     .map((e) => ({ b: e.row, score: sort === 'relevance' ? relevanceOf(e, typed) : 0 }))
     .sort((x, y) => {
       if (x.score !== y.score) return y.score - x.score
+      // the browser's own designs come first among equal matches
+      if (sort === 'relevance' && (x.b.origin === 'user') !== (y.b.origin === 'user'))
+        return x.b.origin === 'user' ? -1 : 1
       const [kx, ky] = [key(x.b), key(y.b)]
       if (kx !== ky && kx != null && ky != null) return ky - kx
       if (kx !== ky && (kx == null || ky == null)) return kx == null ? 1 : -1

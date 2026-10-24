@@ -142,7 +142,8 @@ export function BulletSearchDialog({
       ),
     [rows, typed, manufacturer, caliber, mass, fitOn, fit, origin, sort],
   )
-  const shown = results.slice(0, shownRows)
+  // after a failed read only the error shows, so no listbox or highlight is left behind
+  const shown = state.status === 'error' ? [] : results.slice(0, shownRows)
   // another list highlights its first bullet; the same list, found again, keeps the highlight
   const listKey = `${results.length}:${results[0]?.id}`
   // biome-ignore lint/correctness/useExhaustiveDependencies: the key stands for the list

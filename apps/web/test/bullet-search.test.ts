@@ -33,17 +33,23 @@ const rows: BulletRow[] = [
     mass: 9.072,
     ballisticCoefficientG7: 0.31,
   }),
-  row({ id: 'own-1', origin: 'user', manufacturerName: '', name: 'My 168 gr design' }),
+  row({ id: 'own-1', origin: 'user', manufacturerName: 'Zed', name: 'My 168 gr design' }),
 ]
 const none: BulletFilters = { manufacturer: '', caliber: '', mass: '' }
 const ids = (query: string, filters = none, sort?: Parameters<typeof searchBullets>[3]) =>
   searchBullets(rows, query, filters, sort).map((b) => b.id)
 
 it('finds a bullet by caliber and weight although its name says neither as typed', () => {
-  // the browser's own design comes first among equals, as in the old picker
+  // the browser's own design comes first among equals, whatever manufacturer it names
   expect(ids('308 168')).toEqual(['own-1', 'a-168-match', 'a-168-tipped'])
   expect(ids('.308 175gr')).toEqual(['a-175-match'])
   expect(ids('10.9g')).toEqual(['own-1', 'a-168-match', 'a-168-tipped'])
+})
+
+it('matches a fractional weight at the digits typed', () => {
+  const heavy = [row({ id: 'frac', name: 'Heavy', mass: 77.5 * 0.06479891 })]
+  expect(searchBullets(heavy, '77.5gr', none).map((b) => b.id)).toEqual(['frac'])
+  expect(searchBullets(heavy, '77.6gr', none)).toEqual([])
 })
 
 it('matches words in any order and by the manufacturer alias', () => {
@@ -75,13 +81,13 @@ it('applies the filters before ordering, and the fit and origin filters', () => 
 })
 
 it('sorts by mass or coefficient, rows without a value last', () => {
-  expect(ids('', none, 'mass').slice(0, 2)).toEqual(['a-175-match', 'own-1'])
+  expect(ids('', none, 'mass').slice(0, 2)).toEqual(['a-175-match', 'a-168-match'])
   expect(ids('', none, 'ballisticCoefficient').slice(0, 2)).toEqual(['b-140-match', 'a-168-tipped'])
   expect(ids('', none, 'name')).toEqual([
-    'own-1',
     'a-168-match',
     'a-168-tipped',
     'a-175-match',
     'b-140-match',
+    'own-1',
   ])
 })
