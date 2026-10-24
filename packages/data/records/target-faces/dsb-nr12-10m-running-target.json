@@ -1,0 +1,126 @@
+{
+  "id": "dsb-nr12-10m-running-target",
+  "name": "Scheibe Nr. 12 a/b (10 m Laufende Scheibe)",
+  "organization": "DSB",
+  "rings": [
+    {
+      "value": 1,
+      "diameter": {
+        "value": 50.5
+      }
+    },
+    {
+      "value": 2,
+      "diameter": {
+        "value": 45.5
+      }
+    },
+    {
+      "value": 3,
+      "diameter": {
+        "value": 40.5
+      }
+    },
+    {
+      "value": 4,
+      "diameter": {
+        "value": 35.5
+      }
+    },
+    {
+      "value": 5,
+      "diameter": {
+        "value": 30.5
+      }
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 25.5
+      }
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 20.5
+      }
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 15.5
+      }
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 10.5
+      }
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 5.5
+      }
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 0.5
+    }
+  },
+  "blackDiameter": {
+    "value": 30.5
+  },
+  "events": [
+    {
+      "name": "DSB Laufende Scheibe 10 m",
+      "distance": {
+        "value": 10000,
+        "raw": "10 m"
+      },
+      "scoring": "touch",
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 12 a/b (Teil 0 Seite 69)",
+      "category": "air-rifle"
+    },
+    {
+      "name": "DSB Laufende Scheibe 10 m MIX",
+      "distance": {
+        "value": 10000,
+        "raw": "10 m"
+      },
+      "scoring": "touch",
+      "organization": "DSB",
+      "section": "0.20 Scheibe Nr. 12 a/b (Teil 0 Seite 69)",
+      "category": "air-rifle"
+    }
+  ],
+  "photoSearch": false,
+  "note": "Nr. 12 a and 12 b carry the same rings. On 12 b the mirror takes two shots.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.20 Scheibe Nr. 12 a/b, Teil 0 Seite 69 to 70, PDF pp. 87 to 88; table row Teil 0 Seite 62, PDF p. 80",
+        "fields": [
+          "name",
+          "rings",
+          "innerTen.diameter",
+          "blackDiameter",
+          "events.name",
+          "events.distance",
+          "events.organization",
+          "events.section",
+          "events.category"
+        ]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.11.3, Teil 0 Seite 39, PDF p. 57",
+        "fields": ["events.scoring"]
+      }
+    ]
+  }
+}

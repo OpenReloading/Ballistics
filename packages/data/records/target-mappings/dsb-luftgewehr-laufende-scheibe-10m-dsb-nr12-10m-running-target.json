@@ -1,0 +1,22 @@
+{
+  "id": "dsb-luftgewehr-laufende-scheibe-10m-dsb-nr12-10m-running-target",
+  "discipline": "dsb-luftgewehr-laufende-scheibe-10m",
+  "face": "dsb-nr12-10m-running-target",
+  "event": "DSB Laufende Scheibe 10 m",
+  "shotCount": 60,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 84, PDF p. 102 (row 4.10, column Scheibe Nr.: 12)",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 84, PDF p. 102 (row 4.10, column Wettkampfschüsse)",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}
