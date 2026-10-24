@@ -15245,6 +15245,47 @@
                           "properties": {
                             "kind": {
                               "type": "string",
+                              "const": "manufacturer",
+                              "description": "Kind of the record: `manufacturer`."
+                            },
+                            "id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 64,
+                              "description": "Id of the record in the browser library."
+                            },
+                            "name": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 200,
+                              "description": "Name of the record. Save names the file after it."
+                            },
+                            "saved": {
+                              "type": "string",
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                              "description": "Time of the last save, ISO 8601 in UTC."
+                            },
+                            "data": {
+                              "type": "object",
+                              "properties": {
+                                "origin": {
+                                  "type": "string",
+                                  "const": "user",
+                                  "description": "Where the record lives: `user`."
+                                }
+                              },
+                              "required": ["origin"],
+                              "description": "A manufacturer typed by the user."
+                            }
+                          },
+                          "required": ["kind", "id", "name", "saved", "data"]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
                               "const": "bullet",
                               "description": "Kind of the record: `bullet`."
                             },
@@ -15274,10 +15315,10 @@
                                   "const": "user",
                                   "description": "Where the record lives: `user`."
                                 },
-                                "manufacturerName": {
+                                "manufacturer": {
                                   "type": "string",
-                                  "maxLength": 200,
-                                  "description": "Manufacturer name, free text until manufacturers are records."
+                                  "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                  "description": "Reference to a manufacturer: `catalogue:<record id>` or `user:<UUID>`."
                                 },
                                 "basedOn": {
                                   "type": "string",
@@ -15294,18 +15335,6 @@
                                 "overrides": {
                                   "type": "object",
                                   "properties": {
-                                    "manufacturer": {
-                                      "description": "The `manufacturer` of the bullet record. `null` removes it.",
-                                      "anyOf": [
-                                        {
-                                          "type": "string",
-                                          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
-                                        },
-                                        {
-                                          "type": "null"
-                                        }
-                                      ]
-                                    },
                                     "productNumber": {
                                       "description": "The `productNumber` of the bullet record. `null` removes it.",
                                       "anyOf": [
@@ -16443,7 +16472,8 @@
                                   "description": "The fields that differ from the base record, or all fields without one. A `null` removes a field of the base."
                                 }
                               },
-                              "required": ["origin", "manufacturerName"],
+                              "required": ["origin"],
+                              "additionalProperties": false,
                               "description": "A bullet of the bullet designer."
                             }
                           },
@@ -17044,20 +17074,8 @@
                                 },
                                 "manufacturer": {
                                   "type": "string",
-                                  "allOf": [
-                                    {
-                                      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$"
-                                    },
-                                    {
-                                      "pattern": "^catalogue:"
-                                    }
-                                  ],
-                                  "description": "Reference `catalogue:<record id>` to a catalogue manufacturer."
-                                },
-                                "manufacturerName": {
-                                  "type": "string",
-                                  "maxLength": 200,
-                                  "description": "Manufacturer name as free text, for a maker no record exists for."
+                                  "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                  "description": "Reference to the maker of the firearm."
                                 },
                                 "model": {
                                   "type": "string",
@@ -17501,6 +17519,7 @@
                                 "optics",
                                 "configurations"
                               ],
+                              "additionalProperties": false,
                               "description": "A firearm of the library, in stored units."
                             }
                           },
