@@ -329,7 +329,11 @@ export function TargetDesigner() {
 
   const inputs = (
     <form noValidate onSubmit={(ev) => ev.preventDefault()}>
-      <PropertyGrid title="Parameters" sections={sections} message={edited ? general[0] : undefined} />
+      <PropertyGrid
+        title="Parameters"
+        sections={sections}
+        message={edited ? general[0] : undefined}
+      />
     </form>
   )
   const results = (
