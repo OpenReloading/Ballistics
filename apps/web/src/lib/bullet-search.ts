@@ -95,12 +95,12 @@ export function bulletRelevance(b: BulletRow, query: string): number {
  * sorts by manufacturer and name; the heaviest or the highest BC first for `mass` and
  * `ballisticCoefficient`, rows without a value last.
  */
-export function searchBullets(
-  rows: readonly BulletRow[],
+export function searchBullets<R extends BulletRow>(
+  rows: readonly R[],
   query: string,
   filters: BulletFilters,
   sort: BulletSort = 'relevance',
-): BulletRow[] {
+): R[] {
   const words = typedWords(query)
   // the filters of the directory without its text match, which the key does
   const state = {
@@ -137,6 +137,22 @@ export function searchBullets(
 /** The G7 coefficient, else the G1 one: what the picker's BC column and sort show. */
 export const bc = (b: Pick<BulletSummary, 'ballisticCoefficientG1' | 'ballisticCoefficientG7'>) =>
   b.ballisticCoefficientG7 ?? b.ballisticCoefficientG1
+
+/**
+ * The first `limit` bullets that match `text` best among `designs` and the catalogue, with the
+ * count of all that match: the answer of the card's field, in the shape of the API's lists. `fit`
+ * keeps the bullets of the cartridge.
+ */
+export async function findBullets(
+  designs: readonly BulletRow[],
+  text: string,
+  limit: number,
+  fit?: CartridgeDiameters,
+): Promise<ListOf<BulletRow>> {
+  const rows = [...designs, ...(await fetchBulletCatalogue())]
+  const found = searchBullets(rows, text, { manufacturer: '', caliber: '', mass: '', fit })
+  return { total: found.length, items: found.slice(0, limit) }
+}
 
 let catalogue: Promise<BulletItem[]> | undefined
 

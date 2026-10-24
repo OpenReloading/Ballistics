@@ -95,7 +95,6 @@ export function Workbench() {
     choosePowder,
     csvCopied,
     bulletFit,
-    bulletParams,
     describeBullet,
     direction,
     fields,
@@ -966,7 +965,7 @@ export function Workbench() {
               onBullet={(b) => chooseBullet(b.id)}
               onPowder={(p) => choosePowder(p.id)}
               describeBullet={describeBullet}
-              bulletParams={bulletParams}
+              bulletFit={bulletFit}
               bulletsLabel={
                 bulletFit === undefined
                   ? 'Bullets, all diameters'

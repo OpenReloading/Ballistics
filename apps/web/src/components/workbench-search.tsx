@@ -2,8 +2,10 @@
 
 import { useDebouncedValue } from '@mantine/hooks'
 import { type createSpotlight, Spotlight, spotlight } from '@mantine/spotlight'
+import type { CartridgeDiameters } from '@openreloading/core'
 import { useEffect, useRef, useState } from 'react'
 import type { BulletSummary, CartridgeSummary, PowderSummary } from '../lib/api-types.ts'
+import { fetchBulletCatalogue, searchBullets } from '../lib/bullet-search.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import { cartridgeOptionText } from '../lib/standards.ts'
 import { searchRecords } from './record-search.tsx'
@@ -17,13 +19,22 @@ type Found = {
   powders: PowderSummary[]
 }
 
-/** The API search of each record kind, 8 matches each; bullets with the query `bulletParams`. */
-async function search(text: string, bulletParams: string, signal: AbortSignal): Promise<Found> {
-  const get = async <T,>(kind: string, extra = '') =>
-    (await searchRecords<T>(kind, text, 8, extra, signal)).items
+/**
+ * The search of each record kind, 8 matches each: cartridges and powders by the API, bullets by
+ * the browser's ranking (`searchBullets`, the card's field and dialog), kept to those that fit
+ * `fit`.
+ */
+async function search(
+  text: string,
+  fit: CartridgeDiameters | undefined,
+  signal: AbortSignal,
+): Promise<Found> {
+  const get = async <T,>(kind: string) => (await searchRecords<T>(kind, text, 8, '', signal)).items
   const [cartridges, bullets, powders] = await Promise.all([
     get<CartridgeSummary>('cartridges'),
-    get<BulletSummary>('bullets', bulletParams),
+    fetchBulletCatalogue().then((rows) =>
+      searchBullets(rows, text, { manufacturer: '', caliber: '', mass: '', fit }).slice(0, 8),
+    ),
     get<PowderSummary>('powders'),
   ])
   return { cartridges, bullets, powders }
@@ -32,7 +43,7 @@ async function search(text: string, bulletParams: string, signal: AbortSignal): 
 /**
  * Record search of the workbench (`@mantine/spotlight`): Ctrl+K (Cmd+K), also from a field, or
  * `spotlight.open()`; groups Pages, Commands (the page's, then the shell's), Cartridges, Bullets
- * (with the query `bulletParams`, as `&cartridge=<id>`; named by `bulletsLabel`) and Powders. Ctrl+Enter in the search
+ * (those that fit `bulletFit`; named by `bulletsLabel`) and Powders. Ctrl+Enter in the search
  * closes it and runs. The site search of every other page (`site-search.tsx`) is this one on
  * a store of its own (`search`), opened by the shell, without `onRun`.
  */
@@ -43,7 +54,7 @@ export function WorkbenchSearch({
   onBullet,
   onPowder,
   describeBullet,
-  bulletParams = '',
+  bulletFit,
   bulletsLabel,
   search: own,
 }: {
@@ -54,7 +65,7 @@ export function WorkbenchSearch({
   onPowder: (p: PowderSummary) => void
   describeBullet: (b: BulletSummary) => string
   /** Extra query of the bullet search, for example `&cartridge=308-win`. */
-  bulletParams?: string
+  bulletFit?: CartridgeDiameters
   bulletsLabel: string
   /** A store of its own, opened by the caller (no shortcut); without it the default store on Ctrl+K. */
   search?: ReturnType<typeof createSpotlight>
@@ -81,11 +92,13 @@ export function WorkbenchSearch({
   const after = useRef<(() => void) | undefined>(undefined)
   const [text] = useDebouncedValue(query.trim(), 200)
   const [found, setFound] = useState<Found | 'error' | undefined>(undefined)
-  const shownParams = useRef(bulletParams)
+  const fitKey = bulletFit && `${bulletFit.g1} ${bulletFit.land} ${bulletFit.groove}`
+  const shownFit = useRef(fitKey)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `fitKey` stands for the fit
   useEffect(() => {
     // bullets of another cartridge must not stay choosable while the new search runs
-    if (shownParams.current !== bulletParams) {
-      shownParams.current = bulletParams
+    if (shownFit.current !== fitKey) {
+      shownFit.current = fitKey
       setFound(undefined)
     }
     if (!text) {
@@ -93,13 +106,13 @@ export function WorkbenchSearch({
       return
     }
     const controller = new AbortController()
-    search(text, bulletParams, controller.signal)
+    search(text, bulletFit, controller.signal)
       .then(setFound)
       .catch(() => {
         if (!controller.signal.aborted) setFound('error')
       })
     return () => controller.abort()
-  }, [text, bulletParams])
+  }, [text, fitKey])
 
   const lower = query.trim().toLowerCase()
   const shown = commands.filter((c) => c.label.toLowerCase().includes(lower))
