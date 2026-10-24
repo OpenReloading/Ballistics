@@ -1,10 +1,13 @@
 /**
  * The API of the Pages edition, in the browser. Reads answer from the data files the Pages build
- * writes under `<base>/api/` (`writeStaticApi` of `@openreloading/api/static`): lists filtered and
- * paged here as the API does, `q` ranked over the keys of `<kind>/search.json`. `POST interior` and
+ * writes under `<base>/api/` (`writeStaticApi` of `@openreloading/api/static`): lists from the
+ * catalogue over `catalogue/index.json`, the code the API's routes run, and records from
+ * `<kind>/<id>.json`. `POST interior` and
  * `interior/charge-target` run the API's own validation and runs (`@openreloading/api/compute`),
  * each compute task in a Web Worker of its own, terminated at the API's task deadline.
  */
+
+import { type Catalogue, type CatalogueIndex, openCatalogue } from '@openreloading/api/catalogue'
 import {
   type CartridgeWithSpecs,
   type ComputeRunner,
@@ -17,10 +20,8 @@ import {
   runInterior,
   taskTimeoutMs,
 } from '@openreloading/api/compute'
-import { type Powder, score } from '@openreloading/schema'
+import type { Powder } from '@openreloading/schema'
 import { basePath } from './edition.ts'
-
-type List = { total: number; items: { id: string; manufacturer?: string }[] }
 
 const listKinds = new Set([
   'cartridges',
@@ -65,48 +66,90 @@ function integer(value: string | null, fallback: number, min: number, max: numbe
   return /^\d+$/.test(value) && n >= min && n <= max ? n : Number.NaN
 }
 
+/** The query values each list reads besides `q`, `limit` and `offset`; the API drops the others. */
+const filters: Record<string, string[]> = {
+  cartridges: ['table'],
+  bullets: ['manufacturer', 'cartridge'],
+  powders: ['manufacturer'],
+  disciplines: ['federation'],
+  'target-mappings': ['discipline', 'face'],
+}
+
+let opened: { index: CatalogueIndex; catalogue: Catalogue } | undefined
+
 /**
- * A list answer. Cartridges, bullets and powders page (`limit`, `offset`) and search (`q` ranked by
- * `score` of the schema package over the `search` keys of the data files), bullets and powders also by `manufacturer`, bullets by `cartridge`. The other lists answer every item. Other keys
- * are dropped, as the API drops them. The filters of the federation lists (`federation`,
- * `discipline`, `face`) have no data files: 400.
+ * The catalogue over `catalogue/index.json`, the index every list is answered from.
+ * shortcut: lists only, a record is read from its own data file; extend `records` when a caller needs `get`.
+ */
+async function catalogue() {
+  const index = await dataFile<CatalogueIndex>('catalogue/index')
+  if (!index) throw new Error('catalogue/index.json answered 404')
+  if (opened?.index !== index)
+    opened = {
+      index,
+      catalogue: openCatalogue({
+        index,
+        records: () => {
+          throw new Error('the Pages catalogue holds the index only')
+        },
+      }),
+    }
+  return opened.catalogue
+}
+
+/**
+ * A list answer, from the catalogue as the API's routes answer it: the same paging, `q`, filters and
+ * order, the refusals of its query schemas. Cartridges, bullets and powders page (`limit`, `offset`)
+ * and search (`q`); the filters are `table` (cartridges), `manufacturer` (bullets, powders),
+ * `cartridge` (bullets), `federation` (disciplines) and `discipline` and `face` (target mappings).
+ * Other keys are dropped, as the API drops them.
  */
 async function list(kind: string, query: URLSearchParams) {
-  if (!searchKinds.has(kind)) {
-    for (const key of ['federation', 'discipline', 'face'])
-      if (query.has(key)) return refusal(400, 'Bad Request', `${key} is not in the Pages edition`)
-    return answer(200, await dataFile<List>(`${kind}/index`))
-  }
-  const limit = integer(query.get('limit'), 50, 1, 200)
-  const offset = integer(query.get('offset'), 0, 0, Number.MAX_SAFE_INTEGER)
-  const q = query.get('q')
-  const cartridge = kind === 'bullets' ? query.get('cartridge') : null
-  const manufacturer = kind === 'cartridges' ? null : query.get('manufacturer')
-  const id = (v: string | null) => v === null || (v.length <= 100 && recordId.test(v))
+  const paged = searchKinds.has(kind)
+  const own = (name: string) =>
+    filters[kind]?.includes(name) ? (query.get(name) ?? undefined) : undefined
+  const limit = paged ? integer(query.get('limit'), 50, 1, 200) : 0
+  const offset = paged ? integer(query.get('offset'), 0, 0, Number.MAX_SAFE_INTEGER) : 0
+  const q = paged ? (query.get('q') ?? undefined) : undefined
+  const [table, manufacturer, cartridge, federation, discipline, face] = [
+    'table',
+    'manufacturer',
+    'cartridge',
+    'federation',
+    'discipline',
+    'face',
+  ].map(own)
+  const text = (v: string | undefined, max: number) =>
+    v === undefined || (v.length >= 1 && v.length <= max && !v.includes('\0'))
+  const id = (v: string | undefined) => v === undefined || (v.length <= 100 && recordId.test(v))
   if (
     Number.isNaN(limit) ||
     Number.isNaN(offset) ||
-    (q !== null && !(q.length >= 1 && q.length <= 100)) ||
-    !id(cartridge) ||
-    !id(manufacturer)
+    !text(q, 100) ||
+    !text(table, 10) ||
+    ![manufacturer, cartridge, federation, discipline, face].every(id)
   )
     return refusal(400, 'Bad Request', 'querystring does not match the schema')
-  // a cartridge none fits has no file
-  const source = cartridge === null ? `${kind}/index` : `bullets/cartridge/${cartridge}`
-  let items = (await dataFile<List>(source))?.items ?? []
-  if (manufacturer !== null) items = items.filter((i) => i.manufacturer === manufacturer)
-  if (q?.trim()) {
-    const keys = (await dataFile<Record<string, string>>(`${kind}/search`)) ?? {}
-    // the API's `select` (`packages/api/src/catalogue/list.ts`): ranked, equal ranks in list order
-    items = items
-      .flatMap((i) => {
-        const rank = score(keys[i.id] ?? '', q)
-        return rank === undefined ? [] : [{ i, rank }]
-      })
-      .sort((a, b) => b.rank - a.rank)
-      .map(({ i }) => i)
+  const c = await catalogue()
+  const paging = { limit, offset }
+  switch (kind) {
+    case 'cartridges':
+      return answer(200, c.cartridges({ q, table, ...paging }))
+    case 'bullets':
+      return answer(200, c.bullets({ q, manufacturer, cartridge, ...paging }))
+    case 'powders':
+      return answer(200, c.powders({ q, manufacturer, ...paging }))
+    case 'manufacturers':
+      return answer(200, c.manufacturers())
+    case 'target-faces':
+      return answer(200, c.targetFaces())
+    case 'federations':
+      return answer(200, c.federations())
+    case 'disciplines':
+      return answer(200, c.disciplines({ federation }))
+    default:
+      return answer(200, c.targetMappings({ discipline, face }))
   }
-  return answer(200, { total: items.length, items: items.slice(offset, offset + limit) })
 }
 
 async function get(path: string) {

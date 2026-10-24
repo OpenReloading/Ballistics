@@ -46,6 +46,24 @@ const cartridgeResponse = cartridge.extend({
   capacities: z.array(caseCapacity),
 })
 
+/**
+ * The body of `GET /cartridges/:id`: the stored record with its aliases (empty where it has none),
+ * case type and case capacities. Undefined for an unknown id. The Pages edition's data files hold
+ * the same body.
+ */
+export function cartridgeAnswer(catalogue: Catalogue, id: string) {
+  const found = catalogue.get('cartridge', id)
+  if (!found) return
+  const record = stored(found)
+  const { caseType } = cartridgeItem(record)
+  return {
+    ...record,
+    aliases: record.aliases ?? [],
+    ...(caseType && { caseType }),
+    capacities: catalogue.capacities(record.id).map(stored),
+  }
+}
+
 /** `GET /cartridges` and `GET /cartridges/:id`. */
 // biome-ignore lint/suspicious/useAwait: FastifyPluginAsync returns a promise
 export const cartridgeRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = async (
@@ -79,16 +97,9 @@ export const cartridgeRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
       },
     },
     (request, reply) => {
-      const found = catalogue.get('cartridge', request.params.id)
-      if (!found) return reply.notFound(`cartridge ${request.params.id} not found`)
-      const record = stored(found)
-      const { caseType } = cartridgeItem(record)
-      return reply.send({
-        ...record,
-        aliases: record.aliases ?? [],
-        ...(caseType && { caseType }),
-        capacities: catalogue.capacities(record.id).map(stored),
-      })
+      const answer = cartridgeAnswer(catalogue, request.params.id)
+      if (!answer) return reply.notFound(`cartridge ${request.params.id} not found`)
+      return reply.send(answer)
     },
   )
 }
