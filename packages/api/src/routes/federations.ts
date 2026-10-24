@@ -1,8 +1,9 @@
 import {
-  caliberClassId,
+  caliberClass,
   discipline,
   disciplineCategory,
   federation,
+  recordId,
   targetFace,
   targetMapping,
 } from '@openreloading/schema'
@@ -32,7 +33,7 @@ const targetFaceList = page(
     id: targetFace.shape.id,
     organization: targetFace.shape.organization,
     name: targetFace.shape.name,
-    caliberClasses: z.array(caliberClassId),
+    caliberClasses: z.array(recordId),
     categories: z.array(disciplineCategory),
   }),
 )
@@ -50,13 +51,16 @@ const disciplineList = page(
     distanceMm: z.number(),
   }),
 )
+const caliberClassList = page(
+  caliberClass.pick({ id: true, name: true }).extend({ diameterMm: z.number() }),
+)
 const mappingList = page(
   targetMapping.pick({ id: true, discipline: true, face: true, event: true, stage: true }).extend({
     gaugeMm: z.number().optional(),
   }),
 )
 
-/** `GET /target-faces`, `GET /federations`, `GET /disciplines`, `GET /target-mappings` and their `/:id` routes. */
+/** `GET /target-faces`, `GET /federations`, `GET /disciplines`, `GET /target-mappings`, `GET /caliber-classes` and their `/:id` routes. */
 // biome-ignore lint/suspicious/useAwait: FastifyPluginAsync returns a promise
 export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = async (
   app,
@@ -137,10 +141,23 @@ export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = as
     },
     (request, reply) => reply.send(catalogue.targetMappings(request.query)),
   )
+  app.get(
+    '/caliber-classes',
+    {
+      config: {
+        response: caliberClassList,
+        summary: 'List caliber classes',
+        description:
+          'The caliber classes the disciplines name: groups of cartridges whose bullets have the same diameter, with the nominal diameter (mm), ordered by diameter.',
+      },
+    },
+    (_request, reply) => reply.send(catalogue.caliberClasses()),
+  )
   for (const [path, kind, noun, record] of [
     ['/federations', 'federation', 'federation', federation],
     ['/disciplines', 'discipline', 'discipline', discipline],
     ['/target-mappings', 'targetMapping', 'target mapping', targetMapping],
+    ['/caliber-classes', 'caliberClass', 'caliber class', caliberClass],
   ] as const) {
     app.get<{ Params: { id: string } }>(
       `${path}/:id`,

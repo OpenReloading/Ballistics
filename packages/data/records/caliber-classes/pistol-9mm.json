@@ -1,0 +1,18 @@
+{
+  "id": "pistol-9mm",
+  "name": "9 mm pistol",
+  "diameter": {
+    "value": 9.04
+  },
+  "cartridges": ["9-mm-luger", "38-super-auto", "357-sig", "9-x-21", "9-mm-browning-court"],
+  "provenance": {
+    "kind": "derived",
+    "sources": [
+      {
+        "source": "cip-tdcc",
+        "fields": ["diameter", "cartridges"],
+        "note": "Grouped by the maximum projectile diameter G1 of the cartridge side of the sheets; the nominal diameter lies within 0.15 mm of G1 of every member."
+      }
+    ]
+  }
+}

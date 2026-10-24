@@ -12,6 +12,7 @@ import {
 import {
   bulletRow,
   byKey,
+  caliberClassRow,
   cartridgeRow,
   disciplineRow,
   federationRow,
@@ -123,6 +124,12 @@ export function buildCatalogue(source: CatalogueSource): CatalogueData & { recor
           ),
         (m) => m.id,
       ),
+      caliberClasses: ordered(
+        source.caliberClasses,
+        caliberClassRow,
+        (a, b) => a.diameter.value - b.diameter.value,
+        (c) => c.id,
+      ),
       capacities: Object.fromEntries(capacities),
       renames,
     },
@@ -138,6 +145,7 @@ export function buildCatalogue(source: CatalogueSource): CatalogueData & { recor
       federation: byId(source.federations),
       discipline: byId(source.disciplines),
       targetMapping: byId(source.targetMappings),
+      caliberClass: byId(source.caliberClasses),
     },
   }
 }

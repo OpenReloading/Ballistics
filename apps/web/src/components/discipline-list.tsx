@@ -3,7 +3,6 @@
 import { Select } from '@mantine/core'
 import { useDeferredValue, useMemo } from 'react'
 import {
-  caliberClassLabel,
   type DisciplineRow,
   disciplineMatches,
   type FederationRow,
@@ -36,6 +35,10 @@ const sortedSet = <T,>(values: (T | undefined)[], compare?: (a: T, b: T) => numb
 export function DisciplineList({ items }: { items: DisciplineRow[] }) {
   const [state, set, clear] = useListState()
   const filters = useDeferredValue(state)
+  const className = useMemo(
+    () => new Map(items.flatMap((r) => r.classes.map((c) => [c.id, c.name] as const))),
+    [items],
+  )
   const options = useMemo(
     () => ({
       federations: sortedSet(
@@ -54,24 +57,21 @@ export function DisciplineList({ items }: { items: DisciplineRow[] }) {
         (a, b) => a - b,
       ).map((d) => ({ value: String(d), label: `${d} m` })),
       classes: sortedSet(
-        items.flatMap((r) => r.classes),
+        items.flatMap((r) => r.classes.map((c) => c.id)),
         compareNames,
-      ).map((c) => ({
-        value: c,
-        label: caliberClassLabel(c),
-      })),
+      ).map((id) => ({ value: id, label: className.get(id) ?? id })),
     }),
-    [items],
+    [items, className],
   )
   const shown = useMemo(() => items.filter((r) => disciplineMatches(r, filters)), [items, filters])
   const named = [
     state.organization,
     state.category && titleFromKebab(state.category),
     state.distance && `${state.distance} m`,
-    state.caliberClass && caliberClassLabel(state.caliberClass),
+    state.caliberClass && (className.get(state.caliberClass) ?? state.caliberClass),
     state.query.trim() && `matching "${state.query.trim()}"`,
   ]
-  const classes = (r: DisciplineRow) => r.classes.map(caliberClassLabel).join(', ')
+  const classes = (r: DisciplineRow) => r.classes.map((c) => c.name).join(', ')
   const columns: DirectoryColumn<DisciplineRow>[] = [
     { key: 'name', label: 'Name', value: (r) => r.name, cell: (r) => r.name },
     {

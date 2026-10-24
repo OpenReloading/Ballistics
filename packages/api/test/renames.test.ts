@@ -14,6 +14,7 @@ const renames = {
   federations: { 'old-federation': 'test-federation' },
   disciplines: { 'old-discipline': 'test-discipline' },
   'target-mappings': { 'old-mapping': 'test-discipline-test-face' },
+  'caliber-classes': { 'old-class': 'air-4-5' },
 }
 
 describe('catalogue renames', () => {

@@ -21,18 +21,24 @@ const records = bundle.disciplines as unknown as DisciplineRecord[]
 const federationRecords = bundle.federations as unknown as FederationRecord[]
 const federations = bundle.federations
 const mappings = bundle.targetMappings
+const classes = bundle.caliberClasses.map((c) => ({ id: c.id, name: c.name }))
 const summaries = records.map((d) => ({ ...d, distanceMm: d.distance.value }))
-const rows = records.map((d) => disciplineRow(d, federations, mappings))
+const rows = records.map((d) => disciplineRow(d, federations, mappings, classes))
 const pistol = records.find((d) => d.id === 'dsb-25m-pistole-revolver') as DisciplineRecord
 
 it('lists a discipline with its federation, distance in m, category, caliber classes and faces', () => {
-  expect(disciplineRow(pistol, federations, mappings)).toEqual({
+  expect(disciplineRow(pistol, federations, mappings, classes)).toEqual({
     id: 'dsb-25m-pistole-revolver',
     name: '25 m Pistole/Revolver',
     number: '2.53/2.59/2.55/2.58',
     federation: 'DSB',
     distance: 25,
-    classes: ['pistol-9mm', 'revolver-357-38', 'revolver-44', 'pistol-45'],
+    classes: [
+      { id: 'pistol-9mm', name: '9 mm pistol' },
+      { id: 'revolver-357-38', name: '.357 and .38 revolver' },
+      { id: 'revolver-44', name: '.44 revolver' },
+      { id: 'pistol-45', name: '.45 ACP pistol' },
+    ],
     // the 150 s stage on the precision face, the 20 s stage on the rapid fire face
     faces: 2,
   })
@@ -75,7 +81,7 @@ it('gives the strip, the number, section, page and caliber classes, and the rule
     ['Federation', 'DSB'],
     ['Distance', '25'],
   ])
-  const rowsOf = disciplineGroups(pistol)[0].rows
+  const rowsOf = disciplineGroups(pistol, classes)[0].rows
   expect(rowsOf.map((r) => r.label)).toEqual([
     'Number',
     'Section',

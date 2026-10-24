@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { caliberClassId } from './caliber-class.ts'
 import { recordId } from './ids.ts'
 import { provenance } from './provenance.ts'
 import { countryCode, positiveLength, sha256 } from './shared.ts'
@@ -76,12 +75,13 @@ export const discipline = z.strictObject({
   /** Kind of firearm, where the rule book states it. */
   category: disciplineCategory.optional(),
   /**
-   * The caliber classes the discipline allows. `stated`: the rule book names them; `derived`: our
-   * expansion of a stated range or gauge to the classes of `caliberClasses`.
+   * The caliber classes the discipline allows, by id of a `CaliberClass` record. `stated`: the
+   * rule book names them; `derived`: our expansion of a stated range or gauge to the classes whose
+   * diameter lies in it.
    */
   caliberClasses: z
     .strictObject({
-      ids: z.array(caliberClassId).min(1),
+      ids: z.array(recordId).min(1),
       basis: z.enum(['stated', 'derived']),
     })
     .optional(),

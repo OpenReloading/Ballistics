@@ -3,9 +3,11 @@ import { join } from 'node:path'
 import {
   type Bullet,
   bullet,
+  type CaliberClass,
   type Cartridge,
   type CaseCapacity,
   type ChronoSession,
+  caliberClass,
   cartridge,
   caseCapacity,
   chronoSession,
@@ -33,6 +35,7 @@ import {
   targetMapping,
 } from '@openreloading/schema'
 import { z } from 'zod'
+import { checkCaliberClasses } from './caliber-classes.ts'
 import { checkCoverage } from './coverage.ts'
 import { checkFederations } from './federations.ts'
 import { checkFittedSources } from './load-tables.ts'
@@ -89,6 +92,7 @@ export function readLoadTables(dir: string, errors?: string[]): LoadTables {
 /** The records of a records root, one array per kind. */
 export type Bundle = {
   cartridges: Cartridge[]
+  caliberClasses: CaliberClass[]
   manufacturers: Manufacturer[]
   powders: Powder[]
   bullets: Bullet[]
@@ -120,6 +124,7 @@ function readBundle(roots: string[], errors: string[]): Bundle {
     readKind(roots, dir, schema, { errors, sources, optional })
   const bundle = {
     cartridges: read('cartridges', cartridge),
+    caliberClasses: read('caliber-classes', caliberClass),
     manufacturers: read('manufacturers', manufacturer),
     powders: read('powders', powder),
     bullets: read('bullets', bullet),
@@ -170,6 +175,7 @@ function applyExceptions(spec: Cartridge, errors: string[]) {
 function checkSourceCoverage(bundle: Bundle, errors: string[]) {
   for (const [dir, records] of [
     ['manufacturers', bundle.manufacturers],
+    ['caliber-classes', bundle.caliberClasses],
     ['powders', bundle.powders],
     ['bullets', bundle.bullets],
     ['capacities', bundle.capacities],
@@ -230,6 +236,7 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
   }
   checkSourceCoverage(bundle, errors)
   errors.push(...checkFederations(bundle))
+  errors.push(...checkCaliberClasses(bundle))
   checkRenames(bundle, errors)
   const loadTables = readLoadTables(roots[1] ?? roots[0], errors)
   for (const p of bundle.powders) {

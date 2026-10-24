@@ -79,12 +79,12 @@ describe('discipline', () => {
     expect(discipline.safeParse(bare).success).toBe(true)
   })
 
-  it('refuses an unknown caliber class, an inferred basis and a missing section', () => {
+  it('refuses a caliber class that is no record id, an inferred basis and a missing section', () => {
     const caliberClasses = (c: object) => ({
       ...validDiscipline,
       caliberClasses: { ...validDiscipline.caliberClasses, ...c },
     })
-    expectIssueAt(discipline, caliberClasses({ ids: ['rimfire-99'] }), 'caliberClasses.ids.0')
+    expectIssueAt(discipline, caliberClasses({ ids: ['Rimfire 99'] }), 'caliberClasses.ids.0')
     expectIssueAt(discipline, caliberClasses({ ids: [] }), 'caliberClasses.ids')
     expectIssueAt(discipline, caliberClasses({ basis: 'inferred' }), 'caliberClasses.basis')
     const { section, ...noSection } = validDiscipline

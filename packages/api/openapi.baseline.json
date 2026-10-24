@@ -12,7 +12,7 @@
     },
     {
       "name": "Competition",
-      "description": "Federations, their disciplines, target faces and the mapping between them."
+      "description": "Federations, their disciplines, target faces, the mapping between them and the caliber classes of the disciplines."
     },
     {
       "name": "Exterior",
@@ -939,6 +939,283 @@
         }
       }
     },
+    "/v1/caliber-classes": {
+      "get": {
+        "operationId": "getCaliberClasses",
+        "tags": ["Competition"],
+        "summary": "List caliber classes",
+        "description": "The caliber classes the disciplines name: groups of cartridges whose bullets have the same diameter, with the nominal diameter (mm), ordered by diameter.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "number"
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                          },
+                          "name": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "diameterMm": {
+                            "type": "number"
+                          }
+                        },
+                        "required": ["id", "name", "diameterMm"],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": ["total", "items"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/caliber-classes/{id}": {
+      "get": {
+        "operationId": "getCaliberClassesById",
+        "tags": ["Competition"],
+        "summary": "Get a caliber class",
+        "description": "The whole caliber class record with its provenance.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Record id.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "maxLength": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                    },
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "diameter": {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "number",
+                          "exclusiveMinimum": 0,
+                          "description": "In mm."
+                        },
+                        "raw": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "The value as written in the source, when it differed."
+                        }
+                      },
+                      "required": ["value"],
+                      "additionalProperties": false,
+                      "unit": "mm"
+                    },
+                    "cartridges": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                      }
+                    },
+                    "provenance": {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "type": "string",
+                          "enum": ["published", "measured", "derived", "fitted", "computed"]
+                        },
+                        "sources": {
+                          "minItems": 1,
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "title": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "publisher": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "edition": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "page": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "url": {
+                                "type": "string",
+                                "format": "uri"
+                              },
+                              "retrieved": {
+                                "type": "string",
+                                "format": "date",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                              },
+                              "sha256": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              },
+                              "fields": {
+                                "minItems": 1,
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "minLength": 1
+                                }
+                              },
+                              "kind": {
+                                "type": "string",
+                                "enum": ["published", "measured", "derived", "fitted", "computed"]
+                              },
+                              "license": {
+                                "type": "string",
+                                "pattern": "^(LicenseRef-)?[A-Za-z0-9.+-]+$"
+                              },
+                              "terms": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "origin": {
+                                "type": "string",
+                                "enum": ["manufacturer", "public", "community"]
+                              },
+                              "run": {
+                                "type": "object",
+                                "properties": {
+                                  "version": {
+                                    "type": "string",
+                                    "pattern": "^[0-9a-f]{16}$"
+                                  },
+                                  "report": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  }
+                                },
+                                "required": ["version", "report"],
+                                "additionalProperties": false
+                              },
+                              "note": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": ["title"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "note": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "required": ["kind", "sources"],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": ["id", "name", "diameter", "cartridges", "provenance"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "308": {
+            "description": "Permanent Redirect: the id was renamed, `Location` is the record that replaced it.",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "414": {
+            "description": "URI Too Long",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/cartridges": {
       "get": {
         "operationId": "getCartridges",
@@ -1793,31 +2070,7 @@
                           "type": "array",
                           "items": {
                             "type": "string",
-                            "enum": [
-                              "air-4-5",
-                              "rimfire-17",
-                              "rimfire-22",
-                              "rifle-22-cf",
-                              "rifle-6mm",
-                              "rifle-25",
-                              "rifle-6-5",
-                              "rifle-270",
-                              "rifle-7mm",
-                              "rifle-30",
-                              "rifle-30-carbine",
-                              "rifle-8mm",
-                              "rifle-338",
-                              "pistol-7-65",
-                              "revolver-32",
-                              "pistol-9mm",
-                              "revolver-357-38",
-                              "pistol-9x18",
-                              "pistol-40-10mm",
-                              "revolver-41",
-                              "revolver-44",
-                              "pistol-45",
-                              "revolver-45-colt"
-                            ]
+                            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
                           }
                         },
                         "basis": {
@@ -17705,6 +17958,159 @@
                             }
                           },
                           "required": ["kind", "id", "name", "saved", "data"]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "const": "targetFaceDesign",
+                              "description": "Kind of the record: `targetFaceDesign`."
+                            },
+                            "id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 64,
+                              "description": "Id of the record in the browser library."
+                            },
+                            "name": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 200,
+                              "description": "Name of the record. Save names the file after it."
+                            },
+                            "saved": {
+                              "type": "string",
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                              "description": "Time of the last save, ISO 8601 in UTC."
+                            },
+                            "data": {
+                              "type": "object",
+                              "properties": {
+                                "rings": {
+                                  "maxItems": 40,
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "value": {
+                                        "description": "Ring value.",
+                                        "type": "integer",
+                                        "exclusiveMinimum": 0,
+                                        "maximum": 9007199254740991
+                                      },
+                                      "diameter": {
+                                        "description": "Width of the ring, mm.",
+                                        "type": "number",
+                                        "exclusiveMinimum": 0
+                                      },
+                                      "height": {
+                                        "description": "Height of an oval ring, mm.",
+                                        "type": "number",
+                                        "exclusiveMinimum": 0
+                                      },
+                                      "fill": {
+                                        "description": "Colour of the zone the ring line bounds outside.",
+                                        "type": "string",
+                                        "enum": [
+                                          "black",
+                                          "white",
+                                          "grey",
+                                          "red",
+                                          "orange",
+                                          "yellow",
+                                          "green",
+                                          "blue",
+                                          "brown"
+                                        ]
+                                      },
+                                      "line": {
+                                        "description": "Colour of the ring line.",
+                                        "type": "string",
+                                        "enum": [
+                                          "black",
+                                          "white",
+                                          "grey",
+                                          "red",
+                                          "orange",
+                                          "yellow",
+                                          "green",
+                                          "blue",
+                                          "brown"
+                                        ]
+                                      }
+                                    }
+                                  },
+                                  "description": "Rings from outer to inner."
+                                },
+                                "innerTen": {
+                                  "type": "object",
+                                  "properties": {
+                                    "diameter": {
+                                      "description": "Width of the inner ten, mm.",
+                                      "type": "number",
+                                      "exclusiveMinimum": 0
+                                    },
+                                    "height": {
+                                      "description": "Height of an oval inner ten, mm.",
+                                      "type": "number",
+                                      "exclusiveMinimum": 0
+                                    },
+                                    "rule": {
+                                      "description": "Whether a touch or only a cover counts.",
+                                      "type": "string",
+                                      "enum": ["touch", "cover"]
+                                    }
+                                  },
+                                  "description": "The inner ten."
+                                },
+                                "blackDiameter": {
+                                  "description": "Width of the black aiming area, mm.",
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                "blackHeight": {
+                                  "description": "Height of an oval black aiming area, mm.",
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                "decimal": {
+                                  "description": "Decimal (tenth-ring) scoring.",
+                                  "type": "boolean"
+                                },
+                                "events": {
+                                  "maxItems": 40,
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "name": {
+                                        "type": "string",
+                                        "maxLength": 200,
+                                        "description": "Name of the event. Empty: not named yet."
+                                      },
+                                      "distance": {
+                                        "description": "Shooting distance, mm.",
+                                        "type": "number",
+                                        "exclusiveMinimum": 0
+                                      },
+                                      "gauge": {
+                                        "description": "Diameter of the scored hole, mm.",
+                                        "type": "number",
+                                        "exclusiveMinimum": 0
+                                      }
+                                    },
+                                    "required": ["name"]
+                                  },
+                                  "description": "Events shot on the face."
+                                }
+                              },
+                              "required": ["rings", "events"],
+                              "description": "A target face of the face designer."
+                            }
+                          },
+                          "required": ["kind", "id", "name", "saved", "data"]
                         }
                       ]
                     },
@@ -19020,31 +19426,7 @@
                             "type": "array",
                             "items": {
                               "type": "string",
-                              "enum": [
-                                "air-4-5",
-                                "rimfire-17",
-                                "rimfire-22",
-                                "rifle-22-cf",
-                                "rifle-6mm",
-                                "rifle-25",
-                                "rifle-6-5",
-                                "rifle-270",
-                                "rifle-7mm",
-                                "rifle-30",
-                                "rifle-30-carbine",
-                                "rifle-8mm",
-                                "rifle-338",
-                                "pistol-7-65",
-                                "revolver-32",
-                                "pistol-9mm",
-                                "revolver-357-38",
-                                "pistol-9x18",
-                                "pistol-40-10mm",
-                                "revolver-41",
-                                "revolver-44",
-                                "pistol-45",
-                                "revolver-45-colt"
-                              ]
+                              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
                             }
                           },
                           "categories": {

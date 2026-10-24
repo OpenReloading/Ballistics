@@ -213,7 +213,7 @@ _Avoid_: ownCapacity
 `caseCondition`: state of the case when its capacity was measured: `new`, `fired` or `sized`.
 
 **Caliber class**:
-`caliberClasses`: classes of bullet diameter from the code table `packages/schema/src/caliber-class.ts`. On a discipline an object with the class `ids` it allows and its `basis` (`stated` by the rule book or `derived` from a stated range). On a target face list item the ids of the classes of its events.
+A record of kind `caliber-classes`: a class of bullet diameter with `name`, `diameter` and the member `cartridges`. `caliberClasses`: on a discipline an object with the ids of the class records it allows and its `basis` (`stated` by the rule book or `derived` from a stated range). On a target face list item the ids of the classes of its events.
 _Avoid_: calibers, classes
 
 ### Powders

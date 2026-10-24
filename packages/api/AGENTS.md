@@ -40,7 +40,7 @@ Fastify HTTP API (TypeScript, ESM) exposing `@openreloading/core` and the data r
   - `q` keeps the rows that hold every word of it, in any order, also as written without spaces and hyphens, and ranks them by `score` of the schema package (a word starting a word of the name first); equal ranks keep the default order.
   - The competition lists (`GET /federations`, `/disciplines`, `/target-faces`, `/target-mappings`) are sorted at build with the comparators of `@openreloading/schema` (`src/competition-order.ts`).
   - A record answers as stored: the catalogue's `kind`, `origin` and `revision` are not part of the body.
-- `GET /federations`, `GET /disciplines?federation=`, `GET /target-mappings?discipline=&face=` and their `/:id` routes (`src/routes/federations.ts`): summaries and records as `apps/docs/docs/data/federations.md` lists them. An unknown filter id gives no items.
+- `GET /federations`, `GET /disciplines?federation=`, `GET /target-mappings?discipline=&face=`, `GET /caliber-classes` and their `/:id` routes (`src/routes/federations.ts`): summaries and records as `apps/docs/docs/data/federations.md` lists them. An unknown filter id gives no items.
 
 Compute (`src/routes/compute.ts`):
 

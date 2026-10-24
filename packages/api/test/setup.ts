@@ -25,6 +25,7 @@ export const emptyBundle: Bundle = {
   federations: [],
   disciplines: [],
   targetMappings: [],
+  caliberClasses: [],
 }
 
 /** The catalogue of `data`, as the API opens it. */

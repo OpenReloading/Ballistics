@@ -1,0 +1,18 @@
+{
+  "id": "rifle-22-cf",
+  "name": ".22 centre-fire rifle",
+  "diameter": {
+    "value": 5.7
+  },
+  "cartridges": ["223-rem", "222-rem", "22-250-rem"],
+  "provenance": {
+    "kind": "derived",
+    "sources": [
+      {
+        "source": "cip-tdcc",
+        "fields": ["diameter", "cartridges"],
+        "note": "Grouped by the maximum projectile diameter G1 of the cartridge side of the sheets; the nominal diameter lies within 0.15 mm of G1 of every member."
+      }
+    ]
+  }
+}

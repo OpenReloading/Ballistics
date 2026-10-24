@@ -96,8 +96,9 @@ const tags = [
   },
   {
     name: 'Competition',
-    description: 'Federations, their disciplines, target faces and the mapping between them.',
-    segments: ['federations', 'disciplines', 'target-faces', 'target-mappings'],
+    description:
+      'Federations, their disciplines, target faces, the mapping between them and the caliber classes of the disciplines.',
+    segments: ['federations', 'disciplines', 'target-faces', 'target-mappings', 'caliber-classes'],
   },
   {
     name: 'Exterior',

@@ -1,0 +1,18 @@
+{
+  "id": "rimfire-17",
+  "name": ".17 HMR",
+  "diameter": {
+    "value": 4.38
+  },
+  "cartridges": ["17-hmr"],
+  "provenance": {
+    "kind": "derived",
+    "sources": [
+      {
+        "source": "cip-tdcc",
+        "fields": ["diameter", "cartridges"],
+        "note": "Grouped by the maximum projectile diameter G1 of the cartridge side of the sheets; the nominal diameter lies within 0.15 mm of G1 of every member."
+      }
+    ]
+  }
+}

@@ -158,6 +158,15 @@ export const bundle: Bundle = {
       provenance: published,
     },
   ],
+  caliberClasses: [
+    {
+      id: 'air-4-5',
+      name: '4.5 mm (.177) air',
+      diameter: { value: 4.5 },
+      cartridges: [],
+      provenance: published,
+    },
+  ],
   targetMappings: [
     {
       id: 'test-discipline-test-face',

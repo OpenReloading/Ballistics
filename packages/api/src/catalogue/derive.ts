@@ -1,6 +1,7 @@
 import { leastSpecValue } from '@openreloading/core'
 import {
   type Bullet,
+  type CaliberClass,
   type Cartridge,
   type CaseType,
   compareKeys,
@@ -15,6 +16,7 @@ import {
 } from '@openreloading/schema'
 import type {
   BulletItem,
+  CaliberClassItem,
   CartridgeItem,
   DisciplineItem,
   FederationItem,
@@ -238,6 +240,13 @@ export const targetMappingRow = (m: TargetMapping): IndexRow<TargetMappingItem> 
   },
   sortKey: sortKey(m.id),
   search: searchKey([m.id, m.event]),
+})
+
+/** The index row of a caliber class. */
+export const caliberClassRow = (c: CaliberClass): IndexRow<CaliberClassItem> => ({
+  item: { id: c.id, name: c.name, diameterMm: c.diameter.value },
+  sortKey: sortKey(c.name),
+  search: searchKey([c.name]),
 })
 
 /** Rows in the order of their sort keys, ties by id. */

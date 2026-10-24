@@ -21,6 +21,7 @@ Canonical records in git, validated against `@openreloading/schema`, bundled for
 | `records/sources/<id>.json` | `SourceRecord`, a source that several records cite (the C.I.P. TDCC, rule books, the synthetic demo data), see Provenance below |
 | `records/target-faces/<id>.json` | `TargetFace`, see below |
 | `records/federations/<id>.json`, `records/disciplines/<id>.json`, `records/target-mappings/<id>.json` | `Federation`, `Discipline`, `TargetMapping`, see below |
+| `records/caliber-classes/<id>.json` | `CaliberClass`: groups of cartridges whose bullets have the same diameter, named by the disciplines. Rules in `src/caliber-classes.ts` (below). |
 | `test/fixtures/` | Test data only, never real records |
 
 - Target faces: a printed target face as a rule book defines it (ring diameters to the outside edge of the line, inner ten, aiming black, events with their scoring gauge, and where set ring colours, paper size, bulls, ovals and discipline category per event).
@@ -62,8 +63,9 @@ Every finding below fails validation.
 - Bullets: `checkBullet` in `src/plausibility.ts` (diameter, mass, BC, length-to-diameter and twist ranges, G7 0.35 to 0.65 times G1).
 - Capacities, powders and chronograph sessions: `checkCapacity`, `checkPowder`, `checkChronoSession` in `src/plausibility.ts`.
 - Renames (`src/renames.ts`): an old id that is still a record, a replacement that is no record and a file that breaks the schema fail. Where a reference check names an unknown id, an old id of `renames.json` counts as known (`src/references.ts`, `src/federations.ts`).
+- Caliber classes (`checkCaliberClasses`, `src/caliber-classes.ts`): a member that is no cartridge record, a cartridge in two classes, a member without G1 on its cartridge side, a nominal diameter more than 0.15 mm from G1 of a member, and a class id of a discipline that is no record.
 - Duplicate names (`src/names.ts`): cartridges, powders (names and aliases), bullets, range records and target faces.
-- Sources (`checkCoverage`, `src/coverage.ts`): in powders, bullets, capacities, federations, disciplines and target mappings, every data field must be supported by a source.
+- Sources (`checkCoverage`, `src/coverage.ts`): in powders, bullets, capacities, federations, disciplines, target mappings and caliber classes, every data field must be supported by a source.
   - A source with `fields` supports only those dot paths (`base.length`, `ballisticCoefficients`).
   - Identity fields (`manufacturer`, `name`, `productNumber`, ...) need no field-level source.
 - Powder `interior` (`checkFittedSources` in `src/load-tables.ts`): only `fitted` sources for `interior` that name a manufacturer load table listed in `load-tables.json` of a records root (`readLoadTables` in `src/records.ts`) and the fit run (`run`: model version, report). The load table's `manufacturer` must exist (`checkManufacturerReferences` in `src/references.ts`).

@@ -13,7 +13,7 @@ Zod schemas for records, ESM. The build writes JSON Schema files to `dist/json-s
 - Search and list order (`src/search.ts`, `src/order.ts`, `apps/docs/docs/data/catalogue-storage.md`): `searchKey` is built once per row, `score` ranks a query against it (words in any order, spaces, hyphens, decimal comma and a leading point ignored; exact name 4, word start 2, substring 1). `sortKey` is one precomputed key per row (folded, digit runs padded), `compareKeys` compares by code unit. The web lists, and later the API and the static edition, use these and no other matcher or order.
 - `renames` (`src/renames.ts`): the shape of `records/renames.json`, old record ids per kind directory with the id that replaced each (`apps/docs/docs/data/catalogue-storage.md`).
 - Load tables (`src/load-tables.ts`): the schema of `load-tables.json`, strict entries.
-- Caliber class vocabulary `caliberClasses` (`src/caliber-class.ts`).
+- `CaliberClass` (`src/caliber-class.ts`): a record in `records/caliber-classes`, named by id in `Discipline.caliberClasses`, membership checked by `data:validate`.
 - Vocabularies the API and the web app share are exported once: `caseTypes` (`src/cartridge.ts`), `baseTypes`, `ogiveForms` and `tipTypes` (`src/bullet.ts`). The web app imports record types from here and keeps no copy; the bullet designer's choice lists are the options of these enums. Model overview and plan: `apps/docs/docs/data/record-model.md`.
 
 ## Commands (this directory, or `-w @openreloading/schema` from the root)

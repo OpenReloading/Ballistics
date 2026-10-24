@@ -9,7 +9,11 @@ Three record kinds describe who defines a discipline, what the discipline is and
 
 - Every value is read from a rule book that the target face records already cite, with its section and page. A value the rule book does not state stays absent.
 - Schemas: `packages/schema/src/federation.ts`.
-- Records: `packages/data/records/federations/`, `disciplines/` and `target-mappings/`.
+- Records: `packages/data/records/federations/`, `disciplines/`, `target-mappings/` and `caliber-classes/`.
+
+## Caliber class
+
+`records/caliber-classes/<id>.json`, schema `caliberClass`: `id`, `name` (as a shooter says it), `diameter` (nominal bullet diameter, mm), `cartridges` (ids of the member cartridge records, empty where the class has no C.I.P. cartridge) and `provenance`. A class groups cartridges whose bullets have the same diameter, so a hole size separates .22, 9 mm and .45 and cannot separate classes of one diameter (9 mm Luger and .357 Magnum). `data:validate` (`src/caliber-classes.ts`) checks that every member is a cartridge record in one class only, that G1 of the cartridge side of its sheet lies within 0.15 mm of the class's diameter, and that every class id a discipline names is a record. The diameter is G1 of the sheet; .22 rimfire takes the calibre 5.6 mm of the rule books, since G1 of the .22 Long Rifle sheet equals the case diameter (heeled bullet), and the air class takes the calibre of the rule book. `GET /caliber-classes/:id` answers the record.
 
 ## Federation
 
@@ -36,7 +40,7 @@ Three record kinds describe who defines a discipline, what the discipline is and
 | `section`, `page` | Rule-book section that defines it, printed page and PDF page |
 | `distance` | mm |
 | `category` | Kind of firearm (`disciplineCategory`), where the rule book states it |
-| `caliberClasses` | `ids` of caliber classes of `caliberClasses` with `basis`: `stated` (the rule book names them) or `derived` (a stated range or bound expanded to the classes whose diameter lies in it) |
+| `caliberClasses` | `ids` of caliber class records (`records/caliber-classes/`) with `basis`: `stated` (the rule book names them) or `derived` (a stated range or bound expanded to the classes whose diameter lies in it) |
 | `internationalDiscipline` | Id of the discipline of an international federation the rule book names as equivalent |
 
 A discipline shot over several distances in one match (BDS Mehrdistanzschießen) is one record: `distance.value` is the farthest distance, `distance.raw` lists all of them. Its mapping holds the shots of the whole discipline.
@@ -68,7 +72,7 @@ A face with `photoSearch: false` is skipped by the photo face search. The user p
 - a second mapping of one face event
 - a discipline no mapping names
 
-The schemas reject an unknown caliber class id and any key they do not define. Every data field of the three kinds is covered by a provenance source (`checkCoverage`). The records list `fields` on every source.
+The schemas reject any key they do not define, and `data:validate` an unknown caliber class id. Every data field of the three kinds is covered by a provenance source (`checkCoverage`). The records list `fields` on every source.
 
 ## API
 
@@ -79,6 +83,7 @@ Served under `/v1` (`packages/api/src/routes/federations.ts`). Each `/:id` route
 | `GET /federations` | `{ id, name, abbreviation, country, internationalFederation? }` |
 | `GET /disciplines?federation=` | `{ id, federation, name, number?, distanceMm, category? }` |
 | `GET /target-mappings?discipline=&face=` | `{ id, discipline, face, event, stage?, gaugeMm? }`, `gaugeMm` in mm |
+| `GET /caliber-classes` | `{ id, name, diameterMm }`, by diameter |
 
 Each list answers `{ total, items }` in the default order below. `GET /target-faces` lists per face the caliber classes of the disciplines mapped to it (`caliberClasses`) and the categories of its events and those disciplines (`categories`).
 

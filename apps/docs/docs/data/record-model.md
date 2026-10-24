@@ -23,7 +23,7 @@ Writers: catalogue (git records, checked by `readRecords`), user (browser, `pack
 | Firing series, range firings | `firing.ts`, `range.ts` | no folder, bundle only | catalogue |
 | Source record | `provenance.ts` | `records/sources`, inlined into records on read | catalogue |
 | Federation, discipline, target mapping, target face | `federation.ts`, `target-face.ts` | one folder each | catalogue |
-| Caliber class | `caliber-class.ts` | code only (a constant) | developer |
+| Caliber class | `caliber-class.ts` | `records/caliber-classes` | catalogue |
 | Load tables | `load-tables.ts` | `load-tables.json` of a records root | catalogue |
 | Firearm | `firearm.ts` | user record `firearm` | user |
 | Workbench state | `workbench.ts` | user record `workbenchState`, called "loads" in the UI | user |
@@ -137,7 +137,7 @@ Ranked by impact.
 5. Schema, designer and web types drifted apart where copied (step 1).
 6. `Load`, `ChronoSession`, `FiringSeries` and `RangeFirings` are validated and bundled but nothing reads them, so they can drift unseen.
 7. Id rules and the generator, and no id stability beyond manufacturers.
-8. Catalogue reference checks stop at ids that exist: loads name components in text, caliber class membership is a test only. (`load-tables.json` has a schema since step 12.)
+8. Catalogue reference checks stop at ids that exist: loads name components in text. (`load-tables.json` has a schema and caliber class membership is a data check since step 12.)
 9. Powder numbers mix `quantity` objects and plain numbers with a unit in the metadata.
 
 ## Steps
@@ -157,7 +157,7 @@ Each step lands alone with its model page updated in the same commit. Steps 4 to
 | 9 | Manufacturer references | 3 |
 | 10 | Replaced by the catalogue storage steps D0 to D6 (`catalogue-storage.md`) | |
 | 11 | Browser store hardening: versioned IndexedDB, keep and list invalid records | before 3 and 4 |
-| 12 | Catalogue loose ends: schema for load tables (done, below), caliber classes as records, federation reference of target faces (the renames map is part of the catalogue storage, `catalogue-storage.md`) | |
+| 12 | Catalogue loose ends: schema for load tables (done, below), caliber classes as records (done, below), federation reference of target faces (the renames map is part of the catalogue storage, `catalogue-storage.md`) | |
 
 Steps 1, 2 and 11 go first, then 3, then 4 to 6, then 7 to 9. Steps 10 and 12 fit any time; 10 does not run together with other changes to the cartridge routes.
 
@@ -195,6 +195,8 @@ Steps 1, 2 and 11 go first, then 3, then 4 to 6, then 7 to 9. Steps 10 and 12 fi
 ### Step 12: what changed
 
 - `loadTables` (`packages/schema/src/load-tables.ts`) is the schema of `load-tables.json`: row file name to `{ manufacturer, title, url?, retrieved }`, strict, `manufacturer` a record id and `retrieved` an ISO date. `readLoadTables` parses each entry: one that breaks the schema is left out and `data:validate` reports each issue with the row file and field. The manufacturer must still be a record (`checkManufacturerReferences`).
+
+- Caliber classes are records (`records/caliber-classes`, `caliberClass` in `packages/schema/src/caliber-class.ts`), served by `GET /caliber-classes` and `/:id`. `Discipline.caliberClasses.ids` and the `caliberClasses` of a target face list item are record ids, checked by `data:validate` (`packages/data/src/caliber-classes.ts`), which also holds the membership rules the former test checked. The `caliberClasses` constant of the schema package is gone: the web app reads class names from the API.
 
 ## Decisions
 
