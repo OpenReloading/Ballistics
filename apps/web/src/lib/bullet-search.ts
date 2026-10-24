@@ -4,6 +4,7 @@
  * whole catalogue read once per page load.
  */
 import { bulletFits, type CartridgeDiameters } from '@openreloading/core'
+import { fold } from '@openreloading/schema'
 import { apiFetch } from './api-fetch.ts'
 import type { BulletSummary, ListOf, ManufacturerSummary } from './api-types.ts'
 import {
@@ -15,7 +16,6 @@ import {
 } from './bullet-rows.ts'
 import { commonCaliber } from './caliber.ts'
 import { emptyDirectory } from './directory.ts'
-import { foldAccents } from './lists.ts'
 import { kilogramsPerGrain } from './units.ts'
 
 /** The picker's filters; each empty one leaves every bullet in. */
@@ -34,7 +34,7 @@ export interface BulletFilters {
 export type BulletSort = 'relevance' | 'name' | 'mass' | 'ballisticCoefficient'
 
 const words = (s: string) =>
-  foldAccents(s)
+  fold(s)
     .split(/[^a-z0-9.]+/)
     .filter(Boolean)
 
@@ -87,7 +87,7 @@ function entriesOf(rows: readonly BulletRow[]): Entry[] {
   if (!list) {
     list = rows.map((row) => ({
       row,
-      hay: foldAccents(bulletSearchText(row)),
+      hay: fold(bulletSearchText(row)),
       name: words(row.name),
       maker: words(
         [row.manufacturerName, ...((row as BulletItem).manufacturerAliases ?? [])].join(' '),
