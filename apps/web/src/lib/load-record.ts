@@ -104,7 +104,8 @@ export function toLoad(p: LoadParts): Load {
     firearm: p.firearm,
     bullet: p.bullet,
     powder: p.powder,
-    charge: charge === undefined ? undefined : storedOf('mass', charge),
+    // a charge of 0 or less stays out: the schema would reject the load
+    charge: charge !== undefined && charge > 0 ? storedOf('mass', charge) : undefined,
     case:
       p.waterCapacity === undefined
         ? undefined

@@ -136,6 +136,8 @@ export function SavedLoads({
   const [records, setRecords] = useState<LoadRecord[]>([])
   const [query, setQuery] = useState('')
   const [message, setMessage] = useState('')
+  /** Stored loads of the earlier format, which the schema refuses. */
+  const [older, setOlder] = useState(0)
   /** The load whose name is edited in its row, with the text. */
   const [renaming, setRenaming] = useState<{ id: string; text: string }>()
   const storage = useStorage(opened)
@@ -143,7 +145,10 @@ export function SavedLoads({
   useEffect(() => {
     if (!opened) return
     storedRecords()
-      .then(({ records }) => setRecords(records.filter((r): r is LoadRecord => r.kind === 'load')))
+      .then(({ records, invalid }) => {
+        setRecords(records.filter((r): r is LoadRecord => r.kind === 'load'))
+        setOlder(invalid.filter((i) => i.kind === 'workbenchState').length)
+      })
       .catch(() => setMessage('The saved loads could not be read from this browser.'))
   }, [opened, tick])
 
@@ -320,6 +325,13 @@ export function SavedLoads({
       </div>
       <div className="saved-storage" role="status">
         {message && <p>{message}</p>}
+        {older > 0 && (
+          <p>
+            {older === 1 ? '1 saved load is' : `${older} saved loads are`} in the format of an
+            earlier version, which this app no longer reads. Open lists{' '}
+            {older === 1 ? 'it' : 'them'} under Invalid records.
+          </p>
+        )}
         {storage.persisted !== undefined && (
           <p>
             {storage.persisted

@@ -447,6 +447,17 @@ describe('POST /interior/load-file', () => {
     ).not.toHaveProperty('ladderSteps')
   })
 
+  it('refuses a temperature ladder instead of reading its step as a charge step', async () => {
+    const { status, body } = await simulate(
+      file({
+        siValues,
+        ladder: { kind: 'temperature', stepCount: 3, chargeStep: 5, direction: 'up' },
+      }),
+    )
+    expect(status).toBe(422)
+    expect(body.message).toContain('temperature ladder')
+  })
+
   it('refuses a seating ladder, which needs the seating geometry of the workbench', async () => {
     const { status, body } = await simulate(
       file({

@@ -252,6 +252,10 @@ export function useWorkbenchState() {
   /** The firearm library of this browser, for the Gun and barrel picker. */
   const [firearms, setFirearms] = useState<FirearmRecord[]>([])
   const [firearm, setFirearm] = useState<string>()
+  /** An opened load's gun weight comes from its firearm, which is not read yet. */
+  const gunPending = useRef(false)
+  /** Counts the opened loads: the same firearm chosen again is no change of `firearm`. */
+  const [opens, setOpens] = useState(0)
   /** The name the user typed; undefined: the generated name follows the load. */
   const [customName, setCustomName] = useState<string>()
   const [figureView, setFigureView] = useState<FigureView>('cartridge')
@@ -339,7 +343,7 @@ export function useWorkbenchState() {
     setGunFields({
       firearmMass: { text: fixedFieldText('firearmMass', unitsNow.current, mass), si: mass },
     })
-  }, [firearm, firearms])
+  }, [firearm, firearms, opens])
   /** A bullet design of this browser in place of a record; `fill` writes its mass into the Bullet mass field. */
   function takeBulletDesign(d: Pick<UserBulletView, 'id' | 'name' | 'si'>, fill = true) {
     picking.current.bullets?.abort()
@@ -492,8 +496,6 @@ export function useWorkbenchState() {
   const gunWeight = gunFields.firearmMass
   /** The weight came from a firearm of the library, not from the keyboard, a link or a file. */
   const gunFromFirearm = useRef(false)
-  /** An opened load's gun weight comes from its firearm, which is not read yet. */
-  const gunPending = useRef(false)
   const setGunWeight = (v: FieldValue) => {
     gunFromFirearm.current = false
     setGunFields({ firearmMass: v })
@@ -1555,6 +1557,7 @@ export function useWorkbenchState() {
     fill(query)
     // the weight of a firearm of the library comes from the firearm once it is read
     gunPending.current = firearmKey !== undefined && !typed.has('firearmMass')
+    setOpens((n) => n + 1)
     // a user cartridge or bullet is a record of this browser, read and resolved here
     const userCartridge =
       d.cartridge && parseRef(d.cartridge)?.scope === 'user' ? d.cartridge : undefined

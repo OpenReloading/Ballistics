@@ -97,6 +97,12 @@ describe('toLoad', () => {
     expect(l.charge).toEqual({ value: 2.4 })
   })
 
+  it('leaves a charge of 0 out, as the schema would reject it', () => {
+    const l = toLoad(parts({ values: { charge: 0 } }))
+    expect(l.charge).toBeUndefined()
+    expect(loadSchema.safeParse(l).success).toBe(true)
+  })
+
   it('writes an empty text and no series as absent', () => {
     const l = toLoad(parts({ values: {}, notes: '' }))
     expect(l.note).toBeUndefined()

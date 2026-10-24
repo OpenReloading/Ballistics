@@ -229,7 +229,7 @@ export async function simulate(
   const ladder = record.analysis?.ladder
   const step = ladder?.step && toSi(ladderStepKinds[ladder.kind ?? 'charge'], ladder.step)
   const withLadder =
-    ladder && ladder.kind !== 'seating' && ladder.stepCount > 1 && step !== undefined
+    ladder && (ladder.kind ?? 'charge') === 'charge' && ladder.stepCount > 1 && step !== undefined
   // the file is validated before any record is read: a bad file answers 400 whatever its ids
   const parseBody = (resistance?: InteriorLoad['resistance']) => {
     try {
@@ -253,13 +253,13 @@ export async function simulate(
   }
   parseBody()
   // after the file's checks (a bad file answers 400): a seating ladder needs the seating
-  // geometry of the drawing package, which this route lacks
-  if (ladder?.kind === 'seating')
+  // geometry of the drawing package, which this route lacks, and a temperature ladder is not run here
+  if (ladder?.kind === 'seating' || ladder?.kind === 'temperature')
     return {
       status: 422,
       payload: {
         ...unprocessable,
-        message: 'ladder.kind: a seating ladder runs in the workbench, not in this route',
+        message: `ladder.kind: a ${ladder.kind} ladder runs in the workbench, not in this route`,
         field: 'ladder.kind',
         notice,
       },
