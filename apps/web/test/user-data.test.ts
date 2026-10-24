@@ -280,12 +280,16 @@ describe('user data files', () => {
     expect(invalid[1]).toMatchObject({ id: undefined, name: undefined, kind: undefined })
   })
 
-  it('Export all carries the invalid records as stored; Import reads the rest', () => {
+  it('Export all carries the invalid records as stored; parsing hands them on unchecked', () => {
     const old = { kind: 'bulletDesign', id: 'o1', name: 'Old', saved, data: 'not an object' }
     const { invalid } = validRecords([old])
     const out = exportAllText([bullet], [], invalid)
     expect(out.ok && JSON.parse(out.text).invalid).toEqual([old])
-    expect(out.ok && parseUserDataFile(out.text)).toEqual({ ok: true, records: [bullet] })
+    expect(out.ok && parseUserDataFile(out.text)).toEqual({
+      ok: true,
+      records: [bullet],
+      invalid: [old],
+    })
     // no invalid records: the file has no such field
     const plain = exportAllText([bullet])
     expect(plain.ok && 'invalid' in JSON.parse(plain.text)).toBe(false)
