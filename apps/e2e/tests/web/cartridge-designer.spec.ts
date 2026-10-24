@@ -258,25 +258,29 @@ async function seedHollowBaseDesign(page: Page) {
     })
     const tx = db.transaction('records', 'readwrite')
     tx.objectStore('records').put({
-      kind: 'bulletDesign',
-      id: 'bullet-hollow',
+      kind: 'bullet',
+      id: '6f0f4d3e-0a43-4a43-9a3d-3a2f2e1f0c22',
       name: 'Hollow base',
       saved: '2026-10-20T00:00:00.000Z',
       data: {
+        origin: 'user',
         manufacturerName: '',
-        name: 'Hollow base',
-        choices: { 'base.type': 'conical-hollow-base', 'ogive.form': 'tangent', 'tip.type': '' },
-        siValues: {
-          diameter: 0.007823,
-          mass: 0.010886,
-          length: 0.0305,
-          noseLength: 0.016,
-          bearingLength: 0.0107,
-          baseToOgive: 0.0145,
-          'base.length': 0.0038,
-          'base.diameter': 0.00662,
-          'base.angle': (9 * Math.PI) / 180,
-          'base.cavityDiameter': 0.004,
+        overrides: {
+          name: 'Hollow base',
+          diameter: { value: 7.823 },
+          mass: { value: 10.886 },
+          length: { value: 30.5 },
+          noseLength: { value: 16 },
+          bearingLength: { value: 10.7 },
+          baseToOgive: { value: 14.5 },
+          base: {
+            type: 'conical-hollow-base',
+            length: { value: 3.8 },
+            diameter: { value: 6.62 },
+            angle: { value: 9 },
+            cavityDiameter: { value: 4 },
+          },
+          ogive: { form: 'tangent' },
         },
       },
     })
@@ -348,4 +352,35 @@ test('a chosen bullet seats at the entered COAL in the designed case, and the se
       })
       .toEqual([])
   }
+})
+
+test('a design whose base record is gone opens read only with the reason', async ({ page }) => {
+  await page.goto('/')
+  await page.evaluate(async () => {
+    const db: IDBDatabase = await new Promise((ok, no) => {
+      const r = indexedDB.open('openreloading-user-data')
+      r.onupgradeneeded = () => {
+        for (const n of ['records', 'handles', 'files'])
+          if (!r.result.objectStoreNames.contains(n))
+            r.result.createObjectStore(n, n === 'records' ? { keyPath: 'id' } : undefined)
+      }
+      r.onsuccess = () => ok(r.result)
+      r.onerror = () => no(r.error)
+    })
+    const tx = db.transaction('records', 'readwrite')
+    tx.objectStore('records').put({
+      kind: 'cartridge',
+      id: '6f0f4d3e-0a43-4a43-9a3d-3a2f2e1f0c23',
+      name: 'Orphan',
+      saved: '2026-10-24T00:00:00.000Z',
+      data: { origin: 'user', basedOn: 'catalogue:no-such-cartridge-1', overrides: { table: 'I' } },
+    })
+    await new Promise((ok) => {
+      tx.oncomplete = ok
+    })
+    db.close()
+  })
+  await gotoHydrated(page, '/cartridges/designer?record=6f0f4d3e-0a43-4a43-9a3d-3a2f2e1f0c23')
+  await expect(page.getByText(/no-such-cartridge-1 is no longer in the catalogue/)).toBeVisible()
+  await expect(field(page, 'Cartridge L3')).toBeDisabled()
 })

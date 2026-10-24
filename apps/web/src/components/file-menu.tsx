@@ -3,6 +3,7 @@
 import { Button, Group, Kbd, Menu, Textarea } from '@mantine/core'
 import {
   type EmbeddedFile,
+  parseRef,
   type UserRecord,
   type UserRecordKind,
   userRecord,
@@ -93,8 +94,8 @@ const keyed = (id: ShortcutId) => ({
 })
 
 const kindNames: Record<UserRecordKind, string> = {
-  bulletDesign: 'bullet designs',
-  cartridgeDesign: 'cartridge designs',
+  bullet: 'bullet designs',
+  cartridge: 'cartridge designs',
   workbenchState: 'loads',
   firearm: 'firearms',
   targetSheet: 'target sheets',
@@ -102,10 +103,10 @@ const kindNames: Record<UserRecordKind, string> = {
 }
 
 /** Kinds a share link carries: the designs and the workbench load. */
-const shareable: UserRecordKind[] = ['bulletDesign', 'cartridgeDesign', 'workbenchState']
+const shareable: UserRecordKind[] = ['bullet', 'cartridge', 'workbenchState']
 
-const parentOf = (r: UserRecord) =>
-  r.kind === 'bulletDesign' || r.kind === 'cartridgeDesign' ? r.data.parent : undefined
+const basedOnOf = (r: UserRecord) =>
+  r.kind === 'bullet' || r.kind === 'cartridge' ? r.data.basedOn : undefined
 
 /**
  * What the menu holds about the record shown (its id, kept file and saved text), so a page with
@@ -1112,7 +1113,7 @@ function FileMenuOf<K extends UserRecordKind>({
                 </Button>{' '}
                 <span className="file-reason">
                   saved {new Date(r.saved).toLocaleString()}
-                  {parentOf(r) && `, from ${parentOf(r)?.title}`}
+                  {basedOnOf(r) && `, based on ${parseRef(basedOnOf(r) ?? '')?.id}`}
                 </span>{' '}
                 <Button
                   variant="subtle"

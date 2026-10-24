@@ -27,8 +27,8 @@ Writers: catalogue (git records, checked by `readRecords`), user (browser, `pack
 | Load tables | none | `load-tables.json` of a records root | catalogue |
 | Firearm | `firearm.ts` | user record `firearm` | user |
 | Workbench state | `workbench.ts` | user record `workbenchState`, called "loads" in the UI | user |
-| Bullet design | `user-data.ts` (`bulletDesign`) | user record | user |
-| Cartridge design | `user-data.ts` (`cartridgeDesign`) | user record | user |
+| User bullet | `user-data.ts` (`bullet`) | user record: `basedOn` and `overrides` of a Bullet (step 4) | user |
+| User cartridge | `user-data.ts` (`cartridge`) | user record: `basedOn` and `overrides` of a Cartridge (step 4) | user |
 | Target sheet | `target-sheet.ts` | user record, photos in the store `files` | user |
 | Measured series | `workbench.ts` (`measuredSeries`) | inside the workbench state | user, reshaped from importer output |
 | Solver bodies | `packages/api/src/compute/interior-schema.ts`, `exterior-schema.ts` | none | solver input |
@@ -37,9 +37,9 @@ Writers: catalogue (git records, checked by `readRecords`), user (browser, `pack
 
 Ranked by how much code and visible behavior depends on them.
 
-**Bullet and bullet design (high).** A bullet record is nested, in the stored units (mm, g, degrees), with the manufacturer by id and a provenance. A bullet design is a manufacturer name, a name, three choices as free text and a flat record of dotted keys in SI (m, kg) that no schema checks. The designer (`apps/web/src/lib/bullet-designer.ts`) maps the keys onto the record by path. The link to the catalogue record is a copy plus a title (`parent` in `user-data.ts`), so a catalogue correction never reaches a design. The designer also offered values the record could not hold: the ogive forms `round-nose` and `flat-nose` and a cannelure. Step 1 closes that gap.
+**Bullet and bullet design (high).** A bullet record is nested, in the stored units (mm, g, degrees), with the manufacturer by id and a provenance. A bullet design is a manufacturer name, a name, three choices as free text and a flat record of dotted keys in SI (m, kg) that no schema checks. The designer (`apps/web/src/lib/bullet-designer.ts`) maps the keys onto the record by path. The link to the catalogue record is a copy plus a title (`parent` in `user-data.ts`), so a catalogue correction never reaches a design. The designer also offered values the record could not hold: the ogive forms `round-nose` and `flat-nose` and a cannelure. Step 1 closes that gap. Step 4 replaces the flat record and the `parent` copy with `basedOn` and `overrides`.
 
-**Cartridge and cartridge design (high).** A design is a table, a list of `specValue` entries in the stored units (while the other user kinds are SI) and a `parent`. It lacks the record's dates, verification, pressure method and provenance. The workbench cannot hold a design as its cartridge: `use-workbench-load.ts` keeps a catalogue cartridge and a design side by side, and a saved load keeps only the catalogue id, so a load made on a design cannot be reopened.
+**Cartridge and cartridge design (high).** A design is a table, a list of `specValue` entries in the stored units (while the other user kinds are SI) and a `parent`. It lacks the record's dates, verification, pressure method and provenance. The workbench cannot hold a design as its cartridge: `use-workbench-load.ts` keeps a catalogue cartridge and a design side by side, and a saved load keeps only the catalogue id, so a load made on a design cannot be reopened. Step 4 gives a load a reference to the design and resolves it on opening.
 
 **Load and workbench state (high).** Both are a recipe: cartridge, firearm, bullet, powder, charge, seating, notes. `Load` is validated and bundled but nothing creates or reads one. The workbench state references catalogue ids and keeps a snapshot of every resolved solver value in `siValues`, a record that accepts any key (the API checks the keys, `packages/api/src/compute/load-file.ts`). Whether the catalogue or the snapshot wins on reopening depends on call order in `openLoad`.
 
@@ -149,7 +149,7 @@ Each step lands alone with its model page updated in the same commit. Steps 4 to
 | 1 | Single source of types and vocabularies (done, below) | |
 | 2 | One unit table: `toSi` and `fromSi` per quantity kind (done, below) | |
 | 3 | Id and reference primitives, `checkUserRefs` (done, below) | |
-| 4 | Designs become overrides of Bullet and Cartridge | 1, 3 |
+| 4 | Designs become overrides of Bullet and Cartridge (done, below) | 1, 3 |
 | 5 | Firearm in one shape | 2 |
 | 6 | Load unification: the workbench state becomes Load | 2 to 5 |
 | 7 | Session unification | 3, 6 |
@@ -178,9 +178,19 @@ Steps 1, 2 and 11 go first, then 3, then 4 to 6, then 7 to 9. Steps 10 and 12 fi
 
 - `userId` (`packages/schema/src/ids.ts`) is a lowercase UUID, `ref(kind)` a reference `"catalogue:<record id>"` or `"user:<UUID>"`, `parseRef` splits one into scope and id. The kind only names the entity in the description: the text carries no kind.
 - The browser creates the id of every new user record and photo with `crypto.randomUUID()` (`newId` in `apps/web/src/lib/new-id.ts`, with a `crypto.getRandomValues` fallback for origins that are not secure). The record `id` of a user data file keeps its bound (1 to 64 characters), so records saved with an older id open as before.
-- `checkUserRefs(records)` (`packages/schema/src/user-data.ts`) returns the references between user records that no record answers: a workbench state's `firearm` (an old id or `user:<id>`) and a target sheet's `load`. Open and Import report them in the status line or the import report, `refNote` in `apps/web/src/lib/user-data.ts`, and drop nothing. A `catalogue:` reference, a catalogue id (`cartridge`, `bullet`, `powder`, a design's `parent`) and a group's chronograph session (no user record holds one before step 7) are not checked.
-- A design's `parent.id` and a target sheet's `face.id` name catalogue records and use `recordId`. The API path pattern already is `recordIdRegex`.
+- `checkUserRefs(records)` (`packages/schema/src/user-data.ts`) returns the references between user records that no record answers: a workbench state's `firearm` (an old id or `user:<id>`) and a target sheet's `load`. Open and Import report them in the status line or the import report, `refNote` in `apps/web/src/lib/user-data.ts`, and drop nothing. A `catalogue:` reference, a catalogue id (`cartridge`, `bullet`, `powder`) and a group's chronograph session (no user record holds one before step 7) are not checked.
+- A target sheet's `face.id` names a catalogue record and uses `recordId`; a design's `parent` was replaced by `basedOn` in step 4. The API path pattern already is `recordIdRegex`.
 - Existing fields keep their type: the references of the workbench state and the sheet stay plain ids until the steps that reshape those entities.
+
+### Step 4: what changed
+
+- A user record of kind `bullet` or `cartridge` (`packages/schema/src/user-data.ts`, `userBullet`, `userCartridge`) replaces `bulletDesign` and `cartridgeDesign`. The `{id, kind, name, saved, data}` wrapper of user records stays; the envelope's `origin`, `basedOn` and `overrides` are fields of `data`. `origin` is `user`, `basedOn` is an optional `catalogue:<id>` reference, `overrides` an optional partial of the entity in stored units. A bullet also keeps `manufacturerName` as free text until step 9. Records of the old kinds fail the schema and stay in the store as invalid records, like any other record the format rejects.
+- `applyOverrides(base, overrides)` (`packages/schema/src/overrides.ts`) is the one resolution function: objects merge by key, arrays replace, an explicit `null` removes a field or an object, and a cartridge's `values` merge by `(side, symbol, variant)`. Two refinements keep a base's printed text from outliving a changed number: a quantity (an object with its own `value`) is replaced whole, and so is a cartridge value entry, which also drops its tolerance. A `value: null` entry removes that cartridge value. `bulletOverrides` and `cartridgeOverrides` validate the leaves against the entity schemas and allow any field to be omitted or `null`; whether an override result as a whole is a valid record is not checked before step 9.
+- The designers resolve `basedOn` through the API (`apps/web/src/lib/variants.ts`), show the base's values, and save only what differs from them: a field cleared against a base value is saved as `null`. A design without a base saves every given field. The designer's fields, not the whole entity, are what a save rewrites, so an override of a field the designer has no input for is dropped on the next save.
+- A `basedOn` the catalogue no longer has opens the design read only with the reason shown, and its stored data is saved as it is. A base the API could not be asked is told apart from a missing one. Lists and pickers leave such designs out.
+- A workbench state's `cartridge` and `bullet` take a plain catalogue id (as before) or a reference. A load saved on a design keeps `user:<UUID>` and reopens with the design resolved against its base. `checkUserRefs` also reports such a reference when no user record answers it. A design whose id is no UUID (an older record) cannot be referenced and a load made on it keeps no design.
+- A load file sent to `POST /v1/interior/load-file` and the compute routes take the catalogue reference of a cartridge or bullet and refuse a `user:` reference (400 at `records[i].data.cartridge` or `.bullet`): a user record is resolved in the browser, never on the server. The OpenAPI baseline is rewritten for this.
+- Not part of this step: the "base changed" display and the build hash in `basedOn` (the API answers records without a `revision`), and share links that carry `user:` references.
 
 ## Decisions
 

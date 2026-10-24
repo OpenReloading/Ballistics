@@ -34,6 +34,7 @@ import {
   userBulletRows,
 } from '../lib/sources.ts'
 import { controlSize } from '../lib/theme.ts'
+import { userBullets } from '../lib/variants.ts'
 import { CaliberSelect } from './caliber-select.tsx'
 import { CompareButton, PickedChips, usePicks } from './compare-picks.tsx'
 import {
@@ -46,7 +47,13 @@ import {
   useListState,
 } from './directory-table.tsx'
 import { Noted } from './field-table.tsx'
-import { DeleteRow, SourceFilter, sourceColumn, useUserRecords } from './list-sources.tsx'
+import {
+  DeleteRow,
+  SourceFilter,
+  sourceColumn,
+  useResolved,
+  useUserRecords,
+} from './list-sources.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
 import { RangeFilter } from './range-filter.tsx'
 import { EmptyList } from './states.tsx'
@@ -64,10 +71,11 @@ export function BulletList({
   cartridges?: FitCartridge[]
 }) {
   const [records, removeRow] = useUserRecords()
+  const mine = useResolved(records, userBullets)
   // the browser's designs first: a few rows would sit unseen behind 1684 catalogue rows
   const items = useMemo<BulletRow[]>(
-    () => [...userBulletRows(records), ...unpackBullets(packed)],
-    [records, packed],
+    () => [...userBulletRows(mine), ...unpackBullets(packed)],
+    [mine, packed],
   )
   const { system } = useUnits()
   const [state, set, clear] = useListState()

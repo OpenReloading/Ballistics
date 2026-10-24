@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
+import { barButton } from './bar.ts'
 import { storeUnits } from './units.ts'
 import { loadForm } from './workbench.ts'
 
@@ -6,8 +7,8 @@ import { loadForm } from './workbench.ts'
 test.beforeEach(({ page }) => storeUnits(page))
 
 /**
- * A cartridge design in the browser store, as the designer saves it: the values of a record's
- * sides without the chamber's bore diameter F, bore area Q and twist u.
+ * A cartridge design in the browser store, as the designer saves it (no base record, so every value
+ * is an override): the values of a record's sides without the chamber's bore diameter F, bore area Q and twist u.
  */
 async function seedDesign(page: Page) {
   await page.evaluate(async () => {
@@ -29,11 +30,11 @@ async function seedDesign(page: Page) {
     })
     const tx = db.transaction('records', 'readwrite')
     tx.objectStore('records').put({
-      kind: 'cartridgeDesign',
-      id: 'cartridge-mine',
+      kind: 'cartridge',
+      id: '6f0f4d3e-0a43-4a43-9a3d-3a2f2e1f0c21',
       name: 'Mine 7.8',
       saved: '2026-10-24T00:00:00.000Z',
-      data: { table: record.table, values },
+      data: { origin: 'user', overrides: { table: record.table, values } },
     })
     await new Promise((ok) => {
       tx.oncomplete = ok
@@ -89,4 +90,55 @@ test('a cartridge design fills the fields it covers, draws the figure and is nam
   await page.emulateMedia({ media: 'print' })
   await expect(page.locator('.report-sub')).toContainText('user design Mine 7.8')
   await expect(page.locator('.report-inputs')).toContainText('Mine 7.8 (user design)')
+})
+
+test('a load saved on a design keeps the design by reference and reopens with it', async ({
+  page,
+}) => {
+  // a native picker cannot be driven: the file goes to the origin private file system
+  await page.addInitScript(() => {
+    ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
+      (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
+  })
+  await page.goto('/workbench')
+  await seedDesign(page)
+  await page.reload()
+  await page.getByRole('button', { name: 'Enter values by hand' }).click()
+  const form = loadForm(page)
+  await form.getByRole('combobox', { name: 'Search cartridges by name' }).fill('Mine')
+  await page.getByRole('option', { name: 'Mine 7.8 (your design)' }).click()
+  await form.getByRole('textbox', { name: /^Charge mass/ }).fill('2.4')
+  await (await barButton(page, 'Save')).click()
+  const stored = () =>
+    page.evaluate(async () => {
+      const db: IDBDatabase = await new Promise((ok, no) => {
+        const r = indexedDB.open('openreloading-user-data')
+        r.onsuccess = () => ok(r.result)
+        r.onerror = () => no(r.error)
+      })
+      const all: { kind: string; name: string; data: { cartridge?: string } }[] = await new Promise(
+        (ok, no) => {
+          const r = db.transaction('records').objectStore('records').getAll()
+          r.onsuccess = () => ok(r.result)
+          r.onerror = () => no(r.error)
+        },
+      )
+      db.close()
+      return all.filter((r) => r.kind === 'workbenchState')
+    })
+  await expect
+    .poll(async () => (await stored())[0]?.data.cartridge)
+    .toBe('user:6f0f4d3e-0a43-4a43-9a3d-3a2f2e1f0c21')
+  const [{ name }] = await stored()
+
+  // another load, then the saved one: the design is back, from the design's own values
+  await page.goto('/workbench')
+  await (await barButton(page, 'Open')).click()
+  await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
+  await page.getByRole('button', { name, exact: true }).click()
+  const field = (label: RegExp) => form.getByRole('textbox', { name: label })
+  await expect(page.locator('.seating-figure svg[aria-labelledby]').first()).toHaveAccessibleName(
+    /user design Mine 7\.8/,
+  )
+  await expect(field(/^Bore area/)).toHaveValue('')
 })

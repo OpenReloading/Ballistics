@@ -1,6 +1,6 @@
 import { face } from '@open-reloading/drawing'
 import { bulletFigureModel, bulletOutline } from '@open-reloading/drawing/bullet'
-import { bullet } from '@open-reloading/schema'
+import { applyOverrides, type Bullet, bullet, type UserBullet } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { computedBulletRows } from '../src/lib/bullet.ts'
 import {
@@ -12,8 +12,8 @@ import {
   evaluate,
   fieldInUse,
   fileData,
-  fromFile,
   fromRecord,
+  fromUser,
   type History,
   historyOf,
   newDesign,
@@ -23,6 +23,7 @@ import {
 import { seededRandom } from '../src/lib/ellipse.ts'
 import { fieldValueFromText } from '../src/lib/field-spec.ts'
 import { presetUnits } from '../src/lib/units.ts'
+import type { ResolvedBullet } from '../src/lib/variants.ts'
 import { matchBullet, targetBullet } from './fixtures/bullets.ts'
 
 describe('choice lists', () => {
@@ -38,6 +39,12 @@ describe('choice lists', () => {
     }
     expect(Object.keys(choiceOptions)).toEqual(Object.keys(schema))
   })
+})
+
+/** What `resolveBullet` gives for a base found (`base`) or none. */
+const resolvedOf = (data: UserBullet, base?: Bullet): ResolvedBullet => ({
+  base: base ? { status: 'found', record: base } : { status: 'none' },
+  record: applyOverrides<Partial<Bullet>>(base ?? {}, data.overrides),
 })
 
 const metric = presetUnits('metric-grams')
@@ -367,17 +374,75 @@ describe('record boundaries', () => {
 })
 
 describe('drafts', () => {
-  it('a design keeps its parent record through a file round trip and a reset', () => {
+  it('a design keeps its base record through a file round trip and a reset', () => {
     const start = fromRecord(targetBullet, metric)
     const data = fileData(start)
-    expect(data.parent).toEqual({ id: targetBullet.id, title: start.origin?.title })
-    const opened = fromFile(data, metric)
-    expect(fileData(opened).parent).toEqual(data.parent)
+    expect(data.basedOn).toBe(`catalogue:${targetBullet.id}`)
+    const opened = fromUser(data, resolvedOf(data, targetBullet), metric)
+    expect(fileData(opened)).toEqual(data)
     const reset = reduce(historyOf(opened), { type: 'reset', system: metric }).present
-    expect(reset.parent).toEqual(data.parent)
+    expect(reset.basedOn).toBe(data.basedOn)
     expect(
-      fileData(reduce(historyOf(start), { type: 'new', system: metric }).present).parent,
+      fileData(reduce(historyOf(start), { type: 'new', system: metric }).present).basedOn,
     ).toBeUndefined()
+  })
+
+  it('saves only what differs from the base: an untouched design has no overrides', () => {
+    expect(fileData(fromRecord(targetBullet, metric)).overrides).toBeUndefined()
+    const edited = run(fromRecord(targetBullet, metric), type('length', '30')).present
+    expect(fileData(edited).overrides).toEqual({ length: { value: 30 } })
+  })
+
+  it('saves a cleared field and a cleared choice as null, an entered choice and a name as given', () => {
+    const start = fromRecord(matchBullet, metric)
+    expect(start.choices['ogive.form']).not.toBe('')
+    const cleared = run(
+      start,
+      type('length', ''),
+      { type: 'choice', key: 'ogive.form', value: '' },
+      { type: 'choice', key: 'tip.type', value: 'polymer-tip' },
+      { type: 'text', key: 'name', value: 'Mine' },
+    ).present
+    const { overrides } = fileData(cleared)
+    expect(overrides).toMatchObject({
+      length: null,
+      ogive: { form: null },
+      tip: { type: 'polymer-tip' },
+      name: 'Mine',
+    })
+    // opened again, the resolved design is the edited one and saves the same overrides
+    const again = fromUser(fileData(cleared), resolvedOf(fileData(cleared), matchBullet), metric)
+    expect(again.fields.length.si).toBeUndefined()
+    expect(again.choices['ogive.form']).toBe('')
+    expect(again.name).toBe('Mine')
+    expect(fileData(again)).toEqual(fileData(cleared))
+  })
+
+  it('saves every given field of a design without a base, as quantities in stored units', () => {
+    const d = run(newDesign(metric), type('length', '30')).present
+    expect(fileData(d)).toEqual({
+      origin: 'user',
+      manufacturerName: '',
+      overrides: {
+        diameter: { value: 7.8232 },
+        mass: { value: 10.88621688 },
+        length: { value: 30 },
+      },
+    })
+  })
+
+  it('opens a design whose base is gone read only and saves its data as stored', () => {
+    const data: UserBullet = {
+      origin: 'user',
+      manufacturerName: 'Me',
+      basedOn: 'catalogue:gone',
+      overrides: { mass: { value: 9 } },
+    }
+    const base = { status: 'missing', ref: 'catalogue:gone' } as const
+    const problem = 'The base record catalogue:gone is no longer in the catalogue.'
+    const d = fromUser(data, { base, record: applyOverrides({}, data.overrides), problem }, metric)
+    expect(d.locked?.reason).toBe(problem)
+    expect(fileData(d)).toBe(data)
   })
 
   it('keeps 100 undo steps', () => {
@@ -389,14 +454,13 @@ describe('drafts', () => {
 
   it('draws a design as the seating preview shape, in mm and degrees', () => {
     const d = fileData(fromRecord(targetBullet, metric))
-    const shape = designShape(d, metric)
+    const shape = designShape(resolvedOf(d, targetBullet), metric)
     const r = targetBullet
     expect(shape?.diameter).toBeCloseTo(r.diameter.value, 9)
     expect(shape?.length).toBeCloseTo(r.length?.value as number, 9)
     expect(shape?.base?.length).toBeCloseTo(r.base?.length?.value as number, 9)
-    expect(
-      designShape({ ...d, siValues: { diameter: d.siValues.diameter } }, metric),
-    ).toBeUndefined()
+    const noLength = { diameter: targetBullet.diameter }
+    expect(designShape({ base: { status: 'none' }, record: noLength }, metric)).toBeUndefined()
   })
 })
 
@@ -428,7 +492,7 @@ describe('hollow base', () => {
     const e = evaluate(d, metric)
     expect(e.drawing).toBeDefined()
     expect(e.drawing?.given).toContain('base.cavityDiameter')
-    const shape = designShape(fileData(d), metric)
+    const shape = designShape(resolvedOf(fileData(d)), metric)
     expect(shape?.base).toMatchObject({ type: 'conical-hollow-base' })
     expect(shape?.base?.cavityDiameter).toBeCloseTo(5, 9)
     const o = shape && bulletOutline(shape)

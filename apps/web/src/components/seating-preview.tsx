@@ -15,7 +15,7 @@ import {
   seat,
   type Tagged,
 } from '@open-reloading/drawing/seating'
-import { type Bullet, fromSi, toSi, type UserRecord } from '@open-reloading/schema'
+import { type Bullet, fromSi, toSi } from '@open-reloading/schema'
 import { type ReactNode, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { apiFetch } from '../lib/api-fetch.ts'
@@ -40,6 +40,7 @@ import {
   withUnit,
 } from '../lib/units.ts'
 import { storedRecords } from '../lib/user-store.ts'
+import { type UserBulletView, userBullets } from '../lib/variants.ts'
 import { AppModal } from './app-modal.tsx'
 import { NumberField } from './number-field.tsx'
 import { RecordSearch } from './record-search.tsx'
@@ -58,7 +59,6 @@ type Load<T> =
   | { status: 'error' }
 
 type Mode = 'overallLength' | 'baseToOgive'
-type BulletDesignRecord = Extract<UserRecord, { kind: 'bulletDesign' }>
 
 const modeHelp = {
   overallLength: 'Cartridge overall length.',
@@ -302,14 +302,13 @@ export function SeatingPreview({
   const name = draft?.title ?? cartridge?.name ?? ''
   const [bulletId, setBulletId] = useState(initial?.bullet)
   const names = useManufacturerNames()
-  const [designs, setDesigns] = useState<BulletDesignRecord[]>([])
+  const [designs, setDesigns] = useState<UserBulletView[]>([])
   /** A bullet design of this browser seated instead of a record. */
-  const [design, setDesign] = useState<BulletDesignRecord>()
+  const [design, setDesign] = useState<UserBulletView>()
   const readDesigns = () => {
     storedRecords()
-      .then(({ records }) =>
-        setDesigns(records.filter((r): r is BulletDesignRecord => r.kind === 'bulletDesign')),
-      )
+      .then(({ records }) => userBullets(records))
+      .then(setDesigns)
       .catch(() => {})
   }
   useEffect(readDesigns, [])
@@ -387,7 +386,7 @@ export function SeatingPreview({
   const shaped = useMemo(
     () =>
       design
-        ? designShape(design.data, shown.current)
+        ? designShape(design.resolved, shown.current)
         : bulletRecord && bulletDimensions(bulletRecord),
     [design, bulletRecord],
   )

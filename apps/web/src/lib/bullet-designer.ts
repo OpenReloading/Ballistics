@@ -8,12 +8,12 @@ import {
 } from '@open-reloading/drawing/bullet'
 import {
   type Bullet,
-  type BulletDesign,
   baseTypes,
   fromSi,
   ogiveForms,
   tipTypes,
   toSi,
+  type UserBullet,
 } from '@open-reloading/schema'
 import { computedBulletRows } from './bullet.ts'
 import {
@@ -30,6 +30,7 @@ import { designReduce, editHistory, type History as H, historyOf, pushHistory } 
 import { type ManufacturerNames, noManufacturerNames, productLabel } from './manufacturers.ts'
 import type { FieldRow } from './record-fields.ts'
 import { drawingLengthUnit, kilogramsPerGrain, metersPerInch, type UnitSystem } from './units.ts'
+import { type ResolvedBullet, setPath } from './variants.ts'
 
 /** The field groups of the designer, in order. */
 export const groups = {
@@ -119,8 +120,10 @@ export interface Design {
   choices: Choices
   fields: Fields
   origin?: Origin
-  /** The catalogue record the design started from, kept through files. */
-  parent?: BulletDesign['parent']
+  /** The catalogue bullet the design is based on, `catalogue:<id>`, kept through files. */
+  basedOn?: string
+  /** Why the design is read only (its base is not there), with the record as stored, which Save keeps as it is. */
+  locked?: { reason: string; data: UserBullet }
 }
 
 const stored = (s: FieldSpec) => s.quantity as Parameters<typeof storedToSi>[0]
@@ -148,6 +151,34 @@ export function fieldInUse(
   return true
 }
 
+/** The designer values of a bullet record (or the part of one the overrides give): SI values and choices. */
+function valuesOf(r: Partial<Bullet>): Pick<Origin, 'si' | 'choices'> {
+  const si: Origin['si'] = {}
+  for (const s of designerSpecs) {
+    const q = at(r, s.key) as { value: number } | undefined
+    si[s.key] = q && storedToSi(stored(s), q.value)
+  }
+  return {
+    si,
+    choices: {
+      'base.type': r.base?.type ?? '',
+      'ogive.form': r.ogive?.form ?? '',
+      'tip.type': r.tip?.type ?? '',
+    },
+  }
+}
+
+/** The origin a design is measured against: a catalogue bullet, the manufacturer's name from `names`. */
+function originOf(r: Bullet, names: ManufacturerNames): Origin {
+  return {
+    id: r.id,
+    title: productLabel(r, names),
+    manufacturerName: names.get(r.manufacturer) ?? '',
+    name: r.name,
+    ...valuesOf(r),
+  }
+}
+
 /**
  * The design of a catalogue record, every stored value from the catalogue; the manufacturer's name
  * from `names`.
@@ -157,25 +188,7 @@ export function fromRecord(
   system: UnitSystem,
   names: ManufacturerNames = noManufacturerNames,
 ): Design {
-  const si: Origin['si'] = {}
-  for (const s of designerSpecs) {
-    const q = at(r, s.key) as { value: number } | undefined
-    si[s.key] = q && storedToSi(stored(s), q.value)
-  }
-  const choices: Choices = {
-    'base.type': r.base?.type ?? '',
-    'ogive.form': r.ogive?.form ?? '',
-    'tip.type': r.tip?.type ?? '',
-  }
-  const origin: Origin = {
-    id: r.id,
-    title: productLabel(r, names),
-    manufacturerName: names.get(r.manufacturer) ?? '',
-    name: r.name,
-    si,
-    choices,
-  }
-  return fromOrigin(origin, system)
+  return fromOrigin(originOf(r, names), system)
 }
 
 /** The design of an origin as stored, as on a reset. */
@@ -188,44 +201,83 @@ function fromOrigin(origin: Origin, system: UnitSystem): Design {
       designerSpecs.map((s) => [s.key, fieldOf(system, s, origin.si[s.key])]),
     ),
     origin,
-    parent: { id: origin.id, title: origin.title },
+    basedOn: `catalogue:${origin.id}`,
   }
 }
 
-/** The design of a saved file: its values as entered, no catalogue record. */
-export function fromFile(d: BulletDesign, system: UnitSystem): Design {
+/**
+ * The design of a saved user bullet: the resolved record's values, measured against its base (the
+ * origin) so each field says whether it follows the catalogue or is changed. A base that is not
+ * there gives a read only design that Save leaves as stored.
+ */
+export function fromUser(
+  data: UserBullet,
+  { base, record, problem }: ResolvedBullet,
+  system: UnitSystem,
+  names: ManufacturerNames = noManufacturerNames,
+): Design {
+  const { si, choices } = valuesOf(record)
+  const origin = base.status === 'found' ? originOf(base.record, names) : undefined
   return {
-    manufacturerName: d.manufacturerName,
-    name: d.name,
-    choices: { ...noChoices, ...d.choices },
-    fields: Object.fromEntries(
-      designerSpecs.map((s) => [s.key, fieldOf(system, s, d.siValues[s.key])]),
-    ),
-    parent: d.parent,
+    manufacturerName: data.manufacturerName,
+    name: record.name ?? '',
+    choices: { ...noChoices, ...choices },
+    fields: Object.fromEntries(designerSpecs.map((s) => [s.key, fieldOf(system, s, si[s.key])])),
+    ...(origin && { origin }),
+    ...(data.basedOn && { basedOn: data.basedOn }),
+    ...(problem && { locked: { reason: problem, data } }),
   }
 }
 
-/** The file data of a design: every SI value given. */
-export const fileData = ({
+/** The stored value of a field, in mm, g or degrees: 12 significant digits drop the noise of the SI round trip. */
+const storedOf = (s: FieldSpec, si: number) => Number(siToStored(stored(s), si).toPrecision(12))
+
+/**
+ * The user bullet a design saves: its manufacturer name, the base and the overrides, which are the
+ * fields that differ from the base (a field cleared against a base value is `null`). Without a base
+ * every given field is an override. A read only design gives its stored data back.
+ */
+export function fileData({
   manufacturerName,
   name,
   choices,
   fields,
-  parent,
-}: Design): BulletDesign => ({
-  manufacturerName,
-  name,
-  choices,
-  siValues: Object.fromEntries(
-    Object.entries(fields).flatMap(([k, f]) => (f.si === undefined ? [] : [[k, f.si]])),
-  ),
-  ...(parent && { parent }),
-})
+  origin,
+  basedOn,
+  locked,
+}: Design): UserBullet {
+  if (locked) return locked.data
+  const overrides: Record<string, unknown> = {}
+  for (const s of designerSpecs) {
+    const si = fields[s.key]?.si
+    const was = origin?.si[s.key]
+    if (si === undefined) {
+      if (was !== undefined) setPath(overrides, s.key, null)
+    } else if (!(origin && close(si, was))) setPath(overrides, s.key, { value: storedOf(s, si) })
+  }
+  for (const k of Object.keys(choiceOptions) as ChoiceKey[]) {
+    if (choices[k] !== (origin?.choices[k] ?? '')) setPath(overrides, k, choices[k] || null)
+  }
+  if (name !== (origin?.name ?? '')) overrides.name = name || null
+  return {
+    origin: 'user',
+    manufacturerName,
+    ...(basedOn && { basedOn }),
+    ...(Object.keys(overrides).length > 0 && { overrides: overrides as UserBullet['overrides'] }),
+  }
+}
 
-/** A saved design as the shape the seating preview seats (mm), as the designer draws it; undefined without a length or drawing. */
-export function designShape(d: BulletDesign, system: UnitSystem): BulletDimensions | undefined {
-  if (d.siValues.length === undefined) return
-  return evaluate(fromFile(d, system), system).drawing?.shape
+/**
+ * A user bullet's resolved record as the shape the seating preview seats (mm), as the designer
+ * draws it; undefined without a length or drawing.
+ */
+export function designShape(
+  { base, record, problem }: ResolvedBullet,
+  system: UnitSystem,
+): BulletDimensions | undefined {
+  if (problem || record.length === undefined) return
+  const design = fromUser({ origin: 'user', manufacturerName: '' }, { base, record }, system)
+  return evaluate(design, system).drawing?.shape
 }
 
 /** Start values of a new bullet: .308 in (7.8232 mm), 168 gr. */

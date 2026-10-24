@@ -1,6 +1,7 @@
 'use client'
 
 import { ActionIcon, Button, Drawer, Text, TextInput } from '@mantine/core'
+import { parseRef } from '@open-reloading/schema'
 import { Copy, DownloadSimple, PencilSimple, Trash } from '@phosphor-icons/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { fetchRecord } from '../lib/api-fetch.ts'
@@ -14,12 +15,18 @@ import {
   reminderText,
 } from '../lib/export-reminder.ts'
 import { saveAs } from '../lib/file-access.ts'
-import { duplicateStored, type LoadRecord, loadGroups, renameStored } from '../lib/load-tabs.ts'
+import {
+  cartridgeGroup,
+  duplicateStored,
+  type LoadRecord,
+  loadGroups,
+  renameStored,
+} from '../lib/load-tabs.ts'
 import { newId } from '../lib/new-id.ts'
 import { controlSize } from '../lib/theme.ts'
 import { userDataText } from '../lib/user-data.ts'
 import { recordFileName } from '../lib/user-file-names.ts'
-import { deleteRecord, storedRecords } from '../lib/user-store.ts'
+import { deleteRecord, storedRecord, storedRecords } from '../lib/user-store.ts'
 import { confirmDialog } from './confirm.tsx'
 
 /** Saves since the last export (`localStorage` `exportReminder`), counted by the File menu's callbacks. */
@@ -77,7 +84,11 @@ function useCartridgeNames(ids: string[]) {
     let alive = true
     Promise.all(
       wanted.split(',').map(async (id) => {
-        const record = await fetchRecord<{ name?: string }>('cartridges', id).catch(() => undefined)
+        // a design is a record of this browser, a catalogue cartridge one of the API
+        const own = parseRef(id)?.scope === 'user' ? parseRef(id)?.id : undefined
+        const record = own
+          ? await storedRecord(own).catch(() => undefined)
+          : await fetchRecord<{ name?: string }>('cartridges', id).catch(() => undefined)
         const name = record?.name
         if (name) cartridgeNames.set(id, name)
       }),
@@ -204,7 +215,9 @@ export function SavedLoads({
     onDeleted(r.id)
   }
 
-  const names = useCartridgeNames([...new Set(records.map((r) => r.data.cartridge ?? ''))])
+  const names = useCartridgeNames([
+    ...new Set(records.map((r) => cartridgeGroup(r.data.cartridge))),
+  ])
   const groups = loadGroups(records, query, names)
   return (
     <Drawer opened={opened} onClose={onClose} title="Saved loads" size="sm" position="left">

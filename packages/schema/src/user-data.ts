@@ -1,8 +1,8 @@
 import { z } from 'zod'
 import { firearm } from './firearm.ts'
-import { parseRef, recordId } from './ids.ts'
-import { siValues, text } from './shared.ts'
-import { specValue } from './standards.ts'
+import { parseRef, ref } from './ids.ts'
+import { bulletOverrides, cartridgeOverrides } from './overrides.ts'
+import { text } from './shared.ts'
 import { faceColour } from './target-face.ts'
 import { targetSheet } from './target-sheet.ts'
 import { workbenchState } from './workbench.ts'
@@ -12,53 +12,45 @@ export const userDataFormat = 'openreloading-user-data'
 /** Current `version` of a user data file: a file of any other version is refused. */
 export const userDataVersion = 1
 
-/** The catalogue record a design started from. */
-const parent = z
-  .object({
-    id: recordId.describe('Id of the catalogue record.'),
-    title: text(200).describe('Title of the catalogue record as shown when the design was saved.'),
-  })
-  .describe('The catalogue record the design started from.')
-  .optional()
+/** A reference to the catalogue record a user variant is based on. */
+const catalogueRef = (kind: string) =>
+  ref(kind)
+    .regex(/^catalogue:/, 'A user variant is based on a catalogue record')
+    .describe(
+      `Reference \`catalogue:<record id>\` to the catalogue ${kind} the record is based on. Its fields not in \`overrides\` follow that record.`,
+    )
 
 /**
- * A saved bullet design of the designer: manufacturer name, product name, the choices of base type, ogive form and tip
- * type, and SI values per field key.
- * Inferred type: {@link BulletDesign}.
+ * A bullet of the user: the catalogue bullet it is based on and the fields it overrides, or the
+ * fields it gives alone. Lengths in mm, mass in g, angles in degrees.
+ * Inferred type: {@link UserBullet}.
  */
-export const bulletDesign = z.object({
-  manufacturerName: text(200).describe('Manufacturer name of the design.'),
-  name: text(200).describe('Product name of the design.'),
-  choices: z
-    .object({
-      'base.type': text(64).describe(
-        'Base type: `flat`, `boat-tail`, `rebated-boat-tail`, `conical-hollow-base` or `rounded-hollow-base`. Empty: not chosen.',
-      ),
-      'ogive.form': text(64).describe(
-        'Ogive form: `tangent`, `secant`, `hybrid`, `round-nose` or `flat-nose`. Empty: not chosen.',
-      ),
-      'tip.type': text(64).describe(
-        'Tip type: `hollow-point`, `polymer-tip`, `soft-point`, `full-metal-jacket` or `open-meplat`. Empty: not chosen.',
-      ),
-    })
-    .describe('The choices of the designer.'),
-  siValues: siValues.describe(
-    'Designer field values in SI units by field key: lengths and diameters in m, mass in kg, ratios in 1.',
+export const userBullet = z.object({
+  origin: z.literal('user').describe('Where the record lives: `user`.'),
+  manufacturerName: text(200).describe(
+    'Manufacturer name, free text until manufacturers are records.',
   ),
-  parent,
+  basedOn: catalogueRef('bullet').optional(),
+  overrides: bulletOverrides
+    .describe(
+      'The fields that differ from the base record, or all fields without one. A `null` removes a field of the base.',
+    )
+    .optional(),
 })
 
 /**
- * The spec values the cartridge drawing reads, in stored units.
- * Inferred type: {@link CartridgeDesign}.
+ * A cartridge of the user: the catalogue cartridge it is based on and the fields and spec values
+ * it overrides, or the ones it gives alone, in stored units.
+ * Inferred type: {@link UserCartridge}.
  */
-export const cartridgeDesign = z.object({
-  table: z.string().min(1).max(8).describe('C.I.P. table of the cartridge (`I` to `XI`).'),
-  values: z
-    .array(specValue)
-    .max(500)
-    .describe('Spec values the drawing reads, each in the stored unit of its quantity.'),
-  parent,
+export const userCartridge = z.object({
+  origin: z.literal('user').describe('Where the record lives: `user`.'),
+  basedOn: catalogueRef('cartridge').optional(),
+  overrides: cartridgeOverrides
+    .describe(
+      'The fields and spec values that differ from the base record, or all of them without one. A value with `null` removes the base value of its side, symbol and variant.',
+    )
+    .optional(),
 })
 
 const designLength = z.number().positive()
@@ -126,8 +118,8 @@ const record = <K extends string, D extends z.ZodType>(kind: K, description: str
  * Inferred type: {@link UserRecord}.
  */
 export const userRecord = z.discriminatedUnion('kind', [
-  record('bulletDesign', 'A bullet design of the bullet designer.', bulletDesign),
-  record('cartridgeDesign', 'A cartridge drawing of the cartridge designer.', cartridgeDesign),
+  record('bullet', 'A bullet of the bullet designer.', userBullet),
+  record('cartridge', 'A cartridge of the cartridge designer.', userCartridge),
   record('workbenchState', 'A load of the workbench.', workbenchState),
   record('firearm', 'A firearm of the library: lengths in m, mass in kg, angles in rad.', firearm),
   record('targetSheet', 'A target sheet with its calibration and shot groups.', targetSheet),
@@ -200,7 +192,8 @@ export interface DanglingRef {
 
 /**
  * The references of `records` to user records that no record of `records` answers: a workbench
- * state's `firearm` and a target sheet's `load`. An old id and a `user:<id>` reference name a
+ * state's `firearm`, `cartridge` and `bullet` (the last two only as `user:<id>`) and a target
+ * sheet's `load`. An old id and a `user:<id>` reference name a
  * record by its id, a `catalogue:` reference is not checked here. Reports only: nothing is dropped.
  */
 export function checkUserRefs(records: UserRecords): DanglingRef[] {
@@ -219,8 +212,14 @@ export function checkUserRefs(records: UserRecords): DanglingRef[] {
       dangling.push({ record: r.id, kind: r.kind, field, target })
   }
   for (const r of records) {
-    if (r.kind === 'workbenchState') check(r, 'firearm', r.data.firearm, 'firearm')
-    else if (r.kind === 'targetSheet') check(r, 'load', r.data.load, 'workbenchState')
+    if (r.kind === 'workbenchState') {
+      check(r, 'firearm', r.data.firearm, 'firearm')
+      // a plain id names a catalogue record: only a `user:` reference points at a user record
+      for (const kind of ['cartridge', 'bullet'] as const) {
+        const target = r.data[kind]
+        if (target && parseRef(target)?.scope === 'user') check(r, kind, target, kind)
+      }
+    } else if (r.kind === 'targetSheet') check(r, 'load', r.data.load, 'workbenchState')
   }
   return dangling
 }
@@ -235,17 +234,17 @@ export function versionProblem(json: unknown): string | undefined {
     return `The file has format version ${JSON.stringify(f.version)}; this app reads version ${userDataVersion}.`
 }
 
-/** A saved bullet design: choices and SI values per field key. */
-export interface BulletDesign extends z.infer<typeof bulletDesign> {}
-/** A saved cartridge drawing: table and spec values in stored units. */
-export interface CartridgeDesign extends z.infer<typeof cartridgeDesign> {}
+/** A user bullet: a variant of a catalogue bullet, or a bullet of its own. */
+export interface UserBullet extends z.infer<typeof userBullet> {}
+/** A user cartridge: a variant of a catalogue cartridge, or a cartridge of its own. */
+export interface UserCartridge extends z.infer<typeof userCartridge> {}
 /** A target face of the face designer: rings, inner ten, black area and events, each optional. */
 export interface TargetFaceDesign extends z.infer<typeof targetFaceDesign> {}
 /** The user record of kind `targetSheet`. */
 export type TargetSheetRecord = Extract<UserRecord, { kind: 'targetSheet' }>
 /** One record of a user data file: `kind`, id, name, save time and `data`. */
 export type UserRecord = z.infer<typeof userRecord>
-/** Discriminator of a user record: `bulletDesign`, `cartridgeDesign`, `workbenchState`, `firearm`, `targetSheet` or `targetFaceDesign`. */
+/** Discriminator of a user record: `bullet`, `cartridge`, `workbenchState`, `firearm`, `targetSheet` or `targetFaceDesign`. */
 export type UserRecordKind = UserRecord['kind']
 /** A base64 photo stored in a user data file, referenced by id. */
 export interface EmbeddedFile extends z.infer<typeof embeddedFile> {}

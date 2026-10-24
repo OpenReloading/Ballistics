@@ -20,7 +20,14 @@ import { powderBulkDensity } from './charge-run.ts'
 import { runInterior } from './interior-run.ts'
 import { interiorBody } from './interior-schema.ts'
 import type { CartridgeWithSpecs, Warning } from './limits.ts'
-import { fileLoad, filePath, fileResistance, readLoadFile, unknownKeyIssues } from './load-file.ts'
+import {
+  catalogueIdOf,
+  fileLoad,
+  filePath,
+  fileResistance,
+  readLoadFile,
+  unknownKeyIssues,
+} from './load-file.ts'
 import { findBullet, findCartridge, findPowder } from './resolve.ts'
 import type { ComputeRunner, Results } from './tasks.ts'
 import { responseUnits } from './units.ts'
@@ -57,9 +64,11 @@ type ValidStep = Extract<SimulateStep, { result: unknown }>
  */
 function loadFileRecords(catalogue: Catalogue, record: WorkbenchState) {
   const cartridge: CartridgeWithSpecs | undefined =
-    record.cartridge === undefined ? undefined : findCartridge(catalogue, record.cartridge)
+    record.cartridge === undefined
+      ? undefined
+      : findCartridge(catalogue, catalogueIdOf(record.cartridge))
   const bullet: Bullet | undefined =
-    record.bullet === undefined ? undefined : findBullet(catalogue, record.bullet)
+    record.bullet === undefined ? undefined : findBullet(catalogue, catalogueIdOf(record.bullet))
   const powder: Powder | undefined =
     record.powder === undefined ? undefined : findPowder(catalogue, record.powder)
   const manufacturer = powder && catalogue.get('manufacturer', powder.manufacturer)
@@ -201,7 +210,7 @@ export async function simulate(
       return interiorBody.parse({
         model: 'm3',
         load: resistance ? { ...load, resistance } : load,
-        ...(record.cartridge && { cartridge: record.cartridge }),
+        ...(record.cartridge && { cartridge: catalogueIdOf(record.cartridge) }),
         ...(withLadder && {
           ladder: {
             chargeStep: ladder.chargeStep,

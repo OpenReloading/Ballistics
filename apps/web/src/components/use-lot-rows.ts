@@ -49,6 +49,31 @@ export type LotRows = {
 }
 
 /**
+ * The answers of the two lots, one request after the other and none after a failed one: a ladder asks
+ * for several pool tasks at once, so two ladders at once fill the queue of a small pool and the API
+ * answers busy.
+ */
+async function askLots(
+  ok: Extract<Outcome, { kind: 'ok' }>,
+  charges: number[],
+  fraction: number,
+  signal: AbortSignal,
+) {
+  const answers = []
+  for (const lot of lots) {
+    const res = await apiFetch('interior', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(lotBody(ok.load, charges, ok.direction, lot, fraction, ok.cartridge)),
+      signal,
+    })
+    answers.push({ res, json: await res.json().catch(() => undefined) })
+    if (!res.ok) break
+  }
+  return answers
+}
+
+/**
  * The lot rows of the shown run: two ladder requests, one per lot, at the burn rate raised and
  * lowered by the typed change, asked once the tab or a print wants them (`enabled`). A new change
  * waits for a pause; the rows of the last answer stay until the next one arrives.
@@ -100,19 +125,7 @@ export function useLotRows({
         })
       }, requestTimeout)
       try {
-        const answers = await Promise.all(
-          lots.map(async (lot) => {
-            const res = await apiFetch('interior', {
-              method: 'POST',
-              headers: { 'content-type': 'application/json' },
-              body: JSON.stringify(
-                lotBody(ok.load, charges, ok.direction, lot, fraction, ok.cartridge),
-              ),
-              signal: controller.signal,
-            })
-            return { res, json: await res.json().catch(() => undefined) }
-          }),
-        )
+        const answers = await askLots(ok, charges, fraction, controller.signal)
         if (controller.signal.aborted) return
         const failed = answers.find((a) => !a.res.ok || a.json === undefined)
         if (failed)

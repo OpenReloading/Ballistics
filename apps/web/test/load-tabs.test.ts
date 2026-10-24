@@ -62,6 +62,20 @@ it('groups the list by cartridge, newest first, groups by title, without a cartr
   ])
 })
 
+it('groups a cartridge written as a plain id and as a reference together, a design apart', () => {
+  const design = 'user:6f0f4d3e-0a43-4a43-9a3d-3a2f2e1f0c21'
+  const records = [
+    load('a', 'Old', '2026-10-01T10:00:00.000Z', '308-win'),
+    load('b', 'New', '2026-10-02T10:00:00.000Z', 'catalogue:308-win'),
+    load('c', 'On a design', '2026-10-03T10:00:00.000Z', design),
+  ]
+  const groups = loadGroups(records, '', { '308-win': '308 Win.', [design]: 'Mine 7.8' })
+  expect(groups.map((g) => [g.title, g.records.map((r) => r.id)])).toEqual([
+    ['308 Win.', ['b', 'a']],
+    ['Mine 7.8', ['c']],
+  ])
+})
+
 it('filters the list by the words of the query in the name', () => {
   const records = [
     load('a', '308 Win. load', '2026-10-01T10:00:00.000Z', '308-win'),

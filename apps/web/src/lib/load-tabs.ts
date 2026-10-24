@@ -3,6 +3,7 @@ import type { UserRecord } from '@open-reloading/schema'
 import { matchesQuery } from './lists.ts'
 import { copyName } from './user-file-names.ts'
 import { putRecords, storedRecord } from './user-store.ts'
+import { catalogueIdOf } from './variants.ts'
 
 export type LoadRecord = Extract<UserRecord, { kind: 'workbenchState' }>
 
@@ -66,6 +67,10 @@ export async function duplicateStored(r: LoadRecord, id: string) {
   await putRecords([{ ...from, id, name: copyName(from.name), saved: new Date().toISOString() }])
 }
 
+/** The group of a load's cartridge: a catalogue record by its id, however it is written, a design by its reference. */
+export const cartridgeGroup = (cartridge: string | undefined) =>
+  cartridge ? (catalogueIdOf(cartridge) ?? cartridge) : ''
+
 /**
  * The saved-loads list: records whose name has every word of `query`, grouped by cartridge (groups
  * by title, the group without a cartridge last), newest first. A group is titled by the cartridge's
@@ -79,7 +84,7 @@ export function loadGroups(
   const groups = new Map<string, { key: string; title: string; records: LoadRecord[] }>()
   for (const r of records) {
     if (!matchesQuery([r.name], query)) continue
-    const key = r.data.cartridge ?? ''
+    const key = cartridgeGroup(r.data.cartridge)
     const group = groups.get(key) ?? {
       key,
       title: key ? (cartridgeNames[key] ?? key) : noCartridge,

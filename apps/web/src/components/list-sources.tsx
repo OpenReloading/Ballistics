@@ -67,6 +67,28 @@ export function useUserRecords() {
 }
 
 /**
+ * `records` read into views by `read` (`userBullets`, `userCartridges`): the user variants resolved
+ * against the catalogue after mounting, none until then.
+ */
+export function useResolved<V>(
+  records: readonly UserRecord[],
+  read: (records: readonly UserRecord[]) => Promise<V[]>,
+) {
+  const [views, setViews] = useState<V[]>([])
+  useEffect(() => {
+    let live = true
+    read(records).then(
+      (v) => live && setViews(v),
+      () => {},
+    )
+    return () => {
+      live = false
+    }
+  }, [records, read])
+  return views
+}
+
+/**
  * The data source filter of every list: a button naming the sources shown, and a popover with one
  * checkbox per source of the list (`sources`) with its row count. The sources that are off are kept
  * in the URL by the list. The last one on cannot be turned off.

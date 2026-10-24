@@ -4,7 +4,7 @@ import { NativeSelect, Text, TextInput } from '@mantine/core'
 import { useDebouncedValue } from '@mantine/hooks'
 import { face, type LengthUnit } from '@open-reloading/drawing'
 import { bulletFigureModel, bulletSymbols } from '@open-reloading/drawing/bullet'
-import { type Bullet, type BulletDesign, toSi } from '@open-reloading/schema'
+import { type Bullet, toSi, type UserBullet } from '@open-reloading/schema'
 import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef } from 'react'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { BulletSummary } from '../lib/api-types.ts'
@@ -20,8 +20,8 @@ import {
   type FieldState,
   fieldInUse,
   fileData,
-  fromFile,
   fromRecord,
+  fromUser,
   type Group,
   groups,
   newDesign,
@@ -31,6 +31,7 @@ import { fieldError } from '../lib/field-spec.ts'
 import { fetchManufacturerNames, noManufacturerNames, productLabel } from '../lib/manufacturers.ts'
 import { type FieldRow, rowLabel, rowValue } from '../lib/record-fields.ts'
 import { drawingLengthUnit, formatQuantity, type UnitSystem, withUnit } from '../lib/units.ts'
+import { resolveBullet } from '../lib/variants.ts'
 import { description } from './bullet-drawing.tsx'
 import { DesignerField } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
@@ -191,7 +192,7 @@ export function BulletDesigner() {
     useDesigner<Design, Action>({
       reduce,
       init: newDesign,
-      kind: 'bulletDesign',
+      kind: 'bullet',
       fileData,
       load: async (id, system) => {
         const record = await fetchRecord<Bullet>('bullets', id)
@@ -299,7 +300,13 @@ export function BulletDesigner() {
   const fileDesign = useDeferredValue(design)
   const fileValue = useMemo(() => fileData(fileDesign), [fileDesign])
   const openFile = useCallback(
-    (d: BulletDesign) => dispatch({ type: 'start', design: fromFile(d, system) }),
+    async (d: UserBullet) => {
+      const [resolved, names] = await Promise.all([
+        resolveBullet(d),
+        fetchManufacturerNames().catch(() => noManufacturerNames),
+      ])
+      dispatch({ type: 'start', design: fromUser(d, resolved, system, names) })
+    },
     [system, dispatch],
   )
 
@@ -318,9 +325,10 @@ export function BulletDesigner() {
       />
       <FileMenu
         ref={fileMenu}
-        kind="bulletDesign"
+        kind="bullet"
         name={productLabel(fileDesign) || 'New bullet'}
         data={fileValue}
+        problem={fileDesign.locked?.reason}
         onOpen={openFile}
         reportBox="Include the design"
       />
@@ -328,30 +336,38 @@ export function BulletDesigner() {
   )
 
   const inputs = (
+    // a design whose base is gone is shown, not edited
     <form noValidate onSubmit={(ev) => ev.preventDefault()}>
-      <PropertyGrid
-        title="Parameters"
-        head={<StartSearch system={system} start={start} chosen={design.origin?.title} />}
-        message={loading ?? (design.origin && `Started from ${design.origin.title}.`)}
-        sections={(Object.keys(groups) as Group[]).map((g) => ({
-          key: g,
-          title: groups[g],
-          content:
-            g === 'identity' ? (
-              <div className="prop-grid designer-grid">
-                <TextField
-                  k="manufacturerName"
-                  label="Manufacturer"
-                  value={design.manufacturerName}
-                  dispatch={dispatch}
-                />
-                <TextField k="name" label="Name" value={design.name} dispatch={dispatch} />
-              </div>
-            ) : (
-              groupFields(g)
-            ),
-        }))}
-      />
+      <fieldset disabled={design.locked !== undefined} className="designer-fieldset">
+        <PropertyGrid
+          title="Parameters"
+          head={<StartSearch system={system} start={start} chosen={design.origin?.title} />}
+          message={
+            loading ??
+            (design.locked
+              ? `Read only: ${design.locked.reason}`
+              : design.origin && `Started from ${design.origin.title}.`)
+          }
+          sections={(Object.keys(groups) as Group[]).map((g) => ({
+            key: g,
+            title: groups[g],
+            content:
+              g === 'identity' ? (
+                <div className="prop-grid designer-grid">
+                  <TextField
+                    k="manufacturerName"
+                    label="Manufacturer"
+                    value={design.manufacturerName}
+                    dispatch={dispatch}
+                  />
+                  <TextField k="name" label="Name" value={design.name} dispatch={dispatch} />
+                </div>
+              ) : (
+                groupFields(g)
+              ),
+          }))}
+        />
+      </fieldset>
     </form>
   )
 

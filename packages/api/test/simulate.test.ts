@@ -487,6 +487,27 @@ describe('POST /interior/load-file', () => {
   })
 })
 
+describe('POST /interior/load-file, references', () => {
+  it('reads a catalogue reference like a plain id', async () => {
+    const plain = await simulate(file({ siValues, cartridge: 'beta-pistol' }))
+    const ref = await simulate(file({ siValues, cartridge: 'catalogue:beta-pistol' }))
+    expect(ref.status).toBe(200)
+    expect(ref.body.resolved.cartridge.id).toBe('beta-pistol')
+    expect(ref.body.summary).toEqual(plain.body.summary)
+  })
+
+  it('answers 400 at the field of a user reference: user records are not on the server', async () => {
+    const user = `user:${crypto.randomUUID()}`
+    for (const k of ['cartridge', 'bullet']) {
+      const res = await simulate(file({ siValues, [k]: user }))
+      expect(res.status).toBe(400)
+      expect(res.body.issues.map((i: { path: unknown[] }) => i.path)).toEqual([
+        ['records', 0, 'data', k],
+      ])
+    }
+  })
+})
+
 describe('POST /interior/load-file, 400 with the field path', () => {
   const paths = async (body: unknown, query = '') => {
     const res = await simulate(body, query)
