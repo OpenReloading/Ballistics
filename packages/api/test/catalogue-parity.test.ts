@@ -196,6 +196,41 @@ for (const set of sets)
       })
   })
 
+/** The competition lists have one order in both layers: the comparators of the schema package. */
+const competitionOrder: Record<string, Query> = {
+  'target faces': queries({} as Params)['target faces'],
+  federations: queries({} as Params).federations,
+  disciplines: async (db, c) => ({
+    sql: await listDisciplines(db, {}),
+    catalogue: c.disciplines(),
+  }),
+  'target mappings': async (db, c) => ({
+    sql: await listTargetMappings(db, {}),
+    catalogue: c.targetMappings(),
+  }),
+}
+
+for (const set of sets)
+  describe(`the competition lists have the same order, ${set.name}`, () => {
+    let db: Db
+    let catalogue: Catalogue
+    beforeAll(async () => {
+      const data = set.bundle()
+      db = await createTestDb()
+      await seedBundle(db, data)
+      catalogue = openCatalogue(buildCatalogue(data))
+    })
+    afterAll(() => closeTestDb(db))
+
+    for (const [name, run] of Object.entries(competitionOrder))
+      it(`lists the ${name} in the same order`, async () => {
+        const { sql, catalogue: mine } = await run(db, catalogue)
+        const ids = (a: Answer) => a.items.map((i) => (i as { id: string }).id)
+        expect(sql.total).toBeGreaterThan(0)
+        expect(ids(mine)).toEqual(ids(sql))
+      })
+  })
+
 describe('where the catalogue goes beyond the SQL layer', () => {
   it('has a bullet fit for an unknown cartridge and one without its values: none, as in SQL', async () => {
     const db = await createTestDb()

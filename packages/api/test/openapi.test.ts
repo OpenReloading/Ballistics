@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { buildApp } from '../src/app.ts'
+import type { Catalogue } from '../src/catalogue/types.ts'
 import { inlineRunner } from '../src/compute/tasks.ts'
-import type { Db } from '../src/db/index.ts'
 import { buildOpenApi } from '../src/openapi.ts'
 import { API_VERSION } from '../src/version.ts'
 import { undescribed } from './setup.ts'
@@ -82,7 +82,7 @@ describe('buildOpenApi', () => {
 
 describe('the document and its reference viewer', () => {
   it('serves the document and the viewer under /v1, from the package, without other origins', async () => {
-    const app = buildApp({ db: {} as Db, compute: inlineRunner, openApi: d })
+    const app = buildApp({ catalogue: {} as Catalogue, compute: inlineRunner, openApi: d })
     const json = await app.inject({ url: '/v1/openapi.json' })
     expect(json.statusCode).toBe(200)
     expect(json.json()).toEqual(d)

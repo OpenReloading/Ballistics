@@ -1,18 +1,15 @@
 /**
- * The API on an in-memory PostgreSQL (PGlite) seeded from the data bundle, and the files of its
- * read answers that the web app's Pages edition serves instead of an API
- * (`@openreloading/api/static`, used at build time only). The server never imports it: PGlite is a
- * devDependency.
+ * The API over the catalogue of the data bundle, and the files of its read answers that the web
+ * app's Pages edition serves instead of an API (`@openreloading/api/static`, used at build time
+ * only).
  */
 import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
-import { PGlite } from '@electric-sql/pglite'
-import { drizzle } from 'drizzle-orm/pglite'
 import { buildApp } from './app.ts'
 import { loadBundle } from './bundle.ts'
+import { buildCatalogue } from './catalogue/build.ts'
+import { openCatalogue } from './catalogue/open.ts'
 import { inlineRunner } from './compute/tasks.ts'
-import { ensureTables } from './db/build.ts'
-import { seedBundle } from './db/seed.ts'
 import { API_PREFIX } from './version.ts'
 
 /** The list routes whose answers `writeStaticApi` writes. */
@@ -32,24 +29,14 @@ type Item = { id: string; name: string; manufacturer?: string; aliases?: string[
 type List = { total: number; items: Item[] }
 
 /**
- * Starts the API on 127.0.0.1 at a free port over PGlite, seeded from the bundle, compute in this
+ * Starts the API on 127.0.0.1 at a free port over the catalogue of the bundle, compute in this
  * thread. `url` is its origin, `close` stops it.
  */
 export async function startBundleApi() {
-  const client = new PGlite()
-  const db = drizzle({ client })
-  await ensureTables(db)
-  await seedBundle(db, loadBundle())
-  const app = buildApp({ db, compute: inlineRunner })
+  const catalogue = openCatalogue(buildCatalogue(loadBundle()))
+  const app = buildApp({ catalogue, compute: inlineRunner })
   const url = await app.listen({ host: '127.0.0.1', port: 0 })
-  return {
-    app,
-    url,
-    close: async () => {
-      await app.close()
-      await client.close()
-    },
-  }
+  return { app, url, close: () => app.close() }
 }
 
 async function get<T>(app: App, url: string): Promise<T> {

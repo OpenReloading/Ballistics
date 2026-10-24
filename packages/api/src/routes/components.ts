@@ -1,17 +1,8 @@
 import { bullet, constructionFields, manufacturer, powder } from '@openreloading/schema'
 import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
-import {
-  type ComponentListParams,
-  getBullet,
-  getManufacturer,
-  getPowder,
-  listBullets,
-  listManufacturers,
-  listPowders,
-} from '../db/component-queries.ts'
-import type { Db } from '../db/index.ts'
-import { idParams, listQuery, page, recordIdPattern } from './common.ts'
+import type { BulletQuery, Catalogue } from '../catalogue/types.ts'
+import { idParams, listQuery, page, recordIdPattern, stored } from './common.ts'
 
 const powderQuery = listQuery({
   manufacturer: {
@@ -78,17 +69,21 @@ const manufacturerList = page(
 
 /** `GET /manufacturers`, `GET /powders`, `GET /bullets` and their `/:id` routes. */
 // biome-ignore lint/suspicious/useAwait: FastifyPluginAsync returns a promise
-export const componentRoutes: FastifyPluginAsync<{ db: Db }> = async (app, { db }) => {
+export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = async (
+  app,
+  { catalogue },
+) => {
   app.get(
     '/manufacturers',
     {
       config: {
         response: manufacturerList,
         summary: 'List manufacturers',
-        description: 'Every manufacturer with its aliases and website, ordered by name.',
+        description:
+          'Every manufacturer with its aliases and website, ordered by name, digit runs in numeric order.',
       },
     },
-    async () => listManufacturers(db),
+    (_request, reply) => reply.send(catalogue.manufacturers()),
   )
   app.get<{ Params: { id: string } }>(
     '/manufacturers/:id',
@@ -101,17 +96,15 @@ export const componentRoutes: FastifyPluginAsync<{ db: Db }> = async (app, { db 
         description: 'The manufacturer record with its provenance.',
       },
     },
-    async (request, reply) => {
-      const record = await getManufacturer(db, request.params.id)
+    (request, reply) => {
+      const record = catalogue.get('manufacturer', request.params.id)
       if (!record) return reply.notFound(`manufacturer ${request.params.id} not found`)
-      return record
+      return reply.send(stored(record))
     },
   )
-  for (const [path, list, get, noun, querystring, listResponse, record, listText] of [
+  for (const [path, noun, querystring, listResponse, record, listText] of [
     [
       '/powders',
-      listPowders,
-      getPowder,
       'powder',
       powderQuery,
       powderList,
@@ -120,8 +113,6 @@ export const componentRoutes: FastifyPluginAsync<{ db: Db }> = async (app, { db 
     ],
     [
       '/bullets',
-      listBullets,
-      getBullet,
       'bullet',
       bulletQuery,
       bulletList,
@@ -129,17 +120,20 @@ export const componentRoutes: FastifyPluginAsync<{ db: Db }> = async (app, { db 
       'Each item carries diameter (mm), mass (g), length (mm), the first G1 and G7 ballistic coefficients, tip type and construction.',
     ],
   ] as const) {
-    app.get<{ Querystring: ComponentListParams }>(
+    app.get<{ Querystring: BulletQuery }>(
       path,
       {
         schema: { querystring },
         config: {
           response: listResponse,
           summary: `List ${noun}s`,
-          description: `A page of ${noun}s ordered by manufacturer name, name and id. \`q\` matches the manufacturer name or an alias followed by the product name. ${listText}`,
+          description: `A page of ${noun}s ordered by manufacturer name and name, digit runs in numeric order. \`q\` keeps the ${noun}s whose manufacturer name or alias followed by the product name holds every word of it, in any order, and ranks them by match, ties in the default order. ${listText}`,
         },
       },
-      async (request) => list(db, request.query),
+      (request, reply) =>
+        reply.send(
+          noun === 'powder' ? catalogue.powders(request.query) : catalogue.bullets(request.query),
+        ),
     )
     app.get<{ Params: { id: string } }>(
       `${path}/:id`,
@@ -152,10 +146,10 @@ export const componentRoutes: FastifyPluginAsync<{ db: Db }> = async (app, { db 
           description: `The whole ${noun} record with its provenance.`,
         },
       },
-      async (request, reply) => {
-        const record = await get(db, request.params.id)
-        if (!record) return reply.notFound(`${noun} ${request.params.id} not found`)
-        return record
+      (request, reply) => {
+        const found = catalogue.get(noun, request.params.id)
+        if (!found) return reply.notFound(`${noun} ${request.params.id} not found`)
+        return reply.send(stored(found))
       },
     )
   }

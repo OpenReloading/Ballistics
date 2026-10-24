@@ -14,8 +14,7 @@ import {
 } from '@openreloading/core'
 import { type Bullet, fromSi, type Powder, toSi, type WorkbenchState } from '@openreloading/schema'
 import { z } from 'zod'
-import { getManufacturer } from '../db/component-queries.ts'
-import type { Db } from '../db/index.ts'
+import type { Catalogue } from '../catalogue/types.ts'
 import { assertFinite, notice, resolvedRecord, unprocessable } from './answer.ts'
 import { powderBulkDensity } from './charge-run.ts'
 import { runInterior } from './interior-run.ts'
@@ -56,14 +55,14 @@ type ValidStep = Extract<SimulateStep, { result: unknown }>
  * The cartridge, bullet and powder records the file names, in that order, and the powder's label
  * "<manufacturer name> <product name>"; 404 for an unknown id.
  */
-async function loadFileRecords(db: Db, record: WorkbenchState) {
+function loadFileRecords(catalogue: Catalogue, record: WorkbenchState) {
   const cartridge: CartridgeWithSpecs | undefined =
-    record.cartridge === undefined ? undefined : await findCartridge(db, record.cartridge)
+    record.cartridge === undefined ? undefined : findCartridge(catalogue, record.cartridge)
   const bullet: Bullet | undefined =
-    record.bullet === undefined ? undefined : await findBullet(db, record.bullet)
+    record.bullet === undefined ? undefined : findBullet(catalogue, record.bullet)
   const powder: Powder | undefined =
-    record.powder === undefined ? undefined : await findPowder(db, record.powder)
-  const manufacturer = powder && (await getManufacturer(db, powder.manufacturer))
+    record.powder === undefined ? undefined : findPowder(catalogue, record.powder)
+  const manufacturer = powder && catalogue.get('manufacturer', powder.manufacturer)
   const powderLabel = powder && `${manufacturer?.name ?? powder.manufacturer} ${powder.name}`
   return { cartridge, bullet, powder, powderLabel }
 }
@@ -184,7 +183,7 @@ function simulateAnswer(
 
 /** One `POST /interior/load-file` request (`query`, the load file `json`): the status and body of the answer. */
 export async function simulate(
-  context: { db: Db; compute: ComputeRunner },
+  context: { catalogue: Catalogue; compute: ComputeRunner },
   query: unknown,
   json: unknown,
 ): Promise<{ status: 200 | 422; payload: object }> {
@@ -230,7 +229,7 @@ export async function simulate(
         notice,
       },
     }
-  const { cartridge, bullet, powder, powderLabel } = await loadFileRecords(context.db, record)
+  const { cartridge, bullet, powder, powderLabel } = loadFileRecords(context.catalogue, record)
   // an empty bore area is the cartridge record's, as the workbench fills it
   if (cartridge && record.siValues.boreArea === undefined)
     load.chamber.boreArea = toSi(
@@ -256,7 +255,7 @@ export async function simulate(
   // the record's ramp, so the pair is only known here
   const applied = fileResistance(record, path, resistance)
   const { status, payload } = await runInterior(
-    { compute: context.compute, findCartridge: (id) => findCartridge(context.db, id) },
+    { compute: context.compute, findCartridge: (id) => findCartridge(context.catalogue, id) },
     parseBody(applied),
     cartridge,
   )

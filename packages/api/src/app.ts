@@ -6,9 +6,9 @@ import Fastify, {
   type FastifyServerOptions,
   type RouteOptions,
 } from 'fastify'
+import type { Catalogue } from './catalogue/types.ts'
 import { createComputeRunner, poolDefaults } from './compute/pool.ts'
 import type { ComputeRunner } from './compute/tasks.ts'
-import type { Db } from './db/index.ts'
 import type { OpenApiDocument } from './openapi.ts'
 import { cartridgeRoutes } from './routes/cartridges.ts'
 import { chargeTargetRoutes } from './routes/charge-target.ts'
@@ -19,7 +19,7 @@ import { API_PREFIX } from './version.ts'
 
 /** `compute` defaults to a worker pool with `poolDefaults`, closed with the app. */
 type AppOptions = FastifyServerOptions & {
-  db: Db
+  catalogue: Catalogue
   compute?: ComputeRunner
   /** Sees every route as it is registered (the contract document of `openapi.ts`). */
   onRoute?: (route: RouteOptions) => void
@@ -28,13 +28,13 @@ type AppOptions = FastifyServerOptions & {
 }
 
 /**
- * Builds the Fastify app: the read routes over `db`, the compute routes over `compute`, both under
+ * Builds the Fastify app: the read routes over `catalogue`, the compute routes over `compute`, both under
  * `API_PREFIX`, with `openApi` its document (`/openapi.json`) and the Scalar viewer of it
  * (`/reference/`), and the connection-close handling while the server shuts down. Registers nothing on the network; the
  * caller listens (`server.ts`) or injects requests (tests).
  */
 export function buildApp({
-  db,
+  catalogue,
   compute,
   onRoute,
   openApi,
@@ -75,11 +75,11 @@ export function buildApp({
   app.register(
     // biome-ignore lint/suspicious/useAwait: Fastify waits for a plugin's promise or its done callback
     async (v1) => {
-      v1.register(cartridgeRoutes, { db })
-      v1.register(componentRoutes, { db })
-      v1.register(federationRoutes, { db })
-      v1.register(computeRoutes, { db, compute: runner })
-      v1.register(chargeTargetRoutes, { db, compute: runner })
+      v1.register(cartridgeRoutes, { catalogue })
+      v1.register(componentRoutes, { catalogue })
+      v1.register(federationRoutes, { catalogue })
+      v1.register(computeRoutes, { catalogue, compute: runner })
+      v1.register(chargeTargetRoutes, { catalogue, compute: runner })
       if (!openApi) return
       v1.get('/openapi.json', async () => openApi)
       v1.register(apiReference, {
