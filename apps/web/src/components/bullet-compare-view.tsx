@@ -125,7 +125,7 @@ export function CompareView() {
     if (!wanted) return
     let live = true
     setGot({ status: 'loading' })
-    fetchBullets(wanted.split(',')).then((r) => {
+    void fetchBullets(wanted.split(',')).then((r) => {
       if (live) setGot(r)
     })
     return () => {
