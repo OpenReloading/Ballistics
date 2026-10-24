@@ -1,0 +1,92 @@
+import { expect, type Page, test } from '@playwright/test'
+import { storeUnits } from './units.ts'
+import { loadForm } from './workbench.ts'
+
+// Metric (SI): lengths in mm
+test.beforeEach(({ page }) => storeUnits(page))
+
+/**
+ * A cartridge design in the browser store, as the designer saves it: the values of a record's
+ * sides without the chamber's bore diameter F, bore area Q and twist u.
+ */
+async function seedDesign(page: Page) {
+  await page.evaluate(async () => {
+    const record = await (await fetch('/api/cartridges/308-win')).json()
+    const lacking = ['F', 'Q', 'u']
+    const values = record.values.filter(
+      (v: { side?: string; symbol: string; variant?: string }) =>
+        v.side && !v.variant && !(v.side === 'chamber' && lacking.includes(v.symbol)),
+    )
+    const db: IDBDatabase = await new Promise((ok, no) => {
+      const r = indexedDB.open('openreloading-user-data', 1)
+      r.onupgradeneeded = () => {
+        for (const n of ['records', 'handles', 'files'])
+          if (!r.result.objectStoreNames.contains(n))
+            r.result.createObjectStore(n, n === 'records' ? { keyPath: 'id' } : undefined)
+      }
+      r.onsuccess = () => ok(r.result)
+      r.onerror = () => no(r.error)
+    })
+    const tx = db.transaction('records', 'readwrite')
+    tx.objectStore('records').put({
+      kind: 'cartridgeDesign',
+      id: 'cartridge-mine',
+      name: 'Mine 7.8',
+      saved: '2026-10-24T00:00:00.000Z',
+      data: { table: record.table, values },
+    })
+    await new Promise((ok) => {
+      tx.oncomplete = ok
+    })
+    db.close()
+  })
+}
+
+test('a cartridge design fills the fields it covers, draws the figure and is named in the results and the print', async ({
+  page,
+}) => {
+  await page.goto('/workbench')
+  await seedDesign(page)
+  await page.reload()
+  await page.getByRole('button', { name: 'Enter values by hand' }).click()
+  const form = loadForm(page)
+  const field = (name: RegExp) => form.getByRole('textbox', { name })
+
+  const cartridges = form.getByRole('combobox', { name: 'Search cartridges by name' })
+  // a record's values go with the record when the design replaces it
+  await cartridges.fill('308 Win')
+  await page
+    .getByRole('option', { name: /^308 Win/ })
+    .first()
+    .click()
+  await expect(field(/^Bore area/)).not.toHaveValue('')
+  await cartridges.fill('Mine')
+  await page.getByRole('option', { name: 'Mine 7.8 (your design)' }).click()
+  // the design's own volume and nothing from a record: the bore area and twist stay empty
+  await expect(field(/^Usable case volume/)).not.toHaveValue('')
+  await expect(field(/^Bore diameter/)).toHaveValue('')
+  await expect(field(/^Bore area/)).toHaveValue('')
+  await expect(field(/^Twist/)).toHaveValue('')
+  await expect(field(/^Usable case volume/)).toHaveAccessibleDescription(/user design Mine 7\.8/)
+  // the figure draws the design's case and chamber
+  await expect(page.locator('.seating-figure svg[aria-labelledby]').first()).toHaveAccessibleName(
+    /user design Mine 7\.8/,
+  )
+
+  // the run and the print name the design
+  await form.getByRole('combobox', { name: /^Search bullets/ }).fill('168')
+  await page.getByRole('option', { name: /168 gr/ }).click()
+  await form.getByRole('combobox', { name: /^Search powders/ }).fill('DP40')
+  await page.getByRole('option', { name: /DP40/ }).click()
+  await field(/^Charge mass/).fill('2.4')
+  await field(/^Bullet travel/).fill('600')
+  await field(/^Twist/).fill('305')
+  await field(/^Charge mass/).press('Control+Enter')
+  await expect(page.getByText(/^Simulation done\. /)).toBeAttached({ timeout: 15_000 })
+  await expect(page.locator('.note.user-design')).toContainText(
+    'Case values from the user design Mine 7.8, not a catalogue record.',
+  )
+  await page.emulateMedia({ media: 'print' })
+  await expect(page.locator('.report-sub')).toContainText('user design Mine 7.8')
+  await expect(page.locator('.report-inputs')).toContainText('Mine 7.8 (user design)')
+})

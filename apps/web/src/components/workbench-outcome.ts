@@ -67,6 +67,8 @@ export type Outcome =
       resistanceMissing?: { powder: string; missing: string[] }
       /** The user bullet design whose mass the run used. */
       design?: string
+      /** The user cartridge design whose values the run's fields took. */
+      cartridgeDesign?: string
       /** Id of the cartridge record the run compared its limits with. */
       cartridge?: string
       /** Cartridge, bullet and powder of the run, as their records name them. */

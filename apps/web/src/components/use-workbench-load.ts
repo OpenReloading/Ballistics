@@ -14,7 +14,7 @@ import {
   recordResistance,
   ValueError,
 } from '@openreloading/core'
-import type { UserRecord, WorkbenchState } from '@openreloading/schema'
+import type { CartridgeDesign, UserRecord, WorkbenchState } from '@openreloading/schema'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { apiFetch, fetchRecord } from '../lib/api-fetch.ts'
@@ -29,6 +29,7 @@ import type {
 } from '../lib/api-types.ts'
 import { runBatch } from '../lib/batch.ts'
 import { fitOf } from '../lib/bullet-fit.ts'
+import { workbenchDesign } from '../lib/cartridge-designer.ts'
 import { pagesBasePath } from '../lib/edition.ts'
 import { errorText } from '../lib/error-text.ts'
 import { loadExample } from '../lib/example-data.ts'
@@ -46,6 +47,7 @@ import {
   cartridgeClass,
   type FollowKey,
   followKeys,
+  type Suggestion,
   type Suggestions,
   suggestDefaults,
 } from '../lib/input-defaults.ts'
@@ -180,7 +182,19 @@ export function useWorkbenchState() {
     validateInputOnBlur: true,
     validate,
   })
-  const [cartridge, setCartridge] = useState<CartridgeChoice | undefined>(undefined)
+  const [cartridge, setCartridgeRecord] = useState<CartridgeChoice | undefined>(undefined)
+  // shortcut: the design is not kept in load files or links; add a design id to `workbenchState` when a load should reopen it
+  /** The user cartridge design chosen in place of a record: it fills what its values give, nothing from a catalogue record. */
+  const [cartridgeDesign, setCartridgeDesign] = useState<{
+    id: string
+    name: string
+    data: CartridgeDesign
+  }>()
+  /** A catalogue cartridge replaces the design. */
+  const setCartridge = (c: CartridgeChoice | undefined) => {
+    setCartridgeRecord(c)
+    if (c) setCartridgeDesign(undefined)
+  }
   const [bullet, setBullet] = useState<BulletRecord | undefined>(undefined)
   const [powder, setPowder] = useState<PowderRecord | undefined>(undefined)
   const names = useManufacturerNames()
@@ -206,6 +220,10 @@ export function useWorkbenchState() {
       : undefined
   const [allDiameters, setAllDiameters] = useState(false)
   const [designs, setDesigns] = useState<Extract<UserRecord, { kind: 'bulletDesign' }>[]>([])
+  /** The browser's cartridge designs that draw a case and chamber. */
+  const [cartridgeDesigns, setCartridgeDesigns] = useState<
+    Extract<UserRecord, { kind: 'cartridgeDesign' }>[]
+  >([])
   /** The firearm library of this browser, for the Gun and barrel picker. */
   const [firearms, setFirearms] = useState<Extract<UserRecord, { kind: 'firearm' }>[]>([])
   const [firearm, setFirearm] = useState<string>()
@@ -275,6 +293,13 @@ export function useWorkbenchState() {
               r.kind === 'bulletDesign' && r.data.siValues.mass !== undefined,
           ),
         )
+        setCartridgeDesigns(
+          records.filter(
+            (r): r is (typeof cartridgeDesigns)[number] =>
+              r.kind === 'cartridgeDesign' &&
+              workbenchDesign(r.data, r.name, unitsNow.current) !== undefined,
+          ),
+        )
         setFirearms(records.filter((r): r is (typeof firearms)[number] => r.kind === 'firearm'))
       })
       .catch(() => {})
@@ -293,6 +318,20 @@ export function useWorkbenchState() {
     const mass = d.data.siValues.mass
     if (mass !== undefined)
       form.setFieldValue('bulletMass', { text: fixedFieldText('mass', system, mass), si: mass })
+  }
+  /** A cartridge design of this browser in place of a record. */
+  function chooseCartridgeDesign(id: string) {
+    const d = cartridgeDesigns.find((r) => r.id === id)
+    if (!d) return
+    picking.current.cartridges?.abort()
+    got('cartridge')
+    markChanged()
+    setCartridgeRecord(undefined)
+    setCartridgeDesign({ id: d.id, name: d.name, data: d.data })
+    setBulletNote('')
+    setPreviewInitial(undefined)
+    setSeated({})
+    setSeatingStart(undefined)
   }
   /** A firearm of the library: its twist fills the twist, its barrel length the seating's. */
   function chooseFirearm(id: string | null) {
@@ -631,7 +670,8 @@ export function useWorkbenchState() {
     setFollowed(new Set(followKeys))
     written.current = {}
     form.setValues(exampleFields(interiorFields, d, system, fixedFieldText))
-    setCartridge(undefined)
+    setCartridgeRecord(undefined)
+    setCartridgeDesign(undefined)
     setBullet(undefined)
     setBulletDesign(undefined)
     setBulletNote('')
@@ -1121,8 +1161,10 @@ export function useWorkbenchState() {
           powderChosen: powder !== undefined || linkedPowder !== undefined,
           resistanceMissing,
           design: bulletDesign?.name,
+          cartridgeDesign: cartridgeDesign?.name,
           identity: {
-            cartridge: cartridge?.name,
+            cartridge:
+              cartridge?.name ?? (cartridgeDesign && `${cartridgeDesign.name} (user design)`),
             bullet: bulletLabel ?? bulletDesign?.name ?? linkedBullet?.name,
             powder: powderLabel ?? linkedPowder?.name,
           },
@@ -1439,7 +1481,7 @@ export function useWorkbenchState() {
     previewInitial?.seating || moved ? (seatedNow ?? previewInitial?.seating) : undefined
   // the cartridge asked for counts while its record loads or stays offline, as in `cartridge` below
   const measuredWaterCapacity =
-    measuredFor === (cartridge?.id ?? asked.cartridge?.id) &&
+    measuredFor === (cartridge?.id ?? cartridgeDesign?.id ?? asked.cartridge?.id) &&
     (measured.measuredWaterCapacity.si ?? 0) > 0
       ? measured.measuredWaterCapacity.si
       : undefined
@@ -1502,7 +1544,7 @@ export function useWorkbenchState() {
   }
 
   const generated = generatedName({
-    cartridge: cartridge?.name,
+    cartridge: cartridge?.name ?? cartridgeDesign?.name,
     bullet: bulletLabel ?? bulletDesign?.name,
     powder: powderLabel,
     charge: shown('charge', 'mass'),
@@ -1531,24 +1573,45 @@ export function useWorkbenchState() {
   const recordTable = cartridge && groove?.id === cartridge.id ? groove.record?.table : undefined
   const mmToM = (mm: number | undefined) => (mm === undefined ? undefined : mm * 1e-3)
   const mm2ToM2 = (mm2: number | undefined) => (mm2 === undefined ? undefined : mm2 * 1e-6)
+  /** What the chosen cartridge design gives; the design's own values only. */
+  const designLoad = useMemo(
+    () => cartridgeDesign && workbenchDesign(cartridgeDesign.data, cartridgeDesign.name, system),
+    [cartridgeDesign, system],
+  )
+  const designCapacity: Suggestion | undefined =
+    seated.caseVolume !== undefined
+      ? { si: seated.caseVolume, source: 'your measured case capacity, without the bullet' }
+      : designLoad?.caseVolume !== undefined
+        ? {
+            si: designLoad.caseVolume,
+            source: `outline of the user design ${cartridgeDesign?.name} less a wall, approximate, without the bullet`,
+          }
+        : undefined
   const suggestions: Suggestions = suggestDefaults({
     firearm: gun && { name: gun.name, twist: gun.data.twist, barrelLength: gun.data.barrelLength },
-    cartridge: cartridge && {
-      name: cartridge.name,
-      class: cartridgeClass(recordTable),
-      boreDiameter: mmToM(specValue('chamber', 'F')),
-      boreArea: mm2ToM2(specValue('chamber', 'Q')),
-      twist: mmToM(specValue('chamber', 'u')),
-      capacity:
-        seated.caseVolume === undefined
-          ? undefined
-          : {
-              si: seated.caseVolume,
-              source: measuredWaterCapacity
-                ? 'your measured case capacity, without the bullet'
-                : `case capacity record of ${cartridge.name}, without the bullet`,
-            },
-    },
+    cartridge: cartridgeDesign
+      ? {
+          name: cartridgeDesign.name,
+          design: true,
+          boreDiameter: designLoad?.boreDiameter,
+          capacity: designCapacity,
+        }
+      : cartridge && {
+          name: cartridge.name,
+          class: cartridgeClass(recordTable),
+          boreDiameter: mmToM(specValue('chamber', 'F')),
+          boreArea: mm2ToM2(specValue('chamber', 'Q')),
+          twist: mmToM(specValue('chamber', 'u')),
+          capacity:
+            seated.caseVolume === undefined
+              ? undefined
+              : {
+                  si: seated.caseVolume,
+                  source: measuredWaterCapacity
+                    ? 'your measured case capacity, without the bullet'
+                    : `case capacity record of ${cartridge.name}, without the bullet`,
+                },
+        },
     bullet: bullet && {
       name: productLabel(bullet, names),
       diameter: bullet.diameter.value * 1e-3,
@@ -1601,6 +1664,7 @@ export function useWorkbenchState() {
   /** A new load with nothing chosen or typed: the start card replaces the cards. */
   const fresh =
     !cartridge &&
+    !cartridgeDesign &&
     !bullet &&
     !bulletDesign &&
     !powder &&
@@ -1610,7 +1674,11 @@ export function useWorkbenchState() {
   const has = (keys: readonly string[]) => keys.every((k) => fields[k]?.si !== undefined)
   /** What a run still needs, in the order of the cards; the first open one is next. */
   const todo = [
-    { label: 'Cartridge (optional)', done: !!cartridge, value: cartridge?.name },
+    {
+      label: 'Cartridge (optional)',
+      done: !!(cartridge || cartridgeDesign),
+      value: cartridge?.name ?? (cartridgeDesign && `${cartridgeDesign.name} (your design)`),
+    },
     {
       label: 'Bullet',
       done: has(['bulletMass']),
@@ -1712,6 +1780,10 @@ export function useWorkbenchState() {
     bulletDesign,
     bulletNote,
     cartridge,
+    cartridgeDesign,
+    cartridgeDesigns,
+    chooseCartridgeDesign,
+    designLoad,
     changed,
     chartSlot,
     chartView,
