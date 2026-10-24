@@ -110,7 +110,7 @@
         "source": "vdrbw-schiesssportordnung-2023",
         "fields": ["events.name", "events.distance", "events.organization", "events.section"],
         "page": "9.8.4, 9.8.15 (Seite 72, 73); 10.5 (Seite 100)",
-        "note": "VdRBw 10.5 (Seite 100) prints a ring spacing of 0.825 cm and an outer circle of 16.65 cm for this face."
+        "note": "VdRBw 10.5 (Seite 100) prints a ten of 1.7 cm, a ring spacing of 0.825 cm (16.5 mm steps, 165.5 mm outside) and an outer circle of 16.65 cm, which differ from the 17 mm steps and 170 mm outside here and from each other. VdRBw 9.8.15 names the BDMP face reduced to 50 %, so the record keeps the BDMP rings."
       },
       {
         "source": "vdrbw-schiesssportordnung-2023",

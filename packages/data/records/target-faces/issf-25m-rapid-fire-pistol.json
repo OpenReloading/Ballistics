@@ -353,7 +353,8 @@
       {
         "source": "vdrbw-schiesssportordnung-2023",
         "fields": ["events.name", "events.distance", "events.organization", "events.section"],
-        "page": "10.2 (Seite 97, PDF p. 97); 8.2 to 8.9 (sections named in the events)"
+        "page": "10.2 (Seite 97, PDF p. 97); 8.2 to 8.9 (sections named in the events)",
+        "note": "VdRBw 10.2 prints a ten of 10 cm, a ring spacing of 4 cm, an outer circle of 50 cm and black on rings 5 to 10, as the rings and black area here."
       },
       {
         "source": "bdmp-sportordnung-2026-register-7",
