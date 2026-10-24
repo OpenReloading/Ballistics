@@ -239,7 +239,7 @@
         "source": "vdrbw-schiesssportordnung-2023",
         "fields": ["events.name", "events.distance", "events.organization", "events.section"],
         "page": "10.4 (Seite 99); 9.11.4 to 9.13.5 (PDF pp. 78 to 82)",
-        "note": "VdRBw 10.4 (Seite 99) names the face equal to the ISSF face and prints the black area as rings 4 to 10 (106.4 mm)."
+        "note": "VdRBw 10.4 (Seite 99) names the face equal to the ISSF face and prints the black area as rings 4 to 10 (106.4 mm) and no mirror diameter. The record keeps the ISSF black area of 112.4 mm, 6 mm wider than the book prints for VdRBw matches."
       },
       {
         "source": "bds-sporthandbuch-allgemein-2026",
