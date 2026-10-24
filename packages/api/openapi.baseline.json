@@ -16779,15 +16779,32 @@
                             "data": {
                               "type": "object",
                               "properties": {
+                                "origin": {
+                                  "type": "string",
+                                  "enum": ["catalogue", "user", "shared"],
+                                  "description": "Where the record lives: the git catalogue, this browser, or a received file."
+                                },
                                 "name": {
                                   "type": "string",
                                   "maxLength": 200,
                                   "description": "Name of the firearm as the library lists it."
                                 },
+                                "manufacturer": {
+                                  "type": "string",
+                                  "allOf": [
+                                    {
+                                      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$"
+                                    },
+                                    {
+                                      "pattern": "^catalogue:"
+                                    }
+                                  ],
+                                  "description": "Reference `catalogue:<record id>` to a catalogue manufacturer."
+                                },
                                 "manufacturerName": {
                                   "type": "string",
                                   "maxLength": 200,
-                                  "description": "Manufacturer name."
+                                  "description": "Manufacturer name as free text, for a maker no record exists for."
                                 },
                                 "model": {
                                   "type": "string",
@@ -16796,20 +16813,44 @@
                                 },
                                 "cartridge": {
                                   "type": "string",
-                                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
-                                  "description": "Id of the cartridge record the firearm is chambered for."
+                                  "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                  "description": "Reference to the cartridge the firearm is chambered for."
                                 },
                                 "barrelLength": {
-                                  "type": "number",
-                                  "minimum": 0,
-                                  "unit": "m",
-                                  "description": "Barrel length, m."
+                                  "type": "object",
+                                  "properties": {
+                                    "value": {
+                                      "type": "number",
+                                      "minimum": 0,
+                                      "description": "In mm."
+                                    },
+                                    "raw": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "description": "The value as written in the source, when it differed."
+                                    }
+                                  },
+                                  "required": ["value"],
+                                  "unit": "mm",
+                                  "description": "Barrel length."
                                 },
                                 "twist": {
-                                  "type": "number",
-                                  "minimum": 0,
-                                  "unit": "m",
-                                  "description": "Rifling twist as length per turn, m."
+                                  "type": "object",
+                                  "properties": {
+                                    "value": {
+                                      "type": "number",
+                                      "minimum": 0,
+                                      "description": "In mm."
+                                    },
+                                    "raw": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "description": "The value as written in the source, when it differed."
+                                    }
+                                  },
+                                  "required": ["value"],
+                                  "unit": "mm",
+                                  "description": "Rifling twist as length per turn."
                                 },
                                 "twistHand": {
                                   "type": "string",
@@ -16817,34 +16858,94 @@
                                   "description": "Direction of the rifling twist."
                                 },
                                 "grooveDiameter": {
-                                  "type": "number",
-                                  "minimum": 0,
-                                  "unit": "m",
-                                  "description": "Groove diameter, m."
+                                  "type": "object",
+                                  "properties": {
+                                    "value": {
+                                      "type": "number",
+                                      "minimum": 0,
+                                      "description": "In mm."
+                                    },
+                                    "raw": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "description": "The value as written in the source, when it differed."
+                                    }
+                                  },
+                                  "required": ["value"],
+                                  "unit": "mm",
+                                  "description": "Groove diameter."
                                 },
                                 "boreDiameter": {
-                                  "type": "number",
-                                  "minimum": 0,
-                                  "unit": "m",
-                                  "description": "Bore diameter, m."
+                                  "type": "object",
+                                  "properties": {
+                                    "value": {
+                                      "type": "number",
+                                      "minimum": 0,
+                                      "description": "In mm."
+                                    },
+                                    "raw": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "description": "The value as written in the source, when it differed."
+                                    }
+                                  },
+                                  "required": ["value"],
+                                  "unit": "mm",
+                                  "description": "Bore diameter."
                                 },
                                 "freebore": {
-                                  "type": "number",
-                                  "minimum": 0,
-                                  "unit": "m",
-                                  "description": "Unrifled length of the throat from the case mouth to the start of the rifling, m."
+                                  "type": "object",
+                                  "properties": {
+                                    "value": {
+                                      "type": "number",
+                                      "minimum": 0,
+                                      "description": "In mm."
+                                    },
+                                    "raw": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "description": "The value as written in the source, when it differed."
+                                    }
+                                  },
+                                  "required": ["value"],
+                                  "unit": "mm",
+                                  "description": "Unrifled length of the throat from the case mouth to the start of the rifling."
                                 },
                                 "baseToOgiveAtLands": {
-                                  "type": "number",
-                                  "minimum": 0,
-                                  "unit": "m",
-                                  "description": "Cartridge base to ogive with the bullet touching the lands, measured, m."
+                                  "type": "object",
+                                  "properties": {
+                                    "value": {
+                                      "type": "number",
+                                      "minimum": 0,
+                                      "description": "In mm."
+                                    },
+                                    "raw": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "description": "The value as written in the source, when it differed."
+                                    }
+                                  },
+                                  "required": ["value"],
+                                  "unit": "mm",
+                                  "description": "Cartridge base to ogive with the bullet touching the lands, measured."
                                 },
                                 "firearmMass": {
-                                  "type": "number",
-                                  "exclusiveMinimum": 0,
-                                  "unit": "kg",
-                                  "description": "Mass of the firearm, kg."
+                                  "type": "object",
+                                  "properties": {
+                                    "value": {
+                                      "type": "number",
+                                      "exclusiveMinimum": 0,
+                                      "description": "In g."
+                                    },
+                                    "raw": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "description": "The value as written in the source, when it differed."
+                                    }
+                                  },
+                                  "required": ["value"],
+                                  "unit": "g",
+                                  "description": "Mass of the firearm."
                                 },
                                 "roundCount": {
                                   "type": "integer",
@@ -16882,19 +16983,43 @@
                                       "clickUnit": {
                                         "type": "string",
                                         "enum": ["MOA", "mrad"],
-                                        "description": "How the turrets are marked. `clickValue` and `travel` are angles in rad either way."
+                                        "description": "How the turrets are marked. `clickValue` and `travel` are angles in degrees either way."
                                       },
                                       "clickValue": {
-                                        "type": "number",
-                                        "exclusiveMinimum": 0,
-                                        "unit": "rad",
-                                        "description": "Angle of one turret click, rad."
+                                        "type": "object",
+                                        "properties": {
+                                          "value": {
+                                            "type": "number",
+                                            "exclusiveMinimum": 0,
+                                            "description": "In deg."
+                                          },
+                                          "raw": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "description": "The value as written in the source, when it differed."
+                                          }
+                                        },
+                                        "required": ["value"],
+                                        "unit": "deg",
+                                        "description": "Angle of one turret click."
                                       },
                                       "travel": {
-                                        "type": "number",
-                                        "exclusiveMinimum": 0,
-                                        "unit": "rad",
-                                        "description": "Total adjustment range of the turret, rad."
+                                        "type": "object",
+                                        "properties": {
+                                          "value": {
+                                            "type": "number",
+                                            "exclusiveMinimum": 0,
+                                            "description": "In deg."
+                                          },
+                                          "raw": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "description": "The value as written in the source, when it differed."
+                                          }
+                                        },
+                                        "required": ["value"],
+                                        "unit": "deg",
+                                        "description": "Total adjustment range of the turret."
                                       },
                                       "reticle": {
                                         "type": "string",
@@ -16947,26 +17072,74 @@
                                               "description": "Id of the optic of the firearm."
                                             },
                                             "sightHeight": {
-                                              "type": "number",
-                                              "minimum": 0,
-                                              "unit": "m",
-                                              "description": "Bore axis to optic centre, m."
+                                              "type": "object",
+                                              "properties": {
+                                                "value": {
+                                                  "type": "number",
+                                                  "minimum": 0,
+                                                  "description": "In mm."
+                                                },
+                                                "raw": {
+                                                  "type": "string",
+                                                  "minLength": 1,
+                                                  "description": "The value as written in the source, when it differed."
+                                                }
+                                              },
+                                              "required": ["value"],
+                                              "unit": "mm",
+                                              "description": "Bore axis to optic centre."
                                             },
                                             "lateralOffset": {
-                                              "type": "number",
-                                              "unit": "m",
-                                              "description": "Optic centre to the right of the bore, m. Negative to the left."
+                                              "type": "object",
+                                              "properties": {
+                                                "value": {
+                                                  "type": "number",
+                                                  "description": "In mm."
+                                                },
+                                                "raw": {
+                                                  "type": "string",
+                                                  "minLength": 1,
+                                                  "description": "The value as written in the source, when it differed."
+                                                }
+                                              },
+                                              "required": ["value"],
+                                              "unit": "mm",
+                                              "description": "Optic centre to the right of the bore. Negative to the left."
                                             },
                                             "cant": {
-                                              "type": "number",
-                                              "unit": "rad",
-                                              "description": "Cant of the optic, clockwise as seen from behind, rad."
+                                              "type": "object",
+                                              "properties": {
+                                                "value": {
+                                                  "type": "number",
+                                                  "description": "In deg."
+                                                },
+                                                "raw": {
+                                                  "type": "string",
+                                                  "minLength": 1,
+                                                  "description": "The value as written in the source, when it differed."
+                                                }
+                                              },
+                                              "required": ["value"],
+                                              "unit": "deg",
+                                              "description": "Cant of the optic, clockwise as seen from behind."
                                             },
                                             "zeroRange": {
-                                              "type": "number",
-                                              "exclusiveMinimum": 0,
-                                              "unit": "m",
-                                              "description": "Range of the zero, m."
+                                              "type": "object",
+                                              "properties": {
+                                                "value": {
+                                                  "type": "number",
+                                                  "exclusiveMinimum": 0,
+                                                  "description": "In mm."
+                                                },
+                                                "raw": {
+                                                  "type": "string",
+                                                  "minLength": 1,
+                                                  "description": "The value as written in the source, when it differed."
+                                                }
+                                              },
+                                              "required": ["value"],
+                                              "unit": "mm",
+                                              "description": "Range of the zero."
                                             },
                                             "zeroNotes": {
                                               "type": "string",
@@ -16974,23 +17147,59 @@
                                               "description": "Notes on the zero."
                                             },
                                             "zeroTemperature": {
-                                              "type": "number",
-                                              "exclusiveMinimum": 0,
-                                              "unit": "K",
-                                              "description": "Air temperature of the zero, K."
+                                              "type": "object",
+                                              "properties": {
+                                                "value": {
+                                                  "type": "number",
+                                                  "exclusiveMinimum": -273.15,
+                                                  "description": "In degC."
+                                                },
+                                                "raw": {
+                                                  "type": "string",
+                                                  "minLength": 1,
+                                                  "description": "The value as written in the source, when it differed."
+                                                }
+                                              },
+                                              "required": ["value"],
+                                              "unit": "degC",
+                                              "description": "Air temperature of the zero."
                                             },
                                             "zeroPressure": {
-                                              "type": "number",
-                                              "exclusiveMinimum": 0,
-                                              "unit": "Pa",
-                                              "description": "Absolute station pressure of the zero, Pa."
+                                              "type": "object",
+                                              "properties": {
+                                                "value": {
+                                                  "type": "number",
+                                                  "exclusiveMinimum": 0,
+                                                  "description": "In bar."
+                                                },
+                                                "raw": {
+                                                  "type": "string",
+                                                  "minLength": 1,
+                                                  "description": "The value as written in the source, when it differed."
+                                                }
+                                              },
+                                              "required": ["value"],
+                                              "unit": "bar",
+                                              "description": "Absolute station pressure of the zero."
                                             },
                                             "zeroHumidity": {
-                                              "type": "number",
-                                              "minimum": 0,
-                                              "maximum": 1,
-                                              "unit": "1",
-                                              "description": "Relative humidity of the zero, fraction from 0 to 1."
+                                              "type": "object",
+                                              "properties": {
+                                                "value": {
+                                                  "type": "number",
+                                                  "minimum": 0,
+                                                  "maximum": 100,
+                                                  "description": "In %."
+                                                },
+                                                "raw": {
+                                                  "type": "string",
+                                                  "minLength": 1,
+                                                  "description": "The value as written in the source, when it differed."
+                                                }
+                                              },
+                                              "required": ["value"],
+                                              "unit": "%",
+                                              "description": "Relative humidity of the zero, from 0 to 100 %."
                                             },
                                             "dragFactor": {
                                               "type": "number",
@@ -17032,8 +17241,14 @@
                                   "description": "Id of the configuration on the firearm now."
                                 }
                               },
-                              "required": ["name", "twistHand", "optics", "configurations"],
-                              "description": "A firearm of the library: lengths in m, mass in kg, angles in rad."
+                              "required": [
+                                "origin",
+                                "name",
+                                "twistHand",
+                                "optics",
+                                "configurations"
+                              ],
+                              "description": "A firearm of the library, in stored units."
                             }
                           },
                           "required": ["kind", "id", "name", "saved", "data"]
@@ -17702,6 +17917,159 @@
                               },
                               "required": ["references", "targetRotation", "groups"],
                               "description": "A target sheet with its calibration and shot groups."
+                            }
+                          },
+                          "required": ["kind", "id", "name", "saved", "data"]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "const": "targetFaceDesign",
+                              "description": "Kind of the record: `targetFaceDesign`."
+                            },
+                            "id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 64,
+                              "description": "Id of the record in the browser library."
+                            },
+                            "name": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 200,
+                              "description": "Name of the record. Save names the file after it."
+                            },
+                            "saved": {
+                              "type": "string",
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                              "description": "Time of the last save, ISO 8601 in UTC."
+                            },
+                            "data": {
+                              "type": "object",
+                              "properties": {
+                                "rings": {
+                                  "maxItems": 40,
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "value": {
+                                        "description": "Ring value.",
+                                        "type": "integer",
+                                        "exclusiveMinimum": 0,
+                                        "maximum": 9007199254740991
+                                      },
+                                      "diameter": {
+                                        "description": "Width of the ring, mm.",
+                                        "type": "number",
+                                        "exclusiveMinimum": 0
+                                      },
+                                      "height": {
+                                        "description": "Height of an oval ring, mm.",
+                                        "type": "number",
+                                        "exclusiveMinimum": 0
+                                      },
+                                      "fill": {
+                                        "description": "Colour of the zone the ring line bounds outside.",
+                                        "type": "string",
+                                        "enum": [
+                                          "black",
+                                          "white",
+                                          "grey",
+                                          "red",
+                                          "orange",
+                                          "yellow",
+                                          "green",
+                                          "blue",
+                                          "brown"
+                                        ]
+                                      },
+                                      "line": {
+                                        "description": "Colour of the ring line.",
+                                        "type": "string",
+                                        "enum": [
+                                          "black",
+                                          "white",
+                                          "grey",
+                                          "red",
+                                          "orange",
+                                          "yellow",
+                                          "green",
+                                          "blue",
+                                          "brown"
+                                        ]
+                                      }
+                                    }
+                                  },
+                                  "description": "Rings from outer to inner."
+                                },
+                                "innerTen": {
+                                  "type": "object",
+                                  "properties": {
+                                    "diameter": {
+                                      "description": "Width of the inner ten, mm.",
+                                      "type": "number",
+                                      "exclusiveMinimum": 0
+                                    },
+                                    "height": {
+                                      "description": "Height of an oval inner ten, mm.",
+                                      "type": "number",
+                                      "exclusiveMinimum": 0
+                                    },
+                                    "rule": {
+                                      "description": "Whether a touch or only a cover counts.",
+                                      "type": "string",
+                                      "enum": ["touch", "cover"]
+                                    }
+                                  },
+                                  "description": "The inner ten."
+                                },
+                                "blackDiameter": {
+                                  "description": "Width of the black aiming area, mm.",
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                "blackHeight": {
+                                  "description": "Height of an oval black aiming area, mm.",
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                "decimal": {
+                                  "description": "Decimal (tenth-ring) scoring.",
+                                  "type": "boolean"
+                                },
+                                "events": {
+                                  "maxItems": 40,
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "name": {
+                                        "type": "string",
+                                        "maxLength": 200,
+                                        "description": "Name of the event. Empty: not named yet."
+                                      },
+                                      "distance": {
+                                        "description": "Shooting distance, mm.",
+                                        "type": "number",
+                                        "exclusiveMinimum": 0
+                                      },
+                                      "gauge": {
+                                        "description": "Diameter of the scored hole, mm.",
+                                        "type": "number",
+                                        "exclusiveMinimum": 0
+                                      }
+                                    },
+                                    "required": ["name"]
+                                  },
+                                  "description": "Events shot on the face."
+                                }
+                              },
+                              "required": ["rings", "events"],
+                              "description": "A target face of the face designer."
                             }
                           },
                           "required": ["kind", "id", "name", "saved", "data"]

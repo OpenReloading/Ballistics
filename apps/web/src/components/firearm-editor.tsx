@@ -17,12 +17,26 @@ import {
   Title,
   Tooltip,
 } from '@mantine/core'
-import type { Firearm, Optic, OpticConfiguration, OpticMount } from '@openreloading/schema'
+import type {
+  Firearm,
+  Optic,
+  OpticConfiguration,
+  OpticMount,
+  QuantityValue,
+} from '@openreloading/schema'
 import { Plus, Trash, X } from '@phosphor-icons/react'
 import { type Dispatch, type ReactElement, type SetStateAction, useState } from 'react'
 import type { CartridgeSummary } from '../lib/api-types.ts'
-import { type FieldSpec, fieldError } from '../lib/field-spec.ts'
-import { firearmFields, freeId, mountFields, opticFields, zeroFields } from '../lib/firearm.ts'
+import { close, type FieldSpec, fieldError } from '../lib/field-spec.ts'
+import {
+  fieldSi,
+  fieldStored,
+  firearmFields,
+  freeId,
+  mountFields,
+  opticFields,
+  zeroFields,
+} from '../lib/firearm.ts'
 import { controlSize, tipEvents } from '../lib/theme.ts'
 import { roundedFieldText, type UnitSystem } from '../lib/units.ts'
 import { NumberField } from './number-field.tsx'
@@ -36,7 +50,7 @@ export const opticKinds = [
 ]
 
 /** Filled in by the user; Save checks that it is a number. */
-const empty = undefined as unknown as number
+const empty = undefined as unknown as QuantityValue
 
 /** A field's help on hover, focus and touch; the field shows no description line. */
 function Tip({ help, children }: { help?: string; children: ReactElement }) {
@@ -71,7 +85,11 @@ function SiField({
   /** Left once: a field's own error shows from then on, not on a field just added. */
   const [left, setLeft] = useState(false)
   let { value } = state
-  if (state.system !== system || value.si !== si) {
+  // the stored value comes back through a unit round trip: equal within its noise
+  if (
+    state.system !== system ||
+    (value.si !== si && !(value.si !== undefined && close(value.si, si)))
+  ) {
     value = shown(si)
     setState({ value, system })
   }
@@ -113,7 +131,7 @@ export function FirearmEditor({
   nameLeft: boolean
   setNameLeft: (left: boolean) => void
   setCartridgeNames: Dispatch<SetStateAction<Record<string, string>>>
-  cartridgeName: (id: string | undefined) => string | undefined
+  cartridgeName: (ref: string | undefined) => string | undefined
   patch: (p: Partial<Firearm>) => void
   setOptic: (i: number, p: Partial<Optic>) => void
   setConfig: (i: number, p: Partial<OpticConfiguration>) => void
@@ -184,7 +202,7 @@ export function FirearmEditor({
                 describe={(c) => c.name}
                 onSelect={(c) => {
                   setCartridgeNames((n) => ({ ...n, [c.id]: c.name }))
-                  patch({ cartridge: c.id })
+                  patch({ cartridge: `catalogue:${c.id}` })
                 }}
                 noneText="No cartridge found"
                 unreachableText="The database is unreachable; the cartridge can be chosen later."
@@ -207,8 +225,8 @@ export function FirearmEditor({
                 key={spec.key}
                 spec={spec}
                 system={system}
-                si={data[spec.key]}
-                onChange={(si) => patch({ [spec.key]: si })}
+                si={fieldSi(spec, data[spec.key])}
+                onChange={(si) => patch({ [spec.key]: fieldStored(spec, si) })}
               />
             ))}
             <div className="firearm-row">
@@ -301,8 +319,8 @@ export function FirearmEditor({
                           <SiField
                             spec={{ ...spec, label: `${spec.label}, optic ${i + 1}` }}
                             system={system}
-                            si={o[spec.key]}
-                            onChange={(si) => setOptic(i, { [spec.key]: si })}
+                            si={fieldSi(spec, o[spec.key])}
+                            onChange={(si) => setOptic(i, { [spec.key]: fieldStored(spec, si) })}
                             error={crossError('optics', i, spec.key)}
                           />
                         </Table.Td>
@@ -448,8 +466,10 @@ export function FirearmEditor({
                                   label: `${spec.label}, ${title} mount ${k + 1}`,
                                 }}
                                 system={system}
-                                si={m[spec.key]}
-                                onChange={(si) => setMount(i, k, { [spec.key]: si })}
+                                si={fieldSi(spec, m[spec.key])}
+                                onChange={(si) =>
+                                  setMount(i, k, { [spec.key]: fieldStored(spec, si) })
+                                }
                               />
                             </Table.Td>
                           ))}
@@ -508,8 +528,10 @@ export function FirearmEditor({
                                   label: `${spec.label}, ${title} mount ${k + 1}`,
                                 }}
                                 system={system}
-                                si={m[spec.key]}
-                                onChange={(si) => setMount(i, k, { [spec.key]: si })}
+                                si={fieldSi(spec, m[spec.key])}
+                                onChange={(si) =>
+                                  setMount(i, k, { [spec.key]: fieldStored(spec, si) })
+                                }
                               />
                             </Table.Td>
                           ))}

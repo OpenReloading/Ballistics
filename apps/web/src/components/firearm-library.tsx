@@ -27,6 +27,7 @@ import { loadExample } from '../lib/example-data.ts'
 import {
   blankFirearm,
   cardFacts,
+  catalogueCartridgeId,
   firearmCells,
   firearmIssues,
   firearmProblem,
@@ -122,6 +123,7 @@ export function FirearmLibrary() {
     example.data.cartridge,
     ...(list ?? []).map((r) => r.data.cartridge),
   ]
+    .map(catalogueCartridgeId)
     .filter((c): c is string => !!c)
     .join('\n')
   useEffect(() => {
@@ -134,7 +136,11 @@ export function FirearmLibrary() {
         .catch(() => {})
     }
   }, [cartridgeIds])
-  const cartridgeName = (id: string | undefined) => (id ? (cartridgeNames[id] ?? id) : undefined)
+  /** The name of the cartridge a reference names, else the reference as stored. */
+  const cartridgeName = (ref: string | undefined) => {
+    const id = catalogueCartridgeId(ref)
+    return id === undefined ? ref : (cartridgeNames[id] ?? id)
+  }
 
   // the File menu renders after an edit, from the deferred data
   const fileData = useDeferredValue(data)
@@ -306,7 +312,7 @@ export function FirearmLibrary() {
       unit: system.barrelLength.symbol,
       num: true,
       width: '6rem',
-      value: (r) => r.data.barrelLength,
+      value: (r) => r.data.barrelLength?.value,
       cell: (r) => cells(r).barrel,
     },
     {
@@ -316,7 +322,7 @@ export function FirearmLibrary() {
       help: 'Barrel length per turn of the rifling.',
       num: true,
       width: '6.5rem',
-      value: (r) => r.data.twist,
+      value: (r) => r.data.twist?.value,
       cell: (r) => cells(r).twist,
     },
     {

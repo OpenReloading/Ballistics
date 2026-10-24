@@ -21,7 +21,6 @@ const measured = { kind: 'measured', sources: [{ title: 'Range log' }] } as cons
 const validLoad = {
   id: 'test-load',
   cartridge: 'test-cartridge',
-  firearm: { name: 'Test rifle', barrelLength: { value: 600 } },
   bullet: {
     manufacturerName: 'Manufacturer',
     model: 'Model',
@@ -75,6 +74,12 @@ describe('source', () => {
 describe('load', () => {
   it('accepts a complete load', () => {
     expect(load.safeParse(validLoad).success).toBe(true)
+  })
+
+  it('refers to its firearm and holds none inline', () => {
+    expect(load.safeParse({ ...validLoad, firearm: 'catalogue:test-rifle' }).success).toBe(true)
+    expectIssueAt(load, { ...validLoad, firearm: 'test-rifle' }, 'firearm')
+    expectIssueAt(load, { ...validLoad, firearm: { name: 'Test rifle' } }, 'firearm')
   })
 
   it('rejects an id that is not kebab-case', () => {

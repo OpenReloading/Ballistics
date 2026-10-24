@@ -1,7 +1,6 @@
 {
   "id": "test-load",
   "cartridge": "test-cartridge",
-  "firearm": { "name": "Test rifle", "barrelLength": { "value": 600 } },
   "bullet": { "manufacturerName": "Manufacturer", "model": "Model", "bulletMass": { "value": 10 } },
   "powder": { "manufacturerName": "Manufacturer", "name": "Powder" },
   "charge": { "value": 3 },

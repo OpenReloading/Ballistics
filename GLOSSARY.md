@@ -101,7 +101,7 @@ _Avoid_: maker
 _Avoid_: caseMaker
 
 **Manufacturer name**:
-`manufacturerName`: the manufacturer as free text, where no manufacturer record is referenced: load components (`bullet`, `powder`, `primer`, `case`), a chronograph `device`, a bullet design and a firearm of the user data.
+`manufacturerName`: the manufacturer as free text, where no manufacturer record is referenced: load components (`bullet`, `powder`, `primer`, `case`), a chronograph `device`, a bullet design and, beside the `manufacturer` reference, a firearm.
 _Avoid_: maker
 
 **Website**:
@@ -116,7 +116,7 @@ _Avoid_: maker
 A record of kind `cartridges`, one per C.I.P. sheet: `id`, `name`, `aliases`, `table`, `country`, `published`, `revised`, `pressureMethod`, `verification`, `values`, `exceptions`, `provenance` (the C.I.P. TDCC with the sheet's URL, SHA-256 and retrieval date). Served by `GET /v1/cartridges` and `GET /v1/cartridges/{id}`.
 
 **Cartridge reference**:
-`cartridge`: record id of a cartridge on case capacities, loads, firing series, firearms and workbench states of the user data, and in interior bodies (the cartridge whose pressure limits the answer compares). Also the bullet list filter `?cartridge=`.
+`cartridge`: record id of a cartridge on case capacities, loads and firing series, a reference (`catalogue:<id>` or `user:<UUID>`) on a firearm, a plain id or reference on workbench states of the user data, and in interior bodies (the cartridge whose pressure limits the answer compares). Also the bullet list filter `?cartridge=`.
 
 **Sheet id**:
 `sheetId`: `cip-<id>-<revised or published>`, the id of a cartridge's sheet revision. Figure ids and drawing baselines are named after it.
@@ -183,11 +183,11 @@ _Avoid_: rimType
 _Avoid_: g1
 
 **Bore diameter**:
-`boreDiameter`: diameter across the lands. Cartridge list item (mm, chamber-side CIP F), firearm of the user data (m, measured), M3 `chamber.boreDiameter` (m).
+`boreDiameter`: diameter across the lands. Cartridge list item (mm, chamber-side CIP F), firearm (mm, measured), M3 `chamber.boreDiameter` (m).
 _Avoid_: land
 
 **Groove diameter**:
-`grooveDiameter`: diameter across the grooves. Cartridge list item (mm, chamber-side CIP Z), firearm (m, measured).
+`grooveDiameter`: diameter across the grooves. Cartridge list item (mm, chamber-side CIP Z), firearm (mm, measured).
 _Avoid_: groove
 
 **Case length**:
@@ -376,7 +376,7 @@ _Avoid_: velocityMin, minSpeed
 _Avoid_: minimumTwist
 
 **Twist**:
-`twist`: length of barrel per turn of the rifling. On a load's `firearm` (mm), a firearm of the user data, interior `barrel`, exterior `firearm` and the stability query (m). 0 in an interior body: no rifling.
+`twist`: length of barrel per turn of the rifling. On a firearm (mm), interior `barrel`, exterior `firearm` and the stability query (m). 0 in an interior body: no rifling.
 _Avoid_: twistLength
 
 **Twist hand**:
@@ -385,7 +385,7 @@ _Avoid_: twistLength
 ### Loads
 
 **Load**:
-A record of kind `loads`: one cartridge recipe fired from one firearm, with `cartridge`, `firearm`, `bullet`, `powder`, `charge`, `primer`, `case`, `overallLength`, `baseToOgive`. Its `firearm` holds `name`, `barrelLength`, `twist`, `twistHand`. Its components hold `manufacturerName` and `lot`, the bullet `model` and `bulletMass`, the powder `name`, the primer `model`, the case `firingCount` and `waterCapacity`.
+A record of kind `loads`: one cartridge recipe fired from one firearm, with `cartridge`, `firearm` (a reference to a firearm, optional), `bullet`, `powder`, `charge`, `primer`, `case`, `overallLength`, `baseToOgive`. Its components hold `manufacturerName` and `lot`, the bullet `model` and `bulletMass`, the powder `name`, the primer `model`, the case `firingCount` and `waterCapacity`.
 
 **Lot**:
 `lot`: lot number of a load component as printed on the package.
@@ -402,7 +402,7 @@ _Avoid_: firings
 _Avoid_: coal
 
 **Barrel length**:
-`barrelLength`: barrel length of a load's firearm and a firing series (mm), and of a firearm of the user data (m). Interior bodies take `barrel.length` (m): the bullet travel from the seated position to the muzzle.
+`barrelLength`: barrel length of a firearm and a firing series (mm). Interior bodies take `barrel.length` (m): the bullet travel from the seated position to the muzzle.
 _Avoid_: `travel` (of an M3 barrel)
 
 **Bullet travel**:
@@ -607,37 +607,37 @@ _Avoid_: `step`, `steps` (of a ladder)
 One entry of `measurements` of a workbench state: one imported chronograph file with `name`, `date`, `device`, `muzzleDistance` (m) and `strings` mapped to charges.
 
 **Firearm**:
-A user record of kind `firearm`: `name`, `manufacturerName`, `model`, `cartridge`, `barrelLength`, `twist`, `twistHand`, `grooveDiameter`, `boreDiameter`, `freebore`, `baseToOgiveAtLands`, `firearmMass`, `roundCount`, `notes`, `optics`, `configurations`, `active` (the configuration on the firearm now). A workbench state names one by its local id in `firearm`. The `firearm` of exterior bodies is the sight and rifling of one shot.
+A firearm, one shape for every origin, in stored units (mm, g, degrees; the zero air in degC, bar and %). The user record of kind `firearm` holds `origin`, `name`, `manufacturer` (a `catalogue:` reference), `manufacturerName`, `model`, `cartridge` (a reference), `barrelLength`, `twist`, `twistHand`, `grooveDiameter`, `boreDiameter`, `freebore`, `baseToOgiveAtLands`, `firearmMass`, `roundCount`, `notes`, `optics`, `configurations`, `active` (the configuration on the firearm now). A workbench state names one by its local id in `firearm`, a load by a reference. The `firearm` of exterior bodies is the sight and rifling of one shot.
 _Avoid_: rifle, gun
 
 **Freebore**:
-`freebore`: unrifled length of the throat from the case mouth to the start of the rifling, m, on a firearm.
+`freebore`: unrifled length of the throat from the case mouth to the start of the rifling, mm, on a firearm.
 
 **Base to ogive at the lands**:
 `baseToOgiveAtLands`: cartridge base to ogive with the bullet touching the lands, measured, m.
 _Avoid_: lands
 
 **Firearm mass**:
-`firearmMass`: mass of a firearm, kg.
+`firearmMass`: mass of a firearm, g. The workbench state's `siValues` entry of that name is kg.
 _Avoid_: `mass` (of a firearm), gunMass
 
 **Optic**:
-One entry of `optics`: `id`, `kind` (`scope`, `redDot`, `ironSights`, `other`), `name`, `clickUnit` (how the turrets are marked, `MOA` or `mrad`), `clickValue`, `travel` (total adjustment range, rad), `reticle`, `minMagnification` and `maxMagnification`.
+One entry of `optics`: `id`, `kind` (`scope`, `redDot`, `ironSights`, `other`), `name`, `clickUnit` (how the turrets are marked, `MOA` or `mrad`), `clickValue`, `travel` (total adjustment range, degrees), `reticle`, `minMagnification` and `maxMagnification`.
 _Avoid_: magnificationMin, magnificationMax
 
 **Click value**:
-`clickValue`: angular size of one sight click, rad: on an optic, in range string bodies (nominal) and as a prior.
+`clickValue`: angular size of one sight click: degrees on an optic, rad in range string bodies (nominal) and as a prior.
 _Avoid_: click
 
 **Optic configuration**:
 One entry of `configurations`: the optics mounted on a firearm between `mounted` and `removed` (ISO dates), with `id`, `name` and 1 to 4 `mounts`.
 
 **Optic mount**:
-One entry of `mounts`: `optic` (local id), `sightHeight` (m), `lateralOffset` (optic centre right of the bore, m), `cant` (clockwise as seen from behind, rad), `zeroRange` (m), `zeroNotes`, the optional air of the zero (`zeroTemperature` K, `zeroPressure` Pa, `zeroHumidity` fraction) and an optional `dragFactor` with its `dragFactorSource`.
+One entry of `mounts`: `optic` (local id), `sightHeight` (mm), `lateralOffset` (optic centre right of the bore, mm), `cant` (clockwise as seen from behind, degrees), `zeroRange` (mm), `zeroNotes`, the optional air of the zero (`zeroTemperature` degC, `zeroPressure` bar, `zeroHumidity` %) and an optional `dragFactor` with its `dragFactorSource`.
 _Avoid_: `offset` (of a mount)
 
 **Sight height**:
-`sightHeight`: line of sight above the bore axis at the muzzle, m, on an optic mount and the `firearm` of exterior bodies. The truing nominal holds it in mm.
+`sightHeight`: line of sight above the bore axis at the muzzle: mm on an optic mount, m on the `firearm` of exterior bodies. The truing nominal holds it in mm.
 
 **Zero range**:
 `zeroRange`: range at which an optic mount is zeroed, m. The truing nominal holds it in mm.
