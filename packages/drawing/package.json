@@ -29,6 +29,10 @@
     "./seating": {
       "types": "./dist/seating/index.d.ts",
       "default": "./dist/seating/index.js"
+    },
+    "./target": {
+      "types": "./dist/target/index.d.ts",
+      "default": "./dist/target/index.js"
     }
   },
   "files": [

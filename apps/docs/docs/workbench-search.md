@@ -16,7 +16,7 @@ Option C (inline field and dialog) with matching in the browser (E) and a "Sort 
 ## What the search does today
 
 - `RecordSearch` (`apps/web/src/components/record-search.tsx:43`) sends `GET <kind>?q=<text>&limit=20` 300 ms after the last key (`:110`), from 2 characters on. The Ctrl+K palette (`apps/web/src/components/workbench-search.tsx`) sends the same `q` per kind with 8 matches each.
-- `q` is one substring test (`ilike '%q%'`) over the manufacturer name or an alias, a space, and the product name (`packages/api/src/db/component-queries.ts:29`). For cartridges it tests names and aliases. The Pages edition does the same over `<kind>/search.json` (`apps/web/src/lib/static-api.ts`).
+- `q` was one substring test (`ilike '%q%'`) over the manufacturer name or an alias, a space, and the product name; for cartridges it tested names and aliases. The numbers below were measured with it. The API and the Pages edition now rank with the schema's matcher (`apps/docs/docs/data/catalogue-storage.md`).
 - The words must stand next to each other in that order. Nothing else is searched (no caliber, no weight), and a number is a substring (`168` also matches `0.168`).
 - The answer is ordered by manufacturer name, name, id: no relevance order, and no way to narrow other than typing more.
 - Enter chooses only when exactly one row is shown and none is highlighted.

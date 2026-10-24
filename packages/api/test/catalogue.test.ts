@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -6,7 +6,7 @@ import { buildCatalogue } from '../src/catalogue/build.ts'
 import { cartridgeItem, contentHash, revisionOf } from '../src/catalogue/derive.ts'
 import { loadCatalogue, writeCatalogue } from '../src/catalogue/node.ts'
 import { openCatalogue } from '../src/catalogue/open.ts'
-import { catalogueFormat } from '../src/catalogue/types.ts'
+import { catalogueFormat, deriveVersion } from '../src/catalogue/types.ts'
 import { bundle } from './fixtures.ts'
 
 const built = buildCatalogue(bundle)
@@ -78,6 +78,29 @@ describe('open', () => {
     expect(() => openCatalogue({ index, records: built.records })).toThrow('format')
   })
 
+  it('rejects an index built by another derivation, or without a header', () => {
+    const other = { ...built.index, derive: deriveVersion + 1 } as unknown as typeof built.index
+    expect(() => openCatalogue({ index: other, records: built.records })).toThrow(
+      `index derive version ${deriveVersion + 1} is not ${deriveVersion}: rebuild it`,
+    )
+    const { format: _, derive: __, ...old } = built.index
+    expect(() =>
+      openCatalogue({ index: old as unknown as typeof built.index, records: built.records }),
+    ).toThrow('index format undefined')
+  })
+
+  it('rejects a record file of another format or derivation on the first get', () => {
+    for (const change of [{ format: catalogueFormat + 1 }, { derive: deriveVersion + 1 }]) {
+      const lazy = openCatalogue({
+        index: built.index,
+        records: () => ({ ...built.records, ...change }) as typeof built.records,
+      })
+      expect(lazy.cartridges().total).toBe(3)
+      expect(() => lazy.get('cartridge', 'alpha-rifle')).toThrow('record file')
+      expect(() => lazy.get('cartridge', 'alpha-rifle')).toThrow('record file')
+    }
+  })
+
   it('pages after counting, and filters by table', () => {
     expect(catalogue.cartridges({ limit: 1, offset: 1 })).toMatchObject({
       total: 3,
@@ -114,7 +137,7 @@ describe('open', () => {
     })
   })
 
-  it('ignores an empty filter, as the SQL layer does', () => {
+  it('ignores an empty filter', () => {
     expect(catalogue.cartridges({ table: '' }).total).toBe(3)
     expect(catalogue.powders({ manufacturer: '' }).total).toBe(2)
   })
@@ -184,6 +207,21 @@ describe('files', () => {
       expect(JSON.parse(readFileSync(join(dir, 'index.json'), 'utf8'))).toEqual(built.index)
       expect(loaded.cartridges()).toEqual(catalogue.cartridges())
       expect(loaded.get('bullet', 'example-a-1')).toEqual(catalogue.get('bullet', 'example-a-1'))
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
+  it('refuses files of another format or derivation', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'catalogue-'))
+    try {
+      writeCatalogue(bundle, dir)
+      const path = join(dir, 'index.json')
+      const index = JSON.parse(readFileSync(path, 'utf8'))
+      writeFileSync(path, JSON.stringify({ ...index, derive: deriveVersion - 1 }))
+      expect(() => loadCatalogue(dir)).toThrow('derive version')
+      writeFileSync(path, JSON.stringify({ ...index, format: catalogueFormat - 1 }))
+      expect(() => loadCatalogue(dir)).toThrow('format')
     } finally {
       rmSync(dir, { recursive: true, force: true })
     }

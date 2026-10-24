@@ -4,11 +4,13 @@ Zod schemas for records, ESM. The build writes JSON Schema files to `dist/json-s
 
 - Units, provenance, `Load`, `ChronoSession`, `FiringSeries`, `RangeFirings`, standards and components, user data files, `TargetSheet` (shot groups on a target, m).
 - `TargetFace`: rule-book target faces for ring scoring. Optional ring colours, paper size, bulls, ovals, square rings and event category. Strict events.
+- `TargetFaceDesign` (user record kind `targetFaceDesign`, `src/user-data.ts`): the draft of the web app's face designer, every field optional. The designer builds a `TargetFace` from it and checks that against `targetFace`.
 - `Federation`, `Discipline` and `TargetMapping` (`src/federation.ts`): strict objects, `apps/docs/docs/data/federations.md`.
 - `Manufacturer` (`src/manufacturer.ts`): strict object, referenced by id from powders and bullets, `apps/docs/docs/data/manufacturers.md`.
 - Default order of federations, disciplines, target faces, face events and mappings (`src/competition-order.ts`): the API sorts its lists with it and the web app imports it, rules in `apps/docs/docs/data/federations.md`.
 - Ids and references (`src/ids.ts`): `recordId` for catalogue records, `userId` (UUID) for new user records, `ref(kind)` for `"catalogue:<id>"` or `"user:<UUID>"`. `checkUserRefs` (`src/user-data.ts`) lists the dangling references among user records.
 - Search and list order (`src/search.ts`, `src/order.ts`, `apps/docs/docs/data/catalogue-storage.md`): `searchKey` is built once per row, `score` ranks a query against it (words in any order, spaces, hyphens, decimal comma and a leading point ignored; exact name 4, word start 2, substring 1). `sortKey` is one precomputed key per row (folded, digit runs padded), `compareKeys` compares by code unit. The web lists, and later the API and the static edition, use these and no other matcher or order.
+- `renames` (`src/renames.ts`): the shape of `records/renames.json`, old record ids per kind directory with the id that replaced each (`apps/docs/docs/data/catalogue-storage.md`).
 - Caliber class vocabulary `caliberClasses` (`src/caliber-class.ts`).
 - Vocabularies the API and the web app share are exported once: `caseTypes` (`src/cartridge.ts`), `baseTypes`, `ogiveForms` and `tipTypes` (`src/bullet.ts`). The web app imports record types from here and keeps no copy; the bullet designer's choice lists are the options of these enums. Model overview and plan: `apps/docs/docs/data/record-model.md`.
 

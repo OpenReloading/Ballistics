@@ -1,20 +1,14 @@
 import { once } from 'node:events'
 import type { AddressInfo } from 'node:net'
-import { beforeAll, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { buildApp } from '../src/app.ts'
 import { createComputeRunner } from '../src/compute/pool.ts'
 import type { ComputeRunner } from '../src/compute/tasks.ts'
-import type { Db } from '../src/db/index.ts'
 import { API_PREFIX } from '../src/version.ts'
-import { flatShot, m3Load } from './fixtures.ts'
-import { closeTestDb, createTestDb } from './setup.ts'
+import { bundle, flatShot, m3Load } from './fixtures.ts'
+import { testCatalogue } from './setup.ts'
 
-let db: Db
-
-beforeAll(async () => {
-  db = await createTestDb()
-  return () => closeTestDb(db)
-})
+const catalogue = testCatalogue(bundle)
 
 /** The smallest output step caps the step size: about 17400 steps per run, 13 runs, about 0.47 s. */
 const slow = {
@@ -38,7 +32,7 @@ async function withApp(
 ) {
   // buildApp closes only a runner it created itself
   const compute = createComputeRunner(options)
-  const app = buildApp({ db, compute })
+  const app = buildApp({ catalogue, compute })
   try {
     await body(app, compute)
   } finally {
@@ -114,7 +108,7 @@ describe('compute pool through the API', () => {
   })
 
   it('closes a keep-alive connection after the response in flight when the app closes', async () => {
-    const app = buildApp({ db })
+    const app = buildApp({ catalogue })
     await app.listen({ port: 0, host: '127.0.0.1' })
     const { port } = app.server.address() as AddressInfo
     const received = once(app.server, 'request')

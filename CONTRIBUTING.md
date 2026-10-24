@@ -4,7 +4,7 @@ Where questions, ideas, bugs and record requests go: [README](README.md#communit
 
 ## Setup
 
-- Node 26 (`.nvmrc`) and npm, or the dev container in `.devcontainer/` (Node 26, PostgreSQL, Playwright Chromium, oasdiff, Schemathesis). The dev container runs with rootless podman only (`userns_mode: keep-id` in `.devcontainer/compose.yaml`, which Docker Engine does not accept).
+- Node 26 (`.nvmrc`) and npm, or the dev container in `.devcontainer/` (Node 26, Playwright Chromium, oasdiff, Schemathesis). The dev container runs with rootless podman only (`userns_mode: keep-id` in `.devcontainer/compose.yaml`, which Docker Engine does not accept).
 - `npm ci`, then `npm run build` (workspaces import each other's `dist/`).
 - Every command, environment variable and container: [AGENTS.md](AGENTS.md).
 

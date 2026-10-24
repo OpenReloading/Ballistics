@@ -7,6 +7,7 @@ import type {
   Federation,
   Manufacturer,
   Powder,
+  Renames,
   TargetFace,
   TargetMapping,
 } from '@open-reloading/schema'
@@ -182,12 +183,23 @@ export interface IndexRow<T> {
   search: string
 }
 
-/** The format of {@link CatalogueIndex}; an index of another format is rejected. */
+/** The layout of the index and the record file; a file of another format is refused. */
 export const catalogueFormat = 1
 
-/** The typed summary index: every list of the catalogue, each in its default order. */
-export interface CatalogueIndex {
+/**
+ * The version of what `derive.ts` computes (list items, sort and search keys, revisions). Raise it
+ * with any change to those, so a build made by older code is refused instead of read as current.
+ */
+export const deriveVersion = 1
+
+/** The first fields of the index and of the record file: what built them. */
+export interface CatalogueHeader {
   format: typeof catalogueFormat
+  derive: typeof deriveVersion
+}
+
+/** The typed summary index: every list of the catalogue, each in its default order. */
+export interface CatalogueIndex extends CatalogueHeader {
   cartridges: IndexRow<CartridgeItem>[]
   manufacturers: IndexRow<ManufacturerItem>[]
   powders: IndexRow<PowderItem>[]
@@ -198,10 +210,14 @@ export interface CatalogueIndex {
   targetMappings: IndexRow<TargetMappingItem>[]
   /** The capacity record ids of each cartridge that has any, ordered by id. */
   capacities: Record<string, string[]>
+  /** The ids that no longer name a record, by kind, each with the id that replaces it. */
+  renames: Renames
 }
 
-/** The record file: every record by id, one map per kind. */
-export type RecordFile = { [K in CatalogueKind]: Record<string, RecordOfKind[K]> }
+/** The record file: the header and every record by id, one map per kind. */
+export type RecordFile = CatalogueHeader & {
+  [K in CatalogueKind]: Record<string, RecordOfKind[K]>
+}
 
 /** The records a catalogue is built from; `Bundle` of `@open-reloading/data` has them. */
 export interface CatalogueSource {
@@ -214,6 +230,8 @@ export interface CatalogueSource {
   federations: Federation[]
   disciplines: Discipline[]
   targetMappings: TargetMapping[]
+  /** `renames.json` of the records; absent: none. */
+  renames?: Renames
 }
 
 /** What `openCatalogue` opens: the index and the record file, or a function that reads it on the first `get`. */
@@ -243,6 +261,8 @@ export interface Catalogue {
   targetMappings(query?: { discipline?: string; face?: string }): CataloguePage<TargetMappingItem>
   /** The record `id` of `kind`; undefined if unknown. */
   get<K extends CatalogueKind>(kind: K, id: string): Catalogued<K> | undefined
+  /** The id that replaces `id` of a route kind where it was renamed or removed; undefined otherwise. */
+  renamed(kind: string, id: string): string | undefined
   /** The case capacity records of a cartridge, ordered by id. */
   capacities(cartridge: string): Catalogued<'caseCapacity'>[]
 }

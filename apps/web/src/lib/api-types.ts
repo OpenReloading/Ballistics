@@ -1,4 +1,4 @@
-/** The fields of API responses the pages read (`packages/api/src/db/`, `packages/api/src/compute/`, `packages/api/src/routes/`). */
+/** The fields of API responses the pages read (`packages/api/src/catalogue/`, `packages/api/src/compute/`, `packages/api/src/routes/`). */
 import type { InteriorResult } from '@open-reloading/core'
 import type { Cartridge, CaseCapacity, CaseType, Powder, Provenance } from '@open-reloading/schema'
 

@@ -1,39 +1,15 @@
 services:
-  db:
-    image: docker.io/library/postgres:18-bookworm@sha256:bbf83594798e144bff365a9c191c5d779f181fb3135902064ab8ff11918020fc
-    environment:
-      POSTGRES_USER: ballistics
-      POSTGRES_PASSWORD: ballistics
-      POSTGRES_DB: ballistics
-    ports:
-      # the credentials above are fixed: reachable from this machine only
-      - "127.0.0.1:${DB_PORT:-5432}:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql
-    healthcheck:
-      # TCP, so the init server of the image's entrypoint (socket only) does not count as ready
-      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "ballistics", "-d", "ballistics"]
-      interval: 2s
-      retries: 30
-
   api:
     build:
       context: .
       dockerfile: packages/api/Dockerfile
-    environment:
-      DATABASE_URL: postgres://ballistics:ballistics@db:5432/ballistics
     ports:
       - "${API_PORT:-3000}:3000"
-    depends_on:
-      db:
-        condition: service_healthy
     healthcheck:
       # node, because the slim image has no curl
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"]
       interval: 2s
       retries: 30
-      # building the tables and seeding on a cold start; failed probes in this window do not count
-      start_period: 120s
 
   web:
     build:
@@ -57,6 +33,3 @@ services:
         APP_URL: http://localhost:${WEB_PORT:-3001}
     ports:
       - "${DOCS_PORT:-3002}:80"
-
-volumes:
-  pgdata:

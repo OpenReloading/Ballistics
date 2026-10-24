@@ -7,6 +7,7 @@ import {
   type Discipline,
   type DisciplineKey,
   type Manufacturer,
+  type RenameKind,
 } from '@open-reloading/schema'
 import {
   bulletRow,
@@ -23,6 +24,7 @@ import {
   type CatalogueData,
   type CatalogueSource,
   catalogueFormat,
+  deriveVersion,
   type IndexRow,
   type RecordFile,
 } from './types.ts'
@@ -49,8 +51,12 @@ function ordered<T extends { id: string }, R>(
 }
 
 /** The manufacturer `id` of a component, an error naming the component when there is none. */
-function maker(manufacturers: Map<string, Manufacturer>, c: { id: string; manufacturer: string }) {
-  const m = manufacturers.get(c.manufacturer)
+function maker(
+  manufacturers: Map<string, Manufacturer>,
+  c: { id: string; manufacturer: string },
+  now: (kind: RenameKind, id: string) => string,
+) {
+  const m = manufacturers.get(now('manufacturers', c.manufacturer))
   if (!m) throw new Error(`${c.id}: unknown manufacturer ${c.manufacturer}`)
   return m
 }
@@ -62,23 +68,30 @@ function maker(manufacturers: Map<string, Manufacturer>, c: { id: string; manufa
  */
 export function buildCatalogue(source: CatalogueSource): CatalogueData & { records: RecordFile } {
   const manufacturers = new Map(source.manufacturers.map((m) => [m.id, m]))
+  const renames = source.renames ?? {}
+  // a reference to an old id joins the record that replaced it
+  const now = (kind: RenameKind, id: string) => renames[kind]?.[id] ?? id
   const mappedFaces = new Map<string, Discipline[]>()
   const disciplines = new Map(source.disciplines.map((d) => [d.id, d]))
   for (const m of source.targetMappings) {
-    const d = disciplines.get(m.discipline)
-    if (d) mappedFaces.set(m.face, [...(mappedFaces.get(m.face) ?? []), d])
+    const d = disciplines.get(now('disciplines', m.discipline))
+    const face = now('target-faces', m.face)
+    if (d) mappedFaces.set(face, [...(mappedFaces.get(face) ?? []), d])
   }
   const capacities = new Map<string, string[]>()
-  for (const c of source.capacities.toSorted((a, b) => compareKeys(a.id, b.id)))
-    capacities.set(c.cartridge, [...(capacities.get(c.cartridge) ?? []), c.id])
+  for (const c of source.capacities.toSorted((a, b) => compareKeys(a.id, b.id))) {
+    const cartridge = now('cartridges', c.cartridge)
+    capacities.set(cartridge, [...(capacities.get(cartridge) ?? []), c.id])
+  }
 
   return {
     index: {
       format: catalogueFormat,
+      derive: deriveVersion,
       cartridges: byKey(source.cartridges.map(cartridgeRow)),
       manufacturers: byKey(source.manufacturers.map(manufacturerRow)),
-      powders: byKey(source.powders.map((p) => powderRow(p, maker(manufacturers, p)))),
-      bullets: byKey(source.bullets.map((b) => bulletRow(b, maker(manufacturers, b)))),
+      powders: byKey(source.powders.map((p) => powderRow(p, maker(manufacturers, p, now)))),
+      bullets: byKey(source.bullets.map((b) => bulletRow(b, maker(manufacturers, b, now)))),
       targetFaces: ordered(
         source.targetFaces,
         (f) => targetFaceRow(f, mappedFaces.get(f.id) ?? []),
@@ -97,14 +110,25 @@ export function buildCatalogue(source: CatalogueSource): CatalogueData & { recor
         targetMappingRow,
         (a, b) =>
           compareMappings(
-            { id: a.id, face: a.face, discipline: disciplineKey(disciplineOf(disciplines, a)) },
-            { id: b.id, face: b.face, discipline: disciplineKey(disciplineOf(disciplines, b)) },
+            {
+              id: a.id,
+              face: a.face,
+              discipline: disciplineKey(disciplineOf(disciplines, a, now)),
+            },
+            {
+              id: b.id,
+              face: b.face,
+              discipline: disciplineKey(disciplineOf(disciplines, b, now)),
+            },
           ),
         (m) => m.id,
       ),
       capacities: Object.fromEntries(capacities),
+      renames,
     },
     records: {
+      format: catalogueFormat,
+      derive: deriveVersion,
       cartridge: byId(source.cartridges),
       manufacturer: byId(source.manufacturers),
       powder: byId(source.powders),
@@ -119,8 +143,12 @@ export function buildCatalogue(source: CatalogueSource): CatalogueData & { recor
 }
 
 /** The discipline a mapping names, an error where there is none. */
-function disciplineOf(disciplines: Map<string, Discipline>, m: { id: string; discipline: string }) {
-  const d = disciplines.get(m.discipline)
+function disciplineOf(
+  disciplines: Map<string, Discipline>,
+  m: { id: string; discipline: string },
+  now: (kind: RenameKind, id: string) => string,
+) {
+  const d = disciplines.get(now('disciplines', m.discipline))
   if (!d) throw new Error(`${m.id}: unknown discipline ${m.discipline}`)
   return d
 }

@@ -9,7 +9,7 @@
 - Doc comments: `npm run docs:check` (after `build`)
   - TypeDoc `validation.notDocumented`, warnings as errors, on every export of schema, core, drawing, importers, data and api. Not on properties, constructors, parameters and references. Without `notExported`.
   - Configured in `packages/<name>/typedoc.json`, the shared options in `packages/typedoc.base.json`.
-  - A variable type, parameter type or return type of an exported variable or function that renders longer than 100 characters fails (`apps/docs/check.mjs`): give it a named type or interface. Zod schemas and Drizzle tables are exempt, their doc comment links the inferred type.
+  - A variable type, parameter type or return type of an exported variable or function that renders longer than 100 characters fails (`apps/docs/check.mjs`): give it a named type or interface. Zod schemas are exempt, their doc comment links the inferred type.
 - Test schema, core, importers, drawing, data, api, web, the docs checks, the tools and the e2e script helpers: `npm test`
 - Validate data records: `npm run data:validate`
 - Docs site (Docusaurus, `apps/docs`): `npm run site:build -w @open-reloading/docs` (after `build`)
@@ -30,7 +30,7 @@
 - Pages edition (GitHub Pages, no server): `apps/web/AGENTS.md`, Pages edition.
 - One workspace: `npm run <script> -w @open-reloading/<name>`
 - CI (`.github/workflows/ci.yml`) runs the checks above except the docs site build and the Pages edition.
-  - `e2e` runs against `docker compose up db api web`, runs the drawing pixel baseline in the Playwright image (`npm run drawing-baseline -w @open-reloading/e2e`), builds the web app against that API, then runs `node apps/web/scripts/check-prerender.mts` and `npm run e2e:smoke` against that build.
+  - `e2e` runs against `docker compose up api web`, runs the drawing pixel baseline in the Playwright image (`npm run drawing-baseline -w @open-reloading/e2e`), builds the web app against that API, then runs `node apps/web/scripts/check-prerender.mts` and `npm run e2e:smoke` against that build.
   - On a pull request the `changes` job (`apps/web/scripts/ci-plan.mts`) can skip the `check` job (only prose changed), the `e2e` job (no change to what the API, the web app or the e2e specs read) or that web build (no change to the web app or what it builds from). It can build with `PRERENDER=sample` (no change to record data, record page code or the packages they read). The Turbopack cache (`apps/web/.next/cache/turbopack`) is restored.
   - A push to the default branch or any doubt builds from nothing, every record page prerendered and checked in full.
 - Other workflows: `release.yml` (release-please, images, `apps/docs/docs/release.md`), `pages.yml` (Pages edition), `pr-title.yml`, `scorecard.yml`. Tools, rules and their free terms: `apps/docs/docs/ci-tools.md`.
@@ -64,7 +64,6 @@
 
 ## Environment
 
-- `DATABASE_URL`: PostgreSQL connection string (`.env.example` holds the local one). The API server reads it from the process environment. `npm start -w @open-reloading/api` also loads the root `.env`, where the environment does not set it.
 - `API_URL`: base URL of the API for e2e tests, the web app (read at build time for static pages and at run time) and the link of the docs REST API page (site build).
 - `WEB_URL`: base URL of the web app for the e2e browser tests.
 - `NEXT_PUBLIC_REPOSITORY_URL`: URL of the public source repository, inlined at web build time (no Dockerfile `ARG`). Unset (`apps/web/src/lib/repository-url.ts`): no repository link in the header or the drawer. Set only by `pages.yml`, to the repository the workflow runs in.
@@ -79,8 +78,8 @@
 
 ## Containers
 
-- `compose.yaml`: `db` (postgres:18), `api` (`packages/api/Dockerfile`, port 3000), `web` (`apps/web/Dockerfile`, port 3001) and `docs` (`apps/docs/Dockerfile`, the static site on nginx, port 3002). Build context is the repository root. Run: `docker compose up` or `podman compose up`.
-- `.devcontainer/`: Node 26 dev container plus PostgreSQL. `DATABASE_URL` points at service `db`.
+- `compose.yaml`: `api` (`packages/api/Dockerfile`, port 3000), `web` (`apps/web/Dockerfile`, port 3001) and `docs` (`apps/docs/Dockerfile`, the static site on nginx, port 3002). Build context is the repository root. Run: `docker compose up` or `podman compose up`.
+- `.devcontainer/`: Node 26 dev container.
   - Rootless podman only: the `app` service sets `userns_mode: keep-id`, which Docker Engine does not accept.
   - `initializeCommand` writes `.devcontainer/.env` (git-ignored), so the workspace and, in a git worktree, the shared git directory are mounted at their host paths.
 - The image adds the Mantine MCP server, Playwright MCP with Chromium and the Chromium headless shell of the e2e `@playwright/test` version, both in `/ms-playwright`.

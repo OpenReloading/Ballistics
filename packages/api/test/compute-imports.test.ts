@@ -34,7 +34,7 @@ describe('compute entry', () => {
   })
 
   it('names a runtime import outside the allowed packages', () => {
-    expect(imports('static.ts').found).toContain('static.ts: @electric-sql/pglite')
+    expect(imports('app.ts').found).toContain('app.ts: fastify')
   })
 })
 

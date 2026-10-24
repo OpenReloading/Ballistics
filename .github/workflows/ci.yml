@@ -107,7 +107,7 @@ jobs:
         working-directory: apps/e2e
       # specs import web sources, which import the workspace packages from their dist/
       - run: npm run build -w @open-reloading/schema && npm run build -w @open-reloading/importers && npm run build -w @open-reloading/core && npm run build -w @open-reloading/drawing
-      - run: docker compose up --detach --build db api web
+      - run: docker compose up --detach --build api web
       - name: Wait for the API and the web app
         run: |
           for _ in $(seq 1 60); do

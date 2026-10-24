@@ -24,13 +24,13 @@ const ladderBudgetMs = 14_000
 const ladderPoints = 5 * maxPoints
 
 /**
- * The compute runner and the cartridge lookup an interior request reads. The lookup rejects an
+ * The compute runner and the cartridge lookup an interior request reads. The lookup fails an
  * unknown id with a 404 error.
  */
 export type InteriorContext = {
   compute: ComputeRunner
   /** The cartridge record `id` with its values. */
-  findCartridge: (id: string) => Promise<CartridgeWithSpecs>
+  findCartridge: (id: string) => CartridgeWithSpecs | Promise<CartridgeWithSpecs>
 }
 
 type ResolvedCartridge = ReturnType<typeof limitCheck>['cartridge']

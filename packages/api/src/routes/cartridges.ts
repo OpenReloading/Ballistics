@@ -1,9 +1,16 @@
-import { cartridge, caseCapacity, caseTypes } from '@open-reloading/schema'
+import {
+  type Cartridge,
+  type CaseCapacity,
+  type CaseType,
+  cartridge,
+  caseCapacity,
+  caseTypes,
+} from '@open-reloading/schema'
 import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
-import type { Db } from '../db/index.ts'
-import { type CartridgeListParams, getCartridge, listCartridges } from '../db/queries.ts'
-import { idParams, listQuery, noNul } from './common.ts'
+import { cartridgeItem } from '../catalogue/derive.ts'
+import type { CartridgeQuery, Catalogue } from '../catalogue/types.ts'
+import { idParams, listQuery, missing, noNul, stored } from './common.ts'
 
 const cartridgeQuery = listQuery({
   table: {
@@ -16,7 +23,7 @@ const cartridgeQuery = listQuery({
 })
 
 // response bodies for the contract document (`openapi.ts`), from the record schemas
-// the table holds an empty list for a cartridge without aliases
+// a record without aliases answers an empty list
 const aliases = z.array(cartridge.shape.aliases.unwrap().element)
 const mm = z.number().optional()
 
@@ -46,10 +53,38 @@ const cartridgeResponse = cartridge.extend({
   capacities: z.array(caseCapacity),
 })
 
+/** The body of `GET /cartridges/:id`: the record, its aliases, case type and case capacities. */
+export interface CartridgeAnswer extends Cartridge {
+  aliases: string[]
+  caseType?: CaseType
+  capacities: CaseCapacity[]
+}
+
+/**
+ * The body of `GET /cartridges/:id`: the stored record with its aliases (empty where it has none),
+ * case type and case capacities. Undefined for an unknown id. The Pages edition's data files hold
+ * the same body.
+ */
+export function cartridgeAnswer(catalogue: Catalogue, id: string): CartridgeAnswer | undefined {
+  const found = catalogue.get('cartridge', id)
+  if (!found) return
+  const record = stored(found)
+  const { caseType } = cartridgeItem(record)
+  return {
+    ...record,
+    aliases: record.aliases ?? [],
+    ...(caseType && { caseType }),
+    capacities: catalogue.capacities(record.id).map(stored),
+  }
+}
+
 /** `GET /cartridges` and `GET /cartridges/:id`. */
 // biome-ignore lint/suspicious/useAwait: FastifyPluginAsync returns a promise
-export const cartridgeRoutes: FastifyPluginAsync<{ db: Db }> = async (app, { db }) => {
-  app.get<{ Querystring: CartridgeListParams }>(
+export const cartridgeRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = async (
+  app,
+  { catalogue },
+) => {
+  app.get<{ Querystring: CartridgeQuery }>(
     '/cartridges',
     {
       schema: { querystring: cartridgeQuery },
@@ -57,10 +92,10 @@ export const cartridgeRoutes: FastifyPluginAsync<{ db: Db }> = async (app, { db 
         response: listResponse,
         summary: 'List cartridges',
         description:
-          'A page of cartridges ordered by name. `q` matches names and aliases. Each item carries its smallest CIP bullet, bore and groove diameters, case and cartridge lengths (mm), its highest Pmax (bar) and the case type from its rim and belt dimensions.',
+          'A page of cartridges ordered by name, digit runs in numeric order. `q` keeps the cartridges whose name or alias holds every word of it, in any order, and ranks them by match (a word that starts a word of the name first), ties in the default order. Each item carries its smallest CIP bullet, bore and groove diameters, case and cartridge lengths (mm), its highest Pmax (bar) and the case type from its rim and belt dimensions.',
       },
     },
-    async (request) => listCartridges(db, request.query),
+    (request, reply) => reply.send(catalogue.cartridges(request.query)),
   )
 
   app.get<{ Params: { id: string } }>(
@@ -70,15 +105,16 @@ export const cartridgeRoutes: FastifyPluginAsync<{ db: Db }> = async (app, { db 
       config: {
         response: cartridgeResponse,
         errors: [404],
+        moved: true,
         summary: 'Get a cartridge',
         description:
           'The cartridge record of its C.I.P. sheet with its values, provenance, case type and case capacities.',
       },
     },
-    async (request, reply) => {
-      const cartridge = await getCartridge(db, request.params.id)
-      if (!cartridge) return reply.notFound(`cartridge ${request.params.id} not found`)
-      return cartridge
+    (request, reply) => {
+      const answer = cartridgeAnswer(catalogue, request.params.id)
+      if (!answer) return missing(reply, catalogue, 'cartridges', request.params.id, 'cartridge')
+      return reply.send(answer)
     },
   )
 }

@@ -32,13 +32,3 @@ updates:
         update-types: [version-update:semver-major]
       - dependency-name: '*typescript-node'
         update-types: [version-update:semver-major]
-  - package-ecosystem: docker-compose
-    directories: [/, /.devcontainer]
-    schedule:
-      interval: weekly
-    cooldown:
-      default-days: 7
-    ignore:
-      # a PostgreSQL major needs a dump and restore of the volume
-      - dependency-name: postgres
-        update-types: [version-update:semver-major]
