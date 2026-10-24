@@ -13,7 +13,7 @@ No server database for the catalogue. A typed index and a record file are built 
 
 What decides it is not speed, since every option answers in under 3 ms at this size, but:
 
-1. **Parity.** One implementation of list, filter, search, ranking and order runs in Node and in the browser. The server answered `q` with SQL `ilike`, the Pages edition with a lower-case `includes` over `search.json` (`apps/web/src/lib/static-api.ts`) and the web lists with `matchesQuery` (`apps/web/src/lib/lists.ts`): three matchers that disagreed. All three now use the schema's matcher: the API through the catalogue, the Pages edition over the search keys of the index that `search.json` holds, the lists through `matchesQuery`. A `q` of spaces only is no query. The bullet list's own word-start rule (`bulletMatches`) stays until the record pickers use the ranker.
+1. **Parity.** One implementation of list, filter, search, ranking and order runs in Node and in the browser. The server answered `q` with SQL `ilike`, the Pages edition with a lower-case `includes` over a per-kind search file (`apps/web/src/lib/static-api.ts`) and the web lists with `matchesQuery` (`apps/web/src/lib/lists.ts`): three matchers that disagreed. All three now use the schema's matcher: the API through the catalogue, the Pages edition through `openCatalogue` over `catalogue/index.json`, the lists through `matchesQuery`. A `q` of spaces only is no query. The bullet list's own word-start rule (`bulletMatches`) stays until the record pickers use the ranker.
 2. **Three defects a database does not fix.** The JIT cost of PostgreSQL at default settings, two sort orders between the editions, and word-order dependent search.
 3. **Deletion.** The SQL layer, the in-browser database path of the static build, the seed lock, the database service of `compose.yaml` and of the dev container, the `DATABASE_URL` variable and the database packages are gone from code, containers, CI and docs. This page keeps the measurements and the fallback schema below.
 
@@ -42,6 +42,14 @@ Checks in `packages/api/test/`: `catalogue.test.ts` (derive, build, open, files)
 
 The budgets, tested as the best of fifteen runs after a warm-up (other test files share the CPU): the index of the public bundle from its records in under 50 ms, from the prebuilt index text in under 9 ms, a ranked page of 50 cartridges in under 5 ms. Measured on the public bundle (577 cartridges, one machine): about 10 ms from the records, 1 ms from the prebuilt index (460 kB, the record file is 3.6 MB and read on the first `get`).
 
+## The Pages edition
+
+`writeStaticApi` (`packages/api/src/static.ts`) writes `api/catalogue/index.json`, the index as `buildCatalogue` returns it (the record file stays out: 3.6 MB, read only on `get`), and one file per record, `api/<kind>/<id>.json`, the body of `GET /<kind>/<id>`; both editions build the cartridge body with `cartridgeAnswer`. The browser fetches the index once, opens it with `openCatalogue` and answers every list, with its filters, `q`, paging and order, through the catalogue (`apps/web/src/lib/static-api.ts`). A record is one file fetch. There are no per-kind list files, no `search.json` and no per-cartridge bullet lists: the `cartridge` filter of the bullets runs `bulletWindow` over the index.
+
+In the public data the index is 460 kB (62 kB gzipped). `catalogue-budget.test.ts` caps it at 600 kB and 80 kB gzipped. The Pages service worker precaches it with the build's static files and answers it from the shell cache (`apps/web/src/lib/offline.ts`), so a list opens offline after the first visit and the index always belongs to its build.
+
+`apps/web/test/static-api.test.ts` compares the Pages answers with the API's for every list, paging, filters, ranked queries in both word orders, the default order and the refusals of the query schemas.
+
 ## Triggers for the fallback
 
 The interface stays, only the module that opens the catalogue changes: user entities on the server (accounts, shared records), more than about 200,000 rows or an index over about 200 MB, or ad-hoc relational queries over specification values. SQLite (read-only file, `node:sqlite`) comes first, PostgreSQL second. Both read the same `search` and `sort_key` columns, computed in JavaScript by the functions below, so SQL and the matcher cannot disagree.
@@ -50,7 +58,7 @@ The interface stays, only the module that opens the catalogue changes: user enti
 
 Each row has one `sortKey` string, compared by UTF-16 code unit (`compareKeys` in `packages/schema/src/order.ts`). It is the folded names joined by U+001F, every run of digits padded to 8 digits, so "9 mm" sorts before "10 mm" without locale data. The key is identical in Node, the browser and SQL (`collate "C"`).
 
-The server edition ordered by `name, id` under the container's locale and the Pages edition's data files by `C` collation; for the 577 cartridges 501 positions differed between the two. The web tables sorted by `Intl.Collator`, a third order that depends on the browser's ICU data; they now sort text by `sortKey` too (`sortRows` in `apps/web/src/lib/lists.ts`); the API default order follows it, and so do the Pages edition's data files, which `writeStaticApi` writes from the API.
+The server edition ordered by `name, id` under the container's locale and the Pages edition's data files by `C` collation; for the 577 cartridges 501 positions differed between the two. The web tables sorted by `Intl.Collator`, a third order that depends on the browser's ICU data; they now sort text by `sortKey` too (`sortRows` in `apps/web/src/lib/lists.ts`); the API default order follows it, and so does the Pages edition, which lists from the same catalogue index.
 
 ## One matcher and ranker
 
@@ -64,7 +72,7 @@ So `win 308` and `308 win` give the same rows with the same scores, and `.308`, 
 
 ## Behaviour changes for the editions
 
-In effect on the server edition and, through its data files, on the Pages edition. Non-breaking for the schema, visible in data: the default list order changes from the locale collation to `sortKey` order on the server edition, `q` becomes ranked and independent of word order, and `q` matches the compact form ("8x57"). The contract version does not change.
+In effect on the server edition and on the Pages edition, which runs the same list code. Non-breaking for the schema, visible in data: the default list order changes from the locale collation to `sortKey` order on the server edition, `q` becomes ranked and independent of word order, and `q` matches the compact form ("8x57"). The contract version does not change.
 
 ## Fallback schema (PostgreSQL 18, also PGlite)
 
