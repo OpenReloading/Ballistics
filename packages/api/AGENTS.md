@@ -68,10 +68,10 @@ Compute (`src/routes/compute.ts`):
 
 ## Commands (this directory, or `-w @openreloading/api` from the root)
 
-- Build: `npm run build` (output `dist/`, with `dist/schema.json`: the DDL of `src/db/schema.ts` from `drizzle-kit export --output json`, and `dist/catalogue/index.json` and `records.json`)
+- Build: `npm run build` (output `dist/`, with `dist/catalogue/index.json` and `records.json`)
 - Dev server: `npm run dev` (Node runs `src/server.ts` directly, restarts on change)
 - Start: `npm start` (`HOST`, `PORT`, default `0.0.0.0:3000`; needs the build's catalogue files, else builds the catalogue from the data bundle)
-- Test: `npm test` (Vitest, `app.inject` over a catalogue built from synthetic records, no server needed; the SQL layer's own tests use PGlite)
+- Test: `npm test` (Vitest, `app.inject` over a catalogue built from synthetic records, no server needed)
 - Single test: `npx vitest run <file> -t "<name>"`
 - Type check: `npm run typecheck`
 
@@ -79,12 +79,11 @@ Compute (`src/routes/compute.ts`):
 
 - Relative imports end in `.ts`. `tsc` rewrites them to `.js`. Only erasable TypeScript syntax (no enums, no namespaces), because Node strips types without compiling.
 - Errors (`src/app.ts`): a 4xx answer keeps its message. Any other error answers 500 `{ statusCode, error, message: 'internal server error', requestId }`, without the error's text. The error goes to the server log under that `reqId`.
-- The SQL layer (`src/db/`) answers no route any more; it stays for its parity tests until it is removed. Schema: `src/db/schema.ts`. Client: `src/db/index.ts`. At start `ensureTables` (`src/db/build.ts`) compares the sha256 of the statements in `dist/schema.json` with the one in `bundle_state`. On a mismatch, or a database without it, it drops the tables the statements create (other tables stay) and runs the statements in one transaction. The seed loads the bundle. After a schema change, run the root `npm run build`. Nothing else is committed.
-- Edit records in `packages/data`, never in the catalogue files or the SQL tables.
+- Edit records in `packages/data`, never in the catalogue files.
 - Read endpoints leave out null fields, as records do (absent means unknown). Compute responses keep the core result shape, where `null` means "not defined".
 - Trajectory, truing and interior run on a `node:worker_threads` pool (`src/compute/pool.ts`, tasks in `src/compute/tasks.ts`, entry `src/compute/worker.ts`) with a 5 s deadline per task from submit. The worker of a task past its deadline is terminated. Stability runs on the main thread. Errors cross the thread boundary as plain objects and are rebuilt into `TruingError`, `InputError` or `Error`. Tests that mock core pass `buildApp({ catalogue, compute: inlineRunner })`.
 - The step and count caps in `src/compute/schemas.ts` (per integration, for truing also the iteration cap and the step total over all its trajectories) bound the work of a request. An interior run is at most 13 model runs with its range. A ladder runs that per step, up to 21 steps, in batches of 4 within 14 s and at most 100000 output points: no batch starts once the steps run so far are above it (`compute/interior-run.ts`).
 - `@openreloading/api/compute` (`src/compute/browser.ts`): `runInterior`, `runChargeTarget` (record lookups passed in), the body schemas, `errorAnswer` and the task runner without Fastify, the database or Node APIs. The web app's Pages edition runs it in the browser. At run time it imports only core, schema and zod (`test/compute-imports.test.ts`). The web image builds only it (`tsconfig.compute.json`).
 - `@openreloading/api/static` (`src/static.ts`, build time only): `startBundleApi` (this API over the catalogue of the bundle, compute in its thread) and `writeStaticApi` (the read answers as the Pages edition's data files).
-- `@openreloading/api/catalogue` (`src/catalogue/browser.ts`): the in-process catalogue (`buildCatalogue`, `openCatalogue`, the `Catalogue` interface) without Node APIs, imports core and schema only (`test/compute-imports.test.ts`). `src/catalogue/node.ts` reads and writes its index and record file, which `npm run build` writes into `dist/catalogue/` (`write.ts`). The routes and the compute lookups read it; `test/catalogue-parity.test.ts` holds it to the SQL layer's answers (items, record bodies, the order of the competition lists). Design: `apps/docs/docs/data/catalogue-storage.md`.
+- `@openreloading/api/catalogue` (`src/catalogue/browser.ts`): the in-process catalogue (`buildCatalogue`, `openCatalogue`, the `Catalogue` interface) without Node APIs, imports core and schema only (`test/compute-imports.test.ts`). `src/catalogue/node.ts` reads and writes its index and record file, which `npm run build` writes into `dist/catalogue/` (`write.ts`). The routes and the compute lookups read it. Design: `apps/docs/docs/data/catalogue-storage.md`.
 - Dockerfile build context is the repository root: `docker build -f packages/api/Dockerfile .`
