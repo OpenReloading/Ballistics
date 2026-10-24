@@ -1,4 +1,11 @@
-import { cartridge, caseCapacity, caseTypes } from '@openreloading/schema'
+import {
+  type Cartridge,
+  type CaseCapacity,
+  type CaseType,
+  cartridge,
+  caseCapacity,
+  caseTypes,
+} from '@openreloading/schema'
 import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
 import { cartridgeItem } from '../catalogue/derive.ts'
@@ -46,12 +53,19 @@ const cartridgeResponse = cartridge.extend({
   capacities: z.array(caseCapacity),
 })
 
+/** The body of `GET /cartridges/:id`: the record, its aliases, case type and case capacities. */
+export interface CartridgeAnswer extends Cartridge {
+  aliases: string[]
+  caseType?: CaseType
+  capacities: CaseCapacity[]
+}
+
 /**
  * The body of `GET /cartridges/:id`: the stored record with its aliases (empty where it has none),
  * case type and case capacities. Undefined for an unknown id. The Pages edition's data files hold
  * the same body.
  */
-export function cartridgeAnswer(catalogue: Catalogue, id: string) {
+export function cartridgeAnswer(catalogue: Catalogue, id: string): CartridgeAnswer | undefined {
   const found = catalogue.get('cartridge', id)
   if (!found) return
   const record = stored(found)
