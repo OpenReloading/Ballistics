@@ -188,7 +188,7 @@ export const interiorSources = [
  */
 export const exampleFirearm = {
   kind: 'firearm',
-  id: 'example-rifle-308',
+  id: '3b7e6d1c-5a2f-4e0b-8c94-1d6f0a9b2e57',
   name: 'Example rifle, 308 Win.',
   saved: '2026-10-14T00:00:00.000Z',
   data: {
