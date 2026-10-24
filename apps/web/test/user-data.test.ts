@@ -26,7 +26,7 @@ const bullet: UserRecord = {
   saved,
   data: {
     origin: 'user',
-    manufacturerName: 'Example',
+    manufacturer: 'catalogue:example-a',
     overrides: {
       name: '168 gr',
       diameter: { value: 7.82 },

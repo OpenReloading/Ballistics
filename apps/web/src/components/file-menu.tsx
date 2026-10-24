@@ -94,6 +94,7 @@ const keyed = (id: ShortcutId) => ({
 })
 
 const kindNames: Record<UserRecordKind, string> = {
+  manufacturer: 'manufacturers',
   bullet: 'bullet designs',
   cartridge: 'cartridge designs',
   workbenchState: 'loads',

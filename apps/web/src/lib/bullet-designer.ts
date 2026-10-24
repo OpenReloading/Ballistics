@@ -108,14 +108,16 @@ const noChoices: Choices = { 'base.type': '', 'ogive.form': '', 'tip.type': '' }
 export interface Origin {
   id: string
   title: string
-  manufacturerName: string
+  /** The base's manufacturer, `catalogue:<id>`. */
+  manufacturer: string
   name: string
   si: Record<string, number | undefined>
   choices: Choices
 }
 
 export interface Design {
-  manufacturerName: string
+  /** The manufacturer, `catalogue:<id>` or `user:<id>`; undefined while none is named. */
+  manufacturer?: string
   name: string
   choices: Choices
   fields: Fields
@@ -168,21 +170,18 @@ function valuesOf(r: Partial<Bullet>): Pick<Origin, 'si' | 'choices'> {
   }
 }
 
-/** The origin a design is measured against: a catalogue bullet, the manufacturer's name from `names`. */
+/** The origin a design is measured against: a catalogue bullet, titled with the manufacturer's name from `names`. */
 function originOf(r: Bullet, names: ManufacturerNames): Origin {
   return {
     id: r.id,
     title: productLabel(r, names),
-    manufacturerName: names.get(r.manufacturer) ?? '',
+    manufacturer: `catalogue:${r.manufacturer}`,
     name: r.name,
     ...valuesOf(r),
   }
 }
 
-/**
- * The design of a catalogue record, every stored value from the catalogue; the manufacturer's name
- * from `names`.
- */
+/** The design of a catalogue record, every stored value from the catalogue; `names` title it. */
 export function fromRecord(
   r: Bullet,
   system: UnitSystem,
@@ -194,7 +193,7 @@ export function fromRecord(
 /** The design of an origin as stored, as on a reset. */
 function fromOrigin(origin: Origin, system: UnitSystem): Design {
   return {
-    manufacturerName: origin.manufacturerName,
+    manufacturer: origin.manufacturer,
     name: origin.name,
     choices: { ...origin.choices },
     fields: Object.fromEntries(
@@ -219,7 +218,7 @@ export function fromUser(
   const { si, choices } = valuesOf(record)
   const origin = base.status === 'found' ? originOf(base.record, names) : undefined
   return {
-    manufacturerName: data.manufacturerName,
+    ...(data.manufacturer && { manufacturer: data.manufacturer }),
     name: record.name ?? '',
     choices: { ...noChoices, ...choices },
     fields: Object.fromEntries(designerSpecs.map((s) => [s.key, fieldOf(system, s, si[s.key])])),
@@ -233,12 +232,12 @@ export function fromUser(
 const storedOf = (s: FieldSpec, si: number) => Number(siToStored(stored(s), si).toPrecision(12))
 
 /**
- * The user bullet a design saves: its manufacturer name, the base and the overrides, which are the
+ * The user bullet a design saves: its manufacturer, the base and the overrides, which are the
  * fields that differ from the base (a field cleared against a base value is `null`). Without a base
  * every given field is an override. A read only design gives its stored data back.
  */
 export function fileData({
-  manufacturerName,
+  manufacturer,
   name,
   choices,
   fields,
@@ -261,7 +260,7 @@ export function fileData({
   if (name !== (origin?.name ?? '')) overrides.name = name || null
   return {
     origin: 'user',
-    manufacturerName,
+    ...(manufacturer && { manufacturer }),
     ...(basedOn && { basedOn }),
     ...(Object.keys(overrides).length > 0 && { overrides: overrides as UserBullet['overrides'] }),
   }
@@ -276,7 +275,7 @@ export function designShape(
   system: UnitSystem,
 ): BulletDimensions | undefined {
   if (problem || record.length === undefined) return
-  const design = fromUser({ origin: 'user', manufacturerName: '' }, { base, record }, system)
+  const design = fromUser({ origin: 'user' }, { base, record }, system)
   return evaluate(design, system).drawing?.shape
 }
 
@@ -286,7 +285,6 @@ const newBulletStart = { diameter: 0.308 * metersPerInch, mass: 168 * kilogramsP
 /** A new bullet: the caliber and mass of `from` (else the start values), every other field empty. */
 export function newDesign(system: UnitSystem, from?: Design): Design {
   return {
-    manufacturerName: '',
     name: '',
     choices: { ...noChoices },
     fields: Object.fromEntries(
@@ -305,7 +303,8 @@ export { historyOf } from './history.ts'
 
 export type Action =
   | { type: 'field'; key: string; value: FieldValue }
-  | { type: 'text'; key: 'manufacturerName' | 'name'; value: string }
+  | { type: 'text'; key: 'name'; value: string }
+  | { type: 'manufacturer'; value: string | undefined }
   | { type: 'choice'; key: ChoiceKey; value: string }
   | { type: 'start'; design: Design }
   | { type: 'new'; system: UnitSystem }
@@ -318,6 +317,8 @@ export function reduce(h: History, a: Action): History {
   switch (a.type) {
     case 'text':
       return editHistory(h, { ...h.present, [a.key]: a.value }, a.key)
+    case 'manufacturer':
+      return editHistory(h, { ...h.present, manufacturer: a.value }, 'manufacturer')
     case 'choice':
       // one step per choice; the choice is the field edited last, where a refusal naming it shows
       return pushHistory(

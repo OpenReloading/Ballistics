@@ -3,6 +3,7 @@ import { z } from 'zod'
 import {
   checkUserRefs,
   firearm,
+  type UserRecord,
   units,
   userDataFile,
   userDataFormat,
@@ -20,7 +21,7 @@ const bulletRecord = {
   saved,
   data: {
     origin: 'user',
-    manufacturerName: 'Manufacturer',
+    manufacturer: 'catalogue:test-maker',
     basedOn: 'catalogue:alpha-30425',
     overrides: {
       name: '168 gr',
@@ -29,6 +30,13 @@ const bulletRecord = {
       base: { type: 'boat-tail', angle: null },
     },
   },
+} as const
+const manufacturerRecord = {
+  kind: 'manufacturer',
+  id: uuid,
+  name: 'Home Loader',
+  saved,
+  data: { origin: 'user' },
 } as const
 const cartridgeRecord = {
   kind: 'cartridge',
@@ -60,7 +68,6 @@ const firearmRecord = {
     origin: 'user',
     name: 'Range rifle',
     manufacturer: 'catalogue:test-maker',
-    manufacturerName: 'Manufacturer',
     cartridge: 'catalogue:308-win',
     barrelLength: { value: 610 },
     twist: { value: 254 },
@@ -146,9 +153,41 @@ describe('userDataFile', () => {
   it('accepts every record kind', () => {
     expect(
       userDataFile.safeParse(
-        file([bulletRecord, cartridgeRecord, loadRecord, firearmRecord, sheetRecord, faceRecord]),
+        file([
+          manufacturerRecord,
+          bulletRecord,
+          cartridgeRecord,
+          loadRecord,
+          firearmRecord,
+          sheetRecord,
+          faceRecord,
+        ]),
       ).success,
     ).toBe(true)
+  })
+
+  it('takes a user manufacturer as a name and refuses another origin', () => {
+    expect(userRecord.parse(manufacturerRecord)).toEqual(manufacturerRecord)
+    const shared = { ...manufacturerRecord, data: { origin: 'shared' } }
+    expect(userRecord.safeParse(shared).error?.issues[0].path).toEqual(['data', 'origin'])
+  })
+
+  it('refuses the manufacturer name of an older bullet or firearm', () => {
+    const named = (r: { data: object }) => ({
+      ...r,
+      data: { ...r.data, manufacturerName: 'Maker' },
+    })
+    for (const r of [bulletRecord, firearmRecord])
+      expect(userRecord.safeParse(named(r)).success).toBe(false)
+  })
+
+  it('takes a manufacturer reference of either scope and refuses a plain text', () => {
+    const maker = (manufacturer: string) =>
+      userRecord.safeParse({ ...firearmRecord, data: { ...firearmRecord.data, manufacturer } })
+        .success
+    expect(maker('catalogue:alpha-powder')).toBe(true)
+    expect(maker(`user:${uuid}`)).toBe(true)
+    expect(maker('Alpha Powder')).toBe(false)
   })
 
   it('takes a face draft with missing values and rejects a non-positive size', () => {
@@ -167,10 +206,10 @@ describe('userDataFile', () => {
       expect(basedOn(bad)).toBe(false)
   })
 
-  it('saves a variant of a bullet without a base, a mass or a manufacturer id', () => {
+  it('saves a variant of a bullet without a base, a mass or a manufacturer', () => {
     const alone = {
       ...bulletRecord,
-      data: { origin: 'user', manufacturerName: '', overrides: { diameter: { value: 7.82 } } },
+      data: { origin: 'user', overrides: { diameter: { value: 7.82 } } },
     }
     expect(userRecord.parse(alone)).toEqual(alone)
     const bare = { ...cartridgeRecord, data: { origin: 'user' } }
@@ -500,10 +539,9 @@ describe('firearm', () => {
     expect(userRecord.safeParse({ ...firearmRecord, data: rest }).success).toBe(false)
   })
 
-  it('takes a catalogue maker only, and one schema for every origin', () => {
-    expect(paths({ manufacturer: 'user:2f6c1f3e-9b5a-4a8e-8f21-3c1d7a5b9e10' })).toEqual([
-      'data.manufacturer',
-    ])
+  it('takes a maker reference of either scope, and one schema for every origin', () => {
+    expect(paths({ manufacturer: 'user:2f6c1f3e-9b5a-4a8e-8f21-3c1d7a5b9e10' })).toBeUndefined()
+    expect(paths({ manufacturer: 'Maker' })).toEqual(['data.manufacturer'])
     for (const origin of ['catalogue', 'user', 'shared'])
       expect(firearm.safeParse({ ...firearmRecord.data, origin }).success).toBe(true)
     expect(paths({ origin: 'cloud' })).toEqual(['data.origin'])
@@ -572,6 +610,22 @@ describe('checkUserRefs', () => {
     expect(checkUserRefs([userRecord.parse(loadRecord), userRecord.parse(bulletRecord)])).toEqual(
       [],
     )
+  })
+
+  it('reports a bullet or firearm whose user manufacturer nobody answers', () => {
+    const records = [userRecord.parse(bulletRecord), userRecord.parse(firearmRecord)].map((r) => ({
+      ...r,
+      data: { ...r.data, manufacturer: `user:${uuid}` },
+    })) as UserRecord[]
+    expect(checkUserRefs(records).map((d) => [d.kind, d.field, d.target])).toEqual([
+      ['bullet', 'manufacturer', `user:${uuid}`],
+      ['firearm', 'manufacturer', `user:${uuid}`],
+    ])
+    const answered = userRecord.parse(manufacturerRecord)
+    expect(checkUserRefs([...records, answered])).toEqual([])
+    // a catalogue manufacturer is the catalogue's to answer
+    const own = { ...records[0], data: { ...records[0]?.data, manufacturer: 'catalogue:beta' } }
+    expect(checkUserRefs([own as UserRecord])).toEqual([])
   })
 
   it('reports a load whose cartridge or bullet is a user reference nobody answers', () => {

@@ -106,6 +106,18 @@ describe('readRecords', () => {
     )
   })
 
+  it('reports a chronograph device whose manufacturer is no record', () => {
+    const errors = errorsAfter((root) => {
+      const path = join(root, 'chrono', 'test-session.json')
+      const session = JSON.parse(readFileSync(path, 'utf8'))
+      session.device.manufacturer = 'catalogue:missing-device-maker'
+      writeFileSync(path, JSON.stringify(session))
+    })
+    expect(errors).toContain(
+      'chrono/test-session.json: unknown device.manufacturer "missing-device-maker"',
+    )
+  })
+
   it('resolves source references with the parts of the record', () => {
     const { bundle } = readRecords(join(fixtures, 'valid'))
     expect(bundle.federations[0].ruleBooks[0]).toEqual({

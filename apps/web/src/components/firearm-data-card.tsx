@@ -14,12 +14,15 @@ const kindLabel = (k: Optic['kind']) => opticKinds.find((o) => o.value === k)?.l
 export function DataCard({
   f,
   cartridge,
+  manufacturer,
   system,
   opticName,
   title = true,
 }: {
   f: Firearm
   cartridge?: string
+  /** The name of the maker, `f.manufacturer` resolved. */
+  manufacturer?: string
   system: UnitSystem
   opticName: (id: string) => string
   /** The name as its heading; off where the panel's head names the firearm. */
@@ -27,10 +30,7 @@ export function DataCard({
 }) {
   const facts: [string, string | undefined][] = [
     ['Cartridge', cartridge],
-    [
-      'Manufacturer and model',
-      [f.manufacturerName, f.model].filter(Boolean).join(' ') || undefined,
-    ],
+    ['Manufacturer and model', [manufacturer, f.model].filter(Boolean).join(' ') || undefined],
     ...firearmFields.map((s): [string, string | undefined] => {
       if (s.key === 'twist') return [s.label, twistText(f, system)]
       if (s.key === 'roundCount')

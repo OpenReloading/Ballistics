@@ -89,19 +89,23 @@ _Avoid_: maker
 ### Manufacturers
 
 **Manufacturer**:
-A company that makes powders or bullets, a record of kind `manufacturers` with `id`, `name`, `website`, `aliases` and `provenance`. Its id is the slug of its name without the legal form and never changes. Served by `GET /v1/manufacturers` and `GET /v1/manufacturers/{id}`.
+A company that makes powders or bullets, or whose products other records name (a chronograph), a record of kind `manufacturers` with `id`, `name`, `website`, `aliases` and `provenance`. Its id is the slug of its name without the legal form and never changes. Served by `GET /v1/manufacturers` and `GET /v1/manufacturers/{id}`.
 _Avoid_: maker, brand
 
 **Manufacturer reference**:
-`manufacturer`: record id of a manufacturer on powder and bullet records, their list items, the `resolved` parts of compute answers and the list filter `?manufacturer=`.
+`manufacturer`: record id of a manufacturer on powder and bullet records, their list items, the `resolved` parts of compute answers and the list filter `?manufacturer=`. On a user bullet and a firearm it is a reference `catalogue:<id>` or `user:<id>`, on a chronograph `device` a `catalogue:` reference.
 _Avoid_: maker
+
+**User manufacturer**:
+A user record of kind `manufacturer`: `origin` (`user`) in `data`, the name in the record's `name`. Typing a name no catalogue or user manufacturer has creates one; the same name typed again names it.
+_Avoid_: custom manufacturer
 
 **Case manufacturer**:
 `caseManufacturer`: record id of the manufacturer of the case a case capacity was measured with, when the source names one.
 _Avoid_: caseMaker
 
 **Manufacturer name**:
-`manufacturerName`: the manufacturer as free text, where no manufacturer record is referenced: load components (`bullet`, `powder`, `primer`, `case`), a chronograph `device`, a bullet design and, beside the `manufacturer` reference, a firearm.
+`manufacturerName`: the manufacturer as free text on the components of a load (`bullet`, `powder`, `primer`, `case`) and, as the text a chronograph file gives, on an imported session's `device`. A bullet design, a firearm and a stored session hold a reference.
 _Avoid_: maker
 
 **Website**:
@@ -418,7 +422,7 @@ _Avoid_: `barrelLength` (of the workbench field)
 A record of kind `chrono`: one device, one place, one day, with `date`, `device`, `muzzleDistance`, `conditions`, `strings`. Its provenance kind is `measured`.
 
 **Device**:
-`device`: the chronograph of a session, `kind` (`doppler-radar`, `optical`, `magnetic`, `other`), `manufacturerName`, `model` and `firmware`. In a measured series of the user data, the manufacturer and model as one text.
+`device`: the chronograph of a session, `kind` (`doppler-radar`, `optical`, `magnetic`, `other`), `manufacturer` (a `catalogue:` reference), `model` and `firmware`. In a measured series of the user data, the manufacturer and model as one text.
 
 **Muzzle distance**:
 `muzzleDistance`: muzzle to the measuring point of a chronograph, mm in a session, m in a measured series.
@@ -574,7 +578,7 @@ _Avoid_: workbenchLoad
 One entry of `files`: a photo with `id`, media `type` and base64 `data`.
 
 **Bullet design**:
-A user record of kind `bullet`: `origin` (`user`), `manufacturerName`, the `basedOn` catalogue reference and the `overrides` of the bullet fields, in stored units.
+A user record of kind `bullet`: `origin` (`user`), the `manufacturer` reference, the `basedOn` catalogue reference and the `overrides` of the bullet fields, in stored units.
 
 **Cartridge design**:
 A user record of kind `cartridge`: `origin` (`user`), the `basedOn` catalogue reference and `overrides` of the `table` and the spec `values`.
@@ -607,7 +611,7 @@ _Avoid_: `step`, `steps` (of a ladder)
 One entry of `measurements` of a workbench state: one imported chronograph file with `name`, `date`, `device`, `muzzleDistance` (m) and `strings` mapped to charges.
 
 **Firearm**:
-A firearm, one shape for every origin, in stored units (mm, g, degrees; the zero air in degC, bar and %). The user record of kind `firearm` holds `origin`, `name`, `manufacturer` (a `catalogue:` reference), `manufacturerName`, `model`, `cartridge` (a reference), `barrelLength`, `twist`, `twistHand`, `grooveDiameter`, `boreDiameter`, `freebore`, `baseToOgiveAtLands`, `firearmMass`, `roundCount`, `notes`, `optics`, `configurations`, `active` (the configuration on the firearm now). A workbench state names one by its local id in `firearm`, a load by a reference. The `firearm` of exterior bodies is the sight and rifling of one shot.
+A firearm, one shape for every origin, in stored units (mm, g, degrees; the zero air in degC, bar and %). The user record of kind `firearm` holds `origin`, `name`, `manufacturer` (a reference), `model`, `cartridge` (a reference), `barrelLength`, `twist`, `twistHand`, `grooveDiameter`, `boreDiameter`, `freebore`, `baseToOgiveAtLands`, `firearmMass`, `roundCount`, `notes`, `optics`, `configurations`, `active` (the configuration on the firearm now). A workbench state names one by its local id in `firearm`, a load by a reference. The `firearm` of exterior bodies is the sight and rifling of one shot.
 _Avoid_: rifle, gun
 
 **Freebore**:

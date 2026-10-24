@@ -53,6 +53,7 @@ import { BarCount, PageBar } from './page-bar.tsx'
 import { PrintButton } from './record-actions.tsx'
 import { EmptyList, ErrorNote, Loading } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
+import { useManufacturers } from './use-manufacturers.ts'
 import { recordLoadingText, useRecordLink } from './use-record-link.ts'
 
 type FirearmRecord = Extract<UserRecord, { kind: 'firearm' }>
@@ -83,6 +84,7 @@ export function FirearmLibrary() {
   /** Cartridge names by record id: chosen in the search or read from the API. */
   const [cartridgeNames, setCartridgeNames] = useState<Record<string, string>>({})
   const asked = useRef(new Set<string>())
+  const manufacturers = useManufacturers()
   const menu = useRef<FileMenuHandle>(null)
   // a row's link in a new tab: `?record=<id>` opens that firearm
   // the alert line shows alerts only, not the reading of the linked record
@@ -541,6 +543,7 @@ export function FirearmLibrary() {
             setNameLeft={setNameLeft}
             setCartridgeNames={setCartridgeNames}
             cartridgeName={cartridgeName}
+            manufacturers={manufacturers}
             patch={patch}
             setOptic={setOptic}
             setConfig={setConfig}
@@ -555,6 +558,7 @@ export function FirearmLibrary() {
         <DataCard
           f={data}
           cartridge={cartridgeName(data.cartridge)}
+          manufacturer={manufacturers.nameOf(data.manufacturer)}
           system={system}
           opticName={opticName}
         />

@@ -12,6 +12,12 @@ import {
 } from '@openreloading/schema'
 import { fetchRecord } from './api-fetch.ts'
 import type { CartridgeDetail } from './api-types.ts'
+import {
+  fetchManufacturerNames,
+  noManufacturerNames,
+  refName,
+  withUserManufacturers,
+} from './manufacturers.ts'
 
 /** The base record of a variant: none given, read, no longer in the catalogue, or not read. */
 export type Base<T> =
@@ -98,6 +104,8 @@ export interface UserBulletView {
   name: string
   data: UserBullet
   resolved: ResolvedBullet
+  /** The name of the bullet's manufacturer; empty while it is not known. */
+  manufacturerName: string
   /** Mass, diameter and length of the resolved record in SI; absent where it gives none. */
   si: { mass?: number; diameter?: number; length?: number }
 }
@@ -115,6 +123,10 @@ export interface UserCartridgeView {
  * there is left out: it has no values to list or seat, and opens read only in the designer.
  */
 export async function userBullets(records: readonly UserRecord[]): Promise<UserBulletView[]> {
+  const names = withUserManufacturers(
+    await fetchManufacturerNames().catch(() => noManufacturerNames),
+    records,
+  )
   const views = await Promise.all(
     records.map(async (r): Promise<UserBulletView | undefined> => {
       if (r.kind !== 'bullet') return
@@ -128,6 +140,7 @@ export async function userBullets(records: readonly UserRecord[]): Promise<UserB
         name: r.name,
         data: r.data,
         resolved,
+        manufacturerName: refName(names, r.data.manufacturer),
         si: {
           mass: si(mass, 'mass'),
           diameter: si(diameter, 'length'),

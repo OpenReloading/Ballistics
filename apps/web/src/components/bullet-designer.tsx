@@ -37,6 +37,7 @@ import { DesignerField } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
 import { FieldTable } from './field-table.tsx'
 import { FileMenu } from './file-menu.tsx'
+import { ManufacturerInput } from './manufacturer-input.tsx'
 import type { FieldFlag } from './number-field.tsx'
 import { PageBar } from './page-bar.tsx'
 import { PropertyGrid } from './property-grid.tsx'
@@ -45,6 +46,7 @@ import { RecordSearch } from './record-search.tsx'
 import { TechnicalDrawing } from './technical-drawing.tsx'
 import { useDesigner } from './use-designer.ts'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
+import { useManufacturers } from './use-manufacturers.ts'
 import { Workspace } from './workspace.tsx'
 
 const choiceLabels: Record<ChoiceKey, [string, Group]> = {
@@ -149,7 +151,7 @@ const TextField = memo(function TextField({
   value,
   dispatch,
 }: {
-  k: 'manufacturerName' | 'name'
+  k: 'name'
   label: string
   value: string
   dispatch: (a: Action) => void
@@ -188,6 +190,7 @@ const PrintDrawing = memo(function PrintDrawing({
  * it, undo and redo; the last valid drawing stays while the input is refused.
  */
 export function BulletDesigner() {
+  const manufacturers = useManufacturers()
   const { system, history, design, dispatch, loading, fileMenu, start, toolbarDispatch } =
     useDesigner<Design, Action>({
       reduce,
@@ -264,7 +267,9 @@ export function BulletDesigner() {
     </div>
   )
 
-  const title = `Outline, ${productLabel(design) || 'new bullet'}`
+  const labelOf = (d: Design) =>
+    productLabel({ name: d.name, manufacturerName: manufacturers.nameOf(d.manufacturer) })
+  const title = `Outline, ${labelOf(design) || 'new bullet'}`
   const symbols =
     drawing &&
     [...drawing.profile.annotation.dimensions, ...drawing.profile.annotation.radii].map(
@@ -326,7 +331,7 @@ export function BulletDesigner() {
       <FileMenu
         ref={fileMenu}
         kind="bullet"
-        name={productLabel(fileDesign) || 'New bullet'}
+        name={labelOf(fileDesign) || 'New bullet'}
         data={fileValue}
         problem={fileDesign.locked?.reason}
         onOpen={openFile}
@@ -354,11 +359,11 @@ export function BulletDesigner() {
             content:
               g === 'identity' ? (
                 <div className="prop-grid designer-grid">
-                  <TextField
-                    k="manufacturerName"
+                  <ManufacturerInput
                     label="Manufacturer"
-                    value={design.manufacturerName}
-                    dispatch={dispatch}
+                    value={design.manufacturer}
+                    manufacturers={manufacturers}
+                    onChange={(value) => dispatch({ type: 'manufacturer', value })}
                   />
                   <TextField k="name" label="Name" value={design.name} dispatch={dispatch} />
                 </div>
@@ -378,11 +383,12 @@ export function BulletDesigner() {
 
   // print: the drawing and the values, not the form
   const values: FieldRow[] = [
-    ...(['manufacturerName', 'name'] as const).flatMap((k): FieldRow[] =>
-      design[k]
-        ? [{ label: k === 'manufacturerName' ? 'Manufacturer' : 'Name', text: design[k] }]
-        : [],
-    ),
+    ...(
+      [
+        ['Manufacturer', manufacturers.nameOf(design.manufacturer)],
+        ['Name', design.name],
+      ] as const
+    ).flatMap(([label, text]): FieldRow[] => (text ? [{ label, text }] : [])),
     ...(Object.keys(choiceLabels) as ChoiceKey[]).flatMap((k): FieldRow[] =>
       design.choices[k]
         ? [{ label: choiceLabels[k][0], text: optionLabel(design.choices[k]) }]

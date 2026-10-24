@@ -3,7 +3,8 @@ import { recordId } from './ids.ts'
 import { provenance } from './provenance.ts'
 
 /**
- * A company that makes powders or bullets, as its products and site name it. The id is the slug
+ * A company that makes powders or bullets, or whose products other records name (a chronograph
+ * session's device), as its products and site name it. The id is the slug
  * of the name without the legal form and never changes; a renamed manufacturer keeps its id and
  * the old name goes to `aliases`. Model: `apps/docs/docs/data/manufacturers.md`.
  * Inferred type: {@link Manufacturer}.

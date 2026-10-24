@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { catalogueRef, ref } from './ids.ts'
+import { ref } from './ids.ts'
 import { localId, text } from './shared.ts'
 import { quantity } from './units.ts'
 
@@ -106,21 +106,18 @@ const unique = (ids: string[], path: (i: number) => PropertyKey[], ctx: z.Refine
 
 /**
  * A firearm, one shape for every origin: lengths in mm, mass in g, angles in degrees, zero air in
- * degC, bar and %. The maker is a `catalogue:` reference with a free-text name beside it until
- * manufacturers are records. Optic and configuration ids are unique, each mount names an optic of
- * the firearm and `active` names one of its configurations.
+ * degC, bar and %. The maker is a manufacturer reference. Optic and configuration ids are unique, each
+ * mount names an optic of the firearm and `active` names one of its configurations. A record of an
+ * older format with the maker as text fails the schema.
  * Inferred type: {@link Firearm}.
  */
 export const firearm = z
-  .object({
+  .strictObject({
     origin: z
       .enum(['catalogue', 'user', 'shared'])
       .describe('Where the record lives: the git catalogue, this browser, or a received file.'),
     name: text(200).describe('Name of the firearm as the library lists it.'),
-    manufacturer: catalogueRef('manufacturer').optional(),
-    manufacturerName: text(200)
-      .describe('Manufacturer name as free text, for a maker no record exists for.')
-      .optional(),
+    manufacturer: ref('manufacturer').describe('Reference to the maker of the firearm.').optional(),
     model: text(200).describe('Model name.').optional(),
     cartridge: ref('cartridge')
       .describe('Reference to the cartridge the firearm is chambered for.')
