@@ -53,7 +53,7 @@ function Problem({ title, text, rest }: { title: string; text: string; rest?: st
  * where one cannot draw.
  */
 function drawings(records: (Bullet & { manufacturerName: string })[], unit: LengthUnit) {
-  const profiles = records.map(recordProfile)
+  const profiles = records.map((r) => recordProfile(r))
   const drawn = profiles.filter((p): p is BulletProfile => !('reason' in p))
   const { models, tallest } =
     drawn.length > 0 ? sharedScale(drawn, undefined, unit) : { models: [], tallest: 0 }
