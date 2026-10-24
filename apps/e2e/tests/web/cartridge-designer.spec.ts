@@ -143,6 +143,9 @@ const drawingTop = (page: Page) =>
 test('a change, a check and a refusal move no field and not the drawing', async ({ page }) => {
   await page.goto('/cartridges/designer?from=308-win')
   await expect(drawing(page)).toBeVisible()
+  // the seating controls come with their own chunk (`SeatingPreview`, client only) and add three
+  // inputs below the form: measured only once they are there, else a slow chunk moves the baseline
+  await expect(field(page, 'Case capacity (H₂O)', 'cm³')).toBeVisible()
   const before = await places(page)
   const top = await drawingTop(page)
   // changed (with an outline note in the help), then a check at both P1 fields
