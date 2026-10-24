@@ -1,5 +1,5 @@
 /** The bullet list's rows: search text, filters, cells, the BC column and the packed page props. */
-import { toSi } from '@openreloading/schema'
+import { fold, toSi } from '@openreloading/schema'
 import type { BulletSummary } from './api-types.ts'
 import { caliberLabel, commonCaliber } from './caliber.ts'
 import {
@@ -10,7 +10,6 @@ import {
   numberRange,
   present,
 } from './directory.ts'
-import { foldAccents } from './lists.ts'
 import { formatNumber, inchText, kilogramsPerGrain, type UnitSystem } from './units.ts'
 
 /** Whether `word` occurs in `hay` at a word start (after no letter or digit): "7.8" not in "17.80". */
@@ -80,8 +79,8 @@ export function bulletMatches(
     if (range.min !== undefined && shown < range.min) return false
     if (range.max !== undefined && shown > range.max) return false
   }
-  const hay = foldAccents(text)
-  return foldAccents(s.query)
+  const hay = fold(text)
+  return fold(s.query)
     .split(/\s+/)
     .every((word) => atWordStart(hay, word))
 }
