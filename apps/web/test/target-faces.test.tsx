@@ -27,7 +27,7 @@ const precision = faceById('issf-25m-precision-50m-pistol')
 it('lists every face with its distances, outer diameter, rings and the disciplines mapped to it', () => {
   const row = targetFaceRow(precision, mappings)
   expect(row).toMatchObject({ organization: 'ISSF', outer: 500, rings: 10 })
-  expect(row.distances).toEqual([25, 50, 100, 300])
+  expect(row.distances).toEqual([20, 25, 50, 100, 300])
   const mapped = new Set(mappings.filter((m) => m.face === precision.id).map((m) => m.discipline))
   expect(mapped).toContain('dsb-25m-pistole-revolver')
   expect(row.disciplines).toBe(mapped.size)

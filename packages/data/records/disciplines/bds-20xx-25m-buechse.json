@@ -35,7 +35,8 @@
       {
         "source": "bds-sporthandbuch-langwaffen-2026",
         "page": "L 7.01, Seite L-37, PDF p. 37",
-        "fields": ["caliberClasses"]
+        "fields": ["caliberClasses"],
+        "note": "The code stands for the numbers 2001 to 2004, 2010 to 2012 and 2014. Caliber class, weight and sight differ per number in L 7.01; the classes stored are those of all numbers together."
       }
     ]
   }

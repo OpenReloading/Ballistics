@@ -1219,6 +1219,126 @@
       "scoring": "centre",
       "organization": "DSB",
       "section": "0.21 Scheibe Nr. 4 (row 7.32)"
+    },
+    {
+      "name": "BDS 1201 MD Pistole bis 9 mm",
+      "distance": {
+        "value": 20000,
+        "raw": "5, 10, 15, 20 m"
+      },
+      "scoring": "touch",
+      "organization": "BDS",
+      "section": "K 4.04, Z9"
+    },
+    {
+      "name": "BDS 1202 MD Pistole über 9 mm",
+      "distance": {
+        "value": 20000,
+        "raw": "5, 10, 15, 20 m"
+      },
+      "scoring": "touch",
+      "organization": "BDS",
+      "section": "K 4.04, Z9"
+    },
+    {
+      "name": "BDS 1205 MD Revolver unter 4 Zoll",
+      "distance": {
+        "value": 20000,
+        "raw": "5, 10, 15, 20 m"
+      },
+      "scoring": "touch",
+      "organization": "BDS",
+      "section": "K 4.04, Z9"
+    },
+    {
+      "name": "BDS 1206 MD Revolver bis .38",
+      "distance": {
+        "value": 20000,
+        "raw": "5, 10, 15, 20 m"
+      },
+      "scoring": "touch",
+      "organization": "BDS",
+      "section": "K 4.04, Z9"
+    },
+    {
+      "name": "BDS 1207 MD Revolver über .38",
+      "distance": {
+        "value": 20000,
+        "raw": "5, 10, 15, 20 m"
+      },
+      "scoring": "touch",
+      "organization": "BDS",
+      "section": "K 4.04, Z9"
+    },
+    {
+      "name": "BDS 1208 MD Revolver Magnum bis .357",
+      "distance": {
+        "value": 20000,
+        "raw": "5, 10, 15, 20 m"
+      },
+      "scoring": "touch",
+      "organization": "BDS",
+      "section": "K 4.04, Z9"
+    },
+    {
+      "name": "BDS 1209 MD Revolver Magnum über .357",
+      "distance": {
+        "value": 20000,
+        "raw": "5, 10, 15, 20 m"
+      },
+      "scoring": "touch",
+      "organization": "BDS",
+      "section": "K 4.04, Z9"
+    },
+    {
+      "name": "BDS 1210 MD Freie Klasse Pistole/Revolver .22/5,6 mm offene Visierung",
+      "distance": {
+        "value": 20000,
+        "raw": "5, 10, 15, 20 m"
+      },
+      "scoring": "touch",
+      "organization": "BDS",
+      "section": "K 4.04, Z9"
+    },
+    {
+      "name": "BDS 1211 MD Freie Klasse Pistole/Revolver mind. .30/7,62 mm",
+      "distance": {
+        "value": 20000,
+        "raw": "5, 10, 15, 20 m"
+      },
+      "scoring": "touch",
+      "organization": "BDS",
+      "section": "K 4.04, Z9"
+    },
+    {
+      "name": "BDS 1212 MD Freie Klasse Pistole/Revolver .22/5,6 mm mit Optik",
+      "distance": {
+        "value": 20000,
+        "raw": "5, 10, 15, 20 m"
+      },
+      "scoring": "touch",
+      "organization": "BDS",
+      "section": "K 4.04, Z9"
+    },
+    {
+      "name": "BDS 1214 MD Dienst-Sportpistole/-revolver",
+      "distance": {
+        "value": 20000,
+        "raw": "5, 10, 15, 20 m"
+      },
+      "scoring": "touch",
+      "organization": "BDS",
+      "section": "K 4.04, Z9"
+    },
+    {
+      "name": "BDS 1224 MD Dienstpistole 2",
+      "distance": {
+        "value": 20000,
+        "raw": "5, 10, 15, 20 m"
+      },
+      "scoring": "touch",
+      "organization": "BDS",
+      "section": "K 4.04, Z9"
     }
   ],
   "numerals": true,
@@ -1509,6 +1629,11 @@
         "source": "dsu-sporthandbuch-2018",
         "page": "Kapitel 1, Auswertung der Scheiben, Seite 27, PDF p. 29",
         "fields": ["events.scoring"]
+      },
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "page": "K 4.01, K 4.04, Seite K-16 and K-17, PDF pp. 16 and 17",
+        "fields": ["events.name", "events.distance", "events.organization", "events.section"]
       }
     ]
   }

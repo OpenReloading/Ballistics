@@ -21,7 +21,7 @@
         "source": "bds-sporthandbuch-langwaffen-2026",
         "page": "L 3.04, Seite L-23, PDF p. 23",
         "fields": ["shotCount"],
-        "note": "Deutsche Meisterschaft and Landesmeisterschaft 30 shots; below Landesmeisterschaft the program may be halved to 15."
+        "note": "Deutsche Meisterschaft and Landesmeisterschaft 30 shots; below Landesmeisterschaft the program may be halved to 15. The value is the Deutsche Meisterschaft and Landesmeisterschaft program. Below the Landesmeisterschaft the program may be halved to 15 shots."
       }
     ]
   }
