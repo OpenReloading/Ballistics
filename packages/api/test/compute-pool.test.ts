@@ -21,6 +21,12 @@ const slow = {
     absoluteTolerance: 1e-15,
   },
 }
+/**
+ * Runs until its 3000 ms sampling budget ends, on any machine: 2000 draws of 36 ms each. The deadline of the
+ * timeout test sits at half of that, and leaves the replacement worker its start (module load, 0.2 s and
+ * more on a busy host) and a fast request.
+ */
+const endless = { ...slow, sampling: { samples: 2000, budgetMs: 3000 } }
 const fast = {
   shot: flatShot,
   ranges: [100],
@@ -87,14 +93,18 @@ describe('compute pool through the API', () => {
   })
 
   it('answers 503 timeout for a slow request and replaces the worker', async () => {
-    await withApp({ workerCount: 1, maxQueue: 0, timeoutMs: 150 }, async (app) => {
-      const res = await app.inject({ method: 'POST', url: `${API_PREFIX}/interior`, payload: slow })
+    await withApp({ workerCount: 1, maxQueue: 0, timeoutMs: 1500 }, async (app) => {
+      const res = await app.inject({
+        method: 'POST',
+        url: `${API_PREFIX}/interior`,
+        payload: endless,
+      })
       expect(res.statusCode).toBe(503)
       expect(res.headers['retry-after']).toBeUndefined()
       expect(res.json()).toEqual({
         statusCode: 503,
         error: 'Service Unavailable',
-        message: 'computation did not finish within 150 ms',
+        message: 'computation did not finish within 1500 ms',
         reason: 'timeout',
         notice: 'simulation, not load data',
       })
