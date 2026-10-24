@@ -1,5 +1,5 @@
 import { lbPerSqInToKgPerSqM, millerStability, type Projectile } from '@open-reloading/core'
-import type { BulletRecord } from './api-types.ts'
+import type { Bullet } from '@open-reloading/schema'
 import type { FieldRow } from './record-fields.ts'
 import { metersPerFoot, pascalsPerInHg } from './units.ts'
 
@@ -16,7 +16,7 @@ type BulletDrag =
  * (0 when absent). Several BCs without distinct band starts give `choose`; `choice` then picks one
  * of them as a single band from 0 m/s. A record without a BC of `model` gives `none`.
  */
-export function bulletDrag(record: BulletRecord, model: 'G1' | 'G7', choice?: number): BulletDrag {
+export function bulletDrag(record: Bullet, model: 'G1' | 'G7', choice?: number): BulletDrag {
   const bcs = (record.ballisticCoefficients ?? []).filter((c) => c.dragModel === model)
   if (bcs.length === 0) return { kind: 'none' }
   let bands = bcs.map((c) => ({
@@ -47,7 +47,7 @@ export function bulletDrag(record: BulletRecord, model: 'G1' | 'G7', choice?: nu
 }
 
 /** Sectional density, mass over diameter squared, kg/m2. */
-const sectionalDensity = (r: Pick<BulletRecord, 'mass' | 'diameter'>) =>
+const sectionalDensity = (r: Pick<Bullet, 'mass' | 'diameter'>) =>
   (r.mass.value * 1e-3) / (r.diameter.value * 1e-3) ** 2
 
 /**
@@ -62,9 +62,7 @@ const millerStabilityTarget = 1.5
  * where its velocity and atmosphere corrections are 1; undefined without a length. Sg goes with
  * the inverse square of the twist, so a reference twist scales to it.
  */
-export function millerTwist(
-  r: Pick<BulletRecord, 'mass' | 'diameter' | 'length'>,
-): number | undefined {
+export function millerTwist(r: Pick<Bullet, 'mass' | 'diameter' | 'length'>): number | undefined {
   if (!r.length) return
   const reference = 0.254
   const sg = millerStability({
@@ -80,7 +78,7 @@ export function millerTwist(
 
 /** The computed rows of a bullet page, each with its method on hover. */
 export function computedBulletRows(
-  r: Pick<BulletRecord, 'mass' | 'diameter' | 'length' | 'tip'>,
+  r: Pick<Bullet, 'mass' | 'diameter' | 'length'> & { tip?: { type: string } },
 ): FieldRow[] {
   const twist = millerTwist(r)
   return [

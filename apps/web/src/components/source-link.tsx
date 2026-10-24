@@ -1,4 +1,4 @@
-import type { Source } from '../lib/api-types.ts'
+import type { Source } from '@open-reloading/schema'
 
 /** A source title, linked when it has a URL, and its page. */
 export function SourceLink({ source }: { source: Source }) {

@@ -1,6 +1,6 @@
 import { recordResistance } from '@open-reloading/core'
+import type { Powder } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
-import type { PowderRecord } from '../src/lib/api-types.ts'
 import {
   fitTables,
   fittedEnergyRatio,
@@ -45,7 +45,7 @@ const powder = {
       { title: 'Example B guide 8.0', kind: 'fitted', fields: ['interior'] },
     ],
   },
-} as unknown as PowderRecord
+} as unknown as Powder
 
 it('gives the model fields in SI, the start pressure by the rule of the fit', () => {
   expect(powderModelValues(powder)).toEqual({
@@ -64,7 +64,7 @@ it('gives the model fields in SI, the start pressure by the rule of the fit', ()
     formZ1: 0.8,
   })
   const own = { ...powder, interior: { ...interior, startPressure: { value: 250 } } }
-  expect(powderModelValues(own as unknown as PowderRecord)?.startPressure).toBe(25e6)
+  expect(powderModelValues(own as unknown as Powder)?.startPressure).toBe(25e6)
   expect(powderModelValues({ ...powder, interior: undefined })).toBeUndefined()
 })
 
@@ -139,7 +139,7 @@ it('gives the fitted over the thermochemistry energy, none without thermochemist
       molarMass: t,
       covolume: t,
     },
-  } as unknown as PowderRecord
+  } as unknown as Powder
   // energy of the thermochemistry 1e6 / 0.25 = 4e6 J/kg
   const fitted = withThermo.interior?.energy.value ?? 0
   expect(fittedEnergyRatio(withThermo)).toBeCloseTo(fitted / 4e6, 12)

@@ -268,7 +268,25 @@ describe('user data files', () => {
 
   it('keeps only schema-valid records read from the browser store', () => {
     const bad = { ...bullet, id: '' }
-    expect(validRecords([bullet, bad, null, load])).toEqual({ records: [bullet, load], invalid: 2 })
+    const old = { kind: 'bulletDesign', id: 'o1', name: 'Old', saved, data: 'not an object' }
+    const { records, invalid } = validRecords([bullet, bad, null, load, old])
+    expect(records).toEqual([bullet, load])
+    // kept as stored, with the schema's error and what names it
+    expect(invalid.map((i) => i.raw)).toEqual([bad, null, old])
+    expect(invalid[2]).toMatchObject({ id: 'o1', name: 'Old', kind: 'bulletDesign' })
+    expect(invalid[2].error).toContain('data')
+    expect(invalid[1]).toMatchObject({ id: undefined, name: undefined, kind: undefined })
+  })
+
+  it('Export all carries the invalid records as stored; Import reads the rest', () => {
+    const old = { kind: 'bulletDesign', id: 'o1', name: 'Old', saved, data: 'not an object' }
+    const { invalid } = validRecords([old])
+    const out = exportAllText([bullet], [], invalid)
+    expect(out.ok && JSON.parse(out.text).invalid).toEqual([old])
+    expect(out.ok && parseUserDataFile(out.text)).toEqual({ ok: true, records: [bullet] })
+    // no invalid records: the file has no such field
+    const plain = exportAllText([bullet])
+    expect(plain.ok && 'invalid' in JSON.parse(plain.text)).toBe(false)
   })
 })
 

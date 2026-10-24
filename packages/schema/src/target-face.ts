@@ -37,7 +37,8 @@ const targetFaceFields = z.object({
   organization: z.string().min(1),
   /**
    * Outer to inner; values rise by one ring to ring. `diameter` is the width of the ring; for an
-   * oval ring `height` is its height (axis-aligned, the face upright; absent: a circle).
+   * oval ring `height` is its height (axis-aligned, the face upright; absent: a circle). A
+   * `square` ring has the edge `diameter` and no `height` (absent: a circle).
    * `fill` is the colour of the zone that the ring line bounds on the outside (the area up to the
    * next ring, for the innermost ring the whole disc), `line` the colour of the ring line.
    */
@@ -47,6 +48,7 @@ const targetFaceFields = z.object({
         value: z.int().positive(),
         diameter: positiveLength(),
         height: positiveLength().optional(),
+        shape: z.enum(['circle', 'square']).optional(),
         fill: faceColour.optional(),
         line: faceColour.optional(),
       }),
@@ -149,7 +151,14 @@ function checkRings(f: z.infer<typeof targetFaceFields>, issue: Issue) {
   if (f.innerTen && inner && f.innerTen.diameter.value > inner.diameter.value)
     issue(['innerTen', 'diameter'], 'must not exceed the innermost ring')
   const oval = f.rings.filter((r) => r.height).length
+  f.rings.forEach((r, i) => {
+    if (r.shape === 'square' && r.height) issue(['rings', i, 'height'], 'a square has no height')
+  })
   if (oval > 0 && oval < f.rings.length) issue(['rings'], 'height on all rings or on none')
+  if (f.decimal && (oval > 0 || f.rings.some((r) => r.shape === 'square')))
+    issue(['decimal'], 'tenth-ring values need circular rings')
+  if (f.innerTen?.height && f.innerTen.rule === 'cover')
+    issue(['innerTen', 'rule'], 'cover needs a circular inner ten')
   if (oval === 0 && (f.blackHeight || f.innerTen?.height))
     issue(['rings'], 'a height needs oval rings')
   f.rings.forEach((r, i) => {

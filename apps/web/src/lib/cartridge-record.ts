@@ -1,6 +1,7 @@
 import { greek } from '@open-reloading/drawing'
 import { conflictWording, type Figure, shotshellVariants } from '@open-reloading/drawing/cartridge'
-import type { CartridgeDetail, SpecValue } from './api-types.ts'
+import type { SpecValue } from '@open-reloading/schema'
+import type { CartridgeDetail } from './api-types.ts'
 import { fieldSpecs, type Group, groups } from './cartridge-designer.ts'
 import { degreeText, formatNumber, inchText, type UnitSystem } from './units.ts'
 

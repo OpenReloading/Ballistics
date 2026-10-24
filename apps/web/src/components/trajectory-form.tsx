@@ -19,7 +19,7 @@ import {
   type OmittedEffect,
   type Trajectory,
 } from '@open-reloading/core'
-import type { UserRecord } from '@open-reloading/schema'
+import type { Bullet, UserRecord } from '@open-reloading/schema'
 import { Printer } from '@phosphor-icons/react'
 import {
   type ReactNode,
@@ -32,7 +32,7 @@ import {
 } from 'react'
 import { flushSync } from 'react-dom'
 import { fetchRecord } from '../lib/api-fetch.ts'
-import type { BulletRecord, BulletSummary } from '../lib/api-types.ts'
+import type { BulletSummary } from '../lib/api-types.ts'
 import { bulletDrag } from '../lib/bullet.ts'
 import { errorText } from '../lib/error-text.ts'
 import { loadExample as exampleData } from '../lib/example-data.ts'
@@ -139,7 +139,7 @@ type Result = TrajectoryResult & {
 type RecordState =
   | { status: 'none' }
   | { status: 'loading' }
-  | { status: 'ok'; record: BulletRecord }
+  | { status: 'ok'; record: Bullet }
   | { status: 'error'; message: string }
 
 /** Everything a computation reads; debounced as one value. */
@@ -240,7 +240,7 @@ function RecordDetails({
   names,
   system,
 }: {
-  record: BulletRecord
+  record: Bullet
   names: ManufacturerNames
   system: UnitSystem
 }) {
@@ -739,7 +739,7 @@ export function TrajectoryForm({
     setRecord({ status: 'loading' })
     setChoice(undefined)
     try {
-      const body = await fetchRecord<BulletRecord>('bullets', id, controller.signal)
+      const body = await fetchRecord<Bullet>('bullets', id, controller.signal)
       if (!body) throw new Error('No such bullet')
       if (controller.signal.aborted) return
       setRecord({ status: 'ok', record: body })

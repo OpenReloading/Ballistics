@@ -1,4 +1,4 @@
-import { cartridge, caseCapacity } from '@open-reloading/schema'
+import { cartridge, caseCapacity, caseTypes } from '@open-reloading/schema'
 import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
 import type { Db } from '../db/index.ts'
@@ -16,7 +16,6 @@ const cartridgeQuery = listQuery({
 })
 
 // response bodies for the contract document (`openapi.ts`), from the record schemas
-const caseTypes = z.enum(['rimless', 'semi-rimmed', 'rimmed', 'rebated', 'belted'])
 // the table holds an empty list for a cartridge without aliases
 const aliases = z.array(cartridge.shape.aliases.unwrap().element)
 const mm = z.number().optional()

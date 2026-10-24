@@ -45,7 +45,7 @@
         "source": "bds-sporthandbuch-langwaffen-2026",
         "page": "L 2.02, Seite L-12, PDF p. 12",
         "fields": ["number", "distance", "category", "caliberClasses"],
-        "note": "The table prints the calibre bounds 6.5 mm (.257) to 11.63 mm (.45)."
+        "note": "The table prints the calibre bounds 6.5 mm (.257) to 11.63 mm (.45). The handbook marks the discipline optional (O) (L 1.23)."
       }
     ]
   }

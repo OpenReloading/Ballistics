@@ -1,4 +1,4 @@
-import type { PowderRecord } from './api-types.ts'
+import type { Powder } from '@open-reloading/schema'
 import type { InteriorBody } from './interior-input.ts'
 import { type SortDirection, sortRows } from './lists.ts'
 import { powderModelValues } from './powder-record.ts'
@@ -41,7 +41,7 @@ export function compareCharge(
 export function powderValues(
   fields: Record<string, number | undefined>,
   current: { id: string } | undefined,
-  as?: { powder: PowderRecord; charge?: number },
+  as?: { powder: Powder; charge?: number },
 ): Record<string, number | undefined> {
   return {
     ...fields,

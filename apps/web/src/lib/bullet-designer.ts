@@ -6,8 +6,13 @@ import {
   bulletProfile,
   bulletScreenEm,
 } from '@open-reloading/drawing/bullet'
-import type { BulletDesign } from '@open-reloading/schema'
-import type { BulletRecord } from './api-types.ts'
+import {
+  type Bullet,
+  type BulletDesign,
+  baseTypes,
+  ogiveForms,
+  tipTypes,
+} from '@open-reloading/schema'
 import { computedBulletRows } from './bullet.ts'
 import {
   close,
@@ -83,17 +88,11 @@ export const designerSpecs: DesignerSpec[] = [
   len('tip.mouthDiameter', 'Hollow-point mouth diameter', 'tip'),
 ]
 
-/** The choices, keyed by record path, with their options ('' for not given). */
+/** The choices, keyed by record path, with their options ('' for not given): the record schema's enums. */
 export const choiceOptions = {
-  'base.type': [
-    'flat',
-    'boat-tail',
-    'rebated-boat-tail',
-    'conical-hollow-base',
-    'rounded-hollow-base',
-  ],
-  'ogive.form': ['tangent', 'secant', 'hybrid', 'round-nose', 'flat-nose'],
-  'tip.type': ['hollow-point', 'polymer-tip', 'soft-point', 'full-metal-jacket', 'open-meplat'],
+  'base.type': baseTypes.options,
+  'ogive.form': ogiveForms.options,
+  'tip.type': tipTypes.options,
 } as const
 
 export type ChoiceKey = keyof typeof choiceOptions
@@ -151,7 +150,7 @@ export function fieldInUse(
  * from `names`.
  */
 export function fromRecord(
-  r: BulletRecord,
+  r: Bullet,
   system: UnitSystem,
   names: ManufacturerNames = noManufacturerNames,
 ): Design {

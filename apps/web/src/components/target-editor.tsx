@@ -95,7 +95,6 @@ import { groupStatisticsOf } from '../lib/target-groups.ts'
 import { controlSize, tipEvents } from '../lib/theme.ts'
 import { formatNumber, formatQuantity, unitsOf, withUnit } from '../lib/units.ts'
 import { canonicalJson, validRecords } from '../lib/user-data.ts'
-import { photoIds } from '../lib/user-photos.ts'
 import {
   deletePhoto,
   deleteRecord,
@@ -104,6 +103,7 @@ import {
   putRecords,
   requestPersistentStorage,
   storedPhoto,
+  storedPhotoIds,
   storedRecord,
   storedRecords,
 } from '../lib/user-store.ts'
@@ -803,7 +803,7 @@ export function TargetEditor({
         // the photo the replaced sheet showed, unless a sheet still points at it
         const old = now.data.photo
         if (old && old !== r.data.photo) {
-          const used = new Set(photoIds((await storedRecords()).records))
+          const used = await storedPhotoIds()
           if (!used.has(old)) discardFile(old)
         }
       })
@@ -965,9 +965,7 @@ export function TargetEditor({
           )
           orphans.current = orphans.current.filter((o) => !gone.includes(o))
           // a copy made with Save as may point at the photo too
-          const used = gone.length
-            ? new Set(photoIds((await storedRecords()).records))
-            : new Set<string>()
+          const used = gone.length ? await storedPhotoIds() : new Set<string>()
           for (const o of gone) if (!used.has(o.photo)) discardFile(o.photo)
           setSheets((list) => [record, ...list.filter((r) => r.id !== record.id)])
           requestPersistentStorage()
@@ -1127,7 +1125,7 @@ export function TargetEditor({
         dropCopy(id)
         orphans.current = orphans.current.filter((o) => o.sheet !== id)
         // a copy saved with Save as or opened from a file may share the photo
-        const used = new Set(photoIds((await storedRecords()).records))
+        const used = await storedPhotoIds()
         for (const p of photos) if (!used.has(p)) discardFile(p)
         const rest = sheets.filter((r) => r.id !== id)
         setSheets(rest)

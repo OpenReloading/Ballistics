@@ -57,25 +57,40 @@ export const constructionFields = z
 export interface ConstructionFields extends z.infer<typeof constructionFields> {}
 
 /**
+ * Base types of a bullet. `conical-hollow-base` and `rounded-hollow-base`: a cavity open at the base,
+ * a cone or a hemisphere whose depth follows from its diameter (`cavityDiameter`), on a flat base or
+ * on the boat tail the other fields describe.
+ */
+export const baseTypes = z.enum([
+  'flat',
+  'boat-tail',
+  'rebated-boat-tail',
+  'conical-hollow-base',
+  'rounded-hollow-base',
+])
+
+/**
+ * Ogive forms of a bullet: `tangent`, `secant` and `hybrid` by the head-shape ratio Rt/R,
+ * `round-nose` and `flat-nose` for a nose that is no ogive of revolution.
+ */
+export const ogiveForms = z.enum(['tangent', 'secant', 'hybrid', 'round-nose', 'flat-nose'])
+
+/** Tip types of a bullet: the nose construction. */
+export const tipTypes = z.enum([
+  'hollow-point',
+  'polymer-tip',
+  'soft-point',
+  'full-metal-jacket',
+  'open-meplat',
+])
+
+/**
  * Base of a bullet: type, length, for a boat tail the base face diameter and the tail angle, and
  * for a hollow base the diameter of the cavity.
  */
 const bulletBase = z
   .object({
-    /**
-     * `conical-hollow-base` and `rounded-hollow-base`: a cavity open at the base, a cone or a
-     * hemisphere whose depth follows from its diameter (`cavityDiameter`), on a flat base or on
-     * the boat tail the other fields describe.
-     */
-    type: z
-      .enum([
-        'flat',
-        'boat-tail',
-        'rebated-boat-tail',
-        'conical-hollow-base',
-        'rounded-hollow-base',
-      ])
-      .optional(),
+    type: baseTypes.optional(),
     length: quantity('length').optional(),
     /**
      * Diameter of the base face at the end of the boat tail (McCoy, ARBRL-TR-02293, 1981, PDF p. 21).
@@ -106,7 +121,7 @@ const bulletBase = z
 const bulletOgive = z
   .object({
     /** Optional: a source may give the radius or Rt/R without naming the form. */
-    form: z.enum(['tangent', 'secant', 'hybrid']).optional(),
+    form: ogiveForms.optional(),
     /** Ogive radius R: radius of the nose arc in an axial section (McCoy, ARBRL-TR-02293, 1981, PDF p. 13). */
     radius: quantity('length', z.number().positive()).optional(),
     /**
@@ -120,10 +135,20 @@ const bulletOgive = z
     message: 'needs a form, a radius or Rt/R',
   })
 
+/**
+ * Cannelure, a groove around the shank: `start` is the distance of its rear edge from the base, `width`
+ * its axial extent and `depth` its radial depth where the source gives one.
+ */
+const bulletCannelure = z.object({
+  start: quantity('length', z.number().positive()),
+  width: quantity('length', z.number().positive()),
+  depth: quantity('length', z.number().positive()).optional(),
+})
+
 /** Tip of a bullet: type, and the polymer tip length or the hollow-point mouth diameter. */
 const bulletTip = z
   .object({
-    type: z.enum(['hollow-point', 'polymer-tip', 'soft-point', 'full-metal-jacket', 'open-meplat']),
+    type: tipTypes,
     /**
      * Polymer tip: axial length of the part forward of the jacket opening (the head), without the
      * shank seated in the jacket cavity. Mann 1997, p. 1, describes tips as a head and a shaft;
@@ -166,6 +191,7 @@ export const bullet = z
     length: quantity('length').optional(),
     base: bulletBase.optional(),
     ogive: bulletOgive.optional(),
+    cannelure: bulletCannelure.optional(),
     tip: bulletTip.optional(),
     /** Diameter of the flat at the nose (McCoy, ARBRL-TR-02293, 1981, PDF p. 14); 0 for a sharp point. */
     meplatDiameter: quantity('length', z.number().min(0)).optional(),

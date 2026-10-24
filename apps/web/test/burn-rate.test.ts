@@ -1,5 +1,5 @@
+import type { Powder } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
-import type { PowderRecord } from '../src/lib/api-types.ts'
 import {
   classifyPowder,
   curveAt,
@@ -16,7 +16,7 @@ import {
 const record = (
   vivacity: { value: number; standardUncertainty?: number },
   exponent = 1,
-): PowderRecord => ({
+): Powder => ({
   id: 'p',
   manufacturer: 'm',
   name: 'N',
@@ -28,7 +28,7 @@ const record = (
     burnForm: { kind: 'twoStage', a: { value: 0 }, m: 0.5, q: 0.5, z1: 0.8 },
     trainingRows: 10,
     trainingCartridges: 2,
-  } as PowderRecord['interior'],
+  } as Powder['interior'],
   provenance: { kind: 'published', sources: [] },
 })
 

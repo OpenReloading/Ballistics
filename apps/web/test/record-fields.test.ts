@@ -1,5 +1,5 @@
+import type { Bullet, Powder, Provenance } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
-import type { BulletRecord, PowderRecord } from '../src/lib/api-types.ts'
 import {
   ballisticCoefficientRows,
   buildRows,
@@ -21,7 +21,7 @@ import {
 import { presetUnits } from '../src/lib/units.ts'
 import { targetBullet } from './fixtures/bullets.ts'
 
-const provenance = { kind: 'published', sources: [] }
+const provenance: Provenance = { kind: 'published', sources: [] }
 const grains = presetUnits('metric-grains')
 const us = presetUnits('us')
 const si = presetUnits('metric-grams')
@@ -33,15 +33,14 @@ const shown = (rows: FieldRow[], system = grains) =>
 const target = targetBullet
 
 /** The rows of a bullet's data groups, the computed ones left out. */
-const dataRows = (b: BulletRecord) =>
+const dataRows = (b: Bullet) =>
   bulletDataGroups(b)
     .filter((g) => g.title !== 'Computed')
     .flatMap((g) => g.rows)
 
 it('splits the build into structure, jacket, core and surface, the manufacturer wording as printed on the first', () => {
-  const row = (construction: BulletRecord['construction']) => shown(buildRows(construction))
-  const notes = (construction: BulletRecord['construction']) =>
-    buildRows(construction).map(rowNotes)
+  const row = (construction: Bullet['construction']) => shown(buildRows(construction))
+  const notes = (construction: Bullet['construction']) => buildRows(construction).map(rowNotes)
   const mapped = { raw: 'Jacketed Lead', core: { material: 'lead' }, jacket: {} } as const
   expect(row(mapped)).toEqual([
     ['Jacket', 'yes'],
@@ -102,7 +101,7 @@ it('keeps the text as printed for the hover notes, not in the value', () => {
 })
 
 it('leaves the identity fields to the title and badges and gives text fields as they are', () => {
-  const b: BulletRecord = {
+  const b: Bullet = {
     id: 'x',
     manufacturer: 'example',
     productNumber: '1',
@@ -154,7 +153,7 @@ it('leaves the identity fields to the title and badges and gives text fields as 
 })
 
 it('gives the ballistic coefficients with their band in the velocity unit and the note on hover', () => {
-  const b: BulletRecord = {
+  const b: Bullet = {
     ...target,
     ballisticCoefficients: [
       { dragModel: 'G1', value: 0.505, minVelocity: { value: 792.48 } },
@@ -265,6 +264,7 @@ it('gives the fitted values with intervals, the fixed inputs from their stored u
     manufacturer: 'example-a',
     name: 'Powder B',
     interior: {
+      model: 'm3',
       fitted: ['vivacity', 'energy'],
       vivacity: { value: 0.18342, standardUncertainty: 0.026 },
       energy: { value: 8724300, standardUncertainty: 1400000 },
@@ -281,7 +281,7 @@ it('gives the fitted values with intervals, the fixed inputs from their stored u
       trainingCartridges: 15,
     },
     provenance,
-  } as PowderRecord
+  } as Powder
   expect(shown(fittedParameterRows(p, 2, { value: 2.39, median: 0.78, powders: 30 }))).toEqual([
     ['Vivacity', '0.183\u00a0±\u00a00.052 (±\u00a028\u00a0%) 1/s'],
     ['Energy', '8.7\u00a0±\u00a02.8 (±\u00a032\u00a0%) MJ/kg'],
@@ -316,7 +316,7 @@ it('gives the fitted values with intervals, the fixed inputs from their stored u
   const formFitted = {
     ...p,
     interior: { ...p.interior, fitted: ['vivacity', 'form.a'] },
-  } as PowderRecord
+  } as Powder
   expect(fittedParameterRows(formFitted, 2).at(-1)?.symbol).toBe('a')
   expect(burnFormRows(formFitted).map((r) => r.symbol)).toEqual(['m', 'q', 'z1'])
   expect(rowNotes(modelInputRows(p)[8])).toEqual([
@@ -352,7 +352,7 @@ it('the powder strip has manufacturer, form, base, the burn-rate position, the s
     propellantBase: 'double',
     interior: { density: { value: 1.6 } },
     bulkDensity: { value: 0.93 },
-  } as PowderRecord
+  } as Powder
   expect(
     powderStrip(p, { order: 40, total: 220 }, 'Example A').map((i) => [
       i.label,
@@ -366,9 +366,9 @@ it('the powder strip has manufacturer, form, base, the burn-rate position, the s
     ['Solid density', '1.60 g/cm³'],
     ['Bulk density', '0.93 g/cm³'],
   ])
-  expect(
-    powderStrip({ manufacturer: 'x' } as PowderRecord, undefined, 'X').map((i) => i.label),
-  ).toEqual(['Manufacturer'])
+  expect(powderStrip({ manufacturer: 'x' } as Powder, undefined, 'X').map((i) => i.label)).toEqual([
+    'Manufacturer',
+  ])
 })
 
 it('splits a value from its unit for the unit column, a text row with its own unit too', () => {

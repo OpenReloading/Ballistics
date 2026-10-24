@@ -1,7 +1,7 @@
-import type { BulletRecord } from '../../src/lib/api-types.ts'
+import type { Bullet } from '@open-reloading/schema'
 
 /** Made-up bullet records for the tests; the numbers are not any manufacturer's. */
-export const targetBullet: BulletRecord = {
+export const targetBullet: Bullet = {
   id: 'example-a-1001',
   manufacturer: 'example-a',
   productNumber: '1001',
@@ -45,7 +45,7 @@ export const targetBullet: BulletRecord = {
 }
 
 /** A second made-up record: a boat tail with a secant ogive and a hollow point, no nose or bearing lengths. */
-export const matchBullet: BulletRecord = {
+export const matchBullet: Bullet = {
   id: 'example-b-2002',
   manufacturer: 'example-b',
   productNumber: '2002',

@@ -17,9 +17,27 @@ export const tooLargeMessage = `The file is larger than ${maxFileBytes / 1e6} MB
 /** The size of `text` as a file, UTF-8 bytes, as Open and Import compare it with `maxFileBytes`. */
 const fileBytes = (text: string) => new TextEncoder().encode(text).byteLength
 
-/** The text of a user data file holding `records` and the photos they point at (`files`). */
-export const userDataText = (records: UserRecord[], files?: EmbeddedFile[]) =>
-  `${JSON.stringify({ format: userDataFormat, version: userDataVersion, records, ...(files?.length && { files }) }, null, 2)}\n`
+/**
+ * The text of a user data file holding `records` and the photos they point at (`files`). The
+ * `invalid` records of the browser, as stored, are added under `invalid` (not part of the format
+ * the schema reads: Import ignores them).
+ */
+export const userDataText = (
+  records: UserRecord[],
+  files?: EmbeddedFile[],
+  invalid?: InvalidRecord[],
+) =>
+  `${JSON.stringify(
+    {
+      format: userDataFormat,
+      version: userDataVersion,
+      records,
+      ...(files?.length && { files }),
+      ...(invalid?.length && { invalid: invalid.map((i) => i.raw) }),
+    },
+    null,
+    2,
+  )}\n`
 
 export type ParsedUserFile =
   | {
@@ -53,24 +71,27 @@ export function parseUserDataFile(text: string): ParsedUserFile {
 export function checkedUserDataText(
   records: UserRecord[],
   files?: EmbeddedFile[],
+  invalid?: InvalidRecord[],
 ): { ok: true; text: string } | { ok: false; reason: string } {
-  const text = userDataText(records, files)
+  const text = userDataText(records, files, invalid)
   const check = parseUserDataFile(text)
   return check.ok ? { ok: true, text } : check
 }
 
 /**
- * The text of an Export all file: `records` with their photos in order while the text stays under
- * `maxFileBytes`, the ids of the photos left out (`left`), or why Import would reject it.
+ * The text of an Export all file: `records` and the `invalid` ones with their photos in order
+ * while the text stays under `maxFileBytes`, the ids of the photos left out (`left`), or why
+ * Import would reject it.
  */
 export function exportAllText(
   records: UserRecord[],
   files: EmbeddedFile[] = [],
+  invalid: InvalidRecord[] = [],
 ): { ok: true; text: string; left: string[] } | { ok: false; reason: string } {
-  const all = checkedUserDataText(records, files)
+  const all = checkedUserDataText(records, files, invalid)
   if (all.ok || all.reason !== tooLargeMessage) return all.ok ? { ...all, left: [] } : all
   // a photo adds its entry and less than 64 characters of indentation and separators
-  let room = maxFileBytes - fileBytes(userDataText(records)) - 64
+  let room = maxFileBytes - fileBytes(userDataText(records, undefined, invalid)) - 64
   const kept: EmbeddedFile[] = []
   const left: string[] = []
   for (const f of files) {
@@ -80,7 +101,7 @@ export function exportAllText(
       room -= size
     } else left.push(f.id)
   }
-  const checked = checkedUserDataText(records, kept)
+  const checked = checkedUserDataText(records, kept, invalid)
   return checked.ok ? { ...checked, left } : checked
 }
 
@@ -104,13 +125,40 @@ export const namedKey = (data: unknown, name: string) => canonicalJson([name, da
 export const renamedKey = (key: string, name: string) =>
   canonicalJson([name, (JSON.parse(key) as [string, unknown])[1]])
 
-/** The records of the browser store that pass the schema, and how many did not. */
+/** A record of the browser store that fails the schema, kept as stored. */
+export interface InvalidRecord {
+  /** The stored value. */
+  raw: unknown
+  /** Why the schema rejects it. */
+  error: string
+  /** Its `id`, `name` and `kind` where it has them as texts. */
+  id?: string
+  name?: string
+  kind?: string
+}
+
+/** The records of the browser store that pass the schema, and those that do not, as stored. */
 export function validRecords(raw: unknown[]) {
-  const records = raw.flatMap((r) => {
+  const records: UserRecord[] = []
+  const invalid: InvalidRecord[] = []
+  for (const r of raw) {
     const p = userRecord.safeParse(r)
-    return p.success ? [p.data] : []
-  })
-  return { records, invalid: raw.length - records.length }
+    if (p.success) records.push(p.data)
+    else {
+      const text = (k: string) => {
+        const v = (r as Record<string, unknown> | null)?.[k]
+        return typeof v === 'string' ? v : undefined
+      }
+      invalid.push({
+        raw: r,
+        error: z.prettifyError(p.error),
+        id: text('id'),
+        name: text('name'),
+        kind: text('kind'),
+      })
+    }
+  }
+  return { records, invalid }
 }
 
 const content = (r: UserRecord) => canonicalJson({ kind: r.kind, name: r.name, data: r.data })

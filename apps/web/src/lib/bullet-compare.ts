@@ -1,4 +1,5 @@
 /** Bullets side by side: the rows in the preset, the difference marks, one drawing scale. */
+
 import { face, type LengthUnit } from '@open-reloading/drawing'
 import {
   type BulletModel,
@@ -6,7 +7,7 @@ import {
   bulletFigureModel,
   bulletScreenEm,
 } from '@open-reloading/drawing/bullet'
-import type { BulletRecord } from './api-types.ts'
+import type { Bullet } from '@open-reloading/schema'
 import {
   ballisticCoefficientRows,
   bulletDataGroups,
@@ -38,7 +39,7 @@ const groupOrder = ['Size', 'Shape', 'Tip and base', 'Build', 'Twist', 'Computed
  * ballistic coefficients, each row once in the order first met (a repeated label once per
  * repeat), a value per bullet where its record has the row.
  */
-export function compareGroups(bullets: BulletRecord[], system: UnitSystem): CompareGroup[] {
+export function compareGroups(bullets: Bullet[], system: UnitSystem): CompareGroup[] {
   // the groups in `bulletDataGroups` order, also where the first bullet lacks one
   const groups = new Map<string, Map<string, CompareRow>>(
     [...groupOrder, 'Ballistic coefficients'].map((t) => [t, new Map()]),

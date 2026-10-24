@@ -14,17 +14,21 @@ import {
   recordResistance,
   ValueError,
 } from '@open-reloading/core'
-import type { CartridgeDesign, UserRecord, WorkbenchState } from '@open-reloading/schema'
+import type {
+  Bullet,
+  CartridgeDesign,
+  Powder,
+  UserRecord,
+  WorkbenchState,
+} from '@open-reloading/schema'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { apiFetch, fetchRecord } from '../lib/api-fetch.ts'
 import type {
-  BulletRecord,
   BulletSummary,
   CartridgeDetail,
   ErrorBody,
   InteriorResponse,
-  PowderRecord,
   SampledBand,
 } from '../lib/api-types.ts'
 import { runBatch } from '../lib/batch.ts'
@@ -195,8 +199,8 @@ export function useWorkbenchState() {
     setCartridgeRecord(c)
     if (c) setCartridgeDesign(undefined)
   }
-  const [bullet, setBullet] = useState<BulletRecord | undefined>(undefined)
-  const [powder, setPowder] = useState<PowderRecord | undefined>(undefined)
+  const [bullet, setBullet] = useState<Bullet | undefined>(undefined)
+  const [powder, setPowder] = useState<Powder | undefined>(undefined)
   const names = useManufacturerNames()
   /** The chosen records as "<manufacturer name> <product name>". */
   const bulletLabel = bullet && productLabel(bullet, names)
@@ -793,7 +797,7 @@ export function useWorkbenchState() {
   function chooseBullet(id: string, fill = true) {
     const signal = pick('bullets')
     want('bullet', id)
-    return fetchRecord<BulletRecord>('bullets', id, signal)
+    return fetchRecord<Bullet>('bullets', id, signal)
       .then((b) => {
         if (signal.aborted) return
         if (!b) return lost('bullet', id)
@@ -820,7 +824,7 @@ export function useWorkbenchState() {
   function choosePowder(id: string, fill = true) {
     const signal = pick('powders')
     want('powder', id)
-    return fetchRecord<PowderRecord>('powders', id, signal)
+    return fetchRecord<Powder>('powders', id, signal)
       .then((p) => {
         if (signal.aborted) return
         if (!p) return lost('powder', id)
@@ -965,7 +969,7 @@ export function useWorkbenchState() {
    * the fields as they stand (edited or opened parameters). `recordInputs` lists what the records'
    * bore resistance reads besides the body: the key of the Powders tab's rows.
    */
-  function loadRequest(as?: { powder: PowderRecord; charge?: number }) {
+  function loadRequest(as?: { powder: Powder; charge?: number }) {
     const chosen = as?.powder ?? powder
     const values = powderValues(siValues(fields), powder, as)
     const body = interiorBody(

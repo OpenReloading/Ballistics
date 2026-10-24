@@ -13,6 +13,8 @@ export type RingScore = {
   decimal?: number
   /** True when the hole is in the inner ten under the face's `innerTen.rule`. */
   innerTen: boolean
+  /** Zone label of the bull the shot belongs to, where the face's bull has one. */
+  zone?: string
 }
 
 type GroupScore = {
@@ -41,25 +43,83 @@ export function scoredHoleDiameter<B extends number | undefined>(
   return fixed ? fixed * 1e-3 : bullet
 }
 
+type Shape = Pick<TargetFace['rings'][number], 'diameter' | 'height' | 'shape'>
+
 /**
- * Score of a hole of diameter `hole` (m) centred at `shot` (m from the face centre): the highest
- * ring whose outer edge the hole touches, tenths of that ring's width counted inward from the
- * touching position, and the inner ten by the face's rule.
+ * Distance in m from a point to the filled ellipse of semi-axes `a` and `b`, 0 inside: bisection
+ * on the root of the closest-point condition (Eberly 2013, "Distance from a point to an ellipse").
+ */
+function ellipseGap(a: number, b: number, x: number, y: number): number {
+  // the longer axis along the first coordinate
+  const [e0, e1, y0, y1] =
+    a >= b ? [a, b, Math.abs(x), Math.abs(y)] : [b, a, Math.abs(y), Math.abs(x)]
+  const [z0, z1] = [y0 / e0, y1 / e1]
+  if (z0 * z0 + z1 * z1 <= 1) return 0
+  if (y1 === 0) return y0 - e0
+  const r0 = (e0 / e1) ** 2
+  let [lo, hi] = [z1 - 1, Math.hypot(r0 * z0, z1) - 1]
+  let t = lo
+  for (let i = 0; i < 200; i++) {
+    const mid = (lo + hi) / 2
+    if (mid === lo || mid === hi) break
+    t = mid
+    const g = ((r0 * z0) / (t + r0)) ** 2 + (z1 / (t + 1)) ** 2 - 1
+    if (g > 0) lo = t
+    else if (g < 0) hi = t
+    else break
+  }
+  return Math.hypot((r0 * y0) / (t + r0) - y0, y1 / (t + 1) - y1)
+}
+
+/**
+ * The hole of radius `g` (m) touches the area a ring line bounds, with the hole centre `p` in m
+ * from the area's centre: a circle by the centre distance, an oval by the distance to its
+ * ellipse, a square by the distance to its square (rounded at the corners).
+ */
+function touches(ring: Shape, p: Point, g: number): boolean {
+  const w = radius(ring.diameter)
+  if (ring.shape === 'square')
+    return Math.hypot(Math.max(Math.abs(p.x) - w, 0), Math.max(Math.abs(p.y) - w, 0)) <= g + touch
+  if (ring.height) return ellipseGap(w, radius(ring.height), p.x, p.y) <= g + touch
+  return Math.hypot(p.x, p.y) <= w + g + touch
+}
+
+/** The bull a shot belongs to: the nearest centre (the first of the record on a tie). */
+function nearestBull(face: TargetFace, shot: Point): { centre: Point; zone?: string } {
+  let best = { centre: { x: 0, y: 0 }, zone: undefined as string | undefined }
+  let bestD = Number.POSITIVE_INFINITY
+  for (const b of face.bulls ?? []) {
+    const centre = { x: b.x.value * 1e-3, y: b.y.value * 1e-3 }
+    const d = Math.hypot(shot.x - centre.x, shot.y - centre.y)
+    if (d < bestD) [best, bestD] = [{ centre, zone: b.zone }, d]
+  }
+  return best
+}
+
+/**
+ * Score of a hole of diameter `hole` (m) centred at `shot` (m from the face centre): the bull
+ * nearest to the shot, then the highest ring whose outer edge the hole touches, tenths of that
+ * ring's width counted inward from the touching position, and the inner ten by the face's rule.
  */
 export function scoreShot(face: TargetFace, shot: Point, hole: number): RingScore {
+  const { centre, zone } = nearestBull(face, shot)
+  const score = scoreOnBull(face, { x: shot.x - centre.x, y: shot.y - centre.y }, hole)
+  return zone ? { ...score, zone } : score
+}
+
+/** `scoreShot` for one bull: `shot` in m from its centre. */
+function scoreOnBull(face: TargetFace, shot: Point, hole: number): RingScore {
   const d = Math.hypot(shot.x, shot.y)
   const g = hole / 2
   const rings = face.rings
-  const i = rings.findLastIndex((r) => d <= radius(r.diameter) + g + touch)
+  const i = rings.findLastIndex((r) => touches(r, shot, g))
   if (i < 0) return { value: 0, ...(face.decimal && { decimal: 0 }), innerTen: false }
   const value = rings[i].value
   const inner = face.innerTen
   const x =
     i === rings.length - 1 &&
     !!inner &&
-    (inner.rule === 'cover'
-      ? d + radius(inner.diameter) <= g + touch
-      : d <= radius(inner.diameter) + g + touch)
+    (inner.rule === 'cover' ? d + radius(inner.diameter) <= g + touch : touches(inner, shot, g))
   if (!face.decimal) return { value, innerTen: x }
   // ring width: to the next ring inward, for the innermost ring to the next ring outward
   const [a, b] = i < rings.length - 1 ? [rings[i], rings[i + 1]] : [rings[i - 1], rings[i]]
@@ -169,6 +229,9 @@ export function faceAlignment(
   aim: Point | undefined,
 ): FaceAlignment {
   if (!marks?.length) return { centre: aim ?? { x: 0, y: 0 }, scale: 1 }
+  if (face.bulls) throw new Error('Ring marks fit a face with one bull')
+  if (face.rings.some((r) => r.height || r.shape === 'square'))
+    throw new Error('Ring marks fit circular rings')
   const rings = new Map<number, Point[]>()
   for (const m of marks) rings.set(m.ring, [...(rings.get(m.ring) ?? []), m])
   const fit = fitRings(

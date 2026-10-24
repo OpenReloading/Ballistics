@@ -3,11 +3,11 @@
 import { Text } from '@mantine/core'
 import type { LengthUnit } from '@open-reloading/drawing'
 import { type BulletProfile, recordProfile } from '@open-reloading/drawing/bullet'
+import type { Bullet } from '@open-reloading/schema'
 import { WarningCircle } from '@phosphor-icons/react'
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { fetchRecord } from '../lib/api-fetch.ts'
-import type { BulletRecord } from '../lib/api-types.ts'
 import { sharedScale } from '../lib/bullet-compare.ts'
 import { compareHref, maxComparedBullets, parseCompareIds } from '../lib/compare-ids.ts'
 import {
@@ -52,7 +52,7 @@ function Problem({ title, text, rest }: { title: string; text: string; rest?: st
  * Every drawing at one text size and frame width, so at one scale, its lengths in `unit`; a reason
  * where one cannot draw.
  */
-function drawings(records: (BulletRecord & { manufacturerName: string })[], unit: LengthUnit) {
+function drawings(records: (Bullet & { manufacturerName: string })[], unit: LengthUnit) {
   const profiles = records.map(recordProfile)
   const drawn = profiles.filter((p): p is BulletProfile => !('reason' in p))
   const { models, tallest } =
@@ -93,13 +93,13 @@ function drawings(records: (BulletRecord & { manufacturerName: string })[], unit
 type Fetched =
   | { status: 'loading' }
   | { status: 'unavailable' }
-  | { status: 'ok'; records: (BulletRecord | undefined)[]; names: ManufacturerNames }
+  | { status: 'ok'; records: (Bullet | undefined)[]; names: ManufacturerNames }
 
 /** The records of `ids` (undefined where unknown) and the manufacturer names, through `apiFetch`. */
 async function fetchBullets(ids: string[]): Promise<Fetched> {
   try {
     const [records, names] = await Promise.all([
-      Promise.all(ids.map((id) => fetchRecord<BulletRecord>('bullets', id))),
+      Promise.all(ids.map((id) => fetchRecord<Bullet>('bullets', id))),
       fetchManufacturerNames(),
     ])
     return { status: 'ok', records, names }

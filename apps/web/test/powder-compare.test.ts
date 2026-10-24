@@ -1,7 +1,7 @@
+import type { Powder } from '@open-reloading/schema'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { answerRow, computeRows } from '../src/components/use-powder-compare.ts'
 import { fetchPowder, postInteriorRun, postJson } from '../src/lib/api-client.ts'
-import type { PowderRecord } from '../src/lib/api-types.ts'
 import { runBatch } from '../src/lib/batch.ts'
 import { noComparableLimitText, targetError, targetUnit } from '../src/lib/charge-target.ts'
 import { exampleInterior } from '../src/lib/example-data.ts'
@@ -106,7 +106,7 @@ describe('powderValues', () => {
         startPressure: { value: 250 },
         burnForm: { kind: 'twoStage', a: { value: 0.8 }, m: 0.5, q: 0.5, z1: 0.8 },
       },
-    }) as unknown as PowderRecord
+    }) as unknown as Powder
   // the user edited the vivacity and the ignition pressure of the chosen powder
   const fields = { vivacity: 0.9, ignitionPressure: 1e6, charge: 0.003, mass: 0.01 }
 
@@ -463,7 +463,7 @@ describe('postJson cut by an abort', () => {
 
 describe('computeRows in the target mode', () => {
   const body = interiorBody(exampleInterior, 'x')
-  const loadRequest = (as?: { powder: PowderRecord }) => ({
+  const loadRequest = (as?: { powder: Powder }) => ({
     body,
     bulkDensity: as?.powder.bulkDensity && as.powder.bulkDensity.value * 1e3,
     recordInputs: [],

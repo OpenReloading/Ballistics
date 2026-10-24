@@ -123,6 +123,114 @@
       },
       "section": "L 7.02, Z21",
       "scoring": "touch"
+    },
+    {
+      "name": "3812 MD Büchse Langwaffenkaliber SG SL off. Vis. HL u. 47 mm",
+      "distance": {
+        "value": 50000,
+        "raw": "30, 40, 50 m"
+      },
+      "section": "L 12.05, Z21",
+      "scoring": "touch"
+    },
+    {
+      "name": "3813 MD Büchse SG SL off. Vis. HL mind. 47 mm",
+      "distance": {
+        "value": 50000,
+        "raw": "30, 40, 50 m"
+      },
+      "section": "L 12.05, Z21",
+      "scoring": "touch"
+    },
+    {
+      "name": "3814 MD Büchse SG SL opt. Vis. HL u. 47 mm",
+      "distance": {
+        "value": 50000,
+        "raw": "30, 40, 50 m"
+      },
+      "section": "L 12.05, Z21",
+      "scoring": "touch"
+    },
+    {
+      "name": "3815 MD Büchse SG SL opt. Vis. HL mind. 47 mm",
+      "distance": {
+        "value": 50000,
+        "raw": "30, 40, 50 m"
+      },
+      "section": "L 12.05, Z21",
+      "scoring": "touch"
+    },
+    {
+      "name": "4801 MD Büchse SG SL KW off. Vis.",
+      "distance": {
+        "value": 25000,
+        "raw": "15, 20, 25 m"
+      },
+      "section": "L 12.05, Z21",
+      "scoring": "touch"
+    },
+    {
+      "name": "4802 MD Büchse SG SL KK opt. Vis.",
+      "distance": {
+        "value": 25000,
+        "raw": "15, 20, 25 m"
+      },
+      "section": "L 12.05, Z21",
+      "scoring": "touch"
+    },
+    {
+      "name": "4803 MD Büchse RB KW off. Vis.",
+      "distance": {
+        "value": 25000,
+        "raw": "15, 20, 25 m"
+      },
+      "section": "L 12.05, Z21",
+      "scoring": "touch"
+    },
+    {
+      "name": "4810 MD Büchse SG SL KW opt. Vis.",
+      "distance": {
+        "value": 25000,
+        "raw": "15, 20, 25 m"
+      },
+      "section": "L 12.05, Z21",
+      "scoring": "touch"
+    },
+    {
+      "name": "4812 MD Büchse SG SL KK off. Vis.",
+      "distance": {
+        "value": 25000,
+        "raw": "15, 20, 25 m"
+      },
+      "section": "L 12.05, Z21",
+      "scoring": "touch"
+    },
+    {
+      "name": "4814 MD Büchse RB KK beliebige Optik",
+      "distance": {
+        "value": 25000,
+        "raw": "15, 20, 25 m"
+      },
+      "section": "L 12.05, Z21",
+      "scoring": "touch"
+    },
+    {
+      "name": "4821 MD Büchse Pistole mit Anschlagschaft, offene Visierung",
+      "distance": {
+        "value": 25000,
+        "raw": "15, 20, 25 m"
+      },
+      "section": "L 12.05, Z21",
+      "scoring": "touch"
+    },
+    {
+      "name": "4822 MD Büchse Pistole mit Anschlagschaft, optische Visierung",
+      "distance": {
+        "value": 25000,
+        "raw": "15, 20, 25 m"
+      },
+      "section": "L 12.05, Z21",
+      "scoring": "touch"
     }
   ],
   "provenance": {
@@ -147,6 +255,11 @@
         "source": "bds-sporthandbuch-allgemein-2026",
         "fields": ["events.scoring"],
         "page": "A 9.02, Seite A-22, PDF p. 22"
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 12.01, L 12.05, Seite L-65 to L-69, PDF pp. 65 to 69",
+        "fields": ["events.name", "events.distance", "events.section"]
       }
     ]
   }

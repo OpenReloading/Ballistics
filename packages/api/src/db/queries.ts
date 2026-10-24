@@ -1,5 +1,5 @@
 import { type CartridgeDiameters, leastSpecValue } from '@open-reloading/core'
-import type { CaseCapacity } from '@open-reloading/schema'
+import type { CaseCapacity, CaseType } from '@open-reloading/schema'
 import { and, asc, count, eq, ilike, or, type SQL, sql } from 'drizzle-orm'
 import type { Db } from './index.ts'
 import {
@@ -131,7 +131,11 @@ export async function listCartridges(db: Db, params: CartridgeListParams) {
  * 0.3 mm and at most 0.7 mm wider, rebated with it more than 0.25 mm narrower, rimless between.
  * Bounds set by hand.
  */
-export function caseType(r1: number | null, p1: number | null, r3: number | null) {
+export function caseType(
+  r1: number | null,
+  p1: number | null,
+  r3: number | null,
+): CaseType | undefined {
   if (r3 !== null) return 'belted'
   if (r1 === null || p1 === null) return
   // to 0.01 mm, the records' resolution, so a difference on a bound stays on its side

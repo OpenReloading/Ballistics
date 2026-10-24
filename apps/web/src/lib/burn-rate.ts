@@ -2,8 +2,10 @@
  * Burn-rate charts from fitted M3 parameters (`apps/docs/docs/models/interior-burn-forms.md`, "Dynamic vivacity"): dynamic vivacity
  * in 1/(MPa s), interval plus and minus `uncertaintyFactor` standard uncertainties of the fitted vivacity.
  */
+
 import { dynamicVivacity, meanDynamicVivacity, type VivacityBurn } from '@open-reloading/core'
-import type { PowderRecord, PowderSummary } from './api-types.ts'
+import type { Powder } from '@open-reloading/schema'
+import type { PowderSummary } from './api-types.ts'
 import { type ManufacturerNames, productLabel } from './manufacturers.ts'
 import { formatNumber } from './units.ts'
 
@@ -48,10 +50,7 @@ const noFitReason =
   'No fitted parameters: the load-table fit gives parameters only to powders with at least 10 training rows from at least 2 cartridges.'
 
 /** What `classifyPowder` reads: a powder record or a list summary, with its manufacturer's name where known. */
-type BurnSource = Pick<
-  PowderRecord,
-  'id' | 'manufacturer' | 'name' | 'grainForm' | 'propellantBase'
-> & {
+type BurnSource = Pick<Powder, 'id' | 'manufacturer' | 'name' | 'grainForm' | 'propellantBase'> & {
   manufacturerName?: string
   interior?: PowderSummary['interior']
 }
