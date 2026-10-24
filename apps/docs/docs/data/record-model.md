@@ -53,7 +53,7 @@ Ranked by how much code and visible behavior depends on them.
 
 **Units (high).** Catalogue records and cartridge designs use the stored units of `packages/schema/src/units.ts`. Firearm, workbench state, bullet design, target sheet, measured series and every solver body use SI. The same quantity then differs by a factor in different entities: charge in g or kg, barrel length in mm or m, muzzle distance in mm or m. `units` holds labels only, so conversion factors are written by hand in many files (one named table, `storedToSi` in `apps/web/src/lib/field-spec.ts`).
 
-**Ids (medium).** Six rules: the kebab-case `recordId`, `localId` (1 to 64 characters, any), the same bound written inline, a 1 to 200 character string for references to catalogue records, the API path pattern and the derived `sheetId`. User ids come from `Math.random`. A user id and a catalogue id share one alphabet, so a reference cannot say which side it names.
+**Ids (medium).** Six rules: the kebab-case `recordId`, `localId` (1 to 64 characters, any), the same bound written inline, a 1 to 200 character string for references to catalogue records, the API path pattern and the derived `sheetId`. Step 3 gives user ids a UUID generator and references a scope, see "Step 3: what changed".
 
 **Types and enums (medium).** `apps/web/src/lib/api-types.ts` re-declared the record types of the schema, and the case type list existed in the API route and in the web app. Drift showed in `productNumber` (optional in the copy, required in the schema) and in `ogive.form` (a string). Step 1 removes this.
 
@@ -132,7 +132,7 @@ Ranked by impact.
 
 1. User data the schema rejects is hidden: the store lists only valid records, an invalid one stays in IndexedDB, appears nowhere and is left out of Export all. A schema change makes data vanish from the user's view.
 2. The browser store has no version, so a new object store cannot be added to an existing database. The file `version` is one integer for the whole file.
-3. References in user data are never checked on open: the workbench's firearm, a sheet's load, a group's chronograph session and a design's `parent`.
+3. References in user data were never checked on open: the workbench's firearm, a sheet's load, a group's chronograph session and a design's `parent`. Step 3 checks the first two.
 4. The unit split above is the largest regression risk: about 150 hand-written conversions.
 5. Schema, designer and web types drifted apart where copied (step 1).
 6. `Load`, `ChronoSession`, `FiringSeries` and `RangeFirings` are validated and bundled but nothing reads them, so they can drift unseen.
@@ -153,7 +153,7 @@ Each step lands alone with its model page updated in the same commit. Steps 4 to
 |---|---|---|
 | 1 | Single source of types and vocabularies (done, below) | |
 | 2 | One unit table: `toSi` and `fromSi` per quantity kind | |
-| 3 | Id and reference primitives, `checkUserRefs` | |
+| 3 | Id and reference primitives, `checkUserRefs` (done, below) | |
 | 4 | Designs become overrides of Bullet and Cartridge | 1, 3 |
 | 5 | Firearm in one shape | 2 |
 | 6 | Load unification: the workbench state becomes Load | 2 to 5 |
@@ -172,6 +172,13 @@ Steps 1, 2 and 11 go first, then 3, then 4 to 6, then 7 to 9. Steps 10 and 12 fi
 - `caseTypes` is one enum in `packages/schema/src/cartridge.ts`, used by the cartridges route and the web filter.
 - The designer's choice lists are the options of the enums `baseTypes`, `ogiveForms` and `tipTypes` of `packages/schema/src/bullet.ts`. A test checks that each list is a subset of the enum at its path in the bullet schema.
 - The bullet schema gains the ogive forms `round-nose` and `flat-nose` and an optional `cannelure` (`start`, `width`, `depth?`, lengths in mm). Existing records stay valid. The drawing reads a record's cannelure.
+
+### Step 3: what changed
+
+- `userId` (`packages/schema/src/ids.ts`) is a lowercase UUID, `ref(kind)` a reference `"catalogue:<record id>"` or `"user:<UUID>"`, `parseRef` splits one into scope and id. The kind only names the entity in the description: the text carries no kind.
+- The browser creates the id of every new user record and photo with `crypto.randomUUID()` (`newId` in `apps/web/src/components/file-menu.tsx`). The record `id` of a user data file keeps its bound (1 to 64 characters), so records saved with an older id open as before.
+- `checkUserRefs(records)` (`packages/schema/src/user-data.ts`) returns the references between user records that no record answers: a workbench state's `firearm` (an old id or `user:<id>`) and a target sheet's `load`. Open and Import report them in the status line or the import report, `refNote` in `apps/web/src/lib/user-data.ts`, and drop nothing. A `catalogue:` reference, a catalogue id (`cartridge`, `bullet`, `powder`, a design's `parent`) and a group's chronograph session (no user record holds one before step 7) are not checked.
+- Existing fields keep their type: the references of the workbench state and the sheet stay plain ids until the steps that reshape those entities.
 
 ## Decisions
 

@@ -9,6 +9,7 @@ import {
   maxFileBytes,
   parseUserDataFile,
   planImport,
+  refNote,
   tooLargeMessage,
   userDataText,
   validRecords,
@@ -319,5 +320,34 @@ describe('share links', () => {
   it('ignores a fragment without a record', async () => {
     expect(await readLink('#results')).toBeUndefined()
     expect(await readLink('')).toBeUndefined()
+  })
+})
+
+describe('refNote', () => {
+  const withFirearm = (firearm: string): UserRecord => ({
+    ...load,
+    data: { ...load.data, firearm },
+  })
+  const rifle = {
+    kind: 'firearm',
+    id: 'f1',
+    name: 'Rifle',
+    saved,
+    data: { name: 'Rifle', barrelLength: 0.6, twist: 0.25, twistHand: 'right' },
+  } as UserRecord
+
+  it('names the records whose reference points at no record', () => {
+    expect(refNote([withFirearm('gone')], [])).toBe(
+      'Not found: 308 Win.: the firearm gone is not in this browser.',
+    )
+  })
+
+  it('is empty when the browser holds the referenced record, or the opened ones do', () => {
+    expect(refNote([withFirearm('f1')], [rifle])).toBe('')
+    expect(refNote([withFirearm('f1'), rifle], [])).toBe('')
+  })
+
+  it('does not report a stored record that is not opened', () => {
+    expect(refNote([bullet], [withFirearm('gone')])).toBe('')
   })
 })

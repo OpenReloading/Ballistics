@@ -30,6 +30,7 @@ import {
   type ParsedUserFile,
   parseUserDataFile,
   planImport,
+  refNote,
   renamedKey,
   tooLargeMessage,
   userDataText,
@@ -66,7 +67,7 @@ const ask = (title: string, confirmLabel: string) =>
 
 type Of<K extends UserRecordKind> = Extract<UserRecord, { kind: K }>
 
-export const newId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`
+export const newId = () => crypto.randomUUID()
 
 /** A file's text; undefined for a file over the size limit, which is not read. */
 const read = async (file: File) => (file.size > maxFileBytes ? undefined : file.text())
@@ -698,7 +699,7 @@ function FileMenuOf<K extends UserRecordKind>({
   }
 
   /** Shows `record` unless the user keeps the unsaved changes; false when kept. */
-  async function use(record: Of<K>, file: string, h?: FileSystemFileHandle) {
+  async function use(record: Of<K>, file: string, h?: FileSystemFileHandle, note?: string) {
     if (unsaved && !(await ask('Replace the unsaved changes with the opened record?', 'Replace')))
       return false
     onOpen(record.data as Of<K>['data'], record.name, record)
@@ -706,6 +707,9 @@ function FileMenuOf<K extends UserRecordKind>({
     handle.current = h
     known.current = record.saved
     setSaved({ file, json: keyOf(record.data, record.name) })
+    const stored = (await storedRecords().catch(() => undefined))?.records ?? []
+    const text = [note, refNote([record], stored)].filter(Boolean).join(' ')
+    if (text) setMessage(`${file} opened. ${text}`)
     return true
   }
 
@@ -744,16 +748,12 @@ function FileMenuOf<K extends UserRecordKind>({
       onStored?.()
     }
     // Save writes back only to a file of this record alone
-    const note = readNote(parsed)
-    if (
-      (await use(
-        mine[0],
-        picked.file.name,
-        ownsFile(text, mine[0].id) ? picked.handle : undefined,
-      )) &&
-      note
+    await use(
+      mine[0],
+      picked.file.name,
+      ownsFile(text, mine[0].id) ? picked.handle : undefined,
+      readNote(parsed),
     )
-      setMessage(`${picked.file.name} opened. ${note}`)
   }
 
   /** True when a file was written. */
@@ -803,6 +803,7 @@ function FileMenuOf<K extends UserRecordKind>({
       files: [],
     }
     let count = 0
+    const added: UserRecord[] = []
     for (const f of files) {
       const {
         records,
@@ -821,6 +822,7 @@ function FileMenuOf<K extends UserRecordKind>({
         if (total.added) onStored?.()
         return
       }
+      added.push(...plan.added)
       total.added += plan.added.length
       total.equal += plan.equal.length
       total.skipped.push(...skipped)
@@ -830,6 +832,9 @@ function FileMenuOf<K extends UserRecordKind>({
       const wanted = new Set(photoIds(plan.conflicts.map((c) => c.incoming)))
       total.files.push(...photos.filter((p) => wanted.has(p.id)))
     }
+    // once all files are stored, so a reference to a record of a later file resolves
+    const refs = refNote(added, (await storedRecords()).records)
+    if (refs) total.notes.push({ name: 'References', note: refs })
     onStored?.()
     noteStorage()
     setReport(total)

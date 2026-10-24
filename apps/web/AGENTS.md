@@ -37,6 +37,7 @@ Next.js App Router (TypeScript, React). API at `API_URL` (default `http://localh
 - List sources: the bullet and cartridge lists add the browser's design records as Mine rows (`useUserRecords`, `list-sources.tsx`, rows in `src/lib/sources.ts`).
   - `SourceFilter` (a button with a checkbox per source and its count) in the URL as `?src=`, on every list. Powders have the one source OpenReloading (no user record holds a powder). Firearms: the example is OpenReloading, the firearms of this browser Mine. The bullet and cartridge lists show a Source column only with Mine rows: a Mine row's badge and Delete, a catalogue row blank. A cell without a value shows n/a. Below 48em Delete is at the end of the row (`phoneAction`).
   - The designers open `?record=<id>` from the browser store (`use-record-link.ts`).
+  - New records and photos get `crypto.randomUUID()` ids (`newId` in `file-menu.tsx`); older ids stay valid. Open and Import report references to missing user records with `refNote` (`src/lib/user-data.ts`, `checkUserRefs` of the schema) and keep the records.
 - Cartridge record (`components/cartridge-record.tsx`, rows from `src/lib/cartridge-record.ts`):
   - Four fact cards (`RecordFacts`). The mm or in switch in the heads of the Cartridge and Chamber panels.
   - A shotshell's Variants panel, with the variant select in its title row (`VariantSelect`).
