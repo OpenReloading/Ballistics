@@ -1,0 +1,91 @@
+{
+  "id": "bdmp-long-range-palma",
+  "name": "BDMP-Scheibe Long Range Palma Match",
+  "organization": "BDMP",
+  "rings": [
+    {
+      "value": 6,
+      "diameter": {
+        "value": 1981.2
+      },
+      "fill": "white"
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 1524
+      },
+      "fill": "white"
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 1117.6
+      },
+      "fill": "black"
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 762
+      },
+      "fill": "black"
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 508
+      },
+      "fill": "black"
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 254
+    }
+  },
+  "blackDiameter": {
+    "value": 1117.6
+  },
+  "events": [
+    {
+      "name": "BDMP ZFSPFG 3 ZF Schwarzpulverfreigewehr (SPFG 3)",
+      "distance": {
+        "value": 900000,
+        "raw": "300 bis 900m"
+      },
+      "section": "B.11.8.7 and E.14.8 (Teil B, PDF p. 40; Teil E, PDF p. 38)",
+      "scoring": "centre"
+    }
+  ],
+  "paper": {
+    "width": {
+      "value": 3048
+    },
+    "height": {
+      "value": 1828.8
+    }
+  },
+  "photoSearch": false,
+  "note": "The book prints inch values with the centimetre values. The inner ten is the X (10 in). Ring 5 is the rest of the hit area (120 in x 72 in), the host country may leave a five ring out.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.8.7, Teil B, Seite 40 von 70, PDF p. 40",
+        "fields": ["name", "rings", "innerTen.diameter", "paper", "blackDiameter"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.14.8, Teil E, Seite 38 von 42, PDF p. 38",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-6",
+        "page": "A.3.21.4.1, Teil A, Seite 15 von 32, PDF p. 15",
+        "fields": ["events.scoring"]
+      }
+    ]
+  }
+}

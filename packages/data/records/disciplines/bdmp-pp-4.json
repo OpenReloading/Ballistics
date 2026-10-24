@@ -1,0 +1,29 @@
+{
+  "id": "bdmp-pp-4",
+  "federation": "bdmp",
+  "name": "Police Pistol 4 (Pocket Gun)",
+  "number": "PP 4",
+  "section": "C.6E",
+  "page": "Teil C, Seite 34 bis 35 von 142, PDF pp. 34 to 35",
+  "distance": {
+    "value": 15000,
+    "raw": "15 m"
+  },
+  "category": "pistol",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6E, C.6E.1, Teil C, Seite 34 von 142, PDF p. 34",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6E.5, Teil C, Seite 35 von 142, PDF p. 35",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "Revolvers with a 3 in barrel and pistols that fit the 180 x 140 x 40 mm box (C.6E.1). The course runs at 15, 10 and 7 m, the record holds the longest distance."
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "id": "bdmp-sports-carbine-pp-2",
+  "federation": "bdmp",
+  "name": "Sports Carbine PP2",
+  "number": "SC PP 2",
+  "section": "D.36",
+  "page": "Teil D, Seite 277 bis 284 von 294, PDF pp. 277 to 284",
+  "distance": {
+    "value": 50000,
+    "raw": "50 Meter/Yards"
+  },
+  "category": "carbine",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.36, D.36.1, Teil D, Seite 277 von 294, PDF p. 277",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.36.7, Teil D, Seite 278 bis 279 von 294, PDF pp. 278 to 279",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "Carbines in handgun calibers from .35, metres or yards by announcement (D.36.7). Six sighters at 50 m (D.36.12). Sports Carbine PP2 Rifle .223 (D.36.19, Teil D, PDF p. 284) is scored separately. The course runs at 10, 50 and 25 m, the record holds the longest distance."
+  }
+}

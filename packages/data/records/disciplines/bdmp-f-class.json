@@ -1,0 +1,29 @@
+{
+  "id": "bdmp-f-class",
+  "federation": "bdmp",
+  "name": "F-Class Rifle",
+  "number": "F-Class",
+  "section": "D.23",
+  "page": "Teil D, Seite 210 bis 221 von 294, PDF pp. 210 to 221",
+  "distance": {
+    "value": 1000000,
+    "raw": "1000 m"
+  },
+  "category": "rifle",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.23, D.23.1, Teil D, Seite 210 von 294, PDF p. 210",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.23.1.14, Teil D, Seite 215 von 294, PDF p. 215",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "F-Class Open (D.23.1) and F-Class Target Rifle (D.23.2, Teil D, PDF pp. 220 to 221, .223 Remington and .308 Winchester, scored separately) share distances, shots and faces. Distances are 300 to 1000 m in 100 m steps nationally and 300 to 1200 yd abroad by announcement, the record holds the longest national distance."
+  }
+}

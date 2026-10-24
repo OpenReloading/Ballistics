@@ -1,0 +1,239 @@
+{
+  "id": "bdmp-pp1",
+  "name": "BDMP-Scheibe Police Pistol 1",
+  "organization": "BDMP",
+  "rings": [
+    {
+      "value": 6,
+      "diameter": {
+        "value": 450
+      },
+      "height": {
+        "value": 760
+      }
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 360
+      },
+      "height": {
+        "value": 607.5
+      }
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 270
+      },
+      "height": {
+        "value": 455
+      }
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 180
+      },
+      "height": {
+        "value": 302.5
+      }
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 90
+      },
+      "height": {
+        "value": 150
+      }
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 50
+    }
+  },
+  "blackDiameter": {
+    "value": 450
+  },
+  "events": [
+    {
+      "name": "BDMP PP 1 Police Pistol 1",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "section": "B.11.9 and C.6A.4 (Teil B, PDF p. 42; Teil C, PDF p. 25)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP PP 2 Police Pistol 2",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m / y"
+      },
+      "section": "B.11.9 and C.6B.4 (Teil B, PDF p. 42; Teil C, PDF p. 27)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP SM Super Magnum",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "section": "B.11.9 and C.6C.4 (Teil B, PDF p. 42; Teil C, PDF p. 30)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP PP 3 Police Pistol 3 (Carry Gun)",
+      "distance": {
+        "value": 20000,
+        "raw": "20 m"
+      },
+      "section": "B.11.9 and C.6D.4 (Teil B, PDF p. 42; Teil C, PDF p. 33)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP PP 4 Police Pistol 4 (Pocket Gun)",
+      "distance": {
+        "value": 15000,
+        "raw": "15 m"
+      },
+      "section": "B.11.9 and C.6E.4 (Teil B, PDF p. 42; Teil C, PDF p. 35)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP .30 M 1 Carbine \"PP 2\"",
+      "distance": {
+        "value": 50000,
+        "raw": "50 m"
+      },
+      "section": "B.11.9 and D.10D.7 (Teil B, PDF p. 42; Teil D, PDF pp. 61 to 62)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP LAR 4 Lever Action Rifle 4 (LAR - PP1)",
+      "distance": {
+        "value": 25000,
+        "raw": "25 Meter"
+      },
+      "section": "B.11.9 and D.16B.8 (Teil B, PDF p. 42; Teil D, PDF p. 104)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP LAR 6 Lever Action Rifle 6 (LAR - PP 2)",
+      "distance": {
+        "value": 50000,
+        "raw": "50 Meter"
+      },
+      "section": "B.11.9 and D.16D.8 (Teil B, PDF p. 42; Teil D, PDF p. 114)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP SC PP 2 Sports Carbine PP2",
+      "distance": {
+        "value": 50000,
+        "raw": "50 Meter/Yards"
+      },
+      "section": "B.11.9 and D.36.6 (Teil B, PDF p. 42; Teil D, PDF p. 278)",
+      "scoring": "touch"
+    },
+    {
+      "name": "BDMP SPPDR 1 Schwarzpulverpatronen-DR 1",
+      "distance": {
+        "value": 25000,
+        "raw": "25 m"
+      },
+      "section": "B.11.9 and E.11.5 (Teil B, PDF p. 42; Teil E, PDF p. 31)",
+      "scoring": "centre"
+    }
+  ],
+  "paper": {
+    "width": {
+      "value": 450
+    },
+    "height": {
+      "value": 770
+    }
+  },
+  "photoSearch": false,
+  "note": "Oval ring face printed black on white. The X is a circle of 50 mm. Ring 5 is the rest of the sheet (450 x 770 mm). The book prints no separate aiming black, the figure shows an irregular black pattern over the sheet.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.9, Teil B, Seite 42 von 70, PDF p. 42",
+        "fields": ["name", "rings", "innerTen.diameter", "paper"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.9, Teil B, Seite 42 von 70, PDF p. 42",
+        "fields": ["blackDiameter"],
+        "kind": "derived",
+        "note": "The book prints no separate aiming black; the value is the width of the outermost ring."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6A.4, Teil C, Seite 25 von 142, PDF p. 25",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6B.4, Teil C, Seite 27 von 142, PDF p. 27",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6C.4, Teil C, Seite 30 von 142, PDF p. 30",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6D.4, Teil C, Seite 33 von 142, PDF p. 33",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6E.4, Teil C, Seite 35 von 142, PDF p. 35",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10D.7, Teil D, Seite 61 bis 62 von 294, PDF pp. 61 to 62",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16B.8, Teil D, Seite 104 von 294, PDF p. 104",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16D.8, Teil D, Seite 114 von 294, PDF p. 114",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.36.6, Teil D, Seite 278 von 294, PDF p. 278",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.11.5, Teil E, Seite 31 von 42, PDF p. 31",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-6",
+        "page": "A.3.21.4.1, Teil A, Seite 15 von 32, PDF p. 15",
+        "fields": ["events.scoring"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-6",
+        "page": "A.3.21.1.3, Teil A, Seite 14 von 32, PDF p. 14",
+        "fields": ["events.scoring"]
+      }
+    ]
+  }
+}

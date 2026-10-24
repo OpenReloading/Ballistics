@@ -1,0 +1,29 @@
+{
+  "id": "bdmp-sm",
+  "federation": "bdmp",
+  "name": "Super Magnum",
+  "number": "SM",
+  "section": "C.6C",
+  "page": "Teil C, Seite 30 bis 31 von 142, PDF pp. 30 to 31",
+  "distance": {
+    "value": 25000,
+    "raw": "25 m"
+  },
+  "category": "pistol",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6C, C.6C.1, Teil C, Seite 30 von 142, PDF p. 30",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6C.5, Teil C, Seite 30 von 142, PDF p. 30",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "Calibers .44 Magnum to .50 with a muzzle energy of at least 1200 J (C.6C.1, C.6C.3). The course runs at 25, 15 and 10 m, the record holds the longest distance. SM may also be shot with optical sights, scored separately (C.6C.8, Teil C, PDF p. 31)."
+  }
+}

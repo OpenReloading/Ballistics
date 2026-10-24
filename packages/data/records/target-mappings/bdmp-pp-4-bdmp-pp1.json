@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-pp-4-bdmp-pp1",
+  "discipline": "bdmp-pp-4",
+  "face": "bdmp-pp1",
+  "event": "BDMP PP 4 Police Pistol 4 (Pocket Gun)",
+  "shotCount": 30,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.9, Teil B, Seite 42 von 70, PDF p. 42",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6E.4, Teil C, Seite 35 von 142, PDF p. 35",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6E.3, Teil C, Seite 35 von 142, PDF p. 35",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "10 shots at each of 15, 10 and 7 m (C.6E.5)."
+  }
+}

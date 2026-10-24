@@ -1,0 +1,29 @@
+{
+  "id": "bdmp-sppdr-1",
+  "federation": "bdmp",
+  "name": "Schwarzpulverpatronen-DR 1",
+  "number": "SPPDR 1",
+  "section": "E.11",
+  "page": "Teil E, Seite 31 bis 32 von 42, PDF pp. 31 to 32",
+  "distance": {
+    "value": 25000,
+    "raw": "25 m"
+  },
+  "category": "revolver",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.11, E.11.1, Teil E, Seite 31 von 42, PDF p. 31",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.11.6, Teil E, Seite 31 von 42, PDF p. 31",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "Metallic-cartridge black-powder revolvers of a regular army."
+  }
+}

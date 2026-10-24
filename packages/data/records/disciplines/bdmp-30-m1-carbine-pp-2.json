@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-30-m1-carbine-pp-2",
+  "federation": "bdmp",
+  "name": ".30 M 1 Carbine \"PP 2\"",
+  "section": "D.10D",
+  "page": "Teil D, Seite 61 bis 65 von 294, PDF pp. 61 to 65",
+  "distance": {
+    "value": 50000,
+    "raw": "50 m"
+  },
+  "category": "carbine",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10D, D.10D.1, Teil D, Seite 61 von 294, PDF p. 61",
+        "fields": ["name", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10D.10, Teil D, Seite 62 von 294, PDF p. 62",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "The course runs at 10, 50 and 25 m. D.10D.0 names the pistol discipline PP 1 under a PP 2 heading. The record holds the longest distance."
+  }
+}

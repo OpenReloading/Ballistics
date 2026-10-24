@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-distinguished-revolver-1020",
+  "federation": "bdmp",
+  "name": "Distinguished Revolver 1020",
+  "section": "C.21.D",
+  "page": "Teil C, Seite 140 von 142, PDF p. 140",
+  "distance": {
+    "value": 25000,
+    "raw": "25 Meter/ Yard"
+  },
+  "category": "revolver",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.21, C.21.D, Teil C, Seite 140 von 142, PDF p. 140",
+        "fields": ["name", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.21, Teil C, Seite 138 von 142, PDF p. 138",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "Weapon, sights and caliber as C.9.5 (metres or yards)."
+  }
+}

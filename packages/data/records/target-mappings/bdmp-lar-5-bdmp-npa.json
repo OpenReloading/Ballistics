@@ -1,0 +1,23 @@
+{
+  "id": "bdmp-lar-5-bdmp-npa",
+  "discipline": "bdmp-lar-5",
+  "face": "bdmp-npa",
+  "event": "BDMP LAR 5 Lever Action Rifle 5 (LAR - NPA-B)",
+  "shotCount": 24,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16C.8, Teil D, Seite 109 von 294, PDF p. 109",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16C.6, Teil D, Seite 109 von 294, PDF p. 109",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "Two full-size NPA faces per shooter (D.16C.8). 4 stations of 6 shots (D.16C.11). No sighters (D.16C.14)."
+  }
+}

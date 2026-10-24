@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-sppdr-1-bdmp-pp1",
+  "discipline": "bdmp-sppdr-1",
+  "face": "bdmp-pp1",
+  "event": "BDMP SPPDR 1 Schwarzpulverpatronen-DR 1",
+  "shotCount": 15,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.9, Teil B, Seite 42 von 70, PDF p. 42",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.11.5, Teil E, Seite 31 von 42, PDF p. 31",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.11.7, Teil E, Seite 32 von 42, PDF p. 32",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "15 shots in 3 short series of 5, any number of sighters in 5 min (E.11.7). E.11.5 prints \"PP 1-Scheibe\" without a B.11 number."
+  }
+}

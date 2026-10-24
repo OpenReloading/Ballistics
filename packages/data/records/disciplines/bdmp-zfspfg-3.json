@@ -1,0 +1,29 @@
+{
+  "id": "bdmp-zfspfg-3",
+  "federation": "bdmp",
+  "name": "ZF Schwarzpulverfreigewehr (SPFG 3)",
+  "number": "ZFSPFG 3",
+  "section": "E.14",
+  "page": "Teil E, Seite 37 bis 41 von 42, PDF pp. 37 to 41",
+  "distance": {
+    "value": 900000,
+    "raw": "300 bis 900m"
+  },
+  "category": "rifle",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.14, E.14.1, Teil E, Seite 37 von 42, PDF p. 37",
+        "fields": ["name", "number", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.14.8, Teil E, Seite 38 von 42, PDF p. 38",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "Class SPFG 3 of E.14. E.14.8 gives 300 to 900 m and does not say which distances make a match, the record holds the longest."
+  }
+}

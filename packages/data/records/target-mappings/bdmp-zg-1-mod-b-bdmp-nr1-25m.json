@@ -1,0 +1,25 @@
+{
+  "id": "bdmp-zg-1-mod-b-bdmp-nr1-25m",
+  "discipline": "bdmp-zg-1-mod-b",
+  "face": "bdmp-nr1-25m",
+  "event": "BDMP ZG 1 mod. B Zielfernrohrgewehr 1 modifiziert B",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.11.16, Teil D, Seite 70 von 294, PDF p. 70",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.11.16, Teil D, Seite 70 von 294, PDF p. 70",
+        "fields": ["shotCount"],
+        "kind": "derived",
+        "note": "The product of the scoring fields and the shots per field."
+      }
+    ],
+    "note": "D.11.16 prints the same face and layout as D.11.15 and names no B.11 face. The face is the Nr. 1 reduced face of B.11.2 (Teil B, PDF p. 16), whose rings are 25 % of those of Nr. 1 at 100 m. 5 scoring fields of 4 shots make 20."
+  }
+}

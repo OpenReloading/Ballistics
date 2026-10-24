@@ -1,0 +1,23 @@
+{
+  "id": "bdmp-30-m1-carbine-pp-2-bdmp-pp1",
+  "discipline": "bdmp-30-m1-carbine-pp-2",
+  "face": "bdmp-pp1",
+  "event": "BDMP .30 M 1 Carbine \"PP 2\"",
+  "shotCount": 60,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10D.7, Teil D, Seite 61 bis 62 von 294, PDF pp. 61 to 62",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10D.6, Teil D, Seite 61 von 294, PDF p. 61",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "The 50 m station is shot on the full PP 1 face. The 10 m and 25 m stations use a PP 1 face reduced to 50 %, for which the book prints no dimensions and no record exists."
+  }
+}

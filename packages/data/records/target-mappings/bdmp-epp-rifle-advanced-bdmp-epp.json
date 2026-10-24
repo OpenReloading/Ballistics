@@ -1,0 +1,23 @@
+{
+  "id": "bdmp-epp-rifle-advanced-bdmp-epp",
+  "discipline": "bdmp-epp-rifle-advanced",
+  "face": "bdmp-epp",
+  "event": "BDMP EPP Rifle Advanced EPP Rifle Advanced",
+  "shotCount": 50,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.25.10, Teil D, Seite 234 von 294, PDF p. 234",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.25.8, Teil D, Seite 233 von 294, PDF p. 233",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "D.25.B restates no shot count or face, they are those of D.25 (50 shots, one EPP face)."
+  }
+}

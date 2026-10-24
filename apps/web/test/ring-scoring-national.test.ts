@@ -157,6 +157,7 @@ describe('DSU Sporthandbuch 2018, DSU-Scheibe 200 Meter Präzision (Seite 19, PD
       f.events.filter((e) => e.scoring === 'centre').map((e) => e.name),
     )
     expect(names.sort()).toEqual([
+      'BDMP LRSPFG 3 LR Schwarzpulverfreigewehr (SPFG 3)',
       'BDMP LRSPFG LR Schwarzpulverfreigewehr, 100 m',
       'BDMP LRSPFG LR Schwarzpulverfreigewehr, 300 m',
       'BDMP PFG 1 Perkussions-Freigewehr 1',
@@ -167,9 +168,12 @@ describe('DSU Sporthandbuch 2018, DSU-Scheibe 200 Meter Präzision (Seite 19, PD
       'BDMP SDP 1 Steinschloss-Dienstpistole 1',
       'BDMP SDP 2 Steinschloss-Dienstpistole 2',
       'BDMP SPPDG 2 Schwarzpulverpatronen-DG 2',
+      'BDMP SPPDR 1 Schwarzpulverpatronen-DR 1',
       'BDMP VDR 1 Vorderlader-Dienstrevolver 1',
       'BDMP VDR 2 Vorderlader-Dienstrevolver 2',
       'BDMP VP 1 Vorderladerpistole 1',
+      'BDMP ZFSPFG 3 ZF Schwarzpulverfreigewehr (SPFG 3)',
+      'BDMP ZFSPFG 3 ZF Schwarzpulverfreigewehr (SPFG 3)',
       'BDMP ZFSPFG ZF Schwarzpulverfreigewehr, 100 m',
       'BDMP ZFSPFG ZF Schwarzpulverfreigewehr, 300 m',
       'DSB 25 m Luntenschlosspistole',

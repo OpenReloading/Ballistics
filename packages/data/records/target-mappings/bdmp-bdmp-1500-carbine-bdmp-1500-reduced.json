@@ -1,0 +1,23 @@
+{
+  "id": "bdmp-bdmp-1500-carbine-bdmp-1500-reduced",
+  "discipline": "bdmp-bdmp-1500-carbine",
+  "face": "bdmp-1500-reduced",
+  "event": "BDMP BDMP 1500 Carbine",
+  "shotCount": 150,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.37.8, Teil D, Seite 288 von 294, PDF p. 288",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.37.1, Teil D, Seite 284 von 294, PDF p. 284",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "D.37.8 prints \"BDMP 1500 - reduziert\" (B.11.11). Match 5 alone (60 shots) is a recognised short programme (D.37.1)."
+  }
+}

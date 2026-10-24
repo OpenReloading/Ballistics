@@ -1,0 +1,25 @@
+{
+  "id": "bdmp-standard-revolver-4-25-1020-bdmp-1500",
+  "discipline": "bdmp-standard-revolver-4-25-1020",
+  "face": "bdmp-1500",
+  "event": "BDMP Standard Revolver 4,25“ 1020",
+  "shotCount": 102,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.21, Teil C, Seite 139 von 142, PDF p. 139",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.21, Teil C, Seite 138 von 142, PDF p. 138",
+        "fields": ["shotCount"],
+        "kind": "derived",
+        "note": "The book prints no total; the figure is the sum of the shots of the course table."
+      }
+    ],
+    "note": "The five matches of C.21 (Teil C, PDF p. 138) at 7, 15 and 25 m or yd add up to 102 shots, the book prints no total. B.11.11 does not list the 1020 matches, C.21 names the BDMP 1500 face."
+  }
+}

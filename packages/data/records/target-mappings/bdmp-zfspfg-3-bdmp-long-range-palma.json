@@ -1,0 +1,29 @@
+{
+  "id": "bdmp-zfspfg-3-bdmp-long-range-palma",
+  "discipline": "bdmp-zfspfg-3",
+  "face": "bdmp-long-range-palma",
+  "event": "BDMP ZFSPFG 3 ZF Schwarzpulverfreigewehr (SPFG 3)",
+  "stage": "Alternative face",
+  "shotCount": 10,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-7",
+        "page": "B.11.8.7, Teil B, Seite 40 von 70, PDF p. 40",
+        "fields": ["discipline", "face", "event"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.14.8, Teil E, Seite 38 von 42, PDF p. 38",
+        "fields": ["discipline", "face", "event", "stage"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.14.7, Teil E, Seite 38 von 42, PDF p. 38",
+        "fields": ["shotCount"]
+      }
+    ],
+    "note": "E.14.8 and E.14.20 (Teil E, PDF p. 41) allow the Long Range Palma Match face as an alternative."
+  }
+}

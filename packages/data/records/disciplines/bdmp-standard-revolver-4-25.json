@@ -1,0 +1,28 @@
+{
+  "id": "bdmp-standard-revolver-4-25",
+  "federation": "bdmp",
+  "name": "Standard Revolver 4,25“",
+  "section": "C.9.6",
+  "page": "Teil C, Seite 65 bis 66 von 142, PDF pp. 65 to 66",
+  "distance": {
+    "value": 25000,
+    "raw": "25 Meter/Yards"
+  },
+  "category": "revolver",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.9, C.9.6, C.9.6.1, Teil C, Seite 65 von 142, PDF p. 65",
+        "fields": ["name", "federation", "section", "page", "category"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.2, Teil C, Seite 42 bis 43 von 142, PDF pp. 42 to 43",
+        "fields": ["distance"]
+      }
+    ],
+    "note": "Metres or yards."
+  }
+}
