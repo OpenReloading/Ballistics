@@ -2,8 +2,11 @@ import {
   interiorLoad,
   interiorValueKeys,
   overrideResistance,
+  powderModelValues,
   recordResistance,
+  workbenchValueKeys,
 } from '@openreloading/core'
+import { analysisKinds, legacyLoadProblem, toSi } from '@openreloading/schema'
 import { describe, expect, it } from 'vitest'
 import { maxPoints } from '../src/compute/interior-schema.ts'
 import { filePath } from '../src/compute/load-file.ts'
@@ -13,13 +16,26 @@ import { withApi } from './setup.ts'
 
 const published = { kind: 'published' as const, sources: [{ title: 'Test chart' }] }
 const law = { stress: { value: 4.2 }, oversize: 1.3, engraving: 0 }
+/** The model parameters of a fitted record in stored units; the numbers are made up. */
+const model = {
+  energy: { value: 4.1e6 },
+  gamma: 1.23,
+  density: { value: 1.6 },
+  covolume: { value: 0.00098 },
+  vivacity: { value: 0.6 },
+  pressureExponent: 1,
+  referencePressure: { value: 0.980665 },
+  ignitionPressure: { value: 60 },
+  startPressure: { value: 110 },
+  burnForm: { kind: 'constant', a: { value: 1 }, m: 0.5, q: 0.5, z1: 0.8 },
+}
 /** A powder with a bulk density and a bore-resistance law; the numbers are made up. */
 const fitted = {
   id: 'example-f-fitted',
   manufacturer: 'example-f',
   name: 'Fitted',
   bulkDensity: { value: 0.9 },
-  interior: { resistance: law },
+  interior: { ...model, resistance: law },
   provenance: published,
 }
 /** A powder whose law has an engraving ramp: 0.5 of the start pressure over the bullet length. */
@@ -27,7 +43,7 @@ const ramped = {
   ...fitted,
   id: 'example-f-ramped',
   name: 'Ramped',
-  interior: { resistance: { ...law, engraving: 0.5 } },
+  interior: { ...model, resistance: { ...law, engraving: 0.5 } },
 }
 /** A powder with a low bulk density: the example charge fills 1.37 of the case. */
 const fluffy = {
@@ -37,6 +53,8 @@ const fluffy = {
   bulkDensity: { value: 0.6 },
   provenance: published,
 }
+/** The SI values of a load on the powder record `p`: its model parameters, then the typed `siValues`. */
+const withPowder = (p: object) => ({ ...powderModelValues(p as never), ...siValues })
 const longBullet = {
   id: 'example-a-long',
   manufacturer: 'example-a',
@@ -150,7 +168,7 @@ describe('POST /interior/load-file', () => {
     const sim = await simulate(
       file({ siValues, cartridge: 'beta-pistol', bullet: longBullet.id, powder: fitted.id }),
     )
-    const load = interiorLoad(siValues)
+    const load = interiorLoad(withPowder(fitted))
     const { resistance } = recordResistance(fitted, {
       boreDiameter: load.chamber.boreDiameter,
       boreArea: load.chamber.boreArea,
@@ -204,7 +222,7 @@ describe('POST /interior/load-file', () => {
     // with a powder record the typed friction replaces the record's, the record's engraving stays
     const data = { cartridge: 'beta-pistol', bullet: longBullet.id, powder: fitted.id }
     const withRecord = await simulate(file({ ...data, siValues: { ...siValues, boreFriction } }))
-    const load = interiorLoad(siValues)
+    const load = interiorLoad(withPowder(fitted))
     const { resistance } = recordResistance(fitted, {
       boreDiameter: load.chamber.boreDiameter,
       boreArea: load.chamber.boreArea,
@@ -254,7 +272,14 @@ describe('POST /interior/load-file', () => {
         payload: file({ siValues: { ...siValues, ...given } }),
       })
       expect(res.statusCode).toBe(400)
-      expect(res.json().issues[0].path).toEqual(['records', 0, 'data', 'siValues', missing])
+      expect(res.json().issues[0].path).toEqual([
+        'records',
+        0,
+        'data',
+        'analysis',
+        'overrides',
+        missing,
+      ])
     }
     // a record whose law has friction only has no ramp either
     const data = { cartridge: 'beta-pistol', bullet: longBullet.id, powder: fitted.id }
@@ -268,14 +293,15 @@ describe('POST /interior/load-file', () => {
       'records',
       0,
       'data',
-      'siValues',
+      'analysis',
+      'overrides',
       'engravingPressure',
     ])
   })
 
   describe('with a record ramp', () => {
     const data = { cartridge: 'beta-pistol', bullet: longBullet.id, powder: ramped.id }
-    const load = interiorLoad(siValues)
+    const load = interiorLoad(withPowder(ramped))
     const { resistance } = recordResistance(ramped, {
       boreDiameter: load.chamber.boreDiameter,
       boreArea: load.chamber.boreArea,
@@ -329,7 +355,7 @@ describe('POST /interior/load-file', () => {
       ['engravingLength', -0.01],
     ]
     for (const [key, value] of bad)
-      it(`answers 400 at siValues.${key} for ${value}`, async () => {
+      it(`answers 400 at analysis.overrides.${key} for ${value}`, async () => {
         // the pair is complete, so only the value itself is wrong
         const other = { engravingPressure: 4e6, engravingLength: 0.01 }
         const res = await api.app.inject({
@@ -338,7 +364,14 @@ describe('POST /interior/load-file', () => {
           payload: file({ siValues: { ...siValues, ...other, [key]: value } }),
         })
         expect(res.statusCode).toBe(400)
-        expect(res.json().issues[0].path).toEqual(['records', 0, 'data', 'siValues', key])
+        expect(res.json().issues[0].path).toEqual([
+          'records',
+          0,
+          'data',
+          'analysis',
+          'overrides',
+          key,
+        ])
       })
 
     it('names the key before any record is read', async () => {
@@ -348,7 +381,14 @@ describe('POST /interior/load-file', () => {
         payload: file({ powder: 'unknown', siValues: { ...siValues, boreFriction: -1 } }),
       })
       expect(res.statusCode).toBe(400)
-      expect(res.json().issues[0].path).toEqual(['records', 0, 'data', 'siValues', 'boreFriction'])
+      expect(res.json().issues[0].path).toEqual([
+        'records',
+        0,
+        'data',
+        'analysis',
+        'overrides',
+        'boreFriction',
+      ])
     })
 
     it('takes 0 for a leak area, a bore friction and an engraving pressure', async () => {
@@ -460,24 +500,70 @@ describe('POST /interior/load-file', () => {
       cartridge: 'beta-pistol',
       bullet: longBullet.id,
       powder: fitted.id,
-      notes: 'Range day',
-      measuredWaterCapacity: 3.6e-6,
-      firearm: 'rifle-1',
-      seating: { by: 'overallLength', value: 0.0711 },
+      note: 'Range day',
+      case: { waterCapacity: { value: 3.6 }, firingCount: 2 },
+      firearm: `user:${crypto.randomUUID()}`,
+      seating: { by: 'overallLength', value: { value: 71.1 } },
       ladder: { stepCount: 3, chargeStep: 0.0001, direction: 'up' },
       measurements: [
         {
           name: 'session.csv',
           date: '2026-10-20',
           device: 'Chronograph',
-          muzzleDistance: 3,
+          muzzleDistance: { value: 3000 },
           strings: [
-            { label: 'A', charge: 0.0028, shots: [{ velocity: { value: 765 }, coldBore: true }] },
+            {
+              label: 'A',
+              charge: { value: 2.8 },
+              shots: [{ velocity: { value: 765 }, coldBore: true }],
+            },
           ],
         },
       ],
     }
     expect((await simulate(file(data))).status).toBe(200)
+  })
+
+  it('takes the values the load does not type from the records it names', async () => {
+    // only the charge and what no record gives: the powder's model parameters and the bullet's mass
+    const keep = ['volume', 'boreDiameter', 'boreArea', 'travel', 'twist', 'propellantTemperature']
+    const typed = Object.fromEntries(keep.map((k) => [k, siValues[k as keyof typeof siValues]]))
+    const data = { cartridge: 'beta-pistol', bullet: longBullet.id, powder: fitted.id }
+    const sparse = await simulate(
+      file({ ...data, siValues: { charge: siValues.charge, ...typed } }),
+    )
+    expect(sparse.status).toBe(200)
+    const powderValues = powderModelValues(fitted as never) as Record<string, number>
+    const full = await simulate(
+      file({
+        ...data,
+        siValues: {
+          ...siValues,
+          ...powderValues,
+          bulletMass: toSi('mass', longBullet.mass.value),
+        },
+      }),
+    )
+    expect(sparse.body.summary).toEqual(full.body.summary)
+    // a typed value wins over the record's
+    const typedGamma = await simulate(
+      file({ ...data, siValues: { charge: siValues.charge, ...typed, gamma: 1.3 } }),
+    )
+    expect(typedGamma.body.summary.peakPressure).not.toBe(sparse.body.summary.peakPressure)
+  })
+
+  it('names the value no record gives, at its key under the overrides', async () => {
+    const paths = async (data: Parameters<typeof file>[0]) => {
+      const res = await simulate(file(data))
+      expect(res.status).toBe(400)
+      return res.body.issues.map((i: { path: unknown[] }) => i.path)
+    }
+    const { vivacity: _, ...noVivacity } = siValues
+    expect(await paths({ siValues: noVivacity })).toEqual([
+      ['records', 0, 'data', 'analysis', 'overrides', 'vivacity'],
+    ])
+    // the powder record gives it
+    expect((await simulate(file({ siValues: noVivacity, powder: fitted.id }))).status).toBe(200)
   })
 
   it('answers an unknown record id with 404', async () => {
@@ -517,7 +603,7 @@ describe('POST /interior/load-file, 400 with the field path', () => {
   }
   const at = ['records', 0, 'data']
 
-  it('maps every load field of a file to its siValues key', () => {
+  it('maps every load field of a file to its value in the file', () => {
     const values = Object.fromEntries(interiorValueKeys.map((k, i) => [k, 1 + i / 64]))
     const load = { ...interiorLoad(values), resistance: overrideResistance(undefined, values) }
     const leaves = (x: unknown, path: string[]): [string[], number][] =>
@@ -530,7 +616,9 @@ describe('POST /interior/load-file, 400 with the field path', () => {
     for (const [path, x] of leaves(load, [])) {
       const key = interiorValueKeys.find((k) => values[k] === x)
       if (key === undefined) continue
-      expect(filePath(['load', ...path], at)).toEqual([...at, 'siValues', key])
+      expect(filePath(['load', ...path], at)).toEqual(
+        key === 'charge' ? [...at, 'charge'] : [...at, 'analysis', 'overrides', key],
+      )
       mapped.add(key)
     }
     expect([...mapped].sort()).toEqual([...interiorValueKeys].sort())
@@ -541,7 +629,8 @@ describe('POST /interior/load-file, 400 with the field path', () => {
     expect(await paths(file({ siValues, extra: 1 }))).toContainEqual([...at, 'extra'])
     expect(await paths(file({ siValues: { ...siValues, extra: 1 } }))).toContainEqual([
       ...at,
-      'siValues',
+      'analysis',
+      'overrides',
       'extra',
     ])
     const record = { ...file({ siValues }).records[0], extra: 1 }
@@ -562,22 +651,22 @@ describe('POST /interior/load-file, 400 with the field path', () => {
     ])
     expect(await paths(file({ siValues, valueOf: 1 }))).toEqual([[...at, 'valueOf']])
     expect(await paths(file({ siValues: { ...siValues, hasOwnProperty: 1 } }))).toEqual([
-      [...at, 'siValues', 'hasOwnProperty'],
+      [...at, 'analysis', 'overrides', 'hasOwnProperty'],
     ])
   })
 
   it('answers a bad file with 400 before it looks up its records', async () => {
     const ladder = { stepCount: 3, chargeStep: 1, direction: 'up' }
     expect(await paths(file({ siValues, cartridge: 'nope', bullet: 'nope', ladder }))).toEqual([
-      [...at, 'ladder', 'chargeStep'],
+      [...at, 'analysis', 'ladder', 'step'],
     ])
   })
 
   it('names a missing value and a partly filled burn form', async () => {
     const { charge: _, ...rest } = siValues
-    expect(await paths(file({ siValues: rest }))).toEqual([[...at, 'siValues', 'charge']])
+    expect(await paths(file({ siValues: rest }))).toEqual([[...at, 'charge']])
     expect(await paths(file({ siValues: { ...siValues, formA: 0.5 } }))).toEqual([
-      [...at, 'siValues', 'formM'],
+      [...at, 'analysis', 'overrides', 'formM'],
     ])
   })
 
@@ -585,6 +674,20 @@ describe('POST /interior/load-file, 400 with the field path', () => {
     const { status, body } = await simulate(file({ siValues: { ...siValues, volume: -1 } }))
     expect(status).toBe(422)
     expect(body.notice).toBe('simulation, not load data')
+  })
+
+  it('refuses a record of the old kind and names the kind that replaces it', async () => {
+    const old = file({ siValues })
+    old.records[0].kind = 'workbenchState'
+    const res = await simulate(old)
+    expect(res.status).toBe(400)
+    expect(res.body.issues).toEqual([
+      expect.objectContaining({ path: ['records', 0, 'kind'], message: legacyLoadProblem }),
+    ])
+  })
+
+  it('has one override per workbench key but the charge', () => {
+    expect([...Object.keys(analysisKinds), 'charge'].sort()).toEqual([...workbenchValueKeys].sort())
   })
 
   it('names a file that is not one load', async () => {

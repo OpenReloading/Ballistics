@@ -112,6 +112,10 @@ const record = <K extends string, D extends z.ZodType>(kind: K, description: str
     data: data.describe(description),
   })
 
+/** Why a record of kind `workbenchState`, the load of the format before kind `load`, is refused. */
+export const legacyLoadProblem: string =
+  'A record of kind "workbenchState" is a load in the format of an earlier version, which this app no longer reads. Kind "load" replaces it.'
+
 /**
  * One record of a user data file: its `kind`, id, name, save time and the `data` of that kind.
  * Inferred type: {@link UserRecord}.
@@ -130,7 +134,7 @@ export const userRecord = z.discriminatedUnion(
   {
     error: (issue) =>
       (issue.input as { kind?: unknown } | null)?.kind === 'workbenchState'
-        ? 'A record of kind "workbenchState" is a load in the format of an earlier version, which this app no longer reads. Kind "load" replaces it.'
+        ? legacyLoadProblem
         : undefined,
   },
 )
