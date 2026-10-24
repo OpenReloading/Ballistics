@@ -5,7 +5,7 @@ description: Why the read-only catalogue needs no server database, the single se
 
 # Catalogue storage
 
-The catalogue (the records of `packages/data`) is read only, rebuilt from git on every build and small: about 1.2 thousand records in the public data. This page records how it is stored and queried, what was measured, and which part is already in code: the one search matcher and the one sort order in `packages/schema` (`src/search.ts`, `src/order.ts`). Paths are relative to the repository root. The steps D0 to D6 of the epic "Data model: one entity per concept" carry the rest out.
+The catalogue (the records of `packages/data`) is read only, rebuilt from git on every build and small: about 1.2 thousand records in the public data. This page records how it is stored and queried, what was measured, and which part is already in code: the one search matcher and the one sort order in `packages/schema` (`src/search.ts`, `src/order.ts`) and the in-process catalogue module in `packages/api` (`src/catalogue/`), not yet used by the routes. Paths are relative to the repository root. The steps D0 to D6 of the epic "Data model: one entity per concept" carry the rest out.
 
 ## Decision
 
@@ -27,6 +27,22 @@ Measured on the public bundle, one machine, medians:
 | In the browser | no | yes, +3.7 MB brotli | yes, plain JavaScript |
 
 Ranked search over a generated 20,000 bullet index in plain JavaScript takes 1 to 2.5 ms per query. A scan with a trigram or full text index is needed only above a few thousand rows in a SQL engine; the in-process index needs none.
+
+## The module
+
+`packages/api/src/catalogue/` next to the SQL layer, which stays until the routes move over:
+
+- `derive.ts`: one index row per record, `{ item, sortKey, search }`. `item` is the list item the route answers today (the cartridge's sheet minima and case head, a bullet's first G1 and G7 coefficient, a target face's caliber classes), `sortKey` and `search` come from the schema package's `sortKey` and `searchKey`. Also the revision: a synchronous 53-bit hash of the record's JSON text, the same in Node and the browser, for change detection only.
+- `build.ts`: `buildCatalogue(records)` returns the typed index (`CatalogueIndex`, every list in its default order, format 1) and the record file (every record by id, one map per kind). Pure, so the build, the tests and a browser can all run it. The files hold the records as they are: `kind`, `origin` and `revision` are added when a record is read.
+- `open.ts`: `openCatalogue({ index, records })` returns the `Catalogue` interface: `cartridges`, `powders`, `bullets` (with `q`, `table`, `manufacturer`, `cartridge`, `limit`, `offset`), `manufacturers`, `targetFaces`, `federations`, `disciplines`, `targetMappings`, `capacities` and `get(kind, id)`. The record file may be a function, read on the first `get`. An index of another format is rejected.
+- `list.ts`: the one filter, rank and page step. A query ranks by `score` and keeps the default order between equal ranks.
+- `browser.ts`: the entry `@openreloading/api/catalogue`. It imports core and schema only, no Node API (`test/compute-imports.test.ts`). `node.ts` reads and writes the two files (`index.json`, `records.json`), `write.ts` is the build step (`npm run build` writes them into `dist/catalogue/`, also exported as `@openreloading/api/catalogue/*.json`).
+
+Checks in `packages/api/test/`: `catalogue.test.ts` (derive, build, open, files), `catalogue-parity.test.ts` and `catalogue-budget.test.ts`.
+
+The parity test runs sixteen queries on the SQL layer (PGlite) and on the catalogue, over synthetic records and the public bundle: the cartridge list (all, `q`, `table`, paged), the powder list (all, `q`, `manufacturer`), the bullet list (all, `q`, `manufacturer`, `cartridge`), manufacturers, target faces, federations, disciplines and target mappings. It compares the totals and the sorted ids, not the order (the two orders differ on purpose) and not the paged ids. Where the catalogue finds more than `ilike`, a second test names the difference: words in any order and a number in another printed form.
+
+The budgets, tested as the best of fifteen runs after a warm-up (other test files share the CPU): the index of the public bundle from its records in under 50 ms, from the prebuilt index text in under 9 ms, a ranked page of 50 cartridges in under 5 ms. Measured on the public bundle (577 cartridges, one machine): about 10 ms from the records, 1 ms from the prebuilt index (460 kB, the record file is 3.6 MB and read on the first `get`).
 
 ## Triggers for the fallback
 
