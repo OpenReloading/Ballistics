@@ -95,6 +95,11 @@ test('a cartridge design fills the fields it covers, draws the figure and is nam
 test('a load saved on a design keeps the design by reference and reopens with it', async ({
   page,
 }) => {
+  // a native picker cannot be driven: the file goes to the origin private file system
+  await page.addInitScript(() => {
+    ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
+      (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
+  })
   await page.goto('/workbench')
   await seedDesign(page)
   await page.reload()
@@ -102,6 +107,7 @@ test('a load saved on a design keeps the design by reference and reopens with it
   const form = loadForm(page)
   await form.getByRole('combobox', { name: 'Search cartridges by name' }).fill('Mine')
   await page.getByRole('option', { name: 'Mine 7.8 (your design)' }).click()
+  await form.getByRole('textbox', { name: /^Charge mass/ }).fill('2.4')
   await (await barButton(page, 'Save')).click()
   const stored = () =>
     page.evaluate(async () => {
@@ -131,6 +137,8 @@ test('a load saved on a design keeps the design by reference and reopens with it
   await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
   await page.getByRole('button', { name, exact: true }).click()
   const field = (label: RegExp) => form.getByRole('textbox', { name: label })
-  await expect(field(/^Usable case volume/)).toHaveAccessibleDescription(/user design Mine 7\.8/)
+  await expect(page.locator('.seating-figure svg[aria-labelledby]').first()).toHaveAccessibleName(
+    /user design Mine 7\.8/,
+  )
   await expect(field(/^Bore area/)).toHaveValue('')
 })
