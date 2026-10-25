@@ -8,10 +8,10 @@ import { buildApp } from './app.ts'
 import { loadBundle } from './bundle.ts'
 import { buildCatalogue } from './catalogue/build.ts'
 import { openCatalogue } from './catalogue/open.ts'
-import type { CatalogueData, CatalogueKind } from './catalogue/types.ts'
+import type { CatalogueData, Catalogued, CatalogueKind } from './catalogue/types.ts'
 import { inlineRunner } from './compute/tasks.ts'
 import { cartridgeAnswer } from './routes/cartridges.ts'
-import { stored } from './routes/common.ts'
+import { revised, stored } from './routes/common.ts'
 
 /** The records `writeStaticApi` writes, by the name of their route and the list of the index. */
 const recordFiles = [
@@ -54,7 +54,11 @@ export async function writeStaticApi(data: CatalogueData, dir: string) {
     for (const { item } of data.index[list]) {
       const found = catalogue.get(kind, item.id)
       const answer =
-        kind === 'cartridge' ? cartridgeAnswer(catalogue, item.id) : found && stored(found)
+        kind === 'cartridge'
+          ? cartridgeAnswer(catalogue, item.id)
+          : kind === 'bullet' && found
+            ? revised(found as Catalogued<'bullet'>)
+            : found && stored(found)
       await write(`${route}/${item.id}`, answer)
     }
 }

@@ -14,7 +14,7 @@ import {
 const saved = '2026-10-13T10:00:00.000Z'
 const valid: UserRecord = {
   kind: 'bullet',
-  id: 'b1',
+  id: '9b8a7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d',
   name: 'Valid design',
   saved,
   data: {

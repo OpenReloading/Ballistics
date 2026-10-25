@@ -32,7 +32,7 @@ import {
 } from './field-spec.ts'
 import { designReduce, type History as H, historyOf, pushHistory } from './history.ts'
 import { exactFieldText, type UnitSystem } from './units.ts'
-import type { ResolvedCartridge } from './variants.ts'
+import { type ResolvedCartridge, revisionOf } from './variants.ts'
 
 /** The field groups of the designer, in order. */
 export const groups = {
@@ -141,6 +141,8 @@ const baseSymbols = ['R1', 'R', 'P1', 'L3', 'H2']
 export interface Origin {
   id: string
   title: string
+  /** The `revision` of the catalogue record, as the API answered it. */
+  revision?: string
   table?: string
   values: SpecValue[]
   si: Record<string, number | undefined>
@@ -153,11 +155,16 @@ export interface Design {
   origin?: Origin
   /** The catalogue cartridge the design is based on, `catalogue:<id>`, kept through files. */
   basedOn?: string
+  /** The base changed since the design was saved: the values not overridden follow it. */
+  baseChanged?: boolean
+  /** The overrides as saved: Save keeps those of a value the designer has no field for and every other key. */
+  kept?: UserCartridge['overrides']
   /** Why the design is read only (its base is not there), with the record as stored, which Save keeps as it is. */
   locked?: { reason: string; data: UserCartridge }
 }
 
-const keyOf = (v: SpecValue) => (v.side && !v.variant ? `${v.side}.${v.symbol}` : undefined)
+const keyOf = (v: Pick<SpecValue, 'side' | 'symbol' | 'variant'>) =>
+  v.side && !v.variant ? `${v.side}.${v.symbol}` : undefined
 const empty: FieldValue = { text: '', si: undefined }
 
 /** Whether the record draws at least one figure. */
@@ -185,6 +192,7 @@ function siOf(values: readonly SpecValue[]): Origin['si'] {
 const originOf = (c: Pick<CartridgeDetail, 'id' | 'name' | 'table' | 'values'>): Origin => ({
   id: c.id,
   title: `CIP ${c.name}`,
+  ...(revisionOf(c) && { revision: revisionOf(c) }),
   table: c.table,
   values: c.values,
   si: siOf(c.values),
@@ -197,7 +205,7 @@ const originOf = (c: Pick<CartridgeDetail, 'id' | 'name' | 'table' | 'values'>):
  */
 export function fromUser(
   data: UserCartridge,
-  { base, record, problem }: ResolvedCartridge,
+  { base, record, problem, changed }: ResolvedCartridge,
   system: UnitSystem,
 ): Design {
   const si = siOf(record.values)
@@ -207,6 +215,8 @@ export function fromUser(
     fields: Object.fromEntries(fieldSpecs.map((s) => [s.key, fieldOf(system, s, si[s.key])])),
     ...(origin && { origin }),
     ...(data.basedOn && { basedOn: data.basedOn }),
+    ...(changed && { baseChanged: true }),
+    ...(data.overrides && { kept: data.overrides }),
     ...(problem && { locked: { reason: problem, data } }),
   }
 }
@@ -214,18 +224,25 @@ export function fromUser(
 /**
  * The user cartridge a design saves: its base and the overrides, the table where it differs and the
  * values that differ from the base (a value cleared against the base is one with `null`). Without
- * a base the table and every given value. A read only design gives its stored data back.
+ * a base the table and every given value. What the design was opened with stays where the designer
+ * has no field: the values of a variant or without a side, and every other override key. A read
+ * only design gives its stored data back.
  */
 export function fileData(design: Design): UserCartridge {
   if (design.locked) return design.locked.data
   const { origin, basedOn, table } = design
-  const overrides: CartridgeOverrides = {}
+  const { values: keptValues = [], table: _table, ...others } = design.kept ?? {}
+  const overrides: CartridgeOverrides = others
   if (!origin || table !== origin.table) overrides.table = table
-  const values = valueOverrides(design)
+  const values = [
+    ...keptValues.filter((v) => !specOf.has(keyOf(v) ?? '')),
+    ...valueOverrides(design),
+  ]
   if (values.length > 0) overrides.values = values
   return {
     origin: 'user',
     ...(basedOn && { basedOn }),
+    ...(basedOn && origin?.revision && { basedOnRevision: origin.revision }),
     ...(Object.keys(overrides).length > 0 && { overrides }),
   }
 }

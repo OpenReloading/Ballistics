@@ -26,7 +26,7 @@ import { parseFiles, readLoadFile, readNote } from '../lib/load-file-formats.ts'
 import { shownManufacturerRefs } from '../lib/manufacturers.ts'
 import { guardNavigation, guardPop } from '../lib/navigation-guard.ts'
 import { newId } from '../lib/new-id.ts'
-import { maxLinkChars, readLink, shareLink } from '../lib/share-link.ts'
+import { maxLinkChars, readLink, shareLink, shareProblem } from '../lib/share-link.ts'
 import { type ShortcutId, shortcutAriaKeys, shortcutLabel } from '../lib/shortcuts.ts'
 import { controlSize } from '../lib/theme.ts'
 import {
@@ -695,6 +695,8 @@ function FileMenuOf<K extends UserRecordKind>({
 
   async function share() {
     if (problem) return setFailure(`Not shared: ${problem}`)
+    const refused = shareProblem(current())
+    if (refused) return setFailure(`Not shared: ${refused}`)
     const page = window.location.origin + window.location.pathname
     const link = await shareLink(await withMakers(current()), page)
     if (!link)

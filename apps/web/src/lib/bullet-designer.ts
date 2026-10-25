@@ -30,7 +30,7 @@ import { designReduce, editHistory, type History as H, historyOf, pushHistory } 
 import { type ManufacturerNames, noManufacturerNames, productLabel } from './manufacturers.ts'
 import type { FieldRow } from './record-fields.ts'
 import { drawingLengthUnit, kilogramsPerGrain, metersPerInch, type UnitSystem } from './units.ts'
-import { type ResolvedBullet, setPath } from './variants.ts'
+import { dropPath, type ResolvedBullet, revisionOf, setPath } from './variants.ts'
 
 /** The field groups of the designer, in order. */
 export const groups = {
@@ -108,6 +108,8 @@ const noChoices: Choices = { 'base.type': '', 'ogive.form': '', 'tip.type': '' }
 export interface Origin {
   id: string
   title: string
+  /** The `revision` of the catalogue record, as the API answered it. */
+  revision?: string
   /** The base's manufacturer, `catalogue:<id>`. */
   manufacturer: string
   name: string
@@ -124,6 +126,10 @@ export interface Design {
   origin?: Origin
   /** The catalogue bullet the design is based on, `catalogue:<id>`, kept through files. */
   basedOn?: string
+  /** The base changed since the design was saved: the fields not overridden follow it. */
+  baseChanged?: boolean
+  /** The overrides as saved: Save keeps those of a field the designer has no input for. */
+  kept?: UserBullet['overrides']
   /** Why the design is read only (its base is not there), with the record as stored, which Save keeps as it is. */
   locked?: { reason: string; data: UserBullet }
 }
@@ -175,6 +181,7 @@ function originOf(r: Bullet, names: ManufacturerNames): Origin {
   return {
     id: r.id,
     title: productLabel(r, names),
+    ...(revisionOf(r) && { revision: revisionOf(r) }),
     manufacturer: `catalogue:${r.manufacturer}`,
     name: r.name,
     ...valuesOf(r),
@@ -211,7 +218,7 @@ function fromOrigin(origin: Origin, system: UnitSystem): Design {
  */
 export function fromUser(
   data: UserBullet,
-  { base, record, problem }: ResolvedBullet,
+  { base, record, problem, changed }: ResolvedBullet,
   system: UnitSystem,
   names: ManufacturerNames = noManufacturerNames,
 ): Design {
@@ -224,6 +231,8 @@ export function fromUser(
     fields: Object.fromEntries(designerSpecs.map((s) => [s.key, fieldOf(system, s, si[s.key])])),
     ...(origin && { origin }),
     ...(data.basedOn && { basedOn: data.basedOn }),
+    ...(changed && { baseChanged: true }),
+    ...(data.overrides && { kept: data.overrides }),
     ...(problem && { locked: { reason: problem, data } }),
   }
 }
@@ -234,7 +243,8 @@ const storedOf = (s: FieldSpec, si: number) => Number(siToStored(stored(s), si).
 /**
  * The user bullet a design saves: its manufacturer, the base and the overrides, which are the
  * fields that differ from the base (a field cleared against a base value is `null`). Without a base
- * every given field is an override. A read only design gives its stored data back.
+ * every given field is an override. The overrides it was opened with stay for every field the
+ * designer has no input for. A read only design gives its stored data back.
  */
 export function fileData({
   manufacturer,
@@ -243,25 +253,30 @@ export function fileData({
   fields,
   origin,
   basedOn,
+  kept,
   locked,
 }: Design): UserBullet {
   if (locked) return locked.data
-  const overrides: Record<string, unknown> = {}
+  const overrides: Record<string, unknown> = structuredClone(kept ?? {})
   for (const s of designerSpecs) {
     const si = fields[s.key]?.si
     const was = origin?.si[s.key]
+    dropPath(overrides, s.key)
     if (si === undefined) {
       if (was !== undefined) setPath(overrides, s.key, null)
     } else if (!(origin && close(si, was))) setPath(overrides, s.key, { value: storedOf(s, si) })
   }
   for (const k of Object.keys(choiceOptions) as ChoiceKey[]) {
+    dropPath(overrides, k)
     if (choices[k] !== (origin?.choices[k] ?? '')) setPath(overrides, k, choices[k] || null)
   }
+  delete overrides.name
   if (name !== (origin?.name ?? '')) overrides.name = name || null
   return {
     origin: 'user',
     ...(manufacturer && { manufacturer }),
     ...(basedOn && { basedOn }),
+    ...(basedOn && origin?.revision && { basedOnRevision: origin.revision }),
     ...(Object.keys(overrides).length > 0 && { overrides: overrides as UserBullet['overrides'] }),
   }
 }

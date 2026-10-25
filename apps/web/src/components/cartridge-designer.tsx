@@ -355,7 +355,9 @@ export function CartridgeDesigner() {
             loading ??
             (design.locked
               ? `Read only: ${design.locked.reason}`
-              : design.origin && `Started from ${design.origin.title.replace(/\.?$/, '.')}`)
+              : design.baseChanged
+                ? `The base record ${design.origin?.title ?? design.basedOn} changed since this design was saved. Fields you did not change follow it; Save keeps the design against the new base.`
+                : design.origin && `Started from ${design.origin.title.replace(/\.?$/, '.')}`)
           }
           sections={
             shotshell
