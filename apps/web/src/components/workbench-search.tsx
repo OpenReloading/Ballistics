@@ -34,12 +34,17 @@ async function search(
   signal: AbortSignal,
 ): Promise<Found> {
   const get = async <T,>(kind: string) => (await searchRecords<T>(kind, text, 8, '', signal)).items
-  const [cartridges, bullets, powders] = await Promise.all([
+  const [cartridges, bullets, powders] = await Promise.allSettled([
     get<CartridgeSummary>('cartridges'),
     findBullets(designs, text, 8, fit).then((found) => found.items),
     get<PowderSummary>('powders'),
   ])
-  return { cartridges, bullets, powders }
+  const kept = <T,>(r: PromiseSettledResult<T[]>) => (r.status === 'fulfilled' ? r.value : [])
+  // an API failure keeps the bullets found, the designs among them
+  if (bullets.status === 'fulfilled' && bullets.value.length > 0)
+    return { cartridges: kept(cartridges), bullets: bullets.value, powders: kept(powders) }
+  for (const r of [cartridges, bullets, powders]) if (r.status === 'rejected') throw r.reason
+  return { cartridges: kept(cartridges), bullets: kept(bullets), powders: kept(powders) }
 }
 
 /**
