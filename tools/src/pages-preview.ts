@@ -18,14 +18,16 @@ export function markPreview(dir: string) {
     const file = path.join(dir, page)
     const html = readFileSync(file, 'utf8')
     const open = /<head(\s[^>]*)?>/i.exec(html)
-    const end = open ? html.indexOf('</head>', open.index) : -1
     // the last one: an earlier `</body>` can sit in an inline script
     const close = html.lastIndexOf('</body>')
-    if (end < 0 || close < end) throw new Error(`${page}: no <head> or </body> to mark as preview`)
-    // before `</head>`, so `<meta charset>` stays among the first bytes
+    if (!open || close < open.index)
+      throw new Error(`${page}: no <head> or </body> to mark as preview`)
+    // after `<meta charset>`, which stays among the first bytes; no search for `</head>`, a script may hold the text
+    const charset = /<meta\s+charset=[^>]*>/i.exec(html.slice(open.index, open.index + 1024))
+    const at = open.index + (charset ? charset.index + charset[0].length : open[0].length)
     writeFileSync(
       file,
-      `${html.slice(0, end)}${head}${html.slice(end, close)}${label}${html.slice(close)}`,
+      `${html.slice(0, at)}${head}${html.slice(at, close)}${label}${html.slice(close)}`,
     )
   }
   const sitemaps = globSync('**/sitemap*.xml', { cwd: dir })
