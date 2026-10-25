@@ -20,6 +20,14 @@ export function stored<K extends CatalogueKind>(record: Catalogued<K>) {
   return rest
 }
 
+/** The `revision` field of the record answers that carry one: a hash of the stored record, it changes with any field. */
+export const revision = z.string().describe('Hash of the stored record. It changes with any field.')
+
+/** A record as {@link stored} gives it, with its `revision`: what a variant of the record is based on. */
+export function revised<K extends CatalogueKind>(record: Catalogued<K>) {
+  return { ...stored(record), revision: record.revision }
+}
+
 /**
  * The answer for an id no record has: a permanent redirect to the record that replaced it in
  * `renames.json`, else 404 naming the `noun`.

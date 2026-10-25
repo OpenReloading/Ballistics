@@ -37,6 +37,8 @@ export interface CartridgeDetail extends Omit<Cartridge, 'aliases'> {
   aliases?: string[]
   caseType?: CaseType
   capacities: CatalogueCaseCapacity[]
+  /** Hash of the stored record, which a user variant keeps at save to tell that its base changed. */
+  revision?: string
 }
 
 /** A manufacturer as `GET /manufacturers` lists it. */

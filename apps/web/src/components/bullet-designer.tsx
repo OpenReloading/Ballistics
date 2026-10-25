@@ -351,7 +351,9 @@ export function BulletDesigner() {
             loading ??
             (design.locked
               ? `Read only: ${design.locked.reason}`
-              : design.origin && `Started from ${design.origin.title}.`)
+              : design.baseChanged
+                ? `The base record ${design.origin?.title ?? design.basedOn} changed since this design was saved. Fields you did not change follow it; Save keeps the design against the new base.`
+                : design.origin && `Started from ${design.origin.title}.`)
           }
           sections={(Object.keys(groups) as Group[]).map((g) => ({
             key: g,

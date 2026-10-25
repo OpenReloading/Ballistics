@@ -216,7 +216,7 @@
         "operationId": "getBulletsById",
         "tags": ["Records"],
         "summary": "Get a bullet",
-        "description": "The whole bullet record with its provenance.",
+        "description": "The whole bullet record with its provenance. `revision` is a hash of the stored record that changes with any field.",
         "parameters": [
           {
             "name": "id",
@@ -889,6 +889,10 @@
                       },
                       "required": ["kind", "sources"],
                       "additionalProperties": false
+                    },
+                    "revision": {
+                      "type": "string",
+                      "description": "Hash of the stored record. It changes with any field."
                     }
                   },
                   "required": [
@@ -898,7 +902,8 @@
                     "name",
                     "diameter",
                     "mass",
-                    "provenance"
+                    "provenance",
+                    "revision"
                   ],
                   "additionalProperties": false
                 }
@@ -1411,7 +1416,7 @@
         "operationId": "getCartridgesById",
         "tags": ["Records"],
         "summary": "Get a cartridge",
-        "description": "The cartridge record of its C.I.P. sheet with its values, provenance, case type and case capacities.",
+        "description": "The cartridge record of its C.I.P. sheet with its values, provenance, case type and case capacities. `revision` is a hash of the stored record that changes with any field.",
         "parameters": [
           {
             "name": "id",
@@ -1890,6 +1895,10 @@
                         "required": ["origin", "cartridge", "waterCapacity"],
                         "additionalProperties": false
                       }
+                    },
+                    "revision": {
+                      "type": "string",
+                      "description": "Hash of the stored record. It changes with any field."
                     }
                   },
                   "required": [
@@ -1901,7 +1910,8 @@
                     "verification",
                     "values",
                     "provenance",
-                    "capacities"
+                    "capacities",
+                    "revision"
                   ],
                   "additionalProperties": false
                 }
@@ -15706,9 +15716,8 @@
                             },
                             "id": {
                               "type": "string",
-                              "minLength": 1,
-                              "maxLength": 64,
-                              "description": "Id of the record in the browser library."
+                              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                              "description": "Id of the record in the browser library: a UUID."
                             },
                             "name": {
                               "type": "string",
@@ -15746,6 +15755,12 @@
                                     }
                                   ],
                                   "description": "Reference `catalogue:<record id>` to the catalogue bullet the record is based on. Its fields not in `overrides` follow that record."
+                                },
+                                "basedOnRevision": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 64,
+                                  "description": "The `revision` the base record had when the record was saved. A different revision on opening means the base changed since."
                                 },
                                 "overrides": {
                                   "type": "object",
@@ -16904,9 +16919,8 @@
                             },
                             "id": {
                               "type": "string",
-                              "minLength": 1,
-                              "maxLength": 64,
-                              "description": "Id of the record in the browser library."
+                              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                              "description": "Id of the record in the browser library: a UUID."
                             },
                             "name": {
                               "type": "string",
@@ -16939,6 +16953,12 @@
                                     }
                                   ],
                                   "description": "Reference `catalogue:<record id>` to the catalogue cartridge the record is based on. Its fields not in `overrides` follow that record."
+                                },
+                                "basedOnRevision": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 64,
+                                  "description": "The `revision` the base record had when the record was saved. A different revision on opening means the base changed since."
                                 },
                                 "overrides": {
                                   "type": "object",
