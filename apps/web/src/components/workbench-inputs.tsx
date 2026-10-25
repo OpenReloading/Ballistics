@@ -19,6 +19,8 @@ import { type ReactNode, useEffect, useId, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import type { BulletSummary, CartridgeSummary, PowderSummary } from '../lib/api-types.ts'
 import { fitOf, summaryFitSource } from '../lib/bullet-fit.ts'
+import type { BulletRow } from '../lib/bullet-rows.ts'
+import { findBullets } from '../lib/bullet-search.ts'
 import { quickCartridges } from '../lib/examples.ts'
 import { type FieldSpec, type FieldValue, fieldError, siValues } from '../lib/field-spec.ts'
 import { type FollowKey, followKeys } from '../lib/input-defaults.ts'
@@ -805,9 +807,18 @@ function BulletPicker() {
   // mounted from the start: the first closing returns the focus to the button as the later ones do
   const [dialog, setDialog] = useState({ text: '', opened: false })
   const designRows = useMemo(() => userBulletRows(designs), [designs])
+  const fit = useMemo(
+    () => (bulletParams ? fitOf(cartridge) : undefined),
+    [bulletParams, cartridge],
+  )
+  // the card's field and the dialog rank the same way; the list lasts while its inputs do
+  const find = useMemo(
+    () => (text: string, limit: number) => findBullets(designRows, text, limit, fit),
+    [designRows, fit],
+  )
   return (
     <>
-      <RecordSearch<BulletSummary>
+      <RecordSearch<BulletRow>
         size={controlSize.row.input}
         chevron
         kind="bullets"
@@ -821,14 +832,17 @@ function BulletPicker() {
                 ? `${linkedBullet.name} (from the link)`
                 : 'Search bullets'
         }
-        describe={describeBullet}
-        onSelect={(b) => chooseBullet(b.id)}
-        // the browser's bullet designs in the same list, first
-        extra={designs.map((d) => ({ id: d.id, label: `${d.name} (your design)` }))}
-        onExtra={chooseDesign}
+        describe={(b) =>
+          b.origin ? `${b.name} (your design)` : describeBullet(b as BulletSummary)
+        }
+        onSelect={(b) => {
+          const design = userRecordId(b.id)
+          if (design) chooseDesign(design)
+          else chooseBullet(b.id)
+        }}
         noneText="No bullet found"
         unreachableText={notReached}
-        params={bulletParams}
+        find={find}
         browse={{
           label: 'Browse bullets',
           onOpen: (typed) => {
@@ -842,7 +856,7 @@ function BulletPicker() {
         onClose={() => setDialog({ ...dialog, opened: false })}
         text={dialog.text}
         designs={designRows}
-        fit={bulletParams ? fitOf(cartridge) : undefined}
+        fit={fit}
         fitName={cartridge?.name}
         system={system}
         onChoose={(row) => {

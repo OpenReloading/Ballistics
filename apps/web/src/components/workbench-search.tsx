@@ -2,8 +2,11 @@
 
 import { useDebouncedValue } from '@mantine/hooks'
 import { type createSpotlight, Spotlight, spotlight } from '@mantine/spotlight'
+import type { CartridgeDiameters } from '@openreloading/core'
 import { useEffect, useRef, useState } from 'react'
 import type { BulletSummary, CartridgeSummary, PowderSummary } from '../lib/api-types.ts'
+import type { BulletRow } from '../lib/bullet-rows.ts'
+import { findBullets } from '../lib/bullet-search.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import { cartridgeOptionText } from '../lib/standards.ts'
 import { searchRecords } from './record-search.tsx'
@@ -11,28 +14,43 @@ import { searchHost } from './search-host.ts'
 import { type Command, useShellActions } from './shell-actions.ts'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 
+const noDesigns: readonly BulletRow[] = []
+
 type Found = {
   cartridges: CartridgeSummary[]
-  bullets: BulletSummary[]
+  bullets: BulletRow[]
   powders: PowderSummary[]
 }
 
-/** The API search of each record kind, 8 matches each; bullets with the query `bulletParams`. */
-async function search(text: string, bulletParams: string, signal: AbortSignal): Promise<Found> {
-  const get = async <T,>(kind: string, extra = '') =>
-    (await searchRecords<T>(kind, text, 8, extra, signal)).items
-  const [cartridges, bullets, powders] = await Promise.all([
+/**
+ * The search of each record kind, 8 matches each: cartridges and powders by the API, bullets by
+ * the browser's ranking (`findBullets`, the card's field and dialog) over `designs` and the
+ * catalogue, kept to those that fit `fit`.
+ */
+async function search(
+  text: string,
+  designs: readonly BulletRow[],
+  fit: CartridgeDiameters | undefined,
+  signal: AbortSignal,
+): Promise<Found> {
+  const get = async <T,>(kind: string) => (await searchRecords<T>(kind, text, 8, '', signal)).items
+  const [cartridges, bullets, powders] = await Promise.allSettled([
     get<CartridgeSummary>('cartridges'),
-    get<BulletSummary>('bullets', bulletParams),
+    findBullets(designs, text, 8, fit).then((found) => found.items),
     get<PowderSummary>('powders'),
   ])
-  return { cartridges, bullets, powders }
+  const kept = <T,>(r: PromiseSettledResult<T[]>) => (r.status === 'fulfilled' ? r.value : [])
+  // an API failure keeps the bullets found, the designs among them
+  if (bullets.status === 'fulfilled' && bullets.value.length > 0)
+    return { cartridges: kept(cartridges), bullets: bullets.value, powders: kept(powders) }
+  for (const r of [cartridges, bullets, powders]) if (r.status === 'rejected') throw r.reason
+  return { cartridges: kept(cartridges), bullets: kept(bullets), powders: kept(powders) }
 }
 
 /**
  * Record search of the workbench (`@mantine/spotlight`): Ctrl+K (Cmd+K), also from a field, or
  * `spotlight.open()`; groups Pages, Commands (the page's, then the shell's), Cartridges, Bullets
- * (with the query `bulletParams`, as `&cartridge=<id>`; named by `bulletsLabel`) and Powders. Ctrl+Enter in the search
+ * (those that fit `bulletFit`; named by `bulletsLabel`) and Powders. Ctrl+Enter in the search
  * closes it and runs. The site search of every other page (`site-search.tsx`) is this one on
  * a store of its own (`search`), opened by the shell, without `onRun`.
  */
@@ -43,18 +61,21 @@ export function WorkbenchSearch({
   onBullet,
   onPowder,
   describeBullet,
-  bulletParams = '',
+  designs = noDesigns,
+  bulletFit,
   bulletsLabel,
   search: own,
 }: {
   commands: Command[]
   onRun?: () => void
   onCartridge: (c: CartridgeSummary) => void
-  onBullet: (b: BulletSummary) => void
+  onBullet: (b: BulletRow) => void
   onPowder: (p: PowderSummary) => void
   describeBullet: (b: BulletSummary) => string
+  /** The browser's bullet designs as rows (`userBulletRows`), listed with the catalogue. */
+  designs?: readonly BulletRow[]
   /** Extra query of the bullet search, for example `&cartridge=308-win`. */
-  bulletParams?: string
+  bulletFit?: CartridgeDiameters
   bulletsLabel: string
   /** A store of its own, opened by the caller (no shortcut); without it the default store on Ctrl+K. */
   search?: ReturnType<typeof createSpotlight>
@@ -81,11 +102,13 @@ export function WorkbenchSearch({
   const after = useRef<(() => void) | undefined>(undefined)
   const [text] = useDebouncedValue(query.trim(), 200)
   const [found, setFound] = useState<Found | 'error' | undefined>(undefined)
-  const shownParams = useRef(bulletParams)
+  const fitKey = bulletFit && `${bulletFit.g1} ${bulletFit.land} ${bulletFit.groove}`
+  const shownFit = useRef(fitKey)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `fitKey` stands for the fit
   useEffect(() => {
     // bullets of another cartridge must not stay choosable while the new search runs
-    if (shownParams.current !== bulletParams) {
-      shownParams.current = bulletParams
+    if (shownFit.current !== fitKey) {
+      shownFit.current = fitKey
       setFound(undefined)
     }
     if (!text) {
@@ -93,13 +116,15 @@ export function WorkbenchSearch({
       return
     }
     const controller = new AbortController()
-    search(text, bulletParams, controller.signal)
-      .then(setFound)
+    search(text, designs, bulletFit, controller.signal)
+      .then((f) => {
+        if (!controller.signal.aborted) setFound(f)
+      })
       .catch(() => {
         if (!controller.signal.aborted) setFound('error')
       })
     return () => controller.abort()
-  }, [text, bulletParams])
+  }, [text, fitKey, designs])
 
   const lower = query.trim().toLowerCase()
   const shown = commands.filter((c) => c.label.toLowerCase().includes(lower))
@@ -190,7 +215,11 @@ export function WorkbenchSearch({
         {records && records.bullets.length > 0 && (
           <Spotlight.ActionsGroup label={bulletsLabel}>
             {records.bullets.map((b) => (
-              <Spotlight.Action key={b.id} label={describeBullet(b)} onClick={() => onBullet(b)} />
+              <Spotlight.Action
+                key={b.id}
+                label={b.origin ? `${b.name} (your design)` : describeBullet(b as BulletSummary)}
+                onClick={() => onBullet(b)}
+              />
             ))}
           </Spotlight.ActionsGroup>
         )}
