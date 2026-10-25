@@ -18,7 +18,9 @@ it('marks every page with noindex in its head and one label before the last </bo
   expect(markPreview(dir)).toEqual({ pages: 2, sitemaps: ['docs/sitemap.xml'] })
   for (const f of ['index.html', 'docs/index.html']) {
     const html = readFileSync(path.join(dir, f), 'utf8')
-    expect(html).toMatch(/<head lang="en"><meta name="robots" content="noindex">/)
+    expect(html).toMatch(
+      /<title>x<\/title><meta name="robots" content="noindex"><style>.*<\/style><\/head>/,
+    )
     expect(html.match(/class="preview-label"/g)).toHaveLength(1)
     expect(html).toMatch(/Development preview, not the released site<\/div><\/body><\/html>$/)
   }

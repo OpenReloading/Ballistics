@@ -122,7 +122,7 @@ export const strategyOf = (
   const u = new URL(request.url)
   if (request.method !== 'GET' || u.origin !== origin || !u.pathname.startsWith(`${base}/`)) return
   const path = u.pathname.slice(base.length)
-  if (path.startsWith('/docs/') || path.startsWith('/develop/')) return
+  if (path.startsWith('/docs/') || path === '/develop' || path.startsWith('/develop/')) return
   // the catalogue index is as old as its build, so it comes from the build's shell cache
   if (path.startsWith('/_next/static/') || shellFiles.includes(path) || path === catalogueFile)
     return 'static'

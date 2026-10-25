@@ -149,6 +149,9 @@ it('in the Pages edition, serves under the base path and leaves the docs site to
   const preview = req('/OpenReloading/develop/workbench/', { mode: 'navigate' })
   expect(strategyOf(preview, origin, base)).toBeUndefined()
   expect(strategyOf(preview, origin, `${base}/develop`)).toBe('page')
+  expect(
+    strategyOf(req('/OpenReloading/develop', { mode: 'navigate' }), origin, base),
+  ).toBeUndefined()
   expect(strategyOf(req('/other/', { mode: 'navigate' }), origin, base)).toBeUndefined()
 })
 
