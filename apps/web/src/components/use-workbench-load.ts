@@ -1605,10 +1605,13 @@ export function useWorkbenchState() {
     setCapacityChoice(choice)
   }
 
-  /** A measured capacity typed in the field replaces the one the opened load still asks for. */
-  function typeMeasured(value: Fields['measuredWaterCapacity']) {
+  /**
+   * A measured capacity typed in the field replaces the one the opened load still asks for; the
+   * request stays while the text is not a number yet.
+   */
+  function typeMeasured(value: FieldValue) {
     openingCapacity.current = undefined
-    got('capacity')
+    if (value.si !== undefined || value.text.trim() === '') got('capacity')
     setMeasured({ measuredWaterCapacity: value })
   }
 
