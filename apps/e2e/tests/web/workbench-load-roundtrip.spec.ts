@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import { expect, test } from '@playwright/test'
 import { barButton } from './bar.ts'
+import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { applyExampleLoad, loadForm } from './workbench.ts'
 
@@ -113,7 +114,7 @@ test('the file downloaded for the API runs through the load file route and the s
     ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
       (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
   })
-  await page.goto('/workbench')
+  await gotoHydrated(page, '/workbench')
   await applyExampleLoad(page)
   await loadForm(page)
     .getByRole('textbox', { name: /^Charge mass/ })
