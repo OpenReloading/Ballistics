@@ -21,6 +21,9 @@ export type Candidate = {
   across?: Layout['diameterTips'][number]
 }
 
+/** Adds a conflict's weight, true once the count reaches the limit. */
+type Hit = (weight?: number) => boolean
+
 /** What the steps of one layout share: the face at its text size, what is placed, the choice. */
 export type Placer = ReturnType<typeof createPlacer>
 
@@ -125,14 +128,17 @@ export function createPlacer(
    * would sit at the mirrored corner: that weighs as 50 crossings, a last resort. (Weighing the
    * crossings of angle leaders moves angle texts far out and widens the drawing.)
    */
+  const crossings = (s: LineSegment, from: PartPoint) => {
+    let crossed = 0
+    for (const list of [outlineSegs, segs])
+      for (const o of list) if (o.owner !== s.owner && segsCross(from, s.b, o.a, o.b)) crossed++
+    return crossed
+  }
   const leaderCost = (s: LineSegment) => {
     const length = Math.hypot(s.b[0] - s.a[0], s.b[1] - s.a[1])
     const skip = 0.4 * leaderLength
     const from = add(s.a, unit(s.a, s.b), skip)
-    let crossed = 0
-    if (length > skip)
-      for (const list of [outlineSegs, segs])
-        for (const o of list) if (o.owner !== s.owner && segsCross(from, s.b, o.a, o.b)) crossed++
+    const crossed = length > skip ? crossings(s, from) : 0
     const across = s.a[1] * s.b[1] < 0 ? 50 : 0
     return crossed + across + Math.max(0, length / leaderLength - 1)
   }
@@ -180,6 +186,59 @@ export function createPlacer(
     cornersOf.set(x, c)
     return c
   }
+  const hitsOutline = (l: Label, hit: Hit) =>
+    outlineSegs.some((s) => segHitsBox(s, l, gap / 2) && hit())
+  const hitsLabels = (l: Label, hit: Hit) => labels.some((m) => boxesOverlap(l, m, gap) && hit())
+  const hitsLines = (l: Label, hit: Hit) =>
+    segs.some(
+      (s) =>
+        s.owner !== l.owner &&
+        // the axis may run through an angle text, as it does through the arc
+        !(s.owner === 'axis' && angleSymbols.has(l.owner)) &&
+        segHitsBox(s, l, gap / 2) &&
+        hit(),
+    )
+  const hitsOwnLines = (own: LineSegment[], hit: Hit) =>
+    own.some((s) => labels.some((m) => m.owner !== s.owner && segHitsBox(s, m, gap / 2)) && hit())
+  const hitsTips = (l: Label, box: PartPoint[], hit: Hit) =>
+    tips.some((t) => t.owner !== l.owner && polygonsOverlap(corners(t), box, gap / 2) && hit())
+  const crossesOtherArc = (s: LineSegment, hit: Hit) =>
+    segs.some(
+      (o) =>
+        o.kind === 'rule' &&
+        o.owner !== s.owner &&
+        angleSymbols.has(o.owner) &&
+        segsCross(s.a, s.b, o.a, o.b) &&
+        hit(),
+    )
+  // an angle text keeps off its own arc, flank and arrowheads, its arc off another angle's
+  const hitsAngle = (
+    l: Label,
+    own: LineSegment[],
+    ownTips: Arrowhead[],
+    box: PartPoint[],
+    hit: Hit,
+  ) => {
+    for (const s of own) {
+      if (s.leader) continue
+      if (segHitsBox(s, l, gap / 2) && hit()) return true
+      // arcs only: the flanks of two angles may meet at a shared corner
+      if (s.kind === 'rule' && crossesOtherArc(s, hit)) return true
+    }
+    return ownTips.some((t) => polygonsOverlap(corners(t), box, gap / 2) && hit())
+  }
+  const hitsOwnTips = (ownTips: Arrowhead[], hit: Hit) =>
+    ownTips.some((t) => {
+      const tri = corners(t)
+      return (
+        labels.some(
+          (m) => m.owner !== t.owner && polygonsOverlap(tri, corners(m), gap / 2) && hit(),
+        ) ||
+        tips.some(
+          (u) => u.owner !== t.owner && polygonsOverlap(tri, corners(u), gap / 2) && hit(0.5),
+        )
+      )
+    })
   /**
    * How many texts, lines and arrowheads a candidate runs into, 0 clear; counted up to `limit`.
    * Arrowheads count against texts, so no text hides under one, and against each other at half
@@ -190,53 +249,22 @@ export function createPlacer(
     limit = Infinity,
   ) => {
     let n = angleSymbols.has(l.owner) || radiusSymbols.has(l.owner) || !inside(l.c) ? 0 : 10
-    const hit = (weight = 1) => {
+    const hit: Hit = (weight = 1) => {
       n += weight
       return n >= limit
     }
     if (n >= limit) return n
-    for (const s of outlineSegs) if (segHitsBox(s, l, gap / 2) && hit()) return n
-    for (const m of labels) if (boxesOverlap(l, m, gap) && hit()) return n
-    for (const s of segs)
-      if (
-        s.owner !== l.owner &&
-        // the axis may run through an angle text, as it does through the arc
-        !(s.owner === 'axis' && angleSymbols.has(l.owner)) &&
-        segHitsBox(s, l, gap / 2) &&
-        hit()
-      )
-        return n
-    for (const s of own)
-      if (labels.some((m) => m.owner !== s.owner && segHitsBox(s, m, gap / 2)) && hit()) return n
     const box = corners(l)
-    for (const t of tips)
-      if (t.owner !== l.owner && polygonsOverlap(corners(t), box, gap / 2) && hit()) return n
-    // an angle text keeps off its own arc, flank and arrowheads, its arc off another angle's
-    if (angleSymbols.has(l.owner)) {
-      for (const s of own) {
-        if (s.leader) continue
-        if (segHitsBox(s, l, gap / 2) && hit()) return n
-        // arcs only: the flanks of two angles may meet at a shared corner
-        if (s.kind === 'rule')
-          for (const o of segs)
-            if (
-              o.kind === 'rule' &&
-              o.owner !== s.owner &&
-              angleSymbols.has(o.owner) &&
-              segsCross(s.a, s.b, o.a, o.b) &&
-              hit()
-            )
-              return n
-      }
-      for (const t of ownTips) if (polygonsOverlap(corners(t), box, gap / 2) && hit()) return n
-    }
-    for (const t of ownTips) {
-      const tri = corners(t)
-      for (const m of labels)
-        if (m.owner !== t.owner && polygonsOverlap(tri, corners(m), gap / 2) && hit()) return n
-      for (const u of tips)
-        if (u.owner !== t.owner && polygonsOverlap(tri, corners(u), gap / 2) && hit(0.5)) return n
-    }
+    const stages = [
+      () => hitsOutline(l, hit),
+      () => hitsLabels(l, hit),
+      () => hitsLines(l, hit),
+      () => hitsOwnLines(own, hit),
+      () => hitsTips(l, box, hit),
+      () => angleSymbols.has(l.owner) && hitsAngle(l, own, ownTips, box, hit),
+      () => hitsOwnTips(ownTips, hit),
+    ]
+    stages.some((stage) => stage())
     return n
   }
   const conflicts = (c: Candidate) => textConflicts(c) + leaderCosts(c.segs)

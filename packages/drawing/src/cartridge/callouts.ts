@@ -83,9 +83,48 @@ interface Placed {
   span: Span
 }
 
+/** The first of `spans` that fits lane n+1 on the side `sign` and leaves the lanes it crosses free at `z`. */
+function fittingSpan(
+  spans: Span[],
+  { within, n, sign, z }: { within: boolean; n: number; sign: number; z: number },
+  { gap, box }: Lanes,
+  free: (lane: number, span: Span) => boolean,
+) {
+  return spans.find(
+    ([a, b]) =>
+      (!within || (a >= box[0] && b <= box[2])) &&
+      free(sign * (n + 1), [a, b]) &&
+      Array.from({ length: n }, (_, m) => sign * (m + 1)).every((lane) =>
+        free(lane, [z - gap, z + gap]),
+      ),
+  )
+}
+
+/** Does a text of height em centred at radius r reach past the box's top or bottom? */
+const outsideBox = (r: number, em: number, box: Lanes['box']) =>
+  r + em / 2 > box[3] || r - em / 2 < box[1]
+
+/** The innermost lane that fits a callout, inside the box first, +r before -r; undefined when none does. */
+function searchLanes(
+  { region, z, text, w }: Pick<Placed, 'region' | 'z' | 'text' | 'w'>,
+  spans: Span[],
+  lanes: Lanes,
+  free: (lane: number, span: Span) => boolean,
+): { place: Placed; within: boolean } | undefined {
+  const { laneR, em, box } = lanes
+  for (const within of [true, false])
+    for (let n = 0; n < 40; n++)
+      for (const sign of [1, -1]) {
+        const r = sign * laneR(n)
+        if (within && outsideBox(r, em, box)) continue
+        const span = fittingSpan(spans, { within, n, sign, z }, lanes, free)
+        if (span) return { place: { region, z, text, w, sign, n, span }, within }
+      }
+}
+
 /** Places the callouts in this order; the ones outside `box` counted. */
 function placeInLanes(order: Region[], before: boolean, lanes: Lanes) {
-  const { stations, laneR, gap, em, box, unit } = lanes
+  const { stations, gap, em, unit } = lanes
   const taken = new Map<number, Span[]>()
   const free = (lane: number, [a, b]: Span) =>
     (taken.get(lane) ?? []).every(([c, d]) => b + gap <= c || d + gap <= a)
@@ -98,28 +137,11 @@ function placeInLanes(order: Region[], before: boolean, lanes: Lanes) {
     const w = textWidth(text, em)
     const after: Span = [z + gap, z + gap + w]
     const spans: Span[] = before ? [[z - gap - w, z - gap], after] : [after, [z - gap - w, z - gap]]
-    let place: Placed | undefined
-    for (const within of [true, false])
-      for (let n = 0; !place && n < 40; n++)
-        for (const sign of [1, -1]) {
-          if (place) break
-          const r = sign * laneR(n)
-          if (within && (r + em / 2 > box[3] || r - em / 2 < box[1])) continue
-          const span = spans.find(
-            ([a, b]) =>
-              (!within || (a >= box[0] && b <= box[2])) &&
-              free(sign * (n + 1), [a, b]) &&
-              Array.from({ length: n }, (_, m) => sign * (m + 1)).every((lane) =>
-                free(lane, [z - gap, z + gap]),
-              ),
-          )
-          if (span) {
-            place = { region, z, text, w, sign, n, span }
-            if (!within) outside++
-          }
-        }
+    const found = searchLanes({ region, z, text, w }, spans, lanes, free)
     // a station covered on both sides in every lane: this order fails
-    if (!place) return { placed, outside: Infinity }
+    if (!found) return { placed, outside: Infinity }
+    const { place } = found
+    if (!found.within) outside++
     take(place.sign * (place.n + 1), place.span)
     for (let m = 0; m < place.n; m++) take(place.sign * (m + 1), [z - gap, z + gap])
     placed.push(place)

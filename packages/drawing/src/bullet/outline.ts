@@ -173,21 +173,9 @@ export function bulletOutline(
       fields: [...(d > 0 ? [] : ['diameter']), ...(L > 0 ? [] : ['length'])],
     }
   const notes: string[] = []
-  const base = baseGeometry(b, given, notes)
-  if ('reason' in base) return base
-  const nose = noseLengthOf(b, base, notes)
-  if ('reason' in nose) return nose
-  const { n, nTag } = nose
-  const z0 = L - n
-  const form = b.ogive?.form
-  if (form !== undefined && !forms.has(form))
-    return fail(`Unknown nose form ${form}.`, 'ogive.form')
-  const meplat = meplatRadius(b, given, notes)
-  if ('reason' in meplat) return meplat
-  const { m, mTag } = meplat
-  const curve = noseCurve(b, n, m, notes)
-  if ('reason' in curve) return curve
-  const noseTag = worst(nTag, mTag, curve.formTag)
+  const front = noseFront(b, given, notes)
+  if ('reason' in front) return front
+  const { base, n, nTag, z0, m, mTag, curve, noseTag } = front
   const tip = tipSplit(b, n, noseTag, notes)
   if (tip && 'reason' in tip) return tip
   const mouth = hollowPointMouth(b, m, given, notes)
@@ -196,10 +184,7 @@ export function bulletOutline(
   if (groove && 'reason' in groove) return groove
   const cavity = cavityGeometry(b, base.rb, notes)
   if (cavity && 'reason' in cavity) return cavity
-  const samples = new Map<number, Tag>(curve.zs.map((z) => [z, noseTag]))
-  for (const [z, tag] of [...curve.extra, ...(tip ? [[tip.tipStart, tip.tag] as const] : [])])
-    samples.set(z, tag)
-  const { points, tags, segments, approximate, baseEdge } = assemblePoints({
+  const assembled = assemblePoints({
     given,
     a: d / 2,
     L,
@@ -209,12 +194,67 @@ export function bulletOutline(
     z0,
     nTag,
     noseTag,
-    samples,
+    samples: noseSamples(curve, noseTag, tip),
     rAt: curve.rAt,
     m,
     mTag,
     ...mouth,
   })
+  return closeOutline(assembled, { cavity, tip, n, nTag, bearingLength: z0 - base.t, L, notes })
+}
+
+/** The base, nose length, meplat and nose curve of a bullet: everything up to the tip and the groove. */
+function noseFront(b: BulletDimensions, given: 'sourced' | 'entered', notes: string[]) {
+  const base = baseGeometry(b, given, notes)
+  if ('reason' in base) return base
+  const nose = noseLengthOf(b, base, notes)
+  if ('reason' in nose) return nose
+  const { n, nTag } = nose
+  const form = b.ogive?.form
+  if (form !== undefined && !forms.has(form))
+    return fail(`Unknown nose form ${form}.`, 'ogive.form')
+  const meplat = meplatRadius(b, given, notes)
+  if ('reason' in meplat) return meplat
+  const { m, mTag } = meplat
+  const curve = noseCurve(b, n, m, notes)
+  if ('reason' in curve) return curve
+  const noseTag = worst(nTag, mTag, curve.formTag)
+  return { base, n, nTag, z0: b.length - n, m, mTag, curve, noseTag }
+}
+
+/** The nose sample z values with their tags: the curve's, its extra ones and the tip start. */
+function noseSamples(
+  curve: NoseCurve,
+  noseTag: Tag,
+  tip: { tipStart: number; tag: Tag } | undefined,
+) {
+  const samples = new Map<number, Tag>(curve.zs.map((z) => [z, noseTag]))
+  for (const [z, tag] of [...curve.extra, ...(tip ? [[tip.tipStart, tip.tag] as const] : [])])
+    samples.set(z, tag)
+  return samples
+}
+
+/** The outline from its assembled points, or a refusal when the section crosses itself. */
+function closeOutline(
+  { points, tags, segments, approximate, baseEdge }: ReturnType<typeof assemblePoints>,
+  {
+    cavity,
+    tip,
+    n,
+    nTag,
+    bearingLength,
+    L,
+    notes,
+  }: {
+    cavity: Cavity | undefined
+    tip: { tipStart: number; tag: Tag } | undefined
+    n: number
+    nTag: Tag
+    bearingLength: number
+    L: number
+    notes: string[]
+  },
+): Outline | Refusal {
   // section polygon closed along the axis; the full section mirrors it
   if (profileCrossesItself(points))
     return fail(
@@ -234,7 +274,7 @@ export function bulletOutline(
     ...(cavity && { cavity: { radius: cavity.radius, depth: cavity.depth } }),
     noseLength: n,
     noseAssumed: nTag === 'approximate',
-    bearingLength: z0 - base.t,
+    bearingLength,
     volume: revolutionVolume(points, L),
     area,
     areaCentreZ,
@@ -258,6 +298,148 @@ interface BaseGeometry {
   baseKnown: boolean
 }
 
+/** The boat tail's length t, base edge radius rb, rebate depth s and their tags. */
+interface Tail {
+  t: number
+  rb: number
+  s: number
+  tTag: Tag
+  rbTag: Tag
+}
+
+/** What the cases of a boat tail share: the given values, the cone top radius ac, the start. */
+interface TailInput {
+  gl?: number
+  gd?: number
+  ga?: number
+  ac: number
+  given: 'sourced' | 'entered'
+  start: Tail
+}
+
+const tan = (x: number) => Math.tan(x * deg)
+
+const noBoatTail = (gd: number) =>
+  fail(`The base diameter ${mm(gd)} leaves no boat tail.`, 'base.diameter', 'diameter')
+
+/** Length and diameter given; the angle, if given too, must agree with them. */
+function tailFromLengthDiameter({ ga, ac, given, start }: TailInput, gl: number, gd: number) {
+  const rb = gd / 2
+  if (!(rb < ac)) return noBoatTail(gd)
+  const implied = Math.atan((ac - rb) / gl) / deg
+  if (ga !== undefined && Math.abs(implied - ga) > angleTolerance)
+    return fail(
+      `The base length ${mm(gl)}, base diameter ${mm(gd)} and angle ${ga} degrees disagree: length and diameter give ${implied.toFixed(2)} degrees.`,
+      'base.angle',
+      'base.length',
+      'base.diameter',
+    )
+  return { ...start, t: gl, rb, rbTag: given }
+}
+
+function tailFromLengthAngle({ ac, start }: TailInput, gl: number, ga: number) {
+  const rb = ac - gl * tan(ga)
+  if (!(rb > 0))
+    return fail(
+      `The base length ${mm(gl)} at ${ga} degrees leaves no base.`,
+      'base.length',
+      'base.angle',
+    )
+  return { ...start, t: gl, rb, rbTag: 'derived' as const }
+}
+
+function tailFromDiameterAngle({ ac, given, start }: TailInput, gd: number, ga: number) {
+  const rb = gd / 2
+  if (!(rb < ac)) return noBoatTail(gd)
+  return { ...start, rb, rbTag: given, t: (ac - rb) / tan(ga), tTag: 'derived' as const }
+}
+
+function tailFromLength({ ac, start }: TailInput, gl: number, a: number, notes: string[]) {
+  notes.push(`Boat tail drawn at an assumed ${assumedBoatTailAngle} degree angle.`)
+  return { ...start, t: gl, rb: Math.max(ac - gl * tan(assumedBoatTailAngle), 0.5 * a) }
+}
+
+function tailFromDiameter({ ac, given, start }: TailInput, gd: number, notes: string[]) {
+  const rb = gd / 2
+  if (!(rb < ac)) return noBoatTail(gd)
+  notes.push(
+    `The boat tail length is drawn from the base diameter at an assumed ${assumedBoatTailAngle} degree angle.`,
+  )
+  return {
+    ...start,
+    rb,
+    rbTag: given,
+    t: (ac - rb) / tan(assumedBoatTailAngle),
+    tTag: 'approximate' as const,
+  }
+}
+
+/** The boat tail from the given length, diameter and angle; assumed values are named in `notes`. */
+function boatTail(c: TailInput, a: number, notes: string[]): Tail | Refusal {
+  const { gl, gd, ga } = c
+  if (gl !== undefined && gd !== undefined) return tailFromLengthDiameter(c, gl, gd)
+  if (gl !== undefined && ga !== undefined) return tailFromLengthAngle(c, gl, ga)
+  if (gd !== undefined && ga !== undefined) return tailFromDiameterAngle(c, gd, ga)
+  if (gl !== undefined) return tailFromLength(c, gl, a, notes)
+  if (gd !== undefined) return tailFromDiameter(c, gd, notes)
+  notes.push('The record has no boat tail length: the base is drawn flat.')
+  return c.start
+}
+
+/** Refusal of a base length, diameter or angle outside what a base can have. */
+function baseInputRefusal(d: number, gl?: number, gd?: number, ga?: number) {
+  if (gd !== undefined && !(gd > 0 && gd < d))
+    return fail(
+      `The base diameter ${mm(gd)} is not between 0 and the diameter ${mm(d)}.`,
+      'base.diameter',
+      'diameter',
+    )
+  if (ga !== undefined && !(ga > 0 && ga < 90))
+    return fail(`The boat-tail angle ${ga} degrees is not between 0 and 90.`, 'base.angle')
+  if (gl !== undefined && !(gl >= 0))
+    return fail('The base length must not be negative.', 'base.length')
+}
+
+/** A boat tail or a flat face: a hollow base takes the boat-tail dimensions where it gives any. */
+function baseKinds(type: string | undefined, gl?: number, gd?: number, ga?: number) {
+  const tailType =
+    type === 'boat-tail' ||
+    type === 'rebated-boat-tail' ||
+    (isHollow(type) && (gl !== undefined || gd !== undefined || ga !== undefined))
+  const flatFaced = type === 'flat' || (isHollow(type) && !tailType)
+  return { tailType, flatFaced }
+}
+
+/** The boat tail of a base type with one, with a rebate's depth where the type has it. */
+function shapedTail(
+  b: BulletDimensions,
+  given: 'sourced' | 'entered',
+  start: Tail,
+  notes: string[],
+): Tail | Refusal {
+  let s = 0
+  if (b.base?.type === 'rebated-boat-tail') {
+    s = 0.015 * b.diameter
+    notes.push(`The rebate depth is assumed: 0.015 d, ${mm(s)}.`)
+  }
+  const { length: gl, diameter: gd, angle: ga } = b.base ?? {}
+  const a = b.diameter / 2
+  const shaped = boatTail({ gl, gd, ga, ac: a - s, given, start: { ...start, s } }, a, notes)
+  if ('reason' in shaped) return shaped
+  return shaped.t === 0 ? { ...shaped, rb: a, s: 0 } : shaped
+}
+
+/** A base without a boat tail: flat, with a note where the record names no flat base. */
+function unshapedTail(start: Tail, flatFaced: boolean, gl: number | undefined, notes: string[]) {
+  if (!flatFaced)
+    notes.push(
+      gl === undefined
+        ? 'The record has no base type: the base is drawn flat.'
+        : `The record gives a base length of ${gl} mm without a base type: the base is drawn flat.`,
+    )
+  return start
+}
+
 /** The base from the base type, length, diameter and angle; assumed values are named in `notes`. */
 function baseGeometry(
   b: BulletDimensions,
@@ -271,79 +453,15 @@ function baseGeometry(
   const gl = b.base?.length
   const gd = b.base?.diameter
   const ga = b.base?.angle
-  // a hollow base takes the boat-tail dimensions where it gives any, else its face is flat
-  const tailType =
-    type === 'boat-tail' ||
-    type === 'rebated-boat-tail' ||
-    (isHollow(type) && (gl !== undefined || gd !== undefined || ga !== undefined))
-  const flatFaced = type === 'flat' || (isHollow(type) && !tailType)
-  if (gd !== undefined && !(gd > 0 && gd < d))
-    return fail(
-      `The base diameter ${mm(gd)} is not between 0 and the diameter ${mm(d)}.`,
-      'base.diameter',
-      'diameter',
-    )
-  if (ga !== undefined && !(ga > 0 && ga < 90))
-    return fail(`The boat-tail angle ${ga} degrees is not between 0 and 90.`, 'base.angle')
-  if (gl !== undefined && !(gl >= 0))
-    return fail('The base length must not be negative.', 'base.length')
-  let t = 0
-  let rb = a
-  let tTag: Tag = given
-  let rbTag: Tag = flatFaced ? given : 'approximate'
-  let s = 0
-  if (tailType) {
-    if (type === 'rebated-boat-tail') {
-      s = 0.015 * d
-      notes.push(`The rebate depth is assumed: 0.015 d, ${mm(s)}.`)
-    }
-    const ac = a - s
-    const tan = (x: number) => Math.tan(x * deg)
-    if (gl !== undefined && gd !== undefined) {
-      ;[t, rb, rbTag] = [gl, gd / 2, given]
-      if (!(rb < ac))
-        return fail(`The base diameter ${mm(gd)} leaves no boat tail.`, 'base.diameter', 'diameter')
-      const implied = Math.atan((ac - rb) / gl) / deg
-      if (ga !== undefined && Math.abs(implied - ga) > angleTolerance)
-        return fail(
-          `The base length ${mm(gl)}, base diameter ${mm(gd)} and angle ${ga} degrees disagree: length and diameter give ${implied.toFixed(2)} degrees.`,
-          'base.angle',
-          'base.length',
-          'base.diameter',
-        )
-    } else if (gl !== undefined && ga !== undefined) {
-      ;[t, rb, rbTag] = [gl, ac - gl * tan(ga), 'derived']
-      if (!(rb > 0))
-        return fail(
-          `The base length ${mm(gl)} at ${ga} degrees leaves no base.`,
-          'base.length',
-          'base.angle',
-        )
-    } else if (gd !== undefined && ga !== undefined) {
-      ;[rb, rbTag] = [gd / 2, given]
-      if (!(rb < ac))
-        return fail(`The base diameter ${mm(gd)} leaves no boat tail.`, 'base.diameter', 'diameter')
-      ;[t, tTag] = [(ac - rb) / tan(ga), 'derived']
-    } else if (gl !== undefined) {
-      t = gl
-      rb = Math.max(ac - gl * tan(assumedBoatTailAngle), 0.5 * a)
-      notes.push(`Boat tail drawn at an assumed ${assumedBoatTailAngle} degree angle.`)
-    } else if (gd !== undefined) {
-      ;[rb, rbTag] = [gd / 2, given]
-      if (!(rb < ac))
-        return fail(`The base diameter ${mm(gd)} leaves no boat tail.`, 'base.diameter', 'diameter')
-      ;[t, tTag] = [(ac - rb) / tan(assumedBoatTailAngle), 'approximate']
-      notes.push(
-        `The boat tail length is drawn from the base diameter at an assumed ${assumedBoatTailAngle} degree angle.`,
-      )
-    } else notes.push('The record has no boat tail length: the base is drawn flat.')
-    if (t === 0) [rb, s] = [a, 0]
-  } else if (!flatFaced)
-    notes.push(
-      gl === undefined
-        ? 'The record has no base type: the base is drawn flat.'
-        : `The record gives a base length of ${gl} mm without a base type: the base is drawn flat.`,
-    )
+  const { tailType, flatFaced } = baseKinds(type, gl, gd, ga)
+  const refusal = baseInputRefusal(d, gl, gd, ga)
+  if (refusal) return refusal
+  const start: Tail = { t: 0, rb: a, s: 0, tTag: given, rbTag: flatFaced ? given : 'approximate' }
+  const tail = tailType
+    ? shapedTail(b, given, start, notes)
+    : unshapedTail(start, flatFaced, gl, notes)
+  if ('reason' in tail) return tail
+  const { t, rb, s, tTag, rbTag } = tail
   if (!(t < L))
     return fail(
       `The boat tail ${mm(t)} is not shorter than the length ${mm(L)}.`,
@@ -491,6 +609,121 @@ interface NoseCurve {
   formTag: Tag
 }
 
+/** Refusal of an ogive radius or Rt/R that is out of range or disagrees with the other. */
+function ogiveInputRefusal(
+  radius: number | undefined,
+  ratio: number | undefined,
+  fromRadius: number | undefined,
+) {
+  if (radius !== undefined && !(radius > 0))
+    return fail('The ogive radius must be positive.', 'ogive.radius')
+  if (ratio !== undefined && !(ratio >= 0 && ratio <= 1))
+    return fail(`Rt/R ${ratio} is not between 0 and 1.`, 'ogive.radiusRatio')
+  if (
+    ratio !== undefined &&
+    fromRadius !== undefined &&
+    Math.abs(ratio - fromRadius) > ratioTolerance
+  )
+    return fail(
+      `The ogive radius ${mm(radius as number)} gives Rt/R ${fromRadius.toFixed(3)}, not the given ${ratio}.`,
+      'ogive.radiusRatio',
+      'ogive.radius',
+    )
+}
+
+/**
+ * The Rt/R an ogive nose is drawn with (at most 1, 1 a tangent ogive) and the tag of its form;
+ * assumed values are named in `notes`.
+ */
+function ogiveRatio(
+  form: string | undefined,
+  given: number | undefined,
+  { n, k, rt }: { n: number; k: number; rt: number },
+  notes: string[],
+): { used: number; formTag: Tag } | Refusal {
+  let q = given
+  let formTag: Tag = 'derived'
+  if (q !== undefined && q > 1 + ratioTolerance)
+    return fail(
+      `The ogive radius is below the tangent radius ${mm(rt)}: the nose would rise above the shank.`,
+      'ogive.radius',
+      'ogive.radiusRatio',
+      'noseLength',
+    )
+  if (form === 'tangent' && q !== undefined && Math.abs(q - 1) > ratioTolerance)
+    return fail(
+      `A tangent ogive has Rt/R 1, not ${q.toFixed(3)}.`,
+      'ogive.radiusRatio',
+      'ogive.radius',
+      'ogive.form',
+    )
+  if (form === undefined && q === undefined) {
+    formTag = 'approximate'
+    notes.push('The nose is drawn as an assumed tangent ogive.')
+  }
+  if ((form === 'secant' || form === 'hybrid') && q === undefined) {
+    q = 0.5
+    formTag = 'approximate'
+    notes.push(`The ${form} ogive radius is assumed: Rt/R 0.5.`)
+  }
+  q = Math.min(q ?? 1, 1)
+  if (q > 0 && n < k - 1e-9)
+    return fail(
+      `The nose length ${mm(n)} is below its radial drop ${mm(k)}: no ogive reaches the meplat.`,
+      'noseLength',
+      'meplatDiameter',
+    )
+  return { used: q, formTag }
+}
+
+/** The circle arc through `o` of radius `r` as r(z). */
+const arcAt = (o: SectionPoint, r: number) => (z: number) =>
+  o[0] + Math.sqrt(Math.max(r ** 2 - (z - o[1]) ** 2, 0))
+
+/** What a hybrid nose reads: the length, shank radius, shank end z0, meplat radius m, tangent radius rt, ogive radius R. */
+interface NoseFrame {
+  L: number
+  a: number
+  z0: number
+  m: number
+  rt: number
+  R: number
+}
+
+/** A blend arc tangent to the shank, then a secant arc of radius R tangent to it through the meplat edge. */
+function hybridNose(
+  { L, a, z0, m, rt, R }: NoseFrame,
+  zSteps: number[],
+  formTag: Tag,
+  notes: string[],
+): NoseCurve | Refusal {
+  const r1 = rt / 2
+  const c1: SectionPoint = [a - r1, z0]
+  const D: SectionPoint = [m - c1[0], L - c1[1]]
+  const dl = Math.hypot(...D)
+  const delta = R - r1
+  const g = (R ** 2 - delta ** 2 - dl ** 2) / (2 * delta)
+  const theta = Math.atan2(D[1], D[0]) - Math.acos(g / dl)
+  const c2: SectionPoint = [c1[0] - delta * Math.cos(theta), c1[1] - delta * Math.sin(theta)]
+  const tz = z0 + r1 * Math.sin(theta)
+  if (!(Math.abs(g) <= dl && theta > 0 && theta < Math.PI / 2 && tz < L && m >= c2[0] - 1e-9))
+    return fail(
+      'No hybrid nose joins the blend arc and the secant arc before the meplat.',
+      'ogive.radius',
+      'ogive.radiusRatio',
+      'noseLength',
+    )
+  const blend = arcAt(c1, r1)
+  const secant = arcAt(c2, R)
+  notes.push('The hybrid blend radius is assumed: half the tangent radius.')
+  return {
+    rAt: (z) => (z <= tz ? blend(z) : secant(z)),
+    zs: zSteps,
+    extra: [[tz, 'approximate']],
+    formTag,
+  }
+}
+
 /**
  * The nose curve from the shank end at z0 = L - n to the meplat edge at radius m: a round nose,
  * a cone, a secant or tangent ogive of radius R = Rt / (Rt/R), or a hybrid of a blend arc and a
@@ -510,102 +743,35 @@ function noseCurve(
   const rt = (n ** 2 + k ** 2) / (2 * k)
   const radius = b.ogive?.radius
   const ratio = b.ogive?.radiusRatio
-  if (radius !== undefined && !(radius > 0))
-    return fail('The ogive radius must be positive.', 'ogive.radius')
-  if (ratio !== undefined && !(ratio >= 0 && ratio <= 1))
-    return fail(`Rt/R ${ratio} is not between 0 and 1.`, 'ogive.radiusRatio')
   const fromRadius = radius === undefined ? undefined : rt / radius
-  if (
-    ratio !== undefined &&
-    fromRadius !== undefined &&
-    Math.abs(ratio - fromRadius) > ratioTolerance
-  )
-    return fail(
-      `The ogive radius ${mm(radius as number)} gives Rt/R ${fromRadius.toFixed(3)}, not the given ${ratio}.`,
-      'ogive.radiusRatio',
-      'ogive.radius',
-    )
-  let q = ratio ?? fromRadius
-  let formTag: Tag = 'derived'
-  const round = form === 'round-nose' || form === 'flat-nose'
-  if (round && q !== undefined) notes.push(`A ${form} reads no ogive radius or Rt/R.`)
-  if (!round) {
-    if (q !== undefined && q > 1 + ratioTolerance)
-      return fail(
-        `The ogive radius is below the tangent radius ${mm(rt)}: the nose would rise above the shank.`,
-        'ogive.radius',
-        'ogive.radiusRatio',
-        'noseLength',
-      )
-    if (form === 'tangent' && q !== undefined && Math.abs(q - 1) > ratioTolerance)
-      return fail(
-        `A tangent ogive has Rt/R 1, not ${q.toFixed(3)}.`,
-        'ogive.radiusRatio',
-        'ogive.radius',
-        'ogive.form',
-      )
-    if (form === undefined && q === undefined) {
-      formTag = 'approximate'
-      notes.push('The nose is drawn as an assumed tangent ogive.')
-    }
-    if ((form === 'secant' || form === 'hybrid') && q === undefined) {
-      q = 0.5
-      formTag = 'approximate'
-      notes.push(`The ${form} ogive radius is assumed: Rt/R 0.5.`)
-    }
-    q = Math.min(q ?? 1, 1)
-    if (q > 0 && n < k - 1e-9)
-      return fail(
-        `The nose length ${mm(n)} is below its radial drop ${mm(k)}: no ogive reaches the meplat.`,
-        'noseLength',
-        'meplatDiameter',
-      )
-  }
-  const used = Math.min(q ?? 1, 1)
-  const extra: [number, Tag][] = []
-  const zSteps = Array.from({ length: steps }, (_, j) => z0 + (n * (j + 1)) / steps)
-  if (round)
+  const refusal = ogiveInputRefusal(radius, ratio, fromRadius)
+  if (refusal) return refusal
+  const q = ratio ?? fromRadius
+  if (form === 'round-nose' || form === 'flat-nose') {
+    if (q !== undefined) notes.push(`A ${form} reads no ogive radius or Rt/R.`)
     return {
       rAt: (z) => m + k * Math.sqrt(Math.max(1 - ((z - z0) / n) ** 2, 0)),
       zs: Array.from(
         { length: steps },
         (_, j) => z0 + n * Math.sin(((j + 1) * Math.PI) / 2 / steps),
       ),
-      extra,
-      formTag,
+      extra: [],
+      formTag: 'derived',
     }
+  }
+  const ogive = ogiveRatio(form, q, { n, k, rt }, notes)
+  if ('reason' in ogive) return ogive
+  const { used, formTag } = ogive
+  const zSteps = Array.from({ length: steps }, (_, j) => z0 + (n * (j + 1)) / steps)
   // a vanishing Rt/R is the cone; a secant circle of radius near 1e12 mm loses precision
-  if (used < 1e-6) return { rAt: (z) => a - (k * (z - z0)) / n, zs: zSteps, extra, formTag }
+  if (used < 1e-6) return { rAt: (z) => a - (k * (z - z0)) / n, zs: zSteps, extra: [], formTag }
   // circle of radius R through the shank end and the meplat edge, centre on the axis side
   const R = rt / used
+  if (form === 'hybrid') return hybridNose({ L, a, z0, m, rt, R }, zSteps, formTag, notes)
   const c = Math.hypot(k, n)
   const h = Math.sqrt(Math.max(R ** 2 - c ** 2 / 4, 0))
   const centre: SectionPoint = [a - k / 2 - (h * n) / c, z0 + n / 2 - (h * k) / c]
-  const arc = (o: SectionPoint, r: number) => (z: number) =>
-    o[0] + Math.sqrt(Math.max(r ** 2 - (z - o[1]) ** 2, 0))
-  if (form !== 'hybrid') return { rAt: arc(centre, R), zs: zSteps, extra, formTag }
-  // blend arc tangent to the shank, then a secant arc of radius R tangent to it through the meplat edge
-  const r1 = rt / 2
-  const c1: SectionPoint = [a - r1, z0]
-  const D: SectionPoint = [m - c1[0], L - c1[1]]
-  const dl = Math.hypot(...D)
-  const delta = R - r1
-  const g = (R ** 2 - delta ** 2 - dl ** 2) / (2 * delta)
-  const theta = Math.atan2(D[1], D[0]) - Math.acos(g / dl)
-  const c2: SectionPoint = [c1[0] - delta * Math.cos(theta), c1[1] - delta * Math.sin(theta)]
-  const tz = z0 + r1 * Math.sin(theta)
-  if (!(Math.abs(g) <= dl && theta > 0 && theta < Math.PI / 2 && tz < L && m >= c2[0] - 1e-9))
-    return fail(
-      'No hybrid nose joins the blend arc and the secant arc before the meplat.',
-      'ogive.radius',
-      'ogive.radiusRatio',
-      'noseLength',
-    )
-  const blend = arc(c1, r1)
-  const secant = arc(c2, R)
-  extra.push([tz, 'approximate'])
-  notes.push('The hybrid blend radius is assumed: half the tangent radius.')
-  return { rAt: (z) => (z <= tz ? blend(z) : secant(z)), zs: zSteps, extra, formTag }
+  return { rAt: arcAt(centre, R), zs: zSteps, extra: [], formTag }
 }
 
 /** Where a polymer tip leaves the jacket, with the tag of that sample; none without a polymer tip. */
@@ -713,45 +879,41 @@ interface Parts {
   mouthTag: Tag
 }
 
-/**
- * The outline points from the base centre (or the apex of the cavity) to the tip on the axis, each
- * with its tag and whether the edge reaching it is approximate, the stroked runs, the z ranges
- * drawn from an assumed shape and the index of the base face's edge.
- */
-function assemblePoints(parts: Parts) {
-  const { given, a, L, base, cavity, groove, z0, nTag, noseTag, samples, rAt, m, mTag } = parts
-  const { mouth, mouthTag } = parts
+/** Adds a point with its tag and whether the edge reaching it is approximate. */
+type AddPoint = (p: SectionPoint, tag: Tag, approx: boolean) => void
+
+/** A cavity's wall runs down from its apex to the base face: the profile starts on the axis at the apex. */
+function addBottom({ given, cavity }: Parts, add: AddPoint) {
+  if (!cavity) {
+    add([0, 0], given, false)
+    return
+  }
+  for (const [j, p] of cavity.points.entries())
+    add(p, j === cavity.points.length - 1 ? given : 'approximate', j > 0)
+}
+
+/** The base edge and, past it, the boat tail's end and a rebate's step. */
+function addTail({ a, base }: Parts, add: AddPoint) {
   const { t, rb, s, tTag, rbTag } = base
-  const points: SectionPoint[] = []
-  const tags: Tag[] = []
-  const edges: boolean[] = []
-  const add = (p: SectionPoint, tag: Tag, approx: boolean) => {
-    points.push(p)
-    tags.push(tag)
-    edges.push(approx)
-  }
   const baseApprox = !base.baseKnown
-  // a cavity's wall runs down from its apex to the base face: the profile starts on the axis at the apex
-  if (cavity)
-    for (const [j, p] of cavity.points.entries())
-      add(p, j === cavity.points.length - 1 ? given : 'approximate', j > 0)
-  else add([0, 0], given, false)
-  const baseEdge = points.length
   add([rb, 0], rbTag, baseApprox)
-  if (t > 0) {
-    add([a - s, t], s > 0 ? 'approximate' : tTag, baseApprox)
-    if (s > 0) add([a, t], tTag, baseApprox)
-  }
-  if (groove) {
-    const gTag = groove.assumed ? 'approximate' : given
-    const z1 = groove.start + groove.width
-    add([a, groove.start], given, false)
-    add([a - groove.depth, groove.start], gTag, gTag === 'approximate')
-    add([a - groove.depth, z1], gTag, gTag === 'approximate')
-    add([a, z1], given, gTag === 'approximate')
-  }
-  if (points[points.length - 1][1] < z0 || points[points.length - 1][0] < a)
-    add([a, z0], nTag === 'approximate' ? 'approximate' : 'derived', false)
+  if (t <= 0) return
+  add([a - s, t], s > 0 ? 'approximate' : tTag, baseApprox)
+  if (s > 0) add([a, t], tTag, baseApprox)
+}
+
+function addGroove({ given, a, groove }: Parts, add: AddPoint) {
+  if (!groove) return
+  const gTag = groove.assumed ? 'approximate' : given
+  const z1 = groove.start + groove.width
+  add([a, groove.start], given, false)
+  add([a - groove.depth, groove.start], gTag, gTag === 'approximate')
+  add([a - groove.depth, z1], gTag, gTag === 'approximate')
+  add([a, z1], given, gTag === 'approximate')
+}
+
+/** The nose samples up to the tip. */
+function addNose({ L, z0, noseTag, samples, rAt, m, mTag }: Parts, add: AddPoint) {
   const noseApprox = noseTag === 'approximate'
   for (const z of [...samples.keys()].sort((x, y) => x - y)) {
     if (z <= z0) continue
@@ -759,16 +921,54 @@ function assemblePoints(parts: Parts) {
     add(atTip ? [m, L] : [rAt(z), z], atTip ? mTag : (samples.get(z) as Tag), noseApprox)
     if (atTip) break
   }
+}
+
+/** The hollow-point mouth and the meplat's centre on the meplat line. */
+function addMeplat({ L, given, m, mTag, mouth, mouthTag }: Parts, add: AddPoint) {
   if (mouth > 0 && mouth < m)
     add([mouth, L], mouthTag, mTag === 'approximate' || mouthTag === 'approximate')
   if (m > 0) add([0, L], given, mTag === 'approximate')
+}
 
+/** Stroked runs of the points: consecutive edges of the same kind share one run. */
+function strokedRuns(points: SectionPoint[], edges: boolean[]) {
   const segments: Outline['segments'] = []
   for (let j = 1; j < points.length; j++) {
     const last = segments[segments.length - 1]
     if (last && last.approximate === edges[j]) last.points.push(points[j])
     else segments.push({ points: [points[j - 1], points[j]], approximate: edges[j] })
   }
+  return segments
+}
+
+/**
+ * The outline points from the base centre (or the apex of the cavity) to the tip on the axis, each
+ * with its tag and whether the edge reaching it is approximate, the stroked runs, the z ranges
+ * drawn from an assumed shape and the index of the base face's edge.
+ */
+function assemblePoints(parts: Parts) {
+  const { a, L, base, groove, z0, nTag, noseTag } = parts
+  const { t } = base
+  const points: SectionPoint[] = []
+  const tags: Tag[] = []
+  const edges: boolean[] = []
+  const add: AddPoint = (p, tag, approx) => {
+    points.push(p)
+    tags.push(tag)
+    edges.push(approx)
+  }
+  const baseApprox = !base.baseKnown
+  addBottom(parts, add)
+  const baseEdge = points.length
+  addTail(parts, add)
+  addGroove(parts, add)
+  if (points[points.length - 1][1] < z0 || points[points.length - 1][0] < a)
+    add([a, z0], nTag === 'approximate' ? 'approximate' : 'derived', false)
+  addNose(parts, add)
+  addMeplat(parts, add)
+
+  const segments = strokedRuns(points, edges)
+  const noseApprox = noseTag === 'approximate'
   // an assumed base stands in for an unknown base shape, so it taints the shank up to the nose
   const approximate: [number, number][] = [
     ...(baseApprox ? [[0, t || z0] as [number, number]] : []),

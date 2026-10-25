@@ -3,12 +3,27 @@ import type { PartPoint } from './section.ts'
 import type { Arrowhead, Label } from './types.ts'
 import { add } from './vector.ts'
 
+/** Is the segment clear of the box's bounding circle's square (the box grown by `pad`)? */
+function clearOfReach(a: PartPoint, b: PartPoint, l: Label, reach: number) {
+  return [0, 1].some(
+    (k) => Math.max(a[k], b[k]) < l.c[k] - reach || Math.min(a[k], b[k]) > l.c[k] + reach,
+  )
+}
+
+/** Clips the parameter range `t` against dd * t + ss <= lim; false when the segment is parallel and outside. */
+function clipRange(t: [number, number], dd: number, ss: number, lim: number) {
+  if (Math.abs(dd) < 1e-12) return !(ss > lim)
+  const at = (lim - ss) / dd
+  if (dd > 0) t[1] = Math.min(t[1], at)
+  else t[0] = Math.max(t[0], at)
+  return true
+}
+
 /** Does the segment cross the box (grown by `pad`)? */
 export function segHitsBox({ a, b }: { a: PartPoint; b: PartPoint }, l: Label, pad = 0) {
-  // most segments pass far from the box: clear of its bounding circle's square
+  // most segments pass far from the box
   const reach = Math.hypot(l.w / 2 + pad, l.h / 2 + pad)
-  for (const k of [0, 1])
-    if (Math.max(a[k], b[k]) < l.c[k] - reach || Math.min(a[k], b[k]) > l.c[k] + reach) return false
+  if (clearOfReach(a, b, l, reach)) return false
   const [ux, uy] = l.dir
   const local = ([x, y]: PartPoint): PartPoint => {
     const [dx, dy] = [x - l.c[0], y - l.c[1]]
@@ -16,26 +31,14 @@ export function segHitsBox({ a, b }: { a: PartPoint; b: PartPoint }, l: Label, p
   }
   const [p, q] = [local(a), local(b)]
   const [hw, hh] = [l.w / 2 + pad, l.h / 2 + pad]
-  let [t0, t1] = [0, 1]
+  const t: [number, number] = [0, 1]
   for (const [d, s, lim] of [
     [q[0] - p[0], p[0], hw],
     [q[1] - p[1], p[1], hh],
   ]) {
-    for (const [dd, ss] of [
-      [d, s],
-      [-d, -s],
-    ]) {
-      // clip against dd * t + ss <= lim
-      if (Math.abs(dd) < 1e-12) {
-        if (ss > lim) return false
-      } else {
-        const t = (lim - ss) / dd
-        if (dd > 0) t1 = Math.min(t1, t)
-        else t0 = Math.max(t0, t)
-      }
-    }
+    if (!clipRange(t, d, s, lim) || !clipRange(t, -d, -s, lim)) return false
   }
-  return t0 <= t1
+  return t[0] <= t[1]
 }
 
 /** Do two text boxes (grown by `pad`) overlap? Separating axes of both. */

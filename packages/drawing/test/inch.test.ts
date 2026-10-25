@@ -54,6 +54,75 @@ describe('length texts', () => {
   })
 })
 
+type Shown = ReturnType<typeof recordFigures>[number]
+
+/** What is wrong with one text of a layout: outside the frame, on another text, a line or an arrowhead. */
+function labelFailures(
+  what: (x: string) => string,
+  layout: Layout,
+  k: number,
+  tips: { owner: string; corners: PartPoint[] }[],
+  inside: (p: PartPoint) => boolean,
+) {
+  const failures: string[] = []
+  const l = layout.labels[k]
+  const corners = labelCorners(l)
+  if (!corners.every(inside)) failures.push(what(`${l.owner} text outside`))
+  for (const m of layout.labels.slice(k + 1))
+    if (boxesOverlap(l, m)) failures.push(what(`${l.owner} text overlaps ${m.owner}`))
+  for (const s of layout.segs)
+    if (s.owner !== l.owner && segHitsBox(s, l))
+      failures.push(what(`${s.owner} line crosses ${l.owner} text`))
+  for (const t of tips)
+    if (t.owner !== l.owner && polygonsOverlap(t.corners, corners))
+      failures.push(what(`${t.owner} arrowhead on ${l.owner} text`))
+  return failures
+}
+
+/** What is wrong with the layers of one figure model in one medium. */
+function mediumFailures(f: Shown, medium: string, model: FigureModel) {
+  const failures: string[] = []
+  if (model.scale.note !== 'Dimensions in inches') failures.push(`${f.id} note`)
+  const [fx, fy, fw, fh] = model.frame
+  const inside = ([x, y]: PartPoint) => {
+    const [ox, oy] = medium === 'screen' ? [y, -x] : [x, y]
+    return ox >= fx - 1e-6 && ox <= fx + fw + 1e-6 && oy >= fy - 1e-6 && oy <= fy + fh + 1e-6
+  }
+  for (const [side, layout] of Object.entries(model.layers) as [string, Layout][]) {
+    const what = (x: string) => `${f.id} ${side} ${medium} ${x}`
+    const tips = layout.arrowheads.map((t) => ({
+      owner: t.owner,
+      corners: arrowheadCorners(t),
+    }))
+    for (const k of layout.labels.keys())
+      failures.push(...labelFailures(what, layout, k, tips, inside))
+  }
+  return failures
+}
+
+/** What is wrong with one figure of a record in inches: text size, frame, clearances, length texts. */
+function figureFailures(record: (typeof current)[number], f: Shown, em: number, across: number) {
+  const failures: string[] = []
+  const list = f.drawn.length === 2 ? regions(record.values) : []
+  const models: [string, FigureModel][] = [
+    ['screen', figureModel(f.drawn, 'screen', em, across, list, true, 'in')],
+    ['print', figureModel(f.drawn, 'print', face.printEm, 0, list, false, 'in')],
+  ]
+  const screen = models[0][1]
+  for (const column of [358, 1120]) {
+    const px = em * Math.min(face.pxPerMm, column / screen.frame[2])
+    if (px < face.minTextPx - 1e-9) failures.push(`${f.id} text ${px} px at ${column}`)
+  }
+  for (const [medium, model] of models) failures.push(...mediumFailures(f, medium, model))
+  // every length text in inches
+  for (const { side, p } of f.drawn) {
+    const texts = (screen.layers[side]?.labels ?? []).map((l) => l.text)
+    for (const d of p.annotation.dimensions.filter((x) => !x.derived))
+      if (!texts.includes(labelText(d, 'in'))) failures.push(`${f.id} ${side} ${d.symbol}`)
+  }
+  return failures
+}
+
 it('lays out every CIP figure in inches with its texts clear, inside the frame, at 11 px', () => {
   const failures: string[] = []
   for (const record of current) {
@@ -64,51 +133,7 @@ it('lays out every CIP figure in inches with its texts clear, inside the frame, 
       'in',
     )
     const across = Math.max(...shown.map((f) => screenWidth(f.drawn, em, 'in')))
-    for (const f of shown) {
-      const list = f.drawn.length === 2 ? regions(record.values) : []
-      const models: [string, FigureModel][] = [
-        ['screen', figureModel(f.drawn, 'screen', em, across, list, true, 'in')],
-        ['print', figureModel(f.drawn, 'print', face.printEm, 0, list, false, 'in')],
-      ]
-      const screen = models[0][1]
-      for (const column of [358, 1120]) {
-        const px = em * Math.min(face.pxPerMm, column / screen.frame[2])
-        if (px < face.minTextPx - 1e-9) failures.push(`${f.id} text ${px} px at ${column}`)
-      }
-      for (const [medium, model] of models) {
-        if (model.scale.note !== 'Dimensions in inches') failures.push(`${f.id} note`)
-        const [fx, fy, fw, fh] = model.frame
-        const inside = ([x, y]: PartPoint) => {
-          const [ox, oy] = medium === 'screen' ? [y, -x] : [x, y]
-          return ox >= fx - 1e-6 && ox <= fx + fw + 1e-6 && oy >= fy - 1e-6 && oy <= fy + fh + 1e-6
-        }
-        for (const [side, layout] of Object.entries(model.layers) as [string, Layout][]) {
-          const what = (x: string) => `${f.id} ${side} ${medium} ${x}`
-          const tips = layout.arrowheads.map((t) => ({
-            owner: t.owner,
-            corners: arrowheadCorners(t),
-          }))
-          layout.labels.forEach((l, k) => {
-            const corners = labelCorners(l)
-            if (!corners.every(inside)) failures.push(what(`${l.owner} text outside`))
-            for (const m of layout.labels.slice(k + 1))
-              if (boxesOverlap(l, m)) failures.push(what(`${l.owner} text overlaps ${m.owner}`))
-            for (const s of layout.segs)
-              if (s.owner !== l.owner && segHitsBox(s, l))
-                failures.push(what(`${s.owner} line crosses ${l.owner} text`))
-            for (const t of tips)
-              if (t.owner !== l.owner && polygonsOverlap(t.corners, corners))
-                failures.push(what(`${t.owner} arrowhead on ${l.owner} text`))
-          })
-        }
-      }
-      // every length text in inches
-      for (const { side, p } of f.drawn) {
-        const texts = (screen.layers[side]?.labels ?? []).map((l) => l.text)
-        for (const d of p.annotation.dimensions.filter((x) => !x.derived))
-          if (!texts.includes(labelText(d, 'in'))) failures.push(`${f.id} ${side} ${d.symbol}`)
-      }
-    }
+    for (const f of shown) failures.push(...figureFailures(record, f, em, across))
   }
   expect(failures).toEqual([])
 }, 120_000)

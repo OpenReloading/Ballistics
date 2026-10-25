@@ -43,37 +43,140 @@ const sides = ['cartridge', 'chamber'] as const
 type Side = (typeof sides)[number]
 const base = ['R1', 'R', 'P1', 'L3', 'H2']
 
+/** What is wrong with the points of a drawn side: where they start, finite, never falling in z. */
+function pointFailures(points: SectionPoint[]) {
+  const failures: string[] = []
+  const [first] = points
+  if (first[0] !== 0 || first[1] !== 0) failures.push(`starts at ${first}`)
+  for (const [k, [r, z]] of points.entries()) {
+    if (!Number.isFinite(r) || !Number.isFinite(z) || r < 0)
+      failures.push(`point ${k} at ${r}, ${z}`)
+    if (k && z < points[k - 1][1]) failures.push(`z falls at point ${k}`)
+  }
+  return failures
+}
+
+/** Profiles one side; pushes each broken invariant to failures and returns its codes. */
+function sweepSide(
+  id: string,
+  values: SpecValue[],
+  failures: string[],
+  side: Side,
+  table?: string,
+) {
+  const p = cipProfile(values, side, table)
+  const fail = (what: string) => failures.push(`${id} ${side} ${what}`)
+  const closed = side === 'cartridge' && closedFront(values) ? ['closedFront'] : []
+  if ('missing' in p) {
+    if (!p.missing.length || p.missing.some((s) => !base.includes(s))) fail(`missing ${p.missing}`)
+    return [`missing:${p.missing}`, ...closed]
+  }
+  for (const what of pointFailures(p.points)) fail(what)
+  const P1 = find(values, side, 'P1') as number
+  if (side === 'chamber' && p.points[1][0] < P1 / 2) fail(`head ${p.points[1][0]} below P1`)
+  const codes = p.notes.map((n) => n.code)
+  if (table === 'III' && codes.includes('grooveAngle')) fail('grooveAngle on table III')
+  for (const what of annotationFailures(p, values, side, table)) fail(what)
+  return [...codes, ...closed]
+}
+
 /**
  * Profiles both sides; pushes each broken invariant to failures and returns the codes per side,
  * closedFront last on the cartridge side.
  */
 function sweep(id: string, values: SpecValue[], failures: string[], table?: string) {
-  return sides.map((side) => {
-    const p = cipProfile(values, side, table)
-    const fail = (what: string) => failures.push(`${id} ${side} ${what}`)
-    const closed = side === 'cartridge' && closedFront(values) ? ['closedFront'] : []
-    if ('missing' in p) {
-      if (!p.missing.length || p.missing.some((s) => !base.includes(s)))
-        fail(`missing ${p.missing}`)
-      return [`missing:${p.missing}`, ...closed]
-    }
-    const [first] = p.points
-    if (first[0] !== 0 || first[1] !== 0) fail(`starts at ${first}`)
-    p.points.forEach(([r, z], k) => {
-      if (!Number.isFinite(r) || !Number.isFinite(z) || r < 0) fail(`point ${k} at ${r}, ${z}`)
-      if (k && z < p.points[k - 1][1]) fail(`z falls at point ${k}`)
-    })
-    const P1 = find(values, side, 'P1') as number
-    if (side === 'chamber' && p.points[1][0] < P1 / 2) fail(`head ${p.points[1][0]} below P1`)
-    const codes = p.notes.map((n) => n.code)
-    if (table === 'III' && codes.includes('grooveAngle')) fail('grooveAngle on table III')
-    for (const what of annotationFailures(p, values, side, table)) fail(what)
-    return [...codes, ...closed]
-  })
+  return sides.map((side) => sweepSide(id, values, failures, side, table))
 }
 
 const find = (values: SpecValue[], side: Side, symbol: string) =>
   storedValue(values, side, symbol)?.value
+
+const near = (a: number, b: number, tol = 0.01) => Math.abs(a - b) <= tol
+
+/** What breaks the rules of a derived dimension: only L3 - L2, spanning above zero. */
+function derivedFailures(d: Dimension, name: string, values: SpecValue[], side: Side) {
+  const [L2, L3] = ['L2', 'L3'].map((s) => find(values, side, s) as number)
+  if (
+    d.symbol !== 'L3\u2212L2' ||
+    !near(d.value, L3 - L2, 5e-4) ||
+    !near(d.to - d.from, L3 - L2, 1e-9)
+  )
+    return [`${name} is not L3 - L2`]
+  return d.to - d.from > 0 ? [] : [`${name} spans ${d.to - d.from}`]
+}
+
+/** What breaks the rules of a stored dimension: the value it carries, its span, e, conventions. */
+function storedFailures(
+  d: Dimension,
+  name: string,
+  values: SpecValue[],
+  side: Side,
+  conventions: Profile['annotation']['conventions'],
+  variant?: string,
+) {
+  const out: string[] = []
+  const v = d.stored
+  if (
+    !v ||
+    !values.includes(v) ||
+    v.side !== side ||
+    v.symbol !== d.symbol ||
+    (v.variant !== undefined && v.variant !== variant) ||
+    v.value !== d.value
+  )
+    out.push(`${name} is not a stored value`)
+  else if (d.kind === 'diameter' ? d.radius !== d.value / 2 : !near(d.to - d.from, d.value, 1e-9))
+    out.push(`${name} spans ${d.to - d.from}, stored ${d.value}`)
+  if (d.symbol === 'e' && find(values, side, 'e') === undefined) out.push('derived e dimensioned')
+  // a length's extension line starts at the outline or the steel band, never on a convention
+  for (const c of d.kind === 'diameter' ? conventions : [])
+    if (d.from > c.from + 1e-9 && d.from <= c.to + 1e-9 && near(d.radius as number, c.r))
+      out.push(`${name} ends on the ${c.kind}`)
+  return out
+}
+
+const onLine = ([r, z]: SectionPoint, [r0, z0]: SectionPoint, [r1, z1]: SectionPoint) =>
+  Math.abs((r1 - r0) * (z - z0) - (z1 - z0) * (r - r0)) / Math.hypot(r1 - r0, z1 - z0) <= 0.01
+
+const onOutline = (q: SectionPoint, line: SectionPoint[]) =>
+  line.some(
+    (a, k) =>
+      k > 0 &&
+      onLine(q, line[k - 1], a) &&
+      Math.min(a[1], line[k - 1][1]) - 0.01 <= q[1] &&
+      q[1] <= Math.max(a[1], line[k - 1][1]) + 0.01,
+  )
+
+/** Whether the vertex of an angle lies on the drawn flank f of the outline `sharp`. */
+function vertexOnFlank(vertex: SectionPoint, f: SectionPoint, sharp: SectionPoint[]) {
+  const line = sharp.map(([r, z]): SectionPoint => [(f[0] < 0 ? -1 : 1) * r, z])
+  // a flank along the axis (delta) or the head face (beta) is a construction line
+  if (f[0] === vertex[0] || f[1] === vertex[1]) return onOutline(vertex, line)
+  const k = line.findIndex(([r, z]) => near(r, f[0], 1e-9) && near(z, f[1], 1e-9))
+  return (
+    k >= 0 &&
+    [line[k - 1], line[k + 1]].some(
+      (g) => g && Math.hypot(g[0] - f[0], g[1] - f[1]) > 1e-9 && onLine(vertex, f, g),
+    )
+  )
+}
+
+/** What breaks the rules of the angles: stored values, vertices on both drawn flanks. */
+function angleFailures(
+  angles: Profile['annotation']['angles'],
+  values: SpecValue[],
+  sharp: SectionPoint[],
+) {
+  const out: string[] = []
+  for (const a of angles) {
+    if (!values.includes(a.stored) || a.stored.value !== a.value)
+      out.push(`angle ${a.symbol} not stored`)
+    for (const f of a.flanks)
+      if (!vertexOnFlank(a.vertex, f, sharp))
+        out.push(`angle ${a.symbol} vertex off its flank at ${f}`)
+  }
+  return out
+}
 
 /**
  * What breaks the annotation rules of a drawn side: values stored or derived (L3 - L2 > 0), angle
@@ -91,66 +194,15 @@ function annotationFailures(
   const { dimensions, angles, radii, edges, conventions } = p.annotation
   // the outline before rounding: the fillet corners as drawn without r0, r1 and r2
   const sharp = table === 'VII' ? p.points : unrounded(values, side, table).points
-  const near = (a: number, b: number, tol = 0.01) => Math.abs(a - b) <= tol
   for (const d of dimensions) {
     const name = `${d.kind} ${d.symbol}`
-    if (d.derived) {
-      const [L2, L3] = ['L2', 'L3'].map((s) => find(values, side, s) as number)
-      if (
-        d.symbol !== 'L3\u2212L2' ||
-        !near(d.value, L3 - L2, 5e-4) ||
-        !near(d.to - d.from, L3 - L2, 1e-9)
-      )
-        out.push(`${name} is not L3 - L2`)
-      else if (!(d.to - d.from > 0)) out.push(`${name} spans ${d.to - d.from}`)
-      continue
-    }
-    const v = d.stored
-    if (
-      !v ||
-      !values.includes(v) ||
-      v.side !== side ||
-      v.symbol !== d.symbol ||
-      (v.variant !== undefined && v.variant !== variant) ||
-      v.value !== d.value
+    out.push(
+      ...(d.derived
+        ? derivedFailures(d, name, values, side)
+        : storedFailures(d, name, values, side, conventions, variant)),
     )
-      out.push(`${name} is not a stored value`)
-    else if (d.kind === 'diameter' ? d.radius !== d.value / 2 : !near(d.to - d.from, d.value, 1e-9))
-      out.push(`${name} spans ${d.to - d.from}, stored ${d.value}`)
-    if (d.symbol === 'e' && find(values, side, 'e') === undefined) out.push('derived e dimensioned')
-    // a length's extension line starts at the outline or the steel band, never on a convention
-    for (const c of d.kind === 'diameter' ? conventions : [])
-      if (d.from > c.from + 1e-9 && d.from <= c.to + 1e-9 && near(d.radius as number, c.r))
-        out.push(`${name} ends on the ${c.kind}`)
   }
-  const mirrored = (sign: number) => sharp.map(([r, z]): SectionPoint => [sign * r, z])
-  const onLine = ([r, z]: SectionPoint, [r0, z0]: SectionPoint, [r1, z1]: SectionPoint) =>
-    Math.abs((r1 - r0) * (z - z0) - (z1 - z0) * (r - r0)) / Math.hypot(r1 - r0, z1 - z0) <= 0.01
-  const onOutline = (q: SectionPoint, line: SectionPoint[]) =>
-    line.some(
-      (a, k) =>
-        k > 0 &&
-        onLine(q, line[k - 1], a) &&
-        Math.min(a[1], line[k - 1][1]) - 0.01 <= q[1] &&
-        q[1] <= Math.max(a[1], line[k - 1][1]) + 0.01,
-    )
-  for (const a of angles) {
-    if (!values.includes(a.stored) || a.stored.value !== a.value)
-      out.push(`angle ${a.symbol} not stored`)
-    for (const f of a.flanks) {
-      const line = mirrored(f[0] < 0 ? -1 : 1)
-      const k = line.findIndex(([r, z]) => near(r, f[0], 1e-9) && near(z, f[1], 1e-9))
-      // a flank along the axis (delta) or the head face (beta) is a construction line
-      const flank =
-        f[0] === a.vertex[0] || f[1] === a.vertex[1]
-          ? onOutline(a.vertex, line)
-          : k >= 0 &&
-            [line[k - 1], line[k + 1]].some(
-              (g) => g && Math.hypot(g[0] - f[0], g[1] - f[1]) > 1e-9 && onLine(a.vertex, f, g),
-            )
-      if (!flank) out.push(`angle ${a.symbol} vertex off its flank at ${f}`)
-    }
-  }
+  out.push(...angleFailures(angles, values, sharp))
   for (const c of radii)
     if (!sharp.some(([r, z]) => r === c.corner[0] && z === c.corner[1]))
       out.push(`radius ${c.symbol} off the corner before rounding`)
@@ -332,35 +384,44 @@ it('draws every record with the reviewed notes', () => {
   ])
 })
 
+/** What is wrong with the drawing of a record with one symbol of one side dropped. */
+function droppedFailures(record: SpecRecord, side: Side, symbol: string) {
+  const { id, values, table } = record
+  const failures: string[] = []
+  const dropped = without(values, side, symbol)
+  const both = sweep(`${id} without ${side} ${symbol}`, dropped, failures, table)
+  const own = both[sides.indexOf(side)][0] ?? ''
+  if (base.includes(symbol) && !(side === 'chamber' && symbol === 'R'))
+    if (!own.startsWith('missing:') || !own.slice(8).split(',').includes(symbol))
+      failures.push(`${id} without ${side} ${symbol}: drawn`)
+  const shoulder = ['P2', 'L1', 'L2', 'H1']
+  if (
+    shoulder.includes(symbol) &&
+    shoulder.every((s) => find(values, side, s) !== undefined) &&
+    !own.startsWith('missing:') &&
+    !both[sides.indexOf(side)].includes('shoulderPartial')
+  )
+    failures.push(`${id} without ${side} ${symbol}: no shoulderPartial`)
+  const codes = both[1]
+  const chamberRim = ['E', 'R'].some((s) => find(dropped, 'chamber', s) !== undefined)
+  if (
+    !codes[0]?.startsWith('missing') &&
+    !chamberRim &&
+    find(dropped, 'cartridge', 'R') !== undefined &&
+    !codes.includes('cartridgeR')
+  )
+    failures.push(`${id} without ${side} ${symbol}: no cartridgeR`)
+  return failures
+}
+
 it('keeps the invariants with each symbol dropped', () => {
   const failures: string[] = []
-  for (const { id, values, table } of records)
+  for (const record of records)
     for (const side of sides)
-      for (const symbol of new Set(values.filter((v) => v.side === side).map((v) => v.symbol))) {
-        const dropped = without(values, side, symbol)
-        const both = sweep(`${id} without ${side} ${symbol}`, dropped, failures, table)
-        const own = both[sides.indexOf(side)][0] ?? ''
-        if (base.includes(symbol) && !(side === 'chamber' && symbol === 'R'))
-          if (!own.startsWith('missing:') || !own.slice(8).split(',').includes(symbol))
-            failures.push(`${id} without ${side} ${symbol}: drawn`)
-        const shoulder = ['P2', 'L1', 'L2', 'H1']
-        if (
-          shoulder.includes(symbol) &&
-          shoulder.every((s) => find(values, side, s) !== undefined) &&
-          !own.startsWith('missing:') &&
-          !both[sides.indexOf(side)].includes('shoulderPartial')
-        )
-          failures.push(`${id} without ${side} ${symbol}: no shoulderPartial`)
-        const codes = both[1]
-        const chamberRim = ['E', 'R'].some((s) => find(dropped, 'chamber', s) !== undefined)
-        if (
-          !codes[0]?.startsWith('missing') &&
-          !chamberRim &&
-          find(dropped, 'cartridge', 'R') !== undefined &&
-          !codes.includes('cartridgeR')
-        )
-          failures.push(`${id} without ${side} ${symbol}: no cartridgeR`)
-      }
+      for (const symbol of new Set(
+        record.values.filter((v) => v.side === side).map((v) => v.symbol),
+      ))
+        failures.push(...droppedFailures(record, side, symbol))
   expect(failures).toEqual([])
 })
 
@@ -556,6 +617,10 @@ const radius = (points: SectionPoint[], z: number) => {
   return r0 + ((r1 - r0) * (z - z0)) / (z1 - z0)
 }
 
+/** The ends of the interval before station k, kept off the stations; none before the first. */
+const intervalEnds = (stations: number[], k: number) =>
+  k ? [stations[k - 1] + 1e-9, stations[k] - 1e-9] : []
+
 /** Largest amount the cartridge lies outside the chamber, and where, from the head to the mouth. */
 function interference(cartridge: SectionPoint[], chamber: SectionPoint[]) {
   if (!cartridge.length || !chamber.length) return { by: 0, z: 0 }
@@ -565,13 +630,40 @@ function interference(cartridge: SectionPoint[], chamber: SectionPoint[]) {
     .sort((a, b) => a - b)
   let worst = { by: -Infinity, z: 0 }
   // both outlines are straight between stations, so the ends of each interval bound it
-  for (const [k, a] of stations.entries())
-    for (const z of k ? [stations[k - 1] + 1e-9, a - 1e-9] : []) {
+  for (const k of stations.keys())
+    for (const z of intervalEnds(stations, k)) {
       // past the chamber end the radius is NaN: a hull longer than the chamber fails
       const by = radius(cartridge, z) - radius(chamber, z)
       if (Number.isNaN(by) || by > worst.by) worst = { by: Number.isNaN(by) ? Infinity : by, z }
     }
   return worst
+}
+
+/** What is wrong with one variant figure of a table VII record; `tight` lists a near miss of the hull. */
+function shotshellFailures(
+  id: string,
+  values: SpecValue[],
+  figure: ReturnType<typeof recordFigures>[number],
+  tight: string[],
+) {
+  const failures: string[] = []
+  const { variant, drawn } = figure
+  const name = variant === undefined ? id : `${id} ${variant}`
+  for (const n of figure.notes) failures.push(`${name} ${n.code} ${n.text}`)
+  for (const { side, p } of drawn) {
+    for (const what of pointFailures(p.points)) failures.push(`${name} ${side} ${what}`)
+    const symbols = p.annotation.dimensions.map((d) => d.symbol)
+    if (new Set(symbols).size !== symbols.length) failures.push(`${name} ${side} dimension twice`)
+    for (const what of annotationFailures(p, values, side, 'VII', variant))
+      failures.push(`${name} ${side} ${what}`)
+  }
+  const [cartridge, chamber] = sides.map(
+    (side) => drawn.find((d) => d.side === side)?.p.points ?? [],
+  )
+  const { by, z } = interference(cartridge, chamber)
+  if (by > 0.01) failures.push(`${name} cartridge ${by} mm outside the chamber at ${z} mm`)
+  else if (by > 0) tight.push(`${name} ${by.toFixed(4)} at ${z.toFixed(2)}`)
+  return failures
 }
 
 it('draws every variant of every current table VII record to one span, chamber around the hull', () => {
@@ -584,30 +676,8 @@ it('draws every variant of every current table VII record to one span, chamber a
     if (lengths('cartridge', 'l').join() !== lengths('chamber', 'L').join())
       failures.push(`${id} l and L variants differ`)
     // the figures as the component draws them, all to the span of the longest
-    const list = recordFigures({ id, standard: 'CIP', table: 'VII', values })
-    for (const figure of list) {
-      const { variant, drawn } = figure
-      const name = variant === undefined ? id : `${id} ${variant}`
-      for (const n of figure.notes) failures.push(`${name} ${n.code} ${n.text}`)
-      for (const { side, p } of drawn) {
-        p.points.forEach(([r, z], k) => {
-          if (!Number.isFinite(r) || !Number.isFinite(z) || r < 0)
-            failures.push(`${name} ${side} point ${k}`)
-          if (k && z < p.points[k - 1][1]) failures.push(`${name} ${side} z falls at point ${k}`)
-        })
-        const symbols = p.annotation.dimensions.map((d) => d.symbol)
-        if (new Set(symbols).size !== symbols.length)
-          failures.push(`${name} ${side} dimension twice`)
-        for (const what of annotationFailures(p, values, side, 'VII', variant))
-          failures.push(`${name} ${side} ${what}`)
-      }
-      const [cartridge, chamber] = sides.map(
-        (side) => drawn.find((d) => d.side === side)?.p.points ?? [],
-      )
-      const { by, z } = interference(cartridge, chamber)
-      if (by > 0.01) failures.push(`${name} cartridge ${by} mm outside the chamber at ${z} mm`)
-      else if (by > 0) tight.push(`${name} ${by.toFixed(4)} at ${z.toFixed(2)}`)
-    }
+    for (const figure of recordFigures({ id, standard: 'CIP', table: 'VII', values }))
+      failures.push(...shotshellFailures(id, values, figure, tight))
   }
   expect(failures).toEqual([])
   // Mori: hull d2 8.4 (a maximum, toward h 8.35) over chamber B 8.38 (a minimum) from L2 12.3
@@ -680,229 +750,324 @@ const models = new Map(
 const pxPerMm = ({ frame }: FigureModel, column: number) =>
   Math.min(face.pxPerMm, column / frame[2])
 
-it('lays out every layer of every figure in both media clear of overlaps, inside the frame', () => {
-  const failures: string[] = []
-  let headBelowP1 = 0
-  let beltWiderThanRim = 0
-  const longLeaders: string[] = []
-  const acrossAxis: string[] = []
-  const arrowheads: string[] = []
-  const reference = allFigures.find((f) => f.name === 'cip-308-win-2008-09-23') as Figure
-  const referencePx = pxPerMm((models.get(reference) as { screen: FigureModel }).screen, 358)
-  for (const figure of allFigures) {
-    const { name, drawn, em } = figure
-    const both = models.get(figure) as { screen: FigureModel; print: FigureModel }
-    for (const column of [358, 1120])
-      if (em * pxPerMm(both.screen, column) < face.minTextPx - 1e-9)
-        failures.push(`${name} text ${em * pxPerMm(both.screen, column)} px at ${column}`)
-    if (pxPerMm(both.screen, 358) > 3 * referencePx)
-      failures.push(`${name} ${pxPerMm(both.screen, 358)} px per mm`)
-    if (both.print.frame[2] > face.printWidth)
-      failures.push(`${name} print ${both.print.frame[2]} mm wide`)
-    for (const [medium, model] of Object.entries(both)) {
-      const [fx, fy, fw, fh] = model.frame
-      // the outer frame: screen x = part y, screen y = -part x
-      const outer = ([x, y]: PartPoint): PartPoint => (medium === 'screen' ? [y, -x] : [x, y])
-      const inside = (q: PartPoint) => {
-        const [x, y] = outer(q)
-        return x >= fx - 1e-6 && x <= fx + fw + 1e-6 && y >= fy - 1e-6 && y <= fy + fh + 1e-6
-      }
-      for (const { side, p } of drawn) {
-        const layout = model.layers[side] as Layout
-        const what = (x: string) => `${name} ${side} ${medium} ${x}`
-        const lines: LineSegment[] = [
-          ...layout.segs,
-          ...layout.arcs.flatMap((a) =>
-            Array.from({ length: 12 }, (_, k): LineSegment => {
-              const t = (n: number) => a.from + ((a.to - a.from) * n) / 12
-              return {
-                a: [a.c[0] + a.r * Math.cos(t(k)), a.c[1] + a.r * Math.sin(t(k))],
-                b: [a.c[0] + a.r * Math.cos(t(k + 1)), a.c[1] + a.r * Math.sin(t(k + 1))],
-                kind: 'rule',
-                owner: a.owner,
-              }
-            }),
-          ),
-        ]
-        // the filled arrowheads as drawn, 1.1 by 0.7 mm
-        const tips = layout.arrowheads.map((t) => ({
-          owner: t.owner,
-          corners: arrowheadCorners(t),
-        }))
-        // the edge lines as clipped to the section or the cavity, and the chamber break line
-        const edges = p.annotation.edges.map((z): LineSegment => {
-          const r = radiusAt(p.points, z) as number
-          return { a: [z, -r], b: [z, r], kind: 'thin', owner: 'edge line' }
-        })
-        const breaks =
-          side === 'chamber'
-            ? steelBand(p.points, model.em).sides.flatMap(({ zig }) =>
-                zig
-                  .slice(1)
-                  .map(
-                    (b, n): LineSegment => ({ a: zig[n], b, kind: 'thin', owner: 'break line' }),
-                  ),
-              )
-            : []
-        layout.labels.forEach((l, k) => {
-          const corners = labelCorners(l)
-          if (!corners.every(inside)) failures.push(what(`${l.owner} text outside`))
-          for (const m of layout.labels.slice(k + 1))
-            if (boxesOverlap(l, m)) failures.push(what(`${l.owner} text overlaps ${m.owner}`))
-          for (const s of lines)
-            if (s.owner !== l.owner && segHitsBox(s, l))
-              failures.push(what(`${s.owner} line crosses ${l.owner} text`))
-          for (const s of [...edges, ...breaks])
-            if (segHitsBox(s, l)) failures.push(what(`${s.owner} crosses ${l.owner} text`))
-          for (const t of tips)
-            if (t.owner !== l.owner && polygonsOverlap(t.corners, corners))
-              failures.push(what(`${t.owner} arrowhead on ${l.owner} text`))
-        })
-        // arrowheads of two dimensions that still overlap, else listed
-        tips.forEach((t, k) => {
-          if (!t.corners.every(inside)) failures.push(what(`${t.owner} arrowhead outside`))
-          for (const u of tips.slice(k + 1))
-            if (u.owner !== t.owner && polygonsOverlap(t.corners, u.corners))
-              arrowheads.push(what(`${t.owner} on ${u.owner}`))
-        })
-        // an angle text on a leader starts at its end, and the leader runs off the axis
-        for (const s of layout.segs.filter(
-          (x) => x.leader && layout.arcs.some((a) => a.owner === x.owner),
-        )) {
-          const l = layout.labels.find((x) => x.owner === s.owner) as Label
-          const [dx, dy] = [s.b[0] - l.c[0], s.b[1] - l.c[1]]
-          const [u, v] = [dx * l.dir[0] + dy * l.dir[1], -dx * l.dir[1] + dy * l.dir[0]]
-          const off = Math.hypot(
-            Math.max(Math.abs(u) - l.w / 2, 0),
-            Math.max(Math.abs(v) - l.h / 2, 0),
-          )
-          if (off > 0.2 * model.em) failures.push(what(`${s.owner} text ${off} mm off its leader`))
-          if (Math.max(Math.abs(s.a[1]), Math.abs(s.b[1])) < 0.25 * model.em)
-            failures.push(what(`${s.owner} leader along the axis`))
-        }
-        // a radius leader within 3 times the face's leader, on its own side of the axis, else listed
-        for (const s of layout.segs.filter(
-          (x) => x.leader && p.annotation.radii.some((r) => r.symbol === x.owner),
-        )) {
-          const times =
-            Math.hypot(s.b[0] - s.a[0], s.b[1] - s.a[1]) /
-            ((face.radiusLeaderLength * model.em) / face.baseEm)
-          if (times > 3 + 1e-9) longLeaders.push(`${what(s.owner)} ${times.toFixed(2)}`)
-          if (s.a[1] * s.b[1] < 0) acrossAxis.push(what(s.owner))
-        }
-        // an angle text without a leader lies within 2 em of its arc
-        for (const a of layout.arcs) {
-          if (layout.segs.some((x) => x.leader && x.owner === a.owner)) continue
-          const l = layout.labels.find((x) => x.owner === a.owner) as Label
-          const off = Math.min(
-            ...Array.from({ length: 49 }, (_, k) =>
-              boxDistance(l, [
-                a.c[0] + a.r * Math.cos(a.from + ((a.to - a.from) * k) / 48),
-                a.c[1] + a.r * Math.sin(a.from + ((a.to - a.from) * k) / 48),
-              ]),
-            ),
-          )
-          if (off > face.nearArc * model.em + 1e-9)
-            failures.push(what(`${a.owner} text ${off / model.em} em off its arc, no leader`))
-        }
-        for (const s of lines)
-          if (!inside(s.a) || !inside(s.b)) failures.push(what(`${s.owner} line outside`))
-        for (const { owner, tips } of layout.diameterTips) {
-          const d = p.annotation.dimensions.find((x) => x.symbol === owner) as Dimension
-          for (const [z, r] of tips) {
-            const off = distance([Math.abs(r), z], p.points)
-            // a fillet rounds the corner where P2 and H1 are stored by up to 0.04 mm
-            if (off > 0.01 || Math.abs(Math.abs(r) - (d.radius as number)) > 0.05)
-              failures.push(
-                what(`${owner} tip ${off} mm off the outline, at r ${r}, stored ${d.radius}`),
-              )
-          }
-        }
-        for (const { owner, length, outside, broken } of layout.spans)
-          if (!broken && outside !== length < face.shortSpan * face.arrow.length)
-            failures.push(what(`${owner} arrows ${outside ? 'outside' : 'inside'}`))
-        // the extension lines of a chamber head diameter end, past their gap, on a drawn stroke
-        if (side === 'chamber') {
-          const head = headFace(p.points, p.annotation)
-          if (!head !== !model.chamber?.face) failures.push(what('head face not as laid out'))
-          const strokes = [
-            ...steelBand(p.points, model.em).sides.map((s) => s.stroke),
-            ...(head ? [head] : []),
-          ]
-          const checked = layout.segs.filter(
-            (x) => x.kind === 'thin' && Math.abs(x.a[0] + face.extensionGap) < 1e-9,
-          )
-          // the two R1 lines of a headBelowP1 chamber are among the checked ones
-          if (p.notes.some((n) => n.code === 'headBelowP1')) {
-            if (checked.filter((x) => x.owner === 'R1').length !== 2)
-              failures.push(what('R1 extension lines not checked'))
-            else if (medium === 'screen') headBelowP1++
-          }
-          for (const s of checked) {
-            const end: PartPoint = [0, s.a[1]]
-            const off = Math.min(
-              ...strokes.flatMap((st) => st.slice(1).map((b, n) => segDistance(end, st[n], b))),
-            )
-            if (off > 0.01) failures.push(what(`${s.owner} extension line ${off} mm off the head`))
-          }
-        }
-        // the extension lines of a cartridge head diameter end, past their gap, on the outline
-        if (side === 'cartridge') {
-          const below = new Set(
-            p.annotation.dimensions
-              .filter((d) => d.kind === 'diameter' && d.behindHeadFace)
-              .map((d) => d.symbol),
-          )
-          for (const s of layout.segs) {
-            if (s.kind !== 'thin' || !below.has(s.owner) || s.a[1] !== s.b[1]) continue
-            const off = distance([Math.abs(s.a[1]), s.a[0] + face.extensionGap], p.points)
-            if (off > 0.01)
-              failures.push(what(`${s.owner} extension line ${off} mm off the outline`))
-            // a belt wider than the rim: its lines start past the head face
-            if (s.owner === 'R3' && s.a[0] > 0 && s.a[1] > 0 && medium === 'screen')
-              beltWiderThanRim++
-          }
-        }
-      }
-      // the Combined layer: one callout per region, clear of each other and inside the frame
-      const combined = model.layers.combined
-      const what = (x: string) => `${name} combined ${medium} ${x}`
-      if (!figure.regions.length !== !combined) failures.push(what('layer not as the regions'))
-      if (combined) {
-        const texts = combined.labels.map((l) => l.text).sort()
-        if (
-          texts.join('|') !==
-          figure.regions
-            .map((r) => regionText(r))
-            .sort()
-            .join('|')
+/** What the layout test collects: broken rules, and the reviewed counts and lists. */
+interface Tally {
+  failures: string[]
+  headBelowP1: number
+  beltWiderThanRim: number
+  longLeaders: string[]
+  acrossAxis: string[]
+  arrowheads: string[]
+}
+
+/** One drawn side in one medium: how to name a failure, whether a point lies in the frame. */
+interface LayerCtx {
+  side: Side
+  medium: string
+  p: Profile
+  layout: Layout
+  model: FigureModel
+  what: (x: string) => string
+  inside: (q: PartPoint) => boolean
+  tally: Tally
+}
+
+type Tip = { owner: string; corners: PartPoint[] }
+
+/** The chords of an arc, as a polyline of `steps` rules. */
+const arcLines = (a: Layout['arcs'][number], steps: number) =>
+  Array.from({ length: steps }, (_, k): LineSegment => {
+    const t = (n: number) => a.from + ((a.to - a.from) * n) / steps
+    return {
+      a: [a.c[0] + a.r * Math.cos(t(k)), a.c[1] + a.r * Math.sin(t(k))],
+      b: [a.c[0] + a.r * Math.cos(t(k + 1)), a.c[1] + a.r * Math.sin(t(k + 1))],
+      kind: 'rule',
+      owner: a.owner,
+    }
+  })
+
+/** The filled arrowheads as drawn, 1.1 by 0.7 mm. */
+const tipsOf = (layout: Layout): Tip[] =>
+  layout.arrowheads.map((t) => ({ owner: t.owner, corners: arrowheadCorners(t) }))
+
+/** The edge lines as clipped to the section or the cavity, and the chamber break line. */
+function edgeAndBreakLines(p: Profile, side: Side, em: number): LineSegment[] {
+  const edges = p.annotation.edges.map((z): LineSegment => {
+    const r = radiusAt(p.points, z) as number
+    return { a: [z, -r], b: [z, r], kind: 'thin', owner: 'edge line' }
+  })
+  const breaks =
+    side === 'chamber'
+      ? steelBand(p.points, em).sides.flatMap(({ zig }) =>
+          zig
+            .slice(1)
+            .map((b, n): LineSegment => ({ a: zig[n], b, kind: 'thin', owner: 'break line' })),
         )
-          failures.push(what(`callouts ${texts.join('|')}`))
-        const tips = combined.arrowheads.map((t) => ({
-          owner: t.owner,
-          corners: arrowheadCorners(t),
-        }))
-        combined.labels.forEach((l, k) => {
-          if (!labelCorners(l).every(inside)) failures.push(what(`${l.owner} text outside`))
-          for (const m of combined.labels.slice(k + 1))
-            if (boxesOverlap(l, m, 0.12 * model.em))
-              failures.push(what(`${l.owner} text overlaps ${m.owner}`))
-          for (const s of combined.segs)
-            if (s.owner !== l.owner && segHitsBox(s, l))
-              failures.push(what(`${s.owner} leader crosses ${l.owner} text`))
-          for (const t of tips)
-            if (t.owner !== l.owner && polygonsOverlap(t.corners, labelCorners(l)))
-              failures.push(what(`${t.owner} arrowhead on ${l.owner} text`))
-          // past the steel band
-          const outer =
-            Math.max(...(drawn[1].p.points.map(([r]) => r) as number[])) + face.steelBandWidth
-          if (Math.abs(l.c[1]) - l.h / 2 < outer) failures.push(what(`${l.owner} text on the part`))
-        })
-        for (const s of combined.segs)
-          if (!inside(s.a) || !inside(s.b)) failures.push(what(`${s.owner} leader outside`))
-      }
+      : []
+  return [...edges, ...breaks]
+}
+
+/** What is wrong with one text: outside the frame, on another text, a line, an edge or an arrowhead. */
+function labelChecks(
+  { layout, what, inside, tally }: LayerCtx,
+  l: Label,
+  k: number,
+  lines: LineSegment[],
+  tips: Tip[],
+  edgeLines: LineSegment[],
+) {
+  const { failures } = tally
+  const corners = labelCorners(l)
+  if (!corners.every(inside)) failures.push(what(`${l.owner} text outside`))
+  for (const m of layout.labels.slice(k + 1))
+    if (boxesOverlap(l, m)) failures.push(what(`${l.owner} text overlaps ${m.owner}`))
+  for (const s of lines)
+    if (s.owner !== l.owner && segHitsBox(s, l))
+      failures.push(what(`${s.owner} line crosses ${l.owner} text`))
+  for (const s of edgeLines)
+    if (segHitsBox(s, l)) failures.push(what(`${s.owner} crosses ${l.owner} text`))
+  for (const t of tips)
+    if (t.owner !== l.owner && polygonsOverlap(t.corners, corners))
+      failures.push(what(`${t.owner} arrowhead on ${l.owner} text`))
+}
+
+/** Arrowheads of two dimensions that still overlap are listed, one outside the frame fails. */
+function tipChecks({ what, inside, tally }: LayerCtx, tips: Tip[]) {
+  for (const [k, t] of tips.entries()) {
+    if (!t.corners.every(inside)) tally.failures.push(what(`${t.owner} arrowhead outside`))
+    for (const u of tips.slice(k + 1))
+      if (u.owner !== t.owner && polygonsOverlap(t.corners, u.corners))
+        tally.arrowheads.push(what(`${t.owner} on ${u.owner}`))
+  }
+}
+
+/** An angle text on a leader starts at its end, and the leader runs off the axis. */
+function angleLeaderChecks({ layout, what, model, tally }: LayerCtx) {
+  for (const s of layout.segs.filter(
+    (x) => x.leader && layout.arcs.some((a) => a.owner === x.owner),
+  )) {
+    const l = layout.labels.find((x) => x.owner === s.owner) as Label
+    const [dx, dy] = [s.b[0] - l.c[0], s.b[1] - l.c[1]]
+    const [u, v] = [dx * l.dir[0] + dy * l.dir[1], -dx * l.dir[1] + dy * l.dir[0]]
+    const off = Math.hypot(Math.max(Math.abs(u) - l.w / 2, 0), Math.max(Math.abs(v) - l.h / 2, 0))
+    if (off > 0.2 * model.em) tally.failures.push(what(`${s.owner} text ${off} mm off its leader`))
+    if (Math.max(Math.abs(s.a[1]), Math.abs(s.b[1])) < 0.25 * model.em)
+      tally.failures.push(what(`${s.owner} leader along the axis`))
+  }
+}
+
+/** A radius leader within 3 times the face's leader, on its own side of the axis, else listed. */
+function radiusLeaderChecks({ layout, p, what, model, tally }: LayerCtx) {
+  for (const s of layout.segs.filter(
+    (x) => x.leader && p.annotation.radii.some((r) => r.symbol === x.owner),
+  )) {
+    const times =
+      Math.hypot(s.b[0] - s.a[0], s.b[1] - s.a[1]) /
+      ((face.radiusLeaderLength * model.em) / face.baseEm)
+    if (times > 3 + 1e-9) tally.longLeaders.push(`${what(s.owner)} ${times.toFixed(2)}`)
+    if (s.a[1] * s.b[1] < 0) tally.acrossAxis.push(what(s.owner))
+  }
+}
+
+/** An angle text without a leader lies within 2 em of its arc. */
+function arcTextChecks({ layout, what, model, tally }: LayerCtx) {
+  for (const a of layout.arcs) {
+    if (layout.segs.some((x) => x.leader && x.owner === a.owner)) continue
+    const l = layout.labels.find((x) => x.owner === a.owner) as Label
+    const off = Math.min(
+      ...Array.from({ length: 49 }, (_, k) =>
+        boxDistance(l, [
+          a.c[0] + a.r * Math.cos(a.from + ((a.to - a.from) * k) / 48),
+          a.c[1] + a.r * Math.sin(a.from + ((a.to - a.from) * k) / 48),
+        ]),
+      ),
+    )
+    if (off > face.nearArc * model.em + 1e-9)
+      tally.failures.push(what(`${a.owner} text ${off / model.em} em off its arc, no leader`))
+  }
+}
+
+/** The diameter arrowheads lie on the outline, and an arrow is outside its rule only on a short one. */
+function diameterTipChecks({ layout, p, what, tally }: LayerCtx) {
+  for (const { owner, tips } of layout.diameterTips) {
+    const d = p.annotation.dimensions.find((x) => x.symbol === owner) as Dimension
+    for (const [z, r] of tips) {
+      const off = distance([Math.abs(r), z], p.points)
+      // a fillet rounds the corner where P2 and H1 are stored by up to 0.04 mm
+      if (off > 0.01 || Math.abs(Math.abs(r) - (d.radius as number)) > 0.05)
+        tally.failures.push(
+          what(`${owner} tip ${off} mm off the outline, at r ${r}, stored ${d.radius}`),
+        )
     }
   }
+  for (const { owner, length, outside, broken } of layout.spans)
+    if (!broken && outside !== length < face.shortSpan * face.arrow.length)
+      tally.failures.push(what(`${owner} arrows ${outside ? 'outside' : 'inside'}`))
+}
+
+/** The extension lines of a chamber head diameter end, past their gap, on a drawn stroke. */
+function chamberHeadChecks({ layout, p, medium, what, model, tally }: LayerCtx) {
+  const head = headFace(p.points, p.annotation)
+  if (!head !== !model.chamber?.face) tally.failures.push(what('head face not as laid out'))
+  const strokes = [
+    ...steelBand(p.points, model.em).sides.map((s) => s.stroke),
+    ...(head ? [head] : []),
+  ]
+  const checked = layout.segs.filter(
+    (x) => x.kind === 'thin' && Math.abs(x.a[0] + face.extensionGap) < 1e-9,
+  )
+  // the two R1 lines of a headBelowP1 chamber are among the checked ones
+  if (p.notes.some((n) => n.code === 'headBelowP1')) {
+    if (checked.filter((x) => x.owner === 'R1').length !== 2)
+      tally.failures.push(what('R1 extension lines not checked'))
+    else if (medium === 'screen') tally.headBelowP1++
+  }
+  for (const s of checked) {
+    const end: PartPoint = [0, s.a[1]]
+    const off = Math.min(
+      ...strokes.flatMap((st) => st.slice(1).map((b, n) => segDistance(end, st[n], b))),
+    )
+    if (off > 0.01) tally.failures.push(what(`${s.owner} extension line ${off} mm off the head`))
+  }
+}
+
+/** The extension lines of a cartridge head diameter end, past their gap, on the outline. */
+function cartridgeHeadChecks({ layout, p, medium, what, tally }: LayerCtx) {
+  const below = new Set(
+    p.annotation.dimensions
+      .filter((d) => d.kind === 'diameter' && d.behindHeadFace)
+      .map((d) => d.symbol),
+  )
+  for (const s of layout.segs) {
+    if (s.kind !== 'thin' || !below.has(s.owner) || s.a[1] !== s.b[1]) continue
+    const off = distance([Math.abs(s.a[1]), s.a[0] + face.extensionGap], p.points)
+    if (off > 0.01) tally.failures.push(what(`${s.owner} extension line ${off} mm off the outline`))
+    // a belt wider than the rim: its lines start past the head face
+    if (s.owner === 'R3' && s.a[0] > 0 && s.a[1] > 0 && medium === 'screen')
+      tally.beltWiderThanRim++
+  }
+}
+
+/** Every rule of one drawn side in one medium. */
+function layerChecks(ctx: LayerCtx) {
+  const { side, layout, p, model, what, inside, tally } = ctx
+  const lines: LineSegment[] = [...layout.segs, ...layout.arcs.flatMap((a) => arcLines(a, 12))]
+  const tips = tipsOf(layout)
+  const edgeLines = edgeAndBreakLines(p, side, model.em)
+  for (const [k, l] of layout.labels.entries()) labelChecks(ctx, l, k, lines, tips, edgeLines)
+  tipChecks(ctx, tips)
+  angleLeaderChecks(ctx)
+  radiusLeaderChecks(ctx)
+  arcTextChecks(ctx)
+  for (const s of lines)
+    if (!inside(s.a) || !inside(s.b)) tally.failures.push(what(`${s.owner} line outside`))
+  diameterTipChecks(ctx)
+  if (side === 'chamber') chamberHeadChecks(ctx)
+  if (side === 'cartridge') cartridgeHeadChecks(ctx)
+}
+
+/** What the checks of one Combined text read: the layer, its arrowheads, the figure's steel band. */
+interface CombinedCtx {
+  combined: Layout
+  tips: Tip[]
+  figure: Figure
+  em: number
+  what: (x: string) => string
+  inside: (q: PartPoint) => boolean
+  failures: string[]
+}
+
+/** What is wrong with one callout text: outside the frame, on another text, a leader, an arrowhead, the part. */
+function calloutChecks(c: CombinedCtx, l: Label, k: number) {
+  const { combined, tips, figure, em, what, inside, failures } = c
+  if (!labelCorners(l).every(inside)) failures.push(what(`${l.owner} text outside`))
+  for (const m of combined.labels.slice(k + 1))
+    if (boxesOverlap(l, m, 0.12 * em)) failures.push(what(`${l.owner} text overlaps ${m.owner}`))
+  for (const s of combined.segs)
+    if (s.owner !== l.owner && segHitsBox(s, l))
+      failures.push(what(`${s.owner} leader crosses ${l.owner} text`))
+  for (const t of tips)
+    if (t.owner !== l.owner && polygonsOverlap(t.corners, labelCorners(l)))
+      failures.push(what(`${t.owner} arrowhead on ${l.owner} text`))
+  // past the steel band
+  const outer =
+    Math.max(...(figure.drawn[1].p.points.map(([r]) => r) as number[])) + face.steelBandWidth
+  if (Math.abs(l.c[1]) - l.h / 2 < outer) failures.push(what(`${l.owner} text on the part`))
+}
+
+/** What is wrong with the Combined layer: one callout per region, clear of each other, in the frame. */
+function combinedChecks(
+  figure: Figure,
+  medium: string,
+  model: FigureModel,
+  inside: (q: PartPoint) => boolean,
+  tally: Tally,
+) {
+  const { failures } = tally
+  const combined = model.layers.combined
+  const what = (x: string) => `${figure.name} combined ${medium} ${x}`
+  if (!figure.regions.length !== !combined) failures.push(what('layer not as the regions'))
+  if (!combined) return
+  const texts = combined.labels.map((l) => l.text).sort()
+  const regionTexts = figure.regions
+    .map((r) => regionText(r))
+    .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))
+    .join('|')
+  if (texts.join('|') !== regionTexts) failures.push(what(`callouts ${texts.join('|')}`))
+  const c = { combined, tips: tipsOf(combined), figure, em: model.em, what, inside, failures }
+  for (const [k, l] of combined.labels.entries()) calloutChecks(c, l, k)
+  for (const s of combined.segs)
+    if (!inside(s.a) || !inside(s.b)) failures.push(what(`${s.owner} leader outside`))
+}
+
+/** Whether a part-frame point lies in the model's frame; the screen turns the part frame. */
+function insideFrame(medium: string, model: FigureModel) {
+  const [fx, fy, fw, fh] = model.frame
+  // the outer frame: screen x = part y, screen y = -part x
+  const outer = ([x, y]: PartPoint): PartPoint => (medium === 'screen' ? [y, -x] : [x, y])
+  return (q: PartPoint) => {
+    const [x, y] = outer(q)
+    return x >= fx - 1e-6 && x <= fx + fw + 1e-6 && y >= fy - 1e-6 && y <= fy + fh + 1e-6
+  }
+}
+
+/** The layout rules of one figure: text size, scale, print width, every layer in both media. */
+function figureChecks(figure: Figure, referencePx: number, tally: Tally) {
+  const { failures } = tally
+  const { name, drawn, em } = figure
+  const both = models.get(figure) as { screen: FigureModel; print: FigureModel }
+  for (const column of [358, 1120])
+    if (em * pxPerMm(both.screen, column) < face.minTextPx - 1e-9)
+      failures.push(`${name} text ${em * pxPerMm(both.screen, column)} px at ${column}`)
+  if (pxPerMm(both.screen, 358) > 3 * referencePx)
+    failures.push(`${name} ${pxPerMm(both.screen, 358)} px per mm`)
+  if (both.print.frame[2] > face.printWidth)
+    failures.push(`${name} print ${both.print.frame[2]} mm wide`)
+  for (const [medium, model] of Object.entries(both)) {
+    const inside = insideFrame(medium, model)
+    for (const { side, p } of drawn) {
+      const what = (x: string) => `${name} ${side} ${medium} ${x}`
+      const layout = model.layers[side] as Layout
+      layerChecks({ side, medium, p, layout, model, what, inside, tally })
+    }
+    // the Combined layer: one callout per region, clear of each other and inside the frame
+    combinedChecks(figure, medium, model, inside, tally)
+  }
+}
+
+it('lays out every layer of every figure in both media clear of overlaps, inside the frame', () => {
+  const tally: Tally = {
+    failures: [],
+    headBelowP1: 0,
+    beltWiderThanRim: 0,
+    longLeaders: [],
+    acrossAxis: [],
+    arrowheads: [],
+  }
+  const reference = allFigures.find((f) => f.name === 'cip-308-win-2008-09-23') as Figure
+  const referencePx = pxPerMm((models.get(reference) as { screen: FigureModel }).screen, 358)
+  for (const figure of allFigures) figureChecks(figure, referencePx, tally)
+  const { failures, headBelowP1, beltWiderThanRim, longLeaders, acrossAxis, arrowheads } = tally
   expect(failures).toEqual([])
   expect(headBelowP1).toBe(31)
   expect(beltWiderThanRim).toBe(13)
@@ -926,6 +1091,40 @@ const layoutsDrawn = {
     figureModel(f.drawn, 'screen', face.printEm, 0, [], false, unit),
 }
 
+/** What is wrong with an angle's arc and its text: the text on the arc, its flank or arrowheads, a crossing arc. */
+function arcTextFailures(layout: Layout, a: Layout['arcs'][number], what: (x: string) => string) {
+  const failures: string[] = []
+  const l = layout.labels.find((x) => x.owner === a.owner) as Label
+  const own = [...arcLines(a, 24), ...layout.segs.filter((s) => s.owner === a.owner && !s.leader)]
+  if (own.some((s) => segHitsBox(s, l)))
+    failures.push(what(`${a.owner} arc or flank through its text`))
+  if (
+    layout.arrowheads.some(
+      (t) => t.owner === a.owner && polygonsOverlap(arrowheadCorners(t), labelCorners(l)),
+    )
+  )
+    failures.push(what(`${a.owner} arrowhead on its text`))
+  for (const b of layout.arcs)
+    if (b.owner > a.owner && arcsCross(a, b))
+      failures.push(what(`${a.owner} arc crosses ${b.owner} arc`))
+  return failures
+}
+
+/** What is wrong with one drawn side in one medium and unit: texts touching, an angle text on its arc. */
+function gapFailures(layout: Layout, em: number, what: (x: string) => string) {
+  const failures: string[] = []
+  const gap = 0.12 * em
+  for (const [k, l] of layout.labels.entries())
+    for (const m of layout.labels.slice(k + 1))
+      if (boxesOverlap(l, m, gap)) failures.push(what(`${l.owner} text touches ${m.owner}`))
+  for (const a of layout.arcs) failures.push(...arcTextFailures(layout, a, what))
+  return failures
+}
+
+/** Whether the chords of two arcs cross. */
+const arcsCross = (a: Layout['arcs'][number], b: Layout['arcs'][number]) =>
+  arcLines(a, 24).some((s) => arcLines(b, 24).some((t) => segsCross(s.a, s.b, t.a, t.b)))
+
 it.each(
   (['mm', 'in'] as const).flatMap((unit) =>
     (Object.keys(layoutsDrawn) as (keyof typeof layoutsDrawn)[]).map(
@@ -936,105 +1135,87 @@ it.each(
   'keeps every text a gap from the others and every angle text off its own arc (%s, %s)',
   (medium, unit) => {
     const failures: string[] = []
-    const arcLines = (a: Layout['arcs'][number]) =>
-      Array.from({ length: 24 }, (_, k): LineSegment => {
-        const t = (n: number) => a.from + ((a.to - a.from) * n) / 24
-        return {
-          a: [a.c[0] + a.r * Math.cos(t(k)), a.c[1] + a.r * Math.sin(t(k))],
-          b: [a.c[0] + a.r * Math.cos(t(k + 1)), a.c[1] + a.r * Math.sin(t(k + 1))],
-          kind: 'rule',
-          owner: a.owner,
-        }
-      })
     for (const figure of allFigures) {
       const { name, drawn } = figure
       const model = layoutsDrawn[medium](figure, unit)
-      for (const { side } of drawn) {
-        const layout = model.layers[side] as Layout
-        const what = (x: string) => `${name} ${side} ${medium} ${unit} ${x}`
-        const gap = 0.12 * model.em
-        layout.labels.forEach((l, k) => {
-          for (const m of layout.labels.slice(k + 1))
-            if (boxesOverlap(l, m, gap)) failures.push(what(`${l.owner} text touches ${m.owner}`))
-        })
-        for (const a of layout.arcs) {
-          const l = layout.labels.find((x) => x.owner === a.owner) as Label
-          const own = [
-            ...arcLines(a),
-            ...layout.segs.filter((s) => s.owner === a.owner && !s.leader),
-          ]
-          if (own.some((s) => segHitsBox(s, l)))
-            failures.push(what(`${a.owner} arc or flank through its text`))
-          if (
-            layout.arrowheads.some(
-              (t) => t.owner === a.owner && polygonsOverlap(arrowheadCorners(t), labelCorners(l)),
-            )
-          )
-            failures.push(what(`${a.owner} arrowhead on its text`))
-          for (const b of layout.arcs)
-            if (
-              b.owner > a.owner &&
-              arcLines(a).some((s) => arcLines(b).some((t) => segsCross(s.a, s.b, t.a, t.b)))
-            )
-              failures.push(what(`${a.owner} arc crosses ${b.owner} arc`))
-        }
-      }
+      for (const { side } of drawn)
+        failures.push(
+          ...gapFailures(
+            model.layers[side] as Layout,
+            model.em,
+            (x) => `${name} ${side} ${medium} ${unit} ${x}`,
+          ),
+        )
     }
     expect(failures).toEqual([])
   },
   120_000,
 )
 
+/** What is wrong with the flag numbers and the head marks of one figure in one medium. */
+function flagFailures(figure: Figure, medium: string, model: FigureModel) {
+  const failures: string[] = []
+  const { name, drawn, notes } = figure
+  const caption = notes.flatMap((n) => (n.flagNumber ? [n.flagNumber] : []))
+  const what = (x: string) => `${name} ${medium} ${x}`
+  // flag numbers equal caption numbers
+  const flags = drawn
+    .flatMap(({ side }) => (model.layers[side] as Layout).labels)
+    .filter((l) => l.ring)
+    .map((l) => Number(l.text))
+    .sort((a, b) => a - b)
+  if (flags.join() !== caption.join()) failures.push(what(`flags ${flags} for ${caption}`))
+  // delta, beta, r0 and f keep their labels in the main view
+  for (const { side, p } of drawn) {
+    const { dimensions, angles, radii } = p.annotation
+    const owners = new Set((model.layers[side] as Layout).labels.map((l) => l.owner))
+    for (const { symbol } of [...dimensions, ...angles, ...radii])
+      if (['delta', 'beta', 'r0', 'f'].includes(symbol) && !owners.has(symbol))
+        failures.push(what(`${side} ${symbol} not labelled`))
+  }
+  return failures
+}
+
 it('flags every note and dimensions the head marks in the main view', () => {
   const failures: string[] = []
   for (const figure of allFigures) {
-    const { name, drawn, notes } = figure
     const both = models.get(figure) as { screen: FigureModel; print: FigureModel }
-    const caption = notes.flatMap((n) => (n.flagNumber ? [n.flagNumber] : []))
-    for (const [medium, model] of Object.entries(both)) {
-      const what = (x: string) => `${name} ${medium} ${x}`
-      // flag numbers equal caption numbers
-      const flags = drawn
-        .flatMap(({ side }) => (model.layers[side] as Layout).labels)
-        .filter((l) => l.ring)
-        .map((l) => Number(l.text))
-        .sort((a, b) => a - b)
-      if (flags.join() !== caption.join()) failures.push(what(`flags ${flags} for ${caption}`))
-      // delta, beta, r0 and f keep their labels in the main view
-      for (const { side, p } of drawn) {
-        const { dimensions, angles, radii } = p.annotation
-        const owners = new Set((model.layers[side] as Layout).labels.map((l) => l.owner))
-        for (const { symbol } of [...dimensions, ...angles, ...radii])
-          if (['delta', 'beta', 'r0', 'f'].includes(symbol) && !owners.has(symbol))
-            failures.push(what(`${side} ${symbol} not labelled`))
-      }
-    }
+    for (const [medium, model] of Object.entries(both))
+      failures.push(...flagFailures(figure, medium, model))
   }
   expect(failures).toEqual([])
 })
 
+const isLetter = (x: { owner: string }) => x.owner.startsWith('detail ')
+
+/** What is wrong with the detail letters of one figure: the frame, the marks, the letters per side. */
+function detailFailures(figure: Figure, screen: FigureModel, print: FigureModel) {
+  const failures: string[] = []
+  const { name, drawn } = figure
+  const plain = figureModel(drawn, 'screen', figure.em, figure.across, figure.regions)
+  if (screen.frame.join() !== plain.frame.join()) failures.push(`${name} frame`)
+  if (print.details.length || plain.details.length) failures.push(`${name} details unasked`)
+  for (const { side } of drawn) {
+    const [a, b] = [screen.layers[side], plain.layers[side]] as Layout[]
+    const rest = {
+      ...a,
+      labels: a.labels.filter((l) => !isLetter(l)),
+      segs: a.segs.filter((x) => !isLetter(x)),
+    }
+    if (JSON.stringify(rest) !== JSON.stringify(b)) failures.push(`${name} ${side} marks moved`)
+    const letters = a.labels.filter(isLetter).map((l) => l.text)
+    const want = screen.details.filter((d) => d.side === side).map((d) => d.letter)
+    if (letters.join() !== want.join()) failures.push(`${name} ${side} letters ${letters}`)
+  }
+  return failures
+}
+
 it('adds the detail letters on screen without changing the frame or any other mark', () => {
   const failures: string[] = []
   const counts: Record<string, number> = {}
-  const isLetter = (x: { owner: string }) => x.owner.startsWith('detail ')
   for (const figure of allFigures) {
-    const { name, drawn } = figure
     const { screen, print } = models.get(figure) as { screen: FigureModel; print: FigureModel }
-    const plain = figureModel(drawn, 'screen', figure.em, figure.across, figure.regions)
-    if (screen.frame.join() !== plain.frame.join()) failures.push(`${name} frame`)
-    if (print.details.length || plain.details.length) failures.push(`${name} details unasked`)
-    for (const { side } of drawn) {
-      const [a, b] = [screen.layers[side], plain.layers[side]] as Layout[]
-      const rest = {
-        ...a,
-        labels: a.labels.filter((l) => !isLetter(l)),
-        segs: a.segs.filter((x) => !isLetter(x)),
-      }
-      if (JSON.stringify(rest) !== JSON.stringify(b)) failures.push(`${name} ${side} marks moved`)
-      const letters = a.labels.filter(isLetter).map((l) => l.text)
-      const want = screen.details.filter((d) => d.side === side).map((d) => d.letter)
-      if (letters.join() !== want.join()) failures.push(`${name} ${side} letters ${letters}`)
-    }
+    failures.push(...detailFailures(figure, screen, print))
     for (const d of screen.details) {
       const key = `${d.side} ${d.letter} ${d.scale}`
       counts[key] = (counts[key] ?? 0) + 1
@@ -1115,24 +1296,56 @@ it('counts the drawn sides per table and bounds text size, scale and frame', () 
   }).toMatchSnapshot()
 })
 
-it('dimensions every stored symbol or lists it as undimensioned', () => {
-  // `<side>: <symbol>`, table VII apart, dimensioned on some figure or stored without a dimension
+/** Adds what one side of a figure marks to `dimensioned` and what it stores unmarked to `without`. */
+function markSide(
+  { name, values, table, variant }: Figure,
+  { side, p }: Drawn[number],
+  dimensioned: Set<string>,
+  without: Map<string, string[]>,
+) {
+  const kind = table === 'VII' ? `VII ${side}` : side
+  const { dimensions, angles, radii } = p.annotation
+  const marked = new Set([...dimensions, ...angles, ...radii].map((d) => d.symbol))
+  for (const symbol of marked) dimensioned.add(`${kind}: ${symbol}`)
+  for (const v of values) {
+    const key = `${kind}: ${v.symbol}`
+    if (v.side !== side || v.value === undefined || (v.variant && v.variant !== variant)) continue
+    if (!marked.has(v.symbol)) without.set(key, [...new Set([...(without.get(key) ?? []), name])])
+  }
+}
+
+/** For each stored symbol of a drawn side: the figures that do not mark it, by `<side>: <symbol>`; and the keys marked on some figure. */
+function markedSymbols() {
   const dimensioned = new Set<string>()
   const without = new Map<string, string[]>()
-  for (const { name, values, table, variant, drawn } of allFigures)
-    for (const { side, p } of drawn) {
-      const kind = table === 'VII' ? `VII ${side}` : side
-      const { dimensions, angles, radii } = p.annotation
-      const marked = new Set([...dimensions, ...angles, ...radii].map((d) => d.symbol))
-      for (const symbol of marked) dimensioned.add(`${kind}: ${symbol}`)
-      for (const v of values) {
-        const key = `${kind}: ${v.symbol}`
-        if (v.side !== side || v.value === undefined || (v.variant && v.variant !== variant))
-          continue
-        if (!marked.has(v.symbol))
-          without.set(key, [...new Set([...(without.get(key) ?? []), name])])
-      }
-    }
+  for (const figure of allFigures)
+    for (const drawn of figure.drawn) markSide(figure, drawn, dimensioned, without)
+  return { dimensioned, without }
+}
+
+/** The stored values the values tables mark "not drawn" on a record that no list of `without` has. */
+function unlistedOf(record: SpecRecord, without: Map<string, string[]>) {
+  const marked: string[] = []
+  const list = recordFigures(record).filter((f) => f.drawn.length)
+  if (!list.length) return marked
+  const drawnSides = new Set(list.flatMap((f) => f.drawn.map((d) => d.side)))
+  for (const v of undimensionedValues(record.values, list)) {
+    if (!drawnSides.has(v.side as Side) || v.value === undefined) continue
+    const kind = record.table === 'VII' ? `VII ${v.side}` : v.side
+    const names = without.get(`${kind}: ${v.symbol}`) ?? []
+    if (!names.some((n) => n === record.id || n.startsWith(`${record.id} `)))
+      marked.push(`${record.id} ${v.side} ${v.symbol}${v.variant ? ` ${v.variant}` : ''}`)
+  }
+  return marked
+}
+
+/** The values tables mark stored values "not drawn": the ones that are in no list of `without`. */
+const unlistedUndimensioned = (without: Map<string, string[]>) =>
+  current.flatMap((record) => unlistedOf(record, without))
+
+it('dimensions every stored symbol or lists it as undimensioned', () => {
+  // `<side>: <symbol>`, table VII apart, dimensioned on some figure or stored without a dimension
+  const { dimensioned, without } = markedSymbols()
   const never = new Map<string, string[]>()
   for (const key of without.keys()) {
     if (dimensioned.has(key)) continue
@@ -1145,20 +1358,7 @@ it('dimensions every stored symbol or lists it as undimensioned', () => {
     Object.fromEntries([...never].map(([kind, symbols]) => [kind, symbols.join(', ')])),
   ).toMatchSnapshot()
   // the values tables mark exactly these stored values "not drawn": each is in the lists above
-  const marked: string[] = []
-  for (const record of current) {
-    const list = recordFigures(record).filter((f) => f.drawn.length)
-    if (!list.length) continue
-    const drawnSides = new Set(list.flatMap((f) => f.drawn.map((d) => d.side)))
-    for (const v of undimensionedValues(record.values, list)) {
-      if (!drawnSides.has(v.side as Side) || v.value === undefined) continue
-      const kind = record.table === 'VII' ? `VII ${v.side}` : v.side
-      const names = without.get(`${kind}: ${v.symbol}`) ?? []
-      if (!names.some((n) => n === record.id || n.startsWith(`${record.id} `)))
-        marked.push(`${record.id} ${v.side} ${v.symbol}${v.variant ? ` ${v.variant}` : ''}`)
-    }
-  }
-  expect(marked).toEqual([])
+  expect(unlistedUndimensioned(without)).toEqual([])
   // dimensioned on other figures, not on these (such as L1 and L2 where no shoulder is drawn)
   expect(
     Object.fromEntries(

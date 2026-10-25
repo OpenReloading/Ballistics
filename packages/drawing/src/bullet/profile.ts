@@ -66,31 +66,39 @@ export const bulletSymbols: readonly BulletSymbol[] = [
 /** Stored fields the drawing reads but never dimensions. */
 const undimensionable = [{ path: 'base.angle', name: 'boat-tail angle' }]
 
+const baseDimensions = (base: NonNullable<BulletValues['base']>) => ({
+  ...(base.type && { type: base.type }),
+  ...(base.length && { length: base.length.value }),
+  ...(base.diameter && { diameter: base.diameter.value }),
+  ...(base.angle && { angle: base.angle.value }),
+  ...(base.cavityDiameter && { cavityDiameter: base.cavityDiameter.value }),
+})
+
+const ogiveDimensions = (ogive: NonNullable<BulletValues['ogive']>) => ({
+  ...(ogive.form && { form: ogive.form }),
+  ...(ogive.radius && { radius: ogive.radius.value }),
+  ...(ogive.radiusRatio && { radiusRatio: ogive.radiusRatio.value }),
+})
+
+const cannelureDimensions = (cannelure: NonNullable<BulletValues['cannelure']>) => ({
+  start: cannelure.start.value,
+  width: cannelure.width.value,
+  ...(cannelure.depth && { depth: cannelure.depth.value }),
+})
+
+const tipDimensions = (tip: NonNullable<BulletValues['tip']>) => ({
+  type: tip.type,
+  ...(tip.length && { length: tip.length.value }),
+  ...(tip.mouthDiameter && { mouthDiameter: tip.mouthDiameter.value }),
+})
+
 /** The shape `bulletOutline` reads, in mm and degrees; undefined without a length. */
 export function bulletDimensions(r: BulletValues): BulletDimensions | undefined {
   if (!r.length) return
-  const base = r.base && {
-    ...(r.base.type && { type: r.base.type }),
-    ...(r.base.length && { length: r.base.length.value }),
-    ...(r.base.diameter && { diameter: r.base.diameter.value }),
-    ...(r.base.angle && { angle: r.base.angle.value }),
-    ...(r.base.cavityDiameter && { cavityDiameter: r.base.cavityDiameter.value }),
-  }
-  const ogive = r.ogive && {
-    ...(r.ogive.form && { form: r.ogive.form }),
-    ...(r.ogive.radius && { radius: r.ogive.radius.value }),
-    ...(r.ogive.radiusRatio && { radiusRatio: r.ogive.radiusRatio.value }),
-  }
-  const cannelure = r.cannelure && {
-    start: r.cannelure.start.value,
-    width: r.cannelure.width.value,
-    ...(r.cannelure.depth && { depth: r.cannelure.depth.value }),
-  }
-  const tip = r.tip && {
-    type: r.tip.type,
-    ...(r.tip.length && { length: r.tip.length.value }),
-    ...(r.tip.mouthDiameter && { mouthDiameter: r.tip.mouthDiameter.value }),
-  }
+  const base = r.base && baseDimensions(r.base)
+  const ogive = r.ogive && ogiveDimensions(r.ogive)
+  const cannelure = r.cannelure && cannelureDimensions(r.cannelure)
+  const tip = r.tip && tipDimensions(r.tip)
   return {
     diameter: r.diameter.value,
     length: r.length.value,
@@ -157,6 +165,18 @@ export function bulletProfile(
   }
 }
 
+/** The middle of the longest shank run, off the cannelure: where the diameter goes. */
+function shankStation(t: number, z0: number, groove: BulletDimensions['cannelure']) {
+  const runs: [number, number][] = groove
+    ? [
+        [t, groove.start],
+        [groove.start + groove.width, z0],
+      ]
+    : [[t, z0]]
+  const [s0, s1] = runs.reduce((p, c) => (c[1] - c[0] > p[1] - p[0] ? c : p), runs[0])
+  return (s0 + s1) / 2
+}
+
 /** The dimensions of the stored values `sourced` covers that the drawn outline `o` follows. */
 function dimensionsOf(
   shape: BulletDimensions,
@@ -181,15 +201,7 @@ function dimensionsOf(
     if (value !== undefined && ok && sourced(field))
       dimensions.push({ symbol, value, stored: { symbol, value }, ...d })
   }
-  // the diameter on the middle of the longest shank run, off the cannelure
-  const runs: [number, number][] = groove
-    ? [
-        [t, groove.start],
-        [groove.start + groove.width, z0],
-      ]
-    : [[t, z0]]
-  const [s0, s1] = runs.reduce((p, c) => (c[1] - c[0] > p[1] - p[0] ? c : p), runs[0])
-  const station = (s0 + s1) / 2
+  const station = shankStation(t, z0, groove)
   add('L', L, true, { kind: 'length', from: 0, to: L })
   add('d', diameter, true, { kind: 'diameter', from: station, to: station, radius: a })
   add('n', shape.noseLength, !o.noseAssumed, { kind: 'chain', from: z0, to: L })

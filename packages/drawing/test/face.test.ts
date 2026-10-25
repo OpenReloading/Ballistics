@@ -27,6 +27,15 @@ const lay = (p: Profile, outer?: number, em = face.minEm) =>
 const label = (l: Layout, owner: string) => l.labels.find((x) => x.owner === owner)
 const rule = (l: Layout, owner: string) =>
   l.segs.filter((s) => s.owner === owner && s.kind === 'rule')
+const expectTipsOffOtherTexts = (l: Layout) => {
+  for (const t of l.arrowheads)
+    for (const m of l.labels)
+      if (m.owner !== t.owner)
+        expect(
+          polygonsOverlap(arrowheadCorners(t), labelCorners(m)),
+          `${t.owner} on ${m.owner}`,
+        ).toBe(false)
+}
 
 describe('annotate', () => {
   const p = side('cip-308-win-2008-09-23', 'cartridge')
@@ -64,13 +73,7 @@ describe('annotate', () => {
       ['r2', 'H1'],
     ])
       for (const a of tips(r)) for (const b of tips(d)) expect(polygonsOverlap(a, b)).toBe(false)
-    for (const t of l.arrowheads)
-      for (const m of l.labels)
-        if (m.owner !== t.owner)
-          expect(
-            polygonsOverlap(arrowheadCorners(t), labelCorners(m)),
-            `${t.owner} on ${m.owner}`,
-          ).toBe(false)
+    expectTipsOffOtherTexts(l)
   })
 
   it('puts the head diameters behind the face, the smaller radius nearer', () => {

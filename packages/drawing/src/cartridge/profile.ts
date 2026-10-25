@@ -241,16 +241,64 @@ function headProfile(d: Draft, R: number) {
   marks.edge(R)
 }
 
+/** What the extractor groove is drawn from: its stored values, the belt, whether delta is a cone angle. */
+interface GrooveShape {
+  R: number
+  e: number
+  derivedE?: number
+  E: number
+  E1: number
+  R3?: number
+  delta?: number
+  validDelta: boolean
+  belt: boolean
+  zBelt?: number
+}
+
+/** The groove's points and marks, the belt where there is one, and the notes on e and delta. */
+function drawGroove({ v, marks, note, points }: Draft, c: GrooveShape) {
+  const { R, e, derivedE, E, E1, R3, delta, validDelta, belt, zBelt } = c
+  const P1 = v('P1') as number
+  points.push([E1 / 2, R], [E1 / 2, R + e])
+  marks.diameter('E1', 0, { behindHeadFace: true })
+  marks.length('E', 0, undefined, { behindHeadFace: true })
+  // a derived e is shown in the table and the description only
+  if (v('e') !== undefined) marks.length('e', R, undefined, { behindHeadFace: true })
+  marks.edge(R + e, E)
+  const cone: SectionPoint = belt ? [(R3 as number) / 2, zBelt as number] : [P1 / 2, E]
+  if (validDelta) marks.angle('delta', [E1 / 2, R + e], [[E1 / 2, R + e + (cone[1] - R - e)], cone])
+  if (derivedE !== undefined)
+    note(
+      'grooveDerivedE',
+      ['e', 'delta'],
+      `Cartridge e is not published: delta ${delta} degrees from E1 at R to P1 at E gives e ${mm(derivedE)} mm${derivedE < 0 ? ', drawn as 0' : ''}.`,
+      [E1 / 2, R + e],
+    )
+  if (belt) {
+    points.push([(R3 as number) / 2, zBelt as number], [(R3 as number) / 2, E])
+    marks.diameter('R3', 0, { behindHeadFace: true })
+    marks.edge(zBelt as number)
+  } else if (delta !== undefined) {
+    const angle = Math.atan2((P1 - E1) / 2, E - R - e) / deg
+    if (Math.abs(angle - delta) > 1)
+      note(
+        'grooveAngle',
+        ['delta', 'E'],
+        `Cartridge delta ${delta} degrees differs from the ${mm(angle)} degrees of the groove from E1 at R + e to P1 at E; the lengths are drawn.`,
+        [(E1 + P1) / 4, (R + e + E) / 2],
+      )
+  }
+}
+
 /**
  * The cartridge extractor groove from E1 at R + e to P1 at E, through the belt from R3 to E
  * where table III gives one; returns the station of P1, E after a groove, else R.
  */
 function grooveAndBelt(d: Draft, R: number, { e, derivedE }: GrooveDepth, table?: string) {
-  const { side, v, marks, note, points } = d
-  const [R1, P1] = ['R1', 'P1'].map((s) => v(s) as number)
+  const { side, v, note } = d
+  const R1 = v('R1') as number
   const [E, E1, delta, R3] = ['E', 'E1', 'delta', 'R3'].map(v)
   const validDelta = delta !== undefined && delta > 0 && delta < 90
-  let zP1 = R
   const groove =
     side === 'cartridge' && E !== undefined && E1 !== undefined && e !== undefined && R + e < E
   // the belt front is the only length drawn from an angle: delta, from the axis, up to R3
@@ -267,40 +315,89 @@ function grooveAndBelt(d: Draft, R: number, { e, derivedE }: GrooveDepth, table?
       `Cartridge ${['E1', 'e', 'E', 'R3', 'delta'].map((s) => `${s} ${v(s) ?? 'missing'}`).join(', ')} (mm, delta in degrees) give no belt ending by E: the outline steps to P1 at R.`,
       [R1 / 2, R],
     )
-  if (groove && (table !== 'III' || belt)) {
-    points.push([E1 / 2, R], [E1 / 2, R + e])
-    zP1 = E
-    marks.diameter('E1', 0, { behindHeadFace: true })
-    marks.length('E', 0, undefined, { behindHeadFace: true })
-    // a derived e is shown in the table and the description only
-    if (v('e') !== undefined) marks.length('e', R, undefined, { behindHeadFace: true })
-    marks.edge(R + e, E as number)
-    const cone: SectionPoint = belt ? [(R3 as number) / 2, zBelt as number] : [P1 / 2, E as number]
-    if (validDelta)
-      marks.angle('delta', [E1 / 2, R + e], [[E1 / 2, R + e + (cone[1] - R - e)], cone])
-    if (derivedE !== undefined)
-      note(
-        'grooveDerivedE',
-        ['e', 'delta'],
-        `Cartridge e is not published: delta ${delta} degrees from E1 at R to P1 at E gives e ${mm(derivedE)} mm${derivedE < 0 ? ', drawn as 0' : ''}.`,
-        [E1 / 2, R + e],
-      )
-    if (belt) {
-      points.push([(R3 as number) / 2, zBelt], [(R3 as number) / 2, E])
-      marks.diameter('R3', 0, { behindHeadFace: true })
-      marks.edge(zBelt as number)
-    } else if (delta !== undefined) {
-      const cone = Math.atan2((P1 - E1) / 2, E - R - e) / deg
-      if (Math.abs(cone - delta) > 1)
-        note(
-          'grooveAngle',
-          ['delta', 'E'],
-          `Cartridge delta ${delta} degrees differs from the ${mm(cone)} degrees of the groove from E1 at R + e to P1 at E; the lengths are drawn.`,
-          [(E1 + P1) / 4, (R + e + (E as number)) / 2],
-        )
-    }
+  if (!(groove && (table !== 'III' || belt))) return R
+  drawGroove(d, { R, e, derivedE, E, E1, R3, delta, validDelta, belt, zBelt })
+  return E
+}
+
+/** One shoulder corner, r1 at P2 or r2 at H1: its fillet arc where one fits, else sharp. */
+function shoulderCorner(
+  { v, marks, note, points, name }: Draft,
+  symbol: string,
+  corner: SectionPoint,
+  next: SectionPoint,
+  [L1, L2]: [number, number],
+) {
+  const r = v(symbol)
+  const arc = r === undefined ? null : fillet(points[points.length - 1], corner, next, r)
+  // P2 is dimensioned before the r1 arc, H1 after the r2 arc, on the straight lines
+  if (symbol === 'r1') marks.diameter('P2', arc ? arc[0][1] : L1, { toward: -1 })
+  else marks.diameter('H1', arc ? (arc.at(-1) as SectionPoint)[1] : L2, { toward: 1 })
+  if (arc) {
+    points.push(...arc)
+    marks.radius(symbol, corner)
+    return
   }
-  return zP1
+  if (r !== undefined)
+    note(
+      'filletSkipped',
+      [symbol],
+      `${name} ${symbol} ${r} mm does not fit the corner at ${symbol === 'r1' ? 'P2 at L1' : 'H1 at L2'}: the corner is drawn sharp.`,
+      corner,
+    )
+  points.push(corner)
+}
+
+/** The drawn shoulder: its lengths, the cone angle, the corners with their fillets. */
+function drawShoulder(d: Draft, [P2, L1, L2, H1]: [number, number, number, number]) {
+  const { v, marks, note, name } = d
+  const [L3, H2] = ['L3', 'H2'].map((s) => v(s) as number)
+  marks.length('L1', 0)
+  marks.length('L2', 0)
+  marks.length('S', 0, undefined, { far: true })
+  marks.edge(L1, L2)
+  // where the cone through P2 at L1 and H1 at L2 meets the axis
+  if (H1 < P2) {
+    const vertex = L1 + ((L2 - L1) * P2) / (P2 - H1)
+    marks.angle(
+      'alpha',
+      [0, vertex],
+      [
+        [P2 / 2, L1],
+        [-P2 / 2, L1],
+      ],
+    )
+  }
+  const alpha = v('alpha')
+  const cone = (2 * Math.atan2((P2 - H1) / 2, L2 - L1)) / deg
+  if (angleOff(alpha, cone))
+    note(
+      'shoulderAngle',
+      ['alpha', 'L1', 'L2'],
+      `${name} alpha ${alpha} degrees differs from the ${mm(cone)} degrees of the shoulder from P2 at L1 to H1 at L2; the lengths are drawn.`,
+      [(P2 + H1) / 4, (L1 + L2) / 2],
+    )
+  const corners: [string, SectionPoint, SectionPoint][] = [
+    ['r1', [P2 / 2, L1], [H1 / 2, L2]],
+    ['r2', [H1 / 2, L2], [H2 / 2, L3]],
+  ]
+  // r2 starts where the r1 arc leaves the shoulder, so the two never overlap
+  for (const [symbol, corner, next] of corners) shoulderCorner(d, symbol, corner, next, [L1, L2])
+}
+
+/** The note on a shoulder with only some of P2, L1, L2 and H1 stored. */
+function noteShoulderPartial({ v, note, name }: Draft, zP1: number) {
+  const [P1, L3, H2] = ['P1', 'L3', 'H2'].map((s) => v(s) as number)
+  const shoulderSet = ['P2', 'L1', 'L2', 'H1']
+  const shoulderStored = shoulderSet.filter((s) => v(s) !== undefined)
+  if (!shoulderStored.length || shoulderStored.length >= 4) return
+  const fillets = ['r1', 'r2'].filter((s) => v(s) !== undefined)
+  note(
+    'shoulderPartial',
+    shoulderSet,
+    `${name} ${shoulderStored.map((s) => `${s} ${v(s)}`).join(', ')} mm without ${shoulderSet.filter((s) => v(s) === undefined).join(', ')}: no shoulder is drawn, the wall runs straight from P1 to H2${fillets.length ? `, ${fillets.join(' and ')} not drawn` : ''}.`,
+    [(P1 + H2) / 4, (zP1 + L3) / 2],
+  )
 }
 
 /**
@@ -308,82 +405,22 @@ function grooveAndBelt(d: Draft, R: number, { e, derivedE }: GrooveDepth, table?
  * in order; whether it is drawn.
  */
 function shoulderProfile(d: Draft, zP1: number) {
-  const { v, marks, note, points, name } = d
+  const { v, note, name } = d
   const [P1, L3, H2] = ['P1', 'L3', 'H2'].map((s) => v(s) as number)
-  const [P2, L1, L2, H1, alpha] = ['P2', 'L1', 'L2', 'H1', 'alpha'].map(v)
-  let shoulder = false
-  const shoulderSet = ['P2', 'L1', 'L2', 'H1']
-  const shoulderStored = shoulderSet.filter((s) => v(s) !== undefined)
-  if (shoulderStored.length && shoulderStored.length < 4) {
-    const fillets = ['r1', 'r2'].filter((s) => v(s) !== undefined)
+  const [P2, L1, L2, H1] = ['P2', 'L1', 'L2', 'H1'].map(v)
+  noteShoulderPartial(d, zP1)
+  if (P2 === undefined || L1 === undefined || L2 === undefined || H1 === undefined) return false
+  if (!(zP1 < L1 && L1 < L2 && L2 <= L3 && H1 <= P2)) {
     note(
-      'shoulderPartial',
-      shoulderSet,
-      `${name} ${shoulderStored.map((s) => `${s} ${v(s)}`).join(', ')} mm without ${shoulderSet.filter((s) => v(s) === undefined).join(', ')}: no shoulder is drawn, the wall runs straight from P1 to H2${fillets.length ? `, ${fillets.join(' and ')} not drawn` : ''}.`,
+      'shoulderOrder',
+      ['L1', 'L2', 'L3', 'P2', 'H1'],
+      `${name} L1 ${L1}, L2 ${L2} and L3 ${L3} mm past the P1 station ${zP1} mm, or H1 ${H1} and P2 ${P2} mm, are out of order: no shoulder is drawn.`,
       [(P1 + H2) / 4, (zP1 + L3) / 2],
     )
+    return false
   }
-  if (P2 !== undefined && L1 !== undefined && L2 !== undefined && H1 !== undefined) {
-    if (zP1 < L1 && L1 < L2 && L2 <= L3 && H1 <= P2) {
-      shoulder = true
-      marks.length('L1', 0)
-      marks.length('L2', 0)
-      marks.length('S', 0, undefined, { far: true })
-      marks.edge(L1, L2)
-      // where the cone through P2 at L1 and H1 at L2 meets the axis
-      if (H1 < P2) {
-        const vertex = L1 + ((L2 - L1) * P2) / (P2 - H1)
-        marks.angle(
-          'alpha',
-          [0, vertex],
-          [
-            [P2 / 2, L1],
-            [-P2 / 2, L1],
-          ],
-        )
-      }
-      const cone = (2 * Math.atan2((P2 - H1) / 2, L2 - L1)) / deg
-      if (angleOff(alpha, cone))
-        note(
-          'shoulderAngle',
-          ['alpha', 'L1', 'L2'],
-          `${name} alpha ${alpha} degrees differs from the ${mm(cone)} degrees of the shoulder from P2 at L1 to H1 at L2; the lengths are drawn.`,
-          [(P2 + H1) / 4, (L1 + L2) / 2],
-        )
-      const corners: [string, SectionPoint, SectionPoint][] = [
-        ['r1', [P2 / 2, L1], [H1 / 2, L2]],
-        ['r2', [H1 / 2, L2], [H2 / 2, L3]],
-      ]
-      // r2 starts where the r1 arc leaves the shoulder, so the two never overlap
-      for (const [symbol, corner, next] of corners) {
-        const r = v(symbol)
-        const arc = r === undefined ? null : fillet(points[points.length - 1], corner, next, r)
-        // P2 is dimensioned before the r1 arc, H1 after the r2 arc, on the straight lines
-        if (symbol === 'r1') marks.diameter('P2', arc ? arc[0][1] : L1, { toward: -1 })
-        else marks.diameter('H1', arc ? (arc.at(-1) as SectionPoint)[1] : L2, { toward: 1 })
-        if (arc) {
-          points.push(...arc)
-          marks.radius(symbol, corner)
-        } else {
-          if (r !== undefined)
-            note(
-              'filletSkipped',
-              [symbol],
-              `${name} ${symbol} ${r} mm does not fit the corner at ${symbol === 'r1' ? 'P2 at L1' : 'H1 at L2'}: the corner is drawn sharp.`,
-              corner,
-            )
-          points.push(corner)
-        }
-      }
-    } else
-      note(
-        'shoulderOrder',
-        ['L1', 'L2', 'L3', 'P2', 'H1'],
-        `${name} L1 ${L1}, L2 ${L2} and L3 ${L3} mm past the P1 station ${zP1} mm, or H1 ${H1} and P2 ${P2} mm, are out of order: no shoulder is drawn.`,
-        [(P1 + H2) / 4, (zP1 + L3) / 2],
-      )
-  }
-  return shoulder
+  drawShoulder(d, [P2, L1, L2, H1])
+  return true
 }
 
 /** The neck to H2 at L3; on the cartridge L6, G1 past the mouth and the neck length L3 - L2. */
@@ -401,6 +438,12 @@ function neckProfile(d: Draft, shoulder: boolean) {
     if (shoulder && L3 - (L2 as number) > 1e-6)
       marks.chain('L3−L2', L3 - (L2 as number), L2 as number, L3)
   }
+}
+
+/** The mouth cone's length from its included angle alpha1; 180 degrees is a step; none without an angle. */
+function mouthConeLength(alpha1: number | undefined, H2: number, G1: number) {
+  if (alpha1 === undefined || !(alpha1 > 0)) return
+  return alpha1 >= 180 ? 0 : Math.max(0, (H2 - G1) / 2 / Math.tan((alpha1 / 2) * deg))
 }
 
 /**
@@ -422,13 +465,7 @@ function chamberMouth(d: Draft): number | undefined {
       )
     return
   }
-  // alpha1 is the included angle of the mouth cone; 180 degrees is a step
-  const hCone =
-    alpha1 !== undefined && alpha1 > 0
-      ? alpha1 >= 180
-        ? 0
-        : Math.max(0, (H2 - G1) / 2 / Math.tan((alpha1 / 2) * deg))
-      : undefined
+  const hCone = mouthConeLength(alpha1, H2, G1)
   if (h !== undefined && hCone !== undefined && Math.abs(h - hCone) > 0.05)
     note(
       'mouthCone',
