@@ -205,7 +205,6 @@ if (import.meta.main) {
     // the Safety notice accepted, as in playwright.config.ts, so no dialog covers the pages
     await page.addInitScript((value) => {
       localStorage.setItem('safety-ack', value)
-      localStorage.setItem('first-run-done', '1')
     }, safetyAck)
     const tiles: { file: string; caption: string }[] = []
     for (const url of pages)

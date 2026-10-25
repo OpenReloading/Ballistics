@@ -12,7 +12,6 @@ import {
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { pagesBasePath } from '../lib/edition.ts'
-import { openFirstRun } from './first-run-dialog.tsx'
 import { useInstall } from './install-button.tsx'
 import { ManufacturersForm } from './manufacturers-settings.tsx'
 import type { SettingsTab } from './settings-dialog.ts'
@@ -98,9 +97,6 @@ export function SettingsSections({
           Values are kept in SI units: a change converts what is shown, never a value.
         </Text>
         <UnitsForm />
-        <Button variant="default" mt="sm" onClick={openFirstRun}>
-          Show the first-run step
-        </Button>
       </Tabs.Panel>
       <Tabs.Panel value="defaults">
         <Text size="sm" c="dimmed" mb="xs">
