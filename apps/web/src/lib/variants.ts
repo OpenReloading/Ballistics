@@ -202,6 +202,21 @@ export function setPath(target: Record<string, unknown>, path: string, value: un
   at[last] = value
 }
 
+/** Removes the value at the dotted `path` of `target`, and the objects it leaves empty on the way. */
+export function dropPath(target: Record<string, unknown>, path: string) {
+  const keys = path.split('.')
+  const last = keys.pop() as string
+  const chain = [target]
+  for (const k of keys) {
+    const next = chain.at(-1)?.[k]
+    if (typeof next !== 'object' || next === null || Array.isArray(next)) return
+    chain.push(next as Record<string, unknown>)
+  }
+  delete chain[keys.length][last]
+  for (let i = keys.length; i > 0 && Object.keys(chain[i]).length === 0; i--)
+    delete chain[i - 1][keys[i - 1]]
+}
+
 /** The reference a load file keeps for a catalogue record: a plain id is a catalogue record. */
 export const catalogueRef = (idOrRef: string) =>
   parseRef(idOrRef) ? idOrRef : `catalogue:${idOrRef}`
