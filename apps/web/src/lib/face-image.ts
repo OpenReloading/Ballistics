@@ -35,8 +35,9 @@ export const imageToGrid = (grid: Grid, p: Point): Point => ({
 export function grayGrid(
   image: RgbaImage,
   s: number,
-  box = { x0: 0, y0: 0, x1: image.width, y1: image.height },
+  area?: { x0: number; y0: number; x1: number; y1: number },
 ): Grid {
+  const box = area ?? { x0: 0, y0: 0, x1: image.width, y1: image.height }
   const x0 = Math.max(0, Math.floor(box.x0))
   const y0 = Math.max(0, Math.floor(box.y0))
   const x1 = Math.min(image.width, Math.ceil(box.x1))
