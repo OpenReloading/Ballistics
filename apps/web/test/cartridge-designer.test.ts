@@ -363,6 +363,69 @@ describe('drafts', () => {
     expect(draftSpec(opened).values).toEqual(draftSpec(edited).values)
   })
 
+  it('saves the revision of the base and shows a base that changed since', () => {
+    const base = { ...record308(), revision: 'bbb' }
+    const data = fileData(fromRecord(base, metric))
+    expect(data.basedOnRevision).toBe('bbb')
+    const resolved = (changed: boolean): ResolvedCartridge => ({
+      ...resolvedCartridge(data, base),
+      changed,
+    })
+    expect(fromUser(data, resolved(false), metric).baseChanged).toBeUndefined()
+    expect(fromUser(data, resolved(true), metric).baseChanged).toBe(true)
+    expect(fileData(win308()).basedOnRevision).toBeUndefined()
+  })
+
+  it('keeps on a re-save the values the designer has no field for and the other override keys', () => {
+    const variant = {
+      side: 'cartridge',
+      symbol: 'L3',
+      variant: 'long',
+      quantity: 'length',
+      value: 60,
+    } as const
+    const pressure = { symbol: 'Pmax', quantity: 'pressure', value: 4200 } as const
+    const unknownSymbol = { side: 'chamber', symbol: 'X9', quantity: 'length', value: 3 } as const
+    const stored: UserCartridge = {
+      origin: 'user',
+      basedOn: 'catalogue:308-win',
+      overrides: {
+        country: 'Home',
+        values: [
+          variant,
+          pressure,
+          unknownSymbol,
+          { side: 'cartridge', symbol: 'L3', quantity: 'length', value: 52 },
+        ],
+      },
+    }
+    const opened = fromUser(stored, resolvedOf(stored), metric)
+    const edited = run(opened, type('cartridge.L1', '39')).present
+    const saved = fileData(edited)
+    expect(saved.overrides?.country).toBe('Home')
+    expect(saved.overrides?.values).toEqual(
+      expect.arrayContaining([
+        variant,
+        pressure,
+        unknownSymbol,
+        { side: 'cartridge', symbol: 'L3', quantity: 'length', value: 52 },
+        { side: 'cartridge', symbol: 'L1', quantity: 'length', value: 39 },
+      ]),
+    )
+    expect(saved.overrides?.values).toHaveLength(5)
+    // a designer field set back to the base's value leaves its override, the others stay
+    const back = run(opened, type('cartridge.L3', '51.18')).present
+    const backValues = fileData(back).overrides?.values
+    expect(backValues).toEqual(expect.arrayContaining([variant, pressure, unknownSymbol]))
+    expect(backValues).toHaveLength(3)
+    // a new design and a reset take nothing of the stored overrides
+    const fresh = fileData(reduce(historyOf(opened), { type: 'new' }).present).overrides
+    expect(fresh?.country).toBeUndefined()
+    expect(fresh?.values).not.toEqual(expect.arrayContaining([variant, pressure, unknownSymbol]))
+    const reset = reduce(historyOf(opened), { type: 'reset', system: metric }).present
+    expect(fileData(reset)).toEqual({ origin: 'user', basedOn: 'catalogue:308-win' })
+  })
+
   it('saves a table that differs from the base', () => {
     const data = fileData(run(win308(), { type: 'table', value: 'III' }).present)
     expect(data.overrides).toEqual({ table: 'III' })
