@@ -112,12 +112,18 @@ export function FirearmLibrary() {
   }, [])
   useEffect(refresh, [refresh])
 
-  const onOpen = useCallback((d: Firearm) => {
-    setData(d)
-    setGeneration((g) => g + 1)
-    setEditing(true)
-    setViewing(false)
-  }, [])
+  const reloadManufacturers = manufacturers.reload
+  const onOpen = useCallback(
+    (d: Firearm) => {
+      setData(d)
+      setGeneration((g) => g + 1)
+      setEditing(true)
+      setViewing(false)
+      // the opened record may have brought its manufacturer along
+      void reloadManufacturers()
+    },
+    [reloadManufacturers],
+  )
 
   // the names of the open firearm's and the listed firearms' cartridges, each asked once
   const cartridgeIds = [

@@ -2,6 +2,7 @@
 import {
   checkUserRefs,
   type EmbeddedFile,
+  parseRef,
   type UserRecord,
   userDataFile,
   userDataFormat,
@@ -168,6 +169,41 @@ export function validRecords(raw: unknown[]) {
     }
   }
   return { records, invalid }
+}
+
+/** The id of the user manufacturer a bullet, firearm or case capacity `record` names; undefined for none. */
+export function makerIdOf(record: UserRecord): string | undefined {
+  const text =
+    record.kind === 'bullet' || record.kind === 'firearm'
+      ? record.data.manufacturer
+      : record.kind === 'caseCapacity'
+        ? record.data.caseManufacturer
+        : undefined
+  const ref = text ? parseRef(text) : undefined
+  return ref?.scope === 'user' ? ref.id : undefined
+}
+
+/**
+ * The user manufacturer of `pool` that `record` names: what a file or link of that one record
+ * carries, so the maker does not dangle where it is opened. None for another kind, a catalogue
+ * manufacturer or a maker `pool` lacks.
+ */
+export function makerRecordsOf(record: UserRecord, pool: readonly UserRecord[]): UserRecord[] {
+  const id = makerIdOf(record)
+  return id ? pool.filter((r) => r.kind === 'manufacturer' && r.id === id) : []
+}
+
+/**
+ * The user manufacturer `record` names as a file or link carries it: the stored one, else the one
+ * that came with the opened file or link (`carried`), which the store may lack or hold invalid.
+ */
+export function makersToCarry(
+  record: UserRecord,
+  stored: readonly UserRecord[],
+  carried: readonly UserRecord[],
+): UserRecord[] {
+  const own = makerRecordsOf(record, stored)
+  return own.length ? own : makerRecordsOf(record, carried)
 }
 
 const content = (r: UserRecord) => canonicalJson({ kind: r.kind, name: r.name, data: r.data })

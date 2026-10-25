@@ -14,6 +14,7 @@ import { useMediaQuery } from '@mantine/hooks'
 import { pagesBasePath } from '../lib/edition.ts'
 import { openFirstRun } from './first-run-dialog.tsx'
 import { useInstall } from './install-button.tsx'
+import { ManufacturersForm } from './manufacturers-settings.tsx'
 import type { SettingsTab } from './settings-dialog.ts'
 import { UnitsForm } from './units-settings.tsx'
 import { WorkbenchDefaultsForm } from './workbench-defaults.tsx'
@@ -62,8 +63,8 @@ function Offline() {
 }
 
 /**
- * The settings dialog's body: vertical tabs Units, Workbench defaults, Appearance and
- * Offline, a row of tabs on a phone. Loaded apart from the pages when the dialog first opens.
+ * The settings dialog's body: vertical tabs Units, Workbench defaults, Manufacturers, Appearance
+ * and Offline, a row of tabs on a phone. Loaded apart from the pages when the dialog first opens.
  */
 export function SettingsSections({
   tab,
@@ -88,6 +89,7 @@ export function SettingsSections({
       <Tabs.List aria-label="Settings">
         <Tabs.Tab value="units">Units</Tabs.Tab>
         <Tabs.Tab value="defaults">Workbench defaults</Tabs.Tab>
+        <Tabs.Tab value="manufacturers">Manufacturers</Tabs.Tab>
         <Tabs.Tab value="appearance">Appearance</Tabs.Tab>
         <Tabs.Tab value="offline">Offline</Tabs.Tab>
       </Tabs.List>
@@ -105,6 +107,9 @@ export function SettingsSections({
           New workbench loads start from these values; an open load keeps its own.
         </Text>
         <WorkbenchDefaultsForm />
+      </Tabs.Panel>
+      <Tabs.Panel value="manufacturers">
+        <ManufacturersForm />
       </Tabs.Panel>
       <Tabs.Panel value="appearance">
         <Appearance />

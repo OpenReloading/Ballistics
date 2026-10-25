@@ -59,11 +59,14 @@ test('saves go into the folder without a picker; the folder can be forgotten', a
     const dir = await (await navigator.storage.getDirectory()).getDirectoryHandle('workspace')
     return (await (await dir.getFileHandle('folder.json')).getFile()).text()
   })
-  const { manufacturer } = JSON.parse(text).records[0].data
+  const { records } = JSON.parse(text)
   // the typed name became a user manufacturer of the browser, which the bullet references
   const stored = await storedManufacturers(page)
   expect(stored).toMatchObject([{ name: 'Folder' }])
-  expect(manufacturer).toBe(`user:${stored[0]?.id}`)
+  expect(records[0].data.manufacturer).toBe(`user:${stored[0]?.id}`)
+  // the file carries the manufacturer record, so the reference resolves where it is opened
+  expect(records).toHaveLength(2)
+  expect(records[1]).toMatchObject({ kind: 'manufacturer', id: stored[0]?.id, name: 'Folder' })
   await folderItem(page, 'Forget workspace folder')
   await expect(state(page)).toHaveText('Saved: folder.json')
 })

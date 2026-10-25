@@ -4,9 +4,10 @@
  * from `getManufacturerNames` (`api.ts`).
  */
 
-import { fold, type UserRecord, userIdRegex } from '@open-reloading/schema'
+import { checkUserRefs, fold, type UserRecord, userIdRegex } from '@open-reloading/schema'
 import { apiFetch } from './api-fetch.ts'
 import type { ManufacturerSummary } from './api-types.ts'
+import type { InvalidRecord } from './user-data.ts'
 
 /** Manufacturer names by id. */
 export type ManufacturerNames = ReadonlyMap<string, string>
@@ -82,19 +83,65 @@ export const newManufacturerRecord = (id: string, typed: string, now: Date): Use
 /**
  * The reference a typed name stands for: the manufacturer it names, else that of a new user
  * manufacturer, whose record is `created` for the caller to store (and to add to `known` so the
- * next typed name finds it). Undefined for an empty text.
+ * next typed name finds it). Undefined for an empty text, and for a name nothing matches while the
+ * catalogue is not known (`catalogueKnown` false): the catalogue may hold it, and a user
+ * manufacturer made now would stay a duplicate of it.
  */
 export function referTo(
   known: readonly KnownManufacturer[],
   typed: string,
   newUuid: () => string,
   now: Date,
+  catalogueKnown = true,
 ): { ref: string; created?: UserRecord } | undefined {
   if (typed.trim() === '') return undefined
   const found = findManufacturer(known, typed)
   if (found) return { ref: found.ref }
+  if (!catalogueKnown) return undefined
   const created = newManufacturerRecord(newUuid(), typed, now)
   return { ref: `user:${created.id}`, created }
+}
+
+/** A user manufacturer and the number of places that name it. */
+export interface ManufacturerUse {
+  record: UserRecord
+  uses: number
+}
+
+/** The `user:<id>` references of the records open in a page; Settings counts each as in use. */
+export const shownManufacturerRefs = new Map<object, string>()
+
+/** Fired on `window` after Settings deleted or restored a user manufacturer, for the fields' lists to read the store again. */
+export const manufacturersChanged = 'user-manufacturers-changed'
+
+/**
+ * The user manufacturers of `records` by name, each with the number of places that name it: a
+ * bullet's or firearm's `manufacturer`, a capacity's `caseManufacturer`, an invalid record's text
+ * (read as it is stored, so a record the format rejects keeps its maker) and the record open on a page
+ * (`shown`, from `shownManufacturerRefs`). One that nothing names can be deleted.
+ */
+export function manufacturerUses(
+  records: readonly UserRecord[],
+  invalid: readonly InvalidRecord[],
+  shown: Iterable<string> = shownManufacturerRefs.values(),
+): ManufacturerUse[] {
+  // with no manufacturer record in the set, every reference to one is reported as dangling
+  const named = new Map<string, number>()
+  const count = (ref: string) => named.set(ref, (named.get(ref) ?? 0) + 1)
+  for (const d of checkUserRefs(records.filter((r) => r.kind !== 'manufacturer')))
+    if (d.field === 'manufacturer' || d.field === 'caseManufacturer') count(d.target)
+  for (const ref of shown) count(ref)
+  const raw = invalid.map((i) => JSON.stringify(i.raw))
+  return records
+    .filter((r) => r.kind === 'manufacturer' && userIdRegex.test(r.id))
+    .map((record) => {
+      const ref = `user:${record.id}`
+      return {
+        record,
+        uses: (named.get(ref) ?? 0) + raw.filter((text) => text.includes(ref)).length,
+      }
+    })
+    .sort((a, b) => a.record.name.localeCompare(b.record.name))
 }
 
 /**

@@ -1,4 +1,4 @@
-/** Share links: one user record packed into the fragment of a page link. */
+/** Share links: a user record, with the user manufacturer it names, packed into the fragment of a page link. */
 import {
   type UserRecord,
   userDataFormat,
@@ -19,8 +19,8 @@ const through = async (
 /**
  * Why `record` has no share link: a load that refers to records of this browser (`user:<id>`: its
  * cartridge, bullet, firearm or case capacity) which the browser opening the link does not have.
- * Undefined for a record a link can carry. A design's own references (a user manufacturer) stay
- * in the link: the design opens, only the maker's name is missing.
+ * Undefined for a record a link can carry. A design's user manufacturer travels in the link next
+ * to the design.
  */
 export function shareProblem(record: UserRecord): string | undefined {
   const fields = record.kind === 'load' ? userRefFields(record) : []
@@ -29,14 +29,14 @@ export function shareProblem(record: UserRecord): string | undefined {
 }
 
 /**
- * `page` with `record` in the fragment: the file text, deflate-compressed, base64url; the
+ * `page` with `records` in the fragment: the file text, deflate-compressed, base64url; the
  * browser does not send a fragment to the server. Undefined when the link is over `maxLinkChars`.
  */
-export async function shareLink(record: UserRecord, page: string) {
+export async function shareLink(records: UserRecord[], page: string) {
   const text = JSON.stringify({
     format: userDataFormat,
     version: userDataVersion,
-    records: [record],
+    records,
   })
   const packed = await through(new TextEncoder().encode(text), new CompressionStream('deflate-raw'))
   const b64 = btoa(String.fromCharCode(...packed))
