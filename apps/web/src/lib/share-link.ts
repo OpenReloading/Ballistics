@@ -23,7 +23,7 @@ export async function shareLink(record: UserRecord, page: string) {
   })
   const packed = await through(new TextEncoder().encode(text), new CompressionStream('deflate-raw'))
   const b64 = btoa(String.fromCharCode(...packed))
-  const link = `${page.replace(/#.*$/, '')}${fragmentKey}${b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')}`
+  const link = `${page.split('#', 1)[0]}${fragmentKey}${b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')}`
   return link.length > maxLinkChars ? undefined : link
 }
 

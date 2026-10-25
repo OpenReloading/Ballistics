@@ -11,6 +11,7 @@ import { spawn } from 'node:child_process'
 import { cpSync, rmSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { startBundleApi, writeStaticApi } from '@openreloading/api/static'
+import { executable } from './executable.ts'
 import { dropFullPayloads } from './pages-payload.ts'
 
 const base = process.env.PAGES_BASE_PATH
@@ -24,7 +25,11 @@ const site = at('pages')
 /** Runs npm without blocking this process: the build reads the API it serves. */
 function run(args: string[], env: Record<string, string | undefined>) {
   return new Promise<void>((resolve, reject) => {
-    spawn('npm', args, { cwd: at(''), env: { ...process.env, ...env }, stdio: 'inherit' })
+    spawn(executable('npm'), args, {
+      cwd: at(''),
+      env: { ...process.env, ...env },
+      stdio: 'inherit',
+    })
       .on('error', reject)
       .on('exit', (code) =>
         code === 0 ? resolve() : reject(new Error(`npm ${args.join(' ')} failed`)),

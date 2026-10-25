@@ -1,7 +1,7 @@
 import type { ShotGroup } from '@openreloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
-import { StatsBlock } from '../src/components/target-export.tsx'
+import { extension, StatsBlock } from '../src/components/target-export.tsx'
 import { presetUnits } from '../src/lib/units.ts'
 
 const group: ShotGroup = {
@@ -28,4 +28,13 @@ it('the statistics box of the exports gives angles in the correction unit of the
   expect(markup('metric-grams')).toContain('0.10 mrad')
   expect(markup('metric-grams')).not.toContain('MOA')
   expect(markup('us')).toContain('0.34 MOA')
+})
+
+it('names a download file by the subtype of its MIME type', () => {
+  expect(extension('image/jpeg')).toBe('jpg')
+  expect(extension('image/png')).toBe('png')
+  expect(extension('image/svg+xml')).toBe('svg')
+  expect(extension('image/webp;q=1')).toBe('webp')
+  expect(extension('')).toBe('img')
+  expect(extension('image')).toBe('img')
 })

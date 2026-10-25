@@ -61,6 +61,12 @@ function entryOf(row: BulletRow): Entry {
   return e
 }
 
+/** A caliber label without its leading point or trailing `mm`: ".308" gives "308", "6.5 mm" "6.5". */
+function bareCaliber(label: string) {
+  const digits = label.startsWith('.') ? label.slice(1) : label
+  return digits.endsWith('mm') ? digits.slice(0, -2).trimEnd() : digits
+}
+
 /**
  * What the typed words are worth beyond the schema's rank, per word: the bullet's weight or
  * caliber 3, a word of the product name 2 when exact and 1 at its start (the name counts more than
@@ -74,8 +80,7 @@ function bonus(b: BulletRow, e: Entry, words: readonly string[]): number {
     if (
       typed &&
       (sameMass(b, typed[1], typed[2]) ||
-        (typed[2] === undefined &&
-          commonCaliber(b.diameter).replace(/^\.|\s*mm$/g, '') === typed[1]))
+        (typed[2] === undefined && bareCaliber(commonCaliber(b.diameter)) === typed[1]))
     )
       total += 3
     total += e.name.reduce((m, w) => Math.max(m, w === word ? 2 : w.startsWith(word) ? 1 : 0), 0)

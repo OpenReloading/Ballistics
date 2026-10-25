@@ -868,6 +868,23 @@ describe('GET /exterior/stability', () => {
       ).toBe(400)
   })
 
+  it('reads a query number written with or without digits around the point', async () => {
+    const get = (twist: string) =>
+      api.app.inject({
+        url: `${API_PREFIX}/exterior/stability?mass=0.01&diameter=0.0078&length=0.031&muzzleVelocity=800&twist=${twist}`,
+      })
+    const results = []
+    for (const twist of ['0.254', '.254', '0.2540', '2.54e-1', '2540E-4', '%2B.254']) {
+      const res = await get(twist)
+      expect(res.statusCode).toBe(200)
+      results.push(res.json().result)
+    }
+    expect(new Set(results).size).toBe(1)
+    expect((await get('1.')).statusCode).toBe(200)
+    for (const twist of ['.', '1.2.3', 'e5', '1e', '1,5'])
+      expect((await get(twist)).statusCode).toBe(400)
+  })
+
   it('bounds the query values and record values', async () => {
     const base = { mass: 0.01, diameter: 0.0078, length: 0.031, twist: 0.254, muzzleVelocity: 800 }
     const get = (q: object) =>
