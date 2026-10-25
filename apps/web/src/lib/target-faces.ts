@@ -24,6 +24,8 @@ export type TargetFaceRow = {
   disciplines: number
   /** The event names and their organizations, for the search. */
   events: string[]
+  /** Prototype: every organization the face's events are named under, its own first, with the event names. */
+  used: { organization: string; events: number; names: string[] }[]
 }
 
 /** The distances of a face's events in m, each once, ascending. */
@@ -33,6 +35,23 @@ const faceDistances = (f: Pick<Face, 'events'>) =>
 /** The distances as one text: "25, 50 m". */
 export const distanceText = (metres: readonly number[]) =>
   metres.length > 0 ? `${metres.join(', ')} m` : ''
+
+/** Prototype: the organizations a face's events sit under, the face's own first, then by event count. */
+function usedBy(f: Face) {
+  const by = new Map<string, string[]>([[f.organization, []]])
+  for (const e of f.events)
+    by.set(e.organization ?? f.organization, [
+      ...(by.get(e.organization ?? f.organization) ?? []),
+      e.name,
+    ])
+  return [...by.entries()]
+    .map(([organization, names]) => ({ organization, events: names.length, names }))
+    .sort(
+      (a, b) =>
+        Number(b.organization === f.organization) - Number(a.organization === f.organization) ||
+        b.events - a.events,
+    )
+}
 
 /** The list row of a face; `mappings` of every face, counted by distinct discipline. */
 export function targetFaceRow(f: Face, mappings: readonly MappingSummary[]): TargetFaceRow {
@@ -45,12 +64,16 @@ export function targetFaceRow(f: Face, mappings: readonly MappingSummary[]): Tar
     rings: f.rings.length,
     disciplines: new Set(mappings.filter((m) => m.face === f.id).map((m) => m.discipline)).size,
     events: f.events.flatMap((e) => [e.name, e.organization ?? '']),
+    used: usedBy(f),
   }
 }
 
 /** Whether a face row passes the federation filter and the search. */
-export const targetFaceMatches = (r: TargetFaceRow, s: DirectoryState) =>
-  (!s.organization || r.organization === s.organization) &&
+export const targetFaceMatches = (r: TargetFaceRow, s: DirectoryState, anyOrg = false) =>
+  (!s.organization ||
+    (anyOrg
+      ? r.used.some((u) => u.organization === s.organization)
+      : r.organization === s.organization)) &&
   matchesQuery([r.name, r.organization, ...r.events], s.query)
 
 const length = (label: string, mm: number | undefined, printed?: string): FieldRow[] =>
