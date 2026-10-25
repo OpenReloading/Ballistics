@@ -195,26 +195,11 @@ function checkRows(
 ): void {
   const vi = index.velocity ?? 0
   const nextMapped = header !== undefined && Object.values(index).includes(vi + 1)
-  const pair = (r: Row): [string, string] | undefined => {
-    const [before, v, after] = [r.cells[vi - 1] ?? '', r.cells[vi] ?? '', r.cells[vi + 1] ?? '']
-    if (header)
-      return !nextMapped && /^\d+$/.test(v) && /^\d{1,3}$/.test(after) ? [v, after] : undefined
-    if (/^\d+$/.test(v) && /^\d+(\.\d+)?$/.test(after)) return [v, after]
-    if (/^\d{1,3}$/.test(before) && /^\d{3}(\.\d+)?$/.test(v)) return [before, v]
-    return undefined
-  }
   const suspect: number[] = []
   let first: [string, string] | undefined
   for (const r of data) {
-    if (header && r.cells.length > header.length) {
-      const hint = commaMayCut
-        ? `; an unquoted comma inside a cell (a decimal comma or a thousands separator) splits it: ${remedy}`
-        : ''
-      throw new Error(
-        `row ${r.lineNumber}: ${r.cells.length} cells, the header has ${header.length}${hint}`,
-      )
-    }
-    const p = commaMayCut ? pair(r) : undefined
+    checkOverflow(r, header, commaMayCut, remedy)
+    const p = commaMayCut ? commaPair(r, vi, header, nextMapped) : undefined
     if (p && !header) {
       throw new Error(
         `row ${r.lineNumber}: "${p.join(',')}" may be one velocity with a decimal comma or a thousands separator; ${remedy}`,
@@ -231,14 +216,48 @@ function checkRows(
     }
   }
   if (first) {
-    const rowsText =
-      suspect.length === 1
-        ? `row ${suspect[0]}`
-        : `rows ${suspect.slice(0, 5).join(', ')}${suspect.length > 5 ? ` and ${suspect.length - 5} more` : ''}`
     warnings.push(
-      `${rowsText}: "${first.join(',')}" may be a velocity with a decimal comma or a thousands separator split by the delimiter; check the values or ${remedy}`,
+      `${suspectRows(suspect)}: "${first.join(',')}" may be a velocity with a decimal comma or a thousands separator split by the delimiter; check the values or ${remedy}`,
     )
   }
+}
+
+/** Throws when a row has more cells than the header. */
+function checkOverflow(
+  r: Row,
+  header: string[] | undefined,
+  commaMayCut: boolean,
+  remedy: string,
+): void {
+  if (!header || r.cells.length <= header.length) return
+  const hint = commaMayCut
+    ? `; an unquoted comma inside a cell (a decimal comma or a thousands separator) splits it: ${remedy}`
+    : ''
+  throw new Error(
+    `row ${r.lineNumber}: ${r.cells.length} cells, the header has ${header.length}${hint}`,
+  )
+}
+
+/** The two cells of a row that may be one velocity split at a comma, when there are such. */
+function commaPair(
+  r: Row,
+  vi: number,
+  header: string[] | undefined,
+  nextMapped: boolean,
+): [string, string] | undefined {
+  const [before, v, after] = [r.cells[vi - 1] ?? '', r.cells[vi] ?? '', r.cells[vi + 1] ?? '']
+  if (header)
+    return !nextMapped && /^\d+$/.test(v) && /^\d{1,3}$/.test(after) ? [v, after] : undefined
+  if (/^\d+$/.test(v) && /^\d+(\.\d+)?$/.test(after)) return [v, after]
+  if (/^\d{1,3}$/.test(before) && /^\d{3}(\.\d+)?$/.test(v)) return [before, v]
+  return undefined
+}
+
+/** The line numbers of suspect rows as text, the first five named. */
+function suspectRows(suspect: number[]): string {
+  if (suspect.length === 1) return `row ${suspect[0]}`
+  const more = suspect.length > 5 ? ` and ${suspect.length - 5} more` : ''
+  return `rows ${suspect.slice(0, 5).join(', ')}${more}`
 }
 
 /**
@@ -277,6 +296,22 @@ function readRowShot(
   return shot
 }
 
+/** `readRowShot` with the row's line number in the message of an error. */
+function readRowShotAt(
+  lineNumber: number,
+  cell: (key: keyof ColumnMap) => string | undefined,
+  token: string | undefined,
+  headerText: string | undefined,
+  options: DelimitedOptions,
+  warnings: string[],
+): ChronoShot {
+  try {
+    return readRowShot(cell, token, headerText, options, warnings)
+  } catch (e) {
+    throw new Error(`row ${lineNumber}: ${(e as Error).message}`)
+  }
+}
+
 /**
  * Reads delimited text with `options.columns` as `format`. `detected`: the delimiter in
  * `options` was detected, not named by the user.
@@ -309,6 +344,26 @@ export function parseDelimitedRows(
   checkRows(data, header, index, commaMayCut, remedy, warnings)
 
   const token = headerText === undefined ? undefined : unitToken(headerText)
+  const { strings, labels } = readStrings(data, index, token, headerText, options, warnings)
+
+  return buildChronoImport(
+    format,
+    { device: options.device ?? { kind: 'other' }, strings },
+    labels,
+    warnings,
+    options,
+  )
+}
+
+/** The strings of the data rows: consecutive rows with an equal `string` cell form one string. */
+function readStrings(
+  data: Row[],
+  index: Partial<Record<keyof ColumnMap, number>>,
+  token: string | undefined,
+  headerText: string | undefined,
+  options: DelimitedOptions,
+  warnings: string[],
+): { strings: { shots: ChronoShot[] }[]; labels: (string | undefined)[] } {
   const strings: { shots: ChronoShot[] }[] = []
   const labels: (string | undefined)[] = []
   const seen = new Set<string>()
@@ -322,12 +377,7 @@ export function parseDelimitedRows(
       warnings.push(`row ${r.lineNumber}: no velocity; skipped`)
       continue
     }
-    let shot: ChronoShot
-    try {
-      shot = readRowShot(cell, token, headerText, options, warnings)
-    } catch (e) {
-      throw new Error(`row ${r.lineNumber}: ${(e as Error).message}`)
-    }
+    const shot = readRowShotAt(r.lineNumber, cell, token, headerText, options, warnings)
     const label = cell('string')
     if (strings.length === 0 || label !== current) {
       if (label !== undefined && seen.has(label)) {
@@ -342,12 +392,5 @@ export function parseDelimitedRows(
     }
     strings[strings.length - 1].shots.push(shot)
   }
-
-  return buildChronoImport(
-    format,
-    { device: options.device ?? { kind: 'other' }, strings },
-    labels,
-    warnings,
-    options,
-  )
+  return { strings, labels }
 }

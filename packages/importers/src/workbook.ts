@@ -56,6 +56,15 @@ function resolveTarget(source: string, target: string): string {
 const columnOf = (letters: string) =>
   [...letters].reduce((col, l) => col * 26 + l.charCodeAt(0) - 64, 0)
 
+/** The shared string a cell's `v` text indexes; refused when the index is not in the table. */
+function sharedString(text: string, strings: string[], ref: () => string): string {
+  const k = /^\d+$/.test(text.trim()) ? Number(text) : Number.NaN
+  if (!(k < strings.length)) {
+    throw new Error(`cell ${ref()} refers to shared string ${text} of ${strings.length}`)
+  }
+  return strings[k]
+}
+
 /**
  * Text of a cell from its type, the text of its first `v` and of its first `is`. `ref` names the
  * cell, built only for a refusal.
@@ -72,14 +81,8 @@ function cellText(
     text = is ?? ''
   } else {
     text = v ?? ''
-    if (t === 's' && text !== '') {
-      const k = /^\d+$/.test(text.trim()) ? Number(text) : Number.NaN
-      if (!(k < strings.length)) {
-        throw new Error(`cell ${ref()} refers to shared string ${text} of ${strings.length}`)
-      }
-      // shared strings are cleaned once when the table is read
-      return strings[k]
-    }
+    // shared strings are cleaned once when the table is read
+    if (t === 's' && text !== '') return sharedString(text, strings, ref)
     if (t === 'b' && text.trim() === '0') return ''
   }
   return clean(text)
@@ -110,6 +113,39 @@ function sharedStrings(text: string, xmlRemaining: XmlBudget): string[] {
   return strings
 }
 
+interface CellState {
+  t?: string
+  r?: string
+  v?: string
+  is?: string
+  vs: number
+  iss: number
+}
+
+/** Counts a `v` or `is` child of a cell; the first of each starts its text. */
+function countCellChild(cell: CellState, name: string): void {
+  if (name === 'v' && ++cell.vs === 1) cell.v = ''
+  else if (name === 'is' && ++cell.iss === 1) cell.is = ''
+}
+
+/** Places a closed cell in its row by its reference, or after the cells so far without one. */
+function closeCell(
+  cell: CellState,
+  cells: string[],
+  strings: string[],
+  remaining: CellBudget,
+): void {
+  const ref = cell.r
+  let column = cells.length + 1
+  if (ref !== undefined) {
+    const m = /^([A-Z]{1,3})[0-9]+$/.exec(ref)
+    if (!m) throw new Error(`cell reference "${ref}" is malformed`)
+    column = columnOf(m[1])
+  }
+  const name = () => ref ?? `at column ${column}`
+  placeCell(cells, column, cellText(cell.t, cell.v, cell.is, strings, name), name, remaining)
+}
+
 /**
  * Rows of cell text, read in one pass: the `row` children of the first `sheetData` child of the
  * root and their `c` children. `remaining` counts down the cells (gaps included) and characters every
@@ -125,7 +161,7 @@ function sheetRows(
   const rows: string[][] = []
   let sheetData: 'before' | 'open' | 'after' = 'before'
   let cells: string[] | undefined
-  let cell: { t?: string; r?: string; v?: string; is?: string; vs: number; iss: number } | undefined
+  let cell: CellState | undefined
   scanXml(
     text,
     {
@@ -135,10 +171,7 @@ function sheetRows(
         else if (depth === 2 && name === 'row' && sheetData === 'open') cells = []
         else if (depth === 3 && name === 'c' && cells) {
           cell = { t: attributes.t, r: attributes.r, vs: 0, iss: 0 }
-        } else if (depth === 4 && cell) {
-          if (name === 'v' && ++cell.vs === 1) cell.v = ''
-          else if (name === 'is' && ++cell.iss === 1) cell.is = ''
-        }
+        } else if (depth === 4 && cell) countCellChild(cell, name)
       },
       text(t, path) {
         if (!cell || path.length < 5) return
@@ -152,21 +185,7 @@ function sheetRows(
           if (cells.length > 0) rows.push(cells)
           cells = undefined
         } else if (depth === 3 && name === 'c' && cells && cell) {
-          const ref = cell.r
-          let column = cells.length + 1
-          if (ref !== undefined) {
-            const m = /^([A-Z]{1,3})[0-9]+$/.exec(ref)
-            if (!m) throw new Error(`cell reference "${ref}" is malformed`)
-            column = columnOf(m[1])
-          }
-          const name = () => ref ?? `at column ${column}`
-          placeCell(
-            cells,
-            column,
-            cellText(cell.t, cell.v, cell.is, strings, name),
-            name,
-            remaining,
-          )
+          closeCell(cell, cells, strings, remaining)
           cell = undefined
         }
       },
@@ -178,6 +197,15 @@ function sheetRows(
 
 /** Reads a part of the archive as UTF-8 text with `read`; `limit` caps its declared size. */
 type ReadPart = <T>(name: string, read: (text: string) => T, limit?: number) => Promise<T>
+
+/** The XML limit a shared budget ran out of, as text, or undefined while it holds. */
+function exhausted(xmlRemaining: XmlBudget): string | undefined {
+  if (xmlRemaining.elements < 0) return `${maxElements} elements`
+  if (xmlRemaining.characters < 0) {
+    return `${maxXmlCharacters} characters of text and attribute markup`
+  }
+  return undefined
+}
 
 /**
  * A part reader over the entries of the archive; `budget.left` is the declared size the workbook
@@ -201,12 +229,7 @@ function partReader(
       return read(text)
     } catch (e) {
       // the budget is shared by all parts, so name it, not only the part that used it up
-      const over =
-        xmlRemaining.elements < 0
-          ? `${maxElements} elements`
-          : xmlRemaining.characters < 0
-            ? `${maxXmlCharacters} characters of text and attribute markup`
-            : undefined
+      const over = exhausted(xmlRemaining)
       const message = over ? `the XML parts hold more than ${over}` : (e as Error).message
       throw new Error(`XLSX part ${entry.name}: ${message}`)
     }

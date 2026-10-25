@@ -21,6 +21,17 @@ export function decodeText(bytes: Uint8Array): string {
   }
 }
 
+/** The text of a quoted cell from `from`, after its opening quote, and the position after its closing quote. */
+function readQuoted(line: string, from: number): { cell: string; next: number } {
+  let cell = ''
+  let i = from
+  while (i < line.length && !(line[i] === '"' && line[i + 1] !== '"')) {
+    if (line[i] === '"') i++
+    cell += line[i++]
+  }
+  return { cell, next: i + 1 }
+}
+
 /**
  * Cells split at `delimiter`; quotes may follow spaces, `""` is a quote inside a quoted cell, and
  * text between a closing quote and the delimiter is kept. Tabs before a cell are skipped only
@@ -32,14 +43,10 @@ export function splitDelimited(line: string, delimiter: ',' | ';' | '\t' = ','):
   while (i <= line.length) {
     while (line[i] === ' ' || (line[i] === '\t' && delimiter !== '\t')) i++
     let cell = ''
-    const quoted = line[i] === '"'
-    if (quoted) {
-      i++
-      while (i < line.length && !(line[i] === '"' && line[i + 1] !== '"')) {
-        if (line[i] === '"') i++
-        cell += line[i++]
-      }
-      i++
+    if (line[i] === '"') {
+      const quoted = readQuoted(line, i + 1)
+      cell = quoted.cell
+      i = quoted.next
     }
     const end = line.indexOf(delimiter, i)
     cell += line.slice(i, end < 0 ? line.length : end)
