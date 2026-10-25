@@ -5,9 +5,15 @@
  */
 import { conicOf, type Ellipse, ellipsePoint, meanRadius, ransacEllipse } from './ellipse.ts'
 import type { RgbaImage } from './image.ts'
-import { f32, i8, i32, nth, u8 } from './nth.ts'
+import { nth } from './nth.ts'
 import { clamp } from './raster-ops.ts'
 import type { Point } from './target-geometry.ts'
+
+// Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
+const f32 = (a: Float32Array, i: number) => a[i] as number
+const i8 = (a: Int8Array, i: number) => a[i] as number
+const i32 = (a: Int32Array, i: number) => a[i] as number
+const u8 = (a: Uint8Array | Uint8ClampedArray, i: number) => a[i] as number
 
 /** Grey levels (ITU-R BT.601 luma) averaged over square blocks of `blockSize` image px of a crop of the image. */
 export type Grid = {

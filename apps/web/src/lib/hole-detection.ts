@@ -26,7 +26,7 @@ import {
   type WorkImage,
 } from './colour-axis.ts'
 import type { RgbaImage } from './image.ts'
-import { f32, f64, i32, nth, u8 } from './nth.ts'
+import { nth } from './nth.ts'
 import {
   clamp,
   components,
@@ -38,6 +38,12 @@ import {
 } from './raster-ops.ts'
 import type { Point } from './target-geometry.ts'
 import { paperOutline } from './target-paper.ts'
+
+// Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
+const f32 = (a: Float32Array, i: number) => a[i] as number
+const f64 = (a: Float64Array, i: number) => a[i] as number
+const i32 = (a: Int32Array, i: number) => a[i] as number
+const u8 = (a: Uint8Array | Uint8ClampedArray, i: number) => a[i] as number
 
 /** A polygon or a rectangle in image px. */
 export type Region = readonly Point[] | { x: number; y: number; width: number; height: number }

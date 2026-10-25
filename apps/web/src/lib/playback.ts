@@ -1,5 +1,8 @@
 import type { InteriorResponse } from './api-types.ts'
-import { i32, nth } from './nth.ts'
+import { nth } from './nth.ts'
+
+// Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
+const i32 = (a: Int32Array, i: number) => a[i] as number
 
 /** The M3 result of `POST /interior` as the chart's playback reads it. */
 export type PlaybackResult = InteriorResponse['result']

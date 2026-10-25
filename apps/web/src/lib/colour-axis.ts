@@ -1,8 +1,11 @@
 /** The colour axis of hole detection: Fisher's linear discriminant of a hole against its ring, in log RGB. */
 
-import { f32, nth } from './nth.ts'
+import { nth } from './nth.ts'
 import { clamp, median1 } from './raster-ops.ts'
 import type { Point } from './target-geometry.ts'
+
+// Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
+const f32 = (a: Float32Array, i: number) => a[i] as number
 
 /** The example disc and the ring around it (in D). */
 export const DISC = 0.4

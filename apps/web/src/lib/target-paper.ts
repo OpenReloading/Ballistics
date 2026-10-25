@@ -1,8 +1,13 @@
 /** The target paper in a photo without a marked region: its light area by Otsu's threshold, as a convex hull. */
 import type { RgbaImage } from './image.ts'
-import { f32, f64, nth, u8 } from './nth.ts'
+import { nth } from './nth.ts'
 import { clamp, components, rectangle } from './raster-ops.ts'
 import type { Point } from './target-geometry.ts'
+
+// Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
+const f32 = (a: Float32Array, i: number) => a[i] as number
+const f64 = (a: Float64Array, i: number) => a[i] as number
+const u8 = (a: Uint8Array | Uint8ClampedArray, i: number) => a[i] as number
 
 /**
  * The target in a photo without a marked region (own rule): the convex hull of the largest light

@@ -1,7 +1,12 @@
 /** Raster operations on working images held as flat arrays, row by row: masks, morphology, distances, components. */
 
-import { f32, f64, i32, nth } from './nth.ts'
+import { nth } from './nth.ts'
 import type { Point } from './target-geometry.ts'
+
+// Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
+const f32 = (a: Float32Array, i: number) => a[i] as number
+const f64 = (a: Float64Array, i: number) => a[i] as number
+const i32 = (a: Int32Array, i: number) => a[i] as number
 
 export const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v))
 

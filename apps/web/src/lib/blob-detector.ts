@@ -1,7 +1,10 @@
 /** Multi-scale blob detection on a float image: box-blur scale space, scale-normalised Hessian response, peaks. */
 
-import { f32, nth } from './nth.ts'
+import { nth } from './nth.ts'
 import { clamp } from './raster-ops.ts'
+
+// Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
+const f32 = (a: Float32Array, i: number) => a[i] as number
 
 /** Peaks closer than this (in D) are one. */
 const NMS = 0.8
