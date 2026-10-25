@@ -20,7 +20,11 @@ const nextConfig: NextConfig = {
     basePath: pagesBasePath,
     // every page as <path>/index.html, so a static host needs no rule for `x.html` beside `x/`
     trailingSlash: true,
-    env: { NEXT_PUBLIC_PAGES_BASE_PATH: pagesBasePath },
+    env: {
+      NEXT_PUBLIC_PAGES_BASE_PATH: pagesBasePath,
+      // the development preview of `develop` (`pages.yml`), which shares the origin with the released site
+      ...(process.env.PAGES_PREVIEW && { NEXT_PUBLIC_PAGES_PREVIEW: '1' }),
+    },
   }),
   outputFileTracingRoot: path.join(import.meta.dirname, '../..'),
   // the images are two SVG logos, served as files: no optimizer, so the image needs no sharp

@@ -34,7 +34,7 @@
   - `e2e` runs against `docker compose up api web`, runs the drawing pixel baseline in the Playwright image (`npm run drawing-baseline -w @open-reloading/e2e`), builds the web app against that API, then runs `node apps/web/scripts/check-prerender.mts` and `npm run e2e:smoke` against that build.
   - On a pull request the `changes` job (`apps/web/scripts/ci-plan.mts`) can skip the `check` job (only prose changed), the `e2e` job (no change to what the API, the web app or the e2e specs read) or that web build (no change to the web app or what it builds from). It can build with `PRERENDER=sample` (no change to record data, record page code or the packages they read). The Turbopack cache (`apps/web/.next/cache/turbopack`) is restored.
   - A push to the default branch or any doubt builds from nothing, every record page prerendered and checked in full.
-- Other workflows: `release.yml` (release-please, images, `apps/docs/docs/release.md`), `pages.yml` (Pages edition), `pr-title.yml`, `scorecard.yml`. Tools, rules and their free terms: `apps/docs/docs/ci-tools.md`.
+- Other workflows: `release.yml` (release-please, images, `apps/docs/docs/release.md`), `pages.yml` (Pages edition from `main`, the preview of `develop` under `develop/`), `pr-title.yml`, `scorecard.yml`. Tools, rules and their free terms: `apps/docs/docs/ci-tools.md`.
 - Commits and pull request titles: Conventional Commits (`CONTRIBUTING.md`).
 
 ## Conventions
@@ -70,7 +70,7 @@
 - `NEXT_PUBLIC_REPOSITORY_URL`: URL of the public source repository, inlined at web build time (no Dockerfile `ARG`). Unset (`apps/web/src/lib/repository-url.ts`): no repository link in the header or the drawer. Set only by `pages.yml`, to the repository the workflow runs in.
 - `NEXT_PUBLIC_DOCS_URL`: URL of the docs site, inlined at web build time (no Dockerfile `ARG`). Unset (`apps/web/src/lib/docs-url.ts`): no Docs link in the sidebar or the drawer, except in the Pages edition, which links its own `docs/` folder.
 - `APP_URL`: URL of the web app, read at docs site build time for the docs navbar's Web app link (`ARG` of `apps/docs/Dockerfile`, set by `compose.yaml`; `tools/src/pages.ts` sets it to the Pages site root from `PAGES_URL`). A full URL; unset: no link.
-- `PAGES_BASE_PATH`, `PAGES_URL`: Pages edition (`apps/web/AGENTS.md`).
+- `PAGES_BASE_PATH`, `PAGES_URL`, `PAGES_PREVIEW`: Pages edition (`apps/web/AGENTS.md`).
 - `PRERENDER`:
   - `sample`: a web build prerenders the records selected in `apps/web/src/lib/prerender-sample.ts`. Every other record renders on its first visit.
   - Unset or any other value: every record.

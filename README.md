@@ -57,6 +57,7 @@ npm start -w @open-reloading/web -- -p 3001        # web app on port 3001, API a
   - `PAGES_BASE_PATH=<path> npm run pages:build` writes `pages/`. `PAGES_BASE_PATH=<path> npm run pages:serve` serves it on port 3003 (`PORT`).
   - `PAGES_BASE_PATH`: the base path of the site, `''` or a path such as `/Ballistics`.
   - `PAGES_URL`: the site's origin.
+  - `PAGES_PREVIEW`: any value marks the site as the development preview (`noindex`, a label, no sitemap). `pages.yml` sets it for the build of `develop`, which is deployed under `develop/` of the released site.
 - Checks: [CONTRIBUTING.md](CONTRIBUTING.md#before-a-pull-request). Commands, configuration and the dev container: [AGENTS.md](AGENTS.md).
 
 Developed with the assistance of generative AI.
