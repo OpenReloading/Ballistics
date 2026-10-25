@@ -26,7 +26,7 @@ The number of a field object: `value` of a quantity, of a spec value, of a publi
 _Avoid_: record id (for user data)
 
 **Name**:
-`name`: the name of a record or item as its source, rule book or user writes it. Cartridges, powders, bullets, manufacturers, federations, disciplines, target faces, face events, user records, optics, configurations, shot groups, measured series and range string candidates carry one.
+`name`: the name of a record or item as its source, rule book or user writes it. Cartridges, powders, bullets, manufacturers, federations, disciplines, target faces, face events, user records, optics, configurations, shot groups and range string candidates carry one.
 
 **Note**:
 `note`: free text on a record, a provenance block, a source, a published ballistic coefficient or a plausibility exception.
@@ -389,13 +389,13 @@ _Avoid_: twistLength
 ### Loads
 
 **Load**:
-One cartridge recipe fired from one firearm, one shape for the catalogue (a record of kind `loads`), the user record of kind `load` and the load file, in stored units: `origin`, `cartridge`, `firearm`, `bullet` and `powder` (references, a measured catalogue load may describe the bullet and powder instead), `charge` (g), `capacity` (a reference to a case capacity, catalogue or the user's measured one), `primer`, `case` (`firingCount`), `seating`, `note`, `analysis` (`overrides`, the solver values the user typed, and `ladder`) and `measurements`. A catalogue load also has `id`, `name` and `provenance`; a user load is named by its record. Its components hold `manufacturerName` and `lot`, the bullet `model` and `bulletMass`, the powder `name` and the primer `model`.
+One cartridge recipe fired from one firearm, one shape for the catalogue (a record of kind `loads`), the user record of kind `load` and the load file, in stored units: `origin`, `cartridge`, `firearm`, `bullet` and `powder` (references, a measured catalogue load may describe the bullet and powder instead), `charge` (g), `capacity` (a reference to a case capacity, catalogue or the user's measured one), `primer`, `case` (`firingCount`), `seating`, `note`, `analysis` (`overrides`, the solver values the user typed, and `ladder`) and `sessions` (references to the chronograph sessions of the Measurements tab). A catalogue load also has `id`, `name` and `provenance`; a user load is named by its record. Its components hold `manufacturerName` and `lot`, the bullet `model` and `bulletMass`, the powder `name` and the primer `model`.
 
 **Lot**:
 `lot`: lot number of a load component as printed on the package.
 
 **Charge**:
-`charge`: propellant mass of one round. Load (g), measured series strings (g), interior and charge-target bodies (kg), and the `charge` of each interior answer and ladder step (kg).
+`charge`: propellant mass of one round. Load (g), the `charge` variation of a shot string (g), interior and charge-target bodies (kg), and the `charge` of each interior answer and ladder step (kg).
 
 **Case firings**:
 `firingCount`: times the case of a load was fired before this load.
@@ -419,22 +419,25 @@ _Avoid_: `barrelLength` (of the workbench field)
 ### Chronograph sessions
 
 **Chronograph session**:
-A record of kind `chrono`: one device, one place, one day, with `date`, `device`, `muzzleDistance`, `conditions`, `strings`. Its provenance kind is `measured`.
+One shape for the catalogue (a record of kind `chrono`), the user record of kind `session` and what an import gives: one device, one place, one day, with `origin`, `date`, `device`, `muzzleDistance`, `conditions`, `strings` and `note`. A catalogue session also needs its `id`, the date, the device's maker and model, the air temperature and the load of every string; a user session is named by its record (the file name) and keeps what the file gave. Its provenance kind is `measured`.
 
 **Device**:
-`device`: the chronograph of a session, `kind` (`doppler-radar`, `optical`, `magnetic`, `other`), `manufacturer` (a `catalogue:` reference), `model` and `firmware`. In a measured series of the user data, the manufacturer and model as one text.
+`device`: the chronograph of a session, `kind` (`doppler-radar`, `optical`, `magnetic`, `other`), `manufacturer` (a reference, `catalogue:` in a catalogue session), `model` and `firmware`.
 
 **Muzzle distance**:
-`muzzleDistance`: muzzle to the measuring point of a chronograph, mm in a session, m in a measured series.
+`muzzleDistance`: muzzle to the measuring point of a chronograph, mm.
 
 **Conditions**:
 `conditions`: `airTemperature` (degC), `stationPressure` (absolute air pressure at the site, bar) and `relativeHumidity` (%) of a session. The truing nominal holds the same three.
 
 **Shot string**:
-One entry of a session's `strings`: the shots of one load, with `load`, `propellantTemperature` and `shots`. A measured series of a load holds `strings` with a `label`, the `charge` they are mapped to and `shots`.
+One entry of a session's `strings`: the shots of one load, with `load`, `label`, `variation`, `propellantTemperature` and `shots`.
+
+**String variation**:
+`variation`: what a shot string varies against its load: `kind` `charge` (the charge, g) or `seating` (the length the load seats the bullet by, mm) and its `value`. Absent: the string is not mapped on the Measurements tab. A temperature ladder is the string's `propellantTemperature`.
 
 **Load reference**:
-`load`: on a shot string the record id of the load it was fired with. On a target sheet the local id of the saved load its groups belong to.
+`load`: on a shot string a reference to the load it was fired with, absent while a session is not attached to a load (a file just read). On a target sheet the local id of the saved load its groups belong to.
 _Avoid_: loadId
 
 **Chronograph shot**:
@@ -475,7 +478,7 @@ _Avoid_: `rounds` (as a count)
 A record of kind `range`: spark-range firings of one projectile from one report, with `projectile` (as the report names it), `bulletDiameter`, `bulletMass` and `rounds`, each round with `label` (as printed), `mach`, `totalYaw` (total angle of attack, deg) and `dragCoefficient` at that yaw.
 
 **Label**:
-`label`: a name as printed or typed: the round number of range firings, a shot string of a measured series.
+`label`: a name as printed or typed: the round number of range firings, a shot string of a session.
 _Avoid_: `round` (in range firings)
 
 **Mach number**:
@@ -603,8 +606,8 @@ _Avoid_: si
 `ladder`: a series of runs around or beyond a base value. On a load, `analysis.ladder`: `kind` (`charge`, `seating` or `temperature`), `stepCount` (2 to 21), `step` (g for a charge ladder, mm for seating, K for temperature) and `direction` (`up`, `down`, `around`). In interior bodies a charge ladder from `load.charge` with `chargeStep` (kg), `stepCount` and `direction`, one interior run each.
 _Avoid_: `step`, `steps` (of a ladder)
 
-**Measured series**:
-One entry of `measurements` of a load: one imported chronograph file with `name`, `date`, `device`, `muzzleDistance` (mm) and `strings` mapped to charges (g).
+**Sessions of a load**:
+`sessions`: the references (`user:<UUID>` or `catalogue:<id>`) of the chronograph sessions the Measurements tab shows for a load, in the order shown. The sessions are records of their own.
 
 **Firearm**:
 A firearm, one shape for every origin, in stored units (mm, g, degrees; the zero air in degC, bar and %). The user record of kind `firearm` holds `origin`, `name`, `manufacturer` (a reference), `model`, `cartridge` (a reference), `barrelLength`, `twist`, `twistHand`, `grooveDiameter`, `boreDiameter`, `freebore`, `baseToOgiveAtLands`, `firearmMass`, `roundCount`, `notes`, `optics`, `configurations`, `active` (the configuration on the firearm now). A workbench state names one by its local id in `firearm`, a load by a reference. The `firearm` of exterior bodies is the sight and rifling of one shot.
@@ -678,7 +681,7 @@ One entry of `notes` of a target sheet: `id`, `x`, `y`, `text` with `{key.unit}`
 One entry of `groups`: the shots at one distance, with `id`, `name`, `colour` (`#rrggbb`), `distance` (m), `aim` (point of aim), `ladderStep` (index of the ladder step of the sheet's load, 0 for the first charge), `shots`, `detection` and `face`.
 
 **Group shot**:
-One entry of a group's `shots`: `x`, `y`, `excluded`, `placement` (`detected` or `placed`), `holeDiameter` (measured, m) and `chrono`, the chronograph shot of the round as `session`, `string` (index) and `shot` (index).
+One entry of a group's `shots`: `x`, `y`, `excluded`, `placement` (`detected` or `placed`), `holeDiameter` (measured, m) and `chrono`, the chronograph shot of the round as `session` (a reference), `string` (index) and `shot` (index).
 _Avoid_: `origin` (of a shot), hole
 
 **Hole detection**:
