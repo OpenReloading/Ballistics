@@ -1,5 +1,5 @@
 import { defineConfig, devices } from '@playwright/test'
-import { firstRunDone, safetyAck } from './tests/web/nav.ts'
+import { safetyAck } from './tests/web/nav.ts'
 
 const webUrl = process.env.WEB_URL ?? 'http://localhost:3001'
 /** The Pages site (`npm run pages:serve`), with its base path and a trailing slash. Unset: no project `pages`. */
@@ -10,17 +10,13 @@ const browserAt = (url: string) => ({
   baseURL: url,
   // the offline layer's worker would answer requests from its caches
   serviceWorkers: 'block' as const,
-  // the Safety dialog accepted and the first-run step finished, as after a first visit
-  // (safety-dialog.tsx, first-run-dialog.tsx); safety.spec.ts and first-run.spec.ts start without
+  // the Safety dialog accepted, as after a first visit (safety-dialog.tsx); safety.spec.ts starts without
   storageState: {
     cookies: [],
     origins: [
       {
         origin: new URL(url).origin,
-        localStorage: [
-          { name: 'safety-ack', value: safetyAck },
-          { name: 'first-run-done', value: firstRunDone },
-        ],
+        localStorage: [{ name: 'safety-ack', value: safetyAck }],
       },
     ],
   },
