@@ -49,6 +49,15 @@ describe('parseShotView', () => {
     }
   })
 
+  it('cuts the commas and the white space after them from the name line', () => {
+    const name = (line: string) =>
+      parseShotView(shotViewEnglish.replace(/^[^\n]*"Test load A 42.0gr"/, line)).stringLabels
+    expect(name('Load A,,,')).toEqual(['Load A'])
+    expect(name('Load A, ,')).toEqual(['Load A,'])
+    expect(name('Load A,,  ')).toEqual(['Load A'])
+    expect(name(`Load A${','.repeat(5000)}x${' '.repeat(5000)}`)).toHaveLength(1)
+  })
+
   it('reads a German export in m/s with decimal commas', () => {
     const r = parseShotView(shotViewGerman)
     const shots = r.session.strings[0].shots

@@ -76,6 +76,13 @@ export function bracketed(text: string): string | undefined {
   return a >= 0 && b > a + 1 ? text.slice(a + 1, b) : undefined
 }
 
+/** The text without the commas that end it and the white space after them; linear time. */
+export function withoutTrailingCommas(text: string): string {
+  let end = text.trimEnd().length
+  while (end > 0 && text[end - 1] === ',') end--
+  return text.slice(0, end)
+}
+
 /** Seconds as minutes with up to two decimals, `90.5 min`. */
 export const formatMinutes = (seconds: number) => `${Number((seconds / 60).toFixed(2))} min`
 
