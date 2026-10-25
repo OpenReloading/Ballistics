@@ -62,7 +62,7 @@ export default function BurnRatesPage() {
       <PageBar
         title="Powder burn rates"
         single
-        actions={<LinkButton href="/powders?curve=1&sort=-rate">Powders by burn rate</LinkButton>}
+        actions={<LinkButton href="/powders?sort=-rate">Powders by burn rate</LinkButton>}
       />
       <p className="muted page-lead">
         Dynamic vivacity, the burn rate per pressure, over burnt fraction.{' '}

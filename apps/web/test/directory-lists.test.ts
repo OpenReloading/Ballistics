@@ -17,7 +17,6 @@ import {
   packCartridges,
   unpackCartridges,
 } from '../src/lib/cartridge-rows.ts'
-import { emptyDirectory, readDirectory, writeDirectory } from '../src/lib/directory.ts'
 import { packPowders, powderMatches, unpackPowders } from '../src/lib/powder-rows.ts'
 import { presetUnits } from '../src/lib/units.ts'
 
@@ -33,20 +32,13 @@ const c = (over: Partial<CartridgeRow>): CartridgeRow => ({
   ...over,
 })
 
-it('filters cartridges by case type, common caliber and words of name, aliases and caliber', () => {
-  const s = (over: object) => ({ ...emptyDirectory, ...over })
-  expect(cartridgeMatches(c({}), s({ query: '7,62 51' }))).toBe(true)
-  expect(cartridgeMatches(c({}), s({ query: 'lapua' }))).toBe(false)
-  expect(cartridgeMatches(c({}), s({ caseType: 'rimmed' }))).toBe(false)
-  expect(cartridgeMatches(c({}), s({ caseType: 'rimless' }))).toBe(true)
-  // the common caliber of the G1, whatever the preset
-  expect(cartridgeMatches(c({}), s({ caliber: '.308' }))).toBe(true)
-  expect(cartridgeMatches(c({}), s({ caliber: '.311' }))).toBe(false)
-  expect(cartridgeMatches(c({ maxBulletDiameter: undefined }), s({ caliber: '.308' }))).toBe(false)
+it('searches the words of name, aliases and caliber', () => {
+  expect(cartridgeMatches(c({}), '7,62 51')).toBe(true)
+  expect(cartridgeMatches(c({}), 'lapua')).toBe(false)
   // the search finds the common caliber and the G1 in both units
   for (const q of ['.308', '7.85', '.309', '6.5'])
-    expect(cartridgeMatches(c({}), s({ query: q })), q).toBe(q !== '6.5')
-  expect(cartridgeMatches(c({ maxBulletDiameter: 6.72 }), s({ query: '6.5 mm' }))).toBe(true)
+    expect(cartridgeMatches(c({}), q), q).toBe(q !== '6.5')
+  expect(cartridgeMatches(c({ maxBulletDiameter: 6.72 }), '6.5 mm')).toBe(true)
 })
 
 it('gives the cartridge cells in the preset units', () => {
@@ -102,15 +94,6 @@ it('packs cartridges without key names and back', () => {
   expect(unpackCartridges(packCartridges(rows))).toEqual(rows)
 })
 
-it('keeps the list filters of every list in the URL, other parameters untouched', () => {
-  const s = readDirectory('?type=rebated&base=double&form=ball&curve=1&units=us')
-  expect(s).toMatchObject({ caseType: 'rebated', base: 'double', form: 'ball', curve: '1' })
-  expect(writeDirectory({ ...s, curve: '' }, '?units=us&curve=1')).toBe(
-    '?units=us&type=rebated&base=double&form=ball',
-  )
-  expect(writeDirectory(emptyDirectory, '?type=belted&curve=1')).toBe('')
-})
-
 const fitted = (vivacity: number) =>
   summary('x', vivacity).interior as NonNullable<PowderSummary['interior']>
 
@@ -136,7 +119,7 @@ const summary = (
   ...over,
 })
 
-it('orders powders fastest first and keeps the global order under filters', () => {
+it('orders powders fastest first and keeps the global order under the search', () => {
   const rows = orderPowders([
     summary('a-slow', 0.3),
     summary('h-fast', 0.9),
@@ -153,13 +136,8 @@ it('orders powders fastest first and keeps the global order under filters', () =
   expect(fast.low).toBeLessThan(fast.meanVivacity as number)
   expect(fast.high).toBeGreaterThan(fast.meanVivacity as number)
   expect(rows.find((r) => r.id === 'h-none')?.burnRateOrder).toBeUndefined()
-  const s = { ...emptyDirectory, manufacturer: 'delta' }
-  // filtered: Delta's fastest keeps order 2
-  expect(rows.filter((r) => powderMatches(r, s)).map((r) => r.burnRateOrder)).toEqual([3, 2])
-  expect(rows.filter((r) => powderMatches(r, { ...emptyDirectory, curve: '1' }))).toHaveLength(3)
-  expect(rows.filter((r) => powderMatches(r, { ...emptyDirectory, base: 'double' }))).toHaveLength(
-    1,
-  )
+  // searched: Delta's fastest keeps order 2
+  expect(rows.filter((r) => powderMatches(r, 'delta')).map((r) => r.burnRateOrder)).toEqual([3, 2])
   expect(unpackPowders(packPowders(rows))).toEqual(rows)
 })
 

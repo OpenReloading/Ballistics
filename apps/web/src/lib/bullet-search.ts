@@ -1,6 +1,6 @@
 /**
  * The bullet picker's search, the dialog's, the card's field's and Ctrl+K's: the schema's word
- * matcher over each bullet's text (`bulletScore`), the filters of the directory list, results
+ * matcher over each bullet's text (`bulletScore`), the picker's filters, results
  * ordered by how well each bullet matches the typed words, and the whole catalogue read once per
  * page load.
  */
@@ -12,21 +12,20 @@ import {
   type BulletItem,
   type BulletRow,
   bulletKey,
-  bulletMatches,
   bulletScore,
   massWord,
   sameMass,
   typedWords,
 } from './bullet-rows.ts'
 import { commonCaliber } from './caliber.ts'
-import { emptyDirectory } from './directory.ts'
+import { convertMass, massRange } from './mass-range.ts'
 
 /** The picker's filters; each empty one leaves every bullet in. */
 export interface BulletFilters {
   manufacturer: string
   /** A common caliber (`commonCaliber`): ".308", "6.5 mm". */
   caliber: string
-  /** A mass range with its unit as the directory writes it: "150-180gr", "9.5-g". */
+  /** A mass range with its unit: "150-180gr", "9.5-g". */
   mass: string
   /** The CIP values of the cartridge: only the bullets that fit it (`bulletFits` of core). */
   fit?: CartridgeDiameters
@@ -35,6 +34,24 @@ export interface BulletFilters {
 }
 
 export type BulletSort = 'relevance' | 'name' | 'mass' | 'ballisticCoefficient'
+
+/** Whether a bullet passes the manufacturer, caliber and mass filters, each empty one passing all. */
+function inFilters(
+  b: BulletRow,
+  filters: Pick<BulletFilters, 'manufacturer' | 'caliber' | 'mass'>,
+) {
+  if (filters.manufacturer && b.manufacturer !== filters.manufacturer) return false
+  if (filters.caliber && commonCaliber(b.diameter) !== filters.caliber) return false
+  const range = massRange(filters.mass)
+  if (!range) return true
+  if (b.mass === null) return false
+  // compared at the display rounding, so 168 gr lies in 150-168gr
+  const shown = convertMass(b.mass, 'g', range.unit)
+  return (
+    (range.min === undefined || shown >= range.min) &&
+    (range.max === undefined || shown <= range.max)
+  )
+}
 
 /** A row with what ordering reads of it, worked out once. */
 interface Entry {
@@ -107,13 +124,6 @@ export function searchBullets<R extends BulletRow>(
   sort: BulletSort = 'relevance',
 ): R[] {
   const words = typedWords(query)
-  // the filters of the directory without its text match, which the key does
-  const state = {
-    ...emptyDirectory,
-    manufacturer: filters.manufacturer,
-    caliber: filters.caliber,
-    mass: filters.mass,
-  }
   const key = (b: BulletRow) =>
     sort === 'mass' ? b.mass : sort === 'ballisticCoefficient' ? bc(b) : undefined
   return rows
@@ -123,7 +133,7 @@ export function searchBullets<R extends BulletRow>(
       if (filters.fit !== undefined && !bulletFits(b.diameter, filters.fit)) return []
       const e = entryOf(b)
       const base = bulletScore(b, e.key, query)
-      if (base === undefined || !bulletMatches(b, state, e.key)) return []
+      if (base === undefined || !inFilters(b, filters)) return []
       return [{ b, e, score: sort === 'relevance' ? base + bonus(b, e, words) : 0 }]
     })
     .sort((x, y) => {

@@ -1,9 +1,10 @@
 'use client'
 
 import { Button, CloseButton, Popover, Tooltip } from '@mantine/core'
-import { ArrowsLeftRight } from '@phosphor-icons/react'
+import { ArrowsLeftRight, X } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useId, useLayoutEffect, useRef, useState } from 'react'
+import { togglePick } from '../lib/selection.ts'
 import { controlSize } from '../lib/theme.ts'
 import { AppPopover } from './app-popover.tsx'
 
@@ -21,13 +22,9 @@ export function usePicks(
     .split(',')
     .filter((id) => id && known(id))
     .slice(0, max)
-  const toggle = (id: string) =>
-    onChange(
-      (picked.includes(id) ? picked.filter((x) => x !== id) : [...picked, id].slice(0, max)).join(
-        ',',
-      ),
-    )
-  return [picked, toggle] as const
+  const toggle = (id: string) => onChange(togglePick(picked, id, max).join(','))
+  const replace = (ids: readonly string[]) => onChange(ids.join(','))
+  return [picked, toggle, replace] as const
 }
 
 /** The picks as removable chips, one `li` each. */
@@ -52,17 +49,20 @@ function ChipItems({
  * The picks for the page bar's status line, after the list's count: "n of max" and one removable
  * chip each, also for rows a filter hides. Chips that do not fit the line's width give way to
  * "n selected" with the full list in a popover, so a pick moves nothing and no name is cut.
+ * "Clear selection" unticks them all.
  */
 export function PickedChips({
   ids,
   max,
   name,
   onRemove,
+  onClear,
 }: {
   ids: readonly string[]
   max: number
   name: (id: string) => string
   onRemove: (id: string) => void
+  onClear: () => void
 }) {
   const slot = useRef<HTMLDivElement>(null)
   const list = useRef<HTMLUListElement>(null)
@@ -104,10 +104,31 @@ export function PickedChips({
                 <ul className="picked-list" aria-label="Selected for Compare">
                   <ChipItems ids={ids} name={name} onRemove={onRemove} />
                 </ul>
+                <Button
+                  variant="subtle"
+                  size={controlSize.row.button}
+                  leftSection={<X size={12} aria-hidden="true" />}
+                  onClick={onClear}
+                >
+                  Clear selection
+                </Button>
               </Popover.Dropdown>
             </AppPopover>
           )}
         </div>
+      )}
+      {ids.length > 0 && (
+        <Button
+          className="clear-picks"
+          variant="subtle"
+          size={controlSize.row.button}
+          px={6}
+          aria-label="Clear selection"
+          leftSection={<X size={12} aria-hidden="true" />}
+          onClick={onClear}
+        >
+          <span className="clear-picks-text">Clear</span>
+        </Button>
       )}
     </>
   )

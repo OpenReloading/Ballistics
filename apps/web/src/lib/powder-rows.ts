@@ -1,18 +1,11 @@
-/** The powder list's rows: filters and the packed page props. */
+/** The powder list's rows: search and the packed page props. */
 import type { PowderRow } from './burn-rate.ts'
-import { type DirectoryState, inRange, numberRange, present } from './directory.ts'
+import { present } from './directory.ts'
 import { matchesQuery } from './lists.ts'
 
-/** Whether a powder row passes every filter of `s` (the sort aside). */
-export function powderMatches(r: PowderRow, s: DirectoryState): boolean {
-  if (s.manufacturer && r.manufacturer !== s.manufacturer) return false
-  if (s.base && r.propellantBase !== s.base) return false
-  if (s.form && r.grainForm !== s.form) return false
-  if (s.curve && r.burnRateOrder === undefined) return false
-  if (s.country && r.country !== s.country) return false
-  if (!inRange(r.burnRateOrder, numberRange(s.burnRateOrder ?? '', ['']))) return false
-  return matchesQuery([r.manufacturerName, ...(r.manufacturerAliases ?? []), r.name], s.query)
-}
+/** Whether a powder row matches the search `query`. */
+export const powderMatches = (r: PowderRow, query: string) =>
+  matchesQuery([r.manufacturerName, ...(r.manufacturerAliases ?? []), r.name], query)
 
 export type PackedPowder = [
   string,

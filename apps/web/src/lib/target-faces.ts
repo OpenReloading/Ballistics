@@ -1,4 +1,4 @@
-/** The target face list's rows and filter, and a face record's value groups and event rows. */
+/** The target face list's rows and search, and a face record's value groups and event rows. */
 import {
   compareDisciplines,
   compareNames,
@@ -7,7 +7,6 @@ import {
   type TargetMapping,
   toSi,
 } from '@open-reloading/schema'
-import type { DirectoryState } from './directory.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
 import type { Face } from './face-organization.ts'
 import { matchesQuery } from './lists.ts'
@@ -48,10 +47,9 @@ export function targetFaceRow(f: Face, mappings: readonly MappingSummary[]): Tar
   }
 }
 
-/** Whether a face row passes the federation filter and the search. */
-export const targetFaceMatches = (r: TargetFaceRow, s: DirectoryState) =>
-  (!s.organization || r.organization === s.organization) &&
-  matchesQuery([r.name, r.organization, ...r.events], s.query)
+/** Whether a face row matches the search `query`. */
+export const targetFaceMatches = (r: TargetFaceRow, query: string) =>
+  matchesQuery([r.name, r.organization, ...r.events], query)
 
 const length = (label: string, mm: number | undefined, printed?: string): FieldRow[] =>
   mm === undefined

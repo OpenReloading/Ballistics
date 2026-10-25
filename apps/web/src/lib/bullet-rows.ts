@@ -2,14 +2,7 @@
 import { fold, score, searchKey, toSi } from '@open-reloading/schema'
 import type { BulletSummary } from './api-types.ts'
 import { caliberLabel, commonCaliber } from './caliber.ts'
-import {
-  convertMass,
-  type DirectoryState,
-  inRange,
-  massRange,
-  numberRange,
-  present,
-} from './directory.ts'
+import { present } from './directory.ts'
 import { formatNumber, inchText, kilogramsPerGrain, type UnitSystem } from './units.ts'
 
 /** A catalogue bullet of the list: the summary with the name of its manufacturer. */
@@ -79,35 +72,9 @@ export function bulletScore(b: BulletRow, key: string, query: string): number | 
   return score(key, words.filter((w) => !massWord.exec(w)?.[2]).join(' '))
 }
 
-/** Whether a bullet passes every filter of `s` (the sort aside); `key` precomputed for speed. */
-export function bulletMatches(
-  b: BulletRow,
-  s: DirectoryState,
-  key: string = bulletKey(b),
-): boolean {
-  if (s.manufacturer && b.manufacturer !== s.manufacturer) return false
-  if (s.caliber && commonCaliber(b.diameter) !== s.caliber) return false
-  if (
-    (s.dragModel === 'G1' && b.ballisticCoefficientG1 === null) ||
-    (s.dragModel === 'G7' && b.ballisticCoefficientG7 === null)
-  )
-    return false
-  if (s.country && b.country !== s.country) return false
-  if (s.tipType && b.tipType !== s.tipType) return false
-  if (s.construction && b.construction !== s.construction) return false
-  // the BC the column shows, at its 3 decimals
-  const bc = numberRange(s.ballisticCoefficient ?? '', [''])
-  const shownBc = bc && bulletBallisticCoefficient(b, s.dragModel)
-  if (bc && !inRange(shownBc && Number(shownBc.value.toFixed(3)), bc)) return false
-  const range = massRange(s.mass)
-  if (range) {
-    if (b.mass === null) return false
-    // compared at the display rounding, so 168 gr lies in 150-168gr
-    const shown = convertMass(b.mass, 'g', range.unit)
-    if (range.min !== undefined && shown < range.min) return false
-    if (range.max !== undefined && shown > range.max) return false
-  }
-  return bulletScore(b, key, s.query) !== undefined
+/** Whether a bullet matches the search `query`; `key` precomputed for speed. */
+export function bulletMatches(b: BulletRow, query: string, key: string = bulletKey(b)): boolean {
+  return bulletScore(b, key, query) !== undefined
 }
 
 /** A bullet's cells in the preset's units, rounded for display; empty without a value. */
@@ -134,30 +101,28 @@ export function bulletCells(b: BulletRow, system: UnitSystem) {
 type BallisticCoefficient = { model: 'G1' | 'G7'; value: number }
 
 /**
- * The BC column: the manufacturer's published coefficient of the drag model
- * `drag` ("G1", "G7"), or with any model G7 where given, else G1; `other` the other model's.
+ * The BC column: the manufacturer's published coefficient, G7 where given, else G1; `other` the
+ * other model's.
  */
 export function bulletBallisticCoefficient(
   b: Pick<BulletSummary, 'ballisticCoefficientG1' | 'ballisticCoefficientG7'>,
-  drag: string | undefined,
 ): (BallisticCoefficient & { other?: BallisticCoefficient }) | undefined {
   const g1: BallisticCoefficient | undefined =
     b.ballisticCoefficientG1 === null ? undefined : { model: 'G1', value: b.ballisticCoefficientG1 }
   const g7: BallisticCoefficient | undefined =
     b.ballisticCoefficientG7 === null ? undefined : { model: 'G7', value: b.ballisticCoefficientG7 }
-  const [shown, other] = drag === 'G1' ? [g1, g7] : drag === 'G7' ? [g7, g1] : g7 ? [g7, g1] : [g1]
+  const [shown, other] = g7 ? [g7, g1] : [g1]
   return shown && (other ? { ...shown, other } : shown)
 }
 
-/** Sort key of the BC column: with any model the drag model first (G1, then G7), then the value. */
+/** Sort key of the BC column: the drag model first (G1, then G7), then the value. */
 export function bulletBallisticCoefficientSort(
   b: Pick<BulletSummary, 'ballisticCoefficientG1' | 'ballisticCoefficientG7'>,
-  drag: string | undefined,
 ) {
-  const bc = bulletBallisticCoefficient(b, drag)
+  const bc = bulletBallisticCoefficient(b)
   if (!bc) return
   // BCs lie below 10 lb/in²
-  return drag === 'G1' || drag === 'G7' || bc.model === 'G1' ? bc.value : 10 + bc.value
+  return bc.model === 'G1' ? bc.value : 10 + bc.value
 }
 
 /** A BC as the list shows it: "0.264 G7". */

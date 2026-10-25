@@ -1,16 +1,14 @@
 'use client'
 
-import { Button, Select } from '@mantine/core'
+import { Button } from '@mantine/core'
 import { toSi } from '@open-reloading/schema'
 import { Plus } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useDeferredValue, useMemo } from 'react'
-import { compareNames } from '../lib/face-order.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { countText, filterText } from '../lib/lists.ts'
 import type { Origin } from '../lib/sources.ts'
 import { distanceText, type TargetFaceRow, targetFaceMatches } from '../lib/target-faces.ts'
-import { controlSize } from '../lib/theme.ts'
 import { formatQuantity } from '../lib/units.ts'
 import {
   type DirectoryColumn,
@@ -31,12 +29,11 @@ export function TargetFaceList({ items }: { items: TargetFaceRow[] }) {
   const { system } = useUnits()
   const [state, set, clear] = useListState()
   const filters = useDeferredValue(state)
-  const organizations = useMemo(
-    () => [...new Set(items.map((r) => r.organization))].sort(compareNames),
-    [items],
+  const shown = useMemo(
+    () => items.filter((r) => targetFaceMatches(r, filters.query)),
+    [items, filters],
   )
-  const shown = useMemo(() => items.filter((r) => targetFaceMatches(r, filters)), [items, filters])
-  const named = [state.organization, state.query.trim() && `matching "${state.query.trim()}"`]
+  const named = [state.query.trim() && `matching "${state.query.trim()}"`]
   const outer = (r: TargetFaceRow) => formatQuantity('length', system, toSi('length', r.outer))
   const columns: DirectoryColumn<TargetFaceRow>[] = [
     { key: 'name', label: 'Name', value: (r) => r.name, cell: (r) => r.name },
@@ -115,8 +112,6 @@ export function TargetFaceList({ items }: { items: TargetFaceRow[] }) {
           query={state.query}
           onQuery={(q) => set({ query: q })}
           placeholder="Name, federation or event, 25 m…"
-          active={Boolean(state.query || state.organization)}
-          onClear={clear}
           sorting={{ columns, sort: state.sort, onSort: (sort) => set({ sort }) }}
         >
           <SourceFilter
@@ -124,15 +119,6 @@ export function TargetFaceList({ items }: { items: TargetFaceRow[] }) {
             counts={{ openreloading: items.length, user: 0 }}
             sources={faceSources}
             onChange={(src) => set({ sources: src })}
-          />
-          <Select
-            aria-label="Federation"
-            placeholder="Federation"
-            size={controlSize.row.input}
-            clearable
-            data={organizations}
-            value={state.organization || null}
-            onChange={(v) => set({ organization: v ?? '' })}
           />
         </DirectoryFilters>
         <DirectoryTable
@@ -150,7 +136,7 @@ export function TargetFaceList({ items }: { items: TargetFaceRow[] }) {
           noun="faces"
           sort={state.sort}
           onSort={(sort) => set({ sort })}
-          empty={<EmptyList noun="target faces" filters={filterText(named)} />}
+          empty={<EmptyList noun="target faces" filters={filterText(named)} onClear={clear} />}
         />
       </div>
     </>
