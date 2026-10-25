@@ -124,3 +124,9 @@ it('lists the designs for a first key without reading the catalogue', async () =
   expect(await findBullets(designs, '', 20)).toEqual({ total: 1, items: designs })
   expect(await findBullets(designs, 'x', 20)).toEqual({ total: 0, items: [] })
 })
+
+it('keeps the matching designs when the catalogue cannot be read', async () => {
+  const designs = rows.filter((r) => r.origin === 'user')
+  expect((await findBullets(designs, 'design', 20)).items).toEqual(designs)
+  await expect(findBullets(designs, 'nothing like it', 20)).rejects.toThrow()
+})

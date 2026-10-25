@@ -133,7 +133,7 @@ export function RecordSearch<T extends { id: string }>({
   let message = ''
   if (state.status === 'loading') message = 'Searching'
   else if (state.status === 'error') message = unreachableText
-  else if (state.status === 'ok')
+  else if (state.status === 'ok' && q.trim() !== '')
     message =
       items.length === 0
         ? noneText

@@ -150,8 +150,18 @@ export async function findBullets(
   limit: number,
   fit?: CartridgeDiameters,
 ): Promise<ListOf<BulletRow>> {
-  const rows = text.trim().length < 2 ? designs : [...designs, ...(await fetchBulletCatalogue())]
-  const found = searchBullets(rows, text, { manufacturer: '', caliber: '', mass: '', fit })
+  const filters = { manufacturer: '', caliber: '', mass: '', fit }
+  const own = searchBullets(designs, text, filters)
+  // the designs live in the browser: they stay listed while the catalogue cannot be read
+  const catalogue =
+    text.trim().length < 2
+      ? []
+      : await fetchBulletCatalogue().catch((e) => {
+          if (own.length === 0) throw e
+          return []
+        })
+  const found =
+    catalogue.length === 0 ? own : searchBullets([...designs, ...catalogue], text, filters)
   return { total: found.length, items: found.slice(0, limit) }
 }
 
