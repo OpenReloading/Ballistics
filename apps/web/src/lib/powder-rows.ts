@@ -18,7 +18,6 @@ export type PackedPowder = [
   number | null,
   number | null,
   number | null,
-  string | null,
   string[] | null,
 ]
 
@@ -35,7 +34,6 @@ export const packPowders = (rows: readonly PowderRow[]): PackedPowder[] =>
     r.low ?? null,
     r.high ?? null,
     r.burnRateOrder ?? null,
-    r.country ?? null,
     r.manufacturerAliases ?? null,
   ])
 
@@ -52,7 +50,6 @@ export const unpackPowders = (rows: readonly PackedPowder[]): PowderRow[] =>
       low,
       high,
       burnRateOrder,
-      country,
       manufacturerAliases,
     ]) => ({
       id,
@@ -66,7 +63,6 @@ export const unpackPowders = (rows: readonly PackedPowder[]): PowderRow[] =>
         low,
         high,
         burnRateOrder,
-        country,
         manufacturerAliases,
       }),
     }),

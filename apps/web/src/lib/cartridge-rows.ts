@@ -64,7 +64,6 @@ export type PackedCartridge = [
   number | null,
   number | null,
   CartridgeRow['caseType'] | null,
-  string | null,
 ]
 
 /**
@@ -88,25 +87,14 @@ export const packCartridges = (rows: readonly CartridgeRow[]): PackedCartridge[]
     c.cartridgeLength ?? null,
     c.pmax ?? null,
     c.caseType ?? null,
-    c.country ?? null,
   ])
 
 export const unpackCartridges = (rows: readonly PackedCartridge[]): CartridgeRow[] =>
   rows.map(
-    ([
+    ([id, name, aliases, maxBulletDiameter, caseLength, cartridgeLength, pmax, caseType]) => ({
       id,
       name,
       aliases,
-      maxBulletDiameter,
-      caseLength,
-      cartridgeLength,
-      pmax,
-      caseType,
-      country,
-    ]) => ({
-      id,
-      name,
-      aliases,
-      ...present({ maxBulletDiameter, caseLength, cartridgeLength, pmax, caseType, country }),
+      ...present({ maxBulletDiameter, caseLength, cartridgeLength, pmax, caseType }),
     }),
   )

@@ -653,6 +653,10 @@ function SortSelect({
   )
 }
 
+/** Moves the focus to the search box: where it goes when the control that held it is removed. */
+export const focusSearch = () =>
+  document.querySelector<HTMLInputElement>('.directory-search input')?.focus()
+
 /** A scope the page was opened with (a cartridge's fit, a federation): named, with a button that lifts it. */
 type Scope = { label: string; onRemove: () => void }
 
@@ -712,7 +716,13 @@ export function DirectoryFilters({
       {scope && (
         <span className="scope-chip">
           <span title={scope.label}>{scope.label}</span>
-          <CloseButton aria-label={`Remove ${scope.label}`} onClick={scope.onRemove} />
+          <CloseButton
+            aria-label={`Remove ${scope.label}`}
+            onClick={() => {
+              scope.onRemove()
+              focusSearch()
+            }}
+          />
         </span>
       )}
       {sorting && <SortSelect {...sorting} />}

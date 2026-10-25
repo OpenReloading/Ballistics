@@ -7,6 +7,7 @@ import { useId, useLayoutEffect, useRef, useState } from 'react'
 import { togglePick } from '../lib/selection.ts'
 import { controlSize } from '../lib/theme.ts'
 import { AppPopover } from './app-popover.tsx'
+import { focusSearch } from './directory-table.tsx'
 
 /**
  * The rows ticked for Compare, in the order ticked, at most `max`, kept in the list's
@@ -64,6 +65,11 @@ export function PickedChips({
   onRemove: (id: string) => void
   onClear: () => void
 }) {
+  // the Clear buttons leave with the picks: the focus goes to the search box
+  const clear = () => {
+    onClear()
+    focusSearch()
+  }
   const slot = useRef<HTMLDivElement>(null)
   const list = useRef<HTMLUListElement>(null)
   const [over, setOver] = useState(false)
@@ -108,7 +114,7 @@ export function PickedChips({
                   variant="subtle"
                   size={controlSize.row.button}
                   leftSection={<X size={12} aria-hidden="true" />}
-                  onClick={onClear}
+                  onClick={clear}
                 >
                   Clear selection
                 </Button>
@@ -125,7 +131,7 @@ export function PickedChips({
           px={6}
           aria-label="Clear selection"
           leftSection={<X size={12} aria-hidden="true" />}
-          onClick={onClear}
+          onClick={clear}
         >
           <span className="clear-picks-text">Clear</span>
         </Button>

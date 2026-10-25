@@ -68,16 +68,11 @@ it('keeps the rows picked for Compare in the URL, in the order picked', () => {
 })
 
 it('packs the rows of the lists and back', () => {
-  const bullets = [
-    bullet({ country: 'US', tipType: 'soft-point', construction: 'bonded' }),
-    bullet({ id: 'y' }),
-  ]
+  const bullets = [bullet({ manufacturerAliases: ['B'] }), bullet({ id: 'y' })]
   expect(unpackBullets(packBullets(bullets))).toEqual(bullets)
-  const cartridges = [cartridge({ country: 'US' }), cartridge({ id: 'y' })]
+  const cartridges = [cartridge({ aliases: ['x'] }), cartridge({ id: 'y' })]
   expect(unpackCartridges(packCartridges(cartridges))).toEqual(cartridges)
-  const powders = orderPowders([
-    { id: 'a', manufacturer: 'm', manufacturerName: 'M', name: 'a', country: 'FI' },
-  ])
+  const powders = orderPowders([{ id: 'a', manufacturer: 'm', manufacturerName: 'M', name: 'a' }])
   expect(unpackPowders(packPowders(powders))).toEqual(powders)
 })
 

@@ -9699,6 +9699,11 @@ main .page-bar h1 {
   flex: none;
 }
 
+/* the status line clips: the focus ring stays inside the button */
+.clear-picks:focus-visible {
+  outline-offset: -2px;
+}
+
 /* a phone's status line is 150 px: while rows are picked, the chip that opens the picks has it and
    the count steps aside, still read by screen readers */
 @media screen and (max-width: 47.99em) {
@@ -10271,6 +10276,7 @@ main .page-bar h1 {
 
 .directory-table .select-cell {
   text-align: center;
+  user-select: none;
 }
 
 /* before hydration the cell swallows clicks (directory-table.tsx): the row link beneath would open

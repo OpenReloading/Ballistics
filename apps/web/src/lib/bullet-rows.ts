@@ -140,9 +140,6 @@ export type PackedBullet = [
   number | null,
   number | null,
   number | null,
-  string | null,
-  string | null,
-  string | null,
   string[] | null,
 ]
 
@@ -157,9 +154,6 @@ export const packBullets = (rows: readonly BulletItem[]): PackedBullet[] =>
     b.length,
     b.ballisticCoefficientG1,
     b.ballisticCoefficientG7,
-    b.country ?? null,
-    b.tipType ?? null,
-    b.construction ?? null,
     b.manufacturerAliases ?? null,
   ])
 
@@ -175,9 +169,6 @@ export const unpackBullets = (rows: readonly PackedBullet[]): BulletItem[] =>
       length,
       ballisticCoefficientG1,
       ballisticCoefficientG7,
-      country,
-      tipType,
-      construction,
       manufacturerAliases,
     ]) => ({
       id,
@@ -189,6 +180,6 @@ export const unpackBullets = (rows: readonly PackedBullet[]): BulletItem[] =>
       length,
       ballisticCoefficientG1,
       ballisticCoefficientG7,
-      ...present({ country, tipType, construction, manufacturerAliases }),
+      ...present({ manufacturerAliases }),
     }),
   )

@@ -82,21 +82,3 @@ export function caliberOptions(diameters: readonly number[]) {
     { group: 'Other diameters', items: items(false) },
   ].filter((g) => g.items.length > 0)
 }
-
-/** The most common diameter (mm, to 0.01) of each caliber option group, the smaller on a tie: shown beside its name. */
-export function caliberDiameters(diameters: readonly number[]): Map<string, number> {
-  const counts = new Map<string, Map<number, number>>()
-  for (const mm of diameters) {
-    const name = commonCaliber(mm)
-    const group = counts.get(name) ?? new Map<number, number>()
-    const key = Number(mm.toFixed(2))
-    group.set(key, (group.get(key) ?? 0) + 1)
-    counts.set(name, group)
-  }
-  return new Map(
-    [...counts].map(([name, group]) => [
-      name,
-      [...group].sort((a, b) => b[1] - a[1] || a[0] - b[0])[0][0],
-    ]),
-  )
-}
