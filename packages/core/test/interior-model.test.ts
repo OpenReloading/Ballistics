@@ -352,6 +352,27 @@ const full = (heat = true): InteriorLoad => ({
     : { model: 'none' },
 })
 
+type InteriorPoints = Extract<ReturnType<typeof interior>, { valid: true }>
+
+/** Integral of `flux` over the curve by the trapezoidal rule in time. */
+function trapezoid(
+  points: InteriorPoints['points'],
+  flux: (p: InteriorPoints['points'][number]) => number,
+) {
+  let sum = 0
+  for (let i = 1; i < points.length; i++) {
+    const [p0, p1] = [points[i - 1], points[i]]
+    sum += ((p1.time - p0.time) * (flux(p0) + flux(p1))) / 2
+  }
+  return sum
+}
+
+/** Before the shot starts the gas is at the flame temperature of 2900 K. */
+function expectFlameTemperatureWhileHeld(r: InteriorPoints) {
+  for (const p of r.points)
+    if (p.time < r.shotStartTime) expect(rel(p.gasTemperature ?? 0, 2900)).toBeLessThan(1e-12)
+}
+
 describe('energy and consistency checks', () => {
   // consistency: the gas energy is defined by the same expression as the pressure, so the sum holds by construction
   it('energy terms add up to m_c Q z; resistance work equals its integral over travel', () => {
@@ -464,16 +485,9 @@ describe('energy and consistency checks', () => {
         const h = ((0.023 * ((mu * cp) / pr)) / d) * re ** 0.8 * pr ** (t > 300 ? 0.3 : 0.4)
         return factor * h * Math.PI * d * (p.travel + vc / area) * (t - 300)
       }
-      let heat = 0
-      for (let i = 1; i < r.points.length; i++) {
-        const [p0, p1] = [r.points[i - 1], r.points[i]]
-        heat += ((p1.time - p0.time) * (flux(p0) + flux(p1))) / 2
-      }
-      expect(rel(heat, r.energy.heat)).toBeLessThan(1e-6)
+      expect(rel(trapezoid(r.points, flux), r.energy.heat)).toBeLessThan(1e-6)
       // while held without leakage, no heat is lost and the gas is at the flame temperature
-      if (!leak)
-        for (const p of r.points)
-          if (p.time < r.shotStartTime) expect(rel(p.gasTemperature ?? 0, 2900)).toBeLessThan(1e-12)
+      if (!leak) expectFlameTemperatureWhileHeld(r)
     }
   })
 })
@@ -873,18 +887,20 @@ describe('gas leakage (apps/docs/docs/models/interior-leakage-heat.md)', () => {
     }
   })
 
+  const expectFlowStartsAt = (pa: number, load: InteriorLoad) => {
+    const r = interior(load)
+    if (!r.valid) throw new Error(r.reason)
+    for (const p of r.points) if (p.basePressure <= pa) expect(p.leakedMass).toBe(0)
+    expect(r.points.some((p) => rel(p.basePressure, pa) < 1e-9)).toBe(true)
+    expect(r.points.at(-1)?.leakedMass).toBeGreaterThan(0)
+  }
+
   it('flow starts when the base pressure rises through the back pressure', () => {
     const runs: [number, InteriorLoad][] = [
       [101325, { ...leaky(1e-7), ignitionPressure: 5e4 }],
       [2e6, { ...leaky(1e-7, { backPressure: 2e6 }), ignitionPressure: 1e6 }],
     ]
-    for (const [pa, load] of runs) {
-      const r = interior(load)
-      if (!r.valid) throw new Error(r.reason)
-      for (const p of r.points) if (p.basePressure <= pa) expect(p.leakedMass).toBe(0)
-      expect(r.points.some((p) => rel(p.basePressure, pa) < 1e-9)).toBe(true)
-      expect(r.points.at(-1)?.leakedMass).toBeGreaterThan(0)
-    }
+    for (const [pa, load] of runs) expectFlowStartsAt(pa, load)
     // back pressure equal to the initial pressure: no onset event can fire, the flow still starts
     const start = interior(full())
     if (!start.valid) throw new Error(start.reason)

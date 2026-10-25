@@ -6,45 +6,54 @@
 
 import { type HuberLoss, huberCost, huberRoots } from './huber.ts'
 
+/** Whether the off-diagonal part of `m` is negligible against its diagonal. */
+function isDiagonal(m: number[][]): boolean {
+  const n = m.length
+  let off = 0
+  let diag = 0
+  for (let i = 0; i < n; i++) {
+    diag += m[i][i] ** 2
+    for (let j = i + 1; j < n; j++) off += m[i][j] ** 2
+  }
+  return off <= 1e-32 * diag
+}
+
+/** One Jacobi rotation of `m` that zeroes entry (p, q), accumulated into the vectors `v`. */
+function rotate(m: number[][], v: number[][], p: number, q: number) {
+  const n = m.length
+  const theta = (m[q][q] - m[p][p]) / (2 * m[p][q])
+  const t = (theta < 0 ? -1 : 1) / (Math.abs(theta) + Math.sqrt(theta * theta + 1))
+  const c = 1 / Math.sqrt(t * t + 1)
+  const s = t * c
+  for (let k = 0; k < n; k++) {
+    const kp = m[k][p]
+    const kq = m[k][q]
+    m[k][p] = c * kp - s * kq
+    m[k][q] = s * kp + c * kq
+  }
+  for (let k = 0; k < n; k++) {
+    const pk = m[p][k]
+    const qk = m[q][k]
+    m[p][k] = c * pk - s * qk
+    m[q][k] = s * pk + c * qk
+  }
+  for (let k = 0; k < n; k++) {
+    const kp = v[k][p]
+    const kq = v[k][q]
+    v[k][p] = c * kp - s * kq
+    v[k][q] = s * kp + c * kq
+  }
+}
+
 /** Cyclic Jacobi eigen decomposition of a symmetric matrix; vectors[i][k]: entry i of vector k. */
 function eigen(a: number[][]): { values: number[]; vectors: number[][] } {
   const n = a.length
   const m = a.map((r) => [...r])
   const v: number[][] = a.map((_, i) => a.map((_, j) => (i === j ? 1 : 0)))
   for (let sweep = 0; sweep < 100; sweep++) {
-    let off = 0
-    let diag = 0
-    for (let i = 0; i < n; i++) {
-      diag += m[i][i] ** 2
-      for (let j = i + 1; j < n; j++) off += m[i][j] ** 2
-    }
-    if (off <= 1e-32 * diag) break
+    if (isDiagonal(m)) break
     for (let p = 0; p < n - 1; p++)
-      for (let q = p + 1; q < n; q++) {
-        if (m[p][q] === 0) continue
-        const theta = (m[q][q] - m[p][p]) / (2 * m[p][q])
-        const t = (theta < 0 ? -1 : 1) / (Math.abs(theta) + Math.sqrt(theta * theta + 1))
-        const c = 1 / Math.sqrt(t * t + 1)
-        const s = t * c
-        for (let k = 0; k < n; k++) {
-          const kp = m[k][p]
-          const kq = m[k][q]
-          m[k][p] = c * kp - s * kq
-          m[k][q] = s * kp + c * kq
-        }
-        for (let k = 0; k < n; k++) {
-          const pk = m[p][k]
-          const qk = m[q][k]
-          m[p][k] = c * pk - s * qk
-          m[q][k] = s * pk + c * qk
-        }
-        for (let k = 0; k < n; k++) {
-          const kp = v[k][p]
-          const kq = v[k][q]
-          v[k][p] = c * kp - s * kq
-          v[k][q] = s * kp + c * kq
-        }
-      }
+      for (let q = p + 1; q < n; q++) if (m[p][q] !== 0) rotate(m, v, p, q)
   }
   return { values: m.map((r, i) => r[i]), vectors: v }
 }
@@ -234,12 +243,55 @@ function parameterCovariance(j: number[][], scale: number): number[][] {
   return inverse(transposeTimes(j, j)).map((row) => row.map((x) => x * scale))
 }
 
+const scaled = (m: number[][], w: number[]) => m.map((row, i) => row.map((x) => x * w[i]))
+
+/** The Levenberg-Marquardt step from the Jacobian `j`, residuals `r` with root weights `w`, damped by `lambda`. */
+function levenbergMarquardtStep(j: number[][], r: number[], w: number[], lambda: number) {
+  const jw = scaled(j, w)
+  const a = transposeTimes(jw, jw)
+  const g = transposeTimes(
+    jw,
+    r.map((x, i) => [x * w[i]]),
+  ).map((row) => row[0])
+  const damped = a.map((row, k) => row.map((x, l) => (k === l ? x * (1 + lambda) : x)))
+  const inv = inverse(damped)
+  return inv.map((row) => -row.reduce((s, x, l) => s + x * g[l], 0))
+}
+
+/** The covariance of a fit with its standard errors and correlations. */
+function covarianceSummary(covariance: number[][]) {
+  return {
+    covariance,
+    standardUncertainty: covariance.map((row, k) => Math.sqrt(row[k])),
+    correlation: covariance.map((row, k) =>
+      row.map((x, l) => x / Math.sqrt(covariance[k][k] * covariance[l][l])),
+    ),
+  }
+}
+
+/** Fails with `not-converged` once `iterations` reaches the limit. */
+function checkIterations(fit: LogFitInput, iterations: number, j: number[][], theta: number[]) {
+  if (iterations < fit.maxIterations) return
+  // a parameter that ran to where it has no effect is unresolved, not slow
+  checkConditioning(fit, j, theta)
+  fit.fail('not-converged', theta)
+}
+
+/** Whether an accepted step from cost `cost` to `next` is too small to continue. */
+const stalled = (cost: number, next: number) => (cost - next) / cost < 1e-12 || next === 0
+
+/** The covariance, standard errors and correlations at the solution; none without residual degrees of freedom. */
+function covarianceOf(fit: LogFitInput, jw: number[][], cost: number, dof: number) {
+  if (!(fit.weighted || dof > 0)) return {}
+  return covarianceSummary(parameterCovariance(jw, fit.weighted ? 1 : cost / dof))
+}
+
 /**
  * Levenberg-Marquardt on the log parameters, starting at theta = 0
  * (`apps/docs/docs/models/least-squares.md`, "Levenberg-Marquardt step").
  */
 export function logLeastSquares(fit: LogFitInput): LogFitResult {
-  const { parameterCount, observed, standardUncertainty: sigma, predict, maxIterations, fail } = fit
+  const { parameterCount, observed, standardUncertainty: sigma, predict } = fit
   const n = observed.length
   const residuals = (values: readonly number[]) =>
     values.map((v, i) => (v - observed[i]) / sigma[i])
@@ -247,7 +299,6 @@ export function logLeastSquares(fit: LogFitInput): LogFitResult {
   const { huber } = fit
   const cost2 = (r: number[]) => (huber ? huberCost(r, huber) : chi2(r))
   const roots = (r: number[]) => huberRoots(r, huber)
-  const scaled = (m: number[][], w: number[]) => m.map((row, i) => row.map((x) => x * w[i]))
 
   const { runs = [n], moves = () => true } = fit
   const start = runs.map((_, k) => runs.slice(0, k).reduce((t, c) => t + c, 0))
@@ -264,35 +315,22 @@ export function logLeastSquares(fit: LogFitInput): LogFitResult {
   let lambda = lambda0
   let iterations = 0
   for (;;) {
-    if (iterations >= maxIterations) {
-      // a parameter that ran to where it has no effect is unresolved, not slow
-      checkConditioning(fit, j, theta)
-      fail('not-converged', theta)
-    }
+    checkIterations(fit, iterations, j, theta)
     iterations++
-    const w = roots(r)
-    const jw = scaled(j, w)
-    const a = transposeTimes(jw, jw)
-    const g = transposeTimes(
-      jw,
-      r.map((x, i) => [x * w[i]]),
-    ).map((row) => row[0])
-    const damped = a.map((row, k) => row.map((x, l) => (k === l ? x * (1 + lambda) : x)))
-    const inv = inverse(damped)
-    const delta = inv.map((row) => -row.reduce((s, x, l) => s + x * g[l], 0))
+    const delta = levenbergMarquardtStep(j, r, roots(r), lambda)
     const small = Math.max(...delta.map(Math.abs)) < 1e-8
     const candidate = theta.map((x, k) => x + delta[k])
     const p = small ? null : predict(candidate, theta)
     const next = p ? cost2(residuals(p)) : Infinity
     if (p && next < cost) {
-      const drop = (cost - next) / cost
       theta = candidate
       predicted = p
       r = residuals(p)
-      cost = next
       lambda /= 10
       current = false
-      if (drop < 1e-12 || cost === 0) break
+      const done = stalled(cost, next)
+      cost = next
+      if (done) break
       j = jacobian(fit, stacking, theta)
       current = true
     } else if (small) break
@@ -301,18 +339,6 @@ export function logLeastSquares(fit: LogFitInput): LogFitResult {
 
   if (!current) j = jacobian(fit, stacking, theta)
   const condition = checkConditioning(fit, j, theta)
-  const dof = n - parameterCount
-  if (!(fit.weighted || dof > 0))
-    return {
-      theta,
-      chiSquare: chi2(r),
-      loss: cost,
-      predicted,
-      conditionNumber: condition,
-      iterations,
-    }
-  const scale = fit.weighted ? 1 : cost / dof
-  const covariance = parameterCovariance(scaled(j, roots(r)), scale)
   return {
     theta,
     chiSquare: chi2(r),
@@ -320,10 +346,6 @@ export function logLeastSquares(fit: LogFitInput): LogFitResult {
     predicted,
     conditionNumber: condition,
     iterations,
-    covariance,
-    standardUncertainty: covariance.map((row, k) => Math.sqrt(row[k])),
-    correlation: covariance.map((row, k) =>
-      row.map((x, l) => x / Math.sqrt(covariance[k][k] * covariance[l][l])),
-    ),
+    ...covarianceOf(fit, scaled(j, roots(r)), cost, n - parameterCount),
   }
 }

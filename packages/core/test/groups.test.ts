@@ -593,21 +593,25 @@ describe('ellipse and CEP coverage (seeded simulation)', () => {
 
   // Each trial: a new group of n shots and one further shot; the prediction ellipse holds the
   // further shot with probability `coverage` over trials, the sample ellipse less often.
+  const coverageTrials = (n: number, trials: number) => {
+    const rng = uniforms(1000 + n)
+    let predicted = 0
+    let sampled = 0
+    for (let t = 0; t < trials; t++) {
+      const group = groupStatistics({ shots: draw(rng, n), distance: 100 })
+      const [next] = draw(rng, 1)
+      const pe = predictionEllipse(group, 0.9)
+      const se = dispersionEllipse(group, 0.9)
+      if (!pe || !se || !group.centre) throw new Error('no ellipse')
+      if (insideEllipse(pe, group.centre, next)) predicted++
+      if (insideEllipse(se, group.centre, next)) sampled++
+    }
+    return { predicted, sampled }
+  }
   for (const n of [3, 5, 10]) {
     it(`prediction ellipse covers 0.9 of new shots at n = ${n}`, () => {
       const trials = 4000
-      const rng = uniforms(1000 + n)
-      let predicted = 0
-      let sampled = 0
-      for (let t = 0; t < trials; t++) {
-        const group = groupStatistics({ shots: draw(rng, n), distance: 100 })
-        const [next] = draw(rng, 1)
-        const pe = predictionEllipse(group, 0.9)
-        const se = dispersionEllipse(group, 0.9)
-        if (!pe || !se || !group.centre) throw new Error('no ellipse')
-        if (insideEllipse(pe, group.centre, next)) predicted++
-        if (insideEllipse(se, group.centre, next)) sampled++
-      }
+      const { predicted, sampled } = coverageTrials(n, trials)
       expect(Math.abs(predicted / trials - 0.9)).toBeLessThan(4 * Math.sqrt(0.09 / trials))
       expect(sampled / trials).toBeLessThan(0.9 - 4 * Math.sqrt(0.09 / trials))
     })

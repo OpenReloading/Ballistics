@@ -584,40 +584,63 @@ interface StatusInput {
   post: Identifiability | null
 }
 
-/** Status, standard errors and, when fitted and identified, the value of each active parameter. */
-function parameterStatuses(input: StatusInput): RangeStringParameter[] {
-  const { model, theta, options, fitted, live, info, post } = input
+/** Why a parameter with these standard errors is weak, none when it is identified. */
+function weakReasons(
+  j: number,
+  dataSigma: number,
+  inflation: number,
+  options: RangeStringOptions,
+  fitted: StatusInput['fitted'],
+): WeakReason[] {
   const { maxInflation = rangeStringDefaults.maxInflation } = options
   const { maxRelativeStandardUncertainty = rangeStringDefaults.maxRelativeStandardUncertainty } =
     options
   const { maxZeroSigma = rangeStringDefaults.maxZeroSigma } = options
+  const reasons: WeakReason[] = []
+  if (!(inflation <= maxInflation)) reasons.push('collinear')
+  if (!(dataSigma <= (j === 3 ? maxZeroSigma : maxRelativeStandardUncertainty)))
+    reasons.push('imprecise')
+  // a parameter outside the fitted set has no fitted value, whatever its numbers say
+  if (fitted && !fitted.kept.includes(j) && reasons.length === 0) reasons.push('collinear')
+  return reasons
+}
+
+/** Status and standard errors of the resolved parameter `j`, column `k` of `info` and `post`. */
+function resolvedStatus(
+  input: StatusInput,
+  j: number,
+  k: number,
+  base: { name: RangeStringParameterName; nominal: number },
+): RangeStringParameter {
+  const { model, theta, options, fitted, info, post } = input
+  // standard error per unit parameter: of ln q, or of the zero offset in rad
+  const dataSigma = info?.standardUncertainty[k] ?? Infinity
+  const inflation = info?.varianceInflation[k] ?? Infinity
+  const reasons = weakReasons(j, dataSigma, inflation, options, fitted)
+  const at = j === 3 ? theta[3] : base.nominal * Math.exp(theta[j])
+  const used = post ? post.standardUncertainty[k] : dataSigma
+  const prior = model.priors.find((p) => p.j === j)
+  const common = {
+    ...base,
+    ...(j === 3 ? {} : { relativeStandardUncertainty: dataSigma }),
+    varianceInflation: inflation,
+    standardUncertainty: j === 3 ? used : at * used,
+    ...(post ? { posteriorSigma: used } : {}),
+    ...(post && prior ? { prior: { sigma: prior.sigma, ratio: used / prior.sigma } } : {}),
+  }
+  if (reasons.length > 0) return { ...common, status: 'weak', reasons }
+  return { ...common, status: 'identified', reasons, ...(fitted ? { value: at } : {}) }
+}
+
+/** Status, standard errors and, when fitted and identified, the value of each active parameter. */
+function parameterStatuses(input: StatusInput): RangeStringParameter[] {
+  const { model, live } = input
   const nominal = [model.shot.muzzleVelocity, 1, model.clickValue, 0]
   return model.active.map((j): RangeStringParameter => {
     const base = { name: names[j], nominal: nominal[j] }
     const k = live.indexOf(j)
     if (k < 0) return { ...base, status: 'unresolved', reasons: ['no-information'] }
-    // standard error per unit parameter: of ln q, or of the zero offset in rad
-    const dataSigma = info?.standardUncertainty[k] ?? Infinity
-    const inflation = info?.varianceInflation[k] ?? Infinity
-    const reasons: WeakReason[] = []
-    if (!(inflation <= maxInflation)) reasons.push('collinear')
-    if (!(dataSigma <= (j === 3 ? maxZeroSigma : maxRelativeStandardUncertainty)))
-      reasons.push('imprecise')
-    // a parameter outside the fitted set has no fitted value, whatever its numbers say
-    if (fitted && !fitted.kept.includes(j) && reasons.length === 0) reasons.push('collinear')
-    const at = j === 3 ? theta[3] : nominal[j] * Math.exp(theta[j])
-    const used = post ? post.standardUncertainty[k] : dataSigma
-    const prior = model.priors.find((p) => p.j === j)
-    const common = {
-      ...base,
-      ...(j === 3 ? {} : { relativeStandardUncertainty: dataSigma }),
-      varianceInflation: inflation,
-      standardUncertainty: j === 3 ? used : at * used,
-      ...(post ? { posteriorSigma: used } : {}),
-      ...(post && prior ? { prior: { sigma: prior.sigma, ratio: used / prior.sigma } } : {}),
-    }
-    if (reasons.length > 0) return { ...common, status: 'weak', reasons }
-    return { ...common, status: 'identified', reasons, ...(fitted ? { value: at } : {}) }
+    return resolvedStatus(input, j, k, base)
   })
 }
 
@@ -915,6 +938,14 @@ interface Refit {
   dropped: Map<number, RangeStringParameter>
 }
 
+/** The kept parameters (by column) a failure of the fit names, none when it names none. */
+function failureParameters(e: TruingError, kept: readonly number[]) {
+  if (e.reason === 'unresolved') return kept.filter((_, i) => e.unresolved?.includes(i))
+  if (e.reason === 'ill-conditioned')
+    return kept.filter((_, i) => Math.abs(e.direction?.[i] ?? 0) > confoundedComponent)
+  return []
+}
+
 /**
  * Fits `kept`, then re-screens at the solution: a parameter kept in the fit that turns out weak is
  * held at its nominal value and the rest is fitted again, so the reported model is the fitted one.
@@ -939,12 +970,7 @@ function refitUntilIdentified(
       a = analyse(model, fitted.theta, options, { kept })
     } catch (e) {
       if (!(e instanceof TruingError) || kept.length === 0) throw e
-      const named =
-        e.reason === 'unresolved'
-          ? kept.filter((_, i) => e.unresolved?.includes(i))
-          : e.reason === 'ill-conditioned'
-            ? kept.filter((_, i) => Math.abs(e.direction?.[i] ?? 0) > confoundedComponent)
-            : []
+      const named = failureParameters(e, kept)
       const left = named.length > 0 ? named : kept
       failures.push({ reason: e.reason as LogFitFailure, parameters: left.map((j) => names[j]) })
       kept = kept.filter((j) => !left.includes(j))

@@ -81,7 +81,7 @@ $$
 \frac{\chi^2_\text{old} - \chi^2_\text{new}}{\chi^2_\text{old}} \lt 10^{-12} \ \text{or}\ \chi^2_\text{new} = 0 \ \text{(accepted step)}, \qquad \max_j \lvert \delta_j \rvert \lt 10^{-8} \ \text{(step not applied)}
 $$
 
-Code: `packages/core/src/least-squares.ts`, `logLeastSquares` (`drop`, `small`).
+Code: `packages/core/src/least-squares.ts`, `logLeastSquares` (`stalled`, `small`).
 
 After `maxIterations` accepted or rejected steps it runs the conditioning check at the current iterate, then fails with reason `not-converged`.
 

@@ -87,6 +87,61 @@ export interface PressureRange {
  */
 export type ApplyTolerance<L> = (load: L, side: number, tolerance: number) => L | string
 
+/** The peak of one moved load, or the reason it has none. */
+function runCase<L>(
+  moved: L | string,
+  peak: (load: L) => number | string,
+): Pick<PressureCase, 'maxPressure' | 'reason'> {
+  const p = typeof moved === 'string' ? moved : peak(moved)
+  if (typeof p === 'string') return { maxPressure: null, reason: p }
+  return Number.isFinite(p) ? { maxPressure: p } : { maxPressure: null, reason: 'nonFinite' }
+}
+
+/** Runs each input at both ends of its tolerance, adds the cases and returns the rising side of each. */
+function singleInputCases<L>(
+  load: L,
+  nominal: number,
+  apply: Record<PressureInput, ApplyTolerance<L>>,
+  peak: (load: L) => number | string,
+  tolerances: PressureTolerances,
+  cases: PressureCase[],
+) {
+  const sides = {} as Record<PressureInput, Side>
+  for (const input of pressureInputs) {
+    const t = tolerances[input]
+    sides[input] = 0
+    if (t === 0) continue
+    const up = runCase(apply[input](load, 1, t), peak)
+    const down = runCase(apply[input](load, -1, t), peak)
+    cases.push({ input, side: 1, ...up }, { input, side: -1, ...down })
+    const hi = up.maxPressure ?? nominal
+    const lo = down.maxPressure ?? nominal
+    sides[input] =
+      up.maxPressure === null && down.maxPressure === null ? 0 : (Math.sign(hi - lo) as Side)
+  }
+  return sides
+}
+
+/** Runs all inputs moved together, each to the end that raises the pressure (or lowers it). */
+function combinedCase<L>(
+  load: L,
+  side: 1 | -1,
+  apply: Record<PressureInput, ApplyTolerance<L>>,
+  peak: (load: L) => number | string,
+  tolerances: PressureTolerances,
+  sides: Record<PressureInput, Side>,
+): PressureCase {
+  let moved: L | string = load
+  const used = {} as Record<PressureInput, Side>
+  for (const input of pressureInputs) {
+    const s = sides[input] === 0 ? 0 : ((sides[input] * side) as 1 | -1)
+    // inputs after one that left the model are not applied, so they are reported as 0
+    used[input] = typeof moved === 'string' ? 0 : s
+    if (s !== 0 && typeof moved !== 'string') moved = apply[input](moved, s, tolerances[input])
+  }
+  return { input: 'all', side, sides: used, ...runCase(moved, peak) }
+}
+
 /**
  * The range of `peak` over the tolerance box of `load`. `peak` returns Pa or a reason for an
  * invalid run; `nominal` is `peak(load)`, computed by the caller.
@@ -99,35 +154,9 @@ export function toleranceRange<L>(
   tolerances: PressureTolerances,
 ): PressureRange {
   const cases: PressureCase[] = []
-  const run = (moved: L | string): Pick<PressureCase, 'maxPressure' | 'reason'> => {
-    const p = typeof moved === 'string' ? moved : peak(moved)
-    if (typeof p === 'string') return { maxPressure: null, reason: p }
-    return Number.isFinite(p) ? { maxPressure: p } : { maxPressure: null, reason: 'nonFinite' }
-  }
-  const sides = {} as Record<PressureInput, Side>
-  for (const input of pressureInputs) {
-    const t = tolerances[input]
-    sides[input] = 0
-    if (t === 0) continue
-    const up = run(apply[input](load, 1, t))
-    const down = run(apply[input](load, -1, t))
-    cases.push({ input, side: 1, ...up }, { input, side: -1, ...down })
-    const hi = up.maxPressure ?? nominal
-    const lo = down.maxPressure ?? nominal
-    sides[input] =
-      up.maxPressure === null && down.maxPressure === null ? 0 : (Math.sign(hi - lo) as Side)
-  }
-  for (const side of [1, -1] as const) {
-    let moved: L | string = load
-    const used = {} as Record<PressureInput, Side>
-    for (const input of pressureInputs) {
-      const s = sides[input] === 0 ? 0 : ((sides[input] * side) as 1 | -1)
-      // inputs after one that left the model are not applied, so they are reported as 0
-      used[input] = typeof moved === 'string' ? 0 : s
-      if (s !== 0 && typeof moved !== 'string') moved = apply[input](moved, s, tolerances[input])
-    }
-    cases.push({ input: 'all', side, sides: used, ...run(moved) })
-  }
+  const sides = singleInputCases(load, nominal, apply, peak, tolerances, cases)
+  for (const side of [1, -1] as const)
+    cases.push(combinedCase(load, side, apply, peak, tolerances, sides))
   const valid = cases.flatMap((c) => (c.maxPressure === null ? [] : [c.maxPressure]))
   return {
     quantity: 'maxPressure',

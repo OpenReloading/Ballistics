@@ -56,6 +56,18 @@ const withAero = (shot: TrajectoryInput, a: object): TrajectoryInput => ({
 })
 const p0 = (2 * Math.PI * 790) / 0.254
 
+/** Simpson's rule over 2000 intervals of the drift integral of the lift `az` up to time `t`. */
+function simpsonDrift(az: (t: number) => number, t: number) {
+  const n = 2000
+  let sum = 0
+  for (let k = 0; k <= n; k++) {
+    const tau = (t * k) / n
+    const w = k === 0 || k === n ? 1 : k % 2 === 1 ? 4 : 2
+    sum += w * (t - tau) * az(tau)
+  }
+  return (sum * t) / (3 * n)
+}
+
 describe('modified point-mass helpers', () => {
   const i = { axialInertia: ix, momentSlope: 2.8, density: 1.2, diameter: 0.00782 }
 
@@ -195,14 +207,7 @@ describe('modified point mass', () => {
       }
       for (const q of r.points) {
         const t = q.time
-        const n = 2000
-        let sum = 0
-        for (let k = 0; k <= n; k++) {
-          const tau = (t * k) / n
-          const w = k === 0 || k === n ? 1 : k % 2 === 1 ? 4 : 2
-          sum += w * (t - tau) * az(tau)
-        }
-        const expected = (sum * t) / (3 * n)
+        const expected = simpsonDrift(az, t)
         expect(Math.abs(q.windage / expected - 1)).toBeLessThan(1e-4)
         expect(Math.abs((q.spin ?? 0) / spin(t) - 1)).toBeLessThan(1e-4)
       }

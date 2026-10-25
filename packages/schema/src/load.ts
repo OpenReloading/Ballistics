@@ -132,6 +132,92 @@ const powderDescription = z
   .object({ ...component, name: z.string().min(1).describe('Product name of the powder.') })
   .describe('The powder as the publication describes it, where no record exists.')
 
+const loadShape = z.object({
+  id: recordId.describe('Id of a catalogue load, the file name without `.json`.').optional(),
+  origin: z
+    .enum(['catalogue', 'user', 'shared'])
+    .describe('Where the record lives: the git catalogue, this browser, or a received file.'),
+  name: text(200)
+    .min(1)
+    .describe('Name of a catalogue load. A user load is named by its record.')
+    .optional(),
+  cartridge: ref('cartridge').optional(),
+  firearm: ref('firearm').optional(),
+  bullet: z
+    .union([ref('bullet'), bulletDescription])
+    .describe('The bullet: a reference, or a description in a measured catalogue load.')
+    .optional(),
+  powder: z
+    .union([catalogueRef('powder'), powderDescription])
+    .describe('The powder: a catalogue reference, or a description in a measured catalogue load.')
+    .optional(),
+  charge: quantity('mass', z.number().positive()).describe('Powder mass of one round.').optional(),
+  capacity: ref('case capacity')
+    .describe('The water capacity of the case: a catalogue capacity, or one the user measured.')
+    .optional(),
+  primer: z
+    .object({ ...component, model: z.string().min(1).describe('Model name of the primer.') })
+    .describe('The primer as described.')
+    .optional(),
+  case: z
+    .strictObject({
+      manufacturerName: component.manufacturerName.optional(),
+      lot: component.lot,
+      firingCount: z.int().min(0).describe('Times the case was fired before this load.').optional(),
+    })
+    .describe('The case as described. Its water capacity is the `capacity` reference.')
+    .optional(),
+  seating: z
+    .object({
+      by: z
+        .enum(['overallLength', 'baseToOgive'])
+        .describe('The length the bullet is seated by: cartridge overall length or base to ogive.'),
+      value: quantity('length', z.number().positive()).describe('That length.'),
+    })
+    .describe('The length the bullet is seated by. The other one is derived.')
+    .optional(),
+  note: text(10000).describe('Notes of the load, plain text.').optional(),
+  analysis: loadAnalysis
+    .describe('The typed solver values and the ladder the load is analysed with.')
+    .optional(),
+  sessions: z
+    .array(ref('session'))
+    .max(50)
+    .describe(
+      "Chronograph sessions read on the Measurements tab. Each names its strings' load and what they vary.",
+    )
+    .optional(),
+  provenance: provenance
+    .describe('Where the values come from. Required for a catalogue load.')
+    .optional(),
+})
+
+type LoadIssue = (path: PropertyKey[], message: string) => void
+type LoadFields = z.infer<typeof loadShape>
+
+const checkCatalogueFields = (l: LoadFields, issue: LoadIssue) => {
+  if (l.id === undefined) issue(['id'], 'A catalogue load needs an id')
+  if (l.name === undefined) issue(['name'], 'A catalogue load needs a name')
+  if (l.provenance === undefined) issue(['provenance'], 'A catalogue load needs provenance')
+  for (const k of ['cartridge', 'bullet', 'powder', 'charge'] as const)
+    if (l[k] === undefined) issue([k], `A catalogue load needs a ${k}`)
+  if (l.capacity !== undefined && !l.capacity.startsWith('catalogue:'))
+    issue(['capacity'], 'A catalogue load names catalogue records only')
+}
+
+const checkRecordReferences = (l: LoadFields, issue: LoadIssue) => {
+  const catalogue = l.origin === 'catalogue'
+  const measured = catalogue && l.provenance?.kind === 'measured'
+  for (const k of ['cartridge', 'firearm', 'bullet', 'powder'] as const) {
+    const target = l[k]
+    if (typeof target !== 'string') {
+      if (target !== undefined && !measured)
+        issue([k], `Name a ${k} record: a description is for measured catalogue data only`)
+    } else if (catalogue && !target.startsWith('catalogue:'))
+      issue([k], `A catalogue load names catalogue records only`)
+  }
+}
+
 /**
  * One cartridge recipe fired from one firearm, for every origin. The cartridge, firearm, bullet, powder
  * and the case capacity are references; a catalogue load of publication data (provenance `measured`) may describe
@@ -141,101 +227,16 @@ const powderDescription = z
  * the typed solver values in `analysis`.
  * Inferred type: {@link Load}.
  */
-export const load = z
-  .object({
-    id: recordId.describe('Id of a catalogue load, the file name without `.json`.').optional(),
-    origin: z
-      .enum(['catalogue', 'user', 'shared'])
-      .describe('Where the record lives: the git catalogue, this browser, or a received file.'),
-    name: text(200)
-      .min(1)
-      .describe('Name of a catalogue load. A user load is named by its record.')
-      .optional(),
-    cartridge: ref('cartridge').optional(),
-    firearm: ref('firearm').optional(),
-    bullet: z
-      .union([ref('bullet'), bulletDescription])
-      .describe('The bullet: a reference, or a description in a measured catalogue load.')
-      .optional(),
-    powder: z
-      .union([catalogueRef('powder'), powderDescription])
-      .describe('The powder: a catalogue reference, or a description in a measured catalogue load.')
-      .optional(),
-    charge: quantity('mass', z.number().positive())
-      .describe('Powder mass of one round.')
-      .optional(),
-    capacity: ref('case capacity')
-      .describe('The water capacity of the case: a catalogue capacity, or one the user measured.')
-      .optional(),
-    primer: z
-      .object({ ...component, model: z.string().min(1).describe('Model name of the primer.') })
-      .describe('The primer as described.')
-      .optional(),
-    case: z
-      .strictObject({
-        manufacturerName: component.manufacturerName.optional(),
-        lot: component.lot,
-        firingCount: z
-          .int()
-          .min(0)
-          .describe('Times the case was fired before this load.')
-          .optional(),
-      })
-      .describe('The case as described. Its water capacity is the `capacity` reference.')
-      .optional(),
-    seating: z
-      .object({
-        by: z
-          .enum(['overallLength', 'baseToOgive'])
-          .describe(
-            'The length the bullet is seated by: cartridge overall length or base to ogive.',
-          ),
-        value: quantity('length', z.number().positive()).describe('That length.'),
-      })
-      .describe('The length the bullet is seated by. The other one is derived.')
-      .optional(),
-    note: text(10000).describe('Notes of the load, plain text.').optional(),
-    analysis: loadAnalysis
-      .describe('The typed solver values and the ladder the load is analysed with.')
-      .optional(),
-    sessions: z
-      .array(ref('session'))
-      .max(50)
-      .describe(
-        "Chronograph sessions read on the Measurements tab. Each names its strings' load and what they vary.",
-      )
-      .optional(),
-    provenance: provenance
-      .describe('Where the values come from. Required for a catalogue load.')
-      .optional(),
+export const load = loadShape.superRefine((l, ctx) => {
+  const issue: LoadIssue = (path, message) => ctx.addIssue({ code: 'custom', path, message })
+  const catalogue = l.origin === 'catalogue'
+  if (catalogue) checkCatalogueFields(l, issue)
+  l.sessions?.forEach((target, i) => {
+    if (catalogue && !target.startsWith('catalogue:'))
+      issue(['sessions', i], 'A catalogue load names catalogue records only')
   })
-  .superRefine((l, ctx) => {
-    const issue = (path: PropertyKey[], message: string) =>
-      ctx.addIssue({ code: 'custom', path, message })
-    const catalogue = l.origin === 'catalogue'
-    const measured = catalogue && l.provenance?.kind === 'measured'
-    if (catalogue) {
-      if (l.id === undefined) issue(['id'], 'A catalogue load needs an id')
-      if (l.name === undefined) issue(['name'], 'A catalogue load needs a name')
-      if (l.provenance === undefined) issue(['provenance'], 'A catalogue load needs provenance')
-      for (const k of ['cartridge', 'bullet', 'powder', 'charge'] as const)
-        if (l[k] === undefined) issue([k], `A catalogue load needs a ${k}`)
-    }
-    if (catalogue && l.capacity !== undefined && !l.capacity.startsWith('catalogue:'))
-      issue(['capacity'], 'A catalogue load names catalogue records only')
-    l.sessions?.forEach((target, i) => {
-      if (catalogue && !target.startsWith('catalogue:'))
-        issue(['sessions', i], 'A catalogue load names catalogue records only')
-    })
-    for (const k of ['cartridge', 'firearm', 'bullet', 'powder'] as const) {
-      const target = l[k]
-      if (typeof target !== 'string') {
-        if (target !== undefined && !measured)
-          issue([k], `Name a ${k} record: a description is for measured catalogue data only`)
-      } else if (catalogue && !target.startsWith('catalogue:'))
-        issue([k], `A catalogue load names catalogue records only`)
-    }
-  })
+  checkRecordReferences(l, issue)
+})
 
 /**
  * A load of the catalogue (`records/loads`): {@link load} with `origin` `catalogue`, which also

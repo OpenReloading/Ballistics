@@ -52,25 +52,29 @@ const infinitePaths = {
   fit: new RegExp(String.raw`^\.result\.(conditionNumber|${stringParameter})$`),
 }
 
+/** Mass, diameter and length of a stability query, the missing ones from the bullet `record`. */
+function fillFromRecord(q: z.infer<typeof stabilityQuery>, record: Bullet) {
+  let { mass, diameter, length } = q
+  const si = bulletSi(record)
+  const fields = [
+    ...(mass === undefined ? ['mass'] : []),
+    ...(diameter === undefined ? ['diameter'] : []),
+    ...(length === undefined && si.length !== undefined ? ['length'] : []),
+  ]
+  mass ??= si.mass
+  diameter ??= si.diameter
+  length ??= si.length
+  return { mass, diameter, length, resolved: { bullet: resolvedRecord(record, fields) } }
+}
+
 /**
  * Mass, diameter and length of a stability query, the missing ones from the bullet `record`, each
  * checked against `stabilityBounds`, with the record's `resolved.bullet` part.
  */
 function stabilityInputs(q: z.infer<typeof stabilityQuery>, record: Bullet | undefined) {
-  let { mass, diameter, length } = q
-  let resolved: { bullet: ReturnType<typeof resolvedRecord> } | undefined
-  if (record) {
-    const si = bulletSi(record)
-    const fields = [
-      ...(mass === undefined ? ['mass'] : []),
-      ...(diameter === undefined ? ['diameter'] : []),
-      ...(length === undefined && si.length !== undefined ? ['length'] : []),
-    ]
-    mass ??= si.mass
-    diameter ??= si.diameter
-    length ??= si.length
-    resolved = { bullet: resolvedRecord(record, fields) }
-  }
+  const { mass, diameter, length, resolved } = record
+    ? fillFromRecord(q, record)
+    : { ...q, resolved: undefined }
   if (mass === undefined || diameter === undefined || length === undefined)
     throw new InputError(`bullet ${q.bullet} has no length`)
   // request values have passed these bounds already; record values have not
