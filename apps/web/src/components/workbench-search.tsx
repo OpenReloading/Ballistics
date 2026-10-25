@@ -5,7 +5,8 @@ import { type createSpotlight, Spotlight, spotlight } from '@mantine/spotlight'
 import type { CartridgeDiameters } from '@openreloading/core'
 import { useEffect, useRef, useState } from 'react'
 import type { BulletSummary, CartridgeSummary, PowderSummary } from '../lib/api-types.ts'
-import { fetchBulletCatalogue, searchBullets } from '../lib/bullet-search.ts'
+import type { BulletRow } from '../lib/bullet-rows.ts'
+import { findBullets } from '../lib/bullet-search.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import { cartridgeOptionText } from '../lib/standards.ts'
 import { searchRecords } from './record-search.tsx'
@@ -13,28 +14,29 @@ import { searchHost } from './search-host.ts'
 import { type Command, useShellActions } from './shell-actions.ts'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 
+const noDesigns: readonly BulletRow[] = []
+
 type Found = {
   cartridges: CartridgeSummary[]
-  bullets: BulletSummary[]
+  bullets: BulletRow[]
   powders: PowderSummary[]
 }
 
 /**
  * The search of each record kind, 8 matches each: cartridges and powders by the API, bullets by
- * the browser's ranking (`searchBullets`, the card's field and dialog), kept to those that fit
- * `fit`.
+ * the browser's ranking (`findBullets`, the card's field and dialog) over `designs` and the
+ * catalogue, kept to those that fit `fit`.
  */
 async function search(
   text: string,
+  designs: readonly BulletRow[],
   fit: CartridgeDiameters | undefined,
   signal: AbortSignal,
 ): Promise<Found> {
   const get = async <T,>(kind: string) => (await searchRecords<T>(kind, text, 8, '', signal)).items
   const [cartridges, bullets, powders] = await Promise.all([
     get<CartridgeSummary>('cartridges'),
-    fetchBulletCatalogue().then((rows) =>
-      searchBullets(rows, text, { manufacturer: '', caliber: '', mass: '', fit }).slice(0, 8),
-    ),
+    findBullets(designs, text, 8, fit).then((found) => found.items),
     get<PowderSummary>('powders'),
   ])
   return { cartridges, bullets, powders }
@@ -54,6 +56,7 @@ export function WorkbenchSearch({
   onBullet,
   onPowder,
   describeBullet,
+  designs = noDesigns,
   bulletFit,
   bulletsLabel,
   search: own,
@@ -61,9 +64,11 @@ export function WorkbenchSearch({
   commands: Command[]
   onRun?: () => void
   onCartridge: (c: CartridgeSummary) => void
-  onBullet: (b: BulletSummary) => void
+  onBullet: (b: BulletRow) => void
   onPowder: (p: PowderSummary) => void
   describeBullet: (b: BulletSummary) => string
+  /** The browser's bullet designs as rows (`userBulletRows`), listed with the catalogue. */
+  designs?: readonly BulletRow[]
   /** Extra query of the bullet search, for example `&cartridge=308-win`. */
   bulletFit?: CartridgeDiameters
   bulletsLabel: string
@@ -106,7 +111,7 @@ export function WorkbenchSearch({
       return
     }
     const controller = new AbortController()
-    search(text, bulletFit, controller.signal)
+    search(text, designs, bulletFit, controller.signal)
       .then((f) => {
         if (!controller.signal.aborted) setFound(f)
       })
@@ -114,7 +119,7 @@ export function WorkbenchSearch({
         if (!controller.signal.aborted) setFound('error')
       })
     return () => controller.abort()
-  }, [text, fitKey])
+  }, [text, fitKey, designs])
 
   const lower = query.trim().toLowerCase()
   const shown = commands.filter((c) => c.label.toLowerCase().includes(lower))
@@ -205,7 +210,11 @@ export function WorkbenchSearch({
         {records && records.bullets.length > 0 && (
           <Spotlight.ActionsGroup label={bulletsLabel}>
             {records.bullets.map((b) => (
-              <Spotlight.Action key={b.id} label={describeBullet(b)} onClick={() => onBullet(b)} />
+              <Spotlight.Action
+                key={b.id}
+                label={b.origin ? `${b.name} (your design)` : describeBullet(b as BulletSummary)}
+                onClick={() => onBullet(b)}
+              />
             ))}
           </Spotlight.ActionsGroup>
         )}

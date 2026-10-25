@@ -19,6 +19,7 @@ import { sampler } from '../lib/playback.ts'
 import { inputsQuery, withRecordValues, withTab } from '../lib/query.ts'
 import { ladderTitle, seatingLengthName } from '../lib/seating-ladder.ts'
 import { shortcutAriaKeys, shortcutLabel, shortcuts } from '../lib/shortcuts.ts'
+import { userBulletRows, userRecordId } from '../lib/sources.ts'
 import { startIntentEvent, takeStartIntent } from '../lib/start-intent.ts'
 import { formatNumber, formatQuantity, withUnit } from '../lib/units.ts'
 import { mmLength, shownLength } from '../lib/workbench.ts'
@@ -92,10 +93,12 @@ export function Workbench() {
     choice,
     chooseBullet,
     chooseCartridge,
+    chooseDesign,
     choosePowder,
     csvCopied,
     bulletFit,
     describeBullet,
+    designs,
     direction,
     fields,
     fileData,
@@ -154,6 +157,7 @@ export function Workbench() {
     dropped,
     workspace,
   } = load
+  const designRows = useMemo(() => userBulletRows(designs), [designs])
 
   // the chart code once the cards show and the page is idle, so a result never waits for it and
   // the start card loads none of it
@@ -963,9 +967,14 @@ export function Workbench() {
                   ...summaryFitSource(c),
                 })
               }
-              onBullet={(b) => chooseBullet(b.id)}
+              onBullet={(b) => {
+                const design = userRecordId(b.id)
+                if (design) chooseDesign(design)
+                else chooseBullet(b.id)
+              }}
               onPowder={(p) => choosePowder(p.id)}
               describeBullet={describeBullet}
+              designs={designRows}
               bulletFit={bulletFit}
               bulletsLabel={
                 bulletFit === undefined
