@@ -2,7 +2,7 @@
   "id": "bdmp-sp-4-issf-25m-precision-50m-pistol",
   "discipline": "bdmp-sp-4",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDMP SP4 Sportpistole 4 Präzision",
+  "event": "bdmp-sp4-sportpistole-4-prazision",
   "stage": "Präzision",
   "shotCount": 15,
   "provenance": {

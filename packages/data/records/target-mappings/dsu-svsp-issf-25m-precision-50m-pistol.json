@@ -2,7 +2,7 @@
   "id": "dsu-svsp-issf-25m-precision-50m-pistol",
   "discipline": "dsu-svsp",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "DSU SVSP Steinschlosspistole 25 m",
+  "event": "dsu-svsp-steinschlosspistole-25-m",
   "shotCount": 10,
   "provenance": {
     "kind": "published",

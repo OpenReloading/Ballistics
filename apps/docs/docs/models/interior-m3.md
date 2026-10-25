@@ -290,7 +290,7 @@ $$
 \Lambda = \frac{m_c}{\rho_\text{bulk} V_c}
 $$
 
-Code: `packages/core/src/interior/load-file.ts`, `interiorLoad`, `loadRatio`. `packages/core/src/interior/workbench-keys.ts`, `interiorValueKeys`, `burnFormKeys`.
+Code: `packages/core/src/interior/load-file.ts`, `interiorLoad`, `loadRatio`. `packages/core/src/interior/workbench-keys.ts`, `interiorValueKeys`, `burnFormKeys`, `powderModelValues`.
 
 The solid fill, the solid volume of the charge over the same volume, is the packing fraction of the grains in the chamber:
 

@@ -2,7 +2,7 @@
   "id": "dsb-gewehr-10m-issf-10m-air-rifle",
   "discipline": "dsb-gewehr-10m",
   "face": "issf-10m-air-rifle",
-  "event": "DSB Gewehr 10 m",
+  "event": "dsb-gewehr-10-m",
   "provenance": {
     "kind": "published",
     "sources": [

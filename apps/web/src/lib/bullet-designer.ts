@@ -8,10 +8,12 @@ import {
 } from '@openreloading/drawing/bullet'
 import {
   type Bullet,
-  type BulletDesign,
   baseTypes,
+  fromSi,
   ogiveForms,
   tipTypes,
+  toSi,
+  type UserBullet,
 } from '@openreloading/schema'
 import { computedBulletRows } from './bullet.ts'
 import {
@@ -21,12 +23,14 @@ import {
   type FieldValue,
   fieldError,
   fieldOf,
+  siToStored,
   storedToSi,
 } from './field-spec.ts'
 import { designReduce, editHistory, type History as H, historyOf, pushHistory } from './history.ts'
 import { type ManufacturerNames, noManufacturerNames, productLabel } from './manufacturers.ts'
 import type { FieldRow } from './record-fields.ts'
 import { drawingLengthUnit, kilogramsPerGrain, metersPerInch, type UnitSystem } from './units.ts'
+import { type ResolvedBullet, setPath } from './variants.ts'
 
 /** The field groups of the designer, in order. */
 export const groups = {
@@ -104,23 +108,27 @@ const noChoices: Choices = { 'base.type': '', 'ogive.form': '', 'tip.type': '' }
 export interface Origin {
   id: string
   title: string
-  manufacturerName: string
+  /** The base's manufacturer, `catalogue:<id>`. */
+  manufacturer: string
   name: string
   si: Record<string, number | undefined>
   choices: Choices
 }
 
 export interface Design {
-  manufacturerName: string
+  /** The manufacturer, `catalogue:<id>` or `user:<id>`; undefined while none is named. */
+  manufacturer?: string
   name: string
   choices: Choices
   fields: Fields
   origin?: Origin
-  /** The catalogue record the design started from, kept through files. */
-  parent?: BulletDesign['parent']
+  /** The catalogue bullet the design is based on, `catalogue:<id>`, kept through files. */
+  basedOn?: string
+  /** Why the design is read only (its base is not there), with the record as stored, which Save keeps as it is. */
+  locked?: { reason: string; data: UserBullet }
 }
 
-const factor = (s: FieldSpec) => storedToSi[s.quantity as keyof typeof storedToSi]
+const stored = (s: FieldSpec) => s.quantity as Parameters<typeof storedToSi>[0]
 
 /** A value of `o` by its dot path. */
 const at = (o: unknown, path: string): unknown =>
@@ -145,84 +153,130 @@ export function fieldInUse(
   return true
 }
 
-/**
- * The design of a catalogue record, every stored value from the catalogue; the manufacturer's name
- * from `names`.
- */
+/** The designer values of a bullet record (or the part of one the overrides give): SI values and choices. */
+function valuesOf(r: Partial<Bullet>): Pick<Origin, 'si' | 'choices'> {
+  const si: Origin['si'] = {}
+  for (const s of designerSpecs) {
+    const q = at(r, s.key) as { value: number } | undefined
+    si[s.key] = q && storedToSi(stored(s), q.value)
+  }
+  return {
+    si,
+    choices: {
+      'base.type': r.base?.type ?? '',
+      'ogive.form': r.ogive?.form ?? '',
+      'tip.type': r.tip?.type ?? '',
+    },
+  }
+}
+
+/** The origin a design is measured against: a catalogue bullet, titled with the manufacturer's name from `names`. */
+function originOf(r: Bullet, names: ManufacturerNames): Origin {
+  return {
+    id: r.id,
+    title: productLabel(r, names),
+    manufacturer: `catalogue:${r.manufacturer}`,
+    name: r.name,
+    ...valuesOf(r),
+  }
+}
+
+/** The design of a catalogue record, every stored value from the catalogue; `names` title it. */
 export function fromRecord(
   r: Bullet,
   system: UnitSystem,
   names: ManufacturerNames = noManufacturerNames,
 ): Design {
-  const si: Origin['si'] = {}
-  for (const s of designerSpecs) {
-    const q = at(r, s.key) as { value: number } | undefined
-    si[s.key] = q && q.value * factor(s)
-  }
-  const choices: Choices = {
-    'base.type': r.base?.type ?? '',
-    'ogive.form': r.ogive?.form ?? '',
-    'tip.type': r.tip?.type ?? '',
-  }
-  const origin: Origin = {
-    id: r.id,
-    title: productLabel(r, names),
-    manufacturerName: names.get(r.manufacturer) ?? '',
-    name: r.name,
-    si,
-    choices,
-  }
-  return fromOrigin(origin, system)
+  return fromOrigin(originOf(r, names), system)
 }
 
 /** The design of an origin as stored, as on a reset. */
 function fromOrigin(origin: Origin, system: UnitSystem): Design {
   return {
-    manufacturerName: origin.manufacturerName,
+    manufacturer: origin.manufacturer,
     name: origin.name,
     choices: { ...origin.choices },
     fields: Object.fromEntries(
       designerSpecs.map((s) => [s.key, fieldOf(system, s, origin.si[s.key])]),
     ),
     origin,
-    parent: { id: origin.id, title: origin.title },
+    basedOn: `catalogue:${origin.id}`,
   }
 }
 
-/** The design of a saved file: its values as entered, no catalogue record. */
-export function fromFile(d: BulletDesign, system: UnitSystem): Design {
+/**
+ * The design of a saved user bullet: the resolved record's values, measured against its base (the
+ * origin) so each field says whether it follows the catalogue or is changed. A base that is not
+ * there gives a read only design that Save leaves as stored.
+ */
+export function fromUser(
+  data: UserBullet,
+  { base, record, problem }: ResolvedBullet,
+  system: UnitSystem,
+  names: ManufacturerNames = noManufacturerNames,
+): Design {
+  const { si, choices } = valuesOf(record)
+  const origin = base.status === 'found' ? originOf(base.record, names) : undefined
   return {
-    manufacturerName: d.manufacturerName,
-    name: d.name,
-    choices: { ...noChoices, ...d.choices },
-    fields: Object.fromEntries(
-      designerSpecs.map((s) => [s.key, fieldOf(system, s, d.siValues[s.key])]),
-    ),
-    parent: d.parent,
+    ...(data.manufacturer && { manufacturer: data.manufacturer }),
+    name: record.name ?? '',
+    choices: { ...noChoices, ...choices },
+    fields: Object.fromEntries(designerSpecs.map((s) => [s.key, fieldOf(system, s, si[s.key])])),
+    ...(origin && { origin }),
+    ...(data.basedOn && { basedOn: data.basedOn }),
+    ...(problem && { locked: { reason: problem, data } }),
   }
 }
 
-/** The file data of a design: every SI value given. */
-export const fileData = ({
-  manufacturerName,
+/** The stored value of a field, in mm, g or degrees: 12 significant digits drop the noise of the SI round trip. */
+const storedOf = (s: FieldSpec, si: number) => Number(siToStored(stored(s), si).toPrecision(12))
+
+/**
+ * The user bullet a design saves: its manufacturer, the base and the overrides, which are the
+ * fields that differ from the base (a field cleared against a base value is `null`). Without a base
+ * every given field is an override. A read only design gives its stored data back.
+ */
+export function fileData({
+  manufacturer,
   name,
   choices,
   fields,
-  parent,
-}: Design): BulletDesign => ({
-  manufacturerName,
-  name,
-  choices,
-  siValues: Object.fromEntries(
-    Object.entries(fields).flatMap(([k, f]) => (f.si === undefined ? [] : [[k, f.si]])),
-  ),
-  ...(parent && { parent }),
-})
+  origin,
+  basedOn,
+  locked,
+}: Design): UserBullet {
+  if (locked) return locked.data
+  const overrides: Record<string, unknown> = {}
+  for (const s of designerSpecs) {
+    const si = fields[s.key]?.si
+    const was = origin?.si[s.key]
+    if (si === undefined) {
+      if (was !== undefined) setPath(overrides, s.key, null)
+    } else if (!(origin && close(si, was))) setPath(overrides, s.key, { value: storedOf(s, si) })
+  }
+  for (const k of Object.keys(choiceOptions) as ChoiceKey[]) {
+    if (choices[k] !== (origin?.choices[k] ?? '')) setPath(overrides, k, choices[k] || null)
+  }
+  if (name !== (origin?.name ?? '')) overrides.name = name || null
+  return {
+    origin: 'user',
+    ...(manufacturer && { manufacturer }),
+    ...(basedOn && { basedOn }),
+    ...(Object.keys(overrides).length > 0 && { overrides: overrides as UserBullet['overrides'] }),
+  }
+}
 
-/** A saved design as the shape the seating preview seats (mm), as the designer draws it; undefined without a length or drawing. */
-export function designShape(d: BulletDesign, system: UnitSystem): BulletDimensions | undefined {
-  if (d.siValues.length === undefined) return
-  return evaluate(fromFile(d, system), system).drawing?.shape
+/**
+ * A user bullet's resolved record as the shape the seating preview seats (mm), as the designer
+ * draws it; undefined without a length or drawing.
+ */
+export function designShape(
+  { base, record, problem }: ResolvedBullet,
+  system: UnitSystem,
+): BulletDimensions | undefined {
+  if (problem || record.length === undefined) return
+  const design = fromUser({ origin: 'user' }, { base, record }, system)
+  return evaluate(design, system).drawing?.shape
 }
 
 /** Start values of a new bullet: .308 in (7.8232 mm), 168 gr. */
@@ -231,7 +285,6 @@ const newBulletStart = { diameter: 0.308 * metersPerInch, mass: 168 * kilogramsP
 /** A new bullet: the caliber and mass of `from` (else the start values), every other field empty. */
 export function newDesign(system: UnitSystem, from?: Design): Design {
   return {
-    manufacturerName: '',
     name: '',
     choices: { ...noChoices },
     fields: Object.fromEntries(
@@ -250,7 +303,8 @@ export { historyOf } from './history.ts'
 
 export type Action =
   | { type: 'field'; key: string; value: FieldValue }
-  | { type: 'text'; key: 'manufacturerName' | 'name'; value: string }
+  | { type: 'text'; key: 'name'; value: string }
+  | { type: 'manufacturer'; value: string | undefined }
   | { type: 'choice'; key: ChoiceKey; value: string }
   | { type: 'start'; design: Design }
   | { type: 'new'; system: UnitSystem }
@@ -263,6 +317,8 @@ export function reduce(h: History, a: Action): History {
   switch (a.type) {
     case 'text':
       return editHistory(h, { ...h.present, [a.key]: a.value }, a.key)
+    case 'manufacturer':
+      return editHistory(h, { ...h.present, manufacturer: a.value }, 'manufacturer')
     case 'choice':
       // one step per choice; the choice is the field edited last, where a refusal naming it shows
       return pushHistory(
@@ -328,8 +384,8 @@ function fieldStates({ fields, origin }: Design): {
   const v: StoredValues = {}
   for (const s of designerSpecs) {
     const si = fields[s.key]?.si
-    // 12 significant digits drop the noise of the SI round trip (7.823e-3 / 1e-3)
-    v[s.key] = si === undefined ? undefined : Number((si / factor(s)).toPrecision(12))
+    // 12 significant digits drop the noise of the SI round trip (7.823 mm in m and back)
+    v[s.key] = si === undefined ? undefined : Number(siToStored(stored(s), si).toPrecision(12))
     if (si === undefined) states[s.key] = { kind: 'empty' }
     else if (origin && close(si, origin.si[s.key])) states[s.key] = { kind: 'record' }
     else
@@ -482,7 +538,7 @@ function derivedFills(
     fill['base.diameter'] = [2 * o.points[e][0], tagB]
     const top = o.points[e + 1]
     fill['base.angle'] = [
-      (Math.atan((top[0] - o.points[e][0]) / t) * 180) / Math.PI,
+      fromSi('angle', Math.atan((top[0] - o.points[e][0]) / t)),
       tagT === 'assumed' || tagB === 'assumed' ? 'assumed' : 'derived',
     ]
   }
@@ -539,7 +595,7 @@ export function evaluate(design: Design, system: UnitSystem, last?: string): Eva
   for (const s of designerSpecs) {
     const f = fill[s.key]
     if (v[s.key] === undefined && f && fieldInUse(s.key, design) && Number.isFinite(f[0]))
-      states[s.key] = { kind: f[1], si: f[0] * factor(s), ...(f[2] && { basis: f[2] }) }
+      states[s.key] = { kind: f[1], si: storedToSi(stored(s), f[0]), ...(f[2] && { basis: f[2] }) }
   }
 
   const unit = drawingLengthUnit(system)
@@ -562,7 +618,10 @@ export function evaluate(design: Design, system: UnitSystem, last?: string): Eva
  */
 export function sliderMax(key: string, design: Design): number {
   // the diameter rounded up to whole mm, so the ranges also hold while the diameter is typed
-  const d = Math.ceil((design.fields.diameter?.si ?? newBulletStart.diameter) * 1e3) * 1e-3
+  const d = toSi(
+    'length',
+    Math.ceil(fromSi('length', design.fields.diameter?.si ?? newBulletStart.diameter)),
+  )
   const max: Record<string, number> = {
     diameter: 20e-3,
     mass: 60e-3,
@@ -573,7 +632,7 @@ export function sliderMax(key: string, design: Design): number {
     'base.diameter': d,
     'base.cavityDiameter': d,
     'tip.mouthDiameter': d,
-    'base.angle': (30 * Math.PI) / 180,
+    'base.angle': toSi('angle', 30),
     'cannelure.width': d,
     'cannelure.depth': d / 10,
   }

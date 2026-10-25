@@ -4,7 +4,7 @@ import { NativeSelect, Text, TextInput } from '@mantine/core'
 import { useDebouncedValue } from '@mantine/hooks'
 import { face, type LengthUnit } from '@openreloading/drawing'
 import { bulletFigureModel, bulletSymbols } from '@openreloading/drawing/bullet'
-import type { Bullet, BulletDesign } from '@openreloading/schema'
+import { type Bullet, toSi, type UserBullet } from '@openreloading/schema'
 import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef } from 'react'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { BulletSummary } from '../lib/api-types.ts'
@@ -20,8 +20,8 @@ import {
   type FieldState,
   fieldInUse,
   fileData,
-  fromFile,
   fromRecord,
+  fromUser,
   type Group,
   groups,
   newDesign,
@@ -31,11 +31,13 @@ import { fieldError } from '../lib/field-spec.ts'
 import { fetchManufacturerNames, noManufacturerNames, productLabel } from '../lib/manufacturers.ts'
 import { type FieldRow, rowLabel, rowValue } from '../lib/record-fields.ts'
 import { drawingLengthUnit, formatQuantity, type UnitSystem, withUnit } from '../lib/units.ts'
+import { resolveBullet } from '../lib/variants.ts'
 import { description } from './bullet-drawing.tsx'
 import { DesignerField } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
 import { FieldTable } from './field-table.tsx'
 import { FileMenu } from './file-menu.tsx'
+import { ManufacturerInput } from './manufacturer-input.tsx'
 import type { FieldFlag } from './number-field.tsx'
 import { PageBar } from './page-bar.tsx'
 import { PropertyGrid } from './property-grid.tsx'
@@ -44,6 +46,7 @@ import { RecordSearch } from './record-search.tsx'
 import { TechnicalDrawing } from './technical-drawing.tsx'
 import { useDesigner } from './use-designer.ts'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
+import { useManufacturers } from './use-manufacturers.ts'
 import { Workspace } from './workspace.tsx'
 
 const choiceLabels: Record<ChoiceKey, [string, Group]> = {
@@ -105,7 +108,9 @@ const StartSearch = memo(function StartSearch({
       label="Start from a record"
       chosen={chosen ?? 'Start from a record'}
       picked={chosen !== undefined}
-      describe={(b) => `${productLabel(b, names)}, ${withUnit('mass', system, b.mass * 1e-3)}`}
+      describe={(b) =>
+        `${productLabel(b, names)}, ${withUnit('mass', system, toSi('mass', b.mass))}`
+      }
       onSelect={(b) => start(b.id)}
       noneText="No bullet found"
       unreachableText="The database is unreachable. The designer still works."
@@ -146,7 +151,7 @@ const TextField = memo(function TextField({
   value,
   dispatch,
 }: {
-  k: 'manufacturerName' | 'name'
+  k: 'name'
   label: string
   value: string
   dispatch: (a: Action) => void
@@ -185,11 +190,12 @@ const PrintDrawing = memo(function PrintDrawing({
  * it, undo and redo; the last valid drawing stays while the input is refused.
  */
 export function BulletDesigner() {
+  const manufacturers = useManufacturers()
   const { system, history, design, dispatch, loading, fileMenu, start, toolbarDispatch } =
     useDesigner<Design, Action>({
       reduce,
       init: newDesign,
-      kind: 'bulletDesign',
+      kind: 'bullet',
       fileData,
       load: async (id, system) => {
         const record = await fetchRecord<Bullet>('bullets', id)
@@ -261,7 +267,9 @@ export function BulletDesigner() {
     </div>
   )
 
-  const title = `Outline, ${productLabel(design) || 'new bullet'}`
+  const labelOf = (d: Design) =>
+    productLabel({ name: d.name, manufacturerName: manufacturers.nameOf(d.manufacturer) })
+  const title = `Outline, ${labelOf(design) || 'new bullet'}`
   const symbols =
     drawing &&
     [...drawing.profile.annotation.dimensions, ...drawing.profile.annotation.radii].map(
@@ -297,7 +305,13 @@ export function BulletDesigner() {
   const fileDesign = useDeferredValue(design)
   const fileValue = useMemo(() => fileData(fileDesign), [fileDesign])
   const openFile = useCallback(
-    (d: BulletDesign) => dispatch({ type: 'start', design: fromFile(d, system) }),
+    async (d: UserBullet) => {
+      const [resolved, names] = await Promise.all([
+        resolveBullet(d),
+        fetchManufacturerNames().catch(() => noManufacturerNames),
+      ])
+      dispatch({ type: 'start', design: fromUser(d, resolved, system, names) })
+    },
     [system, dispatch],
   )
 
@@ -316,9 +330,10 @@ export function BulletDesigner() {
       />
       <FileMenu
         ref={fileMenu}
-        kind="bulletDesign"
-        name={productLabel(fileDesign) || 'New bullet'}
+        kind="bullet"
+        name={labelOf(fileDesign) || 'New bullet'}
         data={fileValue}
+        problem={fileDesign.locked?.reason}
         onOpen={openFile}
         reportBox="Include the design"
       />
@@ -326,30 +341,38 @@ export function BulletDesigner() {
   )
 
   const inputs = (
+    // a design whose base is gone is shown, not edited
     <form noValidate onSubmit={(ev) => ev.preventDefault()}>
-      <PropertyGrid
-        title="Parameters"
-        head={<StartSearch system={system} start={start} chosen={design.origin?.title} />}
-        message={loading ?? (design.origin && `Started from ${design.origin.title}.`)}
-        sections={(Object.keys(groups) as Group[]).map((g) => ({
-          key: g,
-          title: groups[g],
-          content:
-            g === 'identity' ? (
-              <div className="prop-grid designer-grid">
-                <TextField
-                  k="manufacturerName"
-                  label="Manufacturer"
-                  value={design.manufacturerName}
-                  dispatch={dispatch}
-                />
-                <TextField k="name" label="Name" value={design.name} dispatch={dispatch} />
-              </div>
-            ) : (
-              groupFields(g)
-            ),
-        }))}
-      />
+      <fieldset disabled={design.locked !== undefined} className="designer-fieldset">
+        <PropertyGrid
+          title="Parameters"
+          head={<StartSearch system={system} start={start} chosen={design.origin?.title} />}
+          message={
+            loading ??
+            (design.locked
+              ? `Read only: ${design.locked.reason}`
+              : design.origin && `Started from ${design.origin.title}.`)
+          }
+          sections={(Object.keys(groups) as Group[]).map((g) => ({
+            key: g,
+            title: groups[g],
+            content:
+              g === 'identity' ? (
+                <div className="prop-grid designer-grid">
+                  <ManufacturerInput
+                    label="Manufacturer"
+                    value={design.manufacturer}
+                    manufacturers={manufacturers}
+                    onChange={(value) => dispatch({ type: 'manufacturer', value })}
+                  />
+                  <TextField k="name" label="Name" value={design.name} dispatch={dispatch} />
+                </div>
+              ) : (
+                groupFields(g)
+              ),
+          }))}
+        />
+      </fieldset>
     </form>
   )
 
@@ -360,11 +383,12 @@ export function BulletDesigner() {
 
   // print: the drawing and the values, not the form
   const values: FieldRow[] = [
-    ...(['manufacturerName', 'name'] as const).flatMap((k): FieldRow[] =>
-      design[k]
-        ? [{ label: k === 'manufacturerName' ? 'Manufacturer' : 'Name', text: design[k] }]
-        : [],
-    ),
+    ...(
+      [
+        ['Manufacturer', manufacturers.nameOf(design.manufacturer)],
+        ['Name', design.name],
+      ] as const
+    ).flatMap(([label, text]): FieldRow[] => (text ? [{ label, text }] : [])),
     ...(Object.keys(choiceLabels) as ChoiceKey[]).flatMap((k): FieldRow[] =>
       design.choices[k]
         ? [{ label: choiceLabels[k][0], text: optionLabel(design.choices[k]) }]

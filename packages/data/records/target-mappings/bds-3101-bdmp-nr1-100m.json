@@ -2,7 +2,7 @@
   "id": "bds-3101-bdmp-nr1-100m",
   "discipline": "bds-3101",
   "face": "bdmp-nr1-100m",
-  "event": "BDS 3101 100 m Präz. MSG",
+  "event": "bds-3101-100-m-praz-msg",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

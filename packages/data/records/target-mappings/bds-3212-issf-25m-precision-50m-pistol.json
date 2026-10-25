@@ -2,7 +2,7 @@
   "id": "bds-3212-issf-25m-precision-50m-pistol",
   "discipline": "bds-3212",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDS 3212 100 m Intervall SG SL off. Vis. HL u. 47 mm",
+  "event": "bds-3212-100-m-intervall-sg-sl-off-vis-hl-u-47-mm",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

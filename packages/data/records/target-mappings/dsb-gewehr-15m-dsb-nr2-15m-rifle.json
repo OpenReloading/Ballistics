@@ -2,7 +2,7 @@
   "id": "dsb-gewehr-15m-dsb-nr2-15m-rifle",
   "discipline": "dsb-gewehr-15m",
   "face": "dsb-nr2-15m-rifle",
-  "event": "Gewehr 15 m",
+  "event": "gewehr-15-m",
   "provenance": {
     "kind": "published",
     "sources": [

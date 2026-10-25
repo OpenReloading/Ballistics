@@ -1,4 +1,4 @@
-import { compareTargetFaces } from '@openreloading/schema'
+import { compareTargetFaces, toSi } from '@openreloading/schema'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -15,6 +15,7 @@ import {
   getDiscipline,
   getTargetFace,
   getTargetMapping,
+  listCaliberClasses,
   listDisciplines,
   listFederations,
   listTargetMappings,
@@ -44,8 +45,8 @@ export async function generateMetadata({
 /** A length in mm in the Settings length unit, both laid out on the server. */
 const shownLength = (mm: number) => (
   <ByLengthUnit
-    mm={withUnit('length', presetUnits('metric-grams'), mm * 1e-3)}
-    inch={withUnit('length', presetUnits('us'), mm * 1e-3)}
+    mm={withUnit('length', presetUnits('metric-grams'), toSi('length', mm))}
+    inch={withUnit('length', presetUnits('us'), toSi('length', mm))}
   />
 )
 
@@ -55,10 +56,11 @@ export default async function DisciplinePage({ params }: PageProps<'/disciplines
   if (id === buildPlaceholderId) notFound()
   const r = await getDiscipline(id)
   if (r.status === 'notFound') notFound()
-  const [listed, disciplines, federations] = await Promise.all([
+  const [listed, disciplines, federations, classes] = await Promise.all([
     listTargetMappings(),
     listDisciplines(),
     listFederations(),
+    listCaliberClasses(),
   ])
   const own = listed.status === 'ok' ? listed.data.filter((m) => m.discipline === id) : []
   // the list leaves out the shot count, and the stages draw their faces
@@ -71,6 +73,7 @@ export default async function DisciplinePage({ params }: PageProps<'/disciplines
     listed.status !== 'ok' ||
     disciplines.status !== 'ok' ||
     federations.status !== 'ok' ||
+    classes.status !== 'ok' ||
     [...mappings, ...faces].some((x) => x.status !== 'ok')
   )
     return <ServerDataError what="Discipline" />
@@ -134,7 +137,7 @@ export default async function DisciplinePage({ params }: PageProps<'/disciplines
                         <span>{f?.name ?? m.face}</span>
                       </Link>
                     </th>
-                    <td>{m.event}</td>
+                    <td>{f?.events.find((e) => e.id === m.event)?.name ?? m.event}</td>
                     <td>{m.stage}</td>
                     <td className="num">{m.gauge && shownLength(m.gauge.value)}</td>
                     <td className="num">{m.shotCount}</td>
@@ -157,7 +160,11 @@ export default async function DisciplinePage({ params }: PageProps<'/disciplines
       }
       values={
         <Panel id="record-data" title="Discipline">
-          <FieldTable caption="Discipline" labelledBy="record-data" groups={disciplineGroups(d)} />
+          <FieldTable
+            caption="Discipline"
+            labelledBy="record-data"
+            groups={disciplineGroups(d, classes.data)}
+          />
           <dl className="record-links">
             <dt>Federation</dt>
             <dd>

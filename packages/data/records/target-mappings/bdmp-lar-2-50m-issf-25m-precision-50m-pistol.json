@@ -2,7 +2,7 @@
   "id": "bdmp-lar-2-50m-issf-25m-precision-50m-pistol",
   "discipline": "bdmp-lar-2-50m",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDMP LAR 2 Lever Action Rifle 2, 50 m",
+  "event": "bdmp-lar-2-lever-action-rifle-2-50-m",
   "shotCount": 40,
   "provenance": {
     "kind": "published",

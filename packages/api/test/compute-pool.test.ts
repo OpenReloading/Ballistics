@@ -1,20 +1,14 @@
 import { once } from 'node:events'
 import type { AddressInfo } from 'node:net'
-import { beforeAll, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { buildApp } from '../src/app.ts'
 import { createComputeRunner } from '../src/compute/pool.ts'
 import type { ComputeRunner } from '../src/compute/tasks.ts'
-import type { Db } from '../src/db/index.ts'
 import { API_PREFIX } from '../src/version.ts'
-import { flatShot, m3Load } from './fixtures.ts'
-import { closeTestDb, createTestDb } from './setup.ts'
+import { bundle, flatShot, m3Load } from './fixtures.ts'
+import { testCatalogue } from './setup.ts'
 
-let db: Db
-
-beforeAll(async () => {
-  db = await createTestDb()
-  return () => closeTestDb(db)
-})
+const catalogue = testCatalogue(bundle)
 
 /** The smallest output step caps the step size: about 17400 steps per run, 13 runs, about 0.47 s. */
 const slow = {
@@ -27,6 +21,12 @@ const slow = {
     absoluteTolerance: 1e-15,
   },
 }
+/**
+ * Runs until its 3000 ms sampling budget ends, on any machine: 2000 draws of 36 ms each. The deadline of the
+ * timeout test sits at half of that, and leaves the replacement worker its start (module load, 0.2 s and
+ * more on a busy host) and a fast request.
+ */
+const endless = { ...slow, sampling: { samples: 2000, budgetMs: 3000 } }
 const fast = {
   shot: flatShot,
   ranges: [100],
@@ -38,7 +38,7 @@ async function withApp(
 ) {
   // buildApp closes only a runner it created itself
   const compute = createComputeRunner(options)
-  const app = buildApp({ db, compute })
+  const app = buildApp({ catalogue, compute })
   try {
     await body(app, compute)
   } finally {
@@ -93,14 +93,18 @@ describe('compute pool through the API', () => {
   })
 
   it('answers 503 timeout for a slow request and replaces the worker', async () => {
-    await withApp({ workerCount: 1, maxQueue: 0, timeoutMs: 150 }, async (app) => {
-      const res = await app.inject({ method: 'POST', url: `${API_PREFIX}/interior`, payload: slow })
+    await withApp({ workerCount: 1, maxQueue: 0, timeoutMs: 1500 }, async (app) => {
+      const res = await app.inject({
+        method: 'POST',
+        url: `${API_PREFIX}/interior`,
+        payload: endless,
+      })
       expect(res.statusCode).toBe(503)
       expect(res.headers['retry-after']).toBeUndefined()
       expect(res.json()).toEqual({
         statusCode: 503,
         error: 'Service Unavailable',
-        message: 'computation did not finish within 150 ms',
+        message: 'computation did not finish within 1500 ms',
         reason: 'timeout',
         notice: 'simulation, not load data',
       })
@@ -114,7 +118,7 @@ describe('compute pool through the API', () => {
   })
 
   it('closes a keep-alive connection after the response in flight when the app closes', async () => {
-    const app = buildApp({ db })
+    const app = buildApp({ catalogue })
     await app.listen({ port: 0, host: '127.0.0.1' })
     const { port } = app.server.address() as AddressInfo
     const received = once(app.server, 'request')

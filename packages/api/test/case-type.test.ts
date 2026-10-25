@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { caseType } from '../src/db/queries.ts'
+import { caseType } from '../src/catalogue/derive.ts'
 
 describe('caseType', () => {
   it('sorts the head by R1 over P1 at the bounds, a belt first', () => {

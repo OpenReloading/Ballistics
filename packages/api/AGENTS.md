@@ -1,9 +1,9 @@
 # @openreloading/api
 
-Fastify HTTP API (TypeScript, ESM) exposing `@openreloading/core` and the data records, with PostgreSQL through Drizzle ORM.
+Fastify HTTP API (TypeScript, ESM) exposing `@openreloading/core` and the data records, which it reads from the in-process catalogue (`src/catalogue/`).
 
 - `src/app.ts` builds the app (plugins and routes registered explicitly).
-- `src/server.ts` waits for the database, builds the tables (`src/db/build.ts`), loads the data bundle (skipped when its hash is unchanged) and starts listening.
+- `src/server.ts` opens the catalogue (`loadCatalogue`: the index and record files `npm run build` wrote into `dist/catalogue/`, else built from the data bundle) and starts listening. No database, no start-up wait.
 
 ## Endpoints
 
@@ -23,26 +23,31 @@ Fastify HTTP API (TypeScript, ESM) exposing `@openreloading/core` and the data r
   - A cartridge is one C.I.P. sheet. `q` searches names and aliases. `table` is the C.I.P. table (`I` to `XI` in the records).
   - `maxBulletDiameter` (mm): the smallest cartridge-side G1 of its sheet. `boreDiameter` and `grooveDiameter` (mm): the smallest chamber-side F and Z, each absent when none.
   - `caseLength` and `cartridgeLength` (mm): the smallest cartridge-side L3 and L6 (the shortest variant). `pmax` (bar): the highest Pmax.
-  - `caseType` (`rimless`, `semi-rimmed`, `rimmed`, `rebated`, `belted`) from its cartridge R1, P1 and R3 (`caseType` in `src/db/queries.ts`): an R3 is a belt, R1 more than 0.7 mm over P1 a rim, more than 0.3 mm a semi-rim, more than 0.25 mm under it a rebated rim. Absent without R1 and P1 (the table VII shotshells among them).
+  - `caseType` (`rimless`, `semi-rimmed`, `rimmed`, `rebated`, `belted`) from its cartridge R1, P1 and R3 (`caseType` in `src/catalogue/derive.ts`): an R3 is a belt, R1 more than 0.7 mm over P1 a rim, more than 0.3 mm a semi-rim, more than 0.25 mm under it a rebated rim. Absent without R1 and P1 (the table VII shotshells among them).
   - `country`: the sheet's `country` text, as printed.
+- Every `/:id` record route below answers an id that `records/renames.json` replaces with 308 and the `Location` of the current record (`missing` in `src/routes/common.ts`), an unknown id with 404.
 - `GET /cartridges/:id`: the cartridge record (`id`, `name`, `aliases`, `table`, `country?`, `published`, `revised?`, `pressureMethod?`, `verification`, `exceptions?`, `values` in file order, `provenance`), its `caseType` (as in the list) and its case capacities. 404 when unknown.
-- `GET /manufacturers`: `{ total, items: [{ id, name, aliases?, website? }] }` ordered by name and id. `GET /manufacturers/:id`: the whole record (`apps/docs/docs/data/manufacturers.md`).
-- `GET /powders?q=&manufacturer=&limit=&offset=`, `GET /bullets?...&cartridge=`: summaries with `manufacturer` (the manufacturer id), ordered by manufacturer name, name and id (joined with `manufacturers`).
-  - `q` matches the manufacturer name or one of its aliases followed by the product name. `manufacturer` is an exact manufacturer id.
-  - `cartridge` (a cartridge id) keeps the bullets that fit its C.I.P. G1, F and Z by `bulletFits` of core (above the middle of F and Z, up to G1 plus 0.005 mm). None for an unknown cartridge or one without the three values (`cartridgeFit` in `src/db/queries.ts`).
+- `GET /manufacturers`: `{ total, items: [{ id, name, aliases?, website? }] }` ordered by name. `GET /manufacturers/:id`: the whole record (`apps/docs/docs/data/manufacturers.md`).
+- `GET /powders?q=&manufacturer=&limit=&offset=`, `GET /bullets?...&cartridge=`: summaries with `manufacturer` (the manufacturer id), ordered by manufacturer name and name.
+  - `q` ranks (see below) the manufacturer name or one of its aliases followed by the product name. `manufacturer` is an exact manufacturer id.
+  - `cartridge` (a cartridge id) keeps the bullets that fit its C.I.P. G1, F and Z by `bulletFits` of core (above the middle of F and Z, up to G1 plus 0.005 mm). None for an unknown cartridge or one without the three values (`bullets` in `src/catalogue/open.ts`).
   - `ballisticCoefficientG1` and `ballisticCoefficientG7` of a bullet: the record's first coefficient of that drag model, null without one.
   - Absent without a value: `country` (ISO code of the manufacturer's country) of a powder or bullet, the bullet's `tipType` (the record's tip type) and `construction` (the record's construction structure, else the core material as `<material>-core`).
   - `GET /powders/:id`, `GET /bullets/:id`: the whole record.
-- `GET /target-faces`: `{ total, items: [{ id, organization, name, caliberClasses, categories }] }`, every face. `caliberClasses`: the caliber classes of the disciplines mapped to it. `categories`: those of its events and those disciplines. `GET /target-faces/:id`: the whole record.
-- The competition lists (`GET /federations`, `/disciplines`, `/target-faces`, `/target-mappings`) are sorted in `src/db/competition-queries.ts` with the comparators of `@openreloading/schema` (`src/competition-order.ts`), so the order is part of the answer.
-- `GET /federations`, `GET /disciplines?federation=`, `GET /target-mappings?discipline=&face=` and their `/:id` routes (`src/routes/federations.ts`): summaries and records as `apps/docs/docs/data/federations.md` lists them. An unknown filter id gives no items.
+- `GET /target-faces`: `{ total, items: [{ id, federation?, organization?, name, caliberClasses, categories }] }`, every face. `caliberClasses`: the caliber classes of the disciplines mapped to it. `categories`: those of its events and those disciplines. `GET /target-faces/:id`: the whole record.
+- Order and search are the catalogue's (`apps/docs/docs/data/catalogue-storage.md`), so the order is part of the answer:
+  - The default order of cartridges, manufacturers, powders and bullets is the `sortKey` of `@openreloading/schema` (case and accent folded, every digit run by value), ties by id.
+  - `q` keeps the rows that hold every word of it, in any order, also as written without spaces and hyphens, and ranks them by `score` of the schema package (a word starting a word of the name first); equal ranks keep the default order.
+  - The competition lists (`GET /federations`, `/disciplines`, `/target-faces`, `/target-mappings`) are sorted at build with the comparators of `@openreloading/schema` (`src/competition-order.ts`).
+  - A record answers as stored: the catalogue's `kind`, `origin` and `revision` are not part of the body.
+- `GET /federations`, `GET /disciplines?federation=`, `GET /target-mappings?discipline=&face=`, `GET /caliber-classes` and their `/:id` routes (`src/routes/federations.ts`): summaries and records as `apps/docs/docs/data/federations.md` lists them. An unknown filter id gives no items.
 
 Compute (`src/routes/compute.ts`):
 
 - `POST /exterior/trajectory`, `POST /exterior/truing`.
 - `POST /exterior/range-strings/plan` and `/fit` (core `comparePlanCandidates`, `fitTruingStrings`). Infinite numbers are `null` at the whitelisted paths in `src/routes/compute.ts`, 422 at any other. A zero-offset prior without `fitZeroOffset` is 400.
 - `POST /interior` (`model` `m3`).
-- `POST /interior/load-file`: the workbench load file as body, results as JSON (`src/compute/load-file.ts`, `src/compute/simulate.ts`). The field mapping is `interiorLoad` of core, shared with the workbench. 400 issues carry the path in the file.
+- `POST /interior/load-file`: the workbench load file as body (one record of kind `load`, `Load` of the schema package, stored units), results as JSON (`src/compute/load-file.ts`, `src/compute/simulate.ts`). The field mapping is `interiorLoad` of core, shared with the workbench. `loadValues` gives the SI values: the powder record's `powderModelValues`, the bullet record's mass, the load's typed `analysis.overrides` and its `charge`; the bore area is the cartridge record's without an override. A value no record or override gives is a 400 at `records[i].data.analysis.overrides.<key>`. 400 issues carry the path in the file. A `cartridge` or `bullet` that is a `user:` reference is refused there (a design is resolved in the browser); a `catalogue:<id>` reference is read from the catalogue. A record of the old kind `workbenchState` is a 400 at `records[i].kind`.
 - `GET /exterior/stability` (`muzzleVelocity` in the query).
 - A compute answer carries its result under `result`, except `POST /interior` with a `ladder` (each of `ladderSteps` has its `result`) and `POST /interior/load-file` (`summary`, `points`, `ladderSteps`).
 - Bodies are the `@openreloading/core` arguments in SI, validated by the strict zod schemas in `src/compute/*-schema.ts` (400). `bullet` and `powder` ids are resolved in `src/compute/resolve.ts` and echoed under `resolved` with `suppliedFields`, the request values the record supplied.
@@ -64,23 +69,22 @@ Compute (`src/routes/compute.ts`):
 
 ## Commands (this directory, or `-w @openreloading/api` from the root)
 
-- Build: `npm run build` (output `dist/`, with `dist/schema.json`: the DDL of `src/db/schema.ts` from `drizzle-kit export --output json`)
+- Build: `npm run build` (output `dist/`, with `dist/catalogue/index.json` and `records.json`)
 - Dev server: `npm run dev` (Node runs `src/server.ts` directly, restarts on change)
-- Start: `npm start` (`HOST`, `PORT`, default `0.0.0.0:3000`)
-- Test: `npm test` (Vitest, `app.inject`, in-memory PostgreSQL through PGlite, no server needed)
+- Start: `npm start` (`HOST`, `PORT`, default `0.0.0.0:3000`; needs the build's catalogue files, else builds the catalogue from the data bundle)
+- Test: `npm test` (Vitest, `app.inject` over a catalogue built from synthetic records, no server needed)
 - Single test: `npx vitest run <file> -t "<name>"`
 - Type check: `npm run typecheck`
 
 ## Facts
 
 - Relative imports end in `.ts`. `tsc` rewrites them to `.js`. Only erasable TypeScript syntax (no enums, no namespaces), because Node strips types without compiling.
-- Requires `DATABASE_URL` in the process environment. `npm start` loads it from the root `.env` when the environment does not set it.
 - Errors (`src/app.ts`): a 4xx answer keeps its message. Any other error answers 500 `{ statusCode, error, message: 'internal server error', requestId }`, without the error's text. The error goes to the server log under that `reqId`.
-- Schema: `src/db/schema.ts`. Client: `src/db/index.ts`. At start `ensureTables` (`src/db/build.ts`) compares the sha256 of the statements in `dist/schema.json` with the one in `bundle_state`. On a mismatch, or a database without it, it drops the tables the statements create (other tables stay) and runs the statements in one transaction. The seed loads the bundle. After a schema change, run the root `npm run build`. Nothing else is committed.
-- The tables are a query layer: `src/db/seed.ts` replaces them from `@openreloading/data/bundle.json`. Edit records in `packages/data`, never rows.
+- Edit records in `packages/data`, never in the catalogue files.
 - Read endpoints leave out null fields, as records do (absent means unknown). Compute responses keep the core result shape, where `null` means "not defined".
-- Trajectory, truing and interior run on a `node:worker_threads` pool (`src/compute/pool.ts`, tasks in `src/compute/tasks.ts`, entry `src/compute/worker.ts`) with a 5 s deadline per task from submit. The worker of a task past its deadline is terminated. Stability runs on the main thread. Errors cross the thread boundary as plain objects and are rebuilt into `TruingError`, `InputError` or `Error`. Tests that mock core pass `buildApp({ db, compute: inlineRunner })`.
+- Trajectory, truing and interior run on a `node:worker_threads` pool (`src/compute/pool.ts`, tasks in `src/compute/tasks.ts`, entry `src/compute/worker.ts`) with a 5 s deadline per task from submit. The worker of a task past its deadline is terminated. Stability runs on the main thread. Errors cross the thread boundary as plain objects and are rebuilt into `TruingError`, `InputError` or `Error`. Tests that mock core pass `buildApp({ catalogue, compute: inlineRunner })`.
 - The step and count caps in `src/compute/schemas.ts` (per integration, for truing also the iteration cap and the step total over all its trajectories) bound the work of a request. An interior run is at most 13 model runs with its range. A ladder runs that per step, up to 21 steps, in batches of 4 within 14 s and at most 100000 output points: no batch starts once the steps run so far are above it (`compute/interior-run.ts`).
-- `@openreloading/api/compute` (`src/compute/browser.ts`): `runInterior`, `runChargeTarget` (record lookups passed in), the body schemas, `errorAnswer` and the task runner without Fastify, the database or Node APIs. The web app's Pages edition runs it in the browser. At run time it imports only core, schema and zod (`test/compute-imports.test.ts`). The web image builds only it (`tsconfig.compute.json`).
-- `@openreloading/api/static` (`src/static.ts`, build time only, PGlite is a dev dependency): `startBundleApi` (this API on PGlite seeded from the bundle, compute in its thread) and `writeStaticApi` (the read answers as the Pages edition's data files).
+- `@openreloading/api/compute` (`src/compute/browser.ts`): `runInterior`, `runChargeTarget` (record lookups passed in), the body schemas, `errorAnswer` and the task runner without Fastify, the database or Node APIs. The web app's Pages edition runs it in the browser. At run time it imports only core, schema and zod (`test/compute-imports.test.ts`). The web image builds it and the catalogue entry only (`tsconfig.browser.json`, whose `files` list both entries).
+- `@openreloading/api/static` (`src/static.ts`, build time only): `startBundleApi` (this API over the catalogue of the bundle, compute in its thread) and `writeStaticApi` (the Pages edition's data files: `catalogue/index.json` and one file per record, the body of the API's record route). Parity of the two editions: `apps/web/test/static-api.test.ts`.
+- `@openreloading/api/catalogue` (`src/catalogue/browser.ts`): the in-process catalogue (`buildCatalogue`, `openCatalogue`, the `Catalogue` interface) without Node APIs, imports core and schema only (`test/compute-imports.test.ts`). `src/catalogue/node.ts` reads and writes its index and record file, which `npm run build` writes into `dist/catalogue/` (`write.ts`). The routes and the compute lookups read it. Design: `apps/docs/docs/data/catalogue-storage.md`.
 - Dockerfile build context is the repository root: `docker build -f packages/api/Dockerfile .`

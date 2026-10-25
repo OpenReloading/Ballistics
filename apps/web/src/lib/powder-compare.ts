@@ -1,7 +1,7 @@
-import type { Powder } from '@openreloading/schema'
+import { powderModelValues } from '@openreloading/core'
+import { type Powder, toSi } from '@openreloading/schema'
 import type { InteriorBody } from './interior-input.ts'
 import { type SortDirection, sortRows } from './lists.ts'
-import { powderModelValues } from './powder-record.ts'
 
 /**
  * The charge of the Powders tab: the typed one, a fraction of each powder's case fill, or the one at
@@ -30,7 +30,7 @@ export function compareCharge(
   volume: number,
 ): number | undefined {
   if (mode.kind !== 'fill') return typed
-  return bulkDensity ? mode.fill * bulkDensity * 1000 * volume : undefined
+  return bulkDensity ? mode.fill * toSi('density', bulkDensity) * volume : undefined
 }
 
 /**

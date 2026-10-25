@@ -2,7 +2,7 @@
   "id": "bdmp-sm-bdmp-pp1",
   "discipline": "bdmp-sm",
   "face": "bdmp-pp1",
-  "event": "BDMP SM Super Magnum",
+  "event": "bdmp-sm-super-magnum",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

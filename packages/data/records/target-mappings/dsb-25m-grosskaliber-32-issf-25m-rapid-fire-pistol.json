@@ -2,7 +2,7 @@
   "id": "dsb-25m-grosskaliber-32-issf-25m-rapid-fire-pistol",
   "discipline": "dsb-25m-grosskaliber-32",
   "face": "issf-25m-rapid-fire-pistol",
-  "event": "DSB 25 m Großkaliberpistole .32 20 Sek. Serie",
+  "event": "dsb-25-m-grosskaliberpistole-32-20-sek-serie",
   "stage": "20 Sek. Serie",
   "gauge": {
     "value": 9.65,

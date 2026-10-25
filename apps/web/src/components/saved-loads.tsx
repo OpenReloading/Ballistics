@@ -1,6 +1,7 @@
 'use client'
 
 import { ActionIcon, Button, Drawer, Text, TextInput } from '@mantine/core'
+import { parseRef } from '@openreloading/schema'
 import { Copy, DownloadSimple, PencilSimple, Trash } from '@phosphor-icons/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { fetchRecord } from '../lib/api-fetch.ts'
@@ -14,13 +15,19 @@ import {
   reminderText,
 } from '../lib/export-reminder.ts'
 import { saveAs } from '../lib/file-access.ts'
-import { duplicateStored, type LoadRecord, loadGroups, renameStored } from '../lib/load-tabs.ts'
+import {
+  cartridgeGroup,
+  duplicateStored,
+  type LoadRecord,
+  loadGroups,
+  renameStored,
+} from '../lib/load-tabs.ts'
+import { newId } from '../lib/new-id.ts'
 import { controlSize } from '../lib/theme.ts'
 import { userDataText } from '../lib/user-data.ts'
 import { recordFileName } from '../lib/user-file-names.ts'
-import { deleteRecord, storedRecords } from '../lib/user-store.ts'
+import { deleteRecord, storedRecord, storedRecords } from '../lib/user-store.ts'
 import { confirmDialog } from './confirm.tsx'
-import { newId } from './file-menu.tsx'
 
 /** Saves since the last export (`localStorage` `exportReminder`), counted by the File menu's callbacks. */
 export function useExportReminder() {
@@ -77,7 +84,11 @@ function useCartridgeNames(ids: string[]) {
     let alive = true
     Promise.all(
       wanted.split(',').map(async (id) => {
-        const record = await fetchRecord<{ name?: string }>('cartridges', id).catch(() => undefined)
+        // a design is a record of this browser, a catalogue cartridge one of the API
+        const own = parseRef(id)?.scope === 'user' ? parseRef(id)?.id : undefined
+        const record = own
+          ? await storedRecord(own).catch(() => undefined)
+          : await fetchRecord<{ name?: string }>('cartridges', id).catch(() => undefined)
         const name = record?.name
         if (name) cartridgeNames.set(id, name)
       }),
@@ -125,6 +136,8 @@ export function SavedLoads({
   const [records, setRecords] = useState<LoadRecord[]>([])
   const [query, setQuery] = useState('')
   const [message, setMessage] = useState('')
+  /** Stored loads of the earlier format, which the schema refuses. */
+  const [older, setOlder] = useState(0)
   /** The load whose name is edited in its row, with the text. */
   const [renaming, setRenaming] = useState<{ id: string; text: string }>()
   const storage = useStorage(opened)
@@ -132,9 +145,10 @@ export function SavedLoads({
   useEffect(() => {
     if (!opened) return
     storedRecords()
-      .then(({ records }) =>
-        setRecords(records.filter((r): r is LoadRecord => r.kind === 'workbenchState')),
-      )
+      .then(({ records, invalid }) => {
+        setRecords(records.filter((r): r is LoadRecord => r.kind === 'load'))
+        setOlder(invalid.filter((i) => i.kind === 'workbenchState').length)
+      })
       .catch(() => setMessage('The saved loads could not be read from this browser.'))
   }, [opened, tick])
 
@@ -204,7 +218,9 @@ export function SavedLoads({
     onDeleted(r.id)
   }
 
-  const names = useCartridgeNames([...new Set(records.map((r) => r.data.cartridge ?? ''))])
+  const names = useCartridgeNames([
+    ...new Set(records.map((r) => cartridgeGroup(r.data.cartridge))),
+  ])
   const groups = loadGroups(records, query, names)
   return (
     <Drawer opened={opened} onClose={onClose} title="Saved loads" size="sm" position="left">
@@ -309,6 +325,13 @@ export function SavedLoads({
       </div>
       <div className="saved-storage" role="status">
         {message && <p>{message}</p>}
+        {older > 0 && (
+          <p>
+            {older === 1 ? '1 saved load is' : `${older} saved loads are`} in the format of an
+            earlier version, which this app no longer reads. Open lists{' '}
+            {older === 1 ? 'it' : 'them'} under Invalid records.
+          </p>
+        )}
         {storage.persisted !== undefined && (
           <p>
             {storage.persisted

@@ -2,7 +2,7 @@
   "id": "bds-2310-bdmp-nr1-100m",
   "discipline": "bds-2310",
   "face": "bdmp-nr1-100m",
-  "event": "BDS 2310 50 m Zeit. SG SL KW opt. Vis.",
+  "event": "bds-2310-50-m-zeit-sg-sl-kw-opt-vis",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

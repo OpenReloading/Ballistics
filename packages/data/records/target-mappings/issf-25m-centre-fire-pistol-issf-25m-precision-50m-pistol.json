@@ -2,7 +2,7 @@
   "id": "issf-25m-centre-fire-pistol-issf-25m-precision-50m-pistol",
   "discipline": "issf-25m-centre-fire-pistol",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "25m Centre Fire Pistol (precision stage)",
+  "event": "25m-centre-fire-pistol-precision-stage",
   "stage": "precision stage",
   "gauge": {
     "value": 9.65,

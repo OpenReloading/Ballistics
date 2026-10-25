@@ -40,7 +40,7 @@ describe('readRecords', () => {
     const errors = invalid
     expect(errors.some((e) => e.startsWith('chrono/broken.json: invalid JSON'))).toBe(true)
     expect(errors).toContain('loads/other-name.json: id "test-load" does not match the file name')
-    expect(errors).toContain('loads/test-load.json: unknown cartridge "test-cartridge"')
+    expect(errors).toContain('loads/test-load.json: unknown cartridge "catalogue:test-cartridge"')
     expect(errors).toContain('chrono/test-session.json: unknown load "missing-load"')
     expect(errors).toContain('firings/test-firing.json: unknown cartridge "missing-cartridge"')
     expect(errors).toContain('range/test-range-b.json: round 1(b)* is also in test-range-a')
@@ -65,6 +65,33 @@ describe('readRecords', () => {
       `${where}: diameter-fit:P1: cartridge P1 = 12.1 mm exceeds chamber P1 = 12 mm`,
     )
     expect(spec).toContain(`${where}: exception "pk-ratio" no longer applies; remove it`)
+  })
+
+  it('reports a load that names a missing bullet or powder, or a user record', () => {
+    const provenance = { kind: 'published', sources: [{ title: 'Test' }] }
+    const load = {
+      id: 'by-reference',
+      origin: 'catalogue',
+      name: 'By reference',
+      cartridge: 'catalogue:test-cartridge',
+      bullet: 'catalogue:missing-bullet',
+      powder: 'catalogue:missing-powder',
+      charge: { value: 3 },
+      provenance,
+    }
+    const errors = errorsAfter((_root, write) => {
+      write('loads/by-reference.json', load)
+      write('loads/by-user.json', {
+        ...load,
+        id: 'by-user',
+        cartridge: 'user:3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13',
+      })
+    })
+    expect(errors).toContain('loads/by-reference.json: unknown bullet "catalogue:missing-bullet"')
+    expect(errors).toContain('loads/by-reference.json: unknown powder "catalogue:missing-powder"')
+    expect(errors).toContain(
+      'loads/by-user.json: cartridge: A catalogue load names catalogue records only',
+    )
   })
 
   it('accepts the committed records', () => {
@@ -93,7 +120,6 @@ describe('readRecords', () => {
           title: 'T',
           retrieved: '2026-01-01',
         },
-        'old.csv': { maker: 'test-manufacturer', title: 'O', retrieved: '2026-01-01' },
       })
     })
     expect(errors).toContain(
@@ -105,7 +131,18 @@ describe('readRecords', () => {
     expect(errors).toContain(
       'load-tables.json: test.csv: unknown manufacturer "missing-table-manufacturer"',
     )
-    expect(errors).toContain('load-tables.json: old.csv: needs a manufacturer id')
+  })
+
+  it('reports a chronograph device whose manufacturer is no record', () => {
+    const errors = errorsAfter((root) => {
+      const path = join(root, 'chrono', 'test-session.json')
+      const session = JSON.parse(readFileSync(path, 'utf8'))
+      session.device.manufacturer = 'catalogue:missing-device-maker'
+      writeFileSync(path, JSON.stringify(session))
+    })
+    expect(errors).toContain(
+      'chrono/test-session.json: unknown device.manufacturer "missing-device-maker"',
+    )
   })
 
   it('resolves source references with the parts of the record', () => {
@@ -163,6 +200,54 @@ describe('readRecords', () => {
 })
 
 describe('readLoadTables', () => {
+  const read = (file: unknown) => {
+    const dir = mkdtempSync(join(tmpdir(), 'load-tables-'))
+    try {
+      writeFileSync(join(dir, 'load-tables.json'), JSON.stringify(file))
+      const errors: string[] = []
+      const tables = readLoadTables(dir, errors)
+      let thrown: string | undefined
+      try {
+        readLoadTables(dir)
+      } catch (e) {
+        thrown = (e as Error).message
+      }
+      return { errors, tables, thrown }
+    } finally {
+      rmSync(dir, { recursive: true })
+    }
+  }
+  const table = {
+    manufacturer: 'example',
+    title: 'T',
+    url: 'https://example.com',
+    retrieved: '2026-01-01',
+  }
+
+  it('keeps the entries that match the schema and reports the others by row file and field', () => {
+    const { errors, tables, thrown } = read({
+      'good.csv': table,
+      'no-maker.csv': { title: 'O', retrieved: '2026-01-01' },
+      'extra.csv': { ...table, maker: 'example' },
+      'bad-date.csv': { ...table, retrieved: 'January' },
+      'bad-url.csv': { ...table, url: 'not a url' },
+      'bad-id.csv': { ...table, manufacturer: 'Example Inc' },
+    })
+    expect(Object.keys(tables)).toEqual(['good.csv'])
+    expect(errors.map((e) => e.split(': ').slice(0, 2).join(': '))).toEqual([
+      'load-tables.json: no-maker.csv.manufacturer',
+      'load-tables.json: extra.csv',
+      'load-tables.json: bad-date.csv.retrieved',
+      'load-tables.json: bad-url.csv.url',
+      'load-tables.json: bad-id.csv.manufacturer',
+    ])
+    expect(thrown).toContain('load-tables.json: no-maker.csv.manufacturer')
+  })
+
+  it('rejects a file that is no object of tables', () => {
+    expect(read([table]).errors).toEqual(['load-tables.json: not an object of tables by row file'])
+  })
+
   it('names load-tables.json when it is not JSON', () => {
     const dir = mkdtempSync(join(tmpdir(), 'load-tables-'))
     try {

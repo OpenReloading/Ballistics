@@ -1,33 +1,40 @@
-import { PGlite } from '@electric-sql/pglite'
 import type { Bundle } from '@openreloading/data'
 import { Ajv2020 } from 'ajv/dist/2020.js'
-import { drizzle } from 'drizzle-orm/pglite'
 import type { InjectOptions } from 'fastify'
 import { beforeAll, expect } from 'vitest'
 import { z } from 'zod'
 import { buildApp } from '../src/app.ts'
+import { buildCatalogue } from '../src/catalogue/build.ts'
+import { openCatalogue } from '../src/catalogue/open.ts'
+import type { Catalogue } from '../src/catalogue/types.ts'
 import type { ComputeRunner } from '../src/compute/tasks.ts'
-import { ensureTables } from '../src/db/build.ts'
-import type { Db } from '../src/db/index.ts'
-import { seedBundle } from '../src/db/seed.ts'
 import { bundle } from './fixtures.ts'
 
-/** An in-memory PostgreSQL (PGlite) with the tables built. */
-export async function createTestDb(): Promise<Db> {
-  const db = drizzle({ client: new PGlite() })
-  await ensureTables(db)
-  return db
+/** A data set without records. */
+export const emptyBundle: Bundle = {
+  cartridges: [],
+  manufacturers: [],
+  powders: [],
+  bullets: [],
+  capacities: [],
+  loads: [],
+  chronoSessions: [],
+  firings: [],
+  rangeFirings: [],
+  targetFaces: [],
+  federations: [],
+  disciplines: [],
+  targetMappings: [],
+  caliberClasses: [],
 }
 
-/** Closes a database from `createTestDb`. */
-export async function closeTestDb(db: Db) {
-  await (db as unknown as { $client: PGlite }).$client.close()
-}
+/** The catalogue of `data`, as the API opens it. */
+export const testCatalogue = (data: Bundle): Catalogue => openCatalogue(buildCatalogue(data))
 
 /**
- * An app on its own test database for the tests of a file or a describe block: built before them,
- * closed after them. `seed` is the bundle loaded (`false`: empty tables), `compute` as `buildApp`
- * takes it. `get` and `post` take the whole URL.
+ * An app on the catalogue of `seed` for the tests of a file or a describe block: built before
+ * them, closed after them (`false`: no records). `load` replaces the app by one on another data
+ * set, `compute` as `buildApp` takes it. `get` and `post` take the whole URL.
  */
 export function withApi({
   seed = bundle,
@@ -40,21 +47,24 @@ export function withApi({
     const res = await api.app.inject(options)
     return { status: res.statusCode, body: res.json() }
   }
+  const open = (data: Bundle) => {
+    api.catalogue = testCatalogue(data)
+    api.app = buildApp({ catalogue: api.catalogue, compute })
+  }
   const api = {
-    db: undefined as unknown as Db,
+    catalogue: undefined as unknown as Catalogue,
     app: undefined as unknown as ReturnType<typeof buildApp>,
     get: (url: string) => send({ url }),
     post: (url: string, payload: unknown) =>
       send({ method: 'POST', url, payload: payload as object }),
-  }
-  beforeAll(async () => {
-    api.db = await createTestDb()
-    if (seed) await seedBundle(api.db, seed)
-    api.app = buildApp({ db: api.db, compute })
-    return async () => {
+    load: async (data: Bundle) => {
       await api.app.close()
-      await closeTestDb(api.db)
-    }
+      open(data)
+    },
+  }
+  beforeAll(() => {
+    open(seed || emptyBundle)
+    return () => api.app.close()
   })
   return api
 }

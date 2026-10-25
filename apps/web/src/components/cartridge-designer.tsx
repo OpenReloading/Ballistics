@@ -3,7 +3,7 @@
 import { NativeSelect, Text } from '@mantine/core'
 import { useDebouncedValue } from '@mantine/hooks'
 import { chamberOf } from '@openreloading/drawing/seating'
-import type { CartridgeDesign } from '@openreloading/schema'
+import type { UserCartridge } from '@openreloading/schema'
 import { Ruler } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
 import { memo, useCallback, useDeferredValue, useMemo, useRef, useState } from 'react'
@@ -20,8 +20,8 @@ import {
   type FieldState,
   fieldSpecs,
   fileData,
-  fromFile,
   fromRecord,
+  fromUser,
   type Group,
   groups,
   missingHint,
@@ -39,6 +39,7 @@ import {
   formatQuantity,
   type UnitSystem,
 } from '../lib/units.ts'
+import { resolveCartridge } from '../lib/variants.ts'
 import { CartridgeDrawing, type View } from './cartridge-drawing.tsx'
 import { DesignerField } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
@@ -193,7 +194,7 @@ export function CartridgeDesigner() {
     useDesigner<Design, Action>({
       reduce,
       init: () => newDesign(),
-      kind: 'cartridgeDesign',
+      kind: 'cartridge',
       fileData,
       load: async (id, system) => {
         const record = await fetchRecord<CartridgeDetail>('cartridges', id)
@@ -293,8 +294,8 @@ export function CartridgeDesigner() {
   const fileDesign = useDeferredValue(design)
   const fileValue = useMemo(() => fileData(fileDesign), [fileDesign])
   const openFile = useCallback(
-    (d: CartridgeDesign, name: string) =>
-      dispatch({ type: 'start', design: fromFile(d, name, system) }),
+    async (d: UserCartridge) =>
+      dispatch({ type: 'start', design: fromUser(d, await resolveCartridge(d), system) }),
     [system, dispatch],
   )
 
@@ -313,9 +314,10 @@ export function CartridgeDesigner() {
       />
       <FileMenu
         ref={fileMenu}
-        kind="cartridgeDesign"
+        kind="cartridge"
         name={fileDesign.origin?.title ?? 'Cartridge design'}
         data={fileValue}
+        problem={fileDesign.locked?.reason}
         onOpen={openFile}
         reportBox="Include the design"
       />
@@ -324,57 +326,63 @@ export function CartridgeDesigner() {
 
   const inputs = (
     <form noValidate onSubmit={(ev) => ev.preventDefault()}>
-      <PropertyGrid
-        title="Parameters"
-        head={
-          <>
-            <StartSearch start={start} chosen={design.origin?.title} />
-            <div className="prop-grid designer-grid">
-              <TableSelect value={design.table} dispatch={dispatch} />
-            </div>
-            {shotshell ? (
-              <p className="note">
-                Shotshell dimensions (CIP table VII) are not edited in the designer; the drawing
-                shows the record.
-              </p>
-            ) : (
-              // the unit once per column; screen readers have it in each field's name
-              <div className="side-row side-head" aria-hidden="true">
-                <span>Symbol</span>
-                <span>Cartridge, {system.length.symbol}</span>
-                <span>Chamber, {system.length.symbol}</span>
+      {/* a design whose base is gone is shown, not edited */}
+      <fieldset disabled={design.locked !== undefined} className="designer-fieldset">
+        <PropertyGrid
+          title="Parameters"
+          head={
+            <>
+              <StartSearch start={start} chosen={design.origin?.title} />
+              <div className="prop-grid designer-grid">
+                <TableSelect value={design.table} dispatch={dispatch} />
               </div>
-            )}
-          </>
-        }
-        message={
-          loading ?? (design.origin && `Started from ${design.origin.title.replace(/\.?$/, '.')}`)
-        }
-        sections={
-          shotshell
-            ? []
-            : [
-                ...(Object.keys(groups) as Group[]).map((g) => ({
-                  key: g,
-                  title: groups[g],
-                  content: groupFields(g),
-                })),
-                {
-                  key: 'seat',
-                  title: 'Seat a bullet',
-                  content: canSeat ? (
-                    <div ref={setSeatSlot} className="seating-slot" />
-                  ) : (
-                    <p className="note">
-                      {drawn?.spec
-                        ? 'Not given: the cartridge L3, which the seating needs.'
-                        : 'Not given: a drawing of the cartridge, which the seating needs.'}
-                    </p>
-                  ),
-                },
-              ]
-        }
-      />
+              {shotshell ? (
+                <p className="note">
+                  Shotshell dimensions (CIP table VII) are not edited in the designer; the drawing
+                  shows the record.
+                </p>
+              ) : (
+                // the unit once per column; screen readers have it in each field's name
+                <div className="side-row side-head" aria-hidden="true">
+                  <span>Symbol</span>
+                  <span>Cartridge, {system.length.symbol}</span>
+                  <span>Chamber, {system.length.symbol}</span>
+                </div>
+              )}
+            </>
+          }
+          message={
+            loading ??
+            (design.locked
+              ? `Read only: ${design.locked.reason}`
+              : design.origin && `Started from ${design.origin.title.replace(/\.?$/, '.')}`)
+          }
+          sections={
+            shotshell
+              ? []
+              : [
+                  ...(Object.keys(groups) as Group[]).map((g) => ({
+                    key: g,
+                    title: groups[g],
+                    content: groupFields(g),
+                  })),
+                  {
+                    key: 'seat',
+                    title: 'Seat a bullet',
+                    content: canSeat ? (
+                      <div ref={setSeatSlot} className="seating-slot" />
+                    ) : (
+                      <p className="note">
+                        {drawn?.spec
+                          ? 'Not given: the cartridge L3, which the seating needs.'
+                          : 'Not given: a drawing of the cartridge, which the seating needs.'}
+                      </p>
+                    ),
+                  },
+                ]
+          }
+        />
+      </fieldset>
     </form>
   )
 

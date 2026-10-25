@@ -2,7 +2,7 @@
   "id": "issf-25m-rapid-fire-pistol-issf-25m-rapid-fire-pistol",
   "discipline": "issf-25m-rapid-fire-pistol",
   "face": "issf-25m-rapid-fire-pistol",
-  "event": "25m Rapid-Fire Pistol",
+  "event": "25m-rapid-fire-pistol",
   "gauge": {
     "value": 5.6,
     "raw": "5.60mm"

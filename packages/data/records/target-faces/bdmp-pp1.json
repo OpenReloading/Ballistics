@@ -1,7 +1,7 @@
 {
   "id": "bdmp-pp1",
   "name": "BDMP-Scheibe Police Pistol 1",
-  "organization": "BDMP",
+  "federation": "bdmp",
   "rings": [
     {
       "value": 6,
@@ -59,6 +59,7 @@
   },
   "events": [
     {
+      "id": "bdmp-pp-1-police-pistol-1",
       "name": "BDMP PP 1 Police Pistol 1",
       "distance": {
         "value": 25000,
@@ -68,6 +69,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-pp-2-police-pistol-2",
       "name": "BDMP PP 2 Police Pistol 2",
       "distance": {
         "value": 50000,
@@ -77,6 +79,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-sm-super-magnum",
       "name": "BDMP SM Super Magnum",
       "distance": {
         "value": 25000,
@@ -86,6 +89,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-police-pistol-3-carry-gun",
       "name": "BDMP Police Pistol 3 (Carry Gun)",
       "distance": {
         "value": 20000,
@@ -95,6 +99,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-police-pistol-4-pocket-gun",
       "name": "BDMP Police Pistol 4 (Pocket Gun)",
       "distance": {
         "value": 15000,
@@ -104,6 +109,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-30-m1-carbine-pp-2",
       "name": "BDMP .30 M1 Carbine PP 2",
       "distance": {
         "value": 50000,
@@ -113,6 +119,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-lar-4-lever-action-rifle-4-lar-pp1",
       "name": "BDMP LAR 4 Lever Action Rifle 4 (LAR - PP1)",
       "distance": {
         "value": 25000,
@@ -122,6 +129,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-lar-6-lever-action-rifle-6-lar-pp-2",
       "name": "BDMP LAR 6 Lever Action Rifle 6 (LAR - PP 2)",
       "distance": {
         "value": 50000,
@@ -131,6 +139,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-sports-carbine-pp2",
       "name": "BDMP Sports Carbine PP2",
       "distance": {
         "value": 50000,
@@ -140,6 +149,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-sppdr-1-schwarzpulverpatronen-dr-1",
       "name": "BDMP SPPDR 1 Schwarzpulverpatronen-DR 1",
       "distance": {
         "value": 25000,

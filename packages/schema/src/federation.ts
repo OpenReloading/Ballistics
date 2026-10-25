@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { caliberClassId } from './caliber-class.ts'
 import { recordId } from './ids.ts'
 import { provenance } from './provenance.ts'
 import { countryCode, positiveLength, sha256 } from './shared.ts'
@@ -31,7 +30,7 @@ export const federation = z.strictObject({
   id: recordId,
   /** Full name as the rule book prints it. */
   name: z.string().min(1),
-  /** Short name as faces and events name it in `organization` ("ISSF", "DSB"). */
+  /** Short name as the rule books and faces print it ("ISSF", "DSB"). */
   abbreviation: z.string().min(1),
   /** ISO 3166-1 alpha-2 code of the federation's country, `international` for a world body. */
   country: z.union([z.literal('international'), countryCode]),
@@ -76,12 +75,13 @@ export const discipline = z.strictObject({
   /** Kind of firearm, where the rule book states it. */
   category: disciplineCategory.optional(),
   /**
-   * The caliber classes the discipline allows. `stated`: the rule book names them; `derived`: our
-   * expansion of a stated range or gauge to the classes of `caliberClasses`.
+   * The caliber classes the discipline allows, by id of a `CaliberClass` record. `stated`: the
+   * rule book names them; `derived`: our expansion of a stated range or gauge to the classes whose
+   * diameter lies in it.
    */
   caliberClasses: z
     .strictObject({
-      ids: z.array(caliberClassId).min(1),
+      ids: z.array(recordId).min(1),
       basis: z.enum(['stated', 'derived']),
     })
     .optional(),
@@ -104,8 +104,8 @@ export const targetMapping = z.strictObject({
   discipline: recordId,
   /** Id of the target face record. */
   face: recordId,
-  /** Name of the face's event that scores the discipline on this face. */
-  event: z.string().min(1),
+  /** Id of the face's event (`events[].id` of the face record) that scores the discipline on this face. */
+  event: recordId,
   /** Part of the discipline shot on this face ("precision stage"); absent: the whole discipline. */
   stage: z.string().min(1).optional(),
   /** Diameter of the hole as scored, where the rule book fixes one for the discipline. */

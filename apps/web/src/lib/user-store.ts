@@ -68,17 +68,36 @@ export async function inStore<T>(
 export const storedRecords = async () =>
   validRecords((await inStore('records', 'readonly', (s) => s.getAll())) ?? [])
 
+/** The photo id a stored value points at as a target sheet, whether or not it passes the schema. */
+export const rawPhotoId = (raw: unknown) => {
+  const photo = (raw as { data?: { photo?: unknown } } | null)?.data?.photo
+  return typeof photo === 'string' ? photo : undefined
+}
+
 /**
  * Ids of the photos a stored target sheet points at, an invalid sheet's too: its photo stays
  * with it.
  */
 export async function storedPhotoIds() {
   const { records, invalid } = await storedRecords()
-  const raw = invalid.flatMap((i) => {
-    const photo = (i.raw as { data?: { photo?: unknown } } | null)?.data?.photo
-    return typeof photo === 'string' ? [photo] : []
-  })
+  const raw = invalid.flatMap((i) => rawPhotoId(i.raw) ?? [])
   return new Set([...photoIds(records), ...raw])
+}
+
+/**
+ * Stores the `invalid` entries of an Export all file as they are, each only where no stored
+ * record has its id, so a valid record is never overwritten. Counts the entries stored (`added`),
+ * left out for an id already in the store (`kept`) and without a text id, which no record has
+ * (`unstorable`).
+ */
+export async function putInvalid(raw: unknown[]) {
+  const n = { added: 0, kept: 0, unstorable: 0 }
+  for (const r of raw) {
+    if (typeof (r as { id?: unknown } | null)?.id !== 'string') n.unstorable++
+    else if (await putRecordIfAbsent(r as UserRecord)) n.added++
+    else n.kept++
+  }
+  return n
 }
 
 /** The stored record `id` as written, unvalidated; undefined when absent. */
@@ -108,6 +127,21 @@ export async function putRecordIf(record: UserRecord, base: string | undefined) 
     return r
   })
   return fits(stored, base)
+}
+
+/**
+ * Puts `record` unless the store holds a record, valid or not, with its id, read and written in
+ * one transaction; false when it was left out.
+ */
+export async function putRecordIfAbsent(record: UserRecord) {
+  const stored = await inStore('records', 'readwrite', (s) => {
+    const r = s.get(record.id)
+    r.addEventListener('success', () => {
+      if (!r.result) s.put(record)
+    })
+    return r
+  })
+  return !stored
 }
 
 export const deleteRecords = (ids: string[]) =>

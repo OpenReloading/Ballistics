@@ -2,7 +2,7 @@
   "id": "dsb-10m-pistole-issf-10m-air-pistol",
   "discipline": "dsb-10m-pistole",
   "face": "issf-10m-air-pistol",
-  "event": "DSB 10 m Pistole",
+  "event": "dsb-10-m-pistole",
   "provenance": {
     "kind": "published",
     "sources": [

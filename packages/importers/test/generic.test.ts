@@ -33,7 +33,7 @@ describe('parseDelimited', () => {
     expect(r.missingPaths).toEqual([
       'id',
       'date',
-      'device.manufacturerName',
+      'device.manufacturer',
       'device.model',
       'device.firmware',
       'conditions.airTemperature',
@@ -42,7 +42,7 @@ describe('parseDelimited', () => {
     ])
     expect(complete(r).device).toEqual({
       kind: 'other',
-      manufacturerName: 'Manufacturer',
+      manufacturer: 'catalogue:test-maker',
       model: 'Model',
       firmware: '1.0',
     })

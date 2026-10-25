@@ -2,7 +2,7 @@
   "id": "bds-1202-issf-25m-precision-50m-pistol",
   "discipline": "bds-1202",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDS 1202 MD Pistole über 9 mm",
+  "event": "bds-1202-md-pistole-uber-9-mm",
   "shotCount": 40,
   "provenance": {
     "kind": "published",

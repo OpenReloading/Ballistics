@@ -6,7 +6,11 @@ import {
 } from '@openreloading/core'
 import type { Bundle } from '@openreloading/data'
 import {
+  type AnalysisKey,
+  analysisKinds,
   type Cartridge,
+  fromSi,
+  ladderStepKinds,
   type Provenance,
   userDataFormat,
   userDataVersion,
@@ -108,7 +112,7 @@ export const bundle: Bundle = {
     {
       id: 'test-face',
       name: 'Test Face',
-      organization: 'Test',
+      federation: 'test-federation',
       rings: [
         { value: 9, diameter: { value: 20 } },
         { value: 10, diameter: { value: 10 } },
@@ -118,6 +122,7 @@ export const bundle: Bundle = {
       decimal: true,
       events: [
         {
+          id: 'test-event',
           name: 'Test event',
           distance: { value: 10000 },
           gauge: { value: 4.5 },
@@ -158,12 +163,21 @@ export const bundle: Bundle = {
       provenance: published,
     },
   ],
+  caliberClasses: [
+    {
+      id: 'air-4-5',
+      name: '4.5 mm (.177) air',
+      diameter: { value: 4.5 },
+      cartridges: [],
+      provenance: published,
+    },
+  ],
   targetMappings: [
     {
       id: 'test-discipline-test-face',
       discipline: 'test-discipline',
       face: 'test-face',
-      event: 'Test event',
+      event: 'test-event',
       gauge: { value: 4.5 },
       shotCount: 60,
       provenance: published,
@@ -216,13 +230,68 @@ export const siValues = {
   startPressure: 1e7,
 }
 
-/** A user data file with one workbench-state record of `data`; `extra` adds top-level fields. */
-export function file(data: object, extra: object = {}) {
+/** A reference by a plain catalogue id or as given. */
+const reference = (id: unknown) =>
+  typeof id === 'string' && !id.includes(':') ? `catalogue:${id}` : id
+
+/**
+ * The data of a user load from SI values and plain catalogue ids, as the load file holds it: the
+ * charge as a stored quantity, every other key under `analysis.overrides` in its stored unit (an
+ * unknown key stays as given), the ladder with its step in the stored unit of its kind. Other
+ * fields pass through.
+ */
+export function loadData(data: {
+  siValues?: Record<string, number | undefined>
+  cartridge?: string
+  bullet?: string
+  powder?: string
+  ladder?: {
+    kind?: 'charge' | 'seating' | 'temperature'
+    chargeStep?: number
+    stepCount?: number
+    direction?: string
+  }
+  [key: string]: unknown
+}) {
+  const { siValues: si = {}, cartridge, bullet, powder, ladder, ...rest } = data
+  const { charge, ...typed } = si
+  const overrides = Object.fromEntries(
+    Object.entries(typed)
+      .filter((e): e is [string, number] => e[1] !== undefined)
+      .map(([k, v]) => [
+        k,
+        Object.hasOwn(analysisKinds, k) ? fromSi(analysisKinds[k as AnalysisKey], v) : v,
+      ]),
+  )
+  const { chargeStep, ...shape } = ladder ?? {}
+  const step = chargeStep && fromSi(ladderStepKinds[shape.kind ?? 'charge'], chargeStep)
+  return {
+    origin: 'user',
+    ...(charge !== undefined && { charge: { value: fromSi('mass', charge) } }),
+    ...(cartridge && { cartridge: reference(cartridge) }),
+    ...(bullet && { bullet: reference(bullet) }),
+    ...(powder && { powder: reference(powder) }),
+    analysis: {
+      overrides,
+      ...(ladder && { ladder: { ...shape, ...(step && { step }) } }),
+    },
+    ...rest,
+  }
+}
+
+/** A user data file with one load record from `data` (see {@link loadData}); `extra` adds top-level fields. */
+export function file(data: Parameters<typeof loadData>[0], extra: object = {}) {
   return {
     format: userDataFormat,
     version: userDataVersion,
     records: [
-      { kind: 'workbenchState', id: 'l1', name: 'Load', saved: '2026-10-20T10:00:00.000Z', data },
+      {
+        kind: 'load',
+        id: 'l1',
+        name: 'Load',
+        saved: '2026-10-20T10:00:00.000Z',
+        data: loadData(data),
+      },
     ],
     ...extra,
   }

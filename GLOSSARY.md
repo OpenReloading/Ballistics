@@ -47,7 +47,7 @@ A record of kind `sources`: a source several records cite (the C.I.P. TDCC, a ru
 `edition`: edition, print or date of a source or rule book as the document states it.
 
 **Source title**:
-`title`: names the actual source, such as the site and the table or the report. Rule books (`ruleBooks`) and a design's `parent` carry a `title` too.
+`title`: names the actual source, such as the site and the table or the report. Rule books (`ruleBooks`) carry a `title` too.
 
 **Publisher**:
 `publisher`: who issued the data of a source, free text: a manufacturer, a standards body or the authors.
@@ -89,19 +89,23 @@ _Avoid_: maker
 ### Manufacturers
 
 **Manufacturer**:
-A company that makes powders or bullets, a record of kind `manufacturers` with `id`, `name`, `website`, `aliases` and `provenance`. Its id is the slug of its name without the legal form and never changes. Served by `GET /v1/manufacturers` and `GET /v1/manufacturers/{id}`.
+A company that makes powders or bullets, or whose products other records name (a chronograph), a record of kind `manufacturers` with `id`, `name`, `website`, `aliases` and `provenance`. Its id is the slug of its name without the legal form and never changes. Served by `GET /v1/manufacturers` and `GET /v1/manufacturers/{id}`.
 _Avoid_: maker, brand
 
 **Manufacturer reference**:
-`manufacturer`: record id of a manufacturer on powder and bullet records, their list items, the `resolved` parts of compute answers and the list filter `?manufacturer=`.
+`manufacturer`: record id of a manufacturer on powder and bullet records, their list items, the `resolved` parts of compute answers and the list filter `?manufacturer=`. On a user bullet and a firearm it is a reference `catalogue:<id>` or `user:<id>`, on a chronograph `device` a `catalogue:` reference.
 _Avoid_: maker
+
+**User manufacturer**:
+A user record of kind `manufacturer`: `origin` (`user`) in `data`, the name in the record's `name`. Typing a name no catalogue or user manufacturer has creates one; the same name typed again names it.
+_Avoid_: custom manufacturer
 
 **Case manufacturer**:
 `caseManufacturer`: record id of the manufacturer of the case a case capacity was measured with, when the source names one.
 _Avoid_: caseMaker
 
 **Manufacturer name**:
-`manufacturerName`: the manufacturer as free text, where no manufacturer record is referenced: load components (`bullet`, `powder`, `primer`, `case`), a chronograph `device`, a bullet design and a firearm of the user data.
+`manufacturerName`: the manufacturer as free text on the components of a load (`bullet`, `powder`, `primer`, `case`) and, as the text a chronograph file gives, on an imported session's `device`. A bullet design, a firearm and a stored session hold a reference.
 _Avoid_: maker
 
 **Website**:
@@ -116,13 +120,13 @@ _Avoid_: maker
 A record of kind `cartridges`, one per C.I.P. sheet: `id`, `name`, `aliases`, `table`, `country`, `published`, `revised`, `pressureMethod`, `verification`, `values`, `exceptions`, `provenance` (the C.I.P. TDCC with the sheet's URL, SHA-256 and retrieval date). Served by `GET /v1/cartridges` and `GET /v1/cartridges/{id}`.
 
 **Cartridge reference**:
-`cartridge`: record id of a cartridge on case capacities, loads, firing series, firearms and workbench states of the user data, and in interior bodies (the cartridge whose pressure limits the answer compares). Also the bullet list filter `?cartridge=`.
+`cartridge`: record id of a cartridge on case capacities, loads and firing series, a reference (`catalogue:<id>` or `user:<UUID>`) on a firearm, a reference on loads, and in interior bodies (the cartridge whose pressure limits the answer compares). Also the bullet list filter `?cartridge=`.
 
 **Sheet id**:
 `sheetId`: `cip-<id>-<revised or published>`, the id of a cartridge's sheet revision. Figure ids and drawing baselines are named after it.
 
 **Organization**:
-`organization`: on a target face and its events, the abbreviation of the federation whose rule book defines it.
+`organization`: on a target face list item, the abbreviation of the federation the face's `federation` names, derived. The records hold `federation`, a federation id.
 _Avoid_: maker (as an organization value)
 
 **Publication date**:
@@ -183,11 +187,11 @@ _Avoid_: rimType
 _Avoid_: g1
 
 **Bore diameter**:
-`boreDiameter`: diameter across the lands. Cartridge list item (mm, chamber-side CIP F), firearm of the user data (m, measured), M3 `chamber.boreDiameter` (m).
+`boreDiameter`: diameter across the lands. Cartridge list item (mm, chamber-side CIP F), firearm (mm, measured), M3 `chamber.boreDiameter` (m).
 _Avoid_: land
 
 **Groove diameter**:
-`grooveDiameter`: diameter across the grooves. Cartridge list item (mm, chamber-side CIP Z), firearm (m, measured).
+`grooveDiameter`: diameter across the grooves. Cartridge list item (mm, chamber-side CIP Z), firearm (mm, measured).
 _Avoid_: groove
 
 **Case length**:
@@ -206,14 +210,14 @@ A record of kind `capacities`: one water capacity of a case of one cartridge fro
 _Avoid_: capacity
 
 **Measured water capacity**:
-`measuredWaterCapacity`: the case capacity (water to the mouth) the user measured, m3, on a workbench state.
+`measuredWaterCapacity`: the case capacity (water to the mouth) the user measured, m3, as a workbench link carries it. A load keeps it as `case.waterCapacity` (g).
 _Avoid_: ownCapacity
 
 **Case condition**:
 `caseCondition`: state of the case when its capacity was measured: `new`, `fired` or `sized`.
 
 **Caliber class**:
-`caliberClasses`: classes of bullet diameter from the code table `packages/schema/src/caliber-class.ts`. On a discipline an object with the class `ids` it allows and its `basis` (`stated` by the rule book or `derived` from a stated range). On a target face list item the ids of the classes of its events.
+A record of kind `caliber-classes`: a class of bullet diameter with `name`, `diameter` and the member `cartridges`. `caliberClasses`: on a discipline an object with the ids of the class records it allows and its `basis` (`stated` by the rule book or `derived` from a stated range). On a target face list item the ids of the classes of its events.
 _Avoid_: calibers, classes
 
 ### Powders
@@ -348,7 +352,7 @@ _Avoid_: `tip` (on a bullet list item)
 `noseLength`: length of the bullet nose, mm.
 
 **Base to ogive**:
-`baseToOgive`: on a bullet, base to the start of the ogive (mm). On a load, cartridge base to the bullet ogive of the loaded round (mm), and a `seating.by` value of a workbench state.
+`baseToOgive`: on a bullet, base to the start of the ogive (mm). On a load, cartridge base to the bullet ogive of the loaded round (mm), and a `seating.by` value of a load.
 _Avoid_: cbto
 
 **Bearing length**:
@@ -376,7 +380,7 @@ _Avoid_: velocityMin, minSpeed
 _Avoid_: minimumTwist
 
 **Twist**:
-`twist`: length of barrel per turn of the rifling. On a load's `firearm` (mm), a firearm of the user data, interior `barrel`, exterior `firearm` and the stability query (m). 0 in an interior body: no rifling.
+`twist`: length of barrel per turn of the rifling. On a firearm (mm), interior `barrel`, exterior `firearm` and the stability query (m). 0 in an interior body: no rifling.
 _Avoid_: twistLength
 
 **Twist hand**:
@@ -385,32 +389,32 @@ _Avoid_: twistLength
 ### Loads
 
 **Load**:
-A record of kind `loads`: one cartridge recipe fired from one firearm, with `cartridge`, `firearm`, `bullet`, `powder`, `charge`, `primer`, `case`, `overallLength`, `baseToOgive`. Its `firearm` holds `name`, `barrelLength`, `twist`, `twistHand`. Its components hold `manufacturerName` and `lot`, the bullet `model` and `bulletMass`, the powder `name`, the primer `model`, the case `firingCount` and `waterCapacity`.
+One cartridge recipe fired from one firearm, one shape for the catalogue (a record of kind `loads`), the user record of kind `load` and the load file, in stored units: `origin`, `cartridge`, `firearm`, `bullet` and `powder` (references, a measured catalogue load may describe the bullet and powder instead), `charge` (g), `primer`, `case` (`firingCount`, `waterCapacity`), `seating`, `note`, `analysis` (`overrides`, the solver values the user typed, and `ladder`) and `measurements`. A catalogue load also has `id`, `name` and `provenance`; a user load is named by its record. Its components hold `manufacturerName` and `lot`, the bullet `model` and `bulletMass`, the powder `name` and the primer `model`.
 
 **Lot**:
 `lot`: lot number of a load component as printed on the package.
 
 **Charge**:
-`charge`: propellant mass of one round. Load record (g), measured series strings (kg), interior and charge-target bodies (kg), and the `charge` of each interior answer and ladder step (kg).
+`charge`: propellant mass of one round. Load (g), measured series strings (g), interior and charge-target bodies (kg), and the `charge` of each interior answer and ladder step (kg).
 
 **Case firings**:
 `firingCount`: times the case of a load was fired before this load.
 _Avoid_: firings
 
 **Overall length**:
-`overallLength`: cartridge overall length of the loaded round, mm on a load, and a `seating.by` value of a workbench state.
+`overallLength`: cartridge overall length of the loaded round, mm on a load, and a `seating.by` value of a load.
 _Avoid_: coal
 
 **Barrel length**:
-`barrelLength`: barrel length of a load's firearm and a firing series (mm), and of a firearm of the user data (m). Interior bodies take `barrel.length` (m): the bullet travel from the seated position to the muzzle.
+`barrelLength`: barrel length of a firearm and a firing series (mm). Interior bodies take `barrel.length` (m): the bullet travel from the seated position to the muzzle.
 _Avoid_: `travel` (of an M3 barrel)
 
 **Bullet travel**:
-`travel`: seated bullet base to the muzzle, m, a workbench field and load-file key of `siValues`, sent as the M3 `barrel.length`.
+`travel`: seated bullet base to the muzzle, m, a workbench field and key of a load's `analysis.overrides` (mm), sent as the M3 `barrel.length`.
 _Avoid_: `barrelLength` (of the workbench field)
 
 **Bullet seating**:
-`seating`: the length a bullet is seated by in a workbench state, `by` (`overallLength` or `baseToOgive`) and its `value` (m). The other length is derived.
+`seating`: the length a bullet is seated by in a load, `by` (`overallLength` or `baseToOgive`) and its `value` (mm). The other length is derived.
 
 ### Chronograph sessions
 
@@ -418,7 +422,7 @@ _Avoid_: `barrelLength` (of the workbench field)
 A record of kind `chrono`: one device, one place, one day, with `date`, `device`, `muzzleDistance`, `conditions`, `strings`. Its provenance kind is `measured`.
 
 **Device**:
-`device`: the chronograph of a session, `kind` (`doppler-radar`, `optical`, `magnetic`, `other`), `manufacturerName`, `model` and `firmware`. In a measured series of the user data, the manufacturer and model as one text.
+`device`: the chronograph of a session, `kind` (`doppler-radar`, `optical`, `magnetic`, `other`), `manufacturer` (a `catalogue:` reference), `model` and `firmware`. In a measured series of the user data, the manufacturer and model as one text.
 
 **Muzzle distance**:
 `muzzleDistance`: muzzle to the measuring point of a chronograph, mm in a session, m in a measured series.
@@ -427,10 +431,10 @@ A record of kind `chrono`: one device, one place, one day, with `date`, `device`
 `conditions`: `airTemperature` (degC), `stationPressure` (absolute air pressure at the site, bar) and `relativeHumidity` (%) of a session. The truing nominal holds the same three.
 
 **Shot string**:
-One entry of a session's `strings`: the shots of one load, with `load`, `propellantTemperature` and `shots`. A measured series of a workbench state holds `strings` with a `label`, the `charge` they are mapped to and `shots`.
+One entry of a session's `strings`: the shots of one load, with `load`, `propellantTemperature` and `shots`. A measured series of a load holds `strings` with a `label`, the `charge` they are mapped to and `shots`.
 
 **Load reference**:
-`load`: on a shot string the record id of the load it was fired with. On a target sheet the local id of the saved workbench state its groups belong to.
+`load`: on a shot string the record id of the load it was fired with. On a target sheet the local id of the saved load its groups belong to.
 _Avoid_: loadId
 
 **Chronograph shot**:
@@ -484,7 +488,7 @@ _Avoid_: cd
 ### Target faces and federations
 
 **Target face**:
-A record of kind `target-faces`: a printed face as a rule book defines it, with `name`, `organization`, `rings`, `innerTen`, `blackDiameter`, `blackHeight`, `decimal`, `events`, `paper`, `bulls`, `numerals`. Its list item carries `caliberClasses` and `categories`.
+A record of kind `target-faces`: a printed face as a rule book defines it, with `name`, `federation`, `rings`, `innerTen`, `blackDiameter`, `blackHeight`, `decimal`, `events`, `paper`, `bulls`, `numerals`. Its list item carries `caliberClasses` and `categories`.
 
 **Ring**:
 One entry of `rings`, outer to inner: `value` (the score, one above the ring outside it), `diameter` (width to the outside edge of the ring line, mm), `height` of an oval ring (mm), `fill` (colour of the zone the ring line bounds outside) and `line` (colour of the ring line). `rings` is also an overlay switch.
@@ -500,7 +504,7 @@ _Avoid_: black
 `decimal`: the rule book allows tenth-ring values on the face.
 
 **Face event**:
-One entry of `events` of a face: `name`, `distance`, `gauge`, `scoring`, `organization`, `section` and `category`. `event` on a target mapping or a shot group's `face` names one.
+One entry of `events` of a face: `id`, `name`, `distance`, `gauge`, `scoring`, `federation`, `section` and `category`. `event` on a target mapping or a shot group's `face` holds its `id`.
 
 **Gauge**:
 `gauge`: diameter of the hole as scored, mm: a face event's gauge, or the one a target mapping fixes for a discipline. A target mapping list item carries `gaugeMm`.
@@ -522,7 +526,7 @@ One entry of `bulls`: a scoring centre of a face with several, `x` and `y` from 
 `numerals`: the ring values are printed on the face.
 
 **Federation**:
-A record of kind `federations`: a shooting sport federation with `name`, `abbreviation` (as faces and events name it in `organization`), `country`, `internationalFederation` and `ruleBooks`.
+A record of kind `federations`: a shooting sport federation with `name`, `abbreviation` (shown as the organization of faces and events), `country`, `internationalFederation` and `ruleBooks`.
 
 **International federation**:
 `internationalFederation`: record id of the international federation a federation is a member of.
@@ -567,71 +571,73 @@ _Avoid_: `shots` (as a count), n
 A JSON file of the web app with `format` (`openreloading-user-data`), `version` (a file of another version is refused), `records` and the photos of its target sheets in `files`.
 
 **User record**:
-One entry of `records`: `kind` (`bulletDesign`, `cartridgeDesign`, `workbenchState`, `firearm`, `targetSheet`), `id`, `name`, `saved` (ISO date and time of the save) and the `data` of that kind.
+One entry of `records`: `kind` (`bullet`, `cartridge`, `load`, `firearm`, `targetSheet`, `targetFaceDesign`), `id`, `name`, `saved` (ISO date and time of the save) and the `data` of that kind.
 _Avoid_: workbenchLoad
 
 **Embedded file**:
 One entry of `files`: a photo with `id`, media `type` and base64 `data`.
 
 **Bullet design**:
-A user record of kind `bulletDesign`: `manufacturerName`, `name`, the `choices` of `base.type`, `ogive.form` and `tip.type`, `siValues` and `parent`.
+A user record of kind `bullet`: `origin` (`user`), the `manufacturer` reference, the `basedOn` catalogue reference and the `overrides` of the bullet fields, in stored units.
 
 **Cartridge design**:
-A user record of kind `cartridgeDesign`: the `table` and spec `values` the cartridge drawing reads, and `parent`.
+A user record of kind `cartridge`: `origin` (`user`), the `basedOn` catalogue reference and `overrides` of the `table` and the spec `values`.
 
-**Parent record**:
-`parent`: the catalogue record a design started from, `id` and `title`.
+**Target face design**:
+A user record of kind `targetFaceDesign`: the `rings`, `innerTen`, `blackDiameter`, `blackHeight`, `decimal` and `events` of a face in mm, each optional while the draft is unfinished. The shot group and hit probability tools offer a design that builds a valid `TargetFace` as `User design <name>` (face id `user-<record id>`).
+
+**Base record**:
+`basedOn`: the catalogue record a design is a variant of, as `catalogue:<id>`. The resolved record is the base with the `overrides` applied (`applyOverrides`).
+
+**Overrides**:
+`overrides`: the fields of a design that differ from its base record. An object merges by key, an array replaces, a cartridge value merges by side, symbol and variant, `null` removes.
 
 **SI values**:
 `siValues`: SI value per field key of a designer or the workbench, as the share link carries them.
 _Avoid_: si
 
-**Workbench state**:
-A user record of kind `workbenchState`: `siValues`, the record ids `cartridge`, `bullet` and `powder`, `notes`, `measuredWaterCapacity`, the library `firearm`, `seating`, `ladder` and `measurements`. Saved alone it is the load file of `POST /v1/interior/load-file`.
-_Avoid_: workbenchLoad
-
 **Notes**:
-`notes`: free text of a workbench state or a firearm. On a target sheet the list of sheet notes.
+`notes`: free text of a firearm; a load's is `note`. On a target sheet the list of sheet notes.
 
 **Ladder**:
-`ladder`: a series of runs around or beyond a base value. On a workbench state `kind` (`charge` or `seating`), `stepCount` (2 to 21), `chargeStep` (kg, m for seating) and `direction` (`up`, `down`, `around`). In interior bodies a charge ladder from `load.charge` with `chargeStep` (kg), `stepCount` and `direction`, one interior run each.
+`ladder`: a series of runs around or beyond a base value. On a load, `analysis.ladder`: `kind` (`charge`, `seating` or `temperature`), `stepCount` (2 to 21), `step` (g for a charge ladder, mm for seating, K for temperature) and `direction` (`up`, `down`, `around`). In interior bodies a charge ladder from `load.charge` with `chargeStep` (kg), `stepCount` and `direction`, one interior run each.
 _Avoid_: `step`, `steps` (of a ladder)
 
 **Measured series**:
-One entry of `measurements` of a workbench state: one imported chronograph file with `name`, `date`, `device`, `muzzleDistance` (m) and `strings` mapped to charges.
+One entry of `measurements` of a load: one imported chronograph file with `name`, `date`, `device`, `muzzleDistance` (mm) and `strings` mapped to charges (g).
 
 **Firearm**:
-A user record of kind `firearm`: `name`, `manufacturerName`, `model`, `cartridge`, `barrelLength`, `twist`, `twistHand`, `grooveDiameter`, `boreDiameter`, `freebore`, `baseToOgiveAtLands`, `firearmMass`, `roundCount`, `notes`, `optics`, `configurations`, `active` (the configuration on the firearm now). A workbench state names one by its local id in `firearm`. The `firearm` of exterior bodies is the sight and rifling of one shot.
+A firearm, one shape for every origin, in stored units (mm, g, degrees; the zero air in degC, bar and %). The user record of kind `firearm` holds `origin`, `name`, `manufacturer` (a reference), `model`, `cartridge` (a reference), `barrelLength`, `twist`, `twistHand`, `grooveDiameter`, `boreDiameter`, `freebore`, `baseToOgiveAtLands`, `firearmMass`, `roundCount`, `notes`, `optics`, `configurations`, `active` (the configuration on the firearm now). A workbench state names one by its local id in `firearm`, a load by a reference. The `firearm` of exterior bodies is the sight and rifling of one shot.
 _Avoid_: rifle, gun
 
 **Freebore**:
-`freebore`: unrifled length of the throat from the case mouth to the start of the rifling, m, on a firearm.
+`freebore`: unrifled length of the throat from the case mouth to the start of the rifling, mm, on a firearm.
 
 **Base to ogive at the lands**:
 `baseToOgiveAtLands`: cartridge base to ogive with the bullet touching the lands, measured, m.
 _Avoid_: lands
 
 **Firearm mass**:
-`firearmMass`: mass of a firearm, kg.
+`firearmMass`: mass of a firearm, g. A load's `analysis.overrides` entry of that name is g too.
 _Avoid_: `mass` (of a firearm), gunMass
 
 **Optic**:
-One entry of `optics`: `id`, `kind` (`scope`, `redDot`, `ironSights`, `other`), `name`, `clickUnit` (how the turrets are marked, `MOA` or `mrad`), `clickValue`, `travel` (total adjustment range, rad), `reticle`, `minMagnification` and `maxMagnification`.
+One entry of `optics`: `id`, `kind` (`scope`, `redDot`, `ironSights`, `other`), `name`, `clickUnit` (how the turrets are marked, `MOA` or `mrad`), `clickValue`, `travel` (total adjustment range, degrees), `reticle`, `minMagnification` and `maxMagnification`.
 _Avoid_: magnificationMin, magnificationMax
 
 **Click value**:
-`clickValue`: angular size of one sight click, rad: on an optic, in range string bodies (nominal) and as a prior.
+`clickValue`: angular size of one sight click: degrees on an optic, rad in range string bodies (nominal) and as a prior.
 _Avoid_: click
 
 **Optic configuration**:
 One entry of `configurations`: the optics mounted on a firearm between `mounted` and `removed` (ISO dates), with `id`, `name` and 1 to 4 `mounts`.
 
 **Optic mount**:
-One entry of `mounts`: `optic` (local id), `sightHeight` (m), `lateralOffset` (optic centre right of the bore, m), `cant` (clockwise as seen from behind, rad), `zeroRange` (m), `zeroNotes`, the optional air of the zero (`zeroTemperature` K, `zeroPressure` Pa, `zeroHumidity` fraction) and an optional `dragFactor` with its `dragFactorSource`.
+One entry of `mounts`: `optic` (local id), `sightHeight` (mm), `lateralOffset` (optic centre right of the bore, mm), `cant` (clockwise as seen from behind, degrees), `zeroRange` (mm), `zeroNotes`, the optional air of the zero (`zeroTemperature` degC, `zeroPressure` bar, `zeroHumidity` %) and an optional `dragFactor` with its `dragFactorSource`.
 _Avoid_: `offset` (of a mount)
 
 **Sight height**:
-`sightHeight`: line of sight above the bore axis at the muzzle, m, on an optic mount and the `firearm` of exterior bodies. The truing nominal holds it in mm.
+`sightHeight`: line of sight above the bore axis at the muzzle: mm on an optic mount, m on the `firearm` of exterior bodies. The truing nominal holds it in mm.
 
 **Zero range**:
 `zeroRange`: range at which an optic mount is zeroed, m. The truing nominal holds it in mm.
@@ -833,7 +839,7 @@ Query of `GET /v1/exterior/stability`: `bullet` or `mass`, `diameter` and `lengt
 `barrel` of interior bodies: `length` and `twist`.
 
 **Interior bullet**:
-`bullet` of interior bodies: `mass`, with `gyrationRadius` (axial radius of gyration, m). In exterior bodies, the stability query and workbench states `bullet` is a bullet record id.
+`bullet` of interior bodies: `mass`, with `gyrationRadius` (axial radius of gyration, m). In exterior bodies and the stability query `bullet` is a bullet record id; on a load it is a bullet reference.
 
 **Propellant**:
 `propellant` of interior bodies: `specificEnergy`, `gamma`, `density`, `covolume`, `burn` and `temperatureSensitivity`.
@@ -870,7 +876,7 @@ _Avoid_: config
 `target` of `POST /v1/interior/charge-target`: `kind` (`peakPressure` Pa, `muzzleVelocity` m/s, `loadRatio`, `barrelTime` s, `bulletLeadTime` s), `value` and `unit` (`percentOfLimit` for a percentage of the first compared limit).
 
 **Load file**:
-The body of `POST /v1/interior/load-file`: a user data file with exactly one workbench state. Query `curves` (`true` adds the curve `points`).
+The body of `POST /v1/interior/load-file`: a user data file with exactly one record of kind `load`. Query `curves` (`true` adds the curve `points`).
 
 ### API compute answers
 
@@ -908,7 +914,7 @@ One entry of `limits`: one CIP Pmax of the cartridge's sheet (`cartridge`, `revi
 _Avoid_: steps
 
 **Load name**:
-`loadName`: name of the workbench state of a load file.
+`loadName`: name of the load record of a load file.
 _Avoid_: `name` (of a load-file answer)
 
 **Summary**:

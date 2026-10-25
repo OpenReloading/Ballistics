@@ -2,7 +2,7 @@
   "id": "bdmp-dp-3-issf-25m-precision-50m-pistol",
   "discipline": "bdmp-dp-3",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDMP DP 3 Dienstpistole 3",
+  "event": "bdmp-dp-3-dienstpistole-3",
   "shotCount": 15,
   "provenance": {
     "kind": "published",

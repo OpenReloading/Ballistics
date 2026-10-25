@@ -2,7 +2,7 @@
   "id": "bdmp-sppdg-1-issf-25m-precision-50m-pistol",
   "discipline": "bdmp-sppdg-1",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDMP SPPDG 1 Schwarzpulverpatronen-DG 1",
+  "event": "bdmp-sppdg-1-schwarzpulverpatronen-dg-1",
   "shotCount": 20,
   "provenance": {
     "kind": "published",

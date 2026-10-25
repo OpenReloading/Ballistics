@@ -22,10 +22,11 @@ COPY packages/drawing packages/drawing
 # the web app imports @openreloading/data/plausibility only: no records, no bundle
 COPY packages/data/tsconfig.json packages/data/tsconfig.build.json packages/data/tsconfig.plausibility.json packages/data/
 COPY packages/data/src/plausibility.ts packages/data/src/
-# and @openreloading/api/compute only (the Pages edition's compute in the browser)
-COPY packages/api/tsconfig.json packages/api/tsconfig.build.json packages/api/tsconfig.compute.json packages/api/
+# and @openreloading/api/compute and /catalogue only (the Pages edition's compute and catalogue in the browser)
+COPY packages/api/tsconfig.json packages/api/tsconfig.build.json packages/api/tsconfig.browser.json packages/api/
 COPY packages/api/src/compute packages/api/src/compute
-RUN npm run build -w @openreloading/schema && npm run build -w @openreloading/importers && npm run build -w @openreloading/core && npm run build -w @openreloading/drawing && npx tsc -p packages/data/tsconfig.plausibility.json && npx tsc -p packages/api/tsconfig.compute.json
+COPY packages/api/src/catalogue packages/api/src/catalogue
+RUN npm run build -w @openreloading/schema && npm run build -w @openreloading/importers && npm run build -w @openreloading/core && npm run build -w @openreloading/drawing && npx tsc -p packages/data/tsconfig.plausibility.json && npx tsc -p packages/api/tsconfig.browser.json
 COPY apps/web apps/web
 RUN npm run build -w @openreloading/web && rm -rf apps/web/.next/standalone/node_modules/sharp apps/web/.next/standalone/node_modules/@img
 

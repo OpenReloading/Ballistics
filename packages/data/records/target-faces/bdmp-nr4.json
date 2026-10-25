@@ -1,7 +1,7 @@
 {
   "id": "bdmp-nr4",
   "name": "BDMP-Scheibe Nr. 4",
-  "organization": "BDMP",
+  "federation": "bdmp",
   "rings": [
     {
       "value": 2,
@@ -44,6 +44,7 @@
   },
   "events": [
     {
+      "id": "bdmp-zg-2-300-m",
       "name": "BDMP ZG 2 300 m",
       "distance": {
         "value": 300000,
@@ -53,6 +54,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-zg-3-300-m",
       "name": "BDMP ZG 3 300 m",
       "distance": {
         "value": 300000,
@@ -62,6 +64,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-zg-4-100-m",
       "name": "BDMP ZG 4 100 m",
       "distance": {
         "value": 100000,
@@ -71,6 +74,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-sports-carbine-zg-50-m",
       "name": "BDMP Sports Carbine ZG 50 m",
       "distance": {
         "value": 50000,

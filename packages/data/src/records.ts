@@ -3,11 +3,15 @@ import { join } from 'node:path'
 import {
   type Bullet,
   bullet,
+  type CaliberClass,
   type Cartridge,
   type CaseCapacity,
+  type CatalogueLoad,
   type ChronoSession,
+  caliberClass,
   cartridge,
   caseCapacity,
+  catalogueLoad,
   chronoSession,
   type Discipline,
   discipline,
@@ -15,13 +19,14 @@ import {
   type FiringSeries,
   federation,
   firingSeries,
-  type Load,
-  load,
+  type LoadTables,
+  loadTable,
   type Manufacturer,
   manufacturer,
   type Powder,
   powder,
   type RangeFirings,
+  type Renames,
   rangeFirings,
   sourceRecord,
   type TargetFace,
@@ -29,10 +34,11 @@ import {
   targetFace,
   targetMapping,
 } from '@openreloading/schema'
-import type { z } from 'zod'
+import { z } from 'zod'
+import { checkCaliberClasses } from './caliber-classes.ts'
 import { checkCoverage } from './coverage.ts'
 import { checkFederations } from './federations.ts'
-import { checkFittedSources, type LoadTables } from './load-tables.ts'
+import { checkFittedSources } from './load-tables.ts'
 import { checkNames, type LocatedFinding } from './names.ts'
 import {
   checkBullet,
@@ -44,34 +50,55 @@ import {
 import { readKind } from './read-kind.ts'
 import {
   checkCartridgeReferences,
+  checkLoadComponentReferences,
   checkLoadReferences,
   checkManufacturerReferences,
   recordIds,
 } from './references.ts'
+import { checkRenames, readRenames } from './renames.ts'
 import { checkSources, sourceIndex } from './sources.ts'
 
 /** Directory `records/` of the data package, the default root of {@link readRecords}. */
 const recordsDir = join(import.meta.dirname, '..', 'records')
 
-/** The load tables listed in `load-tables.json` of a records folder (none without it). */
-export function readLoadTables(dir: string): LoadTables {
+/**
+ * The load tables listed in `load-tables.json` of a records folder (none without it). An entry
+ * that breaks `loadTable` is left out and adds its issues to `errors`; without `errors` it throws.
+ */
+export function readLoadTables(dir: string, errors?: string[]): LoadTables {
   const path = join(dir, 'load-tables.json')
   if (!existsSync(path)) return {}
+  let json: unknown
   try {
-    return JSON.parse(readFileSync(path, 'utf8')) as LoadTables
+    json = JSON.parse(readFileSync(path, 'utf8'))
   } catch (e) {
     throw new Error(`${path}: invalid JSON: ${(e as Error).message}`)
   }
+  const listed = z.record(z.string(), z.unknown()).safeParse(json)
+  const found: string[] = errors ?? []
+  const tables: LoadTables = {}
+  if (!listed.success) found.push('load-tables.json: not an object of tables by row file')
+  else
+    for (const [file, entry] of Object.entries(listed.data)) {
+      const parsed = loadTable.safeParse(entry)
+      if (parsed.success) tables[file] = parsed.data
+      else
+        for (const issue of parsed.error.issues)
+          found.push(`load-tables.json: ${[file, ...issue.path].join('.')}: ${issue.message}`)
+    }
+  if (!errors && found.length) throw new Error(found.join('\n'))
+  return tables
 }
 
 /** The records of a records root, one array per kind. */
 export type Bundle = {
   cartridges: Cartridge[]
+  caliberClasses: CaliberClass[]
   manufacturers: Manufacturer[]
   powders: Powder[]
   bullets: Bullet[]
   capacities: CaseCapacity[]
-  loads: Load[]
+  loads: CatalogueLoad[]
   chronoSessions: ChronoSession[]
   firings: FiringSeries[]
   rangeFirings: RangeFirings[]
@@ -79,6 +106,8 @@ export type Bundle = {
   federations: Federation[]
   disciplines: Discipline[]
   targetMappings: TargetMapping[]
+  /** `renames.json` of the records roots; absent: none. */
+  renames?: Renames
 }
 
 /**
@@ -96,11 +125,12 @@ function readBundle(roots: string[], errors: string[]): Bundle {
     readKind(roots, dir, schema, { errors, sources, optional })
   const bundle = {
     cartridges: read('cartridges', cartridge),
+    caliberClasses: read('caliber-classes', caliberClass),
     manufacturers: read('manufacturers', manufacturer),
     powders: read('powders', powder),
     bullets: read('bullets', bullet),
     capacities: read('capacities', caseCapacity),
-    loads: read('loads', load),
+    loads: read('loads', catalogueLoad),
     chronoSessions: read('chrono', chronoSession),
     firings: read('firings', firingSeries, true),
     rangeFirings: read('range', rangeFirings, true),
@@ -108,6 +138,7 @@ function readBundle(roots: string[], errors: string[]): Bundle {
     federations: read('federations', federation),
     disciplines: read('disciplines', discipline),
     targetMappings: read('target-mappings', targetMapping),
+    renames: readRenames(roots, errors),
   }
   checkSources(sources, errors)
   return bundle
@@ -145,6 +176,7 @@ function applyExceptions(spec: Cartridge, errors: string[]) {
 function checkSourceCoverage(bundle: Bundle, errors: string[]) {
   for (const [dir, records] of [
     ['manufacturers', bundle.manufacturers],
+    ['caliber-classes', bundle.caliberClasses],
     ['powders', bundle.powders],
     ['bullets', bundle.bullets],
     ['capacities', bundle.capacities],
@@ -205,7 +237,9 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
   }
   checkSourceCoverage(bundle, errors)
   errors.push(...checkFederations(bundle))
-  const loadTables = readLoadTables(roots[1] ?? roots[0])
+  errors.push(...checkCaliberClasses(bundle))
+  checkRenames(bundle, errors)
+  const loadTables = readLoadTables(roots[1] ?? roots[0], errors)
   for (const p of bundle.powders) {
     for (const error of checkFittedSources(p, loadTables))
       errors.push(`powders/${p.id}.json: ${error}`)
@@ -217,6 +251,7 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
   checkManufacturerReferences(bundle, loadTables, ids, errors)
   checkRangeRounds(bundle.rangeFirings, errors)
   checkLoadReferences(bundle, ids, errors)
+  checkLoadComponentReferences(bundle, errors)
   for (const f of collectFindings(bundle, new Map(bundle.cartridges.map((c) => [c.id, c]))))
     errors.push(`${f.file}: ${f.finding}: ${f.message}`)
   return { bundle, errors }

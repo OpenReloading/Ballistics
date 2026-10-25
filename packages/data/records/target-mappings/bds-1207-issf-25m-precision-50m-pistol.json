@@ -2,7 +2,7 @@
   "id": "bds-1207-issf-25m-precision-50m-pistol",
   "discipline": "bds-1207",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDS 1207 MD Revolver über .38",
+  "event": "bds-1207-md-revolver-uber-38",
   "shotCount": 40,
   "provenance": {
     "kind": "published",

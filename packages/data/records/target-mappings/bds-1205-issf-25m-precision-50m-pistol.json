@@ -2,7 +2,7 @@
   "id": "bds-1205-issf-25m-precision-50m-pistol",
   "discipline": "bds-1205",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDS 1205 MD Revolver unter 4 Zoll",
+  "event": "bds-1205-md-revolver-unter-4-zoll",
   "shotCount": 40,
   "provenance": {
     "kind": "published",

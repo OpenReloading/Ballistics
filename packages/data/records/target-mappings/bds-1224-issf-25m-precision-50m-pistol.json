@@ -2,7 +2,7 @@
   "id": "bds-1224-issf-25m-precision-50m-pistol",
   "discipline": "bds-1224",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDS 1224 MD Dienstpistole 2",
+  "event": "bds-1224-md-dienstpistole-2",
   "shotCount": 40,
   "provenance": {
     "kind": "published",

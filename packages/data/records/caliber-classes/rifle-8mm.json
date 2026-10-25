@@ -1,0 +1,18 @@
+{
+  "id": "rifle-8mm",
+  "name": "8 mm rifle",
+  "diameter": {
+    "value": 8.22
+  },
+  "cartridges": ["8-x-57-is", "8-x-68-s", "8-mm-rem-mag"],
+  "provenance": {
+    "kind": "derived",
+    "sources": [
+      {
+        "source": "cip-tdcc",
+        "fields": ["diameter", "cartridges"],
+        "note": "Grouped by the maximum projectile diameter G1 of the cartridge side of the sheets; the nominal diameter lies within 0.15 mm of G1 of every member."
+      }
+    ]
+  }
+}

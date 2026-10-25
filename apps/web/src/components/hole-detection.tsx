@@ -1,7 +1,13 @@
 'use client'
 
 import { ActionIcon, Button, Flex, NativeSelect, Popover } from '@mantine/core'
-import type { ShotGroup, TargetFace, TargetSheet } from '@openreloading/schema'
+import {
+  fromSi,
+  type ShotGroup,
+  type TargetFace,
+  type TargetSheet,
+  toSi,
+} from '@openreloading/schema'
 import { ArrowClockwise, ArrowCounterClockwise, GearSix, X } from '@phosphor-icons/react'
 import { type KeyboardEvent, type PointerEvent, useEffect, useRef, useState } from 'react'
 import { ellipsePoint } from '../lib/ellipse.ts'
@@ -137,7 +143,7 @@ export function useHoleDetection({
   /** The marked region, else the face, else the whole turned photo (for the local scale; the run finds the target). */
   const region =
     choices.region ??
-    (geometry && size ? faceLabel(geometry, size.diameter * 1000).outline : undefined) ??
+    (geometry && size ? faceLabel(geometry, fromSi('length', size.diameter)).outline : undefined) ??
     (photo &&
       (() => {
         const b = turnedBox(photo.width, photo.height, turn)
@@ -351,7 +357,8 @@ export function useHoleDetection({
         photoRotation: turn,
         faces,
         // a calibrated sheet gives the size, so faces of another size drop out of the search
-        ...(frame?.calibration && region && { pxPerMm: localPxPerM(frame, region) / 1000 }),
+        ...(frame?.calibration &&
+          region && { pxPerMm: localPxPerM(frame, region) * toSi('length', 1) }),
       },
       (m) => {
         if (m.kind !== 'face') return
@@ -384,11 +391,11 @@ export function useHoleDetection({
       ...(face && {
         id: face.id,
         ...(event && { event }),
-        organization: face.organization,
+        federation: face.federation,
         events: face.events.map((e) => ({
-          name: e.name,
-          distance: e.distance.value / 1000,
-          ...(e.organization && { organization: e.organization }),
+          id: e.id,
+          distance: toSi('length', e.distance.value),
+          ...(e.federation && { federation: e.federation }),
         })),
       }),
       centre: fit.centre,
@@ -646,8 +653,8 @@ export function useHoleDetection({
     : found.fits.length
       ? found.fits.flatMap((f) =>
           f.face.events.map((e) => ({
-            value: `${f.face.id}|${e.name}`,
-            label: `${f.face.name}: ${e.name}, ${formatQuantity('range', system, e.distance.value / 1000)}`,
+            value: `${f.face.id}|${e.id}`,
+            label: `${f.face.name}: ${e.name}, ${formatQuantity('range', system, toSi('length', e.distance.value))}`,
           })),
         )
       : found.ranked.slice(0, 4).map((r) => ({ value: r.id, label: r.name }))
@@ -746,7 +753,7 @@ export function useHoleDetection({
         deferred
         onCommit={(si) => {
           setDiameter(si)
-          const plane = found && si ? fitDiameter(found, si * 1000) : undefined
+          const plane = found && si ? fitDiameter(found, fromSi('length', si)) : undefined
           if (plane) applyFit(plane, false)
           else if (si) say('Find the face first: no black area is known.', true)
         }}

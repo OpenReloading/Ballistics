@@ -225,7 +225,7 @@ describe('charge ladder on a full pool', () => {
     let calls = 0
     // the first step runs, the next ones find the queue full
     const busy = buildApp({
-      db: api.db,
+      catalogue: api.catalogue,
       compute: {
         run: (task) => {
           calls += 1
@@ -255,7 +255,7 @@ describe('charge ladder bounds', () => {
     clock.mockImplementation(() => now)
     // each batch "takes" 6 s: after the first two the next one could end past 14 s
     const slow = buildApp({
-      db: api.db,
+      catalogue: api.catalogue,
       compute: {
         run: async (task) => {
           calls += 1
@@ -282,7 +282,7 @@ describe('charge ladder bounds', () => {
   it('refuses a ladder whose output is above five runs at the point cap, without its later batches', async () => {
     let calls = 0
     const wide = buildApp({
-      db: api.db,
+      catalogue: api.catalogue,
       compute: {
         run: async (task) => {
           calls += 1

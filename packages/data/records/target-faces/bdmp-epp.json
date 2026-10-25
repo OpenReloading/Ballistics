@@ -1,7 +1,7 @@
 {
   "id": "bdmp-epp",
   "name": "BDMP-Scheibe EPP",
-  "organization": "BDMP",
+  "federation": "bdmp",
   "rings": [
     {
       "value": 2,
@@ -52,6 +52,7 @@
   },
   "events": [
     {
+      "id": "bdmp-epp-europaischer-prazisions-parcours",
       "name": "BDMP EPP Europäischer Präzisions Parcours",
       "distance": {
         "value": 30000,
@@ -61,6 +62,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-epp-polymerpistole",
       "name": "BDMP EPP - Polymerpistole",
       "distance": {
         "value": 25000,
@@ -70,6 +72,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-epp-rifle-europaischer-prazisions-parcours-223-rem",
       "name": "BDMP EPP Rifle Europäischer Präzisions Parcours .223 Rem.",
       "distance": {
         "value": 30000,
@@ -79,6 +82,7 @@
       "scoring": "touch"
     },
     {
+      "id": "bdmp-epp-rifle-advanced",
       "name": "BDMP EPP Rifle Advanced",
       "distance": {
         "value": 50000,

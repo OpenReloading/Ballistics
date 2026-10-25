@@ -2,7 +2,7 @@
   "id": "dsb-luntenschlosspistole-25m-issf-25m-precision-50m-pistol",
   "discipline": "dsb-luntenschlosspistole-25m",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "DSB 25 m Luntenschlosspistole",
+  "event": "dsb-25-m-luntenschlosspistole",
   "shotCount": 15,
   "provenance": {
     "kind": "published",

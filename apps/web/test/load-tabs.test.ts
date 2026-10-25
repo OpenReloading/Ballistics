@@ -28,12 +28,12 @@ vi.mock('../src/lib/user-store.ts', () => ({
 
 const load = (id: string, name: string, saved: string, cartridge?: string) =>
   ({
-    kind: 'workbenchState',
+    kind: 'load',
     id,
     name,
     saved,
-    data: { siValues: {}, cartridge },
-  }) as Extract<UserRecord, { kind: 'workbenchState' }>
+    data: { origin: 'user', cartridge },
+  }) as Extract<UserRecord, { kind: 'load' }>
 
 it('numbers equal tab titles from the second on', () => {
   expect(tabTitles(['308 Win. load', 'Load', '308 Win. load', '308 Win. load'])).toEqual([
@@ -49,9 +49,9 @@ const names = { '308-win': '308 Win.', '65-creedmoor': '6.5 Creedmoor' }
 
 it('groups the list by cartridge, newest first, groups by title, without a cartridge last', () => {
   const records = [
-    load('a', '308 Win. load', '2026-10-01T10:00:00.000Z', '308-win'),
-    load('b', '6.5 Creedmoor load', '2026-10-02T10:00:00.000Z', '65-creedmoor'),
-    load('c', '308 Win. load', '2026-10-03T10:00:00.000Z', '308-win'),
+    load('a', '308 Win. load', '2026-10-01T10:00:00.000Z', 'catalogue:308-win'),
+    load('b', '6.5 Creedmoor load', '2026-10-02T10:00:00.000Z', 'catalogue:65-creedmoor'),
+    load('c', '308 Win. load', '2026-10-03T10:00:00.000Z', 'catalogue:308-win'),
     load('d', 'Load', '2026-10-04T10:00:00.000Z'),
   ]
   const groups = loadGroups(records, '', names)
@@ -62,10 +62,24 @@ it('groups the list by cartridge, newest first, groups by title, without a cartr
   ])
 })
 
+it('groups loads of a catalogue cartridge together by its record id, a design apart', () => {
+  const design = 'user:6f0f4d3e-0a43-4a43-9a3d-3a2f2e1f0c21'
+  const records = [
+    load('a', 'Older', '2026-10-01T10:00:00.000Z', 'catalogue:308-win'),
+    load('b', 'New', '2026-10-02T10:00:00.000Z', 'catalogue:308-win'),
+    load('c', 'On a design', '2026-10-03T10:00:00.000Z', design),
+  ]
+  const groups = loadGroups(records, '', { '308-win': '308 Win.', [design]: 'Mine 7.8' })
+  expect(groups.map((g) => [g.title, g.records.map((r) => r.id)])).toEqual([
+    ['308 Win.', ['b', 'a']],
+    ['Mine 7.8', ['c']],
+  ])
+})
+
 it('filters the list by the words of the query in the name', () => {
   const records = [
-    load('a', '308 Win. load', '2026-10-01T10:00:00.000Z', '308-win'),
-    load('b', '6.5 Creedmoor load', '2026-10-02T10:00:00.000Z', '65-creedmoor'),
+    load('a', '308 Win. load', '2026-10-01T10:00:00.000Z', 'catalogue:308-win'),
+    load('b', '6.5 Creedmoor load', '2026-10-02T10:00:00.000Z', 'catalogue:65-creedmoor'),
   ]
   expect(loadGroups(records, 'creed').flatMap((g) => g.records.map((r) => r.id))).toEqual(['b'])
   expect(loadGroups(records, 'zzz')).toEqual([])
@@ -110,7 +124,7 @@ it('reminds to export after 10 changes, or 7 days after the last export', () => 
 
 it('titles a group by the cartridge lookup, not by the record names', () => {
   const records = [
-    load('a', 'Match load for Anna', '2026-10-01T10:00:00.000Z', '308-win'),
+    load('a', 'Match load for Anna', '2026-10-01T10:00:00.000Z', 'catalogue:308-win'),
     load('b', 'Hunting', '2026-10-02T10:00:00.000Z', '308-win'),
     load('c', 'Unknown', '2026-10-03T10:00:00.000Z', 'not-listed'),
   ]
@@ -149,9 +163,9 @@ it('names a copy and keeps it within the 200 characters a record name may have',
 })
 
 it('keys a saved load by name and data; a rename of the saved key changes only the name', () => {
-  const data = { siValues: { charge: 0.003 } }
+  const data = { origin: 'user', charge: { value: 3 } }
   expect(namedKey(data, 'A')).not.toBe(namedKey(data, 'B'))
-  expect(namedKey(data, 'A')).toBe(namedKey({ siValues: { charge: 0.003 } }, 'A'))
+  expect(namedKey(data, 'A')).toBe(namedKey({ origin: 'user', charge: { value: 3 } }, 'A'))
   expect(renamedKey(namedKey(data, 'A'), 'B')).toBe(namedKey(data, 'B'))
 })
 
@@ -165,16 +179,16 @@ it('names the switcher by the typed name, else cartridge and powder, else the ge
 
 it('renames and copies the stored load, not the older copy of the list', async () => {
   const listed: LoadRecord = {
-    kind: 'workbenchState',
+    kind: 'load',
     id: 'w1',
     name: 'Ladder',
     saved: '2026-10-01T10:00:00.000Z',
-    data: { siValues: { charge: 0.0028 } },
+    data: { origin: 'user', charge: { value: 2.8 } },
   }
   const newer = {
     ...listed,
     saved: '2026-10-02T10:00:00.000Z',
-    data: { siValues: { charge: 0.003 } },
+    data: { origin: 'user', charge: { value: 3 } },
   }
   store.set('w1', newer)
   await renameStored('w1', 'Ladder 2')

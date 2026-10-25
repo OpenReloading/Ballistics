@@ -1,12 +1,23 @@
 import {
   type Firearm,
   firearm,
-  type Optic,
+  fromSi,
   type OpticMount,
+  parseRef,
+  type QuantityKind,
+  type QuantityValue,
+  toSi,
   type UserRecord,
 } from '@openreloading/schema'
 import type { FieldSpec } from './field-spec.ts'
-import { formatNumber, formatQuantity, type UnitSystem, unitsOf, withUnit } from './units.ts'
+import {
+  formatNumber,
+  formatQuantity,
+  type Quantity,
+  type UnitSystem,
+  unitsOf,
+  withUnit,
+} from './units.ts'
 
 export const firearmFields = [
   { key: 'barrelLength', label: 'Barrel length', quantity: 'barrelLength', min: 0 },
@@ -126,9 +137,12 @@ export function firearmProblem(name: string, f: Firearm): string | undefined {
     const c = f.configurations[i]
     where = ` in configuration ${c.name || c.id}${typeof j === 'number' ? `, mount ${j + 1}` : ''}`
   }
-  const field = String(issue.path.findLast((p) => typeof p === 'string'))
+  // a stored quantity is `{ value }`: the field is the key above it
+  const field = String(issue.path.findLast((p) => typeof p === 'string' && p !== 'value'))
   let reason = 'not valid'
   if (issue.code === 'custom') reason = issue.message[0].toLowerCase() + issue.message.slice(1)
+  else if (issue.code === 'too_small' && field === 'zeroTemperature')
+    reason = 'must be above absolute zero'
   else if (issue.code === 'too_small' && issue.origin === 'number')
     reason = `must be ${issue.inclusive ? 'at least' : 'greater than'} ${issue.minimum}`
   else if (issue.code === 'too_big' && field === 'zeroHumidity') reason = 'must be from 0 to 100 %'
@@ -137,8 +151,58 @@ export function firearmProblem(name: string, f: Firearm): string | undefined {
   return `${labels[field] ?? field}${where}: ${reason}.`
 }
 
+/** A stored quantity in SI, undefined without one. */
+export const siOf = (kind: QuantityKind, q: QuantityValue | undefined) =>
+  q === undefined ? undefined : toSi(kind, q.value)
+
+/** An SI value as the stored quantity of `kind`, without the noise of the unit round trip. */
+export const storedOf = (kind: QuantityKind, si: number): QuantityValue => ({
+  value: Number(fromSi(kind, si).toPrecision(12)),
+})
+
+/** The stored kind of each form quantity a firearm field holds; the others are plain numbers. */
+const storedKinds: Partial<Record<Quantity, QuantityKind>> = {
+  barrelLength: 'length',
+  twist: 'length',
+  length: 'length',
+  range: 'length',
+  firearmMass: 'mass',
+  correction: 'angle',
+  angle: 'angle',
+  temperature: 'temperature',
+  airPressure: 'pressure',
+  percent: 'relativeHumidity',
+}
+
+/** A firearm field's value in SI: a stored quantity converted, a plain number as it is. */
+export function fieldSi(spec: { quantity: Quantity }, v: number | QuantityValue | undefined) {
+  if (v === undefined) return
+  const kind = storedKinds[spec.quantity]
+  return typeof v === 'number' || !kind ? (v as number) : toSi(kind, v.value)
+}
+
+/** An SI field value as the record stores it: a quantity in its stored unit, or the plain number. */
+export function fieldStored(spec: { quantity: Quantity }, si: number | undefined) {
+  const kind = storedKinds[spec.quantity]
+  return si === undefined || !kind ? si : storedOf(kind, si)
+}
+
+/** What a firearm gives the workbench's Gun card: twist, barrel length (m) and mass (kg). */
+export const gunValues = (f: Firearm) => ({
+  twist: siOf('length', f.twist),
+  barrelLength: siOf('length', f.barrelLength),
+  firearmMass: siOf('mass', f.firearmMass),
+})
+
+/** The catalogue record id a cartridge reference names; undefined for a `user:` reference. */
+export const catalogueCartridgeId = (ref: string | undefined) => {
+  const parsed = ref === undefined ? undefined : parseRef(ref)
+  return parsed?.scope === 'catalogue' ? parsed.id : undefined
+}
+
 /** A new firearm: no optics or configurations yet. */
 export const blankFirearm = (): Firearm => ({
+  origin: 'user',
   name: '',
   twistHand: 'right',
   optics: [],
@@ -158,16 +222,34 @@ type SightFill = {
   click?: { value: number; unit?: 'MOA' | 'mrad' }
   twist?: number
   twistHand: 'right' | 'left'
-} & Pick<OpticMount, (typeof zeroFillKeys)[number]>
+  /** The zero air: K, Pa and a fraction. */
+  zeroTemperature?: number
+  zeroPressure?: number
+  zeroHumidity?: number
+  dragFactor?: number
+  dragFactorSource?: string
+}
 
-/** The mount values a choice fills beside sight height and zero range. */
-export const zeroFillKeys = [
-  'zeroTemperature',
-  'zeroPressure',
-  'zeroHumidity',
-  'dragFactor',
-  'dragFactorSource',
-] as const
+/** The mount's zero air in the stored kind of each. */
+const zeroAirKinds = {
+  zeroTemperature: 'temperature',
+  zeroPressure: 'pressure',
+  zeroHumidity: 'relativeHumidity',
+} as const satisfies Partial<Record<keyof OpticMount, QuantityKind>>
+
+/** The mount's zero air, drag factor and its source, as {@link SightFill} holds them. */
+export function zeroFill(m: OpticMount): Partial<SightFill> {
+  return {
+    ...Object.fromEntries(
+      Object.entries(zeroAirKinds).flatMap(([k, kind]) => {
+        const q = m[k as keyof typeof zeroAirKinds]
+        return q === undefined ? [] : [[k, toSi(kind, q.value)]]
+      }),
+    ),
+    ...(m.dragFactor !== undefined && { dragFactor: m.dragFactor }),
+    ...(m.dragFactorSource !== undefined && { dragFactorSource: m.dragFactorSource }),
+  }
+}
 
 /**
  * Every mounted optic of the firearms among `records`, configuration by configuration, the active
@@ -203,16 +285,16 @@ export function sightOptions(records: UserRecord[]) {
     return {
       ...mountOption(x, optic?.name ?? x.m.optic),
       fill: {
-        sightHeight: x.m.sightHeight,
-        zeroRange: x.m.zeroRange,
-        ...(optic?.clickValue && { click: { value: optic.clickValue, unit: optic.clickUnit } }),
-        ...Object.fromEntries(
-          zeroFillKeys.flatMap((k) => (x.m[k] === undefined ? [] : [[k, x.m[k]]])),
-        ),
+        sightHeight: toSi('length', x.m.sightHeight.value),
+        zeroRange: toSi('length', x.m.zeroRange.value),
+        ...(optic?.clickValue && {
+          click: { value: toSi('angle', optic.clickValue.value), unit: optic.clickUnit },
+        }),
+        ...zeroFill(x.m),
         // a twist of 0 is no twist
-        ...(x.f.twist && { twist: x.f.twist }),
+        ...(x.f.twist?.value && { twist: toSi('length', x.f.twist.value) }),
         twistHand: x.f.twistHand,
-      } as SightFill,
+      } satisfies SightFill as SightFill,
     }
   })
 }
@@ -225,7 +307,9 @@ export function clickOptions(records: UserRecord[]) {
   return [...mountedOptics(records)].flatMap((x) => {
     const o = x.f.optics.find((y) => y.id === x.m.optic)
     if (!o?.clickValue) return []
-    return [{ ...mountOption(x, o.name), click: o.clickValue, unit: o.clickUnit }]
+    return [
+      { ...mountOption(x, o.name), click: toSi('angle', o.clickValue.value), unit: o.clickUnit },
+    ]
   })
 }
 
@@ -238,10 +322,15 @@ export function activeClick(r: UserRecord | undefined) {
 
 /** The twist as length per turn with its direction: "1:10.0 in, right". */
 export const twistText = (f: Firearm, system: UnitSystem) =>
-  f.twist ? `1:${withUnit('twist', system, f.twist)}, ${f.twistHand}` : undefined
+  f.twist?.value
+    ? `1:${withUnit('twist', system, toSi('length', f.twist.value))}, ${f.twistHand}`
+    : undefined
 
-/** An optic's click value in its turret marking, else in the units of `system`. */
-export function clickText(o: Pick<Optic, 'clickValue' | 'clickUnit'>, system: UnitSystem) {
+/** A click value (rad) in the turret marking `clickUnit`, else in the units of `system`. */
+export function clickText(
+  o: { clickValue?: number; clickUnit?: 'MOA' | 'mrad' },
+  system: UnitSystem,
+) {
   if (!o.clickValue) return
   const unit =
     o.clickUnit === 'MOA'
@@ -270,14 +359,16 @@ function firstMount(f: Firearm) {
  */
 export function cardFacts(f: Firearm, system: UnitSystem) {
   const barrel = [
-    f.barrelLength ? `${withUnit('barrelLength', system, f.barrelLength)} barrel` : undefined,
+    f.barrelLength?.value
+      ? `${withUnit('barrelLength', system, toSi('length', f.barrelLength.value))} barrel`
+      : undefined,
     twistText(f, system),
   ]
     .filter(Boolean)
     .join(', ')
   const { mount, optic } = firstMount(f)
   const sight = mount
-    ? `${optic?.name || 'Optic'}, zero ${withUnit('range', system, mount.zeroRange)}`
+    ? `${optic?.name || 'Optic'}, zero ${withUnit('range', system, toSi('length', mount.zeroRange.value))}`
     : undefined
   return { barrel: barrel || undefined, sight }
 }
@@ -290,11 +381,13 @@ export function cardFacts(f: Firearm, system: UnitSystem) {
 export function firearmCells(f: Firearm, system: UnitSystem) {
   const { i, config, mount, optic } = firstMount(f)
   return {
-    barrel: f.barrelLength ? formatQuantity('barrelLength', system, f.barrelLength) : '',
-    twist: f.twist ? formatQuantity('twist', system, f.twist) : '',
-    hand: f.twist ? f.twistHand : '',
+    barrel: f.barrelLength?.value
+      ? formatQuantity('barrelLength', system, toSi('length', f.barrelLength.value))
+      : '',
+    twist: f.twist?.value ? formatQuantity('twist', system, toSi('length', f.twist.value)) : '',
+    hand: f.twist?.value ? f.twistHand : '',
     optic: mount ? optic?.name || 'Optic' : '',
-    zero: mount ? formatQuantity('range', system, mount.zeroRange) : '',
+    zero: mount ? formatQuantity('range', system, toSi('length', mount.zeroRange.value)) : '',
     configuration: config ? config.name || `Configuration ${i + 1}` : '',
   }
 }

@@ -6,8 +6,8 @@
     "src/bundle.ts",
     "src/openapi.ts",
     "src/version.ts",
+    "src/catalogue/*.ts",
     "src/compute/*.ts",
-    "src/db/*.ts",
     "src/routes/*.ts"
   ],
   "tsconfig": "tsconfig.build.json",

@@ -3,7 +3,7 @@
  * face to ring marks on a sheet. Shots and holes in target m relative to the face centre, as the
  * target sheet stores them; face records in mm. Pure: no React, DOM or Next.js.
  */
-import type { TargetFace } from '@openreloading/schema'
+import { fromSi, type TargetFace, toSi } from '@openreloading/schema'
 import { type Point, solve } from './target-geometry.ts'
 
 export type RingScore = {
@@ -27,7 +27,7 @@ type GroupScore = {
 /** 1e-9 mm in m: a hole edge on a ring line within this counts as touching it. */
 const touch = 1e-12
 /** Radius in m of a face diameter in mm. */
-const radius = (d: { value: number }) => d.value * 5e-4
+const radius = (d: { value: number }) => toSi('length', d.value / 2)
 
 /**
  * The scored hole diameter in m: 0 where the event counts the hole centre, else the event's gauge,
@@ -40,7 +40,7 @@ export function scoredHoleDiameter<B extends number | undefined>(
 ): number | B {
   if (event?.scoring === 'centre') return 0
   const fixed = event?.gauge?.value ?? gauge
-  return fixed ? fixed * 1e-3 : bullet
+  return fixed ? toSi('length', fixed) : bullet
 }
 
 type Shape = Pick<TargetFace['rings'][number], 'diameter' | 'height' | 'shape'>
@@ -89,7 +89,7 @@ function nearestBull(face: TargetFace, shot: Point): { centre: Point; zone?: str
   let best = { centre: { x: 0, y: 0 }, zone: undefined as string | undefined }
   let bestD = Number.POSITIVE_INFINITY
   for (const b of face.bulls ?? []) {
-    const centre = { x: b.x.value * 1e-3, y: b.y.value * 1e-3 }
+    const centre = { x: toSi('length', b.x.value), y: toSi('length', b.y.value) }
     const d = Math.hypot(shot.x - centre.x, shot.y - centre.y)
     if (d < bestD) [best, bestD] = [{ centre, zone: b.zone }, d]
   }
@@ -241,12 +241,12 @@ export function faceAlignment(
       return { diameter: ring.diameter.value, points }
     }),
   )
-  return { centre: fit.centre, scale: fit.scale * 1e3, rms: fit.rmsMisfit }
+  return { centre: fit.centre, scale: fromSi('length', fit.scale), rms: fit.rmsMisfit }
 }
 
 /** A ring of `diameter` mm as a closed polyline of 72 points on the sheet, target m. */
 export function ringPath(a: FaceAlignment, diameter: number): Point[] {
-  const r = diameter * 5e-4
+  const r = toSi('length', diameter / 2)
   return Array.from({ length: 72 }, (_, i) => {
     const t = (i / 72) * 2 * Math.PI
     return onSheet(a, { x: r * Math.cos(t), y: r * Math.sin(t) })
@@ -276,7 +276,7 @@ export function scoreGroupOnFace(
 ):
   | { alignment: FaceAlignment; hole: number; usesOwnTenthRule: boolean; score: GroupScore }
   | { error: string } {
-  const event = face.events.find((e) => e.name === choice.event)
+  const event = face.events.find((e) => e.id === choice.event)
   const hole = scoredHoleDiameter(event, bullet, choice.gauge)
   if (hole === undefined || (!hole && event?.scoring !== 'centre'))
     return { error: 'No hole size: set Marker, or choose a discipline or event with a gauge.' }

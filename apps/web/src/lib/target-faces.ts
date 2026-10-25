@@ -5,9 +5,11 @@ import {
   type DisciplineKey,
   type TargetFace,
   type TargetMapping,
+  toSi,
 } from '@openreloading/schema'
 import type { DirectoryState } from './directory.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
+import type { Face } from './face-organization.ts'
 import { matchesQuery } from './lists.ts'
 import type { FieldGroup, FieldRow, StripItem } from './record-fields.ts'
 
@@ -25,15 +27,15 @@ export type TargetFaceRow = {
 }
 
 /** The distances of a face's events in m, each once, ascending. */
-const faceDistances = (f: TargetFace) =>
-  [...new Set(f.events.map((e) => e.distance.value / 1e3))].sort((a, b) => a - b)
+const faceDistances = (f: Pick<Face, 'events'>) =>
+  [...new Set(f.events.map((e) => toSi('length', e.distance.value)))].sort((a, b) => a - b)
 
 /** The distances as one text: "25, 50 m". */
 export const distanceText = (metres: readonly number[]) =>
   metres.length > 0 ? `${metres.join(', ')} m` : ''
 
 /** The list row of a face; `mappings` of every face, counted by distinct discipline. */
-export function targetFaceRow(f: TargetFace, mappings: readonly MappingSummary[]): TargetFaceRow {
+export function targetFaceRow(f: Face, mappings: readonly MappingSummary[]): TargetFaceRow {
   return {
     id: f.id,
     name: f.name,
@@ -57,7 +59,7 @@ const length = (label: string, mm: number | undefined, printed?: string): FieldR
     : [
         {
           label,
-          value: { quantity: 'length', si: mm * 1e-3 },
+          value: { quantity: 'length', si: toSi('length', mm) },
           ...(printed && { printed }),
         },
       ]
@@ -75,7 +77,7 @@ const ringColours = (r: TargetFace['rings'][number]) => {
 }
 
 /** The face's facts under the page bar: federation, distances, outer diameter, black area, rings. */
-export function targetFaceStrip(f: TargetFace): StripItem[] {
+export function targetFaceStrip(f: Face): StripItem[] {
   const oval = f.rings[0].height !== undefined ? ' width' : ''
   const item = (icon: StripItem['icon'], label: string, rows: FieldRow[]): StripItem[] =>
     rows[0] ? [{ icon, label, row: rows[0] }] : []
@@ -156,7 +158,7 @@ type FaceEventRow = {
 
 /** One row per event of the face (one per mapping where several map it), in the order of `compareDisciplines`, then by stage. */
 export function faceEventRows(
-  f: Pick<TargetFace, 'organization' | 'events'>,
+  f: Pick<Face, 'organization' | 'events'>,
   mappings: readonly (Pick<
     TargetMapping,
     'id' | 'discipline' | 'event' | 'stage' | 'gauge' | 'shotCount'
@@ -169,9 +171,9 @@ export function faceEventRows(
   const abbreviation = new Map(federations.map((x) => [x.id, x.abbreviation]))
   return f.events
     .flatMap((e) => {
-      const own = mappings.filter((m) => m.event === e.name)
+      const own = mappings.filter((m) => m.event === e.id)
       const event = {
-        distance: e.distance.raw ?? `${e.distance.value / 1e3} m`,
+        distance: e.distance.raw ?? `${toSi('length', e.distance.value)} m`,
         ...(e.category && { category: e.category }),
         ...(e.scoring && { scoring: e.scoring }),
       }
@@ -193,7 +195,7 @@ export function faceEventRows(
         }
         return {
           key,
-          id: m?.id ?? e.name,
+          id: m?.id ?? e.id,
           ...(d && { disciplineId: d.id }),
           federation,
           ...(d?.number && { number: d.number }),

@@ -38,9 +38,9 @@ describe('federation filter', () => {
 
   it('keeps the faces the federation maps or publishes', () => {
     const faces = [
-      { id: 'bds-face', organization: 'ISSF' },
-      { id: 'dsb-face', organization: 'ISSF' },
-      { id: 'own', organization: 'BDS' },
+      { id: 'bds-face', federation: 'issf' },
+      { id: 'dsb-face', federation: 'issf' },
+      { id: 'own', federation: 'bds' },
     ]
     expect([...federationFaceIds(faces, data, 'bds')].sort()).toEqual(['bds-face', 'own'])
   })

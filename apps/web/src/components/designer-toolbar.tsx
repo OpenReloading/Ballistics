@@ -27,9 +27,10 @@ export const DesignerToolbar = memo(function DesignerToolbar({
 }: {
   undo: boolean
   redo: boolean
-  reset: boolean
+  reset?: boolean
   newLabel: string
-  resetLabel: string
+  /** Without it the toolbar has no reset. */
+  resetLabel?: string
   system: UnitSystem
   dispatch: (a: ToolbarAction) => void
 }) {
@@ -62,14 +63,16 @@ export const DesignerToolbar = memo(function DesignerToolbar({
       >
         {newLabel}
       </Button>
-      <Button
-        variant="default"
-        disabled={!reset}
-        leftSection={<ArrowCounterClockwise aria-hidden="true" />}
-        onClick={() => dispatch({ type: 'reset', system })}
-      >
-        {resetLabel}
-      </Button>
+      {resetLabel && (
+        <Button
+          variant="default"
+          disabled={!reset}
+          leftSection={<ArrowCounterClockwise aria-hidden="true" />}
+          onClick={() => dispatch({ type: 'reset', system })}
+        >
+          {resetLabel}
+        </Button>
+      )}
     </Flex>
   )
 })

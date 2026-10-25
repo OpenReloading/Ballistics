@@ -2,7 +2,7 @@
   "id": "bds-1206-issf-25m-precision-50m-pistol",
   "discipline": "bds-1206",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDS 1206 MD Revolver bis .38",
+  "event": "bds-1206-md-revolver-bis-38",
   "shotCount": 40,
   "provenance": {
     "kind": "published",

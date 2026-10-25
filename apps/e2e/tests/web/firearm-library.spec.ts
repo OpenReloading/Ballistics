@@ -25,10 +25,11 @@ async function seed(page: Page, names: string[], extra: object = {}, first = 0) 
           name,
           saved: '2026-10-20T00:00:00.000Z',
           data: {
+            origin: 'user',
             name,
-            cartridge: '308-win',
-            barrelLength: 0.61,
-            twist: 0.254,
+            cartridge: 'catalogue:308-win',
+            barrelLength: { value: 610 },
+            twist: { value: 254 },
             twistHand: 'right',
             optics: [],
             configurations: [],
@@ -142,11 +143,11 @@ test('the zero air and drag factor of a mount fill the trajectory form with the 
         mounts: [
           {
             optic: 'o1',
-            sightHeight: 0.05,
-            zeroRange: 100,
-            zeroTemperature: 308.15,
-            zeroPressure: 95000,
-            zeroHumidity: 0.4,
+            sightHeight: { value: 50 },
+            zeroRange: { value: 100000 },
+            zeroTemperature: { value: 35 },
+            zeroPressure: { value: 0.95 },
+            zeroHumidity: { value: 40 },
             dragFactor: 1.034,
             dragFactorSource: 'Truing session of 2026-09-14',
           },
@@ -161,7 +162,11 @@ test('the zero air and drag factor of a mount fill the trajectory form with the 
     {
       optics: [{ id: 'o1', kind: 'scope', name: 'Scope' }],
       configurations: [
-        { id: 'c1', name: 'Summer', mounts: [{ optic: 'o1', sightHeight: 0.05, zeroRange: 100 }] },
+        {
+          id: 'c1',
+          name: 'Summer',
+          mounts: [{ optic: 'o1', sightHeight: { value: 50 }, zeroRange: { value: 100000 } }],
+        },
       ],
     },
     1,

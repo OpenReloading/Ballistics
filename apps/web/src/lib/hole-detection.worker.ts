@@ -7,6 +7,7 @@
  * whole photo. Points are on the photo as turned on screen.
  */
 
+import { fromSi } from '@openreloading/schema'
 import { errorText } from './error-text.ts'
 import {
   autoDetect,
@@ -139,7 +140,7 @@ async function handleDetect(
   // module averages it down to the working size (a coarse and a full one for auto detection)
   const k = Math.min(1, (2 * WORK_DIAMETER) / (r.holeDiameter * r.pxPerM))
   // the face's outline on the photo, grown by half a hole
-  const holeMm = r.holeDiameter * 1000
+  const holeMm = fromSi('length', r.holeDiameter)
   const onTurned = r.face && faceLabel(r.face, holeMm)
   // the margin the detection's ring around a hole at the region's edge needs
   const base = r.region ?? onTurned?.outline

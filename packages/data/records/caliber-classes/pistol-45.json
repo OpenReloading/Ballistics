@@ -1,0 +1,18 @@
+{
+  "id": "pistol-45",
+  "name": ".45 ACP pistol",
+  "diameter": {
+    "value": 11.48
+  },
+  "cartridges": ["45-auto"],
+  "provenance": {
+    "kind": "derived",
+    "sources": [
+      {
+        "source": "cip-tdcc",
+        "fields": ["diameter", "cartridges"],
+        "note": "Grouped by the maximum projectile diameter G1 of the cartridge side of the sheets; the nominal diameter lies within 0.15 mm of G1 of every member."
+      }
+    ]
+  }
+}

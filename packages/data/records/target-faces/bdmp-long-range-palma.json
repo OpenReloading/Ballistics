@@ -1,7 +1,7 @@
 {
   "id": "bdmp-long-range-palma",
   "name": "BDMP-Scheibe Long Range Palma Match",
-  "organization": "BDMP",
+  "federation": "bdmp",
   "rings": [
     {
       "value": 6,
@@ -49,6 +49,7 @@
   },
   "events": [
     {
+      "id": "bdmp-spfg3-zf-schwarzpulverfreigewehr-300-bis-900-m",
       "name": "BDMP SPFG3 ZF Schwarzpulverfreigewehr, 300 bis 900 m",
       "distance": {
         "value": 900000,

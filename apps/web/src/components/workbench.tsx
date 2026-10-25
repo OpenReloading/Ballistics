@@ -4,7 +4,7 @@ import { Button, Menu } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { spotlight } from '@mantine/spotlight'
 import { bulletWindow } from '@openreloading/core'
-import type { UserRecord } from '@openreloading/schema'
+import { toSi, type UserRecord } from '@openreloading/schema'
 import { MagnifyingGlass, Play, Printer } from '@phosphor-icons/react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { InteriorResponse } from '../lib/api-types.ts'
@@ -301,7 +301,10 @@ export function Workbench() {
           'Cartridge',
           cartridge?.name ?? (cartridgeDesign && `${cartridgeDesign.name} (user design)`),
         ],
-        ['CIP Pmax', pmax === undefined ? undefined : withUnit('pressure', system, pmax * 1e5)],
+        [
+          'CIP Pmax',
+          pmax === undefined ? undefined : withUnit('pressure', system, toSi('pressure', pmax)),
+        ],
         ['Case length, CIP L3', mmText(specValue('cartridge', 'L3'))],
         printRow('volume'),
         printRow('boreDiameter'),
@@ -526,7 +529,7 @@ export function Workbench() {
       ),
     [firearms, firearm],
   )
-  const bulletDiameter = bullet && bullet.diameter.value / 1000
+  const bulletDiameter = bullet && toSi('length', bullet.diameter.value)
   // the File menu's id: set by Save and Open, which re-render the page
   const fileId = fileMenu.current?.id()
   const result = useMemo<ResultState>(
@@ -813,7 +816,7 @@ export function Workbench() {
                     file={
                       <FileMenu
                         ref={fileMenu}
-                        kind="workbenchState"
+                        kind="load"
                         name={load.name}
                         nameKey={load.customName?.trim() ? load.customName : ''}
                         data={fileData}

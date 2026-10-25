@@ -2,8 +2,8 @@ import { STATUS_CODES } from 'node:http'
 import type { RouteOptions } from 'fastify'
 import { z } from 'zod'
 import { buildApp } from './app.ts'
+import type { Catalogue } from './catalogue/types.ts'
 import { inlineRunner } from './compute/tasks.ts'
-import type { Db } from './db/index.ts'
 import { API_VERSION } from './version.ts'
 
 declare module 'fastify' {
@@ -19,6 +19,8 @@ declare module 'fastify' {
      * the statuses of Fastify (400, 413, 414, 415) and 500.
      */
     errors?: number[]
+    /** The route answers an unknown id that `renames.json` replaces with 308 and a `Location`. */
+    moved?: boolean
     /** One line on what the route answers, read by `buildOpenApi`. */
     summary?: string
     /** What the route reads or computes and how, read by `buildOpenApi`. */
@@ -63,7 +65,11 @@ interface OpenApiOperation {
   }
   responses: Record<
     string,
-    { description: string; content?: { 'application/json': { schema: JsonSchema } } }
+    {
+      description: string
+      headers?: Record<string, { schema: JsonSchema }>
+      content?: { 'application/json': { schema: JsonSchema } }
+    }
   >
 }
 
@@ -90,8 +96,9 @@ const tags = [
   },
   {
     name: 'Competition',
-    description: 'Federations, their disciplines, target faces and the mapping between them.',
-    segments: ['federations', 'disciplines', 'target-faces', 'target-mappings'],
+    description:
+      'Federations, their disciplines, target faces, the mapping between them and the caliber classes of the disciplines.',
+    segments: ['federations', 'disciplines', 'target-faces', 'target-mappings', 'caliber-classes'],
   },
   {
     name: 'Exterior',
@@ -178,6 +185,7 @@ function responses(
   const statuses = [
     ...([...inputs, config.body].some(Boolean) ? [400] : []),
     ...(config.errors ?? []),
+    ...(config.moved ? [308] : []),
     ...(url.includes('{') ? [414] : []),
     ...(config.body ? [413, 415] : []),
     500,
@@ -191,10 +199,16 @@ function responses(
     ...Object.fromEntries(
       statuses.map((s) => [
         s,
-        {
-          description: STATUS_CODES[s] ?? String(s),
-          content: json({ $ref: '#/components/schemas/Error' }),
-        },
+        s === 308
+          ? {
+              description:
+                'Permanent Redirect: the id was renamed, `Location` is the record that replaced it.',
+              headers: { Location: { schema: { type: 'string' } } },
+            }
+          : {
+              description: STATUS_CODES[s] ?? String(s),
+              content: json({ $ref: '#/components/schemas/Error' }),
+            },
       ]),
     ),
   }
@@ -221,7 +235,11 @@ function parameters(where: 'query' | 'path', schema: JsonSchema) {
  */
 export async function buildOpenApi(): Promise<OpenApiDocument> {
   const routes: RouteOptions[] = []
-  const app = buildApp({ db: {} as Db, compute: inlineRunner, onRoute: (r) => routes.push(r) })
+  const app = buildApp({
+    catalogue: {} as Catalogue,
+    compute: inlineRunner,
+    onRoute: (r) => routes.push(r),
+  })
   await app.ready()
   await app.close()
   const paths: OpenApiDocument['paths'] = {}

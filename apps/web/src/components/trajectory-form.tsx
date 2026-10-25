@@ -19,7 +19,7 @@ import {
   type OmittedEffect,
   type Trajectory,
 } from '@openreloading/core'
-import type { Bullet, UserRecord } from '@openreloading/schema'
+import { type Bullet, toSi } from '@openreloading/schema'
 import { Printer } from '@phosphor-icons/react'
 import {
   type ReactNode,
@@ -65,6 +65,7 @@ import {
   withUnit,
 } from '../lib/units.ts'
 import { storedRecords } from '../lib/user-store.ts'
+import { type UserBulletView, userBullets } from '../lib/variants.ts'
 import { HitProbability } from './hit-probability.tsx'
 import { LazyLineChart as LineChart, preloadChart } from './lazy-chart.tsx'
 import { MovingTarget } from './moving-target.tsx'
@@ -99,7 +100,6 @@ function startFields(system: UnitSystem): Fields {
 }
 /** The fields a bullet design fills. */
 const designKeys = ['mass', 'diameter', 'length']
-type BulletDesignRecord = Extract<UserRecord, { kind: 'bulletDesign' }>
 /** The panels open at the start; the zero air and drag panel opens when a value fills it. */
 const panels = ['bullet', 'load', 'rifle', 'conditions', 'output']
 /** The fields a firearm choice fills and an edit leaves; the zero air and drag factor stay editable per run. */
@@ -244,12 +244,13 @@ function RecordDetails({
   names: ManufacturerNames
   system: UnitSystem
 }) {
-  const mm = (x: number) => withUnit('length', system, x * 1e-3)
+  const mm = (x: number) => withUnit('length', system, toSi('length', x))
   return (
     <div className="record">
       <p>
-        {productLabel(record, names)}: {formatQuantity('mass', system, record.mass.value * 1e-3)}{' '}
-        {system.mass.symbol}, diameter {mm(record.diameter.value)}
+        {productLabel(record, names)}:{' '}
+        {formatQuantity('mass', system, toSi('mass', record.mass.value))} {system.mass.symbol},
+        diameter {mm(record.diameter.value)}
         {record.length && `, length ${mm(record.length.value)}`}
       </p>
       <ul>
@@ -507,9 +508,9 @@ export function TrajectoryForm({
   const [dragFrom, setDragFrom] = useState<{ factor: number; source: string }>()
   const [openPanels, setOpenPanels] = useState(panels)
   const showZero = () => setOpenPanels((o) => (o.includes('zero') ? o : [...o, 'zero']))
-  const [designs, setDesigns] = useState<BulletDesignRecord[]>([])
+  const [designs, setDesigns] = useState<UserBulletView[]>([])
   /** The bullet design the manual bullet values came from; an edit of one of them leaves it. */
-  const [design, setDesign] = useState<BulletDesignRecord>()
+  const [design, setDesign] = useState<UserBulletView>()
   const loading = useRef<AbortController | null>(null)
   // when the stored or linked units replace the first render's, a range default not edited becomes
   // the round default of the shown unit (runs after useFieldUnits' conversion); a later unit switch
@@ -664,9 +665,8 @@ export function TrajectoryForm({
   /** The browser's bullet designs, read again on focus as the firearms are. */
   const readDesigns = () => {
     storedRecords()
-      .then(({ records }) =>
-        setDesigns(records.filter((r): r is BulletDesignRecord => r.kind === 'bulletDesign')),
-      )
+      .then(({ records }) => userBullets(records))
+      .then(setDesigns)
       .catch(() => {})
   }
 
@@ -676,7 +676,7 @@ export function TrajectoryForm({
     setDesign(d)
     if (!d) return
     for (const s of allFields.filter((f) => designKeys.includes(f.key))) {
-      const si = d.data.siValues[s.key]
+      const si = d.si[s.key as keyof UserBulletView['si']]
       form.setFieldValue(
         s.key,
         si === undefined
@@ -908,7 +908,7 @@ export function TrajectoryForm({
                             : 'Search bullets'
                         }
                         describe={(b) =>
-                          `${productLabel(b, names)}, ${formatQuantity('mass', system, b.mass * 1e-3)} ${u('mass')}`
+                          `${productLabel(b, names)}, ${formatQuantity('mass', system, toSi('mass', b.mass))} ${u('mass')}`
                         }
                         onSelect={(b) => chooseRecord(b.id)}
                         noneText="No bullet found"

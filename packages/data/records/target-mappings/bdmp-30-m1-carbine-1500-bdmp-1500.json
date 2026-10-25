@@ -2,7 +2,7 @@
   "id": "bdmp-30-m1-carbine-1500-bdmp-1500",
   "discipline": "bdmp-30-m1-carbine-1500",
   "face": "bdmp-1500",
-  "event": "BDMP .30 M1 Carbine 1500",
+  "event": "bdmp-30-m1-carbine-1500",
   "shotCount": 150,
   "provenance": {
     "kind": "published",

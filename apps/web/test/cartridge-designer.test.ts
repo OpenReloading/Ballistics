@@ -1,3 +1,4 @@
+import type { UserCartridge } from '@openreloading/schema'
 import { describe, expect, it } from 'vitest'
 import {
   type Action,
@@ -7,8 +8,8 @@ import {
   evaluate,
   fieldSpecs,
   fileData,
-  fromFile,
   fromRecord,
+  fromUser,
   type History,
   historyOf,
   newDesign,
@@ -18,12 +19,19 @@ import {
 import { seededRandom } from '../src/lib/ellipse.ts'
 import { fieldValueFromText } from '../src/lib/field-spec.ts'
 import { presetUnits } from '../src/lib/units.ts'
+import type { ResolvedCartridge } from '../src/lib/variants.ts'
 import { verified } from './drawing-rules.ts'
 import { sheetRecord } from './records.ts'
+import { resolvedCartridge } from './resolved.ts'
 
 const metric = presetUnits('metric-grams')
 const us = presetUnits('us')
-const win308 = () => fromRecord(sheetRecord('cip-308-win-2008-09-23'), metric)
+const record308 = () => sheetRecord('cip-308-win-2008-09-23')
+const win308 = () => fromRecord(record308(), metric)
+
+/** What `resolveCartridge` gives for the 308 Winchester record as the base, or none. */
+const resolvedOf = (data: UserCartridge, withBase = true) =>
+  resolvedCartridge(data, withBase ? record308() : undefined)
 
 /** Types `text` in the field `key` in metric units (mm, degrees). */
 const type = (key: string, text: string): Action => {
@@ -320,13 +328,74 @@ describe('record boundaries', () => {
 })
 
 describe('drafts', () => {
-  it('a design keeps its parent record through a file round trip and a reset', () => {
+  it('a design keeps its base record through a file round trip and a reset', () => {
     const data = fileData(win308())
-    expect(data.parent).toEqual({ id: '308-win', title: win308().origin?.title })
-    const opened = fromFile(data, 'Design', metric)
-    expect(fileData(opened).parent).toEqual(data.parent)
+    expect(data).toEqual({ origin: 'user', basedOn: 'catalogue:308-win' })
+    const opened = fromUser(data, resolvedOf(data), metric)
+    expect(fileData(opened)).toEqual(data)
     const reset = reduce(historyOf(opened), { type: 'reset', system: metric }).present
-    expect(reset.parent).toEqual(data.parent)
-    expect(reduce(historyOf(win308()), { type: 'new' }).present.parent).toBeUndefined()
+    expect(reset.basedOn).toBe(data.basedOn)
+    expect(reduce(historyOf(win308()), { type: 'new' }).present.basedOn).toBeUndefined()
+  })
+
+  it('saves the values that differ from the base: a changed one, a cleared one as null, a new one', () => {
+    const edited = run(
+      win308(),
+      type('cartridge.L3', '52'),
+      type('cartridge.L6', ''),
+      type('cartridge.r0', '0.5'),
+    ).present
+    const data = fileData(edited)
+    expect(data.overrides?.table).toBeUndefined()
+    expect(data.overrides?.values).toHaveLength(3)
+    expect(data.overrides?.values).toEqual(
+      expect.arrayContaining([
+        { side: 'cartridge', symbol: 'L3', quantity: 'length', value: 52 },
+        { side: 'cartridge', symbol: 'L6', quantity: 'length', value: null },
+        { side: 'cartridge', symbol: 'r0', quantity: 'length', value: 0.5 },
+      ]),
+    )
+    // the base with these overrides applied is the edited design again, and saves the same
+    const opened = fromUser(data, resolvedOf(data), metric)
+    expect(opened.fields['cartridge.L3'].si).toBeCloseTo(52e-3, 12)
+    expect(opened.fields['cartridge.L6'].si).toBeUndefined()
+    expect(fileData(opened)).toEqual(data)
+    expect(draftSpec(opened).values).toEqual(draftSpec(edited).values)
+  })
+
+  it('saves a table that differs from the base', () => {
+    const data = fileData(run(win308(), { type: 'table', value: 'III' }).present)
+    expect(data.overrides).toEqual({ table: 'III' })
+  })
+
+  it('saves the table and every given value of a design without a base', () => {
+    const d = run(newDesign(), type('cartridge.R1', '12'), type('cartridge.L3', '50')).present
+    const data = fileData(d)
+    expect(data.basedOn).toBeUndefined()
+    expect(data.overrides?.table).toBe('I')
+    expect(data.overrides?.values).toEqual([
+      { side: 'cartridge', symbol: 'R1', quantity: 'length', value: 12 },
+      { side: 'cartridge', symbol: 'L3', quantity: 'length', value: 50 },
+    ])
+    const opened = fromUser(data, resolvedOf(data, false), metric)
+    expect(opened.origin).toBeUndefined()
+    expect(fileData(opened)).toEqual(data)
+  })
+
+  it('opens a design whose base is gone read only and saves its data as stored', () => {
+    const data: UserCartridge = {
+      origin: 'user',
+      basedOn: 'catalogue:gone',
+      overrides: { values: [{ side: 'cartridge', symbol: 'L3', quantity: 'length', value: 50 }] },
+    }
+    const problem = 'The base record catalogue:gone is no longer in the catalogue.'
+    const resolved: ResolvedCartridge = {
+      base: { status: 'missing', ref: 'catalogue:gone' },
+      record: { values: [] },
+      problem,
+    }
+    const d = fromUser(data, resolved, metric)
+    expect(d.locked?.reason).toBe(problem)
+    expect(fileData(d)).toBe(data)
   })
 })

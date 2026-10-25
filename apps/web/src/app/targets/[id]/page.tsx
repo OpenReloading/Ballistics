@@ -1,3 +1,4 @@
+import { toSi } from '@openreloading/schema'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -19,6 +20,7 @@ import {
   listTargetMappings,
   staticIds,
 } from '../../../lib/api.ts'
+import { withOrganization } from '../../../lib/face-organization.ts'
 import { titleFromKebab } from '../../../lib/record-fields.ts'
 import { faceEventRows, targetFaceGroups, targetFaceStrip } from '../../../lib/target-faces.ts'
 import { presetUnits, withUnit } from '../../../lib/units.ts'
@@ -44,8 +46,8 @@ const scoredBy = { touch: 'Hole edge', centre: 'Hole centre' }
 /** A length in mm in the Settings length unit, both laid out on the server. */
 const shownLength = (mm: number) => (
   <ByLengthUnit
-    mm={withUnit('length', presetUnits('metric-grams'), mm * 1e-3)}
-    inch={withUnit('length', presetUnits('us'), mm * 1e-3)}
+    mm={withUnit('length', presetUnits('metric-grams'), toSi('length', mm))}
+    inch={withUnit('length', presetUnits('us'), toSi('length', mm))}
   />
 )
 
@@ -71,7 +73,7 @@ export default async function TargetFacePage({ params }: PageProps<'/targets/[id
     mappings.some((m) => m.status !== 'ok')
   )
     return <ServerDataError what="Target face" />
-  const f = r.data
+  const f = withOrganization(r.data, federations.data)
   const rows = faceEventRows(
     f,
     mappings.flatMap((m) => (m.status === 'ok' ? [m.data] : [])),

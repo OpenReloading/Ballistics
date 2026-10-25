@@ -163,22 +163,22 @@ describe('checkNames', () => {
     ).toEqual([])
   })
 
-  it('reports target faces of one organization sharing a name', () => {
-    const face = (id: string, organization: string): TargetFace => ({
+  it('reports target faces of one federation sharing a name', () => {
+    const face = (id: string, federation: string): TargetFace => ({
       id,
       name: '10m Air Rifle Target',
-      organization,
+      federation,
       rings: [
         { value: 9, diameter: { value: 5.5 } },
         { value: 10, diameter: { value: 0.5 } },
       ],
       blackDiameter: { value: 30.5 },
       decimal: true,
-      events: [{ name: '10m Air Rifle', distance: { value: 10000 } }],
+      events: [{ id: 'air-rifle', name: '10m Air Rifle', distance: { value: 10000 } }],
       provenance,
     })
     expect(
-      lines({ targetFaces: [face('a', 'ISSF'), face('b', 'ISSF'), face('c', 'Other')] }),
+      lines({ targetFaces: [face('a', 'issf'), face('b', 'issf'), face('c', 'other')] }),
     ).toEqual(['target-faces/b.json: duplicate-name:10m Air Rifle Target'])
   })
 })

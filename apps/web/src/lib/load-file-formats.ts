@@ -50,10 +50,11 @@ export const readNote = (p: ParsedUserFile) =>
       ].join(' ')
     : ''
 
-/** Every valid file's records, photos and notes, and each skipped file with its reason. */
+/** Every valid file's records, photos, `invalid` entries and notes, and each skipped file with its reason. */
 export function parseFiles(files: { name: string; text?: string }[], formats = loadFileFormats) {
   const records: UserRecord[] = []
   const embedded: EmbeddedFile[] = []
+  const invalid: unknown[] = []
   const skipped: { name: string; reason: string }[] = []
   const notes: { name: string; note: string }[] = []
   for (const f of files) {
@@ -62,9 +63,10 @@ export function parseFiles(files: { name: string; text?: string }[], formats = l
     if (p.ok) {
       records.push(...p.records)
       embedded.push(...(p.files ?? []))
+      invalid.push(...(p.invalid ?? []))
       const note = readNote(p)
       if (note) notes.push({ name: f.name, note })
     } else skipped.push({ name: f.name, reason: p.reason })
   }
-  return { records, files: embedded, skipped, notes }
+  return { records, files: embedded, invalid, skipped, notes }
 }

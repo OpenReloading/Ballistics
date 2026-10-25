@@ -1,0 +1,32 @@
+{
+  "id": "issf-10m-moving-target-mixed",
+  "federation": "issf",
+  "name": "10m Moving Target Mixed",
+  "section": "10.14",
+  "page": "p. 476 (PDF p. 476)",
+  "distance": {
+    "value": 10000,
+    "raw": "10m"
+  },
+  "category": "air-rifle",
+  "caliberClasses": {
+    "ids": ["air-4-5"],
+    "basis": "stated"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 3.3.1, p. 39 (PDF p. 39)",
+        "fields": ["name", "federation", "distance"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 10.14, p. 476 (PDF p. 476)",
+        "fields": ["section", "page", "category", "caliberClasses"],
+        "note": "The rule book gives the event names but no discipline codes. The category is read from the ammunition and weight columns: 4.5 mm (.177\") air rifle at 10 m, 5.6 mm (.22\" lr) rifle at 50 m."
+      }
+    ]
+  }
+}

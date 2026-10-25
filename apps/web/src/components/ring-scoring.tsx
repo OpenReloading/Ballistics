@@ -2,12 +2,13 @@
 
 import { Button, NativeSelect, Select } from '@mantine/core'
 import { useWindowEvent } from '@mantine/hooks'
-import type {
-  CalibrationReference,
-  GroupFace,
-  ShotGroup,
-  TargetFace,
-  TargetSheet,
+import {
+  type CalibrationReference,
+  fromSi,
+  type GroupFace,
+  type ShotGroup,
+  type TargetSheet,
+  toSi,
 } from '@openreloading/schema'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -20,6 +21,7 @@ import {
   mappingOf,
 } from '../lib/face-disciplines.ts'
 import { compareEvents, compareTargetFaces, federationFaceIds } from '../lib/face-order.ts'
+import type { Face } from '../lib/face-organization.ts'
 import {
   type FaceSummary,
   fetchAllFaces,
@@ -40,6 +42,7 @@ import {
 import { type Frame, targetToView, viewToTarget } from '../lib/target-editor.ts'
 import type { Point } from '../lib/target-geometry.ts'
 import { controlSize } from '../lib/theme.ts'
+import { faceIdPrefix } from '../lib/user-faces.ts'
 import { mmLength } from '../lib/workbench.ts'
 import type { Tool } from './target-canvas.tsx'
 import { useUnits } from './units-settings.tsx'
@@ -109,11 +112,11 @@ export function useRingScoring({
 }) {
   const { system } = useUnits()
   const [list, setList] = useState<FaceSummary[] | 'loading' | 'error'>('loading')
-  const [all, setAll] = useState<TargetFace[]>([])
+  const [all, setAll] = useState<Face[]>([])
   const [data, setData] = useState<FederationData>()
   /** The federation picked for the Discipline list; undefined: the one of the group's discipline. */
   const [federation, setFederation] = useState<string>()
-  const [faces, setFaces] = useState<Record<string, TargetFace | 'error'>>({})
+  const [faces, setFaces] = useState<Record<string, Face | 'error'>>({})
   /** Ring value of the next mark, and the marks so far, target m. */
   const [ring, setRing] = useState<number>()
   const [marks, setMarks] = useState<FaceMark[]>([])
@@ -214,7 +217,9 @@ export function useRingScoring({
     try {
       const a = faceAlignment(record, marks, undefined)
       setFace((x) => x && { ...x, marks })
-      say(`Face fitted to ${marks.length} marks, misfit ${mmLength(system, (a.rms ?? 0) * 1e3)}.`)
+      say(
+        `Face fitted to ${marks.length} marks, misfit ${mmLength(system, fromSi('length', a.rms ?? 0))}.`,
+      )
       startTool('select')
       // the Fit button turns disabled: the focus goes back to Mark
       requestAnimationFrame(() => markButton.current?.focus())
@@ -234,8 +239,8 @@ export function useRingScoring({
     onReference({
       kind: 'ringCentre',
       centre: targetToView(frame, a.centre),
-      edge: targetToView(frame, onSheet(a, { x: d * 5e-4, y: 0 })),
-      diameter: d * 1e-3,
+      edge: targetToView(frame, onSheet(a, { x: toSi('length', d / 2), y: 0 })),
+      diameter: toSi('length', d),
     })
   }
 
@@ -351,12 +356,14 @@ export function useRingScoring({
       : !choice
         ? 'No face: no score.'
         : face === 'error'
-          ? `${offline}: ${choice.id} could not be loaded.`
+          ? choice.id.startsWith(faceIdPrefix)
+            ? 'This face design is deleted or no longer a valid face.'
+            : `${offline}: ${choice.id} could not be loaded.`
           : current && typeof current === 'object' && 'error' in current
             ? current.error
             : result
               ? choice.marks
-                ? `Fitted to ${choice.marks.length} marks, misfit ${mmLength(system, (result.alignment.rms ?? 0) * 1e3)}, scale ${(result.alignment.scale * 100).toFixed(1)} %.`
+                ? `Fitted to ${choice.marks.length} marks, misfit ${mmLength(system, fromSi('length', result.alignment.rms ?? 0))}, scale ${(result.alignment.scale * 100).toFixed(1)} %.`
                 : 'Centred on the point of aim (or the origin) at the sheet scale.'
               : 'Loading the face…'
 
@@ -456,7 +463,7 @@ export function useRingScoring({
           if (id)
             fetchFace(id).then(
               (f) => {
-                const event = f.events[0]?.name
+                const event = f.events[0]?.id
                 if (event) setFace((x) => (x && x.id === id && !x.event ? { ...x, event } : x))
               },
               () => {},
@@ -481,7 +488,7 @@ export function useRingScoring({
                   ),
                 )
                 .map((e) => ({
-                  value: e.name,
+                  value: e.id,
                   label: `${e.name}${e.gauge ? `, ${mmLength(system, e.gauge.value)}` : ''}`,
                 })),
               { value: '', label: 'Bullet' },

@@ -1,7 +1,7 @@
 {
   "id": "issf-10m-air-rifle",
   "name": "10m Air Rifle Target",
-  "organization": "ISSF",
+  "federation": "issf",
   "rings": [
     {
       "value": 1,
@@ -77,6 +77,7 @@
   "decimal": true,
   "events": [
     {
+      "id": "10m-air-rifle",
       "name": "10m Air Rifle",
       "distance": {
         "value": 10000,
@@ -88,6 +89,7 @@
       "scoring": "touch"
     },
     {
+      "id": "dsb-gewehr-10-m",
       "name": "DSB Gewehr 10 m",
       "distance": {
         "value": 10000,
@@ -97,28 +99,30 @@
         "value": 4.5,
         "raw": "5,50 mm Außenlehre"
       },
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "0.20 Scheibe Nr. 1; 0.11.3.2",
       "scoring": "touch"
     },
     {
+      "id": "dsb-luftgewehr-10-m-liegend-para",
       "name": "DSB Luftgewehr 10 m liegend (Para)",
       "distance": {
         "value": 10000,
         "raw": "10 m"
       },
       "scoring": "touch",
-      "organization": "DSB",
+      "federation": "dsb",
       "section": "10.12 (row 1.18 Luftgewehr liegend, sitzend mit Tisch)",
       "category": "air-rifle"
     },
     {
+      "id": "bds-75xx-10-m-praz-luftgewehr",
       "name": "BDS 75xx 10 m Präz. Luftgewehr",
       "distance": {
         "value": 10000,
         "raw": "10 m"
       },
-      "organization": "BDS",
+      "federation": "bds",
       "section": "Anhang 1, Z 13",
       "scoring": "touch"
     }

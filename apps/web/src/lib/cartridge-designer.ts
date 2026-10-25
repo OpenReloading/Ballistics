@@ -12,7 +12,12 @@ import {
   storedValue,
 } from '@openreloading/drawing/cartridge'
 import { chamberOf } from '@openreloading/drawing/seating'
-import type { CartridgeDesign, SpecValue } from '@openreloading/schema'
+import {
+  type CartridgeOverrides,
+  type SpecValue,
+  toSi,
+  type UserCartridge,
+} from '@openreloading/schema'
 import type { CartridgeDetail } from './api-types.ts'
 import { drawable } from './cartridge-sheet.ts'
 import {
@@ -22,10 +27,12 @@ import {
   type FieldValue,
   fieldError,
   fieldOf,
+  siToStored,
   storedToSi,
 } from './field-spec.ts'
 import { designReduce, type History as H, historyOf, pushHistory } from './history.ts'
 import { exactFieldText, type UnitSystem } from './units.ts'
+import type { ResolvedCartridge } from './variants.ts'
 
 /** The field groups of the designer, in order. */
 export const groups = {
@@ -116,12 +123,12 @@ export const fieldSpecs: CartridgeFieldSpec[] = symbols.flatMap(
       min: 0,
       ...(q === 'angle'
         ? { max: 180 }
-        : { limit: range === 35 ? 50e-3 : 2.5 * range * storedToSi[q] }),
+        : { limit: range === 35 ? 50e-3 : storedToSi(q, 2.5 * range) }),
       side,
       symbol,
       meaning,
       group,
-      range: range * storedToSi[q],
+      range: storedToSi(q, range),
     })),
 )
 
@@ -144,8 +151,10 @@ export interface Design {
   table: string
   fields: Fields
   origin?: Origin
-  /** The catalogue record the design started from, kept through files. */
-  parent?: CartridgeDesign['parent']
+  /** The catalogue cartridge the design is based on, `catalogue:<id>`, kept through files. */
+  basedOn?: string
+  /** Why the design is read only (its base is not there), with the record as stored, which Save keeps as it is. */
+  locked?: { reason: string; data: UserCartridge }
 }
 
 const keyOf = (v: SpecValue) => (v.side && !v.variant ? `${v.side}.${v.symbol}` : undefined)
@@ -157,40 +166,69 @@ export const draws = (c: CartridgeDetail) =>
 
 /** The design of a cartridge record, every value from the record. */
 export function fromRecord(c: CartridgeDetail, system: UnitSystem): Design {
-  const title = `CIP ${c.name}`
-  return {
-    ...fromValues({ id: c.id, title, table: c.table, values: c.values }, system),
-    parent: { id: c.id, title },
-  }
+  return fromOrigin(originOf(c), system)
 }
 
-/** The design of an origin's values, as from a record. */
-function fromValues(origin: Omit<Origin, 'si'>, system: UnitSystem): Design {
+/** The SI value of each field a list of values gives. */
+function siOf(values: readonly SpecValue[]): Origin['si'] {
   const si: Origin['si'] = {}
-  for (const v of origin.values) {
+  for (const v of values) {
     const key = keyOf(v)
     const s = key && specOf.get(key)
     if (s && v.value !== undefined)
-      si[s.key] = v.value * storedToSi[s.quantity as 'length' | 'angle']
+      si[s.key] = storedToSi(s.quantity as 'length' | 'angle', v.value)
   }
-  return fromOrigin({ ...origin, si }, system)
+  return si
 }
 
-/** The design of a saved file: its values as the origin, so they draw as saved. */
-export const fromFile = (d: CartridgeDesign, title: string, system: UnitSystem): Design => ({
-  ...fromValues({ id: 'file', title, table: d.table, values: d.values }, system),
-  parent: d.parent,
+/** The origin a design is measured against: a cartridge record's values. */
+const originOf = (c: Pick<CartridgeDetail, 'id' | 'name' | 'table' | 'values'>): Origin => ({
+  id: c.id,
+  title: `CIP ${c.name}`,
+  table: c.table,
+  values: c.values,
+  si: siOf(c.values),
 })
 
 /**
- * The `CartridgeDesign` stored in a saved file: table, optional parent and the values of
- * `draftValues` (mm, degrees).
+ * The design of a saved user cartridge: the resolved values, measured against its base (the
+ * origin) so each field says whether it follows the record or is changed. A base that is not there
+ * gives a read only design that Save leaves as stored.
  */
-export const fileData = (design: Design): CartridgeDesign => ({
-  table: design.table,
-  values: draftValues(design) as CartridgeDesign['values'],
-  ...(design.parent && { parent: design.parent }),
-})
+export function fromUser(
+  data: UserCartridge,
+  { base, record, problem }: ResolvedCartridge,
+  system: UnitSystem,
+): Design {
+  const si = siOf(record.values)
+  const origin = base.status === 'found' ? originOf(base.record) : undefined
+  return {
+    table: record.table ?? 'I',
+    fields: Object.fromEntries(fieldSpecs.map((s) => [s.key, fieldOf(system, s, si[s.key])])),
+    ...(origin && { origin }),
+    ...(data.basedOn && { basedOn: data.basedOn }),
+    ...(problem && { locked: { reason: problem, data } }),
+  }
+}
+
+/**
+ * The user cartridge a design saves: its base and the overrides, the table where it differs and the
+ * values that differ from the base (a value cleared against the base is one with `null`). Without
+ * a base the table and every given value. A read only design gives its stored data back.
+ */
+export function fileData(design: Design): UserCartridge {
+  if (design.locked) return design.locked.data
+  const { origin, basedOn, table } = design
+  const overrides: CartridgeOverrides = {}
+  if (!origin || table !== origin.table) overrides.table = table
+  const values = valueOverrides(design)
+  if (values.length > 0) overrides.values = values
+  return {
+    origin: 'user',
+    ...(basedOn && { basedOn }),
+    ...(Object.keys(overrides).length > 0 && { overrides }),
+  }
+}
 
 /** The design of an origin as stored, as on a reset. */
 function fromOrigin(origin: Origin, system: UnitSystem): Design {
@@ -200,6 +238,7 @@ function fromOrigin(origin: Origin, system: UnitSystem): Design {
       fieldSpecs.map((s) => [s.key, fieldOf(system, s, origin.si[s.key])]),
     ),
     origin,
+    basedOn: `catalogue:${origin.id}`,
   }
 }
 
@@ -218,7 +257,7 @@ export function newDesign(from?: Design): Design {
 
 /** A field value in stored units (mm, degrees); 12 significant digits drop the SI round-trip noise. */
 const storedFieldValue = (s: CartridgeFieldSpec, si: number) =>
-  Number((si / storedToSi[s.quantity as 'length' | 'angle']).toPrecision(12))
+  Number(siToStored(s.quantity as 'length' | 'angle', si).toPrecision(12))
 
 /**
  * The values of a design: a value still equal to the record's is the record's own object (printed
@@ -251,6 +290,24 @@ function draftValues({ fields, origin }: Design): SpecValue[] {
   for (const s of fieldSpecs) {
     const si = fields[s.key]?.si
     if (!seen.has(s.key) && si !== undefined) out.push(entered(s, si))
+  }
+  return out
+}
+
+/**
+ * The values a design overrides: a field entered where the base has another value or none, and a
+ * field cleared against a base value as the entry with `null`. A value the design left out of its
+ * fields (a variant, a pressure) is the base's and not listed.
+ */
+function valueOverrides({ fields, origin }: Design): NonNullable<CartridgeOverrides['values']> {
+  const out: NonNullable<CartridgeOverrides['values']> = []
+  for (const s of fieldSpecs) {
+    const si = fields[s.key]?.si
+    const was = origin?.si[s.key]
+    const entry = { side: s.side, symbol: s.symbol, quantity: s.quantity as 'length' | 'angle' }
+    if (si === undefined) {
+      if (was !== undefined) out.push({ ...entry, value: null })
+    } else if (!(origin && close(si, was))) out.push({ ...entry, value: storedFieldValue(s, si) })
   }
   return out
 }
@@ -499,7 +556,7 @@ export function evaluate(design: Design, system: UnitSystem, last?: string): Eva
       p.derivedE !== undefined &&
       design.fields['cartridge.e']?.si === undefined
     )
-      states['cartridge.e'] = { kind: 'derived', si: p.derivedE * 1e-3 }
+      states['cartridge.e'] = { kind: 'derived', si: toSi('length', p.derivedE) }
   return { spec, figures: list, states, checks, notes, derived }
 }
 
@@ -516,7 +573,7 @@ function derivedAngles(figure: Figure, values: SpecValue[]): Derived[] {
         label: `${name} neck length`,
         basis: 'L3 - L2',
         quantity: 'length',
-        si: (L3 - L2) * 1e-3,
+        si: toSi('length', L3 - L2),
       })
     if (P2 !== undefined && H1 !== undefined && L1 !== undefined && L2 !== undefined && L2 > L1)
       out.push({
@@ -567,7 +624,8 @@ function approximateCaseVolume(figure: Figure, values: SpecValue[]): Derived | u
     key: 'volume',
     label: 'Case volume (approximate)',
     quantity: 'capacity',
-    si: mm3 * 1e-9,
+    // mm3 is mm2 times mm
+    si: toSi('length', toSi('area', mm3)),
     basis: `the cartridge outline less a wall of ${fromNeck ? `(H2 - G1) / 2 = ${Number(wall.toFixed(3))} mm` : '0.3 mm (assumed, no G1)'} everywhere, from the head end (E, else R) at ${head} mm to the mouth; cartridge maxima, not a measured capacity`,
   }
 }
@@ -587,12 +645,18 @@ export const sliderMax = (s: CartridgeFieldSpec, design: Design) =>
 
 /**
  * What a saved cartridge design gives the workbench: the spec its preview draws and seats in, the
- * bore diameter (chamber F) and the approximate case volume, SI. Nothing comes from the catalogue
- * record the design started from. Undefined where the design does not draw, is a shotshell (table
+ * bore diameter (chamber F) and the approximate case volume, SI, all from the design's resolved
+ * values (its base with the overrides applied). Undefined where the design does not draw, is a shotshell (table
  * VII) or lacks the cartridge L3 the seating needs.
  */
-export function workbenchDesign(d: CartridgeDesign, name: string, system: UnitSystem) {
-  const design = fromFile(d, name, system)
+export function workbenchDesign(
+  d: UserCartridge,
+  resolved: ResolvedCartridge,
+  name: string,
+  system: UnitSystem,
+) {
+  if (resolved.problem) return
+  const design = fromUser(d, resolved, system)
   const { spec, derived } = evaluate(design, system)
   if (!spec || spec.table === 'VII' || !chamberOf(spec.values)) return
   return {

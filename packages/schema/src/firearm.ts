@@ -1,10 +1,9 @@
 import { z } from 'zod'
-import { recordId } from './ids.ts'
+import { ref } from './ids.ts'
 import { localId, text } from './shared.ts'
+import { quantity } from './units.ts'
 
-/** A finite number in SI units (m, kg, rad), as the `siValues` of the other kinds. */
-const si = (unit: string) => z.number().meta({ unit })
-const length = () => si('m').nonnegative()
+const length = () => quantity('length', z.number().nonnegative())
 /**
  * Runs a cross-field check while `keys` are valid, also when other fields are not; never on a value
  * that is not an object (an issue without a path).
@@ -15,8 +14,8 @@ const whileValid = (...keys: string[]) => ({
 })
 
 /**
- * An optic of a firearm: turret click and travel as angles in rad, magnification range (the highest
- * not below the lowest).
+ * An optic of a firearm: turret click and travel as angles in degrees, magnification range (the
+ * highest not below the lowest).
  * Inferred type: {@link Optic}.
  */
 export const optic = z
@@ -27,11 +26,15 @@ export const optic = z
     clickUnit: z
       .enum(['MOA', 'mrad'])
       .describe(
-        'How the turrets are marked. `clickValue` and `travel` are angles in rad either way.',
+        'How the turrets are marked. `clickValue` and `travel` are angles in degrees either way.',
       )
       .optional(),
-    clickValue: si('rad').positive().describe('Angle of one turret click, rad.').optional(),
-    travel: si('rad').positive().describe('Total adjustment range of the turret, rad.').optional(),
+    clickValue: quantity('angle', z.number().positive())
+      .describe('Angle of one turret click.')
+      .optional(),
+    travel: quantity('angle', z.number().positive())
+      .describe('Total adjustment range of the turret.')
+      .optional(),
     reticle: text(200).describe('Name of the reticle.').optional(),
     minMagnification: z.number().positive().describe('Lowest magnification, times.').optional(),
     maxMagnification: z.number().positive().describe('Highest magnification, times.').optional(),
@@ -48,25 +51,26 @@ export const optic = z
  */
 export const opticMount = z.object({
   optic: localId.describe('Id of the optic of the firearm.'),
-  sightHeight: length().describe('Bore axis to optic centre, m.'),
-  lateralOffset: si('m')
-    .describe('Optic centre to the right of the bore, m. Negative to the left.')
+  sightHeight: length().describe('Bore axis to optic centre.'),
+  lateralOffset: quantity('length')
+    .describe('Optic centre to the right of the bore. Negative to the left.')
     .optional(),
-  cant: si('rad').describe('Cant of the optic, clockwise as seen from behind, rad.').optional(),
-  zeroRange: si('m').positive().describe('Range of the zero, m.'),
+  cant: quantity('angle').describe('Cant of the optic, clockwise as seen from behind.').optional(),
+  zeroRange: quantity('length', z.number().positive()).describe('Range of the zero.'),
   zeroNotes: text(1000).describe('Notes on the zero.').optional(),
-  zeroTemperature: si('K').positive().describe('Air temperature of the zero, K.').optional(),
-  zeroPressure: si('Pa')
-    .positive()
-    .describe('Absolute station pressure of the zero, Pa.')
+  zeroTemperature: quantity('temperature', z.number().gt(-273.15))
+    .describe('Air temperature of the zero.')
     .optional(),
-  zeroHumidity: si('1')
-    .min(0)
-    .max(1)
-    .describe('Relative humidity of the zero, fraction from 0 to 1.')
+  zeroPressure: quantity('pressure', z.number().positive())
+    .describe('Absolute station pressure of the zero.')
     .optional(),
-  dragFactor: si('1')
+  zeroHumidity: quantity('relativeHumidity', z.number().min(0).max(100))
+    .describe('Relative humidity of the zero, from 0 to 100 %.')
+    .optional(),
+  dragFactor: z
+    .number()
     .positive()
+    .meta({ unit: '1' })
     .describe('Factor on the drag of the bullet from truing, 1 for the nominal drag.')
     .optional(),
   dragFactorSource: text(200)
@@ -101,30 +105,37 @@ const unique = (ids: string[], path: (i: number) => PropertyKey[], ctx: z.Refine
   })
 
 /**
- * A firearm of the library, lengths in m, mass in kg, angles in rad. Optic and configuration ids
- * are unique, each mount names an optic of the firearm and `active` names one of its configurations.
+ * A firearm, one shape for every origin: lengths in mm, mass in g, angles in degrees, zero air in
+ * degC, bar and %. The maker is a manufacturer reference. Optic and configuration ids are unique, each
+ * mount names an optic of the firearm and `active` names one of its configurations. A record of an
+ * older format with the maker as text fails the schema.
  * Inferred type: {@link Firearm}.
  */
 export const firearm = z
-  .object({
+  .strictObject({
+    origin: z
+      .enum(['catalogue', 'user', 'shared'])
+      .describe('Where the record lives: the git catalogue, this browser, or a received file.'),
     name: text(200).describe('Name of the firearm as the library lists it.'),
-    manufacturerName: text(200).describe('Manufacturer name.').optional(),
+    manufacturer: ref('manufacturer').describe('Reference to the maker of the firearm.').optional(),
     model: text(200).describe('Model name.').optional(),
-    cartridge: recordId
-      .describe('Id of the cartridge record the firearm is chambered for.')
+    cartridge: ref('cartridge')
+      .describe('Reference to the cartridge the firearm is chambered for.')
       .optional(),
-    barrelLength: length().describe('Barrel length, m.').optional(),
-    twist: length().describe('Rifling twist as length per turn, m.').optional(),
+    barrelLength: length().describe('Barrel length.').optional(),
+    twist: length().describe('Rifling twist as length per turn.').optional(),
     twistHand: z.enum(['right', 'left']).describe('Direction of the rifling twist.'),
-    grooveDiameter: length().describe('Groove diameter, m.').optional(),
-    boreDiameter: length().describe('Bore diameter, m.').optional(),
+    grooveDiameter: length().describe('Groove diameter.').optional(),
+    boreDiameter: length().describe('Bore diameter.').optional(),
     freebore: length()
-      .describe('Unrifled length of the throat from the case mouth to the start of the rifling, m.')
+      .describe('Unrifled length of the throat from the case mouth to the start of the rifling.')
       .optional(),
     baseToOgiveAtLands: length()
-      .describe('Cartridge base to ogive with the bullet touching the lands, measured, m.')
+      .describe('Cartridge base to ogive with the bullet touching the lands, measured.')
       .optional(),
-    firearmMass: si('kg').positive().describe('Mass of the firearm, kg.').optional(),
+    firearmMass: quantity('mass', z.number().positive())
+      .describe('Mass of the firearm.')
+      .optional(),
     roundCount: z.int().nonnegative().describe('Rounds fired through the barrel.').optional(),
     notes: text(10000).describe('Notes on the firearm, plain text.').optional(),
     optics: z.array(optic).max(20).describe('Optics of the firearm.'),
@@ -157,11 +168,11 @@ export const firearm = z
       })
   })
 
-/** A firearm of the library: lengths in m, mass in kg, optics and configurations. */
+/** A firearm: lengths in mm, mass in g, optics and configurations. */
 export interface Firearm extends z.infer<typeof firearm> {}
-/** An optic: click and travel in rad, magnification range. */
+/** An optic: click and travel in degrees, magnification range. */
 export interface Optic extends z.infer<typeof optic> {}
 /** The optics mounted on a firearm between a mount date and a removal date. */
 export interface OpticConfiguration extends z.infer<typeof opticConfiguration> {}
-/** One optic as mounted, with sight height and zero range in m, zero air and drag factor. */
+/** One optic as mounted, with sight height and zero range in mm, zero air and drag factor. */
 export interface OpticMount extends z.infer<typeof opticMount> {}

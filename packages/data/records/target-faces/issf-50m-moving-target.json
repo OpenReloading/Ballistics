@@ -1,0 +1,156 @@
+{
+  "id": "issf-50m-moving-target",
+  "name": "50m Moving Target",
+  "federation": "issf",
+  "rings": [
+    {
+      "value": 1,
+      "diameter": {
+        "value": 366
+      }
+    },
+    {
+      "value": 2,
+      "diameter": {
+        "value": 332
+      }
+    },
+    {
+      "value": 3,
+      "diameter": {
+        "value": 298
+      }
+    },
+    {
+      "value": 4,
+      "diameter": {
+        "value": 264
+      }
+    },
+    {
+      "value": 5,
+      "diameter": {
+        "value": 230
+      }
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 196
+      }
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 162
+      }
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 128
+      }
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 94
+      }
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 60
+      }
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 30
+    },
+    "rule": "touch"
+  },
+  "blackDiameter": {
+    "value": 94,
+    "raw": "Aiming mark outside diameter 94mm"
+  },
+  "decimal": true,
+  "events": [
+    {
+      "id": "50m-moving-target",
+      "name": "50m Moving Target",
+      "distance": {
+        "value": 50000,
+        "raw": "50m"
+      },
+      "gauge": {
+        "value": 5.6,
+        "raw": "5.60mm"
+      },
+      "scoring": "touch"
+    },
+    {
+      "id": "50m-moving-target-mixed",
+      "name": "50m Moving Target Mixed",
+      "distance": {
+        "value": 50000,
+        "raw": "50m"
+      },
+      "gauge": {
+        "value": 5.6,
+        "raw": "5.60mm"
+      },
+      "scoring": "touch"
+    }
+  ],
+  "bulls": [
+    {
+      "x": {
+        "value": -453
+      },
+      "y": {
+        "value": 0
+      },
+      "zone": "left"
+    },
+    {
+      "x": {
+        "value": 453
+      },
+      "y": {
+        "value": 0
+      },
+      "zone": "right"
+    }
+  ],
+  "numerals": true,
+  "photoSearch": false,
+  "note": "One card with two scoring zones, the centres of the 10 rings 453 mm left and right of the single aiming mark at the card centre. The black area is that aiming mark (94 mm, with white rings of 60 mm and a 15 mm dot), not part of the scoring rings. Ring values 1 to 6 are printed in the zones; the 10 ring is 60 mm.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 6.3.4.7, p. 201 (PDF p. 201)",
+        "fields": ["name", "rings", "innerTen.diameter", "blackDiameter", "numerals", "bulls"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 3.3.1, p. 39 (PDF p. 39)",
+        "fields": ["events.name", "events.distance"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rules 6.3.3.1 to 6.3.3.3, pp. 194 to 195 (PDF pp. 194 to 195)",
+        "fields": ["decimal"],
+        "note": "Tenth-ring values where electronic targets or scoring machines are used, else whole rings."
+      },
+      {
+        "source": "issf-paper-target-scoring-2022",
+        "page": "Rule 1.4.3, p. 321 (PDF p. 2); rule 5.2.1, p. 330 (PDF p. 11)",
+        "fields": ["events.gauge", "events.scoring", "innerTen.rule"],
+        "kind": "derived"
+      }
+    ]
+  }
+}

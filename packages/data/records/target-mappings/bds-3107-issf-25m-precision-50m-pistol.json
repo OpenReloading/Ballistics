@@ -2,7 +2,7 @@
   "id": "bds-3107-issf-25m-precision-50m-pistol",
   "discipline": "bds-3107",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDS 3107 100 m Präz. DSG gK und Diopter",
+  "event": "bds-3107-100-m-praz-dsg-gk-und-diopter",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

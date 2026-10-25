@@ -1,10 +1,11 @@
 /** The discipline and federation lists' rows and filters, and a discipline record's rule book and stages. */
 import {
-  caliberClasses,
+  type CaliberClass,
   type Discipline,
   type Federation,
   type Provenance,
   type Source,
+  toSi,
 } from '@openreloading/schema'
 import type { DirectoryState } from './directory.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
@@ -20,6 +21,12 @@ export type FederationRecord = Omit<Federation, 'ruleBooks' | 'provenance'> & {
   provenance: Provenance
 }
 
+/** A caliber class as `GET /caliber-classes` lists it. */
+export type CaliberClassSummary = Pick<CaliberClass, 'id' | 'name'> & { diameterMm: number }
+
+/** A caliber class of a discipline: its id and name. */
+export type CaliberClassRef = Pick<CaliberClassSummary, 'id' | 'name'>
+
 /** One row of the discipline list. Distance in m. */
 export type DisciplineRow = {
   id: string
@@ -29,15 +36,21 @@ export type DisciplineRow = {
   federation: string
   distance: number
   category?: string
-  /** Caliber class ids, in the record's order. */
-  classes: string[]
+  /** The caliber classes, in the record's order. */
+  classes: CaliberClassRef[]
   /** Distinct faces of the discipline's mappings. */
   faces: number
 }
 
-/** The label of a caliber class id; an unknown id is shown as is. */
-export const caliberClassLabel = (id: string) =>
-  caliberClasses.find((c) => c.id === id)?.label ?? id
+/** The caliber classes of a discipline with their names; an id no class answers is shown as is. */
+export const caliberClassRefs = (
+  d: Pick<DisciplineRecord, 'caliberClasses'>,
+  classes: readonly CaliberClassRef[],
+): CaliberClassRef[] =>
+  (d.caliberClasses?.ids ?? []).map((id) => ({
+    id,
+    name: classes.find((c) => c.id === id)?.name ?? id,
+  }))
 
 /** The distinct faces of a discipline's mappings, in mapping order. */
 export const disciplineFaceIds = (mappings: readonly MappingSummary[], discipline: string) => [
@@ -49,15 +62,16 @@ export function disciplineRow(
   d: DisciplineRecord,
   federations: readonly FederationSummary[],
   mappings: readonly MappingSummary[],
+  classes: readonly CaliberClassRef[],
 ): DisciplineRow {
   return {
     id: d.id,
     name: d.name,
     ...(d.number && { number: d.number }),
     federation: federations.find((f) => f.id === d.federation)?.abbreviation ?? d.federation,
-    distance: d.distance.value / 1e3,
+    distance: toSi('length', d.distance.value),
     ...(d.category && { category: d.category }),
-    classes: d.caliberClasses?.ids ?? [],
+    classes: caliberClassRefs(d, classes),
     faces: disciplineFaceIds(mappings, d.id).length,
   }
 }
@@ -67,14 +81,14 @@ export const disciplineMatches = (r: DisciplineRow, s: DirectoryState) =>
   (!s.organization || r.federation === s.organization) &&
   (!s.category || r.category === s.category) &&
   (!s.distance || String(r.distance) === s.distance) &&
-  (!s.caliberClass || r.classes.includes(s.caliberClass)) &&
+  (!s.caliberClass || r.classes.some((c) => c.id === s.caliberClass)) &&
   matchesQuery(
     [
       r.name,
       r.number,
       r.federation,
       r.category && titleFromKebab(r.category),
-      ...r.classes.map(caliberClassLabel),
+      ...r.classes.map((c) => c.name),
     ],
     s.query,
   )
@@ -86,7 +100,7 @@ export function disciplineStrip(d: DisciplineRecord, federation = d.federation):
     {
       icon: 'distance',
       label: 'Distance',
-      row: { label: 'Distance', text: String(d.distance.value / 1e3), unit: 'm' },
+      row: { label: 'Distance', text: String(toSi('length', d.distance.value)), unit: 'm' },
     },
     ...(d.category
       ? [
@@ -106,7 +120,10 @@ const classBasis = {
 }
 
 /** The discipline's values beyond the strip: number, section, page and the caliber classes. */
-export function disciplineGroups(d: DisciplineRecord): FieldGroup[] {
+export function disciplineGroups(
+  d: DisciplineRecord,
+  classes: readonly CaliberClassRef[],
+): FieldGroup[] {
   return [
     {
       rows: [
@@ -117,7 +134,9 @@ export function disciplineGroups(d: DisciplineRecord): FieldGroup[] {
           ? [
               {
                 label: 'Caliber classes',
-                text: d.caliberClasses.ids.map(caliberClassLabel).join(', '),
+                text: caliberClassRefs(d, classes)
+                  .map((c) => c.name)
+                  .join(', '),
               },
               { label: 'Caliber classes from', text: classBasis[d.caliberClasses.basis] },
             ]

@@ -1,5 +1,4 @@
 import { readRecords } from '@openreloading/data'
-import type { TargetFace } from '@openreloading/schema'
 import { describe, expect, it } from 'vitest'
 import {
   disciplineChoice,
@@ -9,21 +8,25 @@ import {
   type FederationData,
   mappedFace,
 } from '../src/lib/face-disciplines.ts'
+import { type Face, withOrganization } from '../src/lib/face-organization.ts'
 
 const { bundle } = readRecords()
-const faces = bundle.targetFaces
+const faces = bundle.targetFaces.map((f) => withOrganization(f, bundle.federations))
 const issf = faces.filter((f) => f.organization === 'ISSF')
-const own = (f: TargetFace) => ({ ...f, events: f.events.filter((e) => !e.organization) })
+const own = (f: Face) => ({ ...f, events: f.events.filter((e) => !e.organization) })
 
 describe('disciplines', () => {
   const items = disciplineOptions(faces)
+  const rifleEvent = faces
+    .find((f) => f.id === 'vdrbw-bw-nr2')
+    ?.events.find((e) => e.name === 'VdRBw G-RM 1 Militär-Repetiergewehr')?.id
 
   it('lists every event of every face once, labelled with its organization', () => {
     expect(items).toHaveLength(faces.reduce((n, f) => n + f.events.length, 0))
     expect(new Set(items.map((i) => i.value)).size).toBe(items.length)
     for (const f of faces)
       for (const e of f.events)
-        expect(items.find((i) => i.value === `${f.id}|${e.name}`)?.label).toMatch(
+        expect(items.find((i) => i.value === `${f.id}|${e.id}`)?.label).toMatch(
           new RegExp(`^${e.organization ?? f.organization} `),
         )
   })
@@ -32,9 +35,9 @@ describe('disciplines', () => {
     const norm = (l: string) => l.toLowerCase().replace(/\s+/g, ' ').trim()
     const labels = items.map((i) => norm(i.label))
     expect(labels.filter((l, i) => labels.indexOf(l) !== i)).toEqual([])
-    expect(
-      items.find((i) => i.value === 'vdrbw-bw-nr2|VdRBw G-RM 1 Militär-Repetiergewehr')?.label,
-    ).toBe('VdRBw G-RM 1 Militär-Repetiergewehr (Scheibe Bundeswehr Nr. 2)')
+    expect(items.find((i) => i.value === `vdrbw-bw-nr2|${rifleEvent}`)?.label).toBe(
+      'VdRBw G-RM 1 Militär-Repetiergewehr (Scheibe Bundeswehr Nr. 2)',
+    )
   })
 
   it('keeps the events of one organization together', () => {
@@ -59,14 +62,14 @@ describe('disciplines', () => {
   it('maps an entry to the face and event a group stores, and back', () => {
     for (const f of faces)
       for (const e of f.events) {
-        const value = `${f.id}|${e.name}`
-        expect(disciplineValue({ id: f.id, event: e.name })).toBe(value)
+        const value = `${f.id}|${e.id}`
+        expect(disciplineValue({ id: f.id, event: e.id })).toBe(value)
         const label = e.organization ? e.name : `${f.organization} ${e.name}`
         // an event on two faces names its face
         expect([label, `${label} (${f.name})`]).toContain(
           items.find((i) => i.value === value)?.label,
         )
-        expect(disciplineChoice(value)).toEqual({ id: f.id, event: e.name })
+        expect(disciplineChoice(value)).toEqual({ id: f.id, event: e.id })
       }
   })
 
@@ -113,10 +116,14 @@ describe('disciplines of the federations', () => {
   })
 
   it('keeps a face event no mapping names as its own entry', () => {
-    const extra = { ...faces[0], id: 'x-face', events: [{ ...faces[0].events[0], name: 'Own' }] }
+    const extra = {
+      ...faces[0],
+      id: 'x-face',
+      events: [{ ...faces[0].events[0], id: 'own', name: 'Own' }],
+    }
     const items = disciplineOptions([...faces, extra], data)
-    expect(items.at(-1)).toEqual({ value: 'x-face|Own', label: `${extra.organization} Own` })
-    expect(disciplineValue({ id: 'x-face', event: 'Own' }, data.mappings)).toBe('x-face|Own')
+    expect(items.at(-1)).toEqual({ value: 'x-face|own', label: `${extra.organization} Own` })
+    expect(disciplineValue({ id: 'x-face', event: 'own' }, data.mappings)).toBe('x-face|own')
     expect(mappedFace(data.mappings, 'x-face')).toBe(false)
     expect(mappedFace(data.mappings, 'issf-10m-air-rifle')).toBe(true)
   })

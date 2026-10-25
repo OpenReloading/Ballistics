@@ -2,7 +2,7 @@
   "id": "bds-2101-bdmp-nr1-100m",
   "discipline": "bds-2101",
   "face": "bdmp-nr1-100m",
-  "event": "BDS 2101 50 m Präz. SG SL KW off. Vis.",
+  "event": "bds-2101-50-m-praz-sg-sl-kw-off-vis",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

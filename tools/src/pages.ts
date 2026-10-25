@@ -1,9 +1,9 @@
 /**
  * Builds the Pages site into `pages/` at the repository root (README, Pages edition): the web app
- * as a static export under `PAGES_BASE_PATH`, every record page prerendered from the API on PGlite
- * seeded from the data bundle (`@openreloading/api/static`), its read answers as data files under
- * `api/`, the docs site under `docs/`, LICENSE, NOTICE, the data license (`data/LICENSE`) and
- * `.nojekyll`.
+ * as a static export under `PAGES_BASE_PATH`, every record page prerendered from the API over the
+ * catalogue built from the data bundle (`@openreloading/api/static`), the catalogue index and the
+ * records as data files under `api/`, the docs site under `docs/`, LICENSE, NOTICE, the data
+ * license (`data/LICENSE`) and `.nojekyll`.
  * `PAGES_URL` (the site's origin) sets the docs' `url` and the app's `metadataBase`. Needs
  * `npm run build` at the root first.
  */
@@ -42,7 +42,7 @@ try {
   rmSync(site, { recursive: true, force: true })
   cpSync(at('apps/web/out'), site, { recursive: true })
   dropFullPayloads(site)
-  await writeStaticApi(api.app, `${site}/api`)
+  await writeStaticApi(api.data, `${site}/api`)
 } finally {
   clearWebBuild()
   await api.close()

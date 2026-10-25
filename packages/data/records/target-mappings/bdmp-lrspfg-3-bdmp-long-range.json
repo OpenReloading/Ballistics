@@ -2,7 +2,7 @@
   "id": "bdmp-lrspfg-3-bdmp-long-range",
   "discipline": "bdmp-lrspfg-3",
   "face": "bdmp-long-range",
-  "event": "BDMP SPFG3 LR Schwarzpulverfreigewehr, 300 bis 900 m",
+  "event": "bdmp-spfg3-lr-schwarzpulverfreigewehr-300-bis-900-m",
   "shotCount": 10,
   "provenance": {
     "kind": "published",

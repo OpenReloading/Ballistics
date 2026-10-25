@@ -5,7 +5,8 @@
     "src/index.ts",
     "src/cartridge/index.ts",
     "src/bullet/index.ts",
-    "src/seating/index.ts"
+    "src/seating/index.ts",
+    "src/target/index.ts"
   ],
   "tsconfig": "tsconfig.build.json"
 }

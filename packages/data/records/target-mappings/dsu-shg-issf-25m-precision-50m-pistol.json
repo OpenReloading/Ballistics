@@ -2,7 +2,7 @@
   "id": "dsu-shg-issf-25m-precision-50m-pistol",
   "discipline": "dsu-shg",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "DSU SHG Schwarzpulver-Hinterladergewehr 50 m",
+  "event": "dsu-shg-schwarzpulver-hinterladergewehr-50-m",
   "shotCount": 10,
   "provenance": {
     "kind": "published",

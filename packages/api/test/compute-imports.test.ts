@@ -5,6 +5,9 @@ import { describe, expect, it } from 'vitest'
 /** The packages `@openreloading/api/compute` may import: it runs in the browser. */
 const allowed = ['@openreloading/core', '@openreloading/schema', 'zod']
 
+/** The packages `@openreloading/api/catalogue` may import: core and schema, no Node API. */
+const catalogueAllowed = ['@openreloading/core', '@openreloading/schema']
+
 /** The files below `src/` that `entry` reaches by relative imports, and their other imports. */
 function imports(entry: string) {
   const files = new Set<string>()
@@ -31,6 +34,25 @@ describe('compute entry', () => {
   })
 
   it('names a runtime import outside the allowed packages', () => {
-    expect(imports('static.ts').found).toContain('static.ts: @electric-sql/pglite')
+    expect(imports('app.ts').found).toContain('app.ts: fastify')
+  })
+})
+
+describe('catalogue entry', () => {
+  it('imports only core and schema, no Node API, also through the modules it imports', () => {
+    const { files, found } = imports('catalogue/browser.ts')
+    expect([...files].sort()).toEqual([
+      'catalogue/browser.ts',
+      'catalogue/build.ts',
+      'catalogue/derive.ts',
+      'catalogue/list.ts',
+      'catalogue/open.ts',
+      'catalogue/types.ts',
+    ])
+    expect(found.filter((f) => !catalogueAllowed.includes(f.split(': ')[1]))).toEqual([])
+  })
+
+  it('names the Node imports of the module that reads and writes the files', () => {
+    expect(imports('catalogue/node.ts').found).toContain('catalogue/node.ts: node:fs')
   })
 })

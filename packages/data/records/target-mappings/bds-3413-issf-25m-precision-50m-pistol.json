@@ -2,7 +2,7 @@
   "id": "bds-3413-issf-25m-precision-50m-pistol",
   "discipline": "bds-3413",
   "face": "issf-25m-precision-50m-pistol",
-  "event": "BDS 3413 100 m Fertigkeit SG SL ü. 6,4 mm",
+  "event": "bds-3413-100-m-fertigkeit-sg-sl-u-6-4-mm",
   "shotCount": 30,
   "provenance": {
     "kind": "published",

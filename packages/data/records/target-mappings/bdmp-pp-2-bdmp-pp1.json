@@ -2,7 +2,7 @@
   "id": "bdmp-pp-2-bdmp-pp1",
   "discipline": "bdmp-pp-2",
   "face": "bdmp-pp1",
-  "event": "BDMP PP 2 Police Pistol 2",
+  "event": "bdmp-pp-2-police-pistol-2",
   "shotCount": 60,
   "provenance": {
     "kind": "published",

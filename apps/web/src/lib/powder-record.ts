@@ -1,34 +1,9 @@
-import { defaultStartPressure, handgunBarrelLengthLimit } from '@openreloading/core'
 import type { Powder } from '@openreloading/schema'
 
 /**
  * A powder record's M3 parameters in the workbench: the fill, the field marks, the fit summary
  * and the bore resistance of the fit.
  */
-
-/** SI field values of the record's model parameters; undefined for a record without them. */
-export function powderModelValues(p: Powder): Record<string, number> | undefined {
-  const i = p.interior
-  if (!i) return undefined
-  return {
-    propellantEnergy: i.energy.value,
-    gamma: i.gamma,
-    density: i.density.value * 1e3,
-    covolume: i.covolume.value,
-    vivacity: i.vivacity.value,
-    exponent: i.pressureExponent,
-    referencePressure: i.referencePressure.value * 1e5,
-    ignitionPressure: i.ignitionPressure.value * 1e5,
-    // without its own value each load had the rule's default: the one from 300 mm, as the workbench has no barrel length
-    startPressure: i.startPressure
-      ? i.startPressure.value * 1e5
-      : defaultStartPressure(handgunBarrelLengthLimit).value,
-    formA: i.burnForm.a.value,
-    formM: i.burnForm.m,
-    formQ: i.burnForm.q,
-    formZ1: i.burnForm.z1,
-  }
-}
 
 /** A field value still equal to the record value `from`, within 1e-9 relative. */
 const matchesRecordValue = (from: number, si: number | undefined) =>

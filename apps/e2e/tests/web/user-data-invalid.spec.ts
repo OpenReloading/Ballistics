@@ -19,6 +19,9 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
       (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
+    ;(window as unknown as Record<string, unknown>).showOpenFilePicker = async () => [
+      await (await navigator.storage.getDirectory()).getFileHandle('export.json'),
+    ]
   })
   await page.goto('/')
   await page.evaluate(async (record) => {
@@ -50,7 +53,7 @@ test('an invalid record of an older store is listed, downloadable and in Export 
   await page.getByRole('menuitem', { name: 'Invalid records (1)…' }).click()
   const dialog = page.getByRole('dialog', { name: 'Invalid records in this browser' })
   await expect(dialog.getByText('Old design')).toBeVisible()
-  await expect(dialog.getByText('data')).toBeVisible()
+  await expect(dialog.getByText(/Invalid discriminator value/)).toBeVisible()
   const download = page.waitForEvent('download')
   await dialog.getByRole('button', { name: 'Download raw' }).click()
   const file = await download
@@ -66,4 +69,37 @@ test('an invalid record of an older store is listed, downloadable and in Export 
     return (await (await dir.getFileHandle('export.json')).getFile()).text()
   })
   expect(JSON.parse(text).invalid).toEqual([old])
+})
+
+test('an invalid record is deleted after a confirmation and Import restores it', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/bullets/designer')
+  await (await barButton(page, 'Save options')).click()
+  await page.getByRole('menuitem', { name: 'Export all…' }).click()
+  await expect(page.getByText('1 invalid record is in it as stored.')).toBeVisible()
+
+  await (await barButton(page, 'Open')).click()
+  await page.getByRole('menuitem', { name: 'Invalid records (1)…' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Invalid records in this browser' })
+  await dialog.getByRole('button', { name: 'Delete' }).click()
+  const ask = page.getByRole('dialog', { name: /^Delete the invalid record Old design/ })
+  // Cancel keeps it
+  await ask.getByRole('button', { name: 'Cancel' }).click()
+  await expect(dialog.getByText('Old design')).toBeVisible()
+  await dialog.getByRole('button', { name: 'Delete' }).click()
+  await ask.getByRole('button', { name: 'Delete' }).click()
+  await expect(dialog.getByText('Old design')).toBeHidden()
+  await page.keyboard.press('Escape')
+  await (await barButton(page, 'Open')).click()
+  await expect(page.getByRole('menuitem', { name: /Invalid records/ })).toBeHidden()
+  await page.keyboard.press('Escape')
+
+  await (await barButton(page, 'Open')).click()
+  await page.getByRole('menuitem', { name: 'Import…' }).click()
+  const report = page.getByRole('dialog', { name: 'Import' })
+  await expect(report.getByText('1 invalid record restored.')).toBeVisible()
+  await report.getByRole('button', { name: 'Close' }).click()
+  await (await barButton(page, 'Open')).click()
+  await expect(page.getByRole('menuitem', { name: 'Invalid records (1)…' })).toBeVisible()
 })

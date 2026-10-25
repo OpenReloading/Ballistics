@@ -1,7 +1,7 @@
 {
   "id": "bdmp-nr6",
   "name": "BDMP-Scheibe Nr. 6",
-  "organization": "BDMP",
+  "federation": "bdmp",
   "rings": [
     {
       "value": 5,
@@ -50,6 +50,7 @@
   },
   "events": [
     {
+      "id": "zg-5-zielfernrohrgewehr-5",
       "name": "ZG 5 Zielfernrohrgewehr 5",
       "distance": {
         "value": 50000,

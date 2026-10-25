@@ -65,7 +65,13 @@ export const sections = [
 ] as const
 
 /** Tool pages: no reading measure on their text; every other page is a document page. */
-export const toolRoutes = ['/workbench', '/groups', '/bullets/designer', '/cartridges/designer']
+export const toolRoutes = [
+  '/workbench',
+  '/groups',
+  '/bullets/designer',
+  '/cartridges/designer',
+  '/targets/designer',
+]
 
 export const isToolRoute = (route: string) => toolRoutes.includes(route)
 

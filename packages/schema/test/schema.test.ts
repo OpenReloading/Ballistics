@@ -20,8 +20,9 @@ const measured = { kind: 'measured', sources: [{ title: 'Range log' }] } as cons
 
 const validLoad = {
   id: 'test-load',
-  cartridge: 'test-cartridge',
-  firearm: { name: 'Test rifle', barrelLength: { value: 600 } },
+  origin: 'catalogue',
+  name: 'Test load',
+  cartridge: 'catalogue:test-cartridge',
   bullet: {
     manufacturerName: 'Manufacturer',
     model: 'Model',
@@ -37,7 +38,7 @@ const validLoad = {
 const validSession = {
   id: 'test-session',
   date: '2026-10-08',
-  device: { kind: 'doppler-radar', manufacturerName: 'Manufacturer', model: 'Model' },
+  device: { kind: 'doppler-radar', manufacturer: 'catalogue:test-maker', model: 'Model' },
   conditions: { airTemperature: { value: 15 } },
   strings: [{ load: 'test-load', shots: [{ velocity: { value: 800 } }] }],
   provenance: measured,
@@ -75,6 +76,12 @@ describe('source', () => {
 describe('load', () => {
   it('accepts a complete load', () => {
     expect(load.safeParse(validLoad).success).toBe(true)
+  })
+
+  it('refers to its firearm and holds none inline', () => {
+    expect(load.safeParse({ ...validLoad, firearm: 'catalogue:test-rifle' }).success).toBe(true)
+    expectIssueAt(load, { ...validLoad, firearm: 'test-rifle' }, 'firearm')
+    expectIssueAt(load, { ...validLoad, firearm: { name: 'Test rifle' } }, 'firearm')
   })
 
   it('rejects an id that is not kebab-case', () => {

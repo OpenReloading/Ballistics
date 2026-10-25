@@ -11,15 +11,19 @@ import {
   cartridgeGrooveDiameterMm,
   gasVelocityFactor,
   overrideResistance,
+  powderModelValues,
   recordResistance,
   ValueError,
 } from '@openreloading/core'
-import type {
-  Bullet,
-  CartridgeDesign,
-  Powder,
-  UserRecord,
-  WorkbenchState,
+import {
+  type Bullet,
+  fromSi,
+  type Load,
+  type Powder,
+  parseRef,
+  toSi,
+  type UserRecord,
+  userRecord,
 } from '@openreloading/schema'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
@@ -46,7 +50,7 @@ import {
   siValues,
 } from '../lib/field-spec.ts'
 import type { FigureView } from '../lib/figure-views.ts'
-import { sightOptions } from '../lib/firearm.ts'
+import { gunValues, sightOptions } from '../lib/firearm.ts'
 import {
   cartridgeClass,
   type FollowKey,
@@ -56,11 +60,12 @@ import {
   suggestDefaults,
 } from '../lib/input-defaults.ts'
 import { burnFormError, interiorBody, interiorFields } from '../lib/interior-input.ts'
+import { fromLoad, givenKeys, type LoadParts, toLoad } from '../lib/load-record.ts'
 import { generatedName, loadName } from '../lib/load-tabs.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import { type IdentifiedSeries, seriesId } from '../lib/measurements.ts'
 import { powderValues } from '../lib/powder-compare.ts'
-import { powderModelValues, unchangedFromRecord } from '../lib/powder-record.ts'
+import { unchangedFromRecord } from '../lib/powder-record.ts'
 import {
   droppedIds,
   linkedId,
@@ -81,7 +86,18 @@ import {
   temperatureLadderBlockReason,
 } from '../lib/seating-ladder.ts'
 import { exactFieldText, fixedFieldText, formatQuantity, withUnit } from '../lib/units.ts'
-import { storedRecords } from '../lib/user-store.ts'
+import { storedRecord, storedRecords } from '../lib/user-store.ts'
+import {
+  catalogueIdOf,
+  catalogueRef,
+  resolveBullet,
+  resolveCartridge,
+  type UserBulletView,
+  type UserCartridgeView,
+  userBullets,
+  userCartridges,
+  userRef,
+} from '../lib/variants.ts'
 import {
   type InputPanel,
   lengthText,
@@ -140,8 +156,10 @@ import type { WorkspaceHandle } from './workspace.tsx'
 const interiorSpec = (key: string) =>
   interiorFields.find((s) => s.key === key) as (typeof interiorFields)[number]
 
+type Seating = LoadParts['seating']
+
 /** The seating of the seated bullet's values, none while no bullet is seated. */
-function seatingOf(seated: Seated): WorkbenchState['seating'] {
+function seatingOf(seated: Seated): Seating {
   const value = seated.mode && seated[seated.mode]
   // to 1 nm: the mm round trip of the preview leaves float noise that would mark an opened file changed
   return seated.mode && value !== undefined
@@ -158,6 +176,8 @@ const cartridgeChoice = (c: CartridgeDetail): CartridgeChoice => ({
 })
 
 /** An answer of `POST /interior`: the response and its body, a result or an error body. */
+type FirearmRecord = Extract<UserRecord, { kind: 'firearm' }>
+
 type Answer = { res: Response; json: (InteriorResponse & ErrorBody) | undefined }
 
 /** The load workbench's state and actions: inputs, records, seating, ladder, run and result. */
@@ -187,13 +207,11 @@ export function useWorkbenchState() {
     validate,
   })
   const [cartridge, setCartridgeRecord] = useState<CartridgeChoice | undefined>(undefined)
-  // shortcut: the design is not kept in load files or links; add a design id to `workbenchState` when a load should reopen it
-  /** The user cartridge design chosen in place of a record: it fills what its values give, nothing from a catalogue record. */
-  const [cartridgeDesign, setCartridgeDesign] = useState<{
-    id: string
-    name: string
-    data: CartridgeDesign
-  }>()
+  /**
+   * The user cartridge chosen in place of a record: it fills what its resolved values give, no
+   * limits, class or capacity record of its base.
+   */
+  const [cartridgeDesign, setCartridgeDesign] = useState<UserCartridgeView>()
   /** A catalogue cartridge replaces the design. */
   const setCartridge = (c: CartridgeChoice | undefined) => {
     setCartridgeRecord(c)
@@ -215,31 +233,36 @@ export function useWorkbenchState() {
     { id: string; z?: number; record?: CartridgeDetail } | undefined
   >(undefined)
   /** Groove diameter Z of the chosen cartridge once its record is loaded, m: the bore area's fallback. */
-  const grooveM = cartridge && groove?.id === cartridge.id && groove.z ? groove.z * 1e-3 : undefined
+  const grooveM =
+    cartridge && groove?.id === cartridge.id && groove.z ? toSi('length', groove.z) : undefined
   /** Bore area Q of the chosen cartridge once its record is loaded, m2: what an empty Bore area takes first. */
   const qM =
     cartridge && groove?.id === cartridge.id
-      ? (groove.record?.values.find((v) => v.side === 'chamber' && v.symbol === 'Q' && !v.variant)
-          ?.value ?? 0) * 1e-6 || undefined
+      ? toSi(
+          'area',
+          groove.record?.values.find((v) => v.side === 'chamber' && v.symbol === 'Q' && !v.variant)
+            ?.value ?? 0,
+        ) || undefined
       : undefined
   const [allDiameters, setAllDiameters] = useState(false)
-  const [designs, setDesigns] = useState<Extract<UserRecord, { kind: 'bulletDesign' }>[]>([])
+  /** The browser's bullet designs that have a mass, resolved against the catalogue. */
+  const [designs, setDesigns] = useState<UserBulletView[]>([])
   /** The browser's cartridge designs that draw a case and chamber. */
-  const [cartridgeDesigns, setCartridgeDesigns] = useState<
-    Extract<UserRecord, { kind: 'cartridgeDesign' }>[]
-  >([])
+  const [cartridgeDesigns, setCartridgeDesigns] = useState<UserCartridgeView[]>([])
   /** The firearm library of this browser, for the Gun and barrel picker. */
-  const [firearms, setFirearms] = useState<Extract<UserRecord, { kind: 'firearm' }>[]>([])
+  const [firearms, setFirearms] = useState<FirearmRecord[]>([])
   const [firearm, setFirearm] = useState<string>()
+  /** An opened load's gun weight comes from its firearm, which is not read yet. */
+  const gunPending = useRef(false)
+  /** Counts the opened loads: the same firearm chosen again is no change of `firearm`. */
+  const [opens, setOpens] = useState(0)
   /** The name the user typed; undefined: the generated name follows the load. */
   const [customName, setCustomName] = useState<string>()
   const [figureView, setFigureView] = useState<FigureView>('cartridge')
   /** The library, with the example's built-in rifle while the example is loaded. */
-  const firearmList: {
-    id: string
-    name: string
-    data: { twist?: number; barrelLength?: number; firearmMass?: number }
-  }[] = firearm === loadExample.firearm.id ? [loadExample.firearm, ...firearms] : firearms
+  const firearmList = (
+    firearm === loadExample.firearm.id ? [loadExample.firearm, ...firearms] : firearms
+  ).map((r) => ({ id: r.id, name: r.name, data: gunValues((r as FirearmRecord).data) }))
   /** The chosen firearm's active sight, for the Trajectory tab. */
   const chosenSight = sightOptions(
     [loadExample.firearm, ...firearms].filter((r) => r.id === firearm) as UserRecord[],
@@ -281,27 +304,23 @@ export function useWorkbenchState() {
   const [figureTab, setFigureTab] = useState<HTMLElement | null>(null)
   /** The card whose More popover is open; the model parameters drawer. */
   const [more, setMore] = useState<InputPanel>()
-  // shortcut: the design is not kept in load files or links, only its mass; add a design id to `workbenchState` when a load should reopen it
   /** The user bullet design that filled the bullet mass; an edit of the mass leaves it. */
-  const [bulletDesign, setBulletDesign] = useState<{ id: string; name: string }>()
+  const [bulletDesign, setBulletDesign] = useState<{ id: string; name: string; mass?: number }>()
   /** The full form without a cartridge, chosen on the start card. */
   const [byHand, setByHand] = useState(false)
   /** The browser's bullet designs, read on load and again on focus. */
   const readDesigns = () =>
     storedRecords()
-      .then(({ records }) => {
+      .then(async ({ records }) => {
+        const [bullets, cartridges] = await Promise.all([
+          userBullets(records),
+          userCartridges(records),
+        ])
         // a design without a mass has nothing to fill
-        setDesigns(
-          records.filter(
-            (r): r is (typeof designs)[number] =>
-              r.kind === 'bulletDesign' && r.data.siValues.mass !== undefined,
-          ),
-        )
+        setDesigns(bullets.filter((d) => d.si.mass !== undefined))
         setCartridgeDesigns(
-          records.filter(
-            (r): r is (typeof cartridgeDesigns)[number] =>
-              r.kind === 'cartridgeDesign' &&
-              workbenchDesign(r.data, r.name, unitsNow.current) !== undefined,
+          cartridges.filter(
+            (d) => workbenchDesign(d.data, d.resolved, d.name, unitsNow.current) !== undefined,
           ),
         )
         setFirearms(records.filter((r): r is (typeof firearms)[number] => r.kind === 'firearm'))
@@ -311,31 +330,55 @@ export function useWorkbenchState() {
   useEffect(() => {
     readDesigns()
   }, [])
-  /** A bullet design of this browser in place of a record; fills the bullet mass. */
-  function chooseDesign(id: string) {
-    const d = designs.find((r) => r.id === id)
-    setBulletDesign(d && { id: d.id, name: d.name })
-    if (!d) return
-    markChanged()
+  // the weight of the opened load's firearm, once the library has been read
+  // biome-ignore lint/correctness/useExhaustiveDependencies: on a new library or firearm only
+  useEffect(() => {
+    if (!gunPending.current) return
+    const f = firearmList.find((r) => r.id === firearm)
+    if (!f) return
+    gunPending.current = false
+    const mass = f.data.firearmMass
+    if (mass === undefined) return
+    gunFromFirearm.current = true
+    setGunFields({
+      firearmMass: { text: fixedFieldText('firearmMass', unitsNow.current, mass), si: mass },
+    })
+  }, [firearm, firearms, opens])
+  /** A bullet design of this browser in place of a record; `fill` writes its mass into the Bullet mass field. */
+  function takeBulletDesign(d: Pick<UserBulletView, 'id' | 'name' | 'si'>, fill = true) {
+    picking.current.bullets?.abort()
+    got('bullet')
+    setBulletDesign({ id: d.id, name: d.name, mass: d.si.mass })
     setBullet(undefined)
     setBulletNote('')
-    const mass = d.data.siValues.mass
+    if (!fill) return
+    markChanged()
+    const mass = d.si.mass
     if (mass !== undefined)
       form.setFieldValue('bulletMass', { text: fixedFieldText('mass', system, mass), si: mass })
   }
-  /** A cartridge design of this browser in place of a record. */
-  function chooseCartridgeDesign(id: string) {
-    const d = cartridgeDesigns.find((r) => r.id === id)
-    if (!d) return
+  function chooseDesign(id: string) {
+    const d = designs.find((r) => r.id === id)
+    if (d) takeBulletDesign(d)
+    else setBulletDesign(undefined)
+  }
+  /** A cartridge design of this browser in place of a record; an opened file's is no change. */
+  function takeCartridgeDesign(d: UserCartridgeView, fill = true) {
     picking.current.cartridges?.abort()
     got('cartridge')
-    markChanged()
+    if (fill) markChanged()
     setCartridgeRecord(undefined)
-    setCartridgeDesign({ id: d.id, name: d.name, data: d.data })
+    setCartridgeDesign(d)
     setBulletNote('')
+    // an opened file keeps the seating it holds
+    if (!fill) return
     setPreviewInitial(undefined)
     setSeated({})
     setSeatingStart(undefined)
+  }
+  function chooseCartridgeDesign(id: string) {
+    const d = cartridgeDesigns.find((r) => r.id === id)
+    if (d) takeCartridgeDesign(d)
   }
   /** A firearm of the library: its twist fills the twist, its barrel length the seating's. */
   function chooseFirearm(id: string | null) {
@@ -379,14 +422,14 @@ export function useWorkbenchState() {
   const [previewInitial, setPreviewInitial] = useState<{
     bullet?: string
     barrel?: number
-    seating?: WorkbenchState['seating']
+    seating?: Seating
   }>()
   /** SI values the preview wrote into the fields. */
   const [previewed, setPreviewed] = useState<Partial<Record<PreviewKey, number>>>({})
   /** The seated bullet's values, SI, none while no bullet is seated: an emptied field takes them again. */
   const [seated, setSeated] = useState<Seated>({})
   /** The seating the preview first reported: a file or link keeps a seating that differs. */
-  const [seatingStart, setSeatingStart] = useState<WorkbenchState['seating']>()
+  const [seatingStart, setSeatingStart] = useState<Seating>()
   const [tab, setTab] = useState<ResultTab>('results')
   /** Counts the File menu's store writes: the Groups tab reads the new id and its sheet again. */
   const [storedTick, setStoredTick] = useState(0)
@@ -448,7 +491,7 @@ export function useWorkbenchState() {
   /** The measured case capacity typed in the Cartridge card, kept for the cartridge it was typed for. */
   const [measured, setMeasured] = useState<Fields>({ measuredWaterCapacity: emptyStep })
   const [measuredFor, setMeasuredFor] = useState<string>()
-  /** The Gun and barrel card's gun weight (free recoil only); the load file's `siValues` and links carry it. */
+  /** The Gun and barrel card's gun weight (free recoil only); the load's typed values and links carry it. */
   const [gunFields, setGunFields] = useState<Fields>({ firearmMass: emptyStep })
   const gunWeight = gunFields.firearmMass
   /** The weight came from a firearm of the library, not from the keyboard, a link or a file. */
@@ -653,7 +696,8 @@ export function useWorkbenchState() {
   const linkedBullet = !bullet && asked.bullet?.id === linked.bullet?.id ? linked.bullet : undefined
   const linkedPowder = !powder && asked.powder?.id === linked.powder?.id ? linked.powder : undefined
   /** The bullet length a run reads, mm: the record's, else the link's. */
-  const bulletLength = bullet?.length?.value ?? (linkedBullet?.length && linkedBullet.length * 1e3)
+  const bulletLength =
+    bullet?.length?.value ?? (linkedBullet?.length && fromSi('length', linkedBullet.length))
 
   function reset() {
     setCustomName(undefined)
@@ -694,6 +738,7 @@ export function useWorkbenchState() {
     setMeasuredFor(undefined)
     setGunFields({ firearmMass: emptyStep })
     gunFromFirearm.current = false
+    gunPending.current = false
     setSearchKey((k) => k + 1)
     setLadderSteps(1)
     setLadder({ ladderStep: emptyStep })
@@ -807,7 +852,7 @@ export function useWorkbenchState() {
         setBulletNote('')
         if (!fill) return
         markChanged()
-        const mass = b.mass.value * 1e-3
+        const mass = toSi('mass', b.mass.value)
         form.setFieldValue('bulletMass', {
           text: fixedFieldText('mass', unitsNow.current, mass),
           si: mass,
@@ -820,8 +865,11 @@ export function useWorkbenchState() {
       })
   }
 
-  /** Loads a powder record; `fill` writes its model parameters into the fields (an opened file keeps its own). */
-  function choosePowder(id: string, fill = true) {
+  /**
+   * Loads a powder record; `fill` writes its model parameters into the fields, except the `keep`
+   * ones (the values an opened load carries).
+   */
+  function choosePowder(id: string, fill = true, keep: ReadonlySet<string> = new Set()) {
     const signal = pick('powders')
     want('powder', id)
     return fetchRecord<Powder>('powders', id, signal)
@@ -855,7 +903,8 @@ export function useWorkbenchState() {
           setDefaulted((s) => new Set([...s, ...back]))
         }
         if (!fill || !values) return
-        for (const [key, si] of Object.entries(values)) {
+        const filled = Object.entries(values).filter(([key]) => !keep.has(key))
+        for (const [key, si] of filled) {
           const spec = interiorFields.find((s) => s.key === key) as FieldSpec
           form.setFieldValue(key, {
             text: fixedFieldText(spec.quantity, unitsNow.current, si),
@@ -863,7 +912,8 @@ export function useWorkbenchState() {
           })
           form.clearFieldError(key)
         }
-        setDefaulted((s) => new Set([...s].filter((k) => !(k in values))))
+        const filledKeys = new Set(filled.map(([key]) => key))
+        setDefaulted((s) => new Set([...s].filter((k) => !filledKeys.has(k))))
       })
       .catch(() => {
         if (signal.aborted) return
@@ -979,7 +1029,9 @@ export function useWorkbenchState() {
     )
     // a missing powder record: the bulk density (kg/m3) and the bore resistance its link carried
     const fromLink = as ? undefined : linkedPowder
-    const bulkDensity = chosen?.bulkDensity ? chosen.bulkDensity.value * 1e3 : fromLink?.bulkDensity
+    const bulkDensity = chosen?.bulkDensity
+      ? toSi('density', chosen.bulkDensity.value)
+      : fromLink?.bulkDensity
     const { resistance, missing } = !chosen?.interior?.resistance
       ? {
           resistance:
@@ -1446,26 +1498,82 @@ export function useWorkbenchState() {
       })
   }
 
-  /** An opened load file: the form, cartridge, bullet, powder and notes it holds. */
-  function openLoad(d: WorkbenchState) {
+  /** The cartridge design `ref` (`user:<id>`) of an opened file; kept in the load, as asked, when it does not resolve. */
+  function openCartridgeDesign(ref: string) {
+    const signal = pick('cartridges')
+    want('cartridge', ref)
+    const id = parseRef(ref)?.id ?? ''
+    storedRecord(id)
+      .then(async (raw) => {
+        const r = userRecord.safeParse(raw)
+        const resolved =
+          r.success && r.data.kind === 'cartridge' && (await resolveCartridge(r.data.data, signal))
+        if (signal.aborted) return
+        if (!r.success || r.data.kind !== 'cartridge' || !resolved) return lost('cartridge', ref)
+        const d = { id, name: r.data.name, data: r.data.data, resolved }
+        if (workbenchDesign(d.data, resolved, d.name, unitsNow.current))
+          takeCartridgeDesign(d, false)
+        else lost('cartridge', ref)
+      })
+      .catch(() => {
+        if (!signal.aborted) lost('cartridge', ref)
+      })
+  }
+
+  /** The bullet design `ref` (`user:<id>`) of an opened load; `fill` writes its mass into the Bullet mass field. */
+  function openBulletDesign(ref: string, fill: boolean) {
+    const signal = pick('bullets')
+    want('bullet', ref)
+    const id = parseRef(ref)?.id ?? ''
+    storedRecord(id)
+      .then(async (raw) => {
+        const r = userRecord.safeParse(raw)
+        const resolved =
+          r.success && r.data.kind === 'bullet' && (await resolveBullet(r.data.data, signal))
+        if (signal.aborted) return
+        if (!r.success || r.data.kind !== 'bullet' || !resolved || resolved.problem)
+          return lost('bullet', ref)
+        const mass = resolved.record.mass && toSi('mass', resolved.record.mass.value)
+        takeBulletDesign({ id, name: r.data.name, si: { mass } }, fill)
+      })
+      .catch(() => {
+        if (!signal.aborted) lost('bullet', ref)
+      })
+  }
+
+  /**
+   * An opened load: the form from its typed values, the records it names from their own. A value
+   * the load does not carry follows the Settings, the records, the gun and the seating.
+   */
+  function openLoad(d: Load) {
     reset()
-    const query = new URLSearchParams(Object.entries(d.siValues).map(([k, v]) => [k, String(v)]))
-    if (d.cartridge) query.set('cartridge', d.cartridge)
-    if (d.ladder) {
-      query.set('ladderSteps', String(d.ladder.stepCount))
-      if (d.ladder.chargeStep !== undefined) query.set('ladderStep', String(d.ladder.chargeStep))
-      query.set('ladderDirection', d.ladder.direction)
-      if (d.ladder.kind) query.set('ladderKind', d.ladder.kind)
+    const { query, typed, measurements } = fromLoad(d)
+    const cartridgeId = d.cartridge && catalogueIdOf(d.cartridge)
+    if (cartridgeId) query.set('cartridge', cartridgeId)
+    const firearmTarget = d.firearm && parseRef(d.firearm)
+    const firearmKey =
+      firearmTarget && firearmTarget.scope === 'user' ? firearmTarget.id : undefined
+    if (firearmKey) query.set('firearm', firearmKey)
+    fill(query)
+    // the weight of a firearm of the library comes from the firearm once it is read
+    gunPending.current = firearmKey !== undefined && !typed.has('firearmMass')
+    setOpens((n) => n + 1)
+    // a user cartridge or bullet is a record of this browser, read and resolved here
+    const userCartridge =
+      d.cartridge && parseRef(d.cartridge)?.scope === 'user' ? d.cartridge : undefined
+    if (userCartridge) {
+      openCartridgeDesign(userCartridge)
+      if (d.case?.waterCapacity) setMeasuredFor(parseRef(userCartridge)?.id)
     }
-    if (d.firearm) query.set('firearm', d.firearm)
-    if (d.measuredWaterCapacity !== undefined)
-      query.set('measuredWaterCapacity', String(d.measuredWaterCapacity))
-    if (d.seating) query.set(d.seating.by, String(d.seating.value))
-    fill(query, false)
-    if (d.bullet) chooseBullet(d.bullet, false)
-    if (d.powder) choosePowder(d.powder, false)
-    setNotes(d.notes ?? '')
-    setChronoSeries((d.measurements ?? []).map((m) => ({ ...m, id: seriesId() })))
+    const fillMass = !typed.has('bulletMass')
+    const bulletRef = typeof d.bullet === 'string' ? d.bullet : undefined
+    const bulletId = bulletRef && catalogueIdOf(bulletRef)
+    if (bulletId) chooseBullet(bulletId, fillMass)
+    else if (bulletRef) openBulletDesign(bulletRef, fillMass)
+    const powderId = typeof d.powder === 'string' ? catalogueIdOf(d.powder) : undefined
+    if (powderId) choosePowder(powderId, true, typed)
+    setNotes(d.note ?? '')
+    setChronoSeries(measurements.map((m) => ({ ...m, id: seriesId() })))
   }
 
   /**
@@ -1481,12 +1589,15 @@ export function useWorkbenchState() {
     (seatedNow?.by !== seatingStart.by ||
       exactFieldText('length', system, seatedNow.value) !==
         exactFieldText('length', system, seatingStart.value))
-  const seating: WorkbenchState['seating'] =
+  const seating: Seating =
     previewInitial?.seating || moved ? (seatedNow ?? previewInitial?.seating) : undefined
   // the cartridge asked for counts while its record loads or stays offline, as in `cartridge` below
   const measuredWaterCapacity =
-    measuredFor === (cartridge?.id ?? cartridgeDesign?.id ?? asked.cartridge?.id) &&
-    (measured.measuredWaterCapacity.si ?? 0) > 0
+    measuredFor ===
+      (cartridge?.id ??
+        cartridgeDesign?.id ??
+        parseRef(asked.cartridge?.id ?? '')?.id ??
+        asked.cartridge?.id) && (measured.measuredWaterCapacity.si ?? 0) > 0
       ? measured.measuredWaterCapacity.si
       : undefined
 
@@ -1496,42 +1607,20 @@ export function useWorkbenchState() {
       : ladderKind === 'temperature'
         ? tempStep.tempStep
         : ladder.ladderStep
-  const loadFile: WorkbenchState = {
-    siValues: Object.fromEntries(
-      Object.entries({ ...fields, firearmMass: gunWeightUsed }).flatMap(([k, f]) =>
-        f.si === undefined ? [] : [[k, f.si]],
-      ),
-    ),
-    cartridge: cartridge?.id ?? asked.cartridge?.id,
-    bullet: asked.bullet?.id ?? bullet?.id,
-    powder: asked.powder?.id ?? powder?.id,
-    notes,
-    measuredWaterCapacity,
-    firearm,
-    seating,
-    // the state keeps an odd count around the charge, as the file schema asks
-    ladder:
-      ladderSteps > 1
-        ? ({
-            // the charge is the default kind and stays out, so an older file opens unchanged
-            ...(ladderKind !== 'charge' && { kind: ladderKind }),
-            stepCount: ladderSteps,
-            // a step of 0 or less stays out: the schema would reject the file on open
-            chargeStep: (activeStep.si ?? 0) > 0 ? activeStep.si : undefined,
-            direction,
-          } as WorkbenchState['ladder'])
-        : undefined,
-    // none stays out, so an older file opens without unsaved changes
-    measurements: chronoSeries.length ? chronoSeries.map(({ id: _, ...m }) => m) : undefined,
-  }
-  // the File menu's props stay the same objects while the load is unchanged, so its memo holds and
-  // its window listeners keep no earlier render, and with it no earlier result, alive
-  const fileKey = JSON.stringify(loadFile)
-  const fileData = useMemo(() => JSON.parse(fileKey) as WorkbenchState, [fileKey])
+  /**
+   * The reference a load keeps: the record being loaded (`asked`, kept too when it did not resolve),
+   * else a user design of this browser, else the catalogue record `id`.
+   */
+  const savedRef = (
+    asked: string | undefined,
+    design: string | undefined,
+    id: string | undefined,
+  ) =>
+    asked ? catalogueRef(asked) : (design && userRef(design)) || (id ? catalogueRef(id) : undefined)
   const opening = useRef(openLoad)
   opening.current = openLoad
   /** An opened load: `name` is the stored name of a record, kept as the typed one. */
-  const onOpenFile = useCallback((d: WorkbenchState, name?: string) => {
+  const onOpenFile = useCallback((d: Load, name?: string) => {
     opening.current(d)
     setCustomName(name)
   }, [])
@@ -1561,7 +1650,7 @@ export function useWorkbenchState() {
   const bulletParams =
     bulletFit && cartridge ? `&cartridge=${encodeURIComponent(cartridge.id)}` : ''
   const describeBullet = (b: BulletSummary) =>
-    `${productLabel(b, names)}, ${withUnit('mass', system, b.mass * 1e-3)}, ${withUnit('length', system, b.diameter * 1e-3)}`
+    `${productLabel(b, names)}, ${withUnit('mass', system, toSi('mass', b.mass))}, ${withUnit('length', system, toSi('length', b.diameter))}`
 
   const specValue = (side: string | undefined, symbol: string) =>
     cartridge && groove?.id === cartridge.id
@@ -1569,17 +1658,19 @@ export function useWorkbenchState() {
           ?.value
       : undefined
   const mmText = (mm: number | undefined) =>
-    mm === undefined ? undefined : shownLength('diameter', system, mm * 1e-3)
+    mm === undefined ? undefined : shownLength('diameter', system, toSi('length', mm))
   const pmax = specValue(undefined, 'Pmax')
 
   // the defaults of volume, bore diameter, twist and barrel length from what is chosen
   const gun = firearmList.find((f) => f.id === firearm)
   const recordTable = cartridge && groove?.id === cartridge.id ? groove.record?.table : undefined
-  const mmToM = (mm: number | undefined) => (mm === undefined ? undefined : mm * 1e-3)
-  const mm2ToM2 = (mm2: number | undefined) => (mm2 === undefined ? undefined : mm2 * 1e-6)
+  const mmToM = (mm: number | undefined) => (mm === undefined ? undefined : toSi('length', mm))
+  const mm2ToM2 = (mm2: number | undefined) => (mm2 === undefined ? undefined : toSi('area', mm2))
   /** What the chosen cartridge design gives; the design's own values only. */
   const designLoad = useMemo(
-    () => cartridgeDesign && workbenchDesign(cartridgeDesign.data, cartridgeDesign.name, system),
+    () =>
+      cartridgeDesign &&
+      workbenchDesign(cartridgeDesign.data, cartridgeDesign.resolved, cartridgeDesign.name, system),
     [cartridgeDesign, system],
   )
   const designCapacity: Suggestion | undefined =
@@ -1618,10 +1709,68 @@ export function useWorkbenchState() {
         },
     bullet: bullet && {
       name: productLabel(bullet, names),
-      diameter: bullet.diameter.value * 1e-3,
+      diameter: toSi('length', bullet.diameter.value),
     },
     settingsBarrelLength: defaults.barrelLength,
   })
+  // the references the load keeps; one that cannot be written (a design or firearm whose id is no
+  // UUID) leaves what it gives in the load as typed values
+  const firearmRef = firearm && userRef(firearm)
+  const powderId = asked.powder?.id ?? powder?.id
+  const referenced =
+    (!firearm || !!firearmRef) &&
+    (!cartridgeDesign || !!userRef(cartridgeDesign.id)) &&
+    (!bulletDesign || !!userRef(bulletDesign.id))
+  const fieldValues: Record<string, number | undefined> = {
+    ...Object.fromEntries(Object.entries(fields).map(([k, f]) => [k, f.si])),
+    firearmMass: gunWeightUsed.si,
+  }
+  const given = givenKeys(fieldValues, {
+    origin,
+    bulletMass: bullet
+      ? toSi('mass', bullet.mass.value)
+      : bulletDesign && userRef(bulletDesign.id)
+        ? bulletDesign.mass
+        : undefined,
+    defaults,
+    defaulted,
+    followed,
+    suggestions: Object.fromEntries(
+      followKeys.map((k) => [k, referenced ? suggestions[k]?.si : undefined]),
+    ),
+    previewed,
+    seatingKept:
+      referenced &&
+      (seated.barrel === undefined ||
+        Math.abs(seated.barrel - (suggestions.barrelLength?.si ?? Number.NaN)) <=
+          1e-9 * seated.barrel),
+    gunMass: gunFromFirearm.current && !!firearmRef,
+  })
+  const loadFile = toLoad({
+    values: fieldValues,
+    given,
+    cartridge: savedRef(asked.cartridge?.id, cartridgeDesign?.id, cartridge?.id),
+    firearm: firearmRef || undefined,
+    bullet: savedRef(asked.bullet?.id, bulletDesign?.id, bullet?.id),
+    powder: powderId && catalogueRef(powderId),
+    notes,
+    waterCapacity: measuredWaterCapacity,
+    seating,
+    ladder:
+      ladderSteps > 1
+        ? {
+            kind: ladderKind,
+            stepCount: ladderSteps,
+            step: activeStep.si,
+            direction,
+          }
+        : undefined,
+    measurements: chronoSeries.map(({ id: _, ...m }) => m),
+  })
+  // the File menu's props stay the same objects while the load is unchanged, so its memo holds and
+  // its window listeners keep no earlier render, and with it no earlier result, alive
+  const fileKey = JSON.stringify(loadFile)
+  const fileData = useMemo(() => JSON.parse(fileKey) as Load, [fileKey])
   /** A followed field's default while it is the field's value; the seating owns the volume once a bullet is seated. */
   const defaultOf = (key: string) => {
     const k = followKeys.find((x) => x === key)
@@ -1745,19 +1894,19 @@ export function useWorkbenchState() {
    * values, else what the link that opened them carried.
    */
   const recordLink = {
-    bulletId: asked.bullet?.id ?? bullet?.id,
+    bulletId: (asked.bullet?.id && catalogueIdOf(asked.bullet.id)) || bullet?.id,
     powderId: asked.powder?.id ?? powder?.id,
     values: {
       bullet: bullet
         ? {
             name: productLabel(bullet, names),
-            length: bullet.length && bullet.length.value * 1e-3,
+            length: bullet.length && toSi('length', bullet.length.value),
           }
         : linkedBullet,
       powder: powder
         ? {
             name: productLabel(powder, names),
-            bulkDensity: powder.bulkDensity && powder.bulkDensity.value * 1e3,
+            bulkDensity: powder.bulkDensity && toSi('density', powder.bulkDensity.value),
             ...recordBore,
           }
         : linkedPowder,

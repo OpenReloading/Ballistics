@@ -1,14 +1,13 @@
 import type { Bundle } from '@openreloading/data'
 import type { Cartridge, SpecValue } from '@openreloading/schema'
 import { describe, expect, it } from 'vitest'
-import { seedBundle } from '../src/db/seed.ts'
 import { API_PREFIX } from '../src/version.ts'
 import { bundle } from './fixtures.ts'
 import { withApi } from './setup.ts'
 
 const api = withApi()
 const { get } = api
-/** A second database, reseeded by each test that needs records of its own. */
+/** A second app, reloaded by each test that needs records of its own. */
 const otherApi = withApi({ seed: false })
 
 describe('GET /', () => {
@@ -55,7 +54,7 @@ describe('GET /cartridges', () => {
   })
 
   it('lists the country of a cartridge when its sheet prints one', async () => {
-    await seedBundle(otherApi.db, {
+    await otherApi.load({
       ...bundle,
       cartridges: bundle.cartridges.map((c) =>
         c.id === 'alpha-rifle' ? { ...c, country: 'Germany' } : c,
@@ -82,7 +81,7 @@ describe('GET /cartridges', () => {
       'beta-pistol': head(13.72, 11.68),
       'gamma-100-percent': head(11.2, 11.73),
     }
-    await seedBundle(otherApi.db, {
+    await otherApi.load({
       ...bundle,
       cartridges: bundle.cartridges.map((c) => ({ ...c, values: [...c.values, ...heads[c.id]] })),
     })
@@ -99,7 +98,7 @@ describe('GET /cartridges', () => {
       expect(
         (await otherApi.app.inject({ url: `${API_PREFIX}/cartridges/${id}` })).json().caseType,
       ).toBe(type)
-    await seedBundle(otherApi.db, {
+    await otherApi.load({
       ...bundle,
       cartridges: bundle.cartridges.map((c) => ({
         ...c,
@@ -123,6 +122,29 @@ describe('GET /cartridges', () => {
     expect((await get(`${API_PREFIX}/cartridges?q=100%25`)).body.total).toBe(1)
     expect((await get(`${API_PREFIX}/cartridges?q=%25`)).body.total).toBe(1)
     expect((await get(`${API_PREFIX}/cartridges?q=_`)).body.total).toBe(0)
+  })
+
+  it('orders digit runs by value and finds words in any order, best match first', async () => {
+    const named = (id: string, name: string) => ({ ...bundle.cartridges[0], id, name, aliases: [] })
+    await otherApi.load({
+      ...bundle,
+      cartridges: [
+        named('c-10', '10 mm Auto'),
+        named('c-9', '9 mm Luger'),
+        named('c-lug', 'Luger Carbine 9 mm'),
+      ],
+    })
+    const ids = async (query: string) =>
+      (await otherApi.app.inject({ url: `${API_PREFIX}/cartridges${query}` }))
+        .json()
+        .items.map((c: { id: string }) => c.id)
+    expect(await ids('')).toEqual(['c-9', 'c-10', 'c-lug'])
+    // a word that starts a word of the name outranks one inside it, ties keep the default order
+    expect(await ids('?q=mm luger')).toEqual(['c-9', 'c-lug'])
+    expect(await ids('?q=luger mm')).toEqual(['c-9', 'c-lug'])
+    expect(await ids('?q=9 mm&limit=1&offset=1')).toEqual(['c-lug'])
+    // spaces only are no query
+    expect(await ids('?q=%20')).toEqual(['c-9', 'c-10', 'c-lug'])
   })
 
   it('filters by table and pages', async () => {
@@ -173,7 +195,7 @@ describe('GET /cartridges/:id', () => {
       pressureMethod: 'piezo' as const,
       exceptions: [{ finding: 'f', note: 'n' }],
     }
-    await seedBundle(otherApi.db, {
+    await otherApi.load({
       ...bundle,
       cartridges: bundle.cartridges.map((c) => (c.id === 'beta-pistol' ? { ...c, ...extra } : c)),
     })
@@ -205,6 +227,7 @@ describe('GET /target-faces', () => {
       items: [
         {
           id: 'test-face',
+          federation: 'test-federation',
           organization: 'Test',
           name: 'Test Face',
           caliberClasses: ['air-4-5'],
@@ -218,7 +241,7 @@ describe('GET /target-faces', () => {
   })
 })
 
-describe('GET /federations, /disciplines and /target-mappings', () => {
+describe('GET /federations, /disciplines, /target-mappings and /caliber-classes', () => {
   it('lists summaries and returns whole records', async () => {
     expect((await get(`${API_PREFIX}/federations`)).body).toEqual({
       total: 1,
@@ -246,7 +269,7 @@ describe('GET /federations, /disciplines and /target-mappings', () => {
       id: 'test-discipline-test-face',
       discipline: 'test-discipline',
       face: 'test-face',
-      event: 'Test event',
+      event: 'test-event',
       gaugeMm: 4.5,
     }
     expect((await get(`${API_PREFIX}/target-mappings`)).body).toEqual({
@@ -258,13 +281,18 @@ describe('GET /federations, /disciplines and /target-mappings', () => {
         .total,
     ).toBe(1)
     expect((await get(`${API_PREFIX}/target-mappings?face=other`)).body.total).toBe(0)
+    expect((await get(`${API_PREFIX}/caliber-classes`)).body).toEqual({
+      total: 1,
+      items: [{ id: 'air-4-5', name: '4.5 mm (.177) air', diameterMm: 4.5 }],
+    })
     for (const [path, record] of [
       ['federations/test-federation', bundle.federations[0]],
       ['disciplines/test-discipline', bundle.disciplines[0]],
       ['target-mappings/test-discipline-test-face', bundle.targetMappings[0]],
+      ['caliber-classes/air-4-5', bundle.caliberClasses[0]],
     ] as const)
       expect((await get(`${API_PREFIX}/${path}`)).body).toEqual(record)
-    for (const path of ['federations', 'disciplines', 'target-mappings']) {
+    for (const path of ['federations', 'disciplines', 'target-mappings', 'caliber-classes']) {
       expect((await get(`${API_PREFIX}/${path}/unknown`)).status).toBe(404)
       expect((await get(`${API_PREFIX}/${path}/Not_An_Id`)).status).toBe(400)
     }
@@ -289,7 +317,7 @@ describe('GET /powders and /bullets', () => {
   })
 
   it('orders powders by manufacturer name, not id', async () => {
-    await seedBundle(otherApi.db, {
+    await otherApi.load({
       ...bundle,
       manufacturers: bundle.manufacturers.map((m) =>
         m.id === 'example-a' ? { ...m, name: 'Zulu' } : m,
@@ -324,7 +352,7 @@ describe('GET /powders and /bullets', () => {
       referencePressure: { value: 0.980665 },
       burnForm: { kind: 'twoStage', a: { value: 0 }, m: 0.5, q: 0.5, z1: 0.8 },
     }
-    await seedBundle(otherApi.db, {
+    await otherApi.load({
       ...bundle,
       powders: [
         { ...bundle.powders[0], grainForm: 'ball', propellantBase: 'double', interior },
@@ -375,7 +403,7 @@ describe('GET /powders and /bullets', () => {
   })
 
   it('lists the first G1 and G7 of a record and its length', async () => {
-    await seedBundle(otherApi.db, {
+    await otherApi.load({
       ...bundle,
       bullets: [
         {
@@ -398,7 +426,7 @@ describe('GET /powders and /bullets', () => {
   })
 
   it('lists the country of a bullet and a powder and the tip type of a bullet', async () => {
-    await seedBundle(otherApi.db, {
+    await otherApi.load({
       ...bundle,
       powders: [{ ...bundle.powders[0], country: 'FI' }, bundle.powders[1]] as Bundle['powders'],
       bullets: [
@@ -433,7 +461,7 @@ describe('GET /powders and /bullets', () => {
   it('pages bullets with the same manufacturer and name by id', async () => {
     const twin = (id: string) => ({ ...bundle.bullets[0], id })
     const ids: string[] = []
-    await seedBundle(otherApi.db, {
+    await otherApi.load({
       ...bundle,
       bullets: [twin('example-a-3'), twin('example-a-2'), twin('example-a-1')],
     })
@@ -460,7 +488,7 @@ describe('GET /powders and /bullets', () => {
         { side: 'chamber', symbol: 'Z', quantity: 'length', value: 7.82 },
       ],
     }
-    await seedBundle(otherApi.db, {
+    await otherApi.load({
       ...bundle,
       cartridges: [...bundle.cartridges, fit],
       bullets: [

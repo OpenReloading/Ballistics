@@ -15,7 +15,7 @@ import {
   seat,
   type Tagged,
 } from '@openreloading/drawing/seating'
-import type { Bullet, UserRecord } from '@openreloading/schema'
+import { type Bullet, fromSi, toSi } from '@openreloading/schema'
 import { type ReactNode, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { apiFetch } from '../lib/api-fetch.ts'
@@ -33,10 +33,14 @@ import {
   fixedFieldText,
   formatQuantity,
   type UnitSystem,
+  unitsOf,
   waterDensityGramsPerCm3,
+  waterGrams,
+  waterVolume,
   withUnit,
 } from '../lib/units.ts'
 import { storedRecords } from '../lib/user-store.ts'
+import { type UserBulletView, userBullets } from '../lib/variants.ts'
 import { AppModal } from './app-modal.tsx'
 import { NumberField } from './number-field.tsx'
 import { RecordSearch } from './record-search.tsx'
@@ -55,7 +59,6 @@ type Load<T> =
   | { status: 'error' }
 
 type Mode = 'overallLength' | 'baseToOgive'
-type BulletDesignRecord = Extract<UserRecord, { kind: 'bulletDesign' }>
 
 const modeHelp = {
   overallLength: 'Cartridge overall length.',
@@ -299,14 +302,13 @@ export function SeatingPreview({
   const name = draft?.title ?? cartridge?.name ?? ''
   const [bulletId, setBulletId] = useState(initial?.bullet)
   const names = useManufacturerNames()
-  const [designs, setDesigns] = useState<BulletDesignRecord[]>([])
+  const [designs, setDesigns] = useState<UserBulletView[]>([])
   /** A bullet design of this browser seated instead of a record. */
-  const [design, setDesign] = useState<BulletDesignRecord>()
+  const [design, setDesign] = useState<UserBulletView>()
   const readDesigns = () => {
     storedRecords()
-      .then(({ records }) =>
-        setDesigns(records.filter((r): r is BulletDesignRecord => r.kind === 'bulletDesign')),
-      )
+      .then(({ records }) => userBullets(records))
+      .then(setDesigns)
       .catch(() => {})
   }
   useEffect(readDesigns, [])
@@ -384,7 +386,7 @@ export function SeatingPreview({
   const shaped = useMemo(
     () =>
       design
-        ? designShape(design.data, shown.current)
+        ? designShape(design.resolved, shown.current)
         : bulletRecord && bulletDimensions(bulletRecord),
     [design, bulletRecord],
   )
@@ -421,7 +423,9 @@ export function SeatingPreview({
     // a design starts empty: a seating the user did not enter would be a default
     if (!start || !chamber || designed) return
     const given = initialValue !== undefined && (initialBy === 'overallLength' || canCbto)
-    const m = given ? initialValue : (chamber.cartridgeL6 ?? (start[0] + start[1]) / 2) * 1e-3
+    const m = given
+      ? initialValue
+      : toSi('length', chamber.cartridgeL6 ?? (start[0] + start[1]) / 2)
     const startMode = given && initialBy === 'baseToOgive' ? 'baseToOgive' : 'overallLength'
     setMode(startMode)
     setPos({ text: fixedFieldText('length', shown.current, m), si: m })
@@ -434,7 +438,7 @@ export function SeatingPreview({
     setPos({ text: '', si: undefined })
   }, [designed, shape, canCbto, mode])
 
-  const value = pos.si === undefined ? undefined : pos.si * 1e3
+  const value = pos.si === undefined ? undefined : fromSi('length', pos.si)
   // the bullet seated by a length (mm): the preview's own position, and each step of a seating ladder
   const seatBy = useMemo(() => {
     if (!chamber || !shape || (mode === 'baseToOgive' && !canCbto)) return
@@ -444,10 +448,10 @@ export function SeatingPreview({
         chamber,
         waterCapacity:
           measuredWaterCapacity.si !== undefined && measuredWaterCapacity.si > 0
-            ? measuredWaterCapacity.si * 1e6 * waterDensityGramsPerCm3
+            ? waterGrams(measuredWaterCapacity.si)
             : capacity?.waterCapacity.value,
         waterDensity: waterDensityGramsPerCm3,
-        barrelLength: barrel.si === undefined ? undefined : barrel.si * 1e3,
+        barrelLength: barrel.si === undefined ? undefined : fromSi('length', barrel.si),
         by: { kind: mode, value: by },
       })
   }, [chamber, shape, mode, canCbto, capacity, measuredWaterCapacity.si, barrel.si])
@@ -458,7 +462,9 @@ export function SeatingPreview({
   const [stepBy, stepValue] = [ladderStep?.by, ladderStep?.value]
   const figureSeating = useMemo(
     () =>
-      seatBy && stepBy === mode && stepValue !== undefined ? seatBy(stepValue * 1e3) : seating,
+      seatBy && stepBy === mode && stepValue !== undefined
+        ? seatBy(fromSi('length', stepValue))
+        : seating,
     [seatBy, stepBy, stepValue, mode, seating],
   )
   // Combined without dimensions, each side's record figure with them, as on the cartridge page;
@@ -512,12 +518,15 @@ export function SeatingPreview({
     if (!seatBy || !seatRange) return
     return {
       lengthKind: mode,
-      range: [(seatRange[0] + ladderShift) * 1e-3, (seatRange[1] + ladderShift) * 1e-3],
+      range: [
+        toSi('length', seatRange[0] + ladderShift),
+        toSi('length', seatRange[1] + ladderShift),
+      ],
       at: (by) => {
-        const s = seatBy(by * 1e3)
+        const s = seatBy(fromSi('length', by))
         return {
-          volume: s.volumeBehindBullet && s.volumeBehindBullet.value * 1e-6,
-          travel: s.travel && s.travel.value * 1e-3,
+          volume: s.volumeBehindBullet && unitsOf.capacity.cm3.toSi(s.volumeBehindBullet.value),
+          travel: s.travel && toSi('length', s.travel.value),
         }
       },
     }
@@ -536,7 +545,7 @@ export function SeatingPreview({
   const caseVolume =
     measuredWaterCapacity.si !== undefined && measuredWaterCapacity.si > 0
       ? measuredWaterCapacity.si
-      : capacity && (capacity.waterCapacity.value / waterDensityGramsPerCm3) * 1e-6
+      : capacity && waterVolume(capacity.waterCapacity.value)
   const [seatedCoal, seatedCbto] = [seating?.coal.value, seating?.cbto?.value]
   const [seatedDepth, barrelSi] = [seating?.depth.value, barrel.si]
   const atStart = pos.si === started?.si && mode === started?.mode
@@ -555,11 +564,11 @@ export function SeatingPreview({
   useEffect(() => {
     seated.current({
       ...(caseVolume !== undefined && { caseVolume }),
-      ...(seatedVolume !== undefined && { volume: seatedVolume * 1e-6 }),
-      ...(seatedTravel !== undefined && { travel: seatedTravel * 1e-3 }),
-      ...(seatedCoal !== undefined && { overallLength: seatedCoal * 1e-3 }),
-      ...(seatedCbto !== undefined && { baseToOgive: seatedCbto * 1e-3 }),
-      ...(seatedDepth !== undefined && { depth: seatedDepth * 1e-3 }),
+      ...(seatedVolume !== undefined && { volume: unitsOf.capacity.cm3.toSi(seatedVolume) }),
+      ...(seatedTravel !== undefined && { travel: toSi('length', seatedTravel) }),
+      ...(seatedCoal !== undefined && { overallLength: toSi('length', seatedCoal) }),
+      ...(seatedCbto !== undefined && { baseToOgive: toSi('length', seatedCbto) }),
+      ...(seatedDepth !== undefined && { depth: toSi('length', seatedDepth) }),
       ...(seatedCoal !== undefined && barrelSi !== undefined && { barrel: barrelSi }),
       ...(seatedCoal !== undefined && { mode, atStart }),
       ...(figure && { figure }),
@@ -578,10 +587,10 @@ export function SeatingPreview({
   ])
 
   const length = system.length
-  const len = (x: number) => formatQuantity('length', system, x * 1e-3)
+  const len = (x: number) => formatQuantity('length', system, toSi('length', x))
   const mm = (x: number) => `${len(x)} ${length.symbol}`
   /** A volume in cm³ in the case capacity unit. */
-  const vol = (cm3: number) => withUnit('capacity', system, cm3 * 1e-6)
+  const vol = (cm3: number) => withUnit('capacity', system, unitsOf.capacity.cm3.toSi(cm3))
 
   const contact =
     seating?.contact &&
@@ -611,7 +620,10 @@ export function SeatingPreview({
     if (value !== undefined && shape.baseToOgive !== undefined) {
       const shift = shape.baseToOgive - shape.length
       const mmValue = next === 'baseToOgive' ? value + shift : value - shift
-      setPos({ text: fixedFieldText('length', system, mmValue * 1e-3), si: mmValue * 1e-3 })
+      setPos({
+        text: fixedFieldText('length', system, toSi('length', mmValue)),
+        si: toSi('length', mmValue),
+      })
     }
     setMode(next)
   }
@@ -629,7 +641,7 @@ export function SeatingPreview({
     )
 
   const range = fixed?.range
-  const toShown = (x: number) => length.fromSi((x + ladderShift) * 1e-3)
+  const toShown = (x: number) => length.fromSi(toSi('length', x + ladderShift))
   const step = system.length.step
   const what = view === 'combined' ? 'case in its chamber' : view
   // a chamber without a cartridge holds no bullet: the Chamber view draws the chamber alone
@@ -795,12 +807,7 @@ export function SeatingPreview({
             // the record's capacity in the field while none is typed
             placeholder={
               capacity
-                ? (s) =>
-                    formatQuantity(
-                      'capacity',
-                      s,
-                      (capacity.waterCapacity.value / waterDensityGramsPerCm3) * 1e-6,
-                    )
+                ? (s) => formatQuantity('capacity', s, waterVolume(capacity.waterCapacity.value))
                 : undefined
             }
             flag={
