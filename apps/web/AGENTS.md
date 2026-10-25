@@ -153,7 +153,7 @@ Next.js App Router (TypeScript, React). API at `API_URL` (default `http://localh
 
 ## Pages edition
 
-A static site without a server for GitHub Pages: the web app with the records as data files and the simulations in the browser, the docs site, the licenses. `pages.yml` builds it from `main` and deploys it. `ci.yml` does not build it.
+A static site without a server for GitHub Pages: the web app with the records as data files and the simulations in the browser, the docs site, the licenses. `pages.yml` builds it from `main` and deploys it at the site root, with the build of `develop` under `develop/` (the preview below). `ci.yml` does not build it.
 
 - `PAGES_BASE_PATH` (`''` or a path such as `/Ballistics`) set (`next.config.ts`): `output: 'export'` under that base path with `trailingSlash`, without Cache Components and Partial Prefetching (Next 16.4 exports only without them, `'use cache'` through `experimental.useCache`), no redirects.
   - `pageExtensions` leaves out the `*.server.ts(x)` route files: the forwarding route and the record pages' `ensureStatic` layouts. A route-segment option one edition rejects goes into such a file.
@@ -165,9 +165,14 @@ A static site without a server for GitHub Pages: the web app with the records as
 - `PAGES_URL`: the site's origin (docs `url`, the web app's `metadataBase` and social image, which the server edition leaves out).
 - Root `PAGES_BASE_PATH=<path> npm run pages:build` (`tools/src/pages.ts`, after the root `npm run build`): starts the API over the catalogue of the data bundle (`@open-reloading/api/static`), builds this edition against it with `PRERENDER=full`, deletes each page's `__next._full.txt` (a copy of its `index.txt`, never requested by the export's client), writes the data files (`writeStaticApi`: the catalogue index and one file per record), builds the docs site into `docs/` (its code reference under `docs/library/`), copies LICENSE, NOTICE and `data/LICENSE` and writes `.nojekyll`. Output: `pages/` at the repository root (git-ignored). It deletes `.next` before and after the build: a Turbopack cache of one edition fails the build of the other, so the server edition builds from nothing afterwards.
 - Root `npm run pages:serve` (`tools/src/pages-serve.ts`): `pages/` under `PAGES_BASE_PATH` on `PORT` (default 3003), directories with their `index.html`, a missing file the site's `404.html`.
+- Preview of `develop` (`PAGES_PREVIEW` set, `tools/src/pages-preview.ts`): `pages.yml` builds `main` (job `build`) and `develop` (job `preview`) in parallel jobs, each with the commands above (the preview with `PAGES_BASE_PATH=<base path>/develop`), and the job `assemble` deploys the preview's `pages/` as `develop/` of the main site's. No code of `develop` runs in the job that builds the released site.
+  - A push to either branch deploys both. A failed preview build leaves a warning annotation and the site deploys without `develop/`. A failed `main` build fails the job and the earlier deployment stays.
+  - Every `.html` page of the preview gets `<meta name="robots" content="noindex">` and a label, "Development preview, not the released site", fixed to the bottom left corner of the window: it takes no room (the workbench's no-scroll rule) and no clicks, and is not printed. The sitemaps are deleted.
+  - The preview shares the origin with the released site, so IndexedDB, `localStorage` and Cache Storage too. Its IndexedDB database has its own name (`databaseName` in `src/lib/user-store.ts`, `NEXT_PUBLIC_PAGES_PREVIEW` set from `PAGES_PREVIEW` in `next.config.ts`): a `develop` change of the database `version` would make the released site's `open` throw `VersionError`, and a record format of `develop` that the released site rejects would stay in its store. The preview starts without the released site's records. `localStorage` stays shared: its readers validate what they read. Its service worker has its own scope (`<base>/develop/`) and cache names (`scope` of `shellPrefix`, `preview-`), and the released site's worker leaves `/develop/` to the network.
+  - GitHub Pages serves one `404.html`, the released site's. The environment `github-pages` must accept `main` and `develop` (Settings, Environments).
 - Offline: the service worker precaches `api/catalogue/index.json` with the static files (`precacheList`, `catalogueFile` in `src/lib/offline.ts`) and answers it from the shell cache; record files stay network-first.
 - E2E: project `pages` with `PAGES_URL` (`apps/e2e/AGENTS.md`).
-- Size: about 300 MB, the cartridge pages about 265 MB of it.
+- Size: about 300 MB, the cartridge pages about 265 MB of it. The deployed site holds two (the 1 GB limit of `apps/docs/docs/ci-tools.md`).
 
 ## UI
 

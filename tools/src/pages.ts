@@ -4,6 +4,7 @@
  * catalogue built from the data bundle (`@open-reloading/api/static`), the catalogue index and the
  * records as data files under `api/`, the docs site under `docs/`, LICENSE, NOTICE, the data
  * license (`data/LICENSE`) and `.nojekyll`.
+ * `PAGES_PREVIEW` (any value) marks it as the development preview (`pages-preview.ts`).
  * `PAGES_URL` (the site's origin) sets the docs' `url` and the app's `metadataBase`. Needs
  * `npm run build` at the root first.
  */
@@ -13,6 +14,7 @@ import { fileURLToPath } from 'node:url'
 import { startBundleApi, writeStaticApi } from '@open-reloading/api/static'
 import { executable } from './executable.ts'
 import { dropFullPayloads } from './pages-payload.ts'
+import { markPreview } from './pages-preview.ts'
 
 const base = process.env.PAGES_BASE_PATH
 // Next's basePath: empty, or a path that starts with a slash and does not end in one
@@ -65,6 +67,8 @@ await run(['run', 'site:build', '-w', '@open-reloading/docs', '--', '--out-dir',
 })
 for (const file of ['LICENSE', 'NOTICE']) cpSync(at(file), `${site}/${file}`)
 cpSync(at('packages/data/LICENSE'), `${site}/data/LICENSE`)
+// the development preview (`develop/` of the site, pages.yml): not for search engines, labelled
+if (process.env.PAGES_PREVIEW) console.log('preview:', markPreview(site))
 // GitHub Pages serves the files as they are, `_next/` among them, without Jekyll
 writeFileSync(`${site}/.nojekyll`, '')
 console.log(`pages/: the Pages site under ${base || '/'}`)

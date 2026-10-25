@@ -13,7 +13,7 @@ All of them need `npm run build` at the root (`src/openapi.ts` imports `@open-re
 - API conformance: `npm run api-conformance` (root: `npm run api:conformance`)
   - Schemathesis against the running API at `API_URL` (default `http://localhost:3000`). From the dev container, a stack on the host is `http://host.containers.internal:3000`.
   - Checks: no 5xx answer, status codes, content types and response bodies as the document declares them.
-- Pages site: `npm run pages` (root: `npm run pages:build`, `src/pages.ts`) with `PAGES_BASE_PATH`, and `npm run pages:serve` (`src/pages-serve.ts`). What they write and serve: `apps/web/AGENTS.md`, Pages edition.
+- Pages site: `npm run pages` (root: `npm run pages:build`, `src/pages.ts`) with `PAGES_BASE_PATH` (`PAGES_PREVIEW` marks the preview, `src/pages-preview.ts`), and `npm run pages:serve` (`src/pages-serve.ts`). What they write and serve: `apps/web/AGENTS.md`, Pages edition.
 - Dependency audit: `node src/audit.ts` (CI `check` job). Fails on every high or critical `npm audit` advisory except those in `allowed`, each with a reason. An allowed advisory fails again once npm reports a fix for its package, and an entry npm no longer reports fails too. Needs no build.
 - Test: `npm test` (Vitest, `test/`)
 - Type check: `npm run typecheck`
