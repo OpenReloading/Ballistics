@@ -193,6 +193,19 @@ export function makerRecordsOf(record: UserRecord, pool: readonly UserRecord[]):
   return id ? pool.filter((r) => r.kind === 'manufacturer' && r.id === id) : []
 }
 
+/**
+ * The user manufacturer `record` names as a file or link carries it: the stored one, else the one
+ * that came with the opened file or link (`carried`), which the store may lack or hold invalid.
+ */
+export function makersToCarry(
+  record: UserRecord,
+  stored: readonly UserRecord[],
+  carried: readonly UserRecord[],
+): UserRecord[] {
+  const own = makerRecordsOf(record, stored)
+  return own.length ? own : makerRecordsOf(record, carried)
+}
+
 const content = (r: UserRecord) => canonicalJson({ kind: r.kind, name: r.name, data: r.data })
 
 /** Sorts incoming records against the stored ones by `id`: new, equal content, other content. */

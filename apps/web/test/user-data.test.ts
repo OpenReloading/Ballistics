@@ -13,6 +13,7 @@ import {
   checkedUserDataText,
   exportAllText,
   makerRecordsOf,
+  makersToCarry,
   maxFileBytes,
   parseUserDataFile,
   planImport,
@@ -388,6 +389,13 @@ describe('the user manufacturer of a record', () => {
       [],
     )
     expect(makerRecordsOf(load, [maker])).toEqual([])
+  })
+
+  it('is the stored maker, else the one that came with the opened file', () => {
+    const renamed = { ...maker, name: 'From the file' }
+    expect(makersToCarry(madeBullet, [maker], [renamed])).toEqual([maker])
+    expect(makersToCarry(madeBullet, [], [renamed])).toEqual([renamed])
+    expect(makersToCarry(madeBullet, [], [])).toEqual([])
   })
 
   it('travels with the record in a file and a share link', async () => {

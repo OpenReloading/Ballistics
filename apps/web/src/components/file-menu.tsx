@@ -36,6 +36,7 @@ import {
   type InvalidRecord,
   makerIdOf,
   makerRecordsOf,
+  makersToCarry,
   maxFileBytes,
   namedKey,
   type ParsedUserFile,
@@ -112,7 +113,7 @@ const kindNames: Record<UserRecordKind, string> = {
 
 /** Shown when a manufacturer that came with a record could not be kept in the browser. */
 const noMaker =
-  'Its manufacturer could not be kept in this browser; Save writes a new file without overwriting the opened one.'
+  'Its manufacturer could not be kept in this browser; Save still writes it into the file.'
 
 /** Kinds a share link carries: the designs and the workbench load. */
 const shareable: UserRecordKind[] = ['bullet', 'cartridge', 'load']
@@ -367,6 +368,7 @@ function FileMenuOf<K extends UserRecordKind>({
           )
             return
           const kept = await keepMakers(r, p.records)
+          carriedMakers.current = makerRecordsOf(r, p.records)
           latest.current.openShared(r)
           if (!kept) setFailure(noMaker)
         })
@@ -758,12 +760,25 @@ function FileMenuOf<K extends UserRecordKind>({
     )
   }
 
-  /** `record` and the user manufacturer it names, as a file, Copy JSON and a share link carry them. */
+  /** The user manufacturer records that came with the opened record, for a Save while the store lacks them. */
+  const carriedMakers = useRef<UserRecord[]>([])
+
+  /**
+   * `record` and the user manufacturer it names, as a file, Copy JSON and a share link carry them:
+   * the stored one (one keyed read; one the format rejects is left out), else the one that came
+   * with the opened file or link. A failed read stops the action unless the opened file has it.
+   */
   async function withMakers(record: UserRecord): Promise<UserRecord[]> {
     const id = makerIdOf(record)
-    // one keyed read; a stored maker the format rejects is left out, as it would fail the file's check
-    const raw = id ? await storedRecord(id).catch(() => undefined) : undefined
-    return [record, ...(raw ? makerRecordsOf(record, validRecords([raw]).records) : [])]
+    if (!id) return [record]
+    let raw: unknown
+    try {
+      raw = await storedRecord(id)
+    } catch (e) {
+      if (!makerRecordsOf(record, carriedMakers.current).length) throw e
+    }
+    const stored = raw ? validRecords([raw]).records : []
+    return [record, ...makersToCarry(record, stored, carriedMakers.current)]
   }
 
   /** Keeps the user manufacturer `record` names, as `carried` holds it, unless one of its id is stored; false when the store refused it. */
@@ -793,12 +808,11 @@ function FileMenuOf<K extends UserRecordKind>({
     if (unsaved && !(await ask('Replace the unsaved changes with the opened record?', 'Replace')))
       return false
     const kept = await keepMakers(record, carried)
-    // a Save over the file would drop the manufacturer the file holds
-    const h = kept ? opened : undefined
+    carriedMakers.current = makerRecordsOf(record, carried)
     const note = kept ? fileNote : [fileNote, noMaker].filter(Boolean).join(' ')
     onOpen(record.data as Of<K>['data'], record.name, record)
     id.current = record.id
-    handle.current = h
+    handle.current = opened
     known.current = record.saved
     setSaved({ file, json: keyOf(record.data, record.name) })
     const text = [note, await refsOf([record])].filter(Boolean).join(' ')
