@@ -14,11 +14,12 @@ const urlPattern = /https?:\/\/[^\s<>)]+/g
 const doiPattern = /10\.\d{4,9}\/[^\s,;<>)]+/g
 
 /** A URL without scheme, `www.` and trailing slash or full stop, lower case. */
-const normalUrl = (url: string) =>
-  url
-    .toLowerCase()
-    .replace(/^https?:\/\/(www\.)?/, '')
-    .replace(/[/.]+$/, '')
+const normalUrl = (url: string) => {
+  const bare = url.toLowerCase().replace(/^https?:\/\/(www\.)?/, '')
+  let end = bare.length
+  while (end > 0 && (bare[end - 1] === '/' || bare[end - 1] === '.')) end--
+  return bare.slice(0, end)
+}
 
 /** DOIs in a text, lower case, without a trailing full stop. */
 const dois = (text: string) =>
@@ -79,14 +80,19 @@ export function recordSources(dir: string): RecordSource[] {
 export function equationErrors(page: string, root: string): string[] {
   const lines = page.split('\n')
   const errors: string[] = []
-  for (let i = 0; i < lines.length; i++) {
-    if (!lines[i].trim().startsWith('$$')) continue
+  let i = 0
+  while (i < lines.length) {
+    if (!lines[i].trim().startsWith('$$')) {
+      i++
+      continue
+    }
     const start = i + 1
-    i = closing(lines, i)
-    let j = i + 1
+    const end = closing(lines, i)
+    let j = end + 1
     while (j < lines.length && lines[j].trim() === '') j++
     if (lines[j]?.startsWith('Code:')) errors.push(...codeLineErrors(lines[j], j + 1, root))
     else errors.push(`line ${start}: equation without a Code line`)
+    i = end + 1
   }
   return errors
 }

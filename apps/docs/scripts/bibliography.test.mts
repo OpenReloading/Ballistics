@@ -18,6 +18,7 @@ test('a source matches by URL, DOI, the C.I.P. entry or its title', () => {
     '- <a id="cip-tdcc"></a>**C.I.P.** https://www.Example.org/a/ and doi:10.1000/xyz.\n- Book Title.'
   const found = [
     source('A', 'https://example.org/a'),
+    source('A2', 'http://example.org/a/.//'),
     source('B, doi:10.1000/xyz', 'https://other.org/b'),
     source('C.I.P. TDCC Cal. 10', 'https://bobp.cip-bobp.org/x.pdf'),
     source('Book Title'),

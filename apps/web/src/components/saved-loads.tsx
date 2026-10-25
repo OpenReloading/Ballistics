@@ -103,6 +103,9 @@ function useCartridgeNames(ids: string[]) {
 const megabytes = (bytes: number) =>
   bytes < 1e5 ? `${Math.max(1, Math.round(bytes / 1e3))} kB` : `${(bytes / 1e6).toFixed(1)} MB`
 
+/** The field that replaces the button that was pressed takes the focus the button had. */
+const focusField = (field: HTMLInputElement | null) => field?.focus()
+
 /**
  * The saved loads of the browser store: search, grouped by cartridge; a row opens the load in
  * a tab, renames it, duplicates it, exports it to a file or deletes it. States whether the browser keeps the records and the
@@ -245,8 +248,7 @@ export function SavedLoads({
                       className="saved-rename"
                       aria-label={`Name of ${r.name}`}
                       maxLength={200}
-                      // biome-ignore lint/a11y/noAutofocus: the field replaces the button that was pressed
-                      autoFocus
+                      ref={focusField}
                       value={renaming.text}
                       onFocus={(e) => e.currentTarget.select()}
                       onChange={(e) => setRenaming({ id: r.id, text: e.currentTarget.value })}

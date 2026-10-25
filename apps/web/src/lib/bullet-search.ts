@@ -49,6 +49,12 @@ function sameMass(b: BulletRow, number: string, unit: string | undefined) {
   return Math.abs(typed - Number(number)) <= half + 1e-9
 }
 
+/** A caliber label without its leading point or trailing `mm`: ".308" gives "308", "6.5 mm" "6.5". */
+function bareCaliber(label: string) {
+  const digits = label.startsWith('.') ? label.slice(1) : label
+  return digits.endsWith('mm') ? digits.slice(0, -2).trimEnd() : digits
+}
+
 /** What a typed word is worth for one bullet: its best field, 0 where it is in none. */
 function wordScore(
   b: BulletRow,
@@ -64,7 +70,7 @@ function wordScore(
   if (typed) {
     if (sameMass(b, typed[1], typed[2])) score = Math.max(score, 8)
     // "308" and ".308" are the caliber ".308", "6.5" the caliber "6.5 mm"
-    if (typed[2] === undefined && commonCaliber(b.diameter).replace(/^\.|\s*mm$/g, '') === typed[1])
+    if (typed[2] === undefined && bareCaliber(commonCaliber(b.diameter)) === typed[1])
       score = Math.max(score, 6)
   }
   return score

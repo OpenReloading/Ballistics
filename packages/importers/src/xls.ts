@@ -134,8 +134,8 @@ class Cursor {
     const count = this.u16()
     const flags = this.u8()
     const runs = flags & 8 ? this.u16() : 0
-    const phonetic = flags & 4 ? this.u32() | 0 : 0
-    if (phonetic < 0) throw new Error('phonetic size is negative')
+    const phonetic = flags & 4 ? this.u32() : 0
+    if (phonetic > 0x7fffffff) throw new Error('phonetic size is negative')
     const text = this.characters(count, (flags & 1) === 1)
     this.skip(4 * runs + phonetic)
     return text
@@ -154,7 +154,7 @@ function letters(column: number): string {
 /** RkNumber (2.5.217): a 30-bit integer or the high 30 bits of a double, divided by 100 when flagged. */
 function rk(u: number): number {
   let x: number
-  if (u & 2) x = (u | 0) >> 2
+  if (u & 2) x = u >> 2
   else {
     const view = new DataView(new ArrayBuffer(8))
     view.setUint32(4, (u & 0xfffffffc) >>> 0, true)

@@ -2848,6 +2848,7 @@ export function TargetEditor({
       {/* biome-ignore lint/a11y/noStaticElementInteractions: catches undo, redo and Escape from any control of the editor, and follows the focus for the field help */}
       <div
         ref={rootRef}
+        role="presentation"
         className="target-editor"
         data-wide={(wide && !compact) || undefined}
         data-phone={phone || undefined}

@@ -33,7 +33,7 @@ it('the table holds a bounded number of row elements however many rows it is giv
 
 it('the rows left out are one hidden spacer and the row count still names them all', () => {
   const html = render(5000)
-  expect(html.match(/<tr aria-hidden="true" style="height:\d+px"/g)).toHaveLength(1)
+  expect(html.match(/<tr inert="" style="height:\d+px"/g)).toHaveLength(1)
   expect(html).toContain('aria-rowcount="5001"')
   expect(html).toContain('aria-rowindex="2"')
   expect(html).not.toContain('aria-rowindex="5002"')
