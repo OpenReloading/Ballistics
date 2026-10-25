@@ -517,21 +517,7 @@ describe('POST /interior/load-file', () => {
       firearm: `user:${crypto.randomUUID()}`,
       seating: { by: 'overallLength', value: { value: 71.1 } },
       ladder: { stepCount: 3, chargeStep: 0.0001, direction: 'up' },
-      measurements: [
-        {
-          name: 'session.csv',
-          date: '2026-10-20',
-          device: 'Chronograph',
-          muzzleDistance: { value: 3000 },
-          strings: [
-            {
-              label: 'A',
-              charge: { value: 2.8 },
-              shots: [{ velocity: { value: 765 }, coldBore: true }],
-            },
-          ],
-        },
-      ],
+      sessions: [`user:${crypto.randomUUID()}`, 'catalogue:example-session'],
     }
     expect((await simulate(file(data))).status).toBe(200)
   })

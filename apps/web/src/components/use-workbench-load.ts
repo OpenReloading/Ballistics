@@ -21,11 +21,12 @@ import {
   type Load,
   type Powder,
   parseRef,
+  type SessionRecord,
   toSi,
   type UserRecord,
   userRecord,
 } from '@open-reloading/schema'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { type SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { apiFetch, fetchRecord } from '../lib/api-fetch.ts'
 import type {
@@ -72,7 +73,7 @@ import {
 } from '../lib/load-record.ts'
 import { generatedName, loadName } from '../lib/load-tabs.ts'
 import { productLabel } from '../lib/manufacturers.ts'
-import { type IdentifiedSeries, seriesId } from '../lib/measurements.ts'
+import { attachLoad, sessionRef } from '../lib/measurements.ts'
 import { powderValues } from '../lib/powder-compare.ts'
 import { unchangedFromRecord } from '../lib/powder-record.ts'
 import {
@@ -136,6 +137,7 @@ import type { Seated } from './seating-preview.tsx'
 import type { TrajectoryHandle } from './trajectory-form.tsx'
 import { useFieldUnits, useUnits } from './units-settings.tsx'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
+import { useManufacturers } from './use-manufacturers.ts'
 import {
   type CartridgeChoice,
   directionOf,
@@ -478,8 +480,34 @@ export function useWorkbenchState() {
     if (slot && reportCopy.current) slot.replaceChildren(reportCopy.current)
   }, [])
   const [notes, setNotes] = useState('')
-  /** The Measurements tab's chronograph files; load files carry them, links do not. */
-  const [chronoSeries, setChronoSeries] = useState<IdentifiedSeries[]>([])
+  /**
+   * The Measurements tab's chronograph sessions: user records of this browser, stored as they
+   * change. The load keeps their references (`sessionRefs`, in order, also those the store did not
+   * answer); links do not carry them.
+   */
+  const [chronoSessions, setSessionsState] = useState<SessionRecord[]>([])
+  const [sessionRefs, setSessionRefs] = useState<string[]>([])
+  const sessionsNow = useRef<SessionRecord[]>([])
+  const sessionsOpened = useRef(0)
+  const manufacturers = useManufacturers()
+  /** Replaces the sessions; the records that changed are stored, a removed one stays in the store. */
+  const setChronoSessions = useCallback((update: SetStateAction<SessionRecord[]>) => {
+    const before = sessionsNow.current
+    const next = typeof update === 'function' ? update(before) : update
+    sessionsNow.current = next
+    setSessionsState(next)
+    const had = new Set(before.map((r) => r.id))
+    const has = new Set(next.map((r) => r.id))
+    const added = next.filter((r) => !had.has(r.id)).map((r) => sessionRef(r.id))
+    const removed = new Set(before.filter((r) => !has.has(r.id)).map((r) => sessionRef(r.id)))
+    setSessionRefs((refs) => [...refs.filter((r) => !removed.has(r)), ...added])
+    const changed = next.filter((r) => !before.includes(r))
+    if (changed.length > 0) {
+      const saved = new Date().toISOString()
+      // a store that refuses leaves the reference to be reported as missing on the next open
+      putRecords(changed.map((r) => ({ ...r, saved }))).catch(() => {})
+    }
+  }, [])
   const [csvCopied, setCsvCopied] = useState<boolean | 'failed'>(false)
   /** Phones: the model parameters stand open on request. */
   const [modelShown, setModelShown] = useState(false)
@@ -768,7 +796,10 @@ export function useWorkbenchState() {
     setTempStep({ tempStep: emptyStep })
     setLadderError(undefined)
     setDirection('up')
-    setChronoSeries([])
+    sessionsOpened.current++
+    sessionsNow.current = []
+    setSessionsState([])
+    setSessionRefs([])
     lastWarnings.current = ''
   }
 
@@ -1617,12 +1648,35 @@ export function useWorkbenchState() {
   }
 
   /**
+   * The sessions `refs` of an opened load, read from the store. The load keeps every reference, so
+   * a Save never drops one only because its record is not in this browser (a catalogue session, or
+   * a session of another browser).
+   */
+  function openSessions(refs: string[]) {
+    setSessionRefs(refs)
+    const token = ++sessionsOpened.current
+    Promise.all(
+      refs.map(async (ref) => {
+        const target = parseRef(ref)
+        if (target?.scope !== 'user') return
+        const r = userRecord.safeParse(await storedRecord(target.id).catch(() => undefined))
+        return r.success && r.data.kind === 'session' ? r.data : undefined
+      }),
+    ).then((found) => {
+      if (sessionsOpened.current !== token) return
+      const list = found.filter((r) => r !== undefined)
+      sessionsNow.current = list
+      setSessionsState(list)
+    })
+  }
+
+  /**
    * An opened load: the form from its typed values, the records it names from their own. A value
    * the load does not carry follows the Settings, the records, the gun and the seating.
    */
   function openLoad(d: Load) {
     reset()
-    const { query, typed, measurements } = fromLoad(d)
+    const { query, typed, sessions } = fromLoad(d)
     const cartridgeId = d.cartridge && catalogueIdOf(d.cartridge)
     if (cartridgeId) query.set('cartridge', cartridgeId)
     const firearmTarget = d.firearm && parseRef(d.firearm)
@@ -1648,7 +1702,7 @@ export function useWorkbenchState() {
     const powderId = typeof d.powder === 'string' ? catalogueIdOf(d.powder) : undefined
     if (powderId) void choosePowder(powderId, true, typed)
     setNotes(d.note ?? '')
-    setChronoSeries(measurements.map((m) => ({ ...m, id: seriesId() })))
+    openSessions(sessions)
   }
 
   /**
@@ -1840,7 +1894,16 @@ export function useWorkbenchState() {
   const storeLoad = useCallback(
     async (record: UserRecord) => {
       const c = measuredCapacity
-      await putRecords(c ? [capacityRecord(c.cartridge, c.m3, new Date()), record] : [record])
+      // the strings mapped to a charge name this load, once it has an id
+      const attached = sessionsNow.current.map((s) => attachLoad(s, sessionRef(record.id)))
+      const changed = attached.filter((s, i) => s !== sessionsNow.current[i])
+      await putRecords([
+        ...(c ? [capacityRecord(c.cartridge, c.m3, new Date())] : []),
+        ...changed,
+        record,
+      ])
+      sessionsNow.current = attached
+      setSessionsState(attached)
       return true
     },
     [measuredCapacity],
@@ -1864,7 +1927,7 @@ export function useWorkbenchState() {
             direction,
           }
         : undefined,
-    measurements: chronoSeries.map(({ id: _, ...m }) => m),
+    sessions: sessionRefs,
   })
   // the File menu's props stay the same objects while the load is unchanged, so its memo holds and
   // its window listeners keep no earlier render, and with it no earlier result, alive
@@ -2087,7 +2150,7 @@ export function useWorkbenchState() {
     modelShown,
     more,
     notes,
-    chronoSeries,
+    chronoSessions,
     onOpenFile,
     onStored,
     online,
@@ -2147,7 +2210,9 @@ export function useWorkbenchState() {
     linkedBullet,
     linkedPowder,
     setNotes,
-    setChronoSeries,
+    setChronoSessions,
+    manufacturerRef: (typed: string) => manufacturers.ensure(typed, manufacturers.newId()),
+    manufacturerName: manufacturers.nameOf,
     setSeen,
     setStepsDraft,
     setTab,

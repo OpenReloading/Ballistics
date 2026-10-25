@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { chronoShot } from './chrono-session.ts'
 import { catalogueRef, recordId, ref } from './ids.ts'
 import { type Provenance, provenance } from './provenance.ts'
 import { text } from './shared.ts'
@@ -117,31 +116,6 @@ export const loadAnalysis = z.object({
     .optional(),
 })
 
-/**
- * One chronograph file of a load: what the Measurements tab shows of it. Lengths in mm, the mass in g.
- * Inferred type: {@link MeasurementSeries}.
- */
-export const measurementSeries = z.object({
-  name: text(200).describe('Name of the imported chronograph file, shown on the Measurements tab.'),
-  date: text(64).describe('Date of the session as the file gives it.').optional(),
-  device: text(400).describe('Manufacturer and model of the device.').optional(),
-  muzzleDistance: quantity('length', z.number().nonnegative())
-    .describe('Muzzle to the measuring point.')
-    .optional(),
-  strings: z
-    .array(
-      z.object({
-        label: text(200).describe('Name of the string in the file.').optional(),
-        charge: quantity('mass', z.number().positive())
-          .describe('The charge the string is mapped to. Absent: not used.')
-          .optional(),
-        shots: z.array(chronoShot).max(5000).describe('Shots of the string in file order.'),
-      }),
-    )
-    .max(500)
-    .describe('Shot strings of the file.'),
-})
-
 const component = {
   manufacturerName: z.string().min(1).describe('Manufacturer as the label names it.'),
   lot: z.string().min(1).describe('Lot number as printed on the package.').optional(),
@@ -224,13 +198,6 @@ export const load = z
     analysis: loadAnalysis
       .describe('The typed solver values and the ladder the load is analysed with.')
       .optional(),
-    measurements: z
-      .array(measurementSeries)
-      .max(50)
-      .describe(
-        'Chronograph files read on the Measurements tab, one series each, strings mapped to charges.',
-      )
-      .optional(),
     sessions: z
       .array(ref('session'))
       .max(50)
@@ -286,8 +253,6 @@ export const catalogueLoad: z.ZodType<CatalogueLoad> = load.refine(
 export interface AnalysisOverrides extends z.infer<typeof analysisOverrides> {}
 /** What a load is analysed with: the typed solver values and the ladder. */
 export interface LoadAnalysis extends z.infer<typeof loadAnalysis> {}
-/** One imported chronograph file with its shot strings mapped to charges. */
-export interface MeasurementSeries extends z.infer<typeof measurementSeries> {}
 /** A cartridge recipe in stored units: references to its records, charge, seating and analysis. */
 export interface Load extends z.infer<typeof load> {}
 /** A load of the catalogue: the fields {@link load} requires of one are present. */

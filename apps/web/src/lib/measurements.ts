@@ -1,64 +1,75 @@
 import { type LadderFlatSpots, ladderFlatSpots } from '@open-reloading/core'
 import type { ChronoImport } from '@open-reloading/importers'
-import { fromSi, type MeasurementSeries, toSi } from '@open-reloading/schema'
+import { fromSi, type SessionRecord, toSi } from '@open-reloading/schema'
 import { type Shot, type StringStats, stringStats } from './chrono.ts'
 
-/** One chronograph file as the Measurements tab holds it: the muzzle distance in m, the charges in kg. */
-export interface MeasuredSeries extends Omit<MeasurementSeries, 'muzzleDistance' | 'strings'> {
-  muzzleDistance?: number
-  strings: (Omit<MeasurementSeries['strings'][number], 'charge'> & { charge?: number })[]
+type SessionString = SessionRecord['data']['strings'][number]
+
+const storedMass = (si: number) => Number(fromSi('mass', si).toPrecision(12))
+
+/** The reference a load keeps for the stored session `id`. */
+export const sessionRef = (id: string) => `user:${id}`
+
+/** The charge string `s` is mapped to, kg; undefined: not used. */
+export const stringCharge = (s: SessionString) =>
+  s.variation?.kind === 'charge' ? toSi('mass', s.variation.value.value) : undefined
+
+/** `s` mapped to the charge `kg` as the session keeps it (g), or not used without one. */
+export function withCharge(s: SessionString, kg: number | undefined): SessionString {
+  const { variation: _, ...rest } = s
+  return kg === undefined
+    ? rest
+    : { ...rest, variation: { kind: 'charge', value: { value: storedMass(kg) } } }
 }
 
-/** A chronograph file on the Measurements tab with an id for this page. */
-export type IdentifiedSeries = MeasuredSeries & { id: number }
-
-const stored = (kind: 'length' | 'mass', si: number) => Number(fromSi(kind, si).toPrecision(12))
-
-/** `s` as the load keeps it: the muzzle distance in mm, the charges in g. */
-export const seriesToLoad = (s: MeasuredSeries): MeasurementSeries => ({
-  ...s,
-  muzzleDistance:
-    s.muzzleDistance === undefined ? undefined : { value: stored('length', s.muzzleDistance) },
-  strings: s.strings.map((x) => ({
-    ...x,
-    charge: x.charge === undefined ? undefined : { value: stored('mass', x.charge) },
-  })),
-})
-
-/** The series of a load as the Measurements tab holds it: the inverse of {@link seriesToLoad}. */
-export const seriesFromLoad = (s: MeasurementSeries): MeasuredSeries => ({
-  ...s,
-  muzzleDistance: s.muzzleDistance && toSi('length', s.muzzleDistance.value),
-  strings: s.strings.map((x) => ({ ...x, charge: x.charge && toSi('mass', x.charge.value) })),
-})
-
-let lastId = 0
-/** Next integer id for an `IdentifiedSeries`, counted from 1 per page load. */
-export const seriesId = () => ++lastId
-
 /**
- * A read file as the load file keeps it: string `i` with its label and `charges[i]`, kg.
- * Texts are cut to the file's caps, so a saved load opens again.
+ * A read file as the session record the Measurements tab holds: string `i` with its label and the
+ * charge `charges[i]` (kg) it is mapped to, `manufacturer` the reference of the device's maker.
+ * Texts are cut to the schema's caps.
  */
-export function seriesOf(
+export function sessionOf(
   name: string,
   data: ChronoImport,
   charges: (number | undefined)[],
-): MeasuredSeries {
-  const { session } = data
-  const device = [session.device.manufacturerName, session.device.model].filter(Boolean).join(' ')
+  record: { id: string; manufacturer?: string; now: Date },
+): SessionRecord {
+  const { session: c } = data
   return {
+    kind: 'session',
+    id: record.id,
     name: name.slice(0, 200),
-    date: session.date?.slice(0, 64) || undefined,
-    device: device.slice(0, 400) || undefined,
-    // mm in the session, m in the load file
-    muzzleDistance: session.muzzleDistance && toSi('length', session.muzzleDistance.value),
-    strings: session.strings.map((s, i) => ({
-      label: data.stringLabels[i]?.slice(0, 200) || undefined,
-      charge: charges[i],
-      shots: s.shots,
-    })),
+    saved: record.now.toISOString(),
+    data: {
+      origin: 'user',
+      ...(c.date && { date: c.date }),
+      device: {
+        kind: c.device.kind,
+        ...(record.manufacturer && { manufacturer: record.manufacturer }),
+        ...(c.device.model && { model: c.device.model }),
+      },
+      ...(c.muzzleDistance && { muzzleDistance: c.muzzleDistance }),
+      strings: c.strings.map((s, i) => {
+        const label = data.stringLabels[i]?.slice(0, 200)
+        return withCharge({ ...(label && { label }), shots: s.shots }, charges[i])
+      }),
+      ...(c.note && { note: c.note }),
+      provenance: {
+        kind: 'measured',
+        sources: c.provenance.sources.map((x) => ({ ...x, title: x.title ?? name })),
+      },
+    },
   }
+}
+
+/**
+ * `session` with the load `load` named by every string that is mapped to a charge and names no
+ * load yet; the same session when none does.
+ */
+export function attachLoad(session: SessionRecord, load: string): SessionRecord {
+  const strings = session.data.strings.map((s) => (s.variation && !s.load ? { ...s, load } : s))
+  return strings.every((s, i) => s === session.data.strings[i])
+    ? session
+    : { ...session, data: { ...session.data, strings } }
 }
 
 /** A chronograph string mapped to a charge, kg; `undefined`: not used. */

@@ -1,12 +1,11 @@
 'use client'
 
-import type { Powder } from '@open-reloading/schema'
+import type { Powder, SessionRecord } from '@open-reloading/schema'
 import type { Context, Dispatch, RefObject, SetStateAction } from 'react'
 import { createContext, useContext } from 'react'
 import type { InteriorResponse } from '../lib/api-types.ts'
 import type { FittedPowder, UnfittedPowder } from '../lib/burn-rate.ts'
 import type { activeClick } from '../lib/firearm.ts'
-import type { IdentifiedSeries } from '../lib/measurements.ts'
 import type { LadderDirection } from '../lib/seating-ladder.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import type { ChartView } from './interior-chart.tsx'
@@ -72,9 +71,13 @@ export type ResultState = {
   trajectory: RefObject<TrajectoryHandle | null>
   notes: string
   setNotes: (notes: string) => void
-  /** The Measurements tab's chronograph files, saved with the load. */
-  chronoSeries: IdentifiedSeries[]
-  setChronoSeries: Dispatch<SetStateAction<IdentifiedSeries[]>>
+  /** The Measurements tab's chronograph sessions: user records, which the load references. */
+  chronoSessions: SessionRecord[]
+  setChronoSessions: Dispatch<SetStateAction<SessionRecord[]>>
+  /** The reference a typed device maker stands for: the manufacturer it names, else a new user one. */
+  manufacturerRef: (typed: string) => string | undefined
+  /** The name of a manufacturer reference; empty for none or an unknown one. */
+  manufacturerName: (ref: string | undefined) => string
   /** The Barrel length tab's range and rows; the report prints the same rows. */
   barrel: BarrelStudy
   /** The Ladder table tab's lot rows; the report prints the same rows. */

@@ -162,35 +162,6 @@ describe('Load', () => {
     expectIssueAt(load, { ...userLoad, sessions: ['example-session'] }, 'sessions.0')
     expectIssueAt(load, { ...catalogueLoad, sessions }, 'sessions.0')
   })
-
-  it('keeps the measured series in stored units', () => {
-    const series = {
-      name: 'day1.csv',
-      date: '2026-10-12',
-      device: 'Radar',
-      muzzleDistance: { value: 3000 },
-      strings: [
-        {
-          label: 'A',
-          charge: { value: 2.48 },
-          shots: [{ velocity: { value: 800 } }, { velocity: { value: 790 }, excluded: 'flyer' }],
-        },
-        { shots: [{ velocity: { value: 810, raw: '2657' }, coldBore: true }] },
-      ],
-    }
-    const measurements = [series, { name: 'day2.csv', strings: [] }]
-    expect(load.parse({ ...userLoad, measurements })).toEqual({ ...userLoad, measurements })
-    expectIssueAt(
-      load,
-      { ...userLoad, measurements: [{ ...series, muzzleDistance: 3 }] },
-      'measurements',
-    )
-    expectIssueAt(
-      load,
-      { ...userLoad, measurements: [{ ...series, strings: [{ shots: [{}] }] }] },
-      'measurements',
-    )
-  })
 })
 
 describe('checkUserRefs of a load', () => {

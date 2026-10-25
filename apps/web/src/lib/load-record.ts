@@ -13,7 +13,6 @@ import {
   userRecord,
 } from '@open-reloading/schema'
 import { storedOf } from './firearm.ts'
-import { type MeasuredSeries, seriesFromLoad, seriesToLoad } from './measurements.ts'
 import type { LadderDirection, RunnableLadderKind } from './seating-ladder.ts'
 import { waterGrams } from './units.ts'
 
@@ -151,7 +150,8 @@ export interface LoadParts {
     step?: number
     direction: LadderDirection
   }
-  measurements: readonly MeasuredSeries[]
+  /** The chronograph sessions of the Measurements tab, as references. */
+  sessions: readonly string[]
 }
 
 /** The load the workbench holds: only the typed solver values, the rest by reference. */
@@ -194,7 +194,7 @@ export function toLoad(p: LoadParts): Load {
             }),
           }
         : undefined,
-    measurements: p.measurements.length > 0 ? p.measurements.map(seriesToLoad) : undefined,
+    sessions: p.sessions.length > 0 ? [...p.sessions] : undefined,
   }
 }
 
@@ -204,10 +204,11 @@ export interface OpenedLoad {
   query: URLSearchParams
   /** The solver values the load carries; the fields without one follow their records. */
   typed: ReadonlySet<string>
-  measurements: MeasuredSeries[]
+  /** The references of the load's sessions. */
+  sessions: string[]
 }
 
-/** The workbench state of `load`: a link's query, the typed keys and the measured series. */
+/** The workbench state of `load`: a link's query, the typed keys and the session references. */
 export function fromLoad(load: Load): OpenedLoad {
   const query = new URLSearchParams()
   const typed = new Set<string>()
@@ -227,5 +228,5 @@ export function fromLoad(load: Load): OpenedLoad {
     if (ladder.kind) query.set('ladderKind', ladder.kind)
   }
   if (load.seating) query.set(load.seating.by, String(toSi('length', load.seating.value.value)))
-  return { query, typed, measurements: (load.measurements ?? []).map(seriesFromLoad) }
+  return { query, typed, sessions: load.sessions ?? [] }
 }

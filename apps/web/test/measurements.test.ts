@@ -1,16 +1,18 @@
 import type { ChronoImport } from '@open-reloading/importers'
-import { measurementSeries } from '@open-reloading/schema'
+import { chronoSession, userRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import type { Shot } from '../src/lib/chrono.ts'
 import {
+  attachLoad,
   chargeRows,
   type SimulatedStep,
   seriesFlatSpots,
-  seriesFromLoad,
-  seriesOf,
-  seriesToLoad,
+  sessionOf,
   simulatedCurve,
+  stringCharge,
+  withCharge,
 } from '../src/lib/measurements.ts'
+import { canonicalJson } from '../src/lib/user-data.ts'
 
 const shot = (value: number, excluded?: string): Shot => ({
   velocity: { value },
@@ -97,7 +99,7 @@ describe('simulatedCurve', () => {
   })
 })
 
-describe('seriesOf', () => {
+describe('sessionOf', () => {
   const data: ChronoImport = {
     format: 'openreloading-csv',
     session: {
@@ -112,34 +114,75 @@ describe('seriesOf', () => {
     missingPaths: [],
     warnings: [],
   }
+  const id = '3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13'
+  const now = new Date('2026-10-12T10:00:00Z')
+  const make = (charges: (number | undefined)[]) =>
+    sessionOf('day1.csv', data, charges, { id, manufacturer: 'catalogue:test-maker', now })
 
-  it('keeps what the tab shows, each string with its label and charge, as a load file entry', () => {
-    const s = seriesOf('day1.csv', data, [40 * gr, undefined])
+  it('keeps what the tab shows, each string with its label and charge, as a stored session', () => {
+    const s = make([40 * gr, undefined])
     expect(JSON.parse(JSON.stringify(s))).toEqual({
+      kind: 'session',
+      id,
       name: 'day1.csv',
-      date: '2026-10-12',
-      device: 'Manufacturer Radar',
-      muzzleDistance: 3,
-      strings: [
-        { label: 'A', charge: 40 * gr, shots: [shot(800), shot(790, 'flyer')] },
-        { shots: [shot(810)] },
-      ],
+      saved: '2026-10-12T10:00:00.000Z',
+      data: {
+        origin: 'user',
+        date: '2026-10-12',
+        device: { kind: 'doppler-radar', manufacturer: 'catalogue:test-maker', model: 'Radar' },
+        muzzleDistance: { value: 3000 },
+        strings: [
+          {
+            label: 'A',
+            variation: { kind: 'charge', value: { value: expect.closeTo(40 * gr * 1000, 9) } },
+            shots: [shot(800), shot(790, 'flyer')],
+          },
+          { shots: [shot(810)] },
+        ],
+        provenance: { kind: 'measured', sources: [{ title: 'day1.csv' }] },
+      },
     })
-    // a reopened load serializes as it was saved, so it opens without unsaved changes
-    const stored = seriesToLoad(s)
-    expect(JSON.stringify(measurementSeries.parse(stored))).toBe(JSON.stringify(stored))
-    expect(stored.muzzleDistance).toEqual({ value: 3000 })
-    expect(stored.strings[0].charge?.value).toBeCloseTo(40 * (gr * 1000), 9)
-    const back = seriesFromLoad(stored)
-    expect(back.muzzleDistance).toBe(3)
-    expect(back.strings[0].charge).toBeCloseTo(40 * gr, 12)
-    expect(JSON.stringify(seriesToLoad(back))).toBe(JSON.stringify(stored))
+    expect(userRecord.safeParse(s).success).toBe(true)
+    // a reopened session serializes as it was stored, so a load opens without unsaved changes
+    expect(canonicalJson(userRecord.parse(s))).toBe(canonicalJson(s))
+    expect(s.data.strings.map(stringCharge)).toEqual([expect.closeTo(40 * gr, 12), undefined])
   })
 
-  it('cuts texts to the caps of the file', () => {
+  it('keeps a file without a maker, a date or a model, and cuts texts to the caps', () => {
     const long = 'x'.repeat(300)
-    const s = seriesOf(long, { ...data, stringLabels: [long] }, [])
-    expect(measurementSeries.safeParse(seriesToLoad(s)).success).toBe(true)
+    const bare = { ...data.session, date: undefined, device: { kind: 'other' as const } }
+    const s = sessionOf(long, { ...data, session: bare, stringLabels: [long] }, [], { id, now })
+    expect(s.name).toHaveLength(200)
+    expect(s.data.device).toEqual({ kind: 'other' })
+    expect(s.data.date).toBeUndefined()
+    expect(chronoSession.safeParse(s.data).success).toBe(true)
+    // the source title falls back to the name when the file gave none
+    const untitled = {
+      ...data.session,
+      provenance: { kind: 'measured' as const, sources: [{}] as [{}] },
+    }
+    const t = sessionOf('x.csv', { ...data, session: untitled }, [], { id, now })
+    expect(t.data.provenance.sources[0].title).toBe('x.csv')
+  })
+
+  it('maps a string to a charge and back to not used', () => {
+    const string = make([undefined, undefined]).data.strings[0]
+    const mapped = withCharge(string, 41 * gr)
+    expect(stringCharge(mapped)).toBeCloseTo(41 * gr, 12)
+    expect(withCharge(mapped, undefined)).toEqual(string)
+    expect(stringCharge(string)).toBeUndefined()
+  })
+
+  it('names the load on the mapped strings that name none, and no other', () => {
+    const s = make([40 * gr, undefined])
+    const attached = attachLoad(s, 'user:7a2d9c10-5b3e-4f68-9d41-0c8e2b6a1f57')
+    expect(attached.data.strings.map((x) => x.load)).toEqual([
+      'user:7a2d9c10-5b3e-4f68-9d41-0c8e2b6a1f57',
+      undefined,
+    ])
+    // a string that names a load keeps it, and the same session comes back when nothing changes
+    expect(attachLoad(attached, 'user:3f1c2b4e-0000-4000-8000-000000000000')).toBe(attached)
+    expect(attachLoad(make([undefined, undefined]), 'user:x')).toEqual(make([undefined, undefined]))
   })
 })
 
