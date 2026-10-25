@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { nth } from '../src/errors.ts'
 import { chargeLadder, InputError } from '../src/index.ts'
 
 describe('chargeLadder', () => {
@@ -6,13 +7,13 @@ describe('chargeLadder', () => {
     const c = chargeLadder(0.0029, 0.0001, 5, 'up')
     const want = [0.0029, 0.003, 0.0031, 0.0032, 0.0033]
     expect(c).toHaveLength(5)
-    for (const [i, v] of c.entries()) expect(v).toBeCloseTo(want[i], 15)
+    for (const [i, v] of c.entries()) expect(v).toBeCloseTo(nth(want, i), 15)
   })
 
   it('steps down from the start charge', () => {
     const c = chargeLadder(0.0029, 0.0001, 3, 'down')
     for (const [i, v] of [0.0029, 0.0028, 0.0027].entries())
-      expect(Math.abs(c[i] - v) / v).toBeLessThan(1e-15)
+      expect(Math.abs(nth(c, i) - v) / v).toBeLessThan(1e-15)
   })
 
   it('multiplies the step, so the last charge is start plus (n - 1) steps', () => {
@@ -22,7 +23,7 @@ describe('chargeLadder', () => {
   it('centres an odd count on the start charge, lowest first', () => {
     const c = chargeLadder(0.0029, 0.0001, 5, 'around')
     for (const [i, v] of [0.0027, 0.0028, 0.0029, 0.003, 0.0031].entries())
-      expect(Math.abs(c[i] - v) / v).toBeLessThan(1e-14)
+      expect(Math.abs(nth(c, i) - v) / v).toBeLessThan(1e-14)
     expect(c[2]).toBe(0.0029)
   })
 

@@ -20,7 +20,7 @@ describe('ZIP container', () => {
 
   it('finds the end record behind a comment that holds its signature', async () => {
     const book = zip(parts, { comment: 'PK\x05\x06 not the record' })
-    expect((await readWorkbook(book)).worksheets[0].rows).toEqual(rows)
+    expect((await readWorkbook(book)).worksheets[0]?.rows).toEqual(rows)
   })
 
   it('takes an inflate function', async () => {
@@ -32,7 +32,7 @@ describe('ZIP container', () => {
 
   it('never inflates parts it does not need', async () => {
     const image = { name: 'xl/media/image1.png', data: 'png', method: 99 }
-    expect((await readWorkbook(withSheet({}, [image]))).worksheets[0].rows).toEqual(rows)
+    expect((await readWorkbook(withSheet({}, [image]))).worksheets[0]?.rows).toEqual(rows)
   })
 
   it('refuses bytes that are not an archive', async () => {
@@ -53,7 +53,7 @@ describe('ZIP container', () => {
   it('reads entries with a data descriptor, stored and deflated', async () => {
     for (const method of [0, 8]) {
       const book = zip(parts.map((p) => ({ ...p, method, descriptor: true })))
-      expect((await readWorkbook(book)).worksheets[0].rows).toEqual(rows)
+      expect((await readWorkbook(book)).worksheets[0]?.rows).toEqual(rows)
     }
   })
 

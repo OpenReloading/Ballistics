@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { cipProfile, type Profile, shotshellProfile } from '../src/cartridge/profile.ts'
 import type { Annotation } from '../src/core/types.ts'
+import { defined } from './defined.ts'
 import { sheet } from './sheets.ts'
 
 const record = sheet
@@ -77,7 +78,7 @@ describe('annotation', () => {
     ])
     expect(a.dimensions.find((d) => d.symbol === 'F')?.from).toBe(58.42)
     expect(a.angles.map((x) => x.symbol)).toEqual(['alpha', 'alpha1', 'i'])
-    expect(a.angles[2].vertex).toEqual([3.935, 54.33])
+    expect(defined(a.angles[2]).vertex).toEqual([3.935, 54.33])
     expect(a.conventions).toEqual([{ kind: 'boreStub', r: 3.81, from: 58.42, to: 63.564 }])
   })
 
@@ -160,6 +161,6 @@ describe('annotation', () => {
     const a = annotation('cip-22-long-shot-2000-06-07', 'chamber')
     expect(a.conventions.map((c) => c.kind)).toEqual(['g1Stub'])
     const G1 = a.dimensions.find((d) => d.symbol === 'G1')
-    expect(G1?.from).toBe(a.conventions[0].from)
+    expect(G1?.from).toBe(defined(a.conventions[0]).from)
   })
 })

@@ -83,9 +83,9 @@ const layouts = layoutCache((drawn: Drawn, medium: Medium, em: number, unit: Len
   }
   const boxes = [
     ...Object.values(layers).map((l) => l.box),
-    ...Object.values(axis).map(([a, b]): number[] => [a, 0, b, 0]),
+    ...Object.values(axis).map(([a, b]): [number, number, number, number] => [a, 0, b, 0]),
   ]
-  const box = [0, 1, 2, 3].map((k) =>
+  const box = ([0, 1, 2, 3] as const).map((k) =>
     k < 2 ? Math.min(...boxes.map((b) => b[k])) : Math.max(...boxes.map((b) => b[k])),
   ) as [number, number, number, number]
   return { layers, box, axis }

@@ -5,6 +5,7 @@ import type { GroupStatistics } from '@open-reloading/core'
 import type { SheetNote, ShotGroup } from '@open-reloading/schema'
 import { BracketsCurly, Plus, Trash } from '@phosphor-icons/react'
 import { type KeyboardEvent, type PointerEvent, useRef, useState } from 'react'
+import { nth } from '../lib/nth.ts'
 import { type Frame, screenNudge, targetToView, viewToTarget } from '../lib/target-editor.ts'
 import type { Point } from '../lib/target-geometry.ts'
 import { groupStatisticsOf } from '../lib/target-groups.ts'
@@ -86,7 +87,7 @@ export function NotesLayer({
     <g className="notes">
       {notes.map((n, i) => {
         const at = targetToView(frame, n)
-        const lines = texts[i].split('\n')
+        const lines = nth(texts, i).split('\n')
         const w = Math.max(...lines.map((l) => l.length), 1) * 0.6 * font + 2 * pad
         const h = lines.length * 1.25 * font + 2 * pad
         const colour = groups.find((g) => g.id === n.group)?.colour

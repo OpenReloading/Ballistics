@@ -4,6 +4,7 @@
  */
 import { type ShotGroup, toSi } from '@open-reloading/schema'
 import type { HoleProposal } from './hole-detection.ts'
+import { nth } from './nth.ts'
 import { type Frame, targetToView, viewToTarget } from './target-editor.ts'
 import type { Point } from './target-geometry.ts'
 
@@ -30,7 +31,10 @@ export function expectedHoleSize(o: {
   if (o.confirmedDiameters.length >= MIN_HOLES_TO_LEARN_SIZE) {
     const h = [...o.confirmedDiameters].sort((a, b) => a - b)
     const m = h.length >> 1
-    return { diameter: h.length % 2 ? h[m] : (h[m - 1] + h[m]) / 2, source: 'learned' }
+    return {
+      diameter: h.length % 2 ? nth(h, m) : (nth(h, m - 1) + nth(h, m)) / 2,
+      source: 'learned',
+    }
   }
   if (o.bulletDiameter) return { diameter: o.bulletDiameter, source: 'bullet' }
   if (o.markerDiameter) return { diameter: o.markerDiameter, source: 'marker' }

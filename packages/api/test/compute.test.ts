@@ -19,6 +19,7 @@ import { describe, expect, it } from 'vitest'
 import { caps } from '../src/compute/schemas.ts'
 import { stabilityBounds } from '../src/compute/stability-schema.ts'
 import { API_PREFIX } from '../src/version.ts'
+import { defined } from './defined.ts'
 import { bundle, m3Load, rifleProjectile as projectile, rifleShot as shot } from './fixtures.ts'
 import { withApi } from './setup.ts'
 
@@ -225,8 +226,9 @@ describe('POST /exterior/trajectory', () => {
     })
     expect(status).toBe(200)
     body.result.points.forEach((p: { range: number; height: number }, i: number) => {
-      const want = -0.05 - (g * xs[i] ** 2) / (2 * v ** 2)
-      expect(p.range).toBe(xs[i])
+      const x = defined(xs[i])
+      const want = -0.05 - (g * x ** 2) / (2 * v ** 2)
+      expect(p.range).toBe(x)
       expect(Math.abs(p.height - want) / Math.abs(want)).toBeLessThan(1e-9)
     })
   })
@@ -914,13 +916,19 @@ describe('GET /exterior/stability', () => {
     const keys = Object.keys(stabilityBounds) as (keyof typeof stabilityBounds)[]
     for (let mask = 0; mask < 2 ** keys.length; mask++) {
       const v = Object.fromEntries(keys.map((k, i) => [k, stabilityBounds[k][(mask >> i) & 1]]))
+      const bound = (k: keyof typeof stabilityBounds) => defined(v[k], k)
       const s = millerStability({
-        mass: v.mass,
-        diameter: v.diameter,
-        length: v.length,
-        twist: v.twist,
-        velocity: v.muzzleVelocity,
-        air: { altitude: 0, pressure: v.pressure, temperature: v.temperature, humidity: 0 },
+        mass: bound('mass'),
+        diameter: bound('diameter'),
+        length: bound('length'),
+        twist: bound('twist'),
+        velocity: bound('muzzleVelocity'),
+        air: {
+          altitude: 0,
+          pressure: bound('pressure'),
+          temperature: bound('temperature'),
+          humidity: 0,
+        },
       })
       expect(Number.isFinite(s) && s > 0).toBe(true)
     }

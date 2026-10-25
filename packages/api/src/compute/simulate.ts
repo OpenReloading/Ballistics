@@ -184,7 +184,8 @@ function simulateAnswer(
   }
   const all = steps ?? [{ charge: load.charge, ...(payload as object) } as SimulateStep]
   const middle = around ? (all.length - 1) / 2 : 0
-  const shown = 'result' in all[middle] ? middle : all.findIndex((s) => 'result' in s)
+  const middleStep = all[middle]
+  const shown = middleStep && 'result' in middleStep ? middle : all.findIndex((s) => 'result' in s)
   const results = all.map((s) => ('result' in s ? summarizeStep(s, summary) : s))
   if (shown < 0)
     return {

@@ -18,6 +18,7 @@ import { compareGroups, differenceMarks, rowDiffers } from '../lib/bullet-compar
 import { caliberLabel, caliberUnit } from '../lib/caliber.ts'
 import { compareHref } from '../lib/compare-ids.ts'
 import { productLabel } from '../lib/manufacturers.ts'
+import { nth } from '../lib/nth.ts'
 import { RecordScope, UnitSwitch } from './cartridge-record.tsx'
 import { Panel } from './panel.tsx'
 import { ScrollRegion } from './scroll-region.tsx'
@@ -64,7 +65,7 @@ function Values({
             {drawings.map((d, i) => (
               <figure key={ids[i]}>
                 {d}
-                <figcaption>{bullets[i].name}</figcaption>
+                <figcaption>{nth(bullets, i).name}</figcaption>
               </figure>
             ))}
           </div>

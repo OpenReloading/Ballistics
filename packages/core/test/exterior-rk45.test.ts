@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'vitest'
+import { nth } from '../src/errors.ts'
 import { type Rhs, rk45 } from '../src/index.ts'
 
 const decay: Rhs = (_t, y, dy) => {
-  dy[0] = -y[0]
+  dy[0] = -nth(y, 0)
 }
 const oscillator: Rhs = (_t, y, dy) => {
-  dy[0] = y[1]
-  dy[1] = -y[0]
+  dy[0] = nth(y, 1)
+  dy[1] = -nth(y, 0)
 }
 const options = { relativeTolerance: 1e-8, absoluteTolerance: 1e-10, maxSteps: 10000, maxTime: 5 }
 
@@ -25,9 +26,9 @@ describe('rk45', () => {
         absoluteTolerance: relativeTolerance,
       })
       const err = Math.max(
-        Math.abs(a.y[0] - Math.exp(-5)),
-        Math.abs(b.y[0] - Math.sin(5)),
-        Math.abs(b.y[1] - Math.cos(5)),
+        Math.abs(nth(a.y, 0) - Math.exp(-5)),
+        Math.abs(nth(b.y, 0) - Math.sin(5)),
+        Math.abs(nth(b.y, 1) - Math.cos(5)),
       )
       expect(a.t).toBe(5)
       expect(err).toBeLessThan(100 * relativeTolerance)
@@ -38,14 +39,14 @@ describe('rk45', () => {
 
   it('integrates a quadratic solution exactly, also in the dense output', () => {
     const f: Rhs = (_t, y, dy) => {
-      dy[0] = y[1]
+      dy[0] = nth(y, 1)
       dy[1] = 2
     }
     const r = rk45(
       f,
       0,
       Float64Array.of(0, 0),
-      [{ eventFunction: (_t, y) => y[0] - 2.25, direction: 1, terminal: false }],
+      [{ eventFunction: (_t, y) => nth(y, 0) - 2.25, direction: 1, terminal: false }],
       {
         ...options,
         relativeTolerance: 1e-3,
@@ -56,8 +57,8 @@ describe('rk45', () => {
     expect(r.y[0]).toBeCloseTo(9, 12)
     expect(r.y[1]).toBeCloseTo(6, 12)
     expect(r.hits).toHaveLength(1)
-    expect(r.hits[0].t).toBeCloseTo(1.5, 12)
-    expect(r.hits[0].y[1]).toBeCloseTo(3, 12)
+    expect(nth(r.hits, 0).t).toBeCloseTo(1.5, 12)
+    expect(nth(r.hits, 0).y[1]).toBeCloseTo(3, 12)
   })
 
   it('has steps whose local error falls as h^6 (fifth order)', () => {
@@ -69,7 +70,7 @@ describe('rk45', () => {
         maxTime: h,
         initialStep: h,
       })
-      return Math.abs(r.y[0] - Math.exp(-h))
+      return Math.abs(nth(r.y, 0) - Math.exp(-h))
     }
     const order = Math.log2(stepError(0.2) / stepError(0.1))
     expect(order).toBeGreaterThan(5.5)
@@ -91,7 +92,7 @@ describe('rk45', () => {
           initialStep: h,
         },
       )
-      return Math.abs(r.hits[0].y[0] - Math.exp(-h / 2))
+      return Math.abs(nth(nth(r.hits, 0).y, 0) - Math.exp(-h / 2))
     }
     const order = Math.log2(midpointError(0.2) / midpointError(0.1))
     expect(order).toBeGreaterThan(4.5)
@@ -103,7 +104,7 @@ describe('rk45', () => {
       oscillator,
       0,
       Float64Array.of(0, 1),
-      [{ eventFunction: (_t, y) => y[0], direction: -1, terminal: true }],
+      [{ eventFunction: (_t, y) => nth(y, 0), direction: -1, terminal: true }],
       {
         ...options,
         relativeTolerance: 1e-12,
@@ -144,7 +145,7 @@ describe('rk45', () => {
       rk45(oscillator, 0, Float64Array.of(0, 1), [], { ...options, maxSteps: 3 }),
     ).toThrow(RangeError)
     const blowUp: Rhs = (_t, y, dy) => {
-      dy[0] = y[0] * y[0]
+      dy[0] = nth(y, 0) * nth(y, 0)
     }
     expect(() => rk45(blowUp, 0, Float64Array.of(1), [], { ...options, maxTime: 2 })).toThrow(
       RangeError,

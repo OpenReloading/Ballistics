@@ -138,11 +138,9 @@ function chooseDelimiter(
   let delimiter = named
   if (delimiter === undefined && names.length > 0) {
     delimiter = candidates.find((d) => {
-      const h = headerIndex(
-        lines.map((l) => splitCells(l, d)),
-        names,
-      )
-      return h >= 0 && splits(lines[h], d)
+      const cells = lines.map((l) => splitCells(l, d))
+      const row = cells[headerIndex(cells, names)]
+      return row !== undefined && row.length > 1
     })
     if (delimiter === undefined) {
       const h = headerIndex(
@@ -169,11 +167,14 @@ function findHeader(
     rows.map((r) => r.cells),
     names,
   )
-  if (h < 0) throw new Error(`no header row holds ${names.map((n) => `"${n}"`).join(', ')}`)
-  const header = rows[h].cells.map((c) => c.toLowerCase())
+  const row = rows[h]
+  if (row === undefined) {
+    throw new Error(`no header row holds ${names.map((n) => `"${n}"`).join(', ')}`)
+  }
+  const header = row.cells.map((c) => c.toLowerCase())
   const headerText =
     typeof velocity === 'string'
-      ? rows[h].cells[header.indexOf(velocity.trim().toLowerCase())]
+      ? row.cells[header.indexOf(velocity.trim().toLowerCase())]
       : undefined
   return { header, headerText, data: rows.slice(h + 1) }
 }
@@ -197,6 +198,7 @@ function checkRows(
   const nextMapped = header !== undefined && Object.values(index).includes(vi + 1)
   const suspect: number[] = []
   let first: [string, string] | undefined
+  const [firstRow] = data
   for (const r of data) {
     checkOverflow(r, header, commaMayCut, remedy)
     const p = commaMayCut ? commaPair(r, vi, header, nextMapped) : undefined
@@ -209,9 +211,9 @@ function checkRows(
       suspect.push(r.lineNumber)
       first ??= p
     }
-    if (!header && r.cells.length !== data[0].cells.length) {
+    if (!header && firstRow && r.cells.length !== firstRow.cells.length) {
       throw new Error(
-        `row ${r.lineNumber}: ${r.cells.length} cells, row ${data[0].lineNumber} has ${data[0].cells.length}`,
+        `row ${r.lineNumber}: ${r.cells.length} cells, row ${firstRow.lineNumber} has ${firstRow.cells.length}`,
       )
     }
   }
@@ -368,6 +370,7 @@ function readStrings(
   const labels: (string | undefined)[] = []
   const seen = new Set<string>()
   let current: string | undefined
+  let open: { shots: ChronoShot[] } | undefined
   for (const r of data) {
     const cell = (key: keyof ColumnMap) => {
       const i = index[key]
@@ -379,18 +382,19 @@ function readStrings(
     }
     const shot = readRowShotAt(r.lineNumber, cell, token, headerText, options, warnings)
     const label = cell('string')
-    if (strings.length === 0 || label !== current) {
+    if (open === undefined || label !== current) {
       if (label !== undefined && seen.has(label)) {
         warnings.push(
           `row ${r.lineNumber}: string "${label}" returns after another string; read as a new string`,
         )
       }
       if (label !== undefined) seen.add(label)
-      strings.push({ shots: [] })
+      open = { shots: [] }
+      strings.push(open)
       labels.push(label || undefined)
       current = label
     }
-    strings[strings.length - 1].shots.push(shot)
+    open.shots.push(shot)
   }
   return { strings, labels }
 }

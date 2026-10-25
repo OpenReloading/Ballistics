@@ -10,6 +10,7 @@ import {
   type UserRecord,
 } from '@open-reloading/schema'
 import type { FieldSpec } from './field-spec.ts'
+import { nth } from './nth.ts'
 import {
   formatNumber,
   formatQuantity,
@@ -140,14 +141,17 @@ type FirearmIssue = ReturnType<typeof firearmIssues>[number]
 function issueWhere(f: Firearm, path: FirearmIssue['path']): string {
   const [list, i, , j] = path
   if (typeof i !== 'number') return ''
-  if (list === 'optics') return ` in optic ${f.optics[i].name || f.optics[i].id}`
+  if (list === 'optics') {
+    const optic = nth(f.optics, i)
+    return ` in optic ${optic.name || optic.id}`
+  }
   if (list !== 'configurations') return ''
-  const c = f.configurations[i]
+  const c = nth(f.configurations, i)
   return ` in configuration ${c.name || c.id}${typeof j === 'number' ? `, mount ${j + 1}` : ''}`
 }
 
 function issueReason(issue: FirearmIssue, field: string): string {
-  if (issue.code === 'custom') return issue.message[0].toLowerCase() + issue.message.slice(1)
+  if (issue.code === 'custom') return issue.message.charAt(0).toLowerCase() + issue.message.slice(1)
   if (issue.code === 'too_small' && field === 'zeroTemperature')
     return 'must be above absolute zero'
   if (issue.code === 'too_small' && issue.origin === 'number')

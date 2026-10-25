@@ -50,13 +50,20 @@ export function dragTableOf(drag: DragInput): DragTable {
   return drag.kind === 'curve' ? drag.curve : dragTables[drag.model]
 }
 
+/** Node `i` of a table; callers keep `i` inside it (tables have at least two nodes). */
+function entry(table: DragTable, i: number): readonly [number, number] {
+  const found = table[i]
+  if (found === undefined) throw new RangeError(`node ${i} outside a drag table of ${table.length}`)
+  return found
+}
+
 /** Index k of the node with table[k][0] <= mach < table[k + 1][0]; clamped to the table. */
 function node(table: DragTable, mach: number): number {
   let lo = 0
   let hi = table.length - 1
   while (hi - lo > 1) {
     const mid = (lo + hi) >> 1
-    if (table[mid][0] <= mach) lo = mid
+    if (entry(table, mid)[0] <= mach) lo = mid
     else hi = mid
   }
   return lo
@@ -65,11 +72,15 @@ function node(table: DragTable, mach: number): number {
 /** Slope of the monotone cubic at node j (Steffen 1990); the end secants at the ends. */
 function nodeSlope(table: DragTable, j: number): number {
   const n = table.length - 1
-  const secant = (k: number) => (table[k + 1][1] - table[k][1]) / (table[k + 1][0] - table[k][0])
+  const secant = (k: number) => {
+    const [m0, c0] = entry(table, k)
+    const [m1, c1] = entry(table, k + 1)
+    return (c1 - c0) / (m1 - m0)
+  }
   if (j === 0) return secant(0)
   if (j === n) return secant(n - 1)
-  const h0 = table[j][0] - table[j - 1][0]
-  const h1 = table[j + 1][0] - table[j][0]
+  const h0 = entry(table, j)[0] - entry(table, j - 1)[0]
+  const h1 = entry(table, j + 1)[0] - entry(table, j)[0]
   const s0 = secant(j - 1)
   const s1 = secant(j)
   const p = (s0 * h1 + s1 * h0) / (h0 + h1)
@@ -83,8 +94,8 @@ function onSegment(
   mach: number,
   interpolation: DragInterpolation,
 ): number {
-  const [m0, c0] = table[k]
-  const [m1, c1] = table[k + 1]
+  const [m0, c0] = entry(table, k)
+  const [m1, c1] = entry(table, k + 1)
   if (interpolation !== 'monotone-cubic') return c0 + ((c1 - c0) * (mach - m0)) / (m1 - m0)
   // both slopes are 0 here; the cubic basis in floating point is off by up to one unit
   if (c0 === c1) return c0
@@ -105,8 +116,8 @@ export function dragCoefficient(
   mach: number,
   interpolation: DragInterpolation = 'linear',
 ): number {
-  if (mach <= table[0][0]) return table[0][1]
-  const last = table[table.length - 1]
+  if (mach <= entry(table, 0)[0]) return entry(table, 0)[1]
+  const last = entry(table, table.length - 1)
   if (mach >= last[0]) return last[1]
   return onSegment(table, node(table, mach), mach, interpolation)
 }
@@ -116,8 +127,8 @@ export function dragCoefficient(
  * first node, table.length - 1 at or above the last.
  */
 export function dragSegment(table: DragTable, mach: number): number {
-  if (mach < table[0][0]) return -1
-  if (mach >= table[table.length - 1][0]) return table.length - 1
+  if (mach < entry(table, 0)[0]) return -1
+  if (mach >= entry(table, table.length - 1)[0]) return table.length - 1
   return node(table, mach)
 }
 
@@ -133,8 +144,8 @@ const steepSegment = 100
  */
 export function heldSegment(table: DragTable, k: number, slope = true): boolean {
   if (k < 0 || k >= table.length - 1) return false
-  const [m0, c0] = table[k]
-  const [m1, c1] = table[k + 1]
+  const [m0, c0] = entry(table, k)
+  const [m1, c1] = entry(table, k + 1)
   // a narrow or steep drag segment's extension can reach zero drag within one trial step; a
   // coefficient table may change sign, so only the width rule applies to it
   return (
@@ -156,14 +167,16 @@ export function segmentCoefficient(
   interpolation: DragInterpolation = 'linear',
   held?: boolean,
 ): number {
-  if (k < 0) return table[0][1]
-  if (k >= table.length - 1) return table[table.length - 1][1]
+  if (k < 0) return entry(table, 0)[1]
+  if (k >= table.length - 1) return entry(table, table.length - 1)[1]
   const m =
-    (held ?? heldSegment(table, k)) ? Math.min(table[k + 1][0], Math.max(table[k][0], mach)) : mach
+    (held ?? heldSegment(table, k))
+      ? Math.min(entry(table, k + 1)[0], Math.max(entry(table, k)[0], mach))
+      : mach
   return onSegment(table, k, m, interpolation)
 }
 
 /** True when the Mach number lies inside the table's Mach range (no clamping needed). */
 export function inDragTable(table: DragTable, mach: number): boolean {
-  return mach >= table[0][0] && mach <= table[table.length - 1][0]
+  return mach >= entry(table, 0)[0] && mach <= entry(table, table.length - 1)[0]
 }

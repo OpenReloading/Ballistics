@@ -11,6 +11,7 @@ import {
 } from '../src/core/geometry.ts'
 import type { PartPoint } from '../src/core/section.ts'
 import type { Label } from '../src/core/types.ts'
+import { defined } from './defined.ts'
 
 const label = (c: PartPoint, dir: PartPoint = [1, 0], w = 4, h = 2): Label => ({
   text: 't',
@@ -29,8 +30,8 @@ const square = (x: number, y: number): PartPoint[] => [
 const near = (actual: PartPoint[], expected: PartPoint[]) => {
   expect(actual).toHaveLength(expected.length)
   actual.forEach((p, i) => {
-    expect(p[0]).toBeCloseTo(expected[i][0], 9)
-    expect(p[1]).toBeCloseTo(expected[i][1], 9)
+    expect(p[0]).toBeCloseTo(defined(expected[i])[0], 9)
+    expect(p[1]).toBeCloseTo(defined(expected[i])[1], 9)
   })
 }
 

@@ -120,7 +120,7 @@ describe('interiorLoad', () => {
   })
 
   it('takes a leak area of 0 and refuses one below 0, naming the field', () => {
-    expect(interiorLoad({ ...values, leakArea: 0 }).leakage?.area[0].area).toBe(0)
+    expect(interiorLoad({ ...values, leakArea: 0 }).leakage?.area[0]?.area).toBe(0)
     expect(() => interiorLoad({ ...values, leakArea: -1e-9 })).toThrow(
       expect.objectContaining({ field: 'leakArea' }),
     )

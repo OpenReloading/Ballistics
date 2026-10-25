@@ -167,7 +167,7 @@ export function bulletProfile(
 
 /** The middle of the longest shank run, off the cannelure: where the diameter goes. */
 function shankStation(t: number, z0: number, groove: BulletDimensions['cannelure']) {
-  const runs: [number, number][] = groove
+  const runs: [[number, number], ...[number, number][]] = groove
     ? [
         [t, groove.start],
         [groove.start + groove.width, z0],
@@ -175,6 +175,13 @@ function shankStation(t: number, z0: number, groove: BulletDimensions['cannelure
     : [[t, z0]]
   const [s0, s1] = runs.reduce((p, c) => (c[1] - c[0] > p[1] - p[0] ? c : p), runs[0])
   return (s0 + s1) / 2
+}
+
+/** Radius of the point the base face's edge reaches. */
+function baseRadius(o: Outline) {
+  const corner = o.points[o.baseEdge]
+  if (!corner) throw new Error('The outline has no base edge point.')
+  return corner[0]
 }
 
 /** The dimensions of the stored values `sourced` covers that the drawn outline `o` follows. */
@@ -187,7 +194,7 @@ function dimensionsOf(
   const a = diameter / 2
   const z0 = L - o.noseLength
   const t = z0 - o.bearingLength
-  const rb = o.points[o.baseEdge][0]
+  const rb = baseRadius(o)
   const tip = shape.tip?.type
   const groove = shape.cannelure
   const dimensions: Dimension[] = []
@@ -288,24 +295,22 @@ function ogiveRadii(
   const nosePoint = (share: number) => {
     const z = z0 + share * o.noseLength
     const nose = o.points.filter(([, pz]) => pz > z0 && pz < L)
-    return nose.reduce((p, c) => (Math.abs(c[1] - z) < Math.abs(p[1] - z) ? c : p), nose[0])
+    const first = nose[0]
+    return first && nose.reduce((p, c) => (Math.abs(c[1] - z) < Math.abs(p[1] - z) ? c : p), first)
   }
   for (const [symbol, value, share] of [
     ['R', shape.ogive?.radius, 0.5],
     ['Rt/R', shape.ogive?.radiusRatio, 0.75],
-  ] as const)
+  ] as const) {
     if (
-      value !== undefined &&
-      !round &&
-      sourced(symbol === 'R' ? 'ogive.radius' : 'ogive.radiusRatio')
+      value === undefined ||
+      round ||
+      !sourced(symbol === 'R' ? 'ogive.radius' : 'ogive.radiusRatio')
     )
-      radii.push({
-        kind: 'radius',
-        symbol,
-        value,
-        stored: { symbol, value },
-        corner: nosePoint(share),
-      })
+      continue
+    const corner = nosePoint(share)
+    if (corner) radii.push({ kind: 'radius', symbol, value, stored: { symbol, value }, corner })
+  }
   return radii
 }
 

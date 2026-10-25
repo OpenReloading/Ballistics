@@ -13,6 +13,7 @@ import { errorText } from '../lib/error-text.ts'
 import { type FaceSummary, fetchFace, fetchFaceSummaries } from '../lib/face-records.ts'
 import { type FieldSpec, type Fields, fieldError, initialFields } from '../lib/field-spec.ts'
 import { faceZones, impactSensitivity } from '../lib/hit-probability.ts'
+import { nth } from '../lib/nth.ts'
 import { formatNumber, formatQuantity, type UnitSystem } from '../lib/units.ts'
 import { NumberField } from './number-field.tsx'
 import { PanelTable } from './scroll-region.tsx'
@@ -107,7 +108,7 @@ export function HitProbability({
   const [at, setAt] = useState(() => {
     const best = candidates.reduce<number | undefined>(
       (b, { p, i }) =>
-        b === undefined || Math.abs(p.range - 100) < Math.abs(points[b].range - 100) ? i : b,
+        b === undefined || Math.abs(p.range - 100) < Math.abs(nth(points, b).range - 100) ? i : b,
       undefined,
     )
     return best ?? 0

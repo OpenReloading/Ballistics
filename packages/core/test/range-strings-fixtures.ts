@@ -1,4 +1,5 @@
 import { expect } from 'vitest'
+import { nth } from '../src/errors.ts'
 import {
   fitTruingStrings,
   lbPerSqInToKgPerSqM,
@@ -56,7 +57,7 @@ export function strings(truth: Truth, noise: () => number, at = defaultAt, exact
       drag: {
         ...g7,
         bands: [
-          { ballisticCoefficient: g7.bands[0].ballisticCoefficient / truth.k, minVelocity: 0 },
+          { ballisticCoefficient: nth(g7.bands, 0).ballisticCoefficient / truth.k, minVelocity: 0 },
         ],
       },
     },
@@ -129,8 +130,9 @@ export function coverage(
     for (const p of r.parameters) {
       expect(p.status).toBe('identified')
       const { lower: low, upper: high } = p.interval as { lower: number; upper: number }
-      covered[p.name] =
-        (covered[p.name] ?? 0) + (low <= wanted[p.name] && wanted[p.name] <= high ? 1 : 0)
+      const target = wanted[p.name]
+      if (target === undefined) throw new Error(`no true value for ${p.name}`)
+      covered[p.name] = (covered[p.name] ?? 0) + (low <= target && target <= high ? 1 : 0)
     }
     if (!r.consistent) inconsistent++
   }

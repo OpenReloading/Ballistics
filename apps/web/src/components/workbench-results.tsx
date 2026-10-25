@@ -411,7 +411,8 @@ function useTabFit(tab: ResultTab, setTab: (tab: ResultTab) => void, hasOutcome:
     const measure = () => {
       // a tab moved into the menu has no width: it keeps the one it was measured with
       row.querySelectorAll<HTMLElement>('[role="tab"]').forEach((t, i) => {
-        if (t.offsetWidth) widths.current.set(shownTabs[i][0], t.offsetWidth)
+        const tab = shownTabs[i]
+        if (tab && t.offsetWidth) widths.current.set(tab[0], t.offsetWidth)
       })
       setFit(
         resultTabsFit(

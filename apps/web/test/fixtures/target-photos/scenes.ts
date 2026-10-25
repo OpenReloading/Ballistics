@@ -5,6 +5,7 @@
  */
 
 import { seededRandom } from '../../../src/lib/ellipse.ts'
+import { defined } from '../../defined.ts'
 
 export type Rgb = [number, number, number]
 
@@ -172,12 +173,15 @@ function holeColourAt(s: Scene, d: number, edge: number, rv: number): Rgb | unde
 export function sceneAt(s: Scene, x: number, y: number, phase: number[]): Rgb {
   const rv = (s.caliberMm * s.visible * s.pxPerMm) / 2
   for (let i = 0; i < s.holes.length; i++) {
-    const h = s.holes[i]
+    const h = defined(s.holes[i])
     const d = Math.hypot(x - h.x, y - h.y)
     if (d > 1.3 * rv) continue
     const a = Math.atan2(y - h.y, x - h.x)
     const edge =
-      rv * (1 + 0.06 * Math.sin(5 * a + phase[2 * i]) + 0.03 * Math.sin(11 * a + phase[2 * i + 1]))
+      rv *
+      (1 +
+        0.06 * Math.sin(5 * a + defined(phase[2 * i])) +
+        0.03 * Math.sin(11 * a + defined(phase[2 * i + 1])))
     const colour = holeColourAt(s, d, edge, rv)
     if (colour) return colour
   }
@@ -208,7 +212,10 @@ export function render(s: Scene): Uint8Array {
       for (let k = 0; k < 3; k++) {
         // Box-Muller noise
         const n = Math.sqrt(-2 * Math.log(rnd() || 1e-9)) * Math.cos(2 * Math.PI * rnd())
-        out[(v * s.width + u) * 3 + k] = Math.max(0, Math.min(255, c[k] * light + s.noise * n))
+        out[(v * s.width + u) * 3 + k] = Math.max(
+          0,
+          Math.min(255, defined(c[k]) * light + s.noise * n),
+        )
       }
     }
   return out

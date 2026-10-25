@@ -37,6 +37,7 @@ import type { FieldValue } from '../lib/field-spec.ts'
 import { figureViews } from '../lib/figure-views.ts'
 import type { Suggestion } from '../lib/input-defaults.ts'
 import { productLabel, refName } from '../lib/manufacturers.ts'
+import { nth } from '../lib/nth.ts'
 import { type SeatingLengths, seatingLengthName } from '../lib/seating-ladder.ts'
 import {
   drawingLengthUnit,
@@ -206,7 +207,7 @@ function SeatedBullet({
   // the clips stay at the mouth while the bullet moves: in the bullet's frame the mouth is at caseLength - base
   const mouth = caseLength - base
   const r = Math.max(...outline.points.map(([y]) => y)) + 1
-  const z = outline.points[outline.points.length - 1][1] + 1
+  const z = nth(outline.points, outline.points.length - 1)[1] + 1
   return (
     <g className="seating">
       {leade !== undefined && g1 !== undefined && (

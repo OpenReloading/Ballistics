@@ -2,6 +2,7 @@ import { readRecords } from '@open-reloading/data'
 import type { TargetFace } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { scoredHoleDiameter, scoreGroupOnFace, scoreShot } from '../src/lib/ring-scoring.ts'
+import { defined } from './defined.ts'
 
 const { bundle } = readRecords()
 const faces = bundle.targetFaces
@@ -25,7 +26,7 @@ function boundaries(id: string, printed: number[], hole: number) {
     const value = 10 - i
     const edge = diameter / 2 + hole / 2
     expect(scoreShot(f, at(edge), hole * mm).value).toBe(value)
-    const outside = value === f.rings[0].value ? 0 : value - 1
+    const outside = value === defined(f.rings[0]).value ? 0 : value - 1
     expect(scoreShot(f, at(edge + off), hole * mm).value).toBe(outside)
   })
 }
@@ -78,7 +79,7 @@ describe('BDMP Sportordnung 24.02.2026, B.11.2 BDMP-Scheibe Nr. 1', () => {
 
   it('keeps the VdRBw .30 M1 face out of the record, with the disagreement in the note', () => {
     const f = face('bdmp-nr1-100m')
-    expect(f.rings[0].diameter.value).toBe(340)
+    expect(defined(f.rings[0]).diameter.value).toBe(340)
     const vdrbw = f.provenance.sources.find((s) => s.note?.startsWith('VdRBw 10.5'))
     expect(vdrbw?.note).toContain('1.65 cm')
     expect(vdrbw?.note).toContain('33.3 cm')

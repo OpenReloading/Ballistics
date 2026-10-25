@@ -37,7 +37,7 @@ describe('OpenReloading session JSON', () => {
     const r = parseChrono(text, { fileName: 'session.json' })
     expect(r?.format).toBe('openreloading-json')
     expect(r?.stringLabels).toEqual(['A', undefined])
-    expect(r?.session.strings[0].shots).toEqual([
+    expect(r?.session.strings[0]?.shots).toEqual([
       { velocity: { value: 853.5, raw: '853.5 m/s' }, coldBore: true },
       { velocity: { value: 856.1, raw: '856.1 m/s' } },
       { velocity: { value: 700, raw: '700 m/s' }, excluded: 'flyer' },

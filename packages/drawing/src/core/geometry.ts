@@ -5,7 +5,7 @@ import { add } from './vector.ts'
 
 /** Is the segment clear of the box's bounding circle's square (the box grown by `pad`)? */
 function clearOfReach(a: PartPoint, b: PartPoint, l: Label, reach: number) {
-  return [0, 1].some(
+  return ([0, 1] as const).some(
     (k) => Math.max(a[k], b[k]) < l.c[k] - reach || Math.min(a[k], b[k]) > l.c[k] + reach,
   )
 }
@@ -32,10 +32,11 @@ export function segHitsBox({ a, b }: { a: PartPoint; b: PartPoint }, l: Label, p
   const [p, q] = [local(a), local(b)]
   const [hw, hh] = [l.w / 2 + pad, l.h / 2 + pad]
   const t: [number, number] = [0, 1]
-  for (const [d, s, lim] of [
+  const axes: [number, number, number][] = [
     [q[0] - p[0], p[0], hw],
     [q[1] - p[1], p[1], hh],
-  ]) {
+  ]
+  for (const [d, s, lim] of axes) {
     if (!clipRange(t, d, s, lim) || !clipRange(t, -d, -s, lim)) return false
   }
   return t[0] <= t[1]
@@ -46,15 +47,17 @@ export function boxesOverlap(l: Label, m: Label, pad = 0) {
   const corners = (b: Label) => {
     const [ux, uy] = b.dir
     const [hw, hh] = [b.w / 2 + pad / 2, b.h / 2 + pad / 2]
-    return [
+    const quad: [number, number][] = [
       [hw, hh],
       [hw, -hh],
       [-hw, -hh],
       [-hw, hh],
-    ].map(([s, t]): PartPoint => [b.c[0] + s * ux - t * uy, b.c[1] + s * uy + t * ux])
+    ]
+    return quad.map(([s, t]): PartPoint => [b.c[0] + s * ux - t * uy, b.c[1] + s * uy + t * ux])
   }
   const [cl, cm] = [corners(l), corners(m)]
-  for (const [ux, uy] of [l.dir, [-l.dir[1], l.dir[0]], m.dir, [-m.dir[1], m.dir[0]]]) {
+  const axes: PartPoint[] = [l.dir, [-l.dir[1], l.dir[0]], m.dir, [-m.dir[1], m.dir[0]]]
+  for (const [ux, uy] of axes) {
     const proj = (pts: PartPoint[]) => pts.map(([x, y]) => x * ux + y * uy)
     const [a, b] = [proj(cl), proj(cm)]
     if (Math.max(...a) <= Math.min(...b) || Math.max(...b) <= Math.min(...a)) return false
@@ -82,16 +85,18 @@ export function segsCross(p: PartPoint, q: PartPoint, r: PartPoint, s: PartPoint
  * The four corners of a label's text box in the part frame, mm, in the order (+w/2, +h/2),
  * (+w/2, -h/2), (-w/2, -h/2), (-w/2, +h/2) from its centre, w along its direction, h across it.
  */
-export const labelCorners = (l: Label): PartPoint[] =>
-  [
+export const labelCorners = (l: Label): PartPoint[] => {
+  const signs: [number, number][] = [
     [1, 1],
     [1, -1],
     [-1, -1],
     [-1, 1],
-  ].map(([s, t]) => [
+  ]
+  return signs.map(([s, t]) => [
     l.c[0] + (s * l.w * l.dir[0]) / 2 - (t * l.h * l.dir[1]) / 2,
     l.c[1] + (s * l.w * l.dir[1]) / 2 + (t * l.h * l.dir[0]) / 2,
   ])
+}
 
 /** The corners of a filled arrowhead: its tip, then the two ends of its base. */
 export function arrowheadCorners({ at, dir: [ux, uy] }: Arrowhead): PartPoint[] {
@@ -120,6 +125,7 @@ export function polygonsOverlap(p: PartPoint[], q: PartPoint[], pad = 0) {
   for (const poly of [p, q])
     for (let i = 0; i < poly.length; i++) {
       const [a, b] = [poly[i], poly[(i + 1) % poly.length]]
+      if (!a || !b) continue
       const l = Math.hypot(b[0] - a[0], b[1] - a[1])
       if (l > 1e-12 && apart((a[1] - b[1]) / l, (b[0] - a[0]) / l)) return false
     }

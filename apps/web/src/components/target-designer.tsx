@@ -354,7 +354,7 @@ export function TargetDesigner() {
         <div className="designer-drawing" data-stale={!shape || undefined}>
           <TargetFaceFigure
             shape={shown}
-            label={`${name}: ${shown.rings.length} rings, ${shown.rings[0].diameter.value} mm across`}
+            label={`${name}: ${shown.rings.length} rings, ${shown.rings[0]?.diameter.value} mm across`}
           />
         </div>
       ) : (

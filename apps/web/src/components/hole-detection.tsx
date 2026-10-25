@@ -361,7 +361,8 @@ export function useHoleDetection({
         if (m.kind !== 'face') return
         setFound(m.search)
         const { fits } = m.search
-        if (fits.length === 1 && m.search.sure) return applyFit(fits[0], thenDetect)
+        const [only] = fits
+        if (only && fits.length === 1 && m.search.sure) return applyFit(only, thenDetect)
         const next = faceFollowUp(m.search)
         setStep(next.step)
         say(next.text)
@@ -408,7 +409,7 @@ export function useHoleDetection({
   async function pickFace(value: string) {
     if (!found || !value) return
     const stopped = stops.current
-    const [id, event] = value.split('|')
+    const [id = '', event] = value.split('|')
     const fit =
       found.fits.find((f) => f.face.id === id) ??
       (await fetchFace(id).then(
@@ -715,10 +716,11 @@ function faceFollowUp({ fits, black }: FaceSearch) {
       step: 1,
       text: 'More than one face fits these rings: choose the target in Target face.',
     }
-  if (fits.length === 1)
+  const [only] = fits
+  if (only)
     return {
       step: 1,
-      text: `The rings may be those of the ${fits[0].face.name}: choose it in Target face to use it.`,
+      text: `The rings may be those of the ${only.face.name}: choose it in Target face to use it.`,
     }
   return {
     step: 1,
@@ -738,11 +740,18 @@ function regionClick(
   reach: number,
 ): { pending: Point[] } | { region: Point[] } {
   const pts = [...pending, p]
-  if (shape === 'rectangle')
-    return pts.length < 2 ? { pending: pts } : { region: rectangleFromDiagonal(pts[0], pts[1]) }
+  if (shape === 'rectangle') {
+    const [a, b] = pts
+    return a && b ? { region: rectangleFromDiagonal(a, b) } : { pending: pts }
+  }
   const near = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y) <= reach
+  const [head] = pending
+  const tail = pending[pending.length - 1]
   const closes =
-    pending.length >= 3 && (near(p, pending[0]) || near(p, pending[pending.length - 1]))
+    pending.length >= 3 &&
+    head !== undefined &&
+    tail !== undefined &&
+    (near(p, head) || near(p, tail))
   if (!closes && pts.length < 64) return { pending: pts }
   return { region: closes ? pending : pts }
 }

@@ -249,7 +249,7 @@ function StepSizeField() {
       : ladderKind === 'temperature'
         ? tempStep.tempStep
         : ladder.ladderStep
-  const setValue = (v: typeof value) => {
+  const setValue = (v: FieldValue) => {
     if (ladderKind === 'seating') setSeatStep({ seatStep: v })
     else if (ladderKind === 'temperature') setTempStep({ tempStep: v })
     else setLadder({ ladderStep: v })

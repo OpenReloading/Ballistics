@@ -13,6 +13,7 @@ import {
   lotFractionError,
   lots,
 } from '../lib/lot-rows.ts'
+import { nth } from '../lib/nth.ts'
 import { roundedFieldText, type UnitSystem } from '../lib/units.ts'
 import {
   needsNetwork,
@@ -85,8 +86,9 @@ async function lotAnswer(
     if (signal.aborted) return undefined
     const failed = answers.find((a) => !a.res.ok || a.json === undefined)
     if (failed) return { message: failed.json?.message ?? `The API answered ${failed.res.status}.` }
-    const [low, high] = answers.map((a) => stepsOf(a.json, charges[0]))
-    return { steps: { low, high } }
+    const charge = nth(charges, 0)
+    const [first, second] = [nth(answers, 0), nth(answers, 1)]
+    return { steps: { low: stepsOf(first.json, charge), high: stepsOf(second.json, charge) } }
   } catch {
     if (signal.aborted) return undefined
     return { message: navigator.onLine ? notReached : needsNetwork }

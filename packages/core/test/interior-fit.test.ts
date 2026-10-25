@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { nth } from '../src/errors.ts'
 import {
   fitPowder,
   InputError,
@@ -44,10 +45,10 @@ const ladder = (truth: InteriorLoad, v: number, p: number, n = 0): LadderPoint[]
     if (!r.valid) throw new Error(r.reason)
     return {
       charge,
-      muzzleVelocity: r.muzzleVelocity + n * noise[i] * (v || 1),
+      muzzleVelocity: r.muzzleVelocity + n * nth(noise, i) * (v || 1),
       ...(v ? { velocitySigma: v } : {}),
       ...(p
-        ? { peakPressure: r.peakBreechPressure + n * noise[(i + 2) % 5] * p, pressureSigma: p }
+        ? { peakPressure: r.peakBreechPressure + n * nth(noise, (i + 2) % 5) * p, pressureSigma: p }
         : {}),
     }
   })
@@ -67,8 +68,8 @@ describe('powder fit round trips', () => {
   it('fits the burn coefficient alone by default and keeps the start pressure', () => {
     const r = fitPowder(load(0.38), ladder(load(), 3, 0))
     expect(r.parameters.map((p) => p.name)).toEqual(['burnRate'])
-    expect(r.parameters[0].initial).toBe(0.38)
-    expect(rel(r.parameters[0].value, 0.45)).toBeLessThan(1e-6)
+    expect(nth(r.parameters, 0).initial).toBe(0.38)
+    expect(rel(nth(r.parameters, 0).value, 0.45)).toBeLessThan(1e-6)
     expect(r.load.startPressure).toBe(30e6)
     expect(r.degreesOfFreedom).toBe(4)
     // one evaluation runs every charge once: the start (1), the Jacobian by central differences
@@ -87,7 +88,7 @@ describe('powder fit round trips', () => {
   it('keeps the default with pressures and a start pressure of 0', () => {
     const r = fitPowder(load(0.38, 0), ladder(load(0.45, 0), 3, 10e6))
     expect(r.parameters.map((p) => p.name)).toEqual(['burnRate'])
-    expect(rel(r.parameters[0].value, 0.45)).toBeLessThan(1e-6)
+    expect(rel(nth(r.parameters, 0).value, 0.45)).toBeLessThan(1e-6)
     expect(r.load.startPressure).toBe(0)
     expect(r.degreesOfFreedom).toBe(9)
   })
@@ -106,10 +107,10 @@ describe('powder fit round trips', () => {
       },
     })
     const r = fitPowder(sphere(4e-9), ladder(sphere(5e-9), 3, 0))
-    expect(rel(r.parameters[0].value, 5e-9)).toBeLessThan(1e-6)
+    expect(rel(nth(r.parameters, 0).value, 5e-9)).toBeLessThan(1e-6)
     expect(r.load.propellant.burn).toEqual({
       ...sphere(5e-9).propellant.burn,
-      coefficient: r.parameters[0].value,
+      coefficient: nth(r.parameters, 0).value,
     })
   })
 })
@@ -122,11 +123,11 @@ describe('powder fit uncertainty', () => {
     const truth = [0.45, 30e6]
     noisy.parameters.forEach((p, k) => {
       expect(p.standardUncertainty).toBeGreaterThan(0)
-      expect(Math.abs(p.value - truth[k])).toBeLessThan(2 * (p.standardUncertainty ?? 0))
+      expect(Math.abs(p.value - nth(truth, k))).toBeLessThan(2 * (p.standardUncertainty ?? 0))
     })
     expect(noisy.degreesOfFreedom).toBe(8)
     // apps/docs/docs/models/interior-powder-fit.md, "Identifiability": sigma(p_st) 6.15 MPa
-    expect(rel(noisy.parameters[1].standardUncertainty ?? 0, 6.15e6)).toBeLessThan(0.01)
+    expect(rel(nth(noisy.parameters, 1).standardUncertainty ?? 0, 6.15e6)).toBeLessThan(0.01)
     const chi = noisy.residuals.reduce(
       (s, x) => s + (x.residual / (x.kind === 'velocity' ? 3 : 5e6)) ** 2,
       0,
@@ -136,9 +137,9 @@ describe('powder fit uncertainty', () => {
 
   it('reports the correlation of a velocity-only ladder', () => {
     const r = fitPowder(load(0.38, 20e6), ladder(load(), 3, 0), { parameters: both })
-    expect(Math.abs(r.correlation?.[0][1] ?? 0)).toBeGreaterThan(0.99)
-    expect(r.parameters[1].standardUncertainty).toBeGreaterThan(
-      2 * (noisy.parameters[1].standardUncertainty ?? Infinity),
+    expect(Math.abs(r.correlation?.[0]?.[1] ?? 0)).toBeGreaterThan(0.99)
+    expect(nth(r.parameters, 1).standardUncertainty).toBeGreaterThan(
+      2 * (nth(noisy.parameters, 1).standardUncertainty ?? Infinity),
     )
     // apps/docs/docs/models/interior-powder-fit.md, "Identifiability": kappa 28.5
     expect(rel(r.conditionNumber, 28.5)).toBeLessThan(0.02)
@@ -146,8 +147,8 @@ describe('powder fit uncertainty', () => {
 
   it('recovers both parameters from a start above the truth', () => {
     const r = fitPowder(load(0.5, 45e6), ladder(load(), 3, 5e6), { parameters: both })
-    expect(rel(r.parameters[0].value, 0.45)).toBeLessThan(1e-6)
-    expect(rel(r.parameters[1].value, 30e6)).toBeLessThan(1e-6)
+    expect(rel(nth(r.parameters, 0).value, 0.45)).toBeLessThan(1e-6)
+    expect(rel(nth(r.parameters, 1).value, 30e6)).toBeLessThan(1e-6)
   })
 
   it('reports a start pressure driven to the floor as unresolved', () => {
@@ -157,7 +158,7 @@ describe('powder fit uncertainty', () => {
     )
     expect(e.reason).toBe('unresolved')
     expect(e.unresolved).toEqual([1])
-    expect(rel(e.estimate?.[1].value ?? 0, 5e6)).toBeLessThan(1e-3)
+    expect(rel(e.estimate?.[1]?.value ?? 0, 5e6)).toBeLessThan(1e-3)
   })
 
   it('scales the covariance by the residual variance without sigmas', () => {
@@ -171,8 +172,8 @@ describe('powder fit uncertainty', () => {
     const scale = Math.sqrt(u.chiSquare / u.degreesOfFreedom)
     expect(
       rel(
-        u.parameters[0].standardUncertainty ?? 0,
-        (w.parameters[0].standardUncertainty ?? 0) * scale,
+        nth(u.parameters, 0).standardUncertainty ?? 0,
+        (nth(w.parameters, 0).standardUncertainty ?? 0) * scale,
       ),
     ).toBeLessThan(1e-6)
   })
@@ -181,8 +182,8 @@ describe('powder fit uncertainty', () => {
     const plain = ladder(load(), 0, 0)
     const r = fitPowder(load(), plain)
     expect(r.chiSquare).toBe(0)
-    expect(r.parameters[0].standardUncertainty).toBe(0)
-    expect(r.correlation?.[0][0]).toBeNaN()
+    expect(nth(r.parameters, 0).standardUncertainty).toBe(0)
+    expect(r.correlation?.[0]?.[0]).toBeNaN()
   })
 })
 
@@ -192,7 +193,7 @@ describe('powder fit result', () => {
     const points = ladder(load(), 3, 10e6).map(({ peakPressure, pressureSigma, ...x }, i) =>
       i % 2 ? { ...x, peakPressure, pressureSigma } : x,
     )
-    const twin = { ...points[2], muzzleVelocity: points[2].muzzleVelocity + 2 }
+    const twin = { ...nth(points, 2), muzzleVelocity: nth(points, 2).muzzleVelocity + 2 }
     const r = fitPowder(load(0.38), [...points, twin])
     expect(r.residuals.map((x) => `${x.kind} ${x.charge}`)).toEqual([
       'velocity 0.0026',
@@ -212,7 +213,7 @@ describe('powder fit result', () => {
       ...base,
       propellant: {
         ...base.propellant,
-        burn: { ...base.propellant.burn, vivacity: r.parameters[0].value },
+        burn: { ...base.propellant.burn, vivacity: nth(r.parameters, 0).value },
       },
     })
     expect(r.load.charge).toBe(0.0028)
@@ -224,7 +225,7 @@ describe('powder fit result', () => {
     const points = ladder(truth, 3, 2e6)
     const r = fitPowder(truth, points, { parameters: ['burnRate', 'startPressure'] })
     // one step, not accepted: the burn coefficient stays exactly at its start
-    expect([r.iterations, r.parameters[0].value]).toEqual([1, 0.45])
+    expect([r.iterations, nth(r.parameters, 0).value]).toEqual([1, 0.45])
     expect(r.load.startPressure).not.toBe(truth.startPressure)
     for (const x of r.residuals) {
       const run = interior({ ...r.load, charge: x.charge })
@@ -253,7 +254,7 @@ describe('powder fit failures', () => {
     const same = failure(() =>
       fitPowder(
         load(0.38, 20e6),
-        [points[2], { ...points[2], muzzleVelocity: points[2].muzzleVelocity + 3 }],
+        [nth(points, 2), { ...nth(points, 2), muzzleVelocity: nth(points, 2).muzzleVelocity + 3 }],
         {
           parameters: both,
         },
@@ -263,7 +264,9 @@ describe('powder fit failures', () => {
     expect(same.conditionNumber).toBeGreaterThan(1e3)
     // both parameters raise the velocity and the column-scaled columns are equal, so the weak
     // direction is (1, -1)/sqrt(2) up to sign
-    const [d0, d1] = same.direction ?? []
+    const direction = same.direction ?? []
+    const d0 = nth(direction, 0)
+    const d1 = nth(direction, 1)
     expect(same.direction).toHaveLength(2)
     expect(Math.abs(Math.abs(d0) - Math.SQRT1_2)).toBeLessThan(1e-6)
     expect(Math.abs(d0 + d1)).toBeLessThan(1e-6)
@@ -276,13 +279,15 @@ describe('powder fit failures', () => {
 
   it('reports each failure reason', () => {
     const broken = { ...load(), chamber: { ...load().chamber, volume: -1 } }
-    const under = failure(() => fitPowder(broken, [points[0]], { parameters: both }))
+    const under = failure(() => fitPowder(broken, [nth(points, 0)], { parameters: both }))
     expect(under.reason).toBe('underdetermined')
     expect(under.message).toBe('powder fit: underdetermined')
     expect(under).toBeInstanceOf(InputError)
 
     // covolume times 3.5 g exceeds the 3.4 cm3 chamber
-    const big = failure(() => fitPowder(load(0.38), [...points, { ...points[4], charge: 3.5e-3 }]))
+    const big = failure(() =>
+      fitPowder(load(0.38), [...points, { ...nth(points, 4), charge: 3.5e-3 }]),
+    )
     expect(big.reason).toBe('invalid')
     expect(big.charge).toBe(3.5e-3)
     expect(big.result?.reason).toBe('chamberVolume')
@@ -325,7 +330,7 @@ describe('powder fit failures', () => {
         expect(e).not.toBeInstanceOf(PowderFitError)
       }
     }
-    const p = points[0]
+    const p = nth(points, 0)
     const { velocitySigma: _, ...bare } = p
     plain(() => fitPowder(load(), []))
     plain(() => fitPowder(load(), [{ ...p, charge: -1 }]))
@@ -378,10 +383,10 @@ describe('powder fit prior and robust loss', () => {
     expect(e.reason).toBe('ill-conditioned')
     const r = fitPowder(load(0.38, 20e6), narrowTruth, { parameters: both, priors })
     expect(r.degreesOfFreedom).toBe(0)
-    expect(rel(r.parameters[0].value, 0.45)).toBeLessThan(1e-3)
-    expect(r.parameters[0].standardUncertainty).toBeGreaterThan(0)
-    expect(r.parameters[0].standardUncertainty).toBeLessThan(0.3 * 0.45)
-    expect(r.parameters[1].standardUncertainty).toBeGreaterThan(0)
+    expect(rel(nth(r.parameters, 0).value, 0.45)).toBeLessThan(1e-3)
+    expect(nth(r.parameters, 0).standardUncertainty).toBeGreaterThan(0)
+    expect(nth(r.parameters, 0).standardUncertainty).toBeLessThan(0.3 * 0.45)
+    expect(nth(r.parameters, 1).standardUncertainty).toBeGreaterThan(0)
     expect(r.priorChiSquare).toBeLessThan(1e-6)
   })
 
@@ -393,9 +398,9 @@ describe('powder fit prior and robust loss', () => {
       priors: { burnRate: { value: 0.1, sigma: 1e5 }, startPressure: { value: 9e6, sigma: 1e5 } },
     })
     plain.parameters.forEach((p, k) => {
-      expect(rel(wide.parameters[k].value, p.value)).toBeLessThan(1e-6)
+      expect(rel(nth(wide.parameters, k).value, p.value)).toBeLessThan(1e-6)
       expect(
-        rel(wide.parameters[k].standardUncertainty ?? 0, p.standardUncertainty ?? 1),
+        rel(nth(wide.parameters, k).standardUncertainty ?? 0, p.standardUncertainty ?? 1),
       ).toBeLessThan(1e-6)
     })
     expect(rel(wide.chiSquare, plain.chiSquare)).toBeLessThan(1e-6)
@@ -410,8 +415,8 @@ describe('powder fit prior and robust loss', () => {
     const none = fitPowder(load(0.38), points)
     expect([none.priorChiSquare, none.dataChiSquare]).toEqual([0, none.chiSquare])
     // a prior pulls the fit toward its centre
-    expect(Math.abs(Math.log(r.parameters[0].value / 0.3))).toBeLessThan(
-      Math.abs(Math.log(none.parameters[0].value / 0.3)),
+    expect(Math.abs(Math.log(nth(r.parameters, 0).value / 0.3))).toBeLessThan(
+      Math.abs(Math.log(nth(none.parameters, 0).value / 0.3)),
     )
   })
 
@@ -421,7 +426,7 @@ describe('powder fit prior and robust loss', () => {
       i === 2 ? { ...x, muzzleVelocity: x.muzzleVelocity + 15 } : x,
     )
     const error = (r: { parameters: { value: number }[] }) =>
-      Math.abs(Math.log(r.parameters[0].value / 0.45))
+      Math.abs(Math.log(nth(r.parameters, 0).value / 0.45))
     const plain = fitPowder(load(0.38), bad)
     const robust = fitPowder(load(0.38), bad, { huberThreshold: 1.5 })
     expect(error(robust)).toBeLessThan(error(plain))
@@ -429,7 +434,7 @@ describe('powder fit prior and robust loss', () => {
     expect(robust.dataChiSquare).toBeGreaterThanOrEqual(plain.dataChiSquare)
     // a threshold above every residual is the quadratic loss
     const loose = fitPowder(load(0.38), bad, { huberThreshold: 100 })
-    expect(loose.parameters[0].value).toBe(plain.parameters[0].value)
+    expect(nth(loose.parameters, 0).value).toBe(nth(plain.parameters, 0).value)
   })
 
   it('rejects malformed priors and a Huber loss without sigmas', () => {
@@ -487,9 +492,9 @@ describe('powder fit prediction bands', () => {
       held.forEach((t, i) => {
         const p = predictPowder(fit, t.charge, { options: coarse })
         if (p.velocity.lower <= t.muzzleVelocity && t.muzzleVelocity <= p.velocity.upper)
-          covered[i].velocity++
+          nth(covered, i).velocity++
         if (p.pressure.lower <= t.peakBreechPressure && t.peakBreechPressure <= p.pressure.upper)
-          covered[i].pressure++
+          nth(covered, i).pressure++
       })
     }
     for (const c of covered) {

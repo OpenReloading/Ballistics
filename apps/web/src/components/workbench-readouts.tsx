@@ -665,7 +665,9 @@ export function LadderStrip({
             if (e.key !== 'Home' && e.key !== 'End') return
             e.preventDefault()
             const valid = steps.filter((s) => s.body)
-            const to = (e.key === 'Home' ? valid[0] : valid[valid.length - 1]).n - 1
+            const target = e.key === 'Home' ? valid[0] : valid[valid.length - 1]
+            if (!target) return
+            const to = target.n - 1
             select(to)
             e.currentTarget.querySelectorAll('input')[to]?.focus()
           }}

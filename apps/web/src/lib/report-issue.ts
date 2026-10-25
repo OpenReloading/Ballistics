@@ -65,12 +65,13 @@ const recordKinds: Record<string, string> = {
 /** The record kind and id of a record page's route, else undefined. */
 export function reportRecord(route: string): { kind: string; id: string } | undefined {
   const [, list, id, more] = route.split('/')
-  if (!recordKinds[list] || !id || more !== undefined) return
+  const kind = list === undefined ? undefined : recordKinds[list]
+  if (!kind || !id || more !== undefined) return
   if (['designer', 'compare', 'burn-rates'].includes(id)) return
   try {
-    return { kind: recordKinds[list], id: decodeURIComponent(id) }
+    return { kind, id: decodeURIComponent(id) }
   } catch {
-    return { kind: recordKinds[list], id }
+    return { kind, id }
   }
 }
 
@@ -100,7 +101,8 @@ export type Report = {
 
 /** "Report: <area>: <type>: " and the first line of `what`, else the page title. */
 export function reportTitle(r: Pick<Report, 'area' | 'type' | 'what' | 'context'>) {
-  const line = Array.from(r.what.trim().split('\n')[0].trim() || r.context.title)
+  const [first = ''] = r.what.trim().split('\n')
+  const line = Array.from(first.trim() || r.context.title)
   return `Report: ${r.area}: ${r.type}: ${line.length > 100 ? `${line.slice(0, 99).join('')}…` : line.join('')}`
 }
 

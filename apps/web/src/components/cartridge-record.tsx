@@ -354,7 +354,7 @@ function SidePanel({
   const [active, setActive] = useState(rows[0]?.key)
   const groups = rows.reduce<CombinedRow[][]>((all, r) => {
     const last = all.at(-1)
-    if (last?.[0].group === r.group) last.push(r)
+    if (last?.[0]?.group === r.group) last.push(r)
     else all.push([r])
     return all
   }, [])
@@ -395,8 +395,8 @@ function SidePanel({
             {/* a group per tbody: named for a screen reader, a heavier rule above it on screen */}
             {groups.map((group) => (
               <TableTbody
-                key={group[0].group}
-                aria-label={rowGroups.find(([g]) => g === group[0].group)?.[1]}
+                key={group[0]?.group}
+                aria-label={rowGroups.find(([g]) => g === group[0]?.group)?.[1]}
               >
                 {group.map((r) => (
                   <SideRow
@@ -560,7 +560,8 @@ export function RecordFacts({
   const pressures = items.filter(({ v }) => v.quantity === 'pressure')
   const test = items.filter(({ v }) => v.quantity !== 'pressure')
   const fact = ({ v, notes }: (typeof items)[number], lead = false) => {
-    const [now, ...also] = [system, ...slotUnits].map((u) => factParts(v, u))
+    const now = factParts(v, system)
+    const also = slotUnits.map((u) => factParts(v, u))
     const text = (p: typeof now) => `${p.number}${p.tolerance ? ` ${p.tolerance}` : ''}`
     return (
       <Fact

@@ -40,8 +40,8 @@ export function openCatalogue({ index, records }: CatalogueData): Catalogue {
   }
   const get = <K extends CatalogueKind>(kind: K, id: string): Catalogued<K> | undefined => {
     const byId = load()[kind] as Record<string, object>
-    if (!Object.hasOwn(byId, id)) return undefined
-    const record = byId[id]
+    const record = Object.hasOwn(byId, id) ? byId[id] : undefined
+    if (record === undefined) return undefined
     return { ...record, kind, origin: 'catalogue', revision: revisionOf(record) } as Catalogued<K>
   }
   const cartridgeItems = new Map(index.cartridges.map((r) => [r.item.id, r.item]))
@@ -84,9 +84,11 @@ export function openCatalogue({ index, records }: CatalogueData): Catalogue {
       const map = (index.renames as Record<string, Record<string, string> | undefined>)[kind]
       return map && Object.hasOwn(map, id) ? map[id] : undefined
     },
-    capacities: (cartridge) =>
-      (Object.hasOwn(index.capacities, cartridge) ? index.capacities[cartridge] : []).flatMap(
-        (id) => get('caseCapacity', id) ?? [],
-      ),
+    capacities: (cartridge) => {
+      const ids = Object.hasOwn(index.capacities, cartridge)
+        ? index.capacities[cartridge]
+        : undefined
+      return (ids ?? []).flatMap((id) => get('caseCapacity', id) ?? [])
+    },
   }
 }

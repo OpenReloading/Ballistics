@@ -2,6 +2,7 @@ import type { TrajectoryPoint } from '@open-reloading/core'
 import type { TargetFace } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { faceZones, impactSensitivity } from '../src/lib/hit-probability.ts'
+import { defined } from './defined.ts'
 
 const mm = (value: number) => ({ value })
 const face = {
@@ -21,11 +22,11 @@ describe('faceZones', () => {
       [0.014, 0.019, 3],
     ]
     zones.forEach((z, i) => {
-      expect(z.halfWidth).toBeCloseTo(expected[i][0], 12)
-      expect(z.halfHeight).toBeCloseTo(expected[i][1], 12)
-      expect(z.value).toBe(expected[i][2])
+      expect(z.halfWidth).toBeCloseTo(defined(defined(expected[i])[0]), 12)
+      expect(z.halfHeight).toBeCloseTo(defined(defined(expected[i])[1]), 12)
+      expect(z.value).toBe(defined(expected[i])[2])
     })
-    expect(faceZones(face, 0)[0].halfWidth).toBe(0.05)
+    expect(defined(faceZones(face, 0)[0]).halfWidth).toBe(0.05)
   })
 })
 

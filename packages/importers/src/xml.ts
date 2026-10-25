@@ -28,7 +28,8 @@ const isXmlChar = (c: number) =>
 
 /** The text of the entity or character reference `&name;`. */
 function replacementOf(name: string): string {
-  if (Object.hasOwn(predefined, name)) return predefined[name]
+  const known = Object.hasOwn(predefined, name) ? predefined[name] : undefined
+  if (known !== undefined) return known
   const m = /^#(?:x([0-9a-fA-F]+)|([0-9]+))$/.exec(name)
   if (!m) throw new Error(`unknown entity &${name};`)
   const code = m[1] ? Number.parseInt(m[1], 16) : Number(m[2])
@@ -116,14 +117,16 @@ function readAttributes(
   const seen = new Set<string>()
   let end = at
   for (let a = match(attributeAt, text, end); a; a = match(attributeAt, text, end)) {
-    if (seen.has(a[1])) throw new Error(`duplicate attribute ${a[1]} in <${qname}>`)
-    seen.add(a[1])
+    // every match has the name (group 1) and one quoted value (group 2 or 3)
+    const name = a[1] as string
+    if (seen.has(name)) throw new Error(`duplicate attribute ${name} in <${qname}>`)
+    seen.add(name)
     if (seen.size > maxAttributes) {
       throw new Error(`more than ${maxAttributes} attributes in <${qname}>`)
     }
     spend(remaining, 'characters', a[0].length)
-    if (a[1] !== 'xmlns' && !a[1].startsWith('xmlns:')) {
-      attributes[local(a[1])] = references(a[2] ?? a[3])
+    if (name !== 'xmlns' && !name.startsWith('xmlns:')) {
+      attributes[local(name)] = references((a[2] ?? a[3]) as string)
     }
     end += a[0].length
   }

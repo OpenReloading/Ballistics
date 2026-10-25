@@ -13,6 +13,7 @@ import { expectedHoleSize, MIN_HOLES_TO_LEARN_SIZE } from '../src/lib/hole-propo
 import type { RgbaImage } from '../src/lib/image.ts'
 import type { Point } from '../src/lib/target-geometry.ts'
 import { paperOutline } from '../src/lib/target-paper.ts'
+import { defined } from './defined.ts'
 
 const detectHoles = (input: HoleDetectionInput): HoleProposal[] => findHoles(input).proposals
 
@@ -115,7 +116,7 @@ class Scene {
         [0, 3.4, 2.5, 4],
         [0, 0, 0.6, 4],
         [1.9, 0, 2.5, 4],
-      ])
+      ] satisfies [number, number, number, number][])
         this.rect(x + a * mm, y + b * mm, x + c * mm, y + d * mm, v)
     }
     for (const r of [15, 21, 27]) digit(cx + r * 0.7 * mm, cy - r * 0.7 * mm, PAPER)
@@ -134,7 +135,7 @@ class Scene {
         const i = y * this.width + x
         const g = Math.sqrt(-2 * Math.log(1 - this.rnd())) * Math.cos(2 * Math.PI * this.rnd())
         const f = gradient ? gradient(x, y) : 1
-        const v = this.lum[i] * f + noise * g
+        const v = defined(this.lum[i]) * f + noise * g
         const c = this.colour.get(i)
         data.set(
           c
@@ -196,7 +197,7 @@ describe('detectFromExample', () => {
         expect(p.confidence).toBeGreaterThan(0.6)
       }
     }
-    const first = from(s, truth[0])?.proposals ?? []
+    const first = from(s, defined(truth[0]))?.proposals ?? []
     expect(new Set(first.map((p) => p.clusterId)).size).toBe(3)
     // sorted by confidence
     expect(first.map((p) => p.confidence)).toEqual(
@@ -211,7 +212,7 @@ describe('detectFromExample', () => {
       { x: 420, y: 180 },
     ]
     for (const t of truth) s.hole(t, 60)
-    const found = from(s, truth[0])
+    const found = from(s, defined(truth[0]))
     expect(found?.example.polarity).toBe('dark')
     expect(found?.example.backing.r).toBeLessThan(100)
     expect(Math.abs((found?.holeDiameter ?? 0) / bullet - 1)).toBeLessThan(0.2)
@@ -223,7 +224,7 @@ describe('detectFromExample', () => {
       { x: 450 - 21 * pxPerMm, y: 450 - 5 * pxPerMm },
     ]
     for (const t of light) dark.hole(t, 140)
-    expect(from(dark, light[0])?.example.polarity).toBe('light')
+    expect(from(dark, defined(light[0]))?.example.polarity).toBe('light')
   })
 
   it('finds light holes on the dark aiming area, also across its edge, and not the dark ones on paper', () => {
@@ -238,7 +239,7 @@ describe('detectFromExample', () => {
     for (const t of truth) s.hole(t, 140)
     const onPaper = { x: 450 + 50 * mm, y: 450 - 50 * mm }
     s.hole(onPaper, 60)
-    const found = from(s, truth[0])?.proposals ?? []
+    const found = from(s, defined(truth[0]))?.proposals ?? []
     expectTop(found, truth, 0.12)
     // the hole on paper is dark: its own example finds it
     expect(
@@ -261,7 +262,7 @@ describe('detectFromExample', () => {
     const curl = (x: number, y: number) => 0.7 + 0.3 * (x / 900) - 0.1 * (y / 900) ** 2
     const found = detectFromExample(
       { image: s.image({ gradient: curl }), region: all(s), pxPerM, expectedHoleDiameter: bullet },
-      truth[0],
+      defined(truth[0]),
     )
     expectTop(found?.proposals ?? [], truth, 0.12)
   })
@@ -278,7 +279,7 @@ describe('detectFromExample', () => {
       y: c.y + 0.6 * D * Math.sin((2 * Math.PI * k) / 3 + 0.3),
     }))
     for (const t of [...pair, ...three]) s.hole(t, 60)
-    const found = from(s, pair[0])?.proposals ?? []
+    const found = from(s, defined(pair[0]))?.proposals ?? []
     expectHoles(found, [...pair, ...three], 0.2)
     const left = found.filter((p) => p.x < 450)
     const right = found.filter((p) => p.x >= 450)
@@ -299,7 +300,7 @@ describe('detectFromExample', () => {
     ]
     for (const t of truth) s.hole(t, 60, d)
     for (const prior of [0.85, 1, 1.25]) {
-      const found = from(s, truth[0], { expectedHoleDiameter: bullet * prior })
+      const found = from(s, defined(truth[0]), { expectedHoleDiameter: bullet * prior })
       expectHoles(found?.proposals ?? [], truth, 0.12)
       expect(
         Math.abs((found?.holeDiameter ?? 0) / (d / pxPerM) - 1),
@@ -407,7 +408,7 @@ describe('autoDetect and findHoles', () => {
       truth,
       0.1,
     )
-    expectHoles(from(s, truth[0])?.proposals ?? [], truth, 0.1)
+    expectHoles(from(s, defined(truth[0]))?.proposals ?? [], truth, 0.1)
   })
 
   it('proposes nothing from a single stain', () => {
@@ -497,7 +498,7 @@ describe('autoDetect and findHoles', () => {
     ]
     const stain = { x: 1500, y: 900 }
     for (const t of [...group, flier, ...second, stain]) s.hole(t, 60)
-    const found = from(s, group[0])?.proposals ?? []
+    const found = from(s, defined(group[0]))?.proposals ?? []
     expectHoles(found, [...group, flier, ...second], 0.1)
   })
 
@@ -511,7 +512,7 @@ describe('autoDetect and findHoles', () => {
     const start = performance.now()
     const found = detectFromExample(
       { image, region: all(s), pxPerM, expectedHoleDiameter: bullet },
-      truth[0],
+      defined(truth[0]),
     )
     const ms = performance.now() - start
     expectHoles(found?.proposals ?? [], truth, 0.1)
@@ -556,7 +557,7 @@ describe('measured hole size', () => {
       { x: 700, y: 120, d: D },
     ]
     for (const t of singles) s.hole(t, 60, t.d)
-    const found = from(s, singles[0])?.proposals ?? []
+    const found = from(s, defined(singles[0]))?.proposals ?? []
     for (const t of singles) {
       const p = found.find((f) => Math.hypot(f.x - t.x, f.y - t.y) < 0.2 * D)
       expect(p?.clusterSize).toBe(1)
@@ -639,7 +640,7 @@ describe('workBlockSize', () => {
       [20, 4000, 3000],
       [24, 8000, 6000],
       [60, 20000, 20000],
-    ]) {
+    ] satisfies [number, number, number][]) {
       const s = workBlockSize(hole, w, h)
       expect(Math.ceil(w / s) * Math.ceil(h / s), `${hole} ${w} ${h}`).toBeLessThanOrEqual(
         MAX_WORK_PIXELS,

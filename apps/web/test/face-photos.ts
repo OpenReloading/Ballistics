@@ -5,6 +5,7 @@ import { autoDetect } from '../src/lib/hole-detection.ts'
 import type { RgbaImage } from '../src/lib/image.ts'
 import { type FaceFit, faceLabel, findFace } from '../src/lib/target-face.ts'
 import { applyMatrix } from '../src/lib/target-geometry.ts'
+import { defined } from './defined.ts'
 import { type Camera, faceById, faces, project, render, type Scene } from './face-render.ts'
 
 // The photos people take of a sheet (`photoScene`): the face search and the hole detection on the
@@ -19,27 +20,29 @@ export function numerals(face: TargetFace, paper = 226, black = 30): NonNullable
   const radii = face.rings.map((r) => r.diameter.value / 2).sort((a, b) => b - a)
   const blackR = face.blackDiameter.value / 2
   return radii.slice(0, -2).flatMap((r, i) => {
-    const gap = r - radii[i + 1]
+    const gap = r - defined(radii[i + 1])
     const mid = r - gap / 2
     const [height, grey] = [0.35 * gap, mid < blackR ? paper - 30 : black]
-    return [
+    const offsets: [number, number][] = [
       [mid, 0],
       [-mid, 0],
       [0, mid],
       [0, -mid],
-    ].map(([x, y]) => ({ x, y, width: 0.6 * height, height, grey }))
+    ]
+    return offsets.map(([x, y]) => ({ x, y, width: 0.6 * height, height, grey }))
   })
 }
 
 /** A printed header (word boxes) above the face and the box line about it, face mm. */
 function sheetPrint(outer: number): NonNullable<Scene['marks']> {
   const words: NonNullable<Scene['marks']> = []
-  for (const [y, size] of [
+  const lines: [number, number][] = [
     [1.24, 0.07],
     [1.13, 0.04],
-  ])
+  ]
+  for (const [y, size] of lines)
     for (let x = -0.95, k = 0; x < 0.95; k++) {
-      const width = [0.3, 0.15, 0.4, 0.2, 0.25][k % 5] * (size / 0.07)
+      const width = defined([0.3, 0.15, 0.4, 0.2, 0.25][k % 5]) * (size / 0.07)
       words.push({
         x: (x + width / 2) * outer,
         y: y * outer,
@@ -61,7 +64,7 @@ function sheetPrint(outer: number): NonNullable<Scene['marks']> {
 }
 
 /** Six holes in the black area, as shares of its radius. */
-const holeSpots = [
+const holeSpots: [number, number][] = [
   [0.3, 0.2],
   [-0.45, 0.35],
   [0.55, -0.4],
@@ -77,7 +80,7 @@ const holeSpots = [
  */
 export function photoScene(face: TargetFace, kind: PhotoKind, bullet: number): Scene {
   const [W, H] = kind === 'poor' ? [640, 480] : [1200, 900]
-  const outer = face.rings[0].diameter.value / 2
+  const outer = defined(face.rings[0]).diameter.value / 2
   const blackR = face.blackDiameter.value / 2
   // the whole sheet, its header included, fills 90 % of the height; the line is 2.2 px wide there
   const whole = (0.9 * H) / (2.53 * outer)

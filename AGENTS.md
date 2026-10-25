@@ -55,6 +55,7 @@
   - Measurement data a publication releases under CC BY 4.0 is imported as values, with authors, DOI and `license` in the source.
   - Values from reports written by US Government employees and approved for unlimited release are public domain in the US (17 U.S.C. 105, outside the US unverified).
 - TypeScript 7, ESM, Vitest, Biome (2 spaces, single quotes, no semicolons) in every workspace. `apps/docs` uses TypeScript 6 and `node --test`.
+- `noUncheckedIndexedAccess`, `noImplicitOverride` and `noFallthroughCasesInSwitch` are on in `tsconfig.base.json`, `apps/web/tsconfig.json` and `apps/docs/tsconfig.json`. An indexed read is restructured so the loop proves it, guarded, or read through `nth` (core, web) or a test `defined`/`nth` helper that throws; a `!` or cast needs a one-line invariant comment.
 - Relative imports end in `.ts` (rewritten to `.js` by `tsc`). Only erasable TypeScript syntax, so Node runs sources directly.
 - Comments, docs, test names and commit messages never say who asked for something, who decided it or when. A comment explains why only where the code cannot show it.
 - No migrations before 1.0: databases are rebuilt, files of an older format are rejected.

@@ -6,7 +6,7 @@
  * charge. A simulation, not load data: the answer is the charge at which the model reaches the
  * target, not a charge to load.
  */
-import { need } from '../errors.ts'
+import { need, nth } from '../errors.ts'
 import { solidFillLimit } from './load-file.ts'
 import {
   type InteriorLoad,
@@ -316,6 +316,6 @@ export function solveCharge(
   if (brackets.length > 1) return refuse('notMonotone')
   if (brackets.length === 0) return refuse('bracketFailed')
 
-  const root = illinoisRoot(brackets[0], target.value, runs.evaluate)
+  const root = illinoisRoot(nth(brackets, 0), target.value, runs.evaluate)
   return typeof root === 'string' ? refuse(root) : done(root)
 }

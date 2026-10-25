@@ -9,6 +9,7 @@ import {
   screenWidth,
 } from '@open-reloading/drawing/cartridge'
 import { describe, expect, it } from 'vitest'
+import { defined, missing } from './defined.ts'
 import {
   arrowheadsClear,
   extensionStarts,
@@ -61,10 +62,10 @@ const sides = (
 describe('layout rules on a broken layout', () => {
   const cartridge = (id: string) => {
     const record = verified.find((r) => r.id === id) as SpecRecord
-    const figure = laidOut(record)[0]
+    const figure = defined(laidOut(record)[0])
     return { figure, laid: sides(record, figure, figure.screen)[0] }
   }
-  const { figure, laid: base } = cartridge('cip-9-mm-luger-2008-09-23')
+  const { figure = missing(), laid: base = missing() } = cartridge('cip-9-mm-luger-2008-09-23')
   const fresh = () => structuredClone(base)
 
   it('passes the 9 mm Luger cartridge as drawn', () => {
@@ -104,13 +105,13 @@ describe('layout rules on a broken layout', () => {
       from: number
     }
     d.to = d.from
-    const span = laid.layout.spans[0]
+    const span = defined(laid.layout.spans[0])
     span.length = 0
     expect(nonZero(laid)).toHaveLength(2)
   })
 
   it('finds a leader that does not reach its text', () => {
-    const { laid } = cartridge('cip-284-win-2005-05-25')
+    const { laid = missing() } = cartridge('cip-284-win-2005-05-25')
     expect(leaderEnds(laid)).toEqual([])
     const s = laid.layout.segs.find((x) => x.leader) as Layout['segs'][number]
     s.b = [s.b[0] + 3 * laid.em, s.b[1] + 3 * laid.em]
@@ -119,12 +120,12 @@ describe('layout rules on a broken layout', () => {
 
   it('finds an arrowhead on a text and on another arrowhead', () => {
     const laid = fresh() as Laid
-    const t = laid.layout.arrowheads[0]
+    const t = defined(laid.layout.arrowheads[0])
     const l = laid.layout.labels.find((x) => x.owner !== t.owner) as Layout['labels'][number]
     t.at = l.c
     expect(arrowheadsClear(laid)).toContainEqual(expect.stringMatching(/arrowhead on .* text/))
     const other = fresh() as Laid
-    const a = other.layout.arrowheads[0]
+    const a = defined(other.layout.arrowheads[0])
     const b = other.layout.arrowheads.find(
       (x) => x.owner !== a.owner,
     ) as Layout['arrowheads'][number]

@@ -1,4 +1,6 @@
 /** The colour axis of hole detection: Fisher's linear discriminant of a hole against its ring, in log RGB. */
+
+import { f32, nth } from './nth.ts'
 import { clamp, median1 } from './raster-ops.ts'
 import type { Point } from './target-geometry.ts'
 
@@ -18,10 +20,14 @@ export type WorkImage = {
   blackMask?: Uint8Array
 }
 
+/** A value per channel of log RGB. */
+export type LogRgb = [number, number, number]
+/** The samples of each channel. */
+type Channels = [number[], number[], number[]]
 /** Unit axis `w` in log RGB, the hole colour `mu`, the ring median `ring` and their separation along `w`. */
-type Axis = { w: number[]; mu: number[]; ring: number[]; sep: number }
+type Axis = { w: LogRgb; mu: LogRgb; ring: LogRgb; sep: number }
 /** The picked hole (work px), or the hole colour in log RGB without a pick. */
-export type Seed = { at?: Point; mu?: number[] }
+export type Seed = { at?: Point; mu?: LogRgb }
 
 /**
  * Fisher's linear discriminant in log RGB: the mean of the disc of 0.4 D at the pick (or the
@@ -38,7 +44,7 @@ export function axisOf(
   if (!samples) return undefined
   const { mu, ring } = samples
   if (!mu || ring[0].length < 30) return undefined
-  const rm = ring.map((v) => median1(v))
+  const rm: LogRgb = [median1(ring[0]), median1(ring[1]), median1(ring[2])]
   return fisherAxis(mu, rm, covariance3(ring), ctx.contrast)
 }
 
@@ -51,8 +57,8 @@ function collectSamples(
   holeDiameter: number,
   seed: Seed,
   disc: number,
-): { mu: number[] | undefined; ring: number[][] } | undefined {
-  const ring: number[][] = [[], [], []]
+): { mu: LogRgb | undefined; ring: Channels } | undefined {
+  const ring: Channels = [[], [], []]
   if (!seed.at) {
     scatterRing(ctx, ring)
     return { mu: seed.mu, ring }
@@ -62,15 +68,17 @@ function collectSamples(
 }
 
 /** The ring samples of a region without a pick: a strided scan of the pixels inside it. */
-function scatterRing({ logRgb, w, h, inside }: WorkImage, ring: number[][]) {
+function scatterRing({ logRgb, w, h, inside }: WorkImage, ring: Channels) {
   const n = w * h
   const step = Math.max(1, Math.floor(n / 20000))
   for (let i = 0; i < n; i += step) if (inside[i]) pushPixel(ring, logRgb, n, i)
 }
 
 /** Appends the three channels of pixel `i` of the planar image to `ring`. */
-function pushPixel(ring: number[][], logRgb: Float32Array, n: number, i: number) {
-  for (let c = 0; c < 3; c++) ring[c].push(logRgb[c * n + i])
+function pushPixel(ring: Channels, logRgb: Float32Array, n: number, i: number) {
+  ring[0].push(f32(logRgb, i))
+  ring[1].push(f32(logRgb, n + i))
+  ring[2].push(f32(logRgb, 2 * n + i))
 }
 
 /** The mean log RGB of the disc at the pick, undefined when the disc holds no block; fills `ring`. */
@@ -79,13 +87,13 @@ function discAndRing(
   holeDiameter: number,
   { x: cx, y: cy }: Point,
   disc: number,
-  ring: number[][],
-): number[] | undefined {
+  ring: Channels,
+): LogRgb | undefined {
   const { logRgb, w, h, blackMask } = ctx
   const n = w * h
   // the surroundings of the same kind of surface as the hole's own (the face label)
   const kind = blackMask?.[Math.round(cy) * w + Math.round(cx)]
-  const sum = [0, 0, 0]
+  const sum: LogRgb = [0, 0, 0]
   let count = 0
   const reach = RING[1] * holeDiameter
   const inRing = (r: number, i: number) =>
@@ -104,19 +112,26 @@ function discAndRing(
       const i = y * w + x
       if (r <= disc) {
         count++
-        for (let c = 0; c < 3; c++) sum[c] += logRgb[c * n + i]
+        sum[0] += f32(logRgb, i)
+        sum[1] += f32(logRgb, n + i)
+        sum[2] += f32(logRgb, 2 * n + i)
       } else if (inRing(r, i)) pushPixel(ring, logRgb, n, i)
     }
-  return count ? sum.map((v) => v / count) : undefined
+  return count ? [sum[0] / count, sum[1] / count, sum[2] / count] : undefined
 }
 
 /** Sums `cov` of the products of the deviations from the channel means (xx yy zz xy xz yz), and the count `m`. */
-function covariance3(ring: number[][]): { cov: number[]; m: number } {
-  const mean = ring.map((v) => v.reduce((a, b) => a + b, 0) / v.length)
-  const cov = [0, 0, 0, 0, 0, 0] // xx yy zz xy xz yz
+function covariance3(ring: Channels): Covariance {
+  const average = (v: number[]) => v.reduce((a, b) => a + b, 0) / v.length
+  const mean: LogRgb = [average(ring[0]), average(ring[1]), average(ring[2])]
+  const cov: Six = [0, 0, 0, 0, 0, 0] // xx yy zz xy xz yz
   const m = ring[0].length
   for (let i = 0; i < m; i++) {
-    const d = [ring[0][i] - mean[0], ring[1][i] - mean[1], ring[2][i] - mean[2]]
+    const d: LogRgb = [
+      nth(ring[0], i) - mean[0],
+      nth(ring[1], i) - mean[1],
+      nth(ring[2], i) - mean[2],
+    ]
     cov[0] += d[0] * d[0]
     cov[1] += d[1] * d[1]
     cov[2] += d[2] * d[2]
@@ -127,30 +142,42 @@ function covariance3(ring: number[][]): { cov: number[]; m: number } {
   return { cov, m }
 }
 
+type Six = [number, number, number, number, number, number]
+type Covariance = { cov: Six; m: number }
+
 /**
  * The unit axis of `mu` minus the ring median `rm` times the inverse of the regularised ring
  * covariance; undefined when the separation along it is under `minSep`.
  */
 function fisherAxis(
-  mu: number[],
-  rm: number[],
-  { cov, m }: { cov: number[]; m: number },
+  mu: LogRgb,
+  rm: LogRgb,
+  { cov, m }: Covariance,
   minSep: number,
 ): Axis | undefined {
   const eps = (0.02 * (cov[0] + cov[1] + cov[2])) / (3 * m) + 1e-5
-  const [a, b, c, d, e, f] = cov.map((v, i) => v / m + (i < 3 ? eps : 0))
+  const reg = (v: number, i: number) => v / m + (i < 3 ? eps : 0)
+  const [a, b, c, d, e, f] = [
+    reg(cov[0], 0),
+    reg(cov[1], 1),
+    reg(cov[2], 2),
+    reg(cov[3], 3),
+    reg(cov[4], 4),
+    reg(cov[5], 5),
+  ]
   // inverse of [[a, d, e], [d, b, f], [e, f, c]] by cofactors
   const det = a * (b * c - f * f) - d * (d * c - f * e) + e * (d * f - b * e)
-  const delta = mu.map((v, i) => v - rm[i])
-  const inv = [
+  const delta: LogRgb = [mu[0] - rm[0], mu[1] - rm[1], mu[2] - rm[2]]
+  const inv: [LogRgb, LogRgb, LogRgb] = [
     [b * c - f * f, e * f - d * c, d * f - b * e],
     [e * f - d * c, a * c - e * e, d * e - a * f],
     [d * f - b * e, d * e - a * f, a * b - d * d],
   ]
-  const raw = inv.map((row) => (row[0] * delta[0] + row[1] * delta[1] + row[2] * delta[2]) / det)
+  const solved = (row: LogRgb) => (row[0] * delta[0] + row[1] * delta[1] + row[2] * delta[2]) / det
+  const raw: LogRgb = [solved(inv[0]), solved(inv[1]), solved(inv[2])]
   const norm = Math.hypot(raw[0], raw[1], raw[2])
   if (!(norm > 0)) return undefined
-  const axis = raw.map((v) => v / norm)
+  const axis: LogRgb = [raw[0] / norm, raw[1] / norm, raw[2] / norm]
   // a hole that the ring does not set apart (blank paper, noise) gives no axis
   const sep = axis[0] * delta[0] + axis[1] * delta[1] + axis[2] * delta[2]
   if (sep < minSep) return undefined
@@ -158,7 +185,7 @@ function fisherAxis(
 }
 
 /** Luma (BT.601 weights) of a colour, here of log RGB values. */
-export const lumaOf = (v: number[]) => 0.299 * v[0] + 0.587 * v[1] + 0.114 * v[2]
+export const lumaOf = (v: Readonly<LogRgb>) => 0.299 * v[0] + 0.587 * v[1] + 0.114 * v[2]
 
 /**
  * Per block, the BT.601 luma weights (0.299, 0.587, 0.114) applied to the log RGB of the working
@@ -168,7 +195,10 @@ export function logLuma(ctx: WorkImage): Float32Array {
   const n = ctx.w * ctx.h
   return Float32Array.from(
     { length: n },
-    (_, i) => 0.299 * ctx.logRgb[i] + 0.587 * ctx.logRgb[n + i] + 0.114 * ctx.logRgb[2 * n + i],
+    (_, i) =>
+      0.299 * f32(ctx.logRgb, i) +
+      0.587 * f32(ctx.logRgb, n + i) +
+      0.114 * f32(ctx.logRgb, 2 * n + i),
   )
 }
 
@@ -193,9 +223,9 @@ export function project(
       P[y * win.w + x] = clamp(
         64 +
           (128 *
-            (wv[0] * ctx.logRgb[i] +
-              wv[1] * ctx.logRgb[n + i] +
-              wv[2] * ctx.logRgb[2 * n + i] -
+            (wv[0] * f32(ctx.logRgb, i) +
+              wv[1] * f32(ctx.logRgb, n + i) +
+              wv[2] * f32(ctx.logRgb, 2 * n + i) -
               base)) /
             sep,
         0,
@@ -209,14 +239,14 @@ export function project(
 export function rescale(P: Float32Array, inside: Uint8Array): Float32Array {
   const step = Math.max(1, Math.floor(P.length / 40000))
   const sample: number[] = []
-  for (let i = 0; i < P.length; i += step) if (inside[i]) sample.push(P[i])
-  if (sample.length < 16) for (let i = 0; i < P.length; i += step) sample.push(P[i])
+  for (let i = 0; i < P.length; i += step) if (inside[i]) sample.push(f32(P, i))
+  if (sample.length < 16) for (let i = 0; i < P.length; i += step) sample.push(f32(P, i))
   const sorted = Float32Array.from(sample).sort()
-  const lo = sorted[Math.floor(0.005 * sorted.length)]
+  const lo = f32(sorted, Math.floor(0.005 * sorted.length))
   const span = Math.max(
     1e-6,
-    sorted[Math.min(sorted.length - 1, Math.floor(0.998 * sorted.length))] - lo,
+    f32(sorted, Math.min(sorted.length - 1, Math.floor(0.998 * sorted.length))) - lo,
   )
-  for (let i = 0; i < P.length; i++) P[i] = clamp((255 * (P[i] - lo)) / span, 0, 255)
+  for (let i = 0; i < P.length; i++) P[i] = clamp((255 * (f32(P, i) - lo)) / span, 0, 255)
   return P
 }

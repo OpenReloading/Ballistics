@@ -79,6 +79,7 @@ import { clickOptions, freeId } from '../lib/firearm.ts'
 import { type Interval, keyReadouts, readouts, statLines } from '../lib/group-readouts.ts'
 import { editHistory, type History, historyOf, pushHistory, redo, undo } from '../lib/history.ts'
 import { newId } from '../lib/new-id.ts'
+import { nth } from '../lib/nth.ts'
 import { shortcutAriaKeys, shortcutLabel, shortcutMatches } from '../lib/shortcuts.ts'
 import {
   clicksToAim,
@@ -606,7 +607,8 @@ function MarkerField({ ed }: { ed: Ed }) {
 function ReferenceRow({ ed, r, i }: { ed: Ed; r: TargetSheet['references'][number]; i: number }) {
   const { sheet, frame, applyCal } = ed
   const cal = frame?.calibration
-  const dev = cal && cal.factors[i] / cal.scale - 1
+  const factor = cal?.factors[i]
+  const dev = cal && factor !== undefined ? factor / cal.scale - 1 : undefined
   const label = `${refNames[r.kind].split(',')[0]} ${i + 1}`
   const help = `${refNames[r.kind]}${dev === undefined || sheet.references.length < 2 ? '' : `; scale ${dev >= 0 ? '+' : ''}${(dev * 100).toFixed(2)} % from the mean`}`
   const key = r.kind === 'line' ? 'length' : r.kind === 'rectangle' ? 'width' : 'diameter'
@@ -1088,7 +1090,9 @@ function ShotsPanel({ ed }: { ed: Ed }) {
                     <Table.Td>{coord('x')}</Table.Td>
                     <Table.Td>{coord('y')}</Table.Td>
                     {group.face && (
-                      <Table.Td>{groupScore ? shotText(groupScore.score.shots[i]) : '…'}</Table.Td>
+                      <Table.Td>
+                        {groupScore ? shotText(nth(groupScore.score.shots, i)) : '…'}
+                      </Table.Td>
                     )}
                     <Table.Td>
                       <Checkbox
@@ -1854,17 +1858,25 @@ function Toolbar({ ed }: { ed: Ed }) {
   )
 }
 
+/** The reference with its points replaced; none when the points are fewer than its kind needs. */
+function withPoints(
+  r: CalibrationReference,
+  [p0, p1, p2, p3]: Point[],
+): CalibrationReference | undefined {
+  if (r.kind === 'line') return p0 && p1 && { ...r, a: p0, b: p1 }
+  if (r.kind === 'ringCentre') return p0 && p1 && { ...r, centre: p0, edge: p1 }
+  if (r.kind === 'ringEdge') return p0 && p1 && p2 && { ...r, points: [p0, p1, p2] }
+  return p0 && p1 && p2 && p3 && { ...r, corners: [p0, p1, p2, p3] }
+}
+
 /** The reference point `pi` of reference `ri` moved to `p`; the sheet as it was when that gives no scale. */
 function movedReference(s: TargetSheet, ri: number, pi: number, p: Point): TargetSheet {
   const r = s.references[ri]
+  if (!r) return s
   const pts = refPoints(r)
   pts[pi] = p
-  const moved: CalibrationReference = (() => {
-    if (r.kind === 'line') return { ...r, a: pts[0], b: pts[1] }
-    if (r.kind === 'ringCentre') return { ...r, centre: pts[0], edge: pts[1] }
-    if (r.kind === 'ringEdge') return { ...r, points: [pts[0], pts[1], pts[2]] }
-    return { ...r, corners: [pts[0], pts[1], pts[2], pts[3]] }
-  })()
+  const moved = withPoints(r, pts)
+  if (!moved) return s
   const next = { ...s, references: s.references.map((x, j) => (j === ri ? moved : x)) }
   return frameOf(next) ? next : s
 }
@@ -3090,16 +3102,17 @@ export function TargetEditor({
 
   function addReference(points: Point[]) {
     const len = known.length
+    const [p0, p1, p2, p3] = points
     let r: CalibrationReference | undefined
-    if (refKind === 'line' && len) r = { kind: 'line', a: points[0], b: points[1], length: len }
-    if (refKind === 'ringCentre' && len)
-      r = { kind: 'ringCentre', centre: points[0], edge: points[1], diameter: len }
-    if (refKind === 'ringEdge' && len)
-      r = { kind: 'ringEdge', points: [points[0], points[1], points[2]], diameter: len }
-    if (refKind === 'rectangle' && known.width && known.height)
+    if (refKind === 'line' && len && p0 && p1) r = { kind: 'line', a: p0, b: p1, length: len }
+    if (refKind === 'ringCentre' && len && p0 && p1)
+      r = { kind: 'ringCentre', centre: p0, edge: p1, diameter: len }
+    if (refKind === 'ringEdge' && len && p0 && p1 && p2)
+      r = { kind: 'ringEdge', points: [p0, p1, p2], diameter: len }
+    if (refKind === 'rectangle' && known.width && known.height && p0 && p1 && p2 && p3)
       r = {
         kind: 'rectangle',
-        corners: [points[0], points[1], points[2], points[3]],
+        corners: [p0, p1, p2, p3],
         width: known.width,
         height: known.height,
       }
@@ -3347,7 +3360,7 @@ export function TargetEditor({
         : e.key === 'End'
           ? items.length - 1
           : (at + (e.key === 'ArrowRight' ? 1 : -1) + items.length) % items.length
-    items[next].focus()
+    items[next]?.focus()
   }
 
   const notesOn = (f: NonNullable<typeof frame>, k: number, still?: boolean) => (

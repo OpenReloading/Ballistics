@@ -15,6 +15,7 @@ import {
 import { exampleInterior } from '../src/lib/example-data.ts'
 import { interiorBody } from '../src/lib/interior-input.ts'
 import { resolveUnits } from '../src/lib/units.ts'
+import { defined, missing } from './defined.ts'
 
 const { load } = interiorBody(exampleInterior)
 const mass = load.bullet.mass
@@ -29,7 +30,7 @@ function run(travel: number) {
 
 const result = run(load.barrel.length)
 const longer = run(load.barrel.length + 0.2)
-const current = base + result.points[result.points.length - 1].travel
+const current = base + defined(result.points[result.points.length - 1]).travel
 
 describe('barrelRows', () => {
   it('gives the workbench readouts for the length of the workbench barrel', () => {
@@ -69,11 +70,14 @@ describe('barrelRows', () => {
 
   it('equals the run point at that travel for a shorter barrel', () => {
     const k = Math.floor(result.points.length / 2)
-    const p = result.points[k]
+    const p = defined(result.points[k])
     // the point's own travel, as the length, with a base of 0 (no float trap)
-    const [row] = barrelRows({ result, mass, baseFromHead: 0, lengths: [p.travel] }).filter(
-      (r) => !r.current,
-    )
+    const [row = missing()] = barrelRows({
+      result,
+      mass,
+      baseFromHead: 0,
+      lengths: [p.travel],
+    }).filter((r) => !r.current)
     expect(row.source).toBe('run')
     expect(row.values).toEqual({
       velocity: p.velocity,
@@ -152,7 +156,7 @@ describe('barrelRows', () => {
     expect(at.breechPressure / result.muzzleBreechPressure).toBeCloseTo(1, 4)
     expect(at.burntFraction).toBeCloseTo(result.muzzleBurntFraction, 6)
     expect(at.barrelTime).toBeCloseTo(result.barrelTime, 9)
-    const [row] = barrelRows({
+    const [row = missing()] = barrelRows({
       result,
       longer,
       mass,
@@ -187,7 +191,7 @@ describe('barrelRows', () => {
     const short = barrelRows({ result, longer, mass, baseFromHead: base, lengths: [current + 0.5] })
     expect(short.find((r) => !r.current)?.reason).toMatch(/ends before/)
     expect(
-      barrelRows({ result, mass, baseFromHead: base, lengths: [current + 0.1] })[1].reason,
+      defined(barrelRows({ result, mass, baseFromHead: base, lengths: [current + 0.1] })[1]).reason,
     ).toBeUndefined()
   })
 

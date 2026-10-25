@@ -27,6 +27,7 @@ import {
   mergeWaitingCopies,
   withoutWaitingCopy,
 } from '../src/lib/waiting-copies.ts'
+import { defined, missing } from './defined.ts'
 
 const group: ShotGroup = {
   id: 'g1',
@@ -75,14 +76,14 @@ describe('rebase', () => {
     const turned = rebase(sheet, { ...sheet, targetRotation: 0.3 })
     const [a, b] = [frameOf(sheet), frameOf(turned)]
     if (!a || !b) throw new Error('no frame')
-    turned.groups[0].shots.forEach((s, i) => {
-      const p = targetToView(a, group.shots[i])
+    defined(turned.groups[0]).shots.forEach((s, i) => {
+      const p = targetToView(a, defined(group.shots[i]))
       const q = targetToView(b, s)
       expect(q.x).toBeCloseTo(p.x, 9)
       expect(q.y).toBeCloseTo(p.y, 9)
     })
-    expect(turned.groups[0].shots[3].excluded).toBe(true)
-    const aim = targetToView(b, turned.groups[0].aim ?? { x: Number.NaN, y: 0 })
+    expect(defined(defined(turned.groups[0]).shots[3]).excluded).toBe(true)
+    const aim = targetToView(b, defined(turned.groups[0]).aim ?? { x: Number.NaN, y: 0 })
     expect(aim.x).toBeCloseTo(600, 9)
   })
 
@@ -98,14 +99,14 @@ describe('rebase', () => {
     const next = rebase(withFace, { ...withFace, references: [line] })
     const [a, b] = [frameOf(withFace), frameOf(next)]
     if (!a || !b) throw new Error('no frame')
-    next.groups[0].face?.marks?.forEach((m, i) => {
-      expect(m.ring).toBe(marks[i].ring)
-      const p = targetToView(a, marks[i])
+    defined(next.groups[0]).face?.marks?.forEach((m, i) => {
+      expect(m.ring).toBe(defined(marks[i]).ring)
+      const p = targetToView(a, defined(marks[i]))
       const q = targetToView(b, m)
       expect(q.x).toBeCloseTo(p.x, 9)
       expect(q.y).toBeCloseTo(p.y, 9)
     })
-    expect(next.groups[0].face?.marks?.[0].x).toBeCloseTo(0.011, 12)
+    expect(defined(defined(next.groups[0]).face?.marks?.[0]).x).toBeCloseTo(0.011, 12)
   })
 
   it('leaves the shots as they are when one side has no calibration', () => {
@@ -138,29 +139,29 @@ describe('turnSheet', () => {
     const [a, b] = [frameOf(withRegion), frameOf(turned)]
     if (!a || !b) throw new Error('no frame')
     const c = { x: 600, y: 500 }
-    turned.groups[0].shots.forEach((s, i) => {
-      const p = turnPoint(targetToView(a, group.shots[i]), c, Math.PI / 2)
+    defined(turned.groups[0]).shots.forEach((s, i) => {
+      const p = turnPoint(targetToView(a, defined(group.shots[i])), c, Math.PI / 2)
       const q = targetToView(b, s)
       expect(q.x).toBeCloseTo(p.x, 9)
       expect(q.y).toBeCloseTo(p.y, 9)
     })
     // the point (100, 0) right of the middle goes up on screen: (600, 400)
     expect(turned.references[0]).toMatchObject({ kind: 'line' })
-    const r = turned.groups[0].detection?.region?.[0]
+    const r = defined(turned.groups[0]).detection?.region?.[0]
     expect(r?.x).toBeCloseTo(200, 9)
     expect(r?.y).toBeCloseTo(500, 9)
     // a shot 10 mm right of the origin is 10 mm up after a quarter turn counter-clockwise
-    expect(turned.groups[0].shots[0].x).toBeCloseTo(-0.002, 9)
-    expect(turned.groups[0].shots[0].y).toBeCloseTo(0.01, 9)
-    expect(turned.groups[0].shots[3].excluded).toBe(true)
+    expect(defined(defined(turned.groups[0]).shots[0]).x).toBeCloseTo(-0.002, 9)
+    expect(defined(defined(turned.groups[0]).shots[0]).y).toBeCloseTo(0.01, 9)
+    expect(defined(defined(turned.groups[0]).shots[3]).excluded).toBe(true)
   })
 
   it('turned back, the sheet is as before; an angle is kept in (-pi, pi]', () => {
     const back = turnSheet(turnSheet(withRegion, size, 0.2), size, 0)
     expect(back.photoRotation).toBeUndefined()
-    back.groups[0].shots.forEach((s, i) => {
-      expect(s.x).toBeCloseTo(group.shots[i].x, 9)
-      expect(s.y).toBeCloseTo(group.shots[i].y, 9)
+    defined(back.groups[0]).shots.forEach((s, i) => {
+      expect(s.x).toBeCloseTo(defined(group.shots[i]).x, 9)
+      expect(s.y).toBeCloseTo(defined(group.shots[i]).y, 9)
     })
     expect(turnSheet(sheet, size, (3 * Math.PI) / 2).photoRotation).toBeCloseTo(-Math.PI / 2, 12)
   })
@@ -193,11 +194,11 @@ describe('a photo with a 100 mm line, turned by 90 degrees, then a rectangle', (
     targetOrigin: { x: 800, y: 600 },
     groups: [{ ...group, shots: [] }],
   }
-  const shotOf = (s: TargetSheet) => s.groups[0].shots[0]
+  const shotOf = (s: TargetSheet) => defined(s.groups[0]).shots[0]
   const hole = (s: TargetSheet) => {
     const f = frameOf(s)
     if (!f) throw new Error('no frame')
-    return targetToView(f, shotOf(s))
+    return targetToView(f, defined(shotOf(s)))
   }
 
   it('keeps the shot on its hole: (30, 30) mm, then (30, -30) mm; the references disagree by 0 %', () => {
@@ -208,17 +209,17 @@ describe('a photo with a 100 mm line, turned by 90 degrees, then a rectangle', (
     expect(q.y).toBeCloseTo(0.03, 12)
     const placed: TargetSheet = {
       ...lined,
-      groups: [{ ...lined.groups[0], shots: [{ ...q, placement: 'placed' }] }],
+      groups: [{ ...defined(lined.groups[0]), shots: [{ ...q, placement: 'placed' }] }],
     }
     // the target axes turn by 90 degrees counter-clockwise on the photo
     const turned = rebase(placed, { ...placed, targetRotation: Math.PI / 2 })
-    expect(shotOf(turned).x).toBeCloseTo(0.03, 12)
-    expect(shotOf(turned).y).toBeCloseTo(-0.03, 12)
+    expect(defined(shotOf(turned)).x).toBeCloseTo(0.03, 12)
+    expect(defined(shotOf(turned)).y).toBeCloseTo(-0.03, 12)
     expect(hole(turned).x).toBeCloseTo(1100, 6)
     expect(hole(turned).y).toBeCloseTo(300, 6)
     const both = rebase(turned, { ...turned, references: [line, square] })
-    expect(shotOf(both).x).toBeCloseTo(0.03, 9)
-    expect(shotOf(both).y).toBeCloseTo(-0.03, 9)
+    expect(defined(shotOf(both)).x).toBeCloseTo(0.03, 9)
+    expect(defined(shotOf(both)).y).toBeCloseTo(-0.03, 9)
     expect(hole(both).x).toBeCloseTo(1100, 6)
     expect(hole(both).y).toBeCloseTo(300, 6)
     expect(frameOf(both)?.calibration?.spread).toBeCloseTo(0, 9)
@@ -241,8 +242,8 @@ describe('overlays', () => {
     const c = s.centre
     if (!pts || !c) throw new Error('no ellipse')
     expect(pts).toHaveLength(4)
-    const r0 = Math.hypot(pts[0].x - c.x, pts[0].y - c.y)
-    const r1 = Math.hypot(pts[1].x - c.x, pts[1].y - c.y)
+    const r0 = Math.hypot(defined(pts[0]).x - c.x, defined(pts[0]).y - c.y)
+    const r1 = Math.hypot(defined(pts[1]).x - c.x, defined(pts[1]).y - c.y)
     expect(r0).toBeGreaterThan(r1)
     const ends = axisEnds(s)
     expect(ends && (ends[0].x + ends[1].x) / 2).toBeCloseTo(c.x, 12)
@@ -276,7 +277,12 @@ describe('overlays', () => {
         [0, -1],
         [13, 12],
         [30, 30],
-      ].map(([x, y], i) => ({ x: x / 1e3, y: y / 1e3, placement: 'placed', excluded: i === 4 })),
+      ].map(([x = missing(), y = missing()], i) => ({
+        x: x / 1e3,
+        y: y / 1e3,
+        placement: 'placed',
+        excluded: i === 4,
+      })),
     }
     const frame = frameOf({ ...sheet, photo: undefined, groups: [g] })
     if (!frame) throw new Error('no frame')
@@ -306,8 +312,8 @@ describe('overlays', () => {
     const ends = axisEnds(s)?.map(v) ?? []
     const ex = v({ x: s.centre.x + s.excludedOffset.x, y: s.centre.y + s.excludedOffset.y })
     for (const o of outlines)
-      for (const [i, p] of o.entries()) scene.segments.push([p, o[(i + 1) % o.length]])
-    scene.segments.push([ends[0], ends[1]], [c, ex])
+      for (const [i, p] of o.entries()) scene.segments.push([p, defined(o[(i + 1) % o.length])])
+    scene.segments.push([defined(ends[0]), defined(ends[1])], [c, ex])
     const extremes = (pts: Point[]) => [
       pts.reduce((a, b) => (b.y < a.y ? b : a)),
       pts.reduce((a, b) => (b.x > a.x ? b : a)),
@@ -315,12 +321,12 @@ describe('overlays', () => {
     // in the canvas's order: labels tied to one point first
     const placed: LabelBox[] = [
       placeLabel(scene, 'excluded shots', [ex], c),
-      placeLabel(scene, 'major axis', [ends[1], ends[0]], c),
+      placeLabel(scene, 'major axis', [defined(ends[1]), defined(ends[0])], c),
       ...outlines.map((o) => placeLabel(scene, '95 % fired', extremes(o), c)),
     ]
     for (const b of placed) expectClear(b, shots, scene.boxes, r)
     // the excluded label sits next to the excluded shot, not on it
-    const e = placed[0]
+    const e = defined(placed[0])
     const near = Math.hypot(
       Math.max(e.x - ex.x, 0, ex.x - e.x - e.w),
       Math.max(e.y - ex.y, 0, ex.y - e.y - e.h),
@@ -346,15 +352,15 @@ describe('readouts', () => {
       'radialStandardDeviation',
       'cepElliptical',
     ])
-    const es = r[0]
+    const es = defined(r[0])
     expect(es.angle).toBeCloseTo(2 * Math.atan(es.value / 200), 15)
     expect(es.interval).toBeUndefined()
-    expect(r[4].interval).toBeUndefined()
-    expect(r[5].interval).toBeUndefined()
-    expect(r[6].interval?.degreesOfFreedom).toBe(2)
-    expect(r[6].interval?.circular).toBe(false)
-    expect(r[8].interval?.circular).toBe(true)
-    const cep = r[9]
+    expect(defined(r[4]).interval).toBeUndefined()
+    expect(defined(r[5]).interval).toBeUndefined()
+    expect(defined(r[6]).interval?.degreesOfFreedom).toBe(2)
+    expect(defined(r[6]).interval?.circular).toBe(false)
+    expect(defined(r[8]).interval?.circular).toBe(true)
+    const cep = defined(r[9])
     expect(cep.value).toBe(st.cepElliptical)
     // the circular estimate and its interval belong to the hover detail only
     expect(cep.interval).toBeUndefined()
@@ -395,7 +401,7 @@ describe('screenNudge', () => {
       [-1, 0],
       [0, 1],
       [0, -1],
-    ]) {
+    ] satisfies [number, number][]) {
       const n = screenNudge(f, q, dx, dy, 1e-4)
       const m = targetToView(f, n)
       // 0.1 mm at 10 px per mm: 1 px on the photo in the key's direction
@@ -439,11 +445,11 @@ describe('ladderSpreads', () => {
       [0, 2],
       [1, 1],
     ])
-    expect(rows[0].angle).toBeCloseTo(
+    expect(defined(rows[0]).angle).toBeCloseTo(
       (subtendedAngle(0.02, 100) + subtendedAngle(0.02, 200)) / 2,
       15,
     )
-    expect(rows[1].angle).toBeCloseTo(subtendedAngle(0.04, 100), 15)
+    expect(defined(rows[1]).angle).toBeCloseTo(subtendedAngle(0.04, 100), 15)
     expect(rows.every((r) => r.length === undefined)).toBe(true)
   })
 
@@ -453,8 +459,8 @@ describe('ladderSpreads', () => {
       [0.003, 0.0031],
     )
     expect(rows).toHaveLength(1)
-    expect(rows[0].charge).toBe(0.003)
-    expect(rows[0].length).toBeCloseTo(0.03, 15)
+    expect(defined(rows[0]).charge).toBe(0.003)
+    expect(defined(rows[0]).length).toBeCloseTo(0.03, 15)
   })
 })
 

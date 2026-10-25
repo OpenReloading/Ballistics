@@ -4,6 +4,7 @@ import { expect, it } from 'vitest'
 import { bulletDrag, computedBulletRows, millerTwist } from '../src/lib/bullet.ts'
 import { rowValue } from '../src/lib/record-fields.ts'
 import { metersPerFoot, pascalsPerInHg, presetUnits } from '../src/lib/units.ts'
+import { missing } from './defined.ts'
 import { targetBullet } from './fixtures/bullets.ts'
 
 /** Synthetic record; the numbers are made up. */
@@ -80,7 +81,7 @@ it('gives none without a BC of the model', () => {
 })
 
 it('computes the sectional density the manufacturer gives (SD 0.253) with its method', () => {
-  const [sd, twist] = computedBulletRows(targetBullet)
+  const [sd = missing(), twist = missing()] = computedBulletRows(targetBullet)
   expect(sd.label).toBe('Sectional density')
   expect(sd.method).toMatch(/^Computed: mass over diameter squared/)
   expect(rowValue(sd, presetUnits('us'))).toBe('0.253 lb/in²')

@@ -13,6 +13,7 @@ import {
 } from '../src/lib/cartridge-record.ts'
 import { drawable } from '../src/lib/cartridge-sheet.ts'
 import { resolveUnits } from '../src/lib/units.ts'
+import { defined } from './defined.ts'
 import { sheetRecord } from './records.ts'
 
 const record = sheetRecord
@@ -126,7 +127,7 @@ describe('row groups and drawing link', () => {
   })
 
   it("names every dimension of the drawing by a row's stored symbol", () => {
-    const f = list[0]
+    const f = defined(list[0])
     const em = screenEm([f.drawn])
     const owners = f.drawn.flatMap(({ side }) =>
       (
@@ -152,7 +153,7 @@ describe('reading order and the hover of a side', () => {
 
   it('orders the groups as the drawing runs from the mouth to the head, the case length first', () => {
     const sorted = inReadingOrder(rows)
-    expect(sorted[0].key).toBe('L3')
+    expect(defined(sorted[0]).key).toBe('L3')
     const order = ['neck', 'shoulder', 'body', 'head', 'throat', 'other']
     const ranks = sorted.map((r) => order.indexOf(r.group))
     expect(ranks).toEqual([...ranks].sort((a, b) => a - b))
@@ -251,10 +252,10 @@ describe('variantMatrix', () => {
     expect(variants).toHaveLength(9)
     expect(variants[0]).toBe('12/35 T')
     expect(rows.map((r) => r.label)).toEqual(['Pmax', 'PK', 'PE', 'M', 'Cartridge l', 'Chamber L'])
-    const pmax = rows[0].cells.map((c) => c?.value)
+    const pmax = defined(rows[0]).cells.map((c) => c?.value)
     expect(pmax[0]).toBe(150)
     expect(pmax.at(-1)).toBe(1050)
-    expect(rows[3].cells[1]?.raw).toBe('25/30')
+    expect(defined(rows[3]).cells[1]?.raw).toBe('25/30')
   })
 
   it('leaves the variant values out of the combined table, but the Fe variants', () => {

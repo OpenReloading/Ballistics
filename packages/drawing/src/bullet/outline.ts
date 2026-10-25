@@ -1,5 +1,6 @@
 import type { SectionPoint } from '../core/types.ts'
 import { deg } from '../core/units.ts'
+import { closedEdges, pairs } from '../core/vector.ts'
 
 /**
  * Where an outline point comes from: `sourced` (a record value) or `entered` (a designer value)
@@ -146,13 +147,11 @@ function meet(p1: SectionPoint, p2: SectionPoint, p3: SectionPoint, p4: SectionP
 
 /** Whether the half profile, closed along the axis, crosses or touches itself away from shared corners. */
 export function profileCrossesItself(points: SectionPoint[]): boolean {
-  const edges = points.map(
-    (p, j) => [p, points[(j + 1) % points.length]] as [SectionPoint, SectionPoint],
-  )
-  for (let i = 0; i < edges.length; i++)
-    for (let j = i + 2; j < edges.length; j++) {
-      if (i === 0 && j === edges.length - 1) continue
-      if (meet(...edges[i], ...edges[j])) return true
+  const edges = closedEdges(points)
+  for (const [i, ei] of edges.entries())
+    for (const [j, ej] of edges.entries()) {
+      if (j < i + 2 || (i === 0 && j === edges.length - 1)) continue
+      if (meet(...ei, ...ej)) return true
     }
   return false
 }
@@ -933,10 +932,11 @@ function addMeplat({ L, given, m, mTag, mouth, mouthTag }: Parts, add: AddPoint)
 /** Stroked runs of the points: consecutive edges of the same kind share one run. */
 function strokedRuns(points: SectionPoint[], edges: boolean[]) {
   const segments: Outline['segments'] = []
-  for (let j = 1; j < points.length; j++) {
+  for (const [k, [prev, p]] of pairs(points).entries()) {
+    const approximate = edges[k + 1] ?? false
     const last = segments[segments.length - 1]
-    if (last && last.approximate === edges[j]) last.points.push(points[j])
-    else segments.push({ points: [points[j - 1], points[j]], approximate: edges[j] })
+    if (last && last.approximate === approximate) last.points.push(p)
+    else segments.push({ points: [prev, p], approximate })
   }
   return segments
 }
@@ -962,7 +962,8 @@ function assemblePoints(parts: Parts) {
   const baseEdge = points.length
   addTail(parts, add)
   addGroove(parts, add)
-  if (points[points.length - 1][1] < z0 || points[points.length - 1][0] < a)
+  const tip = points[points.length - 1]
+  if (tip && (tip[1] < z0 || tip[0] < a))
     add([a, z0], nTag === 'approximate' ? 'approximate' : 'derived', false)
   addNose(parts, add)
   addMeplat(parts, add)
@@ -982,9 +983,7 @@ function assemblePoints(parts: Parts) {
 function sectionProperties(points: SectionPoint[]) {
   let half = 0
   let moment = 0
-  for (let j = 0; j < points.length; j++) {
-    const [r0, za] = points[j]
-    const [r1, zb] = points[(j + 1) % points.length]
+  for (const [[r0, za], [r1, zb]] of closedEdges(points)) {
     const cross = za * r1 - zb * r0
     half += cross / 2
     moment += ((za + zb) * cross) / 6
@@ -999,9 +998,9 @@ function sectionProperties(points: SectionPoint[]) {
  */
 export function revolutionVolume(points: SectionPoint[], cut: number): number {
   let v = 0
-  for (let k = 1; k < points.length; k++) {
-    const up = points[k - 1][1] < points[k][1]
-    const [[r0, z0], [r1, z1]] = up ? [points[k - 1], points[k]] : [points[k], points[k - 1]]
+  for (const [p, q] of pairs(points)) {
+    const up = p[1] < q[1]
+    const [[r0, z0], [r1, z1]] = up ? [p, q] : [q, p]
     if (z1 <= z0 || z0 >= cut) continue
     const z = Math.min(z1, cut)
     const r = r0 + ((r1 - r0) * (z - z0)) / (z1 - z0)

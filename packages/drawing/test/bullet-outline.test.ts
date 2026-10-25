@@ -8,6 +8,7 @@ import {
 } from '../src/bullet/index.ts'
 import { profileCrossesItself, triangleArea2 } from '../src/bullet/outline.ts'
 import type { SectionPoint } from '../src/core/types.ts'
+import { defined } from './defined.ts'
 
 const deg = Math.PI / 180
 const d = 7.823
@@ -30,7 +31,10 @@ const nose = (o: Outline) =>
   o.points.filter(([r, z]) => z > (o.points.at(-1)?.[1] ?? 0) - o.noseLength && r > 0)
 
 /** Centre and radius of the circle through three points, [r, z]. */
-function circle([p, q, s]: SectionPoint[]): { c: SectionPoint; r: number } {
+function circle([p, q, s]: [SectionPoint, SectionPoint, SectionPoint]): {
+  c: SectionPoint
+  r: number
+} {
   const [ax, ay, bx, by, cx, cy] = [...p, ...q, ...s]
   const k = 2 * (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by))
   const ux =
@@ -55,7 +59,7 @@ function expectValid(o: Outline, b: BulletDimensions) {
   expect(o.points.at(-1)?.[0]).toBe(0)
   expect(o.points.at(-1)?.[1]).toBeCloseTo(b.length, 9)
   for (let k = 1; k < o.points.length; k++)
-    expect(o.points[k][1]).toBeGreaterThanOrEqual(o.points[k - 1][1])
+    expect(defined(o.points[k])[1]).toBeGreaterThanOrEqual(defined(o.points[k - 1])[1])
   for (const [r] of o.points) {
     expect(r).toBeGreaterThanOrEqual(0)
     expect(r).toBeLessThanOrEqual(b.diameter / 2 + 1e-9)
@@ -63,7 +67,7 @@ function expectValid(o: Outline, b: BulletDimensions) {
   expect(profileCrossesItself(o.points)).toBe(false)
   // no spike: two edges in a row never run back along one line
   for (let k = 2; k < o.points.length; k++) {
-    const [p, q, s] = [o.points[k - 2], o.points[k - 1], o.points[k]]
+    const [p, q, s] = [defined(o.points[k - 2]), defined(o.points[k - 1]), defined(o.points[k])]
     const dot = (q[0] - p[0]) * (s[0] - q[0]) + (q[1] - p[1]) * (s[1] - q[1])
     expect(Math.abs(triangleArea2(p, q, s)) < 1e-12 && dot < 0).toBe(false)
   }
@@ -99,7 +103,7 @@ describe('nose forms', () => {
     const plain = drawn(base)
     expect(one.points.length).toBe(plain.points.length)
     one.points.forEach((p, j) => {
-      expect(p[0]).toBeCloseTo(plain.points[j][0], 9)
+      expect(p[0]).toBeCloseTo(defined(plain.points[j])[0], 9)
     })
     expect(plain.notes.join(' ')).toMatch(/assumed tangent ogive/)
   })
@@ -108,13 +112,13 @@ describe('nose forms', () => {
     const o = drawn({ ...base, meplatDiameter: 0, ogive: { form: 'secant', radiusRatio: 0.5 } })
     const rt = tangentRadius(20.193, a)
     const pts = nose(o)
-    const fit = circle([pts[0], pts[10], pts[20]])
+    const fit = circle([defined(pts[0]), defined(pts[10]), defined(pts[20])])
     expect(fit.r).toBeCloseTo(2 * rt, 6)
     for (const p of [[a, 32.69 - 20.193] as SectionPoint, ...pts, [0, 32.69] as SectionPoint])
       expect(dist(p, fit.c)).toBeCloseTo(2 * rt, 6)
     // the first nose chord leaves the shank inward at a finite angle
     const z0 = 32.69 - 20.193
-    expect((a - pts[0][0]) / (pts[0][1] - z0)).toBeGreaterThan(0.05)
+    expect((a - defined(pts[0])[0]) / (defined(pts[0])[1] - z0)).toBeGreaterThan(0.05)
   })
 
   it('secant: the radius and Rt/R give the same nose; a disagreeing pair is refused', () => {
@@ -122,7 +126,7 @@ describe('nose forms', () => {
     const byRatio = drawn({ ...base, ogive: { radiusRatio: 0.5 } })
     const byRadius = drawn({ ...base, ogive: { radius: 2 * rt } })
     byRatio.points.forEach((p, j) => {
-      expect(p[0]).toBeCloseTo(byRadius.points[j][0], 9)
+      expect(p[0]).toBeCloseTo(defined(byRadius.points[j])[0], 9)
     })
     expect(reason({ ...base, ogive: { radius: 2 * rt, radiusRatio: 0.7 } })).toMatch(/Rt\/R/)
   })
@@ -143,8 +147,8 @@ describe('nose forms', () => {
     const o = drawn({ ...base, meplatDiameter: 0, ogive: { form: 'hybrid', radiusRatio: 0.5 } })
     const rt = tangentRadius(20.193, a)
     const pts = nose(o)
-    const first = circle([pts[0], pts[1], pts[2]])
-    const last = circle(pts.slice(-3))
+    const first = circle([defined(pts[0]), defined(pts[1]), defined(pts[2])])
+    const last = circle([defined(pts.at(-3)), defined(pts.at(-2)), defined(pts.at(-1))])
     expect(first.r).toBeCloseTo(rt / 2, 6)
     expect(first.c[1]).toBeCloseTo(32.69 - 20.193, 6)
     expect(last.r).toBeCloseTo(2 * rt, 4)
@@ -196,18 +200,18 @@ describe('base', () => {
 
   it('boat tail from length and angle, and from diameter and angle', () => {
     const byAngle = drawn({ ...base, base: { type: 'boat-tail', length: 5, angle: 7 } })
-    expect(byAngle.points[1][0]).toBeCloseTo(a - 5 * Math.tan(7 * deg), 9)
+    expect(defined(byAngle.points[1])[0]).toBeCloseTo(a - 5 * Math.tan(7 * deg), 9)
     expect(byAngle.tags[1]).toBe('derived')
     const byDiameter = drawn({ ...base, base: { type: 'boat-tail', diameter: 6.5, angle: 7 } })
-    expect(byDiameter.points[2][1]).toBeCloseTo((a - 3.25) / Math.tan(7 * deg), 9)
+    expect(defined(byDiameter.points[2])[1]).toBeCloseTo((a - 3.25) / Math.tan(7 * deg), 9)
     expect(byDiameter.tags[2]).toBe('derived')
   })
 
   it('assumes the angle from the length alone and flags the base', () => {
     const o = drawn({ ...base, base: { type: 'boat-tail', length: 5 } })
-    expect(o.points[1][0]).toBeCloseTo(a - 5 * Math.tan(assumedBoatTailAngle * deg), 9)
+    expect(defined(o.points[1])[0]).toBeCloseTo(a - 5 * Math.tan(assumedBoatTailAngle * deg), 9)
     expect(o.tags[1]).toBe('approximate')
-    expect(o.segments[0].approximate).toBe(true)
+    expect(defined(o.segments[0]).approximate).toBe(true)
     expect(o.approximate[0]).toEqual([0, 5])
   })
 
@@ -282,7 +286,7 @@ describe('hollow base', () => {
       ],
       approximate: true,
     })
-    expect(o.segments[1].approximate).toBe(false)
+    expect(defined(o.segments[1]).approximate).toBe(false)
     expect(o.notes.join(' ')).toMatch(/cavity depth is assumed/)
   })
 
@@ -575,7 +579,8 @@ describe('crossing check', () => {
 
 describe('random input', () => {
   const rnd = random(115)
-  const pick = <T>(xs: T[]) => xs[Math.floor(rnd() * xs.length)]
+  // the index is below the length, and a list may hold undefined
+  const pick = <T>(xs: T[]) => xs[Math.floor(rnd() * xs.length)] as T
   const maybe = <T>(x: T) => (rnd() < 0.5 ? x : undefined)
 
   const meplatShare = (form: string | undefined, tipType: string | undefined) => {

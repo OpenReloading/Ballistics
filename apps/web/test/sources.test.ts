@@ -15,6 +15,7 @@ import {
   writeOrigins,
 } from '../src/lib/sources.ts'
 import type { UserCartridgeView } from '../src/lib/variants.ts'
+import { missing } from './defined.ts'
 import { resolvedBullet, resolvedCartridge } from './resolved.ts'
 
 const quantityOf = (kind: 'length' | 'mass', si: number | undefined) =>
@@ -106,7 +107,7 @@ it('lists bullet designs as rows in mm and g', () => {
     bullet('a1', { diameter: 0.007823, mass: 0.010886, length: 0.0315 }, 'Me', 'Test 168'),
   ])
   expect(rows).toHaveLength(1)
-  const [r] = rows
+  const [r = missing()] = rows
   expect(r).toMatchObject({
     id: 'user:a1',
     manufacturerName: 'Me',
@@ -127,7 +128,7 @@ it('leaves out a bullet design without a diameter', () => {
 })
 
 it('lists a bullet design without a mass, length or manufacturer name', () => {
-  const [r] = userBulletRows([bullet('a2', { diameter: 0.00782 }, '', 'Plain')])
+  const [r = missing()] = userBulletRows([bullet('a2', { diameter: 0.00782 }, '', 'Plain')])
   expect(r).toMatchObject({ manufacturerName: '', name: 'Plain', mass: null, length: null })
   // no mass: a mass filter hides it, a search for its name finds it
   expect(searchBullets([r], '', { manufacturer: '', caliber: '', mass: '100-200gr' })).toEqual([])

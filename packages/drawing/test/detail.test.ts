@@ -6,6 +6,7 @@ import {
   detailWindow,
 } from '../src/cartridge/detail.ts'
 import type { Profile } from '../src/cartridge/profile.ts'
+import { defined } from './defined.ts'
 
 const spec = (region: DetailSpec['region'], sizes: DetailSpec['sizes'] = []): DetailSpec => ({
   letter: 'A',
@@ -107,10 +108,12 @@ describe('detailSpecs', () => {
   })
 
   it('spans the throat from H2 at L3 to the G1 stub', () => {
-    const [b] = detailSpecs(
-      'chamber',
-      profile(['G1', 'h'], { conventions: [{ kind: 'g1Stub', r: 3.9, from: 51, to: 55 }] }),
-    ).filter((d) => d.letter === 'B')
+    const b = defined(
+      detailSpecs(
+        'chamber',
+        profile(['G1', 'h'], { conventions: [{ kind: 'g1Stub', r: 3.9, from: 51, to: 55 }] }),
+      ).find((d) => d.letter === 'B'),
+    )
     expect(b.region).toEqual([3.9, 50, 4.4, 51])
     expect(b.anchor).toEqual([4.4, 50])
   })

@@ -19,6 +19,7 @@ import {
 } from '../src/lib/cartridge-rows.ts'
 import { packPowders, powderMatches, unpackPowders } from '../src/lib/powder-rows.ts'
 import { presetUnits } from '../src/lib/units.ts'
+import { defined } from './defined.ts'
 
 const c = (over: Partial<CartridgeRow>): CartridgeRow => ({
   id: '308-win',
@@ -157,8 +158,10 @@ it('groups the powders without a curve by reason', () => {
     ['unresolved', ['d']],
   ])
   // the numbers stay with each powder, the sentence is the group's
-  expect(groups[1].powders[0].detail).toBe('exponent 1.1')
-  expect(groups[2].powders[0].detail).toBe('vivacity 1 1/s, plus and minus 2 times 0.6')
+  expect(defined(defined(groups[1]).powders[0]).detail).toBe('exponent 1.1')
+  expect(defined(defined(groups[2]).powders[0]).detail).toBe(
+    'vivacity 1 1/s, plus and minus 2 times 0.6',
+  )
 })
 
 it('builds the overlay from ?add= only: no preset, the ids in order, colour slots by place', () => {

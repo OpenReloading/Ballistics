@@ -14,6 +14,7 @@ import {
   parseCompareIds,
 } from '../src/lib/compare-ids.ts'
 import { presetUnits } from '../src/lib/units.ts'
+import { defined } from './defined.ts'
 
 it('parses ids: trimmed, deduplicated, at most four, only record id characters', () => {
   expect(parseCompareIds('a-1, b-2,,a-1')).toEqual({ status: 'ok', ids: ['a-1', 'b-2'] })
@@ -93,7 +94,7 @@ it('merges the data tables in the record groups, values in the preset, a missing
   expect(row('Ballistic coefficients', 'G7')?.values).toEqual(['0.260', undefined])
   expect(row('Ballistic coefficients', 'G1')?.values).toEqual(['0.507', undefined])
   const metric = compareGroups([a], presetUnits('metric-grams'))
-  expect(metric[0].rows.map((r) => [r.label, r.values[0], r.unit])).toEqual([
+  expect(defined(metric[0]).rows.map((r) => [r.label, r.values[0], r.unit])).toEqual([
     ['Diameter', '7.82', 'mm'],
     ['Mass', '10.89', 'g'],
     ['Length', '31.50', 'mm'],
@@ -126,10 +127,10 @@ it('lays every drawing out at one text size and one frame width, so one scale', 
   }
   const [short, long] = [profile(5.69, 18), profile(8.59, 45)]
   const { models, tallest } = sharedScale([short, long])
-  expect(models[0].em).toBe(models[1].em)
-  expect(models[0].frame[2]).toBe(models[1].frame[2])
-  expect(tallest).toBe(Math.max(models[0].frame[3], models[1].frame[3]))
-  expect(models[1].frame[3]).toBeGreaterThan(models[0].frame[3])
+  expect(defined(models[0]).em).toBe(defined(models[1]).em)
+  expect(defined(models[0]).frame[2]).toBe(defined(models[1]).frame[2])
+  expect(tallest).toBe(Math.max(defined(models[0]).frame[3], defined(models[1]).frame[3]))
+  expect(defined(models[1]).frame[3]).toBeGreaterThan(defined(models[0]).frame[3])
 })
 
 it('raises the shared text size until the tallest drawing fits its height with 11 px text', () => {
@@ -140,9 +141,9 @@ it('raises the shared text size until the tallest drawing fits its height with 1
   }
   const ps = [profile(7.82, 31), profile(12.95, 75)]
   const { models, tallest } = sharedScale(ps, 320)
-  expect(models[0].em).toBeGreaterThan(1.8)
-  expect((models[0].em * 320) / tallest).toBeGreaterThanOrEqual(11)
+  expect(defined(models[0]).em).toBeGreaterThan(1.8)
+  expect((defined(models[0]).em * 320) / tallest).toBeGreaterThanOrEqual(11)
   // a short pair needs no raise
   const short = sharedScale([profile(7.82, 31)], 320)
-  expect((short.models[0].em * 320) / short.tallest).toBeGreaterThanOrEqual(11)
+  expect((defined(short.models[0]).em * 320) / short.tallest).toBeGreaterThanOrEqual(11)
 })

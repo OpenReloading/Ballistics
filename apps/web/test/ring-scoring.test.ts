@@ -13,6 +13,7 @@ import {
   scoreShot,
   usesOwnTenthRule,
 } from '../src/lib/ring-scoring.ts'
+import { defined } from './defined.ts'
 
 const faces = readRecords().bundle.targetFaces
 const face = (id: string) => faces.find((f) => f.id === id) as TargetFace
@@ -117,7 +118,11 @@ describe('scoreGroup', () => {
     const before = scoreGroup(airRifle, shots, 4.5 * mm)
     expect(before.shots.map((s) => s.value)).toEqual([10, 9, 1])
     expect(before).toMatchObject({ total: 20, decimalTotal: 22.1, innerTenCount: 1 })
-    const moved = scoreGroup(airRifle, [shots[0], at(1.0, 90), shots[2]], 4.5 * mm)
+    const moved = scoreGroup(
+      airRifle,
+      [defined(shots[0]), at(1.0, 90), defined(shots[2])],
+      4.5 * mm,
+    )
     expect(moved.shots.map((s) => s.value)).toEqual([10, 10, 1])
     expect(moved).toMatchObject({ total: 21, decimalTotal: 22.9, innerTenCount: 2 })
   })
@@ -194,13 +199,15 @@ describe('face on the sheet (target m) and face m', () => {
     const centre = { x: 0.012, y: -0.004 }
     const scale = 1.02
     // the 8 ring (42.4 mm) and the 6 ring (74.4 mm) of the 50 m rifle face
-    const marks = [
-      [8, 0],
-      [8, 120],
-      [8, 240],
-      [6, 60],
-      [6, 200],
-    ].map(([ring, deg]) => {
+    const marks = (
+      [
+        [8, 0],
+        [8, 120],
+        [8, 240],
+        [6, 60],
+        [6, 200],
+      ] satisfies [number, number][]
+    ).map(([ring, deg]) => {
       const d = ring === 8 ? 42.4 : 74.4
       const a = (deg * Math.PI) / 180
       const r = (d / 2) * 1e-3 * scale
@@ -270,7 +277,7 @@ describe('scoreGroupOnFace', () => {
     const moved = scoreGroupOnFace(
       rifle50,
       f,
-      { shots: [group.shots[0], { ...at(30, 90), placement: 'placed' as const }] },
+      { shots: [defined(group.shots[0]), { ...at(30, 90), placement: 'placed' as const }] },
       7.82e-3,
     )
     if ('error' in moved) throw new Error(moved.error)

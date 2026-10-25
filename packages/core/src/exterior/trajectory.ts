@@ -5,7 +5,7 @@
  * y up, z right); the line of sight is an output projection (`apps/docs/docs/models/exterior-point-mass.md`, "Frames").
  */
 import { type DragModel, type DragTable, dragTables } from '../drag-tables.ts'
-import { InputError, need } from '../errors.ts'
+import { el, InputError, need, nth } from '../errors.ts'
 import {
   type Air,
   airAt,
@@ -322,14 +322,14 @@ type Kind =
 /** Wind segments (one calm segment without wind) and the wind vector of each in the ground frame. */
 function windTable(wind: readonly WindSegment[]) {
   const winds = wind.length > 0 ? wind : [{ endDistance: Infinity, speed: 0, fromDirection: 0 }]
-  const wv = winds.map((w) => [
+  const wv = winds.map((w): [number, number, number] => [
     -w.speed * Math.cos(w.fromDirection),
     w.vertical ?? 0,
     -w.speed * Math.sin(w.fromDirection),
   ])
   const segmentFor = (x: number) => {
     let k = 0
-    while (k < winds.length - 1 && x >= winds[k].endDistance) k++
+    while (k < winds.length - 1 && x >= nth(winds, k).endDistance) k++
     return k
   }
   return { winds, wv, segmentFor }
@@ -347,7 +347,7 @@ function dragBandTable(p: Projectile) {
           .map((b) => ({ s: b.ballisticCoefficient, minVelocity: b.minVelocity }))
   const bandFor = (speed: number) => {
     let k = 0
-    while (k < bands.length - 1 && speed >= bands[k + 1].minVelocity) k++
+    while (k < bands.length - 1 && speed >= nth(bands, k + 1).minVelocity) k++
     return k
   }
   return { bands, bandFor }
@@ -358,15 +358,14 @@ function dragBandTable(p: Projectile) {
  * is the segment of `tables[j]` that holds grid segment mi; `held` marks segments read as held.
  */
 function machGrid(table: DragTable, aero: Aero | undefined) {
-  const coefficients = aero
-    ? [aero.liftSlope, aero.momentSlope, aero.magnusForceSlope, aero.spinDamping]
-    : []
   const tables: DragTable[] = [table]
   // index in tables by role, not by array identity: a coefficient may be the same array as the
   // drag curve or another coefficient, and then gets its own entry
-  const [liftAt, momentAt, magnusAt, dampingAt] = coefficients.map((k) =>
-    typeof k === 'number' ? -1 : tables.push(k) - 1,
-  )
+  const register = (k: CoefficientOverMach) => (typeof k === 'number' ? -1 : tables.push(k) - 1)
+  const liftAt = aero ? register(aero.liftSlope) : -1
+  const momentAt = aero ? register(aero.momentSlope) : -1
+  const magnusAt = aero ? register(aero.magnusForceSlope) : -1
+  const dampingAt = aero ? register(aero.spinDamping) : -1
   const grid: DragTable =
     tables.length === 1
       ? table
@@ -379,19 +378,19 @@ function machGrid(table: DragTable, aero: Aero | undefined) {
       const mi = i - 1
       const m =
         mi < 0
-          ? grid[0][0] - 1
+          ? nth(grid, 0)[0] - 1
           : mi >= last
-            ? grid[last][0] + 1
-            : (grid[mi][0] + grid[mi + 1][0]) / 2
+            ? nth(grid, last)[0] + 1
+            : (nth(grid, mi)[0] + nth(grid, mi + 1)[0]) / 2
       return tables.length === 1 ? mi : dragSegment(k, m)
     }),
   )
   // the slope hold applies to the drag table only (j = 0), the width hold to every table
-  const held = tables.map((k, j) => seg[j].map((s) => heldSegment(k, s, j === 0)))
+  const held = tables.map((k, j) => nth(seg, j).map((s) => heldSegment(k, s, j === 0)))
   // grid segment; on a node, the one below it, as the airspeed usually falls
   const segmentAt = (m: number) => {
     const k = dragSegment(grid, m)
-    return k >= 0 && grid[k][0] === m ? k - 1 : k
+    return k >= 0 && nth(grid, k)[0] === m ? k - 1 : k
   }
   return { tables, liftAt, momentAt, magnusAt, dampingAt, grid, last, seg, held, segmentAt }
 }
@@ -402,7 +401,7 @@ interface FlightContext {
   air: Air
   aero?: Aero
   /** Wind vector of each wind segment, ground frame, m/s. */
-  wv: number[][]
+  wv: [number, number, number][]
   bands: { s: number; minVelocity: number }[]
   table: DragTable
   mg: ReturnType<typeof machGrid>
@@ -418,41 +417,44 @@ interface FlightContext {
   mi: number
 }
 
-const airspeedOf = (c: FlightContext, y: Float64Array) =>
-  Math.sqrt((y[3] - c.wv[c.wi][0]) ** 2 + (y[4] - c.wv[c.wi][1]) ** 2 + (y[5] - c.wv[c.wi][2]) ** 2)
+const airspeedOf = (c: FlightContext, y: Float64Array) => {
+  const w = nth(c.wv, c.wi)
+  return Math.sqrt((el(y, 3) - w[0]) ** 2 + (el(y, 4) - w[1]) ** 2 + (el(y, 5) - w[2]) ** 2)
+}
 const machOf = (c: FlightContext, y: Float64Array) =>
-  airspeedOf(c, y) / speedOfSound(airAt(c.air, y[1]))
+  airspeedOf(c, y) / speedOfSound(airAt(c.air, el(y, 1)))
 
 /** Point-mass right-hand side: drag on the airspeed, gravity and Coriolis. */
 function pointMassRhs(c: FlightContext): Rhs {
   const { air, table, bands, ox, oy, oz, g } = c
-  const { seg, held } = c.mg
+  const seg0 = nth(c.mg.seg, 0)
+  const held0 = nth(c.mg.held, 0)
   const drag = c.p.drag
   return (_t, y, dy) => {
-    const local = airAt(air, y[1])
-    const w = c.wv[c.wi]
-    const vax = y[3] - w[0]
-    const vay = y[4] - w[1]
-    const vaz = y[5] - w[2]
+    const local = airAt(air, el(y, 1))
+    const w = nth(c.wv, c.wi)
+    const vax = el(y, 3) - w[0]
+    const vay = el(y, 4) - w[1]
+    const vaz = el(y, 5) - w[2]
     const va = Math.sqrt(vax * vax + vay * vay + vaz * vaz)
     const k =
       ((Math.PI / 8) *
         airDensity(local) *
         segmentCoefficient(
           table,
-          seg[0][c.mi + 1],
+          nth(seg0, c.mi + 1),
           va / speedOfSound(local),
           drag.interpolation,
-          held[0][c.mi + 1],
+          nth(held0, c.mi + 1),
         ) *
         va) /
-      bands[c.bi].s
-    dy[0] = y[3]
-    dy[1] = y[4]
-    dy[2] = y[5]
-    dy[3] = -k * vax - 2 * (oy * y[5] - oz * y[4])
-    dy[4] = -k * vay - g - 2 * (oz * y[3] - ox * y[5])
-    dy[5] = -k * vaz - 2 * (ox * y[4] - oy * y[3])
+      nth(bands, c.bi).s
+    dy[0] = el(y, 3)
+    dy[1] = el(y, 4)
+    dy[2] = el(y, 5)
+    dy[3] = -k * vax - 2 * (oy * el(y, 5) - oz * el(y, 4))
+    dy[4] = -k * vay - g - 2 * (oz * el(y, 3) - ox * el(y, 5))
+    dy[5] = -k * vaz - 2 * (ox * el(y, 4) - oy * el(y, 3))
   }
 }
 
@@ -467,18 +469,18 @@ function modifiedPointMassRhs(c: FlightContext, pointMass: Rhs) {
   const coefficient = (k: CoefficientOverMach, j: number, m: number) =>
     typeof k === 'number'
       ? k
-      : segmentCoefficient(k, seg[j][c.mi + 1], m, 'linear', held[j][c.mi + 1])
+      : segmentCoefficient(k, nth(nth(seg, j), c.mi + 1), m, 'linear', nth(nth(held, j), c.mi + 1))
   const area = (Math.PI / 4) * p.diameter ** 2
   return (y: Float64Array, dy: Float64Array, a: Aero) => {
     pointMass(0, y, dy)
-    const local = airAt(air, y[1])
+    const local = airAt(air, el(y, 1))
     const rho = airDensity(local)
-    const w = c.wv[c.wi]
-    const va = [y[3] - w[0], y[4] - w[1], y[5] - w[2]] as const
+    const w = nth(c.wv, c.wi)
+    const va = [el(y, 3) - w[0], el(y, 4) - w[1], el(y, 5) - w[2]] as const
     const speed = Math.hypot(va[0], va[1], va[2])
     const m = speed / speedOfSound(local)
-    const spin = y[6]
-    const yaw = yawOfRepose(va, [dy[3], dy[4], dy[5]], spin, {
+    const spin = el(y, 6)
+    const yaw = yawOfRepose(va, [el(dy, 3), el(dy, 4), el(dy, 5)], spin, {
       axialInertia: a.axialInertia,
       momentSlope: coefficient(a.momentSlope, momentAt, m),
       density: rho,
@@ -490,9 +492,9 @@ function modifiedPointMassRhs(c: FlightContext, pointMass: Rhs) {
       -((rho * area * p.diameter) / (2 * p.mass)) *
       spin *
       coefficient(a.magnusForceSlope, magnusAt, m)
-    dy[3] += kl * yaw[0] + km * (yaw[1] * va[2] - yaw[2] * va[1])
-    dy[4] += kl * yaw[1] + km * (yaw[2] * va[0] - yaw[0] * va[2])
-    dy[5] += kl * yaw[2] + km * (yaw[0] * va[1] - yaw[1] * va[0])
+    dy[3] = el(dy, 3) + (kl * yaw[0] + km * (yaw[1] * va[2] - yaw[2] * va[1]))
+    dy[4] = el(dy, 4) + (kl * yaw[1] + km * (yaw[2] * va[0] - yaw[0] * va[2]))
+    dy[5] = el(dy, 5) + (kl * yaw[2] + km * (yaw[0] * va[1] - yaw[1] * va[0]))
     dy[6] =
       ((rho * area * p.diameter ** 2) / (2 * a.axialInertia)) *
       coefficient(a.spinDamping, dampingAt, m) *
@@ -512,24 +514,24 @@ function trajectoryPointAt(
   const { air, p, aero } = c
   const { tables } = c.mg
   return (t: number, y: Float64Array, range: number): Raw => {
-    const local = airAt(air, y[1])
+    const local = airAt(air, el(y, 1))
     const m = airspeedOf(c, y) / speedOfSound(local)
-    const velocity = Math.sqrt(y[3] ** 2 + y[4] ** 2 + y[5] ** 2)
+    const velocity = Math.sqrt(el(y, 3) ** 2 + el(y, 4) ** 2 + el(y, 5) ** 2)
     return {
       range,
-      distance: y[0],
-      heightAboveFiringPoint: y[1],
+      distance: el(y, 0),
+      heightAboveFiringPoint: el(y, 1),
       time: t,
       velocity,
       mach: m,
       energy: 0.5 * p.mass * velocity ** 2,
-      height: y[0] * nx + y[1] * ny,
-      windage: y[2],
-      pathAngle: Math.atan2(y[4], Math.hypot(y[3], y[5])),
+      height: el(y, 0) * nx + el(y, 1) * ny,
+      windage: el(y, 2),
+      pathAngle: Math.atan2(el(y, 4), Math.hypot(el(y, 3), el(y, 5))),
       transonic: m >= 0.8 && m <= 1.2,
       subsonic: m < 1,
       dragClamped: !tables.every((k) => inDragTable(k, m)),
-      ...(aero ? { yaw: yawAt(y), spin: y[6] } : {}),
+      ...(aero ? { yaw: yawAt(y), spin: el(y, 6) } : {}),
     }
   }
 }
@@ -560,7 +562,7 @@ function flightEvents(
     events.push(ev)
   }
   for (let j = next; j < ranges.length; j++) {
-    const s = ranges[j]
+    const s = nth(ranges, j)
     add('range', {
       eventFunction: (_t, y) => slant(y) - s,
       direction: 1,
@@ -568,40 +570,44 @@ function flightEvents(
     })
   }
   if (wi > 0) {
-    const x = winds[wi - 1].endDistance
-    add('windDown', { eventFunction: (_t, y) => y[0] - x, direction: -1, terminal: true })
+    const x = nth(winds, wi - 1).endDistance
+    add('windDown', { eventFunction: (_t, y) => el(y, 0) - x, direction: -1, terminal: true })
   }
   if (wi < winds.length - 1) {
-    const x = winds[wi].endDistance
-    add('windUp', { eventFunction: (_t, y) => y[0] - x, direction: 1, terminal: true })
+    const x = nth(winds, wi).endDistance
+    add('windUp', { eventFunction: (_t, y) => el(y, 0) - x, direction: 1, terminal: true })
   }
   if (bi > 0) {
-    const v = bands[bi].minVelocity
+    const v = nth(bands, bi).minVelocity
     add('bandDown', { eventFunction: (_t, y) => airspeed(y) - v, direction: -1, terminal: true })
   }
   if (bi < bands.length - 1) {
-    const v = bands[bi + 1].minVelocity
+    const v = nth(bands, bi + 1).minVelocity
     add('bandUp', { eventFunction: (_t, y) => airspeed(y) - v, direction: 1, terminal: true })
   }
   // table nodes are kinks in Cd(Mach): restart there so that no step crosses one
   if (mi >= 0) {
-    const m = grid[mi][0]
+    const m = nth(grid, mi)[0]
     add('machDown', { eventFunction: (_t, y) => mach(y) - m, direction: -1, terminal: true })
   }
   if (mi < last) {
-    const m = grid[mi + 1][0]
+    const m = nth(grid, mi + 1)[0]
     add('machUp', { eventFunction: (_t, y) => mach(y) - m, direction: 1, terminal: true })
   }
-  add('apex', { eventFunction: (_t, y) => y[3] * ux + y[4] * uy, direction: -1, terminal: true })
+  add('apex', {
+    eventFunction: (_t, y) => el(y, 3) * ux + el(y, 4) * uy,
+    direction: -1,
+    terminal: true,
+  })
   if (aero)
     add('yaw', { eventFunction: (_t, y) => yawAt(y) - maxYaw, direction: 1, terminal: true })
   add('atmosphere', {
-    eventFunction: (_t, y) => air.altitude + y[1] - icao.tropopause,
+    eventFunction: (_t, y) => air.altitude + el(y, 1) - icao.tropopause,
     direction: 1,
     terminal: true,
   })
   add('atmosphere', {
-    eventFunction: (_t, y) => air.altitude + y[1] - minAltitude,
+    eventFunction: (_t, y) => air.altitude + el(y, 1) - minAltitude,
     direction: -1,
     terminal: true,
   })
@@ -609,7 +615,7 @@ function flightEvents(
 }
 
 /** The rotation of the earth in the frame of the shot, zero without the coriolis effect or a site. */
-function earthRotationOf(shot: TrajectoryInput, o: TrajectoryOptions) {
+function earthRotationOf(shot: TrajectoryInput, o: TrajectoryOptions): [number, number, number] {
   const lat = shot.site?.latitude
   return o.coriolis && lat !== undefined ? earthRotation(lat, shot.site?.azimuth) : [0, 0, 0]
 }
@@ -646,16 +652,23 @@ function restartSegments(
 ) {
   const d = kind.endsWith('Up') ? 1 : -1
   const along = (prefix: string) => (kind.startsWith(prefix) ? d : 0)
-  fc.wi = settle(fc.wi, along('wind'), y[0], 0, winds.length - 1, (k) => winds[k - 1].endDistance)
+  fc.wi = settle(
+    fc.wi,
+    along('wind'),
+    el(y, 0),
+    0,
+    winds.length - 1,
+    (k) => nth(winds, k - 1).endDistance,
+  )
   fc.bi = settle(
     fc.bi,
     along('band'),
     airspeedOf(fc, y),
     0,
     fc.bands.length - 1,
-    (k) => fc.bands[k].minVelocity,
+    (k) => nth(fc.bands, k).minVelocity,
   )
-  fc.mi = settle(fc.mi, along('mach'), machOf(fc, y), -1, fc.mg.last, (k) => fc.mg.grid[k][0])
+  fc.mi = settle(fc.mi, along('mach'), machOf(fc, y), -1, fc.mg.last, (k) => nth(fc.mg.grid, k)[0])
 }
 
 const endsFlight = (kind: Kind): kind is 'apex' | 'atmosphere' | 'yaw' =>
@@ -689,7 +702,7 @@ function fly(c: Conditions, bore: BoreAngles, ranges: number[], o: TrajectoryOpt
     oy,
     oz,
     g: o.gravity,
-    wi: segmentFor(y0[0]),
+    wi: segmentFor(el(y0, 0)),
     bi: 0,
     mi: 0,
   }
@@ -707,21 +720,21 @@ function fly(c: Conditions, bore: BoreAngles, ranges: number[], o: TrajectoryOpt
       }
     : pointMass
 
-  const slant = (y: Float64Array) => y[0] * ux + y[1] * uy
+  const slant = (y: Float64Array) => el(y, 0) * ux + el(y, 1) * uy
   const point = trajectoryPointAt(fc, nx, ny, yawAt)
 
   const points: Raw[] = []
   let next = 0
   /** Records pending ranges the state has reached (start, and rounding at restarts). */
   const catchUp = (t: number, y: Float64Array) => {
-    while (next < ranges.length && ranges[next] <= slant(y))
-      points.push(point(t, y, ranges[next++]))
+    while (next < ranges.length && nth(ranges, next) <= slant(y))
+      points.push(point(t, y, nth(ranges, next++)))
   }
 
   /** Records the hits of the pending range events, in order, from the event index `first`. */
   const recordHits = (hits: readonly Rk45Hit[], first: number) => {
     for (const hit of hits)
-      if (first + hit.event === next) points.push(point(hit.t, hit.y, ranges[next++]))
+      if (first + hit.event === next) points.push(point(hit.t, hit.y, nth(ranges, next++)))
   }
 
   let t = 0
@@ -729,7 +742,7 @@ function fly(c: Conditions, bore: BoreAngles, ranges: number[], o: TrajectoryOpt
   let h: number | undefined
   let steps = 0
   catchUp(t, y)
-  if (y[3] * ux + y[4] * uy <= 0) return { points, stop: 'apex', steps }
+  if (el(y, 3) * ux + el(y, 4) * uy <= 0) return { points, stop: 'apex', steps }
   while (next < ranges.length) {
     // at the muzzle and after every restart, where the yaw can jump (wind, BC band)
     if (aero && yawAt(y) >= o.maxYaw) return { points, stop: 'yaw', steps }
@@ -751,9 +764,9 @@ function fly(c: Conditions, bore: BoreAngles, ranges: number[], o: TrajectoryOpt
     y = r.y
     h = r.h
     if (r.event === null) return { points, stop: 'maxTime', steps }
-    const kind = kinds[r.event]
+    const kind = nth(kinds, r.event)
     if (kind === 'range') {
-      while (next < ranges.length) points.push(point(t, y, ranges[next++]))
+      while (next < ranges.length) points.push(point(t, y, nth(ranges, next++)))
       break
     }
     catchUp(t, y)
@@ -811,7 +824,7 @@ function checkWind(wind: readonly WindSegment[]): void {
       'wind segment',
     )
     need(
-      k === 0 || w.endDistance > wind[k - 1].endDistance,
+      k === 0 || w.endDistance > nth(wind, k - 1).endDistance,
       'wind segments must end in rising order',
     )
   })
@@ -845,7 +858,7 @@ function checkDragInput(drag: DragInput): void {
     need(curve.length >= 2, 'a drag curve needs at least two nodes')
     curve.forEach(([mach, cd], k) => {
       need(Number.isFinite(mach) && cd >= 0 && Number.isFinite(cd), 'drag curve node')
-      need(k === 0 || mach > curve[k - 1][0], 'drag curve Mach must rise')
+      need(k === 0 || mach > nth(curve, k - 1)[0], 'drag curve Mach must rise')
     })
   }
   const interpolation = drag.interpolation
@@ -924,7 +937,7 @@ function checkCoefficient(k: CoefficientOverMach | undefined, name: string): voi
   need(k.length >= 2, `${name} table needs at least two nodes`)
   k.forEach(([mach, value], j) => {
     need(Number.isFinite(mach) && Number.isFinite(value), `${name} table node`)
-    need(j === 0 || mach > k[j - 1][0], `${name} table Mach must rise`)
+    need(j === 0 || mach > nth(k, j - 1)[0], `${name} table Mach must rise`)
   })
 }
 
@@ -1112,10 +1125,10 @@ function zeroWith(shot: TrajectoryInput, o: TrajectoryOptions, aero: Aero | unde
     aero,
   }
   const range = zero.range
-  const miss = (bore: BoreAngles) => {
+  const miss = (bore: BoreAngles): [number, number] => {
     const f = fly(c, bore, [range], o)
     if (f.points.length === 0) throw new InputError(`zero range ${range} m not reached (${f.stop})`)
-    const [q] = correct(c, f.points, o)
+    const q = nth(correct(c, f.points, o), 0)
     return [q.height, q.windage]
   }
   // flat-fire vacuum estimate, then a secant on elevation and a linear step on windage

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { autoDetect, detectFromExample, type HoleProposal } from '../src/lib/hole-detection.ts'
 import { faceLabel } from '../src/lib/target-face.ts'
+import { defined } from './defined.ts'
 import { photoScene } from './face-photos.ts'
 import { faceById, invert, project, render } from './face-render.ts'
 
@@ -11,7 +12,7 @@ import { faceById, invert, project, render } from './face-render.ts'
 // 2.7 holes across: a black centre small enough to pass for holes.
 const base = faceById('issf-10m-air-rifle')
 const face = { ...base, blackDiameter: { value: 12 } }
-const outer = face.rings[0].diameter.value / 2
+const outer = defined(face.rings[0]).diameter.value / 2
 const W = 1000
 const pxPerMm = (0.45 * W) / outer
 const holeMm = 4.5
@@ -74,7 +75,7 @@ describe('hole detection with the face label', () => {
     const found = autoDetect({ ...input, face: label })
     expect(found && score(found.proposals).outside).toBe(0)
     // the same from an example hole
-    const ex = detectFromExample({ ...input, face: label }, truth[0])
+    const ex = detectFromExample({ ...input, face: label }, defined(truth[0]))
     expect(ex && score(ex.proposals)).toEqual({ hits: 6, extra: 0, outside: 0 })
   })
 
@@ -138,7 +139,7 @@ describe('hole detection with the numerals of the face', () => {
   })
 
   it('are not proposed from an example hole either', () => {
-    const found = detectFromExample({ ...input, face: faceLabel(geometry, mm) }, truth[0])
+    const found = detectFromExample({ ...input, face: faceLabel(geometry, mm) }, defined(truth[0]))
     expect(hits(found?.proposals ?? [])).toBe(seven.length)
     expect(extra(found?.proposals ?? [])).toBe(0)
   })
@@ -165,7 +166,7 @@ describe('hole detection on a face with holes at one angle from the axes', () =>
   })
   const geometry = {
     toFace: invert(h),
-    outer: face.rings[0].diameter.value / 2,
+    outer: defined(face.rings[0]).diameter.value / 2,
     black: face.blackDiameter.value / 2,
     rings: face.rings.map((r) => r.diameter.value / 2),
   }
@@ -205,7 +206,7 @@ describe('a flier far from the group on a found face', () => {
   })
   const geometry = {
     toFace: invert(h),
-    outer: face.rings[0].diameter.value / 2,
+    outer: defined(face.rings[0]).diameter.value / 2,
     black: face.blackDiameter.value / 2,
     rings: face.rings.map((r) => r.diameter.value / 2),
   }
@@ -234,7 +235,7 @@ describe('a flier far from the group on a found face', () => {
 describe('a found face on a sheet half in shadow', () => {
   it('keeps the holes on the shadowed paper', () => {
     const face = faceById('issf-10m-air-rifle')
-    const [black, outer] = [face.blackDiameter.value / 2, face.rings[0].diameter.value / 2]
+    const [black, outer] = [face.blackDiameter.value / 2, defined(face.rings[0]).diameter.value / 2]
     const r = (black + outer) / 2
     const s = photoScene(face, 'whole', 4.5)
     s.holes = [0.3, 1.2, 2.2, 3.1, 4.0, 5.2].map((a) => ({

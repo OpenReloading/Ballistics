@@ -24,6 +24,7 @@ import {
 } from '../src/lib/user-data.ts'
 import { folderFileName, ownsFile, recordFileName } from '../src/lib/user-file-names.ts'
 import { droppedPhotos, embeddedFileBlob, embedFiles, photoIds } from '../src/lib/user-photos.ts'
+import { defined } from './defined.ts'
 
 const saved = '2026-10-13T10:00:00.000Z'
 const bullet: UserRecord = {
@@ -105,8 +106,8 @@ describe('user data files', () => {
     ])
     expect(records).toEqual([load])
     expect(skipped).toHaveLength(1)
-    expect(skipped[0].name).toBe('bad.json')
-    expect(skipped[0].reason).toContain('records[1].data.overrides.mass.value')
+    expect(defined(skipped[0]).name).toBe('bad.json')
+    expect(defined(skipped[0]).reason).toContain('records[1].data.overrides.mass.value')
   })
 
   it('skips a file over the size limit', () => {
@@ -127,13 +128,13 @@ describe('user data files', () => {
       data: { origin: 'user', note: '"};' },
     }
     const parsed = parseUserDataFile(userDataText([hostile as UserRecord]))
-    expect(parsed.ok && parsed.records[0].name).toBe('<img src=x onerror=alert(1)>')
+    expect(parsed.ok && defined(parsed.records[0]).name).toBe('<img src=x onerror=alert(1)>')
     const polluting = userDataText([load]).replace(
       '"kind"',
       '"__proto__": { "polluted": true }, "kind"',
     )
     const result = parseUserDataFile(polluting)
-    expect(result.ok && Object.keys(result.records[0])).not.toContain('__proto__')
+    expect(result.ok && Object.keys(defined(result.records[0]))).not.toContain('__proto__')
     expect(({} as Record<string, unknown>).polluted).toBeUndefined()
   })
 
@@ -323,7 +324,7 @@ describe('user data files', () => {
     // kept as stored, with the schema's error and what names it
     expect(invalid.map((i) => i.raw)).toEqual([bad, null, old])
     expect(invalid[2]).toMatchObject({ id: 'o1', name: 'Old', kind: 'bulletDesign' })
-    expect(invalid[2].error).toContain('kind')
+    expect(defined(invalid[2]).error).toContain('kind')
     expect(invalid[1]).toMatchObject({ id: undefined, name: undefined, kind: undefined })
   })
 
@@ -335,7 +336,7 @@ describe('user data files', () => {
       saved,
       data: { siValues: { charge: 0.0028 }, cartridge: '308-win' },
     }
-    const stored = validRecords([old]).invalid[0]
+    const stored = defined(validRecords([old]).invalid[0])
     expect(stored.error).toContain('earlier version')
     expect(stored).toMatchObject({ id: 'w9', kind: 'workbenchState' })
     const text = JSON.stringify({

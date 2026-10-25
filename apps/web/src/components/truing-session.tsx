@@ -104,7 +104,7 @@ export function TruingSession({ nominal, system }: { nominal: TruingNominal; sys
     <TextInput
       aria-label={`${name}, row ${i + 1}${unit ? ` (${unit})` : ''}`}
       inputMode="decimal"
-      value={rows[i][key]}
+      value={rows[i]?.[key] ?? ''}
       onChange={(e) => setRow(i, { [key]: e.currentTarget.value })}
     />
   )

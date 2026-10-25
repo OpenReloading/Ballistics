@@ -3,6 +3,7 @@ import type { Cartridge, SpecValue } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { revisionOf } from '../src/catalogue/derive.ts'
 import { API_PREFIX } from '../src/version.ts'
+import { defined } from './defined.ts'
 import { bundle } from './fixtures.ts'
 import { withApi } from './setup.ts'
 
@@ -84,7 +85,10 @@ describe('GET /cartridges', () => {
     }
     await otherApi.load({
       ...bundle,
-      cartridges: bundle.cartridges.map((c) => ({ ...c, values: [...c.values, ...heads[c.id]] })),
+      cartridges: bundle.cartridges.map((c) => ({
+        ...c,
+        values: [...c.values, ...defined(heads[c.id])],
+      })),
     })
     const types = (await otherApi.app.inject({ url: `${API_PREFIX}/cartridges` }))
       .json()
@@ -126,7 +130,12 @@ describe('GET /cartridges', () => {
   })
 
   it('orders digit runs by value and finds words in any order, best match first', async () => {
-    const named = (id: string, name: string) => ({ ...bundle.cartridges[0], id, name, aliases: [] })
+    const named = (id: string, name: string) => ({
+      ...defined(bundle.cartridges[0]),
+      id,
+      name,
+      aliases: [],
+    })
     await otherApi.load({
       ...bundle,
       cartridges: [
@@ -182,9 +191,9 @@ describe('GET /cartridges/:id', () => {
       published: '2020-01-01',
       verification: 'unverified',
     })
-    expect(body.provenance).toEqual(bundle.cartridges[0].provenance)
-    expect(body.values).toEqual(bundle.cartridges[0].values)
-    expect(body.revision).toBe(revisionOf(bundle.cartridges[0]))
+    expect(body.provenance).toEqual(defined(bundle.cartridges[0]).provenance)
+    expect(body.values).toEqual(defined(bundle.cartridges[0]).values)
+    expect(body.revision).toBe(revisionOf(defined(bundle.cartridges[0])))
     expect(body).not.toHaveProperty('specs')
     expect(body).not.toHaveProperty('revised')
     expect(body).not.toHaveProperty('pressureMethod')
@@ -399,8 +408,8 @@ describe('GET /powders and /bullets', () => {
     ])
     const { body: record } = await get(`${API_PREFIX}/bullets/example-a-1`)
     const { revision, ...rest } = record
-    expect(rest).toEqual(bundle.bullets[0])
-    expect(revision).toBe(revisionOf(bundle.bullets[0]))
+    expect(rest).toEqual(defined(bundle.bullets[0]))
+    expect(revision).toBe(revisionOf(defined(bundle.bullets[0])))
     expect(await get(`${API_PREFIX}/bullets/unknown`)).toEqual({
       status: 404,
       body: { statusCode: 404, error: 'Not Found', message: 'bullet unknown not found' },
@@ -412,7 +421,7 @@ describe('GET /powders and /bullets', () => {
       ...bundle,
       bullets: [
         {
-          ...bundle.bullets[0],
+          ...defined(bundle.bullets[0]),
           length: { value: 31.5 },
           ballisticCoefficients: [
             { dragModel: 'G7', value: 0.243 },
@@ -436,17 +445,17 @@ describe('GET /powders and /bullets', () => {
       powders: [{ ...bundle.powders[0], country: 'FI' }, bundle.powders[1]] as Bundle['powders'],
       bullets: [
         {
-          ...bundle.bullets[0],
+          ...defined(bundle.bullets[0]),
           country: 'US',
           tip: { type: 'hollow-point' },
           construction: { raw: 'Jacketed Lead', core: { material: 'lead' }, jacket: {} },
         },
         {
-          ...bundle.bullets[0],
+          ...defined(bundle.bullets[0]),
           id: 'bonded-1',
           construction: { raw: 'Bonded Soft Point', structure: 'bonded' },
         },
-        { ...bundle.bullets[0], id: 'plain-1' },
+        { ...defined(bundle.bullets[0]), id: 'plain-1' },
       ] as Bundle['bullets'],
     })
     const [fast, slow] = (await otherApi.app.inject({ url: `${API_PREFIX}/powders` })).json().items
@@ -464,7 +473,7 @@ describe('GET /powders and /bullets', () => {
   })
 
   it('pages bullets with the same manufacturer and name by id', async () => {
-    const twin = (id: string) => ({ ...bundle.bullets[0], id })
+    const twin = (id: string) => ({ ...defined(bundle.bullets[0]), id })
     const ids: string[] = []
     await otherApi.load({
       ...bundle,
@@ -481,9 +490,13 @@ describe('GET /powders and /bullets', () => {
   })
 
   it('filters bullets by the cartridge they fit: above the middle of F and Z, up to G1', async () => {
-    const sized = (id: string, value: number) => ({ ...bundle.bullets[0], id, diameter: { value } })
+    const sized = (id: string, value: number) => ({
+      ...defined(bundle.bullets[0]),
+      id,
+      diameter: { value },
+    })
     const fit: Cartridge = {
-      ...bundle.cartridges[0],
+      ...defined(bundle.cartridges[0]),
       id: 'fit-rifle',
       name: 'Fit Rifle',
       values: [

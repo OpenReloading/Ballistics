@@ -2,6 +2,7 @@ import { lbPerSqInToKgPerSqM, type TrajectoryPoint } from '@open-reloading/core'
 import { describe, expect, it } from 'vitest'
 import { rangeCardColumns, rangeCardFacts, rangeCardRows } from '../src/lib/range-card.ts'
 import { presetUnits } from '../src/lib/units.ts'
+import { defined } from './defined.ts'
 
 const moa = Math.PI / 180 / 60
 const point = {
@@ -19,7 +20,7 @@ describe('range card', () => {
     expect(rangeCardRows([point], presetUnits('us'))).toEqual([
       ['100', '-1.0', '1.00', '-2.00', '2625', '2213', '0.123'],
     ])
-    const mil = rangeCardRows([point], presetUnits('metric-grains'))[0]
+    const mil = defined(rangeCardRows([point], presetUnits('metric-grains'))[0])
     expect(mil[2]).toBe('0.29')
     expect(rangeCardColumns(presetUnits('us'))).toEqual([
       'Range (yd)',
@@ -75,7 +76,7 @@ describe('range card', () => {
       'Sight height': '40 mm',
       Wind: 'none',
     })
-    expect(facts[3][1]).toBe(
+    expect(defined(facts[3])[1]).toBe(
       '15 °C, station pressure not given, altitude not given, humidity not given',
     )
   })
@@ -104,7 +105,7 @@ describe('range card', () => {
       presetUnits('us'),
       true,
     )
-    expect(facts[0][0]).toBe('Bullet')
-    expect(facts[0][1]).toMatch(/^168 gr, BC 0\.243 /)
+    expect(defined(facts[0])[0]).toBe('Bullet')
+    expect(defined(facts[0])[1]).toMatch(/^168 gr, BC 0\.243 /)
   })
 })

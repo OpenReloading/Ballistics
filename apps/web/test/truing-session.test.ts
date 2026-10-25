@@ -17,6 +17,7 @@ import {
   type TruingRow,
 } from '../src/lib/truing-session.ts'
 import { presetUnits } from '../src/lib/units.ts'
+import { defined } from './defined.ts'
 
 const system = presetUnits('us')
 const click = 0.1e-3
@@ -61,7 +62,7 @@ function measured(impacts: number[], dials: number[]): TruingInputs {
         shots: text(shots),
         mean: text(
           system.lineOfSightOffset.fromSi(
-            at(range).height + (noise[i] * spread) / Math.sqrt(shots),
+            at(range).height + (defined(noise[i]) * spread) / Math.sqrt(shots),
           ),
         ),
         deviation: text(system.lineOfSightOffset.fromSi(spread)),
@@ -74,7 +75,9 @@ function measured(impacts: number[], dials: number[]): TruingInputs {
         kind: 'dial',
         range: text(system.range.fromSi(range)),
         shots: text(shots),
-        mean: text(Math.round(clicks + (noise[impacts.length + i] * spread) / Math.sqrt(shots))),
+        mean: text(
+          Math.round(clicks + (defined(noise[impacts.length + i]) * spread) / Math.sqrt(shots)),
+        ),
         deviation: text(spread),
       }
     }),
@@ -83,7 +86,7 @@ function measured(impacts: number[], dials: number[]): TruingInputs {
     rows,
     chrono: {
       shots: '10',
-      mean: text(system.velocity.fromSi(at(0).velocity + (noise[6] * 4) / Math.sqrt(10))),
+      mean: text(system.velocity.fromSi(at(0).velocity + (defined(noise[6]) * 4) / Math.sqrt(10))),
       deviation: text(system.velocity.fromSi(4)),
     },
     click: text(system.correction.fromSi(click)),
@@ -205,10 +208,10 @@ describe('entry problems', () => {
 
   it('gives the core refusal of an impact and a dial of one group', () => {
     const rows = [
-      input.rows[0],
-      { ...input.rows[3], range: input.rows[0].range },
-      input.rows[1],
-      input.rows[4],
+      defined(input.rows[0]),
+      { ...defined(input.rows[3]), range: defined(input.rows[0]).range },
+      defined(input.rows[1]),
+      defined(input.rows[4]),
     ]
     const answer = fitSession(nominal, { ...input, rows })
     expect('problem' in answer).toBe(true)

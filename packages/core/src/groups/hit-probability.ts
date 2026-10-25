@@ -2,7 +2,7 @@
  * Probability of a hit and expected score on a target face from a point dispersion
  * (`apps/docs/docs/models/hit-probability.md`). SI throughout: lengths m, speeds m/s, angles rad.
  */
-import { need } from '../errors.ts'
+import { need, nth } from '../errors.ts'
 import { chiSquareCdf } from './chi-square.ts'
 
 /** A scoring zone: an ellipse about the aim point with the value a hit inside it scores. */
@@ -139,10 +139,10 @@ export function hitProbability(zones: readonly ScoringZone[], d: PointDispersion
   const inside = zones.map((z) => ellipseProbability(z.halfWidth, z.halfHeight, d))
   const parts = zones.map((z, k) => ({
     value: z.value,
-    probability: Math.max(0, inside[k] - (inside[k + 1] ?? 0)),
+    probability: Math.max(0, nth(inside, k) - (inside[k + 1] ?? 0)),
   }))
   return {
-    hit: inside[0],
+    hit: nth(inside, 0),
     expectedScore: parts.reduce((s, p) => s + p.value * p.probability, 0),
     zones: parts,
   }

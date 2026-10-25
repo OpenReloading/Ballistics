@@ -10,6 +10,7 @@ import {
 } from '../src/lib/hole-proposals.ts'
 import { frameOf, targetToView } from '../src/lib/target-editor.ts'
 import { groupStatisticsOf } from '../src/lib/target-groups.ts'
+import { defined } from './defined.ts'
 
 // 10 px per mm: the 100 mm line is 1000 px long; target (0, 0) at photo (600, 500)
 const group: ShotGroup = {
@@ -60,7 +61,7 @@ describe('localPxPerM', () => {
 describe('newProposals', () => {
   it('drops proposals within half a hole of a shot of the group, so a second run adds no shot twice', () => {
     // the shot at target (10, 2) mm is photo (700, 480)
-    const shot = targetToView(frame, group.shots[0])
+    const shot = targetToView(frame, defined(group.shots[0]))
     const list = [proposal(1, shot.x + 30, shot.y), proposal(2, shot.x + 50, shot.y)]
     expect(proposalsClearOfShots(list, group, frame, 78).map((p) => p.id)).toEqual([2])
   })

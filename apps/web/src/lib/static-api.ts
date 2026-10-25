@@ -158,7 +158,8 @@ async function list(kind: string, query: URLSearchParams) {
 async function get(path: string) {
   const url = new URL(path, 'https://api/')
   const [kind, id, ...rest] = url.pathname.slice(1).split('/')
-  if (!listKinds.has(kind) || rest.length > 0) return refusal(404, 'Not Found', `${path} not found`)
+  if (kind === undefined || !listKinds.has(kind) || rest.length > 0)
+    return refusal(404, 'Not Found', `${path} not found`)
   if (id === undefined || id === '') return list(kind, url.searchParams)
   if (!recordId.test(id)) return refusal(400, 'Bad Request', 'params/id must match the record id')
   const record = await dataFile(`${kind}/${id}`)

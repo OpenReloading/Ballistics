@@ -9,6 +9,7 @@ import {
 } from '../src/compute/exterior-response.ts'
 import { inlineRunner } from '../src/compute/tasks.ts'
 import { API_PREFIX } from '../src/version.ts'
+import { defined } from './defined.ts'
 import { rifleProjectile as projectile, rifleShot } from './fixtures.ts'
 import { checkBody, withApi } from './setup.ts'
 
@@ -115,7 +116,7 @@ describe('exterior response schemas', () => {
       shotCount: 5,
       standardDeviation: 0.2e-3 * p.range,
     }))
-    const chronograph = { mean: truth[0].velocity, shotCount: 10, standardDeviation: 4 }
+    const chronograph = { mean: defined(truth[0]).velocity, shotCount: 10, standardDeviation: 4 }
     const fit = await post('/exterior/range-strings/fit', {
       ...strings,
       entries,

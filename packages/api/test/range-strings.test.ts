@@ -11,6 +11,7 @@ import { describe, expect, it } from 'vitest'
 import { caps } from '../src/compute/schemas.ts'
 import { rangeStringsLimits } from '../src/compute/strings-schema.ts'
 import { API_PREFIX } from '../src/version.ts'
+import { defined } from './defined.ts'
 import { withApi } from './setup.ts'
 
 const { post } = withApi()
@@ -88,7 +89,7 @@ describe('POST /exterior/range-strings/plan', () => {
     })
     expect(status).toBe(200)
     const want = planTruingStrings(
-      { shot, clickValue, dispersion, ...candidates[1] },
+      { shot, clickValue, dispersion, ...defined(candidates[1]) },
       { ...defaults, ...options },
     )
     expect(body.result[0].plan.parameters.map((p: { name: string }) => p.name)).toContain(

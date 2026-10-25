@@ -4,7 +4,7 @@ import { useMemo } from 'react'
 import { type BarrelTimes, barrelTimeBand, lotChartDescription, lotLabel } from '../lib/lot-rows.ts'
 import { niceTicks } from '../lib/ticks.ts'
 import { formatNumber, type UnitSystem } from '../lib/units.ts'
-import { EChart, useChartTokens } from './echart.tsx'
+import { EChart, tickStep, useChartTokens } from './echart.tsx'
 
 const tokens = {
   line: '--series-1',
@@ -82,7 +82,8 @@ export function LotChart({
         borderColor: theme.border,
         textStyle: { color: theme.fg },
         formatter: (params: { dataIndex: number }[]) => {
-          const t = times[params[0]?.dataIndex]
+          const index = params[0]?.dataIndex
+          const t = index === undefined ? undefined : times[index]
           if (!t) return ''
           return [
             `${formatNumber(charge.fromSi(t.charge), charge.decimals)} ${charge.symbol}`,
@@ -96,7 +97,7 @@ export function LotChart({
         type: 'value' as const,
         min: xt[0],
         max: xt[xt.length - 1],
-        interval: xt[1] - xt[0],
+        interval: tickStep(xt),
         ...axis(`Charge, ${charge.symbol}`, 26),
         axisLabel: {
           color: theme.muted,
@@ -109,7 +110,7 @@ export function LotChart({
         type: 'value' as const,
         min: yt[0],
         max: yt[yt.length - 1],
-        interval: yt[1] - yt[0],
+        interval: tickStep(yt),
         ...axis('Barrel time, ms', 44),
         axisLabel: {
           color: theme.muted,
@@ -185,6 +186,7 @@ export function LotChart({
         focus={2}
         readout={(i) => {
           const t = times[Math.min(i, times.length - 1)]
+          if (!t) return ''
           return `${formatNumber(charge.fromSi(t.charge), charge.decimals)} ${charge.symbol}: ${lotLabel('low', fraction)} ${msText(t.low)}, nominal ${msText(t.nominal)}, ${lotLabel('high', fraction)} ${msText(t.high)}`
         }}
       />

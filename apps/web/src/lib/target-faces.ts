@@ -10,6 +10,7 @@ import {
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
 import type { Face } from './face-organization.ts'
 import { matchesQuery } from './lists.ts'
+import { nth } from './nth.ts'
 import type { FieldGroup, FieldRow, StripItem } from './record-fields.ts'
 
 /** One row of the target face list. Lengths in mm, distances in m. */
@@ -40,7 +41,7 @@ export function targetFaceRow(f: Face, mappings: readonly MappingSummary[]): Tar
     name: f.name,
     organization: f.organization,
     distances: faceDistances(f),
-    outer: f.rings[0].diameter.value,
+    outer: nth(f.rings, 0).diameter.value,
     rings: f.rings.length,
     disciplines: new Set(mappings.filter((m) => m.face === f.id).map((m) => m.discipline)).size,
     events: f.events.flatMap((e) => [e.name, e.organization ?? '']),
@@ -76,7 +77,8 @@ const ringColours = (r: TargetFace['rings'][number]) => {
 
 /** The face's facts under the page bar: federation, distances, outer diameter, black area, rings. */
 export function targetFaceStrip(f: Face): StripItem[] {
-  const oval = f.rings[0].height !== undefined ? ' width' : ''
+  const outer = nth(f.rings, 0)
+  const oval = outer.height !== undefined ? ' width' : ''
   const item = (icon: StripItem['icon'], label: string, rows: FieldRow[]): StripItem[] =>
     rows[0] ? [{ icon, label, row: rows[0] }] : []
   return [
@@ -87,7 +89,7 @@ export function targetFaceStrip(f: Face): StripItem[] {
     ...item(
       'diameter',
       `Outer diameter${oval}`,
-      length('Outer diameter', f.rings[0].diameter.value, f.rings[0].diameter.raw),
+      length('Outer diameter', outer.diameter.value, outer.diameter.raw),
     ),
     ...item(
       'black',
@@ -100,7 +102,7 @@ export function targetFaceStrip(f: Face): StripItem[] {
 
 /** The face's values beyond the strip: scoring and sheet, then the ring diameters outer to inner and the inner ten. */
 export function targetFaceGroups(f: TargetFace): FieldGroup[] {
-  const w = f.rings[0].height !== undefined ? ' width' : ''
+  const w = nth(f.rings, 0).height !== undefined ? ' width' : ''
   return [
     {
       title: 'Face',

@@ -45,8 +45,8 @@ describe('parseShotViewWorkbook', () => {
       [853.44, 856.6404, 852.0684],
       [850.5, 851.5],
     ])
-    expect(r.session.strings[1].shots[0].velocity.raw).toBe('850.5 mps')
-    expect(r.session.strings[1].shots[0].coldBore).toBe(true)
+    expect(r.session.strings[1]?.shots[0]?.velocity.raw).toBe('850.5 mps')
+    expect(r.session.strings[1]?.shots[0]?.coldBore).toBe(true)
     expect(r.session.note).toBe('ShotView bore flags: string 2 shot 1 cold bore')
     expect(r.stringLabels).toEqual(['Test load A 42.0gr', 'Load B'])
     expect(r.session.date).toBe('2026-03-08')
@@ -56,7 +56,7 @@ describe('parseShotViewWorkbook', () => {
 
   it('ends the shots at the footer', () => {
     const sheet = { ...shotViewSheetEnglish, rows: [...shotViewSheetEnglish.rows, ['5', '2900.0']] }
-    expect(parseShotViewWorkbook(book(sheet)).session.strings[0].shots).toHaveLength(3)
+    expect(parseShotViewWorkbook(book(sheet)).session.strings[0]?.shots).toHaveLength(3)
   })
 
   it('skips worksheets without a header or shots, and refuses a workbook without shots', () => {
@@ -99,7 +99,7 @@ describe('parseShotViewWorkbook', () => {
   it('reads empty rows of a caller-built workbook', () => {
     const sheet = { name: 'a', rows: [[], ['#', 'Speed (FPS)'], [], ['1', '2800.0'], []] }
     const r = parseShotViewWorkbook(book(sheet))
-    expect(r.session.strings[0].shots).toHaveLength(1)
+    expect(r.session.strings[0]?.shots).toHaveLength(1)
     expect(r.warnings).toEqual([
       'worksheet 1: footer date row not found; enter the date',
       'worksheet 1: footer statistics not found; not checked',
@@ -132,7 +132,7 @@ describe('parseShotViewWorkbook', () => {
         ['1', '2800.0', '-2.0', '', '', '2:10 PM', text, text],
       ])
     const set = parseShotViewWorkbook(book(flag('yes')))
-    expect(set.session.strings[0].shots[0].coldBore).toBe(true)
+    expect(set.session.strings[0]?.shots[0]?.coldBore).toBe(true)
     expect(set.session.note).toBe('ShotView bore flags: string 1 shot 1 clean bore and cold bore')
   })
 

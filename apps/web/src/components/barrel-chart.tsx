@@ -4,7 +4,7 @@ import { useMemo } from 'react'
 import type { BarrelRow } from '../lib/barrel-length.ts'
 import { niceTicks } from '../lib/ticks.ts'
 import { formatNumber, formatQuantity, type UnitSystem } from '../lib/units.ts'
-import { EChart, useChartTokens } from './echart.tsx'
+import { EChart, tickStep, useChartTokens } from './echart.tsx'
 import type { BarrelStep } from './use-barrel-study.ts'
 
 const tokens = {
@@ -38,7 +38,7 @@ const valueAxis = (
     position: side,
     min: t[0],
     max: t[t.length - 1],
-    interval: t[1] - t[0],
+    interval: tickStep(t),
     name,
     nameLocation: 'middle' as const,
     nameGap: 44,
@@ -116,7 +116,7 @@ const stepSeries = (c: SeriesContext, q: 'velocity' | 'energy', axisIndex: numbe
   }
 }
 
-type TooltipParams = { axisValue: number; seriesName: string; value: number[] }[]
+type TooltipParams = { axisValue: number; seriesName: string; value: [number, number] }[]
 
 const tooltipFormatter = (system: UnitSystem) => (params: TooltipParams) => {
   const { barrelLength: length, velocity, energy } = system
@@ -132,16 +132,16 @@ const tooltipFormatter = (system: UnitSystem) => (params: TooltipParams) => {
 function chartOption(theme: Theme, steps: BarrelStep[], selected: number, system: UnitSystem) {
   const { barrelLength: length, velocity, energy } = system
   const ladder = steps.length > 1
-  const curves = steps.map((s) => drawn(s.rows))
-  const all = curves.flat()
+  const curves = steps.map((step) => ({ step, curve: drawn(step.rows) }))
+  const all = curves.flatMap((c) => c.curve)
   if (all.length === 0) return
   const xs = all.map((r) => length.fromSi(r.length))
   const current = all.find((r) => r.current)
-  const lines = steps.flatMap((step, index) => {
+  const lines = curves.flatMap(({ step, curve }, index) => {
     const c = {
       theme,
       system,
-      curve: curves[index],
+      curve,
       step,
       index,
       own: index === selected,
@@ -174,7 +174,7 @@ function chartOption(theme: Theme, steps: BarrelStep[], selected: number, system
       type: 'value' as const,
       min: xt[0],
       max: xt[xt.length - 1],
-      interval: xt[1] - xt[0],
+      interval: tickStep(xt),
       name: `Barrel length, ${length.symbol}`,
       nameLocation: 'middle' as const,
       nameGap: 26,
@@ -243,6 +243,7 @@ export function BarrelChart({
         focus={selected * 2}
         readout={(i) => {
           const r = rows[Math.min(i, rows.length - 1)]
+          if (!r) return ''
           return `${formatQuantity('barrelLength', system, r.length)} ${length.symbol}: ${formatQuantity('velocity', system, r.values.velocity)} ${velocity.symbol}, ${formatQuantity('energy', system, r.values.energy)} ${energy.symbol}`
         }}
       />

@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { GET, POST } from '../src/app/api/[...path]/route.server.ts'
 import { API_PREFIX } from '../src/lib/api-version.ts'
+import { defined } from './defined.ts'
 
 const context = (path: string[]) => ({ params: Promise.resolve({ path }) })
 let fetchMock: ReturnType<typeof vi.fn>
@@ -20,7 +21,9 @@ describe('forwarding route', () => {
   it('forwards an allowed GET with its query to API_URL', async () => {
     const res = await GET(new Request('http://web/api/cartridges?q=308'), context(['cartridges']))
     expect(res.status).toBe(200)
-    expect(fetchMock.mock.calls[0][0]).toBe(`http://api.test:3000${API_PREFIX}/cartridges?q=308`)
+    expect(defined(fetchMock.mock.calls[0])[0]).toBe(
+      `http://api.test:3000${API_PREFIX}/cartridges?q=308`,
+    )
   })
 
   it.each([
@@ -48,7 +51,10 @@ describe('forwarding route', () => {
     ],
   ])('forwards %s', async (_, paths) => {
     for (const path of paths)
-      await GET(new Request(`http://web/api/${path}`), context(path.split('?')[0].split('/')))
+      await GET(
+        new Request(`http://web/api/${path}`),
+        context(defined(path.split('?')[0]).split('/')),
+      )
     expect(fetchMock.mock.calls.map((c) => c[0])).toEqual(
       paths.map((path) => `http://api.test:3000${API_PREFIX}/${path}`),
     )
@@ -93,7 +99,7 @@ describe('forwarding route', () => {
     expect(res.headers.get('content-type')).toBe('application/json')
     expect(res.headers.get('x-other')).toBeNull()
     expect(await res.text()).toBe(body)
-    const [url, init] = fetchMock.mock.calls[0]
+    const [url, init] = defined(fetchMock.mock.calls[0])
     expect(url).toBe(`http://api.test:3000${API_PREFIX}/interior`)
     expect(init.method).toBe('POST')
     expect(init.body).toBe('{"model":"m3"}')

@@ -19,6 +19,7 @@ Pure TypeScript ballistics solver, ESM. Must stay headless: no runtime dependenc
   - `InputError` (extends `RangeError`): thrown on purpose for inputs outside the model and for computations that do not finish within their limits. `TruingError`, `PowderFitError` and `ValueError` (`interior/load-file.ts`) extend it.
   - Any other error is a defect (the API answers 500).
   - `need(ok, message)` throws an `InputError` for a failed input check.
+  - `nth(array, index)` returns the entry or throws a `RangeError`; `el(typedArray, index)` is the unchecked read for state vectors in hot loops (`noUncheckedIndexedAccess`).
   - Internal: `src/index.ts` re-exports only `InputError` from this file.
 - `src/drag-tables.ts`: the BRL drag tables (G1, G2, G5, G6, G7, G8, GI and the 9/16 in sphere as GS) as JBM publishes them. Generated: do not edit by hand. Tests pin each table's length and end points.
 - `src/interior/model.ts`: `interior` and `closedVessel`, the M3 Noble-Abel interior model (`apps/docs/docs/models/interior-m3.md`).

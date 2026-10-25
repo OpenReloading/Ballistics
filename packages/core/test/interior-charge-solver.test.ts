@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { nth } from '../src/errors.ts'
 import {
   type ChargeTargetKind,
   chargeSolverMaxRuns,
@@ -72,10 +73,10 @@ describe('solveCharge', () => {
     const series = (kind: ChargeTargetKind) => charges.map((c) => valueAt(kind, c))
     for (const kind of ['peakPressure', 'muzzleVelocity', 'loadRatio'] as const) {
       const v = series(kind)
-      for (let i = 1; i < v.length; i++) expect(v[i]).toBeGreaterThan(v[i - 1])
+      for (let i = 1; i < v.length; i++) expect(v[i]).toBeGreaterThan(nth(v, i - 1))
     }
     const t = series('barrelTime')
-    for (let i = 1; i < t.length; i++) expect(t[i]).toBeLessThan(t[i - 1])
+    for (let i = 1; i < t.length; i++) expect(t[i]).toBeLessThan(nth(t, i - 1))
   })
 
   it.each([

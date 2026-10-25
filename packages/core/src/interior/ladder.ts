@@ -1,4 +1,4 @@
-import { need } from '../errors.ts'
+import { need, nth } from '../errors.ts'
 
 /**
  * Charges of a charge ladder in kg: the i-th (from 0) is `start + i * step` up or `start - i * step`
@@ -20,7 +20,7 @@ export function chargeLadder(
       ? start + (i - (steps - 1) / 2) * step
       : start + (direction === 'up' ? 1 : -1) * i * step,
   )
-  const lowest = Math.min(charges[0], charges[steps - 1])
+  const lowest = Math.min(nth(charges, 0), nth(charges, steps - 1))
   need(lowest > 0, `ladder charge ${lowest} kg must be above 0`)
   return charges
 }

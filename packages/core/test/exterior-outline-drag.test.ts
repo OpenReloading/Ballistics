@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { nth } from '../src/errors.ts'
 import { estimateDragFromOutline, InputError, outlineDragMach } from '../src/index.ts'
 
 // Printed outputs of McCoy, ARBRL-TR-02293, Figures 26 to 28 (pp. 57 to 59), three decimals, so a
@@ -149,7 +150,10 @@ describe('drag estimate from the outline', () => {
           n.basePressureRatio,
         ]
         for (const [j, v] of got.entries()) {
-          expect(Math.abs(v - c.rows[i][j]), `Mach ${n.mach} column ${j}`).toBeLessThanOrEqual(half)
+          expect(
+            Math.abs(v - nth(nth(c.rows, i), j)),
+            `Mach ${n.mach} column ${j}`,
+          ).toBeLessThanOrEqual(half)
         }
       }
       expect(est.dragTable).toEqual(est.nodes.map((n) => [n.mach, n.dragCoefficient]))
@@ -158,7 +162,7 @@ describe('drag estimate from the outline', () => {
 
   it('takes the 5.7 mm printed in the BRL-1 header', () => {
     const est = estimateDragFromOutline({
-      ...cases[0].in,
+      ...nth(cases, 0).in,
       diameter: 0.0057,
       length: 5.48 * 0.0057,
       noseLength: 3 * 0.0057,
@@ -167,17 +171,17 @@ describe('drag estimate from the outline', () => {
       bandDiameter: 0.0057,
     })
     for (const [i, n] of est.nodes.entries())
-      expect(Math.abs(n.dragCoefficient - brl1[i][0])).toBeLessThanOrEqual(half)
+      expect(Math.abs(n.dragCoefficient - nth(brl1, i)[0])).toBeLessThanOrEqual(half)
   })
 
   it('warns where the report warns', () => {
-    expect(estimateDragFromOutline(cases[0].in).warnings).toEqual([])
-    expect(estimateDragFromOutline(cases[1].in).warnings).toEqual([
+    expect(estimateDragFromOutline(nth(cases, 0).in).warnings).toEqual([])
+    expect(estimateDragFromOutline(nth(cases, 1).in).warnings).toEqual([
       'nose-short',
       'base-pressure-negative',
     ])
     const blunt = {
-      ...cases[0].in,
+      ...nth(cases, 0).in,
       noseLength: 0.8 * 0.00569,
       boatTailLength: 1.6 * 0.00569,
       baseDiameter: 0.6 * 0.00569,
@@ -187,7 +191,7 @@ describe('drag estimate from the outline', () => {
     )
     expect(
       estimateDragFromOutline({
-        ...cases[0].in,
+        ...nth(cases, 0).in,
         diameter: 0.0039,
         length: 5.48 * 0.0039,
         noseLength: 3 * 0.0039,
@@ -198,7 +202,7 @@ describe('drag estimate from the outline', () => {
     ).toContain('diameter-range')
     expect(
       estimateDragFromOutline({
-        ...cases[2].in,
+        ...nth(cases, 2).in,
         diameter: 0.5,
         length: 5.65 * 0.5,
         noseLength: 3.01 * 0.5,
@@ -208,10 +212,12 @@ describe('drag estimate from the outline', () => {
         bandDiameter: 0.51,
       }).warnings,
     ).toContain('diameter-range')
-    expect(estimateDragFromOutline({ ...cases[0].in, machNumbers: [0.4, 2] }).warnings).toEqual([
-      'mach-range',
-    ])
-    expect(estimateDragFromOutline({ ...cases[0].in, machNumbers: [0.5, 5] }).warnings).toEqual([])
+    expect(
+      estimateDragFromOutline({ ...nth(cases, 0).in, machNumbers: [0.4, 2] }).warnings,
+    ).toEqual(['mach-range'])
+    expect(
+      estimateDragFromOutline({ ...nth(cases, 0).in, machNumbers: [0.5, 5] }).warnings,
+    ).toEqual([])
   })
 
   it('gives a flat base without a boat tail and a standard deviation per node', () => {
@@ -227,7 +233,7 @@ describe('drag estimate from the outline', () => {
   })
 
   it('rejects an outline the method cannot take', () => {
-    const ok = cases[0].in
+    const ok = nth(cases, 0).in
     expect(() => estimateDragFromOutline({ ...ok, diameter: 0 })).toThrow(InputError)
     expect(() => estimateDragFromOutline({ ...ok, noseLength: ok.length })).toThrow(InputError)
     expect(() => estimateDragFromOutline({ ...ok, meplatDiameter: ok.diameter })).toThrow(

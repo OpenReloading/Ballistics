@@ -13,8 +13,8 @@ import {
   type BulletRow,
   bulletKey,
   bulletScore,
-  massWord,
   sameMass,
+  typedMass,
   typedWords,
 } from './bullet-rows.ts'
 import { commonCaliber } from './caliber.ts'
@@ -92,12 +92,12 @@ function bareCaliber(label: string) {
 function bonus(b: BulletRow, e: Entry, words: readonly string[]): number {
   let total = 0
   for (const word of words) {
-    const typed = massWord.exec(word)
+    const typed = typedMass(word)
     // "308" and ".308" are the caliber ".308", "6.5" the caliber "6.5 mm"
     if (
       typed &&
-      (sameMass(b, typed[1], typed[2]) ||
-        (typed[2] === undefined && bareCaliber(commonCaliber(b.diameter)) === typed[1]))
+      (sameMass(b, typed.number, typed.unit) ||
+        (typed.unit === undefined && bareCaliber(commonCaliber(b.diameter)) === typed.number))
     )
       total += 3
     total += e.name.reduce((m, w) => Math.max(m, w === word ? 2 : w.startsWith(word) ? 1 : 0), 0)

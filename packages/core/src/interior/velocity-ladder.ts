@@ -3,7 +3,7 @@
  * from the mean, spread and shot count of each string
  * (`apps/docs/docs/models/interior-velocity-ladder.md`). SI throughout: charge kg, velocity m/s.
  */
-import { need } from '../errors.ts'
+import { need, nth } from '../errors.ts'
 import { studentTwoSidedQuantile } from '../groups/student-t.ts'
 
 /** One string of a ladder: the charge, the mean and sample standard deviation of its velocities, and its shot count. */
@@ -65,7 +65,7 @@ export function ladderFlatSpots(steps: readonly LadderStep[], level = 0.95): Lad
     need(Number.isInteger(s.count) && s.count >= 2, 'each string needs at least two shots')
   }
   const segments = sorted.slice(1).map((b, i): LadderSegment => {
-    const a = sorted[i]
+    const a = nth(sorted, i)
     need(b.charge > a.charge, 'charges must differ')
     const va = a.standardDeviation ** 2 / a.count
     const vb = b.standardDeviation ** 2 / b.count
@@ -93,9 +93,9 @@ export function ladderFlatSpots(steps: readonly LadderStep[], level = 0.95): Lad
   const close = () => {
     if (run.length > 0)
       flatSpots.push({
-        from: run[0].from,
-        to: run[run.length - 1].to,
-        counts: [run[0].counts[0], ...run.map((s) => s.counts[1])],
+        from: nth(run, 0).from,
+        to: nth(run, run.length - 1).to,
+        counts: [nth(run, 0).counts[0], ...run.map((s) => s.counts[1])],
       })
     run = []
   }

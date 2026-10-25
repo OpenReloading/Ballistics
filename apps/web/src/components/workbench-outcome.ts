@@ -3,6 +3,7 @@ import { fromSi } from '@open-reloading/schema'
 import type { ErrorBody, InteriorLadderResponse, InteriorResponse } from '../lib/api-types.ts'
 import { pagesBasePath } from '../lib/edition.ts'
 import type { InteriorBody } from '../lib/interior-input.ts'
+import { nth } from '../lib/nth.ts'
 import type {
   LadderDirection,
   RunnableLadderKind,
@@ -227,7 +228,7 @@ export function stepFlag(ok: Shown) {
 
 /** The outcome showing step `i`. */
 export function atStep(ok: Extract<Outcome, { kind: 'ok' }>, i: number) {
-  const s = ok.steps[i]
+  const s = nth(ok.steps, i)
   return { ...ok, body: s.body ?? ok.body, load: stepLoad(ok.load, s), selected: i }
 }
 

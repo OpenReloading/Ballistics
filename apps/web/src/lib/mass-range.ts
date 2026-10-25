@@ -13,9 +13,11 @@ export function massRange(text: string) {
   const t = text.trim()
   const unit = (['gr', 'g'] as const).find((u) => t.endsWith(u))
   if (!unit) return
-  const bounds = t.slice(0, -unit.length).split('-')
-  if (bounds.length !== 2) return
-  const [lo, hi] = bounds.map((s) => s.trim())
+  const [lo, hi, ...more] = t
+    .slice(0, -unit.length)
+    .split('-')
+    .map((s) => s.trim())
+  if (lo === undefined || hi === undefined || more.length > 0) return
   if (!number.test(lo) || !number.test(hi)) return
   // "." alone is no number: no bound
   const n = (s: string) => (s && s !== '.' ? Number(s) : undefined)

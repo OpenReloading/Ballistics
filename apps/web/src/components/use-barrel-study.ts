@@ -17,6 +17,7 @@ import {
   rangeLengths,
 } from '../lib/barrel-length.ts'
 import type { FieldValue } from '../lib/field-spec.ts'
+import { nth } from '../lib/nth.ts'
 import { roundedFieldText, type UnitSystem } from '../lib/units.ts'
 import {
   needsNetwork,
@@ -84,7 +85,7 @@ async function requestLonger(
       return { message: json?.message ?? `The API answered ${res.status}.` }
     return {
       // a step the model reports as invalid keeps its reason, as the workbench shows it
-      runs: stepsOf(json, ok.steps[0].charge).map((s) =>
+      runs: stepsOf(json, nth(ok.steps, 0).charge).map((s) =>
         s.body ? s.body.result : { reason: s.error?.reason ?? s.error?.message ?? 'invalid' },
       ),
     }

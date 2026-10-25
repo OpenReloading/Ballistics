@@ -18,6 +18,7 @@ import {
   refName,
   withUserManufacturers,
 } from './manufacturers.ts'
+import { nth } from './nth.ts'
 
 /** The base record of a variant: none given, read, no longer in the catalogue, or not read. */
 export type Base<T> =
@@ -242,9 +243,9 @@ export function dropPath(target: Record<string, unknown>, path: string) {
     if (typeof next !== 'object' || next === null || Array.isArray(next)) return
     chain.push(next as Record<string, unknown>)
   }
-  delete chain[keys.length][last]
-  for (let i = keys.length; i > 0 && Object.keys(chain[i]).length === 0; i--)
-    delete chain[i - 1][keys[i - 1]]
+  delete nth(chain, keys.length)[last]
+  for (let i = keys.length; i > 0 && Object.keys(nth(chain, i)).length === 0; i--)
+    delete nth(chain, i - 1)[nth(keys, i - 1)]
 }
 
 /** The reference a load file keeps for a catalogue record: a plain id is a catalogue record. */

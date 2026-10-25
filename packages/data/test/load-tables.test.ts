@@ -1,6 +1,7 @@
 import type { Powder, Source } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { checkFittedSources, type LoadTables } from '../src/load-tables.ts'
+import { defined } from './defined.ts'
 
 const loadTables: LoadTables = {
   'example-2026': {
@@ -10,7 +11,7 @@ const loadTables: LoadTables = {
     retrieved: '2026-01-01',
   },
 }
-const table = loadTables['example-2026']
+const table = defined(loadTables['example-2026'])
 const fitted: Source = {
   title: table.title,
   url: table.url,

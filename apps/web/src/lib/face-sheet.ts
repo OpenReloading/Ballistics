@@ -7,6 +7,7 @@
  */
 import { type ShotGroup, type TargetFace, type TargetSheet, toSi } from '@open-reloading/schema'
 import { type FederationData, mappingOf } from './face-disciplines.ts'
+import { nth } from './nth.ts'
 import { faceAlignment } from './ring-scoring.ts'
 import type { FaceGeometry, FacePlane } from './target-face.ts'
 import { type Matrix, mul3, type Point } from './target-geometry.ts'
@@ -81,7 +82,7 @@ function eventAt(distance: number, found: FoundFace, { federation }: FaceScope) 
   if (federation) return near.find((e) => of(e) === federation)?.id
   const own = near.find((e) => !e.federation)
   if (own) return own.id
-  return new Set(near.map(of)).size === 1 ? near[0].id : undefined
+  return new Set(near.map(of)).size === 1 ? nth(near, 0).id : undefined
 }
 
 /**
@@ -102,7 +103,7 @@ export function faceGeometry(o: {
   const { sheet, group, record, toTarget } = o
   const choice = group?.face
   if (!toTarget || !group || !choice || !record || record.id !== choice.id) return undefined
-  const outer = record.rings[0].diameter.value / 2
+  const outer = nth(record.rings, 0).diameter.value / 2
   const size = toSi('length', 2 * outer)
   const onFace = sheet.references.some(
     (r) =>

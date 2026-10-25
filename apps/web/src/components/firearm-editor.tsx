@@ -563,12 +563,15 @@ export function FirearmEditor({
                   disabled={c.mounts.length >= 4}
                   style={{ alignSelf: 'flex-start' }}
                   onClick={() => {
-                    const free = data.optics.find((o) => !c.mounts.some((m) => m.optic === o.id))
+                    const optic =
+                      data.optics.find((o) => !c.mounts.some((m) => m.optic === o.id)) ??
+                      data.optics[0]
+                    if (!optic) return
                     setConfig(i, {
                       mounts: [
                         ...c.mounts,
                         {
-                          optic: (free ?? data.optics[0]).id,
+                          optic: optic.id,
                           sightHeight: empty,
                           zeroRange: empty,
                         },
@@ -588,6 +591,8 @@ export function FirearmEditor({
               leftSection={<Plus size={14} aria-hidden="true" />}
               disabled={!data.optics.length}
               onClick={() => {
+                const [firstOptic] = data.optics
+                if (!firstOptic) return
                 const id = freeId(
                   'c',
                   data.configurations.map((c) => c.id),
@@ -598,7 +603,7 @@ export function FirearmEditor({
                     {
                       id,
                       name: '',
-                      mounts: [{ optic: data.optics[0].id, sightHeight: empty, zeroRange: empty }],
+                      mounts: [{ optic: firstOptic.id, sightHeight: empty, zeroRange: empty }],
                     },
                   ],
                   active: data.active ?? id,

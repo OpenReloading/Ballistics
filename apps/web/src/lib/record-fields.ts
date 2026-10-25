@@ -80,7 +80,7 @@ function formatSignificant(x: number, n: number): string {
 
 /** A record value as a name: "hollow-point" as "Hollow point". */
 export const titleFromKebab = (value: string) =>
-  (value[0].toUpperCase() + value.slice(1)).replaceAll('-', ' ')
+  (value.charAt(0).toUpperCase() + value.slice(1)).replaceAll('-', ' ')
 
 /**
  * The construction in a few words: the structure, the core and jacket materials, the surface; a
@@ -136,8 +136,7 @@ export function buildRows(c: Bullet['construction']): FieldRow[] {
     ...text('Surface', c.surface?.map(material).join(', ')),
   ]
   if (rows.length === 0) return [{ label: 'Construction', text: c.raw }]
-  rows[0] = { ...rows[0], printed: c.raw }
-  return rows
+  return rows.map((row, i) => (i === 0 ? { ...row, printed: c.raw } : row))
 }
 
 /**

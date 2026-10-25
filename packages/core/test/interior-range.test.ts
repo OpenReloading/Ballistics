@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { nth } from '../src/errors.ts'
 import {
   type ApplyTolerance,
   type InteriorLoad,
@@ -164,7 +165,9 @@ describe('interiorPressureRange', () => {
       },
     }
     const r = interiorPressureRange(load, peak(load))
-    const [up, down] = r.cases.filter((c) => c.input === 'temperatureKelvin')
+    const moved = r.cases.filter((c) => c.input === 'temperatureKelvin')
+    const up = nth(moved, 0)
+    const down = nth(moved, 1)
     expect(up.maxPressure).toBeGreaterThan(down.maxPressure ?? Number.POSITIVE_INFINITY)
   })
 
@@ -231,7 +234,9 @@ describe('interiorPressureRange', () => {
     const p0 = peak(load)
     expect(Number.isFinite(p0)).toBe(true)
     const r = interiorPressureRange(load, p0)
-    const [up, down] = r.cases.filter((c) => c.input === 'burnRateFraction')
+    const moved = r.cases.filter((c) => c.input === 'burnRateFraction')
+    const up = nth(moved, 0)
+    const down = nth(moved, 1)
     expect(up.maxPressure).toBeGreaterThan(p0)
     expect(down.maxPressure).toBeLessThan(p0)
   })
