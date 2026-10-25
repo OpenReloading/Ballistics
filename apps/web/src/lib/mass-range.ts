@@ -2,18 +2,26 @@
 import { fromSi } from '@open-reloading/schema'
 import { kilogramsPerGrain } from './units.ts'
 
+/** Digits with at most one point, either part may be empty. */
+const number = /^\d*(?:\.\d*)?$/
+
 /**
  * A mass range of the text ("150-180gr", "9.5-g"), undefined when it does not parse or names no
  * known unit. Either bound may be left out.
  */
 export function massRange(text: string) {
-  const m = /^\s*(\d*\.?\d*)\s*-\s*(\d*\.?\d*)\s*(gr|g)\s*$/.exec(text)
-  if (!m) return
+  const t = text.trim()
+  const unit = (['gr', 'g'] as const).find((u) => t.endsWith(u))
+  if (!unit) return
+  const bounds = t.slice(0, -unit.length).split('-')
+  if (bounds.length !== 2) return
+  const [lo, hi] = bounds.map((s) => s.trim())
+  if (!number.test(lo) || !number.test(hi)) return
   // "." alone is no number: no bound
   const n = (s: string) => (s && s !== '.' ? Number(s) : undefined)
-  const [min, max] = [n(m[1]), n(m[2])]
+  const [min, max] = [n(lo), n(hi)]
   if (min === undefined && max === undefined) return
-  return { min, max, unit: m[3] as 'gr' | 'g' }
+  return { min, max, unit }
 }
 
 const gramsPer = { g: 1, gr: fromSi('mass', kilogramsPerGrain) }
