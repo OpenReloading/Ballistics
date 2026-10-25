@@ -21,11 +21,12 @@ import type { DirectoryColumn } from './directory-table.tsx'
 
 /**
  * The user records of this browser, read after mounting; none while the store cannot be
- * read. `remove` asks, as the File menu's list of browser records does, then deletes the record of
+ * read (again whenever `reread` changes). `remove` asks, as the File menu's list of browser records does, then deletes the record of
  * a list row and drops the row.
  */
-export function useUserRecords() {
+export function useUserRecords(reread?: unknown) {
   const [records, setRecords] = useState<UserRecord[]>([])
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `reread` only restarts the read
   useEffect(() => {
     let live = true
     storedRecords().then(
@@ -35,7 +36,7 @@ export function useUserRecords() {
     return () => {
       live = false
     }
-  }, [])
+  }, [reread])
   const remove = useCallback(
     async (rowId: string, rowName: string) => {
       const id = userRecordId(rowId)

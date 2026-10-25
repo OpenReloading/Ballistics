@@ -27,7 +27,7 @@ type Found = {
  * the browser's ranking (`findBullets`, the card's field and dialog) over `designs` and the
  * catalogue, kept to those that fit `fit`.
  */
-async function search(
+export async function paletteSearch(
   text: string,
   designs: readonly BulletRow[],
   fit: CartridgeDiameters | undefined,
@@ -116,7 +116,7 @@ export function WorkbenchSearch({
       return
     }
     const controller = new AbortController()
-    search(text, designs, bulletFit, controller.signal)
+    paletteSearch(text, designs, bulletFit, controller.signal)
       .then((f) => {
         if (!controller.signal.aborted) setFound(f)
       })
