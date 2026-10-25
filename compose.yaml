@@ -32,4 +32,4 @@ services:
         API_URL: http://localhost:${API_PORT:-3000}
         APP_URL: http://localhost:${WEB_PORT:-3001}
     ports:
-      - "${DOCS_PORT:-3002}:80"
+      - "${DOCS_PORT:-3002}:8080"

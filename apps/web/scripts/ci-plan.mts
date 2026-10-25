@@ -154,8 +154,12 @@ export function plan(all: string[], closure = recordClosure()): Plan {
     : { ...everything('no changed file feeds the record pages'), prerender: 'sample' }
 }
 
+/** git by an absolute path of a system directory, never through `PATH`. */
+const gitPath = ['/usr/bin', '/usr/local/bin', '/bin'].map((d) => `${d}/git`).find(existsSync)
+
 function git(...args: string[]) {
-  return execFileSync('git', args, {
+  if (gitPath === undefined) throw new Error('git not found in the system directories')
+  return execFileSync(gitPath, args, {
     cwd: repoRoot,
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
