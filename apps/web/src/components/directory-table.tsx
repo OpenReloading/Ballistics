@@ -412,7 +412,7 @@ export function DirectoryTable<T extends { id: string }>({
                 </th>
               )
             })}
-            <td className="filler" aria-hidden="true" />
+            <td className="filler" role="presentation" />
           </tr>
         </thead>
         <tbody
@@ -448,10 +448,7 @@ export function DirectoryTable<T extends { id: string }>({
             const action = phoneAction?.(row, tabIndexOf(row, 'action'))
             return (
               <Fragment key={row.id}>
-                {pad(gap) > 0 && (
-                  // biome-ignore lint/a11y/noAriaHiddenOnFocusable: an empty spacer row holds no focusable content
-                  <tr aria-hidden="true" style={{ height: pad(gap) }} />
-                )}
+                {pad(gap) > 0 && <tr inert style={{ height: pad(gap) }} />}
                 <tr
                   data-row
                   data-id={row.id}
@@ -521,17 +518,13 @@ export function DirectoryTable<T extends { id: string }>({
                       </td>
                     ),
                   )}
-                  <td className="filler" aria-hidden="true" />
+                  <td className="filler" role="presentation" />
                 </tr>
               </Fragment>
             )
           })}
           {pad(shown.length - 1 - (visible.at(-1) ?? -1)) > 0 && (
-            // biome-ignore lint/a11y/noAriaHiddenOnFocusable: an empty spacer row holds no focusable content
-            <tr
-              aria-hidden="true"
-              style={{ height: pad(shown.length - 1 - (visible.at(-1) ?? -1)) }}
-            />
+            <tr inert style={{ height: pad(shown.length - 1 - (visible.at(-1) ?? -1)) }} />
           )}
           {shown.length === 0 && (
             <tr>
