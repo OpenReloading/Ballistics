@@ -2,6 +2,7 @@
 import {
   checkUserRefs,
   type EmbeddedFile,
+  parseRef,
   type UserRecord,
   userDataFile,
   userDataFormat,
@@ -168,6 +169,19 @@ export function validRecords(raw: unknown[]) {
     }
   }
   return { records, invalid }
+}
+
+/**
+ * The user manufacturer of `pool` that a bullet's or a firearm's `manufacturer` reference names:
+ * what a file or link of that one record carries, so the maker does not dangle where it is opened.
+ * None for another kind, a catalogue manufacturer or a maker `pool` lacks.
+ */
+export function makerRecordsOf(record: UserRecord, pool: readonly UserRecord[]): UserRecord[] {
+  if (record.kind !== 'bullet' && record.kind !== 'firearm') return []
+  const ref = record.data.manufacturer && parseRef(record.data.manufacturer)
+  return ref && ref.scope === 'user'
+    ? pool.filter((r) => r.kind === 'manufacturer' && r.id === ref.id)
+    : []
 }
 
 const content = (r: UserRecord) => canonicalJson({ kind: r.kind, name: r.name, data: r.data })

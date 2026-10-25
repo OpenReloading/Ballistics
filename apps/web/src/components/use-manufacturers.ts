@@ -27,6 +27,20 @@ export function useManufacturers() {
   const [mine, setMine] = useState<UserRecord[]>([])
   const [ready, setReady] = useState(false)
   const loaded = useRef(false)
+  /** Reads the browser's manufacturers again, after a record brought some along. A draft of the same id gives way. */
+  const reload = useCallback(
+    () =>
+      storedRecords().then(
+        (r) =>
+          setMine((m) => {
+            const stored = r.records.filter((x) => x.kind === 'manufacturer')
+            const ids = new Set(stored.map((x) => x.id))
+            return [...m.filter((x) => !ids.has(x.id)), ...stored]
+          }),
+        () => {},
+      ),
+    [],
+  )
   useEffect(() => {
     let live = true
     // without the catalogue a typed name can only match the user's own manufacturers
@@ -39,14 +53,11 @@ export function useManufacturers() {
       },
       () => {},
     )
-    storedRecords().then(
-      (r) => live && setMine((m) => [...m, ...r.records.filter((x) => x.kind === 'manufacturer')]),
-      () => {},
-    )
+    reload()
     return () => {
       live = false
     }
-  }, [])
+  }, [reload])
   const known = useMemo(() => knownManufacturers(catalogue, mine), [catalogue, mine])
   const names = useMemo(
     () => withUserManufacturers(manufacturerNames(catalogue), mine),
@@ -102,6 +113,7 @@ export function useManufacturers() {
     names,
     ready,
     retry,
+    reload,
     preview,
     ensure,
     newId,

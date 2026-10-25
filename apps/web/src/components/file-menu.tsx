@@ -33,6 +33,7 @@ import {
   checkedUserDataText,
   exportAllText,
   type InvalidRecord,
+  makerRecordsOf,
   maxFileBytes,
   namedKey,
   type ParsedUserFile,
@@ -50,6 +51,7 @@ import {
   deleteRecords,
   putInvalid,
   putPhoto,
+  putRecordIfAbsent,
   putRecords,
   rawPhotoId,
   requestPersistentStorage,
@@ -347,6 +349,7 @@ function FileMenuOf<K extends UserRecordKind>({
             !(await ask('Replace the unsaved changes with the shared record?', 'Replace'))
           )
             return
+          await keepMakers(r, p.records)
           latest.current.openShared(r)
         })
         .catch(() => {})
@@ -562,7 +565,7 @@ function FileMenuOf<K extends UserRecordKind>({
     const recordId = as || !id.current ? newId() : id.current
     const record = { kind, id: recordId, name, saved: new Date().toISOString(), data } as Of<K>
     // a file Open and Import would reject is not written
-    const checked = checkedUserDataText([record], await photosOf([record]))
+    const checked = checkedUserDataText(await withMakers(record), await photosOf([record]))
     if (!checked.ok) {
       setFailure(`Not saved: ${checked.reason}`)
       return
@@ -671,7 +674,7 @@ function FileMenuOf<K extends UserRecordKind>({
               problem
                 ? `No share link: ${problem}`
                 : ((await shareLink(
-                    current(),
+                    await withMakers(current()),
                     window.location.origin + window.location.pathname,
                   )) ?? `No share link: longer than ${maxLinkChars} characters.`),
           },
@@ -681,7 +684,7 @@ function FileMenuOf<K extends UserRecordKind>({
   async function share() {
     if (problem) return setFailure(`Not shared: ${problem}`)
     const page = window.location.origin + window.location.pathname
-    const link = await shareLink(current(), page)
+    const link = await shareLink(await withMakers(current()), page)
     if (!link)
       return setFailure(
         `Not shared: the link would be longer than ${maxLinkChars} characters; save the record to a file instead.`,
@@ -735,6 +738,20 @@ function FileMenuOf<K extends UserRecordKind>({
     )
   }
 
+  /** `record` and the user manufacturer it names, as a file, Copy JSON and a share link carry them. */
+  async function withMakers(record: UserRecord): Promise<UserRecord[]> {
+    const stored = await storedRecords().then(
+      (s) => s.records,
+      () => [],
+    )
+    return [record, ...makerRecordsOf(record, stored)]
+  }
+
+  /** Keeps the user manufacturer `record` names, as `carried` holds it, unless one of its id is stored. */
+  async function keepMakers(record: UserRecord, carried: UserRecord[]) {
+    await Promise.all(makerRecordsOf(record, carried).map(putRecordIfAbsent)).catch(() => {})
+  }
+
   /** `refNote` of `opened` against the browser store and the built-in example rifle; empty when the store cannot be read. */
   async function refsOf(opened: UserRecord[]) {
     const stored = await storedRecords().catch(() => undefined)
@@ -742,9 +759,16 @@ function FileMenuOf<K extends UserRecordKind>({
   }
 
   /** Shows `record` unless the user keeps the unsaved changes; false when kept. */
-  async function use(record: Of<K>, file: string, h?: FileSystemFileHandle, note?: string) {
+  async function use(
+    record: Of<K>,
+    file: string,
+    h?: FileSystemFileHandle,
+    note?: string,
+    carried: UserRecord[] = [],
+  ) {
     if (unsaved && !(await ask('Replace the unsaved changes with the opened record?', 'Replace')))
       return false
+    await keepMakers(record, carried)
     onOpen(record.data as Of<K>['data'], record.name, record)
     id.current = record.id
     handle.current = h
@@ -795,6 +819,7 @@ function FileMenuOf<K extends UserRecordKind>({
       picked.file.name,
       ownsFile(text, mine[0].id) ? picked.handle : undefined,
       readNote(parsed),
+      parsed.records,
     )
   }
 
@@ -1042,7 +1067,11 @@ function FileMenuOf<K extends UserRecordKind>({
             {shareable.includes(kind) && (
               <Menu.Item onClick={act('Share', share)}>Copy share link</Menu.Item>
             )}
-            <Menu.Item onClick={act('Copy', () => copy(userDataText([current()]), 'Record JSON'))}>
+            <Menu.Item
+              onClick={act('Copy', async () =>
+                copy(userDataText(await withMakers(current())), 'Record JSON'),
+              )}
+            >
               Copy JSON
             </Menu.Item>
             {apiData && (

@@ -191,6 +191,7 @@ const PrintDrawing = memo(function PrintDrawing({
  */
 export function BulletDesigner() {
   const manufacturers = useManufacturers()
+  const reloadManufacturers = manufacturers.reload
   const { system, history, design, dispatch, loading, fileMenu, start, toolbarDispatch } =
     useDesigner<Design, Action>({
       reduce,
@@ -311,8 +312,10 @@ export function BulletDesigner() {
         fetchManufacturerNames().catch(() => noManufacturerNames),
       ])
       dispatch({ type: 'start', design: fromUser(d, resolved, system, names) })
+      // the opened record may have brought its manufacturer along
+      void reloadManufacturers()
     },
-    [system, dispatch],
+    [system, dispatch, reloadManufacturers],
   )
 
   // New bullet or cartridge starts a new record

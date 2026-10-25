@@ -1,4 +1,4 @@
-/** Share links: one user record packed into the fragment of a page link. */
+/** Share links: a user record, with the user manufacturer it names, packed into the fragment of a page link. */
 import { type UserRecord, userDataFormat, userDataVersion } from '@open-reloading/schema'
 import { type ParsedUserFile, parseUserDataFile } from './user-data.ts'
 
@@ -12,14 +12,14 @@ const through = async (
 ) => new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(t)).arrayBuffer())
 
 /**
- * `page` with `record` in the fragment: the file text, deflate-compressed, base64url; the
+ * `page` with `records` in the fragment: the file text, deflate-compressed, base64url; the
  * browser does not send a fragment to the server. Undefined when the link is over `maxLinkChars`.
  */
-export async function shareLink(record: UserRecord, page: string) {
+export async function shareLink(records: UserRecord[], page: string) {
   const text = JSON.stringify({
     format: userDataFormat,
     version: userDataVersion,
-    records: [record],
+    records,
   })
   const packed = await through(new TextEncoder().encode(text), new CompressionStream('deflate-raw'))
   const b64 = btoa(String.fromCharCode(...packed))
