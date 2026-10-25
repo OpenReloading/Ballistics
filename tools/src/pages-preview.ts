@@ -22,9 +22,8 @@ export function markPreview(dir: string) {
     const close = html.lastIndexOf('</body>')
     if (!open || close < open.index)
       throw new Error(`${page}: no <head> or </body> to mark as preview`)
-    // after `<meta charset>`, which stays among the first bytes; no search for `</head>`, a script may hold the text
-    const charset = /<meta\s+charset=[^>]*>/i.exec(html.slice(open.index, open.index + 1024))
-    const at = open.index + (charset ? charset.index + charset[0].length : open[0].length)
+    // right after the opening tag: no search through comments or scripts. GitHub Pages sends the charset in the header
+    const at = open.index + open[0].length
     writeFileSync(
       file,
       `${html.slice(0, at)}${head}${html.slice(at, close)}${label}${html.slice(close)}`,

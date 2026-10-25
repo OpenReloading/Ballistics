@@ -7,7 +7,7 @@ import { markPreview } from '../src/pages-preview.ts'
 const dir = mkdtempSync(path.join(tmpdir(), 'pages-preview-'))
 afterAll(() => rmSync(dir, { recursive: true }))
 const page = (script = '') =>
-  `<!DOCTYPE html><html><head lang="en"><meta charSet="utf-8"/><title>x</title><script>"</head>"</script></head><body><main>x</main>${script}</body></html>`
+  `<!DOCTYPE html><html><head lang="en"><!-- <meta charset="utf-8"> --><title>x</title><script>"</head>"</script></head><body><main>x</main>${script}</body></html>`
 mkdirSync(path.join(dir, 'docs'), { recursive: true })
 writeFileSync(path.join(dir, 'index.html'), page('<script>"</body>"</script>'))
 writeFileSync(path.join(dir, 'docs', 'index.html'), page())
@@ -18,11 +18,10 @@ it('marks every page with noindex in its head and one label before the last </bo
   expect(markPreview(dir)).toEqual({ pages: 2, sitemaps: ['docs/sitemap.xml'] })
   for (const f of ['index.html', 'docs/index.html']) {
     const html = readFileSync(path.join(dir, f), 'utf8')
-    // after the charset, and the text `</head>` of a script is left alone
+    // right after the opening tag, whatever comments and scripts the head holds
     expect(html).toMatch(
-      /<meta charSet="utf-8"\/><meta name="robots" content="noindex"><style>.*<\/style><title>/,
+      /^<!DOCTYPE html><html><head lang="en"><meta name="robots" content="noindex"><style>.*<\/style><!-- <meta charset="utf-8"> -->/,
     )
-    expect(html).toContain('<script>"</head>"</script></head>')
     expect(html.match(/class="preview-label"/g)).toHaveLength(1)
     expect(html).toMatch(/Development preview, not the released site<\/div><\/body><\/html>$/)
   }
