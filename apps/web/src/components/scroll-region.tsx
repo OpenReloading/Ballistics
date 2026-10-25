@@ -6,6 +6,8 @@ import {
   Fragment,
   isValidElement,
   type ReactNode,
+  type RefObject,
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -19,6 +21,25 @@ export function watchOverflow(box: HTMLElement, set: (over: boolean) => void) {
   // the content grows or shrinks with rows and filters, the box with the window
   for (const child of box.children) observer.observe(child)
   return () => observer.disconnect()
+}
+
+/**
+ * The props of a box that scrolls by itself (spread them on it; `box` also receives the element): a
+ * named region and a tab stop for keyboard scrolling only while its content overflows, as
+ * `ScrollRegion` does.
+ */
+export function useScrollFocus<E extends HTMLElement>(label: string, box?: RefObject<E | null>) {
+  const [node, setNode] = useState<E | null>(null)
+  const [over, setOver] = useState(true)
+  useEffect(() => (node ? watchOverflow(node, setOver) : undefined), [node])
+  const ref = useCallback(
+    (n: E | null) => {
+      if (box) box.current = n
+      setNode(n)
+    },
+    [box],
+  )
+  return { ref, ...(over && { role: 'region', 'aria-label': label, tabIndex: 0 }) }
 }
 
 /**

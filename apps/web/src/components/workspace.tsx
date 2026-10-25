@@ -13,6 +13,7 @@ import {
   useState,
 } from 'react'
 import { flushSync } from 'react-dom'
+import { useScrollFocus } from './scroll-region.tsx'
 
 export type WorkspaceHandle = {
   /** Opens the Inputs tab; call it inside `flushSync` to focus a field right after. */
@@ -61,6 +62,7 @@ export function Workspace({
     return () => wide.removeEventListener('change', leave)
   }, [range])
   const region = useRef<HTMLElement>(null)
+  const scrollFocus = useScrollFocus('Results', region)
   const show = useCallback(() => {
     flushSync(() => setTab('results'))
     region.current?.focus()
@@ -94,11 +96,11 @@ export function Workspace({
         <Tabs.Panel value="results" className="workspace-results">
           {/* scrolls on its own from 62em, so it takes focus for keyboard scrolling */}
           <section
-            ref={region}
             id="results"
             aria-label="Results"
-            // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region needs focus to scroll by keyboard
-            tabIndex={0}
+            // the skip link focuses it; a tab stop only while it scrolls
+            tabIndex={-1}
+            {...scrollFocus}
             className="workspace-scroll"
           >
             {results}

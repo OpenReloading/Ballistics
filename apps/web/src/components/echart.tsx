@@ -85,7 +85,7 @@ export function EChart({
   const box = useRef<HTMLDivElement>(null)
   const chart = useRef<ECharts | null>(null)
   const index = useRef(-1)
-  const status = useRef<HTMLParagraphElement>(null)
+  const keys = useRef<HTMLInputElement>(null)
   const id = useId()
 
   const latest = useRef(option)
@@ -166,7 +166,7 @@ export function EChart({
     drawn.current = option
   }, [option])
 
-  const onKey = (e: KeyboardEvent<HTMLDivElement>) => {
+  const onKey = (e: KeyboardEvent<HTMLInputElement>) => {
     const c = chart.current
     const series = (c?.getOption().series as { data?: unknown[] }[] | undefined)?.[focus]
     const n = series?.data?.length ?? 0
@@ -182,9 +182,13 @@ export function EChart({
     e.preventDefault()
     index.current = moves[e.key]
     c.dispatchAction({ type: 'showTip', seriesIndex: focus, dataIndex: index.current })
-    if (status.current && readout) status.current.textContent = readout(index.current)
+    if (keys.current) {
+      keys.current.value = String(index.current)
+      keys.current.setAttribute('aria-valuetext', readout?.(index.current) ?? '')
+    }
   }
 
+  const points = (option.series as { data?: unknown[] }[] | undefined)?.[focus]?.data?.length ?? 0
   return (
     <div className="echart">
       <div
@@ -192,20 +196,29 @@ export function EChart({
         role="img"
         aria-label={title}
         aria-describedby={`${id}-d`}
-        aria-keyshortcuts="ArrowLeft ArrowRight Home End"
-        // biome-ignore lint/a11y/noNoninteractiveTabindex: the keyboard moves the chart's readout
-        tabIndex={0}
         style={{ height }}
+      />
+      {/* the keyboard's hold on the chart: a slider over the data points, hidden, its focus drawn on the chart */}
+      <input
+        ref={keys}
+        type="range"
+        className="visually-hidden echart-keys"
+        aria-label={`${title}, readout`}
+        aria-describedby={`${id}-d`}
+        aria-keyshortcuts="ArrowLeft ArrowRight Home End"
+        min={0}
+        max={Math.max(0, points - 1)}
+        defaultValue={0}
         onKeyDown={onKey}
         onBlur={() => {
           chart.current?.dispatchAction({ type: 'hideTip' })
           index.current = -1
+          if (keys.current) keys.current.value = '0'
         }}
       />
       <p id={`${id}-d`} className="visually-hidden">
         {description} Arrow keys move the readout along the curve.
       </p>
-      <p ref={status} role="status" className="visually-hidden" />
     </div>
   )
 }

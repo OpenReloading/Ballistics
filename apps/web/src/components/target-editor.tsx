@@ -125,6 +125,7 @@ import { helpOf } from './property-grid.tsx'
 import { PrintButton } from './record-actions.tsx'
 import { useSheetReport } from './report-host.ts'
 import { scoredOnly, scoreLine, shotText, useRingScoring } from './ring-scoring.tsx'
+import { useScrollFocus } from './scroll-region.tsx'
 import { useShortcuts } from './shortcuts.tsx'
 import { SiField } from './si-field.tsx'
 import {
@@ -623,6 +624,7 @@ export function TargetEditor({
 
   const frame = useMemo(() => frameOf(sheet), [sheet])
   const group = sheet.groups.find((g) => g.id === active) ?? sheet.groups[0]
+  const scrollFocus = useScrollFocus(`Shots of ${group?.name ?? ''}`, shotScroller)
 
   useEffect(() => setBrowserOverlays(readOverlays()), [])
   const overlays = sheet.overlays ? { ...defaultOverlays, ...sheet.overlays } : browserOverlays
@@ -1752,10 +1754,8 @@ export function TargetEditor({
   const shotsPanel = group && (
     <div className="shots-panel">
       <div
-        ref={shotScroller}
         className="scroll shots-scroll"
-        // a scrollable region needs focus to scroll by keyboard (as ScrollRegion)
-        {...{ role: 'region', 'aria-label': `Shots of ${group.name}`, tabIndex: 0 }}
+        {...scrollFocus}
         onScroll={(e) =>
           windowed &&
           setShotScroll({ top: e.currentTarget.scrollTop, height: e.currentTarget.clientHeight })

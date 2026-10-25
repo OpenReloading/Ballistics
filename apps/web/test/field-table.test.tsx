@@ -82,7 +82,7 @@ it('heads the symbol table Symbol, Quantity, Value, Unit and marks a symbol row 
   ])
   expect(out).toMatch(/Symbol<\/th><th[^>]*>Quantity<\/th><th[^>]*>Value<\/th><th[^>]*>Unit/)
   expect(out).toContain('data-symbol="d"')
-  expect(out.match(/<span tabindex="0"/g)).toHaveLength(1)
+  expect(out.match(/<button type="button" class="symbol-stop" tabindex="0"/g)).toHaveLength(1)
   // a group filter for two groups; no search for three rows
   expect(out).toContain('aria-label="Bullet data: group"')
   expect(out).not.toContain('type="search"')

@@ -11,7 +11,7 @@ export async function putRecords(page: Page, records: object[]) {
             r.result.createObjectStore(n, n === 'records' ? { keyPath: 'id' } : undefined)
       }
       r.onsuccess = () => ok(r.result)
-      r.onerror = () => no(r.error)
+      r.onerror = () => no(r.error ?? new Error('could not open the user store'))
     })
     const tx = db.transaction('records', 'readwrite')
     for (const record of records) tx.objectStore('records').put(record)
