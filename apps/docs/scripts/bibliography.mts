@@ -14,11 +14,12 @@ const urlPattern = /https?:\/\/[^\s<>)]+/g
 const doiPattern = /10\.\d{4,9}\/[^\s,;<>)]+/g
 
 /** A URL without scheme, `www.` and trailing slash or full stop, lower case. */
-const normalUrl = (url: string) =>
-  url
-    .toLowerCase()
-    .replace(/^https?:\/\/(www\.)?/, '')
-    .replace(/[/.]+$/, '')
+const normalUrl = (url: string) => {
+  const bare = url.toLowerCase().replace(/^https?:\/\/(www\.)?/, '')
+  let end = bare.length
+  while (end > 0 && (bare[end - 1] === '/' || bare[end - 1] === '.')) end--
+  return bare.slice(0, end)
+}
 
 /** DOIs in a text, lower case, without a trailing full stop. */
 const dois = (text: string) =>
