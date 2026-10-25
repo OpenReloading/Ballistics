@@ -92,13 +92,12 @@ export function Workspace({
           {inputs}
         </Tabs.Panel>
         <Tabs.Panel value="results" className="workspace-results">
-          {/* scrolls on its own from 62em, so it takes focus for keyboard scrolling */}
+          {/* scrolls on its own from 62em; its tabs and controls take the focus for keyboard scrolling, the skip link focuses the region itself */}
           <section
             ref={region}
             id="results"
             aria-label="Results"
-            // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region needs focus to scroll by keyboard
-            tabIndex={0}
+            tabIndex={-1}
             className="workspace-scroll"
           >
             {results}
