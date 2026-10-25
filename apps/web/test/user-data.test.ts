@@ -285,6 +285,8 @@ describe('user data files', () => {
     // a manufacturer the record does not name, or another record, makes it a collection
     expect(ownsFile(userDataText([bullet, maker]), 'b1')).toBe(false)
     expect(ownsFile(userDataText([madeBullet, maker, load]), 'b1')).toBe(false)
+    // two records of the same id do not make a file of one
+    expect(ownsFile(userDataText([madeBullet, madeBullet, maker]), 'b1')).toBe(false)
   })
 
   it('picks a folder file name that holds no other record', async () => {
@@ -359,6 +361,17 @@ describe('the user manufacturer of a record', () => {
     const other = { ...maker, id: '0a1b2c3d-0000-4000-8000-000000000001', name: 'Other' }
     expect(makerRecordsOf(madeBullet, [load, other, maker])).toEqual([maker])
     expect(makerRecordsOf(madeBullet, [other])).toEqual([])
+  })
+
+  it('is the case manufacturer of a case capacity', () => {
+    const capacity = {
+      kind: 'caseCapacity',
+      id: 'c1',
+      name: 'Capacity',
+      saved,
+      data: { origin: 'user', caseManufacturer: `user:${makerId}` },
+    } as unknown as UserRecord
+    expect(makerRecordsOf(capacity, [maker])).toEqual([maker])
   })
 
   it('is none for a catalogue manufacturer, no manufacturer or another kind', () => {

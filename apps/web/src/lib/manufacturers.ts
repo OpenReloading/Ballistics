@@ -108,13 +108,16 @@ export interface ManufacturerUse {
   uses: number
 }
 
-/** The `user:<id>` references that a manufacturer field shows now; a record in one is in use. */
+/** The `user:<id>` references of the records open in a page; Settings counts each as in use. */
 export const shownManufacturerRefs = new Map<object, string>()
+
+/** Fired on `window` after Settings deleted or restored a user manufacturer, for the fields' lists to read the store again. */
+export const manufacturersChanged = 'user-manufacturers-changed'
 
 /**
  * The user manufacturers of `records` by name, each with the number of places that name it: a
  * bullet's or firearm's `manufacturer`, a capacity's `caseManufacturer`, an invalid record's text
- * (read as it is stored, so a record the format rejects keeps its maker) and a field open on it
+ * (read as it is stored, so a record the format rejects keeps its maker) and the record open on a page
  * (`shown`, from `shownManufacturerRefs`). One that nothing names can be deleted.
  */
 export function manufacturerUses(

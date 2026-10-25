@@ -3,7 +3,11 @@
 import { Button, Group, Stack, Text } from '@mantine/core'
 import { useCallback, useEffect, useState } from 'react'
 import { errorText } from '../lib/error-text.ts'
-import { type ManufacturerUse, manufacturerUses } from '../lib/manufacturers.ts'
+import {
+  type ManufacturerUse,
+  manufacturersChanged,
+  manufacturerUses,
+} from '../lib/manufacturers.ts'
 import { controlSize } from '../lib/theme.ts'
 import { deleteRecord, putRecords, storedRecords } from '../lib/user-store.ts'
 import { offerUndo } from './confirm.tsx'
@@ -36,16 +40,27 @@ export function ManufacturersForm() {
 
   async function remove({ record }: ManufacturerUse) {
     try {
+      // counted again: a record saved since the list was read may name it now
+      const { records, invalid } = await storedRecords()
+      if (manufacturerUses(records, invalid).find((m) => m.record.id === record.id)?.uses !== 0) {
+        await read()
+        setFailure(`${record.name} was not deleted: a record names it now.`)
+        return
+      }
       await deleteRecord(record.id)
     } catch (e) {
       setFailure(`${record.name} was not deleted: ${errorText(e)}`)
       return
     }
     await read()
+    window.dispatchEvent(new Event(manufacturersChanged))
     offerUndo(`Deleted ${record.name} from this browser.`, () =>
-      putRecords([record]).then(read, (e) =>
-        setFailure(`Undo of ${record.name} failed: ${errorText(e)}`),
-      ),
+      putRecords([record])
+        .then(read)
+        .then(
+          () => void window.dispatchEvent(new Event(manufacturersChanged)),
+          (e) => setFailure(`Undo of ${record.name} failed: ${errorText(e)}`),
+        ),
     )
   }
 

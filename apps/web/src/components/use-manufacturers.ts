@@ -7,6 +7,7 @@ import {
   fetchManufacturers,
   knownManufacturers,
   manufacturerNames,
+  manufacturersChanged,
   newManufacturerRecord,
   referTo,
   refName,
@@ -27,44 +28,24 @@ export function useManufacturers() {
   const [mine, setMine] = useState<UserRecord[]>([])
   const [ready, setReady] = useState(false)
   const loaded = useRef(false)
-  /** Reads the browser's manufacturers again, after a record brought some along. A draft of the same id gives way. */
+  // new names typed and not stored yet: the store does not hold them
+  const drafts = useRef(new Set<string>())
+  /**
+   * Reads the browser's manufacturers again, after a record brought some along or Settings deleted
+   * one. Only the drafts stay of what was held.
+   */
   const reload = useCallback(
     () =>
       storedRecords().then(
         (r) =>
-          setMine((m) => {
-            const stored = r.records.filter((x) => x.kind === 'manufacturer')
-            const ids = new Set(stored.map((x) => x.id))
-            return [...m.filter((x) => !ids.has(x.id)), ...stored]
-          }),
+          setMine((m) => [
+            ...m.filter((x) => drafts.current.has(x.id)),
+            ...r.records.filter((x) => x.kind === 'manufacturer'),
+          ]),
         () => {},
       ),
     [],
   )
-  useEffect(() => {
-    let live = true
-    // without the catalogue a typed name can only match the user's own manufacturers
-    fetchManufacturers().then(
-      (m) => {
-        if (!live) return
-        loaded.current = true
-        setCatalogue(m)
-        setReady(true)
-      },
-      () => {},
-    )
-    reload()
-    return () => {
-      live = false
-    }
-  }, [reload])
-  const known = useMemo(() => knownManufacturers(catalogue, mine), [catalogue, mine])
-  const names = useMemo(
-    () => withUserManufacturers(manufacturerNames(catalogue), mine),
-    [catalogue, mine],
-  )
-  const seen = useRef({ catalogue, mine })
-  seen.current = { catalogue, mine }
   /** Asks the catalogue again; whether it answered. A later `preview` or `ensure` sees it at once. */
   const retry = useCallback(async () => {
     try {
@@ -75,9 +56,23 @@ export function useManufacturers() {
       setReady(true)
       return true
     } catch {
+      // without the catalogue a typed name can only match the user's own manufacturers
       return false
     }
   }, [])
+  useEffect(() => {
+    void retry()
+    void reload()
+    window.addEventListener(manufacturersChanged, reload)
+    return () => window.removeEventListener(manufacturersChanged, reload)
+  }, [retry, reload])
+  const known = useMemo(() => knownManufacturers(catalogue, mine), [catalogue, mine])
+  const names = useMemo(
+    () => withUserManufacturers(manufacturerNames(catalogue), mine),
+    [catalogue, mine],
+  )
+  const seen = useRef({ catalogue, mine })
+  seen.current = { catalogue, mine }
   /**
    * The reference `typed` stands for, `id` the UUID of a new manufacturer. A new one is kept as a
    * draft (its name is known to `nameOf`, nothing is stored) that the next call for `id` replaces
@@ -94,6 +89,8 @@ export function useManufacturers() {
       new Date(),
       loaded.current,
     )
+    if (to?.created) drafts.current.add(id)
+    else drafts.current.delete(id)
     setMine((m) => [...m.filter((r) => r.id !== id), ...(to?.created ? [to.created] : [])])
     return to?.ref
   }, [])
@@ -103,7 +100,10 @@ export function useManufacturers() {
       const ref = preview(typed, id)
       const created = ref === `user:${id}`
       // a store that refuses leaves the reference to be reported as missing on the next open
-      if (created) putRecords([newManufacturerRecord(id, typed, new Date())]).catch(() => {})
+      if (created) {
+        putRecords([newManufacturerRecord(id, typed, new Date())]).catch(() => {})
+        drafts.current.delete(id)
+      }
       return ref
     },
     [preview],

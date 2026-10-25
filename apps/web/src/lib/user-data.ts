@@ -171,17 +171,26 @@ export function validRecords(raw: unknown[]) {
   return { records, invalid }
 }
 
+/** The id of the user manufacturer a bullet, firearm or case capacity `record` names; undefined for none. */
+export function makerIdOf(record: UserRecord): string | undefined {
+  const text =
+    record.kind === 'bullet' || record.kind === 'firearm'
+      ? record.data.manufacturer
+      : record.kind === 'caseCapacity'
+        ? record.data.caseManufacturer
+        : undefined
+  const ref = text ? parseRef(text) : undefined
+  return ref?.scope === 'user' ? ref.id : undefined
+}
+
 /**
- * The user manufacturer of `pool` that a bullet's or a firearm's `manufacturer` reference names:
- * what a file or link of that one record carries, so the maker does not dangle where it is opened.
- * None for another kind, a catalogue manufacturer or a maker `pool` lacks.
+ * The user manufacturer of `pool` that `record` names: what a file or link of that one record
+ * carries, so the maker does not dangle where it is opened. None for another kind, a catalogue
+ * manufacturer or a maker `pool` lacks.
  */
 export function makerRecordsOf(record: UserRecord, pool: readonly UserRecord[]): UserRecord[] {
-  if (record.kind !== 'bullet' && record.kind !== 'firearm') return []
-  const ref = record.data.manufacturer && parseRef(record.data.manufacturer)
-  return ref && ref.scope === 'user'
-    ? pool.filter((r) => r.kind === 'manufacturer' && r.id === ref.id)
-    : []
+  const id = makerIdOf(record)
+  return id ? pool.filter((r) => r.kind === 'manufacturer' && r.id === id) : []
 }
 
 const content = (r: UserRecord) => canonicalJson({ kind: r.kind, name: r.name, data: r.data })

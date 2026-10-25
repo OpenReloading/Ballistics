@@ -23,6 +23,7 @@ import {
   writeHandleText,
 } from '../lib/file-access.ts'
 import { parseFiles, readLoadFile, readNote } from '../lib/load-file-formats.ts'
+import { shownManufacturerRefs } from '../lib/manufacturers.ts'
 import { guardNavigation, guardPop } from '../lib/navigation-guard.ts'
 import { newId } from '../lib/new-id.ts'
 import { maxLinkChars, readLink, shareLink } from '../lib/share-link.ts'
@@ -33,6 +34,7 @@ import {
   checkedUserDataText,
   exportAllText,
   type InvalidRecord,
+  makerIdOf,
   makerRecordsOf,
   maxFileBytes,
   namedKey,
@@ -43,6 +45,7 @@ import {
   renamedKey,
   tooLargeMessage,
   userDataText,
+  validRecords,
 } from '../lib/user-data.ts'
 import { ownsFile, recordFileName } from '../lib/user-file-names.ts'
 import { droppedPhotos, embeddedFileBlob, embedFiles, photoIds } from '../lib/user-photos.ts'
@@ -330,6 +333,15 @@ function FileMenuOf<K extends UserRecordKind>({
   const unsavedCallback = useRef(onUnsaved)
   unsavedCallback.current = onUnsaved
   useEffect(() => unsavedCallback.current?.(unsaved), [unsaved])
+
+  // Settings must not offer to delete the manufacturer of the record shown
+  const shownMaker = makerIdOf({ kind, data } as UserRecord)
+  useEffect(() => {
+    if (!shownMaker) return
+    const key = {}
+    shownManufacturerRefs.set(key, `user:${shownMaker}`)
+    return () => void shownManufacturerRefs.delete(key)
+  }, [shownMaker])
 
   // a share link: the record in the fragment, validated, opened as unsaved work
   // on load, and on a link pasted into this tab (a fragment change, no reload)
@@ -740,11 +752,10 @@ function FileMenuOf<K extends UserRecordKind>({
 
   /** `record` and the user manufacturer it names, as a file, Copy JSON and a share link carry them. */
   async function withMakers(record: UserRecord): Promise<UserRecord[]> {
-    const stored = await storedRecords().then(
-      (s) => s.records,
-      () => [],
-    )
-    return [record, ...makerRecordsOf(record, stored)]
+    const id = makerIdOf(record)
+    // one keyed read; a stored maker the format rejects is left out, as it would fail the file's check
+    const raw = id ? await storedRecord(id).catch(() => undefined) : undefined
+    return [record, ...(raw ? makerRecordsOf(record, validRecords([raw]).records) : [])]
   }
 
   /** Keeps the user manufacturer `record` names, as `carried` holds it, unless one of its id is stored. */

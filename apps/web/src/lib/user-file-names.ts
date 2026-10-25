@@ -21,7 +21,9 @@ export function ownsFile(text: string | undefined, id: string) {
   if (text === undefined) return false
   const p = parseUserDataFile(text)
   const own = p.ok ? p.records.find((r) => r.id === id) : undefined
-  return p.ok && own !== undefined && p.records.length === 1 + makerRecordsOf(own, p.records).length
+  if (!p.ok || !own) return false
+  const makers = makerRecordsOf(own, p.records)
+  return p.records.every((r) => r === own || makers.includes(r))
 }
 
 /** The first of `name`, `<stem>-2.json`, ... that `read` finds absent or holding only record `id`. */
