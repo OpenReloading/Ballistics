@@ -72,7 +72,7 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci
+      - run: npm ci --ignore-scripts && node patches/apply.mjs
       - run: npm run lint
       - run: npm run build
       - run: npm run typecheck
@@ -111,7 +111,7 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci
+      - run: npm ci --ignore-scripts && node patches/apply.mjs
       - run: npm run build
       - run: |
           # unquoted on purpose: the value is several `-w name` words
@@ -188,8 +188,8 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      - run: npm ci --ignore-scripts && node patches/apply.mjs
+      - run: ../../node_modules/.bin/playwright install --with-deps chromium
         working-directory: apps/e2e
       # specs import web sources, which import the workspace packages from their dist/
       - run: npm run build -w @openreloading/schema && npm run build -w @openreloading/importers && npm run build -w @openreloading/core && npm run build -w @openreloading/drawing

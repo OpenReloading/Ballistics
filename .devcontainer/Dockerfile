@@ -22,3 +22,6 @@ RUN arch=$(dpkg --print-architecture) \
 COPY --from=ghcr.io/astral-sh/uv:0.12.23@sha256:61d393e44e249f2e4b526b6c7ddcecce245946826e608e11c93ad4f5bba55b21 /uv /uvx /usr/local/bin/
 RUN UV_TOOL_BIN_DIR=/usr/local/bin UV_TOOL_DIR=/opt/uv-tools UV_PYTHON_DOWNLOADS=never UV_NO_CACHE=1 \
   uv tool install schemathesis==4.29.4
+
+# runtime user: the image's own non-root user (rootless podman keep-id maps the host uid to it)
+USER node

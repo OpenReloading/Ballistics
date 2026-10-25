@@ -13,7 +13,7 @@ COPY apps/web/package.json apps/web/
 COPY tools/package.json tools/
 COPY apps/e2e/package.json apps/e2e/
 COPY apps/docs/package.json apps/docs/
-RUN npm ci -w @openreloading/web -w @openreloading/core -w @openreloading/drawing -w @openreloading/importers -w @openreloading/schema -w @openreloading/data -w @openreloading/api
+RUN npm ci --ignore-scripts -w @openreloading/web -w @openreloading/core -w @openreloading/drawing -w @openreloading/importers -w @openreloading/schema -w @openreloading/data -w @openreloading/api && node patches/apply.mjs
 COPY tsconfig.base.json ./
 COPY packages/schema packages/schema
 COPY packages/importers packages/importers
@@ -26,7 +26,7 @@ COPY packages/data/src/plausibility.ts packages/data/src/
 COPY packages/api/tsconfig.json packages/api/tsconfig.build.json packages/api/tsconfig.browser.json packages/api/
 COPY packages/api/src/compute packages/api/src/compute
 COPY packages/api/src/catalogue packages/api/src/catalogue
-RUN npm run build -w @openreloading/schema && npm run build -w @openreloading/importers && npm run build -w @openreloading/core && npm run build -w @openreloading/drawing && npx tsc -p packages/data/tsconfig.plausibility.json && npx tsc -p packages/api/tsconfig.browser.json
+RUN npm run build -w @openreloading/schema && npm run build -w @openreloading/importers && npm run build -w @openreloading/core && npm run build -w @openreloading/drawing && node_modules/.bin/tsc -p packages/data/tsconfig.plausibility.json && node_modules/.bin/tsc -p packages/api/tsconfig.browser.json
 COPY apps/web apps/web
 RUN npm run build -w @openreloading/web && rm -rf apps/web/.next/standalone/node_modules/sharp apps/web/.next/standalone/node_modules/@img
 

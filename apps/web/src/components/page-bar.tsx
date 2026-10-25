@@ -132,6 +132,7 @@ export function PageBar({
           {/* biome-ignore lint/a11y/noStaticElementInteractions: an action chosen or Escape closes the phone panel */}
           <div
             id={id}
+            role="presentation"
             className="page-bar-actions"
             // a chosen action closes it, also a menu item in its portal (React events bubble through
             // portals); not a button that opens a menu or a dialog, which returns to it

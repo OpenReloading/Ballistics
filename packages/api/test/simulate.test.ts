@@ -512,7 +512,8 @@ describe('POST /interior/load-file', () => {
       bullet: longBullet.id,
       powder: fitted.id,
       note: 'Range day',
-      case: { waterCapacity: { value: 3.6 }, firingCount: 2 },
+      capacity: `user:${crypto.randomUUID()}`,
+      case: { firingCount: 2 },
       firearm: `user:${crypto.randomUUID()}`,
       seating: { by: 'overallLength', value: { value: 71.1 } },
       ladder: { stepCount: 3, chargeStep: 0.0001, direction: 'up' },
@@ -694,6 +695,14 @@ describe('POST /interior/load-file, 400 with the field path', () => {
     expect(res.status).toBe(400)
     expect(res.body.issues).toEqual([
       expect.objectContaining({ path: ['records', 0, 'kind'], message: legacyLoadProblem }),
+    ])
+  })
+
+  it('refuses the case water capacity of the earlier format at its path', async () => {
+    const res = await simulate(file({ siValues, case: { waterCapacity: { value: 3.6 } } }))
+    expect(res.status).toBe(400)
+    expect(res.body.issues.map((i: { path: unknown[] }) => i.path)).toEqual([
+      ['records', 0, 'data', 'case', 'waterCapacity'],
     ])
   })
 

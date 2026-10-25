@@ -32,12 +32,13 @@ describe('renames.json', () => {
     const dangling = (root: string) =>
       write(root, 'capacities/test-capacity.json', {
         id: 'test-capacity',
-        cartridge: 'old-cartridge',
+        origin: 'catalogue',
+        cartridge: 'catalogue:old-cartridge',
         waterCapacity: { value: 3.5 },
         provenance,
       })
     expect(readAfter(dangling).errors).toEqual([
-      'capacities/test-capacity.json: unknown cartridge "old-cartridge"',
+      'capacities/test-capacity.json: unknown cartridge "catalogue:old-cartridge"',
     ])
     const covered = readAfter((root) => {
       dangling(root)

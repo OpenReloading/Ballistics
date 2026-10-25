@@ -112,6 +112,7 @@ it('writes the context always and a block only when ticked', () => {
 
 it('fills the issue form by field id, without labels', () => {
   const what = 'Präzision & #1 = 50%?'
+  expect(reportUrl(`${repo}///`, report).startsWith(`${repo}/issues/new?`)).toBe(true)
   const url = reportUrl(`${repo}/`, { ...report, type: 'Wrong data', area: 'Shot groups', what })
   expect(url.startsWith(`${repo}/issues/new?template=${reportTemplate}&title=`)).toBe(true)
   expect(url).not.toContain(' ')

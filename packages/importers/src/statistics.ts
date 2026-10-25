@@ -17,7 +17,8 @@ function shotStatistics(values: number[]): {
     values.reduce((a, v) => a + (v - mean) ** 2, 0) / values.length,
   )
   const extremeSpread =
-    values.reduce((a, b) => Math.max(a, b)) - values.reduce((a, b) => Math.min(a, b))
+    values.reduce((a, b) => Math.max(a, b), values[0]) -
+    values.reduce((a, b) => Math.min(a, b), values[0])
   return { mean, standardDeviation, extremeSpread }
 }
 

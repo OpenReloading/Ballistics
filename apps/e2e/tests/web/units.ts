@@ -1,14 +1,12 @@
 import { expect, type Page } from '@playwright/test'
 
+const defaultOverrides: Record<string, string> = { lineOfSightOffset: 'cm' }
+
 /**
  * Stores a unit choice before every page load unless one is stored, so the specs do not depend on
  * the browser locale. Metric (SI) with drop in cm shows the units of the old metric switch.
  */
-export const storeUnits = (
-  page: Page,
-  preset = 'metric-grams',
-  overrides: Record<string, string> = { lineOfSightOffset: 'cm' },
-) =>
+export const storeUnits = (page: Page, preset = 'metric-grams', overrides = defaultOverrides) =>
   page.addInitScript(
     ([p, o]) => {
       if (localStorage.getItem('units') === null)

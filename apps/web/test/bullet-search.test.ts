@@ -1,6 +1,11 @@
 import { expect, it } from 'vitest'
 import type { BulletRow } from '../src/lib/bullet-rows.ts'
-import { type BulletFilters, bulletRelevance, searchBullets } from '../src/lib/bullet-search.ts'
+import {
+  type BulletFilters,
+  bulletRelevance,
+  findBullets,
+  searchBullets,
+} from '../src/lib/bullet-search.ts'
 
 // invented bullets: mass in g (168 gr = 10.886 g), diameter in mm
 const row = (over: Partial<BulletRow> & Pick<BulletRow, 'id' | 'name'>): BulletRow => ({
@@ -44,6 +49,28 @@ it('finds a bullet by caliber and weight although its name says neither as typed
   expect(ids('308 168')).toEqual(['own-1', 'a-168-match', 'a-168-tipped'])
   expect(ids('.308 175gr')).toEqual(['a-175-match'])
   expect(ids('10.9g')).toEqual(['own-1', 'a-168-match', 'a-168-tipped'])
+})
+
+it('finds what the API search of the card missed: words in any order, spacing, a unit apart', () => {
+  // a manufacturer and a word of a name that starts with its caliber and weight words
+  expect(ids('acme tipped')).toEqual(['a-168-tipped'])
+  expect(ids('tipped acme')).toEqual(['a-168-tipped'])
+  expect(ids('acme 168')).toEqual(['a-168-match', 'a-168-tipped'])
+  expect(ids('308 168gr')).toEqual(['own-1', 'a-168-match', 'a-168-tipped'])
+  expect(ids('168 gr')).toEqual(['own-1', 'a-168-match', 'a-168-tipped'])
+  expect(ids('30 cal')).toEqual(['a-168-match', 'a-168-tipped', 'a-175-match'])
+  // the caliber with or without its space, the decimal comma as a point
+  expect(ids('6.5mm')).toEqual(['b-140-match'])
+  expect(ids('beta 6,5')).toEqual(['b-140-match'])
+})
+
+it('ranks a number at the start of a word above one inside a word', () => {
+  const inside = [
+    row({ id: 'in', name: 'Plain', diameter: 6.1, mass: 17.82 }),
+    row({ id: 'start', name: 'Plain', diameter: 6.1, mass: 7.82 }),
+  ]
+  // 7.8 in 17.82 g, at the start of 7.82 g
+  expect(searchBullets(inside, '7.8', none).map((b) => b.id)).toEqual(['start', 'in'])
 })
 
 it('matches a fractional weight at the digits typed', () => {
@@ -90,4 +117,16 @@ it('sorts by mass or coefficient, rows without a value last', () => {
     'b-140-match',
     'own-1',
   ])
+})
+
+it('lists the designs for a first key without reading the catalogue', async () => {
+  const designs = rows.filter((r) => r.origin === 'user')
+  expect(await findBullets(designs, '', 20)).toEqual({ total: 1, items: designs })
+  expect(await findBullets(designs, 'x', 20)).toEqual({ total: 0, items: [] })
+})
+
+it('keeps the matching designs when the catalogue cannot be read', async () => {
+  const designs = rows.filter((r) => r.origin === 'user')
+  expect((await findBullets(designs, 'design', 20)).items).toEqual(designs)
+  await expect(findBullets(designs, 'nothing like it', 20)).rejects.toThrow()
 })

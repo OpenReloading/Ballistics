@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process'
 import { expect, it } from 'vitest'
-import { plan, recordClosure } from '../scripts/ci-plan.mts'
+import { importSpecifiers, plan, recordClosure } from '../scripts/ci-plan.mts'
 
 const closure = recordClosure()
 const script = new URL('../scripts/ci-plan.mts', import.meta.url).pathname
@@ -14,6 +14,27 @@ it('walks the imports of the record pages', () => {
   expect(closure.files).toContain('apps/web/src/lib/api.ts')
   expect(closure.files).not.toContain('apps/web/src/components/workbench.tsx')
   expect(closure.packages).toContain('drawing')
+})
+
+it('reads the specifiers of static, side-effect and dynamic imports', () => {
+  const source = [
+    "import { a } from './a.ts'",
+    'import b from "./b.ts"',
+    "import './c.css'",
+    "const d = await import('./d.ts')",
+    "const e = await import(   './e.ts')",
+    "export * from '@/f.ts'",
+    "const note = 'from nowhere'",
+  ].join('\n')
+  expect(importSpecifiers(source)).toEqual([
+    './a.ts',
+    './b.ts',
+    './c.css',
+    './d.ts',
+    './e.ts',
+    '@/f.ts',
+  ])
+  expect(importSpecifiers(`import${' '.repeat(5000)}x`)).toEqual([])
 })
 
 it('builds nothing when no changed file feeds the web build', () => {

@@ -95,7 +95,7 @@ self.addEventListener('activate', (event) => {
 
 // the page's Reload on the update notice; the waiting worker never takes over on its own
 self.addEventListener('message', (event) => {
-  if (event.data === 'skip-waiting') self.skipWaiting()
+  if (event.origin === self.location.origin && event.data === 'skip-waiting') self.skipWaiting()
 })
 
 self.addEventListener('fetch', (event) => {

@@ -165,8 +165,9 @@ export function logLuma(ctx: WorkImage): Float32Array {
 export function project(
   ctx: WorkImage,
   axis: Axis,
-  win = { x0: 0, y0: 0, w: ctx.w, h: ctx.h },
+  region?: { x0: number; y0: number; w: number; h: number },
 ): Float32Array {
+  const win = region ?? { x0: 0, y0: 0, w: ctx.w, h: ctx.h }
   const { w: wv, ring, sep } = axis
   const n = ctx.w * ctx.h
   const P = new Float32Array(win.w * win.h)

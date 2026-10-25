@@ -5,10 +5,10 @@ import { applyExampleLoad, loadForm } from './workbench.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
-type Stored = { kind: string; name: string; data: Record<string, unknown> }
+type Stored = { kind: string; id: string; name: string; data: Record<string, unknown> }
 
-const storedLoads = (page: import('@playwright/test').Page) =>
-  page.evaluate(async () => {
+const storedKind = (page: import('@playwright/test').Page, kind: string) =>
+  page.evaluate(async (kind) => {
     const db: IDBDatabase = await new Promise((ok, no) => {
       const r = indexedDB.open('openreloading-user-data')
       r.onsuccess = () => ok(r.result)
@@ -20,8 +20,10 @@ const storedLoads = (page: import('@playwright/test').Page) =>
       r.onerror = () => no(r.error)
     })
     db.close()
-    return all.filter((r) => r.kind === 'load')
-  })
+    return all.filter((r) => r.kind === kind)
+  }, kind)
+
+const storedLoads = (page: import('@playwright/test').Page) => storedKind(page, 'load')
 
 test('a saved load reopens with every field as it was and nothing unsaved', async ({ page }) => {
   // a native picker cannot be driven: the file goes to the origin private file system
@@ -53,12 +55,20 @@ test('a saved load reopens with every field as it was and nothing unsaved', asyn
   expect(overrides).not.toHaveProperty('bulletMass')
   expect(data.charge).toEqual({ value: 2.45 })
   expect(data.cartridge).toBe('catalogue:308-win')
+  // the example's measured case capacity is a user record of its own that the load names
+  const [capacity] = await storedKind(page, 'caseCapacity')
+  expect(data.capacity).toBe(`user:${capacity.id}`)
+  expect(capacity.data).toMatchObject({ origin: 'user', cartridge: 'catalogue:308-win' })
+  expect(capacity.data.waterCapacity).toEqual({ value: 3.6 })
+  expect(data).not.toHaveProperty('case')
 
   await page.goto('/workbench')
   await (await barButton(page, 'Open')).click()
   await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
   await page.getByRole('button', { name, exact: true }).click()
   await expect.poll(values).toEqual(before)
+  // the measured capacity is back in its field
+  await expect(page.getByRole('textbox', { name: /^Case capacity/ })).toHaveValue(/^\d/)
   await expect(page.locator('.file-state')).toContainText('Saved')
   await expect(page.locator('.file-state[data-dirty]')).toHaveCount(0)
 })
