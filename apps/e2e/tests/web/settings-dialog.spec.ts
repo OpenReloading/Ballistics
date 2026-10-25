@@ -175,7 +175,7 @@ test('the settings dialog over a document page passes axe in light and dark', as
     )
 })
 
-test('the tabs Units, Workbench defaults, Appearance and Offline are each reached by keyboard', async ({
+test('the tabs Units, Workbench defaults, Manufacturers, Appearance and Offline are each reached by keyboard', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
@@ -183,7 +183,7 @@ test('the tabs Units, Workbench defaults, Appearance and Offline are each reache
   const dialog = await openFrom(page, sidebarSettings(page))
   const tabs = dialog.getByRole('tablist', { name: 'Settings' })
   await expect(tabs).toHaveAttribute('aria-orientation', 'vertical')
-  const names = ['Units', 'Workbench defaults', 'Appearance', 'Offline']
+  const names = ['Units', 'Workbench defaults', 'Manufacturers', 'Appearance', 'Offline']
   await expect(tabs.getByRole('tab')).toHaveText(names)
   await tabs.getByRole('tab', { name: 'Units' }).focus()
   for (const name of names.slice(1)) {
