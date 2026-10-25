@@ -13,7 +13,7 @@ COPY apps/web/package.json apps/web/
 COPY tools/package.json tools/
 COPY apps/e2e/package.json apps/e2e/
 COPY apps/docs/package.json apps/docs/
-RUN npm ci -w @openreloading/schema -w @openreloading/core -w @openreloading/drawing -w @openreloading/importers -w @openreloading/data -w @openreloading/api -w @openreloading/docs
+RUN npm ci --ignore-scripts -w @openreloading/schema -w @openreloading/core -w @openreloading/drawing -w @openreloading/importers -w @openreloading/data -w @openreloading/api -w @openreloading/docs && node patches/apply.mjs
 COPY packages packages
 RUN npm run build -w @openreloading/schema -w @openreloading/core -w @openreloading/drawing -w @openreloading/importers -w @openreloading/data -w @openreloading/api
 COPY apps/docs apps/docs
