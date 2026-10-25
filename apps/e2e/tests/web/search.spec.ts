@@ -49,6 +49,49 @@ test('a record found by Ctrl+K opens its page', async ({ page }) => {
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('308 Win.')
 })
 
+test('a bullet design of this browser is found by Ctrl+K and opens in its designer', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/powders')
+  const id = '6f0f4d3e-0a43-4a43-9a3d-3a2f2e1f0c33'
+  await page.evaluate(async (id) => {
+    const db: IDBDatabase = await new Promise((ok, no) => {
+      const r = indexedDB.open('openreloading-user-data')
+      r.onupgradeneeded = () => {
+        for (const n of ['records', 'handles', 'files'])
+          if (!r.result.objectStoreNames.contains(n))
+            r.result.createObjectStore(n, n === 'records' ? { keyPath: 'id' } : undefined)
+      }
+      r.onsuccess = () => ok(r.result)
+      r.onerror = () => no(r.error)
+    })
+    const tx = db.transaction('records', 'readwrite')
+    tx.objectStore('records').put({
+      kind: 'bullet',
+      id,
+      name: 'Slug test design',
+      saved: '2026-10-25T00:00:00.000Z',
+      data: {
+        origin: 'user',
+        overrides: {
+          name: 'Slug test design',
+          diameter: { value: 7.823 },
+          mass: { value: 10.886 },
+        },
+      },
+    })
+    await new Promise((ok) => {
+      tx.oncomplete = ok
+    })
+    db.close()
+  }, id)
+  await page.reload()
+  await open(page)
+  await field(page).fill('slug test')
+  await search(page).getByRole('button', { name: 'Slug test design (your design)' }).click()
+  await expect(page).toHaveURL(`/bullets/designer?record=${id}`)
+})
+
 test('commands found by Ctrl+K open the settings and set the theme', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'light' })
   await gotoHydrated(page, '/cartridges')
