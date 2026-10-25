@@ -69,6 +69,7 @@ import {
   type LoadParts,
   measuredCapacityRef,
   savedCapacityRef,
+  toApiLoad,
   toLoad,
 } from '../lib/load-record.ts'
 import { generatedName, loadName } from '../lib/load-tabs.ts'
@@ -1921,7 +1922,7 @@ export function useWorkbenchState() {
     },
     [measuredCapacity],
   )
-  const loadFile = toLoad({
+  const loadParts: LoadParts = {
     values: fieldValues,
     given,
     cartridge: cartridgeRef,
@@ -1941,11 +1942,20 @@ export function useWorkbenchState() {
           }
         : undefined,
     sessions: sessionRefs,
+  }
+  const loadFile = toLoad(loadParts)
+  // the file for the API: every value of the moment typed, the catalogue records only
+  const apiFile = toApiLoad(loadParts, {
+    cartridge: cartridge && catalogueRef(cartridge.id),
+    bullet: bullet && catalogueRef(bullet.id),
+    powder: powder && catalogueRef(powder.id),
   })
   // the File menu's props stay the same objects while the load is unchanged, so its memo holds and
   // its window listeners keep no earlier render, and with it no earlier result, alive
   const fileKey = JSON.stringify(loadFile)
   const fileData = useMemo(() => JSON.parse(fileKey) as Load, [fileKey])
+  const apiKey = JSON.stringify(apiFile)
+  const apiData = useMemo(() => JSON.parse(apiKey) as Load, [apiKey])
   /** A followed field's default while it is the field's value; the seating owns the volume once a bullet is seated. */
   const defaultOf = (key: string) => {
     const k = followKeys.find((x) => x === key)
@@ -2134,6 +2144,7 @@ export function useWorkbenchState() {
     figureView,
     figureTab,
     setFigureTab,
+    apiData,
     fileData,
     fileMenu,
     fillExample,

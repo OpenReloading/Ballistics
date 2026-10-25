@@ -33,6 +33,7 @@ import {
   filePath,
   fileResistance,
   loadValues,
+  missingValuesAnswer,
   readLoadFile,
   unknownKeyIssues,
 } from './load-file.ts'
@@ -225,6 +226,8 @@ export async function simulate(
   const { curves } = parsed.data
   const { path, record, name } = readLoadFile(json)
   const values = loadValues(record, knownRecords(context.catalogue, record))
+  const lacking = missingValuesAnswer(values, path)
+  if (lacking) return lacking
   const load = fileLoad(values, path)
   const ladder = record.analysis?.ladder
   const step = ladder?.step && toSi(ladderStepKinds[ladder.kind ?? 'charge'], ladder.step)
