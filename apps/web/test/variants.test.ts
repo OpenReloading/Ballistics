@@ -16,6 +16,16 @@ import { sheetRecord } from './records.ts'
 
 afterEach(() => vi.unstubAllGlobals())
 
+/** A `localStorage` in memory, as the browser keeps the last read of each base. */
+function stubStorage() {
+  const items = new Map<string, string>()
+  vi.stubGlobal('localStorage', {
+    getItem: (k: string) => items.get(k) ?? null,
+    setItem: (k: string, v: string) => void items.set(k, v),
+    removeItem: (k: string) => void items.delete(k),
+  })
+}
+
 const saved = '2026-10-24T08:00:00.000Z'
 const uuid = '6f0f4d3e-0a43-4a43-9a3d-3a2f2e1f0c11'
 const cartridge308 = sheetRecord('cip-308-win-2008-09-23')
@@ -154,4 +164,53 @@ it('says a cartridge base changed from the revision of its record', async () => 
   })
   expect((await resolveCartridge(data('aaa'))).changed).toBe(true)
   expect((await resolveCartridge(data('bbb'))).changed).toBe(false)
+})
+
+it('keeps listing a design while the API cannot be reached, from the base it read last', async () => {
+  stubStorage()
+  const good = bulletRecord(`catalogue:${matchBullet.id}`)
+  stubApi({ [`bullets/${matchBullet.id}`]: matchBullet })
+  expect((await userBullets([good])).map((v) => v.id)).toEqual([uuid])
+  stubApi({}, true)
+  const [view] = await userBullets([good])
+  expect(view?.id).toBe(uuid)
+  expect(view?.resolved.base.status).toBe('found')
+  expect(view?.resolved.problem).toBeUndefined()
+  expect(view?.si.diameter).toBeCloseTo(7.823e-3, 9)
+  expect(view?.si.mass).toBeCloseTo(0.011, 9)
+})
+
+it('keeps listing a design while the API cannot be reached and the base was never read', async () => {
+  stubStorage()
+  stubApi({}, true)
+  const cartridge = {
+    kind: 'cartridge',
+    id: uuid,
+    name: 'Mine',
+    saved,
+    data: {
+      origin: 'user',
+      basedOn: `catalogue:${cartridge308.id}`,
+      overrides: { values: [{ side: 'cartridge', symbol: 'L3', quantity: 'length', value: 52 }] },
+    },
+  } satisfies UserRecord
+  const [bullet] = await userBullets([bulletRecord(`catalogue:${matchBullet.id}`)])
+  expect(bullet?.resolved.base.status).toBe('unreachable')
+  expect(bullet?.si.mass).toBeCloseTo(0.011, 9)
+  const [view] = await userCartridges([cartridge])
+  expect(view?.resolved.base.status).toBe('unreachable')
+  expect(view?.resolved.record.values).toHaveLength(1)
+})
+
+it('forgets a base the catalogue no longer has', async () => {
+  stubStorage()
+  const good = bulletRecord(`catalogue:${matchBullet.id}`)
+  stubApi({ [`bullets/${matchBullet.id}`]: matchBullet })
+  await userBullets([good])
+  stubApi({})
+  expect(await userBullets([good])).toEqual([])
+  stubApi({}, true)
+  expect((await resolveBullet(bulletData(`catalogue:${matchBullet.id}`))).base.status).toBe(
+    'unreachable',
+  )
 })

@@ -25,10 +25,33 @@ export type Base<T> =
   | { status: 'found'; record: T }
   | { status: 'missing' | 'unreachable'; ref: string }
 
+const baseKey = (kind: string, id: string) => `openreloading-base:${kind}/${id}`
+
+/** The base last read from the API, kept in this browser; undefined without one or without storage. */
+function recalled<T>(key: string): T | undefined {
+  try {
+    const text = localStorage.getItem(key)
+    return text === null ? undefined : (JSON.parse(text) as T)
+  } catch {
+    return undefined
+  }
+}
+
+/** Keeps `record` (or forgets the key for undefined) as the base last read. Quota or blocked storage: nothing is kept. */
+function remember(key: string, record: object | undefined) {
+  try {
+    if (record) localStorage.setItem(key, JSON.stringify(record))
+    else localStorage.removeItem(key)
+  } catch {}
+}
+
 /**
  * The catalogue record a variant is based on (`kind` as `bullets`); a renamed id is followed by the
- * API. `missing` when the catalogue no longer has it, `unreachable` when the API did not answer, so
- * a record is never called gone for a network error.
+ * API. `missing` when the catalogue no longer has it, `unreachable` when the API did not answer and
+ * this browser holds no earlier read, so a record is never called gone for a network error. While
+ * the API does not answer, the base last read stands in for it.
+ * shortcut: a kept base is never removed for a deleted design, only replaced or dropped when its
+ * record is gone from the catalogue; add a sweep if the entries pile up.
  */
 export async function readBase<T>(
   kind: 'bullets' | 'cartridges',
@@ -37,11 +60,14 @@ export async function readBase<T>(
 ): Promise<Base<T>> {
   if (basedOn === undefined) return { status: 'none' }
   const id = parseRef(basedOn)?.id ?? basedOn
+  const key = baseKey(kind, id)
   try {
     const record = await fetchRecord<T>(kind, id, signal)
+    remember(key, record as object | undefined)
     return record ? { status: 'found', record } : { status: 'missing', ref: basedOn }
   } catch {
-    return { status: 'unreachable', ref: basedOn }
+    const kept = recalled<T>(key)
+    return kept ? { status: 'found', record: kept } : { status: 'unreachable', ref: basedOn }
   }
 }
 
@@ -145,8 +171,10 @@ export interface UserCartridgeView {
 }
 
 /**
- * The bullet records of `records`, each resolved against the catalogue. A record whose base is not
- * there is left out: it has no values to list or seat, and opens read only in the designer.
+ * The bullet records of `records`, each resolved against the catalogue. A record whose base the
+ * catalogue no longer has is left out: it has no values to list or seat, and opens read only in the
+ * designer. A base the API did not answer keeps the record in, with the values of the base last
+ * read, else those its overrides give.
  */
 export async function userBullets(records: readonly UserRecord[]): Promise<UserBulletView[]> {
   const names = withUserManufacturers(
@@ -157,7 +185,7 @@ export async function userBullets(records: readonly UserRecord[]): Promise<UserB
     records.map(async (r): Promise<UserBulletView | undefined> => {
       if (r.kind !== 'bullet') return
       const resolved = await resolveBullet(r.data)
-      if (resolved.problem) return
+      if (resolved.base.status === 'missing') return
       const { mass, diameter, length } = resolved.record
       const si = (q: { value: number } | undefined, kind: 'mass' | 'length') =>
         q && toSi(kind, q.value)
@@ -178,13 +206,15 @@ export async function userBullets(records: readonly UserRecord[]): Promise<UserB
   return views.filter((v): v is UserBulletView => v !== undefined)
 }
 
-/** The cartridge records of `records` that resolve, as {@link userBullets} does for bullets. */
+/** The cartridge records of `records` whose base the catalogue has or could not be asked, as {@link userBullets} does for bullets. */
 export async function userCartridges(records: readonly UserRecord[]): Promise<UserCartridgeView[]> {
   const views = await Promise.all(
     records.map(async (r): Promise<UserCartridgeView | undefined> => {
       if (r.kind !== 'cartridge') return
       const resolved = await resolveCartridge(r.data)
-      return resolved.problem ? undefined : { id: r.id, name: r.name, data: r.data, resolved }
+      return resolved.base.status === 'missing'
+        ? undefined
+        : { id: r.id, name: r.name, data: r.data, resolved }
     }),
   )
   return views.filter((v): v is UserCartridgeView => v !== undefined)
