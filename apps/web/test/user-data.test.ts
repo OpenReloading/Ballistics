@@ -283,12 +283,12 @@ describe('user data files', () => {
   })
 
   it('writes back over a file of this record and the user manufacturer it names', () => {
-    expect(ownsFile(userDataText([madeBullet, maker]), 'b1')).toBe(true)
+    expect(ownsFile(userDataText([madeBullet, maker]), bullet.id)).toBe(true)
     // a manufacturer the record does not name, or another record, makes it a collection
-    expect(ownsFile(userDataText([bullet, maker]), 'b1')).toBe(false)
-    expect(ownsFile(userDataText([madeBullet, maker, load]), 'b1')).toBe(false)
+    expect(ownsFile(userDataText([bullet, maker]), bullet.id)).toBe(false)
+    expect(ownsFile(userDataText([madeBullet, maker, load]), bullet.id)).toBe(false)
     // two records of the same id do not make a file of one
-    expect(ownsFile(userDataText([madeBullet, madeBullet, maker]), 'b1')).toBe(false)
+    expect(ownsFile(userDataText([madeBullet, madeBullet, maker]), bullet.id)).toBe(false)
   })
 
   it('picks a folder file name that holds no other record', async () => {
