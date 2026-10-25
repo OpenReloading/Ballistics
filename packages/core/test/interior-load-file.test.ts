@@ -8,6 +8,7 @@ import {
   interiorLoad,
   interiorValueKeys,
   loadRatio,
+  missingLoadKeys,
   overrideResistance,
   recordResistance,
   solidFill,
@@ -35,6 +36,27 @@ const values: Record<string, number> = {
   ignitionPressure: 5e6,
   startPressure: 1e7,
 }
+
+describe('missingLoadKeys', () => {
+  it('lists every key interiorLoad needs, as interiorLoad throws for each alone', () => {
+    expect(missingLoadKeys(values)).toEqual([])
+    for (const key of Object.keys(values)) {
+      const { [key]: _, ...rest } = values
+      expect(missingLoadKeys(rest)).toEqual([key])
+      expect(() => interiorLoad(rest)).toThrow(expect.objectContaining({ field: key }))
+    }
+  })
+
+  it('names all missing keys at once, a non-finite value among them, and not the optional bore area', () => {
+    const { volume: _v, twist: _t, ...rest } = values
+    expect(missingLoadKeys({ ...rest, gamma: Number.NaN, boreArea: undefined })).toEqual([
+      'volume',
+      'twist',
+      'gamma',
+    ])
+    expect(missingLoadKeys({})).toHaveLength(Object.keys(values).length)
+  })
+})
 
 describe('interiorLoad', () => {
   it('maps the field values; an empty bore area is the circle of the bore diameter', () => {

@@ -17,6 +17,30 @@ export class ValueError extends InputError {
   }
 }
 
+/** The keys `interiorLoad` needs: no other value or record gives them (the bore area is optional). */
+const requiredKeys = [
+  'volume',
+  'boreDiameter',
+  'travel',
+  'twist',
+  'bulletMass',
+  'charge',
+  'propellantEnergy',
+  'gamma',
+  'density',
+  'covolume',
+  'vivacity',
+  'exponent',
+  'referencePressure',
+  'propellantTemperature',
+  'ignitionPressure',
+  'startPressure',
+] as const
+
+/** Every key `interiorLoad` needs that `values` lacks or holds as a non-finite number, in the order of the workbench. */
+export const missingLoadKeys = (values: Record<string, number | undefined>): string[] =>
+  requiredKeys.filter((key) => !Number.isFinite(values[key]))
+
 /**
  * `InteriorLoad` from SI field values. An empty bore area is the circle of the mean of the bore
  * diameter and `grooveDiameter` (m) where given, else of the bore diameter (`boreArea`; a rifled
