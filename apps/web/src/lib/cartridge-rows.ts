@@ -1,16 +1,8 @@
-/** The cartridge list's rows: search text, filters, cells and the packed page props. */
+/** The cartridge list's rows: search text, cells and the packed page props. */
 import { toSi } from '@open-reloading/schema'
 import type { CartridgeSummary } from './api-types.ts'
 import { caliberLabel, commonCaliber } from './caliber.ts'
-import { countryKeys } from './countries.ts'
-import {
-  convertBulletDiameter,
-  convertPressure,
-  type DirectoryState,
-  inRange,
-  numberRange,
-  present,
-} from './directory.ts'
+import { present } from './directory.ts'
 import { matchesQuery } from './lists.ts'
 import { formatNumber, inchText, type UnitSystem } from './units.ts'
 
@@ -31,38 +23,12 @@ export const cartridgeSearchText = (c: CartridgeRow) =>
         ]),
   ].join(' ')
 
-/** Whether a cartridge passes every filter of `s` (the sort aside); `text` precomputed for speed. */
-export function cartridgeMatches(
+/** Whether a cartridge matches the search `query`; `text` precomputed for speed. */
+export const cartridgeMatches = (
   c: CartridgeRow,
-  s: DirectoryState,
+  query: string,
   text: string = cartridgeSearchText(c),
-): boolean {
-  if (s.caseType && c.caseType !== s.caseType) return false
-  if (
-    s.caliber &&
-    (c.maxBulletDiameter === undefined || commonCaliber(c.maxBulletDiameter) !== s.caliber)
-  )
-    return false
-  if (s.country && !countryKeys(c.country ?? '').includes(s.country)) return false
-  const bore = numberRange(s.bulletDiameter ?? '', ['in', 'mm'])
-  if (
-    bore &&
-    !inRange(
-      c.maxBulletDiameter === undefined
-        ? undefined
-        : convertBulletDiameter(c.maxBulletDiameter, 'mm', bore.unit),
-      bore,
-    )
-  )
-    return false
-  const pmax = numberRange(s.pmax ?? '', ['bar', 'psi'])
-  if (
-    pmax &&
-    !inRange(c.pmax === undefined ? undefined : convertPressure(c.pmax, 'bar', pmax.unit), pmax)
-  )
-    return false
-  return matchesQuery([text], s.query)
-}
+) => matchesQuery([text], query)
 
 /** A cartridge's number cells in the preset's units; empty without a value. */
 export function cartridgeCells(c: CartridgeRow, system: UnitSystem) {
@@ -98,7 +64,6 @@ export type PackedCartridge = [
   number | null,
   number | null,
   CartridgeRow['caseType'] | null,
-  string | null,
 ]
 
 /**
@@ -122,25 +87,14 @@ export const packCartridges = (rows: readonly CartridgeRow[]): PackedCartridge[]
     c.cartridgeLength ?? null,
     c.pmax ?? null,
     c.caseType ?? null,
-    c.country ?? null,
   ])
 
 export const unpackCartridges = (rows: readonly PackedCartridge[]): CartridgeRow[] =>
   rows.map(
-    ([
+    ([id, name, aliases, maxBulletDiameter, caseLength, cartridgeLength, pmax, caseType]) => ({
       id,
       name,
       aliases,
-      maxBulletDiameter,
-      caseLength,
-      cartridgeLength,
-      pmax,
-      caseType,
-      country,
-    ]) => ({
-      id,
-      name,
-      aliases,
-      ...present({ maxBulletDiameter, caseLength, cartridgeLength, pmax, caseType, country }),
+      ...present({ maxBulletDiameter, caseLength, cartridgeLength, pmax, caseType }),
     }),
   )

@@ -1,6 +1,7 @@
 import { fromSi, type UserBullet, type UserCartridge } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
 import { bulletMatches } from '../src/lib/bullet-rows.ts'
+import { searchBullets } from '../src/lib/bullet-search.ts'
 import { emptyDirectory, readDirectory, writeDirectory } from '../src/lib/directory.ts'
 import { matchesQuery } from '../src/lib/lists.ts'
 import {
@@ -84,11 +85,11 @@ it('reads, writes and toggles within the sources a list has', () => {
   expect(inOrigins({}, 'user', powders)).toBe(true)
 })
 
-it('keeps src in the URL beside the other filters', () => {
-  const s = readDirectory('?src=user&manufacturer=alpha&units=us')
+it('keeps src in the URL beside the search', () => {
+  const s = readDirectory('?src=user&q=alpha&units=us')
   expect(s.sources).toBe('user')
-  expect(writeDirectory(s, '?units=us')).toBe('?units=us&manufacturer=alpha&src=user')
-  expect(writeDirectory({ ...s, sources: '' }, '?src=user')).toBe('?manufacturer=alpha')
+  expect(writeDirectory(s, '?units=us')).toBe('?units=us&q=alpha&src=user')
+  expect(writeDirectory({ ...s, sources: '' }, '?src=user')).toBe('?q=alpha')
   expect(writeDirectory(emptyDirectory, '?src=user')).toBe('')
 })
 
@@ -129,8 +130,8 @@ it('lists a bullet design without a mass, length or manufacturer name', () => {
   const [r] = userBulletRows([bullet('a2', { diameter: 0.00782 }, '', 'Plain')])
   expect(r).toMatchObject({ manufacturerName: '', name: 'Plain', mass: null, length: null })
   // no mass: a mass filter hides it, a search for its name finds it
-  expect(bulletMatches(r, { ...emptyDirectory, mass: '100-200gr' })).toBe(false)
-  expect(bulletMatches(r, { ...emptyDirectory, query: 'plain' })).toBe(true)
+  expect(searchBullets([r], '', { manufacturer: '', caliber: '', mass: '100-200gr' })).toEqual([])
+  expect(searchBullets([r], 'plain', { manufacturer: '', caliber: '', mass: '' })).toEqual([r])
 })
 
 it('lists cartridge designs with the smallest cartridge G1, L3, L6 and the Pmax', () => {
@@ -189,5 +190,5 @@ it('folds accents in the bullet search and keeps the word-start rule', () => {
     ballisticCoefficientG1: null,
     ballisticCoefficientG7: null,
   }
-  expect(bulletMatches(b, { ...emptyDirectory, query: 'precision' })).toBe(true)
+  expect(bulletMatches(b, 'precision')).toBe(true)
 })

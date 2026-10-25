@@ -7,7 +7,6 @@ const fitViewport = (size: string) => `min(${size}, calc(100vw - 2rem))`
 
 /** The widths of the popovers, each by what it holds; the others take the width of their content. */
 export const popoverWidth = {
-  filters: '21rem',
   notes: 320,
   fields: 380,
   help: fitViewport('24rem'),

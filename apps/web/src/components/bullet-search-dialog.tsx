@@ -352,7 +352,7 @@ export function BulletSearchDialog({
                 <div id={`${id}-list`} role="listbox" aria-label="Bullets" className="bd-list">
                   {shown.map((row, i) => {
                     const cells = bulletCells(row, system)
-                    const bc = bulletBallisticCoefficient(row, undefined)
+                    const bc = bulletBallisticCoefficient(row)
                     const mass = massText(row, system, cells)
                     const bcText = bc ? ballisticCoefficientText(bc) : 'n/a'
                     return (
@@ -403,7 +403,7 @@ export function BulletSearchDialog({
 
 function Preview({ row, system }: { row: BulletRow; system: UnitSystem }) {
   const cells = bulletCells(row, system)
-  const bc = bulletBallisticCoefficient(row, undefined)
+  const bc = bulletBallisticCoefficient(row)
   const facts: [string, string | undefined][] = [
     ['Manufacturer', row.manufacturerName || undefined],
     ['Caliber', cells.caliber],

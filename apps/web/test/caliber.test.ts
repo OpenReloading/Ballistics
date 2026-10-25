@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest'
-import { caliberDiameters, caliberOptions, commonCaliber } from '../src/lib/caliber.ts'
+import { caliberOptions, commonCaliber } from '../src/lib/caliber.ts'
 
 it('names the common caliber of a cartridge G1 as the CIP record gives it', () => {
   // smallest cartridge G1 of the CIP record, mm
@@ -58,14 +58,4 @@ it('lists the common calibers first, then the others, each by size with its coun
   expect(caliberOptions([7.82])).toEqual([
     { group: 'Common calibers', items: [{ value: '.308', label: '.308 (1)' }] },
   ])
-})
-
-it('gives each option group its most common diameter, the smaller on a tie', () => {
-  expect(caliberDiameters([7.85, 7.82, 8.88])).toEqual(
-    new Map([
-      ['.308', 7.82],
-      ['.350', 8.88],
-    ]),
-  )
-  expect(caliberDiameters([7.85, 7.853, 7.82])).toEqual(new Map([['.308', 7.85]]))
 })

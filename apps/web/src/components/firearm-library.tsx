@@ -226,7 +226,7 @@ export function FirearmLibrary() {
   const mounted = (id: string) =>
     data.configurations.some((c) => c.mounts.some((m) => m.optic === id))
   const newFirearm = () => start(blankFirearm())
-  // the shared list pattern: search, Source and Clear filters, kept in the URL
+  // the shared list pattern: search and Source, kept in the URL
   const [filters, setFilters, clearFilters] = useListState()
   // the example is OpenReloading's, the firearms of this browser are Mine
   const on = readOrigins(filters.sources)
@@ -449,8 +449,6 @@ export function FirearmLibrary() {
             query={filters.query}
             onQuery={(q) => setFilters({ query: q })}
             placeholder="Name or cartridge, 308…"
-            active={Boolean(filters.query) || on.length < origins.length}
-            onClear={clearFilters}
             sorting={
               editing || viewing
                 ? undefined

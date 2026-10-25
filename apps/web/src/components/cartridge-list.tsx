@@ -1,12 +1,9 @@
 'use client'
 
-import { Button, Select } from '@mantine/core'
-import { useMediaQuery } from '@mantine/hooks'
-import { caseTypes } from '@open-reloading/schema'
+import { Button } from '@mantine/core'
 import { Plus } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useDeferredValue, useMemo } from 'react'
-import { caliberUnit } from '../lib/caliber.ts'
 import {
   type CartridgeRow,
   cartridgeCells,
@@ -16,8 +13,6 @@ import {
   type PackedCartridge,
   unpackCartridges,
 } from '../lib/cartridge-rows.ts'
-import { countryKeys, countryLabel, countryOptions } from '../lib/countries.ts'
-import { convertBulletDiameter, convertPressure, numberRange } from '../lib/directory.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { countText, filterText } from '../lib/lists.ts'
 import {
@@ -29,11 +24,8 @@ import {
   readOrigins,
   userCartridgeRows,
 } from '../lib/sources.ts'
-import { controlSize } from '../lib/theme.ts'
 import { userCartridges } from '../lib/variants.ts'
-import { CaliberSelect } from './caliber-select.tsx'
 import {
-  CountryFilter,
   type DirectoryColumn,
   DirectoryFilters,
   DirectoryTable,
@@ -47,12 +39,11 @@ import {
   useUserRecords,
 } from './list-sources.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
-import { RangeFilter } from './range-filter.tsx'
 import { GapBadge } from './standard-badge.tsx'
 import { EmptyList } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
 
-/** The cartridge directory: page bar with the count, filter row, windowed table. */
+/** The cartridge directory: page bar with the count, search row, windowed table. */
 export function CartridgeList({ packed }: { packed: PackedCartridge[] }) {
   const [records, removeRow] = useUserRecords()
   const mine = useResolved(records, userCartridges)
@@ -65,19 +56,11 @@ export function CartridgeList({ packed }: { packed: PackedCartridge[] }) {
   const { system } = useUnits()
   const [state, set, clear] = useListState()
   const filters = useDeferredValue(state)
-  const diameters = useMemo(
-    () => items.flatMap((c) => (c.maxBulletDiameter === undefined ? [] : [c.maxBulletDiameter])),
-    [items],
-  )
-  const countries = useMemo(
-    () => countryOptions(items.flatMap((c) => countryKeys(c.country ?? ''))),
-    [items],
-  )
   const texts = useMemo(() => items.map(cartridgeSearchText), [items])
   const shown = useMemo(
     () =>
       items.filter(
-        (c, i) => inOrigins(c, filters.sources) && cartridgeMatches(c, filters, texts[i]),
+        (c, i) => inOrigins(c, filters.sources) && cartridgeMatches(c, filters.query, texts[i]),
       ),
     [items, texts, filters],
   )
@@ -88,21 +71,8 @@ export function CartridgeList({ packed }: { packed: PackedCartridge[] }) {
   const cell = (c: CartridgeRow) => cells.get(c.id) ?? cartridgeCells(c, system)
 
   const on = readOrigins(state.sources)
-  const bore = numberRange(state.bulletDiameter ?? '', ['in', 'mm'])
-  const pressure = numberRange(state.pmax ?? '', ['bar', 'psi'])
-  const extras = Number(Boolean(state.country)) + Number(Boolean(bore)) + Number(Boolean(pressure))
-  // below 48em the caliber and the case type sit behind More filters too
-  const narrow = useMediaQuery('(max-width: 47.99em)')
-  const active = Boolean(
-    state.query || state.caliber || state.caseType || extras || on.length < origins.length,
-  )
   const count = countText(shown.length, items.length, 'cartridges')
   const named = [
-    state.caseType,
-    state.caliber && `caliber ${state.caliber}`,
-    state.country && countryLabel(state.country),
-    bore && `bore ${state.bulletDiameter}`,
-    pressure && `Pmax ${state.pmax}`,
     on.length < origins.length && `${originNames[on[0]]} only`,
     state.query.trim() && `matching "${state.query.trim()}"`,
   ].filter(Boolean)
@@ -226,61 +196,12 @@ export function CartridgeList({ packed }: { packed: PackedCartridge[] }) {
           query={state.query}
           onQuery={(q) => set({ query: q })}
           placeholder="Name or alias, 308, 7,62 or .308…"
-          active={active}
-          onClear={clear}
-          more={
-            extras + (narrow ? Number(Boolean(state.caliber)) + Number(Boolean(state.caseType)) : 0)
-          }
           sorting={{ columns, sort: state.sort, onSort: (sort) => set({ sort }) }}
-          extra={
-            <>
-              <CountryFilter
-                data={countries}
-                value={state.country}
-                onChange={(country) => set({ country })}
-              />
-              <RangeFilter
-                label="Bore G1"
-                unit={caliberUnit(system)}
-                range={bore}
-                convert={(x, from, to) =>
-                  convertBulletDiameter(x, from as 'in' | 'mm', to as 'in' | 'mm')
-                }
-                onChange={(text) => set({ bulletDiameter: text })}
-              />
-              <RangeFilter
-                label="Pmax"
-                unit={pressureUnit}
-                range={pressure}
-                convert={(x, from, to) =>
-                  convertPressure(x, from as 'bar' | 'psi', to as 'bar' | 'psi')
-                }
-                integer
-                onChange={(text) => set({ pmax: text })}
-              />
-            </>
-          }
         >
           <SourceFilter
             src={state.sources}
             counts={counts}
             onChange={(src) => set({ sources: src })}
-          />
-          <CaliberSelect
-            className="more-filter"
-            diameters={diameters}
-            value={state.caliber}
-            onChange={(caliber) => set({ caliber })}
-          />
-          <Select
-            className="more-filter"
-            aria-label="Case type"
-            placeholder="Case type"
-            size={controlSize.row.input}
-            clearable
-            data={[...caseTypes.options]}
-            value={state.caseType || null}
-            onChange={(v) => set({ caseType: v ?? '' })}
           />
         </DirectoryFilters>
         <DirectoryTable
@@ -302,7 +223,7 @@ export function CartridgeList({ packed }: { packed: PackedCartridge[] }) {
           noun="cartridges"
           sort={state.sort}
           onSort={(sort) => set({ sort })}
-          empty={<EmptyList noun="cartridges" filters={filterText(named)} />}
+          empty={<EmptyList noun="cartridges" filters={filterText(named)} onClear={clear} />}
         />
       </div>
     </>
