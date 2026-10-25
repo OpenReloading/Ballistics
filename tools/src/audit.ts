@@ -5,6 +5,7 @@
  */
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
+import { executable } from './executable.ts'
 
 /** Advisories without a fix, by GHSA id, with why they cannot reach users. */
 export const allowed: Record<string, string> = {}
@@ -48,7 +49,10 @@ export function problems(report: AuditReport, allow: Record<string, string> = al
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   // npm audit exits 1 whenever it finds anything, so its JSON decides instead
-  const run = spawnSync('npm', ['audit', '--json'], { encoding: 'utf8', maxBuffer: 64 << 20 })
+  const run = spawnSync(executable('npm'), ['audit', '--json'], {
+    encoding: 'utf8',
+    maxBuffer: 64 << 20,
+  })
   const report = JSON.parse(run.stdout) as AuditReport
   if (!report.vulnerabilities) {
     console.error(run.stdout || run.stderr)
