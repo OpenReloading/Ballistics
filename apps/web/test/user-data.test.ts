@@ -7,11 +7,13 @@ import {
 import { describe, expect, it } from 'vitest'
 import { exampleFirearm } from '../src/lib/example-data.ts'
 import { parseFiles, readLoadFile } from '../src/lib/load-file-formats.ts'
-import { maxLinkChars, readLink, shareLink } from '../src/lib/share-link.ts'
+import { maxLinkChars, readLink, shareLink, shareProblem } from '../src/lib/share-link.ts'
 import {
   canonicalJson,
   checkedUserDataText,
   exportAllText,
+  makerRecordsOf,
+  makersToCarry,
   maxFileBytes,
   parseUserDataFile,
   planImport,
@@ -26,7 +28,7 @@ import { droppedPhotos, embeddedFileBlob, embedFiles, photoIds } from '../src/li
 const saved = '2026-10-13T10:00:00.000Z'
 const bullet: UserRecord = {
   kind: 'bullet',
-  id: 'b1',
+  id: '9b8a7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d',
   name: 'Example 168 gr',
   saved,
   data: {
@@ -53,6 +55,19 @@ const load: UserRecord = {
     note: 'first ladder',
   },
 }
+
+const makerId = '3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13'
+const maker: UserRecord = {
+  kind: 'manufacturer',
+  id: makerId,
+  name: 'Home Loader',
+  saved,
+  data: { origin: 'user' },
+}
+const madeBullet: UserRecord = {
+  ...bullet,
+  data: { ...bullet.data, manufacturer: `user:${makerId}` },
+} as UserRecord
 
 describe('user data files', () => {
   it('round trip: a file of records parses to equal records', () => {
@@ -259,11 +274,22 @@ describe('user data files', () => {
   })
 
   it('writes back only over a file that holds just this record', () => {
-    expect(ownsFile(userDataText([bullet]), 'b1')).toBe(true)
+    expect(ownsFile(userDataText([bullet]), '9b8a7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d')).toBe(true)
     // an Export all file holding this record and others is never overwritten by one record
-    expect(ownsFile(userDataText([bullet, load]), 'b1')).toBe(false)
+    expect(ownsFile(userDataText([bullet, load]), '9b8a7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d')).toBe(
+      false,
+    )
     expect(ownsFile(userDataText([bullet]), 'other')).toBe(false)
-    expect(ownsFile('not json', 'b1')).toBe(false)
+    expect(ownsFile('not json', '9b8a7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d')).toBe(false)
+  })
+
+  it('writes back over a file of this record and the user manufacturer it names', () => {
+    expect(ownsFile(userDataText([madeBullet, maker]), bullet.id)).toBe(true)
+    // a manufacturer the record does not name, or another record, makes it a collection
+    expect(ownsFile(userDataText([bullet, maker]), bullet.id)).toBe(false)
+    expect(ownsFile(userDataText([madeBullet, maker, load]), bullet.id)).toBe(false)
+    // two records of the same id do not make a file of one
+    expect(ownsFile(userDataText([madeBullet, madeBullet, maker]), bullet.id)).toBe(false)
   })
 
   it('picks a folder file name that holds no other record', async () => {
@@ -273,10 +299,16 @@ describe('user data files', () => {
       'mine.json': userDataText([load]),
     }
     const read = async (name: string) => files[name]
-    expect(await folderFileName('new-bullet.json', 'b9', read)).toBe('new-bullet-3.json')
-    expect(await folderFileName('new-bullet.json', 'b1', read)).toBe('new-bullet.json')
+    expect(
+      await folderFileName('new-bullet.json', '1c2d3e4f-5a6b-4c7d-8e9f-0a1b2c3d4e5f', read),
+    ).toBe('new-bullet-3.json')
+    expect(
+      await folderFileName('new-bullet.json', '9b8a7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d', read),
+    ).toBe('new-bullet.json')
     expect(await folderFileName('mine.json', 'w1', read)).toBe('mine.json')
-    expect(await folderFileName('free.json', 'b9', read)).toBe('free.json')
+    expect(await folderFileName('free.json', '1c2d3e4f-5a6b-4c7d-8e9f-0a1b2c3d4e5f', read)).toBe(
+      'free.json',
+    )
   })
 
   it('treats an empty text like an absent one when comparing', () => {
@@ -333,18 +365,59 @@ describe('user data files', () => {
   })
 })
 
+describe('the user manufacturer of a record', () => {
+  it('is the stored record a bullet or firearm names by a user reference', () => {
+    const other = { ...maker, id: '0a1b2c3d-0000-4000-8000-000000000001', name: 'Other' }
+    expect(makerRecordsOf(madeBullet, [load, other, maker])).toEqual([maker])
+    expect(makerRecordsOf(madeBullet, [other])).toEqual([])
+  })
+
+  it('is the case manufacturer of a case capacity', () => {
+    const capacity = {
+      kind: 'caseCapacity',
+      id: 'c1',
+      name: 'Capacity',
+      saved,
+      data: { origin: 'user', caseManufacturer: `user:${makerId}` },
+    } as unknown as UserRecord
+    expect(makerRecordsOf(capacity, [maker])).toEqual([maker])
+  })
+
+  it('is none for a catalogue manufacturer, no manufacturer or another kind', () => {
+    expect(makerRecordsOf(bullet, [maker])).toEqual([])
+    expect(makerRecordsOf({ ...bullet, data: { origin: 'user' } } as UserRecord, [maker])).toEqual(
+      [],
+    )
+    expect(makerRecordsOf(load, [maker])).toEqual([])
+  })
+
+  it('is the stored maker, else the one that came with the opened file', () => {
+    const renamed = { ...maker, name: 'From the file' }
+    expect(makersToCarry(madeBullet, [maker], [renamed])).toEqual([maker])
+    expect(makersToCarry(madeBullet, [], [renamed])).toEqual([renamed])
+    expect(makersToCarry(madeBullet, [], [])).toEqual([])
+  })
+
+  it('travels with the record in a file and a share link', async () => {
+    const records = [madeBullet, ...makerRecordsOf(madeBullet, [maker])]
+    expect(parseUserDataFile(userDataText(records))).toEqual({ ok: true, records })
+    const link = (await shareLink(records, 'https://example.org/bullets/designer')) as string
+    expect(await readLink(new URL(link).hash)).toEqual({ ok: true, records })
+  })
+})
+
 describe('share links', () => {
   const base = 'https://example.org/bullets/designer'
 
   it('round trip: a link of a record reads back to the same record', async () => {
-    const link = (await shareLink(bullet, base)) as string
+    const link = (await shareLink([bullet], base)) as string
     expect(link).toMatch(/^https:\/\/example\.org\/bullets\/designer#record=[\w-]+$/)
     expect(await readLink(new URL(link).hash)).toEqual({ ok: true, records: [bullet] })
   })
 
   it('replaces the fragment of the page and writes the padding-free URL alphabet', async () => {
     for (const page of [`${base}#old`, `${base}#a#b`, `${base}#`]) {
-      const link = (await shareLink(bullet, page)) as string
+      const link = (await shareLink([bullet], page)) as string
       expect(link).toMatch(/^https:\/\/example\.org\/bullets\/designer#record=[\w-]+$/)
     }
   })
@@ -353,7 +426,7 @@ describe('share links', () => {
     // random text does not compress
     const noise = Array.from({ length: 12000 }, () => Math.random().toString(36)[2]).join('')
     const big = { ...load, data: { ...load.data, notes: noise } } as UserRecord
-    await expect(shareLink(big, base)).resolves.toBeUndefined()
+    await expect(shareLink([big], base)).resolves.toBeUndefined()
     expect(maxLinkChars).toBe(8000)
   })
 
@@ -363,10 +436,26 @@ describe('share links', () => {
       ...bullet,
       data: { ...bullet.data, overrides: { mass: { value: 'heavy' } } },
     } as never
-    const link = await shareLink(invalid, base)
+    const link = await shareLink([invalid], base)
     const read = await readLink(new URL(link as string).hash)
     expect(read?.ok).toBe(false)
     expect(read && !read.ok && read.reason).toContain('data.overrides.mass.value')
+  })
+
+  it('refuses a link for a load that refers to records of this browser, naming the fields', () => {
+    const own = (fields: object) => ({ ...load, data: { ...load.data, ...fields } }) as UserRecord
+    const userId = '3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13'
+    const refused = shareProblem(own({ cartridge: `user:${userId}`, firearm: `user:${userId}` }))
+    expect(refused).toContain('(firearm, cartridge)')
+    expect(shareProblem(own({ cartridge: 'catalogue:308-win' }))).toBeUndefined()
+    expect(shareProblem(load)).toBeUndefined()
+    // a design carries its base as a catalogue reference and its maker as a name only
+    expect(
+      shareProblem({
+        ...bullet,
+        data: { ...bullet.data, manufacturer: `user:${userId}` },
+      } as UserRecord),
+    ).toBeUndefined()
   })
 
   it('ignores a fragment without a record', async () => {

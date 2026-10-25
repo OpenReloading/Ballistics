@@ -1,4 +1,10 @@
-import type { Bullet, CaseCapacity, ChronoSession, Powder, SpecValue } from '@open-reloading/schema'
+import type {
+  Bullet,
+  CaseCapacity,
+  CatalogueSession,
+  Powder,
+  SpecValue,
+} from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import {
   checkBullet,
@@ -233,8 +239,9 @@ describe('checkPowder', () => {
 })
 
 describe('checkChronoSession', () => {
-  const base: ChronoSession = {
+  const base: CatalogueSession = {
     id: 'test-session',
+    origin: 'catalogue',
     date: '2026-01-01',
     device: { kind: 'doppler-radar', manufacturer: 'catalogue:test-maker', model: 'X' },
     muzzleDistance: { value: 0 },
@@ -243,12 +250,12 @@ describe('checkChronoSession', () => {
       stationPressure: { value: 1.01325 },
       relativeHumidity: { value: 50 },
     },
-    strings: [{ load: 'test-load', shots: [{ velocity: { value: 800 } }] }],
+    strings: [{ load: 'catalogue:test-load', shots: [{ velocity: { value: 800 } }] }],
     provenance: { kind: 'measured', sources: [{ title: 'Test' }] },
   }
-  const kinds = (s: Partial<ChronoSession>) =>
+  const kinds = (s: Partial<CatalogueSession>) =>
     checkChronoSession({ ...base, ...s }).map((f) => f.finding)
-  const conditions = (c: Partial<ChronoSession['conditions']>) => ({
+  const conditions = (c: Partial<CatalogueSession['conditions']>) => ({
     conditions: { ...base.conditions, ...c },
   })
 
@@ -259,7 +266,7 @@ describe('checkChronoSession', () => {
 
   it('flags each rule', () => {
     expect(
-      kinds({ strings: [{ load: 'test-load', shots: [{ velocity: { value: 0 } }] }] }),
+      kinds({ strings: [{ load: 'catalogue:test-load', shots: [{ velocity: { value: 0 } }] }] }),
     ).toEqual(['velocity-range'])
     expect(kinds(conditions({ relativeHumidity: { value: 120 } }))).toEqual(['humidity-range'])
     expect(kinds(conditions({ relativeHumidity: { value: -1 } }))).toEqual(['humidity-range'])
@@ -272,7 +279,7 @@ describe('checkChronoSession', () => {
   const string = (temperature: number) => ({
     strings: [
       {
-        load: 'test-load',
+        load: 'catalogue:test-load',
         propellantTemperature: { value: temperature },
         shots: [{ velocity: { value: 800 } }],
       },

@@ -1,5 +1,10 @@
-/** Share links: one user record packed into the fragment of a page link. */
-import { type UserRecord, userDataFormat, userDataVersion } from '@open-reloading/schema'
+/** Share links: a user record, with the user manufacturer it names, packed into the fragment of a page link. */
+import {
+  type UserRecord,
+  userDataFormat,
+  userDataVersion,
+  userRefFields,
+} from '@open-reloading/schema'
 import { type ParsedUserFile, parseUserDataFile } from './user-data.ts'
 
 /** Longest share link: the length RFC 9110 section 4.1 recommends every sender and recipient support. */
@@ -12,14 +17,26 @@ const through = async (
 ) => new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(t)).arrayBuffer())
 
 /**
- * `page` with `record` in the fragment: the file text, deflate-compressed, base64url; the
+ * Why `record` has no share link: a load that refers to records of this browser (`user:<id>`: its
+ * cartridge, bullet, firearm or case capacity) which the browser opening the link does not have.
+ * Undefined for a record a link can carry. A design's user manufacturer travels in the link next
+ * to the design.
+ */
+export function shareProblem(record: UserRecord): string | undefined {
+  const fields = record.kind === 'load' ? userRefFields(record) : []
+  if (fields.length > 0)
+    return `the load refers to records of this browser (${fields.join(', ')}); another browser would not find them. Use a catalogue record or save the load and those records to a file.`
+}
+
+/**
+ * `page` with `records` in the fragment: the file text, deflate-compressed, base64url; the
  * browser does not send a fragment to the server. Undefined when the link is over `maxLinkChars`.
  */
-export async function shareLink(record: UserRecord, page: string) {
+export async function shareLink(records: UserRecord[], page: string) {
   const text = JSON.stringify({
     format: userDataFormat,
     version: userDataVersion,
-    records: [record],
+    records,
   })
   const packed = await through(new TextEncoder().encode(text), new CompressionStream('deflate-raw'))
   const b64 = btoa(String.fromCharCode(...packed))

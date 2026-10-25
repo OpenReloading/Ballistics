@@ -138,11 +138,13 @@ it('shows a mass bound of the other unit at that unit display decimals', () => {
     expect(bulletMatches(at(gr), { ...emptyDirectory, mass: '9.72-11.66g' }), `${gr}`).toBe(true)
 })
 
-it('matches a number of the search inside a word too, as the schema matcher does: 7.8 finds a 17.8x g bullet', () => {
+it('matches a number of the search as a whole number, as the schema matcher does', () => {
   const heavy = b({ diameter: 7.035, mass: 17.82 })
-  expect(bulletMatches(heavy, { ...emptyDirectory, query: '7.8' })).toBe(true)
-  expect(bulletMatches(heavy, { ...emptyDirectory, query: '17.8' })).toBe(true)
-  expect(bulletMatches(b({}), { ...emptyDirectory, query: '7.8' })).toBe(true)
+  // 7.8 is no whole number of a 17.82 g, 7.82 mm or 7.035 mm bullet
+  expect(bulletMatches(heavy, { ...emptyDirectory, query: '7.8' })).toBe(false)
+  expect(bulletMatches(b({}), { ...emptyDirectory, query: '7.8' })).toBe(false)
+  expect(bulletMatches(heavy, { ...emptyDirectory, query: '17.82' })).toBe(true)
+  expect(bulletMatches(b({}), { ...emptyDirectory, query: '7.82' })).toBe(true)
   expect(bulletMatches(b({}), { ...emptyDirectory, query: '308' })).toBe(true)
 })
 

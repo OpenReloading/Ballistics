@@ -10,7 +10,7 @@ import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
 import { cartridgeItem } from '../catalogue/derive.ts'
 import type { CartridgeQuery, Catalogue } from '../catalogue/types.ts'
-import { idParams, listQuery, missing, noNul, stored } from './common.ts'
+import { idParams, listQuery, missing, noNul, revision, stored } from './common.ts'
 
 const cartridgeQuery = listQuery({
   table: {
@@ -51,6 +51,7 @@ const cartridgeResponse = cartridge.extend({
   aliases,
   caseType: caseTypes.optional(),
   capacities: z.array(catalogueCaseCapacity),
+  revision,
 })
 
 /** The body of `GET /cartridges/:id`: the record, its aliases, case type and case capacities. */
@@ -58,6 +59,8 @@ export interface CartridgeAnswer extends Cartridge {
   aliases: string[]
   caseType?: CaseType
   capacities: CatalogueCaseCapacity[]
+  /** Hash of the stored record. It changes with any field. */
+  revision: string
 }
 
 /**
@@ -72,6 +75,7 @@ export function cartridgeAnswer(catalogue: Catalogue, id: string): CartridgeAnsw
   const { caseType } = cartridgeItem(record)
   return {
     ...record,
+    revision: found.revision,
     aliases: record.aliases ?? [],
     ...(caseType && { caseType }),
     // a capacity keeps its own `origin`
@@ -109,7 +113,7 @@ export const cartridgeRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
         moved: true,
         summary: 'Get a cartridge',
         description:
-          'The cartridge record of its C.I.P. sheet with its values, provenance, case type and case capacities.',
+          'The cartridge record of its C.I.P. sheet with its values, provenance, case type and case capacities. `revision` is a hash of the stored record that changes with any field.',
       },
     },
     (request, reply) => {

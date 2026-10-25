@@ -101,6 +101,7 @@ export function Workbench() {
     designs,
     direction,
     fields,
+    apiData,
     fileData,
     fileMenu,
     fillExample,
@@ -120,7 +121,7 @@ export function Workbench() {
     measuredFor,
     mmText,
     notes,
-    chronoSeries,
+    chronoSessions,
     edits,
     onOpenFile,
     online,
@@ -139,7 +140,10 @@ export function Workbench() {
     setChartView,
     setCsvCopied,
     setNotes,
-    setChronoSeries,
+    setChronoSessions,
+    manufacturerRef,
+    manufacturerName,
+    sessionRefCount,
     setPrinting,
     setSeen,
     setTab,
@@ -567,8 +571,11 @@ export function Workbench() {
       trajectory,
       notes,
       setNotes,
-      chronoSeries,
-      setChronoSeries,
+      chronoSessions,
+      setChronoSessions,
+      manufacturerRef,
+      manufacturerName,
+      sessionRefCount,
       barrel,
       lot,
       chartView,
@@ -608,8 +615,11 @@ export function Workbench() {
       trajectory,
       notes,
       setNotes,
-      chronoSeries,
-      setChronoSeries,
+      chronoSessions,
+      setChronoSessions,
+      manufacturerRef,
+      manufacturerName,
+      sessionRefCount,
       barrel,
       lot,
       chartView,
@@ -825,6 +835,7 @@ export function Workbench() {
                         name={load.name}
                         nameKey={load.customName?.trim() ? load.customName : ''}
                         data={fileData}
+                        apiData={apiData}
                         store={storeLoad}
                         onOpen={onOpenFile}
                         onStored={stored}

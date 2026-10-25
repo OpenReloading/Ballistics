@@ -23,9 +23,10 @@ import {
   writeHandleText,
 } from '../lib/file-access.ts'
 import { parseFiles, readLoadFile, readNote } from '../lib/load-file-formats.ts'
+import { shownManufacturerRefs } from '../lib/manufacturers.ts'
 import { guardNavigation, guardPop } from '../lib/navigation-guard.ts'
 import { newId } from '../lib/new-id.ts'
-import { maxLinkChars, readLink, shareLink } from '../lib/share-link.ts'
+import { maxLinkChars, readLink, shareLink, shareProblem } from '../lib/share-link.ts'
 import { type ShortcutId, shortcutAriaKeys, shortcutLabel } from '../lib/shortcuts.ts'
 import { controlSize } from '../lib/theme.ts'
 import {
@@ -33,6 +34,9 @@ import {
   checkedUserDataText,
   exportAllText,
   type InvalidRecord,
+  makerIdOf,
+  makerRecordsOf,
+  makersToCarry,
   maxFileBytes,
   namedKey,
   type ParsedUserFile,
@@ -42,6 +46,7 @@ import {
   renamedKey,
   tooLargeMessage,
   userDataText,
+  validRecords,
 } from '../lib/user-data.ts'
 import { ownsFile, recordFileName } from '../lib/user-file-names.ts'
 import { droppedPhotos, embeddedFileBlob, embedFiles, photoIds } from '../lib/user-photos.ts'
@@ -50,6 +55,7 @@ import {
   deleteRecords,
   putInvalid,
   putPhoto,
+  putRecordIfAbsent,
   putRecords,
   rawPhotoId,
   requestPersistentStorage,
@@ -100,9 +106,14 @@ const kindNames: Record<UserRecordKind, string> = {
   caseCapacity: 'measured capacities',
   load: 'loads',
   firearm: 'firearms',
+  session: 'chronograph sessions',
   targetSheet: 'target sheets',
   targetFaceDesign: 'target face designs',
 }
+
+/** Shown when a manufacturer that came with a record could not be kept in the browser. */
+const noMaker =
+  'Its manufacturer could not be kept in this browser; Save still writes it into the file.'
 
 /** Kinds a share link carries: the designs and the workbench load. */
 const shareable: UserRecordKind[] = ['bullet', 'cartridge', 'load']
@@ -195,6 +206,7 @@ function FileMenuOf<K extends UserRecordKind>({
   kind,
   name,
   data,
+  apiData,
   onOpen,
   note,
   problem,
@@ -217,6 +229,11 @@ function FileMenuOf<K extends UserRecordKind>({
   name: string
   /** The page's current record data. */
   data: Of<K>['data']
+  /**
+   * The record as a file for the API reads it, every value resolved (the workbench): the Save
+   * options then offer Download and Copy JSON for the API. Never saved, never the browser copy.
+   */
+  apiData?: Of<K>['data']
   /** `record` is the opened or saved-as record (its id and saved time). */
   onOpen: (data: Of<K>['data'], name: string, record: Of<K>) => void
   /** A line about the record the page adds to the menu's status, such as ids not loaded. */
@@ -323,6 +340,15 @@ function FileMenuOf<K extends UserRecordKind>({
   unsavedCallback.current = onUnsaved
   useEffect(() => unsavedCallback.current?.(unsaved), [unsaved])
 
+  // Settings must not offer to delete the manufacturer of the record shown
+  const shownMaker = makerIdOf({ kind, data } as UserRecord)
+  useEffect(() => {
+    if (!shownMaker) return
+    const key = {}
+    shownManufacturerRefs.set(key, `user:${shownMaker}`)
+    return () => void shownManufacturerRefs.delete(key)
+  }, [shownMaker])
+
   // a share link: the record in the fragment, validated, opened as unsaved work
   // on load, and on a link pasted into this tab (a fragment change, no reload)
   // biome-ignore lint/correctness/useExhaustiveDependencies: once on mount
@@ -341,7 +367,10 @@ function FileMenuOf<K extends UserRecordKind>({
             !(await ask('Replace the unsaved changes with the shared record?', 'Replace'))
           )
             return
+          const kept = await keepMakers(r, p.records)
+          carriedMakers.current = makerRecordsOf(r, p.records)
           latest.current.openShared(r)
+          if (!kept) setFailure(noMaker)
         })
         .catch(() => {})
     void read()
@@ -556,7 +585,7 @@ function FileMenuOf<K extends UserRecordKind>({
     const recordId = as || !id.current ? newId() : id.current
     const record = { kind, id: recordId, name, saved: new Date().toISOString(), data } as Of<K>
     // a file Open and Import would reject is not written
-    const checked = checkedUserDataText([record], await photosOf([record]))
+    const checked = checkedUserDataText(await withMakers(record), await photosOf([record]))
     if (!checked.ok) {
       setFailure(`Not saved: ${checked.reason}`)
       return
@@ -665,7 +694,7 @@ function FileMenuOf<K extends UserRecordKind>({
               problem
                 ? `No share link: ${problem}`
                 : ((await shareLink(
-                    current(),
+                    await withMakers(current()),
                     window.location.origin + window.location.pathname,
                   )) ?? `No share link: longer than ${maxLinkChars} characters.`),
           },
@@ -674,13 +703,26 @@ function FileMenuOf<K extends UserRecordKind>({
 
   async function share() {
     if (problem) return setFailure(`Not shared: ${problem}`)
+    const refused = shareProblem(current())
+    if (refused) return setFailure(`Not shared: ${refused}`)
     const page = window.location.origin + window.location.pathname
-    const link = await shareLink(current(), page)
+    const link = await shareLink(await withMakers(current()), page)
     if (!link)
       return setFailure(
         `Not shared: the link would be longer than ${maxLinkChars} characters; save the record to a file instead.`,
       )
     await copy(link, 'Share link')
+  }
+
+  /** The text of the file for the API, none (and the reason shown) when the record cannot be written. */
+  function apiText() {
+    if (problem || !apiData) {
+      setFailure(`Not written: ${problem ?? 'nothing to write'}`)
+      return
+    }
+    const checked = checkedUserDataText([{ ...current(), data: apiData }])
+    if (checked.ok) return checked.text
+    setFailure(`Not written: ${checked.reason}`)
   }
 
   async function remove(records: Of<K>[], question: string) {
@@ -718,6 +760,37 @@ function FileMenuOf<K extends UserRecordKind>({
     )
   }
 
+  /** The user manufacturer records that came with the opened record, for a Save while the store lacks them. */
+  const carriedMakers = useRef<UserRecord[]>([])
+
+  /**
+   * `record` and the user manufacturer it names, as a file, Copy JSON and a share link carry them:
+   * the stored one (one keyed read; one the format rejects is left out), else the one that came
+   * with the opened file or link. A failed read stops the action unless the opened file has it.
+   */
+  async function withMakers(record: UserRecord): Promise<UserRecord[]> {
+    const id = makerIdOf(record)
+    if (!id) return [record]
+    let raw: unknown
+    try {
+      raw = await storedRecord(id)
+    } catch (e) {
+      if (!makerRecordsOf(record, carriedMakers.current).length) throw e
+    }
+    const stored = raw ? validRecords([raw]).records : []
+    return [record, ...makersToCarry(record, stored, carriedMakers.current)]
+  }
+
+  /** Keeps the user manufacturer `record` names, as `carried` holds it, unless one of its id is stored; false when the store refused it. */
+  async function keepMakers(record: UserRecord, carried: UserRecord[]) {
+    try {
+      await Promise.all(makerRecordsOf(record, carried).map(putRecordIfAbsent))
+      return true
+    } catch {
+      return false
+    }
+  }
+
   /** `refNote` of `opened` against the browser store and the built-in example rifle; empty when the store cannot be read. */
   async function refsOf(opened: UserRecord[]) {
     const stored = await storedRecords().catch(() => undefined)
@@ -725,12 +798,21 @@ function FileMenuOf<K extends UserRecordKind>({
   }
 
   /** Shows `record` unless the user keeps the unsaved changes; false when kept. */
-  async function use(record: Of<K>, file: string, h?: FileSystemFileHandle, note?: string) {
+  async function use(
+    record: Of<K>,
+    file: string,
+    opened?: FileSystemFileHandle,
+    fileNote?: string,
+    carried: UserRecord[] = [],
+  ) {
     if (unsaved && !(await ask('Replace the unsaved changes with the opened record?', 'Replace')))
       return false
+    const kept = await keepMakers(record, carried)
+    carriedMakers.current = makerRecordsOf(record, carried)
+    const note = kept ? fileNote : [fileNote, noMaker].filter(Boolean).join(' ')
     onOpen(record.data as Of<K>['data'], record.name, record)
     id.current = record.id
-    handle.current = h
+    handle.current = opened
     known.current = record.saved
     setSaved({ file, json: keyOf(record.data, record.name) })
     const text = [note, await refsOf([record])].filter(Boolean).join(' ')
@@ -778,6 +860,7 @@ function FileMenuOf<K extends UserRecordKind>({
       picked.file.name,
       ownsFile(text, mine[0].id) ? picked.handle : undefined,
       readNote(parsed),
+      parsed.records,
     )
   }
 
@@ -1025,9 +1108,40 @@ function FileMenuOf<K extends UserRecordKind>({
             {shareable.includes(kind) && (
               <Menu.Item onClick={act('Share', share)}>Copy share link</Menu.Item>
             )}
-            <Menu.Item onClick={act('Copy', () => copy(userDataText([current()]), 'Record JSON'))}>
+            <Menu.Item
+              onClick={act('Copy', async () =>
+                copy(userDataText(await withMakers(current())), 'Record JSON'),
+              )}
+            >
               Copy JSON
             </Menu.Item>
+            {apiData && (
+              <>
+                <Menu.Item
+                  onClick={act('Download', () => {
+                    const text = apiText()
+                    if (text !== undefined) {
+                      download(
+                        new Blob([text], { type: 'application/json' }),
+                        recordFileName(`${name} api`),
+                      )
+                      setMessage('Downloaded the load file for the API.')
+                    }
+                    return Promise.resolve()
+                  })}
+                >
+                  Download for the API
+                </Menu.Item>
+                <Menu.Item
+                  onClick={act('Copy', async () => {
+                    const text = apiText()
+                    if (text !== undefined) await copy(text, 'Load file for the API')
+                  })}
+                >
+                  Copy JSON for the API
+                </Menu.Item>
+              </>
+            )}
             <Menu.Divider />
             <Menu.Item
               onClick={act('Export', async () => {

@@ -6,7 +6,7 @@ Command line tools of the application. Never imported by the API or the web app.
 
 All of them need `npm run build` at the root (`src/openapi.ts` imports `@open-reloading/api/openapi` from `dist`). They run in the dev container, which has `oasdiff` and `schemathesis` (`.devcontainer/Dockerfile`).
 
-- `node src/openapi.ts <file>`: writes the API document of the current routes (`buildOpenApi`).
+- `node src/openapi.ts [baseline]`: writes the API document of the current routes (`buildOpenApi`) to `openapi.json` in the temporary directory (`TMPDIR`), or with `baseline` to `packages/api/openapi.baseline.json`. No path argument.
 - API contract check: `npm run api-check` (root: `npm run api:check`)
   - `oasdiff breaking` of `packages/api/openapi.baseline.json` against the current document. Fails on any `ERR` finding.
   - A breaking change passes only after `npm run api-baseline` writes the current document to the baseline in the same pull request, so the baseline diff shows the break in review.

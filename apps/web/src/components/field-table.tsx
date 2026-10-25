@@ -67,15 +67,14 @@ export function Noted({
         multiline
         maw={320}
       >
-        {inline ? (
-          <span tabIndex={tabIndex} className={className} aria-describedby={id}>
-            {value}
-          </span>
-        ) : (
-          <button type="button" className={className} aria-describedby={id}>
-            {value}
-          </button>
-        )}
+        <button
+          type="button"
+          className={className}
+          aria-describedby={id}
+          tabIndex={inline ? tabIndex : undefined}
+        >
+          {value}
+        </button>
       </Tooltip>
       {/* inline: hidden, so a row header's name stays the symbol; a description may name hidden text */}
       <span id={id} className="visually-hidden" hidden={inline}>
@@ -95,6 +94,15 @@ function Row({ row, system }: { row: FieldRow; system: UnitSystem }) {
         {notes.length > 0 ? <Noted value={value} notes={notes} /> : value}
       </TableTd>
     </TableTr>
+  )
+}
+
+/** A symbol that takes focus, the keyboard path of the linked marking: a button, as a click, Enter or Space keeps the mark (`RecordScope`). */
+export function SymbolStop({ tabIndex, children }: { tabIndex: number; children: ReactNode }) {
+  return (
+    <button type="button" className="symbol-stop" tabIndex={tabIndex}>
+      {children}
+    </button>
   )
 }
 
@@ -120,7 +128,7 @@ function SymbolRow({
   return (
     <TableTr data-symbol={row.symbol} data-off={off || undefined}>
       <TableTd className="field-symbol">
-        {row.symbol && <span tabIndex={tabbable ? 0 : -1}>{row.symbol}</span>}
+        {row.symbol && <SymbolStop tabIndex={tabbable ? 0 : -1}>{row.symbol}</SymbolStop>}
       </TableTd>
       <TableTh scope="row">{rowLabel(row, system)}</TableTh>
       <TableTd className="nowrap num">

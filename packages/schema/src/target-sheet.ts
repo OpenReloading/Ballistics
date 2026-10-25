@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { recordId } from './ids.ts'
+import { recordId, ref } from './ids.ts'
 import { hexColour, localId } from './shared.ts'
 
 /** A pixel of the photo as the browser shows it (orientation applied), x right, y down. */
@@ -60,7 +60,7 @@ export const groupShot = z.object({
     .optional(),
   chrono: z
     .object({
-      session: localId.describe('Id of the chronograph session.'),
+      session: ref('session').describe('The chronograph session of the round.'),
       string: z.int().nonnegative().describe('Index of the string in the session, from 0.'),
       shot: z.int().nonnegative().describe('Index of the shot in the string, from 0.'),
     })

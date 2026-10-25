@@ -1,4 +1,4 @@
-import { type ChronoSession, chronoSession } from '@open-reloading/schema'
+import { type CatalogueSession, catalogueSession } from '@open-reloading/schema'
 import type { ChronoImport } from '../src/index.ts'
 
 const fill: Record<string, unknown> = {
@@ -9,13 +9,16 @@ const fill: Record<string, unknown> = {
   firmware: '1.0',
   muzzleDistance: { value: 3000 },
   airTemperature: { value: 15 },
-  load: 'test-load',
+  load: 'catalogue:test-load',
   title: 'test.csv',
 }
 
-/** Fills exactly the paths in `missing` and validates the result as a `ChronoSession`. */
-export function complete(result: ChronoImport): ChronoSession {
-  const record: Record<string, unknown> = JSON.parse(JSON.stringify(result.session))
+/** Fills exactly the paths in `missing` and validates the result as a catalogue session. */
+export function complete(result: ChronoImport): CatalogueSession {
+  const record: Record<string, unknown> = {
+    origin: 'catalogue',
+    ...JSON.parse(JSON.stringify(result.session)),
+  }
   for (const path of result.missingPaths) {
     const keys = path.split('.')
     let node = record
@@ -26,5 +29,5 @@ export function complete(result: ChronoImport): ChronoSession {
     const last = keys[keys.length - 1]
     node[last] = fill[last]
   }
-  return chronoSession.parse(record)
+  return catalogueSession.parse(record)
 }

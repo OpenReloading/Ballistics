@@ -1,6 +1,7 @@
 import type { Bundle } from '@open-reloading/data'
 import type { Cartridge, SpecValue } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
+import { revisionOf } from '../src/catalogue/derive.ts'
 import { API_PREFIX } from '../src/version.ts'
 import { bundle } from './fixtures.ts'
 import { withApi } from './setup.ts'
@@ -183,6 +184,7 @@ describe('GET /cartridges/:id', () => {
     })
     expect(body.provenance).toEqual(bundle.cartridges[0].provenance)
     expect(body.values).toEqual(bundle.cartridges[0].values)
+    expect(body.revision).toBe(revisionOf(bundle.cartridges[0]))
     expect(body).not.toHaveProperty('specs')
     expect(body).not.toHaveProperty('revised')
     expect(body).not.toHaveProperty('pressureMethod')
@@ -395,7 +397,10 @@ describe('GET /powders and /bullets', () => {
         ballisticCoefficientG7: null,
       },
     ])
-    expect((await get(`${API_PREFIX}/bullets/example-a-1`)).body).toEqual(bundle.bullets[0])
+    const { body: record } = await get(`${API_PREFIX}/bullets/example-a-1`)
+    const { revision, ...rest } = record
+    expect(rest).toEqual(bundle.bullets[0])
+    expect(revision).toBe(revisionOf(bundle.bullets[0]))
     expect(await get(`${API_PREFIX}/bullets/unknown`)).toEqual({
       status: 404,
       body: { statusCode: 404, error: 'Not Found', message: 'bullet unknown not found' },

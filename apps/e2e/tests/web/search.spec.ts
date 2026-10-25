@@ -1,6 +1,7 @@
 import { expect, type Page, test } from '@playwright/test'
 import { sections } from '../../../web/src/lib/sections.ts'
 import { gotoHydrated } from './nav.ts'
+import { putRecords } from './user-store.ts'
 
 // Ctrl+K on every page: pages, the shell's commands and records; the workbench opens its own
 // search with the same pages and commands
@@ -47,6 +48,34 @@ test('a record found by Ctrl+K opens its page', async ({ page }) => {
     .click()
   await expect(page).toHaveURL('/cartridges/308-win')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('308 Win.')
+})
+
+test('a bullet design of this browser is found by Ctrl+K and opens in its designer', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/powders')
+  const id = '6f0f4d3e-0a43-4a43-9a3d-3a2f2e1f0c33'
+  await putRecords(page, [
+    {
+      kind: 'bullet',
+      id,
+      name: 'Slug test design',
+      saved: '2026-10-25T00:00:00.000Z',
+      data: {
+        origin: 'user',
+        overrides: {
+          name: 'Slug test design',
+          diameter: { value: 7.823 },
+          mass: { value: 10.886 },
+        },
+      },
+    },
+  ])
+  await gotoHydrated(page, '/powders')
+  await open(page)
+  await field(page).fill('slug test')
+  await search(page).getByRole('button', { name: 'Slug test design (your design)' }).click()
+  await expect(page).toHaveURL(`/bullets/designer?record=${id}`)
 })
 
 test('commands found by Ctrl+K open the settings and set the theme', async ({ page }) => {

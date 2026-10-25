@@ -1,48 +1,30 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, type Page, test } from '@playwright/test'
 import { storeUnits } from './units.ts'
+import { putRecords } from './user-store.ts'
 import { runExample } from './workbench-run.ts'
 
 /** Firearms in the browser store, as the library saves them; ids `firearm-<first>` on. */
 async function seed(page: Page, names: string[], extra: object = {}, first = 0) {
-  await page.evaluate(
-    async ([names, extra, first]) => {
-      const db: IDBDatabase = await new Promise((ok, no) => {
-        const r = indexedDB.open('openreloading-user-data')
-        r.onupgradeneeded = () => {
-          for (const n of ['records', 'handles', 'files'])
-            if (!r.result.objectStoreNames.contains(n))
-              r.result.createObjectStore(n, n === 'records' ? { keyPath: 'id' } : undefined)
-        }
-        r.onsuccess = () => ok(r.result)
-        r.onerror = () => no(r.error)
-      })
-      const tx = db.transaction('records', 'readwrite')
-      names.forEach((name, i) => {
-        tx.objectStore('records').put({
-          kind: 'firearm',
-          id: `firearm-${first + i}`,
-          name,
-          saved: '2026-10-20T00:00:00.000Z',
-          data: {
-            origin: 'user',
-            name,
-            cartridge: 'catalogue:308-win',
-            barrelLength: { value: 610 },
-            twist: { value: 254 },
-            twistHand: 'right',
-            optics: [],
-            configurations: [],
-            ...extra,
-          },
-        })
-      })
-      await new Promise((ok) => {
-        tx.oncomplete = ok
-      })
-      db.close()
-    },
-    [names, extra, first] as const,
+  await putRecords(
+    page,
+    names.map((name, i) => ({
+      kind: 'firearm',
+      id: `firearm-${first + i}`,
+      name,
+      saved: '2026-10-20T00:00:00.000Z',
+      data: {
+        origin: 'user',
+        name,
+        cartridge: 'catalogue:308-win',
+        barrelLength: { value: 610 },
+        twist: { value: 254 },
+        twistHand: 'right',
+        optics: [],
+        configurations: [],
+        ...extra,
+      },
+    })),
   )
 }
 
