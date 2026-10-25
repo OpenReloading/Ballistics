@@ -37,7 +37,7 @@ export async function searchRecords<T>(
 
 /**
  * Search box over the API list of `kind` (`apiFetch`), 300 ms after the last keystroke; the
- * previous request is aborted. Matches open in a list box: arrow keys move, Enter or a click chooses;
+ * previous request is aborted. With `find` the matches come from it instead, without the pause. Matches open in a list box: arrow keys move, Enter or a click chooses;
  * Enter with no match highlighted chooses the only one.
  */
 export function RecordSearch<T extends { id: string }>({
@@ -55,6 +55,7 @@ export function RecordSearch<T extends { id: string }>({
   size,
   chevron = false,
   browse,
+  find,
 }: {
   kind: 'bullets' | 'cartridges' | 'powders'
   label: string
@@ -80,6 +81,8 @@ export function RecordSearch<T extends { id: string }>({
   chevron?: boolean
   /** A button at the end of the field that opens a browsing dialog with the typed text. */
   browse?: { label: string; onOpen: (typed: string) => void }
+  /** The matches of the typed text, 20 at most with the total, in place of the API search. */
+  find?: (text: string, limit: number) => Promise<ListOf<T>>
 }) {
   const [q, setQ] = useState('')
   const [state, setState] = useState<State<T>>({ status: 'idle' })
@@ -94,25 +97,35 @@ export function RecordSearch<T extends { id: string }>({
       setState({ status: 'idle' })
     }
     const text = q.trim()
-    if (text.length < 2) {
+    if (text.length < 2 && !find) {
       setState({ status: 'idle' })
       return
     }
     const controller = new AbortController()
-    const timer = setTimeout(async () => {
-      setState({ status: 'loading' })
-      try {
-        const body = await searchRecords<T>(kind, text, 20, params, controller.signal)
-        setState({ status: 'ok', items: body.items, total: body.total })
-      } catch {
-        if (!controller.signal.aborted) setState({ status: 'error' })
-      }
-    }, 300)
+    const timer = setTimeout(
+      async () => {
+        // a first key lists what `find` has for it; with nothing, the field stays quiet
+        if (text.length >= 2) setState({ status: 'loading' })
+        try {
+          const body = await (find?.(text, 20) ??
+            searchRecords<T>(kind, text, 20, params, controller.signal))
+          if (!controller.signal.aborted)
+            setState(
+              text.length < 2 && body.items.length === 0
+                ? { status: 'idle' }
+                : { status: 'ok', items: body.items, total: body.total },
+            )
+        } catch {
+          if (!controller.signal.aborted) setState({ status: 'error' })
+        }
+      },
+      find ? 0 : 300,
+    )
     return () => {
       clearTimeout(timer)
       controller.abort()
     }
-  }, [q, kind, params])
+  }, [q, kind, params, find])
 
   const items = state.status === 'ok' ? state.items : []
   const typed = q.trim().toLowerCase()
@@ -120,7 +133,7 @@ export function RecordSearch<T extends { id: string }>({
   let message = ''
   if (state.status === 'loading') message = 'Searching'
   else if (state.status === 'error') message = unreachableText
-  else if (state.status === 'ok')
+  else if (state.status === 'ok' && q.trim() !== '')
     message =
       items.length === 0
         ? noneText
