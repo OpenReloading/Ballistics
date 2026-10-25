@@ -595,7 +595,7 @@ export function TargetEditor({
   const [sheetOpen, setSheetOpen] = useState(false)
   /** The scroll of the shot table, for the rows in view of a long group. */
   const [shotScroll, setShotScroll] = useState({ top: 0, height: 400 })
-  const shotScroller = useRef<HTMLElement>(null)
+  const shotScroller = useRef<HTMLDivElement>(null)
   /** The help of the focused field (label and description), shown on the canvas. */
   const [help, setHelp] = useState<string>()
   const fileInput = useRef<HTMLInputElement>(null)
@@ -1749,11 +1749,11 @@ export function TargetEditor({
   const lastRow = windowed ? Math.min(shotCount, firstRow + inView + 20) : shotCount
   const shotsPanel = group && (
     <div className="shots-panel">
-      <section
+      <div
         ref={shotScroller}
         className="scroll shots-scroll"
-        // the shots' fields take the focus for keyboard scrolling
-        aria-label={`Shots of ${group.name}`}
+        // a scrollable region needs focus to scroll by keyboard (as ScrollRegion)
+        {...{ role: 'region', 'aria-label': `Shots of ${group.name}`, tabIndex: 0 }}
         onScroll={(e) =>
           windowed &&
           setShotScroll({ top: e.currentTarget.scrollTop, height: e.currentTarget.clientHeight })
@@ -1856,7 +1856,7 @@ export function TargetEditor({
             </Table.Tbody>
           </Table>
         </div>
-      </section>
+      </div>
     </div>
   )
 
