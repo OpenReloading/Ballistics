@@ -1,6 +1,7 @@
 import { expect, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
 import { storeUnits } from './units.ts'
+import { putRecords } from './user-store.ts'
 import { loadForm } from './workbench.ts'
 
 // Metric (SI): lengths in mm
@@ -11,36 +12,21 @@ test.beforeEach(({ page }) => storeUnits(page))
  * is an override): the values of a record's sides without the chamber's bore diameter F, bore area Q and twist u.
  */
 async function seedDesign(page: Page) {
-  await page.evaluate(async () => {
-    const record = await (await fetch('/api/cartridges/308-win')).json()
-    const lacking = ['F', 'Q', 'u']
-    const values = record.values.filter(
-      (v: { side?: string; symbol: string; variant?: string }) =>
-        v.side && !v.variant && !(v.side === 'chamber' && lacking.includes(v.symbol)),
-    )
-    const db: IDBDatabase = await new Promise((ok, no) => {
-      const r = indexedDB.open('openreloading-user-data')
-      r.onupgradeneeded = () => {
-        for (const n of ['records', 'handles', 'files'])
-          if (!r.result.objectStoreNames.contains(n))
-            r.result.createObjectStore(n, n === 'records' ? { keyPath: 'id' } : undefined)
-      }
-      r.onsuccess = () => ok(r.result)
-      r.onerror = () => no(r.error)
-    })
-    const tx = db.transaction('records', 'readwrite')
-    tx.objectStore('records').put({
+  const record = await page.evaluate(async () => (await fetch('/api/cartridges/308-win')).json())
+  const lacking = ['F', 'Q', 'u']
+  const values = record.values.filter(
+    (v: { side?: string; symbol: string; variant?: string }) =>
+      v.side && !v.variant && !(v.side === 'chamber' && lacking.includes(v.symbol)),
+  )
+  await putRecords(page, [
+    {
       kind: 'cartridge',
       id: '6f0f4d3e-0a43-4a43-9a3d-3a2f2e1f0c21',
       name: 'Mine 7.8',
       saved: '2026-10-24T00:00:00.000Z',
       data: { origin: 'user', overrides: { table: record.table, values } },
-    })
-    await new Promise((ok) => {
-      tx.oncomplete = ok
-    })
-    db.close()
-  })
+    },
+  ])
 }
 
 test('a cartridge design fills the fields it covers, draws the figure and is named in the results and the print', async ({
