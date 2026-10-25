@@ -77,12 +77,12 @@ export const ManufacturerInput = memo(function ManufacturerInput({
         queueMicrotask(() => {
           picked.current = false
         })
-        commit(text)
+        void commit(text)
       }}
       // the save shortcut works inside fields: the record goes into the store before the save does
       onKeyDown={(e) => {
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's' && typed !== undefined)
-          commit(typed)
+          void commit(typed)
       }}
       onBlur={() => typed !== undefined && commit(typed)}
     />
