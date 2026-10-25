@@ -10,6 +10,7 @@ import {
   userDataFormat,
   userDataVersion,
   userRecord,
+  userRefFields,
   versionProblem,
 } from '../src/index.ts'
 
@@ -512,6 +513,32 @@ describe('versionProblem', () => {
   it('leaves the current version and other formats to the schema', () => {
     for (const x of [file([firearmRecord]), { format: 'x', version: 1 }, null, 'text'])
       expect(versionProblem(x)).toBeUndefined()
+  })
+})
+
+describe('userRefFields', () => {
+  it('names the fields of a record that point at records of the user', () => {
+    const load = userRecord.parse({
+      ...loadRecord,
+      data: {
+        ...loadRecord.data,
+        cartridge: `user:${uuid}`,
+        bullet: `user:${other}`,
+        firearm: 'catalogue:some-rifle',
+      },
+    })
+    expect(userRefFields(load)).toEqual(['cartridge', 'bullet'])
+    const bullet = userRecord.parse({
+      ...bulletRecord,
+      data: { ...bulletRecord.data, manufacturer: `user:${uuid}` },
+    })
+    expect(userRefFields(bullet)).toEqual(['manufacturer'])
+  })
+
+  it('names none for a record that refers to the catalogue alone', () => {
+    expect(userRefFields(userRecord.parse(loadRecord))).toEqual([])
+    expect(userRefFields(userRecord.parse(bulletRecord))).toEqual([])
+    expect(userRefFields(userRecord.parse(manufacturerRecord))).toEqual([])
   })
 })
 

@@ -7,7 +7,7 @@ import {
 import { describe, expect, it } from 'vitest'
 import { exampleFirearm } from '../src/lib/example-data.ts'
 import { parseFiles, readLoadFile } from '../src/lib/load-file-formats.ts'
-import { maxLinkChars, readLink, shareLink } from '../src/lib/share-link.ts'
+import { maxLinkChars, readLink, shareLink, shareProblem } from '../src/lib/share-link.ts'
 import {
   canonicalJson,
   checkedUserDataText,
@@ -367,6 +367,22 @@ describe('share links', () => {
     const read = await readLink(new URL(link as string).hash)
     expect(read?.ok).toBe(false)
     expect(read && !read.ok && read.reason).toContain('data.overrides.mass.value')
+  })
+
+  it('refuses a link for a load that refers to records of this browser, naming the fields', () => {
+    const own = (fields: object) => ({ ...load, data: { ...load.data, ...fields } }) as UserRecord
+    const userId = '3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13'
+    const refused = shareProblem(own({ cartridge: `user:${userId}`, firearm: `user:${userId}` }))
+    expect(refused).toContain('(firearm, cartridge)')
+    expect(shareProblem(own({ cartridge: 'catalogue:308-win' }))).toBeUndefined()
+    expect(shareProblem(load)).toBeUndefined()
+    // a design carries its base as a catalogue reference and its maker as a name only
+    expect(
+      shareProblem({
+        ...bullet,
+        data: { ...bullet.data, manufacturer: `user:${userId}` },
+      } as UserRecord),
+    ).toBeUndefined()
   })
 
   it('ignores a fragment without a record', async () => {

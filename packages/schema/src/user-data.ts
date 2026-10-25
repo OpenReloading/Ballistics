@@ -245,6 +245,16 @@ export function checkUserRefs(records: UserRecords): DanglingRef[] {
 }
 
 /**
+ * The fields of `record` whose reference names a record of the user (`user:<id>`): what another
+ * browser would not have. A `catalogue:` reference and a plain catalogue id are not listed.
+ */
+export function userRefFields(record: UserRecord): string[] {
+  return userRefsOf(record).flatMap(([field, target]) =>
+    target !== undefined && parseRef(target)?.scope === 'user' ? [field] : [],
+  )
+}
+
+/**
  * The references of a record to other user records: the field, its text, the kind the record must
  * have and whether only a `user:` reference counts (a plain text names a catalogue record).
  */
