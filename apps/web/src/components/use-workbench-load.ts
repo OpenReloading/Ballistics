@@ -61,11 +61,13 @@ import {
 } from '../lib/input-defaults.ts'
 import { burnFormError, interiorBody, interiorFields } from '../lib/interior-input.ts'
 import {
+  capacityOfRecord,
   capacityRecord,
   fromLoad,
   givenKeys,
   type LoadParts,
   measuredCapacityRef,
+  savedCapacityRef,
   toLoad,
 } from '../lib/load-record.ts'
 import { generatedName, loadName } from '../lib/load-tabs.ts'
@@ -1561,32 +1563,41 @@ export function useWorkbenchState() {
   }
 
   /**
-   * The case capacity `ref` of an opened load for the cartridge with the id `forCartridge`: a
-   * catalogue record is chosen in the figure, a user record is the measured capacity and fills
-   * its field. A user record the store does not answer stays in the load as asked.
+   * The case capacity `ref` of an opened load for the cartridge reference `forCartridge`: a
+   * catalogue record is chosen in the figure, a user record of that cartridge is the measured
+   * capacity and fills its field. A user record the store does not answer, or one of another
+   * cartridge, stays in the load as asked.
    */
   function openCapacity(ref: string, forCartridge: string | undefined) {
     const target = parseRef(ref)
-    if (!target || !forCartridge) return
+    const cartridgeId = forCartridge && parseRef(forCartridge)?.id
+    if (!target || !cartridgeId) return
     if (target.scope === 'catalogue')
-      return setCapacityChoice({ cartridge: forCartridge, id: target.id })
+      return setCapacityChoice({ cartridge: cartridgeId, id: target.id })
     openingCapacity.current = ref
     want('capacity', ref)
     storedRecord(target.id)
       .then((raw) => {
         if (openingCapacity.current !== ref) return
-        const r = userRecord.safeParse(raw)
-        if (!r.success || r.data.kind !== 'caseCapacity') return lost('capacity', ref)
-        const si = waterVolume(r.data.data.waterCapacity.value)
+        const grams = capacityOfRecord(raw, forCartridge)
+        if (grams === undefined) return lost('capacity', ref)
+        const si = waterVolume(grams)
         setMeasured({
           measuredWaterCapacity: { text: fixedFieldText('capacity', unitsNow.current, si), si },
         })
-        setMeasuredFor(forCartridge)
+        setMeasuredFor(cartridgeId)
         got('capacity')
       })
       .catch(() => {
         if (openingCapacity.current === ref) lost('capacity', ref)
       })
+  }
+
+  /** A capacity chosen in the figure replaces the one the opened load still asks for. */
+  function chooseCapacity(choice: { cartridge: string; id: string }) {
+    openingCapacity.current = undefined
+    got('capacity')
+    setCapacityChoice(choice)
   }
 
   /**
@@ -1612,7 +1623,7 @@ export function useWorkbenchState() {
     if (userCartridge) {
       openCartridgeDesign(userCartridge)
     }
-    if (d.capacity) openCapacity(d.capacity, d.cartridge && parseRef(d.cartridge)?.id)
+    if (d.capacity) openCapacity(d.capacity, d.cartridge)
     const fillMass = !typed.has('bulletMass')
     const bulletRef = typeof d.bullet === 'string' ? d.bullet : undefined
     const bulletId = bulletRef && catalogueIdOf(bulletRef)
@@ -1804,9 +1815,11 @@ export function useWorkbenchState() {
     measuredWaterCapacity !== undefined && cartridgeRef
       ? { cartridge: cartridgeRef, m3: measuredWaterCapacity }
       : undefined
-  const capacityRef = measuredCapacity
-    ? measuredCapacityRef(measuredCapacity.cartridge, measuredCapacity.m3)
-    : (asked.capacity?.id ?? (chosenCapacity && catalogueRef(chosenCapacity)))
+  const capacityRef = savedCapacityRef(
+    measuredCapacity && measuredCapacityRef(measuredCapacity.cartridge, measuredCapacity.m3),
+    asked.capacity?.id,
+    chosenCapacity && catalogueRef(chosenCapacity),
+  )
   const capacityToStore = useRef(measuredCapacity)
   capacityToStore.current = measuredCapacity
   /** Save's browser copy: the load with the capacity record it names. */
@@ -2066,7 +2079,7 @@ export function useWorkbenchState() {
     outcome,
     measuredWaterCapacity,
     capacityId: chosenCapacity,
-    setCapacityChoice,
+    setCapacityChoice: chooseCapacity,
     storeLoad,
     pending,
     powder,

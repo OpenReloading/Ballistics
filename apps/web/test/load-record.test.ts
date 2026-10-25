@@ -10,6 +10,7 @@ import {
 import { describe, expect, it } from 'vitest'
 import { interiorFields } from '../src/lib/interior-input.ts'
 import {
+  capacityOfRecord,
   capacityRecord,
   fromLoad,
   type Givers,
@@ -18,6 +19,7 @@ import {
   measuredCapacityId,
   measuredCapacityRef,
   overrideKeys,
+  savedCapacityRef,
   toLoad,
 } from '../src/lib/load-record.ts'
 import { waterVolume } from '../src/lib/units.ts'
@@ -278,6 +280,24 @@ describe('opening and saving a load', () => {
 describe('the measured case capacity of a load', () => {
   const cartridge = 'catalogue:308-win'
   const m3 = waterVolume(3.6)
+
+  it('is read from a stored record of the load cartridge only', () => {
+    const r = capacityRecord(cartridge, m3, new Date('2026-10-25T10:00:00Z'))
+    expect(capacityOfRecord(r, cartridge)).toBe(3.6)
+    expect(capacityOfRecord(r, 'catalogue:223-rem')).toBeUndefined()
+    expect(capacityOfRecord({ kind: 'powder' }, cartridge)).toBeUndefined()
+    expect(capacityOfRecord(undefined, cartridge)).toBeUndefined()
+  })
+
+  it('is saved as the measured record, else the request not answered, else the choice', () => {
+    const user = measuredCapacityRef(cartridge, m3)
+    const catalogue = 'catalogue:308-win-1'
+    expect(savedCapacityRef(user, user, catalogue)).toBe(user)
+    expect(savedCapacityRef(undefined, 'user:missing', undefined)).toBe('user:missing')
+    // a chosen capacity clears the request, so the choice is what is left to save
+    expect(savedCapacityRef(undefined, undefined, catalogue)).toBe(catalogue)
+    expect(savedCapacityRef(undefined, undefined, undefined)).toBeUndefined()
+  })
 
   it('is a user capacity record named by the load', () => {
     const l = toLoad(

@@ -10,6 +10,7 @@ import {
   ladderStepKinds,
   toSi,
   type UserRecord,
+  userRecord,
 } from '@openreloading/schema'
 import { storedOf } from './firearm.ts'
 import { type MeasuredSeries, seriesFromLoad, seriesToLoad } from './measurements.ts'
@@ -92,6 +93,30 @@ export function measuredCapacityId(cartridge: string, m3: number): string {
 /** The reference a load keeps for the measured capacity `m3` of `cartridge`. */
 export const measuredCapacityRef = (cartridge: string, m3: number) =>
   `user:${measuredCapacityId(cartridge, m3)}`
+
+/**
+ * The water capacity (g) of the stored record `raw` when it is a case capacity of `cartridge`
+ * (a reference), else undefined: a record of another cartridge is no capacity of this load.
+ */
+export function capacityOfRecord(raw: unknown, cartridge: string): number | undefined {
+  const r = userRecord.safeParse(raw)
+  return r.success && r.data.kind === 'caseCapacity' && r.data.data.cartridge === cartridge
+    ? r.data.data.waterCapacity.value
+    : undefined
+}
+
+/**
+ * The case capacity reference a load saves: the measured capacity's record, else the reference
+ * asked for and not loaded, else the catalogue capacity chosen. A choice clears the request
+ * (`got`), so it never stays behind a dangling `user:` reference.
+ */
+export function savedCapacityRef(
+  measured: string | undefined,
+  asked: string | undefined,
+  chosen: string | undefined,
+): string | undefined {
+  return measured ?? asked ?? chosen
+}
 
 /** The user record of the measured capacity `m3` of `cartridge`, stored when the load is saved. */
 export function capacityRecord(cartridge: string, m3: number, now: Date): UserRecord {
