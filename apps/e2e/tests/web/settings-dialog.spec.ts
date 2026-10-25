@@ -119,7 +119,10 @@ test('with unsaved firearm edits Settings and Units open the dialog without a qu
 test('the Manufacturers tab deletes a user manufacturer that no record or open field names', async ({
   page,
 }) => {
+  // the catalogue's list answered: a name is committed at once, not after a retry
+  const listed = page.waitForResponse((r) => r.url().includes('manufacturers'))
   await gotoHydrated(page, '/bullets/designer')
+  await (await listed).finished()
   const field = page.getByRole('combobox', { name: 'Manufacturer' })
   // the first name stays in the browser when the text is changed after leaving the field
   await field.fill('Gone')

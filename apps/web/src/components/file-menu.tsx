@@ -109,6 +109,10 @@ const kindNames: Record<UserRecordKind, string> = {
   targetFaceDesign: 'target face designs',
 }
 
+/** Shown when a manufacturer that came with a record could not be kept in the browser. */
+const noMaker =
+  'Its manufacturer could not be kept in this browser; Save writes a new file without overwriting the opened one.'
+
 /** Kinds a share link carries: the designs and the workbench load. */
 const shareable: UserRecordKind[] = ['bullet', 'cartridge', 'load']
 
@@ -361,8 +365,9 @@ function FileMenuOf<K extends UserRecordKind>({
             !(await ask('Replace the unsaved changes with the shared record?', 'Replace'))
           )
             return
-          await keepMakers(r, p.records)
+          const kept = await keepMakers(r, p.records)
           latest.current.openShared(r)
+          if (!kept) setFailure(noMaker)
         })
         .catch(() => {})
     void read()
@@ -760,9 +765,14 @@ function FileMenuOf<K extends UserRecordKind>({
     return [record, ...(raw ? makerRecordsOf(record, validRecords([raw]).records) : [])]
   }
 
-  /** Keeps the user manufacturer `record` names, as `carried` holds it, unless one of its id is stored. */
+  /** Keeps the user manufacturer `record` names, as `carried` holds it, unless one of its id is stored; false when the store refused it. */
   async function keepMakers(record: UserRecord, carried: UserRecord[]) {
-    await Promise.all(makerRecordsOf(record, carried).map(putRecordIfAbsent)).catch(() => {})
+    try {
+      await Promise.all(makerRecordsOf(record, carried).map(putRecordIfAbsent))
+      return true
+    } catch {
+      return false
+    }
   }
 
   /** `refNote` of `opened` against the browser store and the built-in example rifle; empty when the store cannot be read. */
@@ -775,13 +785,16 @@ function FileMenuOf<K extends UserRecordKind>({
   async function use(
     record: Of<K>,
     file: string,
-    h?: FileSystemFileHandle,
-    note?: string,
+    opened?: FileSystemFileHandle,
+    fileNote?: string,
     carried: UserRecord[] = [],
   ) {
     if (unsaved && !(await ask('Replace the unsaved changes with the opened record?', 'Replace')))
       return false
-    await keepMakers(record, carried)
+    const kept = await keepMakers(record, carried)
+    // a Save over the file would drop the manufacturer the file holds
+    const h = kept ? opened : undefined
+    const note = kept ? fileNote : [fileNote, noMaker].filter(Boolean).join(' ')
     onOpen(record.data as Of<K>['data'], record.name, record)
     id.current = record.id
     handle.current = h
