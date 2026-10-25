@@ -53,6 +53,7 @@ import {
   checkLoadCapacityReferences,
   checkLoadComponentReferences,
   checkLoadReferences,
+  checkLoadSessionReferences,
   checkManufacturerReferences,
   recordIds,
 } from './references.ts'
@@ -254,6 +255,7 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
   checkLoadReferences(bundle, ids, errors)
   checkLoadComponentReferences(bundle, errors)
   checkLoadCapacityReferences(bundle, errors)
+  checkLoadSessionReferences(bundle, errors)
   for (const f of collectFindings(bundle, new Map(bundle.cartridges.map((c) => [c.id, c]))))
     errors.push(`${f.file}: ${f.finding}: ${f.message}`)
   return { bundle, errors }
