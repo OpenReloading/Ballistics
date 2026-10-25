@@ -995,7 +995,7 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
     follow,
     measured,
     measuredFor,
-    setMeasured,
+    typeMeasured,
     setMeasuredFor,
     capacityId,
     setCapacityChoice,
@@ -1063,7 +1063,7 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
       capacityId={capacityId}
       onCapacityId={(id) => cartridge && setCapacityChoice({ cartridge: cartridge.id, id })}
       onMeasuredWaterCapacity={(v) => {
-        setMeasured({ measuredWaterCapacity: v })
+        typeMeasured(v)
         setMeasuredFor(measuredId)
       }}
     />,

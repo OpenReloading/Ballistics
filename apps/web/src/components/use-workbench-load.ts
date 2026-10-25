@@ -1570,8 +1570,13 @@ export function useWorkbenchState() {
    */
   function openCapacity(ref: string, forCartridge: string | undefined) {
     const target = parseRef(ref)
+    if (!target) return
     const cartridgeId = forCartridge && parseRef(forCartridge)?.id
-    if (!target || !cartridgeId) return
+    if (!cartridgeId) {
+      // no cartridge to apply it to: the request stays in the load
+      want('capacity', ref)
+      return lost('capacity', ref)
+    }
     if (target.scope === 'catalogue')
       return setCapacityChoice({ cartridge: cartridgeId, id: target.id })
     openingCapacity.current = ref
@@ -1598,6 +1603,13 @@ export function useWorkbenchState() {
     openingCapacity.current = undefined
     got('capacity')
     setCapacityChoice(choice)
+  }
+
+  /** A measured capacity typed in the field replaces the one the opened load still asks for. */
+  function typeMeasured(value: Fields['measuredWaterCapacity']) {
+    openingCapacity.current = undefined
+    got('capacity')
+    setMeasured({ measuredWaterCapacity: value })
   }
 
   /**
@@ -1820,14 +1832,15 @@ export function useWorkbenchState() {
     asked.capacity?.id,
     chosenCapacity && catalogueRef(chosenCapacity),
   )
-  const capacityToStore = useRef(measuredCapacity)
-  capacityToStore.current = measuredCapacity
   /** Save's browser copy: the load with the capacity record it names. */
-  const storeLoad = useCallback(async (record: UserRecord) => {
-    const c = capacityToStore.current
-    await putRecords(c ? [capacityRecord(c.cartridge, c.m3, new Date()), record] : [record])
-    return true
-  }, [])
+  const storeLoad = useCallback(
+    async (record: UserRecord) => {
+      const c = measuredCapacity
+      await putRecords(c ? [capacityRecord(c.cartridge, c.m3, new Date()), record] : [record])
+      return true
+    },
+    [measuredCapacity],
+  )
   const loadFile = toLoad({
     values: fieldValues,
     given,
@@ -2119,6 +2132,7 @@ export function useWorkbenchState() {
     temperatureBlock,
     setLadderSteps,
     setMeasured,
+    typeMeasured,
     setMeasuredFor,
     setModelShown,
     setMore,
