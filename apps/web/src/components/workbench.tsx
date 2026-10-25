@@ -970,7 +970,7 @@ export function Workbench() {
               onBullet={(b) => {
                 const design = userRecordId(b.id)
                 if (design) chooseDesign(design)
-                else chooseBullet(b.id)
+                else void chooseBullet(b.id)
               }}
               onPowder={(p) => choosePowder(p.id)}
               describeBullet={describeBullet}
