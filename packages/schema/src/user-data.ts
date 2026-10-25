@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { caseCapacity } from './case-capacity.ts'
 import { chronoSession } from './chrono-session.ts'
 import { firearm } from './firearm.ts'
-import { catalogueRef, parseRef, ref } from './ids.ts'
+import { catalogueRef, parseRef, ref, userIdRegex } from './ids.ts'
 import { load } from './load.ts'
 import { bulletOverrides, cartridgeOverrides } from './overrides.ts'
 import { text } from './shared.ts'
@@ -20,6 +20,15 @@ const basedOnRef = (kind: string) =>
     `Reference \`catalogue:<record id>\` to the catalogue ${kind} the record is based on. Its fields not in \`overrides\` follow that record.`,
   )
 
+/** The revision of the base record when a variant was saved, to tell later that the base changed. */
+const basedOnRevision = z
+  .string()
+  .min(1)
+  .max(64)
+  .describe(
+    'The `revision` the base record had when the record was saved. A different revision on opening means the base changed since.',
+  )
+
 /**
  * A bullet of the user: the catalogue bullet it is based on and the fields it overrides, or the
  * fields it gives alone. Lengths in mm, mass in g, angles in degrees.
@@ -29,6 +38,7 @@ export const userBullet = z.strictObject({
   origin: z.literal('user').describe('Where the record lives: `user`.'),
   manufacturer: ref('manufacturer').optional(),
   basedOn: basedOnRef('bullet').optional(),
+  basedOnRevision: basedOnRevision.optional(),
   overrides: bulletOverrides
     .describe(
       'The fields that differ from the base record, or all fields without one. A `null` removes a field of the base.',
@@ -44,6 +54,7 @@ export const userBullet = z.strictObject({
 export const userCartridge = z.object({
   origin: z.literal('user').describe('Where the record lives: `user`.'),
   basedOn: basedOnRef('cartridge').optional(),
+  basedOnRevision: basedOnRevision.optional(),
   overrides: cartridgeOverrides
     .describe(
       'The fields and spec values that differ from the base record, or all of them without one. A value with `null` removes the base value of its side, symbol and variant.',
@@ -113,12 +124,28 @@ const base = {
   saved: z.iso.datetime().describe('Time of the last save, ISO 8601 in UTC.'),
 }
 
-const record = <K extends string, D extends z.ZodType>(kind: K, description: string, data: D) =>
+/** Why a bullet or cartridge id that is no UUID is refused: a load refers to the record by `user:<UUID>`. */
+export const designIdProblem: string =
+  'The id of a bullet or cartridge must be a UUID, so that a load can refer to it.'
+
+const record = <K extends string, D extends z.ZodType>(
+  kind: K,
+  description: string,
+  data: D,
+  id: z.ZodType<string> = base.id,
+) =>
   z.object({
     kind: z.literal(kind).describe(`Kind of the record: \`${kind}\`.`),
     ...base,
+    id,
     data: data.describe(description),
   })
+
+/** The id of a bullet or cartridge: a UUID, as {@link userId}, since loads refer to them. */
+const designId = z
+  .string()
+  .regex(userIdRegex, designIdProblem)
+  .describe('Id of the record in the browser library: a UUID.')
 
 /** Why a record of kind `workbenchState`, the load of the format before kind `load`, is refused. */
 export const legacyLoadProblem: string =
@@ -132,8 +159,8 @@ export const userRecord = z.discriminatedUnion(
   'kind',
   [
     record('manufacturer', 'A manufacturer typed by the user.', userManufacturer),
-    record('bullet', 'A bullet of the bullet designer.', userBullet),
-    record('cartridge', 'A cartridge of the cartridge designer.', userCartridge),
+    record('bullet', 'A bullet of the bullet designer.', userBullet, designId),
+    record('cartridge', 'A cartridge of the cartridge designer.', userCartridge, designId),
     record('caseCapacity', 'A case capacity the user measured, in g.', caseCapacity),
     record('load', 'A load of the workbench, in stored units.', load),
     record('firearm', 'A firearm of the library, in stored units.', firearm),
@@ -235,6 +262,22 @@ export function checkUserRefs(records: UserRecords): DanglingRef[] {
     }
   }
   return dangling
+}
+
+/** A user record as {@link userRefFields} reads it: any {@link UserRecord}. */
+export interface RecordOfUser {
+  kind: UserRecordKind
+  data: unknown
+}
+
+/**
+ * The fields of `record` whose reference names a record of the user (`user:<id>`): what another
+ * browser would not have. A `catalogue:` reference and a plain catalogue id are not listed.
+ */
+export function userRefFields(record: RecordOfUser): string[] {
+  return userRefsOf(record as UserRecord).flatMap(([field, target]) =>
+    target !== undefined && parseRef(target)?.scope === 'user' ? [field] : [],
+  )
 }
 
 /**
