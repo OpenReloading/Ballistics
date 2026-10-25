@@ -205,8 +205,8 @@ export function stringStats(shots: Shot[]): StringStats | undefined {
     v.length > 1
       ? Math.sqrt(v.reduce((a, x) => a + (x - mean) ** 2, 0) / (v.length - 1))
       : undefined
-  const min = v.reduce((a, x) => Math.min(a, x))
-  const max = v.reduce((a, x) => Math.max(a, x))
+  const min = v.reduce((a, x) => Math.min(a, x), Number.POSITIVE_INFINITY)
+  const max = v.reduce((a, x) => Math.max(a, x), Number.NEGATIVE_INFINITY)
   return {
     count: v.length,
     excluded: shots.length - v.length,
