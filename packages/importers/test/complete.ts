@@ -4,7 +4,7 @@ import type { ChronoImport } from '../src/index.ts'
 const fill: Record<string, unknown> = {
   id: 'test-session',
   date: '2026-03-01',
-  manufacturerName: 'Manufacturer',
+  manufacturer: 'catalogue:test-maker',
   model: 'Model',
   firmware: '1.0',
   muzzleDistance: { value: 3000 },

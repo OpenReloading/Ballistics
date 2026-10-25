@@ -15,7 +15,10 @@ export interface ChronoParserOptions {
   sha256?: string
 }
 
-/** The parts of a `ChronoSession` a file can supply. */
+/**
+ * The parts of a `ChronoSession` a file can supply. `device.manufacturerName` is the text the file
+ * gives; the session's `device.manufacturer` is a reference the caller resolves from it.
+ */
 export interface SessionCandidate {
   date?: string
   device: { kind: ChronoSession['device']['kind']; manufacturerName?: string; model?: string }
@@ -106,7 +109,8 @@ function velocityUnitsOf(
 function missingPaths(session: Omit<SessionCandidate, 'provenance'>, source: Source): string[] {
   const missing = ['id']
   if (!session.date) missing.push('date')
-  if (!session.device.manufacturerName) missing.push('device.manufacturerName')
+  // a reference needs the catalogue, which the parsers do not read: the caller resolves a name the file gives
+  missing.push('device.manufacturer')
   if (!session.device.model) missing.push('device.model')
   missing.push('device.firmware')
   // the chronograph protocol asks for the screen distance; the schema keeps it optional

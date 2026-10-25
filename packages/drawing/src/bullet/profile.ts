@@ -188,7 +188,7 @@ function dimensionsOf(
         [groove.start + groove.width, z0],
       ]
     : [[t, z0]]
-  const [s0, s1] = runs.reduce((p, c) => (c[1] - c[0] > p[1] - p[0] ? c : p))
+  const [s0, s1] = runs.reduce((p, c) => (c[1] - c[0] > p[1] - p[0] ? c : p), runs[0])
   const station = (s0 + s1) / 2
   add('L', L, true, { kind: 'length', from: 0, to: L })
   add('d', diameter, true, { kind: 'diameter', from: station, to: station, radius: a })
@@ -275,9 +275,8 @@ function ogiveRadii(
   const round = shape.ogive?.form === 'round-nose' || shape.ogive?.form === 'flat-nose'
   const nosePoint = (share: number) => {
     const z = z0 + share * o.noseLength
-    return o.points
-      .filter(([, pz]) => pz > z0 && pz < L)
-      .reduce((p, c) => (Math.abs(c[1] - z) < Math.abs(p[1] - z) ? c : p))
+    const nose = o.points.filter(([, pz]) => pz > z0 && pz < L)
+    return nose.reduce((p, c) => (Math.abs(c[1] - z) < Math.abs(p[1] - z) ? c : p), nose[0])
   }
   for (const [symbol, value, share] of [
     ['R', shape.ogive?.radius, 0.5],

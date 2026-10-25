@@ -235,7 +235,7 @@ describe('checkChronoSession', () => {
   const base: ChronoSession = {
     id: 'test-session',
     date: '2026-01-01',
-    device: { kind: 'doppler-radar', manufacturerName: 'Manufacturer', model: 'X' },
+    device: { kind: 'doppler-radar', manufacturer: 'catalogue:test-maker', model: 'X' },
     muzzleDistance: { value: 0 },
     conditions: {
       airTemperature: { value: 15 },

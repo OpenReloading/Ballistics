@@ -5,7 +5,7 @@ import { copyName } from './user-file-names.ts'
 import { putRecords, storedRecord } from './user-store.ts'
 import { catalogueIdOf } from './variants.ts'
 
-export type LoadRecord = Extract<UserRecord, { kind: 'workbenchState' }>
+export type LoadRecord = Extract<UserRecord, { kind: 'load' }>
 
 /** Tab titles; equal names are numbered from the second on. */
 export function tabTitles(names: string[]): string[] {

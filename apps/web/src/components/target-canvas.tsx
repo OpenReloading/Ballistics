@@ -549,10 +549,10 @@ export function TargetCanvas({
               )
             }
             const extremes = (pts: Point[]) => [
-              pts.reduce((a, b) => (b.y < a.y ? b : a)),
-              pts.reduce((a, b) => (b.x > a.x ? b : a)),
-              pts.reduce((a, b) => (b.y > a.y ? b : a)),
-              pts.reduce((a, b) => (b.x < a.x ? b : a)),
+              pts.reduce((a, b) => (b.y < a.y ? b : a), pts[0]),
+              pts.reduce((a, b) => (b.x > a.x ? b : a), pts[0]),
+              pts.reduce((a, b) => (b.y > a.y ? b : a), pts[0]),
+              pts.reduce((a, b) => (b.x < a.x ? b : a), pts[0]),
             ]
             return sheet.groups.map((g) => {
               const s = groupStatisticsOf(g)

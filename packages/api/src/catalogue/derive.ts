@@ -187,7 +187,7 @@ export const bulletRow = (b: Bullet, m: Manufacturer): IndexRow<BulletItem> => (
 
 /** The distinct defined values of `values`, sorted. */
 const distinct = (values: (string | undefined)[]) =>
-  [...new Set(values.filter((v) => v !== undefined))].sort()
+  [...new Set(values.filter((v) => v !== undefined))].sort((a, b) => a.localeCompare(b, 'en'))
 
 /** The index row of a target face, with the disciplines mapped to it (their caliber classes and categories) and its federation. */
 export const targetFaceRow = (

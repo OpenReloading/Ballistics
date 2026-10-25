@@ -123,7 +123,12 @@ function overridesOf(schema: z.ZodType, record: string, path: string[] = []): z.
   )
 }
 
-const { id: _bulletId, provenance: _bulletProvenance, ...bulletShape } = bullet.shape
+const {
+  id: _bulletId,
+  provenance: _bulletProvenance,
+  manufacturer: _bulletManufacturer,
+  ...bulletShape
+} = bullet.shape
 const {
   id: _cartridgeId,
   provenance: _cartridgeProvenance,
@@ -132,12 +137,12 @@ const {
 } = cartridge.shape
 
 /**
- * The overrides of a bullet record: any of its fields but `id` and `provenance`, in the stored
- * units, `null` removes a field.
+ * The overrides of a bullet record: any of its fields but `id`, `manufacturer` (the user bullet's
+ * own `manufacturer`) and `provenance`, in the stored units, `null` removes a field.
  * Inferred type: {@link BulletOverrides}.
  */
 export const bulletOverrides = overridesOf(z.object(bulletShape), 'bullet') as z.ZodType<
-  Overrides<Omit<z.infer<typeof bullet>, 'id' | 'provenance'>>
+  Overrides<Omit<z.infer<typeof bullet>, 'id' | 'manufacturer' | 'provenance'>>
 >
 
 /**

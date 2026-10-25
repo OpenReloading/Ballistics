@@ -62,7 +62,7 @@ function useStorage(opened: boolean) {
   useEffect(() => {
     if (!opened) return
     const s = navigator.storage
-    Promise.all([
+    void Promise.all([
       s?.persisted?.().catch(() => undefined),
       s
         ?.estimate?.()
@@ -82,7 +82,7 @@ function useCartridgeNames(ids: string[]) {
   useEffect(() => {
     if (!wanted) return
     let alive = true
-    Promise.all(
+    void Promise.all(
       wanted.split(',').map(async (id) => {
         // a design is a record of this browser, a catalogue cartridge one of the API
         const own = parseRef(id)?.scope === 'user' ? parseRef(id)?.id : undefined
@@ -136,6 +136,8 @@ export function SavedLoads({
   const [records, setRecords] = useState<LoadRecord[]>([])
   const [query, setQuery] = useState('')
   const [message, setMessage] = useState('')
+  /** Stored loads of the earlier format, which the schema refuses. */
+  const [older, setOlder] = useState(0)
   /** The load whose name is edited in its row, with the text. */
   const [renaming, setRenaming] = useState<{ id: string; text: string }>()
   const storage = useStorage(opened)
@@ -143,9 +145,10 @@ export function SavedLoads({
   useEffect(() => {
     if (!opened) return
     storedRecords()
-      .then(({ records }) =>
-        setRecords(records.filter((r): r is LoadRecord => r.kind === 'workbenchState')),
-      )
+      .then(({ records, invalid }) => {
+        setRecords(records.filter((r): r is LoadRecord => r.kind === 'load'))
+        setOlder(invalid.filter((i) => i.kind === 'workbenchState').length)
+      })
       .catch(() => setMessage('The saved loads could not be read from this browser.'))
   }, [opened, tick])
 
@@ -249,7 +252,7 @@ export function SavedLoads({
                       onChange={(e) => setRenaming({ id: r.id, text: e.currentTarget.value })}
                       onBlur={(e) => rename(r, e.currentTarget.value)}
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter') rename(r, renaming.text)
+                        if (e.key === 'Enter') void rename(r, renaming.text)
                         else if (e.key === 'Escape') {
                           // the drawer stays open
                           e.stopPropagation()
@@ -322,6 +325,13 @@ export function SavedLoads({
       </div>
       <div className="saved-storage" role="status">
         {message && <p>{message}</p>}
+        {older > 0 && (
+          <p>
+            {older === 1 ? '1 saved load is' : `${older} saved loads are`} in the format of an
+            earlier version, which this app no longer reads. Open lists{' '}
+            {older === 1 ? 'it' : 'them'} under Invalid records.
+          </p>
+        )}
         {storage.persisted !== undefined && (
           <p>
             {storage.persisted

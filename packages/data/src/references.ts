@@ -1,3 +1,4 @@
+import { parseRef } from '@open-reloading/schema'
 import type { LoadTables } from './load-tables.ts'
 import type { Bundle } from './records.ts'
 
@@ -30,17 +31,34 @@ export function checkCartridgeReferences(
   ids: RecordIds,
   errors: string[],
 ) {
+  const unknown = (dir: string, id: string, cartridge: string, found: string | undefined) => {
+    if (!ids.cartridges.has(found ?? cartridge))
+      errors.push(`${dir}/${id}.json: unknown cartridge "${cartridge}"`)
+  }
   for (const [dir, records] of [
     ['capacities', bundle.capacities],
-    ['loads', bundle.loads],
     ['firings', bundle.firings],
-  ] as const) {
-    for (const record of records) {
-      if (!ids.cartridges.has(record.cartridge)) {
-        errors.push(`${dir}/${record.id}.json: unknown cartridge "${record.cartridge}"`)
-      }
-    }
+  ] as const)
+    for (const r of records) unknown(dir, r.id, r.cartridge, undefined)
+  // a load names its cartridge by reference
+  for (const l of bundle.loads) unknown('loads', l.id, l.cartridge, parseRef(l.cartridge)?.id)
+}
+
+/** The bullet and powder of every load that names a record. */
+export function checkLoadComponentReferences(
+  bundle: Pick<Bundle, 'loads' | 'bullets' | 'powders'>,
+  errors: string[],
+) {
+  const known = {
+    bullet: new Set(bundle.bullets.map((b) => b.id)),
+    powder: new Set(bundle.powders.map((p) => p.id)),
   }
+  for (const l of bundle.loads)
+    for (const k of ['bullet', 'powder'] as const) {
+      const target = l[k]
+      if (typeof target === 'string' && !known[k].has(parseRef(target)?.id ?? target))
+        errors.push(`loads/${l.id}.json: unknown ${k} "${target}"`)
+    }
 }
 
 /** The load of every shot string of a chronograph session. */
@@ -58,9 +76,12 @@ export function checkLoadReferences(
   }
 }
 
-/** The manufacturer of every powder, bullet and listed load table, and the case manufacturer of a capacity. */
+/**
+ * The manufacturer of every powder, bullet and listed load table, the case manufacturer of a
+ * capacity and the device manufacturer of a chronograph session.
+ */
 export function checkManufacturerReferences(
-  bundle: Pick<Bundle, 'powders' | 'bullets' | 'capacities'>,
+  bundle: Pick<Bundle, 'powders' | 'bullets' | 'capacities' | 'chronoSessions'>,
   loadTables: LoadTables,
   ids: RecordIds,
   errors: string[],
@@ -73,6 +94,8 @@ export function checkManufacturerReferences(
   for (const b of bundle.bullets) check(`bullets/${b.id}.json`, 'manufacturer', b.manufacturer)
   for (const c of bundle.capacities)
     check(`capacities/${c.id}.json`, 'caseManufacturer', c.caseManufacturer)
+  for (const s of bundle.chronoSessions)
+    check(`chrono/${s.id}.json`, 'device.manufacturer', parseRef(s.device.manufacturer)?.id)
   for (const [file, table] of Object.entries(loadTables))
     check(`load-tables.json: ${file}`, 'manufacturer', table.manufacturer)
 }

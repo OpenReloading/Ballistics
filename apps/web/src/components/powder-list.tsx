@@ -36,7 +36,9 @@ import { EmptyList } from './states.tsx'
 
 const n2 = (v: number | undefined) => (v === undefined ? '' : formatNumber(v, 2))
 const options = (rows: PowderRow[], key: 'propellantBase' | 'grainForm') =>
-  [...new Set(rows.flatMap((r) => (r[key] ? [r[key]] : [])))].sort()
+  [...new Set(rows.flatMap((r) => (r[key] ? [r[key]] : [])))].sort((a, b) =>
+    a.localeCompare(b, 'en'),
+  )
 /** A facet with up to four values as one segmented control with "Any" first; the filter row stays one line at 1280 px. */
 const segments = (values: string[]) => [{ value: '', label: 'Any' }, ...values]
 /** No user record holds a powder: the catalogue is the list's one source, so the filter filters nothing. */

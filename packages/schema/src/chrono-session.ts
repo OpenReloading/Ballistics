@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { recordId } from './ids.ts'
+import { catalogueRef, recordId } from './ids.ts'
 import { provenance } from './provenance.ts'
 import { quantity } from './units.ts'
 
@@ -34,7 +34,7 @@ export const chronoSession = z.object({
   date: z.iso.date(),
   device: z.object({
     kind: z.enum(['doppler-radar', 'optical', 'magnetic', 'other']),
-    manufacturerName: z.string().min(1),
+    manufacturer: catalogueRef('manufacturer'),
     model: z.string().min(1),
     firmware: z.string().min(1).optional(),
   }),

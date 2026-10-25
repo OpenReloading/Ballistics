@@ -27,7 +27,6 @@ const bullet = (
 ) => {
   const data: UserBullet = {
     origin: 'user',
-    manufacturerName,
     overrides: {
       name,
       ...(si.diameter !== undefined && { diameter: quantityOf('length', si.diameter) }),
@@ -35,7 +34,14 @@ const bullet = (
       ...(si.length !== undefined && { length: quantityOf('length', si.length) }),
     },
   }
-  return { id, name: `${manufacturerName} ${name}`, data, resolved: resolvedBullet(data), si }
+  return {
+    id,
+    name: `${manufacturerName} ${name}`,
+    data,
+    resolved: resolvedBullet(data),
+    manufacturerName,
+    si,
+  }
 }
 const cartridge = (id: string, name: string, values: object[]): UserCartridgeView => {
   const data = {

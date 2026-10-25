@@ -33,7 +33,7 @@ function stubApi(records: Record<string, unknown>, down = false) {
 
 const bulletData = (basedOn?: string): UserBullet => ({
   origin: 'user',
-  manufacturerName: 'Me',
+  manufacturer: 'catalogue:example-a',
   ...(basedOn && { basedOn }),
   overrides: { name: 'My 168', mass: { value: 11 } },
 })
@@ -112,14 +112,14 @@ it('names references: a catalogue record by id or reference, a user record by UU
 
 it('keeps a load that names a design: it parses with the reference and finds its record', () => {
   const load = {
-    kind: 'workbenchState',
+    kind: 'load',
     id: 'w1',
     name: 'Load',
     saved,
-    data: { siValues: {}, bullet: `user:${uuid}`, cartridge: '308-win' },
+    data: { origin: 'user', bullet: `user:${uuid}`, cartridge: 'catalogue:308-win' },
   }
   const parsed = userRecord.parse(load)
-  expect(parsed.kind === 'workbenchState' && parsed.data.bullet).toBe(`user:${uuid}`)
+  expect(parsed.kind === 'load' && parsed.data.bullet).toBe(`user:${uuid}`)
   expect(checkUserRefs([parsed, bulletRecord()].map((r) => userRecord.parse(r)))).toEqual([])
   expect(checkUserRefs([parsed])).toHaveLength(1)
 })

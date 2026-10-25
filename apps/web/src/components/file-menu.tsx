@@ -94,16 +94,17 @@ const keyed = (id: ShortcutId) => ({
 })
 
 const kindNames: Record<UserRecordKind, string> = {
+  manufacturer: 'manufacturers',
   bullet: 'bullet designs',
   cartridge: 'cartridge designs',
-  workbenchState: 'loads',
+  load: 'loads',
   firearm: 'firearms',
   targetSheet: 'target sheets',
   targetFaceDesign: 'target face designs',
 }
 
 /** Kinds a share link carries: the designs and the workbench load. */
-const shareable: UserRecordKind[] = ['bullet', 'cartridge', 'workbenchState']
+const shareable: UserRecordKind[] = ['bullet', 'cartridge', 'load']
 
 const basedOnOf = (r: UserRecord) =>
   r.kind === 'bullet' || r.kind === 'cartridge' ? r.data.basedOn : undefined
@@ -342,7 +343,7 @@ function FileMenuOf<K extends UserRecordKind>({
           latest.current.openShared(r)
         })
         .catch(() => {})
-    read()
+    void read()
     window.addEventListener('hashchange', read)
     return () => window.removeEventListener('hashchange', read)
   }, [])
@@ -375,7 +376,8 @@ function FileMenuOf<K extends UserRecordKind>({
           const snapshot = () => setStarted((n) => n + 1)
           // a `then` that returns a promise (records still loading) is snapshot once it settles
           if (next === undefined) {
-            if (filling instanceof Promise) filling.finally(snapshot)
+            if (filling instanceof Promise)
+              filling.finally(snapshot).catch((e) => setMessage(errorText(e)))
             else snapshot()
           }
           return true as const
@@ -609,7 +611,7 @@ function FileMenuOf<K extends UserRecordKind>({
     try {
       if (!store) await putRecords([record])
       if (!store || (await store(record))) onStored?.()
-      noteStorage()
+      void noteStorage()
     } catch (e) {
       setFailure(`Saved to ${file}; the browser copy failed: ${errorText(e)}`)
     }
@@ -863,7 +865,7 @@ function FileMenuOf<K extends UserRecordKind>({
     const refs = await refsOf(added)
     if (refs) total.notes.push({ name: 'References', note: refs })
     onStored?.()
-    noteStorage()
+    void noteStorage()
     setReport(total)
   }
 

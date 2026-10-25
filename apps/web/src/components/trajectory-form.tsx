@@ -774,7 +774,7 @@ export function TrajectoryForm({
     if (bullet) {
       if (model === 'G1' || model === 'G7') setRecordModel(model)
       const linkedChoice = Number(query.get('choice') || Number.NaN)
-      chooseRecord(bullet, Number.isInteger(linkedChoice) ? linkedChoice : undefined)
+      void chooseRecord(bullet, Number.isInteger(linkedChoice) ? linkedChoice : undefined)
     } else if (query.has('mass')) {
       setSource('manual')
       if (model && dragModels.includes(model)) setManualModel(model)
@@ -859,7 +859,7 @@ export function TrajectoryForm({
           : record.status === 'ok' && record.record.id !== loadBullet,
       )
     setSource('database')
-    chooseRecord(loadBullet)
+    void chooseRecord(loadBullet)
   }, [loadBullet])
 
   const fromDatabase = source === 'database' && record.status === 'ok'

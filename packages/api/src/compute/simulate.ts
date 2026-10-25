@@ -12,7 +12,14 @@ import {
   solidFill,
   solidFillLimit,
 } from '@open-reloading/core'
-import { type Bullet, fromSi, type Powder, toSi, type WorkbenchState } from '@open-reloading/schema'
+import {
+  type Bullet,
+  fromSi,
+  type Load,
+  ladderStepKinds,
+  type Powder,
+  toSi,
+} from '@open-reloading/schema'
 import { z } from 'zod'
 import type { Catalogue } from '../catalogue/types.ts'
 import { assertFinite, notice, resolvedRecord, unprocessable } from './answer.ts'
@@ -25,6 +32,7 @@ import {
   fileLoad,
   filePath,
   fileResistance,
+  loadValues,
   readLoadFile,
   unknownKeyIssues,
 } from './load-file.ts'
@@ -58,19 +66,35 @@ type SimulateStep = { charge: number } & (
 )
 type ValidStep = Extract<SimulateStep, { result: unknown }>
 
+/** The catalogue id a load names a bullet or powder by; none for a description. */
+const recordIdOf = (target: string | object | undefined) =>
+  typeof target === 'string' ? catalogueIdOf(target) : undefined
+
+/** The powder and bullet records the file names that exist: the values the load leaves out come from them. */
+function knownRecords(catalogue: Catalogue, record: Load) {
+  const powderId = recordIdOf(record.powder)
+  const bulletId = recordIdOf(record.bullet)
+  return {
+    powder: powderId === undefined ? undefined : catalogue.get('powder', powderId),
+    bullet: bulletId === undefined ? undefined : catalogue.get('bullet', bulletId),
+  }
+}
+
 /**
  * The cartridge, bullet and powder records the file names, in that order, and the powder's label
  * "<manufacturer name> <product name>"; 404 for an unknown id.
  */
-function loadFileRecords(catalogue: Catalogue, record: WorkbenchState) {
+function loadFileRecords(catalogue: Catalogue, record: Load) {
+  const bulletId = recordIdOf(record.bullet)
+  const powderId = recordIdOf(record.powder)
   const cartridge: CartridgeWithSpecs | undefined =
     record.cartridge === undefined
       ? undefined
       : findCartridge(catalogue, catalogueIdOf(record.cartridge))
   const bullet: Bullet | undefined =
-    record.bullet === undefined ? undefined : findBullet(catalogue, catalogueIdOf(record.bullet))
+    bulletId === undefined ? undefined : findBullet(catalogue, bulletId)
   const powder: Powder | undefined =
-    record.powder === undefined ? undefined : findPowder(catalogue, record.powder)
+    powderId === undefined ? undefined : findPowder(catalogue, powderId)
   const manufacturer = powder && catalogue.get('manufacturer', powder.manufacturer)
   const powderLabel = powder && `${manufacturer?.name ?? powder.manufacturer} ${powder.name}`
   return { cartridge, bullet, powder, powderLabel }
@@ -200,10 +224,12 @@ export async function simulate(
   if (!parsed.success) throw unknownKeyIssues(parsed.error)
   const { curves } = parsed.data
   const { path, record, name } = readLoadFile(json)
-  const load = fileLoad(record, path)
-  const { ladder } = record
+  const values = loadValues(record, knownRecords(context.catalogue, record))
+  const load = fileLoad(values, path)
+  const ladder = record.analysis?.ladder
+  const step = ladder?.step && toSi(ladderStepKinds[ladder.kind ?? 'charge'], ladder.step)
   const withLadder =
-    ladder && ladder.kind !== 'seating' && ladder.stepCount > 1 && ladder.chargeStep !== undefined
+    ladder && (ladder.kind ?? 'charge') === 'charge' && ladder.stepCount > 1 && step !== undefined
   // the file is validated before any record is read: a bad file answers 400 whatever its ids
   const parseBody = (resistance?: InteriorLoad['resistance']) => {
     try {
@@ -213,7 +239,7 @@ export async function simulate(
         ...(record.cartridge && { cartridge: catalogueIdOf(record.cartridge) }),
         ...(withLadder && {
           ladder: {
-            chargeStep: ladder.chargeStep,
+            chargeStep: step,
             stepCount: ladder.stepCount,
             direction: ladder.direction,
           },
@@ -227,20 +253,20 @@ export async function simulate(
   }
   parseBody()
   // after the file's checks (a bad file answers 400): a seating ladder needs the seating
-  // geometry of the drawing package, which this route lacks
-  if (ladder?.kind === 'seating')
+  // geometry of the drawing package, which this route lacks, and a temperature ladder is not run here
+  if (ladder?.kind === 'seating' || ladder?.kind === 'temperature')
     return {
       status: 422,
       payload: {
         ...unprocessable,
-        message: 'ladder.kind: a seating ladder runs in the workbench, not in this route',
+        message: `ladder.kind: a ${ladder.kind} ladder runs in the workbench, not in this route`,
         field: 'ladder.kind',
         notice,
       },
     }
   const { cartridge, bullet, powder, powderLabel } = loadFileRecords(context.catalogue, record)
   // an empty bore area is the cartridge record's, as the workbench fills it
-  if (cartridge && record.siValues.boreArea === undefined)
+  if (cartridge && values.boreArea === undefined)
     load.chamber.boreArea = toSi(
       'area',
       boreArea({
@@ -262,7 +288,7 @@ export async function simulate(
   })
   // the powder record's resistance with the file's overrides: one engraving value alone completes
   // the record's ramp, so the pair is only known here
-  const applied = fileResistance(record, path, resistance)
+  const applied = fileResistance(values, path, resistance)
   const { status, payload } = await runInterior(
     { compute: context.compute, findCartridge: (id) => findCartridge(context.catalogue, id) },
     parseBody(applied),

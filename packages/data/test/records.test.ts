@@ -40,7 +40,7 @@ describe('readRecords', () => {
     const errors = invalid
     expect(errors.some((e) => e.startsWith('chrono/broken.json: invalid JSON'))).toBe(true)
     expect(errors).toContain('loads/other-name.json: id "test-load" does not match the file name')
-    expect(errors).toContain('loads/test-load.json: unknown cartridge "test-cartridge"')
+    expect(errors).toContain('loads/test-load.json: unknown cartridge "catalogue:test-cartridge"')
     expect(errors).toContain('chrono/test-session.json: unknown load "missing-load"')
     expect(errors).toContain('firings/test-firing.json: unknown cartridge "missing-cartridge"')
     expect(errors).toContain('range/test-range-b.json: round 1(b)* is also in test-range-a')
@@ -65,6 +65,33 @@ describe('readRecords', () => {
       `${where}: diameter-fit:P1: cartridge P1 = 12.1 mm exceeds chamber P1 = 12 mm`,
     )
     expect(spec).toContain(`${where}: exception "pk-ratio" no longer applies; remove it`)
+  })
+
+  it('reports a load that names a missing bullet or powder, or a user record', () => {
+    const provenance = { kind: 'published', sources: [{ title: 'Test' }] }
+    const load = {
+      id: 'by-reference',
+      origin: 'catalogue',
+      name: 'By reference',
+      cartridge: 'catalogue:test-cartridge',
+      bullet: 'catalogue:missing-bullet',
+      powder: 'catalogue:missing-powder',
+      charge: { value: 3 },
+      provenance,
+    }
+    const errors = errorsAfter((_root, write) => {
+      write('loads/by-reference.json', load)
+      write('loads/by-user.json', {
+        ...load,
+        id: 'by-user',
+        cartridge: 'user:3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13',
+      })
+    })
+    expect(errors).toContain('loads/by-reference.json: unknown bullet "catalogue:missing-bullet"')
+    expect(errors).toContain('loads/by-reference.json: unknown powder "catalogue:missing-powder"')
+    expect(errors).toContain(
+      'loads/by-user.json: cartridge: A catalogue load names catalogue records only',
+    )
   })
 
   it('accepts the committed records', () => {
@@ -103,6 +130,18 @@ describe('readRecords', () => {
     )
     expect(errors).toContain(
       'load-tables.json: test.csv: unknown manufacturer "missing-table-manufacturer"',
+    )
+  })
+
+  it('reports a chronograph device whose manufacturer is no record', () => {
+    const errors = errorsAfter((root) => {
+      const path = join(root, 'chrono', 'test-session.json')
+      const session = JSON.parse(readFileSync(path, 'utf8'))
+      session.device.manufacturer = 'catalogue:missing-device-maker'
+      writeFileSync(path, JSON.stringify(session))
+    })
+    expect(errors).toContain(
+      'chrono/test-session.json: unknown device.manufacturer "missing-device-maker"',
     )
   })
 

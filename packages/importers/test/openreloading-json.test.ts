@@ -64,7 +64,7 @@ describe('OpenReloading session JSON', () => {
     )
     expect(r.session.device.kind).toBe('other')
     expect(r.missingPaths).toEqual(
-      expect.arrayContaining(['date', 'device.manufacturerName', 'device.model', 'strings.0.load']),
+      expect.arrayContaining(['date', 'device.manufacturer', 'device.model', 'strings.0.load']),
     )
   })
 

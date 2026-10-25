@@ -39,8 +39,10 @@ import {
 } from '../lib/firearm.ts'
 import { controlSize, tipEvents } from '../lib/theme.ts'
 import { roundedFieldText, type UnitSystem } from '../lib/units.ts'
+import { ManufacturerInput } from './manufacturer-input.tsx'
 import { NumberField } from './number-field.tsx'
 import { RecordSearch } from './record-search.tsx'
+import type { useManufacturers } from './use-manufacturers.ts'
 
 export const opticKinds = [
   { value: 'scope', label: 'Scope' },
@@ -118,6 +120,7 @@ export function FirearmEditor({
   setNameLeft,
   setCartridgeNames,
   cartridgeName,
+  manufacturers,
   patch,
   setOptic,
   setConfig,
@@ -132,6 +135,7 @@ export function FirearmEditor({
   setNameLeft: (left: boolean) => void
   setCartridgeNames: Dispatch<SetStateAction<Record<string, string>>>
   cartridgeName: (ref: string | undefined) => string | undefined
+  manufacturers: ReturnType<typeof useManufacturers>
   patch: (p: Partial<Firearm>) => void
   setOptic: (i: number, p: Partial<Optic>) => void
   setConfig: (i: number, p: Partial<OpticConfiguration>) => void
@@ -208,11 +212,11 @@ export function FirearmEditor({
                 unreachableText="The database is unreachable; the cartridge can be chosen later."
               />
             </div>
-            <TextInput
+            <ManufacturerInput
               label="Manufacturer"
-              maxLength={200}
-              value={data.manufacturerName ?? ''}
-              onChange={(e) => patch({ manufacturerName: e.currentTarget.value })}
+              value={data.manufacturer}
+              manufacturers={manufacturers}
+              onChange={(manufacturer) => patch({ manufacturer })}
             />
             <TextInput
               label="Model"

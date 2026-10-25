@@ -26,11 +26,11 @@ Writers: catalogue (git records, checked by `readRecords`), user (browser, `pack
 | Caliber class | `caliber-class.ts` | `records/caliber-classes` | catalogue |
 | Load tables | `load-tables.ts` | `load-tables.json` of a records root | catalogue |
 | Firearm | `firearm.ts` | user record `firearm`, in the stored units (step 5) | user |
-| Workbench state | `workbench.ts` | user record `workbenchState`, called "loads" in the UI | user |
+| Load | `load.ts` | user record `load`, the load file and the catalogue `records/loads` (step 6) | catalogue, user, shared |
 | User bullet | `user-data.ts` (`bullet`) | user record: `basedOn` and `overrides` of a Bullet (step 4) | user |
 | User cartridge | `user-data.ts` (`cartridge`) | user record: `basedOn` and `overrides` of a Cartridge (step 4) | user |
 | Target sheet | `target-sheet.ts` | user record, photos in the store `files` | user |
-| Measured series | `workbench.ts` (`measuredSeries`) | inside the workbench state | user, reshaped from importer output |
+| Measured series | `load.ts` (`measurementSeries`) | inside the load | user, reshaped from importer output |
 | Solver bodies | `packages/api/src/compute/interior-schema.ts`, `exterior-schema.ts` | none | solver input |
 
 ## Overlaps
@@ -49,7 +49,7 @@ Ranked by how much code and visible behavior depends on them.
 
 **Case capacity (medium).** The record (g), `Load.case.waterCapacity` (g) and `workbenchState.measuredWaterCapacity` (m³) describe one measurement.
 
-**Manufacturer (medium).** Catalogue records name a manufacturer by id; loads, sessions, firearms and designs carry free text, merged for display by `productLabel` in `apps/web/src/lib/manufacturers.ts`. `targetFace.federation` and the events' `federation` name a federation by id.
+**Manufacturer (medium).** Catalogue records name a manufacturer by id; loads, sessions, firearms and designs carried free text, merged for display by `productLabel` in `apps/web/src/lib/manufacturers.ts`. Step 9 replaced the text of sessions, firearms and designs by references. `targetFace.federation` and the events' `federation` name a federation by id.
 
 **Units (high).** Catalogue records and cartridge designs use the stored units of `packages/schema/src/units.ts`. Firearm, workbench state, bullet design, target sheet, measured series and every solver body use SI. The same quantity then differs by a factor in different entities: charge in g or kg, barrel length in mm or m, muzzle distance in mm or m. `units` held labels only, so conversion factors were written by hand in many files (one named table, `storedToSi` in `apps/web/src/lib/field-spec.ts`). Step 2 removes this.
 
@@ -151,10 +151,10 @@ Each step lands alone with its model page updated in the same commit. Steps 4 to
 | 3 | Id and reference primitives, `checkUserRefs` (done, below) | |
 | 4 | Designs become overrides of Bullet and Cartridge (done, below) | 1, 3 |
 | 5 | Firearm in one shape (done, below) | 2 |
-| 6 | Load unification: the workbench state becomes Load | 2 to 5 |
+| 6 | Load unification: the workbench state becomes Load (done, below) | 2 to 5 |
 | 7 | Session unification | 3, 6 |
 | 8 | CaseCapacity references | 6 |
-| 9 | Manufacturer references | 3 |
+| 9 | Manufacturer references (done, below) | 3 |
 | 10 | Replaced by the catalogue storage steps D0 to D6 (`catalogue-storage.md`) | |
 | 11 | Browser store hardening: versioned IndexedDB, keep and list invalid records | before 3 and 4 |
 | 12 | Catalogue loose ends: schema for load tables (done, below), caliber classes as records (done, below), federation reference of target faces (the renames map is part of the catalogue storage, `catalogue-storage.md`) | |
@@ -184,7 +184,7 @@ Steps 1, 2 and 11 go first, then 3, then 4 to 6, then 7 to 9. Steps 10 and 12 fi
 
 ### Step 4: what changed
 
-- A user record of kind `bullet` or `cartridge` (`packages/schema/src/user-data.ts`, `userBullet`, `userCartridge`) replaces `bulletDesign` and `cartridgeDesign`. The `{id, kind, name, saved, data}` wrapper of user records stays; the envelope's `origin`, `basedOn` and `overrides` are fields of `data`. `origin` is `user`, `basedOn` is an optional `catalogue:<id>` reference, `overrides` an optional partial of the entity in stored units. A bullet also keeps `manufacturerName` as free text until step 9. Records of the old kinds fail the schema and stay in the store as invalid records, like any other record the format rejects.
+- A user record of kind `bullet` or `cartridge` (`packages/schema/src/user-data.ts`, `userBullet`, `userCartridge`) replaces `bulletDesign` and `cartridgeDesign`. The `{id, kind, name, saved, data}` wrapper of user records stays; the envelope's `origin`, `basedOn` and `overrides` are fields of `data`. `origin` is `user`, `basedOn` is an optional `catalogue:<id>` reference, `overrides` an optional partial of the entity in stored units. The bullet's `manufacturer` is a reference (step 9). Records of the old kinds fail the schema and stay in the store as invalid records, like any other record the format rejects.
 - `applyOverrides(base, overrides)` (`packages/schema/src/overrides.ts`) is the one resolution function: objects merge by key, arrays replace, an explicit `null` removes a field or an object, and a cartridge's `values` merge by `(side, symbol, variant)`. Two refinements keep a base's printed text from outliving a changed number: a quantity (an object with its own `value`) is replaced whole, and so is a cartridge value entry, which also drops its tolerance. A `value: null` entry removes that cartridge value. `bulletOverrides` and `cartridgeOverrides` validate the leaves against the entity schemas and allow any field to be omitted or `null`; whether an override result as a whole is a valid record is not checked before step 9.
 - The designers resolve `basedOn` through the API (`apps/web/src/lib/variants.ts`), show the base's values, and save only what differs from them: a field cleared against a base value is saved as `null`. A design without a base saves every given field. The designer's fields, not the whole entity, are what a save rewrites, so an override of a field the designer has no input for is dropped on the next save.
 - A `basedOn` the catalogue no longer has opens the design read only with the reason shown, and its stored data is saved as it is. A base the API could not be asked is told apart from a missing one. Lists and pickers leave such designs out.
@@ -195,9 +195,19 @@ Steps 1, 2 and 11 go first, then 3, then 4 to 6, then 7 to 9. Steps 10 and 12 fi
 ### Step 5: what changed
 
 - `firearm` (`packages/schema/src/firearm.ts`) is the one firearm shape. Lengths are `quantity('length')` objects in mm, the mass `quantity('mass')` in g, click value, travel and cant `quantity('angle')` in degrees, a mount's zero air `quantity('temperature')` in degC, `quantity('pressure')` in bar and `quantity('relativeHumidity')` in %. The drag factor, magnifications and round count are plain numbers. The envelope field `origin` (`catalogue`, `user`, `shared`) is required, so a firearm of the old SI format fails the schema instead of reading as a firearm 1000 times too short. The user record of kind `firearm` carries it as `data`; no migration, an old record stays in the store as an invalid one.
-- `manufacturer` is a `catalogue:<id>` reference to a manufacturer record, `cartridge` a reference (`catalogue:<id>` or `user:<UUID>`). `manufacturerName` stays as free text for a maker no record exists for, until step 9 makes user manufacturers. A `user:` manufacturer reference is refused, since no record kind answers it.
+- `manufacturer` is a `catalogue:<id>` reference to a manufacturer record, `cartridge` a reference (`catalogue:<id>` or `user:<UUID>`). Since step 9 the maker is a reference of either scope and there is no `manufacturerName`.
 - `Load` drops its inline `firearm` (name, barrel length, twist, hand) for an optional `firearm` reference. No catalogue firearm kind exists yet, so no reference check reads it.
-- The web app converts at its edges: `siOf`, `storedOf`, `fieldSi` and `fieldStored` (`apps/web/src/lib/firearm.ts`) go through `toSi` and `fromSi`, the sight, click and Gun card values stay SI where the solver forms read them, and the editor stores a field only when it is edited, so values the user did not touch keep the exact stored number. Not part of this step: the workbench state's `firearm` (a local id until step 6) and its `siValues` entry `firearmMass` (kg).
+- The web app converts at its edges: `siOf`, `storedOf`, `fieldSi` and `fieldStored` (`apps/web/src/lib/firearm.ts`) go through `toSi` and `fromSi`, the sight, click and Gun card values stay SI where the solver forms read them, and the editor stores a field only when it is edited, so values the user did not touch keep the exact stored number. Not part of this step: the workbench's saved `firearm` and `firearmMass` (step 6).
+
+### Step 6: what changed
+
+- `load` (`packages/schema/src/load.ts`) is the one Load: the catalogue record (`records/loads`, read through `catalogueLoad`), the user record of kind `load` and the load file of `POST /v1/interior/load-file`. It replaces the user record `workbenchState` and the catalogue `Load`. Every quantity is a stored-unit object (charge and the measured case capacity in g, seating and measured muzzle distance in mm), the SI values appear at the solver call only.
+- References: `cartridge`, `firearm` and `bullet` are `catalogue:<id>` or `user:<UUID>` references, `powder` a `catalogue:` reference (no user powder kind exists, so no stub is created). A catalogue load names catalogue records only and carries `id`, `name`, `provenance`, cartridge, bullet, powder and charge; a user load is named by its record. Only a catalogue load of provenance kind `measured` may describe its bullet or powder by maker and name where no record exists; `primer` and `case` stay descriptions.
+- `analysis` holds the typed solver values, `overrides`, and the `ladder`. `overrides` is a strict object with one optional number per key of `workbenchValueKeys` but `charge` (the load's own `charge`), each in the stored unit of `analysisKinds` (`volume` in cm3, `propellantTemperature` in degC, pressures in bar). A key outside that list fails the schema. The ladder step is in the stored unit of its kind: g, mm or K. The measured chronograph series (`measurements`) stay on the load until step 7 moves them to sessions.
+- Old format: a record of kind `workbenchState` or a file with `siValues` is not read. The schema's own message for the old kind says so, in Open, Import, the stored-record list and the load file route.
+- The workbench saves a key under `overrides` only when the user typed it (`givenKeys` in `apps/web/src/lib/load-record.ts`). A value is left out when a reference gives it again on opening: the powder record's model parameters, the bullet record's or design's mass, a followed default of volume, bore diameter, bore area and twist, the seating's volume and travel (while the barrel length is the default one), the Settings defaults and the mass and twist of a referenced firearm. Opening fills the form like a link (the Settings defaults and the followed defaults for the keys the load leaves out), then the records fill the rest, and the typed values stay.
+- A load follows a changed record or changed Settings for every value the user did not type. A value whose source a reference cannot name is saved as typed: a design or firearm whose id is no UUID. The built-in example rifle has a fixed UUID so that the example load keeps it.
+- `POST /v1/interior/load-file` fills the values a load leaves out from the catalogue records it references: the charge, the powder's model parameters, the bullet's mass and the cartridge's bore area. A value no record gives (volume, travel, twist, bore diameter without a cartridge record) is a 400 at `records[i].data.analysis.overrides.<key>`.
 
 ### Step 12: what changed
 
@@ -206,6 +216,15 @@ Steps 1, 2 and 11 go first, then 3, then 4 to 6, then 7 to 9. Steps 10 and 12 fi
 - Caliber classes are records (`records/caliber-classes`, `caliberClass` in `packages/schema/src/caliber-class.ts`), served by `GET /caliber-classes` and `/:id`. `Discipline.caliberClasses.ids` and the `caliberClasses` of a target face list item are record ids, checked by `data:validate` (`packages/data/src/caliber-classes.ts`), which also holds the membership rules the former test checked. The `caliberClasses` constant of the schema package is gone: the web app reads class names from the API.
 
 - `TargetFace.federation` and the face events' `federation` are federation record ids (`organization` is gone from the records), a face without `federation` is a user's own design. Every face event has an `id` (a record id, unique within the face) and `TargetMapping.event` holds it. `data:validate` checks the federation references, the mapping against the event's federation and the uniqueness (`checkFaceFederations`, `checkMappings`). The target faces API list derives `organization` from the federation. The web app keys the event choice by id, and a target sheet's `face.event` is a record id: a saved sheet that holds an event name is rejected like any record of an older format.
+
+### Step 9: what changed
+
+- A manufacturer typed by the user is a record of kind `manufacturer` (`userManufacturer` in `packages/schema/src/user-data.ts`): `data` holds `origin: 'user'`, the name is the record's `name`. It is referenced as `user:<UUID>`.
+- A user bullet's `manufacturer` and a firearm's `manufacturer` are references of either scope (`ref('manufacturer')`) and the free text is gone. Both schemas are strict, so a stored record of the older format with `manufacturerName` is rejected and stays in the store as an invalid record (no migration). The bullet's `manufacturer` is not an override: `bulletOverrides` leaves it out, the user bullet's own field is the one place.
+- The designer's and the firearm editor's manufacturer field (`apps/web/src/components/manufacturer-input.tsx`) turns the typed text into a reference when the field is left or an option is chosen: a catalogue or user manufacturer whose name or alias is the same text (`findManufacturer` in `apps/web/src/lib/manufacturers.ts`, catalogue first), else a new user manufacturer (`referTo`), stored in the browser at once and found by the next typed name.
+- A chronograph session's `device.manufacturer` is a `catalogue:` reference (sessions are catalogue records), checked by `data:validate`. The importers cannot read the catalogue: `missingPaths` always lists `device.manufacturer`, and a name the file gives stays on the candidate (`device.manufacturerName` of `SessionCandidate`, also the member of the OpenReloading session JSON) for the caller to resolve.
+- `packages/schema/test/manufacturer-text.test.ts` fails on a `manufacturerName` property in an entity schema and on a manufacturer property that is not an id or a reference. Not yet covered: the components of a load keep `manufacturerName` (the test lists `load` as the one exception) and the measured series of a workbench state keeps its device as one text, both until the load unification step.
+- `checkUserRefs` also reports a bullet's or a firearm's `user:` manufacturer that no record answers. A file with one bullet carries no manufacturer record: opened in another browser it reports the reference as missing and the bullet shows no manufacturer. A name typed and then changed after leaving the field leaves its first record in the store, listed among the suggestions: no screen deletes a user manufacturer yet.
 
 ## Decisions
 

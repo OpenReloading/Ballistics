@@ -24,6 +24,7 @@ describe('parseShotView', () => {
     expect(r.stringLabels).toEqual(['Test load A 42.0gr'])
     expect(r.missingPaths).toEqual([
       'id',
+      'device.manufacturer',
       'device.model',
       'device.firmware',
       'conditions.airTemperature',
@@ -62,7 +63,9 @@ describe('parseShotView', () => {
     expect(r.stringLabels).toEqual(['Testladung B, 2,5g P100'])
     expect(r.missingPaths).toContain('provenance.sources.0.title')
     expect(r.warnings).toEqual([])
-    expect(complete(r).device.manufacturerName).toBe('Garmin')
+    expect(r.session.device.manufacturerName).toBe('Garmin')
+    expect(complete(r).device.manufacturer).toBe('catalogue:test-maker')
+    expect(r.missingPaths).toContain('device.manufacturer')
   })
 
   it('leaves an unrecognised date to the user', () => {

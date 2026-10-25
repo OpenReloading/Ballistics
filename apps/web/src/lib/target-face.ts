@@ -583,7 +583,7 @@ function fitFace(black: Ellipse, match: FaceMatch): FaceFit | undefined {
     if (!plane || members.length <= MIN_RINGS + 1) return undefined
     const worst = members
       .map((m, i) => ({ i, misfit: i ? misfitOf(m, plane.toFace) : -1 }))
-      .reduce((a, b) => (b.misfit > a.misfit ? b : a)).i
+      .reduce((a, b) => (b.misfit > a.misfit ? b : a), { i: 0, misfit: -1 }).i
     members = members.filter((_, i) => i !== worst)
   }
 }

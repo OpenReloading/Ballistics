@@ -1,6 +1,6 @@
 'use client'
 
-import type { WorkbenchState } from '@open-reloading/schema'
+import type { Load } from '@open-reloading/schema'
 import { useEffect, useRef, useState } from 'react'
 import {
   type LoadRecord,
@@ -30,7 +30,7 @@ type Tab = {
   /** The name the user typed or the record carries; undefined: the generated name. */
   custom?: string
   /** Undefined: a load with nothing chosen or typed, restored by `reset()`. */
-  data?: WorkbenchState
+  data?: Load
   outcome?: UseWorkbenchStateResult['outcome']
   changed: boolean
   file?: FileState
@@ -239,7 +239,7 @@ export function useLoadTabs(load: UseWorkbenchStateResult) {
       .then(({ records }) => {
         if (!alive) return
         const saved = stored.ids.flatMap((id) => {
-          const r = records.find((x): x is LoadRecord => x.kind === 'workbenchState' && x.id === id)
+          const r = records.find((x): x is LoadRecord => x.kind === 'load' && x.id === id)
           return r ? [savedTab(r)] : []
         })
         const shownNow = saved.find((t) => t.recordId === stored.active)

@@ -4,6 +4,7 @@
  * from `getManufacturerNames` (`api.ts`).
  */
 
+import { fold, type UserRecord, userIdRegex } from '@open-reloading/schema'
 import { apiFetch } from './api-fetch.ts'
 import type { ManufacturerSummary } from './api-types.ts'
 
@@ -14,6 +15,87 @@ export const noManufacturerNames: ManufacturerNames = new Map()
 
 export const manufacturerNames = (items: readonly ManufacturerSummary[]): ManufacturerNames =>
   new Map(items.map((m) => [m.id, m.name]))
+
+/**
+ * The name of a manufacturer reference (`catalogue:<id>` or `user:<id>`) in `names`, which holds
+ * catalogue ids and `user:<id>` references (`withUserManufacturers`); empty for none or an unknown one.
+ */
+export const refName = (names: ManufacturerNames, ref: string | undefined) =>
+  (ref?.startsWith('catalogue:')
+    ? names.get(ref.slice('catalogue:'.length))
+    : ref && names.get(ref)) || ''
+
+/** The user manufacturers of `records` as `user:<id>` references with their names, added to `names`. */
+export const withUserManufacturers = (
+  names: ManufacturerNames,
+  records: readonly UserRecord[],
+): ManufacturerNames =>
+  new Map([
+    ...names,
+    ...records.flatMap((r): [string, string][] =>
+      r.kind === 'manufacturer' && userIdRegex.test(r.id) ? [[`user:${r.id}`, r.name]] : [],
+    ),
+  ])
+
+/** A manufacturer to pick or to match a typed name against: its reference, name and other names. */
+export interface KnownManufacturer {
+  ref: string
+  name: string
+  aliases: string[]
+}
+
+/** The catalogue manufacturers, then the user manufacturers of `records`. */
+export const knownManufacturers = (
+  catalogue: readonly ManufacturerSummary[],
+  records: readonly UserRecord[],
+): KnownManufacturer[] => [
+  ...catalogue.map((m) => ({ ref: `catalogue:${m.id}`, name: m.name, aliases: m.aliases ?? [] })),
+  ...records.flatMap((r): KnownManufacturer[] =>
+    r.kind === 'manufacturer' && userIdRegex.test(r.id)
+      ? [{ ref: `user:${r.id}`, name: r.name, aliases: [] }]
+      : [],
+  ),
+]
+
+const sameName = (a: string, b: string) =>
+  fold(a).replace(/[\s-]+/g, '') === fold(b).replace(/[\s-]+/g, '')
+
+/**
+ * The manufacturer a typed name names: one whose name or other name is the same text, ignoring
+ * case, accents, spaces and hyphens. The first in `known` wins, so a catalogue manufacturer is
+ * found before a user one of the same name.
+ */
+export const findManufacturer = (known: readonly KnownManufacturer[], typed: string) =>
+  typed.trim() === ''
+    ? undefined
+    : known.find((m) => [m.name, ...m.aliases].some((n) => sameName(n, typed)))
+
+/** The user manufacturer record a new typed name creates, `id` a new UUID. */
+export const newManufacturerRecord = (id: string, typed: string, now: Date): UserRecord => ({
+  kind: 'manufacturer',
+  id,
+  name: typed.trim().slice(0, 200),
+  saved: now.toISOString(),
+  data: { origin: 'user' },
+})
+
+/**
+ * The reference a typed name stands for: the manufacturer it names, else that of a new user
+ * manufacturer, whose record is `created` for the caller to store (and to add to `known` so the
+ * next typed name finds it). Undefined for an empty text.
+ */
+export function referTo(
+  known: readonly KnownManufacturer[],
+  typed: string,
+  newUuid: () => string,
+  now: Date,
+): { ref: string; created?: UserRecord } | undefined {
+  if (typed.trim() === '') return undefined
+  const found = findManufacturer(known, typed)
+  if (found) return { ref: found.ref }
+  const created = newManufacturerRecord(newUuid(), typed, now)
+  return { ref: `user:${created.id}`, created }
+}
 
 /**
  * The label of a powder or bullet: "<manufacturer name> <product name>". A catalogue record names
@@ -69,14 +151,14 @@ export const manufacturerOptions = (
     .map(([value, label]) => ({ value, label }))
     .sort((a, b) => a.label.localeCompare(b.label))
 
-let listing: Promise<ManufacturerNames> | undefined
+let listing: Promise<ManufacturerSummary[]> | undefined
 
-/** Every manufacturer name through `apiFetch`, once per page load; retried after a failure. */
-export function fetchManufacturerNames() {
+/** Every catalogue manufacturer through `apiFetch`, once per page load; retried after a failure. */
+export function fetchManufacturers() {
   listing ??= apiFetch('manufacturers')
     .then(async (res) => {
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      return manufacturerNames(((await res.json()) as { items: ManufacturerSummary[] }).items)
+      return ((await res.json()) as { items: ManufacturerSummary[] }).items
     })
     .catch((e) => {
       listing = undefined
@@ -84,3 +166,6 @@ export function fetchManufacturerNames() {
     })
   return listing
 }
+
+/** Every manufacturer name through `fetchManufacturers`. */
+export const fetchManufacturerNames = () => fetchManufacturers().then(manufacturerNames)

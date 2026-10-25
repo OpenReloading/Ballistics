@@ -89,7 +89,7 @@ function stabilityInputs(q: z.infer<typeof stabilityQuery>, record: Bullet | und
 const loadFileBody = userDataFile
   .extend({
     records: userDataFile.shape.records.describe(
-      'The records of the file. Exactly one is a workbench load (`kind` `workbenchState`), its `data.siValues` in SI units by workbench field key.',
+      'The records of the file. Exactly one is a workbench load (`kind` `load`). Its `charge` and the solver values it types under `data.analysis.overrides` are in stored units (g, mm, cm3, bar, degC).',
     ),
     files: userDataFile.shape.files.describe('Photos of target sheets, base64. Not read here.'),
   })
@@ -272,7 +272,7 @@ export const computeRoutes: FastifyPluginAsync<ComputeContext> = async (
         example: loadFileExample,
         summary: 'Simulate a workbench load file',
         description:
-          'Reads a load file saved by the workbench (a user data file with one workbench record), resolves its cartridge, bullet and powder ids, runs the M3 model at its charge or over its charge ladder and answers a summary per step: peak pressure, muzzle velocity and energy, barrel time, load ratio and muzzle burnt fraction. Results are simulations, not load data.',
+          "Reads a load file saved by the workbench (a user data file with one load record), resolves its catalogue cartridge, bullet and powder references, runs the M3 model at its charge or over its charge ladder and answers a summary per step: peak pressure, muzzle velocity and energy, barrel time, load ratio and muzzle burnt fraction. The values the file does not type come from those records: the powder's model parameters, the bullet's mass and the cartridge's bore area. A value no record gives is a 400 at its path under `analysis.overrides`. Results are simulations, not load data.",
       },
     },
     async (request, reply) => {

@@ -102,7 +102,7 @@ export function TargetDesigner() {
         if (current.current !== p.record.id) return
         stored.current = { key: p.key, written: true }
         setKept('saved')
-        requestPersistentStorage()
+        void requestPersistentStorage()
       },
       () => current.current === p.record.id && setKept('failed'),
     )
