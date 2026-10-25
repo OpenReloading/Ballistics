@@ -101,6 +101,7 @@ export function Workbench() {
     designs,
     direction,
     fields,
+    apiData,
     fileData,
     fileMenu,
     fillExample,
@@ -825,6 +826,7 @@ export function Workbench() {
                         name={load.name}
                         nameKey={load.customName?.trim() ? load.customName : ''}
                         data={fileData}
+                        apiData={apiData}
                         store={storeLoad}
                         onOpen={onOpenFile}
                         onStored={stored}

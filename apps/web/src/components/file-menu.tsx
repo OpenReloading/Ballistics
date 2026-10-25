@@ -195,6 +195,7 @@ function FileMenuOf<K extends UserRecordKind>({
   kind,
   name,
   data,
+  apiData,
   onOpen,
   note,
   problem,
@@ -217,6 +218,11 @@ function FileMenuOf<K extends UserRecordKind>({
   name: string
   /** The page's current record data. */
   data: Of<K>['data']
+  /**
+   * The record as a file for the API reads it, every value resolved (the workbench): the Save
+   * options then offer Download and Copy JSON for the API. Never saved, never the browser copy.
+   */
+  apiData?: Of<K>['data']
   /** `record` is the opened or saved-as record (its id and saved time). */
   onOpen: (data: Of<K>['data'], name: string, record: Of<K>) => void
   /** A line about the record the page adds to the menu's status, such as ids not loaded. */
@@ -683,6 +689,17 @@ function FileMenuOf<K extends UserRecordKind>({
     await copy(link, 'Share link')
   }
 
+  /** The text of the file for the API, none (and the reason shown) when the record cannot be written. */
+  function apiText() {
+    if (problem || !apiData) {
+      setFailure(`Not written: ${problem ?? 'nothing to write'}`)
+      return
+    }
+    const checked = checkedUserDataText([{ ...current(), data: apiData }])
+    if (checked.ok) return checked.text
+    setFailure(`Not written: ${checked.reason}`)
+  }
+
   async function remove(records: Of<K>[], question: string) {
     if (!records.length || !(await ask(question, 'Delete'))) return
     await deleteRecords(records.map((r) => r.id))
@@ -1028,6 +1045,33 @@ function FileMenuOf<K extends UserRecordKind>({
             <Menu.Item onClick={act('Copy', () => copy(userDataText([current()]), 'Record JSON'))}>
               Copy JSON
             </Menu.Item>
+            {apiData && (
+              <>
+                <Menu.Item
+                  onClick={act('Download', () => {
+                    const text = apiText()
+                    if (text !== undefined) {
+                      download(
+                        new Blob([text], { type: 'application/json' }),
+                        recordFileName(`${name} api`),
+                      )
+                      setMessage('Downloaded the load file for the API.')
+                    }
+                    return Promise.resolve()
+                  })}
+                >
+                  Download for the API
+                </Menu.Item>
+                <Menu.Item
+                  onClick={act('Copy', async () => {
+                    const text = apiText()
+                    if (text !== undefined) await copy(text, 'Load file for the API')
+                  })}
+                >
+                  Copy JSON for the API
+                </Menu.Item>
+              </>
+            )}
             <Menu.Divider />
             <Menu.Item
               onClick={act('Export', async () => {
