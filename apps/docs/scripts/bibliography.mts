@@ -80,14 +80,19 @@ export function recordSources(dir: string): RecordSource[] {
 export function equationErrors(page: string, root: string): string[] {
   const lines = page.split('\n')
   const errors: string[] = []
-  for (let i = 0; i < lines.length; i++) {
-    if (!lines[i].trim().startsWith('$$')) continue
+  let i = 0
+  while (i < lines.length) {
+    if (!lines[i].trim().startsWith('$$')) {
+      i++
+      continue
+    }
     const start = i + 1
-    i = closing(lines, i)
-    let j = i + 1
+    const end = closing(lines, i)
+    let j = end + 1
     while (j < lines.length && lines[j].trim() === '') j++
     if (lines[j]?.startsWith('Code:')) errors.push(...codeLineErrors(lines[j], j + 1, root))
     else errors.push(`line ${start}: equation without a Code line`)
+    i = end + 1
   }
   return errors
 }
