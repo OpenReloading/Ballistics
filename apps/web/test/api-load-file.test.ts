@@ -69,12 +69,16 @@ describe('toApiLoad', () => {
     expect(body.summary.peakPressure).toBeGreaterThan(0)
   })
 
-  it('runs with the catalogue references of the cartridge and bullet', async () => {
-    const file = toApiLoad(parts(), {
+  it('runs with the catalogue references of the loaded records, not the id asked for', async () => {
+    const refs = {
       cartridge: 'catalogue:308-win',
       bullet: 'catalogue:demo-bullet-168',
-    })
-    expect(file.cartridge).toBe('catalogue:308-win')
+      powder: 'catalogue:demo-powder-dp40',
+    }
+    // the powder id the load keeps may be one no record answered: the file drops it
+    expect(toApiLoad(parts({ powder: 'catalogue:unloaded' }), {}).powder).toBeUndefined()
+    const file = toApiLoad(parts({ powder: 'catalogue:unloaded' }), refs)
+    expect(file).toMatchObject(refs)
     expect((await runFile(file)).status).toBe(200)
   })
 
@@ -105,6 +109,7 @@ describe('toApiLoad', () => {
     )
     expect(file.cartridge).toBeUndefined()
     expect(file.bullet).toBeUndefined()
+    expect(file.powder).toBeUndefined()
     expect(file.firearm).toBeUndefined()
     expect(file.capacity).toBeUndefined()
     expect(file.measurements).toBeUndefined()

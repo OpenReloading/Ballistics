@@ -200,17 +200,22 @@ export function toLoad(p: LoadParts): Load {
 
 /**
  * The load file for the API: every solver value of the moment is typed (the API invents none), the
- * cartridge and bullet are the catalogue references in `catalogue` or absent (a user record is not
- * on the server), and what the API does not read is left out: the firearm, the capacity, the
- * chronograph series and a seating or temperature ladder, which the route does not run.
+ * cartridge, bullet and powder are the catalogue references in `catalogue` or absent (a user
+ * record, or an id no record answers, is not on the server), and what the API does not read is
+ * left out: the firearm, the capacity, the chronograph series and a seating or temperature ladder,
+ * which the route does not run.
  */
-export function toApiLoad(p: LoadParts, catalogue: { cartridge?: string; bullet?: string }): Load {
+export function toApiLoad(
+  p: LoadParts,
+  catalogue: { cartridge?: string; bullet?: string; powder?: string },
+): Load {
   const charge = p.ladder?.kind === 'charge'
   return toLoad({
     ...p,
     given: new Set(),
     cartridge: catalogue.cartridge,
     bullet: catalogue.bullet,
+    powder: catalogue.powder,
     firearm: undefined,
     capacity: undefined,
     ladder: charge ? p.ladder : undefined,

@@ -1872,6 +1872,7 @@ export function useWorkbenchState() {
   const apiFile = toApiLoad(loadParts, {
     cartridge: cartridge && catalogueRef(cartridge.id),
     bullet: bullet && catalogueRef(bullet.id),
+    powder: powder && catalogueRef(powder.id),
   })
   // the File menu's props stay the same objects while the load is unchanged, so its memo holds and
   // its window listeners keep no earlier render, and with it no earlier result, alive
