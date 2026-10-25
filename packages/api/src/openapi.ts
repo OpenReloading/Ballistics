@@ -143,7 +143,7 @@ const jsonSchema = (schema: z.ZodType, io: 'input' | 'output' = 'input'): JsonSc
 
 /**
  * The body of every error answer: Fastify's (with `code`, for example `FST_ERR_VALIDATION`), the
- * schema 400 (`issues`), the compute answers (`reason`, `notice` and more) and the 500
+ * schema 400 (`issues`), the compute answers (`reason`, `missing`, `notice` and more) and the 500
  * (`requestId`, the `reqId` of the server log line of the error).
  */
 const errorBody: JsonSchema = {
@@ -165,6 +165,20 @@ const errorBody: JsonSchema = {
       },
     },
     reason: { type: 'string' },
+    missing: {
+      type: 'array',
+      description:
+        'The load file route with `reason` `missingValues`: every solver value the file lacks, with its key, its path in the file and its stored quantity.',
+      items: {
+        type: 'object',
+        properties: {
+          key: { type: 'string' },
+          path: { type: 'array', items: { type: ['string', 'integer'] } },
+          quantity: { type: 'string' },
+        },
+        required: ['key', 'path', 'quantity'],
+      },
+    },
     notice: { type: 'string' },
     requestId: { type: 'string' },
   },
