@@ -325,13 +325,14 @@ export function DirectoryTable<T extends { id: string }>({
   useEffect(() => (box.current ? watchOverflow(box.current, setOver) : undefined), [])
   // a filter change shows the first matches: the table box from the top, and on a phone the page
   // back to the table's top when it lies above the view; the same rows again (the URL read after
-  // mounting, a sort) move nothing
+  // mounting, a sort) move nothing; rows are the same by id, as a list rebuilds its row objects
+  // when the browser's records arrive
   const before = useRef(rows)
   useEffect(() => {
     const was = before.current
     before.current = rows
     const el = box.current
-    if (!el || (was.length === rows.length && was.every((r, i) => r === rows[i]))) return
+    if (!el || (was.length === rows.length && was.every((r, i) => r.id === rows[i]?.id))) return
     el.scrollTop = 0
     const top = el.getBoundingClientRect().top
     if (top < 0) window.scrollBy(0, top)
