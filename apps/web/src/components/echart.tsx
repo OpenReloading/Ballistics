@@ -166,6 +166,15 @@ export function EChart({
     drawn.current = option
   }, [option])
 
+  /** Shows the tooltip and the slider's value text at data index `to`. */
+  const moveTo = (to: number) => {
+    index.current = to
+    chart.current?.dispatchAction({ type: 'showTip', seriesIndex: focus, dataIndex: to })
+    if (!keys.current) return
+    keys.current.value = String(to)
+    keys.current.setAttribute('aria-valuetext', readout?.(to) ?? '')
+  }
+
   const onKey = (e: KeyboardEvent<HTMLInputElement>) => {
     const c = chart.current
     const series = (c?.getOption().series as { data?: unknown[] }[] | undefined)?.[focus]
@@ -180,12 +189,7 @@ export function EChart({
     }
     if (!(e.key in moves)) return
     e.preventDefault()
-    index.current = moves[e.key]
-    c.dispatchAction({ type: 'showTip', seriesIndex: focus, dataIndex: index.current })
-    if (keys.current) {
-      keys.current.value = String(index.current)
-      keys.current.setAttribute('aria-valuetext', readout?.(index.current) ?? '')
-    }
+    moveTo(moves[e.key])
   }
 
   const points = (option.series as { data?: unknown[] }[] | undefined)?.[focus]?.data?.length ?? 0
@@ -210,9 +214,12 @@ export function EChart({
         max={Math.max(0, points - 1)}
         defaultValue={0}
         onKeyDown={onKey}
+        // a change that is no handled key (assistive technology, other keys)
+        onChange={(e) => moveTo(Number(e.currentTarget.value))}
         onBlur={() => {
           chart.current?.dispatchAction({ type: 'hideTip' })
           index.current = -1
+          keys.current?.removeAttribute('aria-valuetext')
           if (keys.current) keys.current.value = '0'
         }}
       />

@@ -57,3 +57,20 @@ test('with reduced motion Play shows the bullet at the muzzle, no flight', async
   const at = await edges(page)
   expect(at.bullet).toBeLessThan(at.box)
 })
+
+test('the chart readout slider follows the keys and a value change, and is cleared on blur', async ({
+  page,
+}) => {
+  await runPlayback(page)
+  const readout = page.getByRole('slider', { name: /^Simulated breech pressure.*, readout$/ })
+  await readout.focus()
+  await readout.press('End')
+  const last = await readout.getAttribute('aria-valuetext')
+  expect(last).toBeTruthy()
+  // a change without a key (assistive technology) moves the readout too
+  await readout.fill('1')
+  await expect(readout).not.toHaveAttribute('aria-valuetext', last ?? '')
+  await readout.blur()
+  await expect(readout).not.toHaveAttribute('aria-valuetext')
+  await expect(readout).toHaveValue('0')
+})

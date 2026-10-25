@@ -6,9 +6,9 @@
   "type": "module",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "api-check": "f=\"${TMPDIR:-/tmp}/openapi.json\" && node src/openapi.ts && oasdiff breaking ../packages/api/openapi.baseline.json \"$f\" --fail-on ERR",
+    "api-check": "f=\"${TMPDIR:-/tmp}/openapi.json\" && TMPDIR=\"${TMPDIR:-/tmp}\" node src/openapi.ts && oasdiff breaking ../packages/api/openapi.baseline.json \"$f\" --fail-on ERR",
     "api-baseline": "node src/openapi.ts baseline && biome format --write --files-max-size=8388608 ../packages/api/openapi.baseline.json",
-    "api-conformance": "f=\"${TMPDIR:-/tmp}/openapi.json\" && node src/openapi.ts && schemathesis run \"$f\" --url \"${API_URL:-http://localhost:3000}\" --checks not_a_server_error,status_code_conformance,content_type_conformance,response_schema_conformance",
+    "api-conformance": "f=\"${TMPDIR:-/tmp}/openapi.json\" && TMPDIR=\"${TMPDIR:-/tmp}\" node src/openapi.ts && schemathesis run \"$f\" --url \"${API_URL:-http://localhost:3000}\" --checks not_a_server_error,status_code_conformance,content_type_conformance,response_schema_conformance",
     "pages": "node src/pages.ts",
     "pages:serve": "node src/pages-serve.ts",
     "test": "vitest run"
