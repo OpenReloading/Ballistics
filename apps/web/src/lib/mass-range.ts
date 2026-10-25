@@ -11,7 +11,7 @@ const number = /^\d*(?:\.\d*)?$/
  */
 export function massRange(text: string) {
   const t = text.trim()
-  const unit: 'gr' | 'g' | undefined = t.endsWith('gr') ? 'gr' : t.endsWith('g') ? 'g' : undefined
+  const unit = (['gr', 'g'] as const).find((u) => t.endsWith(u))
   if (!unit) return
   const bounds = t.slice(0, -unit.length).split('-')
   if (bounds.length !== 2) return
