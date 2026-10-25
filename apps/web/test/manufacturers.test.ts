@@ -4,11 +4,13 @@ import {
   findManufacturer,
   knownManufacturers,
   manufacturerNames,
+  manufacturerUses,
   newManufacturerRecord,
   referTo,
   refName,
   withUserManufacturers,
 } from '../src/lib/manufacturers.ts'
+import { validRecords } from '../src/lib/user-data.ts'
 
 const uuid = '3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13'
 const catalogue = [
@@ -80,5 +82,71 @@ describe('user manufacturers', () => {
     expect(refName(names, `user:${uuid}`)).toBe('Home Loader')
     expect(refName(names, 'catalogue:gone')).toBe('')
     expect(refName(names, undefined)).toBe('')
+  })
+})
+
+describe('manufacturerUses', () => {
+  const other = '0a1b2c3d-0000-4000-8000-000000000001'
+  const third = '0a1b2c3d-0000-4000-8000-000000000002'
+  const makers = [
+    newManufacturerRecord(uuid, 'Home Loader', new Date(0)),
+    newManufacturerRecord(other, 'Another', new Date(0)),
+    newManufacturerRecord(third, 'Third', new Date(0)),
+  ]
+  const bullet = {
+    kind: 'bullet',
+    id: 'b1',
+    name: 'Bullet',
+    saved: '2026-10-13T10:00:00.000Z',
+    data: { origin: 'user', manufacturer: `user:${uuid}` },
+  } as UserRecord
+  const uses = (
+    records: UserRecord[],
+    invalid: ReturnType<typeof validRecords>['invalid'] = [],
+    shown: string[] = [],
+  ) => manufacturerUses(records, invalid, shown).map((m) => [m.record.name, m.uses])
+
+  it('counts the records that name a manufacturer, by name, and the unused ones as 0', () => {
+    const gun = {
+      ...bullet,
+      kind: 'firearm',
+      id: 'f1',
+      data: { origin: 'user', manufacturer: `user:${uuid}` },
+    } as unknown as UserRecord
+    const capacity = {
+      ...bullet,
+      kind: 'caseCapacity',
+      id: 'c1',
+      data: { origin: 'user', caseManufacturer: `user:${other}` },
+    } as unknown as UserRecord
+    expect(uses([...makers, bullet, gun, capacity])).toEqual([
+      ['Another', 1],
+      ['Home Loader', 2],
+      ['Third', 0],
+    ])
+  })
+
+  it('does not count a catalogue manufacturer or a record of another maker as a use', () => {
+    const catalogueBullet = {
+      ...bullet,
+      data: { origin: 'user', manufacturer: 'catalogue:beta' },
+    } as UserRecord
+    expect(uses([...makers, catalogueBullet])).toEqual([
+      ['Another', 0],
+      ['Home Loader', 0],
+      ['Third', 0],
+    ])
+  })
+
+  it('counts a record the format rejects that holds the reference, and an open field', () => {
+    const rejected = validRecords([
+      { kind: 'bullet', id: 'old', name: 'Old', data: { manufacturer: `user:${other}`, x: 1 } },
+    ]).invalid
+    expect(rejected).toHaveLength(1)
+    expect(uses(makers, rejected, [`user:${third}`])).toEqual([
+      ['Another', 1],
+      ['Home Loader', 0],
+      ['Third', 1],
+    ])
   })
 })

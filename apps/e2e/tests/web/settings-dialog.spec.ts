@@ -1,6 +1,7 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, type Locator, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
+import { gotoHydrated } from './nav.ts'
 import { settingsEntry, storeUnits } from './units.ts'
 
 // Settings is a dialog only, no page: every entry is a button opening it over the page, on every
@@ -115,6 +116,27 @@ test('with unsaved firearm edits Settings and Units open the dialog without a qu
   expect(asked).toEqual([])
 })
 
+test('the Manufacturers tab deletes a user manufacturer that no record or open field names', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/bullets/designer')
+  const field = page.getByRole('combobox', { name: 'Manufacturer' })
+  // the first name stays in the browser when the text is changed after leaving the field
+  await field.fill('Gone')
+  await field.blur()
+  await field.fill('Kept')
+  await field.blur()
+  const dialog = await openFrom(page, sidebarSettings(page))
+  await dialog.getByRole('tab', { name: 'Manufacturers' }).click()
+  const panel = dialog.getByRole('tabpanel', { name: 'Manufacturers' })
+  await expect(panel).toContainText('Gone unused')
+  await expect(panel).toContainText('Kept used by 1')
+  await expect(panel.getByRole('button', { name: 'Delete Kept' })).toHaveCount(0)
+  await panel.getByRole('button', { name: 'Delete Gone' }).click()
+  await expect(panel).not.toContainText('Gone')
+  await expect(panel).toContainText('Kept used by 1')
+})
+
 test('the settings dialog over a document page passes axe in light and dark', async ({ page }) => {
   test.setTimeout(2 * 30_000)
   for (const colorScheme of ['light', 'dark'] as const)
@@ -127,7 +149,13 @@ test('the settings dialog over a document page passes axe in light and dark', as
         await expect(page.locator('html')).toHaveAttribute('data-mantine-color-scheme', colorScheme)
         const dialog = await openFrom(page, sidebarSettings(page))
         // every tab
-        for (const tab of ['Units', 'Workbench defaults', 'Appearance', 'Offline']) {
+        for (const tab of [
+          'Units',
+          'Workbench defaults',
+          'Manufacturers',
+          'Appearance',
+          'Offline',
+        ]) {
           await dialog.getByRole('tab', { name: tab }).click()
           await expect(dialog.getByRole('tabpanel', { name: tab })).toBeVisible()
           if (tab === 'Offline')

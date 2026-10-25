@@ -1,7 +1,8 @@
 'use client'
 
 import { Autocomplete } from '@mantine/core'
-import { memo, useRef, useState } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
+import { shownManufacturerRefs } from '../lib/manufacturers.ts'
 import type { useManufacturers } from './use-manufacturers.ts'
 
 /**
@@ -24,6 +25,13 @@ export const ManufacturerInput = memo(function ManufacturerInput({
   onChange: (ref: string | undefined) => void
   manufacturers: ReturnType<typeof useManufacturers>
 }) {
+  // Settings must not offer to delete a manufacturer this field shows
+  useEffect(() => {
+    if (!value) return
+    const key = {}
+    shownManufacturerRefs.set(key, value)
+    return () => void shownManufacturerRefs.delete(key)
+  }, [value])
   // undefined: not being edited, the field shows the name of `value`
   const [typed, setTyped] = useState<string>()
   const pending = useRef<string>(undefined)

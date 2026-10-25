@@ -134,6 +134,7 @@ Next.js App Router (TypeScript, React). API at `API_URL` (default `http://localh
   - Tabs of `src/components/settings-sections.tsx` (vertical, horizontal below 36em, loaded with `next/dynamic` on first open):
     - Units: the unit preset and per-quantity overrides (`UnitsForm` in `src/components/units-settings.tsx`, stored in `localStorage`).
     - Workbench defaults (`src/components/workbench-defaults.tsx`, storage in `src/lib/workbench-defaults.ts`): the defaults of new workbench loads, with the barrel length. The defaults of volume, bore diameter, twist and barrel length from the gun, the cartridge record, Settings and the cartridge class: `src/lib/input-defaults.ts`.
+    - Manufacturers (`manufacturers-settings.tsx`, `manufacturerUses` of `src/lib/manufacturers.ts`): the user manufacturers of this browser with the number of places that name them (user bullets and firearms, capacities, stored records the format rejects, and a manufacturer field open on it, `shownManufacturerRefs`); one that nothing names is deleted at once, with Undo.
     - Appearance (theme System, Light, Dark) and Offline (install help).
   - Opened by Settings in the sidebar rail and the drawer, the search's commands, and `UnitsIconButton` in the page bar of the records, the bullet and cartridge lists, the session summary and the firearm library. Print in a page bar is `PrintButton` (`record-actions.tsx`).
 - Browser API calls go through `apiFetch` (`src/lib/api-fetch.ts`, paths without the version prefix), never `fetch('/api/...')`.

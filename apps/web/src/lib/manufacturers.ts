@@ -4,9 +4,10 @@
  * from `getManufacturerNames` (`api.ts`).
  */
 
-import { fold, type UserRecord, userIdRegex } from '@open-reloading/schema'
+import { checkUserRefs, fold, type UserRecord, userIdRegex } from '@open-reloading/schema'
 import { apiFetch } from './api-fetch.ts'
 import type { ManufacturerSummary } from './api-types.ts'
+import type { InvalidRecord } from './user-data.ts'
 
 /** Manufacturer names by id. */
 export type ManufacturerNames = ReadonlyMap<string, string>
@@ -99,6 +100,45 @@ export function referTo(
   if (!catalogueKnown) return undefined
   const created = newManufacturerRecord(newUuid(), typed, now)
   return { ref: `user:${created.id}`, created }
+}
+
+/** A user manufacturer and the number of places that name it. */
+export interface ManufacturerUse {
+  record: UserRecord
+  uses: number
+}
+
+/** The `user:<id>` references that a manufacturer field shows now; a record in one is in use. */
+export const shownManufacturerRefs = new Map<object, string>()
+
+/**
+ * The user manufacturers of `records` by name, each with the number of places that name it: a
+ * bullet's or firearm's `manufacturer`, a capacity's `caseManufacturer`, an invalid record's text
+ * (read as it is stored, so a record the format rejects keeps its maker) and a field open on it
+ * (`shown`, from `shownManufacturerRefs`). One that nothing names can be deleted.
+ */
+export function manufacturerUses(
+  records: readonly UserRecord[],
+  invalid: readonly InvalidRecord[],
+  shown: Iterable<string> = shownManufacturerRefs.values(),
+): ManufacturerUse[] {
+  // with no manufacturer record in the set, every reference to one is reported as dangling
+  const named = new Map<string, number>()
+  const count = (ref: string) => named.set(ref, (named.get(ref) ?? 0) + 1)
+  for (const d of checkUserRefs(records.filter((r) => r.kind !== 'manufacturer')))
+    if (d.field === 'manufacturer' || d.field === 'caseManufacturer') count(d.target)
+  for (const ref of shown) count(ref)
+  const raw = invalid.map((i) => JSON.stringify(i.raw))
+  return records
+    .filter((r) => r.kind === 'manufacturer' && userIdRegex.test(r.id))
+    .map((record) => {
+      const ref = `user:${record.id}`
+      return {
+        record,
+        uses: (named.get(ref) ?? 0) + raw.filter((text) => text.includes(ref)).length,
+      }
+    })
+    .sort((a, b) => a.record.name.localeCompare(b.record.name))
 }
 
 /**
