@@ -183,6 +183,8 @@ describe('sessionOf', () => {
     // a string that names a load keeps it, and the same session comes back when nothing changes
     expect(attachLoad(attached, 'user:3f1c2b4e-0000-4000-8000-000000000000')).toBe(attached)
     expect(attachLoad(make([undefined, undefined]), 'user:x')).toEqual(make([undefined, undefined]))
+    // a load whose id is no reference (no UUID) is named by no string
+    expect(attachLoad(s, undefined)).toBe(s)
   })
 })
 

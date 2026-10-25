@@ -65,7 +65,8 @@ export function sessionOf(
  * `session` with the load `load` named by every string that is mapped to a charge and names no
  * load yet; the same session when none does.
  */
-export function attachLoad(session: SessionRecord, load: string): SessionRecord {
+export function attachLoad(session: SessionRecord, load: string | undefined): SessionRecord {
+  if (!load) return session
   const strings = session.data.strings.map((s) => (s.variation && !s.load ? { ...s, load } : s))
   return strings.every((s, i) => s === session.data.strings[i])
     ? session

@@ -1904,8 +1904,9 @@ export function useWorkbenchState() {
   const storeLoad = useCallback(
     async (record: UserRecord) => {
       const c = measuredCapacity
-      // the strings mapped to a charge name this load, once it has an id
-      const attached = sessionsNow.current.map((s) => attachLoad(s, sessionRef(record.id)))
+      // the strings mapped to a charge name this load, once it has an id the schema accepts as a reference
+      const ref = userRef(record.id)
+      const attached = sessionsNow.current.map((s) => attachLoad(s, ref))
       const changed = attached.filter((s, i) => s !== sessionsNow.current[i])
       await putRecords([
         ...(c ? [capacityRecord(c.cartridge, c.m3, new Date())] : []),
@@ -1913,7 +1914,7 @@ export function useWorkbenchState() {
         record,
       ])
       // edits made while the store wrote are kept; the strings they mapped name the load too
-      const latest = sessionsNow.current.map((s) => attachLoad(s, sessionRef(record.id)))
+      const latest = sessionsNow.current.map((s) => attachLoad(s, ref))
       const late = latest.filter((s, i) => s !== sessionsNow.current[i])
       sessionsNow.current = latest
       setSessionsState(latest)
