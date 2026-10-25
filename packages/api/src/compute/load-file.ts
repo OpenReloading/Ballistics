@@ -23,6 +23,7 @@ import {
   legacyLoadProblem,
   type Powder,
   parseRef,
+  type QuantityKind,
   toSi,
   userDataFile,
   versionProblem,
@@ -164,15 +165,41 @@ const siKey: Record<string, string> = {
 const valuePath = (at: Path, key: string): Path =>
   key === 'charge' ? [...at, 'charge'] : [...at, 'analysis', 'overrides', key]
 
+/** One solver value a load file lacks. */
+export interface MissingValue {
+  /** The workbench key of the value. */
+  key: string
+  /** Where the file holds it: the load's `charge`, else its key under `analysis.overrides`. */
+  path: PropertyKey[]
+  /** The quantity of its stored unit. */
+  quantity: QuantityKind
+}
+
+/** The 422 answer of a load file that lacks solver values. */
+export interface MissingValuesAnswer {
+  status: 422
+  payload: {
+    statusCode: 422
+    error: string
+    message: string
+    reason: 'missingValues'
+    missing: MissingValue[]
+    notice: string
+  }
+}
+
 /**
  * The 422 answer for a load file that lacks solver values, or undefined when it has them all: one
  * entry per missing value with its path in the file and its stored quantity.
  */
-export function missingValuesAnswer(values: Record<string, number>, at: Path) {
+export function missingValuesAnswer(
+  values: Record<string, number>,
+  at: Path,
+): MissingValuesAnswer | undefined {
   const keys = missingLoadKeys(values)
   if (keys.length === 0) return
   return {
-    status: 422 as const,
+    status: 422,
     payload: {
       ...unprocessable,
       message: `The load file lacks ${keys.length} ${keys.length === 1 ? 'value' : 'values'}: ${keys.join(', ')}. Type them under analysis.overrides, or name catalogue records that give them.`,
