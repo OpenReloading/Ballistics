@@ -1,6 +1,5 @@
 'use client'
 
-import { Select } from '@mantine/core'
 import { useDeferredValue, useMemo } from 'react'
 import {
   type DisciplineRow,
@@ -8,12 +7,10 @@ import {
   type FederationRow,
   federationMatches,
 } from '../lib/disciplines.ts'
-import { compareNames } from '../lib/face-order.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { countText, filterText } from '../lib/lists.ts'
 import { titleFromKebab } from '../lib/record-fields.ts'
 import type { Origin } from '../lib/sources.ts'
-import { controlSize } from '../lib/theme.ts'
 import {
   type DirectoryColumn,
   DirectoryFilters,
@@ -28,49 +25,12 @@ import { EmptyList } from './states.tsx'
 /** Disciplines and federations are rule-book records only: the catalogue is the lists' one source. */
 const ruleBookSources: readonly Origin[] = ['openreloading']
 
-const sortedSet = <T,>(values: (T | undefined)[], compare?: (a: T, b: T) => number) =>
-  [...new Set(values.filter((v): v is T => v !== undefined))].sort(compare)
-
 /** The discipline directory: name, number, federation, distance, category, caliber classes, faces. */
 export function DisciplineList({ items }: { items: DisciplineRow[] }) {
   const [state, set, clear] = useListState()
   const filters = useDeferredValue(state)
-  const className = useMemo(
-    () => new Map(items.flatMap((r) => r.classes.map((c) => [c.id, c.name] as const))),
-    [items],
-  )
-  const options = useMemo(
-    () => ({
-      federations: sortedSet(
-        items.map((r) => r.federation),
-        compareNames,
-      ),
-      categories: sortedSet(
-        items.map((r) => r.category),
-        compareNames,
-      ).map((c) => ({
-        value: c,
-        label: titleFromKebab(c),
-      })),
-      distances: sortedSet(
-        items.map((r) => r.distance),
-        (a, b) => a - b,
-      ).map((d) => ({ value: String(d), label: `${d} m` })),
-      classes: sortedSet(
-        items.flatMap((r) => r.classes.map((c) => c.id)),
-        compareNames,
-      ).map((id) => ({ value: id, label: className.get(id) ?? id })),
-    }),
-    [items, className],
-  )
   const shown = useMemo(() => items.filter((r) => disciplineMatches(r, filters)), [items, filters])
-  const named = [
-    state.organization,
-    state.category && titleFromKebab(state.category),
-    state.distance && `${state.distance} m`,
-    state.caliberClass && (className.get(state.caliberClass) ?? state.caliberClass),
-    state.query.trim() && `matching "${state.query.trim()}"`,
-  ]
+  const named = [state.organization, state.query.trim() && `matching "${state.query.trim()}"`]
   const classes = (r: DisciplineRow) => r.classes.map((c) => c.name).join(', ')
   const columns: DirectoryColumn<DisciplineRow>[] = [
     { key: 'name', label: 'Name', value: (r) => r.name, cell: (r) => r.name },
@@ -118,23 +78,6 @@ export function DisciplineList({ items }: { items: DisciplineRow[] }) {
     [r.federation, r.number, `${r.distance} m`, r.category && titleFromKebab(r.category)]
       .filter(Boolean)
       .join(' · ')
-  const select = (
-    label: string,
-    data: (string | { value: string; label: string })[],
-    value: string | undefined,
-    onChange: (v: string) => void,
-  ) => (
-    <Select
-      aria-label={label}
-      placeholder={label}
-      size={controlSize.row.input}
-      clearable
-      searchable
-      data={data}
-      value={value || null}
-      onChange={(v) => onChange(v ?? '')}
-    />
-  )
   return (
     <>
       <PageBar
@@ -153,15 +96,15 @@ export function DisciplineList({ items }: { items: DisciplineRow[] }) {
           query={state.query}
           onQuery={(q) => set({ query: q })}
           placeholder="Name, number, federation or caliber, 2.53…"
-          active={Boolean(
-            state.query ||
-              state.organization ||
-              state.category ||
-              state.distance ||
-              state.caliberClass,
-          )}
-          onClear={clear}
           sorting={{ columns, sort: state.sort, onSort: (sort) => set({ sort }) }}
+          scope={
+            state.organization
+              ? {
+                  label: `Federation ${state.organization}`,
+                  onRemove: () => set({ organization: '' }),
+                }
+              : undefined
+          }
         >
           <SourceFilter
             src={state.sources}
@@ -169,14 +112,6 @@ export function DisciplineList({ items }: { items: DisciplineRow[] }) {
             sources={ruleBookSources}
             onChange={(src) => set({ sources: src })}
           />
-          {select('Federation', options.federations, state.organization, (v) =>
-            set({ organization: v }),
-          )}
-          {select('Category', options.categories, state.category, (v) => set({ category: v }))}
-          {select('Distance', options.distances, state.distance, (v) => set({ distance: v }))}
-          {select('Caliber class', options.classes, state.caliberClass, (v) =>
-            set({ caliberClass: v }),
-          )}
         </DirectoryFilters>
         <DirectoryTable
           rows={shown}
@@ -193,7 +128,7 @@ export function DisciplineList({ items }: { items: DisciplineRow[] }) {
           noun="disciplines"
           sort={state.sort}
           onSort={(sort) => set({ sort })}
-          empty={<EmptyList noun="disciplines" filters={filterText(named)} />}
+          empty={<EmptyList noun="disciplines" filters={filterText(named)} onClear={clear} />}
         />
       </div>
     </>
@@ -254,8 +189,6 @@ export function FederationList({ items }: { items: FederationRow[] }) {
           query={state.query}
           onQuery={(q) => set({ query: q })}
           placeholder="Name, abbreviation or country, DSB…"
-          active={Boolean(state.query)}
-          onClear={clear}
           sorting={{ columns, sort: state.sort, onSort: (sort) => set({ sort }) }}
         >
           <SourceFilter
@@ -277,7 +210,11 @@ export function FederationList({ items }: { items: FederationRow[] }) {
           sort={state.sort}
           onSort={(sort) => set({ sort })}
           empty={
-            <EmptyList noun="federations" filters={filterText([query && `matching "${query}"`])} />
+            <EmptyList
+              noun="federations"
+              filters={filterText([query && `matching "${query}"`])}
+              onClear={clear}
+            />
           }
         />
       </div>

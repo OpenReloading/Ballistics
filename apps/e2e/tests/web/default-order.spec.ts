@@ -21,7 +21,7 @@ test('the discipline directory lists ISSF by category, distance, then name, and 
 })
 
 test('the target face directory lists BDS faces by their printed code', async ({ page }) => {
-  await gotoHydrated(page, '/targets?org=BDS')
+  await gotoHydrated(page, '/targets?q=ZF-Scheibe')
   const list = rows(page, '/targets')
   await expect(list.nth(0)).toHaveText('BDS-50m-ZF-Scheibe (Z2)')
   await expect(list.nth(1)).toHaveText('BDS-100m-ZF-Scheibe (Z4)')

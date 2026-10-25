@@ -76,12 +76,9 @@ export function disciplineRow(
   }
 }
 
-/** Whether a discipline row passes the federation, category, distance and caliber class filters and the search. */
+/** Whether a discipline row passes the federation scope and the search. */
 export const disciplineMatches = (r: DisciplineRow, s: DirectoryState) =>
   (!s.organization || r.federation === s.organization) &&
-  (!s.category || r.category === s.category) &&
-  (!s.distance || String(r.distance) === s.distance) &&
-  (!s.caliberClass || r.classes.some((c) => c.id === s.caliberClass)) &&
   matchesQuery(
     [
       r.name,

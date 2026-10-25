@@ -5,7 +5,6 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { TargetFaceDrawing } from '../src/components/target-face-drawing.tsx'
 import { TargetFaceList } from '../src/components/target-face-list.tsx'
-import { emptyDirectory, readDirectory, writeDirectory } from '../src/lib/directory.ts'
 import {
   faceEventRows,
   targetFaceGroups,
@@ -34,16 +33,14 @@ it('lists every face with its distances, outer diameter, rings and the disciplin
   expect(rows.every((r) => r.rings >= 2 && r.outer > 0)).toBe(true)
 })
 
-it('filters by federation and searches names, federations and event names', () => {
-  const s = (over: object) => ({ ...emptyDirectory, ...over })
-  const ids = (over: object) => rows.filter((r) => targetFaceMatches(r, s(over))).map((r) => r.id)
-  expect(ids({ organization: 'DSB' })).toEqual(
-    faces.filter((f) => f.organization === 'DSB').map((f) => f.id),
+it('searches names, federations and event names', () => {
+  const ids = (query: string) => rows.filter((r) => targetFaceMatches(r, query)).map((r) => r.id)
+  // a federation's name also matches the faces whose events name its disciplines
+  expect(ids('DSB')).toEqual(
+    expect.arrayContaining(faces.filter((f) => f.organization === 'DSB').map((f) => f.id)),
   )
-  expect(ids({ query: 'Pistole/Revolver' })).toEqual([precision.id, 'issf-25m-rapid-fire-pistol'])
-  expect(ids({})).toHaveLength(faces.length)
-  expect(writeDirectory(s({ organization: 'BDMP' }), '')).toBe('?org=BDMP')
-  expect(readDirectory('?org=BDMP').organization).toBe('BDMP')
+  expect(ids('Pistole/Revolver')).toEqual([precision.id, 'issf-25m-rapid-fire-pistol'])
+  expect(ids('')).toHaveLength(faces.length)
 })
 
 it('renders the list: one row per face linking its page, the outer diameter in the preset unit', () => {

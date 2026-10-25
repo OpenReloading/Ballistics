@@ -9610,42 +9610,40 @@ main .page-bar h1 {
   max-width: 22rem;
 }
 
-.directory-filters > :not(.directory-search, button) {
-  flex: 0 1 7.5rem;
-}
-
-.directory-filters > .directory-number {
-  flex-basis: 5.5rem;
-}
-
 /* the source filter keeps its width in the filter row whatever it names */
 .directory-filters > .source-filter {
   flex: none;
 }
 
-/* More filters and Clear filters end the row on every list */
-.directory-filters > :is(.more-wide, .clear-filters) {
-  margin-left: auto;
+/* the scope the page was opened with (a cartridge's fit, a federation), as a chip with its remove button */
+.scope-chip {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.125rem;
+  max-width: 100%;
+  padding: 0 0.125rem 0 0.5rem;
+  border: 1px solid var(--link);
+  background: color-mix(in srgb, var(--link) 8%, var(--bg));
+  color: var(--fg);
+  font-size: var(--mantine-font-size-xs);
 }
 
-.directory-filters > .more-wide ~ .clear-filters {
-  margin-left: 0;
+.scope-chip > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* a filter that is set: the link colour's border over a tint, so a set "Any" control stands out */
-.directory-filters
-  > :not(.directory-search)
-  .mantine-Input-input[placeholder]:not(:placeholder-shown),
-.directory-extra .mantine-Input-input[placeholder]:not(:placeholder-shown),
-.directory-filters > :is(.source-filter, .more-toggle)[data-set] {
+/* a source choice or a phone's sort that is set: the link colour's border over a tint */
+.directory-filters > .source-filter[data-set],
+.directory-filters > .sort-select .mantine-Input-input[placeholder]:not(:placeholder-shown) {
   border-color: var(--link);
   background: color-mix(in srgb, var(--link) 8%, var(--bg));
 }
 
-/* the phone's Sort, its icon forms of More filters and Clear filters */
-.directory-filters > .sort-select,
-.directory-filters .filter-icon,
-.directory-filters .filter-badge {
+/* the phone's Sort */
+.directory-filters > .sort-select {
   display: none;
 }
 
@@ -9662,37 +9660,11 @@ main .page-bar h1 {
   cursor: help;
 }
 
-/* segmented facets (drag model, form, base) keep their width, a name before each; the filter row
-   stays one line */
-.directory-filters > :is(.mantine-SegmentedControl-root, .mantine-Checkbox-root, .filter-group) {
-  flex: none;
-}
-
-.filter-group {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-}
-
 /* the selects of the row are named by their placeholder: the muted text colour, not the pale default */
 .directory-filters,
-.directory-extra,
 .burn-overlay {
   --mantine-color-placeholder: var(--muted);
   --input-placeholder-color: var(--muted);
-}
-
-.filter-label,
-.extra-label {
-  color: var(--muted);
-  font-size: var(--mantine-font-size-xs);
-}
-
-/* Clear filters while there is nothing to clear: the text stays, the grey block goes */
-.clear-filters[data-disabled] {
-  border-color: transparent;
-  background: transparent;
-  color: var(--muted);
 }
 
 /* the list skeleton (ListLoading): rows in the table's frame, under a filter row of the real metrics */
@@ -9723,13 +9695,29 @@ main .page-bar h1 {
   gap: 0.5rem;
 }
 
-.page-bar-status:has(.picked-slot) > span {
+.page-bar-status:has(.picked-slot) > :is(span, .clear-picks) {
   flex: none;
+}
+
+/* the status line clips: the focus ring stays inside the button */
+.clear-picks:focus-visible {
+  outline-offset: -2px;
 }
 
 /* a phone's status line is 150 px: while rows are picked, the chip that opens the picks has it and
    the count steps aside, still read by screen readers */
 @media screen and (max-width: 47.99em) {
+  /* the icon alone, and only while the chips are listed: the chip that opens the picks holds
+     Clear selection in its popover */
+  .clear-picks .clear-picks-text,
+  .picked-slot[data-over] + .clear-picks {
+    display: none;
+  }
+
+  .clear-picks .mantine-Button-section {
+    margin-inline-end: 0;
+  }
+
   .page-bar-status:has(.picked-slot) > span:first-child {
     position: absolute;
     width: 1px;
@@ -10288,6 +10276,7 @@ main .page-bar h1 {
 
 .directory-table .select-cell {
   text-align: center;
+  user-select: none;
 }
 
 /* before hydration the cell swallows clicks (directory-table.tsx): the row link beneath would open
@@ -10905,124 +10894,18 @@ main .cartridge-values .clearance {
   }
 }
 
-/* a phone's filter row keeps the search, the caliber and the drag model; the fields marked
-   more-filter open with the button */
-.directory-filters > .more-toggle {
-  display: none;
-}
-
 @media screen and (max-width: 47.99em) {
-  /* the search on a row of its own, then Source, Sort and the icons of More filters and Clear filters */
+  /* the search on a row of its own, then Source and Sort, which keep their text and wrap */
   .directory-filters > .directory-search {
     flex-basis: 100%;
     max-width: none;
   }
 
-  /* with More filters open the facets join the row: Source and Sort keep their text and wrap */
   .directory-filters > :is(.source-filter, .sort-select) {
     display: block;
     flex: 1 1 0;
     min-width: 7.5rem;
   }
-
-  .directory-filters > .more-toggle {
-    display: inline-flex;
-    margin-left: 0;
-  }
-
-  .directory-filters > :is(.more-toggle, .more-toggle.more-wide, .clear-filters) {
-    flex: none;
-    min-width: 0;
-    margin-left: 0;
-    padding-inline: 0.5rem;
-  }
-
-  .directory-filters .filter-icon {
-    display: block;
-  }
-
-  .directory-filters .filter-text {
-    display: none;
-  }
-
-  /* the count keeps its room while no filter is set, so setting one moves nothing */
-  .directory-filters .filter-badge {
-    display: block;
-    min-width: 1ch;
-    margin-left: 0.25rem;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .directory-filters .filter-badge:empty {
-    visibility: hidden;
-  }
-
-  .directory-filters:not([data-more-open]) > .more-filter {
-    display: none;
-  }
-}
-
-/* the extra filters: the filters that do not fit the row at 1280 sit in a popover under the
-   button, which shows at every width when a list has them; the popover floats over the table */
-.directory-filters > .more-toggle.more-wide {
-  display: inline-flex;
-}
-
-/* one width for "More filters" and "More filters (2)": Clear filters stays put */
-@media screen and (min-width: 48em) {
-  .directory-filters > .more-toggle.more-wide {
-    min-width: 8rem;
-  }
-}
-
-/* one filter per line, its name at the left (ExtraField): the popover is as wide as its widest
-   line, never the width of the table */
-.directory-extra {
-  display: grid;
-  grid-template-columns: max-content minmax(0, 1fr);
-  align-items: center;
-  gap: 0.5rem 0.75rem;
-  max-width: calc(100vw - 2rem);
-}
-
-.extra-field {
-  display: contents;
-}
-
-.range-filter {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-
-.range-filter .directory-number {
-  flex: 1 1 0;
-  min-width: 0;
-}
-
-/* the unit keeps the room of the longest one ("bar", "psi", "gr"), so a unit change moves nothing */
-.range-unit {
-  min-width: 1.75rem;
-  color: var(--muted);
-  font-size: var(--mantine-font-size-xs);
-}
-
-/* the caliber option: its count at the left, the diameter at the right */
-.caliber-option {
-  display: flex;
-  gap: 1rem;
-  justify-content: space-between;
-  width: 100%;
-  white-space: nowrap;
-}
-
-.caliber-diameter {
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
 }
 
 /* the cartridge record's and the burn-rate page's panel titles: the names of the things shown, not captions */

@@ -44,24 +44,17 @@ it('lists a discipline with its federation, distance in m, category, caliber cla
   })
 })
 
-it('filters by federation, category, distance and caliber class, and keeps them in the URL', () => {
+it('scopes by federation, searches the rest and keeps the federation in the URL', () => {
   const ids = (over: object) =>
     rows.filter((r) => disciplineMatches(r, { ...emptyDirectory, ...over })).map((r) => r.id)
   expect(ids({})).toHaveLength(records.length)
   const dsb = records.filter((d) => d.federation === 'dsb').map((d) => d.id)
   expect(ids({ organization: 'DSB' })).toEqual(dsb)
-  expect(ids({ organization: 'DSB', distance: '25', caliberClass: 'revolver-44' })).toContain(
-    pistol.id,
-  )
-  expect(ids({ distance: '50', caliberClass: 'revolver-44' })).not.toContain(pistol.id)
-  expect(ids({ category: 'air-rifle' })).toEqual(
-    records.filter((d) => d.category === 'air-rifle').map((d) => d.id),
-  )
   expect(ids({ query: '.44 revolver' })).toContain(pistol.id)
   expect(ids({ query: '2.53' })).toEqual([pistol.id])
-  const state = { ...emptyDirectory, category: 'rifle', distance: '300', caliberClass: 'rifle-6mm' }
+  const state = { ...emptyDirectory, organization: 'DSB' }
   const url = writeDirectory(state, '')
-  expect(url).toBe('?cat=rifle&dist=300&class=rifle-6mm')
+  expect(url).toBe('?org=DSB')
   expect(readDirectory(url)).toMatchObject(state)
 })
 

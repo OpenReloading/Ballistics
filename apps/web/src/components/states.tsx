@@ -149,8 +149,7 @@ export function ListLoading({ what }: { what: string }) {
       {/* the metrics of the real filter row (DirectoryFilters), so the frame stays where it is */}
       <Group className="directory-filters" gap="xs" py="xs" aria-hidden="true">
         <Skeleton height={30} className="directory-search" />
-        <Skeleton height={30} />
-        <Skeleton height={30} />
+        <Skeleton height={30} width="7.5rem" />
       </Group>
       <div className="directory-scroll page-panel page-panel-flush" aria-hidden="true">
         <div className="list-skeleton-head" />
@@ -166,8 +165,8 @@ export function ListLoading({ what }: { what: string }) {
 }
 
 /**
- * What a filtered list shows when nothing matches. `filters` names the filters set; Clear filters
- * with `onClear`, for a list without its own in the filter row.
+ * What a searched list shows when nothing matches. `filters` names the search and the choices set;
+ * Clear filters with `onClear` resets them.
  */
 export function EmptyList({
   noun,
