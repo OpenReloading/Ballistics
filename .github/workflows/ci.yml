@@ -79,7 +79,9 @@ jobs:
       - run: npm run docs:check
       - run: npm run data:validate
       # `npm run api:check` in the dev container; the same oasdiff version as .devcontainer/Dockerfile
-      - run: node tools/src/openapi.ts "$RUNNER_TEMP/openapi.json"
+      - run: node tools/src/openapi.ts
+        env:
+          TMPDIR: ${{ runner.temp }}
       - name: Breaking changes of the API document (oasdiff)
         run: docker run --rm -v "$PWD:/repo:ro" -v "$RUNNER_TEMP:/doc:ro" -w /repo "$OASDIFF_IMAGE" breaking packages/api/openapi.baseline.json /doc/openapi.json --fail-on ERR
       - run: node tools/src/audit.ts
@@ -206,7 +208,7 @@ jobs:
       - name: API conformance to its document (Schemathesis)
         run: |
           npm run build -w @open-reloading/data -w @open-reloading/api
-          node tools/src/openapi.ts "$RUNNER_TEMP/openapi.json"
+          TMPDIR="$RUNNER_TEMP" node tools/src/openapi.ts
           docker run --rm --network=host -v "$RUNNER_TEMP:/doc:ro" "$SCHEMATHESIS_IMAGE" \
             run /doc/openapi.json --url http://localhost:3000 --checks not_a_server_error,status_code_conformance,content_type_conformance,response_schema_conformance
       - run: npm run test:e2e

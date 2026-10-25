@@ -16,7 +16,6 @@ import { Certificate, Crosshair, Cylinder, Gauge } from '@phosphor-icons/react'
 import {
   type CSSProperties,
   createContext,
-  type KeyboardEvent,
   type ReactNode,
   useContext,
   useEffect,
@@ -38,7 +37,7 @@ import { controlSize, tipEvents } from '../lib/theme.ts'
 import { drawingLengthUnit, formatNumber, type UnitSystem } from '../lib/units.ts'
 import { Countries } from './countries.tsx'
 import { Fact, FactCard, FactCards, Label, Sized, slotUnits } from './fact-cards.tsx'
-import { arrowStops, Noted } from './field-table.tsx'
+import { arrowStops, Noted, SymbolStop } from './field-table.tsx'
 import { Panel } from './panel.tsx'
 import { ScrollRegion } from './scroll-region.tsx'
 import { LengthOverride, useUnits } from './units-settings.tsx'
@@ -228,14 +227,9 @@ export function RecordScope({
           onKeyDownCapture={(e) => {
             if (e.key === 'Escape' && pinned.current) pin(pinned.current)
           }}
-          onKeyDown={(e: KeyboardEvent) => {
+          // Enter and Space on a symbol click it
+          onKeyDown={() => {
             touch.current = false
-            const link = linkAt(e.target)
-            if (!link || (e.key !== 'Enter' && e.key !== ' ')) return
-            // the symbol in its row, not a field or a button
-            if (!(e.target instanceof Element) || !e.target.matches('tr [tabindex]')) return
-            e.preventDefault()
-            pin(link)
           }}
         >
           {children}
@@ -433,8 +427,7 @@ function SideRow({
         {hint.length > 0 ? (
           <Noted value={r.symbol} notes={hint} inline tabIndex={tabIndex} />
         ) : (
-          // the keyboard path of the linked hover
-          <span tabIndex={tabIndex}>{r.symbol}</span>
+          <SymbolStop tabIndex={tabIndex}>{r.symbol}</SymbolStop>
         )}
       </TableTh>
       <TableTd className="num">

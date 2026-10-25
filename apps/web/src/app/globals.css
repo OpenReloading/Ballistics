@@ -2240,6 +2240,11 @@ td.nowrap {
   border: 0;
 }
 
+/* the chart's keyboard stop is hidden: its focus shows on the chart */
+.echart:has(> .echart-keys:focus-visible) > [role="img"] {
+  outline: 3px solid var(--focus);
+}
+
 /* visually hidden like .visually-hidden (without its margin, border and padding); each selector keeps
    its own specificity */
 /* the field's name and description are for screen readers: the row and column headers show them */
@@ -6718,12 +6723,17 @@ main .field-table tr.field-group > th {
 }
 
 /* a value with notes (as printed, method): dotted, its notes on hover, focus and touch */
-.field-note {
+.field-note,
+.symbol-stop {
   padding: 0;
   border: 0;
   background: none;
   color: inherit;
   font: inherit;
+  text-align: inherit;
+}
+
+.field-note {
   cursor: help;
   text-decoration: underline dotted var(--muted);
   text-underline-offset: 0.2em;
