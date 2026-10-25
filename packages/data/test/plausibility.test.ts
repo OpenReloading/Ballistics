@@ -145,7 +145,8 @@ describe('checkBullet', () => {
 describe('checkCapacity', () => {
   const capacity = (value: number): CaseCapacity => ({
     id: 'test-capacity',
-    cartridge: 'test',
+    origin: 'catalogue',
+    cartridge: 'catalogue:test',
     waterCapacity: { value },
     provenance: { kind: 'published', sources: [{ title: 'Test' }] },
   })

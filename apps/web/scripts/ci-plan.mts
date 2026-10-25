@@ -66,8 +66,12 @@ const recordRoutes = [
   'federations',
 ].map((r) => `apps/web/src/app/${r}/[id]`)
 
-const importRe = /(?:\bfrom|\bimport)\s*\(?\s*['"]([^'"]+)['"]/g
+const importRe = /(?:\bfrom|\bimport)\s*(?:\(\s*)?['"]([^'"]+)['"]/g
 const extensions = ['', '.ts', '.tsx', '.mts', '.js', '.css']
+
+/** The module specifiers of a source file: `from '...'`, `import '...'` and `import('...')`. */
+export const importSpecifiers = (source: string) =>
+  [...source.matchAll(importRe)].map(([, spec = '']) => spec)
 
 /** The repo-relative files `recordRoutes` import, directly or not, and the workspace packages among them. */
 export function recordClosure(root = repoRoot) {
@@ -85,7 +89,7 @@ export function recordClosure(root = repoRoot) {
   for (let file = queue.pop(); file !== undefined; file = queue.pop()) {
     if (!/\.(ts|tsx|mts|js)$/.test(file)) continue
     const source = readFileSync(path.join(root, file), 'utf8')
-    for (const [, spec = ''] of source.matchAll(importRe)) {
+    for (const spec of importSpecifiers(source)) {
       const pkg = /^@open-reloading\/([^/]+)/.exec(spec)
       if (pkg?.[1]) packages.add(pkg[1])
       const target = spec.startsWith('@/')
@@ -154,8 +158,12 @@ export function plan(all: string[], closure = recordClosure()): Plan {
     : { ...everything('no changed file feeds the record pages'), prerender: 'sample' }
 }
 
+/** git by an absolute path of a system directory, never through `PATH`. */
+const gitPath = ['/usr/bin', '/usr/local/bin', '/bin'].map((d) => `${d}/git`).find(existsSync)
+
 function git(...args: string[]) {
-  return execFileSync('git', args, {
+  if (gitPath === undefined) throw new Error('git not found in the system directories')
+  return execFileSync(gitPath, args, {
     cwd: repoRoot,
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],

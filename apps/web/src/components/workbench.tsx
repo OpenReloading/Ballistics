@@ -125,6 +125,7 @@ export function Workbench() {
     opened,
     outcome,
     measuredWaterCapacity,
+    storeLoad,
     pending,
     pmax,
     powder,
@@ -739,6 +740,7 @@ export function Workbench() {
           {/* biome-ignore lint/a11y/noStaticElementInteractions: catches Ctrl+Enter from any control of the bar and the workspace */}
           <div
             className="page-frame"
+            role="presentation"
             onKeyDown={(e) => {
               if (e.key !== 'Enter' || e.defaultPrevented) return
               const inField =
@@ -820,6 +822,7 @@ export function Workbench() {
                         name={load.name}
                         nameKey={load.customName?.trim() ? load.customName : ''}
                         data={fileData}
+                        store={storeLoad}
                         onOpen={onOpenFile}
                         onStored={stored}
                         onExported={reminder.exported}

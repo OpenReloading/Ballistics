@@ -33,7 +33,7 @@ describe('catalogue renames', () => {
         ...bundle,
         renames,
         powders: bundle.powders.map((p) => ({ ...p, manufacturer: 'old-a' })),
-        capacities: bundle.capacities.map((c) => ({ ...c, cartridge: 'old-alpha' })),
+        capacities: bundle.capacities.map((c) => ({ ...c, cartridge: 'catalogue:old-alpha' })),
       }),
     )
     expect(catalogue.capacities('alpha-rifle').map((c) => c.id)).toEqual(['alpha-rifle-test'])

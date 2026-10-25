@@ -7,6 +7,7 @@ import {
   type Discipline,
   type DisciplineKey,
   type Manufacturer,
+  parseRef,
   type RenameKind,
 } from '@open-reloading/schema'
 import {
@@ -82,7 +83,7 @@ export function buildCatalogue(source: CatalogueSource): CatalogueData & { recor
   }
   const capacities = new Map<string, string[]>()
   for (const c of source.capacities.toSorted((a, b) => compareKeys(a.id, b.id))) {
-    const cartridge = now('cartridges', c.cartridge)
+    const cartridge = now('cartridges', parseRef(c.cartridge)?.id ?? c.cartridge)
     capacities.set(cartridge, [...(capacities.get(cartridge) ?? []), c.id])
   }
 
@@ -146,7 +147,7 @@ export function buildCatalogue(source: CatalogueSource): CatalogueData & { recor
       manufacturer: byId(source.manufacturers),
       powder: byId(source.powders),
       bullet: byId(source.bullets),
-      caseCapacity: byId(source.capacities),
+      caseCapacity: byId(source.capacities.map(({ origin, ...rest }) => rest)),
       targetFace: byId(source.targetFaces),
       federation: byId(source.federations),
       discipline: byId(source.disciplines),

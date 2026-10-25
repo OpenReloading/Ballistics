@@ -9,11 +9,13 @@ import {
   type Load,
   ladderStepKinds,
   toSi,
+  type UserRecord,
+  userRecord,
 } from '@open-reloading/schema'
 import { storedOf } from './firearm.ts'
 import { type MeasuredSeries, seriesFromLoad, seriesToLoad } from './measurements.ts'
 import type { LadderDirection, RunnableLadderKind } from './seating-ladder.ts'
-import { waterGrams, waterVolume } from './units.ts'
+import { waterGrams } from './units.ts'
 
 /** The workbench fields a load may override, by key; `charge` is the load's own. */
 export const overrideKeys = Object.keys(analysisKinds) as AnalysisKey[]
@@ -64,6 +66,70 @@ export function givenKeys(values: Record<string, number | undefined>, g: Givers)
   return given
 }
 
+/** The grams of a measured capacity as the schema stores it, rounded like every stored value. */
+const gramsOf = (m3: number) => Number(waterGrams(m3).toPrecision(12))
+
+/**
+ * The id of the user capacity record that holds the measured capacity `m3` (water to the mouth,
+ * m3) of `cartridge` (a reference): a version 8 UUID derived from both, so the same measurement
+ * is one record and a changed value is a record of its own, which a load saved earlier keeps.
+ */
+export function measuredCapacityId(cartridge: string, m3: number): string {
+  let [a, b, c, d] = [1779033703, 3144134277, 1013904242, 2773480762]
+  for (const ch of `${cartridge}|${gramsOf(m3)}`) {
+    const k = ch.codePointAt(0) ?? 0
+    a = b ^ Math.imul(a ^ k, 597399067)
+    b = c ^ Math.imul(b ^ k, 2869860233)
+    c = d ^ Math.imul(c ^ k, 951274213)
+    d = a ^ Math.imul(d ^ k, 2716044179)
+  }
+  const hex = [a, b, c, d]
+    .map((w) => (Math.imul(w ^ (w >>> 15), 2246822507) >>> 0).toString(16).padStart(8, '0'))
+    .join('')
+  const variant = ((Number.parseInt(hex[16] ?? '0', 16) & 3) | 8).toString(16)
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-8${hex.slice(13, 16)}-${variant}${hex.slice(17, 20)}-${hex.slice(20, 32)}`
+}
+
+/** The reference a load keeps for the measured capacity `m3` of `cartridge`. */
+export const measuredCapacityRef = (cartridge: string, m3: number) =>
+  `user:${measuredCapacityId(cartridge, m3)}`
+
+/**
+ * The water capacity (g) of the stored record `raw` when it is a case capacity of `cartridge`
+ * (a reference), else undefined: a record of another cartridge is no capacity of this load.
+ */
+export function capacityOfRecord(raw: unknown, cartridge: string): number | undefined {
+  const r = userRecord.safeParse(raw)
+  return r.success && r.data.kind === 'caseCapacity' && r.data.data.cartridge === cartridge
+    ? r.data.data.waterCapacity.value
+    : undefined
+}
+
+/**
+ * The case capacity reference a load saves: the measured capacity's record, else the reference
+ * asked for and not loaded, else the catalogue capacity chosen. A choice clears the request
+ * (`got`), so it never stays behind a dangling `user:` reference.
+ */
+export function savedCapacityRef(
+  measured: string | undefined,
+  asked: string | undefined,
+  chosen: string | undefined,
+): string | undefined {
+  return measured ?? asked ?? chosen
+}
+
+/** The user record of the measured capacity `m3` of `cartridge`, stored when the load is saved. */
+export function capacityRecord(cartridge: string, m3: number, now: Date): UserRecord {
+  const value = gramsOf(m3)
+  return {
+    kind: 'caseCapacity',
+    id: measuredCapacityId(cartridge, m3),
+    name: `Measured case capacity ${value} g water`,
+    saved: now.toISOString(),
+    data: { origin: 'user', cartridge, waterCapacity: { value } },
+  }
+}
+
 /** What the workbench holds of a load, SI. */
 export interface LoadParts {
   /** The value of each field; the solver values of `given` stay out of the load. */
@@ -74,8 +140,8 @@ export interface LoadParts {
   bullet?: string
   powder?: string
   notes: string
-  /** m3. */
-  waterCapacity?: number
+  /** The case capacity: a catalogue capacity, or the user record of the measured one. */
+  capacity?: string
   /** m. */
   seating?: { by: 'overallLength' | 'baseToOgive'; value: number }
   ladder?: {
@@ -106,10 +172,7 @@ export function toLoad(p: LoadParts): Load {
     powder: p.powder,
     // a charge of 0 or less stays out: the schema would reject the load
     charge: charge !== undefined && charge > 0 ? storedOf('mass', charge) : undefined,
-    case:
-      p.waterCapacity === undefined
-        ? undefined
-        : { waterCapacity: { value: Number(waterGrams(p.waterCapacity).toPrecision(12)) } },
+    capacity: p.capacity,
     seating: p.seating && { by: p.seating.by, value: storedOf('length', p.seating.value) },
     note: p.notes || undefined,
     analysis:
@@ -163,8 +226,6 @@ export function fromLoad(load: Load): OpenedLoad {
     query.set('ladderDirection', ladder.direction)
     if (ladder.kind) query.set('ladderKind', ladder.kind)
   }
-  if (load.case?.waterCapacity)
-    query.set('measuredWaterCapacity', String(waterVolume(load.case.waterCapacity.value)))
   if (load.seating) query.set(load.seating.by, String(toSi('length', load.seating.value.value)))
   return { query, typed, measurements: (load.measurements ?? []).map(seriesFromLoad) }
 }

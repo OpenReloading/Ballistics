@@ -140,6 +140,12 @@ export function reportFields(r: Report, notes: string[] = []): ReportFields {
   }
 }
 
+const withoutTrailingSlashes = (text: string) => {
+  let end = text.length
+  while (end > 0 && text[end - 1] === '/') end--
+  return text.slice(0, end)
+}
+
 /** The new-issue link of the form with title, dropdowns and text fields, under `maxReportChars`. */
 export function reportUrl(repository: string, r: Report): string {
   // encodeURIComponent throws on a lone surrogate in pasted text (toWellFormed is not in Firefox 111)
@@ -154,7 +160,7 @@ export function reportUrl(repository: string, r: Report): string {
     })
       .map(([k, v]) => `${k}=${encodeURIComponent(wellFormed(v))}`)
       .join('&')
-    return `${repository.replace(/\/+$/, '')}/issues/new?${query}`
+    return `${withoutTrailingSlashes(repository)}/issues/new?${query}`
   }
   // the blocks go first, last ticked first, then the text is cut
   const notes: string[] = []

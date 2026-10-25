@@ -1,6 +1,12 @@
 /** The fields of API responses the pages read (`packages/api/src/catalogue/`, `packages/api/src/compute/`, `packages/api/src/routes/`). */
 import type { InteriorResult } from '@open-reloading/core'
-import type { Cartridge, CaseCapacity, CaseType, Powder, Provenance } from '@open-reloading/schema'
+import type {
+  Cartridge,
+  CaseType,
+  CatalogueCaseCapacity,
+  Powder,
+  Provenance,
+} from '@open-reloading/schema'
 
 export interface CartridgeSummary {
   id: string
@@ -30,7 +36,7 @@ export interface CartridgeSummary {
 export interface CartridgeDetail extends Omit<Cartridge, 'aliases'> {
   aliases?: string[]
   caseType?: CaseType
-  capacities: CaseCapacity[]
+  capacities: CatalogueCaseCapacity[]
 }
 
 /** A manufacturer as `GET /manufacturers` lists it. */

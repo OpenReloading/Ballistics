@@ -60,7 +60,16 @@ import {
   suggestDefaults,
 } from '../lib/input-defaults.ts'
 import { burnFormError, interiorBody, interiorFields } from '../lib/interior-input.ts'
-import { fromLoad, givenKeys, type LoadParts, toLoad } from '../lib/load-record.ts'
+import {
+  capacityOfRecord,
+  capacityRecord,
+  fromLoad,
+  givenKeys,
+  type LoadParts,
+  measuredCapacityRef,
+  savedCapacityRef,
+  toLoad,
+} from '../lib/load-record.ts'
 import { generatedName, loadName } from '../lib/load-tabs.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import { type IdentifiedSeries, seriesId } from '../lib/measurements.ts'
@@ -85,8 +94,14 @@ import {
   temperatureLadder,
   temperatureLadderBlockReason,
 } from '../lib/seating-ladder.ts'
-import { exactFieldText, fixedFieldText, formatQuantity, withUnit } from '../lib/units.ts'
-import { storedRecord, storedRecords } from '../lib/user-store.ts'
+import {
+  exactFieldText,
+  fixedFieldText,
+  formatQuantity,
+  waterVolume,
+  withUnit,
+} from '../lib/units.ts'
+import { putRecords, storedRecord, storedRecords } from '../lib/user-store.ts'
 import {
   catalogueIdOf,
   catalogueRef,
@@ -491,6 +506,10 @@ export function useWorkbenchState() {
   /** The measured case capacity typed in the Cartridge card, kept for the cartridge it was typed for. */
   const [measured, setMeasured] = useState<Fields>({ measuredWaterCapacity: emptyStep })
   const [measuredFor, setMeasuredFor] = useState<string>()
+  /** The catalogue capacity record the user chose in the Cartridge card, kept for the cartridge it belongs to. */
+  const [capacityChoice, setCapacityChoice] = useState<{ cartridge: string; id: string }>()
+  /** The user capacity reference of the load being opened: a slower read than a newer open leaves alone. */
+  const openingCapacity = useRef<string>(undefined)
   /** The Gun and barrel card's gun weight (free recoil only); the load's typed values and links carry it. */
   const [gunFields, setGunFields] = useState<Fields>({ firearmMass: emptyStep })
   const gunWeight = gunFields.firearmMass
@@ -671,7 +690,7 @@ export function useWorkbenchState() {
     return controller.signal
   }
 
-  type Kind = 'cartridge' | 'bullet' | 'powder'
+  type Kind = 'cartridge' | 'bullet' | 'powder' | 'capacity'
   /**
    * Record ids asked for and not loaded yet, or not reachable (`failed`): the load keeps them, so
    * a Save never drops an id only because its record could not be fetched.
@@ -736,6 +755,8 @@ export function useWorkbenchState() {
     setPreviewed({})
     setMeasured({ measuredWaterCapacity: emptyStep })
     setMeasuredFor(undefined)
+    setCapacityChoice(undefined)
+    openingCapacity.current = undefined
     setGunFields({ firearmMass: emptyStep })
     gunFromFirearm.current = false
     gunPending.current = false
@@ -1542,6 +1563,60 @@ export function useWorkbenchState() {
   }
 
   /**
+   * The case capacity `ref` of an opened load for the cartridge reference `forCartridge`: a
+   * catalogue record is chosen in the figure, a user record of that cartridge is the measured
+   * capacity and fills its field. A user record the store does not answer, or one of another
+   * cartridge, stays in the load as asked.
+   */
+  function openCapacity(ref: string, forCartridge: string | undefined) {
+    const target = parseRef(ref)
+    if (!target) return
+    const cartridgeId = forCartridge && parseRef(forCartridge)?.id
+    if (!cartridgeId) {
+      // no cartridge to apply it to: the request stays in the load
+      want('capacity', ref)
+      return lost('capacity', ref)
+    }
+    if (target.scope === 'catalogue')
+      return setCapacityChoice({ cartridge: cartridgeId, id: target.id })
+    openingCapacity.current = ref
+    want('capacity', ref)
+    storedRecord(target.id)
+      .then((raw) => {
+        if (openingCapacity.current !== ref) return
+        const grams = capacityOfRecord(raw, forCartridge)
+        if (grams === undefined) return lost('capacity', ref)
+        const si = waterVolume(grams)
+        setMeasured({
+          measuredWaterCapacity: { text: fixedFieldText('capacity', unitsNow.current, si), si },
+        })
+        setMeasuredFor(cartridgeId)
+        got('capacity')
+      })
+      .catch(() => {
+        if (openingCapacity.current === ref) lost('capacity', ref)
+      })
+  }
+
+  /** A capacity chosen in the figure replaces the one the opened load still asks for. */
+  function chooseCapacity(choice: { cartridge: string; id: string }) {
+    openingCapacity.current = undefined
+    got('capacity')
+    setCapacityChoice(choice)
+  }
+
+  /**
+   * A measured capacity typed in the field replaces the one the opened load still asks for; while
+   * the text is not a number yet the request stays in the load as not loaded.
+   */
+  function typeMeasured(value: FieldValue) {
+    openingCapacity.current = undefined
+    if (value.si !== undefined || value.text.trim() === '') got('capacity')
+    else setAsked((a) => (a.capacity ? { ...a, capacity: { id: a.capacity.id, failed: true } } : a))
+    setMeasured({ measuredWaterCapacity: value })
+  }
+
+  /**
    * An opened load: the form from its typed values, the records it names from their own. A value
    * the load does not carry follows the Settings, the records, the gun and the seating.
    */
@@ -1563,8 +1638,8 @@ export function useWorkbenchState() {
       d.cartridge && parseRef(d.cartridge)?.scope === 'user' ? d.cartridge : undefined
     if (userCartridge) {
       openCartridgeDesign(userCartridge)
-      if (d.case?.waterCapacity) setMeasuredFor(parseRef(userCartridge)?.id)
     }
+    if (d.capacity) openCapacity(d.capacity, d.cartridge)
     const fillMass = !typed.has('bulletMass')
     const bulletRef = typeof d.bullet === 'string' ? d.bullet : undefined
     const bulletId = bulletRef && catalogueIdOf(bulletRef)
@@ -1592,14 +1667,17 @@ export function useWorkbenchState() {
   const seating: Seating =
     previewInitial?.seating || moved ? (seatedNow ?? previewInitial?.seating) : undefined
   // the cartridge asked for counts while its record loads or stays offline, as in `cartridge` below
+  const cartridgeKey =
+    cartridge?.id ??
+    cartridgeDesign?.id ??
+    parseRef(asked.cartridge?.id ?? '')?.id ??
+    asked.cartridge?.id
   const measuredWaterCapacity =
-    measuredFor ===
-      (cartridge?.id ??
-        cartridgeDesign?.id ??
-        parseRef(asked.cartridge?.id ?? '')?.id ??
-        asked.cartridge?.id) && (measured.measuredWaterCapacity.si ?? 0) > 0
+    measuredFor === cartridgeKey && (measured.measuredWaterCapacity.si ?? 0) > 0
       ? measured.measuredWaterCapacity.si
       : undefined
+  const chosenCapacity =
+    capacityChoice && capacityChoice.cartridge === cartridgeKey ? capacityChoice.id : undefined
 
   const activeStep =
     ladderKind === 'seating'
@@ -1625,7 +1703,7 @@ export function useWorkbenchState() {
     setCustomName(name)
   }, [])
   const onStored = useCallback(() => setStoredTick((n) => n + 1), [])
-  const unresolved = (['cartridge', 'bullet', 'powder'] as const).flatMap((k) =>
+  const unresolved = (['cartridge', 'bullet', 'powder', 'capacity'] as const).flatMap((k) =>
     asked[k]?.failed ? [`${k} ${asked[k].id}`] : [],
   )
 
@@ -1746,15 +1824,36 @@ export function useWorkbenchState() {
           1e-9 * seated.barrel),
     gunMass: gunFromFirearm.current && !!firearmRef,
   })
+  const cartridgeRef = savedRef(asked.cartridge?.id, cartridgeDesign?.id, cartridge?.id)
+  // the measured capacity is a user record of its own, stored with the load (`storeLoad`); a
+  // reference asked for and not loaded stays until a capacity is typed or chosen
+  const measuredCapacity =
+    measuredWaterCapacity !== undefined && cartridgeRef
+      ? { cartridge: cartridgeRef, m3: measuredWaterCapacity }
+      : undefined
+  const capacityRef = savedCapacityRef(
+    measuredCapacity && measuredCapacityRef(measuredCapacity.cartridge, measuredCapacity.m3),
+    asked.capacity?.id,
+    chosenCapacity && catalogueRef(chosenCapacity),
+  )
+  /** Save's browser copy: the load with the capacity record it names. */
+  const storeLoad = useCallback(
+    async (record: UserRecord) => {
+      const c = measuredCapacity
+      await putRecords(c ? [capacityRecord(c.cartridge, c.m3, new Date()), record] : [record])
+      return true
+    },
+    [measuredCapacity],
+  )
   const loadFile = toLoad({
     values: fieldValues,
     given,
-    cartridge: savedRef(asked.cartridge?.id, cartridgeDesign?.id, cartridge?.id),
+    cartridge: cartridgeRef,
     firearm: firearmRef || undefined,
     bullet: savedRef(asked.bullet?.id, bulletDesign?.id, bullet?.id),
     powder: powderId && catalogueRef(powderId),
     notes,
-    waterCapacity: measuredWaterCapacity,
+    capacity: capacityRef,
     seating,
     ladder:
       ladderSteps > 1
@@ -1996,6 +2095,9 @@ export function useWorkbenchState() {
     origin,
     outcome,
     measuredWaterCapacity,
+    capacityId: chosenCapacity,
+    setCapacityChoice: chooseCapacity,
+    storeLoad,
     pending,
     powder,
     previewInitial,
@@ -2034,6 +2136,7 @@ export function useWorkbenchState() {
     temperatureBlock,
     setLadderSteps,
     setMeasured,
+    typeMeasured,
     setMeasuredFor,
     setModelShown,
     setMore,

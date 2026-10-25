@@ -342,6 +342,13 @@ describe('share links', () => {
     expect(await readLink(new URL(link).hash)).toEqual({ ok: true, records: [bullet] })
   })
 
+  it('replaces the fragment of the page and writes the padding-free URL alphabet', async () => {
+    for (const page of [`${base}#old`, `${base}#a#b`, `${base}#`]) {
+      const link = (await shareLink(bullet, page)) as string
+      expect(link).toMatch(/^https:\/\/example\.org\/bullets\/designer#record=[\w-]+$/)
+    }
+  })
+
   it('refuses a record whose link is longer than the limit', async () => {
     // random text does not compress
     const noise = Array.from({ length: 12000 }, () => Math.random().toString(36)[2]).join('')

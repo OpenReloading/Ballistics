@@ -134,6 +134,18 @@ describe('shownWarnings', () => {
     expect(other).toEqual({ text: 'Other warning.', name: undefined })
   })
 
+  it('converts every bar value of a message and leaves other words alone', () => {
+    const warned = (message: string) =>
+      ({
+        ...body(4000e5, 3600e5, 4400e5),
+        warnings: [{ code: 'test', message }],
+      }) as unknown as InteriorResponse
+    const [us] = shownWarnings(warned('1.5 bar and 25 bar, 3 barrel'), presetUnits('us'))
+    expect(us.text).toBe('22 psi and 363 psi, 3 barrel')
+    const [metric] = shownWarnings(warned('1.5 bar and 25 bar'), presetUnits('metric-grains'))
+    expect(metric.text).toBe('1.5 bar and 25 bar')
+  })
+
   it('keeps bar with the record decimals and names a range above the limit', () => {
     const [line, small] = shownWarnings(body(4000e5, 3600e5, 4400e5), presetUnits('metric-grains'))
     expect(line).toEqual({

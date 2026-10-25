@@ -17,7 +17,7 @@ Writers: catalogue (git records, checked by `readRecords`), user (browser, `pack
 | Cartridge | `cartridge.ts` | `records/cartridges` | catalogue, generated from the C.I.P. sheets |
 | Bullet | `bullet.ts` | `records/bullets` | catalogue |
 | Powder | `powder.ts` | `records/powders` | catalogue |
-| Case capacity | `case-capacity.ts` | `records/capacities`, embedded in `GET /cartridges/:id` | catalogue |
+| Case capacity | `case-capacity.ts` | `records/capacities`, embedded in `GET /cartridges/:id`; user record `caseCapacity` (step 8) | catalogue, user |
 | Load | `load.ts` | `records/loads` (empty), bundle only: no route or web reader | catalogue |
 | Chronograph session | `chrono-session.ts` | `records/chrono` (empty), bundle only | catalogue, importers |
 | Firing series, range firings | `firing.ts`, `range.ts` | no folder, bundle only | catalogue |
@@ -47,7 +47,7 @@ Ranked by how much code and visible behavior depends on them.
 
 **Measured series and chronograph session (medium).** Both hold the same `chronoShot`. `apps/web/src/lib/measurements.ts` reshapes a session into a series and drops device kind, firmware, conditions, propellant temperature and provenance. A string in a ladder varies charge, seating depth or temperature while `shotString.load` has no place for the variation. `groupShot.chrono.session` in `target-sheet.ts` names a session that no user record kind holds.
 
-**Case capacity (medium).** The record (g), `Load.case.waterCapacity` (g) and `workbenchState.measuredWaterCapacity` (m³) describe one measurement.
+**Case capacity (medium).** The record (g), `Load.case.waterCapacity` (g) and `workbenchState.measuredWaterCapacity` (m³) described one measurement. Step 8 leaves one entity in g, which a load references.
 
 **Manufacturer (medium).** Catalogue records name a manufacturer by id; loads, sessions, firearms and designs carried free text, merged for display by `productLabel` in `apps/web/src/lib/manufacturers.ts`. Step 9 replaced the text of sessions, firearms and designs by references. `targetFace.federation` and the events' `federation` name a federation by id.
 
@@ -153,7 +153,7 @@ Each step lands alone with its model page updated in the same commit. Steps 4 to
 | 5 | Firearm in one shape (done, below) | 2 |
 | 6 | Load unification: the workbench state becomes Load (done, below) | 2 to 5 |
 | 7 | Session unification | 3, 6 |
-| 8 | CaseCapacity references | 6 |
+| 8 | CaseCapacity references (done, below) | 6 |
 | 9 | Manufacturer references (done, below) | 3 |
 | 10 | Replaced by the catalogue storage steps D0 to D6 (`catalogue-storage.md`) | |
 | 11 | Browser store hardening: versioned IndexedDB, keep and list invalid records | before 3 and 4 |
@@ -208,6 +208,13 @@ Steps 1, 2 and 11 go first, then 3, then 4 to 6, then 7 to 9. Steps 10 and 12 fi
 - The workbench saves a key under `overrides` only when the user typed it (`givenKeys` in `apps/web/src/lib/load-record.ts`). A value is left out when a reference gives it again on opening: the powder record's model parameters, the bullet record's or design's mass, a followed default of volume, bore diameter, bore area and twist, the seating's volume and travel (while the barrel length is the default one), the Settings defaults and the mass and twist of a referenced firearm. Opening fills the form like a link (the Settings defaults and the followed defaults for the keys the load leaves out), then the records fill the rest, and the typed values stay.
 - A load follows a changed record or changed Settings for every value the user did not type. A value whose source a reference cannot name is saved as typed: a design or firearm whose id is no UUID. The built-in example rifle has a fixed UUID so that the example load keeps it.
 - `POST /v1/interior/load-file` fills the values a load leaves out from the catalogue records it references: the charge, the powder's model parameters, the bullet's mass and the cartridge's bore area. A value no record gives (volume, travel, twist, bore diameter without a cartridge record) is a 400 at `records[i].data.analysis.overrides.<key>`.
+
+### Step 8: what changed
+
+- `caseCapacity` (`packages/schema/src/case-capacity.ts`) is the one capacity entity: the catalogue record (`records/capacities`, read through `catalogueCaseCapacity`, which needs `id`, `provenance` and catalogue references only) and the user record of kind `caseCapacity`, the water always in g (`waterCapacity`). It carries `origin`; `cartridge` and `caseManufacturer` are references (`catalogue:` or `user:`). The catalogue's record file leaves `origin` out like every kind, `GET /cartridges/:id` answers it with the capacity. A catalogue capacity of the earlier format (plain `cartridge` id, no `origin`) is rejected: no migration. A test (`packages/schema/test/case-capacity-unit.test.ts`) fails when another entity holds a water mass or when the unit is not g.
+- `Load.capacity` is a reference to a capacity, `catalogue:<id>` or `user:<UUID>`, and replaces `Load.case.waterCapacity`. A catalogue load names a catalogue capacity, `data:validate` checks that it exists (`checkLoadCapacityReferences`). `Load.case` is a strict object (maker, lot, `firingCount`), so a load or file with `case.waterCapacity` fails the schema in Open, Import, the stored-record list and the load file route (400 at the key's path). `checkUserRefs` reports a load's `user:` capacity and a capacity's `user:` cartridge or manufacturer that no record answers.
+- The workbench keeps its two inputs: the capacity record chosen in the Cartridge card and the measured capacity (water to the mouth, replaces the record's value, the flags and notes of the run are unchanged). A load saved with a typed measured capacity names a user capacity record: its id is a version 8 UUID derived from the cartridge reference and the value in g (`measuredCapacityId` in `apps/web/src/lib/load-record.ts`), so one measurement is one record and a changed value another one, which a load saved earlier keeps. Save writes that record to the browser together with the load (`storeLoad`, the File menu's `store`); opening the load reads it back into the field. A record the browser does not answer stays in the load as asked and is listed as not loaded. A capacity record the user chose from the cartridge's catalogue capacities is saved as `catalogue:<id>` (only when chosen, the first one shown by default is followed). The link parameter `measuredWaterCapacity` is unchanged (m³).
+- Limits: a load file or a copied JSON carries the load, not the capacity record, so in another browser the measured value is reported as missing (the same limit as a user cartridge or bullet design); share links never carried it. The load file route names no solver value from a capacity (the volume is a typed override).
 
 ### Step 12: what changed
 

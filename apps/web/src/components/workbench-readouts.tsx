@@ -620,6 +620,7 @@ export function LadderStrip({
           ref={cells}
           role="radiogroup"
           aria-label="Ladder steps"
+          tabIndex={-1}
           className="ladder-cells"
           onKeyDown={(e) => {
             if (e.key !== 'Home' && e.key !== 'End') return

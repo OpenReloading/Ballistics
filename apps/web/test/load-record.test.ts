@@ -1,15 +1,28 @@
 import { workbenchValueKeys } from '@open-reloading/core'
-import { ladderStepKinds, load as loadSchema } from '@open-reloading/schema'
+import {
+  checkUserRefs,
+  ladderStepKinds,
+  load as loadSchema,
+  parseRef,
+  userId,
+  userRecord,
+} from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { interiorFields } from '../src/lib/interior-input.ts'
 import {
+  capacityOfRecord,
+  capacityRecord,
   fromLoad,
   type Givers,
   givenKeys,
   type LoadParts,
+  measuredCapacityId,
+  measuredCapacityRef,
   overrideKeys,
+  savedCapacityRef,
   toLoad,
 } from '../src/lib/load-record.ts'
+import { waterVolume } from '../src/lib/units.ts'
 import { canonicalJson } from '../src/lib/user-data.ts'
 
 const none: Givers = {
@@ -193,7 +206,7 @@ describe('opening and saving a load', () => {
   const full = parts({
     firearm: 'user:6f0f4d3e-0a43-4a43-9a3d-3a2f2e1f0c21',
     notes: 'first ladder',
-    waterCapacity: 3.6e-6,
+    capacity: measuredCapacityRef('catalogue:308-win', 3.6e-6),
     seating: { by: 'overallLength', value: 0.07112 },
     ladder: { kind: 'seating', stepCount: 5, step: 0.0003, direction: 'around' },
     measurements: [
@@ -218,7 +231,7 @@ describe('opening and saving a load', () => {
       bullet: typeof l.bullet === 'string' ? l.bullet : undefined,
       powder: typeof l.powder === 'string' ? l.powder : undefined,
       notes: l.note ?? '',
-      waterCapacity: si('measuredWaterCapacity'),
+      capacity: l.capacity,
       seating: l.seating && {
         by: l.seating.by,
         value: Number(query.get(l.seating.by)),
@@ -250,7 +263,7 @@ describe('opening and saving a load', () => {
     expect(Number(query.get('propellantTemperature'))).toBeCloseTo(294.15, 9)
     expect(Number(query.get('charge'))).toBeCloseTo(0.0024, 12)
     expect(Number(query.get('overallLength'))).toBeCloseTo(0.07112, 12)
-    expect(Number(query.get('measuredWaterCapacity'))).toBeCloseTo(3.6e-6, 12)
+    expect(query.has('measuredWaterCapacity')).toBe(false)
     expect(query.get('ladderKind')).toBe('seating')
     expect(Number(query.get('ladderStep'))).toBeCloseTo(0.0003, 12)
     expect(typed.has('bulletMass')).toBe(true)
@@ -261,5 +274,70 @@ describe('opening and saving a load', () => {
     const { query, typed } = fromLoad({ origin: 'user', cartridge: 'catalogue:308-win' })
     expect([...query.keys()]).toEqual([])
     expect(typed.size).toBe(0)
+  })
+})
+
+describe('the measured case capacity of a load', () => {
+  const cartridge = 'catalogue:308-win'
+  const m3 = waterVolume(3.6)
+
+  it('is read from a stored record of the load cartridge only', () => {
+    const r = capacityRecord(cartridge, m3, new Date('2026-10-25T10:00:00Z'))
+    expect(capacityOfRecord(r, cartridge)).toBe(3.6)
+    expect(capacityOfRecord(r, 'catalogue:223-rem')).toBeUndefined()
+    expect(capacityOfRecord({ kind: 'powder' }, cartridge)).toBeUndefined()
+    expect(capacityOfRecord(undefined, cartridge)).toBeUndefined()
+  })
+
+  it('is saved as the measured record, else the request not answered, else the choice', () => {
+    const user = measuredCapacityRef(cartridge, m3)
+    const catalogue = 'catalogue:308-win-1'
+    expect(savedCapacityRef(user, user, catalogue)).toBe(user)
+    expect(savedCapacityRef(undefined, 'user:missing', undefined)).toBe('user:missing')
+    // a chosen capacity clears the request, so the choice is what is left to save
+    expect(savedCapacityRef(undefined, undefined, catalogue)).toBe(catalogue)
+    expect(savedCapacityRef(undefined, undefined, undefined)).toBeUndefined()
+  })
+
+  it('is a user capacity record named by the load', () => {
+    const l = toLoad(
+      parts({ capacity: measuredCapacityRef(cartridge, m3), cartridge: 'catalogue:308-win' }),
+    )
+    expect(loadSchema.safeParse(l).success).toBe(true)
+    expect(l.capacity).toBe(`user:${measuredCapacityId(cartridge, m3)}`)
+    expect(l.case).toBeUndefined()
+  })
+
+  it('has an id of one measurement: same value, same record, another value another one', () => {
+    const id = measuredCapacityId(cartridge, m3)
+    expect(userId.safeParse(id).success).toBe(true)
+    expect(measuredCapacityId(cartridge, m3)).toBe(id)
+    // a value read back from the stored grams has the same id
+    expect(measuredCapacityId(cartridge, waterVolume(3.6000000000004))).toBe(id)
+    expect(measuredCapacityId(cartridge, waterVolume(3.7))).not.toBe(id)
+    expect(measuredCapacityId('catalogue:223-rem', m3)).not.toBe(id)
+  })
+
+  it('stores the water in g, and gives the volume back when opened', () => {
+    const r = capacityRecord(cartridge, m3, new Date('2026-10-25T10:00:00Z'))
+    const parsed = userRecord.parse(r)
+    expect(parsed.kind === 'caseCapacity' && parsed.data.waterCapacity.value).toBe(3.6)
+    expect(
+      parsed.kind === 'caseCapacity' && waterVolume(parsed.data.waterCapacity.value),
+    ).toBeCloseTo(m3, 15)
+    expect(parseRef(measuredCapacityRef(cartridge, m3))?.id).toBe(r.id)
+  })
+
+  it('is answered by its record: no reference is left dangling', () => {
+    const l = userRecord.parse({
+      kind: 'load',
+      id: 'l1',
+      name: 'Load',
+      saved: '2026-10-25T10:00:00.000Z',
+      data: toLoad(parts({ capacity: measuredCapacityRef(cartridge, m3) })),
+    })
+    const r = userRecord.parse(capacityRecord(cartridge, m3, new Date()))
+    expect(checkUserRefs([l]).map((d) => d.field)).toEqual(['capacity'])
+    expect(checkUserRefs([l, r])).toEqual([])
   })
 })

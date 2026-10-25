@@ -13,7 +13,7 @@ COPY apps/web/package.json apps/web/
 COPY tools/package.json tools/
 COPY apps/e2e/package.json apps/e2e/
 COPY apps/docs/package.json apps/docs/
-RUN npm ci -w @open-reloading/schema -w @open-reloading/core -w @open-reloading/data -w @open-reloading/api
+RUN npm ci --ignore-scripts -w @open-reloading/schema -w @open-reloading/core -w @open-reloading/data -w @open-reloading/api
 COPY packages/schema packages/schema
 COPY packages/core packages/core
 COPY packages/data packages/data
@@ -35,7 +35,7 @@ COPY apps/web/package.json apps/web/
 COPY tools/package.json tools/
 COPY apps/e2e/package.json apps/e2e/
 COPY apps/docs/package.json apps/docs/
-RUN npm ci --omit=dev -w @open-reloading/schema -w @open-reloading/core -w @open-reloading/data -w @open-reloading/api
+RUN npm ci --omit=dev --ignore-scripts -w @open-reloading/schema -w @open-reloading/core -w @open-reloading/data -w @open-reloading/api
 COPY --from=build /app/packages/schema/dist packages/schema/dist
 COPY --from=build /app/packages/core/dist packages/core/dist
 COPY --from=build /app/packages/data/dist packages/data/dist

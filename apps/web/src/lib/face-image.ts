@@ -35,8 +35,9 @@ export const imageToGrid = (grid: Grid, p: Point): Point => ({
 export function grayGrid(
   image: RgbaImage,
   s: number,
-  box = { x0: 0, y0: 0, x1: image.width, y1: image.height },
+  area?: { x0: number; y0: number; x1: number; y1: number },
 ): Grid {
+  const box = area ?? { x0: 0, y0: 0, x1: image.width, y1: image.height }
   const x0 = Math.max(0, Math.floor(box.x0))
   const y0 = Math.max(0, Math.floor(box.y0))
   const x1 = Math.min(image.width, Math.ceil(box.x1))
@@ -113,7 +114,7 @@ function label(mask: Uint8Array, w: number, h: number): Labels {
       const i = stack[--top]
       n++
       const x = i % w
-      const y = (i / w) | 0
+      const y = Math.trunc(i / w)
       if (x < b.x0) b.x0 = x
       if (x > b.x1) b.x1 = x
       if (y < b.y0) b.y0 = y
@@ -211,7 +212,7 @@ function fillComponent({ lab, k, box: b }: Component, w: number, h: number): Fil
   visit(0, 0)
   while (stack.length) {
     const i = stack.pop() as number
-    const [x, y] = [i % bw, (i / bw) | 0]
+    const [x, y] = [i % bw, Math.trunc(i / bw)]
     visit(x + 1, y)
     visit(x - 1, y)
     visit(x, y + 1)

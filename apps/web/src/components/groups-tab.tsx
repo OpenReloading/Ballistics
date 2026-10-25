@@ -70,6 +70,7 @@ export function GroupsTab({
       ref={ref}
       className="groups-tab"
       data-expanded={expanded || undefined}
+      role="presentation"
       {...(expanded && { role: 'dialog', 'aria-modal': true, 'aria-label': 'Shot groups' })}
       style={height && !expanded ? { height } : undefined}
       onKeyDown={(e) => {

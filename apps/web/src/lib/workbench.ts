@@ -120,7 +120,7 @@ function convertBarMessage(message: string, system: UnitSystem) {
   return u.symbol === 'bar'
     ? message
     : message.replace(
-        /(\d+(?:\.\d+)?) bar\b/g,
+        /(?<!\d)(\d+(?:\.\d+)?) bar\b/g,
         (_, v: string) =>
           `${formatNumber(u.fromSi(toSi('pressure', Number(v))), u.decimals)} ${u.symbol}`,
       )
