@@ -802,78 +802,76 @@ export function Workbench() {
                 </>
               }
               actions={
-                <>
-                  <Toolbar
-                    link={link}
-                    search={
-                      <Button
-                        variant="default"
-                        className="bar-icon"
-                        leftSection={<MagnifyingGlass size={18} aria-hidden="true" />}
-                        onClick={() => spotlight.open()}
-                        aria-keyshortcuts={shortcutAriaKeys('search')}
-                        title={framed ? `Search (${shortcutLabel('search')})` : undefined}
-                      >
-                        Search
-                      </Button>
-                    }
-                    file={
-                      <FileMenu
-                        ref={fileMenu}
-                        kind="load"
-                        name={load.name}
-                        nameKey={load.customName?.trim() ? load.customName : ''}
-                        data={fileData}
-                        apiData={apiData}
-                        store={storeLoad}
-                        onOpen={onOpenFile}
-                        onStored={stored}
-                        onExported={reminder.exported}
-                        onUnsaved={tabs.setUnsaved}
-                        onList={openList}
-                        examples={examples}
-                        note={
-                          [
-                            unresolved.length &&
-                              `Not loaded, kept in the file: ${unresolved.join(', ')}.`,
-                            dropped.length && `Not a record id, left out: ${dropped.join(', ')}.`,
-                          ]
-                            .filter(Boolean)
-                            .join(' ') || undefined
-                        }
-                      />
-                    }
-                    after={
-                      <>
-                        <Menu position="bottom-end">
-                          <Menu.Target>
-                            <Button
-                              variant="default"
-                              className="bar-icon"
-                              title="Print"
-                              leftSection={<Printer size={18} aria-hidden="true" />}
-                            >
-                              Print
-                            </Button>
-                          </Menu.Target>
-                          <Menu.Dropdown>
-                            <Menu.Item disabled={!ok} onClick={printReport}>
-                              Workbench report (also {shortcutLabel('print')})
-                            </Menu.Item>
-                            <Menu.Item disabled={!ok} onClick={() => printSheets(false)}>
-                              Load sheet: one page
-                            </Menu.Item>
-                            <Menu.Item disabled={!ok} onClick={() => printSheets(true)}>
-                              Load sheet and a page per charge
-                            </Menu.Item>
-                          </Menu.Dropdown>
-                        </Menu>
-                        {sheets}
-                        {report()}
-                      </>
-                    }
-                  />
-                </>
+                <Toolbar
+                  link={link}
+                  search={
+                    <Button
+                      variant="default"
+                      className="bar-icon"
+                      leftSection={<MagnifyingGlass size={18} aria-hidden="true" />}
+                      onClick={() => spotlight.open()}
+                      aria-keyshortcuts={shortcutAriaKeys('search')}
+                      title={framed ? `Search (${shortcutLabel('search')})` : undefined}
+                    >
+                      Search
+                    </Button>
+                  }
+                  file={
+                    <FileMenu
+                      ref={fileMenu}
+                      kind="load"
+                      name={load.name}
+                      nameKey={load.customName?.trim() ? load.customName : ''}
+                      data={fileData}
+                      apiData={apiData}
+                      store={storeLoad}
+                      onOpen={onOpenFile}
+                      onStored={stored}
+                      onExported={reminder.exported}
+                      onUnsaved={tabs.setUnsaved}
+                      onList={openList}
+                      examples={examples}
+                      note={
+                        [
+                          unresolved.length &&
+                            `Not loaded, kept in the file: ${unresolved.join(', ')}.`,
+                          dropped.length && `Not a record id, left out: ${dropped.join(', ')}.`,
+                        ]
+                          .filter(Boolean)
+                          .join(' ') || undefined
+                      }
+                    />
+                  }
+                  after={
+                    <>
+                      <Menu position="bottom-end">
+                        <Menu.Target>
+                          <Button
+                            variant="default"
+                            className="bar-icon"
+                            title="Print"
+                            leftSection={<Printer size={18} aria-hidden="true" />}
+                          >
+                            Print
+                          </Button>
+                        </Menu.Target>
+                        <Menu.Dropdown>
+                          <Menu.Item disabled={!ok} onClick={printReport}>
+                            Workbench report (also {shortcutLabel('print')})
+                          </Menu.Item>
+                          <Menu.Item disabled={!ok} onClick={() => printSheets(false)}>
+                            Load sheet: one page
+                          </Menu.Item>
+                          <Menu.Item disabled={!ok} onClick={() => printSheets(true)}>
+                            Load sheet and a page per charge
+                          </Menu.Item>
+                        </Menu.Dropdown>
+                      </Menu>
+                      {sheets}
+                      {report()}
+                    </>
+                  }
+                />
               }
             />
             <Workspace

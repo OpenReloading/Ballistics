@@ -1820,7 +1820,6 @@ export function TargetEditor({
                 )
                 return (
                   <Table.Tr
-                    // biome-ignore lint/suspicious/noArrayIndexKey: shots keep their order
                     key={i}
                     data-selected={
                       (selected?.group === group.id && selected.index === i) || undefined
@@ -2215,7 +2214,6 @@ export function TargetEditor({
           className="sheet-select"
           value={meta.name}
           maxLength={200}
-          // biome-ignore lint/a11y/noAutofocus: Rename puts the focus in the field it opens
           autoFocus
           error={meta.name ? undefined : true}
           onChange={(e) => setMeta({ ...meta, name: e.currentTarget.value })}

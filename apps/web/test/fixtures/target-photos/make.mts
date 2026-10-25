@@ -4,7 +4,6 @@
  */
 import { writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-// biome-ignore lint/correctness/noUndeclaredDependencies: optional dependency of next, hoisted to the root
 import sharp from 'sharp'
 import { render, scenes, tilted } from './scenes.ts'
 

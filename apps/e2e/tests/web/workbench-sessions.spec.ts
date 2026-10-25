@@ -6,7 +6,12 @@ import { runLine } from './workbench-run.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
-type Stored = { kind: string; id: string; name: string; data: Record<string, any> }
+type Stored = {
+  kind: string
+  id: string
+  name: string
+  data: { sessions?: string[]; strings: { variation?: { kind: string }; load?: string }[] }
+}
 
 const stored = (page: Page, kind: string) =>
   page.evaluate(async (kind) => {
@@ -53,9 +58,7 @@ test('a chronograph file on the Measurements tab is a stored session that the sa
   // string k takes step k of the run; the second string is set to not used
   await page.getByLabel(/^String 2: B/).selectOption({ label: 'Not used' })
   await expect
-    .poll(async () =>
-      (await stored(page, 'session'))[0].data.strings.map((s: any) => s.variation?.kind),
-    )
+    .poll(async () => (await stored(page, 'session'))[0].data.strings.map((s) => s.variation?.kind))
     .toEqual(['charge', undefined])
 
   await (await barButton(page, 'Save')).click()
@@ -66,7 +69,7 @@ test('a chronograph file on the Measurements tab is a stored session that the sa
   expect(session.name).toBe('day1.csv')
   // Save names the load on the mapped string only
   await expect
-    .poll(async () => (await stored(page, 'session'))[0].data.strings.map((s: any) => s.load))
+    .poll(async () => (await stored(page, 'session'))[0].data.strings.map((s) => s.load))
     .toEqual([`user:${load.id}`, undefined])
 
   await page.goto('/workbench')

@@ -1,7 +1,6 @@
 /// <reference types="node" />
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-// biome-ignore lint/correctness/noUndeclaredDependencies: optional dependency of next, hoisted to the root
 import sharp from 'sharp'
 import { describe, expect, it } from 'vitest'
 import { autoDetect, detectFromExample, type HoleProposal } from '../src/lib/hole-detection.ts'
