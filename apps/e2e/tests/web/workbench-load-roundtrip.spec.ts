@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises'
 import { expect, test } from '@playwright/test'
 import { barButton } from './bar.ts'
 import { storeUnits } from './units.ts'
@@ -102,4 +103,31 @@ test('a load of records keeps only the charge and the travel and reopens with th
   await expect.poll(values).toEqual(before)
   await expect(page.locator('.file-state')).toContainText('Saved')
   await expect(page.locator('.file-state[data-dirty]')).toHaveCount(0)
+})
+
+test('the file downloaded for the API runs through the load file route and the saved load keeps the typed keys', async ({
+  page,
+  request,
+}) => {
+  await page.addInitScript(() => {
+    ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
+      (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
+  })
+  await page.goto('/workbench?cartridge=308-win&bullet=demo-bullet-168&powder=demo-powder-dp40')
+  const form = loadForm(page)
+  await form.getByRole('textbox', { name: /^Charge mass/ }).fill('2.40')
+  await form.getByRole('textbox', { name: /^Bullet travel/ }).fill('533.40')
+  await (await barButton(page, 'Save options')).click()
+  const download = page.waitForEvent('download')
+  await page.getByRole('menuitem', { name: 'Download for the API' }).click()
+  const file = JSON.parse(await readFile(await (await download).path(), 'utf8'))
+  const api = process.env.API_URL ?? 'http://localhost:3000'
+  const res = await request.post(`${api}/v1/interior/load-file`, { data: file })
+  expect(res.status()).toBe(200)
+  expect((await res.json()).summary.peakPressure).toBeGreaterThan(0)
+
+  await (await barButton(page, 'Save')).click()
+  await expect.poll(async () => (await storedLoads(page)).length).toBe(1)
+  const [{ data }] = await storedLoads(page)
+  expect(data.analysis).toEqual({ overrides: { travel: 533.4 } })
 })

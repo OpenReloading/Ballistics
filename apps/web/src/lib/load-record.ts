@@ -198,6 +198,26 @@ export function toLoad(p: LoadParts): Load {
   }
 }
 
+/**
+ * The load file for the API: every solver value of the moment is typed (the API invents none), the
+ * cartridge and bullet are the catalogue references in `catalogue` or absent (a user record is not
+ * on the server), and what the API does not read is left out: the firearm, the capacity, the
+ * chronograph series and a seating or temperature ladder, which the route does not run.
+ */
+export function toApiLoad(p: LoadParts, catalogue: { cartridge?: string; bullet?: string }): Load {
+  const charge = p.ladder?.kind === 'charge'
+  return toLoad({
+    ...p,
+    given: new Set(),
+    cartridge: catalogue.cartridge,
+    bullet: catalogue.bullet,
+    firearm: undefined,
+    capacity: undefined,
+    ladder: charge ? p.ladder : undefined,
+    measurements: [],
+  })
+}
+
 /** A load as the workbench fills itself from it. */
 export interface OpenedLoad {
   /** The typed values and the options, SI, under the keys of the workbench link. */
