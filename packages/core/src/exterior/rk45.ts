@@ -3,7 +3,10 @@
  * (`apps/docs/docs/models/exterior-point-mass.md`, "Numerical method"; Dormand and Prince 1980; Hairer,
  * Norsett and Wanner 1993, sections II.4 to II.6). Generic over the state length.
  */
-import { el, InputError, nth } from '../errors.ts'
+import { InputError, nth } from '../errors.ts'
+
+/** Unchecked read of a state vector the caller sizes and indexes by the same count (kept in this module so the integrator loops inline it). */
+const el = (a: Float64Array, i: number): number => a[i] as number
 
 /** Right-hand side: writes dy/dt at (t, y) into `dy`. */
 export type Rhs = (t: number, y: Float64Array, dy: Float64Array) => void

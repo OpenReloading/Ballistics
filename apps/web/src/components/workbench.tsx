@@ -162,11 +162,19 @@ function bulletPrintRows(load: Load): PrintRows {
 function ladderPrintText(load: Load) {
   const { ladderSteps, ladderKind, seatAt, direction, seatStep, tempStep, ladder, system } = load
   if (ladderSteps <= 1) return
-  if (ladderKind === 'seating')
-    return `${ladderSteps} ${seatAt ? seatingLengthName[seatAt.lengthKind] : 'seating'} values, ${direction}, ${seatStep.seatStep?.text} ${system.length.symbol} apart`
-  if (ladderKind === 'temperature')
-    return `${ladderSteps} powder temperatures, ${direction}, ${tempStep.tempStep?.text} ${system.temperatureDifference.symbol} apart`
-  return `${ladderSteps} charges, ${direction}, ${ladder.ladderStep?.text} ${system.charge.symbol} apart`
+  if (ladderKind === 'seating') {
+    const step = seatStep.seatStep?.text
+    if (!step) return
+    return `${ladderSteps} ${seatAt ? seatingLengthName[seatAt.lengthKind] : 'seating'} values, ${direction}, ${step} ${system.length.symbol} apart`
+  }
+  if (ladderKind === 'temperature') {
+    const step = tempStep.tempStep?.text
+    if (!step) return
+    return `${ladderSteps} powder temperatures, ${direction}, ${step} ${system.temperatureDifference.symbol} apart`
+  }
+  const step = ladder.ladderStep?.text
+  if (!step) return
+  return `${ladderSteps} charges, ${direction}, ${step} ${system.charge.symbol} apart`
 }
 
 function powderPrintRows(load: Load, runTemperature: string | undefined): PrintRows {

@@ -106,6 +106,7 @@ const near = (a: number, b: number, tol = 0.01) => Math.abs(a - b) <= tol
 
 /** What breaks the rules of a derived dimension: only L3 - L2, spanning above zero. */
 function derivedFailures(d: Dimension, name: string, values: SpecValue[], side: Side) {
+  // a derived L3-L2 sits on a sheet that lists both L2 and L3; a missing one fails the arithmetic below
   const [L2, L3] = [find(values, side, 'L2'), find(values, side, 'L3')] as [number, number]
   if (
     d.symbol !== 'L3\u2212L2' ||
@@ -1002,6 +1003,7 @@ function calloutChecks(c: CombinedCtx, l: Label, k: number) {
       failures.push(what(`${t.owner} arrowhead on ${l.owner} text`))
   // past the steel band
   const outer =
+    // the points of a drawn part are [r, z] pairs, so the radii are all numbers
     Math.max(...(defined(figure.drawn[1]).p.points.map(([r]) => r) as number[])) +
     face.steelBandWidth
   if (Math.abs(l.c[1]) - l.h / 2 < outer) failures.push(what(`${l.owner} text on the part`))
@@ -1208,6 +1210,7 @@ function detailFailures(figure: Figure, screen: FigureModel, print: FigureModel)
   if (screen.frame.join() !== plain.frame.join()) failures.push(`${name} frame`)
   if (print.details.length || plain.details.length) failures.push(`${name} details unasked`)
   for (const { side } of drawn) {
+    // both figure models lay out every side of `drawn`
     const [a, b] = [screen.layers[side], plain.layers[side]] as [Layout, Layout]
     const rest = {
       ...a,

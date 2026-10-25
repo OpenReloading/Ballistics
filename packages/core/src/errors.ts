@@ -23,12 +23,3 @@ export function nth<T>(a: ArrayLike<T>, i: number): T {
   if (v === undefined) throw new RangeError(`index ${i} outside an array of ${a.length}`)
   return v
 }
-
-/**
- * Entry `i` of a state vector or other typed array whose length the caller sizes and indexes by
- * the same count. Unlike `nth` it does not check, so hot loops keep their arithmetic and keep the
- * element access on one array type.
- */
-export function el(a: Float64Array, i: number): number {
-  return a[i] as number
-}

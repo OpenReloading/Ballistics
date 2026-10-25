@@ -106,16 +106,17 @@ export function identifiability(j: number[][]): Identifiability {
   const r = f.map((row, i) => row.map((x, k) => x / (nth(d, i) * nth(d, k))))
   const { values, vectors } = eigen(r)
   const top = Math.max(...values)
+  // NaN eigenvalues make this -1: reads at it are NaN, as the fit treats them
   const lo = values.indexOf(Math.min(...values))
   const floor = 1e-12 * top
-  const singular = nth(values, lo) <= floor
+  const singular = (values[lo] ?? Number.NaN) <= floor
   const lambda = values.map((l) => Math.max(l, floor))
   const inv = r.map((_, a) =>
     r.map((_, b) =>
       lambda.reduce((s, l, k) => s + (nth(nth(vectors, a), k) * nth(nth(vectors, b), k)) / l, 0),
     ),
   )
-  const unbounded = (a: number) => singular && nth(nth(vectors, a), lo) ** 2 > floor
+  const unbounded = (a: number) => singular && (nth(vectors, a)[lo] ?? Number.NaN) ** 2 > floor
   return {
     standardUncertainty: inv.map((row, a) =>
       unbounded(a) ? Infinity : Math.sqrt(nth(row, a)) / nth(d, a),
@@ -125,8 +126,8 @@ export function identifiability(j: number[][]): Identifiability {
       row.map((x, b) => x / Math.sqrt(nth(nth(inv, a), a) * nth(nth(inv, b), b))),
     ),
     varianceInflation: inv.map((row, a) => (unbounded(a) ? Infinity : nth(row, a))),
-    conditionNumber: singular ? Infinity : Math.sqrt(top / nth(values, lo)),
-    direction: vectors.map((row) => nth(row, lo)),
+    conditionNumber: singular ? Infinity : Math.sqrt(top / (values[lo] ?? Number.NaN)),
+    direction: vectors.map((row) => row[lo] ?? Number.NaN),
   }
 }
 
@@ -242,13 +243,14 @@ function checkConditioning(fit: LogFitInput, j: number[][], at: number[]): numbe
   if (unresolved.length > 0) fail('unresolved', at, { unresolved })
   const scaled = j.map((row) => row.map((x, k) => x / nth(norms, k)))
   const { values, vectors } = eigen(transposeTimes(scaled, scaled))
+  // NaN eigenvalues make this -1: reads at it are NaN, as the fit treats them
   const lo = values.indexOf(Math.min(...values))
-  const smallest = nth(values, lo)
+  const smallest = values[lo] ?? Number.NaN
   const condition = smallest > 0 ? Math.sqrt(Math.max(...values) / smallest) : Infinity
   if (!(condition <= maxCondition))
     fail('ill-conditioned', at, {
       conditionNumber: condition,
-      direction: vectors.map((row) => nth(row, lo)),
+      direction: vectors.map((row) => row[lo] ?? Number.NaN),
     })
   return condition
 }

@@ -5,7 +5,7 @@
  * y up, z right); the line of sight is an output projection (`apps/docs/docs/models/exterior-point-mass.md`, "Frames").
  */
 import { type DragModel, type DragTable, dragTables } from '../drag-tables.ts'
-import { el, InputError, need, nth } from '../errors.ts'
+import { InputError, need, nth } from '../errors.ts'
 import {
   type Air,
   airAt,
@@ -35,6 +35,9 @@ import {
 } from './modified.ts'
 import { type Rhs, type Rk45Event, type Rk45Hit, rk45, type StepBudget } from './rk45.ts'
 import { aerodynamicJump, millerStability, spinDrift } from './stability.ts'
+
+/** Unchecked read of a state vector the caller sizes and indexes by the same count (kept in this module so the integrator loops inline it). */
+const el = (a: Float64Array, i: number): number => a[i] as number
 
 /** Projectile of a shot, SI units. */
 export interface Projectile {
