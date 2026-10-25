@@ -1,5 +1,5 @@
 // Velocity units of export files and the conversion to stored m/s.
-import type { QuantityValue } from '@openreloading/schema'
+import type { QuantityValue } from '@open-reloading/schema'
 import { parseNumber } from './text.ts'
 
 /** A velocity unit the importers recognise. Parsed velocities are stored in m/s. */

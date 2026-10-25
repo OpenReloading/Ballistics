@@ -9,7 +9,7 @@ import {
   type UserCartridge,
   type UserRecord,
   userIdRegex,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import { fetchRecord } from './api-fetch.ts'
 import type { CartridgeDetail } from './api-types.ts'
 import {

@@ -3,7 +3,7 @@ import {
   interior,
   interiorPressureRange,
   pressureToleranceDefaults,
-} from '@openreloading/core'
+} from '@open-reloading/core'
 import { describe, expect, it } from 'vitest'
 import { API_PREFIX } from '../src/version.ts'
 import { bundle, m3Load as load } from './fixtures.ts'

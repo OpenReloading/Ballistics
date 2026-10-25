@@ -1,7 +1,7 @@
 'use client'
 
 import { Select } from '@mantine/core'
-import { toSi } from '@openreloading/schema'
+import { toSi } from '@open-reloading/schema'
 import { useMemo } from 'react'
 import { caliberDiameters, caliberOptions } from '../lib/caliber.ts'
 import { controlSize } from '../lib/theme.ts'

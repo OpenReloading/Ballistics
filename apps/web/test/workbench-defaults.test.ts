@@ -1,4 +1,4 @@
-import { defaultStartPressure } from '@openreloading/core'
+import { defaultStartPressure } from '@open-reloading/core'
 import { describe, expect, it } from 'vitest'
 import { interiorFields } from '../src/lib/interior-input.ts'
 import {

@@ -11,7 +11,7 @@ import {
   recordResistance,
   solidFill,
   solidFillLimit,
-} from '@openreloading/core'
+} from '@open-reloading/core'
 import {
   type Bullet,
   fromSi,
@@ -19,7 +19,7 @@ import {
   ladderStepKinds,
   type Powder,
   toSi,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import { z } from 'zod'
 import type { Catalogue } from '../catalogue/types.ts'
 import { assertFinite, notice, resolvedRecord, unprocessable } from './answer.ts'

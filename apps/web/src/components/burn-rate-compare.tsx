@@ -2,7 +2,7 @@
 
 import { Group, MultiSelect, Pill } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
-import type { Powder } from '@openreloading/schema'
+import type { Powder } from '@open-reloading/schema'
 import { ChartLine } from '@phosphor-icons/react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { fetchPowder } from '../lib/api-client.ts'

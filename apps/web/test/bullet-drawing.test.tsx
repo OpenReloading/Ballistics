@@ -1,14 +1,14 @@
 import { readFileSync } from 'node:fs'
-import { readRecords } from '@openreloading/data'
-import { face } from '@openreloading/drawing'
+import { readRecords } from '@open-reloading/data'
+import { face } from '@open-reloading/drawing'
 import {
   type BulletProfile,
   bulletFigureModel,
   bulletScreenEm,
   bulletSymbols,
   recordProfile,
-} from '@openreloading/drawing/bullet'
-import type { Bullet } from '@openreloading/schema'
+} from '@open-reloading/drawing/bullet'
+import type { Bullet } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { bullet } from '../../../packages/schema/src/index.ts'

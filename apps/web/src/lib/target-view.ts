@@ -2,7 +2,7 @@
  * The view of a target sheet as exported, printed and zoomed by touch. View units are photo px,
  * or target mm on a drawn target. No React, DOM or Next.js.
  */
-import { fromSi } from '@openreloading/schema'
+import { fromSi } from '@open-reloading/schema'
 
 export type ViewBox = { x: number; y: number; w: number; h: number }
 type Pt = { x: number; y: number }

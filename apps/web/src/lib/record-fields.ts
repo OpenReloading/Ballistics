@@ -1,4 +1,4 @@
-import { type Bullet, type Powder, type QuantityValue, toSi } from '@openreloading/schema'
+import { type Bullet, type Powder, type QuantityValue, toSi } from '@open-reloading/schema'
 import { computedBulletRows } from './bullet.ts'
 import {
   degreeText,

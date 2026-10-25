@@ -11,7 +11,7 @@ import {
   TableTr,
   Tooltip,
 } from '@mantine/core'
-import type { SpecValue } from '@openreloading/schema'
+import type { SpecValue } from '@open-reloading/schema'
 import { Certificate, Crosshair, Cylinder, Gauge } from '@phosphor-icons/react'
 import {
   type CSSProperties,

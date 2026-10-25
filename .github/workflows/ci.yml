@@ -98,11 +98,11 @@ jobs:
       matrix:
         include:
           - name: drawing
-            workspaces: -w @openreloading/drawing
+            workspaces: -w @open-reloading/drawing
           - name: web
-            workspaces: -w @openreloading/web
+            workspaces: -w @open-reloading/web
           - name: packages
-            workspaces: -w @openreloading/schema -w @openreloading/core -w @openreloading/importers -w @openreloading/data -w @openreloading/api -w @openreloading/docs -w @openreloading/tools
+            workspaces: -w @open-reloading/schema -w @open-reloading/core -w @open-reloading/importers -w @open-reloading/data -w @open-reloading/api -w @open-reloading/docs -w @open-reloading/tools
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -120,7 +120,7 @@ jobs:
         env:
           WORKSPACES: ${{ matrix.workspaces }}
       - if: matrix.name == 'packages'
-        run: npm run test:unit -w @openreloading/e2e
+        run: npm run test:unit -w @open-reloading/e2e
 
   # Fails when a part failed or was cancelled; a skipped part (the plan, the promotion pull request) passes, as the
   # old single job did when skipped. Stays the name the rulesets require.
@@ -192,7 +192,7 @@ jobs:
       - run: ../../node_modules/.bin/playwright install --with-deps chromium
         working-directory: apps/e2e
       # specs import web sources, which import the workspace packages from their dist/
-      - run: npm run build -w @openreloading/schema && npm run build -w @openreloading/importers && npm run build -w @openreloading/core && npm run build -w @openreloading/drawing
+      - run: npm run build -w @open-reloading/schema && npm run build -w @open-reloading/importers && npm run build -w @open-reloading/core && npm run build -w @open-reloading/drawing
       - run: docker compose up --detach --build api web
       - name: Wait for the API and the web app
         run: |
@@ -205,13 +205,13 @@ jobs:
       # `npm run api:conformance` in the dev container; the same Schemathesis version and checks
       - name: API conformance to its document (Schemathesis)
         run: |
-          npm run build -w @openreloading/data -w @openreloading/api
+          npm run build -w @open-reloading/data -w @open-reloading/api
           node tools/src/openapi.ts "$RUNNER_TEMP/openapi.json"
           docker run --rm --network=host -v "$RUNNER_TEMP:/doc:ro" "$SCHEMATHESIS_IMAGE" \
             run /doc/openapi.json --url http://localhost:3000 --checks not_a_server_error,status_code_conformance,content_type_conformance,response_schema_conformance
       - run: npm run test:e2e
       - name: Drawing baseline in the Playwright image
-        run: npm run drawing-baseline -w @openreloading/e2e
+        run: npm run drawing-baseline -w @open-reloading/e2e
       - name: Paired contact sheet of the baseline drawings when drawing code changed
         id: sheet
         env:
@@ -233,7 +233,7 @@ jobs:
           }
           put before "$BASE"
           put after HEAD
-          npm run pair-sheets -w @openreloading/e2e -- "$PWD/sheet/before" "$PWD/sheet/after" "$PWD/sheet/out"
+          npm run pair-sheets -w @open-reloading/e2e -- "$PWD/sheet/before" "$PWD/sheet/after" "$PWD/sheet/out"
           echo "made=1" >> "$GITHUB_OUTPUT"
       - name: Keep the paired contact sheet for review
         if: steps.sheet.outputs.made == '1'
@@ -268,7 +268,7 @@ jobs:
             ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'package-lock.json', 'patches/**', 'apps/web/next.config.ts') }}-
       - name: Build the web app against the API
         if: env.BUILD_WEB == 'true'
-        run: npm run build -w @openreloading/web
+        run: npm run build -w @open-reloading/web
         env:
           API_URL: http://localhost:3000
           PRERENDER: ${{ github.event_name == 'pull_request' && needs.changes.outputs.prerender == 'sample' && 'sample' || 'full' }}

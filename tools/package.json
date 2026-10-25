@@ -1,5 +1,5 @@
 {
-  "name": "@openreloading/tools",
+  "name": "@open-reloading/tools",
   "version": "0.0.1",
   "private": true,
   "license": "MIT",
@@ -14,7 +14,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@openreloading/api": "*"
+    "@open-reloading/api": "*"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",

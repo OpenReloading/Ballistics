@@ -1,5 +1,5 @@
 /** Filtering and sorting of the data lists (cartridges, bullets, powders) in the browser. */
-import { compareKeys, score, searchKey, sortKey } from '@openreloading/schema'
+import { compareKeys, score, searchKey, sortKey } from '@open-reloading/schema'
 
 export type SortDirection = 'ascending' | 'descending'
 

@@ -1,11 +1,11 @@
-import { face } from '@openreloading/drawing'
+import { face } from '@open-reloading/drawing'
 import {
   figureModel,
   recordFigures,
   regions,
   screenEm,
   screenWidth,
-} from '@openreloading/drawing/cartridge'
+} from '@open-reloading/drawing/cartridge'
 import { renderToStaticMarkup } from 'react-dom/server'
 import type { TechnicalDrawing } from '../src/components/technical-drawing.tsx'
 

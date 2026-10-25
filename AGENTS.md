@@ -12,7 +12,7 @@
   - A variable type, parameter type or return type of an exported variable or function that renders longer than 100 characters fails (`apps/docs/check.mjs`): give it a named type or interface. Zod schemas are exempt, their doc comment links the inferred type.
 - Test schema, core, importers, drawing, data, api, web, the docs checks, the tools and the e2e script helpers: `npm test`
 - Validate data records: `npm run data:validate`
-- Docs site (Docusaurus, `apps/docs`): `npm run site:build -w @openreloading/docs` (after `build`)
+- Docs site (Docusaurus, `apps/docs`): `npm run site:build -w @open-reloading/docs` (after `build`)
   - Generated, git-ignored: the TypeDoc site of the six packages (`static/library/`, configured by `apps/docs/typedoc.config.mjs` with the landing page `apps/docs/library.md`), served at `/library/`, the REST API page (`static/rest/`: the API document, the Scalar viewer and its page, `scripts/openapi.mts`), served at `/rest/`. Its link to the API's own reference (`/v1/reference/`) uses `API_URL`, no link when it is unset.
   - Search: after the build, `scripts/search.mts` writes the Pagefind index of the docs pages, the TypeDoc pages and one record per REST operation to `build/pagefind/` (the TypeDoc pages in `build/pagefind-library/`, merged with a lower weight). The navbar search (`src/theme/SearchBar.tsx`) reads it, so `docusaurus start` has no search.
   - Hand-written pages go in `apps/docs/docs/`. Navbar sections are the sidebars of `sidebars.ts`: Models, Data, Contributing.
@@ -20,18 +20,18 @@
   - `DOCS_URL` and `DOCS_BASE_URL` set the origin and the path for a sub directory on GitHub Pages.
 - API contract (after `build`, details in `tools/AGENTS.md`):
   - Both need the dev container, which installs oasdiff and Schemathesis.
-  - `npm run api:check`: breaking changes against `packages/api/openapi.baseline.json`. A break passes only with the baseline rewritten by `npm run api-baseline -w @openreloading/tools` in the same pull request.
+  - `npm run api:check`: breaking changes against `packages/api/openapi.baseline.json`. A break passes only with the baseline rewritten by `npm run api-baseline -w @open-reloading/tools` in the same pull request.
   - `npm run api:conformance`: Schemathesis against the running API at `API_URL`.
-  - The contract version is the `@openreloading/api` version. Every public route is under `/v1`.
+  - The contract version is the `@open-reloading/api` version. Every public route is under `/v1`.
 - E2E (projects and when to run which: `apps/e2e/AGENTS.md`):
   - `npm run test:e2e`: API running on `API_URL` (default `http://localhost:3000`), web app on `WEB_URL` (default `http://localhost:3001`).
   - In `apps/e2e/`: install the browser once with `npx playwright install --with-deps chromium`.
   - `npm run e2e:smoke`: the smoke spec (home, a cartridge record, the workbench, the forwarding route) against an already running API and web app, no build.
 - Pages edition (GitHub Pages, no server): `apps/web/AGENTS.md`, Pages edition.
-- One workspace: `npm run <script> -w @openreloading/<name>`
+- One workspace: `npm run <script> -w @open-reloading/<name>`
 - CI (`.github/workflows/ci.yml`) runs the checks above except the docs site build and the Pages edition.
   - The required check `check` is the job that waits for `static` (lint, build, typecheck, docs check, data validation, API breaking changes, audit) and `test (drawing)`, `test (web)`, `test (packages)`, which run in parallel and together run what `npm test` runs. Add a workspace's tests to one of the `test` groups in `ci.yml` when the root `test` script gains it.
-  - `e2e` runs against `docker compose up api web`, runs the drawing pixel baseline in the Playwright image (`npm run drawing-baseline -w @openreloading/e2e`), builds the web app against that API, then runs `node apps/web/scripts/check-prerender.mts` and `npm run e2e:smoke` against that build.
+  - `e2e` runs against `docker compose up api web`, runs the drawing pixel baseline in the Playwright image (`npm run drawing-baseline -w @open-reloading/e2e`), builds the web app against that API, then runs `node apps/web/scripts/check-prerender.mts` and `npm run e2e:smoke` against that build.
   - On a pull request the `changes` job (`apps/web/scripts/ci-plan.mts`) can skip the `check` job (only prose changed), the `e2e` job (no change to what the API, the web app or the e2e specs read) or that web build (no change to the web app or what it builds from). It can build with `PRERENDER=sample` (no change to record data, record page code or the packages they read). The Turbopack cache (`apps/web/.next/cache/turbopack`) is restored.
   - A push to the default branch or any doubt builds from nothing, every record page prerendered and checked in full.
 - Other workflows: `release.yml` (release-please, images, `apps/docs/docs/release.md`), `pages.yml` (Pages edition), `pr-title.yml`, `scorecard.yml`. Tools, rules and their free terms: `apps/docs/docs/ci-tools.md`.
@@ -40,14 +40,15 @@
 ## Conventions
 
 - Changes start from a GitHub issue. Branches are cut from `develop` and merged back into it; `main` only receives the pull request from `develop` and the release pull request.
+- Published to npmjs.com: schema, core, drawing, importers, data (`apps/docs/docs/release.md`). Every other workspace stays `private`.
 - Package rules:
   - `packages/core`: no runtime dependencies, no I/O, no database, no HTTP.
-  - `packages/importers`: no I/O. Depends on `@openreloading/schema` for types only.
+  - `packages/importers`: no I/O. Depends on `@open-reloading/schema` for types only.
   - `packages/drawing`: no runtime dependencies, no I/O, no React, DOM or Next.js. Values in stored mm and degrees. `test/imports.test.ts` checks the import rules.
   - `packages/data`: git is the source of truth for records.
   - `packages/api`: depends on core, data and schema.
-  - `apps/web`: reads from the API, renders the figure models of `@openreloading/drawing`. No database access or solver logic in route handlers.
-    - The Pages edition's web app runs the API's compute entry (`@openreloading/api/compute`) in the browser and reads data files the API wrote at build time. The server edition still reads from the API only.
+  - `apps/web`: reads from the API, renders the figure models of `@open-reloading/drawing`. No database access or solver logic in route handlers.
+    - The Pages edition's web app runs the API's compute entry (`@open-reloading/api/compute`) in the browser and reads data files the API wrote at build time. The server edition still reads from the API only.
 - Mantine docs: the Mantine MCP server (`.mcp.json`, `.codex/config.toml`) or the docs index https://mantine.dev/llms.txt.
 - ECharts docs (interior chart): the docs index https://echarts.apache.org/en/llms.txt.
 - Reference material (books, papers, other programs' code): never copied. Describe equations in your own words with a citation. Exceptions:
@@ -98,11 +99,11 @@ In order, before a change reaches the default branch:
 1. Issue done: every acceptance criterion met.
 2. Review of the diff by a second reader, a person or a review agent. Findings left unfixed become issues.
 3. UI change:
-   - Start the API and the web app: `npm run build -w @openreloading/web` with `API_URL` set (it also writes `public/sw.js`), then `next start`.
-   - Run `WEB_URL=<web app> npm run visual-check -w @openreloading/e2e -- --preset drawing` (or `--preset calculators`, or page paths such as `/workbench`). It starts no server.
+   - Start the API and the web app: `npm run build -w @open-reloading/web` with `API_URL` set (it also writes `public/sw.js`), then `next start`.
+   - Run `WEB_URL=<web app> npm run visual-check -w @open-reloading/e2e -- --preset drawing` (or `--preset calculators`, or page paths such as `/workbench`). It starts no server.
    - Look at `apps/e2e/visual-check-out/sheet.png` (git-ignored, 390 and 1280 px, light and dark).
    - The dev container image holds the e2e Chromium. An older container needs `cd apps/e2e && npx playwright install --only-shell chromium` once.
-4. Full verify once, in the dev container: `npm run build`, `npm run typecheck`, `npm run lint`, `npm test`, `npm run test:e2e` and the drawing baseline (`npm run drawing-baseline -w @openreloading/e2e`).
+4. Full verify once, in the dev container: `npm run build`, `npm run typecheck`, `npm run lint`, `npm test`, `npm run test:e2e` and the drawing baseline (`npm run drawing-baseline -w @open-reloading/e2e`).
    - A change to the `exports` of a package the web app imports, to the web app's imports of a package, or to a Dockerfile: also the image build on the host, `podman compose build web` (or `docker compose build web`). CI builds the web image from the Dockerfile with only the files it copies, so a local build over the whole workspace does not show a missing one.
 5. Commits signed (`commit.gpgsign` with an SSH key). Never `git filter-branch` (it drops signatures). Re-sign with `git rebase -f --exec 'git commit --amend --no-edit -S' <base>`. Never `--no-verify`.
 6. Push, then CI green on the pushed commit.

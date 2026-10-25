@@ -1,7 +1,7 @@
 /**
  * The compute code of `POST /interior` and `POST /interior/charge-target` without Fastify, the
  * database or Node APIs: the web app's Pages edition runs it in the browser
- * (`@openreloading/api/compute`).
+ * (`@open-reloading/api/compute`).
  */
 export { errorAnswer, notice } from './answer.ts'
 export { type ChargeContext, runChargeTarget } from './charge-run.ts'

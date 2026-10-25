@@ -11,7 +11,7 @@ import {
   toSi,
   type UserRecord,
   userRecord,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import { storedOf } from './firearm.ts'
 import { type MeasuredSeries, seriesFromLoad, seriesToLoad } from './measurements.ts'
 import type { LadderDirection, RunnableLadderKind } from './seating-ladder.ts'

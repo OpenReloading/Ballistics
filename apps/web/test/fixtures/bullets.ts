@@ -1,4 +1,4 @@
-import type { Bullet } from '@openreloading/schema'
+import type { Bullet } from '@open-reloading/schema'
 
 /** Made-up bullet records for the tests; the numbers are not any manufacturer's. */
 export const targetBullet: Bullet = {

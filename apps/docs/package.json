@@ -1,5 +1,5 @@
 {
-  "name": "@openreloading/docs",
+  "name": "@open-reloading/docs",
   "version": "0.0.1",
   "private": true,
   "license": "MIT",
@@ -20,7 +20,7 @@
     "@docusaurus/core": "3.10.2",
     "@docusaurus/plugin-content-docs": "3.10.2",
     "@docusaurus/preset-classic": "3.10.2",
-    "@openreloading/api": "0.0.1",
+    "@open-reloading/api": "0.0.1",
     "@scalar/api-reference": "1.75.1",
     "katex": "0.19.0",
     "pagefind": "1.5.2",

@@ -73,7 +73,7 @@ export const seatingLengthName: Record<SeatingLengthKind, string> = {
 
 /**
  * The seated bullet at another COAL or CBTO, from the seating preview (`seat` of
- * `@openreloading/drawing/seating`): the length it seats by, its slider range and the values
+ * `@open-reloading/drawing/seating`): the length it seats by, its slider range and the values
  * behind the bullet at a length.
  */
 export type SeatingLengths = {

@@ -1,4 +1,4 @@
-import type { Powder } from '@openreloading/schema'
+import type { Powder } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import {
   classifyPowder,

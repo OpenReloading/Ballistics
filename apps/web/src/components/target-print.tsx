@@ -1,6 +1,6 @@
 'use client'
 
-import type { ShotGroup, TargetSheet } from '@openreloading/schema'
+import type { ShotGroup, TargetSheet } from '@open-reloading/schema'
 import type { Ref } from 'react'
 import { createPortal } from 'react-dom'
 import { localDay } from '../lib/dates.ts'

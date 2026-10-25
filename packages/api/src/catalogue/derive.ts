@@ -1,4 +1,4 @@
-import { leastSpecValue } from '@openreloading/core'
+import { leastSpecValue } from '@open-reloading/core'
 import {
   type Bullet,
   type CaliberClass,
@@ -13,7 +13,7 @@ import {
   sortKey,
   type TargetFace,
   type TargetMapping,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import type {
   BulletItem,
   CaliberClassItem,

@@ -1,6 +1,6 @@
 'use client'
 
-import { toSi } from '@openreloading/schema'
+import { toSi } from '@open-reloading/schema'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { requestTimeout } from '../lib/api-client.ts'
 import { apiFetch } from '../lib/api-fetch.ts'

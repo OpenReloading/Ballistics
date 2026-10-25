@@ -1,4 +1,4 @@
-import { parseRef } from '@openreloading/schema'
+import { parseRef } from '@open-reloading/schema'
 import type { LoadTables } from './load-tables.ts'
 import type { Bundle } from './records.ts'
 

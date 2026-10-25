@@ -13,7 +13,7 @@ import {
   overrideResistance,
   powderModelValues,
   ValueError,
-} from '@openreloading/core'
+} from '@open-reloading/core'
 import {
   type AnalysisKey,
   analysisKinds,
@@ -25,7 +25,7 @@ import {
   toSi,
   userDataFile,
   versionProblem,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import { z } from 'zod'
 
 type Path = PropertyKey[]

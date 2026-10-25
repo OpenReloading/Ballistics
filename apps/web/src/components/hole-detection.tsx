@@ -7,7 +7,7 @@ import {
   type TargetFace,
   type TargetSheet,
   toSi,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import { ArrowClockwise, ArrowCounterClockwise, GearSix, X } from '@phosphor-icons/react'
 import { type KeyboardEvent, type PointerEvent, useEffect, useRef, useState } from 'react'
 import { ellipsePoint } from '../lib/ellipse.ts'

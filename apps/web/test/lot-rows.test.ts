@@ -1,4 +1,4 @@
-import { chargeLadder, type InteriorLoad, interior } from '@openreloading/core'
+import { chargeLadder, type InteriorLoad, interior } from '@open-reloading/core'
 import { describe, expect, it } from 'vitest'
 import { exampleInterior, exampleRecords, loadExample } from '../src/lib/example-data.ts'
 import { exampleFields } from '../src/lib/examples.ts'

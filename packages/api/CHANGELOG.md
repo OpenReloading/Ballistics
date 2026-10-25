@@ -12,6 +12,6 @@
 
 * The following workspace dependencies were updated
   * dependencies
-    * @openreloading/core bumped from * to 0.0.1
-    * @openreloading/data bumped from * to 0.0.1
-    * @openreloading/schema bumped from * to 0.0.1
+    * @open-reloading/core bumped from * to 0.0.1
+    * @open-reloading/data bumped from * to 0.0.1
+    * @open-reloading/schema bumped from * to 0.0.1

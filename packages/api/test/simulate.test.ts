@@ -5,8 +5,8 @@ import {
   powderModelValues,
   recordResistance,
   workbenchValueKeys,
-} from '@openreloading/core'
-import { analysisKinds, legacyLoadProblem, toSi } from '@openreloading/schema'
+} from '@open-reloading/core'
+import { analysisKinds, legacyLoadProblem, toSi } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { maxPoints } from '../src/compute/interior-schema.ts'
 import { filePath } from '../src/compute/load-file.ts'

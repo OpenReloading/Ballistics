@@ -1,4 +1,4 @@
-import type { UserCartridge } from '@openreloading/schema'
+import type { UserCartridge } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import {
   type Action,

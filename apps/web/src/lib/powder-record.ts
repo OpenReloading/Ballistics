@@ -1,4 +1,4 @@
-import type { Powder } from '@openreloading/schema'
+import type { Powder } from '@open-reloading/schema'
 
 /**
  * A powder record's M3 parameters in the workbench: the fill, the field marks, the fit summary

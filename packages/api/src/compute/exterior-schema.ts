@@ -1,4 +1,4 @@
-import { dragModels } from '@openreloading/core'
+import { dragModels } from '@open-reloading/core'
 import { z } from 'zod'
 import { caps, fitIterations, recordId, steps } from './schemas.ts'
 

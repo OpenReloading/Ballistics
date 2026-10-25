@@ -1,5 +1,5 @@
 import { SegmentedControl } from '@mantine/core'
-import { angleText, face, type LengthUnit, lengthText } from '@openreloading/drawing'
+import { angleText, face, type LengthUnit, lengthText } from '@open-reloading/drawing'
 import {
   conflictWording,
   type Drawn,
@@ -17,7 +17,7 @@ import {
   sideName,
   signedLengthText,
   valueParts,
-} from '@openreloading/drawing/cartridge'
+} from '@open-reloading/drawing/cartridge'
 import type { drawable } from '../lib/cartridge-sheet.ts'
 import { controlSize } from '../lib/theme.ts'
 import { type Linked, TechnicalDrawing } from './technical-drawing.tsx'

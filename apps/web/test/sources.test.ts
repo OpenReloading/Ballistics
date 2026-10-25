@@ -1,4 +1,4 @@
-import { fromSi, type UserBullet, type UserCartridge } from '@openreloading/schema'
+import { fromSi, type UserBullet, type UserCartridge } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
 import { bulletMatches } from '../src/lib/bullet-rows.ts'
 import { emptyDirectory, readDirectory, writeDirectory } from '../src/lib/directory.ts'

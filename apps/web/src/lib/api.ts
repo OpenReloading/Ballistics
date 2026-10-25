@@ -1,4 +1,4 @@
-import type { Bullet, Powder, TargetFace, TargetMapping } from '@openreloading/schema'
+import type { Bullet, Powder, TargetFace, TargetMapping } from '@open-reloading/schema'
 import { cacheLife } from 'next/cache'
 import { PHASE_PRODUCTION_BUILD } from 'next/constants'
 import type {

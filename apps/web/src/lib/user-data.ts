@@ -8,7 +8,7 @@ import {
   userDataVersion,
   userRecord,
   versionProblem,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import { z } from 'zod'
 
 /** Files above this size are skipped on import: a sheet file carries its photo as base64. */
@@ -53,7 +53,7 @@ export type ParsedUserFile =
     }
   | { ok: false; reason: string }
 
-/** One file, validated against `@openreloading/schema` as a whole. */
+/** One file, validated against `@open-reloading/schema` as a whole. */
 export function parseUserDataFile(text: string): ParsedUserFile {
   if (fileBytes(text) > maxFileBytes) return { ok: false, reason: tooLargeMessage }
   let json: unknown

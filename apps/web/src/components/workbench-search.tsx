@@ -2,7 +2,7 @@
 
 import { useDebouncedValue } from '@mantine/hooks'
 import { type createSpotlight, Spotlight, spotlight } from '@mantine/spotlight'
-import type { CartridgeDiameters } from '@openreloading/core'
+import type { CartridgeDiameters } from '@open-reloading/core'
 import { useEffect, useRef, useState } from 'react'
 import type { BulletSummary, CartridgeSummary, PowderSummary } from '../lib/api-types.ts'
 import type { BulletRow } from '../lib/bullet-rows.ts'

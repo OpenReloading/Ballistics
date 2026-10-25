@@ -1,6 +1,6 @@
 'use client'
 
-import type { TrajectoryPoint } from '@openreloading/core'
+import type { TrajectoryPoint } from '@open-reloading/core'
 import { useState } from 'react'
 import { type FieldSpec, type Fields, fieldError, initialFields } from '../lib/field-spec.ts'
 import { movingTargetRows } from '../lib/moving-target.ts'

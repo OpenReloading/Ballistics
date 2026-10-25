@@ -1,6 +1,6 @@
 'use client'
 
-import type { Powder } from '@openreloading/schema'
+import type { Powder } from '@open-reloading/schema'
 import type { Context, Dispatch, RefObject, SetStateAction } from 'react'
 import { createContext, useContext } from 'react'
 import type { InteriorResponse } from '../lib/api-types.ts'

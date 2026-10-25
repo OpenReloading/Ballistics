@@ -9,7 +9,7 @@ import {
   type Manufacturer,
   parseRef,
   type RenameKind,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import {
   bulletRow,
   byKey,

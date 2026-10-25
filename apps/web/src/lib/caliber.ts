@@ -2,7 +2,7 @@
  * Common caliber names of the lists:
  * a bullet diameter (a bullet's, or a cartridge's G1) falls in the group whose span holds it.
  */
-import { toSi } from '@openreloading/schema'
+import { toSi } from '@open-reloading/schema'
 import { inchText, metersPerInch, type UnitSystem } from './units.ts'
 
 /** Name and span [from, to) in inches, by size; set by hand over the bullets and CIP G1 values. */

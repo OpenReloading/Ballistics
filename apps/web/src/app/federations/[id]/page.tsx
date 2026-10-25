@@ -1,4 +1,4 @@
-import { compareDisciplines, compareTargetFaces, toSi } from '@openreloading/schema'
+import { compareDisciplines, compareTargetFaces, toSi } from '@open-reloading/schema'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'

@@ -1,4 +1,4 @@
-# @openreloading/schema
+# @open-reloading/schema
 
 Zod schemas for records, ESM. The build writes JSON Schema files to `dist/json-schema/` (generated, not committed).
 
@@ -19,7 +19,7 @@ Zod schemas for records, ESM. The build writes JSON Schema files to `dist/json-s
 - `CaliberClass` (`src/caliber-class.ts`): a record in `records/caliber-classes`, named by id in `Discipline.caliberClasses`, membership checked by `data:validate`.
 - Vocabularies the API and the web app share are exported once: `caseTypes` (`src/cartridge.ts`), `baseTypes`, `ogiveForms` and `tipTypes` (`src/bullet.ts`). The web app imports record types from here and keeps no copy; the bullet designer's choice lists are the options of these enums. Model overview and plan: `apps/docs/docs/data/record-model.md`.
 
-## Commands (this directory, or `-w @openreloading/schema` from the root)
+## Commands (this directory, or `-w @open-reloading/schema` from the root)
 
 - Build: `npm run build` (output `dist/`, `dist/json-schema/*.schema.json`)
 - Test: `npm test` (Vitest)
@@ -31,6 +31,6 @@ Zod schemas for records, ESM. The build writes JSON Schema files to `dist/json-s
 - Each quantity has one stored unit (`src/units.ts`). `quantity(kind, value?)` stores `value` in that unit and the source text in `raw`.
 - `toSi(kind, stored)` and `fromSi(kind, si)` (`src/units.ts`) are the only stored-to-SI conversion (`siMaps`: a factor and an offset per quantity). Display units such as inch and grain stay in the web app's `lib/units.ts`.
 - Put a field's bounds on the optional value schema (`quantity('angle', z.number().gt(0).lt(90))`), so the generated JSON Schema carries them as `minimum`/`maximum` or their exclusive forms. Keep only rules across fields in `superRefine`.
-- `SourceRecord` and `SourceReference` (`src/provenance.ts`): a source stored once and a record's citation of it by id, resolved by `@openreloading/data` before the record schemas run.
+- `SourceRecord` and `SourceReference` (`src/provenance.ts`): a source stored once and a record's citation of it by id, resolved by `@open-reloading/data` before the record schemas run.
 - Every record carries `provenance`: a kind (`published`, `measured`, `derived`, `fitted`, `computed`) and at least one source. Fact sources such as C.I.P. sheets and rule books carry no `license` or `terms`. Other third-party data names its `publisher` and what allows the use: `license` (SPDX id, or `LicenseRef-<name>` with `terms` for the publisher's own terms or a written permission).
 - Imports and syntax: root `AGENTS.md`.

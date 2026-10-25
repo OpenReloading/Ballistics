@@ -1,5 +1,5 @@
 import { MantineProvider } from '@mantine/core'
-import type { Source } from '@openreloading/schema'
+import type { Source } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { Sources, SourceTitles } from '../src/components/sources.tsx'

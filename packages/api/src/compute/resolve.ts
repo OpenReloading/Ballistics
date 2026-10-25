@@ -1,7 +1,7 @@
 /** Database records to core inputs, with exact unit conversions. */
 import { httpErrors } from '@fastify/sensible'
-import { type Aerodynamics, InputError, type Projectile } from '@openreloading/core'
-import { type Bullet, toSi } from '@openreloading/schema'
+import { type Aerodynamics, InputError, type Projectile } from '@open-reloading/core'
+import { type Bullet, toSi } from '@open-reloading/schema'
 import type { Catalogue } from '../catalogue/types.ts'
 import { type ResolvedRecord, resolvedRecord } from './answer.ts'
 import type { CartridgeWithSpecs } from './limits.ts'

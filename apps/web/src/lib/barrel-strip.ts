@@ -4,9 +4,9 @@ import {
   type SpecValue,
   steelBand,
   svgPath,
-} from '@openreloading/drawing'
-import { previewDrawn } from '@openreloading/drawing/seating'
-import { fromSi } from '@openreloading/schema'
+} from '@open-reloading/drawing'
+import { previewDrawn } from '@open-reloading/drawing/seating'
+import { fromSi } from '@open-reloading/schema'
 
 /**
  * What the barrel strip of the interior chart draws, taken from the seated preview at the

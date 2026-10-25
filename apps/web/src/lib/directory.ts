@@ -1,5 +1,5 @@
 /** Directory lists: filters and sort kept in the URL, number ranges and the units they compare in. */
-import { fromSi } from '@openreloading/schema'
+import { fromSi } from '@open-reloading/schema'
 import type { SortDirection } from './lists.ts'
 import { kilogramsPerGrain, metersPerInch, psi } from './units.ts'
 

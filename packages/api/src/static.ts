@@ -1,6 +1,6 @@
 /**
  * The API over the catalogue of the data bundle, and the data files the web app's Pages edition
- * serves instead of an API (`@openreloading/api/static`, used at build time only).
+ * serves instead of an API (`@open-reloading/api/static`, used at build time only).
  */
 import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'

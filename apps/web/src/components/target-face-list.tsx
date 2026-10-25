@@ -1,7 +1,7 @@
 'use client'
 
 import { Button, Select } from '@mantine/core'
-import { toSi } from '@openreloading/schema'
+import { toSi } from '@open-reloading/schema'
 import { Plus } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useDeferredValue, useMemo } from 'react'

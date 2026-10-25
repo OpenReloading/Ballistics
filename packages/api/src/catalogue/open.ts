@@ -1,4 +1,4 @@
-import { bulletWindow } from '@openreloading/core'
+import { bulletWindow } from '@open-reloading/core'
 import { revisionOf } from './derive.ts'
 import { select } from './list.ts'
 import {

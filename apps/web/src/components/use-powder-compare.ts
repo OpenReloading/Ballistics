@@ -1,6 +1,6 @@
 'use client'
 
-import type { Powder } from '@openreloading/schema'
+import type { Powder } from '@open-reloading/schema'
 import { useEffect, useRef, useState } from 'react'
 import { fetchPowder, fetchPowderList, postInteriorRun, postJson } from '../lib/api-client.ts'
 import type { InteriorResponse, PowderSummary } from '../lib/api-types.ts'

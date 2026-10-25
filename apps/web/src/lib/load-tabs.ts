@@ -1,5 +1,5 @@
 /** The workbench loads, tabs and the saved-loads list. */
-import type { UserRecord } from '@openreloading/schema'
+import type { UserRecord } from '@open-reloading/schema'
 import { matchesQuery } from './lists.ts'
 import { copyName } from './user-file-names.ts'
 import { putRecords, storedRecord } from './user-store.ts'

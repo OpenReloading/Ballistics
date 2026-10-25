@@ -1,6 +1,6 @@
 'use client'
 
-import type { UserRecordKind } from '@openreloading/schema'
+import type { UserRecordKind } from '@open-reloading/schema'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { type History, historyOf } from '../lib/history.ts'
 import type { UnitSystem } from '../lib/units.ts'

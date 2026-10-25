@@ -23,7 +23,7 @@ import {
   trajectory,
   trueDrag,
   trueMuzzleVelocity,
-} from '@openreloading/core'
+} from '@open-reloading/core'
 
 /** The deadline passed while the task was queued or running. */
 export class ComputeTimeout extends Error {}

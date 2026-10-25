@@ -1,4 +1,4 @@
-import type { Bullet, Powder, Provenance } from '@openreloading/schema'
+import type { Bullet, Powder, Provenance } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
 import {
   ballisticCoefficientRows,

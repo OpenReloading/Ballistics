@@ -1,4 +1,4 @@
-import { fromSi } from '@openreloading/schema'
+import { fromSi } from '@open-reloading/schema'
 import type { InteriorResponse } from './api-types.ts'
 import { firstIndexBeyondTravel } from './interior-chart.ts'
 import type { InteriorBody } from './interior-input.ts'

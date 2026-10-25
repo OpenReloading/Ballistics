@@ -1,8 +1,9 @@
 name: Release
 
 # release-please keeps one release pull request open from the Conventional Commits on main; merging it
-# tags each changed component <component>-vX.Y.Z, writes its CHANGELOG.md and GitHub Release, and the
-# images job publishes the api and web images of the components released.
+# tags each changed component <component>-vX.Y.Z, writes its CHANGELOG.md and GitHub Release, the
+# images job publishes the api and web images of the components released, and the publish job the
+# libraries to npm (trusted publishing, no token).
 # Steps and versioning: apps/docs/docs/release.md.
 on:
   push:
@@ -25,6 +26,7 @@ jobs:
       pull-requests: write
     outputs:
       images: ${{ steps.images.outputs.matrix }}
+      libraries: ${{ steps.libraries.outputs.names }}
     steps:
       - id: release
         uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
@@ -73,6 +75,20 @@ jobs:
                licenses: "MIT AND CC-BY-4.0 AND Apache-2.0 AND BSD-3-Clause AND OFL-1.1"}]
              | map(select(.version != ""))')
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+      - id: libraries
+        env:
+          SCHEMA: ${{ steps.release.outputs['packages/schema--release_created'] }}
+          CORE: ${{ steps.release.outputs['packages/core--release_created'] }}
+          DRAWING: ${{ steps.release.outputs['packages/drawing--release_created'] }}
+          IMPORTERS: ${{ steps.release.outputs['packages/importers--release_created'] }}
+          DATA: ${{ steps.release.outputs['packages/data--release_created'] }}
+        run: |
+          names=$(jq -nc \
+            --arg schema "$SCHEMA" --arg core "$CORE" --arg drawing "$DRAWING" \
+            --arg importers "$IMPORTERS" --arg data "$DATA" \
+            '[["schema", $schema], ["core", $core], ["drawing", $drawing], ["importers", $importers], ["data", $data]]
+             | map(select(.[1] == "true") | .[0])')
+          echo "names=$names" >> "$GITHUB_OUTPUT"
 
   # The images are built in the run that made the release; no workflow triggers on releases or tags.
   images:
@@ -144,3 +160,38 @@ jobs:
           subject-name: ${{ env.IMAGE }}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
+
+  # npm trusted publishing (OIDC): no npm token. Each library needs a Trusted Publisher on npmjs.com for this
+  # repository and workflow. The pushed commit is the release commit, the one every tag points at.
+  publish:
+    needs: release-please
+    if: needs.release-please.outputs.libraries != '[]' && needs.release-please.outputs.libraries != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      LIBRARIES: ${{ needs.release-please.outputs.libraries }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+      # trusted publishing needs npm 11.5.1 or later (Node 22.14.0 or later)
+      - run: '[ "$(printf ''%s\n11.5.1'' "$(npm --version)" | sort -V | head -n 1)" = 11.5.1 ]'
+      # no lifecycle scripts: this job holds the OIDC publish token, and the libraries do not need the Mantine patch
+      - run: npm ci --ignore-scripts
+      - run: npm run build -w @open-reloading/schema -w @open-reloading/core -w @open-reloading/drawing -w @open-reloading/importers -w @open-reloading/data
+      # in the order of LIBRARIES; a version that is already on the registry is skipped, so a failed run can be re-run
+      - run: |
+          for name in $(jq -r '.[]' <<< "$LIBRARIES"); do
+            package="@open-reloading/$name"
+            version=$(node -p "require('./packages/$name/package.json').version")
+            if npm view "$package@$version" version > /dev/null 2>&1; then
+              echo "$package@$version is already published"
+              continue
+            fi
+            npm publish -w "$package" --provenance
+          done

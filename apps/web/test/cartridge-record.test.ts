@@ -1,4 +1,4 @@
-import { figureModel, recordFigures, screenEm } from '@openreloading/drawing/cartridge'
+import { figureModel, recordFigures, screenEm } from '@open-reloading/drawing/cartridge'
 import { describe, expect, it } from 'vitest'
 import {
   combinedRows,

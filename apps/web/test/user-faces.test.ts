@@ -1,4 +1,4 @@
-import type { UserRecord } from '@openreloading/schema'
+import type { UserRecord } from '@open-reloading/schema'
 import { beforeEach, expect, it, vi } from 'vitest'
 import { apiFetch } from '../src/lib/api-fetch.ts'
 import { fetchFace, fetchFaceSummaries, isFaceId } from '../src/lib/face-records.ts'

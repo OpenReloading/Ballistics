@@ -1,5 +1,5 @@
-import { bulletProfile } from '@openreloading/drawing/bullet'
-import type { Bullet } from '@openreloading/schema'
+import { bulletProfile } from '@open-reloading/drawing/bullet'
+import type { Bullet } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
 import {
   compareGroups,

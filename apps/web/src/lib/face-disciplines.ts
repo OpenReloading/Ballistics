@@ -12,7 +12,7 @@ import {
   type GroupFace,
   type TargetMapping,
   toSi,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import { compareDisciplines, compareFederations, compareNames } from './face-order.ts'
 import type { Face } from './face-organization.ts'
 

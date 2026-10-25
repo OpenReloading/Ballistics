@@ -11,7 +11,7 @@ import {
   TextInput,
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
-import type { CartridgeDiameters } from '@openreloading/core'
+import type { CartridgeDiameters } from '@open-reloading/core'
 import { Funnel, MagnifyingGlass } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useDeferredValue, useEffect, useId, useMemo, useRef, useState } from 'react'

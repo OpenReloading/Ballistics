@@ -33,7 +33,7 @@ import {
   type TargetMapping,
   targetFace,
   targetMapping,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import { z } from 'zod'
 import { checkCaliberClasses } from './caliber-classes.ts'
 import { checkCoverage } from './coverage.ts'

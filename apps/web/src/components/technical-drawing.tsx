@@ -8,10 +8,10 @@ import {
   type LineSegment,
   type PartPoint,
   svgPath,
-} from '@openreloading/drawing'
-import type { BulletModel } from '@openreloading/drawing/bullet'
-import type { FigureModel, Side } from '@openreloading/drawing/cartridge'
-import { fromSi, toSi } from '@openreloading/schema'
+} from '@open-reloading/drawing'
+import type { BulletModel } from '@open-reloading/drawing/bullet'
+import type { FigureModel, Side } from '@open-reloading/drawing/cartridge'
+import { fromSi, toSi } from '@open-reloading/schema'
 import type { CSSProperties, ReactNode } from 'react'
 import { drawingFont } from '../app/fonts/drawing.ts'
 
