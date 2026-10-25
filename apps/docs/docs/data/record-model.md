@@ -26,11 +26,11 @@ Writers: catalogue (git records, checked by `readRecords`), user (browser, `pack
 | Caliber class | `caliber-class.ts` | `records/caliber-classes` | catalogue |
 | Load tables | `load-tables.ts` | `load-tables.json` of a records root | catalogue |
 | Firearm | `firearm.ts` | user record `firearm`, in the stored units (step 5) | user |
-| Workbench state | `workbench.ts` | user record `workbenchState`, called "loads" in the UI | user |
+| Load | `load.ts` | user record `load`, the load file and the catalogue `records/loads` (step 6) | catalogue, user, shared |
 | User bullet | `user-data.ts` (`bullet`) | user record: `basedOn` and `overrides` of a Bullet (step 4) | user |
 | User cartridge | `user-data.ts` (`cartridge`) | user record: `basedOn` and `overrides` of a Cartridge (step 4) | user |
 | Target sheet | `target-sheet.ts` | user record, photos in the store `files` | user |
-| Measured series | `workbench.ts` (`measuredSeries`) | inside the workbench state | user, reshaped from importer output |
+| Measured series | `load.ts` (`measurementSeries`) | inside the load | user, reshaped from importer output |
 | Solver bodies | `packages/api/src/compute/interior-schema.ts`, `exterior-schema.ts` | none | solver input |
 
 ## Overlaps
@@ -151,7 +151,7 @@ Each step lands alone with its model page updated in the same commit. Steps 4 to
 | 3 | Id and reference primitives, `checkUserRefs` (done, below) | |
 | 4 | Designs become overrides of Bullet and Cartridge (done, below) | 1, 3 |
 | 5 | Firearm in one shape (done, below) | 2 |
-| 6 | Load unification: the workbench state becomes Load | 2 to 5 |
+| 6 | Load unification: the workbench state becomes Load (done, below) | 2 to 5 |
 | 7 | Session unification | 3, 6 |
 | 8 | CaseCapacity references | 6 |
 | 9 | Manufacturer references (done, below) | 3 |
@@ -197,7 +197,17 @@ Steps 1, 2 and 11 go first, then 3, then 4 to 6, then 7 to 9. Steps 10 and 12 fi
 - `firearm` (`packages/schema/src/firearm.ts`) is the one firearm shape. Lengths are `quantity('length')` objects in mm, the mass `quantity('mass')` in g, click value, travel and cant `quantity('angle')` in degrees, a mount's zero air `quantity('temperature')` in degC, `quantity('pressure')` in bar and `quantity('relativeHumidity')` in %. The drag factor, magnifications and round count are plain numbers. The envelope field `origin` (`catalogue`, `user`, `shared`) is required, so a firearm of the old SI format fails the schema instead of reading as a firearm 1000 times too short. The user record of kind `firearm` carries it as `data`; no migration, an old record stays in the store as an invalid one.
 - `manufacturer` is a `catalogue:<id>` reference to a manufacturer record, `cartridge` a reference (`catalogue:<id>` or `user:<UUID>`). Since step 9 the maker is a reference of either scope and there is no `manufacturerName`.
 - `Load` drops its inline `firearm` (name, barrel length, twist, hand) for an optional `firearm` reference. No catalogue firearm kind exists yet, so no reference check reads it.
-- The web app converts at its edges: `siOf`, `storedOf`, `fieldSi` and `fieldStored` (`apps/web/src/lib/firearm.ts`) go through `toSi` and `fromSi`, the sight, click and Gun card values stay SI where the solver forms read them, and the editor stores a field only when it is edited, so values the user did not touch keep the exact stored number. Not part of this step: the workbench state's `firearm` (a local id until step 6) and its `siValues` entry `firearmMass` (kg).
+- The web app converts at its edges: `siOf`, `storedOf`, `fieldSi` and `fieldStored` (`apps/web/src/lib/firearm.ts`) go through `toSi` and `fromSi`, the sight, click and Gun card values stay SI where the solver forms read them, and the editor stores a field only when it is edited, so values the user did not touch keep the exact stored number. Not part of this step: the workbench's saved `firearm` and `firearmMass` (step 6).
+
+### Step 6: what changed
+
+- `load` (`packages/schema/src/load.ts`) is the one Load: the catalogue record (`records/loads`, read through `catalogueLoad`), the user record of kind `load` and the load file of `POST /v1/interior/load-file`. It replaces the user record `workbenchState` and the catalogue `Load`. Every quantity is a stored-unit object (charge and the measured case capacity in g, seating and measured muzzle distance in mm), the SI values appear at the solver call only.
+- References: `cartridge`, `firearm` and `bullet` are `catalogue:<id>` or `user:<UUID>` references, `powder` a `catalogue:` reference (no user powder kind exists, so no stub is created). A catalogue load names catalogue records only and carries `id`, `name`, `provenance`, cartridge, bullet, powder and charge; a user load is named by its record. Only a catalogue load of provenance kind `measured` may describe its bullet or powder by maker and name where no record exists; `primer` and `case` stay descriptions.
+- `analysis` holds the typed solver values, `overrides`, and the `ladder`. `overrides` is a strict object with one optional number per key of `workbenchValueKeys` but `charge` (the load's own `charge`), each in the stored unit of `analysisKinds` (`volume` in cm3, `propellantTemperature` in degC, pressures in bar). A key outside that list fails the schema. The ladder step is in the stored unit of its kind: g, mm or K. The measured chronograph series (`measurements`) stay on the load until step 7 moves them to sessions.
+- Old format: a record of kind `workbenchState` or a file with `siValues` is not read. The schema's own message for the old kind says so, in Open, Import, the stored-record list and the load file route.
+- The workbench saves a key under `overrides` only when the user typed it (`givenKeys` in `apps/web/src/lib/load-record.ts`). A value is left out when a reference gives it again on opening: the powder record's model parameters, the bullet record's or design's mass, a followed default of volume, bore diameter, bore area and twist, the seating's volume and travel (while the barrel length is the default one), the Settings defaults and the mass and twist of a referenced firearm. Opening fills the form like a link (the Settings defaults and the followed defaults for the keys the load leaves out), then the records fill the rest, and the typed values stay.
+- A load follows a changed record or changed Settings for every value the user did not type. A value whose source a reference cannot name is saved as typed: a design or firearm whose id is no UUID. The built-in example rifle has a fixed UUID so that the example load keeps it.
+- `POST /v1/interior/load-file` fills the values a load leaves out from the catalogue records it references: the charge, the powder's model parameters, the bullet's mass and the cartridge's bore area. A value no record gives (volume, travel, twist, bore diameter without a cartridge record) is a 400 at `records[i].data.analysis.overrides.<key>`.
 
 ### Step 12: what changed
 

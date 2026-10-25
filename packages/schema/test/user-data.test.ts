@@ -3,6 +3,7 @@ import { z } from 'zod'
 import {
   checkUserRefs,
   firearm,
+  legacyLoadProblem,
   type UserRecord,
   units,
   userDataFile,
@@ -52,11 +53,11 @@ const cartridgeRecord = {
   },
 } as const
 const loadRecord = {
-  kind: 'workbenchState',
+  kind: 'load',
   id: 'w4',
   name: 'Load',
   saved,
-  data: { siValues: { charge: 0.0028 }, cartridge: '308-win', notes: '' },
+  data: { origin: 'user', charge: { value: 2.8 }, cartridge: 'catalogue:308-win' },
 } as const
 
 const firearmRecord = {
@@ -317,112 +318,29 @@ describe('userDataFile files', () => {
   })
 })
 
-describe('workbenchState ladder', () => {
-  const withLadder = (ladder: unknown) => ({
-    ...loadRecord,
-    data: { ...loadRecord.data, ladder },
-  })
-
-  it('keeps a ladder and opens a load without one', () => {
-    const ladder = { stepCount: 3, chargeStep: 0.0001, direction: 'down' }
-    expect(userRecord.parse(withLadder(ladder))).toEqual(withLadder(ladder))
-    expect(userRecord.parse(withLadder({ stepCount: 2, direction: 'up' })).data).toHaveProperty(
-      'ladder.stepCount',
-      2,
-    )
-    expect(userRecord.parse(loadRecord).data).not.toHaveProperty('ladder')
-  })
-
-  it('keeps a ladder kind, opens a load without one as the charge and rejects an unknown kind', () => {
-    const seating = { kind: 'seating', stepCount: 3, chargeStep: 0.0005, direction: 'up' }
-    expect(userRecord.parse(withLadder(seating))).toEqual(withLadder(seating))
-    const { kind: _, ...older } = seating
-    expect(userRecord.parse(withLadder(older)).data).not.toHaveProperty('ladder.kind')
-    const temperature = { ...seating, kind: 'temperature', chargeStep: 5 }
-    expect(userRecord.parse(withLadder(temperature))).toEqual(withLadder(temperature))
-    expect(userRecord.safeParse(withLadder({ ...seating, kind: 'Seating' })).success).toBe(false)
-  })
-
-  it('rejects a step count outside 2 to 21, a step of 0, an unknown direction and an even count around', () => {
-    expect(userRecord.safeParse(withLadder({ stepCount: 21, direction: 'around' })).success).toBe(
-      true,
-    )
-    for (const ladder of [
-      { stepCount: 1, direction: 'up' },
-      { stepCount: 22, direction: 'up' },
-      { stepCount: 4, direction: 'around' },
-      { stepCount: 2.5, direction: 'up' },
-      { stepCount: 3, chargeStep: 0, direction: 'up' },
-      { stepCount: 3, direction: 'sideways' },
-    ])
-      expect(userRecord.safeParse(withLadder(ladder)).success).toBe(false)
-  })
-})
-
-describe('workbenchState seating, measured capacity and firearm', () => {
-  const withData = (data: object) => ({ ...loadRecord, data: { ...loadRecord.data, ...data } })
-  const kept = withData({
-    measuredWaterCapacity: 3.52e-6,
-    firearm: 'f5',
-    seating: { by: 'overallLength', value: 0.0708 },
-  })
-
-  it('keeps them through a round trip', () => {
-    expect(userRecord.parse(kept)).toEqual(kept)
-    const baseToOgive = withData({ seating: { by: 'baseToOgive', value: 0.0545 } })
-    expect(userRecord.parse(baseToOgive)).toEqual(baseToOgive)
-  })
-
-  it('opens an older load without them unchanged', () => {
-    const data = userRecord.parse(loadRecord).data
-    for (const k of ['measuredWaterCapacity', 'firearm', 'seating'])
-      expect(data).not.toHaveProperty(k)
-    expect(userDataFile.parse(file([loadRecord])).records).toEqual([loadRecord])
-  })
-
-  it('rejects a capacity or seating of 0, an unknown seating mode and an empty firearm id', () => {
-    for (const data of [
-      { measuredWaterCapacity: 0 },
-      { seating: { by: 'overallLength', value: 0 } },
-      { seating: { by: 'depth', value: 0.07 } },
-      { firearm: '' },
-    ])
-      expect(userRecord.safeParse(withData(data)).success).toBe(false)
-  })
-})
-
-describe('workbenchState measurements', () => {
-  const withData = (data: object) => ({ ...loadRecord, data: { ...loadRecord.data, ...data } })
-  const series = {
-    name: 'day1.csv',
-    date: '2026-10-12',
-    device: 'Manufacturer Radar',
-    muzzleDistance: 3,
-    strings: [
-      {
-        label: 'A',
-        charge: 0.00248,
-        shots: [{ velocity: { value: 800 } }, { velocity: { value: 790 }, excluded: 'flyer' }],
-      },
-      { shots: [{ velocity: { value: 810, raw: '2657' }, coldBore: true }] },
-    ],
+describe('a record of the earlier load format', () => {
+  const old = {
+    kind: 'workbenchState',
+    id: 'w1',
+    name: 'Load',
+    saved,
+    data: { siValues: { charge: 0.0028 }, cartridge: '308-win' },
   }
 
-  it('keeps the series through a round trip and opens a load without them unchanged', () => {
-    const kept = withData({ measurements: [series, { name: 'day2.csv', strings: [] }] })
-    expect(userRecord.parse(kept)).toEqual(kept)
-    expect(userRecord.parse(loadRecord).data).not.toHaveProperty('measurements')
+  it('is refused with a message that names the new kind', () => {
+    const r = userRecord.safeParse(old)
+    expect(r.success).toBe(false)
+    expect(r.error?.issues[0].message).toBe(legacyLoadProblem)
+    expect(legacyLoadProblem).toContain('"load"')
+    const f = userDataFile.safeParse(file([old]))
+    expect(f.success).toBe(false)
+    expect(JSON.stringify(f.error?.issues)).toContain('earlier version')
   })
 
-  it('rejects a charge of 0, a shot without a velocity, a long name and too many series', () => {
-    const string = series.strings[0]
-    for (const measurements of [
-      [{ ...series, strings: [{ ...string, charge: 0 }] }],
-      [{ ...series, strings: [{ shots: [{}] }] }],
-      [{ ...series, name: 'x'.repeat(201) }],
-      Array.from({ length: 51 }, () => series),
-    ])
-      expect(userRecord.safeParse(withData({ measurements })).success).toBe(false)
+  it('does not hide the usual message for another unknown kind', () => {
+    const r = userRecord.safeParse({ ...old, kind: 'other' })
+    expect(r.success).toBe(false)
+    expect(r.error?.issues[0].message).not.toBe(legacyLoadProblem)
   })
 })
 
@@ -587,22 +505,20 @@ describe('checkUserRefs', () => {
     userRecord.parse({ ...loadRecord, data: { ...loadRecord.data, firearm } })
   const firearm = userRecord.parse(firearmRecord)
 
-  it('reports a workbench that points at a missing firearm', () => {
-    expect(checkUserRefs([withFirearm('gone')])).toEqual([
-      { record: 'w4', kind: 'workbenchState', field: 'firearm', target: 'gone' },
+  it('reports a load that points at a missing firearm', () => {
+    expect(checkUserRefs([withFirearm(`user:${uuid}`)])).toEqual([
+      { record: 'w4', kind: 'load', field: 'firearm', target: `user:${uuid}` },
     ])
   })
 
-  it('reports a firearm id that names a record of another kind', () => {
-    const other = userRecord.parse({ ...bulletRecord, id: 'f5' })
-    expect(checkUserRefs([withFirearm('f5'), other])).toHaveLength(1)
+  it('reports a firearm reference that names a record of another kind', () => {
+    const other = userRecord.parse({ ...bulletRecord, id: uuid })
+    expect(checkUserRefs([withFirearm(`user:${uuid}`), other])).toHaveLength(1)
   })
 
-  it('reports nothing for a firearm that is there, as an old id or a user reference', () => {
-    expect(checkUserRefs([withFirearm('f5'), firearm])).toEqual([])
+  it('reports nothing for a firearm that is there', () => {
     const own = { ...firearm, id: uuid }
     expect(checkUserRefs([withFirearm(`user:${uuid}`), own])).toEqual([])
-    expect(checkUserRefs([withFirearm(`user:${uuid}`)])).toHaveLength(1)
   })
 
   it('leaves a catalogue reference and a record without references alone', () => {
@@ -637,25 +553,21 @@ describe('checkUserRefs', () => {
     ]
     expect(checkUserRefs([withRefs(`user:${uuid}`, `user:${own[1]?.id}`), ...own])).toEqual([])
     expect(checkUserRefs([withRefs(`user:${uuid}`, 'catalogue:alpha-30425')])).toEqual([
-      { record: 'w4', kind: 'workbenchState', field: 'cartridge', target: `user:${uuid}` },
+      { record: 'w4', kind: 'load', field: 'cartridge', target: `user:${uuid}` },
     ])
     // a design of the other kind under that id does not answer
-    expect(checkUserRefs([withRefs('308-win', `user:${uuid}`), own[0] as never])).toHaveLength(1)
+    expect(
+      checkUserRefs([withRefs('catalogue:308-win', `user:${uuid}`), own[0] as never]),
+    ).toHaveLength(1)
   })
 
-  it('opens a load that names its cartridge and bullet by plain id or by reference', () => {
-    for (const [cartridge, bullet] of [
-      ['308-win', 'alpha-30425'],
-      ['catalogue:308-win', `user:${uuid}`],
-    ])
-      expect(
-        userRecord.safeParse({ ...loadRecord, data: { ...loadRecord.data, cartridge, bullet } })
-          .success,
-      ).toBe(true)
-    expect(
-      userRecord.safeParse({ ...loadRecord, data: { ...loadRecord.data, bullet: 'user:1' } })
-        .success,
-    ).toBe(false)
+  it('opens a load that names its cartridge and bullet by reference and refuses a plain id', () => {
+    const open = (cartridge: string, bullet: string) =>
+      userRecord.safeParse({ ...loadRecord, data: { ...loadRecord.data, cartridge, bullet } })
+        .success
+    expect(open('catalogue:308-win', `user:${uuid}`)).toBe(true)
+    expect(open('308-win', 'alpha-30425')).toBe(false)
+    expect(open('catalogue:308-win', 'user:1')).toBe(false)
   })
 
   it('reports a target sheet whose load is missing', () => {

@@ -25,20 +25,37 @@ export const isWebLink = (text: string) => /^https?:\/\//.test(text)
  * Inferred type: {@link Source}.
  */
 export const source = z.object({
-  title: z.string().min(1),
+  title: z.string().min(1).describe('Title of the source: the document, or the site and table.'),
   /** Who issued the data: a maker, a standards body or the authors ("Example Bullets Inc."). */
-  publisher: z.string().min(1).optional(),
+  publisher: z
+    .string()
+    .min(1)
+    .describe('Who issued the data: a maker, a standards body or the authors.')
+    .optional(),
   /** Edition, print or date as the document states it. */
-  edition: z.string().min(1).optional(),
-  page: z.string().min(1).optional(),
+  edition: z
+    .string()
+    .min(1)
+    .describe('Edition, print or date as the document states it.')
+    .optional(),
+  page: z.string().min(1).describe('Page or section of the document.').optional(),
   /** An http or https URL: pages render it as a link. */
-  url: z.url({ protocol: /^https?$/ }).optional(),
-  retrieved: z.iso.date().optional(),
-  sha256: sha256.optional(),
+  url: z
+    .url({ protocol: /^https?$/ })
+    .describe('An http or https URL of the source.')
+    .optional(),
+  retrieved: z.iso.date().describe('Date the source was retrieved, ISO 8601.').optional(),
+  sha256: sha256.describe('SHA-256 of the retrieved file, 64 lowercase hex digits.').optional(),
   /** Dot paths of the record fields this source supports; absent means the whole record. */
-  fields: z.array(z.string().min(1)).min(1).optional(),
+  fields: z
+    .array(z.string().min(1))
+    .min(1)
+    .describe('Dot paths of the record fields this source supports. Absent: the whole record.')
+    .optional(),
   /** Kind of this source's values when it differs from the record's provenance kind. */
-  kind: provenanceKind.optional(),
+  kind: provenanceKind
+    .describe('Kind of this source values when it differs from the provenance kind of the record.')
+    .optional(),
   /**
    * SPDX id of the license the data is used under ("CC-BY-4.0"; "LicenseRef-US-Gov-PD" for a US Government work),
    * or `LicenseRef-<name>` for the publisher's own terms or a written permission, described in `terms`.
@@ -46,6 +63,9 @@ export const source = z.object({
   license: z
     .string()
     .regex(/^(LicenseRef-)?[A-Za-z0-9.+-]+$/)
+    .describe(
+      'SPDX id of the license the data is used under, or `LicenseRef-<name>` for the publisher own terms or a written permission described in `terms`.',
+    )
     .optional(),
   /**
    * URL or note of the publisher's terms or permission, where no SPDX license covers the use. A
@@ -58,14 +78,26 @@ export const source = z.object({
     .refine((t) => !isWebLink(t) || URL.canParse(t), {
       message: 'a text starting with http:// or https:// must be a URL',
     })
+    .describe(
+      'URL or note of the publisher terms or permission where no SPDX license covers the use. Text starting with http:// or https:// is a link.',
+    )
     .optional(),
   /** Who stands behind the source; `title` names the actual source (for example the site and the table). */
-  origin: sourceOrigin.optional(),
+  origin: sourceOrigin
+    .describe('Who stands behind the source: manufacturer, public or community.')
+    .optional(),
   /** The fit run behind a `fitted` source: model version id the report names, report of its evaluation. */
   run: z
-    .object({ version: z.string().regex(/^[0-9a-f]{16}$/), report: z.string().min(1) })
+    .object({
+      version: z
+        .string()
+        .regex(/^[0-9a-f]{16}$/)
+        .describe('Model version id the report names.'),
+      report: z.string().min(1).describe('Report of the evaluation of the fit.'),
+    })
+    .describe('The fit run behind a `fitted` source.')
     .optional(),
-  note: z.string().min(1).optional(),
+  note: z.string().min(1).describe('Note on the source.').optional(),
 })
 
 /**
@@ -104,9 +136,9 @@ export const sourceReference = source
  * Inferred type: {@link Provenance}.
  */
 export const provenance = z.object({
-  kind: provenanceKind,
-  sources: z.array(source).min(1),
-  note: z.string().min(1).optional(),
+  kind: provenanceKind.describe('How the values came about.'),
+  sources: z.array(source).min(1).describe('The sources of the values, at least one.'),
+  note: z.string().min(1).describe('Note on the provenance.').optional(),
 })
 
 /** One cited source of a record's values, with the terms of use. */

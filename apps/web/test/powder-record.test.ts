@@ -1,10 +1,9 @@
-import { recordResistance } from '@openreloading/core'
+import { powderModelValues, recordResistance } from '@openreloading/core'
 import type { Powder } from '@openreloading/schema'
 import { expect, it } from 'vitest'
 import {
   fitTables,
   fittedEnergyRatio,
-  powderModelValues,
   recordMark,
   unchangedFromRecord,
 } from '../src/lib/powder-record.ts'

@@ -41,7 +41,9 @@ export function collectWorksheetStrings(
   warnings: string[],
 ): { strings: { shots: ChronoShot[] }[]; labels: string[]; flags: string[]; date?: string } {
   const datesOf = (list: FoundWorksheet[]) =>
-    [...new Set(list.flatMap((f) => (f.date ? [f.date] : [])))].sort()
+    [...new Set(list.flatMap((f) => (f.date ? [f.date] : [])))].sort((a, b) =>
+      a.localeCompare(b, 'en'),
+    )
   const fill = options.date !== undefined && found.every((f) => !f.date)
   const kept = options.date ? found.filter((f) => !f.date || f.date === options.date) : found
   if (options.date && !fill && !found.some((f) => f.date === options.date)) {

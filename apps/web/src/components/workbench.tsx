@@ -815,7 +815,7 @@ export function Workbench() {
                     file={
                       <FileMenu
                         ref={fileMenu}
-                        kind="workbenchState"
+                        kind="load"
                         name={load.name}
                         nameKey={load.customName?.trim() ? load.customName : ''}
                         data={fileData}

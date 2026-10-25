@@ -86,14 +86,14 @@ export function BulletList({
   const structures = useMemo(
     () =>
       [...new Set(items.flatMap((b) => (b.construction ? [b.construction] : [])))]
-        .sort()
+        .sort((a, b) => a.localeCompare(b, 'en'))
         .map((value) => ({ value, label: titleFromKebab(value) })),
     [items],
   )
   const tips = useMemo(
     () =>
       [...new Set(items.flatMap((b) => (b.tipType ? [b.tipType] : [])))]
-        .sort()
+        .sort((a, b) => a.localeCompare(b, 'en'))
         .map((value) => ({ value, label: titleFromKebab(value) })),
     [items],
   )

@@ -10,11 +10,11 @@ import {
 import { maxFileBytes, userDataText } from '../src/lib/user-data.ts'
 
 const load: UserRecord = {
-  kind: 'workbenchState',
+  kind: 'load',
   id: 'w1',
   name: '308 Win.',
   saved: '2026-10-13T10:00:00.000Z',
-  data: { siValues: { charge: 0.0028 }, cartridge: '308-win' },
+  data: { origin: 'user', charge: { value: 2.8 }, cartridge: 'catalogue:308-win' },
 }
 
 /** A made-up format: lines starting `LOAD`, read to one load with two fields not mapped. */

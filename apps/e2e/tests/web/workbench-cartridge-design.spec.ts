@@ -124,7 +124,7 @@ test('a load saved on a design keeps the design by reference and reopens with it
         },
       )
       db.close()
-      return all.filter((r) => r.kind === 'workbenchState')
+      return all.filter((r) => r.kind === 'load')
     })
   await expect
     .poll(async () => (await stored())[0]?.data.cartridge)

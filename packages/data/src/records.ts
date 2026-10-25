@@ -6,10 +6,12 @@ import {
   type CaliberClass,
   type Cartridge,
   type CaseCapacity,
+  type CatalogueLoad,
   type ChronoSession,
   caliberClass,
   cartridge,
   caseCapacity,
+  catalogueLoad,
   chronoSession,
   type Discipline,
   discipline,
@@ -17,9 +19,7 @@ import {
   type FiringSeries,
   federation,
   firingSeries,
-  type Load,
   type LoadTables,
-  load,
   loadTable,
   type Manufacturer,
   manufacturer,
@@ -50,6 +50,7 @@ import {
 import { readKind } from './read-kind.ts'
 import {
   checkCartridgeReferences,
+  checkLoadComponentReferences,
   checkLoadReferences,
   checkManufacturerReferences,
   recordIds,
@@ -97,7 +98,7 @@ export type Bundle = {
   powders: Powder[]
   bullets: Bullet[]
   capacities: CaseCapacity[]
-  loads: Load[]
+  loads: CatalogueLoad[]
   chronoSessions: ChronoSession[]
   firings: FiringSeries[]
   rangeFirings: RangeFirings[]
@@ -129,7 +130,7 @@ function readBundle(roots: string[], errors: string[]): Bundle {
     powders: read('powders', powder),
     bullets: read('bullets', bullet),
     capacities: read('capacities', caseCapacity),
-    loads: read('loads', load),
+    loads: read('loads', catalogueLoad),
     chronoSessions: read('chrono', chronoSession),
     firings: read('firings', firingSeries, true),
     rangeFirings: read('range', rangeFirings, true),
@@ -250,6 +251,7 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
   checkManufacturerReferences(bundle, loadTables, ids, errors)
   checkRangeRounds(bundle.rangeFirings, errors)
   checkLoadReferences(bundle, ids, errors)
+  checkLoadComponentReferences(bundle, errors)
   for (const f of collectFindings(bundle, new Map(bundle.cartridges.map((c) => [c.id, c]))))
     errors.push(`${f.file}: ${f.finding}: ${f.message}`)
   return { bundle, errors }
