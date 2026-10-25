@@ -37,10 +37,11 @@ const validLoad = {
 
 const validSession = {
   id: 'test-session',
+  origin: 'catalogue',
   date: '2026-10-08',
   device: { kind: 'doppler-radar', manufacturer: 'catalogue:test-maker', model: 'Model' },
   conditions: { airTemperature: { value: 15 } },
-  strings: [{ load: 'test-load', shots: [{ velocity: { value: 800 } }] }],
+  strings: [{ load: 'catalogue:test-load', shots: [{ velocity: { value: 800 } }] }],
   provenance: measured,
 }
 

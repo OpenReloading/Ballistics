@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { caseCapacity } from './case-capacity.ts'
+import { chronoSession } from './chrono-session.ts'
 import { firearm } from './firearm.ts'
 import { catalogueRef, parseRef, ref } from './ids.ts'
 import { load } from './load.ts'
@@ -136,6 +137,7 @@ export const userRecord = z.discriminatedUnion(
     record('caseCapacity', 'A case capacity the user measured, in g.', caseCapacity),
     record('load', 'A load of the workbench, in stored units.', load),
     record('firearm', 'A firearm of the library, in stored units.', firearm),
+    record('session', 'A chronograph session, in stored units.', chronoSession),
     record('targetSheet', 'A target sheet with its calibration and shot groups.', targetSheet),
     record('targetFaceDesign', 'A target face of the face designer.', targetFaceDesign),
   ],
@@ -214,7 +216,9 @@ export interface DanglingRef {
 /**
  * The references of `records` to user records that no record of `records` answers: a load's
  * `firearm`, `cartridge`, `bullet` and `capacity`, a bullet's and a firearm's `manufacturer`, a capacity's
- * `cartridge` and `caseManufacturer` (only as `user:<id>`) and a target sheet's `load`. A
+ * `cartridge` and `caseManufacturer` (only as `user:<id>`), a load's `sessions`, a session's device
+ * `manufacturer` and the `load` of its strings, and a target sheet's `load` and the `session` of
+ * its group shots. A
  * `user:<id>` reference names a record by its id, a
  * `catalogue:` reference is not checked here. Reports only: nothing is dropped.
  */
@@ -245,6 +249,14 @@ function userRefsOf(r: UserRecord): [string, string | undefined, UserRecordKind,
         ['cartridge', r.data.cartridge, 'cartridge', true],
         ['bullet', typeof r.data.bullet === 'string' ? r.data.bullet : undefined, 'bullet', true],
         ['capacity', r.data.capacity, 'caseCapacity', true],
+        ...(r.data.sessions ?? []).map(
+          (s, i): [string, string | undefined, UserRecordKind, boolean] => [
+            `sessions.${i}`,
+            s,
+            'session',
+            true,
+          ],
+        ),
       ]
     case 'caseCapacity':
       return [
@@ -252,7 +264,27 @@ function userRefsOf(r: UserRecord): [string, string | undefined, UserRecordKind,
         ['caseManufacturer', r.data.caseManufacturer, 'manufacturer', true],
       ]
     case 'targetSheet':
-      return [['load', r.data.load, 'load', false]]
+      return [
+        ['load', r.data.load, 'load', false],
+        ...r.data.groups.flatMap((g, gi) =>
+          g.shots.map((shot, si): [string, string | undefined, UserRecordKind, boolean] => [
+            `groups.${gi}.shots.${si}.chrono.session`,
+            shot.chrono?.session,
+            'session',
+            true,
+          ]),
+        ),
+      ]
+    case 'session':
+      return [
+        ['device.manufacturer', r.data.device.manufacturer, 'manufacturer', true],
+        ...r.data.strings.map((s, i): [string, string | undefined, UserRecordKind, boolean] => [
+          `strings.${i}.load`,
+          s.load,
+          'load',
+          true,
+        ]),
+      ]
     case 'bullet':
     case 'firearm':
       return [['manufacturer', r.data.manufacturer, 'manufacturer', true]]
@@ -281,11 +313,13 @@ export interface UserCartridge extends z.infer<typeof userCartridge> {}
 export type UserCaseCapacity = Extract<UserRecord, { kind: 'caseCapacity' }>
 /** A target face of the face designer: rings, inner ten, black area and events, each optional. */
 export interface TargetFaceDesign extends z.infer<typeof targetFaceDesign> {}
+/** The user record of kind `session`: a chronograph session. */
+export type SessionRecord = Extract<UserRecord, { kind: 'session' }>
 /** The user record of kind `targetSheet`. */
 export type TargetSheetRecord = Extract<UserRecord, { kind: 'targetSheet' }>
 /** One record of a user data file: `kind`, id, name, save time and `data`. */
 export type UserRecord = z.infer<typeof userRecord>
-/** Discriminator of a user record: `manufacturer`, `bullet`, `cartridge`, `caseCapacity`, `load`, `firearm`, `targetSheet` or `targetFaceDesign`. */
+/** Discriminator of a user record: `manufacturer`, `bullet`, `cartridge`, `caseCapacity`, `load`, `firearm`, `session`, `targetSheet` or `targetFaceDesign`. */
 export type UserRecordKind = UserRecord['kind']
 /** A base64 photo stored in a user data file, referenced by id. */
 export interface EmbeddedFile extends z.infer<typeof embeddedFile> {}

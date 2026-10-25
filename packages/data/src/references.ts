@@ -78,7 +78,7 @@ export function checkLoadReferences(
 ) {
   for (const session of bundle.chronoSessions) {
     for (const string of session.strings) {
-      if (!ids.loads.has(string.load)) {
+      if (!ids.loads.has(parseRef(string.load)?.id ?? string.load)) {
         errors.push(`chrono/${session.id}.json: unknown load "${string.load}"`)
       }
     }

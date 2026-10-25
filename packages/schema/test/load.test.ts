@@ -156,6 +156,13 @@ describe('Load', () => {
     expectIssueAt(load, { ...catalogueLoad, capacity: `user:${uuid}` }, 'capacity')
   })
 
+  it('names its sessions by reference', () => {
+    const sessions = [`user:${uuid}`, 'catalogue:example-session']
+    expect(load.parse({ ...userLoad, sessions })).toEqual({ ...userLoad, sessions })
+    expectIssueAt(load, { ...userLoad, sessions: ['example-session'] }, 'sessions.0')
+    expectIssueAt(load, { ...catalogueLoad, sessions }, 'sessions.0')
+  })
+
   it('keeps the measured series in stored units', () => {
     const series = {
       name: 'day1.csv',

@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { targetSheet } from '../src/index.ts'
 import { expectIssueAt } from './issue-at.ts'
 
+const uuid = '3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13'
+
 const sheet = {
   photo: 'p1',
   references: [
@@ -46,7 +48,7 @@ const sheet = {
           y: 0.0004,
           placement: 'detected',
           holeDiameter: 0.0079,
-          chrono: { session: 's1', string: 0, shot: 2 },
+          chrono: { session: `user:${uuid}`, string: 0, shot: 2 },
         },
         { x: 0.021, y: 0.012, placement: 'placed', excluded: true },
       ],

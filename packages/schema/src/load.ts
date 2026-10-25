@@ -231,6 +231,13 @@ export const load = z
         'Chronograph files read on the Measurements tab, one series each, strings mapped to charges.',
       )
       .optional(),
+    sessions: z
+      .array(ref('session'))
+      .max(50)
+      .describe(
+        "Chronograph sessions read on the Measurements tab. Each names its strings' load and what they vary.",
+      )
+      .optional(),
     provenance: provenance
       .describe('Where the values come from. Required for a catalogue load.')
       .optional(),
@@ -249,6 +256,10 @@ export const load = z
     }
     if (catalogue && l.capacity !== undefined && !l.capacity.startsWith('catalogue:'))
       issue(['capacity'], 'A catalogue load names catalogue records only')
+    l.sessions?.forEach((target, i) => {
+      if (catalogue && !target.startsWith('catalogue:'))
+        issue(['sessions', i], 'A catalogue load names catalogue records only')
+    })
     for (const k of ['cartridge', 'firearm', 'bullet', 'powder'] as const) {
       const target = l[k]
       if (typeof target !== 'string') {
