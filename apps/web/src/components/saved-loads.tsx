@@ -62,7 +62,7 @@ function useStorage(opened: boolean) {
   useEffect(() => {
     if (!opened) return
     const s = navigator.storage
-    Promise.all([
+    void Promise.all([
       s?.persisted?.().catch(() => undefined),
       s
         ?.estimate?.()
@@ -82,7 +82,7 @@ function useCartridgeNames(ids: string[]) {
   useEffect(() => {
     if (!wanted) return
     let alive = true
-    Promise.all(
+    void Promise.all(
       wanted.split(',').map(async (id) => {
         // a design is a record of this browser, a catalogue cartridge one of the API
         const own = parseRef(id)?.scope === 'user' ? parseRef(id)?.id : undefined
@@ -254,7 +254,7 @@ export function SavedLoads({
                       onChange={(e) => setRenaming({ id: r.id, text: e.currentTarget.value })}
                       onBlur={(e) => rename(r, e.currentTarget.value)}
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter') rename(r, renaming.text)
+                        if (e.key === 'Enter') void rename(r, renaming.text)
                         else if (e.key === 'Escape') {
                           // the drawer stays open
                           e.stopPropagation()

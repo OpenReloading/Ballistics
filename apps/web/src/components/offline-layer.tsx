@@ -21,7 +21,7 @@ export function OfflineLayer() {
     if (process.env.NODE_ENV !== 'production') {
       sw.getRegistrations().then(
         (rs) => {
-          for (const r of rs) r.unregister()
+          for (const r of rs) void r.unregister()
         },
         () => {},
       )

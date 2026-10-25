@@ -158,7 +158,7 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
         noValidate
         onSubmit={(e) => {
           e.preventDefault()
-          find()
+          void find()
         }}
       >
         <Stack gap="xs">
