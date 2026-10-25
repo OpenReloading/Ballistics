@@ -76,6 +76,8 @@ export type ResultState = {
   setChronoSessions: Dispatch<SetStateAction<SessionRecord[]>>
   /** The reference a typed device maker stands for: the manufacturer it names, else a new user one. */
   manufacturerRef: (typed: string) => string | undefined
+  /** The sessions the load names, also those this browser does not answer. */
+  sessionRefCount: number
   /** The name of a manufacturer reference; empty for none or an unknown one. */
   manufacturerName: (ref: string | undefined) => string
   /** The Barrel length tab's range and rows; the report prints the same rows. */

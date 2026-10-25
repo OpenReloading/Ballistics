@@ -1667,14 +1667,16 @@ export function useWorkbenchState() {
         const r = userRecord.safeParse(await storedRecord(target.id).catch(() => undefined))
         return r.success && r.data.kind === 'session' ? r.data : undefined
       }),
-    ).then((found) => {
-      if (sessionsOpened.current !== token) return
-      const list = found.filter((r) => r !== undefined)
-      // a file read while the store answered stays
-      const added = sessionsNow.current.filter((r) => !list.some((x) => x.id === r.id))
-      sessionsNow.current = [...list, ...added]
-      setSessionsState(sessionsNow.current)
-    })
+    )
+      .then((found) => {
+        if (sessionsOpened.current !== token) return
+        const list = found.filter((r) => r !== undefined)
+        // a file read while the store answered stays
+        const added = sessionsNow.current.filter((r) => !list.some((x) => x.id === r.id))
+        sessionsNow.current = [...list, ...added]
+        setSessionsState(sessionsNow.current)
+      })
+      .catch(() => {})
   }
 
   /**
@@ -2224,6 +2226,7 @@ export function useWorkbenchState() {
     setChronoSessions,
     manufacturerRef,
     manufacturerName: manufacturers.nameOf,
+    sessionRefCount: sessionRefs.length,
     setSeen,
     setStepsDraft,
     setTab,

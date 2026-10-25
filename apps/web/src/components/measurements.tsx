@@ -155,7 +155,7 @@ export function Measurements({
   sessions: SessionRecord[]
   setSessions: Dispatch<SetStateAction<SessionRecord[]>>
 }) {
-  const { manufacturerRef, manufacturerName } = useResult()
+  const { manufacturerRef, manufacturerName, sessionRefCount } = useResult()
   const [unit, setUnit] = useState<VelocityUnit | ''>('')
   const [error, setError] = useState('')
   const [status, setStatus] = useState('')
@@ -172,7 +172,7 @@ export function Measurements({
       const id = newId()
       try {
         // a load names up to maxSessions sessions
-        if (sessions.length + read.length >= maxSessions)
+        if (sessionRefCount + read.length >= maxSessions)
           throw new Error(`a load keeps ${maxSessions} sessions at most.`)
         const data = await readChrono(await chronoFileBytes(file), {
           fileName: file.name,
