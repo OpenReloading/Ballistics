@@ -41,11 +41,13 @@ export interface Truth {
   offset: number
 }
 
+const defaultAt = { impacts, dials }
+
 /**
  * Strings the solver gives for `truth` with its zero offset, plus noise from `noise`. Dials are
  * rounded to whole clicks and keep the default rounding of a dial, unless `exact`.
  */
-export function strings(truth: Truth, noise: () => number, at = { impacts, dials }, exact = false) {
+export function strings(truth: Truth, noise: () => number, at = defaultAt, exact = false) {
   const s: TrajectoryInput = {
     ...nominal,
     muzzleVelocity: nominal.muzzleVelocity * truth.v,

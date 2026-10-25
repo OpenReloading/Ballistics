@@ -341,7 +341,7 @@ export function useWorkbenchState() {
       .catch(() => {})
   // biome-ignore lint/correctness/useExhaustiveDependencies: once on mount
   useEffect(() => {
-    readDesigns()
+    void readDesigns()
   }, [])
   // the weight of the opened load's firearm, once the library has been read
   // biome-ignore lint/correctness/useExhaustiveDependencies: on a new library or firearm only
@@ -784,9 +784,9 @@ export function useWorkbenchState() {
     setDefaulted(new Set())
     setFollowed(new Set())
     setCartridge(loadExample.cartridge)
-    chooseBullet(loadExample.bulletId, false)
+    void chooseBullet(loadExample.bulletId, false)
     // the example's fields already hold the record's model parameters: no refill
-    choosePowder(loadExample.powderId, false)
+    void choosePowder(loadExample.powderId, false)
     setFirearm(loadExample.firearm.id)
     gunFromFirearm.current = true
     setGunFields({
@@ -1025,7 +1025,7 @@ export function useWorkbenchState() {
       requestAnimationFrame(() => requestAnimationFrame(focus))
       return false
     }
-    send()
+    void send()
     return true
   }
 
@@ -1493,9 +1493,9 @@ export function useWorkbenchState() {
     // of the records stands in for one that is missing
     // an id that does not fit the schema is dropped, else every Save fails on it
     const bulletId = linkedId(query.get('bullet'))
-    if (bulletId) chooseBullet(bulletId, false)
+    if (bulletId) void chooseBullet(bulletId, false)
     const powderId = linkedId(query.get('powder'))
-    if (powderId) choosePowder(powderId, false)
+    if (powderId) void choosePowder(powderId, false)
     const carried = recordValues(query)
     setLinked({
       ...(bulletId && carried.bullet && { bullet: { ...carried.bullet, id: bulletId } }),
@@ -1616,10 +1616,10 @@ export function useWorkbenchState() {
     const fillMass = !typed.has('bulletMass')
     const bulletRef = typeof d.bullet === 'string' ? d.bullet : undefined
     const bulletId = bulletRef && catalogueIdOf(bulletRef)
-    if (bulletId) chooseBullet(bulletId, fillMass)
+    if (bulletId) void chooseBullet(bulletId, fillMass)
     else if (bulletRef) openBulletDesign(bulletRef, fillMass)
     const powderId = typeof d.powder === 'string' ? catalogueIdOf(d.powder) : undefined
-    if (powderId) choosePowder(powderId, true, typed)
+    if (powderId) void choosePowder(powderId, true, typed)
     setNotes(d.note ?? '')
     setChronoSeries(measurements.map((m) => ({ ...m, id: seriesId() })))
   }

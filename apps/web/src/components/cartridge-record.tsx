@@ -201,6 +201,7 @@ export function RecordScope({
         {/* biome-ignore lint/a11y/noStaticElementInteractions: follows hover and focus of the symbols inside, takes none itself */}
         <div
           ref={root}
+          role="presentation"
           className="record-scope"
           onPointerDown={(e) => {
             touch.current = e.pointerType === 'touch'

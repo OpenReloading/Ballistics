@@ -740,6 +740,7 @@ export function Workbench() {
           {/* biome-ignore lint/a11y/noStaticElementInteractions: catches Ctrl+Enter from any control of the bar and the workspace */}
           <div
             className="page-frame"
+            role="presentation"
             onKeyDown={(e) => {
               if (e.key !== 'Enter' || e.defaultPrevented) return
               const inField =

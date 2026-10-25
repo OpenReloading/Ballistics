@@ -2,7 +2,14 @@ import type { Workbook } from './cells.ts'
 import { buildChronoImport, type ChronoImport, type ChronoParserOptions } from './result.ts'
 import { readShotRows, workbookFooterStarts } from './shot-rows.ts'
 import { warnStatistics } from './statistics.ts'
-import { bracketed, isoDate, parseNumber, splitDelimited, splitLines } from './text.ts'
+import {
+  bracketed,
+  isoDate,
+  parseNumber,
+  splitDelimited,
+  splitLines,
+  withoutTrailingCommas,
+} from './text.ts'
 import { resolveUnit } from './units.ts'
 import {
   collectWorksheetStrings,
@@ -81,7 +88,7 @@ export function parseShotView(text: string, options: ChronoParserOptions = {}): 
   const nameLine = lines.slice(0, h).find((l) => l.trim()) ?? ''
   const name = nameLine.trim().startsWith('"')
     ? splitDelimited(nameLine)[0]
-    : nameLine.replace(/,+\s*$/, '').trim()
+    : withoutTrailingCommas(nameLine).trim()
 
   // only rows after the header can hold quoted line breaks; blank lines become empty rows
   const rows = joinQuoted(lines.slice(h + 1)).map((l) => (l.trim() ? splitDelimited(l) : []))

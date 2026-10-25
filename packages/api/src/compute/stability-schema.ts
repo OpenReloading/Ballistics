@@ -5,7 +5,7 @@ import { recordId } from './schemas.ts'
 const queryNumber = (n: z.ZodNumber) =>
   z
     .string()
-    .regex(/^[+-]?(\d+\.?\d*|\.\d+)(e[+-]?\d+)?$/i)
+    .regex(/^[+-]?(\d+(?:\.\d*)?|\.\d+)(e[+-]?\d+)?$/i)
     .transform(Number)
     .pipe(n)
 /**
