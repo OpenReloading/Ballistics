@@ -2,8 +2,8 @@ import type {
   Bullet,
   CaliberClass,
   Cartridge,
-  CaseCapacity,
   CaseType,
+  CatalogueCaseCapacity,
   Discipline,
   Federation,
   Manufacturer,
@@ -32,7 +32,8 @@ export interface RecordOfKind {
   manufacturer: Manufacturer
   powder: Powder
   bullet: Bullet
-  caseCapacity: CaseCapacity
+  /** The record file leaves out `origin`, which every catalogue record has. */
+  caseCapacity: Omit<CatalogueCaseCapacity, 'origin'>
   targetFace: TargetFace
   federation: Federation
   discipline: Discipline
@@ -240,7 +241,7 @@ export interface CatalogueSource {
   manufacturers: Manufacturer[]
   powders: Powder[]
   bullets: Bullet[]
-  capacities: CaseCapacity[]
+  capacities: CatalogueCaseCapacity[]
   targetFaces: TargetFace[]
   federations: Federation[]
   disciplines: Discipline[]

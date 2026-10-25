@@ -94,6 +94,25 @@ describe('readRecords', () => {
     )
   })
 
+  it('reports a load whose capacity is no record', () => {
+    const errors = errorsAfter((_root, write) => {
+      write('loads/with-capacity.json', {
+        id: 'with-capacity',
+        origin: 'catalogue',
+        name: 'With capacity',
+        cartridge: 'catalogue:test-cartridge',
+        bullet: 'catalogue:test-bullet',
+        powder: 'catalogue:test-powder',
+        capacity: 'catalogue:missing-capacity',
+        charge: { value: 3 },
+        provenance: { kind: 'published', sources: [{ title: 'Test' }] },
+      })
+    })
+    expect(errors).toContain(
+      'loads/with-capacity.json: unknown capacity "catalogue:missing-capacity"',
+    )
+  })
+
   it('accepts the committed records', () => {
     expect(readRecords().errors).toEqual([])
   })
@@ -109,9 +128,10 @@ describe('readRecords', () => {
       })
       write('capacities/test-capacity.json', {
         id: 'test-capacity',
-        cartridge: 'test-cartridge',
+        origin: 'catalogue',
+        cartridge: 'catalogue:test-cartridge',
         waterCapacity: { value: 3.5 },
-        caseManufacturer: 'missing-case-manufacturer',
+        caseManufacturer: 'catalogue:missing-case-manufacturer',
         provenance,
       })
       write('load-tables.json', {
