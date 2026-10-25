@@ -1,6 +1,7 @@
 import { expect, type Page, test } from '@playwright/test'
 import { sections } from '../../../web/src/lib/sections.ts'
 import { gotoHydrated } from './nav.ts'
+import { putRecords } from './user-store.ts'
 
 // Ctrl+K on every page: pages, the shell's commands and records; the workbench opens its own
 // search with the same pages and commands
@@ -54,19 +55,8 @@ test('a bullet design of this browser is found by Ctrl+K and opens in its design
 }) => {
   await gotoHydrated(page, '/powders')
   const id = '6f0f4d3e-0a43-4a43-9a3d-3a2f2e1f0c33'
-  await page.evaluate(async (id) => {
-    const db: IDBDatabase = await new Promise((ok, no) => {
-      const r = indexedDB.open('openreloading-user-data')
-      r.onupgradeneeded = () => {
-        for (const n of ['records', 'handles', 'files'])
-          if (!r.result.objectStoreNames.contains(n))
-            r.result.createObjectStore(n, n === 'records' ? { keyPath: 'id' } : undefined)
-      }
-      r.onsuccess = () => ok(r.result)
-      r.onerror = () => no(r.error)
-    })
-    const tx = db.transaction('records', 'readwrite')
-    tx.objectStore('records').put({
+  await putRecords(page, [
+    {
       kind: 'bullet',
       id,
       name: 'Slug test design',
@@ -79,12 +69,8 @@ test('a bullet design of this browser is found by Ctrl+K and opens in its design
           mass: { value: 10.886 },
         },
       },
-    })
-    await new Promise((ok) => {
-      tx.oncomplete = ok
-    })
-    db.close()
-  }, id)
+    },
+  ])
   await page.reload()
   await open(page)
   await field(page).fill('slug test')

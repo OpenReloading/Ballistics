@@ -3,6 +3,7 @@ import { expect, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
+import { putRecords } from './user-store.ts'
 
 // Metric (SI): lengths in mm
 test.beforeEach(({ page }) => storeUnits(page))
@@ -245,19 +246,8 @@ test('the designer shows no load-data notice; the caption says how changes are d
 
 /** A bullet design with a hollow base in the browser store, as the bullet designer saves it. */
 async function seedHollowBaseDesign(page: Page) {
-  await page.evaluate(async () => {
-    const db: IDBDatabase = await new Promise((ok, no) => {
-      const r = indexedDB.open('openreloading-user-data')
-      r.onupgradeneeded = () => {
-        for (const n of ['records', 'handles', 'files'])
-          if (!r.result.objectStoreNames.contains(n))
-            r.result.createObjectStore(n, n === 'records' ? { keyPath: 'id' } : undefined)
-      }
-      r.onsuccess = () => ok(r.result)
-      r.onerror = () => no(r.error)
-    })
-    const tx = db.transaction('records', 'readwrite')
-    tx.objectStore('records').put({
+  await putRecords(page, [
+    {
       kind: 'bullet',
       id: '6f0f4d3e-0a43-4a43-9a3d-3a2f2e1f0c22',
       name: 'Hollow base',
@@ -282,12 +272,8 @@ async function seedHollowBaseDesign(page: Page) {
           ogive: { form: 'tangent' },
         },
       },
-    })
-    await new Promise((ok) => {
-      tx.oncomplete = ok
-    })
-    db.close()
-  })
+    },
+  ])
 }
 
 test('a chosen bullet seats at the entered COAL in the designed case, and the seating moves the volume', async ({
