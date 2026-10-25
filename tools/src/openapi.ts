@@ -8,7 +8,7 @@ import { writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { buildOpenApi } from '@openreloading/api/openapi'
+import { buildOpenApi } from '@open-reloading/api/openapi'
 
 const arg = process.argv[2]
 if (!arg) throw new Error('usage: node src/openapi.ts <file>')

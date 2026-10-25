@@ -1,5 +1,5 @@
 import { MantineProvider } from '@mantine/core'
-import { recordFigures } from '@openreloading/drawing/cartridge'
+import { recordFigures } from '@open-reloading/drawing/cartridge'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { combinedRows } from '../src/lib/cartridge-record.ts'

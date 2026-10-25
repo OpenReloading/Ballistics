@@ -5,7 +5,7 @@
  * centre and scale from two or more concentric ellipses (the conic pencil). Pure: no React, DOM or
  * Next.js, so it runs in the Web Worker.
  */
-import type { TargetFace } from '@openreloading/schema'
+import type { TargetFace } from '@open-reloading/schema'
 import {
   concentricPlane,
   conicOf,

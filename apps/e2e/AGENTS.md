@@ -1,4 +1,4 @@
-# @openreloading/e2e
+# @open-reloading/e2e
 
 Playwright tests against a running API and web app, on the CIP cartridge records, the target faces and the invented example records.
 
@@ -36,9 +36,9 @@ Playwright tests against a running API and web app, on the CIP cartridge records
 | `web/bullet-search-dialog.spec.ts` | the Bullet card's search dialog: the keyboard flow (open from the button, words and weights, highlight, Escape and Enter, focus returned), Sort by with the focus back in the search box, the card's field finding the same bullets, and axe in light and dark at 390 and 1280 px. Ranking and filters are a Vitest test (`apps/web/test/bullet-search.test.ts`) |
 | `web/workbench-link.spec.ts` | a copied workbench link (fragment) runs the same load with its bullet and powder records missing. Older query links open |
 
-## Commands (this directory, or `-w @openreloading/e2e` from the root)
+## Commands (this directory, or `-w @open-reloading/e2e` from the root)
 
-- Run the API on `API_URL` and the web app on `WEB_URL` first (the compose stack, or `node packages/api/dist/server.js` and `next start` on a web build made by `npm run build -w @openreloading/web`)
+- Run the API on `API_URL` and the web app on `WEB_URL` first (the compose stack, or `node packages/api/dist/server.js` and `next start` on a web build made by `npm run build -w @open-reloading/web`)
 - Browser, once: `npx playwright install --with-deps chromium`
 - Specs that import web sources (`../../apps/web/src/...`) load the workspace packages from their `dist/`. Run `npm run build` at the root first (CI builds schema, importers, core and drawing before `npm run test:e2e`).
 - Web pages and the web app's `/api/*` forwarding route carry no version prefix. HTTP requests and responses of the API are tested in `packages/api/test/` and with Schemathesis (`npm run api:conformance`).

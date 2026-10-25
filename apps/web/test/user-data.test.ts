@@ -1,4 +1,9 @@
-import { type UserRecord, userDataFormat, userDataVersion, userRecord } from '@openreloading/schema'
+import {
+  type UserRecord,
+  userDataFormat,
+  userDataVersion,
+  userRecord,
+} from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { exampleFirearm } from '../src/lib/example-data.ts'
 import { parseFiles, readLoadFile } from '../src/lib/load-file-formats.ts'

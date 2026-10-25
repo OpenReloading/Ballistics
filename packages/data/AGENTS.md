@@ -1,6 +1,6 @@
-# @openreloading/data
+# @open-reloading/data
 
-Canonical records in git, validated against `@openreloading/schema`, bundled for the API. ESM.
+Canonical records in git, validated against `@open-reloading/schema`, bundled for the API. ESM.
 
 ## Layout
 
@@ -16,8 +16,8 @@ Canonical records in git, validated against `@openreloading/schema`, bundled for
 | `records/chrono/<id>.json` | `ChronoSession` records. Every `load` of a shot string must name a load record. |
 | `records/range/<id>.json` | `RangeFirings`, spark-range rounds of one projectile from a report (Mach, total yaw, drag coefficient at that yaw). Not served by the API yet. |
 | `records/firings/<id>.json` | `FiringSeries`, rounds fired and measured by others as a publication reports them. `cartridge` must exist. Every source names its URL and `license`. |
-| `load-tables.json` of a records root | The manufacturer load tables the powder fit reads (`loadTables` in `@openreloading/schema`): by row file name, `manufacturer` (a record id), `title`, `url?`, `retrieved`. A file or entry that breaks the schema fails validation. Optional. |
-| `records/renames.json` | Old ids by kind directory, each with the id that replaced it (`renames` in `@openreloading/schema`, `{}` while none). A reference to an old id resolves. |
+| `load-tables.json` of a records root | The manufacturer load tables the powder fit reads (`loadTables` in `@open-reloading/schema`): by row file name, `manufacturer` (a record id), `title`, `url?`, `retrieved`. A file or entry that breaks the schema fails validation. Optional. |
+| `records/renames.json` | Old ids by kind directory, each with the id that replaced it (`renames` in `@open-reloading/schema`, `{}` while none). A reference to an old id resolves. |
 | `records/sources/<id>.json` | `SourceRecord`, a source that several records cite (the C.I.P. TDCC, rule books, the synthetic demo data), see Provenance below |
 | `records/target-faces/<id>.json` | `TargetFace`, see below |
 | `records/federations/<id>.json`, `records/disciplines/<id>.json`, `records/target-mappings/<id>.json` | `Federation`, `Discipline`, `TargetMapping`, see below |
@@ -38,9 +38,9 @@ Canonical records in git, validated against `@openreloading/schema`, bundled for
   - A record outside the CIP and target-face kinds enters this repository only through these rules.
 - Source records (`src/sources.ts`): a source two or more records cite is stored once in `records/sources/` and cited as `{ "source": "<id>" }` plus this record's `page`, `fields`, `kind`, `note` (put before the source record's note) and the `url`, `sha256`, `retrieved` of a file of its own. A federation's `ruleBooks` are source record ids. `readRecords` resolves both before validation, so the bundle and the API carry full sources.
 
-## Commands (this directory, or `-w @openreloading/data` from the root)
+## Commands (this directory, or `-w @open-reloading/data` from the root)
 
-- Validate: `npm run validate` (root: `npm run data:validate`). Needs `@openreloading/schema` built.
+- Validate: `npm run validate` (root: `npm run data:validate`). Needs `@open-reloading/schema` built.
 - Build: `npm run build` (writes `dist/bundle.json`, generated, not committed)
 - Test: `npm test` (Vitest)
 - Type check: `npm run typecheck`
@@ -51,7 +51,7 @@ Canonical records in git, validated against `@openreloading/schema`, bundled for
 - Edits happen only in these records. The API catalogue is rebuilt from the bundle.
 - Cartridge records are generated from the official CIP TDCC sheets: do not hand-edit them.
   - `verification: verified` marks a record whose every value was checked by hand against the sheet.
-  - Figure ids name the sheet revision: `sheetId` (`@openreloading/schema`), `cip-<id>-<revised or published>`.
+  - Figure ids name the sheet revision: `sheetId` (`@open-reloading/schema`), `cip-<id>-<revised or published>`.
   - Records the importer cannot re-read (unsupported layouts, cartridges no longer in the listing) are kept from the earlier import.
 - Firing series, loads and chronograph sessions are in the bundle but not served by the API yet.
 

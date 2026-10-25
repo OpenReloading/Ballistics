@@ -1,4 +1,4 @@
-import { type UserRecordKind, userRecord } from '@openreloading/schema'
+import { type UserRecordKind, userRecord } from '@open-reloading/schema'
 import { type RefObject, useEffect } from 'react'
 import { storedRecord } from '../lib/user-store.ts'
 import type { FileMenuHandle } from './file-menu.tsx'

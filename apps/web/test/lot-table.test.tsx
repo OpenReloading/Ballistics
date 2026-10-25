@@ -1,5 +1,5 @@
 import { MantineProvider } from '@mantine/core'
-import { chargeLadder, interior } from '@openreloading/core'
+import { chargeLadder, interior } from '@open-reloading/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { fractionSpec, LotPanel, lotNote } from '../src/components/lot-rows.tsx'

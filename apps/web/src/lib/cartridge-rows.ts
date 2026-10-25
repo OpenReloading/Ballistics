@@ -1,5 +1,5 @@
 /** The cartridge list's rows: search text, filters, cells and the packed page props. */
-import { toSi } from '@openreloading/schema'
+import { toSi } from '@open-reloading/schema'
 import type { CartridgeSummary } from './api-types.ts'
 import { caliberLabel, commonCaliber } from './caliber.ts'
 import { countryKeys } from './countries.ts'

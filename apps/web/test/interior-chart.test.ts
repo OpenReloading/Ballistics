@@ -1,4 +1,4 @@
-import { interior } from '@openreloading/core'
+import { interior } from '@open-reloading/core'
 import { describe, expect, it } from 'vitest'
 import type { InteriorResponse } from '../src/lib/api-types.ts'
 import { exampleInterior } from '../src/lib/example-data.ts'

@@ -1,12 +1,12 @@
-import { face, type LengthUnit, lengthText } from '@openreloading/drawing'
+import { face, type LengthUnit, lengthText } from '@open-reloading/drawing'
 import {
   type BulletProfile,
   bulletFigureModel,
   bulletScreenEm,
   bulletSymbols,
   recordProfile,
-} from '@openreloading/drawing/bullet'
-import type { Bullet } from '@openreloading/schema'
+} from '@open-reloading/drawing/bullet'
+import type { Bullet } from '@open-reloading/schema'
 import { Ruler } from '@phosphor-icons/react/ssr'
 import { DrawingNotes } from './record-actions.tsx'
 import { EmptyNote } from './states.tsx'

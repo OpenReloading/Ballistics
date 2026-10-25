@@ -1,8 +1,8 @@
 'use client'
 
 import { Alert, Badge, Button, Flex, Group, NativeSelect, Tabs } from '@mantine/core'
-import type { ChronoImport, VelocityUnit } from '@openreloading/importers'
-import { toSi } from '@openreloading/schema'
+import type { ChronoImport, VelocityUnit } from '@open-reloading/importers'
+import { toSi } from '@open-reloading/schema'
 import { FileArrowUp } from '@phosphor-icons/react'
 import { useEffect, useRef, useState } from 'react'
 import {

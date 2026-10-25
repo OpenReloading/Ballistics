@@ -1,7 +1,7 @@
 'use client'
 
 import { Table } from '@mantine/core'
-import type { Firearm, Optic } from '@openreloading/schema'
+import type { Firearm, Optic } from '@open-reloading/schema'
 import type { FieldSpec } from '../lib/field-spec.ts'
 import { clickText, fieldSi, firearmFields, siOf, twistText, zeroFill } from '../lib/firearm.ts'
 import { zeroConditions } from '../lib/range-card.ts'

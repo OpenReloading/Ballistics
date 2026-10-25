@@ -3,7 +3,7 @@
 // Needs `npm run build` at the root (the API is imported from its dist). API_URL is the API whose
 // own reference sends requests. Unset (no API, as on GitHub Pages): the page links to none.
 import { copyFileSync, mkdirSync, writeFileSync } from 'node:fs'
-import { buildOpenApi } from '@openreloading/api/openapi'
+import { buildOpenApi } from '@open-reloading/api/openapi'
 
 const out = new URL('../static/rest/', import.meta.url)
 const api = process.env.API_URL?.replace(/\/$/, '')

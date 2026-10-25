@@ -1,4 +1,4 @@
-import type { Powder } from '@openreloading/schema'
+import type { Powder } from '@open-reloading/schema'
 import Link from 'next/link'
 import {
   classifyPowder,

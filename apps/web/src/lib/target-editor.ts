@@ -9,13 +9,13 @@ import {
   type Ellipse,
   type GroupStatistics,
   subtendedAngle,
-} from '@openreloading/core'
+} from '@open-reloading/core'
 import {
   type CalibrationReference,
   type ShotGroup,
   type TargetSheet,
   toSi,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import {
   applyMatrix,
   type Calibration,

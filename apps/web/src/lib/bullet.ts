@@ -1,5 +1,5 @@
-import { millerStability, type Projectile } from '@openreloading/core'
-import { type Bullet, toSi } from '@openreloading/schema'
+import { millerStability, type Projectile } from '@open-reloading/core'
+import { type Bullet, toSi } from '@open-reloading/schema'
 import type { FieldRow } from './record-fields.ts'
 import { metersPerFoot, pascalsPerInHg } from './units.ts'
 

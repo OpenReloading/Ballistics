@@ -1,4 +1,4 @@
-import { InputError, TruingError } from '@openreloading/core'
+import { InputError, TruingError } from '@open-reloading/core'
 import { describe, expect, it, vi } from 'vitest'
 import { createPool, type PoolOptions } from '../src/compute/pool.ts'
 import { ComputeBusy, ComputeTimeout, reviveError, serializeError } from '../src/compute/tasks.ts'

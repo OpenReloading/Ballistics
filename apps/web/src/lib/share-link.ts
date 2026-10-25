@@ -1,5 +1,5 @@
 /** Share links: one user record packed into the fragment of a page link. */
-import { type UserRecord, userDataFormat, userDataVersion } from '@openreloading/schema'
+import { type UserRecord, userDataFormat, userDataVersion } from '@open-reloading/schema'
 import { type ParsedUserFile, parseUserDataFile } from './user-data.ts'
 
 /** Longest share link: the length RFC 9110 section 4.1 recommends every sender and recipient support. */

@@ -1,4 +1,4 @@
-import { checkUserRefs, type UserBullet, type UserRecord, userRecord } from '@openreloading/schema'
+import { checkUserRefs, type UserBullet, type UserRecord, userRecord } from '@open-reloading/schema'
 import { afterEach, expect, it, vi } from 'vitest'
 import {
   baseProblem,

@@ -1,4 +1,4 @@
-import type { TargetSheet } from '@openreloading/schema'
+import type { TargetSheet } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { calibrateSheetOnFace, faceGeometry } from '../src/lib/face-sheet.ts'
 import { frameOf, viewToTarget } from '../src/lib/target-editor.ts'

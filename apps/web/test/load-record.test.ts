@@ -1,4 +1,4 @@
-import { workbenchValueKeys } from '@openreloading/core'
+import { workbenchValueKeys } from '@open-reloading/core'
 import {
   checkUserRefs,
   ladderStepKinds,
@@ -6,7 +6,7 @@ import {
   parseRef,
   userId,
   userRecord,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { interiorFields } from '../src/lib/interior-input.ts'
 import {

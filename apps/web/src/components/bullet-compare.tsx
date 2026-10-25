@@ -11,7 +11,7 @@ import {
   TableTr,
   Text,
 } from '@mantine/core'
-import type { Bullet } from '@openreloading/schema'
+import type { Bullet } from '@open-reloading/schema'
 import Link from 'next/link'
 import type { CSSProperties, ReactNode } from 'react'
 import { compareGroups, differenceMarks, rowDiffers } from '../lib/bullet-compare.ts'

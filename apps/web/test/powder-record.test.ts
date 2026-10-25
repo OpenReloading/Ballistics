@@ -1,5 +1,5 @@
-import { powderModelValues, recordResistance } from '@openreloading/core'
-import type { Powder } from '@openreloading/schema'
+import { powderModelValues, recordResistance } from '@open-reloading/core'
+import type { Powder } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
 import {
   fitTables,

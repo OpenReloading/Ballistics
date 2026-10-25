@@ -13,8 +13,8 @@ import {
   trajectory,
   trueDrag,
   trueMuzzleVelocity,
-} from '@openreloading/core'
-import type { Cartridge } from '@openreloading/schema'
+} from '@open-reloading/core'
+import type { Cartridge } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { caps } from '../src/compute/schemas.ts'
 import { stabilityBounds } from '../src/compute/stability-schema.ts'

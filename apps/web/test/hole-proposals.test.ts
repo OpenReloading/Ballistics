@@ -1,4 +1,4 @@
-import type { ShotGroup, TargetSheet } from '@openreloading/schema'
+import type { ShotGroup, TargetSheet } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import {
   acceptProposals,

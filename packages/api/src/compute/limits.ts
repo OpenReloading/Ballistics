@@ -2,8 +2,8 @@
  * CIP Pmax of a cartridge against a simulated pressure range. Only values measured by transducer or piezo, or without a stated method, are
  * compared; crusher values are listed, never compared. No message says or implies that a load is safe.
  */
-import { chargeTooSmall, chargeTooSmallRatio, type PressureRange } from '@openreloading/core'
-import { type Cartridge, fromSi, type SpecValue, sheetId, toSi } from '@openreloading/schema'
+import { chargeTooSmall, chargeTooSmallRatio, type PressureRange } from '@open-reloading/core'
+import { type Cartridge, fromSi, type SpecValue, sheetId, toSi } from '@open-reloading/schema'
 
 /** The fields of a `getCartridge` record that the limit check reads. */
 export type CartridgeWithSpecs = Pick<

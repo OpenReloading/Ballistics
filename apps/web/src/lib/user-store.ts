@@ -2,7 +2,7 @@
  * The browser store of user records and target photos (IndexedDB); the workspace folder handle is
  * kept in the same database (`workspace-folder.ts`).
  */
-import type { UserRecord } from '@openreloading/schema'
+import type { UserRecord } from '@open-reloading/schema'
 import { validRecords } from './user-data.ts'
 import { photoIds } from './user-photos.ts'
 

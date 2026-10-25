@@ -4,8 +4,8 @@
  * ordered by how well each bullet matches the typed words, and the whole catalogue read once per
  * page load.
  */
-import { bulletFits, type CartridgeDiameters } from '@openreloading/core'
-import { compareKeys, fold, sortKey } from '@openreloading/schema'
+import { bulletFits, type CartridgeDiameters } from '@open-reloading/core'
+import { compareKeys, fold, sortKey } from '@open-reloading/schema'
 import { apiFetch } from './api-fetch.ts'
 import type { BulletSummary, ListOf, ManufacturerSummary } from './api-types.ts'
 import {

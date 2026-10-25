@@ -1,5 +1,5 @@
-import type { Bundle } from '@openreloading/data'
-import type { Cartridge, SpecValue } from '@openreloading/schema'
+import type { Bundle } from '@open-reloading/data'
+import type { Cartridge, SpecValue } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { API_PREFIX } from '../src/version.ts'
 import { bundle } from './fixtures.ts'

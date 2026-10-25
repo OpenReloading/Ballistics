@@ -1,6 +1,6 @@
 import { MantineProvider } from '@mantine/core'
-import type { FigureModel } from '@openreloading/drawing/cartridge'
-import { chamberOf, coalRange, previewDrawn } from '@openreloading/drawing/seating'
+import type { FigureModel } from '@open-reloading/drawing/cartridge'
+import { chamberOf, coalRange, previewDrawn } from '@open-reloading/drawing/seating'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { drawable } from '../src/lib/cartridge-sheet.ts'

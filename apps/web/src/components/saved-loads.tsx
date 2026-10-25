@@ -1,7 +1,7 @@
 'use client'
 
 import { ActionIcon, Button, Drawer, Text, TextInput } from '@mantine/core'
-import { parseRef } from '@openreloading/schema'
+import { parseRef } from '@open-reloading/schema'
 import { Copy, DownloadSimple, PencilSimple, Trash } from '@phosphor-icons/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { fetchRecord } from '../lib/api-fetch.ts'

@@ -2,7 +2,7 @@
 
 import { Button, Select } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
-import { caseTypes } from '@openreloading/schema'
+import { caseTypes } from '@open-reloading/schema'
 import { Plus } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useDeferredValue, useMemo } from 'react'

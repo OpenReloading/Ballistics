@@ -90,7 +90,7 @@ export function recordClosure(root = repoRoot) {
     if (!/\.(ts|tsx|mts|js)$/.test(file)) continue
     const source = readFileSync(path.join(root, file), 'utf8')
     for (const spec of importSpecifiers(source)) {
-      const pkg = /^@openreloading\/([^/]+)/.exec(spec)
+      const pkg = /^@open-reloading\/([^/]+)/.exec(spec)
       if (pkg?.[1]) packages.add(pkg[1])
       const target = spec.startsWith('@/')
         ? path.posix.join('apps/web/src', spec.slice(2))

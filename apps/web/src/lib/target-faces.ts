@@ -6,7 +6,7 @@ import {
   type TargetFace,
   type TargetMapping,
   toSi,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import type { DirectoryState } from './directory.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
 import type { Face } from './face-organization.ts'

@@ -1,4 +1,4 @@
-import { recordIdRegex } from '@openreloading/schema'
+import { recordIdRegex } from '@open-reloading/schema'
 import type { FastifyReply } from 'fastify'
 import { z } from 'zod'
 import type { Catalogue, Catalogued, CatalogueKind } from '../catalogue/types.ts'
@@ -8,7 +8,7 @@ import { API_PREFIX } from '../version.ts'
 /** `pattern` of a query string value without a NUL character. */
 export const noNul = '^[^\\u0000]*$'
 
-/** `pattern` of a record id, as `recordId` of `@openreloading/schema`. */
+/** `pattern` of a record id, as `recordId` of `@open-reloading/schema`. */
 export const recordIdPattern = recordIdRegex.source
 
 /** What the compute routes read: the records to resolve ids against and the runner of the solver tasks. */

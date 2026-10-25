@@ -1,6 +1,6 @@
 /** The target face designer: the draft, its file data, the face it builds and the problems it reports. */
-import type { FaceShape } from '@openreloading/drawing/target'
-import { faceColour, type TargetFace, type TargetFaceDesign } from '@openreloading/schema'
+import type { FaceShape } from '@open-reloading/drawing/target'
+import { faceColour, type TargetFace, type TargetFaceDesign } from '@open-reloading/schema'
 import {
   type FieldSpec,
   type Fields,

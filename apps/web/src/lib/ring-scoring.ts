@@ -3,7 +3,7 @@
  * face to ring marks on a sheet. Shots and holes in target m relative to the face centre, as the
  * target sheet stores them; face records in mm. Pure: no React, DOM or Next.js.
  */
-import { fromSi, type TargetFace, toSi } from '@openreloading/schema'
+import { fromSi, type TargetFace, toSi } from '@open-reloading/schema'
 import { type Point, solve } from './target-geometry.ts'
 
 export type RingScore = {

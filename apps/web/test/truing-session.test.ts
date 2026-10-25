@@ -3,7 +3,7 @@ import {
   standardAtmosphere,
   type TrajectoryInput,
   trajectory,
-} from '@openreloading/core'
+} from '@open-reloading/core'
 import { describe, expect, it } from 'vitest'
 import {
   blankChrono,

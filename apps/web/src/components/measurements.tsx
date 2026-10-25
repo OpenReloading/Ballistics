@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@mantine/core'
-import type { VelocityUnit } from '@openreloading/importers'
+import type { VelocityUnit } from '@open-reloading/importers'
 import { type Dispatch, type ReactNode, type SetStateAction, useState } from 'react'
 import { chronoFileBytes, readChrono } from '../lib/chrono.ts'
 import { errorText } from '../lib/error-text.ts'

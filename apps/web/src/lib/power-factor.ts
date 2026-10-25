@@ -1,4 +1,4 @@
-import { fromSi } from '@openreloading/schema'
+import { fromSi } from '@open-reloading/schema'
 import { kilogramsPerGrain, metersPerFoot } from './units.ts'
 
 /**

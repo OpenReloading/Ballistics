@@ -1,5 +1,5 @@
 /** A face record with the abbreviation of its federation, as the lists and labels show and compare it. */
-import type { Federation, TargetFace } from '@openreloading/schema'
+import type { Federation, TargetFace } from '@open-reloading/schema'
 import { userOrganization } from './user-faces.ts'
 
 /** A face event with the abbreviation of the federation whose rule book lists it, where that is not its face's. */

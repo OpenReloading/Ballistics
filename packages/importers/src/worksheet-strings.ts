@@ -1,5 +1,5 @@
 // The import step shared by the workbook parsers: one string per worksheet, kept by date.
-import type { ChronoShot } from '@openreloading/schema'
+import type { ChronoShot } from '@open-reloading/schema'
 import type { ChronoParserOptions } from './result.ts'
 
 /**

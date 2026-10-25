@@ -7,7 +7,7 @@ import {
   type UserRecord,
   type UserRecordKind,
   userRecord,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import { CaretDown, FloppyDisk, FolderOpen } from '@phosphor-icons/react'
 import { memo, type Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'

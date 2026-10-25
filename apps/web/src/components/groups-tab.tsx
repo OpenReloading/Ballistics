@@ -1,7 +1,7 @@
 'use client'
 
 import { useFocusTrap, useMediaQuery, useMergedRef } from '@mantine/hooks'
-import { chargeLadder } from '@openreloading/core'
+import { chargeLadder } from '@open-reloading/core'
 import { type ComponentProps, useEffect, useState } from 'react'
 import type { LadderDirection } from '../lib/seating-ladder.ts'
 import { stepLabel } from '../lib/workbench.ts'

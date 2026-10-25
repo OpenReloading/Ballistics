@@ -8,7 +8,7 @@ import {
   type QuantityValue,
   toSi,
   type UserRecord,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import type { FieldSpec } from './field-spec.ts'
 import {
   formatNumber,

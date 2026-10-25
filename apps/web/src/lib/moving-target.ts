@@ -1,4 +1,4 @@
-import { movingTargetLead, type TrajectoryPoint } from '@openreloading/core'
+import { movingTargetLead, type TrajectoryPoint } from '@open-reloading/core'
 
 /** The lead at one range of the trajectory table (SI: m, s, rad). */
 export interface MovingTargetRow {

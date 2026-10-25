@@ -106,7 +106,7 @@ jobs:
       - run: ../../node_modules/.bin/playwright install --with-deps chromium
         working-directory: apps/e2e
       # specs import web sources, which import the workspace packages from their dist/
-      - run: npm run build -w @openreloading/schema && npm run build -w @openreloading/importers && npm run build -w @openreloading/core && npm run build -w @openreloading/drawing
+      - run: npm run build -w @open-reloading/schema && npm run build -w @open-reloading/importers && npm run build -w @open-reloading/core && npm run build -w @open-reloading/drawing
       - run: docker compose up --detach --build api web
       - name: Wait for the API and the web app
         run: |
@@ -119,13 +119,13 @@ jobs:
       # `npm run api:conformance` in the dev container; the same Schemathesis version and checks
       - name: API conformance to its document (Schemathesis)
         run: |
-          npm run build -w @openreloading/data -w @openreloading/api
+          npm run build -w @open-reloading/data -w @open-reloading/api
           node tools/src/openapi.ts "$RUNNER_TEMP/openapi.json"
           docker run --rm --network=host -v "$RUNNER_TEMP:/doc:ro" docker.io/schemathesis/schemathesis:v4.29.4@sha256:16d21ecba0097fc8a3ca71b8d1db3797d2a057610d808715871216450e63f0a6 \
             run /doc/openapi.json --url http://localhost:3000 --checks not_a_server_error,status_code_conformance,content_type_conformance,response_schema_conformance
       - run: npm run test:e2e
       - name: Drawing baseline in the Playwright image
-        run: npm run drawing-baseline -w @openreloading/e2e
+        run: npm run drawing-baseline -w @open-reloading/e2e
       - name: Paired contact sheet of the baseline drawings when drawing code changed
         id: sheet
         env:
@@ -147,7 +147,7 @@ jobs:
           }
           put before "$BASE"
           put after HEAD
-          npm run pair-sheets -w @openreloading/e2e -- "$PWD/sheet/before" "$PWD/sheet/after" "$PWD/sheet/out"
+          npm run pair-sheets -w @open-reloading/e2e -- "$PWD/sheet/before" "$PWD/sheet/after" "$PWD/sheet/out"
           echo "made=1" >> "$GITHUB_OUTPUT"
       - name: Keep the paired contact sheet for review
         if: steps.sheet.outputs.made == '1'
@@ -182,7 +182,7 @@ jobs:
             ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'package-lock.json', 'patches/**', 'apps/web/next.config.ts') }}-
       - name: Build the web app against the API
         if: env.BUILD_WEB == 'true'
-        run: npm run build -w @openreloading/web
+        run: npm run build -w @open-reloading/web
         env:
           API_URL: http://localhost:3000
           PRERENDER: ${{ github.event_name == 'pull_request' && needs.changes.outputs.prerender == 'sample' && 'sample' || 'full' }}

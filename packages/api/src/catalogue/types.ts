@@ -11,7 +11,7 @@ import type {
   Renames,
   TargetFace,
   TargetMapping,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 
 /** The entities of the catalogue, the names `Catalogue.get` takes. */
 export type CatalogueKind =
@@ -235,7 +235,7 @@ export type RecordFile = CatalogueHeader & {
   [K in CatalogueKind]: Record<string, RecordOfKind[K]>
 }
 
-/** The records a catalogue is built from; `Bundle` of `@openreloading/data` has them. */
+/** The records a catalogue is built from; `Bundle` of `@open-reloading/data` has them. */
 export interface CatalogueSource {
   cartridges: Cartridge[]
   manufacturers: Manufacturer[]

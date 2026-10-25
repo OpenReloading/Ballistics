@@ -1,8 +1,15 @@
 {
-  "name": "@openreloading/data",
+  "name": "@open-reloading/data",
   "version": "0.0.1",
-  "private": true,
   "license": "MIT AND CC-BY-4.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenReloading/Ballistics.git",
+    "directory": "packages/data"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "exports": {
     ".": {
@@ -15,6 +22,12 @@
     },
     "./bundle.json": "./dist/bundle.json"
   },
+  "files": [
+    "dist",
+    "!dist/**/*.map",
+    "LICENSE",
+    "LICENSE-MIT"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json && node dist/build.js",
     "validate": "node src/validate.ts",
@@ -22,7 +35,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@openreloading/schema": "0.0.1"
+    "@open-reloading/schema": "0.0.1"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",

@@ -4,7 +4,7 @@ import {
   type TargetFace,
   type TargetFaceDesign,
   targetFace,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 
 /** The owner of a built face: it names the face as the user's own in the tools' lists. */
 export const userOrganization = 'User design'

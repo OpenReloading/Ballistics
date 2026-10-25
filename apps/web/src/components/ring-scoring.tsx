@@ -9,7 +9,7 @@ import {
   type ShotGroup,
   type TargetSheet,
   toSi,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   disciplineChoice,

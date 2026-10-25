@@ -5,7 +5,7 @@
  * this browser come with the faces, read from the store on each call: a design saved in another
  * tab or page shows at once.
  */
-import type { TargetFace } from '@openreloading/schema'
+import type { TargetFace } from '@open-reloading/schema'
 import { apiFetch } from './api-fetch.ts'
 import type { FederationData } from './face-disciplines.ts'
 import { type Face, withOrganization } from './face-organization.ts'

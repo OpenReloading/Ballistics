@@ -1,4 +1,4 @@
-import type { ChronoShot } from '@openreloading/schema'
+import type { ChronoShot } from '@open-reloading/schema'
 import {
   buildChronoImport,
   type ChronoImport,

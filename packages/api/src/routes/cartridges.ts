@@ -5,7 +5,7 @@ import {
   cartridge,
   caseTypes,
   catalogueCaseCapacity,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
 import { cartridgeItem } from '../catalogue/derive.ts'

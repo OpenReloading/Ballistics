@@ -1,5 +1,5 @@
-import { powderModelValues } from '@openreloading/core'
-import { type Powder, toSi } from '@openreloading/schema'
+import { powderModelValues } from '@open-reloading/core'
+import { type Powder, toSi } from '@open-reloading/schema'
 import type { InteriorBody } from './interior-input.ts'
 import { type SortDirection, sortRows } from './lists.ts'
 

@@ -14,7 +14,7 @@ import {
   powderModelValues,
   recordResistance,
   ValueError,
-} from '@openreloading/core'
+} from '@open-reloading/core'
 import {
   type Bullet,
   fromSi,
@@ -24,7 +24,7 @@ import {
   toSi,
   type UserRecord,
   userRecord,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { apiFetch, fetchRecord } from '../lib/api-fetch.ts'

@@ -1,4 +1,4 @@
-import type { Provenance } from '@openreloading/schema'
+import type { Provenance } from '@open-reloading/schema'
 import type { ReactNode } from 'react'
 import { PageBar } from './page-bar.tsx'
 import { Panel } from './panel.tsx'

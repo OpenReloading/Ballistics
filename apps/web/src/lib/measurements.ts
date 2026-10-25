@@ -1,6 +1,6 @@
-import { type LadderFlatSpots, ladderFlatSpots } from '@openreloading/core'
-import type { ChronoImport } from '@openreloading/importers'
-import { fromSi, type MeasurementSeries, toSi } from '@openreloading/schema'
+import { type LadderFlatSpots, ladderFlatSpots } from '@open-reloading/core'
+import type { ChronoImport } from '@open-reloading/importers'
+import { fromSi, type MeasurementSeries, toSi } from '@open-reloading/schema'
 import { type Shot, type StringStats, stringStats } from './chrono.ts'
 
 /** One chronograph file as the Measurements tab holds it: the muzzle distance in m, the charges in kg. */

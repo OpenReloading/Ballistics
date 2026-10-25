@@ -1,5 +1,5 @@
 /** Target photos in user data files: the ids records point at, and base64 file entries. */
-import type { EmbeddedFile, UserRecord } from '@openreloading/schema'
+import type { EmbeddedFile, UserRecord } from '@open-reloading/schema'
 
 /** Ids of the photos the target sheets among `records` point at. */
 export const photoIds = (records: UserRecord[]) => [

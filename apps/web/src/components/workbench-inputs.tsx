@@ -11,8 +11,8 @@ import {
   Switch,
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
-import { boreArea } from '@openreloading/core'
-import { type Bullet, toSi } from '@openreloading/schema'
+import { boreArea } from '@open-reloading/core'
+import { type Bullet, toSi } from '@open-reloading/schema'
 import { DotsThree } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
 import { type ReactNode, useEffect, useId, useMemo, useState } from 'react'

@@ -1,6 +1,6 @@
 'use client'
 
-import type { TrajectoryPoint } from '@openreloading/core'
+import type { TrajectoryPoint } from '@open-reloading/core'
 import { createPortal } from 'react-dom'
 import { localDay } from '../lib/dates.ts'
 import { clickText } from '../lib/firearm.ts'

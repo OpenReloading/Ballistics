@@ -1,5 +1,5 @@
-import { lbPerSqInToKgPerSqM, millerStability } from '@openreloading/core'
-import type { Bullet } from '@openreloading/schema'
+import { lbPerSqInToKgPerSqM, millerStability } from '@open-reloading/core'
+import type { Bullet } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
 import { bulletDrag, computedBulletRows, millerTwist } from '../src/lib/bullet.ts'
 import { rowValue } from '../src/lib/record-fields.ts'

@@ -1,4 +1,4 @@
-import type { Powder } from '@openreloading/schema'
+import type { Powder } from '@open-reloading/schema'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { answerRow, computeRows } from '../src/components/use-powder-compare.ts'
 import { fetchPowder, postInteriorRun, postJson } from '../src/lib/api-client.ts'

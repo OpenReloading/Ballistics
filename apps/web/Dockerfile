@@ -13,22 +13,22 @@ COPY apps/web/package.json apps/web/
 COPY tools/package.json tools/
 COPY apps/e2e/package.json apps/e2e/
 COPY apps/docs/package.json apps/docs/
-RUN npm ci --ignore-scripts -w @openreloading/web -w @openreloading/core -w @openreloading/drawing -w @openreloading/importers -w @openreloading/schema -w @openreloading/data -w @openreloading/api && node patches/apply.mjs
+RUN npm ci --ignore-scripts -w @open-reloading/web -w @open-reloading/core -w @open-reloading/drawing -w @open-reloading/importers -w @open-reloading/schema -w @open-reloading/data -w @open-reloading/api && node patches/apply.mjs
 COPY tsconfig.base.json ./
 COPY packages/schema packages/schema
 COPY packages/importers packages/importers
 COPY packages/core packages/core
 COPY packages/drawing packages/drawing
-# the web app imports @openreloading/data/plausibility only: no records, no bundle
+# the web app imports @open-reloading/data/plausibility only: no records, no bundle
 COPY packages/data/tsconfig.json packages/data/tsconfig.build.json packages/data/tsconfig.plausibility.json packages/data/
 COPY packages/data/src/plausibility.ts packages/data/src/
-# and @openreloading/api/compute and /catalogue only (the Pages edition's compute and catalogue in the browser)
+# and @open-reloading/api/compute and /catalogue only (the Pages edition's compute and catalogue in the browser)
 COPY packages/api/tsconfig.json packages/api/tsconfig.build.json packages/api/tsconfig.browser.json packages/api/
 COPY packages/api/src/compute packages/api/src/compute
 COPY packages/api/src/catalogue packages/api/src/catalogue
-RUN npm run build -w @openreloading/schema && npm run build -w @openreloading/importers && npm run build -w @openreloading/core && npm run build -w @openreloading/drawing && node_modules/.bin/tsc -p packages/data/tsconfig.plausibility.json && node_modules/.bin/tsc -p packages/api/tsconfig.browser.json
+RUN npm run build -w @open-reloading/schema && npm run build -w @open-reloading/importers && npm run build -w @open-reloading/core && npm run build -w @open-reloading/drawing && node_modules/.bin/tsc -p packages/data/tsconfig.plausibility.json && node_modules/.bin/tsc -p packages/api/tsconfig.browser.json
 COPY apps/web apps/web
-RUN npm run build -w @openreloading/web && rm -rf apps/web/.next/standalone/node_modules/sharp apps/web/.next/standalone/node_modules/@img
+RUN npm run build -w @open-reloading/web && rm -rf apps/web/.next/standalone/node_modules/sharp apps/web/.next/standalone/node_modules/@img
 
 FROM docker.io/library/node:26-bookworm-slim@sha256:28147155d47dc31abe0a46e0d12b59b2fb3d0a2dcc5dc65fce76a074180b16fe
 ENV NODE_ENV=production
