@@ -412,7 +412,7 @@ export function DirectoryTable<T extends { id: string }>({
                 </th>
               )
             })}
-            <td className="filler" role="presentation" />
+            <td className="filler" inert />
           </tr>
         </thead>
         <tbody
@@ -518,7 +518,7 @@ export function DirectoryTable<T extends { id: string }>({
                       </td>
                     ),
                   )}
-                  <td className="filler" role="presentation" />
+                  <td className="filler" inert />
                 </tr>
               </Fragment>
             )
