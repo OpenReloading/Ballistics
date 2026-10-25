@@ -7,6 +7,7 @@ import {
   recordMark,
   unchangedFromRecord,
 } from '../src/lib/powder-record.ts'
+import { defined } from './defined.ts'
 
 /** A synthetic fitted record in stored units; the numbers are made up. */
 const interior = {
@@ -96,7 +97,7 @@ it('applies the bore resistance of the record from the cartridge, bullet length 
     ((0.42e6 * Math.PI * 7.85 * 30) / 47.51) * (1 + 1.3 * o),
     3,
   )
-  expect(r.resistance?.engraving?.[0].pressure).toBeCloseTo(0.89 * 30e6, 3)
+  expect(defined(r.resistance?.engraving?.[0]).pressure).toBeCloseTo(0.89 * 30e6, 3)
   // no G1: the bore diameter, as the fit
   const noG1 = recordResistance(powder, { ...run, cartridge: {}, bulletLengthMm: 30 })
   expect(noG1.resistance?.friction).toBeCloseTo((0.42e6 * Math.PI * 7.62 * 30) / 47.51, 3)

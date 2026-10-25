@@ -1,4 +1,4 @@
-import { InputError } from '../errors.ts'
+import { InputError, nth } from '../errors.ts'
 import { boreArea } from './bore-resistance.ts'
 import type { InteriorLoad } from './model.ts'
 import { burnFormKeys } from './workbench-keys.ts'
@@ -67,7 +67,7 @@ export function interiorLoad(
   if (form.length > 0 && form.length < 4) {
     const missing = Object.entries(burnFormKeys).filter(([k]) => values[k] === undefined)
     throw new ValueError(
-      missing[0][0],
+      nth(missing, 0)[0],
       `Burn form: ${missing.map(([, n]) => n).join(', ')} needed with the others, or leave all four empty.`,
     )
   }

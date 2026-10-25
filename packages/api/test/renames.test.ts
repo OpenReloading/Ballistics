@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { buildCatalogue } from '../src/catalogue/build.ts'
 import { openCatalogue } from '../src/catalogue/open.ts'
 import { API_PREFIX } from '../src/version.ts'
+import { defined } from './defined.ts'
 import { bundle } from './fixtures.ts'
 import { testCatalogue, withApi } from './setup.ts'
 
@@ -50,7 +51,7 @@ describe('GET of a renamed id', () => {
 
   it('redirects permanently to the record that replaced it, on every record route', async () => {
     for (const [kind, ids] of Object.entries(renames)) {
-      const [[old, now]] = Object.entries(ids)
+      const [old, now] = defined(Object.entries(ids)[0], 'rename')
       expect(await location(`/${kind}/${old}`), kind).toEqual([308, `${API_PREFIX}/${kind}/${now}`])
       expect((await api.get(`/${kind}/${now}`.replace(/^/, API_PREFIX))).status, kind).toBe(200)
     }

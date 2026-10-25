@@ -44,7 +44,8 @@ export function leadeContact(
     ...(i === undefined || !(i > 0 && i < 90) ? ['i'] : []),
   ]
   if (missing.length) return { missing }
-  const [l3, g1, f, angle] = [L3, G1, F, i] as number[]
+  // `missing` names every one of them that is undefined
+  const [l3, g1, f, angle] = [L3, G1, F, i] as [number, number, number, number]
   const t = Math.tan(angle * deg)
   if (d <= f)
     return { none: `The bullet diameter ${d} mm is not above F ${f} mm: no land contact.` }

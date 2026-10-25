@@ -16,6 +16,7 @@ import { packCartridges } from '../src/lib/cartridge-rows.ts'
 import { drawable } from '../src/lib/cartridge-sheet.ts'
 import { parseCountries } from '../src/lib/countries.ts'
 import { type PresetId, presetUnits } from '../src/lib/units.ts'
+import { defined, missing } from './defined.ts'
 import { replaceUntilStable } from './markup.ts'
 import { sheetRecord } from './records.ts'
 
@@ -112,7 +113,9 @@ describe('the cartridge record', () => {
           drawn={['cartridge', 'chamber']}
         />,
       )
-      return [...sides.matchAll(/<th[^>]*scope="col"[^>]*>(.*?)<\/th>/g)].map(([, h]) => text(h))
+      return [...sides.matchAll(/<th[^>]*scope="col"[^>]*>(.*?)<\/th>/g)].map(([, h = missing()]) =>
+        text(h),
+      )
     }
     expect(heads('metric-grams')).toEqual(['Symbol', 'Max (mm)', 'Symbol', 'Min (mm)'])
     expect(heads('us')).toEqual(['Symbol', 'Max (in)', 'Symbol', 'Min (in)'])
@@ -127,14 +130,14 @@ describe('the Cal. 12 variants matrix', () => {
     <VariantMatrix variants={variants} rows={rows} labelledBy="record-variants" />,
   )
   const cells = (tag: 'th' | 'td', body: string) =>
-    [...body.matchAll(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, 'g'))].map(([, t]) =>
-      text(t),
+    [...body.matchAll(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, 'g'))].map(
+      ([, t = missing()]) => text(t),
     )
   const bodyRows = [...table.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/g)].slice(1).map(([, r]) => r)
 
   it('has a column per variant and a row per value, labelled with its unit', () => {
     expect(cells('th', table.match(/<thead[\s\S]*<\/thead>/)?.[0] ?? '')).toHaveLength(10)
-    expect(bodyRows.map((r) => cells('th', r)[0])).toEqual([
+    expect(bodyRows.map((r) => cells('th', defined(r))[0])).toEqual([
       'Pmax (bar)',
       'PK (bar)',
       'PE (bar)',
@@ -145,10 +148,10 @@ describe('the Cal. 12 variants matrix', () => {
   })
 
   it('gives the pressure from the shortest to the longest variant and the text of M', () => {
-    const pmax = cells('td', bodyRows[0])
+    const pmax = cells('td', defined(bodyRows[0]))
     expect(pmax[0]).toBe('150')
     expect(pmax.at(-1)).toBe('1050')
-    expect(cells('td', bodyRows[3])[1]).toBe('25/30')
+    expect(cells('td', defined(bodyRows[3]))[1]).toBe('25/30')
   })
 
   it('keeps the Fe variants as rows of the chamber table, none for l', () => {

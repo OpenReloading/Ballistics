@@ -220,7 +220,9 @@ function decide(): Plan {
     let built = ''
     if (stampFile !== undefined) {
       if (!existsSync(stampFile)) return full('no earlier build recorded')
-      ;[base, built] = readFileSync(stampFile, 'utf8').trim().split(' ')
+      const [stampedBase, stampedBuilt = ''] = readFileSync(stampFile, 'utf8').trim().split(' ')
+      base = stampedBase
+      built = stampedBuilt
     }
     if (!base) return full('no base commit given')
     const changed = changedSince(base)

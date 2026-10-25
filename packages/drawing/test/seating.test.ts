@@ -14,7 +14,7 @@ import {
   type SeatingValues,
   seat,
 } from '../src/seating/index.ts'
-
+import { defined } from './defined.ts'
 import { sheet } from './sheets.ts'
 
 const deg = Math.PI / 180
@@ -67,7 +67,7 @@ describe('chamberOf', () => {
 describe('bulletOutline', () => {
   it('draws the boat tail from the assumed angle and flags it, the shank not', () => {
     const o = drawn(boatTail)
-    const base = o.points[1]
+    const base = defined(o.points[1])
     expect(base[1]).toBe(0)
     expect(base[0]).toBeCloseTo(7.823 / 2 - 5.664 * Math.tan(assumedBoatTailAngle * deg), 9)
     const shank = o.segments.find((s) => !s.approximate)
@@ -148,15 +148,14 @@ describe('hollow base', () => {
 
   it('1.5 mm more length at fixed COAL adds the cylinder of that length, solid or hollow, past the cavity', () => {
     for (const bullet of [solid, hollow('conical-hollow-base'), hollow('rounded-hollow-base')]) {
-      const [short, long] = [10, 11.5].map((depth) => below(bullet, depth).volume.value)
+      const [short, long] = [below(bullet, 10).volume.value, below(bullet, 11.5).volume.value]
       expect(long - short).toBeCloseTo((Math.PI * a ** 2 * 1.5) / 1000, 12)
     }
   })
 
   it('1.5 mm more length at fixed COAL adds less when the mouth is inside the cavity', () => {
-    const [short, long] = [0.5, 2].map(
-      (depth) => below(hollow('conical-hollow-base'), depth).volume.value,
-    )
+    const volume = (depth: number) => below(hollow('conical-hollow-base'), depth).volume.value
+    const [short, long] = [volume(0.5), volume(2)]
     const expected = cylinder(8, 1.5) - (coneBelow(2) - coneBelow(0.5))
     expect(long - short).toBeCloseTo(expected / 1000, 12)
     expect(expected).toBeLessThan(cylinder(8, 1.5))
@@ -170,15 +169,15 @@ describe('hollow base', () => {
 
   it('leaves the volume behind the bullet to the free volume of the cavity', () => {
     const water = 40
-    const [h, s] = [hollow('conical-hollow-base'), solid].map((bullet) =>
+    const seated = (bullet: BulletDimensions) =>
       seat({
         bullet,
         chamber,
         waterCapacity: water,
         waterDensity,
         by: { kind: 'overallLength', value: 60 },
-      }),
-    )
+      })
+    const [h, s] = [seated(hollow('conical-hollow-base')), seated(solid)]
     const [vh, vs] = [h.volumeBehindBullet?.value, s.volumeBehindBullet?.value] as [number, number]
     expect(vh - vs).toBeCloseTo((Math.PI * rc ** 3) / 3 / 1000, 9)
     expect(h.volumeBehindBullet?.tag).toBe('approximate')
@@ -484,7 +483,7 @@ describe('previewDrawn', () => {
     if ('missing' in drawn) throw new Error('not drawn')
     expect(drawn.map((d) => d.side)).toEqual(['cartridge', 'chamber'])
     for (const { p } of drawn) expect(p.annotation.dimensions).toEqual([])
-    const bore = drawn[1].p.points.at(-1)
+    const bore = defined(drawn[1]).p.points.at(-1)
     expect(bore).toEqual([7.62 / 2, 80])
   })
 

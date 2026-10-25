@@ -7,6 +7,7 @@ import { dynamicVivacity, meanDynamicVivacity, type VivacityBurn } from '@open-r
 import { type Powder, toSi } from '@open-reloading/schema'
 import type { PowderSummary } from './api-types.ts'
 import { type ManufacturerNames, productLabel } from './manufacturers.ts'
+import { nth } from './nth.ts'
 import { formatNumber } from './units.ts'
 
 /** Dash pattern per colour slot of the burn-rate charts: identity is not carried by colour alone. */
@@ -194,7 +195,7 @@ function meanText(p: FittedPowder): string {
 export function describeCurve(p: FittedPowder): string {
   const values = chartBurntFractions.map((z) => curveAt(p, z).value)
   const peak = values.indexOf(Math.max(...values))
-  return `Dynamic vivacity of ${p.label} over burnt fraction 0 to 1: ${n2(values[0])} ${vivacityUnit} at z 0, highest ${n2(values[peak])} at z ${formatNumber(chartBurntFractions[peak], 2)}, ${n2(values.at(-1) ?? 0)} at z 1. Mean over z 0.1 to 0.9: ${meanText(p)}.`
+  return `Dynamic vivacity of ${p.label} over burnt fraction 0 to 1: ${n2(nth(values, 0))} ${vivacityUnit} at z 0, highest ${n2(values[peak] ?? Number.NaN)} at z ${formatNumber(chartBurntFractions[peak] ?? Number.NaN, 2)}, ${n2(values.at(-1) ?? 0)} at z 1. Mean over z 0.1 to 0.9: ${meanText(p)}.`
 }
 
 /** The sentence of each group of powders without a curve. */

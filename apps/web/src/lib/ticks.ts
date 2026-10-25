@@ -1,3 +1,5 @@
+import { nth } from './nth.ts'
+
 const NICE_STEPS = [1, 2, 5, 10]
 
 /**
@@ -9,7 +11,7 @@ function nice(x: number, round: boolean): number {
   const f = x / 10 ** e
   const limits = round ? [1.5, 3, 7] : [1, 2, 5]
   const i = limits.findIndex((l) => (round ? f < l : f <= l))
-  return NICE_STEPS[i < 0 ? 3 : i] * 10 ** e
+  return nth(NICE_STEPS, i < 0 ? 3 : i) * 10 ** e
 }
 
 /** About `count` ticks covering min to max; equal ends widen by 1 each way; non-finite input gives none. */
@@ -32,5 +34,6 @@ export function niceTicks(min: number, max: number, count = 5): number[] {
 
 /** Decimals that tell the ticks apart: those of their step. */
 export function tickDecimals(ticks: number[]): number {
-  return ticks.length < 2 ? 0 : Math.max(0, -Math.floor(Math.log10(ticks[1] - ticks[0])))
+  const [a, b] = ticks
+  return a === undefined || b === undefined ? 0 : Math.max(0, -Math.floor(Math.log10(b - a)))
 }

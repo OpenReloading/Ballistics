@@ -429,11 +429,12 @@ async function readOpened<K extends UserRecordKind>(file: File, kind: K) {
     text === undefined ? { ok: false, reason: tooLargeMessage } : readLoadFile(text)
   if (!parsed.ok) return { problem: `${file.name} not opened: ${parsed.reason}` }
   const mine = parsed.records.filter((r): r is Of<K> => r.kind === kind)
-  if (mine.length !== 1)
+  const [only] = mine
+  if (!only || mine.length !== 1)
     return {
       problem: `${file.name} holds ${mine.length} ${kindNames[kind]}; Open takes a file with one, Import takes collections.`,
     }
-  return { parsed, text, mine: mine[0] }
+  return { parsed, text, mine: only }
 }
 
 /** Stores the opened record and its photo in the browser; false when the user keeps the browser copy. */
@@ -1239,7 +1240,7 @@ function FileMenuOf<K extends UserRecordKind>({
       known.current = undefined
     }
     setMessage(
-      `Deleted ${records.length === 1 ? records[0].name : `${records.length} ${kindNames[kind]}`} from this browser; ${only ? 'the page keeps the shown record as unsaved work' : 'the page and saved files keep their copies'}.`,
+      `Deleted ${records.length === 1 ? records[0]?.name : `${records.length} ${kindNames[kind]}`} from this browser; ${only ? 'the page keeps the shown record as unsaved work' : 'the page and saved files keep their copies'}.`,
     )
   }
 

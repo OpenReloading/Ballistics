@@ -1,4 +1,5 @@
 import type { Dimension, SectionPoint } from '../core/types.ts'
+import { pairs } from '../core/vector.ts'
 import type { Side } from './figures.ts'
 import type { Profile } from './profile.ts'
 
@@ -65,13 +66,9 @@ function headDetail(
   }
   // the chamber recess step to P1 at its depth, else the head corner
   const step = side === 'chamber' ? head.findLast(([, z]) => z > 0) : undefined
-  return {
-    letter: 'A',
-    side,
-    region: box(head),
-    anchor: step ?? head[Math.floor(head.length / 2)],
-    sizes,
-  }
+  const anchor = step ?? head[Math.floor(head.length / 2)]
+  if (!anchor) return
+  return { letter: 'A', side, region: box(head), anchor, sizes }
 }
 
 /** Detail B, the chamber throat, where G1 is dimensioned with F and i or with h or s. */
@@ -92,13 +89,9 @@ function throatDetail(
     at('F')?.from ??
     L3
   const part = p.points.filter(([, z]) => z >= L3 - 1e-9 && z <= z1 + 1e-9)
-  return {
-    letter: 'B',
-    side,
-    region: box(part),
-    anchor: part[0],
-    sizes: segments(part),
-  }
+  const anchor = part[0]
+  if (!anchor) return
+  return { letter: 'B', side, region: box(part), anchor, sizes: segments(part) }
 }
 
 const box = (points: SectionPoint[]): DetailSpec['region'] => [
@@ -110,9 +103,8 @@ const box = (points: SectionPoint[]): DetailSpec['region'] => [
 
 /** Every outline segment of at least 0.01 mm at 1 px; shorter ones are the rounding of the values. */
 const segments = (points: SectionPoint[]) =>
-  points
-    .slice(1)
-    .map(([r, z], k) => Math.hypot(r - points[k][0], z - points[k][1]))
+  pairs(points)
+    .map(([[pr, pz], [r, z]]) => Math.hypot(r - pr, z - pz))
     .filter((mm) => mm >= 0.01 - 1e-9)
     .map((mm) => ({ mm, px: 1 }))
 
@@ -127,10 +119,10 @@ export function detailWindow(spec: DetailSpec, pxPerMm: number, across = detailW
   const fits = (k: number) =>
     (z1 - z0) * k + 2 * detailMargin <= detailWindowCap.along &&
     (r1 - r0) * k + 2 * detailMargin <= across
-  const kFit = detailScales.findLast(fits) ?? detailScales[0]
+  const kFit = detailScales.findLast(fits) ?? Math.min(...detailScales)
   const kNeed =
     detailScales.find((k) => spec.sizes.every(({ mm, px }) => mm * k * pxPerMm >= px)) ??
-    detailScales[detailScales.length - 1]
+    Math.max(...detailScales)
   const k = Math.max(kFit, kNeed)
   const cut = (lo: number, hi: number, at: number, room: number): [number, number] => {
     const [a, b] = [lo * k - detailMargin, hi * k + detailMargin]

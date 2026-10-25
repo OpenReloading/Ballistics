@@ -11,6 +11,7 @@ import { describe, expect, it } from 'vitest'
 import { caps } from '../src/compute/schemas.ts'
 import { rangeStringsLimits } from '../src/compute/strings-schema.ts'
 import { API_PREFIX } from '../src/version.ts'
+import { defined } from './defined.ts'
 import { withApi } from './setup.ts'
 
 const { post } = withApi()
@@ -88,7 +89,7 @@ describe('POST /exterior/range-strings/plan', () => {
     })
     expect(status).toBe(200)
     const want = planTruingStrings(
-      { shot, clickValue, dispersion, ...candidates[1] },
+      { shot, clickValue, dispersion, ...defined(candidates[1]) },
       { ...defaults, ...options },
     )
     expect(body.result[0].plan.parameters.map((p: { name: string }) => p.name)).toContain(
@@ -269,5 +270,29 @@ describe('POST /exterior/range-strings/fit', () => {
       options: { priors, fitZeroOffset: true },
     })
     expect(on.status).toBe(200)
+  })
+
+  it('answers 422, not 500, when the fit has no finite interval (chronograph spread at the float minimum)', async () => {
+    const { status, body } = await post(url, {
+      shot: { ...shot, muzzleVelocity: 800, firearm: { sightHeight: 0.04 } },
+      clickValue: 0.0001,
+      entries: [300, 600, 900].map((range, i) => ({
+        kind: 'impact',
+        range,
+        value: [-0.4257, -3.136, -9.9613][i],
+        shotCount: 5,
+        standardDeviation: 0.06 * (i + 1),
+      })),
+      chronograph: {
+        instrumentDistance: 0,
+        mean: 800,
+        rounding: 0,
+        shotCount: 10,
+        standardDeviation: Number.MIN_VALUE,
+      },
+      options: { fitZeroOffset: true },
+    })
+    expect(status).toBe(422)
+    expect(body.message).toMatch(/non-finite/)
   })
 })

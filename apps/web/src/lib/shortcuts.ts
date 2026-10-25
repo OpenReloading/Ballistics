@@ -27,7 +27,7 @@ export const shortcuts: Record<ShortcutId, Shortcut> = table
 
 const keysOf = (id: ShortcutId) => shortcuts[id].keys
 const parts = (k: string) => k.split('+')
-const cap = (p: string) => p[0].toUpperCase() + p.slice(1)
+const cap = (p: string) => p.charAt(0).toUpperCase() + p.slice(1)
 
 /** The keys as shown in hints: `Ctrl+Shift+Z or Ctrl+Y` (shown as Ctrl on every platform, Cmd works too). */
 export const shortcutLabel = (id: ShortcutId) =>

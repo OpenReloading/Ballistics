@@ -156,16 +156,19 @@ function placeTrack(
   travelX: ((travel: number) => number) | undefined,
 ) {
   const c = chart?.isDisposed() ? null : chart
-  if (!c || !el) return
+  const first = points[0]
+  const last = points[points.length - 1]
+  if (!c || !el || !first || !last) return
   const px = (v: number) => c.convertToPixel({ xAxisIndex: 0 }, v)
-  const [t0, t1] = [px(x(points[0])), px(x(points[points.length - 1]))]
+  const [t0, t1] = [px(x(first)), px(x(last))]
   const set = (name: string, v: number) =>
     Number.isFinite(v) && el.style.setProperty(name, `${v.toFixed(2)}px`)
   set('--track-x', t0)
   set('--track-w', t1 - t0)
   if (strip && travelX) {
     // the strip's drawing runs from 1 mm behind the head to 1 mm past the muzzle
-    const [a, b] = [-1, strip.muzzle + 1].map((z) => px(travelX(toSi('length', z - strip.base))))
+    const at = (z: number) => px(travelX(toSi('length', z - strip.base)))
+    const [a, b] = [at(-1), at(strip.muzzle + 1)]
     set('--strip-x', a)
     set('--strip-w', b - a)
   } else {
@@ -183,7 +186,7 @@ function flightOut(
   const box = svg?.closest('.rail-strip')?.getBoundingClientRect()
   const a = svg?.getBoundingClientRect()
   const muzzle = points[points.length - 1]
-  if (!strip || !box || !a || a.width <= 0) return 0
+  if (!strip || !box || !a || !muzzle || a.width <= 0) return 0
   // 1 px past the edge: the outline's stroke reaches behind the base
   return flightTime(
     strip,

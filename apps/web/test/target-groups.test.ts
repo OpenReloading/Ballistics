@@ -1,6 +1,7 @@
 import type { ShotGroup } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { groupStatisticsInput } from '../src/lib/target-groups.ts'
+import { defined } from './defined.ts'
 
 const group: ShotGroup = {
   id: 'g1',
@@ -35,6 +36,6 @@ describe('statisticsInput', () => {
   it('leaves out the aim and velocities when there are none', () => {
     const input = groupStatisticsInput({ ...group, aim: undefined })
     expect(input.aim).toBeUndefined()
-    expect(input.shots[0].velocity).toBeUndefined()
+    expect(defined(input.shots[0]).velocity).toBeUndefined()
   })
 })

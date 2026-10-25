@@ -5,7 +5,7 @@
  * that the text leaves out. Lengths in calibers inside, SI at the interface.
  */
 import type { DragTable } from '../drag-tables.ts'
-import { need } from '../errors.ts'
+import { need, nth } from '../errors.ts'
 
 /** Mach numbers of the report's output tables (Figures 26 to 28, p. 57 to 59). */
 export const outlineDragMach: readonly number[] = [
@@ -97,14 +97,14 @@ const sdPercent: readonly (readonly [number, number])[] = [
 
 /** Figure 25 curve, linear between its readings, flat outside them. */
 function relativeSd(mach: number): number {
-  const first = sdPercent[0]
-  const last = sdPercent[sdPercent.length - 1]
+  const first = nth(sdPercent, 0)
+  const last = nth(sdPercent, sdPercent.length - 1)
   if (mach <= first[0]) return first[1] / 100
   if (mach >= last[0]) return last[1] / 100
   let k = 0
-  while (sdPercent[k + 1][0] < mach) k++
-  const [m0, s0] = sdPercent[k]
-  const [m1, s1] = sdPercent[k + 1]
+  while (nth(sdPercent, k + 1)[0] < mach) k++
+  const [m0, s0] = nth(sdPercent, k)
+  const [m1, s1] = nth(sdPercent, k + 1)
   return (s0 + ((s1 - s0) * (mach - m0)) / (m1 - m0)) / 100
 }
 

@@ -5,6 +5,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { drawable } from '../src/lib/cartridge-sheet.ts'
 import { figureViews } from '../src/lib/figure-views.ts'
+import { defined, missing } from './defined.ts'
 import { sheetRecord } from './records.ts'
 
 vi.mock('next/font/local', () => ({ default: () => ({ variable: 'drawing-font', className: '' }) }))
@@ -70,12 +71,12 @@ function expectViewsAgree(
   const views = (['combined', 'cartridge', 'chamber'] as const).map((view) =>
     viewOf(id, models, view, medium),
   )
-  const [combined, ...sides] = views
+  const [combined = missing(), ...sides] = views
   for (const { model, svg } of sides) expectSharedFrame(model, svg, combined)
   // the case outline itself is the same with and without its dimensions
-  expect(placement(views[1].svg).cartridge).toBe(placement(combined.svg).cartridge)
+  expect(placement(defined(views[1]).svg).cartridge).toBe(placement(combined.svg).cartridge)
   // the Cartridge view draws dimensions, Combined none
-  expect(views[1].model.layers.cartridge?.labels.length).toBeGreaterThan(0)
+  expect(defined(views[1]).model.layers.cartridge?.labels.length).toBeGreaterThan(0)
   expect(combined.model.layers.cartridge?.labels ?? []).toEqual([])
 }
 

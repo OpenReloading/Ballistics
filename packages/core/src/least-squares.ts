@@ -4,6 +4,7 @@
  * fit: `apps/docs/docs/models/least-squares.md`.
  */
 
+import { nth } from './errors.ts'
 import { type HuberLoss, huberCost, huberRoots } from './huber.ts'
 
 /** Whether the off-diagonal part of `m` is negligible against its diagonal. */
@@ -12,8 +13,9 @@ function isDiagonal(m: number[][]): boolean {
   let off = 0
   let diag = 0
   for (let i = 0; i < n; i++) {
-    diag += m[i][i] ** 2
-    for (let j = i + 1; j < n; j++) off += m[i][j] ** 2
+    const row = nth(m, i)
+    diag += nth(row, i) ** 2
+    for (let j = i + 1; j < n; j++) off += nth(row, j) ** 2
   }
   return off <= 1e-32 * diag
 }
@@ -21,27 +23,29 @@ function isDiagonal(m: number[][]): boolean {
 /** One Jacobi rotation of `m` that zeroes entry (p, q), accumulated into the vectors `v`. */
 function rotate(m: number[][], v: number[][], p: number, q: number) {
   const n = m.length
-  const theta = (m[q][q] - m[p][p]) / (2 * m[p][q])
+  const mp = nth(m, p)
+  const mq = nth(m, q)
+  const theta = (nth(mq, q) - nth(mp, p)) / (2 * nth(mp, q))
   const t = (theta < 0 ? -1 : 1) / (Math.abs(theta) + Math.sqrt(theta * theta + 1))
   const c = 1 / Math.sqrt(t * t + 1)
   const s = t * c
-  for (let k = 0; k < n; k++) {
-    const kp = m[k][p]
-    const kq = m[k][q]
-    m[k][p] = c * kp - s * kq
-    m[k][q] = s * kp + c * kq
+  for (const mk of m) {
+    const kp = nth(mk, p)
+    const kq = nth(mk, q)
+    mk[p] = c * kp - s * kq
+    mk[q] = s * kp + c * kq
   }
   for (let k = 0; k < n; k++) {
-    const pk = m[p][k]
-    const qk = m[q][k]
-    m[p][k] = c * pk - s * qk
-    m[q][k] = s * pk + c * qk
+    const pk = nth(mp, k)
+    const qk = nth(mq, k)
+    mp[k] = c * pk - s * qk
+    mq[k] = s * pk + c * qk
   }
-  for (let k = 0; k < n; k++) {
-    const kp = v[k][p]
-    const kq = v[k][q]
-    v[k][p] = c * kp - s * kq
-    v[k][q] = s * kp + c * kq
+  for (const vk of v) {
+    const kp = nth(vk, p)
+    const kq = nth(vk, q)
+    vk[p] = c * kp - s * kq
+    vk[q] = s * kp + c * kq
   }
 }
 
@@ -53,21 +57,23 @@ function eigen(a: number[][]): { values: number[]; vectors: number[][] } {
   for (let sweep = 0; sweep < 100; sweep++) {
     if (isDiagonal(m)) break
     for (let p = 0; p < n - 1; p++)
-      for (let q = p + 1; q < n; q++) if (m[p][q] !== 0) rotate(m, v, p, q)
+      for (let q = p + 1; q < n; q++) if (nth(nth(m, p), q) !== 0) rotate(m, v, p, q)
   }
-  return { values: m.map((r, i) => r[i]), vectors: v }
+  return { values: m.map((r, i) => nth(r, i)), vectors: v }
 }
 
 /** Inverse of a symmetric positive definite matrix through its eigen decomposition. */
 function inverse(a: number[][]): number[][] {
   const { values, vectors } = eigen(a)
-  return a.map((_, i) =>
-    a.map((_, j) => values.reduce((sum, l, k) => sum + (vectors[i][k] * vectors[j][k]) / l, 0)),
+  return vectors.map((vi) =>
+    vectors.map((vj) => values.reduce((sum, l, k) => sum + (nth(vi, k) * nth(vj, k)) / l, 0)),
   )
 }
 
 const transposeTimes = (j: number[][], b: number[][]) =>
-  j[0].map((_, r) => b[0].map((_, c) => j.reduce((s, row, i) => s + row[r] * b[i][c], 0)))
+  nth(j, 0).map((_, r) =>
+    nth(b, 0).map((_, c) => j.reduce((s, row, i) => s + nth(row, r) * nth(nth(b, i), c), 0)),
+  )
 
 /** Parameter uncertainty and collinearity measures of a weighted Jacobian. */
 export interface Identifiability {
@@ -96,25 +102,32 @@ export interface Identifiability {
  */
 export function identifiability(j: number[][]): Identifiability {
   const f = transposeTimes(j, j)
-  const d = f.map((row, i) => Math.sqrt(row[i]))
-  const r = f.map((row, i) => row.map((x, k) => x / (d[i] * d[k])))
+  const d = f.map((row, i) => Math.sqrt(nth(row, i)))
+  const r = f.map((row, i) => row.map((x, k) => x / (nth(d, i) * nth(d, k))))
   const { values, vectors } = eigen(r)
   const top = Math.max(...values)
+  // NaN eigenvalues make this -1: reads at it are NaN, as the fit treats them
   const lo = values.indexOf(Math.min(...values))
   const floor = 1e-12 * top
-  const singular = values[lo] <= floor
+  const singular = (values[lo] ?? Number.NaN) <= floor
   const lambda = values.map((l) => Math.max(l, floor))
   const inv = r.map((_, a) =>
-    r.map((_, b) => lambda.reduce((s, l, k) => s + (vectors[a][k] * vectors[b][k]) / l, 0)),
+    r.map((_, b) =>
+      lambda.reduce((s, l, k) => s + (nth(nth(vectors, a), k) * nth(nth(vectors, b), k)) / l, 0),
+    ),
   )
-  const unbounded = (a: number) => singular && vectors[a][lo] ** 2 > floor
+  const unbounded = (a: number) => singular && (nth(vectors, a)[lo] ?? Number.NaN) ** 2 > floor
   return {
-    standardUncertainty: inv.map((row, a) => (unbounded(a) ? Infinity : Math.sqrt(row[a]) / d[a])),
+    standardUncertainty: inv.map((row, a) =>
+      unbounded(a) ? Infinity : Math.sqrt(nth(row, a)) / nth(d, a),
+    ),
     conditionalSigma: d.map((x) => 1 / x),
-    correlation: inv.map((row, a) => row.map((x, b) => x / Math.sqrt(inv[a][a] * inv[b][b]))),
-    varianceInflation: inv.map((row, a) => (unbounded(a) ? Infinity : row[a])),
-    conditionNumber: singular ? Infinity : Math.sqrt(top / values[lo]),
-    direction: vectors.map((row) => row[lo]),
+    correlation: inv.map((row, a) =>
+      row.map((x, b) => x / Math.sqrt(nth(nth(inv, a), a) * nth(nth(inv, b), b))),
+    ),
+    varianceInflation: inv.map((row, a) => (unbounded(a) ? Infinity : nth(row, a))),
+    conditionNumber: singular ? Infinity : Math.sqrt(top / (values[lo] ?? Number.NaN)),
+    direction: vectors.map((row) => row[lo] ?? Number.NaN),
   }
 }
 
@@ -207,10 +220,10 @@ function jacobian(fit: LogFitInput, stacking: Stacking, at: number[]): number[][
       const a = predict(up, at, run)
       const b = predict(down, at, run)
       if (!a || !b) return fail('unreachable', at)
-      return a.map((v, i) => (v - b[i]) / (2 * step * sigma[start[run] + i]))
+      return a.map((v, i) => (v - nth(b, i)) / (2 * step * nth(sigma, nth(start, run) + i)))
     })
   })
-  return observed.map((_, i) => columns.map((c) => c[i]))
+  return observed.map((_, i) => columns.map((c) => nth(c, i)))
 }
 
 /**
@@ -220,20 +233,24 @@ function jacobian(fit: LogFitInput, stacking: Stacking, at: number[]): number[][
  */
 function checkConditioning(fit: LogFitInput, j: number[][], at: number[]): number {
   const { floor, maxCondition, fail } = fit
-  const norms = at.map((_, k) => Math.hypot(...j.map((row) => row[k])))
+  const norms = at.map((_, k) => Math.hypot(...j.map((row) => nth(row, k))))
   const largest = Math.max(...norms)
   const unresolved = norms.flatMap((d, k) =>
-    d === 0 || d < 1e-9 * largest || j.every((row, i) => Math.abs(row[k]) < floor[i]) ? [k] : [],
+    d === 0 || d < 1e-9 * largest || j.every((row, i) => Math.abs(nth(row, k)) < nth(floor, i))
+      ? [k]
+      : [],
   )
   if (unresolved.length > 0) fail('unresolved', at, { unresolved })
-  const scaled = j.map((row) => row.map((x, k) => x / norms[k]))
+  const scaled = j.map((row) => row.map((x, k) => x / nth(norms, k)))
   const { values, vectors } = eigen(transposeTimes(scaled, scaled))
+  // NaN eigenvalues make this -1: reads at it are NaN, as the fit treats them
   const lo = values.indexOf(Math.min(...values))
-  const condition = values[lo] > 0 ? Math.sqrt(Math.max(...values) / values[lo]) : Infinity
+  const smallest = values[lo] ?? Number.NaN
+  const condition = smallest > 0 ? Math.sqrt(Math.max(...values) / smallest) : Infinity
   if (!(condition <= maxCondition))
     fail('ill-conditioned', at, {
       conditionNumber: condition,
-      direction: vectors.map((row) => row[lo]),
+      direction: vectors.map((row) => row[lo] ?? Number.NaN),
     })
   return condition
 }
@@ -243,7 +260,7 @@ function parameterCovariance(j: number[][], scale: number): number[][] {
   return inverse(transposeTimes(j, j)).map((row) => row.map((x) => x * scale))
 }
 
-const scaled = (m: number[][], w: number[]) => m.map((row, i) => row.map((x) => x * w[i]))
+const scaled = (m: number[][], w: number[]) => m.map((row, i) => row.map((x) => x * nth(w, i)))
 
 /** The Levenberg-Marquardt step from the Jacobian `j`, residuals `r` with root weights `w`, damped by `lambda`. */
 function levenbergMarquardtStep(j: number[][], r: number[], w: number[], lambda: number) {
@@ -251,20 +268,20 @@ function levenbergMarquardtStep(j: number[][], r: number[], w: number[], lambda:
   const a = transposeTimes(jw, jw)
   const g = transposeTimes(
     jw,
-    r.map((x, i) => [x * w[i]]),
-  ).map((row) => row[0])
+    r.map((x, i) => [x * nth(w, i)]),
+  ).map((row) => nth(row, 0))
   const damped = a.map((row, k) => row.map((x, l) => (k === l ? x * (1 + lambda) : x)))
   const inv = inverse(damped)
-  return inv.map((row) => -row.reduce((s, x, l) => s + x * g[l], 0))
+  return inv.map((row) => -row.reduce((s, x, l) => s + x * nth(g, l), 0))
 }
 
 /** The covariance of a fit with its standard errors and correlations. */
 function covarianceSummary(covariance: number[][]) {
   return {
     covariance,
-    standardUncertainty: covariance.map((row, k) => Math.sqrt(row[k])),
+    standardUncertainty: covariance.map((row, k) => Math.sqrt(nth(row, k))),
     correlation: covariance.map((row, k) =>
-      row.map((x, l) => x / Math.sqrt(covariance[k][k] * covariance[l][l])),
+      row.map((x, l) => x / Math.sqrt(nth(nth(covariance, k), k) * nth(nth(covariance, l), l))),
     ),
   }
 }
@@ -294,7 +311,7 @@ export function logLeastSquares(fit: LogFitInput): LogFitResult {
   const { parameterCount, observed, standardUncertainty: sigma, predict } = fit
   const n = observed.length
   const residuals = (values: readonly number[]) =>
-    values.map((v, i) => (v - observed[i]) / sigma[i])
+    values.map((v, i) => (v - nth(observed, i)) / nth(sigma, i))
   const chi2 = (r: number[]) => r.reduce((s, x) => s + x * x, 0)
   const { huber } = fit
   const cost2 = (r: number[]) => (huber ? huberCost(r, huber) : chi2(r))
@@ -319,7 +336,7 @@ export function logLeastSquares(fit: LogFitInput): LogFitResult {
     iterations++
     const delta = levenbergMarquardtStep(j, r, roots(r), lambda)
     const small = Math.max(...delta.map(Math.abs)) < 1e-8
-    const candidate = theta.map((x, k) => x + delta[k])
+    const candidate = theta.map((x, k) => x + nth(delta, k))
     const p = small ? null : predict(candidate, theta)
     const next = p ? cost2(residuals(p)) : Infinity
     if (p && next < cost) {

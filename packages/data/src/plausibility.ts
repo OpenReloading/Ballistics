@@ -81,8 +81,9 @@ function checkLengthOrder(values: SpecValue[], variant: string | undefined): Fin
   const lengths = lengthOrder
     .map((symbol) => ({ symbol, value: findSpecValue(values, 'cartridge', symbol, variant) }))
     .filter((l): l is { symbol: string; value: number } => l.value !== undefined)
-  for (let i = 1; i < lengths.length; i++) {
-    const [a, b] = [lengths[i - 1], lengths[i]]
+  for (const [i, b] of lengths.entries()) {
+    const a = lengths[i - 1]
+    if (a === undefined) continue
     const ordered = b.symbol === 'L6' ? a.value <= b.value : a.value < b.value
     if (!ordered) {
       findings.push({
@@ -162,8 +163,10 @@ function checkBallisticCoefficients(bullet: Bullet): Finding[] {
   // the records; outside 0.35 to 0.65 one of the two is wrong.
   const g1Coefficients = ballisticCoefficients.filter((b) => b.dragModel === 'G1' && !b.minVelocity)
   const g7Coefficients = ballisticCoefficients.filter((b) => b.dragModel === 'G7' && !b.minVelocity)
-  if (g1Coefficients.length === 1 && g7Coefficients.length === 1) {
-    const [g1, g7] = [g1Coefficients[0].value, g7Coefficients[0].value]
+  const [g1Coefficient, ...moreG1] = g1Coefficients
+  const [g7Coefficient, ...moreG7] = g7Coefficients
+  if (g1Coefficient && g7Coefficient && moreG1.length === 0 && moreG7.length === 0) {
+    const [g1, g7] = [g1Coefficient.value, g7Coefficient.value]
     const ratio = g7 / g1
     if (ratio < 0.35 || ratio > 0.65) {
       findings.push({

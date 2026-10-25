@@ -16,6 +16,7 @@ import {
 import { interiorBody } from '../src/lib/interior-input.ts'
 import type { PlaybackResult } from '../src/lib/playback.ts'
 import { formatQuantity, presetUnits } from '../src/lib/units.ts'
+import { defined } from './defined.ts'
 
 const { load } = interiorBody(exampleInterior)
 const run = (change: Partial<typeof exampleInterior> = {}): PlaybackResult => {
@@ -71,7 +72,7 @@ describe('chartEvents', () => {
       'burnout',
       'muzzle',
     ])
-    expect(chartEvents(r)[0].time).toBe(r.tenPercentPressureTime)
+    expect(defined(chartEvents(r)[0]).time).toBe(r.tenPercentPressureTime)
   })
 
   // points of (time s, burnt fraction): 0 at 0, 0.5 at 1, 0.9 at 2, 1 at 4
@@ -171,7 +172,7 @@ describe('chartEvents', () => {
 describe('sampleAtX', () => {
   it('finds the travel of a point on the travel axis and the time on the time axis', () => {
     const system = presetUnits('metric-grains')
-    const p = r.points[Math.floor(r.points.length / 2)]
+    const p = defined(r.points[Math.floor(r.points.length / 2)])
     const byTravel = sampleAtX(r.points, 'travel', system.length.fromSi(p.travel), system)
     expect(byTravel.travel).toBeCloseTo(p.travel, 9)
     expect(byTravel.velocity).toBeCloseTo(p.velocity, 6)
@@ -193,7 +194,7 @@ describe('chartRows', () => {
   it('gives 20 rows from ignition to muzzle exit', () => {
     const rows = chartRows(r.points)
     expect(rows).toHaveLength(20)
-    expect(rows[0].time).toBe(r.points[0].time)
+    expect(defined(rows[0]).time).toBe(defined(r.points[0]).time)
     expect(rows.at(-1)?.time).toBe(r.muzzleTime)
   })
 })
@@ -224,7 +225,7 @@ describe('limitLines', () => {
   })
 
   it('leaves out the source without a number and gives undefined without a compared limit', () => {
-    expect(limitLines([cip], system)?.[0].label).toBe('CIP Pmax 4150 bar')
+    expect(defined(limitLines([cip], system)?.[0]).label).toBe('CIP Pmax 4150 bar')
     expect(limitLines([{ ...cip, compared: false }], system)).toBeUndefined()
     expect(limitLines(undefined, system)).toBeUndefined()
   })
@@ -282,7 +283,7 @@ describe('interiorOption', () => {
       'Step 2 energy',
     ])
     expect(own.map((s) => s.markPoint?.data.at(-1)?.symbol)).toEqual(['circle', 'rect', 'diamond'])
-    expect(own[1].markPoint?.data.at(-1)?.coord).toEqual(own[1].data.at(-1))
+    expect(defined(own[1]).markPoint?.data.at(-1)?.coord).toEqual(defined(own[1]).data.at(-1))
     expect(own.map((s) => s.lineStyle.type)).toEqual(['solid', 'solid', [7, 4]])
   })
 
@@ -298,7 +299,7 @@ describe('interiorOption', () => {
   })
 
   it('takes a ladder of 300000 points', () => {
-    const points = Array.from({ length: 300_000 }, (_, i) => r.points[i % r.points.length])
+    const points = Array.from({ length: 300_000 }, (_, i) => defined(r.points[i % r.points.length]))
     const long = [{ n: 1, result: { ...r, points } }]
     const o = interiorOption({
       steps: long,
@@ -328,14 +329,14 @@ describe('interiorOption', () => {
     const marks = option('pressure').series.flatMap((s) => s.markLine?.data ?? [])
     const limits = marks.filter((m) => 'yAxis' in m)
     expect(limits.map((m) => [m.yAxis, m.label.position])).toEqual([
-      [lines?.[0].y, 'insideStartTop'],
-      [lines?.[1].y, 'insideEndTop'],
-      [lines?.[2].y, 'insideEndBottom'],
+      [defined(lines?.[0]).y, 'insideStartTop'],
+      [defined(lines?.[1]).y, 'insideEndTop'],
+      [defined(lines?.[2]).y, 'insideEndBottom'],
     ])
   })
 
   it('stretches the pressure axis to the limit line', () => {
-    expect(option('all').yAxis[0].max).toBeGreaterThanOrEqual(
+    expect(defined(option('all').yAxis[0]).max).toBeGreaterThanOrEqual(
       Math.max(...(lines ?? []).map((l) => l.y)),
     )
   })
@@ -367,8 +368,11 @@ describe('interiorOption', () => {
     })
     const marks = o.series.flatMap((s) => s.markPoint?.data ?? [])
     expect(marks.map((m) => m.name)).toEqual(['Step 1 peak', 'Step 1 end'])
-    expect(marks[0].coord[1]).toBeCloseTo(system.pressure.fromSi(close.peakBreechPressure), 6)
-    expect(marks[0].label?.show).toBe(false)
+    expect(defined(marks[0]).coord[1]).toBeCloseTo(
+      system.pressure.fromSi(close.peakBreechPressure),
+      6,
+    )
+    expect(defined(marks[0]).label?.show).toBe(false)
   })
 
   it('switches animation off when asked', () => {
@@ -401,7 +405,7 @@ describe('alignedAxes', () => {
     for (const maxima of [[1], [415, 830, 2900], [0.37, 1.2e4, 5]]) {
       const axes = alignedAxes(maxima)
       expect(new Set(axes.map((a) => Math.round(a.max / a.interval))).size).toBe(1)
-      for (const [i, a] of axes.entries()) expect(a.max).toBeGreaterThanOrEqual(maxima[i])
+      for (const [i, a] of axes.entries()) expect(a.max).toBeGreaterThanOrEqual(defined(maxima[i]))
     }
   })
 })

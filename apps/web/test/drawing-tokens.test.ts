@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { groupColours } from '../src/lib/target-editor.ts'
+import { missing } from './defined.ts'
 
 describe('drawing tokens', () => {
   const css = readFileSync(new URL('../src/app/globals.css', import.meta.url), 'utf8')
@@ -8,11 +9,13 @@ describe('drawing tokens', () => {
     const start = css.indexOf(`${prefix} {\n`)
     const body = css.slice(css.indexOf('{', start + prefix.length) + 1, css.indexOf('}', start))
     return new Map(
-      [...body.matchAll(/(--[\w-]+):\s*([^;]+);/g)].map(([, k, v]) => [k, v.trim()] as const),
+      [...body.matchAll(/(--[\w-]+):\s*([^;]+);/g)].map(
+        ([, k, v = missing()]) => [k, v.trim()] as const,
+      ),
     )
   }
   const luminance = (hex: string) => {
-    const [r, g, b] = [1, 3, 5].map((k) => {
+    const [r = missing(), g = missing(), b = missing()] = [1, 3, 5].map((k) => {
       const c = Number.parseInt(hex.slice(k, k + 2), 16) / 255
       return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
     })
@@ -20,7 +23,7 @@ describe('drawing tokens', () => {
   }
   // WCAG 2.1 contrast ratio, https://www.w3.org/TR/WCAG21/#dfn-contrast-ratio
   const ratio = (a: string, b: string) => {
-    const [x, y] = [luminance(a), luminance(b)].sort((p, q) => q - p)
+    const [x = missing(), y = missing()] = [luminance(a), luminance(b)].sort((p, q) => q - p)
     return (x + 0.05) / (y + 0.05)
   }
   const light = block(':root')

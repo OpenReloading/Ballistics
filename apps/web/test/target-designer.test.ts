@@ -15,6 +15,7 @@ import {
 } from '../src/lib/target-designer.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import { parseUserDataFile, userDataText } from '../src/lib/user-data.ts'
+import { defined, missing } from './defined.ts'
 
 const metric = presetUnits('metric-grams')
 const us = presetUnits('us')
@@ -84,7 +85,7 @@ describe('faceOf', () => {
     })
     const built = faceOf(d, 'user-a1')
     if (!('problems' in built)) throw new Error('built a face')
-    const third = liveRows(d)[2].id
+    const third = defined(liveRows(d)[2]).id
     expect(built.problems).toContainEqual({
       key: `ring.${third}.diameter`,
       message: 'must be below the ring outside it',
@@ -97,7 +98,7 @@ describe('faceOf', () => {
     const built = faceOf({ ...d, fields: { ...d.fields } }, 'user-a1')
     if (!('problems' in built)) throw new Error('built a face')
     expect(built.problems).toContainEqual({
-      key: `ring.${d.rows[0].id}.diameter`,
+      key: `ring.${defined(d.rows[0]).id}.diameter`,
       message: 'Required.',
     })
   })
@@ -123,7 +124,7 @@ describe('the draft file', () => {
     const d = draft()
     const parsed = parseUserDataFile(userDataText([record(d)]))
     if (!parsed.ok) throw new Error(parsed.reason)
-    const [back] = parsed.records
+    const [back = missing()] = parsed.records
     if (back.kind !== 'targetFaceDesign') throw new Error(back.kind)
     expect(back.data).toEqual(club)
     expect(back.name).toBe('Club face')
@@ -138,29 +139,29 @@ describe('the draft file', () => {
 
   it('leaves out a number that is not positive', () => {
     const d = draft()
-    const key = `ring.${d.rows[0].id}.diameter`
+    const key = `ring.${defined(d.rows[0]).id}.diameter`
     const bad = { ...d, fields: { ...d.fields, [key]: fieldValueFromText('length', metric, '-3') } }
     expect(fileData(bad).rings[0]).not.toHaveProperty('diameter')
   })
 
   it('stores a diameter typed in mm or in inches as millimetres', () => {
     const d = draft()
-    const key = `ring.${d.rows[0].id}.diameter`
+    const key = `ring.${defined(d.rows[0]).id}.diameter`
     const typed = (system: typeof metric, text: string) =>
       fileData({ ...d, fields: { ...d.fields, [key]: fieldValueFromText('length', system, text) } })
-    expect(typed(metric, '150').rings[0].diameter).toBe(150)
-    expect(typed(us, '2').rings[0].diameter).toBe(50.8)
+    expect(defined(typed(metric, '150').rings[0]).diameter).toBe(150)
+    expect(defined(typed(us, '2').rings[0]).diameter).toBe(50.8)
   })
 
   it('leaves out a ring value that is not a whole number, as the schema requires', () => {
     const d = draft()
-    const key = `ring.${d.rows[0].id}.value`
+    const key = `ring.${defined(d.rows[0]).id}.value`
     const set = (text: string) => ({
       ...d,
       fields: { ...d.fields, [key]: fieldValueFromText('ratio', metric, text) },
     })
     expect(fileData(set('1.5')).rings[0]).not.toHaveProperty('value')
-    expect(fileData(set('7')).rings[0].value).toBe(7)
+    expect(defined(fileData(set('7')).rings[0]).value).toBe(7)
   })
 })
 
@@ -172,7 +173,7 @@ describe('the drawing', () => {
       const rings = lines.filter((l) => l.ring)
       expect(rings.map((l) => l.ring)).toEqual(club.rings.map((r) => r.value))
       rings.forEach((l, i) => {
-        expect(l.rx * 2).toBeCloseTo(club.rings[i].diameter ?? 0, 9)
+        expect(l.rx * 2).toBeCloseTo(defined(club.rings[i]).diameter ?? 0, 9)
         expect(l.ry).toBe(l.rx)
       })
     }
@@ -205,7 +206,7 @@ describe('reduce', () => {
       const mm = Number((i * 0.05).toFixed(2))
       for (const system of [metric, us]) {
         const data = { rings: [{ value: 1, diameter: mm }], events: [] }
-        expect(fileData(fromFile(data, 'x', system)).rings[0].diameter).toBe(mm)
+        expect(defined(fileData(fromFile(data, 'x', system)).rings[0]).diameter).toBe(mm)
       }
     }
   })
@@ -214,7 +215,7 @@ describe('reduce', () => {
     const d = draft()
     const switched = reduce(historyOf(d), { type: 'units', system: us }).present
     expect(fileData(switched)).toEqual(club)
-    expect(switched.fields[`ring.${d.rows[0].id}.diameter`].text).not.toBe('150')
+    expect(defined(switched.fields[`ring.${defined(d.rows[0]).id}.diameter`]).text).not.toBe('150')
   })
 })
 

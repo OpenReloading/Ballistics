@@ -1,4 +1,8 @@
 import type { InteriorResponse } from './api-types.ts'
+import { nth } from './nth.ts'
+
+// Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
+const i32 = (a: Int32Array, i: number) => a[i] as number
 
 /** The M3 result of `POST /interior` as the chart's playback reads it. */
 export type PlaybackResult = InteriorResponse['result']
@@ -15,7 +19,7 @@ export const slowFactors = [1000, 2000, 5000, 10000, 20000, 50000] as const
 
 /** The smallest factor that makes playback of `duration` s last at least 3 s, else the largest. */
 export function defaultFactor(duration: number): number {
-  return slowFactors.find((f) => duration * f >= 3) ?? slowFactors[slowFactors.length - 1]
+  return slowFactors.find((f) => duration * f >= 3) ?? nth(slowFactors, slowFactors.length - 1)
 }
 
 /** Positions of the time slider: k from 0 to `scrubSteps` is k / `scrubSteps` of the muzzle time. */
@@ -28,17 +32,19 @@ export const scrubSteps = 1000
  */
 export function timeIndex(times: readonly number[]): (t: number) => number {
   const n = times.length
-  const t0 = times[0]
-  const width = (times[n - 1] - t0) / n
+  // no times: NaN, as arithmetic on a missing entry has it
+  const t0 = times[0] ?? Number.NaN
+  const width = ((times[n - 1] ?? Number.NaN) - t0) / n
   const start = new Int32Array(n + 1)
   for (let c = 0, i = 0; c <= n; c++) {
-    while (i < n - 2 && times[i + 1] <= t0 + c * width) i++
+    while (i < n - 2 && nth(times, i + 1) <= t0 + c * width) i++
     start[c] = i
   }
   return (t) => {
     if (!(t >= t0)) return 0
-    let i = start[Math.min(n, Math.floor((t - t0) / width))]
-    while (i < n - 2 && times[i + 1] <= t) i++
+    // a zero width gives NaN here, an index that reads undefined, and the walk below ends at once
+    let i = i32(start, Math.min(n, Math.floor((t - t0) / width)))
+    while (i < n - 2 && nth(times, i + 1) <= t) i++
     return i
   }
 }
@@ -50,11 +56,11 @@ export function timeIndex(times: readonly number[]): (t: number) => number {
  */
 export function segmentAt(points: readonly Point[]) {
   const index = timeIndex(points.map((p) => p.time))
-  const last = points[points.length - 1]
   return (t: number): { a: Point; b: Point; f: number } => {
+    const last = nth(points, points.length - 1)
     if (t >= last.time) return { a: last, b: last, f: 0 }
     const i = index(t)
-    const [a, b] = [points[i], points[i + 1]]
+    const [a, b] = [nth(points, i), nth(points, i + 1)]
     return { a, b, f: t > a.time ? (t - a.time) / (b.time - a.time) : 0 }
   }
 }
@@ -62,8 +68,8 @@ export function segmentAt(points: readonly Point[]) {
 /** Values at time t, linear between the neighbouring points; before the first and from the last point the end values. */
 export function sampler(points: readonly Point[]): (t: number) => PlaybackSample {
   const segment = segmentAt(points)
-  const last = points[points.length - 1]
   return (t) => {
+    const last = nth(points, points.length - 1)
     if (t >= last.time) return last
     const { a, b, f } = segment(t)
     // a (1 - f) + b f is a itself at f = 0
@@ -109,25 +115,25 @@ export const timeScrub = (end: number): Scrub => ({ pos: (t) => t / end, time: (
  */
 export function travelScrub(points: readonly Point[]): Scrub {
   const segment = segmentAt(points)
-  const start = points[0].travel
-  const span = points[points.length - 1].travel - start
+  const start = nth(points, 0).travel
+  const span = nth(points, points.length - 1).travel - start
   return {
     pos: (t) => {
       const { a, b, f } = segment(t)
       return span > 0 ? (a.travel * (1 - f) + b.travel * f - start) / span : 0
     },
     time: (p) => {
-      if (!(p > 0) || !(span > 0)) return points[0].time
+      if (!(p > 0) || !(span > 0)) return nth(points, 0).time
       const target = start + Math.min(p, 1) * span
       // the first point beyond the travel; travel does not decrease
       let [lo, hi] = [0, points.length]
       while (lo < hi) {
         const mid = (lo + hi) >> 1
-        if (points[mid].travel > target) hi = mid
+        if (nth(points, mid).travel > target) hi = mid
         else lo = mid + 1
       }
-      if (lo === points.length) return points[lo - 1].time
-      const [a, b] = [points[lo - 1], points[lo]]
+      if (lo === points.length) return nth(points, lo - 1).time
+      const [a, b] = [nth(points, lo - 1), nth(points, lo)]
       return a.time + ((target - a.travel) / (b.travel - a.travel)) * (b.time - a.time)
     },
   }

@@ -19,6 +19,7 @@ import {
   valueParts,
 } from '@open-reloading/drawing/cartridge'
 import type { drawable } from '../lib/cartridge-sheet.ts'
+import { nth } from '../lib/nth.ts'
 import { controlSize } from '../lib/theme.ts'
 import { type Linked, TechnicalDrawing } from './technical-drawing.tsx'
 
@@ -133,10 +134,10 @@ export function CartridgeDrawing({
   // one frame width and one height in both length units: the scale stays when the unit changes
   // (a switch, or the Settings unit read after hydration)
   const across = Math.max(
-    ...units.flatMap((u, i) => all.map((f) => screenWidth(f.drawn, ems[i], u))),
+    ...units.flatMap((u, i) => all.map((f) => screenWidth(f.drawn, nth(ems, i), u))),
   )
   const model = (f: { drawn: Drawn }, u: LengthUnit) =>
-    sideModel(f.drawn[0], ems[units.indexOf(u)], across, u)
+    sideModel(nth(f.drawn, 0), nth(ems, units.indexOf(u)), across, u)
   // the figures of a record fit the window at one scale, the tallest's, the sides not shown here too
   const tallest = Math.max(...units.flatMap((u) => split.map((f) => model(f, u).frame[3])))
   const layout = (u: LengthUnit) => ({ models: shown.map((f) => model(f, u)), tallest })
@@ -150,9 +151,9 @@ export function CartridgeDrawing({
       spec={spec}
       heading={heading}
       figure={figure}
-      model={models[k]}
+      model={nth(models, k)}
       tallest={tallest}
-      reserve={{ model: other.models[k], tallest: other.tallest }}
+      reserve={{ model: nth(other.models, k), tallest: other.tallest }}
       print={figure.print}
       scale={scale}
       unit={unit}
@@ -215,7 +216,7 @@ function Combined({
       key={f.id}
       spec={spec}
       figure={{ ...f, id: `${f.id}-combined` }}
-      model={models[k]}
+      model={nth(models, k)}
       tallest={tallest}
       unit={unit}
       differences={differences}
@@ -284,7 +285,9 @@ function described(
   unit: LengthUnit,
   angle = false,
 ) {
-  const [symbol, value, ...rest] = d.stored ? valueParts(d.stored) : [d.symbol, String(d.value)]
+  const [symbol, value = '', ...rest] = d.stored
+    ? valueParts(d.stored)
+    : [d.symbol, String(d.value)]
   const length = (text: string) =>
     angle || unit === 'mm' ? text : text.replace(/\d+(\.\d+)?/g, (x) => lengthText(Number(x), unit))
   const shown = angle ? angleText(Number(value)) : `${length(value)} ${unit}`

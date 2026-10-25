@@ -11,6 +11,7 @@ import { describe, expect, it } from 'vitest'
 import { maxPoints } from '../src/compute/interior-schema.ts'
 import { filePath } from '../src/compute/load-file.ts'
 import { API_PREFIX } from '../src/version.ts'
+import { defined } from './defined.ts'
 import { bundle, file, siValues } from './fixtures.ts'
 import { withApi } from './setup.ts'
 
@@ -715,7 +716,7 @@ describe('POST /interior/load-file, 400 with the field path', () => {
 
   it('refuses a record of the old kind and names the kind that replaces it', async () => {
     const old = file({ siValues })
-    old.records[0].kind = 'workbenchState'
+    defined(old.records[0]).kind = 'workbenchState'
     const res = await simulate(old)
     expect(res.status).toBe(400)
     expect(res.body.issues).toEqual([
@@ -738,7 +739,7 @@ describe('POST /interior/load-file, 400 with the field path', () => {
   it('names a file that is not one load', async () => {
     expect(await paths({ ...file({ siValues }), records: [] })).toEqual([['records']])
     const two = file({ siValues })
-    two.records.push({ ...two.records[0], id: 'l2' })
+    two.records.push({ ...defined(two.records[0]), id: 'l2' })
     expect(await paths(two)).toEqual([['records']])
     expect(await paths({ ...file({ siValues }), version: 99 })).toContainEqual(['version'])
     expect(await paths({ format: 'other' })).toContainEqual(['format'])

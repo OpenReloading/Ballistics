@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { bisect } from '../src/bisect.ts'
+import { nth } from '../src/errors.ts'
 import {
   chargeTooSmall,
   chargeTooSmallRatio,
@@ -294,7 +295,7 @@ describe('convergence', () => {
       if (!r.valid) throw new Error(r.reason)
       return Math.max(rel(r.peakBreechPressure, cf.peak), rel(r.muzzleVelocity, cf.muzzleVelocity))
     })
-    for (let i = 1; i < dev.length; i++) expect(dev[i]).toBeLessThan(dev[i - 1] / 5)
+    for (let i = 1; i < dev.length; i++) expect(dev[i]).toBeLessThan(nth(dev, i - 1) / 5)
   })
 
   it('halving the tolerances and the output step changes the results below 1e-7', () => {
@@ -361,7 +362,8 @@ function trapezoid(
 ) {
   let sum = 0
   for (let i = 1; i < points.length; i++) {
-    const [p0, p1] = [points[i - 1], points[i]]
+    const p0 = nth(points, i - 1)
+    const p1 = nth(points, i)
     sum += ((p1.time - p0.time) * (flux(p0) + flux(p1))) / 2
   }
   return sum
@@ -398,7 +400,7 @@ describe('energy and consistency checks', () => {
     const invariant = after.map(
       (p) => p.meanPressure * (3.4e-6 + 3.75e-5 * p.travel - 1e-3 * 0.0028) ** 1.23,
     )
-    for (const v of invariant) expect(rel(v, invariant[0])).toBeLessThan(1e-12)
+    for (const v of invariant) expect(rel(v, nth(invariant, 0))).toBeLessThan(1e-12)
   })
 
   // consistency: the ratios follow from the gradient formulas
@@ -426,10 +428,11 @@ describe('energy and consistency checks', () => {
       [0.008, 10e6],
     ]
     for (let i = 1; i < pr.length; i++)
-      if (x >= pr[i - 1][0] && x <= pr[i][0])
+      if (x >= nth(nth(pr, i - 1), 0) && x <= nth(nth(pr, i), 0))
         return (
-          pr[i - 1][1] +
-          ((x - pr[i - 1][0]) * (pr[i][1] - pr[i - 1][1])) / (pr[i][0] - pr[i - 1][0])
+          nth(nth(pr, i - 1), 1) +
+          ((x - nth(nth(pr, i - 1), 0)) * (nth(nth(pr, i), 1) - nth(nth(pr, i - 1), 1))) /
+            (nth(nth(pr, i), 0) - nth(nth(pr, i - 1), 0))
         )
     return 0
   }
@@ -505,7 +508,7 @@ describe('event location', () => {
     expect(r.burnout).not.toBeNull()
     expect(r.points.at(-1)?.travel).toBeCloseTo(0.6, 12)
     for (let i = 1; i < r.points.length; i++)
-      expect(r.points[i].time).toBeGreaterThanOrEqual(r.points[i - 1].time)
+      expect(nth(r.points, i).time).toBeGreaterThanOrEqual(nth(r.points, i - 1).time)
   })
 
   it('locates the pressure peak and the 10 % time between output points', () => {
@@ -540,7 +543,7 @@ describe('event location', () => {
   })
 
   it('starts from the ignition pressure; shot start waits for the friction force', () => {
-    expect(rel(r.points[0].meanPressure, 5e6)).toBeLessThan(1e-9)
+    expect(rel(nth(r.points, 0).meanPressure, 5e6)).toBeLessThan(1e-9)
     // friction 4 MPa above the start pressure: motion starts at A p = F_r(0)
     const slow = interior({ ...full(), ignitionPressure: 1e6, startPressure: 2e6 })
     if (!slow.valid) throw new Error(slow.reason)
@@ -787,11 +790,11 @@ describe('gas leakage (apps/docs/docs/models/interior-leakage-heat.md)', () => {
       const pts = leakage.area
       const leakArea = (x: number) => {
         for (let i = 1; i < pts.length; i++)
-          if (x >= pts[i - 1].travel && x <= pts[i].travel)
+          if (x >= nth(pts, i - 1).travel && x <= nth(pts, i).travel)
             return (
-              pts[i - 1].area +
-              ((x - pts[i - 1].travel) * (pts[i].area - pts[i - 1].area)) /
-                (pts[i].travel - pts[i - 1].travel)
+              nth(pts, i - 1).area +
+              ((x - nth(pts, i - 1).travel) * (nth(pts, i).area - nth(pts, i - 1).area)) /
+                (nth(pts, i).travel - nth(pts, i - 1).travel)
             )
         return 0
       }
@@ -807,12 +810,13 @@ describe('gas leakage (apps/docs/docs/models/interior-leakage-heat.md)', () => {
       let mass = 0
       let enthalpy = 0
       for (let i = 1; i < r.points.length; i++) {
-        const [p0, p1] = [r.points[i - 1], r.points[i]]
+        const p0 = nth(r.points, i - 1)
+        const p1 = nth(r.points, i)
         // the point at shot start holds the moving state; the interval before it ends held
         const a = flow(p0, p0.time < r.shotStartTime)
         const b = flow(p1, p1.time <= r.shotStartTime)
-        mass += ((p1.time - p0.time) * (a[0] + b[0])) / 2
-        enthalpy += ((p1.time - p0.time) * (a[1] + b[1])) / 2
+        mass += ((p1.time - p0.time) * (nth(a, 0) + nth(b, 0))) / 2
+        enthalpy += ((p1.time - p0.time) * (nth(a, 1) + nth(b, 1))) / 2
       }
       expect(rel(mass, r.points.at(-1)?.leakedMass ?? 0)).toBeLessThan(1e-6)
       expect(rel(enthalpy, r.energy.leakage)).toBeLessThan(1e-6)
@@ -830,13 +834,13 @@ describe('gas leakage (apps/docs/docs/models/interior-leakage-heat.md)', () => {
     const b = r.burnout
     const after = r.points.filter((p) => p.time >= b.time)
     expect(after.length).toBeGreaterThan(100)
-    expect(after.at(-1)?.leakedMass ?? 0).toBeGreaterThan(1.5 * (after[0].leakedMass ?? 0))
+    expect(after.at(-1)?.leakedMass ?? 0).toBeGreaterThan(1.5 * (nth(after, 0).leakedMass ?? 0))
     const invariant = after.map(
       (p) =>
         p.meanPressure *
         ((3.4e-6 + 3.75e-5 * p.travel) / (0.0028 - (p.leakedMass ?? 0)) - 1e-3) ** 1.23,
     )
-    for (const v of invariant) expect(rel(v, invariant[0])).toBeLessThan(1e-12)
+    for (const v of invariant) expect(rel(v, nth(invariant, 0))).toBeLessThan(1e-12)
   })
 
   it('choked blowdown of a fixed vessel follows the isentropic closed form', () => {
@@ -863,7 +867,7 @@ describe('gas leakage (apps/docs/docs/models/interior-leakage-heat.md)', () => {
     }
     const r = closedVessel(load)
     if (!r.valid) throw new Error(r.reason)
-    const first = r.points[0]
+    const first = nth(r.points, 0)
     const [p0, m0] = [first.meanPressure, mc * first.burntFraction]
     const volume = vc - (mc / rho) * (1 - first.burntFraction)
     // m/m0 = (1 + (k-1)/2 C_d A psi sqrt(R T0) t / V)^(-2/(k-1)), p/p0 = (m/m0)^k
@@ -879,7 +883,8 @@ describe('gas leakage (apps/docs/docs/models/interior-leakage-heat.md)', () => {
   it('a larger leak area lowers peak pressure and muzzle velocity', () => {
     const runs = [0, 1e-7, 2e-7, 4e-7].map((a) => interior(leaky(a)))
     for (let i = 1; i < runs.length; i++) {
-      const [a, b] = [runs[i - 1], runs[i]]
+      const a = nth(runs, i - 1)
+      const b = nth(runs, i)
       if (!a.valid || !b.valid) throw new Error('invalid')
       expect(b.peakBreechPressure).toBeLessThan(a.peakBreechPressure)
       expect(b.muzzleVelocity).toBeLessThan(a.muzzleVelocity)
@@ -904,7 +909,7 @@ describe('gas leakage (apps/docs/docs/models/interior-leakage-heat.md)', () => {
     // back pressure equal to the initial pressure: no onset event can fire, the flow still starts
     const start = interior(full())
     if (!start.valid) throw new Error(start.reason)
-    const r = interior(leaky(2e-7, { backPressure: start.points[0].meanPressure }))
+    const r = interior(leaky(2e-7, { backPressure: nth(start.points, 0).meanPressure }))
     if (!r.valid) throw new Error(r.reason)
     expect(r.points.at(-1)?.leakedMass).toBeGreaterThan(3e-5)
     // engraving that starts at 50 MPa: p_b steps through p_a at 0.001 m, on a restart
@@ -1070,7 +1075,9 @@ describe('propellant temperature', () => {
       if (!r.valid) throw new Error(r.reason)
       return r
     }
-    const [cold, mid, hot] = [250, 294.15, 330].map(run)
+    const cold = run(250)
+    const mid = run(294.15)
+    const hot = run(330)
     expect(cold.peakBreechPressure).toBeLessThan(mid.peakBreechPressure)
     expect(mid.peakBreechPressure).toBeLessThan(hot.peakBreechPressure)
     expect(cold.muzzleVelocity).toBeLessThan(mid.muzzleVelocity)

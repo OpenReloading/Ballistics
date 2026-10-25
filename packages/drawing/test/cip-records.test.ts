@@ -35,6 +35,8 @@ import type {
   SpecValue,
 } from '../src/core/types.ts'
 import type { LengthUnit } from '../src/core/units.ts'
+import { pairs } from '../src/core/vector.ts'
+import { defined } from './defined.ts'
 import { type SpecRecord, sheets, undimensionedValues } from './sheets.ts'
 
 const current = sheets
@@ -46,12 +48,12 @@ const base = ['R1', 'R', 'P1', 'L3', 'H2']
 /** What is wrong with the points of a drawn side: where they start, finite, never falling in z. */
 function pointFailures(points: SectionPoint[]) {
   const failures: string[] = []
-  const [first] = points
+  const first = defined(points[0])
   if (first[0] !== 0 || first[1] !== 0) failures.push(`starts at ${first}`)
   for (const [k, [r, z]] of points.entries()) {
     if (!Number.isFinite(r) || !Number.isFinite(z) || r < 0)
       failures.push(`point ${k} at ${r}, ${z}`)
-    if (k && z < points[k - 1][1]) failures.push(`z falls at point ${k}`)
+    if (k && z < defined(points[k - 1])[1]) failures.push(`z falls at point ${k}`)
   }
   return failures
 }
@@ -73,7 +75,8 @@ function sweepSide(
   }
   for (const what of pointFailures(p.points)) fail(what)
   const P1 = find(values, side, 'P1') as number
-  if (side === 'chamber' && p.points[1][0] < P1 / 2) fail(`head ${p.points[1][0]} below P1`)
+  if (side === 'chamber' && defined(p.points[1])[0] < P1 / 2)
+    fail(`head ${defined(p.points[1])[0]} below P1`)
   const codes = p.notes.map((n) => n.code)
   if (table === 'III' && codes.includes('grooveAngle')) fail('grooveAngle on table III')
   for (const what of annotationFailures(p, values, side, table)) fail(what)
@@ -84,8 +87,16 @@ function sweepSide(
  * Profiles both sides; pushes each broken invariant to failures and returns the codes per side,
  * closedFront last on the cartridge side.
  */
-function sweep(id: string, values: SpecValue[], failures: string[], table?: string) {
-  return sides.map((side) => sweepSide(id, values, failures, side, table))
+function sweep(
+  id: string,
+  values: SpecValue[],
+  failures: string[],
+  table?: string,
+): [string[], string[]] {
+  return [
+    sweepSide(id, values, failures, 'cartridge', table),
+    sweepSide(id, values, failures, 'chamber', table),
+  ]
 }
 
 const find = (values: SpecValue[], side: Side, symbol: string) =>
@@ -95,7 +106,8 @@ const near = (a: number, b: number, tol = 0.01) => Math.abs(a - b) <= tol
 
 /** What breaks the rules of a derived dimension: only L3 - L2, spanning above zero. */
 function derivedFailures(d: Dimension, name: string, values: SpecValue[], side: Side) {
-  const [L2, L3] = ['L2', 'L3'].map((s) => find(values, side, s) as number)
+  // a derived L3-L2 sits on a sheet that lists both L2 and L3; a missing one fails the arithmetic below
+  const [L2, L3] = [find(values, side, 'L2'), find(values, side, 'L3')] as [number, number]
   if (
     d.symbol !== 'L3\u2212L2' ||
     !near(d.value, L3 - L2, 5e-4) ||
@@ -142,9 +154,9 @@ const onOutline = (q: SectionPoint, line: SectionPoint[]) =>
   line.some(
     (a, k) =>
       k > 0 &&
-      onLine(q, line[k - 1], a) &&
-      Math.min(a[1], line[k - 1][1]) - 0.01 <= q[1] &&
-      q[1] <= Math.max(a[1], line[k - 1][1]) + 0.01,
+      onLine(q, defined(line[k - 1]), a) &&
+      Math.min(a[1], defined(line[k - 1])[1]) - 0.01 <= q[1] &&
+      q[1] <= Math.max(a[1], defined(line[k - 1])[1]) + 0.01,
   )
 
 /** Whether the vertex of an angle lies on the drawn flank f of the outline `sharp`. */
@@ -390,7 +402,7 @@ function droppedFailures(record: SpecRecord, side: Side, symbol: string) {
   const failures: string[] = []
   const dropped = without(values, side, symbol)
   const both = sweep(`${id} without ${side} ${symbol}`, dropped, failures, table)
-  const own = both[sides.indexOf(side)][0] ?? ''
+  const own = defined(both[sides.indexOf(side)])[0] ?? ''
   if (base.includes(symbol) && !(side === 'chamber' && symbol === 'R'))
     if (!own.startsWith('missing:') || !own.slice(8).split(',').includes(symbol))
       failures.push(`${id} without ${side} ${symbol}: drawn`)
@@ -399,7 +411,7 @@ function droppedFailures(record: SpecRecord, side: Side, symbol: string) {
     shoulder.includes(symbol) &&
     shoulder.every((s) => find(values, side, s) !== undefined) &&
     !own.startsWith('missing:') &&
-    !both[sides.indexOf(side)].includes('shoulderPartial')
+    !defined(both[sides.indexOf(side)]).includes('shoulderPartial')
   )
     failures.push(`${id} without ${side} ${symbol}: no shoulderPartial`)
   const codes = both[1]
@@ -512,7 +524,7 @@ it('draws the rim chamfer where f and beta are stored, beta from the head face l
   const inset = (id: string) => {
     const { values, table } = records.find((r) => r.id === id) as SpecRecord
     const { points } = cipProfile(values, 'cartridge', table) as Profile
-    return points[2][0] - points[1][0]
+    return defined(points[2])[0] - defined(points[1])[0]
   }
   // f / tan(beta): 0.38 / tan(35 deg), 0.6 / tan(20 deg), 0.91 / tan(72 deg)
   expect(Math.abs(inset('cip-308-match-2014-05-20') - 0.543)).toBeLessThan(0.001)
@@ -531,7 +543,11 @@ it('draws the rim chamfer where f and beta are stored, beta from the head face l
     counts.drawn++
     // the arc vertex is the chamfer foot on the head face
     expect(mark.vertex).toEqual(p.points[1])
-    if (Math.abs(p.points[2][0] - p.points[1][0] - f * Math.tan((beta * Math.PI) / 180)) > 0.001)
+    if (
+      Math.abs(
+        defined(p.points[2])[0] - defined(p.points[1])[0] - f * Math.tan((beta * Math.PI) / 180),
+      ) > 0.001
+    )
       counts.notTimesTan++
   }
   expect(counts).toEqual({
@@ -552,7 +568,7 @@ it('rounds the 8 x 51 R Lebel rim corner with r0', () => {
     value: 1.4,
     corner: [(find(values, 'cartridge', 'R1') as number) / 2, 0],
   })
-  const end = p.points[9]
+  const end = defined(p.points[9])
   expect(end[0]).toBeCloseTo((find(values, 'cartridge', 'R1') as number) / 2, 9)
   expect(end[1]).toBeCloseTo(1.4, 9)
 })
@@ -560,7 +576,7 @@ it('rounds the 8 x 51 R Lebel rim corner with r0', () => {
 /** r of the outline at z inside a segment that is not a step, the axis segment left out. */
 function rAt(points: SectionPoint[], z: number) {
   for (let k = 1; k + 1 < points.length; k++) {
-    const [[r0, z0], [r1, z1]] = [points[k], points[k + 1]]
+    const [[r0, z0], [r1, z1]] = [defined(points[k]), defined(points[k + 1])]
     if (z0 < z && z < z1) return r0 + ((r1 - r0) * (z - z0)) / (z1 - z0)
   }
   return Number.NaN
@@ -571,15 +587,15 @@ function bodyEnd(p: Profile, values: SpecValue[], side: Side) {
   const P1 = p.annotation.dimensions.find((d) => d.symbol === 'P1') as Dimension
   let k = p.points.findLastIndex(([r, z]) => r === P1.radius && z === P1.from)
   const [P0, L0] = ['P0', 'L0'].map((s) => find(values, side, s))
-  if (p.points[k + 1][0] === (P0 ?? 0) / 2 && p.points[k + 1][1] === L0) k++
-  return p.points[k + 1][1]
+  if (defined(p.points[k + 1])[0] === (P0 ?? 0) / 2 && defined(p.points[k + 1])[1] === L0) k++
+  return defined(p.points[k + 1])[1]
 }
 
 it('keeps the chamber body around the cartridge body', () => {
   const gaps: [string, number][] = []
   let checked = 0
   for (const { id, values, table } of records) {
-    const [c, ch] = sides.map((side) => cipProfile(values, side, table))
+    const [c, ch] = [cipProfile(values, 'cartridge', table), cipProfile(values, 'chamber', table)]
     if ('missing' in c || 'missing' in ch || closedFront(values)) continue
     checked++
     const end = Math.min(bodyEnd(c, values, 'cartridge'), bodyEnd(ch, values, 'chamber'))
@@ -610,16 +626,16 @@ it('keeps the chamber body around the cartridge body', () => {
 /** Radius of a half-section polyline at z, inside a segment that is not a step. */
 const radius = (points: SectionPoint[], z: number) => {
   const k = points.findIndex(
-    ([, z0], j) => j && points[j - 1][1] < z0 && points[j - 1][1] <= z && z <= z0,
+    ([, z0], j) => j && defined(points[j - 1])[1] < z0 && defined(points[j - 1])[1] <= z && z <= z0,
   )
   if (k < 0) return Number.NaN
-  const [[r0, z0], [r1, z1]] = [points[k - 1], points[k]]
+  const [[r0, z0], [r1, z1]] = [defined(points[k - 1]), defined(points[k])]
   return r0 + ((r1 - r0) * (z - z0)) / (z1 - z0)
 }
 
 /** The ends of the interval before station k, kept off the stations; none before the first. */
 const intervalEnds = (stations: number[], k: number) =>
-  k ? [stations[k - 1] + 1e-9, stations[k] - 1e-9] : []
+  k ? [defined(stations[k - 1]) + 1e-9, defined(stations[k]) - 1e-9] : []
 
 /** Largest amount the cartridge lies outside the chamber, and where, from the head to the mouth. */
 function interference(cartridge: SectionPoint[], chamber: SectionPoint[]) {
@@ -657,9 +673,8 @@ function shotshellFailures(
     for (const what of annotationFailures(p, values, side, 'VII', variant))
       failures.push(`${name} ${side} ${what}`)
   }
-  const [cartridge, chamber] = sides.map(
-    (side) => drawn.find((d) => d.side === side)?.p.points ?? [],
-  )
+  const pointsOf = (side: Side) => drawn.find((d) => d.side === side)?.p.points ?? []
+  const [cartridge, chamber] = [pointsOf('cartridge'), pointsOf('chamber')]
   const { by, z } = interference(cartridge, chamber)
   if (by > 0.01) failures.push(`${name} cartridge ${by} mm outside the chamber at ${z} mm`)
   else if (by > 0) tight.push(`${name} ${by.toFixed(4)} at ${z.toFixed(2)}`)
@@ -710,8 +725,7 @@ function segDistance([x, y]: PartPoint, [ax, ay]: PartPoint, [bx, by]: PartPoint
 /** Distance from a point [r, z] to a half-section polyline. */
 function distance([r, z]: SectionPoint, points: SectionPoint[]) {
   return Math.min(
-    ...points.slice(1).map(([r1, z1], k) => {
-      const [r0, z0] = points[k]
+    ...pairs(points).map(([[r0, z0], [r1, z1]]) => {
       const [dr, dz] = [r1 - r0, z1 - z0]
       const t = Math.max(0, Math.min(1, ((r - r0) * dr + (z - z0) * dz) / (dr * dr + dz * dz || 1)))
       return Math.hypot(r - r0 - t * dr, z - z0 - t * dz)
@@ -799,9 +813,7 @@ function edgeAndBreakLines(p: Profile, side: Side, em: number): LineSegment[] {
   const breaks =
     side === 'chamber'
       ? steelBand(p.points, em).sides.flatMap(({ zig }) =>
-          zig
-            .slice(1)
-            .map((b, n): LineSegment => ({ a: zig[n], b, kind: 'thin', owner: 'break line' })),
+          pairs(zig).map(([a, b]): LineSegment => ({ a, b, kind: 'thin', owner: 'break line' })),
         )
       : []
   return [...edges, ...breaks]
@@ -925,7 +937,7 @@ function chamberHeadChecks({ layout, p, medium, what, model, tally }: LayerCtx) 
   for (const s of checked) {
     const end: PartPoint = [0, s.a[1]]
     const off = Math.min(
-      ...strokes.flatMap((st) => st.slice(1).map((b, n) => segDistance(end, st[n], b))),
+      ...strokes.flatMap((st) => pairs(st).map(([a, b]) => segDistance(end, a, b))),
     )
     if (off > 0.01) tally.failures.push(what(`${s.owner} extension line ${off} mm off the head`))
   }
@@ -991,7 +1003,9 @@ function calloutChecks(c: CombinedCtx, l: Label, k: number) {
       failures.push(what(`${t.owner} arrowhead on ${l.owner} text`))
   // past the steel band
   const outer =
-    Math.max(...(figure.drawn[1].p.points.map(([r]) => r) as number[])) + face.steelBandWidth
+    // the points of a drawn part are [r, z] pairs, so the radii are all numbers
+    Math.max(...(defined(figure.drawn[1]).p.points.map(([r]) => r) as number[])) +
+    face.steelBandWidth
   if (Math.abs(l.c[1]) - l.h / 2 < outer) failures.push(what(`${l.owner} text on the part`))
 }
 
@@ -1196,7 +1210,8 @@ function detailFailures(figure: Figure, screen: FigureModel, print: FigureModel)
   if (screen.frame.join() !== plain.frame.join()) failures.push(`${name} frame`)
   if (print.details.length || plain.details.length) failures.push(`${name} details unasked`)
   for (const { side } of drawn) {
-    const [a, b] = [screen.layers[side], plain.layers[side]] as Layout[]
+    // both figure models lay out every side of `drawn`
+    const [a, b] = [screen.layers[side], plain.layers[side]] as [Layout, Layout]
     const rest = {
       ...a,
       labels: a.labels.filter((l) => !isLetter(l)),
@@ -1237,10 +1252,10 @@ it('counts the chamber recess steps and lists the other outline features under 1
       // the chamber outline starts at the head, not on the axis
       const points = side === 'chamber' ? sharp.points.slice(1) : sharp.points
       return points.slice(1).flatMap(([r, z], k) => {
-        const mm = Math.hypot(r - points[k][0], z - points[k][1])
+        const mm = Math.hypot(r - defined(points[k])[0], z - defined(points[k])[1])
         // under the step of the stored values a segment is rounding, not a feature: 0.01 mm, and
         // 0.005 mm for a radial step, half a diameter difference
-        if (mm < (z === points[k][1] ? 0.005 : 0.01) - 1e-9 || mm * perMm >= 1) return []
+        if (mm < (z === defined(points[k])[1] ? 0.005 : 0.01) - 1e-9 || mm * perMm >= 1) return []
         const recess = side === 'chamber' && table !== 'VII' && k === 1
         return [{ side, px: Number((mm * perMm).toFixed(2)), recess }]
       })
@@ -1256,7 +1271,7 @@ it('counts the drawn sides per table and bounds text size, scale and frame', () 
   const tables: Record<string, Record<string, number>> = {}
   const sizes = allFigures.map((figure) => {
     const { name, table = '', drawn, em } = figure
-    const sides = drawn.length === 2 ? 'both' : drawn[0].side
+    const sides = drawn.length === 2 ? 'both' : defined(drawn[0]).side
     tables[table] = { ...tables[table], [sides]: (tables[table]?.[sides] ?? 0) + 1 }
     const { screen, print } = models.get(figure) as { screen: FigureModel; print: FigureModel }
     return {
@@ -1269,7 +1284,7 @@ it('counts the drawn sides per table and bounds text size, scale and frame', () 
   })
   const range = (key: 'em' | 'px' | 'height' | 'print') => {
     const sorted = [...sizes].sort((a, b) => a[key] - b[key])
-    return [sorted[0], sorted[sorted.length - 1]].map((s) => [s.name, s[key]])
+    return [defined(sorted[0]), defined(sorted[sorted.length - 1])].map((s) => [s.name, s[key]])
   }
   expect({ figures: sizes.length, tables }).toEqual({
     figures: 607,
@@ -1349,7 +1364,7 @@ it('dimensions every stored symbol or lists it as undimensioned', () => {
   const never = new Map<string, string[]>()
   for (const key of without.keys()) {
     if (dimensioned.has(key)) continue
-    const [kind, symbol] = key.split(': ')
+    const [kind, symbol] = key.split(': ') as [string, string]
     never.set(kind, [...(never.get(kind) ?? []), symbol].sort())
   }
   // Reviewed: not dimensioned because no drawn feature carries them (such as L3+G, L4, L5, Q, Z)

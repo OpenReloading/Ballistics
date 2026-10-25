@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { posix } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { defined } from './defined.ts'
 
 /** The packages `@open-reloading/api/compute` may import: it runs in the browser. */
 const allowed = ['@open-reloading/core', '@open-reloading/schema', 'zod']
@@ -18,9 +19,11 @@ function imports(entry: string) {
     const source = readFileSync(new URL(`../src/${file}`, import.meta.url), 'utf8')
       // type-only imports are erased, the browser never loads them
       .replace(/^(?:import|export) type\b.*?from '[^']+'/gms, '')
-    for (const [, spec] of source.matchAll(/(?:from|import)\s*\(?\s*'([^']+)'/g))
+    for (const match of source.matchAll(/(?:from|import)\s*\(?\s*'([^']+)'/g)) {
+      const spec = defined(match[1], 'import specifier')
       if (spec.startsWith('.')) visit(posix.join(posix.dirname(file), spec))
       else found.push(`${file}: ${spec}`)
+    }
   }
   visit(entry)
   return { files, found }
@@ -30,7 +33,7 @@ describe('compute entry', () => {
   it('imports only core, schema and zod, also through the modules it imports', () => {
     const { files, found } = imports('compute/browser.ts')
     expect(files.size).toBeGreaterThan(5)
-    expect(found.filter((f) => !allowed.includes(f.split(': ')[1]))).toEqual([])
+    expect(found.filter((f) => !allowed.includes(defined(f.split(': ')[1])))).toEqual([])
   })
 
   it('names a runtime import outside the allowed packages', () => {
@@ -49,7 +52,7 @@ describe('catalogue entry', () => {
       'catalogue/open.ts',
       'catalogue/types.ts',
     ])
-    expect(found.filter((f) => !catalogueAllowed.includes(f.split(': ')[1]))).toEqual([])
+    expect(found.filter((f) => !catalogueAllowed.includes(defined(f.split(': ')[1])))).toEqual([])
   })
 
   it('names the Node imports of the module that reads and writes the files', () => {

@@ -13,6 +13,7 @@ import {
   useState,
 } from 'react'
 import { type LabelScene, placeLabel } from '../lib/label-placement.ts'
+import { nth } from '../lib/nth.ts'
 import {
   axisEnds,
   coverages,
@@ -103,14 +104,14 @@ export function refPoints(r: CalibrationReference): Point[] {
 
 function RefShape({ r }: { r: CalibrationReference }) {
   const pts = refPoints(r)
-  if (r.kind === 'line') return <line x1={pts[0].x} y1={pts[0].y} x2={pts[1].x} y2={pts[1].y} />
+  if (r.kind === 'line') return <line x1={r.a.x} y1={r.a.y} x2={r.b.x} y2={r.b.y} />
   if (r.kind === 'rectangle') return <polygon points={polyline(pts)} />
   let c: { centre: Point; radius: number } | undefined
   try {
     c =
       r.kind === 'ringCentre'
         ? { centre: r.centre, radius: Math.hypot(r.edge.x - r.centre.x, r.edge.y - r.centre.y) }
-        : circleThrough(pts[0], pts[1], pts[2])
+        : circleThrough(...r.points)
   } catch {
     return null
   }
@@ -328,12 +329,15 @@ type OverlayContext = {
 type Ellipse = { kind: string; p: number; suffix: string; pts: Point[] }
 
 /** The corner points of the ellipse's extremes, to choose a label anchor from. */
-const extremes = (pts: Point[]) => [
-  pts.reduce((a, b) => (b.y < a.y ? b : a), pts[0]),
-  pts.reduce((a, b) => (b.x > a.x ? b : a), pts[0]),
-  pts.reduce((a, b) => (b.y > a.y ? b : a), pts[0]),
-  pts.reduce((a, b) => (b.x < a.x ? b : a), pts[0]),
-]
+const extremes = (pts: Point[]) => {
+  const first = nth(pts, 0)
+  return [
+    pts.reduce((a, b) => (b.y < a.y ? b : a), first),
+    pts.reduce((a, b) => (b.x > a.x ? b : a), first),
+    pts.reduce((a, b) => (b.y > a.y ? b : a), first),
+    pts.reduce((a, b) => (b.x < a.x ? b : a), first),
+  ]
+}
 
 /** The drawn ellipses of a group: prediction and dispersion, at each coverage, in view units. */
 function ellipsesOf(
@@ -413,10 +417,10 @@ function OverlayShapes(p: GroupOverlayParts) {
       {on('spread') && pair && (
         <line
           className="ov-spread"
-          x1={v(g.shots[pair[0]]).x}
-          y1={v(g.shots[pair[0]]).y}
-          x2={v(g.shots[pair[1]]).x}
-          y2={v(g.shots[pair[1]]).y}
+          x1={v(nth(g.shots, pair[0])).x}
+          y1={v(nth(g.shots, pair[0])).y}
+          x2={v(nth(g.shots, pair[1])).x}
+          y2={v(nth(g.shots, pair[1])).y}
         />
       )}
       {on('aim') && g.aim && c && (
@@ -477,7 +481,8 @@ function addSegments(
 ) {
   const { ellipses, ends, c, ex, on, v } = o
   for (const e of ellipses)
-    for (const [i, p] of e.pts.entries()) scene.segments.push([p, e.pts[(i + 1) % e.pts.length]])
+    for (const [i, p] of e.pts.entries())
+      scene.segments.push([p, nth(e.pts, (i + 1) % e.pts.length)])
   if (on('axis') && ends) scene.segments.push([v(ends[0]), v(ends[1])])
   if (ex && c) scene.segments.push([c, ex])
 }

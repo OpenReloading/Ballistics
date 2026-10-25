@@ -31,6 +31,7 @@ import {
 } from '../lib/face-records.ts'
 import type { FaceScope } from '../lib/face-sheet.ts'
 import { type LabelScene, placeLabel } from '../lib/label-placement.ts'
+import { nth } from '../lib/nth.ts'
 import {
   type FaceMark,
   faceAlignment,
@@ -255,9 +256,9 @@ function shotLabels(
     fontSize: font,
     gap: 3 * k,
   }
-  const pts = g.shots.map((s) => targetToView(frame, s))
-  g.shots.forEach((s, i) => {
-    const p = pts[i]
+  const placed = g.shots.map((s) => ({ s, p: targetToView(frame, s) }))
+  const pts = placed.map(({ p }) => p)
+  placed.forEach(({ s, p }, i) => {
     const e = targetToView(frame, { x: s.x + (markerDiameter ?? 0) / 2, y: s.y })
     const rad = Math.max(Math.hypot(e.x - p.x, e.y - p.y), 8 * k)
     scene.circles.push({ ...p, r: rad })
@@ -276,7 +277,7 @@ function shotLabels(
   // shortcut: placeLabel grows with the square of the shots; above 50 the values sit at a fixed
   // offset (bench groups are far smaller); memoize the placement if large groups need it
   if (pts.length > 50) return pts.map((p) => ({ x: p.x + 7 * k, y: p.y + 5 * k, w: 0, h: 0 }))
-  return pts.map((p, i) => placeLabel(scene, shotText(r.score.shots[i]), [p], c))
+  return pts.map((p, i) => placeLabel(scene, shotText(nth(r.score.shots, i)), [p], c))
 }
 
 type ScoredGroup = NonNullable<ReturnType<typeof scoredOnly>>
@@ -330,12 +331,12 @@ function GroupRings({
           // biome-ignore lint/suspicious/noArrayIndexKey: shots keep their order
           key={i}
           className="shot-score"
-          data-excluded={g.shots[i].excluded || undefined}
+          data-excluded={g.shots[i]?.excluded || undefined}
           x={b.x}
           y={b.y + 11 * k}
           fontSize={11 * k}
         >
-          {shotText(r.score.shots[i])}
+          {shotText(nth(r.score.shots, i))}
         </text>
       ))}
     </g>

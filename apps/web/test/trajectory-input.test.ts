@@ -9,6 +9,7 @@ import {
   trajectoryResult,
 } from '../src/lib/trajectory-input.ts'
 import { presetUnits, unitsOf } from '../src/lib/units.ts'
+import { defined } from './defined.ts'
 
 describe('rangeList', () => {
   it('lists multiples of the step and appends a max that is not one', () => {
@@ -114,9 +115,9 @@ describe('trajectoryResult', () => {
     const r = trajectoryResult(values, projectile, 'right')
     expect(r.tablePoints.map((p) => p.range)).toEqual(rangeSteps(1000, 100))
     expect(r.chartPoints).toHaveLength(101)
-    expect(r.chartPoints[100].range).toBe(1000)
+    expect(defined(r.chartPoints[100]).range).toBe(1000)
     expect(r.zeroRange).toBe(100)
-    expect(Math.abs(r.tablePoints[1].height)).toBeLessThan(1e-5)
+    expect(Math.abs(defined(r.tablePoints[1]).height)).toBeLessThan(1e-5)
   })
 
   it('zeroes in the zero air, which moves the bore and the far holds when it differs from the shot air', () => {
@@ -124,8 +125,11 @@ describe('trajectoryResult', () => {
     const hot = { zeroTemperature: 308.15, zeroPressure: 95000 }
     const r = trajectoryResult({ ...values, ...hot }, projectile, 'right')
     expect(r.trajectory.bore.elevationAngle).not.toBeCloseTo(base.trajectory.bore.elevationAngle, 7)
-    expect(Math.abs(r.tablePoints[1].height)).toBeGreaterThan(1e-5)
-    expect(r.tablePoints[10].height).not.toBeCloseTo(base.tablePoints[10].height, 3)
+    expect(Math.abs(defined(r.tablePoints[1]).height)).toBeGreaterThan(1e-5)
+    expect(defined(r.tablePoints[10]).height).not.toBeCloseTo(
+      defined(base.tablePoints[10]).height,
+      3,
+    )
     // the shot's own air as the zero air is the default zero
     const same = trajectoryResult(
       { ...values, zeroTemperature: 288.15, zeroPressure: 101325 },
@@ -133,7 +137,7 @@ describe('trajectoryResult', () => {
       'right',
     )
     expect(same.trajectory.bore.elevationAngle).toBe(base.trajectory.bore.elevationAngle)
-    expect(same.tablePoints[10].height).toBe(base.tablePoints[10].height)
+    expect(defined(same.tablePoints[10]).height).toBe(defined(base.tablePoints[10]).height)
   })
 
   it('gives the windage hold per 1 m/s and per 1 mph of crosswind at each table point', () => {
@@ -142,15 +146,15 @@ describe('trajectoryResult', () => {
     expect(mps).toHaveLength(r.tablePoints.length)
     expect(mps[0]).toBeCloseTo(0, 9)
     // wind drift grows with range, and 1 mph is 0.44704 m/s of the same effect
-    expect(mps[5]).toBeGreaterThan(mps[2])
-    expect(mph[5] / mps[5]).toBeCloseTo(0.44704, 2)
+    expect(mps[5]).toBeGreaterThan(defined(mps[2]))
+    expect(defined(mph[5]) / defined(mps[5])).toBeCloseTo(0.44704, 2)
     // the wind of the shot itself is not part of the bracket
     const windy = trajectoryResult(
       { ...values, windSpeed: 5, windFrom: Math.PI / 2 },
       projectile,
       'right',
     )
-    expect(windy.windPerUnit.mps[5]).toBeCloseTo(mps[5], 9)
+    expect(windy.windPerUnit.mps[5]).toBeCloseTo(defined(mps[5]), 9)
   })
 
   it('gives the density altitude of the standard sea-level air as 0', () => {

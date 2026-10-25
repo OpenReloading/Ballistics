@@ -70,6 +70,7 @@ const ellipse = (
  */
 export function targetFaceFigure(face: FaceShape): FaceFigure {
   const outer = face.rings[0]
+  if (!outer) throw new Error('A target face needs at least one ring.')
   const w = outer.diameter.value
   const h = outer.height?.value ?? w
   const pad = w * 0.02

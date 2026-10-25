@@ -6,13 +6,13 @@ import { shotViewEnglish, shotViewGerman } from './fixtures.ts'
 describe('parseShotView', () => {
   it('reads an English export in fps', () => {
     const r = parseShotView(shotViewEnglish, { fileName: 'session.csv', sha256: 'a'.repeat(64) })
-    const shots = r.session.strings[0].shots
-    expect(shots.map((s) => s.velocity)).toEqual([
+    const shots = r.session.strings[0]?.shots
+    expect(shots?.map((s) => s.velocity)).toEqual([
       { value: 853.44, raw: '2800.0 FPS' },
       { value: 856.6404, raw: '2810.5 FPS' },
       { value: 852.0684, raw: '2795.5 FPS' },
     ])
-    expect(shots.map((s) => s.coldBore)).toEqual([true, undefined, undefined])
+    expect(shots?.map((s) => s.coldBore)).toEqual([true, undefined, undefined])
     expect(r.session.note).toBe('ShotView bore flags: shot 1 cold bore')
     expect(r.session.date).toBe('2026-03-03')
     expect(r.session.device).toEqual({ kind: 'doppler-radar', manufacturerName: 'Garmin' })
@@ -31,7 +31,7 @@ describe('parseShotView', () => {
       'strings.0.load',
     ])
     expect(r.warnings).toEqual([])
-    expect(complete(r).strings[0].shots).toHaveLength(3)
+    expect(complete(r).strings[0]?.shots).toHaveLength(3)
   })
 
   it('reads 0, no, false and n in a bore flag column as unset, other text as set', () => {
@@ -39,12 +39,12 @@ describe('parseShotView', () => {
       shotViewEnglish.replace(', , X, ', `, ${clean}, ${cold}, `)
     for (const text of ['No', 'FALSE', '0', 'n', ' no ']) {
       const r = parseShotView(flagged(text, text))
-      expect(r.session.strings[0].shots[0].coldBore).toBeUndefined()
+      expect(r.session.strings[0]?.shots[0]?.coldBore).toBeUndefined()
       expect(r.session.note).toBeUndefined()
     }
     for (const text of ['x', 'Yes', 'true', '1', '\u2713']) {
       const r = parseShotView(flagged('', text))
-      expect(r.session.strings[0].shots[0].coldBore).toBe(true)
+      expect(r.session.strings[0]?.shots[0]?.coldBore).toBe(true)
       expect(r.session.note).toBe('ShotView bore flags: shot 1 cold bore')
     }
   })
@@ -60,13 +60,13 @@ describe('parseShotView', () => {
 
   it('reads a German export in m/s with decimal commas', () => {
     const r = parseShotView(shotViewGerman)
-    const shots = r.session.strings[0].shots
-    expect(shots.map((s) => s.velocity)).toEqual([
+    const shots = r.session.strings[0]?.shots
+    expect(shots?.map((s) => s.velocity)).toEqual([
       { value: 850.5, raw: '850,5 MPS' },
       { value: 848, raw: '848,0 MPS' },
       { value: 848.5, raw: '848,5 MPS' },
     ])
-    expect(shots[0].coldBore).toBe(true)
+    expect(shots?.[0]?.coldBore).toBe(true)
     expect(r.session.note).toBe('ShotView bore flags: shot 1 clean bore')
     expect(r.session.date).toBe('2026-03-04')
     expect(r.stringLabels).toEqual(['Testladung B, 2,5g P100'])
@@ -104,12 +104,12 @@ describe('parseShotView', () => {
     ]
     for (const [from, to, value, token, unit] of cases) {
       const r = parseShotView(shotViewEnglish.replace(from, to))
-      expect(r.session.strings[0].shots[0].velocity).toEqual({ value, raw: `2800.0 ${token}` })
+      expect(r.session.strings[0]?.shots[0]?.velocity).toEqual({ value, raw: `2800.0 ${token}` })
       expect(r.velocityUnits).toEqual([{ unit, source: 'file' }])
     }
     for (const header of ['Tempo (MPS)', 'TEMPO (MPS)']) {
       const r = parseShotView(shotViewGerman.replace('Tempo (MPS)', header))
-      expect(r.session.strings[0].shots[0].velocity).toEqual({ value: 850.5, raw: '850,5 MPS' })
+      expect(r.session.strings[0]?.shots[0]?.velocity).toEqual({ value: 850.5, raw: '850,5 MPS' })
       expect(r.velocityUnits).toEqual([{ unit: 'm/s', source: 'file' }])
     }
   })
@@ -118,7 +118,7 @@ describe('parseShotView', () => {
     const text = shotViewEnglish.replace('SPEED (FPS)', 'SPEED (KMH)')
     expect(() => parseShotView(text)).toThrow('velocity unit "KMH" is unknown')
     const r = parseShotView(text, { velocityUnit: 'm/s' })
-    expect(r.session.strings[0].shots[0].velocity).toEqual({ value: 2800, raw: '2800.0 KMH' })
+    expect(r.session.strings[0]?.shots[0]?.velocity).toEqual({ value: 2800, raw: '2800.0 KMH' })
     expect(r.warnings).toContain(
       'velocity unit "KMH" in the file; using m/s as named by the caller',
     )
@@ -146,7 +146,7 @@ describe('parseShotView', () => {
     expect(shotViewEnglish).toContain(shot2)
     const note = shotViewEnglish.replace(shot2, '8.5, , , 2:10:31 PM, , , "wind\n10, 5, gusty"')
     const r = parseShotView(`${note}\n7,1`)
-    expect(r.session.strings[0].shots.map((s) => s.velocity.raw)).toEqual([
+    expect(r.session.strings[0]?.shots.map((s) => s.velocity.raw)).toEqual([
       '2800.0 FPS',
       '2810.5 FPS',
       '2795.5 FPS',
@@ -156,7 +156,7 @@ describe('parseShotView', () => {
 
   it('reads lone CR line ends', () => {
     const r = parseShotView(shotViewEnglish.replaceAll('\n', '\r'))
-    expect(r.session.strings[0].shots).toHaveLength(3)
+    expect(r.session.strings[0]?.shots).toHaveLength(3)
   })
 
   it('stores sha256 in lowercase and refuses a malformed one', () => {

@@ -13,6 +13,7 @@ import {
   sampler,
   timeIndex,
 } from '../src/lib/playback.ts'
+import { defined, missing } from './defined.ts'
 
 /** Made-up uneven times with repeats, as event points add them. */
 const times = [0, 1, 2, 2, 2.5, 4, 4, 4, 10, 10.1, 12]
@@ -20,7 +21,7 @@ const times = [0, 1, 2, 2, 2.5, 4, 4, 4, 10, 10.1, 12]
 /** Last interval start at or before t, 0 to n - 2. */
 function scan(t: number) {
   let i = 0
-  for (let k = 0; k < times.length - 1; k++) if (times[k] <= t) i = k
+  for (let k = 0; k < times.length - 1; k++) if (defined(times[k]) <= t) i = k
   return i
 }
 
@@ -51,7 +52,7 @@ it('clamps before the first and after the last time', () => {
   expect(index(99)).toBe(times.length - 2)
 
   const at = sampler(r.points)
-  const first = r.points[0]
+  const first = defined(r.points[0])
   expect(at(-1)).toEqual({
     time: first.time,
     travel: first.travel,
@@ -67,7 +68,7 @@ it('clamps before the first and after the last time', () => {
 it('interpolates linearly in time between neighbouring points', () => {
   const at = sampler(r.points)
   const i = 100
-  const [a, b] = [r.points[i], r.points[i + 1]]
+  const [a = missing(), b = missing()] = [r.points[i], r.points[i + 1]]
   const s = at(a.time + 0.25 * (b.time - a.time))
   expect(s.travel).toBeCloseTo(a.travel + 0.25 * (b.travel - a.travel), 15)
   expect(s.velocity).toBeCloseTo(a.velocity + 0.25 * (b.velocity - a.velocity), 10)
@@ -104,7 +105,7 @@ it('splits the charge at shot start and at the muzzle', () => {
   // start pressure 0: the bullet moves from the first point
   const free = run({ startPressure: 0 })
   const split = powderSplit(free, sampler(free.points))
-  expect(split.before).toBe(free.points[0].burntFraction)
+  expect(split.before).toBe(defined(free.points[0]).burntFraction)
   expect(split.travel).toBe(free.muzzleBurntFraction - split.before)
   // the example's demo powder leaves a little powder unburnt at the muzzle
   expect(split.unburnt).toBeCloseTo(1 - free.muzzleBurntFraction, 15)
@@ -129,7 +130,7 @@ it('gives the muzzle energy terms as shares of the released energy, unsent terms
   expect(e.shown.map((t) => t.key)).toEqual(['translation', 'rotation', 'gasKinetic', 'gas'])
   expect(e.zero.map((t) => t.key)).toEqual(['resistance', 'heat', 'leakage'])
   expect(e.shown.reduce((sum, t) => sum + t.share, 0)).toBeCloseTo(1, 12)
-  expect(e.shown[0].value / r.muzzleEnergy).toBeCloseTo(1, 12)
+  expect(defined(e.shown[0]).value / r.muzzleEnergy).toBeCloseTo(1, 12)
 
   // without rifling the spin term is 0 but modelled, so it stays listed
   const smooth = energySplit(run({ twist: 0 }).energy)
@@ -153,7 +154,7 @@ it('slows playback by the smallest factor that makes it last at least 3 s', () =
 
 it('steps from a time to the next or the previous event, past an event at that time', () => {
   const events = playbackEvents(r)
-  const [start, peak] = events
+  const [start = missing(), peak = missing()] = events
   expect(eventStep(events, 0, 1)).toBe(start)
   expect(eventStep(events, start.time, 1)).toBe(peak)
   expect(eventStep(events, peak.time, -1)).toBe(start)

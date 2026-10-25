@@ -16,6 +16,7 @@ import {
   sheetSettings,
   shotPositions,
 } from '../src/lib/report-issue.ts'
+import { defined } from './defined.ts'
 
 const repo = 'https://github.com/OpenReloading/Ballistics'
 const report: Report = {
@@ -162,11 +163,13 @@ it('matches the issue form: its dropdown options and field ids', () => {
     'utf8',
   )
   const options = (id: string) =>
-    form
-      .split(/^ {2}- type: /m)
-      .find((f) => f.includes(`\n    id: ${id}\n`))
-      ?.split('options:\n')[1]
-      ?.split('\n    validations:')[0]
+    defined(
+      form
+        .split(/^ {2}- type: /m)
+        .find((f) => f.includes(`\n    id: ${id}\n`))
+        ?.split('options:\n')[1]
+        ?.split('\n    validations:')[0],
+    )
       .split('\n')
       .filter(Boolean)
       .map((l) => l.replace(/^ +- /, ''))

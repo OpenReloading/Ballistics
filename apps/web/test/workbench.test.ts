@@ -20,6 +20,7 @@ import {
   stepLabel,
   warningCountText,
 } from '../src/lib/workbench.ts'
+import { defined, missing } from './defined.ts'
 
 type Limit = NonNullable<InteriorResponse['limits']>[number]
 const limit = (l: Partial<Limit>): Limit => ({
@@ -140,14 +141,23 @@ describe('shownWarnings', () => {
         ...body(4000e5, 3600e5, 4400e5),
         warnings: [{ code: 'test', message }],
       }) as unknown as InteriorResponse
-    const [us] = shownWarnings(warned('1.5 bar and 25 bar, 3 barrel'), presetUnits('us'))
+    const [us = missing()] = shownWarnings(
+      warned('1.5 bar and 25 bar, 3 barrel'),
+      presetUnits('us'),
+    )
     expect(us.text).toBe('22 psi and 363 psi, 3 barrel')
-    const [metric] = shownWarnings(warned('1.5 bar and 25 bar'), presetUnits('metric-grains'))
+    const [metric = missing()] = shownWarnings(
+      warned('1.5 bar and 25 bar'),
+      presetUnits('metric-grains'),
+    )
     expect(metric.text).toBe('1.5 bar and 25 bar')
   })
 
   it('keeps bar with the record decimals and names a range above the limit', () => {
-    const [line, small] = shownWarnings(body(4000e5, 3600e5, 4400e5), presetUnits('metric-grains'))
+    const [line, small = missing()] = shownWarnings(
+      body(4000e5, 3600e5, 4400e5),
+      presetUnits('metric-grains'),
+    )
     expect(line).toEqual({
       text: 'The upper end of the simulated peak pressure range, 4400 bar, is above CIP Pmax 4150 bar, source CIP (2008-09-23, transducer); the nominal value is 4000 bar.',
       name: 'range above CIP Pmax',
@@ -177,13 +187,13 @@ describe('shownWarnings', () => {
       presetUnits('metric-grains'),
     )
     expect(lines.map((l) => l.name)).toEqual(['above CIP Pmax (A)', 'above CIP Pmax (B)'])
-    expect(lines[0].text).toContain('above CIP Pmax (A) 4150 bar')
-    expect(lines[1].text).toContain('above CIP Pmax (B) 3800 bar')
+    expect(defined(lines[0]).text).toContain('above CIP Pmax (A) 4150 bar')
+    expect(defined(lines[1]).text).toContain('above CIP Pmax (B) 3800 bar')
   })
 
   it('adds decimals while rounding would put a pressure on the limit', () => {
     // 60190.8 psi rounds to the limit's 60191 psi: one decimal keeps it above 60190.7 psi
-    const [line] = shownWarnings(body(60190.8 * psi, 4000e5, 4400e5), presetUnits('us'))
+    const [line = missing()] = shownWarnings(body(60190.8 * psi, 4000e5, 4400e5), presetUnits('us'))
     expect(line.text).toMatch(
       /^Simulated peak pressure 60190\.8 psi \(range \d+ to 63816\.6 psi\) is above CIP Pmax 60190\.7 psi,/,
     )

@@ -115,7 +115,8 @@ const tags = [
 ]
 
 const tagOf = (url: string) => {
-  const tag = tags.find((t) => t.segments.includes(segments(url)[0]))
+  const first = segments(url)[0]
+  const tag = tags.find((t) => t.segments.some((s) => s === first))
   if (!tag) throw new Error(`no tag for ${url}`)
   return tag.name
 }

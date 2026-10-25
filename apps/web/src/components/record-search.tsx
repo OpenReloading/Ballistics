@@ -229,7 +229,13 @@ export function RecordSearch<T extends { id: string }>({
             onKeyDown={(e) => {
               if (e.key !== 'Enter' || e.ctrlKey || e.metaKey) return
               e.preventDefault()
-              if (shown.length === 1 && combobox.getSelectedOptionIndex() === -1) submit(shown[0])
+              const [only] = shown
+              if (
+                only !== undefined &&
+                shown.length === 1 &&
+                combobox.getSelectedOptionIndex() === -1
+              )
+                submit(only)
             }}
           />
         </Combobox.Target>

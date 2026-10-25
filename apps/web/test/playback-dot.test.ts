@@ -20,6 +20,7 @@ import {
   travelScrub,
 } from '../src/lib/playback.ts'
 import { presetUnits } from '../src/lib/units.ts'
+import { defined, missing } from './defined.ts'
 
 const run = (
   change: Partial<Record<keyof typeof exampleInterior, number>> = {},
@@ -80,7 +81,8 @@ describe('advance', () => {
         const times = visit(lo, hi, seed)
         for (const e of events) expect(times).toContain(e.time)
         // never backwards, ends at the muzzle
-        for (let k = 1; k < times.length; k++) expect(times[k]).toBeGreaterThanOrEqual(times[k - 1])
+        for (let k = 1; k < times.length; k++)
+          expect(times[k]).toBeGreaterThanOrEqual(defined(times[k - 1]))
         expect(times.at(-1)).toBe(r.muzzleTime)
       }
     })
@@ -103,7 +105,7 @@ describe('the dot of the playback', () => {
       const top = Math.max(...drawn.y)
       const vertex = drawn.y.indexOf(top)
       // the peak line of the chart is at the x of the peak time
-      const lineX = chartX(r.points[vertex], x, system)
+      const lineX = chartX(defined(r.points[vertex]), x, system)
       const [px, py] = dot(r.maxPressureTime, x, 'pressure')
       expect(px).toBe(lineX)
       expect(py).toBe(top)
@@ -124,7 +126,12 @@ describe('the dot of the playback', () => {
             ),
             r.points.length - 2,
           )
-          const [x0, y0, x1, y1] = [drawn.x[i], drawn.y[i], drawn.x[i + 1], drawn.y[i + 1]]
+          const [x0 = missing(), y0 = missing(), x1 = missing(), y1 = missing()] = [
+            drawn.x[i],
+            drawn.y[i],
+            drawn.x[i + 1],
+            drawn.y[i + 1],
+          ]
           // between the two vertices, and on the line through them
           expect(px).toBeGreaterThanOrEqual(Math.min(x0, x1) - 1e-9)
           expect(px).toBeLessThanOrEqual(Math.max(x0, x1) + 1e-9)
@@ -147,7 +154,7 @@ describe('the slider scales', () => {
   for (const x of ['travel', 'time'] as const)
     it(`${name}: the thumb is under the marker at every time and the event ticks under the event lines (${x} axis)`, () => {
       const scale = scaleOf[x]
-      const [first, last] = [xs(x)[0], xs(x).at(-1) ?? 0]
+      const [first = missing(), last] = [xs(x)[0], xs(x).at(-1) ?? 0]
       const next = random(11)
       for (let k = 0; k < 400; k++) {
         const t = next() * r.muzzleTime
@@ -163,7 +170,7 @@ describe('the slider scales', () => {
 
   it('takes a position to the time of the bullet at that travel, and back', () => {
     const travel = travelScrub(r.points)
-    const first = r.points[0].time
+    const first = defined(r.points[0]).time
     expect(travel.pos(first)).toBe(0)
     // the pressure rises with the bullet at rest: no travel until the shot starts
     expect(travel.pos(r.shotStartTime)).toBe(0)

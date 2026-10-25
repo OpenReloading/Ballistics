@@ -11,12 +11,14 @@ export async function runBatch<T, R>(
   task: (item: T, index: number) => Promise<R>,
   onDone?: (index: number, result: R, done: number) => void,
 ): Promise<void> {
-  let next = 0
+  const queue = items.entries()
   let done = 0
   const worker = async () => {
-    while (!signal.aborted && next < items.length) {
-      const index = next++
-      const result = await task(items[index], index)
+    while (!signal.aborted) {
+      const step = queue.next()
+      if (step.done) return
+      const [index, item] = step.value
+      const result = await task(item, index)
       onDone?.(index, result, ++done)
     }
   }

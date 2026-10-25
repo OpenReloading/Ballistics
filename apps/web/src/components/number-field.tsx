@@ -54,8 +54,9 @@ function UnitSwitch({
   onPick: (id: string) => void
 }) {
   const units = unitList(q)
-  if (units.length === 2) {
-    const [id, next] = units.find(([, u]) => u !== unit) ?? units[0]
+  const [first, second] = units
+  if (first && second && units.length === 2) {
+    const [id, next] = units.find(([, u]) => u !== unit) ?? first
     // starts with the visible text (WCAG 2.5.3)
     const name = `${unit.symbol}, switch ${label} to ${next.symbol}`
     return (
@@ -283,6 +284,8 @@ function FieldInput({
   )
 }
 
+const noValue: FieldValue = { text: '', si: undefined }
+
 /**
  * A labelled number field: the unit is its suffix and, for screen readers, part of its label; keeps
  * the typed text and its SI value. A
@@ -292,7 +295,7 @@ function FieldInput({
 export function NumberField({
   spec,
   system,
-  value,
+  value: given,
   onChange,
   onBlur,
   onEnter,
@@ -308,7 +311,8 @@ export function NumberField({
 }: {
   spec: FieldSpec
   system: UnitSystem
-  value: FieldValue
+  /** Undefined where the form holds no value for the field: an empty field. */
+  value: FieldValue | undefined
   onChange: (value: FieldValue) => void
   onBlur?: () => void
   /** Called on Enter in the field. */
@@ -342,6 +346,7 @@ export function NumberField({
    */
   unit?: 'switch' | 'text' | 'none'
 }) {
+  const value = given ?? noValue
   const [pick, setPick] = useState<UnitPick>()
   // the field's own unit, held in memory: gone with a change of the Settings or a reload
   if (livePick(pick, system) !== pick) setPick(undefined)

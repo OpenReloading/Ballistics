@@ -10,7 +10,7 @@ describe('ellipse probability', () => {
       [0.05, 0.02],
       [0.003, 0.02],
       [0.2, 0.01],
-    ])
+    ] as const)
       expect(ellipseProbability(r, r, sigma(s))).toBeCloseTo(
         1 - Math.exp(-(r * r) / (2 * s * s)),
         8,

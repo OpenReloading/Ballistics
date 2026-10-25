@@ -70,22 +70,22 @@ describe('limitCheck', () => {
       revised: '2024-05-06',
     })
     const { limits, warnings } = limitCheck(range, revised)
-    expect(limits?.[0].revised).toBe('2024-05-06')
+    expect(limits?.[0]?.revised).toBe('2024-05-06')
     expect(warnings[0]).toMatchObject({ code: 'limitExceeded', spec: 'cip-x-2024-05-06' })
   })
 
   it('prints the stored decimals of a limit and enough decimals to keep a value on its side', () => {
     const pmax = (value: number) => cartridge([{ symbol: 'Pmax', quantity: 'pressure', value }])
     const near = { ...range, nominalPressure: 4274.74e5, highPressure: 4274.9e5 }
-    expect(limitCheck(near, pmax(4274.75)).warnings[0].message).toBe(
+    expect(limitCheck(near, pmax(4274.75)).warnings[0]?.message).toBe(
       'The upper end of the simulated peak pressure range, 4275 bar, is above CIP Pmax 4274.75 bar (cip-x-2020-01-01; transducer); the nominal value is 4274.7 bar.',
     )
     const at = { ...range, nominalPressure: 4274.75e5, highPressure: 4274.751e5 }
-    expect(limitCheck(at, pmax(4274.75)).warnings[0].message).toBe(
+    expect(limitCheck(at, pmax(4274.75)).warnings[0]?.message).toBe(
       'The upper end of the simulated peak pressure range, 4275 bar, is above CIP Pmax 4274.75 bar (cip-x-2020-01-01; transducer); the nominal value is 4274.75 bar.',
     )
     const whole = { ...range, nominalPressure: 4000.3e5, highPressure: 4100e5 }
-    expect(limitCheck(whole, pmax(4000)).warnings[0].message).toBe(
+    expect(limitCheck(whole, pmax(4000)).warnings[0]?.message).toBe(
       'Simulated peak pressure 4000.3 bar (range 3500 to 4100 bar) is above CIP Pmax 4000 bar (cip-x-2020-01-01; transducer).',
     )
   })
@@ -106,7 +106,7 @@ describe('limitCheck', () => {
     }
     const { warnings } = limitCheck(incomplete, undefined)
     expect(warnings.map((w) => w.code)).toEqual(['noCartridge', 'rangeIncomplete'])
-    expect(warnings[1].message).toBe(
+    expect(warnings[1]?.message).toBe(
       '1 of 2 range cases could not be computed (chargeTooHigh); the range covers only the computed cases, and the true range can be wider.',
     )
     for (const w of warnings) expect(w.message).not.toMatch(/safe/i)

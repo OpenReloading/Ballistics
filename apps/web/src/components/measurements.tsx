@@ -16,6 +16,7 @@ import {
   withCharge,
 } from '../lib/measurements.ts'
 import { newId } from '../lib/new-id.ts'
+import { nth } from '../lib/nth.ts'
 import { controlSize } from '../lib/theme.ts'
 import { formatNumber, type UnitSystem, withUnit } from '../lib/units.ts'
 import { ChronoFileInput } from './chrono-file-input.tsx'
@@ -283,7 +284,7 @@ export function Measurements({
   const curve = simulatedCurve(runSteps)
   const plotted = sessions.map((s, k) => ({
     s,
-    shape: shapes[k % shapes.length],
+    shape: nth(shapes, k % shapes.length),
     rows: chargeRows(
       s.data.strings.map((str) => ({ charge: stringCharge(str), shots: str.shots })),
       runSteps,
@@ -305,7 +306,8 @@ export function Measurements({
       all.map((s) => {
         if (s.id !== id) return s
         const strings = [...s.data.strings]
-        strings[i] = withCharge(strings[i], value === '' ? undefined : Number(value))
+        const current = strings[i]
+        if (current) strings[i] = withCharge(current, value === '' ? undefined : Number(value))
         return { ...s, data: { ...s.data, strings } }
       }),
     )

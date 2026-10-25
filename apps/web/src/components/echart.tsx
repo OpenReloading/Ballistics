@@ -24,6 +24,9 @@ use([
   SVGRenderer,
 ])
 
+/** The distance between the first two ticks; NaN when there are fewer than two. */
+export const tickStep = (ticks: number[]) => (ticks[1] ?? Number.NaN) - (ticks[0] ?? Number.NaN)
+
 /**
  * The chart colours: each key's CSS custom property of the page (`globals.css`), read after the
  * colour scheme attribute is set and again on a scheme change; undefined before the first read.
@@ -187,9 +190,10 @@ export function EChart({
       Home: 0,
       End: n - 1,
     }
-    if (!(e.key in moves)) return
+    const target = moves[e.key]
+    if (target === undefined) return
     e.preventDefault()
-    moveTo(moves[e.key])
+    moveTo(target)
   }
 
   const points = (option.series as { data?: unknown[] }[] | undefined)?.[focus]?.data?.length ?? 0

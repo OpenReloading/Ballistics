@@ -5,8 +5,15 @@
  */
 import { conicOf, type Ellipse, ellipsePoint, meanRadius, ransacEllipse } from './ellipse.ts'
 import type { RgbaImage } from './image.ts'
+import { nth } from './nth.ts'
 import { clamp } from './raster-ops.ts'
 import type { Point } from './target-geometry.ts'
+
+// Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
+const f32 = (a: Float32Array, i: number) => a[i] as number
+const i8 = (a: Int8Array, i: number) => a[i] as number
+const i32 = (a: Int32Array, i: number) => a[i] as number
+const u8 = (a: Uint8Array | Uint8ClampedArray, i: number) => a[i] as number
 
 /** Grey levels (ITU-R BT.601 luma) averaged over square blocks of `blockSize` image px of a crop of the image. */
 export type Grid = {
@@ -53,14 +60,16 @@ export function grayGrid(
     for (let x = x0; x < x1; x++) {
       const i = (y * image.width + x) * 4
       const j = row + Math.floor((x - x0) / s)
-      sum[j] += 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]
-      chroma[j] += Math.max(d[i], d[i + 1], d[i + 2]) - Math.min(d[i], d[i + 1], d[i + 2])
-      count[j]++
+      const [red, green, blue] = [u8(d, i), u8(d, i + 1), u8(d, i + 2)]
+      sum[j] = f32(sum, j) + (0.299 * red + 0.587 * green + 0.114 * blue)
+      chroma[j] = f32(chroma, j) + (Math.max(red, green, blue) - Math.min(red, green, blue))
+      count[j] = f32(count, j) + 1
     }
   }
   for (let j = 0; j < w * h; j++) {
-    sum[j] = count[j] ? sum[j] / count[j] : 255
-    chroma[j] = count[j] ? chroma[j] / count[j] : 0
+    const c = f32(count, j)
+    sum[j] = c ? f32(sum, j) / c : 255
+    chroma[j] = c ? f32(chroma, j) / c : 0
   }
   return { width: w, height: h, blockSize: s, left: x0, top: y0, grey: sum, chroma: chroma }
 }
@@ -71,13 +80,13 @@ function sampleBilinear(g: Float32Array, w: number, h: number, x: number, y: num
   const yc = clamp(y, 0, h - 1)
   const [i, j] = [Math.min(w - 2, Math.floor(xc)), Math.min(h - 2, Math.floor(yc))]
   const [fx, fy] = [xc - i, yc - j]
-  if (w < 2 || h < 2) return g[Math.round(yc) * w + Math.round(xc)]
+  if (w < 2 || h < 2) return f32(g, Math.round(yc) * w + Math.round(xc))
   const k = j * w + i
   return (
-    g[k] * (1 - fx) * (1 - fy) +
-    g[k + 1] * fx * (1 - fy) +
-    g[k + w] * (1 - fx) * fy +
-    g[k + w + 1] * fx * fy
+    f32(g, k) * (1 - fx) * (1 - fy) +
+    f32(g, k + 1) * fx * (1 - fy) +
+    f32(g, k + w) * (1 - fx) * fy +
+    f32(g, k + w + 1) * fx * fy
   )
 }
 
@@ -85,9 +94,9 @@ function sampleBilinear(g: Float32Array, w: number, h: number, x: number, y: num
 function quantile(v: ArrayLike<number>, q: number): number {
   const step = Math.max(1, Math.floor(v.length / 20000))
   const s: number[] = []
-  for (let i = 0; i < v.length; i += step) s.push(v[i])
+  for (let i = 0; i < v.length; i += step) s.push(nth(v, i))
   s.sort((a, b) => a - b)
-  return s[Math.min(s.length - 1, Math.floor(q * s.length))]
+  return nth(s, Math.min(s.length - 1, Math.floor(q * s.length)))
 }
 
 type Labels = {
@@ -103,7 +112,7 @@ function label(mask: Uint8Array, w: number, h: number): Labels {
   const area: number[] = []
   const box: Labels['box'] = []
   for (let start = 0; start < w * h; start++) {
-    if (!mask[start] || lab[start] >= 0) continue
+    if (!mask[start] || i32(lab, start) >= 0) continue
     const grown = growComponent(start, area.length, mask, lab, stack, w, h)
     area.push(grown.n)
     box.push(grown.box)
@@ -127,7 +136,7 @@ function growComponent(
   let n = 0
   const b = { x0: w, y0: h, x1: -1, y1: -1 }
   while (top) {
-    const i = stack[--top]
+    const i = i32(stack, --top)
     n++
     const x = i % w
     const y = Math.trunc(i / w)
@@ -162,7 +171,7 @@ function pushUnlabelled(
   for (let v = v0; v <= v1; v++)
     for (let u = u0; u <= u1; u++) {
       const j = v * w + u
-      if (mask[j] && lab[j] < 0) {
+      if (mask[j] && i32(lab, j) < 0) {
         lab[j] = k
         stack[next++] = j
       }
@@ -202,14 +211,15 @@ const MIN_ASPECT = 0.3
 function blobsAt(grid: Grid, t: number, minArea: number): Blob[] {
   const { width: w, height: h, grey: g } = grid
   const mask = new Uint8Array(w * h)
-  for (let i = 0; i < w * h; i++) mask[i] = g[i] < t ? 1 : 0
+  for (let i = 0; i < w * h; i++) mask[i] = f32(g, i) < t ? 1 : 0
   const { lab, area, box } = label(mask, w, h)
   const out: Blob[] = []
-  const order = area.map((_a, k) => k).sort((a, b) => area[b] - area[a])
+  const order = area.map((_a, k) => k).sort((a, b) => nth(area, b) - nth(area, a))
   for (const k of order.slice(0, 5)) {
-    const b = box[k]
-    if (area[k] < minArea) break
-    const component = { lab, k, box: b, area: area[k] }
+    const b = nth(box, k)
+    const size = nth(area, k)
+    if (size < minArea) break
+    const component = { lab, k, box: b, area: size }
     const filled = fillComponent(component, w, h)
     const m = momentsOf(filled)
     if (m.n < minArea || !isBlackArea(grid, component, m)) continue
@@ -296,7 +306,8 @@ function isBlackArea(grid: Grid, { lab, k, box: b, area }: Component, m: Moments
   // black is not a colour: a red or green band is no black area
   let chromaSum = 0
   for (let y = b.y0; y <= b.y1; y++)
-    for (let x = b.x0; x <= b.x1; x++) if (lab[y * w + x] === k) chromaSum += grid.chroma[y * w + x]
+    for (let x = b.x0; x <= b.x1; x++)
+      if (lab[y * w + x] === k) chromaSum += f32(grid.chroma, y * w + x)
   if (chromaSum / area > MAX_CHROMA) return false
   if (!(m.l2 > 0)) return false
   if (m.fill < 0.7 || m.fill > 1.3) return false
@@ -319,7 +330,7 @@ function rimDarkness(grid: Grid, t: number, f: Filled, e: Ellipse): number {
       const u2 = c[0] * px * px + c[1] * px * py + c[2] * py * py + c[3] * px + c[4] * py + c[5] + 1
       if (u2 < 0.64 || u2 > 1.1) continue
       total++
-      if (px >= 0 && py >= 0 && px < w && py < h && g[py * w + px] < t) darkRim++
+      if (px >= 0 && py >= 0 && px < w && py < h && f32(g, py * w + px) < t) darkRim++
     }
   return total ? darkRim / total : 0
 }
@@ -476,7 +487,7 @@ function paperAround(grid: Grid, e: Ellipse, t: number): number {
       const [x, y] = [Math.round(p.x), Math.round(p.y)]
       if (x < 0 || y < 0 || x >= grid.width || y >= grid.height) continue
       total++
-      if (grid.grey[y * grid.width + x] >= t) light++
+      if (f32(grid.grey, y * grid.width + x) >= t) light++
     }
   return total ? light / total : 0
 }
@@ -593,7 +604,11 @@ function edgeAlongRay(
 ): { point: Point; inside: number; outside: number } | undefined {
   const { width: w, height: h, grey: g } = grid
   const [c, sn] = [Math.cos(start.angle), Math.sin(start.angle)]
-  const median = (v: number[]) => v.sort((a, b) => a - b)[v.length >> 1]
+  const median = (v: number[]) =>
+    nth(
+      v.sort((a, b) => a - b),
+      v.length >> 1,
+    )
   // the outward normal of the ellipse at parameter t
   const nx = (Math.cos(t) * c) / start.semiMajor - (Math.sin(t) * sn) / start.semiMinor
   const ny = (Math.cos(t) * sn) / start.semiMajor + (Math.sin(t) * c) / start.semiMinor
@@ -625,7 +640,7 @@ function kernel(sigma: number, order: 0 | 1 | 2): Float32Array {
     k[i + r] = gaussianDerivative(g, i, sigma, order)
     if (order === 0) sum += g
   }
-  if (order === 0) for (let i = 0; i < k.length; i++) k[i] /= sum
+  if (order === 0) for (let i = 0; i < k.length; i++) k[i] = f32(k, i) / sum
   else normaliseDerivative(k, r, order)
   return k
 }
@@ -642,16 +657,16 @@ function normaliseDerivative(k: Float32Array, r: number, order: 1 | 2) {
   let m = 0
   let mom = 0
   for (let i = -r; i <= r; i++) {
-    m += k[i + r]
-    mom += i * k[i + r]
+    m += f32(k, i + r)
+    mom += i * f32(k, i + r)
   }
-  if (order === 2) for (let i = 0; i < k.length; i++) k[i] -= m / k.length
-  else for (let i = -r; i <= r; i++) k[i + r] /= -mom
+  if (order === 2) for (let i = 0; i < k.length; i++) k[i] = f32(k, i) - m / k.length
+  else for (let i = -r; i <= r; i++) k[i + r] = f32(k, i + r) / -mom
 }
 
 /** 1 for a kernel with k[-i] = k[i], -1 for one with k[-i] = -k[i] (the Gaussian derivatives of order 0, 2 and 1). */
 const parity = (k: Float32Array): 1 | -1 =>
-  Math.abs(k[0] - k[k.length - 1]) <= 1e-6 * (Math.abs(k[0]) + 1e-12) ? 1 : -1
+  Math.abs(f32(k, 0) - f32(k, k.length - 1)) <= 1e-6 * (Math.abs(f32(k, 0)) + 1e-12) ? 1 : -1
 
 function convolve(
   src: Float32Array,
@@ -674,12 +689,15 @@ function rowSum(
   px: 1 | -1,
 ): number {
   const rx = (kx.length - 1) / 2
-  let s = kx[rx] * src[row + x]
+  let s = f32(kx, rx) * f32(src, row + x)
   if (x >= rx && x < w - rx)
-    for (let i = 1; i <= rx; i++) s += kx[rx + i] * (src[row + x + i] + px * src[row + x - i])
+    for (let i = 1; i <= rx; i++)
+      s += f32(kx, rx + i) * (f32(src, row + x + i) + px * f32(src, row + x - i))
   else
     for (let i = 1; i <= rx; i++)
-      s += kx[rx + i] * (src[row + clamp(x + i, 0, w - 1)] + px * src[row + clamp(x - i, 0, w - 1)])
+      s +=
+        f32(kx, rx + i) *
+        (f32(src, row + clamp(x + i, 0, w - 1)) + px * f32(src, row + clamp(x - i, 0, w - 1)))
   return s
 }
 
@@ -701,11 +719,16 @@ function convolveColumns(tmp: Float32Array, w: number, h: number, ky: Float32Arr
   const out = new Float32Array(w * h)
   for (let y = 0; y < h; y++) {
     const row = y * w
-    const mid = ky[ry]
-    for (let x = 0; x < w; x++) out[row + x] = mid * tmp[row + x]
+    const mid = f32(ky, ry)
+    for (let x = 0; x < w; x++) out[row + x] = mid * f32(tmp, row + x)
     for (let i = 1; i <= ry; i++) {
-      const [k, up, down] = [ky[ry + i], clamp(y + i, 0, h - 1) * w, clamp(y - i, 0, h - 1) * w]
-      for (let x = 0; x < w; x++) out[row + x] += k * (tmp[up + x] + py * tmp[down + x])
+      const [k, up, down] = [
+        f32(ky, ry + i),
+        clamp(y + i, 0, h - 1) * w,
+        clamp(y - i, 0, h - 1) * w,
+      ]
+      for (let x = 0; x < w; x++)
+        out[row + x] = f32(out, row + x) + k * (f32(tmp, up + x) + py * f32(tmp, down + x))
     }
   }
   return out
@@ -732,8 +755,10 @@ export function ridges(
 ): Ridges {
   const hessian = hessianStrength(grid, searchMask, sigmas)
   const inside: number[] = []
-  for (let i = 0; i < hessian.strength.length; i++)
-    if (hessian.strength[i] > 0) inside.push(hessian.strength[i])
+  for (let i = 0; i < hessian.strength.length; i++) {
+    const s = f32(hessian.strength, i)
+    if (s > 0) inside.push(s)
+  }
   if (inside.length < 50) return { components: [] }
   const p99 = quantile(Float32Array.from(inside), 0.99)
   const thin = thinRidges(grid, hessian, 0.12 * p99, 0.3 * p99)
@@ -787,22 +812,23 @@ function accumulateScale(
   const s2 = sigma * sigma
   for (let i = 0; i < n; i++) {
     if (!searchMask[i]) continue
-    const mid = (lxx[i] + lyy[i]) / 2
-    const half = (lxx[i] - lyy[i]) / 2
-    const rad = Math.sqrt(half * half + lxy[i] * lxy[i])
+    const [xx, yy, xy] = [f32(lxx, i), f32(lyy, i), f32(lxy, i)]
+    const mid = (xx + yy) / 2
+    const half = (xx - yy) / 2
+    const rad = Math.sqrt(half * half + xy * xy)
     const [e1, e2] = [mid + rad, mid - rad]
     // bright line: e2 very negative; dark line: e1 very positive
     const bright = -e2 > e1
     const [main, other] = bright ? [-e2, Math.abs(e1)] : [e1, Math.abs(e2)]
     if (other > main / 3) continue
     const v = main * s2
-    if (v <= strength[i]) continue
+    if (v <= f32(strength, i)) continue
     strength[i] = v
     sgn[i] = bright ? 1 : -1
     sigmaAt[i] = sigma
     // normal: eigenvector of the dominant eigenvalue
     const e = bright ? e2 : e1
-    ;[normalX[i], normalY[i]] = unitVector(lxy[i], e - lxx[i])
+    ;[normalX[i], normalY[i]] = unitVector(xy, e - xx)
   }
 }
 
@@ -826,8 +852,8 @@ function isLine(
     sampleBilinear(g, w, h, x + nx * d, y + ny * d),
     sampleBilinear(g, w, h, x - nx * d, y - ny * d),
   ]
-  const diffA = sign * (g[i] - a)
-  const diffB = sign * (g[i] - b)
+  const diffA = sign * (f32(g, i) - a)
+  const diffB = sign * (f32(g, i) - b)
   return !(Math.min(diffA, diffB) < 0.35 * Math.max(diffA, diffB) || !(diffA > 0 && diffB > 0))
 }
 
@@ -854,12 +880,12 @@ function thinRidges(
   for (let y = 2; y < h - 2; y++)
     for (let x = 2; x < w - 2; x++) {
       const i = y * w + x
-      const v = strength[i]
+      const v = f32(strength, i)
       if (v < low) continue
-      const [nx, ny] = [normalX[i], normalY[i]]
-      const at = (o: number) => strength[Math.round(y + ny * o) * w + Math.round(x + nx * o)]
+      const [nx, ny] = [f32(normalX, i), f32(normalY, i)]
+      const at = (o: number) => f32(strength, Math.round(y + ny * o) * w + Math.round(x + nx * o))
       if (exceeds(v, at(1), at(-1))) continue
-      if (!isLine(g, w, h, x, y, nx, ny, sgn[i], 2 * sigmaAt[i])) continue
+      if (!isLine(g, w, h, x, y, nx, ny, i8(sgn, i), 2 * f32(sigmaAt, i))) continue
       thin[i] = v >= high ? 2 : 1
       // sub-pixel offset along the normal by a parabola through the three strengths
       const off = parabolaOffset(at(-1), v, at(1))
@@ -881,11 +907,11 @@ function hysteresisComponents(
   for (let i = 0; i < n; i++) mask[i] = thin[i] ? 1 : 0
   const { lab, area } = label(mask, w, h)
   const strong = new Uint8Array(area.length)
-  for (let i = 0; i < n; i++) if (thin[i] === 2 && lab[i] >= 0) strong[lab[i]] = 1
+  for (let i = 0; i < n; i++) if (thin[i] === 2 && i32(lab, i) >= 0) strong[i32(lab, i)] = 1
   const comps: Point[][] = area.map(() => [])
   for (let i = 0; i < n; i++) {
-    const k = lab[i]
-    if (k >= 0 && strong[k]) comps[k].push({ x: sub[2 * i], y: sub[2 * i + 1] })
+    const k = i32(lab, i)
+    if (k >= 0 && strong[k]) nth(comps, k).push({ x: f32(sub, 2 * i), y: f32(sub, 2 * i + 1) })
   }
   return comps.filter((c) => c.length >= minLength)
 }

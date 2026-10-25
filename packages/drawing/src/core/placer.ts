@@ -10,7 +10,7 @@ import {
 import { headFace, type PartPoint, radiusAt, steelBand } from './section.ts'
 import { textWidth } from './text.ts'
 import type { Arc, Arrowhead, Label, Layout, LineSegment, Part } from './types.ts'
-import { add, unit } from './vector.ts'
+import { add, pairs, unit } from './vector.ts'
 
 /** One place to try for a text, with the lines, arrowheads, arc and diameter tips it brings. */
 export type Candidate = {
@@ -80,9 +80,7 @@ export function createPlacer(
     part.outer === undefined
       ? []
       : steelBand(points, em).sides.flatMap(({ zig }) =>
-          zig
-            .slice(1)
-            .map((b, n): LineSegment => ({ a: zig[n], b, kind: 'thin', owner: 'outline' })),
+          pairs(zig).map(([a, b]): LineSegment => ({ a, b, kind: 'thin', owner: 'outline' })),
         )
   const head = part.outer === undefined ? undefined : headFace(points, annotation)
   const outlineSegs: LineSegment[] = [
@@ -90,9 +88,9 @@ export function createPlacer(
     ...breakSegs,
     ...(head ? [{ a: head[0], b: head[1], kind: 'thin' as const, owner: 'outline' }] : []),
     ...[1, -1].flatMap((sign) => [
-      ...points.slice(1).map(
-        ([r, z], n): LineSegment => ({
-          a: [points[n][1], sign * points[n][0]],
+      ...pairs(points).map(
+        ([[pr, pz], [r, z]]): LineSegment => ({
+          a: [pz, sign * pr],
           b: [z, sign * r],
           kind: 'thin',
           owner: 'outline',
@@ -271,7 +269,12 @@ export function createPlacer(
   const placements: { candidates: Candidate[]; chosen: Candidate }[] = []
   /** The first candidate that runs into nothing, else the one that runs into least; commits it. */
   const pick = (candidates: Candidate[]) => {
-    let chosen = candidates[0]
+    const [first] = candidates
+    if (!first) throw new Error('A placement needs at least one candidate.')
+    return leastConflicting(first, candidates)
+  }
+  const leastConflicting = (first: Candidate, candidates: Candidate[]) => {
+    let chosen = first
     let least = Infinity
     for (const c of candidates) {
       const soft = leaderCosts(c.segs) + (keepCorners ? cornerCosts(c) : 0)
@@ -322,14 +325,14 @@ export function createPlacer(
     const z1 = add(centre, u, cut / 2)
     const peak = add(add(centre, u, -cut / 4), n, face.breakAmplitude * k)
     const trough = add(add(centre, u, cut / 4), n, -face.breakAmplitude * k)
-    for (const [p, q] of [
+    const rungs: [PartPoint, PartPoint][] = [
       [a, z0],
       [z0, peak],
       [peak, trough],
       [trough, z1],
       [z1, b],
-    ])
-      segs.push({ a: p, b: q, kind: 'rule', owner })
+    ]
+    for (const [p, q] of rungs) segs.push({ a: p, b: q, kind: 'rule', owner })
     arrowAt(a, [-u[0], -u[1]], owner)
   }
 

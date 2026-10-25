@@ -118,7 +118,7 @@ describe('targetFace extended geometry', () => {
   })
 
   it('accepts oval rings on all rings only, each smaller than the one outside', () => {
-    const oval = rings.map((r, i) => ({ ...r, height: mm([40, 26, 12][i]) }))
+    const oval = [40, 26, 12].map((height, i) => ({ ...rings[i], height: mm(height) }))
     expect(ok({ rings: oval, blackHeight: mm(26) }).success).toBe(true)
     expectIssueAt(targetFace, faceWith({ rings: [oval[0], rings[1], rings[2]] }), 'rings')
     expectIssueAt(
@@ -144,7 +144,7 @@ describe('targetFace extended geometry', () => {
   it('refuses tenth-ring values on a square or oval face, and a cover rule on an oval inner ten', () => {
     const square = [{ ...rings[0], shape: 'square' }, rings[1], rings[2]]
     expectIssueAt(targetFace, faceWith({ rings: square, decimal: true }), 'decimal')
-    const oval = rings.map((r, i) => ({ ...r, height: mm([40, 26, 12][i]) }))
+    const oval = [40, 26, 12].map((height, i) => ({ ...rings[i], height: mm(height) }))
     expectIssueAt(targetFace, faceWith({ rings: oval, decimal: true }), 'decimal')
     expect(ok({ rings: square, decimal: false }).success).toBe(true)
     const inner = { diameter: mm(5), height: mm(4), rule: 'cover' }

@@ -4,7 +4,7 @@
  * readings, `apps/docs/docs/models/exterior-truing-strings.md`. Every evaluation is an ordinary
  * `trajectory` call. SI in and out; angles in rad, dialled corrections in clicks.
  */
-import { InputError, need } from '../errors.ts'
+import { InputError, need, nth } from '../errors.ts'
 import { chiSquareQuantile, chiSquareSurvival } from '../groups/chi-square.ts'
 import { studentTwoSidedQuantile } from '../groups/student-t.ts'
 import {
@@ -440,10 +440,10 @@ function checkEntries(
 function applied(shot: TrajectoryInput, theta: readonly number[]): TrajectoryInput {
   return {
     ...shot,
-    muzzleVelocity: shot.muzzleVelocity * Math.exp(theta[0]),
+    muzzleVelocity: shot.muzzleVelocity * Math.exp(nth(theta, 0)),
     projectile: {
       ...shot.projectile,
-      drag: dragCorrection(shot.projectile)([Math.exp(theta[1])]),
+      drag: dragCorrection(shot.projectile)([Math.exp(nth(theta, 1))]),
     },
   }
 }
@@ -483,7 +483,7 @@ class Model {
     }
     this.active = options.fitZeroOffset ? [0, 1, 2, 3] : [0, 1, 2]
     this.priors = this.active.flatMap((j) => {
-      const sigma = options.priors?.[names[j]]
+      const sigma = options.priors?.[nth(names, j)]
       return sigma === undefined ? [] : [{ j, sigma }]
     })
   }
@@ -519,7 +519,7 @@ class Model {
           ? p.height + offset * x.range
           : x.kind === 'velocity'
             ? p.velocity
-            : (p.elevationHold - offset) / (this.clickValue * Math.exp(theta[2])),
+            : (p.elevationHold - offset) / (this.clickValue * Math.exp(nth(theta, 2))),
       )
     }
     return out
@@ -539,21 +539,22 @@ class Model {
       if (j === 2) {
         // the click value only divides the dial rows
         const at = this.predict(theta)
-        return at && this.rows.map((x, i) => (x.kind === 'dial' ? -at[i] : 0))
+        return at && this.rows.map((x, i) => (x.kind === 'dial' ? -nth(at, i) : 0))
       }
       if (j === 3) {
         // the offset is linear: range times it in an impact, minus it over the click value in a dial
-        const perClick = 1 / (this.clickValue * Math.exp(theta[2]))
+        const perClick = 1 / (this.clickValue * Math.exp(nth(theta, 2)))
         return this.rows.map((x) =>
           x.kind === 'impact' ? x.range : x.kind === 'dial' ? -perClick : 0,
         )
       }
       const up = this.predict(theta.map((x, k) => (k === j ? x + h : x)))
       const down = this.predict(theta.map((x, k) => (k === j ? x - h : x)))
-      return up && down && up.map((v, i) => (v - down[i]) / (2 * h))
+      return up && down && up.map((v, i) => (v - nth(down, i)) / (2 * h))
     })
-    if (cols.some((c) => c === null)) return null
-    return this.rows.map((x, i) => cols.map((c) => (c as number[])[i] / x.sigma))
+    const complete = cols.filter((c) => c !== null)
+    if (complete.length < cols.length) return null
+    return this.rows.map((x, i) => complete.map((c) => nth(c, i) / x.sigma))
   }
 }
 
@@ -562,14 +563,19 @@ class Model {
  * (`apps/docs/docs/models/exterior-truing-strings.md`, "Status of a parameter").
  */
 function unresolved(model: Model, j: number[][], columns: readonly number[]): number[] {
-  const norms = columns.map((_, c) => Math.hypot(...j.map((row) => row[c])))
+  const norms = columns.map((_, c) => Math.hypot(...j.map((row) => nth(row, c))))
   const largest = Math.max(...norms)
-  return columns.filter(
-    (_, c) =>
-      norms[c] === 0 ||
-      norms[c] < 1e-9 * largest ||
-      j.every((row, i) => Math.abs(row[c]) < (1e-6 * model.rows[i].scale) / model.rows[i].sigma),
-  )
+  return columns.filter((_, c) => {
+    const norm = nth(norms, c)
+    return (
+      norm === 0 ||
+      norm < 1e-9 * largest ||
+      j.every((row, i) => {
+        const { scale, sigma } = nth(model.rows, i)
+        return Math.abs(nth(row, c)) < (1e-6 * scale) / sigma
+      })
+    )
+  })
 }
 
 /** Inputs of `parameterStatuses`: the information of the data alone and with the priors. */
@@ -617,8 +623,8 @@ function resolvedStatus(
   const dataSigma = info?.standardUncertainty[k] ?? Infinity
   const inflation = info?.varianceInflation[k] ?? Infinity
   const reasons = weakReasons(j, dataSigma, inflation, options, fitted)
-  const at = j === 3 ? theta[3] : base.nominal * Math.exp(theta[j])
-  const used = post ? post.standardUncertainty[k] : dataSigma
+  const at = j === 3 ? nth(theta, 3) : base.nominal * Math.exp(nth(theta, j))
+  const used = post ? nth(post.standardUncertainty, k) : dataSigma
   const prior = model.priors.find((p) => p.j === j)
   const common = {
     ...base,
@@ -637,7 +643,7 @@ function parameterStatuses(input: StatusInput): RangeStringParameter[] {
   const { model, live } = input
   const nominal = [model.shot.muzzleVelocity, 1, model.clickValue, 0]
   return model.active.map((j): RangeStringParameter => {
-    const base = { name: names[j], nominal: nominal[j] }
+    const base = { name: nth(names, j), nominal: nth(nominal, j) }
     const k = live.indexOf(j)
     if (k < 0) return { ...base, status: 'unresolved', reasons: ['no-information'] }
     return resolvedStatus(input, j, k, base)
@@ -652,7 +658,9 @@ function confoundedParameters(
 ): RangeStringParameterName[] {
   const collinear = info?.varianceInflation.some((v) => v > maxInflation) ?? false
   return info !== null && collinear
-    ? live.filter((_, k) => Math.abs(info.direction[k]) > confoundedComponent).map((j) => names[j])
+    ? live
+        .filter((_, k) => Math.abs(nth(info.direction, k)) > confoundedComponent)
+        .map((j) => nth(names, j))
     : []
 }
 
@@ -672,14 +680,15 @@ function analyse(
   if (!full) throw new TruingError('unreachable', { detail: model.failure })
   const dead = unresolved(model, full, all)
   const live = all.filter((j) => !dead.includes(j))
-  const info = live.length > 0 ? identifiability(full.map((row) => live.map((j) => row[j]))) : null
+  const info =
+    live.length > 0 ? identifiability(full.map((row) => live.map((j) => nth(row, j)))) : null
   // Laplace posterior: the data rows and one pseudo-row 1 / sigma per prior of a live parameter.
   // Statuses stay with the data alone; a prior narrows an interval, it identifies nothing.
   const priors = model.priors.filter((p) => live.includes(p.j))
   const post =
     info && priors.length > 0
       ? identifiability([
-          ...full.map((row) => live.map((j) => row[j])),
+          ...full.map((row) => live.map((j) => nth(row, j))),
           ...priors.map((p) => live.map((j) => (j === p.j ? 1 / p.sigma : 0))),
         ])
       : null
@@ -688,7 +697,8 @@ function analyse(
   if (info)
     for (const [ia, a] of live.entries())
       for (const [ib, b] of live.entries())
-        if (a < b) correlation[`${names[a]}:${names[b]}`] = info.correlation[ia][ib]
+        if (a < b)
+          correlation[`${nth(names, a)}:${nth(names, b)}`] = nth(nth(info.correlation, ia), ib)
   return {
     parameters,
     conditionNumber: info?.conditionNumber ?? Infinity,
@@ -869,10 +879,10 @@ function screenParameters(model: Model, maxCondition: number): number[] {
   const dead = unresolved(model, j0, model.active)
   const kept = model.active.filter((j) => !dead.includes(j))
   while (kept.length > 0) {
-    const info = identifiability(j0.map((row) => kept.map((j) => row[j])))
+    const info = identifiability(j0.map((row) => kept.map((j) => nth(row, j))))
     if (kept.length <= model.rows.length && info.conditionNumber <= maxCondition) break
     const worst = info.varianceInflation.reduce(
-      (m, v, k) => (v >= info.varianceInflation[m] ? k : m),
+      (m, v, k) => (v >= nth(info.varianceInflation, m) ? k : m),
       0,
     )
     kept.splice(worst, 1)
@@ -901,7 +911,7 @@ function solveStrings(
   const rows = model.rows
   if (fitting.length === 0) return { theta: zeros, predicted: first, iterations: 0 }
   const expand = (t: readonly number[]) =>
-    [0, 1, 2, 3].map((j) => (fitting.includes(j) ? t[fitting.indexOf(j)] : 0))
+    [0, 1, 2, 3].map((j) => (fitting.includes(j) ? nth(t, fitting.indexOf(j)) : 0))
   // a prior is a pseudo-observation of theta_j = 0 with its sigma, after the data rows
   const priors = model.priors.filter((p) => fitting.includes(p.j))
   const fit = logLeastSquares({
@@ -913,7 +923,7 @@ function solveStrings(
     first: [...first, ...priors.map(() => 0)],
     predict: (trial) => {
       const out = model.predict(expand(trial))
-      return out && [...out, ...priors.map((p) => trial[fitting.indexOf(p.j)])]
+      return out && [...out, ...priors.map((p) => nth(trial, fitting.indexOf(p.j)))]
     },
     maxIterations,
     maxCondition,
@@ -972,13 +982,16 @@ function refitUntilIdentified(
       if (!(e instanceof TruingError) || kept.length === 0) throw e
       const named = failureParameters(e, kept)
       const left = named.length > 0 ? named : kept
-      failures.push({ reason: e.reason as LogFitFailure, parameters: left.map((j) => names[j]) })
+      failures.push({
+        reason: e.reason as LogFitFailure,
+        parameters: left.map((j) => nth(names, j)),
+      })
       kept = kept.filter((j) => !left.includes(j))
       continue
     }
-    const weak = kept.filter((j) => a.parameters[j].status !== 'identified')
+    const weak = kept.filter((j) => nth(a.parameters, j).status !== 'identified')
     if (weak.length === 0) break
-    for (const j of weak) dropped.set(j, a.parameters[j])
+    for (const j of weak) dropped.set(j, nth(a.parameters, j))
     kept = kept.filter((j) => !weak.includes(j))
   }
   return { fitted, a, kept, failures, dropped }
@@ -991,16 +1004,17 @@ function stringsFitResult(model: Model, options: RangeStringOptions, refit: Refi
   const n = rows.length
   const level = options.confidenceLevel ?? rangeStringDefaults.confidenceLevel
   const { theta, predicted, iterations } = fitted
-  const residuals = rows.map(
-    (x, i): RangeStringResidual => ({
+  const residuals = rows.map((x, i): RangeStringResidual => {
+    const value = nth(predicted, i)
+    return {
       kind: x.kind,
       range: x.range,
       observed: x.value,
-      predicted: predicted[i],
-      residual: predicted[i] - x.value,
-      standardized: (predicted[i] - x.value) / x.sigma,
-    }),
-  )
+      predicted: value,
+      residual: value - x.value,
+      standardized: (value - x.value) / x.sigma,
+    }
+  })
   const chiSquare = residuals.reduce((s, r) => s + r.standardized ** 2, 0)
   const dof = n - kept.length
   const { residualConfidenceLevel = rangeStringDefaults.residualConfidenceLevel } = options
@@ -1017,7 +1031,7 @@ function stringsFitResult(model: Model, options: RangeStringOptions, refit: Refi
   // hold the sampling error of the data, not the error of its nominal value.
   const used = names.slice(0, model.active.length)
   const heldWithInformation = used.filter(
-    (name, j) => !kept.includes(j) && (failed.includes(name) || final[j].status === 'weak'),
+    (name, j) => !kept.includes(j) && (failed.includes(name) || nth(final, j).status === 'weak'),
   )
   const conditional = kept.length > 0 && heldWithInformation.length > 0
   const intervalsTrusted = consistent !== false && !conditional

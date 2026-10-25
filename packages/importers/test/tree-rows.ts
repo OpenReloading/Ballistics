@@ -1,4 +1,5 @@
 import { parseXml, type XmlElement } from '../src/xml.ts'
+import { defined } from './defined.ts'
 
 // Reference reader for the one-pass worksheet reader: the element-tree code that src/workbook.ts
 // used before it read shared strings and worksheets in one pass. Budgets and the cell column
@@ -29,7 +30,8 @@ function cellText(c: XmlElement, strings: string[]): string {
   } else {
     const v = elements(c, 'v')[0]
     text = v ? textOf(v) : ''
-    if (c.attributes.t === 's' && text !== '') return strings[Number(text)]
+    if (c.attributes.t === 's' && text !== '')
+      return defined(strings[Number(text)], 'shared string')
     if (c.attributes.t === 'b' && text.trim() === '0') return ''
   }
   return clean(text)
@@ -46,8 +48,9 @@ export function treeRows(xml: string, strings: string[]): string[][] {
   for (const row of elements(elements(parseXml(xml), 'sheetData')[0], 'row')) {
     const cells: string[] = []
     for (const c of elements(row, 'c')) {
-      const m = c.attributes.r === undefined ? null : /^([A-Z]{1,3})[0-9]+$/.exec(c.attributes.r)
-      const column = m ? columnOf(m[1]) : cells.length + 1
+      const letters =
+        c.attributes.r === undefined ? undefined : /^([A-Z]{1,3})[0-9]+$/.exec(c.attributes.r)?.[1]
+      const column = letters === undefined ? cells.length + 1 : columnOf(letters)
       while (cells.length < column - 1) cells.push('')
       cells.push(cellText(c, strings))
     }

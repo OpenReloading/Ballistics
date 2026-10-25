@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest'
 import { parseShotViewWorkbook, readWorkbook } from '../src/index.ts'
 import { maxCellCharacters, maxCells } from '../src/limits.ts'
+import { defined } from './defined.ts'
 import { shotViewSheetEnglish, shotViewSheetGerman } from './fixtures.ts'
 import {
   blank,
@@ -97,8 +98,8 @@ describe('readWorkbook on .xls', () => {
   it('reads empty texts written as LabelSst cells', async () => {
     const book = await readWorkbook(xls(sheets, { empty: true }))
     const twin = await readWorkbook(xlsx(sheets))
-    expect(book.worksheets[0].rows.flat().length).toBeGreaterThan(
-      twin.worksheets[0].rows.flat().length,
+    expect(book.worksheets[0]?.rows.flat().length).toBeGreaterThan(
+      defined(twin.worksheets[0]).rows.flat().length,
     )
     expect(parseShotViewWorkbook(book)).toEqual(parseShotViewWorkbook(twin))
   })
@@ -129,7 +130,7 @@ describe('readWorkbook on .xls', () => {
       mulBlank(0, 21, 2),
     ]
     const r = await readWorkbook(xls([{ name: 'S', records: cells }]))
-    expect(r.worksheets[0].rows).toEqual([
+    expect(r.worksheets[0]?.rows).toEqual([
       [
         'Speed',
         'Δv',
@@ -174,14 +175,14 @@ describe('readWorkbook on .xls', () => {
     const cells = strings.map((_, k) => labelSst(0, k, k))
     const stream = workbookStream([{ name: 'S', records: cells }], { strings, sstChunk: 24 })
     const r = await readWorkbook(new Uint8Array(compoundFile([{ name: 'Workbook', data: stream }])))
-    expect(r.worksheets[0].rows).toEqual([['x'.repeat(18), long, 'rich', 'phon', 'both', 'tail']])
+    expect(r.worksheets[0]?.rows).toEqual([['x'.repeat(18), long, 'rich', 'phon', 'both', 'tail']])
     expect(sst(strings, 24).length).toBeGreaterThan(sst(strings).length)
     const continued = [
       formula(0, 0, formulaOther(0)),
       stringRecord(0x0207, Buffer.alloc(0), 'continued string', 8),
     ]
     const s = await readWorkbook(xls([{ name: 'S', records: continued }]))
-    expect(s.worksheets[0].rows).toEqual([['continued string']])
+    expect(s.worksheets[0]?.rows).toEqual([['continued string']])
   })
 
   it('splits a string right after its header', async () => {
@@ -190,7 +191,7 @@ describe('readWorkbook on .xls', () => {
       xls([{ name: 'S', records: [labelSst(0, 0, 0)] }], { strings: ['\u0394bc'], sstChunk: 11 }),
     )
     // the header's flag is 0, the Continue record's flag byte 1
-    expect(r.worksheets[0].rows).toEqual([['\u0394bc']])
+    expect(r.worksheets[0]?.rows).toEqual([['\u0394bc']])
   })
 
   it('leaves out embedded charts and chart sheets and reads hidden worksheets', async () => {
@@ -313,7 +314,7 @@ describe('readWorkbook .xls refusals', () => {
             { name: 'A', rows },
             { name: 'B', rows },
           ],
-          { positions: (p) => [p[0], p[0]] },
+          { positions: (p) => [defined(p[0]), defined(p[0])] },
         ),
       ),
     ).rejects.toThrow('XLS worksheet 2 starts where an earlier worksheet starts')
@@ -322,7 +323,7 @@ describe('readWorkbook .xls refusals', () => {
     await expect(
       fail(
         xls([{ name: 'A', records: nested }, { name: 'B' }], {
-          positions: (p) => [p[0], p[0] + 20],
+          positions: (p) => [defined(p[0]), defined(p[0]) + 20],
         }),
       ),
     ).rejects.toThrow('XLS sheet substreams overlap')
@@ -337,7 +338,7 @@ describe('readWorkbook .xls refusals', () => {
             { name: 'A', records: chart },
             { name: 'B', rows: [['b', 'c', 'd', 'e']] },
           ],
-          { positions: (p) => [p[0], p[0] + 28] },
+          { positions: (p) => [defined(p[0]), defined(p[0]) + 28] },
         ),
       ),
     ).rejects.toThrow('XLS sheet substreams overlap')

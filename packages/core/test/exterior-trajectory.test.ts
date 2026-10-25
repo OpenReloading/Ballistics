@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { nth } from '../src/errors.ts'
 import {
   aerodynamicJump,
   airAt,
@@ -82,29 +83,29 @@ describe('vacuum', () => {
         { coriolis: false, relativeTolerance: 1e-10 },
       )
       const u = [Math.cos(th), Math.sin(th)]
-      const n = [-u[1], u[0]]
-      const p = [-hs * n[0], -hs * n[1], -os]
+      const n = [-nth(u, 1), nth(u, 0)]
+      const p = [-hs * nth(n, 0), -hs * nth(n, 1), -os]
       const bu = Math.cos(bore.elevationAngle) * Math.cos(bore.windageAngle)
       const bn = Math.sin(bore.elevationAngle)
       const v = [
-        v0 * (bu * u[0] + bn * n[0]),
-        v0 * (bu * u[1] + bn * n[1]),
+        v0 * (bu * nth(u, 0) + bn * nth(n, 0)),
+        v0 * (bu * nth(u, 1) + bn * nth(n, 1)),
         v0 * Math.cos(bore.elevationAngle) * Math.sin(bore.windageAngle),
       ]
       expect(r.points.map((q) => q.range)).toEqual(ranges)
       for (const q of r.points) {
-        const b = v[0] * u[0] + v[1] * u[1]
-        const t = (2 * q.range) / (b + Math.sqrt(b * b - 2 * g * u[1] * q.range))
-        const x = p[0] + v[0] * t
-        const y = p[1] + v[1] * t - (g * t * t) / 2
+        const b = nth(v, 0) * nth(u, 0) + nth(v, 1) * nth(u, 1)
+        const t = (2 * q.range) / (b + Math.sqrt(b * b - 2 * g * nth(u, 1) * q.range))
+        const x = nth(p, 0) + nth(v, 0) * t
+        const y = nth(p, 1) + nth(v, 1) * t - (g * t * t) / 2
         expect(Math.abs(q.time - t)).toBeLessThanOrEqual(1e-12 * Math.max(t, 1e-3))
-        expect(Math.abs(q.height - (x * n[0] + y * n[1]))).toBeLessThan(1e-9)
-        expect(Math.abs(q.windage - (p[2] + v[2] * t))).toBeLessThan(1e-9)
-        expect(Math.abs(q.velocity ** 2 - (v0 ** 2 - 2 * g * (y - p[1])))).toBeLessThan(1e-6)
-        const energy = 0.5 * base.projectile.mass * (v0 ** 2 - 2 * g * (y - p[1]))
+        expect(Math.abs(q.height - (x * nth(n, 0) + y * nth(n, 1)))).toBeLessThan(1e-9)
+        expect(Math.abs(q.windage - (nth(p, 2) + nth(v, 2) * t))).toBeLessThan(1e-9)
+        expect(Math.abs(q.velocity ** 2 - (v0 ** 2 - 2 * g * (y - nth(p, 1))))).toBeLessThan(1e-6)
+        const energy = 0.5 * base.projectile.mass * (v0 ** 2 - 2 * g * (y - nth(p, 1)))
         expect(Math.abs(q.energy / energy - 1)).toBeLessThan(1e-9)
         expect(
-          Math.abs(q.pathAngle - Math.atan2(v[1] - g * t, Math.hypot(v[0], v[2]))),
+          Math.abs(q.pathAngle - Math.atan2(nth(v, 1) - g * t, Math.hypot(nth(v, 0), nth(v, 2)))),
         ).toBeLessThan(1e-9)
         if (q.range === 0) {
           expect(q.elevationHold).toBe(0)
@@ -274,7 +275,8 @@ describe('drag only, one dimension', () => {
       [100, 110, 120, 130],
       { ...flat, relativeTolerance: 1e-10 },
     )
-    const [start, ...rest] = r.points
+    const start = nth(r.points, 0)
+    const rest = r.points.slice(1)
     const va0 = start.velocity + w
     for (const q of rest) {
       const va = va0 / (1 + k * va0 * (q.time - start.time))
@@ -307,11 +309,11 @@ describe('drag only, one dimension', () => {
         [1500],
         { ...flat, relativeTolerance, absoluteTolerance: relativeTolerance },
       )
-      const err = Math.abs(r.points[0].time - exact)
+      const err = Math.abs(nth(r.points, 0).time - exact)
       expect(err).toBeLessThan(10 * relativeTolerance * exact)
       return err
     })
-    expect(errors[3]).toBeLessThan(errors[1] / 1000)
+    expect(errors[3]).toBeLessThan(nth(errors, 1) / 1000)
   })
 
   it('keeps the error proportional to the tolerance with tabulated drag (G1)', () => {
@@ -319,22 +321,28 @@ describe('drag only, one dimension', () => {
     for (const [v0, elevation, range] of [
       [300, 0.1178, 1200],
       [450, 0.06, 1000],
-    ]) {
+    ] as const) {
       const shot: TrajectoryInput = {
         ...g1,
         muzzleVelocity: v0,
         zero: { elevationAngle: elevation, windageAngle: 0 },
       }
       const at = (tol: number) =>
-        trajectory(shot, [range], { relativeTolerance: tol, absoluteTolerance: tol, maxSteps: 1e6 })
-          .points[0].height
+        nth(
+          trajectory(shot, [range], {
+            relativeTolerance: tol,
+            absoluteTolerance: tol,
+            maxSteps: 1e6,
+          }).points,
+          0,
+        ).height
       const exact = at(1e-13)
       const errors = [1e-6, 1e-8, 1e-10].map((tol) => {
         const err = Math.abs(at(tol) - exact)
         expect(err).toBeLessThan(tol * range)
         return err
       })
-      if (v0 === 300) expect(errors[2]).toBeLessThan(errors[0] / 1000)
+      if (v0 === 300) expect(errors[2]).toBeLessThan(nth(errors, 0) / 1000)
     }
   })
 })
@@ -393,7 +401,7 @@ describe('wind', () => {
     )
     left.points.forEach((p, k) => {
       expect(p.windage).toBeGreaterThan(0)
-      expect(Math.abs(p.windage + right.points[k].windage)).toBeLessThan(1e-12)
+      expect(Math.abs(p.windage + nth(right.points, k).windage)).toBeLessThan(1e-12)
     })
   })
 
@@ -411,7 +419,7 @@ describe('wind', () => {
       all,
     )
     gust.points.forEach((p, k) => {
-      const q = calm.points[k]
+      const q = nth(calm.points, k)
       if (p.range <= 500) {
         expect(Math.abs(p.height - q.height)).toBeLessThan(1e-12)
         expect(p.windage).toBe(q.windage)
@@ -424,7 +432,9 @@ describe('wind', () => {
       { endDistance: 500, speed: 0, fromDirection: 0 },
       { endDistance: Infinity, speed: 8, fromDirection: 90 * deg },
     ]
-    const [inside, beyond] = trajectory({ ...still, lookAngle: 30 * deg, wind }, [560, 600]).points
+    const { points } = trajectory({ ...still, lookAngle: 30 * deg, wind }, [560, 600])
+    const inside = nth(points, 0)
+    const beyond = nth(points, 1)
     expect(inside.distance).toBeLessThan(500)
     expect(inside.windage).toBe(0)
     expect(beyond.distance).toBeGreaterThan(500)
@@ -443,7 +453,7 @@ describe('wind', () => {
       wind,
       zero: { elevationAngle: 0.01, windageAngle: 0 },
     }
-    const [q] = trajectory(shot, [1000]).points
+    const q = nth(trajectory(shot, [1000]).points, 0)
     expect(q.distance).toBeLessThan(-1)
     expect(q.windage).toBeLessThan(-1e-4)
   })
@@ -455,8 +465,8 @@ describe('wind', () => {
       { ...up, wind: [{ endDistance: Infinity, speed: 10, fromDirection: 0 }] },
       [500],
     )
-    expect(head.points[0].windage).toBe(0)
-    expect(head.points[0].height - calm.points[0].height).toBeGreaterThan(0.01)
+    expect(nth(head.points, 0).windage).toBe(0)
+    expect(nth(head.points, 0).height - nth(calm.points, 0).height).toBeGreaterThan(0.01)
   })
 })
 
@@ -466,7 +476,7 @@ describe('Earth rotation', () => {
     const s = Math.sin(45 * deg)
     const close = (a: number[], b: number[]) =>
       a.forEach((x, i) => {
-        expect(Math.abs(x - b[i])).toBeLessThan(1e-18)
+        expect(Math.abs(x - nth(b, i))).toBeLessThan(1e-18)
       })
     close(earthRotation(45 * deg, 0), [omega * c, omega * s, 0])
     close(earthRotation(45 * deg, 90 * deg), [0, omega * s, -omega * c])
@@ -574,7 +584,7 @@ describe('Earth rotation', () => {
 
   it('deflects with the signs of the hemisphere and the azimuth', () => {
     const at = (latitude?: number, azimuth?: number) =>
-      trajectory({ ...base, site: { latitude, azimuth } }, [1000]).points[0]
+      nth(trajectory({ ...base, site: { latitude, azimuth } }, [1000]).points, 0)
     const off = at()
     const north = at(45 * deg, 0)
     expect(north.windage).toBeGreaterThan(off.windage)
@@ -613,17 +623,17 @@ describe('convergence', () => {
 
   it('agrees with an independent fixed-step Runge-Kutta reference', () => {
     const r = trajectory(shot, ranges, { relativeTolerance: 1e-12, absoluteTolerance: 1e-14 })
-    const s = g7.bands[0].ballisticCoefficient
+    const s = nth(g7.bands, 0).ballisticCoefficient
     const f = (y: number[]) => {
-      const air = airAt(base.air, y[1])
-      const v = Math.hypot(y[3], y[4], y[5])
+      const air = airAt(base.air, nth(y, 1))
+      const v = Math.hypot(nth(y, 3), nth(y, 4), nth(y, 5))
       const k =
         ((Math.PI / 8) *
           airDensity(air) *
           dragCoefficient(dragTables.G7, v / speedOfSound(air)) *
           v) /
         s
-      return [y[3], y[4], y[5], -k * y[3], -k * y[4] - g, -k * y[5]]
+      return [nth(y, 3), nth(y, 4), nth(y, 5), -k * nth(y, 3), -k * nth(y, 4) - g, -k * nth(y, 5)]
     }
     const hs = base.firearm.sightHeight
     const e = r.bore.elevationAngle
@@ -636,18 +646,20 @@ describe('convergence', () => {
       850 * Math.cos(e) * Math.sin(r.bore.windageAngle),
     ]
     const dt = 1e-5
-    const axpy = (a: number[], b: number[], c: number) => a.map((ai, i) => ai + c * b[i])
+    const axpy = (a: number[], b: number[], c: number) => a.map((ai, i) => ai + c * nth(b, i))
     let j = 0
     while (j < ranges.length) {
       const k1 = f(y)
       const k2 = f(axpy(y, k1, dt / 2))
       const k3 = f(axpy(y, k2, dt / 2))
       const k4 = f(axpy(y, k3, dt))
-      const next = y.map((yi, i) => yi + (dt / 6) * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]))
-      while (j < ranges.length && next[0] >= ranges[j]) {
-        const w = (ranges[j] - y[0]) / (next[0] - y[0])
-        const height = y[1] + w * (next[1] - y[1])
-        expect(Math.abs(height - r.points[j].height)).toBeLessThan(1e-6)
+      const next = y.map(
+        (yi, i) => yi + (dt / 6) * (nth(k1, i) + 2 * nth(k2, i) + 2 * nth(k3, i) + nth(k4, i)),
+      )
+      while (j < ranges.length && nth(next, 0) >= nth(ranges, j)) {
+        const w = (nth(ranges, j) - nth(y, 0)) / (nth(next, 0) - nth(y, 0))
+        const height = nth(y, 1) + w * (nth(next, 1) - nth(y, 1))
+        expect(Math.abs(height - nth(r.points, j).height)).toBeLessThan(1e-6)
         j++
       }
       y = next
@@ -668,7 +680,7 @@ describe('zeroing', () => {
     const r = trajectory(shot, [300])
     expect(r.omitted).toEqual([])
     expect(r.stability).toBeGreaterThan(1)
-    const [q] = r.points
+    const q = nth(r.points, 0)
     expect(q.spinDrift).toBeGreaterThan(0)
     // right-hand twist, wind from the right (60 deg): up
     expect(q.jump).toBeGreaterThan(0)
@@ -680,7 +692,7 @@ describe('zeroing', () => {
     const cold = { ...standardAtmosphere(0), temperature: 263.15 }
     const warm = { ...standardAtmosphere(0), temperature: 303.15 }
     const r = trajectory({ ...base, air: warm, zero: { range: 300, air: cold } }, [300])
-    expect(r.points[0].height).toBeGreaterThan(1e-4)
+    expect(nth(r.points, 0).height).toBeGreaterThan(1e-4)
   })
 
   it('converges for long zeros with tabulated drag at default and loose tolerances', () => {
@@ -688,10 +700,13 @@ describe('zeroing', () => {
     for (const range of [800, 1000, 1200])
       for (const options of [{}, { relativeTolerance: 1e-4, absoluteTolerance: 1e-4 }]) {
         const bore = zeroAngles({ ...shot, zero: { range } }, options)
-        const [q] = trajectory({ ...shot, zero: bore }, [range], {
-          relativeTolerance: 1e-12,
-          absoluteTolerance: 1e-12,
-        }).points
+        const q = nth(
+          trajectory({ ...shot, zero: bore }, [range], {
+            relativeTolerance: 1e-12,
+            absoluteTolerance: 1e-12,
+          }).points,
+          0,
+        )
         expect(Math.abs(q.height)).toBeLessThan('relativeTolerance' in options ? 1e-3 : 1e-5)
       }
   })
@@ -713,7 +728,7 @@ describe('zeroing', () => {
       air: warm,
       zero: { range: 300, air: cold, wind: twisted.wind },
     })
-    const [q] = trajectory({ ...twisted, air: cold, zero: bore }, [300]).points
+    const q = nth(trajectory({ ...twisted, air: cold, zero: bore }, [300]).points, 0)
     expect(Math.abs(q.height)).toBeLessThan(1e-6)
     expect(Math.abs(q.windage)).toBeLessThan(1e-6)
   })
@@ -762,9 +777,9 @@ describe('spin drift and jump in the trajectory', () => {
     for (const hand of ['right', 'left'] as const)
       for (const from of [90 * deg, 270 * deg]) {
         const shot = twist(hand, from)
-        const [on] = trajectory(shot, [500]).points
-        const [noDrift] = trajectory(shot, [500], { spinDrift: false }).points
-        const [noJump] = trajectory(shot, [500], { jump: false }).points
+        const on = nth(trajectory(shot, [500]).points, 0)
+        const noDrift = nth(trajectory(shot, [500], { spinDrift: false }).points, 0)
+        const noJump = nth(trajectory(shot, [500], { jump: false }).points, 0)
         expect(on.windage - noDrift.windage).toBeCloseTo(on.spinDrift, 12)
         expect(on.height - noJump.height).toBeCloseTo(on.jump, 12)
         expect(Math.sign(on.spinDrift)).toBe(hand === 'right' ? 1 : -1)
@@ -782,15 +797,15 @@ describe('spin drift and jump in the trajectory', () => {
     const { length = 0, diameter } = base.projectile
     // wind from 270 deg blows to the right at 4 m/s
     const angle = aerodynamicJump(r.stability ?? 0, length / diameter, 4, 'right')
-    expect(r.points[0].jump).toBeCloseTo(500 * Math.tan(angle), 12)
-    expect(r.points[0].jump).toBeLessThan(0)
+    expect(nth(r.points, 0).jump).toBeCloseTo(500 * Math.tan(angle), 12)
+    expect(nth(r.points, 0).jump).toBeLessThan(0)
   })
 
   it('omits spin drift and jump without a twist hand', () => {
     const r = trajectory({ ...base, firearm: { sightHeight: 0.05, twist: 0.254 } }, [300])
     expect(r.omitted).toEqual(expect.arrayContaining(['spinDrift', 'jump']))
     expect(r.stability).toBeGreaterThan(1)
-    expect(r.points[0].spinDrift).toBe(0)
+    expect(nth(r.points, 0).spinDrift).toBe(0)
   })
 })
 
@@ -856,7 +871,7 @@ describe('outputs and stops', () => {
       firearm: { sightHeight: 0 },
       lookAngle: -Math.PI / 2,
     }
-    const [q] = trajectory(shot, [1500], { coriolis: false }).points
+    const q = nth(trajectory(shot, [1500], { coriolis: false }).points, 0)
     const terminal = Math.sqrt(
       (8 * mass * g) / (airDensity(base.air) * 0.3 * Math.PI * diameter ** 2),
     )
@@ -890,8 +905,9 @@ describe('boundaries closer than the event resolution', () => {
   /** The next double above a positive x. */
   const next = (x: number) => {
     const b = new Float64Array([x])
-    new BigInt64Array(b.buffer)[0]++
-    return b[0]
+    const bits = new BigInt64Array(b.buffer)
+    bits[0] = nth(bits, 0) + 1n
+    return nth(b, 0)
   }
   const mass = 0.01134
   const diameter = 0.00782
@@ -903,7 +919,7 @@ describe('boundaries closer than the event resolution', () => {
   /** The curve with an extra node, carrying the Cd of node k, at `at` just above it. */
   const extra = (curve: DragTable, k: number, at: number): DragTable => [
     ...curve.slice(0, k + 1),
-    [at, curve[k][1]],
+    [at, nth(curve, k)[1]],
     ...curve.slice(k + 1),
   ]
   const g1Shot = (
@@ -918,7 +934,7 @@ describe('boundaries closer than the event resolution', () => {
     ...rest,
   })
   const at1000 = (shot: TrajectoryInput, options = {}) =>
-    trajectory(shot, [1000], { ...o, ...options }).points[0]
+    nth(trajectory(shot, [1000], { ...o, ...options }).points, 0)
 
   it('reads the right segment after an extra node one ulp above Mach 2.15', () => {
     const k = own.findIndex(([m]) => m === 2.15)
@@ -967,11 +983,11 @@ describe('boundaries closer than the event resolution', () => {
     const ranges = [50, 100, 150, 200]
     const ref = trajectory(steep(curve), ranges, o).points
     expect(Math.min(...ref.map((p) => p.mach))).toBeLessThan(0.05)
-    expect(ref[3].mach).toBeGreaterThan(0.25)
+    expect(nth(ref, 3).mach).toBeGreaterThan(0.25)
     for (const k of [1, 2]) {
-      const t = trajectory(steep(extra(curve, k, next(curve[k][0]))), ranges, o).points
+      const t = trajectory(steep(extra(curve, k, next(nth(curve, k)[0]))), ranges, o).points
       for (const [i, p] of t.entries())
-        expect(Math.abs(p.velocity - ref[i].velocity)).toBeLessThan(1e-6)
+        expect(Math.abs(p.velocity - nth(ref, i).velocity)).toBeLessThan(1e-6)
     }
   })
 
@@ -1095,14 +1111,14 @@ describe('boundaries closer than the event resolution', () => {
       ],
     })
     for (const [i, p] of banded.entries())
-      expect(Math.abs(p.velocity / ref[i].velocity - 1)).toBeLessThan(1e-7)
+      expect(Math.abs(p.velocity / nth(ref, i).velocity - 1)).toBeLessThan(1e-7)
   })
 
   describe('steep narrow drag segments', () => {
     /** The curve with the Cd of node k times f from w above that node on: a step of width w. */
     const step = (k: number, w: number, f = 1.2): DragTable => [
       ...own.slice(0, k + 1),
-      [own[k][0] + w, own[k][1] * f],
+      [nth(own, k)[0] + w, nth(own, k)[1] * f],
       ...own.slice(k + 1),
     ]
     const bore = { zero: { elevationAngle: 0.002, windageAngle: 0 } }
@@ -1175,7 +1191,7 @@ describe('boundaries closer than the event resolution', () => {
       const ref = trajectory(shot, ranges, { ...o, ...tight }).points
       expect(Math.min(...v.map((p) => p.mach))).toBeLessThan(0.05)
       for (const [i, p] of v.entries())
-        expect(Math.abs(p.velocity - ref[i].velocity)).toBeLessThan(1e-5)
+        expect(Math.abs(p.velocity - nth(ref, i).velocity)).toBeLessThan(1e-5)
     })
 
     it('finishes 20 % steps 1e-9 Mach wide in the modified point mass', () => {

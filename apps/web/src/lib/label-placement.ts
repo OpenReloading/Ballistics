@@ -1,4 +1,6 @@
 /** Placement of overlay labels in view units, clear of circles, segments and other labels. */
+
+import { nth } from './nth.ts'
 import type { Point } from './target-geometry.ts'
 
 /** A label box in view units: top left, width, height. */
@@ -27,10 +29,11 @@ const boxHitsCircle = (b: LabelBox, c: { x: number; y: number; r: number }, gap:
 function boxHitsSegment(b: LabelBox, [p, q]: [Point, Point]): boolean {
   const [dx, dy] = [q.x - p.x, q.y - p.y]
   let [t0, t1] = [0, 1]
-  for (const [d, lo, hi] of [
+  const axes: [number, number, number][] = [
     [dx, b.x - p.x, b.x + b.w - p.x],
     [dy, b.y - p.y, b.y + b.h - p.y],
-  ]) {
+  ]
+  for (const [d, lo, hi] of axes) {
     if (d === 0) {
       if (lo > 0 || hi < 0) return false
       continue
@@ -83,7 +86,7 @@ export function placeLabel(
     pick((c) => c.near && free(c.box) && inside(c.box)) ??
     pick((c) => clear(c.box) && inside(c.box)) ??
     pick((c) => free(c.box)) ??
-    candidates[0].box
+    nth(candidates, 0).box
   scene.boxes.push(box)
   return box
 }

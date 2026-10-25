@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { frameOf, rebase, targetToView } from '../src/lib/target-editor.ts'
 import { notePlaceholders, resolveNote } from '../src/lib/target-notes.ts'
 import { presetUnits } from '../src/lib/units.ts'
+import { defined } from './defined.ts'
 
 const metric = presetUnits('metric-grains')
 const group = (x3: number): ShotGroup => ({
@@ -41,7 +42,7 @@ describe('note placeholders', () => {
       '{nope} {extremeSpread.km} {name',
     )
     expect(resolveNote('{name} {meanRadius.length}', undefined, metric)).toBe('n/a n/a')
-    const one = { ...group(0), shots: [group(0).shots[0]] }
+    const one = { ...group(0), shots: [defined(group(0).shots[0])] }
     expect(resolveNote('{extremeSpread.moa}', one, metric)).toBe('n/a')
   })
 

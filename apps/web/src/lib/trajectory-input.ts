@@ -12,6 +12,7 @@ import {
   trajectory,
 } from '@open-reloading/core'
 import type { FieldSpec } from './field-spec.ts'
+import { nth } from './nth.ts'
 import { metersPerSecondPerMph } from './units.ts'
 
 /** Points of the chart, evenly spaced from 0 to the largest range. */
@@ -173,7 +174,7 @@ export function rangeSteps(max: number, step: number): number[] {
   if (n + 1 > maxTableRows)
     throw new RangeError(`More than ${maxTableRows} rows; choose a larger step.`)
   const list = Array.from({ length: n + 1 }, (_, k) => k * step)
-  if (Math.abs(list[n] - max) <= 1e-9 * max) list[n] = max
+  if (Math.abs(nth(list, n) - max) <= 1e-9 * max) list[n] = max
   else list.push(max)
   if (list.length > maxTableRows)
     throw new RangeError(`More than ${maxTableRows} rows; choose a larger step.`)
@@ -300,7 +301,7 @@ export function trajectoryResult(
   twistHand: 'right' | 'left',
 ): TrajectoryResult {
   const table = rangeSteps(values.maxRange ?? Number.NaN, values.rangeStep ?? Number.NaN)
-  const max = table[table.length - 1]
+  const max = nth(table, table.length - 1)
   const chart = Array.from({ length: chartPoints }, (_, k) => (k * max) / (chartPoints - 1))
   const shot = shotFromValues(values, projectile, twistHand)
   const t = trajectory(shot, [...table, ...chart])

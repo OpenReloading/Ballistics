@@ -13,6 +13,7 @@ import {
   withCharge,
 } from '../src/lib/measurements.ts'
 import { canonicalJson } from '../src/lib/user-data.ts'
+import { defined, missing } from './defined.ts'
 
 const shot = (value: number, excluded?: string): Shot => ({
   velocity: { value },
@@ -41,13 +42,23 @@ describe('chargeRows', () => {
   it('pools the strings of a charge and compares the mean with the simulated velocity', () => {
     const rows = chargeRows(strings, steps)
     expect(rows.map((r) => r.charge)).toEqual([40 * gr, 41 * gr, 42 * gr])
-    const [a, b, c] = rows
-    expect(a.velocityStats).toMatchObject({ count: 3, excluded: 0, mean: 810, extremeSpread: 20 })
+    const [a = missing(), b = missing(), c = missing()] = rows
+    expect(a.velocityStats).toMatchObject({
+      count: 3,
+      excluded: 0,
+      mean: 810,
+      extremeSpread: 20,
+    })
     expect(a.velocityStats?.standardDeviation).toBeCloseTo(10, 12)
     expect(a.simulatedVelocity).toBe(800)
     expect(a.velocityDifference).toBeCloseTo(10, 12)
     expect(a.differencePercent).toBeCloseTo(1.25, 12)
-    expect(b.velocityStats).toMatchObject({ count: 2, excluded: 1, mean: 820, extremeSpread: 10 })
+    expect(b.velocityStats).toMatchObject({
+      count: 2,
+      excluded: 1,
+      mean: 820,
+      extremeSpread: 10,
+    })
     expect(b.velocityStats?.standardDeviation).toBeCloseTo(Math.sqrt(50), 12)
     expect(b.velocityDifference).toBeCloseTo(0, 12)
     expect(b.excludedShots).toEqual([{ velocity: 790, reason: 'flyer' }])
@@ -66,17 +77,17 @@ describe('chargeRows', () => {
       steps,
     )
     expect(rows.map((r) => r.charge)).toEqual([40 * gr, 43 * gr])
-    expect(rows[0].velocityStats).toBeUndefined()
-    expect(rows[0].excludedShots).toEqual([{ velocity: 805, reason: 'misread' }])
-    expect(rows[0].velocityDifference).toBeUndefined()
-    expect(rows[1].velocityStats).toMatchObject({
+    expect(defined(rows[0]).velocityStats).toBeUndefined()
+    expect(defined(rows[0]).excludedShots).toEqual([{ velocity: 805, reason: 'misread' }])
+    expect(defined(rows[0]).velocityDifference).toBeUndefined()
+    expect(defined(rows[1]).velocityStats).toMatchObject({
       count: 1,
       mean: 850,
       standardDeviation: undefined,
       extremeSpread: 0,
     })
-    expect(rows[1].simulatedVelocity).toBeUndefined()
-    expect(rows[1].differencePercent).toBeUndefined()
+    expect(defined(rows[1]).simulatedVelocity).toBeUndefined()
+    expect(defined(rows[1]).differencePercent).toBeUndefined()
   })
 
   it('matches a charge within 0.1 mg and skips a step without a result', () => {
@@ -84,9 +95,10 @@ describe('chargeRows', () => {
       [{ charge: 40 * gr + 5e-8, shots: [shot(801)] }],
       [{ charge: 40 * gr, muzzleVelocity: undefined }, ...steps.slice(1)],
     )
-    expect(rows[0].simulatedVelocity).toBeUndefined()
+    expect(defined(rows[0]).simulatedVelocity).toBeUndefined()
     expect(
-      chargeRows([{ charge: 41 * gr + 5e-8, shots: [shot(821)] }], steps)[0].simulatedVelocity,
+      defined(chargeRows([{ charge: 41 * gr + 5e-8, shots: [shot(821)] }], steps)[0])
+        .simulatedVelocity,
     ).toBe(820)
   })
 })
@@ -162,15 +174,15 @@ describe('sessionOf', () => {
       provenance: { kind: 'measured' as const, sources: [{}] as [object] },
     }
     const t = sessionOf('x.csv', { ...data, session: untitled }, [], { id, now })
-    expect(t.data.provenance.sources[0].title).toBe('x.csv')
+    expect(defined(t.data.provenance.sources[0]).title).toBe('x.csv')
   })
 
   it('maps a string to a charge and back to not used', () => {
     const string = make([undefined, undefined]).data.strings[0]
-    const mapped = withCharge(string, 41 * gr)
+    const mapped = withCharge(defined(string), 41 * gr)
     expect(stringCharge(mapped)).toBeCloseTo(41 * gr, 12)
     expect(withCharge(mapped, undefined)).toEqual(string)
-    expect(stringCharge(string)).toBeUndefined()
+    expect(stringCharge(defined(string))).toBeUndefined()
   })
 
   it('names the load on the mapped strings that name none, and no other', () => {
@@ -206,7 +218,7 @@ describe('seriesFlatSpots', () => {
     )
     const r = seriesFlatSpots(rows)
     expect(r?.flatSpots).toHaveLength(1)
-    expect(r?.flatSpots[0].counts).toEqual([5, 5, 5])
+    expect(defined(r?.flatSpots[0]).counts).toEqual([5, 5, 5])
   })
 
   it('needs two charges with two shots each', () => {

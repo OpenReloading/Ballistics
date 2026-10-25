@@ -20,7 +20,8 @@ export function LadderFlatSpots({
     const result = seriesFlatSpots(s.rows)
     return result ? [{ id: s.id, name: s.name, result }] : []
   })
-  if (found.length === 0) return null
+  const [first] = found
+  if (!first) return null
   const charge = (kg: number) => withUnit('charge', system, kg)
   // velocity per charge, from the unit scales of the two quantities
   const scale = (q: 'velocity' | 'charge') => system[q].fromSi(1) - system[q].fromSi(0)
@@ -31,7 +32,7 @@ export function LadderFlatSpots({
       <h3>Velocity flat spots</h3>
       <p className="note">
         A flat spot is a statistical observation of the strings fired: neighbouring charges whose
-        slope of mean velocity has a {Math.round(found[0].result.level * 100)} % band that includes
+        slope of mean velocity has a {Math.round(first.result.level * 100)} % band that includes
         zero. Few shots make wide bands. It is not a safety statement and not a charge to load.
       </p>
       {found.map(({ id, name, result }) => (

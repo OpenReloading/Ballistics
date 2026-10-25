@@ -1,6 +1,7 @@
 import type { ShotGroup, TargetSheet } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { beforeEach, expect, it, vi } from 'vitest'
+import { defined } from './defined.ts'
 
 const calls = vi.hoisted(() => ({ n: 0 }))
 vi.mock('@open-reloading/core', async (actual) => {
@@ -36,13 +37,13 @@ beforeEach(() => {
 })
 
 it('statistics are computed once per group object, again only for an edited group', () => {
-  const a = statisticsOf(sheet.groups[0])
-  expect(statisticsOf(sheet.groups[0])).toBe(a)
+  const a = statisticsOf(defined(sheet.groups[0]))
+  expect(statisticsOf(defined(sheet.groups[0]))).toBe(a)
   expect(calls.n).toBe(1)
   const edited = withGroup(sheet, 'g2', (g) => ({ ...g, name: 'renamed' }))
   expect(edited.groups[0]).toBe(sheet.groups[0])
-  statisticsOf(edited.groups[0])
-  statisticsOf(edited.groups[1])
+  statisticsOf(defined(edited.groups[0]))
+  statisticsOf(defined(edited.groups[1]))
   expect(calls.n).toBe(2)
 })
 

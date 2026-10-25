@@ -1,5 +1,10 @@
 /** Multi-scale blob detection on a float image: box-blur scale space, scale-normalised Hessian response, peaks. */
+
+import { nth } from './nth.ts'
 import { clamp } from './raster-ops.ts'
+
+// Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
+const f32 = (a: Float32Array, i: number) => a[i] as number
 
 /** Peaks closer than this (in D) are one. */
 const NMS = 0.8
@@ -24,27 +29,27 @@ export function boxBlur(
   const line = new Float32Array(w + 2 * r + 1)
   for (let y = 0; y < h; y++) {
     const b = y * w
-    line.fill(src[b], 0, r)
+    line.fill(f32(src, b), 0, r)
     line.set(src.subarray(b, b + w), r)
-    line.fill(src[b + w - 1], r + w)
+    line.fill(f32(src, b + w - 1), r + w)
     let acc = 0
-    for (let t = 0; t <= 2 * r; t++) acc += line[t]
+    for (let t = 0; t <= 2 * r; t++) acc += f32(line, t)
     for (let x = 0; x < w; x++) {
       tmp[b + x] = acc * k
-      acc += line[x + 2 * r + 1] - line[x]
+      acc += f32(line, x + 2 * r + 1) - f32(line, x)
     }
   }
   // columns, row by row: a running sum per column keeps the reads in order
   const acc = new Float32Array(w)
   for (let t = -r; t <= r; t++) {
     const b = clamp(t, 0, h - 1) * w
-    for (let x = 0; x < w; x++) acc[x] += tmp[b + x]
+    for (let x = 0; x < w; x++) acc[x] = f32(acc, x) + f32(tmp, b + x)
   }
   for (let y = 0; y < h; y++) {
     const [b, add, sub] = [y * w, Math.min(h - 1, y + r + 1) * w, Math.max(0, y - r) * w]
     for (let x = 0; x < w; x++) {
-      out[b + x] = acc[x] * k
-      acc[x] += tmp[add + x] - tmp[sub + x]
+      out[b + x] = f32(acc, x) * k
+      acc[x] = f32(acc, x) + (f32(tmp, add + x) - f32(tmp, sub + x))
     }
   }
 }
@@ -74,13 +79,14 @@ function response(P: Float32Array, w: number, h: number, r: number): Float32Arra
   const k = sigmaOf(r) ** 2
   for (let y = 1; y < h - 1; y++)
     for (let x = 1, i = y * w + 1; x < w - 1; x++, i++) {
-      const c = B[i]
-      const lxx = B[i - 1] - 2 * c + B[i + 1]
-      const lyy = B[i - w] - 2 * c + B[i + w]
+      const c = f32(B, i)
+      const lxx = f32(B, i - 1) - 2 * c + f32(B, i + 1)
+      const lyy = f32(B, i - w) - 2 * c + f32(B, i + w)
       // the larger eigenvalue; both are negative when it is
       const mid = (lxx + lyy) / 2
       if (mid >= 0) continue
-      const lxy = (B[i + w + 1] - B[i + w - 1] - B[i - w + 1] + B[i - w - 1]) / 4
+      const lxy =
+        (f32(B, i + w + 1) - f32(B, i + w - 1) - f32(B, i - w + 1) + f32(B, i - w - 1)) / 4
       const dd = (lxx - lyy) / 2
       const larger = mid + Math.sqrt(dd * dd + lxy * lxy)
       if (larger < 0) R[i] = -k * larger
@@ -101,15 +107,16 @@ export const space = (P: Float32Array, w: number, h: number, radii: number[]): S
 export function sigmaAt(sp: Space, i: number, count = sp.radii.length): number {
   const { radii, Rs } = sp
   let a = 0
-  for (let k = 1; k < count; k++) if (Rs[k][i] > Rs[a][i]) a = k
-  const sigma = sigmaOf(radii[a])
+  for (let k = 1; k < count; k++) if (f32(nth(Rs, k), i) > f32(nth(Rs, a), i)) a = k
+  const sigma = sigmaOf(nth(radii, a))
   if (a === 0 || a === count - 1) return sigma
-  const [y0, y1, y2] = [Rs[a - 1][i], Rs[a][i], Rs[a + 1][i]]
+  const [y0, y1, y2] = [f32(nth(Rs, a - 1), i), f32(nth(Rs, a), i), f32(nth(Rs, a + 1), i)]
   const den = y0 - 2 * y1 + y2
   if (!(den < 0)) return sigma
   const t = clamp((0.5 * (y0 - y2)) / den, -0.5, 0.5)
   return Math.exp(
-    Math.log(sigma) + (t * (Math.log(sigmaOf(radii[a + 1])) - Math.log(sigmaOf(radii[a - 1])))) / 2,
+    Math.log(sigma) +
+      (t * (Math.log(sigmaOf(nth(radii, a + 1))) - Math.log(sigmaOf(nth(radii, a - 1))))) / 2,
   )
 }
 
@@ -121,8 +128,11 @@ export function peaksOf(sp: Space, inside: Uint8Array, D: number, count = sp.rad
   const { w, h, Rs } = sp
   const M = new Float32Array(w * h)
   for (let a = 0; a < count; a++) {
-    const R = Rs[a]
-    for (let i = 0; i < M.length; i++) if (R[i] > M[i]) M[i] = R[i]
+    const R = nth(Rs, a)
+    for (let i = 0; i < M.length; i++) {
+      const r = f32(R, i)
+      if (r > f32(M, i)) M[i] = r
+    }
   }
   const cand = localMaxima(M, inside, w, h)
   cand.sort((a, b) => b.v - a.v)
@@ -131,8 +141,8 @@ export function peaksOf(sp: Space, inside: Uint8Array, D: number, count = sp.rad
     const [x, y] = [c.i % w, Math.floor(c.i / w)]
     if (out.some((p) => (p.x - x) ** 2 + (p.y - y) ** 2 < (NMS * D) ** 2)) continue
     out.push({
-      x: x + parabolaShift(M[c.i - 1], c.v, M[c.i + 1]),
-      y: y + parabolaShift(M[c.i - w], c.v, M[c.i + w]),
+      x: x + parabolaShift(f32(M, c.i - 1), c.v, f32(M, c.i + 1)),
+      y: y + parabolaShift(f32(M, c.i - w), c.v, f32(M, c.i + w)),
       response: c.v,
       sigma: sigmaAt(sp, c.i, count),
     })
@@ -150,7 +160,7 @@ function localMaxima(
   const cand: Array<{ i: number; v: number }> = []
   for (let y = 1; y < h - 1; y++)
     for (let x = 1, i = y * w + 1; x < w - 1; x++, i++) {
-      const v = M[i]
+      const v = f32(M, i)
       if (!(v > 0) || !inside[i]) continue
       if (isTop(M, i, w, v)) cand.push({ i, v })
     }
@@ -161,7 +171,7 @@ function isTop(M: Float32Array, i: number, w: number, v: number): boolean {
   for (let dy = -1; dy <= 1; dy++)
     for (let dx = -1; dx <= 1; dx++) {
       const j = i + dy * w + dx
-      if ((dx || dy) && (M[j] > v || (M[j] === v && j < i))) return false
+      if ((dx || dy) && (f32(M, j) > v || (f32(M, j) === v && j < i))) return false
     }
   return true
 }

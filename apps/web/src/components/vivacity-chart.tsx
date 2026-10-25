@@ -10,7 +10,7 @@ import {
 } from '../lib/burn-rate.ts'
 import { niceTicks, tickDecimals } from '../lib/ticks.ts'
 import { formatNumber } from '../lib/units.ts'
-import { EChart, useChartTokens } from './echart.tsx'
+import { EChart, tickStep, useChartTokens } from './echart.tsx'
 
 const vivacityTokens: Record<string, string> = {
   muted: '--muted',
@@ -138,7 +138,7 @@ function vivacityOption(
       type: 'value',
       min: 0,
       max: yt[yt.length - 1],
-      interval: yt.length > 1 ? (yt[1] - yt[0]) * (small && yt.length > 4 ? 2 : 1) : undefined,
+      interval: yt.length > 1 ? tickStep(yt) * (small && yt.length > 4 ? 2 : 1) : undefined,
       name: small ? '' : `Dynamic vivacity, ${vivacityUnit}`,
       nameLocation: 'end',
       nameTextStyle: { ...axisText, align: 'left' },
@@ -152,7 +152,7 @@ function vivacityOption(
         type: 'line',
         name: p.label,
         symbol: 'none',
-        lineStyle: { color: tokens[slot + 1], width: 2, type: dashArray(dashes[slot]) },
+        lineStyle: { color: tokens[slot + 1], width: 2, type: dashArray(dashes[slot] ?? '') },
         itemStyle: { color: tokens[slot + 1] },
         data: chartBurntFractions.map((z) => [z, curveAt(p, z).value]),
       })),

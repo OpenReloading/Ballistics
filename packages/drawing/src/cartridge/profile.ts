@@ -49,6 +49,9 @@ export const drawnTables = new Set(['I', 'II', 'III', 'IV', 'V', 'VIII', 'IX', '
 
 const baseSymbols = ['R1', 'R', 'P1', 'L3', 'H2']
 const mm = (x: number) => Number(x.toFixed(3))
+// the callers run after `missing` found the base symbols, or after the check of the symbol itself
+const stored = <S extends string[]>(v: (symbol: string) => number | undefined, ...symbols: S) =>
+  symbols.map((s) => v(s) as number) as { [K in keyof S]: number }
 /**
  * The value of a symbol on a side as drawn: with a value, of `variant` when given and stored,
  * else without a variant.
@@ -79,9 +82,10 @@ const angleOff = (angle: number | undefined, drawn: number) =>
  * L3: its front is closed or crimped (blanks, shot), so the cartridge side is not drawn.
  */
 export function closedFront(values: SpecValue[]): Note | undefined {
-  const [L3, chamberL3] = ['cartridge', 'chamber'].map(
-    (side) => storedValue(values, side, 'L3')?.value,
-  )
+  const [L3, chamberL3] = [
+    storedValue(values, 'cartridge', 'L3')?.value,
+    storedValue(values, 'chamber', 'L3')?.value,
+  ]
   if (L3 === undefined) return undefined
   const front =
     chamberL3 === undefined
@@ -126,7 +130,7 @@ export function cipProfile(
   headProfile(d, R)
   const zP1 = grooveAndBelt(d, R, groove, table)
   const { points, marks } = d
-  const [P1, L3] = ['P1', 'L3'].map((s) => v(s) as number)
+  const [P1, L3] = stored(v, 'P1', 'L3')
   points.push([P1 / 2, zP1])
   marks.diameter('P1', zP1, { toward: 1 })
   const [P0, L0] = [v('P0'), v('L0')]
@@ -194,7 +198,7 @@ interface GrooveDepth {
  * one cone from E1 at R to P1 at E (grooveDerivedE), drawn as 0 when negative.
  */
 function grooveDepth({ side, v }: Draft, R: number, table?: string): GrooveDepth {
-  const [P1, E, E1, storedE, delta] = ['P1', 'E', 'E1', 'e', 'delta'].map(v)
+  const [P1, E, E1, storedE, delta] = [v('P1'), v('E'), v('E1'), v('e'), v('delta')]
   const validDelta = delta !== undefined && delta > 0 && delta < 90
   const derivedE =
     side === 'cartridge' &&
@@ -212,7 +216,7 @@ function grooveDepth({ side, v }: Draft, R: number, table?: string): GrooveDepth
 /** The head from the axis: the rim corner, the head face and the rim (cartridge) or recess (chamber) to R. */
 function headProfile(d: Draft, R: number) {
   const { side, v, marks, note, points } = d
-  const [R1, P1] = ['R1', 'P1'].map((s) => v(s) as number)
+  const [R1, P1] = stored(v, 'R1', 'P1')
   const E = v('E')
   if (side === 'chamber' && E === undefined && v('R') === undefined)
     note(
@@ -297,7 +301,7 @@ function drawGroove({ v, marks, note, points }: Draft, c: GrooveShape) {
 function grooveAndBelt(d: Draft, R: number, { e, derivedE }: GrooveDepth, table?: string) {
   const { side, v, note } = d
   const R1 = v('R1') as number
-  const [E, E1, delta, R3] = ['E', 'E1', 'delta', 'R3'].map(v)
+  const [E, E1, delta, R3] = [v('E'), v('E1'), v('delta'), v('R3')]
   const validDelta = delta !== undefined && delta > 0 && delta < 90
   const groove =
     side === 'cartridge' && E !== undefined && E1 !== undefined && e !== undefined && R + e < E
@@ -329,10 +333,12 @@ function shoulderCorner(
   [L1, L2]: [number, number],
 ) {
   const r = v(symbol)
-  const arc = r === undefined ? null : fillet(points[points.length - 1], corner, next, r)
+  const prev = points.at(-1)
+  const arc = r === undefined || !prev ? null : fillet(prev, corner, next, r)
+  const [arcStart, arcEnd] = [arc?.[0], arc?.at(-1)]
   // P2 is dimensioned before the r1 arc, H1 after the r2 arc, on the straight lines
-  if (symbol === 'r1') marks.diameter('P2', arc ? arc[0][1] : L1, { toward: -1 })
-  else marks.diameter('H1', arc ? (arc.at(-1) as SectionPoint)[1] : L2, { toward: 1 })
+  if (symbol === 'r1') marks.diameter('P2', arcStart ? arcStart[1] : L1, { toward: -1 })
+  else marks.diameter('H1', arcEnd ? arcEnd[1] : L2, { toward: 1 })
   if (arc) {
     points.push(...arc)
     marks.radius(symbol, corner)
@@ -351,7 +357,7 @@ function shoulderCorner(
 /** The drawn shoulder: its lengths, the cone angle, the corners with their fillets. */
 function drawShoulder(d: Draft, [P2, L1, L2, H1]: [number, number, number, number]) {
   const { v, marks, note, name } = d
-  const [L3, H2] = ['L3', 'H2'].map((s) => v(s) as number)
+  const [L3, H2] = stored(v, 'L3', 'H2')
   marks.length('L1', 0)
   marks.length('L2', 0)
   marks.length('S', 0, undefined, { far: true })
@@ -387,7 +393,7 @@ function drawShoulder(d: Draft, [P2, L1, L2, H1]: [number, number, number, numbe
 
 /** The note on a shoulder with only some of P2, L1, L2 and H1 stored. */
 function noteShoulderPartial({ v, note, name }: Draft, zP1: number) {
-  const [P1, L3, H2] = ['P1', 'L3', 'H2'].map((s) => v(s) as number)
+  const [P1, L3, H2] = stored(v, 'P1', 'L3', 'H2')
   const shoulderSet = ['P2', 'L1', 'L2', 'H1']
   const shoulderStored = shoulderSet.filter((s) => v(s) !== undefined)
   if (!shoulderStored.length || shoulderStored.length >= 4) return
@@ -406,8 +412,8 @@ function noteShoulderPartial({ v, note, name }: Draft, zP1: number) {
  */
 function shoulderProfile(d: Draft, zP1: number) {
   const { v, note, name } = d
-  const [P1, L3, H2] = ['P1', 'L3', 'H2'].map((s) => v(s) as number)
-  const [P2, L1, L2, H1] = ['P2', 'L1', 'L2', 'H1'].map(v)
+  const [P1, L3, H2] = stored(v, 'P1', 'L3', 'H2')
+  const [P2, L1, L2, H1] = [v('P2'), v('L1'), v('L2'), v('H1')]
   noteShoulderPartial(d, zP1)
   if (P2 === undefined || L1 === undefined || L2 === undefined || H1 === undefined) return false
   if (!(zP1 < L1 && L1 < L2 && L2 <= L3 && H1 <= P2)) {
@@ -426,7 +432,7 @@ function shoulderProfile(d: Draft, zP1: number) {
 /** The neck to H2 at L3; on the cartridge L6, G1 past the mouth and the neck length L3 - L2. */
 function neckProfile(d: Draft, shoulder: boolean) {
   const { side, v, marks, points } = d
-  const [L3, H2] = ['L3', 'H2'].map((s) => v(s) as number)
+  const [L3, H2] = stored(v, 'L3', 'H2')
   const L2 = v('L2')
   points.push([H2 / 2, L3])
   marks.diameter('H2', L3, { toward: -1 })
@@ -452,8 +458,8 @@ function mouthConeLength(alpha1: number | undefined, H2: number, G1: number) {
  */
 function chamberMouth(d: Draft): number | undefined {
   const { v, marks, note, points } = d
-  const [L3, H2] = ['L3', 'H2'].map((s) => v(s) as number)
-  const [G1, h, alpha1] = ['G1', 'h', 'alpha1'].map(v)
+  const [L3, H2] = stored(v, 'L3', 'H2')
+  const [G1, h, alpha1] = [v('G1'), v('h'), v('alpha1')]
   const throat = ['G', 'F', 'h', 's'].filter((symbol) => v(symbol) !== undefined)
   if (G1 === undefined) {
     if (throat.length)
@@ -502,8 +508,8 @@ function chamberMouth(d: Draft): number | undefined {
  */
 function chamberThroat(d: Draft, zG1: number) {
   const { v, find, marks, note, points } = d
-  const [L3, G1] = ['L3', 'G1'].map((s) => v(s) as number)
-  const [G, F] = ['G', 'F'].map(v)
+  const [L3, G1] = stored(v, 'L3', 'G1')
+  const [G, F] = [v('G'), v('F')]
   if (G === undefined || F === undefined) {
     points.push([G1 / 2, zG1 + 0.1 * L3])
     marks.diameter('G1', zG1, { toward: 1 })
@@ -511,7 +517,7 @@ function chamberThroat(d: Draft, zG1: number) {
     return
   }
   // h, s and G share chamber L3 as datum; the stored L3+G mostly adds G to the cartridge L3
-  const [sum, cartridgeL3] = ['L3+G', 'L3'].map((symbol) => find(symbol, 'cartridge')?.value)
+  const [sum, cartridgeL3] = [find('L3+G', 'cartridge')?.value, find('L3', 'cartridge')?.value]
   const off = (base: number | undefined) =>
     base === undefined || Math.abs((sum as number) - base - G) > 0.015
   if (sum !== undefined && off(L3) && off(cartridgeL3))
@@ -537,8 +543,8 @@ function chamberThroat(d: Draft, zG1: number) {
  */
 function leadeProfile(d: Draft, zG1: number, zEnd: number): number {
   const { v, marks, note, points } = d
-  const [L3, G1, G, F] = ['L3', 'G1', 'G', 'F'].map((s) => v(s) as number)
-  const [i, s] = ['i', 's'].map(v)
+  const [L3, G1, G, F] = stored(v, 'L3', 'G1', 'G', 'F')
+  const [i, s] = [v('i'), v('s')]
   if (G1 <= F) {
     note(
       'noLeade',
@@ -607,7 +613,7 @@ function leadeProfile(d: Draft, zG1: number, zEnd: number): number {
 function rimCorner({ side, v, marks, note }: Draft, head: number, R: number): SectionPoint[] {
   const corner: SectionPoint = [head / 2, 0]
   if (side !== 'cartridge') return [corner]
-  const [f, beta, r0] = ['f', 'beta', 'r0'].map(v)
+  const [f, beta, r0] = [v('f'), v('beta'), v('r0')]
   let chamfer = false
   if (f !== undefined && beta !== undefined) {
     const inset = f / Math.tan(beta * deg)
@@ -738,15 +744,15 @@ function edgeStations(points: SectionPoint[], stations: number[], radii: RadiusM
 
 /** Whether the outline changes direction or steps at the station z. */
 function turns(points: SectionPoint[], z: number): boolean {
-  const at = points.flatMap(([, pz], k) => (Math.abs(pz - z) < 1e-9 ? [k] : []))
-  if (at.length === 0) return false
-  // the directions into and out of the station, skipping repeated points
+  const at = points.flatMap((p, k) => (Math.abs(p[1] - z) < 1e-9 ? [{ k, p }] : []))
   const [first, last] = [at[0], at[at.length - 1]]
-  const before = points.slice(0, first).findLast(([r, pz]) => r !== points[first][0] || pz !== z)
-  const after = points.slice(last + 1).find(([r, pz]) => r !== points[last][0] || pz !== z)
+  if (!first || !last) return false
+  // the directions into and out of the station, skipping repeated points
+  const before = points.slice(0, first.k).findLast(([r, pz]) => r !== first.p[0] || pz !== z)
+  const after = points.slice(last.k + 1).find(([r, pz]) => r !== last.p[0] || pz !== z)
   if (!before || !after) return false
-  if (points[first][0] !== points[last][0]) return true
-  const [r, pz] = points[first]
+  if (first.p[0] !== last.p[0]) return true
+  const [r, pz] = first.p
   const a = Math.atan2(r - before[0], pz - before[1])
   const b = Math.atan2(after[0] - r, after[1] - pz)
   return Math.abs(a - b) > 1e-6
@@ -782,7 +788,7 @@ export function shotshellProfile(
   const { v, points, marks } = outline
   const missing = [gS, tS, dS, hS, lS, ...(chamber ? ['B'] : [])].filter((s) => v(s) === undefined)
   if (missing.length) return { missing }
-  const [g, t, d, h, l] = [gS, tS, dS, hS, lS].map((s) => v(s) as number)
+  const [g, t, d, h, l] = stored(v, gS, tS, dS, hS, lS)
   points.push([0, 0], [g / 2, 0], [g / 2, t], [d / 2, t])
   marks.diameter(gS, 0, { behindHeadFace: true })
   marks.diameter(dS, 0, { behindHeadFace: true })
@@ -796,11 +802,24 @@ export function shotshellProfile(
   return { points, notes: outline.notes, annotation: marks.done(points) }
 }
 
+type ShotshellNames = [
+  string,
+  string,
+  string,
+  string,
+  string,
+  string,
+  string,
+  string,
+  string,
+  string,
+]
+
 /**
  * The symbols of a shotshell side in the order rim, rim length, body start, body end, length,
  * cone start, cone end, cone start length, cone end length, cone angle.
  */
-const shotshellNames = {
+const shotshellNames: Record<Side, ShotshellNames> = {
   chamber: ['G', 'T', 'D', 'H', 'L', 'D1', 'B', 'L1', 'L2', 'alpha1'],
   cartridge: ['g', 't', 'd', 'h', 'l', 'd', 'd2', 'l1', 'l2', 'alpha'],
 }
@@ -809,12 +828,12 @@ const shotshellNames = {
  * The body cone from the start diameter at l1 to the end diameter at l2, where both are stored
  * and in order; whether it is drawn.
  */
-function shotshellCone(o: Draft, names: string[]): boolean {
+function shotshellCone(o: Draft, names: ShotshellNames): boolean {
   const { side, v, points, marks, note, name } = o
   const chamber = side === 'chamber'
   const [, tS, dS, hS, lS, startS, endS, l1S, l2S, angleS] = names
-  const [t, d, h, l] = [tS, dS, hS, lS].map((s) => v(s) as number)
-  const [start, end, l1, l2, angle] = [startS, endS, l1S, l2S, angleS].map(v)
+  const [t, d, h, l] = stored(v, tS, dS, hS, lS)
+  const [start, end, l1, l2, angle] = [v(startS), v(endS), v(l1S), v(l2S), v(angleS)]
   // the cone set without B, which every chamber stores for the bore
   const set = [chamber ? startS : endS, l1S, l2S]
   const cone = set.filter((s) => v(s) !== undefined)
@@ -860,10 +879,10 @@ function shotshellCone(o: Draft, names: string[]): boolean {
 }
 
 /** The chamber forcing cone from H at L to the bore B, and a bore stub. */
-function forcingCone(o: Draft, names: string[], drawCone: boolean) {
+function forcingCone(o: Draft, names: ShotshellNames, drawCone: boolean) {
   const { v, points, marks, note } = o
   const [, , , hS, lS, , , , , angleS] = names
-  const [h, l] = [hS, lS].map((s) => v(s) as number)
+  const [h, l] = stored(v, hS, lS)
   const angle = v(angleS)
   const B = v('B') as number
   // alpha1 is the included angle of the forcing cone; 180 degrees is a step

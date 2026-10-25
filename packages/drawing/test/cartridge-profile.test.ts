@@ -11,6 +11,7 @@ import {
 } from '../src/cartridge/profile.ts'
 import { fillet } from '../src/core/fillet.ts'
 import type { SectionPoint, SpecValue } from '../src/core/types.ts'
+import { defined } from './defined.ts'
 
 const deg = Math.PI / 180
 
@@ -64,7 +65,7 @@ describe('profile', () => {
   it('gives a shoulder at half the angle alpha', () => {
     const p = drawn(cipProfile(values('cartridge', bottleneck), 'cartridge'))
     const i = p.points.findIndex(([r, z]) => r === 5.75 && z === 39.6)
-    const [[r0, z0], [r1, z1]] = p.points.slice(i, i + 2)
+    const [[r0, z0], [r1, z1]] = [defined(p.points[i]), defined(p.points[i + 1])]
     expect(Math.atan((r0 - r1) / (z1 - z0)) / deg).toBeCloseTo(20, 9)
   })
 
@@ -149,14 +150,14 @@ describe('profile', () => {
     ])
     expect(dimension(p, 'P1')?.from).toBe(3.49)
     expect(p.notes).toMatchObject([{ code: 'grooveDerivedE', symbols: ['e', 'delta'] }])
-    expect(p.notes[0].text).toContain('e 0.002 mm')
+    expect(defined(p.notes[0]).text).toContain('e 0.002 mm')
     const clamped = derived({ ...sl, R: 1.52, E: 4.3, E1: 10.31, P1: 11 }, 7)
     expect(clamped.points.slice(3, 6)).toEqual([
       [5.155, 1.52],
       [5.155, 1.52],
       [5.5, 4.3],
     ])
-    expect(clamped.notes[0].text).toContain('-0.03 mm, drawn as 0')
+    expect(defined(clamped.notes[0]).text).toContain('-0.03 mm, drawn as 0')
     // a delta whose cone is longer than E - R draws e 0 and is checked like a stored e
     expect(codes(derived(sl, 2).notes)).toEqual(['grooveDerivedE', 'grooveAngle'])
     // no valid delta, or table III, where delta is the belt cone: a step at R
@@ -343,7 +344,7 @@ describe('profile', () => {
         'chamber',
       ),
     )
-    expect(cone.points[5][1] - 51.44).toBeCloseTo(0.567, 3)
+    expect(defined(cone.points[5])[1] - 51.44).toBeCloseTo(0.567, 3)
     expect(cone.notes).toEqual([])
     const step = drawn(
       cipProfile(
@@ -368,8 +369,10 @@ describe('profile', () => {
       expect(codes(p.notes)).toEqual(['mouthStep'])
       expect(p.points[5]).toEqual([3.935, 51.44])
     }
-    expect(mouth([]).notes[0].text).toContain('has no h or alpha1')
-    expect(mouth([angle('alpha1', 0)]).notes[0].text).toContain('alpha1 0 is not a cone angle')
+    expect(defined(mouth([]).notes[0]).text).toContain('has no h or alpha1')
+    expect(defined(mouth([angle('alpha1', 0)]).notes[0]).text).toContain(
+      'alpha1 0 is not a cone angle',
+    )
     // H2 = G1: nothing to step
     expect(mouth([], { ...noH, H2: 7.87 }).notes).toEqual([])
   })
@@ -385,8 +388,8 @@ describe('profile', () => {
     expect(v(0.6).notes).toEqual([])
     const off = v(0.7)
     expect(codes(off.notes)).toEqual(['mouthCone'])
-    expect(off.notes[0].symbols).toEqual(['h', 'alpha1'])
-    expect(off.points[5][1]).toBeCloseTo(51.44 + 0.7, 9)
+    expect(defined(off.notes[0]).symbols).toEqual(['h', 'alpha1'])
+    expect(defined(off.points[5])[1]).toBeCloseTo(51.44 + 0.7, 9)
   })
 
   it('draws a G1 stub without G and names nothing', () => {
@@ -413,7 +416,7 @@ describe('profile', () => {
     // s and G leave 3.0 mm for a 4.09 mm leade
     const p = chamberWith({ ...rifle, s: 2.89, G: 5.89 })
     expect(codes(p.notes)).toEqual(['leadeAngle'])
-    expect(p.notes[0].symbols).toEqual(['s', 'i'])
+    expect(defined(p.notes[0]).symbols).toEqual(['s', 'i'])
     expect(p.points.at(-3)).toEqual([3.935, 51.44 + 2.89])
   })
 
@@ -424,20 +427,20 @@ describe('profile', () => {
       [3.935, 51.44 + 6.98],
       [3.81, 51.44 + 6.98],
     ])
-    expect(p.notes[0].text).toMatch(/the leade is drawn from 6\.98 mm past L3\.$/)
-    expect(p.notes[1].symbols).toEqual(['s', 'G'])
+    expect(defined(p.notes[0]).text).toMatch(/the leade is drawn from 6\.98 mm past L3\.$/)
+    expect(defined(p.notes[1]).symbols).toEqual(['s', 'G'])
   })
 
   it('clamps a leade start before L3 + h to L3 + h and names it', () => {
     const fromS = chamberWith({ ...rifle, s: 0.3, G: 4.39 })
     expect(fromS.points.at(-3)).toEqual([3.935, 51.44 + 0.6])
     expect(codes(fromS.notes)).toEqual(['leadeStartBelowH'])
-    expect(fromS.notes[0].symbols).toEqual(['s', 'h'])
+    expect(defined(fromS.notes[0]).symbols).toEqual(['s', 'h'])
     // without s, G - leade falls before L3 + h
     const derived = chamberWith({ ...rifle, G: 3 })
     expect(derived.points.at(-3)).toEqual([3.935, 51.44 + 0.6])
     expect(codes(derived.notes)).toEqual(['leadeStartBelowH'])
-    expect(derived.notes[0].symbols).toEqual(['G', 'i', 'h'])
+    expect(defined(derived.notes[0]).symbols).toEqual(['G', 'i', 'h'])
     // 0.05 mm before L3 + h is clamped without a note
     const rounded = chamberWith({ ...rifle, G: 0.55 + 0.125 / Math.tan(1.75 * deg) })
     expect(rounded.points.at(-3)).toEqual([3.935, 51.44 + 0.6])
@@ -474,7 +477,7 @@ describe('profile', () => {
       [3.85, 21.01 + 1.79],
     ])
     expect(codes(p.notes)).toEqual(['noLeade'])
-    expect(p.notes[0].symbols).toEqual(['G1', 'F'])
+    expect(defined(p.notes[0]).symbols).toEqual(['G1', 'F'])
   })
 
   it('ends the 18 x 81 chamber at H2 at L3 without G1 and names G and F', () => {
@@ -482,8 +485,8 @@ describe('profile', () => {
     const p = drawn(cipProfile([...values('chamber', chamber), angle('i', 17.97)], 'chamber'))
     expect(p.points.at(-1)).toEqual([9.6, 80.8])
     expect(codes(p.notes)).toEqual(['noG1'])
-    expect(p.notes[0].symbols).toEqual(['G1', 'G', 'F'])
-    expect(p.notes[0].text).toBe(
+    expect(defined(p.notes[0]).symbols).toEqual(['G1', 'G', 'F'])
+    expect(defined(p.notes[0]).text).toBe(
       'Chamber has no G1: the outline ends at H2 at L3, G 1.85, F 18 mm not drawn.',
     )
   })
@@ -559,12 +562,12 @@ describe('profile', () => {
   it('names a cartridge L3+G off both sums and keeps the leade end at chamber L3 + G', () => {
     const p = withSum(70, 63.35)
     expect(codes(p.notes)).toEqual(['throatDatum'])
-    expect(p.notes[0].text).toBe(
+    expect(defined(p.notes[0]).text).toBe(
       'Cartridge L3+G 70 mm is neither chamber L3 + G 69.74 mm, where the leade ends, nor cartridge L3 + G 69.54 mm.',
     )
     expect(p.points.at(-2)).toEqual([3.81, 63.55 + 6.19])
     // without a cartridge L3 only chamber L3 + G counts
-    expect(withSum(69.54).notes[0].text).toBe(
+    expect(defined(withSum(69.54).notes[0]).text).toBe(
       'Cartridge L3+G 69.54 mm is not chamber L3 + G 69.74 mm, where the leade ends.',
     )
   })
@@ -618,7 +621,7 @@ describe('profile', () => {
     const v = { R1: 12.75, R: 1.15, P1: 11.1, L2: 47.5, H1: 7.57, H2: 7.57, L3: 58.5, r2: 3 }
     const p = drawn(cipProfile(values('cartridge', v), 'cartridge'))
     expect(codes(p.notes)).toEqual(['shoulderPartial'])
-    expect(p.notes[0].text).toBe(
+    expect(defined(p.notes[0]).text).toBe(
       'Cartridge L2 47.5, H1 7.57 mm without P2, L1: no shoulder is drawn, the wall runs straight from P1 to H2, r2 not drawn.',
     )
     expect(p.points.slice(-2)).toEqual([
@@ -645,10 +648,10 @@ describe('fillet', () => {
 
   it('cuts an arc up to 0.1 mm past a segment end to that end', () => {
     const arc = fillet([1, 0], [0, 0], [0, 1], 1.05) as SectionPoint[]
-    expect(arc[0][0]).toBeCloseTo(1, 9)
-    expect(arc[0][1]).toBeCloseTo(0, 9)
-    expect(arc[8][0]).toBeCloseTo(0, 9)
-    expect(arc[8][1]).toBeCloseTo(1, 9)
+    expect(defined(arc[0])[0]).toBeCloseTo(1, 9)
+    expect(defined(arc[0])[1]).toBeCloseTo(0, 9)
+    expect(defined(arc[8])[0]).toBeCloseTo(0, 9)
+    expect(defined(arc[8])[1]).toBeCloseTo(1, 9)
     expectTangent(arc, 1, [1, 0], [0, 0], [0, 1])
   })
 })
@@ -661,7 +664,7 @@ function expectTangent(
   corner: SectionPoint,
   b: SectionPoint,
 ) {
-  const [[ax, ay], [bx, by], [cx, cy]] = [arc[0], arc[4], arc[8]]
+  const [[ax, ay], [bx, by], [cx, cy]] = [defined(arc[0]), defined(arc[4]), defined(arc[8])]
   const d = 2 * (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by))
   const sq = (x: number, y: number) => x * x + y * y
   const ox = (sq(ax, ay) * (by - cy) + sq(bx, by) * (cy - ay) + sq(cx, cy) * (ay - by)) / d
@@ -674,8 +677,8 @@ function expectTangent(
     expect(Math.abs(ux * (y - py) - uy * (x - px)) / l).toBeLessThan(1e-9)
     expect(Math.abs(ux * (x - ox) + uy * (y - oy)) / l).toBeLessThan(1e-9)
   }
-  touches(arc[0], a, corner)
-  touches(arc[8], corner, b)
+  touches(defined(arc[0]), a, corner)
+  touches(defined(arc[8]), corner, b)
 }
 
 function angle(
@@ -863,8 +866,8 @@ describe('head chamfer and r0', () => {
   it('insets the head face by f / tan(beta), beta from the face line and f along the axis', () => {
     const p = head({ f: 0.38, beta: 35 })
     const inset = 0.38 / Math.tan(35 * deg)
-    expect(p.points[1][0]).toBeCloseTo(6.1 - inset, 12)
-    expect(p.points[1][1]).toBe(0)
+    expect(defined(p.points[1])[0]).toBeCloseTo(6.1 - inset, 12)
+    expect(defined(p.points[1])[1]).toBe(0)
     expect(p.points[2]).toEqual([6.1, 0.38])
     expect(p.points[3]).toEqual([6.1, 1.24])
     expect(p.notes).toEqual([])
@@ -892,7 +895,7 @@ describe('head chamfer and r0', () => {
         [6.1, 1.24],
       ])
       expect(codes(p.notes)).toEqual(['chamferSkipped'])
-      expect(p.notes[0].symbols).toEqual(['f', 'beta'])
+      expect(defined(p.notes[0]).symbols).toEqual(['f', 'beta'])
       expect(p.annotation.angles.some((a) => a.symbol === 'beta')).toBe(false)
     }
     // f not below R, f not above 0
@@ -911,9 +914,9 @@ describe('head chamfer and r0', () => {
 
   it('rounds the rim corner at the head face with r0', () => {
     const p = head({ r0: 0.5 })
-    expect(p.points[1][0]).toBeCloseTo(5.6, 9)
-    expect(p.points[1][1]).toBeCloseTo(0, 9)
-    const end = p.points[9]
+    expect(defined(p.points[1])[0]).toBeCloseTo(5.6, 9)
+    expect(defined(p.points[1])[1]).toBeCloseTo(0, 9)
+    const end = defined(p.points[9])
     expect(end[0]).toBeCloseTo(6.1, 9)
     expect(end[1]).toBeCloseTo(0.5, 9)
     expect(p.points[10]).toEqual([6.1, 1.24])
@@ -934,7 +937,7 @@ describe('head chamfer and r0', () => {
     const both = head({ f: 0.38, beta: 35, r0: 0.3 })
     expect(both.points[2]).toEqual([6.1, 0.38])
     expect(codes(both.notes)).toEqual(['filletSkipped'])
-    expect(both.notes[0].symbols).toEqual(['r0'])
+    expect(defined(both.notes[0]).symbols).toEqual(['r0'])
     expect(both.annotation.radii).toEqual([])
   })
 })

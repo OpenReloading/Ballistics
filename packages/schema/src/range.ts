@@ -36,8 +36,8 @@ export const rangeFirings = z
       (p) =>
         p.kind === 'measured' &&
         p.sources.length === 1 &&
-        !!p.sources[0].url &&
-        !!p.sources[0].sha256,
+        !!p.sources[0]?.url &&
+        !!p.sources[0]?.sha256,
       { message: 'range firings are measured, from one report with its URL and sha256' },
     ),
   })

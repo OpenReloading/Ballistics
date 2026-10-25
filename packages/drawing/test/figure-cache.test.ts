@@ -2,6 +2,7 @@ import { expect, it, vi } from 'vitest'
 import { figureModel, screenEm, screenWidth } from '../src/cartridge/figure.ts'
 import { recordFigures } from '../src/cartridge/figures.ts'
 import * as face from '../src/core/face.ts'
+import { defined } from './defined.ts'
 import { sheet } from './sheets.ts'
 
 const annotate = vi.hoisted(() => ({ calls: [] as number[] }))
@@ -18,7 +19,7 @@ vi.mock('../src/core/annotate.ts', async (importOriginal) => {
 
 it('lays out a figure once per side, medium and text size', () => {
   const record = sheet('cip-308-win-2008-09-23')
-  const [{ drawn }] = recordFigures(record)
+  const { drawn } = defined(recordFigures(record)[0])
   const em = screenEm([drawn])
   const searched = annotate.calls.length
   screenWidth(drawn, em)

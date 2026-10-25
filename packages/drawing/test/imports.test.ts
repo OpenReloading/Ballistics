@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { posix } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { defined } from './defined.ts'
 import bad from './fixtures/bad-imports.json' with { type: 'json' }
 
 /** The entry points each source folder may import from; `index.ts` at the root is the core. */
@@ -12,18 +13,19 @@ const allowed: Record<string, string[]> = {
   target: ['target'],
 }
 
-const folder = (file: string) => (file.includes('/') ? file.split('/')[0] : 'core')
+const folder = (file: string) => (file.includes('/') ? defined(file.split('/')[0]) : 'core')
 
 /** The imports of sources keyed by their path below `src/` that break the import rules. */
 function violations(files: Record<string, string>) {
   const found: string[] = []
   for (const [file, source] of Object.entries(files))
-    for (const [, spec] of source.matchAll(/(?:from|import)\s*\(?\s*'([^']+)'/g)) {
+    for (const match of source.matchAll(/(?:from|import)\s*\(?\s*'([^']+)'/g)) {
+      const spec = defined(match[1])
       const target = spec.startsWith('.') ? posix.join(posix.dirname(file), spec) : undefined
       const ok =
         target !== undefined &&
         !target.startsWith('..') &&
-        allowed[folder(file)].includes(folder(target))
+        allowed[folder(file)]?.includes(folder(target))
       if (!ok) found.push(`${file}: ${spec}`)
     }
   return found

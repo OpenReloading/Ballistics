@@ -167,13 +167,13 @@ describe('readRecords', () => {
 
   it('resolves source references with the parts of the record', () => {
     const { bundle } = readRecords(join(fixtures, 'valid'))
-    expect(bundle.federations[0].ruleBooks[0]).toEqual({
+    expect(bundle.federations[0]?.ruleBooks[0]).toEqual({
       title: 'Test rule book',
       edition: '2026',
       url: 'https://example.org/rules.pdf',
       sha256: '0'.repeat(64),
     })
-    expect(bundle.disciplines[0].provenance.sources[0]).toMatchObject({
+    expect(bundle.disciplines[0]?.provenance.sources[0]).toMatchObject({
       title: 'Test rule book',
       edition: '2026',
       note: 'Discipline note. Rule book note.',

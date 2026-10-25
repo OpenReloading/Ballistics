@@ -35,8 +35,9 @@ export function readShotRows(
       continue
     }
     if (!/^\d+$/.test(cells[0] ?? '')) continue
-    const shot: ChronoShot = { velocity: parseVelocity(cells[1] ?? '', unitText, unit) }
-    values.push(parseNumber(cells[1]))
+    const velocityText = cells[1] ?? ''
+    const shot: ChronoShot = { velocity: parseVelocity(velocityText, unitText, unit) }
+    values.push(parseNumber(velocityText))
     const which = boreFlagText(cells)
     if (which) {
       shot.coldBore = true
@@ -49,4 +50,4 @@ export function readShotRows(
 
 /** In a workbook the shots end at the first row whose first cell is neither empty nor a whole number. */
 export const workbookFooterStarts = (cells: string[]) =>
-  (cells[0] ?? '') !== '' && !/^\d+$/.test(cells[0])
+  (cells[0] ?? '') !== '' && !/^\d+$/.test(cells[0] ?? '')

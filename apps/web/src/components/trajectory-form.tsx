@@ -508,9 +508,9 @@ function readLink(system: UnitSystem) {
   return {
     fields,
     touched: Object.fromEntries(
-      allFields.filter((s) => fields[s.key].text).map((s) => [s.key, true]),
+      allFields.filter((s) => fields[s.key]?.text).map((s) => [s.key, true]),
     ),
-    showZero: zeroKeys.some((k) => fields[k].text),
+    showZero: zeroKeys.some((k) => fields[k]?.text),
     model: query.get('drag') as DragModel | null,
     bullet,
     choice: Number.isInteger(choice) ? choice : undefined,

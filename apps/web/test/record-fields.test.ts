@@ -19,6 +19,7 @@ import {
   rowValue,
 } from '../src/lib/record-fields.ts'
 import { presetUnits } from '../src/lib/units.ts'
+import { defined, missing } from './defined.ts'
 import { targetBullet } from './fixtures/bullets.ts'
 
 const provenance: Provenance = { kind: 'published', sources: [] }
@@ -97,7 +98,7 @@ it('shows each bullet dimension once, in the unit of each preset, rounded', () =
 it('keeps the text as printed for the hover notes, not in the value', () => {
   const twist = dataRows(target).at(-1) as FieldRow
   expect(rowNotes(twist)).toEqual(['As printed: 1:12"'])
-  expect(rowNotes(dataRows(target)[0])).toEqual([])
+  expect(rowNotes(defined(dataRows(target)[0]))).toEqual([])
 })
 
 it('leaves the identity fields to the title and badges and gives text fields as they are', () => {
@@ -167,8 +168,8 @@ it('gives the ballistic coefficients with their band in the velocity unit and th
     ['G1', '0.480 lb/in²'],
     ['G7', '0.264 lb/in²'],
   ])
-  expect(rowLabel(rows[0], si)).toBe('G1 from 792 m/s')
-  expect(rowNotes(rows[2])).toEqual(['G7 form factor 0.960'])
+  expect(rowLabel(defined(rows[0]), si)).toBe('G1 from 792 m/s')
+  expect(rowNotes(defined(rows[2]))).toEqual(['G7 form factor 0.960'])
 })
 
 it('leaves the powder properties of the strip out of the Properties table', () => {
@@ -191,7 +192,7 @@ it('leaves the powder properties of the strip out of the Properties table', () =
 })
 
 it('gives the aliases, the composition and the computed thermochemistry with its range on hover', () => {
-  const [identity, composition, thermo] = powderRowGroups({
+  const [identity = missing(), composition = missing(), thermo = missing()] = powderRowGroups({
     id: 'a',
     manufacturer: 'example-c',
     name: 'Powder X',
@@ -217,7 +218,7 @@ it('gives the aliases, the composition and the computed thermochemistry with its
     ['Nitrocellulose', '60 to 100 %'],
     ['Graphite', '1 %'],
   ])
-  expect(rowNotes(composition.rows[0])).toEqual(['As printed: >60'])
+  expect(rowNotes(defined(composition.rows[0]))).toEqual(['As printed: >60'])
   expect(shown(thermo.rows)).toEqual([
     ['Loading density', '0.1 g/cm³'],
     ['Flame temperature', '2800 K'],
@@ -226,7 +227,9 @@ it('gives the aliases, the composition and the computed thermochemistry with its
     ['Molar mass', '23.7 kg/kmol'],
     ['Covolume', '0.001 m³/kg'],
   ])
-  expect(rowNotes(thermo.rows[2])).toEqual(['Over the composition ranges: 900000 to 1100000.'])
+  expect(rowNotes(defined(thermo.rows[2]))).toEqual([
+    'Over the composition ranges: 900000 to 1100000.',
+  ])
 })
 
 it('rounds a value row to significant digits when asked', () => {
@@ -287,7 +290,7 @@ it('gives the fitted values with intervals, the fixed inputs from their stored u
     ['Energy', '8.7\u00a0±\u00a02.8 (±\u00a032\u00a0%) MJ/kg'],
     ['Energy ratio', '2.39'],
   ])
-  expect(rowParts(fittedParameterRows(p, 2)[0], us)).toEqual({
+  expect(rowParts(defined(fittedParameterRows(p, 2)[0]), us)).toEqual({
     number: '0.183\u00a0±\u00a00.052 (±\u00a028\u00a0%)',
     unit: '1/s',
   })
@@ -319,7 +322,7 @@ it('gives the fitted values with intervals, the fixed inputs from their stored u
   } as Powder
   expect(fittedParameterRows(formFitted, 2).at(-1)?.symbol).toBe('a')
   expect(burnFormRows(formFitted).map((r) => r.symbol)).toEqual(['m', 'q', 'z1'])
-  expect(rowNotes(modelInputRows(p)[8])).toEqual([
+  expect(rowNotes(defined(modelInputRows(p)[8]))).toEqual([
     'Stress; groove oversize 1.3 per percent, engraving 0 of the start pressure.',
   ])
   expect(shown(modelInputRows(p), us)[6]).toEqual(['Propellant temperature', '69.8 °F'])
@@ -340,7 +343,7 @@ it('the bullet strip has diameter, mass, length, the G7 BC where given and the s
     '1.2598 in',
   ])
   const bc = target.ballisticCoefficients?.find((c) => c.dragModel === 'G7')
-  expect(rowValue(strip[3].row, us)).toBe(`${bc?.value.toFixed(3)} lb/in²`)
+  expect(rowValue(defined(strip[3]).row, us)).toBe(`${bc?.value.toFixed(3)} lb/in²`)
   const bare = { ...target, length: undefined, ballisticCoefficients: undefined }
   expect(bulletStrip(bare).map((i) => i.label)).toEqual(['Diameter', 'Mass', 'Sectional density'])
 })
@@ -372,7 +375,7 @@ it('the powder strip has manufacturer, form, base, the burn-rate position, the s
 })
 
 it('splits a value from its unit for the unit column, a text row with its own unit too', () => {
-  const [diameter] = dataRows(target)
+  const [diameter = missing()] = dataRows(target)
   expect(rowParts(diameter, us)).toEqual({ number: '.3080', unit: 'in' })
   const twist = dataRows(target).at(-1) as FieldRow
   expect(rowParts(twist, us)).toEqual({ number: '1 turn in 12.0', unit: 'in' })

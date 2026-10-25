@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { figureModel, screenEm } from '../src/cartridge/figure.ts'
 import { type Figure, flagged, recordFigures } from '../src/cartridge/figures.ts'
 import * as face from '../src/core/face.ts'
+import { defined } from './defined.ts'
 import { sheet, sheets } from './sheets.ts'
 
 const record = sheet
@@ -19,14 +20,14 @@ describe('figures', () => {
     expect(list.map((f) => f.id)).toEqual(
       Array.from({ length: 9 }, (_, k) => `cip-12-2018-10-17-drawing-${k}`),
     )
-    expect(list[5].variant).toBe('12/70')
+    expect(defined(list[5]).variant).toBe('12/70')
   })
 
   it('draws the 22 Long Shot chamber only and names the closed front first', () => {
-    const [figure] = recordFigures(record('cip-22-long-shot-2000-06-07'))
+    const figure = defined(recordFigures(record('cip-22-long-shot-2000-06-07'))[0])
     expect(figure.drawn.map((d) => d.side)).toEqual(['chamber'])
-    expect(figure.notes[0].code).toBe('closedFront')
-    expect(figure.notes[0].text).toMatch(/closed or crimped/)
+    expect(defined(figure.notes[0]).code).toBe('closedFront')
+    expect(defined(figure.notes[0]).text).toMatch(/closed or crimped/)
   })
 
   it('gives a record without dimensions no drawn figure', () => {
@@ -37,7 +38,7 @@ describe('figures', () => {
   })
 
   it('flags each side drawn alone with the numbers of the caption (32-40 Win.)', () => {
-    const [figure] = recordFigures(record('cip-32-40-win-2002-05-15'))
+    const figure = defined(recordFigures(record('cip-32-40-win-2002-05-15'))[0])
     expect(figure.notes.map((n) => n.flagNumber)).toEqual([1, 2, 3, 4])
     expect(figure.drawn.map(({ side }) => [side, flagsAlone(figure, side)])).toEqual([
       ['cartridge', ['1']],

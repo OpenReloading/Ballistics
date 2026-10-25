@@ -3,6 +3,7 @@ import { hasFlag } from 'country-flag-icons'
 import { describe, expect, it } from 'vitest'
 import { flags } from '../src/components/countries.tsx'
 import { countryOf, parseCountries } from '../src/lib/countries.ts'
+import { defined } from './defined.ts'
 
 const withoutFlag = new Set(['ussr', 'serbie and montenegro'])
 
@@ -16,9 +17,9 @@ describe('parseCountries', () => {
     ])
     // the records print some names in sentence case; each word starts upper case for display
     expect(parseCountries('United states')).toEqual([{ name: 'United States', code: 'US' }])
-    expect(parseCountries('Czech republic')[0].name).toBe('Czech Republic')
-    expect(parseCountries('USSR')[0].name).toBe('USSR')
-    expect(parseCountries('Serbie and Montenegro')[0].name).toBe('Serbie and Montenegro')
+    expect(defined(parseCountries('Czech republic')[0]).name).toBe('Czech Republic')
+    expect(defined(parseCountries('USSR')[0]).name).toBe('USSR')
+    expect(defined(parseCountries('Serbie and Montenegro')[0]).name).toBe('Serbie and Montenegro')
     // a record that prints the code shows the country's name
     expect(parseCountries('US, IT')).toEqual([
       { name: 'United States', code: 'US' },
@@ -34,7 +35,7 @@ describe('parseCountries', () => {
     }
     expect(names.size).toBeGreaterThan(20)
     for (const name of names) {
-      const { code } = parseCountries(name)[0]
+      const { code } = defined(parseCountries(name)[0])
       // former states without a current flag are text only
       expect(code !== undefined || withoutFlag.has(name.toLowerCase()), name).toBe(true)
       if (code) expect(flags[code], name).toBeDefined()

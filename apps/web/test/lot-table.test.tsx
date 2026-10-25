@@ -12,6 +12,7 @@ import { siValues } from '../src/lib/field-spec.ts'
 import { interiorBody, interiorFields } from '../src/lib/interior-input.ts'
 import { lotChartDescription, lotFractionError, lotLoad } from '../src/lib/lot-rows.ts'
 import { presetUnits } from '../src/lib/units.ts'
+import { defined } from './defined.ts'
 
 const system = presetUnits('us')
 const { load } = interiorBody(
@@ -37,7 +38,7 @@ const stepAt = (l: typeof load, charge: number): Step => {
 const nominal = charges.map((c) => stepAt(load, c))
 const ok = {
   kind: 'ok',
-  body: nominal[0].body,
+  body: defined(nominal[0]).body,
   load,
   steps: nominal,
   selected: 0,

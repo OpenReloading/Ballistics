@@ -32,7 +32,7 @@ const names: Record<string, string> = { fr: 'France', it: 'Italy', us: 'United S
 
 /** Each word upper case first ("United states" as the records print it), "and" kept, the rest as given. */
 const display = (name: string) =>
-  name.replace(/\p{L}+/gu, (w) => (w === 'and' ? w : w[0].toUpperCase() + w.slice(1)))
+  name.replace(/\p{L}+/gu, (w) => (w === 'and' ? w : w.charAt(0).toUpperCase() + w.slice(1)))
 
 /** The record's countries, each with its flag code when it has one. */
 export function parseCountries(text: string) {

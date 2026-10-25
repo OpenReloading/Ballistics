@@ -7,6 +7,7 @@ vi.mock('../src/least-squares.ts', async (original) => {
   return { ...module, logLeastSquares: vi.fn(module.logLeastSquares) }
 })
 
+import { nth } from '../src/errors.ts'
 import { logLeastSquares } from '../src/least-squares.ts'
 import { click, nominal } from './range-strings-fixtures.ts'
 
@@ -35,14 +36,14 @@ describe('failures of the iteration', () => {
     failOnce('unresolved', { unresolved: [1] })
     const r = fitTruingStrings(input)
     expect(r.failures).toEqual([{ reason: 'unresolved', parameters: ['dragFactor'] }])
-    const k = r.parameters[1]
+    const k = nth(r.parameters, 1)
     expect(k.status).toBe('unresolved')
     expect(k.reasons).toEqual(['fit-failed'])
     expect(k.value).toBeUndefined()
     expect(k.interval).toBeUndefined()
     expect(r.held).toEqual(['dragFactor'])
     // the others are fitted with the drag held: conditional on it, whatever the residuals say
-    for (const p of [r.parameters[0], r.parameters[2]]) {
+    for (const p of [nth(r.parameters, 0), nth(r.parameters, 2)]) {
       expect(p.status).toBe('identified')
       expect(p.conditionalOn).toEqual(['dragFactor'])
       expect(p.intervalsTrusted).toBe(false)
@@ -62,13 +63,13 @@ describe('failures of the iteration', () => {
     }
     expect(r.held).toEqual(['muzzleVelocity', 'dragFactor'])
     expect(r.shot.muzzleVelocity).toBe(790)
-    expect(r.parameters[2].conditionalOn).toEqual(['muzzleVelocity', 'dragFactor'])
+    expect(nth(r.parameters, 2).conditionalOn).toEqual(['muzzleVelocity', 'dragFactor'])
   })
 
   it('drops every fitted parameter when the check names none', () => {
     failOnce('ill-conditioned', { conditionNumber: 5e3, direction: [0.1, 0.1, 0.1] })
     const r = fitTruingStrings(input)
-    expect(r.failures[0].parameters).toEqual(['muzzleVelocity', 'dragFactor', 'clickValue'])
+    expect(nth(r.failures, 0).parameters).toEqual(['muzzleVelocity', 'dragFactor', 'clickValue'])
     expect(r.degreesOfFreedom).toBe(6)
     expect(r.parameters.every((p) => p.conditionalOn === undefined)).toBe(true)
   })

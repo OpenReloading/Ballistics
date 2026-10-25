@@ -31,6 +31,7 @@ import {
   storedToSi,
 } from './field-spec.ts'
 import { designReduce, type History as H, historyOf, pushHistory } from './history.ts'
+import { nth } from './nth.ts'
 import { exactFieldText, type UnitSystem } from './units.ts'
 import { type ResolvedCartridge, revisionOf } from './variants.ts'
 
@@ -491,7 +492,7 @@ function refuseUnlayable(
     return {
       refusal: {
         reason: 'These dimensions do not form an outline.',
-        field: last ?? fieldSpecs[0].key,
+        field: last ?? nth(fieldSpecs, 0).key,
       },
     }
   }
@@ -504,7 +505,7 @@ function refuseUnlayable(
     return {
       refusal: {
         reason: [...missing, missingHint].join(' '),
-        field: keys.find((k) => k === last) ?? keys[0] ?? fieldSpecs[0].key,
+        field: keys.find((k) => k === last) ?? keys[0] ?? nth(fieldSpecs, 0).key,
       },
     }
   }
@@ -576,8 +577,9 @@ export function evaluate(design: Design, system: UnitSystem, last?: string): Eva
 
   const checks = plausibilityChecks(spec)
   const notes = outlineNotes(shown)
-  const derived = design.table === 'VII' ? [] : derive(shown[0], spec.values)
-  for (const { side, p } of shown[0].drawn)
+  const lead = nth(shown, 0)
+  const derived = design.table === 'VII' ? [] : derive(lead, spec.values)
+  for (const { side, p } of lead.drawn)
     if (
       side === 'cartridge' &&
       p.derivedE !== undefined &&
@@ -639,7 +641,7 @@ function approximateCaseVolume(figure: Figure, values: SpecValue[]): Derived | u
   let mm3 = 0
   const pts = c.p.points
   for (let k = 1; k < pts.length; k++) {
-    const [[ra, za], [rb, zb]] = [pts[k - 1], pts[k]]
+    const [[ra, za], [rb, zb]] = [nth(pts, k - 1), nth(pts, k)]
     const lo = Math.max(za, head)
     const hi = Math.min(zb, L3)
     if (hi <= lo) continue

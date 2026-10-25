@@ -7,6 +7,7 @@ import { cartridgeItem, contentHash, revisionOf } from '../src/catalogue/derive.
 import { loadCatalogue, writeCatalogue } from '../src/catalogue/node.ts'
 import { openCatalogue } from '../src/catalogue/open.ts'
 import { catalogueFormat, deriveVersion } from '../src/catalogue/types.ts'
+import { defined } from './defined.ts'
 import { bundle } from './fixtures.ts'
 
 const built = buildCatalogue(bundle)
@@ -15,7 +16,8 @@ const ids = (page: { items: { id: string }[] }) => page.items.map((i) => i.id)
 
 describe('derive', () => {
   it('takes the sheet minima, the highest side-less Pmax and the case head of a cartridge', () => {
-    const [alpha, beta] = bundle.cartridges
+    const alpha = defined(defined(bundle.cartridges[0]))
+    const beta = defined(defined(bundle.cartridges[1]))
     expect(cartridgeItem(alpha)).toEqual({
       id: 'alpha-rifle',
       name: 'Alpha Rifle',
@@ -53,7 +55,7 @@ describe('derive', () => {
 describe('build', () => {
   it('writes records without kind, origin and revision', () => {
     expect(JSON.stringify(built.records)).not.toMatch(/"(?:origin|revision)"/)
-    expect(Object.keys(built.records.cartridge['alpha-rifle'])).not.toContain('kind')
+    expect(Object.keys(defined(built.records.cartridge['alpha-rifle']))).not.toContain('kind')
   })
 
   it('keeps each list in its default order', () => {
@@ -67,7 +69,7 @@ describe('build', () => {
   })
 
   it('names a component without its manufacturer', () => {
-    const bad = { ...bundle, bullets: [{ ...bundle.bullets[0], manufacturer: 'nobody' }] }
+    const bad = { ...bundle, bullets: [{ ...defined(bundle.bullets[0]), manufacturer: 'nobody' }] }
     expect(() => buildCatalogue(bad)).toThrow('example-a-1: unknown manufacturer nobody')
   })
 })
@@ -117,7 +119,7 @@ describe('open', () => {
   })
 
   it('ranks a name above a word start above an infix, and keeps the default order between equal ranks', () => {
-    const named = (id: string, name: string) => ({ ...bundle.cartridges[2], id, name })
+    const named = (id: string, name: string) => ({ ...defined(bundle.cartridges[2]), id, name })
     const ranked = openCatalogue(
       buildCatalogue({
         ...bundle,
@@ -152,7 +154,7 @@ describe('open', () => {
   it('answers the record with kind, origin and a revision that follows its content', () => {
     const record = catalogue.get('bullet', 'example-a-1')
     expect(record).toMatchObject({ id: 'example-a-1', kind: 'bullet', origin: 'catalogue' })
-    expect(record?.revision).toBe(revisionOf(bundle.bullets[0]))
+    expect(record?.revision).toBe(revisionOf(defined(bundle.bullets[0])))
     expect(catalogue.get('bullet', 'unknown')).toBeUndefined()
     expect(catalogue.get('bullet', 'constructor')).toBeUndefined()
     expect(catalogue.get('cartridge', 'example-a-1')).toBeUndefined()

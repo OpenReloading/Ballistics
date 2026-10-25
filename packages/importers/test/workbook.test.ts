@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { maxCellCharacters, maxCells, maxElements, maxPartSize } from '../src/limits.ts'
 import { isWorkbook, readWorkbook } from '../src/workbook.ts'
+import { defined } from './defined.ts'
 import { treeRows, treeStrings } from './tree-rows.ts'
 import { type Part, workbookParts, zip } from './xlsx.ts'
 
@@ -26,7 +27,7 @@ describe('readWorkbook cells', () => {
         '<row r="4"/><row><c><v>a</v></c><c><v>b</v></c><c r="E5"><v>e</v></c></row>',
     )
     const r = await readWorkbook(book({ [sheet]: xml }))
-    expect(r.worksheets[0].rows).toEqual([
+    expect(r.worksheets[0]?.rows).toEqual([
       ['1', '2800.0', '', '', '', '', '', 'x'],
       ['a', 'b', '', '', 'e'],
     ])
@@ -43,14 +44,14 @@ describe('readWorkbook cells', () => {
       '<si><t> Speed (FPS)\uFEFF </t></si><si><r><t>Test </t></r><r><rPr/><t>load</t></r><rPh><t>xx</t></rPh></si>',
     )
     const r = await readWorkbook(book({ [sheet]: xml, 'xl/sharedStrings.xml': strings }))
-    expect(r.worksheets[0].rows).toEqual([
+    expect(r.worksheets[0]?.rows).toEqual([
       ['Speed (FPS)', 'Time', '2800.5', 'ok', '1', '', 'Test load', ''],
     ])
   })
 
   it('reads prefixed element names', async () => {
     const xml = `<x:worksheet xmlns:x="${main}"><x:sheetData><x:row><x:c r="A1"><x:v>1</x:v></x:c></x:row></x:sheetData></x:worksheet>`
-    expect((await readWorkbook(book({ [sheet]: xml }))).worksheets[0].rows).toEqual([['1']])
+    expect((await readWorkbook(book({ [sheet]: xml }))).worksheets[0]?.rows).toEqual([['1']])
   })
 
   it('refuses a shared string out of range, a column beyond IV and cells out of order', async () => {
@@ -96,7 +97,7 @@ describe('readWorkbook parts', () => {
         [sheet]: ws('<row><c t="inlineStr"><is><t>a</t></is></c></row>'),
       }),
     )
-    expect(r.worksheets[0].rows).toEqual([['a']])
+    expect(r.worksheets[0]?.rows).toEqual([['a']])
   })
 
   it('finds the workbook through the package relationships and reads absolute targets', async () => {
@@ -208,7 +209,7 @@ function mulberry32(seed: number) {
 
 /** A worksheet and a shared strings part with the constructs both readers must agree on. */
 function generated(random: () => number) {
-  const pick = <T>(items: T[]) => items[Math.floor(random() * items.length)]
+  const pick = <T>(items: T[]) => defined(items[Math.floor(random() * items.length)], 'pick')
   const p = random() < 0.3 ? 'x:' : ''
   const ns = p ? `xmlns:x="${main}"` : `xmlns="${main}"`
   const ws = () => pick(['', '', ' ', '\n  ', '<!-- c -->', '<?p q?>'])
@@ -298,7 +299,7 @@ describe('readWorkbook in one pass', () => {
     for (let k = 0; k < 200; k++) {
       const { sheetXml, sst: strings } = generated(random)
       const r = await readWorkbook(book({ [sheet]: sheetXml, 'xl/sharedStrings.xml': strings }))
-      expect(r.worksheets[0].rows, sheetXml).toEqual(treeRows(sheetXml, treeStrings(strings)))
+      expect(r.worksheets[0]?.rows, sheetXml).toEqual(treeRows(sheetXml, treeStrings(strings)))
     }
   })
 
@@ -307,7 +308,7 @@ describe('readWorkbook in one pass', () => {
       '<row><c><v>1</v><v>2</v></c><c><v>1<x>9</x>2</v></c>' +
         '<c t="inlineStr"><is><t>a</t><r><t>b</t></r><rPh><t>z</t></rPh></is><is><t>q</t></is></c></row>',
     ).replace('</worksheet>', '<sheetData><row><c><v>3</v></c></row></sheetData></worksheet>')
-    expect((await readWorkbook(book({ [sheet]: xml }))).worksheets[0].rows).toEqual([
+    expect((await readWorkbook(book({ [sheet]: xml }))).worksheets[0]?.rows).toEqual([
       ['1', '12', 'ab'],
     ])
   })

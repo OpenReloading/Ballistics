@@ -74,7 +74,7 @@ describe('seven-perforated grain', () => {
   const gridArea = (y: number, n = 400) => {
     const rho = dp / 2 + y
     const r = r0 - y
-    const centres = [[0, 0]]
+    const centres: [number, number][] = [[0, 0]]
     for (let k = 0; k < 6; k++)
       centres.push([s * Math.cos((k * Math.PI) / 3), s * Math.sin((k * Math.PI) / 3)])
     const cell = (2 * r) / n

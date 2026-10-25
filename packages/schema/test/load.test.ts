@@ -61,7 +61,7 @@ describe('Load', () => {
     })
     for (const data of [userLoad, catalogueLoad, { ...userLoad, origin: 'shared' }]) {
       const parsed = userDataFile.parse(file(data))
-      expect(parsed.records[0].data).toEqual(load.parse(data))
+      expect(parsed.records[0]?.data).toEqual(load.parse(data))
     }
     expect(userRecord.parse(wrap(userLoad)).data).toEqual(userLoad)
   })

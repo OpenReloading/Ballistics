@@ -6,6 +6,7 @@ import {
   findBullets,
   searchBullets,
 } from '../src/lib/bullet-search.ts'
+import { defined, missing } from './defined.ts'
 
 // invented bullets: mass in g (168 gr = 10.886 g), diameter in mm
 const row = (over: Partial<BulletRow> & Pick<BulletRow, 'id' | 'name'>): BulletRow => ({
@@ -87,9 +88,11 @@ it('matches words in any order and by the manufacturer alias', () => {
 })
 
 it('ranks an exact word and the product name above a word start and the manufacturer', () => {
-  const [match, matchline] = [rows[0], rows[3]]
+  const [match = missing(), matchline = missing()] = [rows[0], rows[3]]
   expect(bulletRelevance(match, 'match')).toBeGreaterThan(bulletRelevance(matchline, 'match'))
-  expect(bulletRelevance(rows[3], 'beta')).toBeLessThan(bulletRelevance(rows[3], 'matchline'))
+  expect(bulletRelevance(defined(rows[3]), 'beta')).toBeLessThan(
+    bulletRelevance(defined(rows[3]), 'matchline'),
+  )
   expect(bulletRelevance(match, '')).toBe(0)
 })
 

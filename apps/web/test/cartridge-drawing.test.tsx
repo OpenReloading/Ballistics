@@ -4,6 +4,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { combinedRows } from '../src/lib/cartridge-record.ts'
 import { drawable } from '../src/lib/cartridge-sheet.ts'
+import { defined, missing } from './defined.ts'
 import { replaceUntilStable } from './markup.ts'
 import { sheetRecord } from './records.ts'
 
@@ -28,7 +29,7 @@ const render = (file: string, side?: 'cartridge' | 'chamber' | 'designer', unit?
     </MantineProvider>,
   )
   const all = (tag: string) =>
-    [...html.matchAll(new RegExp(`<${tag}[^>]*>(.*?)</${tag}>`, 'gs'))].map(([, t]) =>
+    [...html.matchAll(new RegExp(`<${tag}[^>]*>(.*?)</${tag}>`, 'gs'))].map(([, t = missing()]) =>
       replaceUntilStable(t, /<[^>]+>/g).replaceAll('&#x27;', "'"),
     )
   return { html, captions: all('figcaption'), descs: all('desc') }
@@ -72,7 +73,7 @@ describe('CartridgeDrawing', () => {
     const win = print('cip-308-win-2008-09-23')
     for (const { sizes } of [luger, win]) {
       expect(sizes).toHaveLength(2)
-      for (const [w, h] of sizes) expect(h).toBeGreaterThan(w)
+      for (const [w = missing(), h] of sizes) expect(h).toBeGreaterThan(w)
     }
     expect(luger.captions[0]).toContain('the drawing is life size (1:1)')
     expect(win.captions[1]).toContain('the drawing is at 1:1.25 (80 % of life size)')
@@ -85,7 +86,7 @@ describe('CartridgeDrawing', () => {
       )
       // the room kept for the other length unit is each figure's own height
       expect(svg?.[2]).toMatch(/;min-width:max\(min\([\d.]+px, .*;min-height:calc\(max\(min\(/)
-      return svg && [svg[1], svg[2].replace(/;min-(width|height):[^;]+/g, '')]
+      return svg && [svg[1], defined(svg[2]).replace(/;min-(width|height):[^;]+/g, '')]
     }
     expect(sized('cartridge')).toBeDefined()
     expect(sized('chamber')).toEqual(sized('cartridge'))
@@ -133,7 +134,7 @@ describe('CartridgeDrawing', () => {
     expect(render('cip-308-win-2008-09-23', 'cartridge').html).toContain('Dimensions in mm')
     const inches = texts('cip-308-win-2008-09-23', 'cartridge', 'in')
     expect(inches).toContain('L3 2.0150')
-    expect(inches.find((t) => t.startsWith('α '))).toMatch(/°/)
+    expect(inches.find((t) => defined(t).startsWith('α '))).toMatch(/°/)
     expect(texts('cip-308-win-2008-09-23', 'chamber', 'in')).toContain('L3 2.0252')
     const { html, descs, captions } = render('cip-308-win-2008-09-23', 'cartridge', 'in')
     expect(html).toContain('Dimensions in inches')
@@ -145,9 +146,9 @@ describe('CartridgeDrawing', () => {
   it('names the derived e of 454 Casull in the description and draws no e dimension', () => {
     const { descs } = render('cip-454-casull-2015-05-19', 'cartridge')
     expect(descs[0]).toMatch(/e 0 mm \(derived, not dimensioned\)/)
-    expect(texts('cip-454-casull-2015-05-19', 'cartridge').filter((t) => /^\(?e /.test(t))).toEqual(
-      [],
-    )
+    expect(
+      texts('cip-454-casull-2015-05-19', 'cartridge').filter((t) => /^\(?e /.test(defined(t))),
+    ).toEqual([])
   })
 
   it('draws one 9 C.F. Mori hull with its cone diameter d2 8.4', () => {
@@ -223,7 +224,7 @@ describe('CartridgeDrawing', () => {
     const rows = combinedRows(spec, recordFigures(spec))
     const linked = { cartridge: 0, chamber: 0 }
     for (const side of ['cartridge', 'chamber'] as const) {
-      const [svg] = screens(render(file, side).html)
+      const [svg = missing()] = screens(render(file, side).html)
       const drawn = (tag: string) =>
         new Set(
           [...svg.matchAll(new RegExp(`<${tag}[^>]*data-symbol="([^"]*)"`, 'g'))].map((m) => m[1]),
@@ -231,7 +232,7 @@ describe('CartridgeDrawing', () => {
       const [marks, labels] = [drawn('g'), drawn('text')]
       const symbols = new Set(rows.filter((r) => r[side]).map((r) => r.storedSymbol))
       // a dimension the table has no row for would mark nothing
-      expect([...labels].filter((s) => !symbols.has(s))).toEqual([])
+      expect([...labels].filter((s) => !symbols.has(defined(s)))).toEqual([])
       // a drawn dimension is its lines and arrowheads (the mark) and its text
       expect([...marks].sort()).toEqual([...labels].sort())
       linked[side] = [...symbols].filter((s) => labels.has(s)).length

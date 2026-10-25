@@ -42,6 +42,6 @@ export function TargetFaceFigure({ shape, label }: { shape: FaceShape; label: st
 export const TargetFaceDrawing = ({ face }: { face: TargetFace }) => (
   <TargetFaceFigure
     shape={face}
-    label={`${face.name}: ${face.rings.length} rings, ${face.rings[0].diameter.value} mm across`}
+    label={`${face.name}: ${face.rings.length} rings, ${face.rings[0]?.diameter.value} mm across`}
   />
 )

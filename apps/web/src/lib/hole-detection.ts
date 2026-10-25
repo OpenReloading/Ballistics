@@ -17,6 +17,7 @@ import {
 import {
   axisOf,
   DISC,
+  type LogRgb,
   logLuma,
   lumaOf,
   project,
@@ -25,6 +26,7 @@ import {
   type WorkImage,
 } from './colour-axis.ts'
 import type { RgbaImage } from './image.ts'
+import { nth } from './nth.ts'
 import {
   clamp,
   components,
@@ -36,6 +38,12 @@ import {
 } from './raster-ops.ts'
 import type { Point } from './target-geometry.ts'
 import { paperOutline } from './target-paper.ts'
+
+// Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
+const f32 = (a: Float32Array, i: number) => a[i] as number
+const f64 = (a: Float64Array, i: number) => a[i] as number
+const i32 = (a: Int32Array, i: number) => a[i] as number
+const u8 = (a: Uint8Array | Uint8ClampedArray, i: number) => a[i] as number
 
 /** A polygon or a rectangle in image px. */
 export type Region = readonly Point[] | { x: number; y: number; width: number; height: number }
@@ -178,8 +186,8 @@ type Run = {
   size: number
   /** Their diameters, work px. */
   sizes: number[]
-  mu: number[]
-  ring: number[]
+  mu: LogRgb
+  ring: LogRgb
   /** The shots where the ring numerals stand (a face label with rings), also in `shots`. */
   zone?: HoleProposal[]
 }
@@ -273,7 +281,8 @@ function runSeeds(input: HoleDetectionInput, ctx: Ctx, seeds: (Peak | undefined)
     const got = solved(input, at, ctx, false, false)
     if (!got || got.run.shots.length < 2) continue
     const sizes = [...got.run.sizes].sort((a, b) => a - b)
-    const mid = sizes[sizes.length >> 1]
+    // no sizes: NaN, as arithmetic on a missing entry has it
+    const mid = sizes[sizes.length >> 1] ?? Number.NaN
     // the strongest peaks show alike holes
     if (sizes.filter((v) => Math.abs(v / mid - 1) > 0.35).length > sizes.length / 4) continue
     runs.push({ ...got, at })
@@ -334,12 +343,12 @@ export function detectFromExample(
   const got = solved(input, fromImage(ctx, at), ctx)
   if (!got) return undefined
   const { found, run } = got
-  const rgb = (i: number) => Math.min(255, Math.max(0, Math.round(Math.exp(run.mu[i]) - 8)))
+  const rgb = (v: number) => Math.min(255, Math.max(0, Math.round(Math.exp(v) - 8)))
   return {
     ...found,
     example: {
       diameter: found.holeDiameter * input.pxPerM,
-      backing: { r: rgb(0), g: rgb(1), b: rgb(2) },
+      backing: { r: rgb(run.mu[0]), g: rgb(run.mu[1]), b: rgb(run.mu[2]) },
       polarity: lumaOf(run.mu) < lumaOf(run.ring) ? 'dark' : 'light',
     },
   }
@@ -359,7 +368,9 @@ function solved(
   if (!ctx) return undefined
   const { backing } = input
   const seed: Seed =
-    at || !backing ? { at } : { mu: [backing.r, backing.g, backing.b].map((v) => Math.log(v + 8)) }
+    at || !backing
+      ? { at }
+      : { mu: [Math.log(backing.r + 8), Math.log(backing.g + 8), Math.log(backing.b + 8)] }
   const sized = estimateHoleSize(ctx, seed, refine)
   if (!sized) return undefined
   const { run, holeDiameter } = sized
@@ -577,14 +588,14 @@ function blockAverageLogRgb(
     for (let x = x0; x < x1; x++) {
       const i = (y * image.width + x) * 4
       const j = row + Math.floor((x - x0) / s)
-      sum[j] += image.data[i]
-      sum[n + j] += image.data[i + 1]
-      sum[2 * n + j] += image.data[i + 2]
-      count[j]++
+      sum[j] = f32(sum, j) + u8(image.data, i)
+      sum[n + j] = f32(sum, n + j) + u8(image.data, i + 1)
+      sum[2 * n + j] = f32(sum, 2 * n + j) + u8(image.data, i + 2)
+      count[j] = f32(count, j) + 1
     }
   }
   for (let c = 0; c < 3; c++)
-    for (let j = 0; j < n; j++) sum[c * n + j] = Math.log(sum[c * n + j] / count[j] + 8)
+    for (let j = 0; j < n; j++) sum[c * n + j] = Math.log(f32(sum, c * n + j) / f32(count, j) + 8)
   return sum
 }
 
@@ -654,7 +665,8 @@ function pickedSize(ctx: Ctx, seed: Seed, holeDiameter: number): number | undefi
   const peaks = peaksOf(scales, new Uint8Array(win.w * win.h).fill(1), holeDiameter).filter(
     (p) => Math.hypot(p.x + x0 - at.x, p.y + y0 - at.y) <= holeDiameter,
   )
-  return peaks.length ? D_OVER_SIGMA * peaks[0].sigma : undefined
+  const [first] = peaks
+  return first ? D_OVER_SIGMA * first.sigma : undefined
 }
 
 /** Calls `f` with the index of every pixel of a `w` x `h` image within `r` of `p`. */
@@ -679,7 +691,7 @@ function pipeline(ctx: Ctx, holeDiameter: number, seed: Seed): Run | undefined {
   const contrast = (p: Peak) => {
     let [sum, n] = [0, 0]
     around(ctx, p, 0.25 * holeDiameter, (i) => {
-      sum += hat[i]
+      sum += f32(hat, i)
       n++
     })
     return n ? sum / n : 0
@@ -697,7 +709,7 @@ function pipeline(ctx: Ctx, holeDiameter: number, seed: Seed): Run | undefined {
   const r5 = median1(top.map((p) => p.response))
   const threshold = HAT * median1(top.map(contrast))
   const mask = new Uint8Array(w * h)
-  for (let i = 0; i < w * h; i++) mask[i] = hat[i] > threshold && inside[i] ? 1 : 0
+  for (let i = 0; i < w * h; i++) mask[i] = f32(hat, i) > threshold && inside[i] ? 1 : 0
   const parts = components(mask, w, h)
   const kept = testPeaks(peaks, mask, parts, { w, h, keep: ctx.keep, r5, holeDiameter })
   run.sizes = estimateSize(kept, scales, w)
@@ -719,14 +731,14 @@ function topHat(P: Float32Array, w: number, h: number, holeDiameter: number): Fl
       let [sum, n] = [0, 0]
       for (let v = y * f; v < Math.min(h, (y + 1) * f); v++)
         for (let u = x * f; u < Math.min(w, (x + 1) * f); u++) {
-          sum += smooth[v * w + u]
+          sum += f32(smooth, v * w + u)
           n++
         }
       small[y * w2 + x] = sum / n
     }
   const opened = open(small, w2, h2, Math.max(1, Math.round(holeDiameter / f)))
   return smooth.map(
-    (v, i) => v - opened[Math.floor(Math.floor(i / w) / f) * w2 + Math.floor((i % w) / f)],
+    (v, i) => v - f32(opened, Math.floor(Math.floor(i / w) / f) * w2 + Math.floor((i % w) / f)),
   )
 }
 
@@ -751,16 +763,17 @@ function testPeaks(
     if (p.response < o.keep * o.r5) break
     let [deep, at] = [0, -1]
     around(o, p, 0.3 * holeDiameter, (i) => {
-      if (mask[i] && depth[i] > deep) [deep, at] = [depth[i], i]
+      if (mask[i] && f64(depth, i) > deep) [deep, at] = [f64(depth, i), i]
     })
     if (at < 0 || Math.sqrt(deep) < INSCRIBED * holeDiameter) continue
     let [filled, total] = [0, 0]
     around(o, p, 0.5 * holeDiameter, (i) => {
       total++
-      filled += mask[i]
+      filled += u8(mask, i)
     })
     if (filled < FILL * total) continue
-    kept.set(label[at], [...(kept.get(label[at]) ?? []), p])
+    const part = i32(label, at)
+    kept.set(part, [...(kept.get(part) ?? []), p])
   }
   return kept
 }
@@ -784,7 +797,7 @@ function shotsFromParts(
   const shots: HoleProposal[] = []
   let clusterId = 0
   for (const [k, list] of kept) {
-    const diameter = Math.sqrt((4 * parts[k].length) / (Math.PI * list.length))
+    const diameter = Math.sqrt((4 * nth(parts, k).length) / (Math.PI * list.length))
     // print: a part with far more area than its peaks have holes
     if (diameter > MAX_PART * holeDiameter) continue
     for (const p of list)
@@ -811,6 +824,9 @@ function dropStrays(list: HoleProposal[], holePx: number): HoleProposal[] {
   const nearest = list.map((p) =>
     Math.min(...list.filter((q) => q !== p).map((q) => Math.hypot(q.x - p.x, q.y - p.y))),
   )
-  const m = [...nearest].sort((a, b) => a - b)[nearest.length >> 1]
-  return list.filter((_, i) => nearest[i] <= 4 * m + 2 * holePx)
+  const m = nth(
+    [...nearest].sort((a, b) => a - b),
+    nearest.length >> 1,
+  )
+  return list.filter((_, i) => nth(nearest, i) <= 4 * m + 2 * holePx)
 }

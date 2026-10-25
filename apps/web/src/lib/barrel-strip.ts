@@ -7,6 +7,7 @@ import {
 } from '@open-reloading/drawing'
 import { previewDrawn } from '@open-reloading/drawing/seating'
 import { fromSi } from '@open-reloading/schema'
+import { nth } from './nth.ts'
 
 /**
  * What the barrel strip of the interior chart draws, taken from the seated preview at the
@@ -47,7 +48,7 @@ export function stripModel(f: StripFigure, travel: number): StripModel | undefin
   const muzzle = f.base + fromSi('length', travel)
   const drawn = previewDrawn(f.values, f.table, muzzle)
   if ('missing' in drawn) return
-  const [cartridge, chamber] = [drawn[0].p.points, drawn[1].p.points]
+  const [cartridge, chamber] = [nth(drawn, 0).p.points, nth(drawn, 1).p.points]
   const band = steelBand(chamber, em)
   const r = band.outer + 1
   return {

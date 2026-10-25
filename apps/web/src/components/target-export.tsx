@@ -107,7 +107,10 @@ function standalone(svg: SVGSVGElement, k: number, size: { w: number; h: number 
     b.removeAttribute('class')
     b.removeAttribute('vector-effect')
     const copies = [...b.children]
-    for (const [i, c] of [...a.children].entries()) walk(c, copies[i])
+    for (const [i, c] of [...a.children].entries()) {
+      const copy = copies[i]
+      if (copy) walk(c, copy)
+    }
   }
   walk(svg, clone)
   clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
