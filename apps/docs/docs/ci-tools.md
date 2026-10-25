@@ -31,7 +31,11 @@ Not used: a hosted quality gate and coverage service (SonarQube Cloud, Codecov),
 ## Rules for workflows
 
 - Every action is pinned to a full commit SHA with its version in a comment. Dependabot updates both.
-- `permissions`: read-only at the workflow level (`ci.yml`, `pr-title.yml`), or none at the workflow level and set per job (`pages.yml`, `release.yml`, `scorecard.yml`). `persist-credentials: false` on every checkout.
+- `permissions`: none at the workflow level, set per job. `persist-credentials: false` on every checkout.
+- Every job has a `timeout-minutes` of about three times its median run.
+- `ci.yml` and `pr-title.yml` cancel a superseded pull request run (`concurrency`).
+- `ci.yml` runs on pushes to `develop` and on pull requests. The promotion pull request (develop into main) skips its jobs, because the push to develop already ran them on the same commit; a skipped required check passes.
+- Tool images of `docker run` steps are set in the `env` block of `ci.yml`. Dependabot does not read them: update them by hand.
 - Jobs that publish or need secrets run only in `OpenReloading/Ballistics` (`if: github.repository == ...`).
 
 ## Repository settings (maintainers)

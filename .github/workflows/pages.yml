@@ -17,6 +17,7 @@ jobs:
   build:
     if: github.repository == 'OpenReloading/Ballistics'
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
       pages: read
@@ -27,6 +28,7 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
+          cache: npm
       - run: npm ci --ignore-scripts && node patches/apply.mjs
       - run: npm run build
       - id: pages
@@ -45,6 +47,7 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     permissions:
       pages: write
       id-token: write
