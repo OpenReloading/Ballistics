@@ -3,7 +3,7 @@
 import { Button } from '@mantine/core'
 import type { VelocityUnit } from '@open-reloading/importers'
 import { chronoSession, type SessionRecord, toSi } from '@open-reloading/schema'
-import { type Dispatch, type ReactNode, type SetStateAction, useState } from 'react'
+import { type Dispatch, type ReactNode, type SetStateAction, useRef, useState } from 'react'
 import { chronoFileBytes, readChrono } from '../lib/chrono.ts'
 import { errorText } from '../lib/error-text.ts'
 import {
@@ -159,6 +159,7 @@ export function Measurements({
   const [unit, setUnit] = useState<VelocityUnit | ''>('')
   const [error, setError] = useState('')
   const [status, setStatus] = useState('')
+  const reserved = useRef(0)
 
   async function readFiles(files: File[]) {
     setError('')
@@ -167,13 +168,16 @@ export function Measurements({
     const failed: string[] = []
     // a maker named by several files is one reference, a new one is stored once
     const makers = new Map<string, string | undefined>()
-    for (const file of files) {
+    // a load names up to maxSessions sessions; the slots of reads still running are taken
+    const room = Math.max(0, maxSessions - sessionRefCount - reserved.current)
+    const taken = files.slice(0, room)
+    reserved.current += taken.length
+    for (const file of files.slice(room))
+      failed.push(`${file.name}: a load keeps ${maxSessions} sessions at most.`)
+    for (const file of taken) {
       // taken before the first await, so reads that overlap never share an id
       const id = newId()
       try {
-        // a load names up to maxSessions sessions
-        if (sessionRefCount + read.length >= maxSessions)
-          throw new Error(`a load keeps ${maxSessions} sessions at most.`)
         const data = await readChrono(await chronoFileBytes(file), {
           fileName: file.name,
           ...(unit ? { velocityUnit: unit } : {}),
@@ -202,6 +206,7 @@ export function Measurements({
       }
     }
     setSessions((s) => [...s, ...read])
+    reserved.current -= taken.length
     if (read.length > 0)
       setStatus(
         `Read ${read.map((r) => `${r.name}, ${r.data.strings.length} strings`).join('; ')}.`,
