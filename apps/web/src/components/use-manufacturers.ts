@@ -18,16 +18,25 @@ import { putRecords, storedRecords } from '../lib/user-store.ts'
 /**
  * The manufacturers a user can name: the catalogue's and the browser's, read after mounting.
  * `ensure` turns a typed name into a reference: the manufacturer it names, else a new user
- * manufacturer, stored here and found by the next typed name.
+ * manufacturer, stored here and found by the next typed name. While the catalogue has not
+ * answered (`ready` false) a name that matches no user manufacturer gets no reference and no
+ * record, so it cannot duplicate a catalogue manufacturer; `retry` asks the catalogue again.
  */
 export function useManufacturers() {
   const [catalogue, setCatalogue] = useState<ManufacturerSummary[]>([])
   const [mine, setMine] = useState<UserRecord[]>([])
+  const [ready, setReady] = useState(false)
+  const loaded = useRef(false)
   useEffect(() => {
     let live = true
     // without the catalogue a typed name can only match the user's own manufacturers
     fetchManufacturers().then(
-      (m) => live && setCatalogue(m),
+      (m) => {
+        if (!live) return
+        loaded.current = true
+        setCatalogue(m)
+        setReady(true)
+      },
       () => {},
     )
     storedRecords().then(
@@ -43,8 +52,21 @@ export function useManufacturers() {
     () => withUserManufacturers(manufacturerNames(catalogue), mine),
     [catalogue, mine],
   )
-  const latest = useRef(known)
-  latest.current = known
+  const seen = useRef({ catalogue, mine })
+  seen.current = { catalogue, mine }
+  /** Asks the catalogue again; whether it answered. A later `preview` or `ensure` sees it at once. */
+  const retry = useCallback(async () => {
+    try {
+      const m = await fetchManufacturers()
+      seen.current = { ...seen.current, catalogue: m }
+      loaded.current = true
+      setCatalogue(m)
+      setReady(true)
+      return true
+    } catch {
+      return false
+    }
+  }, [])
   /**
    * The reference `typed` stands for, `id` the UUID of a new manufacturer. A new one is kept as a
    * draft (its name is known to `nameOf`, nothing is stored) that the next call for `id` replaces
@@ -52,10 +74,14 @@ export function useManufacturers() {
    */
   const preview = useCallback((typed: string, id: string) => {
     const to = referTo(
-      latest.current.filter((m) => m.ref !== `user:${id}`),
+      knownManufacturers(
+        seen.current.catalogue,
+        seen.current.mine.filter((r) => r.id !== id),
+      ),
       typed,
       () => id,
       new Date(),
+      loaded.current,
     )
     setMine((m) => [...m.filter((r) => r.id !== id), ...(to?.created ? [to.created] : [])])
     return to?.ref
@@ -74,6 +100,8 @@ export function useManufacturers() {
   return {
     known,
     names,
+    ready,
+    retry,
     preview,
     ensure,
     newId,

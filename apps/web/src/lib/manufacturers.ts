@@ -82,17 +82,21 @@ export const newManufacturerRecord = (id: string, typed: string, now: Date): Use
 /**
  * The reference a typed name stands for: the manufacturer it names, else that of a new user
  * manufacturer, whose record is `created` for the caller to store (and to add to `known` so the
- * next typed name finds it). Undefined for an empty text.
+ * next typed name finds it). Undefined for an empty text, and for a name nothing matches while the
+ * catalogue is not known (`catalogueKnown` false): the catalogue may hold it, and a user
+ * manufacturer made now would stay a duplicate of it.
  */
 export function referTo(
   known: readonly KnownManufacturer[],
   typed: string,
   newUuid: () => string,
   now: Date,
+  catalogueKnown = true,
 ): { ref: string; created?: UserRecord } | undefined {
   if (typed.trim() === '') return undefined
   const found = findManufacturer(known, typed)
   if (found) return { ref: found.ref }
+  if (!catalogueKnown) return undefined
   const created = newManufacturerRecord(newUuid(), typed, now)
   return { ref: `user:${created.id}`, created }
 }

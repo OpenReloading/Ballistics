@@ -64,6 +64,16 @@ describe('user manufacturers', () => {
     expect(referTo(known, ' ', () => uuid, new Date(0))).toBeUndefined()
   })
 
+  it('creates no user manufacturer while the catalogue is unknown, but still names a known one', () => {
+    const known = knownManufacturers([], mine)
+    const typed = (text: string) => referTo(known, text, () => uuid, new Date(0), false)
+    expect(typed('Alpha Powder')).toBeUndefined()
+    expect(typed('home loader')).toEqual({ ref: `user:${uuid}` })
+    expect(
+      referTo(knownManufacturers(catalogue, []), 'Alpha Powder', () => uuid, new Date(0), true),
+    ).toEqual({ ref: 'catalogue:alpha-powder' })
+  })
+
   it('names a reference of either scope', () => {
     const names = withUserManufacturers(manufacturerNames(catalogue), mine)
     expect(refName(names, 'catalogue:beta')).toBe('Beta')
