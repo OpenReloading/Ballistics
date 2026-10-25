@@ -131,7 +131,7 @@ export function ReportIssueDialog({
   // biome-ignore lint/correctness/useExhaustiveDependencies: the ticked boxes are `activeKey`
   useEffect(() => {
     let current = true
-    Promise.all(
+    void Promise.all(
       active.map(async (o) => {
         const text = await Promise.resolve(o.text()).catch(() => undefined)
         return text === undefined ? [] : [{ heading: o.heading, text }]

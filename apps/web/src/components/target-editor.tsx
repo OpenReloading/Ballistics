@@ -172,7 +172,9 @@ function keepCopies(records: WaitingRecord[]) {
 }
 
 /** Deletes a stored file; a refusal leaves it. */
-const discardFile = (id: string) => deletePhoto(id).catch(() => {})
+const discardFile = (id: string) => {
+  void deletePhoto(id).catch(() => {})
+}
 
 /** The copies without sheet `id` up to its save `saved` that landed; without `saved` (a delete), all. */
 function dropCopy(id: string, saved?: string) {
@@ -787,7 +789,7 @@ export function TargetEditor({
    * (Import, Replace) changed it, so the next save does not write the old sheet over it.
    */
   const reloadStored = () => {
-    reloadSheets()
+    void reloadSheets()
     const id = shown.current
     storedRecord(id)
       .then(async (r) => {
@@ -969,7 +971,7 @@ export function TargetEditor({
           const used = gone.length ? await storedPhotoIds() : new Set<string>()
           for (const o of gone) if (!used.has(o.photo)) discardFile(o.photo)
           setSheets((list) => [record, ...list.filter((r) => r.id !== record.id)])
-          requestPersistentStorage()
+          void requestPersistentStorage()
           // a save that ends after another sheet opened leaves that sheet's state alone
           if (shown.current !== record.id) return
           opened.current = { data: sheet, name: meta.name }
@@ -1112,7 +1114,7 @@ export function TargetEditor({
         if (put) setSheets((list) => [back, ...list.filter((x) => x.id !== id)])
         else {
           await putRecords([own])
-          reloadSheets()
+          void reloadSheets()
         }
         open(own)
         if (!put) say(keptNote(own.name), true)
@@ -2317,7 +2319,7 @@ export function TargetEditor({
                   disabled={!sheet.photo}
                   onClick={() => {
                     setPop(undefined)
-                    removePhoto()
+                    void removePhoto()
                   }}
                 >
                   Remove photo
@@ -2339,7 +2341,7 @@ export function TargetEditor({
         accept="image/*"
         hidden
         onChange={(e) => {
-          takePhoto(e.currentTarget.files?.[0])
+          void takePhoto(e.currentTarget.files?.[0])
           e.currentTarget.value = ''
         }}
       />
@@ -2350,7 +2352,7 @@ export function TargetEditor({
         capture="environment"
         hidden
         onChange={(e) => {
-          takePhoto(e.currentTarget.files?.[0])
+          void takePhoto(e.currentTarget.files?.[0])
           e.currentTarget.value = ''
         }}
       />
@@ -2571,7 +2573,7 @@ export function TargetEditor({
       onDragOver={(e) => e.preventDefault()}
       onDrop={(e) => {
         e.preventDefault()
-        takePhoto([...e.dataTransfer.files].find((f) => f.type.startsWith('image/')))
+        void takePhoto([...e.dataTransfer.files].find((f) => f.type.startsWith('image/')))
       }}
     >
       <TargetCanvas
