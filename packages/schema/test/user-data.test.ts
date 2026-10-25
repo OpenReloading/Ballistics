@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 import {
   checkUserRefs,
+  designIdProblem,
   firearm,
   legacyLoadProblem,
   type UserRecord,
@@ -17,9 +18,10 @@ import {
 const saved = '2026-10-13T10:00:00.000Z'
 const uuid = '3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13'
 const other = '7a2d9c10-5b3e-4f68-9d41-0c8e2b6a1f57'
+const designUuid = '9b8a7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d'
 const bulletRecord = {
   kind: 'bullet',
-  id: 'a1b2',
+  id: designUuid,
   name: 'Manufacturer 168 gr',
   saved,
   data: {
@@ -43,7 +45,7 @@ const manufacturerRecord = {
 } as const
 const cartridgeRecord = {
   kind: 'cartridge',
-  id: 'c3',
+  id: other,
   name: 'Design',
   saved,
   data: {
@@ -231,6 +233,15 @@ describe('userDataFile', () => {
     expect(userRecord.parse(alone)).toEqual(alone)
     const bare = { ...cartridgeRecord, data: { origin: 'user' } }
     expect(userRecord.parse(bare)).toEqual(bare)
+  })
+
+  it('refuses a bullet or cartridge with an id that is no UUID, and says why', () => {
+    for (const r of [bulletRecord, cartridgeRecord]) {
+      const old = userRecord.safeParse({ ...r, id: 'lk3j2h1g-a8s7d6f5' })
+      expect(old.success).toBe(false)
+      expect(old.error?.issues[0]).toMatchObject({ path: ['id'], message: designIdProblem })
+      expect(userDataFile.safeParse(file([r, { ...r, id: 'old-1' }])).success).toBe(false)
+    }
   })
 
   it('opens records with an old browser id and with a UUID', () => {

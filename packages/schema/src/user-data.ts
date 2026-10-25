@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { caseCapacity } from './case-capacity.ts'
 import { firearm } from './firearm.ts'
-import { catalogueRef, parseRef, ref } from './ids.ts'
+import { catalogueRef, parseRef, ref, userIdRegex } from './ids.ts'
 import { load } from './load.ts'
 import { bulletOverrides, cartridgeOverrides } from './overrides.ts'
 import { text } from './shared.ts'
@@ -123,12 +123,28 @@ const base = {
   saved: z.iso.datetime().describe('Time of the last save, ISO 8601 in UTC.'),
 }
 
-const record = <K extends string, D extends z.ZodType>(kind: K, description: string, data: D) =>
+/** Why a bullet or cartridge id that is no UUID is refused: a load refers to the record by `user:<UUID>`. */
+export const designIdProblem: string =
+  'The id of a bullet or cartridge must be a UUID, so that a load can refer to it.'
+
+const record = <K extends string, D extends z.ZodType>(
+  kind: K,
+  description: string,
+  data: D,
+  id: z.ZodType<string> = base.id,
+) =>
   z.object({
     kind: z.literal(kind).describe(`Kind of the record: \`${kind}\`.`),
     ...base,
+    id,
     data: data.describe(description),
   })
+
+/** The id of a bullet or cartridge: a UUID, as {@link userId}, since loads refer to them. */
+const designId = z
+  .string()
+  .regex(userIdRegex, designIdProblem)
+  .describe('Id of the record in the browser library: a UUID.')
 
 /** Why a record of kind `workbenchState`, the load of the format before kind `load`, is refused. */
 export const legacyLoadProblem: string =
@@ -142,8 +158,8 @@ export const userRecord = z.discriminatedUnion(
   'kind',
   [
     record('manufacturer', 'A manufacturer typed by the user.', userManufacturer),
-    record('bullet', 'A bullet of the bullet designer.', userBullet),
-    record('cartridge', 'A cartridge of the cartridge designer.', userCartridge),
+    record('bullet', 'A bullet of the bullet designer.', userBullet, designId),
+    record('cartridge', 'A cartridge of the cartridge designer.', userCartridge, designId),
     record('caseCapacity', 'A case capacity the user measured, in g.', caseCapacity),
     record('load', 'A load of the workbench, in stored units.', load),
     record('firearm', 'A firearm of the library, in stored units.', firearm),

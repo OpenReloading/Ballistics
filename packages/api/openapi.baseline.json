@@ -15716,9 +15716,8 @@
                             },
                             "id": {
                               "type": "string",
-                              "minLength": 1,
-                              "maxLength": 64,
-                              "description": "Id of the record in the browser library."
+                              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                              "description": "Id of the record in the browser library: a UUID."
                             },
                             "name": {
                               "type": "string",
@@ -16920,9 +16919,8 @@
                             },
                             "id": {
                               "type": "string",
-                              "minLength": 1,
-                              "maxLength": 64,
-                              "description": "Id of the record in the browser library."
+                              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                              "description": "Id of the record in the browser library: a UUID."
                             },
                             "name": {
                               "type": "string",

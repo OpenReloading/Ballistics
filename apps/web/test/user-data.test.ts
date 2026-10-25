@@ -26,7 +26,7 @@ import { droppedPhotos, embeddedFileBlob, embedFiles, photoIds } from '../src/li
 const saved = '2026-10-13T10:00:00.000Z'
 const bullet: UserRecord = {
   kind: 'bullet',
-  id: 'b1',
+  id: '9b8a7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d',
   name: 'Example 168 gr',
   saved,
   data: {
@@ -259,11 +259,13 @@ describe('user data files', () => {
   })
 
   it('writes back only over a file that holds just this record', () => {
-    expect(ownsFile(userDataText([bullet]), 'b1')).toBe(true)
+    expect(ownsFile(userDataText([bullet]), '9b8a7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d')).toBe(true)
     // an Export all file holding this record and others is never overwritten by one record
-    expect(ownsFile(userDataText([bullet, load]), 'b1')).toBe(false)
+    expect(ownsFile(userDataText([bullet, load]), '9b8a7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d')).toBe(
+      false,
+    )
     expect(ownsFile(userDataText([bullet]), 'other')).toBe(false)
-    expect(ownsFile('not json', 'b1')).toBe(false)
+    expect(ownsFile('not json', '9b8a7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d')).toBe(false)
   })
 
   it('picks a folder file name that holds no other record', async () => {
@@ -273,10 +275,16 @@ describe('user data files', () => {
       'mine.json': userDataText([load]),
     }
     const read = async (name: string) => files[name]
-    expect(await folderFileName('new-bullet.json', 'b9', read)).toBe('new-bullet-3.json')
-    expect(await folderFileName('new-bullet.json', 'b1', read)).toBe('new-bullet.json')
+    expect(
+      await folderFileName('new-bullet.json', '1c2d3e4f-5a6b-4c7d-8e9f-0a1b2c3d4e5f', read),
+    ).toBe('new-bullet-3.json')
+    expect(
+      await folderFileName('new-bullet.json', '9b8a7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d', read),
+    ).toBe('new-bullet.json')
     expect(await folderFileName('mine.json', 'w1', read)).toBe('mine.json')
-    expect(await folderFileName('free.json', 'b9', read)).toBe('free.json')
+    expect(await folderFileName('free.json', '1c2d3e4f-5a6b-4c7d-8e9f-0a1b2c3d4e5f', read)).toBe(
+      'free.json',
+    )
   })
 
   it('treats an empty text like an absent one when comparing', () => {
