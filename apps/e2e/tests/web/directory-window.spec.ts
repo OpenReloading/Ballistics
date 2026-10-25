@@ -38,3 +38,28 @@ test('scrolled to the end, the cartridge list renders the last row and still a b
   await expect(page.locator(`tbody tr[data-row][data-id="${first}"]`)).toHaveCount(0)
   expect(await rows(page).count()).toBeLessThan(100)
 })
+
+test('the records of the browser arriving after a scroll leave the list where it is', async ({
+  page,
+}) => {
+  // the store's reads answer 1.5 s late, after the scroll below
+  await page.addInitScript(() => {
+    const success = Object.getOwnPropertyDescriptor(IDBRequest.prototype, 'onsuccess')
+    Object.defineProperty(IDBRequest.prototype, 'onsuccess', {
+      ...success,
+      set(handler) {
+        success?.set?.call(
+          this,
+          handler && ((e: Event) => setTimeout(() => handler.call(this, e), 1500)),
+        )
+      },
+    })
+  })
+  await gotoHydrated(page, '/cartridges')
+  const box = page.locator('.directory-scroll')
+  await box.evaluate((el) => el.scrollTo(0, el.scrollHeight))
+  const top = await box.evaluate((el) => el.scrollTop)
+  expect(top).toBeGreaterThan(0)
+  await page.waitForTimeout(3000)
+  expect(await box.evaluate((el) => el.scrollTop)).toBe(top)
+})
