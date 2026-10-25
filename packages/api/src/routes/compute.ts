@@ -272,7 +272,7 @@ export const computeRoutes: FastifyPluginAsync<ComputeContext> = async (
         example: loadFileExample,
         summary: 'Simulate a workbench load file',
         description:
-          "Reads a load file saved by the workbench (a user data file with one load record), resolves its catalogue cartridge, bullet and powder references, runs the M3 model at its charge or over its charge ladder and answers a summary per step: peak pressure, muzzle velocity and energy, barrel time, load ratio and muzzle burnt fraction. The values the file does not type come from those records: the powder's model parameters, the bullet's mass and the cartridge's bore area. A value no record gives is a 400 at its path under `analysis.overrides`. Results are simulations, not load data.",
+          "Reads a load file saved by the workbench (a user data file with one load record), resolves its catalogue cartridge, bullet and powder references, runs the M3 model at its charge or over its charge ladder and answers a summary per step: peak pressure, muzzle velocity and energy, barrel time, load ratio and muzzle burnt fraction. The values the file does not type come from those records: the powder's model parameters, the bullet's mass and the cartridge's bore area. A value no record gives is listed, with every other such value, in one 422 (`reason` `missingValues`, `missing`: key, path in the file, quantity); a download from the workbench for the API holds them all. Results are simulations, not load data.",
       },
     },
     async (request, reply) => {

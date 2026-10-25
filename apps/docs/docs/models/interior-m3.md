@@ -284,13 +284,13 @@ Each curve point has time, travel, velocity, burnt fraction, the three pressures
 
 ### Load file
 
-`interiorLoad` maps the values of a workbench load file (SI) onto the model input. The burn law is the vivacity law, with the two-stage form when all four form values are given and the constant form when none is. A leak area is constant over the whole travel. The load ratio, charge bulk volume over the volume behind the seated bullet, is:
+`interiorLoad` maps the values of a workbench load file (SI) onto the model input. The burn law is the vivacity law, with the two-stage form when all four form values are given and the constant form when none is. A leak area is constant over the whole travel. `missingLoadKeys` lists the values it needs that no other source gave (all but the bore area, which falls back to the circle of the bore diameter), so a caller can name every missing value at once instead of the first. The load ratio, charge bulk volume over the volume behind the seated bullet, is:
 
 $$
 \Lambda = \frac{m_c}{\rho_\text{bulk} V_c}
 $$
 
-Code: `packages/core/src/interior/load-file.ts`, `interiorLoad`, `loadRatio`. `packages/core/src/interior/workbench-keys.ts`, `interiorValueKeys`, `burnFormKeys`, `powderModelValues`.
+Code: `packages/core/src/interior/load-file.ts`, `interiorLoad`, `missingLoadKeys`, `loadRatio`. `packages/core/src/interior/workbench-keys.ts`, `interiorValueKeys`, `burnFormKeys`, `powderModelValues`.
 
 The solid fill, the solid volume of the charge over the same volume, is the packing fraction of the grains in the chamber:
 

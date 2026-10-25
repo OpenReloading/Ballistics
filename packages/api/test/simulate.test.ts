@@ -564,18 +564,59 @@ describe('POST /interior/load-file', () => {
     expect(typedGamma.body.summary.peakPressure).not.toBe(sparse.body.summary.peakPressure)
   })
 
-  it('names the value no record gives, at its key under the overrides', async () => {
-    const paths = async (data: Parameters<typeof file>[0]) => {
-      const res = await simulate(file(data))
-      expect(res.status).toBe(400)
-      return res.body.issues.map((i: { path: unknown[] }) => i.path)
-    }
+  it('answers 422 with the value no record gives, at its key under the overrides', async () => {
     const { vivacity: _, ...noVivacity } = siValues
-    expect(await paths({ siValues: noVivacity })).toEqual([
-      ['records', 0, 'data', 'analysis', 'overrides', 'vivacity'],
+    const res = await simulate(file({ siValues: noVivacity }))
+    expect(res.status).toBe(422)
+    expect(res.body.reason).toBe('missingValues')
+    expect(res.body.notice).toBe('simulation, not load data')
+    expect(res.body.missing).toEqual([
+      {
+        key: 'vivacity',
+        path: ['records', 0, 'data', 'analysis', 'overrides', 'vivacity'],
+        quantity: 'burnRate',
+      },
     ])
     // the powder record gives it
     expect((await simulate(file({ siValues: noVivacity, powder: fitted.id }))).status).toBe(200)
+  })
+
+  it('lists every missing value in one 422, the charge at the load', async () => {
+    const { charge: _c, volume: _v, twist: _t, gamma: _g, ...rest } = siValues
+    const res = await simulate(file({ siValues: rest }))
+    expect(res.status).toBe(422)
+    expect(res.body.missing).toEqual([
+      {
+        key: 'volume',
+        path: ['records', 0, 'data', 'analysis', 'overrides', 'volume'],
+        quantity: 'volume',
+      },
+      {
+        key: 'twist',
+        path: ['records', 0, 'data', 'analysis', 'overrides', 'twist'],
+        quantity: 'length',
+      },
+      { key: 'charge', path: ['records', 0, 'data', 'charge'], quantity: 'mass' },
+      {
+        key: 'gamma',
+        path: ['records', 0, 'data', 'analysis', 'overrides', 'gamma'],
+        quantity: 'dimensionless',
+      },
+    ])
+    expect(res.body.message).toContain('volume, twist, charge, gamma')
+    // a file with nothing typed names every value, the powder and bullet records take theirs off
+    const none = await simulate(file({}))
+    expect(none.status).toBe(422)
+    expect(none.body.missing).toHaveLength(16)
+    const records = await simulate(file({ powder: fitted.id, bullet: longBullet.id }))
+    expect(records.body.missing.map((m: { key: string }) => m.key)).toEqual([
+      'volume',
+      'boreDiameter',
+      'travel',
+      'twist',
+      'charge',
+      'propellantTemperature',
+    ])
   })
 
   it('answers an unknown record id with 404', async () => {
@@ -674,9 +715,7 @@ describe('POST /interior/load-file, 400 with the field path', () => {
     ])
   })
 
-  it('names a missing value and a partly filled burn form', async () => {
-    const { charge: _, ...rest } = siValues
-    expect(await paths(file({ siValues: rest }))).toEqual([[...at, 'charge']])
+  it('names a partly filled burn form', async () => {
     expect(await paths(file({ siValues: { ...siValues, formA: 0.5 } }))).toEqual([
       [...at, 'analysis', 'overrides', 'formM'],
     ])
