@@ -102,6 +102,96 @@ function controller(
   return c
 }
 
+type Nodes = Map<string, Element>
+
+/** Writes the strip's bullet, gas and powder for the sample `s` at time `t`; none without a strip. */
+function drawStrip(
+  nodes: Nodes,
+  strip: StripModel | undefined,
+  s: PlaybackSample,
+  t: number,
+  end: number,
+  maxMean: number,
+) {
+  if (!strip) return
+  const set = (key: string, name: string, value: string) =>
+    nodes.get(key)?.setAttribute(name, value)
+  const z = baseAt(strip, s.travel)
+  // past the muzzle time only the bullet moves on; the values stay at the muzzle
+  const flown = t > end ? flightAt(strip, s, t - end) : z
+  set('bullet', 'transform', `translate(${flown.toFixed(3)} 0)`)
+  set('gas', 'width', Math.max(z, 0).toFixed(3))
+  set('gas', 'fill-opacity', (0.15 + (0.75 * s.meanPressure) / maxMean).toFixed(3))
+  set('powder', 'width', ((1 - s.burntFraction) * strip.base).toFixed(3))
+}
+
+/** Puts the marker on the curve at time `t`; nothing while the chart is gone. */
+function placeMarker(
+  chart: ECharts | null,
+  m: HTMLElement | null,
+  segment: ReturnType<typeof segmentAt>,
+  t: number,
+  x: (s: PlaybackSample) => number,
+  y: (s: PlaybackSample) => number,
+) {
+  // the chart is disposed when its page is hidden, before the new one draws
+  const c = chart?.isDisposed() ? null : chart
+  if (!c || !m) return
+  const [cx, cy] = curvePoint(segment, t, x, y)
+  const px = c.convertToPixel({ xAxisIndex: 0 }, cx)
+  const py = c.convertToPixel({ yAxisIndex: 0 }, cy)
+  m.style.transform = `translateX(${Number.isFinite(px) ? px.toFixed(2) : -10}px)`
+  // the values beside the line, on its left past the middle of the chart
+  m.toggleAttribute('data-flip', px > c.getWidth() / 2)
+  m.style.setProperty('--dot', `${Number.isFinite(py) ? py.toFixed(2) : -10}px`)
+}
+
+/** Sets the track's and the strip's place in the row from the chart's x scale. */
+function placeTrack(
+  chart: ECharts | null,
+  el: HTMLElement | null,
+  points: PlaybackResult['points'],
+  x: (s: PlaybackSample) => number,
+  strip: StripModel | undefined,
+  travelX: ((travel: number) => number) | undefined,
+) {
+  const c = chart?.isDisposed() ? null : chart
+  if (!c || !el) return
+  const px = (v: number) => c.convertToPixel({ xAxisIndex: 0 }, v)
+  const [t0, t1] = [px(x(points[0])), px(x(points[points.length - 1]))]
+  const set = (name: string, v: number) =>
+    Number.isFinite(v) && el.style.setProperty(name, `${v.toFixed(2)}px`)
+  set('--track-x', t0)
+  set('--track-w', t1 - t0)
+  if (strip && travelX) {
+    // the strip's drawing runs from 1 mm behind the head to 1 mm past the muzzle
+    const [a, b] = [-1, strip.muzzle + 1].map((z) => px(travelX(toSi('length', z - strip.base))))
+    set('--strip-x', a)
+    set('--strip-w', b - a)
+  } else {
+    el.style.removeProperty('--strip-x')
+    el.style.removeProperty('--strip-w')
+  }
+}
+
+/** Seconds after muzzle exit until the bullet base is past the right edge of the chart box. */
+function flightOut(
+  svg: Element | undefined,
+  points: PlaybackResult['points'],
+  strip: StripModel | undefined,
+) {
+  const box = svg?.closest('.rail-strip')?.getBoundingClientRect()
+  const a = svg?.getBoundingClientRect()
+  const muzzle = points[points.length - 1]
+  if (!strip || !box || !a || a.width <= 0) return 0
+  // 1 px past the edge: the outline's stroke reaches behind the base
+  return flightTime(
+    strip,
+    muzzle,
+    strip.view[0] + ((box.right + 1 - a.left) * strip.view[2]) / a.width,
+  )
+}
+
 /**
  * One row under the interior chart: Play, the speed, and the time slider on the barrel strip with
  * the events as marks; and the live values at the marker of the interior chart: the record's case in its chamber with the seated bullet and
@@ -177,18 +267,8 @@ export function ChartPlayback({
   /** Writes the state at time t into the page; no React update. */
   const draw = (t: number, active = true) => {
     const s = at(t)
-    const set = (key: string, name: string, value: string) =>
-      nodes.current.get(key)?.setAttribute(name, value)
     marker.current?.toggleAttribute('data-active', active)
-    if (strip) {
-      const z = baseAt(strip, s.travel)
-      // past the muzzle time only the bullet moves on; the values stay at the muzzle
-      const flown = t > end ? flightAt(strip, s, t - end) : z
-      set('bullet', 'transform', `translate(${flown.toFixed(3)} 0)`)
-      set('gas', 'width', Math.max(z, 0).toFixed(3))
-      set('gas', 'fill-opacity', (0.15 + (0.75 * s.meanPressure) / maxMean).toFixed(3))
-      set('powder', 'width', ((1 - s.burntFraction) * strip.base).toFixed(3))
-    }
+    drawStrip(nodes.current, strip, s, t, end, maxMean)
     const shown = text(s)
     for (const [key] of readouts) {
       const node = nodes.current.get(key)
@@ -200,58 +280,16 @@ export function ChartPlayback({
     }
     for (const e of events)
       nodes.current.get(`event-${e.key}`)?.toggleAttribute('data-passed', e.time <= t)
-    // the chart is disposed when its page is hidden, before the new one draws
-    const c = chart.current?.isDisposed() ? null : chart.current
-    const m = marker.current
-    if (c && m) {
-      const [cx, cy] = curvePoint(segment, t, x, y)
-      const px = c.convertToPixel({ xAxisIndex: 0 }, cx)
-      const py = c.convertToPixel({ yAxisIndex: 0 }, cy)
-      m.style.transform = `translateX(${Number.isFinite(px) ? px.toFixed(2) : -10}px)`
-      // the values beside the line, on its left past the middle of the chart
-      m.toggleAttribute('data-flip', px > c.getWidth() / 2)
-      m.style.setProperty('--dot', `${Number.isFinite(py) ? py.toFixed(2) : -10}px`)
-    }
+    placeMarker(chart.current, marker.current, segment, t, x, y)
   }
   /**
    * Places the strip and the time track from the chart's own scales, after each chart draw: the
    * track spans ignition to the muzzle on the x axis, and on the travel axis the strip is to scale
    * with it (its chamber behind travel 0, left of the plot), the bullet under the marker.
    */
-  const layout = () => {
-    const c = chart.current?.isDisposed() ? null : chart.current
-    const el = room.current
-    if (!c || !el) return
-    const px = (v: number) => c.convertToPixel({ xAxisIndex: 0 }, v)
-    const [t0, t1] = [px(x(r.points[0])), px(x(r.points[r.points.length - 1]))]
-    const set = (name: string, v: number) =>
-      Number.isFinite(v) && el.style.setProperty(name, `${v.toFixed(2)}px`)
-    set('--track-x', t0)
-    set('--track-w', t1 - t0)
-    if (strip && travelX) {
-      // the strip's drawing runs from 1 mm behind the head to 1 mm past the muzzle
-      const [a, b] = [-1, strip.muzzle + 1].map((z) => px(travelX(toSi('length', z - strip.base))))
-      set('--strip-x', a)
-      set('--strip-w', b - a)
-    } else {
-      el.style.removeProperty('--strip-x')
-      el.style.removeProperty('--strip-w')
-    }
-  }
+  const layout = () => placeTrack(chart.current, room.current, r.points, x, strip, travelX)
   /** Seconds after muzzle exit until the bullet base is past the right edge of the chart box. */
-  const flight = () => {
-    const svg = nodes.current.get('strip')
-    const box = svg?.closest('.rail-strip')?.getBoundingClientRect()
-    const a = svg?.getBoundingClientRect()
-    const muzzle = r.points[r.points.length - 1]
-    if (!strip || !box || !a || a.width <= 0) return 0
-    // 1 px past the edge: the outline's stroke reaches behind the base
-    return flightTime(
-      strip,
-      muzzle,
-      strip.view[0] + ((box.right + 1 - a.left) * strip.view[2]) / a.width,
-    )
-  }
+  const flight = () => flightOut(nodes.current.get('strip'), r.points, strip)
   const drawRef = useRef(draw)
   const flightRef = useRef(flight)
   const control = useRef<ReturnType<typeof controller>>(null)

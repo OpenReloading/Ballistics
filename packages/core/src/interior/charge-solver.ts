@@ -213,6 +213,36 @@ function findBrackets(scan: readonly (Point | undefined)[], target: number): [Po
   return brackets
 }
 
+/** The run at the false position charge inside (a, b), at the midpoint where that gives no valid run. */
+function evaluateInside(
+  a: Point,
+  b: Point,
+  fa: number,
+  fb: number,
+  evaluate: Evaluator['evaluate'],
+): Point | undefined {
+  let c = (a.charge * fb - b.charge * fa) / (fb - fa)
+  if (!(c > a.charge && c < b.charge)) c = (a.charge + b.charge) / 2
+  // a run that is not valid there: bisection
+  return evaluate(c) ?? evaluate((a.charge + b.charge) / 2)
+}
+
+interface IllinoisState {
+  a: Point
+  b: Point
+  fa: number
+  fb: number
+  /** Side the last point replaced, -1 for b and 1 for a. */
+  side: -1 | 0 | 1
+}
+
+/** The bracket after the run `p` replaced the end it lies on, the retained end's value halved on a repeat. */
+function narrow({ a, b, fa, fb, side }: IllinoisState, p: Point, fc: number): IllinoisState {
+  if (Math.sign(fc) === Math.sign(fb))
+    return { a, b: p, fa: side === -1 ? fa / 2 : fa, fb: fc, side: -1 }
+  return { a: p, b, fa: fc, fb: side === 1 ? fb / 2 : fb, side: 1 }
+}
+
 /**
  * Illinois false position inside the bracket, bisection where the false position charge gives no
  * valid run; the run within tolerance of the target value, or the refusal.
@@ -222,33 +252,14 @@ function illinoisRoot(
   target: number,
   evaluate: Evaluator['evaluate'],
 ): Point | 'bracketFailed' | 'toleranceNotReached' {
-  let [a, b] = bracket
-  let [fa, fb] = [a.value - target, b.value - target]
-  let side = 0
+  const [a, b] = bracket
+  let state: IllinoisState = { a, b, fa: a.value - target, fb: b.value - target, side: 0 }
   for (let i = 0; i < maxIterations; i++) {
-    let c = (a.charge * fb - b.charge * fa) / (fb - fa)
-    if (!(c > a.charge && c < b.charge)) c = (a.charge + b.charge) / 2
-    let p = evaluate(c)
-    if (!p) {
-      // a run that is not valid there: bisection
-      c = (a.charge + b.charge) / 2
-      p = evaluate(c)
-      if (!p) return 'bracketFailed'
-    }
-    const fc = p.value - target
+    const p = evaluateInside(state.a, state.b, state.fa, state.fb, evaluate)
+    if (!p) return 'bracketFailed'
     if (within(p.value, target)) return p
-    if (p.charge <= a.charge || p.charge >= b.charge) break
-    if (Math.sign(fc) === Math.sign(fb)) {
-      b = p
-      fb = fc
-      if (side === -1) fa /= 2
-      side = -1
-    } else {
-      a = p
-      fa = fc
-      if (side === 1) fb /= 2
-      side = 1
-    }
+    if (p.charge <= state.a.charge || p.charge >= state.b.charge) break
+    state = narrow(state, p, p.value - target)
   }
   return 'toleranceNotReached'
 }

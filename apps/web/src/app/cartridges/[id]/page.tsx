@@ -53,6 +53,29 @@ export async function generateMetadata({
   }
 }
 
+async function fittingBullets(c: Parameters<typeof cartridgeDiameters>[0]) {
+  const fit = cartridgeDiameters(c)
+  const all = fit ? await listAllBullets() : undefined
+  return fit && all?.status === 'ok' ? all.data.filter((b) => bulletFits(b.diameter, fit)) : []
+}
+
+function RecordBadges({ aliases, gap }: { aliases: string[]; gap: boolean }) {
+  return (
+    <>
+      <StandardBadge label="CIP" />
+      {gap && <GapBadge />}
+      {aliases.length > 0 && (
+        <Noted
+          inline
+          className="record-badge record-aliases"
+          value={aliases.join(', ')}
+          notes={[`Also printed as: ${aliases.join(', ')}`]}
+        />
+      )}
+    </>
+  )
+}
+
 // no Suspense above notFound(): a streamed response keeps status 200
 export default async function CartridgePage({ params }: PageProps<'/cartridges/[id]'>) {
   const { id } = await params
@@ -78,10 +101,7 @@ export default async function CartridgePage({ params }: PageProps<'/cartridges/[
     />
   )
   // the bullets that fit by the CIP rule of the bullet records' cartridge lists
-  const fit = cartridgeDiameters(c)
-  const all = fit ? await listAllBullets() : undefined
-  const bullets =
-    fit && all?.status === 'ok' ? all.data.filter((b) => bulletFits(b.diameter, fit)) : []
+  const bullets = await fittingBullets(c)
   const pairs = (matrix.variants.length ? matrix.variants : [undefined]).map((variant) => ({
     variant,
     cartridge: drawing('cartridge', variant),
@@ -93,20 +113,7 @@ export default async function CartridgePage({ params }: PageProps<'/cartridges/[
         className={matrix.rows.length > 0 ? 'cartridge-record has-variants' : 'cartridge-record'}
         title={c.name}
         badges={['CIP', ...aliases]}
-        badgeNodes={
-          <>
-            <StandardBadge label="CIP" />
-            {gap && <GapBadge />}
-            {aliases.length > 0 && (
-              <Noted
-                inline
-                className="record-badge record-aliases"
-                value={aliases.join(', ')}
-                notes={[`Also printed as: ${aliases.join(', ')}`]}
-              />
-            )}
-          </>
-        }
+        badgeNodes={<RecordBadges aliases={aliases} gap={gap} />}
         workbench={workbenchHref('cartridge', c.id)}
         design={gap ? undefined : `/cartridges/designer?from=${encodeURIComponent(c.id)}`}
         provenance={c.provenance}

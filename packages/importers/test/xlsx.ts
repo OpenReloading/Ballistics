@@ -25,65 +25,90 @@ interface ZipOptions {
   end?: Record<number, number>
 }
 
+/** The local entry (header, name, data, descriptor) and central entry (header, name) of a part. */
+function zipPart(
+  part: Part,
+  offset: number,
+): { local: Buffer[]; central: Buffer[]; length: number } {
+  const data = typeof part.data === 'string' ? Buffer.from(part.data, 'utf8') : part.data
+  const method = part.method ?? 8
+  const compressed = part.compressed ?? (method === 8 ? deflateRawSync(data) : data)
+  const name = Buffer.from(part.name, 'utf8')
+  const crc = part.crc ?? crc32(data)
+  const size = part.size ?? data.length
+  const flags = (part.flags ?? 0) | (part.descriptor ? 8 : 0)
+  const head = Buffer.alloc(30)
+  head.writeUInt32LE(0x04034b50, 0)
+  head.writeUInt16LE(20, 4)
+  head.writeUInt16LE(flags, 6)
+  head.writeUInt16LE(method, 8)
+  if (!part.descriptor) {
+    head.writeUInt32LE(crc, 14)
+    head.writeUInt32LE(compressed.length, 18)
+    head.writeUInt32LE(size, 22)
+  }
+  head.writeUInt16LE(name.length, 26)
+  const descriptor = Buffer.alloc(part.descriptor ? 16 : 0)
+  if (part.descriptor) {
+    descriptor.writeUInt32LE(0x08074b50, 0)
+    descriptor.writeUInt32LE(crc, 4)
+    descriptor.writeUInt32LE(compressed.length, 8)
+    descriptor.writeUInt32LE(size, 12)
+  }
+  const entry = Buffer.alloc(46)
+  entry.writeUInt32LE(0x02014b50, 0)
+  entry.writeUInt16LE(20, 4)
+  entry.writeUInt16LE(20, 6)
+  entry.writeUInt16LE(flags, 8)
+  entry.writeUInt16LE(method, 10)
+  entry.writeUInt32LE(crc, 16)
+  entry.writeUInt32LE(compressed.length, 20)
+  entry.writeUInt32LE(size, 24)
+  entry.writeUInt16LE(name.length, 28)
+  entry.writeUInt32LE(offset, 42)
+  return {
+    local: [head, name, Buffer.from(compressed), descriptor],
+    central: [entry, name],
+    length: head.length + name.length + compressed.length + descriptor.length,
+  }
+}
+
+/** The end of central directory record; `overrides` are written over its fields. */
+function endRecord(
+  count: number,
+  directoryLength: number,
+  offset: number,
+  commentLength: number,
+  overrides: Record<number, number>,
+): Buffer {
+  const end = Buffer.alloc(22)
+  end.writeUInt32LE(0x06054b50, 0)
+  end.writeUInt16LE(count, 8)
+  end.writeUInt16LE(count, 10)
+  end.writeUInt32LE(directoryLength, 12)
+  end.writeUInt32LE(offset, 16)
+  end.writeUInt16LE(commentLength, 20)
+  for (const [at, value] of Object.entries(overrides)) {
+    if (Number(at) >= 12) end.writeUInt32LE(value, Number(at))
+    else end.writeUInt16LE(value, Number(at))
+  }
+  return end
+}
+
 /** A ZIP archive of the parts, in order. */
 export function zip(parts: Part[], options: ZipOptions = {}): Uint8Array {
   const local: Buffer[] = []
   const central: Buffer[] = []
   let offset = 0
   for (const part of parts) {
-    const data = typeof part.data === 'string' ? Buffer.from(part.data, 'utf8') : part.data
-    const method = part.method ?? 8
-    const compressed = part.compressed ?? (method === 8 ? deflateRawSync(data) : data)
-    const name = Buffer.from(part.name, 'utf8')
-    const crc = part.crc ?? crc32(data)
-    const size = part.size ?? data.length
-    const flags = (part.flags ?? 0) | (part.descriptor ? 8 : 0)
-    const head = Buffer.alloc(30)
-    head.writeUInt32LE(0x04034b50, 0)
-    head.writeUInt16LE(20, 4)
-    head.writeUInt16LE(flags, 6)
-    head.writeUInt16LE(method, 8)
-    if (!part.descriptor) {
-      head.writeUInt32LE(crc, 14)
-      head.writeUInt32LE(compressed.length, 18)
-      head.writeUInt32LE(size, 22)
-    }
-    head.writeUInt16LE(name.length, 26)
-    const descriptor = Buffer.alloc(part.descriptor ? 16 : 0)
-    if (part.descriptor) {
-      descriptor.writeUInt32LE(0x08074b50, 0)
-      descriptor.writeUInt32LE(crc, 4)
-      descriptor.writeUInt32LE(compressed.length, 8)
-      descriptor.writeUInt32LE(size, 12)
-    }
-    const entry = Buffer.alloc(46)
-    entry.writeUInt32LE(0x02014b50, 0)
-    entry.writeUInt16LE(20, 4)
-    entry.writeUInt16LE(20, 6)
-    entry.writeUInt16LE(flags, 8)
-    entry.writeUInt16LE(method, 10)
-    entry.writeUInt32LE(crc, 16)
-    entry.writeUInt32LE(compressed.length, 20)
-    entry.writeUInt32LE(size, 24)
-    entry.writeUInt16LE(name.length, 28)
-    entry.writeUInt32LE(offset, 42)
-    local.push(head, name, Buffer.from(compressed), descriptor)
-    central.push(entry, name)
-    offset += head.length + name.length + compressed.length + descriptor.length
+    const written = zipPart(part, offset)
+    local.push(...written.local)
+    central.push(...written.central)
+    offset += written.length
   }
   const directory = Buffer.concat(central)
   const comment = Buffer.from(options.comment ?? '', 'latin1')
-  const end = Buffer.alloc(22)
-  end.writeUInt32LE(0x06054b50, 0)
-  end.writeUInt16LE(parts.length, 8)
-  end.writeUInt16LE(parts.length, 10)
-  end.writeUInt32LE(directory.length, 12)
-  end.writeUInt32LE(offset, 16)
-  end.writeUInt16LE(comment.length, 20)
-  for (const [at, value] of Object.entries(options.end ?? {})) {
-    if (Number(at) >= 12) end.writeUInt32LE(value, Number(at))
-    else end.writeUInt16LE(value, Number(at))
-  }
+  const end = endRecord(parts.length, directory.length, offset, comment.length, options.end ?? {})
   return new Uint8Array(Buffer.concat([...local, directory, end, comment]))
 }
 

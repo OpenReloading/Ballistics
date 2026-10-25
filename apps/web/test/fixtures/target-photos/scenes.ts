@@ -136,21 +136,36 @@ export const scenes: Scene[] = [
 function faceAt(s: Scene, x: number, y: number): Rgb {
   const [cx, cy] = [s.width / 2, s.height / 2]
   const r = Math.hypot(x - cx, y - cy) / s.pxPerMm
-  if (s.face === 'rings') {
-    if (r < 6) return BLACK
-    for (const ring of [12, 20, 28, 36]) if (Math.abs(r - ring) < 0.35) return BLACK
-    return PAPER
-  }
-  if (s.face === 'dark') {
-    if (r < 32) {
-      for (const ring of [10, 18, 26]) if (Math.abs(r - ring) < 0.3) return [200, 200, 195]
-      return BLACK
-    }
-    return PAPER
-  }
+  if (s.face === 'rings') return ringsFaceAt(r)
+  if (s.face === 'dark') return darkFaceAt(r)
   // orange: a black diamond holding an orange disc
   if (Math.abs(x - cx) + Math.abs(y - cy) > 30 * s.pxPerMm) return PAPER
   return r < 18 ? [228, 112, 34] : BLACK
+}
+
+function ringsFaceAt(r: number): Rgb {
+  if (r < 6) return BLACK
+  for (const ring of [12, 20, 28, 36]) if (Math.abs(r - ring) < 0.35) return BLACK
+  return PAPER
+}
+
+function darkFaceAt(r: number): Rgb {
+  if (r >= 32) return PAPER
+  for (const ring of [10, 18, 26]) if (Math.abs(r - ring) < 0.3) return [200, 200, 195]
+  return BLACK
+}
+
+/** The colour of a hole at distance `d` from its centre with the torn `edge`, `rv` the mean radius; undefined outside. */
+function holeColourAt(s: Scene, d: number, edge: number, rv: number): Rgb | undefined {
+  if (d <= edge) {
+    if (s.face === 'rings') return [58, 56, 54]
+    if (s.face === 'dark') return [226, 224, 216]
+    return [240, 234, 214]
+  }
+  // bullet wipe on paper, a burnt rim on the orange face
+  if (s.face === 'rings' && d <= edge + 0.12 * rv) return [90, 88, 86]
+  if (s.face === 'orange' && d <= edge + 0.2 * rv) return [46, 34, 26]
+  return undefined
 }
 
 /** The scene colour at (x, y): face, holes with torn edges and their rims. */
@@ -163,14 +178,8 @@ export function sceneAt(s: Scene, x: number, y: number, phase: number[]): Rgb {
     const a = Math.atan2(y - h.y, x - h.x)
     const edge =
       rv * (1 + 0.06 * Math.sin(5 * a + phase[2 * i]) + 0.03 * Math.sin(11 * a + phase[2 * i + 1]))
-    if (d <= edge) {
-      if (s.face === 'rings') return [58, 56, 54]
-      if (s.face === 'dark') return [226, 224, 216]
-      return [240, 234, 214]
-    }
-    // bullet wipe on paper, a burnt rim on the orange face
-    if (s.face === 'rings' && d <= edge + 0.12 * rv) return [90, 88, 86]
-    if (s.face === 'orange' && d <= edge + 0.2 * rv) return [46, 34, 26]
+    const colour = holeColourAt(s, d, edge, rv)
+    if (colour) return colour
   }
   return faceAt(s, x, y)
 }

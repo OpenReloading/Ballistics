@@ -54,6 +54,7 @@ import type { FigureView } from '../lib/figure-views.ts'
 import { gunValues, sightOptions } from '../lib/firearm.ts'
 import {
   cartridgeClass,
+  type DefaultSources,
   type FollowKey,
   followKeys,
   type Suggestion,
@@ -73,7 +74,7 @@ import {
   toLoad,
 } from '../lib/load-record.ts'
 import { generatedName, loadName } from '../lib/load-tabs.ts'
-import { productLabel } from '../lib/manufacturers.ts'
+import { type ManufacturerNames, productLabel } from '../lib/manufacturers.ts'
 import { attachLoad, sessionRef } from '../lib/measurements.ts'
 import { powderValues } from '../lib/powder-compare.ts'
 import { unchangedFromRecord } from '../lib/powder-record.ts'
@@ -100,6 +101,7 @@ import {
   exactFieldText,
   fixedFieldText,
   formatQuantity,
+  type UnitSystem,
   waterVolume,
   withUnit,
 } from '../lib/units.ts'
@@ -198,6 +200,807 @@ type FirearmRecord = Extract<UserRecord, { kind: 'firearm' }>
 
 type Answer = { res: Response; json: (InteriorResponse & ErrorBody) | undefined }
 
+type Kind = 'cartridge' | 'bullet' | 'powder' | 'capacity'
+type Asked = Partial<Record<Kind, { id: string; failed?: true }>>
+type Groove = { id: string; z?: number; record?: CartridgeDetail }
+
+/**
+ * The chosen cartridge's loaded record: its groove diameter Z, m, the bore area Q, m2, an empty
+ * Bore area takes first, and its CIP table.
+ */
+function grooveValues(cartridge: CartridgeChoice | undefined, groove: Groove | undefined) {
+  const loaded = cartridge && groove?.id === cartridge.id ? groove : undefined
+  if (!loaded) return { grooveM: undefined, qM: undefined, recordTable: undefined }
+  const q = loaded.record?.values.find(
+    (v) => v.side === 'chamber' && v.symbol === 'Q' && !v.variant,
+  )
+  return {
+    grooveM: loaded.z ? toSi('length', loaded.z) : undefined,
+    qM: toSi('area', q?.value ?? 0) || undefined,
+    recordTable: loaded.record?.table,
+  }
+}
+
+/** The example rifle's sight in round numbers of the shown units, 100 yd and 2 in, not 109 yd and 1.9685 in. */
+function exampleSight<S extends { sightHeight: number; zeroRange: number }>(
+  firearm: string | undefined,
+  chosen: S | undefined,
+  system: UnitSystem,
+): S | undefined {
+  if (firearm !== loadExample.firearm.id || !chosen) return chosen
+  return {
+    ...chosen,
+    sightHeight: system.length.toSi(Math.round(system.length.fromSi(chosen.sightHeight))),
+    zeroRange: system.range.toSi(chosen.zeroRange),
+  }
+}
+
+/** The link's values of a record while the record is asked for, loading or missing. */
+function pendingLink<L extends { id: string }>(
+  record: unknown,
+  askedId: string | undefined,
+  linked: L | undefined,
+) {
+  return !record && askedId === linked?.id ? linked : undefined
+}
+
+/** Why a seating ladder cannot run: no seating, or a volume or travel typed over it. */
+function seatingBlockOf(seatAt: SeatingLengths | undefined, typedKeys: readonly PreviewKey[]) {
+  if (seatAt === undefined) return 'The seating ladder needs a cartridge and a bullet record.'
+  if (typedKeys.length === 0) return
+  return `${typedKeys.map((k) => interiorFields.find((f) => f.key === k)?.label).join(' and ')} typed: empty the field to follow the seating.`
+}
+
+function stepSpecOf(kind: RunnableLadderKind) {
+  if (kind === 'seating') return seatingStepSpec
+  if (kind === 'temperature') return temperatureStepSpec
+  return ladderSpec
+}
+
+/** The step size field of the ladder kind: its spec and its value. */
+function ladderStepField(
+  kind: RunnableLadderKind,
+  steps: { seat: Fields; temp: Fields; charge: Fields },
+) {
+  if (kind === 'seating') return [seatingStepSpec, steps.seat.seatStep] as const
+  if (kind === 'temperature') return [temperatureStepSpec, steps.temp.tempStep] as const
+  return [ladderSpec, steps.charge.ladderStep] as const
+}
+
+/**
+ * The seating a file or link keeps, once one was stored or the user moved it away from its start
+ * (the default start would mark an older file changed): the seated bullet's, else the one asked
+ * for while it loads.
+ */
+function keptSeating(
+  seated: Seated,
+  start: Seating,
+  initial: Seating | undefined,
+  system: UnitSystem,
+): Seating {
+  const now = seatingOf(seated)
+  // a move is a change of the seating field's text: the start typed back as shown is none (the
+  // slider snaps back onto the start itself)
+  const moved =
+    start !== undefined &&
+    (now?.by !== start.by ||
+      exactFieldText('length', system, now.value) !== exactFieldText('length', system, start.value))
+  return initial || moved ? (now ?? initial) : undefined
+}
+
+/** The cartridge asked for counts while its record loads or stays offline. */
+function cartridgeKeyOf(
+  cartridge: CartridgeChoice | undefined,
+  design: UserCartridgeView | undefined,
+  asked: Asked['cartridge'],
+) {
+  return cartridge?.id ?? design?.id ?? parseRef(asked?.id ?? '')?.id ?? asked?.id
+}
+
+/** The measured case capacity of the cartridge it was typed for, m3, when above 0. */
+function measuredCapacityOf(
+  typedFor: string | undefined,
+  key: string | undefined,
+  measured: Fields,
+): number | undefined {
+  const si = measured.measuredWaterCapacity.si
+  return typedFor === key && (si ?? 0) > 0 ? si : undefined
+}
+
+/** The capacity of a catalogue record is chosen for the cartridge it belongs to. */
+const chosenCapacityOf = (
+  choice: { cartridge: string; id: string } | undefined,
+  key: string | undefined,
+) => (choice && choice.cartridge === key ? choice.id : undefined)
+
+const mmToM = (mm: number | undefined) => (mm === undefined ? undefined : toSi('length', mm))
+const mm2ToM2 = (mm2: number | undefined) => (mm2 === undefined ? undefined : toSi('area', mm2))
+
+/** The case volume of the seated bullet's cartridge design, else the design's own approximate volume. */
+function designCapacityOf(
+  seated: Seated,
+  designLoad: ReturnType<typeof workbenchDesign>,
+  design: UserCartridgeView | undefined,
+): Suggestion | undefined {
+  if (seated.caseVolume !== undefined)
+    return { si: seated.caseVolume, source: 'your measured case capacity, without the bullet' }
+  if (designLoad?.caseVolume === undefined) return undefined
+  return {
+    si: designLoad.caseVolume,
+    source: `outline of the user design ${design?.name} less a wall, approximate, without the bullet`,
+  }
+}
+
+type CartridgeSource = {
+  cartridge: CartridgeChoice | undefined
+  design: UserCartridgeView | undefined
+  designLoad: ReturnType<typeof workbenchDesign>
+  recordTable: string | undefined
+  specValue: (side: string | undefined, symbol: string) => number | undefined
+  seated: Seated
+  measuredCapacity: number | undefined
+}
+
+/** What the chosen cartridge, or its design, gives the defaults. */
+function cartridgeSource(a: CartridgeSource): DefaultSources['cartridge'] {
+  const { cartridge, design, designLoad, seated } = a
+  if (design)
+    return {
+      name: design.name,
+      design: true,
+      boreDiameter: designLoad?.boreDiameter,
+      capacity: designCapacityOf(seated, designLoad, design),
+    }
+  if (!cartridge) return undefined
+  return {
+    name: cartridge.name,
+    class: cartridgeClass(a.recordTable),
+    boreDiameter: mmToM(a.specValue('chamber', 'F')),
+    boreArea: mm2ToM2(a.specValue('chamber', 'Q')),
+    twist: mmToM(a.specValue('chamber', 'u')),
+    capacity:
+      seated.caseVolume === undefined
+        ? undefined
+        : {
+            si: seated.caseVolume,
+            source: a.measuredCapacity
+              ? 'your measured case capacity, without the bullet'
+              : `case capacity record of ${cartridge.name}, without the bullet`,
+          },
+  }
+}
+
+/** The mass of the bullet record, else of a user design that has a reference, kg. */
+function bulletMassOf(
+  bullet: Bullet | undefined,
+  design: { id: string; mass?: number } | undefined,
+) {
+  if (bullet) return toSi('mass', bullet.mass.value)
+  return design && userRef(design.id) ? design.mass : undefined
+}
+
+/** Whether the seating the load carries is the start's own: the barrel nobody typed. */
+function seatingKeptOf(referenced: boolean, seated: Seated, suggestions: Suggestions) {
+  if (!referenced) return false
+  if (seated.barrel === undefined) return true
+  return (
+    Math.abs(seated.barrel - (suggestions.barrelLength?.si ?? Number.NaN)) <= 1e-9 * seated.barrel
+  )
+}
+
+/** The `ladder` of a load file: the kind, step count, step and direction; none for a single charge. */
+function ladderPartOf(
+  steps: number,
+  kind: RunnableLadderKind,
+  step: number | undefined,
+  direction: LadderDirection,
+): LoadParts['ladder'] {
+  if (steps < 2) return undefined
+  return { kind, stepCount: steps, step, direction }
+}
+
+/** A new load with nothing chosen or typed: the start card replaces the cards. */
+function isFresh(a: {
+  chosen: unknown[]
+  byHand: boolean
+  fields: Fields
+  defaulted: ReadonlySet<string>
+}) {
+  if (a.chosen.some(Boolean) || a.byHand) return false
+  return Object.entries(a.fields).every(([k, v]) => a.defaulted.has(k) || v.text === '')
+}
+
+/** The card of the next open step, marked until the first result (as the checklist). */
+function nextPanelOf(next: number, hasVolume: boolean): InputPanel | undefined {
+  const panels = ['cartridge', 'bullet', 'powder', 'powder', hasVolume ? 'firearm' : 'cartridge']
+  return panels[next] as InputPanel | undefined
+}
+
+const refOf = (record: { id: string } | undefined) => record && catalogueRef(record.id)
+
+/** Whether the references the load keeps can all be written: a design or firearm whose id is no UUID cannot. */
+function referencedOf(
+  firearm: string | undefined,
+  firearmRef: string | undefined | false,
+  cartridgeDesign: UserCartridgeView | undefined,
+  bulletDesign: { id: string } | undefined,
+) {
+  if (firearm && !firearmRef) return false
+  if (cartridgeDesign && !userRef(cartridgeDesign.id)) return false
+  return !bulletDesign || !!userRef(bulletDesign.id)
+}
+
+/** What a run still needs, in the order of the cards; the first open one is next. */
+function todoOf(a: {
+  cartridge: CartridgeChoice | undefined
+  cartridgeDesign: UserCartridgeView | undefined
+  bulletLabel: string | undefined
+  bulletDesign: { name: string } | undefined
+  powderLabel: string | undefined
+  has: (keys: readonly string[]) => boolean
+}) {
+  const { cartridge, cartridgeDesign, has } = a
+  return [
+    {
+      label: 'Cartridge (optional)',
+      done: !!(cartridge || cartridgeDesign),
+      value: cartridge?.name ?? (cartridgeDesign && `${cartridgeDesign.name} (your design)`),
+    },
+    {
+      label: 'Bullet',
+      done: has(['bulletMass']),
+      value: a.bulletLabel ?? a.bulletDesign?.name,
+    },
+    {
+      label: 'Powder or model parameters',
+      done: has(requiredModelKeys),
+      value: a.powderLabel,
+    },
+    { label: 'Charge', done: has(['charge']) },
+    {
+      label: 'Chamber volume, bullet travel and twist',
+      done: has(['volume', 'travel', 'twist']),
+    },
+  ]
+}
+
+/** The ballistic coefficient the chart and the trajectory take: G7, else G1. */
+const bcOf = (bullet: Bullet | undefined) =>
+  bullet?.ballisticCoefficients?.find((c) => c.dragModel === 'G7') ??
+  bullet?.ballisticCoefficients?.find((c) => c.dragModel === 'G1')
+
+type LinkedBullet = NonNullable<RecordValues['bullet']> & { id: string }
+type LinkedPowder = NonNullable<RecordValues['powder']> & { id: string }
+
+/**
+ * What Copy link carries of the bullet and powder records, SI, with their ids: the records'
+ * values, else what the link that opened them carried.
+ */
+function recordLinkOf(a: {
+  asked: Asked
+  bullet: Bullet | undefined
+  powder: Powder | undefined
+  names: ManufacturerNames
+  recordBore:
+    | { boreFriction?: number; engravingPressure?: number; engravingLength?: number }
+    | undefined
+  linkedBullet: LinkedBullet | undefined
+  linkedPowder: LinkedPowder | undefined
+}) {
+  const { asked, bullet, powder, names } = a
+  return {
+    bulletId: (asked.bullet?.id && catalogueIdOf(asked.bullet.id)) || bullet?.id,
+    powderId: asked.powder?.id ?? powder?.id,
+    values: {
+      bullet: bullet
+        ? {
+            name: productLabel(bullet, names),
+            length: bullet.length && toSi('length', bullet.length.value),
+          }
+        : a.linkedBullet,
+      powder: powder
+        ? {
+            name: productLabel(powder, names),
+            bulkDensity: powder.bulkDensity && toSi('density', powder.bulkDensity.value),
+            ...a.recordBore,
+          }
+        : a.linkedPowder,
+    } satisfies RecordValues,
+  }
+}
+
+const labelOf = (record: Bullet | Powder | undefined, names: ManufacturerNames) =>
+  record && productLabel(record, names)
+
+const userRefOf = (id: string | undefined) => (id ? userRef(id) : undefined)
+
+/** The gun weight when above 0: a weight of 0 or less is no weight. */
+const usableWeight = (weight: FieldValue) => ((weight.si ?? 0) > 0 ? weight : emptyStep)
+
+/** The bullet length a run reads, mm: the record's, else the link's. */
+function bulletLengthOf(bullet: Bullet | undefined, linked: LinkedBullet | undefined) {
+  return bullet?.length?.value ?? (linked?.length && fromSi('length', linked.length))
+}
+
+/** The bullets that fit the cartridge (`GET /bullets?cartridge`); all without its CIP values or with all diameters on. */
+function bulletFilter(allDiameters: boolean, cartridge: CartridgeChoice | undefined) {
+  const bulletFit = allDiameters ? undefined : fitOf(cartridge)
+  const bulletParams =
+    bulletFit && cartridge ? `&cartridge=${encodeURIComponent(cartridge.id)}` : ''
+  return { bulletFit, bulletParams }
+}
+
+/** The measured capacity as a user record of its own, stored with the load, and the capacity reference the load keeps. */
+function capacityRefsOf(
+  cartridgeRef: string | undefined,
+  measuredWaterCapacity: number | undefined,
+  askedCapacity: string | undefined,
+  chosenCapacity: string | undefined,
+) {
+  const measuredCapacity =
+    measuredWaterCapacity !== undefined && cartridgeRef
+      ? { cartridge: cartridgeRef, m3: measuredWaterCapacity }
+      : undefined
+  const capacityRef = savedCapacityRef(
+    measuredCapacity && measuredCapacityRef(measuredCapacity.cartridge, measuredCapacity.m3),
+    askedCapacity,
+    chosenCapacity && catalogueRef(chosenCapacity),
+  )
+  return { measuredCapacity, capacityRef }
+}
+
+const resultLineOf = (outcome: Outcome, system: UnitSystem) =>
+  outcome.kind === 'ok' ? resultLine(outcome, system) : undefined
+
+/** The firearm the defaults read: its name, twist and barrel length. */
+const gunSource = (
+  gun: { name: string; data: { twist?: number; barrelLength?: number } } | undefined,
+) => gun && { name: gun.name, twist: gun.data.twist, barrelLength: gun.data.barrelLength }
+
+type PreviewFields = Partial<Record<PreviewKey, FieldValue>>
+
+/**
+ * What the seated bullet changes of volume and travel: the fields to write (empty, or still the
+ * last seated value) and the values that follow it from now on.
+ */
+function followPlan(
+  values: Seated,
+  now: Fields,
+  a: {
+    followed: ReadonlySet<FollowKey>
+    written: Partial<Record<FollowKey, number>>
+    previewed: Partial<Record<PreviewKey, number>>
+    field: (k: PreviewKey, v: number) => FieldValue
+  },
+) {
+  const next: PreviewFields = {}
+  const following: Partial<Record<PreviewKey, number>> = {}
+  for (const k of previewKeys) {
+    const v = values[k]
+    const si = now[k]?.si
+    if (v === undefined) continue
+    const wasDefault = k === 'volume' && a.followed.has(k) && si === a.written.volume
+    if (si !== undefined && Math.abs(si - v) <= 1e-9 * v) following[k] = si
+    else if (si === undefined || si === a.previewed[k] || wasDefault) {
+      following[k] = v
+      next[k] = a.field(k, v)
+    }
+  }
+  return { next, following }
+}
+
+/** `next` and the fields that already held the seated value, in the seating's text: same SI value. */
+function seatedUpdate(next: PreviewFields, seatedText: PreviewFields, now: Fields) {
+  const update: PreviewFields = { ...next }
+  for (const k of previewKeys)
+    if (!next[k] && seatedText[k]?.text !== now[k]?.text) update[k] = seatedText[k]
+  return update
+}
+
+/** The start's own seating, with a barrel nobody typed, completes the start (no edit). */
+const isStartSeating = (values: Seated, suggestions: Suggestions) =>
+  values.atStart && (values.barrel === undefined || values.barrel === suggestions.barrelLength?.si)
+
+type Form = Pick<
+  ReturnType<typeof useForm<Fields>>,
+  'getValues' | 'setFieldValue' | 'clearFieldError'
+>
+
+/**
+ * The fields the previous powder record filled and the user did not edit go back to a new load's
+ * state: the cited default, else empty. The keys that got a default.
+ */
+function revertRecordFill(
+  form: Form,
+  previous: Record<string, number>,
+  defaults: WorkbenchDefaults,
+  system: UnitSystem,
+) {
+  const back = new Set<string>()
+  for (const key of unchangedFromRecord(previous, siValues(form.getValues()))) {
+    const given = (defaultKeys as readonly string[]).includes(key)
+      ? defaults[key as DefaultKey]
+      : undefined
+    const spec = interiorFields.find((s) => s.key === key) as FieldSpec
+    form.setFieldValue(
+      key,
+      given === undefined
+        ? emptyStep
+        : { text: fixedFieldText(spec.quantity, system, given), si: given },
+    )
+    form.clearFieldError(key)
+    if (given !== undefined) back.add(key)
+  }
+  return back
+}
+
+/** Writes the powder record's model parameters into the fields, except the `keep` ones; the keys written. */
+function fillRecordValues(
+  form: Form,
+  values: Record<string, number>,
+  keep: ReadonlySet<string>,
+  system: UnitSystem,
+) {
+  const filled = Object.entries(values).filter(([key]) => !keep.has(key))
+  for (const [key, si] of filled) {
+    const spec = interiorFields.find((s) => s.key === key) as FieldSpec
+    form.setFieldValue(key, { text: fixedFieldText(spec.quantity, system, si), si })
+    form.clearFieldError(key)
+  }
+  return new Set(filled.map(([key]) => key))
+}
+
+/** The step size field's own error: invalid, or not above 0. */
+function ownStepError(spec: FieldSpec, v: FieldValue, shown: UnitSystem) {
+  return (
+    fieldError(spec, v, shown) ??
+    (v.si === undefined || v.si > 0 ? undefined : `${spec.label} must be above 0.`)
+  )
+}
+
+/**
+ * The bore resistance of a run: the record's law, else what a link carried of it, with what the
+ * law could not apply.
+ */
+function resistanceFor(a: {
+  chosen: Powder | undefined
+  fromLink: LinkedPowder | undefined
+  cartridge: CartridgeChoice | undefined
+  groove: Groove | undefined
+  body: ReturnType<typeof interiorBody>
+  bulletLength: number | undefined
+}) {
+  const { chosen, fromLink, cartridge, groove, body } = a
+  if (!chosen?.interior?.resistance)
+    return {
+      resistance:
+        fromLink &&
+        overrideResistance(undefined, {
+          boreFriction: fromLink.boreFriction,
+          engravingPressure: fromLink.engravingPressure,
+          engravingLength: fromLink.engravingLength,
+        }),
+      missing: [],
+    }
+  if (cartridge && groove?.id !== cartridge.id)
+    return { missing: ["the cartridge record's groove diameter (not loaded)"] }
+  return recordResistance(chosen, {
+    boreDiameter: body.load.chamber.boreDiameter,
+    boreArea: body.load.chamber.boreArea,
+    startPressure: body.load.startPressure,
+    cartridge: cartridge && {
+      g1: cartridge.g1,
+      z: groove?.id === cartridge.id ? groove.z : undefined,
+    },
+    bulletLengthMm: a.bulletLength,
+  })
+}
+
+const postInterior = (body: unknown, signal: AbortSignal) =>
+  apiFetch('interior', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+    signal,
+  })
+
+/** The plan of a seating or temperature ladder: its steps, or why it cannot run. */
+function plannedLadder<S, T>(
+  steps: number,
+  kind: RunnableLadderKind,
+  plans: { seating: () => S; temperature: () => T; temperatureBlock: string | undefined },
+) {
+  if (steps < 2) return
+  if (kind === 'seating') return plans.seating()
+  if (kind !== 'temperature') return
+  return plans.temperatureBlock ? { error: plans.temperatureBlock } : plans.temperature()
+}
+
+/** The per-step overrides of a planned ladder's steps. */
+function planRows(kind: RunnableLadderKind, steps: SeatingStep[] | number[]): Partial<Step>[] {
+  return kind === 'seating'
+    ? (steps as SeatingStep[]).map((seating) => ({ seating }))
+    : (steps as number[]).map((temperature) => ({ temperature }))
+}
+
+/** The request body: a charge ladder runs in the API, a planned ladder is sent step by step. */
+function ladderRequest<B extends object>(
+  body: B,
+  plan: Partial<Step>[] | undefined,
+  stepCount: number,
+  chargeStep: number | undefined,
+  direction: LadderDirection,
+) {
+  if (plan || stepCount < 2 || chargeStep === undefined) return body
+  return { ...body, ladder: { chargeStep, stepCount, direction } }
+}
+
+/** The cartridge's CIP table, and the note for why a cartridge has none to read. */
+async function tableOf(
+  cartridge: CartridgeChoice | undefined,
+  groove: Groove | undefined,
+  recordTable: string | undefined,
+  signal: AbortSignal,
+) {
+  // a record still loading is waited for
+  const pending = !!cartridge && groove?.id !== cartridge.id
+  const fetched = pending
+    ? await fetchRecord<CartridgeDetail>('cartridges', cartridge.id, signal).catch(() => undefined)
+    : undefined
+  const table = pending ? fetched?.table : recordTable
+  // the factor 1.75 of a cartridge with an id but no table: the note says why
+  if (!cartridge || table !== undefined) return { table, gasFactorNote: undefined }
+  const unloaded = pending && !fetched
+  return {
+    table,
+    gasFactorNote: unloaded
+      ? 'cartridge record not loaded'
+      : 'cartridge record without a CIP table',
+  }
+}
+
+const gasFactorOf = (table: string | undefined) =>
+  cartridgeClass(table) === 'pistol' ? gasVelocityFactor.pistol : gasVelocityFactor.rifle
+
+/** The rows of a planned ladder: the answers become steps, an error step keeps the API's message. */
+function planSteps(plan: Partial<Step>[], answers: Answer[], charge: number): Step[] {
+  return plan.map((row, i) => {
+    const { res, json } = answers[i]
+    if (res.ok && json !== undefined) return { charge, body: json, ...row }
+    const message = json?.message ?? `The API answered ${res.status}.`
+    return { charge, error: { message, reason: json?.reason }, ...row }
+  })
+}
+
+/**
+ * The answer a run stands for and its steps: the one request, or the planned ladder's steps with
+ * at most 4 in flight. Nothing when a change aborted it.
+ */
+async function runRequest(
+  plan: Partial<Step>[] | undefined,
+  request: unknown,
+  body: ReturnType<typeof interiorBody>,
+  signal: AbortSignal,
+) {
+  const charge = body.load.charge
+  if (!plan) {
+    const res = await postInterior(request, signal)
+    const json: Answer['json'] = await res.json().catch(() => undefined)
+    // a change while the body was read aborted it; the shown result stays marked
+    if (signal.aborted) return
+    return { res, json, steps: res.ok && json !== undefined ? stepsOf(json, charge) : [] }
+  }
+  const answers: Answer[] = []
+  await runBatch(plan, 4, signal, async (row, i) => {
+    const res = await postInterior(
+      { ...body, load: stepLoad(body.load, { charge, ...row }) },
+      signal,
+    )
+    answers[i] = { res, json: await res.json().catch(() => undefined) }
+  })
+  if (signal.aborted) return
+  // a busy API or a step past its deadline (503) is a failed request, not a model error; the first
+  // answer stands for the run's status when no step has a result
+  const shown =
+    answers.find((a) => a.res.status === 503) ?? answers.find((a) => !a.res.ok) ?? answers[0]
+  return { ...shown, steps: shown.res.status === 503 ? [] : planSteps(plan, answers, charge) }
+}
+
+/** The step a new run shows: the first with a result; a ladder around the charge its middle step. */
+function firstStep(steps: Step[], around: boolean) {
+  const middle = around ? (steps.length - 1) / 2 : -1
+  return steps[middle]?.body ? middle : steps.findIndex((s) => s.body)
+}
+
+const ladderOf = (
+  plan: Partial<Step>[] | undefined,
+  kind: RunnableLadderKind,
+  seatingBy: SeatingLengths['lengthKind'] | undefined,
+) => ({
+  kind: plan ? kind : ('charge' as const),
+  seatingBy: plan && kind === 'seating' ? seatingBy : undefined,
+})
+
+type Named = { name?: string } | undefined
+
+/** The names the printed sheet shows for the load's records. */
+function identityOf(a: {
+  cartridge: CartridgeChoice | undefined
+  cartridgeDesign: { name: string } | undefined
+  bulletLabel: string | undefined
+  bulletDesign: Named
+  linkedBullet: Named
+  powderLabel: string | undefined
+  linkedPowder: Named
+}) {
+  const design = a.cartridgeDesign && `${a.cartridgeDesign.name} (user design)`
+  return {
+    cartridge: a.cartridge?.name ?? design,
+    bullet: a.bulletLabel ?? a.bulletDesign?.name ?? a.linkedBullet?.name,
+    powder: a.powderLabel ?? a.linkedPowder?.name,
+  }
+}
+
+/** The seated values still the ones the seating preview wrote. */
+const fromSeatingOf = (
+  seated: Seated,
+  fields: Fields,
+  previewed: Partial<Record<PreviewKey, number>>,
+) => previewKeys.filter((k) => seated[k] !== undefined && fields[k]?.si === previewed[k])
+
+/** A request that gives no band (busy, past its deadline, unreachable) is said so. */
+function fetchBand(request: unknown, signal: AbortSignal): Promise<SampledBand> {
+  const failed: SampledBand = { status: 'failed' }
+  return postInterior(request, signal)
+    .then((r) => (r.ok ? r.json() : undefined))
+    .then((answer: { sampled?: SampledBand } | undefined) => answer?.sampled ?? failed)
+    .catch(() => failed)
+}
+
+/** The outcome with the sampled band of the step shown first, when it is still the run's result. */
+function withBand(o: Outcome | undefined, id: number, first: number, sampled: SampledBand) {
+  if (o?.kind !== 'ok' || o.id !== id) return o
+  return {
+    ...o,
+    body: o.selected === first ? { ...o.body, sampled } : o.body,
+    steps: o.steps.map((s, i) =>
+      i === first && s.body ? { ...s, body: { ...s.body, sampled } } : s,
+    ),
+  }
+}
+
+/** The error outcome of a run whose every step the model reports as invalid, with its status text. */
+function failedRun(steps: Step[], res: Response, json: Answer['json']) {
+  // a ladder shows the first step's error
+  const error = steps[0]?.error
+  const status = error ? 422 : res.status
+  return {
+    outcome: {
+      kind: 'error' as const,
+      status,
+      body: error
+        ? { statusCode: 422, notice: json?.notice, ...error }
+        : (json as ErrorBody | undefined),
+      retryAfter: res.headers.get('retry-after'),
+    },
+    text: `The API answered ${status}.`,
+  }
+}
+
+/** The fields of a link's query, with the default of a defaulted field the link leaves out. */
+function linkedFieldsOf(
+  query: URLSearchParams,
+  system: UnitSystem,
+  defaults: WorkbenchDefaults,
+  withDefaults: boolean,
+) {
+  const linked = queryFields(query, interiorFields, system, fixedFieldText)
+  const missing = withDefaults ? defaultKeys.filter((k) => linked[k].si === undefined) : []
+  for (const k of missing) {
+    const spec = interiorFields.find((s) => s.key === k) as FieldSpec
+    linked[k] = { text: fixedFieldText(spec.quantity, system, defaults[k]), si: defaults[k] }
+  }
+  return { linked, missing }
+}
+
+/** The error of every field whose typed value is outside its bounds. */
+const fieldErrorsOf = (linked: Fields, system: UnitSystem) =>
+  Object.fromEntries(
+    interiorFields.flatMap((s) => {
+      const error = linked[s.key].text && fieldError(s, linked[s.key], system)
+      return error ? [[s.key, error]] : []
+    }),
+  )
+
+/**
+ * The ladder of a link's query, when it fits. The step is a length for a seating ladder, a
+ * temperature difference for a temperature ladder, a charge otherwise; all travel as `ladderStep`.
+ */
+function queryLadder(query: URLSearchParams, system: UnitSystem) {
+  const steps = Number(query.get('ladderSteps'))
+  const direction = directionOf(query.get('ladderDirection'))
+  const fits =
+    Number.isInteger(steps) &&
+    steps > 1 &&
+    steps <= maxLadderSteps &&
+    (direction !== 'around' || steps % 2 === 1)
+  if (!fits) return
+  const kind = runKindOf(query.get('ladderKind'))
+  const spec = stepSpecOf(kind)
+  const { ladderStep } = queryFields(
+    query,
+    [{ ...spec, key: 'ladderStep' }],
+    system,
+    fixedFieldText,
+  )
+  return { steps, kind, direction, ladderStep }
+}
+
+/** The seating a link asks for: the length key whose value is a positive number. */
+const seatingKeyOf = (query: URLSearchParams) =>
+  (['overallLength', 'baseToOgive'] as const).find((k) => {
+    const x = Number(query.get(k))
+    return Number.isFinite(x) && x > 0
+  })
+
+/** What a link carried of its bullet and powder records, under the ids it names. */
+const carriedRecords = (
+  carried: ReturnType<typeof recordValues>,
+  bulletId: string | undefined,
+  powderId: string | undefined,
+) => ({
+  ...(bulletId && carried.bullet && { bullet: { ...carried.bullet, id: bulletId } }),
+  ...(powderId && carried.powder && { powder: { ...carried.powder, id: powderId } }),
+})
+
+const catalogueIdIn = (ref: unknown) => (typeof ref === 'string' ? catalogueIdOf(ref) : undefined)
+
+/** The id of a firearm of this browser's library, from a load's firearm reference. */
+function userFirearmOf(ref: string | undefined) {
+  const target = ref && parseRef(ref)
+  return target && target.scope === 'user' ? target.id : undefined
+}
+
+const userCartridgeOf = (ref: string | undefined) =>
+  ref && parseRef(ref)?.scope === 'user' ? ref : undefined
+
+/** The value a followed field takes: its default, or empty when the default goes and it still holds it. */
+function followedValue(
+  key: FollowKey,
+  target: number | undefined,
+  holdsWritten: boolean,
+  system: UnitSystem,
+): FieldValue | undefined {
+  if (target !== undefined)
+    return { text: fixedFieldText(interiorSpec(key).quantity, system, target), si: target }
+  // a value the user or a gun gave stays
+  return holdsWritten ? { text: '', si: undefined } : undefined
+}
+
+/** The writes a followed field's new default makes; `written` records the defaults put in. */
+function followWrites(a: {
+  followed: ReadonlySet<FollowKey>
+  seatedVolume: boolean
+  now: Fields
+  suggestions: Suggestions
+  written: Partial<Record<FollowKey, number>>
+  system: UnitSystem
+}) {
+  const writes: [FollowKey, FieldValue][] = []
+  for (const k of followKeys) {
+    if (!a.followed.has(k) || (k === 'volume' && a.seatedVolume)) continue
+    const target = a.suggestions[k]?.si
+    const current = a.now[k]?.si
+    if (target !== current) {
+      const value = followedValue(k, target, current === a.written[k], a.system)
+      if (!value) continue
+      writes.push([k, value])
+    }
+    a.written[k] = target
+  }
+  return writes
+}
+
 /** The load workbench's state and actions: inputs, records, seating, ladder, run and result. */
 export function useWorkbenchState() {
   const { choice, system } = useUnits()
@@ -239,29 +1042,16 @@ export function useWorkbenchState() {
   const [powder, setPowder] = useState<Powder | undefined>(undefined)
   const names = useManufacturerNames()
   /** The chosen records as "<manufacturer name> <product name>". */
-  const bulletLabel = bullet && productLabel(bullet, names)
-  const powderLabel = powder && productLabel(powder, names)
+  const bulletLabel = labelOf(bullet, names)
+  const powderLabel = labelOf(powder, names)
   /** SI values of the powder record's model parameters, the reference of the field marks. */
   const [origin, setOrigin] = useState<Record<string, number> | undefined>(undefined)
   const originNow = useRef(origin)
   originNow.current = origin
   /** Groove diameter Z of the chosen cartridge, mm, for the bore resistance of a fitted powder. */
   /** The chosen cartridge's record: its groove diameter and the values the figure draws. */
-  const [groove, setGroove] = useState<
-    { id: string; z?: number; record?: CartridgeDetail } | undefined
-  >(undefined)
-  /** Groove diameter Z of the chosen cartridge once its record is loaded, m: the bore area's fallback. */
-  const grooveM =
-    cartridge && groove?.id === cartridge.id && groove.z ? toSi('length', groove.z) : undefined
-  /** Bore area Q of the chosen cartridge once its record is loaded, m2: what an empty Bore area takes first. */
-  const qM =
-    cartridge && groove?.id === cartridge.id
-      ? toSi(
-          'area',
-          groove.record?.values.find((v) => v.side === 'chamber' && v.symbol === 'Q' && !v.variant)
-            ?.value ?? 0,
-        ) || undefined
-      : undefined
+  const [groove, setGroove] = useState<Groove | undefined>(undefined)
+  const { grooveM, qM, recordTable } = grooveValues(cartridge, groove)
   const [allDiameters, setAllDiameters] = useState(false)
   /** The browser's bullet designs that have a mass, resolved against the catalogue. */
   const [designs, setDesigns] = useState<UserBulletView[]>([])
@@ -285,18 +1075,7 @@ export function useWorkbenchState() {
   const chosenSight = sightOptions(
     [loadExample.firearm, ...firearms].filter((r) => r.id === firearm) as UserRecord[],
   )[0]?.fill
-  // the example rifle's sight in round numbers of the shown units, 100 yd and 2 in, not 109 yd and
-  // 1.9685 in: its zero is 100 in the range unit, as the Trajectory tab's own range defaults
-  const sight =
-    firearm === loadExample.firearm.id && chosenSight
-      ? {
-          ...chosenSight,
-          sightHeight: system.length.toSi(
-            Math.round(system.length.fromSi(chosenSight.sightHeight)),
-          ),
-          zeroRange: system.range.toSi(chosenSight.zeroRange),
-        }
-      : chosenSight
+  const sight = exampleSight(firearm, chosenSight, system)
   /**
    * Where the seating preview puts its controls, by name: the cards register their slots, the
    * figure fills them.
@@ -554,7 +1333,7 @@ export function useWorkbenchState() {
     setGunFields({ firearmMass: v })
   }
   /** A weight of 0 or less is no weight: the field shows its error, the run, files and links skip it. */
-  const gunWeightUsed = (gunWeight.si ?? 0) > 0 ? gunWeight : emptyStep
+  const gunWeightUsed = usableWeight(gunWeight)
   const [ladderError, setLadderError] = useState<string | undefined>()
   const [direction, setDirection] = useState<LadderDirection>('up')
   const [chartView, setChartView] = useState<ChartView>({ x: 'travel', quantity: 'all' })
@@ -643,33 +1422,19 @@ export function useWorkbenchState() {
     // no bullet seated for now (a record loading): what follows the seating keeps following it
     if (values.volume === undefined && values.travel === undefined) return
     const now = form.getValues()
-    const next: Partial<Record<PreviewKey, FieldValue>> = {}
-    const following: Partial<Record<PreviewKey, number>> = {}
-    for (const k of previewKeys) {
-      const v = values[k]
-      const si = now[k]?.si
-      if (v === undefined) continue
-      const wasDefault = k === 'volume' && followed.has(k) && si === written.current.volume
-      if (si !== undefined && Math.abs(si - v) <= 1e-9 * v) following[k] = si
-      else if (si === undefined || si === previewed[k] || wasDefault) {
-        following[k] = v
-        next[k] = seatedField(k, v)
-      }
-    }
+    const { next, following } = followPlan(values, now, {
+      followed,
+      written: written.current,
+      previewed,
+      field: seatedField,
+    })
     if (Object.keys(next).length > 0) markChanged()
     // a value that already was the seated one (the example's) takes the seating's text: same SI value
     const seatedText = withSeatedText(now, following)
-    const update: Partial<Record<PreviewKey, FieldValue>> = { ...next }
-    for (const k of previewKeys)
-      if (!next[k] && seatedText[k]?.text !== now[k]?.text) update[k] = seatedText[k]
+    const update = seatedUpdate(next, seatedText, now)
     // setValues clears every field's error: only when a field changes
-    if (Object.keys(update).length > 0) {
-      // the start's own seating, with a barrel nobody typed, completes the start (no edit)
-      const start =
-        values.atStart &&
-        (values.barrel === undefined || values.barrel === suggestions.barrelLength?.si)
-      keepClean(start, () => form.setValues(update))
-    }
+    if (Object.keys(update).length > 0)
+      keepClean(isStartSeating(values, suggestions), () => form.setValues(update))
     setPreviewed(following)
   }
 
@@ -724,12 +1489,11 @@ export function useWorkbenchState() {
     return controller.signal
   }
 
-  type Kind = 'cartridge' | 'bullet' | 'powder' | 'capacity'
   /**
    * Record ids asked for and not loaded yet, or not reachable (`failed`): the load keeps them, so
    * a Save never drops an id only because its record could not be fetched.
    */
-  const [asked, setAsked] = useState<Partial<Record<Kind, { id: string; failed?: true }>>>({})
+  const [asked, setAsked] = useState<Asked>({})
   const want = (k: Kind, id: string) => setAsked((a) => ({ ...a, [k]: { id } }))
   const got = (k: Kind) =>
     setAsked((a) => {
@@ -741,16 +1505,12 @@ export function useWorkbenchState() {
   /** The record ids of the link the schema refuses, left out of the load (`droppedIds`). */
   const [dropped, setDropped] = useState<string[]>([])
   /** What a link carried of its bullet and powder records, with their ids. */
-  const [linked, setLinked] = useState<{
-    bullet?: NonNullable<RecordValues['bullet']> & { id: string }
-    powder?: NonNullable<RecordValues['powder']> & { id: string }
-  }>({})
+  const [linked, setLinked] = useState<{ bullet?: LinkedBullet; powder?: LinkedPowder }>({})
   // the link's values while its record is asked for, loading or missing
-  const linkedBullet = !bullet && asked.bullet?.id === linked.bullet?.id ? linked.bullet : undefined
-  const linkedPowder = !powder && asked.powder?.id === linked.powder?.id ? linked.powder : undefined
+  const linkedBullet = pendingLink(bullet, asked.bullet?.id, linked.bullet)
+  const linkedPowder = pendingLink(powder, asked.powder?.id, linked.powder)
   /** The bullet length a run reads, mm: the record's, else the link's. */
-  const bulletLength =
-    bullet?.length?.value ?? (linkedBullet?.length && fromSi('length', linkedBullet.length))
+  const bulletLength = bulletLengthOf(bullet, linkedBullet)
 
   function reset() {
     setCustomName(undefined)
@@ -943,34 +1703,11 @@ export function useWorkbenchState() {
         if (fill && !values && previous) {
           // a record without model parameters: what the previous record filled and the user did not
           // edit goes back to a new load's state (the cited default, else empty)
-          const back = new Set<string>()
-          for (const key of unchangedFromRecord(previous, siValues(form.getValues()))) {
-            const given = (defaultKeys as readonly string[]).includes(key)
-              ? defaults[key as DefaultKey]
-              : undefined
-            const spec = interiorFields.find((s) => s.key === key) as FieldSpec
-            form.setFieldValue(
-              key,
-              given === undefined
-                ? emptyStep
-                : { text: fixedFieldText(spec.quantity, unitsNow.current, given), si: given },
-            )
-            form.clearFieldError(key)
-            if (given !== undefined) back.add(key)
-          }
+          const back = revertRecordFill(form, previous, defaults, unitsNow.current)
           setDefaulted((s) => new Set([...s, ...back]))
         }
         if (!fill || !values) return
-        const filled = Object.entries(values).filter(([key]) => !keep.has(key))
-        for (const [key, si] of filled) {
-          const spec = interiorFields.find((s) => s.key === key) as FieldSpec
-          form.setFieldValue(key, {
-            text: fixedFieldText(spec.quantity, unitsNow.current, si),
-            si,
-          })
-          form.clearFieldError(key)
-        }
-        const filledKeys = new Set(filled.map(([key]) => key))
+        const filledKeys = fillRecordValues(form, values, keep, unitsNow.current)
         setDefaulted((s) => new Set([...s].filter((k) => !filledKeys.has(k))))
       })
       .catch(() => {
@@ -984,12 +1721,7 @@ export function useWorkbenchState() {
   const typedKeys = previewKeys.filter(
     (k) => seated[k] !== undefined && fields[k]?.si !== previewed[k],
   )
-  const seatingBlock =
-    seatAt === undefined
-      ? 'The seating ladder needs a cartridge and a bullet record.'
-      : typedKeys.length > 0
-        ? `${typedKeys.map((k) => interiorFields.find((f) => f.key === k)?.label).join(' and ')} typed: empty the field to follow the seating.`
-        : undefined
+  const seatingBlock = seatingBlockOf(seatAt, typedKeys)
 
   /** The steps of the seating ladder from the seating field, or what stops it, in the shown units. */
   function seatingPlan(shown = system) {
@@ -1019,23 +1751,16 @@ export function useWorkbenchState() {
   /** The ladder step size's error; none while the charge runs alone. */
   function stepError(shown = system) {
     if (ladderSteps < 2) return
-    const [spec, v] =
-      ladderKind === 'seating'
-        ? ([seatingStepSpec, seatStep.seatStep] as const)
-        : ladderKind === 'temperature'
-          ? ([temperatureStepSpec, tempStep.tempStep] as const)
-          : ([ladderSpec, ladder.ladderStep] as const)
-    const own =
-      fieldError(spec, v, shown) ??
-      (v.si === undefined || v.si > 0 ? undefined : `${spec.label} must be above 0.`)
+    const [spec, v] = ladderStepField(ladderKind, {
+      seat: seatStep,
+      temp: tempStep,
+      charge: ladder,
+    })
+    const own = ownStepError(spec, v, shown)
     if (own || ladderKind === 'charge') return own
-    if (ladderKind === 'temperature') {
-      if (temperatureBlock) return temperatureBlock
-      const plan = temperaturePlan(shown)
-      return 'error' in plan ? plan.error : undefined
-    }
-    if (seatingBlock) return seatingBlock
-    const plan = seatingPlan(shown)
+    const blocked = ladderKind === 'temperature' ? temperatureBlock : seatingBlock
+    if (blocked) return blocked
+    const plan = ladderKind === 'temperature' ? temperaturePlan(shown) : seatingPlan(shown)
     return 'error' in plan ? plan.error : undefined
   }
 
@@ -1090,29 +1815,14 @@ export function useWorkbenchState() {
     const bulkDensity = chosen?.bulkDensity
       ? toSi('density', chosen.bulkDensity.value)
       : fromLink?.bulkDensity
-    const { resistance, missing } = !chosen?.interior?.resistance
-      ? {
-          resistance:
-            fromLink &&
-            overrideResistance(undefined, {
-              boreFriction: fromLink.boreFriction,
-              engravingPressure: fromLink.engravingPressure,
-              engravingLength: fromLink.engravingLength,
-            }),
-          missing: [],
-        }
-      : cartridge && groove?.id !== cartridge.id
-        ? { missing: ["the cartridge record's groove diameter (not loaded)"] }
-        : recordResistance(chosen, {
-            boreDiameter: body.load.chamber.boreDiameter,
-            boreArea: body.load.chamber.boreArea,
-            startPressure: body.load.startPressure,
-            cartridge: cartridge && {
-              g1: cartridge.g1,
-              z: groove?.id === cartridge.id ? groove.z : undefined,
-            },
-            bulletLengthMm: bulletLength,
-          })
+    const { resistance, missing } = resistanceFor({
+      chosen,
+      fromLink,
+      cartridge,
+      groove,
+      body,
+      bulletLength,
+    })
     // the typed friction and engraving values replace the record's terms
     const applied = overrideResistance(resistance, values)
     if (applied) body.load.resistance = applied
@@ -1141,6 +1851,82 @@ export function useWorkbenchState() {
     form.clearFieldError('charge')
   }
 
+  /** Shows what stopped a run before it was sent: the field a value error names, else the text. */
+  function loadFailed(err: unknown) {
+    // engraving values that need each other: the empty one shows the message
+    if (err instanceof ValueError) {
+      form.setFieldError(err.field, err.message)
+      if ((powderMoreFields as readonly string[]).includes(err.field)) setMore('powder')
+    }
+    setOutcome(undefined)
+    setStatus(errorText(err))
+  }
+
+  /** Shows the first step with a result and starts the request for its sampled band. */
+  function showOk(a: {
+    body: ReturnType<typeof interiorBody>
+    steps: Step[]
+    first: number
+    plan: Partial<Step>[] | undefined
+    bulkDensity: number | undefined
+    resistanceMissing: Extract<Outcome, { kind: 'ok' }>['resistanceMissing']
+    table: string | undefined
+    gasFactorNote: string | undefined
+  }) {
+    const { body, steps, first, plan } = a
+    runs.current += 1
+    const ok = {
+      kind: 'ok' as const,
+      body: steps[first].body as InteriorResponse,
+      load: stepLoad(body.load, steps[first]),
+      steps,
+      selected: first,
+      direction,
+      ladder: ladderOf(plan, ladderKind, seatAt?.lengthKind),
+      at: new Date().toLocaleTimeString('en-GB'),
+      id: runs.current,
+      bulkDensity: a.bulkDensity,
+      cartridge: body.cartridge,
+      powderChosen: powder !== undefined || linkedPowder !== undefined,
+      resistanceMissing: a.resistanceMissing,
+      design: bulletDesign?.name,
+      cartridgeDesign: cartridgeDesign?.name,
+      identity: identityOf({
+        cartridge,
+        cartridgeDesign,
+        bulletLabel,
+        bulletDesign,
+        linkedBullet,
+        powderLabel,
+        linkedPowder,
+      }),
+      printed: {
+        seated,
+        firearm: firearmList.find((f) => f.id === firearm)?.name,
+        firearmMass: gunWeightUsed.si,
+        gasFactor: gasFactorOf(a.table),
+        gasFactorNote: a.gasFactorNote,
+        fromSeating: fromSeatingOf(seated, fields, previewed),
+      },
+      announce: false,
+    }
+    const warnings = derived(ok).warnings.join('\n')
+    ok.announce = warnings !== '' && warnings !== lastWarnings.current
+    lastWarnings.current = warnings
+    showChart(undefined)
+    setOutcome(ok)
+    setStatus({ prefix: 'Simulation done. ' })
+    // the sampled band of the step shown first follows the result: it takes up to its time budget
+    const bandController = new AbortController()
+    bandRequest.current = bandController
+    void fetchBand(
+      { ...body, load: stepLoad(body.load, steps[first]), sampling: {} },
+      bandController.signal,
+    ).then((sampled) => {
+      if (!bandController.signal.aborted) setOutcome((o) => withBand(o, ok.id, first, sampled))
+    })
+  }
+
   async function send() {
     running.current?.abort()
     bandRequest.current?.abort()
@@ -1148,216 +1934,68 @@ export function useWorkbenchState() {
     try {
       req = loadRequest()
     } catch (err) {
-      // engraving values that need each other: the empty one shows the message
-      if (err instanceof ValueError) {
-        form.setFieldError(err.field, err.message)
-        if ((powderMoreFields as readonly string[]).includes(err.field)) setMore('powder')
-      }
-      setOutcome(undefined)
-      setStatus(errorText(err))
+      loadFailed(err)
       return
     }
-    const { body, bulkDensity, resistanceMissing } = req
-    const step = ladder.ladderStep.si
+    const { body } = req
     // a seating or temperature ladder is one single run per step, each with its own volume and
     // travel, or its own propellant temperature
-    const planned =
-      ladderSteps < 2
-        ? undefined
-        : ladderKind === 'seating'
-          ? seatingPlan()
-          : ladderKind === 'temperature'
-            ? temperatureBlock
-              ? { error: temperatureBlock }
-              : temperaturePlan()
-            : undefined
+    const planned = plannedLadder(ladderSteps, ladderKind, {
+      seating: seatingPlan,
+      temperature: temperaturePlan,
+      temperatureBlock,
+    })
     if (planned && 'error' in planned) {
       setOutcome(undefined)
       setStatus(planned.error)
       return
     }
-    const plan: Partial<Step>[] | undefined =
-      planned &&
-      (ladderKind === 'seating'
-        ? (planned.steps as SeatingStep[]).map((seating) => ({ seating }))
-        : (planned.steps as number[]).map((temperature) => ({ temperature })))
-    const request =
-      !plan && ladderSteps > 1 && step !== undefined
-        ? { ...body, ladder: { chargeStep: step, stepCount: ladderSteps, direction } }
-        : body
+    const plan = planned && planRows(ladderKind, planned.steps)
+    const request = ladderRequest(body, plan, ladderSteps, ladder.ladderStep.si, direction)
     const controller = new AbortController()
     running.current = controller
     setPending(true)
     setStatus('Simulating')
     try {
-      // the free recoil's gas factor needs the cartridge's CIP table: wait for a record still loading
-      const pending = !!cartridge && groove?.id !== cartridge.id
-      const fetched =
-        pending && cartridge
-          ? await fetchRecord<CartridgeDetail>('cartridges', cartridge.id, controller.signal).catch(
-              () => undefined,
-            )
-          : undefined
-      const table = pending ? fetched?.table : recordTable
-      // the factor 1.75 of a cartridge with an id but no table: the note says why
-      const gasFactorNote =
-        cartridge && table === undefined
-          ? pending && !fetched
-            ? 'cartridge record not loaded'
-            : 'cartridge record without a CIP table'
-          : undefined
-      if (controller.signal.aborted) return
-      const post = (b: unknown) =>
-        apiFetch('interior', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify(b),
-          signal: controller.signal,
-        })
-      let res: Response
-      let json: Answer['json']
-      let steps: Step[]
-      if (plan) {
-        // at most 4 in flight, as the API runs the steps of a charge ladder
-        const answers: Answer[] = []
-        await runBatch(plan, 4, controller.signal, async (row, i) => {
-          const r = await post({
-            ...body,
-            load: stepLoad(body.load, { charge: body.load.charge, ...row }),
-          })
-          answers[i] = { res: r, json: await r.json().catch(() => undefined) }
-        })
-        if (controller.signal.aborted) return
-        // a busy API or a step past its deadline (503) is a failed request, not a model error
-        const busy = answers.find((a) => a.res.status === 503)
-        steps = busy
-          ? []
-          : plan.map((row, i) => {
-              const { res: r, json: j } = answers[i]
-              const error = {
-                message: j?.message ?? `The API answered ${r.status}.`,
-                reason: j?.reason,
-              }
-              return r.ok && j !== undefined
-                ? { charge: body.load.charge, body: j, ...row }
-                : { charge: body.load.charge, error, ...row }
-            })
-        // the first answer stands for the run's status when no step has a result
-        ;({ res, json } = busy ?? answers.find((a) => !a.res.ok) ?? answers[0])
-      } else {
-        res = await post(request)
-        json = await res.json().catch(() => undefined)
-        // a change while the body was read aborted it; the shown result stays marked
-        if (controller.signal.aborted) return
-        steps = res.ok && json !== undefined ? stepsOf(json, body.load.charge) : []
-      }
-      setChanged(false)
-      // a new run shows its first step with a result; a ladder around the charge its middle step
-      const middle = direction === 'around' ? (steps.length - 1) / 2 : -1
-      const first = steps[middle]?.body ? middle : steps.findIndex((s) => s.body)
-      if (first >= 0) {
-        runs.current += 1
-        const ok = {
-          kind: 'ok' as const,
-          body: steps[first].body as InteriorResponse,
-          load: stepLoad(body.load, steps[first]),
-          steps,
-          selected: first,
-          direction,
-          ladder: {
-            kind: plan ? ladderKind : ('charge' as const),
-            seatingBy: plan && ladderKind === 'seating' ? seatAt?.lengthKind : undefined,
-          },
-          at: new Date().toLocaleTimeString('en-GB'),
-          id: runs.current,
-          bulkDensity,
-          cartridge: body.cartridge,
-          powderChosen: powder !== undefined || linkedPowder !== undefined,
-          resistanceMissing,
-          design: bulletDesign?.name,
-          cartridgeDesign: cartridgeDesign?.name,
-          identity: {
-            cartridge:
-              cartridge?.name ?? (cartridgeDesign && `${cartridgeDesign.name} (user design)`),
-            bullet: bulletLabel ?? bulletDesign?.name ?? linkedBullet?.name,
-            powder: powderLabel ?? linkedPowder?.name,
-          },
-          printed: {
-            seated,
-            firearm: firearmList.find((f) => f.id === firearm)?.name,
-            firearmMass: gunWeightUsed.si,
-            gasFactor:
-              cartridgeClass(table) === 'pistol'
-                ? gasVelocityFactor.pistol
-                : gasVelocityFactor.rifle,
-            gasFactorNote,
-            fromSeating: previewKeys.filter(
-              (k) => seated[k] !== undefined && fields[k]?.si === previewed[k],
-            ),
-          },
-          announce: false,
-        }
-        const warnings = derived(ok).warnings.join('\n')
-        ok.announce = warnings !== '' && warnings !== lastWarnings.current
-        lastWarnings.current = warnings
-        showChart(undefined)
-        setOutcome(ok)
-        setStatus({ prefix: 'Simulation done. ' })
-        // the sampled band of the step shown first follows the result: it takes up to its time budget
-        const attach = (sampled: SampledBand) =>
-          setOutcome((o) =>
-            o?.kind === 'ok' && o.id === ok.id
-              ? {
-                  ...o,
-                  body: o.selected === first ? { ...o.body, sampled } : o.body,
-                  steps: o.steps.map((s, i) =>
-                    i === first && s.body ? { ...s, body: { ...s.body, sampled } } : s,
-                  ),
-                }
-              : o,
-          )
-        // a request that gives no band (busy, past its deadline, unreachable) is said so
-        const bandController = new AbortController()
-        bandRequest.current = bandController
-        apiFetch('interior', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({
-            ...body,
-            load: stepLoad(body.load, steps[first]),
-            sampling: {},
-          }),
-          signal: bandController.signal,
-        })
-          .then((r) => (r.ok ? r.json() : undefined))
-          .then((answer: { sampled?: SampledBand } | undefined) => {
-            if (!bandController.signal.aborted) attach(answer?.sampled ?? { status: 'failed' })
-          })
-          .catch(() => {
-            if (!bandController.signal.aborted) attach({ status: 'failed' })
-          })
-      } else {
-        // a ladder whose every step the model reports as invalid shows the first step's error
-        const error = steps[0]?.error
-        setOutcome({
-          kind: 'error',
-          status: error ? 422 : res.status,
-          body: error
-            ? { statusCode: 422, notice: json?.notice, ...error }
-            : (json as ErrorBody | undefined),
-          retryAfter: res.headers.get('retry-after'),
-        })
-        setStatus(`The API answered ${error ? 422 : res.status}.`)
-      }
+      await simulate(req, plan, request, controller.signal)
     } catch {
-      if (controller.signal.aborted) return
-      setChanged(false)
-      const offline = !navigator.onLine
-      setOutcome({ kind: 'error', status: 502, body: undefined, retryAfter: null, offline })
-      setStatus(offline ? needsNetwork : notReached)
+      if (!controller.signal.aborted) showUnreached()
     } finally {
       if (running.current === controller) setPending(false)
     }
+  }
+
+  /** Sends the run's request or ladder and shows the first step with a result, or the error. */
+  async function simulate(
+    req: ReturnType<typeof loadRequest>,
+    plan: Partial<Step>[] | undefined,
+    request: unknown,
+    signal: AbortSignal,
+  ) {
+    const { body } = req
+    // the free recoil's gas factor needs the cartridge's CIP table: wait for a record still loading
+    const { table, gasFactorNote } = await tableOf(cartridge, groove, recordTable, signal)
+    if (signal.aborted) return
+    const answer = await runRequest(plan, request, body, signal)
+    if (!answer) return
+    setChanged(false)
+    const { res, json, steps } = answer
+    const first = firstStep(steps, direction === 'around')
+    if (first >= 0) {
+      showOk({ ...req, steps, first, plan, table, gasFactorNote })
+      return
+    }
+    const failed = failedRun(steps, res, json)
+    setOutcome(failed.outcome)
+    setStatus(failed.text)
+  }
+
+  /** A request that never got an answer: the API is unreachable, or the browser is offline. */
+  function showUnreached() {
+    setChanged(false)
+    const offline = !navigator.onLine
+    setOutcome({ kind: 'error', status: 502, body: undefined, retryAfter: null, offline })
+    setStatus(offline ? needsNetwork : notReached)
   }
 
   // the cartridge record's groove diameter, for the bore resistance of a fitted powder
@@ -1437,15 +2075,7 @@ export function useWorkbenchState() {
           link.powder && choosePowder(link.powder),
         ])
       })()
-    else {
-      // tuned defaults start a new record, so a fresh page holds no unsaved work
-      const d = readDefaults()
-      if (defaultsText(d) !== undefined)
-        asNewLoad(() => {
-          setDefaults(d)
-          form.setValues(exampleFields(interiorFields, d, system, fixedFieldText))
-        })()
-    }
+    else startFromDefaults()
   }, [])
 
   // a copied link pasted into this tab changes the fragment only, which loads no page: reload it
@@ -1457,63 +2087,51 @@ export function useWorkbenchState() {
     return () => window.removeEventListener('hashchange', open)
   }, [])
 
+  /** Tuned defaults start a new record, so a fresh page holds no unsaved work. */
+  function startFromDefaults() {
+    const d = readDefaults()
+    if (defaultsText(d) === undefined) return
+    asNewLoad(() => {
+      setDefaults(d)
+      form.setValues(exampleFields(interiorFields, d, system, fixedFieldText))
+    })()
+  }
+
   /**
    * Fills the form and the cartridge from a link's query or an opened file; a defaulted field a link
    * leaves out gets the default, a file opens as saved.
    */
   function fill(query: URLSearchParams, withDefaults = true) {
-    const linked = queryFields(query, interiorFields, system, fixedFieldText)
     const d = readDefaults()
-    const missing = withDefaults ? defaultKeys.filter((k) => linked[k].si === undefined) : []
-    for (const k of missing) {
-      const spec = interiorFields.find((s) => s.key === k) as FieldSpec
-      linked[k] = { text: fixedFieldText(spec.quantity, system, d[k]), si: d[k] }
-    }
+    const { linked, missing } = linkedFieldsOf(query, system, d, withDefaults)
     setDefaults(d)
     setDefaulted(new Set(missing))
     // a link follows the defaults of the fields it leaves out; a file opens as saved
     setFollowed(new Set(withDefaults ? followKeys.filter((k) => linked[k].si === undefined) : []))
     form.setValues(linked)
     // a linked value outside its bounds shows as written with its error
-    const errors = Object.fromEntries(
-      interiorFields.flatMap((s) => {
-        const error = linked[s.key].text && fieldError(s, linked[s.key], system)
-        return error ? [[s.key, error]] : []
-      }),
-    )
-    form.setErrors(errors)
-    const steps = Number(query.get('ladderSteps'))
-    const linkedDirection = directionOf(query.get('ladderDirection'))
-    if (
-      Number.isInteger(steps) &&
-      steps > 1 &&
-      steps <= maxLadderSteps &&
-      (linkedDirection !== 'around' || steps % 2 === 1)
-    ) {
-      setLadderSteps(steps)
-      // the step is a length for a seating ladder, a temperature difference for a temperature
-      // ladder, a charge otherwise; all travel as `ladderStep`
-      const kind = runKindOf(query.get('ladderKind'))
-      const stepSpec =
-        kind === 'seating'
-          ? seatingStepSpec
-          : kind === 'temperature'
-            ? temperatureStepSpec
-            : ladderSpec
-      const { ladderStep } = queryFields(
-        query,
-        [{ ...stepSpec, key: 'ladderStep' }],
-        system,
-        fixedFieldText,
-      )
-      setLadderKind(kind)
-      if (kind === 'seating') setSeatStep({ seatStep: ladderStep })
-      else if (kind === 'temperature') setTempStep({ tempStep: ladderStep })
-      else setLadder({ ladderStep })
-      setDirection(linkedDirection)
-    }
-    // the firearm, the measured case capacity and the seating; the seated bullet takes the
-    // seating once its records load
+    form.setErrors(fieldErrorsOf(linked, system))
+    const queried = queryLadder(query, system)
+    if (queried) applyLadder(queried)
+    fillGunAndSeating(query)
+    fillRecords(query)
+  }
+
+  /** The ladder a link carries: its step count, kind, step size and direction. */
+  function applyLadder(l: NonNullable<ReturnType<typeof queryLadder>>) {
+    setLadderSteps(l.steps)
+    setLadderKind(l.kind)
+    if (l.kind === 'seating') setSeatStep({ seatStep: l.ladderStep })
+    else if (l.kind === 'temperature') setTempStep({ tempStep: l.ladderStep })
+    else setLadder({ ladderStep: l.ladderStep })
+    setDirection(l.direction)
+  }
+
+  /**
+   * The firearm, the measured case capacity and the seating of a link; the seated bullet takes the
+   * seating once its records load.
+   */
+  function fillGunAndSeating(query: URLSearchParams) {
     // an id longer than the load file allows would make Save write a file Open rejects
     const firearmId = query.get('firearm')
     if (firearmId && firearmId.length <= 64) setFirearm(firearmId)
@@ -1525,21 +2143,21 @@ export function useWorkbenchState() {
       setMeasured(own)
       setMeasuredFor(linkedId(query.get('cartridge')))
     }
-    const usable = (x: number) => Number.isFinite(x) && x > 0
-    const by = (['overallLength', 'baseToOgive'] as const).find((k) => usable(Number(query.get(k))))
+    const by = seatingKeyOf(query)
     if (by) setPreviewInitial({ seating: { by, value: Number(query.get(by)) } })
-    // a link's records come without their fills: the linked values stay, and what the link carried
-    // of the records stands in for one that is missing
+  }
+
+  /**
+   * The records of a link come without their fills: the linked values stay, and what the link
+   * carried of the records stands in for one that is missing.
+   */
+  function fillRecords(query: URLSearchParams) {
     // an id that does not fit the schema is dropped, else every Save fails on it
     const bulletId = linkedId(query.get('bullet'))
     if (bulletId) void chooseBullet(bulletId, false)
     const powderId = linkedId(query.get('powder'))
     if (powderId) void choosePowder(powderId, false)
-    const carried = recordValues(query)
-    setLinked({
-      ...(bulletId && carried.bullet && { bullet: { ...carried.bullet, id: bulletId } }),
-      ...(powderId && carried.powder && { powder: { ...carried.powder, id: powderId } }),
-    })
+    setLinked(carriedRecords(recordValues(query), bulletId, powderId))
     const id = linkedId(query.get('cartridge'))
     if (!id) return
     const signal = pick('cartridges')
@@ -1687,68 +2305,43 @@ export function useWorkbenchState() {
   function openLoad(d: Load) {
     reset()
     const { query, typed, sessions } = fromLoad(d)
-    const cartridgeId = d.cartridge && catalogueIdOf(d.cartridge)
+    const cartridgeId = catalogueIdIn(d.cartridge)
     if (cartridgeId) query.set('cartridge', cartridgeId)
-    const firearmTarget = d.firearm && parseRef(d.firearm)
-    const firearmKey =
-      firearmTarget && firearmTarget.scope === 'user' ? firearmTarget.id : undefined
+    const firearmKey = userFirearmOf(d.firearm)
     if (firearmKey) query.set('firearm', firearmKey)
     fill(query)
     // the weight of a firearm of the library comes from the firearm once it is read
     gunPending.current = firearmKey !== undefined && !typed.has('firearmMass')
     setOpens((n) => n + 1)
     // a user cartridge or bullet is a record of this browser, read and resolved here
-    const userCartridge =
-      d.cartridge && parseRef(d.cartridge)?.scope === 'user' ? d.cartridge : undefined
-    if (userCartridge) {
-      openCartridgeDesign(userCartridge)
-    }
+    const userCartridge = userCartridgeOf(d.cartridge)
+    if (userCartridge) openCartridgeDesign(userCartridge)
     if (d.capacity) openCapacity(d.capacity, d.cartridge)
-    const fillMass = !typed.has('bulletMass')
-    const bulletRef = typeof d.bullet === 'string' ? d.bullet : undefined
-    const bulletId = bulletRef && catalogueIdOf(bulletRef)
-    if (bulletId) void chooseBullet(bulletId, fillMass)
-    else if (bulletRef) openBulletDesign(bulletRef, fillMass)
-    const powderId = typeof d.powder === 'string' ? catalogueIdOf(d.powder) : undefined
+    openBullet(d.bullet, !typed.has('bulletMass'))
+    const powderId = catalogueIdIn(d.powder)
     if (powderId) void choosePowder(powderId, true, typed)
     setNotes(d.note ?? '')
     openSessions(sessions)
   }
 
-  /**
-   * The seating a file or link keeps, once one was stored or the user moved it away from its start
-   * (the default start would mark an older file changed): the seated bullet's, else the one asked
-   * for while it loads.
-   */
-  const seatedNow = seatingOf(seated)
-  // a move is a change of the seating field's text: the start typed back as shown is none (the
-  // slider snaps back onto the start itself)
-  const moved =
-    seatingStart !== undefined &&
-    (seatedNow?.by !== seatingStart.by ||
-      exactFieldText('length', system, seatedNow.value) !==
-        exactFieldText('length', system, seatingStart.value))
-  const seating: Seating =
-    previewInitial?.seating || moved ? (seatedNow ?? previewInitial?.seating) : undefined
-  // the cartridge asked for counts while its record loads or stays offline, as in `cartridge` below
-  const cartridgeKey =
-    cartridge?.id ??
-    cartridgeDesign?.id ??
-    parseRef(asked.cartridge?.id ?? '')?.id ??
-    asked.cartridge?.id
-  const measuredWaterCapacity =
-    measuredFor === cartridgeKey && (measured.measuredWaterCapacity.si ?? 0) > 0
-      ? measured.measuredWaterCapacity.si
-      : undefined
-  const chosenCapacity =
-    capacityChoice && capacityChoice.cartridge === cartridgeKey ? capacityChoice.id : undefined
+  /** The bullet of an opened load: a catalogue record is chosen, a design of this browser is read. */
+  function openBullet(ref: unknown, fillMass: boolean) {
+    const bulletRef = typeof ref === 'string' ? ref : undefined
+    const id = bulletRef && catalogueIdOf(bulletRef)
+    if (id) void chooseBullet(id, fillMass)
+    else if (bulletRef) openBulletDesign(bulletRef, fillMass)
+  }
 
-  const activeStep =
-    ladderKind === 'seating'
-      ? seatStep.seatStep
-      : ladderKind === 'temperature'
-        ? tempStep.tempStep
-        : ladder.ladderStep
+  const seating = keptSeating(seated, seatingStart, previewInitial?.seating, system)
+  const cartridgeKey = cartridgeKeyOf(cartridge, cartridgeDesign, asked.cartridge)
+  const measuredWaterCapacity = measuredCapacityOf(measuredFor, cartridgeKey, measured)
+  const chosenCapacity = chosenCapacityOf(capacityChoice, cartridgeKey)
+
+  const activeStep = ladderStepField(ladderKind, {
+    seat: seatStep,
+    temp: tempStep,
+    charge: ladder,
+  })[1]
   /**
    * The reference a load keeps: the record being loaded (`asked`, kept too when it did not resolve),
    * else a user design of this browser, else the catalogue record `id`.
@@ -1788,9 +2381,7 @@ export function useWorkbenchState() {
   const name = loadName(customName, generated)
 
   /** The bullets that fit the cartridge (`GET /bullets?cartridge`); all without its CIP values or with all diameters on. */
-  const bulletFit = allDiameters ? undefined : fitOf(cartridge)
-  const bulletParams =
-    bulletFit && cartridge ? `&cartridge=${encodeURIComponent(cartridge.id)}` : ''
+  const { bulletFit, bulletParams } = bulletFilter(allDiameters, cartridge)
   const describeBullet = (b: BulletSummary) =>
     `${productLabel(b, names)}, ${withUnit('mass', system, toSi('mass', b.mass))}, ${withUnit('length', system, toSi('length', b.diameter))}`
 
@@ -1805,9 +2396,6 @@ export function useWorkbenchState() {
 
   // the defaults of volume, bore diameter, twist and barrel length from what is chosen
   const gun = firearmList.find((f) => f.id === firearm)
-  const recordTable = cartridge && groove?.id === cartridge.id ? groove.record?.table : undefined
-  const mmToM = (mm: number | undefined) => (mm === undefined ? undefined : toSi('length', mm))
-  const mm2ToM2 = (mm2: number | undefined) => (mm2 === undefined ? undefined : toSi('area', mm2))
   /** What the chosen cartridge design gives; the design's own values only. */
   const designLoad = useMemo(
     () =>
@@ -1815,40 +2403,17 @@ export function useWorkbenchState() {
       workbenchDesign(cartridgeDesign.data, cartridgeDesign.resolved, cartridgeDesign.name, system),
     [cartridgeDesign, system],
   )
-  const designCapacity: Suggestion | undefined =
-    seated.caseVolume !== undefined
-      ? { si: seated.caseVolume, source: 'your measured case capacity, without the bullet' }
-      : designLoad?.caseVolume !== undefined
-        ? {
-            si: designLoad.caseVolume,
-            source: `outline of the user design ${cartridgeDesign?.name} less a wall, approximate, without the bullet`,
-          }
-        : undefined
   const suggestions: Suggestions = suggestDefaults({
-    firearm: gun && { name: gun.name, twist: gun.data.twist, barrelLength: gun.data.barrelLength },
-    cartridge: cartridgeDesign
-      ? {
-          name: cartridgeDesign.name,
-          design: true,
-          boreDiameter: designLoad?.boreDiameter,
-          capacity: designCapacity,
-        }
-      : cartridge && {
-          name: cartridge.name,
-          class: cartridgeClass(recordTable),
-          boreDiameter: mmToM(specValue('chamber', 'F')),
-          boreArea: mm2ToM2(specValue('chamber', 'Q')),
-          twist: mmToM(specValue('chamber', 'u')),
-          capacity:
-            seated.caseVolume === undefined
-              ? undefined
-              : {
-                  si: seated.caseVolume,
-                  source: measuredWaterCapacity
-                    ? 'your measured case capacity, without the bullet'
-                    : `case capacity record of ${cartridge.name}, without the bullet`,
-                },
-        },
+    firearm: gunSource(gun),
+    cartridge: cartridgeSource({
+      cartridge,
+      design: cartridgeDesign,
+      designLoad,
+      recordTable,
+      specValue,
+      seated,
+      measuredCapacity: measuredWaterCapacity,
+    }),
     bullet: bullet && {
       name: productLabel(bullet, names),
       diameter: toSi('length', bullet.diameter.value),
@@ -1857,23 +2422,16 @@ export function useWorkbenchState() {
   })
   // the references the load keeps; one that cannot be written (a design or firearm whose id is no
   // UUID) leaves what it gives in the load as typed values
-  const firearmRef = firearm && userRef(firearm)
+  const firearmRef = userRefOf(firearm)
   const powderId = asked.powder?.id ?? powder?.id
-  const referenced =
-    (!firearm || !!firearmRef) &&
-    (!cartridgeDesign || !!userRef(cartridgeDesign.id)) &&
-    (!bulletDesign || !!userRef(bulletDesign.id))
+  const referenced = referencedOf(firearm, firearmRef, cartridgeDesign, bulletDesign)
   const fieldValues: Record<string, number | undefined> = {
     ...Object.fromEntries(Object.entries(fields).map(([k, f]) => [k, f.si])),
     firearmMass: gunWeightUsed.si,
   }
   const given = givenKeys(fieldValues, {
     origin,
-    bulletMass: bullet
-      ? toSi('mass', bullet.mass.value)
-      : bulletDesign && userRef(bulletDesign.id)
-        ? bulletDesign.mass
-        : undefined,
+    bulletMass: bulletMassOf(bullet, bulletDesign),
     defaults,
     defaulted,
     followed,
@@ -1881,24 +2439,17 @@ export function useWorkbenchState() {
       followKeys.map((k) => [k, referenced ? suggestions[k]?.si : undefined]),
     ),
     previewed,
-    seatingKept:
-      referenced &&
-      (seated.barrel === undefined ||
-        Math.abs(seated.barrel - (suggestions.barrelLength?.si ?? Number.NaN)) <=
-          1e-9 * seated.barrel),
+    seatingKept: seatingKeptOf(referenced, seated, suggestions),
     gunMass: gunFromFirearm.current && !!firearmRef,
   })
   const cartridgeRef = savedRef(asked.cartridge?.id, cartridgeDesign?.id, cartridge?.id)
   // the measured capacity is a user record of its own, stored with the load (`storeLoad`); a
   // reference asked for and not loaded stays until a capacity is typed or chosen
-  const measuredCapacity =
-    measuredWaterCapacity !== undefined && cartridgeRef
-      ? { cartridge: cartridgeRef, m3: measuredWaterCapacity }
-      : undefined
-  const capacityRef = savedCapacityRef(
-    measuredCapacity && measuredCapacityRef(measuredCapacity.cartridge, measuredCapacity.m3),
+  const { measuredCapacity, capacityRef } = capacityRefsOf(
+    cartridgeRef,
+    measuredWaterCapacity,
     asked.capacity?.id,
-    chosenCapacity && catalogueRef(chosenCapacity),
+    chosenCapacity,
   )
   /** Save's browser copy: the load with the capacity record it names. */
   const storeLoad = useCallback(
@@ -1927,29 +2478,21 @@ export function useWorkbenchState() {
     values: fieldValues,
     given,
     cartridge: cartridgeRef,
-    firearm: firearmRef || undefined,
+    firearm: firearmRef,
     bullet: savedRef(asked.bullet?.id, bulletDesign?.id, bullet?.id),
     powder: powderId && catalogueRef(powderId),
     notes,
     capacity: capacityRef,
     seating,
-    ladder:
-      ladderSteps > 1
-        ? {
-            kind: ladderKind,
-            stepCount: ladderSteps,
-            step: activeStep.si,
-            direction,
-          }
-        : undefined,
+    ladder: ladderPartOf(ladderSteps, ladderKind, activeStep.si, direction),
     sessions: sessionRefs,
   }
   const loadFile = toLoad(loadParts)
   // the file for the API: every value of the moment typed, the catalogue records only
   const apiFile = toApiLoad(loadParts, {
-    cartridge: cartridge && catalogueRef(cartridge.id),
-    bullet: bullet && catalogueRef(bullet.id),
-    powder: powder && catalogueRef(powder.id),
+    cartridge: refOf(cartridge),
+    bullet: refOf(bullet),
+    powder: refOf(powder),
   })
   // the File menu's props stay the same objects while the load is unchanged, so its memo holds and
   // its window listeners keep no earlier render, and with it no earlier result, alive
@@ -1969,84 +2512,37 @@ export function useWorkbenchState() {
   // a followed field takes its default when it changes; what was typed is not in `followed`
   // biome-ignore lint/correctness/useExhaustiveDependencies: on a change of a default or of what follows
   useEffect(() => {
-    const now = form.getValues()
-    const writes: (() => void)[] = []
-    for (const k of followKeys) {
-      if (!followed.has(k) || (k === 'volume' && seatedVolume)) continue
-      const target = suggestions[k]?.si
-      const current = now[k]?.si
-      if (target !== current) {
-        if (target !== undefined)
-          writes.push(() =>
-            form.setFieldValue(k, {
-              text: fixedFieldText(interiorSpec(k).quantity, system, target),
-              si: target,
-            }),
-          )
-        // a default that goes takes its value along; a value the user or a gun gave stays
-        else if (current === written.current[k])
-          writes.push(() => form.setFieldValue(k, { text: '', si: undefined }))
-        else continue
-        writes.push(() => form.clearFieldError(k))
-      }
-      written.current[k] = target
-    }
+    const writes = followWrites({
+      followed,
+      seatedVolume,
+      now: form.getValues(),
+      suggestions,
+      written: written.current,
+      system,
+    })
     if (writes.length > 0)
       keepClean(true, () => {
-        for (const w of writes) w()
+        for (const [k, value] of writes) {
+          form.setFieldValue(k, value)
+          form.clearFieldError(k)
+        }
       })
   }, [suggestionKey, followed, seatedVolume])
-  const bc =
-    bullet?.ballisticCoefficients?.find((c) => c.dragModel === 'G7') ??
-    bullet?.ballisticCoefficients?.find((c) => c.dragModel === 'G1')
+  const bc = bcOf(bullet)
 
   /** A new load with nothing chosen or typed: the start card replaces the cards. */
-  const fresh =
-    !cartridge &&
-    !cartridgeDesign &&
-    !bullet &&
-    !bulletDesign &&
-    !powder &&
-    !outcome &&
-    !byHand &&
-    Object.entries(fields).every(([k, v]) => defaulted.has(k) || v.text === '')
+  const fresh = isFresh({
+    chosen: [cartridge, cartridgeDesign, bullet, bulletDesign, powder, outcome],
+    byHand,
+    fields,
+    defaulted,
+  })
   const has = (keys: readonly string[]) => keys.every((k) => fields[k]?.si !== undefined)
   /** What a run still needs, in the order of the cards; the first open one is next. */
-  const todo = [
-    {
-      label: 'Cartridge (optional)',
-      done: !!(cartridge || cartridgeDesign),
-      value: cartridge?.name ?? (cartridgeDesign && `${cartridgeDesign.name} (your design)`),
-    },
-    {
-      label: 'Bullet',
-      done: has(['bulletMass']),
-      value: bulletLabel ?? bulletDesign?.name,
-    },
-    {
-      label: 'Powder or model parameters',
-      done: has(requiredModelKeys),
-      value: powderLabel,
-    },
-    { label: 'Charge', done: has(['charge']) },
-    {
-      label: 'Chamber volume, bullet travel and twist',
-      done: has(['volume', 'travel', 'twist']),
-    },
-  ]
+  const todo = todoOf({ cartridge, cartridgeDesign, bulletLabel, bulletDesign, powderLabel, has })
   const next = todo.findIndex((s) => !s.done)
   /** The card of the next open step, marked until the first result (as the checklist). */
-  const nextPanel: InputPanel | undefined = outcome
-    ? undefined
-    : (
-        [
-          'cartridge',
-          'bullet',
-          'powder',
-          'powder',
-          has(['volume']) ? 'firearm' : 'cartridge',
-        ] as const
-      )[next]
+  const nextPanel = outcome ? undefined : nextPanelOf(next, has(['volume']))
 
   /**
    * The bore resistance the powder record's law gives for the fields as they stand, under the keys
@@ -2075,29 +2571,15 @@ export function useWorkbenchState() {
     }
   })()
 
-  /**
-   * What Copy link carries of the bullet and powder records, SI, with their ids: the records'
-   * values, else what the link that opened them carried.
-   */
-  const recordLink = {
-    bulletId: (asked.bullet?.id && catalogueIdOf(asked.bullet.id)) || bullet?.id,
-    powderId: asked.powder?.id ?? powder?.id,
-    values: {
-      bullet: bullet
-        ? {
-            name: productLabel(bullet, names),
-            length: bullet.length && toSi('length', bullet.length.value),
-          }
-        : linkedBullet,
-      powder: powder
-        ? {
-            name: productLabel(powder, names),
-            bulkDensity: powder.bulkDensity && toSi('density', powder.bulkDensity.value),
-            ...recordBore,
-          }
-        : linkedPowder,
-    } satisfies RecordValues,
-  }
+  const recordLink = recordLinkOf({
+    asked,
+    bullet,
+    powder,
+    names,
+    recordBore,
+    linkedBullet,
+    linkedPowder,
+  })
 
   return {
     allDiameters,
@@ -2245,7 +2727,7 @@ export function useWorkbenchState() {
     showChart,
     sight,
     suggestions,
-    status: statusText(status, outcome?.kind === 'ok' ? resultLine(outcome, system) : undefined),
+    status: statusText(status, outcome && resultLineOf(outcome, system)),
     stepError,
     stepsDraft,
     storedTick,

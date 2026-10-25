@@ -203,6 +203,18 @@ interface Predictor {
   trajectories: number
 }
 
+/** The values of the session's observations in a trajectory, or null when it misses a range. */
+function observedPoints(u: Run, t: ReturnType<typeof trajectory>): Prediction | null {
+  const at = new Map(t.points.map((p) => [p.range, p]))
+  const points: TrajectoryPoint[] = []
+  for (const x of u.observations) {
+    const p = at.get(x.range)
+    if (p === undefined) return null
+    points.push(p)
+  }
+  return { values: points.map((p, i) => p[u.observations[i].kind]), points }
+}
+
 /**
  * Flies each session at the parameters `q(trial)` with the trajectory options `o`; a failure once
  * `budget` is spent throws `step-budget` with the estimate at `current`.
@@ -236,14 +248,7 @@ function predictSessions(
       if (strict) throw e
       return null
     }
-    const at = new Map(t.points.map((p) => [p.range, p]))
-    const points: TrajectoryPoint[] = []
-    for (const x of u.observations) {
-      const p = at.get(x.range)
-      if (p === undefined) return null
-      points.push(p)
-    }
-    return { values: points.map((p, i) => p[u.observations[i].kind]), points }
+    return observedPoints(u, t)
   }
   const predict = (trial: number[], current: number[], strict = false): Prediction | null => {
     const values: number[] = []

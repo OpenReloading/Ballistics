@@ -7,7 +7,7 @@ import {
   PencilSimpleLine,
   WarningCircle,
 } from '@phosphor-icons/react'
-import { useState } from 'react'
+import { type ReactNode, useState } from 'react'
 import { type FieldSpec, type FieldValue, fieldValueFromText } from '../lib/field-spec.ts'
 import {
   livePick,
@@ -90,6 +90,199 @@ function UnitSwitch({
   )
 }
 
+/** The flag or the restore action of a field, as an icon inside the input. */
+function FieldMarker({
+  action,
+  actionText,
+  flag,
+}: {
+  action: { onClick: () => void } | undefined
+  actionText: string | undefined
+  flag: FieldFlag | undefined
+}) {
+  if (action)
+    return (
+      <Tooltip label={actionText}>
+        <ActionIcon
+          variant="subtle"
+          size={24}
+          className="field-action"
+          aria-label={actionText}
+          onClick={action.onClick}
+        >
+          <ArrowCounterClockwise size={16} aria-hidden="true" />
+        </ActionIcon>
+      </Tooltip>
+    )
+  if (!flag) return null
+  const Icon = flagIcons[flag.kind]
+  return (
+    <Tooltip
+      label={flag.text}
+      multiline
+      maw={280}
+      events={{ hover: true, focus: false, touch: true }}
+    >
+      <span className={`field-flag field-flag-${flag.kind}`}>
+        <Icon size={16} weight={flag.kind === 'exceeded' ? 'fill' : 'regular'} aria-hidden="true" />
+      </span>
+    </Tooltip>
+  )
+}
+
+/** The unit shows once, as the field's suffix; the label keeps it for screen readers. */
+function fieldLabel(text: string, unit: string): ReactNode {
+  if (!unit) return text
+  return (
+    <>
+      {text}
+      <span className="visually-hidden"> ({unit})</span>
+    </>
+  )
+}
+
+/** The field's description: help, mark and flag; a flag that repeats the help is not said twice. */
+const describedByOf = (
+  help: string | undefined,
+  mark: string | undefined,
+  flag: FieldFlag | undefined,
+) =>
+  [help, mark, flag?.text === help ? undefined : flag?.text].filter(Boolean).join(' ') || undefined
+
+/** A twist typed as "8" or "1 in 8" reads "1:8" once the field is left; none when it is as is. */
+function retypedTwist(quantity: Quantity, text: string, si: number | undefined) {
+  if (quantity !== 'twist' || si === undefined) return
+  const typed = twistTyped(text)
+  return typed !== undefined && typed !== text ? typed : undefined
+}
+
+/** The suffix section: the flag or its action before the unit, so the values stay in one column. */
+function endProps({
+  marker,
+  symbol,
+  switchable,
+  longest,
+  q,
+  unit,
+  label,
+  onPick,
+}: {
+  marker: ReactNode
+  symbol: string
+  switchable: boolean
+  longest: number
+  q: Quantity
+  unit: Unit
+  label: string
+  onPick: (id: string) => void
+}) {
+  const interactive = switchable || marker !== undefined
+  return {
+    rightSection:
+      !symbol && !marker ? undefined : (
+        <FieldEnd
+          marker={marker}
+          symbol={symbol}
+          switchable={switchable}
+          q={q}
+          unit={unit}
+          label={label}
+          onPick={onPick}
+        />
+      ),
+    // a unit switch needs room for its 24 px target beside the text, a marker 1.5rem more, both
+    // 0.25rem after the value
+    rightSectionWidth: endWidth(switchable, symbol, longest, marker !== undefined),
+    rightSectionPointerEvents: interactive ? ('all' as const) : ('none' as const),
+  }
+}
+
+/** The classes of a muted default and of a message shown elsewhere. */
+const errorProps = (muted: boolean | undefined, hiddenError: boolean | undefined) => ({
+  classNames: {
+    section: 'field-unit',
+    input: muted ? 'field-default' : undefined,
+    error: hiddenError ? 'field-error-elsewhere' : undefined,
+  },
+  // Mantine adds a margin under the input for an error: with the message elsewhere it would grow the field
+  styles: hiddenError ? { wrapper: { marginBottom: 0 } } : undefined,
+})
+
+/** The width of the suffix: the longest symbol of the quantity, so switching does not change it. */
+const endWidth = (switchable: boolean, symbol: string, longest: number, marker: boolean) =>
+  `${0.25 + Math.max(switchable ? 2 : 0, symbol ? 0.75 + 0.5 * (switchable ? longest : symbol.length) : 0) + (marker ? 1.5 : 0)}rem`
+
+/** The flag or its action before the unit: the values stay in one column. */
+function FieldEnd({
+  marker,
+  symbol,
+  switchable,
+  q,
+  unit,
+  label,
+  onPick,
+}: {
+  marker: ReactNode
+  symbol: string
+  switchable: boolean
+  q: Quantity
+  unit: Unit
+  label: string
+  onPick: (id: string) => void
+}) {
+  let suffix: ReactNode = <span aria-hidden="true">{symbol}</span>
+  if (!symbol) suffix = null
+  else if (switchable) suffix = <UnitSwitch q={q} unit={unit} label={label} onPick={onPick} />
+  return (
+    <span className="field-end">
+      {marker}
+      {suffix}
+    </span>
+  )
+}
+
+/** A twist is "1:8" or "8": text, not a number; a field that accepts negatives is a native number input. */
+function FieldInput({
+  common,
+  quantity,
+  min,
+  text,
+  step,
+  onText,
+}: {
+  common: object
+  quantity: Quantity
+  min: number | undefined
+  text: string
+  step: number | undefined
+  onText: (text: string) => void
+}) {
+  if (quantity === 'twist')
+    return <TextInput {...common} value={text} onChange={(e) => onText(e.currentTarget.value)} />
+  if (min === undefined || min < 0)
+    return (
+      <TextInput
+        {...common}
+        type="number"
+        step="any"
+        value={text}
+        onChange={(e) => onText(e.currentTarget.value)}
+      />
+    )
+  return (
+    <NumberInput
+      {...common}
+      hideControls
+      step={step}
+      clampBehavior="none"
+      // Trimming on blur turns the text into a number and calls onChange although nothing was typed.
+      trimLeadingZeroesOnBlur={false}
+      value={text}
+      onChange={(v) => onText(String(v))}
+    />
+  )
+}
+
 /**
  * A labelled number field: the unit is its suffix and, for screen readers, part of its label; keeps
  * the typed text and its SI value. A
@@ -158,55 +351,22 @@ export function NumberField({
   const { step } = shown[spec.quantity]
   const label = shown[spec.quantity].symbol
   const symbol = unit === 'none' ? '' : label
-  const Icon = flag && flagIcons[flag.kind]
   const at = <T,>(v: OfShown<T>): T =>
     typeof v === 'function' ? (v as (s: UnitSystem) => T)(shown) : v
   const helpText = help ? help(shown) : spec.help
   const markText = at(mark)
   const actionText = action && at(action.text)
-  const marker = action ? (
-    <Tooltip label={actionText}>
-      <ActionIcon
-        variant="subtle"
-        size={24}
-        className="field-action"
-        aria-label={actionText}
-        onClick={action.onClick}
-      >
-        <ArrowCounterClockwise size={16} aria-hidden="true" />
-      </ActionIcon>
-    </Tooltip>
-  ) : flag && Icon ? (
-    <Tooltip
-      label={flag.text}
-      multiline
-      maw={280}
-      events={{ hover: true, focus: false, touch: true }}
-    >
-      <span className={`field-flag field-flag-${flag.kind}`}>
-        <Icon size={16} weight={flag.kind === 'exceeded' ? 'fill' : 'regular'} aria-hidden="true" />
-      </span>
-    </Tooltip>
-  ) : undefined
+  const marker =
+    action || flag ? <FieldMarker action={action} actionText={actionText} flag={flag} /> : undefined
   // a flag that repeats the help is not said twice
-  const describedBy =
-    [helpText, markText, flag?.text === helpText ? undefined : flag?.text]
-      .filter(Boolean)
-      .join(' ') || undefined
+  const describedBy = describedByOf(helpText, markText, flag)
   const units = unitList(spec.quantity)
   const switchable = unit === 'switch' && units.length > 1
   // the longest symbol of the quantity: switching does not change the width of the suffix
   const longest = Math.max(...units.map(([, u]) => u.symbol.length))
   const common = {
     // the unit shows once, as the field's suffix; the label keeps it for screen readers
-    label: label ? (
-      <>
-        {spec.label}
-        <span className="visually-hidden"> ({label})</span>
-      </>
-    ) : (
-      spec.label
-    ),
+    label: fieldLabel(spec.label, label),
     description: describedBy,
     // the dense workbench grid hides the description: the label shows it on hover
     labelProps: { title: [helpText, markText].filter(Boolean).join(' ') || undefined },
@@ -216,8 +376,8 @@ export function NumberField({
     error: at(error),
     // a twist typed as "8" or "1 in 8" reads "1:8" once the field is left
     onBlur: () => {
-      const text = spec.quantity === 'twist' ? twistTyped(shownValue.text) : undefined
-      if (text !== undefined && text !== shownValue.text && value.si !== undefined) {
+      const text = retypedTwist(spec.quantity, shownValue.text, value.si)
+      if (text !== undefined && value.si !== undefined) {
         if (pick && own) setPick({ ...pick, typed: { text, si: value.si } })
         else onChange({ text, si: value.si })
       }
@@ -226,34 +386,17 @@ export function NumberField({
     onKeyDown: onEnter && ((e: { key: string }) => e.key === 'Enter' && onEnter()),
     min: spec.min,
     max: spec.max,
-    // the flag or its action before the unit: the values stay in one column
-    rightSection:
-      !symbol && !marker ? undefined : (
-        <span className="field-end">
-          {marker}
-          {!symbol ? null : switchable ? (
-            <UnitSwitch
-              q={spec.quantity}
-              unit={shown[spec.quantity]}
-              label={spec.label}
-              onPick={(id) => setPick(pickUnit(spec.quantity, system, id))}
-            />
-          ) : (
-            <span aria-hidden="true">{symbol}</span>
-          )}
-        </span>
-      ),
-    // a unit switch needs room for its 24 px target beside the text, a marker 1.5rem more, both
-    // 0.25rem after the value
-    rightSectionWidth: `${0.25 + Math.max(switchable ? 2 : 0, symbol ? 0.75 + 0.5 * (switchable ? longest : symbol.length) : 0) + (marker ? 1.5 : 0)}rem`,
-    rightSectionPointerEvents: switchable || marker ? ('all' as const) : ('none' as const),
-    classNames: {
-      section: 'field-unit',
-      input: muted ? 'field-default' : undefined,
-      error: hiddenError ? 'field-error-elsewhere' : undefined,
-    },
-    // Mantine adds a margin under the input for an error: with the message elsewhere it would grow the field
-    styles: hiddenError ? { wrapper: { marginBottom: 0 } } : undefined,
+    ...endProps({
+      marker,
+      symbol,
+      switchable,
+      longest,
+      q: spec.quantity,
+      unit: shown[spec.quantity],
+      label: spec.label,
+      onPick: (id) => setPick(pickUnit(spec.quantity, system, id)),
+    }),
+    ...errorProps(muted, hiddenError),
   }
   const change = (text: string) => {
     if (!own) return onChange(fieldValueFromText(spec.quantity, system, text))
@@ -261,31 +404,14 @@ export function NumberField({
     setPick(pick && { ...pick, typed: next.typed })
     onChange(next.value)
   }
-  // a twist is "1:8" or "8": text, not a number
-  return spec.quantity === 'twist' ? (
-    <TextInput
-      {...common}
-      value={shownValue.text}
-      onChange={(e) => change(e.currentTarget.value)}
-    />
-  ) : spec.min === undefined || spec.min < 0 ? (
-    <TextInput
-      {...common}
-      type="number"
-      step="any"
-      value={shownValue.text}
-      onChange={(e) => change(e.currentTarget.value)}
-    />
-  ) : (
-    <NumberInput
-      {...common}
-      hideControls
+  return (
+    <FieldInput
+      common={common}
+      quantity={spec.quantity}
+      min={spec.min}
+      text={shownValue.text}
       step={step}
-      clampBehavior="none"
-      // Trimming on blur turns the text into a number and calls onChange although nothing was typed.
-      trimLeadingZeroesOnBlur={false}
-      value={shownValue.text}
-      onChange={(v) => change(String(v))}
+      onText={change}
     />
   )
 }

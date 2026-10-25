@@ -28,7 +28,7 @@ describe('caseType', () => {
       '303-british': 'rimmed',
       '300-win-mag': 'belted',
     }
-    for (const f of readdirSync(dir)) {
+    const checkSheet = (f: string) => {
       const s = JSON.parse(readFileSync(path.join(dir, f), 'utf8'))
       const v = (symbol: string) =>
         s.values.find(
@@ -36,11 +36,12 @@ describe('caseType', () => {
         )?.value ?? null
       const type = caseType(v('R1'), v('P1'), v('R3'))
       if (s.id in named) expect(type).toBe(named[s.id])
-      if (type === undefined) continue
+      if (type === undefined) return
       types.set(s.table, (types.get(s.table) ?? new Set()).add(type))
       if (s.table === 'II' && type !== 'rimmed') expect(s.id).toMatch(/win-sl|arisaka/)
       if (s.id === '220-swift') expect(type).toBe('semi-rimmed')
     }
+    for (const f of readdirSync(dir)) checkSheet(f)
     expect([...(types.get('III') ?? [])]).toEqual(['belted'])
     expect([...(types.get('II') ?? [])].sort()).toEqual(['rimmed', 'semi-rimmed'])
   })

@@ -33,7 +33,7 @@ import {
   momentSlopeFromStability,
   yawOfRepose,
 } from './modified.ts'
-import { type Rhs, type Rk45Event, rk45, type StepBudget } from './rk45.ts'
+import { type Rhs, type Rk45Event, type Rk45Hit, rk45, type StepBudget } from './rk45.ts'
 import { aerodynamicJump, millerStability, spinDrift } from './stability.ts'
 
 /** Projectile of a shot, SI units. */
@@ -608,35 +608,74 @@ function flightEvents(
   return { kinds, events }
 }
 
-/** Integrates one trajectory with fixed bore angles; corrections are added by the caller. */
-function fly(c: Conditions, bore: BoreAngles, ranges: number[], o: TrajectoryOptions): Flight {
-  const { projectile: p, muzzleVelocity: v0, firearm } = c.shot
-  const air = c.air
-  const ux = Math.cos(c.lookAngle)
-  const uy = Math.sin(c.lookAngle)
+/** The rotation of the earth in the frame of the shot, zero without the coriolis effect or a site. */
+function earthRotationOf(shot: TrajectoryInput, o: TrajectoryOptions) {
+  const lat = shot.site?.latitude
+  return o.coriolis && lat !== undefined ? earthRotation(lat, shot.site?.azimuth) : [0, 0, 0]
+}
+
+/** Position, velocity and spin at the muzzle, in the frame of the line of sight. */
+function launchState(c: Conditions, bore: BoreAngles, ux: number, uy: number) {
+  const { muzzleVelocity: v0, firearm } = c.shot
   const nx = -uy
   const ny = ux
   const bu = Math.cos(bore.elevationAngle) * Math.cos(bore.windageAngle)
   const bn = Math.sin(bore.elevationAngle)
   const bz = Math.cos(bore.elevationAngle) * Math.sin(bore.windageAngle)
   const hs = firearm.sightHeight
-  const aero = c.aero
-  const y0 = Float64Array.of(
+  return Float64Array.of(
     -hs * nx,
     -hs * ny,
     -(firearm.sightOffset ?? 0),
     v0 * (bu * ux + bn * nx),
     v0 * (bu * uy + bn * ny),
     v0 * bz,
-    ...(aero ? [aero.spin0] : []),
+    ...(c.aero ? [c.aero.spin0] : []),
   )
+}
+
+/**
+ * Moves the segment indices of `fc` past the boundary a restart state at `y` lies beyond. The
+ * state lies on either side of the crossed boundary; wind first, because the airspeed depends on it.
+ */
+function restartSegments(
+  fc: FlightContext,
+  winds: readonly WindSegment[],
+  kind: Kind,
+  y: Float64Array,
+) {
+  const d = kind.endsWith('Up') ? 1 : -1
+  const along = (prefix: string) => (kind.startsWith(prefix) ? d : 0)
+  fc.wi = settle(fc.wi, along('wind'), y[0], 0, winds.length - 1, (k) => winds[k - 1].endDistance)
+  fc.bi = settle(
+    fc.bi,
+    along('band'),
+    airspeedOf(fc, y),
+    0,
+    fc.bands.length - 1,
+    (k) => fc.bands[k].minVelocity,
+  )
+  fc.mi = settle(fc.mi, along('mach'), machOf(fc, y), -1, fc.mg.last, (k) => fc.mg.grid[k][0])
+}
+
+const endsFlight = (kind: Kind): kind is 'apex' | 'atmosphere' | 'yaw' =>
+  kind === 'apex' || kind === 'atmosphere' || kind === 'yaw'
+
+/** Integrates one trajectory with fixed bore angles; corrections are added by the caller. */
+function fly(c: Conditions, bore: BoreAngles, ranges: number[], o: TrajectoryOptions): Flight {
+  const { projectile: p } = c.shot
+  const air = c.air
+  const ux = Math.cos(c.lookAngle)
+  const uy = Math.sin(c.lookAngle)
+  const nx = -uy
+  const ny = ux
+  const aero = c.aero
+  const y0 = launchState(c, bore, ux, uy)
 
   const { winds, wv, segmentFor } = windTable(c.wind)
   const table = dragTableOf(p.drag)
   const { bands, bandFor } = dragBandTable(p)
-  const lat = c.shot.site?.latitude
-  const [ox, oy, oz] =
-    o.coriolis && lat !== undefined ? earthRotation(lat, c.shot.site?.azimuth) : [0, 0, 0]
+  const [ox, oy, oz] = earthRotationOf(c.shot, o)
   const mg = machGrid(table, aero)
   const fc: FlightContext = {
     p,
@@ -679,6 +718,12 @@ function fly(c: Conditions, bore: BoreAngles, ranges: number[], o: TrajectoryOpt
       points.push(point(t, y, ranges[next++]))
   }
 
+  /** Records the hits of the pending range events, in order, from the event index `first`. */
+  const recordHits = (hits: readonly Rk45Hit[], first: number) => {
+    for (const hit of hits)
+      if (first + hit.event === next) points.push(point(hit.t, hit.y, ranges[next++]))
+  }
+
   let t = 0
   let y: Float64Array = y0
   let h: number | undefined
@@ -701,10 +746,7 @@ function fly(c: Conditions, bore: BoreAngles, ranges: number[], o: TrajectoryOpt
       budget: o.budget,
     })
     steps += r.steps
-    for (const hit of r.hits) {
-      const j = first + hit.event
-      if (j === next) points.push(point(hit.t, hit.y, ranges[next++]))
-    }
+    recordHits(r.hits, first)
     t = r.t
     y = r.y
     h = r.h
@@ -715,24 +757,24 @@ function fly(c: Conditions, bore: BoreAngles, ranges: number[], o: TrajectoryOpt
       break
     }
     catchUp(t, y)
-    if (kind === 'apex' || kind === 'atmosphere' || kind === 'yaw')
-      return { points, stop: kind, steps }
-    // the restart state lies on either side of the crossed boundary; wind first,
-    // because the airspeed depends on it
-    const d = kind.endsWith('Up') ? 1 : -1
-    const along = (prefix: string) => (kind.startsWith(prefix) ? d : 0)
-    fc.wi = settle(fc.wi, along('wind'), y[0], 0, winds.length - 1, (k) => winds[k - 1].endDistance)
-    fc.bi = settle(
-      fc.bi,
-      along('band'),
-      airspeed(y),
-      0,
-      bands.length - 1,
-      (k) => bands[k].minVelocity,
-    )
-    fc.mi = settle(fc.mi, along('mach'), mach(y), -1, mg.last, (k) => mg.grid[k][0])
+    if (endsFlight(kind)) return { points, stop: kind, steps }
+    restartSegments(fc, winds, kind, y)
   }
   return { points, stop: 'done', steps }
+}
+
+/** The index after a restart without a crossing: past the boundaries `v` lies strictly beyond. */
+function settleWithoutCrossing(
+  k: number,
+  v: number,
+  lo: number,
+  hi: number,
+  edge: (k: number) => number,
+): number {
+  let j = k
+  while (j > lo && v < edge(j)) j--
+  while (j < hi && v > edge(j + 1)) j++
+  return j
 }
 
 /**
@@ -751,11 +793,7 @@ function settle(
   edge: (k: number) => number,
 ): number {
   let j = k
-  if (d === 0) {
-    while (j > lo && v < edge(j)) j--
-    while (j < hi && v > edge(j + 1)) j++
-    return j
-  }
+  if (d === 0) return settleWithoutCrossing(j, v, lo, hi, edge)
   const b = edge(d > 0 ? j + 1 : j)
   const reach = d > 0 ? Math.max(v, 2 * b - v) : Math.min(v, 2 * b - v)
   j += d
@@ -1117,6 +1155,45 @@ export function zeroAngles(
   return zeroWith(shot, o, aeroFor(shot, o))
 }
 
+/** Gyroscopic stability factor at the muzzle of a shot with aerodynamic data. */
+function aeroStability(shot: TrajectoryInput, aero: Aero) {
+  const v0 = shot.muzzleVelocity
+  return gyroscopicStability({
+    axialInertia: aero.axialInertia,
+    transverseInertia: aero.transverseInertia,
+    spin: aero.spin0,
+    density: airDensity(shot.air),
+    speed: v0,
+    diameter: shot.projectile.diameter,
+    momentSlope: coefficientAt(aero.momentSlope, v0 / speedOfSound(shot.air)),
+  })
+}
+
+const coriolisOmitted = (shot: TrajectoryInput, o: TrajectoryOptions): OmittedEffect[] => {
+  const site = shot.site
+  if (!o.coriolis || site?.latitude === undefined) return ['coriolis']
+  return site.azimuth === undefined ? ['coriolisVertical'] : []
+}
+
+/** The effects the result leaves out, from the options and the data the shot carries. */
+function omittedEffects(
+  shot: TrajectoryInput,
+  o: TrajectoryOptions,
+  s: ReturnType<typeof spin>,
+  aero: Aero | undefined,
+): OmittedEffect[] {
+  const omitted = coriolisOmitted(shot, o)
+  if (aero) {
+    if (!o.jump) omitted.push('jump')
+    if (shot.projectile.aerodynamics?.spinDamping === undefined) omitted.push('spinDecay')
+    if (shot.projectile.aerodynamics?.magnusForceSlope === undefined) omitted.push('magnus')
+  } else {
+    if (!(s?.hand && o.spinDrift)) omitted.push('spinDrift')
+    if (!(s?.hand && o.jump)) omitted.push('jump')
+  }
+  return omitted
+}
+
 /** Trajectory at the requested slant ranges, m. */
 export function trajectory(
   shot: TrajectoryInput,
@@ -1138,33 +1215,15 @@ export function trajectory(
   const sorted = [...new Set(ranges)].sort((a, b) => a - b)
   const f = fly(c, bore, sorted, o)
   const s = spin(shot, shot.air)
-  const site = shot.site
-  const omitted: OmittedEffect[] = []
-  if (!o.coriolis || site?.latitude === undefined) omitted.push('coriolis')
-  else if (site.azimuth === undefined) omitted.push('coriolisVertical')
   let twin: Map<number, number> | undefined
   let stability = s?.sg
   if (aero) {
     // spin drift column of M2b: windage against a point-mass twin at the same bore
     const t = fly({ ...c, aero: undefined }, bore, sorted, o)
     twin = new Map(t.points.map((q) => [q.range, q.windage]))
-    const v0 = shot.muzzleVelocity
-    stability = gyroscopicStability({
-      axialInertia: aero.axialInertia,
-      transverseInertia: aero.transverseInertia,
-      spin: aero.spin0,
-      density: airDensity(shot.air),
-      speed: v0,
-      diameter: shot.projectile.diameter,
-      momentSlope: coefficientAt(aero.momentSlope, v0 / speedOfSound(shot.air)),
-    })
-    if (!o.jump) omitted.push('jump')
-    if (shot.projectile.aerodynamics?.spinDamping === undefined) omitted.push('spinDecay')
-    if (shot.projectile.aerodynamics?.magnusForceSlope === undefined) omitted.push('magnus')
-  } else {
-    if (!(s?.hand && o.spinDrift)) omitted.push('spinDrift')
-    if (!(s?.hand && o.jump)) omitted.push('jump')
+    stability = aeroStability(shot, aero)
   }
+  const omitted = omittedEffects(shot, o, s, aero)
   return {
     points: correct(c, f.points, o, twin),
     bore,

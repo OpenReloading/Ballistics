@@ -169,17 +169,24 @@ async function handleDetect(
     minContrast: r.minContrast,
     onProgress: (done: number) => post({ kind: 'progress', done: 0.2 + 0.8 * done }),
   }
-  const found: Found =
-    r.kind === 'example'
-      ? (detectFromExample(input, toWork(r.at)) ?? { proposals: [], flagged: [] })
-      : r.auto
-        ? (autoDetect(input) ?? { proposals: [], flagged: [] })
-        : findHoles({
-            ...input,
-            ...(r.backing && { backing: r.backing }),
-            ...(r.polarity && { polarity: r.polarity }),
-          })
+  const found = runDetection(r, input, toWork)
   return toPhotoPx(found, k, x0, y0)
+}
+
+/** The example, auto or plain detection on the working image. */
+function runDetection(
+  r: Extract<WorkerRequest, { kind: 'detect' | 'example' }>,
+  input: Parameters<typeof findHoles>[0],
+  toWork: (p: Point) => Point,
+): Found {
+  if (r.kind === 'example')
+    return detectFromExample(input, toWork(r.at)) ?? { proposals: [], flagged: [] }
+  if (r.auto) return autoDetect(input) ?? { proposals: [], flagged: [] }
+  return findHoles({
+    ...input,
+    ...(r.backing && { backing: r.backing }),
+    ...(r.polarity && { polarity: r.polarity }),
+  })
 }
 
 type Found = {

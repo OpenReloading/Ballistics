@@ -144,68 +144,89 @@ const rng = (seed: number) => {
   }
 }
 
+type Look = { radii: number[]; blackR: number; line: number; paper: number; black: number }
+
 /** The scene as RGBA, drawn per pixel through the inverse homography with 2 x 2 samples. */
 export function render(scene: Scene): { image: RgbaImage; h: Homography } {
   const { width, height } = scene.camera
   const h = camera(scene.camera)
   const inv = invert(h)
   const { face } = scene
-  const line = scene.line ?? 0.5
-  const paper = scene.paper ?? 226
-  const black = scene.black ?? 30
   const radii = face.rings.map((r) => r.diameter.value / 2)
   if (face.innerTen) radii.push(face.innerTen.diameter.value / 2)
-  const blackR = face.blackDiameter.value / 2
+  const look: Look = {
+    radii,
+    blackR: face.blackDiameter.value / 2,
+    line: scene.line ?? 0.5,
+    paper: scene.paper ?? 226,
+    black: scene.black ?? 30,
+  }
   const grey = new Float32Array(width * height)
-  const rand = rng(11)
   for (let y = 0; y < height; y++)
-    for (let x = 0; x < width; x++) {
-      let sum = 0
-      for (let sy = 0; sy < 2; sy++)
-        for (let sx = 0; sx < 2; sx++) {
-          const px = x + 0.25 + 0.5 * sx
-          const py = y + 0.25 + 0.5 * sy
-          const w = inv[6] * px + inv[7] * py + inv[8]
-          const X = (inv[0] * px + inv[1] * py + inv[2]) / w
-          const Y = (inv[3] * px + inv[4] * py + inv[5]) / w
-          const r = Math.hypot(X, Y)
-          const sh = scene.sheet?.box
-          if (sh && (X < sh[0] || X > sh[2] || Y < sh[1] || Y > sh[3])) {
-            sum += scene.sheet?.background ?? paper
-            continue
-          }
-          let v = r <= blackR ? black : paper
-          if (scene.rings !== false)
-            for (const rr of radii)
-              if (Math.abs(r - rr) <= line / 2) {
-                v = r <= blackR + line / 2 ? paper - 30 : black
-                break
-              }
-          for (const m of scene.marks ?? [])
-            if (Math.abs(X - m.x) <= m.width / 2 && Math.abs(Y - m.y) <= m.height / 2) v = m.grey
-          for (const hole of scene.holes ?? [])
-            if (Math.hypot(X - hole.x, Y - hole.y) <= hole.diameter / 2) v = scene.holeGrey ?? paper
-          sum += v
-        }
-      let v = sum / 4
-      for (const p of scene.patches ?? [])
-        if (x >= p.box[0] && x < p.box[2] && y >= p.box[1] && y < p.box[3]) v = p.grey
-      v *= (1 - (scene.gradient ?? 0) * (x / width)) * (scene.light?.(x, y) ?? 1)
-      grey[y * width + x] = v
-    }
+    for (let x = 0; x < width; x++) grey[y * width + x] = pixelGrey(scene, look, inv, x, y)
   if (scene.blur) boxBlur(grey, width, height, scene.blur)
-  if (scene.noise)
-    for (let i = 0; i < width * height; i++) {
-      // Box-Muller
-      const g = Math.sqrt(-2 * Math.log(rand() + 1e-9)) * Math.cos(2 * Math.PI * rand())
-      grey[i] += scene.noise * g
-    }
+  if (scene.noise) addNoise(grey, scene.noise)
   const data = new Uint8ClampedArray(width * height * 4)
   for (let i = 0; i < width * height; i++) {
     data[4 * i] = data[4 * i + 1] = data[4 * i + 2] = grey[i]
     data[4 * i + 3] = 255
   }
   return { image: { width, height, data }, h }
+}
+
+/** The grey of image pixel (x, y): the mean of 2 x 2 samples, the patches, the light. */
+function pixelGrey(scene: Scene, look: Look, inv: Homography, x: number, y: number): number {
+  const { width } = scene.camera
+  let sum = 0
+  for (let sy = 0; sy < 2; sy++)
+    for (let sx = 0; sx < 2; sx++)
+      sum += sampleGrey(scene, look, inv, x + 0.25 + 0.5 * sx, y + 0.25 + 0.5 * sy)
+  let v = sum / 4
+  for (const p of scene.patches ?? [])
+    if (x >= p.box[0] && x < p.box[2] && y >= p.box[1] && y < p.box[3]) v = p.grey
+  v *= (1 - (scene.gradient ?? 0) * (x / width)) * (scene.light?.(x, y) ?? 1)
+  return v
+}
+
+/** The grey at image point (px, py): paper, black area, ring line, print mark or hole. */
+function sampleGrey(scene: Scene, look: Look, inv: Homography, px: number, py: number): number {
+  const { blackR, paper, black } = look
+  const w = inv[6] * px + inv[7] * py + inv[8]
+  const X = (inv[0] * px + inv[1] * py + inv[2]) / w
+  const Y = (inv[3] * px + inv[4] * py + inv[5]) / w
+  const r = Math.hypot(X, Y)
+  const sh = scene.sheet?.box
+  if (sh && (X < sh[0] || X > sh[2] || Y < sh[1] || Y > sh[3]))
+    return scene.sheet?.background ?? paper
+  let v = r <= blackR ? black : paper
+  if (scene.rings !== false) v = ringGrey(look, r, v)
+  return printGrey(scene, X, Y, v, paper)
+}
+
+/** `v` at face point (X, Y), or the grey of the print mark or hole that covers it. */
+function printGrey(scene: Scene, X: number, Y: number, v: number, paper: number): number {
+  let out = v
+  for (const m of scene.marks ?? [])
+    if (Math.abs(X - m.x) <= m.width / 2 && Math.abs(Y - m.y) <= m.height / 2) out = m.grey
+  for (const hole of scene.holes ?? [])
+    if (Math.hypot(X - hole.x, Y - hole.y) <= hole.diameter / 2) out = scene.holeGrey ?? paper
+  return out
+}
+
+/** `v` at radius `r`, or the ring line's grey where a ring line passes. */
+function ringGrey({ radii, blackR, line, paper, black }: Look, r: number, v: number): number {
+  for (const rr of radii)
+    if (Math.abs(r - rr) <= line / 2) return r <= blackR + line / 2 ? paper - 30 : black
+  return v
+}
+
+function addNoise(grey: Float32Array, noise: number) {
+  const rand = rng(11)
+  for (let i = 0; i < grey.length; i++) {
+    // Box-Muller
+    const g = Math.sqrt(-2 * Math.log(rand() + 1e-9)) * Math.cos(2 * Math.PI * rand())
+    grey[i] += noise * g
+  }
 }
 
 /** Three passes of a box blur of radius `r` px over rows and columns, in place. */

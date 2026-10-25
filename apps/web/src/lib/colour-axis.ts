@@ -52,47 +52,62 @@ function collectSamples(
   seed: Seed,
   disc: number,
 ): { mu: number[] | undefined; ring: number[][] } | undefined {
-  const { logRgb, w, h, inside, blackMask } = ctx
-  const n = w * h
   const ring: number[][] = [[], [], []]
-  let mu = seed.mu
-  if (seed.at) {
-    const { x: cx, y: cy } = seed.at
-    // the surroundings of the same kind of surface as the hole's own (the face label)
-    const kind = blackMask?.[Math.round(cy) * w + Math.round(cx)]
-    const sum = [0, 0, 0]
-    let count = 0
-    const reach = RING[1] * holeDiameter
-    for (
-      let y = Math.max(0, Math.floor(cy - reach));
-      y <= Math.min(h - 1, Math.ceil(cy + reach));
-      y++
-    )
-      for (
-        let x = Math.max(0, Math.floor(cx - reach));
-        x <= Math.min(w - 1, Math.ceil(cx + reach));
-        x++
-      ) {
-        const r = Math.hypot(x - cx, y - cy)
-        const i = y * w + x
-        if (r <= disc) {
-          count++
-          for (let c = 0; c < 3; c++) sum[c] += logRgb[c * n + i]
-        } else if (
-          r >= RING[0] * holeDiameter &&
-          r <= reach &&
-          (kind === undefined || blackMask?.[i] === kind)
-        )
-          for (let c = 0; c < 3; c++) ring[c].push(logRgb[c * n + i])
-      }
-    if (!count) return undefined
-    mu = sum.map((v) => v / count)
-  } else {
-    const step = Math.max(1, Math.floor(n / 20000))
-    for (let i = 0; i < n; i += step)
-      if (inside[i]) for (let c = 0; c < 3; c++) ring[c].push(logRgb[c * n + i])
+  if (!seed.at) {
+    scatterRing(ctx, ring)
+    return { mu: seed.mu, ring }
   }
-  return { mu, ring }
+  const mu = discAndRing(ctx, holeDiameter, seed.at, disc, ring)
+  return mu ? { mu, ring } : undefined
+}
+
+/** The ring samples of a region without a pick: a strided scan of the pixels inside it. */
+function scatterRing({ logRgb, w, h, inside }: WorkImage, ring: number[][]) {
+  const n = w * h
+  const step = Math.max(1, Math.floor(n / 20000))
+  for (let i = 0; i < n; i += step) if (inside[i]) pushPixel(ring, logRgb, n, i)
+}
+
+/** Appends the three channels of pixel `i` of the planar image to `ring`. */
+function pushPixel(ring: number[][], logRgb: Float32Array, n: number, i: number) {
+  for (let c = 0; c < 3; c++) ring[c].push(logRgb[c * n + i])
+}
+
+/** The mean log RGB of the disc at the pick, undefined when the disc holds no block; fills `ring`. */
+function discAndRing(
+  ctx: WorkImage,
+  holeDiameter: number,
+  { x: cx, y: cy }: Point,
+  disc: number,
+  ring: number[][],
+): number[] | undefined {
+  const { logRgb, w, h, blackMask } = ctx
+  const n = w * h
+  // the surroundings of the same kind of surface as the hole's own (the face label)
+  const kind = blackMask?.[Math.round(cy) * w + Math.round(cx)]
+  const sum = [0, 0, 0]
+  let count = 0
+  const reach = RING[1] * holeDiameter
+  const inRing = (r: number, i: number) =>
+    r >= RING[0] * holeDiameter && r <= reach && (kind === undefined || blackMask?.[i] === kind)
+  for (
+    let y = Math.max(0, Math.floor(cy - reach));
+    y <= Math.min(h - 1, Math.ceil(cy + reach));
+    y++
+  )
+    for (
+      let x = Math.max(0, Math.floor(cx - reach));
+      x <= Math.min(w - 1, Math.ceil(cx + reach));
+      x++
+    ) {
+      const r = Math.hypot(x - cx, y - cy)
+      const i = y * w + x
+      if (r <= disc) {
+        count++
+        for (let c = 0; c < 3; c++) sum[c] += logRgb[c * n + i]
+      } else if (inRing(r, i)) pushPixel(ring, logRgb, n, i)
+    }
+  return count ? sum.map((v) => v / count) : undefined
 }
 
 /** Sums `cov` of the products of the deviations from the channel means (xx yy zz xy xz yz), and the count `m`. */

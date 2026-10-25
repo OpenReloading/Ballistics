@@ -101,7 +101,6 @@ class Cursor {
    * followed by one starting with a new flag byte (2.5.293). Built 4096 code units at a time.
    */
   characters(count: number, high: boolean): string {
-    const s = this.s
     let text = ''
     let left = count
     let wide = high
@@ -113,16 +112,21 @@ class Cursor {
       const room = wide ? Math.floor((this.end - this.at) / 2) : this.end - this.at
       if (room === 0) throw new Short()
       const n = Math.min(left, room, 4096)
-      const codes = new Array<number>(n)
-      for (let i = 0; i < n; i++) {
-        const k = this.at + (wide ? 2 * i : i)
-        codes[i] = wide ? s[k] | (s[k + 1] << 8) : s[k]
-      }
-      this.at += wide ? 2 * n : n
-      text += String.fromCharCode(...codes)
+      text += this.codeUnits(n, wide)
       left -= n
     }
     return text
+  }
+  /** `n` characters from the cursor inside the current chunk, one or two bytes each. */
+  private codeUnits(n: number, wide: boolean): string {
+    const s = this.s
+    const codes = new Array<number>(n)
+    for (let i = 0; i < n; i++) {
+      const k = this.at + (wide ? 2 * i : i)
+      codes[i] = wide ? s[k] | (s[k + 1] << 8) : s[k]
+    }
+    this.at += wide ? 2 * n : n
+    return String.fromCharCode(...codes)
   }
   /** XLUnicodeString (2.5.294): `u16` count, flag byte, characters. */
   unicodeString(): string {
@@ -220,6 +224,25 @@ function recordReader(s: Uint8Array): RecordReader {
   return { s, view, record, isBof }
 }
 
+/** `read()`, with a record that ends inside its data reported as too short. */
+function whenShort<T>(r: Rec, read: () => T): T {
+  try {
+    return read()
+  } catch (e) {
+    if (!(e instanceof Short)) throw e
+    throw new Error(`XLS record at byte ${r.at} is too short`)
+  }
+}
+
+/** BoundSheet8 (2.4.28): the position, type and name of a sheet. */
+function boundSheet(c: Cursor): { position: number; type: number; name: string } {
+  const position = c.u32()
+  c.u8()
+  const type = c.u8()
+  const count = c.u8()
+  return { position, type, name: c.characters(count, (c.u8() & 1) === 1) }
+}
+
 /**
  * The workbook substream (2.1.7.20.3) from byte 0: the BoundSheet8 entries, the shared strings,
  * and the position after its EOF record.
@@ -241,21 +264,149 @@ function readWorkbookSubstream(reader: RecordReader): {
     p = r.next
     if (r.type === EOF) break
     if (r.type === FILEPASS) throw new Error(encrypted)
-    try {
-      if (r.type === BOUNDSHEET8) {
-        const c = new Cursor(s, r.at + 4, r.end)
-        const position = c.u32()
-        c.u8()
-        const type = c.u8()
-        const count = c.u8()
-        bound.push({ position, type, name: c.characters(count, (c.u8() & 1) === 1) })
-      } else if (r.type === SST) strings = sharedStrings(new Cursor(s, r.at + 4, r.end))
-    } catch (e) {
-      if (!(e instanceof Short)) throw e
-      throw new Error(`XLS record at byte ${r.at} is too short`)
+    if (r.type === BOUNDSHEET8) {
+      bound.push(whenShort(r, () => boundSheet(new Cursor(s, r.at + 4, r.end))))
+    } else if (r.type === SST) {
+      strings = whenShort(r, () => sharedStrings(new Cursor(s, r.at + 4, r.end)))
     }
   }
   return { bound, strings, end: p }
+}
+
+/** Cells of a worksheet being read. */
+interface SheetState {
+  rows: Map<number, string[]>
+  remaining: CellBudget
+  /** A formula with a string result waits for its String record (2.1.7.20.5 FORMULA). */
+  pending?: { row: number; col: number }
+}
+
+function put(st: SheetState, row: number, col: number, text: string): void {
+  let cells = st.rows.get(row)
+  if (!cells) {
+    cells = []
+    st.rows.set(row, cells)
+  }
+  placeCell(cells, col + 1, text, () => `${letters(col + 1)}${row + 1}`, st.remaining)
+}
+
+/** Refuses a formula cell still waiting for its String record. */
+function checkNoPending(st: SheetState): void {
+  if (!st.pending) return
+  const ref = `${letters(st.pending.col + 1)}${st.pending.row + 1}`
+  throw new Error(`formula cell ${ref} has no String record`)
+}
+
+/** How a record changes the nesting of substreams: a BOF opens one, an EOF closes one. */
+const depthChange = (type: number) => (type === BOF ? 1 : type === EOF ? -1 : 0)
+
+/** A cell record of the worksheet, with the places of its fields. */
+interface CellRecord {
+  r: Rec
+  /** The record's data. */
+  d: Uint8Array
+  /** Byte position of the data. */
+  o: number
+  row: number
+  col: number
+}
+
+const cellRef = (c: CellRecord, col = c.col) => `${letters(col + 1)}${c.row + 1}`
+
+function need(c: CellRecord, size: number): void {
+  if (c.d.length < size) throw new Error(`XLS record at byte ${c.r.at} is too short`)
+}
+
+function numberText(c: CellRecord, x: number, col = c.col): string {
+  if (!Number.isFinite(x))
+    throw new Error(`cell ${cellRef(c, col)} holds a number that is not finite`)
+  return String(x)
+}
+
+function errorText(c: CellRecord, code: number): string {
+  const t = errors.get(code)
+  if (t === undefined) throw new Error(`cell ${cellRef(c)} holds an unknown error code ${code}`)
+  return t
+}
+
+/** MulRk and MulBlank: a run of cells in one row, each with a number or empty. */
+function putCellRun(reader: RecordReader, c: CellRecord, st: SheetState): void {
+  const { view } = reader
+  const item = c.r.type === MULRK ? 6 : 2
+  const last = view.getUint16(c.o + c.d.length - 2, true)
+  const size = c.d.length - 6
+  if (last < c.col || size % item !== 0 || last - c.col + 1 !== size / item) {
+    throw new Error(`XLS record at byte ${c.r.at} does not hold the cells it names`)
+  }
+  for (let k = 0; k <= last - c.col; k++) {
+    const t =
+      item === 6 ? numberText(c, rk(view.getUint32(c.o + 4 + 6 * k + 2, true)), c.col + k) : ''
+    put(st, c.row, c.col + k, t)
+  }
+}
+
+/** Formula (2.4.127): a cached number, or a boolean, error, empty or string result. */
+function putFormula(reader: RecordReader, c: CellRecord, st: SheetState): void {
+  const { view } = reader
+  need(c, 14)
+  if (view.getUint16(c.o + 12, true) !== 0xffff) {
+    put(st, c.row, c.col, numberText(c, view.getFloat64(c.o + 6, true)))
+    return
+  }
+  const type = c.d[6]
+  if (type === 0) st.pending = { row: c.row, col: c.col }
+  else if (type === 1) put(st, c.row, c.col, c.d[8] ? '1' : '')
+  else if (type === 2) put(st, c.row, c.col, errorText(c, c.d[8]))
+  else if (type === 3) put(st, c.row, c.col, '')
+  else throw new Error(`formula cell ${cellRef(c)} holds an unknown value type ${type}`)
+}
+
+/** LabelSst (2.4.149): the shared string the cell refers to. */
+function sharedCell(view: DataView, c: CellRecord, strings: string[]): string {
+  need(c, 10)
+  const k = view.getUint32(c.o + 6, true)
+  if (k >= strings.length) {
+    throw new Error(`cell ${cellRef(c)} refers to shared string ${k} of ${strings.length}`)
+  }
+  return strings[k]
+}
+
+/** BoolErr (2.4.24): an error code as its text, TRUE as `1`, FALSE as empty text. */
+function boolErrText(c: CellRecord): string {
+  need(c, 8)
+  if (c.d[7]) return errorText(c, c.d[6])
+  return c.d[6] ? '1' : ''
+}
+
+/** Places the cell or cells of one cell record. */
+function putCell(reader: RecordReader, r: Rec, strings: string[], st: SheetState): void {
+  const { s, view } = reader
+  const d = s.subarray(r.at + 4, r.end)
+  const o = r.at + 4
+  const c: CellRecord = { r, d, o, row: 0, col: 0 }
+  need(c, 6)
+  c.row = view.getUint16(o, true)
+  c.col = view.getUint16(o + 2, true)
+  const { row, col } = c
+  if (r.type === LABELSST) {
+    put(st, row, col, sharedCell(view, c, strings))
+  } else if (r.type === LABEL) {
+    put(st, row, col, clean(readText(() => new Cursor(s, r.at + 10, r.end).unicodeString())))
+  } else if (r.type === NUMBER) {
+    need(c, 14)
+    put(st, row, col, numberText(c, view.getFloat64(o + 6, true)))
+  } else if (r.type === RK) {
+    need(c, 10)
+    put(st, row, col, numberText(c, rk(view.getUint32(o + 6, true))))
+  } else if (r.type === MULRK || r.type === MULBLANK) {
+    putCellRun(reader, c, st)
+  } else if (r.type === FORMULA) {
+    putFormula(reader, c, st)
+  } else if (r.type === BOOLERR) {
+    put(st, row, col, boolErrText(c))
+  } else if (r.type === BLANK) {
+    put(st, row, col, '')
+  }
 }
 
 /**
@@ -269,113 +420,34 @@ function readWorksheetCells(
   strings: string[],
   remaining: CellBudget,
 ): { rows: string[][]; end: number } {
-  const { s, view, record } = reader
-  const rows = new Map<number, string[]>()
-  const put = (row: number, col: number, text: string) => {
-    let cells = rows.get(row)
-    if (!cells) {
-      cells = []
-      rows.set(row, cells)
-    }
-    placeCell(cells, col + 1, text, () => `${letters(col + 1)}${row + 1}`, remaining)
-  }
-  // a formula with a string result waits for its String record (2.1.7.20.5 FORMULA)
-  let pending: { row: number; col: number } | undefined
+  const { s, record } = reader
+  const st: SheetState = { rows: new Map(), remaining }
   let depth = 1
   let end = 0
   for (let at = from; ; ) {
     if (at >= s.length) throw new Error(`XLS worksheet ${n} has no EOF record`)
     const r = record(at)
     at = r.next
-    if (r.type === BOF) depth++
-    else if (r.type === EOF) depth--
-    const missing = () => {
-      if (!pending) return
-      const ref = `${letters(pending.col + 1)}${pending.row + 1}`
-      throw new Error(`formula cell ${ref} has no String record`)
-    }
+    depth += depthChange(r.type)
     if (depth === 0) {
       end = at
-      missing()
+      checkNoPending(st)
       break
     }
-    if (r.type === BOF) missing()
+    if (r.type === BOF) checkNoPending(st)
     // cells of nested substreams (embedded charts) are not cells of the worksheet
     if (depth !== 1) continue
-    if (pending && r.type === STRING) {
-      put(
-        pending.row,
-        pending.col,
-        clean(readText(() => new Cursor(s, r.at + 4, r.end).unicodeString())),
-      )
-      pending = undefined
+    if (st.pending && r.type === STRING) {
+      const text = clean(readText(() => new Cursor(s, r.at + 4, r.end).unicodeString()))
+      put(st, st.pending.row, st.pending.col, text)
+      st.pending = undefined
       continue
     }
     if (!cellRecords.has(r.type)) continue
-    missing()
-    const d = s.subarray(r.at + 4, r.end)
-    const need = (size: number) => {
-      if (d.length < size) throw new Error(`XLS record at byte ${r.at} is too short`)
-    }
-    need(6)
-    const o = r.at + 4
-    const row = view.getUint16(o, true)
-    const col = view.getUint16(o + 2, true)
-    const ref = (c = col) => `${letters(c + 1)}${row + 1}`
-    const number = (x: number, c = col) => {
-      if (!Number.isFinite(x)) throw new Error(`cell ${ref(c)} holds a number that is not finite`)
-      return String(x)
-    }
-    const error = (code: number) => {
-      const t = errors.get(code)
-      if (t === undefined) throw new Error(`cell ${ref()} holds an unknown error code ${code}`)
-      return t
-    }
-    if (r.type === LABELSST) {
-      need(10)
-      const k = view.getUint32(o + 6, true)
-      if (k >= strings.length) {
-        throw new Error(`cell ${ref()} refers to shared string ${k} of ${strings.length}`)
-      }
-      put(row, col, strings[k])
-    } else if (r.type === LABEL) {
-      put(row, col, clean(readText(() => new Cursor(s, r.at + 10, r.end).unicodeString())))
-    } else if (r.type === NUMBER) {
-      need(14)
-      put(row, col, number(view.getFloat64(o + 6, true)))
-    } else if (r.type === RK) {
-      need(10)
-      put(row, col, number(rk(view.getUint32(o + 6, true))))
-    } else if (r.type === MULRK || r.type === MULBLANK) {
-      const item = r.type === MULRK ? 6 : 2
-      const last = view.getUint16(o + d.length - 2, true)
-      if (last < col || (d.length - 6) % item !== 0 || last - col + 1 !== (d.length - 6) / item) {
-        throw new Error(`XLS record at byte ${r.at} does not hold the cells it names`)
-      }
-      for (let k = 0; k <= last - col; k++) {
-        const t = item === 6 ? number(rk(view.getUint32(o + 4 + 6 * k + 2, true)), col + k) : ''
-        put(row, col + k, t)
-      }
-    } else if (r.type === FORMULA) {
-      need(14)
-      if (view.getUint16(o + 12, true) !== 0xffff)
-        put(row, col, number(view.getFloat64(o + 6, true)))
-      else {
-        const type = d[6]
-        if (type === 0) pending = { row, col }
-        else if (type === 1) put(row, col, d[8] ? '1' : '')
-        else if (type === 2) put(row, col, error(d[8]))
-        else if (type === 3) put(row, col, '')
-        else throw new Error(`formula cell ${ref()} holds an unknown value type ${type}`)
-      }
-    } else if (r.type === BOOLERR) {
-      need(8)
-      put(row, col, d[7] ? error(d[6]) : d[6] ? '1' : '')
-    } else if (r.type === BLANK) {
-      put(row, col, '')
-    }
+    checkNoPending(st)
+    putCell(reader, r, strings, st)
   }
-  return { rows: [...rows].sort((a, b) => a[0] - b[0]).map(([, cells]) => cells), end }
+  return { rows: [...st.rows].sort((a, b) => a[0] - b[0]).map(([, cells]) => cells), end }
 }
 
 /**

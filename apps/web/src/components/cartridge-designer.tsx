@@ -182,6 +182,150 @@ function DerivedLine({ rows, system }: { rows: Derived[]; system: UnitSystem }) 
   )
 }
 
+const fieldLabel = (key: string) => fieldSpecs.find((s) => s.key === key)?.label ?? key
+
+const isChanged = (state: FieldState) =>
+  state.kind === 'cleared' || (state.kind === 'entered' && state.changed)
+
+const seatMissing = (drawn: boolean) =>
+  drawn
+    ? 'Not given: the cartridge L3, which the seating needs.'
+    : 'Not given: a drawing of the cartridge, which the seating needs.'
+
+const staleText = (refusal: { field: string; reason: string }, drawn: boolean) =>
+  `${drawn ? 'Drawing for earlier inputs. ' : ''}Fix ${fieldLabel(refusal.field)}: ${refusal.reason}`
+
+/** The polite line: the refusal, else the last change, that the drawing updated and the derived values. */
+function announcement(
+  e: Evaluation,
+  changed: CartridgeFieldSpec | undefined | '',
+  design: Design,
+  derivedText: string,
+) {
+  if (e.refusal) return `Drawing not updated: ${e.refusal.reason}`
+  const change = changed ? `${changed.label} ${design.fields[changed.key].text || 'cleared'}. ` : ''
+  return `${change}Drawing updated.${derivedText ? ` ${derivedText}.` : ''}`
+}
+
+/** The Parameters panel's message for a locked, changed-base or started-from design. */
+function designMessage(design: Design) {
+  if (design.locked) return `Read only: ${design.locked.reason}`
+  if (design.baseChanged)
+    return `The base record ${design.origin?.title ?? design.basedOn} changed since this design was saved. Fields you did not change follow it; Save keeps the design against the new base.`
+  return design.origin && `Started from ${design.origin.title.replace(/\.?$/, '.')}`
+}
+
+function DrawingFigure({
+  drawn,
+  stale,
+  refused,
+  title,
+  view,
+  onView,
+  unit,
+}: {
+  drawn: Evaluation | undefined
+  stale: boolean
+  refused: boolean
+  title: string
+  view: View | undefined
+  onView: (v: View) => void
+  unit: ReturnType<typeof drawingLengthUnit>
+}) {
+  if (drawn?.spec)
+    return (
+      <div className="designer-drawing" data-stale={stale || undefined}>
+        <CartridgeDrawing
+          spec={drawn.spec}
+          list={drawn.figures}
+          heading={title}
+          caption="Changed values are drawn as entered, without the record's tolerances."
+          view={view}
+          onView={onView}
+          unit={unit}
+        />
+      </div>
+    )
+  if (refused) return null
+  return (
+    <EmptyNote
+      icon={<Ruler size={24} aria-hidden="true" />}
+      title="No drawing yet"
+      description={missingHint}
+    />
+  )
+}
+
+/** The drawing a bullet can seat in: not a shotshell, and one whose values give a chamber. */
+function seating(drawn: Evaluation | undefined) {
+  const seatSpec = drawn?.spec?.table === 'VII' ? undefined : drawn?.spec
+  return { seatSpec, canSeat: seatSpec !== undefined && chamberOf(seatSpec.values) !== undefined }
+}
+
+/** The instruction for a design missing its base values is not shown as a refusal. */
+const withoutHint = (refusal: Evaluation['refusal']) =>
+  refusal?.reason.endsWith(missingHint) ? undefined : refusal
+
+const fieldFlag = (state: FieldState) => (isChanged(state) ? 'changed' : flagOf[state.kind])
+
+async function loadCartridge(id: string, system: UnitSystem) {
+  const record = await fetchRecord<CartridgeDetail>('cartridges', id)
+  if (!record) throw new Error('No such cartridge')
+  if (!draws(record))
+    return 'This cartridge has no CIP record that draws. The designer still works.'
+  return fromRecord(record, system)
+}
+
+function fieldErrorText(
+  s: CartridgeFieldSpec,
+  design: Design,
+  system: UnitSystem,
+  refusal: { field: string; reason: string } | undefined,
+  e: Evaluation,
+) {
+  return (
+    fieldError(s, design.fields[s.key], system) ??
+    (refusal?.field === s.key ? refusal.reason : undefined) ??
+    e.checks[s.key]?.join(' ')
+  )
+}
+
+function ParameterHead({
+  start,
+  design,
+  shotshell,
+  dispatch,
+  unit,
+}: {
+  start: (id: string) => void
+  design: Design
+  shotshell: boolean
+  dispatch: (a: Action) => void
+  unit: string
+}) {
+  return (
+    <>
+      <StartSearch start={start} chosen={design.origin?.title} />
+      <div className="prop-grid designer-grid">
+        <TableSelect value={design.table} dispatch={dispatch} />
+      </div>
+      {shotshell ? (
+        <p className="note">
+          Shotshell dimensions (CIP table VII) are not edited in the designer; the drawing shows the
+          record.
+        </p>
+      ) : (
+        // the unit once per column; screen readers have it in each field's name
+        <div className="side-row side-head" aria-hidden="true">
+          <span>Symbol</span>
+          <span>Cartridge, {unit}</span>
+          <span>Chamber, {unit}</span>
+        </div>
+      )}
+    </>
+  )
+}
+
 /**
  * The cartridge designer: a Symbol, Cartridge and Chamber grid of the CIP symbols, the
  * cartridge page's drawing on the design beside it, checks at the fields, derived values, undo and
@@ -196,13 +340,7 @@ export function CartridgeDesigner() {
       init: () => newDesign(),
       kind: 'cartridge',
       fileData,
-      load: async (id, system) => {
-        const record = await fetchRecord<CartridgeDetail>('cartridges', id)
-        if (!record) throw new Error('No such cartridge')
-        if (!draws(record))
-          return 'This cartridge has no CIP record that draws. The designer still works.'
-        return fromRecord(record, system)
-      },
+      load: loadCartridge,
       loadingText: 'Loading the cartridge…',
       failText: 'The cartridge could not be loaded. The designer still works.',
     })
@@ -212,7 +350,6 @@ export function CartridgeDesigner() {
   if (e.spec) lastGood.current = e
   // the drawing lays out after the fields have taken the input
   const drawn = useDeferredValue(e.spec ? e : lastGood.current)
-  const label = (key: string) => fieldSpecs.find((s) => s.key === key)?.label ?? key
 
   // the bullet seats in the drawing shown, its values the case and chamber; the controls portal
   // into the Seat a bullet section, the user's measured capacity stays here through a redraw
@@ -226,8 +363,7 @@ export function CartridgeDesigner() {
   )
   const designName = design.origin ? `design from ${design.origin.title}` : 'new cartridge'
   const title = `Outline, ${designName}`
-  const seatSpec = drawn?.spec?.table === 'VII' ? undefined : drawn?.spec
-  const canSeat = seatSpec !== undefined && chamberOf(seatSpec.values) !== undefined
+  const { seatSpec, canSeat } = seating(drawn)
   const draft = useMemo(
     () => (seatSpec && canSeat ? { spec: seatSpec, title: designName } : undefined),
     [seatSpec, canSeat, designName],
@@ -239,25 +375,17 @@ export function CartridgeDesigner() {
     .map((d) => `${d.label} ${valueText(d.quantity, system, d.si)}`)
     .join(', ')
   // nothing to announce before the first change or start
-  const message = !history.past.length
-    ? ''
-    : e.refusal
-      ? `Drawing not updated: ${e.refusal.reason}`
-      : `${changed ? `${changed.label} ${design.fields[changed.key].text || 'cleared'}. ` : ''}Drawing updated.${derivedText ? ` ${derivedText}.` : ''}`
+  const message = history.past.length ? announcement(e, changed, design, derivedText) : ''
   const [announced] = useDebouncedValue(message, 500)
   // before the first edit a design missing its base values shows the instruction, not a refusal
-  const refusal =
-    history.past.length || !e.refusal?.reason.endsWith(missingHint) ? e.refusal : undefined
+  const refusal = history.past.length ? e.refusal : withoutHint(e.refusal)
 
-  const errorOf = (s: CartridgeFieldSpec) =>
-    fieldError(s, design.fields[s.key], system) ??
-    (refusal?.field === s.key ? refusal.reason : undefined) ??
-    e.checks[s.key]?.join(' ')
+  const errorOf = (s: CartridgeFieldSpec) => fieldErrorText(s, design, system, refusal, e)
 
   const shotshell = design.table === 'VII'
   const field = (s: CartridgeFieldSpec) => {
     const state = e.states[s.key]
-    const changed = state.kind === 'cleared' || (state.kind === 'entered' && state.changed)
+    const changed = isChanged(state)
     return (
       <DesignerField
         key={s.key}
@@ -265,7 +393,7 @@ export function CartridgeDesigner() {
         system={system}
         value={design.fields[s.key]}
         help={helpText(s, state, system, e.notes[s.key])}
-        flag={changed ? 'changed' : flagOf[state.kind]}
+        flag={fieldFlag(state)}
         changed={changed}
         error={errorOf(s)}
         // the column header names the length unit; an angle keeps its own
@@ -331,34 +459,15 @@ export function CartridgeDesigner() {
         <PropertyGrid
           title="Parameters"
           head={
-            <>
-              <StartSearch start={start} chosen={design.origin?.title} />
-              <div className="prop-grid designer-grid">
-                <TableSelect value={design.table} dispatch={dispatch} />
-              </div>
-              {shotshell ? (
-                <p className="note">
-                  Shotshell dimensions (CIP table VII) are not edited in the designer; the drawing
-                  shows the record.
-                </p>
-              ) : (
-                // the unit once per column; screen readers have it in each field's name
-                <div className="side-row side-head" aria-hidden="true">
-                  <span>Symbol</span>
-                  <span>Cartridge, {system.length.symbol}</span>
-                  <span>Chamber, {system.length.symbol}</span>
-                </div>
-              )}
-            </>
+            <ParameterHead
+              start={start}
+              design={design}
+              shotshell={shotshell}
+              dispatch={dispatch}
+              unit={system.length.symbol}
+            />
           }
-          message={
-            loading ??
-            (design.locked
-              ? `Read only: ${design.locked.reason}`
-              : design.baseChanged
-                ? `The base record ${design.origin?.title ?? design.basedOn} changed since this design was saved. Fields you did not change follow it; Save keeps the design against the new base.`
-                : design.origin && `Started from ${design.origin.title.replace(/\.?$/, '.')}`)
-          }
+          message={loading ?? designMessage(design)}
           sections={
             shotshell
               ? []
@@ -374,11 +483,7 @@ export function CartridgeDesigner() {
                     content: canSeat ? (
                       <div ref={setSeatSlot} className="seating-slot" />
                     ) : (
-                      <p className="note">
-                        {drawn?.spec
-                          ? 'Not given: the cartridge L3, which the seating needs.'
-                          : 'Not given: a drawing of the cartridge, which the seating needs.'}
-                      </p>
+                      <p className="note">{seatMissing(drawn?.spec !== undefined)}</p>
                     ),
                   },
                 ]
@@ -401,30 +506,17 @@ export function CartridgeDesigner() {
       </div>
       {/* a slot of its own: a refusal does not move the drawing */}
       <Text component="p" inherit fz="sm" m={0} className="stale-line" title={refusal?.reason}>
-        {refusal &&
-          `${drawn ? 'Drawing for earlier inputs. ' : ''}Fix ${label(refusal.field)}: ${refusal.reason}`}
+        {refusal && staleText(refusal, drawn !== undefined)}
       </Text>
-      {drawn?.spec ? (
-        <div className="designer-drawing" data-stale={!e.spec || undefined}>
-          <CartridgeDrawing
-            spec={drawn.spec}
-            list={drawn.figures}
-            heading={title}
-            caption="Changed values are drawn as entered, without the record's tolerances."
-            view={view}
-            onView={setView}
-            unit={drawingLengthUnit(system)}
-          />
-        </div>
-      ) : (
-        !refusal && (
-          <EmptyNote
-            icon={<Ruler size={24} aria-hidden="true" />}
-            title="No drawing yet"
-            description={missingHint}
-          />
-        )
-      )}
+      <DrawingFigure
+        drawn={drawn}
+        stale={!e.spec}
+        refused={refusal !== undefined}
+        title={title}
+        view={view}
+        onView={setView}
+        unit={drawingLengthUnit(system)}
+      />
       {draft && (
         <SeatingPreview
           draft={draft}

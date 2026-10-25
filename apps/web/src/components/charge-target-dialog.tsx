@@ -20,12 +20,13 @@ import { AppModal } from './app-modal.tsx'
 import { useLoad } from './workbench-context.ts'
 import { notReached } from './workbench-outcome.ts'
 
-/** `request` is the load request the answer was solved for: an answer shows only for the same load. */
-type Answer = { request: string } & (
+type Outcome =
   | { kind: 'found'; body: ChargeTargetResponse }
   | { kind: 'refused'; text: string }
   | { kind: 'failed'; text: string }
-)
+
+/** `request` is the load request the answer was solved for: an answer shows only for the same load. */
+type Answer = { request: string } & Outcome
 
 /** The load request as text, to compare the load an answer was solved for with the current one. */
 function requestKey(loadRequest: () => { body: object; bulkDensity?: number }) {
@@ -34,6 +35,48 @@ function requestKey(loadRequest: () => { body: object; bulkDensity?: number }) {
     return JSON.stringify([body, bulkDensity])
   } catch {
     return ''
+  }
+}
+
+type LoadRequest = ReturnType<ReturnType<typeof useLoad>['loadRequest']>
+
+/** The load request to post, or the text that says why not: a bad value, an unbuilt load, no bulk density. */
+function checkedRequest(
+  value: string | number,
+  unit: ReturnType<typeof targetUnit>,
+  kind: TargetKind,
+  loadRequest: () => LoadRequest,
+): { req: LoadRequest } | { text: string } {
+  const invalid = targetError(value, unit)
+  if (invalid) return { text: invalid }
+  let req: LoadRequest
+  try {
+    req = loadRequest()
+  } catch (err) {
+    return { text: errorText(err) }
+  }
+  if (kind === 'loadRatio' && req.bulkDensity === undefined)
+    return { text: 'The load ratio needs a powder with a bulk density.' }
+  return { req }
+}
+
+/** The answer for an HTTP response of the solver: found, refused (422) or failed. */
+function answerOf(
+  res: Response,
+  json: unknown,
+  kind: TargetKind,
+  system: Parameters<typeof refusalText>[2],
+  asPercent: boolean,
+): Outcome {
+  if (res.ok && json) return { kind: 'found', body: json as ChargeTargetResponse }
+  if (res.status === 422 && json)
+    return {
+      kind: 'refused',
+      text: refusalText(json as ChargeTargetRefusal, kind, system, asPercent),
+    }
+  return {
+    kind: 'failed',
+    text: (json as ChargeTargetRefusal | undefined)?.message ?? `Error ${res.status}.`,
   }
 }
 
@@ -82,30 +125,12 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
 
   async function find() {
     const typed = targetNumber(value)
-    const invalid = targetError(value, unit)
-    if (invalid) {
-      setAnswer({ request, kind: 'failed', text: invalid })
+    const checked = checkedRequest(value, unit, kind, loadRequest)
+    if ('text' in checked) {
+      setAnswer({ request, kind: 'failed', text: checked.text })
       return
     }
-    let req: ReturnType<typeof loadRequest>
-    try {
-      req = loadRequest()
-    } catch (err) {
-      setAnswer({
-        request,
-        kind: 'failed',
-        text: errorText(err),
-      })
-      return
-    }
-    if (kind === 'loadRatio' && req.bulkDensity === undefined) {
-      setAnswer({
-        request,
-        kind: 'failed',
-        text: 'The load ratio needs a powder with a bulk density.',
-      })
-      return
-    }
+    const req = checked.req
     running.current?.abort()
     const controller = new AbortController()
     running.current = controller
@@ -125,25 +150,7 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
       })
       const json = await res.json().catch(() => undefined)
       if (controller.signal.aborted) return
-      if (res.ok && json) {
-        const body = json as ChargeTargetResponse
-        setAnswer({
-          request,
-          kind: 'found',
-          body,
-        })
-      } else if (res.status === 422 && json)
-        setAnswer({
-          request,
-          kind: 'refused',
-          text: refusalText(json as ChargeTargetRefusal, kind, system, asPercent),
-        })
-      else
-        setAnswer({
-          request,
-          kind: 'failed',
-          text: (json as ChargeTargetRefusal | undefined)?.message ?? `Error ${res.status}.`,
-        })
+      setAnswer({ request, ...answerOf(res, json, kind, system, asPercent) })
     } catch {
       if (!controller.signal.aborted) setAnswer({ request, kind: 'failed', text: notReached })
     } finally {

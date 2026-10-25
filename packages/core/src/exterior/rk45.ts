@@ -283,19 +283,10 @@ function locateEvents(
   return stop
 }
 
-/** Integrates y' = f(t, y) from t0 until a terminal event or `maxTime`. */
-export function rk45(
-  f: Rhs,
-  t0: number,
-  y0: Float64Array,
-  events: readonly Rk45Event[],
-  options: Rk45Options,
-): Rk45Result {
-  const { relativeTolerance, absoluteTolerance, maxSteps, maxTime, budget } = options
-  const n = y0.length
+/** The scratch vectors of one integration, `n` states long. */
+function makeWork(n: number): Work {
   const make = () => new Float64Array(n)
-  let y = Float64Array.from(y0)
-  const work: Work = {
+  return {
     n,
     k1: make(),
     k2: make(),
@@ -310,12 +301,82 @@ export function rk45(
     r4: make(),
     r5: make(),
   }
+}
+
+/** Throws `InputError` when the steps taken, or the shared budget, reach their limit. */
+function checkStepLimits(steps: number, options: Rk45Options) {
+  const { maxSteps, budget } = options
+  if (steps + (options.stepsBefore ?? 0) >= maxSteps)
+    throw new InputError(`more than ${maxSteps} integration steps`)
+  if (budget && budget.used >= budget.max)
+    throw new InputError(`more than ${budget.max} integration steps in total`)
+}
+
+/** The events whose function changed sign over the step, in the direction they watch. */
+function crossedEvents(events: readonly Rk45Event[], gPrev: number[], gNew: number[]) {
+  const crossed: number[] = []
+  for (let i = 0; i < events.length; i++)
+    if (crosses(gPrev[i], gNew[i], events[i].direction)) crossed.push(i)
+  return crossed
+}
+
+/** The fifth-order state at an event `hs` into the step from `y` at `t`. */
+function reStepToEvent(
+  f: Rhs,
+  work: Work,
+  t: number,
+  y: Float64Array,
+  hs: number,
+  options: Rk45Options,
+) {
+  const out = new Float64Array(work.n)
+  if (hs > 0)
+    dormandPrinceStep(f, work, t, y, hs, out, options.relativeTolerance, options.absoluteTolerance)
+  else out.set(y)
+  return out
+}
+
+/** Step factor after a rejected step of scaled error `err`. */
+function shrinkFactor(err: number) {
+  return Number.isFinite(err) ? Math.max(0.2, 0.9 * err ** -0.2) : 0.2
+}
+
+/** Step factor after an accepted step, at most 1 right after a rejection. */
+function growFactor(err: number, rejected: boolean) {
+  return Math.min(rejected ? 1 : 5, Math.max(0.2, err === 0 ? 5 : 0.9 * err ** -0.2))
+}
+
+/** The step size `h`, or `InputError` when it is below `minStep`. */
+function checkMinStep(h: number) {
+  if (h < minStep) throw new InputError(`step size ${h} s below ${minStep} s`)
+  return h
+}
+
+/** The step size to start with: the given one, or the automatic choice when none is positive. */
+function firstStep(f: Rhs, work: Work, t: number, y: Float64Array, options: Rk45Options) {
+  const given = options.initialStep ?? 0
+  if (given > 0) return given
+  return startingStep(f, work, t, y, options.relativeTolerance, options.absoluteTolerance)
+}
+
+/** Integrates y' = f(t, y) from t0 until a terminal event or `maxTime`. */
+export function rk45(
+  f: Rhs,
+  t0: number,
+  y0: Float64Array,
+  events: readonly Rk45Event[],
+  options: Rk45Options,
+): Rk45Result {
+  const { relativeTolerance, absoluteTolerance, maxTime, budget } = options
+  const n = y0.length
+  const make = () => new Float64Array(n)
+  let y = Float64Array.from(y0)
+  const work = makeWork(n)
   let ynew = make()
   let t = t0
   f(t, y, work.k1)
 
-  let h = options.initialStep ?? 0
-  if (!(h > 0)) h = startingStep(f, work, t, y, relativeTolerance, absoluteTolerance)
+  let h = firstStep(f, work, t, y, options)
 
   let gPrev = events.map((e) => e.eventFunction(t, y))
   const hits: Rk45Hit[] = []
@@ -323,37 +384,27 @@ export function rk45(
   let rejected = false
 
   while (t < maxTime) {
-    if (steps + (options.stepsBefore ?? 0) >= maxSteps)
-      throw new InputError(`more than ${maxSteps} integration steps`)
-    if (budget && budget.used >= budget.max)
-      throw new InputError(`more than ${budget.max} integration steps in total`)
+    checkStepLimits(steps, options)
     const clipped = h >= maxTime - t
-    if (clipped) h = maxTime - t
-    else if (h < minStep) throw new InputError(`step size ${h} s below ${minStep} s`)
+    h = clipped ? maxTime - t : checkMinStep(h)
     const err = dormandPrinceStep(f, work, t, y, h, ynew, relativeTolerance, absoluteTolerance)
     steps++
     if (budget) budget.used++
     if (!(err <= 1)) {
-      h *= Number.isFinite(err) ? Math.max(0.2, 0.9 * err ** -0.2) : 0.2
+      h *= shrinkFactor(err)
       rejected = true
       continue
     }
     const t1 = clipped ? maxTime : t + h
     const gNew = events.map((e) => e.eventFunction(t1, ynew))
 
-    const crossed: number[] = []
-    for (let i = 0; i < events.length; i++)
-      if (crosses(gPrev[i], gNew[i], events[i].direction)) crossed.push(i)
+    const crossed = crossedEvents(events, gPrev, gNew)
     if (crossed.length > 0) {
       const dense = denseOutput(work, y, ynew, h)
       const stop = locateEvents(events, crossed, gPrev, gNew, t, h, dense, hits)
       if (stop) {
-        // re-step to the root for a fifth-order state at the event
-        const hs = stop.s * h
-        const out = make()
-        if (hs > 0) dormandPrinceStep(f, work, t, y, hs, out, relativeTolerance, absoluteTolerance)
-        else out.set(y)
-        return { t: t + hs, y: out, event: stop.i, hits, steps, h }
+        const out = reStepToEvent(f, work, t, y, h * stop.s, options)
+        return { t: t + h * stop.s, y: out, event: stop.i, hits, steps, h }
       }
     }
 
@@ -365,7 +416,7 @@ export function rk45(
     work.k7 = k
     t = t1
     gPrev = gNew
-    h *= Math.min(rejected ? 1 : 5, Math.max(0.2, err === 0 ? 5 : 0.9 * err ** -0.2))
+    h *= growFactor(err, rejected)
     rejected = false
   }
   return { t, y, event: null, hits, steps, h }

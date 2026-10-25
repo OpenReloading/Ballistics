@@ -185,6 +185,71 @@ const PrintDrawing = memo(function PrintDrawing({
   )
 })
 
+const fieldLabel = (key: string) =>
+  designerSpecs.find((s) => s.key === key)?.label ??
+  (key in choiceLabels ? choiceLabels[key as ChoiceKey][0] : key)
+
+const changedText = (changed: DesignerSpec, design: Design) =>
+  `${changed.label} ${design.fields[changed.key].text || 'cleared'}. `
+
+/** The polite line: the refusal, else the last change and that the drawing updated. */
+const announcement = (refusal: { reason: string } | undefined, change: string | undefined) =>
+  refusal ? `Drawing not updated: ${refusal.reason}` : `${change ?? ''}Drawing updated.`
+
+/** The Parameters panel's message for a locked, changed-base or started-from design. */
+function designMessage(design: Design) {
+  if (design.locked) return `Read only: ${design.locked.reason}`
+  if (design.baseChanged)
+    return `The base record ${design.origin?.title ?? design.basedOn} changed since this design was saved. Fields you did not change follow it; Save keeps the design against the new base.`
+  return design.origin && `Started from ${design.origin.title}.`
+}
+
+/** Whether a segment is drawn from an assumed shape, and the notes under the drawing. */
+function drawingNotes(drawing: Drawing | undefined) {
+  if (!drawing) return { assumed: undefined, notes: [] }
+  const { annotation, outline } = drawing.profile
+  const symbols = [...annotation.dimensions, ...annotation.radii].map(
+    (d) => `${d.symbol} ${bulletSymbols.find((s) => s.symbol === d.symbol)?.name ?? d.symbol}`,
+  )
+  const assumed = outline.segments.some((s) => s.approximate)
+  const notes = [
+    'Entered and catalog values are dimensioned, derived and assumed values are not.',
+    ...(assumed
+      ? ['Dashed in the flag color: parts drawn from an assumed shape (see the notes).']
+      : []),
+    ...(symbols.length > 0 ? [`Symbols: ${symbols.join(', ')}.`] : []),
+    ...outline.notes,
+  ]
+  return { assumed, notes }
+}
+
+/** Marks the drawn dimension of the field `t` is in (`data-symbol`), else none. */
+function markDimension(box: HTMLElement | null, t: Element | null) {
+  if (!box) return
+  for (const el of box.querySelectorAll('.designer-drawing .is-hi')) el.classList.remove('is-hi')
+  const symbol = t?.closest('.designer-field[data-symbol]')?.getAttribute('data-symbol')
+  if (!symbol) return
+  for (const el of box.querySelectorAll('.designer-drawing [data-symbol]'))
+    if (el.getAttribute('data-symbol') === symbol) el.classList.add('is-hi')
+}
+
+/** The values of the print sheet: identity, choices and the entered fields. */
+const printRows = (design: Design, manufacturer: string | undefined): FieldRow[] => [
+  ...(
+    [
+      ['Manufacturer', manufacturer],
+      ['Name', design.name],
+    ] as const
+  ).flatMap(([label, text]): FieldRow[] => (text ? [{ label, text }] : [])),
+  ...(Object.keys(choiceLabels) as ChoiceKey[]).flatMap((k): FieldRow[] =>
+    design.choices[k] ? [{ label: choiceLabels[k][0], text: optionLabel(design.choices[k]) }] : [],
+  ),
+  ...designerSpecs.flatMap((s): FieldRow[] => {
+    const { si } = design.fields[s.key]
+    return si === undefined ? [] : [{ label: s.label, value: { quantity: s.quantity, si } }]
+  }),
+]
+
 /**
  * The bullet designer: a property grid of the fields, a live technical drawing beside
  * it, undo and redo; the last valid drawing stays while the input is refused.
@@ -214,15 +279,9 @@ export function BulletDesigner() {
   if (e.drawing) lastGood.current = e.drawing
   const drawing = e.drawing ?? lastGood.current
   const printed = useDeferredValue(drawing)
-  const label = (key: string) =>
-    designerSpecs.find((s) => s.key === key)?.label ??
-    (key in choiceLabels ? choiceLabels[key as ChoiceKey][0] : key)
-
   // one polite line 500 ms after the last change
   const changed = history.last && designerSpecs.find((s) => s.key === history.last)
-  const message = e.refusal
-    ? `Drawing not updated: ${e.refusal.reason}`
-    : `${changed ? `${changed.label} ${design.fields[changed.key].text || 'cleared'}. ` : ''}Drawing updated.`
+  const message = announcement(e.refusal, changed && changedText(changed, design))
   const [announced] = useDebouncedValue(message, 500)
 
   const errorOf = (key: string) =>
@@ -271,34 +330,10 @@ export function BulletDesigner() {
   const labelOf = (d: Design) =>
     productLabel({ name: d.name, manufacturerName: manufacturers.nameOf(d.manufacturer) })
   const title = `Outline, ${labelOf(design) || 'new bullet'}`
-  const symbols =
-    drawing &&
-    [...drawing.profile.annotation.dimensions, ...drawing.profile.annotation.radii].map(
-      (d) => `${d.symbol} ${bulletSymbols.find((s) => s.symbol === d.symbol)?.name ?? d.symbol}`,
-    )
-  const assumed = drawing?.profile.outline.segments.some((s) => s.approximate)
-  const notes = drawing
-    ? [
-        'Entered and catalog values are dimensioned, derived and assumed values are not.',
-        ...(assumed
-          ? ['Dashed in the flag color: parts drawn from an assumed shape (see the notes).']
-          : []),
-        ...(symbols && symbols.length > 0 ? [`Symbols: ${symbols.join(', ')}.`] : []),
-        ...drawing.profile.outline.notes,
-      ]
-    : []
+  const { assumed, notes } = drawingNotes(drawing)
 
   const root = useRef<HTMLDivElement>(null)
-  /** Marks the drawn dimension of the field `t` is in (`data-symbol`), else none. */
-  const mark = (t: Element | null) => {
-    const box = root.current
-    if (!box) return
-    for (const el of box.querySelectorAll('.designer-drawing .is-hi')) el.classList.remove('is-hi')
-    const symbol = t?.closest('.designer-field[data-symbol]')?.getAttribute('data-symbol')
-    if (symbol)
-      for (const el of box.querySelectorAll('.designer-drawing [data-symbol]'))
-        if (el.getAttribute('data-symbol') === symbol) el.classList.add('is-hi')
-  }
+  const mark = (t: Element | null) => markDimension(root.current, t)
   // an edit draws the figure again: the focused field's mark again
   useEffect(() => mark(document.activeElement))
 
@@ -350,14 +385,7 @@ export function BulletDesigner() {
         <PropertyGrid
           title="Parameters"
           head={<StartSearch system={system} start={start} chosen={design.origin?.title} />}
-          message={
-            loading ??
-            (design.locked
-              ? `Read only: ${design.locked.reason}`
-              : design.baseChanged
-                ? `The base record ${design.origin?.title ?? design.basedOn} changed since this design was saved. Fields you did not change follow it; Save keeps the design against the new base.`
-                : design.origin && `Started from ${design.origin.title}.`)
-          }
+          message={loading ?? designMessage(design)}
           sections={(Object.keys(groups) as Group[]).map((g) => ({
             key: g,
             title: groups[g],
@@ -387,23 +415,7 @@ export function BulletDesigner() {
       : ''
 
   // print: the drawing and the values, not the form
-  const values: FieldRow[] = [
-    ...(
-      [
-        ['Manufacturer', manufacturers.nameOf(design.manufacturer)],
-        ['Name', design.name],
-      ] as const
-    ).flatMap(([label, text]): FieldRow[] => (text ? [{ label, text }] : [])),
-    ...(Object.keys(choiceLabels) as ChoiceKey[]).flatMap((k): FieldRow[] =>
-      design.choices[k]
-        ? [{ label: choiceLabels[k][0], text: optionLabel(design.choices[k]) }]
-        : [],
-    ),
-    ...designerSpecs.flatMap((s): FieldRow[] => {
-      const { si } = design.fields[s.key]
-      return si === undefined ? [] : [{ label: s.label, value: { quantity: s.quantity, si } }]
-    }),
-  ]
+  const values = printRows(design, manufacturers.nameOf(design.manufacturer))
 
   const results = (
     <>
@@ -413,7 +425,7 @@ export function BulletDesigner() {
       {/* a slot of its own: a refusal does not move the drawing */}
       <Text component="p" inherit fz="sm" m={0} className="stale-line" title={e.refusal?.reason}>
         {e.refusal &&
-          `Drawing for earlier inputs. Fix ${label(e.refusal.field)}: ${e.refusal.reason}`}
+          `Drawing for earlier inputs. Fix ${fieldLabel(e.refusal.field)}: ${e.refusal.reason}`}
       </Text>
       {drawing && (
         <figure className="drawing-figure designer-drawing" data-stale={!e.drawing || undefined}>

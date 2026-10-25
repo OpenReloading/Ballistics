@@ -343,6 +343,142 @@ function disabledReason(drawn: Drawn, notes: Figure['notes']) {
   return { missing, text: `${sideName[missing]} and Combined not drawn: ${why}.` }
 }
 
+/** Which views are enabled and shown, and the sides the print draws. */
+function viewState(drawn: Drawn, notes: Figure['notes'], view: View | undefined) {
+  const reason = disabledReason(drawn, notes)
+  const drawnSide = reason?.missing === 'cartridge' ? 'chamber' : 'cartridge'
+  const enabled = (v: string) => !reason || v === drawnSide
+  // Combined by default once both sides draw; a view picked stays while it draws
+  const fallback = reason ? drawnSide : 'combined'
+  const shown = view && enabled(view) ? view : fallback
+  const printSides: Side[] = reason ? [drawnSide] : ['cartridge', 'chamber']
+  return { reason, enabled, shown, printSides }
+}
+
+type Reason = ReturnType<typeof disabledReason>
+
+function ViewSwitch({
+  id,
+  shown,
+  reason,
+  enabled,
+  onView,
+}: {
+  id: string
+  shown: string
+  reason: Reason
+  enabled: (v: string) => boolean
+  onView?: (view: View) => void
+}) {
+  return (
+    <>
+      <div className="drawing-controls">
+        {/* named with the figure title: a table VII record has one switch per variant */}
+        <span id={`${id}-legend`} className="visually-hidden">
+          View
+        </span>
+        <SegmentedControl
+          size={controlSize.row.toggle}
+          aria-labelledby={`${id}-legend ${id}-title`}
+          aria-describedby={reason ? `${id}-reason` : undefined}
+          name={`${id}-view`}
+          value={shown}
+          onChange={(v) => onView?.(v as View)}
+          data={views.map(([value, label]) => ({ value, label, disabled: !enabled(value) }))}
+        />
+      </div>
+      {reason && (
+        <p id={`${id}-reason`} className="views-reason">
+          {reason.text}
+        </p>
+      )}
+    </>
+  )
+}
+
+/**
+ * The print drawing shares the screen drawing's description; print ignores the view and gives each
+ * drawn side dimensioned (`sides`, none for a figure without a switch).
+ */
+function PrintFigures({
+  id,
+  title,
+  print,
+  scale,
+  sides,
+}: {
+  id: string
+  title: string
+  print: FigureModel
+  scale?: number
+  sides?: Side[]
+}) {
+  if (!sides)
+    return (
+      <TechnicalDrawing
+        id={`${id}-print`}
+        title={title}
+        describedBy={`${id}-desc`}
+        model={print}
+        printScale={scale}
+      />
+    )
+  return sides.map((side) => (
+    <div key={side} data-print-view={side}>
+      <TechnicalDrawing
+        id={side === 'cartridge' ? `${id}-print` : `${id}-print-${side}`}
+        title={`${title}, ${sideName[side].toLowerCase()}`}
+        describedBy={`${id}-desc`}
+        model={print}
+        printScale={scale}
+      />
+    </div>
+  ))
+}
+
+function FigureCaption({
+  caption,
+  differences,
+  unit,
+  variant,
+  notes,
+  scale,
+}: {
+  caption?: string
+  differences?: Region[]
+  unit: LengthUnit
+  variant?: string
+  notes: Figure['notes']
+  scale?: number
+}) {
+  return (
+    <figcaption>
+      {caption}
+      {differences !== undefined && differences.length > 0 && (
+        <span className="caption-combined">
+          {` Combined: per region the ${differenceWording} (chamber minimum minus cartridge maximum, in ${unit === 'mm' ? 'mm' : 'inches'}, signed); "conflict" marks a ${conflictWording}.`}
+        </span>
+      )}
+      {/* the select names the variant on screen */}
+      {variant !== undefined && <span className="print-only">{` Variant ${variant}.`}</span>}
+      {notes.some((n) => n.flagNumber) && ' The numbered circles on the drawing mark these notes.'}
+      {notes.map((n) => (
+        <span key={n.text}>
+          {' '}
+          {n.flagNumber && <span className="note-flag">{n.flagNumber}</span>}
+          {n.flagNumber && ' '}
+          {n.text}
+        </span>
+      ))}
+      {scale !== undefined && (
+        <span className="print-only">
+          {` Printed at 100 % scale, the drawing is ${scaleWords(scale)}.`}
+        </span>
+      )}
+    </figcaption>
+  )
+}
+
 function Outline({
   spec,
   heading,
@@ -384,37 +520,14 @@ function Outline({
   // the record's Combined view: no switch of its own and no print drawing
   const combined = print === undefined
   const switchable = differences !== undefined && !combined
-  const reason = disabledReason(drawn, notes)
-  const drawnSide = reason?.missing === 'cartridge' ? 'chamber' : 'cartridge'
-  const enabled = (v: string) => !reason || v === drawnSide
-  // Combined by default once both sides draw; a view picked stays while it draws
-  const shown = view && enabled(view) ? view : reason ? drawnSide : 'combined'
+  const { reason, enabled, shown, printSides } = viewState(drawn, notes, view)
   return (
     <figure
       className="drawing-figure"
       data-view={combined ? 'combined' : switchable ? shown : undefined}
     >
       {switchable && (
-        <div className="drawing-controls">
-          {/* named with the figure title: a table VII record has one switch per variant */}
-          <span id={`${id}-legend`} className="visually-hidden">
-            View
-          </span>
-          <SegmentedControl
-            size={controlSize.row.toggle}
-            aria-labelledby={`${id}-legend ${id}-title`}
-            aria-describedby={reason ? `${id}-reason` : undefined}
-            name={`${id}-view`}
-            value={shown}
-            onChange={(v) => onView?.(v as View)}
-            data={views.map(([value, label]) => ({ value, label, disabled: !enabled(value) }))}
-          />
-        </div>
-      )}
-      {switchable && reason && (
-        <p id={`${id}-reason`} className="views-reason">
-          {reason.text}
-        </p>
+        <ViewSwitch id={id} shown={shown} reason={reason} enabled={enabled} onView={onView} />
       )}
       <TechnicalDrawing
         id={id}
@@ -425,54 +538,23 @@ function Outline({
         linked={linked}
         reserve={reserve}
       />
-      {/* the print drawing shares the screen drawing's description; print ignores the view and
-          gives each drawn side dimensioned */}
-      {print === undefined ? null : switchable ? (
-        ((reason ? [drawnSide] : ['cartridge', 'chamber']) as Side[]).map((side) => (
-          <div key={side} data-print-view={side}>
-            <TechnicalDrawing
-              id={side === 'cartridge' ? `${id}-print` : `${id}-print-${side}`}
-              title={`${title}, ${sideName[side].toLowerCase()}`}
-              describedBy={`${id}-desc`}
-              model={print}
-              printScale={scale}
-            />
-          </div>
-        ))
-      ) : (
-        <TechnicalDrawing
-          id={`${id}-print`}
+      {print && (
+        <PrintFigures
+          id={id}
           title={title}
-          describedBy={`${id}-desc`}
-          model={print}
-          printScale={scale}
+          print={print}
+          scale={scale}
+          sides={switchable ? printSides : undefined}
         />
       )}
-      <figcaption>
-        {caption}
-        {differences !== undefined && differences.length > 0 && (
-          <span className="caption-combined">
-            {` Combined: per region the ${differenceWording} (chamber minimum minus cartridge maximum, in ${unit === 'mm' ? 'mm' : 'inches'}, signed); "conflict" marks a ${conflictWording}.`}
-          </span>
-        )}
-        {/* the select names the variant on screen */}
-        {variant !== undefined && <span className="print-only">{` Variant ${variant}.`}</span>}
-        {notes.some((n) => n.flagNumber) &&
-          ' The numbered circles on the drawing mark these notes.'}
-        {notes.map((n) => (
-          <span key={n.text}>
-            {' '}
-            {n.flagNumber && <span className="note-flag">{n.flagNumber}</span>}
-            {n.flagNumber && ' '}
-            {n.text}
-          </span>
-        ))}
-        {scale !== undefined && (
-          <span className="print-only">
-            {` Printed at 100 % scale, the drawing is ${scaleWords(scale)}.`}
-          </span>
-        )}
-      </figcaption>
+      <FigureCaption
+        caption={caption}
+        differences={differences}
+        unit={unit}
+        variant={variant}
+        notes={notes}
+        scale={scale}
+      />
     </figure>
   )
 }

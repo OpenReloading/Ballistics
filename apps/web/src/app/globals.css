@@ -976,13 +976,13 @@ td.nowrap {
 
   /* both panels at once; Mantine hides the inactive one with an inline display: none */
   .workspace-tabs > [role="tabpanel"] {
-    /* biome-ignore lint/complexity/noImportantStyles: only !important beats the inline style */
+    /* only !important beats the inline style */
     display: block !important;
   }
 
   /* the phone range view has no place beside the others */
   .workspace-tabs > .workspace-range[role="tabpanel"] {
-    /* biome-ignore lint/complexity/noImportantStyles: beats the rule above */
+    /* beats the rule above */
     display: none !important;
   }
 }
@@ -1114,7 +1114,7 @@ td.nowrap {
 
 @media print {
   .workspace [role="tabpanel"].workspace-range {
-    /* biome-ignore lint/complexity/noImportantStyles: beats the print rule that shows every panel */
+    /* beats the print rule that shows every panel */
     display: none !important;
   }
 }
@@ -1271,7 +1271,7 @@ td.nowrap {
   }
 
   .designer .workspace-tabs > [role="tabpanel"] {
-    /* biome-ignore lint/complexity/noImportantStyles: only !important beats Mantine's inline display: none */
+    /* only !important beats Mantine's inline display: none */
     display: block !important;
   }
 
@@ -1530,7 +1530,7 @@ td.nowrap {
 @media print {
   /* the drawing and the values, not the form */
   .designer .workspace-tabs > .workspace-inputs {
-    /* biome-ignore lint/complexity/noImportantStyles: beats the print rule that shows every tab panel */
+    /* beats the print rule that shows every tab panel */
     display: none !important;
   }
 
@@ -1919,7 +1919,6 @@ td.nowrap {
 
   /* every accordion panel and tab panel prints, whatever is open on screen; only !important beats
      the inline styles of Mantine */
-  /* biome-ignore-start lint/complexity/noImportantStyles: inline styles */
   .workspace [role="tabpanel"],
   .workspace .mantine-Accordion-panel {
     display: block !important;
@@ -1932,8 +1931,6 @@ td.nowrap {
     max-height: none;
     overflow: visible;
   }
-
-  /* biome-ignore-end lint/complexity/noImportantStyles: inline styles */
 
   header,
   main,
@@ -9182,7 +9179,7 @@ main .session-shots th:nth-child(-n + 2) {
 
 @media print {
   html[data-print="target-sheet"] body > :not(.target-print) {
-    /* biome-ignore lint/complexity/noImportantStyles: over the print rules of the pages below */
+    /* over the print rules of the pages below */
     display: none !important;
   }
 

@@ -301,16 +301,35 @@ const ENDOFCHAIN = 0xfffffffe
 const FREESECT = 0xffffffff
 const NOSTREAM = 0xffffffff
 
-/** A compound file with the streams under its root; streams below 4096 bytes in the mini stream. */
-export function compoundFile(
-  streams: { name: string; data: Uint8Array }[],
-  options: CompoundOptions = {},
-): Buffer {
-  const version = options.version ?? 3
-  const S = version === 3 ? 512 : 4096
-  const per = S / 4
-  const big = streams.map((s) => s.data.length >= 4096)
-  // mini stream: each small stream in 64-byte mini sectors
+type CompoundStream = { name: string; data: Uint8Array }
+
+/** Where a compound file puts its sectors. */
+interface CompoundPlan {
+  version: 3 | 4
+  sectorSize: number
+  /** FAT entries per sector. */
+  per: number
+  big: boolean[]
+  miniStarts: number[]
+  miniStream: Buffer
+  miniSectors: number
+  miniFatSectors: number
+  dirSectors: number
+  fat: number
+  difat: number
+  /** The FAT, one entry per sector. */
+  table: number[]
+  difatStart: number
+  fatStart: number
+  dirStart: number
+  miniFatStart: number
+  miniStart: number
+  starts: (number | undefined)[]
+  total: number
+}
+
+/** The small streams in 64-byte mini sectors: their first mini sectors and the whole mini stream. */
+function miniLayout(streams: CompoundStream[], big: boolean[]) {
   const miniStarts: number[] = []
   const miniChunks: Buffer[] = []
   let miniCount = 0
@@ -321,23 +340,34 @@ export function compoundFile(
     miniChunks.push(Buffer.concat([s.data, Buffer.alloc(n * 64 - s.data.length)]))
     miniCount += n
   }
-  const miniStream = Buffer.concat(miniChunks)
-  const miniSectors = Math.ceil(miniStream.length / S)
-  const miniFatSectors = Math.ceil(miniCount / per)
-  const dirEntries = 1 + streams.length
-  const dirSectors = Math.ceil(dirEntries / (S / 128))
-  const bigSectors = streams.map((s, i) => (big[i] ? Math.ceil(s.data.length / S) : 0))
-  const content = dirSectors + miniFatSectors + miniSectors + bigSectors.reduce((a, b) => a + b, 0)
-  let fat = Math.max(1, options.fatSectors ?? 0)
+  return { miniStarts, miniStream: Buffer.concat(miniChunks), miniCount }
+}
+
+/** The FAT and DIFAT sector counts for `content` other sectors, at least `minimum` FAT sectors. */
+function fatCounts(content: number, per: number, minimum: number): { fat: number; difat: number } {
+  let fat = Math.max(1, minimum)
   let difat = 0
   for (;;) {
     const d = Math.max(0, Math.ceil((fat - 109) / (per - 1)))
     const f = Math.max(fat, Math.ceil((content + fat + d) / per))
-    if (d === difat && f === fat) break
+    if (d === difat && f === fat) return { fat, difat }
     difat = d
     fat = f
   }
-  const total = difat + fat + content
+}
+
+function planCompound(streams: CompoundStream[], options: CompoundOptions): CompoundPlan {
+  const version = options.version ?? 3
+  const sectorSize = version === 3 ? 512 : 4096
+  const per = sectorSize / 4
+  const big = streams.map((s) => s.data.length >= 4096)
+  const { miniStarts, miniStream, miniCount } = miniLayout(streams, big)
+  const miniSectors = Math.ceil(miniStream.length / sectorSize)
+  const miniFatSectors = Math.ceil(miniCount / per)
+  const dirSectors = Math.ceil((1 + streams.length) / (sectorSize / 128))
+  const bigSectors = streams.map((s, i) => (big[i] ? Math.ceil(s.data.length / sectorSize) : 0))
+  const content = dirSectors + miniFatSectors + miniSectors + bigSectors.reduce((a, b) => a + b, 0)
+  const { fat, difat } = fatCounts(content, per, options.fatSectors ?? 0)
   const table = new Array<number>(fat * per).fill(FREESECT)
   let next = 0
   const run = (count: number, mark?: number) => {
@@ -353,21 +383,48 @@ export function compoundFile(
   const miniFatStart = run(miniFatSectors)
   const miniStart = run(miniSectors)
   const starts = streams.map((_, i) => (big[i] ? run(bigSectors[i]) : undefined))
-  const file = Buffer.alloc(S + total * S)
-  const offset = (n: number) => (n + 1) * S
-  // header ([MS-CFB] 2.2)
+  return {
+    version,
+    sectorSize,
+    per,
+    big,
+    miniStarts,
+    miniStream,
+    miniSectors,
+    miniFatSectors,
+    dirSectors,
+    fat,
+    difat,
+    table,
+    difatStart,
+    fatStart,
+    dirStart,
+    miniFatStart,
+    miniStart,
+    starts,
+    total: difat + fat + content,
+  }
+}
+
+/** The header ([MS-CFB] 2.2), the DIFAT sectors and the FAT sectors. */
+function writeCompoundTables(
+  file: Buffer,
+  plan: CompoundPlan,
+  offset: (n: number) => number,
+): void {
+  const { version, sectorSize: S, per, fat, difat, difatStart, fatStart, table } = plan
   Buffer.from([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]).copy(file, 0)
   file.writeUInt16LE(0x003e, 0x18)
   file.writeUInt16LE(version, 0x1a)
   file.writeUInt16LE(0xfffe, 0x1c)
   file.writeUInt16LE(version === 3 ? 9 : 12, 0x1e)
   file.writeUInt16LE(6, 0x20)
-  file.writeUInt32LE(version === 3 ? 0 : dirSectors, 0x28)
+  file.writeUInt32LE(version === 3 ? 0 : plan.dirSectors, 0x28)
   file.writeUInt32LE(fat, 0x2c)
-  file.writeUInt32LE(dirStart, 0x30)
+  file.writeUInt32LE(plan.dirStart, 0x30)
   file.writeUInt32LE(4096, 0x38)
-  file.writeUInt32LE(miniFatStart, 0x3c)
-  file.writeUInt32LE(miniFatSectors, 0x40)
+  file.writeUInt32LE(plan.miniFatStart, 0x3c)
+  file.writeUInt32LE(plan.miniFatSectors, 0x40)
   file.writeUInt32LE(difatStart, 0x44)
   file.writeUInt32LE(difat, 0x48)
   const fatList = Array.from({ length: fat }, (_, k) => fatStart + k)
@@ -382,9 +439,15 @@ export function compoundFile(
   for (let n = 0; n < table.length; n++) {
     file.writeUInt32LE(table[n], offset(fatStart + Math.floor(n / per)) + 4 * (n % per))
   }
-  // directory ([MS-CFB] 2.6): root, then the streams as a chain of right siblings
-  const entry = (id: number) =>
-    offset(dirStart + Math.floor(id / (S / 128))) + (id % (S / 128)) * 128
+}
+
+/** The directory ([MS-CFB] 2.6): root, then the streams as a chain of right siblings. */
+function writeCompoundDirectory(
+  file: Buffer,
+  plan: CompoundPlan,
+  streams: CompoundStream[],
+  entry: (id: number) => number,
+): void {
   const writeEntry = (id: number, name: string, type: number, start: number, size: number) => {
     const at = entry(id)
     const nameUnits = units(name)
@@ -398,19 +461,31 @@ export function compoundFile(
     file.writeUInt32LE(start, at + 0x74)
     file.writeUInt32LE(size, at + 0x78)
   }
-  for (let id = 0; id < dirSectors * (S / 128); id++) {
+  for (let id = 0; id < plan.dirSectors * (plan.sectorSize / 128); id++) {
     const at = entry(id)
     file.writeUInt32LE(NOSTREAM, at + 0x44)
     file.writeUInt32LE(NOSTREAM, at + 0x48)
     file.writeUInt32LE(NOSTREAM, at + 0x4c)
   }
+  const { miniStream, miniStart } = plan
   writeEntry(0, 'Root Entry', 5, miniStream.length ? miniStart : ENDOFCHAIN, miniStream.length)
   for (const [i, s] of streams.entries()) {
-    writeEntry(i + 1, s.name, 2, starts[i] ?? miniStarts[i], s.data.length)
-    if (big[i]) Buffer.from(s.data).copy(file, offset(starts[i] as number))
+    writeEntry(i + 1, s.name, 2, plan.starts[i] ?? plan.miniStarts[i], s.data.length)
   }
-  // mini FAT ([MS-CFB] 2.4) and mini stream
-  const miniTable = new Array<number>(miniFatSectors * per).fill(FREESECT)
+}
+
+/** The big streams in their sectors, the mini FAT ([MS-CFB] 2.4) and the mini stream. */
+function writeCompoundData(
+  file: Buffer,
+  plan: CompoundPlan,
+  streams: CompoundStream[],
+  offset: (n: number) => number,
+): void {
+  const { big, miniStarts, per } = plan
+  for (const [i, s] of streams.entries()) {
+    if (big[i]) Buffer.from(s.data).copy(file, offset(plan.starts[i] as number))
+  }
+  const miniTable = new Array<number>(plan.miniFatSectors * per).fill(FREESECT)
   for (const [i, s] of streams.entries()) {
     if (big[i] || !s.data.length) continue
     const n = Math.ceil(s.data.length / 64)
@@ -419,15 +494,29 @@ export function compoundFile(
     }
   }
   for (let m = 0; m < miniTable.length; m++) {
-    file.writeUInt32LE(miniTable[m], offset(miniFatStart + Math.floor(m / per)) + 4 * (m % per))
+    const at = offset(plan.miniFatStart + Math.floor(m / per)) + 4 * (m % per)
+    file.writeUInt32LE(miniTable[m], at)
   }
-  if (miniSectors) miniStream.copy(file, offset(miniStart))
+  if (plan.miniSectors) plan.miniStream.copy(file, offset(plan.miniStart))
+}
+
+/** A compound file with the streams under its root; streams below 4096 bytes in the mini stream. */
+export function compoundFile(streams: CompoundStream[], options: CompoundOptions = {}): Buffer {
+  const plan = planCompound(streams, options)
+  const { sectorSize: S, per, dirStart, fatStart } = plan
+  const file = Buffer.alloc(S + plan.total * S)
+  const offset = (n: number) => (n + 1) * S
+  const entry = (id: number) =>
+    offset(dirStart + Math.floor(id / (S / 128))) + (id % (S / 128)) * 128
+  writeCompoundTables(file, plan, offset)
+  writeCompoundDirectory(file, plan, streams, entry)
+  writeCompoundData(file, plan, streams, offset)
   options.patch?.(file, {
     sectorSize: S,
     offset,
     fatEntry: (n) => offset(fatStart + Math.floor(n / per)) + 4 * (n % per),
     entry,
-    starts,
+    starts: plan.starts,
   })
   return file
 }

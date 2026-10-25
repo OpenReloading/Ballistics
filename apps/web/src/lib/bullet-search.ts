@@ -112,6 +112,19 @@ export function bulletRelevance(b: BulletRow, query: string): number {
   return base === undefined ? 0 : base + bonus(b, e, typedWords(query))
 }
 
+function inOriginAndFit(b: BulletRow, filters: BulletFilters) {
+  if (filters.origin !== undefined && (filters.origin === 'designs') !== (b.origin === 'user'))
+    return false
+  return filters.fit === undefined || bulletFits(b.diameter, filters.fit)
+}
+
+/** Larger values first, rows without a value last; undefined for equal values. */
+function compareValues(kx: number | null | undefined, ky: number | null | undefined) {
+  if (kx === ky) return
+  if (kx != null && ky != null) return ky - kx
+  return kx == null ? 1 : -1
+}
+
 /**
  * The bullets that pass `filters` and match every typed word, best match first, ties and the other
  * sorts by manufacturer and name; the heaviest or the highest BC first for `mass` and
@@ -128,9 +141,7 @@ export function searchBullets<R extends BulletRow>(
     sort === 'mass' ? b.mass : sort === 'ballisticCoefficient' ? bc(b) : undefined
   return rows
     .flatMap((b) => {
-      if (filters.origin !== undefined && (filters.origin === 'designs') !== (b.origin === 'user'))
-        return []
-      if (filters.fit !== undefined && !bulletFits(b.diameter, filters.fit)) return []
+      if (!inOriginAndFit(b, filters)) return []
       const e = entryOf(b)
       const base = bulletScore(b, e.key, query)
       if (base === undefined || !inFilters(b, filters)) return []
@@ -141,10 +152,10 @@ export function searchBullets<R extends BulletRow>(
       // the browser's own designs come first among equal matches
       if (sort === 'relevance' && (x.b.origin === 'user') !== (y.b.origin === 'user'))
         return x.b.origin === 'user' ? -1 : 1
-      const [kx, ky] = [key(x.b), key(y.b)]
-      if (kx !== ky && kx != null && ky != null) return ky - kx
-      if (kx !== ky && (kx == null || ky == null)) return kx == null ? 1 : -1
-      return compareKeys(x.e.order, y.e.order) || compareKeys(x.b.id, y.b.id)
+      return (
+        compareValues(key(x.b), key(y.b)) ??
+        (compareKeys(x.e.order, y.e.order) || compareKeys(x.b.id, y.b.id))
+      )
     })
     .map((s) => s.b)
 }

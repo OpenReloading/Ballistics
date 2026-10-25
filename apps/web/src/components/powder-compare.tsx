@@ -56,6 +56,159 @@ const columnsFor = (target: boolean) =>
 
 const noFilters: PowderFilters = { manufacturerName: '', base: '', form: '' }
 
+const nextSort = (
+  key: string,
+  dir: 'ascending' | 'descending' | undefined,
+): ColumnSort | undefined => {
+  if (dir === undefined) return { column: key, dir: 'ascending' }
+  return dir === 'ascending' ? { column: key, dir: 'descending' } : undefined
+}
+
+function SortHead({
+  column: c,
+  first,
+  dir,
+  system,
+  onSort,
+}: {
+  column: Column
+  first: boolean
+  dir: 'ascending' | 'descending' | undefined
+  system: UnitSystem
+  onSort: (sort: ColumnSort | undefined) => void
+}) {
+  return (
+    <th
+      scope="col"
+      aria-sort={dir}
+      className={first || c.key === 'flags' ? undefined : 'num'}
+      data-col={c.key}
+    >
+      <UnstyledButton className="sort-button" onClick={() => onSort(nextSort(c.key, dir))}>
+        <span>
+          {c.label}
+          {c.unit && <span className="th-unit"> {system[c.unit].symbol}</span>}
+        </span>
+        {dir && (
+          <span aria-hidden="true" className="sort-mark">
+            {dir === 'ascending' ? (
+              <CaretUp size={12} weight="bold" />
+            ) : (
+              <CaretDown size={12} weight="bold" />
+            )}
+          </span>
+        )}
+      </UnstyledButton>
+    </th>
+  )
+}
+
+/** The case fill of a row; the reason it is unknown is the title. */
+function FillCell({ ratio }: { ratio: number | undefined }) {
+  return (
+    <td
+      data-label="Case fill"
+      className="num"
+      title={ratio === undefined ? 'No bulk density in the record' : undefined}
+    >
+      {ratio === undefined ? (
+        <>
+          <span aria-hidden="true">&ndash;</span>
+          <span className="visually-hidden">unknown</span>
+        </>
+      ) : (
+        `${formatNumber(ratio * 100, 0)} %`
+      )}
+    </td>
+  )
+}
+
+type Values = NonNullable<CompareRow['values']>
+
+/** The cells of a computed row after the charge. */
+function ValueCells({
+  row: r,
+  values,
+  target,
+  system,
+}: {
+  row: CompareRow
+  values: Values
+  target: boolean
+  system: UnitSystem
+}) {
+  return (
+    <>
+      <td data-label="Flags">{r.flag && flagView(r.flag)}</td>
+      {target ? (
+        <td data-label={`Pressure range, ${system.pressure.symbol}`} className="num">
+          {formatQuantity('pressure', system, values.range.low)} to{' '}
+          {formatQuantity('pressure', system, values.range.high)}
+        </td>
+      ) : (
+        <td data-label={`Peak pressure, ${system.pressure.symbol}`} className="num">
+          {formatQuantity('pressure', system, values.peak)}
+        </td>
+      )}
+      <td data-label="Percent of maximum" className="num">
+        {values.percent === undefined ? 'no limit' : `${formatNumber(values.percent, 0)} %`}
+      </td>
+      <td data-label={`Muzzle velocity, ${system.velocity.symbol}`} className="num">
+        {formatQuantity('velocity', system, values.velocity)}
+      </td>
+      <FillCell ratio={r.ratio} />
+      <td data-label="Burnt at the muzzle" className="num">
+        {formatNumber(values.burnt * 100, 0)} %
+      </td>
+      <td data-label="Burnout" className="num">
+        {values.burnout === undefined ? 'none' : shownLength('travel', system, values.burnout)}
+      </td>
+    </>
+  )
+}
+
+function PowderRow({
+  row: r,
+  current,
+  target,
+  percent,
+  system,
+  onOpen,
+}: {
+  row: CompareRow
+  current: string | undefined
+  target: boolean
+  percent: boolean
+  system: UnitSystem
+  onOpen: (row: CompareRow) => void
+}) {
+  return (
+    <tr aria-current={r.id === current ? 'true' : undefined}>
+      <td data-label="Powder">
+        <UnstyledButton
+          className="powder-open"
+          title="Use this powder in the workbench"
+          onClick={() => onOpen(r)}
+        >
+          {productLabel(r)}
+        </UnstyledButton>
+        {r.id === current && <span className="barrel-current"> current</span>}
+      </td>
+      <td data-label={`Charge, ${system.charge.symbol}`} className="num">
+        {r.charge !== undefined && formatQuantity('charge', system, r.charge)}
+      </td>
+      {r.values ? (
+        <ValueCells row={r} values={r.values} target={target} system={system} />
+      ) : (
+        <td data-label="Result" colSpan={columns.length - 2}>
+          Not computed:{' '}
+          {r.refusal ? refusalText(r.refusal, 'peakPressure', system, percent) : r.reason}
+        </td>
+      )}
+    </tr>
+  )
+}
+
 /** The rows as a sortable table; the powder's name opens it in the workbench. */
 const Rows = memo(function Rows({
   rows,
@@ -84,114 +237,29 @@ const Rows = memo(function Rows({
           <caption className="visually-hidden">Powders for this load (simulation)</caption>
           <thead>
             <tr>
-              {columnsFor(target).map((c, i) => {
-                const dir = sort?.column === c.key ? sort.dir : undefined
-                return (
-                  <th
-                    key={c.key}
-                    scope="col"
-                    aria-sort={dir}
-                    className={i === 0 || c.key === 'flags' ? undefined : 'num'}
-                    data-col={c.key}
-                  >
-                    <UnstyledButton
-                      className="sort-button"
-                      onClick={() =>
-                        onSort(
-                          dir === undefined
-                            ? { column: c.key, dir: 'ascending' }
-                            : dir === 'ascending'
-                              ? { column: c.key, dir: 'descending' }
-                              : undefined,
-                        )
-                      }
-                    >
-                      <span>
-                        {c.label}
-                        {c.unit && <span className="th-unit"> {system[c.unit].symbol}</span>}
-                      </span>
-                      {dir && (
-                        <span aria-hidden="true" className="sort-mark">
-                          {dir === 'ascending' ? (
-                            <CaretUp size={12} weight="bold" />
-                          ) : (
-                            <CaretDown size={12} weight="bold" />
-                          )}
-                        </span>
-                      )}
-                    </UnstyledButton>
-                  </th>
-                )
-              })}
+              {columnsFor(target).map((c, i) => (
+                <SortHead
+                  key={c.key}
+                  column={c}
+                  first={i === 0}
+                  dir={sort?.column === c.key ? sort.dir : undefined}
+                  system={system}
+                  onSort={onSort}
+                />
+              ))}
             </tr>
           </thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={r.id} aria-current={r.id === current ? 'true' : undefined}>
-                <td data-label="Powder">
-                  <UnstyledButton
-                    className="powder-open"
-                    title="Use this powder in the workbench"
-                    onClick={() => onOpen(r)}
-                  >
-                    {productLabel(r)}
-                  </UnstyledButton>
-                  {r.id === current && <span className="barrel-current"> current</span>}
-                </td>
-                <td data-label={`Charge, ${system.charge.symbol}`} className="num">
-                  {r.charge !== undefined && formatQuantity('charge', system, r.charge)}
-                </td>
-                {r.values ? (
-                  <>
-                    <td data-label="Flags">{r.flag && flagView(r.flag)}</td>
-                    {target ? (
-                      <td data-label={`Pressure range, ${system.pressure.symbol}`} className="num">
-                        {formatQuantity('pressure', system, r.values.range.low)} to{' '}
-                        {formatQuantity('pressure', system, r.values.range.high)}
-                      </td>
-                    ) : (
-                      <td data-label={`Peak pressure, ${system.pressure.symbol}`} className="num">
-                        {formatQuantity('pressure', system, r.values.peak)}
-                      </td>
-                    )}
-                    <td data-label="Percent of maximum" className="num">
-                      {r.values.percent === undefined
-                        ? 'no limit'
-                        : `${formatNumber(r.values.percent, 0)} %`}
-                    </td>
-                    <td data-label={`Muzzle velocity, ${system.velocity.symbol}`} className="num">
-                      {formatQuantity('velocity', system, r.values.velocity)}
-                    </td>
-                    <td
-                      data-label="Case fill"
-                      className="num"
-                      title={r.ratio === undefined ? 'No bulk density in the record' : undefined}
-                    >
-                      {r.ratio === undefined ? (
-                        <>
-                          <span aria-hidden="true">&ndash;</span>
-                          <span className="visually-hidden">unknown</span>
-                        </>
-                      ) : (
-                        `${formatNumber(r.ratio * 100, 0)} %`
-                      )}
-                    </td>
-                    <td data-label="Burnt at the muzzle" className="num">
-                      {formatNumber(r.values.burnt * 100, 0)} %
-                    </td>
-                    <td data-label="Burnout" className="num">
-                      {r.values.burnout === undefined
-                        ? 'none'
-                        : shownLength('travel', system, r.values.burnout)}
-                    </td>
-                  </>
-                ) : (
-                  <td data-label="Result" colSpan={columns.length - 2}>
-                    Not computed:{' '}
-                    {r.refusal ? refusalText(r.refusal, 'peakPressure', system, percent) : r.reason}
-                  </td>
-                )}
-              </tr>
+              <PowderRow
+                key={r.id}
+                row={r}
+                current={current}
+                target={target}
+                percent={percent}
+                system={system}
+                onOpen={onOpen}
+              />
             ))}
           </tbody>
         </table>,
@@ -199,6 +267,160 @@ const Rows = memo(function Rows({
     </ScrollRegion>
   )
 })
+
+const isFillValid = (fill: number | string) =>
+  typeof fill === 'number' && fill >= caseFillPercentRange.min && fill <= caseFillPercentRange.max
+
+const isFiltering = (f: PowderFilters) => Boolean(f.manufacturerName || f.base || f.form)
+
+/** The mode the chosen charge kind and its valid value give; the typed charge otherwise. */
+function modeOf(
+  kind: CompareMode['kind'],
+  fill: number | undefined,
+  target: number | undefined,
+  percent: boolean,
+): CompareMode {
+  if (kind === 'fill' && fill !== undefined) return { kind, fill }
+  if (kind === 'target' && target !== undefined) return { kind, value: target, percent }
+  return { kind: 'typed' }
+}
+
+const modeValid = (kind: CompareMode['kind'], fillValid: boolean, targetValid: boolean) =>
+  (kind !== 'fill' || fillValid) && (kind !== 'target' || targetValid)
+
+/** The rows were computed for another load or charge than the fields hold now. */
+function isStale(
+  loadRequest: ReturnType<typeof useLoad>['loadRequest'],
+  mode: CompareMode,
+  key: string | undefined,
+  running: boolean,
+) {
+  if (key === undefined || running) return false
+  try {
+    const now = loadRequest()
+    return compareKey(now.body, mode, now.recordInputs) !== key
+  } catch {
+    return true
+  }
+}
+
+/** The status line: the progress or the count, the message, the target's reason, staleness and the standing notice. */
+function statusText(o: {
+  running: boolean
+  progress: { done: number; total: number } | undefined
+  shown: number
+  total: number
+  failed: number
+  message: string | undefined
+  targetShown: string | undefined
+  stale: boolean
+}) {
+  let head: string | undefined
+  if (o.running && o.progress) head = `Computing ${o.progress.done} of ${o.progress.total} powders`
+  else if (o.total > 0) {
+    const count = o.shown === o.total ? o.total : `${o.shown} of ${o.total}`
+    head = `${count} powders, ${o.failed} not computed`
+  }
+  const parts = [
+    head,
+    o.message,
+    o.targetShown,
+    o.stale ? 'Inputs changed since these rows' : undefined,
+    'Simulation, not load data. A row is no recommendation',
+  ].filter(Boolean)
+  return `${parts.map((p) => p?.replace(/\.$/, '')).join('. ')}.`
+}
+
+/** Whether the row's charge is not the typed one (to a part in a billion). */
+const differsFrom = (typed: number | undefined, charge: number) =>
+  typed === undefined || Math.abs(typed - charge) > 1e-9 * charge
+
+function FilterSelect({
+  label,
+  searchable,
+  data,
+  value,
+  onChange,
+}: {
+  label: string
+  searchable: boolean
+  data: string[]
+  value: string
+  onChange: (value: string) => void
+}) {
+  return (
+    <Select
+      aria-label={label}
+      placeholder={label}
+      size={controlSize.row.input}
+      searchable={searchable}
+      clearable
+      disabled={data.length === 0}
+      data={data}
+      value={value || null}
+      onChange={(v) => onChange(v ?? '')}
+    />
+  )
+}
+
+/** The charge value: the target pressure for a target, else the case fill (disabled for a typed charge). */
+function ChargeInput({
+  kind,
+  unit,
+  targetShown,
+  targetText,
+  onTargetText,
+  onTargetLeft,
+  fill,
+  onFill,
+  fillValid,
+}: {
+  kind: CompareMode['kind']
+  unit: ReturnType<typeof targetUnit>
+  targetShown: string | undefined
+  targetText: number | string
+  onTargetText: (v: number | string) => void
+  onTargetLeft: () => void
+  fill: number | string
+  onFill: (v: number | string) => void
+  fillValid: boolean
+}) {
+  if (kind === 'target')
+    return (
+      <NumberInput
+        size={controlSize.row.input}
+        aria-label="Target peak pressure"
+        suffix={` ${unit.symbol}`}
+        hideControls
+        allowNegative={false}
+        decimalScale={unit.decimals}
+        // the reason stands in the status line, which does not move the controls: the field keeps it as its description
+        error={targetShown}
+        classNames={{ error: 'field-error-elsewhere' }}
+        styles={{ wrapper: { marginBottom: 0 } }}
+        title={targetShown}
+        value={targetText}
+        onChange={onTargetText}
+        onBlur={onTargetLeft}
+      />
+    )
+  return (
+    <NumberInput
+      size={controlSize.row.input}
+      aria-label="Case fill"
+      suffix=" %"
+      min={caseFillPercentRange.min}
+      max={caseFillPercentRange.max}
+      step={5}
+      allowNegative={false}
+      clampBehavior="none"
+      disabled={kind !== 'fill'}
+      error={kind === 'fill' && !fillValid}
+      value={fill}
+      onChange={onFill}
+    />
+  )
+}
 
 /**
  * The Powders tab: every powder with model parameters for the load of the workbench. Nothing runs
@@ -208,8 +430,7 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
   const { loadRequest, powder, choosePowder, applyCharge, fields, cartridge } = useLoad()
   const [kind, setKind] = useState<CompareMode['kind']>('typed')
   const [fill, setFill] = useState<number | string>(caseFillPercentRange.initial)
-  const fillValid =
-    typeof fill === 'number' && fill >= caseFillPercentRange.min && fill <= caseFillPercentRange.max
+  const fillValid = isFillValid(fill)
   // the target of the charge target dialog: a peak pressure, or a share of the cartridge's CIP Pmax
   const [targetText, setTargetText] = useState<number | string>('')
   const [percent, setPercent] = useState(false)
@@ -220,17 +441,16 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
   const targetReason = targetError(targetText, unit)
   const targetValid = targetReason === undefined
   const targetShown = targetText !== '' || targetLeft ? targetReason : undefined
-  const mode: CompareMode =
-    kind === 'fill' && fillValid
-      ? { kind, fill: (fill as number) / 100 }
-      : kind === 'target' && targetValid
-        ? { kind, value: unit.toSi(targetNumber(targetText)), percent: asPercent }
-        : { kind: 'typed' }
+  const mode = modeOf(
+    kind,
+    fillValid ? (fill as number) / 100 : undefined,
+    targetValid ? unit.toSi(targetNumber(targetText)) : undefined,
+    asPercent,
+  )
   const study = usePowderCompare(loadRequest, mode)
   const [filters, setFilters] = useState(noFilters)
   // Compute empties the rows and with them the facets the filters name
-  if (study.rows.length === 0 && (filters.manufacturerName || filters.base || filters.form))
-    setFilters(noFilters)
+  if (study.rows.length === 0 && isFiltering(filters)) setFilters(noFilters)
   const [sort, setSort] = useState<ColumnSort | undefined>()
   // the columns follow the mode the rows were computed for, not the one chosen since
   const target = study.mode?.kind === 'target'
@@ -253,52 +473,36 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
   const failed = study.rows.filter((r) => !r.values).length
   // the rows were computed for another load or charge than the fields hold now
   // `loadRequest` is a new function on each change of the load, so filter and sort changes skip it
-  const stale = useMemo(() => {
-    if (study.key === undefined || running) return false
-    try {
-      const now = loadRequest()
-      return compareKey(now.body, mode, now.recordInputs) !== study.key
-    } catch {
-      return true
-    }
-  }, [loadRequest, mode, study.key, running])
-  const parts = [
-    running && progress
-      ? `Computing ${progress.done} of ${progress.total} powders`
-      : study.rows.length > 0
-        ? `${shown.length === study.rows.length ? study.rows.length : `${shown.length} of ${study.rows.length}`} powders, ${failed} not computed`
-        : undefined,
+  const stale = useMemo(
+    () => isStale(loadRequest, mode, study.key, running),
+    [loadRequest, mode, study.key, running],
+  )
+  const text = statusText({
+    running,
+    progress,
+    shown: shown.length,
+    total: study.rows.length,
+    failed,
     message,
     targetShown,
-    stale ? 'Inputs changed since these rows' : undefined,
-    'Simulation, not load data. A row is no recommendation',
-  ].filter(Boolean)
-  const text = `${parts.map((p) => p?.replace(/\.$/, '')).join('. ')}.`
+    stale,
+  })
   const open = (r: CompareRow) => {
     choosePowder(r.id)
     // the row's values are for its charge: a case fill row sets it too
-    const typed = fields.charge?.si
-    if (
-      r.charge !== undefined &&
-      (typed === undefined || Math.abs(typed - r.charge) > 1e-9 * r.charge)
-    )
-      applyCharge(r.charge)
+    if (r.charge !== undefined && differsFrom(fields.charge?.si, r.charge)) applyCharge(r.charge)
   }
   // the table is memoized: the handler it holds does not change with the fields
   const latest = useRef(open)
   latest.current = open
   const onOpen = useCallback((r: CompareRow) => latest.current(r), [])
   const select = (key: keyof PowderFilters, label: string, data: string[]) => (
-    <Select
-      aria-label={label}
-      placeholder={label}
-      size={controlSize.row.input}
+    <FilterSelect
+      label={label}
       searchable={key === 'manufacturerName'}
-      clearable
-      disabled={data.length === 0}
       data={data}
-      value={filters[key] || null}
-      onChange={(v) => setFilters((f) => ({ ...f, [key]: v ?? '' }))}
+      value={filters[key]}
+      onChange={(v) => setFilters((f) => ({ ...f, [key]: v }))}
     />
   )
   return (
@@ -315,39 +519,17 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
           value={kind}
           onChange={(v) => setKind(v as CompareMode['kind'])}
         />
-        {kind === 'target' ? (
-          <NumberInput
-            size={controlSize.row.input}
-            aria-label="Target peak pressure"
-            suffix={` ${unit.symbol}`}
-            hideControls
-            allowNegative={false}
-            decimalScale={unit.decimals}
-            // the reason stands in the status line, which does not move the controls: the field keeps it as its description
-            error={targetShown}
-            classNames={{ error: 'field-error-elsewhere' }}
-            styles={{ wrapper: { marginBottom: 0 } }}
-            title={targetShown}
-            value={targetText}
-            onChange={setTargetText}
-            onBlur={() => setTargetLeft(true)}
-          />
-        ) : (
-          <NumberInput
-            size={controlSize.row.input}
-            aria-label="Case fill"
-            suffix=" %"
-            min={caseFillPercentRange.min}
-            max={caseFillPercentRange.max}
-            step={5}
-            allowNegative={false}
-            clampBehavior="none"
-            disabled={kind !== 'fill'}
-            error={kind === 'fill' && !fillValid}
-            value={fill}
-            onChange={setFill}
-          />
-        )}
+        <ChargeInput
+          kind={kind}
+          unit={unit}
+          targetShown={targetShown}
+          targetText={targetText}
+          onTargetText={setTargetText}
+          onTargetLeft={() => setTargetLeft(true)}
+          fill={fill}
+          onFill={setFill}
+          fillValid={fillValid}
+        />
         <Button
           size={controlSize.row.button}
           variant="default"
@@ -365,9 +547,7 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
         <Button
           size={controlSize.row.button}
           variant={running ? 'default' : 'filled'}
-          disabled={
-            !running && ((kind === 'fill' && !fillValid) || (kind === 'target' && !targetValid))
-          }
+          disabled={!running && !modeValid(kind, fillValid, targetValid)}
           onClick={running ? study.cancel : study.compute}
         >
           {running ? 'Cancel' : 'Compute'}

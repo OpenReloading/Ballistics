@@ -3,12 +3,12 @@
 import { ActionIcon, Button, Popover } from '@mantine/core'
 import { Info } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
-import { formatNumber, formatQuantity, withUnit } from '../lib/units.ts'
+import { formatNumber, formatQuantity, type UnitSystem, withUnit } from '../lib/units.ts'
 import { bandLine, rangeCardNote, rangeHero, resultBand } from '../lib/workbench.ts'
 import { AppPopover, popoverWidth } from './app-popover.tsx'
 import { printRangeCard } from './range-card.tsx'
 import { useInputEcho, useLoad, useResult } from './workbench-context.ts'
-import { derived, selectedLabel } from './workbench-outcome.ts'
+import { derived, type Outcome, selectedLabel } from './workbench-outcome.ts'
 import { peakFacts } from './workbench-readouts.tsx'
 import { Measurements, measuredSteps, ShownStrip } from './workbench-results.tsx'
 
@@ -23,6 +23,66 @@ function useRangeCard() {
     return () => observer.disconnect()
   }, [])
   return ready
+}
+
+/** Whether 2 s passed since the run: the card follows a run after the trajectory's 150 ms delay. */
+function useWaited(runId: number | undefined) {
+  const [waited, setWaited] = useState(false)
+  useEffect(() => {
+    setWaited(false)
+    if (runId === undefined) return
+    const timer = setTimeout(() => setWaited(true), 2000)
+    return () => clearTimeout(timer)
+  }, [runId])
+  return waited
+}
+
+/** The peak pressure with its share of the limit and the help a tap reaches. */
+function PeakPressure({
+  ok,
+  system,
+}: {
+  ok: Extract<Outcome, { kind: 'ok' }>
+  system: UnitSystem
+}) {
+  const ofMax = derived(ok).ofMax
+  const p = (pa: number) => withUnit('pressure', system, pa)
+  return (
+    <>
+      <dl>
+        <div>
+          <dt>Peak pressure</dt>
+          <dd>{p(ok.body.pressureRange.nominalPressure)}</dd>
+          <dd className="readout-note">
+            <span className="visually-hidden">
+              {resultBand(ok.body).sampled ? '5th to 95th percentile ' : 'range '}
+            </span>
+            {formatQuantity('pressure', system, resultBand(ok.body).pressure.low)} to{' '}
+            {p(resultBand(ok.body).pressure.high)}
+          </dd>
+        </div>
+        {ofMax?.limit.pressure && (
+          <div>
+            <dt>Percent of maximum</dt>
+            <dd>{formatNumber(ofMax.percent, 0)} %</dd>
+            <dd className="readout-note">
+              of CIP {ofMax.limit.symbol} {p(ofMax.limit.pressure)}
+            </dd>
+          </div>
+        )}
+      </dl>
+      <AppPopover position="bottom-end" width={popoverWidth.help} trapFocus>
+        <Popover.Target>
+          <ActionIcon variant="subtle" size={44} aria-label="About the peak pressure">
+            <Info size={24} aria-hidden="true" />
+          </ActionIcon>
+        </Popover.Target>
+        <Popover.Dropdown>
+          <p className="range-help">{peakFacts(ok, system)}</p>
+        </Popover.Dropdown>
+      </AppPopover>
+    </>
+  )
 }
 
 /**
@@ -40,14 +100,7 @@ export function RangeView() {
   const card = useRangeCard()
   // the range card is the Trajectory tab's result: mounting the tab (hidden) computes it
   const runId = ok?.id
-  // the card follows a run after the trajectory's 150 ms delay: a reason is named after a pause
-  const [waited, setWaited] = useState(false)
-  useEffect(() => {
-    setWaited(false)
-    if (runId === undefined) return
-    const timer = setTimeout(() => setWaited(true), 2000)
-    return () => clearTimeout(timer)
-  }, [runId])
+  const waited = useWaited(runId)
   useEffect(() => {
     if (runId !== undefined)
       setSeen((s) => (s.has('trajectory') ? s : new Set([...s, 'trajectory'])))
@@ -60,8 +113,6 @@ export function RangeView() {
       ok.body.result.muzzleVelocity,
       ok.steps.length > 1 ? selectedLabel(ok) : undefined,
     )
-  const ofMax = ok && derived(ok).ofMax
-  const p = (pa: number) => withUnit('pressure', system, pa)
   return (
     <section className="range-view" aria-label="Range">
       {/* always there, so a run moves nothing */}
@@ -80,44 +131,7 @@ export function RangeView() {
         </div>
       </dl>
       <ShownStrip name="range-step" />
-      <div className="range-peak">
-        {ok && (
-          <>
-            <dl>
-              <div>
-                <dt>Peak pressure</dt>
-                <dd>{p(ok.body.pressureRange.nominalPressure)}</dd>
-                <dd className="readout-note">
-                  <span className="visually-hidden">
-                    {resultBand(ok.body).sampled ? '5th to 95th percentile ' : 'range '}
-                  </span>
-                  {formatQuantity('pressure', system, resultBand(ok.body).pressure.low)} to{' '}
-                  {p(resultBand(ok.body).pressure.high)}
-                </dd>
-              </div>
-              {ofMax?.limit.pressure && (
-                <div>
-                  <dt>Percent of maximum</dt>
-                  <dd>{formatNumber(ofMax.percent, 0)} %</dd>
-                  <dd className="readout-note">
-                    of CIP {ofMax.limit.symbol} {p(ofMax.limit.pressure)}
-                  </dd>
-                </div>
-              )}
-            </dl>
-            <AppPopover position="bottom-end" width={popoverWidth.help} trapFocus>
-              <Popover.Target>
-                <ActionIcon variant="subtle" size={44} aria-label="About the peak pressure">
-                  <Info size={24} aria-hidden="true" />
-                </ActionIcon>
-              </Popover.Target>
-              <Popover.Dropdown>
-                <p className="range-help">{peakFacts(ok, system)}</p>
-              </Popover.Dropdown>
-            </AppPopover>
-          </>
-        )}
-      </div>
+      <div className="range-peak">{ok && <PeakPressure ok={ok} system={system} />}</div>
       {ok && bandLine(ok.body, system) && (
         <p className="range-needs band-line screen-only">{bandLine(ok.body, system)}</p>
       )}

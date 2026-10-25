@@ -10,7 +10,7 @@ import {
   useCombobox,
 } from '@mantine/core'
 import { ListMagnifyingGlass, MagnifyingGlass } from '@phosphor-icons/react'
-import { useEffect, useRef, useState } from 'react'
+import { type ReactNode, useEffect, useRef, useState } from 'react'
 import { apiFetch } from '../lib/api-fetch.ts'
 import type { ListOf } from '../lib/api-types.ts'
 
@@ -33,6 +33,61 @@ export async function searchRecords<T>(
   })
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
   return (await res.json()) as ListOf<T>
+}
+
+/** The matches of the typed text: from `find`, else the API; a first key that finds nothing stays quiet. */
+async function matches<T>(
+  kind: 'bullets' | 'cartridges' | 'powders',
+  text: string,
+  params: string,
+  find: ((text: string, limit: number) => Promise<ListOf<T>>) | undefined,
+  signal: AbortSignal,
+): Promise<State<T>> {
+  const body = await (find?.(text, 20) ?? searchRecords<T>(kind, text, 20, params, signal))
+  if (text.length < 2 && body.items.length === 0) return { status: 'idle' }
+  return { status: 'ok', items: body.items, total: body.total }
+}
+
+/** The status line under the field: what the search is doing or found. */
+function statusLine<T>(state: State<T>, typed: boolean, noneText: string, unreachableText: string) {
+  if (state.status === 'loading') return 'Searching'
+  if (state.status === 'error') return unreachableText
+  if (state.status !== 'ok' || !typed) return ''
+  if (state.items.length === 0) return noneText
+  const cut = state.total > state.items.length ? `, first ${state.items.length} shown` : ''
+  return `${state.total} found${cut}`
+}
+
+/** The end of the field: the browse button, else the loader, else the select's chevron. */
+function endSection({
+  loading,
+  browse,
+  chevron,
+  size,
+  onBrowse,
+}: {
+  loading: boolean
+  browse: { label: string } | undefined
+  chevron: boolean
+  size: TextInputProps['size']
+  onBrowse: () => void
+}): ReactNode {
+  if (browse)
+    return (
+      <Group gap={4} wrap="nowrap">
+        {loading && <Loader size="xs" />}
+        <ActionIcon
+          variant="subtle"
+          size={size === 'xs' ? 'input-xs' : 'input-sm'}
+          aria-label={browse.label}
+          onClick={onBrowse}
+        >
+          <ListMagnifyingGlass size={16} aria-hidden="true" />
+        </ActionIcon>
+      </Group>
+    )
+  if (loading) return <Loader size="xs" />
+  return chevron ? <Combobox.Chevron /> : undefined
 }
 
 /**
@@ -107,14 +162,8 @@ export function RecordSearch<T extends { id: string }>({
         // a first key lists what `find` has for it; with nothing, the field stays quiet
         if (text.length >= 2) setState({ status: 'loading' })
         try {
-          const body = await (find?.(text, 20) ??
-            searchRecords<T>(kind, text, 20, params, controller.signal))
-          if (!controller.signal.aborted)
-            setState(
-              text.length < 2 && body.items.length === 0
-                ? { status: 'idle' }
-                : { status: 'ok', items: body.items, total: body.total },
-            )
+          const next = await matches<T>(kind, text, params, find, controller.signal)
+          if (!controller.signal.aborted) setState(next)
         } catch {
           if (!controller.signal.aborted) setState({ status: 'error' })
         }
@@ -130,14 +179,7 @@ export function RecordSearch<T extends { id: string }>({
   const items = state.status === 'ok' ? state.items : []
   const typed = q.trim().toLowerCase()
   const local = extra.filter((e) => e.label.toLowerCase().includes(typed))
-  let message = ''
-  if (state.status === 'loading') message = 'Searching'
-  else if (state.status === 'error') message = unreachableText
-  else if (state.status === 'ok' && q.trim() !== '')
-    message =
-      items.length === 0
-        ? noneText
-        : `${state.total} found${state.total > items.length ? `, first ${items.length} shown` : ''}`
+  const message = statusLine(state, q.trim() !== '', noneText, unreachableText)
 
   const submit = (id: string) => {
     if (id.startsWith('extra:')) onExtra?.(id.slice('extra:'.length))
@@ -164,29 +206,17 @@ export function RecordSearch<T extends { id: string }>({
             }
             autoComplete="off"
             value={q}
-            rightSection={
-              browse ? (
-                <Group gap={4} wrap="nowrap">
-                  {state.status === 'loading' && <Loader size="xs" />}
-                  <ActionIcon
-                    variant="subtle"
-                    size={size === 'xs' ? 'input-xs' : 'input-sm'}
-                    aria-label={browse.label}
-                    onClick={() => {
-                      // the typed text moves into the dialog
-                      browse.onOpen(q)
-                      setQ('')
-                    }}
-                  >
-                    <ListMagnifyingGlass size={16} aria-hidden="true" />
-                  </ActionIcon>
-                </Group>
-              ) : state.status === 'loading' ? (
-                <Loader size="xs" />
-              ) : chevron ? (
-                <Combobox.Chevron />
-              ) : undefined
-            }
+            rightSection={endSection({
+              loading: state.status === 'loading',
+              browse,
+              chevron,
+              size,
+              onBrowse: () => {
+                // the typed text moves into the dialog
+                browse?.onOpen(q)
+                setQ('')
+              },
+            })}
             rightSectionPointerEvents={browse ? 'all' : 'none'}
             onChange={(e) => {
               setQ(e.currentTarget.value)

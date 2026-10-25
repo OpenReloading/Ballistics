@@ -129,26 +129,33 @@ export function firearmProblem(name: string, f: Firearm): string | undefined {
   if (!name) return 'Enter a name.'
   const [issue] = firearmIssues(f)
   if (!issue) return
-  const [list, i, , j] = issue.path
-  let where = ''
-  if (typeof i === 'number' && list === 'optics')
-    where = ` in optic ${f.optics[i].name || f.optics[i].id}`
-  if (typeof i === 'number' && list === 'configurations') {
-    const c = f.configurations[i]
-    where = ` in configuration ${c.name || c.id}${typeof j === 'number' ? `, mount ${j + 1}` : ''}`
-  }
   // a stored quantity is `{ value }`: the field is the key above it
   const field = String(issue.path.findLast((p) => typeof p === 'string' && p !== 'value'))
-  let reason = 'not valid'
-  if (issue.code === 'custom') reason = issue.message[0].toLowerCase() + issue.message.slice(1)
-  else if (issue.code === 'too_small' && field === 'zeroTemperature')
-    reason = 'must be above absolute zero'
-  else if (issue.code === 'too_small' && issue.origin === 'number')
-    reason = `must be ${issue.inclusive ? 'at least' : 'greater than'} ${issue.minimum}`
-  else if (issue.code === 'too_big' && field === 'zeroHumidity') reason = 'must be from 0 to 100 %'
-  else if (issue.code === 'invalid_type')
-    reason = issue.expected === 'int' ? 'must be a whole number' : 'enter a number'
-  return `${labels[field] ?? field}${where}: ${reason}.`
+  return `${labels[field] ?? field}${issueWhere(f, issue.path)}: ${issueReason(issue, field)}.`
+}
+
+type FirearmIssue = ReturnType<typeof firearmIssues>[number]
+
+/** Where in the record an issue is: the optic or configuration (and mount) it names, else nothing. */
+function issueWhere(f: Firearm, path: FirearmIssue['path']): string {
+  const [list, i, , j] = path
+  if (typeof i !== 'number') return ''
+  if (list === 'optics') return ` in optic ${f.optics[i].name || f.optics[i].id}`
+  if (list !== 'configurations') return ''
+  const c = f.configurations[i]
+  return ` in configuration ${c.name || c.id}${typeof j === 'number' ? `, mount ${j + 1}` : ''}`
+}
+
+function issueReason(issue: FirearmIssue, field: string): string {
+  if (issue.code === 'custom') return issue.message[0].toLowerCase() + issue.message.slice(1)
+  if (issue.code === 'too_small' && field === 'zeroTemperature')
+    return 'must be above absolute zero'
+  if (issue.code === 'too_small' && issue.origin === 'number')
+    return `must be ${issue.inclusive ? 'at least' : 'greater than'} ${issue.minimum}`
+  if (issue.code === 'too_big' && field === 'zeroHumidity') return 'must be from 0 to 100 %'
+  if (issue.code === 'invalid_type')
+    return issue.expected === 'int' ? 'must be a whole number' : 'enter a number'
+  return 'not valid'
 }
 
 /** A stored quantity in SI, undefined without one. */

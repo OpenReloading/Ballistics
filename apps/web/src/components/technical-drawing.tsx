@@ -165,6 +165,92 @@ function reserved(
   return { minWidth: width, minHeight: `calc(${width} * ${aspect.toFixed(4)})` }
 }
 
+/** The outlines each drawn once, for the filled, stroked and clipped uses. */
+function DrawingDefs({ id, model }: { id: string; model: FigureModel | BulletModel }) {
+  const cartridge = 'cartridge' in model ? model.cartridge : undefined
+  const chamber = 'chamber' in model ? model.chamber : undefined
+  const bullet = 'bullet' in model ? model.bullet : undefined
+  return (
+    <defs>
+      {cartridge && (
+        <>
+          <path id={`${id}-c`} d={cartridge.section} />
+          <clipPath id={`${id}-cartridge`}>
+            <use href={`#${id}-c`} />
+          </clipPath>
+        </>
+      )}
+      {bullet && (
+        <>
+          <path id={`${id}-b`} d={bullet.section} />
+          <clipPath id={`${id}-bullet`}>
+            <use href={`#${id}-b`} />
+          </clipPath>
+        </>
+      )}
+      {chamber && (
+        <>
+          <path id={`${id}-s`} d={chamber.steel} />
+          <path id={`${id}-v`} d={chamber.cavity} />
+          <clipPath id={`${id}-steel`}>
+            <use href={`#${id}-s`} />
+          </clipPath>
+          <clipPath id={`${id}-cavity`}>
+            <use href={`#${id}-v`} />
+          </clipPath>
+        </>
+      )}
+    </defs>
+  )
+}
+
+/** The parts of the figure: the chamber, the cartridge or the bullet section. */
+function DrawingParts({ id, model }: { id: string; model: FigureModel | BulletModel }) {
+  const cartridge = 'cartridge' in model ? model.cartridge : undefined
+  const chamber = 'chamber' in model ? model.chamber : undefined
+  const bullet = 'bullet' in model ? model.bullet : undefined
+  const axis: Partial<Record<Side | 'bullet', [number, number]>> = model.axis
+  const clip = (name: string) => `url(#${id}-${name})`
+  return (
+    <>
+      {chamber && (
+        <g className="part part-chamber">
+          <use className="steel" href={`#${id}-s`} />
+          <use className="gap" href={`#${id}-v`} />
+          <path className="edge" d={chamber.edges} clipPath={clip('cavity')} />
+          {/* drawn twice as wide and cut to the steel: the inner edge is the chamber size */}
+          <path className="outline" d={chamber.outline} clipPath={clip('steel')} />
+          <path className="thin" d={chamber.breaks} />
+          {chamber.face && <path className="head-face" d={chamber.face} />}
+          <Axis at={axis.chamber} />
+        </g>
+      )}
+      {cartridge && (
+        <g className="part part-cartridge">
+          <use className="section" href={`#${id}-c`} />
+          <path className="edge" d={cartridge.edges} clipPath={clip('cartridge')} />
+          <use className="outline" href={`#${id}-c`} clipPath={clip('cartridge')} />
+          <Axis at={axis.cartridge} />
+        </g>
+      )}
+      {bullet && (
+        <g className="part part-bullet">
+          <use className="section" href={`#${id}-b`} />
+          <path className="edge" d={bullet.edges} clipPath={clip('bullet')} />
+          {/* drawn twice as wide and cut to the section; assumed parts dashed */}
+          <path className="outline" d={bullet.outline} clipPath={clip('bullet')} />
+          <path className="outline approx" d={bullet.approximate} clipPath={clip('bullet')} />
+          <Axis at={axis.bullet} />
+        </g>
+      )}
+      {/* Combined: the chamber outline again, over the filled cartridge section */}
+      {chamber && cartridge && (
+        <path className="outline part-chamber-over" d={chamber.outline} clipPath={clip('steel')} />
+      )}
+    </>
+  )
+}
+
 /**
  * One SVG of a figure, server-rendered: the chamber in its steel band (with the gap shown in the
  * Combined view), the cartridge section, or the bullet section with its assumed parts dashed, the
@@ -207,16 +293,11 @@ export function TechnicalDrawing({
   level?: boolean
 }) {
   const { medium, em, frame, scale } = model
-  const cartridge = 'cartridge' in model ? model.cartridge : undefined
-  const chamber = 'chamber' in model ? model.chamber : undefined
-  const bullet = 'bullet' in model ? model.bullet : undefined
-  const axis: Partial<Record<Side | 'bullet', [number, number]>> = model.axis
   const layers: Partial<Record<Side | 'combined' | 'bullet', Layout>> = model.layers
   const print = (medium === 'print' && !level) || printScale !== undefined
   const turn = medium === 'print' ? 0 : -90
   const k = printScale ?? 1
   const [x, y, w, h] = frame
-  const clip = (name: string) => `url(#${id}-${name})`
   return (
     <svg
       className={`drawing ${drawingFont.variable} ${print ? 'drawing-print print-only' : 'screen-only'}`}
@@ -238,76 +319,10 @@ export function TechnicalDrawing({
       <title id={`${id}-title`}>{title}</title>
       {desc !== undefined && <desc id={`${id}-desc`}>{desc}</desc>}
       {/* each outline once: filled, stroked and clipped through <use> */}
-      <defs>
-        {cartridge && (
-          <>
-            <path id={`${id}-c`} d={cartridge.section} />
-            <clipPath id={`${id}-cartridge`}>
-              <use href={`#${id}-c`} />
-            </clipPath>
-          </>
-        )}
-        {bullet && (
-          <>
-            <path id={`${id}-b`} d={bullet.section} />
-            <clipPath id={`${id}-bullet`}>
-              <use href={`#${id}-b`} />
-            </clipPath>
-          </>
-        )}
-        {chamber && (
-          <>
-            <path id={`${id}-s`} d={chamber.steel} />
-            <path id={`${id}-v`} d={chamber.cavity} />
-            <clipPath id={`${id}-steel`}>
-              <use href={`#${id}-s`} />
-            </clipPath>
-            <clipPath id={`${id}-cavity`}>
-              <use href={`#${id}-v`} />
-            </clipPath>
-          </>
-        )}
-      </defs>
+      <DrawingDefs id={id} model={model} />
       <g transform={`scale(${unit})`}>
         <g transform={turn ? `rotate(${turn})` : undefined}>
-          {chamber && (
-            <g className="part part-chamber">
-              <use className="steel" href={`#${id}-s`} />
-              <use className="gap" href={`#${id}-v`} />
-              <path className="edge" d={chamber.edges} clipPath={clip('cavity')} />
-              {/* drawn twice as wide and cut to the steel: the inner edge is the chamber size */}
-              <path className="outline" d={chamber.outline} clipPath={clip('steel')} />
-              <path className="thin" d={chamber.breaks} />
-              {chamber.face && <path className="head-face" d={chamber.face} />}
-              <Axis at={axis.chamber} />
-            </g>
-          )}
-          {cartridge && (
-            <g className="part part-cartridge">
-              <use className="section" href={`#${id}-c`} />
-              <path className="edge" d={cartridge.edges} clipPath={clip('cartridge')} />
-              <use className="outline" href={`#${id}-c`} clipPath={clip('cartridge')} />
-              <Axis at={axis.cartridge} />
-            </g>
-          )}
-          {bullet && (
-            <g className="part part-bullet">
-              <use className="section" href={`#${id}-b`} />
-              <path className="edge" d={bullet.edges} clipPath={clip('bullet')} />
-              {/* drawn twice as wide and cut to the section; assumed parts dashed */}
-              <path className="outline" d={bullet.outline} clipPath={clip('bullet')} />
-              <path className="outline approx" d={bullet.approximate} clipPath={clip('bullet')} />
-              <Axis at={axis.bullet} />
-            </g>
-          )}
-          {/* Combined: the chamber outline again, over the filled cartridge section */}
-          {chamber && cartridge && (
-            <path
-              className="outline part-chamber-over"
-              d={chamber.outline}
-              clipPath={clip('steel')}
-            />
-          )}
+          <DrawingParts id={id} model={model} />
           {(['cartridge', 'chamber', 'combined', 'bullet'] as const).map((side) => {
             const layout = layers[side]
             return (

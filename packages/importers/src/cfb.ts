@@ -168,6 +168,21 @@ function streamReader(
   }
 }
 
+/** The name of the directory entry at `at`. */
+function entryName(file: CompoundFile, at: number): string {
+  // the name length counts bytes with the terminating NUL; at most 32 UTF-16 code units
+  const units = Math.floor(Math.min(file.u16(at + 0x40), 64) / 2) - 1
+  let name = ''
+  for (let k = 0; k < units; k++) name += String.fromCharCode(file.u16(at + 2 * k))
+  return name
+}
+
+/** The declared stream size of the directory entry at `at`. */
+function entrySize(file: CompoundFile, at: number): number {
+  // version 3 ignores the high 32 bits of the size (2.6.1)
+  return file.u32(at + 0x78) + (file.version === 4 ? file.u32(at + 0x7c) * 2 ** 32 : 0)
+}
+
 /**
  * The directory (2.6, 128-byte entries in the directory chain): a reader for each stream named in
  * `wanted` among the children of the root storage.
@@ -177,7 +192,7 @@ function readDirectory(
   next: (n: number) => number,
   wanted: readonly string[],
 ): Map<string, (limit: number) => Uint8Array> {
-  const { bytes, size, version, within, u16, u32, offset } = file
+  const { bytes, size, within, u32, offset } = file
   const directory = readChain(file, u32(0x30), undefined, next, true)
   const perSector = size / 128
   const entries = directory.length * perSector
@@ -200,15 +215,13 @@ function readDirectory(
     const at = entry(id)
     stack.push(u32(at + 0x44), u32(at + 0x48))
     if (bytes[at + 0x42] !== 2) continue
-    // the name length counts bytes with the terminating NUL; at most 32 UTF-16 code units
-    const units = Math.floor(Math.min(u16(at + 0x40), 64) / 2) - 1
-    let name = ''
-    for (let k = 0; k < units; k++) name += String.fromCharCode(u16(at + 2 * k))
+    const name = entryName(file, at)
     if (!wanted.includes(name.toUpperCase())) continue
     const start = u32(at + 0x74)
-    // version 3 ignores the high 32 bits of the size (2.6.1)
-    const declared = u32(at + 0x78) + (version === 4 ? u32(at + 0x7c) * 2 ** 32 : 0)
-    streams.set(name.toUpperCase(), streamReader(file, next, root, name, start, declared))
+    streams.set(
+      name.toUpperCase(),
+      streamReader(file, next, root, name, start, entrySize(file, at)),
+    )
   }
   return streams
 }

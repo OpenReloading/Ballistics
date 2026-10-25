@@ -71,6 +71,25 @@ export function annotate(
     : first.layout
 }
 
+/** What still runs into something, for the choice between the two layouts. */
+function residualOf({ placements, commit, uncommit, textConflicts }: Placer) {
+  let residual = 0
+  for (const p of placements) {
+    uncommit(p.chosen)
+    residual += textConflicts(p.chosen)
+    commit(p.chosen)
+  }
+  return residual
+}
+
+/** The arcs and diameter tips of the chosen places. */
+function collectArcs({ placements, arcs, across }: Placer) {
+  for (const { chosen } of placements) {
+    if (chosen.arc) arcs.push(chosen.arc)
+    if (chosen.across) across.push(chosen.across)
+  }
+}
+
 function layOut(
   part: Part,
   em: number,
@@ -81,20 +100,7 @@ function layOut(
   anglesFirst = false,
 ): { layout: Layout; residual: number } {
   const placer = createPlacer(part, em, horizontal, axis, keepCorners)
-  const {
-    labels,
-    segs,
-    arcs,
-    tips,
-    across,
-    spans,
-    placements,
-    commit,
-    uncommit,
-    pick,
-    place,
-    textConflicts,
-  } = placer
+  const { labels, segs, arcs, tips, across, spans, commit, pick, place } = placer
   layoutDiameters(placer, layoutLanes(placer, frontOnAxis))
   // angles first where radii first left a text in a conflict (`annotate`)
   for (const pass of anglesFirst ? [layoutAngles, layoutRadii] : [layoutRadii, layoutAngles])
@@ -103,18 +109,9 @@ function layOut(
   // note flags and detail letters: on a leader from the feature, the shortest clear one first
   for (const c of part.callouts ?? []) if (!c.letter) place(calloutCandidates(placer, c))
   settle(placer)
-  for (const { chosen } of placements) {
-    if (chosen.arc) arcs.push(chosen.arc)
-    if (chosen.across) across.push(chosen.across)
-  }
+  collectArcs(placer)
   const box = layoutBox(placer)
-  // what still runs into something, for the choice between the two layouts
-  let residual = 0
-  for (const p of placements) {
-    uncommit(p.chosen)
-    residual += textConflicts(p.chosen)
-    commit(p.chosen)
-  }
+  const residual = residualOf(placer)
   // detail letters last, outside the box and the residual: they move nothing else
   for (const c of part.callouts ?? []) if (c.letter) commit(pick(calloutCandidates(placer, c)))
   const layout: Layout = {
@@ -129,16 +126,8 @@ function layOut(
   return { layout, residual }
 }
 
-/**
- * The lengths in their lanes (the stack on +r, S and the head lengths on -r), the head diameters
- * behind the face and a diameter past the mouth, then the datum: first every line whose place is
- * fixed, then their texts, so each text sees all of them. Returns what the diameters across the
- * part are placed past.
- */
-function layoutLanes(placer: Placer, frontOnAxis: boolean) {
-  const { annotation, lengthUnit, em, lane0, pitch, arrowLen, tailLen, rMax, zBreak, gap, segs } =
-    placer
-  const dims = annotation.dimensions
+/** The dimensions by where they go: the length stack, head lengths, S, diameters across, below and in front. */
+function splitDimensions(dims: Dimension[], zBreak: number) {
   const span = (d: Dimension) => Math.min(d.to, zBreak) - d.from
   const stack = dims
     .filter((d) => d.kind !== 'diameter' && !d.behindHeadFace && !d.far)
@@ -154,9 +143,17 @@ function layoutLanes(placer: Placer, frontOnAxis: boolean) {
     .filter((d) => d.kind === 'diameter' && d.behindHeadFace)
     .sort((a, b) => (a.radius as number) - (b.radius as number))
   const front = dims.filter((d) => d.kind === 'diameter' && d.front)
+  return { stack, heads, far, acrossDims, below, front }
+}
 
-  // the stack: shortest first, each in the innermost lane where its span and its label (outside
-  // when it does not fit between the arrows) clear the others in that lane
+/**
+ * The stack: shortest first, each in the innermost lane where its span and its label (outside
+ * when it does not fit between the arrows) clear the others in that lane.
+ */
+function stackLanes(
+  { lengthUnit, em, arrowLen, tailLen, zBreak, gap }: Placer,
+  stack: Dimension[],
+) {
   const lanes: [number, number][][] = []
   const laneOf = new Map<Dimension, number>()
   for (const d of stack) {
@@ -174,6 +171,21 @@ function layoutLanes(placer: Placer, frontOnAxis: boolean) {
     lanes[n].push(reach)
     laneOf.set(d, n)
   }
+  return { lanes, laneOf }
+}
+
+/**
+ * The lengths in their lanes (the stack on +r, S and the head lengths on -r), the head diameters
+ * behind the face and a diameter past the mouth, then the datum: first every line whose place is
+ * fixed, then their texts, so each text sees all of them. Returns what the diameters across the
+ * part are placed past.
+ */
+function layoutLanes(placer: Placer, frontOnAxis: boolean) {
+  const { annotation, lengthUnit, em, lane0, pitch, rMax, zBreak, segs } = placer
+  const dims = annotation.dimensions
+  const { stack, heads, far, acrossDims, below, front } = splitDimensions(dims, zBreak)
+
+  const { lanes, laneOf } = stackLanes(placer, stack)
   const stackBase = rMax + lane0
   const stackOuter = stackBase + Math.max(lanes.length - 1, 0) * pitch
   const diameterW = Math.max(0, ...acrossDims.map((d) => textWidth(labelText(d, lengthUnit), em)))
@@ -433,10 +445,8 @@ function layoutDiameters(
     farOuter,
   }: { acrossDims: Dimension[]; stackOuter: number; farOuter: number },
 ) {
-  const { points, annotation, lengthUnit, em, lane0, arrowLen, tailLen, rMax, gap, label, place } =
-    placer
+  const { points, annotation, lengthUnit, em, lane0, arrowLen, rMax, gap, place } = placer
   for (const d of acrossDims) {
-    const owner = d.symbol
     const text = labelText(d, lengthUnit)
     const w = textWidth(text, em)
     const columns = [
@@ -457,36 +467,9 @@ function layoutDiameters(
       columns.flatMap(([side, at]) =>
         shifts.flatMap((shift) =>
           zs.flatMap((z) =>
-            ways.map((inward) => {
-              // the tip on the outline; at a step, where the outline has two radii, the stored one
-              const outline = radiusAt(points, z) as number
-              const r =
-                Math.abs(outline - (d.radius as number)) <= 0.05 ? outline : (d.radius as number)
-              const knee = at - 0.6 * lane0
-              const from = -side * (inward ? r : r + tailLen)
-              const line: LineSegment[] = shift
-                ? [
-                    { a: [z, from], b: [z, side * knee], kind: 'rule', owner },
-                    { a: [z, side * knee], b: [z + shift, side * at], kind: 'rule', owner },
-                  ]
-                : [{ a: [z, from], b: [z, side * at], kind: 'rule', owner }]
-              const out = inward ? -1 : 1
-              return {
-                across: {
-                  owner,
-                  tips: [
-                    [z, r],
-                    [z, -r],
-                  ] as [PartPoint, PartPoint],
-                },
-                l: label(text, [z + shift, side * (at + gap + w / 2)], [0, 1], owner),
-                segs: line,
-                tips: [
-                  { at: [z, r], dir: [0, -out], owner },
-                  { at: [z, -r], dir: [0, out], owner },
-                ] as Arrowhead[],
-              }
-            }),
+            ways.map((inward) =>
+              acrossCandidate(placer, d, { text, w, side, at, shift, z, inward }),
+            ),
           ),
         ),
       ),
@@ -494,10 +477,93 @@ function layoutDiameters(
   }
 }
 
+/** Where one diameter text goes: the column side and distance, the shift along the axis, the station and the arrow direction. */
+type AcrossSpot = {
+  text: string
+  w: number
+  side: number
+  at: number
+  shift: number
+  z: number
+  inward: boolean
+}
+
+/** One place of a diameter: its line to the text column, arrowheads on the outline at the station. */
+function acrossCandidate(
+  { points, lane0, tailLen, gap, label }: Placer,
+  d: Dimension,
+  { text, w, side, at, shift, z, inward }: AcrossSpot,
+): Candidate {
+  const owner = d.symbol
+  // the tip on the outline; at a step, where the outline has two radii, the stored one
+  const outline = radiusAt(points, z) as number
+  const r = Math.abs(outline - (d.radius as number)) <= 0.05 ? outline : (d.radius as number)
+  const knee = at - 0.6 * lane0
+  const from = -side * (inward ? r : r + tailLen)
+  const line: LineSegment[] = shift
+    ? [
+        { a: [z, from], b: [z, side * knee], kind: 'rule', owner },
+        { a: [z, side * knee], b: [z + shift, side * at], kind: 'rule', owner },
+      ]
+    : [{ a: [z, from], b: [z, side * at], kind: 'rule', owner }]
+  const out = inward ? -1 : 1
+  return {
+    across: {
+      owner,
+      tips: [
+        [z, r],
+        [z, -r],
+      ] as [PartPoint, PartPoint],
+    },
+    l: label(text, [z + shift, side * (at + gap + w / 2)], [0, 1], owner),
+    segs: line,
+    tips: [
+      { at: [z, r], dir: [0, -out], owner },
+      { at: [z, -r], dir: [0, out], owner },
+    ] as Arrowhead[],
+  }
+}
+
+/** One place of a fillet radius: the leader's direction (sz, sr) mirrored by `side`, its length scaled, how the text sits. */
+type RadiusSpot = {
+  corner: PartPoint
+  text: string
+  w: number
+  owner: string
+  how: 'along' | 'level' | 'beside'
+  sz: number
+  sr: number
+  side: number
+  scale: number
+}
+
+function radiusLeader(
+  { em, horizontal, gap, leaderLength, label }: Placer,
+  { corner, text, w, owner, how, sz, sr, side, scale }: RadiusSpot,
+) {
+  const at: PartPoint = [corner[0], side * corner[1]]
+  const dir: PartPoint = [sz / Math.SQRT2, (side * sr) / Math.SQRT2]
+  const end = add(at, dir, leaderLength * scale)
+  // the level direction is an axis of the part frame, so it meets the leader at 45 deg
+  const toward = Math.sign(dir[0] * horizontal[0] + dir[1] * horizontal[1])
+  const c =
+    how === 'along'
+      ? add(end, dir, gap + w / 2)
+      : how === 'level'
+        ? add(end, dir, gap + w / 2 / Math.SQRT2 + em / 2)
+        : add(end, horizontal, toward * (gap + w / 2))
+  // a level text's box: the leader runs on to a gap before the box edge it meets at 45 deg
+  const b = how === 'level' ? add(c, dir, -(gap + Math.min(w, em) / Math.SQRT2)) : end
+  return {
+    l: label(text, c, how === 'along' ? dir : horizontal, owner),
+    segs: [{ a: at, b, kind: 'thin' as const, owner, leader: true as const }],
+    tips: [{ at, dir: [-dir[0], -dir[1]] as PartPoint, owner }],
+  }
+}
+
 /** Fillet radii: a 45 degree leader to the unrounded corner, the text along it. */
 function layoutRadii(placer: Placer) {
-  const { part, points, annotation, lengthUnit, em, horizontal, gap, leaderLength, label, place } =
-    placer
+  const { part, points, annotation, lengthUnit, em, gap, label, place } = placer
   for (const c of annotation.radii) {
     const owner = c.symbol
     const corner: PartPoint = [c.corner[1], c.corner[0]]
@@ -547,26 +613,9 @@ function layoutRadii(placer: Placer) {
     const leaders = (scale: number) =>
       (['along', 'level', 'beside'] as const).flatMap((how) =>
         options.flatMap(([sz, sr]) =>
-          [1, -1].map((side) => {
-            const at: PartPoint = [corner[0], side * corner[1]]
-            const dir: PartPoint = [sz / Math.SQRT2, (side * sr) / Math.SQRT2]
-            const end = add(at, dir, leaderLength * scale)
-            // the level direction is an axis of the part frame, so it meets the leader at 45 deg
-            const toward = Math.sign(dir[0] * horizontal[0] + dir[1] * horizontal[1])
-            const c =
-              how === 'along'
-                ? add(end, dir, gap + w / 2)
-                : how === 'level'
-                  ? add(end, dir, gap + w / 2 / Math.SQRT2 + em / 2)
-                  : add(end, horizontal, toward * (gap + w / 2))
-            // a level text's box: the leader runs on to a gap before the box edge it meets at 45 deg
-            const b = how === 'level' ? add(c, dir, -(gap + Math.min(w, em) / Math.SQRT2)) : end
-            return {
-              l: label(text, c, how === 'along' ? dir : horizontal, owner),
-              segs: [{ a: at, b, kind: 'thin' as const, owner, leader: true as const }],
-              tips: [{ at, dir: [-dir[0], -dir[1]] as PartPoint, owner }],
-            }
-          }),
+          [1, -1].map((side) =>
+            radiusLeader(placer, { corner, text, w, owner, how, sz, sr, side, scale }),
+          ),
         ),
       )
     // the face's leader, the steel band beside the corner, a shorter leader, then longer ones
@@ -574,24 +623,149 @@ function layoutRadii(placer: Placer) {
   }
 }
 
+/** One place of an angle text on a leader from its arc, and the arc's own lines and arrowheads. */
+type LedSpot = {
+  text: string
+  w: number
+  owner: string
+  v: PartPoint
+  radius: number
+  far: PartPoint
+  along: boolean
+  onArc: number
+  lines: LineSegment[]
+  arcTips: Arrowhead[]
+  arc: Arc
+}
+
+function ledCandidate(
+  { em, horizontal, gap, label }: Placer,
+  { text, w, owner, v, radius, far, along, onArc, lines, arcTips, arc }: LedSpot,
+): Candidate {
+  const [dx, dy] = horizontal
+  const start = polar(v, radius, onArc)
+  const end: PartPoint = along ? [far[0], start[1]] : far
+  const u = unit(along ? v : start, far)
+  // the text box's edge, where the leader's line meets it, a gap past the leader end
+  const reach = Math.min(
+    w / 2 / Math.max(Math.abs(u[0] * dx + u[1] * dy), 1e-9),
+    em / 2 / Math.max(Math.abs(u[0] * dy - u[1] * dx), 1e-9),
+  )
+  const c = add(end, u, gap + reach)
+  // a text across the axis stays centred on it where the leader still meets the text
+  const across = (Math.abs(dy) * w) / 2 + (Math.abs(dx) * em) / 2
+  if (along && Math.abs(start[1]) <= across - em / 4) c[1] = 0
+  const leader: LineSegment = { a: start, b: end, kind: 'thin', owner, leader: true }
+  return {
+    l: label(text, c, horizontal, owner),
+    segs: [...lines, leader],
+    tips: arcTips,
+    arc,
+  }
+}
+
+const tangent = (t: number, s: number): PartPoint => [-Math.sin(t) * s, Math.cos(t) * s]
+
+/** An angle's vertex, the first flank's end and the directions of both flanks, in the part frame. */
+type AngleFrame = { v: PartPoint; f0: PartPoint; t0: number; t1: number }
+
+/** The arcs an angle may take, each with the thin lines that go with it. */
+function angleShapes(
+  { points, em, k, lane0, rMax, zMax, gap }: Placer,
+  a: Annotation['angles'][number],
+  onAxis: boolean,
+  { v, f0, t0, t1 }: AngleFrame,
+): { radius: number; thin: LineSegment[] }[] {
+  const owner = a.symbol
+  if (a.symbol === 'alpha' && onAxis) {
+    // the shoulder: an arc behind L1 at 1.6 times the vertex distance, at most so far that its
+    // flanks end before the texts of lane 0 and its middle stays 0.35 zMax off the head; the
+    // flanks run from the corners at L1 to just past the arc
+    const reachOut =
+      (rMax + lane0 - em - 2 * gap) / Math.max(Math.abs(Math.sin(t0)), 1e-6) - 0.5 * k
+    const radius = Math.max(
+      Math.min(face.alphaArc * (v[0] - f0[0]), v[0] - 0.35 * zMax, reachOut),
+      2 * k,
+    )
+    const corner = Math.hypot(f0[0] - v[0], f0[1] - v[1])
+    return [
+      {
+        radius,
+        thin: [t0, t1].map((t) => ({
+          a: polar(v, Math.min(corner, radius), t),
+          b: polar(v, radius + 0.5 * k, t),
+          kind: 'thin' as const,
+          owner,
+        })),
+      },
+    ]
+  }
+  if (onAxis) {
+    // a cone on the axis (alpha1, table VII): the arc across the middle of the drawn cone
+    const cone = coneMiddle(points, f0, v)
+    return [{ radius: Math.hypot(cone[0] - v[0], cone[1] - v[1]), thin: [] }]
+  }
+  // a short arc, the slanted flank drawn on
+  const t = Math.abs(Math.sin(t0)) > Math.abs(Math.sin(t1)) ? t0 : t1
+  return [1, 1.5, 0.7].map((scale) => ({
+    radius: face.smallArc * k * scale,
+    thin: [{ a: v, b: polar(v, face.smallFlank * k * scale, t), kind: 'thin', owner }],
+  }))
+}
+
+/** An arc of an angle with its lines and arrowheads: the arrows inside when the arc is long enough. */
+function angleVariant(
+  { arrowLen, tailLen }: Placer,
+  owner: string,
+  { v, t0, t1 }: AngleFrame,
+  { radius, thin }: { radius: number; thin: LineSegment[] },
+) {
+  const length = Math.abs(t1 - t0) * radius
+  const short = length < face.shortSpan * arrowLen
+  const sweep = Math.sign(t1 - t0) || 1
+  const arcTips: Arrowhead[] = short
+    ? [
+        { at: polar(v, radius, t0), dir: tangent(t0, sweep), owner },
+        { at: polar(v, radius, t1), dir: tangent(t1, -sweep), owner },
+      ]
+    : [
+        { at: polar(v, radius, t0), dir: tangent(t0, -sweep), owner },
+        { at: polar(v, radius, t1), dir: tangent(t1, sweep), owner },
+      ]
+  const arc: Arc = short
+    ? {
+        c: v,
+        r: radius,
+        from: t0 - (sweep * tailLen) / radius,
+        to: t1 + (sweep * tailLen) / radius,
+        owner,
+      }
+    : { c: v, r: radius, from: t0, to: t1, owner }
+  return { v, t0, t1, sweep, radius, arc, lines: [...thin, ...arcSegs(arc)], arcTips }
+}
+
+/** The arcs of an angle on one side of the axis. */
+function angleVariants(
+  placer: Placer,
+  a: Annotation['angles'][number],
+  onAxis: boolean,
+  side: number,
+) {
+  const v: PartPoint = [a.vertex[1], side * a.vertex[0]]
+  const [f0, f1] = a.flanks.map(([r, z]): PartPoint => [z, side * r])
+  let t0 = Math.atan2(f0[1] - v[1], f0[0] - v[0])
+  let t1 = Math.atan2(f1[1] - v[1], f1[0] - v[0])
+  if (t1 - t0 > Math.PI) t1 -= 2 * Math.PI
+  if (t0 - t1 > Math.PI) t0 -= 2 * Math.PI
+  const frame: AngleFrame = { v, f0, t0, t1 }
+  return angleShapes(placer, a, onAxis, frame).map((shape) =>
+    angleVariant(placer, a.symbol, frame, shape),
+  )
+}
+
 /** Angles about their vertex: an arc between the flanks, the text near it or on a leader. */
 function layoutAngles(placer: Placer) {
-  const {
-    points,
-    annotation,
-    em,
-    horizontal,
-    k,
-    lane0,
-    arrowLen,
-    tailLen,
-    rMax,
-    zMax,
-    gap,
-    label,
-    place,
-  } = placer
-  const tangent = (t: number, s: number): PartPoint => [-Math.sin(t) * s, Math.cos(t) * s]
+  const { annotation, em, horizontal, rMax, gap, label, place } = placer
   // alpha1 first: fewer places are free near its arc in the narrow mouth than near the shoulder's
   const angles = [...annotation.angles].sort(
     (p, q) => Number(q.symbol === 'alpha1') - Number(p.symbol === 'alpha1'),
@@ -602,72 +776,9 @@ function layoutAngles(placer: Placer) {
     const text = labelText(a)
     const w = textWidth(text, em)
     // an angle at the outline (delta, i) may go on either side; one on the axis is symmetric
-    const variants = (onAxis ? [1] : [1, -1]).flatMap((side) => {
-      const v: PartPoint = [a.vertex[1], side * a.vertex[0]]
-      const [f0, f1] = a.flanks.map(([r, z]): PartPoint => [z, side * r])
-      let t0 = Math.atan2(f0[1] - v[1], f0[0] - v[0])
-      let t1 = Math.atan2(f1[1] - v[1], f1[0] - v[0])
-      if (t1 - t0 > Math.PI) t1 -= 2 * Math.PI
-      if (t0 - t1 > Math.PI) t0 -= 2 * Math.PI
-      const shapes: { radius: number; thin: LineSegment[] }[] = []
-      if (a.symbol === 'alpha' && onAxis) {
-        // the shoulder: an arc behind L1 at 1.6 times the vertex distance, at most so far that its
-        // flanks end before the texts of lane 0 and its middle stays 0.35 zMax off the head; the
-        // flanks run from the corners at L1 to just past the arc
-        const reachOut =
-          (rMax + lane0 - em - 2 * gap) / Math.max(Math.abs(Math.sin(t0)), 1e-6) - 0.5 * k
-        const radius = Math.max(
-          Math.min(face.alphaArc * (v[0] - f0[0]), v[0] - 0.35 * zMax, reachOut),
-          2 * k,
-        )
-        const corner = Math.hypot(f0[0] - v[0], f0[1] - v[1])
-        shapes.push({
-          radius,
-          thin: [t0, t1].map((t) => ({
-            a: polar(v, Math.min(corner, radius), t),
-            b: polar(v, radius + 0.5 * k, t),
-            kind: 'thin' as const,
-            owner,
-          })),
-        })
-      } else if (onAxis) {
-        // a cone on the axis (alpha1, table VII): the arc across the middle of the drawn cone
-        const cone = coneMiddle(points, f0, v)
-        shapes.push({ radius: Math.hypot(cone[0] - v[0], cone[1] - v[1]), thin: [] })
-      } else {
-        // a short arc, the slanted flank drawn on
-        const t = Math.abs(Math.sin(t0)) > Math.abs(Math.sin(t1)) ? t0 : t1
-        for (const scale of [1, 1.5, 0.7])
-          shapes.push({
-            radius: face.smallArc * k * scale,
-            thin: [{ a: v, b: polar(v, face.smallFlank * k * scale, t), kind: 'thin', owner }],
-          })
-      }
-      return shapes.map(({ radius, thin }) => {
-        const length = Math.abs(t1 - t0) * radius
-        const short = length < face.shortSpan * arrowLen
-        const sweep = Math.sign(t1 - t0) || 1
-        const arcTips: Arrowhead[] = short
-          ? [
-              { at: polar(v, radius, t0), dir: tangent(t0, sweep), owner },
-              { at: polar(v, radius, t1), dir: tangent(t1, -sweep), owner },
-            ]
-          : [
-              { at: polar(v, radius, t0), dir: tangent(t0, -sweep), owner },
-              { at: polar(v, radius, t1), dir: tangent(t1, sweep), owner },
-            ]
-        const arc: Arc = short
-          ? {
-              c: v,
-              r: radius,
-              from: t0 - (sweep * tailLen) / radius,
-              to: t1 + (sweep * tailLen) / radius,
-              owner,
-            }
-          : { c: v, r: radius, from: t0, to: t1, owner }
-        return { v, t0, t1, sweep, radius, arc, lines: [...thin, ...arcSegs(arc)], arcTips }
-      })
-    })
+    const variants = (onAxis ? [1] : [1, -1]).flatMap((side) =>
+      angleVariants(placer, a, onAxis, side),
+    )
     const candidates = variants.flatMap(({ v, t0, t1, sweep, radius, arc, lines, arcTips }) => {
       const mid = (t0 + t1) / 2
       const ring = Array.from({ length: 25 }, (_, n) =>
@@ -716,28 +827,21 @@ function layoutAngles(placer: Placer) {
           const from = along
             ? [t0 + 0.15 * (t1 - t0), t1 - 0.15 * (t1 - t0)]
             : [Math.min(Math.max(t, Math.min(t0, t1)), Math.max(t0, t1))]
-          const [dx, dy] = horizontal
-          return from.map((onArc) => {
-            const start = polar(v, radius, onArc)
-            const end: PartPoint = along ? [far[0], start[1]] : far
-            const u = unit(along ? v : start, far)
-            // the text box's edge, where the leader's line meets it, a gap past the leader end
-            const reach = Math.min(
-              w / 2 / Math.max(Math.abs(u[0] * dx + u[1] * dy), 1e-9),
-              em / 2 / Math.max(Math.abs(u[0] * dy - u[1] * dx), 1e-9),
-            )
-            const c = add(end, u, gap + reach)
-            // a text across the axis stays centred on it where the leader still meets the text
-            const across = (Math.abs(dy) * w) / 2 + (Math.abs(dx) * em) / 2
-            if (along && Math.abs(start[1]) <= across - em / 4) c[1] = 0
-            const leader: LineSegment = { a: start, b: end, kind: 'thin', owner, leader: true }
-            return {
-              l: label(text, c, horizontal, owner),
-              segs: [...lines, leader],
-              tips: arcTips,
+          return from.map((onArc) =>
+            ledCandidate(placer, {
+              text,
+              w,
+              owner,
+              v,
+              radius,
+              far,
+              along,
+              onArc,
+              lines,
+              arcTips,
               arc,
-            }
-          })
+            }),
+          )
         }),
       )
       // within the part the nearest to the arc first; past it the nearest to the axis, as a text

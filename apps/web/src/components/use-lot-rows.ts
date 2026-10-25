@@ -73,6 +73,46 @@ async function askLots(
   return answers
 }
 
+/** The steps of the two lots, or why there are none; nothing once the request was aborted. */
+async function lotAnswer(
+  ok: Extract<Outcome, { kind: 'ok' }>,
+  charges: number[],
+  fraction: number,
+  signal: AbortSignal,
+): Promise<{ steps?: Record<Lot, Step[]>; message?: string } | undefined> {
+  try {
+    const answers = await askLots(ok, charges, fraction, signal)
+    if (signal.aborted) return undefined
+    const failed = answers.find((a) => !a.res.ok || a.json === undefined)
+    if (failed) return { message: failed.json?.message ?? `The API answered ${failed.res.status}.` }
+    const [low, high] = answers.map((a) => stepsOf(a.json, charges[0]))
+    return { steps: { low, high } }
+  } catch {
+    if (signal.aborted) return undefined
+    return { message: navigator.onLine ? notReached : needsNetwork }
+  }
+}
+
+/** The rows of an answer for this run, with the change they were asked at. */
+function lotRowsOf(
+  ok: Extract<Outcome, { kind: 'ok' }> | undefined,
+  current: { fraction: number; steps?: Record<Lot, Step[]> } | undefined,
+): LotRows['rows'] {
+  if (!ok || !current?.steps) return
+  const steps = {
+    low: shownSteps({ ...ok, steps: current.steps.low }),
+    high: shownSteps({ ...ok, steps: current.steps.high }),
+  }
+  const times = barrelTimes(
+    ok.steps.map((s) => ({ charge: s.charge, barrelTime: s.body?.result.barrelTime })),
+    {
+      low: current.steps.low.map((s) => ({ barrelTime: s.body?.result.barrelTime })),
+      high: current.steps.high.map((s) => ({ barrelTime: s.body?.result.barrelTime })),
+    },
+  )
+  return { fraction: current.fraction, steps, times }
+}
+
 /**
  * The lot rows of the shown run: two ladder requests, one per lot, at the burn rate raised and
  * lowered by the typed change, asked once the tab or a print wants them (`enabled`). A new change
@@ -125,21 +165,8 @@ export function useLotRows({
         })
       }, requestTimeout)
       try {
-        const answers = await askLots(ok, charges, fraction, controller.signal)
-        if (controller.signal.aborted) return
-        const failed = answers.find((a) => !a.res.ok || a.json === undefined)
-        if (failed)
-          return setGot({
-            key,
-            run,
-            fraction,
-            message: failed.json?.message ?? `The API answered ${failed.res.status}.`,
-          })
-        const [low, high] = answers.map((a) => stepsOf(a.json, charges[0]))
-        setGot({ key, run, fraction, steps: { low, high } })
-      } catch {
-        if (!controller.signal.aborted)
-          setGot({ key, run, fraction, message: navigator.onLine ? notReached : needsNetwork })
+        const answer = await lotAnswer(ok, charges, fraction, controller.signal)
+        if (answer) setGot({ key, run, fraction, ...answer })
       } finally {
         clearTimeout(late)
       }
@@ -152,21 +179,7 @@ export function useLotRows({
     }
   }, [enabled, key])
   const pending = enabled && key !== undefined && got?.key !== key
-  const rows = useMemo(() => {
-    if (!ok || !current?.steps) return
-    const steps = {
-      low: shownSteps({ ...ok, steps: current.steps.low }),
-      high: shownSteps({ ...ok, steps: current.steps.high }),
-    }
-    const times = barrelTimes(
-      ok.steps.map((s) => ({ charge: s.charge, barrelTime: s.body?.result.barrelTime })),
-      {
-        low: current.steps.low.map((s) => ({ barrelTime: s.body?.result.barrelTime })),
-        high: current.steps.high.map((s) => ({ barrelTime: s.body?.result.barrelTime })),
-      },
-    )
-    return { fraction: current.fraction, steps, times }
-  }, [ok, current])
+  const rows = useMemo(() => lotRowsOf(ok, current), [ok, current])
   const retry = useCallback(() => setAttempt((a) => a + 1), [])
   const seconds = Number(target) * 1e-3
   const targetSeconds = target !== '' && seconds > 0 ? seconds : undefined

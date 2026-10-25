@@ -9,7 +9,16 @@ import {
   userRecord,
 } from '@open-reloading/schema'
 import { CaretDown, FloppyDisk, FolderOpen } from '@phosphor-icons/react'
-import { memo, type Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import {
+  memo,
+  type ReactNode,
+  type Ref,
+  useContext,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react'
 import { createPortal } from 'react-dom'
 import { localDay } from '../lib/dates.ts'
 import { download } from '../lib/download.ts'
@@ -197,6 +206,642 @@ async function storePhotos(files: EmbeddedFile[], records: UserRecord[]) {
   for (const f of files) if (wanted.has(f.id)) await putPhoto(f.id, embeddedFileBlob(f))
 }
 
+/** The user manufacturer `record` names, as `carried` holds it, kept unless one of its id is stored; false when the store refused it. */
+async function keepMakers(record: UserRecord, carried: UserRecord[]) {
+  try {
+    await Promise.all(makerRecordsOf(record, carried).map(putRecordIfAbsent))
+    return true
+  } catch {
+    return false
+  }
+}
+
+/** `refNote` of `opened` against the browser store and the built-in example rifle; empty when the store cannot be read. */
+async function refsOf(opened: UserRecord[]) {
+  const stored = await storedRecords().catch(() => undefined)
+  return stored ? refNote(opened, [builtIn, ...stored.records]) : ''
+}
+
+const keptText: Record<string, string> = {
+  blank: '',
+  saving: 'Saving in this browser',
+  failed: 'Not saved in this browser',
+}
+
+/** The file state shown in the page bar. */
+function stateText({
+  saved,
+  dirty,
+  autosaved,
+  kept,
+  unsaved,
+}: {
+  saved: { file: string } | undefined
+  dirty: boolean
+  autosaved: string | undefined
+  kept: string | undefined
+  unsaved: boolean
+}) {
+  if (saved) {
+    if (!dirty) return `Saved: ${saved.file}`
+    return autosaved ? `Changed since ${saved.file}` : `Unsaved changes (${saved.file})`
+  }
+  // an autosaved record is kept in the browser until a file is written
+  if (autosaved) return keptText[kept ?? ''] ?? 'Saved in this browser'
+  return unsaved ? 'Unsaved changes, not saved to a file' : 'Not saved to a file'
+}
+
+/** The question while it shows: a second way out asked meanwhile waits for the same answer. */
+function createLeave() {
+  let leaving = false
+  let asking: Promise<boolean> | undefined
+  /** True once the user chose to leave; asked once. */
+  const leave = () => {
+    if (leaving) return Promise.resolve(true)
+    asking ??= ask('Leave this page? Changes not saved to a file are lost.', 'Leave').then((go) => {
+      leaving = go
+      asking = undefined
+      return go
+    })
+    return asking
+  }
+  return { leave, leaving: () => leaving, asking: () => asking !== undefined }
+}
+
+/** The link of a click that would leave this page, undefined for any other click. */
+function leavingLink(e: MouseEvent) {
+  if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) return
+  const a = e.target instanceof Element ? e.target.closest('a[href]') : null
+  if (!(a instanceof HTMLAnchorElement) || a.target === '_blank' || a.hasAttribute('download'))
+    return
+  const to = new URL(a.href)
+  const here = window.location
+  if (to.origin !== here.origin || (to.pathname === here.pathname && to.search === here.search))
+    return
+  return a
+}
+
+/**
+ * Unsaved work: the browser's leave-page prompt, a question before an in-app link or a router push
+ * or replace, and a guard history entry with this URL, so Back and Forward ask too. Returns the
+ * cleanup.
+ */
+function guardLeaving(say: (message: string) => void) {
+  const { leave, leaving, asking } = createLeave()
+  /** Set while a Back taken during the question is undone by a step forward. */
+  let undoing = false
+  const warn = (e: BeforeUnloadEvent) => e.preventDefault()
+  const link = (e: MouseEvent) => {
+    if (leaving()) return
+    const a = leavingLink(e)
+    if (!a) return
+    // held while the dialog asks; on yes the same click again, which passes then
+    e.preventDefault()
+    e.stopPropagation()
+    void leave().then((go) => go && a.click())
+  }
+  const guard = { ...window.history.state, fileGuard: true }
+  // the guard entry replaces the forward entries (Navigation API, Chromium; elsewhere unknown)
+  if ((window as { navigation?: { canGoForward: boolean } }).navigation?.canGoForward)
+    say('Forward is not available while changes are not saved to a file.')
+  window.history.pushState(guard, '', window.location.href)
+  // through guardPop: runs before the router, which must not see a move off the guard entry
+  const pop = (e: PopStateEvent) => {
+    e.stopImmediatePropagation()
+    if (undoing) {
+      undoing = false
+      return
+    }
+    // a second Back while the first asks: undone, so the first's answer acts on its own step
+    if (asking()) {
+      undoing = true
+      window.history.go(1)
+      return
+    }
+    void leave().then((go) => {
+      if (!go) {
+        window.history.pushState(guard, '', window.location.href)
+        say('Stayed on this page to keep the changes not saved to a file.')
+        return
+      }
+      unpop()
+      window.history.back()
+    })
+  }
+  const unguard = guardNavigation(leave)
+  const unpop = guardPop(pop)
+  window.addEventListener('beforeunload', warn)
+  document.addEventListener('click', link, true)
+  return () => {
+    unguard()
+    window.removeEventListener('beforeunload', warn)
+    document.removeEventListener('click', link, true)
+    unpop()
+    // saved again: the guard entry goes; a navigation away has moved past it already
+    if (!leaving() && window.history.state?.fileGuard) window.history.back()
+  }
+}
+
+/** What the page offers a share link: the record, and how it is opened, kept and reported. */
+interface SharedLink<K extends UserRecordKind> {
+  unsaved: () => boolean
+  open: (record: Of<K>) => void
+  carry: (record: Of<K>, records: UserRecord[]) => void
+  say: (message: string) => void
+  fail: (message: string) => void
+}
+
+/** A share link: the record in the fragment, validated, opened as unsaved work. */
+async function openSharedLink<K extends UserRecordKind>(kind: K, page: SharedLink<K>) {
+  const p = await readLink(window.location.hash)
+  if (!p) return
+  window.history.replaceState(window.history.state, '', window.location.href.split('#')[0])
+  if (!p.ok) return page.say(`Shared link not opened: ${p.reason}`)
+  const r = p.records.find((x): x is Of<K> => x.kind === kind)
+  if (!r) return page.say(`Shared link not opened: it holds no ${kindNames[kind]}.`)
+  if (
+    page.unsaved() &&
+    !(await ask('Replace the unsaved changes with the shared record?', 'Replace'))
+  )
+    return
+  const kept = await keepMakers(r, p.records)
+  page.carry(r, p.records)
+  page.open(r)
+  if (!kept) page.fail(noMaker)
+}
+
+/** A copy saved after this tab's one (another tab or window) is overwritten only on yes, asked once. */
+function newerGuard(known: () => string | undefined) {
+  let agreed = false
+  return async (other: string | undefined) => {
+    const mine = known()
+    if (agreed || !mine || !other || other <= mine) return true
+    agreed = await confirmDialog({
+      title: 'Overwrite the newer copy?',
+      message: `A newer copy of this record was saved at ${new Date(other).toLocaleString()} (another tab or window); this tab has the copy saved at ${new Date(mine).toLocaleString()}.`,
+      confirmLabel: 'Overwrite',
+      danger: true,
+    })
+    return agreed
+  }
+}
+
+/** The time a file's text gives the record `recordId`. */
+const savedIn = (t: string | undefined, recordId: string) => {
+  const p = t === undefined ? undefined : parseUserDataFile(t)
+  return p?.ok ? p.records.find((r) => r.id === recordId)?.saved : undefined
+}
+
+/**
+ * Writes the record's file: the kept file while it holds this record alone (not an Export all
+ * file), else the workspace folder, else a file picked. `current` is the kept file's text.
+ * 'newer' when the user keeps a newer copy, undefined when the picker was dismissed.
+ */
+async function writeRecordFile(o: {
+  handle: FileSystemFileHandle | undefined
+  current: string | undefined
+  as: boolean
+  ready: FileSystemDirectoryHandle | undefined
+  name: string
+  recordId: string
+  text: string
+  allow: (other: string | undefined) => Promise<boolean>
+}): Promise<'newer' | { name: string; handle?: FileSystemFileHandle } | undefined> {
+  const { handle, current, as, ready, name, recordId, text, allow } = o
+  if (handle && ownsFile(current, recordId)) {
+    if (!(await allow(savedIn(current, recordId)))) return 'newer'
+    await writeHandleText(handle, text)
+    return { name: handle.name, handle }
+  }
+  if (!as && ready) {
+    const h = await saveToFolder(ready, recordFileName(name), recordId, text, (t) =>
+      allow(savedIn(t, recordId)),
+    )
+    return h ? { name: h.name, handle: h } : 'newer'
+  }
+  return saveAs(text, recordFileName(name), ready)
+}
+
+/** The file of Open: its one record of `kind`, or the message that says why not. */
+async function readOpened<K extends UserRecordKind>(file: File, kind: K) {
+  const text = await read(file)
+  const parsed: ParsedUserFile =
+    text === undefined ? { ok: false, reason: tooLargeMessage } : readLoadFile(text)
+  if (!parsed.ok) return { problem: `${file.name} not opened: ${parsed.reason}` }
+  const mine = parsed.records.filter((r): r is Of<K> => r.kind === kind)
+  if (mine.length !== 1)
+    return {
+      problem: `${file.name} holds ${mine.length} ${kindNames[kind]}; Open takes a file with one, Import takes collections.`,
+    }
+  return { parsed, text, mine: mine[0] }
+}
+
+/** Stores the opened record and its photo in the browser; false when the user keeps the browser copy. */
+async function keepInBrowser(r: UserRecord, files: EmbeddedFile[]) {
+  const stored = await storedRecord(r.id).catch(() => undefined)
+  if (
+    stored &&
+    canonicalJson(stored.data) !== canonicalJson(r.data) &&
+    !(await ask(`Replace the browser copy of ${stored.name} with the one in the file?`, 'Replace'))
+  )
+    return false
+  await storePhotos(files, [r])
+  await putRecords([r])
+  return true
+}
+
+/** The sentences after an export: the photos left out for the size limit and the invalid records in it. */
+function exportNotes(records: UserRecord[], invalid: InvalidRecord[], left: string[]) {
+  const without = records.flatMap((s) =>
+    s.kind === 'targetSheet' && left.includes(s.data.photo ?? '') ? [s.name] : [],
+  )
+  const photos = without.length
+    ? ` Left out for the file size limit: the photos of ${without.join(', ')}. Save on a sheet keeps its photo.`
+    : ''
+  const raw = invalid.length
+    ? ` ${invalid.length} invalid ${invalid.length === 1 ? 'record is' : 'records are'} in it as stored.`
+    : ''
+  return `${raw}${photos}`
+}
+
+/** What an import reports to: the store hooks and the page's messages. */
+interface ImportIo {
+  onStored?: () => void
+  noteStorage: () => void
+  fail: (message: string) => void
+  show: (report: Report) => void
+}
+
+/** Reads and stores one file at a time, so several large files are not held at once. */
+async function importTexts(
+  files: { name: string; text: () => Promise<string | undefined> }[],
+  io: ImportIo,
+) {
+  const total: Report = {
+    added: 0,
+    equal: 0,
+    skipped: [],
+    notes: [],
+    conflicts: [],
+    invalid: { added: 0, kept: 0, unstorable: 0 },
+    files: [],
+  }
+  let count = 0
+  const added: UserRecord[] = []
+  for (const f of files) {
+    const {
+      records,
+      files: photos,
+      invalid,
+      skipped,
+      notes,
+    } = parseFiles([{ name: f.name, text: await f.text() }])
+    count += records.length
+    const plan = planImport(records, (await storedRecords()).records)
+    try {
+      // an equal record may come to a browser without its photo
+      await storePhotos(photos, [...plan.added, ...plan.equal])
+      await putRecords(plan.added)
+      // after the valid records, and never over a record with its id
+      const stored = await putInvalid(invalid)
+      for (const k of ['added', 'kept', 'unstorable'] as const) total.invalid[k] += stored[k]
+    } catch (e) {
+      io.fail(`Import read ${count} records; the browser store write failed: ${errorText(e)}`)
+      if (total.added) io.onStored?.()
+      return
+    }
+    added.push(...plan.added)
+    total.added += plan.added.length
+    total.equal += plan.equal.length
+    total.skipped.push(...skipped)
+    total.notes.push(...notes)
+    total.conflicts.push(...plan.conflicts)
+    // kept for Replace: only the photos of the records it may store
+    const wanted = new Set(photoIds(plan.conflicts.map((c) => c.incoming)))
+    total.files.push(...photos.filter((p) => wanted.has(p.id)))
+  }
+  // once all files are stored, so a reference to a record of a later file resolves
+  const refs = await refsOf(added)
+  if (refs) total.notes.push({ name: 'References', note: refs })
+  io.onStored?.()
+  io.noteStorage()
+  io.show(total)
+}
+
+/** Restores the remembered workspace folder; says so when it was lost. */
+function restoreFolderInto(
+  setFolder: (folder: { handle: FileSystemDirectoryHandle; allowed: boolean }) => void,
+  say: (message: string) => void,
+) {
+  restoreFolder()
+    .then(async (h) => {
+      if (h === 'lost') say('The workspace folder could not be restored; choose it again.')
+      else if (h) setFolder({ handle: h, allowed: await folderAllowed(h, false) })
+    })
+    .catch(() => {})
+}
+
+/** The Open menu's Examples section: the page's starting points. */
+function ExampleItems({ examples }: { examples: FileMenuItem[] | undefined }) {
+  if (!examples || examples.length === 0) return null
+  return (
+    <>
+      <Menu.Label>Examples</Menu.Label>
+      {examples.map((x) => (
+        <Menu.Item key={x.label} onClick={x.run}>
+          {x.label}
+        </Menu.Item>
+      ))}
+    </>
+  )
+}
+
+/**
+ * Unsaved work: nothing for a record kept in the browser on every change; for a saved one whether
+ * it changed since (`dirty`); else whether the text differs from the one the record started with
+ * (none yet counts as unchanged).
+ */
+function isUnsaved(
+  autosaved: string | undefined,
+  dirty: boolean | undefined,
+  initial: string | undefined,
+  now: string,
+) {
+  if (autosaved) return false
+  if (dirty !== undefined) return dirty
+  return initial !== undefined && now !== initial
+}
+
+/** The status in the page bar's status line when there is one, else in place. */
+const inBar = (bar: HTMLElement | null | undefined, status: ReactNode) =>
+  bar === undefined ? status : bar && createPortal(status, bar)
+
+/** The Report issue box that adds the record's share link, none without a label. */
+const reportOption = (
+  label: string | undefined,
+  problem: string | undefined,
+  records: () => Promise<UserRecord[]>,
+) =>
+  label === undefined
+    ? undefined
+    : [
+        {
+          label,
+          heading: 'Design',
+          text: async () =>
+            problem
+              ? `No share link: ${problem}`
+              : ((await shareLink(
+                  await records(),
+                  window.location.origin + window.location.pathname,
+                )) ?? `No share link: longer than ${maxLinkChars} characters.`),
+        },
+      ]
+
+/** Runs `snapshot` once `filling` has settled, at once when it is no promise. */
+function settled(filling: unknown, snapshot: () => void, say: (message: string) => void) {
+  if (filling instanceof Promise) filling.finally(snapshot).catch((e) => say(errorText(e)))
+  else snapshot()
+}
+
+function BrowserItems({
+  shown,
+  kind,
+  onList,
+}: {
+  shown: boolean
+  kind: string
+  onList: () => void
+}) {
+  if (!shown) return null
+  return (
+    <>
+      <Menu.Label>This browser</Menu.Label>
+      <Menu.Item onClick={onList}>Saved {kind}…</Menu.Item>
+    </>
+  )
+}
+
+function ApiItems({ onDownload, onCopy }: { onDownload: () => void; onCopy: () => void }) {
+  return (
+    <>
+      <Menu.Item onClick={onDownload}>Download for the API</Menu.Item>
+      <Menu.Item onClick={onCopy}>Copy JSON for the API</Menu.Item>
+    </>
+  )
+}
+
+function FolderItems({
+  folder,
+  onReconnect,
+  onPick,
+  onForget,
+}: {
+  folder: { handle: FileSystemDirectoryHandle; allowed: boolean } | undefined
+  onReconnect: () => void
+  onPick: () => void
+  onForget: () => void
+}) {
+  return (
+    <>
+      <Menu.Divider />
+      <Menu.Label>Workspace folder</Menu.Label>
+      {folder && !folder.allowed && (
+        <Menu.Item onClick={onReconnect}>Reconnect folder {folder.handle.name}</Menu.Item>
+      )}
+      <Menu.Item onClick={onPick}>
+        {folder ? 'Change workspace folder…' : 'Choose workspace folder…'}
+      </Menu.Item>
+      {folder && <Menu.Item onClick={onForget}>Forget workspace folder</Menu.Item>}
+    </>
+  )
+}
+
+function FileStatus({
+  idle,
+  state,
+  folderName,
+  lines,
+  failure,
+  unsaved,
+  autosaved,
+  kept,
+}: {
+  /** No record is open: the status shows messages only. */
+  idle: boolean | undefined
+  state: string
+  /** The workspace folder named after the state, none when it is not in use. */
+  folderName: string | undefined
+  lines: string
+  failure: string
+  unsaved: boolean
+  autosaved: string | undefined
+  kept: string | undefined
+}) {
+  const folder = folderName ? `, folder ${folderName}` : ''
+  const shown = !idle
+  return (
+    <span
+      className="file-status"
+      title={[shown && `${state}${folder}`, lines, failure].filter(Boolean).join(' ')}
+    >
+      <span
+        className="file-state"
+        data-dirty={unsaved || (autosaved && kept === 'failed') || undefined}
+        // also after a file is written, when the text is the file's state
+        data-saving={(autosaved && kept === 'saving') || undefined}
+        aria-live="polite"
+      >
+        {shown && state}
+        {shown && folder}
+      </span>
+      <span role="status" className="file-message">
+        {lines}
+      </span>
+      <span role="alert" className="file-message">
+        {failure}
+      </span>
+    </span>
+  )
+}
+
+function ImportReport({
+  report,
+  onClose,
+  onReplace,
+}: {
+  report: Report
+  onClose: () => void
+  onReplace: () => void
+}) {
+  const { invalid } = report
+  return (
+    <>
+      <p>
+        {report.added} records added, {report.equal} already in this browser,{' '}
+        {report.skipped.length} files skipped.
+      </p>
+      {invalid.added + invalid.kept + invalid.unstorable > 0 && (
+        <p>
+          {invalid.added} invalid {invalid.added === 1 ? 'record' : 'records'} restored
+          {invalid.kept > 0 && `, ${invalid.kept} left out because a browser record has their id`}
+          {invalid.unstorable > 0 && `, ${invalid.unstorable} left out without a text id`}.
+        </p>
+      )}
+      {report.skipped.length > 0 && (
+        <ul className="file-skipped">
+          {report.skipped.map((s) => (
+            <li key={s.name}>
+              <strong>{s.name}</strong>: <span className="file-reason">{s.reason}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {report.notes.length > 0 && (
+        <ul className="file-skipped">
+          {report.notes.map((n) => (
+            <li key={n.name}>
+              <strong>{n.name}</strong>: <span className="file-reason">{n.note}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {report.conflicts.length > 0 ? (
+        <>
+          <p>
+            {report.conflicts.length} records have the id of a browser record with other content:{' '}
+            {report.conflicts.map((c) => c.stored.name).join(', ')}. Replace the browser copies?
+          </p>
+          <Group>
+            <Button onClick={onReplace}>Replace</Button>
+            <Button variant="default" onClick={onClose}>
+              Keep browser copies
+            </Button>
+          </Group>
+        </>
+      ) : (
+        <Button onClick={onClose}>Close</Button>
+      )}
+    </>
+  )
+}
+
+function SavedList<R extends UserRecord>({
+  list,
+  kind,
+  onUse,
+  onDelete,
+  onDeleteAll,
+}: {
+  list: R[] | undefined
+  /** The plural name of the kind. */
+  kind: string
+  onUse: (record: R) => void
+  onDelete: (record: R) => void
+  onDeleteAll: () => void
+}) {
+  return (
+    <>
+      {list?.length ? (
+        <ul className="file-records">
+          {list.map((r) => (
+            <li key={r.id}>
+              <Button variant="subtle" onClick={() => onUse(r)}>
+                {r.name}
+              </Button>{' '}
+              <span className="file-reason">
+                saved {new Date(r.saved).toLocaleString()}
+                {basedOnOf(r) && `, based on ${parseRef(basedOnOf(r) ?? '')?.id}`}
+              </span>{' '}
+              <Button
+                variant="subtle"
+                color="red"
+                size={controlSize.row.button}
+                aria-label={`Delete ${r.name}`}
+                onClick={() => onDelete(r)}
+              >
+                Delete
+              </Button>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>None yet; Save and Import keep records here.</p>
+      )}
+      {list && list.length > 0 && (
+        <Button variant="default" color="red" onClick={onDeleteAll}>
+          Delete all {kind}…
+        </Button>
+      )}
+    </>
+  )
+}
+
+function InvalidItem({ record: r, onDelete }: { record: InvalidRecord; onDelete: () => void }) {
+  return (
+    <li>
+      <strong>{r.name ?? r.id ?? 'Unnamed record'}</strong>{' '}
+      <span className="file-reason">{[r.kind, r.id].filter(Boolean).join(', ')}</span>{' '}
+      <Button
+        variant="subtle"
+        size={controlSize.row.button}
+        onClick={() =>
+          download(
+            new Blob([`${JSON.stringify(r.raw, null, 2)}\n`], { type: 'application/json' }),
+            recordFileName(`invalid ${r.id ?? r.name ?? 'record'}`),
+          )
+        }
+      >
+        Download raw
+      </Button>{' '}
+      <Button variant="subtle" color="red" size={controlSize.row.button} onClick={onDelete}>
+        Delete
+      </Button>
+      <pre className="file-error">{r.error}</pre>
+    </li>
+  )
+}
+
 /**
  * The page bar's Open menu (the browser's records, a file, Import, Paste JSON, the page's examples)
  * and Save with its menu (Save as, share link, JSON, Export all, the optional workspace folder).
@@ -304,12 +949,7 @@ function FileMenuOf<K extends UserRecordKind>({
   useEffect(() => {
     if (!canPickFolder()) return
     setFolderApi(true)
-    restoreFolder()
-      .then(async (h) => {
-        if (h === 'lost') setMessage('The workspace folder could not be restored; choose it again.')
-        else if (h) setFolder({ handle: h, allowed: await folderAllowed(h, false) })
-      })
-      .catch(() => {})
+    restoreFolderInto(setFolder, setMessage)
   }, [])
 
   const named = nameKey !== undefined
@@ -321,8 +961,7 @@ function FileMenuOf<K extends UserRecordKind>({
   const [started, setStarted] = useState(0)
   const dirty = saved !== undefined && saved.json !== now
   // kept in the browser on every change: nothing to lose when the page goes
-  const unsaved =
-    !autosaved && (saved ? dirty : initial.current !== undefined && now !== initial.current)
+  const unsaved = isUnsaved(autosaved, saved ? dirty : undefined, initial.current, now)
   // Save and Open file of the menu, for a page's own commands (the workbench search)
   const commands = {
     save: () => act('Save', () => save(false))(),
@@ -355,24 +994,15 @@ function FileMenuOf<K extends UserRecordKind>({
   useEffect(() => {
     if (!shareable.includes(kind)) return
     const read = () =>
-      readLink(window.location.hash)
-        .then(async (p) => {
-          if (!p) return
-          window.history.replaceState(window.history.state, '', window.location.href.split('#')[0])
-          if (!p.ok) return setMessage(`Shared link not opened: ${p.reason}`)
-          const r = p.records.find((x): x is Of<K> => x.kind === kind)
-          if (!r) return setMessage(`Shared link not opened: it holds no ${kindNames[kind]}.`)
-          if (
-            latest.current.unsaved &&
-            !(await ask('Replace the unsaved changes with the shared record?', 'Replace'))
-          )
-            return
-          const kept = await keepMakers(r, p.records)
-          carriedMakers.current = makerRecordsOf(r, p.records)
-          latest.current.openShared(r)
-          if (!kept) setFailure(noMaker)
-        })
-        .catch(() => {})
+      openSharedLink(kind, {
+        unsaved: () => latest.current.unsaved,
+        open: (r) => latest.current.openShared(r),
+        carry: (r, records) => {
+          carriedMakers.current = makerRecordsOf(r, records)
+        },
+        say: setMessage,
+        fail: setFailure,
+      }).catch(() => {})
     void read()
     window.addEventListener('hashchange', read)
     return () => window.removeEventListener('hashchange', read)
@@ -405,11 +1035,7 @@ function FileMenuOf<K extends UserRecordKind>({
           const filling = then?.()
           const snapshot = () => setStarted((n) => n + 1)
           // a `then` that returns a promise (records still loading) is snapshot once it settles
-          if (next === undefined) {
-            if (filling instanceof Promise)
-              filling.finally(snapshot).catch((e) => setMessage(errorText(e)))
-            else snapshot()
-          }
+          if (next === undefined) settled(filling, snapshot, setMessage)
           return true as const
         }
         if (!latest.current.unsaved) return start()
@@ -445,129 +1071,25 @@ function FileMenuOf<K extends UserRecordKind>({
 
   // unsaved work: the browser's leave-page prompt, a question before an in-app link or a router
   // push or replace, and a guard history entry with this URL, so Back and Forward ask too
-  useEffect(() => {
-    if (!unsaved) return
-    let leaving = false
-    /** The question while it shows: a second way out asked meanwhile waits for the same answer. */
-    let asking: Promise<boolean> | undefined
-    /** True once the user chose to leave; asked once. */
-    const leave = () => {
-      if (leaving) return Promise.resolve(true)
-      asking ??= ask('Leave this page? Changes not saved to a file are lost.', 'Leave').then(
-        (go) => {
-          leaving = go
-          asking = undefined
-          return go
-        },
-      )
-      return asking
-    }
-    /** Set while a Back taken during the question is undone by a step forward. */
-    let undoing = false
-    const warn = (e: BeforeUnloadEvent) => e.preventDefault()
-    const link = (e: MouseEvent) => {
-      if (leaving) return
-      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) return
-      const a = e.target instanceof Element ? e.target.closest('a[href]') : null
-      if (!(a instanceof HTMLAnchorElement) || a.target === '_blank' || a.hasAttribute('download'))
-        return
-      const to = new URL(a.href)
-      const here = window.location
-      if (to.origin !== here.origin || (to.pathname === here.pathname && to.search === here.search))
-        return
-      // held while the dialog asks; on yes the same click again, which passes then
-      e.preventDefault()
-      e.stopPropagation()
-      void leave().then((go) => go && a.click())
-    }
-    const guard = { ...window.history.state, fileGuard: true }
-    // the guard entry replaces the forward entries (Navigation API, Chromium; elsewhere unknown)
-    if ((window as { navigation?: { canGoForward: boolean } }).navigation?.canGoForward)
-      setMessage('Forward is not available while changes are not saved to a file.')
-    window.history.pushState(guard, '', window.location.href)
-    // through guardPop: runs before the router, which must not see a move off the guard entry
-    const pop = (e: PopStateEvent) => {
-      e.stopImmediatePropagation()
-      if (undoing) {
-        undoing = false
-        return
-      }
-      // a second Back while the first asks: undone, so the first's answer acts on its own step
-      if (asking) {
-        undoing = true
-        window.history.go(1)
-        return
-      }
-      void leave().then((go) => {
-        if (!go) {
-          window.history.pushState(guard, '', window.location.href)
-          setMessage('Stayed on this page to keep the changes not saved to a file.')
-          return
-        }
-        unpop()
-        window.history.back()
-      })
-    }
-    const unguard = guardNavigation(leave)
-    const unpop = guardPop(pop)
-    window.addEventListener('beforeunload', warn)
-    document.addEventListener('click', link, true)
-    return () => {
-      unguard()
-      window.removeEventListener('beforeunload', warn)
-      document.removeEventListener('click', link, true)
-      unpop()
-      // saved again: the guard entry goes; a navigation away has moved past it already
-      if (!leaving && window.history.state?.fileGuard) window.history.back()
-    }
-  }, [unsaved])
+  useEffect(() => (unsaved ? guardLeaving(setMessage) : undefined), [unsaved])
 
   // an autosaved record is kept in the browser until a file is written
-  const state = !saved
-    ? autosaved
-      ? kept === 'blank'
-        ? ''
-        : kept === 'saving'
-          ? 'Saving in this browser'
-          : kept === 'failed'
-            ? 'Not saved in this browser'
-            : 'Saved in this browser'
-      : unsaved
-        ? 'Unsaved changes, not saved to a file'
-        : 'Not saved to a file'
-    : dirty
-      ? autosaved
-        ? `Changed since ${saved.file}`
-        : `Unsaved changes (${saved.file})`
-      : `Saved: ${saved.file}`
+  const state = stateText({ saved, dirty, autosaved, kept, unsaved })
   const ready = folder?.allowed ? folder.handle : undefined
   // in a page bar the state and messages are its status line: one line, the whole text on hover
   const bar = useContext(BarStatus)
   const lines = [message, note, storageNote].filter(Boolean).join(' ')
   const status = (
-    <span
-      className="file-status"
-      title={[!idle && `${state}${ready ? `, folder ${ready.name}` : ''}`, lines, failure]
-        .filter(Boolean)
-        .join(' ')}
-    >
-      <span
-        className="file-state"
-        data-dirty={unsaved || (autosaved && kept === 'failed') || undefined}
-        // also after a file is written, when the text is the file's state
-        data-saving={(autosaved && kept === 'saving') || undefined}
-        aria-live="polite"
-      >
-        {!idle && state}
-        {!idle && ready && `, folder ${ready.name}`}
-      </span>
-      <span role="status" className="file-message">
-        {lines}
-      </span>
-      <span role="alert" className="file-message">
-        {failure}
-      </span>
-    </span>
+    <FileStatus
+      idle={idle}
+      state={state}
+      folderName={ready?.name}
+      lines={lines}
+      failure={failure}
+      unsaved={unsaved}
+      autosaved={autosaved}
+      kept={kept}
+    />
   )
 
   /** Runs a file action; a failure is shown, not thrown. */
@@ -577,7 +1099,8 @@ function FileMenuOf<K extends UserRecordKind>({
     f().catch((e: unknown) => setFailure(`${what} failed: ${errorText(e)}`))
   }
 
-  async function save(as: boolean) {
+  /** The record to write and its checked file text; undefined after showing why not. */
+  async function prepareSave(as: boolean) {
     if (problem) {
       setFailure(`Not saved: ${problem}`)
       return
@@ -590,54 +1113,52 @@ function FileMenuOf<K extends UserRecordKind>({
       setFailure(`Not saved: ${checked.reason}`)
       return
     }
-    const { text } = checked
-    // a copy saved after this tab's one (another tab or window) is overwritten only on yes
-    const savedIn = (t: string | undefined) => {
-      const p = t === undefined ? undefined : parseUserDataFile(t)
-      return p?.ok ? p.records.find((r) => r.id === recordId)?.saved : undefined
-    }
-    let agreed = false
-    const allow = async (other: string | undefined) => {
-      if (agreed || !known.current || !other || other <= known.current) return true
-      agreed = await confirmDialog({
-        title: 'Overwrite the newer copy?',
-        message: `A newer copy of this record was saved at ${new Date(other).toLocaleString()} (another tab or window); this tab has the copy saved at ${new Date(known.current).toLocaleString()}.`,
-        confirmLabel: 'Overwrite',
-        danger: true,
-      })
-      return agreed
-    }
-    const keepNewer = () => setMessage('Not saved: a newer copy was kept.')
+    return { recordId, record, text: checked.text }
+  }
+
+  /** Writes the file of a prepared save; undefined when none was written (a newer copy kept, or no file picked). */
+  async function writeSave(as: boolean, { recordId, text }: { recordId: string; text: string }) {
+    const allow = newerGuard(() => known.current)
     // a failed read leaves the check to the file; the write reports the browser store failure; an
     // autosaved record's browser copy is this page's own
-    if (
-      !as &&
-      !autosaved &&
-      !(await allow((await storedRecord(recordId).catch(() => undefined))?.saved))
-    )
-      return keepNewer()
-    let file: string
+    const stored = !as && !autosaved && (await storedRecord(recordId).catch(() => undefined))
+    if (stored !== false && !(await allow(stored?.saved))) return keptNewer()
     const current = !as && handle.current ? await readHandleText(handle.current) : undefined
-    // a kept file is written only while it holds this record alone (not an Export all file)
-    if (handle.current && ownsFile(current, recordId)) {
-      if (!(await allow(savedIn(current)))) return keepNewer()
-      await writeHandleText(handle.current, text)
-      file = handle.current.name
-    } else if (!as && ready) {
-      const h = await saveToFolder(ready, recordFileName(name), recordId, text, (t) =>
-        allow(savedIn(t)),
-      )
-      if (!h) return keepNewer()
-      handle.current = h
-      file = h.name
-    } else {
-      const r = await saveAs(text, recordFileName(name), ready)
-      if (!r) return
-      handle.current = r.handle
-      file = r.name
-    }
-    id.current = recordId
+    const written = await writeRecordFile({
+      handle: handle.current,
+      current,
+      as,
+      ready,
+      name,
+      recordId,
+      text,
+      allow,
+    })
+    return written === 'newer' ? keptNewer() : written
+  }
+
+  async function save(as: boolean) {
+    const prepared = await prepareSave(as)
+    if (!prepared) return
+    const written = await writeSave(as, prepared)
+    if (!written) return
+    const { record } = prepared
+    handle.current = written.handle
+    id.current = record.id
     known.current = record.saved
+    await keepBrowserCopy(record, written.name)
+    // the file holds the record whether or not the browser copy was written
+    setSaved({ file: written.name, json: keyOf(data, nameKey ?? '') })
+    // the copy is what the page shows now
+    if (autosaved && as) onOpen(data, name, record)
+  }
+
+  function keptNewer() {
+    setMessage('Not saved: a newer copy was kept.')
+  }
+
+  /** The browser's copy of a saved record; a failure is shown, the file stays written. */
+  async function keepBrowserCopy(record: Of<K>, file: string) {
     try {
       if (!store) await putRecords([record])
       if (!store || (await store(record))) onStored?.()
@@ -645,10 +1166,6 @@ function FileMenuOf<K extends UserRecordKind>({
     } catch (e) {
       setFailure(`Saved to ${file}; the browser copy failed: ${errorText(e)}`)
     }
-    // the file holds the record whether or not the browser copy was written
-    setSaved({ file, json: keyOf(data, nameKey ?? '') })
-    // the copy is what the page shows now
-    if (autosaved && as) onOpen(data, name, record)
   }
 
   /** A shared record: a new id, no file, unsaved until saved. */
@@ -683,23 +1200,7 @@ function FileMenuOf<K extends UserRecordKind>({
 
   const current = () =>
     ({ kind, id: id.current ?? newId(), name, saved: new Date().toISOString(), data }) as Of<K>
-  useReportOptions(
-    reportBox === undefined
-      ? undefined
-      : [
-          {
-            label: reportBox,
-            heading: 'Design',
-            text: async () =>
-              problem
-                ? `No share link: ${problem}`
-                : ((await shareLink(
-                    await withMakers(current()),
-                    window.location.origin + window.location.pathname,
-                  )) ?? `No share link: longer than ${maxLinkChars} characters.`),
-          },
-        ],
-  )
+  useReportOptions(reportOption(reportBox, problem, async () => withMakers(current())))
 
   async function share() {
     if (problem) return setFailure(`Not shared: ${problem}`)
@@ -781,22 +1282,6 @@ function FileMenuOf<K extends UserRecordKind>({
     return [record, ...makersToCarry(record, stored, carriedMakers.current)]
   }
 
-  /** Keeps the user manufacturer `record` names, as `carried` holds it, unless one of its id is stored; false when the store refused it. */
-  async function keepMakers(record: UserRecord, carried: UserRecord[]) {
-    try {
-      await Promise.all(makerRecordsOf(record, carried).map(putRecordIfAbsent))
-      return true
-    } catch {
-      return false
-    }
-  }
-
-  /** `refNote` of `opened` against the browser store and the built-in example rifle; empty when the store cannot be read. */
-  async function refsOf(opened: UserRecord[]) {
-    const stored = await storedRecords().catch(() => undefined)
-    return stored ? refNote(opened, [builtIn, ...stored.records]) : ''
-  }
-
   /** Shows `record` unless the user keeps the unsaved changes; false when kept. */
   async function use(
     record: Of<K>,
@@ -823,42 +1308,22 @@ function FileMenuOf<K extends UserRecordKind>({
   async function open() {
     const [picked] = await pickFiles(false, ready)
     if (!picked) return
-    const text = await read(picked.file)
-    const parsed: ParsedUserFile =
-      text === undefined ? { ok: false, reason: tooLargeMessage } : readLoadFile(text)
-    if (!parsed.ok) {
-      setMessage(`${picked.file.name} not opened: ${parsed.reason}`)
+    const opened = await readOpened(picked.file, kind)
+    if (opened.problem !== undefined) {
+      setMessage(opened.problem)
       return
     }
-    const mine = parsed.records.filter((r): r is Of<K> => r.kind === kind)
-    if (mine.length !== 1) {
-      setMessage(
-        `${picked.file.name} holds ${mine.length} ${kindNames[kind]}; Open takes a file with one, Import takes collections.`,
-      )
-      return
-    }
+    const { parsed, text, mine } = opened
+    // kept in the browser at once, with its photo, as the page keeps every change
     if (autosaved) {
-      // kept in the browser at once, with its photo, as the page keeps every change
-      const r = mine[0]
-      const stored = await storedRecord(r.id).catch(() => undefined)
-      if (
-        stored &&
-        canonicalJson(stored.data) !== canonicalJson(r.data) &&
-        !(await ask(
-          `Replace the browser copy of ${stored.name} with the one in the file?`,
-          'Replace',
-        ))
-      )
-        return
-      await storePhotos(parsed.files ?? [], [r])
-      await putRecords([r])
+      if (!(await keepInBrowser(mine, parsed.files ?? []))) return
       onStored?.()
     }
     // Save writes back only to a file of this record alone
     await use(
-      mine[0],
+      mine,
       picked.file.name,
-      ownsFile(text, mine[0].id) ? picked.handle : undefined,
+      ownsFile(text, mine.id) ? picked.handle : undefined,
       readNote(parsed),
       parsed.records,
     )
@@ -876,81 +1341,31 @@ function FileMenuOf<K extends UserRecordKind>({
       setFailure(`Not exported: ${checked.reason}`)
       return false
     }
-    const without = records.flatMap((s) =>
-      s.kind === 'targetSheet' && checked.left.includes(s.data.photo ?? '') ? [s.name] : [],
-    )
-    const photos = without.length
-      ? ` Left out for the file size limit: the photos of ${without.join(', ')}. Save on a sheet keeps its photo.`
-      : ''
     const day = localDay(new Date())
     const r = await saveAs(checked.text, `openreloading-data-${day}.json`, ready)
     if (r) {
-      const raw = invalid.length
-        ? ` ${invalid.length} invalid ${invalid.length === 1 ? 'record is' : 'records are'} in it as stored.`
-        : ''
-      setMessage(`Exported ${records.length} records to ${r.name}.${raw}${photos}`)
+      setMessage(
+        `Exported ${records.length} records to ${r.name}.${exportNotes(records, invalid, checked.left)}`,
+      )
       onExported?.()
     }
     return r !== undefined
   }
 
+  const importIo = {
+    onStored,
+    noteStorage: () => void noteStorage(),
+    fail: setFailure,
+    show: setReport,
+  }
+
   async function importFiles() {
     const picked = await pickFiles(true, ready)
     if (!picked.length) return
-    await importTexts(picked.map(({ file }) => ({ name: file.name, text: () => read(file) })))
-  }
-
-  /** Reads and stores one file at a time, so several large files are not held at once. */
-  async function importTexts(files: { name: string; text: () => Promise<string | undefined> }[]) {
-    const total: Report = {
-      added: 0,
-      equal: 0,
-      skipped: [],
-      notes: [],
-      conflicts: [],
-      invalid: { added: 0, kept: 0, unstorable: 0 },
-      files: [],
-    }
-    let count = 0
-    const added: UserRecord[] = []
-    for (const f of files) {
-      const {
-        records,
-        files: photos,
-        invalid,
-        skipped,
-        notes,
-      } = parseFiles([{ name: f.name, text: await f.text() }])
-      count += records.length
-      const plan = planImport(records, (await storedRecords()).records)
-      try {
-        // an equal record may come to a browser without its photo
-        await storePhotos(photos, [...plan.added, ...plan.equal])
-        await putRecords(plan.added)
-        // after the valid records, and never over a record with its id
-        const stored = await putInvalid(invalid)
-        for (const k of ['added', 'kept', 'unstorable'] as const) total.invalid[k] += stored[k]
-      } catch (e) {
-        setFailure(`Import read ${count} records; the browser store write failed: ${errorText(e)}`)
-        if (total.added) onStored?.()
-        return
-      }
-      added.push(...plan.added)
-      total.added += plan.added.length
-      total.equal += plan.equal.length
-      total.skipped.push(...skipped)
-      total.notes.push(...notes)
-      total.conflicts.push(...plan.conflicts)
-      // kept for Replace: only the photos of the records it may store
-      const wanted = new Set(photoIds(plan.conflicts.map((c) => c.incoming)))
-      total.files.push(...photos.filter((p) => wanted.has(p.id)))
-    }
-    // once all files are stored, so a reference to a record of a later file resolves
-    const refs = await refsOf(added)
-    if (refs) total.notes.push({ name: 'References', note: refs })
-    onStored?.()
-    void noteStorage()
-    setReport(total)
+    await importTexts(
+      picked.map(({ file }) => ({ name: file.name, text: () => read(file) })),
+      importIo,
+    )
   }
 
   async function replace() {
@@ -1010,35 +1425,30 @@ function FileMenuOf<K extends UserRecordKind>({
     if (handle) setFolder({ handle, allowed: true })
   }
 
+  async function forget() {
+    await forgetFolder()
+    setFolder(undefined)
+  }
+
+  /** Downloads the load file for the API. */
+  function downloadApi() {
+    const text = apiText()
+    if (text !== undefined) {
+      download(new Blob([text], { type: 'application/json' }), recordFileName(`${name} api`))
+      setMessage('Downloaded the load file for the API.')
+    }
+    return Promise.resolve()
+  }
+
+  async function copyApi() {
+    const text = apiText()
+    if (text !== undefined) await copy(text, 'Load file for the API')
+  }
+
   async function reconnect() {
     if (folder)
       setFolder({ handle: folder.handle, allowed: await folderAllowed(folder.handle, true) })
   }
-
-  const folderItems = folderApi && (
-    <>
-      <Menu.Divider />
-      <Menu.Label>Workspace folder</Menu.Label>
-      {folder && !folder.allowed && (
-        <Menu.Item onClick={act('Reconnect', reconnect)}>
-          Reconnect folder {folder.handle.name}
-        </Menu.Item>
-      )}
-      <Menu.Item onClick={act('Folder', pickFolder)}>
-        {folder ? 'Change workspace folder…' : 'Choose workspace folder…'}
-      </Menu.Item>
-      {folder && (
-        <Menu.Item
-          onClick={act('Forget', async () => {
-            await forgetFolder()
-            setFolder(undefined)
-          })}
-        >
-          Forget workspace folder
-        </Menu.Item>
-      )}
-    </>
-  )
 
   return (
     <Group gap="xs" className="file-menu">
@@ -1054,14 +1464,11 @@ function FileMenuOf<K extends UserRecordKind>({
           </Button>
         </Menu.Target>
         <Menu.Dropdown>
-          {(onList || browserList || !autosaved) && (
-            <>
-              <Menu.Label>This browser</Menu.Label>
-              <Menu.Item onClick={onList ?? act('Listing', browserRecords)}>
-                Saved {kindNames[kind]}…
-              </Menu.Item>
-            </>
-          )}
+          <BrowserItems
+            shown={Boolean(onList || browserList || !autosaved)}
+            kind={kindNames[kind]}
+            onList={onList ?? act('Listing', browserRecords)}
+          />
           {invalidCount > 0 && (
             <Menu.Item onClick={act('Listing', invalidRecords)}>
               Invalid records ({invalidCount})…
@@ -1073,16 +1480,7 @@ function FileMenuOf<K extends UserRecordKind>({
           </Menu.Item>
           <Menu.Item onClick={act('Import', importFiles)}>Import…</Menu.Item>
           <Menu.Item onClick={() => setPasted('')}>Paste JSON…</Menu.Item>
-          {examples && examples.length > 0 && (
-            <>
-              <Menu.Label>Examples</Menu.Label>
-              {examples.map((x) => (
-                <Menu.Item key={x.label} onClick={x.run}>
-                  {x.label}
-                </Menu.Item>
-              ))}
-            </>
-          )}
+          <ExampleItems examples={examples} />
         </Menu.Dropdown>
       </Menu>
       <Button.Group className="save-group">
@@ -1116,31 +1514,7 @@ function FileMenuOf<K extends UserRecordKind>({
               Copy JSON
             </Menu.Item>
             {apiData && (
-              <>
-                <Menu.Item
-                  onClick={act('Download', () => {
-                    const text = apiText()
-                    if (text !== undefined) {
-                      download(
-                        new Blob([text], { type: 'application/json' }),
-                        recordFileName(`${name} api`),
-                      )
-                      setMessage('Downloaded the load file for the API.')
-                    }
-                    return Promise.resolve()
-                  })}
-                >
-                  Download for the API
-                </Menu.Item>
-                <Menu.Item
-                  onClick={act('Copy', async () => {
-                    const text = apiText()
-                    if (text !== undefined) await copy(text, 'Load file for the API')
-                  })}
-                >
-                  Copy JSON for the API
-                </Menu.Item>
-              </>
+              <ApiItems onDownload={act('Download', downloadApi)} onCopy={act('Copy', copyApi)} />
             )}
             <Menu.Divider />
             <Menu.Item
@@ -1150,65 +1524,25 @@ function FileMenuOf<K extends UserRecordKind>({
             >
               Export all…
             </Menu.Item>
-            {folderItems}
+            {folderApi && (
+              <FolderItems
+                folder={folder}
+                onReconnect={act('Reconnect', reconnect)}
+                onPick={act('Folder', pickFolder)}
+                onForget={act('Forget', forget)}
+              />
+            )}
           </Menu.Dropdown>
         </Menu>
       </Button.Group>
-      {bar === undefined ? status : bar && createPortal(status, bar)}
+      {inBar(bar, status)}
       <AppModal opened={report !== undefined} onClose={() => setReport(undefined)} title="Import">
         {report && (
-          <>
-            <p>
-              {report.added} records added, {report.equal} already in this browser,{' '}
-              {report.skipped.length} files skipped.
-            </p>
-            {report.invalid.added + report.invalid.kept + report.invalid.unstorable > 0 && (
-              <p>
-                {report.invalid.added} invalid {report.invalid.added === 1 ? 'record' : 'records'}{' '}
-                restored
-                {report.invalid.kept > 0 &&
-                  `, ${report.invalid.kept} left out because a browser record has their id`}
-                {report.invalid.unstorable > 0 &&
-                  `, ${report.invalid.unstorable} left out without a text id`}
-                .
-              </p>
-            )}
-            {report.skipped.length > 0 && (
-              <ul className="file-skipped">
-                {report.skipped.map((s) => (
-                  <li key={s.name}>
-                    <strong>{s.name}</strong>: <span className="file-reason">{s.reason}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {report.notes.length > 0 && (
-              <ul className="file-skipped">
-                {report.notes.map((n) => (
-                  <li key={n.name}>
-                    <strong>{n.name}</strong>: <span className="file-reason">{n.note}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {report.conflicts.length > 0 ? (
-              <>
-                <p>
-                  {report.conflicts.length} records have the id of a browser record with other
-                  content: {report.conflicts.map((c) => c.stored.name).join(', ')}. Replace the
-                  browser copies?
-                </p>
-                <Group>
-                  <Button onClick={act('Replace', replace)}>Replace</Button>
-                  <Button variant="default" onClick={() => setReport(undefined)}>
-                    Keep browser copies
-                  </Button>
-                </Group>
-              </>
-            ) : (
-              <Button onClick={() => setReport(undefined)}>Close</Button>
-            )}
-          </>
+          <ImportReport
+            report={report}
+            onClose={() => setReport(undefined)}
+            onReplace={act('Replace', replace)}
+          />
         )}
       </AppModal>
       <AppModal
@@ -1216,44 +1550,19 @@ function FileMenuOf<K extends UserRecordKind>({
         onClose={() => setList(undefined)}
         title={`Saved ${kindNames[kind]} in this browser`}
       >
-        {list?.length ? (
-          <ul className="file-records">
-            {list.map((r) => (
-              <li key={r.id}>
-                <Button
-                  variant="subtle"
-                  onClick={async () => {
-                    if (await use(r, `${r.name} (browser)`)) setList(undefined)
-                  }}
-                >
-                  {r.name}
-                </Button>{' '}
-                <span className="file-reason">
-                  saved {new Date(r.saved).toLocaleString()}
-                  {basedOnOf(r) && `, based on ${parseRef(basedOnOf(r) ?? '')?.id}`}
-                </span>{' '}
-                <Button
-                  variant="subtle"
-                  color="red"
-                  size={controlSize.row.button}
-                  aria-label={`Delete ${r.name}`}
-                  onClick={act('Delete', () =>
-                    remove([r], `Delete ${r.name} from this browser? This cannot be undone.`),
-                  )}
-                >
-                  Delete
-                </Button>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>None yet; Save and Import keep records here.</p>
-        )}
-        {list && list.length > 0 && (
-          <Button variant="default" color="red" onClick={act('Delete all', removeAll)}>
-            Delete all {kindNames[kind]}…
-          </Button>
-        )}
+        <SavedList
+          list={list}
+          kind={kindNames[kind]}
+          onUse={async (r) => {
+            if (await use(r, `${r.name} (browser)`)) setList(undefined)
+          }}
+          onDelete={(r) =>
+            act('Delete', () =>
+              remove([r], `Delete ${r.name} from this browser? This cannot be undone.`),
+            )()
+          }
+          onDeleteAll={act('Delete all', removeAll)}
+        />
       </AppModal>
       <AppModal
         opened={invalidList !== undefined}
@@ -1266,31 +1575,11 @@ function FileMenuOf<K extends UserRecordKind>({
         </p>
         <ul className="file-records">
           {invalidList?.map((r) => (
-            <li key={String((r.raw as { id?: unknown } | null)?.id)}>
-              <strong>{r.name ?? r.id ?? 'Unnamed record'}</strong>{' '}
-              <span className="file-reason">{[r.kind, r.id].filter(Boolean).join(', ')}</span>{' '}
-              <Button
-                variant="subtle"
-                size={controlSize.row.button}
-                onClick={() =>
-                  download(
-                    new Blob([`${JSON.stringify(r.raw, null, 2)}\n`], { type: 'application/json' }),
-                    recordFileName(`invalid ${r.id ?? r.name ?? 'record'}`),
-                  )
-                }
-              >
-                Download raw
-              </Button>{' '}
-              <Button
-                variant="subtle"
-                color="red"
-                size={controlSize.row.button}
-                onClick={act('Delete', () => removeInvalid(r))}
-              >
-                Delete
-              </Button>
-              <pre className="file-error">{r.error}</pre>
-            </li>
+            <InvalidItem
+              key={String((r.raw as { id?: unknown } | null)?.id)}
+              record={r}
+              onDelete={act('Delete', () => removeInvalid(r))}
+            />
           ))}
         </ul>
       </AppModal>
@@ -1328,7 +1617,7 @@ function FileMenuOf<K extends UserRecordKind>({
             onClick={act('Paste', async () => {
               const text = pasted ?? ''
               setPasted(undefined)
-              await importTexts([{ name: 'Pasted text', text: async () => text }])
+              await importTexts([{ name: 'Pasted text', text: async () => text }], importIo)
             })}
           >
             Import
