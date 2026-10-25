@@ -71,7 +71,7 @@ test('a bullet design of this browser is found by Ctrl+K and opens in its design
       },
     },
   ])
-  await page.reload()
+  await gotoHydrated(page, '/powders')
   await open(page)
   await field(page).fill('slug test')
   await search(page).getByRole('button', { name: 'Slug test design (your design)' }).click()
