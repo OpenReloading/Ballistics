@@ -490,6 +490,11 @@ export function useWorkbenchState() {
   const sessionsNow = useRef<SessionRecord[]>([])
   const sessionsOpened = useRef(0)
   const manufacturers = useManufacturers()
+  const { ensure: ensureManufacturer, newId: freshId } = manufacturers
+  const manufacturerRef = useCallback(
+    (typed: string) => ensureManufacturer(typed, freshId()),
+    [ensureManufacturer, freshId],
+  )
   /** Replaces the sessions; the records that changed are stored, a removed one stays in the store. */
   const setChronoSessions = useCallback((update: SetStateAction<SessionRecord[]>) => {
     const before = sessionsNow.current
@@ -1665,8 +1670,10 @@ export function useWorkbenchState() {
     ).then((found) => {
       if (sessionsOpened.current !== token) return
       const list = found.filter((r) => r !== undefined)
-      sessionsNow.current = list
-      setSessionsState(list)
+      // a file read while the store answered stays
+      const added = sessionsNow.current.filter((r) => !list.some((x) => x.id === r.id))
+      sessionsNow.current = [...list, ...added]
+      setSessionsState(sessionsNow.current)
     })
   }
 
@@ -1902,8 +1909,12 @@ export function useWorkbenchState() {
         ...changed,
         record,
       ])
-      sessionsNow.current = attached
-      setSessionsState(attached)
+      // edits made while the store wrote are kept; the strings they mapped name the load too
+      const latest = sessionsNow.current.map((s) => attachLoad(s, sessionRef(record.id)))
+      const late = latest.filter((s, i) => s !== sessionsNow.current[i])
+      sessionsNow.current = latest
+      setSessionsState(latest)
+      if (late.length > 0) await putRecords(late)
       return true
     },
     [measuredCapacity],
@@ -2211,7 +2222,7 @@ export function useWorkbenchState() {
     linkedPowder,
     setNotes,
     setChronoSessions,
-    manufacturerRef: (typed: string) => manufacturers.ensure(typed, manufacturers.newId()),
+    manufacturerRef,
     manufacturerName: manufacturers.nameOf,
     setSeen,
     setStepsDraft,

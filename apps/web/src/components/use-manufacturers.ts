@@ -71,12 +71,13 @@ export function useManufacturers() {
     },
     [preview],
   )
+  const nameOf = useCallback((ref: string | undefined) => refName(names, ref), [names])
   return {
     known,
     names,
     preview,
     ensure,
     newId,
-    nameOf: (ref: string | undefined) => refName(names, ref),
+    nameOf,
   }
 }

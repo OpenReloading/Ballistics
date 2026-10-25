@@ -41,6 +41,8 @@ const columns = [
   'Difference',
   'Difference %',
 ] as const
+/** Sessions a load names at most (`Load.sessions`). */
+const maxSessions = 50
 const tableName = 'Measured against simulated velocity per charge'
 const chartName = 'Measured mean velocity and simulated muzzle velocity against charge'
 
@@ -169,25 +171,31 @@ export function Measurements({
       // taken before the first await, so reads that overlap never share an id
       const id = newId()
       try {
+        // a load names up to maxSessions sessions
+        if (sessions.length + read.length >= maxSessions)
+          throw new Error(`a load keeps ${maxSessions} sessions at most.`)
         const data = await readChrono(await chronoFileBytes(file), {
           fileName: file.name,
           ...(unit ? { velocityUnit: unit } : {}),
         })
         // string k takes step k's charge; the selects show the guess
         const charges = data.session.strings.map((_, i) => steps?.[i]?.charge)
+        // checked before the maker is stored: a file over the schema's caps would be stored as an
+        // invalid record
+        const now = new Date()
+        const draft = sessionOf(file.name, data, charges, { id, now })
+        const checked = chronoSession.safeParse(draft.data)
+        if (!checked.success)
+          throw new Error(
+            checked.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; '),
+          )
         const named = data.session.device.manufacturerName?.trim() ?? ''
         if (named && !makers.has(named)) makers.set(named, manufacturerRef(named))
         const record = sessionOf(file.name, data, charges, {
           id,
           manufacturer: makers.get(named),
-          now: new Date(),
+          now,
         })
-        // a file over the schema's caps would be stored as an invalid record
-        const checked = chronoSession.safeParse(record.data)
-        if (!checked.success)
-          throw new Error(
-            checked.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; '),
-          )
         read.push(record)
       } catch (err) {
         failed.push(`${file.name}: ${errorText(err)}`)
