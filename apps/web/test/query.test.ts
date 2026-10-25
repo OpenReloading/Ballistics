@@ -1,4 +1,4 @@
-import { overrideResistance, recordResistance } from '@openreloading/core'
+import { overrideResistance, recordResistance } from '@open-reloading/core'
 import { expect, it } from 'vitest'
 import { fieldError, fieldValueFromText, initialFields } from '../src/lib/field-spec.ts'
 import {

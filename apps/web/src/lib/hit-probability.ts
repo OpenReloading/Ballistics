@@ -1,5 +1,5 @@
-import type { ScoringZone, TrajectoryPoint } from '@openreloading/core'
-import { type TargetFace, toSi } from '@openreloading/schema'
+import type { ScoringZone, TrajectoryPoint } from '@open-reloading/core'
+import { type TargetFace, toSi } from '@open-reloading/schema'
 
 /**
  * The scoring zones of a face for a hole of diameter `hole` m, outermost first: each ring grown by

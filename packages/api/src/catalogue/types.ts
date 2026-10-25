@@ -2,8 +2,8 @@ import type {
   Bullet,
   CaliberClass,
   Cartridge,
-  CaseCapacity,
   CaseType,
+  CatalogueCaseCapacity,
   Discipline,
   Federation,
   Manufacturer,
@@ -11,7 +11,7 @@ import type {
   Renames,
   TargetFace,
   TargetMapping,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 
 /** The entities of the catalogue, the names `Catalogue.get` takes. */
 export type CatalogueKind =
@@ -32,7 +32,8 @@ export interface RecordOfKind {
   manufacturer: Manufacturer
   powder: Powder
   bullet: Bullet
-  caseCapacity: CaseCapacity
+  /** The record file leaves out `origin`, which every catalogue record has. */
+  caseCapacity: Omit<CatalogueCaseCapacity, 'origin'>
   targetFace: TargetFace
   federation: Federation
   discipline: Discipline
@@ -234,13 +235,13 @@ export type RecordFile = CatalogueHeader & {
   [K in CatalogueKind]: Record<string, RecordOfKind[K]>
 }
 
-/** The records a catalogue is built from; `Bundle` of `@openreloading/data` has them. */
+/** The records a catalogue is built from; `Bundle` of `@open-reloading/data` has them. */
 export interface CatalogueSource {
   cartridges: Cartridge[]
   manufacturers: Manufacturer[]
   powders: Powder[]
   bullets: Bullet[]
-  capacities: CaseCapacity[]
+  capacities: CatalogueCaseCapacity[]
   targetFaces: TargetFace[]
   federations: Federation[]
   disciplines: Discipline[]

@@ -1,5 +1,5 @@
-import { radPerMoa, radPerMrad, waterDensityGramsPerCm3 } from '@openreloading/core'
-import { fromSi, type QuantityKind, toSi } from '@openreloading/schema'
+import { radPerMoa, radPerMrad, waterDensityGramsPerCm3 } from '@open-reloading/core'
+import { fromSi, type QuantityKind, toSi } from '@open-reloading/schema'
 
 /**
  * Display units. Every value is held in SI; a unit converts to and from SI and has a fixed number

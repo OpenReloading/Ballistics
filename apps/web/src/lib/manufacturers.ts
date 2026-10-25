@@ -4,7 +4,7 @@
  * from `getManufacturerNames` (`api.ts`).
  */
 
-import { fold, type UserRecord, userIdRegex } from '@openreloading/schema'
+import { fold, type UserRecord, userIdRegex } from '@open-reloading/schema'
 import { apiFetch } from './api-fetch.ts'
 import type { ManufacturerSummary } from './api-types.ts'
 

@@ -1,8 +1,8 @@
 'use client'
 
 import { ActionIcon, Button, NativeSelect, Popover, Textarea } from '@mantine/core'
-import type { GroupStatistics } from '@openreloading/core'
-import type { SheetNote, ShotGroup } from '@openreloading/schema'
+import type { GroupStatistics } from '@open-reloading/core'
+import type { SheetNote, ShotGroup } from '@open-reloading/schema'
 import { BracketsCurly, Plus, Trash } from '@phosphor-icons/react'
 import { type KeyboardEvent, type PointerEvent, useRef, useState } from 'react'
 import { type Frame, screenNudge, targetToView, viewToTarget } from '../lib/target-editor.ts'

@@ -7540,9 +7540,9 @@ main .field-table tr.field-group > th {
     break-inside: avoid;
   }
 
-  /* the paper of the card: A6 and A5 across, A4 upright, each with its own named page */
+  /* the paper of the card: A6 (148 x 105 mm, no CSS size keyword) and A5 across, A4 upright, each with its own named page */
   @page range-a6 {
-    size: A6 landscape;
+    size: 148mm 105mm;
     margin: 5mm;
   }
 

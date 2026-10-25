@@ -1,7 +1,7 @@
 'use client'
 
-import { dispersionEllipse, predictionEllipse } from '@openreloading/core'
-import { type CalibrationReference, fromSi, type TargetSheet, toSi } from '@openreloading/schema'
+import { dispersionEllipse, predictionEllipse } from '@open-reloading/core'
+import { type CalibrationReference, fromSi, type TargetSheet, toSi } from '@open-reloading/schema'
 import {
   type KeyboardEvent,
   type PointerEvent,
@@ -549,10 +549,10 @@ export function TargetCanvas({
               )
             }
             const extremes = (pts: Point[]) => [
-              pts.reduce((a, b) => (b.y < a.y ? b : a)),
-              pts.reduce((a, b) => (b.x > a.x ? b : a)),
-              pts.reduce((a, b) => (b.y > a.y ? b : a)),
-              pts.reduce((a, b) => (b.x < a.x ? b : a)),
+              pts.reduce((a, b) => (b.y < a.y ? b : a), pts[0]),
+              pts.reduce((a, b) => (b.x > a.x ? b : a), pts[0]),
+              pts.reduce((a, b) => (b.y > a.y ? b : a), pts[0]),
+              pts.reduce((a, b) => (b.x < a.x ? b : a), pts[0]),
             ]
             return sheet.groups.map((g) => {
               const s = groupStatisticsOf(g)

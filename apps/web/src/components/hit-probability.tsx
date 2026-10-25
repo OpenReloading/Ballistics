@@ -6,8 +6,8 @@ import {
   hitProbability,
   pointDispersion,
   type TrajectoryPoint,
-} from '@openreloading/core'
-import type { TargetFace } from '@openreloading/schema'
+} from '@open-reloading/core'
+import type { TargetFace } from '@open-reloading/schema'
 import { useEffect, useMemo, useState } from 'react'
 import { errorText } from '../lib/error-text.ts'
 import { type FaceSummary, fetchFace, fetchFaceSummaries } from '../lib/face-records.ts'

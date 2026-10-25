@@ -1,4 +1,4 @@
-import { type userDataFile, userDataFormat, userDataVersion } from '@openreloading/schema'
+import { type userDataFile, userDataFormat, userDataVersion } from '@open-reloading/schema'
 import type { z } from 'zod'
 
 /** A body of `POST /interior/load-file` as a client sends it, before defaults. */

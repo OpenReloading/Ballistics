@@ -1,4 +1,4 @@
-import type { TargetFace } from '@openreloading/schema'
+import type { TargetFace } from '@open-reloading/schema'
 import sharp from 'sharp'
 import { expect } from 'vitest'
 import { autoDetect } from '../src/lib/hole-detection.ts'

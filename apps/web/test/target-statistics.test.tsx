@@ -1,10 +1,10 @@
-import type { ShotGroup, TargetSheet } from '@openreloading/schema'
+import type { ShotGroup, TargetSheet } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { beforeEach, expect, it, vi } from 'vitest'
 
 const calls = vi.hoisted(() => ({ n: 0 }))
-vi.mock('@openreloading/core', async (actual) => {
-  const core = await actual<typeof import('@openreloading/core')>()
+vi.mock('@open-reloading/core', async (actual) => {
+  const core = await actual<typeof import('@open-reloading/core')>()
   return {
     ...core,
     groupStatistics: (...a: Parameters<typeof core.groupStatistics>) => {

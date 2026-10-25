@@ -1,5 +1,5 @@
 import { Table, TableTbody, TableTd, TableTh, TableThead, TableTr } from '@mantine/core'
-import type { Powder } from '@openreloading/schema'
+import type { Powder } from '@open-reloading/schema'
 import { fitTables } from '../lib/powder-record.ts'
 import { Panel } from './panel.tsx'
 import { ScrollRegion } from './scroll-region.tsx'

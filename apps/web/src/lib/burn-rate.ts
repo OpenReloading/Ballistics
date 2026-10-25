@@ -3,8 +3,8 @@
  * in 1/(MPa s), interval plus and minus `uncertaintyFactor` standard uncertainties of the fitted vivacity.
  */
 
-import { dynamicVivacity, meanDynamicVivacity, type VivacityBurn } from '@openreloading/core'
-import { type Powder, toSi } from '@openreloading/schema'
+import { dynamicVivacity, meanDynamicVivacity, type VivacityBurn } from '@open-reloading/core'
+import { type Powder, toSi } from '@open-reloading/schema'
 import type { PowderSummary } from './api-types.ts'
 import { type ManufacturerNames, productLabel } from './manufacturers.ts'
 import { formatNumber } from './units.ts'

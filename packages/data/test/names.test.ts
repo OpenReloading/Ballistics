@@ -5,7 +5,7 @@ import type {
   Powder,
   RangeFirings,
   TargetFace,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { checkNames, normaliseName } from '../src/names.ts'
 

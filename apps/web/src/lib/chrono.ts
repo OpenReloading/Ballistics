@@ -9,7 +9,7 @@ import {
   readWorkbook,
   stringifyOpenReloadingJson,
   type VelocityUnit,
-} from '@openreloading/importers'
+} from '@open-reloading/importers'
 
 import { toCsv } from './csv.ts'
 import { formatNumber, type Unit } from './units.ts'
@@ -205,8 +205,8 @@ export function stringStats(shots: Shot[]): StringStats | undefined {
     v.length > 1
       ? Math.sqrt(v.reduce((a, x) => a + (x - mean) ** 2, 0) / (v.length - 1))
       : undefined
-  const min = v.reduce((a, x) => Math.min(a, x))
-  const max = v.reduce((a, x) => Math.max(a, x))
+  const min = v.reduce((a, x) => Math.min(a, x), v[0])
+  const max = v.reduce((a, x) => Math.max(a, x), v[0])
   return {
     count: v.length,
     excluded: shots.length - v.length,

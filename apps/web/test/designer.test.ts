@@ -1,6 +1,6 @@
-import { face } from '@openreloading/drawing'
-import { bulletFigureModel, bulletOutline } from '@openreloading/drawing/bullet'
-import { applyOverrides, type Bullet, bullet, type UserBullet } from '@openreloading/schema'
+import { face } from '@open-reloading/drawing'
+import { bulletFigureModel, bulletOutline } from '@open-reloading/drawing/bullet'
+import { applyOverrides, type Bullet, bullet, type UserBullet } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { computedBulletRows } from '../src/lib/bullet.ts'
 import {

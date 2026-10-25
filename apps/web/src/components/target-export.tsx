@@ -1,7 +1,7 @@
 'use client'
 
 import { ActionIcon, Button, Menu } from '@mantine/core'
-import type { ShotGroup } from '@openreloading/schema'
+import type { ShotGroup } from '@open-reloading/schema'
 import { Export } from '@phosphor-icons/react'
 import { type ReactNode, useState } from 'react'
 import { createPortal, flushSync } from 'react-dom'
@@ -124,8 +124,8 @@ const loaded = async (src: string) => {
   return img
 }
 
-const extension = (type: string) =>
-  type === 'image/jpeg' ? 'jpg' : (type.split('/')[1]?.replace(/\W.*$/, '') ?? 'img')
+export const extension = (type: string) =>
+  type === 'image/jpeg' ? 'jpg' : (type.split('/')[1]?.replace(/\W[\s\S]*/, '') ?? 'img')
 
 /**
  * The Export menu: the original photo as stored, the rendered image of the fitted view at

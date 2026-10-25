@@ -1,4 +1,4 @@
-import type { Bundle } from '@openreloading/data'
+import type { Bundle } from '@open-reloading/data'
 import { Ajv2020 } from 'ajv/dist/2020.js'
 import type { InjectOptions } from 'fastify'
 import { beforeAll, expect } from 'vitest'

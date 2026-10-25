@@ -1,22 +1,25 @@
 /**
- * The bullet picker's search: the directory list's filters and word matching
- * (`bulletMatches`), results ordered by how well each bullet matches the typed words, and the
- * whole catalogue read once per page load.
+ * The bullet picker's search, the dialog's, the card's field's and Ctrl+K's: the schema's word
+ * matcher over each bullet's text (`bulletScore`), the filters of the directory list, results
+ * ordered by how well each bullet matches the typed words, and the whole catalogue read once per
+ * page load.
  */
-import { bulletFits, type CartridgeDiameters } from '@openreloading/core'
-import { fold, toSi } from '@openreloading/schema'
+import { bulletFits, type CartridgeDiameters } from '@open-reloading/core'
+import { compareKeys, fold, sortKey } from '@open-reloading/schema'
 import { apiFetch } from './api-fetch.ts'
 import type { BulletSummary, ListOf, ManufacturerSummary } from './api-types.ts'
 import {
-  atWordStart,
   type BulletItem,
   type BulletRow,
+  bulletKey,
   bulletMatches,
-  bulletSearchText,
+  bulletScore,
+  massWord,
+  sameMass,
+  typedWords,
 } from './bullet-rows.ts'
 import { commonCaliber } from './caliber.ts'
 import { emptyDirectory } from './directory.ts'
-import { kilogramsPerGrain } from './units.ts'
 
 /** The picker's filters; each empty one leaves every bullet in. */
 export interface BulletFilters {
@@ -33,101 +36,78 @@ export interface BulletFilters {
 
 export type BulletSort = 'relevance' | 'name' | 'mass' | 'ballisticCoefficient'
 
-const words = (s: string) =>
-  fold(s)
-    .split(/[^a-z0-9.]+/)
-    .filter(Boolean)
-
-/** A number with an optional unit as typed: "168", "168gr", "10.9g". */
-const massWord = /^(\d+(?:\.\d+)?)(gr|g)?$/
-
-/** Whether a bullet weighs what a typed number says: "168" and "168gr" grains, "10.9g" grams, within half a unit of the last typed digit. */
-function sameMass(b: BulletRow, number: string, unit: string | undefined) {
-  if (b.mass === null) return false
-  const half = 0.5 * 10 ** -(number.split('.')[1]?.length ?? 0)
-  const typed = unit === 'g' ? b.mass : toSi('mass', b.mass) / kilogramsPerGrain
-  return Math.abs(typed - Number(number)) <= half + 1e-9
-}
-
-/** What a typed word is worth for one bullet: its best field, 0 where it is in none. */
-function wordScore(
-  b: BulletRow,
-  word: string,
-  name: readonly string[],
-  maker: readonly string[],
-): number {
-  // an exact word counts twice a word start; the product name outweighs the manufacturer
-  const best = (of: readonly string[], weight: number) =>
-    of.reduce((m, w) => Math.max(m, w === word ? 2 * weight : w.startsWith(word) ? weight : 0), 0)
-  let score = Math.max(best(name, 3), best(maker, 2))
-  const typed = massWord.exec(word)
-  if (typed) {
-    if (sameMass(b, typed[1], typed[2])) score = Math.max(score, 8)
-    // "308" and ".308" are the caliber ".308", "6.5" the caliber "6.5 mm"
-    if (typed[2] === undefined && commonCaliber(b.diameter).replace(/^\.|\s*mm$/g, '') === typed[1])
-      score = Math.max(score, 6)
-  }
-  return score
-}
-
-/** A row with what matching and ordering read of it, worked out once. */
+/** A row with what ordering reads of it, worked out once. */
 interface Entry {
-  row: BulletRow
-  /** The text the words are looked for in, as the directory list builds it. */
-  hay: string
+  key: string
+  /** The words of the product name. */
   name: string[]
-  maker: string[]
+  order: string
 }
 
-/** The entries of a list of rows, kept while the list is. */
-const entries = new WeakMap<readonly BulletRow[], Entry[]>()
+const entries = new WeakMap<BulletRow, Entry>()
 
-function entriesOf(rows: readonly BulletRow[]): Entry[] {
-  let list = entries.get(rows)
-  if (!list) {
-    list = rows.map((row) => ({
-      row,
-      hay: fold(bulletSearchText(row)),
-      name: words(row.name),
-      maker: words(
-        [row.manufacturerName, ...((row as BulletItem).manufacturerAliases ?? [])].join(' '),
-      ),
-    }))
-    entries.set(rows, list)
+function entryOf(row: BulletRow): Entry {
+  let e = entries.get(row)
+  if (!e) {
+    e = {
+      key: bulletKey(row),
+      name: fold(row.name)
+        .split(/[^a-z0-9.]+/)
+        .filter(Boolean),
+      order: sortKey(row.manufacturerName ?? '', row.name),
+    }
+    entries.set(row, e)
   }
-  return list
+  return e
 }
 
-const relevanceOf = (e: Entry, typed: readonly string[]) =>
-  typed.reduce((sum, word) => sum + wordScore(e.row, word, e.name, e.maker), 0)
+/** A caliber label without its leading point or trailing `mm`: ".308" gives "308", "6.5 mm" "6.5". */
+function bareCaliber(label: string) {
+  const digits = label.startsWith('.') ? label.slice(1) : label
+  return digits.endsWith('mm') ? digits.slice(0, -2).trimEnd() : digits
+}
 
-/** How well a bullet matches the typed words: the sum of each word's best field, 0 for no words. */
+/**
+ * What the typed words are worth beyond the schema's rank, per word: the bullet's weight or
+ * caliber 3, a word of the product name 2 when exact and 1 at its start (the name counts more than
+ * the manufacturer).
+ */
+function bonus(b: BulletRow, e: Entry, words: readonly string[]): number {
+  let total = 0
+  for (const word of words) {
+    const typed = massWord.exec(word)
+    // "308" and ".308" are the caliber ".308", "6.5" the caliber "6.5 mm"
+    if (
+      typed &&
+      (sameMass(b, typed[1], typed[2]) ||
+        (typed[2] === undefined && bareCaliber(commonCaliber(b.diameter)) === typed[1]))
+    )
+      total += 3
+    total += e.name.reduce((m, w) => Math.max(m, w === word ? 2 : w.startsWith(word) ? 1 : 0), 0)
+  }
+  return total
+}
+
+/** How well a bullet matches the typed words, 0 for none or no match. */
 export function bulletRelevance(b: BulletRow, query: string): number {
-  return relevanceOf(entriesOf([b])[0], words(query))
+  const e = entryOf(b)
+  const base = bulletScore(b, e.key, query)
+  return base === undefined ? 0 : base + bonus(b, e, typedWords(query))
 }
-
-const byName = (a: BulletRow, b: BulletRow) =>
-  (a.manufacturerName ?? '').localeCompare(b.manufacturerName ?? '') ||
-  a.name.localeCompare(b.name) ||
-  a.id.localeCompare(b.id)
 
 /**
  * The bullets that pass `filters` and match every typed word, best match first, ties and the other
  * sorts by manufacturer and name; the heaviest or the highest BC first for `mass` and
- * `ballisticCoefficient`, rows without a value last. The first search of a list of `rows` indexes
- * it: search the same array again.
+ * `ballisticCoefficient`, rows without a value last.
  */
-export function searchBullets(
-  rows: readonly BulletRow[],
+export function searchBullets<R extends BulletRow>(
+  rows: readonly R[],
   query: string,
   filters: BulletFilters,
   sort: BulletSort = 'relevance',
-): BulletRow[] {
-  const typed = words(query)
-  // a number with its unit is a weight the text of a row does not hold ("175gr", "10.9g")
-  const weights = typed.map((w) => massWord.exec(w)).filter((m) => m?.[2])
-  const text = typed.filter((w) => !massWord.exec(w)?.[2])
-  // the filters of the directory without its text match, which the index does
+): R[] {
+  const words = typedWords(query)
+  // the filters of the directory without its text match, which the key does
   const state = {
     ...emptyDirectory,
     manufacturer: filters.manufacturer,
@@ -136,17 +116,16 @@ export function searchBullets(
   }
   const key = (b: BulletRow) =>
     sort === 'mass' ? b.mass : sort === 'ballisticCoefficient' ? bc(b) : undefined
-  return entriesOf(rows)
-    .filter(
-      ({ row, hay }) =>
-        (filters.origin === undefined ||
-          (filters.origin === 'designs') === (row.origin === 'user')) &&
-        (filters.fit === undefined || bulletFits(row.diameter, filters.fit)) &&
-        weights.every((w) => w && sameMass(row, w[1], w[2])) &&
-        bulletMatches(row, state, '') &&
-        text.every((word) => atWordStart(hay, word)),
-    )
-    .map((e) => ({ b: e.row, score: sort === 'relevance' ? relevanceOf(e, typed) : 0 }))
+  return rows
+    .flatMap((b) => {
+      if (filters.origin !== undefined && (filters.origin === 'designs') !== (b.origin === 'user'))
+        return []
+      if (filters.fit !== undefined && !bulletFits(b.diameter, filters.fit)) return []
+      const e = entryOf(b)
+      const base = bulletScore(b, e.key, query)
+      if (base === undefined || !bulletMatches(b, state, e.key)) return []
+      return [{ b, e, score: sort === 'relevance' ? base + bonus(b, e, words) : 0 }]
+    })
     .sort((x, y) => {
       if (x.score !== y.score) return y.score - x.score
       // the browser's own designs come first among equal matches
@@ -155,7 +134,7 @@ export function searchBullets(
       const [kx, ky] = [key(x.b), key(y.b)]
       if (kx !== ky && kx != null && ky != null) return ky - kx
       if (kx !== ky && (kx == null || ky == null)) return kx == null ? 1 : -1
-      return byName(x.b, y.b)
+      return compareKeys(x.e.order, y.e.order) || compareKeys(x.b.id, y.b.id)
     })
     .map((s) => s.b)
 }
@@ -163,6 +142,33 @@ export function searchBullets(
 /** The G7 coefficient, else the G1 one: what the picker's BC column and sort show. */
 export const bc = (b: Pick<BulletSummary, 'ballisticCoefficientG1' | 'ballisticCoefficientG7'>) =>
   b.ballisticCoefficientG7 ?? b.ballisticCoefficientG1
+
+/**
+ * The first `limit` bullets that match `text` best among `designs` and the catalogue, with the
+ * count of all that match: the answer of the card's field, in the shape of the API's lists. `fit`
+ * keeps the bullets of the cartridge. Under 2 characters only `designs` are searched, so the
+ * catalogue is not read for a first key.
+ */
+export async function findBullets(
+  designs: readonly BulletRow[],
+  text: string,
+  limit: number,
+  fit?: CartridgeDiameters,
+): Promise<ListOf<BulletRow>> {
+  const filters = { manufacturer: '', caliber: '', mass: '', fit }
+  const own = searchBullets(designs, text, filters)
+  // the designs live in the browser: they stay listed while the catalogue cannot be read
+  const catalogue =
+    text.trim().length < 2
+      ? []
+      : await fetchBulletCatalogue().catch((e) => {
+          if (own.length === 0) throw e
+          return []
+        })
+  const found =
+    catalogue.length === 0 ? own : searchBullets([...designs, ...catalogue], text, filters)
+  return { total: found.length, items: found.slice(0, limit) }
+}
 
 let catalogue: Promise<BulletItem[]> | undefined
 

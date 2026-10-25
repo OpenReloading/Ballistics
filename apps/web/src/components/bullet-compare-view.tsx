@@ -1,9 +1,9 @@
 'use client'
 
 import { Text } from '@mantine/core'
-import type { LengthUnit } from '@openreloading/drawing'
-import { type BulletProfile, recordProfile } from '@openreloading/drawing/bullet'
-import type { Bullet } from '@openreloading/schema'
+import type { LengthUnit } from '@open-reloading/drawing'
+import { type BulletProfile, recordProfile } from '@open-reloading/drawing/bullet'
+import type { Bullet } from '@open-reloading/schema'
 import { WarningCircle } from '@phosphor-icons/react'
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -53,7 +53,7 @@ function Problem({ title, text, rest }: { title: string; text: string; rest?: st
  * where one cannot draw.
  */
 function drawings(records: (Bullet & { manufacturerName: string })[], unit: LengthUnit) {
-  const profiles = records.map(recordProfile)
+  const profiles = records.map((r) => recordProfile(r))
   const drawn = profiles.filter((p): p is BulletProfile => !('reason' in p))
   const { models, tallest } =
     drawn.length > 0 ? sharedScale(drawn, undefined, unit) : { models: [], tallest: 0 }
@@ -125,7 +125,7 @@ export function CompareView() {
     if (!wanted) return
     let live = true
     setGot({ status: 'loading' })
-    fetchBullets(wanted.split(',')).then((r) => {
+    void fetchBullets(wanted.split(',')).then((r) => {
       if (live) setGot(r)
     })
     return () => {

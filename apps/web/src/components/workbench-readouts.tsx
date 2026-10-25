@@ -1,8 +1,8 @@
 'use client'
 
 import { Button, Popover, UnstyledButton } from '@mantine/core'
-import { freeRecoil } from '@openreloading/core'
-import { fromSi } from '@openreloading/schema'
+import { freeRecoil } from '@open-reloading/core'
+import { fromSi } from '@open-reloading/schema'
 import { memo, useEffect, useRef } from 'react'
 import type { InteriorResponse } from '../lib/api-types.ts'
 import {
@@ -620,6 +620,7 @@ export function LadderStrip({
           ref={cells}
           role="radiogroup"
           aria-label="Ladder steps"
+          tabIndex={-1}
           className="ladder-cells"
           onKeyDown={(e) => {
             if (e.key !== 'Home' && e.key !== 'End') return

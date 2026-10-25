@@ -1,4 +1,4 @@
-import { leastSpecValue } from '@openreloading/core'
+import { leastSpecValue } from '@open-reloading/core'
 import {
   type Bullet,
   type CaliberClass,
@@ -13,7 +13,7 @@ import {
   sortKey,
   type TargetFace,
   type TargetMapping,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import type {
   BulletItem,
   CaliberClassItem,
@@ -187,7 +187,7 @@ export const bulletRow = (b: Bullet, m: Manufacturer): IndexRow<BulletItem> => (
 
 /** The distinct defined values of `values`, sorted. */
 const distinct = (values: (string | undefined)[]) =>
-  [...new Set(values.filter((v) => v !== undefined))].sort()
+  [...new Set(values.filter((v) => v !== undefined))].sort((a, b) => a.localeCompare(b, 'en'))
 
 /** The index row of a target face, with the disciplines mapped to it (their caliber classes and categories) and its federation. */
 export const targetFaceRow = (

@@ -1,6 +1,6 @@
-# @openreloading/api
+# @open-reloading/api
 
-Fastify HTTP API (TypeScript, ESM) exposing `@openreloading/core` and the data records, which it reads from the in-process catalogue (`src/catalogue/`).
+Fastify HTTP API (TypeScript, ESM) exposing `@open-reloading/core` and the data records, which it reads from the in-process catalogue (`src/catalogue/`).
 
 - `src/app.ts` builds the app (plugins and routes registered explicitly).
 - `src/server.ts` opens the catalogue (`loadCatalogue`: the index and record files `npm run build` wrote into `dist/catalogue/`, else built from the data bundle) and starts listening. No database, no start-up wait.
@@ -10,7 +10,7 @@ Fastify HTTP API (TypeScript, ESM) exposing `@openreloading/core` and the data r
 - Every route below is served under `API_PREFIX` (`/v1`, `src/version.ts`) except the liveness probe `GET /`. Paths below omit the prefix. `src/app.ts` registers the route plugins under it.
 - `buildOpenApi` (`src/openapi.ts`) reads the route's `config`:
   - `body`, `query`: the zod schema of a request, every field with a `.describe()` text and its unit. A query number is parsed from its text and documented as the number.
-  - `response`: the zod schema of the 200 body. The read routes build theirs from the record schemas of `@openreloading/schema`, the compute routes from `src/compute/*-response.ts` (loose objects: a field core adds does not break the document).
+  - `response`: the zod schema of the 200 body. The read routes build theirs from the record schemas of `@open-reloading/schema`, the compute routes from `src/compute/*-response.ts` (loose objects: a field core adds does not break the document).
   - `errors`: the error statuses of the route's own code.
   - `summary`, `description`: what the route answers. `example`: a valid request body.
   - Fastify JSON-schema parameters carry their `description` in the property schema.
@@ -36,9 +36,9 @@ Fastify HTTP API (TypeScript, ESM) exposing `@openreloading/core` and the data r
   - `GET /powders/:id`, `GET /bullets/:id`: the whole record.
 - `GET /target-faces`: `{ total, items: [{ id, federation?, organization?, name, caliberClasses, categories }] }`, every face. `caliberClasses`: the caliber classes of the disciplines mapped to it. `categories`: those of its events and those disciplines. `GET /target-faces/:id`: the whole record.
 - Order and search are the catalogue's (`apps/docs/docs/data/catalogue-storage.md`), so the order is part of the answer:
-  - The default order of cartridges, manufacturers, powders and bullets is the `sortKey` of `@openreloading/schema` (case and accent folded, every digit run by value), ties by id.
+  - The default order of cartridges, manufacturers, powders and bullets is the `sortKey` of `@open-reloading/schema` (case and accent folded, every digit run by value), ties by id.
   - `q` keeps the rows that hold every word of it, in any order, also as written without spaces and hyphens, and ranks them by `score` of the schema package (a word starting a word of the name first); equal ranks keep the default order.
-  - The competition lists (`GET /federations`, `/disciplines`, `/target-faces`, `/target-mappings`) are sorted at build with the comparators of `@openreloading/schema` (`src/competition-order.ts`).
+  - The competition lists (`GET /federations`, `/disciplines`, `/target-faces`, `/target-mappings`) are sorted at build with the comparators of `@open-reloading/schema` (`src/competition-order.ts`).
   - A record answers as stored: the catalogue's `kind`, `origin` and `revision` are not part of the body.
 - `GET /federations`, `GET /disciplines?federation=`, `GET /target-mappings?discipline=&face=`, `GET /caliber-classes` and their `/:id` routes (`src/routes/federations.ts`): summaries and records as `apps/docs/docs/data/federations.md` lists them. An unknown filter id gives no items.
 
@@ -47,10 +47,10 @@ Compute (`src/routes/compute.ts`):
 - `POST /exterior/trajectory`, `POST /exterior/truing`.
 - `POST /exterior/range-strings/plan` and `/fit` (core `comparePlanCandidates`, `fitTruingStrings`). Infinite numbers are `null` at the whitelisted paths in `src/routes/compute.ts`, 422 at any other. A zero-offset prior without `fitZeroOffset` is 400.
 - `POST /interior` (`model` `m3`).
-- `POST /interior/load-file`: the workbench load file as body (one record of kind `load`, `Load` of the schema package, stored units), results as JSON (`src/compute/load-file.ts`, `src/compute/simulate.ts`). The field mapping is `interiorLoad` of core, shared with the workbench. `loadValues` gives the SI values: the powder record's `powderModelValues`, the bullet record's mass, the load's typed `analysis.overrides` and its `charge`; the bore area is the cartridge record's without an override. A value no record or override gives is a 400 at `records[i].data.analysis.overrides.<key>`. 400 issues carry the path in the file. A `cartridge` or `bullet` that is a `user:` reference is refused there (a design is resolved in the browser); a `catalogue:<id>` reference is read from the catalogue. A record of the old kind `workbenchState` is a 400 at `records[i].kind`.
+- `POST /interior/load-file`: the workbench load file as body (one record of kind `load`, `Load` of the schema package, stored units), results as JSON (`src/compute/load-file.ts`, `src/compute/simulate.ts`). The field mapping is `interiorLoad` of core, shared with the workbench. `loadValues` gives the SI values: the powder record's `powderModelValues`, the bullet record's mass, the load's typed `analysis.overrides` and its `charge`; the bore area is the cartridge record's without an override. A value no record or override gives is a 400 at `records[i].data.analysis.overrides.<key>`. 400 issues carry the path in the file. A `cartridge` or `bullet` that is a `user:` reference is refused there (a design is resolved in the browser); a `catalogue:<id>` reference is read from the catalogue. The load's `capacity` reference (a catalogue or user capacity) gives no solver value here (the volume is a typed override) and is not resolved; `case.waterCapacity` of the earlier format is a 400 at its path. A record of the old kind `workbenchState` is a 400 at `records[i].kind`.
 - `GET /exterior/stability` (`muzzleVelocity` in the query).
 - A compute answer carries its result under `result`, except `POST /interior` with a `ladder` (each of `ladderSteps` has its `result`) and `POST /interior/load-file` (`summary`, `points`, `ladderSteps`).
-- Bodies are the `@openreloading/core` arguments in SI, validated by the strict zod schemas in `src/compute/*-schema.ts` (400). `bullet` and `powder` ids are resolved in `src/compute/resolve.ts` and echoed under `resolved` with `suppliedFields`, the request values the record supplied.
+- Bodies are the `@open-reloading/core` arguments in SI, validated by the strict zod schemas in `src/compute/*-schema.ts` (400). `bullet` and `powder` ids are resolved in `src/compute/resolve.ts` and echoed under `resolved` with `suppliedFields`, the request values the record supplied.
 - 422: core `InputError` (and its subclass `TruingError`), unusable records and invalid interior results.
 - 503: a compute deadline (`reason` `timeout`), a full queue or a worker that cannot be created (`reason` `busy`).
 - 500: other errors.
@@ -67,7 +67,7 @@ Compute (`src/routes/compute.ts`):
 - `options.maxSteps` is capped at `caps.chargeSteps` (the solver runs up to 152 times in one task).
 - Every answer carries the notice.
 
-## Commands (this directory, or `-w @openreloading/api` from the root)
+## Commands (this directory, or `-w @open-reloading/api` from the root)
 
 - Build: `npm run build` (output `dist/`, with `dist/catalogue/index.json` and `records.json`)
 - Dev server: `npm run dev` (Node runs `src/server.ts` directly, restarts on change)
@@ -84,7 +84,7 @@ Compute (`src/routes/compute.ts`):
 - Read endpoints leave out null fields, as records do (absent means unknown). Compute responses keep the core result shape, where `null` means "not defined".
 - Trajectory, truing and interior run on a `node:worker_threads` pool (`src/compute/pool.ts`, tasks in `src/compute/tasks.ts`, entry `src/compute/worker.ts`) with a 5 s deadline per task from submit. The worker of a task past its deadline is terminated. Stability runs on the main thread. Errors cross the thread boundary as plain objects and are rebuilt into `TruingError`, `InputError` or `Error`. Tests that mock core pass `buildApp({ catalogue, compute: inlineRunner })`.
 - The step and count caps in `src/compute/schemas.ts` (per integration, for truing also the iteration cap and the step total over all its trajectories) bound the work of a request. An interior run is at most 13 model runs with its range. A ladder runs that per step, up to 21 steps, in batches of 4 within 14 s and at most 100000 output points: no batch starts once the steps run so far are above it (`compute/interior-run.ts`).
-- `@openreloading/api/compute` (`src/compute/browser.ts`): `runInterior`, `runChargeTarget` (record lookups passed in), the body schemas, `errorAnswer` and the task runner without Fastify, the database or Node APIs. The web app's Pages edition runs it in the browser. At run time it imports only core, schema and zod (`test/compute-imports.test.ts`). The web image builds it and the catalogue entry only (`tsconfig.browser.json`, whose `files` list both entries).
-- `@openreloading/api/static` (`src/static.ts`, build time only): `startBundleApi` (this API over the catalogue of the bundle, compute in its thread) and `writeStaticApi` (the Pages edition's data files: `catalogue/index.json` and one file per record, the body of the API's record route). Parity of the two editions: `apps/web/test/static-api.test.ts`.
-- `@openreloading/api/catalogue` (`src/catalogue/browser.ts`): the in-process catalogue (`buildCatalogue`, `openCatalogue`, the `Catalogue` interface) without Node APIs, imports core and schema only (`test/compute-imports.test.ts`). `src/catalogue/node.ts` reads and writes its index and record file, which `npm run build` writes into `dist/catalogue/` (`write.ts`). The routes and the compute lookups read it. Design: `apps/docs/docs/data/catalogue-storage.md`.
+- `@open-reloading/api/compute` (`src/compute/browser.ts`): `runInterior`, `runChargeTarget` (record lookups passed in), the body schemas, `errorAnswer` and the task runner without Fastify, the database or Node APIs. The web app's Pages edition runs it in the browser. At run time it imports only core, schema and zod (`test/compute-imports.test.ts`). The web image builds it and the catalogue entry only (`tsconfig.browser.json`, whose `files` list both entries).
+- `@open-reloading/api/static` (`src/static.ts`, build time only): `startBundleApi` (this API over the catalogue of the bundle, compute in its thread) and `writeStaticApi` (the Pages edition's data files: `catalogue/index.json` and one file per record, the body of the API's record route). Parity of the two editions: `apps/web/test/static-api.test.ts`.
+- `@open-reloading/api/catalogue` (`src/catalogue/browser.ts`): the in-process catalogue (`buildCatalogue`, `openCatalogue`, the `Catalogue` interface) without Node APIs, imports core and schema only (`test/compute-imports.test.ts`). `src/catalogue/node.ts` reads and writes its index and record file, which `npm run build` writes into `dist/catalogue/` (`write.ts`). The routes and the compute lookups read it. Design: `apps/docs/docs/data/catalogue-storage.md`.
 - Dockerfile build context is the repository root: `docker build -f packages/api/Dockerfile .`

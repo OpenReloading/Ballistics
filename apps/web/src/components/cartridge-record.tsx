@@ -11,7 +11,7 @@ import {
   TableTr,
   Tooltip,
 } from '@mantine/core'
-import type { SpecValue } from '@openreloading/schema'
+import type { SpecValue } from '@open-reloading/schema'
 import { Certificate, Crosshair, Cylinder, Gauge } from '@phosphor-icons/react'
 import {
   type CSSProperties,
@@ -201,6 +201,7 @@ export function RecordScope({
         {/* biome-ignore lint/a11y/noStaticElementInteractions: follows hover and focus of the symbols inside, takes none itself */}
         <div
           ref={root}
+          role="presentation"
           className="record-scope"
           onPointerDown={(e) => {
             touch.current = e.pointerType === 'touch'

@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto'
-import type { UserRecord } from '@openreloading/schema'
+import type { UserRecord } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
 import { parseFiles } from '../src/lib/load-file-formats.ts'
 import { exportAllText, validRecords } from '../src/lib/user-data.ts'

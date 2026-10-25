@@ -7,7 +7,7 @@ import {
   type UserRecord,
   type UserRecordKind,
   userRecord,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import { CaretDown, FloppyDisk, FolderOpen } from '@phosphor-icons/react'
 import { memo, type Ref, useContext, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
@@ -97,6 +97,7 @@ const kindNames: Record<UserRecordKind, string> = {
   manufacturer: 'manufacturers',
   bullet: 'bullet designs',
   cartridge: 'cartridge designs',
+  caseCapacity: 'measured capacities',
   load: 'loads',
   firearm: 'firearms',
   targetSheet: 'target sheets',
@@ -343,7 +344,7 @@ function FileMenuOf<K extends UserRecordKind>({
           latest.current.openShared(r)
         })
         .catch(() => {})
-    read()
+    void read()
     window.addEventListener('hashchange', read)
     return () => window.removeEventListener('hashchange', read)
   }, [])
@@ -376,7 +377,8 @@ function FileMenuOf<K extends UserRecordKind>({
           const snapshot = () => setStarted((n) => n + 1)
           // a `then` that returns a promise (records still loading) is snapshot once it settles
           if (next === undefined) {
-            if (filling instanceof Promise) filling.finally(snapshot)
+            if (filling instanceof Promise)
+              filling.finally(snapshot).catch((e) => setMessage(errorText(e)))
             else snapshot()
           }
           return true as const
@@ -610,7 +612,7 @@ function FileMenuOf<K extends UserRecordKind>({
     try {
       if (!store) await putRecords([record])
       if (!store || (await store(record))) onStored?.()
-      noteStorage()
+      void noteStorage()
     } catch (e) {
       setFailure(`Saved to ${file}; the browser copy failed: ${errorText(e)}`)
     }
@@ -864,7 +866,7 @@ function FileMenuOf<K extends UserRecordKind>({
     const refs = await refsOf(added)
     if (refs) total.notes.push({ name: 'References', note: refs })
     onStored?.()
-    noteStorage()
+    void noteStorage()
     setReport(total)
   }
 

@@ -1,9 +1,9 @@
 'use client'
 
 import { NativeSelect } from '@mantine/core'
-import { fullSection, svgPath, toPartFrame } from '@openreloading/drawing'
-import { bulletDimensions } from '@openreloading/drawing/bullet'
-import { drawnTables } from '@openreloading/drawing/cartridge'
+import { fullSection, svgPath, toPartFrame } from '@open-reloading/drawing'
+import { bulletDimensions } from '@open-reloading/drawing/bullet'
+import { drawnTables } from '@open-reloading/drawing/cartridge'
 import {
   bulletOutline,
   chamberOf,
@@ -14,8 +14,8 @@ import {
   type Seating,
   seat,
   type Tagged,
-} from '@openreloading/drawing/seating'
-import { type Bullet, fromSi, toSi } from '@openreloading/schema'
+} from '@open-reloading/drawing/seating'
+import { type Bullet, fromSi, toSi } from '@open-reloading/schema'
 import { type ReactNode, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { apiFetch } from '../lib/api-fetch.ts'
@@ -26,7 +26,7 @@ import { drawable } from '../lib/cartridge-sheet.ts'
 import type { FieldValue } from '../lib/field-spec.ts'
 import { figureViews } from '../lib/figure-views.ts'
 import type { Suggestion } from '../lib/input-defaults.ts'
-import { productLabel } from '../lib/manufacturers.ts'
+import { productLabel, refName } from '../lib/manufacturers.ts'
 import { type SeatingLengths, seatingLengthName } from '../lib/seating-ladder.ts'
 import {
   drawingLengthUnit,
@@ -224,7 +224,7 @@ function SeatedBullet({
 /**
  * Live half-section of the chosen cartridge's case (CIP maximum, interior not shown) in its
  * chamber (CIP minimum) with the bullet seated by COAL or CBTO; seating depth, volume behind the
- * bullet, travel and jump follow the slider and the number field (`@openreloading/drawing/seating`).
+ * bullet, travel and jump follow the slider and the number field (`@open-reloading/drawing/seating`).
  */
 export function SeatingPreview({
   cartridge,
@@ -237,6 +237,8 @@ export function SeatingPreview({
   onSeatLadder,
   measuredWaterCapacity = { text: '', si: undefined },
   onMeasuredWaterCapacity,
+  capacityId: chosenId,
+  onCapacityId,
   linked,
   slots,
   view = 'combined',
@@ -268,6 +270,9 @@ export function SeatingPreview({
    */
   measuredWaterCapacity?: FieldValue
   onMeasuredWaterCapacity?: (value: FieldValue) => void
+  /** The capacity record chosen, held by the page so a load keeps it; without it the choice is the figure's own. */
+  capacityId?: string
+  onCapacityId?: (id: string) => void
   /**
    * The bullet record or design of the page's own bullet input: the preview seats it and
    * shows no bullet search or design choice of its own.
@@ -321,7 +326,9 @@ export function SeatingPreview({
     setDesign(linkedDesign ? designs.find((d) => d.id === linkedDesign) : undefined)
   }, [isLinked, linkedBullet, linkedDesign, designs])
   const record = useRecord<Bullet>(bulletId ? `bullets/${encodeURIComponent(bulletId)}` : undefined)
-  const [capacityId, setCapacityId] = useState<string | undefined>(undefined)
+  const [ownCapacityId, setOwnCapacityId] = useState<string | undefined>(undefined)
+  const capacityId = onCapacityId ? chosenId : ownCapacityId
+  const setCapacityId = onCapacityId ?? setOwnCapacityId
   const [barrel, setBarrel] = useState<FieldValue>(() => {
     const m = barrelLength ?? initial?.barrel
     return m === undefined
@@ -780,7 +787,7 @@ export function SeatingPreview({
                 onChange={(e) => setCapacityId(e.currentTarget.value)}
                 data={capacities.map((c) => ({
                   value: c.id,
-                  label: `${c.id}: ${c.waterCapacity.value} g water${c.caseManufacturer ? `, ${names.get(c.caseManufacturer) ?? c.caseManufacturer}` : ''}`,
+                  label: `${c.id}: ${c.waterCapacity.value} g water${c.caseManufacturer ? `, ${refName(names, c.caseManufacturer) || c.caseManufacturer}` : ''}`,
                 }))}
               />
             ) : (
@@ -814,7 +821,7 @@ export function SeatingPreview({
               capacity && measuredWaterCapacity.si === undefined
                 ? {
                     kind: 'record',
-                    text: `From the capacity record ${capacity.id}: ${capacity.waterCapacity.value} g water${capacity.caseManufacturer ? `, ${names.get(capacity.caseManufacturer) ?? capacity.caseManufacturer}` : ''}. Type a measured capacity to replace it.`,
+                    text: `From the capacity record ${capacity.id}: ${capacity.waterCapacity.value} g water${capacity.caseManufacturer ? `, ${refName(names, capacity.caseManufacturer) || capacity.caseManufacturer}` : ''}. Type a measured capacity to replace it.`,
                   }
                 : undefined
             }

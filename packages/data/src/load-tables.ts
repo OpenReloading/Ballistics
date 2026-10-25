@@ -1,6 +1,6 @@
-import type { LoadTables, Powder, Source } from '@openreloading/schema'
+import type { LoadTables, Powder, Source } from '@open-reloading/schema'
 
-export type { LoadTable, LoadTables } from '@openreloading/schema'
+export type { LoadTable, LoadTables } from '@open-reloading/schema'
 
 /** Whether `loadTables` lists a table with the source's title, URL and retrieval date. */
 function isListedLoadTable(source: Source, loadTables: LoadTables) {

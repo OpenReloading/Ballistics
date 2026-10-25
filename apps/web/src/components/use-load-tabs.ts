@@ -1,6 +1,6 @@
 'use client'
 
-import type { Load } from '@openreloading/schema'
+import type { Load } from '@open-reloading/schema'
 import { useEffect, useRef, useState } from 'react'
 import {
   type LoadRecord,

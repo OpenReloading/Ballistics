@@ -15,7 +15,7 @@ function buildStage(dockerfile: string) {
   }
 }
 
-/** Every `@openreloading/<package>[/<entry>]` the web app's sources and scripts import (the image's `.dockerignore` leaves out `test/`). */
+/** Every `@open-reloading/<package>[/<entry>]` the web app's sources and scripts import (the image's `.dockerignore` leaves out `test/`). */
 function webImports(dir = 'apps/web'): Set<string> {
   const found = new Set<string>()
   for (const entry of readdirSync(new URL(`${dir}/`, repo), { withFileTypes: true })) {
@@ -23,7 +23,7 @@ function webImports(dir = 'apps/web'): Set<string> {
     const path = `${dir}/${entry.name}`
     if (entry.isDirectory()) for (const spec of webImports(path)) found.add(spec)
     else if (/\.(m?ts|tsx)$/.test(entry.name))
-      for (const [, spec] of read(path).matchAll(/'(@openreloading\/[^']+)'/g)) found.add(spec)
+      for (const [, spec] of read(path).matchAll(/'(@open-reloading\/[^']+)'/g)) found.add(spec)
   }
   return found
 }
@@ -45,7 +45,7 @@ function reached(pkg: string, entries: string[]): Set<string> {
 
 /** What the image build writes to `dist/` of `pkg`: the whole package, or the `tsc -p` projects it runs. */
 function built(pkg: string, run: string): Set<string> | 'all' {
-  if (run.includes(`npm run build -w @openreloading/${pkg}`)) return 'all'
+  if (run.includes(`npm run build -w @open-reloading/${pkg}`)) return 'all'
   const out = new Set<string>()
   for (const [, config] of run.matchAll(new RegExp(`tsc -p packages/${pkg}/(\\S+)`, 'g'))) {
     const files = JSON.parse(read(`packages/${pkg}/${config}`)).files as string[]
@@ -61,8 +61,8 @@ describe('web image', () => {
   const imports = [...webImports()].sort()
 
   it('finds the imports of the web app', () => {
-    expect(imports).toContain('@openreloading/api/catalogue')
-    expect(imports).toContain('@openreloading/data/plausibility')
+    expect(imports).toContain('@open-reloading/api/catalogue')
+    expect(imports).toContain('@open-reloading/data/plausibility')
   })
 
   it.each(imports)('builds %s', (spec) => {
@@ -70,7 +70,7 @@ describe('web image', () => {
     const manifest = JSON.parse(read(`packages/${pkg}/package.json`))
     const target: string = manifest.exports[rest.length ? `./${rest.join('/')}` : '.'].default
 
-    expect(run, `npm ci of ${pkg}`).toContain(`-w @openreloading/${pkg}`)
+    expect(run, `npm ci of ${pkg}`).toContain(`-w @open-reloading/${pkg}`)
     const output = built(pkg, run)
     if (output === 'all') expect(covered(`packages/${pkg}`), `COPY of ${pkg}`).toBe(true)
     else {

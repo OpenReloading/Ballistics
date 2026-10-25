@@ -1,13 +1,13 @@
 /**
  * The API of the Pages edition, in the browser. Reads answer from the data files the Pages build
- * writes under `<base>/api/` (`writeStaticApi` of `@openreloading/api/static`): lists from the
+ * writes under `<base>/api/` (`writeStaticApi` of `@open-reloading/api/static`): lists from the
  * catalogue over `catalogue/index.json`, the code the API's routes run, and records from
  * `<kind>/<id>.json`. `POST interior` and
- * `interior/charge-target` run the API's own validation and runs (`@openreloading/api/compute`),
+ * `interior/charge-target` run the API's own validation and runs (`@open-reloading/api/compute`),
  * each compute task in a Web Worker of its own, terminated at the API's task deadline.
  */
 
-import { type Catalogue, type CatalogueIndex, openCatalogue } from '@openreloading/api/catalogue'
+import { type Catalogue, type CatalogueIndex, openCatalogue } from '@open-reloading/api/catalogue'
 import {
   type CartridgeWithSpecs,
   type ComputeRunner,
@@ -19,8 +19,8 @@ import {
   runChargeTarget,
   runInterior,
   taskTimeoutMs,
-} from '@openreloading/api/compute'
-import type { Powder } from '@openreloading/schema'
+} from '@open-reloading/api/compute'
+import type { Powder } from '@open-reloading/schema'
 import { basePath } from './edition.ts'
 
 const listKinds = new Set([
@@ -156,7 +156,7 @@ async function list(kind: string, query: URLSearchParams) {
 }
 
 async function get(path: string) {
-  const url = new URL(path, 'http://api/')
+  const url = new URL(path, 'https://api/')
   const [kind, id, ...rest] = url.pathname.slice(1).split('/')
   if (!listKinds.has(kind) || rest.length > 0) return refusal(404, 'Not Found', `${path} not found`)
   if (id === undefined || id === '') return list(kind, url.searchParams)

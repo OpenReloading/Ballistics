@@ -1,4 +1,4 @@
-import { radPerMoa } from '@openreloading/core'
+import { radPerMoa } from '@open-reloading/core'
 import { describe, expect, it } from 'vitest'
 import { cssMm, ladderMarks, markDiameterMm, maxMarkMm, rulerMm } from '../src/lib/ladder-target.ts'
 

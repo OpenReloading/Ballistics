@@ -1,4 +1,4 @@
-import { score } from '@openreloading/schema'
+import { score } from '@open-reloading/schema'
 import type { CataloguePage, IndexRow, Paging } from './types.ts'
 
 /**

@@ -1,4 +1,4 @@
-import { parseRef } from '@openreloading/schema'
+import { parseRef } from '@open-reloading/schema'
 import type { LoadTables } from './load-tables.ts'
 import type { Bundle } from './records.ts'
 
@@ -35,12 +35,10 @@ export function checkCartridgeReferences(
     if (!ids.cartridges.has(found ?? cartridge))
       errors.push(`${dir}/${id}.json: unknown cartridge "${cartridge}"`)
   }
-  for (const [dir, records] of [
-    ['capacities', bundle.capacities],
-    ['firings', bundle.firings],
-  ] as const)
-    for (const r of records) unknown(dir, r.id, r.cartridge, undefined)
-  // a load names its cartridge by reference
+  for (const r of bundle.firings) unknown('firings', r.id, r.cartridge, undefined)
+  // a capacity and a load name their cartridge by reference
+  for (const c of bundle.capacities)
+    unknown('capacities', c.id, c.cartridge, parseRef(c.cartridge)?.id)
   for (const l of bundle.loads) unknown('loads', l.id, l.cartridge, parseRef(l.cartridge)?.id)
 }
 
@@ -59,6 +57,17 @@ export function checkLoadComponentReferences(
       if (typeof target === 'string' && !known[k].has(parseRef(target)?.id ?? target))
         errors.push(`loads/${l.id}.json: unknown ${k} "${target}"`)
     }
+}
+
+/** The capacity of every load that names one. */
+export function checkLoadCapacityReferences(
+  bundle: Pick<Bundle, 'loads' | 'capacities'>,
+  errors: string[],
+) {
+  const known = new Set(bundle.capacities.map((c) => c.id))
+  for (const l of bundle.loads)
+    if (l.capacity !== undefined && !known.has(parseRef(l.capacity)?.id ?? l.capacity))
+      errors.push(`loads/${l.id}.json: unknown capacity "${l.capacity}"`)
 }
 
 /** The load of every shot string of a chronograph session. */
@@ -93,7 +102,11 @@ export function checkManufacturerReferences(
   for (const p of bundle.powders) check(`powders/${p.id}.json`, 'manufacturer', p.manufacturer)
   for (const b of bundle.bullets) check(`bullets/${b.id}.json`, 'manufacturer', b.manufacturer)
   for (const c of bundle.capacities)
-    check(`capacities/${c.id}.json`, 'caseManufacturer', c.caseManufacturer)
+    check(
+      `capacities/${c.id}.json`,
+      'caseManufacturer',
+      c.caseManufacturer && (parseRef(c.caseManufacturer)?.id ?? c.caseManufacturer),
+    )
   for (const s of bundle.chronoSessions)
     check(`chrono/${s.id}.json`, 'device.manufacturer', parseRef(s.device.manufacturer)?.id)
   for (const [file, table] of Object.entries(loadTables))

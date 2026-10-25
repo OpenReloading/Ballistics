@@ -6,7 +6,7 @@ import {
   type Provenance,
   type Source,
   toSi,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import type { DirectoryState } from './directory.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
 import { matchesQuery } from './lists.ts'

@@ -55,6 +55,33 @@ test('the keyboard finds, highlights and chooses a bullet', async ({ page }) => 
   )
 })
 
+test('Sort by reorders the result and the focus returns to the search box', async ({ page }) => {
+  await gotoHydrated(page, '/workbench?cartridge=308-win')
+  await browse(page).click()
+  const options = dialog(page).getByRole('option')
+  await expect(options).toHaveCount(2)
+  const sortBy = dialog(page).getByRole('combobox', { name: 'Sort by' })
+  await sortBy.click()
+  await page.getByRole('option', { name: 'Heaviest first' }).click()
+  await expect(options.first()).toContainText('168 gr HPBT')
+  await expect(box(page)).toBeFocused()
+  await sortBy.click()
+  await page.getByRole('option', { name: 'Manufacturer and name' }).click()
+  await expect(options.first()).toContainText('150 gr')
+  await expect(box(page)).toBeFocused()
+})
+
+test("the card's own field finds a bullet by the same words as the dialog", async ({ page }) => {
+  await gotoHydrated(page, '/workbench?cartridge=308-win')
+  const field = loadForm(page).getByRole('combobox', { name: /^Search bullets/ })
+  for (const typed of ['308 168', 'hpbt demo 10.9g'] as const) {
+    await field.fill(typed)
+    const options = page.getByRole('listbox', { name: 'Matches' }).getByRole('option')
+    await expect(options).toHaveCount(1)
+    await expect(options.first()).toContainText('168 gr HPBT')
+  }
+})
+
 for (const [width, height] of [
   [1280, 800],
   [390, 844],

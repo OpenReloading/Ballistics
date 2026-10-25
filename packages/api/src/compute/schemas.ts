@@ -1,10 +1,10 @@
 /**
  * Parts shared by the request schemas of the compute endpoints (`exterior-schema.ts`,
  * `strings-schema.ts`, `interior-schema.ts`, `charge-schema.ts`, `stability-schema.ts`) and the
- * step caps. Field names and units are those of the `@openreloading/core` inputs (SI, rad, K). Objects are strict, so a misspelled key is an error instead of
+ * step caps. Field names and units are those of the `@open-reloading/core` inputs (SI, rad, K). Objects are strict, so a misspelled key is an error instead of
  * being ignored. zod 4 `z.number()` rejects Infinity and NaN.
  */
-import { recordIdRegex } from '@openreloading/schema'
+import { recordIdRegex } from '@open-reloading/schema'
 import { z } from 'zod'
 
 /** A record id in a request body or query, at most 200 characters. */

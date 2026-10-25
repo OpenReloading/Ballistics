@@ -5,7 +5,7 @@ import {
   bulletFigureModel,
   bulletProfile,
   bulletScreenEm,
-} from '@openreloading/drawing/bullet'
+} from '@open-reloading/drawing/bullet'
 import {
   type Bullet,
   baseTypes,
@@ -14,7 +14,7 @@ import {
   tipTypes,
   toSi,
   type UserBullet,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import { computedBulletRows } from './bullet.ts'
 import {
   close,

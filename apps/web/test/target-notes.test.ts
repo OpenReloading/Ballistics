@@ -1,5 +1,5 @@
-import { subtendedAngle } from '@openreloading/core'
-import type { ShotGroup, TargetSheet } from '@openreloading/schema'
+import { subtendedAngle } from '@open-reloading/core'
+import type { ShotGroup, TargetSheet } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { frameOf, rebase, targetToView } from '../src/lib/target-editor.ts'
 import { notePlaceholders, resolveNote } from '../src/lib/target-notes.ts'

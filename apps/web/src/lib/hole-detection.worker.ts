@@ -7,7 +7,7 @@
  * whole photo. Points are on the photo as turned on screen.
  */
 
-import { fromSi } from '@openreloading/schema'
+import { fromSi } from '@open-reloading/schema'
 import { errorText } from './error-text.ts'
 import {
   autoDetect,

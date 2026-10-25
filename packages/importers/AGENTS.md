@@ -1,10 +1,10 @@
-# @openreloading/importers
+# @open-reloading/importers
 
 Parsers for chronograph export files, ESM. Pure functions from file text, or from an XLSX workbook read from file bytes, to `ChronoSession` candidates. No Node imports in `src/`. Package rules: root `AGENTS.md`.
 
-## Commands (this directory, or `-w @openreloading/importers` from the root)
+## Commands (this directory, or `-w @open-reloading/importers` from the root)
 
-- Build: `npm run build` (output `dist/`, build `@openreloading/schema` first)
+- Build: `npm run build` (output `dist/`, build `@open-reloading/schema` first)
 - Test: `npm test` (Vitest)
 - Single test: `npx vitest run <file> -t "<name>"`
 - Type check: `npm run typecheck`

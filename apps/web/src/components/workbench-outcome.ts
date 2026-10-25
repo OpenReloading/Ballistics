@@ -1,5 +1,5 @@
-import { loadRatio } from '@openreloading/core'
-import { fromSi } from '@openreloading/schema'
+import { loadRatio } from '@open-reloading/core'
+import { fromSi } from '@open-reloading/schema'
 import type { ErrorBody, InteriorLadderResponse, InteriorResponse } from '../lib/api-types.ts'
 import { pagesBasePath } from '../lib/edition.ts'
 import type { InteriorBody } from '../lib/interior-input.ts'

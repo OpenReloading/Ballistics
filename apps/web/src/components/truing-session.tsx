@@ -1,7 +1,7 @@
 'use client'
 
 import { Button, Checkbox, NativeSelect, TextInput } from '@mantine/core'
-import type { RangeStringFit, TrajectoryInput, TruingPlan } from '@openreloading/core'
+import type { RangeStringFit, TrajectoryInput, TruingPlan } from '@open-reloading/core'
 import { useState } from 'react'
 import {
   type Attempt,

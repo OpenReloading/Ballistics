@@ -1,4 +1,9 @@
-import { type UserRecord, userDataFormat, userDataVersion, userRecord } from '@openreloading/schema'
+import {
+  type UserRecord,
+  userDataFormat,
+  userDataVersion,
+  userRecord,
+} from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { exampleFirearm } from '../src/lib/example-data.ts'
 import { parseFiles, readLoadFile } from '../src/lib/load-file-formats.ts'
@@ -335,6 +340,13 @@ describe('share links', () => {
     const link = (await shareLink(bullet, base)) as string
     expect(link).toMatch(/^https:\/\/example\.org\/bullets\/designer#record=[\w-]+$/)
     expect(await readLink(new URL(link).hash)).toEqual({ ok: true, records: [bullet] })
+  })
+
+  it('replaces the fragment of the page and writes the padding-free URL alphabet', async () => {
+    for (const page of [`${base}#old`, `${base}#a#b`, `${base}#`]) {
+      const link = (await shareLink(bullet, page)) as string
+      expect(link).toMatch(/^https:\/\/example\.org\/bullets\/designer#record=[\w-]+$/)
+    }
   })
 
   it('refuses a record whose link is longer than the limit', async () => {

@@ -1,4 +1,4 @@
-import type { Bullet, CaseCapacity, ChronoSession, Powder, SpecValue } from '@openreloading/schema'
+import type { Bullet, CaseCapacity, ChronoSession, Powder, SpecValue } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import {
   checkBullet,
@@ -145,7 +145,8 @@ describe('checkBullet', () => {
 describe('checkCapacity', () => {
   const capacity = (value: number): CaseCapacity => ({
     id: 'test-capacity',
-    cartridge: 'test',
+    origin: 'catalogue',
+    cartridge: 'catalogue:test',
     waterCapacity: { value },
     provenance: { kind: 'published', sources: [{ title: 'Test' }] },
   })

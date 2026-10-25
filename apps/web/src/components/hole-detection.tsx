@@ -7,7 +7,7 @@ import {
   type TargetFace,
   type TargetSheet,
   toSi,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import { ArrowClockwise, ArrowCounterClockwise, GearSix, X } from '@phosphor-icons/react'
 import { type KeyboardEvent, type PointerEvent, useEffect, useRef, useState } from 'react'
 import { ellipsePoint } from '../lib/ellipse.ts'
@@ -221,10 +221,14 @@ export function useHoleDetection({
     }
     w.onerror = () => {
       if (worker.current !== w) return
-      stop()
-      say('Hole detection failed in this browser.', true)
+      failed()
     }
     w.postMessage(request)
+  }
+
+  const failed = () => {
+    stop()
+    say('Hole detection failed in this browser.', true)
   }
 
   async function photoBlob() {
@@ -444,7 +448,7 @@ export function useHoleDetection({
     }
     run(true, undefined, (n) => {
       if (!n) setStep(2)
-    })
+    }).catch(failed)
   }
 
   function cancel() {
@@ -526,12 +530,12 @@ export function useHoleDetection({
   function onPoint(p: Point): boolean {
     if (tool === 'backing') {
       startTool('select')
-      pickColour(p)
+      pickColour(p).catch(failed)
       return true
     }
     if (tool === 'example') {
       startTool('select')
-      pickExample(p)
+      pickExample(p).catch(failed)
       return true
     }
     if (tool !== 'region') return false

@@ -13,17 +13,20 @@ COPY apps/web/package.json apps/web/
 COPY tools/package.json tools/
 COPY apps/e2e/package.json apps/e2e/
 COPY apps/docs/package.json apps/docs/
-RUN npm ci -w @openreloading/schema -w @openreloading/core -w @openreloading/drawing -w @openreloading/importers -w @openreloading/data -w @openreloading/api -w @openreloading/docs
+RUN npm ci --ignore-scripts -w @open-reloading/schema -w @open-reloading/core -w @open-reloading/drawing -w @open-reloading/importers -w @open-reloading/data -w @open-reloading/api -w @open-reloading/docs && node patches/apply.mjs
 COPY packages packages
-RUN npm run build -w @openreloading/schema -w @openreloading/core -w @openreloading/drawing -w @openreloading/importers -w @openreloading/data -w @openreloading/api
+RUN npm run build -w @open-reloading/schema -w @open-reloading/core -w @open-reloading/drawing -w @open-reloading/importers -w @open-reloading/data -w @open-reloading/api
 COPY apps/docs apps/docs
 # the API the REST page links to, no link when unset
 ARG API_URL
 # the web app the navbar links to, no link when unset
 ARG APP_URL
-RUN npm run site:build -w @openreloading/docs
+RUN npm run site:build -w @open-reloading/docs
 
-FROM docker.io/library/nginx:1.29-alpine@sha256:5616878291a2eed594aee8db4dade5878cf7edcb475e59193904b198d9b830de
+# unprivileged variant: listens on 8080, runs as `nginx`
+FROM docker.io/nginxinc/nginx-unprivileged:1.29-alpine@sha256:0c79d56aee561a1d81c63f00eee5fb5fe29279560cdc55e91425133104c7fbe6
 COPY apps/docs/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/apps/docs/build /usr/share/nginx/html
 COPY LICENSE NOTICE /usr/share/nginx/html/
+USER nginx
+EXPOSE 8080

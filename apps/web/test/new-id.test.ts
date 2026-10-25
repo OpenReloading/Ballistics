@@ -1,4 +1,4 @@
-import { userId } from '@openreloading/schema'
+import { userId } from '@open-reloading/schema'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { newId } from '../src/lib/new-id.ts'
 

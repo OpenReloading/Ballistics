@@ -203,14 +203,14 @@ _Avoid_: l3
 _Avoid_: l6
 
 **Case capacity**:
-A record of kind `capacities`: one water capacity of a case of one cartridge from one source, with `cartridge`, `waterCapacity`, `caseManufacturer`, `caseCondition`, `note`. The cartridge record answer lists them in `capacities`.
+One entity for every `origin`: the catalogue record (`records/capacities`) and the user record of kind `caseCapacity`, a capacity the user measured. One water capacity of a case of one cartridge from one source, with `origin`, `cartridge` and `caseManufacturer` (references), `waterCapacity` (g), `caseCondition`, `note`. A catalogue capacity also has `id` and `provenance`. The cartridge record answer lists the catalogue ones in `capacities`.
 
 **Water capacity**:
-`waterCapacity`: mass of water filling a case to the mouth, g, on case capacities and the `case` of a load.
+`waterCapacity`: mass of water filling a case to the mouth, g, on a case capacity.
 _Avoid_: capacity
 
 **Measured water capacity**:
-`measuredWaterCapacity`: the case capacity (water to the mouth) the user measured, m3, as a workbench link carries it. A load keeps it as `case.waterCapacity` (g).
+`measuredWaterCapacity`: the case capacity (water to the mouth) the user measured, m3, as a workbench link carries it. A load keeps it as a reference `capacity` to a user capacity record (g).
 _Avoid_: ownCapacity
 
 **Case condition**:
@@ -389,7 +389,7 @@ _Avoid_: twistLength
 ### Loads
 
 **Load**:
-One cartridge recipe fired from one firearm, one shape for the catalogue (a record of kind `loads`), the user record of kind `load` and the load file, in stored units: `origin`, `cartridge`, `firearm`, `bullet` and `powder` (references, a measured catalogue load may describe the bullet and powder instead), `charge` (g), `primer`, `case` (`firingCount`, `waterCapacity`), `seating`, `note`, `analysis` (`overrides`, the solver values the user typed, and `ladder`) and `measurements`. A catalogue load also has `id`, `name` and `provenance`; a user load is named by its record. Its components hold `manufacturerName` and `lot`, the bullet `model` and `bulletMass`, the powder `name` and the primer `model`.
+One cartridge recipe fired from one firearm, one shape for the catalogue (a record of kind `loads`), the user record of kind `load` and the load file, in stored units: `origin`, `cartridge`, `firearm`, `bullet` and `powder` (references, a measured catalogue load may describe the bullet and powder instead), `charge` (g), `capacity` (a reference to a case capacity, catalogue or the user's measured one), `primer`, `case` (`firingCount`), `seating`, `note`, `analysis` (`overrides`, the solver values the user typed, and `ladder`) and `measurements`. A catalogue load also has `id`, `name` and `provenance`; a user load is named by its record. Its components hold `manufacturerName` and `lot`, the bullet `model` and `bulletMass`, the powder `name` and the primer `model`.
 
 **Lot**:
 `lot`: lot number of a load component as printed on the package.

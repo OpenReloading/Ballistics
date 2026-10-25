@@ -1,7 +1,7 @@
 'use client'
 
 import { useFocusTrap, useMediaQuery, useMergedRef } from '@mantine/hooks'
-import { chargeLadder } from '@openreloading/core'
+import { chargeLadder } from '@open-reloading/core'
 import { type ComponentProps, useEffect, useState } from 'react'
 import type { LadderDirection } from '../lib/seating-ladder.ts'
 import { stepLabel } from '../lib/workbench.ts'
@@ -70,6 +70,7 @@ export function GroupsTab({
       ref={ref}
       className="groups-tab"
       data-expanded={expanded || undefined}
+      role="presentation"
       {...(expanded && { role: 'dialog', 'aria-modal': true, 'aria-label': 'Shot groups' })}
       style={height && !expanded ? { height } : undefined}
       onKeyDown={(e) => {

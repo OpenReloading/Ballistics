@@ -5,7 +5,7 @@ import {
   type PressureTolerances,
   pressureToleranceDefaults,
   type SampledBand,
-} from '@openreloading/core'
+} from '@open-reloading/core'
 import { assertFinite, notice, unprocessable } from './answer.ts'
 import { type InteriorBody, m3Options, maxPoints, samplingDefaults } from './interior-schema.ts'
 import { type CartridgeWithSpecs, limitCheck } from './limits.ts'

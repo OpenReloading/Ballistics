@@ -2,8 +2,8 @@
 
 import { NativeSelect, Text } from '@mantine/core'
 import { useDebouncedValue } from '@mantine/hooks'
-import { chamberOf } from '@openreloading/drawing/seating'
-import type { UserCartridge } from '@openreloading/schema'
+import { chamberOf } from '@open-reloading/drawing/seating'
+import type { UserCartridge } from '@open-reloading/schema'
 import { Ruler } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
 import { memo, useCallback, useDeferredValue, useMemo, useRef, useState } from 'react'

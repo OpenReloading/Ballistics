@@ -1,4 +1,4 @@
-import { type TrajectoryInput, trajectory } from '@openreloading/core'
+import { type TrajectoryInput, trajectory } from '@open-reloading/core'
 import { describe, expect, it } from 'vitest'
 import {
   rangeStringsFitResponse,

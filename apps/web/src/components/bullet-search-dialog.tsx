@@ -11,10 +11,10 @@ import {
   TextInput,
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
-import type { CartridgeDiameters } from '@openreloading/core'
+import type { CartridgeDiameters } from '@open-reloading/core'
 import { Funnel, MagnifyingGlass } from '@phosphor-icons/react'
 import Link from 'next/link'
-import { useDeferredValue, useEffect, useId, useMemo, useState } from 'react'
+import { useDeferredValue, useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
   type BulletItem,
   type BulletRow,
@@ -105,6 +105,7 @@ export function BulletSearchDialog({
   const [active, setActive] = useState(0)
   const [filtersOpen, setFiltersOpen] = useState(false)
   const id = useId()
+  const searchBox = useRef<HTMLInputElement>(null)
 
   // each opening starts from the card's text, the cartridge fit and no other filter
   // biome-ignore lint/correctness/useExhaustiveDependencies: on opening only
@@ -199,6 +200,7 @@ export function BulletSearchDialog({
     >
       <div className="bd">
         <TextInput
+          ref={searchBox}
           data-autofocus
           label="Search bullets"
           description="Words of the manufacturer or name in any order, a caliber such as 308, a weight such as 168 or 10.9g"
@@ -305,7 +307,12 @@ export function BulletSearchDialog({
             data={sortOptions}
             value={sort}
             allowDeselect={false}
-            onChange={(v) => v && setSort(v as BulletSort)}
+            onChange={(v) => {
+              if (!v) return
+              setSort(v as BulletSort)
+              // the choice reorders the list under the search box, which keeps the focus
+              searchBox.current?.focus()
+            }}
           />
         </div>
         {fit && fitOn && (

@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { type RenameKind, type Renames, renameKind, renames } from '@openreloading/schema'
+import { type RenameKind, type Renames, renameKind, renames } from '@open-reloading/schema'
 import type { Bundle } from './records.ts'
 
 /** The record ids of `bundle` per kind directory that has an id route. */

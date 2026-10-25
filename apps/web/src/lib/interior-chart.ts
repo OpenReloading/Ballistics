@@ -246,7 +246,8 @@ function eventMarkLines(
 /** Mark line data of the limit (first, dashed, its label at the plot's left end) and reference lines (dotted, labels at the right end, the lower of two below its line). */
 function limitMarkLines(pressureLines: LimitLine[], theme: ChartTheme) {
   // of two reference lines the lower one's label goes below it: in a short plot the lines lie close
-  const low = pressureLines.length > 2 ? Math.min(...pressureLines.slice(1).map((l) => l.y)) : NaN
+  const low =
+    pressureLines.length > 2 ? Math.min(...pressureLines.slice(1).map((l) => l.y)) : Number.NaN
   const margin = (l: LimitLine) => (l.y === low ? 'insideEndBottom' : 'insideEndTop')
   return pressureLines.map((l, k) => ({
     name: `limit ${k}`,

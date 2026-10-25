@@ -23,7 +23,7 @@ import type {
   OpticConfiguration,
   OpticMount,
   QuantityValue,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 import { Plus, Trash, X } from '@phosphor-icons/react'
 import { type Dispatch, type ReactElement, type SetStateAction, useState } from 'react'
 import type { CartridgeSummary } from '../lib/api-types.ts'

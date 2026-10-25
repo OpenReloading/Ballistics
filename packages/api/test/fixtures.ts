@@ -3,8 +3,8 @@ import {
   lbPerSqInToKgPerSqM,
   type Projectile,
   type TrajectoryInput,
-} from '@openreloading/core'
-import type { Bundle } from '@openreloading/data'
+} from '@open-reloading/core'
+import type { Bundle } from '@open-reloading/data'
 import {
   type AnalysisKey,
   analysisKinds,
@@ -14,7 +14,7 @@ import {
   type Provenance,
   userDataFormat,
   userDataVersion,
-} from '@openreloading/schema'
+} from '@open-reloading/schema'
 
 const published: Provenance = { kind: 'published', sources: [{ title: 'Test standard' }] }
 
@@ -99,7 +99,8 @@ export const bundle: Bundle = {
   capacities: [
     {
       id: 'alpha-rifle-test',
-      cartridge: 'alpha-rifle',
+      origin: 'catalogue',
+      cartridge: 'catalogue:alpha-rifle',
       waterCapacity: { value: 3.6, raw: '55.6 gr H2O' },
       provenance: published,
     },

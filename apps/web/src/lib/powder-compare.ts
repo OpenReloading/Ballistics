@@ -1,5 +1,5 @@
-import { powderModelValues } from '@openreloading/core'
-import { type Powder, toSi } from '@openreloading/schema'
+import { powderModelValues } from '@open-reloading/core'
+import { type Powder, toSi } from '@open-reloading/schema'
 import type { InteriorBody } from './interior-input.ts'
 import { type SortDirection, sortRows } from './lists.ts'
 
@@ -76,7 +76,10 @@ export function compareKey(
 export const distinctValues = (
   rows: readonly { manufacturerName: string; base?: string; form?: string }[],
   key: 'manufacturerName' | 'base' | 'form',
-) => [...new Set(rows.flatMap((r) => (r[key] ? [r[key]] : [])))].sort()
+) =>
+  [...new Set(rows.flatMap((r) => (r[key] ? [r[key]] : [])))].sort((a, b) =>
+    a.localeCompare(b, 'en'),
+  )
 
 export type PowderFilters = { manufacturerName: string; base: string; form: string }
 

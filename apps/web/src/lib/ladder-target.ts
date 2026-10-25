@@ -1,5 +1,5 @@
 /** Length of the check ruler on the printed ladder target, mm. */
-import { fromSi } from '@openreloading/schema'
+import { fromSi } from '@open-reloading/schema'
 export const rulerMm = 100
 
 /** Widest mark that fits across the narrowest usual sheet (A5 upright less its margins), mm. */

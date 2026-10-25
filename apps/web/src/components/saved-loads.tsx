@@ -1,7 +1,7 @@
 'use client'
 
 import { ActionIcon, Button, Drawer, Text, TextInput } from '@mantine/core'
-import { parseRef } from '@openreloading/schema'
+import { parseRef } from '@open-reloading/schema'
 import { Copy, DownloadSimple, PencilSimple, Trash } from '@phosphor-icons/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { fetchRecord } from '../lib/api-fetch.ts'
@@ -62,7 +62,7 @@ function useStorage(opened: boolean) {
   useEffect(() => {
     if (!opened) return
     const s = navigator.storage
-    Promise.all([
+    void Promise.all([
       s?.persisted?.().catch(() => undefined),
       s
         ?.estimate?.()
@@ -82,7 +82,7 @@ function useCartridgeNames(ids: string[]) {
   useEffect(() => {
     if (!wanted) return
     let alive = true
-    Promise.all(
+    void Promise.all(
       wanted.split(',').map(async (id) => {
         // a design is a record of this browser, a catalogue cartridge one of the API
         const own = parseRef(id)?.scope === 'user' ? parseRef(id)?.id : undefined
@@ -102,6 +102,9 @@ function useCartridgeNames(ids: string[]) {
 
 const megabytes = (bytes: number) =>
   bytes < 1e5 ? `${Math.max(1, Math.round(bytes / 1e3))} kB` : `${(bytes / 1e6).toFixed(1)} MB`
+
+/** The field that replaces the button that was pressed takes the focus the button had. */
+const focusField = (field: HTMLInputElement | null) => field?.focus()
 
 /**
  * The saved loads of the browser store: search, grouped by cartridge; a row opens the load in
@@ -245,14 +248,13 @@ export function SavedLoads({
                       className="saved-rename"
                       aria-label={`Name of ${r.name}`}
                       maxLength={200}
-                      // biome-ignore lint/a11y/noAutofocus: the field replaces the button that was pressed
-                      autoFocus
+                      ref={focusField}
                       value={renaming.text}
                       onFocus={(e) => e.currentTarget.select()}
                       onChange={(e) => setRenaming({ id: r.id, text: e.currentTarget.value })}
                       onBlur={(e) => rename(r, e.currentTarget.value)}
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter') rename(r, renaming.text)
+                        if (e.key === 'Enter') void rename(r, renaming.text)
                         else if (e.key === 'Escape') {
                           // the drawer stays open
                           e.stopPropagation()

@@ -5,7 +5,7 @@ description: What the record search of the workbench cards does today, where it 
 
 # Searching records in the workbench
 
-A shooter picks a cartridge, bullet or powder in a workbench card by typing a name. This page records how that search behaves, where it fails when the catalogue holds thousands of records, and compares ways to replace it with a dialog. A prototype for bullets exists (`apps/web/src/components/bullet-search-dialog.tsx`); nothing else described under Options is built.
+A shooter picks a cartridge, bullet or powder in a workbench card by typing a name. This page records how that search behaves, where it fails when the catalogue holds thousands of records, and compares ways to replace it with a dialog. The Bullet card has option C (`apps/web/src/components/bullet-search-dialog.tsx`, the card's field and the Ctrl+K palette on one ranking); nothing else described under Options is built.
 
 How the numbers were made: one machine in the dev container, single runs unless a spread is given. The public tree holds 2 invented bullets and 1 powder, so the measurements ran on a larger test bundle of the same record format with 1,686 bullets, 248 powders and 577 cartridges (the bundle is not part of the repository). Bullet and powder results are given by query pattern and count only. The cartridge records are public, so their queries are given in full. The 10,000 row sets are the 1,686 bullets repeated with a suffix on id and name, so compressed sizes of them are optimistic: read the gzip figure.
 
@@ -113,7 +113,7 @@ Decision 1, the shape of the search:
 
 - **A. Improved inline combobox**: word matching in any order, ranking, grouped results. Smallest change. No filters, no weight or caliber range, no preview, and the phone list stays short; thousands of records stay a typing exercise.
 - **B. A dialog only**, opened from the card: query, filters, sortable result, preview. Best for browsing. The common case "I know the name" costs one more step, and the card head changes its behaviour.
-- **C. Both (recommended)**: the card's field keeps typing for a quick pick, a button at its end opens the dialog with the typed text. The prototype is C for bullets; the inline field there still uses the API search.
+- **C. Both (recommended)**: the card's field keeps typing for a quick pick, a button at its end opens the dialog with the typed text. The Bullet card is C: its field, the Ctrl+K palette and the dialog rank in the browser.
 
 Decision 2, where matching runs: D, E (recommended up to about 10,000 rows per kind) or F, as in the previous section.
 
@@ -122,15 +122,16 @@ Decision 3, sorting the result:
 - **G. A "Sort by" choice** (best match, name, heaviest, highest BC). Works on a phone and keeps the list a plain listbox with the focus in the search box (recommended).
 - **H. Sortable column headers.** Needs the grid pattern, so the focus and key handling of the listbox change.
 
-## The bullet prototype
+## The bullet search
 
-- `searchBullets` (`apps/web/src/lib/bullet-search.ts:121`) filters with the directory's `bulletMatches` rules and orders by `bulletRelevance` (`:106`). Per typed word the best field counts: a weight match 8 (`168` and `168gr` as grains, `10.9g` as grams), a caliber match 6 (`308` and `.308`), an exact word 2 times and a word start 1 times the field weight (product name 3, manufacturer and aliases 2). Ties by manufacturer, name and id; the browser's designs first among equals. Rows are indexed once per list (`WeakMap`, `:84`).
+- `searchBullets` (`apps/web/src/lib/bullet-search.ts`) matches with the schema's word matcher (`bulletScore` over `bulletKey` in `apps/web/src/lib/bullet-rows.ts`, also the `/bullets` list's text match) and the directory's filters. A number with a unit (`168gr`, `168 gr`, `10.9g`) is a weight the text does not hold, compared with the bullet's mass. The rank is the schema's (2 per word at a word start, 1 inside one, 4 more for the whole name) plus 3 per typed weight or caliber the bullet has (`168` and `168gr` as grains, `10.9g` as grams, `308` and `.308`) and, per word, 2 for an exact and 1 for a start of a word of the product name. Ties by the schema's sort key (manufacturer, name), then id; the browser's designs first among equals. A number inside a word matches too, ranked below one at a word start. The index of a row is built once (`WeakMap`).
+- The Bullet card's field (`findBullets`) and the Ctrl+K palette use the same function over the catalogue and the browser's designs, 20 and 8 matches, so the three give the same hits for the same words. The catalogue is read once per page load on the first search.
 - Keyboard and focus: the dialog opens with the focus in the search box, a combobox over a listbox (`aria-activedescendant`, `bullet-search-dialog.tsx:211`), so the focus never leaves it. Arrow keys and Page keys move the highlight, Enter chooses, Ctrl+Enter is left alone for Run, Escape closes and the focus returns to the button. A status line announces the count. Tab goes through the filters and the preview link; the rows are not tab stops.
 - Filters: manufacturer, caliber (with counts), mass range in the preset's unit, source (all, catalogue, my designs; shown with designs), the cartridge fit as a removable chip, and the sort choice.
 - Mixing records: the browser's designs are listed with a "Your design" badge, found by the same words and filters, first among equals.
 - Phone: full screen; the filters sit behind a Filters button (Sort stays visible), each row stacks the name over caliber, mass and BC, the preview is left out. At 1280 px the result list and the preview sit side by side.
-- Tests: `apps/web/test/bullet-search.test.ts` (ranking and filters) and `apps/e2e/tests/web/bullet-search-dialog.spec.ts` (keyboard flow; axe clean in light and dark at 390 and 1280 px).
-- Not done: rows beyond the first 100 are not drawn (a window as the directory tables use is needed), no typo tolerance, no sortable headers, no powder or cartridge dialog, and the catalogue is read again on each page load.
+- Tests: `apps/web/test/bullet-search.test.ts` (the query patterns of the failure table that returned too few rows, ranking and filters) and `apps/e2e/tests/web/bullet-search-dialog.spec.ts` (keyboard flow, Sort by, the card's field; axe clean in light and dark at 390 and 1280 px).
+- Not done: rows beyond the first 100 are not drawn (a window as the directory tables use is needed), no typo tolerance, no sortable headers, no powder or cartridge dialog, and the catalogue is read again on each page load. The cartridge and powder fields and the cartridge and powder groups of Ctrl+K still use the API's `q`.
 
 ## Follow-up issues (proposed)
 

@@ -2,14 +2,14 @@
  * The browser store of user records and target photos (IndexedDB); the workspace folder handle is
  * kept in the same database (`workspace-folder.ts`).
  */
-import type { UserRecord } from '@openreloading/schema'
+import type { UserRecord } from '@open-reloading/schema'
 import { validRecords } from './user-data.ts'
 import { photoIds } from './user-photos.ts'
 
 const request = <T>(r: IDBRequest<T>) =>
   new Promise<T>((resolve, reject) => {
     r.onsuccess = () => resolve(r.result)
-    r.onerror = () => reject(r.error)
+    r.onerror = () => reject(r.error ?? new Error('IndexedDB request failed'))
   })
 
 type Store = 'records' | 'handles' | 'files'
@@ -41,7 +41,7 @@ const database = () =>
       }
       resolve(r.result)
     }
-    r.onerror = () => reject(r.error)
+    r.onerror = () => reject(r.error ?? new Error('IndexedDB request failed'))
     // a failure, also a throw of `open` itself (no IndexedDB here), is not kept: the next call tries again
   }).catch((e) => {
     opened = undefined
@@ -59,7 +59,7 @@ export async function inStore<T>(
   const result = r && request(r)
   await new Promise<void>((resolve, reject) => {
     tx.oncomplete = () => resolve()
-    tx.onerror = tx.onabort = () => reject(tx.error)
+    tx.onerror = tx.onabort = () => reject(tx.error ?? new Error('IndexedDB transaction failed'))
   })
   return result
 }

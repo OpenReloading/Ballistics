@@ -1,8 +1,9 @@
-import type { Provenance } from '@openreloading/schema'
+import type { Provenance } from '@open-reloading/schema'
 
 /** Fields that name a record rather than carry data, and need no source of their own. */
 const identity = new Set([
   'id',
+  'origin',
   'manufacturer',
   'productNumber',
   'name',
@@ -37,12 +38,12 @@ function hasPath(record: Record<string, unknown>, path: string) {
  * Checks that every data field is supported by a source and that every `fields` entry names a
  * field of the record.
  */
-export function checkCoverage(record: Record<string, unknown> & { provenance: Provenance }) {
+export function checkCoverage(record: { provenance: Provenance }) {
   const errors: string[] = []
   const { sources } = record.provenance
   for (const source of sources) {
     for (const field of source.fields ?? []) {
-      if (!hasPath(record, field))
+      if (!hasPath(record as Record<string, unknown>, field))
         errors.push(`source "${source.title}" names missing field ${field}`)
     }
   }

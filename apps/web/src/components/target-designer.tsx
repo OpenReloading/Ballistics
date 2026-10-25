@@ -1,7 +1,7 @@
 'use client'
 
 import { ActionIcon, Button, Checkbox, NativeSelect, Text, TextInput } from '@mantine/core'
-import type { UserRecord } from '@openreloading/schema'
+import type { UserRecord } from '@open-reloading/schema'
 import { Plus, Target, X } from '@phosphor-icons/react'
 import {
   type ReactNode,
@@ -65,7 +65,7 @@ const colourOptions = (part: string) => [
 
 /**
  * The target face designer: the rings, inner ten, black area and events of a face as fields, the
- * face drawn from them by `@openreloading/drawing` while they change, the checks of the target
+ * face drawn from them by `@open-reloading/drawing` while they change, the checks of the target
  * face schema at the fields. The draft is kept in this browser on every change (a record of kind
  * `targetFaceDesign`); a face that passes the schema is offered by the shot groups and hit
  * probability tools as the user's own.
@@ -102,7 +102,7 @@ export function TargetDesigner() {
         if (current.current !== p.record.id) return
         stored.current = { key: p.key, written: true }
         setKept('saved')
-        requestPersistentStorage()
+        void requestPersistentStorage()
       },
       () => current.current === p.record.id && setKept('failed'),
     )

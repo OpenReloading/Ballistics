@@ -38,7 +38,7 @@ const longTypes = (project) =>
 let failed = false
 for (const name of packages) {
   const dir = join(import.meta.dirname, '..', '..', 'packages', name)
-  console.log(`typedoc @openreloading/${name}`)
+  console.log(`typedoc @open-reloading/${name}`)
   process.chdir(dir)
   // the check writes nothing, so no source links: a clone without a git remote passes too
   const app = await Application.bootstrapWithPlugins(

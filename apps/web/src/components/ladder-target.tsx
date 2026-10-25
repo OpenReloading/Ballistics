@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@mantine/core'
-import { radPerMoa } from '@openreloading/core'
+import { radPerMoa } from '@open-reloading/core'
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { localDay } from '../lib/dates.ts'

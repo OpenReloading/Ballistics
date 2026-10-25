@@ -17,4 +17,4 @@
 
 * The following workspace dependencies were updated
   * dependencies
-    * @openreloading/api bumped from * to 0.0.1
+    * @open-reloading/api bumped from * to 0.0.1

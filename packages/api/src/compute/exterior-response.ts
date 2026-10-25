@@ -3,8 +3,8 @@
  * loose, so fields core adds later do not break the document. Paths where the route writes a NaN or
  * infinite number as null are nullable.
  */
-import { dragModels } from '@openreloading/core'
-import { provenance } from '@openreloading/schema'
+import { dragModels } from '@open-reloading/core'
+import { provenance } from '@open-reloading/schema'
 import { z } from 'zod'
 
 const num = (description: string) => z.number().describe(description)

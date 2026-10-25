@@ -1,5 +1,5 @@
 /** Share links: one user record packed into the fragment of a page link. */
-import { type UserRecord, userDataFormat, userDataVersion } from '@openreloading/schema'
+import { type UserRecord, userDataFormat, userDataVersion } from '@open-reloading/schema'
 import { type ParsedUserFile, parseUserDataFile } from './user-data.ts'
 
 /** Longest share link: the length RFC 9110 section 4.1 recommends every sender and recipient support. */
@@ -23,7 +23,7 @@ export async function shareLink(record: UserRecord, page: string) {
   })
   const packed = await through(new TextEncoder().encode(text), new CompressionStream('deflate-raw'))
   const b64 = btoa(String.fromCharCode(...packed))
-  const link = `${page.replace(/#.*$/, '')}${fragmentKey}${b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')}`
+  const link = `${page.split('#', 1)[0]}${fragmentKey}${b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')}`
   return link.length > maxLinkChars ? undefined : link
 }
 

@@ -1,4 +1,4 @@
-import { type SourceRecord, sourceReference } from '@openreloading/schema'
+import { type SourceRecord, sourceReference } from '@open-reloading/schema'
 
 /** The source records by id, the ids records cite, and the files that embed each other source. */
 export type SourceIndex = {

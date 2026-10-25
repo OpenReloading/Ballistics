@@ -1,5 +1,5 @@
 /** Form fields: specs, typed text and SI values, validation messages. */
-import { fromSi, type QuantityKind, toSi } from '@openreloading/schema'
+import { fromSi, type QuantityKind, toSi } from '@open-reloading/schema'
 import {
   exactFieldText,
   parseTwist,
