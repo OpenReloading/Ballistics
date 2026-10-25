@@ -127,6 +127,7 @@ export function Workbench() {
     opened,
     outcome,
     measuredWaterCapacity,
+    storeLoad,
     pending,
     pmax,
     powder,
@@ -824,6 +825,7 @@ export function Workbench() {
                         name={load.name}
                         nameKey={load.customName?.trim() ? load.customName : ''}
                         data={fileData}
+                        store={storeLoad}
                         onOpen={onOpenFile}
                         onStored={stored}
                         onExported={reminder.exported}

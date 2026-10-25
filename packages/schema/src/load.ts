@@ -159,8 +159,8 @@ const powderDescription = z
   .describe('The powder as the publication describes it, where no record exists.')
 
 /**
- * One cartridge recipe fired from one firearm, for every origin. The cartridge, firearm, bullet and
- * powder are references; a catalogue load of publication data (provenance `measured`) may describe
+ * One cartridge recipe fired from one firearm, for every origin. The cartridge, firearm, bullet, powder
+ * and the case capacity are references; a catalogue load of publication data (provenance `measured`) may describe
  * its bullet and powder by maker and name where no record exists. A catalogue load carries its `id`
  * (the file name), `name`, `provenance`, cartridge, bullet, powder and charge; a user load keeps
  * what the workbench had and takes its name from its record. Charge and masses in g, lengths in mm,
@@ -190,12 +190,15 @@ export const load = z
     charge: quantity('mass', z.number().positive())
       .describe('Powder mass of one round.')
       .optional(),
+    capacity: ref('case capacity')
+      .describe('The water capacity of the case: a catalogue capacity, or one the user measured.')
+      .optional(),
     primer: z
       .object({ ...component, model: z.string().min(1).describe('Model name of the primer.') })
       .describe('The primer as described.')
       .optional(),
     case: z
-      .object({
+      .strictObject({
         manufacturerName: component.manufacturerName.optional(),
         lot: component.lot,
         firingCount: z
@@ -203,11 +206,8 @@ export const load = z
           .min(0)
           .describe('Times the case was fired before this load.')
           .optional(),
-        waterCapacity: quantity('mass', z.number().positive())
-          .describe('Water to the mouth of the case, the measured capacity.')
-          .optional(),
       })
-      .describe('The case as described, with its measured capacity.')
+      .describe('The case as described. Its water capacity is the `capacity` reference.')
       .optional(),
     seating: z
       .object({
@@ -247,6 +247,8 @@ export const load = z
       for (const k of ['cartridge', 'bullet', 'powder', 'charge'] as const)
         if (l[k] === undefined) issue([k], `A catalogue load needs a ${k}`)
     }
+    if (catalogue && l.capacity !== undefined && !l.capacity.startsWith('catalogue:'))
+      issue(['capacity'], 'A catalogue load names catalogue records only')
     for (const k of ['cartridge', 'firearm', 'bullet', 'powder'] as const) {
       const target = l[k]
       if (typeof target !== 'string') {

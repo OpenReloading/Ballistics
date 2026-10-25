@@ -24,7 +24,8 @@ const userLoad = {
   powder: 'catalogue:example-a-fast',
   charge: { value: 2.8 },
   seating: { by: 'overallLength', value: { value: 70.8 } },
-  case: { waterCapacity: { value: 3.52 } },
+  capacity: 'catalogue:example-capacity',
+  case: { firingCount: 2 },
   note: 'Seated 0.1 mm off the lands.',
   analysis: {
     overrides: { twist: 305, propellantTemperature: 21, vivacity: 0.55 },
@@ -131,13 +132,28 @@ describe('Load', () => {
   it('rejects a charge, capacity or seating of 0 and an unknown seating mode', () => {
     for (const data of [
       { charge: { value: 0 } },
-      { case: { waterCapacity: { value: 0 } } },
+      { case: { firingCount: -1 } },
+      { capacity: 'example-capacity' },
+      { capacity: 'user:1' },
       { seating: { by: 'overallLength', value: { value: 0 } } },
       { seating: { by: 'depth', value: { value: 70 } } },
       { cartridge: '308-win' },
       { firearm: 'f5' },
     ])
       expect(issuePaths(load, { ...userLoad, ...data })).not.toEqual([])
+  })
+
+  it('refuses the water capacity of the earlier format, now a reference to a capacity', () => {
+    expectIssueAt(load, { ...userLoad, case: { waterCapacity: { value: 3.52 } } }, 'case')
+    const record = { ...wrap({ ...userLoad, case: { waterCapacity: { value: 3.52 } } }) }
+    expect(userRecord.safeParse(record).success).toBe(false)
+  })
+
+  it('names the capacity of a catalogue load by a catalogue reference', () => {
+    expect(
+      load.safeParse({ ...catalogueLoad, capacity: 'catalogue:example-capacity' }).success,
+    ).toBe(true)
+    expectIssueAt(load, { ...catalogueLoad, capacity: `user:${uuid}` }, 'capacity')
   })
 
   it('keeps the measured series in stored units', () => {
@@ -181,5 +197,23 @@ describe('checkUserRefs of a load', () => {
     const missing = checkUserRefs(records({ cartridge: `user:${other}` }))
     expect(missing.map((d) => d.field)).toEqual(['cartridge', 'bullet'])
     expect(checkUserRefs(records({ bullet: 'catalogue:example-a-1' }))).toEqual([])
+  })
+
+  it('reports a user capacity no record answers', () => {
+    const capacityId = crypto.randomUUID()
+    const capacity = {
+      ...wrap(
+        { origin: 'user', cartridge: 'catalogue:308-win', waterCapacity: { value: 3.5 } },
+        'caseCapacity',
+      ),
+      id: capacityId,
+    }
+    const own = (id: string) =>
+      [wrap({ ...userLoad, capacity: `user:${id}` }), capacity] as unknown as Parameters<
+        typeof checkUserRefs
+      >[0]
+    const missing = (id: string) => checkUserRefs(own(id)).filter((d) => d.field === 'capacity')
+    expect(missing(capacityId)).toEqual([])
+    expect(missing(crypto.randomUUID())).toHaveLength(1)
   })
 })

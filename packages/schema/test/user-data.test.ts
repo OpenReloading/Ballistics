@@ -15,6 +15,7 @@ import {
 
 const saved = '2026-10-13T10:00:00.000Z'
 const uuid = '3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13'
+const other = '7a2d9c10-5b3e-4f68-9d41-0c8e2b6a1f57'
 const bulletRecord = {
   kind: 'bullet',
   id: 'a1b2',
@@ -568,6 +569,28 @@ describe('checkUserRefs', () => {
     expect(open('catalogue:308-win', `user:${uuid}`)).toBe(true)
     expect(open('308-win', 'alpha-30425')).toBe(false)
     expect(open('catalogue:308-win', 'user:1')).toBe(false)
+  })
+
+  it('reports a capacity record whose user cartridge or manufacturer nobody answers', () => {
+    const capacity = userRecord.parse({
+      kind: 'caseCapacity',
+      id: other,
+      name: 'Measured',
+      saved,
+      data: {
+        origin: 'user',
+        cartridge: `user:${uuid}`,
+        caseManufacturer: `user:${crypto.randomUUID()}`,
+        waterCapacity: { value: 3.5 },
+      },
+    })
+    expect(checkUserRefs([capacity]).map((d) => [d.kind, d.field])).toEqual([
+      ['caseCapacity', 'cartridge'],
+      ['caseCapacity', 'caseManufacturer'],
+    ])
+    expect(
+      checkUserRefs([{ ...userRecord.parse(cartridgeRecord), id: uuid }, capacity]),
+    ).toHaveLength(1)
   })
 
   it('reports a target sheet whose load is missing', () => {

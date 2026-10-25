@@ -1,10 +1,10 @@
 import {
   type Cartridge,
-  type CaseCapacity,
   type CaseType,
+  type CatalogueCaseCapacity,
   cartridge,
-  caseCapacity,
   caseTypes,
+  catalogueCaseCapacity,
 } from '@openreloading/schema'
 import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
@@ -50,14 +50,14 @@ const listResponse = z.object({
 const cartridgeResponse = cartridge.extend({
   aliases,
   caseType: caseTypes.optional(),
-  capacities: z.array(caseCapacity),
+  capacities: z.array(catalogueCaseCapacity),
 })
 
 /** The body of `GET /cartridges/:id`: the record, its aliases, case type and case capacities. */
 export interface CartridgeAnswer extends Cartridge {
   aliases: string[]
   caseType?: CaseType
-  capacities: CaseCapacity[]
+  capacities: CatalogueCaseCapacity[]
 }
 
 /**
@@ -74,7 +74,8 @@ export function cartridgeAnswer(catalogue: Catalogue, id: string): CartridgeAnsw
     ...record,
     aliases: record.aliases ?? [],
     ...(caseType && { caseType }),
-    capacities: catalogue.capacities(record.id).map(stored),
+    // a capacity keeps its own `origin`
+    capacities: catalogue.capacities(record.id).map(({ kind, revision, ...rest }) => rest),
   }
 }
 
