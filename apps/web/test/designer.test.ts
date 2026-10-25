@@ -384,6 +384,23 @@ describe('drafts', () => {
     ).toBeUndefined()
   })
 
+  it('saves the revision of the base and shows a base that changed since', () => {
+    const base = { ...targetBullet, revision: 'bbb' }
+    const start = fromRecord(base, metric)
+    expect(start.origin?.revision).toBe('bbb')
+    const data = fileData(start)
+    expect(data.basedOnRevision).toBe('bbb')
+    expect(fromUser(data, { ...resolvedOf(data, base), changed: false }, metric).baseChanged).toBe(
+      undefined,
+    )
+    const later = { ...base, revision: 'ccc' }
+    const seen = fromUser(data, { ...resolvedOf(data, later), changed: true }, metric)
+    expect(seen.baseChanged).toBe(true)
+    // Save writes the revision the design was measured against now
+    expect(fileData(seen).basedOnRevision).toBe('ccc')
+    expect(fileData(fromRecord(targetBullet, metric)).basedOnRevision).toBeUndefined()
+  })
+
   it('saves only what differs from the base: an untouched design has no overrides', () => {
     expect(fileData(fromRecord(targetBullet, metric)).overrides).toBeUndefined()
     const edited = run(fromRecord(targetBullet, metric), type('length', '30')).present

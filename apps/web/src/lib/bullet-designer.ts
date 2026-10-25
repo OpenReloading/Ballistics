@@ -30,7 +30,7 @@ import { designReduce, editHistory, type History as H, historyOf, pushHistory } 
 import { type ManufacturerNames, noManufacturerNames, productLabel } from './manufacturers.ts'
 import type { FieldRow } from './record-fields.ts'
 import { drawingLengthUnit, kilogramsPerGrain, metersPerInch, type UnitSystem } from './units.ts'
-import { type ResolvedBullet, setPath } from './variants.ts'
+import { type ResolvedBullet, revisionOf, setPath } from './variants.ts'
 
 /** The field groups of the designer, in order. */
 export const groups = {
@@ -108,6 +108,8 @@ const noChoices: Choices = { 'base.type': '', 'ogive.form': '', 'tip.type': '' }
 export interface Origin {
   id: string
   title: string
+  /** The `revision` of the catalogue record, as the API answered it. */
+  revision?: string
   /** The base's manufacturer, `catalogue:<id>`. */
   manufacturer: string
   name: string
@@ -124,6 +126,8 @@ export interface Design {
   origin?: Origin
   /** The catalogue bullet the design is based on, `catalogue:<id>`, kept through files. */
   basedOn?: string
+  /** The base changed since the design was saved: the fields not overridden follow it. */
+  baseChanged?: boolean
   /** Why the design is read only (its base is not there), with the record as stored, which Save keeps as it is. */
   locked?: { reason: string; data: UserBullet }
 }
@@ -175,6 +179,7 @@ function originOf(r: Bullet, names: ManufacturerNames): Origin {
   return {
     id: r.id,
     title: productLabel(r, names),
+    ...(revisionOf(r) && { revision: revisionOf(r) }),
     manufacturer: `catalogue:${r.manufacturer}`,
     name: r.name,
     ...valuesOf(r),
@@ -211,7 +216,7 @@ function fromOrigin(origin: Origin, system: UnitSystem): Design {
  */
 export function fromUser(
   data: UserBullet,
-  { base, record, problem }: ResolvedBullet,
+  { base, record, problem, changed }: ResolvedBullet,
   system: UnitSystem,
   names: ManufacturerNames = noManufacturerNames,
 ): Design {
@@ -224,6 +229,7 @@ export function fromUser(
     fields: Object.fromEntries(designerSpecs.map((s) => [s.key, fieldOf(system, s, si[s.key])])),
     ...(origin && { origin }),
     ...(data.basedOn && { basedOn: data.basedOn }),
+    ...(changed && { baseChanged: true }),
     ...(problem && { locked: { reason: problem, data } }),
   }
 }
@@ -262,6 +268,7 @@ export function fileData({
     origin: 'user',
     ...(manufacturer && { manufacturer }),
     ...(basedOn && { basedOn }),
+    ...(basedOn && origin?.revision && { basedOnRevision: origin.revision }),
     ...(Object.keys(overrides).length > 0 && { overrides: overrides as UserBullet['overrides'] }),
   }
 }

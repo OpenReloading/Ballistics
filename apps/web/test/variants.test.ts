@@ -1,6 +1,7 @@
 import { checkUserRefs, type UserBullet, type UserRecord, userRecord } from '@open-reloading/schema'
 import { afterEach, expect, it, vi } from 'vitest'
 import {
+  baseChanged,
   baseProblem,
   catalogueIdOf,
   catalogueRef,
@@ -122,4 +123,35 @@ it('keeps a load that names a design: it parses with the reference and finds its
   expect(parsed.kind === 'load' && parsed.data.bullet).toBe(`user:${uuid}`)
   expect(checkUserRefs([parsed, bulletRecord()].map((r) => userRecord.parse(r)))).toEqual([])
   expect(checkUserRefs([parsed])).toHaveLength(1)
+})
+
+it('says a base changed only when the revision kept at save differs from the base now', async () => {
+  const revised = (revision?: string) => ({ ...matchBullet, ...(revision && { revision }) })
+  const data = (basedOnRevision?: string): UserBullet => ({
+    ...bulletData(`catalogue:${matchBullet.id}`),
+    ...(basedOnRevision && { basedOnRevision }),
+  })
+  const changed = async (saved: string | undefined, now: string | undefined) => {
+    stubApi({ [`bullets/${matchBullet.id}`]: revised(now) })
+    return (await resolveBullet(data(saved))).changed
+  }
+  expect(await changed('aaa', 'bbb')).toBe(true)
+  expect(await changed('aaa', 'aaa')).toBe(false)
+  // a design saved without a revision, or a base the API answers without one, claims nothing
+  expect(await changed(undefined, 'bbb')).toBe(false)
+  expect(await changed('aaa', undefined)).toBe(false)
+  expect(baseChanged('aaa', { status: 'missing', ref: 'catalogue:gone-1' })).toBe(false)
+  expect(baseChanged('aaa', { status: 'none' })).toBe(false)
+})
+
+it('says a cartridge base changed from the revision of its record', async () => {
+  const record = (revision: string) => ({ ...cartridge308, revision })
+  stubApi({ [`cartridges/${cartridge308.id}`]: record('bbb') })
+  const data = (basedOnRevision: string) => ({
+    origin: 'user' as const,
+    basedOn: `catalogue:${cartridge308.id}`,
+    basedOnRevision,
+  })
+  expect((await resolveCartridge(data('aaa'))).changed).toBe(true)
+  expect((await resolveCartridge(data('bbb'))).changed).toBe(false)
 })

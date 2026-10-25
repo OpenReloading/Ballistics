@@ -363,6 +363,19 @@ describe('drafts', () => {
     expect(draftSpec(opened).values).toEqual(draftSpec(edited).values)
   })
 
+  it('saves the revision of the base and shows a base that changed since', () => {
+    const base = { ...record308(), revision: 'bbb' }
+    const data = fileData(fromRecord(base, metric))
+    expect(data.basedOnRevision).toBe('bbb')
+    const resolved = (changed: boolean): ResolvedCartridge => ({
+      ...resolvedCartridge(data, base),
+      changed,
+    })
+    expect(fromUser(data, resolved(false), metric).baseChanged).toBeUndefined()
+    expect(fromUser(data, resolved(true), metric).baseChanged).toBe(true)
+    expect(fileData(win308()).basedOnRevision).toBeUndefined()
+  })
+
   it('saves a table that differs from the base', () => {
     const data = fileData(run(win308(), { type: 'table', value: 'III' }).present)
     expect(data.overrides).toEqual({ table: 'III' })

@@ -32,7 +32,7 @@ import {
 } from './field-spec.ts'
 import { designReduce, type History as H, historyOf, pushHistory } from './history.ts'
 import { exactFieldText, type UnitSystem } from './units.ts'
-import type { ResolvedCartridge } from './variants.ts'
+import { type ResolvedCartridge, revisionOf } from './variants.ts'
 
 /** The field groups of the designer, in order. */
 export const groups = {
@@ -141,6 +141,8 @@ const baseSymbols = ['R1', 'R', 'P1', 'L3', 'H2']
 export interface Origin {
   id: string
   title: string
+  /** The `revision` of the catalogue record, as the API answered it. */
+  revision?: string
   table?: string
   values: SpecValue[]
   si: Record<string, number | undefined>
@@ -153,6 +155,8 @@ export interface Design {
   origin?: Origin
   /** The catalogue cartridge the design is based on, `catalogue:<id>`, kept through files. */
   basedOn?: string
+  /** The base changed since the design was saved: the values not overridden follow it. */
+  baseChanged?: boolean
   /** Why the design is read only (its base is not there), with the record as stored, which Save keeps as it is. */
   locked?: { reason: string; data: UserCartridge }
 }
@@ -185,6 +189,7 @@ function siOf(values: readonly SpecValue[]): Origin['si'] {
 const originOf = (c: Pick<CartridgeDetail, 'id' | 'name' | 'table' | 'values'>): Origin => ({
   id: c.id,
   title: `CIP ${c.name}`,
+  ...(revisionOf(c) && { revision: revisionOf(c) }),
   table: c.table,
   values: c.values,
   si: siOf(c.values),
@@ -197,7 +202,7 @@ const originOf = (c: Pick<CartridgeDetail, 'id' | 'name' | 'table' | 'values'>):
  */
 export function fromUser(
   data: UserCartridge,
-  { base, record, problem }: ResolvedCartridge,
+  { base, record, problem, changed }: ResolvedCartridge,
   system: UnitSystem,
 ): Design {
   const si = siOf(record.values)
@@ -207,6 +212,7 @@ export function fromUser(
     fields: Object.fromEntries(fieldSpecs.map((s) => [s.key, fieldOf(system, s, si[s.key])])),
     ...(origin && { origin }),
     ...(data.basedOn && { basedOn: data.basedOn }),
+    ...(changed && { baseChanged: true }),
     ...(problem && { locked: { reason: problem, data } }),
   }
 }
@@ -226,6 +232,7 @@ export function fileData(design: Design): UserCartridge {
   return {
     origin: 'user',
     ...(basedOn && { basedOn }),
+    ...(basedOn && origin?.revision && { basedOnRevision: origin.revision }),
     ...(Object.keys(overrides).length > 0 && { overrides }),
   }
 }

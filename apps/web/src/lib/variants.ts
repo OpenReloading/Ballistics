@@ -45,6 +45,22 @@ export async function readBase<T>(
   }
 }
 
+/** The `revision` the API answered a base record with; undefined for a record without one. */
+export const revisionOf = (record: object): string | undefined => {
+  const { revision } = record as { revision?: unknown }
+  return typeof revision === 'string' ? revision : undefined
+}
+
+/**
+ * Whether a base changed since the variant was saved: the revision kept at save (`saved`) differs
+ * from the one the base has now. False without either revision.
+ */
+export function baseChanged(saved: string | undefined, base: Base<object>): boolean {
+  if (saved === undefined || base.status !== 'found') return false
+  const now = revisionOf(base.record)
+  return now !== undefined && now !== saved
+}
+
 /** Why a variant opens read only: its base is not there. Undefined for a base found or none. */
 export function baseProblem(base: Base<unknown>): string | undefined {
   if (base.status === 'missing') return `The base record ${base.ref} is no longer in the catalogue.`
@@ -58,6 +74,8 @@ export interface ResolvedBullet {
   record: Partial<Bullet>
   /** Why the record is read only. */
   problem?: string
+  /** The base changed since the bullet was saved. */
+  changed?: boolean
 }
 
 /** A user cartridge with its base and the table and values the overrides give. */
@@ -66,6 +84,8 @@ export interface ResolvedCartridge {
   /** The base with the overrides applied; the overrides alone without a base or while it is missing. */
   record: { table?: string; values: SpecValue[] }
   problem?: string
+  /** The base changed since the cartridge was saved. */
+  changed?: boolean
 }
 
 /** The user bullet `data` with its base read from the catalogue. */
@@ -76,7 +96,12 @@ export async function resolveBullet(
   const base = await readBase<Bullet>('bullets', data.basedOn, signal)
   const problem = baseProblem(base)
   const from = base.status === 'found' ? base.record : {}
-  return { base, record: applyOverrides<Partial<Bullet>>(from, data.overrides), problem }
+  return {
+    base,
+    record: applyOverrides<Partial<Bullet>>(from, data.overrides),
+    problem,
+    changed: baseChanged(data.basedOnRevision, base),
+  }
 }
 
 /** The user cartridge `data` with its base read from the catalogue. */
@@ -93,6 +118,7 @@ export async function resolveCartridge(
     base,
     record: applyOverrides<{ table?: string; values: SpecValue[] }>(from, data.overrides),
     problem: baseProblem(base),
+    changed: baseChanged(data.basedOnRevision, base),
   }
 }
 
