@@ -594,6 +594,7 @@ function SelectBox({
 }) {
   const checked = ids.includes(row.id)
   const full = !checked && ids.length >= max
+  const space = useRef(false)
   // the tooltip on a wrapper: a disabled input gets no pointer events
   return (
     <Tooltip label={`At most ${max} at once`} disabled={!full} events={tipEvents}>
@@ -604,8 +605,18 @@ function SelectBox({
           tabIndex={tabIndex}
           checked={checked}
           disabled={full}
-          // a checkbox's change is its click: the shift key is the click's, also from Shift+Space
-          onChange={(e) => onPick((e.nativeEvent as MouseEvent).shiftKey)}
+          // a checkbox's change is its click, which carries the shift key; for Space the key's own
+          // state covers a browser that synthesizes that click without it
+          onKeyDown={(e) => {
+            space.current = e.key === ' ' && e.shiftKey
+          }}
+          onBlur={() => {
+            space.current = false
+          }}
+          onChange={(e) => {
+            onPick((e.nativeEvent as MouseEvent).shiftKey || space.current)
+            space.current = false
+          }}
         />
       </span>
     </Tooltip>

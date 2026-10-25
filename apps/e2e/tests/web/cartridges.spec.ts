@@ -114,6 +114,13 @@ test('a shift click ticks the rows between two boxes and Clear selection unticks
   await expect(boxes.first()).not.toBeChecked()
   await expect(boxes.last()).not.toBeChecked()
   await expect(page).not.toHaveURL(/pick=/)
+  // from the keyboard: Shift+Space on the last box ticks the range from the box clicked before
+  await boxes.first().click()
+  await boxes.first().click()
+  await boxes.last().focus()
+  await page.keyboard.press('Shift+Space')
+  await expect(boxes.first()).toBeChecked()
+  await expect(boxes.last()).toBeChecked()
 })
 
 test('the list sorts by L3 through its header button', async ({ page }) => {
