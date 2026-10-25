@@ -9,6 +9,93 @@ import { SourceLink } from './source-link.tsx'
 /** A record note without its notice: a page carries one model note at most, prints none. */
 const note = (text: string) => text.replaceAll(', not load data', '')
 
+type Has = (k: keyof Source) => boolean
+
+function SourcesHead({ has }: { has: Has }) {
+  const columns: [keyof Source, string][] = [
+    ['origin', 'Origin'],
+    ['retrieved', 'Retrieved'],
+    ['license', 'License'],
+    ['fields', 'Covers'],
+    ['note', 'Note'],
+  ]
+  return (
+    <TableTr role="row">
+      <TableTh scope="col" role="columnheader">
+        Source
+      </TableTh>
+      {columns
+        .filter(([key]) => has(key))
+        .map(([key, label]) => (
+          <TableTh key={key} scope="col" role="columnheader">
+            {label}
+          </TableTh>
+        ))}
+    </TableTr>
+  )
+}
+
+function SourceMeta({ source: s }: { source: Source }) {
+  return (
+    <span className="source-meta">
+      {s.publisher && <span>{s.publisher}</span>}
+      {s.edition && <span>{s.edition}</span>}
+      {s.terms && (
+        <span>{isWebLink(s.terms) ? <a href={s.terms}>Terms</a> : `Terms: ${s.terms}`}</span>
+      )}
+      {s.sha256 && <CopyHash hash={s.sha256} />}
+    </span>
+  )
+}
+
+function CoversCell({ fields }: { fields: string[] | undefined }) {
+  if (!fields) return 'whole record'
+  return (
+    <Noted
+      value={`${fields.length} ${fields.length === 1 ? 'field' : 'fields'}`}
+      notes={[fields.join(', ')]}
+    />
+  )
+}
+
+function SourceRow({ source: s, has }: { source: Source; has: Has }) {
+  return (
+    <TableTr role="row">
+      <TableTh scope="row" role="rowheader">
+        <span className="source-title">
+          <SourceLink source={s} />
+        </span>
+        <SourceMeta source={s} />
+      </TableTh>
+      {has('origin') && (
+        <TableTd role="cell" data-label="Origin">
+          {s.origin}
+        </TableTd>
+      )}
+      {has('retrieved') && (
+        <TableTd role="cell" className="nowrap" data-label="Retrieved">
+          {s.retrieved && <time dateTime={s.retrieved}>{dayText(s.retrieved)}</time>}
+        </TableTd>
+      )}
+      {has('license') && (
+        <TableTd role="cell" data-label="License">
+          {s.license}
+        </TableTd>
+      )}
+      {has('fields') && (
+        <TableTd role="cell" className="nowrap" data-label="Covers">
+          <CoversCell fields={s.fields} />
+        </TableTd>
+      )}
+      {has('note') && (
+        <TableTd role="cell" data-label="Note">
+          {s.note && note(s.note)}
+        </TableTd>
+      )}
+    </TableTr>
+  )
+}
+
 /**
  * The sources of a record as a table, one row per source: the title (linked) with publisher,
  * edition, terms and hash (copyable) under it, the origin, the retrieval day, the license, the
@@ -24,88 +111,11 @@ export function Sources({ provenance }: { provenance: Provenance }) {
       <ScrollRegion label="Sources table">
         <Table className="sources" role="table">
           <TableThead role="rowgroup">
-            <TableTr role="row">
-              <TableTh scope="col" role="columnheader">
-                Source
-              </TableTh>
-              {has('origin') && (
-                <TableTh scope="col" role="columnheader">
-                  Origin
-                </TableTh>
-              )}
-              {has('retrieved') && (
-                <TableTh scope="col" role="columnheader">
-                  Retrieved
-                </TableTh>
-              )}
-              {has('license') && (
-                <TableTh scope="col" role="columnheader">
-                  License
-                </TableTh>
-              )}
-              {has('fields') && (
-                <TableTh scope="col" role="columnheader">
-                  Covers
-                </TableTh>
-              )}
-              {has('note') && (
-                <TableTh scope="col" role="columnheader">
-                  Note
-                </TableTh>
-              )}
-            </TableTr>
+            <SourcesHead has={has} />
           </TableThead>
           <TableTbody role="rowgroup">
             {list.map((s) => (
-              <TableTr key={`${s.title} ${s.url ?? ''} ${s.page ?? ''}`} role="row">
-                <TableTh scope="row" role="rowheader">
-                  <span className="source-title">
-                    <SourceLink source={s} />
-                  </span>
-                  <span className="source-meta">
-                    {s.publisher && <span>{s.publisher}</span>}
-                    {s.edition && <span>{s.edition}</span>}
-                    {s.terms && (
-                      <span>
-                        {isWebLink(s.terms) ? <a href={s.terms}>Terms</a> : `Terms: ${s.terms}`}
-                      </span>
-                    )}
-                    {s.sha256 && <CopyHash hash={s.sha256} />}
-                  </span>
-                </TableTh>
-                {has('origin') && (
-                  <TableTd role="cell" data-label="Origin">
-                    {s.origin}
-                  </TableTd>
-                )}
-                {has('retrieved') && (
-                  <TableTd role="cell" className="nowrap" data-label="Retrieved">
-                    {s.retrieved && <time dateTime={s.retrieved}>{dayText(s.retrieved)}</time>}
-                  </TableTd>
-                )}
-                {has('license') && (
-                  <TableTd role="cell" data-label="License">
-                    {s.license}
-                  </TableTd>
-                )}
-                {has('fields') && (
-                  <TableTd role="cell" className="nowrap" data-label="Covers">
-                    {s.fields ? (
-                      <Noted
-                        value={`${s.fields.length} ${s.fields.length === 1 ? 'field' : 'fields'}`}
-                        notes={[s.fields.join(', ')]}
-                      />
-                    ) : (
-                      'whole record'
-                    )}
-                  </TableTd>
-                )}
-                {has('note') && (
-                  <TableTd role="cell" data-label="Note">
-                    {s.note && note(s.note)}
-                  </TableTd>
-                )}
-              </TableTr>
+              <SourceRow key={`${s.title} ${s.url ?? ''} ${s.page ?? ''}`} source={s} has={has} />
             ))}
           </TableTbody>
         </Table>

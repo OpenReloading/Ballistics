@@ -221,32 +221,162 @@ const directions = [
   { value: 'around', label: 'Around' },
 ] as const
 
-function LadderInputs() {
+/** The step size of a ladder: its field, spec and value follow the kind of ladder. */
+function StepSizeField() {
   const {
     system,
-    direction,
-    ladderSteps,
-    stepsDraft,
     ladder,
     ladderError,
     ladderKind,
     seatStep,
     tempStep,
+    markChanged,
+    setLadderError,
+    stepError,
+    setLadder,
+    setSeatStep,
+    setTempStep,
+  } = useLoad()
+  const spec =
+    ladderKind === 'seating'
+      ? seatingStepSpec
+      : ladderKind === 'temperature'
+        ? temperatureStepSpec
+        : ladderSpec
+  const value =
+    ladderKind === 'seating'
+      ? seatStep.seatStep
+      : ladderKind === 'temperature'
+        ? tempStep.tempStep
+        : ladder.ladderStep
+  const setValue = (v: typeof value) => {
+    if (ladderKind === 'seating') setSeatStep({ seatStep: v })
+    else if (ladderKind === 'temperature') setTempStep({ tempStep: v })
+    else setLadder({ ladderStep: v })
+  }
+  return (
+    <NumberField
+      spec={spec}
+      system={system}
+      value={value}
+      // shown once a run or blur found one, and gone as soon as the cause is fixed
+      error={ladderError && stepError}
+      onBlur={() => setLadderError(stepError())}
+      onChange={(v) => {
+        markChanged()
+        setValue(v)
+        if (ladderError) setLadderError(undefined)
+      }}
+    />
+  )
+}
+
+/** The ladder's step count: a number sets the count at once, so Enter runs it. */
+function StepCountInput() {
+  const {
+    direction,
+    ladderSteps,
+    stepsDraft,
+    markChanged,
+    setLadderSteps,
+    setLadderError,
+    setStepsDraft,
+  } = useLoad()
+  const around = direction === 'around'
+  return (
+    <NumberInput
+      className="ladder-steps"
+      label={around ? 'Steps each side' : 'Ladder steps'}
+      labelProps={{ className: 'visually-hidden' }}
+      hideControls
+      // around, 0 steps each side is the charge alone
+      min={around ? 0 : 1}
+      max={around ? (maxLadderSteps - 1) / 2 : maxLadderSteps}
+      allowDecimal={false}
+      clampBehavior="strict"
+      value={stepsDraft ?? (around ? (ladderSteps - 1) / 2 : ladderSteps)}
+      onChange={(v) => {
+        setStepsDraft(v)
+        // a number sets the count at once, so Enter runs it; an empty field keeps the count
+        if (typeof v !== 'number') return
+        markChanged()
+        setLadderSteps(around ? 2 * v + 1 : v)
+        setLadderError(undefined)
+      }}
+      onBlur={() => setStepsDraft(undefined)}
+    />
+  )
+}
+
+/** The reason a ladder kind cannot be chosen now, if any. */
+function ladderKindReason(
+  k: (typeof ladderKinds)[number],
+  ladderKind: string,
+  powderLabel: string | undefined,
+  sensitive: boolean,
+  seatingBlock: string | undefined,
+) {
+  if (k.value === ladderKind) return
+  if (k.value === 'temperature') return temperatureLadderBlockReason(powderLabel, sensitive)
+  return k.value === 'seating' ? seatingBlock : undefined
+}
+
+/** The ladder kind and direction, once there is more than one step. */
+function LadderChoices() {
+  const {
+    direction,
+    ladderSteps,
+    ladderKind,
     seatingBlock,
     powderLabel,
     powder,
     setLadderKind,
-    setSeatStep,
-    setTempStep,
-    setStepsDraft,
     markChanged,
     setLadderSteps,
     setLadderError,
-    stepError,
-    setLadder,
     setDirection,
   } = useLoad()
   const id = useId()
+  return (
+    <>
+      <SegmentedRow
+        legend="Ladder"
+        name={`${id}-kind`}
+        value={ladderKind}
+        segments={ladderKinds.map((k) => ({
+          ...k,
+          reason: ladderKindReason(
+            k,
+            ladderKind,
+            powderLabel,
+            powder?.temperatureSensitivity !== undefined,
+            seatingBlock,
+          ),
+        }))}
+        onChange={(v) => {
+          markChanged()
+          setLadderKind(runKindOf(v))
+          setLadderError(undefined)
+        }}
+      />
+      <SegmentedRow
+        legend="Direction"
+        name={`${id}-direction`}
+        value={direction}
+        segments={directions}
+        onChange={(next) => {
+          markChanged()
+          // around the charge needs an odd count of charges
+          if (next === 'around' && ladderSteps % 2 === 0) setLadderSteps(ladderSteps + 1)
+          setDirection(next)
+        }}
+      />
+    </>
+  )
+}
+
+function LadderInputs() {
+  const { direction, ladderSteps } = useLoad()
   const stepsLabel = direction === 'around' ? 'Steps each side' : 'Ladder steps'
   return (
     <>
@@ -264,95 +394,10 @@ function LadderInputs() {
           {direction === 'around' ? stepsLabel : `${stepsLabel}, size`}
         </span>
         {/* the state is the number of charges; around the charge the field counts the steps per side */}
-        <NumberInput
-          className="ladder-steps"
-          label={stepsLabel}
-          labelProps={{ className: 'visually-hidden' }}
-          hideControls
-          // around, 0 steps each side is the charge alone
-          min={direction === 'around' ? 0 : 1}
-          max={direction === 'around' ? (maxLadderSteps - 1) / 2 : maxLadderSteps}
-          allowDecimal={false}
-          clampBehavior="strict"
-          value={stepsDraft ?? (direction === 'around' ? (ladderSteps - 1) / 2 : ladderSteps)}
-          onChange={(v) => {
-            setStepsDraft(v)
-            // a number sets the count at once, so Enter runs it; an empty field keeps the count
-            if (typeof v !== 'number') return
-            markChanged()
-            setLadderSteps(direction === 'around' ? 2 * v + 1 : v)
-            setLadderError(undefined)
-          }}
-          onBlur={() => setStepsDraft(undefined)}
-        />
-        {ladderSteps > 1 && (
-          <NumberField
-            spec={
-              ladderKind === 'seating'
-                ? seatingStepSpec
-                : ladderKind === 'temperature'
-                  ? temperatureStepSpec
-                  : ladderSpec
-            }
-            system={system}
-            value={
-              ladderKind === 'seating'
-                ? seatStep.seatStep
-                : ladderKind === 'temperature'
-                  ? tempStep.tempStep
-                  : ladder.ladderStep
-            }
-            // shown once a run or blur found one, and gone as soon as the cause is fixed
-            error={ladderError && stepError}
-            onBlur={() => setLadderError(stepError())}
-            onChange={(value) => {
-              markChanged()
-              if (ladderKind === 'seating') setSeatStep({ seatStep: value })
-              else if (ladderKind === 'temperature') setTempStep({ tempStep: value })
-              else setLadder({ ladderStep: value })
-              if (ladderError) setLadderError(undefined)
-            }}
-          />
-        )}
+        <StepCountInput />
+        {ladderSteps > 1 && <StepSizeField />}
       </div>
-      {ladderSteps > 1 && (
-        <>
-          <SegmentedRow
-            legend="Ladder"
-            name={`${id}-kind`}
-            value={ladderKind}
-            segments={ladderKinds.map((k) => ({
-              ...k,
-              reason:
-                k.value === 'temperature' && ladderKind !== 'temperature'
-                  ? temperatureLadderBlockReason(
-                      powderLabel,
-                      powder?.temperatureSensitivity !== undefined,
-                    )
-                  : k.value === 'seating' && ladderKind !== 'seating'
-                    ? seatingBlock
-                    : undefined,
-            }))}
-            onChange={(v) => {
-              markChanged()
-              setLadderKind(runKindOf(v))
-              setLadderError(undefined)
-            }}
-          />
-          <SegmentedRow
-            legend="Direction"
-            name={`${id}-direction`}
-            value={direction}
-            segments={directions}
-            onChange={(next) => {
-              markChanged()
-              // around the charge needs an odd count of charges
-              if (next === 'around' && ladderSteps % 2 === 0) setLadderSteps(ladderSteps + 1)
-              setDirection(next)
-            }}
-          />
-        </>
-      )}
+      {ladderSteps > 1 && <LadderChoices />}
     </>
   )
 }
@@ -543,6 +588,110 @@ function SeatingSlot({ name }: { name: SeatingSlotName }) {
 /** The cards with a More popover. */
 const morePanels: readonly InputPanel[] = ['cartridge', 'bullet', 'powder']
 
+type LoadValues = ReturnType<typeof useLoad>
+type InteriorSpec = (typeof interiorFields)[number]
+
+/** What an optional empty field stands for. */
+function fieldPlaceholder(
+  key: string,
+  quantity: InteriorSpec['quantity'],
+  fromRecord: number | undefined,
+  boreDiameter: number | undefined,
+  bore: {
+    cartridgeBoreArea: LoadValues['cartridgeBoreArea']
+    grooveDiameter: LoadValues['grooveDiameter']
+  },
+) {
+  if (key === 'boreArea' && boreDiameter)
+    return (s: UnitSystem) =>
+      formatQuantity(
+        'area',
+        s,
+        boreArea({
+          area: bore.cartridgeBoreArea,
+          boreDiameter: boreDiameter ?? 0,
+          grooveDiameter: bore.grooveDiameter,
+        }),
+      )
+  if (key === 'sebert') return 'Lagrange'
+  if (key.startsWith('form')) return 'constant'
+  if (fromRecord !== undefined) return (s: UnitSystem) => formatQuantity(quantity, s, fromRecord)
+  return
+}
+
+/** The note of a field that holds a Settings or cited default. */
+function defaultMark(key: string, defaults: LoadValues['defaults']) {
+  const cited = citedDefaults[key as DefaultKey]
+  const source =
+    defaults[key as DefaultKey] === cited.si ? cited.source : 'your default from Settings'
+  return `Default: ${source}.`
+}
+
+type LoadFieldMarkArgs = {
+  key: string
+  spec: InteriorSpec
+  fields: LoadValues['fields']
+  defaulted: LoadValues['defaulted']
+  defaults: LoadValues['defaults']
+  given: ReturnType<LoadValues['defaultOf']>
+  fromRecord: number | undefined
+  powder: LoadValues['powder']
+  origin: LoadValues['origin']
+}
+
+/** The mark of a field in the units it shows: where its value comes from. */
+function loadFieldMark(
+  s: UnitSystem,
+  { key, spec, fields, defaulted, defaults, given, fromRecord, powder, origin }: LoadFieldMarkArgs,
+) {
+  if (defaulted.has(key)) return defaultMark(key, defaults)
+  if (given) return `Default: ${given.source}.`
+  if (fromRecord !== undefined)
+    return fields[key]?.si === undefined
+      ? "From the powder record's bore-resistance law. A typed value replaces it."
+      : `Typed. The powder record gives ${formatQuantity(spec.quantity, s, fromRecord)} ${s[spec.quantity].symbol}.`
+  return (
+    powder &&
+    origin &&
+    recordMark(powder, origin, key, fields[key]?.si, (si) =>
+      [formatQuantity(spec.quantity, s, si), s[spec.quantity].symbol].filter(Boolean).join(' '),
+    )
+  )
+}
+
+/** The flag of a field that holds the seated bullet's value. */
+function seatingFlag(
+  key: string,
+  seated: LoadValues['seated'],
+  previewed: LoadValues['previewed'],
+  fields: LoadValues['fields'],
+) {
+  if (!isPreviewKey(key) || seated[key] === undefined || previewed[key] === undefined) return
+  if (fields[key]?.si !== previewed[key]) return
+  return {
+    kind: 'seating' as const,
+    text: 'From the seated bullet in the Cartridge card, approximate: derived from the bullet and case geometry. A typed value replaces it; an emptied field follows again.',
+  }
+}
+
+/** The action of a field that holds another value than the seated bullet's: use it again. */
+function seatingAction(
+  key: string,
+  spec: InteriorSpec,
+  seated: LoadValues['seated'],
+  previewed: LoadValues['previewed'],
+  fields: LoadValues['fields'],
+  takeSeated: LoadValues['takeSeated'],
+) {
+  if (!isPreviewKey(key) || seated[key] === undefined || fields[key]?.si === previewed[key]) return
+  return {
+    kind: 'restore' as const,
+    text: (s: UnitSystem) =>
+      `Use seating: ${spec.label} ${formatQuantity(spec.quantity, s, seated[key] as number)} ${s[spec.quantity].symbol} from the seated bullet, and follow it again`,
+    onClick: () => takeSeated(key),
+  }
+}
+
 /** One interior field of the load, with its marks, flag, restore action and error. */
 function LoadField({ name: key }: { name: string }) {
   const {
@@ -577,8 +726,6 @@ function LoadField({ name: key }: { name: string }) {
   const followable = (followKeys as readonly string[]).includes(key)
   /** What the powder record's bore-resistance law gives this field, SI. */
   const fromRecord = recordBore?.[key as keyof typeof recordBore]
-  const recordText = (s: UnitSystem) =>
-    `${formatQuantity(spec.quantity, s, fromRecord as number)} ${s[spec.quantity].symbol}`
   return (
     <NumberField
       spec={spec}
@@ -590,44 +737,24 @@ function LoadField({ name: key }: { name: string }) {
           : value
       }
       // what an optional empty field stands for
-      placeholder={
-        key === 'boreArea' && fields.boreDiameter?.si
-          ? (s) =>
-              formatQuantity(
-                'area',
-                s,
-                boreArea({
-                  area: cartridgeBoreArea,
-                  boreDiameter: fields.boreDiameter?.si ?? 0,
-                  grooveDiameter,
-                }),
-              )
-          : key === 'sebert'
-            ? 'Lagrange'
-            : key.startsWith('form')
-              ? 'constant'
-              : fromRecord !== undefined
-                ? (s) => formatQuantity(spec.quantity, s, fromRecord)
-                : undefined
-      }
+      placeholder={fieldPlaceholder(key, spec.quantity, fromRecord, fields.boreDiameter?.si, {
+        cartridgeBoreArea,
+        grooveDiameter,
+      })}
       muted={given !== undefined}
       // texts naming a unit follow the units the field shows
       mark={(s) =>
-        defaulted.has(key)
-          ? `Default: ${defaults[key as DefaultKey] === citedDefaults[key as DefaultKey].si ? citedDefaults[key as DefaultKey].source : 'your default from Settings'}.`
-          : given
-            ? `Default: ${given.source}.`
-            : fromRecord !== undefined
-              ? value?.si === undefined
-                ? "From the powder record's bore-resistance law. A typed value replaces it."
-                : `Typed. The powder record gives ${recordText(s)}.`
-              : powder &&
-                origin &&
-                recordMark(powder, origin, key, fields[key]?.si, (si) =>
-                  [formatQuantity(spec.quantity, s, si), s[spec.quantity].symbol]
-                    .filter(Boolean)
-                    .join(' '),
-                )
+        loadFieldMark(s, {
+          key,
+          spec,
+          fields,
+          defaulted,
+          defaults,
+          given,
+          fromRecord,
+          powder,
+          origin,
+        })
       }
       // in the units the field shows, so a unit switch rewrites a shown message
       error={
@@ -638,27 +765,8 @@ function LoadField({ name: key }: { name: string }) {
           // a message a run set, as the engraving values needing each other
           (typeof props.error === 'string' ? props.error : undefined))
       }
-      flag={
-        isPreviewKey(key) &&
-        seated[key] !== undefined &&
-        previewed[key] !== undefined &&
-        fields[key]?.si === previewed[key]
-          ? {
-              kind: 'seating',
-              text: 'From the seated bullet in the Cartridge card, approximate: derived from the bullet and case geometry. A typed value replaces it; an emptied field follows again.',
-            }
-          : undefined
-      }
-      action={
-        isPreviewKey(key) && seated[key] !== undefined && fields[key]?.si !== previewed[key]
-          ? {
-              kind: 'restore',
-              text: (s) =>
-                `Use seating: ${spec.label} ${formatQuantity(spec.quantity, s, seated[key] as number)} ${s[spec.quantity].symbol} from the seated bullet, and follow it again`,
-              onClick: () => takeSeated(key),
-            }
-          : undefined
-      }
+      flag={seatingFlag(key, seated, previewed, fields)}
+      action={seatingAction(key, spec, seated, previewed, fields, takeSeated)}
       onBlur={() => {
         // an emptied field takes its default again
         if (followable && !fields[key]?.text.trim())
@@ -870,77 +978,76 @@ function BulletPicker() {
   )
 }
 
-/** A card's record picker, its heading: the chosen record shows in the field. */
-function CardPicker({ panel }: { panel: InputPanel }) {
+/** The cartridge search: the browser's cartridge designs in the same list, first. */
+function CartridgePicker() {
   const {
-    fields,
     cartridge,
     cartridgeDesign,
     cartridgeDesigns,
     chooseCartridgeDesign,
-    powderLabel,
     searchKey,
     chooseCartridge,
-    choosePowder,
-    chooseFirearm,
-    firearm,
-    firearmList,
-    readDesigns,
-    linkedPowder,
   } = useLoad()
+  return (
+    <RecordSearch<CartridgeSummary>
+      size={controlSize.row.input}
+      chevron
+      key={searchKey}
+      kind="cartridges"
+      label="Search cartridges by name"
+      chosen={
+        cartridge?.name ??
+        (cartridgeDesign ? `${cartridgeDesign.name} (your design)` : 'Search cartridges (optional)')
+      }
+      describe={cartridgeOptionText}
+      onSelect={(c) =>
+        chooseCartridge({
+          id: c.id,
+          name: c.name,
+          ...summaryFitSource(c),
+        })
+      }
+      // the browser's cartridge designs in the same list, first
+      extra={cartridgeDesigns.map((d) => ({ id: d.id, label: `${d.name} (your design)` }))}
+      onExtra={chooseCartridgeDesign}
+      noneText="No cartridge found"
+      unreachableText={notReached}
+    />
+  )
+}
+
+/** The powder search, with the chosen powder, the link's name or the typed parameters as its text. */
+function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames> }) {
+  const { fields, powderLabel, choosePowder, linkedPowder } = useLoad()
+  const chosen = (() => {
+    if (powderLabel) return powderLabel
+    if (linkedPowder?.name) return `${linkedPowder.name} (from the link)`
+    return requiredModelKeys.every((k) => fields[k]?.si !== undefined)
+      ? 'Typed model parameters, no powder record'
+      : 'Search powders'
+  })()
+  return (
+    <RecordSearch<PowderSummary>
+      size={controlSize.row.input}
+      chevron
+      kind="powders"
+      label="Search powders by manufacturer and name"
+      chosen={chosen}
+      describe={(p) => productLabel(p, names)}
+      onSelect={(p) => choosePowder(p.id)}
+      noneText="No powder found"
+      unreachableText={notReached}
+    />
+  )
+}
+
+/** A card's record picker, its heading: the chosen record shows in the field. */
+function CardPicker({ panel }: { panel: InputPanel }) {
+  const { chooseFirearm, firearm, firearmList, readDesigns } = useLoad()
   const names = useManufacturerNames()
-  if (panel === 'cartridge')
-    return (
-      <RecordSearch<CartridgeSummary>
-        size={controlSize.row.input}
-        chevron
-        key={searchKey}
-        kind="cartridges"
-        label="Search cartridges by name"
-        chosen={
-          cartridge?.name ??
-          (cartridgeDesign
-            ? `${cartridgeDesign.name} (your design)`
-            : 'Search cartridges (optional)')
-        }
-        describe={cartridgeOptionText}
-        onSelect={(c) =>
-          chooseCartridge({
-            id: c.id,
-            name: c.name,
-            ...summaryFitSource(c),
-          })
-        }
-        // the browser's cartridge designs in the same list, first
-        extra={cartridgeDesigns.map((d) => ({ id: d.id, label: `${d.name} (your design)` }))}
-        onExtra={chooseCartridgeDesign}
-        noneText="No cartridge found"
-        unreachableText={notReached}
-      />
-    )
+  if (panel === 'cartridge') return <CartridgePicker />
   if (panel === 'bullet') return <BulletPicker />
-  if (panel === 'powder')
-    return (
-      <RecordSearch<PowderSummary>
-        size={controlSize.row.input}
-        chevron
-        kind="powders"
-        label="Search powders by manufacturer and name"
-        chosen={
-          powderLabel
-            ? powderLabel
-            : linkedPowder?.name
-              ? `${linkedPowder.name} (from the link)`
-              : requiredModelKeys.every((k) => fields[k]?.si !== undefined)
-                ? 'Typed model parameters, no powder record'
-                : 'Search powders'
-        }
-        describe={(p) => productLabel(p, names)}
-        onSelect={(p) => choosePowder(p.id)}
-        noneText="No powder found"
-        unreachableText={notReached}
-      />
-    )
+  if (panel === 'powder') return <PowderPicker names={names} />
   return (
     <Select
       size={controlSize.row.input}

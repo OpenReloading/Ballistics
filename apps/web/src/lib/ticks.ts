@@ -1,3 +1,5 @@
+const NICE_STEPS = [1, 2, 5, 10]
+
 /**
  * Axis ticks after Heckbert 1990: the span and then the step are rounded to 1, 2, 5 or 10 times a
  * power of ten.
@@ -5,10 +7,9 @@
 function nice(x: number, round: boolean): number {
   const e = Math.floor(Math.log10(x))
   const f = x / 10 ** e
-  let n: number
-  if (round) n = f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10
-  else n = f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10
-  return n * 10 ** e
+  const limits = round ? [1.5, 3, 7] : [1, 2, 5]
+  const i = limits.findIndex((l) => (round ? f < l : f <= l))
+  return NICE_STEPS[i < 0 ? 3 : i] * 10 ** e
 }
 
 /** About `count` ticks covering min to max; equal ends widen by 1 each way; non-finite input gives none. */

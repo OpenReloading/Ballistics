@@ -20,6 +20,37 @@ const placement = (svg: string) => ({
   cartridge: svg.match(/<path id="[^"]*-c" d="([^"]*)"/)?.[1],
 })
 
+/** One view of the workbench figure, with its model and its SVG. */
+function viewOf(
+  id: string,
+  models: ReturnType<typeof figureViews>,
+  view: 'combined' | 'cartridge' | 'chamber',
+  medium: 'screen' | 'print',
+) {
+  const model = models[view]
+  if (!model) throw new Error(`${id} has no ${view} view`)
+  return {
+    model,
+    svg: renderToStaticMarkup(
+      <TechnicalDrawing id="f" title={id} model={model} level={medium === 'print'} />,
+    ),
+  }
+}
+
+/** A side view shares the Combined view's frame, text size, scale and part placement. */
+function expectSharedFrame(
+  model: FigureModel,
+  svg: string,
+  combined: { model: FigureModel; svg: string },
+) {
+  expect(model.frame).toEqual(combined.model.frame)
+  expect(model.em).toBe(combined.model.em)
+  expect(model.scale).toEqual(combined.model.scale)
+  const [a, b] = [placement(svg), placement(combined.svg)]
+  expect(a.svg).toBe(b.svg)
+  expect(a.transforms).toEqual(b.transforms)
+}
+
 // a rimless, a rimmed, a belted and a rebated case
 const ids = [
   'cip-308-win-2008-09-23',
@@ -27,6 +58,26 @@ const ids = [
   'cip-300-weath-mag-2002-05-15',
   'cip-458-socom-2021-11-09',
 ]
+
+function expectViewsAgree(
+  id: string,
+  spec: ReturnType<typeof record>,
+  drawn: Parameters<typeof figureViews>[1],
+  unit: 'mm' | 'in',
+  medium: 'screen' | 'print',
+) {
+  const models = figureViews(spec, drawn, unit, undefined, medium)
+  const views = (['combined', 'cartridge', 'chamber'] as const).map((view) =>
+    viewOf(id, models, view, medium),
+  )
+  const [combined, ...sides] = views
+  for (const { model, svg } of sides) expectSharedFrame(model, svg, combined)
+  // the case outline itself is the same with and without its dimensions
+  expect(placement(views[1].svg).cartridge).toBe(placement(combined.svg).cartridge)
+  // the Cartridge view draws dimensions, Combined none
+  expect(views[1].model.layers.cartridge?.labels.length).toBeGreaterThan(0)
+  expect(combined.model.layers.cartridge?.labels ?? []).toEqual([])
+}
 
 describe('hiding the dimensions keeps the outline in place', () => {
   for (const id of ids)
@@ -39,33 +90,8 @@ describe('hiding the dimensions keeps the outline in place', () => {
       const drawn = previewDrawn(spec.values, spec.table, range[1] + 2)
       if ('missing' in drawn) throw new Error(`${id} misses ${drawn.missing}`)
       for (const unit of ['mm', 'in'] as const)
-        for (const medium of ['screen', 'print'] as const) {
-          const models = figureViews(spec, drawn, unit, undefined, medium)
-          const views = (['combined', 'cartridge', 'chamber'] as const).map((view) => {
-            const model = models[view]
-            if (!model) throw new Error(`${id} has no ${view} view`)
-            return {
-              model,
-              svg: renderToStaticMarkup(
-                <TechnicalDrawing id="f" title={id} model={model} level={medium === 'print'} />,
-              ),
-            }
-          })
-          const [combined, ...sides] = views
-          for (const { model, svg } of sides) {
-            expect(model.frame).toEqual(combined.model.frame)
-            expect(model.em).toBe(combined.model.em)
-            expect(model.scale).toEqual(combined.model.scale)
-            const [a, b] = [placement(svg), placement(combined.svg)]
-            expect(a.svg).toBe(b.svg)
-            expect(a.transforms).toEqual(b.transforms)
-          }
-          // the case outline itself is the same with and without its dimensions
-          expect(placement(views[1].svg).cartridge).toBe(placement(combined.svg).cartridge)
-          // the Cartridge view draws dimensions, Combined none
-          expect(views[1].model.layers.cartridge?.labels.length).toBeGreaterThan(0)
-          expect(combined.model.layers.cartridge?.labels ?? []).toEqual([])
-        }
+        for (const medium of ['screen', 'print'] as const)
+          expectViewsAgree(id, spec, drawn, unit, medium)
     })
 
   it("the cartridge designer's views draw one screen SVG, the same in each view", () => {

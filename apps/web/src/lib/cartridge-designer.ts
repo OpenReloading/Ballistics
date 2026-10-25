@@ -284,12 +284,6 @@ const storedFieldValue = (s: CartridgeFieldSpec, si: number) =>
 function draftValues({ fields, origin }: Design): SpecValue[] {
   const out: SpecValue[] = []
   const seen = new Set<string>()
-  const entered = (s: CartridgeFieldSpec, si: number): SpecValue => ({
-    side: s.side,
-    symbol: s.symbol,
-    quantity: s.quantity as 'length' | 'angle',
-    value: storedFieldValue(s, si),
-  })
   for (const v of origin?.values ?? []) {
     if (!v.side) continue
     const key = keyOf(v)
@@ -299,16 +293,32 @@ function draftValues({ fields, origin }: Design): SpecValue[] {
       continue
     }
     seen.add(s.key)
-    const si = fields[s.key]?.si
-    if (si === undefined) {
-      if (origin?.si[s.key] === undefined) out.push(v)
-    } else out.push(close(si, origin?.si[s.key]) ? v : entered(s, si))
+    const kept = keptValue(v, s, fields[s.key]?.si, origin?.si[s.key])
+    if (kept) out.push(kept)
   }
   for (const s of fieldSpecs) {
     const si = fields[s.key]?.si
-    if (!seen.has(s.key) && si !== undefined) out.push(entered(s, si))
+    if (!seen.has(s.key) && si !== undefined) out.push(enteredValue(s, si))
   }
   return out
+}
+
+const enteredValue = (s: CartridgeFieldSpec, si: number): SpecValue => ({
+  side: s.side,
+  symbol: s.symbol,
+  quantity: s.quantity as 'length' | 'angle',
+  value: storedFieldValue(s, si),
+})
+
+/** The record's value `v` as the design keeps it: itself, the entered value, or nothing once cleared. */
+function keptValue(
+  v: SpecValue,
+  s: CartridgeFieldSpec,
+  si: number | undefined,
+  was: number | undefined,
+) {
+  if (si === undefined) return was === undefined ? v : undefined
+  return close(si, was) ? v : enteredValue(s, si)
 }
 
 /**

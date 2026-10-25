@@ -176,8 +176,8 @@ function noBcText(model: string) {
   return `This bullet has no ${model} BC in the database. Choose ${model === 'G7' ? 'G1' : 'G7'} or enter the drag manually.`
 }
 
-/** Field errors of the edited fields and the outcome of one computation. */
-function evaluate(i: Inputs): { errors: Record<string, string>; attempt: Attempt } {
+/** The errors of the edited fields, the first edited field with one, and the first empty one's error. */
+function checkFields(i: Inputs) {
   const specs: readonly FieldSpec[] = i.source === 'manual' ? allFields : shotFields
   const errors: Record<string, string> = {}
   let invalid: string | undefined
@@ -190,40 +190,66 @@ function evaluate(i: Inputs): { errors: Record<string, string>; attempt: Attempt
       invalid ??= s.label
     } else empty ??= error
   }
+  return { errors, invalid, empty }
+}
+
+type Drawn =
+  | { projectile: ReturnType<typeof manualProjectile>; bullet: string }
+  | { prompt: string }
+
+/** The projectile of the manual fields, or the prompt for the field still empty. */
+function manualDrawn(i: Inputs, si: ReturnType<typeof siValues>, empty: string | undefined): Drawn {
+  if (empty) return { prompt: empty }
+  return {
+    projectile: manualProjectile(si, i.manualModel),
+    bullet: `${i.design ? `${i.design} (user design), ` : ''}${i.manualModel} manual drag`,
+  }
+}
+
+/** The projectile of the chosen bullet record, or the prompt for what is missing. */
+function recordDrawn(i: Inputs, empty: string | undefined): Drawn {
+  if (i.record.status !== 'ok') return { prompt: 'Choose a bullet from the database.' }
+  const { record } = i.record
+  const drag = bulletDrag(record, i.recordModel, i.choice)
+  if (drag.kind === 'none') return { prompt: noBcText(i.recordModel) }
+  if (drag.kind === 'choose') return { prompt: 'Choose one of the BC values of the record.' }
+  if (empty) return { prompt: empty }
+  const bc = bulletDrag(record, i.recordModel)
+  const chosen = bc.kind === 'choose' && i.choice !== undefined ? bc.values[i.choice] : undefined
+  return {
+    projectile: drag.projectile,
+    bullet: `${productLabel(record, i.names)}, ${i.recordModel}${chosen ? ` ${chosen.value} lb/in²` : ''}`,
+  }
+}
+
+/** The result's fields that only some inputs have: the optic's click, the drag source, the design. */
+function resultExtras(i: Inputs) {
+  return {
+    ...(i.click && { click: i.click }),
+    ...(i.dragSource && { dragSource: i.dragSource }),
+    ...(i.source === 'manual' && i.design && { design: i.design }),
+  }
+}
+
+/** Field errors of the edited fields and the outcome of one computation. */
+function evaluate(i: Inputs): { errors: Record<string, string>; attempt: Attempt } {
+  const { errors, invalid, empty } = checkFields(i)
   if (invalid) return { errors, attempt: { kind: 'invalid', label: invalid } }
   const prompt = (text: string) => ({ errors, attempt: { kind: 'prompt', text } as const })
   const si = siValues(i.fields)
-  let projectile: ReturnType<typeof manualProjectile>
-  let bullet: string
-  if (i.source === 'manual') {
-    if (empty) return prompt(empty)
-    projectile = manualProjectile(si, i.manualModel)
-    bullet = `${i.design ? `${i.design} (user design), ` : ''}${i.manualModel} manual drag`
-  } else {
-    if (i.record.status !== 'ok') return prompt('Choose a bullet from the database.')
-    const { record } = i.record
-    const drag = bulletDrag(record, i.recordModel, i.choice)
-    if (drag.kind === 'none') return prompt(noBcText(i.recordModel))
-    if (drag.kind === 'choose') return prompt('Choose one of the BC values of the record.')
-    if (empty) return prompt(empty)
-    const bc = bulletDrag(record, i.recordModel)
-    const chosen = bc.kind === 'choose' && i.choice !== undefined ? bc.values[i.choice] : undefined
-    projectile = drag.projectile
-    bullet = `${productLabel(record, i.names)}, ${i.recordModel}${chosen ? ` ${chosen.value} lb/in²` : ''}`
-  }
+  const drawn = i.source === 'manual' ? manualDrawn(i, si, empty) : recordDrawn(i, empty)
+  if ('prompt' in drawn) return prompt(drawn.prompt)
   try {
     return {
       errors,
       attempt: {
         kind: 'ok',
         result: {
-          ...trajectoryResult(si, projectile, i.twistHand),
-          bullet,
+          ...trajectoryResult(si, drawn.projectile, i.twistHand),
+          bullet: drawn.bullet,
           si,
           manual: i.source === 'manual',
-          ...(i.click && { click: i.click }),
-          ...(i.dragSource && { dragSource: i.dragSource }),
-          ...(i.source === 'manual' && i.design && { design: i.design }),
+          ...resultExtras(i),
         },
       },
     }
@@ -311,26 +337,14 @@ function ResultTop({ result, system }: { result: Result; system: UnitSystem }) {
   )
 }
 
-/** The notes, the chart and the table of a result. */
-function ResultDetail({
-  result,
-  system,
-  chartHeight,
-  staleLine,
-}: {
-  result: Result
-  system: UnitSystem
-  /** The chart's height, px; without it the chart fills the height its column leaves. */
-  chartHeight?: number
-  /** Over the chart's top right corner, so it shows and goes without moving the chart. */
-  staleLine?: ReactNode
-}) {
+/** The summary list of a result: bore elevation, air, stability, transonic range and what was left out. */
+function ResultNotes({ result, system }: { result: Result; system: UnitSystem }) {
   const u = (q: Parameters<typeof formatQuantity>[0]) => system[q].symbol
-  const { trajectory: t, tablePoints: rows, chartPoints: chart } = result
+  const { trajectory: t, tablePoints: rows } = result
   const last = rows[rows.length - 1]
   const transonic = rows.find((p) => p.transonic || p.subsonic)
   const zero = zeroConditions(result.si, system, result.dragSource)
-  const notes = (
+  return (
     <ul className="summary">
       <li>Bore elevation above the line of sight: {angle(system, t.bore.elevationAngle)}</li>
       <li>
@@ -366,20 +380,13 @@ function ResultDetail({
       )}
     </ul>
   )
-  const chartEl = (
-    <LineChart
-      height={chartHeight}
-      fill={chartHeight === undefined}
-      x={chart.map((p) => system.range.fromSi(p.range))}
-      y={chart.map((p) => system.lineOfSightOffset.fromSi(p.height))}
-      xLabel={`Range (${u('range')})`}
-      yLabel={`Height above the line of sight (${u('lineOfSightOffset')})`}
-      title="Height above the line of sight against range"
-      description={`From 0 to ${formatQuantity('range', system, chart[chart.length - 1]?.range ?? 0)} ${u('range')}; lowest point ${formatQuantity('lineOfSightOffset', system, Math.min(...chart.map((p) => p.height)))} ${u('lineOfSightOffset')}. The table tab lists the values.`}
-      zeroLine
-    />
-  )
-  const tableEl = (
+}
+
+/** The trajectory table of a result. */
+function ResultTable({ result, system }: { result: Result; system: UnitSystem }) {
+  const u = (q: Parameters<typeof formatQuantity>[0]) => system[q].symbol
+  const rows = result.tablePoints
+  return (
     <PanelTable
       label="Trajectory table"
       caption={
@@ -419,6 +426,39 @@ function ResultDetail({
       ))}
     </PanelTable>
   )
+}
+
+/** The notes, the chart and the table of a result. */
+function ResultDetail({
+  result,
+  system,
+  chartHeight,
+  staleLine,
+}: {
+  result: Result
+  system: UnitSystem
+  /** The chart's height, px; without it the chart fills the height its column leaves. */
+  chartHeight?: number
+  /** Over the chart's top right corner, so it shows and goes without moving the chart. */
+  staleLine?: ReactNode
+}) {
+  const u = (q: Parameters<typeof formatQuantity>[0]) => system[q].symbol
+  const { tablePoints: rows, chartPoints: chart } = result
+  const notes = <ResultNotes result={result} system={system} />
+  const chartEl = (
+    <LineChart
+      height={chartHeight}
+      fill={chartHeight === undefined}
+      x={chart.map((p) => system.range.fromSi(p.range))}
+      y={chart.map((p) => system.lineOfSightOffset.fromSi(p.height))}
+      xLabel={`Range (${u('range')})`}
+      yLabel={`Height above the line of sight (${u('lineOfSightOffset')})`}
+      title="Height above the line of sight against range"
+      description={`From 0 to ${formatQuantity('range', system, chart[chart.length - 1]?.range ?? 0)} ${u('range')}; lowest point ${formatQuantity('lineOfSightOffset', system, Math.min(...chart.map((p) => p.height)))} ${u('lineOfSightOffset')}. The table tab lists the values.`}
+      zeroLine
+    />
+  )
+  const tableEl = <ResultTable result={result} system={system} />
   return (
     <>
       {notes}
@@ -456,6 +496,473 @@ function ResultDetail({
 
 /** What the workbench reads from its Trajectory tab: the tab's query for Copy link. */
 export type TrajectoryHandle = { query: () => string }
+
+/** What the tab's keys of a copied link set: the fields, the bullet and the drag model. */
+function readLink(system: UnitSystem) {
+  // the tab's keys under `tab.`: the workbench's query holds interior keys such as twist
+  const query = tabQuery(linkParams(window.location).toString(), 'trajectory')
+  if (!query) return
+  const fields = queryFields(query, allFields, system, roundedFieldText)
+  const choice = Number(query.get('choice') || Number.NaN)
+  const bullet = query.get('bullet')
+  return {
+    fields,
+    touched: Object.fromEntries(
+      allFields.filter((s) => fields[s.key].text).map((s) => [s.key, true]),
+    ),
+    showZero: zeroKeys.some((k) => fields[k].text),
+    model: query.get('drag') as DragModel | null,
+    bullet,
+    choice: Number.isInteger(choice) ? choice : undefined,
+    manual: !bullet && query.has('mass'),
+    left: query.get('hand') === 'left',
+  }
+}
+
+type LinkActions = {
+  form: { setValues: (f: Fields) => void; setTouched: (t: Record<string, boolean>) => void }
+  showZero: () => void
+  setRecordModel: (m: 'G1' | 'G7') => void
+  chooseRecord: (id: string, choice?: number) => Promise<void>
+  setSource: (s: 'database' | 'manual') => void
+  setManualModel: (m: DragModel) => void
+  setTwistHand: (h: 'right' | 'left') => void
+}
+
+/** Sets the form and its choices from what a copied link holds. */
+function applyLink(link: NonNullable<ReturnType<typeof readLink>>, a: LinkActions) {
+  a.form.setValues(link.fields)
+  if (link.showZero) a.showZero()
+  // linked values count as edited, so one outside its bounds shows its error
+  a.form.setTouched(link.touched)
+  if (link.bullet) {
+    if (link.model === 'G1' || link.model === 'G7') a.setRecordModel(link.model)
+    void a.chooseRecord(link.bullet, link.choice)
+  } else if (link.manual) {
+    a.setSource('manual')
+    if (link.model && dragModels.includes(link.model)) a.setManualModel(link.model)
+  }
+  if (link.left) a.setTwistHand('left')
+}
+
+type BulletFieldsProps = {
+  own: boolean
+  source: 'database' | 'manual'
+  setSource: (s: 'database' | 'manual') => void
+  system: UnitSystem
+  names: ManufacturerNames
+  record: RecordState
+  recordModel: 'G1' | 'G7'
+  setRecordModel: (m: 'G1' | 'G7') => void
+  setChoice: (c: number | undefined) => void
+  choice: number | undefined
+  chooseRecord: (id: string) => Promise<void>
+  loadBullet: string | undefined
+  replaced: boolean
+  designs: UserBulletView[]
+  design: UserBulletView | undefined
+  readDesigns: () => void
+  chooseDesign: (id: string) => void
+  manualModel: DragModel
+  setManualModel: (m: DragModel) => void
+  group: (keys: string[]) => ReactNode[]
+}
+
+/** The bullet record the form draws the drag from: its search, drag model, BC choice and facts. */
+function DatabaseBullet({
+  own,
+  system,
+  names,
+  record,
+  recordModel,
+  setRecordModel,
+  setChoice,
+  choice,
+  chooseRecord,
+  loadBullet,
+  replaced,
+}: BulletFieldsProps) {
+  const u = (q: Parameters<typeof formatQuantity>[0]) => system[q].symbol
+  const drag = record.status === 'ok' ? bulletDrag(record.record, recordModel, choice) : undefined
+  // without `choice`, so the BC list stays while one value is chosen
+  const bcOptions = record.status === 'ok' ? bulletDrag(record.record, recordModel) : undefined
+  const chosen =
+    bcOptions?.kind === 'choose' && choice !== undefined ? bcOptions.values[choice] : undefined
+  return (
+    <>
+      {own && (
+        <div className="wide">
+          <RecordSearch<BulletSummary>
+            kind="bullets"
+            label="Search bullets by manufacturer or name"
+            // the chosen record in the field, as in the workbench's pickers
+            chosen={record.status === 'ok' ? productLabel(record.record, names) : 'Search bullets'}
+            describe={(b) =>
+              `${productLabel(b, names)}, ${formatQuantity('mass', system, toSi('mass', b.mass))} ${u('mass')}`
+            }
+            onSelect={(b) => chooseRecord(b.id)}
+            noneText="No bullet found"
+            unreachableText="The database is unreachable; manual input still works."
+          />
+        </div>
+      )}
+      <NativeSelect
+        label="Drag model"
+        value={recordModel}
+        data={['G7', 'G1']}
+        onChange={(e) => {
+          setRecordModel(e.currentTarget.value as 'G1' | 'G7')
+          setChoice(undefined)
+        }}
+      />
+      <div className="wide">
+        {record.status === 'loading' && <Loading what="the bullet record" inline />}
+        {record.status === 'error' && <p>{record.message}</p>}
+        {/* the Bullet card shows the load's record */}
+        {record.status === 'ok' && own && (
+          <RecordDetails record={record.record} names={names} system={system} />
+        )}
+        {record.status === 'ok' && record.record.id === loadBullet && (
+          <p className="note from-load">
+            From the load: the bullet of the Bullet panel
+            {replaced && ', in place of the one entered here'}.
+          </p>
+        )}
+        {drag?.kind === 'none' && <p className="note">{noBcText(recordModel)}</p>}
+        {bcOptions?.kind === 'choose' && (
+          <Radio.Group
+            label={`The record lists several ${recordModel} BCs without velocity bands; choose one`}
+            value={choice === undefined ? null : String(choice)}
+            onChange={(v) => setChoice(Number(v))}
+          >
+            <Stack gap="xs" mt="xs">
+              {bcOptions.values.map((v, i) => (
+                <Radio
+                  // biome-ignore lint/suspicious/noArrayIndexKey: BCs keep the record order and have no id
+                  key={i}
+                  value={String(i)}
+                  label={`${v.value} lb/in²${v.note ? ` (${v.note})` : ''}`}
+                />
+              ))}
+            </Stack>
+          </Radio.Group>
+        )}
+        {chosen && (
+          <p>
+            {recordModel} BC {chosen.value} lb/in² chosen from the record, used from 0{' '}
+            {u('velocity')}.
+          </p>
+        )}
+      </div>
+    </>
+  )
+}
+
+/** The manual bullet: a design of this browser, the values and the drag model. */
+function ManualBullet({
+  designs,
+  design,
+  readDesigns,
+  chooseDesign,
+  manualModel,
+  setManualModel,
+  group,
+}: BulletFieldsProps) {
+  return (
+    <>
+      <NativeSelect
+        className="wide"
+        label="Bullet design"
+        description="From your bullet designs in this browser; fills mass, diameter and length."
+        value={design?.id ?? ''}
+        onFocus={readDesigns}
+        onChange={(e) => chooseDesign(e.currentTarget.value)}
+        data={[
+          { value: '', label: designs.length ? 'None' : 'None in this browser' },
+          ...designs.map((d) => ({ value: d.id, label: d.name })),
+        ]}
+      />
+      {group(['mass', 'diameter', 'length'])}
+      <NativeSelect
+        label="Drag model"
+        value={manualModel}
+        data={dragModels}
+        onChange={(e) => setManualModel(e.currentTarget.value as DragModel)}
+      />
+      {group(['ballisticCoefficient'])}
+    </>
+  )
+}
+
+/** The Bullet panel's fields: with the load's bullet no source switch or search. */
+function BulletFields(props: BulletFieldsProps) {
+  const { own, source, setSource } = props
+  return (
+    <>
+      {/* with the load's bullet: no source switch or search */}
+      {own && (
+        <SegmentedControl
+          size={controlSize.row.toggle}
+          aria-label="Bullet source"
+          className="wide"
+          value={source}
+          onChange={(v) => setSource(v as 'database' | 'manual')}
+          data={[
+            { value: 'database', label: 'From the database' },
+            { value: 'manual', label: 'Manual drag' },
+          ]}
+        />
+      )}
+      {source === 'database' ? <DatabaseBullet {...props} /> : <ManualBullet {...props} />}
+    </>
+  )
+}
+
+type RifleFieldsProps = {
+  ownSight: boolean
+  sightGone: boolean
+  sight: string
+  sights: ReturnType<typeof sightOptions>
+  readSights: () => void
+  chooseSight: (value: string) => void
+  twistHand: 'right' | 'left'
+  setTwistHand: (h: 'right' | 'left') => void
+  setSight: (value: string) => void
+  group: (keys: string[]) => ReactNode[]
+}
+
+/** The Rifle and scope panel's fields: the firearm's sight, the twist and its direction, the zero range. */
+function RifleFields({
+  ownSight,
+  sightGone,
+  sight,
+  sights,
+  readSights,
+  chooseSight,
+  twistHand,
+  setTwistHand,
+  setSight,
+  group,
+}: RifleFieldsProps) {
+  return (
+    <>
+      {ownSight && (
+        <NativeSelect
+          className="wide"
+          label="Firearm and sight"
+          description={
+            sightGone
+              ? 'The chosen firearm is no longer in this browser; its values stay.'
+              : 'From your firearm library; fills sight height, twist, zero range, zero air and drag factor.'
+          }
+          value={sight}
+          onFocus={readSights}
+          onChange={(e) => chooseSight(e.currentTarget.value)}
+          data={[
+            { value: '', label: sights.length ? 'None' : 'None in this browser' },
+            ...sights.map(({ value, label }) => ({ value, label })),
+          ]}
+        />
+      )}
+      {group(['sightHeight', 'twist'])}
+      <div className="twist-hand">
+        <p className="segment-label" id="twist-hand">
+          Twist direction
+        </p>
+        <SegmentedControl
+          aria-labelledby="twist-hand"
+          size={controlSize.row.toggle}
+          value={twistHand}
+          onChange={(v) => {
+            setTwistHand(v as 'right' | 'left')
+            setSight('')
+          }}
+          data={[
+            { value: 'right', label: 'Right' },
+            { value: 'left', label: 'Left' },
+          ]}
+        />
+      </div>
+      {group(['zeroRange'])}
+    </>
+  )
+}
+
+/** The text over a result whose inputs changed. */
+function staleTextOf(attempt: Attempt) {
+  return attempt.kind === 'invalid'
+    ? `Result for earlier inputs. Fix ${attempt.label} to update.`
+    : 'Result for earlier inputs.'
+}
+
+/** The status line of an attempt: the update it made, or that the result is of earlier inputs. */
+function summaryOf(attempt: Attempt, stale: boolean, system: UnitSystem) {
+  if (attempt.kind === 'ok') {
+    const rows = attempt.result.tablePoints
+    const lastRow = rows[rows.length - 1]
+    if (lastRow)
+      return `Updated: ${rows.length} ranges, elevation at ${formatQuantity('range', system, lastRow.range)} ${system.range.symbol} ${angle(system, lastRow.elevationHold)}.`
+  }
+  return stale ? staleTextOf(attempt) : ''
+}
+
+/** The fields a computation still needs before its first result. */
+function neededOf(source: 'database' | 'manual', record: RecordState, fields: Fields) {
+  return [
+    ...(source === 'database' && record.status !== 'ok' ? ['Bullet'] : []),
+    ...(source === 'manual' ? [...manualBulletFields, ...shotFields] : shotFields)
+      .filter((s) => 'required' in s && s.required && !fields[s.key]?.text)
+      .map((s) => s.label),
+  ]
+}
+
+/** The alert, the prompt, or before the first result what is still needed and the example. */
+function FormNotes({
+  alert,
+  attempt,
+  emptyState,
+  needed,
+  fillExample,
+}: {
+  alert: ReactNode
+  attempt: Attempt
+  emptyState: boolean
+  needed: string[]
+  fillExample: () => void
+}) {
+  return (
+    <>
+      {alert}
+      {attempt.kind === 'prompt' && attempt.text && !emptyState && (
+        <p className="prompt">{attempt.text}</p>
+      )}
+      {emptyState && (
+        <section aria-labelledby="trajectory-empty" className="trajectory-empty">
+          <h2 id="trajectory-empty">No result yet</h2>
+          {attempt.kind === 'prompt' && <p className="prompt">{attempt.text}</p>}
+          {needed.length > 0 && (
+            <>
+              <p>Still needed:</p>
+              <ul>
+                {needed.map((label) => (
+                  <li key={label}>{label}</li>
+                ))}
+              </ul>
+            </>
+          )}
+          {exampleData && (
+            <Button variant="default" onClick={fillExample}>
+              Use the example
+            </Button>
+          )}
+        </section>
+      )}
+    </>
+  )
+}
+
+/** The range card's Print menu, one entry per paper size. */
+function RangeCardMenu({ setPaper }: { setPaper: (size: PaperSize) => void }) {
+  return (
+    // an icon at the end of the holds row, so the hold labels keep their width
+    <Menu position="bottom-end" withinPortal shadow="sm">
+      <Menu.Target>
+        <ActionIcon
+          variant="default"
+          size={controlSize.row.icon}
+          className="range-card-button"
+          aria-label="Print range card"
+          title="Print range card"
+        >
+          <Printer aria-hidden="true" />
+        </ActionIcon>
+      </Menu.Target>
+      <Menu.Dropdown>
+        {paperSizes.map((size) => (
+          <Menu.Item
+            key={size}
+            onClick={() => {
+              // the card is drawn for the paper before the dialog takes its snapshot
+              flushSync(() => setPaper(size))
+              printRangeCard()
+            }}
+          >
+            Print on {size.toUpperCase()}
+          </Menu.Item>
+        ))}
+      </Menu.Dropdown>
+    </Menu>
+  )
+}
+
+/** The holds of the result and the range card's Print menu. */
+function TrajectoryTop({
+  result,
+  system,
+  stale,
+  printButton,
+}: {
+  result: Result
+  system: UnitSystem
+  stale: boolean
+  printButton: ReactNode
+}) {
+  return (
+    <section
+      aria-labelledby="trajectory-result"
+      className="result trajectory-top"
+      data-stale={stale || undefined}
+    >
+      <h2 id="trajectory-result" className="visually-hidden">
+        Trajectory result
+      </h2>
+      <ResultTop result={result} system={system} />
+      {printButton}
+    </section>
+  )
+}
+
+/** The notes, the chart, the table and the range card of the result. */
+function TrajectoryDetail({
+  result,
+  system,
+  stale,
+  wide,
+  staleLine,
+  paper,
+}: {
+  result: Result
+  system: UnitSystem
+  stale: boolean
+  wide: boolean
+  staleLine: ReactNode
+  paper: PaperSize
+}) {
+  return (
+    <div className="trajectory-detail" data-stale={stale || undefined}>
+      <ResultDetail
+        result={result}
+        system={system}
+        chartHeight={wide ? undefined : 200}
+        staleLine={staleLine}
+      />
+      <RangeCard result={result} system={system} paper={paper} />
+    </div>
+  )
+}
+
+/** The latest result, kept on each new attempt during render without a second committed render. */
+function useLastResult(attempt: Attempt) {
+  const [last, setLast] = useState<Result | undefined>(undefined)
+  const [seen, setSeen] = useState<Attempt>()
+  if (seen !== attempt) {
+    setSeen(attempt)
+    if (attempt.kind === 'ok') setLast(attempt.result)
+  }
+  const result = attempt.kind === 'ok' ? attempt.result : last
+  const stale = attempt.kind !== 'ok' && result !== undefined
+  return { result, stale, clearLast: () => setLast(undefined) }
+}
 
 /**
  * The trajectory calculator of the workbench's Trajectory tab, the only trajectory UI. It takes the
@@ -498,7 +1005,6 @@ export function TrajectoryForm({
   const [twistHand, setTwistHand] = useState<'right' | 'left'>('right')
   // from 62em the chart fills the results column's height
   const wide = useMediaQuery('(min-width: 62em)')
-  const [last, setLast] = useState<Result | undefined>(undefined)
   const [sights, setSights] = useState<ReturnType<typeof sightOptions>>([])
   const [sight, setSight] = useState('')
   const [paper, setPaper] = useState<PaperSize>('a4')
@@ -571,36 +1077,15 @@ export function TrajectoryForm({
   )
   const [debounced] = useDebouncedValue(inputs, 150)
   const { errors, attempt } = useMemo(() => evaluate(debounced), [debounced])
-  // kept on each new attempt during render, without a second committed render
-  const [seen, setSeen] = useState<Attempt>()
-  if (seen !== attempt) {
-    setSeen(attempt)
-    if (attempt.kind === 'ok') setLast(attempt.result)
-  }
-  const result = attempt.kind === 'ok' ? attempt.result : last
-  const stale = attempt.kind !== 'ok' && result !== undefined
+  const { result, stale, clearLast } = useLastResult(attempt)
 
-  const u = (q: Parameters<typeof formatQuantity>[0]) => system[q].symbol
-  const lastRow = result?.tablePoints[result.tablePoints.length - 1]
-  const staleText =
-    attempt.kind === 'invalid'
-      ? `Result for earlier inputs. Fix ${attempt.label} to update.`
-      : 'Result for earlier inputs.'
-  let summary = ''
-  if (attempt.kind === 'ok' && lastRow)
-    summary = `Updated: ${attempt.result.tablePoints.length} ranges, elevation at ${formatQuantity('range', system, lastRow.range)} ${u('range')} ${angle(system, lastRow.elevationHold)}.`
-  else if (stale) summary = staleText
+  const staleText = staleTextOf(attempt)
+  const summary = summaryOf(attempt, stale, system)
   // announced and alerted 1 s after the last change, so values passed while typing stay quiet
   const [status] = useDebouncedValue(summary, 1000)
   const message = attempt.kind === 'error' ? attempt.message : ''
   const [alerted] = useDebouncedValue(message, 1000)
   const alert = alerted && alerted === message && <ErrorNote>{message}</ErrorNote>
-
-  const drag = record.status === 'ok' ? bulletDrag(record.record, recordModel, choice) : undefined
-  // without `choice`, so the BC list stays while one value is chosen
-  const bcOptions = record.status === 'ok' ? bulletDrag(record.record, recordModel) : undefined
-  const chosen =
-    bcOptions?.kind === 'choose' && choice !== undefined ? bcOptions.values[choice] : undefined
 
   const field = (spec: FieldSpec) => (
     <NumberField
@@ -635,7 +1120,7 @@ export function TrajectoryForm({
     setRecord({ status: 'none' })
     setChoice(undefined)
     setTwistHand('right')
-    setLast(undefined)
+    clearLast()
     setSight('')
     setSightGone(false)
     setDragFrom(undefined)
@@ -759,27 +1244,17 @@ export function TrajectoryForm({
     preloadChart()
     readDesigns()
     readSights()
-    // the tab's keys under `tab.`: the workbench's query holds interior keys such as twist
-    const query = tabQuery(linkParams(window.location).toString(), 'trajectory')
-    if (!query) return
-    const linked = queryFields(query, allFields, system, roundedFieldText)
-    form.setValues(linked)
-    if (zeroKeys.some((k) => linked[k].text)) showZero()
-    // linked values count as edited, so one outside its bounds shows its error
-    form.setTouched(
-      Object.fromEntries(allFields.filter((s) => linked[s.key].text).map((s) => [s.key, true])),
-    )
-    const model = query.get('drag') as DragModel | null
-    const bullet = query.get('bullet')
-    if (bullet) {
-      if (model === 'G1' || model === 'G7') setRecordModel(model)
-      const linkedChoice = Number(query.get('choice') || Number.NaN)
-      void chooseRecord(bullet, Number.isInteger(linkedChoice) ? linkedChoice : undefined)
-    } else if (query.has('mass')) {
-      setSource('manual')
-      if (model && dragModels.includes(model)) setManualModel(model)
-    }
-    if (query.get('hand') === 'left') setTwistHand('left')
+    const link = readLink(system)
+    if (link)
+      applyLink(link, {
+        form,
+        showZero,
+        setRecordModel,
+        chooseRecord,
+        setSource,
+        setManualModel,
+        setTwistHand,
+      })
   }, [])
 
   const loadVelocity = load.muzzleVelocity
@@ -880,115 +1355,28 @@ export function TrajectoryForm({
           <Accordion.Control aria-label="Bullet of the trajectory">Bullet</Accordion.Control>
           <Accordion.Panel>
             <div className="panel-fields">
-              {/* with the load's bullet: no source switch or search */}
-              {own && (
-                <SegmentedControl
-                  size={controlSize.row.toggle}
-                  aria-label="Bullet source"
-                  className="wide"
-                  value={source}
-                  onChange={(v) => setSource(v as 'database' | 'manual')}
-                  data={[
-                    { value: 'database', label: 'From the database' },
-                    { value: 'manual', label: 'Manual drag' },
-                  ]}
-                />
-              )}
-              {source === 'database' ? (
-                <>
-                  {own && (
-                    <div className="wide">
-                      <RecordSearch<BulletSummary>
-                        kind="bullets"
-                        label="Search bullets by manufacturer or name"
-                        // the chosen record in the field, as in the workbench's pickers
-                        chosen={
-                          record.status === 'ok'
-                            ? productLabel(record.record, names)
-                            : 'Search bullets'
-                        }
-                        describe={(b) =>
-                          `${productLabel(b, names)}, ${formatQuantity('mass', system, toSi('mass', b.mass))} ${u('mass')}`
-                        }
-                        onSelect={(b) => chooseRecord(b.id)}
-                        noneText="No bullet found"
-                        unreachableText="The database is unreachable; manual input still works."
-                      />
-                    </div>
-                  )}
-                  <NativeSelect
-                    label="Drag model"
-                    value={recordModel}
-                    data={['G7', 'G1']}
-                    onChange={(e) => {
-                      setRecordModel(e.currentTarget.value as 'G1' | 'G7')
-                      setChoice(undefined)
-                    }}
-                  />
-                  <div className="wide">
-                    {record.status === 'loading' && <Loading what="the bullet record" inline />}
-                    {record.status === 'error' && <p>{record.message}</p>}
-                    {/* the Bullet card shows the load's record */}
-                    {record.status === 'ok' && own && (
-                      <RecordDetails record={record.record} names={names} system={system} />
-                    )}
-                    {record.status === 'ok' && record.record.id === loadBullet && (
-                      <p className="note from-load">
-                        From the load: the bullet of the Bullet panel
-                        {replaced && ', in place of the one entered here'}.
-                      </p>
-                    )}
-                    {drag?.kind === 'none' && <p className="note">{noBcText(recordModel)}</p>}
-                    {bcOptions?.kind === 'choose' && (
-                      <Radio.Group
-                        label={`The record lists several ${recordModel} BCs without velocity bands; choose one`}
-                        value={choice === undefined ? null : String(choice)}
-                        onChange={(v) => setChoice(Number(v))}
-                      >
-                        <Stack gap="xs" mt="xs">
-                          {bcOptions.values.map((v, i) => (
-                            <Radio
-                              // biome-ignore lint/suspicious/noArrayIndexKey: BCs keep the record order and have no id
-                              key={i}
-                              value={String(i)}
-                              label={`${v.value} lb/in²${v.note ? ` (${v.note})` : ''}`}
-                            />
-                          ))}
-                        </Stack>
-                      </Radio.Group>
-                    )}
-                    {chosen && (
-                      <p>
-                        {recordModel} BC {chosen.value} lb/in² chosen from the record, used from 0{' '}
-                        {u('velocity')}.
-                      </p>
-                    )}
-                  </div>
-                </>
-              ) : (
-                <>
-                  <NativeSelect
-                    className="wide"
-                    label="Bullet design"
-                    description="From your bullet designs in this browser; fills mass, diameter and length."
-                    value={design?.id ?? ''}
-                    onFocus={readDesigns}
-                    onChange={(e) => chooseDesign(e.currentTarget.value)}
-                    data={[
-                      { value: '', label: designs.length ? 'None' : 'None in this browser' },
-                      ...designs.map((d) => ({ value: d.id, label: d.name })),
-                    ]}
-                  />
-                  {group(['mass', 'diameter', 'length'])}
-                  <NativeSelect
-                    label="Drag model"
-                    value={manualModel}
-                    data={dragModels}
-                    onChange={(e) => setManualModel(e.currentTarget.value as DragModel)}
-                  />
-                  {group(['ballisticCoefficient'])}
-                </>
-              )}
+              <BulletFields
+                own={own}
+                source={source}
+                setSource={setSource}
+                system={system}
+                names={names}
+                record={record}
+                recordModel={recordModel}
+                setRecordModel={setRecordModel}
+                setChoice={setChoice}
+                choice={choice}
+                chooseRecord={chooseRecord}
+                loadBullet={loadBullet}
+                replaced={replaced}
+                designs={designs}
+                design={design}
+                readDesigns={readDesigns}
+                chooseDesign={chooseDesign}
+                manualModel={manualModel}
+                setManualModel={setManualModel}
+                group={group}
+              />
             </div>
           </Accordion.Panel>
         </Accordion.Item>
@@ -1007,44 +1395,18 @@ export function TrajectoryForm({
           <Accordion.Control>Rifle and scope</Accordion.Control>
           <Accordion.Panel>
             <div className="panel-fields">
-              {ownSight && (
-                <NativeSelect
-                  className="wide"
-                  label="Firearm and sight"
-                  description={
-                    sightGone
-                      ? 'The chosen firearm is no longer in this browser; its values stay.'
-                      : 'From your firearm library; fills sight height, twist, zero range, zero air and drag factor.'
-                  }
-                  value={sight}
-                  onFocus={readSights}
-                  onChange={(e) => chooseSight(e.currentTarget.value)}
-                  data={[
-                    { value: '', label: sights.length ? 'None' : 'None in this browser' },
-                    ...sights.map(({ value, label }) => ({ value, label })),
-                  ]}
-                />
-              )}
-              {group(['sightHeight', 'twist'])}
-              <div className="twist-hand">
-                <p className="segment-label" id="twist-hand">
-                  Twist direction
-                </p>
-                <SegmentedControl
-                  aria-labelledby="twist-hand"
-                  size={controlSize.row.toggle}
-                  value={twistHand}
-                  onChange={(v) => {
-                    setTwistHand(v as 'right' | 'left')
-                    setSight('')
-                  }}
-                  data={[
-                    { value: 'right', label: 'Right' },
-                    { value: 'left', label: 'Left' },
-                  ]}
-                />
-              </div>
-              {group(['zeroRange'])}
+              <RifleFields
+                ownSight={ownSight}
+                sightGone={sightGone}
+                sight={sight}
+                sights={sights}
+                readSights={readSights}
+                chooseSight={chooseSight}
+                twistHand={twistHand}
+                setTwistHand={setTwistHand}
+                setSight={setSight}
+                group={group}
+              />
             </div>
           </Accordion.Panel>
         </Accordion.Item>
@@ -1080,12 +1442,7 @@ export function TrajectoryForm({
   // before the first result with the tab's own bullet: what is missing, or the example; with
   // the load's bullet the prompt alone
   const emptyState = own && !result && attempt.kind !== 'ok'
-  const needed = [
-    ...(source === 'database' && record.status !== 'ok' ? ['Bullet'] : []),
-    ...(source === 'manual' ? [...manualBulletFields, ...shotFields] : shotFields)
-      .filter((s) => 'required' in s && s.required && !fields[s.key]?.text)
-      .map((s) => s.label),
-  ]
+  const needed = neededOf(source, record, fields)
 
   // the stale line shows the state, so a stale or lagging stale text is only announced
   const statusLine = (
@@ -1097,65 +1454,16 @@ export function TrajectoryForm({
     </p>
   )
   const formNotes = (
-    <>
-      {alert}
-      {attempt.kind === 'prompt' && attempt.text && !emptyState && (
-        <p className="prompt">{attempt.text}</p>
-      )}
-      {emptyState && (
-        <section aria-labelledby="trajectory-empty" className="trajectory-empty">
-          <h2 id="trajectory-empty">No result yet</h2>
-          {attempt.kind === 'prompt' && <p className="prompt">{attempt.text}</p>}
-          {needed.length > 0 && (
-            <>
-              <p>Still needed:</p>
-              <ul>
-                {needed.map((label) => (
-                  <li key={label}>{label}</li>
-                ))}
-              </ul>
-            </>
-          )}
-          {exampleData && (
-            <Button variant="default" onClick={fillExample}>
-              Use the example
-            </Button>
-          )}
-        </section>
-      )}
-    </>
+    <FormNotes
+      alert={alert}
+      attempt={attempt}
+      emptyState={emptyState}
+      needed={needed}
+      fillExample={fillExample}
+    />
   )
   const staleLine = stale && <p className="stale-line">{staleText}</p>
-  const printButton = (
-    // an icon at the end of the holds row, so the hold labels keep their width
-    <Menu position="bottom-end" withinPortal shadow="sm">
-      <Menu.Target>
-        <ActionIcon
-          variant="default"
-          size={controlSize.row.icon}
-          className="range-card-button"
-          aria-label="Print range card"
-          title="Print range card"
-        >
-          <Printer aria-hidden="true" />
-        </ActionIcon>
-      </Menu.Target>
-      <Menu.Dropdown>
-        {paperSizes.map((size) => (
-          <Menu.Item
-            key={size}
-            onClick={() => {
-              // the card is drawn for the paper before the dialog takes its snapshot
-              flushSync(() => setPaper(size))
-              printRangeCard()
-            }}
-          >
-            Print on {size.toUpperCase()}
-          </Menu.Item>
-        ))}
-      </Menu.Dropdown>
-    </Menu>
-  )
+  const printButton = <RangeCardMenu setPaper={setPaper} />
 
   // one view at every width: the holds and Print range card, the inputs, then the notes,
   // the chart and the table; from 62em the chart takes the height the results column leaves
@@ -1163,30 +1471,19 @@ export function TrajectoryForm({
     <div className="embedded-calculator trajectory-view">
       {statusLine}
       {result && (
-        <section
-          aria-labelledby="trajectory-result"
-          className="result trajectory-top"
-          data-stale={stale || undefined}
-        >
-          <h2 id="trajectory-result" className="visually-hidden">
-            Trajectory result
-          </h2>
-          <ResultTop result={result} system={system} />
-          {printButton}
-        </section>
+        <TrajectoryTop result={result} system={system} stale={stale} printButton={printButton} />
       )}
       {inputsPanel}
       {formNotes}
       {result && (
-        <div className="trajectory-detail" data-stale={stale || undefined}>
-          <ResultDetail
-            result={result}
-            system={system}
-            chartHeight={wide ? undefined : 200}
-            staleLine={staleLine}
-          />
-          <RangeCard result={result} system={system} paper={paper} />
-        </div>
+        <TrajectoryDetail
+          result={result}
+          system={system}
+          stale={stale}
+          wide={Boolean(wide)}
+          staleLine={staleLine}
+          paper={paper}
+        />
       )}
     </div>
   )

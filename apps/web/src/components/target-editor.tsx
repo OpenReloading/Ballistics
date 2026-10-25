@@ -54,10 +54,13 @@ import {
 } from '@phosphor-icons/react'
 import {
   type CSSProperties,
+  type Dispatch,
   Fragment,
   type KeyboardEvent,
   type ReactElement,
   type ReactNode,
+  type RefObject,
+  type SetStateAction,
   useCallback,
   useDeferredValue,
   useEffect,
@@ -74,7 +77,7 @@ import { calibrateSheetOnFace } from '../lib/face-sheet.ts'
 import { fieldValueFromText } from '../lib/field-spec.ts'
 import { clickOptions, freeId } from '../lib/firearm.ts'
 import { type Interval, keyReadouts, readouts, statLines } from '../lib/group-readouts.ts'
-import { editHistory, historyOf, pushHistory, redo, undo } from '../lib/history.ts'
+import { editHistory, type History, historyOf, pushHistory, redo, undo } from '../lib/history.ts'
 import { newId } from '../lib/new-id.ts'
 import { shortcutAriaKeys, shortcutLabel, shortcutMatches } from '../lib/shortcuts.ts'
 import {
@@ -404,899 +407,143 @@ function Row({ label, help, children }: { label: string; help?: string; children
   )
 }
 
-/**
- * The target photo editor: a sheet of the browser store (a photo
- * kept on the device, or a drawn target) with its calibration and shot groups, saved on every
- * change. On `/groups` it lists every sheet; in the workbench tab Groups the sheets of the saved
- * load `load`, each group linked to a ladder step and a chart of size against charge.
- */
-export function TargetEditor({
-  load,
-  charges,
-  stepLabels,
-  step,
-  bulletDiameter,
-  optic,
-  expand,
-  summary,
-  heading,
-  stored: storedTick,
-}: {
-  /** Id of the saved load (workbench); the sheets of that load only. */
-  load?: string
-  /** Charge of each ladder step of the load, kg. */
-  charges?: number[]
-  /** Each ladder step as the workbench names it, relative to the main charge. */
-  stepLabels?: string[]
-  /** Index of the ladder step shown in the workbench; new groups take it. */
-  step?: number
-  /** Bullet diameter of the load, m: the marker of a new sheet. */
-  bulletDiameter?: number
-  /** The optic of the workbench's firearm, for the clicks to the point of aim. */
-  optic?: { label: string; click: number }
-  /**
-   * The workbench tab: compact (the target and the key readouts) until expanded over the
-   * workbench; `onChange` switches.
-   */
-  expand?: { expanded: boolean; onChange: (expanded: boolean) => void }
-  /** The workbench's load and its simulated velocities, for the print sheet. */
-  summary?: LoadSummary
-  /** The page heading (`/groups`): shown with the File menu of the open sheet beside it. */
-  heading?: string
-  /** Counts the page's File menu writes to the browser store (workbench Import, Replace). */
-  stored?: number
-}) {
-  const { system } = useUnits()
-  /** The distance of a new sheet: 100 of the display unit (100 yd or 100 m), held in m. */
-  const newDistance = useRef(0)
-  newDistance.current = system.range.toSi(100)
-  const [sheets, setSheets] = useState<TargetSheetRecord[]>([])
-  // the id is set on mount (`create` or `open`): no clock or random value during the prerender
-  const [meta, setMeta] = useState({ id: '', name: 'Target sheet 1' })
-  const [h, setH] = useState(() => historyOf(blank(load, bulletDiameter, newDistance.current)))
-  const sheet = h.present
-  // the Report issue boxes of /groups, not of the workbench tab
-  useSheetReport(heading === undefined ? undefined : sheet)
-  /** The File menu compares the sheet as JSON: after the edits of a drag, not during them. */
-  const fileData = useDeferredValue(sheet)
-  /** The sheet and name as opened, created or last saved: saved again only once they differ. */
-  const opened = useRef<{ data: TargetSheet; name: string }>({ data: sheet, name: '' })
-  /** The sheet and name shown now, for a store read that finishes later. */
-  const showing = useRef({ data: sheet, name: meta.name })
-  showing.current = { data: sheet, name: meta.name }
-  const [stored, setStored] = useState(false)
-  /** The browser store refused the last save; the next save that lands clears it. */
-  const [saveFailed, setSaveFailed] = useState(false)
-  const [photo, setPhoto] = useState<Photo | 'missing'>()
-  const [active, setActive] = useState<string | undefined>(sheet.groups[0]?.id)
-  const [selected, setSelected] = useState<Selection>()
-  const [tool, setTool] = useState<Tool>('select')
-  const [pending, setPending] = useState<Point[]>([])
-  const [refKind, setRefKind] = useState<RefKind>('line')
-  const [known, setKnown] = useState<{ length?: number; width?: number; height?: number }>({})
-  /** The browser's last overlay choice: the switches of a sheet without its own. */
-  const [browserOverlays, setBrowserOverlays] = useState(defaultOverlays)
-  const [noteSel, setNoteSel] = useState<string>()
-  const noteFields = useRef(new Map<string, HTMLTextAreaElement>())
-  /** The view the canvas shows, for the exports and the print. */
-  const view: ViewRef = useRef(undefined)
-  const [printBox, setPrintBox] = useState<{ x: number; y: number; w: number; h: number }>()
-  const printPhoto = useRef<HTMLImageElement>(null)
-  // undo and redo are this editor's own keys (`onKeyDown`)
-  useShortcuts({ undo: null, redo: null, ...(heading !== undefined && { print: null }) })
-  // on /groups the browser's print command (Ctrl+P) prints the sheet, as Export > Print sheet does;
-  // the workbench tab leaves it to the workbench report
-  const ours = useRef(false)
-  usePrintEvents(
-    () => {
-      const html = document.documentElement
-      // Print sheet has set it already
-      if (html.dataset.print || !view.current) return
-      const box = view.current.extent
-      ours.current = true
-      html.dataset.print = 'target-sheet'
-      flushSync(() => setPrintBox(box))
-    },
-    () => {
-      if (!ours.current) return
-      ours.current = false
-      delete document.documentElement.dataset.print
-      setPrintBox(undefined)
-    },
-    heading !== undefined,
-  )
-  const [filter, setFilter] = useState({ contrast: 1, darken: 0 })
-  /** The last message; an alert (a failure or a limit) shows over a tool's hint. */
-  const [status, setStatus] = useState({ text: '', alert: false })
-  const say = useCallback((text: string, alert = false) => setStatus({ text, alert }), [])
-  // a routine message goes after a while: it sits over the target; an alert stays until the next
-  useEffect(() => {
-    if (!status.text || status.alert) return
-    const t = setTimeout(
-      () => setStatus((x) => (x === status ? { text: '', alert: false } : x)),
-      8000,
-    )
-    return () => clearTimeout(t)
-  }, [status])
-  /** Why the browser store could not be read: nothing is saved then. */
-  const [storeError, setStoreError] = useState<string>()
-  const [options, setOptions] = useState<ReturnType<typeof clickOptions>>([])
-  const [opticChoice, setOpticChoice] = useState('')
-  const [side, setSide] = useState<string | null>('groups')
-  const coarse = useMediaQuery('(pointer: coarse)')
-  const { ref: sized, width } = useElementSize<HTMLDivElement>()
-  const root = useRef<HTMLDivElement>(null)
-  const rootRef = useMergedRef(sized, root)
-  const wide = width >= 928
-  const uid = useId()
-  /** The toolbar popovers: Photo, Calibrate, Overlays; one open at a time. */
-  const [pop, setPop] = useState<'photo' | 'calibrate' | 'overlays'>()
-  const popOf = (p: NonNullable<typeof pop>) => ({
-    opened: pop === p,
-    onChange: (on: boolean) => setPop((x) => (on ? p : x === p ? undefined : x)),
-    // closed with the focus inside, it goes back to the button, also when the popover opened
-    // after a Calibrate tool (the focus was on the canvas marker then)
-    onClose: () =>
-      requestAnimationFrame(() => {
-        if (document.activeElement === document.body)
-          root.current?.querySelector<HTMLElement>(`[data-pop="${p}"]`)?.focus()
-      }),
-  })
-  /** A controlled popover's target toggles it itself. */
-  const togglePop = (p: NonNullable<typeof pop>) => setPop((x) => (x === p ? undefined : p))
-  /** A toolbar button with its popover `p`, its hover text off while open; `frame` wraps the popover. */
-  const toolPopover = (
-    p: NonNullable<typeof pop>,
-    o: {
-      tip: ReactNode
-      wideTip?: boolean
-      name: string
-      description?: string
-      icon: ReactNode
-      position?: 'bottom-start' | 'bottom-end'
-      frame?: (popover: ReactNode) => ReactElement
-      children: ReactNode
-    },
-  ) => {
-    const popover = (
-      <Popover
-        position={o.position ?? 'bottom-start'}
-        shadow="sm"
-        withinPortal={false}
-        returnFocus
-        transitionProps={{ duration: 0 }}
-        {...popOf(p)}
-      >
-        <Popover.Target>
-          <ActionIcon
-            variant="default"
-            aria-label={o.name}
-            data-pop={p}
-            onClick={() => togglePop(p)}
-            aria-description={o.description}
-          >
-            {o.icon}
-          </ActionIcon>
-        </Popover.Target>
-        <Popover.Dropdown className="toolbar-pop">{o.children}</Popover.Dropdown>
-      </Popover>
-    )
-    return (
-      <Tooltip
-        label={o.tip}
-        events={tipEvents}
-        {...(o.wideTip && { multiline: true, maw: 260 })}
-        disabled={pop === p}
-      >
-        {o.frame ? o.frame(popover) : <span className="tool-indicator">{popover}</span>}
-      </Tooltip>
-    )
-  }
-  const [renaming, setRenaming] = useState(false)
-  const [shotsOpen, setShotsOpen] = useState(true)
-  /** The phone's bottom sheet: open or only its summary strip. */
-  const [sheetOpen, setSheetOpen] = useState(false)
-  /** The scroll of the shot table, for the rows in view of a long group. */
-  const [shotScroll, setShotScroll] = useState({ top: 0, height: 400 })
-  const shotScroller = useRef<HTMLDivElement>(null)
-  /** The help of the focused field (label and description), shown on the canvas. */
-  const [help, setHelp] = useState<string>()
-  const fileInput = useRef<HTMLInputElement>(null)
-  const cameraInput = useRef<HTMLInputElement>(null)
-  const dragKey = useRef(0)
-  /** The save of the last edit while it waits for the debounce. */
-  const pendingSave = useRef<(() => void) & { record?: () => WaitingRecord }>(undefined)
-  /** Saves started and not yet landed, by sheet id: copied too when the page goes. */
-  const inFlight = useRef(new Map<string, WaitingRecord>())
-  /** The `saved` of each sheet as this editor last read or wrote it: a save writes only over that. */
-  const bases = useRef(new Map<string, string | undefined>())
-  const flush = () => pendingSave.current?.()
-  /** The sheet shown now, for a photo read that finishes after a switch. */
-  const shown = useRef(meta.id)
-  shown.current = meta.id
-  /** The photo of the sheet shown now, for a photo read that finishes after an edit. */
-  const photoNow = useRef(sheet.photo)
-  photoNow.current = sheet.photo
-  /** Replaced or removed photos, deleted once their sheet is saved without them or deleted. */
-  const orphans = useRef<{ sheet: string; photo: string }[]>([])
-  /** The undo notice of the last group delete, joined by a delete while it shows. */
-  const groupUndo = useRef<{ n: number; undo: () => void; names: string[] }>(undefined)
+/** The rows of a long shot table in view, at a fixed row height. */
+function shotWindowOf(
+  shotCount: number,
+  coarse: boolean | undefined,
+  shotScroll: { top: number; height: number },
+) {
+  const rowHeight = coarse ? 44 : 24
+  const windowed = shotCount > windowFrom
+  const inView = Math.ceil(shotScroll.height / rowHeight)
+  const firstRow = windowed
+    ? Math.max(0, Math.min(Math.floor(shotScroll.top / rowHeight), shotCount - inView) - 10)
+    : 0
+  const lastRow = windowed ? Math.min(shotCount, firstRow + inView + 20) : shotCount
+  return { rowHeight, windowed, firstRow, lastRow, shotCount }
+}
 
-  const frame = useMemo(() => frameOf(sheet), [sheet])
-  const group = sheet.groups.find((g) => g.id === active) ?? sheet.groups[0]
-  const scrollFocus = useScrollFocus(`Shots of ${group?.name ?? ''}`, shotScroller)
+type Meta = { id: string; name: string }
+type Pop = 'photo' | 'calibrate' | 'overlays'
+type Kept = 'failed' | 'saving' | 'saved' | 'blank'
+type System = ReturnType<typeof useUnits>['system']
+type Apply = (f: (s: TargetSheet) => TargetSheet, key?: string) => void
+type Frame = ReturnType<typeof frameOf>
+type Stats = NonNullable<ReturnType<typeof groupStatisticsOf>>
+type GroupScore = ReturnType<typeof scoredOnly>
+type Score = ReturnType<typeof useRingScoring>
+type ShotAt = (
+  sel: Selection,
+  f: (s: ShotGroup['shots'][number]) => ShotGroup['shots'][number] | undefined,
+  key?: string,
+) => void
 
-  useEffect(() => setBrowserOverlays(readOverlays()), [])
-  const overlays = sheet.overlays ? { ...defaultOverlays, ...sheet.overlays } : browserOverlays
+/** What the editor's panels read and call; one object per render. */
+type Ed = {
+  sheet: TargetSheet
+  group: ShotGroup | undefined
+  frame: Frame
+  system: System
+  compact: boolean
+  tool: Tool
+  startTool: (t: Tool) => void
+  apply: Apply
+  applyCal: Apply
+  onGroup: (f: (g: ShotGroup) => ShotGroup, key?: string) => void
+  root: RefObject<HTMLDivElement | null>
+  score: Score
+  groupScore: GroupScore | undefined
+  stats: Stats | undefined
+  keyValues: ReturnType<typeof readouts>
+  charges: number[] | undefined
+  stepLabels: string[] | undefined
+  step: number | undefined
+  uid: string
+  filter: { contrast: number; darken: number }
+  setFilter: (f: { contrast: number; darken: number }) => void
+  refKind: RefKind
+  setRefKind: (k: RefKind) => void
+  known: { length?: number; width?: number; height?: number }
+  setKnown: (k: { length?: number; width?: number; height?: number }) => void
+  calTool: (which: string, t: Tool) => void
+  newDistance: { current: number }
+  setActive: (id: string | undefined) => void
+  setSelected: (s: Selection | undefined) => void
+  deleteGroup: () => void
+  scrollFocus: ReturnType<typeof useScrollFocus<HTMLDivElement>>
+  shotWindow: ReturnType<typeof shotWindowOf>
+  setShotScroll: (s: { top: number; height: number }) => void
+  selected: Selection | undefined
+  shotAt: ShotAt
+  toggle: (sel: Selection) => void
+  remove: (sel: Selection) => void
+  optic: { label: string; click: number } | undefined
+  options: ReturnType<typeof clickOptions>
+  opticChoice: string
+  setOpticChoice: (v: string) => void
+  click: { label: string; click: number } | undefined
+  ladderRows: ReturnType<typeof ladderExtremeSpreads>
+  meta: Meta
+  setMeta: Dispatch<SetStateAction<Meta>>
+  stored: boolean
+  sheets: TargetSheetRecord[]
+  setSheets: Dispatch<SetStateAction<TargetSheetRecord[]>>
+  open: (r: TargetSheetRecord) => void
+  create: () => void
+  deleteSheet: () => Promise<void>
+  renaming: boolean
+  setRenaming: (on: boolean) => void
+  fileInput: RefObject<HTMLInputElement | null>
+  cameraInput: RefObject<HTMLInputElement | null>
+  takePhoto: (file: File | undefined) => Promise<void>
+  removePhoto: () => Promise<void>
+  coarse: boolean
+  pop: Pop | undefined
+  setPop: Dispatch<SetStateAction<Pop | undefined>>
+  storeError: string | undefined
+  h: History<TargetSheet>
+  setH: Dispatch<SetStateAction<History<TargetSheet>>>
+  overlays: Record<Overlay, boolean>
+  toggleOverlay: (o: Overlay, on: boolean) => void
+  heading: string | undefined
+  exportMenu: ReactNode
+  expand: { expanded: boolean; onChange: (expanded: boolean) => void } | undefined
+  toolbarKeys: (e: KeyboardEvent<HTMLDivElement>) => void
+  unscaled: boolean
+  photo: Photo | 'missing' | undefined
+  pending: Point[]
+  describe: (sel: Selection) => string
+  addShot: (q: Point) => void
+  dragKey: { current: number }
+  onPoint: (p: Point) => void
+  view: ViewRef
+  detect: ReturnType<typeof useHoleDetection>
+  layer: (k: number) => ReactNode
+  hint: string
+  help: string | undefined
+  blankSheet: boolean
+  startActions: (size: 'xs' | 'sm') => ReactNode
+  shotsOpen: boolean
+  setShotsOpen: Dispatch<SetStateAction<boolean>>
+  notesPanel: ReactNode
+  side: string | null
+  setSide: (side: string | null) => void
+  panel: string
+  wide: boolean
+  phone: boolean
+  sheetOpen: boolean
+  setSheetOpen: Dispatch<SetStateAction<boolean>>
+  fileData: TargetSheet
+  kept: Kept
+  storeFromMenu: (record: TargetSheetRecord) => Promise<boolean>
+  reloadStored: () => void
+  printSheet: () => Promise<void>
+}
 
-  /** An edit as one undo step; `key` joins a run of edits of one field into one step. */
-  const apply = (f: (s: TargetSheet) => TargetSheet, key?: string) =>
-    setH((x) => {
-      const next = f(x.present)
-      if (next === x.present) return x
-      return key ? editHistory(x, next, key) : pushHistory(x, next)
-    })
-  /** A calibration edit: shots and points of aim stay on their photo points. */
-  const applyCal = (f: (s: TargetSheet) => TargetSheet, key?: string) =>
-    apply((s) => rebase(s, f(s)), key)
-  const onGroup = (f: (g: ShotGroup) => ShotGroup, key?: string) =>
-    group && apply((s) => withGroup(s, group.id, f), key)
-  /** A switch kept with the sheet and as the browser's choice for sheets without their own. */
-  const toggleOverlay = (o: Overlay, on: boolean) => {
-    const next = { ...overlays, [o]: on }
-    apply((s) => ({ ...s, overlays: next }), 'overlays')
-    setBrowserOverlays(next)
-    try {
-      localStorage.setItem(overlayKey, JSON.stringify(next))
-    } catch {}
-  }
-  const notes = sheet.notes ?? []
-  const onNote = (id: string, f: (n: SheetNote) => SheetNote | undefined, key?: string) =>
-    apply((s) => {
-      const next = (s.notes ?? []).flatMap((n) => {
-        if (n.id !== id) return [n]
-        const m = f(n)
-        return m ? [m] : []
-      })
-      const { notes: _, ...rest } = s
-      return next.length ? { ...rest, notes: next } : rest
-    }, key)
-  const addNote = () => {
-    if (!frame) return
-    // right of the group's shots, level with its top, so it covers none
-    const pts = group?.shots.filter((x) => !x.excluded) ?? []
-    const at = pts.length
-      ? { x: Math.max(...pts.map((p) => p.x)), y: Math.max(...pts.map((p) => p.y)) }
-      : (group?.aim ?? { x: 0, y: 0 })
-    const id = freeId(
-      'n',
-      notes.map((n) => n.id),
-    )
-    const note: SheetNote = {
-      id,
-      x: at.x + 0.005,
-      y: at.y + 0.005,
-      text: '{name}: ES {extremeSpread.length}, {extremeSpread.moa}',
-      ...(group && { group: group.id }),
-    }
-    apply((s) => ({ ...s, notes: [...(s.notes ?? []), note] }))
-    setNoteSel(id)
-    requestAnimationFrame(() => noteFields.current.get(id)?.focus())
-  }
-  const editNote = (id: string) => {
-    setNoteSel(id)
-    setSide('notes')
-    // on a phone the panels are in the bottom sheet
-    setSheetOpen(true)
-    requestAnimationFrame(() => noteFields.current.get(id)?.focus())
-  }
-  const detect = useHoleDetection({
-    sheet,
-    sheetId: meta.id,
-    frame,
-    group,
-    photo: photo === 'missing' ? undefined : photo,
-    bullet: bulletDiameter,
-    onGroup,
-    onTurn: (angle, key) => {
-      const size = photo && photo !== 'missing' ? photo : undefined
-      if (size) apply((s) => turnSheet(s, size, angle), key)
-    },
-    openCalibrate: () => setPop('calibrate'),
-    onFace: (found) => applyCal((s) => calibrateSheetOnFace(s, group?.id, found, score.scope)),
-    say,
-    tool,
-    startTool,
-  })
-  const score = useRingScoring({
-    sheet,
-    frame,
-    group,
-    bullet: bulletDiameter ?? sheet.markerDiameter,
-    rings: overlays.rings,
-    onGroup,
-    onReference: pushReference,
-    say,
-    tool,
-    startTool,
-  })
-  /** The score of group `id` when it has one; undefined while the face loads or without it. */
-  const scored = (id: string) => scoredOnly(score.of(id))
-
-  function open(r: TargetSheetRecord) {
-    flush()
-    setMeta({ id: r.id, name: r.name })
-    opened.current = { data: r.data, name: r.name }
-    bases.current.set(r.id, r.saved)
-    setH(historyOf(r.data))
-    setStored(true)
-    setSaveFailed(false)
-    setActive(r.data.groups[0]?.id)
-    setSelected(undefined)
-    setNoteSel(undefined)
-    setTool('select')
-    setPending([])
-    // the same photo (a copy, a replaced sheet) stays: its effect does not run again
-    if (r.data.photo !== photoNow.current) setPhoto(undefined)
-    try {
-      localStorage.setItem(lastSheet, r.id)
-    } catch {}
-  }
-
-  /** A new sheet; `face`: the id of the target face its first group is scored on. */
-  function create(list = sheets, face?: GroupFace) {
-    flush()
-    // the units may be read after the mount that calls this: the ref has the current ones
-    const empty = blank(load, bulletDiameter, newDistance.current, charges ? step : undefined)
-    const data = face
-      ? {
-          ...empty,
-          groups: empty.groups.map((g, i) => (i === 0 ? { ...g, face } : g)),
-        }
-      : empty
-    const name = `Target sheet ${list.length + 1}`
-    setMeta({ id: newId(), name })
-    opened.current = { data, name }
-    setH(historyOf(data))
-    setStored(false)
-    setSaveFailed(false)
-    setActive(data.groups[0]?.id)
-    setSelected(undefined)
-    setNoteSel(undefined)
-    setTool('select')
-    setPending([])
-    setPhoto(undefined)
-  }
-
-  /** The sheets of this browser (of the load in the workbench), the newest first. */
-  const sheetsOf = (records: UserRecord[]) =>
-    records
-      .filter(
-        (r): r is TargetSheetRecord =>
-          r.kind === 'targetSheet' && (load === undefined || r.data.load === load),
-      )
-      .sort((a, b) => (a.saved < b.saved ? 1 : -1))
-
-  /** The sheet list again after the File menu wrote records (Open, Import). */
-  const reloadSheets = () =>
-    storedRecords()
-      .then(({ records }) => setSheets(sheetsOf(records)))
-      .catch(() => {})
-  /** `reloadSheets` of this render, for the save effect. */
-  const reloadLatest = useRef(reloadSheets)
-  reloadLatest.current = reloadSheets
-
-  /**
-   * After the File menu wrote records: the list again, and the sheet shown when another writer
-   * (Import, Replace) changed it, so the next save does not write the old sheet over it.
-   */
-  const reloadStored = () => {
-    void reloadSheets()
-    const id = shown.current
-    storedRecord(id)
-      .then(async (r) => {
-        if (r?.kind !== 'targetSheet' || shown.current !== id) return
-        const now = showing.current
-        const same = (x: { data: TargetSheet; name: string }) =>
-          r.name === x.name && canonicalJson(r.data) === canonicalJson(x.data)
-        // the store holds what this editor opened or last saved (an edit may wait), or what it
-        // shows (File, Save): nothing to open
-        if (same(opened.current) || same(now)) return void bases.current.set(id, r.saved)
-        // the stored sheet wins: an edit still waiting would write the old one over it
-        pendingSave.current = undefined
-        open(r)
-        // the photo the replaced sheet showed, unless a sheet still points at it
-        const old = now.data.photo
-        if (old && old !== r.data.photo) {
-          const used = await storedPhotoIds()
-          if (!used.has(old)) discardFile(old)
-        }
-      })
-      .catch(() => {})
-  }
-  // biome-ignore lint/correctness/useExhaustiveDependencies: on the page's File menu writes only
-  useEffect(() => {
-    if (storedTick) reloadStored()
-  }, [storedTick])
-
-  // the sheets of this browser (of the load in the workbench); the last one used opens
-  // biome-ignore lint/correctness/useExhaustiveDependencies: again only for another load
-  useEffect(() => {
-    let live = true
-    let kept: string[] = []
-    restoreWaiting()
-      .then(
-        (k) => {
-          kept = k
-        },
-        () => {},
-      )
-      .then(storedRecords)
-      .then(({ records }) => {
-        if (!live) return
-        const list = sheetsOf(records)
-        setSheets(list)
-        setOptions(clickOptions(records))
-        let last: string | null = null
-        try {
-          last = localStorage.getItem(lastSheet)
-        } catch {}
-        const r = list.find((x) => x.id === last) ?? list[0]
-        const linked = linkedFace(heading)
-        // a well-formed id no face record has opens no face
-        return (linked ? isFaceId(linked.id) : Promise.resolve(false)).then((known) => {
-          if (!live) return
-          const face = known ? linked : undefined
-          if (r && !face) open(r)
-          else create(list, face)
-        })
-      })
-      .then(() => {
-        // once: the copies are the last page's
-        if (live) for (const name of kept.splice(0)) say(keptNote(name), true)
-      })
-      .catch((e) =>
-        setStoreError(
-          `the browser store could not be read. ${e instanceof Error ? e.message : ''}`.trim(),
-        ),
-      )
-    return () => {
-      live = false
-    }
-  }, [load])
-
-  // the photo of the sheet from the browser store
-  useEffect(() => {
-    const id = sheet.photo
-    if (!id) return setPhoto(undefined)
-    let live = true
-    let url: string | undefined
-    storedPhoto(id)
-      .then(async (blob) => {
-        if (!blob) return live && setPhoto('missing')
-        const p = await photoOf(blob)
-        url = p.url
-        if (live) setPhoto(p)
-        else URL.revokeObjectURL(p.url)
-      })
-      .catch(() => live && setPhoto('missing'))
-    return () => {
-      live = false
-      if (url) URL.revokeObjectURL(url)
-    }
-  }, [sheet.photo])
-
-  /**
-   * Keeps `record` (an edit of `data`) as a sheet of its own after another tab saved the sheet
-   * since: that save stays.
-   */
-  const keepOwn = useRef(async (record: TargetSheetRecord, data: TargetSheet) => {
-    // a later save of the sheet keeps this edit with its own
-    if (bases.current.get(record.id) !== record.saved) return
-    const own = keptCopy(record, newId())
-    await putRecords([own])
-    bases.current.set(own.id, own.saved)
-    dropCopy(record.id, record.saved)
-    reloadLatest.current()
-    say(keptNote(own.name), true)
-    if (shown.current !== record.id) return
-    pendingSave.current = undefined
-    opened.current = { data, name: own.name }
-    setMeta({ id: own.id, name: own.name })
-    setStored(true)
-    setSaveFailed(false)
-    try {
-      localStorage.setItem(lastSheet, own.id)
-    } catch {}
-  })
-  /** File, Save: the browser copy written as autosave writes it; false when kept as a copy. */
-  const storeFromMenu = async (record: TargetSheetRecord) => {
-    const base = bases.current.get(record.id)
-    // an autosave since the menu took the sheet holds a newer edit
-    if (base !== undefined && base > record.saved) return true
-    bases.current.set(record.id, record.saved)
-    const put = await putRecordIf(record, base).catch((e: unknown) => {
-      if (bases.current.get(record.id) === record.saved) bases.current.set(record.id, base)
-      throw e
-    })
-    if (!put) await keepOwn.current(record, record.data)
-    return put
-  }
-
-  // saved on every change, once it differs from what was opened
-  useEffect(() => {
-    if (!meta.id || (sheet === opened.current.data && meta.name === opened.current.name)) {
-      // an edit undone before its save is not saved later
-      pendingSave.current = undefined
-      setSaveFailed(false)
-      if (!meta.id && storeError) say(`Not saved: ${storeError}`, true)
-      return
-    }
-    const parsed = targetSheet.safeParse(sheet)
-    if (!parsed.success) {
-      pendingSave.current = undefined
-      setSaveFailed(true)
-      say(`Not saved: ${z.prettifyError(parsed.error).split('\n')[0]}`, true)
-      return
-    }
-    const recordNow = (): TargetSheetRecord => ({
-      kind: 'targetSheet',
-      id: meta.id,
-      name: meta.name || 'Target sheet',
-      saved: new Date().toISOString(),
-      data: parsed.data,
-    })
-    const save = () => {
-      // only the latest edit saves; a delete drops it
-      if (pendingSave.current !== save) return
-      pendingSave.current = undefined
-      const record = recordNow()
-      const base = bases.current.get(record.id)
-      // the store runs this editor's writes in order: the next save writes over this one
-      bases.current.set(record.id, record.saved)
-      const waiting = { ...record, base }
-      inFlight.current.set(record.id, waiting)
-      const landed = () => {
-        if (inFlight.current.get(record.id) === waiting) inFlight.current.delete(record.id)
-      }
-      putRecordIf(record, base)
-        .then(async (put) => {
-          landed()
-          if (!put) return keepOwn.current(record, sheet)
-          dropCopy(record.id, record.saved)
-          // replaced photos go once their saved sheet points at another
-          const gone = orphans.current.filter(
-            (o) => o.sheet === record.id && o.photo !== sheet.photo,
-          )
-          orphans.current = orphans.current.filter((o) => !gone.includes(o))
-          // a copy made with Save as may point at the photo too
-          const used = gone.length ? await storedPhotoIds() : new Set<string>()
-          for (const o of gone) if (!used.has(o.photo)) discardFile(o.photo)
-          setSheets((list) => [record, ...list.filter((r) => r.id !== record.id)])
-          void requestPersistentStorage()
-          // a save that ends after another sheet opened leaves that sheet's state alone
-          if (shown.current !== record.id) return
-          opened.current = { data: sheet, name: meta.name }
-          setStored(true)
-          setSaveFailed(false)
-          // on /groups the page bar's File state says it
-          if (heading === undefined) say('Saved in this browser.')
-          try {
-            localStorage.setItem(lastSheet, record.id)
-          } catch {}
-        })
-        .catch(() => {
-          landed()
-          if (bases.current.get(record.id) === record.saved) bases.current.set(record.id, base)
-          if (shown.current === record.id) setSaveFailed(true)
-          say('Not saved: the browser store refused the sheet.', true)
-        })
-    }
-    pendingSave.current = Object.assign(save, {
-      record: () => ({ ...recordNow(), base: bases.current.get(meta.id) }),
-    })
-    const t = setTimeout(save, 300)
-    return () => clearTimeout(t)
-  }, [sheet, meta, storeError, say, heading])
-  // an edit still waiting is saved when the editor goes (a link, a load change) or the page does
-  useEffect(() => {
-    const flushNow = () => pendingSave.current?.()
-    // a write started when the page goes lands only if the page lives until it commits (lost when
-    // the next page answers at once, measured in the e2e Chromium): a synchronous copy of the waiting
-    // edit and of the saves not landed first, each saved on the next open when newer than the stored
-    // sheet
-    const leave = () => {
-      const waiting = new Map(inFlight.current)
-      // shortcut: a waiting edit's base is the save in flight; when that save is lost too, the next
-      // page keeps the edit as a copy (a duplicate, nothing lost), carry both bases if that shows up
-      const record = pendingSave.current?.record?.()
-      if (record) waiting.set(record.id, record)
-      if (waiting.size) keepCopies([...waiting.values()])
-      flushNow()
-    }
-    const hidden = () => document.visibilityState === 'hidden' && leave()
-    const events = ['beforeunload', 'pagehide']
-    for (const e of events) window.addEventListener(e, leave)
-    document.addEventListener('visibilitychange', hidden)
-    return () => {
-      for (const e of events) window.removeEventListener(e, leave)
-      document.removeEventListener('visibilitychange', hidden)
-      flushNow()
-    }
-  }, [])
-
-  async function takePhoto(file: File | undefined) {
-    if (!file) return
-    if (!(photoTypes as readonly string[]).includes(file.type))
-      return say('The file is not a photo: JPEG, PNG, WebP, GIF, AVIF, HEIC or BMP.', true)
-    const target = meta.id
-    if (
-      sheet.photo &&
-      !(await confirmDialog({
-        title: 'Replace the photo?',
-        message: 'Its references go; the shots keep their target values.',
-        confirmLabel: 'Replace',
-        danger: true,
-      }))
-    )
-      return
-    try {
-      const id = newId()
-      const p = await photoOf(file)
-      // the size only: the effect below shows the stored file
-      URL.revokeObjectURL(p.url)
-      await putPhoto(id, file)
-      // another sheet opened while the photo was read: it is not this photo's sheet
-      if (shown.current !== target) return void deletePhoto(id).catch(() => {})
-      const old = photoNow.current
-      // a new photo starts a new history: undo cannot bring back a deleted photo
-      setH((x) =>
-        historyOf({
-          ...withoutRegions(x.present),
-          photo: id,
-          references: [],
-          targetOrigin: { x: p.width / 2, y: p.height / 2 },
-        }),
-      )
-      if (old) orphans.current.push({ sheet: target, photo: old })
-      setRefKind('line')
-      say('Photo kept in this browser. Calibrate: mark a reference to place shots.')
-    } catch {
-      say('The photo could not be read.', true)
-    }
-  }
-
-  async function removePhoto() {
-    const old = sheet.photo
-    const target = meta.id
-    if (
-      !old ||
-      !(await confirmDialog({
-        title: 'Remove the photo?',
-        message: 'The shots stay on a drawn target.',
-        confirmLabel: 'Remove',
-        danger: true,
-      })) ||
-      shown.current !== target
-    )
-      return
-    setH((x) => {
-      const { photo: _, targetOrigin: __, ...rest } = x.present
-      return historyOf({ ...withoutRegions(rest), references: [] })
-    })
-    orphans.current.push({ sheet: target, photo: old })
-  }
-
-  /** No question first: Undo puts the sheet and its photos back. */
-  async function deleteSheet() {
-    if (!stored) return
-    const { id, name } = meta
-    // the photo shown and every replaced one not yet deleted
-    const photos = [
-      ...(sheet.photo ? [sheet.photo] : []),
-      ...orphans.current.filter((o) => o.sheet === id).map((o) => o.photo),
-    ]
-    // what Undo writes back: the sheet as shown, else as last stored
-    const parsed = targetSheet.safeParse(sheet)
-    const record: TargetSheetRecord | undefined = parsed.success
-      ? { kind: 'targetSheet', id, name: name || 'Target sheet', saved: '', data: parsed.data }
-      : sheets.find((r) => r.id === id)
-    // a save still waiting would write the sheet back while the photos are read
-    pendingSave.current = undefined
-    const files = await Promise.all(
-      photos.map(async (p) => ({ id: p, blob: await storedPhoto(p).catch(() => undefined) })),
-    )
-    const restore = async (r: TargetSheetRecord) => {
-      try {
-        for (const f of files) if (f.blob) await putPhoto(f.id, f.blob)
-        const back = { ...r, saved: new Date().toISOString() }
-        // another tab saved the sheet since the delete: it stays, this one comes back as a copy
-        const put = await putRecordIf(back, undefined)
-        const own = put ? back : keptCopy(back, newId())
-        if (put) setSheets((list) => [back, ...list.filter((x) => x.id !== id)])
-        else {
-          await putRecords([own])
-          void reloadSheets()
-        }
-        open(own)
-        if (!put) say(keptNote(own.name), true)
-      } catch {
-        say('Not restored: the browser store refused.', true)
-      }
-    }
-    deleteRecord(id)
-      .then(async () => {
-        // a copy left by a page that went would bring the sheet back on the next open
-        dropCopy(id)
-        orphans.current = orphans.current.filter((o) => o.sheet !== id)
-        // a copy saved with Save as or opened from a file may share the photo
-        const used = await storedPhotoIds()
-        for (const p of photos) if (!used.has(p)) discardFile(p)
-        const rest = sheets.filter((r) => r.id !== id)
-        setSheets(rest)
-        if (rest[0]) open(rest[0])
-        else create(rest)
-        if (record) offerUndo(`Deleted ${name}.`, () => restore(record))
-      })
-      .catch(() => say('Not deleted: the browser store refused.', true))
-  }
-
-  // a pasted image becomes the photo while the editor is shown and no field has the focus
-  const takeLatest = useRef(takePhoto)
-  takeLatest.current = takePhoto
-  useEffect(() => {
-    const onPaste = (e: ClipboardEvent) => {
-      if (!root.current?.offsetParent) return
-      const t = e.target as HTMLElement | null
-      if (t?.closest('input, textarea')) return
-      const file = [...(e.clipboardData?.files ?? [])].find((f) => f.type.startsWith('image/'))
-      if (file) {
-        e.preventDefault()
-        takeLatest.current(file)
-      }
-    }
-    window.addEventListener('paste', onPaste)
-    return () => window.removeEventListener('paste', onPaste)
-  }, [])
-
-  function startTool(t: Tool) {
-    setTool(t)
-    setPending([])
-    // a message from before does not hide the new tool's hint
-    setStatus((x) => ({ ...x, alert: false }))
-  }
-
-  function addReference(points: Point[]) {
-    const len = known.length
-    let r: CalibrationReference | undefined
-    if (refKind === 'line' && len) r = { kind: 'line', a: points[0], b: points[1], length: len }
-    if (refKind === 'ringCentre' && len)
-      r = { kind: 'ringCentre', centre: points[0], edge: points[1], diameter: len }
-    if (refKind === 'ringEdge' && len)
-      r = { kind: 'ringEdge', points: [points[0], points[1], points[2]], diameter: len }
-    if (refKind === 'rectangle' && known.width && known.height)
-      r = {
-        kind: 'rectangle',
-        corners: [points[0], points[1], points[2], points[3]],
-        width: known.width,
-        height: known.height,
-      }
-    if (!r) return say('Enter the known size first.', true)
-    pushReference(r)
-  }
-
-  /** Adds a scale reference (a rectangle replaces the one before); shots stay on the photo. */
-  function pushReference(ref: CalibrationReference) {
-    const next = {
-      ...sheet,
-      references: [
-        ...sheet.references.filter((x) => ref.kind !== 'rectangle' || x.kind !== 'rectangle'),
-        ref,
-      ],
-    }
-    if (next.references.length > 20) return say('A sheet holds at most 20 references.', true)
-    if (!frameOf(next)) return say('These points give no scale: three lie on one line.', true)
-    applyCal(() => next)
-    say(`${refNames[ref.kind].split(',')[0]} ${next.references.length} added.`)
-  }
-
-  function onPoint(p: Point) {
-    if (detect.onPoint(p) || score.onPoint(p)) return
-    if (tool === 'origin') {
-      applyCal((s) => ({ ...s, targetOrigin: p }))
-      return startTool('select')
-    }
-    if (tool === 'aim') {
-      if (frame) onGroup((g) => ({ ...g, aim: viewToTarget(frame, p) }))
-      return startTool('select')
-    }
-    const need = toolPoints[tool]
-    if (!need) return
-    const pts = [...pending, p]
-    if (pts.length < need) return setPending(pts)
-    setPending([])
-    setTool('select')
-    addReference(pts)
-  }
-
-  const describe = (sel: Selection) => {
-    const g = sheet.groups.find((x) => x.id === sel.group)
-    const s = g?.shots[sel.index]
-    if (!g || !s) return ''
-    const value = scored(g.id)?.score.shots[sel.index]
-    return `${g.name}, shot ${sel.index + 1}, x ${formatQuantity('length', system, s.x)}, y ${withUnit('length', system, s.y)}${s.excluded ? ', excluded' : ''}${value ? `, score ${shotText(value)}` : ''}`
-  }
-
-  const shotAt = (
-    sel: Selection,
-    f: (s: ShotGroup['shots'][number]) => ShotGroup['shots'][number] | undefined,
-    key?: string,
-  ) =>
-    apply(
-      (s) =>
-        withGroup(s, sel.group, (g) => ({
-          ...g,
-          shots: g.shots.flatMap((x, i) => {
-            if (i !== sel.index) return [x]
-            const y = f(x)
-            return y ? [y] : []
-          }),
-        })),
-      key,
-    )
-
-  const addShot = (q: Point) => {
-    if (!group) return
-    if (group.shots.length >= 1000) return say('A group holds at most 1000 shots.', true)
-    setSelected({ group: group.id, index: group.shots.length })
-    onGroup((g) => ({ ...g, shots: [...g.shots, { x: q.x, y: q.y, placement: 'placed' }] }))
-  }
-  const toggle = (sel: Selection) => shotAt(sel, (s) => ({ ...s, excluded: !s.excluded }))
-  const remove = (sel: Selection) => {
-    shotAt(sel, () => undefined)
-    setSelected(undefined)
-  }
-
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    const t = e.target as HTMLElement
-    // Escape closes a toolbar popover, not the expanded editor around it
-    if (e.key === 'Escape' && pop) {
-      e.preventDefault()
-      setPop(undefined)
-      return
-    }
-    if (t.closest('input, textarea, select')) return
-    if (shortcutMatches('undo', e.nativeEvent)) {
-      e.preventDefault()
-      setH(undo)
-    } else if (shortcutMatches('redo', e.nativeEvent)) {
-      e.preventDefault()
-      setH(redo)
-    } else if (e.key === 'Escape' && tool !== 'select') {
-      // used here: the expanded editor stays open
-      e.preventDefault()
-      startTool('select')
-    }
-  }
-
-  /** The workbench tab before Expand: the target and the key readouts only. */
-  const compact = expand !== undefined && !expand.expanded
-  const click = optic ?? options.find((o) => o.value === opticChoice)
-  const stats = group && groupStatisticsOf(group)
-  /** The readouts of the active group, for its table, its key values and the statistics box. */
-  const keyValues = group && stats ? readouts(stats, group.distance) : []
-  const len = system.length
-  const moa = unitsOf.correction.MOA
-  const mrad = unitsOf.correction.mrad
-  const angles = (a: number) => [
-    formatNumber(moa.fromSi(a), moa.decimals),
-    formatNumber(mrad.fromSi(a), mrad.decimals),
-  ]
-
-  // ----- panels -----
-
-  /** Display of the photo only; the file stays as it is (Photo menu). */
-  const filters = (
+/** The photo's display filters: contrast and darken. */
+function FilterPanel({ ed }: { ed: Ed }) {
+  const { sheet, filter, setFilter } = ed
+  return (
     <div className="prop-grid">
       <Row label="Contrast" help="Display only; the photo file stays as it is.">
         <Slider
@@ -1326,8 +573,12 @@ export function TargetEditor({
       </Row>
     </div>
   )
+}
 
-  const markerField = (
+/** The shot marker's diameter. */
+function MarkerField({ ed }: { ed: Ed }) {
+  const { sheet, apply } = ed
+  return (
     <div className="prop-grid">
       <SiField
         spec={{
@@ -1349,22 +600,68 @@ export function TargetEditor({
       />
     </div>
   )
+}
 
-  // a Calibrate tool ended (set, cancelled): Calibrate opens again with the focus where it was
-  const calReturnFrom = usePopoverReturn(
-    tool,
-    () => setPop('calibrate'),
-    (which) => root.current?.querySelector<HTMLElement>(`[data-cal="${which}"]`),
-  )
-  /** A Calibrate tool: the popover closes for the clicks on the photo and opens again after. */
-  const calTool = (which: string, t: Tool) => {
-    calReturnFrom(which)
-    setPop(undefined)
-    startTool(t)
-  }
-
+/** One scale reference of a photo: its known size and Remove. */
+function ReferenceRow({ ed, r, i }: { ed: Ed; r: TargetSheet['references'][number]; i: number }) {
+  const { sheet, frame, applyCal } = ed
   const cal = frame?.calibration
-  const scalePanel = sheet.photo ? (
+  const dev = cal && cal.factors[i] / cal.scale - 1
+  const label = `${refNames[r.kind].split(',')[0]} ${i + 1}`
+  const help = `${refNames[r.kind]}${dev === undefined || sheet.references.length < 2 ? '' : `; scale ${dev >= 0 ? '+' : ''}${(dev * 100).toFixed(2)} % from the mean`}`
+  const key = r.kind === 'line' ? 'length' : r.kind === 'rectangle' ? 'width' : 'diameter'
+  const value = (r as Record<string, unknown>)[key] as number
+  return (
+    <div className="ref-row">
+      <SiField
+        spec={{
+          key: `ref${i}`,
+          label,
+          help,
+          quantity: 'length',
+          min: 0,
+          positive: true,
+          required: true,
+        }}
+        si={value}
+        onCommit={(si) =>
+          si &&
+          applyCal(
+            (s) => ({
+              ...s,
+              references: s.references.map((x, j) => (j === i ? { ...x, [key]: si } : x)),
+            }),
+            `ref${i}`,
+          )
+        }
+      />
+      <ActionIcon
+        variant="subtle"
+        size={controlSize.row.icon}
+        aria-label={`Remove ${label}`}
+        disabled={sheet.references.length === 1 && sheet.groups.some((g) => g.shots.length)}
+        title={
+          sheet.references.length === 1 && sheet.groups.some((g) => g.shots.length)
+            ? 'The last reference stays while there are shots.'
+            : undefined
+        }
+        onClick={() =>
+          applyCal((s) => ({ ...s, references: s.references.filter((_, j) => j !== i) }))
+        }
+      >
+        <Trash size={14} aria-hidden="true" />
+      </ActionIcon>
+    </div>
+  )
+}
+
+/** The Calibrate panel: scale references, rotation and origin; none on a drawn target. */
+function ScalePanel({ ed }: { ed: Ed }) {
+  const { sheet, refKind, setRefKind, known, setKnown, tool, calTool, applyCal, frame } = ed
+  const cal = frame?.calibration
+  if (!sheet.photo)
+    return <p className="note">A drawn target: shots in target coordinates, no scale needed.</p>
+  return (
     <div className="prop-grid">
       <NativeSelect
         label="Reference"
@@ -1411,56 +708,10 @@ export function TargetEditor({
       >
         Mark on photo
       </Button>
-      {sheet.references.map((r, i) => {
-        const dev = cal && cal.factors[i] / cal.scale - 1
-        const label = `${refNames[r.kind].split(',')[0]} ${i + 1}`
-        const help = `${refNames[r.kind]}${dev === undefined || sheet.references.length < 2 ? '' : `; scale ${dev >= 0 ? '+' : ''}${(dev * 100).toFixed(2)} % from the mean`}`
-        const key = r.kind === 'line' ? 'length' : r.kind === 'rectangle' ? 'width' : 'diameter'
-        const value = (r as Record<string, unknown>)[key] as number
-        return (
-          // biome-ignore lint/suspicious/noArrayIndexKey: references keep their order
-          <div key={i} className="ref-row">
-            <SiField
-              spec={{
-                key: `ref${i}`,
-                label,
-                help,
-                quantity: 'length',
-                min: 0,
-                positive: true,
-                required: true,
-              }}
-              si={value}
-              onCommit={(si) =>
-                si &&
-                applyCal(
-                  (s) => ({
-                    ...s,
-                    references: s.references.map((x, j) => (j === i ? { ...x, [key]: si } : x)),
-                  }),
-                  `ref${i}`,
-                )
-              }
-            />
-            <ActionIcon
-              variant="subtle"
-              size={controlSize.row.icon}
-              aria-label={`Remove ${label}`}
-              disabled={sheet.references.length === 1 && sheet.groups.some((g) => g.shots.length)}
-              title={
-                sheet.references.length === 1 && sheet.groups.some((g) => g.shots.length)
-                  ? 'The last reference stays while there are shots.'
-                  : undefined
-              }
-              onClick={() =>
-                applyCal((s) => ({ ...s, references: s.references.filter((_, j) => j !== i) }))
-              }
-            >
-              <Trash size={14} aria-hidden="true" />
-            </ActionIcon>
-          </div>
-        )
-      })}
+      {sheet.references.map((r, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: references keep their order
+        <ReferenceRow key={i} ed={ed} r={r} i={i} />
+      ))}
       {sheet.references.length > 1 && cal && (
         <Row
           label="Spread"
@@ -1490,46 +741,44 @@ export function TargetEditor({
         </Button>
       </Row>
     </div>
-  ) : (
-    <p className="note">A drawn target: shots in target coordinates, no scale needed.</p>
   )
+}
 
-  /** The colours offered: the series colours and a stored colour that is not one of them. */
-  const colours = group
-    ? [
-        ...groupColours.map((c, i) => ({ value: c, label: colourNames[i] ?? c })),
-        ...(groupColours.includes(group.colour)
-          ? []
-          : [{ value: group.colour, label: `Color ${group.colour}` }]),
-      ]
-    : []
+/** The colours offered: the series colours and a stored colour that is not one of them. */
+function coloursOf(group: ShotGroup | undefined) {
+  if (!group) return []
+  return [
+    ...groupColours.map((c, i) => ({ value: c, label: colourNames[i] ?? c })),
+    ...(groupColours.includes(group.colour)
+      ? []
+      : [{ value: group.colour, label: `Color ${group.colour}` }]),
+  ]
+}
 
-  const deleteGroup = () => {
-    if (!group) return
-    // no question first: Undo puts the group back at its place; deletes in a row (a double click)
-    // share one notice, whose Undo brings every one back
-    const gone = group
-    const at = sheet.groups.findIndex((g) => g.id === gone.id)
-    const target = meta.id
-    apply((s) => ({ ...s, groups: s.groups.filter((g) => g.id !== gone.id) }))
-    setActive(undefined)
-    const before = groupUndo.current
-    const earlier = before && offered(before.n) ? before : undefined
-    const names = [...(earlier?.names ?? []), gone.name]
-    const undo = () => {
-      if (shown.current !== target) return
-      apply((s) =>
-        s.groups.some((g) => g.id === gone.id)
-          ? s
-          : { ...s, groups: [...s.groups.slice(0, at), gone, ...s.groups.slice(at)] },
-      )
-      setActive(gone.id)
-      earlier?.undo()
-    }
-    groupUndo.current = { n: offerUndo(`Deleted ${names.join(', ')}.`, undo), undo, names }
-  }
-
-  const groupPanel = (
+/** The active group's settings: name, color, distance, ladder step, point of aim and score. */
+function GroupPanel({ ed }: { ed: Ed }) {
+  const {
+    sheet,
+    group,
+    system,
+    frame,
+    tool,
+    startTool,
+    apply,
+    onGroup,
+    score,
+    charges,
+    stepLabels,
+    step,
+    uid,
+    newDistance,
+    setActive,
+    setSelected,
+    deleteGroup,
+  } = ed
+  const len = system.length
+  const colours = coloursOf(group)
+  return (
     <div className="prop-grid">
       {/* above the list: a delete that shortens the list moves neither button (a double click
           deletes two groups) */}
@@ -1715,9 +964,13 @@ export function TargetEditor({
       )}
     </div>
   )
+}
 
-  const groupScore = group && scored(group.id)
-  const addShotButton = group && (
+/** The add shot button of the shots panel's head. */
+function AddShotButton({ ed, addShot }: { ed: Ed; addShot: (q: Point) => void }) {
+  const { group, frame, root } = ed
+  if (!group) return null
+  return (
     <Button
       size={controlSize.row.button}
       variant="default"
@@ -1736,22 +989,28 @@ export function TargetEditor({
       Add shot
     </Button>
   )
-  // a long group renders the rows in view only, at a fixed row height
-  const shotCount = group?.shots.length ?? 0
-  const rowHeight = coarse ? 44 : 24
-  const windowed = shotCount > windowFrom
-  // scroll events come only while windowed: read the scroll once it starts and on another group
-  // biome-ignore lint/correctness/useExhaustiveDependencies: on these changes only
-  useLayoutEffect(() => {
-    const e = shotScroller.current
-    if (windowed && e) setShotScroll({ top: e.scrollTop, height: e.clientHeight })
-  }, [windowed, group?.id])
-  const inView = Math.ceil(shotScroll.height / rowHeight)
-  const firstRow = windowed
-    ? Math.max(0, Math.min(Math.floor(shotScroll.top / rowHeight), shotCount - inView) - 10)
-    : 0
-  const lastRow = windowed ? Math.min(shotCount, firstRow + inView + 20) : shotCount
-  const shotsPanel = group && (
+}
+
+/** The shot table of the active group; a long group renders the rows in view only. */
+function ShotsPanel({ ed }: { ed: Ed }) {
+  const {
+    group,
+    system,
+    compact,
+    groupScore,
+    score,
+    scrollFocus,
+    shotWindow,
+    setShotScroll,
+    selected,
+    shotAt,
+    toggle,
+    remove,
+  } = ed
+  if (!group) return null
+  const len = system.length
+  const { windowed, firstRow, lastRow, rowHeight, shotCount } = shotWindow
+  return (
     <div className="shots-panel">
       <div
         className="scroll shots-scroll"
@@ -1860,9 +1119,34 @@ export function TargetEditor({
       </div>
     </div>
   )
+}
 
-  const offset = stats?.aimOffset
-  const statsPanel = group && stats && (
+/** The statistics of the active group: score, key values, offset and the clicks to the point of aim. */
+function StatsPanel({ ed }: { ed: Ed }) {
+  const {
+    group,
+    stats,
+    system,
+    compact,
+    groupScore,
+    score,
+    keyValues,
+    optic,
+    options,
+    opticChoice,
+    setOpticChoice,
+    click,
+  } = ed
+  if (!group || !stats) return null
+  const len = system.length
+  const offset = stats.aimOffset
+  const moa = unitsOf.correction.MOA
+  const mrad = unitsOf.correction.mrad
+  const angles = (a: number) => [
+    formatNumber(moa.fromSi(a), moa.decimals),
+    formatNumber(mrad.fromSi(a), mrad.decimals),
+  ]
+  return (
     <div className="stats-panel">
       <Table className="readout-table" withRowBorders horizontalSpacing={4} verticalSpacing={0}>
         <caption className="visually-hidden">Statistics of {group.name}</caption>
@@ -2005,12 +1289,20 @@ export function TargetEditor({
       )}
     </div>
   )
+}
 
-  const keyValue = (key: string) => {
-    const r = keyValues.find((x) => x.key === key)
-    return r ? `${formatQuantity('length', system, r.value)} ${len.symbol}` : 'n/a'
-  }
-  const headline = group && stats && (
+/** A key value of the group as text with its unit; n/a without it. */
+function keyValueText(keyValues: Ed['keyValues'], system: System, key: string) {
+  const r = keyValues.find((x) => x.key === key)
+  return r ? `${formatQuantity('length', system, r.value)} ${system.length.symbol}` : 'n/a'
+}
+
+/** The group's count and key values in one row. */
+function Headline({ ed }: { ed: Ed }) {
+  const { group, stats, keyValues, system } = ed
+  if (!group || !stats) return null
+  const keyValue = (key: string) => keyValueText(keyValues, system, key)
+  return (
     <dl className="stat-head">
       <div>
         <dt>n</dt>
@@ -2030,20 +1322,16 @@ export function TargetEditor({
       </div>
     </dl>
   )
+}
 
-  // groups per ladder step of this load, every sheet, the open one as edited
-  const ladderRows = useMemo(() => {
-    if (!charges) return []
-    const all = [sheet, ...sheets.filter((r) => r.id !== meta.id).map((r) => r.data)]
-    return ladderExtremeSpreads(
-      all.flatMap((s) => s.groups),
-      charges,
-    )
-  }, [charges, sheet, sheets, meta.id])
+/** Groups per ladder step of the load: the extreme spread chart and its table. */
+function LadderPanel({ ed }: { ed: Ed }) {
+  const { charges, ladderRows, system, stepLabels } = ed
+  if (!charges) return null
   const turn = system.correction
   const oneDistance = ladderRows.every((r) => r.length !== undefined)
-
-  const ladderPanel = charges && (
+  const len = system.length
+  return (
     <div className="ladder-groups">
       {ladderRows.length >= 2 ? (
         <LazyLineChart
@@ -2087,8 +1375,13 @@ export function TargetEditor({
       </Table>
     </div>
   )
+}
 
-  const statsBox = group && stats && (
+/** The statistics box of the canvas and the exports: the group's name, lines and score. */
+function StatsBoxContent({ ed }: { ed: Ed }) {
+  const { group, stats, keyValues, system, groupScore } = ed
+  if (!group || !stats) return null
+  return (
     <>
       <strong>{group.name}</strong>
       {statLines(stats, keyValues, system).map((line) => (
@@ -2097,26 +1390,1884 @@ export function TargetEditor({
       {groupScore && <span>Score {scoreLine(groupScore)}</span>}
     </>
   )
+}
 
-  const keys = 'Or arrow keys and Enter. Esc cancels.'
-  const toolHint =
-    detect.hint ??
-    score.hint ??
-    (toolPoints[tool]
-      ? `${refHints[tool as RefKind]} Point ${pending.length + 1} of ${toolPoints[tool]}. ${keys}`
-      : tool === 'origin'
-        ? `Click the photo point of target (0, 0). ${keys}`
-        : tool === 'aim'
-          ? `Click the point of aim of the active group. ${keys}`
-          : tool === 'shot'
-            ? frame
-              ? 'Click a hole to add a shot to the active group.'
-              : 'Mark a reference first.'
-            : undefined)
-  // a failure or a limit shows over the hint; a routine message does not; the help of the focused
-  // field shows over a routine message
+/** A toolbar button with its popover `p`, its hover text off while open; `frame` wraps the popover. */
+function ToolPopover({
+  ed,
+  p,
+  tip,
+  wideTip,
+  name,
+  description,
+  icon,
+  position,
+  frame,
+  children,
+}: {
+  ed: Ed
+  p: Pop
+  tip: ReactNode
+  wideTip?: boolean
+  name: string
+  description?: string
+  icon: ReactNode
+  position?: 'bottom-start' | 'bottom-end'
+  frame?: (popover: ReactNode) => ReactElement
+  children: ReactNode
+}) {
+  const { pop, setPop, root } = ed
+  const popover = (
+    <Popover
+      position={position ?? 'bottom-start'}
+      shadow="sm"
+      withinPortal={false}
+      returnFocus
+      transitionProps={{ duration: 0 }}
+      opened={pop === p}
+      onChange={(on) => setPop((x) => (on ? p : x === p ? undefined : x))}
+      // closed with the focus inside, it goes back to the button, also when the popover opened
+      // after a Calibrate tool (the focus was on the canvas marker then)
+      onClose={() =>
+        requestAnimationFrame(() => {
+          if (document.activeElement === document.body)
+            root.current?.querySelector<HTMLElement>(`[data-pop="${p}"]`)?.focus()
+        })
+      }
+    >
+      <Popover.Target>
+        {/* a controlled popover's target toggles it itself */}
+        <ActionIcon
+          variant="default"
+          aria-label={name}
+          data-pop={p}
+          onClick={() => setPop((x) => (x === p ? undefined : p))}
+          aria-description={description}
+        >
+          {icon}
+        </ActionIcon>
+      </Popover.Target>
+      <Popover.Dropdown className="toolbar-pop">{children}</Popover.Dropdown>
+    </Popover>
+  )
+  return (
+    <Tooltip
+      label={tip}
+      events={tipEvents}
+      {...(wideTip && { multiline: true, maw: 260 })}
+      disabled={pop === p}
+    >
+      {frame ? frame(popover) : <span className="tool-indicator">{popover}</span>}
+    </Tooltip>
+  )
+}
+
+/** The sheet's name while it is renamed. */
+function SheetName({ ed }: { ed: Ed }) {
+  const { meta, setMeta, setRenaming, root } = ed
+  return (
+    <TextInput
+      aria-label="Sheet name"
+      className="sheet-select"
+      value={meta.name}
+      maxLength={200}
+      autoFocus
+      error={meta.name ? undefined : true}
+      onChange={(e) => setMeta({ ...meta, name: e.currentTarget.value })}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === 'Escape') {
+          e.preventDefault()
+          e.currentTarget.blur()
+        }
+      }}
+      onBlur={() => {
+        if (!meta.name) setMeta((m) => ({ ...m, name: 'Target sheet' }))
+        setRenaming(false)
+        requestAnimationFrame(() =>
+          root.current?.querySelector<HTMLElement>('[data-rename]')?.focus(),
+        )
+      }}
+    />
+  )
+}
+
+/** The list of the sheets of this browser. */
+function SheetSelect({ ed }: { ed: Ed }) {
+  const { meta, sheets, stored, open } = ed
+  return (
+    <NativeSelect
+      aria-label="Target sheet"
+      // the narrow list cuts a long name
+      title={meta.name}
+      className="sheet-select"
+      data={[
+        ...(stored ? [] : [{ value: meta.id, label: meta.name }]),
+        ...sheets.map((r) => ({ value: r.id, label: r.id === meta.id ? meta.name : r.name })),
+      ]}
+      value={meta.id}
+      onChange={(e) => {
+        const r = sheets.find((x) => x.id === e.currentTarget.value)
+        if (r) open(r)
+      }}
+    />
+  )
+}
+
+/** Rename, new and delete; the compact tab keeps one row, so they are in Expand. */
+function SheetButtons({ ed }: { ed: Ed }) {
+  const { compact, setRenaming, create, stored, deleteSheet } = ed
+  if (compact) return null
+  return (
+    <>
+      <IconButton label="Rename sheet" data-rename onClick={() => setRenaming(true)}>
+        <PencilSimple />
+      </IconButton>
+      <IconButton label="New sheet" onClick={create}>
+        <FilePlus />
+      </IconButton>
+      <IconButton label="Delete sheet" disabled={!stored} onClick={deleteSheet}>
+        <Trash />
+      </IconButton>
+    </>
+  )
+}
+
+/** The Photo popover's content: the photo's buttons and its display filters. */
+function PhotoPanel({ ed }: { ed: Ed }) {
+  const { sheet, coarse, setPop, fileInput, cameraInput, removePhoto } = ed
+  return (
+    <>
+      <h2 className="prop-head">Photo</h2>
+      <p className="note">
+        Choose, drop or paste a photo; it stays in this browser and is never uploaded.
+      </p>
+      <Flex component="span" className="row-buttons" wrap="wrap" gap={4} mb="xs">
+        <Button
+          size={controlSize.row.button}
+          variant="default"
+          leftSection={<ImageIcon size={14} aria-hidden="true" />}
+          onClick={() => {
+            setPop(undefined)
+            fileInput.current?.click()
+          }}
+        >
+          {sheet.photo ? 'Replace photo' : 'Add photo'}
+        </Button>
+        {coarse && (
+          <Button
+            size={controlSize.row.button}
+            variant="default"
+            leftSection={<Camera size={14} aria-hidden="true" />}
+            onClick={() => {
+              setPop(undefined)
+              cameraInput.current?.click()
+            }}
+          >
+            Camera
+          </Button>
+        )}
+        <Button
+          size={controlSize.row.button}
+          variant="default"
+          leftSection={<ImageBroken size={14} aria-hidden="true" />}
+          disabled={!sheet.photo}
+          onClick={() => {
+            setPop(undefined)
+            void removePhoto()
+          }}
+        >
+          Remove photo
+        </Button>
+      </Flex>
+      <FilterPanel ed={ed} />
+    </>
+  )
+}
+
+/** The photo tool: a button in the compact tab, a popover otherwise. */
+function PhotoTool({ ed }: { ed: Ed }) {
+  const { compact, fileInput } = ed
+  if (compact)
+    return (
+      <IconButton
+        label="Photo: choose, drop or paste one; it stays in this browser and is never uploaded"
+        onClick={() => fileInput.current?.click()}
+      >
+        <ImageIcon />
+      </IconButton>
+    )
+  return (
+    <ToolPopover
+      ed={ed}
+      p="photo"
+      tip="Photo: add, replace or remove; contrast and darken"
+      name="Photo"
+      icon={
+        <span className="icon-slot" aria-hidden="true">
+          <ImageIcon />
+        </span>
+      }
+    >
+      <PhotoPanel ed={ed} />
+    </ToolPopover>
+  )
+}
+
+/** The camera button of the compact tab on a touch screen. */
+function CameraButton({ ed }: { ed: Ed }) {
+  const { compact, coarse, cameraInput } = ed
+  if (!compact || !coarse) return null
+  return (
+    <IconButton label="Photo from the camera" onClick={() => cameraInput.current?.click()}>
+      <Camera />
+    </IconButton>
+  )
+}
+
+/** The hidden file inputs of the Photo tool: a file and the camera. */
+function PhotoInputs({ ed }: { ed: Ed }) {
+  const { fileInput, cameraInput, takePhoto } = ed
+  return (
+    <>
+      <input
+        ref={fileInput}
+        type="file"
+        accept="image/*"
+        hidden
+        onChange={(e) => {
+          void takePhoto(e.currentTarget.files?.[0])
+          e.currentTarget.value = ''
+        }}
+      />
+      <input
+        ref={cameraInput}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        hidden
+        onChange={(e) => {
+          void takePhoto(e.currentTarget.files?.[0])
+          e.currentTarget.value = ''
+        }}
+      />
+    </>
+  )
+}
+
+/** The Calibrate popover: the scale references, rotation and origin. */
+function CalibrateTool({ ed }: { ed: Ed }) {
+  const { compact, unscaled } = ed
+  if (compact) return null
+  return (
+    <ToolPopover
+      ed={ed}
+      p="calibrate"
+      tip={
+        unscaled
+          ? 'Calibrate: the photo has no scale yet; mark a reference of known size'
+          : 'Calibrate: scale references, rotation and origin'
+      }
+      wideTip
+      name="Calibrate"
+      description={unscaled ? 'The photo has no scale yet.' : undefined}
+      icon={
+        <span className="icon-slot" aria-hidden="true">
+          <Ruler />
+        </span>
+      }
+      frame={(popover) => (
+        <Indicator
+          disabled={!unscaled}
+          size={9}
+          offset={3}
+          color="orange"
+          withBorder
+          className="tool-indicator"
+          data-unscaled={unscaled || undefined}
+        >
+          {popover}
+        </Indicator>
+      )}
+    >
+      <h2 className="prop-head">Calibrate</h2>
+      <ScalePanel ed={ed} />
+    </ToolPopover>
+  )
+}
+
+/** The Select and Shot tools. */
+function ToolSwitch({ ed }: { ed: Ed }) {
+  const { meta, storeError, tool, startTool } = ed
+  return (
+    <SegmentedControl
+      aria-label="Tool"
+      // an edit before the store is read is lost when the sheet opens
+      disabled={!meta.id && !storeError}
+      value={tool === 'select' || tool === 'shot' ? tool : ''}
+      onChange={(v) => startTool(v as Tool)}
+      data={[
+        {
+          value: 'select',
+          label: (
+            <Group
+              component="span"
+              display="inline-flex"
+              gap={4}
+              wrap="nowrap"
+              title="Select: drag shots, points of aim and reference points; drag the background to pan"
+            >
+              <Cursor size={14} aria-hidden="true" />
+              <span className="seg-text">Select</span>
+            </Group>
+          ),
+        },
+        {
+          value: 'shot',
+          label: (
+            <Group
+              component="span"
+              display="inline-flex"
+              gap={4}
+              wrap="nowrap"
+              title="Shot: add shots to the active group by click or tap"
+            >
+              <Target size={14} aria-hidden="true" />
+              <span className="seg-text">Shot</span>
+            </Group>
+          ),
+        },
+      ]}
+    />
+  )
+}
+
+/** Undo, and Redo outside the compact tab. */
+function UndoRedo({ ed }: { ed: Ed }) {
+  const { compact, h, setH } = ed
+  return (
+    <>
+      <IconButton
+        label={`Undo (${shortcutLabel('undo')})`}
+        aria-keyshortcuts={shortcutAriaKeys('undo')}
+        disabled={!h.past.length}
+        onClick={() => setH(undo)}
+      >
+        <ArrowCounterClockwise />
+      </IconButton>
+      {!compact && (
+        <IconButton
+          label={`Redo (${shortcutLabel('redo')})`}
+          aria-keyshortcuts={shortcutAriaKeys('redo')}
+          disabled={!h.future.length}
+          onClick={() => setH(redo)}
+        >
+          <ArrowClockwise />
+        </IconButton>
+      )}
+    </>
+  )
+}
+
+/** The Overlays popover: the switches of what the canvas draws. */
+function OverlaysTool({ ed }: { ed: Ed }) {
+  const { compact, overlays, toggleOverlay } = ed
+  const overlayCount = (Object.keys(overlayNames) as Overlay[]).filter((o) => overlays[o]).length
+  return (
+    <ToolPopover
+      ed={ed}
+      p="overlays"
+      tip={`Overlays: ${overlayCount} on`}
+      name="Overlays"
+      position="bottom-end"
+      icon={<Eye size={16} aria-hidden="true" />}
+      frame={(popover) => (
+        <Indicator
+          label={<span aria-hidden="true">{overlayCount}</span>}
+          size={14}
+          offset={3}
+          disabled={!overlayCount}
+          color="gray"
+          className="tool-indicator"
+        >
+          {popover}
+        </Indicator>
+      )}
+    >
+      <fieldset className="overlay-list">
+        <legend className="overlay-legend">Overlays</legend>
+        {(Object.keys(overlayNames) as Overlay[]).map((o) => (
+          <Checkbox
+            key={o}
+            label={overlayNames[o]}
+            title={overlayHelp[o]}
+            wrapperProps={{ title: overlayHelp[o] }}
+            checked={overlays[o]}
+            onChange={(e) => toggleOverlay(o, e.currentTarget.checked)}
+          />
+        ))}
+      </fieldset>
+      {!compact && <MarkerField ed={ed} />}
+    </ToolPopover>
+  )
+}
+
+/** The workbench tab's Expand and Close button. */
+function ExpandButton({ ed }: { ed: Ed }) {
+  const { expand } = ed
+  if (!expand) return null
+  return (
+    <IconButton
+      label={expand.expanded ? 'Close' : 'Expand'}
+      data-expand
+      onClick={() => expand.onChange(!expand.expanded)}
+    >
+      {expand.expanded ? <ArrowsIn /> : <ArrowsOut />}
+    </IconButton>
+  )
+}
+
+/** The editor's toolbar: sheet, photo, calibration, tools, undo and the overlays. */
+function Toolbar({ ed }: { ed: Ed }) {
+  const { renaming, heading, exportMenu, toolbarKeys } = ed
+  return (
+    <div
+      className="target-toolbar"
+      role="toolbar"
+      aria-label="Target sheet tools"
+      onKeyDown={toolbarKeys}
+    >
+      {renaming ? <SheetName ed={ed} /> : <SheetSelect ed={ed} />}
+      <SheetButtons ed={ed} />
+      <span className="toolbar-gap" />
+      <PhotoTool ed={ed} />
+      <CameraButton ed={ed} />
+      <PhotoInputs ed={ed} />
+      <CalibrateTool ed={ed} />
+      <span className="toolbar-gap" />
+      <ToolSwitch ed={ed} />
+      <UndoRedo ed={ed} />
+      <OverlaysTool ed={ed} />
+      {/* on /groups in the page bar */}
+      {heading === undefined && exportMenu}
+      <ExpandButton ed={ed} />
+    </div>
+  )
+}
+
+/** The reference point `pi` of reference `ri` moved to `p`; the sheet as it was when that gives no scale. */
+function movedReference(s: TargetSheet, ri: number, pi: number, p: Point): TargetSheet {
+  const r = s.references[ri]
+  const pts = refPoints(r)
+  pts[pi] = p
+  const moved: CalibrationReference = (() => {
+    if (r.kind === 'line') return { ...r, a: pts[0], b: pts[1] }
+    if (r.kind === 'ringCentre') return { ...r, centre: pts[0], edge: pts[1] }
+    if (r.kind === 'ringEdge') return { ...r, points: [pts[0], pts[1], pts[2]] }
+    return { ...r, corners: [pts[0], pts[1], pts[2], pts[3]] }
+  })()
+  const next = { ...s, references: s.references.map((x, j) => (j === ri ? moved : x)) }
+  return frameOf(next) ? next : s
+}
+
+/** The canvas stage: the target with its hint, notes and start actions; a photo can be dropped on it. */
+function Canvas({ ed }: { ed: Ed }) {
+  const {
+    sheet,
+    frame,
+    group,
+    selected,
+    tool,
+    pending,
+    overlays,
+    filter,
+    photo,
+    describe,
+    stats,
+    setSelected,
+    setActive,
+    addShot,
+    dragKey,
+    shotAt,
+    apply,
+    applyCal,
+    toggle,
+    remove,
+    onPoint,
+    view,
+    layer,
+    detect,
+    hint,
+    help,
+    blankSheet,
+    startActions,
+    takePhoto,
+    unscaled,
+  } = ed
+  const statsBox = group && stats && <StatsBoxContent ed={ed} />
+  const photoBox =
+    photo && photo !== 'missing'
+      ? turnedBox(photo.width, photo.height, sheet.photoRotation ?? 0)
+      : undefined
+  return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: drop target for a photo; Photo is the keyboard path
+    <div
+      className="target-stage"
+      // a phone with its panels open gives the stage the photo's shape
+      style={photoBox && ({ '--photo-ratio': `${photoBox.w} / ${photoBox.h}` } as CSSProperties)}
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={(e) => {
+        e.preventDefault()
+        void takePhoto([...e.dataTransfer.files].find((f) => f.type.startsWith('image/')))
+      }}
+    >
+      <TargetCanvas
+        sheet={sheet}
+        frame={frame}
+        photo={photo === 'missing' ? undefined : photo}
+        active={group?.id}
+        selected={selected}
+        tool={tool}
+        pending={pending}
+        overlays={overlays}
+        filter={filter}
+        marker={sheet.markerDiameter}
+        describe={describe}
+        statsBox={statsBox}
+        onSelect={(sel) => {
+          setSelected(sel)
+          if (sel) setActive(sel.group)
+        }}
+        onAdd={addShot}
+        onMove={(sel, q, first) => {
+          if (first) dragKey.current++
+          shotAt(sel, (s) => ({ ...s, x: q.x, y: q.y }), `drag${dragKey.current}`)
+        }}
+        onAimMove={(gid, q, first) => {
+          if (first) dragKey.current++
+          apply((s) => withGroup(s, gid, (g) => ({ ...g, aim: q })), `drag${dragKey.current}`)
+        }}
+        onRefMove={(ri, pi, p, first) => {
+          if (first) dragKey.current++
+          applyCal((s) => movedReference(s, ri, pi, p), `drag${dragKey.current}`)
+        }}
+        onToggle={toggle}
+        onDelete={remove}
+        onNudge={(sel, dx, dy) =>
+          shotAt(
+            sel,
+            (s) => ({ ...s, x: s.x + dx, y: s.y + dy }),
+            `nudge:${sel.group}:${sel.index}`,
+          )
+        }
+        onPoint={onPoint}
+        view={view}
+        layer={layer}
+      />
+      {detect.progressBar}
+      {/* the tool hint and the last message, on the canvas: nothing moves when it changes */}
+      <p className="target-status" role="status" title={hint}>
+        {hint}
+      </p>
+      {!hint && help && (
+        <p className="target-help" aria-hidden="true">
+          {help}
+        </p>
+      )}
+      {blankSheet && (
+        <div className="canvas-start">
+          <p>
+            A drawn target. Place shots, then click where each shot hit. Or add a photo of the
+            target: choose, drop or paste one.
+          </p>
+          {startActions(controlSize.bar.button)}
+        </div>
+      )}
+      {photo === 'missing' && (
+        <p className="canvas-note">
+          The photo of this sheet is not in this browser; its shots are kept.
+        </p>
+      )}
+      {unscaled && (
+        <p className="canvas-note">Mark a reference of known size (Calibrate) to place shots.</p>
+      )}
+    </div>
+  )
+}
+
+/** The shots section's head: the fold toggle and the add button. */
+function ShotsHead({ ed }: { ed: Ed }) {
+  const { group, uid, shotsOpen, setShotsOpen, addShot } = ed
+  if (!group) return null
+  return (
+    <div className="section-head">
+      <h2 className="prop-head">
+        <button
+          type="button"
+          className="head-toggle"
+          aria-expanded={shotsOpen}
+          aria-controls={`${uid}-shots`}
+          onClick={() => setShotsOpen((o) => !o)}
+        >
+          {shotsOpen ? (
+            <CaretDown size={12} aria-hidden="true" />
+          ) : (
+            <CaretUp size={12} aria-hidden="true" />
+          )}
+          Shots ({group.shots.length})
+        </button>
+      </h2>
+      <AddShotButton ed={ed} addShot={addShot} />
+    </div>
+  )
+}
+
+/** A heading of a side column: the page template's panel head on /groups. */
+function SideHead({ ed, title }: { ed: Ed; title: string }) {
+  if (!ed.panel) return <h2 className="prop-head">{title}</h2>
+  return (
+    <div className="page-panel-head">
+      <h2 className="page-panel-title record-heading">{title}</h2>
+    </div>
+  )
+}
+
+/** The content of the side tab `v`. */
+function SidePanel({ ed, v }: { ed: Ed; v: string }) {
+  const { group, stats, detect, addShot, notesPanel, charges } = ed
+  if (v === 'groups')
+    return (
+      <>
+        <GroupPanel ed={ed} />
+        {detect.panel}
+      </>
+    )
+  if (v === 'shots')
+    return (
+      <>
+        <div className="section-head">{group && <AddShotButton ed={ed} addShot={addShot} />}</div>
+        {group && <ShotsPanel ed={ed} />}
+      </>
+    )
+  if (v === 'stats')
+    return (
+      <>
+        <Headline ed={ed} />
+        {group && stats && <StatsPanel ed={ed} />}
+      </>
+    )
+  if (v === 'notes') return notesPanel
+  return charges ? <LadderPanel ed={ed} /> : null
+}
+
+/** The panels as tabs: beside the target, or in the phone's bottom sheet. */
+function SideTabs({ ed }: { ed: Ed }) {
+  const { group, stats, side, setSide, panel, charges } = ed
+  const tabs = [
+    ['groups', 'Group'],
+    ['shots', 'Shots'],
+    ['stats', 'Stats'],
+    ['notes', 'Notes'],
+    ...(charges ? [['ladder', 'Ladder']] : []),
+  ] as [string, string][]
+  return (
+    <Tabs value={side} onChange={setSide} className={`target-tabs${panel}`}>
+      {panel && <SideHead ed={ed} title={group?.name ?? 'Groups'} />}
+      <Tabs.List>
+        {tabs.map(([v, label]) => (
+          <Tabs.Tab key={v} value={v}>
+            {label}
+          </Tabs.Tab>
+        ))}
+      </Tabs.List>
+      {tabs.map(([v]) => (
+        <Tabs.Panel key={v} value={v} className="target-side">
+          <SidePanel ed={ed} v={v} />
+        </Tabs.Panel>
+      ))}
+      {/* the group's key values under every other tab, at the panel's foot */}
+      {panel && side !== 'stats' && group && stats && (
+        <div className="target-summary">
+          <h3 className="prop-head">Summary</h3>
+          <Headline ed={ed} />
+        </div>
+      )}
+    </Tabs>
+  )
+}
+
+/** The phone's bottom sheet: a summary strip that opens the panels. */
+function BottomSheet({ ed }: { ed: Ed }) {
+  const { group, stats, keyValues, system, uid, sheetOpen, setSheetOpen } = ed
+  const summaryLine = group
+    ? [
+        group.name,
+        `${stats?.shotCount ?? 0} shots`,
+        ...(stats && stats.shotCount > 1
+          ? [`ES ${keyValueText(keyValues, system, 'extremeSpread')}`]
+          : []),
+      ].join(' · ')
+    : 'No group'
+  return (
+    <section className="target-sheet" data-open={sheetOpen || undefined} aria-label="Group panels">
+      <button
+        type="button"
+        className="sheet-strip"
+        aria-expanded={sheetOpen}
+        aria-controls={`${uid}-sheet`}
+        onClick={() => setSheetOpen((o) => !o)}
+      >
+        {group && (
+          <span className="swatch" style={{ background: group.colour }} aria-hidden="true" />
+        )}
+        <span className="strip-text">{summaryLine}</span>
+        {sheetOpen ? (
+          <CaretDown size={16} aria-hidden="true" />
+        ) : (
+          <CaretUp size={16} aria-hidden="true" />
+        )}
+        <span className="visually-hidden">{sheetOpen ? 'Hide panels' : 'Show panels'}</span>
+      </button>
+      <div id={`${uid}-sheet`} className="sheet-body" hidden={!sheetOpen}>
+        {sheetOpen && <SideTabs ed={ed} />}
+      </div>
+    </section>
+  )
+}
+
+/** The side column of the compact tab: the key statistics, or how to start. */
+function KeySide({ ed }: { ed: Ed }) {
+  const { group, stats, sheet, frame, startActions } = ed
+  return (
+    <aside className="target-side key-side" aria-label="Key statistics">
+      <h3 className="prop-head">{group?.name ?? 'Statistics'}</h3>
+      {group?.shots.length ? (
+        <>
+          {stats && <StatsPanel ed={ed} />}
+          <ShotsPanel ed={ed} />
+        </>
+      ) : (
+        <Stack gap={4}>
+          <p className="note">{startNote(!!sheet.photo, !!frame)}</p>
+          {startActions(controlSize.row.button)}
+        </Stack>
+      )}
+    </aside>
+  )
+}
+
+/** What to do first on a compact tab without shots. */
+function startNote(photo: boolean, scaled: boolean) {
+  if (!photo)
+    return 'A drawn target. Place shots, then click where each shot hit. Or add a photo of the target.'
+  return scaled
+    ? 'Place shots, then click each hole.'
+    : 'Mark a reference of known size (Expand, Calibrate) to place shots.'
+}
+
+/** The statistics column of the wide layout, with the shots, the notes and the ladder. */
+function StatsSide({ ed }: { ed: Ed }) {
+  const { group, stats, uid, shotsOpen, panel, charges, notesPanel } = ed
+  return (
+    <aside className={`target-side stats-side${panel}`} aria-label="Statistics and shots">
+      <SideHead ed={ed} title="Statistics" />
+      <Headline ed={ed} />
+      {group && stats && <StatsPanel ed={ed} />}
+      <ShotsHead ed={ed} />
+      <div id={`${uid}-shots`} className="shots-body" hidden={!shotsOpen}>
+        {shotsOpen && group && <ShotsPanel ed={ed} />}
+      </div>
+      <h2 className="prop-head">Notes</h2>
+      {notesPanel}
+      {charges && (
+        <>
+          <h2 className="prop-head">Ladder</h2>
+          <LadderPanel ed={ed} />
+        </>
+      )}
+    </aside>
+  )
+}
+
+/** The target body: the canvas with the panels beside it, in the layout the width allows. */
+function Body({ ed }: { ed: Ed }) {
+  const { compact, wide, phone, panel, detect } = ed
+  if (compact)
+    return (
+      <>
+        <Canvas key="canvas" ed={ed} />
+        {/* target first: the side column keeps its width, empty or not, so nothing moves */}
+        <KeySide key="key" ed={ed} />
+      </>
+    )
+  if (wide)
+    return (
+      <>
+        <aside key="left" className={`target-side${panel}`} aria-label="Groups">
+          <SideHead ed={ed} title="Groups" />
+          <GroupPanel ed={ed} />
+          {detect.panel}
+        </aside>
+        <Canvas key="canvas" ed={ed} />
+        <StatsSide key="right" ed={ed} />
+      </>
+    )
+  return (
+    <>
+      <Canvas key="canvas" ed={ed} />
+      {phone ? <BottomSheet key="sheet" ed={ed} /> : <SideTabs key="tabs" ed={ed} />}
+    </>
+  )
+}
+
+/** The page bar of /groups: the File menu of the open sheet, Export and Print. */
+function SheetPageBar({ ed }: { ed: Ed }) {
+  const {
+    heading,
+    meta,
+    fileData,
+    kept,
+    setSheets,
+    open,
+    reloadStored,
+    storeFromMenu,
+    exportMenu,
+    printSheet,
+  } = ed
+  if (heading === undefined) return null
+  return (
+    <PageBar
+      title={heading}
+      actions={
+        <>
+          {/* from the sheet's id on: the menu never runs without autosave; a placeholder keeps
+              its place until then */}
+          {meta.id ? (
+            <FileMenu
+              kind="targetSheet"
+              name={meta.name || 'Target sheet'}
+              data={fileData}
+              autosaved={meta.id}
+              // the save effect brings the two together again
+              kept={kept}
+              onOpen={(_, __, r) => {
+                setSheets((list) => [r, ...list.filter((x) => x.id !== r.id)])
+                open(r)
+              }}
+              onStored={reloadStored}
+              store={storeFromMenu}
+            />
+          ) : (
+            <FileMenuPlaceholder />
+          )}
+          {exportMenu}
+          <PrintButton
+            onClick={printSheet}
+            hint={`Print: what Fit shows at a stated scale with a ruler, and the statistics (also ${shortcutLabel('print')})`}
+          />
+        </>
+      }
+    />
+  )
+}
+
+/** The keys the editor handles itself: undo and redo, and Print on /groups. */
+function ownShortcuts(onPage: boolean) {
+  return { undo: null, redo: null, ...(onPage && { print: null }) }
+}
+
+/** The photo to draw: none while the sheet's photo is missing from the store. */
+function shownPhoto(photo: Photo | 'missing' | undefined) {
+  return photo === 'missing' ? undefined : photo
+}
+
+/** The statistics of the group and its readouts, for its table, its key values and the statistics box. */
+function statsOf(group: ShotGroup | undefined) {
+  const stats = group && groupStatisticsOf(group)
+  const keyValues = group && stats ? readouts(stats, group.distance) : []
+  return { stats, keyValues }
+}
+
+/**
+ * A failure or a limit shows over the hint; a routine message does not; the help of the focused
+ * field shows over a routine message.
+ */
+function hintOf(
+  status: { text: string; alert: boolean },
+  toolHint: string | undefined,
+  help: string | undefined,
+) {
   const alertText = status.alert ? status.text : ''
-  const hint = alertText || toolHint || (help ? '' : status.text)
+  return alertText || toolHint || (help ? '' : status.text)
+}
+
+/** Whether the sheet is a drawn target without a shot yet, with the select tool. */
+function isBlank(compact: boolean, tool: Tool, sheet: TargetSheet) {
+  return !compact && tool === 'select' && !sheet.photo && sheet.groups.every((g) => !g.shots.length)
+}
+
+/** Whether the photo is there and no reference gives it a scale yet. */
+function isUnscaled(sheet: TargetSheet, photo: Photo | 'missing' | undefined, frame: Frame) {
+  return !!sheet.photo && photo !== 'missing' && !frame
+}
+
+/** The layout switches of the editor's root element. */
+function rootAttrs(wide: boolean, phone: boolean, sheet: boolean) {
+  return {
+    'data-wide': wide || undefined,
+    'data-phone': phone || undefined,
+    'data-sheet': sheet || undefined,
+  }
+}
+
+/** Replaced or removed photos of a sheet, deleted once the saved sheet points at another. */
+type Orphan = { sheet: string; photo: string }
+
+/** The sheet the editor opens next time. */
+function rememberSheet(id: string) {
+  try {
+    localStorage.setItem(lastSheet, id)
+  } catch {}
+}
+
+/** Deletes the photo file `old` unless a stored sheet still points at it (`now` is the new photo). */
+async function dropUnusedPhoto(old: string | undefined, now: string | undefined) {
+  if (!old || old === now) return
+  const used = await storedPhotoIds()
+  if (!used.has(old)) discardFile(old)
+}
+
+/** Deletes the replaced photos of sheet `sheetId` that its saved sheet no longer shows. */
+async function dropOrphans(
+  orphans: { current: Orphan[] },
+  sheetId: string,
+  shown: string | undefined,
+) {
+  const gone = orphans.current.filter((o) => o.sheet === sheetId && o.photo !== shown)
+  orphans.current = orphans.current.filter((o) => !gone.includes(o))
+  // a copy made with Save as may point at the photo too
+  const used = gone.length ? await storedPhotoIds() : new Set<string>()
+  for (const o of gone) if (!used.has(o.photo)) discardFile(o.photo)
+}
+
+/**
+ * Writes the photos and the sheet of a deleted sheet back. Another tab may have saved the sheet
+ * since the delete: it stays, and this one comes back as a copy (`put` false).
+ */
+async function putBack(r: TargetSheetRecord, files: { id: string; blob: Blob | undefined }[]) {
+  for (const f of files) if (f.blob) await putPhoto(f.id, f.blob)
+  const back = { ...r, saved: new Date().toISOString() }
+  const put = await putRecordIf(back, undefined)
+  const own = put ? back : keptCopy(back, newId())
+  if (!put) await putRecords([own])
+  return { own, put }
+}
+
+/** The group edited: the chosen one, else the first. */
+function activeGroupOf(sheet: TargetSheet, active: string | undefined) {
+  return sheet.groups.find((g) => g.id === active) ?? sheet.groups[0]
+}
+
+/** The overlay switches of the sheet, else the browser's last choice. */
+function overlaysOf(sheet: TargetSheet, browser: Record<Overlay, boolean>) {
+  return sheet.overlays ? { ...defaultOverlays, ...sheet.overlays } : browser
+}
+
+/** The class of the side panels: the page template's panels on /groups only. */
+function panelOf(heading: string | undefined) {
+  return heading === undefined ? '' : ' page-panel'
+}
+
+/** The editor's height on a phone: from its top edge, not a flex share of the page. */
+function editorStyle(phoneTop: number | undefined, sheetOpen: boolean): CSSProperties | undefined {
+  if (phoneTop === undefined) return undefined
+  // with the panels open the photo and the panels below it set the height and the page scrolls
+  return sheetOpen ? { flex: 'none' } : { height: `calc(100dvh - ${phoneTop}px)`, flex: 'none' }
+}
+
+/** The hint of the active tool, or what the tool needs next. */
+function toolHintOf(
+  tool: Tool,
+  frame: Frame,
+  pointsDone: number,
+  detectHint: string | undefined,
+  scoreHint: string | undefined,
+) {
+  const first = detectHint ?? scoreHint
+  if (first !== undefined) return first
+  const keys = 'Or arrow keys and Enter. Esc cancels.'
+  if (toolPoints[tool])
+    return `${refHints[tool as RefKind]} Point ${pointsDone + 1} of ${toolPoints[tool]}. ${keys}`
+  if (tool === 'origin') return `Click the photo point of target (0, 0). ${keys}`
+  if (tool === 'aim') return `Click the point of aim of the active group. ${keys}`
+  if (tool !== 'shot') return
+  return frame ? 'Click a hole to add a shot to the active group.' : 'Mark a reference first.'
+}
+
+/** The state the File menu shows for the sheet. */
+function keptOf(failed: boolean, saving: boolean, stored: boolean): Kept {
+  if (failed) return 'failed'
+  if (saving) return 'saving'
+  return stored ? 'saved' : 'blank'
+}
+
+/**
+ * The target photo editor: a sheet of the browser store (a photo
+ * kept on the device, or a drawn target) with its calibration and shot groups, saved on every
+ * change. On `/groups` it lists every sheet; in the workbench tab Groups the sheets of the saved
+ * load `load`, each group linked to a ladder step and a chart of size against charge.
+ */
+export function TargetEditor({
+  load,
+  charges,
+  stepLabels,
+  step,
+  bulletDiameter,
+  optic,
+  expand,
+  summary,
+  heading,
+  stored: storedTick,
+}: {
+  /** Id of the saved load (workbench); the sheets of that load only. */
+  load?: string
+  /** Charge of each ladder step of the load, kg. */
+  charges?: number[]
+  /** Each ladder step as the workbench names it, relative to the main charge. */
+  stepLabels?: string[]
+  /** Index of the ladder step shown in the workbench; new groups take it. */
+  step?: number
+  /** Bullet diameter of the load, m: the marker of a new sheet. */
+  bulletDiameter?: number
+  /** The optic of the workbench's firearm, for the clicks to the point of aim. */
+  optic?: { label: string; click: number }
+  /**
+   * The workbench tab: compact (the target and the key readouts) until expanded over the
+   * workbench; `onChange` switches.
+   */
+  expand?: { expanded: boolean; onChange: (expanded: boolean) => void }
+  /** The workbench's load and its simulated velocities, for the print sheet. */
+  summary?: LoadSummary
+  /** The page heading (`/groups`): shown with the File menu of the open sheet beside it. */
+  heading?: string
+  /** Counts the page's File menu writes to the browser store (workbench Import, Replace). */
+  stored?: number
+}) {
+  const { system } = useUnits()
+  /** The distance of a new sheet: 100 of the display unit (100 yd or 100 m), held in m. */
+  const newDistance = useRef(0)
+  newDistance.current = system.range.toSi(100)
+  const [sheets, setSheets] = useState<TargetSheetRecord[]>([])
+  // the id is set on mount (`create` or `open`): no clock or random value during the prerender
+  const [meta, setMeta] = useState({ id: '', name: 'Target sheet 1' })
+  const [h, setH] = useState(() => historyOf(blank(load, bulletDiameter, newDistance.current)))
+  const sheet = h.present
+  // the Report issue boxes of /groups, not of the workbench tab
+  useSheetReport(heading === undefined ? undefined : sheet)
+  /** The File menu compares the sheet as JSON: after the edits of a drag, not during them. */
+  const fileData = useDeferredValue(sheet)
+  /** The sheet and name as opened, created or last saved: saved again only once they differ. */
+  const opened = useRef<{ data: TargetSheet; name: string }>({ data: sheet, name: '' })
+  /** The sheet and name shown now, for a store read that finishes later. */
+  const showing = useRef({ data: sheet, name: meta.name })
+  showing.current = { data: sheet, name: meta.name }
+  const [stored, setStored] = useState(false)
+  /** The browser store refused the last save; the next save that lands clears it. */
+  const [saveFailed, setSaveFailed] = useState(false)
+  const [photo, setPhoto] = useState<Photo | 'missing'>()
+  const [active, setActive] = useState<string | undefined>(sheet.groups[0]?.id)
+  const [selected, setSelected] = useState<Selection>()
+  const [tool, setTool] = useState<Tool>('select')
+  const [pending, setPending] = useState<Point[]>([])
+  const [refKind, setRefKind] = useState<RefKind>('line')
+  const [known, setKnown] = useState<{ length?: number; width?: number; height?: number }>({})
+  /** The browser's last overlay choice: the switches of a sheet without its own. */
+  const [browserOverlays, setBrowserOverlays] = useState(defaultOverlays)
+  const [noteSel, setNoteSel] = useState<string>()
+  const noteFields = useRef(new Map<string, HTMLTextAreaElement>())
+  /** The view the canvas shows, for the exports and the print. */
+  const view: ViewRef = useRef(undefined)
+  const [printBox, setPrintBox] = useState<{ x: number; y: number; w: number; h: number }>()
+  const printPhoto = useRef<HTMLImageElement>(null)
+  // undo and redo are this editor's own keys (`onKeyDown`)
+  useShortcuts(ownShortcuts(heading !== undefined))
+  // on /groups the browser's print command (Ctrl+P) prints the sheet, as Export > Print sheet does;
+  // the workbench tab leaves it to the workbench report
+  const ours = useRef(false)
+  usePrintEvents(
+    () => {
+      const html = document.documentElement
+      // Print sheet has set it already
+      if (html.dataset.print || !view.current) return
+      const box = view.current.extent
+      ours.current = true
+      html.dataset.print = 'target-sheet'
+      flushSync(() => setPrintBox(box))
+    },
+    () => {
+      if (!ours.current) return
+      ours.current = false
+      delete document.documentElement.dataset.print
+      setPrintBox(undefined)
+    },
+    heading !== undefined,
+  )
+  const [filter, setFilter] = useState({ contrast: 1, darken: 0 })
+  /** The last message; an alert (a failure or a limit) shows over a tool's hint. */
+  const [status, setStatus] = useState({ text: '', alert: false })
+  const say = useCallback((text: string, alert = false) => setStatus({ text, alert }), [])
+  // a routine message goes after a while: it sits over the target; an alert stays until the next
+  useEffect(() => {
+    if (!status.text || status.alert) return
+    const t = setTimeout(
+      () => setStatus((x) => (x === status ? { text: '', alert: false } : x)),
+      8000,
+    )
+    return () => clearTimeout(t)
+  }, [status])
+  /** Why the browser store could not be read: nothing is saved then. */
+  const [storeError, setStoreError] = useState<string>()
+  const [options, setOptions] = useState<ReturnType<typeof clickOptions>>([])
+  const [opticChoice, setOpticChoice] = useState('')
+  const [side, setSide] = useState<string | null>('groups')
+  const coarse = useMediaQuery('(pointer: coarse)')
+  const { ref: sized, width } = useElementSize<HTMLDivElement>()
+  const root = useRef<HTMLDivElement>(null)
+  const rootRef = useMergedRef(sized, root)
+  const wide = width >= 928
+  const uid = useId()
+  /** The toolbar popovers: Photo, Calibrate, Overlays; one open at a time. */
+  const [pop, setPop] = useState<'photo' | 'calibrate' | 'overlays'>()
+  const [renaming, setRenaming] = useState(false)
+  const [shotsOpen, setShotsOpen] = useState(true)
+  /** The phone's bottom sheet: open or only its summary strip. */
+  const [sheetOpen, setSheetOpen] = useState(false)
+  /** The scroll of the shot table, for the rows in view of a long group. */
+  const [shotScroll, setShotScroll] = useState({ top: 0, height: 400 })
+  const shotScroller = useRef<HTMLDivElement>(null)
+  /** The help of the focused field (label and description), shown on the canvas. */
+  const [help, setHelp] = useState<string>()
+  const fileInput = useRef<HTMLInputElement>(null)
+  const cameraInput = useRef<HTMLInputElement>(null)
+  const dragKey = useRef(0)
+  /** The save of the last edit while it waits for the debounce. */
+  const pendingSave = useRef<(() => void) & { record?: () => WaitingRecord }>(undefined)
+  /** Saves started and not yet landed, by sheet id: copied too when the page goes. */
+  const inFlight = useRef(new Map<string, WaitingRecord>())
+  /** The `saved` of each sheet as this editor last read or wrote it: a save writes only over that. */
+  const bases = useRef(new Map<string, string | undefined>())
+  const flush = () => pendingSave.current?.()
+  /** The sheet shown now, for a photo read that finishes after a switch. */
+  const shown = useRef(meta.id)
+  shown.current = meta.id
+  /** The photo of the sheet shown now, for a photo read that finishes after an edit. */
+  const photoNow = useRef(sheet.photo)
+  photoNow.current = sheet.photo
+  /** Replaced or removed photos, deleted once their sheet is saved without them or deleted. */
+  const orphans = useRef<Orphan[]>([])
+  /** The undo notice of the last group delete, joined by a delete while it shows. */
+  const groupUndo = useRef<{ n: number; undo: () => void; names: string[] }>(undefined)
+
+  const frame = useMemo(() => frameOf(sheet), [sheet])
+  const group = activeGroupOf(sheet, active)
+  const scrollFocus = useScrollFocus(`Shots of ${group?.name ?? ''}`, shotScroller)
+
+  useEffect(() => setBrowserOverlays(readOverlays()), [])
+  const overlays = overlaysOf(sheet, browserOverlays)
+
+  /** An edit as one undo step; `key` joins a run of edits of one field into one step. */
+  const apply = (f: (s: TargetSheet) => TargetSheet, key?: string) =>
+    setH((x) => {
+      const next = f(x.present)
+      if (next === x.present) return x
+      return key ? editHistory(x, next, key) : pushHistory(x, next)
+    })
+  /** A calibration edit: shots and points of aim stay on their photo points. */
+  const applyCal = (f: (s: TargetSheet) => TargetSheet, key?: string) =>
+    apply((s) => rebase(s, f(s)), key)
+  const onGroup = (f: (g: ShotGroup) => ShotGroup, key?: string) =>
+    group && apply((s) => withGroup(s, group.id, f), key)
+  /** A switch kept with the sheet and as the browser's choice for sheets without their own. */
+  const toggleOverlay = (o: Overlay, on: boolean) => {
+    const next = { ...overlays, [o]: on }
+    apply((s) => ({ ...s, overlays: next }), 'overlays')
+    setBrowserOverlays(next)
+    try {
+      localStorage.setItem(overlayKey, JSON.stringify(next))
+    } catch {}
+  }
+  const notes = sheet.notes ?? []
+  const onNote = (id: string, f: (n: SheetNote) => SheetNote | undefined, key?: string) =>
+    apply((s) => {
+      const next = (s.notes ?? []).flatMap((n) => {
+        if (n.id !== id) return [n]
+        const m = f(n)
+        return m ? [m] : []
+      })
+      const { notes: _, ...rest } = s
+      return next.length ? { ...rest, notes: next } : rest
+    }, key)
+  const addNote = () => {
+    if (!frame) return
+    // right of the group's shots, level with its top, so it covers none
+    const pts = group?.shots.filter((x) => !x.excluded) ?? []
+    const at = pts.length
+      ? { x: Math.max(...pts.map((p) => p.x)), y: Math.max(...pts.map((p) => p.y)) }
+      : (group?.aim ?? { x: 0, y: 0 })
+    const id = freeId(
+      'n',
+      notes.map((n) => n.id),
+    )
+    const note: SheetNote = {
+      id,
+      x: at.x + 0.005,
+      y: at.y + 0.005,
+      text: '{name}: ES {extremeSpread.length}, {extremeSpread.moa}',
+      ...(group && { group: group.id }),
+    }
+    apply((s) => ({ ...s, notes: [...(s.notes ?? []), note] }))
+    setNoteSel(id)
+    requestAnimationFrame(() => noteFields.current.get(id)?.focus())
+  }
+  const editNote = (id: string) => {
+    setNoteSel(id)
+    setSide('notes')
+    // on a phone the panels are in the bottom sheet
+    setSheetOpen(true)
+    requestAnimationFrame(() => noteFields.current.get(id)?.focus())
+  }
+  const detect = useHoleDetection({
+    sheet,
+    sheetId: meta.id,
+    frame,
+    group,
+    photo: shownPhoto(photo),
+    bullet: bulletDiameter,
+    onGroup,
+    onTurn: (angle, key) => {
+      const size = shownPhoto(photo)
+      if (size) apply((s) => turnSheet(s, size, angle), key)
+    },
+    openCalibrate: () => setPop('calibrate'),
+    onFace: (found) => applyCal((s) => calibrateSheetOnFace(s, group?.id, found, score.scope)),
+    say,
+    tool,
+    startTool,
+  })
+  const score = useRingScoring({
+    sheet,
+    frame,
+    group,
+    bullet: bulletDiameter ?? sheet.markerDiameter,
+    rings: overlays.rings,
+    onGroup,
+    onReference: pushReference,
+    say,
+    tool,
+    startTool,
+  })
+  /** The score of group `id` when it has one; undefined while the face loads or without it. */
+  const scored = (id: string) => scoredOnly(score.of(id))
+
+  function open(r: TargetSheetRecord) {
+    flush()
+    setMeta({ id: r.id, name: r.name })
+    opened.current = { data: r.data, name: r.name }
+    bases.current.set(r.id, r.saved)
+    setH(historyOf(r.data))
+    setStored(true)
+    setSaveFailed(false)
+    setActive(r.data.groups[0]?.id)
+    setSelected(undefined)
+    setNoteSel(undefined)
+    setTool('select')
+    setPending([])
+    // the same photo (a copy, a replaced sheet) stays: its effect does not run again
+    if (r.data.photo !== photoNow.current) setPhoto(undefined)
+    rememberSheet(r.id)
+  }
+
+  /** A new sheet; `face`: the id of the target face its first group is scored on. */
+  function create(list = sheets, face?: GroupFace) {
+    flush()
+    // the units may be read after the mount that calls this: the ref has the current ones
+    const empty = blank(load, bulletDiameter, newDistance.current, charges ? step : undefined)
+    const data = face
+      ? {
+          ...empty,
+          groups: empty.groups.map((g, i) => (i === 0 ? { ...g, face } : g)),
+        }
+      : empty
+    const name = `Target sheet ${list.length + 1}`
+    setMeta({ id: newId(), name })
+    opened.current = { data, name }
+    setH(historyOf(data))
+    setStored(false)
+    setSaveFailed(false)
+    setActive(data.groups[0]?.id)
+    setSelected(undefined)
+    setNoteSel(undefined)
+    setTool('select')
+    setPending([])
+    setPhoto(undefined)
+  }
+
+  /** The sheets of this browser (of the load in the workbench), the newest first. */
+  const sheetsOf = (records: UserRecord[]) =>
+    records
+      .filter(
+        (r): r is TargetSheetRecord =>
+          r.kind === 'targetSheet' && (load === undefined || r.data.load === load),
+      )
+      .sort((a, b) => (a.saved < b.saved ? 1 : -1))
+
+  /** The sheet list again after the File menu wrote records (Open, Import). */
+  const reloadSheets = () =>
+    storedRecords()
+      .then(({ records }) => setSheets(sheetsOf(records)))
+      .catch(() => {})
+  /** `reloadSheets` of this render, for the save effect. */
+  const reloadLatest = useRef(reloadSheets)
+  reloadLatest.current = reloadSheets
+
+  /**
+   * After the File menu wrote records: the list again, and the sheet shown when another writer
+   * (Import, Replace) changed it, so the next save does not write the old sheet over it.
+   */
+  const reloadStored = () => {
+    void reloadSheets()
+    const id = shown.current
+    storedRecord(id)
+      .then(async (r) => {
+        if (r?.kind !== 'targetSheet' || shown.current !== id) return
+        const now = showing.current
+        const same = (x: { data: TargetSheet; name: string }) =>
+          r.name === x.name && canonicalJson(r.data) === canonicalJson(x.data)
+        // the store holds what this editor opened or last saved (an edit may wait), or what it
+        // shows (File, Save): nothing to open
+        if (same(opened.current) || same(now)) return void bases.current.set(id, r.saved)
+        // the stored sheet wins: an edit still waiting would write the old one over it
+        pendingSave.current = undefined
+        open(r)
+        // the photo the replaced sheet showed, unless a sheet still points at it
+        await dropUnusedPhoto(now.data.photo, r.data.photo)
+      })
+      .catch(() => {})
+  }
+  // biome-ignore lint/correctness/useExhaustiveDependencies: on the page's File menu writes only
+  useEffect(() => {
+    if (storedTick) reloadStored()
+  }, [storedTick])
+
+  // the sheets of this browser (of the load in the workbench); the last one used opens
+  // biome-ignore lint/correctness/useExhaustiveDependencies: again only for another load
+  useEffect(() => {
+    let live = true
+    let kept: string[] = []
+    restoreWaiting()
+      .then(
+        (k) => {
+          kept = k
+        },
+        () => {},
+      )
+      .then(storedRecords)
+      .then(({ records }) => {
+        if (!live) return
+        const list = sheetsOf(records)
+        setSheets(list)
+        setOptions(clickOptions(records))
+        let last: string | null = null
+        try {
+          last = localStorage.getItem(lastSheet)
+        } catch {}
+        const r = list.find((x) => x.id === last) ?? list[0]
+        const linked = linkedFace(heading)
+        // a well-formed id no face record has opens no face
+        return (linked ? isFaceId(linked.id) : Promise.resolve(false)).then((known) => {
+          if (!live) return
+          const face = known ? linked : undefined
+          if (r && !face) open(r)
+          else create(list, face)
+        })
+      })
+      .then(() => {
+        // once: the copies are the last page's
+        if (live) for (const name of kept.splice(0)) say(keptNote(name), true)
+      })
+      .catch((e) =>
+        setStoreError(
+          `the browser store could not be read. ${e instanceof Error ? e.message : ''}`.trim(),
+        ),
+      )
+    return () => {
+      live = false
+    }
+  }, [load])
+
+  // the photo of the sheet from the browser store
+  useEffect(() => {
+    const id = sheet.photo
+    if (!id) return setPhoto(undefined)
+    let live = true
+    let url: string | undefined
+    storedPhoto(id)
+      .then(async (blob) => {
+        if (!blob) return live && setPhoto('missing')
+        const p = await photoOf(blob)
+        url = p.url
+        if (live) setPhoto(p)
+        else URL.revokeObjectURL(p.url)
+      })
+      .catch(() => live && setPhoto('missing'))
+    return () => {
+      live = false
+      if (url) URL.revokeObjectURL(url)
+    }
+  }, [sheet.photo])
+
+  /**
+   * Keeps `record` (an edit of `data`) as a sheet of its own after another tab saved the sheet
+   * since: that save stays.
+   */
+  const keepOwn = useRef(async (record: TargetSheetRecord, data: TargetSheet) => {
+    // a later save of the sheet keeps this edit with its own
+    if (bases.current.get(record.id) !== record.saved) return
+    const own = keptCopy(record, newId())
+    await putRecords([own])
+    bases.current.set(own.id, own.saved)
+    dropCopy(record.id, record.saved)
+    reloadLatest.current()
+    say(keptNote(own.name), true)
+    if (shown.current !== record.id) return
+    pendingSave.current = undefined
+    opened.current = { data, name: own.name }
+    setMeta({ id: own.id, name: own.name })
+    setStored(true)
+    setSaveFailed(false)
+    rememberSheet(own.id)
+  })
+  /** File, Save: the browser copy written as autosave writes it; false when kept as a copy. */
+  const storeFromMenu = async (record: TargetSheetRecord) => {
+    const base = bases.current.get(record.id)
+    // an autosave since the menu took the sheet holds a newer edit
+    if (base !== undefined && base > record.saved) return true
+    bases.current.set(record.id, record.saved)
+    const put = await putRecordIf(record, base).catch((e: unknown) => {
+      if (bases.current.get(record.id) === record.saved) bases.current.set(record.id, base)
+      throw e
+    })
+    if (!put) await keepOwn.current(record, record.data)
+    return put
+  }
+
+  // saved on every change, once it differs from what was opened
+  useEffect(() => {
+    if (!meta.id || (sheet === opened.current.data && meta.name === opened.current.name)) {
+      // an edit undone before its save is not saved later
+      pendingSave.current = undefined
+      setSaveFailed(false)
+      if (!meta.id && storeError) say(`Not saved: ${storeError}`, true)
+      return
+    }
+    const parsed = targetSheet.safeParse(sheet)
+    if (!parsed.success) {
+      pendingSave.current = undefined
+      setSaveFailed(true)
+      say(`Not saved: ${z.prettifyError(parsed.error).split('\n')[0]}`, true)
+      return
+    }
+    const recordNow = (): TargetSheetRecord => ({
+      kind: 'targetSheet',
+      id: meta.id,
+      name: meta.name || 'Target sheet',
+      saved: new Date().toISOString(),
+      data: parsed.data,
+    })
+    const save = () => {
+      // only the latest edit saves; a delete drops it
+      if (pendingSave.current !== save) return
+      pendingSave.current = undefined
+      const record = recordNow()
+      const base = bases.current.get(record.id)
+      // the store runs this editor's writes in order: the next save writes over this one
+      bases.current.set(record.id, record.saved)
+      const waiting = { ...record, base }
+      inFlight.current.set(record.id, waiting)
+      const landed = () => {
+        if (inFlight.current.get(record.id) === waiting) inFlight.current.delete(record.id)
+      }
+      putRecordIf(record, base)
+        .then(async (put) => {
+          landed()
+          if (!put) return keepOwn.current(record, sheet)
+          dropCopy(record.id, record.saved)
+          // replaced photos go once their saved sheet points at another
+          await dropOrphans(orphans, record.id, sheet.photo)
+          setSheets((list) => [record, ...list.filter((r) => r.id !== record.id)])
+          void requestPersistentStorage()
+          // a save that ends after another sheet opened leaves that sheet's state alone
+          if (shown.current !== record.id) return
+          opened.current = { data: sheet, name: meta.name }
+          setStored(true)
+          setSaveFailed(false)
+          // on /groups the page bar's File state says it
+          if (heading === undefined) say('Saved in this browser.')
+          rememberSheet(record.id)
+        })
+        .catch(() => {
+          landed()
+          if (bases.current.get(record.id) === record.saved) bases.current.set(record.id, base)
+          if (shown.current === record.id) setSaveFailed(true)
+          say('Not saved: the browser store refused the sheet.', true)
+        })
+    }
+    pendingSave.current = Object.assign(save, {
+      record: () => ({ ...recordNow(), base: bases.current.get(meta.id) }),
+    })
+    const t = setTimeout(save, 300)
+    return () => clearTimeout(t)
+  }, [sheet, meta, storeError, say, heading])
+  // an edit still waiting is saved when the editor goes (a link, a load change) or the page does
+  useEffect(() => {
+    const flushNow = () => pendingSave.current?.()
+    // a write started when the page goes lands only if the page lives until it commits (lost when
+    // the next page answers at once, measured in the e2e Chromium): a synchronous copy of the waiting
+    // edit and of the saves not landed first, each saved on the next open when newer than the stored
+    // sheet
+    const leave = () => {
+      const waiting = new Map(inFlight.current)
+      // shortcut: a waiting edit's base is the save in flight; when that save is lost too, the next
+      // page keeps the edit as a copy (a duplicate, nothing lost), carry both bases if that shows up
+      const record = pendingSave.current?.record?.()
+      if (record) waiting.set(record.id, record)
+      if (waiting.size) keepCopies([...waiting.values()])
+      flushNow()
+    }
+    const hidden = () => document.visibilityState === 'hidden' && leave()
+    const events = ['beforeunload', 'pagehide']
+    for (const e of events) window.addEventListener(e, leave)
+    document.addEventListener('visibilitychange', hidden)
+    return () => {
+      for (const e of events) window.removeEventListener(e, leave)
+      document.removeEventListener('visibilitychange', hidden)
+      flushNow()
+    }
+  }, [])
+
+  async function takePhoto(file: File | undefined) {
+    if (!file) return
+    if (!(photoTypes as readonly string[]).includes(file.type))
+      return say('The file is not a photo: JPEG, PNG, WebP, GIF, AVIF, HEIC or BMP.', true)
+    const target = meta.id
+    if (
+      sheet.photo &&
+      !(await confirmDialog({
+        title: 'Replace the photo?',
+        message: 'Its references go; the shots keep their target values.',
+        confirmLabel: 'Replace',
+        danger: true,
+      }))
+    )
+      return
+    try {
+      const id = newId()
+      const p = await photoOf(file)
+      // the size only: the effect below shows the stored file
+      URL.revokeObjectURL(p.url)
+      await putPhoto(id, file)
+      // another sheet opened while the photo was read: it is not this photo's sheet
+      if (shown.current !== target) return void deletePhoto(id).catch(() => {})
+      const old = photoNow.current
+      // a new photo starts a new history: undo cannot bring back a deleted photo
+      setH((x) =>
+        historyOf({
+          ...withoutRegions(x.present),
+          photo: id,
+          references: [],
+          targetOrigin: { x: p.width / 2, y: p.height / 2 },
+        }),
+      )
+      if (old) orphans.current.push({ sheet: target, photo: old })
+      setRefKind('line')
+      say('Photo kept in this browser. Calibrate: mark a reference to place shots.')
+    } catch {
+      say('The photo could not be read.', true)
+    }
+  }
+
+  async function removePhoto() {
+    const old = sheet.photo
+    const target = meta.id
+    if (
+      !old ||
+      !(await confirmDialog({
+        title: 'Remove the photo?',
+        message: 'The shots stay on a drawn target.',
+        confirmLabel: 'Remove',
+        danger: true,
+      })) ||
+      shown.current !== target
+    )
+      return
+    setH((x) => {
+      const { photo: _, targetOrigin: __, ...rest } = x.present
+      return historyOf({ ...withoutRegions(rest), references: [] })
+    })
+    orphans.current.push({ sheet: target, photo: old })
+  }
+
+  /** No question first: Undo puts the sheet and its photos back. */
+  async function deleteSheet() {
+    if (!stored) return
+    const { id, name } = meta
+    // the photo shown and every replaced one not yet deleted
+    const photos = [
+      ...(sheet.photo ? [sheet.photo] : []),
+      ...orphans.current.filter((o) => o.sheet === id).map((o) => o.photo),
+    ]
+    // what Undo writes back: the sheet as shown, else as last stored
+    const parsed = targetSheet.safeParse(sheet)
+    const record: TargetSheetRecord | undefined = parsed.success
+      ? { kind: 'targetSheet', id, name: name || 'Target sheet', saved: '', data: parsed.data }
+      : sheets.find((r) => r.id === id)
+    // a save still waiting would write the sheet back while the photos are read
+    pendingSave.current = undefined
+    const files = await Promise.all(
+      photos.map(async (p) => ({ id: p, blob: await storedPhoto(p).catch(() => undefined) })),
+    )
+    const restore = async (r: TargetSheetRecord) => {
+      try {
+        const { own, put } = await putBack(r, files)
+        if (put) setSheets((list) => [own, ...list.filter((x) => x.id !== id)])
+        else void reloadSheets()
+        open(own)
+        if (!put) say(keptNote(own.name), true)
+      } catch {
+        say('Not restored: the browser store refused.', true)
+      }
+    }
+    deleteRecord(id)
+      .then(async () => {
+        // a copy left by a page that went would bring the sheet back on the next open
+        dropCopy(id)
+        orphans.current = orphans.current.filter((o) => o.sheet !== id)
+        // a copy saved with Save as or opened from a file may share the photo
+        const used = await storedPhotoIds()
+        for (const p of photos) if (!used.has(p)) discardFile(p)
+        const rest = sheets.filter((r) => r.id !== id)
+        setSheets(rest)
+        if (rest[0]) open(rest[0])
+        else create(rest)
+        if (record) offerUndo(`Deleted ${name}.`, () => restore(record))
+      })
+      .catch(() => say('Not deleted: the browser store refused.', true))
+  }
+
+  // a pasted image becomes the photo while the editor is shown and no field has the focus
+  const takeLatest = useRef(takePhoto)
+  takeLatest.current = takePhoto
+  useEffect(() => {
+    const onPaste = (e: ClipboardEvent) => {
+      if (!root.current?.offsetParent) return
+      const t = e.target as HTMLElement | null
+      if (t?.closest('input, textarea')) return
+      const file = [...(e.clipboardData?.files ?? [])].find((f) => f.type.startsWith('image/'))
+      if (file) {
+        e.preventDefault()
+        takeLatest.current(file)
+      }
+    }
+    window.addEventListener('paste', onPaste)
+    return () => window.removeEventListener('paste', onPaste)
+  }, [])
+
+  function startTool(t: Tool) {
+    setTool(t)
+    setPending([])
+    // a message from before does not hide the new tool's hint
+    setStatus((x) => ({ ...x, alert: false }))
+  }
+
+  function addReference(points: Point[]) {
+    const len = known.length
+    let r: CalibrationReference | undefined
+    if (refKind === 'line' && len) r = { kind: 'line', a: points[0], b: points[1], length: len }
+    if (refKind === 'ringCentre' && len)
+      r = { kind: 'ringCentre', centre: points[0], edge: points[1], diameter: len }
+    if (refKind === 'ringEdge' && len)
+      r = { kind: 'ringEdge', points: [points[0], points[1], points[2]], diameter: len }
+    if (refKind === 'rectangle' && known.width && known.height)
+      r = {
+        kind: 'rectangle',
+        corners: [points[0], points[1], points[2], points[3]],
+        width: known.width,
+        height: known.height,
+      }
+    if (!r) return say('Enter the known size first.', true)
+    pushReference(r)
+  }
+
+  /** Adds a scale reference (a rectangle replaces the one before); shots stay on the photo. */
+  function pushReference(ref: CalibrationReference) {
+    const next = {
+      ...sheet,
+      references: [
+        ...sheet.references.filter((x) => ref.kind !== 'rectangle' || x.kind !== 'rectangle'),
+        ref,
+      ],
+    }
+    if (next.references.length > 20) return say('A sheet holds at most 20 references.', true)
+    if (!frameOf(next)) return say('These points give no scale: three lie on one line.', true)
+    applyCal(() => next)
+    say(`${refNames[ref.kind].split(',')[0]} ${next.references.length} added.`)
+  }
+
+  function onPoint(p: Point) {
+    if (detect.onPoint(p) || score.onPoint(p)) return
+    if (tool === 'origin') {
+      applyCal((s) => ({ ...s, targetOrigin: p }))
+      return startTool('select')
+    }
+    if (tool === 'aim') {
+      if (frame) onGroup((g) => ({ ...g, aim: viewToTarget(frame, p) }))
+      return startTool('select')
+    }
+    const need = toolPoints[tool]
+    if (!need) return
+    const pts = [...pending, p]
+    if (pts.length < need) return setPending(pts)
+    setPending([])
+    setTool('select')
+    addReference(pts)
+  }
+
+  const describe = (sel: Selection) => {
+    const g = sheet.groups.find((x) => x.id === sel.group)
+    const s = g?.shots[sel.index]
+    if (!g || !s) return ''
+    const value = scored(g.id)?.score.shots[sel.index]
+    return `${g.name}, shot ${sel.index + 1}, x ${formatQuantity('length', system, s.x)}, y ${withUnit('length', system, s.y)}${s.excluded ? ', excluded' : ''}${value ? `, score ${shotText(value)}` : ''}`
+  }
+
+  const shotAt = (
+    sel: Selection,
+    f: (s: ShotGroup['shots'][number]) => ShotGroup['shots'][number] | undefined,
+    key?: string,
+  ) =>
+    apply(
+      (s) =>
+        withGroup(s, sel.group, (g) => ({
+          ...g,
+          shots: g.shots.flatMap((x, i) => {
+            if (i !== sel.index) return [x]
+            const y = f(x)
+            return y ? [y] : []
+          }),
+        })),
+      key,
+    )
+
+  const addShot = (q: Point) => {
+    if (!group) return
+    if (group.shots.length >= 1000) return say('A group holds at most 1000 shots.', true)
+    setSelected({ group: group.id, index: group.shots.length })
+    onGroup((g) => ({ ...g, shots: [...g.shots, { x: q.x, y: q.y, placement: 'placed' }] }))
+  }
+  const toggle = (sel: Selection) => shotAt(sel, (s) => ({ ...s, excluded: !s.excluded }))
+  const remove = (sel: Selection) => {
+    shotAt(sel, () => undefined)
+    setSelected(undefined)
+  }
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    const t = e.target as HTMLElement
+    // Escape closes a toolbar popover, not the expanded editor around it
+    if (e.key === 'Escape' && pop) {
+      e.preventDefault()
+      setPop(undefined)
+      return
+    }
+    if (t.closest('input, textarea, select')) return
+    if (shortcutMatches('undo', e.nativeEvent)) {
+      e.preventDefault()
+      setH(undo)
+    } else if (shortcutMatches('redo', e.nativeEvent)) {
+      e.preventDefault()
+      setH(redo)
+    } else if (e.key === 'Escape' && tool !== 'select') {
+      // used here: the expanded editor stays open
+      e.preventDefault()
+      startTool('select')
+    }
+  }
+
+  /** The workbench tab before Expand: the target and the key readouts only. */
+  const compact = expand !== undefined && !expand.expanded
+  const click = optic ?? options.find((o) => o.value === opticChoice)
+  const { stats, keyValues } = statsOf(group)
+
+  // ----- panels -----
+
+  // a Calibrate tool ended (set, cancelled): Calibrate opens again with the focus where it was
+  const calReturnFrom = usePopoverReturn(
+    tool,
+    () => setPop('calibrate'),
+    (which) => root.current?.querySelector<HTMLElement>(`[data-cal="${which}"]`),
+  )
+  /** A Calibrate tool: the popover closes for the clicks on the photo and opens again after. */
+  const calTool = (which: string, t: Tool) => {
+    calReturnFrom(which)
+    setPop(undefined)
+    startTool(t)
+  }
+
+  const deleteGroup = () => {
+    if (!group) return
+    // no question first: Undo puts the group back at its place; deletes in a row (a double click)
+    // share one notice, whose Undo brings every one back
+    const gone = group
+    const at = sheet.groups.findIndex((g) => g.id === gone.id)
+    const target = meta.id
+    apply((s) => ({ ...s, groups: s.groups.filter((g) => g.id !== gone.id) }))
+    setActive(undefined)
+    const before = groupUndo.current
+    const earlier = before && offered(before.n) ? before : undefined
+    const names = [...(earlier?.names ?? []), gone.name]
+    const undo = () => {
+      if (shown.current !== target) return
+      apply((s) =>
+        s.groups.some((g) => g.id === gone.id)
+          ? s
+          : { ...s, groups: [...s.groups.slice(0, at), gone, ...s.groups.slice(at)] },
+      )
+      setActive(gone.id)
+      earlier?.undo()
+    }
+    groupUndo.current = { n: offerUndo(`Deleted ${names.join(', ')}.`, undo), undo, names }
+  }
+
+  const groupScore = group && scored(group.id)
+  // a long group renders the rows in view only, at a fixed row height
+  const shotWindow = shotWindowOf(group?.shots.length ?? 0, coarse, shotScroll)
+  const { windowed } = shotWindow
+  // scroll events come only while windowed: read the scroll once it starts and on another group
+  // biome-ignore lint/correctness/useExhaustiveDependencies: on these changes only
+  useLayoutEffect(() => {
+    const e = shotScroller.current
+    if (windowed && e) setShotScroll({ top: e.scrollTop, height: e.clientHeight })
+  }, [windowed, group?.id])
+  // groups per ladder step of this load, every sheet, the open one as edited
+  const ladderRows = useMemo(() => {
+    if (!charges) return []
+    const all = [sheet, ...sheets.filter((r) => r.id !== meta.id).map((r) => r.data)]
+    return ladderExtremeSpreads(
+      all.flatMap((s) => s.groups),
+      charges,
+    )
+  }, [charges, sheet, sheets, meta.id])
+
+  const toolHint = toolHintOf(tool, frame, pending.length, detect.hint, score.hint)
+  const hint = hintOf(status, toolHint, help)
 
   /** The sheet without the photo at a fixed view, for the exports (with the statistics box) and the print. */
   const stillOf =
@@ -2157,12 +3308,12 @@ export function TargetEditor({
   }
 
   // the page template's panels on /groups only: the workbench's Groups tab keeps its layout
-  const panel = heading === undefined ? '' : ' page-panel'
+  const panel = panelOf(heading)
   const exportMenu = (
     <ExportMenu
       name={meta.name}
       photoId={sheet.photo}
-      photo={photo === 'missing' ? undefined : photo}
+      photo={shownPhoto(photo)}
       turn={sheet.photoRotation}
       view={view}
       still={stillOf(true)}
@@ -2198,302 +3349,6 @@ export function TargetEditor({
           : (at + (e.key === 'ArrowRight' ? 1 : -1) + items.length) % items.length
     items[next].focus()
   }
-
-  const overlayCount = (Object.keys(overlayNames) as Overlay[]).filter((o) => overlays[o]).length
-  const unscaled = !!sheet.photo && photo !== 'missing' && !frame
-  const toolbar = (
-    <div
-      className="target-toolbar"
-      role="toolbar"
-      aria-label="Target sheet tools"
-      onKeyDown={toolbarKeys}
-    >
-      {renaming ? (
-        <TextInput
-          aria-label="Sheet name"
-          className="sheet-select"
-          value={meta.name}
-          maxLength={200}
-          autoFocus
-          error={meta.name ? undefined : true}
-          onChange={(e) => setMeta({ ...meta, name: e.currentTarget.value })}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === 'Escape') {
-              e.preventDefault()
-              e.currentTarget.blur()
-            }
-          }}
-          onBlur={() => {
-            if (!meta.name) setMeta((m) => ({ ...m, name: 'Target sheet' }))
-            setRenaming(false)
-            requestAnimationFrame(() =>
-              root.current?.querySelector<HTMLElement>('[data-rename]')?.focus(),
-            )
-          }}
-        />
-      ) : (
-        <NativeSelect
-          aria-label="Target sheet"
-          // the narrow list cuts a long name
-          title={meta.name}
-          className="sheet-select"
-          data={[
-            ...(stored ? [] : [{ value: meta.id, label: meta.name }]),
-            ...sheets.map((r) => ({ value: r.id, label: r.id === meta.id ? meta.name : r.name })),
-          ]}
-          value={meta.id}
-          onChange={(e) => {
-            const r = sheets.find((x) => x.id === e.currentTarget.value)
-            if (r) open(r)
-          }}
-        />
-      )}
-      {/* the compact tab keeps one row: sheet management, Remove photo and Redo are in Expand */}
-      {!compact && (
-        <>
-          <IconButton label="Rename sheet" data-rename onClick={() => setRenaming(true)}>
-            <PencilSimple />
-          </IconButton>
-          <IconButton label="New sheet" onClick={() => create()}>
-            <FilePlus />
-          </IconButton>
-          <IconButton label="Delete sheet" disabled={!stored} onClick={deleteSheet}>
-            <Trash />
-          </IconButton>
-        </>
-      )}
-      <span className="toolbar-gap" />
-      {compact ? (
-        <IconButton
-          label="Photo: choose, drop or paste one; it stays in this browser and is never uploaded"
-          onClick={() => fileInput.current?.click()}
-        >
-          <ImageIcon />
-        </IconButton>
-      ) : (
-        toolPopover('photo', {
-          tip: 'Photo: add, replace or remove; contrast and darken',
-          name: 'Photo',
-          icon: (
-            <span className="icon-slot" aria-hidden="true">
-              <ImageIcon />
-            </span>
-          ),
-          children: (
-            <>
-              <h2 className="prop-head">Photo</h2>
-              <p className="note">
-                Choose, drop or paste a photo; it stays in this browser and is never uploaded.
-              </p>
-              <Flex component="span" className="row-buttons" wrap="wrap" gap={4} mb="xs">
-                <Button
-                  size={controlSize.row.button}
-                  variant="default"
-                  leftSection={<ImageIcon size={14} aria-hidden="true" />}
-                  onClick={() => {
-                    setPop(undefined)
-                    fileInput.current?.click()
-                  }}
-                >
-                  {sheet.photo ? 'Replace photo' : 'Add photo'}
-                </Button>
-                {coarse && (
-                  <Button
-                    size={controlSize.row.button}
-                    variant="default"
-                    leftSection={<Camera size={14} aria-hidden="true" />}
-                    onClick={() => {
-                      setPop(undefined)
-                      cameraInput.current?.click()
-                    }}
-                  >
-                    Camera
-                  </Button>
-                )}
-                <Button
-                  size={controlSize.row.button}
-                  variant="default"
-                  leftSection={<ImageBroken size={14} aria-hidden="true" />}
-                  disabled={!sheet.photo}
-                  onClick={() => {
-                    setPop(undefined)
-                    void removePhoto()
-                  }}
-                >
-                  Remove photo
-                </Button>
-              </Flex>
-              {filters}
-            </>
-          ),
-        })
-      )}
-      {compact && coarse && (
-        <IconButton label="Photo from the camera" onClick={() => cameraInput.current?.click()}>
-          <Camera />
-        </IconButton>
-      )}
-      <input
-        ref={fileInput}
-        type="file"
-        accept="image/*"
-        hidden
-        onChange={(e) => {
-          void takePhoto(e.currentTarget.files?.[0])
-          e.currentTarget.value = ''
-        }}
-      />
-      <input
-        ref={cameraInput}
-        type="file"
-        accept="image/*"
-        capture="environment"
-        hidden
-        onChange={(e) => {
-          void takePhoto(e.currentTarget.files?.[0])
-          e.currentTarget.value = ''
-        }}
-      />
-      {!compact &&
-        toolPopover('calibrate', {
-          tip: unscaled
-            ? 'Calibrate: the photo has no scale yet; mark a reference of known size'
-            : 'Calibrate: scale references, rotation and origin',
-          wideTip: true,
-          name: 'Calibrate',
-          description: unscaled ? 'The photo has no scale yet.' : undefined,
-          icon: (
-            <span className="icon-slot" aria-hidden="true">
-              <Ruler />
-            </span>
-          ),
-          frame: (popover) => (
-            <Indicator
-              disabled={!unscaled}
-              size={9}
-              offset={3}
-              color="orange"
-              withBorder
-              className="tool-indicator"
-              data-unscaled={unscaled || undefined}
-            >
-              {popover}
-            </Indicator>
-          ),
-          children: (
-            <>
-              <h2 className="prop-head">Calibrate</h2>
-              {scalePanel}
-            </>
-          ),
-        })}
-      <span className="toolbar-gap" />
-      <SegmentedControl
-        aria-label="Tool"
-        // an edit before the store is read is lost when the sheet opens
-        disabled={!meta.id && !storeError}
-        value={tool === 'select' || tool === 'shot' ? tool : ''}
-        onChange={(v) => startTool(v as Tool)}
-        data={[
-          {
-            value: 'select',
-            label: (
-              <Group
-                component="span"
-                display="inline-flex"
-                gap={4}
-                wrap="nowrap"
-                title="Select: drag shots, points of aim and reference points; drag the background to pan"
-              >
-                <Cursor size={14} aria-hidden="true" />
-                <span className="seg-text">Select</span>
-              </Group>
-            ),
-          },
-          {
-            value: 'shot',
-            label: (
-              <Group
-                component="span"
-                display="inline-flex"
-                gap={4}
-                wrap="nowrap"
-                title="Shot: add shots to the active group by click or tap"
-              >
-                <Target size={14} aria-hidden="true" />
-                <span className="seg-text">Shot</span>
-              </Group>
-            ),
-          },
-        ]}
-      />
-      <IconButton
-        label={`Undo (${shortcutLabel('undo')})`}
-        aria-keyshortcuts={shortcutAriaKeys('undo')}
-        disabled={!h.past.length}
-        onClick={() => setH(undo)}
-      >
-        <ArrowCounterClockwise />
-      </IconButton>
-      {!compact && (
-        <IconButton
-          label={`Redo (${shortcutLabel('redo')})`}
-          aria-keyshortcuts={shortcutAriaKeys('redo')}
-          disabled={!h.future.length}
-          onClick={() => setH(redo)}
-        >
-          <ArrowClockwise />
-        </IconButton>
-      )}
-      {toolPopover('overlays', {
-        tip: `Overlays: ${overlayCount} on`,
-        name: 'Overlays',
-        position: 'bottom-end',
-        icon: <Eye size={16} aria-hidden="true" />,
-        frame: (popover) => (
-          <Indicator
-            label={<span aria-hidden="true">{overlayCount}</span>}
-            size={14}
-            offset={3}
-            disabled={!overlayCount}
-            color="gray"
-            className="tool-indicator"
-          >
-            {popover}
-          </Indicator>
-        ),
-        children: (
-          <>
-            <fieldset className="overlay-list">
-              <legend className="overlay-legend">Overlays</legend>
-              {(Object.keys(overlayNames) as Overlay[]).map((o) => (
-                <Checkbox
-                  key={o}
-                  label={overlayNames[o]}
-                  title={overlayHelp[o]}
-                  wrapperProps={{ title: overlayHelp[o] }}
-                  checked={overlays[o]}
-                  onChange={(e) => toggleOverlay(o, e.currentTarget.checked)}
-                />
-              ))}
-            </fieldset>
-            {!compact && markerField}
-          </>
-        ),
-      })}
-      {/* on /groups in the page bar */}
-      {heading === undefined && exportMenu}
-      {expand && (
-        <IconButton
-          label={expand.expanded ? 'Close' : 'Expand'}
-          data-expand
-          onClick={() => expand.onChange(!expand.expanded)}
-        >
-          {expand.expanded ? <ArrowsIn /> : <ArrowsOut />}
-        </IconButton>
-      )}
-    </div>
-  )
 
   const notesOn = (f: NonNullable<typeof frame>, k: number, still?: boolean) => (
     <NotesLayer
@@ -2554,202 +3409,7 @@ export function TargetEditor({
       </Button>
     </span>
   )
-  const blankSheet =
-    !compact && tool === 'select' && !sheet.photo && sheet.groups.every((g) => !g.shots.length)
-
-  const photoBox =
-    photo && photo !== 'missing'
-      ? turnedBox(photo.width, photo.height, sheet.photoRotation ?? 0)
-      : undefined
-  const canvas = (
-    // biome-ignore lint/a11y/noStaticElementInteractions: drop target for a photo; Photo is the keyboard path
-    <div
-      key="canvas"
-      className="target-stage"
-      // a phone with its panels open gives the stage the photo's shape
-      style={photoBox && ({ '--photo-ratio': `${photoBox.w} / ${photoBox.h}` } as CSSProperties)}
-      onDragOver={(e) => e.preventDefault()}
-      onDrop={(e) => {
-        e.preventDefault()
-        void takePhoto([...e.dataTransfer.files].find((f) => f.type.startsWith('image/')))
-      }}
-    >
-      <TargetCanvas
-        sheet={sheet}
-        frame={frame}
-        photo={photo === 'missing' ? undefined : photo}
-        active={group?.id}
-        selected={selected}
-        tool={tool}
-        pending={pending}
-        overlays={overlays}
-        filter={filter}
-        marker={sheet.markerDiameter}
-        describe={describe}
-        statsBox={statsBox}
-        onSelect={(sel) => {
-          setSelected(sel)
-          if (sel) setActive(sel.group)
-        }}
-        onAdd={addShot}
-        onMove={(sel, q, first) => {
-          if (first) dragKey.current++
-          shotAt(sel, (s) => ({ ...s, x: q.x, y: q.y }), `drag${dragKey.current}`)
-        }}
-        onAimMove={(gid, q, first) => {
-          if (first) dragKey.current++
-          apply((s) => withGroup(s, gid, (g) => ({ ...g, aim: q })), `drag${dragKey.current}`)
-        }}
-        onRefMove={(ri, pi, p, first) => {
-          if (first) dragKey.current++
-          applyCal((s) => {
-            const r = s.references[ri]
-            const pts = refPoints(r)
-            pts[pi] = p
-            const moved: CalibrationReference =
-              r.kind === 'line'
-                ? { ...r, a: pts[0], b: pts[1] }
-                : r.kind === 'ringCentre'
-                  ? { ...r, centre: pts[0], edge: pts[1] }
-                  : r.kind === 'ringEdge'
-                    ? { ...r, points: [pts[0], pts[1], pts[2]] }
-                    : { ...r, corners: [pts[0], pts[1], pts[2], pts[3]] }
-            const next = { ...s, references: s.references.map((x, j) => (j === ri ? moved : x)) }
-            return frameOf(next) ? next : s
-          }, `drag${dragKey.current}`)
-        }}
-        onToggle={toggle}
-        onDelete={remove}
-        onNudge={(sel, dx, dy) =>
-          shotAt(
-            sel,
-            (s) => ({ ...s, x: s.x + dx, y: s.y + dy }),
-            `nudge:${sel.group}:${sel.index}`,
-          )
-        }
-        onPoint={onPoint}
-        view={view}
-        layer={(k) => (
-          <>
-            {score.layer(k)}
-            {frame && notesOn(frame, k)}
-            {detect.layer(k)}
-          </>
-        )}
-      />
-      {detect.progressBar}
-      {/* the tool hint and the last message, on the canvas: nothing moves when it changes */}
-      <p className="target-status" role="status" title={hint}>
-        {hint}
-      </p>
-      {!hint && help && (
-        <p className="target-help" aria-hidden="true">
-          {help}
-        </p>
-      )}
-      {blankSheet && (
-        <div className="canvas-start">
-          <p>
-            A drawn target. Place shots, then click where each shot hit. Or add a photo of the
-            target: choose, drop or paste one.
-          </p>
-          {startActions(controlSize.bar.button)}
-        </div>
-      )}
-      {photo === 'missing' && (
-        <p className="canvas-note">
-          The photo of this sheet is not in this browser; its shots are kept.
-        </p>
-      )}
-      {unscaled && (
-        <p className="canvas-note">Mark a reference of known size (Calibrate) to place shots.</p>
-      )}
-    </div>
-  )
-
-  const shotsHead = group && (
-    <div className="section-head">
-      <h2 className="prop-head">
-        <button
-          type="button"
-          className="head-toggle"
-          aria-expanded={shotsOpen}
-          aria-controls={`${uid}-shots`}
-          onClick={() => setShotsOpen((o) => !o)}
-        >
-          {shotsOpen ? (
-            <CaretDown size={12} aria-hidden="true" />
-          ) : (
-            <CaretUp size={12} aria-hidden="true" />
-          )}
-          Shots ({group.shots.length})
-        </button>
-      </h2>
-      {addShotButton}
-    </div>
-  )
-
-  const tabs = [
-    ['groups', 'Group'],
-    ['shots', 'Shots'],
-    ['stats', 'Stats'],
-    ['notes', 'Notes'],
-    ...(charges ? [['ladder', 'Ladder']] : []),
-  ] as [string, string][]
-  const panelOf: Record<string, ReactNode> = {
-    groups: (
-      <>
-        {groupPanel}
-        {detect.panel}
-      </>
-    ),
-    shots: (
-      <>
-        <div className="section-head">{addShotButton}</div>
-        {shotsPanel}
-      </>
-    ),
-    stats: (
-      <>
-        {headline}
-        {statsPanel}
-      </>
-    ),
-    notes: notesPanel,
-    ladder: ladderPanel,
-  }
-  const sideHead = (title: string) =>
-    panel ? (
-      <div className="page-panel-head">
-        <h2 className="page-panel-title record-heading">{title}</h2>
-      </div>
-    ) : (
-      <h2 className="prop-head">{title}</h2>
-    )
-  const sideTabs = (
-    <Tabs key="tabs" value={side} onChange={setSide} className={`target-tabs${panel}`}>
-      {panel && sideHead(group?.name ?? 'Groups')}
-      <Tabs.List>
-        {tabs.map(([v, label]) => (
-          <Tabs.Tab key={v} value={v}>
-            {label}
-          </Tabs.Tab>
-        ))}
-      </Tabs.List>
-      {tabs.map(([v]) => (
-        <Tabs.Panel key={v} value={v} className="target-side">
-          {panelOf[v]}
-        </Tabs.Panel>
-      ))}
-      {/* the group's key values under every other tab, at the panel's foot */}
-      {panel && side !== 'stats' && headline && (
-        <div className="target-summary">
-          <h3 className="prop-head">Summary</h3>
-          {headline}
-        </div>
-      )}
-    </Tabs>
-  )
+  const blankSheet = isBlank(compact, tool, sheet)
 
   /** Phones: the target fills the screen; a bottom sheet holds the panels. */
   const phone = !compact && width > 0 && width < 600
@@ -2761,117 +3421,142 @@ export function TargetEditor({
     const r = root.current?.getBoundingClientRect()
     if (r) setPhoneTop(Math.round(r.top + window.scrollY))
   }, [phone, expanded])
-  const summaryLine = group
-    ? [
-        group.name,
-        `${stats?.shotCount ?? 0} shots`,
-        ...(stats && stats.shotCount > 1 ? [`ES ${keyValue('extremeSpread')}`] : []),
-      ].join(' · ')
-    : 'No group'
-  const bottomSheet = (
-    <section
-      key="sheet"
-      className="target-sheet"
-      data-open={sheetOpen || undefined}
-      aria-label="Group panels"
-    >
-      <button
-        type="button"
-        className="sheet-strip"
-        aria-expanded={sheetOpen}
-        aria-controls={`${uid}-sheet`}
-        onClick={() => setSheetOpen((o) => !o)}
-      >
-        {group && (
-          <span className="swatch" style={{ background: group.colour }} aria-hidden="true" />
-        )}
-        <span className="strip-text">{summaryLine}</span>
-        {sheetOpen ? (
-          <CaretDown size={16} aria-hidden="true" />
-        ) : (
-          <CaretUp size={16} aria-hidden="true" />
-        )}
-        <span className="visually-hidden">{sheetOpen ? 'Hide panels' : 'Show panels'}</span>
-      </button>
-      <div id={`${uid}-sheet`} className="sheet-body" hidden={!sheetOpen}>
-        {sheetOpen && sideTabs}
-      </div>
-    </section>
+  const unscaled = isUnscaled(sheet, photo, frame)
+  /** What the canvas layers over the target: scoring, notes and hole detection. */
+  const layer = (k: number) => (
+    <>
+      {score.layer(k)}
+      {frame && notesOn(frame, k)}
+      {detect.layer(k)}
+    </>
   )
+  const ed: Ed = {
+    sheet,
+    group,
+    frame,
+    system,
+    compact,
+    tool,
+    startTool,
+    apply,
+    applyCal,
+    onGroup,
+    root,
+    score,
+    groupScore,
+    stats,
+    keyValues,
+    charges,
+    stepLabels,
+    step,
+    uid,
+    filter,
+    setFilter,
+    refKind,
+    setRefKind,
+    known,
+    setKnown,
+    calTool,
+    newDistance,
+    setActive,
+    setSelected,
+    deleteGroup,
+    scrollFocus,
+    shotWindow,
+    setShotScroll,
+    selected,
+    shotAt,
+    toggle,
+    remove,
+    optic,
+    options,
+    opticChoice,
+    setOpticChoice,
+    click,
+    ladderRows,
+    meta,
+    setMeta,
+    stored,
+    sheets,
+    setSheets,
+    open,
+    create: () => create(),
+    deleteSheet,
+    renaming,
+    setRenaming,
+    fileInput,
+    cameraInput,
+    takePhoto,
+    removePhoto,
+    coarse: !!coarse,
+    pop,
+    setPop,
+    storeError,
+    h,
+    setH,
+    overlays,
+    toggleOverlay,
+    heading,
+    exportMenu,
+    expand,
+    toolbarKeys,
+    unscaled,
+    photo,
+    pending,
+    describe,
+    addShot,
+    dragKey,
+    onPoint,
+    view,
+    detect,
+    layer,
+    hint,
+    help,
+    blankSheet,
+    startActions,
+    shotsOpen,
+    setShotsOpen,
+    notesPanel,
+    side,
+    setSide,
+    panel,
+    wide,
+    phone,
+    sheetOpen,
+    setSheetOpen,
+    fileData,
+    kept: keptOf(
+      saveFailed,
+      sheet !== opened.current.data || meta.name !== opened.current.name,
+      stored,
+    ),
+    storeFromMenu,
+    reloadStored,
+    printSheet,
+  }
 
   return (
     <>
-      {heading !== undefined && (
-        <PageBar
-          title={heading}
-          actions={
-            <>
-              {/* from the sheet's id on: the menu never runs without autosave; a placeholder keeps
-                  its place until then */}
-              {meta.id ? (
-                <FileMenu
-                  kind="targetSheet"
-                  name={meta.name || 'Target sheet'}
-                  data={fileData}
-                  autosaved={meta.id}
-                  // the save effect brings the two together again
-                  kept={
-                    saveFailed
-                      ? 'failed'
-                      : sheet !== opened.current.data || meta.name !== opened.current.name
-                        ? 'saving'
-                        : stored
-                          ? 'saved'
-                          : 'blank'
-                  }
-                  onOpen={(_, __, r) => {
-                    setSheets((list) => [r, ...list.filter((x) => x.id !== r.id)])
-                    open(r)
-                  }}
-                  onStored={reloadStored}
-                  store={storeFromMenu}
-                />
-              ) : (
-                <FileMenuPlaceholder />
-              )}
-              {exportMenu}
-              <PrintButton
-                onClick={printSheet}
-                hint={`Print: what Fit shows at a stated scale with a ruler, and the statistics (also ${shortcutLabel('print')})`}
-              />
-            </>
-          }
-        />
-      )}
+      <SheetPageBar ed={ed} />
       {/* biome-ignore lint/a11y/noStaticElementInteractions: catches undo, redo and Escape from any control of the editor, and follows the focus for the field help */}
       <div
         ref={rootRef}
         role="presentation"
         className="target-editor"
-        data-wide={(wide && !compact) || undefined}
-        data-phone={phone || undefined}
-        data-sheet={(phone && sheetOpen && !expanded) || undefined}
-        style={
-          // the height from its top edge, not a flex share of the page; with the panels open the
-          // photo and the panels below it set the height and the page scrolls
-          phoneTop !== undefined
-            ? sheetOpen
-              ? { flex: 'none' }
-              : { height: `calc(100dvh - ${phoneTop}px)`, flex: 'none' }
-            : undefined
-        }
+        {...rootAttrs(wide && !compact, phone, phone && sheetOpen && !expanded)}
+        style={editorStyle(phoneTop, sheetOpen)}
         onKeyDown={onKeyDown}
         onFocus={(e) => setHelp(helpOf(e.target))}
         onBlur={() => setHelp(undefined)}
       >
-        {toolbar}
+        <Toolbar ed={ed} />
         {printBox && (
           <TargetPrint
             name={meta.name}
             sheet={sheet}
             frame={frame}
             box={printBox}
-            photo={photo === 'missing' ? undefined : photo}
+            photo={shownPhoto(photo)}
             still={stillOf(false)}
             system={system}
             score={(g) => scoreLine(score.of(g.id))}
@@ -2880,72 +3565,7 @@ export function TargetEditor({
           />
         )}
         <div className="target-body">
-          {compact ? (
-            <>
-              {canvas}
-              {/* target first: the side column keeps its width, empty or not, so nothing moves */}
-              <aside key="key" className="target-side key-side" aria-label="Key statistics">
-                <h3 className="prop-head">{group?.name ?? 'Statistics'}</h3>
-                {group?.shots.length ? (
-                  <>
-                    {statsPanel}
-                    {shotsPanel}
-                  </>
-                ) : (
-                  <Stack gap={4}>
-                    <p className="note">
-                      {!sheet.photo
-                        ? 'A drawn target. Place shots, then click where each shot hit. Or add a photo of the target.'
-                        : frame
-                          ? 'Place shots, then click each hole.'
-                          : 'Mark a reference of known size (Expand, Calibrate) to place shots.'}
-                    </p>
-                    {startActions(controlSize.row.button)}
-                  </Stack>
-                )}
-              </aside>
-            </>
-          ) : wide ? (
-            <>
-              <aside key="left" className={`target-side${panel}`} aria-label="Groups">
-                {sideHead('Groups')}
-                {groupPanel}
-                {detect.panel}
-              </aside>
-              {canvas}
-              <aside
-                key="right"
-                className={`target-side stats-side${panel}`}
-                aria-label="Statistics and shots"
-              >
-                {sideHead('Statistics')}
-                {headline}
-                {statsPanel}
-                {shotsHead}
-                <div id={`${uid}-shots`} className="shots-body" hidden={!shotsOpen}>
-                  {shotsOpen && shotsPanel}
-                </div>
-                <h2 className="prop-head">Notes</h2>
-                {notesPanel}
-                {charges && (
-                  <>
-                    <h2 className="prop-head">Ladder</h2>
-                    {ladderPanel}
-                  </>
-                )}
-              </aside>
-            </>
-          ) : phone ? (
-            <>
-              {canvas}
-              {bottomSheet}
-            </>
-          ) : (
-            <>
-              {canvas}
-              {sideTabs}
-            </>
-          )}
+          <Body ed={ed} />
         </div>
       </div>
     </>

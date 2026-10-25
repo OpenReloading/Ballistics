@@ -50,26 +50,40 @@ function laid(r: Bullet, p: BulletProfile, medium: 'screen' | 'print') {
   return { model, side }
 }
 
+/** Draws the record under both media; its layout failures go to `failures`. False when it is refused. */
+function checkRecord(
+  r: (typeof records)[number],
+  failures: string[],
+  reasons: Map<string, number>,
+): boolean {
+  const p = recordProfile(r)
+  if ('reason' in p) {
+    if (r.length && p.reason === 'The record has no length.') failures.push(`${r.id} refused`)
+    reasons.set(p.reason, (reasons.get(p.reason) ?? 0) + 1)
+    return false
+  }
+  for (const medium of ['screen', 'print'] as const) layoutFailures(r, p, medium, failures)
+  return true
+}
+
+function layoutFailures(
+  r: (typeof records)[number],
+  p: Parameters<typeof laid>[1],
+  medium: 'screen' | 'print',
+  failures: string[],
+) {
+  const { model, side } = laid(r, p, medium)
+  for (const [name, rule] of Object.entries(sideRules))
+    for (const f of rule(side)) failures.push(`${r.id} ${medium} ${name}: ${f}`)
+  if (medium === 'screen') for (const f of textSize(model)) failures.push(`${r.id} ${f}`)
+}
+
 describe('bullet drawing over the records', () => {
   it('draws every record with a length or gives a reason, and passes every layout rule', () => {
     const failures: string[] = []
     let drawn = 0
     const reasons = new Map<string, number>()
-    for (const r of records) {
-      const p = recordProfile(r)
-      if ('reason' in p) {
-        if (r.length && p.reason === 'The record has no length.') failures.push(`${r.id} refused`)
-        reasons.set(p.reason, (reasons.get(p.reason) ?? 0) + 1)
-        continue
-      }
-      drawn++
-      for (const medium of ['screen', 'print'] as const) {
-        const { model, side } = laid(r, p, medium)
-        for (const [name, rule] of Object.entries(sideRules))
-          for (const f of rule(side)) failures.push(`${r.id} ${medium} ${name}: ${f}`)
-        if (medium === 'screen') for (const f of textSize(model)) failures.push(`${r.id} ${f}`)
-      }
-    }
+    for (const r of records) if (checkRecord(r, failures, reasons)) drawn++
     expect(failures).toEqual([])
     // every record with a length draws; the rest have no length
     expect(drawn).toBe(records.filter((r) => r.length).length)

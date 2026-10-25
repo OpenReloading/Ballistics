@@ -247,13 +247,17 @@ async function post(path: string, init: RequestInit | undefined) {
         : await runChargeTarget(context, chargeBody.parse(body))
     return answer(status, payload)
   } catch (error) {
-    if (signal?.aborted) throw signal.reason
-    if (error instanceof RecordUnread) throw error
-    if (error instanceof RecordNotFound) return refusal(404, 'Not Found', error.message)
-    const known = errorAnswer(error, { withNotice: true, truingDetails: false })
-    if (known) return answer(known.status, known.body)
-    return refusal(500, 'Internal Server Error', 'internal server error')
+    return failure(error, signal)
   }
+}
+
+function failure(error: unknown, signal: AbortSignal | undefined) {
+  if (signal?.aborted) throw signal.reason
+  if (error instanceof RecordUnread) throw error
+  if (error instanceof RecordNotFound) return refusal(404, 'Not Found', error.message)
+  const known = errorAnswer(error, { withNotice: true, truingDetails: false })
+  if (known) return answer(known.status, known.body)
+  return refusal(500, 'Internal Server Error', 'internal server error')
 }
 
 /** `apiFetch` of the Pages edition: GET from the data files, POST from the compute worker. */

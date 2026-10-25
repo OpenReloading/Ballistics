@@ -124,38 +124,50 @@ export function peaksOf(sp: Space, inside: Uint8Array, D: number, count = sp.rad
     const R = Rs[a]
     for (let i = 0; i < M.length; i++) if (R[i] > M[i]) M[i] = R[i]
   }
-  const cand: Array<{ i: number; v: number }> = []
-  for (let y = 1; y < h - 1; y++)
-    for (let x = 1, i = y * w + 1; x < w - 1; x++, i++) {
-      const v = M[i]
-      if (!(v > 0) || !inside[i]) continue
-      let top = true
-      for (let dy = -1; dy <= 1 && top; dy++)
-        for (let dx = -1; dx <= 1; dx++) {
-          const j = i + dy * w + dx
-          if ((dx || dy) && (M[j] > v || (M[j] === v && j < i))) {
-            top = false
-            break
-          }
-        }
-      if (top) cand.push({ i, v })
-    }
+  const cand = localMaxima(M, inside, w, h)
   cand.sort((a, b) => b.v - a.v)
   const out: Peak[] = []
   for (const c of cand.slice(0, 600)) {
     const [x, y] = [c.i % w, Math.floor(c.i / w)]
     if (out.some((p) => (p.x - x) ** 2 + (p.y - y) ** 2 < (NMS * D) ** 2)) continue
-    // sub-pixel position from the parabola through the neighbours
-    const sub = (m: number, c0: number, p: number) => {
-      const den = m - 2 * c0 + p
-      return den < 0 ? clamp((0.5 * (m - p)) / den, -0.5, 0.5) : 0
-    }
     out.push({
-      x: x + sub(M[c.i - 1], c.v, M[c.i + 1]),
-      y: y + sub(M[c.i - w], c.v, M[c.i + w]),
+      x: x + parabolaShift(M[c.i - 1], c.v, M[c.i + 1]),
+      y: y + parabolaShift(M[c.i - w], c.v, M[c.i + w]),
       response: c.v,
       sigma: sigmaAt(sp, c.i, count),
     })
   }
   return out
+}
+
+/** The pixels inside the mask whose positive response no neighbour beats (ties go to the lower index). */
+function localMaxima(
+  M: Float32Array,
+  inside: Uint8Array,
+  w: number,
+  h: number,
+): Array<{ i: number; v: number }> {
+  const cand: Array<{ i: number; v: number }> = []
+  for (let y = 1; y < h - 1; y++)
+    for (let x = 1, i = y * w + 1; x < w - 1; x++, i++) {
+      const v = M[i]
+      if (!(v > 0) || !inside[i]) continue
+      if (isTop(M, i, w, v)) cand.push({ i, v })
+    }
+  return cand
+}
+
+function isTop(M: Float32Array, i: number, w: number, v: number): boolean {
+  for (let dy = -1; dy <= 1; dy++)
+    for (let dx = -1; dx <= 1; dx++) {
+      const j = i + dy * w + dx
+      if ((dx || dy) && (M[j] > v || (M[j] === v && j < i))) return false
+    }
+  return true
+}
+
+/** Sub-pixel position from the parabola through the neighbours. */
+function parabolaShift(m: number, c0: number, p: number) {
+  const den = m - 2 * c0 + p
+  return den < 0 ? clamp((0.5 * (m - p)) / den, -0.5, 0.5) : 0
 }

@@ -55,6 +55,80 @@ export type BarrelStudy = {
   retry: () => void
 }
 
+type LongerAnswer = { runs?: (LongerRun | undefined)[]; message?: string }
+
+/** The longer run of the study, or its failure; nothing once the request was aborted. */
+async function requestLonger(
+  ok: Extract<Outcome, { kind: 'ok' }>,
+  single: boolean,
+  travel: number,
+  signal: AbortSignal,
+): Promise<LongerAnswer | undefined> {
+  try {
+    const res = await apiFetch('interior', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(
+        longerBody(
+          ok.load,
+          single ? [ok.load.charge] : ok.steps.map((s) => s.charge),
+          ok.direction,
+          travel,
+        ),
+      ),
+      signal,
+    })
+    const json = await res.json().catch(() => undefined)
+    if (signal.aborted) return undefined
+    if (!res.ok || json === undefined)
+      return { message: json?.message ?? `The API answered ${res.status}.` }
+    return {
+      // a step the model reports as invalid keeps its reason, as the workbench shows it
+      runs: stepsOf(json, ok.steps[0].charge).map((s) =>
+        s.body ? s.body.result : { reason: s.error?.reason ?? s.error?.message ?? 'invalid' },
+      ),
+    }
+  } catch {
+    if (signal.aborted) return undefined
+    return { message: navigator.onLine ? notReached : needsNetwork }
+  }
+}
+
+/** The rows of every step; none for a step the model reported as invalid or without a seated bullet. */
+function stepRows(
+  ok: Extract<Outcome, { kind: 'ok' }> | undefined,
+  steps: ShownStep[],
+  lengths: number[] | undefined,
+  base: number | undefined,
+  runs: LongerAnswer['runs'],
+): BarrelStep[] {
+  return steps.map(({ n, label, charge, body }, i) => ({
+    n,
+    label,
+    charge,
+    rows:
+      ok && body && lengths && base !== undefined
+        ? barrelRows({
+            result: body.result,
+            longer: runs?.[i],
+            mass: ok.load.bullet.mass,
+            baseFromHead: base,
+            lengths,
+          })
+        : undefined,
+  }))
+}
+
+/** Whether the run's barrel is the seating's barrel length, within the shown precision, 0.05 mm. */
+function atSeatingOf(
+  base: number | undefined,
+  seatedBarrel: number | undefined,
+  runTravel: number | undefined,
+) {
+  if (base === undefined || seatedBarrel === undefined || runTravel === undefined) return true
+  return Math.abs(base + runTravel - seatedBarrel) < 5e-5
+}
+
 /**
  * The study of the shown run: the range the user typed (the defaults until then), the longer run
  * for the lengths beyond the barrel, requested once the tab has been opened (`enabled`), and the
@@ -121,33 +195,8 @@ export function useBarrelStudy({
         setLonger({ key, message: `The longer run did not answer in ${requestTimeout / 1000} s.` })
       }, requestTimeout)
       try {
-        const res = await apiFetch('interior', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify(
-            longerBody(
-              ok.load,
-              single ? [ok.load.charge] : ok.steps.map((s) => s.charge),
-              ok.direction,
-              travel,
-            ),
-          ),
-          signal: controller.signal,
-        })
-        const json = await res.json().catch(() => undefined)
-        if (controller.signal.aborted) return
-        if (!res.ok || json === undefined)
-          return setLonger({ key, message: json?.message ?? `The API answered ${res.status}.` })
-        setLonger({
-          key,
-          // a step the model reports as invalid keeps its reason, as the workbench shows it
-          runs: stepsOf(json, ok.steps[0].charge).map((s) =>
-            s.body ? s.body.result : { reason: s.error?.reason ?? s.error?.message ?? 'invalid' },
-          ),
-        })
-      } catch {
-        if (!controller.signal.aborted)
-          setLonger({ key, message: navigator.onLine ? notReached : needsNetwork })
+        const answer = await requestLonger(ok, single, travel, controller.signal)
+        if (answer) setLonger({ key, ...answer })
       } finally {
         clearTimeout(late)
       }
@@ -162,24 +211,7 @@ export function useBarrelStudy({
   const got = longer?.key === key ? longer : undefined
   const pending = enabled && key !== undefined && got === undefined
   const rows = useMemo(
-    () =>
-      steps.map(
-        ({ n, label, charge, body }, i): BarrelStep => ({
-          n,
-          label,
-          charge,
-          rows:
-            ok && body && lengths && base !== undefined
-              ? barrelRows({
-                  result: body.result,
-                  longer: got?.runs?.[i],
-                  mass: ok.load.bullet.mass,
-                  baseFromHead: base,
-                  lengths,
-                })
-              : undefined,
-        }),
-      ),
+    () => stepRows(ok, steps, lengths, base, got?.runs),
     [ok, steps, lengths, base, got],
   )
   const setRange = useCallback(
@@ -188,12 +220,7 @@ export function useBarrelStudy({
   )
   const errors = 'errors' in planned ? planned.errors : undefined
   const seatedBarrel = ok?.printed.seated.barrel
-  // within the shown precision of the seating's barrel length, 0.05 mm
-  const atSeating =
-    base === undefined ||
-    seatedBarrel === undefined ||
-    runTravel === undefined ||
-    Math.abs(base + runTravel - seatedBarrel) < 5e-5
+  const atSeating = atSeatingOf(base, seatedBarrel, runTravel)
   const retry = useCallback(() => setAttempt((a) => a + 1), [])
   // a seating ladder's study holds the shown step alone (`workbench.tsx`)
   const [selected, message] = [single ? 0 : (ok?.selected ?? 0), got?.message]

@@ -104,40 +104,70 @@ function label(mask: Uint8Array, w: number, h: number): Labels {
   const box: Labels['box'] = []
   for (let start = 0; start < w * h; start++) {
     if (!mask[start] || lab[start] >= 0) continue
-    const k = area.length
-    let top = 0
-    stack[top++] = start
-    lab[start] = k
-    let n = 0
-    const b = { x0: w, y0: h, x1: -1, y1: -1 }
-    while (top) {
-      const i = stack[--top]
-      n++
-      const x = i % w
-      const y = Math.trunc(i / w)
-      if (x < b.x0) b.x0 = x
-      if (x > b.x1) b.x1 = x
-      if (y < b.y0) b.y0 = y
-      if (y > b.y1) b.y1 = y
-      const [u0, u1, v0, v1] = [
-        Math.max(0, x - 1),
-        Math.min(w - 1, x + 1),
-        Math.max(0, y - 1),
-        Math.min(h - 1, y + 1),
-      ]
-      for (let v = v0; v <= v1; v++)
-        for (let u = u0; u <= u1; u++) {
-          const j = v * w + u
-          if (mask[j] && lab[j] < 0) {
-            lab[j] = k
-            stack[top++] = j
-          }
-        }
-    }
-    area.push(n)
-    box.push(b)
+    const grown = growComponent(start, area.length, mask, lab, stack, w, h)
+    area.push(grown.n)
+    box.push(grown.box)
   }
   return { lab, area, box }
+}
+
+/** Labels the component of `start` with `k` by a flood fill: its pixel count and bounding box. */
+function growComponent(
+  start: number,
+  k: number,
+  mask: Uint8Array,
+  lab: Int32Array,
+  stack: Int32Array,
+  w: number,
+  h: number,
+) {
+  let top = 0
+  stack[top++] = start
+  lab[start] = k
+  let n = 0
+  const b = { x0: w, y0: h, x1: -1, y1: -1 }
+  while (top) {
+    const i = stack[--top]
+    n++
+    const x = i % w
+    const y = Math.trunc(i / w)
+    if (x < b.x0) b.x0 = x
+    if (x > b.x1) b.x1 = x
+    if (y < b.y0) b.y0 = y
+    if (y > b.y1) b.y1 = y
+    top = pushUnlabelled(x, y, k, mask, lab, stack, top, w, h)
+  }
+  return { n, box: b }
+}
+
+/** Labels the unlabelled mask pixels around (x, y) and pushes them on the stack; the new stack top. */
+function pushUnlabelled(
+  x: number,
+  y: number,
+  k: number,
+  mask: Uint8Array,
+  lab: Int32Array,
+  stack: Int32Array,
+  top: number,
+  w: number,
+  h: number,
+): number {
+  let next = top
+  const [u0, u1, v0, v1] = [
+    Math.max(0, x - 1),
+    Math.min(w - 1, x + 1),
+    Math.max(0, y - 1),
+    Math.min(h - 1, y + 1),
+  ]
+  for (let v = v0; v <= v1; v++)
+    for (let u = u0; u <= u1; u++) {
+      const j = v * w + u
+      if (mask[j] && lab[j] < 0) {
+        lab[j] = k
+        stack[next++] = j
+      }
+    }
+  return next
 }
 
 /** A dark area found by one threshold: its filled mask, outline and moment ellipse. */
@@ -520,6 +550,37 @@ export function refineEdge(
   }
 }
 
+/** The offset along the ray, from -span to span, of the upward crossing of `mid` nearest the ellipse. */
+function firstCrossing(at: (o: number) => number, span: number, mid: number): number | undefined {
+  let found: number | undefined
+  const step = 0.25
+  let prev = at(-span)
+  for (let o = -span + step; o <= span; o += step) {
+    const v = at(o)
+    if (prev < mid && v >= mid) {
+      const cand = o - step + ((mid - prev) / (v - prev)) * step
+      if (
+        paperSideHolds(at, o, span, mid) &&
+        (found === undefined || Math.abs(cand) < Math.abs(found))
+      )
+        found = cand
+    }
+    prev = v
+  }
+  return found
+}
+
+/** A thin line is not the edge: the paper side stays above halfway over half the span. */
+function paperSideHolds(at: (o: number) => number, o: number, span: number, mid: number) {
+  let above = 0
+  let total = 0
+  for (let q = o; q <= Math.min(span, o + span / 2); q += 0.5) {
+    total++
+    if (at(q) >= mid) above++
+  }
+  return above >= 0.7 * total
+}
+
 /**
  * The edge on the normal of `start` at parameter `t` (rad), within `span` grid px of the ellipse,
  * and the median grey levels inside and outside; undefined without a contrast or a crossing.
@@ -549,25 +610,7 @@ function edgeAlongRay(
   // the black area is darker inside than outside
   if (hi - lo < 25) return undefined
   const mid = (lo + hi) / 2
-  let found: number | undefined
-  const step = 0.25
-  let prev = at(-span)
-  for (let o = -span + step; o <= span; o += step) {
-    const v = at(o)
-    if (prev < mid && v >= mid) {
-      const cand = o - step + ((mid - prev) / (v - prev)) * step
-      // a thin line is not the edge: the paper side stays above halfway
-      let above = 0
-      let total = 0
-      for (let q = o; q <= Math.min(span, o + span / 2); q += 0.5) {
-        total++
-        if (at(q) >= mid) above++
-      }
-      if (above >= 0.7 * total && (found === undefined || Math.abs(cand) < Math.abs(found)))
-        found = cand
-    }
-    prev = v
-  }
+  const found = firstCrossing(at, span, mid)
   if (found === undefined) return undefined
   return { point: { x: px + dx * found, y: py + dy * found }, inside: lo, outside: hi }
 }
@@ -579,27 +622,31 @@ function kernel(sigma: number, order: 0 | 1 | 2): Float32Array {
   let sum = 0
   for (let i = -r; i <= r; i++) {
     const g = Math.exp(-(i * i) / (2 * sigma * sigma))
-    k[i + r] =
-      order === 0
-        ? g
-        : order === 1
-          ? (-i / (sigma * sigma)) * g
-          : ((i * i) / sigma ** 4 - 1 / (sigma * sigma)) * g
+    k[i + r] = gaussianDerivative(g, i, sigma, order)
     if (order === 0) sum += g
   }
   if (order === 0) for (let i = 0; i < k.length; i++) k[i] /= sum
-  else {
-    // zero mean for the second derivative, unit moment for the first
-    let m = 0
-    let mom = 0
-    for (let i = -r; i <= r; i++) {
-      m += k[i + r]
-      mom += i * k[i + r]
-    }
-    if (order === 2) for (let i = 0; i < k.length; i++) k[i] -= m / k.length
-    else for (let i = -r; i <= r; i++) k[i + r] /= -mom
-  }
+  else normaliseDerivative(k, r, order)
   return k
+}
+
+/** The Gaussian value `g` at offset `i` as the derivative of the given order. */
+function gaussianDerivative(g: number, i: number, sigma: number, order: 0 | 1 | 2): number {
+  if (order === 0) return g
+  if (order === 1) return (-i / (sigma * sigma)) * g
+  return ((i * i) / sigma ** 4 - 1 / (sigma * sigma)) * g
+}
+
+/** Zero mean for the second derivative, unit moment for the first. */
+function normaliseDerivative(k: Float32Array, r: number, order: 1 | 2) {
+  let m = 0
+  let mom = 0
+  for (let i = -r; i <= r; i++) {
+    m += k[i + r]
+    mom += i * k[i + r]
+  }
+  if (order === 2) for (let i = 0; i < k.length; i++) k[i] -= m / k.length
+  else for (let i = -r; i <= r; i++) k[i + r] /= -mom
 }
 
 /** 1 for a kernel with k[-i] = k[i], -1 for one with k[-i] = -k[i] (the Gaussian derivatives of order 0, 2 and 1). */
@@ -613,24 +660,44 @@ function convolve(
   kx: Float32Array,
   ky: Float32Array,
 ): Float32Array {
-  const [rx, ry] = [(kx.length - 1) / 2, (ky.length - 1) / 2]
-  const [px, py] = [parity(kx), parity(ky)]
+  const tmp = convolveRows(src, w, h, kx, parity(kx))
+  return convolveColumns(tmp, w, h, ky, parity(ky))
+}
+
+/** The kernel `kx` (parity `px`) over row `row` at column `x`; the row's edge pixels repeat. */
+function rowSum(
+  src: Float32Array,
+  row: number,
+  x: number,
+  w: number,
+  kx: Float32Array,
+  px: 1 | -1,
+): number {
+  const rx = (kx.length - 1) / 2
+  let s = kx[rx] * src[row + x]
+  if (x >= rx && x < w - rx)
+    for (let i = 1; i <= rx; i++) s += kx[rx + i] * (src[row + x + i] + px * src[row + x - i])
+  else
+    for (let i = 1; i <= rx; i++)
+      s += kx[rx + i] * (src[row + clamp(x + i, 0, w - 1)] + px * src[row + clamp(x - i, 0, w - 1)])
+  return s
+}
+
+function convolveRows(src: Float32Array, w: number, h: number, kx: Float32Array, px: 1 | -1) {
   const tmp = new Float32Array(w * h)
   for (let y = 0; y < h; y++) {
     const row = y * w
     for (let x = 0; x < w; x++) {
-      let s = kx[rx] * src[row + x]
-      if (x >= rx && x < w - rx)
-        for (let i = 1; i <= rx; i++) s += kx[rx + i] * (src[row + x + i] + px * src[row + x - i])
-      else
-        for (let i = 1; i <= rx; i++)
-          s +=
-            kx[rx + i] *
-            (src[row + clamp(x + i, 0, w - 1)] + px * src[row + clamp(x - i, 0, w - 1)])
+      const s = rowSum(src, row, x, w, kx, px)
       tmp[row + x] = s
     }
   }
-  // columns, a row at a time: the reads stay in order
+  return tmp
+}
+
+/** The columns, a row at a time: the reads stay in order. */
+function convolveColumns(tmp: Float32Array, w: number, h: number, ky: Float32Array, py: 1 | -1) {
+  const ry = (ky.length - 1) / 2
   const out = new Float32Array(w * h)
   for (let y = 0; y < h; y++) {
     const row = y * w
@@ -673,7 +740,13 @@ export function ridges(
   return { components: hysteresisComponents(thin, grid.width, grid.height, minLength) }
 }
 
-type Hessian = ReturnType<typeof hessianStrength>
+type Hessian = {
+  strength: Float32Array
+  normalX: Float32Array
+  normalY: Float32Array
+  sgn: Int8Array
+  sigmaAt: Float32Array
+}
 
 /**
  * Per pixel the strongest line response over the scales (the dominant Hessian eigenvalue times
@@ -681,45 +754,87 @@ type Hessian = ReturnType<typeof hessianStrength>
  * and its sigma.
  */
 function hessianStrength(grid: Grid, searchMask: Uint8Array, sigmas: number[]) {
-  const { width: w, height: h, grey: g } = grid
-  const n = w * h
-  const strength = new Float32Array(n)
-  const normalX = new Float32Array(n)
-  const normalY = new Float32Array(n)
-  const sgn = new Int8Array(n)
-  const sigmaAt = new Float32Array(n)
-  for (const sigma of sigmas) {
-    const [k0, k1, k2] = [kernel(sigma, 0), kernel(sigma, 1), kernel(sigma, 2)]
-    const lxx = convolve(g, w, h, k2, k0)
-    const lyy = convolve(g, w, h, k0, k2)
-    const lxy = convolve(g, w, h, k1, k1)
-    const s2 = sigma * sigma
-    for (let i = 0; i < n; i++) {
-      if (!searchMask[i]) continue
-      const mid = (lxx[i] + lyy[i]) / 2
-      const half = (lxx[i] - lyy[i]) / 2
-      const rad = Math.sqrt(half * half + lxy[i] * lxy[i])
-      const [e1, e2] = [mid + rad, mid - rad]
-      // bright line: e2 very negative; dark line: e1 very positive
-      const bright = -e2 > e1
-      const [main, other] = bright ? [-e2, Math.abs(e1)] : [e1, Math.abs(e2)]
-      if (other > main / 3) continue
-      const v = main * s2
-      if (v <= strength[i]) continue
-      strength[i] = v
-      sgn[i] = bright ? 1 : -1
-      sigmaAt[i] = sigma
-      // normal: eigenvector of the dominant eigenvalue
-      const e = bright ? e2 : e1
-      let [vx, vy] = [lxy[i], e - lxx[i]]
-      const l = Math.hypot(vx, vy)
-      if (l < 1e-9) [vx, vy] = [1, 0]
-      else [vx, vy] = [vx / l, vy / l]
-      normalX[i] = vx
-      normalY[i] = vy
-    }
+  const n = grid.width * grid.height
+  const acc = {
+    strength: new Float32Array(n),
+    normalX: new Float32Array(n),
+    normalY: new Float32Array(n),
+    sgn: new Int8Array(n),
+    sigmaAt: new Float32Array(n),
   }
-  return { strength, normalX, normalY, sgn, sigmaAt }
+  for (const sigma of sigmas) accumulateScale(grid, searchMask, sigma, acc)
+  return acc
+}
+
+/** The vector scaled to length 1, (1, 0) for a null one. */
+function unitVector(vx: number, vy: number): [number, number] {
+  const l = Math.hypot(vx, vy)
+  return l < 1e-9 ? [1, 0] : [vx / l, vy / l]
+}
+
+/** Raises the line response in `acc` where the scale `sigma` gives a stronger one. */
+function accumulateScale(
+  { width: w, height: h, grey: g }: Grid,
+  searchMask: Uint8Array,
+  sigma: number,
+  { strength, normalX, normalY, sgn, sigmaAt }: Hessian,
+) {
+  const n = w * h
+  const [k0, k1, k2] = [kernel(sigma, 0), kernel(sigma, 1), kernel(sigma, 2)]
+  const lxx = convolve(g, w, h, k2, k0)
+  const lyy = convolve(g, w, h, k0, k2)
+  const lxy = convolve(g, w, h, k1, k1)
+  const s2 = sigma * sigma
+  for (let i = 0; i < n; i++) {
+    if (!searchMask[i]) continue
+    const mid = (lxx[i] + lyy[i]) / 2
+    const half = (lxx[i] - lyy[i]) / 2
+    const rad = Math.sqrt(half * half + lxy[i] * lxy[i])
+    const [e1, e2] = [mid + rad, mid - rad]
+    // bright line: e2 very negative; dark line: e1 very positive
+    const bright = -e2 > e1
+    const [main, other] = bright ? [-e2, Math.abs(e1)] : [e1, Math.abs(e2)]
+    if (other > main / 3) continue
+    const v = main * s2
+    if (v <= strength[i]) continue
+    strength[i] = v
+    sgn[i] = bright ? 1 : -1
+    sigmaAt[i] = sigma
+    // normal: eigenvector of the dominant eigenvalue
+    const e = bright ? e2 : e1
+    ;[normalX[i], normalY[i]] = unitVector(lxy[i], e - lxx[i])
+  }
+}
+
+/** Whether either neighbour is stronger than `v`. */
+const exceeds = (v: number, a: number, b: number) => a > v || b > v
+
+/** A line, not a step: both sides at distance `d` along the normal are lower (bright) or higher (dark). */
+function isLine(
+  g: Float32Array,
+  w: number,
+  h: number,
+  x: number,
+  y: number,
+  nx: number,
+  ny: number,
+  sign: number,
+  d: number,
+): boolean {
+  const i = y * w + x
+  const [a, b] = [
+    sampleBilinear(g, w, h, x + nx * d, y + ny * d),
+    sampleBilinear(g, w, h, x - nx * d, y - ny * d),
+  ]
+  const diffA = sign * (g[i] - a)
+  const diffB = sign * (g[i] - b)
+  return !(Math.min(diffA, diffB) < 0.35 * Math.max(diffA, diffB) || !(diffA > 0 && diffB > 0))
+}
+
+/** The sub-pixel offset of the peak by a parabola through the three strengths. */
+function parabolaOffset(m1: number, v: number, p1: number): number {
+  const den = m1 - 2 * v + p1
+  return den < 0 ? clamp((0.5 * (m1 - p1)) / den, -0.5, 0.5) : 0
 }
 
 /**
@@ -743,22 +858,11 @@ function thinRidges(
       if (v < low) continue
       const [nx, ny] = [normalX[i], normalY[i]]
       const at = (o: number) => strength[Math.round(y + ny * o) * w + Math.round(x + nx * o)]
-      if (at(1) > v || at(-1) > v) continue
-      // a line, not a step: both sides at 2 sigma are lower (bright) or higher (dark)
-      const d = 2 * sigmaAt[i]
-      const [a, b] = [
-        sampleBilinear(g, w, h, x + nx * d, y + ny * d),
-        sampleBilinear(g, w, h, x - nx * d, y - ny * d),
-      ]
-      const diffA = sgn[i] * (g[i] - a)
-      const diffB = sgn[i] * (g[i] - b)
-      if (Math.min(diffA, diffB) < 0.35 * Math.max(diffA, diffB) || !(diffA > 0 && diffB > 0))
-        continue
+      if (exceeds(v, at(1), at(-1))) continue
+      if (!isLine(g, w, h, x, y, nx, ny, sgn[i], 2 * sigmaAt[i])) continue
       thin[i] = v >= high ? 2 : 1
       // sub-pixel offset along the normal by a parabola through the three strengths
-      const [m1, p1] = [at(-1), at(1)]
-      const den = m1 - 2 * v + p1
-      const off = den < 0 ? clamp((0.5 * (m1 - p1)) / den, -0.5, 0.5) : 0
+      const off = parabolaOffset(at(-1), v, at(1))
       sub[2 * i] = x + nx * off
       sub[2 * i + 1] = y + ny * off
     }

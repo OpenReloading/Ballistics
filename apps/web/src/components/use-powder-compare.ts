@@ -13,7 +13,11 @@ import {
 } from '../lib/charge-target.ts'
 import { errorText } from '../lib/error-text.ts'
 import type { InteriorBody } from '../lib/interior-input.ts'
-import { fetchManufacturerNames, noManufacturerNames } from '../lib/manufacturers.ts'
+import {
+  fetchManufacturerNames,
+  type ManufacturerNames,
+  noManufacturerNames,
+} from '../lib/manufacturers.ts'
 import {
   type CompareMode,
   compareCharge,
@@ -108,6 +112,97 @@ type PowderCompare = {
   cancel: () => void
 }
 
+type RowHead = Pick<CompareRow, 'id' | 'manufacturerName' | 'name' | 'base' | 'form'>
+
+/** The identity columns of a row. */
+const rowHead = (names: ManufacturerNames, s: PowderSummary): RowHead => ({
+  id: s.id,
+  manufacturerName: names.get(s.manufacturer) ?? '',
+  name: s.name,
+  base: s.propellantBase,
+  form: s.grainForm,
+})
+
+type RowContext = {
+  loadRequest: UseWorkbenchStateResult['loadRequest']
+  mode: CompareMode
+  /** The workbench's charge, kg. */
+  typed: number
+  /** The free volume of the chamber, m3. */
+  volume: number
+  batch: AbortSignal
+  /** The cartridge has no comparable limit: the rest of the batch gets that reason. */
+  onNoLimit: (refusal: ChargeTargetRefusal) => void
+}
+
+/** The powder's record when it has model parameters, else the row that says why not. */
+async function recordFor(
+  head: RowHead,
+  id: string,
+  batch: AbortSignal,
+): Promise<{ record: Powder } | { row: CompareRow | undefined }> {
+  let record: Powder | undefined
+  try {
+    record = await fetchPowder(id, batch)
+  } catch {
+    return { row: batch.aborted ? undefined : { ...head, reason: 'The API did not answer.' } }
+  }
+  if (!record) return { row: { ...head, reason: 'The powder record was not found.' } }
+  if (!record.interior) return { row: { ...head, reason: 'No fitted model parameters' } }
+  return { record }
+}
+
+/** A target mode row: one solver task per powder, the charge is the answer, so a refusal has none. */
+async function targetRow(
+  cx: RowContext,
+  head: RowHead,
+  req: ReturnType<RowContext['loadRequest']>,
+  mode: Extract<CompareMode, { kind: 'target' }>,
+): Promise<CompareRow | undefined> {
+  const run = await postJson<ChargeTargetResponse>(
+    'interior/charge-target',
+    chargeTargetBody(req.body, req.bulkDensity, {
+      kind: 'peakPressure',
+      value: mode.value,
+      percent: mode.percent,
+    }),
+    cx.batch,
+  )
+  if (!run) return undefined
+  if ('reason' in run) {
+    if (run.refusal?.reason === 'noComparableLimit') cx.onNoLimit(run.refusal)
+    return { ...head, reason: run.reason, refusal: run.refusal }
+  }
+  const { charge: solved, result } = run.answer
+  const answer = { ...run.answer, result: { ...result, points: [] } } as InteriorResponse
+  return answerRow(head, req, solved, answer)
+}
+
+/** One powder's row: its record, then its run, or the reason it has none. */
+async function powderRow(
+  cx: RowContext,
+  head: RowHead,
+  s: PowderSummary,
+): Promise<CompareRow | undefined> {
+  if (!s.interior) return { ...head, reason: 'No fitted model parameters' }
+  const fetched = await recordFor(head, s.id, cx.batch)
+  if ('row' in fetched) return fetched.row
+  const { record } = fetched
+  const charge = compareCharge(cx.mode, cx.typed, record.bulkDensity?.value, cx.volume)
+  if (charge === undefined) return { ...head, reason: 'No bulk density in the record' }
+  let req: ReturnType<RowContext['loadRequest']>
+  try {
+    req = cx.loadRequest({ powder: record, charge })
+  } catch (err) {
+    return { ...head, charge, reason: errorText(err) }
+  }
+  if (cx.mode.kind === 'target') return targetRow(cx, head, req, cx.mode)
+  const run = await postInteriorRun(req.body, cx.batch)
+  if (!run) return undefined
+  if ('reason' in run) return { ...head, charge, reason: run.reason }
+  return answerRow(head, req, charge, run.answer)
+}
+
 /**
  * The rows of the Powders tab: every powder of the API for the load `base` under `mode`, in batches
  * of `compareConcurrency` requests, by place in the powder list. `on.start` gets the number of
@@ -135,62 +230,19 @@ export async function computeRows(
   const stop = new AbortController()
   const batch = AbortSignal.any([signal, stop.signal])
   let noLimit: ChargeTargetRefusal | undefined
-  const { charge: typed, chamber } = base.body.load
-  const headOf = (s: PowderSummary) => ({
-    id: s.id,
-    manufacturerName: names.get(s.manufacturer) ?? '',
-    name: s.name,
-    base: s.propellantBase,
-    form: s.grainForm,
-  })
-  const computeOne = async (s: PowderSummary): Promise<CompareRow | undefined> => {
-    const head = headOf(s)
-    if (!s.interior) return { ...head, reason: 'No fitted model parameters' }
-    let record: Powder | undefined
-    try {
-      record = await fetchPowder(s.id, batch)
-    } catch {
-      if (batch.aborted) return undefined
-      return { ...head, reason: 'The API did not answer.' }
-    }
-    if (!record) return { ...head, reason: 'The powder record was not found.' }
-    if (!record.interior) return { ...head, reason: 'No fitted model parameters' }
-    const charge = compareCharge(mode, typed, record.bulkDensity?.value, chamber.volume)
-    if (charge === undefined) return { ...head, reason: 'No bulk density in the record' }
-    let req: ReturnType<typeof loadRequest>
-    try {
-      req = loadRequest({ powder: record, charge })
-    } catch (err) {
-      return { ...head, charge, reason: errorText(err) }
-    }
-    if (mode.kind === 'target') {
-      // one solver task per powder: the charge is the answer, so a refusal has none
-      const run = await postJson<ChargeTargetResponse>(
-        'interior/charge-target',
-        chargeTargetBody(req.body, req.bulkDensity, {
-          kind: 'peakPressure',
-          value: mode.value,
-          percent: mode.percent,
-        }),
-        batch,
-      )
-      if (!run) return undefined
-      if ('reason' in run) {
-        if (run.refusal?.reason === 'noComparableLimit') {
-          noLimit = run.refusal
-          stop.abort()
-        }
-        return { ...head, reason: run.reason, refusal: run.refusal }
-      }
-      const { charge: solved, result } = run.answer
-      const answer = { ...run.answer, result: { ...result, points: [] } } as InteriorResponse
-      return answerRow(head, req, solved, answer)
-    }
-    const run = await postInteriorRun(req.body, batch)
-    if (!run) return undefined
-    if ('reason' in run) return { ...head, charge, reason: run.reason }
-    return answerRow(head, req, charge, run.answer)
+  const cx: RowContext = {
+    loadRequest,
+    mode,
+    typed: base.body.load.charge,
+    volume: base.body.load.chamber.volume,
+    batch,
+    onNoLimit: (refusal) => {
+      noLimit = refusal
+      stop.abort()
+    },
   }
+  const headOf = (s: PowderSummary) => rowHead(names, s)
+  const computeOne = (s: PowderSummary) => powderRow(cx, headOf(s), s)
   const slots: (CompareRow | undefined)[] = []
   const produced = () => slots.filter((r): r is CompareRow => r !== undefined)
   on.start(powders.length)
@@ -206,6 +258,25 @@ export async function computeRows(
         : { ...headOf(s), reason: 'No fitted model parameters' }
     })
   return { rows: produced(), total: powders.length, noLimit }
+}
+
+/** The line after a batch that stopped early: no comparable limit, or cancelled. */
+function endMessage(
+  done: { rows: CompareRow[]; total: number; noLimit?: ChargeTargetRefusal },
+  aborted: boolean,
+) {
+  if (done.noLimit && !aborted) return `Stopped. ${noComparableLimitText}`
+  if (aborted) return `Cancelled after ${done.rows.length} of ${done.total} powders.`
+  return
+}
+
+/** The workbench's load as a request, or why it cannot be built. */
+function baseRequest(loadRequest: UseWorkbenchStateResult['loadRequest']) {
+  try {
+    return { base: loadRequest() }
+  } catch (err) {
+    return { message: errorText(err) }
+  }
 }
 
 /**
@@ -229,12 +300,9 @@ export function usePowderCompare(
 
   async function compute() {
     controller.current?.abort()
-    let base: ReturnType<typeof loadRequest>
-    try {
-      base = loadRequest()
-    } catch (err) {
-      return setMessage(errorText(err))
-    }
+    const built = baseRequest(loadRequest)
+    if ('message' in built) return setMessage(built.message)
+    const { base } = built
     const abort = new AbortController()
     controller.current = abort
     const { signal } = abort
@@ -273,10 +341,8 @@ export function usePowderCompare(
       if (!done) return
       produced = () => done.rows
       flush()
-      if (done.noLimit && !signal.aborted && current())
-        setMessage(`Stopped. ${noComparableLimitText}`)
-      else if (signal.aborted && current())
-        setMessage(`Cancelled after ${done.rows.length} of ${done.total} powders.`)
+      const ended = endMessage(done, signal.aborted)
+      if (ended && current()) setMessage(ended)
     } catch (err) {
       if (!signal.aborted) setMessage(errorText(err))
     } finally {

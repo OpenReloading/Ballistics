@@ -64,6 +64,157 @@ function useCatalogue(opened: boolean) {
 const massText = (row: BulletRow, system: UnitSystem, cells: ReturnType<typeof bulletCells>) =>
   row.mass === null ? 'n/a' : `${cells.mass} ${system.mass.symbol}`
 
+const keySteps: Record<string, number> = { ArrowDown: 1, ArrowUp: -1, PageDown: 8, PageUp: -8 }
+
+/** Enter chooses the highlighted bullet, the arrow and page keys move the highlight. */
+function searchKey(
+  e: React.KeyboardEvent<HTMLInputElement>,
+  choose: () => void,
+  move: (by: number) => void,
+) {
+  // Ctrl+Enter (Cmd+Enter) stays free for the calculator's run shortcut
+  if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey) {
+    e.preventDefault()
+    choose()
+    return
+  }
+  const step = keySteps[e.key]
+  if (step === undefined) return
+  e.preventDefault()
+  move(step)
+}
+
+function statusMessage(state: Catalogue, found: number, total: number) {
+  if (state.status === 'loading') return 'Loading bullets'
+  if (state.status === 'error') return ''
+  if (found === total) return `${total} bullets`
+  const cut = found > shownRows ? `, first ${shownRows} shown` : ''
+  return `${found} of ${total} bullets${cut}`
+}
+
+function ResultRow({
+  row,
+  index,
+  id,
+  active,
+  system,
+  onActive,
+  onChoose,
+}: {
+  row: BulletRow
+  index: number
+  id: string
+  active: number
+  system: UnitSystem
+  onActive: (i: number) => void
+  onChoose: (row: BulletRow) => void
+}) {
+  const cells = bulletCells(row, system)
+  const bc = bulletBallisticCoefficient(row)
+  const mass = massText(row, system, cells)
+  const bcText = bc ? ballisticCoefficientText(bc) : 'n/a'
+  return (
+    // keyboard: the search box owns the focus and moves the highlight
+    // biome-ignore lint/a11y/useKeyWithClickEvents: see above
+    <div
+      id={`${id}-option-${index}`}
+      role="option"
+      tabIndex={-1}
+      // the search box keeps the focus when a row is pressed
+      onMouseDown={(e) => e.preventDefault()}
+      aria-selected={index === active}
+      className="bd-row"
+      data-active={index === active || undefined}
+      onMouseMove={() => index !== active && onActive(index)}
+      onClick={() => onChoose(row)}
+    >
+      <span className="bd-name">
+        {row.manufacturerName && <span className="bd-maker">{row.manufacturerName}</span>}
+        <span>
+          {row.name}
+          {row.origin && (
+            <Badge ml="xs" variant="light">
+              Your design
+            </Badge>
+          )}
+        </span>
+      </span>
+      <span>{cells.caliber}</span>
+      <span>{mass}</span>
+      <span>{bcText}</span>
+    </div>
+  )
+}
+
+function Results({
+  status,
+  retry,
+  shown,
+  id,
+  active,
+  system,
+  onActive,
+  onChoose,
+}: {
+  status: Catalogue['status']
+  retry: () => void
+  shown: BulletRow[]
+  id: string
+  active: number
+  system: UnitSystem
+  onActive: (i: number) => void
+  onChoose: (row: BulletRow) => void
+}) {
+  if (status === 'error')
+    return (
+      <ErrorNote title="The bullets could not be read." onRetry={retry}>
+        The server did not answer. The designer and the workbench still work.
+      </ErrorNote>
+    )
+  if (shown.length === 0)
+    return status === 'ok' ? (
+      <EmptyNote
+        icon={<MagnifyingGlass size={20} aria-hidden="true" />}
+        title="No bullet matches"
+        description="Remove a filter or a word."
+      />
+    ) : null
+  return (
+    <div className="bd-list-wrap">
+      <div className="bd-head" aria-hidden="true">
+        <span>Bullet</span>
+        <span>Caliber</span>
+        <span>Mass</span>
+        <span>BC</span>
+      </div>
+      <div id={`${id}-list`} role="listbox" aria-label="Bullets" className="bd-list">
+        {shown.map((row, i) => (
+          <ResultRow
+            key={row.id}
+            row={row}
+            index={i}
+            id={id}
+            active={active}
+            system={system}
+            onActive={onActive}
+            onChoose={onChoose}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/** The manufacturer options, each with its number of bullets. */
+function manufacturerChoices(catalogue: BulletItem[]) {
+  const counts = new Map<string, number>()
+  for (const r of catalogue) counts.set(r.manufacturer, (counts.get(r.manufacturer) ?? 0) + 1)
+  return manufacturerOptions(catalogue).map((o) => ({
+    ...o,
+    label: `${o.label} (${counts.get(o.value)})`,
+  }))
+}
+
 /**
  * The bullet picker of a workbench card as a dialog: a search box over the whole catalogue and the
  * browser's own designs (several words in any order, a caliber such as 308, a weight such as 168
@@ -156,27 +307,14 @@ export function BulletSearchDialog({
       document.getElementById(`${id}-option-${active}`)?.scrollIntoView({ block: 'nearest' })
   }, [active, opened, current, id])
 
-  const manufacturers = useMemo(() => {
-    const counts = new Map<string, number>()
-    for (const r of catalogue) counts.set(r.manufacturer, (counts.get(r.manufacturer) ?? 0) + 1)
-    return manufacturerOptions(catalogue).map((o) => ({
-      ...o,
-      label: `${o.label} (${counts.get(o.value)})`,
-    }))
-  }, [catalogue])
+  const manufacturers = useMemo(() => manufacturerChoices(catalogue), [catalogue])
   const calibers = useMemo(() => caliberOptions(rows.map((r) => r.diameter)), [rows])
   const filterCount = [manufacturer, caliber, mass, origin !== 'all' && origin].filter(
     Boolean,
   ).length
 
   const total = rows.length
-  let message = ''
-  if (state.status === 'loading') message = 'Loading bullets'
-  else if (state.status === 'ok')
-    message =
-      results.length === total
-        ? `${total} bullets`
-        : `${results.length} of ${total} bullets${results.length > shownRows ? `, first ${shownRows} shown` : ''}`
+  const message = statusMessage(state, results.length, total)
 
   function move(by: number) {
     if (shown.length === 0) return
@@ -188,6 +326,7 @@ export function BulletSearchDialog({
   }
 
   const list = shown.length > 0
+  const listAria = { 'aria-controls': `${id}-list`, 'aria-activedescendant': optionId(active) }
   return (
     <AppModal
       opened={opened}
@@ -210,32 +349,9 @@ export function BulletSearchDialog({
           onChange={(e) => setQuery(e.currentTarget.value)}
           role="combobox"
           aria-expanded={list}
-          aria-controls={list ? `${id}-list` : undefined}
-          aria-activedescendant={list ? optionId(active) : undefined}
+          {...(list && listAria)}
           aria-autocomplete="list"
-          onKeyDown={(e) => {
-            // Ctrl+Enter (Cmd+Enter) stays free for the calculator's run shortcut
-            if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey) {
-              e.preventDefault()
-              choose(current)
-            } else if (
-              e.key === 'ArrowDown' ||
-              e.key === 'ArrowUp' ||
-              e.key === 'PageDown' ||
-              e.key === 'PageUp'
-            ) {
-              e.preventDefault()
-              move(
-                e.key === 'ArrowDown'
-                  ? 1
-                  : e.key === 'ArrowUp'
-                    ? -1
-                    : e.key === 'PageDown'
-                      ? 8
-                      : -8,
-              )
-            }
-          }}
+          onKeyDown={(e) => searchKey(e, () => choose(current), move)}
         />
         <div className="bd-filter-bar">
           <Button
@@ -330,70 +446,16 @@ export function BulletSearchDialog({
           {message}
         </p>
         <div className="bd-body">
-          {state.status === 'error' ? (
-            <ErrorNote title="The bullets could not be read." onRetry={retry}>
-              The server did not answer. The designer and the workbench still work.
-            </ErrorNote>
-          ) : state.status === 'ok' && !list ? (
-            <EmptyNote
-              icon={<MagnifyingGlass size={20} aria-hidden="true" />}
-              title="No bullet matches"
-              description="Remove a filter or a word."
-            />
-          ) : (
-            list && (
-              <div className="bd-list-wrap">
-                <div className="bd-head" aria-hidden="true">
-                  <span>Bullet</span>
-                  <span>Caliber</span>
-                  <span>Mass</span>
-                  <span>BC</span>
-                </div>
-                <div id={`${id}-list`} role="listbox" aria-label="Bullets" className="bd-list">
-                  {shown.map((row, i) => {
-                    const cells = bulletCells(row, system)
-                    const bc = bulletBallisticCoefficient(row)
-                    const mass = massText(row, system, cells)
-                    const bcText = bc ? ballisticCoefficientText(bc) : 'n/a'
-                    return (
-                      // keyboard: the search box owns the focus and moves the highlight
-                      // biome-ignore lint/a11y/useKeyWithClickEvents: see above
-                      <div
-                        key={row.id}
-                        id={optionId(i)}
-                        role="option"
-                        tabIndex={-1}
-                        // the search box keeps the focus when a row is pressed
-                        onMouseDown={(e) => e.preventDefault()}
-                        aria-selected={i === active}
-                        className="bd-row"
-                        data-active={i === active || undefined}
-                        onMouseMove={() => i !== active && setActive(i)}
-                        onClick={() => choose(row)}
-                      >
-                        <span className="bd-name">
-                          {row.manufacturerName && (
-                            <span className="bd-maker">{row.manufacturerName}</span>
-                          )}
-                          <span>
-                            {row.name}
-                            {row.origin && (
-                              <Badge ml="xs" variant="light">
-                                Your design
-                              </Badge>
-                            )}
-                          </span>
-                        </span>
-                        <span>{cells.caliber}</span>
-                        <span>{mass}</span>
-                        <span>{bcText}</span>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )
-          )}
+          <Results
+            status={state.status}
+            retry={retry}
+            shown={shown}
+            id={id}
+            active={active}
+            system={system}
+            onActive={setActive}
+            onChoose={choose}
+          />
           {current && !phone && <Preview row={current} system={system} />}
         </div>
       </div>

@@ -117,6 +117,485 @@ function RefShape({ r }: { r: CalibrationReference }) {
   return <circle cx={c.centre.x} cy={c.centre.y} r={c.radius} />
 }
 
+/** The extent to fit: the photo, or every point drawn with a margin. */
+function extentOf(
+  sheet: TargetSheet,
+  frame: Frame | undefined,
+  photo: { width: number; height: number } | undefined,
+): ViewBox {
+  if (photo) return turnedBox(photo.width, photo.height, sheet.photoRotation ?? 0)
+  const pts: Point[] = []
+  if (frame)
+    for (const g of sheet.groups) {
+      for (const s of g.shots) pts.push(targetToView(frame, s))
+      if (g.aim) pts.push(targetToView(frame, g.aim))
+    }
+  for (const r of sheet.references) pts.push(...refPoints(r))
+  // a drawn target: at least 200 mm around the origin
+  if (!sheet.photo) pts.push({ x: -100, y: -100 }, { x: 100, y: 100 })
+  if (!pts.length) return { x: 0, y: 0, w: 1000, h: 1000 }
+  const xs = pts.map((p) => p.x)
+  const ys = pts.map((p) => p.y)
+  const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)]
+  const m = 0.1 * Math.max(x1 - x0, y1 - y0, 1)
+  return { x: x0 - m, y: y0 - m, w: x1 - x0 + 2 * m, h: y1 - y0 + 2 * m }
+}
+
+type ShotHandlers = {
+  onNudge?: (sel: Selection, dx: number, dy: number) => void
+  onDelete?: (sel: Selection) => void
+  onToggle?: (sel: Selection) => void
+}
+
+/** The arrows, Home and End move the focus along the shots of the group (one tab stop per group). */
+function focusAlong(
+  e: KeyboardEvent<SVGElement>,
+  sel: Selection,
+  d: readonly [number, number] | undefined,
+) {
+  e.preventDefault()
+  const shots =
+    e.currentTarget.parentElement?.parentElement?.querySelectorAll<SVGElement>('.shot-hit')
+  const last = (shots?.length ?? 1) - 1
+  const step = d && d[0] + d[1] > 0 ? 1 : -1
+  const to = e.key === 'Home' ? 0 : e.key === 'End' ? last : sel.index + step
+  shots?.[Math.max(0, Math.min(last, to))]?.focus()
+}
+
+/** The keys of a shot's mark: Alt+arrows nudge, arrows and Home and End move the focus, Delete removes, E or Space toggles. */
+function shotKey(
+  e: KeyboardEvent<SVGElement>,
+  sel: Selection,
+  s: Point,
+  frame: Frame | undefined,
+  h: ShotHandlers,
+) {
+  const d = arrows[e.key]
+  if (d && e.altKey && frame) {
+    // also keeps Alt+Left from going back in the history
+    e.preventDefault()
+    // along the screen, whatever the rotation of the target axes
+    const n = screenNudge(frame, s, ...d, e.shiftKey ? 1e-3 : 1e-4)
+    h.onNudge?.(sel, n.x - s.x, n.y - s.y)
+    return
+  }
+  // the browser's own shortcuts (Ctrl+E, Ctrl+Home, Alt+Backspace) stay the browser's
+  if (e.ctrlKey || e.metaKey || e.altKey) return
+  if (d || e.key === 'Home' || e.key === 'End') return focusAlong(e, sel, d)
+  if (e.key === 'Delete' || e.key === 'Backspace') {
+    e.preventDefault()
+    h.onDelete?.(sel)
+  } else if (e.key === 'e' || e.key === 'E' || e.key === ' ') {
+    e.preventDefault()
+    h.onToggle?.(sel)
+  }
+}
+
+/** The calibration references on the photo: their shapes with a handle per point, and the clicks so far. */
+function RefsLayer({
+  references,
+  pending,
+  k,
+  onHandle,
+}: {
+  references: CalibrationReference[]
+  pending: Point[]
+  k: number
+  onHandle: (e: PointerEvent<SVGElement>, ref: number, point: number) => void
+}) {
+  return (
+    // biome-ignore lint/a11y/noAriaHiddenOnFocusable: an SVG group is not focusable; it only draws
+    <g className="refs" aria-hidden="true">
+      {references.map((r, ri) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: references keep their order
+        <g key={ri}>
+          <RefShape r={r} />
+          {refPoints(r).map((p, pi) => (
+            <circle
+              // biome-ignore lint/suspicious/noArrayIndexKey: points keep their order
+              key={pi}
+              className="handle"
+              cx={p.x}
+              cy={p.y}
+              r={5 * k}
+              onPointerDown={(e) => onHandle(e, ri, pi)}
+            />
+          ))}
+        </g>
+      ))}
+      {pending.map((p, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: clicks keep their order
+        <circle key={i} className="handle pending" cx={p.x} cy={p.y} r={5 * k} />
+      ))}
+      {pending.length > 1 && <polyline className="pending" points={polyline(pending)} />}
+    </g>
+  )
+}
+
+/** The x and y axes of the calibrated sheet, drawn from the origin. */
+function AxesMark({ v, k, fontSize }: { v: (q: Point) => Point; k: number; fontSize: number }) {
+  const o = v({ x: 0, y: 0 })
+  const len = 40 * k
+  const ux = v({ x: toSi('length', 1), y: 0 })
+  const uy = v({ x: 0, y: toSi('length', 1) })
+  const dir = (u: Point) => {
+    const d = Math.hypot(u.x - o.x, u.y - o.y) || 1
+    return { x: o.x + ((u.x - o.x) / d) * len, y: o.y + ((u.y - o.y) / d) * len }
+  }
+  const [ex, ey] = [dir(ux), dir(uy)]
+  return (
+    // biome-ignore lint/a11y/noAriaHiddenOnFocusable: an SVG group is not focusable; it only draws
+    <g className="axes" aria-hidden="true">
+      <line x1={o.x} y1={o.y} x2={ex.x} y2={ex.y} />
+      <line x1={o.x} y1={o.y} x2={ey.x} y2={ey.y} />
+      <text x={ex.x} y={ex.y} fontSize={fontSize}>
+        x
+      </text>
+      <text x={ey.x} y={ey.y} fontSize={fontSize}>
+        y
+      </text>
+    </g>
+  )
+}
+
+function AimMark({
+  at: a,
+  k,
+  onPointerDown,
+}: {
+  at: Point
+  k: number
+  onPointerDown: (e: PointerEvent<SVGElement>) => void
+}) {
+  const r = 9 * k
+  return (
+    <g className="aim-mark" onPointerDown={onPointerDown}>
+      <circle cx={a.x} cy={a.y} r={r} />
+      <path d={`M${a.x - 1.6 * r} ${a.y}h${3.2 * r}M${a.x} ${a.y - 1.6 * r}v${3.2 * r}`} />
+    </g>
+  )
+}
+
+/** The magnifier above and left of the pointer, so a finger does not cover it; `children` is the drawing again. */
+function Loupe({
+  at: loupe,
+  k,
+  id,
+  children,
+}: {
+  at: Point
+  k: number
+  id: string
+  children: ReactNode
+}) {
+  const r = 60 * k
+  const at = { x: loupe.x - 1.4 * r, y: loupe.y - 1.4 * r }
+  const z = 4
+  return (
+    <>
+      <clipPath id={`${id}-loupe`}>
+        <circle cx={at.x} cy={at.y} r={r} />
+      </clipPath>
+      <g clipPath={`url(#${id}-loupe)`}>
+        <rect x={at.x - r} y={at.y - r} width={2 * r} height={2 * r} className="loupe-bg" />
+        {/* drawn again, not a <use>: rules like .target-canvas .shot-mark miss a use's shadow tree */}
+        <g transform={`translate(${at.x} ${at.y}) scale(${z}) translate(${-loupe.x} ${-loupe.y})`}>
+          {children}
+        </g>
+      </g>
+      <circle cx={at.x} cy={at.y} r={r} className="loupe-halo" />
+      <circle cx={at.x} cy={at.y} r={r} className="loupe-ring" />
+      <path
+        className="loupe-cross"
+        d={`M${at.x - r} ${at.y}h${2 * r}M${at.x} ${at.y - r}v${2 * r}`}
+      />
+    </>
+  )
+}
+
+type OverlayContext = {
+  sheet: TargetSheet
+  overlays: Record<Overlay, boolean>
+  active: string | undefined
+  box: ViewBox
+  k: number
+  fontSize: number
+  v: (q: Point) => Point
+  shotR: (q: Point) => number
+  id: string
+}
+
+type Ellipse = { kind: string; p: number; suffix: string; pts: Point[] }
+
+/** The corner points of the ellipse's extremes, to choose a label anchor from. */
+const extremes = (pts: Point[]) => [
+  pts.reduce((a, b) => (b.y < a.y ? b : a), pts[0]),
+  pts.reduce((a, b) => (b.x > a.x ? b : a), pts[0]),
+  pts.reduce((a, b) => (b.y > a.y ? b : a), pts[0]),
+  pts.reduce((a, b) => (b.x < a.x ? b : a), pts[0]),
+]
+
+/** The drawn ellipses of a group: prediction and dispersion, at each coverage, in view units. */
+function ellipsesOf(
+  s: ReturnType<typeof groupStatisticsOf>,
+  on: (o: Overlay) => boolean,
+  v: (q: Point) => Point,
+): Ellipse[] {
+  const kinds = [
+    on('ellipses') && { kind: 'prediction', at: predictionEllipse, suffix: '' },
+    on('dispersion') && { kind: 'dispersion', at: dispersionEllipse, suffix: ' fired' },
+  ].filter((x) => x !== false)
+  return kinds.flatMap(({ kind, at, suffix }) =>
+    coverages.flatMap((p) => {
+      const pts = ellipsePoints(s, at(s, p))
+      return pts ? [{ kind, p, suffix, pts: pts.map(v) }] : []
+    }),
+  )
+}
+
+/** Labels keep clear of every shot, shot number and label placed before them. */
+function labelScene(c: OverlayContext): LabelScene {
+  const { sheet, overlays, box, k, fontSize, v, shotR } = c
+  return {
+    circles: sheet.groups.flatMap((g) => g.shots.map((s) => ({ ...v(s), r: shotR(s) }))),
+    segments: [],
+    boxes: overlays.numbers
+      ? sheet.groups.flatMap((g) =>
+          g.shots.map((s, i) => {
+            const [p, r] = [v(s), shotR(s)]
+            const w = 0.6 * fontSize * String(i + 1).length
+            return { x: p.x + r + 2 * k, y: p.y - r - fontSize, w, h: fontSize }
+          }),
+        )
+      : [],
+    view: box,
+    fontSize,
+    gap: 3 * k,
+  }
+}
+
+type GroupOverlayParts = {
+  g: TargetSheet['groups'][number]
+  c: Point | undefined
+  ex: Point | undefined
+  ends: ReturnType<typeof axisEnds>
+  pair: ReturnType<typeof extremePairIndices>
+  box4: ReturnType<typeof shotExtentCorners>
+  ellipses: Ellipse[]
+  on: (o: Overlay) => boolean
+  v: (q: Point) => Point
+  k: number
+  id: string
+}
+
+/** The lines and shapes of one group's overlays. */
+function OverlayShapes(p: GroupOverlayParts) {
+  const { g, c, ex, ends, pair, box4, on, v, k } = p
+  return (
+    <>
+      {on('box') && box4 && <polygon className="ov-box" points={polyline(box4.map(v))} />}
+      {p.ellipses.map((e) => (
+        <polygon
+          key={`${e.kind} ${e.p}`}
+          className={`ov-ellipse ov-${e.kind}`}
+          points={polyline(e.pts)}
+        />
+      ))}
+      {on('axis') && ends && (
+        <line
+          className="ov-axis"
+          x1={v(ends[0]).x}
+          y1={v(ends[0]).y}
+          x2={v(ends[1]).x}
+          y2={v(ends[1]).y}
+        />
+      )}
+      {on('spread') && pair && (
+        <line
+          className="ov-spread"
+          x1={v(g.shots[pair[0]]).x}
+          y1={v(g.shots[pair[0]]).y}
+          x2={v(g.shots[pair[1]]).x}
+          y2={v(g.shots[pair[1]]).y}
+        />
+      )}
+      {on('aim') && g.aim && c && (
+        <line className="ov-aim" x1={c.x} y1={c.y} x2={v(g.aim).x} y2={v(g.aim).y} />
+      )}
+      {ex && c && (
+        <line
+          className="ov-excluded"
+          x1={c.x}
+          y1={c.y}
+          x2={ex.x}
+          y2={ex.y}
+          markerEnd={`url(#${p.id}-arrow)`}
+        />
+      )}
+      {c && (
+        <path
+          className="ov-centre"
+          d={`M${c.x - 4 * k} ${c.y}h${8 * k}M${c.x} ${c.y - 4 * k}v${8 * k}`}
+        />
+      )}
+    </>
+  )
+}
+
+/** The overlays of every group; each group's lines are in the scene before any label is placed. */
+function groupOverlays(ctx: OverlayContext): ReactNode {
+  const { sheet, fontSize } = ctx
+  const scene = labelScene(ctx)
+  const label = (text: string, anchors: Point[], from: Point, key: string) => {
+    const b = placeLabel(scene, text, anchors, from)
+    return (
+      <text key={key} x={b.x} y={b.y + fontSize} fontSize={fontSize}>
+        {text}
+      </text>
+    )
+  }
+  return sheet.groups.map((g) => overlayOf(g, scene, ctx, label))
+}
+
+type Labeller = (text: string, anchors: Point[], from: Point, key: string) => ReactNode
+
+/** The end of the excluded-direction arrow, view units. */
+function excludedEnd(
+  s: ReturnType<typeof groupStatisticsOf>,
+  c: Point | undefined,
+  on: (o: Overlay) => boolean,
+  v: (q: Point) => Point,
+) {
+  if (!on('excluded') || !s.excludedOffset || !s.centre || !c) return
+  return v({ x: s.centre.x + s.excludedOffset.x, y: s.centre.y + s.excludedOffset.y })
+}
+
+/** Every line of a group is in the scene before a label is placed, so no label lands on one. */
+function addSegments(
+  scene: LabelScene,
+  o: Pick<GroupOverlayParts, 'ellipses' | 'ends' | 'c' | 'ex' | 'on' | 'v'>,
+) {
+  const { ellipses, ends, c, ex, on, v } = o
+  for (const e of ellipses)
+    for (const [i, p] of e.pts.entries()) scene.segments.push([p, e.pts[(i + 1) % e.pts.length]])
+  if (on('axis') && ends) scene.segments.push([v(ends[0]), v(ends[1])])
+  if (ex && c) scene.segments.push([c, ex])
+}
+
+/** Labels tied to one point first; an ellipse label has four to choose from. */
+function overlayLabels(p: GroupOverlayParts, label: Labeller) {
+  const { c, ex, ends, on, v } = p
+  return (
+    <>
+      {ex && c && label('excluded shots', [ex], c, 'excluded label')}
+      {on('axis') && ends && c && label('major axis', [v(ends[1]), v(ends[0])], c, 'axis label')}
+      {c &&
+        p.ellipses.map((e) =>
+          label(
+            `${Math.round(e.p * 100)} %${e.suffix}`,
+            extremes(e.pts),
+            c,
+            `${e.kind} ${e.p} label`,
+          ),
+        )}
+    </>
+  )
+}
+
+/** One group's overlays: its segments enter the scene, then its labels are placed. */
+function overlayOf(
+  g: TargetSheet['groups'][number],
+  scene: LabelScene,
+  ctx: OverlayContext,
+  label: Labeller,
+) {
+  const { overlays, active, k, v, id } = ctx
+  const s = groupStatisticsOf(g)
+  const c = s.centre && v(s.centre)
+  const on = (o: Overlay) => overlays[o]
+  const parts: GroupOverlayParts = {
+    g,
+    c,
+    ex: excludedEnd(s, c, on, v),
+    ends: axisEnds(s),
+    pair: extremePairIndices(g.shots),
+    box4: shotExtentCorners(g.shots),
+    ellipses: ellipsesOf(s, on, v),
+    on,
+    v,
+    k,
+    id,
+  }
+  addSegments(scene, parts)
+  return (
+    // biome-ignore lint/a11y/noAriaHiddenOnFocusable: an SVG group is not focusable; it only draws
+    <g
+      key={g.id}
+      className="group-overlays"
+      style={{ color: g.colour }}
+      data-dim={(active !== undefined && g.id !== active) || undefined}
+      aria-hidden="true"
+    >
+      <OverlayShapes {...parts} />
+      {overlayLabels(parts, label)}
+    </g>
+  )
+}
+
+/** The tools that take a point by click or by the keyboard marker. */
+function isPointTool(tool: Tool) {
+  return (
+    ['aim', 'origin', 'region', 'backing', 'example', 'rings'].includes(tool) || tool in toolPoints
+  )
+}
+
+/** The tools that show the magnifier while the pointer is over the sheet. */
+function showsLoupe(tool: Tool) {
+  return ['shot', 'rings', 'example'].includes(tool) || tool in toolPoints
+}
+
+/** Where the magnifier shows: while dragging or with a point tool, at the pointer. */
+function loupeAt(dragging: boolean, tool: Tool, hover: Point | undefined) {
+  return dragging || showsLoupe(tool) ? hover : undefined
+}
+
+/** The photo, or the drawn target without one. */
+function Backdrop({
+  sheet,
+  photo,
+  filter,
+}: {
+  sheet: TargetSheet
+  photo: { url: string; width: number; height: number } | undefined
+  filter: { contrast: number; darken: number }
+}) {
+  if (photo)
+    return (
+      <image
+        href={photo.url}
+        x={0}
+        y={0}
+        width={photo.width}
+        height={photo.height}
+        transform={photoTransform(photo, sheet.photoRotation)}
+        style={{
+          filter: `contrast(${filter.contrast}) brightness(${1 - filter.darken})`,
+        }}
+      />
+    )
+  if (sheet.photo) return null
+  return (
+    // biome-ignore lint/a11y/noAriaHiddenOnFocusable: an SVG group is not focusable; it only draws
+    <g className="drawn-target" aria-hidden="true">
+      {[10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((r) => (
+        <circle key={r} cx={0} cy={0} r={r} vectorEffect="non-scaling-stroke" />
+      ))}
+      <line x1={-100} y1={0} x2={100} y2={0} vectorEffect="non-scaling-stroke" />
+      <line x1={0} y1={-100} x2={0} y2={100} vectorEffect="non-scaling-stroke" />
+    </g>
+  )
+}
+
 /**
  * The drawing of a target sheet: the photo (or a drawn target), references, points of aim, shots
  * and the switchable overlays, all mapped from target m to the view through `frame`; pointer and
@@ -194,24 +673,7 @@ export function TargetCanvas({
   const [statsAt, setStatsAt] = useState({ x: 8, y: 8 })
 
   /** The extent to fit: the photo, or every point drawn with a margin. */
-  const extent = useMemo((): ViewBox => {
-    if (photo) return turnedBox(photo.width, photo.height, sheet.photoRotation ?? 0)
-    const pts: Point[] = []
-    if (frame)
-      for (const g of sheet.groups) {
-        for (const s of g.shots) pts.push(targetToView(frame, s))
-        if (g.aim) pts.push(targetToView(frame, g.aim))
-      }
-    for (const r of sheet.references) pts.push(...refPoints(r))
-    // a drawn target: at least 200 mm around the origin
-    if (!sheet.photo) pts.push({ x: -100, y: -100 }, { x: 100, y: 100 })
-    if (!pts.length) return { x: 0, y: 0, w: 1000, h: 1000 }
-    const xs = pts.map((p) => p.x)
-    const ys = pts.map((p) => p.y)
-    const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)]
-    const m = 0.1 * Math.max(x1 - x0, y1 - y0, 1)
-    return { x: x0 - m, y: y0 - m, w: x1 - x0 + 2 * m, h: y1 - y0 + 2 * m }
-  }, [photo, frame, sheet])
+  const extent = useMemo(() => extentOf(sheet, frame, photo), [photo, frame, sheet])
   const extentKey = `${photo?.url ?? sheet.photo ?? 'drawn'} ${sheet.photoRotation ?? 0}`
   // biome-ignore lint/correctness/useExhaustiveDependencies: fit once per photo and turn, not on every edit
   useEffect(() => setView(undefined), [extentKey])
@@ -327,43 +789,11 @@ export function TargetCanvas({
   // two fingers zoom and pan; the second one cancels what the first one started
   usePinch(svg, { box, k }, setView, end)
 
-  const onShotKey = (e: KeyboardEvent<SVGElement>, sel: Selection, s: Point) => {
-    const d = arrows[e.key]
-    if (d && e.altKey && frame) {
-      // also keeps Alt+Left from going back in the history
-      e.preventDefault()
-      // along the screen, whatever the rotation of the target axes
-      const n = screenNudge(frame, s, ...d, e.shiftKey ? 1e-3 : 1e-4)
-      onNudge?.(sel, n.x - s.x, n.y - s.y)
-    } else if (e.ctrlKey || e.metaKey || e.altKey) {
-      // the browser's own shortcuts (Ctrl+E, Ctrl+Home, Alt+Backspace) stay the browser's
-    } else if (d || e.key === 'Home' || e.key === 'End') {
-      // one tab stop per group: the arrows, Home and End move the focus along its shots
-      e.preventDefault()
-      const shots =
-        e.currentTarget.parentElement?.parentElement?.querySelectorAll<SVGElement>('.shot-hit')
-      const last = (shots?.length ?? 1) - 1
-      const to =
-        e.key === 'Home' ? 0 : e.key === 'End' ? last : sel.index + (d && d[0] + d[1] > 0 ? 1 : -1)
-      shots?.[Math.max(0, Math.min(last, to))]?.focus()
-    } else if (e.key === 'Delete' || e.key === 'Backspace') {
-      e.preventDefault()
-      onDelete?.(sel)
-    } else if (e.key === 'e' || e.key === 'E' || e.key === ' ') {
-      e.preventDefault()
-      onToggle?.(sel)
-    }
-  }
+  const onShotKey = (e: KeyboardEvent<SVGElement>, sel: Selection, s: Point) =>
+    shotKey(e, sel, s, frame, { onNudge, onDelete, onToggle })
 
   // the point tools (aim, origin, references) by keyboard: a marker the arrow keys move and Enter sets
-  const pointTool =
-    tool === 'aim' ||
-    tool === 'origin' ||
-    tool === 'region' ||
-    tool === 'backing' ||
-    tool === 'example' ||
-    tool === 'rings' ||
-    tool in toolPoints
+  const pointTool = isPointTool(tool)
   const [cursor, setCursor] = useState<Point>({ x: 0, y: 0 })
   const cursorEl = useRef<SVGCircleElement>(null)
   /** The control that had the focus when a point tool started; it gets it back after. */
@@ -395,34 +825,11 @@ export function TargetCanvas({
 
   const v = (q: Point) => (frame ? targetToView(frame, q) : q)
   const fontSize = 11 * k
-  const loupe =
-    (dragging || tool === 'shot' || tool === 'rings' || tool === 'example' || tool in toolPoints) &&
-    hover
+  const loupe = loupeAt(dragging, tool, hover)
 
   const content = (
     <>
-      {photo ? (
-        <image
-          href={photo.url}
-          x={0}
-          y={0}
-          width={photo.width}
-          height={photo.height}
-          transform={photoTransform(photo, sheet.photoRotation)}
-          style={{
-            filter: `contrast(${filter.contrast}) brightness(${1 - filter.darken})`,
-          }}
-        />
-      ) : !sheet.photo ? (
-        // biome-ignore lint/a11y/noAriaHiddenOnFocusable: an SVG group is not focusable; it only draws
-        <g className="drawn-target" aria-hidden="true">
-          {[10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((r) => (
-            <circle key={r} cx={0} cy={0} r={r} vectorEffect="non-scaling-stroke" />
-          ))}
-          <line x1={-100} y1={0} x2={100} y2={0} vectorEffect="non-scaling-stroke" />
-          <line x1={0} y1={-100} x2={0} y2={100} vectorEffect="non-scaling-stroke" />
-        </g>
-      ) : null}
+      <Backdrop sheet={sheet} photo={photo} filter={filter} />
       {sheet.groups.map((g) =>
         g.shots.map((s, i) => {
           const p = v(s)
@@ -465,198 +872,17 @@ export function TargetCanvas({
       >
         {content}
         {sheet.photo && !still && (
-          // biome-ignore lint/a11y/noAriaHiddenOnFocusable: an SVG group is not focusable; it only draws
-          <g className="refs" aria-hidden="true">
-            {sheet.references.map((r, ri) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: references keep their order
-              <g key={ri}>
-                <RefShape r={r} />
-                {refPoints(r).map((p, pi) => (
-                  <circle
-                    // biome-ignore lint/suspicious/noArrayIndexKey: points keep their order
-                    key={pi}
-                    className="handle"
-                    cx={p.x}
-                    cy={p.y}
-                    r={5 * k}
-                    onPointerDown={(e) =>
-                      tool === 'select' && start(e, { kind: 'ref', ref: ri, point: pi })
-                    }
-                  />
-                ))}
-              </g>
-            ))}
-            {pending.map((p, i) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: clicks keep their order
-              <circle key={i} className="handle pending" cx={p.x} cy={p.y} r={5 * k} />
-            ))}
-            {pending.length > 1 && <polyline className="pending" points={polyline(pending)} />}
-          </g>
+          <RefsLayer
+            references={sheet.references}
+            pending={pending}
+            k={k}
+            onHandle={(e, ref, point) => tool === 'select' && start(e, { kind: 'ref', ref, point })}
+          />
         )}
         {frame?.calibration && sheet.targetOrigin && !still && (
-          // biome-ignore lint/a11y/noAriaHiddenOnFocusable: an SVG group is not focusable; it only draws
-          <g className="axes" aria-hidden="true">
-            {(() => {
-              const o = v({ x: 0, y: 0 })
-              const len = 40 * k
-              const ux = v({ x: toSi('length', 1), y: 0 })
-              const uy = v({ x: 0, y: toSi('length', 1) })
-              const dir = (u: Point) => {
-                const d = Math.hypot(u.x - o.x, u.y - o.y) || 1
-                return { x: o.x + ((u.x - o.x) / d) * len, y: o.y + ((u.y - o.y) / d) * len }
-              }
-              const [ex, ey] = [dir(ux), dir(uy)]
-              return (
-                <>
-                  <line x1={o.x} y1={o.y} x2={ex.x} y2={ex.y} />
-                  <line x1={o.x} y1={o.y} x2={ey.x} y2={ey.y} />
-                  <text x={ex.x} y={ex.y} fontSize={fontSize}>
-                    x
-                  </text>
-                  <text x={ey.x} y={ey.y} fontSize={fontSize}>
-                    y
-                  </text>
-                </>
-              )
-            })()}
-          </g>
+          <AxesMark v={v} k={k} fontSize={fontSize} />
         )}
-        {frame &&
-          (() => {
-            // labels keep clear of every shot, shot number and label placed before them
-            const scene: LabelScene = {
-              circles: sheet.groups.flatMap((g) => g.shots.map((s) => ({ ...v(s), r: shotR(s) }))),
-              segments: [],
-              boxes: overlays.numbers
-                ? sheet.groups.flatMap((g) =>
-                    g.shots.map((s, i) => {
-                      const [p, r] = [v(s), shotR(s)]
-                      const w = 0.6 * fontSize * String(i + 1).length
-                      return { x: p.x + r + 2 * k, y: p.y - r - fontSize, w, h: fontSize }
-                    }),
-                  )
-                : [],
-              view: box,
-              fontSize,
-              gap: 3 * k,
-            }
-            const label = (text: string, anchors: Point[], from: Point, key: string) => {
-              const b = placeLabel(scene, text, anchors, from)
-              return (
-                <text key={key} x={b.x} y={b.y + fontSize} fontSize={fontSize}>
-                  {text}
-                </text>
-              )
-            }
-            const extremes = (pts: Point[]) => [
-              pts.reduce((a, b) => (b.y < a.y ? b : a), pts[0]),
-              pts.reduce((a, b) => (b.x > a.x ? b : a), pts[0]),
-              pts.reduce((a, b) => (b.y > a.y ? b : a), pts[0]),
-              pts.reduce((a, b) => (b.x < a.x ? b : a), pts[0]),
-            ]
-            return sheet.groups.map((g) => {
-              const s = groupStatisticsOf(g)
-              const c = s.centre && v(s.centre)
-              const pair = extremePairIndices(g.shots)
-              const box4 = shotExtentCorners(g.shots)
-              const ends = axisEnds(s)
-              const on = (o: Overlay) => overlays[o]
-              const dim = active !== undefined && g.id !== active
-              const kinds = [
-                on('ellipses') && { kind: 'prediction', at: predictionEllipse, suffix: '' },
-                on('dispersion') && { kind: 'dispersion', at: dispersionEllipse, suffix: ' fired' },
-              ].filter((x) => x !== false)
-              const ellipses = kinds.flatMap(({ kind, at, suffix }) =>
-                coverages.flatMap((p) => {
-                  const pts = ellipsePoints(s, at(s, p))
-                  return pts ? [{ kind, p, suffix, pts: pts.map(v) }] : []
-                }),
-              )
-              const ex =
-                on('excluded') && s.excludedOffset && s.centre && c
-                  ? v({ x: s.centre.x + s.excludedOffset.x, y: s.centre.y + s.excludedOffset.y })
-                  : undefined
-              // every line is drawn first, so no label lands on one
-              for (const e of ellipses)
-                for (const [i, p] of e.pts.entries())
-                  scene.segments.push([p, e.pts[(i + 1) % e.pts.length]])
-              if (on('axis') && ends) scene.segments.push([v(ends[0]), v(ends[1])])
-              if (ex && c) scene.segments.push([c, ex])
-              return (
-                // biome-ignore lint/a11y/noAriaHiddenOnFocusable: an SVG group is not focusable; it only draws
-                <g
-                  key={g.id}
-                  className="group-overlays"
-                  style={{ color: g.colour }}
-                  data-dim={dim || undefined}
-                  aria-hidden="true"
-                >
-                  {on('box') && box4 && (
-                    <polygon className="ov-box" points={polyline(box4.map(v))} />
-                  )}
-                  {ellipses.map((e) => (
-                    <polygon
-                      key={`${e.kind} ${e.p}`}
-                      className={`ov-ellipse ov-${e.kind}`}
-                      points={polyline(e.pts)}
-                    />
-                  ))}
-                  {on('axis') && ends && (
-                    <line
-                      className="ov-axis"
-                      x1={v(ends[0]).x}
-                      y1={v(ends[0]).y}
-                      x2={v(ends[1]).x}
-                      y2={v(ends[1]).y}
-                    />
-                  )}
-                  {on('spread') && pair && (
-                    <line
-                      className="ov-spread"
-                      x1={v(g.shots[pair[0]]).x}
-                      y1={v(g.shots[pair[0]]).y}
-                      x2={v(g.shots[pair[1]]).x}
-                      y2={v(g.shots[pair[1]]).y}
-                    />
-                  )}
-                  {on('aim') && g.aim && c && (
-                    <line className="ov-aim" x1={c.x} y1={c.y} x2={v(g.aim).x} y2={v(g.aim).y} />
-                  )}
-                  {ex && c && (
-                    <line
-                      className="ov-excluded"
-                      x1={c.x}
-                      y1={c.y}
-                      x2={ex.x}
-                      y2={ex.y}
-                      markerEnd={`url(#${id}-arrow)`}
-                    />
-                  )}
-                  {c && (
-                    <path
-                      className="ov-centre"
-                      d={`M${c.x - 4 * k} ${c.y}h${8 * k}M${c.x} ${c.y - 4 * k}v${8 * k}`}
-                    />
-                  )}
-                  {/* labels tied to one point first; an ellipse label has four to choose from */}
-                  {ex && c && label('excluded shots', [ex], c, 'excluded label')}
-                  {on('axis') &&
-                    ends &&
-                    c &&
-                    label('major axis', [v(ends[1]), v(ends[0])], c, 'axis label')}
-                  {c &&
-                    ellipses.map((e) =>
-                      label(
-                        `${Math.round(e.p * 100)} %${e.suffix}`,
-                        extremes(e.pts),
-                        c,
-                        `${e.kind} ${e.p} label`,
-                      ),
-                    )}
-                </g>
-              )
-            })
-          })()}
+        {frame && groupOverlays({ sheet, overlays, active, box, k, fontSize, v, shotR, id })}
         <defs>
           <marker
             id={`${id}-arrow`}
@@ -677,24 +903,13 @@ export function TargetCanvas({
               style={{ color: g.colour }}
               data-dim={(active !== undefined && g.id !== active) || undefined}
             >
-              {g.aim &&
-                (() => {
-                  const a = v(g.aim)
-                  const r = 9 * k
-                  return (
-                    <g
-                      className="aim-mark"
-                      onPointerDown={(e) =>
-                        tool === 'select' && start(e, { kind: 'aim', group: g.id })
-                      }
-                    >
-                      <circle cx={a.x} cy={a.y} r={r} />
-                      <path
-                        d={`M${a.x - 1.6 * r} ${a.y}h${3.2 * r}M${a.x} ${a.y - 1.6 * r}v${3.2 * r}`}
-                      />
-                    </g>
-                  )
-                })()}
+              {g.aim && (
+                <AimMark
+                  at={v(g.aim)}
+                  k={k}
+                  onPointerDown={(e) => tool === 'select' && start(e, { kind: 'aim', group: g.id })}
+                />
+              )}
               {g.shots.map((s, i) => {
                 const p = v(s)
                 const sel = { group: g.id, index: i }
@@ -773,40 +988,9 @@ export function TargetCanvas({
         {loupe && (
           // biome-ignore lint/a11y/noAriaHiddenOnFocusable: an SVG group is not focusable; it only draws
           <g className="loupe" aria-hidden="true" pointerEvents="none">
-            {(() => {
-              const r = 60 * k
-              // above and left of the pointer, so a finger does not cover it
-              const at = { x: loupe.x - 1.4 * r, y: loupe.y - 1.4 * r }
-              const z = 4
-              return (
-                <>
-                  <clipPath id={`${id}-loupe`}>
-                    <circle cx={at.x} cy={at.y} r={r} />
-                  </clipPath>
-                  <g clipPath={`url(#${id}-loupe)`}>
-                    <rect
-                      x={at.x - r}
-                      y={at.y - r}
-                      width={2 * r}
-                      height={2 * r}
-                      className="loupe-bg"
-                    />
-                    {/* drawn again, not a <use>: rules like .target-canvas .shot-mark miss a use's shadow tree */}
-                    <g
-                      transform={`translate(${at.x} ${at.y}) scale(${z}) translate(${-loupe.x} ${-loupe.y})`}
-                    >
-                      {content}
-                    </g>
-                  </g>
-                  <circle cx={at.x} cy={at.y} r={r} className="loupe-halo" />
-                  <circle cx={at.x} cy={at.y} r={r} className="loupe-ring" />
-                  <path
-                    className="loupe-cross"
-                    d={`M${at.x - r} ${at.y}h${2 * r}M${at.x} ${at.y - r}v${2 * r}`}
-                  />
-                </>
-              )
-            })()}
+            <Loupe at={loupe} k={k} id={id}>
+              {content}
+            </Loupe>
           </g>
         )}
       </svg>

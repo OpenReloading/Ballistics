@@ -118,6 +118,11 @@ export function fieldError(
   const symbol = shown[spec.quantity].symbol
   const unit = symbol ? ` ${symbol}` : ''
   const x = spec.quantity === 'twist' ? (parseTwist(text) ?? Number.NaN) : Number(text)
+  return rangeError(spec, x, unit)
+}
+
+/** The message of the first bound that the number `x` breaks, undefined when it holds them all. */
+function rangeError(spec: FieldSpec, x: number, unit: string): string | undefined {
   if (spec.min !== undefined && x < spec.min)
     return `${spec.label} must be at least ${spec.min}${unit}.`
   if (spec.max !== undefined && x > spec.max)

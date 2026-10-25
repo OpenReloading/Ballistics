@@ -39,6 +39,59 @@ function Swatch({ slot }: { slot: number }) {
   )
 }
 
+/** Puts the picks in the address as `?add=`, the other parameters kept. */
+function writeAdd(picks: OverlayPick[]) {
+  const { pathname } = window.location
+  const p = new URLSearchParams(window.location.search)
+  if (picks.length > 0) p.set('add', picks.map((s) => s.id).join(','))
+  else p.delete('add')
+  const s = p.toString().replaceAll('%2C', ',')
+  window.history.replaceState(null, '', `${pathname}${s ? `?${s}` : ''}`)
+}
+
+function OverlayBody({
+  read,
+  picks,
+  loading,
+  series,
+  wide,
+}: {
+  read: boolean
+  picks: number
+  loading: boolean
+  series: { powder: FittedPowder; slot: number }[]
+  wide: boolean | undefined
+}) {
+  if (!read || loading) return <Loading what="curves" />
+  if (picks === 0)
+    return (
+      <EmptyNote
+        icon={<ChartLine size={24} aria-hidden="true" />}
+        title="No powder in the overlay."
+        description="Tick powders in the powder list to add them."
+      />
+    )
+  // every pick failed: the error note above stands alone
+  if (series.length === 0) return null
+  return (
+    <>
+      <LazyVivacityChart
+        series={series}
+        height={wide ? 420 : 300}
+        title="Dynamic vivacity of the chosen powders, model output"
+        description={series.map((s) => describeCurve(s.powder)).join(' ')}
+      />
+      <details className="values-details">
+        <summary>Values table</summary>
+        <CurveTable
+          powders={series.map((s) => s.powder)}
+          caption="Dynamic vivacity of the chosen powders"
+        />
+      </details>
+    </>
+  )
+}
+
 /**
  * The burn-rate overlay: up to six powders picked in a searchable select, each pill with
  * its line sample; colour slots stay with their powder when another is removed. The picks live in
@@ -76,12 +129,7 @@ export function BurnRateCompare({ options }: { options: { value: string; label: 
 
   useEffect(() => {
     if (!read) return
-    const { pathname } = window.location
-    const p = new URLSearchParams(window.location.search)
-    if (picks.length > 0) p.set('add', picks.map((s) => s.id).join(','))
-    else p.delete('add')
-    const s = p.toString().replaceAll('%2C', ',')
-    window.history.replaceState(null, '', `${pathname}${s ? `?${s}` : ''}`)
+    writeAdd(picks)
   }, [picks, read])
 
   useEffect(() => {
@@ -146,34 +194,7 @@ export function BurnRateCompare({ options }: { options: { value: string; label: 
           {failed.map((p) => options.find((o) => o.value === p.id)?.label ?? p.id).join(', ')}
         </ErrorNote>
       )}
-      {!read ? (
-        <Loading what="curves" />
-      ) : picks.length === 0 ? (
-        <EmptyNote
-          icon={<ChartLine size={24} aria-hidden="true" />}
-          title="No powder in the overlay."
-          description="Tick powders in the powder list to add them."
-        />
-      ) : loading ? (
-        <Loading what="curves" />
-      ) : series.length === 0 ? null : (
-        // every pick failed: the error note above stands alone
-        <>
-          <LazyVivacityChart
-            series={series}
-            height={wide ? 420 : 300}
-            title="Dynamic vivacity of the chosen powders, model output"
-            description={series.map((s) => describeCurve(s.powder)).join(' ')}
-          />
-          <details className="values-details">
-            <summary>Values table</summary>
-            <CurveTable
-              powders={series.map((s) => s.powder)}
-              caption="Dynamic vivacity of the chosen powders"
-            />
-          </details>
-        </>
-      )}
+      <OverlayBody read={read} picks={picks.length} loading={loading} series={series} wide={wide} />
     </Panel>
   )
 }

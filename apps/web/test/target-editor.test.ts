@@ -249,6 +249,22 @@ describe('overlays', () => {
     expect(ellipsePoints(s, undefined)).toBeUndefined()
   })
 
+  const overlap = (a: LabelBox, b: LabelBox) =>
+    a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h
+
+  /** The label is farther than `r` from every shot, overlaps no other box, and lies inside the view. */
+  const expectClear = (b: LabelBox, shots: Point[], boxes: LabelScene['boxes'], r: number) => {
+    for (const p of shots) {
+      const dx = Math.max(b.x - p.x, 0, p.x - b.x - b.w)
+      const dy = Math.max(b.y - p.y, 0, p.y - b.y - b.h)
+      expect(Math.hypot(dx, dy)).toBeGreaterThan(r)
+    }
+    for (const o of boxes) if (o !== b) expect(overlap(b, o)).toBe(false)
+    // inside the view
+    expect(b.x).toBeGreaterThanOrEqual(-110)
+    expect(b.y + b.h).toBeLessThanOrEqual(110)
+  }
+
   it('places the labels clear of every shot, number, line and other label', () => {
     // a drawn target (view mm, y down), 1 px = 0.35 mm
     const g: ShotGroup = {
@@ -302,19 +318,7 @@ describe('overlays', () => {
       placeLabel(scene, 'major axis', [ends[1], ends[0]], c),
       ...outlines.map((o) => placeLabel(scene, '95 % fired', extremes(o), c)),
     ]
-    const overlap = (a: LabelBox, b: LabelBox) =>
-      a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h
-    for (const b of placed) {
-      for (const p of shots) {
-        const dx = Math.max(b.x - p.x, 0, p.x - b.x - b.w)
-        const dy = Math.max(b.y - p.y, 0, p.y - b.y - b.h)
-        expect(Math.hypot(dx, dy)).toBeGreaterThan(r)
-      }
-      for (const o of scene.boxes) if (o !== b) expect(overlap(b, o)).toBe(false)
-      // inside the view
-      expect(b.x).toBeGreaterThanOrEqual(-110)
-      expect(b.y + b.h).toBeLessThanOrEqual(110)
-    }
+    for (const b of placed) expectClear(b, shots, scene.boxes, r)
     // the excluded label sits next to the excluded shot, not on it
     const e = placed[0]
     const near = Math.hypot(

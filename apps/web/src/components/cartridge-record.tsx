@@ -136,6 +136,40 @@ interface Link {
   scope: Element
 }
 
+/** The link at `t`: its symbol and its own panel (else the whole scope). */
+function linkIn(box: HTMLElement | null, t: EventTarget | null): Link | undefined {
+  const symbol = t instanceof Element && t.closest('[data-symbol]')?.getAttribute('data-symbol')
+  if (!box || !symbol) return undefined
+  return { symbol, scope: (t as Element).closest('.side-panel') ?? box }
+}
+
+/** Marks the table row and the drawn dimension of `link`, nothing for none. */
+function markLink(box: HTMLElement | null, link: Link | undefined) {
+  if (!box) return
+  for (const el of box.querySelectorAll('.is-hi')) el.classList.remove('is-hi')
+  if (!link) return
+  // the whole symbol: "delta L" is one, not "delta" and "L"
+  const ends = [...link.scope.querySelectorAll('[data-symbol]')].filter(
+    (el) => el.getAttribute('data-symbol') === link.symbol,
+  )
+  // a row and a drawn dimension, else nothing to link
+  if (ends.some((el) => el.tagName === 'TR') && ends.some((el) => el.tagName !== 'TR'))
+    for (const el of ends) el.classList.add('is-hi')
+}
+
+/** A click on the pinned link again drops it, else the link is pinned. */
+function pinnedAfter(pinned: Link | undefined, link: Link | undefined) {
+  const same = link && pinned?.symbol === link.symbol && pinned.scope === link.scope
+  return link && !same ? link : undefined
+}
+
+/** Keeps the rows of the pinned link marked. */
+function pinRows(pinned: Link | undefined) {
+  if (!pinned) return
+  for (const el of pinned.scope.querySelectorAll('tr[data-symbol]'))
+    if (el.getAttribute('data-symbol') === pinned.symbol) el.classList.add('is-pin')
+}
+
 /**
  * A record page's client scope (cartridge, bullet): the length unit of the strip, the drawings and the
  * tables (not stored; it starts at the Settings unit and follows a change there), the shotshell
@@ -164,34 +198,13 @@ export function RecordScope({
   // a touch on a table symbol opens its notes and marks nothing: any change to the page after the
   // tap closes the notes again (the browser's emulated hover leaves); a tapped drawing dimension marks
   const touch = useRef(false)
-  const linkAt = (t: EventTarget | null): Link | undefined => {
-    const box = root.current
-    const symbol = t instanceof Element && t.closest('[data-symbol]')?.getAttribute('data-symbol')
-    if (!box || !symbol) return undefined
-    return { symbol, scope: (t as Element).closest('.side-panel') ?? box }
-  }
-  const mark = (link: Link | undefined) => {
-    const box = root.current
-    if (!box) return
-    for (const el of box.querySelectorAll('.is-hi')) el.classList.remove('is-hi')
-    if (!link) return
-    // the whole symbol: "delta L" is one, not "delta" and "L"
-    const ends = [...link.scope.querySelectorAll('[data-symbol]')].filter(
-      (el) => el.getAttribute('data-symbol') === link.symbol,
-    )
-    // a row and a drawn dimension, else nothing to link
-    if (ends.some((el) => el.tagName === 'TR') && ends.some((el) => el.tagName !== 'TR'))
-      for (const el of ends) el.classList.add('is-hi')
-  }
+  const linkAt = (t: EventTarget | null) => linkIn(root.current, t)
+  const mark = (link: Link | undefined) => markLink(root.current, link)
   const pin = (link: Link | undefined) => {
-    const same =
-      link && pinned.current?.symbol === link.symbol && pinned.current.scope === link.scope
-    pinned.current = link && !same ? link : undefined
+    pinned.current = pinnedAfter(pinned.current, link)
     for (const el of root.current?.querySelectorAll('tr.is-pin') ?? [])
       el.classList.remove('is-pin')
-    if (pinned.current)
-      for (const el of pinned.current.scope.querySelectorAll('tr[data-symbol]'))
-        if (el.getAttribute('data-symbol') === pinned.current.symbol) el.classList.add('is-pin')
+    pinRows(pinned.current)
     mark(pinned.current)
   }
   return (

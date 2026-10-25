@@ -273,6 +273,33 @@ describe('slider ranges', () => {
   })
 })
 
+function randomText(r: number, now: number, next: () => number): string {
+  if (r < 0.08) return ''
+  if (r < 0.12) return '0'
+  if (r < 0.15) return '-3'
+  if (r < 0.18) return '1e6'
+  return String(Number((now * (0.5 + next())).toFixed(3)))
+}
+
+/** One random edit of a field and its evaluation: the new history, and whether it draws. */
+function randomEdit(h: History, next: () => number) {
+  const s = fieldSpecs[Math.floor(next() * fieldSpecs.length)]
+  // mostly near the present value (else a tenth of the slider range), sometimes extreme
+  const now =
+    (h.present.fields[s.key].si ?? s.range / 10) * (s.quantity === 'angle' ? 180 / Math.PI : 1e3)
+  const r = next()
+  const text = randomText(r, now, next)
+  let out = reduce(h, type(s.key, text))
+  const e = evaluate(out.present, metric, out.last)
+  expect(e.spec !== undefined || e.refusal !== undefined).toBe(true)
+  if (e.refusal) {
+    expect(e.refusal.reason.length).toBeGreaterThan(0)
+    // as a user would: take the refused step back and go on
+    out = reduce(out, { type: 'undo' })
+  }
+  return { h: out, drawn: e.spec !== undefined }
+}
+
 describe('random edits', () => {
   for (const [seed, start] of [
     [1, 'cip-308-win-2008-09-23'],
@@ -284,31 +311,9 @@ describe('random edits', () => {
       let h = historyOf(fromRecord(sheetRecord(start), metric))
       let drawn = 0
       for (let k = 0; k < 150; k++) {
-        const s = fieldSpecs[Math.floor(next() * fieldSpecs.length)]
-        // mostly near the present value (else a tenth of the slider range), sometimes extreme
-        const now =
-          (h.present.fields[s.key].si ?? s.range / 10) *
-          (s.quantity === 'angle' ? 180 / Math.PI : 1e3)
-        const r = next()
-        const text =
-          r < 0.08
-            ? ''
-            : r < 0.12
-              ? '0'
-              : r < 0.15
-                ? '-3'
-                : r < 0.18
-                  ? '1e6'
-                  : String(Number((now * (0.5 + next())).toFixed(3)))
-        h = reduce(h, type(s.key, text))
-        const e = evaluate(h.present, metric, h.last)
-        expect(e.spec !== undefined || e.refusal !== undefined).toBe(true)
-        if (e.spec) drawn++
-        if (e.refusal) {
-          expect(e.refusal.reason.length).toBeGreaterThan(0)
-          // as a user would: take the refused step back and go on
-          h = reduce(h, { type: 'undo' })
-        }
+        const step = randomEdit(h, next)
+        h = step.h
+        if (step.drawn) drawn++
       }
       // the sequence draws, not only refuses
       expect(drawn).toBeGreaterThan(75)

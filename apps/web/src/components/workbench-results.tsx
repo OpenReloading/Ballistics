@@ -4,10 +4,11 @@ import { Button, Menu, Tabs, Textarea } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { CaretDown } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
-import { memo, useEffect, useMemo, useRef, useState } from 'react'
+import { memo, type RefObject, useEffect, useMemo, useRef, useState } from 'react'
 import { vivacityUnit } from '../lib/burn-rate.ts'
 import { toCsv } from '../lib/csv.ts'
 import { controlSize } from '../lib/theme.ts'
+import type { UnitSystem } from '../lib/units.ts'
 import { resultTabsFit } from '../lib/workbench.ts'
 import { BarrelLength } from './barrel-length.tsx'
 import { LadderTarget } from './ladder-target.tsx'
@@ -220,89 +221,30 @@ function TrajectoryPanel() {
   )
 }
 
-/**
- * The results area: the load line, the notice, an error, the readouts or the checklist with the
- * burn rate, the warnings, the ladder strip and the result tabs. It reads the result context only,
- * so a keystroke in the inputs does not render it again.
- */
-export const ResultsArea = memo(function ResultsArea() {
-  const {
-    ok,
-    outcome,
-    identity,
-    stale,
-    warnings,
-    system,
-    todo,
-    steps,
-    stepValue,
-    velocity,
-    tab,
-    setTab,
-    setSeen,
-    opened,
-    csvCopied,
-    setCsvCopied,
-    notes,
-    setNotes,
-    chronoSessions,
-    setChronoSessions,
-    barrel,
-    lot,
-    status,
-    online,
-    pending,
-  } = useResult()
-  const next = todo.findIndex((s) => !s.done)
-  const echoed =
-    ok !== undefined &&
-    (status.startsWith('Simulation done. ') || status === resultLine(ok, system))
-  const choose = (v: ResultTab) => {
-    setTab(v)
-    setSeen((s) => (s.has(v) ? s : new Set([...s, v])))
-  }
-  // from 62em the tabs that do not fit their row go into a More menu; narrower, the row
-  // scrolls sideways
-  const framed = useMediaQuery('screen and (min-width: 62em)')
-  // in a low desktop window the burn-rate figure stands in the inputs' second column
-  const short = useMediaQuery(shortFrame, false) ?? false
-  const list = useRef<HTMLDivElement>(null)
-  const shownTabs = useMemo(() => resultTabs.filter(([v]) => short || v !== 'cartridge'), [short])
-  // by tab value: the Cartridge tab comes and goes
-  const widths = useRef(new Map<ResultTab, number>())
-  const [fit, setFit] = useState<number>(resultTabs.length)
-  // a window grown out of the low frame has no Cartridge tab
-  useEffect(() => {
-    if (!short && tab === 'cartridge') setTab('results')
-  }, [short, tab, setTab])
-  const hasOutcome = outcome !== undefined
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the tabs show once there is an outcome
-  useEffect(() => {
-    const row = list.current
-    if (!framed || !row) {
-      setFit(shownTabs.length)
-      return
-    }
-    const measure = () => {
-      // a tab moved into the menu has no width: it keeps the one it was measured with
-      row.querySelectorAll<HTMLElement>('[role="tab"]').forEach((t, i) => {
-        if (t.offsetWidth) widths.current.set(shownTabs[i][0], t.offsetWidth)
-      })
-      setFit(
-        resultTabsFit(
-          shownTabs.map(([v]) => widths.current.get(v) ?? 0),
-          row.clientWidth,
-        ),
-      )
-    }
-    const observer = new ResizeObserver(measure)
-    observer.observe(row)
-    return () => observer.disconnect()
-  }, [framed, hasOutcome, shownTabs])
+type ChecklistItems = ReturnType<typeof useResult>['todo']
+
+type ShownTabs = (typeof resultTabs)[number][]
+
+/** The tab row; from 62em the tabs that do not fit go into the More menu, which stays in the row. */
+function ResultTabBar({
+  shownTabs,
+  fit,
+  framed,
+  tab,
+  choose,
+  listRef,
+}: {
+  shownTabs: ShownTabs
+  fit: number
+  framed: boolean | undefined
+  tab: ResultTab
+  choose: (v: ResultTab) => void
+  listRef: RefObject<HTMLDivElement | null>
+}) {
   const moved = shownTabs.slice(fit)
-  const tabList = (
+  return (
     <div className="result-tabbar">
-      <Tabs.List ref={list} className="result-tablist">
+      <Tabs.List ref={listRef} className="result-tablist">
         {shownTabs.map(([v, label], i) => (
           // before the first run only the tab with content: the figure of a low window
           <Tabs.Tab
@@ -343,6 +285,355 @@ export const ResultsArea = memo(function ResultsArea() {
       )}
     </div>
   )
+}
+
+/** Copies the ladder table as shown, for a spreadsheet. */
+function CopyCsvButton({
+  csvCopied,
+  setCsvCopied,
+}: {
+  csvCopied: boolean | 'failed'
+  setCsvCopied: (copied: boolean | 'failed') => void
+}) {
+  return (
+    <Button
+      size={controlSize.row.button}
+      variant="default"
+      className="copy-csv"
+      onClick={(e) => {
+        const table = e.currentTarget.parentElement?.querySelector('table')
+        if (!table) return
+        const csv = toCsv(
+          [...table.querySelectorAll('tr')].map((r) =>
+            [...r.cells].map((c) => c.textContent?.trim() ?? ''),
+          ),
+        )
+        const show = (state: true | 'failed') => {
+          setCsvCopied(state)
+          setTimeout(() => setCsvCopied(false), 2000)
+        }
+        navigator.clipboard.writeText(csv).then(
+          () => show(true),
+          () => show('failed'),
+        )
+      }}
+    >
+      {csvCopied === 'failed' ? 'Copy failed' : csvCopied ? 'Copied' : 'Copy as CSV'}
+    </Button>
+  )
+}
+
+/** One line: the load, the notice and the warnings with their popover in a slot of fixed width. */
+function RunLine({
+  ok,
+  identity,
+  status,
+  echoed,
+  online,
+  warnings,
+}: {
+  ok: Extract<Outcome, { kind: 'ok' }> | undefined
+  identity: string[] | undefined
+  status: string
+  echoed: boolean
+  online: boolean
+  warnings: { text: string; name?: string }[] | undefined
+}) {
+  return (
+    <div className="run-line">
+      {ok && identity && (
+        // one line where the column is narrow: the whole line on hover
+        <p className="load-identity" title={identity.join(' · ')}>
+          <strong>{identity[0]}</strong>
+          {identity.slice(1).map((t) => (
+            <span key={t}> · {t}</span>
+          ))}
+        </p>
+      )}
+      {/* the result's own line repeats the readouts: for screen readers only; an error shows */}
+      <p
+        role="status"
+        className={echoed ? 'status visually-hidden' : 'status'}
+        title={status || undefined}
+      >
+        {status}
+      </p>
+      {!online && (
+        <span
+          id="run-network-hint"
+          className="run-hint"
+          title="The interior simulation runs on the server"
+        >
+          Needs the network
+        </span>
+      )}
+      <span className="notice-text screen-only">
+        <NavIcon name="safety" size={14} />
+        Simulation, not load data
+      </span>
+      <span className="warnings-slot screen-only">
+        {ok && warnings && (
+          <WarningsBlock
+            key={ok.id}
+            warnings={warnings}
+            summary={warningsLine(ok, warnings)}
+            announce={ok.announce}
+          />
+        )}
+      </span>
+    </div>
+  )
+}
+
+/** Which tabs show and how many fit their row; the rest go into the More menu from 62em. */
+function useTabFit(tab: ResultTab, setTab: (tab: ResultTab) => void, hasOutcome: boolean) {
+  // from 62em the tabs that do not fit their row go into a More menu; narrower, the row
+  // scrolls sideways
+  const framed = useMediaQuery('screen and (min-width: 62em)')
+  // in a low desktop window the burn-rate figure stands in the inputs' second column
+  const short = useMediaQuery(shortFrame, false) ?? false
+  const list = useRef<HTMLDivElement>(null)
+  const shownTabs = useMemo(() => resultTabs.filter(([v]) => short || v !== 'cartridge'), [short])
+  // by tab value: the Cartridge tab comes and goes
+  const widths = useRef(new Map<ResultTab, number>())
+  const [fit, setFit] = useState<number>(resultTabs.length)
+  // a window grown out of the low frame has no Cartridge tab
+  useEffect(() => {
+    if (!short && tab === 'cartridge') setTab('results')
+  }, [short, tab, setTab])
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the tabs show once there is an outcome
+  useEffect(() => {
+    const row = list.current
+    if (!framed || !row) {
+      setFit(shownTabs.length)
+      return
+    }
+    const measure = () => {
+      // a tab moved into the menu has no width: it keeps the one it was measured with
+      row.querySelectorAll<HTMLElement>('[role="tab"]').forEach((t, i) => {
+        if (t.offsetWidth) widths.current.set(shownTabs[i][0], t.offsetWidth)
+      })
+      setFit(
+        resultTabsFit(
+          shownTabs.map(([v]) => widths.current.get(v) ?? 0),
+          row.clientWidth,
+        ),
+      )
+    }
+    const observer = new ResizeObserver(measure)
+    observer.observe(row)
+    return () => observer.disconnect()
+  }, [framed, hasOutcome, shownTabs])
+  return { framed, short, list, shownTabs, fit }
+}
+
+/** The results list with the chosen powder's burn rate beside it; an error in their place. */
+function ResultsHead({
+  outcome,
+  ok,
+  system,
+  stale,
+  todo,
+  next,
+  short,
+}: {
+  outcome: Outcome | undefined
+  ok: Extract<Outcome, { kind: 'ok' }> | undefined
+  system: UnitSystem
+  stale: boolean
+  todo: ChecklistItems
+  next: number
+  short: boolean
+}) {
+  return (
+    <div className="results-head">
+      {outcome?.kind === 'error' ? (
+        <div className="results-error">
+          <ErrorNote title="The simulation did not run.">
+            <ErrorView outcome={outcome} />
+          </ErrorNote>
+        </div>
+      ) : ok ? (
+        <Readouts ok={ok} system={system} stale={stale} />
+      ) : (
+        <Checklist todo={todo} next={next} />
+      )}
+      {!short && <BurnFigure />}
+    </div>
+  )
+}
+
+/** What the run took from the user's designs instead of a catalogue record. */
+function DesignNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> | undefined }) {
+  return (
+    <>
+      {ok?.cartridgeDesign && (
+        <p className="note user-design">
+          Case values from the user design {ok.cartridgeDesign}, not a catalogue record.
+        </p>
+      )}
+      {ok?.design && (
+        <p className="note user-design">
+          Computed with the bullet mass of the user design {ok.design}, not a catalogue record.
+        </p>
+      )}
+    </>
+  )
+}
+
+/** The ladder table tab's content: the table with its CSV copy, lot rows and target. */
+function LadderBody() {
+  const { ok, steps, stepValue, velocity, csvCopied, setCsvCopied, lot, system } = useResult()
+  return (
+    <>
+      {/* one step: its row would repeat the readouts */}
+      {!ok ? (
+        notRun('the ladder table')
+      ) : steps.length > 1 ? (
+        <>
+          <CopyCsvButton csvCopied={csvCopied} setCsvCopied={setCsvCopied} />
+          {lot.applies && <LotPanel lot={lot} system={system} />}
+          <LadderTarget labels={steps.map(stepValue)} system={system} />
+          <LadderTable
+            ok={ok}
+            steps={steps}
+            system={system}
+            value={stepValue}
+            velocity={velocity}
+            lot={lot.rows}
+          />
+        </>
+      ) : (
+        later(
+          'One step: the readouts give its values. Set Ladder steps in the Powder card for a table of steps.',
+        )
+      )}
+    </>
+  )
+}
+
+/** The panels of the result tabs. */
+function ResultPanels({ short }: { short: boolean }) {
+  const {
+    ok,
+    stale,
+    steps,
+    opened,
+    notes,
+    setNotes,
+    chronoSessions,
+    setChronoSessions,
+    barrel,
+    system,
+  } = useResult()
+  return (
+    <>
+      <Tabs.Panel value="results" className="results-panel" data-stale={stale || undefined}>
+        {heading('results')}
+        {ok ? (
+          // from 62em the chart's height is the room the column leaves (globals.css)
+          <div className="plain-chart">
+            <ResultChart />
+          </div>
+        ) : (
+          notRun('the breech pressure curve')
+        )}
+      </Tabs.Panel>
+      {short && (
+        <Tabs.Panel value="cartridge" data-before-run>
+          <FigureTab />
+        </Tabs.Panel>
+      )}
+      <Tabs.Panel value="ladder" data-stale={stale || undefined}>
+        {heading('ladder')}
+        <LadderBody />
+      </Tabs.Panel>
+      <Tabs.Panel value="measurements" data-stale={stale || undefined}>
+        {heading('measurements')}
+        {opened('measurements') && (
+          <Measurements
+            steps={measuredSteps(steps, ok)}
+            system={system}
+            sessions={chronoSessions}
+            setSessions={setChronoSessions}
+          />
+        )}
+      </Tabs.Panel>
+      <Tabs.Panel value="groups">
+        {heading('groups')}
+        {opened('groups') && <GroupsPanel />}
+      </Tabs.Panel>
+      <Tabs.Panel value="trajectory">
+        {heading('trajectory')}
+        {opened('trajectory') && <TrajectoryPanel />}
+      </Tabs.Panel>
+      <Tabs.Panel value="barrel" data-stale={stale || undefined}>
+        {heading('barrel')}
+        {!ok
+          ? notRun('the barrel length study')
+          : opened('barrel') && <BarrelLength study={barrel} system={system} />}
+      </Tabs.Panel>
+      <Tabs.Panel value="powders" data-stale={stale || undefined}>
+        {/* not in the report: no print heading either */}
+        {!ok
+          ? notRun('the powder comparison')
+          : opened('powders') && <PowderCompare system={system} />}
+      </Tabs.Panel>
+      <Tabs.Panel value="notes">
+        {heading('notes')}
+        <Textarea
+          label="Notes"
+          description="Saved with the load file (File, Save). Not in copied links."
+          autosize
+          minRows={4}
+          value={notes}
+          onChange={(e) => setNotes(e.currentTarget.value)}
+        />
+      </Tabs.Panel>
+    </>
+  )
+}
+
+/**
+ * The results area: the load line, the notice, an error, the readouts or the checklist with the
+ * burn rate, the warnings, the ladder strip and the result tabs. It reads the result context only,
+ * so a keystroke in the inputs does not render it again.
+ */
+export const ResultsArea = memo(function ResultsArea() {
+  const {
+    ok,
+    outcome,
+    identity,
+    stale,
+    warnings,
+    system,
+    todo,
+    tab,
+    setTab,
+    setSeen,
+    status,
+    online,
+    pending,
+  } = useResult()
+  const next = todo.findIndex((s) => !s.done)
+  const echoed =
+    ok !== undefined &&
+    (status.startsWith('Simulation done. ') || status === resultLine(ok, system))
+  const choose = (v: ResultTab) => {
+    setTab(v)
+    setSeen((s) => (s.has(v) ? s : new Set([...s, v])))
+  }
+  const { framed, short, list, shownTabs, fit } = useTabFit(tab, setTab, outcome !== undefined)
+  const tabList = (
+    <ResultTabBar
+      shownTabs={shownTabs}
+      fit={fit}
+      framed={framed}
+      tab={tab}
+      choose={choose}
+      listRef={list}
+    />
+  )
 
   return (
     // one element whether or not a result is shown, so the tabs and the preview keep their state;
@@ -368,183 +659,29 @@ export const ResultsArea = memo(function ResultsArea() {
           {/* one line: the load, the notice and the warnings with their popover in a slot of fixed
               width; the run's time and the stale mark are in the page bar's status, and the status,
               which the readouts repeat, is for screen readers */}
-          <div className="run-line">
-            {ok && identity && (
-              // one line where the column is narrow: the whole line on hover
-              <p className="load-identity" title={identity.join(' · ')}>
-                <strong>{identity[0]}</strong>
-                {identity.slice(1).map((t) => (
-                  <span key={t}> · {t}</span>
-                ))}
-              </p>
-            )}
-            {/* the result's own line repeats the readouts: for screen readers only; an error shows */}
-            <p
-              role="status"
-              className={echoed ? 'status visually-hidden' : 'status'}
-              title={status || undefined}
-            >
-              {status}
-            </p>
-            {!online && (
-              <span
-                id="run-network-hint"
-                className="run-hint"
-                title="The interior simulation runs on the server"
-              >
-                Needs the network
-              </span>
-            )}
-            <span className="notice-text screen-only">
-              <NavIcon name="safety" size={14} />
-              Simulation, not load data
-            </span>
-            <span className="warnings-slot screen-only">
-              {ok && warnings && (
-                <WarningsBlock
-                  key={ok.id}
-                  warnings={warnings}
-                  summary={warningsLine(ok, warnings)}
-                  announce={ok.announce}
-                />
-              )}
-            </span>
-          </div>
+          <RunLine
+            ok={ok}
+            identity={identity}
+            status={status}
+            echoed={echoed}
+            online={online}
+            warnings={warnings}
+          />
           {/* the results list with the chosen powder's burn rate beside it; an error in their place */}
-          <div className="results-head">
-            {outcome?.kind === 'error' ? (
-              <div className="results-error">
-                <ErrorNote title="The simulation did not run.">
-                  <ErrorView outcome={outcome} />
-                </ErrorNote>
-              </div>
-            ) : ok ? (
-              <Readouts ok={ok} system={system} stale={stale} />
-            ) : (
-              <Checklist todo={todo} next={next} />
-            )}
-            {!short && <BurnFigure />}
-          </div>
-          {ok?.cartridgeDesign && (
-            <p className="note user-design">
-              Case values from the user design {ok.cartridgeDesign}, not a catalogue record.
-            </p>
-          )}
-          {ok?.design && (
-            <p className="note user-design">
-              Computed with the bullet mass of the user design {ok.design}, not a catalogue record.
-            </p>
-          )}
+          <ResultsHead
+            outcome={outcome}
+            ok={ok}
+            system={system}
+            stale={stale}
+            todo={todo}
+            next={next}
+            short={short}
+          />
+          <DesignNotes ok={ok} />
           {/* the ladder bar sits directly above the tabs and drives every tab */}
           <ShownStrip />
           {tabList}
-          <Tabs.Panel value="results" className="results-panel" data-stale={stale || undefined}>
-            {heading('results')}
-            {ok ? (
-              // from 62em the chart's height is the room the column leaves (globals.css)
-              <div className="plain-chart">
-                <ResultChart />
-              </div>
-            ) : (
-              notRun('the breech pressure curve')
-            )}
-          </Tabs.Panel>
-          {short && (
-            <Tabs.Panel value="cartridge" data-before-run>
-              <FigureTab />
-            </Tabs.Panel>
-          )}
-          <Tabs.Panel value="ladder" data-stale={stale || undefined}>
-            {heading('ladder')}
-            {/* one step: its row would repeat the readouts */}
-            {!ok ? (
-              notRun('the ladder table')
-            ) : steps.length > 1 ? (
-              <>
-                {/* the table as shown, for a spreadsheet */}
-                <Button
-                  size={controlSize.row.button}
-                  variant="default"
-                  className="copy-csv"
-                  onClick={(e) => {
-                    const table = e.currentTarget.parentElement?.querySelector('table')
-                    if (!table) return
-                    const csv = toCsv(
-                      [...table.querySelectorAll('tr')].map((r) =>
-                        [...r.cells].map((c) => c.textContent?.trim() ?? ''),
-                      ),
-                    )
-                    const show = (state: true | 'failed') => {
-                      setCsvCopied(state)
-                      setTimeout(() => setCsvCopied(false), 2000)
-                    }
-                    navigator.clipboard.writeText(csv).then(
-                      () => show(true),
-                      () => show('failed'),
-                    )
-                  }}
-                >
-                  {csvCopied === 'failed' ? 'Copy failed' : csvCopied ? 'Copied' : 'Copy as CSV'}
-                </Button>
-                {lot.applies && <LotPanel lot={lot} system={system} />}
-                <LadderTarget labels={steps.map(stepValue)} system={system} />
-                <LadderTable
-                  ok={ok}
-                  steps={steps}
-                  system={system}
-                  value={stepValue}
-                  velocity={velocity}
-                  lot={lot.rows}
-                />
-              </>
-            ) : (
-              later(
-                'One step: the readouts give its values. Set Ladder steps in the Powder card for a table of steps.',
-              )
-            )}
-          </Tabs.Panel>
-          <Tabs.Panel value="measurements" data-stale={stale || undefined}>
-            {heading('measurements')}
-            {opened('measurements') && (
-              <Measurements
-                steps={measuredSteps(steps, ok)}
-                system={system}
-                sessions={chronoSessions}
-                setSessions={setChronoSessions}
-              />
-            )}
-          </Tabs.Panel>
-          <Tabs.Panel value="groups">
-            {heading('groups')}
-            {opened('groups') && <GroupsPanel />}
-          </Tabs.Panel>
-          <Tabs.Panel value="trajectory">
-            {heading('trajectory')}
-            {opened('trajectory') && <TrajectoryPanel />}
-          </Tabs.Panel>
-          <Tabs.Panel value="barrel" data-stale={stale || undefined}>
-            {heading('barrel')}
-            {!ok
-              ? notRun('the barrel length study')
-              : opened('barrel') && <BarrelLength study={barrel} system={system} />}
-          </Tabs.Panel>
-          <Tabs.Panel value="powders" data-stale={stale || undefined}>
-            {/* not in the report: no print heading either */}
-            {!ok
-              ? notRun('the powder comparison')
-              : opened('powders') && <PowderCompare system={system} />}
-          </Tabs.Panel>
-          <Tabs.Panel value="notes">
-            {heading('notes')}
-            <Textarea
-              label="Notes"
-              description="Saved with the load file (File, Save). Not in copied links."
-              autosize
-              minRows={4}
-              value={notes}
-              onChange={(e) => setNotes(e.currentTarget.value)}
-            />
-          </Tabs.Panel>
+          <ResultPanels short={short} />
         </div>
       </Tabs>
     </section>

@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { computedBulletRows } from '../src/lib/bullet.ts'
 import {
   type Action,
+  type ChoiceKey,
   choiceOptions,
   type Design,
   designerSpecs,
@@ -305,6 +306,31 @@ it('extreme typed values give a drawing or a reason, never a throw', () => {
   }
 })
 
+type Choices = readonly (readonly [ChoiceKey, readonly string[]])[]
+
+/** A random choice, undo or redo, or a field edit that is often empty or invalid. */
+function randomAction(rnd: () => number, h: History, choices: Choices): Action {
+  const r = rnd()
+  if (r < 0.15) {
+    const [key, opts] = choices[Math.floor(rnd() * choices.length)]
+    return { type: 'choice', key, value: opts[Math.floor(rnd() * opts.length)] }
+  }
+  if (r < 0.2) return { type: rnd() < 0.5 ? 'undo' : 'redo' }
+  const spec = designerSpecs[Math.floor(rnd() * designerSpecs.length)]
+  const key = spec.key
+  // parts along the axis up to the current length, as a user would set them
+  const length = h.present.fields.length.si ?? 4 * (h.present.fields.diameter.si ?? 0)
+  const axial = spec.quantity === 'length' && !['length', 'diameter', 'ogive.radius'].includes(key)
+  const max = metric[spec.quantity].fromSi(
+    axial ? Math.min(sliderMax(key, h.present), length) : sliderMax(key, h.present),
+  )
+  // clearing a field often, so the sequence leaves refused states again
+  // the required diameter stays a number here; its empty and invalid text is tested above
+  const pick = key === 'diameter' ? 1 : rnd()
+  const text = pick < 0.35 ? '' : pick < 0.38 ? 'x' : String(+(rnd() * max).toFixed(3))
+  return type(key, text)
+}
+
 it('random edit sequences always leave a drawing to show', () => {
   const rnd = seededRandom(118)
   const choices = [
@@ -318,28 +344,7 @@ it('random edit sequences always leave a drawing to show', () => {
     expect(last).toBeDefined()
     let drawn = 0
     for (let i = 0; i < 1500; i++) {
-      const r = rnd()
-      let a: Action
-      if (r < 0.15) {
-        const [key, opts] = choices[Math.floor(rnd() * choices.length)]
-        a = { type: 'choice', key, value: opts[Math.floor(rnd() * opts.length)] }
-      } else if (r < 0.2) a = { type: rnd() < 0.5 ? 'undo' : 'redo' }
-      else {
-        const spec = designerSpecs[Math.floor(rnd() * designerSpecs.length)]
-        const key = spec.key
-        // parts along the axis up to the current length, as a user would set them
-        const length = h.present.fields.length.si ?? 4 * (h.present.fields.diameter.si ?? 0)
-        const axial =
-          spec.quantity === 'length' && !['length', 'diameter', 'ogive.radius'].includes(key)
-        const max = metric[spec.quantity].fromSi(
-          axial ? Math.min(sliderMax(key, h.present), length) : sliderMax(key, h.present),
-        )
-        // clearing a field often, so the sequence leaves refused states again
-        // the required diameter stays a number here; its empty and invalid text is tested above
-        const pick = key === 'diameter' ? 1 : rnd()
-        const text = pick < 0.35 ? '' : pick < 0.38 ? 'x' : String(+(rnd() * max).toFixed(3))
-        a = type(key, text)
-      }
+      const a = randomAction(rnd, h, choices)
       h = reduce(h, a)
       const e = evaluate(h.present, metric, 'key' in a ? a.key : undefined)
       // a drawing, or a stated reason at a field while the last drawing stays

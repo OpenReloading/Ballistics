@@ -240,6 +240,34 @@ export function fromUser(
 /** The stored value of a field, in mm, g or degrees: 12 significant digits drop the noise of the SI round trip. */
 const storedOf = (s: FieldSpec, si: number) => Number(siToStored(stored(s), si).toPrecision(12))
 
+/** Sets the override of every designer field that differs from `origin`, and clears the others. */
+function fieldOverrides(
+  overrides: Record<string, unknown>,
+  fields: Design['fields'],
+  origin: Design['origin'],
+) {
+  for (const s of designerSpecs) {
+    const si = fields[s.key]?.si
+    const was = origin?.si[s.key]
+    dropPath(overrides, s.key)
+    if (si === undefined) {
+      if (was !== undefined) setPath(overrides, s.key, null)
+    } else if (!(origin && close(si, was))) setPath(overrides, s.key, { value: storedOf(s, si) })
+  }
+}
+
+/** Sets the override of every choice that differs from `origin`, and clears the others. */
+function choiceOverrides(
+  overrides: Record<string, unknown>,
+  choices: Design['choices'],
+  origin: Design['origin'],
+) {
+  for (const k of Object.keys(choiceOptions) as ChoiceKey[]) {
+    dropPath(overrides, k)
+    if (choices[k] !== (origin?.choices[k] ?? '')) setPath(overrides, k, choices[k] || null)
+  }
+}
+
 /**
  * The user bullet a design saves: its manufacturer, the base and the overrides, which are the
  * fields that differ from the base (a field cleared against a base value is `null`). Without a base
@@ -258,18 +286,8 @@ export function fileData({
 }: Design): UserBullet {
   if (locked) return locked.data
   const overrides: Record<string, unknown> = structuredClone(kept ?? {})
-  for (const s of designerSpecs) {
-    const si = fields[s.key]?.si
-    const was = origin?.si[s.key]
-    dropPath(overrides, s.key)
-    if (si === undefined) {
-      if (was !== undefined) setPath(overrides, s.key, null)
-    } else if (!(origin && close(si, was))) setPath(overrides, s.key, { value: storedOf(s, si) })
-  }
-  for (const k of Object.keys(choiceOptions) as ChoiceKey[]) {
-    dropPath(overrides, k)
-    if (choices[k] !== (origin?.choices[k] ?? '')) setPath(overrides, k, choices[k] || null)
-  }
+  fieldOverrides(overrides, fields, origin)
+  choiceOverrides(overrides, choices, origin)
   delete overrides.name
   if (name !== (origin?.name ?? '')) overrides.name = name || null
   return {
@@ -463,6 +481,40 @@ function completeShape(v: StoredValues, choices: Choices) {
   return { L, assumedLength, n, noseFromRadius }
 }
 
+function baseShape(v: StoredValues, choices: Choices): NonNullable<BulletDimensions['base']> {
+  return {
+    ...(choices['base.type'] && {
+      type: choices['base.type'] as NonNullable<BulletDimensions['base']>['type'],
+    }),
+    ...(v['base.length'] !== undefined && { length: v['base.length'] }),
+    ...(v['base.diameter'] !== undefined && { diameter: v['base.diameter'] }),
+    ...(v['base.angle'] !== undefined && { angle: v['base.angle'] }),
+    ...(v['base.cavityDiameter'] !== undefined && { cavityDiameter: v['base.cavityDiameter'] }),
+  }
+}
+
+function tipShape(
+  v: StoredValues,
+  type: NonNullable<BulletDimensions['tip']>['type'],
+): NonNullable<BulletDimensions['tip']> {
+  return {
+    type,
+    ...(v['tip.length'] !== undefined && { length: v['tip.length'] }),
+    ...(v['tip.mouthDiameter'] !== undefined && { mouthDiameter: v['tip.mouthDiameter'] }),
+  }
+}
+
+function cannelureShape(v: StoredValues): Pick<BulletDimensions, 'cannelure'> {
+  if (v['cannelure.start'] === undefined) return {}
+  return {
+    cannelure: {
+      start: v['cannelure.start'],
+      width: v['cannelure.width'] as number,
+      ...(v['cannelure.depth'] !== undefined && { depth: v['cannelure.depth'] }),
+    },
+  }
+}
+
 /** The bullet shape of the given values, mm and degrees, with length `L` and nose length `n`. */
 function shapeFromValues(
   v: StoredValues,
@@ -481,34 +533,14 @@ function shapeFromValues(
     ...(v.baseToOgive !== undefined && { baseToOgive: v.baseToOgive }),
     ...(v.bearingLength !== undefined && { bearingLength: v.bearingLength }),
     ...(v.meplatDiameter !== undefined && { meplatDiameter: v.meplatDiameter }),
-    base: {
-      ...(choices['base.type'] && {
-        type: choices['base.type'] as NonNullable<BulletDimensions['base']>['type'],
-      }),
-      ...(v['base.length'] !== undefined && { length: v['base.length'] }),
-      ...(v['base.diameter'] !== undefined && { diameter: v['base.diameter'] }),
-      ...(v['base.angle'] !== undefined && { angle: v['base.angle'] }),
-      ...(v['base.cavityDiameter'] !== undefined && { cavityDiameter: v['base.cavityDiameter'] }),
-    },
+    base: baseShape(v, choices),
     ogive: {
       ...(form && { form }),
       ...(radius !== undefined && { radius }),
       ...(ratio !== undefined && { radiusRatio: ratio }),
     },
-    ...(tipType && {
-      tip: {
-        type: tipType,
-        ...(v['tip.length'] !== undefined && { length: v['tip.length'] }),
-        ...(v['tip.mouthDiameter'] !== undefined && { mouthDiameter: v['tip.mouthDiameter'] }),
-      },
-    }),
-    ...(v['cannelure.start'] !== undefined && {
-      cannelure: {
-        start: v['cannelure.start'],
-        width: v['cannelure.width'] as number,
-        ...(v['cannelure.depth'] !== undefined && { depth: v['cannelure.depth'] }),
-      },
-    }),
+    ...(tipType && { tip: tipShape(v, tipType) }),
+    ...cannelureShape(v),
   }
 }
 
@@ -521,46 +553,20 @@ function derivedFills(
   v: StoredValues,
   choices: Choices,
   { L, assumedLength, noseFromRadius }: ReturnType<typeof completeShape>,
-): Record<string, [number, 'derived' | 'assumed', string?]> {
+): Fill {
   const d = v.diameter as number
-  const form = choices['ogive.form']
-  const round = form === 'round-nose' || form === 'flat-nose'
-  const radius = v['ogive.radius']
-  const ratio = v['ogive.radiusRatio']
   const tag = (i: number) => (o.tags[i] === 'approximate' ? 'assumed' : 'derived')
-  // a boat tail starts at a base edge inside the shank radius; its top is the next point
-  const e = o.baseEdge
-  const tail = o.points[e][0] < d / 2 - 1e-12
-  const t = tail ? o.points[e + 1][1] : 0
   const baseAssumed = o.approximate.some(([z]) => z === 0)
   const tipIndex = o.points.findIndex(([, z]) => z === L)
   const m = o.points[tipIndex][0]
-  const k = d / 2 - m
-  const rt = (o.noseLength ** 2 + k ** 2) / (2 * k)
-  const q = ratio ?? (radius ? rt / radius : form === 'secant' || form === 'hybrid' ? 0.5 : 1)
-  const noseShapeAssumed =
-    o.noseAssumed || (ratio === undefined && radius === undefined && form !== 'tangent')
-  const fill: Record<string, [number, 'derived' | 'assumed', string?]> = {
+  const fill: Fill = {
     length: [L, 'assumed', assumedLength],
     noseLength: [o.noseLength, noseFromRadius ? 'derived' : o.noseAssumed ? 'assumed' : 'derived'],
     bearingLength: [o.bearingLength, o.noseAssumed || baseAssumed ? 'assumed' : 'derived'],
     meplatDiameter: [2 * m, tag(tipIndex)],
   }
-  if (tail) {
-    const tagT = tag(e + 1)
-    const tagB = tag(e)
-    fill['base.length'] = [t, tagT]
-    fill['base.diameter'] = [2 * o.points[e][0], tagB]
-    const top = o.points[e + 1]
-    fill['base.angle'] = [
-      fromSi('angle', Math.atan((top[0] - o.points[e][0]) / t)),
-      tagT === 'assumed' || tagB === 'assumed' ? 'assumed' : 'derived',
-    ]
-  }
-  if (!round && k > 0 && q > 0) {
-    fill['ogive.radius'] = [rt / q, noseShapeAssumed ? 'assumed' : 'derived']
-    fill['ogive.radiusRatio'] = [q, noseShapeAssumed ? 'assumed' : 'derived']
-  }
+  boatTailFills(fill, o, d, tag)
+  ogiveFills(fill, o, v, choices, m)
   if (o.tipStart !== undefined) fill['tip.length'] = [L - o.tipStart, 'assumed']
   if (choices['tip.type'] === 'hollow-point') {
     const mouth = o.points.filter(([, z]) => z === L).map(([r]) => r)
@@ -569,6 +575,54 @@ function derivedFills(
   if (v['cannelure.start'] !== undefined && v['cannelure.depth'] === undefined)
     fill['cannelure.depth'] = [0.02 * d, 'assumed', '0.02 d']
   return fill
+}
+
+type Fill = Record<string, [number, 'derived' | 'assumed', string?]>
+
+function boatTailFills(
+  fill: Fill,
+  o: BulletProfile['outline'],
+  d: number,
+  tag: (i: number) => 'derived' | 'assumed',
+) {
+  // a boat tail starts at a base edge inside the shank radius; its top is the next point
+  const e = o.baseEdge
+  if (!(o.points[e][0] < d / 2 - 1e-12)) return
+  const t = o.points[e + 1][1]
+  const tagT = tag(e + 1)
+  const tagB = tag(e)
+  fill['base.length'] = [t, tagT]
+  fill['base.diameter'] = [2 * o.points[e][0], tagB]
+  const top = o.points[e + 1]
+  fill['base.angle'] = [
+    fromSi('angle', Math.atan((top[0] - o.points[e][0]) / t)),
+    tagT === 'assumed' || tagB === 'assumed' ? 'assumed' : 'derived',
+  ]
+}
+
+/** The radius and radius ratio of a nose whose form is not round, from the drawn nose length. */
+function ogiveFills(
+  fill: Fill,
+  o: BulletProfile['outline'],
+  v: StoredValues,
+  choices: Choices,
+  m: number,
+) {
+  const d = v.diameter as number
+  const form = choices['ogive.form']
+  if (form === 'round-nose' || form === 'flat-nose') return
+  const radius = v['ogive.radius']
+  const ratio = v['ogive.radiusRatio']
+  const k = d / 2 - m
+  const rt = (o.noseLength ** 2 + k ** 2) / (2 * k)
+  const q = ratio ?? (radius ? rt / radius : form === 'secant' || form === 'hybrid' ? 0.5 : 1)
+  if (!(k > 0 && q > 0)) return
+  const assumed =
+    o.noseAssumed || (ratio === undefined && radius === undefined && form !== 'tangent')
+      ? 'assumed'
+      : 'derived'
+  fill['ogive.radius'] = [rt / q, assumed]
+  fill['ogive.radiusRatio'] = [q, assumed]
 }
 
 /**
