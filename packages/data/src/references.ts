@@ -70,6 +70,18 @@ export function checkLoadCapacityReferences(
       errors.push(`loads/${l.id}.json: unknown capacity "${l.capacity}"`)
 }
 
+/** The session of every load that names one. */
+export function checkLoadSessionReferences(
+  bundle: Pick<Bundle, 'loads' | 'chronoSessions'>,
+  errors: string[],
+) {
+  const known = new Set(bundle.chronoSessions.map((s) => s.id))
+  for (const l of bundle.loads)
+    for (const ref of l.sessions ?? [])
+      if (!known.has(parseRef(ref)?.id ?? ref))
+        errors.push(`loads/${l.id}.json: unknown session "${ref}"`)
+}
+
 /** The load of every shot string of a chronograph session. */
 export function checkLoadReferences(
   bundle: Pick<Bundle, 'chronoSessions'>,
@@ -78,7 +90,7 @@ export function checkLoadReferences(
 ) {
   for (const session of bundle.chronoSessions) {
     for (const string of session.strings) {
-      if (!ids.loads.has(string.load)) {
+      if (!ids.loads.has(parseRef(string.load)?.id ?? string.load)) {
         errors.push(`chrono/${session.id}.json: unknown load "${string.load}"`)
       }
     }

@@ -72,7 +72,7 @@ const parts = (over: Partial<LoadParts> = {}): LoadParts => ({
   bullet: 'catalogue:demo-bullet-168',
   powder: 'catalogue:demo-powder-dp40',
   notes: '',
-  measurements: [],
+  sessions: [],
   ...over,
 })
 
@@ -116,10 +116,10 @@ describe('toLoad', () => {
     expect(loadSchema.safeParse(l).success).toBe(true)
   })
 
-  it('writes an empty text and no series as absent', () => {
+  it('writes an empty text and no sessions as absent', () => {
     const l = toLoad(parts({ values: {}, notes: '' }))
     expect(l.note).toBeUndefined()
-    expect(l.measurements).toBeUndefined()
+    expect(l.sessions).toBeUndefined()
     expect(l.case).toBeUndefined()
     expect(l.seating).toBeUndefined()
   })
@@ -209,18 +209,12 @@ describe('opening and saving a load', () => {
     capacity: measuredCapacityRef('catalogue:308-win', 3.6e-6),
     seating: { by: 'overallLength', value: 0.07112 },
     ladder: { kind: 'seating', stepCount: 5, step: 0.0003, direction: 'around' },
-    measurements: [
-      {
-        name: 'day1.csv',
-        muzzleDistance: 3,
-        strings: [{ label: 'A', charge: 0.0024, shots: [{ velocity: { value: 800 } }] }],
-      },
-    ],
+    sessions: ['user:3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13', 'catalogue:example-session'],
   })
 
-  /** What the workbench holds after it opened `l`: the values of the query and the series. */
+  /** What the workbench holds after it opened `l`: the values of the query and the session references. */
   const reopened = (l: ReturnType<typeof toLoad>): LoadParts => {
-    const { query, measurements } = fromLoad(l)
+    const { query, sessions } = fromLoad(l)
     const si = (k: string) => (query.has(k) ? Number(query.get(k)) : undefined)
     const kind = (query.get('ladderKind') ?? 'charge') as 'charge' | 'seating' | 'temperature'
     return {
@@ -244,7 +238,7 @@ describe('opening and saving a load', () => {
           direction: query.get('ladderDirection') as 'up',
         }) ||
         undefined,
-      measurements,
+      sessions,
     }
   }
 

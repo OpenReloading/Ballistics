@@ -39,7 +39,7 @@ const parts = (over: Partial<LoadParts> = {}): LoadParts => ({
   bullet: 'catalogue:demo-bullet-168',
   powder: 'catalogue:demo-powder-dp40',
   notes: '',
-  measurements: [],
+  sessions: [],
   ...over,
 })
 
@@ -96,14 +96,14 @@ describe('toApiLoad', () => {
     expect((await runFile(toApiLoad(parts({ given, powder: undefined }), {}))).status).toBe(200)
   })
 
-  it('leaves out what the API cannot read: a user reference, the firearm, the capacity, series and a seating ladder', () => {
+  it('leaves out what the API cannot read: a user reference, the firearm, the capacity, sessions and a seating ladder', () => {
     const seating = { kind: 'seating', stepCount: 3, step: 0.0005, direction: 'around' } as const
     const file = toApiLoad(
       parts({
         firearm: `user:${crypto.randomUUID()}`,
         capacity: 'catalogue:x',
         ladder: seating,
-        measurements: [{ name: 'a', strings: [] } as never],
+        sessions: ['user:11111111-1111-4111-8111-111111111111'],
       }),
       {},
     )
@@ -112,7 +112,7 @@ describe('toApiLoad', () => {
     expect(file.powder).toBeUndefined()
     expect(file.firearm).toBeUndefined()
     expect(file.capacity).toBeUndefined()
-    expect(file.measurements).toBeUndefined()
+    expect(file.sessions).toBeUndefined()
     expect(file.analysis?.ladder).toBeUndefined()
     const charge = toApiLoad(
       parts({ ladder: { kind: 'charge', stepCount: 3, step: 1e-4, direction: 'up' } }),

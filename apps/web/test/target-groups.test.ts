@@ -9,7 +9,12 @@ const group: ShotGroup = {
   distance: 100,
   aim: { x: -0.002, y: 0.004 },
   shots: [
-    { x: 0.003, y: -0.001, placement: 'placed', chrono: { session: 's1', string: 0, shot: 1 } },
+    {
+      x: 0.003,
+      y: -0.001,
+      placement: 'placed',
+      chrono: { session: 'user:3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13', string: 0, shot: 1 },
+    },
     { x: 0.005, y: 0.002, placement: 'detected', excluded: true },
   ],
 }
