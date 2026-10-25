@@ -4,7 +4,12 @@
  * are the functions the worker runs: no imports, and each refers only to other exports.
  */
 
-export const shellPrefix = 'openreloading-shell-'
+/**
+ * The prefix of the shell caches. `scope` is `''` for the released site and `'preview-'` for the
+ * development preview, which shares the origin (and so Cache Storage) with it: each worker deletes
+ * only the shells of its own scope.
+ */
+export const shellPrefix = (scope = '') => `openreloading-${scope}shell-`
 /** Records fetched through `/api/`: JSON that stays valid across builds, so no build in the name. */
 export const recordsCache = 'openreloading-records'
 export const offlinePage = '/offline'
@@ -24,7 +29,7 @@ export const shellPages = [
 /** Files precached with the pages: the manifest and its icons. */
 export const shellFiles = ['/manifest.webmanifest', '/icon.png', '/icon-192.png', '/apple-icon.png']
 
-export const shellCache = (version: string) => shellPrefix + version
+export const shellCache = (version: string, scope = '') => shellPrefix(scope) + version
 
 /**
  * The caches a worker of `version` deletes on activation: the shells of other builds but the newest
@@ -32,8 +37,10 @@ export const shellCache = (version: string) => shellPrefix + version
  * that build load later.
  * shortcut: a tab open across two deploys still loses its chunks; keep more shells if that matters.
  */
-export const staleCaches = (names: string[], version: string) =>
-  names.filter((n) => n.startsWith(shellPrefix) && n !== shellPrefix + version).slice(0, -1)
+export const staleCaches = (names: string[], version: string, scope = '') =>
+  names
+    .filter((n) => n.startsWith(shellPrefix(scope)) && n !== shellCache(version, scope))
+    .slice(0, -1)
 
 /** How long a network-first request waits before a cached copy answers (ms). */
 export const slowNetwork = 4000
@@ -99,7 +106,8 @@ export const shellAnswer = (cached: Response, destination: string) =>
  * the cached record behind it, `page` network-first with the cached page and the offline page
  * behind it, `navigation` (a client navigation fetching RSC) from the network while the page's HTML
  * is stored; undefined leaves the request to the network (POST /interior, searches, prefetches,
- * other origins, paths outside `base` and the docs site under `<base>/docs/`).
+ * other origins, paths outside `base`, the docs site under `<base>/docs/` and the development
+ * preview under `<base>/develop/`, which has a worker of its own).
  */
 export const strategyOf = (
   request: {
@@ -114,7 +122,7 @@ export const strategyOf = (
   const u = new URL(request.url)
   if (request.method !== 'GET' || u.origin !== origin || !u.pathname.startsWith(`${base}/`)) return
   const path = u.pathname.slice(base.length)
-  if (path.startsWith('/docs/')) return
+  if (path.startsWith('/docs/') || path.startsWith('/develop/')) return
   // the catalogue index is as old as its build, so it comes from the build's shell cache
   if (path.startsWith('/_next/static/') || shellFiles.includes(path) || path === catalogueFile)
     return 'static'

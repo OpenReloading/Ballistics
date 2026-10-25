@@ -42,6 +42,18 @@ it('names one shell cache per build and keeps the records cache across builds', 
   expect(staleCaches([shellCache('new')], 'new')).toEqual([])
 })
 
+it('keeps the preview worker from deleting the released site shells, and the reverse', () => {
+  expect(shellCache('abc', 'preview-')).toBe('openreloading-preview-shell-abc')
+  const names = [
+    shellCache('a'),
+    shellCache('p1', 'preview-'),
+    shellCache('b'),
+    shellCache('p2', 'preview-'),
+  ]
+  expect(staleCaches(names, 'new', 'preview-')).toEqual([shellCache('p1', 'preview-')])
+  expect(staleCaches([...names, shellCache('new')], 'new')).toEqual([shellCache('a')])
+})
+
 it('answers from the network, else from the cached copy on a failure, a server error or a stall', async () => {
   const net = { status: 200 }
   const copy = { status: 200 }
@@ -133,6 +145,10 @@ it('in the Pages edition, serves under the base path and leaves the docs site to
   )
   const docs = req('/OpenReloading/docs/models/', { mode: 'navigate' })
   expect(strategyOf(docs, origin, base)).toBeUndefined()
+  // the development preview under /develop/ has a worker of its own
+  const preview = req('/OpenReloading/develop/workbench/', { mode: 'navigate' })
+  expect(strategyOf(preview, origin, base)).toBeUndefined()
+  expect(strategyOf(preview, origin, `${base}/develop`)).toBe('page')
   expect(strategyOf(req('/other/', { mode: 'navigate' }), origin, base)).toBeUndefined()
 })
 

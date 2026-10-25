@@ -1,10 +1,11 @@
 name: Pages
 
-# Builds the Pages edition (`npm run pages:build`, README) from main and deploys it to GitHub Pages.
-# The repository's Pages source must be "GitHub Actions".
+# Builds the Pages edition (`npm run pages:build`, README) from main and deploys it to GitHub Pages,
+# with the build of develop under `develop/` as a preview (`PAGES_PREVIEW`). The repository's Pages
+# source must be "GitHub Actions" and the `github-pages` environment must accept main and develop.
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   workflow_dispatch:
 
 permissions: {}
@@ -17,32 +18,71 @@ jobs:
   build:
     if: github.repository == 'OpenReloading/Ballistics'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # two builds: the released site, then the preview
+    timeout-minutes: 40
     permissions:
       contents: read
       pages: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: main
+          path: main
+          persist-credentials: false
+      # a failed checkout of develop costs the preview only
+      - id: develop
+        continue-on-error: true
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: develop
+          path: develop
           persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version-file: .nvmrc
+          node-version-file: main/.nvmrc
           cache: npm
+          cache-dependency-path: |
+            main/package-lock.json
+            develop/package-lock.json
       - run: npm ci --ignore-scripts && node patches/apply.mjs
+        working-directory: main
       - run: npm run build
+        working-directory: main
       - id: pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
       - run: npm run pages:build
+        working-directory: main
         env:
           PAGES_BASE_PATH: ${{ steps.pages.outputs.base_path }}
           PAGES_URL: ${{ steps.pages.outputs.origin }}
           NEXT_PUBLIC_REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
           # the docs navbar's repository widget reads stars, forks and the release at build time
           GITHUB_TOKEN: ${{ github.token }}
+      # the preview of develop, a site of its own under `<base path>/develop`: a failure leaves the
+      # released site to deploy without it
+      - id: preview
+        if: steps.develop.outcome == 'success'
+        continue-on-error: true
+        working-directory: develop
+        env:
+          PAGES_BASE: ${{ steps.pages.outputs.base_path }}
+          PAGES_ORIGIN: ${{ steps.pages.outputs.origin }}
+          REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
+          TOKEN: ${{ github.token }}
+        run: |
+          npm ci --ignore-scripts
+          node patches/apply.mjs
+          npm run build
+          PAGES_BASE_PATH="$PAGES_BASE/develop" PAGES_URL="$PAGES_ORIGIN" PAGES_PREVIEW=1 \
+            NEXT_PUBLIC_REPOSITORY_URL="$REPOSITORY_URL" GITHUB_TOKEN="$TOKEN" \
+            npm run pages:build
+      - if: steps.develop.outcome == 'failure' || steps.preview.outcome == 'failure'
+        run: echo "::warning title=Preview of develop::The build of develop failed, the released site deploys without the preview."
+      - if: steps.preview.outcome == 'success'
+        run: mv develop/pages main/pages/develop
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
-          path: pages
+          path: main/pages
 
   deploy:
     needs: build
