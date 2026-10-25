@@ -245,8 +245,8 @@ export const ResultsArea = memo(function ResultsArea() {
     setCsvCopied,
     notes,
     setNotes,
-    chronoSeries,
-    setChronoSeries,
+    chronoSessions,
+    setChronoSessions,
     barrel,
     lot,
     status,
@@ -509,8 +509,8 @@ export const ResultsArea = memo(function ResultsArea() {
               <Measurements
                 steps={measuredSteps(steps, ok)}
                 system={system}
-                series={chronoSeries}
-                setSeries={setChronoSeries}
+                sessions={chronoSessions}
+                setSessions={setChronoSessions}
               />
             )}
           </Tabs.Panel>

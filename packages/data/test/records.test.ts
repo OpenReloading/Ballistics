@@ -41,7 +41,7 @@ describe('readRecords', () => {
     expect(errors.some((e) => e.startsWith('chrono/broken.json: invalid JSON'))).toBe(true)
     expect(errors).toContain('loads/other-name.json: id "test-load" does not match the file name')
     expect(errors).toContain('loads/test-load.json: unknown cartridge "catalogue:test-cartridge"')
-    expect(errors).toContain('chrono/test-session.json: unknown load "missing-load"')
+    expect(errors).toContain('chrono/test-session.json: unknown load "catalogue:missing-load"')
     expect(errors).toContain('firings/test-firing.json: unknown cartridge "missing-cartridge"')
     expect(errors).toContain('range/test-range-b.json: round 1(b)* is also in test-range-a')
     expect(errors).toContain(

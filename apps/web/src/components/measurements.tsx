@@ -2,18 +2,20 @@
 
 import { Button } from '@mantine/core'
 import type { VelocityUnit } from '@open-reloading/importers'
-import { type Dispatch, type ReactNode, type SetStateAction, useState } from 'react'
+import { chronoSession, type SessionRecord, toSi } from '@open-reloading/schema'
+import { type Dispatch, type ReactNode, type SetStateAction, useRef, useState } from 'react'
 import { chronoFileBytes, readChrono } from '../lib/chrono.ts'
 import { errorText } from '../lib/error-text.ts'
 import {
   type ChargeRow,
   chargeRows,
-  type IdentifiedSeries,
   type SimulatedStep,
-  seriesId,
-  seriesOf,
+  sessionOf,
   simulatedCurve,
+  stringCharge,
+  withCharge,
 } from '../lib/measurements.ts'
+import { newId } from '../lib/new-id.ts'
 import { controlSize } from '../lib/theme.ts'
 import { formatNumber, type UnitSystem, withUnit } from '../lib/units.ts'
 import { ChronoFileInput } from './chrono-file-input.tsx'
@@ -21,6 +23,7 @@ import { LadderFlatSpots } from './ladder-flat-spots.tsx'
 import { LineChart, useChartScale } from './line-chart.tsx'
 import { PanelTable } from './scroll-region.tsx'
 import { ErrorNote } from './states.tsx'
+import { useResult } from './workbench-context.ts'
 
 /** A step of the last run as the Measurements tab needs it. */
 /** `label`: the step relative to the main charge. */
@@ -38,6 +41,8 @@ const columns = [
   'Difference',
   'Difference %',
 ] as const
+/** Sessions a load names at most (`Load.sessions`). */
+const maxSessions = 50
 const tableName = 'Measured against simulated velocity per charge'
 const chartName = 'Measured mean velocity and simulated muzzle velocity against charge'
 
@@ -134,34 +139,44 @@ function Marks({ series, system }: { series: Plotted[]; system: UnitSystem }) {
 /**
  * The Measurements tab: chronograph files read in the browser, strings mapped to the charges of the
  * last run, a table per series and charge and one chart over charge. `steps` is undefined before a
- * run. The load keeps `series`, so a load file saves them.
+ * run. The sessions are user records the load references, stored as they change.
  */
 export function Measurements({
   steps,
   system,
-  series,
-  setSeries,
+  sessions,
+  setSessions,
   idPrefix = 'measurements',
 }: {
   /** Ids of the controls; the phone range view shows a second copy. */
   idPrefix?: string
   steps: MeasuredStep[] | undefined
   system: UnitSystem
-  series: IdentifiedSeries[]
-  setSeries: Dispatch<SetStateAction<IdentifiedSeries[]>>
+  sessions: SessionRecord[]
+  setSessions: Dispatch<SetStateAction<SessionRecord[]>>
 }) {
+  const { manufacturerRef, manufacturerName, sessionRefCount } = useResult()
   const [unit, setUnit] = useState<VelocityUnit | ''>('')
   const [error, setError] = useState('')
   const [status, setStatus] = useState('')
+  const reserved = useRef(0)
 
   async function readFiles(files: File[]) {
     setError('')
     setStatus('')
-    const read: IdentifiedSeries[] = []
+    const read: SessionRecord[] = []
     const failed: string[] = []
-    for (const file of files) {
+    // a maker named by several files is one reference, a new one is stored once
+    const makers = new Map<string, string | undefined>()
+    // a load names up to maxSessions sessions; the slots of reads still running are taken
+    const room = Math.max(0, maxSessions - sessionRefCount - reserved.current)
+    const taken = files.slice(0, room)
+    reserved.current += taken.length
+    for (const file of files.slice(room))
+      failed.push(`${file.name}: a load keeps ${maxSessions} sessions at most.`)
+    for (const file of taken) {
       // taken before the first await, so reads that overlap never share an id
-      const id = seriesId()
+      const id = newId()
       try {
         const data = await readChrono(await chronoFileBytes(file), {
           fileName: file.name,
@@ -169,14 +184,33 @@ export function Measurements({
         })
         // string k takes step k's charge; the selects show the guess
         const charges = data.session.strings.map((_, i) => steps?.[i]?.charge)
-        read.push({ id, ...seriesOf(file.name, data, charges) })
+        // checked before the maker is stored: a file over the schema's caps would be stored as an
+        // invalid record
+        const now = new Date()
+        const draft = sessionOf(file.name, data, charges, { id, now })
+        const checked = chronoSession.safeParse(draft.data)
+        if (!checked.success)
+          throw new Error(
+            checked.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; '),
+          )
+        const named = data.session.device.manufacturerName?.trim() ?? ''
+        if (named && !makers.has(named)) makers.set(named, manufacturerRef(named))
+        const record = sessionOf(file.name, data, charges, {
+          id,
+          manufacturer: makers.get(named),
+          now,
+        })
+        read.push(record)
       } catch (err) {
         failed.push(`${file.name}: ${errorText(err)}`)
       }
     }
-    setSeries((s) => [...s, ...read])
+    setSessions((s) => [...s, ...read])
+    reserved.current -= taken.length
     if (read.length > 0)
-      setStatus(`Read ${read.map((r) => `${r.name}, ${r.strings.length} strings`).join('; ')}.`)
+      setStatus(
+        `Read ${read.map((r) => `${r.name}, ${r.data.strings.length} strings`).join('; ')}.`,
+      )
     if (failed.length > 0) setError(failed.join(' '))
   }
 
@@ -185,27 +219,32 @@ export function Measurements({
   const speed = (ms: number) => formatNumber(v.fromSi(ms), 1)
   const runSteps = steps ?? []
   const curve = simulatedCurve(runSteps)
-  const plotted = series.map((s, k) => ({
+  const plotted = sessions.map((s, k) => ({
     s,
     shape: shapes[k % shapes.length],
     rows: chargeRows(
-      s.strings.map((str) => ({ charge: str.charge, shots: str.shots })),
+      s.data.strings.map((str) => ({ charge: stringCharge(str), shots: str.shots })),
       runSteps,
     ),
   }))
-  const seriesName = (s: IdentifiedSeries) => [s.name, s.date, s.device].filter(Boolean).join(', ')
-  const distances = series.flatMap((s) => {
-    const d = s.muzzleDistance
-    return d !== undefined ? [`${withUnit('length', system, d)} (${s.name})`] : []
+  const device = (s: SessionRecord) =>
+    [manufacturerName(s.data.device.manufacturer), s.data.device.model].filter(Boolean).join(' ')
+  const seriesName = (s: SessionRecord) =>
+    [s.name, s.data.date, device(s)].filter(Boolean).join(', ')
+  const distances = sessions.flatMap((s) => {
+    const d = s.data.muzzleDistance
+    return d !== undefined
+      ? [`${withUnit('length', system, toSi('length', d.value))} (${s.name})`]
+      : []
   })
 
-  function mapString(id: number, i: number, value: string) {
-    setSeries((all) =>
+  function mapString(id: string, i: number, value: string) {
+    setSessions((all) =>
       all.map((s) => {
         if (s.id !== id) return s
-        const strings = [...s.strings]
-        strings[i] = { ...strings[i], charge: value === '' ? undefined : Number(value) }
-        return { ...s, strings }
+        const strings = [...s.data.strings]
+        strings[i] = withCharge(strings[i], value === '' ? undefined : Number(value))
+        return { ...s, data: { ...s.data, strings } }
       }),
     )
   }
@@ -295,8 +334,8 @@ export function Measurements({
   return (
     <div className="measurements">
       <p className="note">
-        Strings are saved with the load file (Save), not in copied links. Chronograph velocities are
-        not corrected to the muzzle
+        Sessions are kept in this browser and the saved load names them; a load file or copied link
+        does not carry their shots. Chronograph velocities are not corrected to the muzzle
         {distances.length > 0 ? `; measured at ${distances.join(', ')} from the muzzle` : ''}.
       </p>
       <ChronoFileInput
@@ -310,13 +349,13 @@ export function Measurements({
       />
       <p role="status">{status}</p>
       {error && <ErrorNote title="The file was not read.">{error}</ErrorNote>}
-      {series.length === 0 && (
+      {sessions.length === 0 && (
         <p className="prompt empty-state">
           Read a chronograph file to compare its strings with the simulated velocity per charge.
           Nothing is sent; the file is read in this browser.
         </p>
       )}
-      {series.length > 0 && !steps && (
+      {sessions.length > 0 && !steps && (
         <p className="prompt empty-state">
           Run the simulation, with a charge ladder for several charges, to map the strings to
           charges.
@@ -374,16 +413,16 @@ export function Measurements({
           </ul>
         </>
       )}
-      {series.length > 0 && <h3>Strings and charges</h3>}
+      {sessions.length > 0 && <h3>Strings and charges</h3>}
       {plotted.map(({ s, shape }, k) => (
         <fieldset key={s.id} className="measured-series">
           <legend className="series-name">
             <LegendShape shape={shape} k={k} /> {seriesName(s)}
           </legend>
-          {s.strings.map((str, i) => {
+          {s.data.strings.map((str, i) => {
             const label = str.label
             const name = `String ${i + 1}${label ? `: ${label}` : ''}`
-            const at = str.charge
+            const at = stringCharge(str)
             const step =
               at === undefined ? undefined : runSteps.find((st) => Math.abs(st.charge - at) < 1e-7)
             return (
@@ -414,7 +453,7 @@ export function Measurements({
           <Button
             variant="subtle"
             size={controlSize.row.button}
-            onClick={() => setSeries((all) => all.filter((x) => x.id !== s.id))}
+            onClick={() => setSessions((all) => all.filter((x) => x.id !== s.id))}
           >
             Remove {s.name}
           </Button>

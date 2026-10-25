@@ -32,7 +32,8 @@ function useRangeCard() {
  * result context, so it shows what the Results tab shows.
  */
 export function RangeView() {
-  const { ok, steps, stale, system, setSeen, chronoSeries, setChronoSeries, online } = useResult()
+  const { ok, steps, stale, system, setSeen, chronoSessions, setChronoSessions, online } =
+    useResult()
   const { run, pending } = useLoad()
   const { trajectoryLoad } = useInputEcho()
   const [chrono, setChrono] = useState(false)
@@ -126,8 +127,8 @@ export function RangeView() {
             idPrefix="range-measurements"
             steps={measuredSteps(steps, ok)}
             system={system}
-            series={chronoSeries}
-            setSeries={setChronoSeries}
+            sessions={chronoSessions}
+            setSessions={setChronoSessions}
           />
         )}
       </div>
