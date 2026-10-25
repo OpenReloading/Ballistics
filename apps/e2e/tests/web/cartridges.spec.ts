@@ -2,7 +2,7 @@ import { expect, type Page, test } from '@playwright/test'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 
-// the cartridge directory: count in the page bar, windowed rows, filters and sort in the URL
+// the cartridge directory: count in the page bar, windowed rows, search and sort in the URL
 const status = (page: Page) => page.locator('.page-bar-status [role="status"]')
 // the rendered table's rows: a streamed server segment not yet revealed stays hidden beside it
 const rows = (page: Page) => page.locator('tbody tr[data-row]').locator('visible=true')
@@ -12,9 +12,7 @@ async function total(page: Page) {
   return Number((await status(page).textContent())?.split(' ')[0])
 }
 
-test('the list searches names and aliases, filters by caliber and case and keeps them in the URL', async ({
-  page,
-}) => {
+test('the list searches names and aliases and keeps the search in the URL', async ({ page }) => {
   await gotoHydrated(page, '/cartridges')
   const n = await total(page)
   // windowed: the DOM holds the rows in view; no standards and no table column, CIP on every row
@@ -23,52 +21,28 @@ test('the list searches names and aliases, filters by caliber and case and keeps
   await expect(page.getByRole('columnheader', { name: /^Table/ })).toHaveCount(0)
   await expect(page.getByRole('combobox', { name: 'CIP table' })).toHaveCount(0)
   await expect(page.locator('.directory .standard-badge')).toHaveCount(0)
+  // the table's own controls are the sort, with no filter in the table or its row
+  await expect(page.getByRole('combobox', { name: 'Caliber' })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: /^More filters/ })).toHaveCount(0)
   const search = page.getByRole('searchbox', { name: 'Search' })
   await search.fill('lapua')
   await expect(status(page)).toHaveText(/^\d+ of \d+ cartridges$/)
-  await page.getByRole('combobox', { name: 'Caliber' }).click()
-  await page.getByRole('option', { name: /^\.338 \(\d+\)$/ }).click()
-  const table = page.getByRole('table', { name: 'Cartridges, caliber .338, matching "lapua"' })
-  await expect(table).toBeVisible()
-  // the rows follow the caption once the deferred filter applies
+  await expect(page.getByRole('table', { name: 'Cartridges, matching "lapua"' })).toBeVisible()
+  // the rows follow the caption once the deferred search applies
   await expect
-    .poll(async () => [...new Set(await rows(page).locator('td:nth-child(2)').allTextContents())])
-    .toEqual(['.338'])
+    .poll(async () => (await rows(page).getByRole('link').allTextContents()).length)
+    .toBeGreaterThan(0)
   for (const name of await rows(page).getByRole('link').allTextContents())
     expect(name).toMatch(/lapua/i)
   await expect(page).toHaveURL(/[?&]q=lapua/)
-  await expect(page).toHaveURL(/[?&]caliber=\.338/)
   // aliases are part of the name cell, muted
   await page.goto('/cartridges?q=308+winchester')
   const win = page.getByRole('link', { name: /^308 Win\./ })
   await expect(win.locator('.aliases')).toContainText('308 Winchester')
-  // a link restores the filters: belted cases only
-  await gotoHydrated(page, '/cartridges?type=belted')
-  await expect(status(page)).toHaveText(/^\d+ of \d+ cartridges$/)
-  await expect(page.getByRole('link', { name: /^300 Win\. Mag\./ })).toHaveCount(1)
-  for (const cell of await rows(page).locator('td:nth-child(3)').all())
-    await expect(cell).toHaveText('belted')
-  await page.getByRole('button', { name: 'Clear filters' }).click()
+  await gotoHydrated(page, '/cartridges?q=lapua')
+  await page.getByRole('button', { name: 'Clear search' }).click()
   await expect(status(page)).toHaveText(`${n} cartridges`)
   await expect(page).toHaveURL(/\/cartridges$/)
-})
-
-test('one caliber filter: common calibers first, by the G1', async ({ page }) => {
-  await gotoHydrated(page, '/cartridges')
-  await total(page)
-  await expect(page.getByRole('group', { name: 'Common calibers' })).toHaveCount(0)
-  await expect(page.getByRole('checkbox')).toHaveCount(0)
-  await page.getByRole('combobox', { name: 'Caliber' }).click()
-  const listbox = page.getByRole('listbox')
-  await expect(listbox.getByText('Common calibers')).toBeVisible()
-  await expect(listbox.getByRole('option').first()).toHaveText(/^\.172 \(\d+\)$/)
-  await page.keyboard.type('6.5')
-  await listbox.getByRole('option', { name: /^6\.5 mm \(\d+\) \.264 in$/ }).click()
-  await expect(page).toHaveURL(/[?&]caliber=6\.5\+mm/)
-  await expect(page.getByRole('link', { name: /^6,5 Creedmoor/ })).toHaveCount(1)
-  await expect
-    .poll(async () => [...new Set(await rows(page).locator('td:nth-child(2)').allTextContents())])
-    .toEqual(['6.5 mm'])
 })
 
 test('the source filter names the sources shown, keeps them in the URL and one stays on', async ({
@@ -111,8 +85,42 @@ test('the rows ticked for Compare stay in the URL and come back on reload', asyn
   await page.reload()
   await page.locator('html[data-hydrated]').waitFor({ state: 'attached' })
   await expect(tick).toBeChecked()
+  // a click on the row opens the record while rows are ticked
+  await page.getByRole('link', { name: 'DP40' }).click()
+  await expect(page).toHaveURL(/\/powders\/demo-powder-dp40$/)
+  await page.goBack()
+  await page.locator('html[data-hydrated]').waitFor({ state: 'attached' })
   await tick.uncheck()
   await expect(page).not.toHaveURL(/pick=/)
+})
+
+test('a shift click ticks the rows between two boxes and Clear selection unticks them', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/bullets')
+  const boxes = page.getByRole('checkbox', { name: /^Select Demo Bullets / })
+  await expect(boxes).toHaveCount(2)
+  await boxes.first().click()
+  await boxes.last().click({ modifiers: ['Shift'] })
+  await expect(boxes.first()).toBeChecked()
+  await expect(boxes.last()).toBeChecked()
+  await expect(page).toHaveURL(/[?&]pick=demo-bullet-/)
+  // a click on a cell of a ticked row opens the bullet
+  await page.locator('tr[data-picked]').first().click()
+  await expect(page).toHaveURL(/\/bullets\/demo-bullet-/)
+  await page.goBack()
+  await page.locator('html[data-hydrated]').waitFor({ state: 'attached' })
+  await page.getByRole('button', { name: 'Clear selection' }).click()
+  await expect(boxes.first()).not.toBeChecked()
+  await expect(boxes.last()).not.toBeChecked()
+  await expect(page).not.toHaveURL(/pick=/)
+  // from the keyboard: Shift+Space on the last box ticks the range from the box clicked before
+  await boxes.first().click()
+  await boxes.first().click()
+  await boxes.last().focus()
+  await page.keyboard.press('Shift+Space')
+  await expect(boxes.first()).toBeChecked()
+  await expect(boxes.last()).toBeChecked()
 })
 
 test('the list sorts by L3 through its header button', async ({ page }) => {
@@ -482,18 +490,11 @@ test('the record shows the case type without a hover note: 220 Swift is semi-rim
   await expect(facts(page).locator('.field-note', { hasText: 'semi-rimmed' })).toHaveCount(0)
 })
 
-test('semi-rimmed cases filter by link; the Case type column has no help note', async ({
-  page,
-}) => {
+test('the Case type column has no help note', async ({ page }) => {
   await page.goto('/cartridges')
   await total(page)
   await page.getByRole('columnheader', { name: 'Case type' }).getByRole('button').focus()
   await expect(page.getByRole('tooltip')).toHaveCount(0)
-  // the list matches the record: 220 Swift is semi-rimmed there too
-  await page.goto('/cartridges?type=semi-rimmed')
-  await expect(status(page)).toHaveText(/^\d+ of \d+ cartridges$/)
-  await expect(page.getByRole('link', { name: /^220 Swift/ })).toHaveCount(1)
-  await expect(page.getByRole('link', { name: /^280 Riml\. N\.E\. Ross/ })).toHaveCount(1)
 })
 
 test('printed, the standard shows once: the badge, not the facts line', async ({ page }) => {

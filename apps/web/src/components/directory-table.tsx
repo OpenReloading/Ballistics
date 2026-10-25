@@ -1,23 +1,7 @@
 'use client'
 
-import {
-  Button,
-  CloseButton,
-  Group,
-  Popover,
-  Select,
-  TextInput,
-  Tooltip,
-  UnstyledButton,
-} from '@mantine/core'
-import {
-  CaretDown,
-  CaretUp,
-  CaretUpDown,
-  FunnelSimple,
-  FunnelX,
-  MagnifyingGlass,
-} from '@phosphor-icons/react'
+import { CloseButton, Group, Select, TextInput, Tooltip, UnstyledButton } from '@mantine/core'
+import { CaretDown, CaretUp, CaretUpDown, MagnifyingGlass } from '@phosphor-icons/react'
 import Link from 'next/link'
 import {
   type CSSProperties,
@@ -41,9 +25,9 @@ import {
 } from '../lib/directory.ts'
 import { basePath } from '../lib/edition.ts'
 import { sortRows } from '../lib/lists.ts'
+import { pickRange } from '../lib/selection.ts'
 import { shortcutAriaKeys } from '../lib/shortcuts.ts'
 import { controlSize, tipEvents } from '../lib/theme.ts'
-import { AppPopover, popoverWidth } from './app-popover.tsx'
 import { Noted } from './field-table.tsx'
 import { usePrintEvents } from './print.ts'
 import { watchOverflow } from './scroll-region.tsx'
@@ -71,11 +55,14 @@ export interface DirectoryColumn<T> {
   head?: ReactNode
 }
 
-/** Row checkboxes: the chosen ids, at most `max`; a row `can` refuses gets none. */
+/**
+ * Row checkboxes: the chosen ids in the order ticked, at most `max`; a row `can` refuses gets none.
+ * A click on a box ticks or unticks its row, a shift click the rows from the box clicked before.
+ */
 type Selection<T> = {
   ids: readonly string[]
   max: number
-  onToggle: (id: string) => void
+  onChange: (ids: string[]) => void
   can?: (row: T) => boolean
 }
 
@@ -294,6 +281,22 @@ export function DirectoryTable<T extends { id: string }>({
     selection !== undefined &&
     (selection.can?.(row) ?? true) &&
     (selection.ids.includes(row.id) || selection.ids.length < selection.max)
+  // the box clicked last, where a shift click starts its range
+  const anchor = useRef<string>(undefined)
+  const pick = (row: T, range: boolean) => {
+    if (!selection) return
+    selection.onChange(
+      pickRange(
+        shown,
+        selection.ids,
+        range ? anchor.current : undefined,
+        row.id,
+        selection.max,
+        selection.can,
+      ),
+    )
+    anchor.current = row.id
+  }
   const tabIndexOf = (row: T, col: string) =>
     stopId === row.id &&
     (nav?.id === row.id && (col !== 'select' || boxOn(row)) ? nav.col === col : col === link)
@@ -467,6 +470,7 @@ export function DirectoryTable<T extends { id: string }>({
                           row={row}
                           label={label(row)}
                           selection={selection}
+                          onPick={(range) => pick(row, range)}
                           tabIndex={mounted ? tabIndexOf(row, 'select') : -1}
                         />
                       )}
@@ -574,20 +578,23 @@ function HeadLabel<T>({ column: { label, unit } }: { column: DirectoryColumn<T> 
   )
 }
 
-/** A row's checkbox above the row's link; unchecked ones are disabled while the selection is full. */
+/** A row's checkbox above the row's link; unchecked ones are disabled while the selection is full. `onPick` says whether shift was held. */
 function SelectBox({
   row,
   label,
-  selection: { ids, max, onToggle },
+  selection: { ids, max },
+  onPick,
   tabIndex,
 }: {
   row: { id: string }
   label: string
-  selection: Pick<Selection<unknown>, 'ids' | 'max' | 'onToggle'>
+  selection: Pick<Selection<unknown>, 'ids' | 'max'>
+  onPick: (range: boolean) => void
   tabIndex: number
 }) {
   const checked = ids.includes(row.id)
   const full = !checked && ids.length >= max
+  const space = useRef(false)
   // the tooltip on a wrapper: a disabled input gets no pointer events
   return (
     <Tooltip label={`At most ${max} at once`} disabled={!full} events={tipEvents}>
@@ -598,7 +605,18 @@ function SelectBox({
           tabIndex={tabIndex}
           checked={checked}
           disabled={full}
-          onChange={() => onToggle(row.id)}
+          // a checkbox's change is its click, which carries the shift key; for Space the key's own
+          // state covers a browser that synthesizes that click without it
+          onKeyDown={(e) => {
+            space.current = e.key === ' ' && e.shiftKey
+          }}
+          onBlur={() => {
+            space.current = false
+          }}
+          onChange={(e) => {
+            onPick((e.nativeEvent as MouseEvent).shiftKey || space.current)
+            space.current = false
+          }}
         />
       </span>
     </Tooltip>
@@ -646,43 +664,41 @@ function SortSelect({
   )
 }
 
+/** Moves the focus to the search box: where it goes when the control that held it is removed. */
+export const focusSearch = () =>
+  document.querySelector<HTMLInputElement>('.directory-search input')?.focus()
+
+/** A scope the page was opened with (a cartridge's fit, a federation): named, with a button that lifts it. */
+type Scope = { label: string; onRemove: () => void }
+
 /**
- * The filter row: search with an icon and a clear button, the facets, the phone's Sort, then More
- * filters and Clear filters at the row's end (icons on a phone).
+ * The filter row: search with an icon and a clear button, the source choice (`children`), the scope
+ * the page was opened with and the phone's Sort.
  */
 export function DirectoryFilters({
   query,
   onQuery,
   placeholder,
-  active,
-  onClear,
-  more,
-  extra,
   sorting,
+  scope,
   children,
 }: {
   query: string
   onQuery: (q: string) => void
   placeholder: string
-  active: boolean
-  onClear: () => void
-  /** The filters marked `more-filter` sit behind a button on a phone; this many of them are set. */
-  more?: number
-  /** Filters in a popover under "More filters" at every width, given with `more`, which counts those set. */
-  extra?: ReactNode
   /** The table's columns and sort, for the phone's Sort select. */
   sorting?: {
     columns: readonly SortColumn[]
     sort: DirectorySort
     onSort: (sort: DirectorySort) => void
   }
+  scope?: Scope
   children?: ReactNode
 }) {
-  const [moreOpen, setMoreOpen] = useState(false)
   const search = useRef<HTMLInputElement>(null)
   useShortcuts({ focusSearch: () => search.current?.focus() })
   return (
-    <Group className="directory-filters" gap="xs" py="xs" data-more-open={moreOpen || undefined}>
+    <Group className="directory-filters" gap="xs" py="xs">
       <TextInput
         ref={search}
         className="directory-search"
@@ -708,129 +724,19 @@ export function DirectoryFilters({
         onChange={(e) => onQuery(e.currentTarget.value)}
       />
       {children}
-      {sorting && <SortSelect {...sorting} />}
-      {more !== undefined && (
-        <AppPopover
-          opened={moreOpen}
-          onChange={setMoreOpen}
-          position="bottom-end"
-          width={popoverWidth.filters}
-          withinPortal={false}
-          transitionProps={{ duration: 0 }}
-        >
-          <Popover.Target>
-            <Button
-              variant="default"
-              size={controlSize.row.button}
-              className="more-toggle more-wide"
-              data-set={more > 0 || undefined}
-              aria-label={more > 0 ? `More filters (${more})` : 'More filters'}
-              aria-haspopup="dialog"
-              aria-expanded={moreOpen}
-              onClick={() => setMoreOpen((o) => !o)}
-              onKeyDown={(e) => e.key === 'Escape' && setMoreOpen(false)}
-            >
-              <FunnelSimple size={16} className="filter-icon" aria-hidden="true" />
-              <span className="filter-text">
-                {more > 0 ? `More filters (${more})` : 'More filters'}
-              </span>
-              <span className="filter-badge" aria-hidden="true">
-                {more || ''}
-              </span>
-            </Button>
-          </Popover.Target>
-          {/* over the table, so a filter set from here moves nothing */}
-          <Popover.Dropdown className="directory-extra">{extra}</Popover.Dropdown>
-        </AppPopover>
+      {scope && (
+        <span className="scope-chip">
+          <span title={scope.label}>{scope.label}</span>
+          <CloseButton
+            aria-label={`Remove ${scope.label}`}
+            onClick={() => {
+              scope.onRemove()
+              focusSearch()
+            }}
+          />
+        </span>
       )}
-      <Button
-        variant="subtle"
-        size={controlSize.row.button}
-        className="clear-filters"
-        aria-label="Clear filters"
-        onClick={onClear}
-        disabled={!active}
-      >
-        <FunnelX size={16} className="filter-icon" aria-hidden="true" />
-        <span className="filter-text">Clear filters</span>
-      </Button>
+      {sorting && <SortSelect {...sorting} />}
     </Group>
   )
-}
-
-/** A facet in the filter row with its name before it: two bare "Any" controls would not say which is which. */
-export function FilterGroup({
-  label,
-  className,
-  children,
-}: {
-  label: string
-  /** `more-filter`: behind "More filters" on a phone. */
-  className?: string
-  children: ReactNode
-}) {
-  return (
-    <span className={className ? `filter-group ${className}` : 'filter-group'}>
-      <span className="filter-label" aria-hidden="true">
-        {label}
-      </span>
-      {children}
-    </span>
-  )
-}
-
-/** A filter of the "More filters" popover: its name at the left, the control after it. */
-export function ExtraField({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="extra-field">
-      <span className="extra-label" aria-hidden="true">
-        {label}
-      </span>
-      {children}
-    </div>
-  )
-}
-
-/** A select of the "More filters" popover under its name; `value` is empty for any. */
-export function ExtraSelect({
-  label,
-  data,
-  value,
-  onChange,
-  searchable,
-}: {
-  label: string
-  data: { value: string; label: string }[]
-  value: string | undefined
-  onChange: (value: string) => void
-  searchable?: boolean
-}) {
-  return (
-    <ExtraField label={label}>
-      <Select
-        comboboxProps={{ withinPortal: false }}
-        aria-label={label}
-        placeholder="Any"
-        size={controlSize.row.input}
-        searchable={searchable}
-        clearable
-        data={data}
-        value={value || null}
-        onChange={(v) => onChange(v ?? '')}
-      />
-    </ExtraField>
-  )
-}
-
-/** The Country filter of the "More filters" popover; `value` is empty for any country. */
-export function CountryFilter({
-  data,
-  value,
-  onChange,
-}: {
-  data: { value: string; label: string }[]
-  value: string | undefined
-  onChange: (country: string) => void
-}) {
-  return <ExtraSelect label="Country" data={data} value={value} onChange={onChange} searchable />
 }

@@ -14,7 +14,7 @@ Playwright tests against a running API and web app, on the CIP cartridge records
 | Spec | What only a browser checks |
 |---|---|
 | `web/smoke.spec.ts` | pages load with a heading and no console error, the forwarding route answers (not in `pages`), the Pages workbench's start card in the window and its example load result equal to the server edition's, a client navigation between two record pages with back and forward and no failed RSC file (`pages` only) |
-| `web/cartridges.spec.ts` | list search and filters, record page, print layout, CIP outline drawing geometry |
+| `web/cartridges.spec.ts` | list search and source choice, the ticked rows of the powder and bullet lists (kept in the URL, shift click range, Clear selection, a click on a row opening its record), record page, print layout, CIP outline drawing geometry |
 | `web/directory-window.spec.ts` | axe on the cartridge, bullet and powder lists in light and dark, the cartridge list scrolled to its last row with a bounded number of row elements |
 | `web/drawing-face.spec.ts`, `web/drawing-baseline.spec.ts` | rendered text width (two cartridge pages), print page size, pixel baseline of the cartridge drawings (default set: the most common cartridge of each drawing case and a record per geometry they miss, 11 cartridges, light at 390 px, 308 Win. also dark and at 1280 px). The SVG markup of every sample and verified figure is a Vitest golden (`apps/web/test/drawing-markup.test.tsx`) |
 | `web/cartridge-designer.spec.ts` | slider keys, redraw, print drawing, 390 px fit, a chosen bullet seated at the entered COAL in the designed case (volume with a measured capacity, "not given" without, depth following the design's L3, axe in light and dark) |

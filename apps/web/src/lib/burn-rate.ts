@@ -223,8 +223,6 @@ export interface PowderRow {
   name: string
   grainForm?: string
   propellantBase?: string
-  /** ISO 3166-1 alpha-2 code of the manufacturer's country. */
-  country?: string
   /** Mean dynamic vivacity with its interval, 1/(MPa s); absent without a curve. */
   meanVivacity?: number
   low?: number
@@ -250,7 +248,6 @@ export function orderPowders(
       name: s.name,
       grainForm: s.grainForm,
       propellantBase: s.propellantBase,
-      country: s.country,
     }
     if (!isFitted(p)) return row
     const m = meanRate(p)

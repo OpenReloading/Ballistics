@@ -182,8 +182,7 @@ export const withManufacturerName = <T extends { manufacturer: string }>(
   })
 
 /**
- * The manufacturer filter's options of a list: each catalogue manufacturer id of `rows` with its
- * name, by name.
+ * The manufacturer options over `rows`: each catalogue manufacturer id with its name, by name.
  */
 export const manufacturerOptions = (
   rows: readonly { manufacturer?: string; manufacturerName: string }[],
