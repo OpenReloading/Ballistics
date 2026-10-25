@@ -2,7 +2,7 @@ import type {
   Bullet,
   Cartridge,
   CaseCapacity,
-  ChronoSession,
+  CatalogueSession,
   Powder,
   SpecValue,
 } from '@open-reloading/schema'
@@ -335,7 +335,7 @@ export const airTemperatureRange = Object.freeze({ min: -89.2, max: 56.7 })
 const stationPressureRange = Object.freeze({ min: 0.16, max: 1.2 })
 
 /** Propellant temperature not below the coldest air recorded, every velocity positive. */
-function checkShotStrings(strings: ChronoSession['strings']): Finding[] {
+function checkShotStrings(strings: CatalogueSession['strings']): Finding[] {
   const findings: Finding[] = []
   strings.forEach((string, i) => {
     // Powder takes the temperature of its surroundings: not below the coldest air recorded.
@@ -362,7 +362,7 @@ function checkShotStrings(strings: ChronoSession['strings']): Finding[] {
 }
 
 /** Humidity, air temperature and station pressure within their physical and recorded ranges. */
-function checkConditions(conditions: ChronoSession['conditions']): Finding[] {
+function checkConditions(conditions: CatalogueSession['conditions']): Finding[] {
   const findings: Finding[] = []
   const relativeHumidity = conditions.relativeHumidity?.value
   if (relativeHumidity !== undefined && !(relativeHumidity >= 0 && relativeHumidity <= 100)) {
@@ -392,7 +392,7 @@ function checkConditions(conditions: ChronoSession['conditions']): Finding[] {
 }
 
 /** Checks one chronograph session against physical limits and the world temperature extremes. */
-export function checkChronoSession(session: ChronoSession): Finding[] {
+export function checkChronoSession(session: CatalogueSession): Finding[] {
   const findings = [...checkShotStrings(session.strings), ...checkConditions(session.conditions)]
   const distance = session.muzzleDistance?.value
   if (distance !== undefined && !(distance >= 0)) {

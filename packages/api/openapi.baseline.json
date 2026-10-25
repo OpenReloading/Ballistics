@@ -17861,120 +17861,15 @@
                                   },
                                   "description": "The typed solver values and the ladder the load is analysed with."
                                 },
-                                "measurements": {
+                                "sessions": {
                                   "maxItems": 50,
                                   "type": "array",
                                   "items": {
-                                    "type": "object",
-                                    "properties": {
-                                      "name": {
-                                        "type": "string",
-                                        "maxLength": 200,
-                                        "description": "Name of the imported chronograph file, shown on the Measurements tab."
-                                      },
-                                      "date": {
-                                        "type": "string",
-                                        "maxLength": 64,
-                                        "description": "Date of the session as the file gives it."
-                                      },
-                                      "device": {
-                                        "type": "string",
-                                        "maxLength": 400,
-                                        "description": "Manufacturer and model of the device."
-                                      },
-                                      "muzzleDistance": {
-                                        "type": "object",
-                                        "properties": {
-                                          "value": {
-                                            "type": "number",
-                                            "minimum": 0,
-                                            "description": "In mm."
-                                          },
-                                          "raw": {
-                                            "type": "string",
-                                            "minLength": 1,
-                                            "description": "The value as written in the source, when it differed."
-                                          }
-                                        },
-                                        "required": ["value"],
-                                        "unit": "mm",
-                                        "description": "Muzzle to the measuring point."
-                                      },
-                                      "strings": {
-                                        "maxItems": 500,
-                                        "type": "array",
-                                        "items": {
-                                          "type": "object",
-                                          "properties": {
-                                            "label": {
-                                              "type": "string",
-                                              "maxLength": 200,
-                                              "description": "Name of the string in the file."
-                                            },
-                                            "charge": {
-                                              "type": "object",
-                                              "properties": {
-                                                "value": {
-                                                  "type": "number",
-                                                  "exclusiveMinimum": 0,
-                                                  "description": "In g."
-                                                },
-                                                "raw": {
-                                                  "type": "string",
-                                                  "minLength": 1,
-                                                  "description": "The value as written in the source, when it differed."
-                                                }
-                                              },
-                                              "required": ["value"],
-                                              "unit": "g",
-                                              "description": "The charge the string is mapped to. Absent: not used."
-                                            },
-                                            "shots": {
-                                              "maxItems": 5000,
-                                              "type": "array",
-                                              "items": {
-                                                "type": "object",
-                                                "properties": {
-                                                  "velocity": {
-                                                    "type": "object",
-                                                    "properties": {
-                                                      "value": {
-                                                        "type": "number",
-                                                        "description": "In m/s."
-                                                      },
-                                                      "raw": {
-                                                        "type": "string",
-                                                        "minLength": 1,
-                                                        "description": "The value as written in the source, when it differed."
-                                                      }
-                                                    },
-                                                    "required": ["value"],
-                                                    "unit": "m/s",
-                                                    "description": "Velocity of the shot, m/s."
-                                                  },
-                                                  "coldBore": {
-                                                    "type": "boolean",
-                                                    "description": "First shot from a cold or clean barrel."
-                                                  },
-                                                  "excluded": {
-                                                    "type": "string",
-                                                    "minLength": 1,
-                                                    "description": "Reason the shot is left out of statistics, for example a misread."
-                                                  }
-                                                },
-                                                "required": ["velocity"]
-                                              },
-                                              "description": "Shots of the string in file order."
-                                            }
-                                          },
-                                          "required": ["shots"]
-                                        },
-                                        "description": "Shot strings of the file."
-                                      }
-                                    },
-                                    "required": ["name", "strings"]
+                                    "type": "string",
+                                    "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                    "description": "Reference to a session: `catalogue:<record id>` or `user:<UUID>`."
                                   },
-                                  "description": "Chronograph files read on the Measurements tab, one series each, strings mapped to charges."
+                                  "description": "Chronograph sessions read on the Measurements tab. Each names its strings' load and what they vary."
                                 },
                                 "provenance": {
                                   "type": "object",
@@ -18607,6 +18502,431 @@
                           "properties": {
                             "kind": {
                               "type": "string",
+                              "const": "session",
+                              "description": "Kind of the record: `session`."
+                            },
+                            "id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 64,
+                              "description": "Id of the record in the browser library."
+                            },
+                            "name": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 200,
+                              "description": "Name of the record. Save names the file after it."
+                            },
+                            "saved": {
+                              "type": "string",
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                              "description": "Time of the last save, ISO 8601 in UTC."
+                            },
+                            "data": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                                  "description": "Id of a catalogue session, the file name without `.json`."
+                                },
+                                "origin": {
+                                  "type": "string",
+                                  "enum": ["catalogue", "user", "shared"],
+                                  "description": "Where the record lives: the git catalogue, this browser, or a received file."
+                                },
+                                "date": {
+                                  "type": "string",
+                                  "format": "date",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                  "description": "Day of the session, ISO 8601."
+                                },
+                                "device": {
+                                  "type": "object",
+                                  "properties": {
+                                    "kind": {
+                                      "type": "string",
+                                      "enum": ["doppler-radar", "optical", "magnetic", "other"],
+                                      "description": "How the device measures."
+                                    },
+                                    "manufacturer": {
+                                      "type": "string",
+                                      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                      "description": "Reference to a manufacturer: `catalogue:<record id>` or `user:<UUID>`."
+                                    },
+                                    "model": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "description": "Model name of the device."
+                                    },
+                                    "firmware": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "description": "Firmware version of the device."
+                                    }
+                                  },
+                                  "required": ["kind"],
+                                  "description": "The chronograph."
+                                },
+                                "muzzleDistance": {
+                                  "type": "object",
+                                  "properties": {
+                                    "value": {
+                                      "type": "number",
+                                      "description": "In mm."
+                                    },
+                                    "raw": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "description": "The value as written in the source, when it differed."
+                                    }
+                                  },
+                                  "required": ["value"],
+                                  "unit": "mm",
+                                  "description": "Muzzle to the measuring point; optical screens measure downrange."
+                                },
+                                "conditions": {
+                                  "type": "object",
+                                  "properties": {
+                                    "airTemperature": {
+                                      "type": "object",
+                                      "properties": {
+                                        "value": {
+                                          "type": "number",
+                                          "description": "In degC."
+                                        },
+                                        "raw": {
+                                          "type": "string",
+                                          "minLength": 1,
+                                          "description": "The value as written in the source, when it differed."
+                                        }
+                                      },
+                                      "required": ["value"],
+                                      "unit": "degC",
+                                      "description": "Air temperature."
+                                    },
+                                    "stationPressure": {
+                                      "type": "object",
+                                      "properties": {
+                                        "value": {
+                                          "type": "number",
+                                          "description": "In bar."
+                                        },
+                                        "raw": {
+                                          "type": "string",
+                                          "minLength": 1,
+                                          "description": "The value as written in the source, when it differed."
+                                        }
+                                      },
+                                      "required": ["value"],
+                                      "unit": "bar",
+                                      "description": "Absolute air pressure at the site."
+                                    },
+                                    "relativeHumidity": {
+                                      "type": "object",
+                                      "properties": {
+                                        "value": {
+                                          "type": "number",
+                                          "description": "In %."
+                                        },
+                                        "raw": {
+                                          "type": "string",
+                                          "minLength": 1,
+                                          "description": "The value as written in the source, when it differed."
+                                        }
+                                      },
+                                      "required": ["value"],
+                                      "unit": "%",
+                                      "description": "Relative humidity."
+                                    }
+                                  },
+                                  "description": "The weather of the session."
+                                },
+                                "strings": {
+                                  "minItems": 1,
+                                  "maxItems": 500,
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "load": {
+                                        "type": "string",
+                                        "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                        "description": "The `Load` the string was fired with. Absent on a session not yet attached to a load, such as a file just read."
+                                      },
+                                      "label": {
+                                        "type": "string",
+                                        "maxLength": 200,
+                                        "description": "Name of the string in the file."
+                                      },
+                                      "variation": {
+                                        "oneOf": [
+                                          {
+                                            "type": "object",
+                                            "properties": {
+                                              "kind": {
+                                                "type": "string",
+                                                "const": "charge",
+                                                "description": "The string varies the charge."
+                                              },
+                                              "value": {
+                                                "type": "object",
+                                                "properties": {
+                                                  "value": {
+                                                    "type": "number",
+                                                    "exclusiveMinimum": 0,
+                                                    "description": "In g."
+                                                  },
+                                                  "raw": {
+                                                    "type": "string",
+                                                    "minLength": 1,
+                                                    "description": "The value as written in the source, when it differed."
+                                                  }
+                                                },
+                                                "required": ["value"],
+                                                "unit": "g",
+                                                "description": "The charge of the string."
+                                              }
+                                            },
+                                            "required": ["kind", "value"]
+                                          },
+                                          {
+                                            "type": "object",
+                                            "properties": {
+                                              "kind": {
+                                                "type": "string",
+                                                "const": "seating",
+                                                "description": "The string varies the seating length."
+                                              },
+                                              "value": {
+                                                "type": "object",
+                                                "properties": {
+                                                  "value": {
+                                                    "type": "number",
+                                                    "exclusiveMinimum": 0,
+                                                    "description": "In mm."
+                                                  },
+                                                  "raw": {
+                                                    "type": "string",
+                                                    "minLength": 1,
+                                                    "description": "The value as written in the source, when it differed."
+                                                  }
+                                                },
+                                                "required": ["value"],
+                                                "unit": "mm",
+                                                "description": "The length the load seats the bullet by (`seating.by`) in this string."
+                                              }
+                                            },
+                                            "required": ["kind", "value"]
+                                          }
+                                        ],
+                                        "description": "What the string varies against its load. Absent: the load as it is."
+                                      },
+                                      "propellantTemperature": {
+                                        "type": "object",
+                                        "properties": {
+                                          "value": {
+                                            "type": "number",
+                                            "description": "In degC."
+                                          },
+                                          "raw": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "description": "The value as written in the source, when it differed."
+                                          }
+                                        },
+                                        "required": ["value"],
+                                        "unit": "degC",
+                                        "description": "Temperature of the powder in this string."
+                                      },
+                                      "shots": {
+                                        "minItems": 1,
+                                        "maxItems": 5000,
+                                        "type": "array",
+                                        "items": {
+                                          "type": "object",
+                                          "properties": {
+                                            "velocity": {
+                                              "type": "object",
+                                              "properties": {
+                                                "value": {
+                                                  "type": "number",
+                                                  "description": "In m/s."
+                                                },
+                                                "raw": {
+                                                  "type": "string",
+                                                  "minLength": 1,
+                                                  "description": "The value as written in the source, when it differed."
+                                                }
+                                              },
+                                              "required": ["value"],
+                                              "unit": "m/s",
+                                              "description": "Velocity of the shot, m/s."
+                                            },
+                                            "coldBore": {
+                                              "type": "boolean",
+                                              "description": "First shot from a cold or clean barrel."
+                                            },
+                                            "excluded": {
+                                              "type": "string",
+                                              "minLength": 1,
+                                              "description": "Reason the shot is left out of statistics, for example a misread."
+                                            }
+                                          },
+                                          "required": ["velocity"]
+                                        },
+                                        "description": "Shots of the string in file order."
+                                      }
+                                    },
+                                    "required": ["shots"]
+                                  },
+                                  "description": "The shot strings of the session."
+                                },
+                                "note": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "description": "Note on the session."
+                                },
+                                "provenance": {
+                                  "type": "object",
+                                  "properties": {
+                                    "kind": {
+                                      "type": "string",
+                                      "enum": [
+                                        "published",
+                                        "measured",
+                                        "derived",
+                                        "fitted",
+                                        "computed"
+                                      ],
+                                      "description": "How the values came about."
+                                    },
+                                    "sources": {
+                                      "minItems": 1,
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "title": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "description": "Title of the source: the document, or the site and table."
+                                          },
+                                          "publisher": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "description": "Who issued the data: a maker, a standards body or the authors."
+                                          },
+                                          "edition": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "description": "Edition, print or date as the document states it."
+                                          },
+                                          "page": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "description": "Page or section of the document."
+                                          },
+                                          "url": {
+                                            "type": "string",
+                                            "format": "uri",
+                                            "description": "An http or https URL of the source."
+                                          },
+                                          "retrieved": {
+                                            "type": "string",
+                                            "format": "date",
+                                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                            "description": "Date the source was retrieved, ISO 8601."
+                                          },
+                                          "sha256": {
+                                            "type": "string",
+                                            "pattern": "^[0-9a-f]{64}$",
+                                            "description": "SHA-256 of the retrieved file, 64 lowercase hex digits."
+                                          },
+                                          "fields": {
+                                            "minItems": 1,
+                                            "type": "array",
+                                            "items": {
+                                              "type": "string",
+                                              "minLength": 1
+                                            },
+                                            "description": "Dot paths of the record fields this source supports. Absent: the whole record."
+                                          },
+                                          "kind": {
+                                            "type": "string",
+                                            "enum": [
+                                              "published",
+                                              "measured",
+                                              "derived",
+                                              "fitted",
+                                              "computed"
+                                            ],
+                                            "description": "Kind of this source values when it differs from the provenance kind of the record."
+                                          },
+                                          "license": {
+                                            "type": "string",
+                                            "pattern": "^(LicenseRef-)?[A-Za-z0-9.+-]+$",
+                                            "description": "SPDX id of the license the data is used under, or `LicenseRef-<name>` for the publisher own terms or a written permission described in `terms`."
+                                          },
+                                          "terms": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "description": "URL or note of the publisher terms or permission where no SPDX license covers the use. Text starting with http:// or https:// is a link."
+                                          },
+                                          "origin": {
+                                            "type": "string",
+                                            "enum": ["manufacturer", "public", "community"],
+                                            "description": "Who stands behind the source: manufacturer, public or community."
+                                          },
+                                          "run": {
+                                            "type": "object",
+                                            "properties": {
+                                              "version": {
+                                                "type": "string",
+                                                "pattern": "^[0-9a-f]{16}$",
+                                                "description": "Model version id the report names."
+                                              },
+                                              "report": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "description": "Report of the evaluation of the fit."
+                                              }
+                                            },
+                                            "required": ["version", "report"],
+                                            "description": "The fit run behind a `fitted` source."
+                                          },
+                                          "note": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "description": "Note on the source."
+                                          }
+                                        },
+                                        "required": ["title"]
+                                      },
+                                      "description": "The sources of the values, at least one."
+                                    },
+                                    "note": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "description": "Note on the provenance."
+                                    }
+                                  },
+                                  "required": ["kind", "sources"],
+                                  "description": "Where the values come from: the imported file."
+                                }
+                              },
+                              "required": ["origin", "device", "strings", "provenance"],
+                              "description": "A chronograph session, in stored units."
+                            }
+                          },
+                          "required": ["kind", "id", "name", "saved", "data"]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
                               "const": "targetSheet",
                               "description": "Kind of the record: `targetSheet`."
                             },
@@ -19040,9 +19360,8 @@
                                               "properties": {
                                                 "session": {
                                                   "type": "string",
-                                                  "minLength": 1,
-                                                  "maxLength": 64,
-                                                  "description": "Id of the chronograph session."
+                                                  "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                                  "description": "The chronograph session of the round."
                                                 },
                                                 "string": {
                                                   "type": "integer",

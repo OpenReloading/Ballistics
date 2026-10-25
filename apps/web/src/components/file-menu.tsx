@@ -100,6 +100,7 @@ const kindNames: Record<UserRecordKind, string> = {
   caseCapacity: 'measured capacities',
   load: 'loads',
   firearm: 'firearms',
+  session: 'chronograph sessions',
   targetSheet: 'target sheets',
   targetFaceDesign: 'target face designs',
 }

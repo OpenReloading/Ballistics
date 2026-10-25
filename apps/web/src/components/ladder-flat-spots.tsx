@@ -13,7 +13,7 @@ export function LadderFlatSpots({
   series,
   system,
 }: {
-  series: { id: number; name: string; rows: ChargeRow[] }[]
+  series: { id: string; name: string; rows: ChargeRow[] }[]
   system: UnitSystem
 }) {
   const found = series.flatMap((s) => {

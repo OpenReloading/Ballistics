@@ -40,7 +40,7 @@ export interface ChronoImport {
   /** Distinct units of the velocities in first-seen order: named in the file, or by the caller. */
   velocityUnits: { unit: VelocityUnit; source: 'file' | 'caller' }[]
   /**
-   * Dot paths the user should enter: the ones `chronoSession` requires, plus `device.firmware`
+   * Dot paths the user should enter: the ones a catalogue session (`catalogueSession`) requires, plus `device.firmware`
    * and, for optical devices, `muzzleDistance`.
    */
   missingPaths: string[]
