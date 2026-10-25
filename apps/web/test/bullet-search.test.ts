@@ -64,13 +64,15 @@ it('finds what the API search of the card missed: words in any order, spacing, a
   expect(ids('beta 6,5')).toEqual(['b-140-match'])
 })
 
-it('ranks a number at the start of a word above one inside a word', () => {
-  const inside = [
+it('matches a number as a whole number, not inside a longer one', () => {
+  const heavy = [
     row({ id: 'in', name: 'Plain', diameter: 6.1, mass: 17.82 }),
     row({ id: 'start', name: 'Plain', diameter: 6.1, mass: 7.82 }),
   ]
-  // 7.8 in 17.82 g, at the start of 7.82 g
-  expect(searchBullets(inside, '7.8', none).map((b) => b.id)).toEqual(['start', 'in'])
+  // 7.8 is neither 17.82 g nor 7.82 g; 7.82 is 7.82 g only
+  expect(searchBullets(heavy, '7.8', none)).toEqual([])
+  expect(searchBullets(heavy, '7.82', none).map((b) => b.id)).toEqual(['start'])
+  expect(searchBullets(heavy, '17.82', none).map((b) => b.id)).toEqual(['in'])
 })
 
 it('matches a fractional weight at the digits typed', () => {

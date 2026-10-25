@@ -42,6 +42,23 @@ describe('score', () => {
     expect(find('9mm')).toEqual(['9x19'])
   })
 
+  it('matches a number as a whole number, not inside a longer one', () => {
+    const mass = (text: string) => searchKey(['Plain', text])
+    // 7.8 is neither 17.82 nor 7.82; 7.82 is not 17.82
+    expect(score(mass('17.82 g'), '7.8')).toBeUndefined()
+    expect(score(mass('7.82 g'), '7.8')).toBeUndefined()
+    expect(score(mass('17.82 g'), '7.82')).toBeUndefined()
+    expect(score(mass('7.82 g'), '7.82')).toBeDefined()
+    // whole numbers: neither a longer integer nor the integer part of a decimal
+    expect(score(mass('1682 g'), '168')).toBeUndefined()
+    expect(score(mass('168.5 g'), '168')).toBeUndefined()
+    expect(score(mass('0.5 g'), '5')).toBeUndefined()
+    expect(find('30')).toEqual(['30-06'])
+    expect(find('06')).toEqual(['30-06'])
+    // a number ends at a point that is not followed by a digit
+    expect(score(mass('7.62.'), '7.62')).toBeDefined()
+  })
+
   it('ignores accents and case and has no match for a word no text holds', () => {
     expect(find('CAFE creme')).toEqual(['cafe'])
     expect(find('café')).toEqual(['cafe'])
