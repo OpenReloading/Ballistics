@@ -205,12 +205,8 @@ function band(m: number, dRB: number): number {
   return (m < 0.95 ? m ** 12.5 : 0.21 + 0.28 / (m * m)) * (dRB - 1)
 }
 
-/**
- * Estimates the zero-yaw drag coefficient from the outline. Throws `InputError` for a
- * geometry the method cannot take; a geometry or Mach number outside its stated limits
- * (p. 3, p. 26) gives a result and a warning.
- */
-export function estimateDragFromOutline(input: OutlineDragInput): OutlineDragEstimate {
+/** The validated outline in calibers, with the meplat and band diameters the nodes need. */
+function outlineShape(input: OutlineDragInput) {
   const d = input.diameter
   need(Number.isFinite(d) && d > 0, 'diameter must be positive')
   const cal = (len: number) => len / d
@@ -240,6 +236,29 @@ export function estimateDragFromOutline(input: OutlineDragInput): OutlineDragEst
       (input.boundaryLayer ?? (dMm < 20 ? 'laminar-nose' : 'turbulent')) === 'laminar-nose',
     dMm,
   }
+  return { shape, dM, dRB }
+}
+
+/** The warnings of an estimate that is inside the method but near or past its stated limits. */
+function outlineWarnings(shape: Shape, machs: readonly number[], nodes: OutlineDragNode[]) {
+  const warnings: OutlineDragWarning[] = []
+  if (shape.dMm < 4 || shape.dMm > 400) warnings.push('diameter-range')
+  if (machs.some((m) => m < 0.5 || m > 5)) warnings.push('mach-range')
+  if (shape.ln < 1) warnings.push('nose-short')
+  if (shape.lbt > 1.5) warnings.push('boat-tail-long')
+  if (shape.db < 0.65) warnings.push('base-small')
+  if (nodes.some((n) => n.basePressureRatio < 0)) warnings.push('base-pressure-negative')
+  return warnings
+}
+
+/**
+ * Estimates the zero-yaw drag coefficient from the outline. Throws `InputError` for a
+ * geometry the method cannot take; a geometry or Mach number outside its stated limits
+ * (p. 3, p. 26) gives a result and a warning.
+ */
+export function estimateDragFromOutline(input: OutlineDragInput): OutlineDragEstimate {
+  const { shape, dM, dRB } = outlineShape(input)
+  const { rtr, db } = shape
   const machs = input.machNumbers ?? outlineDragMach
   need(machs.length > 0 && machs.every((m) => Number.isFinite(m) && m > 0), 'mach must be positive')
 
@@ -270,12 +289,6 @@ export function estimateDragFromOutline(input: OutlineDragInput): OutlineDragEst
     nodes.every((n) => Number.isFinite(n.dragCoefficient) && n.dragCoefficient > 0),
     'the outline gives no positive finite drag: outside the method',
   )
-  const warnings: OutlineDragWarning[] = []
-  if (dMm < 4 || dMm > 400) warnings.push('diameter-range')
-  if (machs.some((m) => m < 0.5 || m > 5)) warnings.push('mach-range')
-  if (ln < 1) warnings.push('nose-short')
-  if (lbt > 1.5) warnings.push('boat-tail-long')
-  if (db < 0.65) warnings.push('base-small')
-  if (nodes.some((n) => n.basePressureRatio < 0)) warnings.push('base-pressure-negative')
+  const warnings = outlineWarnings(shape, machs, nodes)
   return { nodes, dragTable: nodes.map((n) => [n.mach, n.dragCoefficient] as const), warnings }
 }

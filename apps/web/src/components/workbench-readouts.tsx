@@ -182,6 +182,126 @@ export function peakFacts(ok: Extract<Outcome, { kind: 'ok' }>, system: UnitSyst
   }`
 }
 
+/** A value that is a phrase, not a number: smaller, so it stays on one line in a tile. */
+const readoutPhrase = 'readout-phrase'
+
+/** A value and its unit, the unit in the muted small type of the readout units. */
+const unit = (value: string, symbol: string) => (
+  <>
+    {value} <span className="readout-unit">{symbol}</span>
+  </>
+)
+
+// the hover facts also as text: a title alone reaches neither the keyboard nor every screen reader
+const readoutFact = (text: string | undefined) =>
+  text && <dd className="visually-hidden">{text}</dd>
+
+/** Where the bullet's powder burns out, and how much of it is burnt at the muzzle. */
+function BurnoutItem({ ok, system }: { ok: Extract<Outcome, { kind: 'ok' }>; system: UnitSystem }) {
+  const r = ok.body.result
+  const burnoutTitle = r.burnout ? `Burnout ${msText(r.burnout.time)} after ignition.` : undefined
+  const burnoutAt = (travel: number) =>
+    unit(inchText(lengthText('travel', system, travel), system.length.symbol), system.length.symbol)
+  return (
+    <div
+      title={[
+        burnoutTitle,
+        `${formatNumber(r.muzzleBurntFraction * 100, 0)} % burnt at the muzzle.`,
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    >
+      <dt>Burnout at</dt>
+      <dd className={r.burnout ? undefined : readoutPhrase}>
+        {r.burnout ? burnoutAt(r.burnout.travel) : 'no burnout in the barrel'}
+      </dd>
+      <dd className="readout-note">{formatNumber(r.muzzleBurntFraction * 100, 0)} % burnt</dd>
+      {readoutFact(burnoutTitle)}
+    </div>
+  )
+}
+
+/** The free recoil of the firearm, when its mass is known. */
+function RecoilItem({ ok, system }: { ok: Extract<Outcome, { kind: 'ok' }>; system: UnitSystem }) {
+  const { firearmMass, gasFactor, gasFactorNote } = ok.printed
+  if (firearmMass === undefined) return null
+  const recoil = freeRecoil({
+    firearmMass,
+    projectileMass: ok.load.bullet.mass,
+    chargeMass: ok.load.charge,
+    muzzleVelocity: ok.body.result.muzzleVelocity,
+    gasFactor,
+  })
+  const recoilNote = `Free recoil ${formatNumber(system.energy.fromSi(recoil.energy), 1)} ${system.energy.symbol}, ${formatNumber(system.velocity.fromSi(recoil.velocity), 2)} ${system.velocity.symbol}`
+  const recoilTitle = `${recoilNote}. Kinetic energy and velocity of the free firearm. Momentum of the bullet plus the powder gas (charge mass times ${gasFactor} times muzzle velocity${gasFactorNote ? `; factor ${gasFactor}, ${gasFactorNote}` : ''}); muzzle devices not counted (SAAMI, Gun Recoil - Technical, 2018).`
+  return (
+    <div title={recoilTitle}>
+      <dt>Free recoil</dt>
+      <dd>
+        {unit(formatNumber(system.energy.fromSi(recoil.energy), 1), system.energy.symbol)},{' '}
+        {unit(formatNumber(system.velocity.fromSi(recoil.velocity), 2), system.velocity.symbol)}
+      </dd>
+      {readoutFact(recoilTitle)}
+    </div>
+  )
+}
+
+/** The muzzle spin: turns per second at the muzzle times 60; no rifling, no spin. */
+function SpinItem({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> }) {
+  const twist = ok.load.barrel.twist
+  const spin = twist ? (ok.body.result.muzzleVelocity / twist) * 60 : undefined
+  return (
+    <div>
+      <dt>Muzzle spin</dt>
+      <dd className={spin === undefined ? readoutPhrase : undefined}>
+        {spin === undefined ? 'no twist' : unit(formatNumber(spin / 1000, 1), 'krpm')}
+      </dd>
+    </div>
+  )
+}
+
+type OfMax = NonNullable<ReturnType<typeof derived>['ofMax']>
+
+/** The peak pressure's share of the limit: as text in the report, else a button to the limits table. */
+function PeakLimits({
+  ok,
+  system,
+  printed,
+  ofMax,
+}: {
+  ok: Extract<Outcome, { kind: 'ok' }>
+  system: UnitSystem
+  printed: boolean
+  ofMax: OfMax
+}) {
+  const pressure = ofMax.limit.pressure
+  if (pressure === undefined) return null
+  return (
+    <span>
+      {printed ? (
+        // the report prints the limits table itself: the limit as text, no control
+        `${formatNumber(ofMax.percent, 0)} % of CIP ${ofMax.limit.symbol} ${withUnit('pressure', system, pressure)}`
+      ) : (
+        /* the limits table and its sources one click away */
+        <AppPopover position="bottom" width={popoverWidth.table} withinPortal trapFocus>
+          <Popover.Target>
+            <UnstyledButton
+              className="readout-limits"
+              aria-haspopup="dialog"
+              title={`CIP ${ofMax.limit.symbol} ${withUnit('pressure', system, pressure)}`}
+            >
+              {formatNumber(ofMax.percent, 0)} % of CIP {ofMax.limit.symbol}
+            </UnstyledButton>
+          </Popover.Target>
+          <Popover.Dropdown className="limits-popover">
+            <LimitsView body={ok.body} system={system} />
+          </Popover.Dropdown>
+        </AppPopover>
+      )}
+    </span>
+  )
+}
+
 /**
  * The readouts of the selected step: the key values peak pressure (with its share of the limit and
  * the limits table one click away), muzzle velocity and energy, then the list of the others.
@@ -201,72 +321,20 @@ export function Readouts({
   const { result: r, pressureRange: range } = ok.body
   const band = resultBand(ok.body, printed)
   const { ofMax, lead, ratio } = derived(ok)
-  /** A value and its unit, the unit in the muted small type of the readout units. */
-  const unit = (value: string, symbol: string) => (
-    <>
-      {value} <span className="readout-unit">{symbol}</span>
-    </>
-  )
   const p = (pa: number) => unit(formatQuantity('pressure', system, pa), system.pressure.symbol)
   const msUnit = (s: number) => unit(formatNumber(s * 1e3, 3), 'ms')
-  const burnoutAt = (travel: number) =>
-    unit(inchText(lengthText('travel', system, travel), system.length.symbol), system.length.symbol)
-  // turns per second at the muzzle times 60; no rifling, no spin
-  const twist = ok.load.barrel.twist
-  const spin = twist ? (r.muzzleVelocity / twist) * 60 : undefined
-  /** A value that is a phrase, not a number: smaller, so it stays on one line in a tile. */
-  const phrase = 'readout-phrase'
   const peakTitle = peakFacts(ok, system)
-  // the hover facts also as text: a title alone reaches neither the keyboard nor every screen reader
-  const fact = (text: string | undefined) => text && <dd className="visually-hidden">{text}</dd>
   const mipTitle =
     '0.1 times the bullet mass in g times the muzzle velocity in m/s (DSB Sportordnung, Regeln für Pistole und Revolver, 2.21.1).'
-  const { firearmMass, gasFactor, gasFactorNote } = ok.printed
-  const recoil =
-    firearmMass === undefined
-      ? undefined
-      : freeRecoil({
-          firearmMass,
-          projectileMass: ok.load.bullet.mass,
-          chargeMass: ok.load.charge,
-          muzzleVelocity: r.muzzleVelocity,
-          gasFactor,
-        })
-  const recoilNote =
-    recoil &&
-    `Free recoil ${formatNumber(system.energy.fromSi(recoil.energy), 1)} ${system.energy.symbol}, ${formatNumber(system.velocity.fromSi(recoil.velocity), 2)} ${system.velocity.symbol}`
-  const recoilTitle = `${recoilNote}. Kinetic energy and velocity of the free firearm. Momentum of the bullet plus the powder gas (charge mass times ${gasFactor} times muzzle velocity${gasFactorNote ? `; factor ${gasFactor}, ${gasFactorNote}` : ''}); muzzle devices not counted (SAAMI, Gun Recoil - Technical, 2018).`
   const leadTitle = `From the 10 % pressure time (${msText(r.tenPercentPressureTime)} after ignition) to muzzle exit.`
   const fillTitle =
     "Load ratio: the charge's bulk volume over the free volume behind the bullet; above 100 % the charge is compressed."
-  const burnoutTitle = r.burnout ? `Burnout ${msText(r.burnout.time)} after ignition.` : undefined
   // the chart's key of that quantity before the label (globals.css)
   const key = (q: 'pressure' | 'velocity' | 'energy') => (
     <span className="series-key" data-q={q} aria-hidden="true" />
   )
   const limits = ofMax?.limit.pressure && (
-    <span>
-      {printed ? (
-        // the report prints the limits table itself: the limit as text, no control
-        `${formatNumber(ofMax.percent, 0)} % of CIP ${ofMax.limit.symbol} ${withUnit('pressure', system, ofMax.limit.pressure)}`
-      ) : (
-        /* the limits table and its sources one click away */
-        <AppPopover position="bottom" width={popoverWidth.table} withinPortal trapFocus>
-          <Popover.Target>
-            <UnstyledButton
-              className="readout-limits"
-              aria-haspopup="dialog"
-              title={`CIP ${ofMax.limit.symbol} ${withUnit('pressure', system, ofMax.limit.pressure)}`}
-            >
-              {formatNumber(ofMax.percent, 0)} % of CIP {ofMax.limit.symbol}
-            </UnstyledButton>
-          </Popover.Target>
-          <Popover.Dropdown className="limits-popover">
-            <LimitsView body={ok.body} system={system} />
-          </Popover.Dropdown>
-        </AppPopover>
-      )}
-    </span>
+    <PeakLimits ok={ok} system={system} printed={printed} ofMax={ofMax} />
   )
   const bandText = bandLine(ok.body, system)
   const big = (value: string, unit: string) => (
@@ -301,7 +369,7 @@ export function Readouts({
               <span style={{ width: `${Math.min(100, ofMax.percent)}%` }} />
             </dd>
           )}
-          {fact(peakTitle)}
+          {readoutFact(peakTitle)}
         </div>
         <div>
           <dt>
@@ -331,60 +399,31 @@ export function Readouts({
         <div title="From shot start to muzzle exit.">
           <dt>Barrel time</dt>
           <dd>{msUnit(r.barrelTime)}</dd>
-          {fact('From shot start to muzzle exit.')}
+          {readoutFact('From shot start to muzzle exit.')}
         </div>
         <div title={leadTitle}>
           <dt>Bullet lead time</dt>
-          <dd className={lead === undefined ? phrase : undefined}>
+          <dd className={lead === undefined ? readoutPhrase : undefined}>
             {lead === undefined ? 'not available' : msUnit(lead)}
           </dd>
-          {fact(leadTitle)}
+          {readoutFact(leadTitle)}
         </div>
-        <div
-          title={[
-            burnoutTitle,
-            `${formatNumber(r.muzzleBurntFraction * 100, 0)} % burnt at the muzzle.`,
-          ]
-            .filter(Boolean)
-            .join(' ')}
-        >
-          <dt>Burnout at</dt>
-          <dd className={r.burnout ? undefined : phrase}>
-            {r.burnout ? burnoutAt(r.burnout.travel) : 'no burnout in the barrel'}
-          </dd>
-          <dd className="readout-note">{formatNumber(r.muzzleBurntFraction * 100, 0)} % burnt</dd>
-          {fact(burnoutTitle)}
-        </div>
+        <BurnoutItem ok={ok} system={system} />
         <div title={fillTitle}>
           <dt>Case fill</dt>
           {/* without a value the reason in view and in print, in the small type of a phrase */}
-          <dd className={ratio === undefined ? phrase : undefined}>{loadRatioText(ok, ratio)}</dd>
+          <dd className={ratio === undefined ? readoutPhrase : undefined}>
+            {loadRatioText(ok, ratio)}
+          </dd>
           {ratio !== undefined && ratio > 1 && <dd className="readout-note">compressed</dd>}
-          {fact(fillTitle)}
+          {readoutFact(fillTitle)}
         </div>
         <div>
           <dt>Efficiency</dt>
           <dd>{unit(formatNumber(r.efficiency * 100, 1), '%')}</dd>
         </div>
-        {recoil && (
-          <div title={recoilTitle}>
-            <dt>Free recoil</dt>
-            <dd>
-              {unit(formatNumber(system.energy.fromSi(recoil.energy), 1), system.energy.symbol)},{' '}
-              {unit(
-                formatNumber(system.velocity.fromSi(recoil.velocity), 2),
-                system.velocity.symbol,
-              )}
-            </dd>
-            {fact(recoilTitle)}
-          </div>
-        )}
-        <div>
-          <dt>Muzzle spin</dt>
-          <dd className={spin === undefined ? phrase : undefined}>
-            {spin === undefined ? 'no twist' : unit(formatNumber(spin / 1000, 1), 'krpm')}
-          </dd>
-        </div>
+        <RecoilItem ok={ok} system={system} />
+        <SpinItem ok={ok} />
         <div>
           <dt>Power factor (IPSC)</dt>
           <dd>{formatNumber(ipscPowerFactor(ok.load.bullet.mass, r.muzzleVelocity), 0)}</dd>
@@ -392,7 +431,7 @@ export function Readouts({
         <div title={mipTitle}>
           <dt>MIP factor</dt>
           <dd>{formatNumber(powerFactor(ok.load.bullet.mass, r.muzzleVelocity), 1)}</dd>
-          {fact(mipTitle)}
+          {readoutFact(mipTitle)}
         </div>
       </dl>
     </>
@@ -676,51 +715,98 @@ export function LadderStrip({
   )
 }
 
-/** The steps of the shown run as a table, one row per charge, with the lot rows under each charge when there are any. */
-export function LadderTable({
+type LadderLot = { fraction: number; steps: Record<Lot, ShownStep[]> }
+
+/** The leading columns of the ladder table: what a step varies, with a seating ladder the case volume. */
+function ladderLead(ok: Extract<Outcome, { kind: 'ok' }> | undefined) {
+  if (ok?.ladder.kind === 'seating')
+    return [seatingLengthName[ok.ladder.seatingBy ?? 'overallLength'], 'Usable case volume']
+  return ok?.ladder.kind === 'temperature' ? ['Powder temperature'] : ['Charge']
+}
+
+/** The columns of one ladder column name: the lot rows add the burn rate and the barrel time. */
+function ladderColumn(c: string, lead: string[], lot: LadderLot | undefined) {
+  if (c === 'Charge') return lead.concat(lot ? ['Burn rate'] : [])
+  return c === 'Burnt at the muzzle' && lot ? ['Barrel time', c] : [c]
+}
+
+/** The cells of a computed ladder step from its peak pressure on. */
+function LadderResultCells({
+  step,
+  system,
+  velocity,
+  ratioShown,
+  lot,
+}: {
+  step: {
+    body: InteriorResponse
+    d: NonNullable<ShownStep['d']>
+    at: Extract<Outcome, { kind: 'ok' }>
+  }
+  system: UnitSystem
+  velocity: (r: InteriorResponse['result']) => string
+  ratioShown: boolean
+  lot: LadderLot | undefined
+}) {
+  const { body, d, at } = step
+  return (
+    <>
+      <td data-label="Peak pressure" className="num">
+        {formatQuantity('pressure', system, body.pressureRange.nominalPressure)}{' '}
+        {system.pressure.symbol}
+      </td>
+      <td data-label="Percent of maximum" className="num">
+        {d.ofMax ? `${formatNumber(d.ofMax.percent, 0)} %` : 'no limit'}
+      </td>
+      <td data-label="Muzzle velocity" className="num">
+        {velocity(body.result)}
+      </td>
+      <td data-label="Muzzle energy" className="num">
+        {formatQuantity('energy', system, body.result.muzzleEnergy)} {system.energy.symbol}
+      </td>
+      {ratioShown && <td data-label="Case fill">{loadRatioText(at, d.ratio)}</td>}
+      {lot && (
+        <td data-label="Barrel time" className="num">
+          {msText(body.result.barrelTime)}
+        </td>
+      )}
+      <td data-label="Burnt at the muzzle" className="num">
+        {formatNumber(body.result.muzzleBurntFraction * 100, 0)} %
+      </td>
+    </>
+  )
+}
+
+type LadderRowProps = {
+  s: ShownStep
+  which?: Lot
+  ok: Extract<Outcome, { kind: 'ok' }> | undefined
+  system: UnitSystem
+  value: (s: ShownStep) => string
+  velocity: (r: InteriorResponse['result']) => string
+  lead: string[]
+  lot: LadderLot | undefined
+  ratioShown: boolean
+  /** The columns the result's cells span when the step has none. */
+  resultSpan: number
+}
+
+/** One row of the ladder table: a step, or a lot row of it. */
+function LadderRow({
+  s,
+  which,
   ok,
-  steps,
   system,
   value,
   velocity,
+  lead,
   lot,
-}: {
-  ok: Extract<Outcome, { kind: 'ok' }> | undefined
-  steps: ShownStep[]
-  system: UnitSystem
-  /** What a step varies: its charge, its seating length or its powder temperature. */
-  value: (s: ShownStep) => string
-  velocity: (r: InteriorResponse['result']) => string
-  /** The rows at a burn rate above and below, in step order, and the change they were run at. */
-  lot?: { fraction: number; steps: Record<Lot, ShownStep[]> }
-}) {
-  const pressure = system.pressure
-  // without a load ratio on any step the column would repeat the load ratio readout's phrase
-  const ratioShown = steps.some((st) => st.d?.ratio !== undefined)
-  // a seating ladder names its length (COAL or CBTO) and shows the case volume behind the bullet
-  const seating = ok?.ladder.kind === 'seating'
-  const lead = seating
-    ? [seatingLengthName[ok.ladder.seatingBy ?? 'overallLength'], 'Usable case volume']
-    : ok?.ladder.kind === 'temperature'
-      ? ['Powder temperature']
-      : ['Charge']
-  const columns = ladderColumns
-    .flatMap((c) =>
-      c === 'Charge'
-        ? lead.concat(lot ? ['Burn rate'] : [])
-        : c === 'Burnt at the muzzle' && lot
-          ? ['Barrel time', c]
-          : [c],
-    )
-    .filter((c) => ratioShown || c !== 'Case fill')
-  // the cells before the result's: the step, what it varies, the seating volume, the burn rate and the flags
-  const before = 3 + (seating ? 1 : 0) + (lot ? 1 : 0)
-  const row = (s: ShownStep, which?: Lot) => (
-    <tr
-      key={`${s.n}${which ?? ''}`}
-      aria-current={!which && ok && s.n - 1 === ok.selected ? 'true' : undefined}
-      data-lot={which}
-    >
+  ratioShown,
+  resultSpan,
+}: LadderRowProps) {
+  const current = !which && ok && s.n - 1 === ok.selected
+  return (
+    <tr aria-current={current ? 'true' : undefined} data-lot={which}>
       <td data-label="Step">
         {s.label}
         {s.label === '0' && !which && ' main'}
@@ -740,36 +826,64 @@ export function LadderTable({
       )}
       <td data-label="Flags">{s.flag || s.error ? flagView(s.flag ?? 'model error') : 'none'}</td>
       {s.body && s.d && s.at ? (
-        <>
-          <td data-label="Peak pressure" className="num">
-            {formatQuantity('pressure', system, s.body.pressureRange.nominalPressure)}{' '}
-            {pressure.symbol}
-          </td>
-          <td data-label="Percent of maximum" className="num">
-            {s.d.ofMax ? `${formatNumber(s.d.ofMax.percent, 0)} %` : 'no limit'}
-          </td>
-          <td data-label="Muzzle velocity" className="num">
-            {velocity(s.body.result)}
-          </td>
-          <td data-label="Muzzle energy" className="num">
-            {formatQuantity('energy', system, s.body.result.muzzleEnergy)} {system.energy.symbol}
-          </td>
-          {ratioShown && <td data-label="Case fill">{loadRatioText(s.at, s.d.ratio)}</td>}
-          {lot && (
-            <td data-label="Barrel time" className="num">
-              {msText(s.body.result.barrelTime)}
-            </td>
-          )}
-          <td data-label="Burnt at the muzzle" className="num">
-            {formatNumber(s.body.result.muzzleBurntFraction * 100, 0)} %
-          </td>
-        </>
+        <LadderResultCells
+          step={{ body: s.body, d: s.d, at: s.at }}
+          system={system}
+          velocity={velocity}
+          ratioShown={ratioShown}
+          lot={lot}
+        />
       ) : (
-        <td data-label="Result" colSpan={columns.length - before}>
+        <td data-label="Result" colSpan={resultSpan}>
           Not computed: {s.error?.message}
         </td>
       )}
     </tr>
+  )
+}
+
+/** The steps of the shown run as a table, one row per charge, with the lot rows under each charge when there are any. */
+export function LadderTable({
+  ok,
+  steps,
+  system,
+  value,
+  velocity,
+  lot,
+}: {
+  ok: Extract<Outcome, { kind: 'ok' }> | undefined
+  steps: ShownStep[]
+  system: UnitSystem
+  /** What a step varies: its charge, its seating length or its powder temperature. */
+  value: (s: ShownStep) => string
+  velocity: (r: InteriorResponse['result']) => string
+  /** The rows at a burn rate above and below, in step order, and the change they were run at. */
+  lot?: LadderLot
+}) {
+  // without a load ratio on any step the column would repeat the load ratio readout's phrase
+  const ratioShown = steps.some((st) => st.d?.ratio !== undefined)
+  // a seating ladder names its length (COAL or CBTO) and shows the case volume behind the bullet
+  const seating = ok?.ladder.kind === 'seating'
+  const lead = ladderLead(ok)
+  const columns = ladderColumns
+    .flatMap((c) => ladderColumn(c, lead, lot))
+    .filter((c) => ratioShown || c !== 'Case fill')
+  // the cells before the result's: the step, what it varies, the seating volume, the burn rate and the flags
+  const before = 3 + (seating ? 1 : 0) + (lot ? 1 : 0)
+  const row = (s: ShownStep, which?: Lot) => (
+    <LadderRow
+      key={`${s.n}${which ?? ''}`}
+      s={s}
+      which={which}
+      ok={ok}
+      system={system}
+      value={value}
+      velocity={velocity}
+      lead={lead}
+      lot={lot}
+      ratioShown={ratioShown}
+      resultSpan={columns.length - before}
+    />
   )
   return (
     <PanelTable

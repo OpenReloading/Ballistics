@@ -73,6 +73,21 @@ const extensions = ['', '.ts', '.tsx', '.mts', '.js', '.css']
 export const importSpecifiers = (source: string) =>
   [...source.matchAll(importRe)].map(([, spec = '']) => spec)
 
+/** The repo-relative file a relative or `@/` specifier of `file` names, null for any other specifier. */
+function resolveImport(root: string, file: string, spec: string) {
+  const target = spec.startsWith('@/')
+    ? path.posix.join('apps/web/src', spec.slice(2))
+    : spec.startsWith('.')
+      ? path.posix.join(path.posix.dirname(file), spec)
+      : null
+  if (target === null) return null
+  const found = extensions
+    .map((e) => target + e)
+    .find((f) => existsSync(path.join(root, f)) && statSync(path.join(root, f)).isFile())
+  if (!found) throw new Error(`${file} imports ${spec}, which does not resolve`)
+  return found
+}
+
 /** The repo-relative files `recordRoutes` import, directly or not, and the workspace packages among them. */
 export function recordClosure(root = repoRoot) {
   const files = new Set<string>()
@@ -92,16 +107,8 @@ export function recordClosure(root = repoRoot) {
     for (const spec of importSpecifiers(source)) {
       const pkg = /^@open-reloading\/([^/]+)/.exec(spec)
       if (pkg?.[1]) packages.add(pkg[1])
-      const target = spec.startsWith('@/')
-        ? path.posix.join('apps/web/src', spec.slice(2))
-        : spec.startsWith('.')
-          ? path.posix.join(path.posix.dirname(file), spec)
-          : null
-      if (target === null) continue
-      const found = extensions
-        .map((e) => target + e)
-        .find((f) => existsSync(path.join(root, f)) && statSync(path.join(root, f)).isFile())
-      if (!found) throw new Error(`${file} imports ${spec}, which does not resolve`)
+      const found = resolveImport(root, file, spec)
+      if (found === null) continue
       add(found)
     }
   }
@@ -187,6 +194,22 @@ function argument(name: string) {
   return i < 0 ? undefined : process.argv[i + 1]
 }
 
+const nothingChanged: Plan = {
+  check: false,
+  e2e: false,
+  web: false,
+  prerender: 'sample',
+  reason: 'nothing changed since the recorded build',
+}
+
+function settle(p: Plan, stamped: boolean, built: string): Plan {
+  if (argument('--require') === 'full' && p.prerender === 'sample') p.prerender = 'full'
+  // an earlier sample build does not stand in for a full one
+  if (stamped && !p.web && p.prerender === 'full' && built !== 'full')
+    return everything('the earlier build is a sample')
+  return p
+}
+
 function decide(): Plan {
   const full = everything
   try {
@@ -203,20 +226,8 @@ function decide(): Plan {
     const changed = changedSince(base)
     // an empty list is a doubt in CI, but the answer for a local run against its own last build
     const p: Plan =
-      stampFile !== undefined && changed.length === 0
-        ? {
-            check: false,
-            e2e: false,
-            web: false,
-            prerender: 'sample',
-            reason: 'nothing changed since the recorded build',
-          }
-        : plan(changed)
-    if (argument('--require') === 'full' && p.prerender === 'sample') p.prerender = 'full'
-    // an earlier sample build does not stand in for a full one
-    if (stampFile !== undefined && !p.web && p.prerender === 'full' && built !== 'full')
-      return full('the earlier build is a sample')
-    return p
+      stampFile !== undefined && changed.length === 0 ? { ...nothingChanged } : plan(changed)
+    return settle(p, stampFile !== undefined, built)
   } catch (e) {
     return full(`plan failed: ${e instanceof Error ? e.message.split('\n')[0] : String(e)}`)
   }

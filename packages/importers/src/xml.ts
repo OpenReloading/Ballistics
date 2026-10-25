@@ -26,6 +26,16 @@ const isXmlChar = (c: number) =>
   (c >= 0xe000 && c <= 0xfffd) ||
   (c >= 0x10000 && c <= 0x10ffff)
 
+/** The text of the entity or character reference `&name;`. */
+function replacementOf(name: string): string {
+  if (Object.hasOwn(predefined, name)) return predefined[name]
+  const m = /^#(?:x([0-9a-fA-F]+)|([0-9]+))$/.exec(name)
+  if (!m) throw new Error(`unknown entity &${name};`)
+  const code = m[1] ? Number.parseInt(m[1], 16) : Number(m[2])
+  if (!isXmlChar(code)) throw new Error(`character reference &${name}; is not an XML character`)
+  return String.fromCodePoint(code)
+}
+
 /**
  * Text with the five predefined entities (4.6) and character references (4.1) replaced. Pieces
  * are joined in batches, so memory stays near the size of the text for any number of references.
@@ -42,15 +52,7 @@ function references(text: string): string {
     const next = text.indexOf('&', amp + 1)
     if (semi <= amp + 1 || (next >= 0 && next < semi)) throw new Error('bare & in text')
     const name = text.slice(amp + 1, semi)
-    let replacement = Object.hasOwn(predefined, name) ? predefined[name] : undefined
-    if (replacement === undefined) {
-      const m = /^#(?:x([0-9a-fA-F]+)|([0-9]+))$/.exec(name)
-      if (!m) throw new Error(`unknown entity &${name};`)
-      const code = m[1] ? Number.parseInt(m[1], 16) : Number(m[2])
-      if (!isXmlChar(code)) throw new Error(`character reference &${name}; is not an XML character`)
-      replacement = String.fromCodePoint(code)
-    }
-    pieces.push(replacement)
+    pieces.push(replacementOf(name))
     if (pieces.length >= 8192) {
       out += pieces.join('')
       pieces.length = 0
@@ -144,78 +146,103 @@ function readStartTag(
   return { qname, attributes, empty: close[1] !== '', end: end + close[0].length }
 }
 
+/** What `scanXml` keeps while it reads. */
+interface ScanState {
+  events: XmlEvents
+  remaining: XmlBudget | undefined
+  /** Qualified names of the open elements. */
+  qnames: string[]
+  /** Local names of the open elements. */
+  path: string[]
+  rooted: boolean
+}
+
+function addText(st: ScanState, t: string): void {
+  if (st.path.length > 0) st.events.text(t, st.path)
+  else if (t.trim()) throw new Error('text outside the root element')
+}
+
+/** Refuses an XML declaration that names an encoding other than UTF-8. */
+function checkEncoding(pi: string): void {
+  const encoding = /^xml\s[\s\S]*?encoding\s*=\s*["']([^"']*)["']/.exec(pi)?.[1]
+  if (encoding !== undefined && encoding.toLowerCase() !== 'utf-8') {
+    throw new Error(`encoding "${encoding}" is not read; only UTF-8`)
+  }
+}
+
+/** Closes the element named by the end tag at `lt`; returns the position after the tag. */
+function readEndTag(text: string, lt: number, st: ScanState): number {
+  const m = match(endTagAt, text, lt + 2)
+  const top = st.qnames.pop()
+  if (!m || top === undefined || m[1] !== top) {
+    throw new Error(`end tag </${m?.[1] ?? ''}> does not match <${top ?? ''}>`)
+  }
+  const name = st.path.pop() as string
+  st.events.close(name, st.path)
+  return lt + 2 + m[0].length
+}
+
+/** Opens the element of the start tag at `lt`; returns the position after the tag. */
+function readElement(text: string, lt: number, st: ScanState): number {
+  const tag = readStartTag(text, lt, st.remaining)
+  if (st.qnames.length >= maxDepth) throw new Error(`elements nest deeper than ${maxDepth}`)
+  if (st.qnames.length === 0) {
+    if (st.rooted) throw new Error('more than one root element')
+    st.rooted = true
+  }
+  const name = local(tag.qname)
+  st.events.open(name, tag.attributes, st.path)
+  if (tag.empty) st.events.close(name, st.path)
+  else {
+    st.qnames.push(tag.qname)
+    st.path.push(name)
+  }
+  return tag.end
+}
+
+/** Reads the markup at `lt` (a `<`); returns the position after it. */
+function readMarkup(text: string, lt: number, st: ScanState): number {
+  if (text.startsWith('<?', lt)) {
+    const e = closing(text, '?>', lt + 2, 'processing instruction')
+    checkEncoding(text.slice(lt + 2, e))
+    return e + 2
+  }
+  if (text.startsWith('<!--', lt)) return closing(text, '-->', lt + 4, 'comment') + 3
+  if (text.startsWith('<![CDATA[', lt)) {
+    const e = closing(text, ']]>', lt + 9, 'CDATA section')
+    spend(st.remaining, 'characters', e - lt - 9)
+    addText(st, text.slice(lt + 9, e))
+    return e + 3
+  }
+  if (text.startsWith('<!DOCTYPE', lt)) throw new Error('DOCTYPE is not allowed')
+  if (text[lt + 1] === '!') throw new Error('markup declarations are not allowed')
+  if (text[lt + 1] === '/') return readEndTag(text, lt, st)
+  return readElement(text, lt, st)
+}
+
 /**
  * Reads `text` left to right and reports its elements and text to `events`; throws on markup
  * this reader does not accept. `remaining` is counted down before each element or text is
  * reported, so several parts can share one budget. Errors thrown by `events` are not caught.
  */
 export function scanXml(text: string, events: XmlEvents, remaining?: XmlBudget): void {
-  const qnames: string[] = []
-  const path: string[] = []
-  let rooted = false
-  const addText = (t: string) => {
-    if (path.length > 0) events.text(t, path)
-    else if (t.trim()) throw new Error('text outside the root element')
-  }
+  const st: ScanState = { events, remaining, qnames: [], path: [], rooted: false }
   let i = 0
   while (i < text.length) {
     const lt = text.indexOf('<', i)
     if (lt < 0) {
       spend(remaining, 'characters', text.length - i)
-      addText(references(text.slice(i)))
+      addText(st, references(text.slice(i)))
       break
     }
     if (lt > i) {
       spend(remaining, 'characters', lt - i)
-      addText(references(text.slice(i, lt)))
+      addText(st, references(text.slice(i, lt)))
     }
-    if (text.startsWith('<?', lt)) {
-      const e = closing(text, '?>', lt + 2, 'processing instruction')
-      const pi = text.slice(lt + 2, e)
-      const encoding = /^xml\s[\s\S]*?encoding\s*=\s*["']([^"']*)["']/.exec(pi)?.[1]
-      if (encoding !== undefined && encoding.toLowerCase() !== 'utf-8') {
-        throw new Error(`encoding "${encoding}" is not read; only UTF-8`)
-      }
-      i = e + 2
-    } else if (text.startsWith('<!--', lt)) {
-      i = closing(text, '-->', lt + 4, 'comment') + 3
-    } else if (text.startsWith('<![CDATA[', lt)) {
-      const e = closing(text, ']]>', lt + 9, 'CDATA section')
-      spend(remaining, 'characters', e - lt - 9)
-      addText(text.slice(lt + 9, e))
-      i = e + 3
-    } else if (text.startsWith('<!DOCTYPE', lt)) {
-      throw new Error('DOCTYPE is not allowed')
-    } else if (text[lt + 1] === '!') {
-      throw new Error('markup declarations are not allowed')
-    } else if (text[lt + 1] === '/') {
-      const m = match(endTagAt, text, lt + 2)
-      const top = qnames.pop()
-      if (!m || top === undefined || m[1] !== top) {
-        throw new Error(`end tag </${m?.[1] ?? ''}> does not match <${top ?? ''}>`)
-      }
-      const name = path.pop() as string
-      events.close(name, path)
-      i = lt + 2 + m[0].length
-    } else {
-      const tag = readStartTag(text, lt, remaining)
-      if (qnames.length >= maxDepth) throw new Error(`elements nest deeper than ${maxDepth}`)
-      if (qnames.length === 0) {
-        if (rooted) throw new Error('more than one root element')
-        rooted = true
-      }
-      const name = local(tag.qname)
-      events.open(name, tag.attributes, path)
-      if (tag.empty) events.close(name, path)
-      else {
-        qnames.push(tag.qname)
-        path.push(name)
-      }
-      i = tag.end
-    }
+    i = readMarkup(text, lt, st)
   }
-  if (qnames.length > 0) throw new Error(`unclosed element <${qnames.at(-1)}>`)
-  if (!rooted) throw new Error('no root element')
+  if (st.qnames.length > 0) throw new Error(`unclosed element <${st.qnames.at(-1)}>`)
+  if (!st.rooted) throw new Error('no root element')
 }
 
 /** The root element of `text` as a tree, read with `scanXml` (same checks and budget). */

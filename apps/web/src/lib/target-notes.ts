@@ -53,20 +53,38 @@ export function resolveNote(
 ): string {
   if (!text.includes('{')) return text
   const rows = group && stats ? readouts(stats, group.distance) : []
-  return text.replace(/\{([A-Za-z]+)(?:\.([a-z]+))?\}/g, (token, key: string, unit?: string) => {
-    if (unit === undefined && plain.has(key)) {
-      if (!group || !stats) return 'n/a'
-      if (key === 'name') return group.name
-      if (key === 'shots') return String(stats.shotCount)
-      if (key === 'excluded') return String(stats.excludedCount)
-      return withUnit('range', system, group.distance)
-    }
-    if (!readoutKeys.has(key) || !(unit === 'length' || unit === 'moa' || unit === 'mrad'))
-      return token
-    const r = rows.find((x) => x.key === key)
-    if (!r) return 'n/a'
-    if (unit === 'length') return withUnit('length', system, r.value)
-    const u = unit === 'moa' ? unitsOf.correction.MOA : unitsOf.correction.mrad
-    return `${formatNumber(u.fromSi(r.angle), u.decimals)} ${u.symbol}`
-  })
+  return text.replace(/\{([A-Za-z]+)(?:\.([a-z]+))?\}/g, (token, key: string, unit?: string) =>
+    unit === undefined && plain.has(key)
+      ? plainValue(key, group, stats, system)
+      : readoutValue(token, key, unit, rows, system),
+  )
+}
+
+function plainValue(
+  key: string,
+  group: ShotGroup | undefined,
+  stats: GroupStatistics | undefined,
+  system: UnitSystem,
+): string {
+  if (!group || !stats) return 'n/a'
+  if (key === 'name') return group.name
+  if (key === 'shots') return String(stats.shotCount)
+  if (key === 'excluded') return String(stats.excludedCount)
+  return withUnit('range', system, group.distance)
+}
+
+function readoutValue(
+  token: string,
+  key: string,
+  unit: string | undefined,
+  rows: ReturnType<typeof readouts>,
+  system: UnitSystem,
+): string {
+  if (!readoutKeys.has(key) || !(unit === 'length' || unit === 'moa' || unit === 'mrad'))
+    return token
+  const r = rows.find((x) => x.key === key)
+  if (!r) return 'n/a'
+  if (unit === 'length') return withUnit('length', system, r.value)
+  const u = unit === 'moa' ? unitsOf.correction.MOA : unitsOf.correction.mrad
+  return `${formatNumber(u.fromSi(r.angle), u.decimals)} ${u.symbol}`
 }

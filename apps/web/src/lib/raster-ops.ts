@@ -30,6 +30,41 @@ export function median1(v: readonly number[]): number {
       : (s[s.length / 2 - 1] + s[s.length / 2]) / 2
     : 0
 }
+type Pick = (a: number, b: number) => number
+
+/** The running extreme from the start of each block of `size` pixels in `g`, to its end in `f`. */
+function blockExtremes(
+  line: Float32Array,
+  len: number,
+  size: number,
+  pick: Pick,
+  g: Float32Array,
+  f: Float32Array,
+) {
+  for (let i = 0; i < len; i++) g[i] = i % size === 0 ? line[i] : pick(g[i - 1], line[i])
+  for (let i = len - 1; i >= 0; i--)
+    f[i] = i === len - 1 || (i + 1) % size === 0 ? line[i] : pick(f[i + 1], line[i])
+}
+
+/** The extreme of each window of 2k + 1 pixels from the block extremes. */
+function windowExtremes(
+  len: number,
+  k: number,
+  size: number,
+  pick: Pick,
+  g: Float32Array,
+  f: Float32Array,
+  res: Float32Array,
+) {
+  for (let i = 0; i < len; i++) {
+    const lo = Math.max(0, i - k)
+    const hi = Math.min(len - 1, i + k)
+    // One block: the window starts at its first pixel or ends at its last one.
+    if (Math.floor(lo / size) !== Math.floor(hi / size)) res[i] = pick(f[lo], g[hi])
+    else res[i] = lo % size === 0 ? g[hi] : f[lo]
+  }
+}
+
 /**
  * Maximum (`max`) or minimum over a (2k + 1) square, rows then columns, three comparisons per
  * pixel whatever k (van Herk; Gil and Werman). The window is cut at the image edge.
@@ -56,16 +91,8 @@ function minMax(src: Float32Array, w: number, h: number, k: number, max: boolean
     const size = 2 * k + 1
     for (let l = 0; l < lines; l++) {
       for (let i = 0; i < len; i++) line[i] = from[l * stride + i * step]
-      for (let i = 0; i < len; i++) g[i] = i % size === 0 ? line[i] : pick(g[i - 1], line[i])
-      for (let i = len - 1; i >= 0; i--)
-        f[i] = i === len - 1 || (i + 1) % size === 0 ? line[i] : pick(f[i + 1], line[i])
-      for (let i = 0; i < len; i++) {
-        const lo = Math.max(0, i - k)
-        const hi = Math.min(len - 1, i + k)
-        // One block: the window starts at its first pixel or ends at its last one.
-        if (Math.floor(lo / size) !== Math.floor(hi / size)) res[i] = pick(f[lo], g[hi])
-        else res[i] = lo % size === 0 ? g[hi] : f[lo]
-      }
+      blockExtremes(line, len, size, pick, g, f)
+      windowExtremes(len, k, size, pick, g, f, res)
       for (let i = 0; i < len; i++) to[l * stride + i * step] = res[i]
     }
   }
@@ -94,6 +121,43 @@ function morph(src: Float32Array, w: number, h: number, k: number, closing: bool
 export const open = (src: Float32Array, w: number, h: number, k: number) =>
   morph(src, w, h, k, false)
 
+/** Where the parabola rooted at `q` overtakes the one rooted at `p`. */
+const crossing = (f: Float64Array, q: number, p: number) =>
+  (f[q] + q * q - (f[p] + p * p)) / (2 * q - 2 * p)
+
+/** The parabolas of the lower envelope of the samples `f`: roots in `v`, the bounds between them in `z`. */
+function lowerEnvelope(f: Float64Array, len: number, v: Int32Array, z: Float64Array) {
+  let j = 0
+  v[0] = 0
+  z[0] = -Infinity
+  z[1] = Infinity
+  for (let q = 1; q < len; q++) {
+    let s = crossing(f, q, v[j])
+    while (s <= z[j]) {
+      j--
+      s = crossing(f, q, v[j])
+    }
+    j++
+    v[j] = q
+    z[j] = s
+    z[j + 1] = Infinity
+  }
+}
+
+function readEnvelope(
+  f: Float64Array,
+  len: number,
+  v: Int32Array,
+  z: Float64Array,
+  out: Float64Array,
+) {
+  let j = 0
+  for (let q = 0; q < len; q++) {
+    while (z[j + 1] < q) j++
+    out[q] = (q - v[j]) ** 2 + f[v[j]]
+  }
+}
+
 /**
  * Squared Euclidean distance of every pixel to the nearest pixel whose mask value is `target`
  * (Felzenszwalb and Huttenlocher, lower envelope of parabolas, rows then columns).
@@ -117,26 +181,8 @@ export function distanceSquared(
   const pass = (len: number, lines: number, step: number, stride: number) => {
     for (let l = 0; l < lines; l++) {
       for (let i = 0; i < len; i++) f[i] = d[l * stride + i * step]
-      let j = 0
-      v[0] = 0
-      z[0] = -Infinity
-      z[1] = Infinity
-      for (let q = 1; q < len; q++) {
-        let s = (f[q] + q * q - (f[v[j]] + v[j] * v[j])) / (2 * q - 2 * v[j])
-        while (s <= z[j]) {
-          j--
-          s = (f[q] + q * q - (f[v[j]] + v[j] * v[j])) / (2 * q - 2 * v[j])
-        }
-        j++
-        v[j] = q
-        z[j] = s
-        z[j + 1] = Infinity
-      }
-      j = 0
-      for (let q = 0; q < len; q++) {
-        while (z[j + 1] < q) j++
-        out[q] = (q - v[j]) ** 2 + f[v[j]]
-      }
+      lowerEnvelope(f, len, v, z)
+      readEnvelope(f, len, v, z, out)
       for (let i = 0; i < len; i++) d[l * stride + i * step] = out[i]
     }
   }
@@ -152,25 +198,36 @@ export function components(mask: Uint8Array, w: number, h: number): number[][] {
   const out: number[][] = []
   for (let start = 0; start < w * h; start++) {
     if (!mask[start] || seen[start]) continue
-    const pixels: number[] = []
-    let top = 0
-    stack[top++] = start
-    seen[start] = 1
-    while (top) {
-      const i = stack[--top]
-      pixels.push(i)
-      const [x, y] = [i % w, Math.floor(i / w)]
-      for (let dy = -1; dy <= 1; dy++)
-        for (let dx = -1; dx <= 1; dx++) {
-          const [u, v] = [x + dx, y + dy]
-          const j = v * w + u
-          if (u >= 0 && u < w && v >= 0 && v < h && mask[j] && !seen[j]) {
-            seen[j] = 1
-            stack[top++] = j
-          }
-        }
-    }
-    out.push(pixels)
+    out.push(flood(start, mask, w, h, seen, stack))
   }
   return out
+}
+
+function flood(
+  start: number,
+  mask: Uint8Array,
+  w: number,
+  h: number,
+  seen: Uint8Array,
+  stack: Int32Array,
+): number[] {
+  const pixels: number[] = []
+  let top = 0
+  stack[top++] = start
+  seen[start] = 1
+  while (top) {
+    const i = stack[--top]
+    pixels.push(i)
+    const [x, y] = [i % w, Math.floor(i / w)]
+    for (let dy = -1; dy <= 1; dy++)
+      for (let dx = -1; dx <= 1; dx++) {
+        const [u, v] = [x + dx, y + dy]
+        const j = v * w + u
+        if (u >= 0 && u < w && v >= 0 && v < h && mask[j] && !seen[j]) {
+          seen[j] = 1
+          stack[top++] = j
+        }
+      }
+  }
+  return pixels
 }

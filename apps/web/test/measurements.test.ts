@@ -159,7 +159,7 @@ describe('sessionOf', () => {
     // the source title falls back to the name when the file gave none
     const untitled = {
       ...data.session,
-      provenance: { kind: 'measured' as const, sources: [{}] as [{}] },
+      provenance: { kind: 'measured' as const, sources: [{}] as [object] },
     }
     const t = sessionOf('x.csv', { ...data, session: untitled }, [], { id, now })
     expect(t.data.provenance.sources[0].title).toBe('x.csv')

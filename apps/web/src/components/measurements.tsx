@@ -136,6 +136,92 @@ function Marks({ series, system }: { series: Plotted[]; system: UnitSystem }) {
   )
 }
 
+/** Reads one chronograph file as a session record; a maker named by several files is one reference. */
+async function readSession(
+  file: File,
+  unit: VelocityUnit | '',
+  steps: MeasuredStep[] | undefined,
+  makers: Map<string, string | undefined>,
+  manufacturerRef: (name: string) => string | undefined,
+) {
+  // taken before the first await, so reads that overlap never share an id
+  const id = newId()
+  const data = await readChrono(await chronoFileBytes(file), {
+    fileName: file.name,
+    ...(unit ? { velocityUnit: unit } : {}),
+  })
+  // string k takes step k's charge; the selects show the guess
+  const charges = data.session.strings.map((_, i) => steps?.[i]?.charge)
+  // checked before the maker is stored: a file over the schema's caps would be stored as an
+  // invalid record
+  const now = new Date()
+  const draft = sessionOf(file.name, data, charges, { id, now })
+  const checked = chronoSession.safeParse(draft.data)
+  if (!checked.success)
+    throw new Error(checked.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; '))
+  const named = data.session.device.manufacturerName?.trim() ?? ''
+  if (named && !makers.has(named)) makers.set(named, manufacturerRef(named))
+  return sessionOf(file.name, data, charges, { id, manufacturer: makers.get(named), now })
+}
+
+/** `text` of a statistic when there is one, else nothing. */
+const when = <T,>(x: T | undefined, text: (x: T) => string) => (x === undefined ? '' : text(x))
+
+function SeriesRow({
+  name,
+  shape,
+  k,
+  row: r,
+  charge,
+  speed,
+}: {
+  name: string
+  shape: Shape
+  k: number
+  row: ChargeRow
+  charge: (kg: number) => string
+  speed: (ms: number) => string
+}) {
+  const stats = r.velocityStats
+  return (
+    <tr>
+      <td data-label={columns[0]}>
+        <span className="series-name">
+          <LegendShape shape={shape} k={k} />
+          {name}
+        </span>
+      </td>
+      <td data-label={columns[1]} className="num">
+        {charge(r.charge)}
+      </td>
+      <td data-label={columns[2]} className="num">
+        {stats?.count ?? 0}
+      </td>
+      <td data-label={columns[3]} className="num">
+        {r.excludedShots.length}
+      </td>
+      <td data-label={columns[4]} className="num">
+        {when(stats, (st) => speed(st.mean))}
+      </td>
+      <td data-label={columns[5]} className="num">
+        {when(stats?.standardDeviation, speed)}
+      </td>
+      <td data-label={columns[6]} className="num">
+        {when(stats, (st) => speed(st.extremeSpread))}
+      </td>
+      <td data-label={columns[7]} className="num">
+        {when(r.simulatedVelocity, speed) || 'no step'}
+      </td>
+      <td data-label={columns[8]} className="num">
+        {when(r.velocityDifference, speed)}
+      </td>
+      <td data-label={columns[9]} className="num">
+        {when(r.differencePercent, (x) => `${formatNumber(x, 1)} %`)}
+      </td>
+    </tr>
+  )
+}
+
 /**
  * The Measurements tab: chronograph files read in the browser, strings mapped to the charges of the
  * last run, a table per series and charge and one chart over charge. `steps` is undefined before a
@@ -175,32 +261,8 @@ export function Measurements({
     for (const file of files.slice(room))
       failed.push(`${file.name}: a load keeps ${maxSessions} sessions at most.`)
     for (const file of taken) {
-      // taken before the first await, so reads that overlap never share an id
-      const id = newId()
       try {
-        const data = await readChrono(await chronoFileBytes(file), {
-          fileName: file.name,
-          ...(unit ? { velocityUnit: unit } : {}),
-        })
-        // string k takes step k's charge; the selects show the guess
-        const charges = data.session.strings.map((_, i) => steps?.[i]?.charge)
-        // checked before the maker is stored: a file over the schema's caps would be stored as an
-        // invalid record
-        const now = new Date()
-        const draft = sessionOf(file.name, data, charges, { id, now })
-        const checked = chronoSession.safeParse(draft.data)
-        if (!checked.success)
-          throw new Error(
-            checked.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; '),
-          )
-        const named = data.session.device.manufacturerName?.trim() ?? ''
-        if (named && !makers.has(named)) makers.set(named, manufacturerRef(named))
-        const record = sessionOf(file.name, data, charges, {
-          id,
-          manufacturer: makers.get(named),
-          now,
-        })
-        read.push(record)
+        read.push(await readSession(file, unit, steps, makers, manufacturerRef))
       } catch (err) {
         failed.push(`${file.name}: ${errorText(err)}`)
       }
@@ -264,45 +326,15 @@ export function Measurements({
       >
         {plotted.flatMap(({ s, shape, rows }, k) =>
           rows.map((r) => (
-            <tr key={`${s.id} ${r.charge}`}>
-              <td data-label={columns[0]}>
-                <span className="series-name">
-                  <LegendShape shape={shape} k={k} />
-                  {s.name}
-                </span>
-              </td>
-              <td data-label={columns[1]} className="num">
-                {charge(r.charge)}
-              </td>
-              <td data-label={columns[2]} className="num">
-                {r.velocityStats?.count ?? 0}
-              </td>
-              <td data-label={columns[3]} className="num">
-                {r.excludedShots.length}
-              </td>
-              <td data-label={columns[4]} className="num">
-                {r.velocityStats ? speed(r.velocityStats.mean) : ''}
-              </td>
-              <td data-label={columns[5]} className="num">
-                {r.velocityStats?.standardDeviation !== undefined
-                  ? speed(r.velocityStats.standardDeviation)
-                  : ''}
-              </td>
-              <td data-label={columns[6]} className="num">
-                {r.velocityStats ? speed(r.velocityStats.extremeSpread) : ''}
-              </td>
-              <td data-label={columns[7]} className="num">
-                {r.simulatedVelocity !== undefined ? speed(r.simulatedVelocity) : 'no step'}
-              </td>
-              <td data-label={columns[8]} className="num">
-                {r.velocityDifference !== undefined ? speed(r.velocityDifference) : ''}
-              </td>
-              <td data-label={columns[9]} className="num">
-                {r.differencePercent !== undefined
-                  ? `${formatNumber(r.differencePercent, 1)} %`
-                  : ''}
-              </td>
-            </tr>
+            <SeriesRow
+              key={`${s.id} ${r.charge}`}
+              name={s.name}
+              shape={shape}
+              k={k}
+              row={r}
+              charge={charge}
+              speed={speed}
+            />
           )),
         )}
       </PanelTable>

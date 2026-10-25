@@ -7,6 +7,13 @@ import { parseVelocity, type VelocityUnit } from './units.ts'
 /** A bore flag cell is set unless it is empty, `0`, `no`, `false` or `n` (any case). */
 const isSet = (cell = '') => !['', '0', 'no', 'false', 'n'].includes(cell.trim().toLowerCase())
 
+/** The bore flags set in a shot row, `clean bore and cold bore`, or empty text. */
+function boreFlagText(cells: string[]): string {
+  return [isSet(cells[6]) ? 'clean bore' : '', isSet(cells[7]) ? 'cold bore' : '']
+    .filter(Boolean)
+    .join(' and ')
+}
+
 /**
  * Shot rows after a header row, until the first row for which `footerStarts` holds; that row and
  * the non-empty rows after it are the footer. Velocity in column 2, CLEAN BORE and COLD BORE by
@@ -30,9 +37,7 @@ export function readShotRows(
     if (!/^\d+$/.test(cells[0] ?? '')) continue
     const shot: ChronoShot = { velocity: parseVelocity(cells[1] ?? '', unitText, unit) }
     values.push(parseNumber(cells[1]))
-    const which = [isSet(cells[6]) ? 'clean bore' : '', isSet(cells[7]) ? 'cold bore' : '']
-      .filter(Boolean)
-      .join(' and ')
+    const which = boreFlagText(cells)
     if (which) {
       shot.coldBore = true
       flags.push(`shot ${cells[0]} ${which}`)

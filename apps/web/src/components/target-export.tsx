@@ -127,6 +127,46 @@ const loaded = async (src: string) => {
 export const extension = (type: string) =>
   type === 'image/jpeg' ? 'jpg' : (type.split('/')[1]?.replace(/\W[\s\S]*/, '') ?? 'img')
 
+type RenderJob = {
+  photo: { url: string; width: number; height: number } | undefined
+  box: ViewBox
+  size: { w: number; h: number }
+  turn: number
+  k: number
+}
+
+/** The photo, turned about its middle as on screen, under the overlay SVG, drawn into a canvas. */
+async function renderCanvas({ photo, box, size, turn, k }: RenderJob) {
+  const svg = document.querySelector('.target-offscreen svg')
+  if (!(svg instanceof SVGSVGElement)) throw new Error('nothing drawn')
+  const canvas = document.createElement('canvas')
+  canvas.width = size.w
+  canvas.height = size.h
+  const g = canvas.getContext('2d')
+  if (!g) throw new Error('no canvas')
+  const stage = document.querySelector('.target-stage')
+  g.fillStyle = (stage && getComputedStyle(stage).backgroundColor) || '#ffffff'
+  g.fillRect(0, 0, size.w, size.h)
+  if (photo) {
+    const img = await loaded(photo.url)
+    const f = size.w / box.w
+    // turned about its middle as on screen
+    g.translate((photo.width / 2 - box.x) * f, (photo.height / 2 - box.y) * f)
+    g.rotate(-turn)
+    g.drawImage(
+      img,
+      (-photo.width / 2) * f,
+      (-photo.height / 2) * f,
+      photo.width * f,
+      photo.height * f,
+    )
+    g.setTransform(1, 0, 0, 1, 0, 0)
+  }
+  const markup = standalone(svg, k, size)
+  g.drawImage(await loaded(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(markup)}`), 0, 0)
+  return canvas
+}
+
 /**
  * The Export menu: the original photo as stored, the rendered image of the fitted view at
  * the photo's pixel size, and the print sheet. Everything is made in the browser and downloaded;
@@ -171,37 +211,7 @@ export function ExportMenu({
     const k = box.w / 1000
     flushSync(() => setJob({ box, k }))
     try {
-      const svg = document.querySelector('.target-offscreen svg')
-      if (!(svg instanceof SVGSVGElement)) throw new Error('nothing drawn')
-      const canvas = document.createElement('canvas')
-      canvas.width = size.w
-      canvas.height = size.h
-      const g = canvas.getContext('2d')
-      if (!g) throw new Error('no canvas')
-      const stage = document.querySelector('.target-stage')
-      g.fillStyle = (stage && getComputedStyle(stage).backgroundColor) || '#ffffff'
-      g.fillRect(0, 0, size.w, size.h)
-      if (photo) {
-        const img = await loaded(photo.url)
-        const f = size.w / box.w
-        // turned about its middle as on screen
-        g.translate((photo.width / 2 - box.x) * f, (photo.height / 2 - box.y) * f)
-        g.rotate(-turn)
-        g.drawImage(
-          img,
-          (-photo.width / 2) * f,
-          (-photo.height / 2) * f,
-          photo.width * f,
-          photo.height * f,
-        )
-        g.setTransform(1, 0, 0, 1, 0, 0)
-      }
-      const markup = standalone(svg, k, size)
-      g.drawImage(
-        await loaded(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(markup)}`),
-        0,
-        0,
-      )
+      const canvas = await renderCanvas({ photo, box, size, turn, k })
       const type = photo ? 'image/jpeg' : 'image/png'
       const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, type, 0.92))
       if (!blob) throw new Error('the browser made no image')

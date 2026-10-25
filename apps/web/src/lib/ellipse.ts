@@ -313,6 +313,31 @@ function refitOnInliers(pts: readonly Point[], o: RobustOptions, start: Candidat
   return best
 }
 
+/** One Jacobi rotation of the rows and columns `p` and `q` of `a`, accumulated in the vectors `v`. */
+function jacobiRotate(a: number[], v: number[], p: number, q: number) {
+  const apq = a[3 * p + q]
+  if (apq === 0) return
+  const theta = (a[3 * q + q] - a[3 * p + p]) / (2 * apq)
+  const t = Math.sign(theta || 1) / (Math.abs(theta) + Math.sqrt(theta * theta + 1))
+  const c = 1 / Math.sqrt(t * t + 1)
+  const s = t * c
+  for (let k = 0; k < 3; k++) {
+    const [akp, akq] = [a[3 * k + p], a[3 * k + q]]
+    a[3 * k + p] = c * akp - s * akq
+    a[3 * k + q] = s * akp + c * akq
+  }
+  for (let k = 0; k < 3; k++) {
+    const [apk, aqk] = [a[3 * p + k], a[3 * q + k]]
+    a[3 * p + k] = c * apk - s * aqk
+    a[3 * q + k] = s * apk + c * aqk
+  }
+  for (let k = 0; k < 3; k++) {
+    const [vkp, vkq] = [v[3 * k + p], v[3 * k + q]]
+    v[3 * k + p] = c * vkp - s * vkq
+    v[3 * k + q] = s * vkp + c * vkq
+  }
+}
+
 /** Eigen-decomposition of a symmetric 3 x 3 matrix by Jacobi rotations: values and the vectors as rows. */
 function jacobi3(m: Matrix): { values: number[]; vectors: number[][] } {
   const a = [...m]
@@ -324,29 +349,8 @@ function jacobi3(m: Matrix): { values: number[]; vectors: number[][] } {
       [0, 1],
       [0, 2],
       [1, 2],
-    ]) {
-      const apq = a[3 * p + q]
-      if (apq === 0) continue
-      const theta = (a[3 * q + q] - a[3 * p + p]) / (2 * apq)
-      const t = Math.sign(theta || 1) / (Math.abs(theta) + Math.sqrt(theta * theta + 1))
-      const c = 1 / Math.sqrt(t * t + 1)
-      const s = t * c
-      for (let k = 0; k < 3; k++) {
-        const [akp, akq] = [a[3 * k + p], a[3 * k + q]]
-        a[3 * k + p] = c * akp - s * akq
-        a[3 * k + q] = s * akp + c * akq
-      }
-      for (let k = 0; k < 3; k++) {
-        const [apk, aqk] = [a[3 * p + k], a[3 * q + k]]
-        a[3 * p + k] = c * apk - s * aqk
-        a[3 * q + k] = s * apk + c * aqk
-      }
-      for (let k = 0; k < 3; k++) {
-        const [vkp, vkq] = [v[3 * k + p], v[3 * k + q]]
-        v[3 * k + p] = c * vkp - s * vkq
-        v[3 * k + q] = s * vkp + c * vkq
-      }
-    }
+    ])
+      jacobiRotate(a, v, p, q)
   }
   return {
     values: [a[0], a[4], a[8]],

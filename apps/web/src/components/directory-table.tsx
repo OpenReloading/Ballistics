@@ -5,8 +5,10 @@ import { CaretDown, CaretUp, CaretUpDown, MagnifyingGlass } from '@phosphor-icon
 import Link from 'next/link'
 import {
   type CSSProperties,
+  type FocusEvent,
   Fragment,
   type KeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
   type ReactNode,
   useCallback,
   useEffect,
@@ -93,32 +95,48 @@ function moveFocus(
   const row = cell?.closest<HTMLElement>('tr[data-row]')
   if (!cell || !row || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return
   let next: HTMLElement | null | undefined
-  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-    // aria-rowindex is the index in `rows` plus 2 (the head row is 1)
-    const id =
-      rows[Number(row.getAttribute('aria-rowindex')) - 2 + (e.key === 'ArrowDown' ? 1 : -1)]?.id
-    if (!id) return
-    // the focused row can leave the DOM with the reveal, so look in the tbody
-    const body = e.currentTarget
-    const find = () =>
-      [...body.querySelectorAll<HTMLElement>('tr[data-row]')].find((r) => r.dataset.id === id)
-    let target = find()
-    if (!target) {
-      flushSync(() => reveal(id, cell.dataset.col ?? ''))
-      target = find()
-    }
-    if (!target) return
-    next =
-      focusableIn(target.querySelector(`[data-col="${cell.dataset.col}"]`)) ??
-      target.querySelector<HTMLElement>('td.name-cell a')
-  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-    const cells = [...row.querySelectorAll<HTMLElement>('[data-col]')].filter(focusableIn)
-    const at = cells.indexOf(cell) + (e.key === 'ArrowRight' ? 1 : -1)
-    next = focusableIn(cells[at] ?? null)
-  } else return
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp')
+    next = verticalTarget(e, row, cell, rows, reveal)
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') next = sideTarget(e.key, row, cell)
+  else return
   if (!next) return
   e.preventDefault()
   next.focus()
+}
+
+/** The focusable of the same column in the row above or below, revealed when it is not rendered. */
+function verticalTarget(
+  e: KeyboardEvent<HTMLElement>,
+  row: HTMLElement,
+  cell: HTMLElement,
+  rows: readonly { id: string }[],
+  reveal: (id: string, col: string) => void,
+) {
+  // aria-rowindex is the index in `rows` plus 2 (the head row is 1)
+  const id =
+    rows[Number(row.getAttribute('aria-rowindex')) - 2 + (e.key === 'ArrowDown' ? 1 : -1)]?.id
+  if (!id) return
+  // the focused row can leave the DOM with the reveal, so look in the tbody
+  const body = e.currentTarget
+  const find = () =>
+    [...body.querySelectorAll<HTMLElement>('tr[data-row]')].find((r) => r.dataset.id === id)
+  let target = find()
+  if (!target) {
+    flushSync(() => reveal(id, cell.dataset.col ?? ''))
+    target = find()
+  }
+  if (!target) return
+  return (
+    focusableIn(target.querySelector(`[data-col="${cell.dataset.col}"]`)) ??
+    target.querySelector<HTMLElement>('td.name-cell a')
+  )
+}
+
+/** The focusable of the neighbouring cell of the row that holds something to focus. */
+function sideTarget(key: string, row: HTMLElement, cell: HTMLElement) {
+  const cells = [...row.querySelectorAll<HTMLElement>('[data-col]')].filter(focusableIn)
+  const at = cells.indexOf(cell) + (key === 'ArrowRight' ? 1 : -1)
+  return focusableIn(cells[at] ?? null)
 }
 
 const cellClass = <T,>(c: DirectoryColumn<T>, link: string, repeat = false) =>
@@ -208,6 +226,76 @@ function useWindowedRows(count: number) {
   return { body, ...range }
 }
 
+/** Sorts the rows by the sort's column when it has a value, else keeps the list order. */
+function sortedRows<T>(rows: readonly T[], columns: DirectoryColumn<T>[], sort: DirectorySort) {
+  const by = columns.find((c) => c.key === sort?.column)
+  return sort && by?.value ? sortRows(rows, (r) => by.value?.(r) ?? undefined, sort.dir) : rows
+}
+
+/** Whether a row's box can be ticked: not under a full selection unless it is ticked. */
+const boxEnabled = <T extends { id: string }>(selection: Selection<T> | undefined, row: T) =>
+  selection !== undefined &&
+  (selection.can?.(row) ?? true) &&
+  (selection.ids.includes(row.id) || selection.ids.length < selection.max)
+
+/**
+ * Keeps one tab stop live: the remembered cell may hold nothing to focus or be hidden at this
+ * width, then the row's link is the stop. Returns the cleanup of its resize listener.
+ */
+function keepStop(
+  body: HTMLElement | null,
+  stopId: string | undefined,
+  link: string,
+  setNav: (
+    update: (n: { id: string; col: string } | null) => { id: string; col: string } | null,
+  ) => void,
+) {
+  const ensureStop = () => {
+    const stops = body?.querySelectorAll<HTMLInputElement>('[tabindex="0"]') ?? []
+    const live = [...stops].some((el) => !el.disabled && el.getClientRects().length > 0)
+    if (!live && stopId)
+      setNav((n) => (n?.id === stopId && n.col === link ? n : { id: stopId, col: link }))
+  }
+  ensureStop()
+  window.addEventListener('resize', ensureStop)
+  return () => window.removeEventListener('resize', ensureStop)
+}
+
+/** The row id and column of the cell around `target`. */
+function cellAt(target: EventTarget) {
+  const cell = (target as HTMLElement).closest<HTMLElement>('[data-col]')
+  const id = cell?.closest<HTMLElement>('tr[data-id]')?.dataset.id
+  return cell?.dataset.col && id ? { id, col: cell.dataset.col } : undefined
+}
+
+/** True when a blur leaves the table body; a window or tab switch blurs with no `relatedTarget` but keeps the element active. */
+const focusLeft = (e: FocusEvent<HTMLElement>) =>
+  !e.currentTarget.contains(e.relatedTarget) &&
+  document.activeElement !== e.target &&
+  document.hasFocus()
+
+/** The indexes of the rows to render: the window and the row that holds focus, kept outside it. */
+function visibleIndexes(pinned: number, from: number, to: number, count: number) {
+  // `to` can exceed the rows for one render after the rows shrink (a filter), before the window is measured
+  const end = Math.min(to, count)
+  return [
+    ...(pinned >= 0 && pinned < from ? [pinned] : []),
+    ...Array.from({ length: Math.max(0, end - from) }, (_, i) => from + i),
+    ...(pinned >= end ? [pinned] : []),
+  ]
+}
+
+const sameIds = (a: readonly { id: string }[], b: readonly { id: string }[]) =>
+  a.length === b.length && a.every((r, i) => r.id === b[i]?.id)
+
+/** The table box from the top, and the page back to the table's top when it lies above the view. */
+function scrollToTop(el: HTMLElement | null) {
+  if (!el) return
+  el.scrollTop = 0
+  const top = el.getBoundingClientRect().top
+  if (top < 0) window.scrollBy(0, top)
+}
+
 /**
  * A directory list: the table is the page's scroll box from 62em, the header sticks, the
  * whole row is its link, rows are windowed (the DOM holds the rows in view), headers sort
@@ -254,9 +342,7 @@ export function DirectoryTable<T extends { id: string }>({
   /** A row action for phones, where the columns after the name are hidden (a Mine row's Delete); not shown from 48em. `tabIndex` as for a column's cell. */
   phoneAction?: (row: T, tabIndex: number) => ReactNode
 }) {
-  const by = columns.find((c) => c.key === sort?.column)
-  const shown =
-    sort && by?.value ? sortRows(rows, (r) => by.value?.(r) ?? undefined, sort.dir) : rows
+  const shown = sortedRows(rows, columns, sort)
   const printing = usePrinting()
   const { body, start, end, height } = useWindowedRows(shown.length)
   const [from, to] = printing ? [0, Math.min(shown.length, printCap)] : [start, end]
@@ -269,18 +355,10 @@ export function DirectoryTable<T extends { id: string }>({
   // window: an unmounted focus falls to the body and keyboard scrolling stops
   const [held, setHeld] = useState(false)
   const pinned = held && !printing ? shown.findIndex((r) => r.id === nav?.id) : -1
-  const visible = [
-    ...(pinned >= 0 && pinned < from ? [pinned] : []),
-    // `to` can exceed the rows for one render after the rows shrink (a filter), before the window is measured
-    ...Array.from({ length: Math.max(0, Math.min(to, shown.length) - from) }, (_, i) => from + i),
-    ...(pinned >= Math.min(to, shown.length) ? [pinned] : []),
-  ]
+  const visible = visibleIndexes(pinned, from, to, shown.length)
   const rendered = visible.map((i) => shown[i] as T)
   const stopId = rendered.some((r) => r.id === nav?.id) ? nav?.id : rendered[0]?.id
-  const boxOn = (row: T) =>
-    selection !== undefined &&
-    (selection.can?.(row) ?? true) &&
-    (selection.ids.includes(row.id) || selection.ids.length < selection.max)
+  const boxOn = (row: T) => boxEnabled(selection, row)
   // the box clicked last, where a shift click starts its range
   const anchor = useRef<string>(undefined)
   const pick = (row: T, range: boolean) => {
@@ -297,24 +375,14 @@ export function DirectoryTable<T extends { id: string }>({
     )
     anchor.current = row.id
   }
-  const tabIndexOf = (row: T, col: string) =>
-    stopId === row.id &&
-    (nav?.id === row.id && (col !== 'select' || boxOn(row)) ? nav.col === col : col === link)
-      ? 0
-      : -1
+  const tabIndexOf = (row: T, col: string) => {
+    if (stopId !== row.id) return -1
+    const remembered = nav?.id === row.id && (col !== 'select' || boxOn(row))
+    return (remembered ? nav.col === col : col === link) ? 0 : -1
+  }
   // the remembered cell may hold nothing to focus or be hidden at this width (below 48em): then
   // the row's link is the stop, so the table never has none
-  useLayoutEffect(() => {
-    const ensureStop = () => {
-      const stops = body.current?.querySelectorAll<HTMLInputElement>('[tabindex="0"]') ?? []
-      const live = [...stops].some((el) => !el.disabled && el.getClientRects().length > 0)
-      if (!live && stopId)
-        setNav((n) => (n?.id === stopId && n.col === link ? n : { id: stopId, col: link }))
-    }
-    ensureStop()
-    window.addEventListener('resize', ensureStop)
-    return () => window.removeEventListener('resize', ensureStop)
-  })
+  useLayoutEffect(() => keepStop(body.current, stopId, link, setNav))
   // the server rows are unfiltered (the URL is read after mounting): a tick before hydration
   // would be replayed on a row the filters then hide, so the select cells swallow clicks until
   // mounted (CSS on `data-booting`, nothing visible changes)
@@ -331,11 +399,7 @@ export function DirectoryTable<T extends { id: string }>({
   useEffect(() => {
     const was = before.current
     before.current = rows
-    const el = box.current
-    if (!el || (was.length === rows.length && was.every((r, i) => r.id === rows[i]?.id))) return
-    el.scrollTop = 0
-    const top = el.getBoundingClientRect().top
-    if (top < 0) window.scrollBy(0, top)
+    if (!sameIds(was, rows)) scrollToTop(box.current)
   }, [rows])
   return (
     // a scroll box needs focus to scroll by keyboard: a named region while it overflows, with the
@@ -371,72 +435,22 @@ export function DirectoryTable<T extends { id: string }>({
                 <span className="visually-hidden">Select</span>
               </th>
             )}
-            {columns.map((c) => {
-              const dir = sort?.column === c.key ? sort.dir : undefined
-              return (
-                <th
-                  key={c.key}
-                  scope="col"
-                  aria-sort={dir}
-                  className={cellClass(c, link)}
-                  data-help={c.help ? '' : undefined}
-                >
-                  {c.head && <span className="th-end">{c.head}</span>}
-                  {c.value ? (
-                    <Tooltip label={c.help} disabled={!c.help} events={tipEvents} multiline w={260}>
-                      <UnstyledButton
-                        className="sort-button"
-                        onClick={() =>
-                          onSort(
-                            dir === undefined
-                              ? { column: c.key, dir: 'ascending' }
-                              : dir === 'ascending'
-                                ? { column: c.key, dir: 'descending' }
-                                : undefined,
-                          )
-                        }
-                      >
-                        <HeadLabel column={c} />
-                        <span aria-hidden="true" className="sort-mark" data-dir={dir}>
-                          {dir === 'ascending' ? (
-                            <CaretUp size={12} weight="bold" />
-                          ) : dir === 'descending' ? (
-                            <CaretDown size={12} weight="bold" />
-                          ) : (
-                            <CaretUpDown size={12} />
-                          )}
-                        </span>
-                      </UnstyledButton>
-                    </Tooltip>
-                  ) : c.help ? (
-                    <Noted inline value={<HeadLabel column={c} />} notes={[c.help]} />
-                  ) : (
-                    <HeadLabel column={c} />
-                  )}
-                </th>
-              )
-            })}
+            {columns.map((c) => (
+              <HeadCell key={c.key} column={c} link={link} sort={sort} onSort={onSort} />
+            ))}
             <td className="filler" inert />
           </tr>
         </thead>
         <tbody
           ref={body}
           onFocus={(e) => {
-            const cell = (e.target as HTMLElement).closest<HTMLElement>('[data-col]')
-            const id = cell?.closest<HTMLElement>('tr[data-id]')?.dataset.id
-            if (cell?.dataset.col && id) {
-              setNav({ id, col: cell.dataset.col })
-              setHeld(true)
-            }
+            const at = cellAt(e.target)
+            if (!at) return
+            setNav(at)
+            setHeld(true)
           }}
           onBlur={(e) => {
-            // a window or tab switch blurs with no relatedTarget but keeps the element active
-            if (
-              !e.currentTarget.contains(e.relatedTarget) &&
-              document.activeElement !== e.target &&
-              document.hasFocus()
-            )
-              setHeld(false)
+            if (focusLeft(e)) setHeld(false)
           }}
           onKeyDown={(e) =>
             moveFocus(e, shown, (id, col) => {
@@ -453,78 +467,23 @@ export function DirectoryTable<T extends { id: string }>({
             return (
               <Fragment key={row.id}>
                 {pad(gap) > 0 && <tr inert style={{ height: pad(gap) }} />}
-                <tr
-                  data-row
-                  data-id={row.id}
-                  data-picked={selection?.ids.includes(row.id) || undefined}
-                  data-break={(previous && breakBefore?.(row, previous)) || undefined}
-                  aria-rowindex={index + 2}
-                >
-                  {selection && (
-                    <td
-                      className="select-cell"
-                      data-col="select"
-                      data-booting={mounted ? undefined : ''}
-                    >
-                      {(selection.can?.(row) ?? true) && (
-                        <SelectBox
-                          row={row}
-                          label={label(row)}
-                          selection={selection}
-                          onPick={(range) => pick(row, range)}
-                          tabIndex={mounted ? tabIndexOf(row, 'select') : -1}
-                        />
-                      )}
-                    </td>
-                  )}
-                  {columns.map((c) =>
-                    c.key === link ? (
-                      <td
-                        key={c.key}
-                        data-col={c.key}
-                        className="name-cell"
-                        data-action={action ? '' : undefined}
-                      >
-                        {/* no prefetch: a long list of links (Next.js docs); a click fetches the page, which the offline worker stores */}
-                        <Link
-                          href={href(row)}
-                          prefetch={false}
-                          tabIndex={tabIndexOf(row, c.key)}
-                          onClick={
-                            onOpen &&
-                            ((e) => {
-                              if (e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)
-                                return
-                              e.preventDefault()
-                              onOpen(row)
-                            })
-                          }
-                        >
-                          {c.cell(row, -1)}
-                        </Link>
-                        <span className="facts">{facts(row)}</span>
-                        {action && (
-                          <span className="phone-action" data-col="action">
-                            {action}
-                          </span>
-                        )}
-                      </td>
-                    ) : (
-                      <td
-                        key={c.key}
-                        data-col={c.key}
-                        className={cellClass(
-                          c,
-                          link,
-                          Boolean(c.dim && previous && c.value?.(previous) === c.value?.(row)),
-                        )}
-                      >
-                        <Cell>{c.cell(row, tabIndexOf(row, c.key))}</Cell>
-                      </td>
-                    ),
-                  )}
-                  <td className="filler" inert />
-                </tr>
+                <DirectoryRow
+                  row={row}
+                  previous={previous}
+                  index={index}
+                  columns={columns}
+                  link={link}
+                  href={href}
+                  onOpen={onOpen}
+                  facts={facts}
+                  label={label}
+                  selection={selection}
+                  breakBefore={breakBefore}
+                  mounted={mounted}
+                  action={action}
+                  tabIndexOf={tabIndexOf}
+                  onPick={(range) => pick(row, range)}
+                />
               </Fragment>
             )
           })}
@@ -557,6 +516,161 @@ export function DirectoryTable<T extends { id: string }>({
       </noscript>
     </div>
   )
+}
+
+const nextSort = (key: string, dir: 'ascending' | 'descending' | undefined): DirectorySort => {
+  if (dir === undefined) return { column: key, dir: 'ascending' }
+  return dir === 'ascending' ? { column: key, dir: 'descending' } : undefined
+}
+
+function SortMark({ dir }: { dir: 'ascending' | 'descending' | undefined }) {
+  return (
+    <span aria-hidden="true" className="sort-mark" data-dir={dir}>
+      {dir === 'ascending' && <CaretUp size={12} weight="bold" />}
+      {dir === 'descending' && <CaretDown size={12} weight="bold" />}
+      {dir === undefined && <CaretUpDown size={12} />}
+    </span>
+  )
+}
+
+function HeadCell<T>({
+  column: c,
+  link,
+  sort,
+  onSort,
+}: {
+  column: DirectoryColumn<T>
+  link: string
+  sort: DirectorySort
+  onSort: (sort: DirectorySort) => void
+}) {
+  const dir = sort?.column === c.key ? sort.dir : undefined
+  return (
+    <th
+      scope="col"
+      aria-sort={dir}
+      className={cellClass(c, link)}
+      data-help={c.help ? '' : undefined}
+    >
+      {c.head && <span className="th-end">{c.head}</span>}
+      {c.value ? (
+        <Tooltip label={c.help} disabled={!c.help} events={tipEvents} multiline w={260}>
+          <UnstyledButton className="sort-button" onClick={() => onSort(nextSort(c.key, dir))}>
+            <HeadLabel column={c} />
+            <SortMark dir={dir} />
+          </UnstyledButton>
+        </Tooltip>
+      ) : c.help ? (
+        <Noted inline value={<HeadLabel column={c} />} notes={[c.help]} />
+      ) : (
+        <HeadLabel column={c} />
+      )}
+    </th>
+  )
+}
+
+function DirectoryRow<T extends { id: string }>({
+  row,
+  previous,
+  index,
+  columns,
+  link,
+  href,
+  onOpen,
+  facts,
+  label,
+  selection,
+  breakBefore,
+  mounted,
+  action,
+  tabIndexOf,
+  onPick,
+}: {
+  row: T
+  previous: T | undefined
+  index: number
+  columns: DirectoryColumn<T>[]
+  link: string
+  href: (row: T) => string
+  onOpen?: (row: T) => void
+  facts: (row: T) => string
+  label: (row: T) => string
+  selection?: Selection<T>
+  breakBefore?: (row: T, previous: T) => boolean
+  mounted: boolean
+  action: ReactNode
+  tabIndexOf: (row: T, col: string) => number
+  onPick: (range: boolean) => void
+}) {
+  return (
+    <tr
+      data-row
+      data-id={row.id}
+      data-picked={selection?.ids.includes(row.id) || undefined}
+      data-break={(previous && breakBefore?.(row, previous)) || undefined}
+      aria-rowindex={index + 2}
+    >
+      {selection && (
+        <td className="select-cell" data-col="select" data-booting={mounted ? undefined : ''}>
+          {(selection.can?.(row) ?? true) && (
+            <SelectBox
+              row={row}
+              label={label(row)}
+              selection={selection}
+              onPick={onPick}
+              tabIndex={mounted ? tabIndexOf(row, 'select') : -1}
+            />
+          )}
+        </td>
+      )}
+      {columns.map((c) =>
+        c.key === link ? (
+          <td
+            key={c.key}
+            data-col={c.key}
+            className="name-cell"
+            data-action={action ? '' : undefined}
+          >
+            {/* no prefetch: a long list of links (Next.js docs); a click fetches the page, which the offline worker stores */}
+            <Link
+              href={href(row)}
+              prefetch={false}
+              tabIndex={tabIndexOf(row, c.key)}
+              onClick={onOpen && ((e) => openInPage(e, () => onOpen(row)))}
+            >
+              {c.cell(row, -1)}
+            </Link>
+            <span className="facts">{facts(row)}</span>
+            {action && (
+              <span className="phone-action" data-col="action">
+                {action}
+              </span>
+            )}
+          </td>
+        ) : (
+          <td
+            key={c.key}
+            data-col={c.key}
+            className={cellClass(
+              c,
+              link,
+              Boolean(c.dim && previous && c.value?.(previous) === c.value?.(row)),
+            )}
+          >
+            <Cell>{c.cell(row, tabIndexOf(row, c.key))}</Cell>
+          </td>
+        ),
+      )}
+      <td className="filler" inert />
+    </tr>
+  )
+}
+
+/** A plain click opens the row in the page; a modified one keeps the link's own behaviour. */
+function openInPage(e: ReactMouseEvent<HTMLAnchorElement>, open: () => void) {
+  if (e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+  e.preventDefault()
+  open()
 }
 
 /** A cell's content; an empty cell shows the app's missing-value marker. */

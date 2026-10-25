@@ -17,34 +17,48 @@ export function normaliseName(name: string) {
     .replace(/[^a-z0-9.]|(?<!\d)\.|\.(?!\d)/g, '')
 }
 
+type Seen = { exact: Map<string, string>; normalised: Map<string, string> }
+
+/** The finding for one name of a record, if an earlier record has it; adds the name to `seen`. */
+function duplicateOf(
+  seen: Seen,
+  { file, scope }: Named,
+  name: string,
+  reported: Set<string>,
+): LocatedFinding | undefined {
+  const norm = normaliseName(name)
+  const same = seen.exact.get(`${scope}\n${name}`)
+  const similar = seen.normalised.get(`${scope}\n${norm}`)
+  let found: LocatedFinding | undefined
+  if (same && same !== file) {
+    found = {
+      file,
+      finding: `duplicate-name:${name}`,
+      message: `"${name}" is also a name of ${same}`,
+    }
+    reported.add(norm)
+  } else if (norm !== '' && similar && similar !== file && !reported.has(norm)) {
+    found = {
+      file,
+      finding: `duplicate-normalised-name:${norm}`,
+      message: `"${name}" normalises like a name of ${similar}`,
+    }
+    reported.add(norm)
+  }
+  if (!same) seen.exact.set(`${scope}\n${name}`, file)
+  if (!similar && norm !== '') seen.normalised.set(`${scope}\n${norm}`, file)
+  return found
+}
+
 /** Reports each record that shares a name with an earlier record (by file name, code-unit order as `readKind` reads them) of its kind and scope. */
 function duplicates(records: Named[]): LocatedFinding[] {
   const findings: LocatedFinding[] = []
-  const exact = new Map<string, string>()
-  const normalised = new Map<string, string>()
-  for (const { file, scope, names } of [...records].sort((a, b) => (a.file < b.file ? -1 : 1))) {
+  const seen: Seen = { exact: new Map(), normalised: new Map() }
+  for (const record of [...records].sort((a, b) => (a.file < b.file ? -1 : 1))) {
     const reported = new Set<string>()
-    for (const name of new Set(names)) {
-      const norm = normaliseName(name)
-      const same = exact.get(`${scope}\n${name}`)
-      const similar = normalised.get(`${scope}\n${norm}`)
-      if (same && same !== file) {
-        findings.push({
-          file,
-          finding: `duplicate-name:${name}`,
-          message: `"${name}" is also a name of ${same}`,
-        })
-        reported.add(norm)
-      } else if (norm !== '' && similar && similar !== file && !reported.has(norm)) {
-        findings.push({
-          file,
-          finding: `duplicate-normalised-name:${norm}`,
-          message: `"${name}" normalises like a name of ${similar}`,
-        })
-        reported.add(norm)
-      }
-      if (!same) exact.set(`${scope}\n${name}`, file)
-      if (!similar && norm !== '') normalised.set(`${scope}\n${norm}`, file)
+    for (const name of new Set(record.names)) {
+      const found = duplicateOf(seen, record, name, reported)
+      if (found) findings.push(found)
     }
   }
   return findings

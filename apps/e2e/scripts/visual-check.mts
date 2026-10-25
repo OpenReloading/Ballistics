@@ -51,20 +51,86 @@ export function args(argv: string[]): string[] {
   return [...new Set(pages)]
 }
 
-/** Waits until the page shows what a person checks: the drawing, or the .308 Win. example result. */
-async function ready(page: Page, url: string) {
-  // the URL's filters and the browser's records apply after hydration
-  await page.locator('html[data-hydrated]').waitFor({ state: 'attached' })
-  // a designer loads apart from the route; its drawing is a tab away at 390 px (a new cartridge
-  // has none until its base values are entered)
-  const designer = /^\/(bullets|cartridges)\/designer/.test(url)
-  if (designer && (url.startsWith('/bullets/') || url.includes('from='))) {
+/** A designer loads apart from the route; its drawing is a tab away at 390 px. */
+async function designerReady(page: Page, url: string) {
+  // a new cartridge has no drawing until its base values are entered
+  if (url.startsWith('/bullets/') || url.includes('from=')) {
     await page
       .locator('svg[aria-labelledby="designer-drawing-title"]')
       .waitFor({ state: 'attached' })
     if (url.includes('from=')) await page.getByText(/^Started from /).waitFor()
   }
-  if (designer) await page.locator('.designer').waitFor()
+  await page.locator('.designer').waitFor()
+}
+
+/** Opens the example load in the workbench; below 75em the bar's actions are behind "Page actions". */
+async function openExampleLoad(page: Page) {
+  await (await barButton(page, 'Open')).click()
+  await page.getByRole('menuitem', { name: 'Example load' }).click()
+}
+
+/** VISUAL_DEFAULTS=1: the example's link without the defaulted inputs, so the run lists them. */
+async function withoutDefaults(page: Page) {
+  // Copy link writes the link into the address bar
+  await (await barButton(page, 'Copy link')).click()
+  const link = new URL(page.url())
+  for (const key of ['propellantTemperature', 'ignitionPressure', 'startPressure'])
+    link.searchParams.delete(key)
+  await page.goto(link.href)
+  const powder = page.getByRole('button', { name: /^Powder/ })
+  if ((await powder.getAttribute('aria-expanded')) !== 'true') await powder.click()
+}
+
+/**
+ * VISUAL_LOADS=<n>: n open loads (the example in each), made at 1280 px where the strip is shown
+ * (below 75em it is hidden), then the window back at its width.
+ */
+async function openLoads(page: Page, loads: number) {
+  const size = page.viewportSize()
+  await page.setViewportSize({ width: 1280, height: size?.height ?? 844 })
+  for (let i = 1; i < loads; i++) {
+    await page.locator('.load-strip > button[aria-label="New load"]').click()
+    await openExampleLoad(page)
+    await page.locator('.field-flag-seating').first().waitFor()
+  }
+  if (size) await page.setViewportSize(size)
+}
+
+/** The workbench with the example run and its results shown. */
+async function workbenchReady(page: Page) {
+  await openExampleLoad(page)
+  if (process.env.VISUAL_DEFAULTS) await withoutDefaults(page)
+  const loads = Number(process.env.VISUAL_LOADS)
+  if (loads > 1) await openLoads(page, loads)
+  // VISUAL_LADDER=<steps>: a charge ladder of that many steps of 0.5 gr (both default presets weigh
+  // the charge in grains) on the example
+  const steps = process.env.VISUAL_LADDER
+  if (steps) {
+    await page.getByLabel(/^Ladder steps/).fill(steps)
+    await page.getByLabel(/^Step size/).fill('0.5')
+  }
+  // at 390 px the readout bar's button, the last one, also opens the results
+  await page.getByRole('button', { name: 'Run simulation' }).last().click()
+  // at 390 px inputs and results are tabs: show the results
+  const results = page.getByRole('tab', { name: 'Results' }).first()
+  if (await results.isVisible()) await results.click()
+  await page.getByRole('region', { name: 'Result', exact: true }).waitFor()
+  // the chart code loads apart from the route; the interior chart is drawn with ECharts
+  await page.locator('.echart svg').first().waitFor()
+  // filling a field scrolls the inputs region: show each region from its top
+  await page
+    .locator('.workspace-inputs, .workbench-centre, .workbench-aside')
+    .evaluateAll((regions) => {
+      for (const r of regions) r.scrollTop = 0
+    })
+}
+
+/** Waits until the page shows what a person checks: the drawing, or the .308 Win. example result. */
+async function ready(page: Page, url: string) {
+  // the URL's filters and the browser's records apply after hydration
+  await page.locator('html[data-hydrated]').waitFor({ state: 'attached' })
+  const designer = /^\/(bullets|cartridges)\/designer/.test(url)
+  if (designer) await designerReady(page, url)
   if (url.startsWith('/cartridges/') && !designer)
     await page.locator('svg.drawing.screen-only:visible').first().waitFor()
   // the compare view reads its records in the browser
@@ -83,57 +149,7 @@ async function ready(page: Page, url: string) {
       .or(page.getByText('No powder in the overlay.'))
       .first()
       .waitFor()
-  if (url === '/workbench') {
-    // below 75em the bar's actions are behind "Page actions"
-    await (await barButton(page, 'Open')).click()
-    await page.getByRole('menuitem', { name: 'Example load' }).click()
-    // VISUAL_DEFAULTS=1: the example's link without the defaulted inputs, so the run lists them
-    // under "Defaults used" (Copy link writes the link into the address bar)
-    if (process.env.VISUAL_DEFAULTS) {
-      await (await barButton(page, 'Copy link')).click()
-      const link = new URL(page.url())
-      for (const key of ['propellantTemperature', 'ignitionPressure', 'startPressure'])
-        link.searchParams.delete(key)
-      await page.goto(link.href)
-      const powder = page.getByRole('button', { name: /^Powder/ })
-      if ((await powder.getAttribute('aria-expanded')) !== 'true') await powder.click()
-    }
-    // VISUAL_LOADS=<n>: n open loads (the example in each), made at 1280 px where the strip is
-    // shown (below 75em it is hidden), then the window back at its width
-    const loads = Number(process.env.VISUAL_LOADS)
-    if (loads > 1) {
-      const size = page.viewportSize()
-      await page.setViewportSize({ width: 1280, height: size?.height ?? 844 })
-      for (let i = 1; i < loads; i++) {
-        await page.locator('.load-strip > button[aria-label="New load"]').click()
-        await (await barButton(page, 'Open')).click()
-        await page.getByRole('menuitem', { name: 'Example load' }).click()
-        await page.locator('.field-flag-seating').first().waitFor()
-      }
-      if (size) await page.setViewportSize(size)
-    }
-    // VISUAL_LADDER=<steps>: a charge ladder of that many steps of 0.5 gr (both default presets weigh
-    // the charge in grains) on the example
-    const steps = process.env.VISUAL_LADDER
-    if (steps) {
-      await page.getByLabel(/^Ladder steps/).fill(steps)
-      await page.getByLabel(/^Step size/).fill('0.5')
-    }
-    // at 390 px the readout bar's button, the last one, also opens the results
-    await page.getByRole('button', { name: 'Run simulation' }).last().click()
-    // at 390 px inputs and results are tabs: show the results
-    const results = page.getByRole('tab', { name: 'Results' }).first()
-    if (await results.isVisible()) await results.click()
-    await page.getByRole('region', { name: 'Result', exact: true }).waitFor()
-    // the chart code loads apart from the route; the interior chart is drawn with ECharts
-    await page.locator('.echart svg').first().waitFor()
-    // filling a field scrolls the inputs region: show each region from its top
-    await page
-      .locator('.workspace-inputs, .workbench-centre, .workbench-aside')
-      .evaluateAll((regions) => {
-        for (const r of regions) r.scrollTop = 0
-      })
-  }
+  if (url === '/workbench') await workbenchReady(page)
 }
 
 /** On a cartridge page the area from the first to the last drawing figure, else the whole page. */

@@ -5,7 +5,7 @@
 import { bisect } from '../bisect.ts'
 import { InputError } from '../errors.ts'
 import { icao } from '../exterior/atmosphere.ts'
-import { type Rhs, type Rk45Event, rk45 } from '../exterior/rk45.ts'
+import { type Rhs, type Rk45Event, type Rk45Options, rk45 } from '../exterior/rk45.ts'
 import { type Burn, burnError, burnForm } from './form.ts'
 
 /** Chamber, barrel, bullet, charge and propellant of one `interior` run, SI units. */
@@ -256,13 +256,13 @@ export type ClosedVesselResult =
 const pos = (v: number | undefined) => v !== undefined && Number.isFinite(v) && v > 0
 const nonNeg = (v: number | undefined) => v !== undefined && Number.isFinite(v) && v >= 0
 
-/** Name of the first invalid input field, or undefined (`apps/docs/docs/models/interior-m3.md`, "Limits"). */
-function inputError(load: InteriorLoad): string | undefined {
-  const { chamber, barrel, bullet, propellant, resistance, gradient, heat, leakage } = load
+type Check = [string, boolean]
+
+/** Checks of the chamber, barrel, bullet, charge and propellant. */
+function bodyChecks(load: InteriorLoad): Check[] {
+  const { chamber, barrel, bullet, propellant } = load
   const t = propellant.temperatureSensitivity
-  const profile = resistance?.engraving ?? []
-  const leak = leakage?.area ?? []
-  const checks: [string, boolean][] = [
+  return [
     ['chamber.volume', pos(chamber.volume)],
     ['chamber.boreArea', pos(chamber.boreArea)],
     ['chamber.boreDiameter', pos(chamber.boreDiameter)],
@@ -282,6 +282,14 @@ function inputError(load: InteriorLoad): string | undefined {
     ['propellantTemperature', pos(load.propellantTemperature)],
     ['ignitionPressure', pos(load.ignitionPressure)],
     ['startPressure', nonNeg(load.startPressure)],
+  ]
+}
+
+/** Checks of the bullet's resistance, the gas gradient and the heat loss. */
+function resistanceChecks(load: InteriorLoad): Check[] {
+  const { resistance, gradient, heat } = load
+  const profile = resistance?.engraving ?? []
+  return [
     ['resistance.friction', resistance?.friction === undefined || nonNeg(resistance.friction)],
     [
       'resistance.engraving',
@@ -301,6 +309,13 @@ function inputError(load: InteriorLoad): string | undefined {
           ) &&
           (heat.factor === undefined || nonNeg(heat.factor))),
     ],
+  ]
+}
+
+/** Checks of the gas leakage. */
+function leakageChecks({ leakage }: InteriorLoad): Check[] {
+  const leak = leakage?.area ?? []
+  return [
     [
       'leakage.area',
       leakage === undefined ||
@@ -313,8 +328,13 @@ function inputError(load: InteriorLoad): string | undefined {
     ['leakage.backPressure', leakage?.backPressure === undefined || nonNeg(leakage.backPressure)],
     ['leakage.discharge', leakage?.discharge === undefined || nonNeg(leakage.discharge)],
   ]
+}
+
+/** Name of the first invalid input field, or undefined (`apps/docs/docs/models/interior-m3.md`, "Limits"). */
+function inputError(load: InteriorLoad): string | undefined {
+  const checks = [...bodyChecks(load), ...resistanceChecks(load), ...leakageChecks(load)]
   for (const [field, ok] of checks) if (!ok) return field
-  return burnError(propellant.burn)
+  return burnError(load.propellant.burn)
 }
 
 type EventKind = 'start' | 'break' | 'burnout' | 'profile' | 'muzzle' | 'stall' | 'peak' | 'onset'
@@ -590,6 +610,25 @@ function interiorEvents(
       return rates[q]
     }
   }
+  type AddEvent = (
+    kind: EventKind,
+    eventFunction: Rk45Event['eventFunction'],
+    direction: -1 | 1,
+    index?: number,
+  ) => void
+  const addBurning = (add: AddEvent, y: Float64Array) => {
+    for (let i = phase.breakIndex; i < form.breaks.length; i++)
+      if (form.breaks[i] > y[0]) add('break', (_t, y) => y[0] - form.breaks[i], 1, i)
+    add('burnout', (_t, y) => y[0] - form.end, 1)
+  }
+  const addMoving = (add: AddEvent, y: Float64Array) => {
+    for (let i = phase.profileIndex; i < kinks.length; i++)
+      if (kinks[i] / xe > y[1]) add('profile', (_t, y) => y[1] - kinks[i] / xe, 1, i)
+    add('muzzle', (_t, y) => y[1] - 1, 1)
+    add('stall', (_t, y) => y[2], -1)
+    const slope = slopes()
+    for (const q of [0, 1, 2]) add('peak', slope(q), -1)
+  }
   return (y: Float64Array) => {
     const list: { kind: EventKind; index: number; ev: Rk45Event }[] = []
     const add = (
@@ -599,19 +638,8 @@ function interiorEvents(
       index = 0,
     ) => list.push({ kind, index, ev: { eventFunction, direction, terminal: kind !== 'peak' } })
     if (!phase.moving && !closed) add('start', (_t, y) => startG(y), 1)
-    if (phase.burning) {
-      for (let i = phase.breakIndex; i < form.breaks.length; i++)
-        if (form.breaks[i] > y[0]) add('break', (_t, y) => y[0] - form.breaks[i], 1, i)
-      add('burnout', (_t, y) => y[0] - form.end, 1)
-    }
-    if (phase.moving) {
-      for (let i = phase.profileIndex; i < kinks.length; i++)
-        if (kinks[i] / xe > y[1]) add('profile', (_t, y) => y[1] - kinks[i] / xe, 1, i)
-      add('muzzle', (_t, y) => y[1] - 1, 1)
-      add('stall', (_t, y) => y[2], -1)
-      const slope = slopes()
-      for (const q of [0, 1, 2]) add('peak', slope(q), -1)
-    }
+    if (phase.burning) addBurning(add, y)
+    if (phase.moving) addMoving(add, y)
     // onset of flow: the subsonic rate has an infinite slope at p_b = p_a
     if (leak && !phase.leaking) add('onset', (_t, y) => pressures(y)[1] - pa, 1)
     return list
@@ -636,6 +664,130 @@ function energyBalance(s: Scaling, gas: Gas, y: Float64Array): InteriorEnergy {
 }
 
 /**
+ * Moves the phase past the event; a burnout also sets the burnt state at the end of the form
+ * function. True for a burnout.
+ */
+function applyEvent(s: Scaling, phase: Phase, kind: EventKind, index: number, y: Float64Array) {
+  if (kind === 'start') phase.moving = true
+  else if (kind === 'break') phase.breakIndex = index + 1
+  else if (kind === 'profile') phase.profileIndex = index + 1
+  else if (kind === 'onset') phase.leaking = true
+  else if (kind === 'burnout') {
+    phase.burning = false
+    y[0] = s.form.end
+  }
+  return kind === 'burnout'
+}
+
+/** The state at ignition: the burnt fraction that gives the ignition pressure in the closed chamber. */
+function ignitionState(
+  load: InteriorLoad,
+  s: Scaling,
+  leak: boolean,
+): Float64Array | InteriorInvalid {
+  const { vc, mc, k, eta, solid, e0, form } = s
+  const pi = load.ignitionPressure
+  const z0 = (pi * (vc - solid)) / ((k - 1) * e0 - pi * mc * (1 / load.propellant.density - eta))
+  if (!(z0 > 0 && z0 < 1)) return { valid: false, reason: 'input', field: 'ignitionPressure' }
+  const y = new Float64Array(leak ? 7 : 5)
+  y[0] = bisect((f) => form.z(f) < z0, 0, form.end, 200, false)
+  return y
+}
+
+/** One integration to the next terminal event or `until.maxTime`; a step failure invalidates the run. */
+function integrate(
+  rhs: Rhs,
+  tau: number,
+  y: Float64Array,
+  events: Rk45Event[],
+  options: InteriorOptions,
+  until: Pick<Rk45Options, 'stepsBefore' | 'maxTime' | 'initialStep'>,
+): ReturnType<typeof rk45> | InteriorInvalid {
+  try {
+    return rk45(rhs, tau, y, events, {
+      relativeTolerance: options.relativeTolerance,
+      absoluteTolerance: options.absoluteTolerance,
+      maxSteps: options.maxSteps,
+      ...until,
+    })
+  } catch (err) {
+    if (err instanceof InputError) return { valid: false, reason: 'integration' }
+    throw err
+  }
+}
+
+/** What the driver carries from one integration to the next. */
+interface RunState {
+  tau: number
+  y: Float64Array
+  h: number | undefined
+  steps: number
+  /** End of the current output chunk, in tau. */
+  next: number
+  shotStartTime: number
+  burnout: Run['burnout']
+  points: InteriorPoint[]
+}
+
+/** What the driver needs to restart an integration. */
+interface Driver {
+  s: Scaling
+  gas: Gas
+  phase: Phase
+  rhs: Rhs
+  events: ReturnType<typeof interiorEvents>
+  point: (tau: number, y: Float64Array) => InteriorPoint
+  options: InteriorOptions
+  closed: boolean
+  tauMax: number
+  dTau: number
+}
+
+/** The run after the integration reached an event: its phase change, and whether the run ends. */
+function handleEvent(
+  d: Driver,
+  st: RunState,
+  { kind, index }: { kind: EventKind; index: number },
+): InteriorInvalid | 'continue' | 'done' {
+  const { tau, y } = st
+  const { ts, xe } = d.s
+  if (kind === 'stall') return { valid: false, reason: 'stuck' }
+  if (kind === 'start') st.shotStartTime = tau * ts
+  if (kind === 'burnout') st.burnout = { time: tau * ts, travel: y[1] * xe }
+  if (applyEvent(d.s, d.phase, kind, index, y) && !d.phase.moving && !d.closed)
+    return { valid: false, reason: 'noShotStart' }
+  st.points.push(d.point(tau, y))
+  return kind === 'muzzle' || (d.closed && kind === 'burnout') ? 'done' : 'continue'
+}
+
+/** One integration from the state of `st` to the next event or output step. */
+function advance(d: Driver, st: RunState): InteriorInvalid | 'continue' | 'done' {
+  const { leak, pa, pressures } = d.gas
+  // flow at or above p_a at the start or after a restart, where the rising onset event cannot fire
+  if (leak && !d.phase.leaking && pressures(st.y)[1] >= pa) d.phase.leaking = true
+  const list = d.events(st.y)
+  const r = integrate(
+    d.rhs,
+    st.tau,
+    st.y,
+    list.map((e) => e.ev),
+    d.options,
+    { stepsBefore: st.steps, maxTime: Math.min(st.next, d.tauMax), initialStep: st.h },
+  )
+  if ('valid' in r) return r
+  st.steps += r.steps
+  st.h = r.h
+  for (const hit of r.hits) st.points.push(d.point(hit.t, hit.y))
+  st.tau = r.t
+  st.y = r.y
+  if (r.event !== null) return handleEvent(d, st, list[r.event])
+  st.points.push(d.point(st.tau, st.y))
+  if (st.tau >= d.tauMax) return { valid: false, reason: 'maxTime' }
+  st.next += d.dTau
+  return 'continue'
+}
+
+/**
  * Driver: from ignition in chunks of `outputStep`, restarted at every terminal event, until the
  * muzzle (closed vessel: burnout).
  */
@@ -645,7 +797,7 @@ function runInterior(
   closed: boolean,
   s: Scaling,
 ): Run | InteriorInvalid {
-  const { vc, xe, mc, k, eta, solid, e0, form, vr, ts } = s
+  const { xe, form, vr, ts } = s
   const phase: Phase = {
     moving: false,
     burning: true,
@@ -654,7 +806,7 @@ function runInterior(
     profileIndex: 0,
   }
   const gas = gasState(load, s, phase)
-  const { leak, pa, lostMass, temperature, pressures, startG } = gas
+  const { leak, lostMass, temperature, pressures, startG } = gas
   const rhs = interiorRhs(s, gas, phase)
   const point = (tau: number, y: Float64Array): InteriorPoint => {
     const [p, pb, pbr] = pressures(y)
@@ -672,76 +824,40 @@ function runInterior(
     return pt
   }
 
-  // ignition: burnt fraction that gives the ignition pressure in the closed chamber
-  const pi = load.ignitionPressure
-  const z0 = (pi * (vc - solid)) / ((k - 1) * e0 - pi * mc * (1 / load.propellant.density - eta))
-  if (!(z0 > 0 && z0 < 1)) return { valid: false, reason: 'input', field: 'ignitionPressure' }
-  let y: Float64Array = new Float64Array(leak ? 7 : 5)
-  y[0] = bisect((f) => form.z(f) < z0, 0, form.end, 200, false)
-  const events = interiorEvents(s, gas, phase, rhs, y.length, closed)
-
-  let tau = 0
-  let shotStartTime = 0
-  let burnout: Run['burnout'] = null
-  const points = [point(0, y)]
-  if (!closed && startG(y) >= 0) phase.moving = true
-  const tauMax = options.maxTime / ts
+  const start = ignitionState(load, s, leak)
+  if ('valid' in start) return start
+  const events = interiorEvents(s, gas, phase, rhs, start.length, closed)
+  const first = point(0, start)
+  if (!closed && startG(start) >= 0) phase.moving = true
   const dTau = options.outputStep / ts
-  let next = dTau
-  let h: number | undefined
-  let steps = 0
-  for (;;) {
-    // flow at or above p_a at the start or after a restart, where the rising onset event cannot fire
-    if (leak && !phase.leaking && pressures(y)[1] >= pa) phase.leaking = true
-    const list = events(y)
-    let r: ReturnType<typeof rk45>
-    try {
-      r = rk45(
-        rhs,
-        tau,
-        y,
-        list.map((e) => e.ev),
-        {
-          relativeTolerance: options.relativeTolerance,
-          absoluteTolerance: options.absoluteTolerance,
-          maxSteps: options.maxSteps,
-          stepsBefore: steps,
-          maxTime: Math.min(next, tauMax),
-          initialStep: h,
-        },
-      )
-    } catch (err) {
-      if (err instanceof InputError) return { valid: false, reason: 'integration' }
-      throw err
-    }
-    steps += r.steps
-    h = r.h
-    for (const hit of r.hits) points.push(point(hit.t, hit.y))
-    tau = r.t
-    y = r.y
-    if (r.event === null) {
-      points.push(point(tau, y))
-      if (tau >= tauMax) return { valid: false, reason: 'maxTime' }
-      next += dTau
-      continue
-    }
-    const { kind, index } = list[r.event]
-    if (kind === 'stall') return { valid: false, reason: 'stuck' }
-    if (kind === 'start') {
-      phase.moving = true
-      shotStartTime = tau * ts
-    } else if (kind === 'break') phase.breakIndex = index + 1
-    else if (kind === 'profile') phase.profileIndex = index + 1
-    else if (kind === 'onset') phase.leaking = true
-    else if (kind === 'burnout') {
-      phase.burning = false
-      y[0] = form.end
-      burnout = { time: tau * ts, travel: y[1] * xe }
-      if (!phase.moving && !closed) return { valid: false, reason: 'noShotStart' }
-    }
-    points.push(point(tau, y))
-    if (kind === 'muzzle' || (closed && kind === 'burnout')) break
+  const st: RunState = {
+    tau: 0,
+    y: start,
+    h: undefined,
+    steps: 0,
+    next: dTau,
+    shotStartTime: 0,
+    burnout: null,
+    points: [first],
   }
+  const driver: Driver = {
+    s,
+    gas,
+    phase,
+    rhs,
+    events,
+    point,
+    options,
+    closed,
+    tauMax: options.maxTime / ts,
+    dTau,
+  }
+  for (;;) {
+    const outcome = advance(driver, st)
+    if (outcome === 'done') break
+    if (outcome !== 'continue') return outcome
+  }
+  const { points, shotStartTime, burnout, steps, y } = st
   return { points, shotStartTime, burnout, steps, energy: energyBalance(s, gas, y) }
 }
 

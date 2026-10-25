@@ -65,23 +65,68 @@ const fail = (message: string): never => {
   throw new Error(`not an XLSX workbook: ${message}`)
 }
 
+/** The position of the end of central directory record (4.3.16), or -1. */
+function findEnd(bytes: Uint8Array, view: DataView): number {
+  // 22 bytes plus a comment of up to 65535 bytes
+  for (let i = bytes.length - 22; i >= Math.max(0, bytes.length - 22 - 0xffff); i--) {
+    if (
+      view.getUint32(i, true) === 0x06054b50 &&
+      i + 22 + view.getUint16(i + 20, true) === bytes.length
+    ) {
+      return i
+    }
+  }
+  return -1
+}
+
+/** The entry of the central directory header at `p` and the position of the next header. */
+function readHeader(
+  bytes: Uint8Array,
+  view: DataView,
+  p: number,
+  end: number,
+): { entry: ZipEntry; next: number } {
+  if (p + 46 > end || view.getUint32(p, true) !== 0x02014b50) fail('central directory is malformed')
+  const nameLength = view.getUint16(p + 28, true)
+  const next = p + 46 + nameLength + view.getUint16(p + 30, true) + view.getUint16(p + 32, true)
+  if (next > end) fail('central directory is malformed')
+  // shortcut: names read as Latin-1, exact for the ASCII part names of XLSX; upgrade if a needed part name is not ASCII
+  const name = String.fromCharCode(...bytes.subarray(p + 46, p + 46 + nameLength))
+  const entry: ZipEntry = {
+    name,
+    flags: view.getUint16(p + 8, true),
+    method: view.getUint16(p + 10, true),
+    crc: view.getUint32(p + 16, true),
+    compressedSize: view.getUint32(p + 20, true),
+    size: view.getUint32(p + 24, true),
+    offset: view.getUint32(p + 42, true),
+  }
+  return { entry, next }
+}
+
+/** Adds a file entry under its lower-case name; ZIP64 sizes and repeated names are refused. */
+function addEntry(entries: Map<string, ZipEntry>, entry: ZipEntry): void {
+  if (
+    entry.compressedSize === 0xffffffff ||
+    entry.size === 0xffffffff ||
+    entry.offset === 0xffffffff
+  ) {
+    fail('ZIP64 archives are not read')
+  }
+  const key = entry.name.toLowerCase()
+  const other = entries.get(key)
+  if (other?.name === entry.name) throw new Error(`XLSX part ${entry.name} appears twice`)
+  if (other) throw new Error(`XLSX parts ${other.name} and ${entry.name} differ only in case`)
+  entries.set(key, entry)
+}
+
 /**
  * Entries from the central directory (4.3.12), keyed by lower-case name; directories are left
  * out. Split, ZIP64 and malformed archives and repeated names, also in another case, are refused.
  */
 export function zipEntries(bytes: Uint8Array): Map<string, ZipEntry> {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
-  // end of central directory record (4.3.16): 22 bytes plus a comment of up to 65535 bytes
-  let end = -1
-  for (let i = bytes.length - 22; i >= Math.max(0, bytes.length - 22 - 0xffff); i--) {
-    if (
-      view.getUint32(i, true) === 0x06054b50 &&
-      i + 22 + view.getUint16(i + 20, true) === bytes.length
-    ) {
-      end = i
-      break
-    }
-  }
+  const end = findEnd(bytes, view)
   if (end < 0) fail('no ZIP end of central directory record')
   const disk = view.getUint16(end + 4, true)
   const directoryDisk = view.getUint16(end + 6, true)
@@ -97,53 +142,20 @@ export function zipEntries(bytes: Uint8Array): Map<string, ZipEntry> {
   const entries = new Map<string, ZipEntry>()
   let p = directoryOffset
   for (let k = 0; k < total; k++) {
-    if (p + 46 > end || view.getUint32(p, true) !== 0x02014b50)
-      fail('central directory is malformed')
-    const nameLength = view.getUint16(p + 28, true)
-    const next = p + 46 + nameLength + view.getUint16(p + 30, true) + view.getUint16(p + 32, true)
-    if (next > end) fail('central directory is malformed')
-    // shortcut: names read as Latin-1, exact for the ASCII part names of XLSX; upgrade if a needed part name is not ASCII
-    const name = String.fromCharCode(...bytes.subarray(p + 46, p + 46 + nameLength))
-    const entry: ZipEntry = {
-      name,
-      flags: view.getUint16(p + 8, true),
-      method: view.getUint16(p + 10, true),
-      crc: view.getUint32(p + 16, true),
-      compressedSize: view.getUint32(p + 20, true),
-      size: view.getUint32(p + 24, true),
-      offset: view.getUint32(p + 42, true),
-    }
+    const { entry, next } = readHeader(bytes, view, p, end)
     p = next
-    if (name.endsWith('/')) continue
-    if (
-      entry.compressedSize === 0xffffffff ||
-      entry.size === 0xffffffff ||
-      entry.offset === 0xffffffff
-    ) {
-      fail('ZIP64 archives are not read')
-    }
-    const key = name.toLowerCase()
-    const other = entries.get(key)
-    if (other?.name === name) throw new Error(`XLSX part ${name} appears twice`)
-    if (other) throw new Error(`XLSX parts ${other.name} and ${name} differ only in case`)
-    entries.set(key, entry)
+    if (!entry.name.endsWith('/')) addEntry(entries, entry)
   }
   return entries
 }
 
-/**
- * The bytes of one entry: stored (method 0) or deflated (method 8), checked against the declared
- * size and CRC-32. `budget.left` is the declared size the workbook may still read; `limit` is
- * the largest declared size of this part.
- */
-export async function readEntry(
-  bytes: Uint8Array,
+/** Checks the declared sizes of an entry against `limit` and the shared budget, and spends them. */
+function spendDeclared(
   entry: ZipEntry,
-  inflate: Inflate,
   budget: { left: number },
-  limit = maxPartSize,
-): Promise<Uint8Array<ArrayBuffer>> {
-  const part = (message: string) => new Error(`XLSX part ${entry.name}: ${message}`)
+  limit: number,
+  part: (message: string) => Error,
+): void {
   if (entry.flags & 1) throw part('encrypted entries are not read')
   if (entry.method !== 0 && entry.method !== 8) {
     throw part(`compression method ${entry.method} is not read`)
@@ -159,6 +171,14 @@ export async function readEntry(
   if (entry.method === 8 && entry.compressedSize > maxCompressed) {
     throw part(`compressed size ${entry.compressedSize} is more than ${entry.size} bytes can take`)
   }
+}
+
+/** The compressed data of an entry, located through its local header. */
+function entryData(
+  bytes: Uint8Array,
+  entry: ZipEntry,
+  part: (message: string) => Error,
+): Uint8Array<ArrayBuffer> {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
   // local header (4.3.7): only its name and extra field lengths locate the data; sizes come
   // from the central directory, since a data descriptor (4.3.9) leaves them zero here
@@ -168,7 +188,24 @@ export async function readEntry(
   }
   const start = at + 30 + view.getUint16(at + 26, true) + view.getUint16(at + 28, true)
   if (start + entry.compressedSize > bytes.length) throw part('data lies outside the file')
-  const data = bytes.slice(start, start + entry.compressedSize)
+  return bytes.slice(start, start + entry.compressedSize)
+}
+
+/**
+ * The bytes of one entry: stored (method 0) or deflated (method 8), checked against the declared
+ * size and CRC-32. `budget.left` is the declared size the workbook may still read; `limit` is
+ * the largest declared size of this part.
+ */
+export async function readEntry(
+  bytes: Uint8Array,
+  entry: ZipEntry,
+  inflate: Inflate,
+  budget: { left: number },
+  limit = maxPartSize,
+): Promise<Uint8Array<ArrayBuffer>> {
+  const part = (message: string) => new Error(`XLSX part ${entry.name}: ${message}`)
+  spendDeclared(entry, budget, limit, part)
+  const data = entryData(bytes, entry, part)
   let out: Uint8Array<ArrayBuffer>
   if (entry.method === 0) {
     if (entry.compressedSize !== entry.size) {

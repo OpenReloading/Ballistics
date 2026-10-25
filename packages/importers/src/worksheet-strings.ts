@@ -29,6 +29,28 @@ export interface FoundWorksheet {
   read: (warnings: string[]) => WorksheetString | undefined
 }
 
+/** The distinct dates of the worksheets, ascending. */
+const datesOf = (list: FoundWorksheet[]) =>
+  [...new Set(list.flatMap((f) => (f.date ? [f.date] : [])))].sort((a, b) =>
+    a.localeCompare(b, 'en'),
+  )
+
+/** Warns about the date of a kept worksheet: a date taken from the option, or its own date warning once. */
+function warnDate(
+  f: FoundWorksheet,
+  options: WorkbookOptions,
+  fill: boolean,
+  warnings: string[],
+): void {
+  if (options.date && !fill && !f.date) {
+    warnings.push(
+      `worksheet ${f.position}: no date read; ${options.date} taken from the date option`,
+    )
+  } else if (!fill && f.dateWarning && !warnings.includes(f.dateWarning)) {
+    warnings.push(f.dateWarning)
+  }
+}
+
 /**
  * Keeps the worksheets of the `date` option (all without it), reads their strings and sets the
  * date when every kept string has the same one. Warnings of other days are not added. The `date`
@@ -40,10 +62,6 @@ export function collectWorksheetStrings(
   options: WorkbookOptions,
   warnings: string[],
 ): { strings: { shots: ChronoShot[] }[]; labels: string[]; flags: string[]; date?: string } {
-  const datesOf = (list: FoundWorksheet[]) =>
-    [...new Set(list.flatMap((f) => (f.date ? [f.date] : [])))].sort((a, b) =>
-      a.localeCompare(b, 'en'),
-    )
   const fill = options.date !== undefined && found.every((f) => !f.date)
   const kept = options.date ? found.filter((f) => !f.date || f.date === options.date) : found
   if (options.date && !fill && !found.some((f) => f.date === options.date)) {
@@ -56,13 +74,7 @@ export function collectWorksheetStrings(
   const flags: string[] = []
   const read: FoundWorksheet[] = []
   for (const f of kept) {
-    if (options.date && !fill && !f.date) {
-      warnings.push(
-        `worksheet ${f.position}: no date read; ${options.date} taken from the date option`,
-      )
-    } else if (!fill && f.dateWarning && !warnings.includes(f.dateWarning)) {
-      warnings.push(f.dateWarning)
-    }
+    warnDate(f, options, fill, warnings)
     const s = f.read(warnings)
     if (!s) {
       warnings.push(`worksheet ${f.position}: no shot rows; skipped`)

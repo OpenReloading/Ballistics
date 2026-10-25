@@ -11,21 +11,30 @@ test.beforeEach(({ page }) => storeUnits(page))
 /** Every scroll container of the page that has more content than room, and the page itself. */
 const overflowing = (page: Page) =>
   page.evaluate(() => {
-    const out: string[] = []
-    const root = document.scrollingElement as HTMLElement
-    if (root.scrollHeight > innerHeight || root.scrollWidth > innerWidth)
-      out.push(`page ${root.scrollHeight - innerHeight} x ${root.scrollWidth - innerWidth}`)
-    for (const e of document.querySelectorAll<HTMLElement>('main *')) {
-      const s = getComputedStyle(e)
-      const scrolls = [s.overflowX, s.overflowY].some((o) => o === 'auto' || o === 'scroll')
-      if (!scrolls && !e.matches('.workspace-inputs, .ladder-cells, .workspace-results')) continue
+    const scrolls = (s: CSSStyleDeclaration) =>
+      [s.overflowX, s.overflowY].some((o) => o === 'auto' || o === 'scroll')
+    const pageSize = (): string[] => {
+      const root = document.scrollingElement as HTMLElement
+      if (root.scrollHeight > innerHeight || root.scrollWidth > innerWidth)
+        return [`page ${root.scrollHeight - innerHeight} x ${root.scrollWidth - innerWidth}`]
+      return []
+    }
+    const watched = (e: HTMLElement) =>
+      scrolls(getComputedStyle(e)) ||
+      e.matches('.workspace-inputs, .ladder-cells, .workspace-results')
+    const directions = (h: number, w: number) => `${h > 1 ? 'v' : ''}${w > 1 ? 'h' : ''}`
+    const element = (e: HTMLElement): string[] => {
+      if (!watched(e)) return []
       const [h, w] = [e.scrollHeight - e.clientHeight, e.scrollWidth - e.clientWidth]
       // the ladder steps are one row that scrolls sideways, never down
-      const sideways = e.matches('.ladder-cells')
-      if (h > 1 || (w > 1 && !sideways))
-        out.push(`${e.tagName}.${e.className} ${h > 1 ? 'v' : ''}${w > 1 ? 'h' : ''}`)
+      const wide = w > 1 && !e.matches('.ladder-cells')
+      if (h > 1 || wide) return [`${e.tagName}.${e.className} ${directions(h, w)}`]
+      return []
     }
-    return out
+    return [
+      ...pageSize(),
+      ...[...document.querySelectorAll<HTMLElement>('main *')].flatMap(element),
+    ]
   })
 
 /**
@@ -34,36 +43,45 @@ const overflowing = (page: Page) =>
  */
 const cut = (page: Page) =>
   page.evaluate(() => {
-    const out: string[] = []
     const clips = (o: string) => o === 'hidden' || o === 'clip'
     const hidden = (e: Element) => {
       for (let a: Element | null = e; a; a = a.parentElement)
         if (getComputedStyle(a).clipPath === 'inset(50%)') return true
       return false
     }
-    for (const e of document.querySelectorAll<HTMLElement>(
-      'main :is(button, [role=tab], input, label, dt, dd, .field-unit)',
-    )) {
-      const r = e.getBoundingClientRect()
-      if (r.width < 2 || r.height < 2 || !e.checkVisibility() || hidden(e)) continue
-      const name = `${e.tagName} "${e.textContent || (e as HTMLInputElement).value || e.ariaLabel}"`
-      const s = getComputedStyle(e)
-      if ((e.tagName === 'INPUT' || clips(s.overflowX)) && e.scrollWidth > e.clientWidth + 1)
-        out.push(`${name} overflows`)
+    // whether the box `r` lies outside the area `a` clips
+    const outside = (a: Element, as: CSSStyleDeclaration, r: DOMRect) => {
+      const b = a.getBoundingClientRect()
+      const [left, top] = [b.left + a.clientLeft, b.top + a.clientTop]
+      const x = clips(as.overflowX) && (r.left < left - 1 || r.right > left + a.clientWidth + 1)
+      const y = clips(as.overflowY) && (r.top < top - 1 || r.bottom > top + a.clientHeight + 1)
+      return x || y
+    }
+    // the ancestor that clips the box `r` of `e`, up to the first scroll container
+    const cutBy = (e: HTMLElement, r: DOMRect): string | undefined => {
       for (let a = e.parentElement; a; a = a.parentElement) {
         const as = getComputedStyle(a)
-        if ([as.overflowX, as.overflowY].some((o) => o === 'auto' || o === 'scroll')) break
-        const b = a.getBoundingClientRect()
-        const [left, top] = [b.left + a.clientLeft, b.top + a.clientTop]
-        const x = clips(as.overflowX) && (r.left < left - 1 || r.right > left + a.clientWidth + 1)
-        const y = clips(as.overflowY) && (r.top < top - 1 || r.bottom > top + a.clientHeight + 1)
-        if (x || y) {
-          out.push(`${name} cut by ${a.tagName}.${a.className}`)
-          break
-        }
+        if ([as.overflowX, as.overflowY].some((o) => o === 'auto' || o === 'scroll')) return
+        if (outside(a, as, r)) return `${a.tagName}.${a.className}`
       }
     }
-    return out
+    const problems = (e: HTMLElement): string[] => {
+      const r = e.getBoundingClientRect()
+      if (r.width < 2 || r.height < 2 || !e.checkVisibility() || hidden(e)) return []
+      const name = `${e.tagName} "${e.textContent || (e as HTMLInputElement).value || e.ariaLabel}"`
+      const s = getComputedStyle(e)
+      const out: string[] = []
+      if ((e.tagName === 'INPUT' || clips(s.overflowX)) && e.scrollWidth > e.clientWidth + 1)
+        out.push(`${name} overflows`)
+      const by = cutBy(e, r)
+      if (by) out.push(`${name} cut by ${by}`)
+      return out
+    }
+    return [
+      ...document.querySelectorAll<HTMLElement>(
+        'main :is(button, [role=tab], input, label, dt, dd, .field-unit)',
+      ),
+    ].flatMap(problems)
   })
 
 /** Runs the example with a `steps`-step ladder of `kind`; its top steps carry the widest flags. */

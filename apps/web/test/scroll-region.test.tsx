@@ -60,9 +60,7 @@ it('a panel table gives every table element its ARIA role, header cells by scope
     <PanelTable label="Limits" caption="Limits" columns={['Limit', 'Value']}>
       <tr>
         <th scope="row">Pmax</th>
-        <>
-          <td>380</td>
-        </>
+        <td>380</td>
       </tr>
     </PanelTable>,
   )

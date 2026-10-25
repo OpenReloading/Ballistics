@@ -154,6 +154,29 @@ export interface LoadParts {
   sessions: readonly string[]
 }
 
+type Analysis = NonNullable<Load['analysis']>
+
+function analysisOf(overrides: Record<string, number>, ladder: LoadParts['ladder']) {
+  const typed = Object.keys(overrides).length > 0
+  if (!typed && !ladder) return
+  return {
+    ...(typed && { overrides }),
+    ...(ladder && {
+      ladder: {
+        // the charge is the default kind and stays out
+        ...(ladder.kind !== 'charge' && { kind: ladder.kind }),
+        stepCount: ladder.stepCount,
+        // a step of 0 or less stays out: the schema would reject the load
+        step:
+          ladder.step !== undefined && ladder.step > 0
+            ? storedOf(ladderStepKinds[ladder.kind], ladder.step).value
+            : undefined,
+        direction: ladder.direction,
+      } as NonNullable<Analysis['ladder']>,
+    }),
+  }
+}
+
 /** The load the workbench holds: only the typed solver values, the rest by reference. */
 export function toLoad(p: LoadParts): Load {
   const overrides: Record<string, number> = {}
@@ -175,25 +198,7 @@ export function toLoad(p: LoadParts): Load {
     capacity: p.capacity,
     seating: p.seating && { by: p.seating.by, value: storedOf('length', p.seating.value) },
     note: p.notes || undefined,
-    analysis:
-      Object.keys(overrides).length > 0 || ladder
-        ? {
-            ...(Object.keys(overrides).length > 0 && { overrides }),
-            ...(ladder && {
-              ladder: {
-                // the charge is the default kind and stays out
-                ...(ladder.kind !== 'charge' && { kind: ladder.kind }),
-                stepCount: ladder.stepCount,
-                // a step of 0 or less stays out: the schema would reject the load
-                step:
-                  ladder.step !== undefined && ladder.step > 0
-                    ? storedOf(ladderStepKinds[ladder.kind], ladder.step).value
-                    : undefined,
-                direction: ladder.direction,
-              } as NonNullable<NonNullable<Load['analysis']>['ladder']>,
-            }),
-          }
-        : undefined,
+    analysis: analysisOf(overrides, ladder),
     sessions: p.sessions.length > 0 ? [...p.sessions] : undefined,
   }
 }

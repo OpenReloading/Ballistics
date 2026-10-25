@@ -63,6 +63,15 @@ import { checkSources, sourceIndex } from './sources.ts'
 /** Directory `records/` of the data package, the default root of {@link readRecords}. */
 const recordsDir = join(import.meta.dirname, '..', 'records')
 
+/** Parses one entry of `load-tables.json` into `tables`, or adds its issues to `found`. */
+function readLoadTable(file: string, entry: unknown, tables: LoadTables, found: string[]) {
+  const parsed = loadTable.safeParse(entry)
+  if (parsed.success) tables[file] = parsed.data
+  else
+    for (const issue of parsed.error.issues)
+      found.push(`load-tables.json: ${[file, ...issue.path].join('.')}: ${issue.message}`)
+}
+
 /**
  * The load tables listed in `load-tables.json` of a records folder (none without it). An entry
  * that breaks `loadTable` is left out and adds its issues to `errors`; without `errors` it throws.
@@ -81,13 +90,8 @@ export function readLoadTables(dir: string, errors?: string[]): LoadTables {
   const tables: LoadTables = {}
   if (!listed.success) found.push('load-tables.json: not an object of tables by row file')
   else
-    for (const [file, entry] of Object.entries(listed.data)) {
-      const parsed = loadTable.safeParse(entry)
-      if (parsed.success) tables[file] = parsed.data
-      else
-        for (const issue of parsed.error.issues)
-          found.push(`load-tables.json: ${[file, ...issue.path].join('.')}: ${issue.message}`)
-    }
+    for (const [file, entry] of Object.entries(listed.data))
+      readLoadTable(file, entry, tables, found)
   if (!errors && found.length) throw new Error(found.join('\n'))
   return tables
 }

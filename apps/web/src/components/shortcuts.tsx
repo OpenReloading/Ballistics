@@ -31,33 +31,46 @@ export function useShortcuts(bind: Partial<Record<ShortcutId, (() => void) | nul
     const list = ids.split(' ') as ShortcutId[]
     for (const id of list) mounted.set(id, (mounted.get(id) ?? 0) + 1)
     changed()
-    const onKey = (e: KeyboardEvent) => {
-      if (e.isComposing) return
-      for (const id of list) {
-        const run = latest.current[id]
-        if (!run || !shortcutMatches(id, e)) continue
-        const s = shortcuts[id]
-        if (!s.fields && inField(e.target)) return
-        const modal = document.querySelector('[aria-modal="true"]')
-        if (modal && s.keys.every((k) => k.length === 1)) return
-        // the browser's own print stays with a dialog open: nothing else would print
-        if (modal && id === 'print') return
-        e.preventDefault()
-        if (!modal) run()
-        return
-      }
-    }
+    const onKey = (e: KeyboardEvent) => runShortcut(list, latest.current, e)
     document.documentElement.addEventListener('keydown', onKey)
     return () => {
       document.documentElement.removeEventListener('keydown', onKey)
-      for (const id of list) {
-        const n = (mounted.get(id) ?? 1) - 1
-        if (n) mounted.set(id, n)
-        else mounted.delete(id)
-      }
+      for (const id of list) unmount(id)
       changed()
     }
   }, [ids])
+}
+
+function unmount(id: ShortcutId) {
+  const n = (mounted.get(id) ?? 1) - 1
+  if (n) mounted.set(id, n)
+  else mounted.delete(id)
+}
+
+/** Whether a text field or an open dialog keeps shortcut `id` from running. */
+function keptFromPage(id: ShortcutId, e: KeyboardEvent, modal: boolean) {
+  const s = shortcuts[id]
+  if (!s.fields && inField(e.target)) return true
+  // the browser's own print stays with a dialog open: nothing else would print
+  return modal && (s.keys.every((k) => k.length === 1) || id === 'print')
+}
+
+/** Runs the first mounted shortcut that matches `e`, with the modal and text field rules of `useShortcuts`. */
+function runShortcut(
+  list: ShortcutId[],
+  bound: Partial<Record<ShortcutId, (() => void) | null>>,
+  e: KeyboardEvent,
+) {
+  if (e.isComposing) return
+  for (const id of list) {
+    const run = bound[id]
+    if (!run || !shortcutMatches(id, e)) continue
+    const modal = document.querySelector('[aria-modal="true"]')
+    if (keptFromPage(id, e, !!modal)) return
+    e.preventDefault()
+    if (!modal) run()
+    return
+  }
 }
 
 const openEvent = 'openreloading:shortcuts'

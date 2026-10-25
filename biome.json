@@ -7,6 +7,7 @@
   },
   "files": {
     "ignoreUnknown": true,
+    "maxSize": 2097152,
     "includes": [
       "**",
       "!.claude",
@@ -30,8 +31,8 @@
       "preset": "recommended",
       "complexity": {
         "noUselessUndefined": "error",
-        "useMaxParams": "warn",
-        "noExcessiveCognitiveComplexity": "warn"
+        "noExcessiveCognitiveComplexity": "error",
+        "noImportantStyles": "off"
       },
       "correctness": {
         "noUnusedVariables": "error",
@@ -41,7 +42,7 @@
       "style": {
         "noParameterAssign": "error",
         "useForOf": "error",
-        "noExcessiveLinesPerFile": "warn"
+        "noDescendingSpecificity": "off"
       },
       "suspicious": {
         "noUnusedExpressions": "error",

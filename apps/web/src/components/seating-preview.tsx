@@ -16,7 +16,17 @@ import {
   type Tagged,
 } from '@open-reloading/drawing/seating'
 import { type Bullet, fromSi, toSi } from '@open-reloading/schema'
-import { type ReactNode, useEffect, useId, useMemo, useRef, useState } from 'react'
+import {
+  type Dispatch,
+  type ReactNode,
+  type RefObject,
+  type SetStateAction,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { createPortal } from 'react-dom'
 import { apiFetch } from '../lib/api-fetch.ts'
 import type { BulletSummary, CartridgeDetail } from '../lib/api-types.ts'
@@ -221,30 +231,7 @@ function SeatedBullet({
   )
 }
 
-/**
- * Live half-section of the chosen cartridge's case (CIP maximum, interior not shown) in its
- * chamber (CIP minimum) with the bullet seated by COAL or CBTO; seating depth, volume behind the
- * bullet, travel and jump follow the slider and the number field (`@open-reloading/drawing/seating`).
- */
-export function SeatingPreview({
-  cartridge,
-  draft,
-  system,
-  initial,
-  barrelLength,
-  barrelDefault,
-  onSeated,
-  onSeatLadder,
-  measuredWaterCapacity = { text: '', si: undefined },
-  onMeasuredWaterCapacity,
-  capacityId: chosenId,
-  onCapacityId,
-  linked,
-  slots,
-  view = 'combined',
-  ladderStep,
-  fullView,
-}: {
+type PreviewProps = {
   /** The catalogue record to seat in; none for a `draft`. */
   cartridge?: { id: string; name: string }
   /** The cartridge design to seat in, instead of a record. */
@@ -295,18 +282,32 @@ export function SeatingPreview({
   ladderStep?: { by: Mode; value: number }
   /** The figure's full view: the same drawing in a modal at the window's height. */
   fullView?: { opened: boolean; onClose: () => void }
-}) {
-  const id = useId().replace(/:/g, '')
-  const detail = useRecord<CartridgeDetail>(
-    cartridge && !draft ? `cartridges/${encodeURIComponent(cartridge.id)}` : undefined,
-  )
-  const draftSpec = draft?.spec
-  const designed = draft !== undefined
-  /** The designer page: its own drawing is above, its controls in one section. */
-  const designer = designed && !draft.card
-  const name = draft?.title ?? cartridge?.name ?? ''
-  const [bulletId, setBulletId] = useState(initial?.bullet)
-  const names = useManufacturerNames()
+}
+
+type Spec = NonNullable<ReturnType<typeof specOf>>
+type Chamber = NonNullable<ReturnType<typeof chamberOf>>
+type Shape = NonNullable<ReturnType<typeof shapeOf>>
+type Capacity = CartridgeDetail['capacities'][number]
+type Slots = PreviewProps['slots']
+
+const emptyValue = (): FieldValue => ({ text: '', si: undefined })
+
+/** The barrel length field for `m`, its text in the units shown; empty without a value. */
+function barrelFieldValue(units: UnitSystem, m: number | undefined): FieldValue {
+  return m === undefined ? emptyValue() : { text: fixedFieldText('barrelLength', units, m), si: m }
+}
+
+const detailUrl = (cartridge: PreviewProps['cartridge'], draft: DraftCartridge | undefined) =>
+  cartridge && !draft ? `cartridges/${encodeURIComponent(cartridge.id)}` : undefined
+
+const bulletUrl = (id: string | undefined) => (id ? `bullets/${encodeURIComponent(id)}` : undefined)
+
+const nameOf = (draft: DraftCartridge | undefined, cartridge: PreviewProps['cartridge']) =>
+  draft?.title ?? cartridge?.name ?? ''
+
+/** The bullet record or design the preview seats: the page's own when linked, else the one searched or picked. */
+function useBulletChoice(initialBullet: string | undefined, linked: PreviewProps['linked']) {
+  const [bulletId, setBulletId] = useState(initialBullet)
   const [designs, setDesigns] = useState<UserBulletView[]>([])
   /** A bullet design of this browser seated instead of a record. */
   const [design, setDesign] = useState<UserBulletView>()
@@ -325,48 +326,47 @@ export function SeatingPreview({
     if (linkedBullet) setBulletId(linkedBullet)
     setDesign(linkedDesign ? designs.find((d) => d.id === linkedDesign) : undefined)
   }, [isLinked, linkedBullet, linkedDesign, designs])
-  const record = useRecord<Bullet>(bulletId ? `bullets/${encodeURIComponent(bulletId)}` : undefined)
-  const [ownCapacityId, setOwnCapacityId] = useState<string | undefined>(undefined)
-  const capacityId = onCapacityId ? chosenId : ownCapacityId
-  const setCapacityId = onCapacityId ?? setOwnCapacityId
-  const [barrel, setBarrel] = useState<FieldValue>(() => {
-    const m = barrelLength ?? initial?.barrel
-    return m === undefined
-      ? { text: '', si: undefined }
-      : { text: fixedFieldText('barrelLength', system, m), si: m }
-  })
+  const record = useRecord<Bullet>(bulletUrl(bulletId))
+  return { setBulletId, designs, design, setDesign, readDesigns, record }
+}
+
+/** The barrel length field: the gun's, the example's or typed, else the default. */
+function useBarrel(o: {
+  barrelLength: number | undefined
+  initialBarrel: number | undefined
+  barrelDefault: Suggestion | undefined
+  system: UnitSystem
+  shown: RefObject<UnitSystem>
+}) {
+  const { barrelLength, initialBarrel, barrelDefault, system, shown } = o
+  const [barrel, setBarrel] = useState<FieldValue>(() =>
+    barrelFieldValue(system, barrelLength ?? initialBarrel),
+  )
   /** The barrel length is the gun's, the example's or typed: no longer the default. */
   const [barrelTyped, setBarrelTyped] = useState(
-    () => (barrelLength ?? initial?.barrel) !== undefined,
+    () => (barrelLength ?? initialBarrel) !== undefined,
   )
   const defaultBarrel = barrelDefault?.si
-  const [mode, setMode] = useState<Mode>('overallLength')
-  const [pos, setPos] = useState<FieldValue>({ text: '', si: undefined })
-  /** The position and mode the preview last started at by itself. */
-  const [started, setStarted] = useState<{ si: number; mode: Mode }>()
-  const shown = useRef(system)
   useEffect(() => {
     if (barrelLength === undefined) return
-    setBarrel({
-      text: fixedFieldText('barrelLength', shown.current, barrelLength),
-      si: barrelLength,
-    })
+    setBarrel(barrelFieldValue(shown.current, barrelLength))
     setBarrelTyped(true)
-  }, [barrelLength])
+  }, [barrelLength, shown])
   // the default follows the cartridge's class and the Settings until one is typed
   useEffect(() => {
     if (barrelTyped) return
-    setBarrel(
-      defaultBarrel === undefined
-        ? { text: '', si: undefined }
-        : {
-            text: fixedFieldText('barrelLength', shown.current, defaultBarrel),
-            si: defaultBarrel,
-          },
-    )
-  }, [barrelTyped, defaultBarrel])
+    setBarrel(barrelFieldValue(shown.current, defaultBarrel))
+  }, [barrelTyped, defaultBarrel, shown])
+  return { barrel, setBarrel, barrelTyped, setBarrelTyped }
+}
 
-  // a unit switch rewrites the texts from the SI values
+/** A unit switch rewrites the texts from the SI values. */
+function useUnitRewrite(
+  system: UnitSystem,
+  shown: RefObject<UnitSystem>,
+  setBarrel: Dispatch<SetStateAction<FieldValue>>,
+  setPos: Dispatch<SetStateAction<FieldValue>>,
+) {
   useEffect(() => {
     const was = shown.current
     shown.current = system
@@ -374,104 +374,372 @@ export function SeatingPreview({
       f.si === undefined ? f : { text: fixedFieldText(q, system, f.si), si: f.si }
     if (was.barrelLength !== system.barrelLength) setBarrel(rewrite('barrelLength'))
     if (was.length !== system.length) setPos(rewrite('length'))
-  }, [system])
+  }, [system, shown, setBarrel, setPos])
+}
 
-  // the record when its table draws
-  const spec = useMemo(
-    () =>
-      draftSpec ??
-      (detail.status === 'ok' && drawnTables.has(detail.value.table)
-        ? drawable(detail.value)
-        : undefined),
-    [draftSpec, detail],
-  )
+/** The record when its table draws, or the design's own. */
+function specOf(draftSpec: DraftCartridge['spec'] | undefined, detail: Load<CartridgeDetail>) {
+  if (draftSpec) return draftSpec
+  return detail.status === 'ok' && drawnTables.has(detail.value.table)
+    ? drawable(detail.value)
+    : undefined
+}
+
+/** The bullet's shape in mm whatever the units: a unit switch must not move the bullet. */
+function shapeOf(
+  design: UserBulletView | undefined,
+  bulletRecord: Bullet | undefined,
+  units: UnitSystem,
+) {
+  return design
+    ? designShape(design.resolved, units)
+    : bulletRecord && bulletDimensions(bulletRecord)
+}
+
+/** Why a record whose dimensions cannot form an outline is not seated. */
+function refusalOf(shaped: ReturnType<typeof shapeOf>) {
+  const o = shaped && bulletOutline(shaped)
+  return o && 'reason' in o ? o.reason : undefined
+}
+
+/** The slider range and the drawing: they depend on the records only, never on the position. */
+function fixedOf(spec: Spec | undefined, chamber: Chamber | undefined, shape: Shape | undefined) {
+  if (!spec || !chamber || !shape) return
+  const contact = leadeContact(chamber, shape.diameter)
+  const outline = bulletOutline(shape)
+  const contactCoal =
+    'z' in contact && 'noseLength' in outline && !outline.noseAssumed
+      ? contact.z + outline.noseLength
+      : undefined
+  const range = coalRange(chamber, shape, contactCoal)
+  const drawn = previewDrawn(spec.values, spec.table, range[1] + 2)
+  if ('missing' in drawn) return { range, missing: drawn.missing }
+  return { range, drawn }
+}
+
+/** The records the seating reads: cartridge, capacity, bullet, the shape and its outline. */
+function useGeometry(o: {
+  draft: DraftCartridge | undefined
+  detail: Load<CartridgeDetail>
+  record: Load<Bullet>
+  design: UserBulletView | undefined
+  capacityId: string | undefined
+  shown: RefObject<UnitSystem>
+}) {
+  const { draft, detail, record, design, capacityId, shown } = o
+  const draftSpec = draft?.spec
+  const spec = useMemo(() => specOf(draftSpec, detail), [draftSpec, detail])
   const chamber = useMemo(() => spec && chamberOf(spec.values), [spec])
-  const capacities = detail.status === 'ok' ? detail.value.capacities : []
+  const capacities = capacitiesOf(detail)
   const capacity = capacities.find((c) => c.id === capacityId) ?? capacities[0]
   const bulletRecord = record.status === 'ok' && !design ? record.value : undefined
-  // the design's shape in mm whatever the units: a unit switch must not move the bullet
   const shaped = useMemo(
-    () =>
-      design
-        ? designShape(design.resolved, shown.current)
-        : bulletRecord && bulletDimensions(bulletRecord),
-    [design, bulletRecord],
+    () => shapeOf(design, bulletRecord, shown.current),
+    [design, bulletRecord, shown],
   )
   // a record whose dimensions cannot form an outline is not seated; its reason is shown
-  const refused = useMemo(() => {
-    const o = shaped && bulletOutline(shaped)
-    return o && 'reason' in o ? o.reason : undefined
-  }, [shaped])
+  const refused = useMemo(() => refusalOf(shaped), [shaped])
   const shape = refused ? undefined : shaped
+  const fixed = useMemo(() => fixedOf(spec, chamber, shape), [spec, chamber, shape])
+  return { spec, chamber, capacities, capacity, bulletRecord, shaped, refused, shape, fixed }
+}
 
-  // the slider range and the drawing depend on the records only, never on the position
-  const fixed = useMemo(() => {
-    if (!spec || !chamber || !shape) return
-    const contact = leadeContact(chamber, shape.diameter)
-    const outline = bulletOutline(shape)
-    const contactCoal =
-      'z' in contact && 'noseLength' in outline && !outline.noseAssumed
-        ? contact.z + outline.noseLength
-        : undefined
-    const range = coalRange(chamber, shape, contactCoal)
-    const drawn = previewDrawn(spec.values, spec.table, range[1] + 2)
-    if ('missing' in drawn) return { range, missing: drawn.missing }
-    return { range, drawn }
-  }, [spec, chamber, shape])
-  // apart from `fixed`: a unit switch relabels the drawing and keeps the seating position
-  const unit = drawingLengthUnit(system)
+const capacitiesOf = (detail: Load<CartridgeDetail>): Capacity[] =>
+  detail.status === 'ok' ? detail.value.capacities : []
 
-  const canCbto = shape?.baseToOgive !== undefined
-  // a new bullet or cartridge starts at the initial seating (CBTO only with a base to ogive), else at
-  // L6, else in the middle of the range
-  const start = fixed?.range
-  const [initialBy, initialValue] = [initial?.seating?.by, initial?.seating?.value]
+/** The seating a new bullet or cartridge starts at: the given one, else L6, else the middle of the range. */
+function startOf(
+  range: readonly [number, number],
+  chamber: Chamber,
+  by: Mode | undefined,
+  value: number | undefined,
+  canCbto: boolean,
+) {
+  // CBTO only with a base to ogive
+  const given = value !== undefined && (by === 'overallLength' || canCbto)
+  const si = given ? value : toSi('length', chamber.cartridgeL6 ?? (range[0] + range[1]) / 2)
+  const mode: Mode = given && by === 'baseToOgive' ? 'baseToOgive' : 'overallLength'
+  return { si, mode }
+}
+
+/** Starts the position at a new bullet or cartridge; a design starts empty. */
+function useStart(o: {
+  range: readonly [number, number] | undefined
+  chamber: Chamber | undefined
+  designed: boolean
+  shape: Shape | undefined
+  canCbto: boolean
+  mode: Mode
+  initial: PreviewProps['initial']
+  shown: RefObject<UnitSystem>
+  setMode: Dispatch<SetStateAction<Mode>>
+  setPos: Dispatch<SetStateAction<FieldValue>>
+  setStarted: Dispatch<SetStateAction<{ si: number; mode: Mode } | undefined>>
+}) {
+  const { range, chamber, designed, shape, canCbto, mode, shown, setMode, setPos, setStarted } = o
+  const [initialBy, initialValue] = [o.initial?.seating?.by, o.initial?.seating?.value]
   useEffect(() => {
     // a design starts empty: a seating the user did not enter would be a default
-    if (!start || !chamber || designed) return
-    const given = initialValue !== undefined && (initialBy === 'overallLength' || canCbto)
-    const m = given
-      ? initialValue
-      : toSi('length', chamber.cartridgeL6 ?? (start[0] + start[1]) / 2)
-    const startMode = given && initialBy === 'baseToOgive' ? 'baseToOgive' : 'overallLength'
-    setMode(startMode)
-    setPos({ text: fixedFieldText('length', shown.current, m), si: m })
-    setStarted({ si: m, mode: startMode })
-  }, [start, chamber, designed, initialBy, initialValue, canCbto])
+    if (!range || !chamber || designed) return
+    const start = startOf(range, chamber, initialBy, initialValue, canCbto)
+    setMode(start.mode)
+    setPos({ text: fixedFieldText('length', shown.current, start.si), si: start.si })
+    setStarted(start)
+  }, [
+    range,
+    chamber,
+    designed,
+    initialBy,
+    initialValue,
+    canCbto,
+    shown,
+    setMode,
+    setPos,
+    setStarted,
+  ])
   // a bullet without a base-to-ogive cannot keep a CBTO entered for the one before
   useEffect(() => {
     if (!designed || !shape || canCbto || mode !== 'baseToOgive') return
     setMode('overallLength')
-    setPos({ text: '', si: undefined })
-  }, [designed, shape, canCbto, mode])
+    setPos(emptyValue())
+  }, [designed, shape, canCbto, mode, setMode, setPos])
+}
 
-  const value = pos.si === undefined ? undefined : fromSi('length', pos.si)
-  // the bullet seated by a length (mm): the preview's own position, and each step of a seating ladder
-  const seatBy = useMemo(() => {
-    if (!chamber || !shape || (mode === 'baseToOgive' && !canCbto)) return
-    return (by: number) =>
-      seat({
-        bullet: shape,
-        chamber,
-        waterCapacity:
-          measuredWaterCapacity.si !== undefined && measuredWaterCapacity.si > 0
-            ? waterGrams(measuredWaterCapacity.si)
-            : capacity?.waterCapacity.value,
-        waterDensity: waterDensityGramsPerCm3,
-        barrelLength: barrel.si === undefined ? undefined : fromSi('length', barrel.si),
-        by: { kind: mode, value: by },
-      })
-  }, [chamber, shape, mode, canCbto, capacity, measuredWaterCapacity.si, barrel.si])
+const positive = (si: number | undefined) => (si !== undefined && si > 0 ? si : undefined)
+
+/** The bullet seated by a length (mm), for the preview's position and each step of a seating ladder. */
+function seatBuilder(o: {
+  chamber: Chamber | undefined
+  shape: Shape | undefined
+  mode: Mode
+  canCbto: boolean
+  measured: number | undefined
+  capacity: Capacity | undefined
+  barrel: number | undefined
+}) {
+  const { chamber, shape, mode, canCbto, measured, capacity, barrel } = o
+  if (!chamber || !shape || (mode === 'baseToOgive' && !canCbto)) return
+  return (by: number) =>
+    seat({
+      bullet: shape,
+      chamber,
+      waterCapacity: measured !== undefined ? waterGrams(measured) : capacity?.waterCapacity.value,
+      waterDensity: waterDensityGramsPerCm3,
+      barrelLength: barrel === undefined ? undefined : fromSi('length', barrel),
+      by: { kind: mode, value: by },
+    })
+}
+
+/** The case volume to the mouth, m³: the measured one, else the capacity record's. */
+const caseVolumeOf = (measured: number | undefined, capacity: Capacity | undefined) =>
+  measured !== undefined ? measured : capacity && waterVolume(capacity.waterCapacity.value)
+
+type SeatFn = ReturnType<typeof seatBuilder>
+
+/** The seating of the figure: a seating ladder step in the field's mode, else the field's seating. */
+function ladderSeating(
+  seatBy: SeatFn,
+  ladder: { by: Mode | undefined; value: number | undefined },
+  mode: Mode,
+  seating: Seating | undefined,
+) {
+  return seatBy && ladder.by === mode && ladder.value !== undefined
+    ? seatBy(fromSi('length', ladder.value))
+    : seating
+}
+
+type Seated3 = { coal: number; cbto: number | undefined } | undefined
+
+/** The card's Cartridge, Chamber and Combined views; the Cartridge view's L6 is the seated COAL. */
+function cardModels(
+  spec: Spec | undefined,
+  designer: boolean,
+  drawn: Parameters<typeof figureViews>[1],
+  unit: Parameters<typeof figureViews>[2],
+  seated: Seated3,
+): ReturnType<typeof figureViews> {
+  return spec && !designer ? figureViews(spec, drawn, unit, seated) : {}
+}
+
+/**
+ * The workbench card also draws the figure level, shown where its panel is wider than tall; a
+ * design draws it level only, in the room under its own drawing, framed to the combined view.
+ */
+function levelViewsOf(
+  spec: Spec | undefined,
+  drawIt: boolean,
+  designer: boolean,
+  drawn: Parameters<typeof figureViews>[1],
+  unit: Parameters<typeof figureViews>[2],
+  seated: Seated3,
+): ReturnType<typeof figureViews> {
+  return spec && drawIt
+    ? figureViews(spec, drawn, unit, seated, 'print', designer ? ['combined'] : undefined)
+    : {}
+}
+
+/** The seating mode's length minus COAL: the slider and the ladder show the mode's length. */
+const ladderShiftOf = (shape: Shape | undefined, mode: Mode) =>
+  shape?.baseToOgive !== undefined && mode === 'baseToOgive' ? shape.baseToOgive - shape.length : 0
+
+function seatAtOf(
+  seatBy: SeatFn,
+  range: readonly [number, number] | undefined,
+  mode: Mode,
+  shift: number,
+): SeatingLengths | undefined {
+  if (!seatBy || !range) return undefined
+  return {
+    lengthKind: mode,
+    range: [toSi('length', range[0] + shift), toSi('length', range[1] + shift)],
+    at: (by) => {
+      const s = seatBy(fromSi('length', by))
+      return {
+        volume: s.volumeBehindBullet && unitsOf.capacity.cm3.toSi(s.volumeBehindBullet.value),
+        travel: s.travel && toSi('length', s.travel.value),
+      }
+    },
+  }
+}
+
+const figureOf = (spec: Spec | undefined, seating: Seating | undefined) =>
+  spec && seating
+    ? {
+        values: spec.values,
+        table: spec.table,
+        bullet: seating.outline.points,
+        base: seating.basePosition,
+      }
+    : undefined
+
+/** What the page's fields follow, from the seating; none seated reports `{}`. */
+function seatedReport(o: {
+  caseVolume: number | undefined
+  seating: Seating | undefined
+  barrel: number | undefined
+  mode: Mode
+  atStart: boolean
+  figure: Seated['figure']
+}): Seated {
+  const { caseVolume, seating, barrel, mode, atStart, figure } = o
+  const [volume, travel] = [seating?.volumeBehindBullet?.value, seating?.travel?.value]
+  const [coal, cbto, depth] = [seating?.coal.value, seating?.cbto?.value, seating?.depth.value]
+  return {
+    ...(caseVolume !== undefined && { caseVolume }),
+    ...(volume !== undefined && { volume: unitsOf.capacity.cm3.toSi(volume) }),
+    ...(travel !== undefined && { travel: toSi('length', travel) }),
+    ...(coal !== undefined && { overallLength: toSi('length', coal) }),
+    ...(cbto !== undefined && { baseToOgive: toSi('length', cbto) }),
+    ...(depth !== undefined && { depth: toSi('length', depth) }),
+    ...(coal !== undefined && barrel !== undefined && { barrel }),
+    ...(coal !== undefined && { mode, atStart }),
+    ...(figure && { figure }),
+  }
+}
+
+/** The interior fields follow the seated bullet, derived from COAL. */
+function useReportSeated(
+  onSeated: (values: Seated) => void,
+  o: Parameters<typeof seatedReport>[0],
+) {
+  const seated = useRef(onSeated)
+  seated.current = onSeated
+  const { caseVolume, seating, barrel, mode, atStart, figure } = o
+  const key = [
+    caseVolume,
+    seating?.volumeBehindBullet?.value,
+    seating?.travel?.value,
+    seating?.coal.value,
+    seating?.cbto?.value,
+    seating?.depth.value,
+    barrel,
+    mode,
+    atStart,
+  ]
+  // no seated bullet reports {}: the page forgets the earlier seating
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the reported values only, not the seating object
+  useEffect(() => {
+    seated.current(seatedReport({ caseVolume, seating, barrel, mode, atStart, figure }))
+  }, [...key, figure])
+}
+
+function useLive(announce: string) {
+  const [live, setLive] = useState('')
+  useEffect(() => {
+    const timer = setTimeout(() => setLive(announce), 600)
+    return () => clearTimeout(timer)
+  }, [announce])
+  return live
+}
+
+/** The seating's state and values: every hook of the preview, so its parts only draw. */
+function useSeatingModel(p: PreviewProps) {
+  const { cartridge, draft, system, initial, onSeatLadder, slots, view = 'combined' } = p
+  const { measuredWaterCapacity = emptyValue(), ladderStep } = p
+  const id = useId().replace(/:/g, '')
+  const detail = useRecord<CartridgeDetail>(detailUrl(cartridge, draft))
+  const designed = draft !== undefined
+  /** The designer page: its own drawing is above, its controls in one section. */
+  const designer = isDesigner(draft)
+  const name = nameOf(draft, cartridge)
+  const bullet = useBulletChoice(initial?.bullet, p.linked)
+  const { design, record } = bullet
+  const names = useManufacturerNames()
+  const [ownCapacityId, setOwnCapacityId] = useState<string | undefined>(undefined)
+  const capacityId = p.onCapacityId ? p.capacityId : ownCapacityId
+  const setCapacityId = p.onCapacityId ?? setOwnCapacityId
+  const shown = useRef(system)
+  const { barrel, setBarrel, barrelTyped, setBarrelTyped } = useBarrel({
+    barrelLength: p.barrelLength,
+    initialBarrel: initial?.barrel,
+    barrelDefault: p.barrelDefault,
+    system,
+    shown,
+  })
+  const [mode, setMode] = useState<Mode>('overallLength')
+  const [pos, setPos] = useState<FieldValue>(emptyValue)
+  /** The position and mode the preview last started at by itself. */
+  const [started, setStarted] = useState<{ si: number; mode: Mode }>()
+  useUnitRewrite(system, shown, setBarrel, setPos)
+  const { spec, chamber, capacity, shape, fixed, ...geometry } = useGeometry({
+    draft,
+    detail,
+    record,
+    design,
+    capacityId,
+    shown,
+  })
+  // apart from `fixed`: a unit switch relabels the drawing and keeps the seating position
+  const unit = drawingLengthUnit(system)
+  const canCbto = shape?.baseToOgive !== undefined
+  const range = fixed?.range
+  useStart({
+    range,
+    chamber,
+    designed,
+    shape,
+    canCbto,
+    mode,
+    initial,
+    shown,
+    setMode,
+    setPos,
+    setStarted,
+  })
+
+  const value = lengthMm(pos)
+  const measured = positive(measuredWaterCapacity.si)
+  const seatBy = useMemo(
+    () => seatBuilder({ chamber, shape, mode, canCbto, measured, capacity, barrel: barrel.si }),
+    [chamber, shape, mode, canCbto, capacity, measured, barrel.si],
+  )
   const seating = useMemo(
     () => (seatBy && value !== undefined ? seatBy(value) : undefined),
     [seatBy, value],
   )
   const [stepBy, stepValue] = [ladderStep?.by, ladderStep?.value]
   const figureSeating = useMemo(
-    () =>
-      seatBy && stepBy === mode && stepValue !== undefined
-        ? seatBy(fromSi('length', stepValue))
-        : seating,
+    () => ladderSeating(seatBy, { by: stepBy, value: stepValue }, mode, seating),
     [seatBy, stepBy, stepValue, mode, seating],
   )
   // Combined without dimensions, each side's record figure with them, as on the cartridge page;
@@ -481,63 +749,23 @@ export function SeatingPreview({
   const [coal, cbto, inCard] = [
     figureSeating?.coal.value,
     figureSeating?.cbto?.value,
-    Boolean(slots) && !designer,
+    isCard(slots, designer),
   ]
+  const drawn = fixed?.drawn
   const models = useMemo(
-    () =>
-      spec && !designer
-        ? figureViews(
-            spec,
-            fixed?.drawn,
-            unit,
-            inCard && coal !== undefined ? { coal, cbto } : undefined,
-          )
-        : {},
-    [spec, fixed, unit, inCard, designer, coal, cbto],
+    () => cardModels(spec, designer, drawn, unit, inCard ? coalOf(coal, cbto) : undefined),
+    [spec, drawn, unit, inCard, designer, coal, cbto],
   )
-  const model = models[view]
-  // the workbench card also draws the figure level, shown where its panel is wider than tall; a
-  // design draws it level only, in the room under its own drawing
   const levelModels = useMemo(
-    () =>
-      spec && (inCard || designer)
-        ? figureViews(
-            spec,
-            fixed?.drawn,
-            unit,
-            coal === undefined ? undefined : { coal, cbto },
-            'print',
-            // the design's own drawing above shows its sides: the frame fits the combined view
-            designer ? ['combined'] : undefined,
-          )
-        : {},
-    [spec, fixed, unit, inCard, designer, coal, cbto],
+    () => levelViewsOf(spec, inCard || designer, designer, drawn, unit, coalOf(coal, cbto)),
+    [spec, drawn, unit, inCard, designer, coal, cbto],
   )
-  const levelModel = levelModels[view]
   // the slider's range in the mode's length, for the seating ladder
-  const seatRange = fixed?.range
-  // the seating mode's length minus COAL: the slider and the ladder show the mode's length
-  const ladderShift =
-    shape?.baseToOgive !== undefined && mode === 'baseToOgive'
-      ? shape.baseToOgive - shape.length
-      : 0
-  const seatAt = useMemo<SeatingLengths | undefined>(() => {
-    if (!seatBy || !seatRange) return
-    return {
-      lengthKind: mode,
-      range: [
-        toSi('length', seatRange[0] + ladderShift),
-        toSi('length', seatRange[1] + ladderShift),
-      ],
-      at: (by) => {
-        const s = seatBy(fromSi('length', by))
-        return {
-          volume: s.volumeBehindBullet && unitsOf.capacity.cm3.toSi(s.volumeBehindBullet.value),
-          travel: s.travel && toSi('length', s.travel.value),
-        }
-      },
-    }
-  }, [seatBy, seatRange, mode, ladderShift])
+  const ladderShift = ladderShiftOf(shape, mode)
+  const seatAt = useMemo(
+    () => seatAtOf(seatBy, range, mode, ladderShift),
+    [seatBy, range, mode, ladderShift],
+  )
   const onSeatAt = useRef(onSeatLadder)
   onSeatAt.current = onSeatLadder
   useEffect(() => {
@@ -545,144 +773,173 @@ export function SeatingPreview({
     return () => onSeatAt.current?.(undefined)
   }, [seatAt])
 
-  // the interior fields follow the seated bullet, derived from COAL
-  const seated = useRef(onSeated)
-  seated.current = onSeated
-  const [seatedVolume, seatedTravel] = [seating?.volumeBehindBullet?.value, seating?.travel?.value]
-  const caseVolume =
-    measuredWaterCapacity.si !== undefined && measuredWaterCapacity.si > 0
-      ? measuredWaterCapacity.si
-      : capacity && waterVolume(capacity.waterCapacity.value)
-  const [seatedCoal, seatedCbto] = [seating?.coal.value, seating?.cbto?.value]
-  const [seatedDepth, barrelSi] = [seating?.depth.value, barrel.si]
+  const figure = useMemo(() => figureOf(spec, seating), [spec, seating])
   const atStart = pos.si === started?.si && mode === started?.mode
-  const figure = useMemo(
-    () =>
-      spec &&
-      seating && {
-        values: spec.values,
-        table: spec.table,
-        bullet: seating.outline.points,
-        base: seating.basePosition,
-      },
-    [spec, seating],
-  )
-  // no seated bullet reports {}: the page forgets the earlier seating
-  useEffect(() => {
-    seated.current({
-      ...(caseVolume !== undefined && { caseVolume }),
-      ...(seatedVolume !== undefined && { volume: unitsOf.capacity.cm3.toSi(seatedVolume) }),
-      ...(seatedTravel !== undefined && { travel: toSi('length', seatedTravel) }),
-      ...(seatedCoal !== undefined && { overallLength: toSi('length', seatedCoal) }),
-      ...(seatedCbto !== undefined && { baseToOgive: toSi('length', seatedCbto) }),
-      ...(seatedDepth !== undefined && { depth: toSi('length', seatedDepth) }),
-      ...(seatedCoal !== undefined && barrelSi !== undefined && { barrel: barrelSi }),
-      ...(seatedCoal !== undefined && { mode, atStart }),
-      ...(figure && { figure }),
-    })
-  }, [
-    caseVolume,
-    seatedVolume,
-    seatedTravel,
-    seatedCoal,
-    seatedCbto,
-    seatedDepth,
-    barrelSi,
-    mode,
-    atStart,
-    figure,
-  ])
+  const caseVolume = caseVolumeOf(measured, capacity)
+  useReportSeated(p.onSeated, { caseVolume, seating, barrel: barrel.si, mode, atStart, figure })
 
-  const length = system.length
-  const len = (x: number) => formatQuantity('length', system, toSi('length', x))
-  const mm = (x: number) => `${len(x)} ${length.symbol}`
-  /** A volume in cm³ in the case capacity unit. */
-  const vol = (cm3: number) => withUnit('capacity', system, unitsOf.capacity.cm3.toSi(cm3))
-
-  const contact =
-    seating?.contact &&
-    `Contact with leade (${seating.jump.tag}): the bullet reaches the leade at ${mm(seating.contactCoal as number)} COAL; it is not moved back.`
+  const fmt = unitFormats(system)
+  const contact = contactText(seating, fmt.mm)
   /** The workbench's cards: the fields there show what the rows below leave out. */
-  const card = Boolean(slots) && !designer
-  const warnings = [
-    seating?.aboveL6 &&
-      chamber?.cartridgeL6 !== undefined &&
-      `Above the ${designed ? 'cartridge' : 'CIP maximum'} L6 of ${mm(chamber.cartridgeL6)}`,
-    contact,
-  ].filter((w): w is string => !!w)
-
-  const jumpText = (s: Seating) =>
-    s.jump.value === undefined ? jumpNote(s.jump) : `${mm(s.jump.value)}, ${s.jump.tag}`
-  const announce = seating
-    ? `COAL ${mm(seating.coal.value)}, seating depth ${mm(seating.depth.value)}, jump ${jumpText(seating)}${seating.contact ? ', contact with leade' : ''}.`
-    : ''
-  const [live, setLive] = useState('')
-  useEffect(() => {
-    const timer = setTimeout(() => setLive(announce), 600)
-    return () => clearTimeout(timer)
-  }, [announce])
+  const card = inCard
+  const warnings = warningsOf(seating, chamber, designed, contact, fmt.mm)
+  const live = useLive(announceOf(seating, fmt.mm))
 
   function changeMode(next: Mode) {
     if (next === mode || !shape) return
-    if (value !== undefined && shape.baseToOgive !== undefined) {
-      const shift = shape.baseToOgive - shape.length
-      const mmValue = next === 'baseToOgive' ? value + shift : value - shift
-      setPos({
-        text: fixedFieldText('length', system, toSi('length', mmValue)),
-        si: toSi('length', mmValue),
-      })
-    }
+    const moved = movedPosition(value, next, shape, system)
+    if (moved) setPos(moved)
     setMode(next)
   }
 
+  return {
+    ...geometry,
+    ...bullet,
+    ...fmt,
+    p,
+    id,
+    detail,
+    designed,
+    designer,
+    name,
+    names,
+    spec,
+    chamber,
+    capacity,
+    shape,
+    fixed,
+    range,
+    view,
+    slots,
+    system,
+    barrel,
+    barrelTyped,
+    setBarrel,
+    setBarrelTyped,
+    mode,
+    pos,
+    setPos,
+    started,
+    setCapacityId,
+    seating,
+    figureSeating,
+    model: models[view],
+    levelModel: levelModels[view],
+    ladderShift,
+    contact,
+    card,
+    warnings,
+    live,
+    changeMode,
+    canCbto,
+    measuredWaterCapacity,
+  }
+}
+
+type Model = ReturnType<typeof useSeatingModel>
+
+const isDesigner = (draft: DraftCartridge | undefined) => draft !== undefined && !draft.card
+const isCard = (slots: Slots, designer: boolean) => Boolean(slots) && !designer
+const coalOf = (coal: number | undefined, cbto: number | undefined): Seated3 =>
+  coal === undefined ? undefined : { coal, cbto }
+const lengthMm = (pos: FieldValue) => (pos.si === undefined ? undefined : fromSi('length', pos.si))
+
+/** The length formats of the units shown: `len` the number, `mm` with its symbol, `vol` a cm³ volume. */
+function unitFormats(system: UnitSystem) {
+  const length = system.length
+  const len = (x: number) => formatQuantity('length', system, toSi('length', x))
+  return {
+    length,
+    len,
+    mm: (x: number) => `${len(x)} ${length.symbol}`,
+    vol: (cm3: number) => withUnit('capacity', system, unitsOf.capacity.cm3.toSi(cm3)),
+  }
+}
+
+const contactText = (seating: Seating | undefined, mm: (x: number) => string) =>
+  seating?.contact &&
+  `Contact with leade (${seating.jump.tag}): the bullet reaches the leade at ${mm(seating.contactCoal as number)} COAL; it is not moved back.`
+
+function warningsOf(
+  seating: Seating | undefined,
+  chamber: Chamber | undefined,
+  designed: boolean,
+  contact: string | false | undefined,
+  mm: (x: number) => string,
+) {
+  const above =
+    seating?.aboveL6 &&
+    chamber?.cartridgeL6 !== undefined &&
+    `Above the ${designed ? 'cartridge' : 'CIP maximum'} L6 of ${mm(chamber.cartridgeL6)}`
+  return [above, contact].filter((w): w is string => !!w)
+}
+
+const jumpText = (s: Seating, mm: (x: number) => string) =>
+  s.jump.value === undefined ? jumpNote(s.jump) : `${mm(s.jump.value)}, ${s.jump.tag}`
+
+const announceOf = (seating: Seating | undefined, mm: (x: number) => string) =>
+  seating
+    ? `COAL ${mm(seating.coal.value)}, seating depth ${mm(seating.depth.value)}, jump ${jumpText(seating, mm)}${seating.contact ? ', contact with leade' : ''}.`
+    : ''
+
+/** The position in the other mode's length, or undefined when the bullet gives no shift. */
+function movedPosition(
+  value: number | undefined,
+  next: Mode,
+  shape: Shape,
+  system: UnitSystem,
+): FieldValue | undefined {
+  if (value === undefined || shape.baseToOgive === undefined) return undefined
+  const shift = shape.baseToOgive - shape.length
+  const mmValue = next === 'baseToOgive' ? value + shift : value - shift
+  return {
+    text: fixedFieldText('length', system, toSi('length', mmValue)),
+    si: toSi('length', mmValue),
+  }
+}
+
+/** What stands in for the preview while the record loads, fails or lacks a drawing; else the spec and chamber. */
+function gateOf(m: Model): { gate: ReactNode } | { spec: Spec; chamber: Chamber } {
+  const { designed, detail, spec, chamber, name } = m
   if (!designed && (detail.status === 'loading' || detail.status === 'none'))
-    return <Loading what="the cartridge record" inline />
-  if (!designed && detail.status === 'error') return <p>{notReached}</p>
-  if (!spec || !chamber)
-    return (
+    return { gate: <Loading what="the cartridge record" inline /> }
+  if (!designed && detail.status === 'error') return { gate: <p>{notReached}</p> }
+  if (spec && chamber) return { spec, chamber }
+  return {
+    gate: (
       <p>
         {designed
           ? 'Not given: the cartridge L3, which the seating needs.'
           : `No CIP drawing for ${name}: the preview needs the CIP cartridge and chamber values.`}
       </p>
-    )
+    ),
+  }
+}
 
-  const range = fixed?.range
-  const toShown = (x: number) => length.fromSi(toSi('length', x + ladderShift))
-  const step = system.length.step
-  const what = view === 'combined' ? 'case in its chamber' : view
-  // a chamber without a cartridge holds no bullet: the Chamber view draws the chamber alone
-  const drawnSeating = view === 'chamber' ? undefined : figureSeating
-  const where = designed ? name : `${spec.standard} ${spec.name}`
-  const caption =
-    view === 'chamber'
-      ? `Chamber, ${where}`
-      : `${view === 'combined' ? 'Seated' : 'Cartridge with the seated'} ${design ? `user design ${design.name}` : 'bullet'}, ${where}`
-  const desc = drawnSeating
-    ? `Half section of the ${designed ? `case of the ${name}` : `${spec.name} case`} (${designed ? 'maximum' : 'CIP maximum'} outline, interior not shown) in its chamber (${designed ? 'minimum' : 'CIP minimum'} outline) with the bullet seated at COAL ${mm(drawnSeating.coal.value)}: seating depth ${mm(drawnSeating.depth.value)}, jump ${jumpText(drawnSeating)}. Dashed lines are approximate geometry.`
-    : `Half section of the ${designed ? what : `${spec.name} ${what}`}; no bullet ${view === 'chamber' ? 'or case drawn' : 'seated'}.`
-  const drawing = (name: string, shown = model) =>
-    shown && (
-      <TechnicalDrawing
-        id={`${id}-${name}`}
-        title={caption}
-        desc={desc}
-        model={shown}
-        level={shown.medium === 'print'}
-      >
-        {drawnSeating && (
-          <SeatedBullet
-            id={`${id}-${name}`}
-            s={drawnSeating}
-            caseLength={chamber.caseLength}
-            leade={drawnSeating.leade}
-            g1={chamber.G1}
-          />
-        )}
-      </TechnicalDrawing>
-    )
+/** A part in its slot, or in place without slots; nothing while the slot is not mounted. */
+function put(slots: Slots, node: ReactNode, target: HTMLElement | null | undefined) {
+  if (!slots) return node
+  return target ? createPortal(node, target) : null
+}
 
-  const barrelField = (
+/** A rarely needed part: in the `more` slot when the page gives one, else in place. */
+function aside(slots: Slots, node: ReactNode, target: HTMLElement | null | undefined) {
+  if (!slots || target === undefined) return node
+  return target ? createPortal(node, target) : null
+}
+
+/** The capacity record's description: its water, and its case maker when it has one. */
+function capacityText(c: Capacity, names: Model['names']) {
+  const maker = c.caseManufacturer
+    ? `, ${refName(names, c.caseManufacturer) || c.caseManufacturer}`
+    : ''
+  return `${c.id}: ${c.waterCapacity.value} g water${maker}`
+}
+
+function BarrelField({ m }: { m: Model }) {
+  const { system, barrel, barrelTyped } = m
+  const barrelDefault = m.p.barrelDefault
+  return (
     <NumberField
       spec={{
         key: 'barrel',
@@ -696,14 +953,331 @@ export function SeatingPreview({
       muted={!barrelTyped && barrel.si !== undefined}
       mark={!barrelTyped && barrelDefault ? `Default: ${barrelDefault.source}.` : undefined}
       onChange={(v) => {
-        setBarrel(v)
-        setBarrelTyped(true)
+        m.setBarrel(v)
+        m.setBarrelTyped(true)
       }}
       // an emptied field takes the default again
-      onBlur={() => barrel.text.trim() === '' && setBarrelTyped(false)}
+      onBlur={() => barrel.text.trim() === '' && m.setBarrelTyped(false)}
     />
   )
-  const notes = seating && (
+}
+
+function BulletPicker({ m }: { m: Model }) {
+  const { design, designs, names } = m
+  return (
+    <>
+      <RecordSearch<BulletSummary>
+        kind="bullets"
+        label="Search bullets by manufacturer or name"
+        describe={(b) => productLabel(b, names)}
+        onSelect={(b) => {
+          m.setDesign(undefined)
+          m.setBulletId(b.id)
+        }}
+        noneText="No bullet found"
+        unreachableText={notReached}
+      />
+      <NativeSelect
+        label="Or a bullet design"
+        description="From your bullet designs in this browser."
+        value={design?.id ?? ''}
+        onFocus={m.readDesigns}
+        onChange={(e) => m.setDesign(designs.find((d) => d.id === e.currentTarget.value))}
+        data={[
+          { value: '', label: designs.length ? 'None' : 'None in this browser' },
+          ...designs.map((d) => ({ value: d.id, label: d.name })),
+        ]}
+      />
+    </>
+  )
+}
+
+/** What the bullet choice stands at: loading, failed, the record or design in use, and why it does not seat. */
+function BulletStatus({ m }: { m: Model }) {
+  const { design, record, bulletRecord, shaped, refused, names } = m
+  return (
+    <>
+      {!design && record.status === 'loading' && <Loading what="the bullet record" inline />}
+      {!design && record.status === 'error' && <p>{notReached}</p>}
+      {design && (
+        <p className="record">Bullet: {design.name} (user design, not a catalogue record)</p>
+      )}
+      {design && !shaped && (
+        <p>This bullet design has no length or does not draw: the preview needs both.</p>
+      )}
+      {bulletRecord && (
+        <p className="record">
+          Bullet: {productLabel(bulletRecord, names)} ({bulletRecord.id}
+          {bulletRecord.provenance.sources[0] && (
+            <>
+              , <SourceTitles sources={bulletRecord.provenance.sources.slice(0, 1)} />
+            </>
+          )}
+          )
+        </p>
+      )}
+      {bulletRecord && !shaped && <p>This bullet record has no length: the preview needs it.</p>}
+      {refused && <p>The bullet outline is not drawn: {refused}</p>}
+    </>
+  )
+}
+
+function CapacityChoice({ m }: { m: Model }) {
+  const { capacities, capacity, names, designed, name } = m
+  if (capacities.length > 0)
+    return (
+      <NativeSelect
+        label="Case capacity record"
+        value={capacity?.id}
+        onChange={(e) => m.setCapacityId(e.currentTarget.value)}
+        data={capacities.map((c) => ({ value: c.id, label: capacityText(c, names) }))}
+      />
+    )
+  if (designed) return null
+  return (
+    <p>
+      No case capacity record for {name}: enter your measured case capacity for the volume behind
+      the bullet.
+    </p>
+  )
+}
+
+function MeasuredCapacity({ m }: { m: Model }) {
+  const { system, capacity, names, designed, measuredWaterCapacity } = m
+  return (
+    <NumberField
+      spec={{
+        ...measuredWaterCapacitySpec,
+        help: designed
+          ? 'Measured: water to the mouth of your fired cases. Empty: not given, and so is the volume behind the bullet.'
+          : "Measured: water to the mouth of your fired cases. Replaces the capacity record; empty: the record's value.",
+      }}
+      system={system}
+      value={measuredWaterCapacity}
+      onChange={(v) => m.p.onMeasuredWaterCapacity?.(v)}
+      // the record's capacity in the field while none is typed
+      placeholder={
+        capacity
+          ? (s) => formatQuantity('capacity', s, waterVolume(capacity.waterCapacity.value))
+          : undefined
+      }
+      flag={
+        capacity && measuredWaterCapacity.si === undefined
+          ? {
+              kind: 'record',
+              text: `From the capacity record ${capacityText(capacity, names)}. Type a measured capacity to replace it.`,
+            }
+          : undefined
+      }
+    />
+  )
+}
+
+/** The slider's value after a move: within half a step of the start it is the start. */
+function slidTo(
+  raw: number,
+  m: Pick<Model, 'length' | 'started' | 'mode' | 'system'>,
+  step: number | undefined,
+) {
+  const slid = m.length.toSi(raw)
+  const si =
+    m.started?.mode === m.mode && Math.abs(slid - m.started.si) <= m.length.toSi(step ?? 0) / 2
+      ? m.started.si
+      : slid
+  // the display decimals; the exact value stays
+  return { text: fixedFieldText('length', m.system, si), si }
+}
+
+function SeatSlider({ m, range }: { m: Model; range: readonly [number, number] }) {
+  const { id, mode, pos, length, system } = m
+  const step = system.length.step
+  const toShown = (x: number) => length.fromSi(toSi('length', x + m.ladderShift))
+  return (
+    <div className="field seating-slider">
+      <label htmlFor={`${id}-slider`}>Slide to change {seatingLengthName[mode]}</label>
+      <input
+        id={`${id}-slider`}
+        type="range"
+        min={toShown(range[0])}
+        max={toShown(range[1])}
+        step={step}
+        value={pos.si === undefined ? toShown(range[0]) : length.fromSi(pos.si)}
+        aria-valuetext={
+          pos.si === undefined
+            ? undefined
+            : `${formatQuantity('length', system, pos.si)} ${length.symbol}`
+        }
+        onChange={(e) => m.setPos(slidTo(Number(e.target.value), m, step))}
+      />
+    </div>
+  )
+}
+
+/** The seating by COAL or CBTO: the mode, its field and the slider. */
+function SeatFields({ m, range }: { m: Model; range: readonly [number, number] }) {
+  const { id, mode, pos, system, canCbto, card, warnings } = m
+  return (
+    <>
+      <SegmentedRow
+        legend="Seat the bullet by"
+        name={`${id}-mode`}
+        value={mode}
+        segments={(['overallLength', 'baseToOgive'] as const).map((s) => ({
+          value: s,
+          label: seatingLengthName[s],
+          reason:
+            s === 'baseToOgive' && !canCbto
+              ? "CBTO needs the bullet's base-to-ogive length. This bullet record has none."
+              : undefined,
+        }))}
+        onChange={m.changeMode}
+      />
+      <NumberField
+        spec={{
+          key: 'position',
+          label: seatingLengthName[mode],
+          help: modeHelp[mode],
+          quantity: 'length',
+          min: 0,
+        }}
+        system={system}
+        value={pos}
+        onChange={m.setPos}
+        // in the workbench card the field carries the L6 and leade warnings: no rows of their own
+        flag={
+          card && warnings.length > 0 ? { kind: 'exceeded', text: warnings.join('. ') } : undefined
+        }
+      />
+      <SeatSlider m={m} range={range} />
+    </>
+  )
+}
+
+function SeatingControls({ m }: { m: Model }) {
+  const { slots, linked, shape, range, card } = { ...m, linked: m.p.linked }
+  return (
+    <div className="seating-controls">
+      {!linked && <BulletPicker m={m} />}
+      <BulletStatus m={m} />
+      {aside(slots, <CapacityChoice m={m} />, slots?.more)}
+      {!card && <BarrelField m={m} />}
+      <MeasuredCapacity m={m} />
+      {shape && range && <SeatFields m={m} range={range} />}
+    </div>
+  )
+}
+
+/** The figure's description: the half section and the bullet seated in it, if any. */
+function figureDesc(m: Model, spec: Spec, drawnSeating: Seating | undefined) {
+  const { view, designed, name, mm } = m
+  if (!drawnSeating) {
+    const what = view === 'combined' ? 'case in its chamber' : view
+    return `Half section of the ${designed ? what : `${spec.name} ${what}`}; no bullet ${view === 'chamber' ? 'or case drawn' : 'seated'}.`
+  }
+  const [maximum, minimum] = designed ? ['maximum', 'minimum'] : ['CIP maximum', 'CIP minimum']
+  const the = designed ? `case of the ${name}` : `${spec.name} case`
+  return `Half section of the ${the} (${maximum} outline, interior not shown) in its chamber (${minimum} outline) with the bullet seated at COAL ${mm(drawnSeating.coal.value)}: seating depth ${mm(drawnSeating.depth.value)}, jump ${jumpText(drawnSeating, mm)}. Dashed lines are approximate geometry.`
+}
+
+/** The figure's title and description for the view and the seating drawn. */
+function figureText(m: Model, spec: Spec, drawnSeating: Seating | undefined) {
+  const { view, designed, name, design } = m
+  const where = designed ? name : `${spec.standard} ${spec.name}`
+  const seated = `${view === 'combined' ? 'Seated' : 'Cartridge with the seated'} ${design ? `user design ${design.name}` : 'bullet'}`
+  const caption = view === 'chamber' ? `Chamber, ${where}` : `${seated}, ${where}`
+  return { caption, desc: figureDesc(m, spec, drawnSeating) }
+}
+
+type FigureModel = NonNullable<Model['model']>
+
+function DrawnFigure({
+  m,
+  name,
+  shown,
+  text,
+  seating,
+  chamber,
+}: {
+  m: Model
+  name: string
+  shown: FigureModel
+  text: { caption: string; desc: string }
+  seating: Seating | undefined
+  chamber: Chamber
+}) {
+  const id = `${m.id}-${name}`
+  return (
+    <TechnicalDrawing
+      id={id}
+      title={text.caption}
+      desc={text.desc}
+      model={shown}
+      level={shown.medium === 'print'}
+    >
+      {seating && (
+        <SeatedBullet
+          id={id}
+          s={seating}
+          caseLength={chamber.caseLength}
+          leade={seating.leade}
+          g1={chamber.G1}
+        />
+      )}
+    </TechnicalDrawing>
+  )
+}
+
+function SeatingFigure({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Chamber }) {
+  const { view, fixed, model, levelModel, designer, shape, p } = m
+  const fullView = p.fullView
+  // a chamber without a cartridge holds no bullet: the Chamber view draws the chamber alone
+  const drawnSeating = view === 'chamber' ? undefined : m.figureSeating
+  const text = figureText(m, spec, drawnSeating)
+  const draw = (name: string, shown: FigureModel) => (
+    <DrawnFigure
+      m={m}
+      name={name}
+      shown={shown}
+      text={text}
+      seating={drawnSeating}
+      chamber={chamber}
+    />
+  )
+  return (
+    <div className="seating-figure">
+      {view === 'combined' && fixed?.missing && (
+        <p>The outline needs {fixed.missing.join(', ')}.</p>
+      )}
+      {view !== 'combined' && !model && <p>No {view} drawing for this record.</p>}
+      {model && draw('drawing', model)}
+      {/* a design's own drawing is above: this one shows once a bullet is seated in it */}
+      {levelModel && (!designer || drawnSeating) && draw('level', levelModel)}
+      {model && fullView && (
+        <AppModal
+          opened={fullView.opened}
+          onClose={fullView.onClose}
+          title={text.caption}
+          size="auto"
+          className="figure-full"
+        >
+          {draw('full', model)}
+        </AppModal>
+      )}
+      {drawnSeating && (
+        <p className="seating-legend">
+          Dashed in the flag colour: approximate geometry (see the notes). Faint: the bullet inside
+          the case. Dashed ticks: leade contact, approximate.
+        </p>
+      )}
+      {!shape && view === 'combined' && !designer && (
+        <p>Choose a bullet with a length to seat it.</p>
+      )}
+    </div>
+  )
+}
+
+function SeatingNotes({ seating }: { seating: Seating }) {
+  return (
     <>
       <p className="note">
         The jump is not a measured jump and not a seating recommendation. Staying at or below L6
@@ -718,344 +1292,192 @@ export function SeatingPreview({
       )}
     </>
   )
-  /** A part in its slot, or in place without slots; nothing while the slot is not mounted. */
-  const put = (node: ReactNode, target: HTMLElement | null | undefined) =>
-    !slots ? node : target ? createPortal(node, target) : null
-  /** A rarely needed part: in the `more` slot when the page gives one, else in place. */
-  const aside = (node: ReactNode, target: HTMLElement | null | undefined) =>
-    slots && target !== undefined ? (target ? createPortal(node, target) : null) : node
+}
 
+type RowsProps = { m: Model; seating: Seating; chamber: Chamber }
+
+function CoalRow({ m, seating, chamber }: RowsProps) {
+  const { card, designed, len, mm, length } = m
+  // in the workbench card the CBTO field's flag says it: no line of its own
+  const above =
+    !card && seating.aboveL6 && chamber.cartridgeL6 !== undefined ? (
+      <strong className="exceeded">
+        above {designed ? 'cartridge' : 'CIP maximum'} L6 ({mm(chamber.cartridgeL6)})
+      </strong>
+    ) : undefined
+  return (
+    <Row
+      term="COAL"
+      value={len(seating.coal.value)}
+      unit={length.symbol}
+      tag={seating.coal.tag}
+      note={above}
+    />
+  )
+}
+
+function CbtoRow({ m, seating }: RowsProps) {
+  if (seating.cbto)
+    return (
+      <Row
+        term="CBTO"
+        value={m.len(seating.cbto.value)}
+        unit={m.length.symbol}
+        tag={seating.cbto.tag}
+      />
+    )
+  return m.designed ? <NotGiven term="CBTO" why="the bullet base-to-ogive" /> : null
+}
+
+function CaseVolumeRow({ m, seating }: RowsProps) {
+  const { capacity, measuredWaterCapacity, vol } = m
+  if (!seating.caseVolume)
+    return m.designed ? (
+      <NotGiven term="Case volume to the mouth" why="a measured case capacity" />
+    ) : null
+  return (
+    <Row
+      term="Case volume to the mouth"
+      value={vol(seating.caseVolume.value)}
+      tag={seating.caseVolume.tag}
+      note={
+        measuredWaterCapacity.si !== undefined || !capacity
+          ? 'your measured case capacity'
+          : `${capacity.waterCapacity.value} g water (${capacity.id}) at ${waterDensityGramsPerCm3} g/cm³`
+      }
+    />
+  )
+}
+
+function VolumeRow({ m, seating }: RowsProps) {
+  if (seating.volumeBehindBullet)
+    return (
+      <Row
+        term="Volume behind the bullet"
+        value={m.vol(seating.volumeBehindBullet.value)}
+        tag={seating.volumeBehindBullet.tag}
+      />
+    )
+  return m.designed ? (
+    <NotGiven term="Volume behind the bullet" why="a measured case capacity" />
+  ) : null
+}
+
+function TravelRow({ m, seating }: RowsProps) {
+  if (seating.travel)
+    return (
+      <Row
+        term="Travel to the muzzle"
+        value={m.mm(seating.travel.value)}
+        tag={seating.travel.tag}
+      />
+    )
+  return m.designed ? <NotGiven term="Travel to the muzzle" why="the barrel length" /> : null
+}
+
+function LeadeRow({ m, seating }: RowsProps) {
+  if (seating.leade !== undefined)
+    return (
+      <Row
+        term="Leade contact from the head"
+        value={m.mm(seating.leade)}
+        tag="approximate"
+        note={`own derivation from the ${m.designed ? 'chamber of the design' : 'CIP chamber'}, not a CIP value`}
+      />
+    )
+  return m.designed ? (
+    <NotGiven term="Leade contact from the head" why="the chamber L3, G1, F, i, and s or G" />
+  ) : null
+}
+
+function JumpRow({ m, seating }: RowsProps) {
+  const unknown = seating.jump.value === undefined
+  return (
+    <Row
+      term="Jump to the leade"
+      value={seating.jump.value === undefined ? 'not given' : m.mm(seating.jump.value)}
+      tag={unknown ? undefined : seating.jump.tag}
+      note={jumpNote(seating.jump)}
+    />
+  )
+}
+
+function SeatingValues({ m, seating, chamber }: RowsProps) {
+  const { card, mode, slots, design, contact } = m
+  const rows = { m, seating, chamber }
+  const more = slots?.moreValues
+  return (
+    <div className="seating-values">
+      {/* a linked figure sits on a page that states this in its own notice */}
+      {!m.p.linked && (
+        <p className="note screen-only">
+          Results from this software are simulations, not load data.
+        </p>
+      )}
+      {design && (
+        <p className="note user-design">
+          Seated from the user design {design.name}, not a catalogue record.
+        </p>
+      )}
+      <dl>
+        {/* in the workbench's card the field shows the mode's length with its L6 flag and
+            this list the other one, so both modes keep one height */}
+        {(!card || mode === 'baseToOgive') && <CoalRow {...rows} />}
+        {(!card || mode !== 'baseToOgive') && <CbtoRow {...rows} />}
+        <Row
+          term="Seating depth"
+          value={m.len(seating.depth.value)}
+          unit={m.length.symbol}
+          tag={seating.depth.tag}
+          note={`case length: ${m.designed ? 'cartridge L3 of the design' : 'CIP L3 maximum'} ${m.mm(chamber.caseLength)}`}
+        />
+        {aside(slots, <CaseVolumeRow {...rows} />, more)}
+        {/* in the workbench the field "Usable case volume" shows it, flagged "from seating" */}
+        {!card && <VolumeRow {...rows} />}
+        {aside(slots, <TravelRow {...rows} />, more)}
+        {aside(slots, <LeadeRow {...rows} />, more)}
+        {aside(slots, <JumpRow {...rows} />, more)}
+      </dl>
+      {contact && !card && <ErrorNote color="orange">{contact}</ErrorNote>}
+      {!card && <SeatingNotes seating={seating} />}
+    </div>
+  )
+}
+
+function PreviewBody({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Chamber }) {
+  const { slots, seating, card, live } = m
   return (
     <div className="seating-preview" data-split={slots ? '' : undefined}>
-      {card && put(barrelField, slots?.gun)}
-      {put(
-        <div className="seating-controls">
-          {!linked && (
-            <>
-              <RecordSearch<BulletSummary>
-                kind="bullets"
-                label="Search bullets by manufacturer or name"
-                describe={(b) => productLabel(b, names)}
-                onSelect={(b) => {
-                  setDesign(undefined)
-                  setBulletId(b.id)
-                }}
-                noneText="No bullet found"
-                unreachableText={notReached}
-              />
-              <NativeSelect
-                label="Or a bullet design"
-                description="From your bullet designs in this browser."
-                value={design?.id ?? ''}
-                onFocus={readDesigns}
-                onChange={(e) => setDesign(designs.find((d) => d.id === e.currentTarget.value))}
-                data={[
-                  { value: '', label: designs.length ? 'None' : 'None in this browser' },
-                  ...designs.map((d) => ({ value: d.id, label: d.name })),
-                ]}
-              />
-            </>
-          )}
-          {!design && record.status === 'loading' && <Loading what="the bullet record" inline />}
-          {!design && record.status === 'error' && <p>{notReached}</p>}
-          {design && (
-            <p className="record">Bullet: {design.name} (user design, not a catalogue record)</p>
-          )}
-          {design && !shaped && (
-            <p>This bullet design has no length or does not draw: the preview needs both.</p>
-          )}
-          {bulletRecord && (
-            <p className="record">
-              Bullet: {productLabel(bulletRecord, names)} ({bulletRecord.id}
-              {bulletRecord.provenance.sources[0] && (
-                <>
-                  , <SourceTitles sources={bulletRecord.provenance.sources.slice(0, 1)} />
-                </>
-              )}
-              )
-            </p>
-          )}
-          {bulletRecord && !shaped && (
-            <p>This bullet record has no length: the preview needs it.</p>
-          )}
-          {refused && <p>The bullet outline is not drawn: {refused}</p>}
-          {aside(
-            capacities.length > 0 ? (
-              <NativeSelect
-                label="Case capacity record"
-                value={capacity?.id}
-                onChange={(e) => setCapacityId(e.currentTarget.value)}
-                data={capacities.map((c) => ({
-                  value: c.id,
-                  label: `${c.id}: ${c.waterCapacity.value} g water${c.caseManufacturer ? `, ${refName(names, c.caseManufacturer) || c.caseManufacturer}` : ''}`,
-                }))}
-              />
-            ) : (
-              !designed && (
-                <p>
-                  No case capacity record for {name}: enter your measured case capacity for the
-                  volume behind the bullet.
-                </p>
-              )
-            ),
-            slots?.more,
-          )}
-          {!card && barrelField}
-          <NumberField
-            spec={{
-              ...measuredWaterCapacitySpec,
-              help: designed
-                ? 'Measured: water to the mouth of your fired cases. Empty: not given, and so is the volume behind the bullet.'
-                : "Measured: water to the mouth of your fired cases. Replaces the capacity record; empty: the record's value.",
-            }}
-            system={system}
-            value={measuredWaterCapacity}
-            onChange={(v) => onMeasuredWaterCapacity?.(v)}
-            // the record's capacity in the field while none is typed
-            placeholder={
-              capacity
-                ? (s) => formatQuantity('capacity', s, waterVolume(capacity.waterCapacity.value))
-                : undefined
-            }
-            flag={
-              capacity && measuredWaterCapacity.si === undefined
-                ? {
-                    kind: 'record',
-                    text: `From the capacity record ${capacity.id}: ${capacity.waterCapacity.value} g water${capacity.caseManufacturer ? `, ${refName(names, capacity.caseManufacturer) || capacity.caseManufacturer}` : ''}. Type a measured capacity to replace it.`,
-                  }
-                : undefined
-            }
-          />
-          {shape && range && (
-            <>
-              <SegmentedRow
-                legend="Seat the bullet by"
-                name={`${id}-mode`}
-                value={mode}
-                segments={(['overallLength', 'baseToOgive'] as const).map((m) => ({
-                  value: m,
-                  label: seatingLengthName[m],
-                  reason:
-                    m === 'baseToOgive' && !canCbto
-                      ? "CBTO needs the bullet's base-to-ogive length. This bullet record has none."
-                      : undefined,
-                }))}
-                onChange={changeMode}
-              />
-              <NumberField
-                spec={{
-                  key: 'position',
-                  label: seatingLengthName[mode],
-                  help: modeHelp[mode],
-                  quantity: 'length',
-                  min: 0,
-                }}
-                system={system}
-                value={pos}
-                onChange={setPos}
-                // in the workbench card the field carries the L6 and leade warnings: no rows of their own
-                flag={
-                  card && warnings.length > 0
-                    ? { kind: 'exceeded', text: warnings.join('. ') }
-                    : undefined
-                }
-              />
-              <div className="field seating-slider">
-                <label htmlFor={`${id}-slider`}>Slide to change {seatingLengthName[mode]}</label>
-                <input
-                  id={`${id}-slider`}
-                  type="range"
-                  min={toShown(range[0])}
-                  max={toShown(range[1])}
-                  step={step}
-                  value={pos.si === undefined ? toShown(range[0]) : length.fromSi(pos.si)}
-                  aria-valuetext={
-                    pos.si === undefined
-                      ? undefined
-                      : `${formatQuantity('length', system, pos.si)} ${length.symbol}`
-                  }
-                  onChange={(e) => {
-                    const slid = length.toSi(Number(e.target.value))
-                    // the slider's step grid misses the start: within half a step it is the start
-                    const si =
-                      started?.mode === mode &&
-                      Math.abs(slid - started.si) <= length.toSi(step ?? 0) / 2
-                        ? started.si
-                        : slid
-                    // the display decimals; the exact value stays
-                    setPos({ text: fixedFieldText('length', system, si), si })
-                  }}
-                />
-              </div>
-            </>
-          )}
-        </div>,
-        slots?.cartridge,
-      )}
-      <div className="seating-figure">
-        {view === 'combined' && fixed?.missing && (
-          <p>The outline needs {fixed.missing.join(', ')}.</p>
-        )}
-        {view !== 'combined' && !model && <p>No {view} drawing for this record.</p>}
-        {model && drawing('drawing')}
-        {/* a design's own drawing is above: this one shows once a bullet is seated in it */}
-        {levelModel && (!designer || drawnSeating) && drawing('level', levelModel)}
-        {model && fullView && (
-          <AppModal
-            opened={fullView.opened}
-            onClose={fullView.onClose}
-            title={caption}
-            size="auto"
-            className="figure-full"
-          >
-            {drawing('full')}
-          </AppModal>
-        )}
-        {drawnSeating && (
-          <p className="seating-legend">
-            Dashed in the flag colour: approximate geometry (see the notes). Faint: the bullet
-            inside the case. Dashed ticks: leade contact, approximate.
-          </p>
-        )}
-        {!shape && view === 'combined' && !designer && (
-          <p>Choose a bullet with a length to seat it.</p>
-        )}
-      </div>
+      {card && put(slots, <BarrelField m={m} />, slots?.gun)}
+      {put(slots, <SeatingControls m={m} />, slots?.cartridge)}
+      <SeatingFigure m={m} spec={spec} chamber={chamber} />
       {seating &&
-        put(
-          <div className="seating-values">
-            {/* a linked figure sits on a page that states this in its own notice */}
-            {!linked && (
-              <p className="note screen-only">
-                Results from this software are simulations, not load data.
-              </p>
-            )}
-            {design && (
-              <p className="note user-design">
-                Seated from the user design {design.name}, not a catalogue record.
-              </p>
-            )}
-            <dl>
-              {/* in the workbench's card the field shows the mode's length with its L6 flag and
-                  this list the other one, so both modes keep one height */}
-              {(!card || mode === 'baseToOgive') && (
-                <Row
-                  term="COAL"
-                  value={len(seating.coal.value)}
-                  unit={length.symbol}
-                  tag={seating.coal.tag}
-                  // in the workbench card the CBTO field's flag says it: no line of its own
-                  note={
-                    !card && seating.aboveL6 && chamber.cartridgeL6 !== undefined ? (
-                      <strong className="exceeded">
-                        above {designed ? 'cartridge' : 'CIP maximum'} L6 ({mm(chamber.cartridgeL6)}
-                        )
-                      </strong>
-                    ) : undefined
-                  }
-                />
-              )}
-              {(!card || mode !== 'baseToOgive') &&
-                (seating.cbto ? (
-                  <Row
-                    term="CBTO"
-                    value={len(seating.cbto.value)}
-                    unit={length.symbol}
-                    tag={seating.cbto.tag}
-                  />
-                ) : (
-                  designed && <NotGiven term="CBTO" why="the bullet base-to-ogive" />
-                ))}
-              <Row
-                term="Seating depth"
-                value={len(seating.depth.value)}
-                unit={length.symbol}
-                tag={seating.depth.tag}
-                note={`case length: ${designed ? 'cartridge L3 of the design' : 'CIP L3 maximum'} ${mm(chamber.caseLength)}`}
-              />
-              {aside(
-                seating.caseVolume ? (
-                  <Row
-                    term="Case volume to the mouth"
-                    value={vol(seating.caseVolume.value)}
-                    tag={seating.caseVolume.tag}
-                    note={
-                      measuredWaterCapacity.si !== undefined || !capacity
-                        ? 'your measured case capacity'
-                        : `${capacity.waterCapacity.value} g water (${capacity.id}) at ${waterDensityGramsPerCm3} g/cm³`
-                    }
-                  />
-                ) : (
-                  designed && (
-                    <NotGiven term="Case volume to the mouth" why="a measured case capacity" />
-                  )
-                ),
-                slots?.moreValues,
-              )}
-              {/* in the workbench the field "Usable case volume" shows it, flagged "from seating" */}
-              {!card &&
-                (seating.volumeBehindBullet ? (
-                  <Row
-                    term="Volume behind the bullet"
-                    value={vol(seating.volumeBehindBullet.value)}
-                    tag={seating.volumeBehindBullet.tag}
-                  />
-                ) : (
-                  designed && (
-                    <NotGiven term="Volume behind the bullet" why="a measured case capacity" />
-                  )
-                ))}
-              {aside(
-                seating.travel ? (
-                  <Row
-                    term="Travel to the muzzle"
-                    value={mm(seating.travel.value)}
-                    tag={seating.travel.tag}
-                  />
-                ) : (
-                  designed && <NotGiven term="Travel to the muzzle" why="the barrel length" />
-                ),
-                slots?.moreValues,
-              )}
-              {aside(
-                seating.leade !== undefined ? (
-                  <Row
-                    term="Leade contact from the head"
-                    value={mm(seating.leade)}
-                    tag="approximate"
-                    note={`own derivation from the ${designed ? 'chamber of the design' : 'CIP chamber'}, not a CIP value`}
-                  />
-                ) : (
-                  designed && (
-                    <NotGiven
-                      term="Leade contact from the head"
-                      why="the chamber L3, G1, F, i, and s or G"
-                    />
-                  )
-                ),
-                slots?.moreValues,
-              )}
-              {aside(
-                <Row
-                  term="Jump to the leade"
-                  value={seating.jump.value === undefined ? 'not given' : mm(seating.jump.value)}
-                  tag={seating.jump.value === undefined ? undefined : seating.jump.tag}
-                  note={jumpNote(seating.jump)}
-                />,
-                slots?.moreValues,
-              )}
-            </dl>
-            {contact && !card && <ErrorNote color="orange">{contact}</ErrorNote>}
-            {!card && notes}
-          </div>,
-          slots?.cartridge,
-        )}
+        put(slots, <SeatingValues m={m} seating={seating} chamber={chamber} />, slots?.cartridge)}
       {/* in the workbench the notes (staying below L6 says nothing about pressure or safety) sit in
           the Cartridge card's More, beside the further values */}
-      {slots?.more && seating && createPortal(<div>{notes}</div>, slots.more)}
+      {slots?.more &&
+        seating &&
+        createPortal(
+          <div>
+            <SeatingNotes seating={seating} />
+          </div>,
+          slots.more,
+        )}
       <p className="seating-live" aria-live="polite">
         {live}
       </p>
     </div>
   )
+}
+
+/**
+ * Live half-section of the chosen cartridge's case (CIP maximum, interior not shown) in its
+ * chamber (CIP minimum) with the bullet seated by COAL or CBTO; seating depth, volume behind the
+ * bullet, travel and jump follow the slider and the number field (`@open-reloading/drawing/seating`).
+ */
+export function SeatingPreview(props: PreviewProps) {
+  const m = useSeatingModel(props)
+  const g = gateOf(m)
+  if ('gate' in g) return g.gate
+  return <PreviewBody m={m} spec={g.spec} chamber={g.chamber} />
 }

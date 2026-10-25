@@ -140,6 +140,33 @@ describe('layout rules on a broken layout', () => {
   })
 })
 
+const unitNote = (unit: LengthUnit) => (unit === 'mm' ? 'Dimensions in mm' : 'Dimensions in inches')
+
+/** The layout failures of one figure of `record` in both media, labels in `unit`. */
+function figureFailures(
+  record: SpecRecord,
+  f: ReturnType<typeof laidOut>[number],
+  unit: LengthUnit,
+): string[] {
+  const failures: string[] = []
+  for (const medium of ['screen', 'print'] as const) {
+    if (f[medium].scale.note !== unitNote(unit)) failures.push(`${f.id} ${medium} unit note`)
+  }
+  for (const x of textSize(f.screen)) failures.push(`${f.id} screen ${x}`)
+  for (const medium of ['screen', 'print'] as const)
+    for (const laid of sides(record, f, f[medium]))
+      for (const [name, rule] of Object.entries(sideRules))
+        for (const x of rule(laid)) failures.push(`${f.id} ${laid.side} ${medium} ${name}: ${x}`)
+  return failures
+}
+
+/** The layout failures of every verified record at both widths, labels in `unit`. */
+function verifiedFailures(unit: LengthUnit): string[] {
+  return verified.flatMap((record) =>
+    laidOut(record, unit).flatMap((f) => figureFailures(record, f, unit)),
+  )
+}
+
 describe('verified records', () => {
   it('are 33', () => {
     expect(verified).toHaveLength(33)
@@ -149,21 +176,7 @@ describe('verified records', () => {
   it.each(['mm', 'in'] as const)(
     'pass every layout rule in both media at 390 and 1280 px, labels in %s',
     (unit) => {
-      const failures: string[] = []
-      for (const record of verified)
-        for (const f of laidOut(record, unit)) {
-          for (const medium of ['screen', 'print'] as const)
-            if (
-              f[medium].scale.note !== (unit === 'mm' ? 'Dimensions in mm' : 'Dimensions in inches')
-            )
-              failures.push(`${f.id} ${medium} unit note`)
-          for (const x of textSize(f.screen)) failures.push(`${f.id} screen ${x}`)
-          for (const medium of ['screen', 'print'] as const)
-            for (const laid of sides(record, f, f[medium]))
-              for (const [name, rule] of Object.entries(sideRules))
-                for (const x of rule(laid))
-                  failures.push(`${f.id} ${laid.side} ${medium} ${name}: ${x}`)
-        }
+      const failures = verifiedFailures(unit)
       expect(failures).toEqual([])
     },
     60_000,

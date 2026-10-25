@@ -84,8 +84,8 @@ describe('chronoSession', () => {
   it('asks a catalogue session for what a file does not give', () => {
     for (const path of ['id', 'date', 'device.manufacturer', 'device.model', 'conditions']) {
       const [head, tail] = path.split('.')
-      const value = structuredClone(catalogue) as Record<string, any>
-      if (tail) delete value[head][tail]
+      const value = structuredClone(catalogue) as Record<string, unknown>
+      if (tail) delete (value[head] as Record<string, unknown>)[tail]
       else delete value[head]
       expectIssueAt(
         catalogueSession,

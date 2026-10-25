@@ -10,6 +10,35 @@ const current = sheets
 const flat = (id: string) =>
   regions(record(id).values).flatMap((r) => r.values.map((v) => `${r.name} ${v.symbol} ${v.value}`))
 
+type Values = Parameters<typeof regions>[0]
+
+/** Checks each region value against the stored difference; returns how many, adds the negative ones to `conflicts`. */
+function checkDifferences(id: string, values: Values, conflicts: string[]) {
+  let count = 0
+  for (const region of regions(values))
+    for (const { symbol, value } of region.values) {
+      count++
+      expect(regionSymbols[region.name]).toContain(symbol)
+      const [c, ch] = (['cartridge', 'chamber'] as const).map(
+        (side) => storedValue(values, side, symbol)?.value as number,
+      )
+      expect(value, `${id} ${symbol}`).toBe(Number((ch - c).toFixed(3)))
+      if (value < 0) conflicts.push(`${id} ${symbol} ${value}`)
+    }
+  return count
+}
+
+/** A symbol has a region value exactly where both sides store it. */
+function checkBothSides(id: string, values: Values) {
+  for (const symbol of Object.values(regionSymbols).flat()) {
+    const has = regions(values).some((r) => r.values.some((v) => v.symbol === symbol))
+    const both = (['cartridge', 'chamber'] as const).every((side) =>
+      storedValue(values, side, symbol),
+    )
+    if (has) expect(both, `${id} ${symbol}`).toBe(true)
+  }
+}
+
 describe('regions', () => {
   it.each([
     [
@@ -61,24 +90,8 @@ describe('regions', () => {
     const conflicts: string[] = []
     let count = 0
     for (const { id, values } of current) {
-      for (const region of regions(values))
-        for (const { symbol, value } of region.values) {
-          count++
-          expect(regionSymbols[region.name]).toContain(symbol)
-          const [c, ch] = (['cartridge', 'chamber'] as const).map(
-            (side) => storedValue(values, side, symbol)?.value as number,
-          )
-          expect(value, `${id} ${symbol}`).toBe(Number((ch - c).toFixed(3)))
-          if (value < 0) conflicts.push(`${id} ${symbol} ${value}`)
-        }
-      // no value where a side lacks the symbol
-      for (const symbol of Object.values(regionSymbols).flat()) {
-        const has = regions(values).some((r) => r.values.some((v) => v.symbol === symbol))
-        const both = (['cartridge', 'chamber'] as const).every((side) =>
-          storedValue(values, side, symbol),
-        )
-        if (has) expect(both, `${id} ${symbol}`).toBe(true)
-      }
+      count += checkDifferences(id, values, conflicts)
+      checkBothSides(id, values)
     }
     expect(count).toBe(2576)
     // Reviewed: the 6 rim records (chamber R, a minimum, below cartridge R, a maximum), P1 and H2

@@ -110,6 +110,12 @@ export function solve(a: number[][], b: number[]): number[] {
       b[r] -= f * b[k]
     }
   }
+  return backSubstitute(a, b)
+}
+
+/** The solution of the upper triangular system `a` x = `b`. */
+function backSubstitute(a: number[][], b: number[]): number[] {
+  const n = b.length
   const x = new Array<number>(n)
   for (let k = n - 1; k >= 0; k--) {
     let s = b[k]

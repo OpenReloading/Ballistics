@@ -104,15 +104,19 @@ export function withTableRoles(node: ReactNode, inBody = false): ReactNode {
   return Children.map(node, (c) => {
     if (!isValidElement<{ children?: ReactNode; scope?: string }>(c)) return c
     const type = typeof c.type === 'string' ? c.type : undefined
-    if (type === 'th') {
-      const row = c.props.scope === 'row' || (c.props.scope !== 'col' && inBody)
-      return cloneElement(c, { role: row ? 'rowheader' : 'columnheader' } as object)
-    }
-    if (type === 'td') return cloneElement(c, { role: 'cell' } as object)
+    const role = cellRole(type, c.props.scope, inBody)
+    if (role) return cloneElement(c, { role } as object)
     if (c.type !== Fragment && !(type && type in tableRoles)) return c
     const kids = withTableRoles(c.props.children, inBody || type === 'tbody')
     return cloneElement(c, (type ? { role: tableRoles[type] } : {}) as object, kids)
   })
+}
+
+/** The role of a header or data cell, else undefined. */
+function cellRole(type: string | undefined, scope: string | undefined, inBody: boolean) {
+  if (type === 'td') return 'cell'
+  if (type !== 'th') return
+  return scope === 'row' || (scope !== 'col' && inBody) ? 'rowheader' : 'columnheader'
 }
 
 /**

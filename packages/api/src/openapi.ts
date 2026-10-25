@@ -240,6 +240,31 @@ function parameters(where: 'query' | 'path', schema: JsonSchema) {
   }))
 }
 
+/** The operation of one method of a route, `url` in OpenAPI path form. */
+function operationOf(route: RouteOptions, method: string, url: string): OpenApiOperation {
+  const schema = (route.schema ?? {}) as { querystring?: JsonSchema; params?: JsonSchema }
+  const query = route.config?.query ? jsonSchema(route.config.query) : schema.querystring
+  const op: OpenApiOperation = {
+    operationId: operationId(method.toLowerCase(), url),
+    tags: [tagOf(url)],
+    summary: route.config?.summary,
+    description: route.config?.description,
+    parameters: [...parameters('path', schema.params ?? {}), ...parameters('query', query ?? {})],
+    responses: responses(route, url, [schema.params, query]),
+  }
+  if (route.config?.body)
+    op.requestBody = {
+      required: true,
+      content: {
+        'application/json': {
+          schema: jsonSchema(route.config.body),
+          ...(route.config.example !== undefined && { example: route.config.example }),
+        },
+      },
+    }
+  return op
+}
+
 /**
  * The contract document of the running routes: every route registered by `buildApp`, with the
  * query, path and body schemas the routes declare (Fastify JSON schemas, or the zod schemas in the
@@ -262,29 +287,7 @@ export async function buildOpenApi(): Promise<OpenApiDocument> {
     const url = route.url.replace(/:(\w+)/g, '{$1}')
     for (const method of [route.method].flat()) {
       if (method === 'HEAD') continue
-      const schema = (route.schema ?? {}) as { querystring?: JsonSchema; params?: JsonSchema }
-      const query = route.config?.query ? jsonSchema(route.config.query) : schema.querystring
-      const op: OpenApiOperation = {
-        operationId: operationId(method.toLowerCase(), url),
-        tags: [tagOf(url)],
-        summary: route.config?.summary,
-        description: route.config?.description,
-        parameters: [
-          ...parameters('path', schema.params ?? {}),
-          ...parameters('query', query ?? {}),
-        ],
-        responses: responses(route, url, [schema.params, query]),
-      }
-      if (route.config?.body)
-        op.requestBody = {
-          required: true,
-          content: {
-            'application/json': {
-              schema: jsonSchema(route.config.body),
-              ...(route.config.example !== undefined && { example: route.config.example }),
-            },
-          },
-        }
+      const op = operationOf(route, method, url)
       paths[url] = { ...paths[url], [method.toLowerCase()]: op }
     }
   }

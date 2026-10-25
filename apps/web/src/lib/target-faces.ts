@@ -154,14 +154,61 @@ type FaceEventRow = {
   section?: string
 }
 
+type EventMapping = Pick<
+  TargetMapping,
+  'id' | 'discipline' | 'event' | 'stage' | 'gauge' | 'shotCount'
+> &
+  Partial<Pick<TargetMapping, 'provenance'>>
+
+function disciplineKeyOf(
+  d: DisciplineSummary | undefined,
+  e: Face['events'][number],
+  federation: string,
+): DisciplineKey {
+  return {
+    federation,
+    number: d?.number,
+    name: d?.name ?? e.name,
+    category: d?.category ?? e.category,
+    distanceMm: d?.distanceMm ?? e.distance.value,
+  }
+}
+
+/** The row of event `e` for its mapping `m`, with its sort key; the event alone without a mapping. */
+function eventRow(
+  f: Pick<Face, 'organization' | 'events'>,
+  e: Face['events'][number],
+  m: EventMapping | undefined,
+  byId: ReadonlyMap<string, DisciplineSummary>,
+  abbreviation: ReadonlyMap<string, string>,
+  event: Pick<FaceEventRow, 'distance' | 'category' | 'scoring'>,
+): FaceEventRow & { key: DisciplineKey } {
+  const d = m && byId.get(m.discipline)
+  const gauge = m?.gauge ?? e.gauge
+  // an event without its section: the page the mapping's source cites for it
+  const section = e.section ?? m?.provenance?.sources.find((x) => x.fields?.includes('event'))?.page
+  const federation = d
+    ? (abbreviation.get(d.federation) ?? d.federation)
+    : (e.organization ?? f.organization)
+  return {
+    key: disciplineKeyOf(d, e, federation),
+    id: m?.id ?? e.id,
+    ...(d && { disciplineId: d.id }),
+    federation,
+    ...(d?.number && { number: d.number }),
+    discipline: d?.name ?? e.name,
+    ...(m?.stage && { stage: m.stage }),
+    ...(gauge && { gauge: gauge.value }),
+    ...(m?.shotCount && { shotCount: m.shotCount }),
+    ...(section && { section }),
+    ...event,
+  }
+}
+
 /** One row per event of the face (one per mapping where several map it), in the order of `compareDisciplines`, then by stage. */
 export function faceEventRows(
   f: Pick<Face, 'organization' | 'events'>,
-  mappings: readonly (Pick<
-    TargetMapping,
-    'id' | 'discipline' | 'event' | 'stage' | 'gauge' | 'shotCount'
-  > &
-    Partial<Pick<TargetMapping, 'provenance'>>)[],
+  mappings: readonly EventMapping[],
   disciplines: readonly DisciplineSummary[],
   federations: readonly FederationSummary[],
 ): FaceEventRow[] {
@@ -175,36 +222,9 @@ export function faceEventRows(
         ...(e.category && { category: e.category }),
         ...(e.scoring && { scoring: e.scoring }),
       }
-      return (own.length > 0 ? own : [undefined]).map((m) => {
-        const d = m && byId.get(m.discipline)
-        const gauge = m?.gauge ?? e.gauge
-        // an event without its section: the page the mapping's source cites for it
-        const section =
-          e.section ?? m?.provenance?.sources.find((x) => x.fields?.includes('event'))?.page
-        const federation = d
-          ? (abbreviation.get(d.federation) ?? d.federation)
-          : (e.organization ?? f.organization)
-        const key: DisciplineKey = {
-          federation,
-          number: d?.number,
-          name: d?.name ?? e.name,
-          category: d?.category ?? e.category,
-          distanceMm: d?.distanceMm ?? e.distance.value,
-        }
-        return {
-          key,
-          id: m?.id ?? e.id,
-          ...(d && { disciplineId: d.id }),
-          federation,
-          ...(d?.number && { number: d.number }),
-          discipline: d?.name ?? e.name,
-          ...(m?.stage && { stage: m.stage }),
-          ...(gauge && { gauge: gauge.value }),
-          ...(m?.shotCount && { shotCount: m.shotCount }),
-          ...(section && { section }),
-          ...event,
-        }
-      })
+      return (own.length > 0 ? own : [undefined]).map((m) =>
+        eventRow(f, e, m, byId, abbreviation, event),
+      )
     })
     .sort((a, b) => compareDisciplines(a.key, b.key) || compareNames(a.stage ?? '', b.stage ?? ''))
     .map(({ key: _, ...row }) => row)

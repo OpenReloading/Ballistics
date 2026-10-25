@@ -578,6 +578,40 @@ describe('random input', () => {
   const pick = <T>(xs: T[]) => xs[Math.floor(rnd() * xs.length)]
   const maybe = <T>(x: T) => (rnd() < 0.5 ? x : undefined)
 
+  const meplatShare = (form: string | undefined, tipType: string | undefined) => {
+    if (form === 'flat-nose') return 0.6
+    return tipType === 'hollow-point' || tipType === 'soft-point' ? 0.15 : 0
+  }
+  const validBase = (
+    type: NonNullable<BulletDimensions['base']>['type'],
+    tail: number,
+    dia: number,
+  ) => ({
+    type,
+    ...(tail > 0 && { length: tail }),
+    ...(tail > 0 && rnd() < 0.5 && { diameter: dia * (0.75 + 0.2 * rnd()) }),
+  })
+  const validOgive = (form: string) => ({
+    form,
+    ...((form === 'secant' || form === 'hybrid') &&
+      rnd() < 0.7 && { radiusRatio: form === 'hybrid' ? 0.3 + 0.6 * rnd() : rnd() }),
+  })
+  const arbitraryBase = () => ({
+    type: pick(['flat', 'boat-tail', 'rebated-boat-tail'] as const),
+    ...(rnd() < 0.6 && { length: 8 * rnd() }),
+    ...(rnd() < 0.4 && { diameter: 10 * rnd() }),
+    ...(rnd() < 0.4 && { angle: 20 * rnd() }),
+  })
+  const arbitraryOgive = () => ({
+    form: pick(['tangent', 'secant', 'hybrid', 'round-nose', 'flat-nose']),
+    ...(rnd() < 0.5 && { radiusRatio: rnd() }),
+    ...(rnd() < 0.3 && { radius: 60 * rnd() }),
+  })
+  const arbitraryTip = () => ({
+    type: pick(['hollow-point', 'polymer-tip', 'soft-point']),
+    ...(rnd() < 0.5 && { length: 10 * rnd(), mouthDiameter: 3 * rnd() }),
+  })
+
   /** A consistent input: every part fits the length and every radius is below the bullet radius. */
   function valid(): BulletDimensions {
     const dia = 4 + 10 * rnd()
@@ -594,8 +628,7 @@ describe('random input', () => {
       undefined,
     ])
     const meplat = maybe(dia * 0.4 * rnd())
-    const share =
-      form === 'flat-nose' ? 0.6 : tipType === 'hollow-point' || tipType === 'soft-point' ? 0.15 : 0
+    const share = meplatShare(form, tipType)
     const drop = r - (meplat ?? share * dia) / 2
     const room = len - tail
     // ogive forms need a nose at least as long as the radial drop
@@ -610,20 +643,8 @@ describe('random input', () => {
       length: len,
       noseLength: n,
       ...(meplat !== undefined && { meplatDiameter: meplat }),
-      ...(type && {
-        base: {
-          type,
-          ...(tail > 0 && { length: tail }),
-          ...(tail > 0 && rnd() < 0.5 && { diameter: dia * (0.75 + 0.2 * rnd()) }),
-        },
-      }),
-      ...(form && {
-        ogive: {
-          form,
-          ...((form === 'secant' || form === 'hybrid') &&
-            rnd() < 0.7 && { radiusRatio: form === 'hybrid' ? 0.3 + 0.6 * rnd() : rnd() }),
-        },
-      }),
+      ...(type && { base: validBase(type, tail, dia) }),
+      ...(form && { ogive: validOgive(form) }),
       ...(tipType && { tip: { type: tipType } }),
       ...(groove && { cannelure: groove }),
     }
@@ -647,27 +668,9 @@ describe('random input', () => {
         ...(rnd() < 0.7 && { noseLength: 1.2 * len * rnd() }),
         ...(rnd() < 0.3 && { bearingLength: len * rnd() }),
         ...(rnd() < 0.4 && { meplatDiameter: 8 * rnd() }),
-        ...(rnd() < 0.6 && {
-          base: {
-            type: pick(['flat', 'boat-tail', 'rebated-boat-tail'] as const),
-            ...(rnd() < 0.6 && { length: 8 * rnd() }),
-            ...(rnd() < 0.4 && { diameter: 10 * rnd() }),
-            ...(rnd() < 0.4 && { angle: 20 * rnd() }),
-          },
-        }),
-        ...(rnd() < 0.6 && {
-          ogive: {
-            form: pick(['tangent', 'secant', 'hybrid', 'round-nose', 'flat-nose']),
-            ...(rnd() < 0.5 && { radiusRatio: rnd() }),
-            ...(rnd() < 0.3 && { radius: 60 * rnd() }),
-          },
-        }),
-        ...(rnd() < 0.5 && {
-          tip: {
-            type: pick(['hollow-point', 'polymer-tip', 'soft-point']),
-            ...(rnd() < 0.5 && { length: 10 * rnd(), mouthDiameter: 3 * rnd() }),
-          },
-        }),
+        ...(rnd() < 0.6 && { base: arbitraryBase() }),
+        ...(rnd() < 0.6 && { ogive: arbitraryOgive() }),
+        ...(rnd() < 0.5 && { tip: arbitraryTip() }),
         ...(rnd() < 0.3 && { cannelure: { start: len * rnd(), width: 2 * rnd() } }),
       }
       const o = bulletOutline(b)
