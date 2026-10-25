@@ -6,12 +6,15 @@
  */
 import { writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
+import { resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { buildOpenApi } from '@openreloading/api/openapi'
-import { confined } from './confined.ts'
 
 const arg = process.argv[2]
 if (!arg) throw new Error('usage: node src/openapi.ts <file>')
 const roots = [fileURLToPath(new URL('../../', import.meta.url)), tmpdir()]
 if (process.env.RUNNER_TEMP) roots.push(process.env.RUNNER_TEMP)
-writeFileSync(confined(arg, roots), `${JSON.stringify(await buildOpenApi(), null, 2)}\n`)
+const target = resolve(arg)
+if (!roots.some((root) => target.startsWith(`${resolve(root)}${sep}`)))
+  throw new Error(`${arg} is outside ${roots.join(', ')}`)
+writeFileSync(target, `${JSON.stringify(await buildOpenApi(), null, 2)}\n`)
