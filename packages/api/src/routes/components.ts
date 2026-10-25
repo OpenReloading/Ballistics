@@ -1,8 +1,17 @@
 import { bullet, constructionFields, manufacturer, powder } from '@open-reloading/schema'
 import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
-import type { BulletQuery, Catalogue } from '../catalogue/types.ts'
-import { idParams, listQuery, missing, page, recordIdPattern, stored } from './common.ts'
+import type { BulletQuery, Catalogue, Catalogued } from '../catalogue/types.ts'
+import {
+  idParams,
+  listQuery,
+  missing,
+  page,
+  recordIdPattern,
+  revised,
+  revision,
+  stored,
+} from './common.ts'
 
 const powderQuery = listQuery({
   manufacturer: {
@@ -118,7 +127,7 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
       'bullet',
       bulletQuery,
       bulletList,
-      bullet,
+      bullet.extend({ revision }),
       'Each item carries diameter (mm), mass (g), length (mm), the first G1 and G7 ballistic coefficients, tip type and construction.',
     ],
   ] as const) {
@@ -146,13 +155,15 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
           errors: [404],
           moved: true,
           summary: `Get a ${noun}`,
-          description: `The whole ${noun} record with its provenance.`,
+          description: `The whole ${noun} record with its provenance.${noun === 'bullet' ? ' `revision` is a hash of the stored record that changes with any field.' : ''}`,
         },
       },
       (request, reply) => {
         const found = catalogue.get(noun, request.params.id)
         if (!found) return missing(reply, catalogue, `${noun}s` as const, request.params.id, noun)
-        return reply.send(stored(found))
+        return reply.send(
+          noun === 'bullet' ? revised(found as Catalogued<'bullet'>) : stored(found),
+        )
       },
     )
   }

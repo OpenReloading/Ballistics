@@ -208,6 +208,20 @@ describe('userDataFile', () => {
       expect(basedOn(bad)).toBe(false)
   })
 
+  it('keeps the revision the base had at save, for a bullet and a cartridge', () => {
+    const bullet = {
+      ...bulletRecord,
+      data: { ...bulletRecord.data, basedOnRevision: '0a1b2c3d4e5f60' },
+    }
+    const cartridge = {
+      ...cartridgeRecord,
+      data: { origin: 'user', basedOn: 'catalogue:308-win', basedOnRevision: '0a1b2c3d4e5f60' },
+    }
+    expect(userDataFile.parse(file([bullet, cartridge])).records).toEqual([bullet, cartridge])
+    const empty = { ...bullet, data: { ...bullet.data, basedOnRevision: '' } }
+    expect(userRecord.safeParse(empty).success).toBe(false)
+  })
+
   it('saves a variant of a bullet without a base, a mass or a manufacturer', () => {
     const alone = {
       ...bulletRecord,

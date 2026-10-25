@@ -19,6 +19,15 @@ const basedOnRef = (kind: string) =>
     `Reference \`catalogue:<record id>\` to the catalogue ${kind} the record is based on. Its fields not in \`overrides\` follow that record.`,
   )
 
+/** The revision of the base record when a variant was saved, to tell later that the base changed. */
+const basedOnRevision = z
+  .string()
+  .min(1)
+  .max(64)
+  .describe(
+    'The `revision` the base record had when the record was saved. A different revision on opening means the base changed since.',
+  )
+
 /**
  * A bullet of the user: the catalogue bullet it is based on and the fields it overrides, or the
  * fields it gives alone. Lengths in mm, mass in g, angles in degrees.
@@ -28,6 +37,7 @@ export const userBullet = z.strictObject({
   origin: z.literal('user').describe('Where the record lives: `user`.'),
   manufacturer: ref('manufacturer').optional(),
   basedOn: basedOnRef('bullet').optional(),
+  basedOnRevision: basedOnRevision.optional(),
   overrides: bulletOverrides
     .describe(
       'The fields that differ from the base record, or all fields without one. A `null` removes a field of the base.',
@@ -43,6 +53,7 @@ export const userBullet = z.strictObject({
 export const userCartridge = z.object({
   origin: z.literal('user').describe('Where the record lives: `user`.'),
   basedOn: basedOnRef('cartridge').optional(),
+  basedOnRevision: basedOnRevision.optional(),
   overrides: cartridgeOverrides
     .describe(
       'The fields and spec values that differ from the base record, or all of them without one. A value with `null` removes the base value of its side, symbol and variant.',

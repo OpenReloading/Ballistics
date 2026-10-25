@@ -105,7 +105,7 @@ A user variant is `basedOn` plus `overrides`, a partial of the same entity schem
 
 - The resolved record is the base with the overrides applied, by one pure function used by the web app, the importers and the compute routes.
 - Objects merge by key and arrays replace as a whole. Cartridge `values` merge by `(side, symbol, variant)`, the key that already identifies a value. An explicit `null` removes a field.
-- A field the user did not override follows the catalogue. `basedOn` carries the build hash seen at save, so the page can say the base changed.
+- A field the user did not override follows the catalogue. The user record keeps the base's `revision` seen at save as `basedOnRevision` next to `basedOn`, so the page can say the base changed.
 - A `basedOn` that no longer resolves opens the record read only with the error shown. It is never replaced by a copy.
 
 ### Units
@@ -190,7 +190,8 @@ Steps 1, 2 and 11 go first, then 3, then 4 to 6, then 7 to 9. Steps 10 and 12 fi
 - A `basedOn` the catalogue no longer has opens the design read only with the reason shown, and its stored data is saved as it is. A base the API could not be asked is told apart from a missing one. Lists and pickers leave such designs out.
 - A workbench state's `cartridge` and `bullet` take a plain catalogue id (as before) or a reference. A load saved on a design keeps `user:<UUID>` and reopens with the design resolved against its base. `checkUserRefs` also reports such a reference when no user record answers it. A design whose id is no UUID (an older record) cannot be referenced and a load made on it keeps no design.
 - A load file sent to `POST /v1/interior/load-file` and the compute routes take the catalogue reference of a cartridge or bullet and refuse a `user:` reference (400 at `records[i].data.cartridge` or `.bullet`): a user record is resolved in the browser, never on the server. The OpenAPI baseline is rewritten for this.
-- Not part of this step: the "base changed" display and the build hash in `basedOn` (the API answers records without a `revision`), and share links that carry `user:` references.
+- `GET /v1/bullets/{id}` and `GET /v1/cartridges/{id}` (and the Pages edition's data files of the same records) answer with `revision`, a hash of the stored record that changes with any field. A user bullet or cartridge keeps the revision of its base at save in the optional `basedOnRevision` (`userBullet`, `userCartridge`), a sibling of `basedOn` so that a saved design stays valid. The OpenAPI baseline is rewritten for the new field.
+- Not part of this step: share links that carry `user:` references.
 
 ### Step 5: what changed
 
