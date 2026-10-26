@@ -1,4 +1,10 @@
-import type { Bullet, Case, Powder, TargetFace, TargetMapping } from '@open-reloading/schema'
+import type {
+  Bullet,
+  CatalogueCase,
+  Powder,
+  TargetFace,
+  TargetMapping,
+} from '@open-reloading/schema'
 import { cacheLife } from 'next/cache'
 import { PHASE_PRODUCTION_BUILD } from 'next/constants'
 import type {
@@ -83,7 +89,7 @@ const getOne =
 export const getCartridge = getOne<CartridgeDetail>('/cartridges')
 export const getBullet = getOne<Bullet>('/bullets')
 export const getPowder = getOne<Powder>('/powders')
-export const getCase = getOne<Case>('/cases')
+export const getCase = getOne<CatalogueCase>('/cases')
 export const getTargetFace = getOne<TargetFace>('/target-faces')
 export const getTargetMapping = getOne<TargetMapping>('/target-mappings')
 export const getDiscipline = getOne<DisciplineRecord>('/disciplines')

@@ -7,12 +7,17 @@ export const metadata: Metadata = { title: 'Offline', robots: { index: false } }
 
 /** The service worker's answer for a page never opened on this device while offline. */
 export default function Offline() {
-  // the tools and the user's own records (Firearms) open offline
+  // the tools and the user's own records (Firearms, My cases) open offline
   const [tools, data] = sections
   return (
     <>
       <PageBar title="Offline" />
-      <OfflineState links={[...tools.pages, ...data.pages.filter((p) => p.href === '/firearms')]} />
+      <OfflineState
+        links={[
+          ...tools.pages,
+          ...data.pages.filter((p) => p.href === '/firearms' || p.href === '/my-cases'),
+        ]}
+      />
     </>
   )
 }

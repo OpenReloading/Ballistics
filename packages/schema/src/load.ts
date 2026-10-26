@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { catalogueRef, recordId, ref } from './ids.ts'
+import { recordId, ref } from './ids.ts'
 import { type Provenance, provenance } from './provenance.ts'
 import { text } from './shared.ts'
 import { type QuantityKind, quantity, units } from './units.ts'
@@ -206,9 +206,9 @@ const loadShape = z.object({
       manufacturer: component.manufacturer.optional(),
       lot: component.lot,
       firingCount: z.int().min(0).describe('Times the case was fired before this load.').optional(),
-      record: catalogueRef('case')
+      record: ref('case')
         .describe(
-          'The case product of the catalogue. Its stated water capacity is the default of `capacity`.',
+          'The case: a catalogue product, whose stated water capacity is the default of `capacity`, or a case group of the user.',
         )
         .optional(),
     })
@@ -257,6 +257,8 @@ const checkCatalogueFields = (l: LoadFields, issue: LoadIssue) => {
     if (l[k] === undefined) issue([k], `A catalogue load needs a ${k}`)
   if (l.capacity !== undefined && !l.capacity.startsWith('catalogue:'))
     issue(['capacity'], 'A catalogue load names catalogue records only')
+  if (l.case?.record !== undefined && !l.case.record.startsWith('catalogue:'))
+    issue(['case', 'record'], 'A catalogue load names catalogue records only')
 }
 
 const checkComponentMakers = (l: LoadFields, issue: LoadIssue) => {

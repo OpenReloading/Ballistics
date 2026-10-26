@@ -34,6 +34,7 @@ import type { StripFigure } from '../lib/barrel-strip.ts'
 import { designShape } from '../lib/bullet-designer.ts'
 import { drawable } from '../lib/cartridge-sheet.ts'
 import { renamedCasePath, type UsedWater, usedWater } from '../lib/case-capacity.ts'
+import type { OwnCase } from '../lib/case-group.ts'
 import type { FieldValue } from '../lib/field-spec.ts'
 import { figureViews } from '../lib/figure-views.ts'
 import type { Suggestion } from '../lib/input-defaults.ts'
@@ -267,6 +268,10 @@ type PreviewProps = {
   /** The case record chosen, held by the page so a load keeps it: its stated capacity is the default of the capacity. */
   caseId?: string | undefined
   onCaseId?: (id: string | undefined) => void
+  /** The user's groups of cases of this cartridge, and the one chosen: its measured capacity is the page's measured capacity. */
+  ownCases?: readonly OwnCase[] | undefined
+  ownCaseId?: string | undefined
+  onOwnCaseId?: (id: string | undefined) => void
   /**
    * The bullet record or design of the page's own bullet input: the preview seats it and
    * shows no bullet search or design choice of its own.
@@ -1068,19 +1073,44 @@ function BulletStatus({ m }: { m: Model }) {
 function CaseChoice({ m }: { m: Model }) {
   const { caseList, names } = m
   const items = caseList.status === 'ok' ? caseList.value.items : []
-  if (items.length === 0) return null
+  const own = m.p.ownCases ?? []
+  const ownId = m.p.ownCaseId
+  if (items.length === 0 && own.length === 0 && !ownId) return null
+  const ownItems = [
+    ...own.map((c) => ({ value: `user:${c.id}`, label: ownCaseText(c) })),
+    // a load names a group this browser does not have
+    ...(ownId && !own.some((c) => c.id === ownId)
+      ? [{ value: `user:${ownId}`, label: 'A case group not in this browser' }]
+      : []),
+  ]
   return (
     <NativeSelect
       label="Case record"
-      value={m.chosenCase?.id ?? ''}
-      onChange={(e) => m.setCaseId(e.currentTarget.value || undefined)}
+      value={ownId ? `user:${ownId}` : (m.chosenCase?.id ?? '')}
+      onChange={(e) => {
+        const v = e.currentTarget.value
+        if (v.startsWith('user:')) m.p.onOwnCaseId?.(v.slice('user:'.length))
+        else m.setCaseId(v || undefined)
+      }}
       data={[
         { value: '', label: 'None' },
-        ...items.map((c) => ({ value: c.id, label: caseText(c, names) })),
+        ...(ownItems.length > 0 ? [{ group: 'Your cases', items: ownItems }] : []),
+        ...(items.length > 0
+          ? [
+              {
+                group: 'Products',
+                items: items.map((c) => ({ value: c.id, label: caseText(c, names) })),
+              },
+            ]
+          : []),
       ]}
     />
   )
 }
+
+/** A group of the user's cases: its name and its measured water, which the workbench takes as measured. */
+const ownCaseText = (c: OwnCase) =>
+  c.grams === undefined ? c.name : `${c.name}: ${c.grams} g water, measured`
 
 /** The case record's description: its product, and its stated water when it has one. */
 function caseText(c: CaseSummary, names: Model['names']) {

@@ -8,4 +8,5 @@ export const listTitles = {
   disciplines: 'Disciplines',
   federations: 'Federations',
   firearms: 'Firearms',
+  myCases: 'My cases',
 }

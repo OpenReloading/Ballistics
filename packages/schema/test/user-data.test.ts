@@ -109,6 +109,22 @@ const firearmRecord = {
   },
 } as const
 
+const caseUuid = '5d6e7f80-1a2b-4c3d-8e4f-5a6b7c8d9e0f'
+const caseRecord = {
+  kind: 'case',
+  id: caseUuid,
+  name: 'Match brass, lot 3',
+  saved,
+  data: {
+    origin: 'user',
+    name: 'Match brass, lot 3',
+    cartridge: 'catalogue:308-win',
+    material: 'brass',
+    numberOfFirings: 3,
+    trimLength: { value: 51.1 },
+  },
+} as const
+
 const sheetRecord = {
   kind: 'targetSheet',
   id: 't1',
@@ -186,9 +202,18 @@ describe('userDataFile', () => {
           sheetRecord,
           faceRecord,
           powderRecord,
+          caseRecord,
         ]),
       ).success,
     ).toBe(true)
+  })
+
+  it('keeps a case group and its measured fields through a round trip', () => {
+    const json = JSON.parse(JSON.stringify(file([caseRecord])))
+    expect(userDataFile.parse(json).records).toEqual([caseRecord])
+    expect(
+      userRecord.safeParse({ ...caseRecord, data: { ...caseRecord.data, material: 1 } }).success,
+    ).toBe(false)
   })
 
   it('takes a powder draft with missing values and keeps it through a round trip', () => {
@@ -595,6 +620,19 @@ describe('userRefFields', () => {
     expect(userRefFields(bullet)).toEqual(['manufacturer'])
   })
 
+  it('names the user references of a case group and of a load that names one', () => {
+    const group = userRecord.parse({
+      ...caseRecord,
+      data: { ...caseRecord.data, cartridge: `user:${other}`, capacity: `user:${designUuid}` },
+    })
+    expect(userRefFields(group)).toEqual(['cartridge', 'capacity'])
+    const load = userRecord.parse({
+      ...loadRecord,
+      data: { ...loadRecord.data, case: { lot: 'A', record: `user:${caseUuid}` } },
+    })
+    expect(userRefFields(load)).toEqual(['case.record'])
+  })
+
   it('names none for a record that refers to the catalogue alone', () => {
     expect(userRefFields(userRecord.parse(loadRecord))).toEqual([])
     expect(userRefFields(userRecord.parse(bulletRecord))).toEqual([])
@@ -722,6 +760,20 @@ describe('checkUserRefs', () => {
     expect(
       checkUserRefs([{ ...userRecord.parse(cartridgeRecord), id: uuid }, capacity]),
     ).toHaveLength(1)
+  })
+
+  it('reports a case group whose capacity record nobody answers, and a load whose case group is missing', () => {
+    const group = userRecord.parse({
+      ...caseRecord,
+      data: { ...caseRecord.data, capacity: `user:${other}` },
+    })
+    expect(checkUserRefs([group]).map((d) => [d.kind, d.field])).toEqual([['case', 'capacity']])
+    const load = userRecord.parse({
+      ...loadRecord,
+      data: { ...loadRecord.data, case: { lot: 'A', record: `user:${caseUuid}` } },
+    })
+    expect(checkUserRefs([load]).map((d) => d.field)).toEqual(['case.record'])
+    expect(checkUserRefs([load, userRecord.parse(caseRecord)])).toEqual([])
   })
 
   it('reports a target sheet whose load is missing', () => {
