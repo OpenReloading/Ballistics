@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { recordId, ref } from './ids.ts'
+import { catalogueRef, recordId, ref } from './ids.ts'
 import { type Provenance, provenance } from './provenance.ts'
 import { text } from './shared.ts'
 import { type QuantityKind, quantity, units } from './units.ts'
