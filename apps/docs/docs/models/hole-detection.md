@@ -190,13 +190,15 @@ $$
 1.2\, \operatorname{median}_\mathrm{low} D_\mathrm{part} \lt D_\mathrm{part} \le 1.4\, D \Rightarrow \text{kept}
 $$
 
+Code: `apps/web/src/lib/hole-detection.ts`, `printAmong`, `HOLE_ON_PRINT`, `SIZE_MAX`.
+
 The face plane is found without a turn of its own, so the axes are turned by the angle $\phi$ from the nearest axis that most marks in the numeral rings share within 2 degrees (when those give none, the marks where the quarter marks stand), the axes repeating every quarter turn. It needs three marks at least, two of them at one radius (within 3 %) on two axes as the numerals of a ring stand, else it is 0:
 
 $$
 \phi = \arg\max_{\phi_i} \#\left\{ j : \left\lvert \phi_j - \phi_i \right\rvert_{\mathrm{mod}\ 90^\circ} \le 2^\circ \right\}
 $$
 
-Code: `apps/web/src/lib/hole-detection.ts`, `dropPrintMarks`, `printAmong`, `numeralRoll`, `ROLL_SPREAD`, `polar`, `PRINT_CONFIDENCE`, `NUMERALS_MIN`, `HOLE_ON_PRINT`. `apps/web/src/lib/target-face.ts`, `faceLabel`, `QUARTER_WIDTH`, `QUARTER_REACH`.
+Code: `apps/web/src/lib/hole-detection.ts`, `dropPrintMarks`, `numeralRoll`, `ROLL_SPREAD`, `polar`, `PRINT_CONFIDENCE`, `NUMERALS_MIN`. `apps/web/src/lib/target-face.ts`, `faceLabel`, `QUARTER_WIDTH`, `QUARTER_REACH`.
 
 ### Target area
 
