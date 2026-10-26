@@ -363,8 +363,12 @@ function cannelureOf(o: Outline, s: Shank, put: Put) {
   const tol = Math.max(2, 4 * s.sigma)
   let run: [number, number] | undefined
   let area = 0
-  for (let i = s.first; i <= s.last; i++) {
-    if (at(o.r, i) >= s.rRef - tol) continue
+  let i = s.first
+  while (i <= s.last) {
+    if (at(o.r, i) >= s.rRef - tol) {
+      i++
+      continue
+    }
     let j = i
     let a = 0
     while (j <= s.last && at(o.r, j) < s.rRef - tol) a += s.rRef - at(o.r, j++)

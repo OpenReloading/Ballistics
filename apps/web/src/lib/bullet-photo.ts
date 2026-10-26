@@ -52,8 +52,9 @@ const rowOf = (a: number[][], i: number) => a[i] as number[]
 export function solve(m: readonly number[], b: readonly number[], n: number): number[] | undefined {
   const a = Array.from({ length: n }, (_, i) => [...m.slice(i * n, i * n + n), at(b, i)])
   for (let c = 0; c < n; c++) {
-    const p = Array.from({ length: n - c }, (_, k) => c + k).reduce((best, r) =>
-      Math.abs(at(rowOf(a, r), c)) > Math.abs(at(rowOf(a, best), c)) ? r : best,
+    const p = Array.from({ length: n - c }, (_, k) => c + k).reduce(
+      (best, r) => (Math.abs(at(rowOf(a, r), c)) > Math.abs(at(rowOf(a, best), c)) ? r : best),
+      c,
     )
     const pivot = rowOf(a, p)
     if (Math.abs(at(pivot, c)) < 1e-12) return

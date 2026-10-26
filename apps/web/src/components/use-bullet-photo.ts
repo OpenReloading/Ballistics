@@ -78,6 +78,8 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
   const photo = useRef<HTMLCanvasElement | null>(null)
   const tint = useRef<HTMLCanvasElement | null>(null)
   const edited = useRef(false)
+  /** Counts the brush strokes, so a cut-out that was asked for before a stroke is dropped when it arrives. */
+  const strokes = useRef(0)
   const [size, setSize] = useState<{ width: number; height: number }>()
   const [cut, setCut] = useState<Cut>()
   const [points, setPoints] = useState<Point[]>([])
@@ -101,8 +103,10 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
     async (exclude: Point[]) => {
       if (!(size && tint.current)) return
       setBusy('Cutting out the bullet…')
+      const asked = strokes.current
       const r = await ask({ kind: 'segment', exclude })
       setBusy(undefined)
+      if (strokes.current !== asked) return
       if (r.kind === 'error') return setFailure(r.message)
       if (r.kind !== 'segmented' || !tint.current) return
       tintOf(r.alpha, size.width, size.height, tint.current)
@@ -116,7 +120,9 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
   // the scale points keep the ruler out of the cut-out: cut again when they move, unless the cut-out was corrected by hand
   useEffect(() => {
     if (!size || edited.current) return
-    const t = setTimeout(() => void cutOut(points), 250)
+    const t = setTimeout(() => {
+      if (!edited.current) void cutOut(points)
+    }, 250)
     return () => clearTimeout(t)
   }, [size, points, cutOut])
 
@@ -229,6 +235,7 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
     ]
     tintBox(cut.alpha, size.width, tint.current, box)
     edited.current = true
+    strokes.current++
     setCut({ alpha: cut.alpha, rev: cut.rev + 1 })
   }
 
@@ -268,7 +275,10 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
     read,
     sample,
     stamp,
-    cutAgain: () => void cutOut(points),
+    cutAgain: () => {
+      edited.current = false
+      void cutOut(points)
+    },
     edited,
   }
 }

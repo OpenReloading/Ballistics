@@ -443,7 +443,7 @@ export function BulletDesigner() {
           onClose={() => setPhotoOpen(false)}
           system={system}
           record={design.origin}
-          onOpen={(d) => void begin(d)}
+          onOpen={begin}
         />
       )}
       <div className="page-panel-head designer-panel-head">

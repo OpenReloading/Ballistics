@@ -21,13 +21,15 @@ $$
 k = \frac{\ell}{L}, \qquad \frac{u(k)}{k} = \frac{\sqrt{2}\, u_p}{\ell}
 $$
 
+Code: `apps/web/src/lib/bullet-photo.ts`, `scaleOf`, `pointUncertainty`.
+
 with $u_p = 1$ px the standard uncertainty of one placed point (the aim and the width of a graduation line). Two spans give the mean $\bar k$, the placement terms averaged in quadrature and, for their disagreement, a rectangular distribution of half-width $\Delta/2$, $\Delta = k_\mathrm{max} - k_\mathrm{min}$, divided by $\sqrt{3}$:
 
 $$
 \frac{u(\bar k)}{\bar k} = \sqrt{\left(\frac{1}{n}\sqrt{\sum_i \frac{2\, u_p^2}{\ell_i^2}}\right)^2 + \left(\frac{\Delta}{2\sqrt{3}\,\bar k}\right)^2}
 $$
 
-Code: `apps/web/src/lib/bullet-photo.ts`, `scaleOf`, `pointUncertainty`.
+Code: `apps/web/src/lib/bullet-photo.ts`, `scaleOf`.
 
 ### Cut-out
 
@@ -47,6 +49,8 @@ $$
 \theta = \tfrac{1}{2} \operatorname{atan2}\left(2 \mu_{xy},\; \mu_{xx} - \mu_{yy}\right)
 $$
 
+Code: `apps/web/src/lib/bullet-photo-outline.ts`, `momentsOf`.
+
 with $\mu$ the central second moments. It is then turned and shifted over four passes of a least squares line through the middles of the two edges of every column (columns at least 0.3 of the widest), until the middle of both edges lies on it: the symmetry line. Along it, the position of each edge at half coverage is found by linear interpolation of the bilinear coverage, at every pixel step. This gives the half width $r(z)$, with $z$ from the base to the tip. The nose end is the end whose taper to 90 % of the widest width is longer; when the two differ by less than 15 % the tool says so and the user can flip the nose or type the axis direction.
 
 Code: `apps/web/src/lib/bullet-photo-outline.ts`, `fitOutline`.
@@ -59,6 +63,8 @@ $$
 u(a)^2 = \tfrac{1}{2} u_e^2 + \frac{\sigma_a^2}{\max(1, n/4)}
 $$
 
+Code: `apps/web/src/lib/bullet-photo-measure.ts`, `shankOf`.
+
 with $u_e = 0.3$ px the standard uncertainty of an edge position (a uniform rounding error of one pixel, $1/\sqrt{12} \approx 0.29$ px, plus the grey's noise) and $n$ the number of samples. The diameter is $d = 2a$.
 
 A **boat tail** is present when the radius at the base is lower than $a$ by more than 4 % (at least 2.5 px). Its cone is the line $r = r_0 + c z$ fitted to the lower part of the cone, and
@@ -67,6 +73,8 @@ $$
 z_b = \frac{a - r_0}{c}, \qquad \text{base diameter } 2 r_0, \qquad \text{angle } \arctan c
 $$
 
+Code: `apps/web/src/lib/bullet-photo-measure.ts`, `boatTailOf`.
+
 where $z_b$ is the boat tail length.
 
 The **nose** is a circle of radius $\rho$ and centre $(r_c, z_c)$ in the $(r, z)$ plane, fitted by minimising the distances of the profile points between the shank and the tip to the circle (a geometric fit, [Coope 1993](../bibliography.md#coope-1993), started from the algebraic fit of [Kasa 1976](../bibliography.md#kasa-1976)) with Levenberg-Marquardt ([Levenberg 1944](../bibliography.md#levenberg-1944), [Marquardt 1963](../bibliography.md#marquardt-1963)). Two circles are fitted: a free one (a secant ogive) and one tangent to the shank, $r_c = a - \rho$. The secant circle is taken when it lowers the residual sum of squares by more than nine times the variance of the edge noise (three standard deviations); otherwise the tangent circle is taken. Then, with the circle's end on the shank $z_j$, the tip $z_t$ and the meplat radius $m$ where the circle meets $z_t$:
@@ -74,6 +82,8 @@ The **nose** is a circle of radius $\rho$ and centre $(r_c, z_c)$ in the $(r, z)
 $$
 \text{nose length } n = z_t - z_j, \qquad h = a - m, \qquad \frac{R_t}{R} = \frac{n^2 + h^2}{2 h \rho}
 $$
+
+Code: `apps/web/src/lib/bullet-photo-measure.ts`, `noseOf`, `noseFit`.
 
 A tangent nose gives $R_t/R = 1$ and no radius to the designer; a secant nose gives its radius $\rho$ and the designer derives $R_t/R$ from the nose length. The meplat diameter is $2m$. The bearing length is $z_j - z_b$ and the length is the tip's position (a pointed tip is thinner than a pixel at its end, so the circle's end on the axis is taken then, with an uncertainty of 1 px).
 
@@ -91,15 +101,17 @@ $$
 u_\mathrm{px}(f)^2 = \nabla f^\mathsf{T}\, \Sigma\, \nabla f
 $$
 
+Code: `apps/web/src/lib/bullet-photo-measure.ts`, `propagate`.
+
 with a numeric gradient. A value in mm is $v = f/k$ and the scale's relative uncertainty joins in quadrature:
 
 $$
 u(v)^2 = \left(\frac{u_\mathrm{px}}{k}\right)^2 + \left(v\, \frac{u(k)}{k}\right)^2
 $$
 
-Ratios and angles take the scale out and carry the fit's uncertainty only.
+Code: `apps/web/src/lib/bullet-photo-measure.ts`, `measureOutline`.
 
-Code: `apps/web/src/lib/bullet-photo-measure.ts`, `propagate`, `lsq`, `measureOutline`.
+Ratios and angles take the scale out and carry the fit's uncertainty only. The fits' covariance comes from `lsq`.
 
 ## Symbols
 

@@ -171,7 +171,7 @@ function PhotoTool({
 }: {
   system: UnitSystem
   record: Design['origin']
-  onOpen: (d: Design) => void
+  onOpen: (d: Design) => Promise<boolean>
 }) {
   const t = useBulletPhoto(system, record)
   const { size, points, found, scale, drawing } = t
@@ -340,7 +340,10 @@ function PhotoTool({
         <MessageSlot label="Photograph messages" messages={messages} />
         {t.rows.length > 0 && <ValuesTable rows={t.rows} system={system} record={record} />}
         <Flex gap="xs" mt="sm" align="center" wrap="wrap">
-          <Button disabled={!(t.design && drawing)} onClick={() => t.design && onOpen(t.design)}>
+          <Button
+            disabled={!(t.design && drawing)}
+            onClick={() => t.design && void onOpen(t.design)}
+          >
             Open in designer
           </Button>
           <Text fz="sm" c="dimmed">
@@ -365,7 +368,8 @@ export function BulletPhoto({
   onClose: () => void
   system: UnitSystem
   record: Design['origin']
-  onOpen: (d: Design) => void
+  /** Resolves true when the designer took the design, false when the user kept their unsaved one. */
+  onOpen: (d: Design) => Promise<boolean>
 }) {
   const phone = useMediaQuery('(max-width: 47.99em)')
   return (
@@ -380,9 +384,10 @@ export function BulletPhoto({
       <PhotoTool
         system={system}
         record={record}
-        onOpen={(d) => {
-          onOpen(d)
-          onClose()
+        onOpen={async (d) => {
+          const taken = await onOpen(d)
+          if (taken) onClose()
+          return taken
         }}
       />
     </AppModal>
