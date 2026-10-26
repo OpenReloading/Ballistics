@@ -78,6 +78,15 @@ const spec = (
   help: string,
 ): PowderSpec => ({ key, label, quantity, kind, group, help })
 
+/** A field of the burn law; without a quantity it is a plain number. */
+const burn = (
+  key: string,
+  label: string,
+  help: string,
+  quantity: Quantity = 'ratio',
+  kind: QuantityKind = 'dimensionless',
+): PowderSpec => spec(key, label, quantity, kind, 'burn', help)
+
 /** The three numbers of a computed range of the thermochemistry. */
 const range = (
   name: string,
@@ -150,116 +159,72 @@ export const powderSpecs: readonly PowderSpec[] = [
     'specificVolume',
     'Covolume of the combustion gas, with its extremes.',
   ),
-  spec(
+  burn(
     'interior.vivacity.value',
     'Vivacity',
+    'Burn rate scale of the vivacity law at the reference pressure.',
     'vivacity',
     'burnRate',
-    'burn',
-    'Burn rate scale of the vivacity law at the reference pressure.',
   ),
-  spec(
+  burn(
     'interior.energy.value',
     'Specific energy',
-    'specificEnergy',
-    'specificEnergy',
-    'burn',
     'Specific energy of the powder at constant volume.',
+    'specificEnergy',
+    'specificEnergy',
   ),
-  spec(
-    'interior.gamma',
-    'Gamma',
-    'ratio',
-    'dimensionless',
-    'burn',
-    'Ratio of specific heats of the gas; above 1.',
-  ),
-  spec(
-    'interior.covolume.value',
-    'Covolume',
-    'covolume',
-    'specificVolume',
-    'burn',
-    'Covolume of the gas.',
-  ),
-  spec(
+  burn('interior.gamma', 'Gamma', 'Ratio of specific heats of the gas; above 1.'),
+  burn('interior.covolume.value', 'Covolume', 'Covolume of the gas.', 'covolume', 'specificVolume'),
+  burn(
     'interior.density.value',
     'Grain density',
-    'density',
-    'density',
-    'burn',
     'Solid density of the grains.',
+    'density',
+    'density',
   ),
-  spec(
+  burn(
     'interior.pressureExponent',
     'Pressure exponent',
-    'ratio',
-    'dimensionless',
-    'burn',
     'Exponent of the pressure in the burn law.',
   ),
-  spec(
+  burn(
     'interior.referencePressure.value',
     'Reference pressure',
-    'pressure',
-    'pressure',
-    'burn',
     'Pressure at which the vivacity holds.',
+    'pressure',
+    'pressure',
   ),
-  spec(
+  burn(
     'interior.ignitionPressure.value',
     'Ignition pressure',
-    'pressure',
-    'pressure',
-    'burn',
     'Pressure at which the grains start to burn.',
+    'pressure',
+    'pressure',
   ),
-  spec(
+  burn(
     'interior.startPressure.value',
     'Start pressure',
-    'pressure',
-    'pressure',
-    'burn',
     'Pressure at which the bullet starts to move. Empty: the default of the solver.',
+    'pressure',
+    'pressure',
   ),
-  spec(
+  burn(
     'interior.propellantTemperature.value',
     'Propellant temperature',
-    'temperature',
-    'temperature',
-    'burn',
     'Temperature of the propellant the parameters were fitted at.',
+    'temperature',
+    'temperature',
   ),
-  spec(
-    'interior.burnForm.a.value',
-    'Form a',
-    'ratio',
-    'dimensionless',
-    'burn',
-    'Form parameter a of the two-stage burn form.',
-  ),
-  spec(
-    'interior.burnForm.m',
-    'Form m',
-    'ratio',
-    'dimensionless',
-    'burn',
-    'Form parameter m of the two-stage burn form.',
-  ),
-  spec(
+  burn('interior.burnForm.a.value', 'Form a', 'Form parameter a of the two-stage burn form.'),
+  burn('interior.burnForm.m', 'Form m', 'Form parameter m of the two-stage burn form.'),
+  burn(
     'interior.burnForm.q',
     'Form q',
-    'ratio',
-    'dimensionless',
-    'burn',
     'Form parameter q of the two-stage burn form; not negative.',
   ),
-  spec(
+  burn(
     'interior.burnForm.z1',
     'Form z1',
-    'ratio',
-    'dimensionless',
-    'burn',
     'Burnt fraction at which the first stage ends; above 0, at most 1.',
   ),
 ]

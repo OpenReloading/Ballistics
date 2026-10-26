@@ -9,17 +9,8 @@ import {
   Textarea,
   TextInput,
 } from '@mantine/core'
-import type { UserPowder, UserRecord } from '@open-reloading/schema'
 import { Flask, Plus, X } from '@phosphor-icons/react'
-import {
-  type ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from 'react'
+import { type ReactNode, useEffect, useMemo, useReducer, useState } from 'react'
 import { fieldError } from '../lib/field-spec.ts'
 import { historyOf } from '../lib/history.ts'
 import { newId } from '../lib/new-id.ts'
@@ -46,7 +37,6 @@ import {
 } from '../lib/powder-designer.ts'
 import { controlSize } from '../lib/theme.ts'
 import { namedKey } from '../lib/user-data.ts'
-import { putRecords, requestPersistentStorage } from '../lib/user-store.ts'
 import { DesignerField } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
 import { FieldTable } from './field-table.tsx'
@@ -56,12 +46,11 @@ import { PropertyGrid } from './property-grid.tsx'
 import { useShortcuts } from './shortcuts.tsx'
 import { EmptyNote, Message } from './states.tsx'
 import { useUnits } from './units-settings.tsx'
+import { useKeptDraft } from './use-kept-draft.ts'
 import { Workspace } from './workspace.tsx'
 
 /** The key of the empty draft: nothing to keep before the first edit. */
 const blankKey = namedKey(fileData(newDesign()), '')
-
-type Kept = 'blank' | 'saving' | 'saved' | 'failed'
 
 const optionLabel = (o: string) => (o === '' ? 'Not stated' : o)
 
@@ -89,68 +78,6 @@ const ranges = [
 ] as const
 
 const specsOf = (group: PowderSpec['group']) => powderSpecs.filter((s) => s.group === group)
-
-/**
- * Keeps the draft in this browser: written 400 ms after the last change, and when the page is
- * hidden or goes. `stored` holds what the browser has for the record shown, or the record opened,
- * so opening a record is no change to save.
- */
-function useKeptDraft(recordId: string, name: string, data: UserPowder, key: string) {
-  const [kept, setKept] = useState<Kept>('blank')
-  const stored = useRef({ key: blankKey, written: false })
-  const current = useRef(recordId)
-  current.current = recordId
-  const pending = useRef<{ record: UserRecord; key: string }>(undefined)
-  const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
-  const flush = useCallback(() => {
-    clearTimeout(timer.current)
-    const p = pending.current
-    pending.current = undefined
-    if (!p) return
-    putRecords([p.record]).then(
-      () => {
-        if (current.current !== p.record.id) return
-        stored.current = { key: p.key, written: true }
-        setKept('saved')
-        void requestPersistentStorage()
-      },
-      () => current.current === p.record.id && setKept('failed'),
-    )
-  }, [])
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the key stands for the name and the data
-  useEffect(() => {
-    if (key === stored.current.key) {
-      pending.current = undefined
-      setKept(stored.current.written ? 'saved' : 'blank')
-      return
-    }
-    setKept('saving')
-    pending.current = {
-      key,
-      record: {
-        kind: 'powder',
-        id: recordId,
-        name: name.trim().slice(0, 200) || fallbackName,
-        saved: new Date().toISOString(),
-        data,
-      },
-    }
-    timer.current = setTimeout(flush, 400)
-    return () => clearTimeout(timer.current)
-  }, [key, recordId])
-  useEffect(() => {
-    // a write begun in pagehide can be aborted with the page: hidden comes while it is still live
-    const hidden = () => document.visibilityState === 'hidden' && flush()
-    document.addEventListener('visibilitychange', hidden)
-    window.addEventListener('pagehide', flush)
-    return () => {
-      document.removeEventListener('visibilitychange', hidden)
-      window.removeEventListener('pagehide', flush)
-      flush()
-    }
-  }, [flush])
-  return { kept, flush, stored }
-}
 
 /** The results side: the status line, the problems of the draft and what prints. */
 function RecordPanel({
@@ -249,7 +176,15 @@ export function PowderDesigner() {
   const data = useMemo(() => fileData(design), [design])
   const key = namedKey(data, design.name)
   const edited = key !== blankKey
-  const { kept, flush, stored } = useKeptDraft(recordId, design.name, data, key)
+  const { kept, flush, drop, stored } = useKeptDraft(
+    'powder',
+    fallbackName,
+    blankKey,
+    recordId,
+    design.name,
+    data,
+    key,
+  )
 
   const built = useMemo(() => checkDesign(design, recordId), [design, recordId])
   const problems = 'problems' in built ? built.problems : []
@@ -520,7 +455,9 @@ export function PowderDesigner() {
               browserList
               kept={kept}
               onOpen={(opened, openedName, record) => {
-                flush()
+                // the file menu stored the opened record already: an older draft of the same id must not overwrite it
+                if (record.id === recordId) drop()
+                else flush()
                 setRecordId(record.id)
                 const next = fromFile(opened, openedName, system)
                 // the draft as the designer keeps it, so opening a record is no change to save
