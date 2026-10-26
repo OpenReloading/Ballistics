@@ -86,10 +86,10 @@ test('commands found by Ctrl+K open the settings and set the theme', async ({ pa
   await search(page).getByRole('button', { name: 'Theme: dark', exact: true }).click()
   await expect(page.locator('html')).toHaveAttribute('data-mantine-color-scheme', 'dark')
   await open(page)
-  await field(page).fill('workbench def')
-  await search(page).getByRole('button', { name: 'Workbench defaults', exact: true }).click()
+  await field(page).fill('workbench set')
+  await search(page).getByRole('button', { name: 'Workbench settings', exact: true }).click()
   const dialog = page.getByRole('dialog', { name: 'Settings' })
-  await expect(dialog.getByRole('tab', { name: 'Workbench defaults' })).toHaveAttribute(
+  await expect(dialog.getByRole('tab', { name: 'Workbench' })).toHaveAttribute(
     'aria-selected',
     'true',
   )
