@@ -218,6 +218,29 @@ describe('powder fit over sessions', () => {
     expect(nth(r.parameters, 0).value).toBe(nth(direct.parameters, 0).value)
   })
 
+  it('refuses a prior on a parameter that was not requested', () => {
+    expect(() =>
+      fitPowderSessions(start, sessions([0.6], [294.15]), {
+        priors: { energy: { value: 3.9e6, sigma: 0.05 } },
+      }),
+    ).toThrow(InputError)
+  })
+
+  it('keeps the barrel length and temperature a point states itself', () => {
+    const list = sessions(lengths, [294.15], 1)
+    // session lengths wrong, point lengths right: the points win
+    const mislabelled = list.map((s) => ({
+      ...s,
+      barrelLength: 0.6,
+      ladder: s.ladder.map((x) => ({ ...x, barrelLength: s.barrelLength ?? 0.6 })),
+    }))
+    const parameters = ['burnRate', 'energy'] as const
+    const direct = fitPowder(start, points(list), { parameters })
+    const r = fitPowderSessions(start, mislabelled, { parameters })
+    expect(r.resolved).toEqual(parameters)
+    expect(nth(r.parameters, 1).value).toBe(nth(direct.parameters, 1).value)
+  })
+
   it('keeps the burn coefficient and refuses empty input', () => {
     expect(() => fitPowderSessions(start, [])).toThrow(InputError)
     expect(() =>

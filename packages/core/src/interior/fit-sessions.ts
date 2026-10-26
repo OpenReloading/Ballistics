@@ -83,8 +83,11 @@ export function fitPowderSessions(
     s.ladder.map(
       (x): LadderPoint => ({
         ...x,
-        ...(s.barrelLength === undefined ? {} : { barrelLength: s.barrelLength }),
-        ...(s.propellantTemperature === undefined
+        // a condition a point states itself is kept
+        ...(x.barrelLength !== undefined || s.barrelLength === undefined
+          ? {}
+          : { barrelLength: s.barrelLength }),
+        ...(x.propellantTemperature !== undefined || s.propellantTemperature === undefined
           ? {}
           : { propellantTemperature: s.propellantTemperature }),
       }),
@@ -92,6 +95,13 @@ export function fitPowderSessions(
   )
   let parameters = options.parameters ?? ['burnRate']
   need(parameters.includes('burnRate'), 'the burn coefficient is always fitted')
+  const requested = parameters
+  need(
+    Object.entries(options.priors ?? {}).every(
+      ([name, prior]) => prior === undefined || requested.includes(name as PowderParameter),
+    ),
+    'a prior needs its parameter in parameters',
+  )
   const held: HeldPowderParameter[] = []
   for (;;) {
     try {
