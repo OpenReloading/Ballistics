@@ -59,8 +59,9 @@ export interface PowderPrior {
 export interface PowderFitOptions {
   /**
    * Default ['burnRate']; `startPressure` is resolved only with measured pressures. `volumeFactor`
-   * corrects the load's chamber volume and, like the burn rate, is resolved only with a prior or
-   * measured pressures (`apps/docs/docs/models/interior-powder-fit.md`, "Identifiability").
+   * corrects the load's chamber volume; a ladder too narrow to separate it from the burn rate
+   * needs a prior on it or measured pressures (`apps/docs/docs/models/interior-powder-fit.md`,
+   * "Identifiability").
    */
   parameters?: readonly PowderParameter[] | undefined
   /**

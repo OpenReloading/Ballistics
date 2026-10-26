@@ -119,7 +119,7 @@ export type Outcome =
 /** The note of a run whose chamber volume is not a measured capacity: what is estimated and what to enter. */
 export const volumeNote = {
   title: 'Chamber volume not measured',
-  text: 'The volume comes from a record or a typed value, and the peak pressure and muzzle velocity follow it. Enter a measured case capacity in the Cartridge card to replace it.',
+  text: 'The volume comes from a record or a typed value, and the peak pressure and muzzle velocity follow it. Enter a measured case capacity in the Cartridge card and empty the volume field to follow it.',
 }
 
 /** The note as one sentence pair for the prints, none when the run's volume is measured. */
