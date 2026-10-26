@@ -8,8 +8,8 @@
 - Type check all: `npm run typecheck`
 - Package import rules: `npm run deps:check` (after `build`: workspace imports resolve to `dist/`)
   - dependency-cruiser with the rules of `.dependency-cruiser.cjs`, each named in its failure. It reads the sources of schema, core, drawing, importers, data, api and `apps/web/src` (not tests, scripts or configuration files), and the compiled files of importers, where a type import is erased, so any import of schema there is a runtime one.
-  - Rules: core imports only itself; drawing's folders import the folders of the matrix in the config (core; cartridge and bullet with core; seating with core, cartridge and bullet; target alone) and nothing outside `src`; importers import schema only, and only for types; schema imports no workspace package; data imports schema only; api imports core, data and schema only; the web app imports no `node:` module, and of data and api only `data/plausibility` and `api/compute` and `api/catalogue`; no import may be unresolvable (else a rule would pass without seeing it).
-  - The swc parser reads the TypeScript (dependency-cruiser supports TypeScript below 7): it does not tell `import type` from an import, so a type import counts too.
+  - The rules for core, drawing, importers, schema, data, api and the web app are in `.dependency-cruiser.cjs`, each with a comment. No import may be unresolvable (else a rule would pass without seeing it).
+  - The swc parser reads the TypeScript, because dependency-cruiser 18.7.0 lists TypeScript below 7 as its supported range (`depcruise --info`). It does not tell `import type` from an import, so a type import counts too.
   - `tools/test/deps.test.ts` runs the config over `tools/test/fixtures/deps-rules.json`, a mirror of the layout with the rule each forbidden import breaks. A new rule gets a violating and an allowed file there.
 - Doc comments: `npm run docs:check` (after `build`)
   - TypeDoc `validation.notDocumented`, warnings as errors, on every export of schema, core, drawing, importers, data and api. Not on properties, constructors, parameters and references. Without `notExported`.
@@ -48,7 +48,7 @@
 
 - Changes start from a GitHub issue. Branches are cut from `develop` and merged back into it; `main` only receives the pull request from `develop` and the release pull request.
 - Published to npmjs.com: schema, core, drawing, importers, data (`apps/docs/docs/release.md`). Every other workspace stays `private`.
-- Package rules:
+- Package rules (`npm run deps:check` checks them):
   - `packages/core`: no runtime dependencies, no I/O, no database, no HTTP.
   - `packages/importers`: no I/O. Depends on `@open-reloading/schema` for types only.
   - `packages/drawing`: no runtime dependencies, no I/O, no React, DOM or Next.js. Values in stored mm and degrees.
