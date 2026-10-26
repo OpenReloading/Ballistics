@@ -1,0 +1,18 @@
+{
+  "id": "dsu-k-27-dsu-b2",
+  "discipline": "dsu-k-27",
+  "face": "dsu-b2",
+  "event": "k-27-kurzwaffe-27",
+  "shotCount": 30,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 2, Seite 19, PDF p. 51",
+        "fields": ["discipline", "face", "event", "shotCount"],
+        "note": "Three sheets: precision, interval and time-series part, 10 shots each."
+      }
+    ]
+  }
+}

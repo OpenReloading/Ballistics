@@ -1,0 +1,18 @@
+{
+  "id": "dsu-dlhms-dsu-b4",
+  "discipline": "dsu-dlhms",
+  "face": "dsu-b4",
+  "event": "dlhms-halbautomatisches-luftgewehr-mehrdistanz-silhouette",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 5, Seite 17, PDF p. 161",
+        "fields": ["discipline", "face", "event", "shotCount"],
+        "note": "Scored by field: 3 points inner white area, 2 points green area, 1 point outer white area, 60 points at most."
+      }
+    ]
+  }
+}

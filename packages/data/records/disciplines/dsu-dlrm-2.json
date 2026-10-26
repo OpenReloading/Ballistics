@@ -1,0 +1,28 @@
+{
+  "id": "dsu-dlrm-2",
+  "federation": "dsu",
+  "name": "Repetier-Luftgewehr Mehrdistanz",
+  "number": "DLRM 2",
+  "section": "Kapitel 5, Druckluftwaffen und Zimmerstutzen, DLRM 2",
+  "page": "Seiten 11 bis 12, PDF pp. 155 to 156",
+  "distance": {
+    "value": 25000,
+    "raw": "25, 20, 15 und 10 Meter"
+  },
+  "category": "air-rifle",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 5, Seiten 11 bis 12, PDF pp. 155 to 156",
+        "fields": ["federation", "section", "page", "distance", "category"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 5, Inhaltsverzeichnis, Seite 2 (PDF p. 146)",
+        "fields": ["name", "number"]
+      }
+    ]
+  }
+}

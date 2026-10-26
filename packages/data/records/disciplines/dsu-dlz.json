@@ -1,0 +1,29 @@
+{
+  "id": "dsu-dlz",
+  "federation": "dsu",
+  "name": "Zimmerstutzen",
+  "number": "DLZ",
+  "section": "Kapitel 5, Druckluftwaffen und Zimmerstutzen, DLZ",
+  "page": "Seite 19, PDF p. 163",
+  "distance": {
+    "value": 15000,
+    "raw": "15 Meter"
+  },
+  "category": "rifle",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 5, Seite 19, PDF p. 163",
+        "fields": ["federation", "section", "page", "distance", "number", "category"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 5, Inhaltsverzeichnis, Seite 2 (PDF p. 146)",
+        "fields": ["name"],
+        "note": "The page and the sheet page of b5 print the code DLZ, the contents print LZ. The contents print the name with the prefix Langwaffendisziplin."
+      }
+    ]
+  }
+}

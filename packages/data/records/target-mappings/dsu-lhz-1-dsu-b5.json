@@ -1,0 +1,18 @@
+{
+  "id": "dsu-lhz-1-dsu-b5",
+  "discipline": "dsu-lhz-1",
+  "face": "dsu-b5",
+  "event": "lhz-1-halbautomatisches-gewehr-zielfernrohr-50-m",
+  "stage": "Gruppe 1",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 43, PDF p. 101",
+        "fields": ["discipline", "face", "event", "stage", "shotCount"]
+      }
+    ]
+  }
+}

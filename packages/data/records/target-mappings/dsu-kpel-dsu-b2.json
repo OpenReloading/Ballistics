@@ -1,0 +1,18 @@
+{
+  "id": "dsu-kpel-dsu-b2",
+  "discipline": "dsu-kpel",
+  "face": "dsu-b2",
+  "event": "kpel-praezision-einzelladerpistole-langdistanz",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 2, Seite 26, PDF p. 58",
+        "fields": ["discipline", "face", "event", "shotCount"],
+        "note": "Two sheets of 10 shots for both groups. Scored by zone: centre 3, green 2, outer white 1, at most 60 points. The KPEL section states no boundary rule; the event takes the touch rule of Kapitel 1, Seite 27."
+      }
+    ]
+  }
+}

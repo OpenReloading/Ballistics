@@ -1,0 +1,18 @@
+{
+  "id": "dsu-k-2-dsu-b2",
+  "discipline": "dsu-k-2",
+  "face": "dsu-b2",
+  "event": "k-2-kurzwaffe-2",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 2, Seite 9, PDF p. 41",
+        "fields": ["discipline", "face", "event", "shotCount"],
+        "note": "Two sheets of 10 shots, 4 series of 5."
+      }
+    ]
+  }
+}

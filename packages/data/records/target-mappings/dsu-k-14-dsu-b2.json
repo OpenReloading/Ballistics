@@ -1,0 +1,18 @@
+{
+  "id": "dsu-k-14-dsu-b2",
+  "discipline": "dsu-k-14",
+  "face": "dsu-b2",
+  "event": "k-14-kurzwaffe-14",
+  "shotCount": 25,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 2, Seite 12, PDF p. 44",
+        "fields": ["discipline", "face", "event", "shotCount"],
+        "note": "Two sheets, 5 series of 5."
+      }
+    ]
+  }
+}

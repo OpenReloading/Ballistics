@@ -1,0 +1,219 @@
+{
+  "id": "dsu-b5",
+  "name": "DSU-Scheibe b5",
+  "federation": "dsu",
+  "rings": [
+    {
+      "value": 1,
+      "diameter": {
+        "value": 126
+      },
+      "height": {
+        "value": 196
+      },
+      "shape": "stadium",
+      "fill": "white",
+      "line": "green"
+    },
+    {
+      "value": 2,
+      "diameter": {
+        "value": 114.6
+      },
+      "height": {
+        "value": 178.1
+      },
+      "shape": "stadium",
+      "fill": "white",
+      "line": "green"
+    },
+    {
+      "value": 3,
+      "diameter": {
+        "value": 103.1
+      },
+      "height": {
+        "value": 160.2
+      },
+      "shape": "stadium",
+      "fill": "white",
+      "line": "green"
+    },
+    {
+      "value": 4,
+      "diameter": {
+        "value": 91.7
+      },
+      "height": {
+        "value": 142.3
+      },
+      "shape": "stadium",
+      "fill": "white",
+      "line": "green"
+    },
+    {
+      "value": 5,
+      "diameter": {
+        "value": 80.2
+      },
+      "height": {
+        "value": 124.4
+      },
+      "shape": "stadium",
+      "fill": "green",
+      "line": "green"
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 68.8
+      },
+      "height": {
+        "value": 106.6
+      },
+      "shape": "stadium",
+      "fill": "green",
+      "line": "white"
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 57.3
+      },
+      "height": {
+        "value": 88.7
+      },
+      "shape": "stadium",
+      "fill": "green",
+      "line": "white"
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 45.9
+      },
+      "height": {
+        "value": 70.8
+      },
+      "shape": "stadium",
+      "fill": "green",
+      "line": "white"
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 34.4
+      },
+      "height": {
+        "value": 52.9
+      },
+      "shape": "stadium",
+      "fill": "white",
+      "line": "green"
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 23
+      },
+      "height": {
+        "value": 35
+      },
+      "shape": "stadium",
+      "fill": "white",
+      "line": "green"
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 11
+    },
+    "height": {
+      "value": 18
+    }
+  },
+  "blackDiameter": {
+    "value": 80.2
+  },
+  "blackHeight": {
+    "value": 124.4
+  },
+  "events": [
+    {
+      "id": "lez-1-einzellader-zielfernrohrgewehr-50-m",
+      "name": "LEZ 1 Einzellader Zielfernrohrgewehr 50 m",
+      "distance": {
+        "value": 50000,
+        "raw": "50 Meter"
+      },
+      "section": "Kapitel 3, Langwaffenübungen, LEZ 1",
+      "category": "rifle",
+      "scoring": "touch"
+    },
+    {
+      "id": "lhz-1-halbautomatisches-gewehr-zielfernrohr-50-m",
+      "name": "LHZ 1 Halbautomatisches Gewehr Zielfernrohr 50 m",
+      "distance": {
+        "value": 50000,
+        "raw": "50 Meter"
+      },
+      "section": "Kapitel 3, Langwaffenübungen, LHZ 1",
+      "scoring": "touch",
+      "category": "rifle"
+    },
+    {
+      "id": "lrz-1-repetiergewehr-zielfernrohr-50-m",
+      "name": "LRZ 1 Repetiergewehr Zielfernrohr 50 m",
+      "distance": {
+        "value": 50000,
+        "raw": "50 Meter"
+      },
+      "section": "Kapitel 3, Langwaffenübungen, LRZ 1",
+      "category": "rifle",
+      "scoring": "touch"
+    }
+  ],
+  "paper": {
+    "format": "A5",
+    "width": {
+      "value": 148
+    },
+    "height": {
+      "value": 210
+    }
+  },
+  "numerals": true,
+  "photoSearch": false,
+  "note": "Stadium rings: straight vertical sides and half circle ends of half the ring width. The book prints the outer width and height of the scoring area, the width and height of the ten and of the Mouche, and ring widths that are rounded, so nine of them do not add up to the printed totals; rings 2 to 9 are spaced evenly between the outer ring and the ten, which is how the printed figure draws them. The green mirror runs from ring 5 to ring 8 (rings 6 to 8 have white lines), the centre inside ring 9 is white. The Mouche is the inner ten; the book states no rule for it beyond the touch rule for rings.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 1, Scheiben, Seite 15 (PDF p. 17)",
+        "fields": [
+          "name",
+          "rings",
+          "innerTen.diameter",
+          "innerTen.height",
+          "blackDiameter",
+          "blackHeight",
+          "paper",
+          "numerals"
+        ]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 1, Scheiben, Seite 15 (PDF p. 17)",
+        "fields": ["rings"],
+        "kind": "derived",
+        "note": "Rings 2 to 9 are the printed outer ring and the ten spaced evenly, to 0.1 mm; the book prints no width or height for them."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 1, Auswertung der Scheiben, Seite 27 (PDF p. 29)",
+        "fields": ["events.scoring"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "id": "dsu-lrz-2-dsu-b3",
+  "discipline": "dsu-lrz-2",
+  "face": "dsu-b3",
+  "event": "lrz-2-repetiergewehr-zielfernrohr-100-m",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 30, PDF p. 88",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}
