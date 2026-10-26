@@ -20,6 +20,7 @@ import {
   measuredCapacityRef,
   overrideKeys,
   savedCapacityRef,
+  toApiLoad,
   toLoad,
 } from '../src/lib/load-record.ts'
 import { waterVolume } from '../src/lib/units.ts'
@@ -300,6 +301,21 @@ describe('the measured case capacity of a load', () => {
     expect(loadSchema.safeParse(l).success).toBe(true)
     expect(l.capacity).toBe(`user:${measuredCapacityId(cartridge, m3)}`)
     expect(l.case).toBeUndefined()
+  })
+
+  it('names a case record next to the lot, and leaves the record out of the API file', () => {
+    const base = parts({
+      cartridge: 'catalogue:308-win',
+      caseRecord: 'catalogue:demo-case-308-brass',
+      lots: { powder: '', primer: '', case: 'L7' },
+    })
+    const l = toLoad(base)
+    expect(loadSchema.safeParse(l).success).toBe(true)
+    expect(l.case).toEqual({ record: 'catalogue:demo-case-308-brass', lot: 'L7' })
+    expect(toLoad(parts({ caseRecord: 'catalogue:demo-case-308-brass' })).case).toEqual({
+      record: 'catalogue:demo-case-308-brass',
+    })
+    expect(toApiLoad(base, { cartridge: 'catalogue:308-win' }).case).toBeUndefined()
   })
 
   it('has an id of one measurement: same value, same record, another value another one', () => {

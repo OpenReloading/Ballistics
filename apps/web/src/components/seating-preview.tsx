@@ -29,10 +29,11 @@ import {
 } from 'react'
 import { createPortal } from 'react-dom'
 import { apiFetch } from '../lib/api-fetch.ts'
-import type { BulletSummary, CartridgeDetail } from '../lib/api-types.ts'
+import type { BulletSummary, CartridgeDetail, CaseSummary } from '../lib/api-types.ts'
 import type { StripFigure } from '../lib/barrel-strip.ts'
 import { designShape } from '../lib/bullet-designer.ts'
 import { drawable } from '../lib/cartridge-sheet.ts'
+import { type UsedWater, usedWater } from '../lib/case-capacity.ts'
 import type { FieldValue } from '../lib/field-spec.ts'
 import { figureViews } from '../lib/figure-views.ts'
 import type { Suggestion } from '../lib/input-defaults.ts'
@@ -262,7 +263,10 @@ type PreviewProps = {
   onMeasuredWaterCapacity?: (value: FieldValue) => void
   /** The capacity record chosen, held by the page so a load keeps it; without it the choice is the figure's own. */
   capacityId?: string | undefined
-  onCapacityId?: (id: string) => void
+  onCapacityId?: (id: string | undefined) => void
+  /** The case record chosen, held by the page so a load keeps it: its stated capacity is the default of the capacity. */
+  caseId?: string | undefined
+  onCaseId?: (id: string | undefined) => void
   /**
    * The bullet record or design of the page's own bullet input: the preview seats it and
    * shows no bullet search or design choice of its own.
@@ -302,6 +306,11 @@ function barrelFieldValue(units: UnitSystem, m: number | undefined): FieldValue 
 
 const detailUrl = (cartridge: PreviewProps['cartridge'], draft: DraftCartridge | undefined) =>
   cartridge && !draft ? `cartridges/${encodeURIComponent(cartridge.id)}` : undefined
+
+const casesUrl = (cartridge: PreviewProps['cartridge'], draft: DraftCartridge | undefined) =>
+  cartridge && !draft
+    ? `cases?${new URLSearchParams({ cartridge: cartridge.id, limit: '200' })}`
+    : undefined
 
 const bulletUrl = (id: string | undefined) => (id ? `bullets/${encodeURIComponent(id)}` : undefined)
 
@@ -426,15 +435,13 @@ function useGeometry(o: {
   detail: Load<CartridgeDetail>
   record: Load<Bullet>
   design: UserBulletView | undefined
-  capacityId: string | undefined
   shown: RefObject<UnitSystem>
 }) {
-  const { draft, detail, record, design, capacityId, shown } = o
+  const { draft, detail, record, design, shown } = o
   const draftSpec = draft?.spec
   const spec = useMemo(() => specOf(draftSpec, detail), [draftSpec, detail])
   const chamber = useMemo(() => spec && chamberOf(spec.values), [spec])
   const capacities = capacitiesOf(detail)
-  const capacity = capacities.find((c) => c.id === capacityId) ?? capacities[0]
   const bulletRecord = record.status === 'ok' && !design ? record.value : undefined
   const shaped = useMemo(
     () => shapeOf(design, bulletRecord, shown.current),
@@ -444,7 +451,7 @@ function useGeometry(o: {
   const refused = useMemo(() => refusalOf(shaped), [shaped])
   const shape = refused ? undefined : shaped
   const fixed = useMemo(() => fixedOf(spec, chamber, shape), [spec, chamber, shape])
-  return { spec, chamber, capacities, capacity, bulletRecord, shaped, refused, shape, fixed }
+  return { spec, chamber, capacities, bulletRecord, shaped, refused, shape, fixed }
 }
 
 const capacitiesOf = (detail: Load<CartridgeDetail>): Capacity[] =>
@@ -516,26 +523,26 @@ function seatBuilder(o: {
   shape: Shape | undefined
   mode: Mode
   canCbto: boolean
-  measured: number | undefined
-  capacity: Capacity | undefined
+  /** The water (g) the case holds. */
+  water: number | undefined
   barrel: number | undefined
 }) {
-  const { chamber, shape, mode, canCbto, measured, capacity, barrel } = o
+  const { chamber, shape, mode, canCbto, water, barrel } = o
   if (!chamber || !shape || (mode === 'baseToOgive' && !canCbto)) return
   return (by: number) =>
     seat({
       bullet: shape,
       chamber,
-      waterCapacity: measured !== undefined ? waterGrams(measured) : capacity?.waterCapacity.value,
+      waterCapacity: water,
       waterDensity: waterDensityGramsPerCm3,
       barrelLength: barrel === undefined ? undefined : fromSi('length', barrel),
       by: { kind: mode, value: by },
     })
 }
 
-/** The case volume to the mouth, m³: the measured one, else the capacity record's. */
-const caseVolumeOf = (measured: number | undefined, capacity: Capacity | undefined) =>
-  measured !== undefined ? measured : capacity && waterVolume(capacity.waterCapacity.value)
+/** The case volume to the mouth, m³: the measured one, else the water of the capacity record or the case record. */
+const caseVolumeOf = (measured: number | undefined, water: UsedWater | undefined) =>
+  measured !== undefined ? measured : water && waterVolume(water.grams)
 
 type SeatFn = ReturnType<typeof seatBuilder>
 
@@ -691,6 +698,10 @@ function useSeatingModel(p: PreviewProps) {
   const [ownCapacityId, setOwnCapacityId] = useState<string | undefined>(undefined)
   const capacityId = p.onCapacityId ? p.capacityId : ownCapacityId
   const setCapacityId = p.onCapacityId ?? setOwnCapacityId
+  const caseList = useRecord<{ items: CaseSummary[] }>(casesUrl(cartridge, draft))
+  const [ownCaseId, setOwnCaseId] = useState<string | undefined>(undefined)
+  const caseId = p.onCaseId ? p.caseId : ownCaseId
+  const setCaseId = p.onCaseId ?? setOwnCaseId
   const shown = useRef(system)
   const { barrel, setBarrel, barrelTyped, setBarrelTyped } = useBarrel({
     barrelLength: p.barrelLength,
@@ -704,14 +715,15 @@ function useSeatingModel(p: PreviewProps) {
   /** The position and mode the preview last started at by itself. */
   const [started, setStarted] = useState<{ si: number; mode: Mode }>()
   useUnitRewrite(system, shown, setBarrel, setPos)
-  const { spec, chamber, capacity, shape, fixed, ...geometry } = useGeometry({
+  const { spec, chamber, capacities, shape, fixed, ...geometry } = useGeometry({
     draft,
     detail,
     record,
     design,
-    capacityId,
     shown,
   })
+  const chosenCase =
+    caseList.status === 'ok' ? caseList.value.items.find((c) => c.id === caseId) : undefined
   // apart from `fixed`: a unit switch relabels the drawing and keeps the seating position
   const unit = drawingLengthUnit(system)
   const canCbto = shape?.baseToOgive !== undefined
@@ -732,9 +744,20 @@ function useSeatingModel(p: PreviewProps) {
 
   const value = lengthMm(pos)
   const measured = positive(measuredWaterCapacity.si)
+  const stated = chosenCase?.waterCapacity
+  // the records' water, and the water with a measured value typed over it
+  const stock = usedWater({ capacities, capacityId, stated })
+  const capacity = stock?.record
+  const water = usedWater({
+    measured: measured === undefined ? undefined : waterGrams(measured),
+    capacities,
+    capacityId,
+    stated,
+  })
+  const waterUsed = water?.grams
   const seatBy = useMemo(
-    () => seatBuilder({ chamber, shape, mode, canCbto, measured, capacity, barrel: barrel.si }),
-    [chamber, shape, mode, canCbto, capacity, measured, barrel.si],
+    () => seatBuilder({ chamber, shape, mode, canCbto, water: waterUsed, barrel: barrel.si }),
+    [chamber, shape, mode, canCbto, waterUsed, barrel.si],
   )
   const seating = useMemo(
     () => (seatBy && value !== undefined ? seatBy(value) : undefined),
@@ -778,7 +801,7 @@ function useSeatingModel(p: PreviewProps) {
 
   const figure = useMemo(() => figureOf(spec, seating), [spec, seating])
   const atStart = pos.si === started?.si && mode === started?.mode
-  const caseVolume = caseVolumeOf(measured, capacity)
+  const caseVolume = caseVolumeOf(measured, water)
   useReportSeated(p.onSeated, { caseVolume, seating, barrel: barrel.si, mode, atStart, figure })
 
   const fmt = unitFormats(system)
@@ -808,7 +831,12 @@ function useSeatingModel(p: PreviewProps) {
     names,
     spec,
     chamber,
+    capacities,
     capacity,
+    stock,
+    caseList,
+    chosenCase,
+    setCaseId,
     shape,
     fixed,
     range,
@@ -1025,15 +1053,43 @@ function BulletStatus({ m }: { m: Model }) {
   )
 }
 
+/** The case products of the cartridge: choosing one makes its stated capacity the default. */
+function CaseChoice({ m }: { m: Model }) {
+  const { caseList, names } = m
+  const items = caseList.status === 'ok' ? caseList.value.items : []
+  if (items.length === 0) return null
+  return (
+    <NativeSelect
+      label="Case record"
+      value={m.chosenCase?.id ?? ''}
+      onChange={(e) => m.setCaseId(e.currentTarget.value || undefined)}
+      data={[
+        { value: '', label: 'None' },
+        ...items.map((c) => ({ value: c.id, label: caseText(c, names) })),
+      ]}
+    />
+  )
+}
+
+/** The case record's description: its product, and its stated water when it has one. */
+function caseText(c: CaseSummary, names: Model['names']) {
+  const water = c.waterCapacity === undefined ? '' : `: ${c.waterCapacity} g water`
+  return `${productLabel({ name: c.name, manufacturer: c.manufacturer }, names)}${water}`
+}
+
 function CapacityChoice({ m }: { m: Model }) {
   const { capacities, capacity, names, designed, name } = m
   if (capacities.length > 0)
     return (
       <NativeSelect
         label="Case capacity record"
-        value={capacity?.id}
-        onChange={(e) => m.setCapacityId(e.currentTarget.value)}
-        data={capacities.map((c) => ({ value: c.id, label: capacityText(c, names) }))}
+        // with a case record's stated capacity in use, no capacity record is the choice
+        value={capacity?.id ?? ''}
+        onChange={(e) => m.setCapacityId(e.currentTarget.value || undefined)}
+        data={[
+          ...(m.stock?.source === 'case' ? [{ value: '', label: 'From the case record' }] : []),
+          ...capacities.map((c) => ({ value: c.id, label: capacityText(c, names) })),
+        ]}
       />
     )
   if (designed) return null
@@ -1046,29 +1102,31 @@ function CapacityChoice({ m }: { m: Model }) {
 }
 
 function MeasuredCapacity({ m }: { m: Model }) {
-  const { system, capacity, names, designed, measuredWaterCapacity } = m
+  const { system, stock, chosenCase, names, designed, measuredWaterCapacity } = m
   return (
     <NumberField
       spec={{
         ...measuredWaterCapacitySpec,
         help: designed
           ? 'Measured: water to the mouth of your fired cases. Empty: not given, and so is the volume behind the bullet.'
-          : "Measured: water to the mouth of your fired cases. Replaces the capacity record; empty: the record's value.",
+          : "Measured: water to the mouth of your fired cases. Replaces the capacity or case record; empty: the record's value.",
       }}
       system={system}
       value={measuredWaterCapacity}
       onChange={(v) => m.p.onMeasuredWaterCapacity?.(v)}
       // the record's capacity in the field while none is typed
       placeholder={
-        capacity
-          ? (s) => formatQuantity('capacity', s, waterVolume(capacity.waterCapacity.value))
-          : undefined
+        stock ? (s) => formatQuantity('capacity', s, waterVolume(stock.grams)) : undefined
       }
       flag={
-        capacity && measuredWaterCapacity.si === undefined
+        stock && measuredWaterCapacity.si === undefined
           ? {
               kind: 'record',
-              text: `From the capacity record ${capacityText(capacity, names)}. Type a measured capacity to replace it.`,
+              text: `From ${
+                stock.record
+                  ? `the capacity record ${capacityText(stock.record, names)}`
+                  : `the case record ${chosenCase ? caseText(chosenCase, names) : ''}`
+              }. Type a measured capacity to replace it.`,
             }
           : undefined
       }
@@ -1162,7 +1220,14 @@ function SeatingControls({ m }: { m: Model }) {
     <div className="seating-controls">
       {!linked && <BulletPicker m={m} />}
       <BulletStatus m={m} />
-      {aside(slots, <CapacityChoice m={m} />, slots?.more)}
+      {aside(
+        slots,
+        <>
+          <CaseChoice m={m} />
+          <CapacityChoice m={m} />
+        </>,
+        slots?.more,
+      )}
       {!card && <BarrelField m={m} />}
       <MeasuredCapacity m={m} />
       {shape && range && <SeatFields m={m} range={range} />}
@@ -1333,7 +1398,7 @@ function CbtoRow({ m, seating }: RowsProps) {
 }
 
 function CaseVolumeRow({ m, seating }: RowsProps) {
-  const { capacity, measuredWaterCapacity, vol } = m
+  const { stock, chosenCase, measuredWaterCapacity, vol } = m
   if (!seating.caseVolume)
     return m.designed ? (
       <NotGiven term="Case volume to the mouth" why="a measured case capacity" />
@@ -1344,9 +1409,9 @@ function CaseVolumeRow({ m, seating }: RowsProps) {
       value={vol(seating.caseVolume.value)}
       tag={seating.caseVolume.tag}
       note={
-        measuredWaterCapacity.si !== undefined || !capacity
+        measuredWaterCapacity.si !== undefined || !stock
           ? 'your measured case capacity'
-          : `${capacity.waterCapacity.value} g water (${capacity.id}) at ${waterDensityGramsPerCm3} g/cm³`
+          : `${stock.grams} g water (${stock.record?.id ?? chosenCase?.id}) at ${waterDensityGramsPerCm3} g/cm³`
       }
     />
   )
