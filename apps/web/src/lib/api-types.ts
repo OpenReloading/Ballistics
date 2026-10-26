@@ -2,6 +2,7 @@
 import type { InteriorResult } from '@open-reloading/core'
 import type {
   Cartridge,
+  CaseMaterial,
   CaseType,
   CatalogueCaseCapacity,
   Powder,
@@ -67,6 +68,22 @@ export interface BulletSummary {
   tipType?: string
   /** The construction structure of the record, else "<core material>-core". */
   construction?: string
+}
+
+/** A case as `GET /cases` lists it. */
+export interface CaseSummary {
+  id: string
+  /** Id of the manufacturer record. */
+  manufacturer: string
+  /** Id of the cartridge record. */
+  cartridge: string
+  name: string
+  productNumber: string
+  material: CaseMaterial
+  /** The stated water capacity, g. */
+  waterCapacity?: number | undefined
+  /** The empty case, g. */
+  mass?: number | undefined
 }
 
 export interface PowderSummary {

@@ -10,6 +10,7 @@ import {
   type Icon,
   Info,
   MagnifyingGlass,
+  Package,
   Target,
   Warning,
 } from '@phosphor-icons/react'
@@ -22,6 +23,7 @@ import type { ReactNode } from 'react'
  */
 const icons: Record<string, Icon> = {
   '/powders': Grains,
+  '/cases': Package,
   '/workbench': Flask,
   '/session': ChartBar,
   '/groups': Target,

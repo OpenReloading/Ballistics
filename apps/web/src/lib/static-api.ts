@@ -27,6 +27,7 @@ const listKinds = new Set([
   'cartridges',
   'bullets',
   'powders',
+  'cases',
   'manufacturers',
   'target-faces',
   'federations',
@@ -34,7 +35,7 @@ const listKinds = new Set([
   'target-mappings',
   'caliber-classes',
 ])
-const searchKinds = new Set(['cartridges', 'bullets', 'powders'])
+const searchKinds = new Set(['cartridges', 'bullets', 'powders', 'cases'])
 const recordId = /^[a-z0-9]+(-[a-z0-9]+)*$/
 /** The forwarding route's cap on a compute body (`src/app/api/[...path]/route.server.ts`). */
 const maxBody = 64 * 1024
@@ -72,6 +73,7 @@ const filters: Record<string, string[]> = {
   cartridges: ['table'],
   bullets: ['manufacturer', 'cartridge'],
   powders: ['manufacturer'],
+  cases: ['manufacturer', 'cartridge'],
   disciplines: ['federation'],
   'target-mappings': ['discipline', 'face'],
 }
@@ -100,9 +102,9 @@ async function catalogue() {
 
 /**
  * A list answer, from the catalogue as the API's routes answer it: the same paging, `q`, filters and
- * order, the refusals of its query schemas. Cartridges, bullets and powders page (`limit`, `offset`)
- * and search (`q`); the filters are `table` (cartridges), `manufacturer` (bullets, powders),
- * `cartridge` (bullets), `federation` (disciplines) and `discipline` and `face` (target mappings).
+ * order, the refusals of its query schemas. Cartridges, bullets, powders and cases page (`limit`, `offset`)
+ * and search (`q`); the filters are `table` (cartridges), `manufacturer` (bullets, powders, cases),
+ * `cartridge` (bullets, cases), `federation` (disciplines) and `discipline` and `face` (target mappings).
  * Other keys are dropped, as the API drops them.
  */
 async function list(kind: string, query: URLSearchParams) {
@@ -140,6 +142,8 @@ async function list(kind: string, query: URLSearchParams) {
       return answer(200, c.bullets({ q, manufacturer, cartridge, ...paging }))
     case 'powders':
       return answer(200, c.powders({ q, manufacturer, ...paging }))
+    case 'cases':
+      return answer(200, c.cases({ q, manufacturer, cartridge, ...paging }))
     case 'manufacturers':
       return answer(200, c.manufacturers())
     case 'target-faces':

@@ -36,6 +36,8 @@ const icons: Record<StripItem['icon'], Icon> = {
   base: Drop,
   density: Cube,
   bulkDensity: Package,
+  capacity: Drop,
+  material: Cube,
   federation: Flag,
   distance: Ruler,
   rings: Target,

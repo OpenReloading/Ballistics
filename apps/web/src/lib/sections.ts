@@ -43,6 +43,12 @@ export const sections = [
         description: 'Propellants and their recorded properties, each with its sources.',
       },
       {
+        href: '/cases',
+        label: 'Cases',
+        description:
+          'Cartridge case products with material, primer pocket and stated water capacity, each with its sources.',
+      },
+      {
         href: '/targets',
         label: 'Targets',
         description:

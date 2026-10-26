@@ -11,6 +11,7 @@ it('lists the two groups in order: Tools, Data', () => {
     '/cartridges',
     '/bullets',
     '/powders',
+    '/cases',
     '/targets',
     '/disciplines',
     '/firearms',

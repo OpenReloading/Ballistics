@@ -61,6 +61,10 @@
         "/targets": {
           "initial": 407032,
           "total": 455037
+        },
+        "/cases": {
+          "initial": 408999,
+          "total": 457018
         }
       }
     },
@@ -97,6 +101,10 @@
         "/session": {
           "initial": 421163,
           "total": 469168
+        },
+        "/cases/[id]": {
+          "initial": 416980,
+          "total": 464999
         }
       }
     },
