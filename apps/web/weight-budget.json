@@ -133,6 +133,10 @@
         "/targets/designer": {
           "initial": 392180,
           "total": 490729
+        },
+        "/powders/designer": {
+          "initial": 393004,
+          "total": 497293
         }
       }
     },

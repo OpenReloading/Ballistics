@@ -7,6 +7,7 @@ import dynamic from 'next/dynamic'
 import { memo, type RefObject, useEffect, useMemo, useRef, useState } from 'react'
 import { vivacityUnit } from '../lib/burn-rate.ts'
 import { toCsv } from '../lib/csv.ts'
+import { powderDesignNote } from '../lib/powder-designer.ts'
 import { controlSize } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { resultTabsFit } from '../lib/workbench.ts'
@@ -475,6 +476,7 @@ function DesignNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> | undefined 
           Case values from the user design {ok.cartridgeDesign}, not a catalogue record.
         </p>
       )}
+      {ok?.powderDesign && <p className="note user-design">{powderDesignNote(ok.powderDesign)}</p>}
       {ok?.design && (
         <p className="note user-design">
           Computed with the bullet mass of the user design {ok.design}, not a catalogue record.

@@ -82,6 +82,13 @@ it('marks a field from the record, fitted or a fixed input, and an edit after th
     'Changed from the record value 0.5 u.',
   )
   expect(recordMark(powder, origin, 'charge', 0.002, shown)).toBeUndefined()
+  // the values of a user design say so
+  expect(recordMark(powder, origin, 'vivacity', 0.5, shown, 'user design')).toBe(
+    'From the user design (fitted).',
+  )
+  expect(recordMark(powder, origin, 'vivacity', 0.6, shown, 'user design')).toBe(
+    'Changed from the user design value 0.5 u.',
+  )
 })
 
 it('applies the bore resistance of the record from the cartridge, bullet length and run', () => {

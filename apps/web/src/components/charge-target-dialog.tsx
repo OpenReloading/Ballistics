@@ -15,6 +15,7 @@ import {
   targetUnit,
 } from '../lib/charge-target.ts'
 import { errorText } from '../lib/error-text.ts'
+import { powderDesignNote } from '../lib/powder-designer.ts'
 import { formatQuantity, msText, withUnit } from '../lib/units.ts'
 import { AppModal } from './app-modal.tsx'
 import { useLoad } from './workbench-context.ts'
@@ -85,7 +86,7 @@ function answerOf(
  * the pressure range at that charge, and Apply, which writes the charge into the field. It posts the load of the fields as Run does.
  */
 export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClose: () => void }) {
-  const { system, cartridge, loadRequest, applyCharge, online } = useLoad()
+  const { system, cartridge, loadRequest, applyCharge, online, powderDesign } = useLoad()
   const [kind, setKind] = useState<TargetKind>('peakPressure')
   const [percent, setPercent] = useState(false)
   const [value, setValue] = useState<string | number>('')
@@ -251,6 +252,11 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
             />
             <Row label="Barrel time" value={msText(found.result.barrelTime)} />
             {!found.burnoutInBarrel && <Row label="Burnout" value="not in the barrel" />}
+            {powderDesign && (
+              <Text size="xs" className="user-design">
+                {powderDesignNote(powderDesign.name)}
+              </Text>
+            )}
             {found.warnings
               .filter((w) => w.code !== 'noCartridge')
               .map((w) => (

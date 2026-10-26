@@ -73,6 +73,8 @@ export type Outcome =
       cartridgeDesign?: string | undefined
       /** The run's chamber volume is a measured case capacity (`volumeMeasured`), not an estimate. */
       volumeMeasured: boolean
+      /** The user powder design whose model parameters the run's fields took. */
+      powderDesign?: string | undefined
       /** Id of the cartridge record the run compared its limits with. */
       cartridge?: string | undefined
       /** Cartridge, bullet and powder of the run, as their records name them. */

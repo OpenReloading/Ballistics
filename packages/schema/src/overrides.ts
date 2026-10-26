@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { bullet } from './bullet.ts'
 import { cartridge } from './cartridge.ts'
+import { type Powder, powder } from './powder.ts'
 import { specValue } from './standards.ts'
 
 /**
@@ -95,10 +96,17 @@ function describedFields(schema: z.ZodObject, record: string, path: string[]): z
  * The schema of the overrides of `schema`, a part of a `record`: every field optional and nullable,
  * nested objects likewise. Rules across fields (`superRefine`) are dropped, since an override is a
  * part of a record. Arrays and leaves keep their schema. A field without a description gets one
- * from its path.
+ * from its path. With `bare`, a number has no bounds (the draft of a record in the making).
  */
-function overridesOf(schema: z.ZodType, record: string, path: string[] = []): z.ZodType {
+function overridesOf(
+  schema: z.ZodType,
+  record: string,
+  path: string[] = [],
+  bare = false,
+): z.ZodType {
   const inner = schema instanceof z.ZodOptional ? (schema.unwrap() as z.ZodType) : schema
+  // a draft holds what was typed, so a number loses the bounds the finished record has
+  if (bare && inner instanceof z.ZodNumber) return z.number()
   if (inner instanceof z.ZodArray && inner.element instanceof z.ZodObject)
     return z.array(describedFields(inner.element as z.ZodObject, record, [...path, '[]']))
   if (!(inner instanceof z.ZodObject)) return inner
@@ -111,7 +119,7 @@ function overridesOf(schema: z.ZodType, record: string, path: string[] = []): z.
           (v instanceof z.ZodOptional ? (v.unwrap() as z.ZodType).description : undefined)
         return [
           k,
-          overridesOf(v, record, at)
+          overridesOf(v, record, at, bare)
             .nullable()
             .optional()
             .describe(
@@ -135,6 +143,56 @@ const {
   values: _values,
   ...cartridgeShape
 } = cartridge.shape
+
+const {
+  id: _powderId,
+  manufacturer: _powderManufacturer,
+  name: _powderName,
+  country: _powderCountry,
+  provenance: _powderProvenance,
+  composition: _powderComposition,
+  temperatureSensitivity: _powderSensitivity,
+  ...powderShape
+} = powder.shape
+
+/** One ingredient of a powder draft: the printed name, CAS number and mass percent range, each still optional. */
+const compositionDraft = z.object({
+  name: z
+    .string()
+    .describe('Name of the ingredient as the safety data sheet prints it.')
+    .optional(),
+  cas: z.string().describe('CAS registry number of the ingredient.').optional(),
+  min: z.number().describe('Lower end of the mass percent range.').optional(),
+  max: z.number().describe('Upper end of the mass percent range.').optional(),
+})
+
+/** The fields of a powder draft that {@link powderDraft} types, in stored units. */
+type PowderDraftFields = Overrides<
+  Omit<
+    Powder,
+    | 'id'
+    | 'manufacturer'
+    | 'name'
+    | 'country'
+    | 'provenance'
+    | 'composition'
+    | 'temperatureSensitivity'
+  >
+> & { composition?: z.infer<typeof compositionDraft>[] | null }
+
+/**
+ * The fields of a powder in the powder designer while the draft is unfinished: any of the powder
+ * record's fields but `id`, `manufacturer`, `name`, `country`, `provenance` and
+ * `temperatureSensitivity`, every one optional, nested objects likewise, in the stored units, the numbers without the powder
+ * record's bounds (a half-typed value stays in the draft). The designer builds a {@link Powder} from it and checks that against `powder`.
+ * Inferred type: {@link PowderDraft}.
+ */
+export const powderDraft = overridesOf(
+  z.object({ ...powderShape, composition: z.array(compositionDraft).max(40) }),
+  'powder',
+  [],
+  true,
+) as z.ZodType<PowderDraftFields>
 
 /**
  * The overrides of a bullet record: any of its fields but `id`, `manufacturer` (the user bullet's
@@ -178,6 +236,8 @@ export const cartridgeOverrides = overridesOf(
   }
 >
 
+/** The fields of a powder in the powder designer: a partial of {@link Powder} in stored units. */
+export type PowderDraft = z.infer<typeof powderDraft>
 /** The overrides of a bullet: a partial of {@link Bullet} in stored units. */
 export type BulletOverrides = z.infer<typeof bulletOverrides>
 /** The overrides of a cartridge: a partial of {@link Cartridge} in stored units. */

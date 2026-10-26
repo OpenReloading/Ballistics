@@ -71,6 +71,7 @@ export const toolRoutes = [
   '/bullets/designer',
   '/cartridges/designer',
   '/targets/designer',
+  '/powders/designer',
 ]
 
 export const isToolRoute = (route: string) => toolRoutes.includes(route)

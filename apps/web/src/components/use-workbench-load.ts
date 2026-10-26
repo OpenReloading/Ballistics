@@ -89,6 +89,7 @@ import { type ManufacturerNames, productLabel } from '../lib/manufacturers.ts'
 import { attachLoad, sessionRef } from '../lib/measurements.ts'
 import { nth } from '../lib/nth.ts'
 import { powderValues } from '../lib/powder-compare.ts'
+import { type PowderDesign, powderDesigns, powderOf } from '../lib/powder-designer.ts'
 import { unchangedFromRecord } from '../lib/powder-record.ts'
 import {
   droppedIds,
@@ -509,7 +510,7 @@ function recordLinkOf(a: {
   const { asked, bullet, powder, names } = a
   return {
     bulletId: (asked.bullet?.id && catalogueIdOf(asked.bullet.id)) || bullet?.id,
-    powderId: asked.powder?.id ?? powder?.id,
+    powderId: (asked.powder?.id && catalogueIdOf(asked.powder.id)) || powder?.id,
     values: {
       bullet: bullet
         ? {
@@ -853,13 +854,16 @@ function identityOf(a: {
   bulletDesign: Named
   linkedBullet: Named
   powderLabel: string | undefined
+  powderDesign: Named
   linkedPowder: Named
 }) {
   const design = a.cartridgeDesign && `${a.cartridgeDesign.name} (user design)`
   return {
     cartridge: a.cartridge?.name ?? design,
     bullet: a.bulletLabel ?? a.bulletDesign?.name ?? a.linkedBullet?.name,
-    powder: a.powderLabel ?? a.linkedPowder?.name,
+    powder: a.powderDesign
+      ? `${a.powderLabel} (user design)`
+      : (a.powderLabel ?? a.linkedPowder?.name),
   }
 }
 
@@ -1062,10 +1066,14 @@ export function useWorkbenchState() {
   }
   const [bullet, setBullet] = useState<Bullet | undefined>(undefined)
   const [powder, setPowder] = useState<Powder | undefined>(undefined)
+  /** The user powder design whose values the fields took; the powder record is then none. */
+  const [powderDesign, setPowderDesign] = useState<PowderDesign>()
+  /** The powder the run reads: the record, else the design's. */
+  const chosenPowder = powder ?? powderDesign?.powder
   const names = useManufacturerNames()
   /** The chosen records as "<manufacturer name> <product name>". */
   const bulletLabel = labelOf(bullet, names)
-  const powderLabel = labelOf(powder, names)
+  const powderLabel = labelOf(powder, names) ?? powderDesign?.name
   /** SI values of the powder record's model parameters, the reference of the field marks. */
   const [origin, setOrigin] = useState<Record<string, number> | undefined>(undefined)
   const originNow = useRef(origin)
@@ -1079,6 +1087,8 @@ export function useWorkbenchState() {
   const [designs, setDesigns] = useState<UserBulletView[]>([])
   /** The browser's cartridge designs that draw a case and chamber. */
   const [cartridgeDesigns, setCartridgeDesigns] = useState<UserCartridgeView[]>([])
+  /** The browser's powder designs that build a valid powder. */
+  const [powderDesignList, setPowderDesignList] = useState<PowderDesign[]>([])
   /** The firearm library of this browser, for the Gun and barrel picker. */
   const [firearms, setFirearms] = useState<FirearmRecord[]>([])
   const [firearm, setFirearm] = useState<string>()
@@ -1146,6 +1156,7 @@ export function useWorkbenchState() {
             (d) => workbenchDesign(d.data, d.resolved, d.name, unitsNow.current) !== undefined,
           ),
         )
+        setPowderDesignList(powderDesigns(records))
         setFirearms(records.filter((r): r is (typeof firearms)[number] => r.kind === 'firearm'))
       })
       .catch(() => {})
@@ -1572,6 +1583,7 @@ export function useWorkbenchState() {
     setBulletNote('')
     setAllDiameters(false)
     setPowder(undefined)
+    setPowderDesign(undefined)
     setOrigin(undefined)
     setOutcome(undefined)
     showChart(undefined)
@@ -1720,6 +1732,64 @@ export function useWorkbenchState() {
   }
 
   /**
+   * `p`, a powder record or the powder a user design builds (`design`), in place of the earlier
+   * one; `fill` writes its model parameters into the fields, except the `keep` ones.
+   */
+  function takePowder(
+    p: Powder,
+    design: PowderDesign | undefined,
+    fill: boolean,
+    keep: ReadonlySet<string>,
+  ) {
+    markChanged()
+    setPowder(design ? undefined : p)
+    setPowderDesign(design)
+    const values = powderModelValues(p)
+    const previous = originNow.current
+    setOrigin(values)
+    if (fill && !values && previous) {
+      // a record without model parameters: what the previous record filled and the user did not
+      // edit goes back to a new load's state (the cited default, else empty)
+      const back = revertRecordFill(form, previous, defaults, unitsNow.current)
+      setDefaulted((s) => new Set([...s, ...back]))
+    }
+    if (!fill || !values) return
+    const filledKeys = fillRecordValues(form, values, keep, unitsNow.current)
+    setDefaulted((s) => new Set([...s].filter((k) => !filledKeys.has(k))))
+  }
+
+  /** A powder design of this browser in place of a record. */
+  function takePowderDesign(d: PowderDesign, fill = true, keep: ReadonlySet<string> = new Set()) {
+    picking.current.powders?.abort()
+    got('powder')
+    takePowder(d.powder, d, fill, keep)
+  }
+  function choosePowderDesign(id: string) {
+    const d = powderDesignList.find((r) => r.id === id)
+    if (d) takePowderDesign(d)
+  }
+
+  /** The powder design `ref` (`user:<id>`) of an opened load; `keep` are the values the load carries. */
+  function openPowderDesign(ref: string, keep: ReadonlySet<string>) {
+    const signal = pick('powders')
+    want('powder', ref)
+    const id = parseRef(ref)?.id ?? ''
+    storedRecord(id)
+      .then((raw) => {
+        const r = userRecord.safeParse(raw)
+        const built =
+          r.success && r.data.kind === 'powder' && powderOf(r.data.data, r.data.name, id)
+        if (signal.aborted) return
+        if (!r.success || r.data.kind !== 'powder' || !built || !('powder' in built))
+          return lost('powder', ref)
+        takePowderDesign({ id, name: r.data.name, powder: built.powder }, true, keep)
+      })
+      .catch(() => {
+        if (!signal.aborted) lost('powder', ref)
+      })
+  }
+
+  /**
    * Loads a powder record; `fill` writes its model parameters into the fields, except the `keep`
    * ones (the values an opened load carries).
    */
@@ -1731,20 +1801,7 @@ export function useWorkbenchState() {
         if (signal.aborted) return
         if (!p) return lost('powder', id)
         got('powder')
-        markChanged()
-        setPowder(p)
-        const values = powderModelValues(p)
-        const previous = originNow.current
-        setOrigin(values)
-        if (fill && !values && previous) {
-          // a record without model parameters: what the previous record filled and the user did not
-          // edit goes back to a new load's state (the cited default, else empty)
-          const back = revertRecordFill(form, previous, defaults, unitsNow.current)
-          setDefaulted((s) => new Set([...s, ...back]))
-        }
-        if (!fill || !values) return
-        const filledKeys = fillRecordValues(form, values, keep, unitsNow.current)
-        setDefaulted((s) => new Set([...s].filter((k) => !filledKeys.has(k))))
+        takePowder(p, undefined, fill, keep)
       })
       .catch(() => {
         if (signal.aborted) return
@@ -1839,8 +1896,8 @@ export function useWorkbenchState() {
    * bore resistance reads besides the body: the key of the Powders tab's rows.
    */
   function loadRequest(as?: { powder: Powder; charge?: number }) {
-    const chosen = as?.powder ?? powder
-    const values = powderValues(siValues(fields), powder, as)
+    const chosen = as?.powder ?? chosenPowder
+    const values = powderValues(siValues(fields), chosenPowder, as)
     const body = interiorBody(
       { ...values, boreArea: values.boreArea ?? qM },
       cartridge?.id,
@@ -1872,7 +1929,7 @@ export function useWorkbenchState() {
     const resistanceMissing =
       chosen && missing.length > 0 ? { powder: productLabel(chosen, names), missing } : undefined
     const recordInputs = [
-      powder?.id,
+      chosenPowder?.id,
       bulletLength,
       cartridge?.g1,
       groove?.id === cartridge?.id ? groove?.z : undefined,
@@ -1923,7 +1980,7 @@ export function useWorkbenchState() {
       id: runs.current,
       bulkDensity: a.bulkDensity,
       cartridge: body.cartridge,
-      powderChosen: powder !== undefined || linkedPowder !== undefined,
+      powderChosen: chosenPowder !== undefined || linkedPowder !== undefined,
       resistanceMissing: a.resistanceMissing,
       design: bulletDesign?.name,
       cartridgeDesign: cartridgeDesign?.name,
@@ -1932,6 +1989,7 @@ export function useWorkbenchState() {
         volume: fields.volume?.si,
         derived: [suggestions.volume?.si, seated.volume],
       }),
+      powderDesign: powderDesign?.name,
       identity: identityOf({
         cartridge,
         cartridgeDesign,
@@ -1939,6 +1997,7 @@ export function useWorkbenchState() {
         bulletDesign,
         linkedBullet,
         powderLabel,
+        powderDesign,
         linkedPowder,
       }),
       printed: {
@@ -2364,12 +2423,19 @@ export function useWorkbenchState() {
     if (userCartridge) openCartridgeDesign(userCartridge)
     if (d.capacity) openCapacity(d.capacity, d.cartridge)
     openBullet(d.bullet, !typed.has('bulletMass'))
-    const powderId = catalogueIdIn(d.powder)
-    if (powderId) void choosePowder(powderId, true, typed)
+    openPowder(d.powder, typed)
     setNotes(d.note ?? '')
     setLots(lotsFrom(d))
     setSnapshots(d.snapshots ?? [])
     openSessions(sessions)
+  }
+
+  /** The powder of an opened load: a catalogue record is chosen, a design of this browser is read. */
+  function openPowder(ref: unknown, keep: ReadonlySet<string>) {
+    const powderRef = typeof ref === 'string' ? ref : undefined
+    const id = powderRef && catalogueIdOf(powderRef)
+    if (id) void choosePowder(id, true, keep)
+    else if (powderRef) openPowderDesign(powderRef, keep)
   }
 
   /** The bullet of an opened load: a catalogue record is chosen, a design of this browser is read. */
@@ -2475,7 +2541,6 @@ export function useWorkbenchState() {
   // the references the load keeps; one that cannot be written (a design or firearm whose id is no
   // UUID) leaves what it gives in the load as typed values
   const firearmRef = userRefOf(firearm)
-  const powderId = asked.powder?.id ?? powder?.id
   const referenced = referencedOf(firearm, firearmRef, cartridgeDesign, bulletDesign)
   const fieldValues: Record<string, number | undefined> = {
     ...Object.fromEntries(Object.entries(fields).map(([k, f]) => [k, f.si])),
@@ -2562,7 +2627,7 @@ export function useWorkbenchState() {
     cartridge: cartridgeRef,
     firearm: firearmRef,
     bullet: savedRef(asked.bullet?.id, bulletDesign?.id, bullet?.id),
-    powder: powderId && catalogueRef(powderId),
+    powder: savedRef(asked.powder?.id, powderDesign?.id, powder?.id),
     notes,
     capacity: capacityRef,
     seating,
@@ -2614,7 +2679,7 @@ export function useWorkbenchState() {
 
   /** A new load with nothing chosen or typed: the start card replaces the cards. */
   const fresh = isFresh({
-    chosen: [cartridge, cartridgeDesign, bullet, bulletDesign, powder, outcome],
+    chosen: [cartridge, cartridgeDesign, bullet, bulletDesign, powder, powderDesign, outcome],
     byHand,
     fields,
     defaulted,
@@ -2751,7 +2816,10 @@ export function useWorkbenchState() {
     setCapacityChoice: chooseCapacity,
     storeLoad,
     pending,
-    powder,
+    powder: chosenPowder,
+    powderDesign,
+    powderDesigns: powderDesignList,
+    choosePowderDesign,
     previewInitial,
     previewed,
     printMedia,
