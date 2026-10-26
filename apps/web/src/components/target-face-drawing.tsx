@@ -7,10 +7,17 @@ type Paint = {
   vectorEffect?: 'non-scaling-stroke' | undefined
 }
 
-// a square ring is a rectangle, any other an ellipse
+// a square ring is a rectangle, a stadium a rectangle with half circle ends, any other an ellipse
 const Outline = ({ e, ...paint }: { e: FaceEllipse } & Paint) =>
-  e.square ? (
-    <rect x={-e.rx} y={-e.ry} width={2 * e.rx} height={2 * e.ry} {...paint} />
+  e.square || e.stadium ? (
+    <rect
+      x={-e.rx}
+      y={-e.ry}
+      width={2 * e.rx}
+      height={2 * e.ry}
+      {...(e.stadium && { rx: e.rx })}
+      {...paint}
+    />
   ) : (
     <ellipse rx={e.rx} ry={e.ry} {...paint} />
   )

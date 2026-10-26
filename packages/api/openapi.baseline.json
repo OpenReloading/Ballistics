@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "OpenReloading API",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "Records of cartridges, components and competitions, and the exterior and interior ballistics models. Quantities are SI (m, kg, s, Pa, K, rad) unless a field names another unit. Results are simulations, not load data."
   },
   "tags": [
@@ -23008,7 +23008,7 @@
                           },
                           "shape": {
                             "type": "string",
-                            "enum": ["circle", "square"]
+                            "enum": ["circle", "square", "stadium"]
                           },
                           "fill": {
                             "type": "string",
