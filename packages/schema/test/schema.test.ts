@@ -249,6 +249,39 @@ describe('bullet', () => {
     ).toBe(false)
   })
 
+  it('refuses a cannelure that leaves the shank or is deeper than the radius', () => {
+    const groove = (start: number, width: number, depth?: number) => ({
+      start: { value: start },
+      width: { value: width },
+      ...(depth === undefined ? {} : { depth: { value: depth } }),
+    })
+    const issues = (extra: object) => {
+      const r = bullet.safeParse({ ...base, ...extra })
+      return r.success ? [] : r.error.issues.map((i) => i.path.join('.'))
+    }
+    const shaped = { length: { value: 30 }, noseLength: { value: 12 } }
+    // the shank runs from 0 to 18 mm, so the groove may end exactly at 18
+    expect(issues({ ...shaped, cannelure: groove(16.8, 1.2) })).toEqual([])
+    expect(issues({ ...shaped, cannelure: groove(17, 1.2) })).toEqual(['cannelure.width'])
+    // without a nose length only the length bounds the groove
+    expect(issues({ length: { value: 30 }, cannelure: groove(28.8, 1.2) })).toEqual([])
+    expect(issues({ length: { value: 30 }, cannelure: groove(29, 1.2) })).toEqual([
+      'cannelure.width',
+    ])
+    // behind a boat tail the shank begins where the tail ends
+    const tailed = { base: { type: 'boat-tail', length: { value: 4 } } }
+    expect(issues({ ...shaped, ...tailed, cannelure: groove(4, 1.2) })).toEqual([])
+    expect(issues({ ...shaped, ...tailed, cannelure: groove(3.5, 1.2) })).toEqual([
+      'cannelure.start',
+    ])
+    // a flat base has no tail: a stated base length does not move the rear bound
+    const flat = { base: { type: 'flat', length: { value: 4 } } }
+    expect(issues({ ...shaped, ...flat, cannelure: groove(1, 1.2) })).toEqual([])
+    // the depth stays below the radius (3.9115 mm)
+    expect(issues({ cannelure: groove(9, 1.2, 3.9) })).toEqual([])
+    expect(issues({ cannelure: groove(9, 1.2, 3.92) })).toEqual(['cannelure.depth'])
+  })
+
   it('carries the unit of each geometry field in the JSON Schema', () => {
     const json = z.toJSONSchema(bullet, { io: 'input' }) as {
       properties: Record<string, { properties?: Record<string, unknown> }>

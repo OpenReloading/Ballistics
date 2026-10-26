@@ -135,9 +135,16 @@ const bulletOgive = z
     message: 'needs a form, a radius or Rt/R',
   })
 
+/** Slack of the cannelure checks, mm, for a groove that ends exactly on a shank end. */
+const lengthTolerance = 1e-9
+
 /**
- * Cannelure, a groove around the shank: `start` is the distance of its rear edge from the base, `width`
- * its axial extent and `depth` its radial depth where the source gives one.
+ * Cannelure, a groove around the shank. `start` is the distance from the base of the bullet to the
+ * groove's rear edge, the edge nearer the base: forensic work measures a cannelure's position as its
+ * height above the base of the bullet, from the base of the bullet to the base of the groove
+ * (Hudson, Proceedings of the American Academy of Forensic Sciences, 2018, abstract B129). The
+ * bullet designer's cannelure start has the same datum and unit, so a record seeds it unchanged.
+ * `width` is the axial extent of the groove and `depth` its radial depth where the source gives one.
  */
 const bulletCannelure = z.object({
   start: quantity('length', z.number().positive()),
@@ -172,6 +179,39 @@ const bulletTip = z
     if (tip.mouthDiameter && tip.type !== 'hollow-point')
       issue('mouthDiameter', 'only for a hollow point')
   })
+
+type Stored = { value: number } | undefined
+
+/**
+ * Refuses a cannelure that leaves the shank, as far as the record gives its ends: the shank ends
+ * where the nose begins (the length less the nose length) and, behind a boat tail, begins where the
+ * tail ends. The drawing checks the ends the record leaves out.
+ */
+function cannelureOnShank(
+  b: {
+    diameter: { value: number }
+    length?: Stored
+    noseLength?: Stored
+    base?: { type?: string | undefined; length?: Stored } | undefined
+    cannelure?: { start: { value: number }; width: { value: number }; depth?: Stored } | undefined
+  },
+  issue: (path: string[], message: string) => void,
+) {
+  const groove = b.cannelure
+  if (!groove) return
+  const tail = b.base?.type === 'boat-tail' || b.base?.type === 'rebated-boat-tail'
+  const rear = tail ? (b.base?.length?.value ?? 0) : 0
+  if (groove.start.value < rear - lengthTolerance)
+    issue(['cannelure', 'start'], 'must not lie on the boat tail')
+  const end = b.length && b.length.value - (b.noseLength?.value ?? 0)
+  if (end !== undefined && groove.start.value + groove.width.value > end + lengthTolerance)
+    issue(
+      ['cannelure', 'width'],
+      b.noseLength ? 'must end before the nose begins' : 'must end within the length',
+    )
+  if (groove.depth && !(groove.depth.value < b.diameter.value / 2))
+    issue(['cannelure', 'depth'], 'must be smaller than the radius')
+}
 
 /** A projectile as its manufacturer sells it. Inferred type: {@link Bullet}. */
 export const bullet = z
@@ -235,6 +275,7 @@ export const bullet = z
       b.base?.diameter?.value ?? d,
       b.base?.diameter ? 'the base diameter' : 'the diameter',
     )
+    cannelureOnShank(b, issue)
     // The depth is not stored: it is half the opening (`bulletOutline`).
     if (cavity !== undefined && b.length && !(cavity / 2 < b.length.value))
       issue(

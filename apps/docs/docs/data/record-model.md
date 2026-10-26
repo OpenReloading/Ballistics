@@ -167,6 +167,7 @@ Steps 1, 2 and 11 go first, then 3, then 4 to 6, then 7 to 9. Steps 10 and 12 fi
 - `caseTypes` is one enum in `packages/schema/src/cartridge.ts`, used by the cartridges route and the web filter.
 - The designer's choice lists are the options of the enums `baseTypes`, `ogiveForms` and `tipTypes` of `packages/schema/src/bullet.ts`. A test checks that each list is a subset of the enum at its path in the bullet schema.
 - The bullet schema gains the ogive forms `round-nose` and `flat-nose` and an optional `cannelure` (`start`, `width`, `depth?`, lengths in mm). Existing records stay valid. The drawing reads a record's cannelure.
+- A cannelure's `start` is the distance from the base of the bullet to the groove's rear edge, the edge nearer the base. Forensic work gives a cannelure's position as its height above the base of the bullet, measured from the base to the base of the groove (Hudson, Proceedings of the American Academy of Forensic Sciences, 2018, abstract B129); the source does not draw the edge, so the rear edge is the reading taken here. The designer's cannelure start has the same datum and unit, so a record seeds it without conversion. The schema refuses a groove that ends beyond the shank (the length less the nose length, or the length without a nose length), that starts on a boat tail whose length the record gives, or whose depth reaches the radius.
 
 ### Step 2: what changed
 
