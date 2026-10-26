@@ -11,6 +11,7 @@
     "test": "node --test scripts/*.test.mts"
   },
   "devDependencies": {
+    "@docusaurus/theme-common": "3.10.2",
     "@docusaurus/tsconfig": "3.10.2",
     "@docusaurus/types": "3.10.2",
     "typedoc": "^0.28.20",
@@ -19,7 +20,8 @@
   "dependencies": {
     "@docusaurus/core": "3.10.2",
     "@docusaurus/plugin-content-docs": "3.10.2",
-    "@docusaurus/preset-classic": "3.10.2",
+    "@docusaurus/plugin-sitemap": "3.10.2",
+    "@docusaurus/theme-classic": "3.10.2",
     "@open-reloading/api": "0.0.1",
     "@scalar/api-reference": "1.75.1",
     "katex": "0.19.0",

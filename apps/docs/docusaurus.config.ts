@@ -1,5 +1,7 @@
 import { execFileSync } from 'node:child_process'
-import type * as Preset from '@docusaurus/preset-classic'
+import type { Options as SitemapOptions } from '@docusaurus/plugin-sitemap'
+import type { Options as ThemeOptions } from '@docusaurus/theme-classic'
+import type { UserThemeConfig } from '@docusaurus/theme-common'
 import type { Config } from '@docusaurus/types'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
@@ -25,25 +27,24 @@ const config = async (): Promise<Config> => ({
   stylesheets: [`${baseUrl}pagefind/pagefind-component-ui.css`],
   // the search box of src/theme/SearchBar.tsx: it reads the index next to this script
   scripts: [{ src: `${baseUrl}pagefind/pagefind-component-ui.js`, defer: true }],
-  presets: [
-    [
-      'classic',
-      {
-        docs: {
-          routeBasePath: '/',
-          sidebarPath: './sidebars.ts',
-          remarkPlugins: [remarkMath],
-          rehypePlugins: [rehypeKatex],
-          breadcrumbs: true,
-        },
-        blog: false,
-        theme: { customCss: './src/css/custom.css' },
-      } satisfies Preset.Options,
-    ],
+  // the pieces of the classic preset the site uses, without its SVG-as-component and search plugins
+  themes: [
+    ['@docusaurus/theme-classic', { customCss: './src/css/custom.css' } satisfies ThemeOptions],
   ],
-  // the search index of the built site, docs and both reference sites (scripts/search.mts), in
-  // its own process: the config loader cannot require the ESM-only pagefind package
   plugins: [
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        routeBasePath: '/',
+        sidebarPath: './sidebars.ts',
+        remarkPlugins: [remarkMath],
+        rehypePlugins: [rehypeKatex],
+        breadcrumbs: true,
+      },
+    ],
+    ['@docusaurus/plugin-sitemap', {} satisfies SitemapOptions],
+    // the search index of the built site, docs and both reference sites (scripts/search.mts), in
+    // its own process: the config loader cannot require the ESM-only pagefind package
     ({ siteDir }) => ({
       name: 'search-index',
       postBuild: ({ outDir }) => {
@@ -74,7 +75,7 @@ const config = async (): Promise<Config> => ({
     },
     docs: { sidebar: { hideable: true, autoCollapseCategories: true } },
     colorMode: { respectPrefersColorScheme: true },
-  } satisfies Preset.ThemeConfig,
+  } satisfies UserThemeConfig,
 })
 
 export default config
