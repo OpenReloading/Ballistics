@@ -10,7 +10,7 @@ Simulate a handload before you take it to the range: muzzle velocity, peak press
 
 It is for handloaders who want to see what a load does on paper, and for developers who want the same models as TypeScript packages or a REST API.
 
-**Alpha:** breaking changes are to be expected in pages, features, data and file formats.
+**Alpha version:** breaking changes are to be expected in pages, features, data and file formats.
 
 ## Try it
 
@@ -33,15 +33,14 @@ The records in `packages/data/records/` are one cartridge record per C.I.P. shee
 
 ## Safety
 
-Reloading ammunition is dangerous. Results are simulations, not load data. Never use one as a charge weight or as proof that a load is safe: start from the load data the powder or bullet maker publishes for your exact components.
+Reloading ammunition is dangerous. This software helps you plan, simulate and document. It does not replace published load data, the instructions of your component and equipment makers, or safe practice.
 
-- Simulated pressures carry model and input uncertainty. The shown ranges do not include model error, and the absence of a warning does not mean a load is safe.
-- Components, cases, chambers and barrels differ, so measured pressure and velocity can differ from any simulation.
-- Statistics, group sizes, scores and records can contain errors from the models, the data or your inputs.
+- Results are simulations, not load data. Never use a result as a charge weight or as proof that a load is safe. Start from load data published by the powder or bullet maker for your exact components.
+- Simulated pressures carry model and input uncertainty. The shown ranges do not include model error. The absence of a warning does not mean a load is safe.
+- Component lots, cases, chambers and barrels differ. Measured pressure and velocity can differ from any simulation.
+- Measurements, statistics, group sizes, scores and records shown here can contain errors from the models, the data or your inputs.
 
-Reloading and shooting are at your own risk. The software comes without warranty, and its authors are not liable for damage or injury arising from its use.
-
-Developed with the assistance of generative AI.
+Reloading and shooting are done at your own risk. This software comes without warranty of any kind, and its authors are not liable for any damage or injury arising from its use.
 
 ## Community and contributing
 
@@ -56,3 +55,5 @@ Developed with the assistance of generative AI.
 - Code: MIT, see [LICENSE](LICENSE).
 - Data records (`packages/data/records/`): CC BY 4.0, see [packages/data/LICENSE](packages/data/LICENSE). Sources with their own terms name them in `license`.
 - The Ballistics logo: [OpenReloading/Artwork](https://github.com/OpenReloading/Artwork) (MIT), see [NOTICE](NOTICE).
+
+Developed with the assistance of generative AI.
