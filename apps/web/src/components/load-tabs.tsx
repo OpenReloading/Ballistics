@@ -79,7 +79,7 @@ export function LoadTabs({
               variant="default"
               className="load-switch"
               aria-label={`Load ${index + 1}: ${label}${shown?.unsaved ? ', unsaved changes' : ''}, switch load (${items.length} open)`}
-              // the name holds the visible text, the number and the label, in order (WCAG 2.5.3)
+              // WCAG 2.5.3: the name holds the visible number and label as two words (the space after the number)
               title={shown?.title}
               aria-haspopup="dialog"
               aria-expanded={menu}
@@ -87,7 +87,7 @@ export function LoadTabs({
               data-due={due || undefined}
               leftSection={
                 <span className="load-index" aria-hidden="true">
-                  {index + 1}
+                  {index + 1}{' '}
                 </span>
               }
               rightSection={<CaretDown size={12} aria-hidden="true" />}
