@@ -78,7 +78,7 @@ export function LoadTabs({
               ref={switcher}
               variant="default"
               className="load-switch"
-              aria-label={`Open loads, ${index + 1} of ${items.length}: ${shown?.title ?? label}${shown?.unsaved ? ', unsaved changes' : ''}`}
+              aria-label={`${label}, open loads, ${index + 1} of ${items.length}${shown?.unsaved ? ', unsaved changes' : ''}`}
               title={shown?.title}
               aria-haspopup="dialog"
               aria-expanded={menu}
