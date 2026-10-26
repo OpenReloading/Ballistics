@@ -69,7 +69,7 @@ function convexHull(points: Point[]): Point[] {
 }
 
 /** Otsu's threshold of a histogram of `n` values: the last bin of the lower class. */
-function otsu(hist: Float64Array, n: number): number {
+export function otsu(hist: Float64Array, n: number): number {
   let total = 0
   for (let i = 0; i < hist.length; i++) total += i * f64(hist, i)
   let [sumB, wB, best, t] = [0, 0, -1, 0]
