@@ -103,6 +103,55 @@
         }
       ]
     },
+    "phone-night.jpg": {
+      "about": "phone photo of a dark face in dim light: holes as dark as the backing behind them, lighter torn rims, 0.7 of the bullet",
+      "size": [640, 640],
+      "pxPerMm": 6,
+      "caliberMm": 7.62,
+      "visibleDiameterPx": 32.004,
+      "holes": [
+        {
+          "x": 265.7,
+          "y": 247.1
+        },
+        {
+          "x": 308.4,
+          "y": 235.3
+        },
+        {
+          "x": 375,
+          "y": 264.8
+        },
+        {
+          "x": 236.2,
+          "y": 313.6
+        },
+        {
+          "x": 318.2,
+          "y": 315.9
+        },
+        {
+          "x": 394.8,
+          "y": 344
+        },
+        {
+          "x": 266.3,
+          "y": 389.3
+        },
+        {
+          "x": 341.6,
+          "y": 405.2
+        },
+        {
+          "x": 293.3,
+          "y": 446.8
+        },
+        {
+          "x": 407.2,
+          "y": 414.7
+        }
+      ]
+    },
     "scan-orange.jpg": {
       "about": "scan of an orange face on a black diamond: light holes with burnt dark rims, 0.8 of the bullet",
       "size": [520, 520],
