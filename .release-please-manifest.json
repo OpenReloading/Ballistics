@@ -1,10 +1,10 @@
 {
-  "packages/schema": "0.0.1",
-  "packages/core": "0.0.1",
-  "packages/drawing": "0.0.1",
-  "packages/importers": "0.0.1",
-  "packages/data": "0.0.1",
-  "packages/api": "0.0.1",
-  "apps/web": "0.0.1",
-  "apps/docs": "0.0.1"
+  "packages/schema": "0.0.2",
+  "packages/core": "0.0.2",
+  "packages/drawing": "0.0.2",
+  "packages/importers": "0.0.2",
+  "packages/data": "0.0.2",
+  "packages/api": "0.0.2",
+  "apps/web": "0.0.2",
+  "apps/docs": "0.0.2"
 }
