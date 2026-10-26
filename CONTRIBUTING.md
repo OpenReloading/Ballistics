@@ -6,6 +6,9 @@ Where questions, ideas, bugs and record requests go: [README](README.md#communit
 
 - Node 26 (`.nvmrc`) and npm, or the dev container in `.devcontainer/` (Node 26, Playwright Chromium, oasdiff, Schemathesis). The dev container runs with rootless podman only (`userns_mode: keep-id` in `.devcontainer/compose.yaml`, which Docker Engine does not accept).
 - `npm ci`, then `npm run build` (workspaces import each other's `dist/`).
+- `npm ci` also installs a pre-commit hook into this repository's hooks folder (`hooks/install.mjs`, shared by every git worktree). A commit runs Biome on the staged files, the rules of `npm run lint`, and is refused with Biome's message on a finding; `npm run format` applies the safe fixes. It runs no tests or type checks, and CI runs the same Biome check on every pull request.
+  - The hook runs `node_modules/.bin/biome` of the checkout. With git on the host and `npm ci` run in the dev container, that is the container's install on the bind-mounted checkout (Linux host): the container need not be running. Where that binary does not run on the host (another operating system, no `npm ci` yet), the hook says so and the commit goes on unchecked: run `devcontainer exec --workspace-folder . npm run lint` before the pull request.
+  - A `core.hooksPath` of your own, or a `pre-commit` hook already in the hooks folder, is left alone and the install says so in one line. The hook is not installed in CI.
 - Every command, environment variable and container: [AGENTS.md](AGENTS.md).
 
 ## Before a pull request

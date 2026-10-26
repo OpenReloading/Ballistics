@@ -5,6 +5,10 @@
 - Install: `npm ci`
 - Lint and format check: `npm run lint` (Biome). Apply fixes: `npm run format`
 - Build all: `npm run build`, before `typecheck`, `test` and `data:validate` (workspaces import each other's `dist/`)
+- Pre-commit hook: `npm ci` (root `postinstall`, `hooks/install.mjs`) writes a stub into the repository's own hooks folder (shared by every worktree) that runs `hooks/pre-commit`: Biome on the staged files (`biome check --staged --error-on-warnings`), nothing else, skipped in CI.
+  - It never sets `core.hooksPath` and leaves a `core.hooksPath` or a foreign `pre-commit` hook alone (one message line at install). Re-run `npm install` after you unset your own.
+  - It runs the checkout's `node_modules/.bin/biome` on the host, where git runs. `npm ci` in the dev container fills the bind-mounted `node_modules`, so the container itself need not run. Where that binary does not run (no install yet, not Linux), the hook prints one line and lets the commit through: run `npm run lint` in the dev container.
+  - `tools/test/hooks.test.ts` covers the install and the hook. Never `--no-verify`.
 - Type check all: `npm run typecheck`
 - Package import rules: `npm run deps:check` (after `build`: workspace imports resolve to `dist/`)
   - dependency-cruiser with the rules of `.dependency-cruiser.cjs`, each named in its failure. It reads the sources of schema, core, drawing, importers, data, api and `apps/web/src` (not tests, scripts or configuration files), and the compiled files of importers, where a type import is erased, so any import of schema there is a runtime one.

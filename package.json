@@ -34,7 +34,7 @@
     "deps:check": "depcruise packages/core/src packages/drawing/src packages/importers/src packages/importers/dist packages/schema/src packages/data/src packages/api/src apps/web/src --config .dependency-cruiser.cjs --output-type err",
     "knip": "knip",
     "docs:check": "npm run check -w @open-reloading/docs",
-    "postinstall": "node patches/apply.mjs"
+    "postinstall": "node patches/apply.mjs && node hooks/install.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.15",

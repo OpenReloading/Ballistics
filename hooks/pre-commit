@@ -1,0 +1,16 @@
+#!/bin/sh
+# Biome on the staged files, the same rules as `npm run lint`. The CI `check` job stays the
+# authority, so a checkout where Biome does not run is told so and the commit goes on.
+# shortcut: Biome reads the working-tree file, not the index, so a partly staged file is checked
+# as a whole; upgrade when that hides a failure in practice.
+[ -n "$CI" ] && exit 0
+cd "$(git rev-parse --show-toplevel)" || exit 0
+biome=node_modules/.bin/biome
+if ! "$biome" --version >/dev/null 2>&1; then
+  echo 'pre-commit: Biome does not run in this checkout, nothing checked (CI checks it). npm ci installs it; in the dev container: devcontainer exec --workspace-folder . npm run lint' >&2
+  exit 0
+fi
+"$biome" check --staged --error-on-warnings --no-errors-on-unmatched || {
+  echo 'pre-commit: fix the findings above (npm run format applies the safe ones), stage the files and commit again' >&2
+  exit 1
+}
