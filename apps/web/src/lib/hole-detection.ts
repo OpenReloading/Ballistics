@@ -93,6 +93,11 @@ export type FaceLabel = {
    * ring lines.
    */
   numeral?: ((p: Point, roll?: number) => boolean) | undefined
+  /**
+   * True for a point where the quarter marks of the black area stand: on an axis turned by `roll`
+   * (rad), near the black area's edge.
+   */
+  quarter?: ((p: Point, roll?: number) => boolean) | undefined
   /** Distance of a point from the face centre (mm) and its angle from the face's x axis (rad). */
   polar?: (p: Point) => { radius: number; angle: number }
 }
@@ -174,8 +179,12 @@ const MAX_PART = 3
 const PRINT_CONFIDENCE = 0.8
 /** Marks where the ring numerals stand that make a run's marks there print: fewer are holes. */
 const NUMERALS_MIN = 3
+/** Of the marks where print stands, one whose part is more than this many times the lower median disc diameter of them is a hole on the print. */
+const HOLE_ON_PRINT = 1.2
 /** Marks on the turned axes agree on the turn within this angle, rad (2 degrees). */
 const ROLL_SPREAD = Math.PI / 90
+/** A seed run whose strongest peaks are smaller than this share of the expected hole size shows grain, not holes. */
+const SEED_MIN_SIZE = 0.5
 /** Peaks of the auto run per polarity that seed a run. */
 const AUTO_SEEDS = 4
 
@@ -283,6 +292,7 @@ function runSeeds(input: HoleDetectionInput, ctx: Ctx, seeds: (Peak | undefined)
     const sizes = [...got.run.sizes].sort((a, b) => a - b)
     // no sizes: NaN, as arithmetic on a missing entry has it
     const mid = sizes[sizes.length >> 1] ?? Number.NaN
+    if (mid < SEED_MIN_SIZE * ctx.prior) continue
     // the strongest peaks show alike holes
     if (sizes.filter((v) => Math.abs(v / mid - 1) > 0.35).length > sizes.length / 4) continue
     runs.push({ ...got, at })
@@ -421,8 +431,10 @@ function estimateHoleSize(
 
 /**
  * The shots of `run` with their image px, without the marks within half a hole of the working
- * image's edge and print: a dark mark on the black area and a light one on the paper, and the marks where the numerals stand when they are print (`printed`, or
- * when there are `NUMERALS_MIN` or more). `zone`: the shots where the numerals stand.
+ * image's edge and print: a dark mark on the black area and a light one on the paper, the marks
+ * where the numerals stand when they are print (`printed`, or when there are `NUMERALS_MIN` or
+ * more) and the quarter marks of the black area when they stand on `NUMERALS_MIN` axes or more.
+ * `zone`: the shots where the numerals stand.
  */
 function dropPrintMarks(ctx: Ctx, run: Run, printed: boolean | undefined) {
   const dark = lumaOf(run.mu) < lumaOf(run.ring)
@@ -433,10 +445,37 @@ function dropPrintMarks(ctx: Ctx, run: Run, printed: boolean | undefined) {
     .map((shot) => ({ shot, c: toImage(ctx, shot) }))
     .filter(({ shot, c }) => !(ctx.face?.black(c) === dark && shot.confidence < PRINT_CONFIDENCE))
   const roll = numeralRoll(ctx.face, marks)
-  const numerals = marks.filter(({ c }) => ctx.face?.numeral?.(c, roll))
+  const numerals = printAmong(
+    ctx,
+    marks.filter(({ c }) => ctx.face?.numeral?.(c, roll)),
+  )
   const zone = numerals.map((m) => m.shot)
   if (printed || numerals.length >= NUMERALS_MIN) marks = marks.filter((m) => !numerals.includes(m))
+  const quarter = printAmong(
+    ctx,
+    marks.filter(({ c }) => ctx.face?.quarter?.(c, roll)),
+  )
+  const axes = new Set(quarter.map(({ c }) => quarterTurn(ctx.face, c, roll)))
+  if (axes.size >= NUMERALS_MIN) marks = marks.filter((m) => !quarter.includes(m))
   return { marks, zone }
+}
+
+/** The quarter turns (0 to 3) from the face's x axis, turned by `roll`, to the direction of `c`. */
+function quarterTurn(face: FaceLabel | undefined, c: Point, roll: number): number {
+  const turn = Math.round(((face?.polar?.(c).angle ?? 0) - roll) / (Math.PI / 2))
+  return ((turn % 4) + 4) % 4
+}
+
+/**
+ * The marks of `group`, standing where print does, that are print: a mark whose disc diameter is
+ * above `HOLE_ON_PRINT` times the lower median of the group's but no larger than a hole can be
+ * (`SIZE_MAX` of the expected size) is a hole on the print. A larger part is print that merged.
+ */
+function printAmong<T extends { shot: HoleProposal }>(ctx: Ctx, group: readonly T[]): T[] {
+  if (!group.length) return []
+  const sizes = group.map((m) => m.shot.diameter).sort((a, b) => a - b)
+  const alike = HOLE_ON_PRINT * nth(sizes, (sizes.length - 1) >> 1)
+  return group.filter((m) => m.shot.diameter <= alike || m.shot.diameter > SIZE_MAX * ctx.prior)
 }
 
 /**
@@ -446,30 +485,34 @@ function dropPrintMarks(ctx: Ctx, run: Run, printed: boolean | undefined) {
  * the numerals of a ring do; else 0.
  */
 function numeralRoll(face: FaceLabel | undefined, marks: readonly { c: Point }[]): number {
-  const { numeral, polar } = face ?? {}
+  const { numeral, quarter, polar } = face ?? {}
   if (!numeral || !polar) return 0
   const q = Math.PI / 2
   // the axes repeat every quarter turn
   const offset = (a: number) => a - Math.round(a / q) * q
   const apart = (a: number, b: number) => Math.abs(offset(a - b))
-  const cands = marks
+  const turned = marks
     .map(({ c }) => ({ c, ...polar(c) }))
     .map((m) => ({ ...m, a: offset(m.angle) }))
-    .filter((m) => numeral(m.c, m.a))
-  const paired = (group: typeof cands) =>
-    group.some((m) =>
-      group.some(
-        (o) =>
-          Math.abs(o.radius / m.radius - 1) <= 0.03 &&
-          Math.abs(((o.angle - m.angle + 3 * Math.PI) % (2 * Math.PI)) - Math.PI) >= q / 2,
-      ),
-    )
-  let [roll, most] = [0, NUMERALS_MIN - 1]
-  for (const m of cands) {
-    const group = cands.filter((o) => apart(o.a, m.a) <= ROLL_SPREAD)
-    if (group.length > most && paired(group)) [roll, most] = [m.a, group.length]
+  const rollOf = (zone: (p: Point, roll: number) => boolean): number | undefined => {
+    const cands = turned.filter((m) => zone(m.c, m.a))
+    const paired = (group: typeof cands) =>
+      group.some((m) =>
+        group.some(
+          (o) =>
+            Math.abs(o.radius / m.radius - 1) <= 0.03 &&
+            Math.abs(((o.angle - m.angle + 3 * Math.PI) % (2 * Math.PI)) - Math.PI) >= q / 2,
+        ),
+      )
+    let [roll, most] = [undefined as number | undefined, NUMERALS_MIN - 1]
+    for (const m of cands) {
+      const group = cands.filter((o) => apart(o.a, m.a) <= ROLL_SPREAD)
+      if (group.length > most && paired(group)) [roll, most] = [m.a, group.length]
+    }
+    return roll
   }
-  return roll
+  // the quarter marks give the turn of a face whose numerals do not
+  return rollOf(numeral) ?? (quarter && rollOf(quarter)) ?? 0
 }
 
 /**

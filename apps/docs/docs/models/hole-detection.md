@@ -181,15 +181,22 @@ With a found face and no region drawn, the region is the face, and a flier on it
 A mark within half a hole of the working image's edge leaves a run: a ring line or the sheet's edge meets the photo's edge there. With a found face, these marks are print and leave it too:
 
 - a dark mark on the black area or a light one on the paper whose confidence is below 0.8;
-- the marks where the ring numerals stand, when the run or the seed runs hold three or more there. They stand on the face's axes, between two ring lines, within $\min(6\ \text{mm}, 0.3 g)$ of an axis, with $g$ the ring spacing.
+- the marks where the ring numerals stand, when the run or the seed runs hold three or more there. They stand on the face's axes, between two ring lines, within $\min(6\ \text{mm}, 0.3 g)$ of an axis, with $g$ the ring spacing;
+- the marks where the quarter marks of the black area stand, when three or more stand on different axes: on an axis within $0.5$ hole diameters of it and within one hole diameter of the black area's edge. The numerals' evidence from the other runs does not count for them.
 
-The face plane is found without a turn of its own, so the axes are turned by the angle $\phi$ from the nearest axis that most marks in the numeral rings share within 2 degrees, the axes repeating every quarter turn. It needs three marks at least, two of them at one radius (within 3 %) on two axes as the numerals of a ring stand, else it is 0:
+A hole on a numeral or a quarter mark makes a larger part than the print beside it. Of the marks where one kind of print stands, a mark whose part has a disc diameter $D_\mathrm{part}$ (the part's area per peak, as in the count per part) above 1.2 times the lower median of those of the group but within $1.4 D$ is a hole and stays. A larger part is print that merged with a neighbour, and the others are print:
+
+$$
+1.2\, \operatorname{median}_\mathrm{low} D_\mathrm{part} \lt D_\mathrm{part} \le 1.4\, D \Rightarrow \text{kept}
+$$
+
+The face plane is found without a turn of its own, so the axes are turned by the angle $\phi$ from the nearest axis that most marks in the numeral rings share within 2 degrees (when those give none, the marks where the quarter marks stand), the axes repeating every quarter turn. It needs three marks at least, two of them at one radius (within 3 %) on two axes as the numerals of a ring stand, else it is 0:
 
 $$
 \phi = \arg\max_{\phi_i} \#\left\{ j : \left\lvert \phi_j - \phi_i \right\rvert_{\mathrm{mod}\ 90^\circ} \le 2^\circ \right\}
 $$
 
-Code: `apps/web/src/lib/hole-detection.ts`, `dropPrintMarks`, `numeralRoll`, `ROLL_SPREAD`, `polar`, `PRINT_CONFIDENCE`, `NUMERALS_MIN`. `apps/web/src/lib/target-face.ts`, `faceLabel`.
+Code: `apps/web/src/lib/hole-detection.ts`, `dropPrintMarks`, `printAmong`, `numeralRoll`, `ROLL_SPREAD`, `polar`, `PRINT_CONFIDENCE`, `NUMERALS_MIN`, `HOLE_ON_PRINT`. `apps/web/src/lib/target-face.ts`, `faceLabel`, `QUARTER_WIDTH`, `QUARTER_REACH`.
 
 ### Target area
 
@@ -233,10 +240,10 @@ Code: `apps/web/src/lib/target-face.ts`, `findFace`, `ringLines`, `ringPlane`, `
 ### Detection without a picked hole
 
 1. The log luma is rescaled from its 0.5th to its 99.8th percentile in the region. Its four strongest blobs of each polarity each seed a colour axis and a run.
-2. A run is kept when it finds at least two shots of alike size: no more than a quarter of the sizes lie off their median by more than 35 %.
+2. A run is kept when it finds at least two shots of alike size: no more than a quarter of the sizes lie off their median by more than 35 %, and that median is at least half the expected hole size. Grain of the photo, on a dark face with dark holes the strongest light blobs, gives alike blobs far below that size, and runs of them agree with each other more than the holes' runs do.
 3. The run whose shots the other runs find again most often (within $0.5 D$) is proposed, then run again on the full working image. The seed runs use a working image with holes of about 12 pixels (0.75 times 16).
 
-Code: `apps/web/src/lib/hole-detection.ts`, `autoDetect`. `apps/web/src/lib/colour-axis.ts`, `rescale`, `logLuma`.
+Code: `apps/web/src/lib/hole-detection.ts`, `autoDetect`, `runSeeds`, `SEED_MIN_SIZE`. `apps/web/src/lib/colour-axis.ts`, `rescale`, `logLuma`.
 
 ## Symbols
 
@@ -276,7 +283,8 @@ Code: `apps/web/src/lib/hole-detection.ts`, `autoDetect`. `apps/web/src/lib/colo
 - A hole shows one colour, the backing seen through it, that differs from the paper or the black area around it along one direction in log RGB.
 - Holes are round blobs about the expected size, within 0.7 to 1.4 of it.
 - Overlapping holes form one connected part whose area is shared equally by its peaks.
-- With a found face, a dark mark on the black area and a light mark on the paper are print unless their confidence reaches 0.8, and marks where the ring numerals stand are print when they appear at three or more places (section Print on the face).
+- With a found face, a dark mark on the black area and a light mark on the paper are print unless their confidence reaches 0.8, and marks where the ring numerals or the quarter marks of the black area stand are print when they appear at three or more places and are no larger than the print there (section Print on the face).
+- Quarter marks are small marks about a hole's size on the four axes at the black area's edge. Where a face prints another kind of mark, it is proposed as a hole.
 
 ## Limits
 
@@ -285,6 +293,8 @@ Code: `apps/web/src/lib/hole-detection.ts`, `autoDetect`. `apps/web/src/lib/colo
 - A hole within half a hole of the photo's edge is not proposed.
 - A shadow confined to the outer paper can be mistaken for the sheet edge while the black area stays lit, so holes in that shadow can be omitted. Marking a region bypasses the automatic sheet boundary.
 - A hole whose backing is about as dark as the black area around it, with light torn rims, is often missed there.
+- A hole where print stands (a numeral, a quarter mark) whose part is no larger than the print's is dropped with it. A hole on a numeral or beside it makes a larger part and stays, unless the part reaches past what a hole can be (1.4 times the expected size).
+- Digits of quite different sizes on one face, or print that varies by more than a fifth, can read as holes on print.
 - A hole under 4 photo pixels across is refused. So is a region whose working image would leave a hole fewer than 4 working pixels.
 - Without a known scale the search cannot tell faces of equal ring ratios and different size apart, and a face that is penalised for rings the photo does not show can rank behind a larger twin outside the tie window.
 - The face search does not read the ring numerals: on a photo of an insert card the faces whose inner rings stand in the same ratios are offered for the user to choose.

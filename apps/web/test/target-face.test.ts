@@ -486,4 +486,28 @@ describe('on the photo and as a label', () => {
       faceLabel({ toFace: [1, 0, 0, 0, 1, 0, 0, 0, 1], outer: 250, black: 100 }, 6).numeral,
     ).toBeUndefined()
   })
+
+  it('marks where the quarter marks of the black area stand: on an axis, near its edge', () => {
+    const face = faceById('issf-25m-precision-50m-pistol')
+    const radii = face.rings.map((r) => r.diameter.value / 2)
+    const { quarter } = faceLabel(
+      { toFace: [1, 0, 0, 0, 1, 0, 0, 0, 1], outer: 250, black: 100, rings: radii },
+      6,
+    )
+    expect(quarter).toBeDefined()
+    if (!quarter) return
+    const at = (x: number, y: number, roll?: number) => quarter({ x, y }, roll)
+    expect(at(96, 0)).toBe(true)
+    expect(at(0, -104)).toBe(true)
+    expect(at(-98, 2)).toBe(true)
+    // off the axes, away from the edge, past the reach
+    expect(at(-98, 4)).toBe(false)
+    expect(at(70, 70)).toBe(false)
+    expect(at(60, 0)).toBe(false)
+    expect(at(0, 110)).toBe(false)
+    // the axes turned by 30 degrees
+    const turn = Math.PI / 6
+    expect(at(96 * Math.cos(turn), -96 * Math.sin(turn), -turn)).toBe(true)
+    expect(at(96, 0, turn)).toBe(false)
+  })
 })

@@ -87,3 +87,24 @@ describe('hole detection on the fixture photos', () => {
       ).toBeLessThan(0.25)
     })
 })
+
+// A dark face with holes as dark as their backing (phone-night.jpg): the strongest light blobs of
+// the grain agree with each other, so the run that wins must not be theirs.
+describe('hole detection on a dark face with dark holes', () => {
+  const fixture = fixtures.find(([file]) => file === 'phone-night.jpg')
+
+  it('finds at least 8 of the 10 holes in the automatic run, with at most 2 false proposals', async () => {
+    const [file, f] = fixture ?? []
+    expect(file && f).toBeTruthy()
+    if (!(file && f)) return
+    expect(f.holes).toHaveLength(10)
+    const found = autoDetect({
+      image: await load(file),
+      pxPerM: f.pxPerMm * 1000,
+      expectedHoleDiameter: f.caliberMm / 1000,
+    })
+    const s = score(found?.proposals ?? [], f)
+    expect(s.recall).toBeGreaterThanOrEqual(0.8)
+    expect(s.false).toBeLessThanOrEqual(2)
+  })
+})
