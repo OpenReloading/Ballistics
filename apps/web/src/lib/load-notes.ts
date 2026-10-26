@@ -67,17 +67,20 @@ export function effectiveSnapshots(
   return refs.map((ref) => stored.find((s) => s.session === ref) ?? snapshotOf(ref, now))
 }
 
-/** `snapshots` with `rule` dismissed for `session`. */
+/**
+ * The stored snapshots with `rule` dismissed for `session`: only that session's snapshot (its
+ * `effective` one) becomes stored, the other sessions stay as live as they were.
+ */
 export function dismissed(
-  snapshots: readonly SessionSnapshot[],
+  stored: readonly SessionSnapshot[],
+  effective: readonly SessionSnapshot[],
   session: string,
   rule: LoadNoteRule,
 ): SessionSnapshot[] {
-  return snapshots.map((s) =>
-    s.session === session && !s.dismissed?.includes(rule)
-      ? { ...s, dismissed: [...(s.dismissed ?? []), rule] }
-      : s,
-  )
+  const own = effective.find((s) => s.session === session)
+  if (!own) return [...stored]
+  const next = { ...own, dismissed: [...new Set([...(own.dismissed ?? []), rule])] }
+  return [...stored.filter((s) => s.session !== session), next]
 }
 
 /**

@@ -2542,7 +2542,8 @@ export function useWorkbenchState() {
       setLots,
       notes: noteList,
       sessionName: (ref) => sessionNames[ref] ?? 'a session of another browser',
-      dismiss: (session, rule) => setSnapshots(dismissed(snapshotsNow.current, session, rule)),
+      dismiss: (session, rule) =>
+        setSnapshots((stored) => dismissed(stored, snapshotsNow.current, session, rule)),
     }),
     [noteKey],
   )

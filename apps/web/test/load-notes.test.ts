@@ -64,10 +64,14 @@ describe('snapshotOf', () => {
     expect(effectiveSnapshots([b], [stored], now)).toEqual([snapshotOf(b, now)])
   })
 
-  it('dismisses a rule once, for its session only', () => {
-    const once = dismissed([{ session: a }, { session: b }], b, 'seating')
-    expect(once).toEqual([{ session: a }, { session: b, dismissed: ['seating'] }])
-    expect(dismissed(once, b, 'seating')).toEqual(once)
+  it('dismisses a rule once and stores only its session, the others stay live', () => {
+    const live = effectiveSnapshots([a, b], [], now)
+    const once = dismissed([], live, b, 'seating')
+    expect(once).toEqual([{ ...snapshotOf(b, now), dismissed: ['seating'] }])
+    const again = dismissed(once, effectiveSnapshots([a, b], once, now), b, 'seating')
+    expect(again).toEqual(once)
+    expect(dismissed(once, live, a, 'powderLot').map((s) => s.session)).toEqual([b, a])
+    expect(dismissed(once, live, 'user:none', 'seating')).toEqual(once)
   })
 })
 
