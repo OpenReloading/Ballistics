@@ -9,6 +9,7 @@ test.beforeEach(({ page }) => storeUnits(page))
 const saved = '2026-10-26T10:00:00.000Z'
 const capacityId = '7a2d9c10-5b3e-4f68-9d41-0c8e2b6a1f57'
 const caseId = '5d6e7f80-1a2b-4c3d-8e4f-5a6b7c8d9e0f'
+const plainId = '2c4e6a80-3b5d-4f71-9a2c-6e8f0a1b3c5d'
 const records = [
   {
     kind: 'caseCapacity',
@@ -32,6 +33,18 @@ const records = [
       casesMeasured: 10,
     },
   },
+  {
+    kind: 'case',
+    id: plainId,
+    name: 'Plain brass',
+    saved,
+    data: {
+      origin: 'user',
+      name: 'Plain brass',
+      cartridge: 'catalogue:308-win',
+      material: 'brass',
+    },
+  },
 ]
 
 test('an own case group is listed, picked in the workbench as the measured capacity', async ({
@@ -40,12 +53,14 @@ test('an own case group is listed, picked in the workbench as the measured capac
   await gotoHydrated(page, '/my-cases')
   await putRecords(page, records)
   await page.reload()
-  await expect(page.locator('.page-bar-status .bar-count')).toHaveText('1 case group')
+  await expect(page.locator('.page-bar-status .bar-count')).toHaveText('2 case groups')
   await expect(page.getByRole('link', { name: 'Match brass, lot 3', exact: true })).toBeVisible()
   // a row's link opens the group in the editor with its measured values
   await page.getByRole('link', { name: 'Match brass, lot 3', exact: true }).click()
   await expect(page.getByRole('textbox', { name: /^Cases measured/ })).toHaveValue('10')
   await expect(page.getByRole('textbox', { name: /^Water capacity/ })).toHaveValue(/^3\.6/)
+  // the catalogue's case products of the cartridge are offered as a start
+  await expect(page.getByLabel('Start from a case product')).toBeVisible()
 
   await gotoHydrated(page, '/workbench?cartridge=308-win')
   const capacity = loadForm(page).getByRole('textbox', { name: /^Case capacity/ })
@@ -54,4 +69,7 @@ test('an own case group is listed, picked in the workbench as the measured capac
   await page.getByRole('combobox', { name: 'Case record' }).selectOption(`user:${caseId}`)
   // the group's measured capacity is in the measured field, where the run marks it as measured
   await expect(capacity).toHaveValue(/^3\.6/)
+  // a group without a measured capacity leaves none of the previous group's in the field
+  await page.getByRole('combobox', { name: 'Case record' }).selectOption(`user:${plainId}`)
+  await expect(capacity).toHaveValue('')
 })

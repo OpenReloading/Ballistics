@@ -268,6 +268,11 @@ export function CaseLibrary() {
   const fileData = useDeferredValue(withCapacity(data, capacity))
   const problem = caseGroupProblem(fileData.name ?? '', fileData)
   const patch = (p: Partial<Case>) => setData((d) => ({ ...d, ...p }))
+  /** A cleared field also drops the reference to a record this browser does not hold. */
+  const changeCapacity = (m3: number | undefined) => {
+    setCapacity(m3)
+    if (m3 === undefined) patch({ capacity: undefined })
+  }
 
   /** Save's browser copy: the group with the record of its measured capacity. */
   const store = useCallback(
@@ -434,7 +439,7 @@ export function CaseLibrary() {
             setCartridgeNames={setCartridgeNames}
             cartridgeName={cartridgeName}
             patch={patch}
-            setCapacity={setCapacity}
+            setCapacity={changeCapacity}
           />
         )}
       </div>

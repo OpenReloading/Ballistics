@@ -53,8 +53,9 @@ it('names the capacity record of the workbench for the same cartridge and value,
   const c = withCapacity(group, m3)
   expect(c.capacity).toBe(measuredCapacityRef(cartridge, m3))
   expect(capacityRecord(cartridge, m3, new Date(saved)).id).toBe(measuredCapacityId(cartridge, m3))
-  // no capacity or no cartridge: the group names none, and an earlier one is dropped
-  expect(withCapacity({ ...group, capacity: c.capacity }, undefined).capacity).toBeUndefined()
+  // no value: the group keeps the reference it has; no cartridge: it names none
+  expect(withCapacity({ ...group, capacity: c.capacity }, undefined).capacity).toBe(c.capacity)
+  expect(withCapacity(group, undefined).capacity).toBeUndefined()
   expect(withCapacity({ ...group, cartridge: '' }, m3).capacity).toBeUndefined()
 })
 

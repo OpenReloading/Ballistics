@@ -12,6 +12,7 @@ import {
 import { type Case, caseMaterials } from '@open-reloading/schema'
 import { X } from '@phosphor-icons/react'
 import { type Dispatch, type SetStateAction, useEffect, useState } from 'react'
+import { apiFetch } from '../lib/api-fetch.ts'
 import type { CartridgeSummary, CaseSummary } from '../lib/api-types.ts'
 import { caseGroupCapacitySpec, caseGroupFields } from '../lib/case-group.ts'
 import { fieldSi, fieldStored } from '../lib/firearm.ts'
@@ -19,7 +20,7 @@ import { productLabel } from '../lib/manufacturers.ts'
 import { controlSize } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { SiField } from './firearm-editor.tsx'
-import { RecordSearch, searchRecords } from './record-search.tsx'
+import { RecordSearch } from './record-search.tsx'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 
 /** The case products of a catalogue cartridge, for the "Start from a product" choice. */
@@ -29,17 +30,20 @@ function useProducts(cartridge: string | undefined) {
     setItems([])
     if (!cartridge?.startsWith('catalogue:')) return
     const control = new AbortController()
-    searchRecords<CaseSummary>(
-      'cases',
-      '',
-      200,
-      `&cartridge=${encodeURIComponent(cartridge.slice('catalogue:'.length))}`,
-      control.signal,
-    ).then(
-      (r) => setItems(r.items),
-      // unreachable: the group is entered by hand
-      () => {},
-    )
+    const params = new URLSearchParams({
+      cartridge: cartridge.slice('catalogue:'.length),
+      limit: '200',
+    })
+    apiFetch(`cases?${params}`, { signal: control.signal })
+      .then(async (res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        return (await res.json()) as { items: CaseSummary[] }
+      })
+      .then(
+        (r) => setItems(r.items),
+        // unreachable: the group is entered by hand
+        () => {},
+      )
     return () => control.abort()
   }, [cartridge])
   return items
@@ -128,7 +132,10 @@ export function CaseEditor({
             describe={(c) => c.name}
             onSelect={(c) => {
               setCartridgeNames((n) => ({ ...n, [c.id]: c.name }))
-              patch({ cartridge: `catalogue:${c.id}`, basedOn: undefined })
+              const cartridge = `catalogue:${c.id}`
+              // a measured capacity belongs to its cartridge: another one starts without it
+              if (data.cartridge && data.cartridge !== cartridge) setCapacity(undefined)
+              patch({ cartridge, basedOn: undefined })
             }}
             noneText="No cartridge found"
             unreachableText="The database is unreachable; the cartridge can be chosen later."

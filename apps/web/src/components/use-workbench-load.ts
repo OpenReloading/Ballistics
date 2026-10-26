@@ -1372,6 +1372,8 @@ export function useWorkbenchState() {
   const [ownCaseChoice, setOwnCaseChoice] = useState<{ cartridge: string; id: string }>()
   /** The user capacity reference of the load being opened: a slower read than a newer open leaves alone. */
   const openingCapacity = useRef<string>(undefined)
+  /** Whether the measured capacity field holds the value a chosen group of cases named, not a typed or loaded one. */
+  const measuredFromGroup = useRef(false)
   /** The Gun and barrel card's gun weight (free recoil only); the load's typed values and links carry it. */
   const [gunFields, setGunFields] = useState<Fields>({ firearmMass: emptyStep })
   const gunWeight = gunFields.firearmMass
@@ -1606,6 +1608,7 @@ export function useWorkbenchState() {
     setCaseChoice(undefined)
     setOwnCaseChoice(undefined)
     openingCapacity.current = undefined
+    measuredFromGroup.current = false
     setGunFields({ firearmMass: emptyStep })
     gunFromFirearm.current = false
     gunPending.current = false
@@ -2337,7 +2340,7 @@ export function useWorkbenchState() {
    * capacity and fills its field. A user record the store does not answer, or one of another
    * cartridge, stays in the load as asked.
    */
-  function openCapacity(ref: string, forCartridge: string | undefined) {
+  function openCapacity(ref: string, forCartridge: string | undefined, fromGroup = false) {
     const target = parseRef(ref)
     if (!target) return
     const cartridgeId = forCartridge && parseRef(forCartridge)?.id
@@ -2360,6 +2363,7 @@ export function useWorkbenchState() {
           measuredWaterCapacity: { text: fixedFieldText('capacity', unitsNow.current, si), si },
         })
         setMeasuredFor(cartridgeId)
+        measuredFromGroup.current = fromGroup
         got('capacity')
       })
       .catch(() => {
@@ -2396,7 +2400,14 @@ export function useWorkbenchState() {
     if (!id) return
     setCaseChoice(undefined)
     const capacity = cases.find((c) => c.id === id)?.capacity
-    if (capacity) openCapacity(capacity, `catalogue:${cartridgeId}`)
+    if (capacity) return openCapacity(capacity, `catalogue:${cartridgeId}`, true)
+    // a group without a measured capacity leaves none of the previous group's in the field
+    openingCapacity.current = undefined
+    if (!measuredFromGroup.current) return
+    measuredFromGroup.current = false
+    setMeasured({ measuredWaterCapacity: emptyStep })
+    setMeasuredFor(undefined)
+    got('capacity')
   }
 
   /** A capacity chosen in the figure replaces the one the opened load still asks for. */
@@ -2412,6 +2423,7 @@ export function useWorkbenchState() {
    */
   function typeMeasured(value: FieldValue) {
     openingCapacity.current = undefined
+    measuredFromGroup.current = false
     if (value.si !== undefined || value.text.trim() === '') got('capacity')
     else setAsked((a) => (a.capacity ? { ...a, capacity: { id: a.capacity.id, failed: true } } : a))
     setMeasured({ measuredWaterCapacity: value })

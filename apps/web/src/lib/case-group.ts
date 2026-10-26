@@ -79,13 +79,14 @@ export function groupCapacity(c: Case, records: readonly UserRecord[]): number |
 /**
  * The group with its `capacity` naming the record of its measured capacity `m3` (water, SI): the
  * same record as the workbench's measured capacity of that cartridge and value, so a capacity is
- * stored once. Without a capacity or a cartridge the group names none.
+ * stored once. Without `m3` the group keeps the reference it has, for a record this browser does
+ * not hold; without a cartridge it names none.
  */
 export function withCapacity(c: Case, m3: number | undefined): Case {
-  const { capacity: _dropped, ...rest } = c
-  return m3 === undefined || !c.cartridge
-    ? rest
-    : { ...rest, capacity: measuredCapacityRef(c.cartridge, m3) }
+  const { capacity: held, ...rest } = c
+  if (!c.cartridge) return rest
+  if (m3 === undefined) return held === undefined ? rest : c
+  return { ...rest, capacity: measuredCapacityRef(c.cartridge, m3) }
 }
 
 /** A group of the user's cases as the workbench's case choice lists it. */
