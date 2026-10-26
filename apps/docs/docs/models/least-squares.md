@@ -78,10 +78,12 @@ Without a Huber loss $W$ is the identity. With it, $W$ is the weight of iterativ
 The loop stops on
 
 $$
-\frac{\chi^2_\text{old} - \chi^2_\text{new}}{\chi^2_\text{old}} \lt 10^{-12} \ \text{or}\ \chi^2_\text{new} = 0 \ \text{(accepted step)}, \qquad \max_j \lvert \delta_j \rvert \lt 10^{-8} \ \text{(step not applied)}
+\frac{\chi^2_\text{old} - \chi^2_\text{new}}{\chi^2_\text{old}} \lt \epsilon \ \text{or}\ \chi^2_\text{new} = 0 \ \text{(accepted step)}, \qquad \max_j \lvert \delta_j \rvert \lt 10^{-8} \ \text{(step not applied)}
 $$
 
 Code: `packages/core/src/least-squares.ts`, `logLeastSquares` (`stalled`, `small`).
+
+The tolerance $\epsilon$ is $10^{-12}$ unless the caller sets `tolerance`. The [curve fit](interior-curve-fit.md) sets $10^{-9}$: correlated form parameters leave a flat valley in which steps still gain a small share of $\chi^2$ long after the parameters have moved by far less than their uncertainty.
 
 After `maxIterations` accepted or rejected steps it runs the conditioning check at the current iterate, then fails with reason `not-converged`.
 
@@ -198,6 +200,7 @@ The design is singular when $\mu_\text{min} \le 10^{-12}\mu_\text{max}$. Then $\
 | $J$ | Weighted Jacobian, per unit $\theta$ | no kind | 1 over the unit of $\theta$ |
 | $h$ | Difference step in $\theta$ | 1 | 1 |
 | $\lambda$ | Damping of the step | 1 | 1 |
+| $\epsilon$ | Relative decrease of the cost below which an accepted step ends the loop | 1 | 1 |
 | $\delta$ | Step in $\theta$ | 1 | 1 |
 | $\mu_k$, $u_k$ | Eigenvalue and eigenvector | 1 | 1 |
 | $\kappa$ | Condition number of the column-scaled information | 1 | 1 |

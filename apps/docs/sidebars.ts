@@ -16,6 +16,7 @@ const sidebars: SidebarsConfig = {
       'interior-leakage-heat',
       'interior-shotshell',
       'interior-powder-fit',
+      'interior-curve-fit',
       'interior-charge-solver',
       'interior-pressure-range',
       'interior-sampled-band',
