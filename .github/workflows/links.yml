@@ -53,14 +53,15 @@ jobs:
         with:
           path: .lycheecache
           key: lychee-${{ github.run_id }}
-      # One open issue holds the report of the last run: opened on the first failure, edited on the next, closed on a clean run.
+      # One open issue, created by this workflow's token, holds the report of the last run: opened on the first
+      # failure, edited on the next, closed on a clean run.
       - name: Report in one issue
         env:
           GH_TOKEN: ${{ github.token }}
           STATUS: ${{ steps.lychee.outputs.status }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          number=$(gh issue list --state open --search "\"$ISSUE_TITLE\" in:title" --json number,title \
+          number=$(gh issue list --state open --author app/github-actions --search "\"$ISSUE_TITLE\" in:title" --json number,title \
             --jq "map(select(.title == \"$ISSUE_TITLE\")) | first | .number // empty")
           if [ "$STATUS" = 0 ]; then
             [ -z "$number" ] || gh issue close "$number" --comment "No broken external link in $RUN_URL."
