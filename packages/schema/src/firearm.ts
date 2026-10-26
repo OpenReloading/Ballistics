@@ -137,6 +137,13 @@ export const firearm = z
       .describe('Mass of the firearm.')
       .optional(),
     roundCount: z.int().nonnegative().describe('Rounds fired through the barrel.').optional(),
+    noteAtRoundCount: z
+      .int()
+      .positive()
+      .describe(
+        'Round count the user set: a saved load shot from this firearm gets a note when a session passes it.',
+      )
+      .optional(),
     notes: text(10000).describe('Notes on the firearm, plain text.').optional(),
     optics: z.array(optic).max(20).describe('Optics of the firearm.'),
     configurations: z

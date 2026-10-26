@@ -17557,6 +17557,11 @@
                                   ],
                                   "description": "The powder: a catalogue reference, or a description in a measured catalogue load."
                                 },
+                                "powderLot": {
+                                  "description": "Lot number of the powder, as printed on the package.",
+                                  "type": "string",
+                                  "minLength": 1
+                                },
                                 "charge": {
                                   "type": "object",
                                   "properties": {
@@ -17599,7 +17604,6 @@
                                       "description": "Model name of the primer."
                                     }
                                   },
-                                  "required": ["manufacturerName", "model"],
                                   "description": "The primer as described."
                                 },
                                 "case": {
@@ -17870,6 +17874,84 @@
                                     "description": "Reference to a session: `catalogue:<record id>` or `user:<UUID>`."
                                   },
                                   "description": "Chronograph sessions read on the Measurements tab. Each names its strings' load and what they vary."
+                                },
+                                "snapshots": {
+                                  "maxItems": 50,
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "session": {
+                                        "type": "string",
+                                        "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                        "description": "The session the snapshot belongs to: one of `Load.sessions`."
+                                      },
+                                      "powderLot": {
+                                        "description": "Powder lot of the load at the session.",
+                                        "type": "string",
+                                        "minLength": 1
+                                      },
+                                      "primerLot": {
+                                        "description": "Primer lot of the load at the session.",
+                                        "type": "string",
+                                        "minLength": 1
+                                      },
+                                      "caseLot": {
+                                        "description": "Case lot of the load at the session.",
+                                        "type": "string",
+                                        "minLength": 1
+                                      },
+                                      "seating": {
+                                        "type": "object",
+                                        "properties": {
+                                          "by": {
+                                            "type": "string",
+                                            "enum": ["overallLength", "baseToOgive"],
+                                            "description": "The length the bullet was seated by: cartridge overall length or base to ogive."
+                                          },
+                                          "value": {
+                                            "type": "object",
+                                            "properties": {
+                                              "value": {
+                                                "type": "number",
+                                                "exclusiveMinimum": 0,
+                                                "description": "In mm."
+                                              },
+                                              "raw": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "description": "The value as written in the source, when it differed."
+                                              }
+                                            },
+                                            "required": ["value"],
+                                            "unit": "mm",
+                                            "description": "That length."
+                                          }
+                                        },
+                                        "required": ["by", "value"],
+                                        "description": "The seating of the load at the session."
+                                      },
+                                      "roundCount": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "maximum": 9007199254740991,
+                                        "description": "Rounds fired through the firearm at the session."
+                                      },
+                                      "dismissed": {
+                                        "maxItems": 10,
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string",
+                                          "minLength": 1,
+                                          "maxLength": 40
+                                        },
+                                        "description": "Ids of the notes on this session that the user dismissed."
+                                      }
+                                    },
+                                    "required": ["session"],
+                                    "additionalProperties": false
+                                  },
+                                  "description": "What the load was at each of its sessions, at most one per session of `sessions`."
                                 },
                                 "provenance": {
                                   "type": "object",
@@ -18195,6 +18277,12 @@
                                   "minimum": 0,
                                   "maximum": 9007199254740991,
                                   "description": "Rounds fired through the barrel."
+                                },
+                                "noteAtRoundCount": {
+                                  "type": "integer",
+                                  "exclusiveMinimum": 0,
+                                  "maximum": 9007199254740991,
+                                  "description": "Round count the user set: a saved load shot from this firearm gets a note when a session passes it."
                                 },
                                 "notes": {
                                   "type": "string",

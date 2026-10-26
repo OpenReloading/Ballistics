@@ -110,6 +110,36 @@ describe('Load', () => {
     expect(issuePaths(load, measured)).toEqual([])
   })
 
+  it('keeps lots and one snapshot per session of the load, and a firearm round count to note', () => {
+    const session = `user:${other}`
+    const snapshot = {
+      session,
+      powderLot: 'P-1',
+      primerLot: 'R-2',
+      caseLot: 'C-3',
+      seating: { by: 'baseToOgive', value: { value: 54.1 } },
+      roundCount: 120,
+      dismissed: ['seating'],
+    }
+    const withLots = {
+      ...userLoad,
+      powderLot: 'P-1',
+      primer: { lot: 'R-2' },
+      case: { lot: 'C-3' },
+      sessions: [session],
+      snapshots: [snapshot],
+    }
+    expect(load.parse(withLots)).toEqual(withLots)
+    expectIssueAt(
+      load,
+      { ...withLots, snapshots: [{ ...snapshot, session: `user:${uuid}` }] },
+      'snapshots',
+    )
+    expectIssueAt(load, { ...withLots, snapshots: [snapshot, snapshot] }, 'snapshots')
+    expectIssueAt(load, { ...withLots, snapshots: [{ ...snapshot, roundCount: -1 }] }, 'snapshots')
+    expectIssueAt(load, { ...withLots, snapshots: [{ ...snapshot, bullet: 'x' }] }, 'snapshots')
+  })
+
   it('keeps the ladder: counts, steps and directions', () => {
     const withLadder = (ladder: unknown) => ({ ...userLoad, analysis: { ladder } })
     for (const ladder of [

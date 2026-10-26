@@ -132,6 +132,39 @@ const powderDescription = z
   .object({ ...component, name: z.string().min(1).describe('Product name of the powder.') })
   .describe('The powder as the publication describes it, where no record exists.')
 
+/**
+ * What a load was when a chronograph session was attached to it, kept for the notes on a saved
+ * load: the lots, the seating, the firearm's round count and the notes the user dismissed.
+ * Inferred type: {@link SessionSnapshot}.
+ */
+export const sessionSnapshot = z.strictObject({
+  session: ref('session').describe('The session the snapshot belongs to: one of `Load.sessions`.'),
+  powderLot: component.lot.describe('Powder lot of the load at the session.').optional(),
+  primerLot: component.lot.describe('Primer lot of the load at the session.').optional(),
+  caseLot: component.lot.describe('Case lot of the load at the session.').optional(),
+  seating: z
+    .object({
+      by: z
+        .enum(['overallLength', 'baseToOgive'])
+        .describe(
+          'The length the bullet was seated by: cartridge overall length or base to ogive.',
+        ),
+      value: quantity('length', z.number().positive()).describe('That length.'),
+    })
+    .describe('The seating of the load at the session.')
+    .optional(),
+  roundCount: z
+    .int()
+    .nonnegative()
+    .describe('Rounds fired through the firearm at the session.')
+    .optional(),
+  dismissed: z
+    .array(z.string().min(1).max(40))
+    .max(10)
+    .describe('Ids of the notes on this session that the user dismissed.')
+    .optional(),
+})
+
 const loadShape = z.object({
   id: recordId.describe('Id of a catalogue load, the file name without `.json`.').optional(),
   origin: z
@@ -151,12 +184,19 @@ const loadShape = z.object({
     .union([catalogueRef('powder'), powderDescription])
     .describe('The powder: a catalogue reference, or a description in a measured catalogue load.')
     .optional(),
+  powderLot: component.lot
+    .describe('Lot number of the powder, as printed on the package.')
+    .optional(),
   charge: quantity('mass', z.number().positive()).describe('Powder mass of one round.').optional(),
   capacity: ref('case capacity')
     .describe('The water capacity of the case: a catalogue capacity, or one the user measured.')
     .optional(),
   primer: z
-    .object({ ...component, model: z.string().min(1).describe('Model name of the primer.') })
+    .object({
+      manufacturerName: component.manufacturerName.optional(),
+      lot: component.lot,
+      model: z.string().min(1).describe('Model name of the primer.').optional(),
+    })
     .describe('The primer as described.')
     .optional(),
   case: z
@@ -186,6 +226,11 @@ const loadShape = z.object({
     .describe(
       "Chronograph sessions read on the Measurements tab. Each names its strings' load and what they vary.",
     )
+    .optional(),
+  snapshots: z
+    .array(sessionSnapshot)
+    .max(50)
+    .describe('What the load was at each of its sessions, at most one per session of `sessions`.')
     .optional(),
   provenance: provenance
     .describe('Where the values come from. Required for a catalogue load.')
@@ -236,6 +281,12 @@ export const load = loadShape.superRefine((l, ctx) => {
       issue(['sessions', i], 'A catalogue load names catalogue records only')
   })
   checkRecordReferences(l, issue)
+  l.snapshots?.forEach((snapshot, i) => {
+    if (!l.sessions?.includes(snapshot.session))
+      issue(['snapshots', i, 'session'], 'Not a session of this load')
+    else if (l.snapshots?.findIndex((x) => x.session === snapshot.session) !== i)
+      issue(['snapshots', i, 'session'], 'A second snapshot of one session')
+  })
 })
 
 /**
@@ -256,6 +307,8 @@ export interface AnalysisOverrides extends z.infer<typeof analysisOverrides> {}
 export interface LoadAnalysis extends z.infer<typeof loadAnalysis> {}
 /** A cartridge recipe in stored units: references to its records, charge, seating and analysis. */
 export interface Load extends z.infer<typeof load> {}
+/** What a load was at one of its chronograph sessions: lots, seating, round count, dismissed notes. */
+export interface SessionSnapshot extends z.infer<typeof sessionSnapshot> {}
 /** A load of the catalogue: the fields {@link load} requires of one are present. */
 export interface CatalogueLoad extends Load {
   id: string
