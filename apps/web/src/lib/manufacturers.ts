@@ -93,7 +93,7 @@ export function referTo(
   newUuid: () => string,
   now: Date,
   catalogueKnown = true,
-): { ref: string; created?: UserRecord } | undefined {
+): { ref: string; created?: UserRecord | undefined } | undefined {
   if (typed.trim() === '') return undefined
   const found = findManufacturer(known, typed)
   if (found) return { ref: found.ref }
@@ -150,7 +150,7 @@ export function manufacturerUses(
  * or a design carries `manufacturerName`.
  */
 export function productLabel(
-  r: { name: string; manufacturer?: string; manufacturerName?: string },
+  r: { name: string; manufacturer?: string | undefined; manufacturerName?: string | undefined },
   names: ManufacturerNames = noManufacturerNames,
 ) {
   const manufacturer = r.manufacturerName ?? (r.manufacturer && names.get(r.manufacturer))
@@ -171,7 +171,7 @@ export const withManufacturerName = <T extends { manufacturer: string }>(
   rows: readonly T[],
   names: ManufacturerNames,
   aliases: ManufacturerAliases = new Map(),
-): (T & { manufacturerName: string; manufacturerAliases?: string[] })[] =>
+): (T & { manufacturerName: string; manufacturerAliases?: string[] | undefined })[] =>
   rows.map((r) => {
     const manufacturerAliases = aliases.get(r.manufacturer)
     return {
@@ -185,7 +185,7 @@ export const withManufacturerName = <T extends { manufacturer: string }>(
  * The manufacturer options over `rows`: each catalogue manufacturer id with its name, by name.
  */
 export const manufacturerOptions = (
-  rows: readonly { manufacturer?: string; manufacturerName: string }[],
+  rows: readonly { manufacturer?: string | undefined; manufacturerName: string }[],
 ) =>
   [
     ...new Map(

@@ -173,7 +173,13 @@ export function useUnits() {
  * The units of the Settings with the length unit replaced inside it, not stored: the cartridge
  * record's drawing unit switch, so its drawing, strip and table agree.
  */
-export function LengthOverride({ unit, children }: { unit?: 'mm' | 'in'; children: ReactNode }) {
+export function LengthOverride({
+  unit,
+  children,
+}: {
+  unit?: 'mm' | 'in' | undefined
+  children: ReactNode
+}) {
   const parent = useContext(UnitsContext)
   const value = useMemo(() => {
     if (unit === undefined) return parent

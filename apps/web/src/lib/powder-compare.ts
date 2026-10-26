@@ -41,7 +41,7 @@ export function compareCharge(
 export function powderValues(
   fields: Record<string, number | undefined>,
   current: { id: string } | undefined,
-  as?: { powder: Powder; charge?: number },
+  as?: { powder: Powder; charge?: number | undefined },
 ): Record<string, number | undefined> {
   return {
     ...fields,
@@ -74,7 +74,11 @@ export function compareKey(
 
 /** The facets the filters offer: the distinct values of a field, sorted. */
 export const distinctValues = (
-  rows: readonly { manufacturerName: string; base?: string; form?: string }[],
+  rows: readonly {
+    manufacturerName: string
+    base?: string | undefined
+    form?: string | undefined
+  }[],
   key: 'manufacturerName' | 'base' | 'form',
 ) =>
   [...new Set(rows.flatMap((r) => (r[key] ? [r[key]] : [])))].sort((a, b) =>
@@ -84,7 +88,7 @@ export const distinctValues = (
 export type PowderFilters = { manufacturerName: string; base: string; form: string }
 
 export function filterPowderRows<
-  T extends { manufacturerName: string; base?: string; form?: string },
+  T extends { manufacturerName: string; base?: string | undefined; form?: string | undefined },
 >(rows: readonly T[], f: PowderFilters): T[] {
   return rows.filter(
     (r) =>

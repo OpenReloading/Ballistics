@@ -189,14 +189,14 @@ export interface CombinedRow {
   /** The stored symbol (`alpha`, `L3+G`): the drawing names its dimensions by it (`data-symbol`). */
   storedSymbol: string
   /** What the symbol stands for, the table's Description column. */
-  description?: string
+  description?: string | undefined
   group: RowGroup
   /** Hover lines: the spelled name of a Greek letter, then each side's notes. */
   notes: string[]
-  cartridge?: SpecValue
-  chamber?: SpecValue
+  cartridge?: SpecValue | undefined
+  chamber?: SpecValue | undefined
   /** Chamber minimum minus cartridge maximum, mm, where it is a fit (`fits`). */
-  clearance?: number
+  clearance?: number | undefined
 }
 
 /** What the record rows read of a cartridge. */

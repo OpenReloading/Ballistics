@@ -79,7 +79,7 @@ export function reportRecord(route: string): { kind: string; id: string } | unde
 export type ReportContext = {
   path: string
   title: string
-  record?: { kind: string; id: string; name?: string }
+  record?: { kind: string; id: string; name?: string | undefined } | undefined
   version: string
   edition: 'server' | 'Pages'
   userAgent: string

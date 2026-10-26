@@ -39,13 +39,13 @@ export function Workspace({
   inputs: ReactNode
   results: ReactNode
   /** A third tab below 48em, the phone range view; mounted while its tab is open. */
-  range?: ReactNode
+  range?: ReactNode | undefined
   /** Readout bar of the phone layout, under the inputs and the results; `show` opens the Results tab and focuses it. */
   bar: (show: () => void) => ReactNode
-  ref?: Ref<WorkspaceHandle>
+  ref?: Ref<WorkspaceHandle> | undefined
   /** Name of the inputs tab below 48em. */
-  inputsLabel?: string
-  className?: string
+  inputsLabel?: string | undefined
+  className?: string | undefined
 }) {
   const [tab, setTab] = useState('inputs')
   useImperativeHandle(
@@ -144,11 +144,11 @@ export function Toolbar({
   link,
 }: {
   /** The workbench's record search button. */
-  search?: ReactNode
+  search?: ReactNode | undefined
   /** Open and Save (`FileMenu`). */
-  file?: ReactNode
+  file?: ReactNode | undefined
   /** Print. */
-  after?: ReactNode
+  after?: ReactNode | undefined
   /** The page's `useCopyLink`, shared with the other controls that copy the link. */
   link: ReturnType<typeof useCopyLink>
 }) {

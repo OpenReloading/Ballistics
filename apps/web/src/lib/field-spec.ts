@@ -15,18 +15,18 @@ export interface FieldSpec {
   key: string
   label: string
   /** Field help, shown as the field description. */
-  help?: string
+  help?: string | undefined
   quantity: Quantity
-  required?: boolean
+  required?: boolean | undefined
   /** Bounds in display units, only where they hold in every unit of the quantity. */
-  min?: number
-  max?: number
+  min?: number | undefined
+  max?: number | undefined
   /** The value must be greater than 0. */
-  positive?: boolean
+  positive?: boolean | undefined
   /** The value must be a whole number. */
-  integer?: boolean
+  integer?: boolean | undefined
   /** Initial SI value. */
-  initial?: number
+  initial?: number | undefined
 }
 
 export type Fields = Record<string, FieldValue>

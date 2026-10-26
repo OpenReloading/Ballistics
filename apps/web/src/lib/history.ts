@@ -6,7 +6,7 @@ export interface History<D> {
   past: D[]
   present: D
   future: D[]
-  last?: string
+  last?: string | undefined
 }
 
 export const historyOf = <D>(present: D): History<D> => ({ past: [], present, future: [] })
@@ -54,7 +54,7 @@ export type DesignAction<D> =
   | { type: 'units'; system: UnitSystem }
 
 /** The designer actions of `DesignAction`; `fromOrigin` is the design of the record it started from. */
-export function designReduce<D extends { fields: Fields; origin?: O }, O>(
+export function designReduce<D extends { fields: Fields; origin?: O | undefined }, O>(
   h: History<D>,
   a: DesignAction<D>,
   specs: readonly FieldSpec[],

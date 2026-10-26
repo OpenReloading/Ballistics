@@ -186,11 +186,11 @@ export type ParameterLine = {
   /** "Identified", "Weak: ..." or "Unresolved: ...". */
   statusText: string
   /** Fitted value with its unit; absent unless identified, and in a plan. */
-  value?: string
+  value?: string | undefined
   /** Confidence interval with its level; absent unless identified. */
-  interval?: string
+  interval?: string | undefined
   /** Standard error: relative to the value, the zero offset's in the correction unit. */
-  error?: string
+  error?: string | undefined
 }
 
 /** `x` in the display unit of the parameter, with its symbol. */

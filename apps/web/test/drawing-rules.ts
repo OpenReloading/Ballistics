@@ -52,7 +52,7 @@ export interface Laid {
   em: number
   /** The record's values and the figure's table VII variant. */
   values: SpecValue[]
-  variant?: string
+  variant?: string | undefined
   /** The unit of the length texts, mm by default. */
   unit?: LengthUnit
 }

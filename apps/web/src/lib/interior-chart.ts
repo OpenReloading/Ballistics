@@ -203,7 +203,7 @@ export type ChartTheme = Record<
   string
 >
 
-type Step = { n: number; label?: string; result: PlaybackResult }
+type Step = { n: number; label?: string | undefined; result: PlaybackResult }
 
 const axisNames: Record<ChartQuantity, string> = {
   pressure: 'Breech pressure',
@@ -475,7 +475,7 @@ export function interiorOption({
   theme: ChartTheme
   animate: boolean
   /** The run's burn form z1, for its event line. */
-  z1?: number
+  z1?: number | undefined
 }) {
   const shown = shownQuantities(show)
   const r = nth(steps, selected).result

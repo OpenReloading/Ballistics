@@ -33,8 +33,8 @@ export function RateBar({
 }: {
   domain: RateDomain
   mean: number
-  low?: number
-  high?: number
+  low?: number | undefined
+  high?: number | undefined
 }) {
   return (
     <svg width={scaleWidth} height="28" aria-hidden="true">

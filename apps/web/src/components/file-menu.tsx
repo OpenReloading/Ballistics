@@ -135,12 +135,12 @@ const basedOnOf = (r: UserRecord) =>
  * several records open (the workbench tabs) puts it back when it shows that record again.
  */
 export interface FileState {
-  id?: string
-  handle?: FileSystemFileHandle
-  known?: string
-  saved?: { file: string; json: string }
+  id?: string | undefined
+  handle?: FileSystemFileHandle | undefined
+  known?: string | undefined
+  saved?: { file: string; json: string } | undefined
   /** The record's start text; undefined takes the data of the next render. */
-  initial?: string
+  initial?: string | undefined
   /** Unsaved changes when the state was taken. */
   unsaved: boolean
 }
@@ -406,7 +406,7 @@ async function writeRecordFile(o: {
   recordId: string
   text: string
   allow: (other: string | undefined) => Promise<boolean>
-}): Promise<'newer' | { name: string; handle?: FileSystemFileHandle } | undefined> {
+}): Promise<'newer' | { name: string; handle?: FileSystemFileHandle | undefined } | undefined> {
   const { handle, current, as, ready, name, recordId, text, allow } = o
   if (handle && ownsFile(current, recordId)) {
     if (!(await allow(savedIn(current, recordId)))) return 'newer'
@@ -467,7 +467,7 @@ function exportNotes(records: UserRecord[], invalid: InvalidRecord[], left: stri
 
 /** What an import reports to: the store hooks and the page's messages. */
 interface ImportIo {
-  onStored?: () => void
+  onStored?: (() => void) | undefined
   noteStorage: () => void
   fail: (message: string) => void
   show: (report: Report) => void
@@ -879,51 +879,51 @@ function FileMenuOf<K extends UserRecordKind>({
    * The record as a file for the API reads it, every value resolved (the workbench): the Save
    * options then offer Download and Copy JSON for the API. Never saved, never the browser copy.
    */
-  apiData?: Of<K>['data']
+  apiData?: Of<K>['data'] | undefined
   /** `record` is the opened or saved-as record (its id and saved time). */
   onOpen: (data: Of<K>['data'], name: string, record: Of<K>) => void
   /** A line about the record the page adds to the menu's status, such as ids not loaded. */
-  note?: string
+  note?: string | undefined
   /** Why the record cannot be saved, in the page's words; Save then writes nothing. */
-  problem?: string
+  problem?: string | undefined
   /**
    * The name as far as it counts as a change (the workbench): what the user typed, empty for
    * a generated name that follows the data. Renaming then is an unsaved change.
    */
-  nameKey?: string
+  nameKey?: string | undefined
   /** Called after Save, Import or Replace wrote records to the browser store. */
-  onStored?: () => void
+  onStored?: (() => void) | undefined
   /**
    * Writes Save's browser copy in place of a plain put (an autosaved record written only over the
    * version the page read); false when the page kept it otherwise.
    */
-  store?: (record: Of<K>) => Promise<boolean>
+  store?: ((record: Of<K>) => Promise<boolean>) | undefined
   /** Called after Export all wrote a file. */
-  onExported?: () => void
+  onExported?: (() => void) | undefined
   /** Called with whether the record has unsaved changes, when that changes. */
-  onUnsaved?: (unsaved: boolean) => void
+  onUnsaved?: ((unsaved: boolean) => void) | undefined
   /**
    * The id of a record the page keeps in the browser on every change (`/groups`): no leave
    * questions, Save writes this id, Open keeps the opened record in the browser, Save as writes a
    * copy with a new id that `onOpen` shows. The page lists its records itself.
    */
-  autosaved?: string
+  autosaved?: string | undefined
   /**
    * With `autosaved`, the browser copy: `blank` before the first save (no state shown), `saving`
    * while the last change is not yet in the browser, `failed` when the browser store refused it.
    */
-  kept?: 'blank' | 'saving' | 'saved' | 'failed'
+  kept?: 'blank' | 'saving' | 'saved' | 'failed' | undefined
   /** No record is open (the firearm library before New or Open): the status shows messages only. */
-  idle?: boolean
+  idle?: boolean | undefined
   /** Opens the page's own list of browser records (the workbench's Saved loads) in place of the menu's. */
-  onList?: () => void
+  onList?: (() => void) | undefined
   /** With `autosaved` and no `onList`: the menu's own list of the browser's records (the page has none). */
-  browserList?: boolean
+  browserList?: boolean | undefined
   /** The Open menu's Examples section: the page's starting points. Stable, so the memo holds. */
-  examples?: FileMenuItem[]
+  examples?: FileMenuItem[] | undefined
   /** The label of the Report issue box that adds the record's share link (the designers). */
-  reportBox?: string
-  ref?: Ref<FileMenuHandle>
+  reportBox?: string | undefined
+  ref?: Ref<FileMenuHandle> | undefined
 }) {
   const id = useRef<string | undefined>(undefined)
   const handle = useRef<FileSystemFileHandle | undefined>(undefined)

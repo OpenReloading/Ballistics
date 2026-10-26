@@ -28,7 +28,7 @@ import { useResult } from './workbench-context.ts'
 
 /** A step of the last run as the Measurements tab needs it. */
 /** `label`: the step relative to the main charge. */
-type MeasuredStep = SimulatedStep & { n: number; label?: string }
+type MeasuredStep = SimulatedStep & { n: number; label?: string | undefined }
 
 const columns = [
   'Series',
@@ -51,7 +51,17 @@ const chartName = 'Measured mean velocity and simulated muzzle velocity against 
 const shapes = ['circle', 'square', 'triangle', 'diamond'] as const
 type Shape = (typeof shapes)[number]
 
-function Marker({ shape, x, y, r = 5 }: { shape: Shape; x: number; y: number; r?: number }) {
+function Marker({
+  shape,
+  x,
+  y,
+  r = 5,
+}: {
+  shape: Shape
+  x: number
+  y: number
+  r?: number | undefined
+}) {
   if (shape === 'circle') return <circle cx={x} cy={y} r={r} />
   if (shape === 'square') return <rect x={x - r} y={y - r} width={2 * r} height={2 * r} />
   const points =
@@ -236,7 +246,7 @@ export function Measurements({
   idPrefix = 'measurements',
 }: {
   /** Ids of the controls; the phone range view shows a second copy. */
-  idPrefix?: string
+  idPrefix?: string | undefined
   steps: MeasuredStep[] | undefined
   system: UnitSystem
   sessions: SessionRecord[]

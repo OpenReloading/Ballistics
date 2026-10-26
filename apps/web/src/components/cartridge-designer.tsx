@@ -128,7 +128,7 @@ const StartSearch = memo(function StartSearch({
 }: {
   start: (id: string) => void
   /** The record the design started from, shown in the empty field. */
-  chosen?: string
+  chosen?: string | undefined
 }) {
   return (
     <RecordSearch<CartridgeSummary>

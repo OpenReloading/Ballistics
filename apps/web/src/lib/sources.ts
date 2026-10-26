@@ -10,7 +10,8 @@ export type Origin = (typeof origins)[number]
 export const originNames: Record<Origin, string> = { openreloading: 'OpenReloading', user: 'Mine' }
 
 /** A row without `origin` is a catalogue row. */
-export const originOf = (row: { origin?: 'user' }): Origin => row.origin ?? 'openreloading'
+export const originOf = (row: { origin?: 'user' | undefined }): Origin =>
+  row.origin ?? 'openreloading'
 
 /**
  * The sources the `src` parameter turns on, of the sources a list has (`available`): all of them
@@ -45,12 +46,14 @@ export function toggleOrigin(
 }
 
 export const inOrigins = (
-  row: { origin?: 'user' },
+  row: { origin?: 'user' | undefined },
   src: string | undefined,
   available: readonly Origin[] = origins,
 ) => readOrigins(src, available).includes(originOf(row))
 
-export function countOrigins(rows: readonly { origin?: 'user' }[]): Record<Origin, number> {
+export function countOrigins(
+  rows: readonly { origin?: 'user' | undefined }[],
+): Record<Origin, number> {
   const counts = { openreloading: 0, user: 0 }
   for (const r of rows) counts[originOf(r)]++
   return counts

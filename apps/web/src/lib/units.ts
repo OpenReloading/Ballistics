@@ -45,7 +45,7 @@ export interface Unit {
   /** Decimals when formatted. */
   decimals: number
   /** Arrow-key step of a field, in this unit. */
-  step?: number
+  step?: number | undefined
 }
 
 /** The volume in m3 of `grams` of water: a water capacity as the records store it. */

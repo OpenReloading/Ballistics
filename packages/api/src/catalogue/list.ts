@@ -7,7 +7,7 @@ import type { CataloguePage, IndexRow, Paging } from './types.ts'
  */
 export function select<T>(
   rows: readonly IndexRow<T>[],
-  { q, limit, offset = 0 }: Paging & { q?: string },
+  { q, limit, offset = 0 }: Paging & { q?: string | undefined },
   keep: (item: T) => boolean = () => true,
 ): CataloguePage<T> {
   let found = rows.filter((r) => keep(r.item)).map((r) => ({ r, rank: 0 }))

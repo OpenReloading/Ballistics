@@ -5,11 +5,12 @@
  * `apps/docs/docs/models/interior-powder-fit.md`.
  * Every evaluation runs `interior` once per distinct charge. SI in and out.
  */
+
+import type { Settings } from '../errors.ts'
 import { InputError, need, nth } from '../errors.ts'
 import { chiSquareQuantile } from '../groups/chi-square.ts'
 import { studentTwoSidedQuantile } from '../groups/student-t.ts'
 import { logLeastSquares } from '../least-squares.ts'
-import type { Settings } from '../settings.ts'
 import {
   type InteriorInvalid,
   type InteriorLoad,

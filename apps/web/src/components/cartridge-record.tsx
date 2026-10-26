@@ -90,7 +90,7 @@ function Slotted({
   system,
 }: {
   v: SpecValue
-  clearance?: number
+  clearance?: number | undefined
   system: UnitSystem
 }) {
   const text = (u: UnitSystem) =>
@@ -124,7 +124,7 @@ function signed(x: number, system: UnitSystem) {
 
 /** The record's own length unit (the switch beside the facts), the shotshell variant shown, and their setters. */
 const RecordView = createContext<{
-  unit?: 'mm' | 'in'
+  unit?: 'mm' | 'in' | undefined
   setUnit: (u: 'mm' | 'in') => void
   variant: number
   setVariant: (k: number) => void
@@ -184,7 +184,7 @@ export function RecordScope({
   children,
 }: {
   /** The shotshell case length variants; the select starts on `defaultVariantIndex`. */
-  variants?: string[]
+  variants?: string[] | undefined
   children: ReactNode
 }) {
   const { choice } = useUnits()
@@ -253,7 +253,7 @@ export function RecordScope({
 }
 
 /** The record's mm or inch switch, named by `label` where a page has more than one. */
-export function UnitSwitch({ label = 'Length unit' }: { label?: string }) {
+export function UnitSwitch({ label = 'Length unit' }: { label?: string | undefined }) {
   const { system } = useUnits()
   const { setUnit } = useContext(RecordView)
   return (
@@ -287,9 +287,9 @@ export function CartridgeSides({
   table,
   drawn,
 }: {
-  pairs: { variant?: string; cartridge: ReactNode; chamber: ReactNode }[]
+  pairs: { variant?: string | undefined; cartridge: ReactNode; chamber: ReactNode }[]
   rows: CombinedRow[]
-  table?: string
+  table?: string | undefined
   /** The sides with a drawing; a panel without one takes its table's width, the reason under it. */
   drawn: ('cartridge' | 'chamber')[]
 }) {
@@ -328,7 +328,7 @@ function SidePanel({
   side: 'cartridge' | 'chamber'
   undrawn: boolean
   rows: CombinedRow[]
-  table?: string
+  table?: string | undefined
   figures: ReactNode
 }) {
   const { system } = useUnits()
@@ -427,7 +427,7 @@ function SideRow({
 }: {
   row: CombinedRow
   side: 'cartridge' | 'chamber'
-  table?: string
+  table?: string | undefined
   tabbable: boolean
   system: UnitSystem
 }) {
@@ -549,11 +549,11 @@ export function RecordFacts({
   values: SpecValue[]
   notes: string[][]
   standard: {
-    table?: string
-    date?: { label: string; value: string }
-    countries?: { name: string; code?: string }[]
+    table?: string | undefined
+    date?: { label: string; value: string } | undefined
+    countries?: { name: string; code?: string | undefined }[] | undefined
   }
-  build: { caseType?: string; method?: string }
+  build: { caseType?: string | undefined; method?: string | undefined }
 }) {
   const { system } = useUnits()
   const items = values.map((v, i) => ({ v, notes: notes[i] ?? [] }))
@@ -632,7 +632,7 @@ export function VariantSelect({ variants }: { variants: string[] }) {
       w="8.5rem"
       allowDeselect={false}
       data={variants}
-      value={variants[variant]}
+      {...(variants[variant] !== undefined && { value: variants[variant] })}
       onChange={(v) => setVariant(Math.max(0, variants.indexOf(v ?? '')))}
     />
   )

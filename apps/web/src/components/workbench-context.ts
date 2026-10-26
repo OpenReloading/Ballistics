@@ -33,10 +33,10 @@ export type ResultState = {
   /** A run is on its way: the shown values are the previous run's. */
   pending: boolean
   /** The warnings of the shown step in the page's units. */
-  warnings: { text: string; name?: string }[] | undefined
+  warnings: { text: string; name?: string | undefined }[] | undefined
   system: UnitSystem
   /** What a run still needs, shown in place of the readouts before the first result. */
-  todo: { label: string; done: boolean; value?: string }[]
+  todo: { label: string; done: boolean; value?: string | undefined }[]
   /** The burn law of the chart: the powder record's fit, else the typed model parameters. */
   burn: FittedPowder | UnfittedPowder | undefined
   powder: Powder | undefined
@@ -104,16 +104,16 @@ type InputEchoState = {
     | undefined
   /** The load the Trajectory tab starts from. */
   trajectoryLoad: {
-    muzzleVelocity?: number
-    bullet?: string
-    twist?: number
-    sightHeight?: number
-    zeroRange?: number
-    zeroTemperature?: number
-    zeroPressure?: number
-    zeroHumidity?: number
-    dragFactor?: number
-    dragFactorSource?: string
+    muzzleVelocity?: number | undefined
+    bullet?: string | undefined
+    twist?: number | undefined
+    sightHeight?: number | undefined
+    zeroRange?: number | undefined
+    zeroTemperature?: number | undefined
+    zeroPressure?: number | undefined
+    zeroHumidity?: number | undefined
+    dragFactor?: number | undefined
+    dragFactorSource?: string | undefined
   }
 }
 export const InputEcho = createContext<InputEchoState | null>(null)

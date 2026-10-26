@@ -28,7 +28,7 @@ type Column = {
   key: string
   label: string
   /** The quantity whose unit symbol follows the label. */
-  unit?: 'charge' | 'pressure' | 'velocity'
+  unit?: 'charge' | 'pressure' | 'velocity' | undefined
   value: (r: CompareRow) => string | number | undefined
 }
 

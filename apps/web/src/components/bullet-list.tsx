@@ -58,7 +58,7 @@ export function BulletList({
   cartridges = [],
 }: {
   packed: PackedBullet[]
-  cartridges?: FitCartridge[]
+  cartridges?: FitCartridge[] | undefined
 }) {
   const [records, removeRow] = useUserRecords()
   const mine = useResolved(records, userBullets)

@@ -55,21 +55,21 @@ export function CartridgeDrawing({
 }: {
   spec: Drawable
   /** Replaces "Outline, <standard> <name>" in the title. */
-  heading?: string
-  list?: Figure[]
+  heading?: string | undefined
+  list?: Figure[] | undefined
   /**
    * One side only: the record page draws cartridge and chamber in sections of their own, and
    * `combined` both outlines with the region differences, screen only.
    */
-  side?: Side | 'combined'
+  side?: Side | 'combined' | undefined
   /** With `side`: the figure of this shotshell variant only, at the scale of all. */
-  variant?: string
+  variant?: string | undefined
   /** A sentence that starts the caption of the designer's figure. */
-  caption?: string
+  caption?: string | undefined
   /** The view picked in the designer; shown while it draws, else Combined, else the drawn side. */
-  view?: View
-  onView?: (view: View) => void
-  unit?: LengthUnit
+  view?: View | undefined
+  onView?: ((view: View) => void) | undefined
+  unit?: LengthUnit | undefined
 }) {
   const all = list.filter((f) => f.drawn.length)
   if (side === undefined) {
@@ -187,7 +187,7 @@ function Combined({
 }: {
   spec: Drawable
   list: Figure[]
-  variant?: string
+  variant?: string | undefined
   unit: LengthUnit
 }) {
   const all = list.filter((f) => f.drawn.length)
@@ -228,7 +228,7 @@ function Combined({
 /**
  * Why nothing is drawn: for one side its own note (missing values, closed front), else every note.
  */
-function Undrawn({ list, side }: { list: Figure[]; side?: Side }) {
+function Undrawn({ list, side }: { list: Figure[]; side?: Side | undefined }) {
   const notes = list
     .flatMap((f) => f.notes)
     .filter(
@@ -281,7 +281,7 @@ const scaleWords = (k: number) =>
  * lengths and their tolerances in `unit`, an angle in degrees.
  */
 function described(
-  d: { symbol: string; value: number; derived?: true; stored?: SpecValue },
+  d: { symbol: string; value: number; derived?: true | undefined; stored?: SpecValue | undefined },
   unit: LengthUnit,
   angle = false,
 ) {
@@ -371,7 +371,7 @@ function ViewSwitch({
   shown: string
   reason: Reason
   enabled: (v: string) => boolean
-  onView?: (view: View) => void
+  onView?: ((view: View) => void) | undefined
 }) {
   return (
     <>
@@ -413,8 +413,8 @@ function PrintFigures({
   id: string
   title: string
   print: FigureModel
-  scale?: number
-  sides?: Side[]
+  scale?: number | undefined
+  sides?: Side[] | undefined
 }) {
   if (!sides)
     return (
@@ -447,12 +447,12 @@ function FigureCaption({
   notes,
   scale,
 }: {
-  caption?: string
-  differences?: Region[]
+  caption?: string | undefined
+  differences?: Region[] | undefined
   unit: LengthUnit
-  variant?: string
+  variant?: string | undefined
   notes: Figure['notes']
-  scale?: number
+  scale?: number | undefined
 }) {
   return (
     <figcaption>
@@ -499,24 +499,24 @@ function Outline({
   reserve,
 }: {
   spec: Drawable
-  heading?: string
-  caption?: string
+  heading?: string | undefined
+  caption?: string | undefined
   unit: LengthUnit
   /** The record page's linked hover: the screen drawing's dimensions named by symbol. */
-  linked?: Linked
-  view?: View
-  onView?: (view: View) => void
+  linked?: Linked | undefined
+  view?: View | undefined
+  onView?: ((view: View) => void) | undefined
   figure: Figure
   /** The screen model. */
   model: FigureModel
   tallest: number
   /** The upright print model and the record's print scale; none for the record's Combined view. */
-  print?: FigureModel
-  scale?: number
+  print?: FigureModel | undefined
+  scale?: number | undefined
   /** The designer's figure of both sides: the region differences of its Combined view. */
-  differences?: Region[]
+  differences?: Region[] | undefined
   /** The record page: the screen figure in the other length unit, whose room the drawing keeps. */
-  reserve?: { model: FigureModel; tallest: number }
+  reserve?: { model: FigureModel; tallest: number } | undefined
 }) {
   const title = `${heading ?? `Outline, ${spec.standard} ${spec.name}`}${variant === undefined ? '' : ` (${variant})`}`
   const desc = description(drawn, differences ?? [], unit)

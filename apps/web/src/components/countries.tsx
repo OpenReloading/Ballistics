@@ -55,11 +55,11 @@ export function Countries({
   title,
   as: Tag = 'li',
 }: {
-  items: { name: string; code?: string }[]
+  items: { name: string; code?: string | undefined }[]
   /** Hover text for the whole item. */
-  title?: string
+  title?: string | undefined
   /** `span` inside a list of its own. */
-  as?: 'li' | 'span'
+  as?: 'li' | 'span' | undefined
 }) {
   return (
     <Tag className="countries" title={title}>

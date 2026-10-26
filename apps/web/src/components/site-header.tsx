@@ -60,7 +60,7 @@ type Section = (typeof sections)[number]
  * tooltip, by pointer and keyboard focus, says that breaking changes are to be expected. `full`: the
  * whole wordmark in the top bar (a page without a visible title), else cut to its mark.
  */
-function Brand({ onClick, full }: { onClick?: () => void; full?: boolean }) {
+function Brand({ onClick, full }: { onClick?: () => void; full?: boolean | undefined }) {
   const note = useId()
   return (
     <>
@@ -69,7 +69,7 @@ function Brand({ onClick, full }: { onClick?: () => void; full?: boolean }) {
           component={Link}
           href="/"
           display="flex"
-          onClick={onClick}
+          {...(onClick && { onClick })}
           className={full ? 'brand brand-full' : 'brand'}
           aria-describedby={note}
         >
@@ -104,11 +104,11 @@ function PageLink({
   route: string
   rail: boolean
   /** A button opening a dialog over the page (Settings, Search) instead of a link to `href`. */
-  onOpen?: () => void
+  onOpen?: (() => void) | undefined
   /** Called when the link is followed (the drawer closes). */
-  onNavigate?: () => void
+  onNavigate?: (() => void) | undefined
   /** The key in the rail's tooltip (Ctrl K). */
-  hint?: string
+  hint?: string | undefined
 }) {
   const current = !onOpen && pageCoversRoute(href, route)
   const icon = <NavIcon name={href} />
@@ -117,7 +117,7 @@ function PageLink({
     onOpen ? (
       <button type="button" {...props} onClick={onOpen} aria-haspopup="dialog" />
     ) : (
-      <Link {...props} href={href} onClick={onNavigate} />
+      <Link {...props} href={href} {...(onNavigate && { onClick: onNavigate })} />
     )
   if (!rail)
     return (
@@ -139,7 +139,7 @@ function PageLink({
         renderRoot={root}
         size="xl"
         variant={current ? 'light' : 'subtle'}
-        color={current ? undefined : 'gray'}
+        {...(!current && { color: 'gray' })}
         aria-label={label}
         aria-current={current ? 'page' : undefined}
         aria-keyshortcuts={hint && shortcutAriaKeys('search')}
@@ -160,7 +160,7 @@ function SectionLinks({
   section: Section
   route: string
   rail: boolean
-  onNavigate?: () => void
+  onNavigate?: (() => void) | undefined
 }) {
   // the sidebar stays in the document beside the drawer: ids of their own
   const id = useId()

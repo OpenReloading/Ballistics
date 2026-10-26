@@ -25,7 +25,13 @@ export const BarStatus = createContext<HTMLElement | null | undefined>(undefined
  * that React has not swapped in yet (a hidden `S:` segment) holds no second status. `widest`, the
  * longest text it can show, sets its width from 48em, so what follows it never moves.
  */
-export function BarCount({ children, widest }: { children: ReactNode; widest?: string }) {
+export function BarCount({
+  children,
+  widest,
+}: {
+  children: ReactNode
+  widest?: string | undefined
+}) {
   return (
     <span
       role={useMounted() ? 'status' : undefined}
@@ -56,21 +62,21 @@ export function PageBar({
 }: {
   title: string
   /** The h1 for screen readers only: the home page shows the wordmark instead. */
-  titleHidden?: boolean
+  titleHidden?: boolean | undefined
   /** Beside the title: the workbench's open loads, a record's standard badges. */
-  after?: ReactNode
+  after?: ReactNode | undefined
   /** The status line's own content, such as a list's count. */
-  status?: ReactNode
-  actions?: ReactNode
+  status?: ReactNode | undefined
+  actions?: ReactNode | undefined
   /** One action only: below 75em it shows as itself in the bar, not behind "Page actions". */
-  single?: boolean
+  single?: boolean | undefined
   /**
    * A loading bar that holds the box of the bar that replaces it, so nothing moves when it is replaced:
    * the status row and the Page actions slot, empty and not shown.
    */
-  reserve?: boolean
+  reserve?: boolean | undefined
   /** The Safety button as an icon, as the workbench's other secondary actions. */
-  compact?: boolean
+  compact?: boolean | undefined
 }) {
   const [statusLine, setStatusLine] = useState<HTMLDivElement | null>(null)
   const [open, setOpen] = useState(false)

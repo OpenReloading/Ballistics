@@ -230,15 +230,15 @@ type SightFill = {
   sightHeight: number
   zeroRange: number
   /** The mounted optic's turret click, rad, with how the turrets are marked. */
-  click?: { value: number; unit?: 'MOA' | 'mrad' }
-  twist?: number
+  click?: { value: number; unit?: 'MOA' | 'mrad' | undefined } | undefined
+  twist?: number | undefined
   twistHand: 'right' | 'left'
   /** The zero air: K, Pa and a fraction. */
-  zeroTemperature?: number
-  zeroPressure?: number
-  zeroHumidity?: number
-  dragFactor?: number
-  dragFactorSource?: string
+  zeroTemperature?: number | undefined
+  zeroPressure?: number | undefined
+  zeroHumidity?: number | undefined
+  dragFactor?: number | undefined
+  dragFactorSource?: string | undefined
 }
 
 /** The mount's zero air in the stored kind of each. */
@@ -339,7 +339,7 @@ export const twistText = (f: Firearm, system: UnitSystem) =>
 
 /** A click value (rad) in the turret marking `clickUnit`, else in the units of `system`. */
 export function clickText(
-  o: { clickValue?: number; clickUnit?: 'MOA' | 'mrad' },
+  o: { clickValue?: number | undefined; clickUnit?: 'MOA' | 'mrad' | undefined },
   system: UnitSystem,
 ) {
   if (!o.clickValue) return

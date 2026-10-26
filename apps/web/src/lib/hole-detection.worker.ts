@@ -198,8 +198,8 @@ function runDetection(
 type Found = {
   proposals: HoleProposal[]
   flagged: FlaggedRegion[]
-  holeDiameter?: number
-  example?: HoleExample
+  holeDiameter?: number | undefined
+  example?: HoleExample | undefined
 }
 
 /** The reply with the run's working px mapped back to photo px: `k` times the photo, from (x0, y0). */

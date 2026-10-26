@@ -58,7 +58,9 @@ export function useExportReminder() {
 
 /** Whether the browser keeps the records, and how much storage they use. */
 function useStorage(opened: boolean) {
-  const [info, setInfo] = useState<{ persisted?: boolean; used?: number }>({})
+  const [info, setInfo] = useState<{ persisted?: boolean | undefined; used?: number | undefined }>(
+    {},
+  )
   useEffect(() => {
     if (!opened) return
     const s = navigator.storage
@@ -88,7 +90,9 @@ function useCartridgeNames(ids: string[]) {
         const own = parseRef(id)?.scope === 'user' ? parseRef(id)?.id : undefined
         const record = own
           ? await storedRecord(own).catch(() => undefined)
-          : await fetchRecord<{ name?: string }>('cartridges', id).catch(() => undefined)
+          : await fetchRecord<{ name?: string | undefined }>('cartridges', id).catch(
+              () => undefined,
+            )
         const name = record?.name
         if (name) cartridgeNames.set(id, name)
       }),
@@ -134,7 +138,7 @@ export function SavedLoads({
   onRenamed: (id: string, name: string) => void
   /** Called after a rename or a copy wrote the store. */
   onStored: () => void
-  reminder?: string
+  reminder?: string | undefined
 }) {
   const [records, setRecords] = useState<LoadRecord[]>([])
   const [query, setQuery] = useState('')

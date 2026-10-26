@@ -19,9 +19,9 @@ export interface FaceRing {
 export interface FaceShape {
   /** Outer to inner. */
   rings: FaceRing[]
-  innerTen?: { diameter: FaceLength; height?: FaceLength }
+  innerTen?: { diameter: FaceLength; height?: FaceLength | undefined } | undefined
   blackDiameter: FaceLength
-  blackHeight?: FaceLength
+  blackHeight?: FaceLength | undefined
 }
 
 /** An ellipse, or a rectangle when `square`, centred on the scoring centre, radii in mm. */
@@ -29,9 +29,9 @@ export interface FaceEllipse {
   rx: number
   ry: number
   /** The shape is a rectangle of half-width `rx` and half-height `ry`, not an ellipse. */
-  square?: true
+  square?: true | undefined
   /** Ring value of the ring the ellipse is drawn for; absent for the paper, the black area and the inner ten. */
-  ring?: number
+  ring?: number | undefined
   /** A colour name of the face record, or `white` and `black`. */
   colour: string
 }

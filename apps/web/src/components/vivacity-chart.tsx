@@ -179,9 +179,9 @@ export function VivacityChart({
   title: string
   description: string
   /** Px; without it the box's CSS height. */
-  height?: number
+  height?: number | undefined
   /** Burnt fractions of a run to mark, as shot start, peak pressure and muzzle (workbench). */
-  marks?: Mark[]
+  marks?: Mark[] | undefined
 }) {
   const tokens = useChartTokens(vivacityTokens)
   const option = useMemo(

@@ -5,9 +5,8 @@
  * ordinary `trajectory` call with candidate inputs. SI in and out; angles in rad.
  */
 import type { DragTable } from '../drag-tables.ts'
-import { InputError, need, nth } from '../errors.ts'
+import { InputError, need, nth, overlay, type Settings } from '../errors.ts'
 import { type LogFitResult, logLeastSquares } from '../least-squares.ts'
-import { overlay, type Settings } from '../settings.ts'
 import { type DragInput, dragCoefficient, dragTableOf } from './drag.ts'
 import type { StepBudget } from './rk45.ts'
 import {

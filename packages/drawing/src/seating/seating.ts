@@ -34,7 +34,7 @@ export interface Tagged {
 export function leadeContact(
   ch: SeatingValues,
   d: number,
-): { z: number; note?: string } | { missing: string[] } | { none: string } {
+): { z: number; note?: string | undefined } | { missing: string[] } | { none: string } {
   const { chamberL3: L3, G1, F, leadeEnd: G, leadeStart: s, leadeAngle: i } = ch
   const missing = [
     ...(L3 === undefined ? ['L3'] : []),
@@ -66,11 +66,11 @@ interface SeatInput {
   bullet: BulletDimensions
   chamber: SeatingValues
   /** Water capacity, g. */
-  waterCapacity?: number
+  waterCapacity?: number | undefined
   /** Water density, g/cm³: turns the water capacity into a volume (the caller passes core's value). */
   waterDensity: number
   /** Barrel length from the breech face, mm. */
-  barrelLength?: number
+  barrelLength?: number | undefined
   by: { kind: 'overallLength' | 'baseToOgive'; value: number }
 }
 
@@ -82,17 +82,17 @@ export interface Seating {
   /** Cartridge overall length (COAL), mm. */
   coal: Tagged
   /** Cartridge base to ogive (CBTO), mm; none without the bullet base-to-ogive. */
-  cbto?: Tagged
+  cbto?: Tagged | undefined
   /** Seating depth: case length (cartridge L3) less the base position, mm. */
   depth: Tagged
   /** Case volume to the mouth and volume behind the bullet, cm³. */
-  caseVolume?: Tagged
-  volumeBehindBullet?: Tagged
-  travel?: Tagged
+  caseVolume?: Tagged | undefined
+  volumeBehindBullet?: Tagged | undefined
+  travel?: Tagged | undefined
   /** Leade contact from the head, approximate. */
-  leade?: number
+  leade?: number | undefined
   /** COAL at which the jump is 0. */
-  contactCoal?: number
+  contactCoal?: number | undefined
   /** Value undefined where a jump cannot be given; missing names what a derived value lacks. */
   jump: { value?: number | undefined; tag: 'derived' | 'approximate'; missing: string[] }
   /** The bullet touches the lands: a jump of 0 or less. */

@@ -22,11 +22,11 @@ export interface FittedPowder {
   label: string
   /** Id of the manufacturer record; empty for typed parameters. */
   manufacturer: string
-  form?: string
-  base?: string
+  form?: string | undefined
+  base?: string | undefined
   burn: VivacityBurn
   /** `uncertaintyFactor` times sigma / vivacity; absent when the record has no sigma. */
-  spread?: number
+  spread?: number | undefined
 }
 
 /** Why a powder has no curve: no fit, a pressure exponent other than 1, an interval reaching 0. */
@@ -38,13 +38,13 @@ export interface UnfittedPowder {
   kind: UnfitKind
   reason: string
   /** The powder's own numbers behind `kind`, for a list grouped by kind. */
-  detail?: string
+  detail?: string | undefined
 }
 
 interface RateInterval {
   value: number
-  low?: number
-  high?: number
+  low?: number | undefined
+  high?: number | undefined
 }
 
 const noFitReason =
@@ -52,8 +52,8 @@ const noFitReason =
 
 /** What `classifyPowder` reads: a powder record or a list summary, with its manufacturer's name where known. */
 type BurnSource = Pick<Powder, 'id' | 'manufacturer' | 'name' | 'grainForm' | 'propellantBase'> & {
-  manufacturerName?: string
-  interior?: PowderSummary['interior']
+  manufacturerName?: string | undefined
+  interior?: PowderSummary['interior'] | undefined
 }
 
 /** Why a powder with a fitted pressure exponent `exponent` other than 1 has no curve. */
@@ -220,23 +220,23 @@ export interface PowderRow {
   manufacturer: string
   manufacturerName: string
   /** Other names of the manufacturer, searched by the list. */
-  manufacturerAliases?: string[]
+  manufacturerAliases?: string[] | undefined
   name: string
-  grainForm?: string
-  propellantBase?: string
+  grainForm?: string | undefined
+  propellantBase?: string | undefined
   /** Mean dynamic vivacity with its interval, 1/(MPa s); absent without a curve. */
-  meanVivacity?: number
-  low?: number
-  high?: number
+  meanVivacity?: number | undefined
+  low?: number | undefined
+  high?: number | undefined
   /** 1 for the fastest fitted powder; kept when a filter hides others. */
-  burnRateOrder?: number
+  burnRateOrder?: number | undefined
 }
 
 /** The list rows of `summaries` in their order, each fitted powder with its global order. */
 export function orderPowders(
   summaries: readonly (PowderSummary & {
     manufacturerName: string
-    manufacturerAliases?: string[]
+    manufacturerAliases?: string[] | undefined
   })[],
 ): PowderRow[] {
   const rows = summaries.map((s): PowderRow => {

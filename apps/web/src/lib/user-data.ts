@@ -45,12 +45,12 @@ export type ParsedUserFile =
   | {
       ok: true
       records: UserRecord[]
-      files?: EmbeddedFile[]
+      files?: EmbeddedFile[] | undefined
       /** The `invalid` entries of an Export all file, as written: not checked, not part of the format. */
-      invalid?: unknown[]
+      invalid?: unknown[] | undefined
       /** Fields of the file mapped to no record field, as the format names them. */
-      unmapped?: string[]
-      warnings?: string[]
+      unmapped?: string[] | undefined
+      warnings?: string[] | undefined
     }
   | { ok: false; reason: string }
 
@@ -142,9 +142,9 @@ export interface InvalidRecord {
   /** Why the schema rejects it. */
   error: string
   /** Its `id`, `name` and `kind` where it has them as texts. */
-  id?: string
-  name?: string
-  kind?: string
+  id?: string | undefined
+  name?: string | undefined
+  kind?: string | undefined
 }
 
 /** The records of the browser store that pass the schema, and those that do not, as stored. */

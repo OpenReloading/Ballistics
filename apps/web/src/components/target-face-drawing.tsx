@@ -1,7 +1,11 @@
 import { type FaceEllipse, type FaceShape, targetFaceFigure } from '@open-reloading/drawing/target'
 import type { TargetFace } from '@open-reloading/schema'
 
-type Paint = { fill?: string; stroke?: string; vectorEffect?: 'non-scaling-stroke' }
+type Paint = {
+  fill?: string | undefined
+  stroke?: string | undefined
+  vectorEffect?: 'non-scaling-stroke' | undefined
+}
 
 // a square ring is a rectangle, any other an ellipse
 const Outline = ({ e, ...paint }: { e: FaceEllipse } & Paint) =>

@@ -113,7 +113,7 @@ export const measuredSteps = (
     : undefined
 
 /** The ladder bar; before a run it shows the charge field's value. */
-export function ShownStrip({ name }: { name?: string } = {}) {
+export function ShownStrip({ name }: { name?: string | undefined } = {}) {
   const { ok, steps, stale, oneFlag, stepValue, select } = useResult()
   const { chargeText } = useInputEcho()
   return useMemo(
@@ -337,7 +337,7 @@ function RunLine({
   status: string
   echoed: boolean
   online: boolean
-  warnings: { text: string; name?: string }[] | undefined
+  warnings: { text: string; name?: string | undefined }[] | undefined
 }) {
   return (
     <div className="run-line">

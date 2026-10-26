@@ -40,10 +40,10 @@ export function LinkButton({
   children,
 }: {
   href: string
-  size?: ButtonProps['size']
-  icon?: ReactNode
-  primary?: boolean
-  className?: string
+  size?: ButtonProps['size'] | undefined
+  icon?: ReactNode | undefined
+  primary?: boolean | undefined
+  className?: string | undefined
   children: ReactNode
 }) {
   return (
@@ -51,7 +51,7 @@ export function LinkButton({
       component={Link}
       href={href}
       variant={primary ? 'filled' : 'default'}
-      size={size}
+      {...(size && { size })}
       leftSection={icon}
       className={className}
     >
@@ -72,10 +72,10 @@ export function RecordActions({
   groups,
   design,
 }: {
-  compare?: string
-  workbench?: string
-  groups?: string
-  design?: string
+  compare?: string | undefined
+  workbench?: string | undefined
+  groups?: string | undefined
+  design?: string | undefined
 }) {
   const clipboard = useClipboard({ timeout: 2000 })
   return (
@@ -104,7 +104,7 @@ export function RecordActions({
       {/* the name stays, so a copy moves nothing */}
       <Tooltip
         label={clipboard.copied ? 'Link copied' : 'Copy link'}
-        opened={clipboard.copied || undefined}
+        {...(clipboard.copied && { opened: true })}
       >
         <ActionIcon
           variant="default"
@@ -128,13 +128,18 @@ export function PrintButton({
   disabled,
   hint,
 }: {
-  onClick?: () => void
-  disabled?: boolean
-  hint?: string
+  onClick?: (() => void) | undefined
+  disabled?: boolean | undefined
+  hint?: string | undefined
 }) {
   return (
     <Tooltip label={hint ?? 'Print'} multiline={!!hint} maw={hint ? 320 : undefined}>
-      <ActionIcon variant="default" aria-label="Print" disabled={disabled} onClick={onClick}>
+      <ActionIcon
+        variant="default"
+        aria-label="Print"
+        {...(disabled !== undefined && { disabled })}
+        onClick={onClick}
+      >
         <Printer aria-hidden="true" />
       </ActionIcon>
     </Tooltip>

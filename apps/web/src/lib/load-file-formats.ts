@@ -52,7 +52,10 @@ export const readNote = (p: ParsedUserFile) =>
     : ''
 
 /** Every valid file's records, photos, `invalid` entries and notes, and each skipped file with its reason. */
-export function parseFiles(files: { name: string; text?: string }[], formats = loadFileFormats) {
+export function parseFiles(
+  files: { name: string; text?: string | undefined }[],
+  formats = loadFileFormats,
+) {
   const records: UserRecord[] = []
   const embedded: EmbeddedFile[] = []
   const invalid: unknown[] = []

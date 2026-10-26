@@ -27,10 +27,10 @@ export const DesignerToolbar = memo(function DesignerToolbar({
 }: {
   undo: boolean
   redo: boolean
-  reset?: boolean
+  reset?: boolean | undefined
   newLabel: string
   /** Without it the toolbar has no reset. */
-  resetLabel?: string
+  resetLabel?: string | undefined
   system: UnitSystem
   dispatch: (a: ToolbarAction) => void
 }) {

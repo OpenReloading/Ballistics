@@ -1,6 +1,6 @@
 import { getHotkeyHandler } from '@mantine/hooks'
 
-type Shortcut = { action: string; keys: readonly string[]; fields?: boolean }
+type Shortcut = { action: string; keys: readonly string[]; fields?: boolean | undefined }
 
 /**
  * The app's keyboard shortcuts: handlers, hints, the search's

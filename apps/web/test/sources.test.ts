@@ -18,8 +18,7 @@ import type { UserCartridgeView } from '../src/lib/variants.ts'
 import { missing } from './defined.ts'
 import { resolvedBullet, resolvedCartridge } from './resolved.ts'
 
-const quantityOf = (kind: 'length' | 'mass', si: number | undefined) =>
-  si === undefined ? undefined : { value: fromSi(kind, si) }
+const quantityOf = (kind: 'length' | 'mass', si: number) => ({ value: fromSi(kind, si) })
 /** A bullet view with the SI values given as overrides of no base. */
 const bullet = (
   id: string,

@@ -195,7 +195,7 @@ type Blob = {
   rimDarkShare: number
   outline: Point[]
   /** The moment ellipse of a component whose outline is no clean ellipse. */
-  rough?: boolean
+  rough?: boolean | undefined
 }
 
 /** The dark pixels of a black area differ in colour by at most this much between their channels. */

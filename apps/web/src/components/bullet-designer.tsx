@@ -99,7 +99,7 @@ const StartSearch = memo(function StartSearch({
   system: UnitSystem
   start: (id: string) => void
   /** The bullet the design started from, shown in the empty field. */
-  chosen?: string
+  chosen?: string | undefined
 }) {
   const names = useManufacturerNames()
   return (
@@ -126,7 +126,7 @@ const ChoiceSelect = memo(function ChoiceSelect({
 }: {
   k: ChoiceKey
   value: string
-  error?: string
+  error?: string | undefined
   dispatch: (a: Action) => void
 }) {
   return (

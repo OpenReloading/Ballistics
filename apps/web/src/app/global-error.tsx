@@ -7,7 +7,7 @@
 export default function GlobalError({
   retry,
 }: {
-  error: Error & { digest?: string }
+  error: Error & { digest?: string | undefined }
   retry: () => void
 }) {
   return (

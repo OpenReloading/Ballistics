@@ -112,7 +112,7 @@ export interface CartridgeFieldSpec extends FieldSpec {
   /** End of the slider range, SI. */
   range: number
   /** Largest length accepted, SI: the layout time grows with the size of the drawing. */
-  limit?: number
+  limit?: number | undefined
 }
 
 export const fieldSpecs: CartridgeFieldSpec[] = symbols.flatMap(
@@ -143,8 +143,8 @@ export interface Origin {
   id: string
   title: string
   /** The `revision` of the catalogue record, as the API answered it. */
-  revision?: string
-  table?: string
+  revision?: string | undefined
+  table?: string | undefined
   values: SpecValue[]
   si: Record<string, number | undefined>
 }
@@ -153,15 +153,15 @@ export interface Design {
   /** The CIP table whose drawing rules apply (table III: belt). */
   table: string
   fields: Fields
-  origin?: Origin
+  origin?: Origin | undefined
   /** The catalogue cartridge the design is based on, `catalogue:<id>`, kept through files. */
-  basedOn?: string
+  basedOn?: string | undefined
   /** The base changed since the design was saved: the values not overridden follow it. */
-  baseChanged?: boolean
+  baseChanged?: boolean | undefined
   /** The overrides as saved: Save keeps those of a value the designer has no field for and every other key. */
-  kept?: UserCartridge['overrides']
+  kept?: UserCartridge['overrides'] | undefined
   /** Why the design is read only (its base is not there), with the record as stored, which Save keeps as it is. */
-  locked?: { reason: string; data: UserCartridge }
+  locked?: { reason: string; data: UserCartridge } | undefined
 }
 
 const keyOf = (v: Pick<SpecValue, 'side' | 'symbol' | 'variant'>) =>
@@ -384,7 +384,7 @@ export function reduce(h: History, a: Action): History {
  */
 export type FieldState =
   | { kind: 'record' }
-  | { kind: 'entered'; changed: boolean; record?: number }
+  | { kind: 'entered'; changed: boolean; record?: number | undefined }
   | { kind: 'cleared'; record: number }
   | { kind: 'derived'; si: number }
   | { kind: 'notPrinted' }
@@ -396,15 +396,15 @@ export interface Derived {
   label: string
   quantity: 'length' | 'angle' | 'capacity'
   si: number
-  basis?: string
+  basis?: string | undefined
 }
 
 export interface Evaluation {
   /** The spec drawn and its figures, laid out once; none when the input is refused. */
-  spec?: DraftSpec
-  figures?: Figure[]
+  spec?: DraftSpec | undefined
+  figures?: Figure[] | undefined
   /** Why there is no drawing for this input, and the field to show it at. */
-  refusal?: { reason: string; field: string }
+  refusal?: { reason: string; field: string } | undefined
   states: Record<string, FieldState>
   /** CIP plausibility findings by field key, shown as the field's error. */
   checks: Record<string, string[]>

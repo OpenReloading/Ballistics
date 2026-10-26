@@ -3,10 +3,9 @@
  * `apps/docs/docs/models/interior-m3.md`. SI in and out, temperatures in K.
  */
 import { bisect } from '../bisect.ts'
-import { InputError, nth } from '../errors.ts'
+import { InputError, nth, overlay, type Settings } from '../errors.ts'
 import { icao } from '../exterior/atmosphere.ts'
 import { type Rhs, type Rk45Event, type Rk45Options, rk45 } from '../exterior/rk45.ts'
-import { overlay, type Settings } from '../settings.ts'
 import { type Burn, burnError, burnForm } from './form.ts'
 
 /** Unchecked read of a state vector the caller sizes and indexes by the same count (kept in this module so the integrator loops inline it). */

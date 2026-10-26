@@ -25,7 +25,7 @@ export interface Figure {
    * closedFront first, then per side its missing symbols (code `missing`) or its notes; a note of
    * a drawn side carries the number of its flag.
    */
-  notes: { code: string; text: string; flagNumber?: number }[]
+  notes: { code: string; text: string; flagNumber?: number | undefined }[]
 }
 
 /** The notes of the drawn sides, numbered from 1 in caption order, or by their figure: each has a flag. */
@@ -41,7 +41,7 @@ export const flagged = (drawn: { side: Side; p: Profile }[]) =>
 export function recordFigures(spec: {
   id: string
   standard: string
-  table?: string
+  table?: string | undefined
   values: SpecValue[]
 }): Figure[] {
   const cip = spec.standard === 'CIP'

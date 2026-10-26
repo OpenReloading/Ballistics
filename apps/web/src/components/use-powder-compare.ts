@@ -33,28 +33,28 @@ export type CompareRow = {
   id: string
   manufacturerName: string
   name: string
-  base?: string
-  form?: string
+  base?: string | undefined
+  form?: string | undefined
   /** kg. */
-  charge?: number
+  charge?: number | undefined
   /** Charge over the free volume at the record's bulk density; none without a bulk density. */
-  ratio?: number
+  ratio?: number | undefined
   values?: {
     peak: number
     /** Of the first compared limit; none without one. */
-    percent?: number
+    percent?: number | undefined
     velocity: number
     burnt: number
     /** Travel at burnout, m; none when the powder does not burn out in the barrel. */
-    burnout?: number
+    burnout?: number | undefined
     /** Pa: the pressure range of the run, low and high. */
     range: { low: number; high: number }
   }
-  flag?: string
+  flag?: string | undefined
   /** Why the powder has no values. */
-  reason?: string
+  reason?: string | undefined
   /** The solver's 422 answer of a target mode row, worded in the units shown by `refusalText`. */
-  refusal?: ChargeTargetRefusal
+  refusal?: ChargeTargetRefusal | undefined
 }
 
 /**
@@ -65,8 +65,8 @@ export function answerRow(
   head: Pick<CompareRow, 'id' | 'manufacturerName' | 'name' | 'base' | 'form'>,
   req: {
     body: { load: InteriorBody['load'] }
-    bulkDensity?: number
-    resistanceMissing?: { powder: string; missing: string[] }
+    bulkDensity?: number | undefined
+    resistanceMissing?: { powder: string; missing: string[] } | undefined
   },
   charge: number,
   answer: InteriorResponse,
@@ -101,13 +101,13 @@ export function answerRow(
 /** The Powders tab's state: the rows, the progress of the batch and what the rows were computed for. */
 type PowderCompare = {
   rows: CompareRow[]
-  progress?: { done: number; total: number }
+  progress?: { done: number; total: number } | undefined
   running: boolean
-  message?: string
+  message?: string | undefined
   /** Names the load and charge mode the rows were computed for. */
-  key?: string
+  key?: string | undefined
   /** The mode the rows were computed for. */
-  mode?: CompareMode
+  mode?: CompareMode | undefined
   compute: () => void
   cancel: () => void
 }
@@ -220,7 +220,9 @@ export async function computeRows(
     start: (total: number) => void
     done: (done: number, total: number, rows: () => CompareRow[]) => void
   },
-): Promise<{ rows: CompareRow[]; total: number; noLimit?: ChargeTargetRefusal } | undefined> {
+): Promise<
+  { rows: CompareRow[]; total: number; noLimit?: ChargeTargetRefusal | undefined } | undefined
+> {
   const [powders, names] = await Promise.all([
     fetchPowderList(signal),
     // without names the rows show the product names alone
@@ -262,7 +264,7 @@ export async function computeRows(
 
 /** The line after a batch that stopped early: no comparable limit, or cancelled. */
 function endMessage(
-  done: { rows: CompareRow[]; total: number; noLimit?: ChargeTargetRefusal },
+  done: { rows: CompareRow[]; total: number; noLimit?: ChargeTargetRefusal | undefined },
   aborted: boolean,
 ) {
   if (done.noLimit && !aborted) return `Stopped. ${noComparableLimitText}`

@@ -4,8 +4,9 @@
  * draw and the 5th, 50th and 95th percentiles of the peak pressure and the muzzle velocity are reported.
  * It covers input tolerances only, not model error.
  */
+
+import type { Settings } from '../errors.ts'
 import { nth } from '../errors.ts'
-import type { Settings } from '../settings.ts'
 import { type InteriorLoad, type InteriorOptions, interior } from './model.ts'
 import {
   type ApplyTolerance,

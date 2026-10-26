@@ -119,25 +119,25 @@ export function RecordSearch<T extends { id: string }>({
   noneText: string
   unreachableText: string
   /** Extra query parameters, for example `&cartridge=308-win`. */
-  params?: string
+  params?: string | undefined
   /**
    * The chosen record, or the picker's prompt: a compact picker with a search icon, the
    * label left to screen readers, this text in the empty field.
    */
-  chosen?: string
+  chosen?: string | undefined
   /** `chosen` names a record, not the prompt: drawn in the text colour. */
-  picked?: boolean
+  picked?: boolean | undefined
   /** Local options listed first, matched by the typed text, such as the browser's bullet designs. */
-  extra?: { id: string; label: string }[]
-  onExtra?: (id: string) => void
+  extra?: { id: string; label: string }[] | undefined
+  onExtra?: ((id: string) => void) | undefined
   /** The field's size of the scale (`controlSize` in `theme.ts`); the theme's default without it. */
-  size?: TextInputProps['size']
+  size?: TextInputProps['size'] | undefined
   /** Drawn as a select: a chevron at the end, no search icon. */
-  chevron?: boolean
+  chevron?: boolean | undefined
   /** A button at the end of the field that opens a browsing dialog with the typed text. */
-  browse?: { label: string; onOpen: (typed: string) => void }
+  browse?: { label: string; onOpen: (typed: string) => void } | undefined
   /** The matches of the typed text, 20 at most with the total, in place of the API search. */
-  find?: (text: string, limit: number) => Promise<ListOf<T>>
+  find?: ((text: string, limit: number) => Promise<ListOf<T>>) | undefined
 }) {
   const [q, setQ] = useState('')
   const [state, setState] = useState<State<T>>({ status: 'idle' })
@@ -195,15 +195,14 @@ export function RecordSearch<T extends { id: string }>({
       <Combobox store={combobox} onOptionSubmit={submit}>
         <Combobox.Target withExpandedAttribute>
           <TextInput
-            size={size}
+            {...(size !== undefined && { size })}
             label={label}
-            labelProps={chosen === undefined ? undefined : { className: 'visually-hidden' }}
-            placeholder={chosen}
-            leftSection={
-              chosen === undefined || chevron ? undefined : (
-                <MagnifyingGlass size={16} aria-hidden="true" />
-              )
-            }
+            {...(chosen !== undefined && {
+              labelProps: { className: 'visually-hidden' },
+              placeholder: chosen,
+            })}
+            {...(chosen !== undefined &&
+              !chevron && { leftSection: <MagnifyingGlass size={16} aria-hidden="true" /> })}
             autoComplete="off"
             value={q}
             rightSection={endSection({

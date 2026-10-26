@@ -215,7 +215,7 @@ export function ChartPlayback({
   redraw,
 }: {
   r: PlaybackResult
-  strip?: StripModel
+  strip?: StripModel | undefined
   system: UnitSystem
   /** The chart's x and first y value of a point: the dot is mixed from them, on the drawn curve. */
   x: (s: PlaybackSample) => number
@@ -231,9 +231,9 @@ export function ChartPlayback({
    * Display x of a bullet travel (m), on the travel axis only: the strip then lies on the chart's
    * x scale, the bullet under the marker. On the time axis the strip spans the plot.
    */
-  travelX?: (travel: number) => number
+  travelX?: ((travel: number) => number) | undefined
   /** Set here: draws the current time again, after the chart drew. */
-  redraw: { current?: () => void }
+  redraw: { current?: (() => void) | undefined }
 }) {
   const id = useId().replace(/:/g, '')
   const end = r.muzzleTime

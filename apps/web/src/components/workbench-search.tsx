@@ -67,18 +67,18 @@ export function WorkbenchSearch({
   search: own,
 }: {
   commands: Command[]
-  onRun?: () => void
+  onRun?: (() => void) | undefined
   onCartridge: (c: CartridgeSummary) => void
   onBullet: (b: BulletRow) => void
   onPowder: (p: PowderSummary) => void
   describeBullet: (b: BulletSummary) => string
   /** The browser's bullet designs as rows (`userBulletRows`), listed with the catalogue. */
-  designs?: readonly BulletRow[]
+  designs?: readonly BulletRow[] | undefined
   /** Extra query of the bullet search, for example `&cartridge=308-win`. */
-  bulletFit?: CartridgeDiameters
+  bulletFit?: CartridgeDiameters | undefined
   bulletsLabel: string
   /** A store of its own, opened by the caller (no shortcut); without it the default store on Ctrl+K. */
-  search?: ReturnType<typeof createSpotlight>
+  search?: ReturnType<typeof createSpotlight> | undefined
 }) {
   const [store, actions] = own ?? [undefined, spotlight]
   const shell = useShellActions()
@@ -135,8 +135,8 @@ export function WorkbenchSearch({
     (!records || records.cartridges.length + records.bullets.length + records.powders.length === 0)
   return (
     <Spotlight.Root
-      store={store}
-      shortcut={own ? null : undefined}
+      {...(store && { store })}
+      {...(own && { shortcut: null })}
       query={query}
       onQueryChange={setQuery}
       tagsToIgnore={[]}

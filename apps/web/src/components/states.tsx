@@ -16,8 +16,8 @@ export function EmptyNote({
 }: {
   icon: ReactNode
   title: ReactNode
-  description?: ReactNode
-  action?: ReactNode
+  description?: ReactNode | undefined
+  action?: ReactNode | undefined
 }) {
   return (
     <EmptyState
@@ -44,8 +44,8 @@ export function Loading({
   inline = false,
 }: {
   what: string
-  rows?: number
-  inline?: boolean
+  rows?: number | undefined
+  inline?: boolean | undefined
 }) {
   if (inline) return <p>{`Loading ${what}`}</p>
   return (
@@ -73,10 +73,10 @@ export function ErrorNote({
   onRetry,
   color = 'red',
 }: {
-  title?: string
-  children?: ReactNode
-  onRetry?: () => void
-  color?: 'red' | 'orange'
+  title?: string | undefined
+  children?: ReactNode | undefined
+  onRetry?: (() => void) | undefined
+  color?: 'red' | 'orange' | undefined
 }) {
   return (
     <Alert
@@ -174,8 +174,8 @@ export function EmptyList({
   onClear,
 }: {
   noun: string
-  filters?: string
-  onClear?: () => void
+  filters?: string | undefined
+  onClear?: (() => void) | undefined
 }) {
   return (
     <EmptyNote

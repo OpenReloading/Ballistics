@@ -3,9 +3,9 @@
  * and runs its commands): the shell's Search and Ctrl+K open it instead of the site search.
  */
 export const searchHost: {
-  page?: () => void
+  page?: (() => void) | undefined
   /** Asked for on the workbench before its search mounted: it opens when it does. */
-  wanted?: boolean
+  wanted?: boolean | undefined
 } = {}
 
 const openEvent = 'site-search-open'

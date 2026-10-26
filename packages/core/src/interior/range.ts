@@ -1,4 +1,4 @@
-import type { Settings } from '../settings.ts'
+import type { Settings } from '../errors.ts'
 /**
  * Peak-pressure range over input tolerances (`apps/docs/docs/models/interior-pressure-range.md`): each input
  * alone at both ends of its tolerance, then all inputs together at the pressure-raising and the

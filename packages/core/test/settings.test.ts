@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { overlay } from '../src/settings.ts'
+import { overlay } from '../src/errors.ts'
 
 describe('overlay', () => {
   it('keeps the base value for an entry that is absent or undefined', () => {

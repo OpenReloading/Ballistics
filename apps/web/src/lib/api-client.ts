@@ -50,7 +50,7 @@ const wait = (ms: number, signal: AbortSignal) =>
   })
 
 /** The answer, the reason there is none (`refusal`: the body of a 422), or undefined after an abort. */
-type Posted<T> = { answer: T } | { reason: string; refusal?: ErrorBody } | undefined
+type Posted<T> = { answer: T } | { reason: string; refusal?: ErrorBody | undefined } | undefined
 
 /**
  * One POST. A busy pool (503 `busy`) gives its `retry-after` (s, at least 1) while `retry` holds;
@@ -114,7 +114,9 @@ export function postJson<T>(path: string, body: object, signal: AbortSignal): Pr
 export async function postInteriorRun(
   body: object,
   signal: AbortSignal,
-): Promise<{ answer: InteriorResponse } | { reason: string; refusal?: ErrorBody } | undefined> {
+): Promise<
+  { answer: InteriorResponse } | { reason: string; refusal?: ErrorBody | undefined } | undefined
+> {
   const run = await postJson<InteriorResponse>('interior', body, signal)
   return run && 'answer' in run
     ? { answer: { ...run.answer, result: { ...run.answer.result, points: [] } } }

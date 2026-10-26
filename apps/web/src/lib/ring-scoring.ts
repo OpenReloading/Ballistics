@@ -11,17 +11,17 @@ export type RingScore = {
   /** Value of the highest ring the hole touches; 0 outside the face. */
   value: number
   /** Tenth-ring value, on faces whose rules define it. */
-  decimal?: number
+  decimal?: number | undefined
   /** True when the hole is in the inner ten under the face's `innerTen.rule`. */
   innerTen: boolean
   /** Zone label of the bull the shot belongs to, where the face's bull has one. */
-  zone?: string
+  zone?: string | undefined
 }
 
 type GroupScore = {
   shots: RingScore[]
   total: number
-  decimalTotal?: number
+  decimalTotal?: number | undefined
   innerTenCount: number
 }
 
@@ -86,7 +86,7 @@ function touches(ring: Shape, p: Point, g: number): boolean {
 }
 
 /** The bull a shot belongs to: the nearest centre (the first of the record on a tie). */
-function nearestBull(face: TargetFace, shot: Point): { centre: Point; zone?: string } {
+function nearestBull(face: TargetFace, shot: Point): { centre: Point; zone?: string | undefined } {
   let best = { centre: { x: 0, y: 0 }, zone: undefined as string | undefined }
   let bestD = Number.POSITIVE_INFINITY
   for (const b of face.bulls ?? []) {
@@ -207,7 +207,7 @@ function solveCircleFit(
 }
 
 /** Where a face lies on the sheet: its centre in target m and target m per face m (1 when true). */
-type FaceAlignment = { centre: Point; scale: number; rms?: number }
+type FaceAlignment = { centre: Point; scale: number; rms?: number | undefined }
 /** A point marked on ring `ring` (its value) of a face, in target m. */
 export type FaceMark = { ring: number; x: number; y: number }
 
@@ -277,8 +277,16 @@ export function usesOwnTenthRule(face: TargetFace, hole: number): boolean {
  */
 export function scoreGroupOnFace(
   face: TargetFace,
-  choice: { id: string; event?: string; marks?: readonly FaceMark[]; gauge?: number },
-  group: { aim?: Point; shots: readonly (Point & { excluded?: boolean })[] },
+  choice: {
+    id: string
+    event?: string | undefined
+    marks?: readonly FaceMark[] | undefined
+    gauge?: number | undefined
+  },
+  group: {
+    aim?: Point | undefined
+    shots: readonly (Point & { excluded?: boolean | undefined })[]
+  },
   bullet: number | undefined,
 ):
   | { alignment: FaceAlignment; hole: number; usesOwnTenthRule: boolean; score: GroupScore }

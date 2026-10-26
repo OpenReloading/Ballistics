@@ -6,8 +6,9 @@
  * charge. A simulation, not load data: the answer is the charge at which the model reaches the
  * target, not a charge to load.
  */
+
+import type { Settings } from '../errors.ts'
 import { need, nth } from '../errors.ts'
-import type { Settings } from '../settings.ts'
 import { solidFillLimit } from './load-file.ts'
 import {
   type InteriorLoad,

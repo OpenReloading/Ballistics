@@ -76,14 +76,14 @@ export function EChart({
 }: {
   option: EChartsCoreOption
   /** Px; without it the box's CSS height, which the chart follows. */
-  height?: number
+  height?: number | undefined
   title: string
   description: string
   /** Index of the series the keyboard walks. */
-  focus?: number
-  readout?: (dataIndex: number) => string
+  focus?: number | undefined
+  readout?: ((dataIndex: number) => string) | undefined
   /** Called after each draw, for an overlay that reads the chart's scales. */
-  onRender?: (chart: ECharts) => void
+  onRender?: ((chart: ECharts) => void) | undefined
 }) {
   const box = useRef<HTMLDivElement>(null)
   const chart = useRef<ECharts | null>(null)
@@ -180,7 +180,9 @@ export function EChart({
 
   const onKey = (e: KeyboardEvent<HTMLInputElement>) => {
     const c = chart.current
-    const series = (c?.getOption().series as { data?: unknown[] }[] | undefined)?.[focus]
+    const series = (c?.getOption().series as { data?: unknown[] | undefined }[] | undefined)?.[
+      focus
+    ]
     const n = series?.data?.length ?? 0
     if (!c || n === 0) return
     const step = Math.max(1, Math.round(n / 50))
@@ -196,7 +198,8 @@ export function EChart({
     moveTo(target)
   }
 
-  const points = (option.series as { data?: unknown[] }[] | undefined)?.[focus]?.data?.length ?? 0
+  const points =
+    (option.series as { data?: unknown[] | undefined }[] | undefined)?.[focus]?.data?.length ?? 0
   return (
     <div className="echart">
       <div

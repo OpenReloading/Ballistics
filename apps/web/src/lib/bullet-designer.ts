@@ -110,7 +110,7 @@ export interface Origin {
   id: string
   title: string
   /** The `revision` of the catalogue record, as the API answered it. */
-  revision?: string
+  revision?: string | undefined
   /** The base's manufacturer, `catalogue:<id>`. */
   manufacturer: string
   name: string
@@ -120,19 +120,19 @@ export interface Origin {
 
 export interface Design {
   /** The manufacturer, `catalogue:<id>` or `user:<id>`; undefined while none is named. */
-  manufacturer?: string
+  manufacturer?: string | undefined
   name: string
   choices: Choices
   fields: Fields
-  origin?: Origin
+  origin?: Origin | undefined
   /** The catalogue bullet the design is based on, `catalogue:<id>`, kept through files. */
-  basedOn?: string
+  basedOn?: string | undefined
   /** The base changed since the design was saved: the fields not overridden follow it. */
-  baseChanged?: boolean
+  baseChanged?: boolean | undefined
   /** The overrides as saved: Save keeps those of a field the designer has no input for. */
-  kept?: UserBullet['overrides']
+  kept?: UserBullet['overrides'] | undefined
   /** Why the design is read only (its base is not there), with the record as stored, which Save keeps as it is. */
-  locked?: { reason: string; data: UserBullet }
+  locked?: { reason: string; data: UserBullet } | undefined
 }
 
 const stored = (s: FieldSpec) => s.quantity as Parameters<typeof storedToSi>[0]
@@ -373,8 +373,8 @@ export function reduce(h: History, a: Action): History {
  */
 export type FieldState =
   | { kind: 'record' }
-  | { kind: 'entered'; changed: boolean; record?: number }
-  | { kind: 'derived' | 'assumed'; si: number; basis?: string }
+  | { kind: 'entered'; changed: boolean; record?: number | undefined }
+  | { kind: 'derived' | 'assumed'; si: number; basis?: string | undefined }
   | { kind: 'empty' }
 
 export interface Drawing {
@@ -387,9 +387,9 @@ export interface Drawing {
 }
 
 interface Evaluation {
-  drawing?: Drawing
+  drawing?: Drawing | undefined
   /** Why there is no drawing for this input, and the field to show it at. */
-  refusal?: { reason: string; field: string }
+  refusal?: { reason: string; field: string } | undefined
   states: Record<string, FieldState>
   /** The computed rows of a bullet page (sectional density, Miller twist with a given length); none without a mass and diameter. */
   computed: FieldRow[]
@@ -578,7 +578,7 @@ function derivedFills(
   return fill
 }
 
-type Fill = Record<string, [number, 'derived' | 'assumed', string?]>
+type Fill = Record<string, [number, 'derived' | 'assumed', (string | undefined)?]>
 
 function boatTailFills(
   fill: Fill,

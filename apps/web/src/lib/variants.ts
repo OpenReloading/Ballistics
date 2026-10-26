@@ -100,19 +100,19 @@ export interface ResolvedBullet {
   /** The base with the overrides applied; the overrides alone without a base or while it is missing. */
   record: Partial<Bullet>
   /** Why the record is read only. */
-  problem?: string
+  problem?: string | undefined
   /** The base changed since the bullet was saved. */
-  changed?: boolean
+  changed?: boolean | undefined
 }
 
 /** A user cartridge with its base and the table and values the overrides give. */
 export interface ResolvedCartridge {
   base: Base<CartridgeDetail>
   /** The base with the overrides applied; the overrides alone without a base or while it is missing. */
-  record: { table?: string; values: SpecValue[] }
-  problem?: string
+  record: { table?: string | undefined; values: SpecValue[] }
+  problem?: string | undefined
   /** The base changed since the cartridge was saved. */
-  changed?: boolean
+  changed?: boolean | undefined
 }
 
 /** The user bullet `data` with its base read from the catalogue. */
@@ -143,7 +143,10 @@ export async function resolveCartridge(
       : { values: [] }
   return {
     base,
-    record: applyOverrides<{ table?: string; values: SpecValue[] }>(from, data.overrides),
+    record: applyOverrides<{ table?: string | undefined; values: SpecValue[] }>(
+      from,
+      data.overrides,
+    ),
     problem: baseProblem(base),
     changed: baseChanged(data.basedOnRevision, base),
   }
@@ -160,7 +163,7 @@ export interface UserBulletView {
   /** The name of the bullet's manufacturer; empty while it is not known. */
   manufacturerName: string
   /** Mass, diameter and length of the resolved record in SI; absent where it gives none. */
-  si: { mass?: number; diameter?: number; length?: number }
+  si: { mass?: number | undefined; diameter?: number | undefined; length?: number | undefined }
 }
 
 /** A user cartridge of the browser whose base resolves. */

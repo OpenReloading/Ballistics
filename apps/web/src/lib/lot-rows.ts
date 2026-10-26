@@ -36,7 +36,7 @@ export function lotBody(
   lot: Lot,
   fraction: number,
   cartridge?: string,
-): ReturnType<typeof longerBody> & { cartridge?: string } {
+): ReturnType<typeof longerBody> & { cartridge?: string | undefined } {
   const body = longerBody(lotLoad(load, lot, fraction), charges, direction, load.barrel.length)
   return cartridge ? { ...body, cartridge } : body
 }
@@ -64,15 +64,15 @@ export const burnRateLabel = (lot: Lot | undefined, fraction: number) =>
 /** The barrel times of one charge in the nominal run and the two lots, s; absent for a row without a result. */
 export interface BarrelTimes {
   charge: number
-  nominal?: number
-  low?: number
-  high?: number
+  nominal?: number | undefined
+  low?: number | undefined
+  high?: number | undefined
 }
 
 /** The barrel times of the rows of each charge, in the order of the charges. */
 export function barrelTimes(
-  nominal: readonly { charge: number; barrelTime?: number }[],
-  byLot: Record<Lot, readonly { barrelTime?: number }[]>,
+  nominal: readonly { charge: number; barrelTime?: number | undefined }[],
+  byLot: Record<Lot, readonly { barrelTime?: number | undefined }[]>,
 ): BarrelTimes[] {
   return nominal.map((s, i) => ({
     charge: s.charge,

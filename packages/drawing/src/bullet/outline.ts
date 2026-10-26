@@ -79,7 +79,7 @@ export interface Outline {
   /** Index in `points` of the edge of the base face. */
   baseEdge: number
   /** The cavity of a hollow base: its radius at the base face and its depth, an assumed shape. */
-  cavity?: { radius: number; depth: number }
+  cavity?: { radius: number; depth: number } | undefined
   noseLength: number
   noseAssumed: boolean
   /** Shank length between the boat tail and the nose, mm. */
@@ -91,7 +91,7 @@ export interface Outline {
   /** z of the centre of the section area, mm. */
   areaCentreZ: number
   /** z where a polymer tip leaves the jacket. */
-  tipStart?: number
+  tipStart?: number | undefined
   notes: string[]
 }
 

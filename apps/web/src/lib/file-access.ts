@@ -8,9 +8,9 @@ import { folderFileName } from './user-file-names.ts'
 
 /** File System Access API members (https://developer.mozilla.org/en-US/docs/Web/API/File_System_API). */
 export type Pickers = {
-  showSaveFilePicker?: (o: object) => Promise<FileSystemFileHandle>
-  showOpenFilePicker?: (o: object) => Promise<FileSystemFileHandle[]>
-  showDirectoryPicker?: (o: object) => Promise<FileSystemDirectoryHandle>
+  showSaveFilePicker?: ((o: object) => Promise<FileSystemFileHandle>) | undefined
+  showOpenFilePicker?: ((o: object) => Promise<FileSystemFileHandle[]>) | undefined
+  showDirectoryPicker?: ((o: object) => Promise<FileSystemDirectoryHandle>) | undefined
 }
 
 /** The window's File System Access pickers; each is absent where the browser lacks it. */
@@ -31,7 +31,7 @@ export async function saveAs(
   text: string,
   name: string,
   startIn?: FileSystemDirectoryHandle,
-): Promise<{ name: string; handle?: FileSystemFileHandle } | undefined> {
+): Promise<{ name: string; handle?: FileSystemFileHandle | undefined } | undefined> {
   const { showSaveFilePicker } = pickers()
   if (showSaveFilePicker) {
     try {
@@ -51,7 +51,7 @@ export async function saveAs(
 export async function pickFiles(
   multiple: boolean,
   startIn?: FileSystemDirectoryHandle,
-): Promise<{ file: File; handle?: FileSystemFileHandle }[]> {
+): Promise<{ file: File; handle?: FileSystemFileHandle | undefined }[]> {
   const { showOpenFilePicker } = pickers()
   if (showOpenFilePicker) {
     try {

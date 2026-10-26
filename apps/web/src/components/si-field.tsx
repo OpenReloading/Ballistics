@@ -22,11 +22,11 @@ export function SiField({
   spec: FieldSpec
   si: number | undefined
   onCommit: (si: number | undefined) => void
-  placeholder?: string
+  placeholder?: string | undefined
   /** A value shown before the placeholder text, SI. */
-  shown?: number
+  shown?: number | undefined
   /** Commit when the field is left or on Enter, not on every keystroke. */
-  deferred?: boolean
+  deferred?: boolean | undefined
 }) {
   const { system } = useUnits()
   const [draft, setDraft] = useState<FieldValue>()

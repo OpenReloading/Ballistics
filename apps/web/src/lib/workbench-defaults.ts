@@ -29,14 +29,14 @@ export const citedDefaults = {
 export type DefaultKey = keyof typeof citedDefaults
 export const defaultKeys = Object.keys(citedDefaults) as DefaultKey[]
 /** The cited defaults, and the user's barrel length: no cited value, empty means by cartridge class. */
-export type WorkbenchDefaults = Record<DefaultKey, number> & { barrelLength?: number }
+export type WorkbenchDefaults = Record<DefaultKey, number> & { barrelLength?: number | undefined }
 
 const cited = () =>
   Object.fromEntries(defaultKeys.map((k) => [k, citedDefaults[k].si])) as WorkbenchDefaults
 
 /** A usable default: finite, within the field's bounds; temperature (K) and ignition pressure above 0. */
 export function validDefault(key: DefaultKey, si: unknown): si is number {
-  const spec = interiorFields.find((s) => s.key === key) as { min?: number }
+  const spec = interiorFields.find((s) => s.key === key) as { min?: number | undefined }
   if (typeof si !== 'number' || !Number.isFinite(si)) return false
   if (key !== 'startPressure' && si <= 0) return false
   return spec.min === undefined || si >= spec.min

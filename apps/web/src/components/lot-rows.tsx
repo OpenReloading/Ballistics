@@ -46,7 +46,7 @@ export function LotChartBlock({
   lot: LotRows
   system: UnitSystem
   /** The note under the chart; the printed report carries none. */
-  note?: boolean
+  note?: boolean | undefined
 }) {
   if (!lot.rows) return null
   return (

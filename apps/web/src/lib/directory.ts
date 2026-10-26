@@ -12,13 +12,13 @@ export interface DirectoryState {
   query: string
   sort: DirectorySort
   /** The sources that are on, comma-separated; empty for all (`sources.ts`). URL key `src`. */
-  sources?: string
+  sources?: string | undefined
   /** Bullets and powders: the rows ticked for Compare, ids comma-separated, in the order ticked. URL key `pick`. */
-  compareIds?: string
+  compareIds?: string | undefined
   /** Bullets: the id of a cartridge; only the bullets that fit it by the CIP rule (`fitRule`). */
-  fits?: string
+  fits?: string | undefined
   /** Disciplines: the federation's abbreviation, from the federation record's link. URL key `org`. */
-  organization?: string
+  organization?: string | undefined
 }
 
 export const emptyDirectory: DirectoryState = { query: '', sort: undefined }

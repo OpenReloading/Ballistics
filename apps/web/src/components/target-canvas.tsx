@@ -143,9 +143,9 @@ function extentOf(
 }
 
 type ShotHandlers = {
-  onNudge?: (sel: Selection, dx: number, dy: number) => void
-  onDelete?: (sel: Selection) => void
-  onToggle?: (sel: Selection) => void
+  onNudge?: ((sel: Selection, dx: number, dy: number) => void) | undefined
+  onDelete?: ((sel: Selection) => void) | undefined
+  onToggle?: ((sel: Selection) => void) | undefined
 }
 
 /** The arrows, Home and End move the focus along the shots of the group (one tab stop per group). */
@@ -634,34 +634,34 @@ export function TargetCanvas({
 }: {
   sheet: TargetSheet
   frame: Frame | undefined
-  photo?: { url: string; width: number; height: number }
-  active?: string
-  selected?: Selection
+  photo?: { url: string; width: number; height: number } | undefined
+  active?: string | undefined
+  selected?: Selection | undefined
   tool: Tool
   /** Points clicked so far for the calibration tool, image px. */
-  pending?: Point[]
+  pending?: Point[] | undefined
   overlays: Record<Overlay, boolean>
   filter: { contrast: number; darken: number }
   /** Diameter of the shot marks, m; a fixed size on screen without it. */
   marker: number | undefined
   /** A shot's accessible name. */
   describe: (sel: Selection) => string
-  statsBox?: ReactNode
+  statsBox?: ReactNode | undefined
   onSelect?: (sel: Selection | undefined) => void
-  onAdd?: (q: Point) => void
+  onAdd?: ((q: Point) => void) | undefined
   /** A drag step of a shot; `first` starts an undo step. */
-  onMove?: (sel: Selection, q: Point, first: boolean) => void
-  onToggle?: (sel: Selection) => void
-  onDelete?: (sel: Selection) => void
-  onNudge?: (sel: Selection, dx: number, dy: number) => void
+  onMove?: ((sel: Selection, q: Point, first: boolean) => void) | undefined
+  onToggle?: ((sel: Selection) => void) | undefined
+  onDelete?: ((sel: Selection) => void) | undefined
+  onNudge?: ((sel: Selection, dx: number, dy: number) => void) | undefined
   /** A click of the aim, origin or a calibration tool, view point (image px with a photo). */
-  onPoint?: (p: Point) => void
-  onRefMove?: (ref: number, point: number, p: Point, first: boolean) => void
-  onAimMove?: (group: string, q: Point, first: boolean) => void
+  onPoint?: ((p: Point) => void) | undefined
+  onRefMove?: ((ref: number, point: number, p: Point, first: boolean) => void) | undefined
+  onAimMove?: ((group: string, q: Point, first: boolean) => void) | undefined
   /** Drawn over the shots in view units, `k` view units per screen px: the notes. */
-  layer?: (k: number) => ReactNode
+  layer?: ((k: number) => ReactNode) | undefined
   /** A fixed view and scale for an export or the print: no input (no handlers), loupe, zoom buttons, references or axes. */
-  still?: { box: ViewBox; k: number }
+  still?: { box: ViewBox; k: number } | undefined
   /** Set to the extent Fit shows on every render, for the exports and the print. */
   view?: { current: { extent: ViewBox } | undefined }
 }) {

@@ -18,9 +18,9 @@ export function AppModal({
   ...root
 }: Omit<ModalRootProps, 'title'> & {
   title: ReactNode
-  closeButton?: false | ComponentProps<typeof Modal.CloseButton>
-  bodyProps?: ComponentProps<typeof Modal.Body> & { 'data-autofocus'?: boolean }
-  footer?: ReactNode
+  closeButton?: false | ComponentProps<typeof Modal.CloseButton> | undefined
+  bodyProps?: (ComponentProps<typeof Modal.Body> & { 'data-autofocus'?: boolean }) | undefined
+  footer?: ReactNode | undefined
 }) {
   return (
     <Modal.Root {...root}>

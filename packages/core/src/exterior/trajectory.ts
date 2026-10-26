@@ -5,8 +5,7 @@
  * y up, z right); the line of sight is an output projection (`apps/docs/docs/models/exterior-point-mass.md`, "Frames").
  */
 import { type DragModel, type DragTable, dragTables } from '../drag-tables.ts'
-import { InputError, need, nth } from '../errors.ts'
-import { overlay, type Settings } from '../settings.ts'
+import { InputError, need, nth, overlay, type Settings } from '../errors.ts'
 import {
   type Air,
   airAt,

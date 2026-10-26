@@ -11,11 +11,11 @@ export type ReportOption = {
   /** The block's Markdown; undefined when the page has none to give. */
   text: () => string | undefined | Promise<string | undefined>
   /** The label of the option that must be ticked first. */
-  needs?: string
+  needs?: string | undefined
 }
 
 /** The options of the page shown, set while it is mounted. */
-export const reportHost: { options?: () => ReportOption[] } = {}
+export const reportHost: { options?: (() => ReportOption[]) | undefined } = {}
 
 /** Offers `options` to the Report issue dialog while the calling page is mounted; none when undefined. */
 export function useReportOptions(options: ReportOption[] | undefined) {

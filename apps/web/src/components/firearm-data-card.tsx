@@ -20,13 +20,13 @@ export function DataCard({
   title = true,
 }: {
   f: Firearm
-  cartridge?: string
+  cartridge?: string | undefined
   /** The name of the maker, `f.manufacturer` resolved. */
-  manufacturer?: string
+  manufacturer?: string | undefined
   system: UnitSystem
   opticName: (id: string) => string
   /** The name as its heading; off where the panel's head names the firearm. */
-  title?: boolean
+  title?: boolean | undefined
 }) {
   const facts: [string, string | undefined][] = [
     ['Cartridge', cartridge],

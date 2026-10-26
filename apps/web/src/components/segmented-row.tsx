@@ -7,7 +7,7 @@ import { tipEvents } from '../lib/theme.ts'
 export interface Segment<T extends string> {
   value: T
   label: string
-  reason?: string
+  reason?: string | undefined
 }
 
 /**

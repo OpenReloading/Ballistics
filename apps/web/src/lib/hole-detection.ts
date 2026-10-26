@@ -50,7 +50,7 @@ export type Region = readonly Point[] | { x: number; y: number; width: number; h
 
 export type HoleDetectionInput = {
   image: RgbaImage
-  region?: Region
+  region?: Region | undefined
   /** Image px per m of the target near the region. */
   pxPerM: number
   /** Expected hole diameter, m (the bullet diameter, a typed or a learned hole size). */
@@ -60,26 +60,26 @@ export type HoleDetectionInput = {
    * the median of the 5 strongest peaks, held to 0.05 to 0.9) and the least colour separation
    * (`MIN_SEP` times `minContrast / 0.15`) scale with it.
    */
-  minContrast?: number
+  minContrast?: number | undefined
   /** Visible hole diameter over the bullet diameter. */
-  holeScale?: number
+  holeScale?: number | undefined
   /**
    * Colour seen through a hole (0..255 per channel), picked by the user in one hole: the colour
    * axis runs from the surroundings of the region to it. Absent: the axis comes from the strongest
    * blobs of the region (`autoDetect`).
    */
-  backing?: { r: number; g: number; b: number }
+  backing?: { r: number; g: number; b: number } | undefined
   /** Holes darker (`dark`) or lighter (`light`) than their surroundings only; absent: both. */
-  polarity?: 'dark' | 'light'
+  polarity?: 'dark' | 'light' | undefined
   /** Called with the share of the work done, 0..1, between the steps. */
-  onProgress?: (done: number) => void
+  onProgress?: ((done: number) => void) | undefined
   /**
    * The target face found on the photo: its outline is the region when
    * none is given, the colour axis of a hole takes its surroundings from the same kind of surface
    * (black area or paper), and a run drops what its polarity cannot show: dark marks on the black
    * area and light marks on the paper are print.
    */
-  face?: FaceLabel
+  face?: FaceLabel | undefined
 }
 
 /** The printed face as the detection sees it. */
@@ -92,9 +92,9 @@ export type FaceLabel = {
    * True for a point where the ring numerals stand: on an axis turned by `roll` (rad), between two
    * ring lines.
    */
-  numeral?: (p: Point, roll?: number) => boolean
+  numeral?: ((p: Point, roll?: number) => boolean) | undefined
   /** Distance of a point from the face centre (mm) and its angle from the face's x axis (rad). */
-  polar?: (p: Point) => { radius: number; angle: number }
+  polar?: ((p: Point) => { radius: number; angle: number }) | undefined
 }
 
 export type HoleProposal = {
@@ -189,7 +189,7 @@ type Run = {
   mu: LogRgb
   ring: LogRgb
   /** The shots where the ring numerals stand (a face label with rings), also in `shots`. */
-  zone?: HoleProposal[]
+  zone?: HoleProposal[] | undefined
 }
 type Ctx = WorkImage & {
   blockSize: number
@@ -200,7 +200,7 @@ type Ctx = WorkImage & {
   prior: number
   keep: number
   progress: (done: number) => void
-  face?: FaceLabel
+  face?: FaceLabel | undefined
 }
 /** A seed run of the auto detection. */
 type SeedRun = { found: Found; run: Run; at: Point; holeDiameter: number }

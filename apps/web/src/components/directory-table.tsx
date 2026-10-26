@@ -39,22 +39,22 @@ export interface DirectoryColumn<T> {
   key: string
   label: string
   /** The unit, in a muted line under the label ("(mm)"); the value cells carry none. */
-  unit?: string
+  unit?: string | undefined
   /** `tabIndex`: for the cell's focusable content (0 only on the table's one tab stop). */
   cell: (row: T, tabIndex: number) => ReactNode
   /** Sort key; columns without one do not sort. */
   value?: (row: T) => string | number | null | undefined
-  num?: boolean
+  num?: boolean | undefined
   /** A value equal to the row above's is set muted (a manufacturer's name once per run of its rows). */
-  dim?: boolean
+  dim?: boolean | undefined
   /** Column width (CSS); one column without it takes the rest. */
-  width?: string
+  width?: string | undefined
   /** Help on the header, shown on hover, focus and touch. */
-  help?: string
+  help?: string | undefined
   /** Not printed, as a row action. */
-  screenOnly?: boolean
+  screenOnly?: boolean | undefined
   /** At the header's end, after its label: a scale's ticks. */
-  head?: ReactNode
+  head?: ReactNode | undefined
 }
 
 /**
@@ -65,7 +65,7 @@ type Selection<T> = {
   ids: readonly string[]
   max: number
   onChange: (ids: string[]) => void
-  can?: (row: T) => boolean
+  can?: ((row: T) => boolean) | undefined
 }
 
 const focusable = 'a[href], input:not(:disabled), [tabindex]'
@@ -325,7 +325,7 @@ export function DirectoryTable<T extends { id: string }>({
   link: string
   href: (row: T) => string
   /** A plain click on the row's link opens the row in the page instead (the firearm library's editor). */
-  onOpen?: (row: T) => void
+  onOpen?: ((row: T) => void) | undefined
   /** The phone row's second line. */
   facts: (row: T) => string
   /** The row's name as plain text, for the link index. */
@@ -336,11 +336,11 @@ export function DirectoryTable<T extends { id: string }>({
   onSort: (sort: DirectorySort) => void
   empty: ReactNode
   /** A full selection disables the other boxes. */
-  selection?: Selection<T>
+  selection?: Selection<T> | undefined
   /** A heavier rule above a row that starts a group (the browser's own rows end before the catalogue's). */
-  breakBefore?: (row: T, previous: T) => boolean
+  breakBefore?: ((row: T, previous: T) => boolean) | undefined
   /** A row action for phones, where the columns after the name are hidden (a Mine row's Delete); not shown from 48em. `tabIndex` as for a column's cell. */
-  phoneAction?: (row: T, tabIndex: number) => ReactNode
+  phoneAction?: ((row: T, tabIndex: number) => ReactNode) | undefined
 }) {
   const shown = sortedRows(rows, columns, sort)
   const printing = usePrinting()
@@ -592,11 +592,11 @@ function DirectoryRow<T extends { id: string }>({
   columns: DirectoryColumn<T>[]
   link: string
   href: (row: T) => string
-  onOpen?: (row: T) => void
+  onOpen?: ((row: T) => void) | undefined
   facts: (row: T) => string
   label: (row: T) => string
-  selection?: Selection<T>
-  breakBefore?: (row: T, previous: T) => boolean
+  selection?: Selection<T> | undefined
+  breakBefore?: ((row: T, previous: T) => boolean) | undefined
   mounted: boolean
   action: ReactNode
   tabIndexOf: (row: T, col: string) => number
@@ -636,7 +636,9 @@ function DirectoryRow<T extends { id: string }>({
               href={href(row)}
               prefetch={false}
               tabIndex={tabIndexOf(row, c.key)}
-              onClick={onOpen && ((e) => openInPage(e, () => onOpen(row)))}
+              onClick={(e) => {
+                if (onOpen) openInPage(e, () => onOpen(row))
+              }}
             >
               {c.cell(row, -1)}
             </Link>
@@ -739,7 +741,7 @@ function SelectBox({
 }
 
 /** A column as the phone's Sort select reads it. */
-type SortColumn = { key: string; label: string; num?: boolean; value?: unknown }
+type SortColumn = { key: string; label: string; num?: boolean | undefined; value?: unknown }
 
 /**
  * The phone's sort (below 48em only the name column shows its head): one option per sortable
@@ -802,13 +804,15 @@ export function DirectoryFilters({
   onQuery: (q: string) => void
   placeholder: string
   /** The table's columns and sort, for the phone's Sort select. */
-  sorting?: {
-    columns: readonly SortColumn[]
-    sort: DirectorySort
-    onSort: (sort: DirectorySort) => void
-  }
-  scope?: Scope
-  children?: ReactNode
+  sorting?:
+    | {
+        columns: readonly SortColumn[]
+        sort: DirectorySort
+        onSort: (sort: DirectorySort) => void
+      }
+    | undefined
+  scope?: Scope | undefined
+  children?: ReactNode | undefined
 }) {
   const search = useRef<HTMLInputElement>(null)
   useShortcuts({ focusSearch: () => search.current?.focus() })

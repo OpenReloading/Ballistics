@@ -291,7 +291,7 @@ export type TrajectoryResult = {
   /** Density altitude of the shot's air, m. */
   densityAltitude: number
   /** Where Miller's factor first falls below `minStability` along the flight; none without length and twist. */
-  lowStability?: { range: number; stability: number }
+  lowStability?: { range: number; stability: number } | undefined
 }
 
 /** Table and chart points of one shot from SI field values; throws the input and core errors. */

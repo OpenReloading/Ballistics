@@ -8,11 +8,11 @@ import { useRoute } from './use-route.ts'
 
 type Ask = {
   title: string
-  message?: ReactNode
+  message?: ReactNode | undefined
   /** The label of the button that goes ahead, a verb: Delete, Replace, Leave. */
   confirmLabel: string
-  cancelLabel?: string
-  danger?: boolean
+  cancelLabel?: string | undefined
+  danger?: boolean | undefined
 }
 type Pending = Ask & { resolve: (ok: boolean) => void }
 type Offer = { text: string; undo: () => unknown; n: number }
@@ -142,7 +142,7 @@ export function ConfirmHost() {
           <Button variant="default" data-autofocus onClick={() => answer(shown, false)}>
             {shown?.cancelLabel ?? 'Cancel'}
           </Button>
-          <Button color={shown?.danger ? 'red' : undefined} onClick={() => answer(shown, true)}>
+          <Button {...(shown?.danger && { color: 'red' })} onClick={() => answer(shown, true)}>
             {shown?.confirmLabel}
           </Button>
         </Group>

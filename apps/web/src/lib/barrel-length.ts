@@ -29,9 +29,9 @@ export type BarrelRow = {
   /** Which run the values are read from. */
   source: 'run' | 'longer run'
   /** None while the longer run is missing or did not give a result. */
-  values?: BarrelValues
+  values?: BarrelValues | undefined
   /** Why a longer run that answered gave no values. */
-  reason?: string
+  reason?: string | undefined
 }
 
 /** What a longer run gave for one ladder step: its run, or the model's reason for none. */
@@ -169,7 +169,7 @@ export function barrelRows({
   lengths,
 }: {
   result: Result
-  longer?: LongerRun
+  longer?: LongerRun | undefined
   /** Bullet mass, kg. */
   mass: number
   /** Seated bullet base from the head, m. */

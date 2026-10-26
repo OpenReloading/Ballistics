@@ -707,7 +707,7 @@ interface Figure {
   variant?: string | undefined
   drawn: Drawn
   /** The caption notes, numbered where they have a flag. */
-  notes: { flagNumber?: number }[]
+  notes: { flagNumber?: number | undefined }[]
   /** Text size and width across the screen column, shared by the figures of a record. */
   em: number
   across: number

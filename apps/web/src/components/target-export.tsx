@@ -34,7 +34,7 @@ export function StatsBlock({
   /** A group's ring score as one line, when it has a face. */
   score?: (g: ShotGroup) => string | undefined
 }) {
-  const lines = groups.flatMap((g): { text: string; colour?: string }[] => {
+  const lines = groups.flatMap((g): { text: string; colour?: string | undefined }[] => {
     const s = groupStatisticsOf(g)
     if (!s.shotCount) return []
     return [
@@ -187,18 +187,18 @@ export function ExportMenu({
   text,
 }: {
   name: string
-  photoId?: string
+  photoId?: string | undefined
   /** The shown photo; undefined for a drawn target or a missing photo. */
-  photo?: { url: string; width: number; height: number }
+  photo?: { url: string; width: number; height: number } | undefined
   /** The photo's turn on screen, rad counter-clockwise (`photoRotation`). */
-  turn?: number
+  turn?: number | undefined
   view: ViewRef
   still: StillCanvas
   /** Print sheet as a menu item; on /groups the page bar has its own Print button instead. */
-  onPrint?: () => void
+  onPrint?: (() => void) | undefined
   onMessage: (text: string, alert?: boolean) => void
   /** A text button the size of File (the page bar), else a toolbar icon. */
-  text?: boolean
+  text?: boolean | undefined
 }) {
   const [job, setJob] = useState<{ box: ViewBox; k: number }>()
   const stem = recordFileName(name).replace(/\.json$/, '')

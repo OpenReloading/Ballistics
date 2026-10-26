@@ -7,7 +7,7 @@ import { matchesQuery } from './lists.ts'
 import { formatNumber, inchText, type UnitSystem } from './units.ts'
 
 /** A cartridge row of the list: the summary without its table (CIP on every row). */
-export type CartridgeRow = Omit<CartridgeSummary, 'table'> & { origin?: 'user' }
+export type CartridgeRow = Omit<CartridgeSummary, 'table'> & { origin?: 'user' | undefined }
 
 /** Search text of a cartridge: name, aliases, its common caliber and its G1 in mm and inches. */
 export const cartridgeSearchText = (c: CartridgeRow) =>

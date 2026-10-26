@@ -20,8 +20,8 @@ export function TemplateLinks({
   json = 'JSON template',
   between,
 }: {
-  json?: string
-  between?: ReactNode
+  json?: string | undefined
+  between?: ReactNode | undefined
 }) {
   return (
     <>
@@ -53,7 +53,7 @@ export function ChronoFileInput({
   id: string
   unitId: string
   label: string
-  multiple?: boolean
+  multiple?: boolean | undefined
   unit: VelocityUnit | ''
   onUnit: (unit: VelocityUnit | '') => void
   onFiles: (files: File[]) => void

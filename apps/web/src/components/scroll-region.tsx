@@ -102,7 +102,8 @@ const tableRoles: Record<string, string> = {
  */
 export function withTableRoles(node: ReactNode, inBody = false): ReactNode {
   return Children.map(node, (c) => {
-    if (!isValidElement<{ children?: ReactNode; scope?: string }>(c)) return c
+    if (!isValidElement<{ children?: ReactNode | undefined; scope?: string | undefined }>(c))
+      return c
     const type = typeof c.type === 'string' ? c.type : undefined
     const role = cellRole(type, c.props.scope, inBody)
     if (role) return cloneElement(c, { role } as object)
@@ -132,10 +133,10 @@ export function PanelTable({
   children,
 }: {
   label: string
-  className?: string
+  className?: string | undefined
   caption: ReactNode
   columns: readonly string[]
-  numeric?: boolean
+  numeric?: boolean | undefined
   children: ReactNode
 }) {
   return (

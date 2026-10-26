@@ -202,8 +202,8 @@ type FirearmRecord = Extract<UserRecord, { kind: 'firearm' }>
 type Answer = { res: Response; json: (InteriorResponse & ErrorBody) | undefined }
 
 type Kind = 'cartridge' | 'bullet' | 'powder' | 'capacity'
-type Asked = Partial<Record<Kind, { id: string; failed?: true }>>
-type Groove = { id: string; z?: number; record?: CartridgeDetail }
+type Asked = Partial<Record<Kind, { id: string; failed?: true | undefined }>>
+type Groove = { id: string; z?: number | undefined; record?: CartridgeDetail | undefined }
 
 /**
  * The chosen cartridge's loaded record: its groove diameter Z, m, the bore area Q, m2, an empty
@@ -375,7 +375,7 @@ function cartridgeSource(a: CartridgeSource): DefaultSources['cartridge'] {
 /** The mass of the bullet record, else of a user design that has a reference, kg. */
 function bulletMassOf(
   bullet: Bullet | undefined,
-  design: { id: string; mass?: number } | undefined,
+  design: { id: string; mass?: number | undefined } | undefined,
 ) {
   if (bullet) return toSi('mass', bullet.mass.value)
   return design && userRef(design.id) ? design.mass : undefined
@@ -484,7 +484,11 @@ function recordLinkOf(a: {
   powder: Powder | undefined
   names: ManufacturerNames
   recordBore:
-    | { boreFriction?: number; engravingPressure?: number; engravingLength?: number }
+    | {
+        boreFriction?: number | undefined
+        engravingPressure?: number | undefined
+        engravingLength?: number | undefined
+      }
     | undefined
   linkedBullet: LinkedBullet | undefined
   linkedPowder: LinkedPowder | undefined
@@ -557,10 +561,12 @@ const resultLineOf = (outcome: Outcome, system: UnitSystem) =>
 
 /** The firearm the defaults read: its name, twist and barrel length. */
 const gunSource = (
-  gun: { name: string; data: { twist?: number; barrelLength?: number } } | undefined,
+  gun:
+    | { name: string; data: { twist?: number | undefined; barrelLength?: number | undefined } }
+    | undefined,
 ) => gun && { name: gun.name, twist: gun.data.twist, barrelLength: gun.data.barrelLength }
 
-type PreviewFields = Partial<Record<PreviewKey, FieldValue>>
+type PreviewFields = Partial<Record<PreviewKey, FieldValue | undefined>>
 
 /**
  * What the seated bullet changes of volume and travel: the fields to write (empty, or still the
@@ -571,7 +577,7 @@ function followPlan(
   now: Fields,
   a: {
     followed: ReadonlySet<FollowKey>
-    written: Partial<Record<FollowKey, number>>
+    written: Partial<Record<FollowKey, number | undefined>>
     previewed: Partial<Record<PreviewKey, number>>
     field: (k: PreviewKey, v: number) => FieldValue
   },
@@ -824,7 +830,7 @@ const ladderOf = (
   seatingBy: plan && kind === 'seating' ? seatingBy : undefined,
 })
 
-type Named = { name?: string } | undefined
+type Named = { name?: string | undefined } | undefined
 
 /** The names the printed sheet shows for the load's records. */
 function identityOf(a: {
@@ -856,7 +862,7 @@ function fetchBand(request: unknown, signal: AbortSignal): Promise<SampledBand> 
   const failed: SampledBand = { status: 'failed' }
   return postInterior(request, signal)
     .then((r) => (r.ok ? r.json() : undefined))
-    .then((answer: { sampled?: SampledBand } | undefined) => answer?.sampled ?? failed)
+    .then((answer: { sampled?: SampledBand | undefined } | undefined) => answer?.sampled ?? failed)
     .catch(() => failed)
 }
 
@@ -986,7 +992,7 @@ function followWrites(a: {
   seatedVolume: boolean
   now: Fields
   suggestions: Suggestions
-  written: Partial<Record<FollowKey, number>>
+  written: Partial<Record<FollowKey, number | undefined>>
   system: UnitSystem
 }) {
   const writes: [FollowKey, FieldValue][] = []
@@ -1105,7 +1111,11 @@ export function useWorkbenchState() {
   /** The card whose More popover is open; the model parameters drawer. */
   const [more, setMore] = useState<InputPanel>()
   /** The user bullet design that filled the bullet mass; an edit of the mass leaves it. */
-  const [bulletDesign, setBulletDesign] = useState<{ id: string; name: string; mass?: number }>()
+  const [bulletDesign, setBulletDesign] = useState<{
+    id: string
+    name: string
+    mass?: number | undefined
+  }>()
   /** The full form without a cartridge, chosen on the start card. */
   const [byHand, setByHand] = useState(false)
   /** The browser's bullet designs, read on load and again on focus. */
@@ -1220,9 +1230,9 @@ export function useWorkbenchState() {
   // remounts the cartridge search so it drops an earlier query when a preset chooses the cartridge
   const [searchKey, setSearchKey] = useState(0)
   const [previewInitial, setPreviewInitial] = useState<{
-    bullet?: string
-    barrel?: number
-    seating?: Seating
+    bullet?: string | undefined
+    barrel?: number | undefined
+    seating?: Seating | undefined
   }>()
   /** SI values the preview wrote into the fields. */
   const [previewed, setPreviewed] = useState<Partial<Record<PreviewKey, number>>>({})
@@ -1449,7 +1459,7 @@ export function useWorkbenchState() {
   })
 
   /** `fields` with volume and travel that follow the seated bullet in the seating's text. */
-  const withSeatedText = <F extends Partial<Record<PreviewKey, FieldValue>>>(
+  const withSeatedText = <F extends Partial<Record<PreviewKey, FieldValue | undefined>>>(
     fields: F,
     seatedValues = previewed,
   ): F => {
@@ -1508,7 +1518,10 @@ export function useWorkbenchState() {
   /** The record ids of the link the schema refuses, left out of the load (`droppedIds`). */
   const [dropped, setDropped] = useState<string[]>([])
   /** What a link carried of its bullet and powder records, with their ids. */
-  const [linked, setLinked] = useState<{ bullet?: LinkedBullet; powder?: LinkedPowder }>({})
+  const [linked, setLinked] = useState<{
+    bullet?: LinkedBullet | undefined
+    powder?: LinkedPowder | undefined
+  }>({})
   // the link's values while its record is asked for, loading or missing
   const linkedBullet = pendingLink(bullet, asked.bullet?.id, linked.bullet)
   const linkedPowder = pendingLink(powder, asked.powder?.id, linked.powder)
@@ -1805,7 +1818,7 @@ export function useWorkbenchState() {
    * the fields as they stand (edited or opened parameters). `recordInputs` lists what the records'
    * bore resistance reads besides the body: the key of the Powders tab's rows.
    */
-  function loadRequest(as?: { powder: Powder; charge?: number }) {
+  function loadRequest(as?: { powder: Powder; charge?: number | undefined }) {
     const chosen = as?.powder ?? powder
     const values = powderValues(siValues(fields), powder, as)
     const body = interiorBody(

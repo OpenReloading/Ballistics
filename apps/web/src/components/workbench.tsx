@@ -465,7 +465,7 @@ function runMarksOf(ok: OkOutcome | undefined) {
   ]
 }
 
-type PrintAsked = { key?: string; lot?: string; edits: number }
+type PrintAsked = { key?: string | undefined; lot?: string | undefined; edits: number }
 
 /**
  * Prints once the longer runs have answered.

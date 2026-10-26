@@ -4,7 +4,7 @@
  * readings, `apps/docs/docs/models/exterior-truing-strings.md`. Every evaluation is an ordinary
  * `trajectory` call. SI in and out; angles in rad, dialled corrections in clicks.
  */
-import { InputError, need, nth } from '../errors.ts'
+import { InputError, need, nth, overlay, type Settings } from '../errors.ts'
 import { chiSquareQuantile, chiSquareSurvival } from '../groups/chi-square.ts'
 import { studentTwoSidedQuantile } from '../groups/student-t.ts'
 import {
@@ -13,7 +13,6 @@ import {
   type LogFitFailure,
   logLeastSquares,
 } from '../least-squares.ts'
-import { overlay, type Settings } from '../settings.ts'
 import { type TrajectoryInput, type TrajectoryOptions, trajectory } from './trajectory.ts'
 import { dragCorrection, TruingError } from './truing.ts'
 

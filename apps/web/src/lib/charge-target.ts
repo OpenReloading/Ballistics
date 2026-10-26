@@ -43,16 +43,16 @@ export interface ChargeTargetResponse {
   burnoutInBarrel: boolean
   result: Omit<InteriorResponse['result'], 'points'>
   pressureRange: InteriorResponse['pressureRange']
-  limits?: InteriorResponse['limits']
+  limits?: InteriorResponse['limits'] | undefined
   warnings: InteriorResponse['warnings']
 }
 
 /** 422 answer of a target the solver refuses, or any other error body. */
 export type ChargeTargetRefusal = ErrorBody & {
-  target?: { limit?: { pressure: number } }
-  reachable?: ChargeRange
+  target?: { limit?: { pressure: number } } | undefined
+  reachable?: ChargeRange | undefined
   /** `noValidRun`: `reason` and `field` of the first scanned run that failed. */
-  failure?: { reason: string; field?: string }
+  failure?: { reason: string; field?: string | undefined } | undefined
 }
 
 /** A target as typed: a number, or the text of a `NumberInput` such as "12." or "0.", NaN where it is no number. */
@@ -83,7 +83,11 @@ export function targetError(typed: string | number, unit: TargetUnit): string | 
  * `load.propellant.bulkDensity`.
  */
 export function chargeTargetBody(
-  base: { model?: string; load: { propellant: object }; cartridge?: string },
+  base: {
+    model?: string | undefined
+    load: { propellant: object }
+    cartridge?: string | undefined
+  },
   bulkDensity: number | undefined,
   target: { kind: TargetKind; value: number; percent: boolean },
 ) {

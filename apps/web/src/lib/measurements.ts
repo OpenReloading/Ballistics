@@ -31,7 +31,7 @@ export function sessionOf(
   name: string,
   data: ChronoImport,
   charges: (number | undefined)[],
-  record: { id: string; manufacturer?: string; now: Date },
+  record: { id: string; manufacturer?: string | undefined; now: Date },
 ): SessionRecord {
   const { session: c } = data
   return {
