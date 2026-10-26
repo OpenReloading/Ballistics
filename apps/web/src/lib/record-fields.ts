@@ -1,6 +1,7 @@
 import {
   type Bullet,
   type Case,
+  leadFree,
   type Powder,
   type QuantityValue,
   toSi,
@@ -100,10 +101,16 @@ export function constructionRows(c: Bullet['construction']): FieldRow[] {
     c.core && `${c.core.material} core`,
     c.jacket && `${c.jacket.material ?? ''} jacket`.trim(),
     ...(c.surface ?? []),
+    c.gasCheck && 'gas check',
+    c.drivingBands && `${c.drivingBands} driving bands`,
+    leadFree(c) && 'lead-free',
   ].filter(Boolean)
   const text = parts.length > 0 ? titleFromKebab(parts.join(', ')) : c.raw
   return [{ label: 'Construction', text, ...(text !== c.raw && { printed: c.raw }) }]
 }
+
+const yesNo = (value: boolean | undefined) =>
+  value === undefined ? undefined : value ? 'yes' : 'no'
 
 const text = (label: string, value: string | undefined): FieldRow[] =>
   value === undefined ? [] : [{ label, text: value }]
@@ -139,8 +146,13 @@ export function buildRows(c: Bullet['construction']): FieldRow[] {
   const rows = [
     ...text('Structure', c.structure),
     ...text('Jacket', c.jacket && (c.jacket.material ? material(c.jacket.material) : 'yes')),
+    ...length('Jacket thickness', c.jacket?.thickness),
     ...text('Core', c.core && material(c.core.material)),
+    ...text('Core hardness (HBW)', c.core?.hardness?.value.toString()),
     ...text('Surface', c.surface?.map(material).join(', ')),
+    ...(c.gasCheck === undefined ? [] : text('Gas check', c.gasCheck ? 'yes' : 'no')),
+    ...text('Driving bands', c.drivingBands?.toString()),
+    ...text('Lead-free', yesNo(leadFree(c))),
   ]
   if (rows.length === 0) return [{ label: 'Construction', text: c.raw }]
   return rows.map((row, i) => (i === 0 ? { ...row, printed: c.raw } : row))

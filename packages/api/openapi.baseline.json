@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "OpenReloading API",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "Records of cartridges, components and competitions, and the exterior and interior ballistics models. Quantities are SI (m, kg, s, Pa, K, rad) unless a field names another unit. Results are simulations, not load data."
   },
   "tags": [
@@ -158,12 +158,13 @@
                                   "monolithic",
                                   "cast",
                                   "swaged",
-                                  "plated"
+                                  "plated",
+                                  "frangible"
                                 ]
                               },
                               {
                                 "type": "string",
-                                "pattern": "^(lead|lead-alloy|copper|copper-alloy)-core$"
+                                "pattern": "^(lead|lead-alloy|copper|copper-alloy|tin|tungsten|steel|compressed-powder)-core$"
                               }
                             ]
                           }
@@ -650,7 +651,8 @@
                             "monolithic",
                             "cast",
                             "swaged",
-                            "plated"
+                            "plated",
+                            "frangible"
                           ]
                         },
                         "core": {
@@ -658,7 +660,34 @@
                           "properties": {
                             "material": {
                               "type": "string",
-                              "enum": ["lead", "lead-alloy", "copper", "copper-alloy"]
+                              "enum": [
+                                "lead",
+                                "lead-alloy",
+                                "copper",
+                                "copper-alloy",
+                                "tin",
+                                "tungsten",
+                                "steel",
+                                "compressed-powder"
+                              ]
+                            },
+                            "hardness": {
+                              "type": "object",
+                              "properties": {
+                                "value": {
+                                  "type": "number",
+                                  "exclusiveMinimum": 0,
+                                  "description": "In 1."
+                                },
+                                "raw": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "description": "The value as written in the source, when it differed."
+                                }
+                              },
+                              "required": ["value"],
+                              "additionalProperties": false,
+                              "unit": "1"
                             }
                           },
                           "required": ["material"],
@@ -673,8 +702,27 @@
                                 "copper",
                                 "gilding-metal",
                                 "copper-clad-steel",
-                                "copper-plated-steel"
+                                "copper-plated-steel",
+                                "steel"
                               ]
+                            },
+                            "thickness": {
+                              "type": "object",
+                              "properties": {
+                                "value": {
+                                  "type": "number",
+                                  "exclusiveMinimum": 0,
+                                  "description": "In mm."
+                                },
+                                "raw": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "description": "The value as written in the source, when it differed."
+                                }
+                              },
+                              "required": ["value"],
+                              "additionalProperties": false,
+                              "unit": "mm"
                             }
                           },
                           "additionalProperties": false
@@ -684,8 +732,27 @@
                           "type": "array",
                           "items": {
                             "type": "string",
-                            "enum": ["moly", "black-oxide"]
+                            "enum": [
+                              "moly",
+                              "black-oxide",
+                              "powder-coat",
+                              "polymer-coat",
+                              "paint",
+                              "wax-lube",
+                              "boron-nitride",
+                              "tungsten-disulfide",
+                              "copper-wash",
+                              "lead-wash"
+                            ]
                           }
+                        },
+                        "gasCheck": {
+                          "type": "boolean"
+                        },
+                        "drivingBands": {
+                          "type": "integer",
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991
                         },
                         "unmapped": {
                           "type": "boolean",
@@ -17241,7 +17308,8 @@
                                                     "monolithic",
                                                     "cast",
                                                     "swaged",
-                                                    "plated"
+                                                    "plated",
+                                                    "frangible"
                                                   ]
                                                 },
                                                 {
@@ -17264,8 +17332,51 @@
                                                             "lead",
                                                             "lead-alloy",
                                                             "copper",
-                                                            "copper-alloy"
+                                                            "copper-alloy",
+                                                            "tin",
+                                                            "tungsten",
+                                                            "steel",
+                                                            "compressed-powder"
                                                           ]
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "hardness": {
+                                                      "description": "The `construction.core.hardness` of the bullet record. `null` removes it.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "value": {
+                                                              "description": "In 1.",
+                                                              "anyOf": [
+                                                                {
+                                                                  "type": "number",
+                                                                  "exclusiveMinimum": 0,
+                                                                  "description": "In 1."
+                                                                },
+                                                                {
+                                                                  "type": "null"
+                                                                }
+                                                              ]
+                                                            },
+                                                            "raw": {
+                                                              "description": "The value as written in the source, when it differed.",
+                                                              "anyOf": [
+                                                                {
+                                                                  "type": "string",
+                                                                  "minLength": 1,
+                                                                  "description": "The value as written in the source, when it differed."
+                                                                },
+                                                                {
+                                                                  "type": "null"
+                                                                }
+                                                              ]
+                                                            }
+                                                          }
                                                         },
                                                         {
                                                           "type": "null"
@@ -17294,8 +17405,48 @@
                                                             "copper",
                                                             "gilding-metal",
                                                             "copper-clad-steel",
-                                                            "copper-plated-steel"
+                                                            "copper-plated-steel",
+                                                            "steel"
                                                           ]
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "thickness": {
+                                                      "description": "The `construction.jacket.thickness` of the bullet record. `null` removes it.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "value": {
+                                                              "description": "In mm.",
+                                                              "anyOf": [
+                                                                {
+                                                                  "type": "number",
+                                                                  "exclusiveMinimum": 0,
+                                                                  "description": "In mm."
+                                                                },
+                                                                {
+                                                                  "type": "null"
+                                                                }
+                                                              ]
+                                                            },
+                                                            "raw": {
+                                                              "description": "The value as written in the source, when it differed.",
+                                                              "anyOf": [
+                                                                {
+                                                                  "type": "string",
+                                                                  "minLength": 1,
+                                                                  "description": "The value as written in the source, when it differed."
+                                                                },
+                                                                {
+                                                                  "type": "null"
+                                                                }
+                                                              ]
+                                                            }
+                                                          }
                                                         },
                                                         {
                                                           "type": "null"
@@ -17317,8 +17468,36 @@
                                                   "type": "array",
                                                   "items": {
                                                     "type": "string",
-                                                    "enum": ["moly", "black-oxide"]
+                                                    "enum": [
+                                                      "moly",
+                                                      "black-oxide",
+                                                      "powder-coat",
+                                                      "polymer-coat",
+                                                      "paint",
+                                                      "wax-lube",
+                                                      "boron-nitride",
+                                                      "tungsten-disulfide",
+                                                      "copper-wash",
+                                                      "lead-wash"
+                                                    ]
                                                   }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "gasCheck": {
+                                              "description": "The `construction.gasCheck` of the bullet record. `null` removes it.",
+                                              "type": ["boolean", "null"]
+                                            },
+                                            "drivingBands": {
+                                              "description": "The `construction.drivingBands` of the bullet record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "integer",
+                                                  "exclusiveMinimum": 0,
+                                                  "maximum": 9007199254740991
                                                 },
                                                 {
                                                   "type": "null"
