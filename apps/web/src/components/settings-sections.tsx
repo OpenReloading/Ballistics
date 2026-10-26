@@ -8,9 +8,11 @@ import {
   Stack,
   Tabs,
   Text,
+  Title,
   useMantineColorScheme,
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
+import type { ReactNode } from 'react'
 import { pagesBasePath } from '../lib/edition.ts'
 import { useInstall } from './install-button.tsx'
 import { ManufacturersForm } from './manufacturers-settings.tsx'
@@ -61,9 +63,21 @@ function Offline() {
   )
 }
 
+/** A headed block of the General tab. */
+function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
+  return (
+    <Stack component="section" gap="xs" aria-labelledby={id}>
+      <Title order={3} id={id}>
+        {title}
+      </Title>
+      {children}
+    </Stack>
+  )
+}
+
 /**
- * The settings dialog's body: vertical tabs Units, Workbench defaults, Manufacturers, Appearance
- * and Offline, a row of tabs on a phone. Loaded apart from the pages when the dialog first opens.
+ * The settings dialog's body: vertical tabs General, Units and Workbench, a row of tabs on a
+ * phone. Loaded apart from the pages when the dialog first opens.
  */
 export function SettingsSections({
   tab,
@@ -86,32 +100,35 @@ export function SettingsSections({
       }
     >
       <Tabs.List aria-label="Settings">
+        <Tabs.Tab value="general">General</Tabs.Tab>
         <Tabs.Tab value="units">Units</Tabs.Tab>
-        <Tabs.Tab value="defaults">Workbench defaults</Tabs.Tab>
-        <Tabs.Tab value="manufacturers">Manufacturers</Tabs.Tab>
-        <Tabs.Tab value="appearance">Appearance</Tabs.Tab>
-        <Tabs.Tab value="offline">Offline</Tabs.Tab>
+        <Tabs.Tab value="workbench">Workbench</Tabs.Tab>
       </Tabs.List>
+      <Tabs.Panel value="general">
+        <Stack gap="lg">
+          <Section id="settings-appearance" title="Appearance">
+            <Appearance />
+          </Section>
+          <Section id="settings-offline" title="Offline">
+            <Offline />
+          </Section>
+          {/* temporary home: moves with the page for the browser's own records */}
+          <Section id="settings-manufacturers" title="Manufacturers in this browser">
+            <ManufacturersForm />
+          </Section>
+        </Stack>
+      </Tabs.Panel>
       <Tabs.Panel value="units">
         <Text size="sm" c="dimmed" mb="xs">
           Values are kept in SI units: a change converts what is shown, never a value.
         </Text>
         <UnitsForm />
       </Tabs.Panel>
-      <Tabs.Panel value="defaults">
+      <Tabs.Panel value="workbench">
         <Text size="sm" c="dimmed" mb="xs">
           New workbench loads start from these values; an open load keeps its own.
         </Text>
         <WorkbenchDefaultsForm />
-      </Tabs.Panel>
-      <Tabs.Panel value="manufacturers">
-        <ManufacturersForm />
-      </Tabs.Panel>
-      <Tabs.Panel value="appearance">
-        <Appearance />
-      </Tabs.Panel>
-      <Tabs.Panel value="offline">
-        <Offline />
       </Tabs.Panel>
     </Tabs>
   )

@@ -116,7 +116,7 @@ test('with unsaved firearm edits Settings and Units open the dialog without a qu
   expect(asked).toEqual([])
 })
 
-test('the Manufacturers tab deletes a user manufacturer that no record or open field names', async ({
+test('the Manufacturers section of General deletes a user manufacturer that no record or open field names', async ({
   page,
 }) => {
   // the catalogue's list answered: a name is committed at once, not after a retry
@@ -130,8 +130,8 @@ test('the Manufacturers tab deletes a user manufacturer that no record or open f
   await field.fill('Kept')
   await field.blur()
   const dialog = await openFrom(page, sidebarSettings(page))
-  await dialog.getByRole('tab', { name: 'Manufacturers' }).click()
-  const panel = dialog.getByRole('tabpanel', { name: 'Manufacturers' })
+  await dialog.getByRole('tab', { name: 'General' }).click()
+  const panel = dialog.getByRole('region', { name: 'Manufacturers in this browser' })
   await expect(panel).toContainText('Gone unused')
   await expect(panel).toContainText('Kept used by 1')
   await expect(panel.getByRole('button', { name: 'Delete Kept' })).toHaveCount(0)
@@ -152,16 +152,10 @@ test('the settings dialog over a document page passes axe in light and dark', as
         await expect(page.locator('html')).toHaveAttribute('data-mantine-color-scheme', colorScheme)
         const dialog = await openFrom(page, sidebarSettings(page))
         // every tab
-        for (const tab of [
-          'Units',
-          'Workbench defaults',
-          'Manufacturers',
-          'Appearance',
-          'Offline',
-        ]) {
+        for (const tab of ['General', 'Units', 'Workbench']) {
           await dialog.getByRole('tab', { name: tab }).click()
           await expect(dialog.getByRole('tabpanel', { name: tab })).toBeVisible()
-          if (tab === 'Offline')
+          if (tab === 'General')
             await expect(dialog.getByRole('tabpanel', { name: tab })).toContainText(
               'Add to Home Screen',
             )
@@ -178,17 +172,15 @@ test('the settings dialog over a document page passes axe in light and dark', as
     )
 })
 
-test('the tabs Units, Workbench defaults, Manufacturers, Appearance and Offline are each reached by keyboard', async ({
-  page,
-}) => {
+test('the tabs General, Units and Workbench are each reached by keyboard', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
   await page.goto('/powders')
   const dialog = await openFrom(page, sidebarSettings(page))
   const tabs = dialog.getByRole('tablist', { name: 'Settings' })
   await expect(tabs).toHaveAttribute('aria-orientation', 'vertical')
-  const names = ['Units', 'Workbench defaults', 'Manufacturers', 'Appearance', 'Offline']
+  const names = ['General', 'Units', 'Workbench']
   await expect(tabs.getByRole('tab')).toHaveText(names)
-  await tabs.getByRole('tab', { name: 'Units' }).focus()
+  await tabs.getByRole('tab', { name: 'General' }).focus()
   for (const name of names.slice(1)) {
     await page.keyboard.press('ArrowDown')
     const tab = tabs.getByRole('tab', { name })
@@ -203,12 +195,12 @@ test('the tabs Units, Workbench defaults, Manufacturers, Appearance and Offline 
   await expect(again.getByRole('tab', { name: 'Units' })).toHaveAttribute('aria-selected', 'true')
 })
 
-test('Appearance stores the theme as System, Light or Dark', async ({ page }) => {
+test('Appearance in General stores the theme as System, Light or Dark', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
   await page.emulateMedia({ colorScheme: 'dark' })
   await page.goto('/powders')
   const dialog = await openFrom(page, sidebarSettings(page))
-  await dialog.getByRole('tab', { name: 'Appearance' }).click()
+  await dialog.getByRole('tab', { name: 'General' }).click()
   const theme = dialog.getByRole('radiogroup', { name: 'Theme' })
   await expect(theme.getByRole('radio', { name: 'System' })).toBeChecked()
   const html = page.locator('html')
