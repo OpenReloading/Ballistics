@@ -1,6 +1,6 @@
 name: PR title
 
-# Pull requests into develop are squash-merged with their title as the commit message, which release-please reads:
+# Pull requests into main are squash-merged with their title as the commit message, which release-please reads:
 # the title follows Conventional Commits (CONTRIBUTING.md).
 on:
   pull_request:
