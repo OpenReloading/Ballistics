@@ -503,7 +503,7 @@ describe('powder fit prediction bands', () => {
       expect(c.pressure / repeats).toBeGreaterThan(0.85)
       expect(c.pressure / repeats).toBeLessThan(0.95)
     }
-  }, 120_000)
+  }, 360_000)
 
   it('is wider outside the fired range than at its centre and marks the extrapolation', () => {
     const fit = fitPowder(load(0.4), ladder(truth, 3, 2e6, 1), { parameters: [...parameters] })

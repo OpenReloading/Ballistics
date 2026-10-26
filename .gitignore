@@ -12,3 +12,4 @@ visual-check-out
 /.agents/skills/
 /.claude/skills/
 /.benchkeeper/
+coverage

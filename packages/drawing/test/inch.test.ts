@@ -137,7 +137,7 @@ it('lays out every CIP figure in inches with its texts clear, inside the frame, 
     for (const f of shown) failures.push(...figureFailures(record, f, em, across))
   }
   expect(failures).toEqual([])
-}, 120_000)
+}, 300_000)
 
 it('dimensions a bullet in inches, the ratio Rt/R unchanged', () => {
   const p = {

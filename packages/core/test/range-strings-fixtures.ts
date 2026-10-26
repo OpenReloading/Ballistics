@@ -31,8 +31,8 @@ export const impacts = [300, 600, 900]
 // other groups than the impacts: an impact and a dial entry of one group share their shots
 export const dials = [400, 700, 1000]
 export const shots = 5
-// The Monte Carlo coverage tests take about 3.5 s alone and exceed the 5 s default under a full parallel `npm test`.
-export const monteCarloTimeout = 30_000
+// The Monte Carlo coverage tests take about 3.5 s alone, and several times that in parallel with code coverage on a CI runner.
+export const monteCarloTimeout = 120_000
 
 /** True parameters: ratios to the nominal values and the zero offset in rad. */
 export interface Truth {

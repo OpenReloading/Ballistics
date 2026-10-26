@@ -27,12 +27,13 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run --coverage"
   },
   "dependencies": {
     "@open-reloading/schema": "0.0.1"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "^5.0.5",
     "fast-check": "^4.10.2",
     "typescript": "^7.0.2",
     "vitest": "^5.0.5"
