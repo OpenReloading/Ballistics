@@ -17513,6 +17513,7 @@
                                         }
                                       },
                                       "required": ["manufacturer", "model", "bulletMass"],
+                                      "additionalProperties": false,
                                       "description": "The bullet as the publication describes it, where no record exists."
                                     }
                                   ],
@@ -17552,6 +17553,7 @@
                                         }
                                       },
                                       "required": ["manufacturer", "name"],
+                                      "additionalProperties": false,
                                       "description": "The powder as the publication describes it, where no record exists."
                                     }
                                   ],

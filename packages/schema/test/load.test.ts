@@ -122,6 +122,22 @@ describe('Load', () => {
     expectIssueAt(load, maker('Maker'), 'primer.manufacturer')
     expectIssueAt(load, { ...catalogueLoad, primer: { manufacturerName: 'Maker' } }, 'primer')
     expect(issuePaths(load, { ...userLoad, primer: { manufacturer: `user:${uuid}` } })).toEqual([])
+    const measured = { provenance: { kind: 'measured', sources: [{ title: 'Own measurement' }] } }
+    const legacy = { manufacturer: 'catalogue:maker', manufacturerName: 'Maker' }
+    expectIssueAt(
+      load,
+      {
+        ...catalogueLoad,
+        ...measured,
+        bullet: { ...legacy, model: 'FMJ', bulletMass: { value: 10 } },
+      },
+      'bullet',
+    )
+    expectIssueAt(
+      load,
+      { ...catalogueLoad, ...measured, powder: { ...legacy, name: 'Fast' } },
+      'powder',
+    )
   })
 
   it('keeps lots and one snapshot per session of the load, and a firearm round count to note', () => {

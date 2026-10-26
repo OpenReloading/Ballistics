@@ -122,14 +122,14 @@ const component = {
 }
 
 const bulletDescription = z
-  .object({
+  .strictObject({
     ...component,
     model: z.string().min(1).describe('Model name of the bullet.'),
     bulletMass: quantity('mass').describe('Mass of the bullet.'),
   })
   .describe('The bullet as the publication describes it, where no record exists.')
 const powderDescription = z
-  .object({ ...component, name: z.string().min(1).describe('Product name of the powder.') })
+  .strictObject({ ...component, name: z.string().min(1).describe('Product name of the powder.') })
   .describe('The powder as the publication describes it, where no record exists.')
 
 /**
