@@ -88,6 +88,24 @@ describe('hole detection with the face label', () => {
   })
 })
 
+// Seven holes on a 25 m pistol face and the numerals between its rings, shared by the numeral scenes.
+const seven = [
+  { x: 30, y: 20 },
+  { x: -45, y: 35 },
+  { x: 55, y: -40 },
+  { x: -20, y: -55 },
+  { x: 15, y: 70 },
+  { x: -65, y: -25 },
+  { x: 40, y: 60 },
+]
+// a digit: a bar of 4 x 7 mm
+const digit = (x: number, y: number) => [{ x, y, width: 4, height: 7 }]
+const gaps = [37.5, 62.5, 87.5]
+const numeralMarks = gaps
+  .flatMap((r) => [digit(r, 0), digit(-r, 0), digit(0, r), digit(0, -r)])
+  .flat()
+  .map((m) => ({ ...m, grey: 226 }))
+
 // Ring numerals (`apps/docs/docs/models/hole-detection.md`): a 25 m pistol face, light holes on its black
 // area, and light numerals (bars of the size of a digit) between the rings on both axes.
 describe('hole detection with the numerals of the face', () => {
@@ -95,22 +113,7 @@ describe('hole detection with the numerals of the face', () => {
   const size = 1400
   const scale = (0.45 * size) / 250
   const mm = 7.6
-  const seven = [
-    { x: 30, y: 20 },
-    { x: -45, y: 35 },
-    { x: 55, y: -40 },
-    { x: -20, y: -55 },
-    { x: 15, y: 70 },
-    { x: -65, y: -25 },
-    { x: 40, y: 60 },
-  ]
-  // a digit: a bar of 4 x 7 mm
-  const digit = (x: number, y: number) => [{ x, y, width: 4, height: 7 }]
-  const gaps = [37.5, 62.5, 87.5]
-  const marks = gaps
-    .flatMap((r) => [digit(r, 0), digit(-r, 0), digit(0, r), digit(0, -r)])
-    .flat()
-    .map((m) => ({ ...m, grey: 226 }))
+  const marks = numeralMarks
   const { image, h } = render({
     face: pistol,
     camera: { width: size, height: size, pxPerMm: scale, depth: 6 },
@@ -170,20 +173,7 @@ describe('hole detection with holes on the print of the face', () => {
   const scale = (0.45 * size) / 250
   const mm = 7.6
   const D = mm * scale
-  const seven = [
-    { x: 30, y: 20 },
-    { x: -45, y: 35 },
-    { x: 55, y: -40 },
-    { x: -20, y: -55 },
-    { x: 15, y: 70 },
-    { x: -65, y: -25 },
-    { x: 40, y: 60 },
-  ]
-  const digit = (x: number, y: number) => [{ x, y, width: 4, height: 7 }]
-  const numerals = [37.5, 62.5, 87.5]
-    .flatMap((r) => [digit(r, 0), digit(-r, 0), digit(0, r), digit(0, -r)])
-    .flat()
-    .map((m) => ({ ...m, grey: 226 }))
+  const numerals = numeralMarks
   const quarter = [
     { x: 96, y: 0 },
     { x: -96, y: 0 },
