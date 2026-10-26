@@ -12,6 +12,7 @@ import {
 } from '@open-reloading/importers'
 
 import { toCsv } from './csv.ts'
+import { stringStats } from './string-stats.ts'
 import { formatNumber, type Unit } from './units.ts'
 
 export type Shot = ChronoImport['session']['strings'][number]['shots'][number]
@@ -181,39 +182,3 @@ export const sessionJsonBlob = (data: ChronoImport) =>
 /** The CSV download: UTF-8 with a byte order mark, which spreadsheets need to read non-ASCII text. */
 export const sessionCsvBlob = (data: ChronoImport, unit: Unit) =>
   new Blob(['\uFEFF', sessionCsv(data, unit)], { type: 'text/csv;charset=utf-8' })
-
-export interface StringStats {
-  /** Shots in the statistics: all but the excluded ones. */
-  count: number
-  excluded: number
-  /** m/s. */
-  mean: number
-  /** Sample standard deviation (n - 1), m/s; undefined below two shots. */
-  standardDeviation: number | undefined
-  /** Extreme spread, max - min, m/s. */
-  extremeSpread: number
-  min: number
-  max: number
-}
-
-/** Statistics of one string over its shots without an exclusion reason; undefined when none is left. */
-export function stringStats(shots: Shot[]): StringStats | undefined {
-  const v = shots.filter((s) => !s.excluded).map((s) => s.velocity.value)
-  if (v.length === 0) return undefined
-  const mean = v.reduce((a, x) => a + x, 0) / v.length
-  const sd =
-    v.length > 1
-      ? Math.sqrt(v.reduce((a, x) => a + (x - mean) ** 2, 0) / (v.length - 1))
-      : undefined
-  const min = v.reduce((a, x) => Math.min(a, x), Number.POSITIVE_INFINITY)
-  const max = v.reduce((a, x) => Math.max(a, x), Number.NEGATIVE_INFINITY)
-  return {
-    count: v.length,
-    excluded: shots.length - v.length,
-    mean,
-    standardDeviation: sd,
-    extremeSpread: max - min,
-    min,
-    max,
-  }
-}

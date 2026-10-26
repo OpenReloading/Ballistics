@@ -7,10 +7,10 @@ import {
   sessionCsv,
   sessionCsvBlob,
   sessionJsonBlob,
-  stringStats,
   templateCsv,
   templateJson,
 } from '../src/lib/chrono.ts'
+import { stringStats } from '../src/lib/string-stats.ts'
 import { unitsOf } from '../src/lib/units.ts'
 import { defined } from './defined.ts'
 

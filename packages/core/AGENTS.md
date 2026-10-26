@@ -33,6 +33,7 @@ Pure TypeScript ballistics solver, ESM. Must stay headless: no runtime dependenc
   - `logLeastSquares`: the Levenberg-Marquardt loop on log parameters with the conditioning check and covariance, shared by truing and the powder fit.
   - `huber.ts`: the Huber loss and its reweighting for `logLeastSquares` (`huber` input; the powder fit's `huberThreshold`).
   - `identifiability`: covariance, variance inflation and condition number of a weighted Jacobian, used by the range string plan and fit.
+- `src/load-notes.ts`: `loadNotes` (`apps/docs/docs/models/load-notes.md`). Notes on a saved load from its sessions in order: a lot changed or not recorded, seating length moved, mean velocity moved by more than the larger standard deviation, round count passed. Structured notes (rule, sessions, values), no wording and no units.
 - `src/bisect.ts`: `bisect`, the bisection loop. Internal, not exported from `src/index.ts`.
   - Shared by the seven-perforation burnout (`interior/form.ts`), the ignition burnt fraction (`interior/model.ts`), `chiSquareQuantile`, `studentTwoSidedQuantile` and the CEP (`groups/`).
   - Each caller passes its own iteration count and stop rule (stop once the midpoint equals an end, or not). This keeps its results bit-identical.

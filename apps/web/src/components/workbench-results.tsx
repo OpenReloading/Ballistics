@@ -13,6 +13,7 @@ import { resultTabsFit } from '../lib/workbench.ts'
 import { BarrelLength } from './barrel-length.tsx'
 import { LadderTarget } from './ladder-target.tsx'
 import { LazyInteriorChart } from './lazy-chart.tsx'
+import { LoadLots, SessionNotes } from './load-notes.tsx'
 import { LotPanel } from './lot-rows.tsx'
 import { NavIcon } from './nav-icons.tsx'
 import { PowderCompare } from './powder-compare.tsx'
@@ -582,6 +583,12 @@ function ResultPanels({ short }: { short: boolean }) {
       </Tabs.Panel>
       <Tabs.Panel value="notes">
         {heading('notes')}
+        <LoadLots />
+        <p className="note">
+          Each session is compared with the one before it. A note shows what differs and where the
+          values come from; it says nothing about whether a load is acceptable.
+        </p>
+        <SessionNotes />
         <Textarea
           label="Notes"
           description="Saved with the load file (File, Save). Not in copied links."

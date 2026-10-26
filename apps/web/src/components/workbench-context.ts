@@ -1,11 +1,13 @@
 'use client'
 
+import type { LoadNote, LoadNoteRule } from '@open-reloading/core'
 import type { Powder, SessionRecord } from '@open-reloading/schema'
 import type { Context, Dispatch, RefObject, SetStateAction } from 'react'
 import { createContext, useContext } from 'react'
 import type { InteriorResponse } from '../lib/api-types.ts'
 import type { FittedPowder, UnfittedPowder } from '../lib/burn-rate.ts'
 import type { activeClick } from '../lib/firearm.ts'
+import type { Lots } from '../lib/load-notes.ts'
 import type { LadderDirection } from '../lib/seating-ladder.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import type { ChartView } from './interior-chart.tsx'
@@ -78,6 +80,7 @@ export type ResultState = {
   manufacturerRef: (typed: string) => string | undefined
   /** The sessions the load names, also those this browser does not answer. */
   sessionRefCount: number
+  loadNotes: LoadNotesState
   /** The name of a manufacturer reference; empty for none or an unknown one. */
   manufacturerName: (ref: string | undefined) => string
   /** The Barrel length tab's range and rows; the report prints the same rows. */
@@ -117,6 +120,17 @@ type InputEchoState = {
   }
 }
 export const InputEcho = createContext<InputEchoState | null>(null)
+
+/** The lots of the load and the notes on its sessions. */
+export interface LoadNotesState {
+  lots: Lots
+  setLots: (lots: Lots) => void
+  notes: LoadNote[]
+  /** The name of a session reference. */
+  sessionName: (ref: string) => string
+  /** Dismisses the note of `rule` on `session`; it is kept with the load. */
+  dismiss: (session: string, rule: LoadNoteRule) => void
+}
 
 /** A workbench context; throws outside its provider. */
 function useWorkbenchContext<T>(context: Context<T | null>, name: string): T {
