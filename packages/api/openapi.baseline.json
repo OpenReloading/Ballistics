@@ -8,7 +8,7 @@
   "tags": [
     {
       "name": "Records",
-      "description": "Cartridges with their C.I.P. sheet values, manufacturers, powders and bullets."
+      "description": "Cartridges with their C.I.P. sheet values, manufacturers, powders, bullets and cartridge cases."
     },
     {
       "name": "Competition",
@@ -1913,6 +1913,499 @@
                     "capacities",
                     "revision"
                   ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "308": {
+            "description": "Permanent Redirect: the id was renamed, `Location` is the record that replaced it.",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "414": {
+            "description": "URI Too Long",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/cases": {
+      "get": {
+        "operationId": "getCases",
+        "tags": ["Records"],
+        "summary": "List cases",
+        "description": "A page of cartridge case products ordered by manufacturer name and name, digit runs in numeric order. `q` keeps the cases whose manufacturer name or alias followed by the product name, or by the product number, holds every word of it, in any order, and ranks them by match. Each item carries the cartridge and manufacturer ids, the material, and the stated water capacity (g) and empty mass (g) where the record has them.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "description": "Search text.",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "pattern": "^[^\\u0000]*$"
+            }
+          },
+          {
+            "name": "manufacturer",
+            "in": "query",
+            "required": false,
+            "description": "Manufacturer id: only its products.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Items per page.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Items skipped before the page.",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "default": 0
+            }
+          },
+          {
+            "name": "cartridge",
+            "in": "query",
+            "required": false,
+            "description": "Cartridge id: only the cases made for it.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "maxLength": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "number"
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                          },
+                          "manufacturer": {
+                            "type": "string",
+                            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                          },
+                          "cartridge": {
+                            "type": "string",
+                            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "productNumber": {
+                            "type": "string"
+                          },
+                          "material": {
+                            "type": "string",
+                            "enum": [
+                              "brass",
+                              "nickel-plated-brass",
+                              "lacquered-steel",
+                              "polymer-coated-steel",
+                              "aluminium"
+                            ]
+                          },
+                          "waterCapacity": {
+                            "type": "number"
+                          },
+                          "mass": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "manufacturer",
+                          "cartridge",
+                          "name",
+                          "productNumber",
+                          "material"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": ["total", "items"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/cases/{id}": {
+      "get": {
+        "operationId": "getCasesById",
+        "tags": ["Records"],
+        "summary": "Get a case",
+        "description": "The whole case record with its provenance and `origin`. `revision` is a hash of the stored record that changes with any field.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Record id.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                      "description": "Id of a catalogue case, the file name without `.json`."
+                    },
+                    "origin": {
+                      "type": "string",
+                      "enum": ["catalogue", "user", "shared"],
+                      "description": "Where the record lives: the git catalogue, this browser, or a received file."
+                    },
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "Name of the product as the manufacturer prints it."
+                    },
+                    "manufacturer": {
+                      "type": "string",
+                      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                      "description": "Reference to a manufacturer: `catalogue:<record id>` or `user:<UUID>`."
+                    },
+                    "cartridge": {
+                      "type": "string",
+                      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                      "description": "Reference to a cartridge: `catalogue:<record id>` or `user:<UUID>`."
+                    },
+                    "productNumber": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "Product number."
+                    },
+                    "headstamp": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "Marking on the case head as the source states it."
+                    },
+                    "material": {
+                      "type": "string",
+                      "enum": [
+                        "brass",
+                        "nickel-plated-brass",
+                        "lacquered-steel",
+                        "polymer-coated-steel",
+                        "aluminium"
+                      ]
+                    },
+                    "primerPocket": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": ["boxer", "berdan"]
+                        },
+                        "size": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "Pocket size as the source states it, for example `large rifle` or `5.5 mm`."
+                        }
+                      },
+                      "required": ["type"],
+                      "additionalProperties": false
+                    },
+                    "flashHole": {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "number",
+                          "exclusiveMinimum": 0,
+                          "description": "In mm."
+                        },
+                        "raw": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "The value as written in the source, when it differed."
+                        }
+                      },
+                      "required": ["value"],
+                      "additionalProperties": false,
+                      "unit": "mm",
+                      "description": "Diameter of the flash hole (of each hole in a Berdan pocket)."
+                    },
+                    "mass": {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "number",
+                          "exclusiveMinimum": 0,
+                          "description": "In g."
+                        },
+                        "raw": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "The value as written in the source, when it differed."
+                        }
+                      },
+                      "required": ["value"],
+                      "additionalProperties": false,
+                      "unit": "g",
+                      "description": "Mass of the empty case."
+                    },
+                    "waterCapacity": {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "number",
+                          "exclusiveMinimum": 0,
+                          "description": "In g."
+                        },
+                        "raw": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "The value as written in the source, when it differed."
+                        }
+                      },
+                      "required": ["value"],
+                      "additionalProperties": false,
+                      "unit": "g",
+                      "description": "Mass of water filling the case to the mouth, as the manufacturer states it."
+                    },
+                    "annealed": {
+                      "type": "boolean",
+                      "description": "Whether the case is delivered annealed."
+                    },
+                    "note": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "Notes on the product."
+                    },
+                    "provenance": {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "type": "string",
+                          "enum": ["published", "measured", "derived", "fitted", "computed"],
+                          "description": "How the values came about."
+                        },
+                        "sources": {
+                          "minItems": 1,
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "title": {
+                                "type": "string",
+                                "minLength": 1,
+                                "description": "Title of the source: the document, or the site and table."
+                              },
+                              "publisher": {
+                                "type": "string",
+                                "minLength": 1,
+                                "description": "Who issued the data: a maker, a standards body or the authors."
+                              },
+                              "edition": {
+                                "type": "string",
+                                "minLength": 1,
+                                "description": "Edition, print or date as the document states it."
+                              },
+                              "page": {
+                                "type": "string",
+                                "minLength": 1,
+                                "description": "Page or section of the document."
+                              },
+                              "url": {
+                                "type": "string",
+                                "format": "uri",
+                                "description": "An http or https URL of the source."
+                              },
+                              "retrieved": {
+                                "type": "string",
+                                "format": "date",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                "description": "Date the source was retrieved, ISO 8601."
+                              },
+                              "sha256": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$",
+                                "description": "SHA-256 of the retrieved file, 64 lowercase hex digits."
+                              },
+                              "fields": {
+                                "minItems": 1,
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "description": "Dot paths of the record fields this source supports. Absent: the whole record."
+                              },
+                              "kind": {
+                                "type": "string",
+                                "enum": ["published", "measured", "derived", "fitted", "computed"],
+                                "description": "Kind of this source values when it differs from the provenance kind of the record."
+                              },
+                              "license": {
+                                "type": "string",
+                                "pattern": "^(LicenseRef-)?[A-Za-z0-9.+-]+$",
+                                "description": "SPDX id of the license the data is used under, or `LicenseRef-<name>` for the publisher own terms or a written permission described in `terms`."
+                              },
+                              "terms": {
+                                "type": "string",
+                                "minLength": 1,
+                                "description": "URL or note of the publisher terms or permission where no SPDX license covers the use. Text starting with http:// or https:// is a link."
+                              },
+                              "origin": {
+                                "type": "string",
+                                "enum": ["manufacturer", "public", "community"],
+                                "description": "Who stands behind the source: manufacturer, public or community."
+                              },
+                              "run": {
+                                "type": "object",
+                                "properties": {
+                                  "version": {
+                                    "type": "string",
+                                    "pattern": "^[0-9a-f]{16}$",
+                                    "description": "Model version id the report names."
+                                  },
+                                  "report": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "description": "Report of the evaluation of the fit."
+                                  }
+                                },
+                                "required": ["version", "report"],
+                                "additionalProperties": false,
+                                "description": "The fit run behind a `fitted` source."
+                              },
+                              "note": {
+                                "type": "string",
+                                "minLength": 1,
+                                "description": "Note on the source."
+                              }
+                            },
+                            "required": ["title"],
+                            "additionalProperties": false
+                          },
+                          "description": "The sources of the values, at least one."
+                        },
+                        "note": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "Note on the provenance."
+                        }
+                      },
+                      "required": ["kind", "sources"],
+                      "additionalProperties": false,
+                      "description": "Where the values come from. Required for a catalogue case."
+                    },
+                    "revision": {
+                      "type": "string",
+                      "description": "Hash of the stored record. It changes with any field."
+                    }
+                  },
+                  "required": ["origin", "manufacturer", "cartridge", "material", "revision"],
                   "additionalProperties": false
                 }
               }
@@ -17627,10 +18120,22 @@
                                       "minimum": 0,
                                       "maximum": 9007199254740991,
                                       "description": "Times the case was fired before this load."
+                                    },
+                                    "record": {
+                                      "type": "string",
+                                      "allOf": [
+                                        {
+                                          "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$"
+                                        },
+                                        {
+                                          "pattern": "^catalogue:"
+                                        }
+                                      ],
+                                      "description": "The case product of the catalogue. Its stated water capacity is the default of `capacity`."
                                     }
                                   },
                                   "additionalProperties": false,
-                                  "description": "The case as described. Its water capacity is the `capacity` reference."
+                                  "description": "The case as described. Its measured water capacity is the `capacity` reference, which takes precedence over the stated capacity of `record`."
                                 },
                                 "seating": {
                                   "type": "object",

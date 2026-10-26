@@ -26,6 +26,10 @@ A case record describes one cartridge case product as its manufacturer sells it,
 
 Every data field needs a source that lists it in `fields`. A value a source does not state is left out, never estimated.
 
+## API
+
+Served under `/v1` (`packages/api/src/routes/components.ts`): `GET /cases` filters by `cartridge=<id>` and `manufacturer=<id>`, orders by manufacturer name and name, and its `q` matches the manufacturer name with the product name or the product number. Each item carries the cartridge and manufacturer ids, the material, and the stated water capacity and empty mass where the record has them. `GET /cases/:id` answers the record with its `origin` and `revision`.
+
 ## Validation
 
 `npm run data:validate` reports a case whose `cartridge` or `manufacturer` names no record, a flash hole or mass outside the ranges of `checkCase` (`packages/data/src/plausibility.ts`), a stated water capacity above the water the case's enclosing cylinder holds, and two cases of one manufacturer and cartridge with the same name.

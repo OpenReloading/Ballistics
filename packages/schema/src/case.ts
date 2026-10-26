@@ -12,6 +12,9 @@ export const caseMaterials = z.enum([
   'aluminium',
 ])
 
+/** A wall material of {@link caseMaterials}. */
+export type CaseMaterial = z.infer<typeof caseMaterials>
+
 /** Primer pocket of a case: Boxer (one central flash hole) or Berdan (the anvil is in the case), and its size as the source names it. */
 const primerPocket = z.strictObject({
   type: z.enum(['boxer', 'berdan']),

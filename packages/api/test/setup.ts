@@ -16,6 +16,7 @@ const emptyBundle: Bundle = {
   manufacturers: [],
   powders: [],
   bullets: [],
+  cases: [],
   capacities: [],
   loads: [],
   chronoSessions: [],

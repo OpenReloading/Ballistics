@@ -11,6 +11,7 @@ const renames = {
   manufacturers: { 'old-a': 'example-a' },
   powders: { 'old-powder': 'example-a-fast' },
   bullets: { 'old-bullet': 'example-a-1' },
+  cases: { 'old-case': 'alpha-brass' },
   'target-faces': { 'old-face': 'test-face' },
   federations: { 'old-federation': 'test-federation' },
   disciplines: { 'old-discipline': 'test-discipline' },
