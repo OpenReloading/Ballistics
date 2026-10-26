@@ -37,14 +37,16 @@ export function recordMark(
   key: string,
   si: number | undefined,
   shown: (si: number) => string,
+  /** Where the values come from: `record`, or `user design`. */
+  source = 'record',
 ) {
   const from = origin[key]
   if (from === undefined) return
   if (matchesRecordValue(from, si) && key === 'startPressure' && !p.interior?.startPressure)
     return "From the fit's start pressure rule for barrels of 300 mm and longer."
   if (matchesRecordValue(from, si))
-    return `From the record (${p.interior?.fitted.some((k) => k === fittedKey[key]) ? 'fitted' : 'input of the fit'}).`
-  return `Changed from the record value ${shown(from)}.`
+    return `From the ${source} (${p.interior?.fitted.some((k) => k === fittedKey[key]) ? 'fitted' : 'input of the fit'}).`
+  return `Changed from the ${source} value ${shown(from)}.`
 }
 
 /**

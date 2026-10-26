@@ -574,7 +574,7 @@ _Avoid_: `shots` (as a count), n
 A JSON file of the web app with `format` (`openreloading-user-data`), `version` (a file of another version is refused), `records` and the photos of its target sheets in `files`.
 
 **User record**:
-One entry of `records`: `kind` (`bullet`, `cartridge`, `load`, `firearm`, `targetSheet`, `targetFaceDesign`), `id`, `name`, `saved` (ISO date and time of the save) and the `data` of that kind.
+One entry of `records`: `kind` (`bullet`, `cartridge`, `load`, `firearm`, `targetSheet`, `targetFaceDesign`, `powder`), `id`, `name`, `saved` (ISO date and time of the save) and the `data` of that kind.
 _Avoid_: workbenchLoad
 
 **Embedded file**:
@@ -588,6 +588,9 @@ A user record of kind `cartridge`: `origin` (`user`), the `basedOn` catalogue re
 
 **Target face design**:
 A user record of kind `targetFaceDesign`: the `rings`, `innerTen`, `blackDiameter`, `blackHeight`, `decimal` and `events` of a face in mm, each optional while the draft is unfinished. The shot group and hit probability tools offer a design that builds a valid `TargetFace` as `User design <name>` (face id `user-<record id>`).
+
+**Powder design**:
+A user record of kind `powder`: `origin` (`user`), the `provenanceKind` and the `draft`, the powder's grain form, bulk density, composition, thermochemistry and burn law in stored units, each optional while the draft is unfinished. The workbench and the charge target tool offer a design that builds a valid `Powder` as `<name> (your design)`, a saved load names it as `user:<id>`, and every result from it says the powder values are from a user design.
 
 **Base record**:
 `basedOn`: the catalogue record a design is a variant of, as `catalogue:<id>`. The resolved record is the base with the `overrides` applied (`applyOverrides`).
