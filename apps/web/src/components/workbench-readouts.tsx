@@ -41,6 +41,7 @@ import { NavIcon } from './nav-icons.tsx'
 import { PanelTable } from './scroll-region.tsx'
 import { SourceTitles } from './sources.tsx'
 import { StandardBadge } from './standard-badge.tsx'
+import { useScrolls } from './states.tsx'
 import {
   derived,
   loadRatioText,
@@ -112,9 +113,10 @@ export function WarningsBlock({
   summary: string
   announce: boolean
 }) {
+  const { ref: list, scrolls } = useScrolls()
   if (warnings.length === 0) return null
   return (
-    <span role={announce ? 'alert' : undefined} className="warnings-block">
+    <span role={announce ? 'status' : undefined} className="warnings-block">
       <AppPopover
         position="bottom-end"
         width={popoverWidth.list}
@@ -143,8 +145,9 @@ export function WarningsBlock({
           </Button>
         </Popover.Target>
         <Popover.Dropdown id="warnings-list" className="warnings-list">
-          <h3>Warnings</h3>
-          <ul>
+          <h3 id="warnings-title">Warnings</h3>
+          {/* a list of any length keeps the popover's height: it scrolls, and takes focus to do so */}
+          <ul ref={list} tabIndex={scrolls ? 0 : undefined} aria-labelledby="warnings-title">
             {warnings.map((w) => (
               <li key={w.text}>
                 <span className="warn-icon">
