@@ -1536,6 +1536,85 @@ td.nowrap {
   }
 }
 
+/* the powder designer: a label and three numbers (thermochemistry), or an ingredient, its CAS number and
+   two percentages; the column header names the fields */
+.powder-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(0, 1fr));
+  gap: 0 0.5rem;
+  align-items: center;
+  min-height: 1.75rem;
+}
+
+.powder-ingredient {
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) repeat(2, minmax(0, 0.75fr)) 1.75rem;
+}
+
+.powder-head {
+  background: var(--bg);
+  color: var(--muted);
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 600;
+}
+
+.powder-label {
+  font-size: var(--mantine-font-size-sm);
+}
+
+.powder-designer .side-grid > button {
+  margin-top: 0.25rem;
+}
+
+.powder-designer .designer-checks {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.powder-designer .designer-checks .mantine-Checkbox-root {
+  display: flex;
+  align-items: center;
+  min-height: 1.75rem;
+}
+
+.powder-designer .designer-checks legend {
+  padding: 0;
+  font-size: var(--mantine-font-size-sm);
+}
+
+.powder-problems {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.powder-designer .message {
+  overflow-wrap: anywhere;
+}
+
+/* no drawing to keep in view: on a phone the record status is the first block of the page and the
+   fields scroll with it */
+@media screen and (max-width: 47.99em) {
+  html:has(.powder-designer) {
+    scroll-padding-top: var(--app-shell-header-offset, 0rem);
+  }
+
+  .powder-designer .workspace-results {
+    position: static;
+  }
+
+  .powder-designer .workspace-scroll {
+    max-height: none;
+    overflow-y: visible;
+  }
+}
+
+@media screen and (min-width: 62em) {
+  .powder-designer .workspace-tabs {
+    grid-template-columns: 30rem minmax(0, 1fr);
+  }
+}
+
 @media print {
   /* the drawing and the values, not the form */
   .designer .workspace-tabs > .workspace-inputs {

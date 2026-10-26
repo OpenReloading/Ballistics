@@ -1,6 +1,8 @@
 'use client'
 
-import { Box, Text } from '@mantine/core'
+import { Box, Button, Text } from '@mantine/core'
+import { Plus } from '@phosphor-icons/react'
+import Link from 'next/link'
 import { useDeferredValue, useMemo } from 'react'
 import {
   maxOverlay,
@@ -135,12 +137,21 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
           </>
         }
         actions={
-          <CompareButton
-            count={picked.length}
-            min={0}
-            href={overlayHref(picked)}
-            idle="Burn rates"
-          />
+          <>
+            <CompareButton
+              count={picked.length}
+              min={0}
+              href={overlayHref(picked)}
+              idle="Burn rates"
+            />
+            <Button
+              component={Link}
+              href="/powders/designer"
+              leftSection={<Plus aria-hidden="true" />}
+            >
+              New powder
+            </Button>
+          </>
         }
       />
       <div className="directory">

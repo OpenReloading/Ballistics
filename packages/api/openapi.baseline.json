@@ -17209,6 +17209,733 @@
                           "properties": {
                             "kind": {
                               "type": "string",
+                              "const": "powder",
+                              "description": "Kind of the record: `powder`."
+                            },
+                            "id": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                              "description": "Id of the record in the browser library: a UUID."
+                            },
+                            "name": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 200,
+                              "description": "Name of the record. Save names the file after it."
+                            },
+                            "saved": {
+                              "type": "string",
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                              "description": "Time of the last save, ISO 8601 in UTC."
+                            },
+                            "data": {
+                              "type": "object",
+                              "properties": {
+                                "origin": {
+                                  "type": "string",
+                                  "const": "user",
+                                  "description": "Where the record lives: `user`."
+                                },
+                                "provenanceKind": {
+                                  "type": "string",
+                                  "enum": [
+                                    "published",
+                                    "measured",
+                                    "derived",
+                                    "fitted",
+                                    "computed"
+                                  ],
+                                  "description": "How the values came about: the kind of the provenance the designer builds. Burn-law parameters need `fitted`."
+                                },
+                                "draft": {
+                                  "type": "object",
+                                  "properties": {
+                                    "aliases": {
+                                      "description": "The `aliases` of the powder record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "minItems": 1,
+                                          "type": "array",
+                                          "items": {
+                                            "type": "string",
+                                            "minLength": 1
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "grainForm": {
+                                      "description": "The `grainForm` of the powder record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "string",
+                                          "enum": ["ball", "extruded", "flake", "other"]
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "propellantBase": {
+                                      "description": "The `propellantBase` of the powder record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "string",
+                                          "enum": ["single", "double", "triple"]
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "bulkDensity": {
+                                      "description": "The `bulkDensity` of the powder record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "value": {
+                                              "description": "In g/cm3.",
+                                              "type": ["number", "null"]
+                                            },
+                                            "raw": {
+                                              "description": "The value as written in the source, when it differed.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "string",
+                                                  "minLength": 1,
+                                                  "description": "The value as written in the source, when it differed."
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "thermochemistry": {
+                                      "description": "The `thermochemistry` of the powder record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "loadingDensity": {
+                                              "description": "The `thermochemistry.loadingDensity` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In g/cm3.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "flameTemperature": {
+                                              "description": "The `thermochemistry.flameTemperature` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "The `thermochemistry.flameTemperature.value` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "min": {
+                                                      "description": "The `thermochemistry.flameTemperature.min` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "max": {
+                                                      "description": "The `thermochemistry.flameTemperature.max` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "impetus": {
+                                              "description": "The `thermochemistry.impetus` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "The `thermochemistry.impetus.value` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "min": {
+                                                      "description": "The `thermochemistry.impetus.min` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "max": {
+                                                      "description": "The `thermochemistry.impetus.max` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "gamma": {
+                                              "description": "The `thermochemistry.gamma` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "The `thermochemistry.gamma.value` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "min": {
+                                                      "description": "The `thermochemistry.gamma.min` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "max": {
+                                                      "description": "The `thermochemistry.gamma.max` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "molarMass": {
+                                              "description": "The `thermochemistry.molarMass` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "The `thermochemistry.molarMass.value` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "min": {
+                                                      "description": "The `thermochemistry.molarMass.min` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "max": {
+                                                      "description": "The `thermochemistry.molarMass.max` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "covolume": {
+                                              "description": "The `thermochemistry.covolume` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "The `thermochemistry.covolume.value` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "min": {
+                                                      "description": "The `thermochemistry.covolume.min` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "max": {
+                                                      "description": "The `thermochemistry.covolume.max` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "interior": {
+                                      "description": "The `interior` of the powder record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "model": {
+                                              "description": "The `interior.model` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "string",
+                                                  "const": "m3"
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "fitted": {
+                                              "description": "The `interior.fitted` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "minItems": 1,
+                                                  "type": "array",
+                                                  "items": {
+                                                    "type": "string",
+                                                    "enum": ["vivacity", "energy", "form.a"]
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "vivacity": {
+                                              "description": "The `interior.vivacity` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "The `interior.vivacity.value` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "standardUncertainty": {
+                                                      "description": "The `interior.vivacity.standardUncertainty` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "energy": {
+                                              "description": "The `interior.energy` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "The `interior.energy.value` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "standardUncertainty": {
+                                                      "description": "The `interior.energy.standardUncertainty` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "gamma": {
+                                              "description": "The `interior.gamma` of the powder record. `null` removes it.",
+                                              "type": ["number", "null"]
+                                            },
+                                            "covolume": {
+                                              "description": "The `interior.covolume` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In m3/kg.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "density": {
+                                              "description": "The `interior.density` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In g/cm3.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "pressureExponent": {
+                                              "description": "The `interior.pressureExponent` of the powder record. `null` removes it.",
+                                              "type": ["number", "null"]
+                                            },
+                                            "referencePressure": {
+                                              "description": "The `interior.referencePressure` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In bar.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "ignitionPressure": {
+                                              "description": "The `interior.ignitionPressure` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In bar.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "startPressure": {
+                                              "description": "The `interior.startPressure` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In bar.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "propellantTemperature": {
+                                              "description": "The `interior.propellantTemperature` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In degC.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "burnForm": {
+                                              "description": "The `interior.burnForm` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "kind": {
+                                                      "description": "The `interior.burnForm.kind` of the powder record. `null` removes it.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "const": "twoStage"
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "a": {
+                                                      "description": "The `interior.burnForm.a` of the powder record. `null` removes it.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "value": {
+                                                              "description": "The `interior.burnForm.a.value` of the powder record. `null` removes it.",
+                                                              "type": ["number", "null"]
+                                                            },
+                                                            "standardUncertainty": {
+                                                              "description": "The `interior.burnForm.a.standardUncertainty` of the powder record. `null` removes it.",
+                                                              "type": ["number", "null"]
+                                                            }
+                                                          }
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "m": {
+                                                      "description": "The `interior.burnForm.m` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "q": {
+                                                      "description": "The `interior.burnForm.q` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "z1": {
+                                                      "description": "The `interior.burnForm.z1` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "resistance": {
+                                              "description": "The `interior.resistance` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "stress": {
+                                                      "description": "The `interior.resistance.stress` of the powder record. `null` removes it.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "value": {
+                                                              "description": "In bar.",
+                                                              "type": ["number", "null"]
+                                                            },
+                                                            "raw": {
+                                                              "description": "The value as written in the source, when it differed.",
+                                                              "anyOf": [
+                                                                {
+                                                                  "type": "string",
+                                                                  "minLength": 1,
+                                                                  "description": "The value as written in the source, when it differed."
+                                                                },
+                                                                {
+                                                                  "type": "null"
+                                                                }
+                                                              ]
+                                                            }
+                                                          }
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "oversize": {
+                                                      "description": "The `interior.resistance.oversize` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "engraving": {
+                                                      "description": "The `interior.resistance.engraving` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "trainingRows": {
+                                              "description": "The `interior.trainingRows` of the powder record. `null` removes it.",
+                                              "type": ["number", "null"]
+                                            },
+                                            "trainingCartridges": {
+                                              "description": "The `interior.trainingCartridges` of the powder record. `null` removes it.",
+                                              "type": ["number", "null"]
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "note": {
+                                      "description": "The `note` of the powder record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "string",
+                                          "minLength": 1
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "composition": {
+                                      "description": "The `composition` of the powder record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "name": {
+                                                "type": "string",
+                                                "description": "Name of the ingredient as the safety data sheet prints it."
+                                              },
+                                              "cas": {
+                                                "type": "string",
+                                                "description": "CAS registry number of the ingredient."
+                                              },
+                                              "min": {
+                                                "type": "number",
+                                                "description": "Lower end of the mass percent range."
+                                              },
+                                              "max": {
+                                                "type": "number",
+                                                "description": "Upper end of the mass percent range."
+                                              }
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "description": "The powder fields entered so far, in stored units."
+                                }
+                              },
+                              "required": ["origin"],
+                              "description": "A powder of the powder designer."
+                            }
+                          },
+                          "required": ["kind", "id", "name", "saved", "data"]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
                               "const": "caseCapacity",
                               "description": "Kind of the record: `caseCapacity`."
                             },
@@ -17523,15 +18250,8 @@
                                   "anyOf": [
                                     {
                                       "type": "string",
-                                      "allOf": [
-                                        {
-                                          "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$"
-                                        },
-                                        {
-                                          "pattern": "^catalogue:"
-                                        }
-                                      ],
-                                      "description": "Reference `catalogue:<record id>` to a catalogue powder."
+                                      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                      "description": "Reference to a powder: `catalogue:<record id>` or `user:<UUID>`."
                                     },
                                     {
                                       "type": "object",
@@ -17557,7 +18277,7 @@
                                       "description": "The powder as the publication describes it, where no record exists."
                                     }
                                   ],
-                                  "description": "The powder: a catalogue reference, or a description in a measured catalogue load."
+                                  "description": "The powder: a reference, or a description in a measured catalogue load. A catalogue load names a catalogue powder."
                                 },
                                 "powderLot": {
                                   "description": "Lot number of the powder, as printed on the package.",

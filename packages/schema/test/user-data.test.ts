@@ -148,6 +148,25 @@ const faceRecord = {
   },
 } as const
 
+const powderId = '5d4c3b2a-1f0e-4d9c-8b7a-6a5f4e3d2c1b'
+const powderRecord = {
+  kind: 'powder',
+  id: powderId,
+  name: 'Draft powder',
+  saved,
+  data: {
+    origin: 'user',
+    provenanceKind: 'fitted',
+    draft: {
+      grainForm: 'extruded',
+      propellantBase: 'double',
+      bulkDensity: { value: 0.9 },
+      composition: [{ name: 'Nitrocellulose', min: 60, max: 100 }, {}],
+      interior: { fitted: ['vivacity'], gamma: 1.24, burnForm: { a: { value: 0.5 } } },
+    },
+  },
+} as const
+
 const file = (records: unknown[], version: unknown = userDataVersion) => ({
   format: userDataFormat,
   version,
@@ -166,9 +185,39 @@ describe('userDataFile', () => {
           firearmRecord,
           sheetRecord,
           faceRecord,
+          powderRecord,
         ]),
       ).success,
     ).toBe(true)
+  })
+
+  it('takes a powder draft with missing values and keeps it through a round trip', () => {
+    expect(userRecord.parse(powderRecord)).toEqual(powderRecord)
+    const empty = { ...powderRecord, data: { origin: 'user' } }
+    expect(userRecord.parse(empty)).toEqual(empty)
+  })
+
+  it('rejects a powder draft with a value of the wrong type or an unknown kind', () => {
+    const draft = (d: object) => ({ ...powderRecord, data: { ...powderRecord.data, draft: d } })
+    expect(userRecord.safeParse(draft({ grainForm: 'cube' })).error?.issues[0]?.path).toEqual([
+      'data',
+      'draft',
+      'grainForm',
+    ])
+    expect(userRecord.safeParse(draft({ bulkDensity: { value: 'dense' } })).success).toBe(false)
+    const kind = { ...powderRecord, data: { ...powderRecord.data, provenanceKind: 'guessed' } }
+    expect(userRecord.safeParse(kind).success).toBe(false)
+  })
+
+  it('keeps a powder draft whose numbers are out of the finished record bounds', () => {
+    const interior = { gamma: 1, pressureExponent: 0, burnForm: { z1: 0 } }
+    const draft = { ...powderRecord, data: { ...powderRecord.data, draft: { interior } } }
+    expect(userRecord.safeParse(draft).success).toBe(true)
+  })
+
+  it('refuses a powder with an id that is no UUID, and says why', () => {
+    const r = userRecord.safeParse({ ...powderRecord, id: 'old-1' })
+    expect(r.error?.issues[0]).toMatchObject({ path: ['id'], message: designIdProblem })
   })
 
   it('takes a user manufacturer as a name and refuses another origin', () => {
@@ -290,7 +339,7 @@ describe('userDataFile', () => {
 
   it('rejects an unknown kind, a bad date, a non-finite value and an invalid spec value', () => {
     const paths = (r: object) => userRecord.safeParse(r).error?.issues.map((i) => i.path.join('.'))
-    expect(paths({ ...bulletRecord, kind: 'powder' })).toEqual(['kind'])
+    expect(paths({ ...bulletRecord, kind: 'unknown' })).toEqual(['kind'])
     expect(paths({ ...bulletRecord, saved: 'yesterday' })).toEqual(['saved'])
     expect(
       paths({
@@ -630,6 +679,18 @@ describe('checkUserRefs', () => {
     expect(
       checkUserRefs([withRefs('catalogue:308-win', `user:${uuid}`), own[0] as never]),
     ).toHaveLength(1)
+  })
+
+  it('reports a load whose powder is a user reference nobody answers', () => {
+    const withPowder = (powder: string) =>
+      userRecord.parse({ ...loadRecord, data: { ...loadRecord.data, powder } })
+    const own = userRecord.parse(powderRecord)
+    expect(checkUserRefs([withPowder(`user:${powderId}`), own])).toEqual([])
+    expect(checkUserRefs([withPowder(`user:${powderId}`)])).toEqual([
+      { record: 'w4', kind: 'load', field: 'powder', target: `user:${powderId}` },
+    ])
+    expect(checkUserRefs([withPowder('catalogue:test-powder')])).toEqual([])
+    expect(userRefFields(withPowder(`user:${powderId}`))).toContain('powder')
   })
 
   it('opens a load that names its cartridge and bullet by reference and refuses a plain id', () => {

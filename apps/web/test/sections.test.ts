@@ -44,7 +44,7 @@ it('names existing routes as tool pages, the workbench, the shot groups and the 
 })
 
 it('covers each designer by its database list, not by a link of its own', () => {
-  for (const list of ['/bullets', '/cartridges', '/targets']) {
+  for (const list of ['/bullets', '/cartridges', '/targets', '/powders']) {
     expect(routes).toContain(`${list}/designer`)
     expect(hrefs).not.toContain(`${list}/designer`)
     expect(pageCoversRoute(list, `${list}/designer`)).toBe(true)
