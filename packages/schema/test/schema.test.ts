@@ -279,6 +279,9 @@ describe('bullet', () => {
     expect(issues({ ...shaped, ...flat, cannelure: groove(1, 1.2) })).toEqual([])
     // the depth stays below the radius (3.9115 mm)
     expect(issues({ cannelure: groove(9, 1.2, 3.9) })).toEqual([])
+    expect(issues({ cannelure: groove(9, 1.2, base.diameter.value / 2) })).toEqual([
+      'cannelure.depth',
+    ])
     expect(issues({ cannelure: groove(9, 1.2, 3.92) })).toEqual(['cannelure.depth'])
   })
 
