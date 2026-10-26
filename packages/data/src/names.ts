@@ -67,13 +67,19 @@ function duplicates(records: Named[]): LocatedFinding[] {
 /**
  * Reports records that share a name, exactly or after `normaliseName`, with an earlier record of
  * their kind and scope. Scopes: none for cartridges, manufacturers and powder aliases, manufacturer id
- * for powders and bullets, the report for range
+ * for powders and bullets, manufacturer and cartridge for cases, the report for range
  * records, federation id for target faces.
  */
 export function checkNames(
   bundle: Pick<
     Bundle,
-    'cartridges' | 'manufacturers' | 'powders' | 'bullets' | 'rangeFirings' | 'targetFaces'
+    | 'cartridges'
+    | 'manufacturers'
+    | 'powders'
+    | 'bullets'
+    | 'cases'
+    | 'rangeFirings'
+    | 'targetFaces'
   >,
 ): LocatedFinding[] {
   const at = (dir: string, id: string) => `${dir}/${id}.json`
@@ -108,6 +114,14 @@ export function checkNames(
         file: at('bullets', b.id),
         scope: b.manufacturer,
         names: [b.name],
+      })),
+    ),
+    // A case is named per cartridge, as the same product line serves several.
+    ...duplicates(
+      bundle.cases.map((c) => ({
+        file: at('cases', c.id),
+        scope: `${c.manufacturer} ${c.cartridge}`,
+        names: [c.name],
       })),
     ),
     // One projectile may appear in several reports.

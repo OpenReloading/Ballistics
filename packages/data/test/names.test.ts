@@ -15,6 +15,7 @@ const empty = {
   manufacturers: [],
   powders: [],
   bullets: [],
+  cases: [],
   rangeFirings: [],
   targetFaces: [],
 }

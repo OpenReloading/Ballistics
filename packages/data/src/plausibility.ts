@@ -1,7 +1,7 @@
 import type {
   Bullet,
   Cartridge,
-  CaseCapacity,
+  CatalogueCase,
   CatalogueSession,
   Powder,
   SpecValue,
@@ -224,7 +224,7 @@ export function checkBullet(bullet: Bullet): Finding[] {
  * 1 g/cm3, the highest density of water.
  */
 export function checkCapacity(
-  capacity: CaseCapacity,
+  capacity: { waterCapacity: { value: number } },
   spec: Pick<Cartridge, 'values'> | undefined,
 ): Finding[] {
   const w = capacity.waterCapacity.value
@@ -245,6 +245,35 @@ export function checkCapacity(
       message: `water capacity ${w} g is outside 0 to ${roundToTenth(max)} g (cylinder enclosing the case)`,
     },
   ]
+}
+
+/** Bounds of a case product: flash hole diameter in mm and empty case mass in g, wide enough for every cartridge of the catalogue. */
+const caseRanges = {
+  flashHole: { min: 0.3, max: 5, unit: 'mm' },
+  mass: { min: 0.1, max: 400, unit: 'g' },
+} as const
+
+/**
+ * Checks one case: the flash hole and the empty mass inside small-arms ranges, and the stated water
+ * capacity as {@link checkCapacity} checks a measured one against the cartridge's sheet.
+ */
+export function checkCase(
+  record: Pick<CatalogueCase, 'flashHole' | 'mass' | 'waterCapacity'>,
+  spec: Pick<Cartridge, 'values'> | undefined,
+): Finding[] {
+  const out: Finding[] = []
+  for (const key of ['flashHole', 'mass'] as const) {
+    const v = record[key]?.value
+    const { min, max, unit } = caseRanges[key]
+    if (v !== undefined && !(v >= min && v <= max))
+      out.push({
+        finding: `${key}-range`,
+        message: `${key === 'mass' ? 'mass' : 'flash hole'} ${v} ${unit} is outside ${min} to ${max} ${unit}`,
+      })
+  }
+  if (record.waterCapacity)
+    out.push(...checkCapacity({ waterCapacity: record.waterCapacity }, spec))
+  return out
 }
 
 /** Universal gas constant, J/(kmol K) (CODATA 2018, exact). */

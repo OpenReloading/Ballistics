@@ -20,6 +20,7 @@ function* properties(node: unknown, path = ''): Generator<[string, string, Node]
 
 const entities = {
   caseCapacity: schema.caseCapacity,
+  cartridgeCase: schema.cartridgeCase,
   load: schema.load,
   userRecord: schema.userRecord,
   cartridge: schema.cartridge,
@@ -41,8 +42,9 @@ describe('the case capacity in the schema', () => {
   )
   const capacities = found.filter((p) => /water|capacity/i.test(p.key))
 
-  it('is one entity: only the case capacity holds a water mass, a load references it', () => {
+  it('is one measured entity, a load references it; a case product holds the stated one', () => {
     expect(capacities.map((p) => p.path).sort()).toEqual([
+      'cartridgeCase.waterCapacity',
       'caseCapacity.waterCapacity',
       'load.capacity',
       'userRecord.data.capacity',

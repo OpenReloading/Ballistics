@@ -5,11 +5,13 @@ import {
   bullet,
   type CaliberClass,
   type Cartridge,
+  type CatalogueCase,
   type CatalogueCaseCapacity,
   type CatalogueLoad,
   type CatalogueSession,
   caliberClass,
   cartridge,
+  catalogueCase,
   catalogueCaseCapacity,
   catalogueLoad,
   catalogueSession,
@@ -24,6 +26,7 @@ import {
   type Manufacturer,
   manufacturer,
   type Powder,
+  parseRef,
   powder,
   type RangeFirings,
   type Renames,
@@ -43,6 +46,7 @@ import { checkNames, type LocatedFinding } from './names.ts'
 import {
   checkBullet,
   checkCapacity,
+  checkCase,
   checkChronoSession,
   checkPowder,
   checkSpec,
@@ -103,6 +107,7 @@ export type Bundle = {
   manufacturers: Manufacturer[]
   powders: Powder[]
   bullets: Bullet[]
+  cases: CatalogueCase[]
   capacities: CatalogueCaseCapacity[]
   loads: CatalogueLoad[]
   chronoSessions: CatalogueSession[]
@@ -135,6 +140,7 @@ function readBundle(roots: string[], errors: string[]): Bundle {
     manufacturers: read('manufacturers', manufacturer),
     powders: read('powders', powder),
     bullets: read('bullets', bullet),
+    cases: read('cases', catalogueCase),
     capacities: read('capacities', catalogueCaseCapacity),
     loads: read('loads', catalogueLoad),
     chronoSessions: read('chrono', catalogueSession),
@@ -185,6 +191,7 @@ function checkSourceCoverage(bundle: Bundle, errors: string[]) {
     ['caliber-classes', bundle.caliberClasses],
     ['powders', bundle.powders],
     ['bullets', bundle.bullets],
+    ['cases', bundle.cases],
     ['capacities', bundle.capacities],
     ['federations', bundle.federations],
     ['disciplines', bundle.disciplines],
@@ -214,7 +221,7 @@ function checkRangeRounds(records: RangeFirings[], errors: string[]) {
   }
 }
 
-/** The findings of duplicate names, capacities, powders and sessions; each is an error. */
+/** The findings of duplicate names, cases, capacities, powders and sessions; each is an error. */
 function collectFindings(bundle: Bundle, cartridges: Map<string, Cartridge>): LocatedFinding[] {
   const located = (dir: string, id: string, findings: { finding: string; message: string }[]) =>
     findings.map((f) => ({ file: `${dir}/${id}.json`, ...f }))
@@ -222,6 +229,13 @@ function collectFindings(bundle: Bundle, cartridges: Map<string, Cartridge>): Lo
     ...checkNames(bundle),
     ...bundle.capacities.flatMap((c) =>
       located('capacities', c.id, checkCapacity(c, cartridges.get(c.cartridge))),
+    ),
+    ...bundle.cases.flatMap((c) =>
+      located(
+        'cases',
+        c.id,
+        checkCase(c, cartridges.get(parseRef(c.cartridge)?.id ?? c.cartridge)),
+      ),
     ),
     ...bundle.powders.flatMap((p) => located('powders', p.id, checkPowder(p))),
     ...bundle.chronoSessions.flatMap((s) => located('chrono', s.id, checkChronoSession(s))),

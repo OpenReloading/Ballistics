@@ -6,6 +6,7 @@ const identity = new Set([
   'origin',
   'manufacturer',
   'productNumber',
+  'headstamp',
   'name',
   'productLine',
   'caliber',
