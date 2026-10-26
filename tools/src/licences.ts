@@ -67,11 +67,16 @@ function resolve(lock: Lock, from: string, name: string) {
   }
 }
 
+/** Whether an npm `os`, `cpu` or `libc` list rules `value` out: `!value` blocks it, a list of plain names must name it. */
+const excludes = (list: string[] | undefined, value: string) =>
+  list !== undefined &&
+  (list.includes(`!${value}`) || (list.some((c) => !c.startsWith('!')) && !list.includes(value)))
+
 /** A platform package that the Linux images (glibc, x64 or arm64) never install. */
 const otherPlatform = (e: Lock['packages'][string]) =>
-  (e.os && !e.os.includes('linux')) ||
-  (e.cpu && !e.cpu.some((c) => c === 'x64' || c === 'arm64')) ||
-  (e.libc && !e.libc.includes('glibc'))
+  excludes(e.os, 'linux') ||
+  (excludes(e.cpu, 'x64') && excludes(e.cpu, 'arm64')) ||
+  excludes(e.libc, 'glibc')
 
 const id = (p: Shipped) => `${p.name}@${p.version}`
 

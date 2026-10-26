@@ -43,7 +43,7 @@ const entry = (version: string, license: string | undefined, rest = {}) => ({
 const lock: Lock = {
   packages: {
     'apps/web': {
-      dependencies: { a: '*', core: '*' },
+      dependencies: { a: '*', core: '*', 'not-windows': '*', 'not-linux': '*', musl: '*' },
       optionalDependencies: { 'bin-darwin': '*' },
     },
     'node_modules/core': { link: true, resolved: 'packages/core' },
@@ -53,13 +53,21 @@ const lock: Lock = {
     'node_modules/b': entry('1.0.0', 'ISC'),
     'node_modules/sharp': entry('0.1.0', 'LGPL-3.0-or-later'),
     'node_modules/bin-darwin': entry('1.0.0', 'GPL-3.0-only', { os: ['darwin'] }),
+    'node_modules/not-windows': entry('1.0.0', 'MIT', { os: ['!win32'] }),
+    'node_modules/not-linux': entry('1.0.0', 'GPL-3.0-only', { os: ['!linux'] }),
+    'node_modules/musl': entry('1.0.0', 'GPL-3.0-only', { libc: ['musl'] }),
     'node_modules/unused': entry('1.0.0', 'GPL-3.0-only'),
   },
 }
 
-it('lists the production closure: links followed, nearest copy, no other platform, no removed package', () => {
+it('lists the production closure: links followed, nearest copy, a negated or other platform left out, no removed package', () => {
   const found = shippedPackages(lock, ['apps/web'], (name) => name === 'sharp')
-  expect(found.map((p) => `${p.name}@${p.version}`)).toEqual(['a@1.0.0', 'b@1.0.0', 'b@2.0.0'])
+  expect(found.map((p) => `${p.name}@${p.version}`)).toEqual([
+    'a@1.0.0',
+    'b@1.0.0',
+    'b@2.0.0',
+    'not-windows@1.0.0',
+  ])
 })
 
 it('fails on a licence outside the list and on no licence, not on an excepted package', () => {
