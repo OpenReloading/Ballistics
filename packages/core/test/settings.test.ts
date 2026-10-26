@@ -9,4 +9,9 @@ describe('overlay', () => {
     expect(overlay(base, undefined)).toEqual(base)
     expect(base).toEqual({ a: 1, b: 2, c: 3 })
   })
+
+  it('ignores inherited entries, as a spread does', () => {
+    const inherited: { a?: number } = Object.create({ a: 10 })
+    expect(overlay({ a: 1 }, inherited)).toEqual({ a: 1 })
+  })
 })
