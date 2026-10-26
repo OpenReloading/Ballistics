@@ -93,8 +93,9 @@ License, whose text is the same as above, with these copyright notices:
 - @phosphor-icons/react 2.1.10 (https://github.com/phosphor-icons/react):
   Copyright (c) 2020 Phosphor Icons
 - zod 4.6.7 (https://github.com/colinhacks/zod): Copyright (c) 2025 Colin McDonnell
-- @docusaurus/core, @docusaurus/preset-classic, @docusaurus/plugin-content-docs 3.10.2, docs
-  site (https://github.com/facebook/docusaurus): Copyright (c) Facebook, Inc. and its affiliates.
+- @docusaurus/core, @docusaurus/theme-classic, @docusaurus/plugin-content-docs,
+  @docusaurus/plugin-sitemap 3.10.2, docs site (https://github.com/facebook/docusaurus):
+  Copyright (c) Facebook, Inc. and its affiliates.
 - katex 0.19.0 with its fonts, docs site (https://github.com/KaTeX/KaTeX):
   Copyright (c) 2013-2020 Khan Academy and other contributors
 - pagefind 1.5.2, the search script and index of the docs site (https://github.com/Pagefind/pagefind):
