@@ -31,6 +31,7 @@ import {
   DirectoryTable,
   useListState,
 } from './directory-table.tsx'
+import { LibraryTabs } from './library-tabs.tsx'
 import {
   DeleteRow,
   SourceFilter,
@@ -191,6 +192,7 @@ export function CartridgeList({ packed }: { packed: PackedCartridge[] }) {
           </>
         }
       />
+      <LibraryTabs />
       <div className="directory">
         <DirectoryFilters
           query={state.query}

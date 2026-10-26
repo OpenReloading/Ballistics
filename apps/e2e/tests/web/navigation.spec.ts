@@ -51,23 +51,25 @@ test('at 390 px the drawer lists every section page under its section, and two p
   }
 })
 
-test('the home page lists the tools, the data with its counts, and opens the site search', async ({
+test('the home page lists the tools and the library with its counts, and opens the tools', async ({
   page,
 }) => {
   await gotoHydrated(page, '/')
-  const [tools, data] = sections
+  const [tools, library] = sections
   const toolPanel = page.getByRole('region', { name: tools.title, exact: true })
   await expect(toolPanel.getByRole('heading', { level: 3 })).toHaveText(
     tools.pages.map((p) => p.label),
   )
-  const dataPanel = page.getByRole('region', { name: data.title, exact: true })
-  await expect(dataPanel.getByRole('heading', { level: 3 })).toHaveText(
-    data.pages.map((p) => p.label),
+  const libraryPanel = page.getByRole('region', { name: library.title, exact: true })
+  await expect(libraryPanel.getByRole('heading', { level: 3 })).toHaveText(
+    library.pages.map((p) => p.label),
   )
   // the record counts are the API's, at build time
   for (const label of ['Cartridges', 'Bullets', 'Powders', 'Targets', 'Disciplines'])
     await expect(
-      dataPanel.getByRole('listitem').filter({ has: page.getByRole('heading', { name: label }) }),
+      libraryPanel
+        .locator('.home-tabs > li')
+        .filter({ has: page.getByRole('link', { name: label }) }),
     ).toContainText(/\b[1-9]\d* records?$/)
   await toolPanel.getByRole('link', { name: 'Open load workbench' }).click()
   await expect(page).toHaveURL('/workbench')
@@ -78,7 +80,7 @@ test('a cartridge, after a search, and a report are two clicks from the home pag
 }) => {
   await gotoHydrated(page, '/')
   await page
-    .getByRole('region', { name: 'Data', exact: true })
+    .getByRole('region', { name: 'Library', exact: true })
     .getByRole('link', { name: 'Cartridges' })
     .click()
   await expect(page).toHaveURL('/cartridges')
@@ -88,6 +90,36 @@ test('a cartridge, after a search, and a report are two clicks from the home pag
   await expect(link).toBeVisible()
   await link.click()
   await expect(page).toHaveURL('/cartridges/308-win')
+})
+
+test('the Database tabs follow the tabs pattern and carry the search to the next kind', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await gotoHydrated(page, '/cartridges')
+  const tabs = page.getByRole('tablist', { name: 'Database' })
+  await expect(tabs.getByRole('tab')).toHaveText([
+    'Cartridges',
+    'Bullets',
+    'Powders',
+    'Cases',
+    'Targets',
+    'Disciplines',
+  ])
+  await expect(tabs.getByRole('tab', { selected: true })).toHaveText('Cartridges')
+  await page.getByRole('searchbox', { name: 'Search' }).fill('win')
+  // the arrow key moves the focus only: Enter opens the tab
+  await tabs.getByRole('tab', { selected: true }).focus()
+  await page.keyboard.press('ArrowRight')
+  await expect(tabs.getByRole('tab', { name: 'Bullets' })).toBeFocused()
+  await expect(page).toHaveURL(/\/cartridges\?q=win$/)
+  await page.keyboard.press('Enter')
+  await expect(page).toHaveURL('/bullets?q=win')
+  await expect(page.getByRole('tab', { selected: true })).toHaveText('Bullets')
+  // the sidebar names the Database as the current page on every tab
+  await expect(
+    page.getByRole('navigation', { name: 'Main' }).locator('[aria-current="page"]'),
+  ).toHaveAccessibleName('Database')
 })
 
 test('Report an issue opens a dialog whose link is a new issue of the repository', async ({
@@ -126,7 +158,7 @@ test('the drawer marks the current page and its rows are at least 44 px high', a
   await page.goto('/bullets')
   await page.getByRole('button', { name: 'Navigation', exact: true }).click()
   const nav = page.getByRole('dialog').getByRole('navigation', { name: 'Main' })
-  await expect(nav.locator('[aria-current="page"]')).toHaveText(['Bullets'])
+  await expect(nav.locator('[aria-current="page"]')).toHaveText(['Database'])
   const rows = nav.locator('a, button')
   await expect(rows).toHaveCount(pages.length + (repository ? 4 : 2))
   for (const box of await rows.evaluateAll((r) => r.map((e) => e.getBoundingClientRect().height)))

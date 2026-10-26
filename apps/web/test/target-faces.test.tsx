@@ -2,7 +2,7 @@ import { readdirSync } from 'node:fs'
 import { MantineProvider } from '@mantine/core'
 import type { TargetMapping } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { expect, it } from 'vitest'
+import { expect, it, vi } from 'vitest'
 import { TargetFaceDrawing } from '../src/components/target-face-drawing.tsx'
 import { TargetFaceList } from '../src/components/target-face-list.tsx'
 import {
@@ -15,6 +15,12 @@ import {
 import { defined, missing } from './defined.ts'
 import { faceById, faces } from './face-render.ts'
 import { readRecord } from './read-record.ts'
+
+// the list renders its tab bar, which reads the route and the router
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/targets',
+  useRouter: () => ({ push: () => {} }),
+}))
 
 const mappings = readdirSync(
   new URL('../../../packages/data/records/target-mappings/', import.meta.url),
