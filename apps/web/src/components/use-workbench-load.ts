@@ -1263,7 +1263,14 @@ export function useWorkbenchState() {
   /** SI values the preview wrote into the fields. */
   const [previewed, setPreviewed] = useState<Partial<Record<PreviewKey, number>>>({})
   /** The seated bullet's values, SI, none while no bullet is seated: an emptied field takes them again. */
-  const [seated, setSeated] = useState<Seated>({})
+  const [seated, setSeatedState] = useState<Seated>({})
+  // the seating reports run in transitions: `seated` lags them, so an effect that must not write
+  // over a seated volume reads this mirror, which is current at once
+  const seatedNow = useRef(seated)
+  const setSeated = useCallback((values: Seated) => {
+    seatedNow.current = values
+    setSeatedState(values)
+  }, [])
   /** The seating the preview first reported: a file or link keeps a seating that differs. */
   const [seatingStart, setSeatingStart] = useState<Seating>()
   const [tab, setTab] = useState<ResultTab>('results')
@@ -2722,7 +2729,7 @@ export function useWorkbenchState() {
   useEffect(() => {
     const writes = followWrites({
       followed,
-      seatedVolume,
+      seatedVolume: seatedNow.current.volume !== undefined,
       now: form.getValues(),
       suggestions,
       written: written.current,

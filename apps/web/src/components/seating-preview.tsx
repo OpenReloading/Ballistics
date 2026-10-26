@@ -21,6 +21,8 @@ import {
   type ReactNode,
   type RefObject,
   type SetStateAction,
+  startTransition,
+  useDeferredValue,
   useEffect,
   useId,
   useMemo,
@@ -36,11 +38,12 @@ import { drawable } from '../lib/cartridge-sheet.ts'
 import { renamedCasePath, type UsedWater, usedWater } from '../lib/case-capacity.ts'
 import type { OwnCase } from '../lib/case-group.ts'
 import type { FieldValue } from '../lib/field-spec.ts'
-import { figureViews } from '../lib/figure-views.ts'
+import { figureViewBuilder } from '../lib/figure-views.ts'
 import type { Suggestion } from '../lib/input-defaults.ts'
 import { productLabel, refName } from '../lib/manufacturers.ts'
 import { nth } from '../lib/nth.ts'
 import { type SeatingLengths, seatingLengthName } from '../lib/seating-ladder.ts'
+import { trailing } from '../lib/trailing.ts'
 import {
   drawingLengthUnit,
   fixedFieldText,
@@ -565,15 +568,19 @@ function ladderSeating(
 
 type Seated3 = { coal: number; cbto: number | undefined } | undefined
 
+/** The views laid out for the seated lengths; the part that does not follow them is built once. */
+type ViewsAt = (seated: Seated3) => ReturnType<ReturnType<typeof figureViewBuilder>>
+
+const noViews: ViewsAt = () => ({})
+
 /** The card's Cartridge, Chamber and Combined views; the Cartridge view's L6 is the seated COAL. */
-function cardModels(
+function cardViewsOf(
   spec: Spec | undefined,
   designer: boolean,
-  drawn: Parameters<typeof figureViews>[1],
-  unit: Parameters<typeof figureViews>[2],
-  seated: Seated3,
-): ReturnType<typeof figureViews> {
-  return spec && !designer ? figureViews(spec, drawn, unit, seated) : {}
+  drawn: Parameters<typeof figureViewBuilder>[1],
+  unit: Parameters<typeof figureViewBuilder>[2],
+): ViewsAt {
+  return spec && !designer ? figureViewBuilder(spec, drawn, unit) : noViews
 }
 
 /**
@@ -584,13 +591,12 @@ function levelViewsOf(
   spec: Spec | undefined,
   drawIt: boolean,
   designer: boolean,
-  drawn: Parameters<typeof figureViews>[1],
-  unit: Parameters<typeof figureViews>[2],
-  seated: Seated3,
-): ReturnType<typeof figureViews> {
+  drawn: Parameters<typeof figureViewBuilder>[1],
+  unit: Parameters<typeof figureViewBuilder>[2],
+): ViewsAt {
   return spec && drawIt
-    ? figureViews(spec, drawn, unit, seated, 'print', designer ? ['combined'] : undefined)
-    : {}
+    ? figureViewBuilder(spec, drawn, unit, 'print', designer ? ['combined'] : undefined)
+    : noViews
 }
 
 /** The seating mode's length minus COAL: the slider and the ladder show the mode's length. */
@@ -652,13 +658,26 @@ function seatedReport(o: {
   }
 }
 
-/** The interior fields follow the seated bullet, derived from COAL. */
+/** The wait after the last slider move before the page gets the seated values, ms. */
+const slideWait = 150
+
+/**
+ * The interior fields follow the seated bullet, derived from COAL. The page recomputes from the
+ * report, so it goes in a transition, the next slider move first. While the slider moves only the
+ * last report is sent, after `slideWait` ms or at once when the slider is released.
+ */
 function useReportSeated(
   onSeated: (values: Seated) => void,
   o: Parameters<typeof seatedReport>[0],
+  sliding: boolean,
 ) {
   const seated = useRef(onSeated)
   seated.current = onSeated
+  const send = useMemo(
+    () => trailing<Seated>((values) => startTransition(() => seated.current(values)), slideWait),
+    [],
+  )
+  useEffect(() => () => send.cancel(), [send])
   const { caseVolume, seating, barrel, mode, atStart, figure } = o
   const key = [
     caseVolume,
@@ -674,8 +693,23 @@ function useReportSeated(
   // no seated bullet reports {}: the page forgets the earlier seating
   // biome-ignore lint/correctness/useExhaustiveDependencies: the reported values only, not the seating object
   useEffect(() => {
-    seated.current(seatedReport({ caseVolume, seating, barrel, mode, atStart, figure }))
-  }, [...key, figure])
+    const values = seatedReport({ caseVolume, seating, barrel, mode, atStart, figure })
+    if (sliding) return send.push(values)
+    send.cancel()
+    startTransition(() => seated.current(values))
+  }, [...key, figure, sliding])
+}
+
+/** The seated lengths; while the slider moves, as they were `slideWait` ms after its last move. */
+function useRestedLengths(coal: number | undefined, cbto: number | undefined, sliding: boolean) {
+  const [rested, setRested] = useState({ coal, cbto })
+  useEffect(() => {
+    const rest = () => setRested((r) => (r.coal === coal && r.cbto === cbto ? r : { coal, cbto }))
+    if (!sliding) return rest()
+    const timer = setTimeout(rest, slideWait)
+    return () => clearTimeout(timer)
+  }, [coal, cbto, sliding])
+  return sliding ? rested : { coal, cbto }
 }
 
 function useLive(announce: string) {
@@ -757,7 +791,14 @@ function useSeatingModel(p: PreviewProps) {
     setStarted,
   })
 
+  // the slider and the field follow the pointer; what is computed from the position (the
+  // seating, the drawing, the values the page follows) renders after them and gives way to the
+  // next move, with the mode in step so a seating never mixes the two
+  const { pos: seatPos, mode: seatMode } = useDeferredValue(
+    useMemo(() => ({ pos, mode }), [pos, mode]),
+  )
   const value = lengthMm(pos)
+  const seatValue = lengthMm(seatPos)
   const measured = positive(measuredWaterCapacity.si)
   const stated = chosenCase?.waterCapacity
   // the records' water, and the water with a measured value typed over it
@@ -772,18 +813,21 @@ function useSeatingModel(p: PreviewProps) {
   })
   const waterUsed = water?.grams
   const seatBy = useMemo(
-    () => seatBuilder({ chamber, shape, mode, canCbto, water: waterUsed, barrel: barrel.si }),
-    [chamber, shape, mode, canCbto, waterUsed, barrel.si],
+    () =>
+      seatBuilder({ chamber, shape, mode: seatMode, canCbto, water: waterUsed, barrel: barrel.si }),
+    [chamber, shape, seatMode, canCbto, waterUsed, barrel.si],
   )
   const seating = useMemo(
-    () => (seatBy && value !== undefined ? seatBy(value) : undefined),
-    [seatBy, value],
+    () => (seatBy && seatValue !== undefined ? seatBy(seatValue) : undefined),
+    [seatBy, seatValue],
   )
   const [stepBy, stepValue] = [ladderStep?.by, ladderStep?.value]
   const figureSeating = useMemo(
-    () => ladderSeating(seatBy, { by: stepBy, value: stepValue }, mode, seating),
-    [seatBy, stepBy, stepValue, mode, seating],
+    () => ladderSeating(seatBy, { by: stepBy, value: stepValue }, seatMode, seating),
+    [seatBy, stepBy, stepValue, seatMode, seating],
   )
+  /** Set by the slider's moves, cleared by its release. */
+  const [sliding, setSliding] = useState(false)
   // Combined without dimensions, each side's record figure with them, as on the cartridge page;
   // one frame for all, which reaches the longest COAL, so the bullet tip stays in view and the
   // outline stays put when the view changes; the bullet goes on top. In the workbench card the
@@ -794,19 +838,31 @@ function useSeatingModel(p: PreviewProps) {
     isCard(slots, designer),
   ]
   const drawn = fixed?.drawn
+  const cardViews = useMemo(
+    () => cardViewsOf(spec, designer, drawn, unit),
+    [spec, designer, drawn, unit],
+  )
+  const levelViews = useMemo(
+    () => levelViewsOf(spec, inCard || designer, designer, drawn, unit),
+    [spec, inCard, designer, drawn, unit],
+  )
+  // the dimension layout is the costly part of a move: while the slider moves the lengths on the
+  // drawing follow when it rests, the bullet itself follows each move
+  const { coal: shownCoal, cbto: shownCbto } = useRestedLengths(coal, cbto, sliding)
   const models = useMemo(
-    () => cardModels(spec, designer, drawn, unit, inCard ? coalOf(coal, cbto) : undefined),
-    [spec, drawn, unit, inCard, designer, coal, cbto],
+    () => cardViews(inCard ? coalOf(shownCoal, shownCbto) : undefined),
+    [cardViews, inCard, shownCoal, shownCbto],
   )
   const levelModels = useMemo(
-    () => levelViewsOf(spec, inCard || designer, designer, drawn, unit, coalOf(coal, cbto)),
-    [spec, drawn, unit, inCard, designer, coal, cbto],
+    () => levelViews(coalOf(shownCoal, shownCbto)),
+    [levelViews, shownCoal, shownCbto],
   )
   // the slider's range in the mode's length, for the seating ladder
   const ladderShift = ladderShiftOf(shape, mode)
+  const seatShift = ladderShiftOf(shape, seatMode)
   const seatAt = useMemo(
-    () => seatAtOf(seatBy, range, mode, ladderShift),
-    [seatBy, range, mode, ladderShift],
+    () => seatAtOf(seatBy, range, seatMode, seatShift),
+    [seatBy, range, seatMode, seatShift],
   )
   const onSeatAt = useRef(onSeatLadder)
   onSeatAt.current = onSeatLadder
@@ -816,9 +872,13 @@ function useSeatingModel(p: PreviewProps) {
   }, [seatAt])
 
   const figure = useMemo(() => figureOf(spec, seating), [spec, seating])
-  const atStart = pos.si === started?.si && mode === started?.mode
+  const atStart = seatPos.si === started?.si && seatMode === started?.mode
   const caseVolume = caseVolumeOf(measured, water)
-  useReportSeated(p.onSeated, { caseVolume, seating, barrel: barrel.si, mode, atStart, figure })
+  useReportSeated(
+    p.onSeated,
+    { caseVolume, seating, barrel: barrel.si, mode: seatMode, atStart, figure },
+    sliding,
+  )
 
   const fmt = unitFormats(system)
   const contact = contactText(seating, fmt.mm)
@@ -878,6 +938,7 @@ function useSeatingModel(p: PreviewProps) {
     warnings,
     live,
     changeMode,
+    setSliding,
     canCbto,
     measuredWaterCapacity,
   }
@@ -1196,6 +1257,7 @@ function SeatSlider({ m, range }: { m: Model; range: readonly [number, number] }
   const { id, mode, pos, length, system } = m
   const step = system.length.step
   const toShown = (x: number) => length.fromSi(toSi('length', x + m.ladderShift))
+  const release = () => m.setSliding(false)
   return (
     <div className="field seating-slider">
       <label htmlFor={`${id}-slider`}>Slide to change {seatingLengthName[mode]}</label>
@@ -1211,7 +1273,15 @@ function SeatSlider({ m, range }: { m: Model; range: readonly [number, number] }
             ? undefined
             : `${formatQuantity('length', system, pos.si)} ${length.symbol}`
         }
-        onChange={(e) => m.setPos(slidTo(Number(e.target.value), m, step))}
+        onChange={(e) => {
+          m.setSliding(true)
+          m.setPos(slidTo(Number(e.target.value), m, step))
+        }}
+        onPointerUp={release}
+        onPointerCancel={release}
+        onLostPointerCapture={release}
+        onKeyUp={release}
+        onBlur={release}
       />
     </div>
   )
