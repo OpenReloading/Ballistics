@@ -4,7 +4,7 @@ import { chamberOf, coalRange, previewDrawn } from '@open-reloading/drawing/seat
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { drawable } from '../src/lib/cartridge-sheet.ts'
-import { figureViewBuilder, figureViews } from '../src/lib/figure-views.ts'
+import { figureViewBuilder } from '../src/lib/figure-views.ts'
 import { defined, missing } from './defined.ts'
 import { sheetRecord } from './records.ts'
 
@@ -13,6 +13,16 @@ const { TechnicalDrawing } = await import('../src/components/technical-drawing.t
 const { CartridgeDrawing } = await import('../src/components/cartridge-drawing.tsx')
 
 const record = (id: string) => drawable(sheetRecord(id))
+
+/** One call of the builder: the views for `seated`. */
+const figureViews = (
+  spec: Parameters<typeof figureViewBuilder>[0],
+  preview: Parameters<typeof figureViewBuilder>[1],
+  unit: Parameters<typeof figureViewBuilder>[2],
+  seated?: Parameters<ReturnType<typeof figureViewBuilder>>[0],
+  medium?: Parameters<typeof figureViewBuilder>[3],
+  views?: Parameters<typeof figureViewBuilder>[4],
+) => figureViewBuilder(spec, preview, unit, medium, views)(seated)
 
 /** The screen SVG's view box and style, and the transforms and outline of every part group. */
 const placement = (svg: string) => ({
@@ -129,7 +139,7 @@ describe("the workbench card's Cartridge view", () => {
     expect(seated?.labels.map((l) => l.text)).toContain('COAL 68.74')
   })
 
-  it('a builder reused across seatings gives what a fresh one gives, with the shared frame', () => {
+  it('a builder reused across seatings gives what a fresh one gives', () => {
     const reused = figureViewBuilder(spec, undefined, 'mm')
     for (const seated of [{ coal: 68.74, cbto: 52.74 }, { coal: 72.1 }, undefined, { coal: 60 }]) {
       const fresh = figureViews(spec, undefined, 'mm', seated)

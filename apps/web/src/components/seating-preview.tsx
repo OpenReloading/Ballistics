@@ -659,13 +659,12 @@ const slideWait = 150
 /**
  * The interior fields follow the seated bullet, derived from COAL. The page recomputes from the
  * report, so it goes in a transition, the next slider move first. While the slider moves only the
- * last report is sent, after `slideWait` ms or at once from the returned `flush` (the slider's
- * release).
+ * last report is sent, after `slideWait` ms or at once when the slider is released.
  */
 function useReportSeated(
   onSeated: (values: Seated) => void,
   o: Parameters<typeof seatedReport>[0],
-  sliding: RefObject<boolean>,
+  sliding: boolean,
 ) {
   const seated = useRef(onSeated)
   seated.current = onSeated
@@ -690,30 +689,22 @@ function useReportSeated(
   // biome-ignore lint/correctness/useExhaustiveDependencies: the reported values only, not the seating object
   useEffect(() => {
     const values = seatedReport({ caseVolume, seating, barrel, mode, atStart, figure })
-    if (sliding.current) return send.push(values)
+    if (sliding) return send.push(values)
     send.cancel()
     startTransition(() => seated.current(values))
-  }, [...key, figure])
-  return () => {
-    sliding.current = false
-    send.flush()
-  }
+  }, [...key, figure, sliding])
 }
 
 /** The seated lengths; while the slider moves, as they were `slideWait` ms after its last move. */
-function useRestedLengths(
-  coal: number | undefined,
-  cbto: number | undefined,
-  sliding: RefObject<boolean>,
-) {
+function useRestedLengths(coal: number | undefined, cbto: number | undefined, sliding: boolean) {
   const [rested, setRested] = useState({ coal, cbto })
   useEffect(() => {
     const rest = () => setRested((r) => (r.coal === coal && r.cbto === cbto ? r : { coal, cbto }))
-    if (!sliding.current) return rest()
+    if (!sliding) return rest()
     const timer = setTimeout(rest, slideWait)
     return () => clearTimeout(timer)
   }, [coal, cbto, sliding])
-  return sliding.current ? rested : { coal, cbto }
+  return sliding ? rested : { coal, cbto }
 }
 
 function useLive(announce: string) {
@@ -831,7 +822,7 @@ function useSeatingModel(p: PreviewProps) {
     [seatBy, stepBy, stepValue, seatMode, seating],
   )
   /** Set by the slider's moves, cleared by its release. */
-  const sliding = useRef(false)
+  const [sliding, setSliding] = useState(false)
   // Combined without dimensions, each side's record figure with them, as on the cartridge page;
   // one frame for all, which reaches the longest COAL, so the bullet tip stays in view and the
   // outline stays put when the view changes; the bullet goes on top. In the workbench card the
@@ -878,7 +869,7 @@ function useSeatingModel(p: PreviewProps) {
   const figure = useMemo(() => figureOf(spec, seating), [spec, seating])
   const atStart = seatPos.si === started?.si && seatMode === started?.mode
   const caseVolume = caseVolumeOf(measured, water)
-  const endSlide = useReportSeated(
+  useReportSeated(
     p.onSeated,
     { caseVolume, seating, barrel: barrel.si, mode: seatMode, atStart, figure },
     sliding,
@@ -942,8 +933,7 @@ function useSeatingModel(p: PreviewProps) {
     warnings,
     live,
     changeMode,
-    sliding,
-    endSlide,
+    setSliding,
     canCbto,
     measuredWaterCapacity,
   }
@@ -1237,6 +1227,7 @@ function SeatSlider({ m, range }: { m: Model; range: readonly [number, number] }
   const { id, mode, pos, length, system } = m
   const step = system.length.step
   const toShown = (x: number) => length.fromSi(toSi('length', x + m.ladderShift))
+  const release = () => m.setSliding(false)
   return (
     <div className="field seating-slider">
       <label htmlFor={`${id}-slider`}>Slide to change {seatingLengthName[mode]}</label>
@@ -1253,12 +1244,14 @@ function SeatSlider({ m, range }: { m: Model; range: readonly [number, number] }
             : `${formatQuantity('length', system, pos.si)} ${length.symbol}`
         }
         onChange={(e) => {
-          m.sliding.current = true
+          m.setSliding(true)
           m.setPos(slidTo(Number(e.target.value), m, step))
         }}
-        onPointerUp={m.endSlide}
-        onKeyUp={m.endSlide}
-        onBlur={m.endSlide}
+        onPointerUp={release}
+        onPointerCancel={release}
+        onLostPointerCapture={release}
+        onKeyUp={release}
+        onBlur={release}
       />
     </div>
   )
