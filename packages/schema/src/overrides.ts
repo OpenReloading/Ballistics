@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { bullet } from './bullet.ts'
 import { cartridge } from './cartridge.ts'
+import { type Powder, powder } from './powder.ts'
 import { specValue } from './standards.ts'
 
 /**
@@ -136,6 +137,54 @@ const {
   ...cartridgeShape
 } = cartridge.shape
 
+const {
+  id: _powderId,
+  manufacturer: _powderManufacturer,
+  name: _powderName,
+  country: _powderCountry,
+  provenance: _powderProvenance,
+  composition: _powderComposition,
+  temperatureSensitivity: _powderSensitivity,
+  ...powderShape
+} = powder.shape
+
+/** One ingredient of a powder draft: the printed name, CAS number and mass percent range, each still optional. */
+const compositionDraft = z.object({
+  name: z
+    .string()
+    .describe('Name of the ingredient as the safety data sheet prints it.')
+    .optional(),
+  cas: z.string().describe('CAS registry number of the ingredient.').optional(),
+  min: z.number().describe('Lower end of the mass percent range.').optional(),
+  max: z.number().describe('Upper end of the mass percent range.').optional(),
+})
+
+/** The fields of a powder draft that {@link powderDraft} types, in stored units. */
+type PowderDraftFields = Overrides<
+  Omit<
+    Powder,
+    | 'id'
+    | 'manufacturer'
+    | 'name'
+    | 'country'
+    | 'provenance'
+    | 'composition'
+    | 'temperatureSensitivity'
+  >
+> & { composition?: z.infer<typeof compositionDraft>[] | null }
+
+/**
+ * The fields of a powder in the powder designer while the draft is unfinished: any of the powder
+ * record's fields but `id`, `manufacturer`, `name`, `country`, `provenance` and
+ * `temperatureSensitivity`, every one optional, nested objects likewise, in the stored units.
+ * The designer builds a {@link Powder} from it and checks that against `powder`.
+ * Inferred type: {@link PowderDraft}.
+ */
+export const powderDraft = overridesOf(
+  z.object({ ...powderShape, composition: z.array(compositionDraft).max(40) }),
+  'powder',
+) as z.ZodType<PowderDraftFields>
+
 /**
  * The overrides of a bullet record: any of its fields but `id`, `manufacturer` (the user bullet's
  * own `manufacturer`) and `provenance`, in the stored units, `null` removes a field.
@@ -178,6 +227,8 @@ export const cartridgeOverrides = overridesOf(
   }
 >
 
+/** The fields of a powder in the powder designer: a partial of {@link Powder} in stored units. */
+export type PowderDraft = z.infer<typeof powderDraft>
 /** The overrides of a bullet: a partial of {@link Bullet} in stored units. */
 export type BulletOverrides = z.infer<typeof bulletOverrides>
 /** The overrides of a cartridge: a partial of {@link Cartridge} in stored units. */

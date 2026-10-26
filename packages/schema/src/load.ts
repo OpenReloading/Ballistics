@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { catalogueRef, recordId, ref } from './ids.ts'
+import { recordId, ref } from './ids.ts'
 import { type Provenance, provenance } from './provenance.ts'
 import { text } from './shared.ts'
 import { type QuantityKind, quantity, units } from './units.ts'
@@ -181,8 +181,10 @@ const loadShape = z.object({
     .describe('The bullet: a reference, or a description in a measured catalogue load.')
     .optional(),
   powder: z
-    .union([catalogueRef('powder'), powderDescription])
-    .describe('The powder: a catalogue reference, or a description in a measured catalogue load.')
+    .union([ref('powder'), powderDescription])
+    .describe(
+      'The powder: a reference, or a description in a measured catalogue load. A catalogue load names a catalogue powder.',
+    )
     .optional(),
   powderLot: component.lot
     .describe('Lot number of the powder, as printed on the package.')

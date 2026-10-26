@@ -4,7 +4,8 @@ import { chronoSession } from './chrono-session.ts'
 import { firearm } from './firearm.ts'
 import { catalogueRef, parseRef, ref, userIdRegex } from './ids.ts'
 import { load } from './load.ts'
-import { bulletOverrides, cartridgeOverrides } from './overrides.ts'
+import { bulletOverrides, cartridgeOverrides, powderDraft } from './overrides.ts'
+import { provenanceKind } from './provenance.ts'
 import { text } from './shared.ts'
 import { faceColour } from './target-face.ts'
 import { targetSheet } from './target-sheet.ts'
@@ -60,6 +61,22 @@ export const userCartridge = z.object({
       'The fields and spec values that differ from the base record, or all of them without one. A value with `null` removes the base value of its side, symbol and variant.',
     )
     .optional(),
+})
+
+/**
+ * A powder of the user in the powder designer: the powder fields entered so far in stored units,
+ * each optional while the draft is unfinished, and the provenance kind the designer builds the
+ * record's provenance with. The record's `name` is the powder's name.
+ * Inferred type: {@link UserPowder}.
+ */
+export const userPowder = z.object({
+  origin: z.literal('user').describe('Where the record lives: `user`.'),
+  provenanceKind: provenanceKind
+    .describe(
+      'How the values came about: the kind of the provenance the designer builds. Burn-law parameters need `fitted`.',
+    )
+    .optional(),
+  draft: powderDraft.describe('The powder fields entered so far, in stored units.').optional(),
 })
 
 /**
@@ -124,9 +141,9 @@ const base = {
   saved: z.iso.datetime().describe('Time of the last save, ISO 8601 in UTC.'),
 }
 
-/** Why a bullet or cartridge id that is no UUID is refused: a load refers to the record by `user:<UUID>`. */
+/** Why a bullet, cartridge or powder id that is no UUID is refused: a load refers to the record by `user:<UUID>`. */
 export const designIdProblem: string =
-  'The id of a bullet or cartridge must be a UUID, so that a load can refer to it.'
+  'The id of a bullet, cartridge or powder must be a UUID, so that a load can refer to it.'
 
 const record = <K extends string, D extends z.ZodType>(
   kind: K,
@@ -141,7 +158,7 @@ const record = <K extends string, D extends z.ZodType>(
     data: data.describe(description),
   })
 
-/** The id of a bullet or cartridge: a UUID, as {@link userId}, since loads refer to them. */
+/** The id of a bullet, cartridge or powder: a UUID, as {@link userId}, since loads refer to them. */
 const designId = z
   .string()
   .regex(userIdRegex, designIdProblem)
@@ -161,6 +178,7 @@ export const userRecord = z.discriminatedUnion(
     record('manufacturer', 'A manufacturer typed by the user.', userManufacturer),
     record('bullet', 'A bullet of the bullet designer.', userBullet, designId),
     record('cartridge', 'A cartridge of the cartridge designer.', userCartridge, designId),
+    record('powder', 'A powder of the powder designer.', userPowder, designId),
     record('caseCapacity', 'A case capacity the user measured, in g.', caseCapacity),
     record('load', 'A load of the workbench, in stored units.', load),
     record('firearm', 'A firearm of the library, in stored units.', firearm),
@@ -242,7 +260,7 @@ export interface DanglingRef {
 
 /**
  * The references of `records` to user records that no record of `records` answers: a load's
- * `firearm`, `cartridge`, `bullet` and `capacity`, the `manufacturer` of its primer and case, a bullet's and a firearm's `manufacturer`, a capacity's
+ * `firearm`, `cartridge`, `bullet`, `powder` and `capacity`, the `manufacturer` of its primer and case, a bullet's and a firearm's `manufacturer`, a capacity's
  * `cartridge` and `caseManufacturer` (only as `user:<id>`), a load's `sessions`, a session's device
  * `manufacturer` and the `load` of its strings, and a target sheet's `load` and the `session` of
  * its group shots. A
@@ -291,6 +309,7 @@ function userRefsOf(r: UserRecord): [string, string | undefined, UserRecordKind,
         ['firearm', r.data.firearm, 'firearm', true],
         ['cartridge', r.data.cartridge, 'cartridge', true],
         ['bullet', typeof r.data.bullet === 'string' ? r.data.bullet : undefined, 'bullet', true],
+        ['powder', typeof r.data.powder === 'string' ? r.data.powder : undefined, 'powder', true],
         ['capacity', r.data.capacity, 'caseCapacity', true],
         ['primer.manufacturer', r.data.primer?.manufacturer, 'manufacturer', true],
         ['case.manufacturer', r.data.case?.manufacturer, 'manufacturer', true],
@@ -350,6 +369,8 @@ export function versionProblem(json: unknown): string | undefined {
 
 /** A user manufacturer: its `name` is the record's name. */
 export interface UserManufacturer extends z.infer<typeof userManufacturer> {}
+/** A user powder: the fields of a powder entered in the designer, a draft until the record is valid. */
+export interface UserPowder extends z.infer<typeof userPowder> {}
 /** A user bullet: a variant of a catalogue bullet, or a bullet of its own. */
 export interface UserBullet extends z.infer<typeof userBullet> {}
 /** A user cartridge: a variant of a catalogue cartridge, or a cartridge of its own. */
@@ -364,7 +385,7 @@ export type SessionRecord = Extract<UserRecord, { kind: 'session' }>
 export type TargetSheetRecord = Extract<UserRecord, { kind: 'targetSheet' }>
 /** One record of a user data file: `kind`, id, name, save time and `data`. */
 export type UserRecord = z.infer<typeof userRecord>
-/** Discriminator of a user record: `manufacturer`, `bullet`, `cartridge`, `caseCapacity`, `load`, `firearm`, `session`, `targetSheet` or `targetFaceDesign`. */
+/** Discriminator of a user record: `manufacturer`, `bullet`, `cartridge`, `powder`, `caseCapacity`, `load`, `firearm`, `session`, `targetSheet` or `targetFaceDesign`. */
 export type UserRecordKind = UserRecord['kind']
 /** A base64 photo stored in a user data file, referenced by id. */
 export interface EmbeddedFile extends z.infer<typeof embeddedFile> {}
