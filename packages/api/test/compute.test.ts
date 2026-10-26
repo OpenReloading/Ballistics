@@ -279,7 +279,7 @@ describe('POST /exterior/trajectory', () => {
       { shot, ranges: tooMany },
       { shot, ranges, options: { maxSteps: 5001 } },
       { shot, ranges, extra: 1 },
-      { shot: { ...shot, firearm: { ...shot.firearm, sightHieght: 0.04 } }, ranges },
+      { shot: { ...shot, firearm: { ...shot.firearm, sightElevation: 0.04 } }, ranges },
     ]) {
       const { status, body } = await post(`${API_PREFIX}/exterior/trajectory`, payload)
       expect(status).toBe(400)
