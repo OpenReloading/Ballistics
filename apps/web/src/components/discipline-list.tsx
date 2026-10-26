@@ -186,7 +186,6 @@ export function FederationList({ items }: { items: FederationRow[] }) {
         }
         actions={<LinkButton href="/disciplines">Disciplines</LinkButton>}
       />
-      <LibraryTabs />
       <div className="directory">
         <DirectoryFilters
           query={state.query}

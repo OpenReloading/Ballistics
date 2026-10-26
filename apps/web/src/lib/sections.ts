@@ -1,5 +1,5 @@
 /** A tab of a library page: another route of it, listed in the page's tab bar. */
-export interface LibraryTab {
+interface LibraryTab {
   href: string
   label: string
   description: string

@@ -406,6 +406,8 @@ main .home-cards h3 {
 /* the tabs of a Library card: each a link with its record count */
 .home-cards .home-tabs {
   display: grid;
+  color: var(--muted);
+  font-size: var(--mantine-font-size-sm);
   gap: 0.125rem;
   width: 100%;
   margin: 0;
@@ -430,6 +432,12 @@ main .home-cards h3 {
 .library-tabs {
   flex: none;
   margin-bottom: 0.5rem;
+}
+
+@media print {
+  .library-tabs {
+    display: none;
+  }
 }
 
 @media (max-width: 47.99em) {

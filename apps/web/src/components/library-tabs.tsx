@@ -22,7 +22,7 @@ export function LibraryTabs() {
       activateTabWithKeyboard={false}
       className="library-tabs"
       onChange={(href) => {
-        if (!href) return
+        if (!href || href === route) return
         // read at the click: the list keeps its search in the address without rendering again
         const q = new URLSearchParams(window.location.search).get('q')
         router.push(q ? `${href}?${new URLSearchParams({ q })}` : href)
