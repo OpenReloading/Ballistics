@@ -76,6 +76,7 @@ jobs:
       - run: npm run lint
       - run: npm run build
       - run: npm run typecheck
+      - run: npm run deps:check
       - run: npm run docs:check
       - run: npm run data:validate
       # `npm run api:check` in the dev container; the same oasdiff version as .devcontainer/Dockerfile

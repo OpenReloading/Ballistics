@@ -31,11 +31,14 @@
     "data:validate": "npm run validate -w @open-reloading/data",
     "api:check": "npm run api-check -w @open-reloading/tools",
     "api:conformance": "npm run api-conformance -w @open-reloading/tools",
+    "deps:check": "depcruise packages/core/src packages/drawing/src packages/importers/src packages/importers/dist packages/schema/src packages/data/src packages/api/src apps/web/src --config .dependency-cruiser.cjs --output-type err",
     "docs:check": "npm run check -w @open-reloading/docs",
     "postinstall": "node patches/apply.mjs"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.15"
+    "@biomejs/biome": "^2.5.15",
+    "@swc/core": "^1.16.20",
+    "dependency-cruiser": "^18.7.0"
   },
   "overrides": {
     "@docusaurus/core": {
