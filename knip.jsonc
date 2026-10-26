@@ -43,7 +43,12 @@
       ]
     },
     "apps/docs": {
-      "entry": ["sidebars.ts", "src/theme/**/*.tsx", "src/components/*.tsx"],
+      // Docusaurus loads these without an import: the sidebars config and the swizzled theme files
+      "entry": [
+        "sidebars.ts",
+        "src/theme/SearchBar.tsx",
+        "src/theme/NavbarItem/ComponentTypes.tsx"
+      ],
       "ignoreDependencies": [
         // its stylesheet is imported by src/css/custom.css, which knip does not read
         "katex"
@@ -55,7 +60,6 @@
         "src/service-worker.js",
         // scripts/service-worker.mts copies every export into public/sw.js through a namespace import
         "src/lib/offline.ts",
-        "src/lib/*.worker.ts",
         "test/fixtures/target-photos/make.mts"
       ]
     },
