@@ -10,6 +10,11 @@
   /* the result notice: yellow, apart from the orange result warnings; 8:1 contrast */
   --caution-bg: #fff3bf;
   --caution-fg: #5c4400;
+  /* message variants (Message in states.tsx): text on its own fill, at least 4.5:1 */
+  --info-bg: #e8f0fe;
+  --info-fg: #0a3f9c;
+  --error-bg: #fdecea;
+  --error-fg: #9b1c1c;
   --surface: #f2f4f7;
   /* burn-rate chart series, slots 1 to 6 (apps/docs/docs/models/interior-burn-forms.md); each slot
      also has a dash pattern; light steps at least 3:1 against --bg, the chart background
@@ -73,6 +78,10 @@
     --warn-fg: #ffc48a;
     --caution-bg: #3a3000;
     --caution-fg: #ffe066;
+    --info-bg: #1b2a44;
+    --info-fg: #b5d0ff;
+    --error-bg: #3d1717;
+    --error-fg: #ffb4ab;
     --surface: #20242b;
     --series-1: #3987e5;
     --series-2: #d95926;
@@ -1891,6 +1900,10 @@ td.nowrap {
     --warn-fg: #8a3b00;
     --caution-bg: #fff3bf;
     --caution-fg: #5c4400;
+    --info-bg: #e8f0fe;
+    --info-fg: #0a3f9c;
+    --error-bg: #fdecea;
+    --error-fg: #9b1c1c;
     --surface: #f2f4f7;
     --gas: #e8590c;
     --copper: #b8693e;
@@ -2895,7 +2908,9 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .warnings-list ul {
+  max-height: 40svh;
   margin: 0;
+  overflow-y: auto;
   padding-left: 1.25rem;
 }
 
@@ -7588,6 +7603,78 @@ main .field-table tr.field-group > th {
 
   .range-card[data-paper="a4"] {
     page: range-a4;
+  }
+}
+
+/* one look for messages: the severity's fill and text, an edge in the text colour, and with it the
+   icon and the word, so colour is never the only signal */
+.message {
+  --alert-bd: 1px solid var(--message-fg);
+  --alert-bg: var(--message-bg);
+  --alert-color: var(--message-fg);
+
+  padding: 0.25rem 0.5rem;
+  border-inline-start: 4px solid var(--message-fg);
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1.3;
+}
+
+.message[data-severity="info"] {
+  --message-bg: var(--info-bg);
+  --message-fg: var(--info-fg);
+}
+
+.message[data-severity="warning"] {
+  --message-bg: var(--warn-bg);
+  --message-fg: var(--warn-fg);
+}
+
+.message[data-severity="error"] {
+  --message-bg: var(--error-bg);
+  --message-fg: var(--error-fg);
+}
+
+.message .mantine-Alert-wrapper {
+  gap: 0.5rem;
+}
+
+.message .mantine-Alert-title,
+.message .mantine-Alert-body {
+  color: var(--message-fg);
+}
+
+.message-label {
+  font-weight: 700;
+}
+
+/* a place for messages: its height does not change with none, one or many; the list scrolls */
+.message-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  height: 3.25rem;
+  min-width: 0;
+  margin: 0 0 0.5rem;
+  padding: 0;
+  overflow-y: auto;
+  border: 0;
+  overscroll-behavior: contain;
+}
+
+.message-slot > .message {
+  flex: none;
+}
+
+@media (max-width: 47.99em) {
+  .message-slot {
+    height: 4.5rem;
+  }
+}
+
+@media (forced-colors: active) {
+  .message {
+    border-color: CanvasText;
+    border-inline-start-color: Highlight;
   }
 }
 

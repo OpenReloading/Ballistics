@@ -61,6 +61,18 @@ describe('drawing tokens', () => {
       expect(light.get('--mantine-color-disabled-color')).toBe('var(--muted)')
       expect(ratio(tokens.get('--muted') as string, fill)).toBeGreaterThanOrEqual(4.5)
     })
+  // Message in states.tsx: each variant's text on its own fill
+  for (const [theme, tokens] of [
+    ['light', light],
+    ['dark', dark],
+  ] as const)
+    it(`gives each message variant 4.5:1 for its text on its fill in ${theme}`, () => {
+      for (const variant of ['info', 'warn', 'error'])
+        expect(
+          ratio(tokens.get(`--${variant}-fg`) as string, tokens.get(`--${variant}-bg`) as string),
+          variant,
+        ).toBeGreaterThanOrEqual(4.5)
+    })
   it('gives shot groups the light chart series colours', () => {
     const series = new Set([1, 2, 3, 4, 5, 6].map((k) => light.get(`--series-${k}`)))
     for (const colour of groupColours) expect(series.has(colour), colour).toBe(true)

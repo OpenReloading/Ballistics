@@ -143,8 +143,10 @@ export function WarningsBlock({
           </Button>
         </Popover.Target>
         <Popover.Dropdown id="warnings-list" className="warnings-list">
-          <h3>Warnings</h3>
-          <ul>
+          <h3 id="warnings-title">Warnings</h3>
+          {/* a list of any length keeps the popover's height: it scrolls, and takes focus to do so */}
+          {/* biome-ignore lint/a11y/noNoninteractiveTabindex: a scroll area must take focus to scroll */}
+          <ul tabIndex={0} aria-labelledby="warnings-title">
             {warnings.map((w) => (
               <li key={w.text}>
                 <span className="warn-icon">

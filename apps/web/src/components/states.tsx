@@ -1,7 +1,7 @@
 'use client'
 
 import { Alert, Button, EmptyState, Group, Skeleton, Stack, Text } from '@mantine/core'
-import { FunnelX, WarningCircle } from '@phosphor-icons/react'
+import { FunnelX, Info, Warning, WarningOctagon } from '@phosphor-icons/react'
 import { useRouter } from 'next/navigation'
 import type { ReactNode } from 'react'
 import { controlSize } from '../lib/theme.ts'
@@ -63,6 +63,107 @@ export function Loading({
   )
 }
 
+/** How serious a message is: a note, something to check, or something that failed. */
+export type Severity = 'info' | 'warning' | 'error'
+
+/** One entry of a `MessageSlot`. */
+export interface MessageEntry {
+  severity: Severity
+  text: ReactNode
+}
+
+const severities = {
+  info: { word: 'Note', color: 'blue', Icon: Info },
+  warning: { word: 'Warning', color: 'orange', Icon: Warning },
+  error: { word: 'Error', color: 'red', Icon: WarningOctagon },
+} as const
+
+/**
+ * The one message: icon, the severity's word and the text, so colour is never the only signal. An
+ * error is announced at once (`role="alert"`), a note or warning politely (`role="status"`).
+ */
+export function Message({
+  severity,
+  title,
+  children,
+  onRetry,
+  compact = false,
+}: {
+  severity: Severity
+  title?: string | undefined
+  children?: ReactNode
+  /** Retry button under the text. */
+  onRetry?: (() => void) | undefined
+  /** No margin: for a slot that sets the room. */
+  compact?: boolean | undefined
+}) {
+  const { word, color, Icon } = severities[severity]
+  const label = <span className="message-label">{word}:</span>
+  return (
+    <Alert
+      className="message"
+      data-severity={severity}
+      color={color}
+      variant="light"
+      role={severity === 'error' ? 'alert' : 'status'}
+      title={
+        title && (
+          <>
+            {label} {title}
+          </>
+        )
+      }
+      icon={<Icon size={20} aria-hidden="true" />}
+      {...(compact ? {} : { my: 'xs' })}
+    >
+      {!title && label}
+      {!title && children && ' '}
+      {children}
+      {onRetry && (
+        <Button
+          display="block"
+          size={controlSize.row.button}
+          variant="default"
+          mt={children ? 'xs' : 0}
+          onClick={onRetry}
+        >
+          Retry
+        </Button>
+      )}
+    </Alert>
+  )
+}
+
+/**
+ * A place for messages that keeps one size whether it holds none, one or many: a box of fixed
+ * height whose list scrolls, reachable with Tab while it holds a message. `label` names the
+ * region. It stays mounted, so a message that appears is announced and nothing below moves.
+ */
+export function MessageSlot({
+  label,
+  messages,
+}: {
+  label: string
+  messages: readonly MessageEntry[]
+}) {
+  return (
+    <fieldset
+      className="message-slot"
+      aria-label={label}
+      // a box that may scroll takes focus, so the keyboard reaches the rest of the list
+      tabIndex={messages.length > 0 ? 0 : undefined}
+      data-count={messages.length}
+    >
+      {messages.map((m, k) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: messages have no identity
+        <Message key={k} severity={m.severity} compact>
+          {m.text}
+        </Message>
+      ))}
+    </fieldset>
+  )
+}
+
 /**
  * The one inline alert: what failed, and Retry with `onRetry`. `color` orange marks a warning
  * that is no failure.
@@ -79,26 +180,9 @@ export function ErrorNote({
   color?: 'red' | 'orange'
 }) {
   return (
-    <Alert
-      color={color}
-      variant="light"
-      title={title}
-      icon={<WarningCircle size={20} aria-hidden="true" />}
-      my="xs"
-    >
+    <Message severity={color === 'red' ? 'error' : 'warning'} title={title} onRetry={onRetry}>
       {children}
-      {onRetry && (
-        <Button
-          display="block"
-          size={controlSize.row.button}
-          variant="default"
-          mt={children ? 'xs' : 0}
-          onClick={onRetry}
-        >
-          Retry
-        </Button>
-      )}
-    </Alert>
+    </Message>
   )
 }
 

@@ -10,6 +10,7 @@ import { cssMm, ladderMarks, markDiameterMm, maxMarkMm, rulerMm } from '../lib/l
 import { formatQuantity, type UnitSystem } from '../lib/units.ts'
 import { NumberField } from './number-field.tsx'
 import { printAlone, usePortalBody } from './print.ts'
+import { type MessageEntry, MessageSlot } from './states.tsx'
 import { useFieldUnits } from './units-settings.tsx'
 
 const specs = [
@@ -56,6 +57,21 @@ export function LadderTarget({
   const diameter = valid ? markDiameterMm(distance, size) : undefined
   const marks = valid ? ladderMarks(labels, distance, size) : []
   const tooBig = diameter !== undefined && diameter > maxMarkMm
+  // the field errors and the size note share one slot of fixed height under the fields
+  const messages: MessageEntry[] = [
+    ...specs.flatMap((s) => {
+      const error = errors[s.key]
+      return error ? [{ severity: 'error' as const, text: error }] : []
+    }),
+    ...(tooBig
+      ? [
+          {
+            severity: 'warning' as const,
+            text: `A mark of ${Math.round(diameter)} mm does not fit a sheet: choose a smaller size or distance.`,
+          },
+        ]
+      : []),
+  ]
   return (
     <section className="ladder-target-controls" aria-labelledby="ladder-target-title">
       <h3 id="ladder-target-title">Ladder target</h3>
@@ -68,6 +84,7 @@ export function LadderTarget({
             value={fields[spec.key]}
             onChange={(v) => setFields((f) => ({ ...f, [spec.key]: v }))}
             error={errors[spec.key]}
+            hiddenError
           />
         ))}
         <Button
@@ -78,12 +95,7 @@ export function LadderTarget({
           Print ladder target
         </Button>
       </div>
-      {tooBig && (
-        <p className="note" role="status">
-          A mark of {Math.round(diameter)} mm does not fit a sheet: choose a smaller size or
-          distance.
-        </p>
-      )}
+      <MessageSlot label="Ladder target messages" messages={messages} />
       {body &&
         marks.length > 0 &&
         distance !== undefined &&
