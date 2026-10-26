@@ -9,8 +9,7 @@ export interface HuberLoss {
 }
 
 /** Huber loss of a weighted residual: r^2 up to `k`, then 2k|r| - k^2. */
-export const huberLoss = (r: number, k: number) =>
-  Math.abs(r) <= k ? r * r : 2 * k * Math.abs(r) - k * k
+const huberLoss = (r: number, k: number) => (Math.abs(r) <= k ? r * r : 2 * k * Math.abs(r) - k * k)
 
 /** The cost: the Huber loss on the first `count` residuals, squares on the rest. */
 export const huberCost = (r: number[], { threshold, count }: HuberLoss) =>

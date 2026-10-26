@@ -6,6 +6,15 @@
 - Lint and format check: `npm run lint` (Biome). Apply fixes: `npm run format`
 - Build all: `npm run build`, before `typecheck`, `test` and `data:validate` (workspaces import each other's `dist/`)
 - Type check all: `npm run typecheck`
+- Package import rules: `npm run deps:check` (after `build`: workspace imports resolve to `dist/`)
+  - dependency-cruiser with the rules of `.dependency-cruiser.cjs`, each named in its failure. It reads the sources of schema, core, drawing, importers, data, api and `apps/web/src` (not tests, scripts or configuration files), and the compiled files of importers, where a type import is erased, so any import of schema there is a runtime one.
+  - The rules for core, drawing, importers, schema, data, api and the web app are in `.dependency-cruiser.cjs`, each with a comment. No import may be unresolvable (else a rule would pass without seeing it).
+  - The swc parser reads the TypeScript, because dependency-cruiser 18.7.0 lists TypeScript below 7 as its supported range (`depcruise --info`). It does not tell `import type` from an import, so a type import counts too.
+  - `tools/test/deps.test.ts` runs the config over `tools/test/fixtures/deps-rules.json`, a mirror of the layout with the rule each forbidden import breaks. A new rule gets a violating and an allowed file there.
+- Unused code: `npm run knip` (after `build`)
+  - knip over every workspace, configured in `knip.jsonc`. Fails on an unused file, export, exported type or dependency, and on an unlisted binary.
+  - The `exports` of a package point into `dist`, which knip cannot map back to `src`, so each entry file of a package is listed in `knip.jsonc`. A new entry file (a package export, a worker, a script run by Node or CI) is added there. Every `ignore*` entry carries a one-line reason.
+  - A finding is fixed: drop the `export` of a symbol used only in its file, delete code nothing uses. `tools/test/knip.test.ts` checks that knip fails on each kind.
 - Doc comments: `npm run docs:check` (after `build`)
   - TypeDoc `validation.notDocumented`, warnings as errors, on every export of schema, core, drawing, importers, data and api. Not on properties, constructors, parameters and references. Without `notExported`.
   - Configured in `packages/<name>/typedoc.json`, the shared options in `packages/typedoc.base.json`.
@@ -32,7 +41,7 @@
 - Pages edition (GitHub Pages, no server): `apps/web/AGENTS.md`, Pages edition.
 - One workspace: `npm run <script> -w @open-reloading/<name>`
 - CI (`.github/workflows/ci.yml`) runs the checks above except the docs site build and the Pages edition.
-  - The required check `check` is the job that waits for `static` (lint, build, typecheck, docs check, data validation, API breaking changes, audit) and `test (drawing)`, `test (web)`, `test (packages)`, which run in parallel and together run what `npm test` runs. Add a workspace's tests to one of the `test` groups in `ci.yml` when the root `test` script gains it.
+  - The required check `check` is the job that waits for `static` (lint, build, typecheck, import rules, docs check, data validation, API breaking changes, audit) and `test (drawing)`, `test (web)`, `test (packages)`, which run in parallel and together run what `npm test` runs. Add a workspace's tests to one of the `test` groups in `ci.yml` when the root `test` script gains it.
   - `e2e` runs against `docker compose up api web`, runs the drawing pixel baseline in the Playwright image (`npm run drawing-baseline -w @open-reloading/e2e`), builds the web app against that API, then runs `node apps/web/scripts/check-prerender.mts` and `npm run e2e:smoke` against that build.
   - On a pull request the `changes` job (`apps/web/scripts/ci-plan.mts`) can skip the `check` job (only prose changed), the `e2e` job (no change to what the API, the web app or the e2e specs read) or that web build (no change to the web app or what it builds from). It can build with `PRERENDER=sample` (no change to record data, record page code or the packages they read). The Turbopack cache (`apps/web/.next/cache/turbopack`) is restored.
   - A push to the default branch or any doubt builds from nothing, every record page prerendered and checked in full.
@@ -43,10 +52,10 @@
 
 - Changes start from a GitHub issue. Branches are cut from `develop` and merged back into it; `main` only receives the pull request from `develop` and the release pull request.
 - Published to npmjs.com: schema, core, drawing, importers, data (`apps/docs/docs/release.md`). Every other workspace stays `private`.
-- Package rules:
+- Package rules (`npm run deps:check` checks them):
   - `packages/core`: no runtime dependencies, no I/O, no database, no HTTP.
   - `packages/importers`: no I/O. Depends on `@open-reloading/schema` for types only.
-  - `packages/drawing`: no runtime dependencies, no I/O, no React, DOM or Next.js. Values in stored mm and degrees. `test/imports.test.ts` checks the import rules.
+  - `packages/drawing`: no runtime dependencies, no I/O, no React, DOM or Next.js. Values in stored mm and degrees.
   - `packages/data`: git is the source of truth for records.
   - `packages/api`: depends on core, data and schema.
   - `apps/web`: reads from the API, renders the figure models of `@open-reloading/drawing`. No database access or solver logic in route handlers.

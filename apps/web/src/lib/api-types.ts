@@ -178,7 +178,7 @@ export type SampledBand =
     }
 
 /** The 5th, 50th and 95th percentile of a sampled quantity. */
-export interface SampledPercentiles {
+interface SampledPercentiles {
   p05: number
   p50: number
   p95: number

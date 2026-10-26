@@ -12,7 +12,7 @@ export interface WorkbookOptions extends ChronoParserOptions {
 }
 
 /** The shots, label and bore flags of one worksheet, read as one string of shots. */
-export interface WorksheetString {
+interface WorksheetString {
   shots: ChronoShot[]
   label: string
   /** Bore flags as `shot <n> <flag>`. */

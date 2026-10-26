@@ -35,7 +35,7 @@ export interface Row {
 }
 
 /** An event row; its numbers are `event.<id>.<distance|gauge>`. */
-export interface Event {
+interface Event {
   id: string
   name: string
 }
@@ -85,7 +85,7 @@ const blankRing = (d: Design, r: Row) => empty(d, ringKeys(r.id)) && !r.fill && 
 const blankEvent = (d: Design, e: Event) => empty(d, eventKeys(e.id)) && e.name.trim() === ''
 
 export const liveRows = (d: Design) => d.rows.filter((r) => !blankRing(d, r))
-export const liveEvents = (d: Design) => d.events.filter((e) => !blankEvent(d, e))
+const liveEvents = (d: Design) => d.events.filter((e) => !blankEvent(d, e))
 
 export function newDesign(): Design {
   const rows = [

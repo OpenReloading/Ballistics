@@ -161,7 +161,7 @@ export function searchBullets<R extends BulletRow>(
 }
 
 /** The G7 coefficient, else the G1 one: what the picker's BC column and sort show. */
-export const bc = (b: Pick<BulletSummary, 'ballisticCoefficientG1' | 'ballisticCoefficientG7'>) =>
+const bc = (b: Pick<BulletSummary, 'ballisticCoefficientG1' | 'ballisticCoefficientG7'>) =>
   b.ballisticCoefficientG7 ?? b.ballisticCoefficientG1
 
 /**

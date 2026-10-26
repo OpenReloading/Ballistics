@@ -1,0 +1,170 @@
+{
+  "packages/drawing/src/core/geometry.ts": {
+    "source": "export const geometry = 1",
+    "rules": []
+  },
+  "packages/drawing/src/cartridge/profile.ts": {
+    "source": "import { geometry } from '../core/geometry.ts'\nexport const profile = geometry",
+    "rules": []
+  },
+  "packages/drawing/src/bullet/outline.ts": {
+    "source": "import { geometry } from '../core/geometry.ts'\nexport const outline = geometry",
+    "rules": []
+  },
+  "packages/drawing/src/seating/seating.ts": {
+    "source": "export const seat = 1",
+    "rules": []
+  },
+  "packages/drawing/src/seating/uses-cartridge-and-bullet.ts": {
+    "source": "import { profile } from '../cartridge/profile.ts'\nimport { outline } from '../bullet/outline.ts'\nexport const both = [profile, outline]",
+    "rules": []
+  },
+  "packages/drawing/src/target/face.ts": {
+    "source": "export const face = 1",
+    "rules": []
+  },
+  "packages/drawing/src/index.ts": {
+    "source": "export { geometry } from './core/geometry.ts'",
+    "rules": []
+  },
+  "apps/web/src/lib/api-types.ts": {
+    "source": "export type SpecValue = number",
+    "rules": []
+  },
+  "packages/drawing/src/core/up-cartridge.ts": {
+    "source": "import { profile } from '../cartridge/profile.ts'\nexport { profile }",
+    "rules": ["drawing-core-imports"]
+  },
+  "packages/drawing/src/core/up-seating.ts": {
+    "source": "import type { seat } from '../seating/seating.ts'\nexport type Seat = typeof seat",
+    "rules": ["drawing-core-imports"]
+  },
+  "packages/drawing/src/dynamic-react-dom.ts": {
+    "source": "export const dom = await import('react-dom')",
+    "rules": ["drawing-core-imports", "not-to-unresolvable"]
+  },
+  "packages/drawing/src/cartridge/to-bullet.ts": {
+    "source": "import { outline } from '../bullet/outline.ts'\nexport { outline }",
+    "rules": ["drawing-cartridge-imports"]
+  },
+  "packages/drawing/src/cartridge/to-seating.ts": {
+    "source": "import { seat } from '../seating/seating.ts'\nexport { seat }",
+    "rules": ["drawing-cartridge-imports"]
+  },
+  "packages/drawing/src/bullet/reexport-cartridge.ts": {
+    "source": "export { profile } from '../cartridge/profile.ts'",
+    "rules": ["drawing-bullet-imports"]
+  },
+  "packages/drawing/src/bullet/to-seating.ts": {
+    "source": "import { seat } from '../seating/seating.ts'\nexport { seat }",
+    "rules": ["drawing-bullet-imports"]
+  },
+  "packages/drawing/src/seating/react.ts": {
+    "source": "import { useMemo } from 'react'\nexport { useMemo }",
+    "rules": ["drawing-seating-imports", "not-to-unresolvable"]
+  },
+  "packages/drawing/src/seating/next.ts": {
+    "source": "import Link from 'next/link'\nexport { Link }",
+    "rules": ["drawing-seating-imports", "not-to-unresolvable"]
+  },
+  "packages/drawing/src/seating/node-fs.ts": {
+    "source": "import { readFileSync } from 'node:fs'\nexport { readFileSync }",
+    "rules": ["drawing-seating-imports"]
+  },
+  "packages/drawing/src/seating/workspace-package.ts": {
+    "source": "import { waterDensity } from '@open-reloading/core'\nexport { waterDensity }",
+    "rules": ["drawing-seating-imports", "not-to-unresolvable"]
+  },
+  "packages/drawing/src/seating/into-web.ts": {
+    "source": "import type { SpecValue } from '../../../../apps/web/src/lib/api-types.ts'\nexport type Spec = SpecValue",
+    "rules": ["drawing-seating-imports"]
+  },
+  "packages/drawing/src/target/to-core.ts": {
+    "source": "import { geometry } from '../core/geometry.ts'\nexport { geometry }",
+    "rules": ["drawing-target-imports"]
+  },
+  "packages/core/src/node-fs.ts": {
+    "source": "import { readFileSync } from 'node:fs'\nexport { readFileSync }",
+    "rules": ["core-imports-nothing"]
+  },
+  "packages/core/src/npm-package.ts": {
+    "source": "import { z } from 'zod'\nexport { z }",
+    "rules": ["core-imports-nothing", "not-to-unresolvable"]
+  },
+  "packages/core/src/missing.ts": {
+    "source": "import './nope.ts'",
+    "rules": ["core-imports-nothing", "not-to-unresolvable"]
+  },
+  "packages/importers/src/types-of-schema.ts": {
+    "source": "import type { ChronoShot } from '@open-reloading/schema'\nexport type Shot = ChronoShot",
+    "rules": ["not-to-unresolvable"]
+  },
+  "packages/importers/src/node-fs.ts": {
+    "source": "import { readFileSync } from 'node:fs'\nexport { readFileSync }",
+    "rules": ["importers-imports-schema-only"]
+  },
+  "packages/importers/src/npm-package.ts": {
+    "source": "import { z } from 'zod'\nexport { z }",
+    "rules": ["importers-imports-schema-only", "not-to-unresolvable"]
+  },
+  "packages/importers/dist/clean.js": {
+    "source": "export const clean = 1",
+    "rules": []
+  },
+  "packages/importers/dist/runtime-schema.js": {
+    "source": "import { ChronoShot } from '@open-reloading/schema'\nexport { ChronoShot }",
+    "rules": ["importers-schema-for-types-only", "not-to-unresolvable"]
+  },
+  "packages/schema/src/zod.ts": {
+    "source": "import { z } from 'zod'\nexport { z }",
+    "rules": ["not-to-unresolvable"]
+  },
+  "packages/schema/src/core.ts": {
+    "source": "import { waterDensity } from '@open-reloading/core'\nexport { waterDensity }",
+    "rules": ["not-to-unresolvable", "schema-imports-no-workspace-package"]
+  },
+  "packages/data/src/schema-and-fs.ts": {
+    "source": "import { readFileSync } from 'node:fs'\nimport { Load } from '@open-reloading/schema'\nexport { readFileSync, Load }",
+    "rules": ["not-to-unresolvable"]
+  },
+  "packages/data/src/core.ts": {
+    "source": "import { waterDensity } from '@open-reloading/core'\nexport { waterDensity }",
+    "rules": ["data-imports-schema-only", "not-to-unresolvable"]
+  },
+  "packages/api/src/core-data-schema.ts": {
+    "source": "import { waterDensity } from '@open-reloading/core'\nimport { readRecords } from '@open-reloading/data'\nimport { Load } from '@open-reloading/schema'\nimport Fastify from 'fastify'\nexport { waterDensity, readRecords, Load, Fastify }",
+    "rules": ["not-to-unresolvable"]
+  },
+  "packages/api/src/importers.ts": {
+    "source": "import { parse } from '@open-reloading/importers'\nexport { parse }",
+    "rules": ["api-imports-core-data-schema-only", "not-to-unresolvable"]
+  },
+  "packages/api/src/web.ts": {
+    "source": "import type { SpecValue } from '../../../apps/web/src/lib/api-types.ts'\nexport type Spec = SpecValue",
+    "rules": ["api-imports-core-data-schema-only"]
+  },
+  "apps/web/src/lib/allowed.ts": {
+    "source": "import { checkSpec } from '@open-reloading/data/plausibility'\nimport { runTask } from '@open-reloading/api/compute'\nimport { openCatalogue } from '@open-reloading/api/catalogue'\nimport { waterDensity } from '@open-reloading/core'\nimport { seating } from '@open-reloading/drawing/seating'\nexport { checkSpec, runTask, openCatalogue, waterDensity, seating }",
+    "rules": ["not-to-unresolvable"]
+  },
+  "apps/web/src/lib/alias.ts": {
+    "source": "import type { SpecValue } from '@/lib/api-types.ts'\nexport type Spec = SpecValue",
+    "rules": []
+  },
+  "apps/web/src/lib/node-fs.ts": {
+    "source": "import { readFileSync } from 'node:fs'\nexport { readFileSync }",
+    "rules": ["web-no-node-builtins"]
+  },
+  "apps/web/src/lib/data-package.ts": {
+    "source": "import { readRecords } from '@open-reloading/data'\nexport { readRecords }",
+    "rules": ["not-to-unresolvable", "web-reads-api-only"]
+  },
+  "apps/web/src/lib/api-static.ts": {
+    "source": "import { startBundleApi } from '@open-reloading/api/static'\nexport { startBundleApi }",
+    "rules": ["not-to-unresolvable", "web-reads-api-only"]
+  },
+  "apps/web/src/lib/api-server.ts": {
+    "source": "import Fastify from 'fastify'\nexport { Fastify }",
+    "rules": ["not-to-unresolvable", "web-reads-api-only"]
+  }
+}

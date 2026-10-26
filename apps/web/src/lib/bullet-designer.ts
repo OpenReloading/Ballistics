@@ -101,12 +101,12 @@ export const choiceOptions = {
 } as const
 
 export type ChoiceKey = keyof typeof choiceOptions
-export type Choices = Record<ChoiceKey, string>
+type Choices = Record<ChoiceKey, string>
 
 const noChoices: Choices = { 'base.type': '', 'ogive.form': '', 'tip.type': '' }
 
 /** The catalogue record a design started from: SI values and choices. */
-export interface Origin {
+interface Origin {
   id: string
   title: string
   /** The `revision` of the catalogue record, as the API answered it. */

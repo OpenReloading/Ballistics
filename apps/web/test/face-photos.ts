@@ -16,7 +16,7 @@ export const photoKinds = ['whole', 'insert', 'zoom', 'corner', 'cut', 'skewed',
 export type PhotoKind = (typeof photoKinds)[number]
 
 /** Ring numerals as bars of a digit's size on both axes, in the zones outside the two innermost (dark on paper, light on black). */
-export function numerals(face: TargetFace, paper = 226, black = 30): NonNullable<Scene['marks']> {
+function numerals(face: TargetFace, paper = 226, black = 30): NonNullable<Scene['marks']> {
   const radii = face.rings.map((r) => r.diameter.value / 2).sort((a, b) => b - a)
   const blackR = face.blackDiameter.value / 2
   return radii.slice(0, -2).flatMap((r, i) => {

@@ -54,7 +54,7 @@ export interface ChronoImport {
 type Source = SessionCandidate['provenance']['sources'][0]
 
 /** The sha256 lowercase; throws unless it is 64 hex digits. */
-export function checkSha256(sha256: string): string {
+function checkSha256(sha256: string): string {
   const lower = sha256.toLowerCase()
   if (!/^[0-9a-f]{64}$/.test(lower)) throw new Error('sha256 must be 64 hex digits')
   return lower

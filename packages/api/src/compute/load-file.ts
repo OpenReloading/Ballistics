@@ -166,7 +166,7 @@ const valuePath = (at: Path, key: string): Path =>
   key === 'charge' ? [...at, 'charge'] : [...at, 'analysis', 'overrides', key]
 
 /** One solver value a load file lacks. */
-export interface MissingValue {
+interface MissingValue {
   /** The workbench key of the value. */
   key: string
   /** Where the file holds it: the load's `charge`, else its key under `analysis.overrides`. */
