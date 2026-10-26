@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import type { Case } from './case.ts'
 import { recordId, ref } from './ids.ts'
 import { type Provenance, provenance } from './provenance.ts'
 import { quantity } from './units.ts'
@@ -58,4 +59,21 @@ export interface CatalogueCaseCapacity extends CaseCapacity {
   id: string
   origin: 'catalogue'
   provenance: Provenance
+}
+
+/** Where the water capacity a load uses comes from: its capacity record, or the case product's stated figure. */
+export type CapacitySource = 'capacity' | 'case'
+
+/**
+ * The water capacity (g) a load uses and where it comes from. A capacity record the load names
+ * (one the user measured, or a catalogue figure chosen) takes precedence; without one the stated
+ * capacity of the case record is the default; with neither the capacity is unknown.
+ */
+export function loadWaterCapacity(records: {
+  capacity?: Pick<CaseCapacity, 'waterCapacity'> | undefined
+  case?: Pick<Case, 'waterCapacity'> | undefined
+}): { grams: number; source: CapacitySource } | undefined {
+  if (records.capacity) return { grams: records.capacity.waterCapacity.value, source: 'capacity' }
+  if (records.case?.waterCapacity)
+    return { grams: records.case.waterCapacity.value, source: 'case' }
 }

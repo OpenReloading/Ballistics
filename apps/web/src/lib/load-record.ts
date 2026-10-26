@@ -143,6 +143,8 @@ export interface LoadParts {
   notes: string
   /** The case capacity: a catalogue capacity, or the user record of the measured one. */
   capacity?: string | undefined
+  /** The case product of the catalogue the load names, a reference: its stated capacity is the default of `capacity`. */
+  caseRecord?: string | undefined
   /** m. */
   seating?: { by: 'overallLength' | 'baseToOgive'; value: number } | undefined
   ladder?:
@@ -208,18 +210,25 @@ export function toLoad(p: LoadParts): Load {
     analysis: analysisOf(overrides, ladder),
     sessions: p.sessions.length > 0 ? [...p.sessions] : undefined,
     ...lotsOf(p.lots),
+    case: caseOf(p.caseRecord, p.lots),
     snapshots: p.snapshots?.length ? [...p.snapshots] : undefined,
   }
 }
 
 /** The lots typed, as the load's fields; a lot left empty is left out. */
 function lotsOf(lots: Lots | undefined) {
-  const [powder, primer, kase] = [lots?.powder.trim(), lots?.primer.trim(), lots?.case.trim()]
+  const [powder, primer] = [lots?.powder.trim(), lots?.primer.trim()]
   return {
     powderLot: powder || undefined,
     primer: primer ? { lot: primer } : undefined,
-    case: kase ? { lot: kase } : undefined,
   }
+}
+
+/** The load's `case`: the case record chosen and the case lot typed; none when neither is set. */
+function caseOf(record: string | undefined, lots: Lots | undefined): Load['case'] {
+  const lot = lots?.case.trim()
+  if (!record && !lot) return undefined
+  return { ...(record && { record }), ...(lot && { lot }) } as NonNullable<Load['case']>
 }
 
 /**
@@ -246,6 +255,7 @@ export function toApiLoad(
     powder: catalogue.powder,
     firearm: undefined,
     capacity: undefined,
+    caseRecord: undefined,
     ladder: charge ? p.ladder : undefined,
     sessions: [],
     lots: undefined,

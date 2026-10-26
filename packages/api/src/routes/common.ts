@@ -28,6 +28,12 @@ export function revised<K extends CatalogueKind>(record: Catalogued<K>) {
   return { ...stored(record), revision: record.revision }
 }
 
+/** A record with its `origin` and `revision`, without the `kind`: the answer for a kind whose schema carries `origin`. */
+export function originated<K extends CatalogueKind>(record: Catalogued<K>) {
+  const { kind, ...rest } = record
+  return rest
+}
+
 /**
  * The answer for an id no record has: a permanent redirect to the record that replaced it in
  * `renames.json`, else 404 naming the `noun`.

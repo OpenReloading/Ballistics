@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { recordId, ref } from './ids.ts'
+import { catalogueRef, recordId, ref } from './ids.ts'
 import { type Provenance, provenance } from './provenance.ts'
 import { text } from './shared.ts'
 import { type QuantityKind, quantity, units } from './units.ts'
@@ -206,8 +206,15 @@ const loadShape = z.object({
       manufacturer: component.manufacturer.optional(),
       lot: component.lot,
       firingCount: z.int().min(0).describe('Times the case was fired before this load.').optional(),
+      record: catalogueRef('case')
+        .describe(
+          'The case product of the catalogue. Its stated water capacity is the default of `capacity`.',
+        )
+        .optional(),
     })
-    .describe('The case as described. Its water capacity is the `capacity` reference.')
+    .describe(
+      'The case as described. Its measured water capacity is the `capacity` reference, which takes precedence over the stated capacity of `record`.',
+    )
     .optional(),
   seating: z
     .object({

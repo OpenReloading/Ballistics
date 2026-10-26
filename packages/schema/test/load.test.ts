@@ -221,6 +221,14 @@ describe('Load', () => {
     expectIssueAt(load, { ...catalogueLoad, capacity: `user:${uuid}` }, 'capacity')
   })
 
+  it('names a case record by a catalogue reference, in a user load too', () => {
+    const record = 'catalogue:example-308-win-brass'
+    expect(load.parse({ ...userLoad, case: { firingCount: 2, record } }).case?.record).toBe(record)
+    expect(issuePaths(load, { ...catalogueLoad, case: { record } })).toEqual([])
+    expectIssueAt(load, { ...userLoad, case: { record: `user:${uuid}` } }, 'case.record')
+    expectIssueAt(load, { ...userLoad, case: { record: 'example-308-win-brass' } }, 'case.record')
+  })
+
   it('names its sessions by reference', () => {
     const sessions = [`user:${uuid}`, 'catalogue:example-session']
     expect(load.parse({ ...userLoad, sessions })).toEqual({ ...userLoad, sessions })

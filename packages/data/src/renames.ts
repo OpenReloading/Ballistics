@@ -11,6 +11,7 @@ function currentIds(bundle: Bundle): Record<RenameKind, Set<string>> {
     manufacturers: ids(bundle.manufacturers),
     powders: ids(bundle.powders),
     bullets: ids(bundle.bullets),
+    cases: ids(bundle.cases),
     'target-faces': ids(bundle.targetFaces),
     federations: ids(bundle.federations),
     disciplines: ids(bundle.disciplines),

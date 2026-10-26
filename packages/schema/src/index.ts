@@ -1,6 +1,7 @@
 export * from './bullet.ts'
 export * from './caliber-class.ts'
 export * from './cartridge.ts'
+export * from './case.ts'
 export * from './case-capacity.ts'
 export * from './chrono-session.ts'
 export * from './competition-order.ts'

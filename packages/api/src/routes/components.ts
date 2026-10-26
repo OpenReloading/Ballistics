@@ -1,11 +1,19 @@
-import { bullet, constructionFields, manufacturer, powder } from '@open-reloading/schema'
+import {
+  bullet,
+  cartridgeCase,
+  constructionFields,
+  manufacturer,
+  powder,
+  recordId,
+} from '@open-reloading/schema'
 import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
-import type { BulletQuery, Catalogue, Catalogued } from '../catalogue/types.ts'
+import type { BulletQuery, CaseQuery, Catalogue, Catalogued } from '../catalogue/types.ts'
 import {
   idParams,
   listQuery,
   missing,
+  originated,
   page,
   recordIdPattern,
   revised,
@@ -32,6 +40,19 @@ const bulletQuery = {
       maxLength: 100,
       description:
         'Cartridge id: only bullets that fit its CIP bullet diameter G1, bore F and groove Z.',
+    },
+  },
+} as const
+
+const caseQuery = {
+  ...powderQuery,
+  properties: {
+    ...powderQuery.properties,
+    cartridge: {
+      type: 'string',
+      pattern: recordIdPattern,
+      maxLength: 100,
+      description: 'Cartridge id: only the cases made for it.',
     },
   },
 } as const
@@ -72,11 +93,25 @@ const bulletList = page(
   }),
 )
 
+const caseList = page(
+  z.object({
+    id: recordId,
+    manufacturer: recordId,
+    cartridge: recordId,
+    name: z.string(),
+    productNumber: z.string(),
+    material: cartridgeCase.shape.material,
+    // the stated water capacity and the empty mass of the record, g
+    waterCapacity: z.number().optional(),
+    mass: z.number().optional(),
+  }),
+)
+
 const manufacturerList = page(
   manufacturer.pick({ id: true, name: true, aliases: true, website: true }),
 )
 
-/** `GET /manufacturers`, `GET /powders`, `GET /bullets` and their `/:id` routes. */
+/** `GET /manufacturers`, `GET /powders`, `GET /bullets`, `GET /cases` and their `/:id` routes. */
 // biome-ignore lint/suspicious/useAwait: FastifyPluginAsync returns a promise
 export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = async (
   app,
@@ -167,4 +202,36 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
       },
     )
   }
+  app.get<{ Querystring: CaseQuery }>(
+    '/cases',
+    {
+      schema: { querystring: caseQuery },
+      config: {
+        response: caseList,
+        summary: 'List cases',
+        description:
+          'A page of cartridge case products ordered by manufacturer name and name, digit runs in numeric order. `q` keeps the cases whose manufacturer name or alias followed by the product name, or by the product number, holds every word of it, in any order, and ranks them by match. Each item carries the cartridge and manufacturer ids, the material, and the stated water capacity (g) and empty mass (g) where the record has them.',
+      },
+    },
+    (request, reply) => reply.send(catalogue.cases(request.query)),
+  )
+  app.get<{ Params: { id: string } }>(
+    '/cases/:id',
+    {
+      schema: { params: idParams },
+      config: {
+        response: cartridgeCase.extend({ revision }),
+        errors: [404],
+        moved: true,
+        summary: 'Get a case',
+        description:
+          'The whole case record with its provenance and `origin`. `revision` is a hash of the stored record that changes with any field.',
+      },
+    },
+    (request, reply) => {
+      const found = catalogue.get('case', request.params.id)
+      if (!found) return missing(reply, catalogue, 'cases', request.params.id, 'case')
+      return reply.send(originated(found))
+    },
+  )
 }

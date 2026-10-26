@@ -8,16 +8,17 @@ import { buildApp } from './app.ts'
 import { loadBundle } from './bundle.ts'
 import { buildCatalogue } from './catalogue/build.ts'
 import { openCatalogue } from './catalogue/open.ts'
-import type { CatalogueData, Catalogued, CatalogueKind } from './catalogue/types.ts'
+import type { Catalogue, CatalogueData, Catalogued, CatalogueKind } from './catalogue/types.ts'
 import { inlineRunner } from './compute/tasks.ts'
 import { cartridgeAnswer } from './routes/cartridges.ts'
-import { revised, stored } from './routes/common.ts'
+import { originated, revised, stored } from './routes/common.ts'
 
 /** The records `writeStaticApi` writes, by the name of their route and the list of the index. */
 const recordFiles = [
   ['cartridges', 'cartridge', 'cartridges'],
   ['bullets', 'bullet', 'bullets'],
   ['powders', 'powder', 'powders'],
+  ['cases', 'case', 'cases'],
   ['manufacturers', 'manufacturer', 'manufacturers'],
   ['target-faces', 'targetFace', 'targetFaces'],
   ['federations', 'federation', 'federations'],
@@ -37,6 +38,15 @@ export async function startBundleApi() {
   return { app, url, data, close: () => app.close() }
 }
 
+/** The body the API's `GET /<kind>/<id>` answers for a record of the catalogue. */
+function recordAnswer(catalogue: Catalogue, kind: CatalogueKind, id: string) {
+  if (kind === 'cartridge') return cartridgeAnswer(catalogue, id)
+  const found = catalogue.get(kind, id)
+  if (!found) return
+  if (kind === 'bullet') return revised(found as Catalogued<'bullet'>)
+  return kind === 'case' ? originated(found) : stored(found)
+}
+
 /**
  * Writes the data files of the Pages edition under `dir`: `catalogue/index.json` (the catalogue
  * index, which the browser opens with `openCatalogue` and answers every list from) and
@@ -51,14 +61,6 @@ export async function writeStaticApi(data: CatalogueData, dir: string) {
   }
   await write('catalogue/index', data.index)
   for (const [route, kind, list] of recordFiles)
-    for (const { item } of data.index[list]) {
-      const found = catalogue.get(kind, item.id)
-      const answer =
-        kind === 'cartridge'
-          ? cartridgeAnswer(catalogue, item.id)
-          : kind === 'bullet' && found
-            ? revised(found as Catalogued<'bullet'>)
-            : found && stored(found)
-      await write(`${route}/${item.id}`, answer)
-    }
+    for (const { item } of data.index[list])
+      await write(`${route}/${item.id}`, recordAnswer(catalogue, kind, item.id))
 }

@@ -1363,6 +1363,8 @@ export function useWorkbenchState() {
   const [measuredFor, setMeasuredFor] = useState<string>()
   /** The catalogue capacity record the user chose in the Cartridge card, kept for the cartridge it belongs to. */
   const [capacityChoice, setCapacityChoice] = useState<{ cartridge: string; id: string }>()
+  /** The catalogue case record the user chose in the Cartridge card, kept for the cartridge it belongs to. */
+  const [caseChoice, setCaseChoice] = useState<{ cartridge: string; id: string }>()
   /** The user capacity reference of the load being opened: a slower read than a newer open leaves alone. */
   const openingCapacity = useRef<string>(undefined)
   /** The Gun and barrel card's gun weight (free recoil only); the load's typed values and links carry it. */
@@ -1596,6 +1598,7 @@ export function useWorkbenchState() {
     setMeasured({ measuredWaterCapacity: emptyStep })
     setMeasuredFor(undefined)
     setCapacityChoice(undefined)
+    setCaseChoice(undefined)
     openingCapacity.current = undefined
     setGunFields({ firearmMass: emptyStep })
     gunFromFirearm.current = false
@@ -2358,8 +2361,15 @@ export function useWorkbenchState() {
       })
   }
 
+  /** The case record `ref` of an opened load is chosen for the cartridge it names. */
+  function openCase(ref: string | undefined, forCartridge: string | undefined) {
+    const id = ref && catalogueIdIn(ref)
+    const cartridgeId = forCartridge && parseRef(forCartridge)?.id
+    if (id && cartridgeId) setCaseChoice({ cartridge: cartridgeId, id })
+  }
+
   /** A capacity chosen in the figure replaces the one the opened load still asks for. */
-  function chooseCapacity(choice: { cartridge: string; id: string }) {
+  function chooseCapacity(choice: { cartridge: string; id: string } | undefined) {
     openingCapacity.current = undefined
     got('capacity')
     setCapacityChoice(choice)
@@ -2422,6 +2432,7 @@ export function useWorkbenchState() {
     const userCartridge = userCartridgeOf(d.cartridge)
     if (userCartridge) openCartridgeDesign(userCartridge)
     if (d.capacity) openCapacity(d.capacity, d.cartridge)
+    openCase(d.case?.record, d.cartridge)
     openBullet(d.bullet, !typed.has('bulletMass'))
     openPowder(d.powder, typed)
     setNotes(d.note ?? '')
@@ -2450,6 +2461,7 @@ export function useWorkbenchState() {
   const cartridgeKey = cartridgeKeyOf(cartridge, cartridgeDesign, asked.cartridge)
   const measuredWaterCapacity = measuredCapacityOf(measuredFor, cartridgeKey, measured)
   const chosenCapacity = chosenCapacityOf(capacityChoice, cartridgeKey)
+  const chosenCase = chosenCapacityOf(caseChoice, cartridgeKey)
 
   const activeStep = ladderStepField(ladderKind, {
     seat: seatStep,
@@ -2630,6 +2642,7 @@ export function useWorkbenchState() {
     powder: savedRef(asked.powder?.id, powderDesign?.id, powder?.id),
     notes,
     capacity: capacityRef,
+    caseRecord: chosenCase && catalogueRef(chosenCase),
     seating,
     ladder: ladderPartOf(ladderSteps, ladderKind, activeStep.si, direction),
     sessions: sessionRefs,
@@ -2814,6 +2827,8 @@ export function useWorkbenchState() {
     measuredWaterCapacity,
     capacityId: chosenCapacity,
     setCapacityChoice: chooseCapacity,
+    caseId: chosenCase,
+    setCaseChoice,
     storeLoad,
     pending,
     powder: chosenPowder,

@@ -15,6 +15,7 @@ import {
   byKey,
   caliberClassRow,
   cartridgeRow,
+  caseRow,
   disciplineRow,
   federationRow,
   manufacturerRow,
@@ -52,6 +53,9 @@ function ordered<T extends { id: string }, R>(
     .map((r) => rows.get(r) as IndexRow<T>)
 }
 
+/** The record id a reference names. */
+const refId = (reference: string) => parseRef(reference)?.id ?? reference
+
 /** The manufacturer `id` of a component, an error naming the component when there is none. */
 function maker(
   manufacturers: Map<string, Manufacturer>,
@@ -83,7 +87,7 @@ export function buildCatalogue(source: CatalogueSource): CatalogueData & { recor
   }
   const capacities = new Map<string, string[]>()
   for (const c of source.capacities.toSorted((a, b) => compareKeys(a.id, b.id))) {
-    const cartridge = now('cartridges', parseRef(c.cartridge)?.id ?? c.cartridge)
+    const cartridge = now('cartridges', refId(c.cartridge))
     capacities.set(cartridge, [...(capacities.get(cartridge) ?? []), c.id])
   }
 
@@ -95,6 +99,15 @@ export function buildCatalogue(source: CatalogueSource): CatalogueData & { recor
       manufacturers: byKey(source.manufacturers.map(manufacturerRow)),
       powders: byKey(source.powders.map((p) => powderRow(p, maker(manufacturers, p, now)))),
       bullets: byKey(source.bullets.map((b) => bulletRow(b, maker(manufacturers, b, now)))),
+      cases: byKey(
+        source.cases.map((c) =>
+          caseRow(
+            c,
+            maker(manufacturers, { id: c.id, manufacturer: refId(c.manufacturer) }, now),
+            now('cartridges', refId(c.cartridge)),
+          ),
+        ),
+      ),
       targetFaces: ordered(
         source.targetFaces,
         (f) =>
@@ -147,6 +160,7 @@ export function buildCatalogue(source: CatalogueSource): CatalogueData & { recor
       manufacturer: byId(source.manufacturers),
       powder: byId(source.powders),
       bullet: byId(source.bullets),
+      case: byId(source.cases.map(({ origin, ...rest }) => rest)),
       caseCapacity: byId(source.capacities.map(({ origin, ...rest }) => rest)),
       targetFace: byId(source.targetFaces),
       federation: byId(source.federations),

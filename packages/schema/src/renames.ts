@@ -7,6 +7,7 @@ export const renameKind = z.enum([
   'manufacturers',
   'powders',
   'bullets',
+  'cases',
   'target-faces',
   'federations',
   'disciplines',
