@@ -14,8 +14,8 @@ import { offerUndo } from './confirm.tsx'
 import { ErrorNote, Loading } from './states.tsx'
 
 /**
- * The Manufacturers tab of Settings: the manufacturers typed in this browser, each with the number
- * of records that name it. One that nothing names is deleted at once, with Undo.
+ * The Manufacturers section of Settings, General: the manufacturers typed in this browser, each
+ * with the number of records that name it. One that nothing names is deleted at once, with Undo.
  */
 export function ManufacturersForm() {
   const [rows, setRows] = useState<ManufacturerUse[]>()
