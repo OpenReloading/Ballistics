@@ -11,6 +11,8 @@
   - Configured in `packages/<name>/typedoc.json`, the shared options in `packages/typedoc.base.json`.
   - A variable type, parameter type or return type of an exported variable or function that renders longer than 100 characters fails (`apps/docs/check.mjs`): give it a named type or interface. Zod schemas are exempt, their doc comment links the inferred type.
 - Test schema, core, importers, drawing, data, api, web, the docs checks, the tools and the e2e script helpers: `npm test`
+  - Coverage: the `test` script of schema, core, importers, drawing, data and api is `vitest run --coverage` (v8, summary in the log, so the CI `test` groups run it). The floors (`coverage.thresholds`) and the excluded files, each with its reason, are in `packages/<name>/vitest.config.ts`. A floor is the measured value rounded down, minus one: raise it in the same pull request when coverage rises, never lower it to make a check pass.
+  - A single file or test runs without coverage: `npx vitest run <file>` in the package.
 - Validate data records: `npm run data:validate`
 - Docs site (Docusaurus, `apps/docs`): `npm run site:build -w @open-reloading/docs` (after `build`)
   - Generated, git-ignored: the TypeDoc site of the six packages (`static/library/`, configured by `apps/docs/typedoc.config.mjs` with the landing page `apps/docs/library.md`), served at `/library/`, the REST API page (`static/rest/`: the API document, the Scalar viewer and its page, `scripts/openapi.mts`), served at `/rest/`. Its link to the API's own reference (`/v1/reference/`) uses `API_URL`, no link when it is unset.

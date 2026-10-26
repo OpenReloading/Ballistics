@@ -27,7 +27,7 @@
     "build": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.build.json && node dist/catalogue/write.js",
     "start": "node --env-file-if-exists=../../.env dist/server.js",
     "dev": "node --watch src/server.ts",
-    "test": "vitest run",
+    "test": "vitest run --coverage",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -41,6 +41,7 @@
   },
   "devDependencies": {
     "@types/node": "^26.6.5",
+    "@vitest/coverage-v8": "^5.0.5",
     "ajv": "^8.20.0",
     "typescript": "^7.0.2",
     "vitest": "^5.0.5"
