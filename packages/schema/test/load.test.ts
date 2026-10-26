@@ -221,11 +221,12 @@ describe('Load', () => {
     expectIssueAt(load, { ...catalogueLoad, capacity: `user:${uuid}` }, 'capacity')
   })
 
-  it('names a case record by a catalogue reference, in a user load too', () => {
+  it('names a case record by a reference: a user load may name a case group of the user', () => {
     const record = 'catalogue:example-308-win-brass'
     expect(load.parse({ ...userLoad, case: { firingCount: 2, record } }).case?.record).toBe(record)
     expect(issuePaths(load, { ...catalogueLoad, case: { record } })).toEqual([])
-    expectIssueAt(load, { ...userLoad, case: { record: `user:${uuid}` } }, 'case.record')
+    expect(load.safeParse({ ...userLoad, case: { record: `user:${uuid}` } }).success).toBe(true)
+    expectIssueAt(load, { ...catalogueLoad, case: { record: `user:${uuid}` } }, 'case.record')
     expectIssueAt(load, { ...userLoad, case: { record: 'example-308-win-brass' } }, 'case.record')
   })
 

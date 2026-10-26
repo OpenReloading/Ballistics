@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { recordId, ref } from './ids.ts'
+import { catalogueRef, recordId, ref } from './ids.ts'
 import { type Provenance, provenance } from './provenance.ts'
 import { quantity } from './units.ts'
 
@@ -26,11 +26,12 @@ const primerPocket = z.strictObject({
 })
 
 /**
- * A cartridge case as its manufacturer sells it, for one cartridge: the entity of a catalogue record
- * (`records/cases`) and the case a load references. A catalogue case carries its `id` (the file name),
- * `name`, `productNumber` and `provenance`, and names catalogue records only. `waterCapacity` is the
- * capacity the manufacturer states; a capacity the user measured stays a case capacity record and
- * takes precedence.
+ * A cartridge case, for one cartridge: the entity of a catalogue record (`records/cases`) as its
+ * manufacturer sells it, the user record of kind `case` (a group of cases the user keeps, with
+ * their measured values) and the case a load references. A catalogue case carries its `id` (the
+ * file name), `manufacturer`, `name`, `productNumber` and `provenance`, and names catalogue records
+ * only. `waterCapacity` is the capacity the manufacturer states; a capacity the user measured stays
+ * a case capacity record that `capacity` names, and takes precedence.
  * Inferred type: {@link Case}.
  */
 export const cartridgeCase = z
@@ -44,8 +45,15 @@ export const cartridgeCase = z
       .min(1)
       .describe('Name of the product as the manufacturer prints it.')
       .optional(),
-    manufacturer: ref('manufacturer'),
+    manufacturer: ref('manufacturer')
+      .describe('The manufacturer of the case. Required of a catalogue case.')
+      .optional(),
     cartridge: ref('cartridge'),
+    basedOn: catalogueRef('case')
+      .describe(
+        'The catalogue case product a user case group starts from; its fields stay the record of the product.',
+      )
+      .optional(),
     productNumber: z.string().min(1).describe('Product number.').optional(),
     headstamp: z
       .string()
@@ -62,6 +70,28 @@ export const cartridgeCase = z
       .describe('Mass of water filling the case to the mouth, as the manufacturer states it.')
       .optional(),
     annealed: z.boolean().describe('Whether the case is delivered annealed.').optional(),
+    capacity: ref('case capacity')
+      .describe(
+        'The case capacity record that holds the water capacity the user measured on these cases.',
+      )
+      .optional(),
+    numberOfFirings: z.int().min(0).describe('Measured: times the cases were fired.').optional(),
+    trimLength: quantity('length', z.number().positive())
+      .describe('Measured: the length the cases are trimmed to.')
+      .optional(),
+    neckWall: quantity('length', z.number().positive())
+      .describe('Measured: wall thickness of the case neck.')
+      .optional(),
+    casesMeasured: z
+      .int()
+      .positive()
+      .describe('Measured: the number of cases the measured values come from.')
+      .optional(),
+    spread: quantity('mass', z.number().nonnegative())
+      .describe(
+        'Measured: spread (standard deviation) of the water capacity over the cases measured.',
+      )
+      .optional(),
     note: z.string().min(1).describe('Notes on the product.').optional(),
     provenance: provenance
       .describe('Where the values come from. Required for a catalogue case.')
@@ -71,10 +101,10 @@ export const cartridgeCase = z
     if (c.origin !== 'catalogue') return
     const issue = (path: PropertyKey[], message: string) =>
       ctx.addIssue({ code: 'custom', path, message })
-    for (const k of ['id', 'name', 'productNumber', 'provenance'] as const)
+    for (const k of ['id', 'name', 'manufacturer', 'productNumber', 'provenance'] as const)
       if (c[k] === undefined) issue([k], `A catalogue case needs ${k === 'id' ? 'an' : 'a'} ${k}`)
-    for (const k of ['cartridge', 'manufacturer'] as const)
-      if (!c[k].startsWith('catalogue:'))
+    for (const k of ['cartridge', 'manufacturer', 'capacity'] as const)
+      if (c[k] !== undefined && !c[k].startsWith('catalogue:'))
         issue([k], 'A catalogue case names catalogue records only')
   })
 
@@ -84,13 +114,14 @@ export const catalogueCase: z.ZodType<CatalogueCase> = cartridgeCase.refine(
   { message: 'A catalogue record has origin catalogue', path: ['origin'] },
 )
 
-/** A cartridge case product: material, primer pocket, flash hole, mass and stated water capacity. */
+/** A cartridge case: a product with its material, primer pocket, flash hole, mass and stated water capacity, or a group of the user's cases with measured values. */
 export interface Case extends z.infer<typeof cartridgeCase> {}
 
 /** A case of the catalogue: the fields {@link cartridgeCase} requires of one are present. */
 export interface CatalogueCase extends Case {
   id: string
   name: string
+  manufacturer: string
   origin: 'catalogue'
   productNumber: string
   provenance: Provenance
