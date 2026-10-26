@@ -2,7 +2,8 @@ name: Release
 
 # release-please keeps one release pull request open from the Conventional Commits on main; merging it
 # tags each changed component <component>-vX.Y.Z, writes its CHANGELOG.md and GitHub Release, the
-# images job publishes the api and web images of the components released, and the publish job the
+# images job publishes the api and web images of the components released (with an SBOM attestation each),
+# the sbom-release job attaches those SBOMs to the GitHub Releases, and the publish job pushes the
 # libraries to npm (trusted publishing, no token).
 # Steps and versioning: apps/docs/docs/release.md.
 on:
@@ -107,6 +108,9 @@ jobs:
         include: ${{ fromJSON(needs.release-please.outputs.images) }}
     env:
       IMAGE: ghcr.io/openreloading/ballistics-${{ matrix.name }}
+      # Dependabot does not read this reference: bump it by hand
+      SYFT_IMAGE: docker.io/anchore/syft:v1.55.0@sha256:4cc92b64ca74ffca4c94d4c8fcc01f217731375300be14d0b6eeb2e82eaa110a
+      SBOM_FILE: ballistics-${{ matrix.name }}-${{ matrix.version }}.spdx.json
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -143,6 +147,15 @@ jobs:
         with:
           sarif_file: ${{ steps.scan.outputs.sarif }}
           category: image-${{ matrix.name }}
+      # SPDX SBOM of the image that is pushed, read from the saved image: the syft container gets no registry
+      # credentials (the login comes after)
+      - env:
+          VERSION: ${{ steps.meta.outputs.version }}
+        run: |
+          mkdir "$RUNNER_TEMP/sbom"
+          docker save "$IMAGE:$VERSION" -o "$RUNNER_TEMP/sbom/image.tar"
+          docker run --rm -v "$RUNNER_TEMP/sbom:/work" "$SYFT_IMAGE" docker-archive:/work/image.tar \
+            --source-name "$IMAGE" --source-version "$VERSION" -o "spdx-json=/work/$SBOM_FILE"
       - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
           registry: ghcr.io
@@ -160,6 +173,41 @@ jobs:
           subject-name: ${{ env.IMAGE }}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
+      - uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-name: ${{ env.IMAGE }}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          sbom-path: ${{ runner.temp }}/sbom/${{ env.SBOM_FILE }}
+          push-to-registry: true
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: sbom-${{ matrix.name }}
+          path: ${{ runner.temp }}/sbom/${{ env.SBOM_FILE }}
+          if-no-files-found: error
+          retention-days: 1
+
+  # Own job, so that only this one holds contents: write and no step that builds or runs image code does.
+  sbom-release:
+    needs: [release-please, images]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    env:
+      IMAGES: ${{ needs.release-please.outputs.images }}
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: sbom-*
+          merge-multiple: true
+          path: sbom
+      # --clobber: a re-run replaces the asset
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          jq -r '.[] | [.tag, .name, .version] | @tsv' <<< "$IMAGES" | while IFS=$'\t' read -r tag name version; do
+            gh release upload "$tag" "sbom/ballistics-$name-$version.spdx.json" --clobber -R "$GITHUB_REPOSITORY"
+          done
 
   # npm trusted publishing (OIDC): no npm token. Each library needs a Trusted Publisher on npmjs.com for this
   # repository and workflow. The pushed commit is the release commit, the one every tag points at.
