@@ -152,7 +152,7 @@ jobs:
         run: git ls-files '*.md' '*.mdx' | docker run --rm --interactive -v "$PWD:/repo:ro" -w /repo "$LYCHEE_IMAGE" --config lychee.toml --offline --files-from -
       - name: Spelling of code, comments, docs and UI text (typos)
         run: |
-          curl --fail --silent --show-error --location --output "$RUNNER_TEMP/typos.tar.gz" "https://github.com/crate-ci/typos/releases/download/v${TYPOS_VERSION}/typos-v${TYPOS_VERSION}-x86_64-unknown-linux-musl.tar.gz"
+          curl --proto "=https" --tlsv1.2 --fail --silent --show-error --location --output "$RUNNER_TEMP/typos.tar.gz" "https://github.com/crate-ci/typos/releases/download/v${TYPOS_VERSION}/typos-v${TYPOS_VERSION}-x86_64-unknown-linux-musl.tar.gz"
           echo "$TYPOS_SHA256  $RUNNER_TEMP/typos.tar.gz" | sha256sum --check
           tar --extract --gzip --file "$RUNNER_TEMP/typos.tar.gz" --directory "$RUNNER_TEMP" ./typos
           "$RUNNER_TEMP/typos"
