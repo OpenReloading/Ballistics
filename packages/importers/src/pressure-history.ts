@@ -1,7 +1,7 @@
 // A pressure-time trace of the user's own measurement: time and pressure columns, the units and the
 // sensor position named by the user or the file, an optional zero-phase low-pass.
 import { detectDelimiter, splitCells } from './generic.ts'
-import { bracketed, parseNumber, splitLines } from './text.ts'
+import { bracketed, splitLines } from './text.ts'
 
 /** A pressure unit the trace importer recognises (any case in the file). */
 export type PressureUnit = 'bar' | 'mbar' | 'MPa' | 'kPa' | 'Pa' | 'psi' | 'kpsi'
@@ -65,12 +65,15 @@ export interface PressureHistoryImport {
   warnings: string[]
 }
 
-/** A number as written by an instrument: `parseNumber` plus exponent notation (`1.0E-05`). */
+/**
+ * A number with a decimal point or comma and optional exponent (`1.0E-05`), NaN otherwise. A lone
+ * comma is a decimal comma (`0,125`): the delimiter is a semicolon or a tab when cells hold one.
+ */
 function reading(text: string): number {
-  const n = parseNumber(text)
-  return Number.isNaN(n) && /^[+-]?(\d+\.?\d*|\.\d+)[eE][+-]?\d+$/.test(text.trim())
-    ? Number(text)
-    : n
+  const t = text.trim()
+  if (t.includes(',') && t.includes('.')) return Number.NaN
+  const s = t.replace(',', '.')
+  return /^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/.test(s) ? Number(s) : Number.NaN
 }
 
 /** The text in `(...)` or `[...]` of a header cell, else undefined. */

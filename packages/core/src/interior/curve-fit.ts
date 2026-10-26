@@ -39,6 +39,8 @@ export interface PressureHistory {
  */
 export type CurveParameter = 'burnRate' | 'formSlope' | 'transition' | 'exponent'
 
+const sensors: readonly PressureSensor[] = ['breech', 'mean', 'base']
+
 const order: readonly CurveParameter[] = ['burnRate', 'formSlope', 'transition', 'exponent']
 
 /** Options of `fitPressureCurve`. */
@@ -197,6 +199,7 @@ function checkInput(load: InteriorLoad, trace: PressureHistory, options: CurveFi
       pressure.every(Number.isFinite),
     'trace: equal numbers of finite, strictly increasing times and finite pressures, at least 2',
   )
+  need(sensors.includes(trace.sensor), 'trace.sensor: breech, mean or base')
   need(sigma === undefined || (Number.isFinite(sigma) && sigma > 0), 'sigma must be positive')
   const given = load.propellant.burn
   need(

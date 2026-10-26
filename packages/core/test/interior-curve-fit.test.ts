@@ -250,6 +250,10 @@ describe('curve fit failures', () => {
       /trace:/,
     )
     rejects(() => fitPressureCurve(start(), { ...t, sigma: 0 }), /sigma must be positive/)
+    rejects(
+      () => fitPressureCurve(start(), { ...t, sensor: 'Breech' as PressureSensor }),
+      /trace.sensor/,
+    )
   })
 
   it('rejects a trace that does not rise and fall', () => {

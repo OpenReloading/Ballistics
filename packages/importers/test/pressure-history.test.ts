@@ -131,4 +131,14 @@ describe('parsePressureHistory', () => {
     const t = parsePressureHistory('t (s);p (MPA)\n0;1\n1;2\n2;3\n', o)
     expect(t.units.pressure.unit).toBe('MPa')
   })
+
+  it('reads a decimal comma and keeps the first sample of a headerless file', () => {
+    const t = parsePressureHistory('0,000;12,5\n0,125;30\n0,250;20\n', {
+      sensor: 'breech',
+      timeUnit: 'ms',
+      pressureUnit: 'bar',
+    })
+    expect(t.time).toEqual([0, 1.25e-4, 2.5e-4])
+    expect(t.pressureBar).toEqual([12.5, 30, 20])
+  })
 })
