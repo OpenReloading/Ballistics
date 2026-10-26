@@ -86,13 +86,13 @@ export interface Seating {
   /** Seating depth: case length (cartridge L3) less the base position, mm. */
   depth: Tagged
   /** Case volume to the mouth and volume behind the bullet, cm³. */
-  caseVolume?: Tagged | undefined
-  volumeBehindBullet?: Tagged | undefined
-  travel?: Tagged | undefined
+  caseVolume?: Tagged
+  volumeBehindBullet?: Tagged
+  travel?: Tagged
   /** Leade contact from the head, approximate. */
   leade?: number | undefined
   /** COAL at which the jump is 0. */
-  contactCoal?: number | undefined
+  contactCoal?: number
   /** Value undefined where a jump cannot be given; missing names what a derived value lacks. */
   jump: { value?: number | undefined; tag: 'derived' | 'approximate'; missing: string[] }
   /** The bullet touches the lands: a jump of 0 or less. */

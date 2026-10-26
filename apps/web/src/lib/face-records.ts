@@ -15,7 +15,7 @@ import { storedRecords } from './user-store.ts'
 export type FaceSummary = { id: string; organization: string; name: string }
 
 /** A face of `GET /target-faces`: the abbreviation of its federation is derived there. */
-type ListedFace = { id: string; organization?: string | undefined; name: string }
+type ListedFace = { id: string; organization?: string; name: string }
 
 let listing: Promise<FaceSummary[]> | undefined
 const records = new Map<string, Promise<Face>>()

@@ -246,7 +246,7 @@ export function Measurements({
   idPrefix = 'measurements',
 }: {
   /** Ids of the controls; the phone range view shows a second copy. */
-  idPrefix?: string | undefined
+  idPrefix?: string
   steps: MeasuredStep[] | undefined
   system: UnitSystem
   sessions: SessionRecord[]

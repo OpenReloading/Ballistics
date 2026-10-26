@@ -17,14 +17,14 @@ export interface FieldSpec {
   /** Field help, shown as the field description. */
   help?: string | undefined
   quantity: Quantity
-  required?: boolean | undefined
+  required?: boolean
   /** Bounds in display units, only where they hold in every unit of the quantity. */
-  min?: number | undefined
-  max?: number | undefined
+  min?: number
+  max?: number
   /** The value must be greater than 0. */
-  positive?: boolean | undefined
+  positive?: boolean
   /** The value must be a whole number. */
-  integer?: boolean | undefined
+  integer?: boolean
   /** Initial SI value. */
   initial?: number | undefined
 }

@@ -30,9 +30,9 @@ export function PropertyGrid({
   sections,
   message,
 }: {
-  title?: string | undefined
+  title?: string
   /** Above the sections, such as the start-from search. */
-  head?: ReactNode | undefined
+  head?: ReactNode
   sections: GridSection[]
   message?: string | undefined
 }) {

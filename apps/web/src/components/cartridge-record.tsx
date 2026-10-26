@@ -184,7 +184,7 @@ export function RecordScope({
   children,
 }: {
   /** The shotshell case length variants; the select starts on `defaultVariantIndex`. */
-  variants?: string[] | undefined
+  variants?: string[]
   children: ReactNode
 }) {
   const { choice } = useUnits()
@@ -550,7 +550,7 @@ export function RecordFacts({
   notes: string[][]
   standard: {
     table?: string | undefined
-    date?: { label: string; value: string } | undefined
+    date?: { label: string; value: string }
     countries?: { name: string; code?: string | undefined }[] | undefined
   }
   build: { caseType?: string | undefined; method?: string | undefined }

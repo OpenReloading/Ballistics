@@ -58,7 +58,7 @@ function valueNotes(v: SpecValue) {
 function meaningOf(
   symbol: string,
   sides: ('cartridge' | 'chamber' | undefined)[],
-  table?: string,
+  table?: string | undefined,
 ): string | undefined {
   const own = table === 'VII' ? shotshellMeanings : meanings
   const meant = sides.flatMap((s) => {
@@ -194,7 +194,7 @@ export interface CombinedRow {
   /** Hover lines: the spelled name of a Greek letter, then each side's notes. */
   notes: string[]
   cartridge?: SpecValue | undefined
-  chamber?: SpecValue | undefined
+  chamber?: SpecValue
   /** Chamber minimum minus cartridge maximum, mm, where it is a fit (`fits`). */
   clearance?: number | undefined
 }
@@ -246,7 +246,7 @@ function addDerivedE(rows: Map<string, Draft>, list: Figure[]) {
 function withClearanceAndGroup(
   { sideNotes, ...row }: Draft,
   clearance: Map<string, number>,
-  table?: string,
+  table?: string | undefined,
 ): CombinedRow {
   const sides = [row.cartridge?.side, row.chamber?.side].filter(
     (s): s is 'cartridge' | 'chamber' => s !== undefined,

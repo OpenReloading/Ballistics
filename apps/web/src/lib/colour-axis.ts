@@ -20,7 +20,7 @@ export type WorkImage = {
   /** Least separation of a hole from its ring along the colour axis (log RGB units). */
   contrast: number
   /** 1 on the black area of the printed face, else 0; absent without a face. */
-  blackMask?: Uint8Array | undefined
+  blackMask?: Uint8Array
 }
 
 /** A value per channel of log RGB. */
@@ -30,7 +30,7 @@ type Channels = [number[], number[], number[]]
 /** Unit axis `w` in log RGB, the hole colour `mu`, the ring median `ring` and their separation along `w`. */
 type Axis = { w: LogRgb; mu: LogRgb; ring: LogRgb; sep: number }
 /** The picked hole (work px), or the hole colour in log RGB without a pick. */
-export type Seed = { at?: Point | undefined; mu?: LogRgb | undefined }
+export type Seed = { at?: Point | undefined; mu?: LogRgb }
 
 /**
  * Fisher's linear discriminant in log RGB: the mean of the disc of 0.4 D at the pick (or the

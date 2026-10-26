@@ -67,18 +67,18 @@ export function WorkbenchSearch({
   search: own,
 }: {
   commands: Command[]
-  onRun?: (() => void) | undefined
+  onRun?: () => void
   onCartridge: (c: CartridgeSummary) => void
   onBullet: (b: BulletRow) => void
   onPowder: (p: PowderSummary) => void
   describeBullet: (b: BulletSummary) => string
   /** The browser's bullet designs as rows (`userBulletRows`), listed with the catalogue. */
-  designs?: readonly BulletRow[] | undefined
+  designs?: readonly BulletRow[]
   /** Extra query of the bullet search, for example `&cartridge=308-win`. */
   bulletFit?: CartridgeDiameters | undefined
   bulletsLabel: string
   /** A store of its own, opened by the caller (no shortcut); without it the default store on Ctrl+K. */
-  search?: ReturnType<typeof createSpotlight> | undefined
+  search?: ReturnType<typeof createSpotlight>
 }) {
   const [store, actions] = own ?? [undefined, spotlight]
   const shell = useShellActions()

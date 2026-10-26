@@ -8,11 +8,11 @@ import { useRoute } from './use-route.ts'
 
 type Ask = {
   title: string
-  message?: ReactNode | undefined
+  message?: ReactNode
   /** The label of the button that goes ahead, a verb: Delete, Replace, Leave. */
   confirmLabel: string
-  cancelLabel?: string | undefined
-  danger?: boolean | undefined
+  cancelLabel?: string
+  danger?: boolean
 }
 type Pending = Ask & { resolve: (ok: boolean) => void }
 type Offer = { text: string; undo: () => unknown; n: number }

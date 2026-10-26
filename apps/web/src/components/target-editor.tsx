@@ -222,7 +222,7 @@ const blank = (
   load: string | undefined,
   marker: number | undefined,
   distance: number,
-  step?: number,
+  step?: number | undefined,
 ): TargetSheet => {
   const g = newGroup({ references: [], targetRotation: 0, groups: [] }, 'g1', distance)
   return {
@@ -304,7 +304,7 @@ async function restoreCopy() {
     copies = (Array.isArray(list) ? list : []).flatMap((item) => {
       // the schema drops `base`: read next to the record
       const [copy] = validRecords([item]).records
-      const base = (item as { base?: unknown } | null)?.base
+      const base = (item as { base?: unknown | undefined } | null)?.base
       return copy?.kind === 'targetSheet'
         ? [{ copy, ...(typeof base === 'string' && { base }) }]
         : []
@@ -340,7 +340,7 @@ function IconButton({
   ...rest
 }: {
   label: string
-  disabled?: boolean | undefined
+  disabled?: boolean
   onClick: () => void
   children: ReactNode
   'data-expand'?: boolean
@@ -374,7 +374,7 @@ function CoordInput({
   label: string
   si: number | undefined
   onCommit: (si: number) => void
-  disabled?: boolean | undefined
+  disabled?: boolean
 }) {
   const { system } = useUnits()
   const [draft, setDraft] = useState<string>()
@@ -445,7 +445,7 @@ type Score = ReturnType<typeof useRingScoring>
 type ShotAt = (
   sel: Selection,
   f: (s: ShotGroup['shots'][number]) => ShotGroup['shots'][number] | undefined,
-  key?: string,
+  key?: string | undefined,
 ) => void
 
 /** What the editor's panels read and call; one object per render. */
@@ -1425,12 +1425,12 @@ function ToolPopover({
   ed: Ed
   p: Pop
   tip: ReactNode
-  wideTip?: boolean | undefined
+  wideTip?: boolean
   name: string
   description?: string | undefined
   icon: ReactNode
-  position?: 'bottom-start' | 'bottom-end' | undefined
-  frame?: ((popover: ReactNode) => ReactElement) | undefined
+  position?: 'bottom-start' | 'bottom-end'
+  frame?: (popover: ReactNode) => ReactElement
   children: ReactNode
 }) {
   const { pop, setPop, root } = ed
@@ -2471,13 +2471,13 @@ export function TargetEditor({
    * The workbench tab: compact (the target and the key readouts) until expanded over the
    * workbench; `onChange` switches.
    */
-  expand?: { expanded: boolean; onChange: (expanded: boolean) => void } | undefined
+  expand?: { expanded: boolean; onChange: (expanded: boolean) => void }
   /** The workbench's load and its simulated velocities, for the print sheet. */
   summary?: LoadSummary | undefined
   /** The page heading (`/groups`): shown with the File menu of the open sheet beside it. */
   heading?: string | undefined
   /** Counts the page's File menu writes to the browser store (workbench Import, Replace). */
-  stored?: number | undefined
+  stored?: number
 }) {
   const { system } = useUnits()
   /** The distance of a new sheet: 100 of the display unit (100 yd or 100 m), held in m. */
@@ -3184,7 +3184,7 @@ export function TargetEditor({
   const shotAt = (
     sel: Selection,
     f: (s: ShotGroup['shots'][number]) => ShotGroup['shots'][number] | undefined,
-    key?: string,
+    key?: string | undefined,
   ) =>
     apply(
       (s) =>

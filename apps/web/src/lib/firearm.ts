@@ -230,15 +230,15 @@ type SightFill = {
   sightHeight: number
   zeroRange: number
   /** The mounted optic's turret click, rad, with how the turrets are marked. */
-  click?: { value: number; unit?: 'MOA' | 'mrad' | undefined } | undefined
-  twist?: number | undefined
+  click?: { value: number; unit?: 'MOA' | 'mrad' | undefined }
+  twist?: number
   twistHand: 'right' | 'left'
   /** The zero air: K, Pa and a fraction. */
-  zeroTemperature?: number | undefined
-  zeroPressure?: number | undefined
-  zeroHumidity?: number | undefined
-  dragFactor?: number | undefined
-  dragFactorSource?: string | undefined
+  zeroTemperature?: number
+  zeroPressure?: number
+  zeroHumidity?: number
+  dragFactor?: number
+  dragFactorSource?: string
 }
 
 /** The mount's zero air in the stored kind of each. */

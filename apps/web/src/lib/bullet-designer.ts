@@ -126,13 +126,13 @@ export interface Design {
   fields: Fields
   origin?: Origin | undefined
   /** The catalogue bullet the design is based on, `catalogue:<id>`, kept through files. */
-  basedOn?: string | undefined
+  basedOn?: string
   /** The base changed since the design was saved: the fields not overridden follow it. */
-  baseChanged?: boolean | undefined
+  baseChanged?: boolean
   /** The overrides as saved: Save keeps those of a field the designer has no input for. */
-  kept?: UserBullet['overrides'] | undefined
+  kept?: UserBullet['overrides']
   /** Why the design is read only (its base is not there), with the record as stored, which Save keeps as it is. */
-  locked?: { reason: string; data: UserBullet } | undefined
+  locked?: { reason: string; data: UserBullet }
 }
 
 const stored = (s: FieldSpec) => s.quantity as Parameters<typeof storedToSi>[0]
@@ -374,7 +374,7 @@ export function reduce(h: History, a: Action): History {
 export type FieldState =
   | { kind: 'record' }
   | { kind: 'entered'; changed: boolean; record?: number | undefined }
-  | { kind: 'derived' | 'assumed'; si: number; basis?: string | undefined }
+  | { kind: 'derived' | 'assumed'; si: number; basis?: string }
   | { kind: 'empty' }
 
 export interface Drawing {
@@ -387,7 +387,7 @@ export interface Drawing {
 }
 
 interface Evaluation {
-  drawing?: Drawing | undefined
+  drawing?: Drawing
   /** Why there is no drawing for this input, and the field to show it at. */
   refusal?: { reason: string; field: string } | undefined
   states: Record<string, FieldState>

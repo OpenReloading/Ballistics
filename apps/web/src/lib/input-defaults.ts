@@ -9,7 +9,7 @@ export type Suggestion = {
   si: number
   source: string
   /** The firearm's own value: used as the firearm's, not shown as a default. */
-  fromFirearm?: true | undefined
+  fromFirearm?: true
 }
 
 /** The form fields that follow a default until typed; the barrel length is the seating's own field. */

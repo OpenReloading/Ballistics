@@ -174,7 +174,7 @@ export async function findBullets(
   designs: readonly BulletRow[],
   text: string,
   limit: number,
-  fit?: CartridgeDiameters,
+  fit?: CartridgeDiameters | undefined,
 ): Promise<ListOf<BulletRow>> {
   const filters = { manufacturer: '', caliber: '', mass: '', fit }
   const own = searchBullets(designs, text, filters)

@@ -36,14 +36,14 @@ if (typeof window !== 'undefined')
   })
 
 type Go = (href: string, options?: object) => void
-type Router = { push: Go; replace: Go; guarded?: true | undefined }
+type Router = { push: Go; replace: Go; guarded?: true }
 
 // `window.next.router` is the instance `useRouter` hands out; `useRouter` copies its methods when
 // a component first renders, so this module is imported by the root providers, before any page.
 const router =
   typeof window === 'undefined'
     ? undefined
-    : (window as { next?: { router?: Router | undefined } }).next?.router
+    : (window as { next?: { router?: Router } }).next?.router
 if (router && !router.guarded) {
   for (const key of ['push', 'replace'] as const) {
     const go = router[key]

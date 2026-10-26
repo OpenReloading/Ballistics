@@ -43,16 +43,16 @@ export interface ChargeTargetResponse {
   burnoutInBarrel: boolean
   result: Omit<InteriorResponse['result'], 'points'>
   pressureRange: InteriorResponse['pressureRange']
-  limits?: InteriorResponse['limits'] | undefined
+  limits?: InteriorResponse['limits']
   warnings: InteriorResponse['warnings']
 }
 
 /** 422 answer of a target the solver refuses, or any other error body. */
 export type ChargeTargetRefusal = ErrorBody & {
-  target?: { limit?: { pressure: number } } | undefined
-  reachable?: ChargeRange | undefined
+  target?: { limit?: { pressure: number } }
+  reachable?: ChargeRange
   /** `noValidRun`: `reason` and `field` of the first scanned run that failed. */
-  failure?: { reason: string; field?: string | undefined } | undefined
+  failure?: { reason: string; field?: string }
 }
 
 /** A target as typed: a number, or the text of a `NumberInput` such as "12." or "0.", NaN where it is no number. */

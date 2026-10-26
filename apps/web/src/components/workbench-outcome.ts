@@ -30,12 +30,12 @@ export const isPreviewKey = (key: string): key is PreviewKey =>
 /** A ladder step of a run: its answer, or the error of a result the model reports as invalid. */
 export type Step = {
   charge: number
-  body?: InteriorResponse | undefined
-  error?: { message: string; reason?: string | undefined } | undefined
+  body?: InteriorResponse
+  error?: { message: string; reason?: string | undefined }
   /** A seating ladder's step: the length the bullet is seated by and what follows from it. */
-  seating?: SeatingStep | undefined
+  seating?: SeatingStep
   /** A temperature ladder's step: the propellant temperature, K. */
-  temperature?: number | undefined
+  temperature?: number
 }
 
 /**
@@ -109,7 +109,7 @@ export type Outcome =
       body: ErrorBody | undefined
       retryAfter: string | null
       /** The run failed while the browser reported no network. */
-      offline?: boolean | undefined
+      offline?: boolean
     }
 
 export const notReached = 'The API is unreachable.'

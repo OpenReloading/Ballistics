@@ -11,7 +11,7 @@ export type RingScore = {
   /** Value of the highest ring the hole touches; 0 outside the face. */
   value: number
   /** Tenth-ring value, on faces whose rules define it. */
-  decimal?: number | undefined
+  decimal?: number
   /** True when the hole is in the inner ten under the face's `innerTen.rule`. */
   innerTen: boolean
   /** Zone label of the bull the shot belongs to, where the face's bull has one. */
@@ -21,7 +21,7 @@ export type RingScore = {
 type GroupScore = {
   shots: RingScore[]
   total: number
-  decimalTotal?: number | undefined
+  decimalTotal?: number
   innerTenCount: number
 }
 
@@ -207,7 +207,7 @@ function solveCircleFit(
 }
 
 /** Where a face lies on the sheet: its centre in target m and target m per face m (1 when true). */
-type FaceAlignment = { centre: Point; scale: number; rms?: number | undefined }
+type FaceAlignment = { centre: Point; scale: number; rms?: number }
 /** A point marked on ring `ring` (its value) of a face, in target m. */
 export type FaceMark = { ring: number; x: number; y: number }
 

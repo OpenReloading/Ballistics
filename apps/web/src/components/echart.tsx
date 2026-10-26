@@ -80,8 +80,8 @@ export function EChart({
   title: string
   description: string
   /** Index of the series the keyboard walks. */
-  focus?: number | undefined
-  readout?: ((dataIndex: number) => string) | undefined
+  focus?: number
+  readout?: (dataIndex: number) => string
   /** Called after each draw, for an overlay that reads the chart's scales. */
   onRender?: ((chart: ECharts) => void) | undefined
 }) {

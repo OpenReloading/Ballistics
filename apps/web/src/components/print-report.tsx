@@ -33,8 +33,8 @@ export function PrintReport({
 }: {
   children: ReactNode
   /** What follows the chart. */
-  after?: ReactNode | undefined
-  chartSlot?: Ref<HTMLDivElement> | undefined
+  after?: ReactNode
+  chartSlot?: Ref<HTMLDivElement>
 }) {
   const body = usePortalBody()
   // the report prints only while its page is shown: a page kept hidden (Activity) runs this cleanup

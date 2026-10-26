@@ -38,7 +38,7 @@ export interface UnfittedPowder {
   kind: UnfitKind
   reason: string
   /** The powder's own numbers behind `kind`, for a list grouped by kind. */
-  detail?: string | undefined
+  detail?: string
 }
 
 interface RateInterval {
@@ -52,8 +52,8 @@ const noFitReason =
 
 /** What `classifyPowder` reads: a powder record or a list summary, with its manufacturer's name where known. */
 type BurnSource = Pick<Powder, 'id' | 'manufacturer' | 'name' | 'grainForm' | 'propellantBase'> & {
-  manufacturerName?: string | undefined
-  interior?: PowderSummary['interior'] | undefined
+  manufacturerName?: string
+  interior?: PowderSummary['interior']
 }
 
 /** Why a powder with a fitted pressure exponent `exponent` other than 1 has no curve. */
@@ -220,7 +220,7 @@ export interface PowderRow {
   manufacturer: string
   manufacturerName: string
   /** Other names of the manufacturer, searched by the list. */
-  manufacturerAliases?: string[] | undefined
+  manufacturerAliases?: string[]
   name: string
   grainForm?: string | undefined
   propellantBase?: string | undefined
@@ -229,14 +229,14 @@ export interface PowderRow {
   low?: number | undefined
   high?: number | undefined
   /** 1 for the fastest fitted powder; kept when a filter hides others. */
-  burnRateOrder?: number | undefined
+  burnRateOrder?: number
 }
 
 /** The list rows of `summaries` in their order, each fitted powder with its global order. */
 export function orderPowders(
   summaries: readonly (PowderSummary & {
     manufacturerName: string
-    manufacturerAliases?: string[] | undefined
+    manufacturerAliases?: string[]
   })[],
 ): PowderRow[] {
   const rows = summaries.map((s): PowderRow => {

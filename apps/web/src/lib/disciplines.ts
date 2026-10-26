@@ -31,11 +31,11 @@ export type CaliberClassRef = Pick<CaliberClassSummary, 'id' | 'name'>
 export type DisciplineRow = {
   id: string
   name: string
-  number?: string | undefined
+  number?: string
   /** The federation's abbreviation. */
   federation: string
   distance: number
-  category?: string | undefined
+  category?: string
   /** The caliber classes, in the record's order. */
   classes: CaliberClassRef[]
   /** Distinct faces of the discipline's mappings. */

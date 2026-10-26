@@ -41,7 +41,7 @@ export function compareCharge(
 export function powderValues(
   fields: Record<string, number | undefined>,
   current: { id: string } | undefined,
-  as?: { powder: Powder; charge?: number | undefined },
+  as?: { powder: Powder; charge?: number },
 ): Record<string, number | undefined> {
   return {
     ...fields,

@@ -26,7 +26,7 @@ const fileBytes = (text: string) => new TextEncoder().encode(text).byteLength
  */
 export const userDataText = (
   records: UserRecord[],
-  files?: EmbeddedFile[],
+  files?: EmbeddedFile[] | undefined,
   invalid?: InvalidRecord[],
 ) =>
   `${JSON.stringify(
@@ -47,10 +47,10 @@ export type ParsedUserFile =
       records: UserRecord[]
       files?: EmbeddedFile[] | undefined
       /** The `invalid` entries of an Export all file, as written: not checked, not part of the format. */
-      invalid?: unknown[] | undefined
+      invalid?: unknown[]
       /** Fields of the file mapped to no record field, as the format names them. */
-      unmapped?: string[] | undefined
-      warnings?: string[] | undefined
+      unmapped?: string[]
+      warnings?: string[]
     }
   | { ok: false; reason: string }
 
@@ -80,7 +80,7 @@ export function parseUserDataFile(text: string): ParsedUserFile {
 /** The text of `userDataText`, or why Open and Import would reject it (too large, invalid). */
 export function checkedUserDataText(
   records: UserRecord[],
-  files?: EmbeddedFile[],
+  files?: EmbeddedFile[] | undefined,
   invalid?: InvalidRecord[],
 ): { ok: true; text: string } | { ok: false; reason: string } {
   const text = userDataText(records, files, invalid)

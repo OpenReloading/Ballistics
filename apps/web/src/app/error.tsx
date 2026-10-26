@@ -7,7 +7,7 @@ import { ErrorNote } from '../components/states.tsx'
 export default function RootError({
   retry,
 }: {
-  error: Error & { digest?: string | undefined }
+  error: Error & { digest?: string }
   retry: () => void
 }) {
   return (

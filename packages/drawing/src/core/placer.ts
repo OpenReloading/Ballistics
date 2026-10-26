@@ -15,10 +15,10 @@ import { add, pairs, unit } from './vector.ts'
 /** One place to try for a text, with the lines, arrowheads, arc and diameter tips it brings. */
 export type Candidate = {
   l: Label
-  segs?: LineSegment[] | undefined
-  tips?: Arrowhead[] | undefined
-  arc?: Arc | undefined
-  across?: Layout['diameterTips'][number] | undefined
+  segs?: LineSegment[]
+  tips?: Arrowhead[]
+  arc?: Arc
+  across?: Layout['diameterTips'][number]
 }
 
 /** Adds a conflict's weight, true once the count reaches the limit. */

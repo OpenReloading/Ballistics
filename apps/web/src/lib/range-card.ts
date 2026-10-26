@@ -21,17 +21,17 @@ function valueText(system: UnitSystem, q: Quantity, x: number | undefined) {
  */
 export function zeroConditions(
   si: {
-    zeroTemperature?: number | undefined
-    zeroPressure?: number | undefined
-    zeroHumidity?: number | undefined
-    dragFactor?: number | undefined
-    temperature?: number | undefined
-    pressure?: number | undefined
-    humidity?: number | undefined
+    zeroTemperature?: number
+    zeroPressure?: number
+    zeroHumidity?: number
+    dragFactor?: number
+    temperature?: number
+    pressure?: number
+    humidity?: number
   },
   system: UnitSystem,
   dragSource?: string,
-): { zeroAir?: string | undefined; dragFactor?: string | undefined } {
+): { zeroAir?: string; dragFactor?: string } {
   const v = (q: Quantity, x: number | undefined) => valueText(system, q, x)
   const zeroSet = [si.zeroTemperature, si.zeroPressure, si.zeroHumidity].some(
     (x) => x !== undefined,
@@ -91,7 +91,7 @@ export interface RangeCardExtras {
   /** Angle of one turret click, rad: the elevation and wind holds are also given in clicks. */
   click?: number | undefined
   /** Windage hold per 1 m/s and per 1 mph of crosswind at each point, rad. */
-  wind?: { mps: number[]; mph: number[] } | undefined
+  wind?: { mps: number[]; mph: number[] }
 }
 
 /** Column headings of the card's table, units included; the last column stays blank for notes. */

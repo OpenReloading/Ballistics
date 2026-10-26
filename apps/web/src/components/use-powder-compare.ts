@@ -36,7 +36,7 @@ export type CompareRow = {
   base?: string | undefined
   form?: string | undefined
   /** kg. */
-  charge?: number | undefined
+  charge?: number
   /** Charge over the free volume at the record's bulk density; none without a bulk density. */
   ratio?: number | undefined
   values?: {

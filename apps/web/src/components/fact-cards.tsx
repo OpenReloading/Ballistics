@@ -33,9 +33,9 @@ export function Fact({
   children,
 }: {
   label: string
-  notes?: string[] | undefined
+  notes?: string[]
   /** The most important value of its card, set larger. */
-  lead?: boolean | undefined
+  lead?: boolean
   /** The unit after the label, as a table head has it (and printed after the value). */
   unit?: { now: string; also: string[] } | undefined
   children: ReactNode

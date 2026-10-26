@@ -64,7 +64,7 @@ function sweepSide(
   values: SpecValue[],
   failures: string[],
   side: Side,
-  table?: string,
+  table?: string | undefined,
 ) {
   const p = cipProfile(values, side, table)
   const fail = (what: string) => failures.push(`${id} ${side} ${what}`)
@@ -91,7 +91,7 @@ function sweep(
   id: string,
   values: SpecValue[],
   failures: string[],
-  table?: string,
+  table?: string | undefined,
 ): [string[], string[]] {
   return [
     sweepSide(id, values, failures, 'cartridge', table),
@@ -124,7 +124,7 @@ function storedFailures(
   values: SpecValue[],
   side: Side,
   conventions: Profile['annotation']['conventions'],
-  variant?: string,
+  variant?: string | undefined,
 ) {
   const out: string[] = []
   const v = d.stored
@@ -199,8 +199,8 @@ function annotationFailures(
   p: Profile,
   values: SpecValue[],
   side: Side,
-  table?: string,
-  variant?: string,
+  table?: string | undefined,
+  variant?: string | undefined,
 ) {
   const out: string[] = []
   const { dimensions, angles, radii, edges, conventions } = p.annotation

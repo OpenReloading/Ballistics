@@ -286,8 +286,8 @@ export function TechnicalDrawing({
   id: string
   title: string
   /** The description, or none where `describedBy` names another drawing's. */
-  desc?: string | undefined
-  describedBy?: string | undefined
+  desc?: string
+  describedBy?: string
   model: FigureModel | BulletModel
   /** Screen: the height in mm the window fits, the tallest figure of the record (one scale). */
   tallest?: number | undefined
@@ -296,11 +296,11 @@ export function TechnicalDrawing({
   /** Screen only: each dimension named by its symbol for the record table's linked hover. */
   linked?: Linked | undefined
   /** Drawn last in the part frame, mm (the seated bullet of the interior preview). */
-  children?: ReactNode | undefined
+  children?: ReactNode
   /** Screen: the same figure in the other length unit, whose box the drawing keeps free, so a unit switch moves nothing (its column a size container). */
   reserve?: { model: FigureModel; tallest: number } | undefined
   /** Screen: the model is laid out level (medium print), shown with `data-level`. */
-  level?: boolean | undefined
+  level?: boolean
 }) {
   const { medium, em, frame, scale } = model
   const layers: Partial<Record<Side | 'combined' | 'bullet', Layout>> = model.layers

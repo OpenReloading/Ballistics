@@ -28,10 +28,10 @@ export function RangeCard({
     si: Record<string, number | undefined>
     manual: boolean
     /** Where the drag factor of the result comes from. */
-    dragSource?: string | undefined
+    dragSource?: string
     tablePoints: TrajectoryPoint[]
     windPerUnit: { mps: number[]; mph: number[] }
-    click?: { value: number; unit?: 'MOA' | 'mrad' | undefined } | undefined
+    click?: { value: number; unit?: 'MOA' | 'mrad' | undefined }
   }
   system: UnitSystem
   paper: PaperSize

@@ -26,7 +26,7 @@ export function DataCard({
   system: UnitSystem
   opticName: (id: string) => string
   /** The name as its heading; off where the panel's head names the firearm. */
-  title?: boolean | undefined
+  title?: boolean
 }) {
   const facts: [string, string | undefined][] = [
     ['Cartridge', cartridge],

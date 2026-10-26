@@ -8,7 +8,7 @@ import { formatNumber, inchText, kilogramsPerGrain, type UnitSystem } from './un
 /** A catalogue bullet of the list: the summary with the name of its manufacturer. */
 export type BulletItem = BulletSummary & {
   manufacturerName: string
-  manufacturerAliases?: string[] | undefined
+  manufacturerAliases?: string[]
 }
 
 /**
@@ -112,7 +112,7 @@ type BallisticCoefficient = { model: 'G1' | 'G7'; value: number }
  */
 export function bulletBallisticCoefficient(
   b: Pick<BulletSummary, 'ballisticCoefficientG1' | 'ballisticCoefficientG7'>,
-): (BallisticCoefficient & { other?: BallisticCoefficient | undefined }) | undefined {
+): (BallisticCoefficient & { other?: BallisticCoefficient }) | undefined {
   const g1: BallisticCoefficient | undefined =
     b.ballisticCoefficientG1 === null ? undefined : { model: 'G1', value: b.ballisticCoefficientG1 }
   const g7: BallisticCoefficient | undefined =

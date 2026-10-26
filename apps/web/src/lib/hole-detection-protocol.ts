@@ -17,9 +17,9 @@ export type Photo = {
 
 export type Search = {
   /** The marked region; absent: the target face, else the target the module finds in the whole turned photo. */
-  region?: Point[] | undefined
+  region?: Point[]
   /** The face recognised or chosen: its outline is the region and its black area the background. */
-  face?: FaceGeometry | undefined
+  face?: FaceGeometry
   pxPerM: number
   /** Expected hole diameter, m. */
   holeDiameter: number
@@ -30,14 +30,14 @@ export type WorkerRequest =
   | (Photo &
       Search & {
         kind: 'detect'
-        backing?: Rgb | undefined
-        polarity?: 'dark' | 'light' | undefined
+        backing?: Rgb
+        polarity?: 'dark' | 'light'
         /** Try hole sizes around `holeDiameter` (the bullet) and keep the one the holes show (`autoDetect`). */
-        auto?: boolean | undefined
+        auto?: boolean
       })
   | (Photo & { kind: 'colour'; at: Point; radius: number })
   /** The face search over the whole turned photo against `faces`; `pxPerMm` is the photo's known scale. */
-  | (Photo & { kind: 'face'; faces: TargetFace[]; pxPerMm?: number | undefined })
+  | (Photo & { kind: 'face'; faces: TargetFace[]; pxPerMm?: number })
   /** Detection from the hole under `at` (`detectFromExample`); `holeDiameter` sets the sizes it tries. */
   | (Photo & Search & { kind: 'example'; at: Point })
 
@@ -48,9 +48,9 @@ export type WorkerReply =
       proposals: HoleProposal[]
       flagged: FlaggedRegion[]
       /** The hole size an auto or example run kept, m; absent when it kept none. */
-      holeDiameter?: number | undefined
+      holeDiameter?: number
       /** What the picked hole showed; absent when no hole was found there. */
-      example?: HoleExample | undefined
+      example?: HoleExample
     }
   | { kind: 'colour'; rgb: Rgb }
   /** The search on the photo's px; `fits` is empty when no face is proposed. */

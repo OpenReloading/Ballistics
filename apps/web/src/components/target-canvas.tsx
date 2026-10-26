@@ -639,29 +639,29 @@ export function TargetCanvas({
   selected?: Selection | undefined
   tool: Tool
   /** Points clicked so far for the calibration tool, image px. */
-  pending?: Point[] | undefined
+  pending?: Point[]
   overlays: Record<Overlay, boolean>
   filter: { contrast: number; darken: number }
   /** Diameter of the shot marks, m; a fixed size on screen without it. */
   marker: number | undefined
   /** A shot's accessible name. */
   describe: (sel: Selection) => string
-  statsBox?: ReactNode | undefined
+  statsBox?: ReactNode
   onSelect?: (sel: Selection | undefined) => void
-  onAdd?: ((q: Point) => void) | undefined
+  onAdd?: (q: Point) => void
   /** A drag step of a shot; `first` starts an undo step. */
-  onMove?: ((sel: Selection, q: Point, first: boolean) => void) | undefined
+  onMove?: (sel: Selection, q: Point, first: boolean) => void
   onToggle?: ((sel: Selection) => void) | undefined
   onDelete?: ((sel: Selection) => void) | undefined
   onNudge?: ((sel: Selection, dx: number, dy: number) => void) | undefined
   /** A click of the aim, origin or a calibration tool, view point (image px with a photo). */
-  onPoint?: ((p: Point) => void) | undefined
-  onRefMove?: ((ref: number, point: number, p: Point, first: boolean) => void) | undefined
-  onAimMove?: ((group: string, q: Point, first: boolean) => void) | undefined
+  onPoint?: (p: Point) => void
+  onRefMove?: (ref: number, point: number, p: Point, first: boolean) => void
+  onAimMove?: (group: string, q: Point, first: boolean) => void
   /** Drawn over the shots in view units, `k` view units per screen px: the notes. */
-  layer?: ((k: number) => ReactNode) | undefined
+  layer?: (k: number) => ReactNode
   /** A fixed view and scale for an export or the print: no input (no handlers), loupe, zoom buttons, references or axes. */
-  still?: { box: ViewBox; k: number } | undefined
+  still?: { box: ViewBox; k: number }
   /** Set to the extent Fit shows on every render, for the exports and the print. */
   view?: { current: { extent: ViewBox } | undefined }
 }) {

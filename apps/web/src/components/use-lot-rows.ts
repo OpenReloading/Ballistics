@@ -98,7 +98,7 @@ async function lotAnswer(
 /** The rows of an answer for this run, with the change they were asked at. */
 function lotRowsOf(
   ok: Extract<Outcome, { kind: 'ok' }> | undefined,
-  current: { fraction: number; steps?: Record<Lot, Step[]> | undefined } | undefined,
+  current: { fraction: number; steps?: Record<Lot, Step[]> } | undefined,
 ): LotRows['rows'] {
   if (!ok || !current?.steps) return
   const steps = {
@@ -143,7 +143,7 @@ export function useLotRows({
     key: string
     run: number
     fraction: number
-    steps?: Record<Lot, Step[]> | undefined
+    steps?: Record<Lot, Step[]>
     message?: string | undefined
   }>()
   const current = got && ok && got.run === ok.id ? got : undefined

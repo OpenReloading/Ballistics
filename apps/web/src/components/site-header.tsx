@@ -60,7 +60,7 @@ type Section = (typeof sections)[number]
  * tooltip, by pointer and keyboard focus, says that breaking changes are to be expected. `full`: the
  * whole wordmark in the top bar (a page without a visible title), else cut to its mark.
  */
-function Brand({ onClick, full }: { onClick?: () => void; full?: boolean | undefined }) {
+function Brand({ onClick, full }: { onClick?: () => void; full?: boolean }) {
   const note = useId()
   return (
     <>
@@ -108,7 +108,7 @@ function PageLink({
   /** Called when the link is followed (the drawer closes). */
   onNavigate?: (() => void) | undefined
   /** The key in the rail's tooltip (Ctrl K). */
-  hint?: string | undefined
+  hint?: string
 }) {
   const current = !onOpen && pageCoversRoute(href, route)
   const icon = <NavIcon name={href} />

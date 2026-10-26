@@ -32,13 +32,13 @@ export function RecordPage({
   /** Facts beside the title (line, caliber, product number), not repeated in the tables. */
   badges: string[]
   /** A layout of the grid, such as `record-chart` (powder) or `cartridge-record`. */
-  className?: string | undefined
+  className?: string
   /** "Compare" link. */
   compare?: string | undefined
   /** The badges as drawn in the bar, where they are more than text (the cartridge record's notes on hover); `badges` stays the line below 75em. */
-  badgeNodes?: ReactNode | undefined
+  badgeNodes?: ReactNode
   /** A line under the bar, over the grid (the cartridge record's pressures). */
-  strip?: ReactNode | undefined
+  strip?: ReactNode
   /** "Use in workbench" link. */
   workbench?: string | undefined
   /** "Open in shot groups" link. */
@@ -46,7 +46,7 @@ export function RecordPage({
   /** "Open in designer" link. */
   design?: string | undefined
   /** The figure section; a record whose values carry their own figures (the cartridge's) has none. */
-  figure?: ReactNode | undefined
+  figure?: ReactNode
   /** The values section: the record's table. */
   values: ReactNode
   /** The side column: coefficients, notes. */

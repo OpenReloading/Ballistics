@@ -95,26 +95,26 @@ export interface DraftCartridge {
    * design itself, with the cartridge and chamber views. Without it the page is the designer, whose
    * own drawing is above.
    */
-  card?: true | undefined
+  card?: true
 }
 
 /** The seated bullet's volume (m³), travel, COAL and CBTO (m), for the page's fields and print. */
 export type Seated = {
   /** The case volume to the mouth, m³ (the capacity record or the measured one), seated or not. */
-  caseVolume?: number | undefined
+  caseVolume?: number
   volume?: number | undefined
   travel?: number | undefined
-  overallLength?: number | undefined
-  baseToOgive?: number | undefined
+  overallLength?: number
+  baseToOgive?: number
   /** Seating depth and the barrel length of the seating, m, for print. */
-  depth?: number | undefined
-  barrel?: number | undefined
+  depth?: number
+  barrel?: number
   /** The length the bullet is seated by; the other one is derived. */
   mode?: Mode | undefined
   /** The seating is the preview's own start (initial, L6 or mid-range), not a user move. */
-  atStart?: boolean | undefined
+  atStart?: boolean
   /** What the chart's barrel strip draws. */
-  figure?: StripFigure | undefined
+  figure?: StripFigure
 }
 
 /** A record fetched through `apiFetch`; a later id aborts the earlier request. */
@@ -157,7 +157,7 @@ function Row({
   /** The unit of `value`, in a column of its own in the workbench card. */
   unit?: string | undefined
   tag?: Tagged['tag'] | undefined
-  note?: ReactNode | undefined
+  note?: ReactNode
 }) {
   return (
     <div className="seating-row">
@@ -259,15 +259,15 @@ type PreviewProps = {
    * it: replaces the record's.
    */
   measuredWaterCapacity?: FieldValue | undefined
-  onMeasuredWaterCapacity?: ((value: FieldValue) => void) | undefined
+  onMeasuredWaterCapacity?: (value: FieldValue) => void
   /** The capacity record chosen, held by the page so a load keeps it; without it the choice is the figure's own. */
   capacityId?: string | undefined
-  onCapacityId?: ((id: string) => void) | undefined
+  onCapacityId?: (id: string) => void
   /**
    * The bullet record or design of the page's own bullet input: the preview seats it and
    * shows no bullet search or design choice of its own.
    */
-  linked?: { bullet?: string | undefined; design?: string | undefined } | undefined
+  linked?: { bullet?: string | undefined; design?: string | undefined }
   /**
    * Where the controls go instead of beside the drawing: case capacity, seating and the
    * values in `cartridge`, the barrel length in `gun`; the figure keeps the drawing.
@@ -276,15 +276,15 @@ type PreviewProps = {
     cartridge: HTMLElement | null
     gun: HTMLElement | null
     /** Rarely needed parts: the capacity record (`more`) and further values (`moreValues`, a `dl`). */
-    more?: HTMLElement | null | undefined
-    moreValues?: HTMLElement | null | undefined
+    more?: HTMLElement | null
+    moreValues?: HTMLElement | null
   }
   /** Combined: both outlines, no dimensions; Cartridge or Chamber: that side's dimensioned record figure. */
   view?: 'cartridge' | 'chamber' | 'combined' | undefined
   /** A seating ladder step to draw instead of the field's seating, m; the fields keep theirs. */
   ladderStep?: { by: Mode; value: number } | undefined
   /** The figure's full view: the same drawing in a modal at the window's height. */
-  fullView?: { opened: boolean; onClose: () => void } | undefined
+  fullView?: { opened: boolean; onClose: () => void }
 }
 
 type Spec = NonNullable<ReturnType<typeof specOf>>

@@ -9,7 +9,7 @@ export interface MovingTargetRow {
   lateral: number
   angle: number
   /** The lead in target lengths; without a target length none. */
-  lengths?: number | undefined
+  lengths?: number
 }
 
 /**

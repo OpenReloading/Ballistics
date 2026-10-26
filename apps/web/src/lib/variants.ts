@@ -102,7 +102,7 @@ export interface ResolvedBullet {
   /** Why the record is read only. */
   problem?: string | undefined
   /** The base changed since the bullet was saved. */
-  changed?: boolean | undefined
+  changed?: boolean
 }
 
 /** A user cartridge with its base and the table and values the overrides give. */
@@ -112,7 +112,7 @@ export interface ResolvedCartridge {
   record: { table?: string | undefined; values: SpecValue[] }
   problem?: string | undefined
   /** The base changed since the cartridge was saved. */
-  changed?: boolean | undefined
+  changed?: boolean
 }
 
 /** The user bullet `data` with its base read from the catalogue. */

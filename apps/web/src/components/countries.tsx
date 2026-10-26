@@ -57,9 +57,9 @@ export function Countries({
 }: {
   items: { name: string; code?: string | undefined }[]
   /** Hover text for the whole item. */
-  title?: string | undefined
+  title?: string
   /** `span` inside a list of its own. */
-  as?: 'li' | 'span' | undefined
+  as?: 'li' | 'span'
 }) {
   return (
     <Tag className="countries" title={title}>

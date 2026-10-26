@@ -281,7 +281,7 @@ const scaleWords = (k: number) =>
  * lengths and their tolerances in `unit`, an angle in degrees.
  */
 function described(
-  d: { symbol: string; value: number; derived?: true | undefined; stored?: SpecValue | undefined },
+  d: { symbol: string; value: number; derived?: true; stored?: SpecValue },
   unit: LengthUnit,
   angle = false,
 ) {
@@ -511,7 +511,7 @@ function Outline({
   model: FigureModel
   tallest: number
   /** The upright print model and the record's print scale; none for the record's Combined view. */
-  print?: FigureModel | undefined
+  print?: FigureModel
   scale?: number | undefined
   /** The designer's figure of both sides: the region differences of its Combined view. */
   differences?: Region[] | undefined

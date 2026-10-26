@@ -314,7 +314,7 @@ export function NumberField({
   /** Undefined where the form holds no value for the field: an empty field. */
   value: FieldValue | undefined
   onChange: (value: FieldValue) => void
-  onBlur?: (() => void) | undefined
+  onBlur?: () => void
   /** Called on Enter in the field. */
   onEnter?: (() => void) | undefined
   /**
@@ -323,7 +323,7 @@ export function NumberField({
    */
   error?: OfShown<string | boolean | undefined>
   /** The message is the field's description for screen readers but not drawn: it stands elsewhere. */
-  hiddenError?: boolean | undefined
+  hiddenError?: boolean
   /** The field's help where it names a unit, in place of `spec.help`. */
   help?: ((shown: UnitSystem) => string) | undefined
   /** Shown under the field after the help, as where a default value comes from. */
@@ -338,7 +338,7 @@ export function NumberField({
   /** Shown while the field is empty, as the value used instead. */
   placeholder?: string | ((system: UnitSystem) => string | undefined) | undefined
   /** The value is a default: muted text (its source is the `mark`). */
-  muted?: boolean | undefined
+  muted?: boolean
   /**
    * The unit suffix: a switch to the quantity's other units for this field only, plain text, or
    * none where a column header names it (the designers follow the Settings preset); the label

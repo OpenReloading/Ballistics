@@ -28,7 +28,7 @@ import { defined } from './defined.ts'
 export interface SpecRecord {
   id: string
   standard: string
-  table?: string
+  table?: string | undefined
   verification?: string
   values: SpecValue[]
 }
@@ -54,7 +54,7 @@ export interface Laid {
   values: SpecValue[]
   variant?: string | undefined
   /** The unit of the length texts, mm by default. */
-  unit?: LengthUnit
+  unit?: LengthUnit | undefined
 }
 
 /** Distance from p to the segment from a to b. */

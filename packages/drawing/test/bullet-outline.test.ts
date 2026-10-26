@@ -493,7 +493,7 @@ interface BulletJson {
     diameter?: Stored
     angle?: Stored
   }
-  ogive?: { form?: string; radius?: Stored; radiusRatio?: Stored }
+  ogive?: { form?: string | undefined; radius?: Stored; radiusRatio?: Stored }
   tip?: { type: string; length?: Stored; mouthDiameter?: Stored }
 }
 

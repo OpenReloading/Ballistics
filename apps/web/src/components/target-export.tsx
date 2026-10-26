@@ -34,7 +34,7 @@ export function StatsBlock({
   /** A group's ring score as one line, when it has a face. */
   score?: (g: ShotGroup) => string | undefined
 }) {
-  const lines = groups.flatMap((g): { text: string; colour?: string | undefined }[] => {
+  const lines = groups.flatMap((g): { text: string; colour?: string }[] => {
     const s = groupStatisticsOf(g)
     if (!s.shotCount) return []
     return [
@@ -198,7 +198,7 @@ export function ExportMenu({
   onPrint?: (() => void) | undefined
   onMessage: (text: string, alert?: boolean) => void
   /** A text button the size of File (the page bar), else a toolbar icon. */
-  text?: boolean | undefined
+  text?: boolean
 }) {
   const [job, setJob] = useState<{ box: ViewBox; k: number }>()
   const stem = recordFileName(name).replace(/\.json$/, '')

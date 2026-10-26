@@ -37,7 +37,12 @@ import { presetUnits, waterDensityGramsPerCm3 } from '../src/lib/units.ts'
 import { defined } from './defined.ts'
 import { readRecord } from './read-record.ts'
 
-type Value = { side?: string; symbol: string; value: number; variant?: string }
+type Value = {
+  side?: string | undefined
+  symbol: string
+  value: number
+  variant?: string | undefined
+}
 
 function record(kind: string, id: string) {
   return readRecord(`${kind}/${id}.json`)

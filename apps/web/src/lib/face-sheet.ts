@@ -16,7 +16,7 @@ export type FoundFace = Pick<FacePlane, 'centre' | 'corners' | 'outer'> & {
   /** Id of the face record; absent for a plane from a typed diameter. */
   id?: string | undefined
   /** Id of the event the user chose; absent: the group's discipline, else an event at the group's distance. */
-  event?: string | undefined
+  event?: string
   /** Id of the federation that publishes the face. */
   federation?: string | undefined
   /** The events of the face with their distances, m, and the federation of an event of another one. */

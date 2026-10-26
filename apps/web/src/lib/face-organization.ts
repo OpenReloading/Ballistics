@@ -3,7 +3,7 @@ import type { Federation, TargetFace } from '@open-reloading/schema'
 import { userOrganization } from './user-faces.ts'
 
 /** A face event with the abbreviation of the federation whose rule book lists it, where that is not its face's. */
-export type FaceEvent = TargetFace['events'][number] & { organization?: string | undefined }
+export type FaceEvent = TargetFace['events'][number] & { organization?: string }
 
 /** A target face record and its federation's abbreviation (`User design` for a face without a federation). */
 export type Face = Omit<TargetFace, 'events'> & { organization: string; events: FaceEvent[] }

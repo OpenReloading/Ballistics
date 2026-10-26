@@ -154,8 +154,8 @@ export function CompareButton({
   count: number
   min: number
   href: string
-  need?: string | undefined
-  idle?: string | undefined
+  need?: string
+  idle?: string
 }) {
   const label = count > 0 ? `Compare ${count}` : idle
   const hint = useId()

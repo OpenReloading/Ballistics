@@ -60,8 +60,8 @@ export function fittedEnergyRatio(p: Powder) {
 /** One load table of a record's fit: title, training rows and cartridges. */
 interface FitTable {
   title: string
-  trainingRows?: number | undefined
-  trainingCartridges?: number | undefined
+  trainingRows?: number
+  trainingCartridges?: number
 }
 
 /** The fitted sources of a record with their training rows. */

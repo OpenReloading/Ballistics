@@ -316,7 +316,7 @@ export function Readouts({
   system: UnitSystem
   stale: boolean
   /** In the print report: text in place of controls. */
-  printed?: boolean | undefined
+  printed?: boolean
 }) {
   const { result: r, pressureRange: range } = ok.body
   const band = resultBand(ok.body, printed)

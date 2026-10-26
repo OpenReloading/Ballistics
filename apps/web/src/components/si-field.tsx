@@ -26,7 +26,7 @@ export function SiField({
   /** A value shown before the placeholder text, SI. */
   shown?: number | undefined
   /** Commit when the field is left or on Enter, not on every keystroke. */
-  deferred?: boolean | undefined
+  deferred?: boolean
 }) {
   const { system } = useUnits()
   const [draft, setDraft] = useState<FieldValue>()

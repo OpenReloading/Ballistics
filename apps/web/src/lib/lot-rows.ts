@@ -35,7 +35,7 @@ export function lotBody(
   direction: LadderDirection,
   lot: Lot,
   fraction: number,
-  cartridge?: string,
+  cartridge?: string | undefined,
 ): ReturnType<typeof longerBody> & { cartridge?: string | undefined } {
   const body = longerBody(lotLoad(load, lot, fraction), charges, direction, load.barrel.length)
   return cartridge ? { ...body, cartridge } : body

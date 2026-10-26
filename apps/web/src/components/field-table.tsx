@@ -53,8 +53,8 @@ export function Noted({
 }: {
   value: ReactNode
   notes: string[]
-  inline?: boolean | undefined
-  className?: string | undefined
+  inline?: boolean
+  className?: string
   /** `inline` only: -1 for a symbol in a list with one tab stop. */
   tabIndex?: number | undefined
 }) {
@@ -246,9 +246,9 @@ export function FieldPanel({
   id: string
   title: string
   groups: FieldGroup[]
-  className?: string | undefined
+  className?: string
   /** Under the table: the record's note. */
-  children?: ReactNode | undefined
+  children?: ReactNode
 }) {
   const [group, setGroup] = useState('All')
   const [q, setQ] = useState('')

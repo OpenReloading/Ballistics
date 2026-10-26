@@ -122,7 +122,7 @@ export function InteriorChart({
   /** What the barrel strip above the chart draws, from the run's seating. */
   strip?: StripFigure | undefined
   /** A new key starts the playback afresh at ignition: a new run or step. */
-  playKey?: string | undefined
+  playKey?: string
   /** The run's burn form z1 (the two-stage form), for its event line. */
   z1?: number | undefined
 }) {

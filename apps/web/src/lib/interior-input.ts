@@ -147,8 +147,8 @@ export type InteriorBody = { model: 'm3'; load: InteriorLoad; cartridge?: string
  */
 export function interiorBody(
   values: Record<string, number | undefined>,
-  cartridge?: string,
-  grooveDiameter?: number,
+  cartridge?: string | undefined,
+  grooveDiameter?: number | undefined,
 ): InteriorBody {
   const label = (key: string) => interiorFields.find((s) => s.key === key)?.label ?? key
   return {

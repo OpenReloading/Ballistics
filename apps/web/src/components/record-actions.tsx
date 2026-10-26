@@ -40,10 +40,10 @@ export function LinkButton({
   children,
 }: {
   href: string
-  size?: ButtonProps['size'] | undefined
-  icon?: ReactNode | undefined
-  primary?: boolean | undefined
-  className?: string | undefined
+  size?: ButtonProps['size']
+  icon?: ReactNode
+  primary?: boolean
+  className?: string
   children: ReactNode
 }) {
   return (
@@ -128,9 +128,9 @@ export function PrintButton({
   disabled,
   hint,
 }: {
-  onClick?: (() => void) | undefined
-  disabled?: boolean | undefined
-  hint?: string | undefined
+  onClick?: () => void
+  disabled?: boolean
+  hint?: string
 }) {
   return (
     <Tooltip label={hint ?? 'Print'} multiline={!!hint} maw={hint ? 320 : undefined}>

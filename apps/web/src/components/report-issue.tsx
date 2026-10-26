@@ -49,7 +49,7 @@ export function ReportIssueButton({
   onOpen,
 }: {
   url?: string | undefined
-  drawer?: boolean | undefined
+  drawer?: boolean
   onOpen: () => void
 }) {
   if (!url) return null

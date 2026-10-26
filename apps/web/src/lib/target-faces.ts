@@ -140,20 +140,20 @@ export function targetFaceGroups(f: TargetFace): FieldGroup[] {
 type FaceEventRow = {
   id: string
   /** The discipline record's id; absent where no listed discipline maps the event. */
-  disciplineId?: string | undefined
+  disciplineId?: string
   federation: string
-  number?: string | undefined
+  number?: string
   /** The discipline's name, else the event's. */
   discipline: string
-  stage?: string | undefined
+  stage?: string
   /** As the rule book prints it, else in m. */
   distance: string
   /** Gauge diameter, mm. */
-  gauge?: number | undefined
-  shotCount?: number | undefined
-  category?: string | undefined
-  scoring?: TargetFace['events'][number]['scoring'] | undefined
-  section?: string | undefined
+  gauge?: number
+  shotCount?: number
+  category?: string
+  scoring?: TargetFace['events'][number]['scoring']
+  section?: string
 }
 
 type EventMapping = Pick<

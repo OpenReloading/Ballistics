@@ -34,7 +34,7 @@ export interface CartridgeSummary {
 
 /** A cartridge record, as `GET /cartridges/{id}` answers: its C.I.P. sheet, case type and case capacities. */
 export interface CartridgeDetail extends Omit<Cartridge, 'aliases'> {
-  aliases?: string[] | undefined
+  aliases?: string[]
   caseType?: CaseType | undefined
   capacities: CatalogueCaseCapacity[]
   /** Hash of the stored record, which a user variant keeps at save to tell that its base changed. */
@@ -45,8 +45,8 @@ export interface CartridgeDetail extends Omit<Cartridge, 'aliases'> {
 export interface ManufacturerSummary {
   id: string
   name: string
-  aliases?: string[] | undefined
-  website?: string | undefined
+  aliases?: string[]
+  website?: string
 }
 
 export interface BulletSummary {
@@ -64,9 +64,9 @@ export interface BulletSummary {
   /** ISO 3166-1 alpha-2 code of the manufacturer's country. */
   country?: string | undefined
   /** The tip type of the record. */
-  tipType?: string | undefined
+  tipType?: string
   /** The construction structure of the record, else "<core material>-core". */
-  construction?: string | undefined
+  construction?: string
 }
 
 export interface PowderSummary {
@@ -74,8 +74,8 @@ export interface PowderSummary {
   /** Id of the manufacturer record. */
   manufacturer: string
   name: string
-  grainForm?: Powder['grainForm'] | undefined
-  propellantBase?: Powder['propellantBase'] | undefined
+  grainForm?: Powder['grainForm']
+  propellantBase?: Powder['propellantBase']
   /** ISO 3166-1 alpha-2 code of the manufacturer's country. */
   country?: string | undefined
   /** The fitted model's fields the burn-rate curve needs. */
@@ -128,7 +128,7 @@ export interface InteriorResponse {
     cases: { maxPressure: number | null }[]
   }
   /** The sampled band of the run (`sampling`), `POST /interior`; `failed` is set by the web app when its request did not answer. */
-  sampled?: SampledBand | undefined
+  sampled?: SampledBand
   limits?: {
     cartridge: string
     /** Date of the sheet revision, `revised` or else `published`. */
@@ -136,20 +136,20 @@ export interface InteriorResponse {
     symbol: string
     method: string | null
     variant?: string | undefined
-    pressure?: number | undefined
+    pressure?: number
     compared: boolean
     reason?: string | undefined
-    exceeded?: boolean | undefined
-    nominalExceeded?: boolean | undefined
+    exceeded?: boolean
+    nominalExceeded?: boolean
   }[]
   /** `spec`: the id of the C.I.P. sheet of a limit warning, `symbol`, `variant`, `method`: its limit. */
   warnings: {
     code: string
     message: string
-    spec?: string | undefined
+    spec?: string
     symbol?: string | undefined
     variant?: string | undefined
-    method?: string | null | undefined
+    method?: string | null
   }[]
   resolved?: {
     cartridge?:
@@ -190,7 +190,7 @@ export interface SampledPercentiles {
  */
 type InteriorLadderStep = { charge: number } & (
   | Pick<InteriorResponse, 'result' | 'pressureRange' | 'limits' | 'warnings'>
-  | { error: { message: string; reason?: string | undefined; field?: string | undefined } }
+  | { error: { message: string; reason?: string | undefined; field?: string } }
 )
 
 /** The answer to a request with `ladder`: the shared fields once, then the steps. */
@@ -206,6 +206,6 @@ export interface ErrorBody {
   message?: string | undefined
   notice?: string | undefined
   reason?: string | undefined
-  field?: string | undefined
-  issues?: { path: (string | number)[]; message: string }[] | undefined
+  field?: string
+  issues?: { path: (string | number)[]; message: string }[]
 }

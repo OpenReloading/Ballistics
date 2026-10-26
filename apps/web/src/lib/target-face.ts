@@ -301,7 +301,7 @@ export function matchFaces(
   rings: readonly Ring[],
   faces: readonly TargetFace[],
   frame?: { width: number; height: number },
-  scale?: number,
+  scale?: number | undefined,
 ): FaceMatch[] {
   const rho = meanRadius(black)
   const found = concentric(black, rings)
@@ -391,7 +391,7 @@ export type FaceGeometry = {
   outer: number
   black: number
   /** Radii of the scoring rings, mm (the numerals stand between them). */
-  rings?: readonly number[] | undefined
+  rings?: readonly number[]
 }
 
 /** The face plane on the photo. */
@@ -604,7 +604,7 @@ function misfitOf(m: Member, toFace: Matrix): number {
 
 export type FaceSearch = {
   /** The black area found, image px. */
-  black?: Ellipse | undefined
+  black?: Ellipse
   /** The black edge and the ring lines found, image px: what the user sees when no face fits. */
   ellipses: Ellipse[]
   /** The rings found (without the black edge), for a fit of a face the user picks. */
@@ -630,7 +630,7 @@ export type FaceSearch = {
 export function findFace(
   image: RgbaImage,
   faces: readonly TargetFace[],
-  scale?: number,
+  scale?: number | undefined,
 ): FaceSearch {
   const s0 = Math.max(1, Math.ceil(Math.max(image.width, image.height) / COARSE))
   const coarse = grayGrid(image, s0)

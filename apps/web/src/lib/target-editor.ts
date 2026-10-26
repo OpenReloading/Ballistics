@@ -29,7 +29,7 @@ import {
 import { groupStatisticsOf } from './target-groups.ts'
 
 /** Image px to target m and back; for a drawn target the view is target mm with y down. */
-export type Frame = { toTarget: Matrix; toImage: Matrix; calibration?: Calibration | undefined }
+export type Frame = { toTarget: Matrix; toImage: Matrix; calibration?: Calibration }
 
 const mm = toSi('length', 1)
 const drawn: Frame = {

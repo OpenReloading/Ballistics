@@ -202,8 +202,8 @@ type FirearmRecord = Extract<UserRecord, { kind: 'firearm' }>
 type Answer = { res: Response; json: (InteriorResponse & ErrorBody) | undefined }
 
 type Kind = 'cartridge' | 'bullet' | 'powder' | 'capacity'
-type Asked = Partial<Record<Kind, { id: string; failed?: true | undefined }>>
-type Groove = { id: string; z?: number | undefined; record?: CartridgeDetail | undefined }
+type Asked = Partial<Record<Kind, { id: string; failed?: true }>>
+type Groove = { id: string; z?: number | undefined; record?: CartridgeDetail }
 
 /**
  * The chosen cartridge's loaded record: its groove diameter Z, m, the bore area Q, m2, an empty
@@ -862,7 +862,7 @@ function fetchBand(request: unknown, signal: AbortSignal): Promise<SampledBand> 
   const failed: SampledBand = { status: 'failed' }
   return postInterior(request, signal)
     .then((r) => (r.ok ? r.json() : undefined))
-    .then((answer: { sampled?: SampledBand | undefined } | undefined) => answer?.sampled ?? failed)
+    .then((answer: { sampled?: SampledBand } | undefined) => answer?.sampled ?? failed)
     .catch(() => failed)
 }
 
@@ -1231,8 +1231,8 @@ export function useWorkbenchState() {
   const [searchKey, setSearchKey] = useState(0)
   const [previewInitial, setPreviewInitial] = useState<{
     bullet?: string | undefined
-    barrel?: number | undefined
-    seating?: Seating | undefined
+    barrel?: number
+    seating?: Seating
   }>()
   /** SI values the preview wrote into the fields. */
   const [previewed, setPreviewed] = useState<Partial<Record<PreviewKey, number>>>({})
@@ -1818,7 +1818,7 @@ export function useWorkbenchState() {
    * the fields as they stand (edited or opened parameters). `recordInputs` lists what the records'
    * bore resistance reads besides the body: the key of the Powders tab's rows.
    */
-  function loadRequest(as?: { powder: Powder; charge?: number | undefined }) {
+  function loadRequest(as?: { powder: Powder; charge?: number }) {
     const chosen = as?.powder ?? powder
     const values = powderValues(siValues(fields), powder, as)
     const body = interiorBody(

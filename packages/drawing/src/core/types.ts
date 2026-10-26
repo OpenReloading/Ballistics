@@ -24,9 +24,9 @@ export interface Note<Code extends string = string> {
   symbols: string[]
   text: string
   /** The point of the feature the note concerns, in the half section; none on `closedFront`. */
-  at?: SectionPoint | undefined
+  at?: SectionPoint
   /** Its number in the figure (`recordFigures`), kept when one side is laid out alone. */
-  flagNumber?: number | undefined
+  flagNumber?: number
 }
 
 /**
@@ -51,8 +51,8 @@ export interface Dimension {
   symbol: string
   value: number
   /** The stored value; absent on a derived value. */
-  stored?: SpecValue | undefined
-  derived?: true | undefined
+  stored?: SpecValue
+  derived?: true
   /** Length and chain: from z to z; diameter: the station, from = to. */
   from: number
   to: number
@@ -62,13 +62,13 @@ export interface Dimension {
    * Dimensioned behind the head face: a head diameter (R1, E1, R3; table VII g, d, G, D) or a head
    * length (R, E, e; table VII t, T).
    */
-  behindHeadFace?: true | undefined
+  behindHeadFace?: true
   /** Diameter: the way along the axis it may move off its station, on its own segment. */
-  toward?: 1 | -1 | undefined
+  toward?: 1 | -1
   /** A diameter dimensioned past the mouth (the cartridge G1, the bullet not drawn). */
-  front?: true | undefined
+  front?: true
   /** S, on the side opposite the length stack. */
-  far?: true | undefined
+  far?: true
 }
 
 /** An angle about its vertex: the rays to the two flank points bound it. */
@@ -120,7 +120,7 @@ export interface Label {
   h: number
   owner: string
   /** A note flag: the number in a circle of diameter w. */
-  ring?: true | undefined
+  ring?: true
 }
 
 /** A dimension line (`rule`) or an extension line, flank or leader (`thin`). */
@@ -130,7 +130,7 @@ export interface LineSegment {
   kind: 'rule' | 'thin'
   owner: string
   /** A leader to a text: an angle's from its arc, a radius's from its corner. */
-  leader?: true | undefined
+  leader?: true
 }
 
 /** An angle arc about c, from angle `from` to `to` (radians in the part frame). */
@@ -173,7 +173,7 @@ export interface Part {
   /** Steel band edge for a chamber; extension lines start there. */
   outer?: number | undefined
   /** Texts on a leader from a feature (note flags, detail letters), placed after the rest. */
-  callouts?: Callout[] | undefined
+  callouts?: Callout[]
   /** The unit of the length texts; mm by default. */
   unit?: LengthUnit | undefined
 }
@@ -184,5 +184,5 @@ export interface Callout {
   text: string
   /** The feature in the half section. */
   at: SectionPoint
-  letter?: true | undefined
+  letter?: true
 }

@@ -17,8 +17,8 @@ export function Panel({
   id: string
   title: string
   /** Beside the title: a view switch, a filter, a search field. */
-  controls?: ReactNode | undefined
-  className?: string | undefined
+  controls?: ReactNode
+  className?: string
   children: ReactNode
 }) {
   return (

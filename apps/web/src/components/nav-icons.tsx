@@ -52,7 +52,7 @@ const drawn: Record<string, ReactNode> = {
   ),
 }
 
-export function NavIcon({ name, size = 20 }: { name: string; size?: number | undefined }) {
+export function NavIcon({ name, size = 20 }: { name: string; size?: number }) {
   if (drawn[name])
     return (
       <svg

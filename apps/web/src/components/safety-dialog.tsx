@@ -109,8 +109,8 @@ export function SafetyBarButton({
   iconOnly = false,
   className,
 }: {
-  iconOnly?: boolean | undefined
-  className?: string | undefined
+  iconOnly?: boolean
+  className?: string
 }) {
   const icon = <NavIcon name="safety" />
   return iconOnly ? (

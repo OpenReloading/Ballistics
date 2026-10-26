@@ -103,7 +103,7 @@ export function SourceFilter({
   src: string | undefined
   counts: Record<Origin, number>
   onChange: (src: string) => void
-  sources?: readonly Origin[] | undefined
+  sources?: readonly Origin[]
 }) {
   const shown = readOrigins(src, sources)
   const text =

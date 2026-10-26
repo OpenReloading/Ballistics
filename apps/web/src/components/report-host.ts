@@ -11,7 +11,7 @@ export type ReportOption = {
   /** The block's Markdown; undefined when the page has none to give. */
   text: () => string | undefined | Promise<string | undefined>
   /** The label of the option that must be ticked first. */
-  needs?: string | undefined
+  needs?: string
 }
 
 /** The options of the page shown, set while it is mounted. */

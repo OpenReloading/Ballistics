@@ -36,7 +36,7 @@ const cited = () =>
 
 /** A usable default: finite, within the field's bounds; temperature (K) and ignition pressure above 0. */
 export function validDefault(key: DefaultKey, si: unknown): si is number {
-  const spec = interiorFields.find((s) => s.key === key) as { min?: number | undefined }
+  const spec = interiorFields.find((s) => s.key === key) as { min?: number }
   if (typeof si !== 'number' || !Number.isFinite(si)) return false
   if (key !== 'startPressure' && si <= 0) return false
   return spec.min === undefined || si >= spec.min

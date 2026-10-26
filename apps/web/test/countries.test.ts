@@ -30,7 +30,9 @@ describe('parseCountries', () => {
   it('give every country of the cartridge records a flag or list it as having none', () => {
     const names = new Set<string>()
     for (const f of readdirSync(dir)) {
-      const { country } = JSON.parse(readFileSync(new URL(f, dir), 'utf8')) as { country?: string }
+      const { country } = JSON.parse(readFileSync(new URL(f, dir), 'utf8')) as {
+        country?: string | undefined
+      }
       if (country) for (const c of country.split(',')) names.add(c.trim())
     }
     expect(names.size).toBeGreaterThan(20)
@@ -56,7 +58,7 @@ describe('countryOf', () => {
     const dir = new URL(`../../../packages/data/records/${kind}/`, import.meta.url)
     for (const f of readdirSync(dir)) {
       const { country } = JSON.parse(readFileSync(new URL(f, dir), 'utf8')) as {
-        country?: string
+        country?: string | undefined
       }
       if (country) codes.add(country)
     }

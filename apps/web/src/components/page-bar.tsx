@@ -62,21 +62,21 @@ export function PageBar({
 }: {
   title: string
   /** The h1 for screen readers only: the home page shows the wordmark instead. */
-  titleHidden?: boolean | undefined
+  titleHidden?: boolean
   /** Beside the title: the workbench's open loads, a record's standard badges. */
-  after?: ReactNode | undefined
+  after?: ReactNode
   /** The status line's own content, such as a list's count. */
-  status?: ReactNode | undefined
-  actions?: ReactNode | undefined
+  status?: ReactNode
+  actions?: ReactNode
   /** One action only: below 75em it shows as itself in the bar, not behind "Page actions". */
-  single?: boolean | undefined
+  single?: boolean
   /**
    * A loading bar that holds the box of the bar that replaces it, so nothing moves when it is replaced:
    * the status row and the Page actions slot, empty and not shown.
    */
   reserve?: boolean | undefined
   /** The Safety button as an icon, as the workbench's other secondary actions. */
-  compact?: boolean | undefined
+  compact?: boolean
 }) {
   const [statusLine, setStatusLine] = useState<HTMLDivElement | null>(null)
   const [open, setOpen] = useState(false)

@@ -25,7 +25,7 @@ export interface Figure {
    * closedFront first, then per side its missing symbols (code `missing`) or its notes; a note of
    * a drawn side carries the number of its flag.
    */
-  notes: { code: string; text: string; flagNumber?: number | undefined }[]
+  notes: { code: string; text: string; flagNumber?: number }[]
 }
 
 /** The notes of the drawn sides, numbered from 1 in caption order, or by their figure: each has a flag. */

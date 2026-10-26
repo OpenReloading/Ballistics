@@ -133,10 +133,10 @@ export function PanelTable({
   children,
 }: {
   label: string
-  className?: string | undefined
+  className?: string
   caption: ReactNode
   columns: readonly string[]
-  numeric?: boolean | undefined
+  numeric?: boolean
   children: ReactNode
 }) {
   return (

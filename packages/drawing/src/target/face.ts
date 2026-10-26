@@ -29,9 +29,9 @@ export interface FaceEllipse {
   rx: number
   ry: number
   /** The shape is a rectangle of half-width `rx` and half-height `ry`, not an ellipse. */
-  square?: true | undefined
+  square?: true
   /** Ring value of the ring the ellipse is drawn for; absent for the paper, the black area and the inner ten. */
-  ring?: number | undefined
+  ring?: number
   /** A colour name of the face record, or `white` and `black`. */
   colour: string
 }

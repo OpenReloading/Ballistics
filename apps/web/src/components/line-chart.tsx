@@ -64,17 +64,17 @@ export function LineChart({
   yLabel: string
   title: string
   description: string
-  zeroLine?: boolean | undefined
+  zeroLine?: boolean
   /** Rendered height, px. */
   height?: number | undefined
   /** The height its box has by CSS, not `height`. */
-  fill?: boolean | undefined
-  limits?: { y: number; label: string }[] | undefined
-  include?: number[] | undefined
+  fill?: boolean
+  limits?: { y: number; label: string }[]
+  include?: number[]
   /** A marker on each point of `x` and `y`. */
-  points?: boolean | undefined
-  integerX?: boolean | undefined
-  children?: ReactNode | undefined
+  points?: boolean
+  integerX?: boolean
+  children?: ReactNode
 }) {
   const tokens = useChartTokens(lineTokens)
   const [scale, setScale] = useState<ChartScale>()

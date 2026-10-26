@@ -18,7 +18,7 @@ export const greek: Record<string, string> = { alpha: 'α', alpha1: 'α1', beta:
  * degrees; the ratio Rt/R as stored.
  */
 export function labelText(
-  d: { kind: string; symbol: string; value: number; derived?: true | undefined },
+  d: { kind: string; symbol: string; value: number; derived?: true },
   unit: LengthUnit = 'mm',
 ) {
   if (d.kind === 'angle') {

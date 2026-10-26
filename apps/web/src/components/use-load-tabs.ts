@@ -32,7 +32,7 @@ type Tab = {
   custom?: string | undefined
   /** Undefined: a load with nothing chosen or typed, restored by `reset()`. */
   data?: Load | undefined
-  outcome?: UseWorkbenchStateResult['outcome'] | undefined
+  outcome?: UseWorkbenchStateResult['outcome']
   changed: boolean
   file?: FileState | undefined
   unsaved: boolean

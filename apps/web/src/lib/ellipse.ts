@@ -271,8 +271,8 @@ type RobustFit = { conic: Conic; ellipse: Ellipse; inliers: number[]; rms: numbe
 type RobustOptions = {
   tolerance: number
   minPoints: number
-  rounds?: number | undefined
-  accept?: ((e: Ellipse) => boolean) | undefined
+  rounds?: number
+  accept?: (e: Ellipse) => boolean
 }
 type Candidate = { conic: Conic; inliers: number[] }
 

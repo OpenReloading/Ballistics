@@ -20,22 +20,22 @@ export interface FieldRow {
   /** The drawing's symbol of the value (`data-symbol`), for the linked marking. */
   symbol?: string | undefined
   /** Shown as is: names, forms, values without a unit choice. */
-  text?: string | undefined
+  text?: string
   /** A text's unit, shown after it. */
   unit?: string | undefined
   /** `sig`: that many significant digits instead of the unit's decimals. */
-  value?: { quantity: Quantity; si: number; significantDigits?: number | undefined } | undefined
-  printed?: string | undefined
+  value?: { quantity: Quantity; si: number; significantDigits?: number }
+  printed?: string
   method?: string | undefined
   /** SI velocity: the lower bound of a ballistic coefficient's band, after the label. */
-  fromVelocity?: number | undefined
+  fromVelocity?: number
 }
 
 /** Rows under a group heading row (Dimensions, Computed, Coefficients); no title, no heading row. */
 export type FieldGroup = {
-  title?: string | undefined
+  title?: string
   /** The group filter's label (`FieldPanel`), shared by groups that filter together; else the title. */
-  filter?: string | undefined
+  filter?: string
   rows: FieldRow[]
 }
 
@@ -281,7 +281,7 @@ const fittedNote = (k: number) =>
 export function fittedParameterRows(
   p: Powder,
   k: number,
-  ratio?: { value: number; median?: number | undefined; powders?: number | undefined },
+  ratio?: { value: number; median?: number; powders?: number },
 ): FieldRow[] {
   const i = p.interior
   if (!i) return []
@@ -412,7 +412,7 @@ export function burnFormRows(p: Powder): FieldRow[] {
 export function powderParameterGroups(
   p: Powder,
   k: number,
-  ratio?: { value: number; median?: number | undefined; powders?: number | undefined },
+  ratio?: { value: number; median?: number; powders?: number },
 ): FieldGroup[] {
   return [
     {

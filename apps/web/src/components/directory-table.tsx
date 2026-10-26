@@ -44,17 +44,17 @@ export interface DirectoryColumn<T> {
   cell: (row: T, tabIndex: number) => ReactNode
   /** Sort key; columns without one do not sort. */
   value?: (row: T) => string | number | null | undefined
-  num?: boolean | undefined
+  num?: boolean
   /** A value equal to the row above's is set muted (a manufacturer's name once per run of its rows). */
-  dim?: boolean | undefined
+  dim?: boolean
   /** Column width (CSS); one column without it takes the rest. */
-  width?: string | undefined
+  width?: string
   /** Help on the header, shown on hover, focus and touch. */
   help?: string | undefined
   /** Not printed, as a row action. */
-  screenOnly?: boolean | undefined
+  screenOnly?: boolean
   /** At the header's end, after its label: a scale's ticks. */
-  head?: ReactNode | undefined
+  head?: ReactNode
 }
 
 /**
@@ -65,7 +65,7 @@ type Selection<T> = {
   ids: readonly string[]
   max: number
   onChange: (ids: string[]) => void
-  can?: ((row: T) => boolean) | undefined
+  can?: (row: T) => boolean
 }
 
 const focusable = 'a[href], input:not(:disabled), [tabindex]'
@@ -340,7 +340,7 @@ export function DirectoryTable<T extends { id: string }>({
   /** A heavier rule above a row that starts a group (the browser's own rows end before the catalogue's). */
   breakBefore?: ((row: T, previous: T) => boolean) | undefined
   /** A row action for phones, where the columns after the name are hidden (a Mine row's Delete); not shown from 48em. `tabIndex` as for a column's cell. */
-  phoneAction?: ((row: T, tabIndex: number) => ReactNode) | undefined
+  phoneAction?: (row: T, tabIndex: number) => ReactNode
 }) {
   const shown = sortedRows(rows, columns, sort)
   const printing = usePrinting()
@@ -741,7 +741,7 @@ function SelectBox({
 }
 
 /** A column as the phone's Sort select reads it. */
-type SortColumn = { key: string; label: string; num?: boolean | undefined; value?: unknown }
+type SortColumn = { key: string; label: string; num?: boolean; value?: unknown }
 
 /**
  * The phone's sort (below 48em only the name column shows its head): one option per sortable

@@ -60,7 +60,7 @@ export const storedValue = (
   values: SpecValue[],
   side: string,
   symbol: string,
-  variant?: string,
+  variant?: string | undefined,
 ) => {
   const of = (want?: string) =>
     values.find(
@@ -116,7 +116,7 @@ export function closedFront(values: SpecValue[]): Note | undefined {
 export function cipProfile(
   values: SpecValue[],
   side: Side,
-  table?: string,
+  table?: string | undefined,
 ): Profile | { missing: string[] } {
   const find = (symbol: string, s: string = side) => storedValue(values, s, symbol)
   const v = (symbol: string) => find(symbol)?.value
@@ -776,7 +776,7 @@ export function shotshellVariants(values: SpecValue[]): (string | undefined)[] {
 export function shotshellProfile(
   values: SpecValue[],
   side: Side,
-  variant?: string,
+  variant?: string | undefined,
 ): Profile | { missing: string[] } {
   const chamber = side === 'chamber'
   const names = chamber ? shotshellNames.chamber : shotshellNames.cartridge

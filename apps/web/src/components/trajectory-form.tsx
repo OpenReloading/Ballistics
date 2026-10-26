@@ -131,9 +131,9 @@ type Result = TrajectoryResult & {
   /** The bullet values came from the manual fields, so the card lists mass and BC. */
   manual: boolean
   /** The chosen optic's turret click: the card gives the holds in clicks too. */
-  click?: { value: number; unit?: 'MOA' | 'mrad' | undefined } | undefined
+  click?: { value: number; unit?: 'MOA' | 'mrad' | undefined }
   /** Where the applied drag factor comes from: the mount it was filled from. */
-  dragSource?: string | undefined
+  dragSource?: string
 }
 
 type RecordState =
@@ -440,7 +440,7 @@ function ResultDetail({
   /** The chart's height, px; without it the chart fills the height its column leaves. */
   chartHeight?: number | undefined
   /** Over the chart's top right corner, so it shows and goes without moving the chart. */
-  staleLine?: ReactNode | undefined
+  staleLine?: ReactNode
 }) {
   const u = (q: Parameters<typeof formatQuantity>[0]) => system[q].symbol
   const { tablePoints: rows, chartPoints: chart } = result

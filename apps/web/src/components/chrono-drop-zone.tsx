@@ -22,7 +22,7 @@ export function ChronoDropZone({
   id: string
   label: string
   variant: 'box' | 'bar'
-  multiple?: boolean | undefined
+  multiple?: boolean
   help?: string | undefined
   /** The name of the file read (bar). */
   file?: string | undefined
