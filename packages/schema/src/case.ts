@@ -17,7 +17,9 @@ export type CaseMaterial = z.infer<typeof caseMaterials>
 
 /** Primer pocket of a case: Boxer (one central flash hole) or Berdan (the anvil is in the case), and its size as the source names it. */
 const primerPocket = z.strictObject({
-  type: z.enum(['boxer', 'berdan']),
+  type: z
+    .enum(['boxer', 'berdan'])
+    .describe('Boxer (one central flash hole) or Berdan (the anvil is in the case).'),
   size: z
     .string()
     .min(1)
@@ -60,8 +62,8 @@ export const cartridgeCase = z
       .min(1)
       .describe('Marking on the case head as the source states it.')
       .optional(),
-    material: caseMaterials,
-    primerPocket: primerPocket.optional(),
+    material: caseMaterials.describe('Wall material of the case.'),
+    primerPocket: primerPocket.describe('The primer pocket: its type and size.').optional(),
     flashHole: quantity('length', z.number().positive())
       .describe('Diameter of the flash hole (of each hole in a Berdan pocket).')
       .optional(),

@@ -142,9 +142,9 @@ const base = {
   saved: z.iso.datetime().describe('Time of the last save, ISO 8601 in UTC.'),
 }
 
-/** Why a bullet, cartridge or powder id that is no UUID is refused: a load refers to the record by `user:<UUID>`. */
+/** Why a bullet, cartridge, powder or case group id that is no UUID is refused: a load refers to the record by `user:<UUID>`. */
 export const designIdProblem: string =
-  'The id of a bullet, cartridge or powder must be a UUID, so that a load can refer to it.'
+  'The id of a bullet, cartridge, powder or case group must be a UUID, so that a load can refer to it.'
 
 const record = <K extends string, D extends z.ZodType>(
   kind: K,
@@ -159,7 +159,7 @@ const record = <K extends string, D extends z.ZodType>(
     data: data.describe(description),
   })
 
-/** The id of a bullet, cartridge or powder: a UUID, as {@link userId}, since loads refer to them. */
+/** The id of a bullet, cartridge, powder or case group: a UUID, as {@link userId}, since loads refer to them. */
 const designId = z
   .string()
   .regex(userIdRegex, designIdProblem)
@@ -181,12 +181,17 @@ export const userRecord = z.discriminatedUnion(
     record('cartridge', 'A cartridge of the cartridge designer.', userCartridge, designId),
     record('powder', 'A powder of the powder designer.', userPowder, designId),
     record('caseCapacity', 'A case capacity the user measured, in g.', caseCapacity),
-    record('case', 'A group of cases of the user with their measured values.', cartridgeCase),
     record('load', 'A load of the workbench, in stored units.', load),
     record('firearm', 'A firearm of the library, in stored units.', firearm),
     record('session', 'A chronograph session, in stored units.', chronoSession),
     record('targetSheet', 'A target sheet with its calibration and shot groups.', targetSheet),
     record('targetFaceDesign', 'A target face of the face designer.', targetFaceDesign),
+    record(
+      'case',
+      'A group of cases of the user with their measured values.',
+      cartridgeCase,
+      designId,
+    ),
   ],
   {
     error: (issue) =>
@@ -396,7 +401,7 @@ export type SessionRecord = Extract<UserRecord, { kind: 'session' }>
 export type TargetSheetRecord = Extract<UserRecord, { kind: 'targetSheet' }>
 /** One record of a user data file: `kind`, id, name, save time and `data`. */
 export type UserRecord = z.infer<typeof userRecord>
-/** Discriminator of a user record: `manufacturer`, `bullet`, `cartridge`, `powder`, `caseCapacity`, `case`, `load`, `firearm`, `session`, `targetSheet` or `targetFaceDesign`. */
+/** Discriminator of a user record: `manufacturer`, `bullet`, `cartridge`, `powder`, `caseCapacity`, `load`, `firearm`, `session`, `targetSheet`, `targetFaceDesign` or `case`. */
 export type UserRecordKind = UserRecord['kind']
 /** A base64 photo stored in a user data file, referenced by id. */
 export interface EmbeddedFile extends z.infer<typeof embeddedFile> {}

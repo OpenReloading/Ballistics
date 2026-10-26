@@ -15,6 +15,7 @@ it('lists the two groups in order: Tools, Data', () => {
     '/targets',
     '/disciplines',
     '/firearms',
+    '/my-cases',
   ])
   // Settings is a dialog, no page
   expect(hrefs).not.toContain('/settings')

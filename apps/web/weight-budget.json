@@ -161,6 +161,10 @@
         "/groups": {
           "initial": 534251,
           "total": 572859
+        },
+        "/my-cases": {
+          "initial": 469648,
+          "total": 501634
         }
       }
     },

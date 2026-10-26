@@ -65,7 +65,7 @@ function Tip({ help, children }: { help?: string | undefined; children: ReactEle
 }
 
 /** A number field over an SI value; keeps the typed text until the value or the unit changes from outside. */
-function SiField({
+export function SiField({
   spec,
   system,
   si,

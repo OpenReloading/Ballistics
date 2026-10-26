@@ -106,7 +106,7 @@ it('precaches the catalogue index in the Pages edition only, and answers it from
 it('the shell holds the offline page, the tools, the manifest and its icons', () => {
   for (const u of ['/', '/offline', '/workbench', '/groups', '/session'])
     expect(shellPages).toContain(u)
-  for (const u of ['/firearms', '/bullets/designer', '/cartridges/designer'])
+  for (const u of ['/firearms', '/my-cases', '/bullets/designer', '/cartridges/designer'])
     expect(shellPages).toContain(u)
   // Settings is a dialog, no page
   expect(shellPages).not.toContain('/settings')

@@ -187,6 +187,7 @@ const storedKinds: Partial<Record<Quantity, QuantityKind>> = {
   length: 'length',
   range: 'length',
   firearmMass: 'mass',
+  mass: 'mass',
   correction: 'angle',
   angle: 'angle',
   temperature: 'temperature',
