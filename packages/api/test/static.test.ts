@@ -19,14 +19,22 @@ describe('writeStaticApi', () => {
     await writeStaticApi(data, dir)
     expect(read('catalogue/index.json')).toEqual(JSON.parse(JSON.stringify(data.index)))
     const app = buildApp({ catalogue: openCatalogue(data), compute: inlineRunner })
-    expect(data.index.cartridges.length + data.index.bullets.length).toBeGreaterThan(0)
-    for (const { item } of data.index.cartridges) {
-      const live = await app.inject({ url: `/v1/cartridges/${item.id}` })
-      expect(read(`cartridges/${item.id}.json`)).toEqual(live.json())
-    }
-    for (const { item } of data.index.bullets) {
-      const live = await app.inject({ url: `/v1/bullets/${item.id}` })
-      expect(read(`bullets/${item.id}.json`)).toEqual(live.json())
+    const lists = [
+      ['cartridges', data.index.cartridges],
+      ['bullets', data.index.bullets],
+      ['powders', data.index.powders],
+      ['manufacturers', data.index.manufacturers],
+      ['target-faces', data.index.targetFaces],
+      ['federations', data.index.federations],
+      ['disciplines', data.index.disciplines],
+      ['target-mappings', data.index.targetMappings],
+      ['caliber-classes', data.index.caliberClasses],
+    ] as const
+    const records = lists.flatMap(([route, list]) => list.map(({ item }) => [route, item.id]))
+    expect(records.length).toBeGreaterThan(0)
+    for (const [route, id] of records) {
+      const live = await app.inject({ url: `/v1/${route}/${id}` })
+      expect(read(`${route}/${id}.json`), `${route}/${id}`).toEqual(live.json())
     }
   })
 })
