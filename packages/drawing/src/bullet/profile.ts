@@ -10,28 +10,44 @@ import {
 /** A stored quantity: the value in the stored unit and the text as printed. */
 interface StoredQuantity {
   value: number
-  raw?: string
+  raw?: string | undefined
 }
 
 /** The bullet record fields the drawing reads; the API type of a bullet record is assignable to it. */
 export interface BulletValues {
   diameter: StoredQuantity
-  length?: StoredQuantity
-  noseLength?: StoredQuantity
-  baseToOgive?: StoredQuantity
-  bearingLength?: StoredQuantity
-  meplatDiameter?: StoredQuantity
-  base?: {
-    type?: BaseType
-    length?: StoredQuantity
-    diameter?: StoredQuantity
-    angle?: StoredQuantity
-    cavityDiameter?: StoredQuantity
-  }
-  ogive?: { form?: string; radius?: StoredQuantity; radiusRatio?: StoredQuantity }
-  cannelure?: { start: StoredQuantity; width: StoredQuantity; depth?: StoredQuantity }
-  tip?: { type: string; length?: StoredQuantity; mouthDiameter?: StoredQuantity }
-  provenance: { sources: { title: string; fields?: string[] }[] }
+  length?: StoredQuantity | undefined
+  noseLength?: StoredQuantity | undefined
+  baseToOgive?: StoredQuantity | undefined
+  bearingLength?: StoredQuantity | undefined
+  meplatDiameter?: StoredQuantity | undefined
+  base?:
+    | {
+        type?: BaseType | undefined
+        length?: StoredQuantity | undefined
+        diameter?: StoredQuantity | undefined
+        angle?: StoredQuantity | undefined
+        cavityDiameter?: StoredQuantity | undefined
+      }
+    | undefined
+  ogive?:
+    | {
+        form?: string | undefined
+        radius?: StoredQuantity | undefined
+        radiusRatio?: StoredQuantity | undefined
+      }
+    | undefined
+  cannelure?:
+    | { start: StoredQuantity; width: StoredQuantity; depth?: StoredQuantity | undefined }
+    | undefined
+  tip?:
+    | {
+        type: string
+        length?: StoredQuantity | undefined
+        mouthDiameter?: StoredQuantity | undefined
+      }
+    | undefined
+  provenance: { sources: { title: string; fields?: string[] | undefined }[] }
 }
 
 /** A dimensioned field of a bullet drawing. */

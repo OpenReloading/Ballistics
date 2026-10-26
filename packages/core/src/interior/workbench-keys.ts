@@ -51,22 +51,24 @@ export const unknownValueKeys = (values: Record<string, unknown>): string[] =>
 
 /** The M3 parameters of a powder record in stored units, as far as {@link powderModelValues} reads them. */
 export interface PowderInteriorRecord {
-  interior?: {
-    energy: { value: number }
-    gamma: number
-    /** g/cm3. */
-    density: { value: number }
-    covolume: { value: number }
-    vivacity: { value: number }
-    pressureExponent: number
-    /** bar. */
-    referencePressure: { value: number }
-    /** bar. */
-    ignitionPressure: { value: number }
-    /** bar. */
-    startPressure?: { value: number }
-    burnForm: { a: { value: number }; m: number; q: number; z1: number }
-  }
+  interior?:
+    | {
+        energy: { value: number }
+        gamma: number
+        /** g/cm3. */
+        density: { value: number }
+        covolume: { value: number }
+        vivacity: { value: number }
+        pressureExponent: number
+        /** bar. */
+        referencePressure: { value: number }
+        /** bar. */
+        ignitionPressure: { value: number }
+        /** bar. */
+        startPressure?: { value: number } | undefined
+        burnForm: { a: { value: number }; m: number; q: number; z1: number }
+      }
+    | undefined
 }
 
 /**

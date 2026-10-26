@@ -31,7 +31,7 @@ export function RangeCard({
     dragSource?: string
     tablePoints: TrajectoryPoint[]
     windPerUnit: { mps: number[]; mph: number[] }
-    click?: { value: number; unit?: 'MOA' | 'mrad' }
+    click?: { value: number; unit?: 'MOA' | 'mrad' | undefined }
   }
   system: UnitSystem
   paper: PaperSize

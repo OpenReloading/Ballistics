@@ -12,7 +12,7 @@ import { splitLines } from './text.ts'
 /** Options of `parseOpenReloadingCsv`: the parser options and the device of the session. */
 export interface TemplateOptions extends ChronoParserOptions {
   /** Device of the session; kind `other` without manufacturer name or model when absent. */
-  device?: SessionCandidate['device']
+  device?: SessionCandidate['device'] | undefined
 }
 
 const templateNames = ['string', 'velocity', 'velocityUnit', 'coldBore', 'excluded'] as const

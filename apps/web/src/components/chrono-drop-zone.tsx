@@ -23,9 +23,9 @@ export function ChronoDropZone({
   label: string
   variant: 'box' | 'bar'
   multiple?: boolean
-  help?: string
+  help?: string | undefined
   /** The name of the file read (bar). */
-  file?: string
+  file?: string | undefined
   onFiles: (files: File[]) => void
 }) {
   const [over, setOver] = useState(false)

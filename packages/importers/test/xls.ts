@@ -221,7 +221,7 @@ interface WorkbookStreamOptions {
   /** Leave out the EOF of each worksheet. */
   noSheetEof?: boolean
   /** Extra strings at the end of the shared string table. */
-  strings?: (string | RichString)[]
+  strings?: (string | RichString)[] | undefined
 }
 
 /** A BIFF8 Workbook stream; every non-empty text is a LabelSst cell at its row and column. */

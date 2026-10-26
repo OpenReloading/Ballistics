@@ -165,7 +165,7 @@ function limitExceededText(
 export function shownWarnings(
   body: InteriorResponse,
   system: UnitSystem,
-): { text: string; name?: string }[] {
+): { text: string; name?: string | undefined }[] {
   return body.warnings.map((w) => {
     const l =
       w.code === 'limitExceeded'

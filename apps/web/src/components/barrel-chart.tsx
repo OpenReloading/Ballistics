@@ -221,7 +221,7 @@ export function BarrelChart({
   steps: BarrelStep[]
   selected: number
   system: UnitSystem
-  height?: number
+  height?: number | undefined
 }) {
   const theme = useChartTokens(tokens)
   const { barrelLength: length, velocity, energy } = system

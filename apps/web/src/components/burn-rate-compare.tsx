@@ -172,7 +172,7 @@ export function BurnRateCompare({ options }: { options: { value: string; label: 
         hidePickedOptions
         nothingFoundMessage="No powder with a curve matches"
         renderPill={({ option, value, onRemove }) => (
-          <Pill withRemoveButton onRemove={onRemove}>
+          <Pill withRemoveButton {...(onRemove && { onRemove })}>
             <Group component="span" display="inline-flex" gap={4} wrap="nowrap">
               <Swatch slot={slotOf.get(String(value)) ?? 0} />
               {option?.label ?? value}

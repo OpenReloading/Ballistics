@@ -26,7 +26,7 @@ export type TruingNominal = {
   bullet: string
   zeroRange: number
   /** The chosen optic's click, rad. */
-  click?: number
+  click?: number | undefined
 }
 
 const startRows = () => [blankRow(), blankRow(), blankRow()]

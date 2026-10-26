@@ -34,7 +34,7 @@ export function PropertyGrid({
   /** Above the sections, such as the start-from search. */
   head?: ReactNode
   sections: GridSection[]
-  message?: string
+  message?: string | undefined
 }) {
   const phone = useMediaQuery('(max-width: 47.99em)', false, { getInitialValueInEffect: false })
   const [focused, setFocused] = useState<Element>()

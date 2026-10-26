@@ -113,7 +113,7 @@ export type Bundle = {
   disciplines: Discipline[]
   targetMappings: TargetMapping[]
   /** `renames.json` of the records roots; absent: none. */
-  renames?: Renames
+  renames?: Renames | undefined
 }
 
 /**

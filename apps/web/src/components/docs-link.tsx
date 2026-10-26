@@ -7,7 +7,13 @@ const label = 'Documentation'
  * The link to the docs site: an icon in the sidebar's foot (tooltip as its name), a labelled row in
  * the phone drawer. Renders nothing without a URL.
  */
-export function DocsLink({ url, drawer }: { url?: string; drawer?: boolean }) {
+export function DocsLink({
+  url,
+  drawer,
+}: {
+  url?: string | undefined
+  drawer?: boolean | undefined
+}) {
   if (!url) return null
   if (drawer)
     return (

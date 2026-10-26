@@ -25,7 +25,13 @@ export const BarStatus = createContext<HTMLElement | null | undefined>(undefined
  * that React has not swapped in yet (a hidden `S:` segment) holds no second status. `widest`, the
  * longest text it can show, sets its width from 48em, so what follows it never moves.
  */
-export function BarCount({ children, widest }: { children: ReactNode; widest?: string }) {
+export function BarCount({
+  children,
+  widest,
+}: {
+  children: ReactNode
+  widest?: string | undefined
+}) {
   return (
     <span
       role={useMounted() ? 'status' : undefined}
@@ -68,7 +74,7 @@ export function PageBar({
    * A loading bar that holds the box of the bar that replaces it, so nothing moves when it is replaced:
    * the status row and the Page actions slot, empty and not shown.
    */
-  reserve?: boolean
+  reserve?: boolean | undefined
   /** The Safety button as an icon, as the workbench's other secondary actions. */
   compact?: boolean
 }) {

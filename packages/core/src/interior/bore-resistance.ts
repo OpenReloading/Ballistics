@@ -21,7 +21,7 @@ export interface ResistanceCartridge {
   /** Bore area, mm2. */
   boreAreaMm2: number
   /** Groove diameter Z, mm. */
-  grooveDiameterMm?: number
+  grooveDiameterMm?: number | undefined
 }
 
 /**
@@ -32,9 +32,9 @@ export interface ResistanceCartridge {
  * pressure, which divides by it).
  */
 export function boreArea(b: {
-  area?: number
+  area?: number | undefined
   boreDiameter: number
-  grooveDiameter?: number
+  grooveDiameter?: number | undefined
 }): number {
   return (
     b.area ?? (Math.PI / 4) * ((b.boreDiameter + (b.grooveDiameter ?? b.boreDiameter)) / 2) ** 2
@@ -89,13 +89,13 @@ export interface ResistanceRun {
   boreDiameter: number
   boreArea: number
   startPressure: number
-  cartridge?: { g1?: number; z?: number }
-  bulletLengthMm?: number
+  cartridge?: { g1?: number | undefined; z?: number | undefined } | undefined
+  bulletLengthMm?: number | undefined
 }
 
 /** Result of {@link recordResistance}: the law for the run, or what the run lacks in `missing`. */
 export interface RecordResistance {
-  resistance?: InteriorLoad['resistance']
+  resistance?: InteriorLoad['resistance'] | undefined
   missing: string[]
 }
 
@@ -107,7 +107,11 @@ export interface RecordResistance {
  */
 export function recordResistance(
   p: {
-    interior?: { resistance?: { stress: { value: number } } & Omit<ResistanceTerms, 'stress'> }
+    interior?:
+      | {
+          resistance?: ({ stress: { value: number } } & Omit<ResistanceTerms, 'stress'>) | undefined
+        }
+      | undefined
   },
   run: ResistanceRun,
 ): RecordResistance {

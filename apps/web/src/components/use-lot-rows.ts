@@ -33,20 +33,20 @@ export type LotRows = {
   percent: FieldValue
   setPercent: (v: FieldValue) => void
   /** Why the typed change gives no rows. */
-  error?: string
+  error?: string | undefined
   /** The typed target barrel time, ms; empty for none. */
   target: string | number
   setTarget: (v: string | number) => void
   /** The target barrel time, s; none when empty or not above 0. */
-  targetSeconds?: number
+  targetSeconds?: number | undefined
   /** Names the request (the run, the change, the attempt); none when it needs none. */
-  key?: string
+  key?: string | undefined
   /** The rows are on their way, or failed with `message`. */
   pending: boolean
-  message?: string
+  message?: string | undefined
   retry: () => void
   /** The rows of the last answer for this run, with the change they were asked at. */
-  rows?: { fraction: number; steps: Record<Lot, ShownStep[]>; times: BarrelTimes[] }
+  rows?: { fraction: number; steps: Record<Lot, ShownStep[]>; times: BarrelTimes[] } | undefined
 }
 
 /**
@@ -80,7 +80,7 @@ async function lotAnswer(
   charges: number[],
   fraction: number,
   signal: AbortSignal,
-): Promise<{ steps?: Record<Lot, Step[]>; message?: string } | undefined> {
+): Promise<{ steps?: Record<Lot, Step[]>; message?: string | undefined } | undefined> {
   try {
     const answers = await askLots(ok, charges, fraction, signal)
     if (signal.aborted) return undefined
@@ -144,7 +144,7 @@ export function useLotRows({
     run: number
     fraction: number
     steps?: Record<Lot, Step[]>
-    message?: string
+    message?: string | undefined
   }>()
   const current = got && ok && got.run === ok.id ? got : undefined
   const pause = current ? 300 : 0

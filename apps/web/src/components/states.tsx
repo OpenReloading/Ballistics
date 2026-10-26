@@ -17,7 +17,7 @@ export function EmptyNote({
   icon: ReactNode
   title: ReactNode
   description?: ReactNode
-  action?: ReactNode
+  action?: ReactNode | undefined
 }) {
   return (
     <EmptyState
@@ -44,7 +44,7 @@ export function Loading({
   inline = false,
 }: {
   what: string
-  rows?: number
+  rows?: number | undefined
   inline?: boolean
 }) {
   if (inline) return <p>{`Loading ${what}`}</p>

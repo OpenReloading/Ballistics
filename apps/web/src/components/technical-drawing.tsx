@@ -43,7 +43,17 @@ function rotation({ dir: [ux, uy] }: Label, turn: number) {
 }
 
 /** A label's text; a flag in its ring. */
-function Text({ l, turn, em, symbol }: { l: Label; turn: number; em: number; symbol?: string }) {
+function Text({
+  l,
+  turn,
+  em,
+  symbol,
+}: {
+  l: Label
+  turn: number
+  em: number
+  symbol?: string | undefined
+}) {
   const text = (
     <text
       data-symbol={symbol}
@@ -114,7 +124,7 @@ function Dimensions({
   layout: Layout
   turn: number
   em: number
-  linked?: Linked
+  linked?: Linked | undefined
 }) {
   const rules = layout.segs.filter((s) => s.kind === 'rule')
   const thin = layout.segs.filter((s) => s.kind === 'thin')
@@ -133,7 +143,7 @@ function Dimensions({
   )
 }
 
-function Axis({ at }: { at?: [number, number] }) {
+function Axis({ at }: { at?: [number, number] | undefined }) {
   return (
     at && (
       <path
@@ -156,7 +166,7 @@ function fitWidth({ em, frame: [, , w, h] }: FigureModel | BulletModel, tallest 
  * the same in either length unit.
  */
 function reserved(
-  own: { model: FigureModel | BulletModel; tallest?: number },
+  own: { model: FigureModel | BulletModel; tallest?: number | undefined },
   other: { model: FigureModel; tallest: number },
 ) {
   const both = [own, other]
@@ -280,15 +290,15 @@ export function TechnicalDrawing({
   describedBy?: string
   model: FigureModel | BulletModel
   /** Screen: the height in mm the window fits, the tallest figure of the record (one scale). */
-  tallest?: number
+  tallest?: number | undefined
   /** Print the model laid out for the screen (upright) as the image at this scale, 1 life size. */
-  printScale?: number
+  printScale?: number | undefined
   /** Screen only: each dimension named by its symbol for the record table's linked hover. */
-  linked?: Linked
+  linked?: Linked | undefined
   /** Drawn last in the part frame, mm (the seated bullet of the interior preview). */
   children?: ReactNode
   /** Screen: the same figure in the other length unit, whose box the drawing keeps free, so a unit switch moves nothing (its column a size container). */
-  reserve?: { model: FigureModel; tallest: number }
+  reserve?: { model: FigureModel; tallest: number } | undefined
   /** Screen: the model is laid out level (medium print), shown with `data-level`. */
   level?: boolean
 }) {

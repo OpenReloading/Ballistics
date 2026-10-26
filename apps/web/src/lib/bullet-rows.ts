@@ -16,9 +16,9 @@ export type BulletItem = BulletSummary & {
  * may have no mass and names its manufacturer as text only.
  */
 export type BulletRow = Omit<BulletItem, 'mass' | 'manufacturer'> & {
-  manufacturer?: string
+  manufacturer?: string | undefined
   mass: number | null
-  origin?: 'user'
+  origin?: 'user' | undefined
 }
 
 /** Search text of a bullet: manufacturer, name, diameter in mm and inches, mass in grains and grams. */

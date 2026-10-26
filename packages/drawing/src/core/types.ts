@@ -9,13 +9,13 @@ export type SectionPoint = [r: number, z: number]
  * type of a spec value is assignable to it.
  */
 export interface SpecValue {
-  side?: string
+  side?: string | undefined
   symbol: string
-  quantity?: string
-  value?: number
-  limit?: 'max' | 'min'
-  tolerance?: { lower?: number; upper?: number }
-  variant?: string
+  quantity?: string | undefined
+  value?: number | undefined
+  limit?: 'max' | 'min' | undefined
+  tolerance?: { lower?: number | undefined; upper?: number | undefined } | undefined
+  variant?: string | undefined
 }
 
 /** Stored values that disagree, or a value the outline cannot follow; the text gives both. */
@@ -39,7 +39,7 @@ export interface Profile<Code extends string = string> {
   notes: Note<Code>[]
   annotation: Annotation
   /** A cartridge e derived from delta (grooveDerivedE): for the description, never dimensioned. */
-  derivedE?: number
+  derivedE?: number | undefined
 }
 
 /**
@@ -57,7 +57,7 @@ export interface Dimension {
   from: number
   to: number
   /** Diameter: half the value. */
-  radius?: number
+  radius?: number | undefined
   /**
    * Dimensioned behind the head face: a head diameter (R1, E1, R3; table VII g, d, G, D) or a head
    * length (R, E, e; table VII t, T).
@@ -171,11 +171,11 @@ export interface Part {
   points: SectionPoint[]
   annotation: Annotation
   /** Steel band edge for a chamber; extension lines start there. */
-  outer?: number
+  outer?: number | undefined
   /** Texts on a leader from a feature (note flags, detail letters), placed after the rest. */
   callouts?: Callout[]
   /** The unit of the length texts; mm by default. */
-  unit?: LengthUnit
+  unit?: LengthUnit | undefined
 }
 
 /** A note flag (its number in a circle) or a detail letter, on a leader from the feature at `at`. */

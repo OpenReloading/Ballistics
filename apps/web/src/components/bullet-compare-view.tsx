@@ -27,7 +27,15 @@ import { DataError, EmptyNote, Loading } from './states.tsx'
 import { TechnicalDrawing } from './technical-drawing.tsx'
 
 /** The compare view cannot show these ids: what is wrong and the way back to the list. */
-function Problem({ title, text, rest }: { title: string; text: string; rest?: string[] }) {
+function Problem({
+  title,
+  text,
+  rest,
+}: {
+  title: string
+  text: string
+  rest?: string[] | undefined
+}) {
   return (
     <EmptyNote
       icon={<WarningCircle size={24} aria-hidden="true" />}

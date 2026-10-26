@@ -88,7 +88,7 @@ describe('typed model parameters', () => {
 })
 
 describe('the log scale of the burn rates', () => {
-  const row = (mean: number, low?: number, high?: number): PowderRow => ({
+  const row = (mean: number, low?: number | undefined, high?: number): PowderRow => ({
     id: String(mean),
     manufacturer: 'm',
     manufacturerName: 'M',

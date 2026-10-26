@@ -6,7 +6,7 @@ import type { SpecValue } from '../src/core/types.ts'
 export interface SpecRecord {
   id: string
   standard: string
-  table?: string
+  table?: string | undefined
   values: (SpecValue & { side?: Side })[]
 }
 

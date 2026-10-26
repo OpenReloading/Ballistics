@@ -466,7 +466,8 @@ describe('residual check', () => {
 
 describe('errors', () => {
   const base = strings()
-  const bad = (change: Partial<typeof base>) => () => fitTruingStrings({ ...base, ...change })
+  const bad = (change: Partial<Parameters<typeof fitTruingStrings>[0]>) => () =>
+    fitTruingStrings({ ...base, ...change })
   const entry = nth(base.entries, 0)
   it('rejects malformed input before any trajectory runs', () => {
     expect(bad({ entries: [], chronograph: undefined })).toThrow(InputError)

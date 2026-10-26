@@ -103,7 +103,12 @@ export function InteriorChart({
   z1,
 }: {
   /** Valid steps in ladder order, one without a ladder. `label`: the step as the page names it, relative to the main charge; `value`: its charge or seating as shown. */
-  steps: { n: number; label?: string; value?: string; result: PlaybackResult }[]
+  steps: {
+    n: number
+    label?: string | undefined
+    value?: string | undefined
+    result: PlaybackResult
+  }[]
   /** Index into `steps`. */
   selected: number
   /** Bullet mass, kg. */
@@ -113,13 +118,13 @@ export function InteriorChart({
   view: ChartView
   onView: (v: ChartView) => void
   /** After each draw, also in a hidden tab: the workbench copies the chart for its report. */
-  onRender?: (chart: ECharts) => void
+  onRender?: ((chart: ECharts) => void) | undefined
   /** What the barrel strip above the chart draws, from the run's seating. */
-  strip?: StripFigure
+  strip?: StripFigure | undefined
   /** A new key starts the playback afresh at ignition: a new run or step. */
   playKey?: string
   /** The run's burn form z1 (the two-stage form), for its event line. */
-  z1?: number
+  z1?: number | undefined
 }) {
   const { x, quantity } = view
   const theme = useChartTokens(themeTokens)

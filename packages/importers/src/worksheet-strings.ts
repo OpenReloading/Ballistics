@@ -8,7 +8,7 @@ import type { ChronoParserOptions } from './result.ts'
  */
 export interface WorkbookOptions extends ChronoParserOptions {
   /** Keep only the worksheets of this day (`YYYY-MM-DD`). */
-  date?: string
+  date?: string | undefined
 }
 
 /** The shots, label and bore flags of one worksheet, read as one string of shots. */

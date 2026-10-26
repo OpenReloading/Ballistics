@@ -143,9 +143,9 @@ function extentOf(
 }
 
 type ShotHandlers = {
-  onNudge?: (sel: Selection, dx: number, dy: number) => void
-  onDelete?: (sel: Selection) => void
-  onToggle?: (sel: Selection) => void
+  onNudge?: ((sel: Selection, dx: number, dy: number) => void) | undefined
+  onDelete?: ((sel: Selection) => void) | undefined
+  onToggle?: ((sel: Selection) => void) | undefined
 }
 
 /** The arrows, Home and End move the focus along the shots of the group (one tab stop per group). */
@@ -634,9 +634,9 @@ export function TargetCanvas({
 }: {
   sheet: TargetSheet
   frame: Frame | undefined
-  photo?: { url: string; width: number; height: number }
-  active?: string
-  selected?: Selection
+  photo?: { url: string; width: number; height: number } | undefined
+  active?: string | undefined
+  selected?: Selection | undefined
   tool: Tool
   /** Points clicked so far for the calibration tool, image px. */
   pending?: Point[]
@@ -651,9 +651,9 @@ export function TargetCanvas({
   onAdd?: (q: Point) => void
   /** A drag step of a shot; `first` starts an undo step. */
   onMove?: (sel: Selection, q: Point, first: boolean) => void
-  onToggle?: (sel: Selection) => void
-  onDelete?: (sel: Selection) => void
-  onNudge?: (sel: Selection, dx: number, dy: number) => void
+  onToggle?: ((sel: Selection) => void) | undefined
+  onDelete?: ((sel: Selection) => void) | undefined
+  onNudge?: ((sel: Selection, dx: number, dy: number) => void) | undefined
   /** A click of the aim, origin or a calibration tool, view point (image px with a photo). */
   onPoint?: (p: Point) => void
   onRefMove?: (ref: number, point: number, p: Point, first: boolean) => void

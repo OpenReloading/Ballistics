@@ -32,9 +32,9 @@ export function LotChart({
 }: {
   times: BarrelTimes[]
   fraction: number
-  target?: number
+  target?: number | undefined
   system: UnitSystem
-  height?: number
+  height?: number | undefined
 }) {
   const theme = useChartTokens(tokens)
   const { charge } = system

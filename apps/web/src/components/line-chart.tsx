@@ -66,7 +66,7 @@ export function LineChart({
   description: string
   zeroLine?: boolean
   /** Rendered height, px. */
-  height?: number
+  height?: number | undefined
   /** The height its box has by CSS, not `height`. */
   fill?: boolean
   limits?: { y: number; label: string }[]

@@ -26,7 +26,7 @@ const fileBytes = (text: string) => new TextEncoder().encode(text).byteLength
  */
 export const userDataText = (
   records: UserRecord[],
-  files?: EmbeddedFile[],
+  files?: EmbeddedFile[] | undefined,
   invalid?: InvalidRecord[],
 ) =>
   `${JSON.stringify(
@@ -45,7 +45,7 @@ export type ParsedUserFile =
   | {
       ok: true
       records: UserRecord[]
-      files?: EmbeddedFile[]
+      files?: EmbeddedFile[] | undefined
       /** The `invalid` entries of an Export all file, as written: not checked, not part of the format. */
       invalid?: unknown[]
       /** Fields of the file mapped to no record field, as the format names them. */
@@ -80,7 +80,7 @@ export function parseUserDataFile(text: string): ParsedUserFile {
 /** The text of `userDataText`, or why Open and Import would reject it (too large, invalid). */
 export function checkedUserDataText(
   records: UserRecord[],
-  files?: EmbeddedFile[],
+  files?: EmbeddedFile[] | undefined,
   invalid?: InvalidRecord[],
 ): { ok: true; text: string } | { ok: false; reason: string } {
   const text = userDataText(records, files, invalid)
@@ -142,9 +142,9 @@ export interface InvalidRecord {
   /** Why the schema rejects it. */
   error: string
   /** Its `id`, `name` and `kind` where it has them as texts. */
-  id?: string
-  name?: string
-  kind?: string
+  id?: string | undefined
+  name?: string | undefined
+  kind?: string | undefined
 }
 
 /** The records of the browser store that pass the schema, and those that do not, as stored. */

@@ -8,11 +8,11 @@ export type { ChronoFormatId }
 /** Options every chronograph parser takes. */
 export interface ChronoParserOptions {
   /** Unit for velocities whose unit the file does not name or names in an unknown way. */
-  velocityUnit?: VelocityUnit
+  velocityUnit?: VelocityUnit | undefined
   /** File name, used as the provenance source title. */
-  fileName?: string
+  fileName?: string | undefined
   /** Lowercase hex sha256 of the file bytes, computed by the caller. */
-  sha256?: string
+  sha256?: string | undefined
 }
 
 /**
@@ -20,8 +20,12 @@ export interface ChronoParserOptions {
  * gives; the session's `device.manufacturer` is a reference the caller resolves from it.
  */
 export interface SessionCandidate {
-  date?: string
-  device: { kind: ChronoSession['device']['kind']; manufacturerName?: string; model?: string }
+  date?: string | undefined
+  device: {
+    kind: ChronoSession['device']['kind']
+    manufacturerName?: string | undefined
+    model?: string | undefined
+  }
   muzzleDistance?: QuantityValue
   strings: { shots: ChronoShot[] }[]
   note?: string

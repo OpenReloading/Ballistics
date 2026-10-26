@@ -28,9 +28,9 @@ export interface BulletFilters {
   /** A mass range with its unit: "150-180gr", "9.5-g". */
   mass: string
   /** The CIP values of the cartridge: only the bullets that fit it (`bulletFits` of core). */
-  fit?: CartridgeDiameters
+  fit?: CartridgeDiameters | undefined
   /** `catalogue` or `designs` (the browser's own); both without it. */
-  origin?: 'catalogue' | 'designs'
+  origin?: 'catalogue' | 'designs' | undefined
 }
 
 export type BulletSort = 'relevance' | 'name' | 'mass' | 'ballisticCoefficient'
@@ -174,7 +174,7 @@ export async function findBullets(
   designs: readonly BulletRow[],
   text: string,
   limit: number,
-  fit?: CartridgeDiameters,
+  fit?: CartridgeDiameters | undefined,
 ): Promise<ListOf<BulletRow>> {
   const filters = { manufacturer: '', caliber: '', mass: '', fit }
   const own = searchBullets(designs, text, filters)

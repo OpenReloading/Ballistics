@@ -36,16 +36,18 @@ export interface FigureModel {
   em: number
   /** viewBox of the outer frame in mm: x, y, width, height. */
   frame: [number, number, number, number]
-  cartridge?: { section: string; edges: string }
-  chamber?: {
-    cavity: string
-    steel: string
-    outline: string
-    breaks: string
-    edges: string
-    /** The head face across the cavity mouth, where a head diameter lies inside the drawn head. */
-    face?: string
-  }
+  cartridge?: { section: string; edges: string } | undefined
+  chamber?:
+    | {
+        cavity: string
+        steel: string
+        outline: string
+        breaks: string
+        edges: string
+        /** The head face across the cavity mouth, where a head diameter lies inside the drawn head. */
+        face?: string | undefined
+      }
+    | undefined
   /** The dash-dot axis of each side, from just behind the head to just past its end or a station past it. */
   axis: Partial<Record<Side, [number, number]>>
   /** The dimensions of each side; the region callouts of Combined. */

@@ -124,7 +124,7 @@ export function RecordSearch<T extends { id: string }>({
    * The chosen record, or the picker's prompt: a compact picker with a search icon, the
    * label left to screen readers, this text in the empty field.
    */
-  chosen?: string
+  chosen?: string | undefined
   /** `chosen` names a record, not the prompt: drawn in the text colour. */
   picked?: boolean
   /** Local options listed first, matched by the typed text, such as the browser's bullet designs. */
@@ -195,15 +195,14 @@ export function RecordSearch<T extends { id: string }>({
       <Combobox store={combobox} onOptionSubmit={submit}>
         <Combobox.Target withExpandedAttribute>
           <TextInput
-            size={size}
+            {...(size !== undefined && { size })}
             label={label}
-            labelProps={chosen === undefined ? undefined : { className: 'visually-hidden' }}
-            placeholder={chosen}
-            leftSection={
-              chosen === undefined || chevron ? undefined : (
-                <MagnifyingGlass size={16} aria-hidden="true" />
-              )
-            }
+            {...(chosen !== undefined && {
+              labelProps: { className: 'visually-hidden' },
+              placeholder: chosen,
+            })}
+            {...(chosen !== undefined &&
+              !chevron && { leftSection: <MagnifyingGlass size={16} aria-hidden="true" /> })}
             autoComplete="off"
             value={q}
             rightSection={endSection({

@@ -48,7 +48,7 @@ export function ReportIssueButton({
   drawer,
   onOpen,
 }: {
-  url?: string
+  url?: string | undefined
   drawer?: boolean
   onOpen: () => void
 }) {

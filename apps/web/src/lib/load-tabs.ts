@@ -27,10 +27,10 @@ const noCartridge = 'No cartridge'
 
 /** The name of a load nobody named: cartridge, bullet, and powder with the charge; "New load" when none is set. */
 export function generatedName(p: {
-  cartridge?: string
-  bullet?: string
-  powder?: string
-  charge?: string
+  cartridge?: string | undefined
+  bullet?: string | undefined
+  powder?: string | undefined
+  charge?: string | undefined
 }): string {
   const parts = [p.cartridge, p.bullet, [p.powder, p.charge].filter(Boolean).join(' ')]
   return parts.filter(Boolean).join(', ') || 'New load'
@@ -41,9 +41,9 @@ export function generatedName(p: {
  * without its maker), else the generated name.
  */
 export function shortName(p: {
-  custom?: string
-  cartridge?: string
-  powder?: string
+  custom?: string | undefined
+  cartridge?: string | undefined
+  powder?: string | undefined
   generated: string
 }): string {
   if (p.custom?.trim()) return p.custom
@@ -103,7 +103,7 @@ export function loadGroups(
 }
 
 /** The saved loads open in the tabs and the one shown, stored in `localStorage` (`openLoads`). */
-type OpenLoads = { ids: string[]; active?: string }
+type OpenLoads = { ids: string[]; active?: string | undefined }
 
 export const openLoadsKey = 'openLoads'
 

@@ -26,15 +26,15 @@ import type { UseWorkbenchStateResult } from './use-workbench-load.ts'
 type Tab = {
   key: string
   /** The saved record the tab was installed from, if any. */
-  recordId?: string
+  recordId?: string | undefined
   title: string
   /** The name the user typed or the record carries; undefined: the generated name. */
-  custom?: string
+  custom?: string | undefined
   /** Undefined: a load with nothing chosen or typed, restored by `reset()`. */
-  data?: Load
+  data?: Load | undefined
   outcome?: UseWorkbenchStateResult['outcome']
   changed: boolean
-  file?: FileState
+  file?: FileState | undefined
   unsaved: boolean
 }
 

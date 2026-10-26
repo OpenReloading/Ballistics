@@ -20,7 +20,8 @@ Pure TypeScript ballistics solver, ESM. Must stay headless: no runtime dependenc
   - Any other error is a defect (the API answers 500).
   - `need(ok, message)` throws an `InputError` for a failed input check.
   - `nth(array, index)` returns the entry or throws a `RangeError`; the integrator and interior model keep a module-local unchecked `el` for state vectors (`noUncheckedIndexedAccess`), a call into another module does not inline in vitest and slowed the Monte Carlo tests several times.
-  - Internal: `src/index.ts` re-exports only `InputError` from this file.
+  - `overlay(base, settings)` returns `base` with the entries of `settings` that are not `undefined`; `Settings<T>` is `T` with every entry optional and allowed to be `undefined`. Options that are merged over defaults take `Settings<...>` and merge with `overlay`, never a spread (a spread lets an `undefined` entry replace its default).
+  - Internal: `src/index.ts` re-exports only `InputError`, `overlay` and `Settings` from this file.
 - `src/drag-tables.ts`: the BRL drag tables (G1, G2, G5, G6, G7, G8, GI and the 9/16 in sphere as GS) as JBM publishes them. Generated: do not edit by hand. Tests pin each table's length and end points.
 - `src/interior/model.ts`: `interior` and `closedVessel`, the M3 Noble-Abel interior model (`apps/docs/docs/models/interior-m3.md`).
   - SI in and out, temperatures in K. Integrates with `src/exterior/rk45.ts` in scaled time.

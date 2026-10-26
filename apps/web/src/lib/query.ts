@@ -76,11 +76,14 @@ export const droppedIds = (query: URLSearchParams) =>
  * powder record page (`cartridge`, `bullet`, `powder` without `units`, filled from the records), or
  * nothing.
  */
-export function linkedLoad(
-  query: URLSearchParams,
-):
+export function linkedLoad(query: URLSearchParams):
   | { kind: 'values' }
-  | { kind: 'records'; cartridge?: string; bullet?: string; powder?: string }
+  | {
+      kind: 'records'
+      cartridge?: string | undefined
+      bullet?: string | undefined
+      powder?: string | undefined
+    }
   | undefined {
   if (query.has('units')) return { kind: 'values' }
   const cartridge = linkedId(query.get('cartridge'))
@@ -105,14 +108,16 @@ export const workbenchHref = (kind: 'cartridge' | 'bullet' | 'powder', id: strin
  * workbench link carries it under `record.`, so the load runs the same where a record is missing.
  */
 export type RecordValues = {
-  bullet?: { name?: string; length?: number }
-  powder?: {
-    name?: string
-    bulkDensity?: number
-    boreFriction?: number
-    engravingPressure?: number
-    engravingLength?: number
-  }
+  bullet?: { name?: string | undefined; length?: number | undefined } | undefined
+  powder?:
+    | {
+        name?: string | undefined
+        bulkDensity?: number | undefined
+        boreFriction?: number | undefined
+        engravingPressure?: number | undefined
+        engravingLength?: number | undefined
+      }
+    | undefined
 }
 
 const recordKeys = {

@@ -35,14 +35,14 @@ export type DragInput =
       /** One or more bands; a single BC is one band with `minVelocity` 0. */
       bands: readonly BallisticCoefficientBand[]
       /** Reference atmosphere the maker states; stored, does not scale the drag. */
-      reference?: 'icao' | 'metro'
-      interpolation?: DragInterpolation
+      reference?: 'icao' | 'metro' | undefined
+      interpolation?: DragInterpolation | undefined
     }
   | {
       kind: 'curve'
       /** The bullet's own drag coefficient on area pi d^2 / 4, against Mach. */
       curve: DragTable
-      interpolation?: DragInterpolation
+      interpolation?: DragInterpolation | undefined
     }
 
 /** Drag table of a drag input: the curve itself, or the standard table of the BC's model. */

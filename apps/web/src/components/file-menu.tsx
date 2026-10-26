@@ -135,12 +135,12 @@ const basedOnOf = (r: UserRecord) =>
  * several records open (the workbench tabs) puts it back when it shows that record again.
  */
 export interface FileState {
-  id?: string
-  handle?: FileSystemFileHandle
-  known?: string
-  saved?: { file: string; json: string }
+  id?: string | undefined
+  handle?: FileSystemFileHandle | undefined
+  known?: string | undefined
+  saved?: { file: string; json: string } | undefined
   /** The record's start text; undefined takes the data of the next render. */
-  initial?: string
+  initial?: string | undefined
   /** Unsaved changes when the state was taken. */
   unsaved: boolean
 }
@@ -406,7 +406,7 @@ async function writeRecordFile(o: {
   recordId: string
   text: string
   allow: (other: string | undefined) => Promise<boolean>
-}): Promise<'newer' | { name: string; handle?: FileSystemFileHandle } | undefined> {
+}): Promise<'newer' | { name: string; handle?: FileSystemFileHandle | undefined } | undefined> {
   const { handle, current, as, ready, name, recordId, text, allow } = o
   if (handle && ownsFile(current, recordId)) {
     if (!(await allow(savedIn(current, recordId)))) return 'newer'
@@ -467,7 +467,7 @@ function exportNotes(records: UserRecord[], invalid: InvalidRecord[], left: stri
 
 /** What an import reports to: the store hooks and the page's messages. */
 interface ImportIo {
-  onStored?: () => void
+  onStored?: (() => void) | undefined
   noteStorage: () => void
   fail: (message: string) => void
   show: (report: Report) => void
@@ -883,16 +883,16 @@ function FileMenuOf<K extends UserRecordKind>({
   /** `record` is the opened or saved-as record (its id and saved time). */
   onOpen: (data: Of<K>['data'], name: string, record: Of<K>) => void
   /** A line about the record the page adds to the menu's status, such as ids not loaded. */
-  note?: string
+  note?: string | undefined
   /** Why the record cannot be saved, in the page's words; Save then writes nothing. */
-  problem?: string
+  problem?: string | undefined
   /**
    * The name as far as it counts as a change (the workbench): what the user typed, empty for
    * a generated name that follows the data. Renaming then is an unsaved change.
    */
   nameKey?: string
   /** Called after Save, Import or Replace wrote records to the browser store. */
-  onStored?: () => void
+  onStored?: (() => void) | undefined
   /**
    * Writes Save's browser copy in place of a plain put (an autosaved record written only over the
    * version the page read); false when the page kept it otherwise.

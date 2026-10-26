@@ -185,7 +185,7 @@ export function fromFile(data: TargetFaceDesign, name: string, system: UnitSyste
 
 /** A reason the draft is no face: the field it belongs to, else it is about the face as a whole. */
 export interface Problem {
-  key?: string
+  key?: string | undefined
   message: string
 }
 

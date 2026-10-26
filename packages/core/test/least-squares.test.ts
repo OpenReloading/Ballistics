@@ -43,7 +43,7 @@ describe('shared least-squares loop', () => {
       Math.exp(nth(t, 0) - nth(t, 1)),
       2 * Math.exp(nth(t, 0) - nth(t, 1)),
     ]
-    let failure: { reason: string; direction?: number[] } | undefined
+    let failure: { reason: string; direction?: number[] | undefined } | undefined
     try {
       logLeastSquares({
         parameterCount: 2,

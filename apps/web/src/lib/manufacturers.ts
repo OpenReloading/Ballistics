@@ -150,7 +150,7 @@ export function manufacturerUses(
  * or a design carries `manufacturerName`.
  */
 export function productLabel(
-  r: { name: string; manufacturer?: string; manufacturerName?: string },
+  r: { name: string; manufacturer?: string | undefined; manufacturerName?: string },
   names: ManufacturerNames = noManufacturerNames,
 ) {
   const manufacturer = r.manufacturerName ?? (r.manufacturer && names.get(r.manufacturer))
@@ -185,7 +185,7 @@ export const withManufacturerName = <T extends { manufacturer: string }>(
  * The manufacturer options over `rows`: each catalogue manufacturer id with its name, by name.
  */
 export const manufacturerOptions = (
-  rows: readonly { manufacturer?: string; manufacturerName: string }[],
+  rows: readonly { manufacturer?: string | undefined; manufacturerName: string }[],
 ) =>
   [
     ...new Map(

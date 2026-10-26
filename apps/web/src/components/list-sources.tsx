@@ -156,7 +156,7 @@ export function SourceFilter({
  * The Source column of the bullet and cartridge lists: a Mine row's badge and Delete. A catalogue
  * row is blank on screen and named for screen readers.
  */
-export function sourceColumn<T extends { id: string; origin?: 'user' }>(
+export function sourceColumn<T extends { id: string; origin?: 'user' | undefined }>(
   name: (row: T) => string,
   onDelete: (rowId: string, name: string) => void,
 ): DirectoryColumn<T> {

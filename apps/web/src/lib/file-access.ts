@@ -31,7 +31,7 @@ export async function saveAs(
   text: string,
   name: string,
   startIn?: FileSystemDirectoryHandle,
-): Promise<{ name: string; handle?: FileSystemFileHandle } | undefined> {
+): Promise<{ name: string; handle?: FileSystemFileHandle | undefined } | undefined> {
   const { showSaveFilePicker } = pickers()
   if (showSaveFilePicker) {
     try {
@@ -51,7 +51,7 @@ export async function saveAs(
 export async function pickFiles(
   multiple: boolean,
   startIn?: FileSystemDirectoryHandle,
-): Promise<{ file: File; handle?: FileSystemFileHandle }[]> {
+): Promise<{ file: File; handle?: FileSystemFileHandle | undefined }[]> {
   const { showOpenFilePicker } = pickers()
   if (showOpenFilePicker) {
     try {

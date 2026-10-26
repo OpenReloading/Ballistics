@@ -32,31 +32,36 @@ import {
 export type { RangeKey }
 
 /** One ladder step of the study: its rows, none for a step the model reported as invalid. */
-export type BarrelStep = { n: number; label: string; charge: number; rows?: BarrelRow[] }
+export type BarrelStep = {
+  n: number
+  label: string
+  charge: number
+  rows?: BarrelRow[] | undefined
+}
 
 /** The Barrel length tab's state. */
 export type BarrelStudy = {
   range: Record<RangeKey, FieldValue>
   setRange: (key: RangeKey, value: FieldValue) => void
   /** Why the range gives no lengths, per field. */
-  errors?: RangeErrors
+  errors?: RangeErrors | undefined
   /** The run's barrel is the workbench's barrel length; false when the typed travel differs. */
   atSeating: boolean
   /** The seated bullet's base from the head, m; none without a seated bullet. */
-  base?: number
+  base?: number | undefined
   /** Every step of the run, in ladder order. */
   steps: BarrelStep[]
   selected: number
   /** Names the longer run asked for (the run, its travel, the attempt); none when it needs none. */
-  key?: string
+  key?: string | undefined
   /** The longer run is on its way, or failed with `message`. */
   pending: boolean
-  message?: string
+  message?: string | undefined
   /** Asks for the longer run again after it failed. */
   retry: () => void
 }
 
-type LongerAnswer = { runs?: (LongerRun | undefined)[]; message?: string }
+type LongerAnswer = { runs?: (LongerRun | undefined)[]; message?: string | undefined }
 
 /** The longer run of the study, or its failure; nothing once the request was aborted. */
 async function requestLonger(
@@ -181,7 +186,7 @@ export function useBarrelStudy({
   const [longer, setLonger] = useState<{
     key: string
     runs?: (LongerRun | undefined)[]
-    message?: string
+    message?: string | undefined
   }>()
   // the request reads the run it was made for: a step change does not send it again
   // biome-ignore lint/correctness/useExhaustiveDependencies: `key` names the run and the travel

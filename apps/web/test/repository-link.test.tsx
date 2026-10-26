@@ -4,7 +4,7 @@ import { expect, it } from 'vitest'
 import { RepositoryLink } from '../src/components/repository-link.tsx'
 import { repositoryUrl } from '../src/lib/repository-url.ts'
 
-const render = (url?: string, drawer?: boolean) =>
+const render = (url?: string | undefined, drawer?: boolean) =>
   renderToStaticMarkup(
     <MantineProvider>
       <RepositoryLink url={url} drawer={drawer} />

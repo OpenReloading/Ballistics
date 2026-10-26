@@ -14,7 +14,10 @@ import {
 } from '../src/lib/offline.ts'
 
 const origin = 'https://example.test'
-const req = (url: string, init: { method?: string; mode?: string; headers?: object } = {}) => ({
+const req = (
+  url: string,
+  init: { method?: string | undefined; mode?: string | undefined; headers?: object } = {},
+) => ({
   method: init.method ?? 'GET',
   url: new URL(url, origin).href,
   mode: init.mode ?? 'cors',

@@ -199,7 +199,7 @@ function RowActions({
   onDelete,
 }: {
   record: FirearmRecord
-  tabIndex?: number
+  tabIndex?: number | undefined
   onOpen: () => void
   onDuplicate: () => void
   onDelete: () => void

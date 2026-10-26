@@ -515,7 +515,13 @@ function LimitRange({ body, system }: { body: InteriorResponse; system: UnitSyst
 }
 
 /** Pressure limits table and the sources of the limits; with `system` the range bar between them (the popover). */
-export function LimitsView({ body, system }: { body: InteriorResponse; system?: UnitSystem }) {
+export function LimitsView({
+  body,
+  system,
+}: {
+  body: InteriorResponse
+  system?: UnitSystem | undefined
+}) {
   const resolved = body.resolved?.cartridge
   if (!body.limits || body.limits.length === 0)
     return (
@@ -578,8 +584,8 @@ export const BurnRate = memo(function BurnRate({
   height,
 }: {
   p: FittedPowder | UnfittedPowder
-  powderId?: string
-  marks?: { z: number; label: string }[]
+  powderId?: string | undefined
+  marks?: { z: number; label: string }[] | undefined
   /** The chart's height, px. */
   height: number
 }) {
@@ -627,7 +633,7 @@ export function LadderStrip({
   steps: ShownStep[]
   stale: boolean
   /** The radios' group name; the phone range view has a second strip. */
-  name?: string
+  name?: string | undefined
   /** The charge of the shown result, else of the field. */
   chargeText: string
   /** The flag of the one step. */
@@ -781,7 +787,7 @@ function LadderResultCells({
 
 type LadderRowProps = {
   s: ShownStep
-  which?: Lot
+  which?: Lot | undefined
   ok: Extract<Outcome, { kind: 'ok' }> | undefined
   system: UnitSystem
   value: (s: ShownStep) => string
@@ -860,7 +866,7 @@ export function LadderTable({
   value: (s: ShownStep) => string
   velocity: (r: InteriorResponse['result']) => string
   /** The rows at a burn rate above and below, in step order, and the change they were run at. */
-  lot?: LadderLot
+  lot?: LadderLot | undefined
 }) {
   // without a load ratio on any step the column would repeat the load ratio readout's phrase
   const ratioShown = steps.some((st) => st.d?.ratio !== undefined)

@@ -3,7 +3,11 @@ import { type Bullet, toSi } from '@open-reloading/schema'
 import type { FieldRow } from './record-fields.ts'
 import { metersPerFoot, pascalsPerInHg } from './units.ts'
 
-type BallisticCoefficientChoice = { value: number; minVelocity?: number; note?: string }
+type BallisticCoefficientChoice = {
+  value: number
+  minVelocity?: number | undefined
+  note?: string | undefined
+}
 
 type BulletDrag =
   | { kind: 'bands'; projectile: Projectile }
@@ -80,7 +84,7 @@ export function millerTwist(r: Pick<Bullet, 'mass' | 'diameter' | 'length'>): nu
 
 /** The computed rows of a bullet page, each with its method on hover. */
 export function computedBulletRows(
-  r: Pick<Bullet, 'mass' | 'diameter' | 'length'> & { tip?: { type: string } },
+  r: Pick<Bullet, 'mass' | 'diameter' | 'length'> & { tip?: { type: string } | undefined },
 ): FieldRow[] {
   const twist = millerTwist(r)
   return [

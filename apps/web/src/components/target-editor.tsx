@@ -20,6 +20,7 @@ import {
   Tooltip,
 } from '@mantine/core'
 import { useElementSize, useMediaQuery, useMergedRef } from '@mantine/hooks'
+import { overlay } from '@open-reloading/core'
 import {
   type CalibrationReference,
   type GroupFace,
@@ -154,7 +155,7 @@ const lastSheet = 'target-sheet-last'
 /** Copies of the sheets whose save had not landed when the page went. */
 const waitingCopy = 'target-sheet-waiting'
 /** A sheet to save, with the `saved` of the stored version it was edited from (none: a new sheet). */
-type WaitingRecord = TargetSheetRecord & { base?: string }
+type WaitingRecord = TargetSheetRecord & { base?: string | undefined }
 
 /** The copies kept now, of every tab of this browser. */
 function storedCopies(): WaitingRecord[] {
@@ -221,7 +222,7 @@ const blank = (
   load: string | undefined,
   marker: number | undefined,
   distance: number,
-  step?: number,
+  step?: number | undefined,
 ): TargetSheet => {
   const g = newGroup({ references: [], targetRotation: 0, groups: [] }, 'g1', distance)
   return {
@@ -297,13 +298,13 @@ async function restoreCopy() {
     raw = localStorage.getItem(waitingCopy)
   } catch {}
   if (!raw) return kept
-  let copies: { copy: TargetSheetRecord; base?: string }[] = []
+  let copies: { copy: TargetSheetRecord; base?: string | undefined }[] = []
   try {
     const list: unknown = JSON.parse(raw)
     copies = (Array.isArray(list) ? list : []).flatMap((item) => {
       // the schema drops `base`: read next to the record
       const [copy] = validRecords([item]).records
-      const base = (item as { base?: unknown } | null)?.base
+      const base = (item as { base?: unknown | undefined } | null)?.base
       return copy?.kind === 'targetSheet'
         ? [{ copy, ...(typeof base === 'string' && { base }) }]
         : []
@@ -351,7 +352,7 @@ function IconButton({
       <ActionIcon
         variant="default"
         aria-label={label}
-        disabled={disabled}
+        {...(disabled !== undefined && { disabled })}
         onClick={onClick}
         {...rest}
       >
@@ -397,7 +398,15 @@ function CoordInput({
 }
 
 /** A labelled row of the property grid that is not a field. */
-function Row({ label, help, children }: { label: string; help?: string; children: ReactNode }) {
+function Row({
+  label,
+  help,
+  children,
+}: {
+  label: string
+  help?: string | undefined
+  children: ReactNode
+}) {
   return (
     <div className="prop-row">
       <span className="prop-label" title={help}>
@@ -436,7 +445,7 @@ type Score = ReturnType<typeof useRingScoring>
 type ShotAt = (
   sel: Selection,
   f: (s: ShotGroup['shots'][number]) => ShotGroup['shots'][number] | undefined,
-  key?: string,
+  key?: string | undefined,
 ) => void
 
 /** What the editor's panels read and call; one object per render. */
@@ -464,8 +473,12 @@ type Ed = {
   setFilter: (f: { contrast: number; darken: number }) => void
   refKind: RefKind
   setRefKind: (k: RefKind) => void
-  known: { length?: number; width?: number; height?: number }
-  setKnown: (k: { length?: number; width?: number; height?: number }) => void
+  known: { length?: number | undefined; width?: number | undefined; height?: number | undefined }
+  setKnown: (k: {
+    length?: number | undefined
+    width?: number | undefined
+    height?: number | undefined
+  }) => void
   calTool: (which: string, t: Tool) => void
   newDistance: { current: number }
   setActive: (id: string | undefined) => void
@@ -1414,7 +1427,7 @@ function ToolPopover({
   tip: ReactNode
   wideTip?: boolean
   name: string
-  description?: string
+  description?: string | undefined
   icon: ReactNode
   position?: 'bottom-start' | 'bottom-end'
   frame?: (popover: ReactNode) => ReactElement
@@ -2381,7 +2394,9 @@ function activeGroupOf(sheet: TargetSheet, active: string | undefined) {
 
 /** The overlay switches of the sheet, else the browser's last choice. */
 function overlaysOf(sheet: TargetSheet, browser: Record<Overlay, boolean>) {
-  return sheet.overlays ? { ...defaultOverlays, ...sheet.overlays } : browser
+  return sheet.overlays
+    ? overlay<Record<Overlay, boolean>>(defaultOverlays, sheet.overlays)
+    : browser
 }
 
 /** The class of the side panels: the page template's panels on /groups only. */
@@ -2441,26 +2456,26 @@ export function TargetEditor({
   stored: storedTick,
 }: {
   /** Id of the saved load (workbench); the sheets of that load only. */
-  load?: string
+  load?: string | undefined
   /** Charge of each ladder step of the load, kg. */
-  charges?: number[]
+  charges?: number[] | undefined
   /** Each ladder step as the workbench names it, relative to the main charge. */
-  stepLabels?: string[]
+  stepLabels?: string[] | undefined
   /** Index of the ladder step shown in the workbench; new groups take it. */
-  step?: number
+  step?: number | undefined
   /** Bullet diameter of the load, m: the marker of a new sheet. */
-  bulletDiameter?: number
+  bulletDiameter?: number | undefined
   /** The optic of the workbench's firearm, for the clicks to the point of aim. */
-  optic?: { label: string; click: number }
+  optic?: { label: string; click: number } | undefined
   /**
    * The workbench tab: compact (the target and the key readouts) until expanded over the
    * workbench; `onChange` switches.
    */
   expand?: { expanded: boolean; onChange: (expanded: boolean) => void }
   /** The workbench's load and its simulated velocities, for the print sheet. */
-  summary?: LoadSummary
+  summary?: LoadSummary | undefined
   /** The page heading (`/groups`): shown with the File menu of the open sheet beside it. */
-  heading?: string
+  heading?: string | undefined
   /** Counts the page's File menu writes to the browser store (workbench Import, Replace). */
   stored?: number
 }) {
@@ -2491,7 +2506,11 @@ export function TargetEditor({
   const [tool, setTool] = useState<Tool>('select')
   const [pending, setPending] = useState<Point[]>([])
   const [refKind, setRefKind] = useState<RefKind>('line')
-  const [known, setKnown] = useState<{ length?: number; width?: number; height?: number }>({})
+  const [known, setKnown] = useState<{
+    length?: number | undefined
+    width?: number | undefined
+    height?: number | undefined
+  }>({})
   /** The browser's last overlay choice: the switches of a sheet without its own. */
   const [browserOverlays, setBrowserOverlays] = useState(defaultOverlays)
   const [noteSel, setNoteSel] = useState<string>()
@@ -3165,7 +3184,7 @@ export function TargetEditor({
   const shotAt = (
     sel: Selection,
     f: (s: ShotGroup['shots'][number]) => ShotGroup['shots'][number] | undefined,
-    key?: string,
+    key?: string | undefined,
   ) =>
     apply(
       (s) =>

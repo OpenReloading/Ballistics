@@ -55,7 +55,7 @@ export function Countries({
   title,
   as: Tag = 'li',
 }: {
-  items: { name: string; code?: string }[]
+  items: { name: string; code?: string | undefined }[]
   /** Hover text for the whole item. */
   title?: string
   /** `span` inside a list of its own. */

@@ -53,7 +53,7 @@ export function FieldStrip({
   tags = [],
 }: {
   items: StripItem[]
-  country?: { name: string; code?: string }
+  country?: { name: string; code?: string | undefined } | undefined
   tags?: string[]
 }) {
   const { system } = useUnits()

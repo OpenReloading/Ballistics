@@ -30,7 +30,7 @@ type Channels = [number[], number[], number[]]
 /** Unit axis `w` in log RGB, the hole colour `mu`, the ring median `ring` and their separation along `w`. */
 type Axis = { w: LogRgb; mu: LogRgb; ring: LogRgb; sep: number }
 /** The picked hole (work px), or the hole colour in log RGB without a pick. */
-export type Seed = { at?: Point; mu?: LogRgb }
+export type Seed = { at?: Point | undefined; mu?: LogRgb }
 
 /**
  * Fisher's linear discriminant in log RGB: the mean of the disc of 0.4 D at the pick (or the

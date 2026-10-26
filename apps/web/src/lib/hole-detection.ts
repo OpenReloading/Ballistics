@@ -79,7 +79,7 @@ export type HoleDetectionInput = {
    * (black area or paper), and a run drops what its polarity cannot show: dark marks on the black
    * area and light marks on the paper are print.
    */
-  face?: FaceLabel
+  face?: FaceLabel | undefined
 }
 
 /** The printed face as the detection sees it. */
@@ -92,7 +92,7 @@ export type FaceLabel = {
    * True for a point where the ring numerals stand: on an axis turned by `roll` (rad), between two
    * ring lines.
    */
-  numeral?: (p: Point, roll?: number) => boolean
+  numeral?: ((p: Point, roll?: number) => boolean) | undefined
   /** Distance of a point from the face centre (mm) and its angle from the face's x axis (rad). */
   polar?: (p: Point) => { radius: number; angle: number }
 }
@@ -200,7 +200,7 @@ type Ctx = WorkImage & {
   prior: number
   keep: number
   progress: (done: number) => void
-  face?: FaceLabel
+  face?: FaceLabel | undefined
 }
 /** A seed run of the auto detection. */
 type SeedRun = { found: Found; run: Run; at: Point; holeDiameter: number }

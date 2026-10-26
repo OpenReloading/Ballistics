@@ -22,10 +22,10 @@ type HoleSize = { diameter: number; source: 'typed' | 'learned' | 'bullet' | 'ma
  * the bullet diameter; else the marker diameter; else none.
  */
 export function expectedHoleSize(o: {
-  typedDiameter?: number
+  typedDiameter?: number | undefined
   confirmedDiameters: readonly number[]
-  bulletDiameter?: number
-  markerDiameter?: number
+  bulletDiameter?: number | undefined
+  markerDiameter?: number | undefined
 }): HoleSize | undefined {
   if (o.typedDiameter) return { diameter: o.typedDiameter, source: 'typed' }
   if (o.confirmedDiameters.length >= MIN_HOLES_TO_LEARN_SIZE) {

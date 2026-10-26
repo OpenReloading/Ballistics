@@ -50,9 +50,9 @@ export function NotesLayer({
   frame: Frame
   k: number
   /** An export or the print: not in the tab order. */
-  still?: boolean
+  still?: boolean | undefined
   system: UnitSystem
-  selected?: string
+  selected?: string | undefined
   /** Select is the tool: notes take pointer drags; else a click goes to the target. */
   movable: boolean
   onSelect: (id: string) => void
@@ -224,7 +224,7 @@ export function NotesPanel({
   system: UnitSystem
   /** False until the sheet has a scale. */
   canAdd: boolean
-  selected?: string
+  selected?: string | undefined
   onAdd: () => void
   /** A change of one note; `key` joins a run of typing into one undo step. */
   onChange: (id: string, patch: Partial<SheetNote>, key?: string) => void

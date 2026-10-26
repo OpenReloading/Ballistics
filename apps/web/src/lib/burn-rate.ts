@@ -22,11 +22,11 @@ export interface FittedPowder {
   label: string
   /** Id of the manufacturer record; empty for typed parameters. */
   manufacturer: string
-  form?: string
-  base?: string
+  form?: string | undefined
+  base?: string | undefined
   burn: VivacityBurn
   /** `uncertaintyFactor` times sigma / vivacity; absent when the record has no sigma. */
-  spread?: number
+  spread?: number | undefined
 }
 
 /** Why a powder has no curve: no fit, a pressure exponent other than 1, an interval reaching 0. */
@@ -43,8 +43,8 @@ export interface UnfittedPowder {
 
 interface RateInterval {
   value: number
-  low?: number
-  high?: number
+  low?: number | undefined
+  high?: number | undefined
 }
 
 const noFitReason =
@@ -222,12 +222,12 @@ export interface PowderRow {
   /** Other names of the manufacturer, searched by the list. */
   manufacturerAliases?: string[]
   name: string
-  grainForm?: string
-  propellantBase?: string
+  grainForm?: string | undefined
+  propellantBase?: string | undefined
   /** Mean dynamic vivacity with its interval, 1/(MPa s); absent without a curve. */
-  meanVivacity?: number
-  low?: number
-  high?: number
+  meanVivacity?: number | undefined
+  low?: number | undefined
+  high?: number | undefined
   /** 1 for the fastest fitted powder; kept when a filter hides others. */
   burnRateOrder?: number
 }

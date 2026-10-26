@@ -34,22 +34,26 @@ export const cartridgeClass = (table: string | undefined): CartridgeClass | unde
 
 export type DefaultSources = {
   /** The chosen firearm (of the firearm library); a twist of 0 is none. */
-  firearm?: { name: string; twist?: number; barrelLength?: number }
+  firearm?:
+    | { name: string; twist?: number | undefined; barrelLength?: number | undefined }
+    | undefined
   /** The chosen cartridge with its record's values: land diameter F, bore area Q, twist u, case capacity as a volume. */
-  cartridge?: {
-    name: string
-    /** A user design: its values are not CIP values, and it has no class. */
-    design?: true
-    class?: CartridgeClass
-    boreDiameter?: number
-    boreArea?: number
-    twist?: number
-    capacity?: Suggestion
-  }
+  cartridge?:
+    | {
+        name: string
+        /** A user design: its values are not CIP values, and it has no class. */
+        design?: true | undefined
+        class?: CartridgeClass | undefined
+        boreDiameter?: number | undefined
+        boreArea?: number | undefined
+        twist?: number | undefined
+        capacity?: Suggestion | undefined
+      }
+    | undefined
   /** The chosen bullet record. */
-  bullet?: { name: string; diameter: number }
+  bullet?: { name: string; diameter: number } | undefined
   /** The user's barrel length from Settings. */
-  settingsBarrelLength?: number
+  settingsBarrelLength?: number | undefined
 }
 
 const positive = (x: number | undefined): x is number => x !== undefined && x > 0

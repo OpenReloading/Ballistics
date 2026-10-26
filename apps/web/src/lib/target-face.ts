@@ -301,7 +301,7 @@ export function matchFaces(
   rings: readonly Ring[],
   faces: readonly TargetFace[],
   frame?: { width: number; height: number },
-  scale?: number,
+  scale?: number | undefined,
 ): FaceMatch[] {
   const rho = meanRadius(black)
   const found = concentric(black, rings)
@@ -630,7 +630,7 @@ export type FaceSearch = {
 export function findFace(
   image: RgbaImage,
   faces: readonly TargetFace[],
-  scale?: number,
+  scale?: number | undefined,
 ): FaceSearch {
   const s0 = Math.max(1, Math.ceil(Math.max(image.width, image.height) / COARSE))
   const coarse = grayGrid(image, s0)

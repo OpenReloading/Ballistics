@@ -30,13 +30,13 @@ export interface Rk45Options {
   /** Accepted plus rejected steps before the call fails, counting `stepsBefore`. */
   maxSteps: number
   /** Steps already taken by earlier calls of the same run; default 0. */
-  stepsBefore?: number
+  stepsBefore?: number | undefined
   /** Shared by several calls: each step adds 1 to `used`; a call fails once `used` is `max`. */
-  budget?: StepBudget
+  budget?: StepBudget | undefined
   /** The call ends at this time (s) when no terminal event comes first. */
   maxTime: number
   /** First step size, s; estimated when absent. */
-  initialStep?: number
+  initialStep?: number | undefined
 }
 
 /** Step count shared by several `rk45` calls of one run. */

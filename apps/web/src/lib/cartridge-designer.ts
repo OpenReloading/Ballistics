@@ -143,8 +143,8 @@ export interface Origin {
   id: string
   title: string
   /** The `revision` of the catalogue record, as the API answered it. */
-  revision?: string
-  table?: string
+  revision?: string | undefined
+  table?: string | undefined
   values: SpecValue[]
   si: Record<string, number | undefined>
 }
@@ -153,7 +153,7 @@ export interface Design {
   /** The CIP table whose drawing rules apply (table III: belt). */
   table: string
   fields: Fields
-  origin?: Origin
+  origin?: Origin | undefined
   /** The catalogue cartridge the design is based on, `catalogue:<id>`, kept through files. */
   basedOn?: string
   /** The base changed since the design was saved: the values not overridden follow it. */
@@ -384,7 +384,7 @@ export function reduce(h: History, a: Action): History {
  */
 export type FieldState =
   | { kind: 'record' }
-  | { kind: 'entered'; changed: boolean; record?: number }
+  | { kind: 'entered'; changed: boolean; record?: number | undefined }
   | { kind: 'cleared'; record: number }
   | { kind: 'derived'; si: number }
   | { kind: 'notPrinted' }
@@ -404,7 +404,7 @@ export interface Evaluation {
   spec?: DraftSpec
   figures?: Figure[]
   /** Why there is no drawing for this input, and the field to show it at. */
-  refusal?: { reason: string; field: string }
+  refusal?: { reason: string; field: string } | undefined
   states: Record<string, FieldState>
   /** CIP plausibility findings by field key, shown as the field's error. */
   checks: Record<string, string[]>

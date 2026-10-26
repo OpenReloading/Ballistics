@@ -60,25 +60,25 @@ export interface CataloguePage<T> {
 
 /** Paging of a list: `limit` items from `offset`, every item without them. */
 export interface Paging {
-  limit?: number
-  offset?: number
+  limit?: number | undefined
+  offset?: number | undefined
 }
 
 /** Query of `Catalogue.cartridges`: `q` searches names and aliases, `table` is the C.I.P. table. */
 export interface CartridgeQuery extends Paging {
-  q?: string
-  table?: string
+  q?: string | undefined
+  table?: string | undefined
 }
 
 /** Query of `Catalogue.powders`: `q` searches the manufacturer's name or alias with the product name, `manufacturer` is a manufacturer id. */
 export interface PowderQuery extends Paging {
-  q?: string
-  manufacturer?: string
+  q?: string | undefined
+  manufacturer?: string | undefined
 }
 
 /** Query of `Catalogue.bullets`: as {@link PowderQuery}, `cartridge` keeps the bullets that fit that cartridge (`bulletWindow` of core). */
 export interface BulletQuery extends PowderQuery {
-  cartridge?: string
+  cartridge?: string | undefined
 }
 
 /** A cartridge of the list, the fields of `GET /cartridges`. Lengths and diameters in mm, `pmax` in bar. */
@@ -145,7 +145,7 @@ export interface BulletItem {
  */
 export interface TargetFaceItem {
   id: string
-  federation?: string
+  federation?: string | undefined
   organization?: string
   name: string
   caliberClasses: string[]
@@ -248,7 +248,7 @@ export interface CatalogueSource {
   targetMappings: TargetMapping[]
   caliberClasses: CaliberClass[]
   /** `renames.json` of the records; absent: none. */
-  renames?: Renames
+  renames?: Renames | undefined
 }
 
 /** What `openCatalogue` opens: the index and the record file, or a function that reads it on the first `get`. */
@@ -273,9 +273,12 @@ export interface Catalogue {
   /** Every federation. */
   federations(): CataloguePage<FederationItem>
   /** Disciplines, of one federation where `federation` is set. */
-  disciplines(query?: { federation?: string }): CataloguePage<DisciplineItem>
+  disciplines(query?: { federation?: string | undefined }): CataloguePage<DisciplineItem>
   /** Target mappings, of one discipline and one face where set. */
-  targetMappings(query?: { discipline?: string; face?: string }): CataloguePage<TargetMappingItem>
+  targetMappings(query?: {
+    discipline?: string | undefined
+    face?: string | undefined
+  }): CataloguePage<TargetMappingItem>
   /** Caliber classes by nominal diameter. */
   caliberClasses(): CataloguePage<CaliberClassItem>
   /** The record `id` of `kind`; undefined if unknown. */

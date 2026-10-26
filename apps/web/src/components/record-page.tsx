@@ -34,23 +34,23 @@ export function RecordPage({
   /** A layout of the grid, such as `record-chart` (powder) or `cartridge-record`. */
   className?: string
   /** "Compare" link. */
-  compare?: string
+  compare?: string | undefined
   /** The badges as drawn in the bar, where they are more than text (the cartridge record's notes on hover); `badges` stays the line below 75em. */
   badgeNodes?: ReactNode
   /** A line under the bar, over the grid (the cartridge record's pressures). */
   strip?: ReactNode
   /** "Use in workbench" link. */
-  workbench?: string
+  workbench?: string | undefined
   /** "Open in shot groups" link. */
-  groups?: string
+  groups?: string | undefined
   /** "Open in designer" link. */
-  design?: string
+  design?: string | undefined
   /** The figure section; a record whose values carry their own figures (the cartridge's) has none. */
   figure?: ReactNode
   /** The values section: the record's table. */
   values: ReactNode
   /** The side column: coefficients, notes. */
-  side?: ReactNode
+  side?: ReactNode | undefined
   provenance: Provenance
 }) {
   return (

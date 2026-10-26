@@ -8,20 +8,20 @@ export interface FaceRing {
   value: number
   diameter: FaceLength
   /** Height of an oval ring; absent: a circle. */
-  height?: FaceLength
+  height?: FaceLength | undefined
   /** `square`: a square of edge `diameter`; absent or `circle`: a circle or oval. */
-  shape?: 'circle' | 'square'
-  fill?: string
-  line?: string
+  shape?: 'circle' | 'square' | undefined
+  fill?: string | undefined
+  line?: string | undefined
 }
 
 /** The fields of a target face the figure reads; a `TargetFace` record fits. */
 export interface FaceShape {
   /** Outer to inner. */
   rings: FaceRing[]
-  innerTen?: { diameter: FaceLength; height?: FaceLength }
+  innerTen?: { diameter: FaceLength; height?: FaceLength | undefined } | undefined
   blackDiameter: FaceLength
-  blackHeight?: FaceLength
+  blackHeight?: FaceLength | undefined
 }
 
 /** An ellipse, or a rectangle when `square`, centred on the scoring centre, radii in mm. */

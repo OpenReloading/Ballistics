@@ -81,7 +81,7 @@ export type SeatingLengths = {
   /** Slider range of the length it seats by, m. */
   range: readonly [number, number]
   /** Case volume behind the bullet (m³) and bullet travel (m) at `value` (m); absent without the record values. */
-  at: (value: number) => { volume?: number; travel?: number }
+  at: (value: number) => { volume?: number | undefined; travel?: number | undefined }
 }
 
 /** One step of a seating ladder: the length the bullet is seated by (m) and what follows from it. */

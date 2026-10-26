@@ -18,7 +18,7 @@ export function GroupsTab({
   ...props
 }: Omit<ComponentProps<typeof TargetEditor>, 'charges' | 'stepLabels'> & {
   /** The load's charge ladder, as the API runs it; its charges label the ladder steps. */
-  ladder?: { charge: number; step: number; steps: number; direction: LadderDirection }
+  ladder?: { charge: number; step: number; steps: number; direction: LadderDirection } | undefined
 }) {
   let charges: number[] | undefined
   try {

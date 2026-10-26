@@ -5,7 +5,7 @@
  * ordinary `trajectory` call with candidate inputs. SI in and out; angles in rad.
  */
 import type { DragTable } from '../drag-tables.ts'
-import { InputError, need, nth } from '../errors.ts'
+import { InputError, need, nth, overlay, type Settings } from '../errors.ts'
 import { type LogFitResult, logLeastSquares } from '../least-squares.ts'
 import { type DragInput, dragCoefficient, dragTableOf } from './drag.ts'
 import type { StepBudget } from './rk45.ts'
@@ -26,26 +26,26 @@ export interface Observation {
   /** m, rad or m/s, in the signs of `TrajectoryPoint`. */
   value: number
   /** One standard deviation in the unit of `value`; all observations or none. */
-  standardUncertainty?: number
+  standardUncertainty?: number | undefined
 }
 
 /**
  * Trajectory options of every evaluation (`budget` excluded: the fit sets it) and the limits of
  * the fit. The integrator defaults are relativeTolerance 1e-10, absoluteTolerance 1e-9 and zeroTolerance 1e-9.
  */
-export interface TruingOptions extends Partial<Omit<TrajectoryOptions, 'budget'>> {
+export interface TruingOptions extends Settings<Omit<TrajectoryOptions, 'budget'>> {
   /**
    * Levenberg-Marquardt iterations (accepted plus rejected steps) before the fit fails with reason
    * `not-converged`; default 30.
    */
-  maxIterations?: number
+  maxIterations?: number | undefined
   /** Largest condition number of the column-scaled Jacobian; default 1e3. */
-  maxCondition?: number
+  maxCondition?: number | undefined
   /**
    * Integration steps of all trajectories of the fit together, zero searches and point-mass twins
    * included, before it fails with reason `step-budget`; positive, default no limit.
    */
-  maxTotalSteps?: number
+  maxTotalSteps?: number | undefined
 }
 
 /** A fitted parameter: start value, result and uncertainty. */
@@ -129,22 +129,22 @@ export type TruingReason =
  */
 export class TruingError extends InputError {
   readonly reason: TruingReason
-  readonly conditionNumber?: number
+  readonly conditionNumber?: number | undefined
   /** Indices of parameters the observations do not resolve. */
-  readonly unresolved?: number[]
+  readonly unresolved?: number[] | undefined
   /** Parameter combination (in log parameters, column-scaled) with the smallest eigenvalue. */
-  readonly direction?: number[]
-  readonly estimate?: TruedParameter[]
+  readonly direction?: number[] | undefined
+  readonly estimate?: TruedParameter[] | undefined
 
   constructor(
     reason: TruingReason,
     extra: {
-      conditionNumber?: number
-      unresolved?: number[]
-      direction?: number[]
-      estimate?: TruedParameter[]
+      conditionNumber?: number | undefined
+      unresolved?: number[] | undefined
+      direction?: number[] | undefined
+      estimate?: TruedParameter[] | undefined
       /** What the solver reported, appended to the message. */
-      detail?: string
+      detail?: string | undefined
     } = {},
   ) {
     super(extra.detail ? `truing: ${reason} (${extra.detail})` : `truing: ${reason}`)
@@ -224,7 +224,7 @@ function observedPoints(u: Run, t: ReturnType<typeof trajectory>): Prediction | 
 function predictSessions(
   runs: readonly Run[],
   q: (theta: number[]) => number[],
-  o: Partial<TrajectoryOptions>,
+  o: Settings<TrajectoryOptions>,
   budget: StepBudget,
   estimate: (theta: number[]) => TruedParameter[],
 ): Predictor {
@@ -330,11 +330,11 @@ function leastSquares(
   need(maxTotalSteps > 0, 'maxTotalSteps must be positive')
   if (n < np) throw new TruingError('underdetermined')
   const budget = { used: 0, max: maxTotalSteps }
-  const o: Partial<TrajectoryOptions> = {
-    relativeTolerance: 1e-10,
-    absoluteTolerance: 1e-9,
-    zeroTolerance: 1e-9,
-    ...rest,
+  const o: Settings<TrajectoryOptions> = {
+    ...overlay<Settings<TrajectoryOptions>>(
+      { relativeTolerance: 1e-10, absoluteTolerance: 1e-9, zeroTolerance: 1e-9 },
+      rest,
+    ),
     budget,
   }
   const sigma = observations.map((x) => x.standardUncertainty ?? 1)
@@ -503,7 +503,7 @@ const factorSpecs = (knots?: readonly number[]): Spec[] =>
 export function trueDrag(
   shot: TrajectoryInput,
   observations: readonly Observation[],
-  spec: { knots?: readonly number[]; fitMuzzleVelocity?: boolean } = {},
+  spec: { knots?: readonly number[] | undefined; fitMuzzleVelocity?: boolean | undefined } = {},
   options?: TruingOptions,
 ): TruingResult {
   const { knots, fitMuzzleVelocity = false } = spec
@@ -521,7 +521,7 @@ export function trueDrag(
 export function trueDragSessions(
   projectile: Projectile,
   sessions: readonly TruingSession[],
-  spec: { knots?: readonly number[] } = {},
+  spec: { knots?: readonly number[] | undefined } = {},
   options?: TruingOptions,
 ): SessionsTruingResult {
   return fitDrag(projectile, sessions, spec.knots, options, true)

@@ -14,17 +14,19 @@ import { type Matrix, mul3, type Point } from './target-geometry.ts'
 
 export type FoundFace = Pick<FacePlane, 'centre' | 'corners' | 'outer'> & {
   /** Id of the face record; absent for a plane from a typed diameter. */
-  id?: string
+  id?: string | undefined
   /** Id of the event the user chose; absent: the group's discipline, else an event at the group's distance. */
   event?: string
   /** Id of the federation that publishes the face. */
-  federation?: string
+  federation?: string | undefined
   /** The events of the face with their distances, m, and the federation of an event of another one. */
-  events?: ReadonlyArray<{ id: string; distance: number; federation?: string }>
+  events?:
+    | ReadonlyArray<{ id: string; distance: number; federation?: string | undefined }>
+    | undefined
 }
 
 /** The federation the user chose for the Discipline list, and the federations' disciplines and mappings. */
-export type FaceScope = { federation?: string; data?: FederationData }
+export type FaceScope = { federation?: string | undefined; data?: FederationData | undefined }
 
 /** `sheet` calibrated on `found`; the active group `groupId` takes the face for ring scoring. */
 export function calibrateSheetOnFace(

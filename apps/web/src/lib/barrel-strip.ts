@@ -16,7 +16,7 @@ import { nth } from './nth.ts'
  */
 export type StripFigure = {
   values: SpecValue[]
-  table?: string
+  table?: string | undefined
   bullet: SectionPoint[]
   base: number
 }

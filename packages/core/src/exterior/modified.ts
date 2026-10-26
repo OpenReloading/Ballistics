@@ -14,15 +14,15 @@ export interface Aerodynamics {
   /** Lift-force slope C_L-alpha, 1/rad. */
   liftSlope: CoefficientOverMach
   /** Overturning-moment slope C_M-alpha, 1/rad, > 0; estimated from Miller's rule if absent. */
-  momentSlope?: CoefficientOverMach
+  momentSlope?: CoefficientOverMach | undefined
   /** Magnus-force slope C_N-p-alpha, 1/rad; 0 when absent. */
-  magnusForceSlope?: CoefficientOverMach
+  magnusForceSlope?: CoefficientOverMach | undefined
   /** Spin-damping coefficient C_l-p, negative; constant spin when absent. */
-  spinDamping?: CoefficientOverMach
+  spinDamping?: CoefficientOverMach | undefined
   /** Axial moment of inertia, kg m2; uniform-cylinder estimate when absent. */
-  axialInertia?: number
+  axialInertia?: number | undefined
   /** Transverse moment of inertia about the centre of mass, kg m2; estimated when absent. */
-  transverseInertia?: number
+  transverseInertia?: number | undefined
 }
 
 /** Three-component vector, SI units of the quantity it holds. */

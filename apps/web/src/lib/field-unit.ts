@@ -11,7 +11,7 @@ export type UnitPick = {
   /** The page units the pick was made under. */
   system: UnitSystem
   /** The text typed in the picked unit and the SI value it gave: shown while the value is unchanged. */
-  typed?: { text: string; si: number }
+  typed?: { text: string; si: number } | undefined
 }
 
 /** The units of a quantity as [id, unit] pairs. */

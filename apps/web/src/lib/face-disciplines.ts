@@ -27,7 +27,7 @@ export type MappingSummary = Pick<
   TargetMapping,
   'id' | 'discipline' | 'face' | 'event' | 'stage'
 > & {
-  gaugeMm?: number
+  gaugeMm?: number | undefined
 }
 
 /** The federations, their disciplines and the mappings to faces, as the API lists them. */

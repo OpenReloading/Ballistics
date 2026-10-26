@@ -48,7 +48,7 @@ export type Camera = {
   /** Roll of the photo, degrees. */
   roll?: number
   /** Image position of the face centre, px; default the middle. */
-  at?: Point
+  at?: Point | undefined
   /** Distance of the camera in focal lengths of the 1 px/mm view: smaller is more perspective. */
   depth?: number
 }
@@ -124,7 +124,7 @@ export type Scene = {
   holes?: Array<{ x: number; y: number; diameter: number }>
   holeGrey?: number
   /** Print marks (numerals): boxes centred at face mm, width and height in mm, drawn with this grey. */
-  marks?: Array<{ x: number; y: number; width: number; height: number; grey: number }>
+  marks?: Array<{ x: number; y: number; width: number; height: number; grey: number }> | undefined
   /** Dark patches in image px: [x0, y0, x1, y1], grey. */
   patches?: Array<{ box: [number, number, number, number]; grey: number }>
   /** Brightness falling by this share across the image width. */

@@ -55,7 +55,7 @@ export const opticKinds = [
 const empty = undefined as unknown as QuantityValue
 
 /** A field's help on hover, focus and touch; the field shows no description line. */
-function Tip({ help, children }: { help?: string; children: ReactElement }) {
+function Tip({ help, children }: { help?: string | undefined; children: ReactElement }) {
   if (!help) return children
   return (
     <Tooltip label={help} events={tipEvents} multiline maw={280} position="top-start">
@@ -77,7 +77,7 @@ function SiField({
   si: number | undefined
   onChange: (si: number | undefined) => void
   /** A cross-field error of the schema, shown when the field itself is valid. */
-  error?: string
+  error?: string | undefined
 }) {
   const shown = (x: number | undefined) => ({
     text: x === undefined ? '' : roundedFieldText(spec.quantity, system, x),
