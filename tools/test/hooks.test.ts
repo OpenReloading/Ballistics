@@ -5,6 +5,7 @@ import {
   existsSync,
   mkdirSync,
   mkdtempSync,
+  readdirSync,
   readFileSync,
   rmSync,
   writeFileSync,
@@ -18,12 +19,13 @@ const hooks = resolve(import.meta.dirname, '../../hooks')
 const env = { ...process.env, GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_NOSYSTEM: '1', CI: '' }
 
 let repo: string
+const realGit = execFileSync('sh', ['-c', 'command -v git'], { encoding: 'utf8' }).trim()
 
 const git = (cwd: string, ...args: string[]) =>
   execFileSync('git', args, { cwd, env, encoding: 'utf8' }).trim()
 
 const install = (cwd = repo, extra: Record<string, string> = {}) =>
-  spawnSync('node', [join(hooks, 'install.mjs')], {
+  spawnSync(process.execPath, [join(hooks, 'install.mjs')], {
     cwd,
     env: { ...env, ...extra },
     encoding: 'utf8',
@@ -113,6 +115,29 @@ it('reports a hooks folder it cannot write instead of failing', () => {
   const run = install()
   expect(run.status).toBe(0)
   expect(run.stdout).toContain('cannot be written')
+})
+
+it('finds git on PATH wherever it is installed', () => {
+  const bin = join(repo, 'bin')
+  mkdirSync(bin)
+  writeFileSync(
+    join(bin, 'git'),
+    `#!/bin/sh\necho used >> "${repo}/git.log"\nexec "${realGit}" "$@"\n`,
+  )
+  chmodSync(join(bin, 'git'), 0o755)
+  expect(install(repo, { PATH: bin }).status).toBe(0)
+  expect(existsSync(join(repo, 'git.log'))).toBe(true)
+  expect(existsSync(join(repo, '.git/hooks/pre-commit'))).toBe(true)
+})
+
+it('does not write an identical stub again and leaves no temporary file', () => {
+  install()
+  const file = join(repo, '.git/hooks/pre-commit')
+  chmodSync(file, 0o444)
+  expect(install().stdout).toBe('')
+  expect(readdirSync(join(repo, '.git/hooks')).filter((name) => !name.endsWith('.sample'))).toEqual(
+    ['pre-commit'],
+  )
 })
 
 it('installs nothing in CI', () => {

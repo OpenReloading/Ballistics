@@ -4,9 +4,16 @@
 // a contributor's own hooks path or pre-commit hook (an edited stub too) wins, with a one-line
 // message. Never fails the install.
 import { execFileSync } from 'node:child_process'
-import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { join, resolve } from 'node:path'
-import { executable } from '../tools/src/executable.ts'
+import {
+  chmodSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  renameSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
+import { delimiter, isAbsolute, join, resolve } from 'node:path'
 
 const marker = '# managed by hooks/install.mjs'
 const stub = `#!/bin/sh
@@ -15,15 +22,19 @@ root=$(git rev-parse --show-toplevel) && [ -x "$root/hooks/pre-commit" ] && exec
 exit 0
 `
 
+/** The absolute path of the first `git` on `PATH`; a relative entry (the working directory) is skipped. */
+const findGit = () =>
+  (process.env.PATH ?? '')
+    .split(delimiter)
+    .filter(isAbsolute)
+    .map((dir) => join(dir, 'git'))
+    .find((file) => existsSync(file))
+
 /** The reason nothing was installed; nothing returned once the hook is in place. */
 function install() {
   if (process.env.CI) return 'CI'
-  let bin
-  try {
-    bin = executable('git')
-  } catch {
-    return 'git not found'
-  }
+  const bin = findGit()
+  if (!bin) return 'git not found'
   const git = (...args) =>
     execFileSync(bin, args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()
   let hooksPath
@@ -40,12 +51,19 @@ function install() {
     return 'not a git checkout'
   }
   const file = join(folder, 'pre-commit')
+  const temporary = `${file}.${process.pid}.tmp`
   try {
-    if (existsSync(file) && readFileSync(file, 'utf8') !== stub) return `${file} is another hook`
+    if (existsSync(file)) {
+      if (readFileSync(file, 'utf8') !== stub) return `${file} is another hook`
+      return
+    }
     mkdirSync(folder, { recursive: true })
-    writeFileSync(file, stub)
-    chmodSync(file, 0o755)
+    // renamed into place, so an interrupted write never leaves a partial hook
+    writeFileSync(temporary, stub)
+    chmodSync(temporary, 0o755)
+    renameSync(temporary, file)
   } catch (error) {
+    if (existsSync(temporary)) rmSync(temporary)
     return `${file} cannot be written (${error.code})`
   }
 }
