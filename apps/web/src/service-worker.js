@@ -1,10 +1,9 @@
 // The service worker of the offline layer. `scripts/service-worker.mts`
 // writes it to public/sw.js after `next build` (out/sw.js in the Pages edition), preceded by
-// `version` (the build id), `precache` (the static output), `base` and `slash` (`appUrl`), `scope`
-// (the cache scope of `shellPrefix`) and the exports of src/lib/offline.ts. It never opens
+// `version` (the build id), `precache` (the static output), `base` and `slash` (`appUrl`) and the exports of src/lib/offline.ts. It never opens
 // IndexedDB.
 
-const shell = shellCache(version, scope)
+const shell = shellCache(version)
 
 /** Stores a page's HTML once per build; failures are ignored (the page is fetched again later). */
 async function keepPage(key) {
@@ -85,7 +84,7 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
       const names = await caches.keys()
-      await Promise.all(staleCaches(names, version, scope).map((n) => caches.delete(n)))
+      await Promise.all(staleCaches(names, version).map((n) => caches.delete(n)))
       await self.clients.claim()
       // the page that registered the worker loaded before it: store it too
       const windows = await self.clients.matchAll({ type: 'window' })
