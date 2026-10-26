@@ -99,10 +99,11 @@ export function checkLoadReferences(
 
 /**
  * The manufacturer of every powder, bullet and listed load table, the case manufacturer of a
- * capacity and the device manufacturer of a chronograph session.
+ * capacity, the device manufacturer of a chronograph session and the manufacturers a load names
+ * (a described bullet or powder, the primer and the case).
  */
 export function checkManufacturerReferences(
-  bundle: Pick<Bundle, 'powders' | 'bullets' | 'capacities' | 'chronoSessions'>,
+  bundle: Pick<Bundle, 'powders' | 'bullets' | 'capacities' | 'chronoSessions' | 'loads'>,
   loadTables: LoadTables,
   ids: RecordIds,
   errors: string[],
@@ -121,6 +122,16 @@ export function checkManufacturerReferences(
     )
   for (const s of bundle.chronoSessions)
     check(`chrono/${s.id}.json`, 'device.manufacturer', parseRef(s.device.manufacturer)?.id)
+  for (const l of bundle.loads) {
+    const named = [
+      ['bullet.manufacturer', typeof l.bullet === 'object' ? l.bullet.manufacturer : undefined],
+      ['powder.manufacturer', typeof l.powder === 'object' ? l.powder.manufacturer : undefined],
+      ['primer.manufacturer', l.primer?.manufacturer],
+      ['case.manufacturer', l.case?.manufacturer],
+    ] as const
+    for (const [field, maker] of named)
+      check(`loads/${l.id}.json`, field, maker && parseRef(maker)?.id)
+  }
   for (const [file, table] of Object.entries(loadTables))
     check(`load-tables.json: ${file}`, 'manufacturer', table.manufacturer)
 }

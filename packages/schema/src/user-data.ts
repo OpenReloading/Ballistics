@@ -242,7 +242,7 @@ export interface DanglingRef {
 
 /**
  * The references of `records` to user records that no record of `records` answers: a load's
- * `firearm`, `cartridge`, `bullet` and `capacity`, a bullet's and a firearm's `manufacturer`, a capacity's
+ * `firearm`, `cartridge`, `bullet` and `capacity`, the `manufacturer` of its primer and case, a bullet's and a firearm's `manufacturer`, a capacity's
  * `cartridge` and `caseManufacturer` (only as `user:<id>`), a load's `sessions`, a session's device
  * `manufacturer` and the `load` of its strings, and a target sheet's `load` and the `session` of
  * its group shots. A
@@ -292,6 +292,8 @@ function userRefsOf(r: UserRecord): [string, string | undefined, UserRecordKind,
         ['cartridge', r.data.cartridge, 'cartridge', true],
         ['bullet', typeof r.data.bullet === 'string' ? r.data.bullet : undefined, 'bullet', true],
         ['capacity', r.data.capacity, 'caseCapacity', true],
+        ['primer.manufacturer', r.data.primer?.manufacturer, 'manufacturer', true],
+        ['case.manufacturer', r.data.case?.manufacturer, 'manufacturer', true],
         ...(r.data.sessions ?? []).map(
           (s, i): [string, string | undefined, UserRecordKind, boolean] => [
             `sessions.${i}`,
