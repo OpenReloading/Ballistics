@@ -6,6 +6,7 @@
 import { execFileSync } from 'node:child_process'
 import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
+import { executable } from '../tools/src/executable.ts'
 
 const marker = '# managed by hooks/install.mjs'
 const stub = `#!/bin/sh
@@ -14,12 +15,17 @@ root=$(git rev-parse --show-toplevel) && [ -x "$root/hooks/pre-commit" ] && exec
 exit 0
 `
 
-const git = (...args) =>
-  execFileSync('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()
-
 /** The reason nothing was installed; nothing returned once the hook is in place. */
 function install() {
   if (process.env.CI) return 'CI'
+  let bin
+  try {
+    bin = executable('git')
+  } catch {
+    return 'git not found'
+  }
+  const git = (...args) =>
+    execFileSync(bin, args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()
   let hooksPath
   let folder
   try {
