@@ -170,10 +170,13 @@ export function parsePressureHistory(
     const [t, p] = [reading(cells[tc - 1] ?? ''), reading(cells[pc - 1] ?? '')]
     if (Number.isNaN(t) || Number.isNaN(p))
       throw new Error(`line ${i + first}: time or pressure is not a number`)
-    if (time.length > 0 && t * tf <= (time.at(-1) as number))
+    const [seconds, bar] = [t * tf, p * pf]
+    if (!Number.isFinite(seconds) || !Number.isFinite(bar))
+      throw new Error(`line ${i + first}: time or pressure is not finite`)
+    if (time.length > 0 && seconds <= (time.at(-1) as number))
       throw new Error(`line ${i + first}: times must increase`)
-    time.push(t * tf)
-    pressure.push(p * pf)
+    time.push(seconds)
+    pressure.push(bar)
   })
   if (time.length < 3) throw new Error('a trace needs at least 3 samples')
   return {

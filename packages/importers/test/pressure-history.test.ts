@@ -141,4 +141,15 @@ describe('parsePressureHistory', () => {
     expect(t.time).toEqual([0, 1.25e-4, 2.5e-4])
     expect(t.pressureBar).toEqual([12.5, 30, 20])
   })
+
+  it('rejects a reading that is not finite, also after the unit factor', () => {
+    const o = { sensor: 'breech', timeUnit: 's', pressureUnit: 'bar' } as const
+    expect(() => parsePressureHistory('0;1\n1;1e309\n2;3\n', o)).toThrow(
+      'line 2: time or pressure is not finite',
+    )
+    expect(() => parsePressureHistory('0;1\n1e309;2\n2;3\n', o)).toThrow('line 2:')
+    expect(() =>
+      parsePressureHistory('0;1\n1;1.7e308\n2;3\n', { ...o, pressureUnit: 'MPa' }),
+    ).toThrow('line 2: time or pressure is not finite')
+  })
 })
