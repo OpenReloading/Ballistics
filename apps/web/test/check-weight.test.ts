@@ -103,3 +103,8 @@ it('tabulates the change against the recorded weight', () => {
   const rows = table({ '/a': { initial: 95_000, total: 120_000 } }, big).split('\n')
   expect(rows[2]).toBe('| pages | `/a` | 95.0 kB | +5000 B | 120.0 kB | 0 | 100.0 kB / 150.0 kB |')
 })
+
+it('tabulates a built route in no group, for the budget it needs', () => {
+  const rows = table({ '/new': { initial: 1_000, total: 2_000 } }, { groups: {} }).split('\n')
+  expect(rows[2]).toBe('| none | `/new` | 1.0 kB | new | 2.0 kB | new | none |')
+})

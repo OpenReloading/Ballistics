@@ -158,6 +158,14 @@ export function table(measured: Record<string, Weight>, budget: Budget) {
       )
     }
   }
+  const listed = new Set(Object.values(budget.groups).flatMap((g) => Object.keys(g.routes)))
+  for (const [route, now] of Object.entries(measured)) {
+    if (!listed.has(route)) {
+      rows.push(
+        `| none | \`${route}\` | ${kb(now.initial)} | new | ${kb(now.total)} | new | none |`,
+      )
+    }
+  }
   return rows.join('\n')
 }
 
