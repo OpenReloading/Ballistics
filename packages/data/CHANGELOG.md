@@ -1,5 +1,44 @@
 # Changelog
 
+## [0.0.2](https://github.com/OpenReloading/Ballistics/compare/data-v0.0.1...data-v0.0.2) (2026-10-26)
+
+
+### Features
+
+* **data:** add BDS multi-distance disciplines and rule-book notes ([#114](https://github.com/OpenReloading/Ballistics/issues/114)) ([8ab8362](https://github.com/OpenReloading/Ballistics/commit/8ab8362d4dc3116724c4f868578e903b0fa4547a))
+* **data:** add missing BDMP disciplines and target faces ([#115](https://github.com/OpenReloading/Ballistics/issues/115)) ([1bc4837](https://github.com/OpenReloading/Ballistics/commit/1bc48370ac2cc216f7bc85e5eadec3c5496cd51c))
+* **data:** add the ISSF moving target disciplines and faces ([#117](https://github.com/OpenReloading/Ballistics/issues/117)) ([da96e18](https://github.com/OpenReloading/Ballistics/commit/da96e184906238932d6097d95ef0ec37d5bcb29f))
+* **data:** caliber classes become catalogue records ([c174ad6](https://github.com/OpenReloading/Ballistics/commit/c174ad69a8ed2355f96e508bc486522195a05120)), closes [#138](https://github.com/OpenReloading/Ballistics/issues/138)
+* **data:** DSB Sportordnung 2027, running target disciplines ([#113](https://github.com/OpenReloading/Ballistics/issues/113)) ([75f8cf9](https://github.com/OpenReloading/Ballistics/commit/75f8cf906dd3b648df5492a7b2ac1d6b36945a7d))
+* **data:** renames map for record ids that changed ([a6be073](https://github.com/OpenReloading/Ballistics/commit/a6be0732b02ebbc91af1e9441ebb9297d1821bd8)), closes [#146](https://github.com/OpenReloading/Ballistics/issues/146)
+* **release:** publish the libraries to npm under [@open-reloading](https://github.com/open-reloading) ([#123](https://github.com/OpenReloading/Ballistics/issues/123)) ([a25e75f](https://github.com/OpenReloading/Ballistics/commit/a25e75f36e8f82b37efc807d93a6a1ee0cbef11f))
+* **schema:** case capacity references ([#160](https://github.com/OpenReloading/Ballistics/issues/160)) ([3eb89de](https://github.com/OpenReloading/Ballistics/commit/3eb89deafca1703cc766a90a8b47193c2d6326be))
+* **schema:** chronograph sessions name the device maker by reference ([e406649](https://github.com/OpenReloading/Ballistics/commit/e406649943e0321d6b0767af6fb81be2126ee8c6)), closes [#135](https://github.com/OpenReloading/Ballistics/issues/135)
+* **schema:** firearm in one shape in stored units ([4eba127](https://github.com/OpenReloading/Ballistics/commit/4eba127053eb9eb03fc57cdc1ee47dced5d768b7)), closes [#131](https://github.com/OpenReloading/Ballistics/issues/131)
+* **schema:** one Load in stored units for the catalogue, user data and the load file ([0279e8f](https://github.com/OpenReloading/Ballistics/commit/0279e8fe55c0c58e7ae6a75530285a2225760b21)), closes [#132](https://github.com/OpenReloading/Ballistics/issues/132)
+* **schema:** target faces name their federation by id and events carry ids ([e385467](https://github.com/OpenReloading/Ballistics/commit/e385467d8155a32afb92a1e0df67d4d32f77b6c8)), closes [#138](https://github.com/OpenReloading/Ballistics/issues/138)
+* **schema:** validate load-tables.json with a schema ([5581193](https://github.com/OpenReloading/Ballistics/commit/5581193e1b84ca41a342226e3e17db0f85b271ba)), closes [#138](https://github.com/OpenReloading/Ballistics/issues/138)
+* **web:** unify chronograph sessions across imports, the workbench and target sheets ([#168](https://github.com/OpenReloading/Ballistics/issues/168)) ([bc1d594](https://github.com/OpenReloading/Ballistics/commit/bc1d594123001d2da9848da86b03ba13864e337b))
+
+
+### Bug fixes
+
+* **api:** document the 308 of the id routes and pass the doc-type check ([1efa7df](https://github.com/OpenReloading/Ballistics/commit/1efa7df3765f2e4181bdd29c3363e17988478690)), closes [#146](https://github.com/OpenReloading/Ballistics/issues/146)
+* **data:** explain VdRBw target face differences ([#118](https://github.com/OpenReloading/Ballistics/issues/118)) ([ee7ba47](https://github.com/OpenReloading/Ballistics/commit/ee7ba4795424f921a06a2f705d9e8f4cbadf4466))
+* **data:** note the SVPR 2 code print and the unapproved DSU sheets ([#116](https://github.com/OpenReloading/Ballistics/issues/116)) ([662eec1](https://github.com/OpenReloading/Ballistics/commit/662eec1bb0639c897d3d57cc8c96b0fe48e1723f))
+
+
+### Documentation
+
+* drop PostgreSQL and the SQL layer from the guides and the data pages ([4b0c96d](https://github.com/OpenReloading/Ballistics/commit/4b0c96db634d04e1b8bc71958f054c1bced89ecb)), closes [#144](https://github.com/OpenReloading/Ballistics/issues/144)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @open-reloading/schema bumped from 0.0.1 to 0.0.2
+
 ## 0.0.1 (2026-10-22)
 
 
