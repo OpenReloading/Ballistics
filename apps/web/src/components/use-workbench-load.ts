@@ -150,6 +150,7 @@ import { usePrintEvents } from './print.ts'
 import type { Seated } from './seating-preview.tsx'
 import type { TrajectoryHandle } from './trajectory-form.tsx'
 import { useFieldUnits, useUnits } from './units-settings.tsx'
+import { useCommit } from './use-commit.ts'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 import { useManufacturers } from './use-manufacturers.ts'
 import type { LoadNotesState } from './workbench-context.ts'
@@ -1294,7 +1295,7 @@ export function useWorkbenchState() {
   /** The lots of the load and what it was at each session (`Load.snapshots`). */
   const [lots, setLots] = useState<Lots>(noLots)
   const [snapshots, setSnapshots] = useState<SessionSnapshot[]>([])
-  /** The snapshots of the render, the stored ones or the load as it is: what Save writes. */
+  /** The snapshots of the last committed render, the stored ones or the load as it is: what Save writes. */
   const snapshotsNow = useRef<SessionSnapshot[]>([])
   const sessionsNow = useRef<SessionRecord[]>([])
   const sessionsOpened = useRef(0)
@@ -2525,7 +2526,7 @@ export function useWorkbenchState() {
     seating: seating && { by: seating.by, value: storedOf('length', seating.value).value },
     roundCount: firearmData?.roundCount,
   })
-  snapshotsNow.current = effective
+  useCommit(snapshotsNow, effective)
   const noteList = notesOf(
     sessionRefs,
     effective,
