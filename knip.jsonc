@@ -1,0 +1,70 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema-jsonc.json",
+  // The `exports` of the packages point into `dist`, which knip cannot map back to `src` (the build
+  // uses another `rootDir` than `tsconfig.json`), so every entry file is listed with its source path.
+  "workspaces": {
+    ".": {
+      // read by the `webpackConfig` of .dependency-cruiser.cjs by path, not by import
+      "entry": [".dependency-cruiser-alias.cjs"],
+      "ignoreDependencies": [
+        // loaded by dependency-cruiser as its TypeScript parser, never imported
+        "@swc/core"
+      ]
+    },
+    "packages/schema": {
+      "entry": ["src/index.ts", "src/write-json-schema.ts"]
+    },
+    "packages/core": {
+      "entry": ["src/index.ts"]
+    },
+    "packages/importers": {
+      "entry": ["src/index.ts"]
+    },
+    "packages/data": {
+      "entry": ["src/index.ts", "src/plausibility.ts", "src/build.ts"]
+    },
+    "packages/drawing": {
+      "entry": [
+        "src/index.ts",
+        "src/cartridge/index.ts",
+        "src/bullet/index.ts",
+        "src/seating/index.ts",
+        "src/target/index.ts"
+      ]
+    },
+    "packages/api": {
+      "entry": [
+        "src/openapi.ts",
+        "src/static.ts",
+        "src/compute/browser.ts",
+        "src/compute/worker.ts",
+        "src/catalogue/browser.ts",
+        "src/catalogue/write.ts"
+      ]
+    },
+    "apps/docs": {
+      "entry": ["sidebars.ts", "src/theme/**/*.tsx", "src/components/*.tsx"],
+      "ignoreDependencies": [
+        // its stylesheet is imported by src/css/custom.css, which knip does not read
+        "katex"
+      ]
+    },
+    "apps/web": {
+      "entry": [
+        "scripts/glyph-advances.mts",
+        "src/service-worker.js",
+        // scripts/service-worker.mts copies every export into public/sw.js through a namespace import
+        "src/lib/offline.ts",
+        "src/lib/*.worker.ts",
+        "test/fixtures/target-photos/make.mts"
+      ]
+    },
+    "tools": {
+      "ignoreBinaries": [
+        // installed in the dev container and the CI image, not from npm
+        "oasdiff",
+        "schemathesis"
+      ]
+    }
+  }
+}

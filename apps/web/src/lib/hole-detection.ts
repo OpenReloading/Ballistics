@@ -46,7 +46,7 @@ const i32 = (a: Int32Array, i: number) => a[i] as number
 const u8 = (a: Uint8Array | Uint8ClampedArray, i: number) => a[i] as number
 
 /** A polygon or a rectangle in image px. */
-export type Region = readonly Point[] | { x: number; y: number; width: number; height: number }
+type Region = readonly Point[] | { x: number; y: number; width: number; height: number }
 
 export type HoleDetectionInput = {
   image: RgbaImage

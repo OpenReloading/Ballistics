@@ -43,7 +43,7 @@ export type DisciplineRow = {
 }
 
 /** The caliber classes of a discipline with their names; an id no class answers is shown as is. */
-export const caliberClassRefs = (
+const caliberClassRefs = (
   d: Pick<DisciplineRecord, 'caliberClasses'>,
   classes: readonly CaliberClassRef[],
 ): CaliberClassRef[] =>

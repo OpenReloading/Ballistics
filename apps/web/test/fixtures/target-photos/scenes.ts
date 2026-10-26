@@ -7,7 +7,7 @@
 import { seededRandom } from '../../../src/lib/ellipse.ts'
 import { defined } from '../../defined.ts'
 
-export type Rgb = [number, number, number]
+type Rgb = [number, number, number]
 
 export type Scene = {
   file: string
@@ -170,7 +170,7 @@ function holeColourAt(s: Scene, d: number, edge: number, rv: number): Rgb | unde
 }
 
 /** The scene colour at (x, y): face, holes with torn edges and their rims. */
-export function sceneAt(s: Scene, x: number, y: number, phase: number[]): Rgb {
+function sceneAt(s: Scene, x: number, y: number, phase: number[]): Rgb {
   const rv = (s.caliberMm * s.visible * s.pxPerMm) / 2
   for (let i = 0; i < s.holes.length; i++) {
     const h = defined(s.holes[i])

@@ -5,7 +5,7 @@ sidebar_position: 3
 
 # CI, quality and supply-chain tools
 
-One tool per job, each free for a public repository. Terms checked on 2026-10-20 on the pages linked (oasdiff and Schemathesis on 2026-10-21, dependency-cruiser and swc on 2026-10-26). Recheck a term before use.
+One tool per job, each free for a public repository. Terms checked on 2026-10-20 on the pages linked (oasdiff and Schemathesis on 2026-10-21, dependency-cruiser, swc and knip on 2026-10-26). Recheck a term before use.
 
 | Job | Tool | Runs in | Free terms (public repository) |
 |---|---|---|---|
@@ -17,6 +17,7 @@ One tool per job, each free for a public repository. Terms checked on 2026-10-20
 | Dependency review | `actions/dependency-review-action` | `ci.yml` `dependency-review` | Free for public repositories. [About](https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/about-dependency-review) |
 | Secrets | Secret scanning with push protection | repository settings | Free for public repositories. [About](https://docs.github.com/en/code-security/secret-scanning/introduction/about-secret-scanning) |
 | Import rules | dependency-cruiser, parsing TypeScript with @swc/core | `ci.yml` `check` (`static`) | MIT and Apache-2.0, local. [dependency-cruiser](https://github.com/sverweij/dependency-cruiser), [license](https://github.com/sverweij/dependency-cruiser/blob/main/LICENSE), [swc](https://github.com/swc-project/swc), [license](https://github.com/swc-project/swc/blob/main/LICENSE) |
+| Unused files, exports and dependencies | knip 6 (`knip.jsonc`) | `ci.yml` `check` (`static`) | ISC, local. [knip](https://github.com/webpro-nl/knip), [license](https://github.com/webpro-nl/knip/blob/main/LICENSE) |
 | Workflow lint and security | actionlint 1.7.12, zizmor 1.31.1 | `ci.yml` `workflows` | MIT, local. [actionlint](https://github.com/rhysd/actionlint), [zizmor](https://github.com/zizmorcore/zizmor) |
 | Image vulnerabilities | Grype (`anchore/scan-action`), fails on fixable critical findings | `release.yml` `images` | Apache-2.0, local. [scan-action](https://github.com/anchore/scan-action) |
 | Image registry | GitHub Container Registry | `release.yml` `images` | Public packages free (storage and transfer). [Billing](https://docs.github.com/en/billing/concepts/product-billing/github-packages) |

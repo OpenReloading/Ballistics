@@ -30,7 +30,7 @@ const roundToMillionths = (x: number) => Math.round(x * 1e6) / 1e6
 export const namedByCaller = (unit: VelocityUnit) => `using ${unit} as named by the caller`
 
 /** Throws when the caller names a unit other than the recognised `unit` the file names as `text`. */
-export function checkCallerUnit(
+function checkCallerUnit(
   text: string,
   unit: VelocityUnit,
   options: { velocityUnit?: VelocityUnit | undefined },

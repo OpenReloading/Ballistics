@@ -11,7 +11,7 @@ import type { ComputeRunner } from '../src/compute/tasks.ts'
 import { bundle } from './fixtures.ts'
 
 /** A data set without records. */
-export const emptyBundle: Bundle = {
+const emptyBundle: Bundle = {
   cartridges: [],
   manufacturers: [],
   powders: [],
