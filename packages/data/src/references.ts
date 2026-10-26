@@ -73,16 +73,30 @@ export function checkLoadCapacityReferences(
       errors.push(`loads/${l.id}.json: unknown capacity "${l.capacity}"`)
 }
 
-/** The case record of every load that names one. */
+/** The case record of every load that names one: it exists and is a case of the load's cartridge. */
 export function checkLoadCaseReferences(
-  bundle: Pick<Bundle, 'loads'>,
+  bundle: Pick<Bundle, 'loads' | 'cases' | 'renames'>,
   ids: RecordIds,
   errors: string[],
 ) {
+  // an old id counts as the record that replaced it
+  const current = (kind: 'cartridges' | 'cases', id: string) => bundle.renames?.[kind]?.[id] ?? id
+  const cartridgeOfCase = new Map(
+    bundle.cases.map((c) => [
+      c.id,
+      current('cartridges', parseRef(c.cartridge)?.id ?? c.cartridge),
+    ]),
+  )
   for (const l of bundle.loads) {
     const record = l.case?.record
-    if (record !== undefined && !ids.cases.has(parseRef(record)?.id ?? record))
-      errors.push(`loads/${l.id}.json: unknown case "${record}"`)
+    if (record === undefined) continue
+    const id = parseRef(record)?.id ?? record
+    if (!ids.cases.has(id)) errors.push(`loads/${l.id}.json: unknown case "${record}"`)
+    else if (
+      cartridgeOfCase.get(current('cases', id)) !==
+      current('cartridges', parseRef(l.cartridge)?.id ?? l.cartridge)
+    )
+      errors.push(`loads/${l.id}.json: case "${record}" is a case of another cartridge`)
   }
 }
 

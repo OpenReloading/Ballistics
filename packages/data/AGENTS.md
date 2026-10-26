@@ -13,7 +13,7 @@ Canonical records in git, validated against `@open-reloading/schema`, bundled fo
 | `records/powders/<id>.json`, `records/bullets/<id>.json` | Components as their manufacturers sell them. `manufacturer` must exist. |
 | `records/cases/<id>.json` | `Case` (`origin` `catalogue`, `manufacturer` and `cartridge` as `catalogue:<id>` references), a case product per cartridge. `cartridge` and `manufacturer` must exist. `demo-case-308-brass` is synthetic (CC0-1.0). |
 | `records/capacities/<id>.json` | `CaseCapacity` (`origin` `catalogue`, `cartridge` and `caseManufacturer` as `catalogue:<id>` references), one figure from one source. `cartridge` must exist, and `caseManufacturer` where set. |
-| `records/loads/<id>.json` | `Load` records (`origin` `catalogue`, records named by `catalogue:<id>` references). `cartridge`, `bullet`, `powder` and `capacity` (where set) must exist, except a bullet or powder a measured load describes by maker and name. |
+| `records/loads/<id>.json` | `Load` records (`origin` `catalogue`, records named by `catalogue:<id>` references). `cartridge`, `bullet`, `powder`, `capacity` and `case.record` (where set) must exist, and a case record must be a case of the load's cartridge, except a bullet or powder a measured load describes by maker and name. |
 | `records/chrono/<id>.json` | `ChronoSession` records. Every `load` of a shot string must name a load record. |
 | `records/range/<id>.json` | `RangeFirings`, spark-range rounds of one projectile from a report (Mach, total yaw, drag coefficient at that yaw). Not served by the API yet. |
 | `records/firings/<id>.json` | `FiringSeries`, rounds fired and measured by others as a publication reports them. `cartridge` must exist. Every source names its URL and `license`. |

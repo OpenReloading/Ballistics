@@ -92,55 +92,58 @@ describe('case records', () => {
     )
   })
 
-  it('resolves a load that names a renamed case id', () => {
-    const load = {
-      id: 'test-load',
-      origin: 'catalogue',
-      name: 'Test load',
-      cartridge: 'catalogue:test-cartridge',
-      bullet: 'catalogue:test-bullet',
-      powder: 'catalogue:test-powder',
-      charge: { value: 3 },
-      case: { record: 'catalogue:old-case' },
-      provenance,
-    }
+  /** The errors about the case of a catalogue load over the valid fixtures plus the test case. */
+  function caseErrors(load: { cartridge: string; record: string }, renames?: object) {
     const root = mkdtempSync(join(tmpdir(), 'cases-'))
     cpSync(fixtures, root, { recursive: true })
     try {
       writeFileSync(join(root, 'cases', 'test-case.json'), JSON.stringify(record))
+      if (renames) writeFileSync(join(root, 'renames.json'), JSON.stringify(renames))
       writeFileSync(
-        join(root, 'renames.json'),
-        JSON.stringify({ cases: { 'old-case': 'test-case' } }),
+        join(root, 'loads', 'test-load.json'),
+        JSON.stringify({
+          id: 'test-load',
+          origin: 'catalogue',
+          name: 'Test load',
+          cartridge: load.cartridge,
+          bullet: 'catalogue:test-bullet',
+          powder: 'catalogue:test-powder',
+          charge: { value: 3 },
+          case: { record: load.record },
+          provenance,
+        }),
       )
-      writeFileSync(join(root, 'loads', 'test-load.json'), JSON.stringify(load))
-      expect(readRecords(root).errors.filter((e) => e.includes('unknown case'))).toEqual([])
+      return readRecords(root).errors.filter((e) => /case "|unknown case/.test(e))
     } finally {
       rmSync(root, { recursive: true })
     }
-  })
+  }
 
   it('reports a load whose case record is no record', () => {
-    const load = {
-      id: 'test-load',
-      origin: 'catalogue',
-      name: 'Test load',
-      cartridge: 'catalogue:test-cartridge',
-      bullet: 'catalogue:test-bullet',
-      powder: 'catalogue:test-powder',
-      charge: { value: 3 },
-      case: { record: 'catalogue:missing-case' },
-      provenance,
-    }
-    const root = mkdtempSync(join(tmpdir(), 'cases-'))
-    cpSync(fixtures, root, { recursive: true })
-    try {
-      writeFileSync(join(root, 'loads', 'test-load.json'), JSON.stringify(load))
-      expect(readRecords(root).errors).toContain(
-        'loads/test-load.json: unknown case "catalogue:missing-case"',
-      )
-    } finally {
-      rmSync(root, { recursive: true })
-    }
+    expect(
+      caseErrors({ cartridge: 'catalogue:test-cartridge', record: 'catalogue:missing-case' }),
+    ).toEqual(['loads/test-load.json: unknown case "catalogue:missing-case"'])
+  })
+
+  it('accepts a load whose case is a case of its cartridge', () => {
+    expect(
+      caseErrors({ cartridge: 'catalogue:test-cartridge', record: 'catalogue:test-case' }),
+    ).toEqual([])
+  })
+
+  it('reports a load whose case belongs to another cartridge', () => {
+    expect(
+      caseErrors({ cartridge: 'catalogue:other-cartridge', record: 'catalogue:test-case' }),
+    ).toEqual(['loads/test-load.json: case "catalogue:test-case" is a case of another cartridge'])
+  })
+
+  it('resolves a renamed case id and a renamed cartridge id of a load', () => {
+    expect(
+      caseErrors(
+        { cartridge: 'catalogue:old-cartridge', record: 'catalogue:old-case' },
+        { cases: { 'old-case': 'test-case' }, cartridges: { 'old-cartridge': 'test-cartridge' } },
+      ),
+    ).toEqual([])
   })
 
   it('accepts the demo case of the committed records', () => {

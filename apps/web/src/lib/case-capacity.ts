@@ -1,5 +1,18 @@
 import { loadWaterCapacity } from '@open-reloading/schema'
 
+/**
+ * The path that answers the case record `caseId` when the cartridge's case list has no such id: a
+ * renamed record is answered with a redirect to the record that replaced it. Undefined while the
+ * list is not read or when it holds the id.
+ */
+export function renamedCasePath(
+  caseId: string | undefined,
+  list: readonly { id: string }[] | undefined,
+) {
+  if (caseId === undefined || list === undefined || list.some((c) => c.id === caseId)) return
+  return `cases/${encodeURIComponent(caseId)}`
+}
+
 /** A capacity record as the cartridge's record lists it. */
 type Recorded = { id: string; waterCapacity: { value: number } }
 

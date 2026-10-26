@@ -33,7 +33,7 @@ import type { BulletSummary, CartridgeDetail, CaseSummary } from '../lib/api-typ
 import type { StripFigure } from '../lib/barrel-strip.ts'
 import { designShape } from '../lib/bullet-designer.ts'
 import { drawable } from '../lib/cartridge-sheet.ts'
-import { type UsedWater, usedWater } from '../lib/case-capacity.ts'
+import { renamedCasePath, type UsedWater, usedWater } from '../lib/case-capacity.ts'
 import type { FieldValue } from '../lib/field-spec.ts'
 import { figureViews } from '../lib/figure-views.ts'
 import type { Suggestion } from '../lib/input-defaults.ts'
@@ -724,6 +724,14 @@ function useSeatingModel(p: PreviewProps) {
   })
   const chosenCase =
     caseList.status === 'ok' ? caseList.value.items.find((c) => c.id === caseId) : undefined
+  // a renamed case answers with the record that replaced it: the choice takes that id
+  const renamed = useRecord<{ id: string }>(
+    renamedCasePath(caseId, caseList.status === 'ok' ? caseList.value.items : undefined),
+  )
+  const renamedTo = renamed.status === 'ok' ? renamed.value.id : undefined
+  useEffect(() => {
+    if (renamedTo !== undefined && renamedTo !== caseId) setCaseId(renamedTo)
+  }, [renamedTo, caseId, setCaseId])
   // a case record is chosen but not read (loading, failed or no longer listed): no other record stands in
   const pendingCase = caseId !== undefined && chosenCase === undefined
   // apart from `fixed`: a unit switch relabels the drawing and keeps the seating position

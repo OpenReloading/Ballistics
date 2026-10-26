@@ -1,10 +1,24 @@
 import { describe, expect, it } from 'vitest'
-import { usedWater } from '../src/lib/case-capacity.ts'
+import { renamedCasePath, usedWater } from '../src/lib/case-capacity.ts'
 
 const capacities = [
   { id: 'cap-a', waterCapacity: { value: 56 } },
   { id: 'cap-b', waterCapacity: { value: 57 } },
 ]
+
+describe('a chosen case that the list does not hold', () => {
+  const list = [{ id: 'case-a' }]
+
+  it('is asked for by its id, as a renamed one answers with the record that replaced it', () => {
+    expect(renamedCasePath('old case', list)).toBe('cases/old%20case')
+  })
+
+  it('is not asked for while the list is unread, when it holds the id or no case is chosen', () => {
+    expect(renamedCasePath('old', undefined)).toBeUndefined()
+    expect(renamedCasePath('case-a', list)).toBeUndefined()
+    expect(renamedCasePath(undefined, list)).toBeUndefined()
+  })
+})
 
 describe('the water a case holds in the workbench', () => {
   it('takes the measured value over everything', () => {
