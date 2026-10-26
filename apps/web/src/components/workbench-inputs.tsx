@@ -23,6 +23,7 @@ import type { BulletRow } from '../lib/bullet-rows.ts'
 import { findBullets } from '../lib/bullet-search.ts'
 import { quickCartridges } from '../lib/examples.ts'
 import { type FieldSpec, type FieldValue, fieldError, siValues } from '../lib/field-spec.ts'
+import { landsFor } from '../lib/firearm.ts'
 import { type FollowKey, followKeys } from '../lib/input-defaults.ts'
 import { burnFormError, interiorFields } from '../lib/interior-input.ts'
 import { productLabel } from '../lib/manufacturers.ts'
@@ -39,6 +40,7 @@ import { userBulletRows, userRecordId } from '../lib/sources.ts'
 import { cartridgeOptionText } from '../lib/standards.ts'
 import { controlSize } from '../lib/theme.ts'
 import { formatQuantity, inchText, type UnitSystem } from '../lib/units.ts'
+import { catalogueRef, userRef } from '../lib/variants.ts'
 import { type InputPanel, lengthText } from '../lib/workbench.ts'
 import { citedDefaults, type DefaultKey } from '../lib/workbench-defaults.ts'
 import { AppPopover, popoverWidth } from './app-popover.tsx'
@@ -1123,6 +1125,16 @@ function CardMore({ panel }: { panel: InputPanel }) {
   )
 }
 
+/** The lands contact of the chosen firearm as it applies to the chosen bullet record or design. */
+function landsChoice(
+  lands: Parameters<typeof landsFor>[0],
+  bullet: { id: string } | undefined,
+  design: { id: string } | undefined,
+) {
+  const ref = design ? userRef(design.id) : bullet && catalogueRef(bullet.id)
+  return landsFor(lands, ref)
+}
+
 /**
  * The cartridge figure with the seated bullet, once a cartridge is chosen, drawn into `host`: the
  * card of the inputs' second column or the result tab Cartridge. One node moves between them, so
@@ -1180,6 +1192,11 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
   useEffect(() => {
     if (node && host) host.append(node)
   }, [node, host])
+  const lands = landsChoice(
+    firearmList.find((f) => f.id === firearm)?.data.lands,
+    bullet,
+    bulletDesign,
+  )
   const shown = cartridge !== undefined || cartridgeDesign !== undefined
   const moreOpen = more === 'cartridge'
   useEffect(() => {
@@ -1204,6 +1221,8 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
       system={system}
       initial={previewInitial}
       barrelLength={firearmList.find((f) => f.id === firearm)?.data.barrelLength}
+      lands={lands.contact}
+      landsOther={lands.other}
       barrelDefault={suggestions.barrelLength}
       linked={{ bullet: bullet?.id, design: bulletDesign?.id }}
       slots={{

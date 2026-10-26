@@ -267,7 +267,7 @@ export interface DanglingRef {
 
 /**
  * The references of `records` to user records that no record of `records` answers: a load's
- * `firearm`, `cartridge`, `bullet`, `powder`, `capacity` and `case.record`, the `manufacturer` of its primer and case, a bullet's and a firearm's `manufacturer`, a capacity's
+ * `firearm`, `cartridge`, `bullet`, `powder`, `capacity` and `case.record`, the `manufacturer` of its primer and case, a bullet's and a firearm's `manufacturer`, a firearm's `landsBullet`, a capacity's
  * `cartridge` and `caseManufacturer` (only as `user:<id>`), a case's `cartridge`, `manufacturer` and `capacity`, a load's `sessions`, a session's device
  * `manufacturer` and the `load` of its strings, and a target sheet's `load` and the `session` of
  * its group shots. A
@@ -364,8 +364,12 @@ function userRefsOf(r: UserRecord): [string, string | undefined, UserRecordKind,
         ]),
       ]
     case 'bullet':
-    case 'firearm':
       return [['manufacturer', r.data.manufacturer, 'manufacturer', true]]
+    case 'firearm':
+      return [
+        ['manufacturer', r.data.manufacturer, 'manufacturer', true],
+        ['landsBullet', r.data.landsBullet, 'bullet', true],
+      ]
     default:
       return []
   }

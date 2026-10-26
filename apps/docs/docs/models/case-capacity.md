@@ -117,9 +117,33 @@ $$
 j = z_\mathrm{c} - (z_b + L_b - L_\mathrm{nose})
 $$
 
-Code: `packages/drawing/src/seating/seating.ts`, `leadeContact`, `seat` (`jumpValue`).
+Code: `packages/drawing/src/seating/seating.ts`, `leadeContact`, `jumpOf`.
 
 The contact position is derived here from the C.I.P. chamber drawing, not a C.I.P. value, and is not checked against a measurement. The jump is an estimate against the C.I.P. minimum chamber for either seating input: derived for a bullet seated by a measured CBTO, approximate from COAL.
+
+#### Measured lands contact
+
+A firearm record can hold the cartridge length at which one bullet touched the lands: a CBTO, a COAL, or both, with the bullet it was measured with. For that bullet the base position at contact $z_{b,\mathrm{c}}$ is the measured CBTO less the bullet base-to-ogive $B$ (used when the bullet has one), else the measured COAL less the bullet length $L_b$:
+
+$$
+z_{b,\mathrm{c}} = \mathrm{CBTO}_\mathrm{lands} - B
+\qquad\text{or}\qquad
+z_{b,\mathrm{c}} = \mathrm{COAL}_\mathrm{lands} - L_b
+$$
+
+Code: `packages/drawing/src/seating/seating.ts`, `landsBase`, `landsContactCoal`.
+
+The jump is the distance the base moves from the seated position to the contact, and the COAL of contact is $z_{b,\mathrm{c}} + L_b$:
+
+$$
+j = z_{b,\mathrm{c}} - z_b
+$$
+
+Code: `packages/drawing/src/seating/seating.ts`, `jumpOf`.
+
+A jump of 0 or less is contact. The bullet and the chamber values do not enter, so this jump is given without a nose length or chamber values and is tagged derived: it holds the measured contact and the entered length, and assumes the same comparator and bullet as the measurement. A contact measured with another bullet is not used for the chosen one: the jump then comes from the chamber values above, and the row says so.
+
+The workbench matches the contact to the chosen bullet in `landsFor` (`apps/web/src/lib/firearm.ts`).
 
 ### Seating ladder
 
@@ -160,6 +184,7 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
 | $G_1$, $F$ | Chamber diameter at the leade start, land diameter at the leade end (C.I.P.) | mm | mm |
 | $i$ | Leade angle of the chamber to the axis | deg | deg |
 | $z_\mathrm{c}$, $j$ | Leade contact from the case head, jump | mm | mm |
+| $z_{b,\mathrm{c}}$ | Bullet base position at the measured lands contact | mm | mm |
 | $\ell_i$, $\Delta$, $N$ | Seating length of step $i$, step size, step count | mm, mm, 1 | m, m, 1 |
 
 ## Assumptions
@@ -174,7 +199,7 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
 
 - A capacity measured with water at another temperature than 20 °C is not corrected.
 - A bullet base in front of the case mouth gives $V_b = 0$ with a note, and a bullet wholly below the mouth counts its whole volume.
-- The jump needs the chamber values and the bullet nose length. Without them it is not given.
+- The jump needs the chamber values and the bullet nose length, or a measured lands contact of the firearm for the same bullet. Without either it is not given.
 - A cavity of a different depth than its radius is not described. The cavity diameter must be below the base face diameter and its depth below the bullet length, else the outline is refused.
 - The bounds from the length tolerance cover the bullet length only, not the case capacity.
 
