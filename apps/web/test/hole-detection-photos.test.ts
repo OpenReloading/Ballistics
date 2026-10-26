@@ -93,7 +93,7 @@ describe('hole detection on the fixture photos', () => {
 describe('hole detection on a dark face with dark holes', () => {
   const fixture = fixtures.find(([file]) => file === 'phone-night.jpg')
 
-  it('finds at least 8 of the 10 holes in the automatic run, with at most 2 false proposals', async () => {
+  it('finds at least 8 of the 10 holes in the automatic run, with no false proposal', async () => {
     const [file, f] = fixture ?? []
     expect(file && f).toBeTruthy()
     if (!(file && f)) return
@@ -105,6 +105,6 @@ describe('hole detection on a dark face with dark holes', () => {
     })
     const s = score(found?.proposals ?? [], f)
     expect(s.recall).toBeGreaterThanOrEqual(0.8)
-    expect(s.false).toBeLessThanOrEqual(2)
+    expect(s.false).toBe(0)
   })
 })

@@ -207,7 +207,7 @@ describe('hole detection with holes on the print of the face', () => {
     const geometry = { toFace: invert(h), outer: 250, black: 100, rings: radii }
     return {
       truth,
-      label: faceLabel(geometry, mm),
+      label: faceLabel(geometry, mm / 0.9),
       input: {
         image: await viaJpeg(image, 75),
         pxPerM: scale * 1000,
@@ -239,6 +239,14 @@ describe('hole detection with holes on the print of the face', () => {
       const found = autoDetect({ ...s.input, face: s.label })?.proposals ?? []
       expect(hits(found, s.truth).every(Boolean)).toBe(true)
       expect(extra(found, s.truth)).toBe(0)
+    })
+
+    it('leaves numerals of two sizes out, 5 and 4 mm wide', async () => {
+      const wide = numerals.map((m) => (m.x === 62.5 || m.x === -62.5 ? { ...m, width: 5 } : m))
+      const mixed = await scene([], wide)
+      const found = autoDetect({ ...mixed.input, face: mixed.label })?.proposals ?? []
+      expect(hits(found, mixed.truth).every(Boolean)).toBe(true)
+      expect(extra(found, mixed.truth)).toBe(0)
     })
 
     it('is kept from an example hole as well', () => {

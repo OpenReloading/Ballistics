@@ -294,7 +294,8 @@ Code: `apps/web/src/lib/hole-detection.ts`, `autoDetect`, `runSeeds`, `SEED_MIN_
 - A shadow confined to the outer paper can be mistaken for the sheet edge while the black area stays lit, so holes in that shadow can be omitted. Marking a region bypasses the automatic sheet boundary.
 - A hole whose backing is about as dark as the black area around it, with light torn rims, is often missed there.
 - A hole where print stands (a numeral, a quarter mark) whose part is no larger than the print's is dropped with it. A hole on a numeral or beside it makes a larger part and stays, unless the part reaches past what a hole can be (1.4 times the expected size).
-- Digits of quite different sizes on one face, or print that varies by more than a fifth, can read as holes on print.
+- Print whose parts differ by more than about a fifth in disc diameter (digits of quite different sizes on one face) can read as holes on print: numerals of 4 and 5 mm width pass, a 6.5 mm width among 4 mm ones does not (synthetic digits).
+- A run whose strongest peaks are smaller than half the expected hole size is cut as grain, so holes visible at under about half the expected size are not found without a picked hole.
 - A hole under 4 photo pixels across is refused. So is a region whose working image would leave a hole fewer than 4 working pixels.
 - Without a known scale the search cannot tell faces of equal ring ratios and different size apart, and a face that is penalised for rings the photo does not show can rank behind a larger twin outside the tie window.
 - The face search does not read the ring numerals: on a photo of an insert card the faces whose inner rings stand in the same ratios are offered for the user to choose.
