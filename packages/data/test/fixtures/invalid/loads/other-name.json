@@ -4,25 +4,25 @@
   "name": "Test load",
   "cartridge": "catalogue:test-cartridge",
   "bullet": {
-    "manufacturerName": "Manufacturer",
+    "manufacturer": "catalogue:test-manufacturer",
     "model": "Model",
     "bulletMass": {
       "value": 10
     }
   },
   "powder": {
-    "manufacturerName": "Manufacturer",
+    "manufacturer": "catalogue:test-manufacturer",
     "name": "Powder"
   },
   "charge": {
     "value": 3
   },
   "primer": {
-    "manufacturerName": "Manufacturer",
+    "manufacturer": "catalogue:test-manufacturer",
     "model": "LR"
   },
   "case": {
-    "manufacturerName": "Manufacturer"
+    "manufacturer": "catalogue:test-manufacturer"
   },
   "provenance": {
     "kind": "measured",

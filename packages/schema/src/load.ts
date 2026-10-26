@@ -117,7 +117,7 @@ export const loadAnalysis = z.object({
 })
 
 const component = {
-  manufacturerName: z.string().min(1).describe('Manufacturer as the label names it.'),
+  manufacturer: ref('manufacturer').describe('Manufacturer record of the component.'),
   lot: z.string().min(1).describe('Lot number as printed on the package.').optional(),
 }
 
@@ -192,8 +192,8 @@ const loadShape = z.object({
     .describe('The water capacity of the case: a catalogue capacity, or one the user measured.')
     .optional(),
   primer: z
-    .object({
-      manufacturerName: component.manufacturerName.optional(),
+    .strictObject({
+      manufacturer: component.manufacturer.optional(),
       lot: component.lot,
       model: z.string().min(1).describe('Model name of the primer.').optional(),
     })
@@ -201,7 +201,7 @@ const loadShape = z.object({
     .optional(),
   case: z
     .strictObject({
-      manufacturerName: component.manufacturerName.optional(),
+      manufacturer: component.manufacturer.optional(),
       lot: component.lot,
       firingCount: z.int().min(0).describe('Times the case was fired before this load.').optional(),
     })
@@ -250,6 +250,18 @@ const checkCatalogueFields = (l: LoadFields, issue: LoadIssue) => {
     issue(['capacity'], 'A catalogue load names catalogue records only')
 }
 
+const checkComponentMakers = (l: LoadFields, issue: LoadIssue) => {
+  const makers: [PropertyKey[], string | undefined][] = [
+    [['bullet', 'manufacturer'], typeof l.bullet === 'object' ? l.bullet.manufacturer : undefined],
+    [['powder', 'manufacturer'], typeof l.powder === 'object' ? l.powder.manufacturer : undefined],
+    [['primer', 'manufacturer'], l.primer?.manufacturer],
+    [['case', 'manufacturer'], l.case?.manufacturer],
+  ]
+  for (const [path, maker] of makers)
+    if (maker !== undefined && !maker.startsWith('catalogue:'))
+      issue(path, 'A catalogue load names catalogue records only')
+}
+
 const checkRecordReferences = (l: LoadFields, issue: LoadIssue) => {
   const catalogue = l.origin === 'catalogue'
   const measured = catalogue && l.provenance?.kind === 'measured'
@@ -261,6 +273,7 @@ const checkRecordReferences = (l: LoadFields, issue: LoadIssue) => {
     } else if (catalogue && !target.startsWith('catalogue:'))
       issue([k], `A catalogue load names catalogue records only`)
   }
+  if (catalogue) checkComponentMakers(l, issue)
 }
 
 /**

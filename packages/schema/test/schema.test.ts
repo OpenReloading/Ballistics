@@ -24,14 +24,14 @@ const validLoad = {
   name: 'Test load',
   cartridge: 'catalogue:test-cartridge',
   bullet: {
-    manufacturerName: 'Manufacturer',
+    manufacturer: 'catalogue:test-manufacturer',
     model: 'Model',
     bulletMass: { value: 10, raw: '154.3 gr' },
   },
-  powder: { manufacturerName: 'Manufacturer', name: 'Powder' },
+  powder: { manufacturer: 'catalogue:test-manufacturer', name: 'Powder' },
   charge: { value: 3 },
-  primer: { manufacturerName: 'Manufacturer', model: 'LR' },
-  case: { manufacturerName: 'Manufacturer', firingCount: 1 },
+  primer: { manufacturer: 'catalogue:test-manufacturer', model: 'LR' },
+  case: { manufacturer: 'catalogue:test-manufacturer', firingCount: 1 },
   provenance: measured,
 }
 

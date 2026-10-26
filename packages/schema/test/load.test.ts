@@ -97,8 +97,8 @@ describe('Load', () => {
     expectIssueAt(load, { ...catalogueLoad, bullet: `user:${uuid}` }, 'bullet')
     expectIssueAt(load, { ...catalogueLoad, powder: `user:${uuid}` }, 'powder')
     const description = {
-      bullet: { manufacturerName: 'Maker', model: 'FMJ', bulletMass: { value: 10 } },
-      powder: { manufacturerName: 'Maker', name: 'Fast' },
+      bullet: { manufacturer: 'catalogue:maker', model: 'FMJ', bulletMass: { value: 10 } },
+      powder: { manufacturer: 'catalogue:maker', name: 'Fast' },
     }
     expectIssueAt(load, { ...catalogueLoad, ...description }, 'bullet')
     expectIssueAt(load, { ...userLoad, ...description }, 'powder')
@@ -108,6 +108,20 @@ describe('Load', () => {
       provenance: { kind: 'measured', sources: [{ title: 'Own measurement' }] },
     }
     expect(issuePaths(load, measured)).toEqual([])
+  })
+
+  it('names a component maker by a reference, a catalogue load by a catalogue one', () => {
+    const maker = (m: string) => ({ ...catalogueLoad, primer: { manufacturer: m } })
+    expect(issuePaths(load, maker('catalogue:maker'))).toEqual([])
+    expectIssueAt(load, maker(`user:${uuid}`), 'primer.manufacturer')
+    expectIssueAt(
+      load,
+      { ...catalogueLoad, case: { manufacturer: `user:${uuid}` } },
+      'case.manufacturer',
+    )
+    expectIssueAt(load, maker('Maker'), 'primer.manufacturer')
+    expectIssueAt(load, { ...catalogueLoad, primer: { manufacturerName: 'Maker' } }, 'primer')
+    expect(issuePaths(load, { ...userLoad, primer: { manufacturer: `user:${uuid}` } })).toEqual([])
   })
 
   it('keeps lots and one snapshot per session of the load, and a firearm round count to note', () => {

@@ -17479,10 +17479,10 @@
                                     {
                                       "type": "object",
                                       "properties": {
-                                        "manufacturerName": {
+                                        "manufacturer": {
                                           "type": "string",
-                                          "minLength": 1,
-                                          "description": "Manufacturer as the label names it."
+                                          "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                          "description": "Manufacturer record of the component."
                                         },
                                         "lot": {
                                           "type": "string",
@@ -17512,7 +17512,7 @@
                                           "description": "Mass of the bullet."
                                         }
                                       },
-                                      "required": ["manufacturerName", "model", "bulletMass"],
+                                      "required": ["manufacturer", "model", "bulletMass"],
                                       "description": "The bullet as the publication describes it, where no record exists."
                                     }
                                   ],
@@ -17535,10 +17535,10 @@
                                     {
                                       "type": "object",
                                       "properties": {
-                                        "manufacturerName": {
+                                        "manufacturer": {
                                           "type": "string",
-                                          "minLength": 1,
-                                          "description": "Manufacturer as the label names it."
+                                          "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                          "description": "Manufacturer record of the component."
                                         },
                                         "lot": {
                                           "type": "string",
@@ -17551,7 +17551,7 @@
                                           "description": "Product name of the powder."
                                         }
                                       },
-                                      "required": ["manufacturerName", "name"],
+                                      "required": ["manufacturer", "name"],
                                       "description": "The powder as the publication describes it, where no record exists."
                                     }
                                   ],
@@ -17588,10 +17588,10 @@
                                 "primer": {
                                   "type": "object",
                                   "properties": {
-                                    "manufacturerName": {
+                                    "manufacturer": {
                                       "type": "string",
-                                      "minLength": 1,
-                                      "description": "Manufacturer as the label names it."
+                                      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                      "description": "Manufacturer record of the component."
                                     },
                                     "lot": {
                                       "type": "string",
@@ -17604,15 +17604,16 @@
                                       "description": "Model name of the primer."
                                     }
                                   },
+                                  "additionalProperties": false,
                                   "description": "The primer as described."
                                 },
                                 "case": {
                                   "type": "object",
                                   "properties": {
-                                    "manufacturerName": {
+                                    "manufacturer": {
                                       "type": "string",
-                                      "minLength": 1,
-                                      "description": "Manufacturer as the label names it."
+                                      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                      "description": "Manufacturer record of the component."
                                     },
                                     "lot": {
                                       "type": "string",

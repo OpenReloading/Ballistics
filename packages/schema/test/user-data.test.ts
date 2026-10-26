@@ -597,6 +597,24 @@ describe('checkUserRefs', () => {
     expect(checkUserRefs([own as UserRecord])).toEqual([])
   })
 
+  it('reports a load whose primer or case names a user manufacturer nobody answers', () => {
+    const base = userRecord.parse(loadRecord)
+    const withMakers = {
+      ...base,
+      data: {
+        ...base.data,
+        primer: { manufacturer: `user:${uuid}` },
+        case: { manufacturer: `user:${uuid}` },
+      },
+    } as UserRecord
+    expect(checkUserRefs([withMakers]).map((d) => d.field)).toEqual([
+      'primer.manufacturer',
+      'case.manufacturer',
+    ])
+    expect(userRefFields(withMakers)).toEqual(['primer.manufacturer', 'case.manufacturer'])
+    expect(checkUserRefs([withMakers, userRecord.parse(manufacturerRecord)])).toEqual([])
+  })
+
   it('reports a load whose cartridge or bullet is a user reference nobody answers', () => {
     const withRefs = (cartridge: string, bullet: string) =>
       userRecord.parse({ ...loadRecord, data: { ...loadRecord.data, cartridge, bullet } })
