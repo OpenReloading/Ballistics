@@ -1499,7 +1499,13 @@ function SeatingFigure({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Ch
   )
 }
 
-function SeatingNotes({ seating }: { seating: Seating }) {
+function SeatingNotes({
+  seating,
+  landsOther,
+}: {
+  seating: Seating
+  landsOther?: boolean | undefined
+}) {
   return (
     <>
       <p className="note">
@@ -1509,6 +1515,12 @@ function SeatingNotes({ seating }: { seating: Seating }) {
         Staying at or below L6 says nothing about pressure, magazine fit or safety; seating depth
         changes pressure.
       </p>
+      {landsOther && (
+        <p className="note">
+          The firearm's lands contact was measured with another bullet and is not used for this
+          jump.
+        </p>
+      )}
       {seating.notes.length > 0 && (
         <ul className="seating-notes">
           {seating.notes.map((n) => (
@@ -1618,17 +1630,12 @@ function LeadeRow({ m, seating }: RowsProps) {
 
 function JumpRow({ m, seating }: RowsProps) {
   const unknown = seating.jump.value === undefined
-  const { landsOther } = m.p
   return (
     <Row
       term={seating.jump.source === 'lands' ? 'Jump to the lands' : 'Jump to the leade'}
       value={seating.jump.value === undefined ? 'not given' : m.mm(seating.jump.value)}
       tag={unknown ? undefined : seating.jump.tag}
-      note={
-        landsOther && seating.jump.source !== 'lands'
-          ? `${jumpNote(seating.jump)}; the firearm's lands contact was measured with another bullet and is not used`
-          : jumpNote(seating.jump)
-      }
+      note={jumpNote(seating.jump)}
     />
   )
 }
@@ -1670,7 +1677,7 @@ function SeatingValues({ m, seating, chamber }: RowsProps) {
         {aside(slots, <JumpRow {...rows} />, more)}
       </dl>
       {contact && !card && <ErrorNote color="orange">{contact}</ErrorNote>}
-      {!card && <SeatingNotes seating={seating} />}
+      {!card && <SeatingNotes seating={seating} landsOther={m.p.landsOther} />}
     </div>
   )
 }
@@ -1690,7 +1697,7 @@ function PreviewBody({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Cham
         seating &&
         createPortal(
           <div>
-            <SeatingNotes seating={seating} />
+            <SeatingNotes seating={seating} landsOther={m.p.landsOther} />
           </div>,
           slots.more,
         )}

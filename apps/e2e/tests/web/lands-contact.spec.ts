@@ -61,12 +61,12 @@ test("a firearm's lands contact gives the jump of the bullet it was measured wit
   await chooseFirearm(page, 'Lands rifle')
   await more.click()
   await expect(row(page, 'Jump to the lands')).toContainText('1.88')
-  await expect(row(page, 'Jump to the lands')).toContainText('measured lands contact')
+  await expect(page.getByText(/^The jump is your measured lands contact/)).toBeVisible()
   await page.keyboard.press('Escape')
 
   // a contact measured with another bullet is not used for this one
   await chooseFirearm(page, 'Other bullet rifle')
   await more.click()
-  await expect(row(page, 'Jump to the leade')).toContainText('another bullet')
+  await expect(page.getByText(/lands contact was measured with another bullet/)).toBeVisible()
   await expect(row(page, 'Jump to the lands')).toHaveCount(0)
 })
