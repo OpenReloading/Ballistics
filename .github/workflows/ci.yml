@@ -128,8 +128,8 @@ jobs:
         run: npm run test:unit -w @open-reloading/e2e
 
   # Fails when a part failed or was cancelled; a skipped part (the plan) passes, as the old single job did when
-  # skipped. Stays the name the ruleset requires. It also checks the relative links and
-  # anchors of the Markdown files and the spelling of the tracked text files (typos, which skips `_typos.toml` itself) on every run:
+  # skipped. Stays the name the ruleset requires. It also checks the relative links and anchors of the Markdown
+  # files and the spelling of the tracked text files (typos, which skips `_typos.toml` itself) on every run:
   # the plan skips `static` for prose that no other check reads, which is where a link or a word breaks. External
   # links: links.yml.
   check:

@@ -187,7 +187,7 @@ A static site without a server for GitHub Pages: the web app with the records as
 - Root `npm run pages:serve` (`tools/src/pages-serve.ts`): `pages/` under `PAGES_BASE_PATH` on `PORT` (default 3003), directories with their `index.html`, a missing file the site's `404.html`.
 - Offline: the service worker precaches `api/catalogue/index.json` with the static files (`precacheList`, `catalogueFile` in `src/lib/offline.ts`) and answers it from the shell cache; record files stay network-first.
 - E2E: project `pages` with `PAGES_URL` (`apps/e2e/AGENTS.md`).
-- Size: about 300 MB, the cartridge pages about 265 MB of it. The deployed site holds one (the 1 GB limit of `apps/docs/docs/ci-tools.md`).
+- Size: about 300 MB, the cartridge pages about 265 MB of it. The 1 GB limit of `apps/docs/docs/ci-tools.md` applies to the deployed site.
 
 ## UI
 

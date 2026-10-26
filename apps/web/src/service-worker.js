@@ -1,7 +1,7 @@
 // The service worker of the offline layer. `scripts/service-worker.mts`
 // writes it to public/sw.js after `next build` (out/sw.js in the Pages edition), preceded by
-// `version` (the build id), `precache` (the static output), `base` and `slash` (`appUrl`) and the exports of src/lib/offline.ts. It never opens
-// IndexedDB.
+// `version` (the build id), `precache` (the static output), `base` and `slash` (`appUrl`) and the
+// exports of src/lib/offline.ts. It never opens IndexedDB.
 
 const shell = shellCache(version)
 
