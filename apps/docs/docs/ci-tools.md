@@ -5,7 +5,7 @@ sidebar_position: 3
 
 # CI, quality and supply-chain tools
 
-One tool per job, each free for a public repository. Terms checked on 2026-10-20 on the pages linked (oasdiff and Schemathesis on 2026-10-21, dependency-cruiser, swc, knip, yaml and lychee on 2026-10-26). Recheck a term before use.
+One tool per job, each free for a public repository. Terms checked on 2026-10-20 on the pages linked (oasdiff and Schemathesis on 2026-10-21, dependency-cruiser, swc, knip, yaml and lychee and Syft on 2026-10-26). Recheck a term before use.
 
 | Job | Tool | Runs in | Free terms (public repository) |
 |---|---|---|---|
@@ -26,6 +26,7 @@ One tool per job, each free for a public repository. Terms checked on 2026-10-20
 | Image vulnerabilities | Grype (`anchore/scan-action`), fails on fixable critical findings | `release.yml` `images` | Apache-2.0, local. [scan-action](https://github.com/anchore/scan-action) |
 | Image registry | GitHub Container Registry | `release.yml` `images` | Public packages free (storage and transfer). [Billing](https://docs.github.com/en/billing/concepts/product-billing/github-packages) |
 | Pages site and the preview of `develop` | GitHub Pages, deployed by `actions/deploy-pages` | `pages.yml` | Free for public repositories. 1 GB site, 100 GB bandwidth a month (soft limits). [Limits](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits) |
+| Image SBOM | Syft 1.55.0 (`anchore/syft` container, SPDX JSON), attested with `actions/attest` and attached to the GitHub Release | `release.yml` `images`, `sbom-release` | Apache-2.0, local. [syft](https://github.com/anchore/syft), [license](https://github.com/anchore/syft/blob/main/LICENSE) |
 | Build provenance | `actions/attest` (Sigstore public instance) | `release.yml` `images` | Free for public repositories. [Artifact attestations](https://docs.github.com/en/actions/concepts/security/artifact-attestations) |
 | Releases and changelog | release-please 17.6.0 through `release-please-action` 5.0.0 (`release-please-config.json`, manifest mode) | `release.yml` | Apache-2.0. [release-please](https://github.com/googleapis/release-please) |
 | API breaking changes | oasdiff 1.33.0 (`oasdiff breaking --fail-on ERR`) | `ci.yml` `check`, dev container | Apache-2.0, local. [oasdiff](https://github.com/oasdiff/oasdiff), [license](https://github.com/oasdiff/oasdiff/blob/main/LICENSE) |
@@ -41,7 +42,7 @@ Not used: a hosted quality gate and coverage service (SonarQube Cloud, Codecov),
 - Every job has a `timeout-minutes` of about three times its median run.
 - `ci.yml` and `pr-title.yml` cancel a superseded pull request run (`concurrency`).
 - `ci.yml` runs on pushes to `develop` and on pull requests. The promotion pull request (develop into main) skips its jobs, because the push to develop already ran them on the same commit; a skipped required check passes.
-- Tool images of `docker run` steps are set in the `env` block of `ci.yml`. Dependabot does not read them: update them by hand.
+- Tool images of `docker run` steps are set in the `env` block of `ci.yml` and `release.yml`. Dependabot does not read them: update them by hand.
 - Jobs that publish or need secrets run only in `OpenReloading/Ballistics` (`if: github.repository == ...`).
 
 ## Repository settings (maintainers)
