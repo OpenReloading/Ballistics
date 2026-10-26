@@ -99,6 +99,22 @@ it('does not overwrite another pre-commit hook', () => {
   expect(readFileSync(join(repo, '.git/hooks/pre-commit'), 'utf8')).toBe('#!/bin/sh\nexit 0\n')
 })
 
+it('keeps a stub the contributor edited', () => {
+  install()
+  const file = join(repo, '.git/hooks/pre-commit')
+  writeFileSync(file, `${readFileSync(file, 'utf8')}echo mine\n`)
+  expect(install().stdout).toContain('is another hook')
+  expect(readFileSync(file, 'utf8')).toContain('echo mine')
+})
+
+it('reports a hooks folder it cannot write instead of failing', () => {
+  rmSync(join(repo, '.git/hooks'), { recursive: true })
+  writeFileSync(join(repo, '.git/hooks'), 'a file where the folder should be')
+  const run = install()
+  expect(run.status).toBe(0)
+  expect(run.stdout).toContain('cannot be written')
+})
+
 it('installs nothing in CI', () => {
   expect(install(repo, { CI: 'true' }).stdout).toBe('')
   expect(existsSync(join(repo, '.git/hooks/pre-commit'))).toBe(false)
