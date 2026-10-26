@@ -105,7 +105,7 @@ _Avoid_: custom manufacturer
 _Avoid_: caseMaker
 
 **Manufacturer name**:
-`manufacturerName`: the manufacturer as free text on the components of a load (`bullet`, `powder`, `primer`, `case`) and, as the text a chronograph file gives, on an imported session's `device`. A bullet design, a firearm and a stored session hold a reference.
+`manufacturerName`: the manufacturer as the free text a chronograph file gives, on an imported session candidate's `device`. Every stored record (a bullet design, a firearm, a load's components, a session) holds a manufacturer reference instead.
 _Avoid_: maker
 
 **Website**:
@@ -389,7 +389,7 @@ _Avoid_: twistLength
 ### Loads
 
 **Load**:
-One cartridge recipe fired from one firearm, one shape for the catalogue (a record of kind `loads`), the user record of kind `load` and the load file, in stored units: `origin`, `cartridge`, `firearm`, `bullet` and `powder` (references, a measured catalogue load may describe the bullet and powder instead), `charge` (g), `capacity` (a reference to a case capacity, catalogue or the user's measured one), `primer`, `case` (`firingCount`), `seating`, `note`, `analysis` (`overrides`, the solver values the user typed, and `ladder`) and `sessions` (references to the chronograph sessions of the Measurements tab). A catalogue load also has `id`, `name` and `provenance`; a user load is named by its record. Its components hold `manufacturerName` and `lot`, the bullet `model` and `bulletMass`, the powder `name` and the primer `model`.
+One cartridge recipe fired from one firearm, one shape for the catalogue (a record of kind `loads`), the user record of kind `load` and the load file, in stored units: `origin`, `cartridge`, `firearm`, `bullet` and `powder` (references, a measured catalogue load may describe the bullet and powder instead), `charge` (g), `capacity` (a reference to a case capacity, catalogue or the user's measured one), `primer`, `case` (`firingCount`), `seating`, `note`, `analysis` (`overrides`, the solver values the user typed, and `ladder`) and `sessions` (references to the chronograph sessions of the Measurements tab). A catalogue load also has `id`, `name` and `provenance`; a user load is named by its record. Its components hold a `manufacturer` reference and `lot`, the bullet `model` and `bulletMass`, the powder `name` and the primer `model`.
 
 **Lot**:
 `lot`: lot number of a load component as printed on the package.
