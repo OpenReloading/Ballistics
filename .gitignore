@@ -13,3 +13,4 @@ visual-check-out
 /.claude/skills/
 /.benchkeeper/
 coverage
+.lycheecache

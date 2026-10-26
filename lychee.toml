@@ -1,0 +1,25 @@
+# Link check of the tracked Markdown files, shared by the offline run in ci.yml (relative links and anchors only) and
+# the scheduled online run in links.yml (external links too).
+include_fragments = "anchor-only"
+no_progress = true
+
+# External links only (the offline run skips them). A browser agent, because some hosts refuse the default one.
+user_agent = "Mozilla/5.0 (X11; Linux x86_64; rv:130.0) Gecko/20100101 Firefox/130.0"
+timeout = 30
+max_retries = 4
+retry_wait_time = 15
+host_concurrency = 2
+host_request_interval = "500ms"
+# a failure is never cached: it is checked again on the next run
+cache_exclude_status = ["400.."]
+max_cache_age = "6d"
+
+# Pages that answer 403 or drop the connection for an automated client, one URL each, never a whole host. They are
+# not broken links as far as can be told, only unreachable for a check. Recheck by hand when the page is edited.
+exclude = [
+  '^https://doi\.org/10\.1111/j\.1469-1809\.1936\.tb02137\.x$', # Wiley refuses automated clients
+  '^https://nso\.nato\.int/nso/nsdd/main/standards$',
+  '^https://www\.acic\.gov\.au/copyright$',
+  '^https://www\.brownells\.com/help/technical-support/terms-of-use/$',
+  '^https://www\.guns\.com/terms-and-conditions$',
+]

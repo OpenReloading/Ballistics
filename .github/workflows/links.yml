@@ -1,0 +1,78 @@
+name: Links
+
+# External links of the Markdown files. A host that is down for an hour must not fail a pull request, so the pull
+# request check (ci.yml `check`) covers relative links and anchors only, and this run reports the rest in one issue.
+on:
+  schedule:
+    - cron: '17 4 * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+# Bumped together with LYCHEE_IMAGE in ci.yml. Dependabot does not read it.
+env:
+  LYCHEE_IMAGE: docker.io/lycheeverse/lychee:0.24.2@sha256:e2d19e57cf6ab037026f20b8e449a1f30d9d7f81eef4194763aab2eab20bd28d
+  ISSUE_TITLE: Broken external links
+
+jobs:
+  external:
+    if: github.repository == 'OpenReloading/Ballistics'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # The cache holds the answers of links that worked, for max_cache_age of lychee.toml. A failure is not cached.
+      - name: Restore the link cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .lycheecache
+          key: lychee-${{ github.run_id }}
+          restore-keys: lychee-
+      - name: Check the external links (lychee)
+        id: lychee
+        env:
+          # raises the rate limit of the github.com links
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          status=0
+          git ls-files '*.md' '*.mdx' | docker run --rm --interactive -e GITHUB_TOKEN -v "$PWD:/repo" -w /repo "$LYCHEE_IMAGE" \
+            --config lychee.toml --cache --format markdown --output report.md --files-from - || status=$?
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+      - name: Save the link cache
+        if: always()
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .lycheecache
+          key: lychee-${{ github.run_id }}
+      # One open issue holds the report of the last run: opened on the first failure, edited on the next, closed on a clean run.
+      - name: Report in one issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STATUS: ${{ steps.lychee.outputs.status }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          number=$(gh issue list --state open --search "\"$ISSUE_TITLE\" in:title" --json number,title \
+            --jq "map(select(.title == \"$ISSUE_TITLE\")) | first | .number // empty")
+          if [ "$STATUS" = 0 ]; then
+            [ -z "$number" ] || gh issue close "$number" --comment "No broken external link in $RUN_URL."
+            exit 0
+          fi
+          # 2 is a broken link, any other code a failed run that has no report
+          [ "$STATUS" = 2 ] || exit 1
+          # an issue body holds 65536 characters
+          { printf 'Found by the scheduled link check, [run](%s).\n\n' "$RUN_URL"; head -c 60000 report.md; } > body.md
+          if [ -n "$number" ]; then
+            gh issue edit "$number" --body-file body.md
+          else
+            gh issue create --title "$ISSUE_TITLE" --label tools --body-file body.md
+          fi
+          exit 1
