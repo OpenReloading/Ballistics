@@ -81,7 +81,7 @@ const burn = z
   )
 
 /** Interior defaults of the API: `maxTime` 0.04 s, `outputStep` as core (2e-6 s). */
-export const interiorApiDefaults = { maxTime: 0.04, outputStep: 2e-6 } as const
+const interiorApiDefaults = { maxTime: 0.04, outputStep: 2e-6 } as const
 /** The options of an M3 run: the API's `maxTime`, `maxSteps`, then the request's `options`. */
 export const m3Options = <T extends object>(maxSteps: number, options?: T) => ({
   maxTime: interiorApiDefaults.maxTime,

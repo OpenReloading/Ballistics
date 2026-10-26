@@ -152,7 +152,7 @@ export function chartRows(points: readonly Point[], n = 20): PlaybackSample[] {
 type Limit = NonNullable<InteriorResponse['limits']>[number]
 
 /** Percentages of the limit that the reference lines mark. */
-export const referenceLines = [85, 75] as const
+const referenceLines = [85, 75] as const
 
 /**
  * Lines at the first compared limit with a pressure, as "Percent of maximum" uses, and at the

@@ -139,7 +139,7 @@ const specOf = new Map(fieldSpecs.map((s) => [s.key, s]))
 const baseSymbols = ['R1', 'R', 'P1', 'L3', 'H2']
 
 /** The record a design started from: its values and their SI values by field key. */
-export interface Origin {
+interface Origin {
   id: string
   title: string
   /** The `revision` of the catalogue record, as the API answered it. */

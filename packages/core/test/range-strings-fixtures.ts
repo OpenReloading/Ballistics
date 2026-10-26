@@ -11,7 +11,7 @@ import {
 } from '../src/index.ts'
 import { normals } from './random.ts'
 
-export const g7 = {
+const g7 = {
   kind: 'bc' as const,
   model: 'G7' as const,
   bands: [{ ballisticCoefficient: 0.3 * lbPerSqInToKgPerSqM, minVelocity: 0 }],

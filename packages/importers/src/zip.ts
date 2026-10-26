@@ -28,7 +28,7 @@ const crcTable = Array.from({ length: 256 }, (_, n) => {
 })
 
 /** CRC-32 of APPNOTE 4.4.7 (reflected polynomial 0xEDB88320, RFC 1952 section 8). */
-export function crc32(bytes: Uint8Array): number {
+function crc32(bytes: Uint8Array): number {
   let crc = 0xffffffff
   for (const b of bytes) crc = (crcTable[(crc ^ b) & 0xff] as number) ^ (crc >>> 8) // the index is a byte of a 256-entry table
   return (crc ^ 0xffffffff) >>> 0

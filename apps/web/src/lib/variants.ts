@@ -54,7 +54,7 @@ function remember(key: string, record: object | undefined) {
  * shortcut: a kept base is never removed for a deleted design, only replaced or dropped when its
  * record is gone from the catalogue; add a sweep if the entries pile up.
  */
-export async function readBase<T>(
+async function readBase<T>(
   kind: 'bullets' | 'cartridges',
   basedOn: string | undefined,
   signal?: AbortSignal,

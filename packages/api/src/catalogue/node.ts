@@ -6,7 +6,7 @@ import { openCatalogue } from './open.ts'
 import type { Catalogue, CatalogueSource } from './types.ts'
 
 /** The files the build writes: the index and the record file. */
-export const catalogueFiles = { index: 'index.json', records: 'records.json' } as const
+const catalogueFiles = { index: 'index.json', records: 'records.json' } as const
 
 /** Writes the index and the record file of `source` into `dir` (created where missing). */
 export function writeCatalogue(source: CatalogueSource, dir: string) {

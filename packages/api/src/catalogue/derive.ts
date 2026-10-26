@@ -28,7 +28,7 @@ import type {
 } from './types.ts'
 
 /** Drops null and undefined fields, so responses match the records' "absent means unknown". */
-export function compact<T extends Record<string, unknown>>(row: T) {
+function compact<T extends Record<string, unknown>>(row: T) {
   return Object.fromEntries(Object.entries(row).filter(([, v]) => v !== null && v !== undefined))
 }
 
