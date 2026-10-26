@@ -20,10 +20,13 @@ export function usedWater<T extends Recorded>(o: {
   capacities: readonly T[]
   capacityId?: string | undefined
   stated?: number | undefined
+  /** A case record is chosen but not read yet: its capacity is not known, so no other record stands in for it. */
+  pendingCase?: boolean | undefined
 }): UsedWater<T> | undefined {
   if (o.measured !== undefined) return { grams: o.measured, source: 'measured' }
   const chosen = o.capacities.find((c) => c.id === o.capacityId)
-  const capacity = chosen ?? (o.stated === undefined ? o.capacities[0] : undefined)
+  const capacity =
+    chosen ?? (o.stated === undefined && !o.pendingCase ? o.capacities[0] : undefined)
   const water = loadWaterCapacity({
     capacity,
     case: o.stated === undefined ? undefined : { waterCapacity: { value: o.stated } },

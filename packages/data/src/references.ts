@@ -8,18 +8,20 @@ import type { Bundle } from './records.ts'
 /** The ids a record may reference, by kind: the records and the ids `renames.json` replaces. */
 type RecordIds = {
   cartridges: Set<string>
+  cases: Set<string>
   loads: Set<string>
   manufacturers: Set<string>
 }
 
 /** The ids of the referenced kinds in `bundle`. */
 export function recordIds(
-  bundle: Pick<Bundle, 'cartridges' | 'loads' | 'manufacturers' | 'renames'>,
+  bundle: Pick<Bundle, 'cartridges' | 'cases' | 'loads' | 'manufacturers' | 'renames'>,
 ): RecordIds {
-  const renamed = (kind: 'cartridges' | 'manufacturers') =>
+  const renamed = (kind: 'cartridges' | 'cases' | 'manufacturers') =>
     Object.keys(bundle.renames?.[kind] ?? {})
   return {
     cartridges: new Set([...bundle.cartridges.map((c) => c.id), ...renamed('cartridges')]),
+    cases: new Set([...bundle.cases.map((c) => c.id), ...renamed('cases')]),
     loads: new Set(bundle.loads.map((l) => l.id)),
     manufacturers: new Set([...bundle.manufacturers.map((m) => m.id), ...renamed('manufacturers')]),
   }
@@ -72,11 +74,14 @@ export function checkLoadCapacityReferences(
 }
 
 /** The case record of every load that names one. */
-export function checkLoadCaseReferences(bundle: Pick<Bundle, 'loads' | 'cases'>, errors: string[]) {
-  const known = new Set(bundle.cases.map((c) => c.id))
+export function checkLoadCaseReferences(
+  bundle: Pick<Bundle, 'loads'>,
+  ids: RecordIds,
+  errors: string[],
+) {
   for (const l of bundle.loads) {
     const record = l.case?.record
-    if (record !== undefined && !known.has(parseRef(record)?.id ?? record))
+    if (record !== undefined && !ids.cases.has(parseRef(record)?.id ?? record))
       errors.push(`loads/${l.id}.json: unknown case "${record}"`)
   }
 }

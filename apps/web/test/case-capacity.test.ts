@@ -31,6 +31,11 @@ describe('the water a case holds in the workbench', () => {
     expect(usedWater({ capacities, capacityId: 'gone' })?.record?.id).toBe('cap-a')
   })
 
+  it('does not stand in another record for a chosen case that is not read', () => {
+    expect(usedWater({ capacities, pendingCase: true })).toBeUndefined()
+    expect(usedWater({ capacities, capacityId: 'cap-b', pendingCase: true })?.grams).toBe(57)
+  })
+
   it('has no water without any', () => {
     expect(usedWater({ capacities: [] })).toBeUndefined()
   })

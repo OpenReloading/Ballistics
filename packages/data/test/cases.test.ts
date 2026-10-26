@@ -92,6 +92,33 @@ describe('case records', () => {
     )
   })
 
+  it('resolves a load that names a renamed case id', () => {
+    const load = {
+      id: 'test-load',
+      origin: 'catalogue',
+      name: 'Test load',
+      cartridge: 'catalogue:test-cartridge',
+      bullet: 'catalogue:test-bullet',
+      powder: 'catalogue:test-powder',
+      charge: { value: 3 },
+      case: { record: 'catalogue:old-case' },
+      provenance,
+    }
+    const root = mkdtempSync(join(tmpdir(), 'cases-'))
+    cpSync(fixtures, root, { recursive: true })
+    try {
+      writeFileSync(join(root, 'cases', 'test-case.json'), JSON.stringify(record))
+      writeFileSync(
+        join(root, 'renames.json'),
+        JSON.stringify({ cases: { 'old-case': 'test-case' } }),
+      )
+      writeFileSync(join(root, 'loads', 'test-load.json'), JSON.stringify(load))
+      expect(readRecords(root).errors.filter((e) => e.includes('unknown case'))).toEqual([])
+    } finally {
+      rmSync(root, { recursive: true })
+    }
+  })
+
   it('reports a load whose case record is no record', () => {
     const load = {
       id: 'test-load',

@@ -724,6 +724,8 @@ function useSeatingModel(p: PreviewProps) {
   })
   const chosenCase =
     caseList.status === 'ok' ? caseList.value.items.find((c) => c.id === caseId) : undefined
+  // a case record is chosen but not read (loading, failed or no longer listed): no other record stands in
+  const pendingCase = caseId !== undefined && chosenCase === undefined
   // apart from `fixed`: a unit switch relabels the drawing and keeps the seating position
   const unit = drawingLengthUnit(system)
   const canCbto = shape?.baseToOgive !== undefined
@@ -746,13 +748,14 @@ function useSeatingModel(p: PreviewProps) {
   const measured = positive(measuredWaterCapacity.si)
   const stated = chosenCase?.waterCapacity
   // the records' water, and the water with a measured value typed over it
-  const stock = usedWater({ capacities, capacityId, stated })
+  const stock = usedWater({ capacities, capacityId, stated, pendingCase })
   const capacity = stock?.record
   const water = usedWater({
     measured: measured === undefined ? undefined : waterGrams(measured),
     capacities,
     capacityId,
     stated,
+    pendingCase,
   })
   const waterUsed = water?.grams
   const seatBy = useMemo(
@@ -1087,7 +1090,9 @@ function CapacityChoice({ m }: { m: Model }) {
         value={capacity?.id ?? ''}
         onChange={(e) => m.setCapacityId(e.currentTarget.value || undefined)}
         data={[
-          ...(m.stock?.source === 'case' ? [{ value: '', label: 'From the case record' }] : []),
+          ...(m.chosenCase?.waterCapacity === undefined
+            ? []
+            : [{ value: '', label: 'From the case record' }]),
           ...capacities.map((c) => ({ value: c.id, label: capacityText(c, names) })),
         ]}
       />

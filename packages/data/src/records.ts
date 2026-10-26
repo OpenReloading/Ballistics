@@ -276,7 +276,7 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
   checkLoadReferences(bundle, ids, errors)
   checkLoadComponentReferences(bundle, errors)
   checkLoadCapacityReferences(bundle, errors)
-  checkLoadCaseReferences(bundle, errors)
+  checkLoadCaseReferences(bundle, ids, errors)
   checkLoadSessionReferences(bundle, errors)
   for (const f of collectFindings(bundle, new Map(bundle.cartridges.map((c) => [c.id, c]))))
     errors.push(`${f.file}: ${f.finding}: ${f.message}`)
