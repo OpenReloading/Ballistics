@@ -197,6 +197,7 @@ describe('hole detection with holes on the print of the face', () => {
     const geometry = { toFace: invert(h), outer: 250, black: 100, rings: radii }
     return {
       truth,
+      geometry,
       label: faceLabel(geometry, mm / 0.9),
       input: {
         image: await viaJpeg(image, 75),
@@ -261,6 +262,13 @@ describe('hole detection with holes on the print of the face', () => {
 
     it('are not proposed with it, and every hole is found', () => {
       const found = autoDetect({ ...s.input, face: s.label })?.proposals ?? []
+      expect(hits(found, s.truth).every(Boolean)).toBe(true)
+      expect(extra(found, s.truth)).toBe(0)
+    })
+
+    it('are not proposed on a face without ring radii either', () => {
+      const { rings: _, ...bare } = s.geometry
+      const found = autoDetect({ ...s.input, face: faceLabel(bare, mm / 0.9) })?.proposals ?? []
       expect(hits(found, s.truth).every(Boolean)).toBe(true)
       expect(extra(found, s.truth)).toBe(0)
     })

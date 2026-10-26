@@ -773,17 +773,17 @@ export function faceLabel(g: FaceGeometry, hole: number): FaceLabel {
           Math.min(r - lo, hi - r) >= 0.2 * gap
         )
       },
-      quarter: (p, roll = 0) => {
-        const q = turned(p, roll)
-        return (
-          Math.abs(Math.hypot(q.x, q.y) - g.black) <= QUARTER_REACH * hole &&
-          Math.min(Math.abs(q.x), Math.abs(q.y)) <= QUARTER_WIDTH * hole
-        )
-      },
-      polar: (p) => {
-        const q = mm(p)
-        return { radius: Math.hypot(q.x, q.y), angle: Math.atan2(q.y, q.x) }
-      },
     }),
+    quarter: (p, roll = 0) => {
+      const q = turned(p, roll)
+      return (
+        Math.abs(Math.hypot(q.x, q.y) - g.black) <= QUARTER_REACH * hole &&
+        Math.min(Math.abs(q.x), Math.abs(q.y)) <= QUARTER_WIDTH * hole
+      )
+    },
+    polar: (p) => {
+      const q = mm(p)
+      return { radius: Math.hypot(q.x, q.y), angle: Math.atan2(q.y, q.x) }
+    },
   }
 }

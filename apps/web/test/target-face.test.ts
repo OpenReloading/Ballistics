@@ -509,5 +509,9 @@ describe('on the photo and as a label', () => {
     const turn = Math.PI / 6
     expect(at(96 * Math.cos(turn), -96 * Math.sin(turn), -turn)).toBe(true)
     expect(at(96, 0, turn)).toBe(false)
+    // a face without ring radii still has them, and the polar position the turn is taken from
+    const bare = faceLabel({ toFace: [1, 0, 0, 0, 1, 0, 0, 0, 1], outer: 250, black: 100 }, 6)
+    expect(bare.quarter?.({ x: 96, y: 0 })).toBe(true)
+    expect(bare.polar?.({ x: 0, y: 5 })).toEqual({ radius: 5, angle: Math.PI / 2 })
   })
 })

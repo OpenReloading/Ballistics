@@ -486,7 +486,7 @@ function printAmong<T extends { shot: HoleProposal }>(ctx: Ctx, group: readonly 
  */
 function numeralRoll(face: FaceLabel | undefined, marks: readonly { c: Point }[]): number {
   const { numeral, quarter, polar } = face ?? {}
-  if (!numeral || !polar) return 0
+  if (!(numeral || quarter) || !polar) return 0
   const q = Math.PI / 2
   // the axes repeat every quarter turn
   const offset = (a: number) => a - Math.round(a / q) * q
@@ -512,7 +512,7 @@ function numeralRoll(face: FaceLabel | undefined, marks: readonly { c: Point }[]
     return roll
   }
   // the quarter marks give the turn of a face whose numerals do not
-  return rollOf(numeral) ?? (quarter && rollOf(quarter)) ?? 0
+  return (numeral && rollOf(numeral)) ?? (quarter && rollOf(quarter)) ?? 0
 }
 
 /**
