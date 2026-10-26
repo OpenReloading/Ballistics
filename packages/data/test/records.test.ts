@@ -165,6 +165,20 @@ describe('readRecords', () => {
     )
   })
 
+  it('reports a load whose bullet, powder, primer or case maker is no record', () => {
+    const errors = errorsAfter((root) => {
+      const path = join(root, 'loads', 'test-load.json')
+      const l = JSON.parse(readFileSync(path, 'utf8'))
+      for (const k of ['bullet', 'powder', 'primer', 'case'])
+        l[k].manufacturer = `catalogue:missing-${k}-maker`
+      writeFileSync(path, JSON.stringify(l))
+    })
+    for (const k of ['bullet', 'powder', 'primer', 'case'])
+      expect(errors).toContain(
+        `loads/test-load.json: unknown ${k}.manufacturer "missing-${k}-maker"`,
+      )
+  })
+
   it('resolves source references with the parts of the record', () => {
     const { bundle } = readRecords(join(fixtures, 'valid'))
     expect(bundle.federations[0]?.ruleBooks[0]).toEqual({
