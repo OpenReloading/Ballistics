@@ -21,6 +21,7 @@ const frameRoutes = new Set([
   '/bullets/designer',
   '/cartridges/designer',
   '/targets/designer',
+  '/powders/designer',
 ])
 
 /**

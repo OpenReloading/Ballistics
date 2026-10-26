@@ -93,6 +93,11 @@ describe('Load', () => {
       expectIssueAt(load, { ...catalogueLoad, [k]: undefined }, k)
   })
 
+  it('lets a user load name a user powder and refuses a plain id', () => {
+    expect(load.safeParse({ ...userLoad, powder: `user:${uuid}` }).success).toBe(true)
+    expect(load.safeParse({ ...userLoad, powder: 'example-a-fast' }).success).toBe(false)
+  })
+
   it('names records only: a user record is no catalogue record, a description is measured data', () => {
     expectIssueAt(load, { ...catalogueLoad, bullet: `user:${uuid}` }, 'bullet')
     expectIssueAt(load, { ...catalogueLoad, powder: `user:${uuid}` }, 'powder')

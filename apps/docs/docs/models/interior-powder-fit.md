@@ -5,6 +5,8 @@ description: Weighted least-squares fit of the burn coefficient and, on request,
 
 # Powder fit from a chronograph ladder
 
+The burn form and the pressure exponent are fitted to a measured pressure-time trace on the [curve fit page](interior-curve-fit.md).
+
 `fitPowder` fits the burn coefficient of one [M3](interior-m3.md) load and, on request, its shot-start pressure to a ladder: charges with their mean muzzle velocities and, optionally, measured peak pressures. The fit works on log parameters with the Levenberg-Marquardt loop of the [least-squares page](least-squares.md). It reports the fitted values, their uncertainty, correlation and covariance, the residuals, $\chi^2$ split into the ladder's and the priors' share, the degrees of freedom and the condition number. Optional Gaussian priors on the log parameters turn the fit into a maximum a posteriori estimate, and an optional Huber loss limits the pull of one outlying string. The fitted values describe the ladder's rifle, powder lot, components and model version over the ladder's charge range. They are not powder data and not load data. `predictPowder` propagates the covariance to the muzzle velocity and the peak pressure at any charge, with an interval, and marks a charge outside the ladder's range.
 
 ## Equations

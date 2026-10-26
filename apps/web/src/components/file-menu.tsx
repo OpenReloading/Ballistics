@@ -112,6 +112,7 @@ const kindNames: Record<UserRecordKind, string> = {
   manufacturer: 'manufacturers',
   bullet: 'bullet designs',
   cartridge: 'cartridge designs',
+  powder: 'powder designs',
   caseCapacity: 'measured capacities',
   load: 'loads',
   firearm: 'firearms',

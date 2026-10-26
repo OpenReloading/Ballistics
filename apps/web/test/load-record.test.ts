@@ -105,6 +105,15 @@ describe('toLoad', () => {
     expect(l.analysis?.overrides?.boreDiameter).toBe(7.62)
   })
 
+  it('keeps a user powder design as its reference and leaves out the values it gives', () => {
+    const powder = 'user:5d4c3b2a-1f0e-4d9c-8b7a-6a5f4e3d2c1b'
+    const given = new Set(['gamma', 'vivacity'])
+    const l = toLoad(parts({ powder, given }))
+    expect(l.powder).toBe(powder)
+    expect(l.analysis?.overrides).not.toHaveProperty('vivacity')
+    expect(loadSchema.safeParse(l).success).toBe(true)
+  })
+
   it('writes no analysis for a load of references only', () => {
     const l = toLoad(parts({ values: { charge: 0.0024 } }))
     expect(l.analysis).toBeUndefined()

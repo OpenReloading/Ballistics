@@ -20,6 +20,14 @@ export {
   sessionJsonFormat,
   stringifyOpenReloadingJson,
 } from './openreloading-json.ts'
+export type {
+  PressureHistoryImport,
+  PressureHistoryOptions,
+  PressureUnit,
+  SensorPosition,
+  TimeUnit,
+} from './pressure-history.ts'
+export { parsePressureHistory } from './pressure-history.ts'
 export type { ChronoImport, ChronoParserOptions, SessionCandidate } from './result.ts'
 export { parseShotView, parseShotViewWorkbook } from './shotview.ts'
 export type { TemplateOptions } from './template.ts'

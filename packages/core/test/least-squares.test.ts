@@ -37,6 +37,29 @@ describe('shared least-squares loop', () => {
     expect(candidates.find((c) => c.ok)?.current).toBe(0)
   })
 
+  it('stops at the tolerance of an accepted step that gains less than it', () => {
+    const run = (tolerance?: number) =>
+      logLeastSquares({
+        parameterCount: 1,
+        observed: [Math.E],
+        standardUncertainty: [1],
+        weighted: true,
+        floor: [0],
+        first: [1],
+        predict: (theta) => [Math.exp(nth(theta, 0))],
+        maxIterations: 50,
+        maxCondition: 1e3,
+        ...(tolerance === undefined ? {} : { tolerance }),
+        fail: (reason) => {
+          throw new Error(reason)
+        },
+      })
+    const loose = run(0.999)
+    expect(loose.iterations).toBeLessThan(run().iterations)
+    expect(nth(loose.theta, 0)).toBeGreaterThan(0)
+    expect(Math.abs(nth(loose.theta, 0) - 1)).toBeGreaterThan(1e-8)
+  })
+
   it('reports the weak direction of an ill-conditioned fit', () => {
     // y depends on theta_0 - theta_1 only: J d = 0 for d = (1, 1)/sqrt(2)
     const at = (t: number[]) => [

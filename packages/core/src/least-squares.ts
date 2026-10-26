@@ -167,6 +167,8 @@ export interface LogFitInput {
   maxIterations: number
   /** Largest condition number of the column-scaled Jacobian before `'ill-conditioned'`. */
   maxCondition: number
+  /** Relative decrease of the cost below which an accepted step ends the fit; default 1e-12. */
+  tolerance?: number
   /** Throws the caller's error for a failure at log parameters `theta`. */
   fail: (
     reason: LogFitFailure,
@@ -295,7 +297,8 @@ function checkIterations(fit: LogFitInput, iterations: number, j: number[][], th
 }
 
 /** Whether an accepted step from cost `cost` to `next` is too small to continue. */
-const stalled = (cost: number, next: number) => (cost - next) / cost < 1e-12 || next === 0
+const stalled = (cost: number, next: number, tolerance: number) =>
+  (cost - next) / cost < tolerance || next === 0
 
 /** The covariance, standard errors and correlations at the solution; none without residual degrees of freedom. */
 function covarianceOf(fit: LogFitInput, jw: number[][], cost: number, dof: number) {
@@ -308,7 +311,7 @@ function covarianceOf(fit: LogFitInput, jw: number[][], cost: number, dof: numbe
  * (`apps/docs/docs/models/least-squares.md`, "Levenberg-Marquardt step").
  */
 export function logLeastSquares(fit: LogFitInput): LogFitResult {
-  const { parameterCount, observed, standardUncertainty: sigma, predict } = fit
+  const { parameterCount, observed, standardUncertainty: sigma, predict, tolerance = 1e-12 } = fit
   const n = observed.length
   const residuals = (values: readonly number[]) =>
     values.map((v, i) => (v - nth(observed, i)) / nth(sigma, i))
@@ -345,7 +348,7 @@ export function logLeastSquares(fit: LogFitInput): LogFitResult {
       r = residuals(p)
       lambda /= 10
       current = false
-      const done = stalled(cost, next)
+      const done = stalled(cost, next, tolerance)
       cost = next
       if (done) break
       j = jacobian(fit, stacking, theta)
