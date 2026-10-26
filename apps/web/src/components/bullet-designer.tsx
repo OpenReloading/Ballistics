@@ -1,11 +1,13 @@
 'use client'
 
-import { NativeSelect, Text, TextInput } from '@mantine/core'
+import { Button, NativeSelect, Text, TextInput } from '@mantine/core'
 import { useDebouncedValue } from '@mantine/hooks'
 import { face, type LengthUnit } from '@open-reloading/drawing'
 import { bulletFigureModel, bulletSymbols } from '@open-reloading/drawing/bullet'
 import { type Bullet, toSi, type UserBullet } from '@open-reloading/schema'
-import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef } from 'react'
+import { Camera } from '@phosphor-icons/react'
+import dynamic from 'next/dynamic'
+import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { BulletSummary } from '../lib/api-types.ts'
 import {
@@ -48,6 +50,11 @@ import { useDesigner } from './use-designer.ts'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 import { useManufacturers } from './use-manufacturers.ts'
 import { Workspace } from './workspace.tsx'
+
+/** The photo tool, fetched when it is first opened: its image maths and the sample stay out of the designer's first load. */
+const BulletPhoto = dynamic(() => import('./bullet-photo.tsx').then((m) => m.BulletPhoto), {
+  ssr: false,
+})
 
 const choiceLabels: Record<ChoiceKey, [string, Group]> = {
   'base.type': ['Base type', 'base'],
@@ -257,7 +264,7 @@ const printRows = (design: Design, manufacturer: string | undefined): FieldRow[]
 export function BulletDesigner() {
   const manufacturers = useManufacturers()
   const reloadManufacturers = manufacturers.reload
-  const { system, history, design, dispatch, loading, fileMenu, start, toolbarDispatch } =
+  const { system, history, design, dispatch, loading, fileMenu, start, begin, toolbarDispatch } =
     useDesigner<Design, Action>({
       reduce,
       init: newDesign,
@@ -274,6 +281,7 @@ export function BulletDesigner() {
       failText: 'The bullet could not be loaded. The designer still works.',
     })
 
+  const [photoOpen, setPhotoOpen] = useState(false)
   const e = useMemo(() => evaluate(design, system, history.last), [design, system, history.last])
   const lastGood = useRef<Drawing | undefined>(undefined)
   if (e.drawing) lastGood.current = e.drawing
@@ -368,6 +376,14 @@ export function BulletDesigner() {
         system={system}
         dispatch={toolbarDispatch}
       />
+      <Button
+        variant="default"
+        leftSection={<Camera aria-hidden="true" />}
+        onClick={() => setPhotoOpen(true)}
+        disabled={design.locked !== undefined}
+      >
+        From a photo
+      </Button>
       <FileMenu
         ref={fileMenu}
         kind="bullet"
@@ -421,6 +437,15 @@ export function BulletDesigner() {
 
   const results = (
     <>
+      {photoOpen && (
+        <BulletPhoto
+          opened
+          onClose={() => setPhotoOpen(false)}
+          system={system}
+          record={design.origin}
+          onOpen={begin}
+        />
+      )}
       <div className="page-panel-head designer-panel-head">
         <h2 className="page-panel-title record-heading">Drawing</h2>
       </div>

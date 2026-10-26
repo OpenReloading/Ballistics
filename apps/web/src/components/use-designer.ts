@@ -65,6 +65,15 @@ export function useDesigner<D, A extends { type: string }>(setup: DesignerSetup<
 
   const latest = useRef(setup)
   latest.current = setup
+  /** Starts the designer on `design`, after the question of unsaved changes; false when the user keeps them. */
+  const begin = useCallback(
+    async (design: D) => {
+      if (!(await startNew(design))) return false
+      dispatch(asAction<D, A>({ type: 'start', design }))
+      return true
+    },
+    [startNew],
+  )
   const start = useCallback(
     async (id: string) => {
       const { load, loadingText, failText } = latest.current
@@ -75,17 +84,13 @@ export function useDesigner<D, A extends { type: string }>(setup: DesignerSetup<
           setLoading(design)
           return
         }
-        if (!(await startNew(design))) {
-          setLoading(undefined)
-          return
-        }
-        dispatch(asAction<D, A>({ type: 'start', design }))
+        await begin(design)
         setLoading(undefined)
       } catch {
         setLoading(failText)
       }
     },
-    [system, startNew],
+    [system, begin],
   )
   // a record page's "Start a new ... from this one" link
   // biome-ignore lint/correctness/useExhaustiveDependencies: once on mount
@@ -113,6 +118,7 @@ export function useDesigner<D, A extends { type: string }>(setup: DesignerSetup<
     loading,
     fileMenu,
     start,
+    begin,
     toolbarDispatch,
   }
 }
