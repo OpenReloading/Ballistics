@@ -16,10 +16,12 @@ const frameRoutes = new Set([
   '/bullets',
   '/cartridges',
   '/powders',
+  '/cases',
   '/powders/burn-rates',
   '/bullets/designer',
   '/cartridges/designer',
   '/targets/designer',
+  '/powders/designer',
 ])
 
 /**

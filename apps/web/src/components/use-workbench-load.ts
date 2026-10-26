@@ -17,11 +17,13 @@ import {
 } from '@open-reloading/core'
 import {
   type Bullet,
+  type Firearm,
   fromSi,
   type Load,
   type Powder,
   parseRef,
   type SessionRecord,
+  type SessionSnapshot,
   toSi,
   type UserRecord,
   userRecord,
@@ -39,6 +41,7 @@ import type {
 import { runBatch } from '../lib/batch.ts'
 import { fitOf } from '../lib/bullet-fit.ts'
 import { workbenchDesign } from '../lib/cartridge-designer.ts'
+import { type OwnCase, ownCases } from '../lib/case-group.ts'
 import { pagesBasePath } from '../lib/edition.ts'
 import { errorText } from '../lib/error-text.ts'
 import { loadExample } from '../lib/example-data.ts'
@@ -51,7 +54,7 @@ import {
   siValues,
 } from '../lib/field-spec.ts'
 import type { FigureView } from '../lib/figure-views.ts'
-import { gunValues, sightOptions } from '../lib/firearm.ts'
+import { gunValues, sightOptions, storedOf } from '../lib/firearm.ts'
 import {
   cartridgeClass,
   type DefaultSources,
@@ -60,8 +63,17 @@ import {
   type Suggestion,
   type Suggestions,
   suggestDefaults,
+  volumeMeasured,
 } from '../lib/input-defaults.ts'
 import { burnFormError, interiorBody, interiorFields } from '../lib/interior-input.ts'
+import {
+  dismissed,
+  effectiveSnapshots,
+  type Lots,
+  lotsFrom,
+  noLots,
+  notesOf,
+} from '../lib/load-notes.ts'
 import {
   capacityOfRecord,
   capacityRecord,
@@ -78,6 +90,7 @@ import { type ManufacturerNames, productLabel } from '../lib/manufacturers.ts'
 import { attachLoad, sessionRef } from '../lib/measurements.ts'
 import { nth } from '../lib/nth.ts'
 import { powderValues } from '../lib/powder-compare.ts'
+import { type PowderDesign, powderDesigns, powderOf } from '../lib/powder-designer.ts'
 import { unchangedFromRecord } from '../lib/powder-record.ts'
 import {
   droppedIds,
@@ -140,8 +153,10 @@ import { usePrintEvents } from './print.ts'
 import type { Seated } from './seating-preview.tsx'
 import type { TrajectoryHandle } from './trajectory-form.tsx'
 import { useFieldUnits, useUnits } from './units-settings.tsx'
+import { useCommit } from './use-commit.ts'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 import { useManufacturers } from './use-manufacturers.ts'
+import type { LoadNotesState } from './workbench-context.ts'
 import {
   type CartridgeChoice,
   directionOf,
@@ -496,7 +511,7 @@ function recordLinkOf(a: {
   const { asked, bullet, powder, names } = a
   return {
     bulletId: (asked.bullet?.id && catalogueIdOf(asked.bullet.id)) || bullet?.id,
-    powderId: asked.powder?.id ?? powder?.id,
+    powderId: (asked.powder?.id && catalogueIdOf(asked.powder.id)) || powder?.id,
     values: {
       bullet: bullet
         ? {
@@ -840,13 +855,16 @@ function identityOf(a: {
   bulletDesign: Named
   linkedBullet: Named
   powderLabel: string | undefined
+  powderDesign: Named
   linkedPowder: Named
 }) {
   const design = a.cartridgeDesign && `${a.cartridgeDesign.name} (user design)`
   return {
     cartridge: a.cartridge?.name ?? design,
     bullet: a.bulletLabel ?? a.bulletDesign?.name ?? a.linkedBullet?.name,
-    powder: a.powderLabel ?? a.linkedPowder?.name,
+    powder: a.powderDesign
+      ? `${a.powderLabel} (user design)`
+      : (a.powderLabel ?? a.linkedPowder?.name),
   }
 }
 
@@ -1049,10 +1067,14 @@ export function useWorkbenchState() {
   }
   const [bullet, setBullet] = useState<Bullet | undefined>(undefined)
   const [powder, setPowder] = useState<Powder | undefined>(undefined)
+  /** The user powder design whose values the fields took; the powder record is then none. */
+  const [powderDesign, setPowderDesign] = useState<PowderDesign>()
+  /** The powder the run reads: the record, else the design's. */
+  const chosenPowder = powder ?? powderDesign?.powder
   const names = useManufacturerNames()
   /** The chosen records as "<manufacturer name> <product name>". */
   const bulletLabel = labelOf(bullet, names)
-  const powderLabel = labelOf(powder, names)
+  const powderLabel = labelOf(powder, names) ?? powderDesign?.name
   /** SI values of the powder record's model parameters, the reference of the field marks. */
   const [origin, setOrigin] = useState<Record<string, number> | undefined>(undefined)
   const originNow = useRef(origin)
@@ -1066,6 +1088,8 @@ export function useWorkbenchState() {
   const [designs, setDesigns] = useState<UserBulletView[]>([])
   /** The browser's cartridge designs that draw a case and chamber. */
   const [cartridgeDesigns, setCartridgeDesigns] = useState<UserCartridgeView[]>([])
+  /** The browser's powder designs that build a valid powder. */
+  const [powderDesignList, setPowderDesignList] = useState<PowderDesign[]>([])
   /** The firearm library of this browser, for the Gun and barrel picker. */
   const [firearms, setFirearms] = useState<FirearmRecord[]>([])
   const [firearm, setFirearm] = useState<string>()
@@ -1133,7 +1157,9 @@ export function useWorkbenchState() {
             (d) => workbenchDesign(d.data, d.resolved, d.name, unitsNow.current) !== undefined,
           ),
         )
+        setPowderDesignList(powderDesigns(records))
         setFirearms(records.filter((r): r is (typeof firearms)[number] => r.kind === 'firearm'))
+        setCases(ownCases(records))
       })
       .catch(() => {})
   // biome-ignore lint/correctness/useExhaustiveDependencies: once on mount
@@ -1280,6 +1306,11 @@ export function useWorkbenchState() {
    */
   const [chronoSessions, setSessionsState] = useState<SessionRecord[]>([])
   const [sessionRefs, setSessionRefs] = useState<string[]>([])
+  /** The lots of the load and what it was at each session (`Load.snapshots`). */
+  const [lots, setLots] = useState<Lots>(noLots)
+  const [snapshots, setSnapshots] = useState<SessionSnapshot[]>([])
+  /** The snapshots of the last committed render, the stored ones or the load as it is: what Save writes. */
+  const snapshotsNow = useRef<SessionSnapshot[]>([])
   const sessionsNow = useRef<SessionRecord[]>([])
   const sessionsOpened = useRef(0)
   const manufacturers = useManufacturers()
@@ -1334,8 +1365,15 @@ export function useWorkbenchState() {
   const [measuredFor, setMeasuredFor] = useState<string>()
   /** The catalogue capacity record the user chose in the Cartridge card, kept for the cartridge it belongs to. */
   const [capacityChoice, setCapacityChoice] = useState<{ cartridge: string; id: string }>()
+  /** The catalogue case record the user chose in the Cartridge card, kept for the cartridge it belongs to. */
+  const [caseChoice, setCaseChoice] = useState<{ cartridge: string; id: string }>()
+  /** The user's cases of this browser, and the group of them the user chose for the cartridge it belongs to. */
+  const [cases, setCases] = useState<OwnCase[]>([])
+  const [ownCaseChoice, setOwnCaseChoice] = useState<{ cartridge: string; id: string }>()
   /** The user capacity reference of the load being opened: a slower read than a newer open leaves alone. */
   const openingCapacity = useRef<string>(undefined)
+  /** Whether the measured capacity field holds the value a chosen group of cases named, not a typed or loaded one. */
+  const measuredFromGroup = useRef(false)
   /** The Gun and barrel card's gun weight (free recoil only); the load's typed values and links carry it. */
   const [gunFields, setGunFields] = useState<Fields>({ firearmMass: emptyStep })
   const gunWeight = gunFields.firearmMass
@@ -1554,6 +1592,7 @@ export function useWorkbenchState() {
     setBulletNote('')
     setAllDiameters(false)
     setPowder(undefined)
+    setPowderDesign(undefined)
     setOrigin(undefined)
     setOutcome(undefined)
     showChart(undefined)
@@ -1566,7 +1605,10 @@ export function useWorkbenchState() {
     setMeasured({ measuredWaterCapacity: emptyStep })
     setMeasuredFor(undefined)
     setCapacityChoice(undefined)
+    setCaseChoice(undefined)
+    setOwnCaseChoice(undefined)
     openingCapacity.current = undefined
+    measuredFromGroup.current = false
     setGunFields({ firearmMass: emptyStep })
     gunFromFirearm.current = false
     gunPending.current = false
@@ -1582,6 +1624,8 @@ export function useWorkbenchState() {
     sessionsNow.current = []
     setSessionsState([])
     setSessionRefs([])
+    setLots(noLots)
+    setSnapshots([])
     lastWarnings.current = ''
   }
 
@@ -1700,6 +1744,64 @@ export function useWorkbenchState() {
   }
 
   /**
+   * `p`, a powder record or the powder a user design builds (`design`), in place of the earlier
+   * one; `fill` writes its model parameters into the fields, except the `keep` ones.
+   */
+  function takePowder(
+    p: Powder,
+    design: PowderDesign | undefined,
+    fill: boolean,
+    keep: ReadonlySet<string>,
+  ) {
+    markChanged()
+    setPowder(design ? undefined : p)
+    setPowderDesign(design)
+    const values = powderModelValues(p)
+    const previous = originNow.current
+    setOrigin(values)
+    if (fill && !values && previous) {
+      // a record without model parameters: what the previous record filled and the user did not
+      // edit goes back to a new load's state (the cited default, else empty)
+      const back = revertRecordFill(form, previous, defaults, unitsNow.current)
+      setDefaulted((s) => new Set([...s, ...back]))
+    }
+    if (!fill || !values) return
+    const filledKeys = fillRecordValues(form, values, keep, unitsNow.current)
+    setDefaulted((s) => new Set([...s].filter((k) => !filledKeys.has(k))))
+  }
+
+  /** A powder design of this browser in place of a record. */
+  function takePowderDesign(d: PowderDesign, fill = true, keep: ReadonlySet<string> = new Set()) {
+    picking.current.powders?.abort()
+    got('powder')
+    takePowder(d.powder, d, fill, keep)
+  }
+  function choosePowderDesign(id: string) {
+    const d = powderDesignList.find((r) => r.id === id)
+    if (d) takePowderDesign(d)
+  }
+
+  /** The powder design `ref` (`user:<id>`) of an opened load; `keep` are the values the load carries. */
+  function openPowderDesign(ref: string, keep: ReadonlySet<string>) {
+    const signal = pick('powders')
+    want('powder', ref)
+    const id = parseRef(ref)?.id ?? ''
+    storedRecord(id)
+      .then((raw) => {
+        const r = userRecord.safeParse(raw)
+        const built =
+          r.success && r.data.kind === 'powder' && powderOf(r.data.data, r.data.name, id)
+        if (signal.aborted) return
+        if (!r.success || r.data.kind !== 'powder' || !built || !('powder' in built))
+          return lost('powder', ref)
+        takePowderDesign({ id, name: r.data.name, powder: built.powder }, true, keep)
+      })
+      .catch(() => {
+        if (!signal.aborted) lost('powder', ref)
+      })
+  }
+
+  /**
    * Loads a powder record; `fill` writes its model parameters into the fields, except the `keep`
    * ones (the values an opened load carries).
    */
@@ -1711,20 +1813,7 @@ export function useWorkbenchState() {
         if (signal.aborted) return
         if (!p) return lost('powder', id)
         got('powder')
-        markChanged()
-        setPowder(p)
-        const values = powderModelValues(p)
-        const previous = originNow.current
-        setOrigin(values)
-        if (fill && !values && previous) {
-          // a record without model parameters: what the previous record filled and the user did not
-          // edit goes back to a new load's state (the cited default, else empty)
-          const back = revertRecordFill(form, previous, defaults, unitsNow.current)
-          setDefaulted((s) => new Set([...s, ...back]))
-        }
-        if (!fill || !values) return
-        const filledKeys = fillRecordValues(form, values, keep, unitsNow.current)
-        setDefaulted((s) => new Set([...s].filter((k) => !filledKeys.has(k))))
+        takePowder(p, undefined, fill, keep)
       })
       .catch(() => {
         if (signal.aborted) return
@@ -1819,8 +1908,8 @@ export function useWorkbenchState() {
    * bore resistance reads besides the body: the key of the Powders tab's rows.
    */
   function loadRequest(as?: { powder: Powder; charge?: number }) {
-    const chosen = as?.powder ?? powder
-    const values = powderValues(siValues(fields), powder, as)
+    const chosen = as?.powder ?? chosenPowder
+    const values = powderValues(siValues(fields), chosenPowder, as)
     const body = interiorBody(
       { ...values, boreArea: values.boreArea ?? qM },
       cartridge?.id,
@@ -1852,7 +1941,7 @@ export function useWorkbenchState() {
     const resistanceMissing =
       chosen && missing.length > 0 ? { powder: productLabel(chosen, names), missing } : undefined
     const recordInputs = [
-      powder?.id,
+      chosenPowder?.id,
       bulletLength,
       cartridge?.g1,
       groove?.id === cartridge?.id ? groove?.z : undefined,
@@ -1903,10 +1992,16 @@ export function useWorkbenchState() {
       id: runs.current,
       bulkDensity: a.bulkDensity,
       cartridge: body.cartridge,
-      powderChosen: powder !== undefined || linkedPowder !== undefined,
+      powderChosen: chosenPowder !== undefined || linkedPowder !== undefined,
       resistanceMissing: a.resistanceMissing,
       design: bulletDesign?.name,
       cartridgeDesign: cartridgeDesign?.name,
+      volumeMeasured: volumeMeasured({
+        measuredCapacity: measuredWaterCapacity,
+        volume: fields.volume?.si,
+        derived: [suggestions.volume?.si, seated.volume],
+      }),
+      powderDesign: powderDesign?.name,
       identity: identityOf({
         cartridge,
         cartridgeDesign,
@@ -1914,6 +2009,7 @@ export function useWorkbenchState() {
         bulletDesign,
         linkedBullet,
         powderLabel,
+        powderDesign,
         linkedPowder,
       }),
       printed: {
@@ -2244,7 +2340,7 @@ export function useWorkbenchState() {
    * capacity and fills its field. A user record the store does not answer, or one of another
    * cartridge, stays in the load as asked.
    */
-  function openCapacity(ref: string, forCartridge: string | undefined) {
+  function openCapacity(ref: string, forCartridge: string | undefined, fromGroup = false) {
     const target = parseRef(ref)
     if (!target) return
     const cartridgeId = forCartridge && parseRef(forCartridge)?.id
@@ -2267,6 +2363,7 @@ export function useWorkbenchState() {
           measuredWaterCapacity: { text: fixedFieldText('capacity', unitsNow.current, si), si },
         })
         setMeasuredFor(cartridgeId)
+        measuredFromGroup.current = fromGroup
         got('capacity')
       })
       .catch(() => {
@@ -2274,8 +2371,47 @@ export function useWorkbenchState() {
       })
   }
 
+  /**
+   * The case `ref` of an opened load is chosen for the cartridge it names: a catalogue product, or
+   * a group of the user's cases. The group's measured capacity comes with the load's own capacity.
+   */
+  function openCase(ref: string | undefined, forCartridge: string | undefined) {
+    const target = ref ? parseRef(ref) : undefined
+    const cartridgeId = forCartridge && parseRef(forCartridge)?.id
+    if (!target || !cartridgeId) return
+    if (target.scope === 'catalogue') setCaseChoice({ cartridge: cartridgeId, id: target.id })
+    else setOwnCaseChoice({ cartridge: cartridgeId, id: target.id })
+  }
+
+  /** A catalogue case product chosen in the figure replaces a group of the user's cases. */
+  function chooseCase(choice: { cartridge: string; id: string } | undefined) {
+    setOwnCaseChoice(undefined)
+    setCaseChoice(choice)
+  }
+
+  /**
+   * A group of the user's cases chosen in the figure: its measured capacity fills the measured
+   * capacity field, where it replaces the record's value and shows as measured.
+   */
+  function chooseOwnCase(id: string | undefined) {
+    const cartridgeId = cartridge?.id
+    if (!cartridgeId) return
+    setOwnCaseChoice(id ? { cartridge: cartridgeId, id } : undefined)
+    if (!id) return
+    setCaseChoice(undefined)
+    const capacity = cases.find((c) => c.id === id)?.capacity
+    if (capacity) return openCapacity(capacity, `catalogue:${cartridgeId}`, true)
+    // a group without a measured capacity leaves none of the previous group's in the field
+    openingCapacity.current = undefined
+    if (!measuredFromGroup.current) return
+    measuredFromGroup.current = false
+    setMeasured({ measuredWaterCapacity: emptyStep })
+    setMeasuredFor(undefined)
+    got('capacity')
+  }
+
   /** A capacity chosen in the figure replaces the one the opened load still asks for. */
-  function chooseCapacity(choice: { cartridge: string; id: string }) {
+  function chooseCapacity(choice: { cartridge: string; id: string } | undefined) {
     openingCapacity.current = undefined
     got('capacity')
     setCapacityChoice(choice)
@@ -2287,6 +2423,7 @@ export function useWorkbenchState() {
    */
   function typeMeasured(value: FieldValue) {
     openingCapacity.current = undefined
+    measuredFromGroup.current = false
     if (value.si !== undefined || value.text.trim() === '') got('capacity')
     else setAsked((a) => (a.capacity ? { ...a, capacity: { id: a.capacity.id, failed: true } } : a))
     setMeasured({ measuredWaterCapacity: value })
@@ -2338,11 +2475,21 @@ export function useWorkbenchState() {
     const userCartridge = userCartridgeOf(d.cartridge)
     if (userCartridge) openCartridgeDesign(userCartridge)
     if (d.capacity) openCapacity(d.capacity, d.cartridge)
+    openCase(d.case?.record, d.cartridge)
     openBullet(d.bullet, !typed.has('bulletMass'))
-    const powderId = catalogueIdIn(d.powder)
-    if (powderId) void choosePowder(powderId, true, typed)
+    openPowder(d.powder, typed)
     setNotes(d.note ?? '')
+    setLots(lotsFrom(d))
+    setSnapshots(d.snapshots ?? [])
     openSessions(sessions)
+  }
+
+  /** The powder of an opened load: a catalogue record is chosen, a design of this browser is read. */
+  function openPowder(ref: unknown, keep: ReadonlySet<string>) {
+    const powderRef = typeof ref === 'string' ? ref : undefined
+    const id = powderRef && catalogueIdOf(powderRef)
+    if (id) void choosePowder(id, true, keep)
+    else if (powderRef) openPowderDesign(powderRef, keep)
   }
 
   /** The bullet of an opened load: a catalogue record is chosen, a design of this browser is read. */
@@ -2357,6 +2504,11 @@ export function useWorkbenchState() {
   const cartridgeKey = cartridgeKeyOf(cartridge, cartridgeDesign, asked.cartridge)
   const measuredWaterCapacity = measuredCapacityOf(measuredFor, cartridgeKey, measured)
   const chosenCapacity = chosenCapacityOf(capacityChoice, cartridgeKey)
+  const chosenCase = chosenCapacityOf(caseChoice, cartridgeKey)
+  const chosenOwnCase = chosenCapacityOf(ownCaseChoice, cartridgeKey)
+  const cartridgeCases = cartridge
+    ? cases.filter((c) => c.cartridge === `catalogue:${cartridge.id}`)
+    : []
 
   const activeStep = ladderStepField(ladderKind, {
     seat: seatStep,
@@ -2380,7 +2532,11 @@ export function useWorkbenchState() {
     opening.current(d)
     setCustomName(name)
   }, [])
-  const onStored = useCallback(() => setStoredTick((n) => n + 1), [])
+  // a saved load keeps each session's snapshot as it was then, not as the load becomes
+  const onStored = useCallback(() => {
+    setSnapshots(snapshotsNow.current)
+    setStoredTick((n) => n + 1)
+  }, [])
   const unresolved = (['cartridge', 'bullet', 'powder', 'capacity'] as const).flatMap((k) =>
     asked[k]?.failed ? [`${k} ${asked[k].id}`] : [],
   )
@@ -2444,7 +2600,6 @@ export function useWorkbenchState() {
   // the references the load keeps; one that cannot be written (a design or firearm whose id is no
   // UUID) leaves what it gives in the load as typed values
   const firearmRef = userRefOf(firearm)
-  const powderId = asked.powder?.id ?? powder?.id
   const referenced = referencedOf(firearm, firearmRef, cartridgeDesign, bulletDesign)
   const fieldValues: Record<string, number | undefined> = {
     ...Object.fromEntries(Object.entries(fields).map(([k, f]) => [k, f.si])),
@@ -2495,15 +2650,47 @@ export function useWorkbenchState() {
     },
     [measuredCapacity],
   )
+  const firearmData: Firearm | undefined = firearms.find((f) => f.id === firearm)?.data
+  const effective = effectiveSnapshots(sessionRefs, snapshots, {
+    lots,
+    seating: seating && { by: seating.by, value: storedOf('length', seating.value).value },
+    roundCount: firearmData?.roundCount,
+  })
+  useCommit(snapshotsNow, effective)
+  const noteList = notesOf(
+    sessionRefs,
+    effective,
+    chronoSessions,
+    fieldValues.charge,
+    firearmData?.noteAtRoundCount,
+  )
+  const sessionNames = Object.fromEntries(chronoSessions.map((r) => [sessionRef(r.id), r.name]))
+  const noteKey = JSON.stringify([lots, noteList, sessionNames])
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `noteKey` holds the values
+  const loadNotes = useMemo<LoadNotesState>(
+    () => ({
+      lots,
+      setLots,
+      notes: noteList,
+      sessionName: (ref) => sessionNames[ref] ?? 'a session of another browser',
+      dismiss: (session, rule) =>
+        setSnapshots((stored) => dismissed(stored, snapshotsNow.current, session, rule)),
+    }),
+    [noteKey],
+  )
   const loadParts: LoadParts = {
+    lots,
+    snapshots: effective,
     values: fieldValues,
     given,
     cartridge: cartridgeRef,
     firearm: firearmRef,
     bullet: savedRef(asked.bullet?.id, bulletDesign?.id, bullet?.id),
-    powder: powderId && catalogueRef(powderId),
+    powder: savedRef(asked.powder?.id, powderDesign?.id, powder?.id),
     notes,
     capacity: capacityRef,
+    caseRecord:
+      (chosenOwnCase && userRefOf(chosenOwnCase)) || (chosenCase && catalogueRef(chosenCase)),
     seating,
     ladder: ladderPartOf(ladderSteps, ladderKind, activeStep.si, direction),
     sessions: sessionRefs,
@@ -2553,7 +2740,7 @@ export function useWorkbenchState() {
 
   /** A new load with nothing chosen or typed: the start card replaces the cards. */
   const fresh = isFresh({
-    chosen: [cartridge, cartridgeDesign, bullet, bulletDesign, powder, outcome],
+    chosen: [cartridge, cartridgeDesign, bullet, bulletDesign, powder, powderDesign, outcome],
     byHand,
     fields,
     defaulted,
@@ -2688,9 +2875,17 @@ export function useWorkbenchState() {
     measuredWaterCapacity,
     capacityId: chosenCapacity,
     setCapacityChoice: chooseCapacity,
+    caseId: chosenCase,
+    setCaseChoice: chooseCase,
+    ownCases: cartridgeCases,
+    ownCaseId: chosenOwnCase,
+    chooseOwnCase,
     storeLoad,
     pending,
-    powder,
+    powder: chosenPowder,
+    powderDesign,
+    powderDesigns: powderDesignList,
+    choosePowderDesign,
     previewInitial,
     previewed,
     printMedia,
@@ -2741,6 +2936,7 @@ export function useWorkbenchState() {
     setChronoSessions,
     manufacturerRef,
     manufacturerName: manufacturers.nameOf,
+    loadNotes,
     sessionRefCount: sessionRefs.length,
     setSeen,
     setStepsDraft,

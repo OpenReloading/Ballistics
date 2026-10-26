@@ -80,6 +80,7 @@ describe('the Pages edition answers reads as the API', () => {
     'cartridges',
     'bullets',
     'powders',
+    'cases',
     'manufacturers',
     'target-faces',
     'federations',
@@ -101,6 +102,7 @@ describe('the Pages edition answers reads as the API', () => {
       cartridges: ['308', 'WIN', 'magnum', 'x', '7,62', 'mm', 'zzzz', '%', '_'],
       bullets: ['demo', 'DEMO BULLETS', '168', 'hpbt', 'zzzz'],
       powders: ['demo', 'dp40', 'Powder Co', 'zzzz'],
+      cases: ['demo', 'demo cases', 'C308', 'brass', '308', 'zzzz'],
     }
     const { items } = (await both('cartridges?limit=200')).live.body as {
       items: { name: string; aliases: string[] }[]
@@ -116,7 +118,7 @@ describe('the Pages edition answers reads as the API', () => {
 
   it('filters bullets and powders by manufacturer as the API does', async () => {
     const { items } = (await both('manufacturers')).live.body as { items: { id: string }[] }
-    for (const kind of ['bullets', 'powders'])
+    for (const kind of ['bullets', 'powders', 'cases'])
       for (const { id } of items) {
         const { live, file } = await both(`${kind}?manufacturer=${id}&limit=200`)
         expect(file, `${kind} ${id}`).toEqual(live)
@@ -192,6 +194,14 @@ describe('the Pages edition answers reads as the API', () => {
     }
   })
 
+  it('keeps the cases of one cartridge as the API does', async () => {
+    for (const id of ['308-win', 'no-such-cartridge']) {
+      const { live, file } = await both(`cases?cartridge=${id}&limit=200`)
+      expect(file, id).toEqual(live)
+    }
+    expect(((await both('cases?cartridge=308-win')).file.body.items as unknown[]).length).toBe(1)
+  })
+
   it('answers a record, an unknown id with 404 and a malformed one with 400', async () => {
     for (const kind of kinds) {
       const first = (await both(`${kind}?limit=1`)).live.body.items[0] as { id: string }
@@ -214,6 +224,8 @@ describe('the Pages edition answers reads as the API', () => {
       'bullets?cartridge=..%2F..%2Fx',
       'bullets?manufacturer=Not_An_Id',
       'powders?manufacturer=Not_An_Id',
+      'cases?cartridge=Not_An_Id',
+      'cases?manufacturer=Not_An_Id',
       'cartridges?table=',
       'cartridges?table=toolongvalue',
       'disciplines?federation=Not_An_Id',

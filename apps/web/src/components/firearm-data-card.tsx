@@ -33,8 +33,8 @@ export function DataCard({
     ['Manufacturer and model', [manufacturer, f.model].filter(Boolean).join(' ') || undefined],
     ...firearmFields.map((s): [string, string | undefined] => {
       if (s.key === 'twist') return [s.label, twistText(f, system)]
-      if (s.key === 'roundCount')
-        return [s.label, f.roundCount === undefined ? undefined : String(f.roundCount)]
+      if (s.key === 'roundCount' || s.key === 'noteAtRoundCount')
+        return [s.label, f[s.key] === undefined ? undefined : String(f[s.key])]
       const si = fieldSi(s, f[s.key])
       return [s.label, si === undefined ? undefined : withUnit(s.quantity, system, si)]
     }),

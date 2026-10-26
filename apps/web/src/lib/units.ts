@@ -27,6 +27,7 @@ export type Quantity =
   | 'altitude'
   | 'capacity'
   | 'specificEnergy'
+  | 'molarMass'
   | 'ratio'
   | 'density'
   | 'covolume'
@@ -123,6 +124,7 @@ export const unitsOf = {
     grH2O: linear('gr H₂O', kilogramsPerGrain / toSi('density', waterDensityGramsPerCm3), 1),
   },
   specificEnergy: { 'MJ/kg': linear('MJ/kg', 1e6, 3) },
+  molarMass: { 'kg/kmol': stored('molarMass', 'kg/kmol', 2) },
   ratio: { '1': linear('', 1, 3) },
   density: { 'g/cm3': stored('density', 'g/cm³', 3) },
   covolume: { 'cm3/g': linear('cm³/g', 1e-3, 3) },
@@ -171,6 +173,7 @@ const metricBase = {
 
 const single = {
   specificEnergy: 'MJ/kg',
+  molarMass: 'kg/kmol',
   ratio: '1',
   density: 'g/cm3',
   covolume: 'cm3/g',

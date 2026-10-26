@@ -8,7 +8,7 @@
   "tags": [
     {
       "name": "Records",
-      "description": "Cartridges with their C.I.P. sheet values, manufacturers, powders and bullets."
+      "description": "Cartridges with their C.I.P. sheet values, manufacturers, powders, bullets and cartridge cases."
     },
     {
       "name": "Competition",
@@ -1913,6 +1913,589 @@
                     "capacities",
                     "revision"
                   ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "308": {
+            "description": "Permanent Redirect: the id was renamed, `Location` is the record that replaced it.",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "414": {
+            "description": "URI Too Long",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/cases": {
+      "get": {
+        "operationId": "getCases",
+        "tags": ["Records"],
+        "summary": "List cases",
+        "description": "A page of cartridge case products ordered by manufacturer name and name, digit runs in numeric order. `q` keeps the cases whose manufacturer name or alias followed by the product name, or by the product number, holds every word of it, in any order, and ranks them by match. Each item carries the cartridge and manufacturer ids, the material, and the stated water capacity (g) and empty mass (g) where the record has them.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "description": "Search text.",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "pattern": "^[^\\u0000]*$"
+            }
+          },
+          {
+            "name": "manufacturer",
+            "in": "query",
+            "required": false,
+            "description": "Manufacturer id: only its products.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Items per page.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Items skipped before the page.",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "default": 0
+            }
+          },
+          {
+            "name": "cartridge",
+            "in": "query",
+            "required": false,
+            "description": "Cartridge id: only the cases made for it.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "maxLength": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "number"
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                          },
+                          "manufacturer": {
+                            "type": "string",
+                            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                          },
+                          "cartridge": {
+                            "type": "string",
+                            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "productNumber": {
+                            "type": "string"
+                          },
+                          "material": {
+                            "type": "string",
+                            "enum": [
+                              "brass",
+                              "nickel-plated-brass",
+                              "lacquered-steel",
+                              "polymer-coated-steel",
+                              "aluminium"
+                            ],
+                            "description": "Wall material of the case."
+                          },
+                          "waterCapacity": {
+                            "type": "number"
+                          },
+                          "mass": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "manufacturer",
+                          "cartridge",
+                          "name",
+                          "productNumber",
+                          "material"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": ["total", "items"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/cases/{id}": {
+      "get": {
+        "operationId": "getCasesById",
+        "tags": ["Records"],
+        "summary": "Get a case",
+        "description": "The whole case record with its provenance and `origin`. `revision` is a hash of the stored record that changes with any field.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Record id.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                      "description": "Id of a catalogue case, the file name without `.json`."
+                    },
+                    "origin": {
+                      "type": "string",
+                      "enum": ["catalogue", "user", "shared"],
+                      "description": "Where the record lives: the git catalogue, this browser, or a received file."
+                    },
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "Name of the product as the manufacturer prints it."
+                    },
+                    "manufacturer": {
+                      "type": "string",
+                      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                      "description": "The manufacturer of the case. Required of a catalogue case."
+                    },
+                    "cartridge": {
+                      "type": "string",
+                      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                      "description": "Reference to a cartridge: `catalogue:<record id>` or `user:<UUID>`."
+                    },
+                    "basedOn": {
+                      "type": "string",
+                      "allOf": [
+                        {
+                          "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$"
+                        },
+                        {
+                          "pattern": "^catalogue:"
+                        }
+                      ],
+                      "description": "The catalogue case product a user case group starts from; its fields stay the record of the product."
+                    },
+                    "productNumber": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "Product number."
+                    },
+                    "headstamp": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "Marking on the case head as the source states it."
+                    },
+                    "material": {
+                      "type": "string",
+                      "enum": [
+                        "brass",
+                        "nickel-plated-brass",
+                        "lacquered-steel",
+                        "polymer-coated-steel",
+                        "aluminium"
+                      ],
+                      "description": "Wall material of the case."
+                    },
+                    "primerPocket": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": ["boxer", "berdan"],
+                          "description": "Boxer (one central flash hole) or Berdan (the anvil is in the case)."
+                        },
+                        "size": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "Pocket size as the source states it, for example `large rifle` or `5.5 mm`."
+                        }
+                      },
+                      "required": ["type"],
+                      "additionalProperties": false,
+                      "description": "The primer pocket: its type and size."
+                    },
+                    "flashHole": {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "number",
+                          "exclusiveMinimum": 0,
+                          "description": "In mm."
+                        },
+                        "raw": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "The value as written in the source, when it differed."
+                        }
+                      },
+                      "required": ["value"],
+                      "additionalProperties": false,
+                      "unit": "mm",
+                      "description": "Diameter of the flash hole (of each hole in a Berdan pocket)."
+                    },
+                    "mass": {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "number",
+                          "exclusiveMinimum": 0,
+                          "description": "In g."
+                        },
+                        "raw": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "The value as written in the source, when it differed."
+                        }
+                      },
+                      "required": ["value"],
+                      "additionalProperties": false,
+                      "unit": "g",
+                      "description": "Mass of the empty case."
+                    },
+                    "waterCapacity": {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "number",
+                          "exclusiveMinimum": 0,
+                          "description": "In g."
+                        },
+                        "raw": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "The value as written in the source, when it differed."
+                        }
+                      },
+                      "required": ["value"],
+                      "additionalProperties": false,
+                      "unit": "g",
+                      "description": "Mass of water filling the case to the mouth, as the manufacturer states it."
+                    },
+                    "annealed": {
+                      "type": "boolean",
+                      "description": "Whether the case is delivered annealed."
+                    },
+                    "capacity": {
+                      "type": "string",
+                      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                      "description": "The case capacity record that holds the water capacity the user measured on these cases."
+                    },
+                    "numberOfFirings": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991,
+                      "description": "Measured: times the cases were fired."
+                    },
+                    "trimLength": {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "number",
+                          "exclusiveMinimum": 0,
+                          "description": "In mm."
+                        },
+                        "raw": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "The value as written in the source, when it differed."
+                        }
+                      },
+                      "required": ["value"],
+                      "additionalProperties": false,
+                      "unit": "mm",
+                      "description": "Measured: the length the cases are trimmed to."
+                    },
+                    "neckWall": {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "number",
+                          "exclusiveMinimum": 0,
+                          "description": "In mm."
+                        },
+                        "raw": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "The value as written in the source, when it differed."
+                        }
+                      },
+                      "required": ["value"],
+                      "additionalProperties": false,
+                      "unit": "mm",
+                      "description": "Measured: wall thickness of the case neck."
+                    },
+                    "casesMeasured": {
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991,
+                      "description": "Measured: the number of cases the measured values come from."
+                    },
+                    "spread": {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "In g."
+                        },
+                        "raw": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "The value as written in the source, when it differed."
+                        }
+                      },
+                      "required": ["value"],
+                      "additionalProperties": false,
+                      "unit": "g",
+                      "description": "Measured: spread (standard deviation) of the water capacity over the cases measured."
+                    },
+                    "note": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "Notes on the product."
+                    },
+                    "provenance": {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "type": "string",
+                          "enum": ["published", "measured", "derived", "fitted", "computed"],
+                          "description": "How the values came about."
+                        },
+                        "sources": {
+                          "minItems": 1,
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "title": {
+                                "type": "string",
+                                "minLength": 1,
+                                "description": "Title of the source: the document, or the site and table."
+                              },
+                              "publisher": {
+                                "type": "string",
+                                "minLength": 1,
+                                "description": "Who issued the data: a maker, a standards body or the authors."
+                              },
+                              "edition": {
+                                "type": "string",
+                                "minLength": 1,
+                                "description": "Edition, print or date as the document states it."
+                              },
+                              "page": {
+                                "type": "string",
+                                "minLength": 1,
+                                "description": "Page or section of the document."
+                              },
+                              "url": {
+                                "type": "string",
+                                "format": "uri",
+                                "description": "An http or https URL of the source."
+                              },
+                              "retrieved": {
+                                "type": "string",
+                                "format": "date",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                "description": "Date the source was retrieved, ISO 8601."
+                              },
+                              "sha256": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$",
+                                "description": "SHA-256 of the retrieved file, 64 lowercase hex digits."
+                              },
+                              "fields": {
+                                "minItems": 1,
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "description": "Dot paths of the record fields this source supports. Absent: the whole record."
+                              },
+                              "kind": {
+                                "type": "string",
+                                "enum": ["published", "measured", "derived", "fitted", "computed"],
+                                "description": "Kind of this source values when it differs from the provenance kind of the record."
+                              },
+                              "license": {
+                                "type": "string",
+                                "pattern": "^(LicenseRef-)?[A-Za-z0-9.+-]+$",
+                                "description": "SPDX id of the license the data is used under, or `LicenseRef-<name>` for the publisher own terms or a written permission described in `terms`."
+                              },
+                              "terms": {
+                                "type": "string",
+                                "minLength": 1,
+                                "description": "URL or note of the publisher terms or permission where no SPDX license covers the use. Text starting with http:// or https:// is a link."
+                              },
+                              "origin": {
+                                "type": "string",
+                                "enum": ["manufacturer", "public", "community"],
+                                "description": "Who stands behind the source: manufacturer, public or community."
+                              },
+                              "run": {
+                                "type": "object",
+                                "properties": {
+                                  "version": {
+                                    "type": "string",
+                                    "pattern": "^[0-9a-f]{16}$",
+                                    "description": "Model version id the report names."
+                                  },
+                                  "report": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "description": "Report of the evaluation of the fit."
+                                  }
+                                },
+                                "required": ["version", "report"],
+                                "additionalProperties": false,
+                                "description": "The fit run behind a `fitted` source."
+                              },
+                              "note": {
+                                "type": "string",
+                                "minLength": 1,
+                                "description": "Note on the source."
+                              }
+                            },
+                            "required": ["title"],
+                            "additionalProperties": false
+                          },
+                          "description": "The sources of the values, at least one."
+                        },
+                        "note": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "Note on the provenance."
+                        }
+                      },
+                      "required": ["kind", "sources"],
+                      "additionalProperties": false,
+                      "description": "Where the values come from. Required for a catalogue case."
+                    },
+                    "revision": {
+                      "type": "string",
+                      "description": "Hash of the stored record. It changes with any field."
+                    }
+                  },
+                  "required": ["origin", "manufacturer", "cartridge", "material", "revision"],
                   "additionalProperties": false
                 }
               }
@@ -17209,6 +17792,733 @@
                           "properties": {
                             "kind": {
                               "type": "string",
+                              "const": "powder",
+                              "description": "Kind of the record: `powder`."
+                            },
+                            "id": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                              "description": "Id of the record in the browser library: a UUID."
+                            },
+                            "name": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 200,
+                              "description": "Name of the record. Save names the file after it."
+                            },
+                            "saved": {
+                              "type": "string",
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                              "description": "Time of the last save, ISO 8601 in UTC."
+                            },
+                            "data": {
+                              "type": "object",
+                              "properties": {
+                                "origin": {
+                                  "type": "string",
+                                  "const": "user",
+                                  "description": "Where the record lives: `user`."
+                                },
+                                "provenanceKind": {
+                                  "type": "string",
+                                  "enum": [
+                                    "published",
+                                    "measured",
+                                    "derived",
+                                    "fitted",
+                                    "computed"
+                                  ],
+                                  "description": "How the values came about: the kind of the provenance the designer builds. Burn-law parameters need `fitted`."
+                                },
+                                "draft": {
+                                  "type": "object",
+                                  "properties": {
+                                    "aliases": {
+                                      "description": "The `aliases` of the powder record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "minItems": 1,
+                                          "type": "array",
+                                          "items": {
+                                            "type": "string",
+                                            "minLength": 1
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "grainForm": {
+                                      "description": "The `grainForm` of the powder record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "string",
+                                          "enum": ["ball", "extruded", "flake", "other"]
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "propellantBase": {
+                                      "description": "The `propellantBase` of the powder record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "string",
+                                          "enum": ["single", "double", "triple"]
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "bulkDensity": {
+                                      "description": "The `bulkDensity` of the powder record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "value": {
+                                              "description": "In g/cm3.",
+                                              "type": ["number", "null"]
+                                            },
+                                            "raw": {
+                                              "description": "The value as written in the source, when it differed.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "string",
+                                                  "minLength": 1,
+                                                  "description": "The value as written in the source, when it differed."
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "thermochemistry": {
+                                      "description": "The `thermochemistry` of the powder record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "loadingDensity": {
+                                              "description": "The `thermochemistry.loadingDensity` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In g/cm3.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "flameTemperature": {
+                                              "description": "The `thermochemistry.flameTemperature` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "The `thermochemistry.flameTemperature.value` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "min": {
+                                                      "description": "The `thermochemistry.flameTemperature.min` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "max": {
+                                                      "description": "The `thermochemistry.flameTemperature.max` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "impetus": {
+                                              "description": "The `thermochemistry.impetus` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "The `thermochemistry.impetus.value` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "min": {
+                                                      "description": "The `thermochemistry.impetus.min` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "max": {
+                                                      "description": "The `thermochemistry.impetus.max` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "gamma": {
+                                              "description": "The `thermochemistry.gamma` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "The `thermochemistry.gamma.value` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "min": {
+                                                      "description": "The `thermochemistry.gamma.min` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "max": {
+                                                      "description": "The `thermochemistry.gamma.max` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "molarMass": {
+                                              "description": "The `thermochemistry.molarMass` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "The `thermochemistry.molarMass.value` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "min": {
+                                                      "description": "The `thermochemistry.molarMass.min` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "max": {
+                                                      "description": "The `thermochemistry.molarMass.max` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "covolume": {
+                                              "description": "The `thermochemistry.covolume` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "The `thermochemistry.covolume.value` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "min": {
+                                                      "description": "The `thermochemistry.covolume.min` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "max": {
+                                                      "description": "The `thermochemistry.covolume.max` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "interior": {
+                                      "description": "The `interior` of the powder record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "model": {
+                                              "description": "The `interior.model` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "string",
+                                                  "const": "m3"
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "fitted": {
+                                              "description": "The `interior.fitted` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "minItems": 1,
+                                                  "type": "array",
+                                                  "items": {
+                                                    "type": "string",
+                                                    "enum": ["vivacity", "energy", "form.a"]
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "vivacity": {
+                                              "description": "The `interior.vivacity` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "The `interior.vivacity.value` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "standardUncertainty": {
+                                                      "description": "The `interior.vivacity.standardUncertainty` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "energy": {
+                                              "description": "The `interior.energy` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "The `interior.energy.value` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "standardUncertainty": {
+                                                      "description": "The `interior.energy.standardUncertainty` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "gamma": {
+                                              "description": "The `interior.gamma` of the powder record. `null` removes it.",
+                                              "type": ["number", "null"]
+                                            },
+                                            "covolume": {
+                                              "description": "The `interior.covolume` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In m3/kg.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "density": {
+                                              "description": "The `interior.density` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In g/cm3.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "pressureExponent": {
+                                              "description": "The `interior.pressureExponent` of the powder record. `null` removes it.",
+                                              "type": ["number", "null"]
+                                            },
+                                            "referencePressure": {
+                                              "description": "The `interior.referencePressure` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In bar.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "ignitionPressure": {
+                                              "description": "The `interior.ignitionPressure` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In bar.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "startPressure": {
+                                              "description": "The `interior.startPressure` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In bar.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "propellantTemperature": {
+                                              "description": "The `interior.propellantTemperature` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In degC.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "burnForm": {
+                                              "description": "The `interior.burnForm` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "kind": {
+                                                      "description": "The `interior.burnForm.kind` of the powder record. `null` removes it.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "const": "twoStage"
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "a": {
+                                                      "description": "The `interior.burnForm.a` of the powder record. `null` removes it.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "value": {
+                                                              "description": "The `interior.burnForm.a.value` of the powder record. `null` removes it.",
+                                                              "type": ["number", "null"]
+                                                            },
+                                                            "standardUncertainty": {
+                                                              "description": "The `interior.burnForm.a.standardUncertainty` of the powder record. `null` removes it.",
+                                                              "type": ["number", "null"]
+                                                            }
+                                                          }
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "m": {
+                                                      "description": "The `interior.burnForm.m` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "q": {
+                                                      "description": "The `interior.burnForm.q` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "z1": {
+                                                      "description": "The `interior.burnForm.z1` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "resistance": {
+                                              "description": "The `interior.resistance` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "stress": {
+                                                      "description": "The `interior.resistance.stress` of the powder record. `null` removes it.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "value": {
+                                                              "description": "In bar.",
+                                                              "type": ["number", "null"]
+                                                            },
+                                                            "raw": {
+                                                              "description": "The value as written in the source, when it differed.",
+                                                              "anyOf": [
+                                                                {
+                                                                  "type": "string",
+                                                                  "minLength": 1,
+                                                                  "description": "The value as written in the source, when it differed."
+                                                                },
+                                                                {
+                                                                  "type": "null"
+                                                                }
+                                                              ]
+                                                            }
+                                                          }
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "oversize": {
+                                                      "description": "The `interior.resistance.oversize` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "engraving": {
+                                                      "description": "The `interior.resistance.engraving` of the powder record. `null` removes it.",
+                                                      "type": ["number", "null"]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "trainingRows": {
+                                              "description": "The `interior.trainingRows` of the powder record. `null` removes it.",
+                                              "type": ["number", "null"]
+                                            },
+                                            "trainingCartridges": {
+                                              "description": "The `interior.trainingCartridges` of the powder record. `null` removes it.",
+                                              "type": ["number", "null"]
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "note": {
+                                      "description": "The `note` of the powder record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "string",
+                                          "minLength": 1
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "composition": {
+                                      "description": "The `composition` of the powder record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "name": {
+                                                "type": "string",
+                                                "description": "Name of the ingredient as the safety data sheet prints it."
+                                              },
+                                              "cas": {
+                                                "type": "string",
+                                                "description": "CAS registry number of the ingredient."
+                                              },
+                                              "min": {
+                                                "type": "number",
+                                                "description": "Lower end of the mass percent range."
+                                              },
+                                              "max": {
+                                                "type": "number",
+                                                "description": "Upper end of the mass percent range."
+                                              }
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "description": "The powder fields entered so far, in stored units."
+                                }
+                              },
+                              "required": ["origin"],
+                              "description": "A powder of the powder designer."
+                            }
+                          },
+                          "required": ["kind", "id", "name", "saved", "data"]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
                               "const": "caseCapacity",
                               "description": "Kind of the record: `caseCapacity`."
                             },
@@ -17479,10 +18789,10 @@
                                     {
                                       "type": "object",
                                       "properties": {
-                                        "manufacturerName": {
+                                        "manufacturer": {
                                           "type": "string",
-                                          "minLength": 1,
-                                          "description": "Manufacturer as the label names it."
+                                          "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                          "description": "Manufacturer record of the component."
                                         },
                                         "lot": {
                                           "type": "string",
@@ -17512,7 +18822,8 @@
                                           "description": "Mass of the bullet."
                                         }
                                       },
-                                      "required": ["manufacturerName", "model", "bulletMass"],
+                                      "required": ["manufacturer", "model", "bulletMass"],
+                                      "additionalProperties": false,
                                       "description": "The bullet as the publication describes it, where no record exists."
                                     }
                                   ],
@@ -17522,23 +18833,16 @@
                                   "anyOf": [
                                     {
                                       "type": "string",
-                                      "allOf": [
-                                        {
-                                          "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$"
-                                        },
-                                        {
-                                          "pattern": "^catalogue:"
-                                        }
-                                      ],
-                                      "description": "Reference `catalogue:<record id>` to a catalogue powder."
+                                      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                      "description": "Reference to a powder: `catalogue:<record id>` or `user:<UUID>`."
                                     },
                                     {
                                       "type": "object",
                                       "properties": {
-                                        "manufacturerName": {
+                                        "manufacturer": {
                                           "type": "string",
-                                          "minLength": 1,
-                                          "description": "Manufacturer as the label names it."
+                                          "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                          "description": "Manufacturer record of the component."
                                         },
                                         "lot": {
                                           "type": "string",
@@ -17551,11 +18855,17 @@
                                           "description": "Product name of the powder."
                                         }
                                       },
-                                      "required": ["manufacturerName", "name"],
+                                      "required": ["manufacturer", "name"],
+                                      "additionalProperties": false,
                                       "description": "The powder as the publication describes it, where no record exists."
                                     }
                                   ],
-                                  "description": "The powder: a catalogue reference, or a description in a measured catalogue load."
+                                  "description": "The powder: a reference, or a description in a measured catalogue load. A catalogue load names a catalogue powder."
+                                },
+                                "powderLot": {
+                                  "description": "Lot number of the powder, as printed on the package.",
+                                  "type": "string",
+                                  "minLength": 1
                                 },
                                 "charge": {
                                   "type": "object",
@@ -17583,10 +18893,10 @@
                                 "primer": {
                                   "type": "object",
                                   "properties": {
-                                    "manufacturerName": {
+                                    "manufacturer": {
                                       "type": "string",
-                                      "minLength": 1,
-                                      "description": "Manufacturer as the label names it."
+                                      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                      "description": "Manufacturer record of the component."
                                     },
                                     "lot": {
                                       "type": "string",
@@ -17599,16 +18909,16 @@
                                       "description": "Model name of the primer."
                                     }
                                   },
-                                  "required": ["manufacturerName", "model"],
+                                  "additionalProperties": false,
                                   "description": "The primer as described."
                                 },
                                 "case": {
                                   "type": "object",
                                   "properties": {
-                                    "manufacturerName": {
+                                    "manufacturer": {
                                       "type": "string",
-                                      "minLength": 1,
-                                      "description": "Manufacturer as the label names it."
+                                      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                      "description": "Manufacturer record of the component."
                                     },
                                     "lot": {
                                       "type": "string",
@@ -17620,10 +18930,15 @@
                                       "minimum": 0,
                                       "maximum": 9007199254740991,
                                       "description": "Times the case was fired before this load."
+                                    },
+                                    "record": {
+                                      "type": "string",
+                                      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                      "description": "The case: a catalogue product, whose stated water capacity is the default of `capacity`, or a case group of the user."
                                     }
                                   },
                                   "additionalProperties": false,
-                                  "description": "The case as described. Its water capacity is the `capacity` reference."
+                                  "description": "The case as described. Its measured water capacity is the `capacity` reference, which takes precedence over the stated capacity of `record`."
                                 },
                                 "seating": {
                                   "type": "object",
@@ -17870,6 +19185,84 @@
                                     "description": "Reference to a session: `catalogue:<record id>` or `user:<UUID>`."
                                   },
                                   "description": "Chronograph sessions read on the Measurements tab. Each names its strings' load and what they vary."
+                                },
+                                "snapshots": {
+                                  "maxItems": 50,
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "session": {
+                                        "type": "string",
+                                        "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                        "description": "The session the snapshot belongs to: one of `Load.sessions`."
+                                      },
+                                      "powderLot": {
+                                        "description": "Powder lot of the load at the session.",
+                                        "type": "string",
+                                        "minLength": 1
+                                      },
+                                      "primerLot": {
+                                        "description": "Primer lot of the load at the session.",
+                                        "type": "string",
+                                        "minLength": 1
+                                      },
+                                      "caseLot": {
+                                        "description": "Case lot of the load at the session.",
+                                        "type": "string",
+                                        "minLength": 1
+                                      },
+                                      "seating": {
+                                        "type": "object",
+                                        "properties": {
+                                          "by": {
+                                            "type": "string",
+                                            "enum": ["overallLength", "baseToOgive"],
+                                            "description": "The length the bullet was seated by: cartridge overall length or base to ogive."
+                                          },
+                                          "value": {
+                                            "type": "object",
+                                            "properties": {
+                                              "value": {
+                                                "type": "number",
+                                                "exclusiveMinimum": 0,
+                                                "description": "In mm."
+                                              },
+                                              "raw": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "description": "The value as written in the source, when it differed."
+                                              }
+                                            },
+                                            "required": ["value"],
+                                            "unit": "mm",
+                                            "description": "That length."
+                                          }
+                                        },
+                                        "required": ["by", "value"],
+                                        "description": "The seating of the load at the session."
+                                      },
+                                      "roundCount": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "maximum": 9007199254740991,
+                                        "description": "Rounds fired through the firearm at the session."
+                                      },
+                                      "dismissed": {
+                                        "maxItems": 10,
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string",
+                                          "minLength": 1,
+                                          "maxLength": 40
+                                        },
+                                        "description": "Ids of the notes on this session that the user dismissed."
+                                      }
+                                    },
+                                    "required": ["session"],
+                                    "additionalProperties": false
+                                  },
+                                  "description": "What the load was at each of its sessions, at most one per session of `sessions`."
                                 },
                                 "provenance": {
                                   "type": "object",
@@ -18195,6 +19588,12 @@
                                   "minimum": 0,
                                   "maximum": 9007199254740991,
                                   "description": "Rounds fired through the barrel."
+                                },
+                                "noteAtRoundCount": {
+                                  "type": "integer",
+                                  "exclusiveMinimum": 0,
+                                  "maximum": 9007199254740991,
+                                  "description": "Round count the user set: a saved load shot from this firearm gets a note when a session passes it."
                                 },
                                 "notes": {
                                   "type": "string",
@@ -19737,6 +21136,379 @@
                               },
                               "required": ["rings", "events"],
                               "description": "A target face of the face designer."
+                            }
+                          },
+                          "required": ["kind", "id", "name", "saved", "data"]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "const": "case",
+                              "description": "Kind of the record: `case`."
+                            },
+                            "id": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                              "description": "Id of the record in the browser library: a UUID."
+                            },
+                            "name": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 200,
+                              "description": "Name of the record. Save names the file after it."
+                            },
+                            "saved": {
+                              "type": "string",
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                              "description": "Time of the last save, ISO 8601 in UTC."
+                            },
+                            "data": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                                  "description": "Id of a catalogue case, the file name without `.json`."
+                                },
+                                "origin": {
+                                  "type": "string",
+                                  "enum": ["catalogue", "user", "shared"],
+                                  "description": "Where the record lives: the git catalogue, this browser, or a received file."
+                                },
+                                "name": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "description": "Name of the product as the manufacturer prints it."
+                                },
+                                "manufacturer": {
+                                  "type": "string",
+                                  "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                  "description": "The manufacturer of the case. Required of a catalogue case."
+                                },
+                                "cartridge": {
+                                  "type": "string",
+                                  "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                  "description": "Reference to a cartridge: `catalogue:<record id>` or `user:<UUID>`."
+                                },
+                                "basedOn": {
+                                  "type": "string",
+                                  "allOf": [
+                                    {
+                                      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$"
+                                    },
+                                    {
+                                      "pattern": "^catalogue:"
+                                    }
+                                  ],
+                                  "description": "The catalogue case product a user case group starts from; its fields stay the record of the product."
+                                },
+                                "productNumber": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "description": "Product number."
+                                },
+                                "headstamp": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "description": "Marking on the case head as the source states it."
+                                },
+                                "material": {
+                                  "type": "string",
+                                  "enum": [
+                                    "brass",
+                                    "nickel-plated-brass",
+                                    "lacquered-steel",
+                                    "polymer-coated-steel",
+                                    "aluminium"
+                                  ],
+                                  "description": "Wall material of the case."
+                                },
+                                "primerPocket": {
+                                  "type": "object",
+                                  "properties": {
+                                    "type": {
+                                      "type": "string",
+                                      "enum": ["boxer", "berdan"],
+                                      "description": "Boxer (one central flash hole) or Berdan (the anvil is in the case)."
+                                    },
+                                    "size": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "description": "Pocket size as the source states it, for example `large rifle` or `5.5 mm`."
+                                    }
+                                  },
+                                  "required": ["type"],
+                                  "additionalProperties": false,
+                                  "description": "The primer pocket: its type and size."
+                                },
+                                "flashHole": {
+                                  "type": "object",
+                                  "properties": {
+                                    "value": {
+                                      "type": "number",
+                                      "exclusiveMinimum": 0,
+                                      "description": "In mm."
+                                    },
+                                    "raw": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "description": "The value as written in the source, when it differed."
+                                    }
+                                  },
+                                  "required": ["value"],
+                                  "unit": "mm",
+                                  "description": "Diameter of the flash hole (of each hole in a Berdan pocket)."
+                                },
+                                "mass": {
+                                  "type": "object",
+                                  "properties": {
+                                    "value": {
+                                      "type": "number",
+                                      "exclusiveMinimum": 0,
+                                      "description": "In g."
+                                    },
+                                    "raw": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "description": "The value as written in the source, when it differed."
+                                    }
+                                  },
+                                  "required": ["value"],
+                                  "unit": "g",
+                                  "description": "Mass of the empty case."
+                                },
+                                "waterCapacity": {
+                                  "type": "object",
+                                  "properties": {
+                                    "value": {
+                                      "type": "number",
+                                      "exclusiveMinimum": 0,
+                                      "description": "In g."
+                                    },
+                                    "raw": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "description": "The value as written in the source, when it differed."
+                                    }
+                                  },
+                                  "required": ["value"],
+                                  "unit": "g",
+                                  "description": "Mass of water filling the case to the mouth, as the manufacturer states it."
+                                },
+                                "annealed": {
+                                  "type": "boolean",
+                                  "description": "Whether the case is delivered annealed."
+                                },
+                                "capacity": {
+                                  "type": "string",
+                                  "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                  "description": "The case capacity record that holds the water capacity the user measured on these cases."
+                                },
+                                "numberOfFirings": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 9007199254740991,
+                                  "description": "Measured: times the cases were fired."
+                                },
+                                "trimLength": {
+                                  "type": "object",
+                                  "properties": {
+                                    "value": {
+                                      "type": "number",
+                                      "exclusiveMinimum": 0,
+                                      "description": "In mm."
+                                    },
+                                    "raw": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "description": "The value as written in the source, when it differed."
+                                    }
+                                  },
+                                  "required": ["value"],
+                                  "unit": "mm",
+                                  "description": "Measured: the length the cases are trimmed to."
+                                },
+                                "neckWall": {
+                                  "type": "object",
+                                  "properties": {
+                                    "value": {
+                                      "type": "number",
+                                      "exclusiveMinimum": 0,
+                                      "description": "In mm."
+                                    },
+                                    "raw": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "description": "The value as written in the source, when it differed."
+                                    }
+                                  },
+                                  "required": ["value"],
+                                  "unit": "mm",
+                                  "description": "Measured: wall thickness of the case neck."
+                                },
+                                "casesMeasured": {
+                                  "type": "integer",
+                                  "exclusiveMinimum": 0,
+                                  "maximum": 9007199254740991,
+                                  "description": "Measured: the number of cases the measured values come from."
+                                },
+                                "spread": {
+                                  "type": "object",
+                                  "properties": {
+                                    "value": {
+                                      "type": "number",
+                                      "minimum": 0,
+                                      "description": "In g."
+                                    },
+                                    "raw": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "description": "The value as written in the source, when it differed."
+                                    }
+                                  },
+                                  "required": ["value"],
+                                  "unit": "g",
+                                  "description": "Measured: spread (standard deviation) of the water capacity over the cases measured."
+                                },
+                                "note": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "description": "Notes on the product."
+                                },
+                                "provenance": {
+                                  "type": "object",
+                                  "properties": {
+                                    "kind": {
+                                      "type": "string",
+                                      "enum": [
+                                        "published",
+                                        "measured",
+                                        "derived",
+                                        "fitted",
+                                        "computed"
+                                      ],
+                                      "description": "How the values came about."
+                                    },
+                                    "sources": {
+                                      "minItems": 1,
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "title": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "description": "Title of the source: the document, or the site and table."
+                                          },
+                                          "publisher": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "description": "Who issued the data: a maker, a standards body or the authors."
+                                          },
+                                          "edition": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "description": "Edition, print or date as the document states it."
+                                          },
+                                          "page": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "description": "Page or section of the document."
+                                          },
+                                          "url": {
+                                            "type": "string",
+                                            "format": "uri",
+                                            "description": "An http or https URL of the source."
+                                          },
+                                          "retrieved": {
+                                            "type": "string",
+                                            "format": "date",
+                                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                            "description": "Date the source was retrieved, ISO 8601."
+                                          },
+                                          "sha256": {
+                                            "type": "string",
+                                            "pattern": "^[0-9a-f]{64}$",
+                                            "description": "SHA-256 of the retrieved file, 64 lowercase hex digits."
+                                          },
+                                          "fields": {
+                                            "minItems": 1,
+                                            "type": "array",
+                                            "items": {
+                                              "type": "string",
+                                              "minLength": 1
+                                            },
+                                            "description": "Dot paths of the record fields this source supports. Absent: the whole record."
+                                          },
+                                          "kind": {
+                                            "type": "string",
+                                            "enum": [
+                                              "published",
+                                              "measured",
+                                              "derived",
+                                              "fitted",
+                                              "computed"
+                                            ],
+                                            "description": "Kind of this source values when it differs from the provenance kind of the record."
+                                          },
+                                          "license": {
+                                            "type": "string",
+                                            "pattern": "^(LicenseRef-)?[A-Za-z0-9.+-]+$",
+                                            "description": "SPDX id of the license the data is used under, or `LicenseRef-<name>` for the publisher own terms or a written permission described in `terms`."
+                                          },
+                                          "terms": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "description": "URL or note of the publisher terms or permission where no SPDX license covers the use. Text starting with http:// or https:// is a link."
+                                          },
+                                          "origin": {
+                                            "type": "string",
+                                            "enum": ["manufacturer", "public", "community"],
+                                            "description": "Who stands behind the source: manufacturer, public or community."
+                                          },
+                                          "run": {
+                                            "type": "object",
+                                            "properties": {
+                                              "version": {
+                                                "type": "string",
+                                                "pattern": "^[0-9a-f]{16}$",
+                                                "description": "Model version id the report names."
+                                              },
+                                              "report": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "description": "Report of the evaluation of the fit."
+                                              }
+                                            },
+                                            "required": ["version", "report"],
+                                            "description": "The fit run behind a `fitted` source."
+                                          },
+                                          "note": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "description": "Note on the source."
+                                          }
+                                        },
+                                        "required": ["title"]
+                                      },
+                                      "description": "The sources of the values, at least one."
+                                    },
+                                    "note": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "description": "Note on the provenance."
+                                    }
+                                  },
+                                  "required": ["kind", "sources"],
+                                  "description": "Where the values come from. Required for a catalogue case."
+                                }
+                              },
+                              "required": ["origin", "cartridge", "material"],
+                              "additionalProperties": false,
+                              "description": "A group of cases of the user with their measured values."
                             }
                           },
                           "required": ["kind", "id", "name", "saved", "data"]

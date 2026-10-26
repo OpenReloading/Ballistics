@@ -91,8 +91,9 @@ const operationId = (method: string, url: string) =>
 const tags = [
   {
     name: 'Records',
-    description: 'Cartridges with their C.I.P. sheet values, manufacturers, powders and bullets.',
-    segments: ['cartridges', 'manufacturers', 'powders', 'bullets'],
+    description:
+      'Cartridges with their C.I.P. sheet values, manufacturers, powders, bullets and cartridge cases.',
+    segments: ['cartridges', 'manufacturers', 'powders', 'bullets', 'cases'],
   },
   {
     name: 'Competition',

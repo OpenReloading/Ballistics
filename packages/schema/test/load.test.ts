@@ -93,12 +93,17 @@ describe('Load', () => {
       expectIssueAt(load, { ...catalogueLoad, [k]: undefined }, k)
   })
 
+  it('lets a user load name a user powder and refuses a plain id', () => {
+    expect(load.safeParse({ ...userLoad, powder: `user:${uuid}` }).success).toBe(true)
+    expect(load.safeParse({ ...userLoad, powder: 'example-a-fast' }).success).toBe(false)
+  })
+
   it('names records only: a user record is no catalogue record, a description is measured data', () => {
     expectIssueAt(load, { ...catalogueLoad, bullet: `user:${uuid}` }, 'bullet')
     expectIssueAt(load, { ...catalogueLoad, powder: `user:${uuid}` }, 'powder')
     const description = {
-      bullet: { manufacturerName: 'Maker', model: 'FMJ', bulletMass: { value: 10 } },
-      powder: { manufacturerName: 'Maker', name: 'Fast' },
+      bullet: { manufacturer: 'catalogue:maker', model: 'FMJ', bulletMass: { value: 10 } },
+      powder: { manufacturer: 'catalogue:maker', name: 'Fast' },
     }
     expectIssueAt(load, { ...catalogueLoad, ...description }, 'bullet')
     expectIssueAt(load, { ...userLoad, ...description }, 'powder')
@@ -108,6 +113,66 @@ describe('Load', () => {
       provenance: { kind: 'measured', sources: [{ title: 'Own measurement' }] },
     }
     expect(issuePaths(load, measured)).toEqual([])
+  })
+
+  it('names a component maker by a reference, a catalogue load by a catalogue one', () => {
+    const maker = (m: string) => ({ ...catalogueLoad, primer: { manufacturer: m } })
+    expect(issuePaths(load, maker('catalogue:maker'))).toEqual([])
+    expectIssueAt(load, maker(`user:${uuid}`), 'primer.manufacturer')
+    expectIssueAt(
+      load,
+      { ...catalogueLoad, case: { manufacturer: `user:${uuid}` } },
+      'case.manufacturer',
+    )
+    expectIssueAt(load, maker('Maker'), 'primer.manufacturer')
+    expectIssueAt(load, { ...catalogueLoad, primer: { manufacturerName: 'Maker' } }, 'primer')
+    expect(issuePaths(load, { ...userLoad, primer: { manufacturer: `user:${uuid}` } })).toEqual([])
+    const measured = { provenance: { kind: 'measured', sources: [{ title: 'Own measurement' }] } }
+    const legacy = { manufacturer: 'catalogue:maker', manufacturerName: 'Maker' }
+    expectIssueAt(
+      load,
+      {
+        ...catalogueLoad,
+        ...measured,
+        bullet: { ...legacy, model: 'FMJ', bulletMass: { value: 10 } },
+      },
+      'bullet',
+    )
+    expectIssueAt(
+      load,
+      { ...catalogueLoad, ...measured, powder: { ...legacy, name: 'Fast' } },
+      'powder',
+    )
+  })
+
+  it('keeps lots and one snapshot per session of the load, and a firearm round count to note', () => {
+    const session = `user:${other}`
+    const snapshot = {
+      session,
+      powderLot: 'P-1',
+      primerLot: 'R-2',
+      caseLot: 'C-3',
+      seating: { by: 'baseToOgive', value: { value: 54.1 } },
+      roundCount: 120,
+      dismissed: ['seating'],
+    }
+    const withLots = {
+      ...userLoad,
+      powderLot: 'P-1',
+      primer: { lot: 'R-2' },
+      case: { lot: 'C-3' },
+      sessions: [session],
+      snapshots: [snapshot],
+    }
+    expect(load.parse(withLots)).toEqual(withLots)
+    expectIssueAt(
+      load,
+      { ...withLots, snapshots: [{ ...snapshot, session: `user:${uuid}` }] },
+      'snapshots',
+    )
+    expectIssueAt(load, { ...withLots, snapshots: [snapshot, snapshot] }, 'snapshots')
+    expectIssueAt(load, { ...withLots, snapshots: [{ ...snapshot, roundCount: -1 }] }, 'snapshots')
+    expectIssueAt(load, { ...withLots, snapshots: [{ ...snapshot, bullet: 'x' }] }, 'snapshots')
   })
 
   it('keeps the ladder: counts, steps and directions', () => {
@@ -154,6 +219,15 @@ describe('Load', () => {
       load.safeParse({ ...catalogueLoad, capacity: 'catalogue:example-capacity' }).success,
     ).toBe(true)
     expectIssueAt(load, { ...catalogueLoad, capacity: `user:${uuid}` }, 'capacity')
+  })
+
+  it('names a case record by a reference: a user load may name a case group of the user', () => {
+    const record = 'catalogue:example-308-win-brass'
+    expect(load.parse({ ...userLoad, case: { firingCount: 2, record } }).case?.record).toBe(record)
+    expect(issuePaths(load, { ...catalogueLoad, case: { record } })).toEqual([])
+    expect(load.safeParse({ ...userLoad, case: { record: `user:${uuid}` } }).success).toBe(true)
+    expectIssueAt(load, { ...catalogueLoad, case: { record: `user:${uuid}` } }, 'case.record')
+    expectIssueAt(load, { ...userLoad, case: { record: 'example-308-win-brass' } }, 'case.record')
   })
 
   it('names its sessions by reference', () => {

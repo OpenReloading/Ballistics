@@ -7,17 +7,19 @@ import dynamic from 'next/dynamic'
 import { memo, type RefObject, useEffect, useMemo, useRef, useState } from 'react'
 import { vivacityUnit } from '../lib/burn-rate.ts'
 import { toCsv } from '../lib/csv.ts'
+import { powderDesignNote } from '../lib/powder-designer.ts'
 import { controlSize } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { resultTabsFit } from '../lib/workbench.ts'
 import { BarrelLength } from './barrel-length.tsx'
 import { LadderTarget } from './ladder-target.tsx'
 import { LazyInteriorChart } from './lazy-chart.tsx'
+import { LoadLots, SessionNotes } from './load-notes.tsx'
 import { LotPanel } from './lot-rows.tsx'
 import { NavIcon } from './nav-icons.tsx'
 import { PowderCompare } from './powder-compare.tsx'
 import { chartCopy } from './print-report.tsx'
-import { ErrorNote, Loading } from './states.tsx'
+import { ErrorNote, Loading, Message } from './states.tsx'
 import { TrajectoryForm } from './trajectory-form.tsx'
 import { useInputEcho, useResult } from './workbench-context.ts'
 import { FigureTab } from './workbench-figure.tsx'
@@ -28,6 +30,7 @@ import {
   type ShownStep,
   singleCharge,
   stripFigureOf,
+  volumeNote,
   warningsLine,
 } from './workbench-outcome.ts'
 import {
@@ -464,7 +467,7 @@ function ResultsHead({
   )
 }
 
-/** What the run took from the user's designs instead of a catalogue record. */
+/** What the run took from the user's designs instead of a catalogue record, and the volume note. */
 function DesignNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> | undefined }) {
   return (
     <>
@@ -473,10 +476,16 @@ function DesignNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> | undefined 
           Case values from the user design {ok.cartridgeDesign}, not a catalogue record.
         </p>
       )}
+      {ok?.powderDesign && <p className="note user-design">{powderDesignNote(ok.powderDesign)}</p>}
       {ok?.design && (
         <p className="note user-design">
           Computed with the bullet mass of the user design {ok.design}, not a catalogue record.
         </p>
+      )}
+      {ok && !ok.volumeMeasured && (
+        <Message severity="info" title={volumeNote.title} compact>
+          {volumeNote.text}
+        </Message>
       )}
     </>
   )
@@ -582,6 +591,12 @@ function ResultPanels({ short }: { short: boolean }) {
       </Tabs.Panel>
       <Tabs.Panel value="notes">
         {heading('notes')}
+        <LoadLots />
+        <p className="note">
+          Each session is compared with the one before it. A note shows what differs and where the
+          values come from; it says nothing about whether a load is acceptable.
+        </p>
+        <SessionNotes />
         <Textarea
           label="Notes"
           description="Saved with the load file (File, Save). Not in copied links."

@@ -1,7 +1,8 @@
 import { type LadderFlatSpots, ladderFlatSpots } from '@open-reloading/core'
 import type { ChronoImport } from '@open-reloading/importers'
 import { fromSi, type SessionRecord, toSi } from '@open-reloading/schema'
-import { type Shot, type StringStats, stringStats } from './chrono.ts'
+import type { Shot } from './chrono.ts'
+import { type StringStats, stringStats } from './string-stats.ts'
 
 type SessionString = SessionRecord['data']['strings'][number]
 

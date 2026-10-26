@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { catalogueRef, recordId, ref } from './ids.ts'
+import { recordId, ref } from './ids.ts'
 import { type Provenance, provenance } from './provenance.ts'
 import { text } from './shared.ts'
 import { type QuantityKind, quantity, units } from './units.ts'
@@ -117,20 +117,53 @@ export const loadAnalysis = z.object({
 })
 
 const component = {
-  manufacturerName: z.string().min(1).describe('Manufacturer as the label names it.'),
+  manufacturer: ref('manufacturer').describe('Manufacturer record of the component.'),
   lot: z.string().min(1).describe('Lot number as printed on the package.').optional(),
 }
 
 const bulletDescription = z
-  .object({
+  .strictObject({
     ...component,
     model: z.string().min(1).describe('Model name of the bullet.'),
     bulletMass: quantity('mass').describe('Mass of the bullet.'),
   })
   .describe('The bullet as the publication describes it, where no record exists.')
 const powderDescription = z
-  .object({ ...component, name: z.string().min(1).describe('Product name of the powder.') })
+  .strictObject({ ...component, name: z.string().min(1).describe('Product name of the powder.') })
   .describe('The powder as the publication describes it, where no record exists.')
+
+/**
+ * What a load was when a chronograph session was attached to it, kept for the notes on a saved
+ * load: the lots, the seating, the firearm's round count and the notes the user dismissed.
+ * Inferred type: {@link SessionSnapshot}.
+ */
+export const sessionSnapshot = z.strictObject({
+  session: ref('session').describe('The session the snapshot belongs to: one of `Load.sessions`.'),
+  powderLot: component.lot.describe('Powder lot of the load at the session.').optional(),
+  primerLot: component.lot.describe('Primer lot of the load at the session.').optional(),
+  caseLot: component.lot.describe('Case lot of the load at the session.').optional(),
+  seating: z
+    .object({
+      by: z
+        .enum(['overallLength', 'baseToOgive'])
+        .describe(
+          'The length the bullet was seated by: cartridge overall length or base to ogive.',
+        ),
+      value: quantity('length', z.number().positive()).describe('That length.'),
+    })
+    .describe('The seating of the load at the session.')
+    .optional(),
+  roundCount: z
+    .int()
+    .nonnegative()
+    .describe('Rounds fired through the firearm at the session.')
+    .optional(),
+  dismissed: z
+    .array(z.string().min(1).max(40))
+    .max(10)
+    .describe('Ids of the notes on this session that the user dismissed.')
+    .optional(),
+})
 
 const loadShape = z.object({
   id: recordId.describe('Id of a catalogue load, the file name without `.json`.').optional(),
@@ -148,24 +181,40 @@ const loadShape = z.object({
     .describe('The bullet: a reference, or a description in a measured catalogue load.')
     .optional(),
   powder: z
-    .union([catalogueRef('powder'), powderDescription])
-    .describe('The powder: a catalogue reference, or a description in a measured catalogue load.')
+    .union([ref('powder'), powderDescription])
+    .describe(
+      'The powder: a reference, or a description in a measured catalogue load. A catalogue load names a catalogue powder.',
+    )
+    .optional(),
+  powderLot: component.lot
+    .describe('Lot number of the powder, as printed on the package.')
     .optional(),
   charge: quantity('mass', z.number().positive()).describe('Powder mass of one round.').optional(),
   capacity: ref('case capacity')
     .describe('The water capacity of the case: a catalogue capacity, or one the user measured.')
     .optional(),
   primer: z
-    .object({ ...component, model: z.string().min(1).describe('Model name of the primer.') })
+    .strictObject({
+      manufacturer: component.manufacturer.optional(),
+      lot: component.lot,
+      model: z.string().min(1).describe('Model name of the primer.').optional(),
+    })
     .describe('The primer as described.')
     .optional(),
   case: z
     .strictObject({
-      manufacturerName: component.manufacturerName.optional(),
+      manufacturer: component.manufacturer.optional(),
       lot: component.lot,
       firingCount: z.int().min(0).describe('Times the case was fired before this load.').optional(),
+      record: ref('case')
+        .describe(
+          'The case: a catalogue product, whose stated water capacity is the default of `capacity`, or a case group of the user.',
+        )
+        .optional(),
     })
-    .describe('The case as described. Its water capacity is the `capacity` reference.')
+    .describe(
+      'The case as described. Its measured water capacity is the `capacity` reference, which takes precedence over the stated capacity of `record`.',
+    )
     .optional(),
   seating: z
     .object({
@@ -187,6 +236,11 @@ const loadShape = z.object({
       "Chronograph sessions read on the Measurements tab. Each names its strings' load and what they vary.",
     )
     .optional(),
+  snapshots: z
+    .array(sessionSnapshot)
+    .max(50)
+    .describe('What the load was at each of its sessions, at most one per session of `sessions`.')
+    .optional(),
   provenance: provenance
     .describe('Where the values come from. Required for a catalogue load.')
     .optional(),
@@ -203,6 +257,20 @@ const checkCatalogueFields = (l: LoadFields, issue: LoadIssue) => {
     if (l[k] === undefined) issue([k], `A catalogue load needs a ${k}`)
   if (l.capacity !== undefined && !l.capacity.startsWith('catalogue:'))
     issue(['capacity'], 'A catalogue load names catalogue records only')
+  if (l.case?.record !== undefined && !l.case.record.startsWith('catalogue:'))
+    issue(['case', 'record'], 'A catalogue load names catalogue records only')
+}
+
+const checkComponentMakers = (l: LoadFields, issue: LoadIssue) => {
+  const makers: [PropertyKey[], string | undefined][] = [
+    [['bullet', 'manufacturer'], typeof l.bullet === 'object' ? l.bullet.manufacturer : undefined],
+    [['powder', 'manufacturer'], typeof l.powder === 'object' ? l.powder.manufacturer : undefined],
+    [['primer', 'manufacturer'], l.primer?.manufacturer],
+    [['case', 'manufacturer'], l.case?.manufacturer],
+  ]
+  for (const [path, maker] of makers)
+    if (maker !== undefined && !maker.startsWith('catalogue:'))
+      issue(path, 'A catalogue load names catalogue records only')
 }
 
 const checkRecordReferences = (l: LoadFields, issue: LoadIssue) => {
@@ -216,6 +284,7 @@ const checkRecordReferences = (l: LoadFields, issue: LoadIssue) => {
     } else if (catalogue && !target.startsWith('catalogue:'))
       issue([k], `A catalogue load names catalogue records only`)
   }
+  if (catalogue) checkComponentMakers(l, issue)
 }
 
 /**
@@ -236,6 +305,12 @@ export const load = loadShape.superRefine((l, ctx) => {
       issue(['sessions', i], 'A catalogue load names catalogue records only')
   })
   checkRecordReferences(l, issue)
+  l.snapshots?.forEach((snapshot, i) => {
+    if (!l.sessions?.includes(snapshot.session))
+      issue(['snapshots', i, 'session'], 'Not a session of this load')
+    else if (l.snapshots?.findIndex((x) => x.session === snapshot.session) !== i)
+      issue(['snapshots', i, 'session'], 'A second snapshot of one session')
+  })
 })
 
 /**
@@ -256,6 +331,8 @@ export interface AnalysisOverrides extends z.infer<typeof analysisOverrides> {}
 export interface LoadAnalysis extends z.infer<typeof loadAnalysis> {}
 /** A cartridge recipe in stored units: references to its records, charge, seating and analysis. */
 export interface Load extends z.infer<typeof load> {}
+/** What a load was at one of its chronograph sessions: lots, seating, round count, dismissed notes. */
+export interface SessionSnapshot extends z.infer<typeof sessionSnapshot> {}
 /** A load of the catalogue: the fields {@link load} requires of one are present. */
 export interface CatalogueLoad extends Load {
   id: string

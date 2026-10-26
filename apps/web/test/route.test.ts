@@ -46,6 +46,10 @@ describe('forwarding route', () => {
       ],
     ],
     [
+      'the case list and a case record for the workbench picker',
+      ['cases?cartridge=308-win&limit=200', 'cases/demo-case-308-brass'],
+    ],
+    [
       'the manufacturer list and record that label powders and bullets',
       ['manufacturers', 'manufacturers/demo-powder'],
     ],

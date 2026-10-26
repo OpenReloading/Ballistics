@@ -10,6 +10,7 @@ export const reportAreas = [
   'Cartridges',
   'Bullets',
   'Powders',
+  'Cases',
   'Targets',
   'Disciplines',
   'Federations',
@@ -41,10 +42,12 @@ const areaRoutes: [string, ReportArea][] = [
   ['/cartridges', 'Cartridges'],
   ['/bullets', 'Bullets'],
   ['/powders', 'Powders'],
+  ['/cases', 'Cases'],
   ['/targets', 'Targets'],
   ['/disciplines', 'Disciplines'],
   ['/federations', 'Federations'],
   ['/firearms', 'Firearms'],
+  ['/my-cases', 'Cases'],
 ]
 
 const under = (route: string, path: string) => route === path || route.startsWith(`${path}/`)
@@ -57,6 +60,7 @@ const recordKinds: Record<string, string> = {
   cartridges: 'cartridge',
   bullets: 'bullet',
   powders: 'powder',
+  cases: 'case',
   targets: 'target face',
   disciplines: 'discipline',
   federations: 'federation',

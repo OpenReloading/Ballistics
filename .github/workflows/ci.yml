@@ -13,11 +13,15 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
-# Tool images of the `docker run` steps below. Dependabot does not read them: bump them by hand, oasdiff and
-# Schemathesis together with .devcontainer/Dockerfile.
+# Tool images of the `docker run` steps below and the typos release (the action is not on the repository's list of
+# allowed actions). Dependabot does not read them: bump them by hand, oasdiff and Schemathesis together with
+# .devcontainer/Dockerfile, lychee together with links.yml, the typos checksum with its version.
 env:
+  TYPOS_VERSION: 1.51.1
+  TYPOS_SHA256: 93c301fd4120ff076e2cc2a6d6a61cab4a4bdb81899287c0938b452e56d1f454
   ACTIONLINT_IMAGE: docker.io/rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
   OASDIFF_IMAGE: docker.io/tufin/oasdiff:v1.33.0@sha256:6263a96dd2ef0726c54e21fea9b8e1607eac4841add0079324b424c1f52b819c
+  LYCHEE_IMAGE: docker.io/lycheeverse/lychee:0.24.2@sha256:e2d19e57cf6ab037026f20b8e449a1f30d9d7f81eef4194763aab2eab20bd28d
   SCHEMATHESIS_IMAGE: docker.io/schemathesis/schemathesis:v4.29.4@sha256:16d21ecba0097fc8a3ca71b8d1db3797d2a057610d808715871216450e63f0a6
 
 jobs:
@@ -129,14 +133,29 @@ jobs:
         run: npm run test:unit -w @open-reloading/e2e
 
   # Fails when a part failed or was cancelled; a skipped part (the plan, the promotion pull request) passes, as the
-  # old single job did when skipped. Stays the name the rulesets require.
+  # old single job did when skipped. Stays the name the rulesets require. It also checks the relative links and
+  # anchors of the Markdown files and the spelling of the tracked text files (typos, which skips `_typos.toml` itself) on every run:
+  # the plan skips `static` for prose that no other check reads, which is where a link or a word breaks. External
+  # links: links.yml.
   check:
     needs: [static, test]
     if: ${{ always() && !(github.event_name == 'pull_request' && github.head_ref == 'develop' && github.base_ref == 'main' && github.event.pull_request.head.repo.full_name == github.repository) }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    permissions: {}
+    permissions:
+      contents: read
     steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Relative links and anchors of the Markdown files (lychee, offline)
+        run: git ls-files '*.md' '*.mdx' | docker run --rm --interactive -v "$PWD:/repo:ro" -w /repo "$LYCHEE_IMAGE" --config lychee.toml --offline --files-from -
+      - name: Spelling of code, comments, docs and UI text (typos)
+        run: |
+          curl --proto "=https" --tlsv1.2 --fail --silent --show-error --location --output "$RUNNER_TEMP/typos.tar.gz" "https://github.com/crate-ci/typos/releases/download/v${TYPOS_VERSION}/typos-v${TYPOS_VERSION}-x86_64-unknown-linux-musl.tar.gz"
+          echo "$TYPOS_SHA256  $RUNNER_TEMP/typos.tar.gz" | sha256sum --check
+          tar --extract --gzip --file "$RUNNER_TEMP/typos.tar.gz" --directory "$RUNNER_TEMP" ./typos
+          "$RUNNER_TEMP/typos"
       - env:
           RESULTS: ${{ needs.static.result }} ${{ needs.test.result }}
         run: |
@@ -289,6 +308,9 @@ jobs:
         with:
           path: apps/web/.next/cache/turbopack
           key: ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'package-lock.json', 'patches/**', 'apps/web/next.config.ts') }}-${{ hashFiles('apps/web/src/**', 'packages/*/src/**') }}
+      - name: JavaScript budget per route
+        if: env.BUILD_WEB == 'true'
+        run: npm run check-weight -w @open-reloading/web
       - run: node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON apps/web/scripts/check-prerender.mts
         if: env.BUILD_WEB == 'true'
         env:

@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { bullet } from './bullet.ts'
 import { caliberClass } from './caliber-class.ts'
 import { cartridge } from './cartridge.ts'
+import { cartridgeCase } from './case.ts'
 import { caseCapacity } from './case-capacity.ts'
 import { chronoSession } from './chrono-session.ts'
 import { discipline, federation, targetMapping } from './federation.ts'
@@ -26,6 +27,7 @@ for (const [name, schema] of Object.entries({
   cartridge,
   powder,
   bullet,
+  case: cartridgeCase,
   'case-capacity': caseCapacity,
   'source-record': sourceRecord,
   'firing-series': firingSeries,

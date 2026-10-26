@@ -2,7 +2,9 @@ import type {
   Bullet,
   CaliberClass,
   Cartridge,
+  CaseMaterial,
   CaseType,
+  CatalogueCase,
   CatalogueCaseCapacity,
   Discipline,
   Federation,
@@ -19,6 +21,7 @@ export type CatalogueKind =
   | 'manufacturer'
   | 'powder'
   | 'bullet'
+  | 'case'
   | 'caseCapacity'
   | 'targetFace'
   | 'federation'
@@ -32,6 +35,8 @@ export interface RecordOfKind {
   manufacturer: Manufacturer
   powder: Powder
   bullet: Bullet
+  /** The record file leaves out `origin`, which every catalogue record has. */
+  case: Omit<CatalogueCase, 'origin'>
   /** The record file leaves out `origin`, which every catalogue record has. */
   caseCapacity: Omit<CatalogueCaseCapacity, 'origin'>
   targetFace: TargetFace
@@ -78,6 +83,11 @@ export interface PowderQuery extends Paging {
 
 /** Query of `Catalogue.bullets`: as {@link PowderQuery}, `cartridge` keeps the bullets that fit that cartridge (`bulletWindow` of core). */
 export interface BulletQuery extends PowderQuery {
+  cartridge?: string | undefined
+}
+
+/** Query of `Catalogue.cases`: as {@link PowderQuery}, `cartridge` keeps the cases of that cartridge (an id). */
+export interface CaseQuery extends PowderQuery {
   cartridge?: string | undefined
 }
 
@@ -137,6 +147,18 @@ export interface BulletItem {
   country?: string
   tipType?: string
   construction?: string
+}
+
+/** A case of the list. `manufacturer` and `cartridge` are record ids; `waterCapacity` (the stated one) and `mass` in g. */
+export interface CaseItem {
+  id: string
+  manufacturer: string
+  cartridge: string
+  name: string
+  productNumber: string
+  material: CaseMaterial
+  waterCapacity?: number
+  mass?: number
 }
 
 /**
@@ -205,7 +227,7 @@ export const catalogueFormat = 1
  * The version of what `derive.ts` computes (list items, sort and search keys, revisions). Raise it
  * with any change to those, so a build made by older code is refused instead of read as current.
  */
-export const deriveVersion = 2
+export const deriveVersion = 3
 
 /** The first fields of the index and of the record file: what built them. */
 export interface CatalogueHeader {
@@ -219,6 +241,7 @@ export interface CatalogueIndex extends CatalogueHeader {
   manufacturers: IndexRow<ManufacturerItem>[]
   powders: IndexRow<PowderItem>[]
   bullets: IndexRow<BulletItem>[]
+  cases: IndexRow<CaseItem>[]
   targetFaces: IndexRow<TargetFaceItem>[]
   federations: IndexRow<FederationItem>[]
   disciplines: IndexRow<DisciplineItem>[]
@@ -241,6 +264,7 @@ export interface CatalogueSource {
   manufacturers: Manufacturer[]
   powders: Powder[]
   bullets: Bullet[]
+  cases: CatalogueCase[]
   capacities: CatalogueCaseCapacity[]
   targetFaces: TargetFace[]
   federations: Federation[]
@@ -268,6 +292,8 @@ export interface Catalogue {
   powders(query?: PowderQuery): CataloguePage<PowderItem>
   /** Bullets by manufacturer name and name, ranked by `q` where set; none for a `cartridge` that is unknown or lacks its C.I.P. G1, F or Z. */
   bullets(query?: BulletQuery): CataloguePage<BulletItem>
+  /** Cases by manufacturer name and name, ranked by `q` where set. */
+  cases(query?: CaseQuery): CataloguePage<CaseItem>
   /** Every target face. */
   targetFaces(): CataloguePage<TargetFaceItem>
   /** Every federation. */

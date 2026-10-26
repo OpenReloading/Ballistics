@@ -1,0 +1,35 @@
+{
+  "id": "demo-case-308-brass",
+  "origin": "catalogue",
+  "name": "308 Win. Brass Demo",
+  "manufacturer": "catalogue:demo-cases",
+  "cartridge": "catalogue:308-win",
+  "productNumber": "C308",
+  "headstamp": "DEMO 308 WIN",
+  "material": "brass",
+  "primerPocket": {
+    "type": "boxer",
+    "size": "large rifle"
+  },
+  "flashHole": {
+    "value": 2
+  },
+  "mass": {
+    "value": 11.4
+  },
+  "waterCapacity": {
+    "value": 3.6
+  },
+  "annealed": false,
+  "provenance": {
+    "kind": "computed",
+    "sources": [
+      {
+        "source": "synthetic-test-data",
+        "kind": "computed",
+        "fields": ["material", "primerPocket", "flashHole", "mass", "waterCapacity", "annealed"],
+        "note": "Invented values for tests and the example; not a real product."
+      }
+    ]
+  }
+}

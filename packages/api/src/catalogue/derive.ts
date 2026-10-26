@@ -4,6 +4,7 @@ import {
   type CaliberClass,
   type Cartridge,
   type CaseType,
+  type CatalogueCase,
   compareKeys,
   type Discipline,
   type Federation,
@@ -18,6 +19,7 @@ import type {
   BulletItem,
   CaliberClassItem,
   CartridgeItem,
+  CaseItem,
   DisciplineItem,
   FederationItem,
   IndexRow,
@@ -183,6 +185,27 @@ export const bulletRow = (b: Bullet, m: Manufacturer): IndexRow<BulletItem> => (
     ...compact({ country: b.country, tipType: b.tip?.type, construction: constructionOf(b) }),
   },
   ...componentKeys(m, b),
+})
+
+/**
+ * The index row of a case of manufacturer `m` for the cartridge with id `cartridge` (the current
+ * ids its references resolve to), searched by the manufacturer with its name or product number.
+ */
+export const caseRow = (
+  c: CatalogueCase,
+  m: Manufacturer,
+  cartridge: string,
+): IndexRow<CaseItem> => ({
+  item: {
+    id: c.id,
+    manufacturer: m.id,
+    cartridge,
+    name: c.name,
+    productNumber: c.productNumber,
+    material: c.material,
+    ...compact({ waterCapacity: c.waterCapacity?.value, mass: c.mass?.value }),
+  },
+  ...componentKeys(m, { name: c.name, aliases: [c.productNumber] }),
 })
 
 /** The distinct defined values of `values`, sorted. */

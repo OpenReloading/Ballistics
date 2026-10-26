@@ -184,6 +184,8 @@ describe('firearm helpers', () => {
       'Zero humidity in configuration Summer, mount 1: must be from 0 to 100 %.',
     )
     expect(problem({ roundCount: 1.5 })).toBe('Round count: must be a whole number.')
+    expect(problem({ noteAtRoundCount: 0 })).toBe('Note at round count: must be greater than 0.')
+    expect(problem({ noteAtRoundCount: 500 })).toBeUndefined()
     expect(problem({ firearmMass: { value: 0 } })).toBe('Mass: must be greater than 0.')
     expect(
       problem({

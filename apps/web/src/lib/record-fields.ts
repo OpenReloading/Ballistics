@@ -1,4 +1,10 @@
-import { type Bullet, type Powder, type QuantityValue, toSi } from '@open-reloading/schema'
+import {
+  type Bullet,
+  type Case,
+  type Powder,
+  type QuantityValue,
+  toSi,
+} from '@open-reloading/schema'
 import { computedBulletRows } from './bullet.ts'
 import {
   degreeText,
@@ -8,6 +14,7 @@ import {
   type Quantity,
   type UnitSystem,
   unitsOf,
+  waterVolume,
   withUnit,
 } from './units.ts'
 
@@ -440,6 +447,8 @@ export type StripItem = {
     | 'base'
     | 'density'
     | 'bulkDensity'
+    | 'capacity'
+    | 'material'
     | 'federation'
     | 'distance'
     | 'rings'
@@ -533,5 +542,55 @@ export function powderStrip(
           },
         ]
       : []),
+  ]
+}
+
+/** The stated water capacity of a case as a row: the mass of water in g, shown as the volume it fills. */
+const capacityRow = (c: Pick<Case, 'waterCapacity'>): FieldRow[] =>
+  c.waterCapacity
+    ? [
+        {
+          label: 'Water capacity',
+          value: { quantity: 'capacity', si: waterVolume(c.waterCapacity.value) },
+          ...(c.waterCapacity.raw && { printed: c.waterCapacity.raw }),
+        },
+      ]
+    : []
+
+/**
+ * The case strip: manufacturer (`manufacturerName`), material, empty mass and the stated water
+ * capacity; only what the record has.
+ */
+export function caseStrip(c: Case, manufacturerName?: string): StripItem[] {
+  const item = (icon: StripItem['icon'], label: string, rows: FieldRow[]): StripItem[] =>
+    rows[0] ? [{ icon, label, row: rows[0] }] : []
+  return [
+    ...item('manufacturer', 'Manufacturer', text('Manufacturer', manufacturerName || undefined)),
+    ...item('material', 'Material', text('Material', titleFromKebab(c.material))),
+    ...item('mass', 'Mass', stored('mass', 'g')('Mass', c.mass)),
+    ...item('capacity', 'Water capacity', capacityRow(c)),
+  ]
+}
+
+/** `Boxer, large rifle`: the primer pocket's type and size. */
+const pocketText = (p: NonNullable<Case['primerPocket']>) =>
+  [titleFromKebab(p.type), p.size].filter(Boolean).join(', ')
+
+/**
+ * The groups of a case page's Properties table: product number, headstamp, primer pocket, flash
+ * hole and whether it is annealed. Manufacturer, material, mass and
+ * capacity are the cards of `caseStrip`.
+ */
+export function caseRowGroups(c: Case): FieldGroup[] {
+  return [
+    {
+      rows: [
+        ...text('Product number', c.productNumber),
+        ...text('Headstamp', c.headstamp),
+        ...text('Primer pocket', c.primerPocket && pocketText(c.primerPocket)),
+        ...length('Flash hole diameter', c.flashHole),
+        ...text('Annealed', c.annealed === undefined ? undefined : c.annealed ? 'Yes' : 'No'),
+      ],
+    },
   ]
 }

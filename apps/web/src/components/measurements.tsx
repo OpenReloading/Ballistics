@@ -11,6 +11,7 @@ import {
   chargeRows,
   type SimulatedStep,
   sessionOf,
+  sessionRef,
   simulatedCurve,
   stringCharge,
   withCharge,
@@ -22,6 +23,7 @@ import { formatNumber, type UnitSystem, withUnit } from '../lib/units.ts'
 import { ChronoFileInput } from './chrono-file-input.tsx'
 import { LadderFlatSpots } from './ladder-flat-spots.tsx'
 import { LineChart, useChartScale } from './line-chart.tsx'
+import { SessionNotes } from './load-notes.tsx'
 import { PanelTable } from './scroll-region.tsx'
 import { ErrorNote } from './states.tsx'
 import { useResult } from './workbench-context.ts'
@@ -494,6 +496,7 @@ export function Measurements({
               </div>
             )
           })}
+          <SessionNotes session={sessionRef(s.id)} />
           <Button
             variant="subtle"
             size={controlSize.row.button}

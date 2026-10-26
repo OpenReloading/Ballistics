@@ -21,6 +21,8 @@ describe('buildOpenApi', () => {
         'GET /v1/caliber-classes/{id}',
         'GET /v1/cartridges',
         'GET /v1/cartridges/{id}',
+        'GET /v1/cases',
+        'GET /v1/cases/{id}',
         'GET /v1/disciplines',
         'GET /v1/disciplines/{id}',
         'GET /v1/exterior/stability',

@@ -109,6 +109,22 @@ const firearmRecord = {
   },
 } as const
 
+const caseUuid = '5d6e7f80-1a2b-4c3d-8e4f-5a6b7c8d9e0f'
+const caseRecord = {
+  kind: 'case',
+  id: caseUuid,
+  name: 'Match brass, lot 3',
+  saved,
+  data: {
+    origin: 'user',
+    name: 'Match brass, lot 3',
+    cartridge: 'catalogue:308-win',
+    material: 'brass',
+    numberOfFirings: 3,
+    trimLength: { value: 51.1 },
+  },
+} as const
+
 const sheetRecord = {
   kind: 'targetSheet',
   id: 't1',
@@ -148,6 +164,25 @@ const faceRecord = {
   },
 } as const
 
+const powderId = '5d4c3b2a-1f0e-4d9c-8b7a-6a5f4e3d2c1b'
+const powderRecord = {
+  kind: 'powder',
+  id: powderId,
+  name: 'Draft powder',
+  saved,
+  data: {
+    origin: 'user',
+    provenanceKind: 'fitted',
+    draft: {
+      grainForm: 'extruded',
+      propellantBase: 'double',
+      bulkDensity: { value: 0.9 },
+      composition: [{ name: 'Nitrocellulose', min: 60, max: 100 }, {}],
+      interior: { fitted: ['vivacity'], gamma: 1.24, burnForm: { a: { value: 0.5 } } },
+    },
+  },
+} as const
+
 const file = (records: unknown[], version: unknown = userDataVersion) => ({
   format: userDataFormat,
   version,
@@ -166,9 +201,48 @@ describe('userDataFile', () => {
           firearmRecord,
           sheetRecord,
           faceRecord,
+          powderRecord,
+          caseRecord,
         ]),
       ).success,
     ).toBe(true)
+  })
+
+  it('keeps a case group and its measured fields through a round trip', () => {
+    const json = JSON.parse(JSON.stringify(file([caseRecord])))
+    expect(userDataFile.parse(json).records).toEqual([caseRecord])
+    expect(
+      userRecord.safeParse({ ...caseRecord, data: { ...caseRecord.data, material: 1 } }).success,
+    ).toBe(false)
+  })
+
+  it('takes a powder draft with missing values and keeps it through a round trip', () => {
+    expect(userRecord.parse(powderRecord)).toEqual(powderRecord)
+    const empty = { ...powderRecord, data: { origin: 'user' } }
+    expect(userRecord.parse(empty)).toEqual(empty)
+  })
+
+  it('rejects a powder draft with a value of the wrong type or an unknown kind', () => {
+    const draft = (d: object) => ({ ...powderRecord, data: { ...powderRecord.data, draft: d } })
+    expect(userRecord.safeParse(draft({ grainForm: 'cube' })).error?.issues[0]?.path).toEqual([
+      'data',
+      'draft',
+      'grainForm',
+    ])
+    expect(userRecord.safeParse(draft({ bulkDensity: { value: 'dense' } })).success).toBe(false)
+    const kind = { ...powderRecord, data: { ...powderRecord.data, provenanceKind: 'guessed' } }
+    expect(userRecord.safeParse(kind).success).toBe(false)
+  })
+
+  it('keeps a powder draft whose numbers are out of the finished record bounds', () => {
+    const interior = { gamma: 1, pressureExponent: 0, burnForm: { z1: 0 } }
+    const draft = { ...powderRecord, data: { ...powderRecord.data, draft: { interior } } }
+    expect(userRecord.safeParse(draft).success).toBe(true)
+  })
+
+  it('refuses a powder with an id that is no UUID, and says why', () => {
+    const r = userRecord.safeParse({ ...powderRecord, id: 'old-1' })
+    expect(r.error?.issues[0]).toMatchObject({ path: ['id'], message: designIdProblem })
   })
 
   it('takes a user manufacturer as a name and refuses another origin', () => {
@@ -290,7 +364,7 @@ describe('userDataFile', () => {
 
   it('rejects an unknown kind, a bad date, a non-finite value and an invalid spec value', () => {
     const paths = (r: object) => userRecord.safeParse(r).error?.issues.map((i) => i.path.join('.'))
-    expect(paths({ ...bulletRecord, kind: 'powder' })).toEqual(['kind'])
+    expect(paths({ ...bulletRecord, kind: 'unknown' })).toEqual(['kind'])
     expect(paths({ ...bulletRecord, saved: 'yesterday' })).toEqual(['saved'])
     expect(
       paths({
@@ -546,6 +620,19 @@ describe('userRefFields', () => {
     expect(userRefFields(bullet)).toEqual(['manufacturer'])
   })
 
+  it('names the user references of a case group and of a load that names one', () => {
+    const group = userRecord.parse({
+      ...caseRecord,
+      data: { ...caseRecord.data, cartridge: `user:${other}`, capacity: `user:${designUuid}` },
+    })
+    expect(userRefFields(group)).toEqual(['cartridge', 'capacity'])
+    const load = userRecord.parse({
+      ...loadRecord,
+      data: { ...loadRecord.data, case: { lot: 'A', record: `user:${caseUuid}` } },
+    })
+    expect(userRefFields(load)).toEqual(['case.record'])
+  })
+
   it('names none for a record that refers to the catalogue alone', () => {
     expect(userRefFields(userRecord.parse(loadRecord))).toEqual([])
     expect(userRefFields(userRecord.parse(bulletRecord))).toEqual([])
@@ -597,6 +684,24 @@ describe('checkUserRefs', () => {
     expect(checkUserRefs([own as UserRecord])).toEqual([])
   })
 
+  it('reports a load whose primer or case names a user manufacturer nobody answers', () => {
+    const base = userRecord.parse(loadRecord)
+    const withMakers = {
+      ...base,
+      data: {
+        ...base.data,
+        primer: { manufacturer: `user:${uuid}` },
+        case: { manufacturer: `user:${uuid}` },
+      },
+    } as UserRecord
+    expect(checkUserRefs([withMakers]).map((d) => d.field)).toEqual([
+      'primer.manufacturer',
+      'case.manufacturer',
+    ])
+    expect(userRefFields(withMakers)).toEqual(['primer.manufacturer', 'case.manufacturer'])
+    expect(checkUserRefs([withMakers, userRecord.parse(manufacturerRecord)])).toEqual([])
+  })
+
   it('reports a load whose cartridge or bullet is a user reference nobody answers', () => {
     const withRefs = (cartridge: string, bullet: string) =>
       userRecord.parse({ ...loadRecord, data: { ...loadRecord.data, cartridge, bullet } })
@@ -612,6 +717,18 @@ describe('checkUserRefs', () => {
     expect(
       checkUserRefs([withRefs('catalogue:308-win', `user:${uuid}`), own[0] as never]),
     ).toHaveLength(1)
+  })
+
+  it('reports a load whose powder is a user reference nobody answers', () => {
+    const withPowder = (powder: string) =>
+      userRecord.parse({ ...loadRecord, data: { ...loadRecord.data, powder } })
+    const own = userRecord.parse(powderRecord)
+    expect(checkUserRefs([withPowder(`user:${powderId}`), own])).toEqual([])
+    expect(checkUserRefs([withPowder(`user:${powderId}`)])).toEqual([
+      { record: 'w4', kind: 'load', field: 'powder', target: `user:${powderId}` },
+    ])
+    expect(checkUserRefs([withPowder('catalogue:test-powder')])).toEqual([])
+    expect(userRefFields(withPowder(`user:${powderId}`))).toContain('powder')
   })
 
   it('opens a load that names its cartridge and bullet by reference and refuses a plain id', () => {
@@ -643,6 +760,20 @@ describe('checkUserRefs', () => {
     expect(
       checkUserRefs([{ ...userRecord.parse(cartridgeRecord), id: uuid }, capacity]),
     ).toHaveLength(1)
+  })
+
+  it('reports a case group whose capacity record nobody answers, and a load whose case group is missing', () => {
+    const group = userRecord.parse({
+      ...caseRecord,
+      data: { ...caseRecord.data, capacity: `user:${other}` },
+    })
+    expect(checkUserRefs([group]).map((d) => [d.kind, d.field])).toEqual([['case', 'capacity']])
+    const load = userRecord.parse({
+      ...loadRecord,
+      data: { ...loadRecord.data, case: { lot: 'A', record: `user:${caseUuid}` } },
+    })
+    expect(checkUserRefs([load]).map((d) => d.field)).toEqual(['case.record'])
+    expect(checkUserRefs([load, userRecord.parse(caseRecord)])).toEqual([])
   })
 
   it('reports a target sheet whose load is missing', () => {

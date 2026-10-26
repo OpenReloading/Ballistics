@@ -3,8 +3,10 @@ export const listTitles = {
   bullets: 'Bullets',
   cartridges: 'Cartridges',
   powders: 'Powders',
+  cases: 'Cases',
   targets: 'Targets',
   disciplines: 'Disciplines',
   federations: 'Federations',
   firearms: 'Firearms',
+  myCases: 'My cases',
 }

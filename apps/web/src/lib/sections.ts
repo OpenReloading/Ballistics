@@ -43,6 +43,12 @@ export const sections = [
         description: 'Propellants and their recorded properties, each with its sources.',
       },
       {
+        href: '/cases',
+        label: 'Cases',
+        description:
+          'Cartridge case products with material, primer pocket and stated water capacity, each with its sources.',
+      },
+      {
         href: '/targets',
         label: 'Targets',
         description:
@@ -60,6 +66,12 @@ export const sections = [
         description:
           'Your firearms with their optics and zeros, kept in this browser and in files; they fill the rifle fields of the workbench.',
       },
+      {
+        href: '/my-cases',
+        label: 'My cases',
+        description:
+          'Your groups of cases with their measured water capacity, trim length and neck wall, kept in this browser and in files; the workbench picks them.',
+      },
     ],
   },
 ] as const
@@ -71,6 +83,7 @@ export const toolRoutes = [
   '/bullets/designer',
   '/cartridges/designer',
   '/targets/designer',
+  '/powders/designer',
 ]
 
 export const isToolRoute = (route: string) => toolRoutes.includes(route)

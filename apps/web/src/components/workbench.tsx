@@ -24,6 +24,7 @@ import { activeClick } from '../lib/firearm.ts'
 import { interiorFields } from '../lib/interior-input.ts'
 import { shortName } from '../lib/load-tabs.ts'
 import { sampler } from '../lib/playback.ts'
+import { powderDesignNote } from '../lib/powder-designer.ts'
 import { inputsQuery, withRecordValues, withTab } from '../lib/query.ts'
 import { ladderTitle, seatingLengthName } from '../lib/seating-ladder.ts'
 import { shortcutAriaKeys, shortcutLabel, shortcuts } from '../lib/shortcuts.ts'
@@ -62,6 +63,7 @@ import {
   shownSteps,
   singleCharge,
   stepFlag,
+  volumeNoteText,
   warningLines,
 } from './workbench-outcome.ts'
 import { RangeView } from './workbench-range.tsx'
@@ -179,7 +181,7 @@ function ladderPrintText(load: Load) {
 
 function powderPrintRows(load: Load, runTemperature: string | undefined): PrintRows {
   return [
-    ['Powder', load.powderLabel],
+    ['Powder', load.powderDesign ? `${load.powderLabel} (user design)` : load.powderLabel],
     printRow(load, 'charge'),
     ['Powder temperature', runTemperature],
     ['Ladder', ladderPrintText(load)],
@@ -768,11 +770,17 @@ function PrintViews({
     : ''
   const seatingRows = seatingRowsOf(ok, system)
   const runTemperature = ok && withUnit('temperature', system, ok.load.propellantTemperature)
-  const approximate = approximateNote(ok)
+  const approximate =
+    [approximateNote(ok), volumeNoteText(ok)].filter(Boolean).join(' ') || undefined
   /** Said on every print and result that took values from a user cartridge design. */
-  const fromDesign = ok?.cartridgeDesign
-    ? `Case values from the user design ${ok.cartridgeDesign}, not a catalogue record.`
-    : undefined
+  const fromDesign =
+    [
+      ok?.cartridgeDesign &&
+        `Case values from the user design ${ok.cartridgeDesign}, not a catalogue record.`,
+      ok?.powderDesign && powderDesignNote(ok.powderDesign),
+    ]
+      .filter(Boolean)
+      .join(' ') || undefined
   const printGroups = printGroupsOf(load, ok, seatingRows, runTemperature)
   const ladderTable = (
     <LadderTable
@@ -892,6 +900,7 @@ export function Workbench() {
     setChronoSessions,
     manufacturerRef,
     manufacturerName,
+    loadNotes,
     sessionRefCount,
     setPrinting,
     setSeen,
@@ -1000,6 +1009,7 @@ export function Workbench() {
       setChronoSessions,
       manufacturerRef,
       manufacturerName,
+      loadNotes,
       sessionRefCount,
       barrel,
       lot,
@@ -1044,6 +1054,7 @@ export function Workbench() {
       setChronoSessions,
       manufacturerRef,
       manufacturerName,
+      loadNotes,
       sessionRefCount,
       barrel,
       lot,

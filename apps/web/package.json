@@ -10,6 +10,7 @@
     "build": "next build && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/service-worker.mts",
     "start": "next start",
     "typecheck": "next typegen && tsc --noEmit",
+    "check-weight": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-weight.mts",
     "test": "vitest run --dir test"
   },
   "dependencies": {

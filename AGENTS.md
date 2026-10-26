@@ -5,6 +5,10 @@
 - Install: `npm ci`
 - Lint and format check: `npm run lint` (Biome). Apply fixes: `npm run format`
 - Build all: `npm run build`, before `typecheck`, `test` and `data:validate` (workspaces import each other's `dist/`)
+- Pre-commit hook: `npm ci` (root `postinstall`, `hooks/install.mjs`) writes a stub into the repository's own hooks folder (shared by every worktree) that runs `hooks/pre-commit`: Biome on the staged files (`biome check --staged --error-on-warnings`), nothing else, skipped in CI.
+  - It never sets `core.hooksPath` and leaves a `core.hooksPath` or a foreign `pre-commit` hook alone (one message line at install). Re-run `npm install` after you unset your own.
+  - It runs the checkout's `node_modules/.bin/biome` on the host, where git runs. `npm ci` in the dev container fills the bind-mounted `node_modules`, so the container itself need not run. Where that binary does not run (no install yet, not Linux), the hook prints one line and lets the commit through: run `npm run lint` in the dev container.
+  - `tools/test/hooks.test.ts` covers the install and the hook. Never `--no-verify`.
 - Type check all: `npm run typecheck`
 - Package import rules: `npm run deps:check` (after `build`: workspace imports resolve to `dist/`)
   - dependency-cruiser with the rules of `.dependency-cruiser.cjs`, each named in its failure. It reads the sources of schema, core, drawing, importers, data, api and `apps/web/src` (not tests, scripts or configuration files), and the compiled files of importers, where a type import is erased, so any import of schema there is a runtime one.
@@ -22,6 +26,7 @@
 - Test schema, core, importers, drawing, data, api, web, the docs checks, the tools and the e2e script helpers: `npm test`
   - Coverage: the `test` script of schema, core, importers, drawing, data and api is `vitest run --coverage` (v8, summary in the log, so the CI `test` groups run it). The floors (`coverage.thresholds`) and the excluded files, each with its reason, are in `packages/<name>/vitest.config.ts`. A floor is the measured value rounded down, minus one: raise it in the same pull request when coverage rises, never lower it to make a check pass.
   - A single file or test runs without coverage: `npx vitest run <file>` in the package.
+- Web JavaScript budget per route: `npm run check-weight -w @open-reloading/web` (after `build`, details in `apps/web/AGENTS.md`). CI runs it in the `e2e` job after the web build.
 - Validate data records: `npm run data:validate`
 - Docs site (Docusaurus, `apps/docs`): `npm run site:build -w @open-reloading/docs` (after `build`)
   - Generated, git-ignored: the TypeDoc site of the six packages (`static/library/`, configured by `apps/docs/typedoc.config.mjs` with the landing page `apps/docs/library.md`), served at `/library/`, the REST API page (`static/rest/`: the API document, the Scalar viewer and its page, `scripts/openapi.mts`), served at `/rest/`. Its link to the API's own reference (`/v1/reference/`) uses `API_URL`, no link when it is unset.
@@ -41,11 +46,11 @@
 - Pages edition (GitHub Pages, no server): `apps/web/AGENTS.md`, Pages edition.
 - One workspace: `npm run <script> -w @open-reloading/<name>`
 - CI (`.github/workflows/ci.yml`) runs the checks above except the docs site build and the Pages edition.
-  - The required check `check` is the job that waits for `static` (lint, build, typecheck, import rules, docs check, data validation, API breaking changes, audit, licence policy) and `test (drawing)`, `test (web)`, `test (packages)`, which run in parallel and together run what `npm test` runs. Add a workspace's tests to one of the `test` groups in `ci.yml` when the root `test` script gains it.
+  - The required checks of the `develop` ruleset are `check`, `e2e`, `workflows`, `conventional`, `dependency-review` and the SonarQube Cloud check `SonarCloud Code Analysis` (a GitHub App, no workflow in the repository); `main` requires `check`, `e2e` and `workflows` (`apps/docs/docs/ci-tools.md`). `check` is the job that waits for `static` (lint, build, typecheck, import rules, docs check, data validation, API breaking changes, audit, licence policy) and `test (drawing)`, `test (web)`, `test (packages)`, which run in parallel and together run what `npm test` runs. `check` itself also runs lychee offline over the tracked Markdown files (relative links and anchors, `lychee.toml`), on every run including a prose-only one (the command is in `ci.yml`), and runs typos over the tracked text files (`_typos.toml`, which typos skips itself: the records, lockfile, snapshots and golden files are excluded, each accepted term has its reason there; run `typos` from the repository root with a binary from https://github.com/crate-ci/typos/releases). Add a workspace's tests to one of the `test` groups in `ci.yml` when the root `test` script gains it.
   - `e2e` runs against `docker compose up api web`, runs the drawing pixel baseline in the Playwright image (`npm run drawing-baseline -w @open-reloading/e2e`), builds the web app against that API, then runs `node apps/web/scripts/check-prerender.mts` and `npm run e2e:smoke` against that build.
   - On a pull request the `changes` job (`apps/web/scripts/ci-plan.mts`) can skip the `check` job (only prose changed), the `e2e` job (no change to what the API, the web app or the e2e specs read) or that web build (no change to the web app or what it builds from). It can build with `PRERENDER=sample` (no change to record data, record page code or the packages they read). The Turbopack cache (`apps/web/.next/cache/turbopack`) is restored.
   - A push to the default branch or any doubt builds from nothing, every record page prerendered and checked in full.
-- Other workflows: `release.yml` (release-please, images, `apps/docs/docs/release.md`), `pages.yml` (Pages edition from `main`, the preview of `develop` under `develop/`), `pr-title.yml`, `scorecard.yml`. Tools, rules and their free terms: `apps/docs/docs/ci-tools.md`.
+- Other workflows: `links.yml` (daily lychee run over the external links of the Markdown files, one open issue "Broken external links" with the report), `release.yml` (release-please, images with provenance and SBOM, `apps/docs/docs/release.md`), `pages.yml` (Pages edition from `main`, the preview of `develop` under `develop/`), `pr-title.yml`, `scorecard.yml`. Tools, rules and their free terms: `apps/docs/docs/ci-tools.md`.
 - Commits and pull request titles: Conventional Commits (`CONTRIBUTING.md`).
 
 ## Conventions

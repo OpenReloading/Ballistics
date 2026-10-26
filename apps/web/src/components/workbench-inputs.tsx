@@ -636,13 +636,25 @@ type LoadFieldMarkArgs = {
   given: ReturnType<LoadValues['defaultOf']>
   fromRecord: number | undefined
   powder: LoadValues['powder']
+  powderDesign: LoadValues['powderDesign']
   origin: LoadValues['origin']
 }
 
 /** The mark of a field in the units it shows: where its value comes from. */
 function loadFieldMark(
   s: UnitSystem,
-  { key, spec, fields, defaulted, defaults, given, fromRecord, powder, origin }: LoadFieldMarkArgs,
+  {
+    key,
+    spec,
+    fields,
+    defaulted,
+    defaults,
+    given,
+    fromRecord,
+    powder,
+    powderDesign,
+    origin,
+  }: LoadFieldMarkArgs,
 ) {
   if (defaulted.has(key)) return defaultMark(key, defaults)
   if (given) return `Default: ${given.source}.`
@@ -653,8 +665,14 @@ function loadFieldMark(
   return (
     powder &&
     origin &&
-    recordMark(powder, origin, key, fields[key]?.si, (si) =>
-      [formatQuantity(spec.quantity, s, si), s[spec.quantity].symbol].filter(Boolean).join(' '),
+    recordMark(
+      powder,
+      origin,
+      key,
+      fields[key]?.si,
+      (si) =>
+        [formatQuantity(spec.quantity, s, si), s[spec.quantity].symbol].filter(Boolean).join(' '),
+      powderDesign ? 'user design' : 'record',
     )
   )
 }
@@ -705,6 +723,7 @@ function LoadField({ name: key }: { name: string }) {
     cartridgeBoreArea,
     setFollowed,
     powder,
+    powderDesign,
     origin,
     seated,
     previewed,
@@ -753,6 +772,7 @@ function LoadField({ name: key }: { name: string }) {
           given,
           fromRecord,
           powder,
+          powderDesign,
           origin,
         })
       }
@@ -1018,8 +1038,17 @@ function CartridgePicker() {
 
 /** The powder search, with the chosen powder, the link's name or the typed parameters as its text. */
 function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames> }) {
-  const { fields, powderLabel, choosePowder, linkedPowder } = useLoad()
+  const {
+    fields,
+    powderLabel,
+    choosePowder,
+    linkedPowder,
+    powderDesign,
+    powderDesigns,
+    choosePowderDesign,
+  } = useLoad()
   const chosen = (() => {
+    if (powderDesign) return `${powderDesign.name} (your design)`
     if (powderLabel) return powderLabel
     if (linkedPowder?.name) return `${linkedPowder.name} (from the link)`
     return requiredModelKeys.every((k) => fields[k]?.si !== undefined)
@@ -1035,6 +1064,9 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
       chosen={chosen}
       describe={(p) => productLabel(p, names)}
       onSelect={(p) => choosePowder(p.id)}
+      // the browser's powder designs in the same list, first
+      extra={powderDesigns.map((d) => ({ id: d.id, label: `${d.name} (your design)` }))}
+      onExtra={choosePowderDesign}
       noneText="No powder found"
       unreachableText={notReached}
     />
@@ -1120,6 +1152,11 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
     setMeasuredFor,
     capacityId,
     setCapacityChoice,
+    caseId,
+    setCaseChoice,
+    ownCases,
+    ownCaseId,
+    chooseOwnCase,
     setSeatAt,
     suggestions,
   } = useLoad()
@@ -1182,7 +1219,16 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
         measuredFor === measuredId ? measured.measuredWaterCapacity : emptyStep
       }
       capacityId={capacityId}
-      onCapacityId={(id) => cartridge && setCapacityChoice({ cartridge: cartridge.id, id })}
+      onCapacityId={(id) =>
+        cartridge && setCapacityChoice(id ? { cartridge: cartridge.id, id } : undefined)
+      }
+      caseId={caseId}
+      onCaseId={(id) =>
+        cartridge && setCaseChoice(id ? { cartridge: cartridge.id, id } : undefined)
+      }
+      ownCases={ownCases}
+      ownCaseId={ownCaseId}
+      onOwnCaseId={chooseOwnCase}
       onMeasuredWaterCapacity={(v) => {
         typeMeasured(v)
         setMeasuredFor(measuredId)

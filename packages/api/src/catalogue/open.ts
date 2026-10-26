@@ -68,6 +68,14 @@ export function openCatalogue({ index, records }: CatalogueData): Catalogue {
           (window === undefined || (b.diameter > window.above && b.diameter <= window.upTo)),
       )
     },
+    cases: ({ manufacturer, cartridge, ...paging } = {}) =>
+      select(
+        index.cases,
+        paging,
+        (c) =>
+          (!manufacturer || c.manufacturer === manufacturer) &&
+          (!cartridge || c.cartridge === cartridge),
+      ),
     targetFaces: () => select(index.targetFaces, {}),
     federations: () => select(index.federations, {}),
     disciplines: ({ federation } = {}) =>

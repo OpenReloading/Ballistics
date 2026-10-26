@@ -62,6 +62,9 @@ const SURE_RINGS = 4
 const SURE_SCORE = 2.5
 /** Numerals stand on the two axes within this many mm of them (the digits of the local 25 m faces are 4 to 9 mm tall), between the ring lines. */
 const NUMERAL_WIDTH = 6
+/** Quarter marks of the black area stand on an axis within this share of a hole diameter and within this many hole diameters of its edge (own values). */
+const QUARTER_WIDTH = 0.5
+const QUARTER_REACH = 1
 /** The rings rectify to circles within this share of the black radius (rms). */
 const MAX_RMS = 0.015
 
@@ -745,6 +748,12 @@ export function faceLabel(g: FaceGeometry, hole: number): FaceLabel {
   )
   const radii = [...(g.rings ?? [])].sort((a, b) => a - b)
   const mm = (p: Point) => applyMatrix(g.toFace, p)
+  /** The point in face mm with the axes turned by `roll` (rad). */
+  const turned = (p: Point, roll: number) => {
+    const f = mm(p)
+    const [c, s] = [Math.cos(roll), Math.sin(roll)]
+    return { x: c * f.x + s * f.y, y: c * f.y - s * f.x }
+  }
   return {
     outline,
     black: (p) => {
@@ -753,9 +762,7 @@ export function faceLabel(g: FaceGeometry, hole: number): FaceLabel {
     },
     ...(radii.length > 1 && {
       numeral: (p, roll = 0) => {
-        const f = mm(p)
-        const [c, s] = [Math.cos(roll), Math.sin(roll)]
-        const q = { x: c * f.x + s * f.y, y: c * f.y - s * f.x }
+        const q = turned(p, roll)
         const r = Math.hypot(q.x, q.y)
         const next = radii.findIndex((v) => v > r)
         const [lo, hi] = [radii[next - 1], radii[next]]
@@ -766,10 +773,17 @@ export function faceLabel(g: FaceGeometry, hole: number): FaceLabel {
           Math.min(r - lo, hi - r) >= 0.2 * gap
         )
       },
-      polar: (p) => {
-        const q = mm(p)
-        return { radius: Math.hypot(q.x, q.y), angle: Math.atan2(q.y, q.x) }
-      },
     }),
+    quarter: (p, roll = 0) => {
+      const q = turned(p, roll)
+      return (
+        Math.abs(Math.hypot(q.x, q.y) - g.black) <= QUARTER_REACH * hole &&
+        Math.min(Math.abs(q.x), Math.abs(q.y)) <= QUARTER_WIDTH * hole
+      )
+    },
+    polar: (p) => {
+      const q = mm(p)
+      return { radius: Math.hypot(q.x, q.y), angle: Math.atan2(q.y, q.x) }
+    },
   }
 }

@@ -1,9 +1,12 @@
 /**
- * Powder fit: fits the burn coefficient and, on request, the start pressure of the M3 interior
- * model to a chronograph ladder by weighted least squares, with optional Gaussian priors and a
- * Huber loss, and the prediction band of the fitted load at any charge,
+ * Powder fit: fits the burn coefficient and, on request, the start pressure, a correction factor
+ * of the chamber volume, the specific energy and a factor on the temperature sensitivities of the
+ * M3 interior model to a chronograph ladder, or to ladders at several barrel lengths and powder
+ * temperatures, by weighted least squares, with optional Gaussian priors and a Huber loss, and the
+ * prediction band of the fitted load at any charge,
  * `apps/docs/docs/models/interior-powder-fit.md`.
- * Every evaluation runs `interior` once per distinct charge. SI in and out.
+ * Every evaluation runs `interior` once per distinct charge, barrel length and temperature. SI in
+ * and out.
  */
 
 import type { Settings } from '../errors.ts'
@@ -31,13 +34,29 @@ export interface LadderPoint {
   peakPressure?: number
   /** Standard uncertainty of `peakPressure`, Pa; required with `peakPressure`. */
   pressureSigma?: number
+  /** Projectile travel to the muzzle of the barrel fired, m; default the load's. */
+  barrelLength?: number
+  /** Propellant temperature of the string, K; default the load's. */
+  propellantTemperature?: number
 }
 
+const parameterNames = [
+  'burnRate',
+  'startPressure',
+  'volumeFactor',
+  'energy',
+  'temperatureFactor',
+] as const
+
 /**
- * Parameter of the fit: the burn coefficient (or vivacity, by the load's burn kind) and the start
- * pressure, Pa.
+ * Parameter of the fit: the burn coefficient (or vivacity, by the load's burn kind), the start
+ * pressure, Pa, the factor that multiplies the chamber volume (1 leaves it as given), the specific
+ * energy of the propellant, J/kg, and the factor that multiplies both temperature sensitivities of
+ * the load (1 leaves them as given; the load must carry them). Energy and the temperature factor
+ * are resolved only by ladders at several barrel lengths or several temperatures
+ * (`apps/docs/docs/models/interior-powder-fit.md`, "Several barrel lengths and temperatures").
  */
-export type PowderParameter = 'burnRate' | 'startPressure'
+export type PowderParameter = (typeof parameterNames)[number]
 
 /**
  * Gaussian prior of one fitted parameter in its log parameter
@@ -45,19 +64,22 @@ export type PowderParameter = 'burnRate' | 'startPressure'
  */
 export interface PowderPrior {
   /**
-   * Centre of the prior, in the unit of the parameter. Burn coefficient: above 0. Start pressure:
-   * above the floor of the shot start, as the fitted value is.
+   * Centre of the prior, in the unit of the parameter. Burn coefficient and volume factor: above 0
+   * (a volume factor prior is centred on 1 where the volume is a record's nominal one). Start
+   * pressure: above the floor of the shot start, as the fitted value is.
    */
   value: number
-  /** Standard deviation of the log parameter: of ln(value) for the burn coefficient, of ln(value - floor) for the start pressure. */
+  /** Standard deviation of the log parameter: of ln(value) for the burn coefficient and the volume factor, of ln(value - floor) for the start pressure. */
   sigma: number
 }
 
 /** Options of `fitPowder`. */
 export interface PowderFitOptions {
   /**
-   * Default ['burnRate']; `startPressure` is resolved only with measured pressures
-   * (`apps/docs/docs/models/interior-powder-fit.md`, "Identifiability").
+   * Default ['burnRate']; `startPressure` is resolved only with measured pressures. `volumeFactor`
+   * corrects the load's chamber volume; a ladder too narrow to separate it from the burn rate
+   * needs a prior on it or measured pressures (`apps/docs/docs/models/interior-powder-fit.md`,
+   * "Identifiability").
    */
   parameters?: readonly PowderParameter[] | undefined
   /**
@@ -81,7 +103,7 @@ export interface PowderFitOptions {
   options?: Settings<InteriorOptions> | undefined
 }
 
-/** A fitted parameter: start value, result and uncertainty. */
+/** A fitted parameter: start value, result and uncertainty. A volume factor starts at 1. */
 export interface FittedPowderParameter {
   /** Which parameter. */
   name: PowderParameter
@@ -109,7 +131,7 @@ export interface PowderFitResidual {
 
 /** Result of `fitPowder`. */
 export interface PowderFit {
-  /** The input load with the fitted values applied; its charge is the input's. */
+  /** The input load with the fitted values applied (a volume factor scales its chamber volume); its charge is the input's. */
   load: InteriorLoad
   /** Fitted parameters, in the order of `PowderFitOptions.parameters`. */
   parameters: FittedPowderParameter[]
@@ -193,6 +215,9 @@ export class PowderFitError extends InputError {
   }
 }
 
+/** Smallest ratio of the longest to the shortest barrel length at which `energy` is fitted. */
+const minLengthSpan = 1.05
+
 const positive = (v: number | undefined) => v === undefined || (Number.isFinite(v) && v > 0)
 
 /** Start pressure below which the shot start does not depend on it: max(p_i, p_f + p_e(0)). */
@@ -216,6 +241,8 @@ function checkLadder(ladder: readonly LadderPoint[]): number {
     need(positive(x.velocitySigma), 'velocitySigma must be positive')
     need(positive(x.peakPressure), 'ladder pressure must be positive')
     need(positive(x.pressureSigma), 'pressureSigma must be positive')
+    need(positive(x.barrelLength), 'barrelLength must be positive')
+    need(positive(x.propellantTemperature), 'propellantTemperature must be positive')
     need(
       (x.peakPressure === undefined) === (x.pressureSigma === undefined),
       'peakPressure and pressureSigma together',
@@ -234,6 +261,8 @@ function checkLadder(ladder: readonly LadderPoint[]): number {
 interface LadderRow {
   kind: 'velocity' | 'pressure'
   charge: number
+  barrelLength: number | undefined
+  temperature: number | undefined
   value: number
   sigma: number
 }
@@ -244,6 +273,8 @@ function ladderRows(ladder: readonly LadderPoint[]): LadderRow[] {
     {
       kind: 'velocity' as const,
       charge: x.charge,
+      barrelLength: x.barrelLength,
+      temperature: x.propellantTemperature,
       value: x.muzzleVelocity,
       sigma: x.velocitySigma ?? 1,
     },
@@ -253,6 +284,8 @@ function ladderRows(ladder: readonly LadderPoint[]): LadderRow[] {
           {
             kind: 'pressure' as const,
             charge: x.charge,
+            barrelLength: x.barrelLength,
+            temperature: x.propellantTemperature,
             value: x.peakPressure,
             sigma: x.pressureSigma ?? 1,
           },
@@ -269,34 +302,38 @@ function powderParameterMap(
   parameters: readonly PowderParameter[],
   floor: number,
 ) {
-  const fitsStart = parameters.includes('startPressure')
   const burn = load.propellant.burn
-  const initial = parameters.map((p) =>
-    p === 'startPressure'
-      ? load.startPressure
-      : burn.kind === 'vivacity'
-        ? burn.vivacity
-        : burn.coefficient,
-  )
-  const apply = (values: number[]): InteriorLoad => {
-    const at = (name: PowderParameter) => values[parameters.indexOf(name)]
-    const rate = parameters.includes('burnRate') ? at('burnRate') : undefined
-    return {
-      ...load,
-      ...(fitsStart ? { startPressure: at('startPressure') } : {}),
-      ...(rate === undefined
-        ? {}
-        : {
-            propellant: {
-              ...load.propellant,
-              burn:
-                burn.kind === 'vivacity'
-                  ? { ...burn, vivacity: rate }
-                  : { ...burn, coefficient: rate },
-            },
-          }),
-    }
+  const startValue = (p: PowderParameter) => {
+    if (p === 'startPressure') return load.startPressure
+    if (p === 'volumeFactor' || p === 'temperatureFactor') return 1
+    if (p === 'energy') return load.propellant.specificEnergy
+    return burn.kind === 'vivacity' ? burn.vivacity : burn.coefficient
   }
+  const initial = parameters.map(startValue)
+  const withPropellant = (
+    l: InteriorLoad,
+    p: Partial<InteriorLoad['propellant']>,
+  ): InteriorLoad => ({
+    ...l,
+    propellant: { ...l.propellant, ...p },
+  })
+  const set: Record<PowderParameter, (l: InteriorLoad, v: number) => InteriorLoad> = {
+    burnRate: (l, v) =>
+      withPropellant(l, {
+        burn: burn.kind === 'vivacity' ? { ...burn, vivacity: v } : { ...burn, coefficient: v },
+      }),
+    startPressure: (l, v) => ({ ...l, startPressure: v }),
+    volumeFactor: (l, v) => ({ ...l, chamber: { ...l.chamber, volume: load.chamber.volume * v } }),
+    energy: (l, v) => withPropellant(l, { specificEnergy: v }),
+    temperatureFactor: (l, v) => {
+      const t = load.propellant.temperatureSensitivity
+      return t === undefined
+        ? l
+        : withPropellant(l, { temperatureSensitivity: { ...t, cold: t.cold * v, hot: t.hot * v } })
+    },
+  }
+  const apply = (values: number[]): InteriorLoad =>
+    parameters.reduce((l, name, k) => set[name](l, nth(values, k)), load)
   // log parameters; the start pressure in ln((p_st - p_floor)/(p_st0 - p_floor)), so no step reaches the floor
   const offset = parameters.map((p) => (p === 'startPressure' ? floor : 0))
   const q = (theta: number[]) =>
@@ -311,7 +348,35 @@ function powderParameterMap(
   return { initial, apply, offset, q, estimate }
 }
 
-/** Fits burn coefficient and optionally start pressure of `load` to the ladder. */
+/** Checks the requested parameters against the load and the ladder; `energy` needs cut-down barrels. */
+function checkParameters(
+  load: InteriorLoad,
+  ladder: readonly LadderPoint[],
+  parameters: readonly PowderParameter[],
+) {
+  need(
+    parameters.length > 0 &&
+      new Set(parameters).size === parameters.length &&
+      parameters.every((p) => parameterNames.includes(p)),
+    `parameters: ${parameterNames.join(', ')}, each at most once`,
+  )
+  const sensitivity = load.propellant.temperatureSensitivity
+  need(
+    !parameters.includes('temperatureFactor') ||
+      (sensitivity !== undefined && (sensitivity.cold !== 0 || sensitivity.hot !== 0)),
+    'temperatureFactor needs the load to carry a temperature sensitivity other than 0',
+  )
+  // a charge ladder at one length leaves the energy to the model error of every fixed input, so cut-down barrels are required
+  const lengths = ladder.map((x) => x.barrelLength ?? load.barrel.length)
+  if (parameters.includes('energy') && Math.max(...lengths) < minLengthSpan * Math.min(...lengths))
+    throw new PowderFitError('unresolved', { unresolved: [parameters.indexOf('energy')] })
+}
+
+/**
+ * Fits burn coefficient and optionally start pressure, chamber volume factor, specific energy and
+ * temperature factor of `load` to the ladder. Points with another `barrelLength` or
+ * `propellantTemperature` are fired from another barrel or at another temperature.
+ */
 export function fitPowder(
   load: InteriorLoad,
   ladder: readonly LadderPoint[],
@@ -319,12 +384,7 @@ export function fitPowder(
 ): PowderFit {
   const { parameters = ['burnRate'], maxIterations = 30, maxCondition = 1e3 } = options
   const withSigma = checkLadder(ladder)
-  need(
-    parameters.length > 0 &&
-      new Set(parameters).size === parameters.length &&
-      parameters.every((p) => p === 'burnRate' || p === 'startPressure'),
-    'parameters: burnRate and startPressure, each at most once',
-  )
+  checkParameters(load, ladder, parameters)
   need(
     Number.isInteger(maxIterations) && maxIterations > 0,
     'maxIterations must be a positive integer',
@@ -376,8 +436,13 @@ export function fitPowder(
     }
   })
 
+  // one run per distinct charge, barrel length and temperature
+  const key = (o: LadderRow) => `${o.charge} ${o.barrelLength} ${o.temperature}`
+  const runs = new Map(rows.map((o) => [key(o), o]))
+  const conditions = [...runs.values()]
+  const keys = [...runs.keys()]
+  const index = rows.map((o) => keys.indexOf(key(o)))
   const charges = [...new Set(ladder.map((x) => x.charge))]
-  const index = rows.map((o) => charges.indexOf(o.charge))
   let runCount = 0
   /** The last invalid run. */
   let rejected: { charge?: number; result?: InteriorInvalid } = {}
@@ -385,9 +450,19 @@ export function fitPowder(
   const evaluate = (values: number[]): number[] | null => {
     const trial = apply(values)
     const results: Valid[] = []
-    for (const charge of charges) {
+    for (const { charge, barrelLength, temperature } of conditions) {
       runCount++
-      const r = interior({ ...trial, charge }, options.options)
+      const r = interior(
+        {
+          ...trial,
+          charge,
+          ...(barrelLength === undefined
+            ? {}
+            : { barrel: { ...trial.barrel, length: barrelLength } }),
+          ...(temperature === undefined ? {} : { propellantTemperature: temperature }),
+        },
+        options.options,
+      )
       if (!r.valid) {
         rejected = { charge, result: r }
         return null

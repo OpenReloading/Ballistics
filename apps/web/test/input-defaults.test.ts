@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest'
+import { volumeNoteText } from '../src/components/workbench-outcome.ts'
 import {
   barrelLengthByClass,
   cartridgeClass,
   type DefaultSources,
   suggestDefaults,
+  volumeMeasured,
 } from '../src/lib/input-defaults.ts'
 
 const capacity = { si: 3.9e-6, source: 'case capacity record' }
@@ -120,5 +122,54 @@ describe('the cartridge class', () => {
     expect(cartridgeClass('IV')).toBe('pistol')
     for (const table of ['I', 'II', 'III', 'V']) expect(cartridgeClass(table)).toBe('rifle')
     expect(cartridgeClass(undefined)).toBeUndefined()
+  })
+})
+
+describe('the chamber volume note', () => {
+  const measuredCapacity = 3.6e-6
+  const measuredSuggestion = { si: measuredCapacity, source: 'your measured case capacity' }
+
+  it('takes the measured capacity in place of the record and drops the note', () => {
+    const fromRecord = suggestDefaults({ cartridge })
+    const fromMeasured = suggestDefaults({
+      cartridge: { ...cartridge, capacity: measuredSuggestion },
+    })
+    expect(fromMeasured.volume?.si).not.toBe(fromRecord.volume?.si)
+    const run = (volume: number, measured: number | undefined) => ({
+      volumeMeasured: volumeMeasured({
+        measuredCapacity: measured,
+        volume,
+        derived: [volume],
+      }),
+    })
+    expect(volumeNoteText(run(fromMeasured.volume?.si ?? 0, measuredCapacity))).toBeUndefined()
+    expect(volumeNoteText(run(fromRecord.volume?.si ?? 0, undefined))).toMatch(
+      /^Chamber volume not measured: .*measured case capacity/,
+    )
+  })
+
+  it('counts a record, a chosen capacity record and a typed volume as estimates', () => {
+    // a record's capacity: no measured one entered
+    expect(volumeMeasured({ measuredCapacity: undefined, volume: 3.9e-6, derived: [3.9e-6] })).toBe(
+      false,
+    )
+    // typed over a measured capacity
+    expect(
+      volumeMeasured({ measuredCapacity, volume: 3.7e-6, derived: [measuredCapacity, 3.5e-6] }),
+    ).toBe(false)
+    // no volume yet
+    expect(
+      volumeMeasured({ measuredCapacity, volume: undefined, derived: [measuredCapacity] }),
+    ).toBe(false)
+  })
+
+  it("counts the seated bullet's volume of a measured capacity as measured", () => {
+    expect(
+      volumeMeasured({ measuredCapacity, volume: 3.2e-6, derived: [measuredCapacity, 3.2e-6] }),
+    ).toBe(true)
+  })
+
+  it('says nothing without a result', () => {
+    expect(volumeNoteText(undefined)).toBeUndefined()
   })
 })

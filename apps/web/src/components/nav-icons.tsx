@@ -1,6 +1,7 @@
 'use client'
 
 import {
+  Archive,
   BookOpenText,
   ChartBar,
   DownloadSimple,
@@ -10,6 +11,7 @@ import {
   type Icon,
   Info,
   MagnifyingGlass,
+  Package,
   Target,
   Warning,
 } from '@phosphor-icons/react'
@@ -22,6 +24,9 @@ import type { ReactNode } from 'react'
  */
 const icons: Record<string, Icon> = {
   '/powders': Grains,
+  '/cases': Package,
+  // the user's own groups of cases
+  '/my-cases': Archive,
   '/workbench': Flask,
   '/session': ChartBar,
   '/groups': Target,

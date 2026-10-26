@@ -1,11 +1,13 @@
 ---
 title: Powder fit from a chronograph ladder
-description: Weighted least-squares fit of the burn coefficient and, on request, the start pressure of the M3 interior model to measured muzzle velocities and peak pressures of a charge ladder, with optional Gaussian priors and a Huber loss, and the prediction band of the fitted load at a charge that was not fired.
+description: Weighted least-squares fit of the burn coefficient and, on request, the start pressure, a chamber volume correction factor, the specific energy and a factor on the temperature sensitivities of the M3 interior model to measured muzzle velocities and peak pressures of a charge ladder or of sessions at several barrel lengths and powder temperatures, with optional Gaussian priors and a Huber loss, and the prediction band of the fitted load at a charge that was not fired.
 ---
 
 # Powder fit from a chronograph ladder
 
-`fitPowder` fits the burn coefficient of one [M3](interior-m3.md) load and, on request, its shot-start pressure to a ladder: charges with their mean muzzle velocities and, optionally, measured peak pressures. The fit works on log parameters with the Levenberg-Marquardt loop of the [least-squares page](least-squares.md). It reports the fitted values, their uncertainty, correlation and covariance, the residuals, $\chi^2$ split into the ladder's and the priors' share, the degrees of freedom and the condition number. Optional Gaussian priors on the log parameters turn the fit into a maximum a posteriori estimate, and an optional Huber loss limits the pull of one outlying string. The fitted values describe the ladder's rifle, powder lot, components and model version over the ladder's charge range. They are not powder data and not load data. `predictPowder` propagates the covariance to the muzzle velocity and the peak pressure at any charge, with an interval, and marks a charge outside the ladder's range.
+The burn form and the pressure exponent are fitted to a measured pressure-time trace on the [curve fit page](interior-curve-fit.md).
+
+`fitPowder` fits the burn coefficient of one [M3](interior-m3.md) load and, on request, its shot-start pressure, a factor on its chamber volume, its specific energy and a factor on its temperature sensitivities to a ladder: charges with their mean muzzle velocities and, optionally, measured peak pressures. Points of a ladder may be fired from another barrel length or at another powder temperature, which is what resolves the energy and the temperature factor ([below](#several-barrel-lengths-and-temperatures)); `fitPowderSessions` takes such ladders as sessions and holds the parameters they do not resolve. The fit works on log parameters with the Levenberg-Marquardt loop of the [least-squares page](least-squares.md). It reports the fitted values, their uncertainty, correlation and covariance, the residuals, $\chi^2$ split into the ladder's and the priors' share, the degrees of freedom and the condition number. Optional Gaussian priors on the log parameters turn the fit into a maximum a posteriori estimate, and an optional Huber loss limits the pull of one outlying string. The fitted values describe the ladder's rifle, powder lot, components and model version over the ladder's charge range, barrel lengths and temperatures. They are not powder data and not load data. `predictPowder` propagates the covariance to the muzzle velocity and the peak pressure at any charge, with an interval, and marks a charge outside the ladder's range.
 
 ## Equations
 
@@ -37,18 +39,25 @@ $$
 
 Code: `packages/core/src/interior/fit.ts`, `ladderRows`, `fitPowder` (`rows`, `evaluate`).
 
-Velocity uncertainties are given on all points or on none. Pressures need their uncertainty and need velocity uncertainties. Repeated charges add rows but no runs.
+A point carries its own `barrelLength` and `propellantTemperature` where they differ from the load's, and its prediction is the run at that length and temperature. Velocity uncertainties are given on all points or on none. Pressures need their uncertainty and need velocity uncertainties. Repeated charges add rows but no runs.
 
 ### Parameters
 
-The burn coefficient is the vivacity $B_a$ of a vivacity law or the coefficient $\beta$ of a geometric law (see [burn laws and form functions](interior-burn-forms.md)). Both parameters are fitted as logarithms, the start pressure relative to a floor below which it has no effect:
+The burn coefficient is the vivacity $B_a$ of a vivacity law or the coefficient $\beta$ of a geometric law (see [burn laws and form functions](interior-burn-forms.md)). All parameters are fitted as logarithms, the start pressure relative to a floor below which it has no effect:
 
 $$
 B = B_0\,e^{\theta_1}, \qquad
-p_\text{st} = p_\text{floor} + (p_{\text{st},0} - p_\text{floor})\,e^{\theta_2}
+p_\text{st} = p_\text{floor} + (p_{\text{st},0} - p_\text{floor})\,e^{\theta_2}, \qquad
+f_V = e^{\theta_3}, \qquad
+Q = Q_0\,e^{\theta_4}, \qquad
+f_T = e^{\theta_5}
 $$
 
 Code: `packages/core/src/interior/fit.ts`, `powderParameterMap` (`q`, `offset`).
+
+The specific energy $Q$ (parameter `energy`, initial value the load's) replaces the energy of the propellant. The temperature factor $f_T$ (parameter `temperatureFactor`, initial value 1) multiplies both temperature sensitivities of the load, $\sigma_c$ and $\sigma_h$, of the [temperature factor on the burn rate](interior-m3.md#temperature-of-the-propellant), so their ratio stays the load's. It needs a load that carries a sensitivity other than 0. The fitted load carries the scaled sensitivities.
+
+The volume factor $f_V$ (parameter `volumeFactor`, initial value 1) multiplies the chamber volume of the load, $V_c = f_V\,V_{c,0}$, where $V_{c,0}$ is the volume the load carries. That volume is a nominal one unless it is a measured [case capacity](case-capacity.md), so the factor is the way to let a ladder correct it. It leaves the bore area, the bore diameter and every other input as given, and the fitted load carries the corrected volume. With the factor not fitted the load's chamber is not touched and the fit is the one without the option.
 
 $$
 p_\text{floor} = \max\bigl(p_i,\ p_f + p_e(0)\bigr)
@@ -87,7 +96,7 @@ $$
 
 Code: `packages/core/src/interior/fit.ts`, `fitPowder` (`priorRows`, `priorChiSquare`, `dataChiSquare`).
 
-The burn coefficient needs $q_j^\ast \gt 0$ and the start pressure $q_j^\ast \gt p_\text{floor}$, with $s_j \gt 0$ in both. A prior on a parameter that is not fitted is refused. The checks for unresolved and ill-conditioned parameters see the prior rows too. A ladder whose velocities barely separate the burn coefficient and the start pressure therefore fits with priors where it fails as `ill-conditioned` without them, and a prior keeps its parameter from counting as `unresolved`. The reported uncertainty is then the posterior one, and its size against $s_j$ shows how much the ladder added. The degrees of freedom still count the ladder rows only. A prior with a very large $s_j$ leaves the fit unchanged.
+The burn coefficient and the volume factor need $q_j^\ast \gt 0$ and the start pressure $q_j^\ast \gt p_\text{floor}$, with $s_j \gt 0$ in both. A volume factor prior is centred on 1, with a standard deviation that states how far the load's volume may be from the real one, for example the spread of the capacity of a fired case; its width is the caller's choice and no default is built in. A prior on a parameter that is not fitted is refused. The checks for unresolved and ill-conditioned parameters see the prior rows too. A ladder whose velocities barely separate the burn coefficient and the start pressure therefore fits with priors where it fails as `ill-conditioned` without them, and a prior keeps its parameter from counting as `unresolved`. The reported uncertainty is then the posterior one, and its size against $s_j$ shows how much the ladder added. The degrees of freedom still count the ladder rows only. A prior with a very large $s_j$ leaves the fit unchanged.
 
 The Huber loss of the [least-squares page](least-squares.md) with threshold $k$ (option `huberThreshold`, in sigmas of the rows) applies to the ladder rows only, not to the prior rows. $\chi^2$ in the result stays the plain sum, so a downweighted string still shows its full residual, and `loss` holds the minimized cost:
 
@@ -104,7 +113,7 @@ Priors and the Huber loss need uncertainties on every velocity, since $s_j$ and 
 With $C_\theta$ the covariance of the log parameters at the solution (scaled by $\chi^2/\nu$ when no uncertainties are given; with priors it is the posterior covariance, from the ladder rows and the prior rows, and with a Huber loss the weights $W$ of the [least-squares page](least-squares.md) are taken at the solution), the standard uncertainty of a fitted value is
 
 $$
-\sigma_{q_j} = (q_j - o_j)\sqrt{C_{\theta,jj}}, \qquad o_j = \begin{cases} p_\text{floor} & \text{start pressure} \\ 0 & \text{burn coefficient} \end{cases}
+\sigma_{q_j} = (q_j - o_j)\sqrt{C_{\theta,jj}}, \qquad o_j = \begin{cases} p_\text{floor} & \text{start pressure} \\ 0 & \text{burn coefficient, volume factor} \end{cases}
 $$
 
 Code: `packages/core/src/interior/fit.ts`, `fitPowder` (`standardUncertainty`), `powderParameterMap` (`offset`).
@@ -140,13 +149,29 @@ A charge below the smallest or above the largest ladder charge (`chargeRange`) i
 
 On a velocity-only ladder a higher burn coefficient and a higher start pressure both raise the early pressure and the muzzle velocity. The ratio of the two effects changes little over the ladder. Their Jacobian columns are nearly parallel and the correlation of the two parameters is near $-1$. The condition check does not reject such a fit, but the start-pressure uncertainty is large. Measured peak pressures and wider ladders separate the two. A fitted burn coefficient absorbs the errors of every fixed input that moves the velocity: energy, isentropic exponent, covolume, chamber volume, form function, exponent, bore resistance and heat loss.
 
+The volume factor and the burn coefficient act alike on the velocity: a larger volume lowers the pressure as a slower powder does. A ladder over a wide charge span still separates them, because the volume changes the pressure with the charge differently than the burn rate does, and measured peak pressures separate them better. On a ladder too narrow to separate them, for example two charges a few milligrams apart, their Jacobian columns are nearly parallel and the fit fails (`ill-conditioned`, `unresolved` or `not-converged`). A prior on the factor, centred on 1, or measured peak pressures then resolve it, and the reported uncertainty of both is the posterior one. A factor fitted without a prior is a correction of the volume only as far as no other fixed input is wrong in the same direction: its value is the volume that makes the model match the ladder, not a measurement of the case.
+
+### Several barrel lengths and temperatures
+
+Sessions that differ in barrel length or in powder temperature share the powder parameters. Each distinct combination of charge, barrel length and temperature is one `interior` run, and every ladder row is compared with the run of its own combination. A barrel length is the travel to the muzzle, as the load's. A temperature is the propellant temperature of the session.
+
+The muzzle velocity against barrel length depends on how much of the charge is burnt along the bore, so a cut-down series separates the energy from the burn coefficient: a shorter barrel ends the run earlier in the burn. The burn coefficient alone fixes the burn rate at the reference temperature of the load, and a series at other temperatures moves the burn rate by $\tau_T$, so it fixes $f_T$. A charge ladder at one length also moves the velocity with energy and burn coefficient, but nearly alike, and in the model the other fixed inputs (covolume, isentropic exponent, heat loss, form function) are absorbed by whichever of the two is fitted. The fit therefore treats the energy as resolved only by lengths that differ: it fails as `unresolved` when the longest barrel is less than 5 % longer than the shortest. The 5 % is a choice of the fit. The temperature factor needs no such rule: with one temperature its Jacobian column is parallel to the burn coefficient's (at the reference temperature it is 0), and the conditioning check fails the fit.
+
+Code: `packages/core/src/interior/fit.ts`, `fitPowder` (`conditions`, `evaluate`), `checkParameters` (`minLengthSpan`).
+
+`fitPowderSessions` takes the sessions (a barrel length, a temperature and a ladder each), joins their points and requests the parameters of `options.parameters`, which must hold the burn coefficient. When the fit fails as `unresolved`, it drops the unresolved requested parameter other than the burn coefficient. When it fails as `ill-conditioned`, it drops the one with the largest component in the direction of the smallest eigenvalue. When it fails as `underdetermined`, it drops the last. It then fits again, until a fit passes or no parameter other than the burn coefficient is left (the failure is then thrown). A prior on a dropped parameter is dropped too. The result lists the `resolved` parameters, the fitted ones in the order of the fit, and the `held` ones with the reason of the failure. A held parameter is not in `parameters`: it keeps the value of the input load, so the caller sets the prior centre of a parameter it wants held there as the load's value. A parameter that a prior resolves counts as resolved, with the posterior uncertainty, as in the single-ladder fit.
+
+Code: `packages/core/src/interior/fit-sessions.ts`, `fitPowderSessions` (`giveUp`).
+
+The values describe the rifle's barrels, the lot and the temperatures of the sessions. A fitted energy absorbs every fixed input that moves the velocity with the barrel length (see Identifiability), and a fitted temperature factor absorbs the effect of the initial temperature on the gas energy, which the model does not have. Neither is a property of the powder to carry to another load, and the result is a simulation parameter, not load data.
+
 ### Failures
 
 `fitPowder` throws a `PowderFitError` with one of these reasons:
 
 - `underdetermined`: fewer rows than parameters, before any run.
 - `invalid`: an `interior` run at the start values or in a Jacobian is invalid. The error names the charge and the run's reason.
-- `unresolved`: a parameter does not measurably change any prediction, for example a start pressure carried to the floor.
+- `unresolved`: a parameter does not measurably change any prediction, for example a start pressure carried to the floor, or `energy` where the barrel lengths do not differ by 5 %.
 - `ill-conditioned`: the condition number is above the limit. The error carries the parameter combination of the smallest eigenvalue.
 - `not-converged`: the step budget ran out with the conditioning check passed.
 
@@ -165,7 +190,12 @@ Malformed input (an empty ladder, a value that is not finite and above 0, uncert
 | $B$, $B_0$ | Burn coefficient, fitted and initial: vivacity of a vivacity law | 1/s | 1/s |
 | $B$, $B_0$ | Burn coefficient, fitted and initial: coefficient of a geometric law | no kind | m s⁻¹ Pa⁻ⁿ |
 | $p_\text{st}$, $p_{\text{st},0}$ | Start pressure, fitted and initial | bar | Pa |
+| $Q$, $Q_0$ | Specific energy of the propellant, fitted and initial | J/kg | J/kg |
+| $f_T$ | Factor on both temperature sensitivities of the load, fitted; initial value 1 | 1 | 1 |
+| $\sigma_c$, $\sigma_h$, $\tau_T$ | Burn-rate temperature sensitivities below and above the reference, the factor they give on the burn rate | no kind, no kind, 1 | 1/K, 1/K, 1 |
 | $p_\text{floor}$ | Start pressure below which it has no effect | bar | Pa |
+| $f_V$ | Factor on the chamber volume of the load, fitted; initial value 1 | 1 | 1 |
+| $V_c$, $V_{c,0}$ | Chamber volume of the fitted load and of the input load | cm³ | m³ |
 | $p_i$ | Ignition pressure | bar | Pa |
 | $p_f$ | Bore friction pressure | bar | Pa |
 | $p_e(0)$ | Engraving pressure at travel 0 | bar | Pa |
@@ -198,9 +228,10 @@ Malformed input (an empty ladder, a value that is not finite and above 0, uncert
 - The peak pressure has a kink in the parameters where the peak moves between a located interior peak and burnout. A Jacobian taken across it mixes both sides.
 - Charges outside the ladder's range are extrapolations. The result holds no charge recommendation and no limit.
 - A prediction band covers parameter uncertainty and not model error, and it is linearized: far from the ladder, where the model is strongly nonlinear in the parameters, the interval is less reliable.
-- The posterior uncertainty is the first-order Laplace approximation, no sampling. With a Huber loss it is approximate. Several sessions in one fit are not supported.
-- Only the burn coefficient and the start pressure are fitted. Exponent, energy, form parameters and temperature coefficients stay as given. One ladder, one barrel and one temperature per fit.
-- Each prediction costs one `interior` run per distinct charge, and each Jacobian two predictions per parameter.
+- The posterior uncertainty is the first-order Laplace approximation, no sampling. With a Huber loss it is approximate.
+- The burn coefficient, start pressure, volume factor, energy and temperature factor are fitted. Exponent, form parameters and the ratio of the two temperature sensitivities stay as given. Pooling over lots and over shooters is not supported: the sessions of one fit share one rifle's load, one lot and one set of fixed inputs.
+- Each session is one barrel length and one temperature, and the barrel length is the one the sessions' bore and chamber share. A session fired from a barrel with another bore, chamber or twist is another load.
+- Each prediction costs one `interior` run per distinct charge, barrel length and temperature, and each Jacobian two predictions per parameter.
 
 ## Sources
 

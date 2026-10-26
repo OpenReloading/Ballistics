@@ -105,7 +105,7 @@ _Avoid_: custom manufacturer
 _Avoid_: caseMaker
 
 **Manufacturer name**:
-`manufacturerName`: the manufacturer as free text on the components of a load (`bullet`, `powder`, `primer`, `case`) and, as the text a chronograph file gives, on an imported session's `device`. A bullet design, a firearm and a stored session hold a reference.
+`manufacturerName`: the manufacturer as the free text a chronograph file gives, on an imported session candidate's `device`. Every stored record (a bullet design, a firearm, a load's components, a session) holds a manufacturer reference instead.
 _Avoid_: maker
 
 **Website**:
@@ -389,7 +389,7 @@ _Avoid_: twistLength
 ### Loads
 
 **Load**:
-One cartridge recipe fired from one firearm, one shape for the catalogue (a record of kind `loads`), the user record of kind `load` and the load file, in stored units: `origin`, `cartridge`, `firearm`, `bullet` and `powder` (references, a measured catalogue load may describe the bullet and powder instead), `charge` (g), `capacity` (a reference to a case capacity, catalogue or the user's measured one), `primer`, `case` (`firingCount`), `seating`, `note`, `analysis` (`overrides`, the solver values the user typed, and `ladder`) and `sessions` (references to the chronograph sessions of the Measurements tab). A catalogue load also has `id`, `name` and `provenance`; a user load is named by its record. Its components hold `manufacturerName` and `lot`, the bullet `model` and `bulletMass`, the powder `name` and the primer `model`.
+One cartridge recipe fired from one firearm, one shape for the catalogue (a record of kind `loads`), the user record of kind `load` and the load file, in stored units: `origin`, `cartridge`, `firearm`, `bullet` and `powder` (references, a measured catalogue load may describe the bullet and powder instead), `charge` (g), `capacity` (a reference to a case capacity, catalogue or the user's measured one), `primer`, `case` (`firingCount`), `seating`, `note`, `analysis` (`overrides`, the solver values the user typed, and `ladder`) and `sessions` (references to the chronograph sessions of the Measurements tab). A catalogue load also has `id`, `name` and `provenance`; a user load is named by its record. Its components hold a `manufacturer` reference and `lot`, the bullet `model` and `bulletMass`, the powder `name` and the primer `model`.
 
 **Lot**:
 `lot`: lot number of a load component as printed on the package.
@@ -574,7 +574,7 @@ _Avoid_: `shots` (as a count), n
 A JSON file of the web app with `format` (`openreloading-user-data`), `version` (a file of another version is refused), `records` and the photos of its target sheets in `files`.
 
 **User record**:
-One entry of `records`: `kind` (`bullet`, `cartridge`, `load`, `firearm`, `targetSheet`, `targetFaceDesign`), `id`, `name`, `saved` (ISO date and time of the save) and the `data` of that kind.
+One entry of `records`: `kind` (`bullet`, `cartridge`, `load`, `firearm`, `targetSheet`, `targetFaceDesign`, `powder`), `id`, `name`, `saved` (ISO date and time of the save) and the `data` of that kind.
 _Avoid_: workbenchLoad
 
 **Embedded file**:
@@ -588,6 +588,9 @@ A user record of kind `cartridge`: `origin` (`user`), the `basedOn` catalogue re
 
 **Target face design**:
 A user record of kind `targetFaceDesign`: the `rings`, `innerTen`, `blackDiameter`, `blackHeight`, `decimal` and `events` of a face in mm, each optional while the draft is unfinished. The shot group and hit probability tools offer a design that builds a valid `TargetFace` as `User design <name>` (face id `user-<record id>`).
+
+**Powder design**:
+A user record of kind `powder`: `origin` (`user`), the `provenanceKind` and the `draft`, the powder's grain form, bulk density, composition, thermochemistry and burn law in stored units, each optional while the draft is unfinished. The workbench and the charge target tool offer a design that builds a valid `Powder` as `<name> (your design)`, a saved load names it as `user:<id>`, and every result from it says the powder values are from a user design.
 
 **Base record**:
 `basedOn`: the catalogue record a design is a variant of, as `catalogue:<id>`. The resolved record is the base with the `overrides` applied (`applyOverrides`).

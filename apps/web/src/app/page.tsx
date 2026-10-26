@@ -7,6 +7,7 @@ import { LinkButton } from '../components/record-actions.tsx'
 import {
   listAllBullets,
   listAllCartridges,
+  listAllCases,
   listAllPowders,
   listAllTargetFaces,
   listDisciplines,
@@ -30,9 +31,11 @@ const inData: Record<string, ReactNode> = {
   '/cartridges': <Count list={listAllCartridges} />,
   '/bullets': <Count list={listAllBullets} />,
   '/powders': <Count list={listAllPowders} />,
+  '/cases': <Count list={listAllCases} />,
   '/targets': <Count list={listAllTargetFaces} />,
   '/disciplines': <Count list={listDisciplines} />,
   '/firearms': 'In this browser',
+  '/my-cases': 'In this browser',
 }
 
 /** A card's head: the page's icon left of its linked title. */

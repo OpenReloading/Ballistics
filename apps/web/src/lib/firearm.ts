@@ -42,6 +42,15 @@ export const firearmFields = [
     min: 0,
     integer: true,
   },
+  {
+    key: 'noteAtRoundCount',
+    label: 'Note at round count',
+    help: 'A saved load shot from this firearm gets a note when a session passes this count.',
+    quantity: 'ratio',
+    min: 0,
+    positive: true,
+    integer: true,
+  },
 ] as const satisfies readonly FieldSpec[]
 
 export const opticFields = [
@@ -178,6 +187,7 @@ const storedKinds: Partial<Record<Quantity, QuantityKind>> = {
   length: 'length',
   range: 'length',
   firearmMass: 'mass',
+  mass: 'mass',
   correction: 'angle',
   angle: 'angle',
   temperature: 'temperature',

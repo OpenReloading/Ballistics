@@ -20,6 +20,7 @@ import {
   measuredCapacityRef,
   overrideKeys,
   savedCapacityRef,
+  toApiLoad,
   toLoad,
 } from '../src/lib/load-record.ts'
 import { waterVolume } from '../src/lib/units.ts'
@@ -102,6 +103,15 @@ describe('toLoad', () => {
     const l = toLoad(parts({ given }))
     for (const k of given) expect(l.analysis?.overrides).not.toHaveProperty(k)
     expect(l.analysis?.overrides?.boreDiameter).toBe(7.62)
+  })
+
+  it('keeps a user powder design as its reference and leaves out the values it gives', () => {
+    const powder = 'user:5d4c3b2a-1f0e-4d9c-8b7a-6a5f4e3d2c1b'
+    const given = new Set(['gamma', 'vivacity'])
+    const l = toLoad(parts({ powder, given }))
+    expect(l.powder).toBe(powder)
+    expect(l.analysis?.overrides).not.toHaveProperty('vivacity')
+    expect(loadSchema.safeParse(l).success).toBe(true)
   })
 
   it('writes no analysis for a load of references only', () => {
@@ -300,6 +310,21 @@ describe('the measured case capacity of a load', () => {
     expect(loadSchema.safeParse(l).success).toBe(true)
     expect(l.capacity).toBe(`user:${measuredCapacityId(cartridge, m3)}`)
     expect(l.case).toBeUndefined()
+  })
+
+  it('names a case record next to the lot, and leaves the record out of the API file', () => {
+    const base = parts({
+      cartridge: 'catalogue:308-win',
+      caseRecord: 'catalogue:demo-case-308-brass',
+      lots: { powder: '', primer: '', case: 'L7' },
+    })
+    const l = toLoad(base)
+    expect(loadSchema.safeParse(l).success).toBe(true)
+    expect(l.case).toEqual({ record: 'catalogue:demo-case-308-brass', lot: 'L7' })
+    expect(toLoad(parts({ caseRecord: 'catalogue:demo-case-308-brass' })).case).toEqual({
+      record: 'catalogue:demo-case-308-brass',
+    })
+    expect(toApiLoad(base, { cartridge: 'catalogue:308-win' }).case).toBeUndefined()
   })
 
   it('has an id of one measurement: same value, same record, another value another one', () => {
