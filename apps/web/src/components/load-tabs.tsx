@@ -78,7 +78,8 @@ export function LoadTabs({
               ref={switcher}
               variant="default"
               className="load-switch"
-              aria-label={`${label}, open loads, ${index + 1} of ${items.length}${shown?.unsaved ? ', unsaved changes' : ''}`}
+              aria-label={`Load ${index + 1}: ${label}${shown?.unsaved ? ', unsaved changes' : ''}, switch load (${items.length} open)`}
+              // the name holds the visible text, the number and the label, in order (WCAG 2.5.3)
               title={shown?.title}
               aria-haspopup="dialog"
               aria-expanded={menu}
