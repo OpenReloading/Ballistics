@@ -9,6 +9,7 @@ import { InputError, need, nth } from '../errors.ts'
 import { chiSquareQuantile } from '../groups/chi-square.ts'
 import { studentTwoSidedQuantile } from '../groups/student-t.ts'
 import { logLeastSquares } from '../least-squares.ts'
+import type { Settings } from '../settings.ts'
 import {
   type InteriorInvalid,
   type InteriorLoad,
@@ -57,26 +58,26 @@ export interface PowderFitOptions {
    * Default ['burnRate']; `startPressure` is resolved only with measured pressures
    * (`apps/docs/docs/models/interior-powder-fit.md`, "Identifiability").
    */
-  parameters?: readonly PowderParameter[]
+  parameters?: readonly PowderParameter[] | undefined
   /**
    * Levenberg-Marquardt iterations (accepted plus rejected steps) before the fit fails with reason
    * `not-converged`; default 30.
    */
-  maxIterations?: number
+  maxIterations?: number | undefined
   /** Largest condition number of the column-scaled Jacobian; default 1e3. */
-  maxCondition?: number
+  maxCondition?: number | undefined
   /**
    * Priors on fitted parameters; none by default. The fit then returns the maximum of the
    * posterior. Needs `velocitySigma` on the ladder.
    */
-  priors?: Partial<Record<PowderParameter, PowderPrior>>
+  priors?: Partial<Record<PowderParameter, PowderPrior | undefined>>
   /**
    * Threshold of a Huber loss in sigmas of the ladder rows; none by default, quadratic loss. Needs
    * `velocitySigma` on the ladder.
    */
-  huberThreshold?: number
+  huberThreshold?: number | undefined
   /** Integration settings of every `interior` run; default `interiorDefaults`. */
-  options?: Partial<InteriorOptions>
+  options?: Settings<InteriorOptions> | undefined
 }
 
 /** A fitted parameter: start value, result and uncertainty. */
@@ -157,26 +158,26 @@ export type PowderFitReason =
  */
 export class PowderFitError extends InputError {
   readonly reason: PowderFitReason
-  readonly conditionNumber?: number
+  readonly conditionNumber?: number | undefined
   /** Indices of parameters the ladder does not resolve. */
-  readonly unresolved?: number[]
+  readonly unresolved?: number[] | undefined
   /** Parameter combination (in log parameters, column-scaled) with the smallest eigenvalue. */
-  readonly direction?: number[]
-  readonly estimate?: FittedPowderParameter[]
+  readonly direction?: number[] | undefined
+  readonly estimate?: FittedPowderParameter[] | undefined
   /** With `invalid`: the ladder charge, kg, whose `interior` run was invalid. */
-  readonly charge?: number
+  readonly charge?: number | undefined
   /** With `invalid`: that run's result. */
-  readonly result?: InteriorInvalid
+  readonly result?: InteriorInvalid | undefined
 
   constructor(
     reason: PowderFitReason,
     extra: {
-      conditionNumber?: number
-      unresolved?: number[]
-      direction?: number[]
-      estimate?: FittedPowderParameter[]
-      charge?: number
-      result?: InteriorInvalid
+      conditionNumber?: number | undefined
+      unresolved?: number[] | undefined
+      direction?: number[] | undefined
+      estimate?: FittedPowderParameter[] | undefined
+      charge?: number | undefined
+      result?: InteriorInvalid | undefined
     } = {},
   ) {
     super(`powder fit: ${reason}`)
@@ -475,9 +476,9 @@ export function fitPowder(
 /** Options of `predictPowder`. */
 export interface PowderPredictionOptions {
   /** Coverage of the interval, in (0, 1); default 0.9. */
-  level?: number
+  level?: number | undefined
   /** Integration settings of the `interior` runs; use the fit's own, default `interiorDefaults`. */
-  options?: Partial<InteriorOptions>
+  options?: Settings<InteriorOptions> | undefined
 }
 
 /** A predicted value with its parameter uncertainty and interval. */

@@ -124,7 +124,7 @@ export const manufacturerRow = (m: Manufacturer): IndexRow<ManufacturerItem> => 
  * The key a component is ordered and searched by: the manufacturer's name or one of its aliases
  * followed by the product name (and the product's own aliases).
  */
-function componentKeys(m: Manufacturer, c: { name: string; aliases?: string[] }) {
+function componentKeys(m: Manufacturer, c: { name: string; aliases?: string[] | undefined }) {
   const names = [m.name, ...(m.aliases ?? [])]
   const products = [c.name, ...(c.aliases ?? [])]
   return {

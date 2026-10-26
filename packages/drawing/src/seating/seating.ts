@@ -94,7 +94,7 @@ export interface Seating {
   /** COAL at which the jump is 0. */
   contactCoal?: number
   /** Value undefined where a jump cannot be given; missing names what a derived value lacks. */
-  jump: { value?: number; tag: 'derived' | 'approximate'; missing: string[] }
+  jump: { value?: number | undefined; tag: 'derived' | 'approximate'; missing: string[] }
   /** The bullet touches the lands: a jump of 0 or less. */
   contact: boolean
   /** COAL above the CIP maximum L6. */
@@ -137,7 +137,7 @@ export function seat({
     coal,
     ...(cbto && { cbto }),
     depth: { value: depthValue, tag: 'derived' },
-    ...(caseVolume && { caseVolume, volumeBehindBullet: volume }),
+    ...(caseVolume && volume && { caseVolume, volumeBehindBullet: volume }),
     ...(barrelLength !== undefined && {
       travel: { value: barrelLength - base, tag: 'derived' as const },
     }),

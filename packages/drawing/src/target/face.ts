@@ -8,11 +8,11 @@ export interface FaceRing {
   value: number
   diameter: FaceLength
   /** Height of an oval ring; absent: a circle. */
-  height?: FaceLength
+  height?: FaceLength | undefined
   /** `square`: a square of edge `diameter`; absent or `circle`: a circle or oval. */
-  shape?: 'circle' | 'square'
-  fill?: string
-  line?: string
+  shape?: 'circle' | 'square' | undefined
+  fill?: string | undefined
+  line?: string | undefined
 }
 
 /** The fields of a target face the figure reads; a `TargetFace` record fits. */

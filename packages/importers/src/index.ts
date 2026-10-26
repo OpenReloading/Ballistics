@@ -36,7 +36,7 @@ export interface ParseChronoOptions
   extends ChronoParserOptions,
     Partial<Omit<DelimitedOptions, keyof ChronoParserOptions>> {
   /** `YYYY-MM-DD`: the formats that read it keep only this day. */
-  date?: string
+  date?: string | undefined
 }
 
 /** A chronograph format that reads text. */

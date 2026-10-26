@@ -7,6 +7,7 @@
  * target, not a charge to load.
  */
 import { need, nth } from '../errors.ts'
+import type { Settings } from '../settings.ts'
 import { solidFillLimit } from './load-file.ts'
 import {
   type InteriorLoad,
@@ -47,11 +48,11 @@ const scanSpan = 1e-3
 /** Options of `solveCharge`. */
 export interface ChargeSolverOptions {
   /** Bulk density, kg/m3: needed for the load ratio target. */
-  bulkDensity?: number
+  bulkDensity?: number | undefined
   /** Overrides of `interiorDefaults` for every run. */
-  options?: Partial<InteriorOptions>
+  options?: Settings<InteriorOptions> | undefined
   /** The model run, `interior` by default; a seam for tests with synthetic curves. */
-  run?: (load: InteriorLoad, options?: Partial<InteriorOptions>) => InteriorResult
+  run?: ((load: InteriorLoad, options?: Settings<InteriorOptions>) => InteriorResult) | undefined
 }
 
 /** Why a run was not valid: `reason` and `field` of `interior`. */

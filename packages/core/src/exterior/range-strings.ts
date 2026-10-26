@@ -13,6 +13,7 @@ import {
   type LogFitFailure,
   logLeastSquares,
 } from '../least-squares.ts'
+import { overlay, type Settings } from '../settings.ts'
 import { type TrajectoryInput, type TrajectoryOptions, trajectory } from './trajectory.ts'
 import { dragCorrection, TruingError } from './truing.ts'
 
@@ -49,25 +50,25 @@ export interface RangeStringEntry {
    * Step of the reading in the unit of `value`; adds step / sqrt(12). Default: `defaultRounding`
    * of the kind (a dial moves in whole clicks, 1; a measured impact has no step, 0).
    */
-  rounding?: number
+  rounding?: number | undefined
   /**
    * The group of shots behind the entry. An impact and a dial entry of one group count the same
    * shots twice and are rejected. Default: the distance, so give distinct names to two groups
    * shot at one distance.
    */
-  group?: string
+  group?: string | undefined
 }
 
 /** Muzzle velocity readings; `instrumentDistance` is the distance from the muzzle to the instrument. */
 export interface Chronograph {
-  instrumentDistance?: number
+  instrumentDistance?: number | undefined
   /** Mean muzzle velocity of the readings, m/s. */
   mean: number
   shotCount: number
   /** Standard deviation of one shot, m/s. */
   standardDeviation: number
   /** Step of the reading, m/s; default 0. */
-  rounding?: number
+  rounding?: number | undefined
 }
 
 /**
@@ -79,46 +80,46 @@ export interface Chronograph {
  */
 export interface RangeStringPriors {
   /** Standard deviation of ln(v0 / nominal). */
-  muzzleVelocity?: number
+  muzzleVelocity?: number | undefined
   /** Standard deviation of ln k. */
-  dragFactor?: number
+  dragFactor?: number | undefined
   /** Standard deviation of ln(c / nominal). */
-  clickValue?: number
+  clickValue?: number | undefined
   /** Standard deviation of the zero offset, rad; needs `RangeStringOptions.fitZeroOffset`. */
-  zeroOffset?: number
+  zeroOffset?: number | undefined
 }
 
 /** Solver settings and thresholds of `planTruingStrings` and `fitTruingStrings`. */
 export interface RangeStringOptions {
   /** Fit the zero offset as a fourth parameter; default false (three parameters). */
-  fitZeroOffset?: boolean
+  fitZeroOffset?: boolean | undefined
   /** Gaussian priors on the parameters; none by default. */
-  priors?: RangeStringPriors
+  priors?: RangeStringPriors | undefined
   /** Standard error of the zero offset in rad above which it is weakly identified; default 1e-4. */
-  maxZeroSigma?: number
+  maxZeroSigma?: number | undefined
   /** Options of every trajectory; default tolerances `relativeTolerance` 1e-10, `absoluteTolerance` 1e-9, `zeroTolerance` 1e-9. */
-  trajectoryOptions?: Omit<Partial<TrajectoryOptions>, 'budget'>
+  trajectoryOptions?: Settings<Omit<TrajectoryOptions, 'budget'>> | undefined
   /**
    * Levenberg-Marquardt iterations (accepted plus rejected steps) before the fit of the current
    * parameters fails with reason `not-converged`; default 30.
    */
-  maxIterations?: number
+  maxIterations?: number | undefined
   /** Largest condition number of the fit; parameters beyond it are held; default 1e3. */
-  maxCondition?: number
+  maxCondition?: number | undefined
   /** Two-sided confidence level of the intervals; default 0.95. */
-  confidenceLevel?: number
+  confidenceLevel?: number | undefined
   /** Variance inflation above which a parameter is weakly identified; default 10. */
-  maxInflation?: number
+  maxInflation?: number | undefined
   /** Standard error of ln q above which a parameter is weakly identified; default 0.05. */
-  maxRelativeStandardUncertainty?: number
+  maxRelativeStandardUncertainty?: number | undefined
   /** Level of the chi-square test of the residuals; default 0.99. */
-  residualConfidenceLevel?: number
+  residualConfidenceLevel?: number | undefined
   /**
    * Scale the standard errors in the intervals by the square root of the reduced chi-square
    * and use Student's t instead of the normal quantile, for spreads that are not known; no effect
    * at 0 degrees of freedom. Default false (`apps/docs/docs/models/exterior-truing-strings.md`, "Intervals").
    */
-  scaleByResidual?: boolean
+  scaleByResidual?: boolean | undefined
 }
 
 /** Defaults of `RangeStringOptions` for the fields it lists. */
@@ -235,9 +236,9 @@ export interface PlanEntry {
   /** Planned shots behind the mean, a whole number of at least 1. */
   shotCount: number
   /** Step of the reading in the unit of the kind; default `defaultRounding`. */
-  rounding?: number
+  rounding?: number | undefined
   /** Group of shots, see `RangeStringEntry.group`. */
-  group?: string
+  group?: string | undefined
 }
 
 /** Input of `planTruingStrings`. */
@@ -251,10 +252,9 @@ export interface TruingPlanInput {
   /** Planned distances; at least one entry or a chronograph. */
   entries: readonly PlanEntry[]
   /** Planned muzzle velocity readings. */
-  chronograph?: Pick<
-    Chronograph,
-    'instrumentDistance' | 'shotCount' | 'standardDeviation' | 'rounding'
-  >
+  chronograph?:
+    | Pick<Chronograph, 'instrumentDistance' | 'shotCount' | 'standardDeviation' | 'rounding'>
+    | undefined
 }
 
 /** Result of `planTruingStrings`. */
@@ -374,7 +374,9 @@ function checkCommon(shot: TrajectoryInput, clickValue: number, options: RangeSt
 }
 
 /** An impact and a dial entry of one group count the same shots twice. */
-function checkGroups(entries: readonly { kind: string; range: number; group?: string }[]): void {
+function checkGroups(
+  entries: readonly { kind: string; range: number; group?: string | undefined }[],
+): void {
   const kinds = new Map<string, Set<string>>()
   for (const e of entries) {
     const key = e.group ?? `${e.range} m`
@@ -457,7 +459,7 @@ interface Prior {
 }
 
 class Model {
-  readonly options: Partial<TrajectoryOptions>
+  readonly options: Settings<TrajectoryOptions>
   readonly shot: TrajectoryInput
   readonly clickValue: number
   readonly rows: readonly Row[]
@@ -475,12 +477,10 @@ class Model {
     this.shot = shot
     this.clickValue = clickValue
     this.rows = rows
-    this.options = {
-      relativeTolerance: 1e-10,
-      absoluteTolerance: 1e-9,
-      zeroTolerance: 1e-9,
-      ...options.trajectoryOptions,
-    }
+    this.options = overlay<Settings<TrajectoryOptions>>(
+      { relativeTolerance: 1e-10, absoluteTolerance: 1e-9, zeroTolerance: 1e-9 },
+      options.trajectoryOptions,
+    )
     this.active = options.fitZeroOffset ? [0, 1, 2, 3] : [0, 1, 2]
     this.priors = this.active.flatMap((j) => {
       const sigma = options.priors?.[nth(names, j)]
@@ -583,7 +583,7 @@ interface StatusInput {
   model: Model
   theta: readonly number[]
   options: RangeStringOptions
-  fitted?: { kept: readonly number[] }
+  fitted?: { kept: readonly number[] } | undefined
   /** Resolved parameters, the columns of `info` and `post`. */
   live: readonly number[]
   info: Identifiability | null
@@ -672,7 +672,7 @@ function analyse(
   model: Model,
   theta: readonly number[],
   options: RangeStringOptions,
-  fitted?: { kept: readonly number[] },
+  fitted?: { kept: readonly number[] } | undefined,
 ): Identification {
   const { maxInflation = rangeStringDefaults.maxInflation } = options
   const all = model.active
@@ -758,11 +758,11 @@ export function planTruingStrings(
 /** One candidate string of `comparePlanCandidates`: planned entries and chronograph readings. */
 export interface PlanCandidate {
   /** Label returned with the result. */
-  name?: string
+  name?: string | undefined
   /** Planned distances. */
   entries: readonly PlanEntry[]
   /** Planned muzzle velocity readings. */
-  chronograph?: TruingPlanInput['chronograph']
+  chronograph?: TruingPlanInput['chronograph'] | undefined
 }
 
 /** Plan of one candidate string. */
@@ -866,7 +866,7 @@ export interface TruingStringsInput {
   /** Measured distances; at least one entry or a chronograph. */
   entries: readonly RangeStringEntry[]
   /** Measured muzzle velocity readings. */
-  chronograph?: Chronograph
+  chronograph?: Chronograph | undefined
 }
 
 /**
@@ -1060,7 +1060,7 @@ function stringsFitResult(model: Model, options: RangeStringOptions, refit: Refi
     residuals,
     chiSquare,
     degreesOfFreedom: dof,
-    ...(dof > 0 ? { pValue: chiSquareSurvival(chiSquare, dof), consistent } : {}),
+    ...(consistent === undefined ? {} : { pValue: chiSquareSurvival(chiSquare, dof), consistent }),
     intervalsTrusted,
     intervalScale,
     failures,

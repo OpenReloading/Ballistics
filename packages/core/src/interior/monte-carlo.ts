@@ -5,6 +5,7 @@
  * It covers input tolerances only, not model error.
  */
 import { nth } from '../errors.ts'
+import type { Settings } from '../settings.ts'
 import { type InteriorLoad, type InteriorOptions, interior } from './model.ts'
 import {
   type ApplyTolerance,
@@ -148,7 +149,7 @@ export function interiorSampledBand(
   load: InteriorLoad,
   tolerances: PressureTolerances,
   sampling: SamplingOptions,
-  options: Partial<InteriorOptions> = {},
+  options: Settings<InteriorOptions> = {},
 ): SampledBand {
   const run = (l: InteriorLoad) => {
     const r = interior(l, options)

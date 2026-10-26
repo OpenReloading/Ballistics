@@ -16,21 +16,21 @@ interface StoredQuantity {
 /** The bullet record fields the drawing reads; the API type of a bullet record is assignable to it. */
 export interface BulletValues {
   diameter: StoredQuantity
-  length?: StoredQuantity
-  noseLength?: StoredQuantity
-  baseToOgive?: StoredQuantity
-  bearingLength?: StoredQuantity
-  meplatDiameter?: StoredQuantity
+  length?: StoredQuantity | undefined
+  noseLength?: StoredQuantity | undefined
+  baseToOgive?: StoredQuantity | undefined
+  bearingLength?: StoredQuantity | undefined
+  meplatDiameter?: StoredQuantity | undefined
   base?: {
-    type?: BaseType
-    length?: StoredQuantity
-    diameter?: StoredQuantity
-    angle?: StoredQuantity
-    cavityDiameter?: StoredQuantity
+    type?: BaseType | undefined
+    length?: StoredQuantity | undefined
+    diameter?: StoredQuantity | undefined
+    angle?: StoredQuantity | undefined
+    cavityDiameter?: StoredQuantity | undefined
   }
-  ogive?: { form?: string; radius?: StoredQuantity; radiusRatio?: StoredQuantity }
-  cannelure?: { start: StoredQuantity; width: StoredQuantity; depth?: StoredQuantity }
-  tip?: { type: string; length?: StoredQuantity; mouthDiameter?: StoredQuantity }
+  ogive?: { form?: string; radius?: StoredQuantity; radiusRatio?: StoredQuantity } | undefined
+  cannelure?: { start: StoredQuantity; width: StoredQuantity; depth?: StoredQuantity } | undefined
+  tip?: { type: string; length?: StoredQuantity; mouthDiameter?: StoredQuantity } | undefined
   provenance: { sources: { title: string; fields?: string[] }[] }
 }
 

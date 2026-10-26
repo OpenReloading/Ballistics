@@ -6,6 +6,7 @@ import { bisect } from '../bisect.ts'
 import { InputError, nth } from '../errors.ts'
 import { icao } from '../exterior/atmosphere.ts'
 import { type Rhs, type Rk45Event, type Rk45Options, rk45 } from '../exterior/rk45.ts'
+import { overlay, type Settings } from '../settings.ts'
 import { type Burn, burnError, burnForm } from './form.ts'
 
 /** Unchecked read of a state vector the caller sizes and indexes by the same count (kept in this module so the integrator loops inline it). */
@@ -31,7 +32,7 @@ export interface InteriorLoad {
     /** Bullet mass, kg. */
     mass: number
     /** Axial radius of gyration, m; default boreDiameter / (2 sqrt 2), a solid cylinder. */
-    gyrationRadius?: number
+    gyrationRadius?: number | undefined
   }
   /** Charge mass, kg. */
   charge: number
@@ -50,7 +51,7 @@ export interface InteriorLoad {
      * Burn-rate temperature sensitivity, 1/K, below (cold) and above (hot) the reference, K
      * (`apps/docs/docs/models/interior-m3.md`, "Temperature of the propellant").
      */
-    temperatureSensitivity?: { reference: number; cold: number; hot: number }
+    temperatureSensitivity?: { reference: number; cold: number; hot: number } | undefined
   }
   /** Propellant temperature, K. */
   propellantTemperature: number
@@ -59,41 +60,46 @@ export interface InteriorLoad {
   /** Mean pressure at which the projectile may start to move, Pa (`apps/docs/docs/models/interior-m3.md`, "Shot start"). */
   startPressure: number
   /** Bore resistance as pressures on the bore area (`apps/docs/docs/models/interior-m3.md`, "Bore resistance"). */
-  resistance?: {
-    /** Constant friction pressure, Pa. */
-    friction?: number
-    /** Engraving pressure over travel, m and Pa, interpolated linearly, 0 outside. */
-    engraving?: readonly { travel: number; pressure: number }[]
-  }
+  resistance?:
+    | {
+        /** Constant friction pressure, Pa. */
+        friction?: number | undefined
+        /** Engraving pressure over travel, m and Pa, interpolated linearly, 0 outside. */
+        engraving?: readonly { travel: number; pressure: number }[] | undefined
+      }
+    | undefined
   /** Pressure-gradient coefficients (`apps/docs/docs/models/interior-m3.md`, "Pressure gradient"); default `lagrangeGradient`. */
-  gradient?: { energy: number; breech: number }
+  gradient?: { energy: number; breech: number } | undefined
   /**
    * Heat loss to the bore (`apps/docs/docs/models/interior-leakage-heat.md`, "Convective heat loss"); default none.
    * Omitted fields take `convectiveDefaults`.
    */
   heat?:
+    | undefined
     | { model: 'none' }
     | {
         model: 'convective'
         /** Flame temperature, K. */
         flameTemperature: number
         /** Wall temperature, K. */
-        wallTemperature?: number
+        wallTemperature?: number | undefined
         /** Gas viscosity, Pa s. */
-        viscosity?: number
-        prandtl?: number
+        viscosity?: number | undefined
+        prandtl?: number | undefined
         /** Factor on the heat flux, default 1. */
-        factor?: number
+        factor?: number | undefined
       }
   /** Gas leakage past the projectile (`apps/docs/docs/models/interior-leakage-heat.md`); default none. */
-  leakage?: {
-    /** Leak area over travel, m and m2, interpolated linearly, 0 outside; while held the area at travel 0 applies (0 unless a point is at travel 0). */
-    area: readonly { travel: number; area: number }[]
-    /** Pressure ahead of the projectile, Pa; default the ICAO sea-level pressure. */
-    backPressure?: number
-    /** Discharge coefficient on the area, default 1. */
-    discharge?: number
-  }
+  leakage?:
+    | {
+        /** Leak area over travel, m and m2, interpolated linearly, 0 outside; while held the area at travel 0 applies (0 unless a point is at travel 0). */
+        area: readonly { travel: number; area: number }[]
+        /** Pressure ahead of the projectile, Pa; default the ICAO sea-level pressure. */
+        backPressure?: number | undefined
+        /** Discharge coefficient on the area, default 1. */
+        discharge?: number | undefined
+      }
+    | undefined
 }
 
 /** Defaults of the convective heat model (`apps/docs/docs/models/interior-leakage-heat.md`, "Convective heat loss"): K, Pa s, 1. */
@@ -872,10 +878,10 @@ function runInterior(
 
 function simulate(
   load: InteriorLoad,
-  options: Partial<InteriorOptions>,
+  options: Settings<InteriorOptions>,
   closed: boolean,
 ): Run | InteriorInvalid {
-  const merged = { ...interiorDefaults, ...options }
+  const merged = overlay(interiorDefaults, options)
   // an output step of 0 never advances the run
   const option = (Object.keys(interiorDefaults) as (keyof InteriorOptions)[]).find(
     (k) => !(Number.isFinite(merged[k]) && merged[k] > 0),
@@ -912,7 +918,7 @@ export function chargeTooSmall(
 /** Runs the interior model on one load until muzzle exit. */
 export function interior(
   load: InteriorLoad,
-  options: Partial<InteriorOptions> = {},
+  options: Settings<InteriorOptions> = {},
 ): InteriorResult {
   const run = simulate(load, options, false)
   if ('valid' in run) return run
@@ -960,7 +966,7 @@ export function interior(
 /** Burns the charge in the closed chamber (projectile held) until burnout. */
 export function closedVessel(
   load: InteriorLoad,
-  options: Partial<InteriorOptions> = {},
+  options: Settings<InteriorOptions> = {},
 ): ClosedVesselResult {
   const run = simulate(load, options, true)
   if ('valid' in run) return run

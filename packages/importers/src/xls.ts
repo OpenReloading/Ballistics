@@ -283,7 +283,7 @@ interface SheetState {
   rows: Map<number, string[]>
   remaining: CellBudget
   /** A formula with a string result waits for its String record (2.1.7.20.5 FORMULA). */
-  pending?: { row: number; col: number }
+  pending?: { row: number; col: number } | undefined
 }
 
 function put(st: SheetState, row: number, col: number, text: string): void {

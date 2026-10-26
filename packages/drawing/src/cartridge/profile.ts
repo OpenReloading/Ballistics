@@ -189,8 +189,8 @@ function draft(side: Side, find: (symbol: string, s?: string) => SpecValue | und
 
 /** The groove depth e drawn, and a cartridge e derived from delta where none is stored. */
 interface GrooveDepth {
-  e?: number
-  derivedE?: number
+  e?: number | undefined
+  derivedE?: number | undefined
 }
 
 /**
@@ -249,14 +249,14 @@ function headProfile(d: Draft, R: number) {
 interface GrooveShape {
   R: number
   e: number
-  derivedE?: number
+  derivedE?: number | undefined
   E: number
   E1: number
-  R3?: number
-  delta?: number
+  R3?: number | undefined
+  delta?: number | undefined
   validDelta: boolean
   belt: boolean
-  zBelt?: number
+  zBelt?: number | undefined
 }
 
 /** The groove's points and marks, the belt where there is one, and the notes on e and delta. */

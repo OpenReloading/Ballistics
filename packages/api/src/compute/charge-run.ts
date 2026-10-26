@@ -2,6 +2,7 @@
 import {
   type ChargeTarget,
   InputError,
+  overlay,
   type PressureRange,
   pressureToleranceDefaults,
 } from '@open-reloading/core'
@@ -190,7 +191,7 @@ export async function runChargeTarget(
   if (!solution.reached) return { status: 422, payload: unreachedAnswer(solution, echoTarget) }
   // the pressure range, limits and warnings at the solved charge, as `POST /interior` gives them
   const load = { ...body.load, propellant, charge: solution.charge }
-  const tolerances = { ...pressureToleranceDefaults, ...body.tolerances }
+  const tolerances = overlay(pressureToleranceDefaults, body.tolerances)
   const { result, range } = await context.compute.run({
     kind: 'interiorM3',
     load,

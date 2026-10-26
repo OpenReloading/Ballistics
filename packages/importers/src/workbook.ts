@@ -115,10 +115,10 @@ function sharedStrings(text: string, xmlRemaining: XmlBudget): string[] {
 }
 
 interface CellState {
-  t?: string
-  r?: string
-  v?: string
-  is?: string
+  t?: string | undefined
+  r?: string | undefined
+  v?: string | undefined
+  is?: string | undefined
   vs: number
   iss: number
 }

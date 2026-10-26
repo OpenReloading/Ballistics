@@ -4,17 +4,17 @@ import type { SpecValue } from '../core/types.ts'
 /** The values of a CIP record the preview reads: the cartridge L3 (case length) and L6, the chamber throat. */
 export interface SeatingValues {
   caseLength: number
-  cartridgeL6?: number
+  cartridgeL6?: number | undefined
   /** Chamber L3, mm. */
-  chamberL3?: number
-  G1?: number
-  F?: number
+  chamberL3?: number | undefined
+  G1?: number | undefined
+  F?: number | undefined
   /** Chamber G: the leade end past chamber L3, mm. */
-  leadeEnd?: number
+  leadeEnd?: number | undefined
   /** Chamber s: the leade start past chamber L3, mm. */
-  leadeStart?: number
+  leadeStart?: number | undefined
   /** Chamber i: the leade angle to the axis, degrees. */
-  leadeAngle?: number
+  leadeAngle?: number | undefined
 }
 
 /**

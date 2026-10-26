@@ -33,7 +33,7 @@ export const namedByCaller = (unit: VelocityUnit) => `using ${unit} as named by 
 export function checkCallerUnit(
   text: string,
   unit: VelocityUnit,
-  options: { velocityUnit?: VelocityUnit },
+  options: { velocityUnit?: VelocityUnit | undefined },
 ): void {
   const caller = options.velocityUnit
   if (caller && caller !== unit) {
@@ -46,7 +46,7 @@ export function checkCallerUnit(
 /** The file's unit, else the caller's; throws when neither is known or they differ. */
 export function resolveUnit(
   text: string | undefined,
-  options: { velocityUnit?: VelocityUnit },
+  options: { velocityUnit?: VelocityUnit | undefined },
   warnings: string[],
 ): VelocityUnit {
   const unit = parseVelocityUnit(text)

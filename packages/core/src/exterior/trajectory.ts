@@ -6,6 +6,7 @@
  */
 import { type DragModel, type DragTable, dragTables } from '../drag-tables.ts'
 import { InputError, need, nth } from '../errors.ts'
+import { overlay, type Settings } from '../settings.ts'
 import {
   type Air,
   airAt,
@@ -46,11 +47,11 @@ export interface Projectile {
   /** Reference diameter, m. */
   diameter: number
   /** Length, m; needed for stability, spin drift and jump. */
-  length?: number
+  length?: number | undefined
   /** Drag input: ballistic coefficient bands or a drag coefficient curve. */
   drag: DragInput
   /** Coefficients of the modified point mass (`apps/docs/docs/models/exterior-modified-point-mass.md`, "Coefficients over Mach"); ignored by the point mass. */
-  aerodynamics?: Aerodynamics
+  aerodynamics?: Aerodynamics | undefined
 }
 
 /** Firearm and sight of a shot, SI units. */
@@ -58,14 +59,14 @@ export interface Firearm {
   /** Line of sight above the bore axis at the muzzle, perpendicular to the line of sight, m. */
   sightHeight: number
   /** Sight to the right of the bore, m. */
-  sightOffset?: number
+  sightOffset?: number | undefined
   /** Twist length per turn, m. */
-  twist?: number
+  twist?: number | undefined
   /**
    * Direction of the twist. Spin drift and jump need it, and the modified point mass signs the
    * spin by it.
    */
-  twistHand?: 'right' | 'left'
+  twistHand?: 'right' | 'left' | undefined
 }
 
 /** Wind over a span of horizontal downrange distance (`apps/docs/docs/models/exterior-point-mass.md`, "Wind"). */
@@ -77,15 +78,15 @@ export interface WindSegment {
   /** Direction the wind blows from, rad clockwise from the line of fire: 0 headwind, pi/2 from the right. */
   fromDirection: number
   /** Vertical component, m/s, positive up. */
-  vertical?: number
+  vertical?: number | undefined
 }
 
 /** Position and direction of fire, for the Earth rotation (`apps/docs/docs/models/exterior-point-mass.md`, "Earth rotation"). */
 export interface FiringSite {
   /** Latitude, rad, positive north; switches on Coriolis. */
-  latitude?: number
+  latitude?: number | undefined
   /** Azimuth of fire, rad clockwise from true north. */
-  azimuth?: number
+  azimuth?: number | undefined
 }
 
 /** Conditions of the zero (`apps/docs/docs/models/exterior-point-mass.md`, "Zeroing"). */
@@ -93,11 +94,11 @@ export interface ZeroSpec {
   /** Zero slant range, m. */
   range: number
   /** Look angle of the zero, rad; default 0. */
-  lookAngle?: number
+  lookAngle?: number | undefined
   /** Air of the zero; default the shot's air. */
-  air?: Air
+  air?: Air | undefined
   /** Wind of the zero; default none. */
-  wind?: readonly WindSegment[]
+  wind?: readonly WindSegment[] | undefined
 }
 
 /** Bore direction relative to the line of sight, rad. */
@@ -119,11 +120,11 @@ export interface TrajectoryInput {
   /** Station air at the firing point. */
   air: Air
   /** Angle of the line of sight above the horizontal, rad; default 0. */
-  lookAngle?: number
+  lookAngle?: number | undefined
   /** Wind by distance segment; default none. */
-  wind?: readonly WindSegment[]
+  wind?: readonly WindSegment[] | undefined
   /** Latitude and azimuth for Coriolis; default none. */
-  site?: FiringSite
+  site?: FiringSite | undefined
   /** Zero conditions (the bore angles are searched), or the bore angles themselves. */
   zero: ZeroSpec | BoreAngles
 }
@@ -156,7 +157,7 @@ export interface TrajectoryOptions {
    * Step count shared with other calls; every integration of the call (zero search, run, twin)
    * adds to it.
    */
-  budget?: StepBudget
+  budget?: StepBudget | undefined
 }
 
 /** Defaults of `TrajectoryOptions`; options passed to `trajectory` override them by field. */
@@ -299,7 +300,7 @@ interface Conditions {
   air: Air
   wind: readonly WindSegment[]
   /** Present for the modified point mass. */
-  aero?: Aero
+  aero?: Aero | undefined
 }
 
 type Raw = Omit<TrajectoryPoint, 'spinDrift' | 'jump' | 'elevationHold' | 'windageHold'>
@@ -402,7 +403,7 @@ function machGrid(table: DragTable, aero: Aero | undefined) {
 interface FlightContext {
   p: Projectile
   air: Air
-  aero?: Aero
+  aero?: Aero | undefined
   /** Wind vector of each wind segment, ground frame, m/s. */
   wv: [number, number, number][]
   bands: { s: number; minVelocity: number }[]
@@ -1109,10 +1110,8 @@ function correct(
   })
 }
 
-const resolve = (options?: Partial<TrajectoryOptions>): TrajectoryOptions => ({
-  ...trajectoryDefaults,
-  ...options,
-})
+const resolve = (options?: Settings<TrajectoryOptions>): TrajectoryOptions =>
+  overlay(trajectoryDefaults, options)
 
 const aeroFor = (shot: TrajectoryInput, o: TrajectoryOptions) =>
   o.model === 'modified-point-mass' ? resolveAero(shot) : undefined
@@ -1164,7 +1163,7 @@ function zeroWith(shot: TrajectoryInput, o: TrajectoryOptions, aero: Aero | unde
 /** Bore angles that put the impact on the line of sight at the zero range (`apps/docs/docs/models/exterior-point-mass.md`, "Zeroing"). */
 export function zeroAngles(
   shot: TrajectoryInput,
-  options?: Partial<TrajectoryOptions>,
+  options?: Settings<TrajectoryOptions>,
 ): BoreAngles {
   const o = resolve(options)
   checkShot(shot, o)
@@ -1214,7 +1213,7 @@ function omittedEffects(
 export function trajectory(
   shot: TrajectoryInput,
   ranges: readonly number[],
-  options?: Partial<TrajectoryOptions>,
+  options?: Settings<TrajectoryOptions>,
 ): Trajectory {
   const o = resolve(options)
   checkShot(shot, o)

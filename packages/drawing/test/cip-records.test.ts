@@ -703,8 +703,8 @@ it('draws every variant of every current table VII record to one span, chamber a
 interface Figure {
   name: string
   values: SpecValue[]
-  table?: string
-  variant?: string
+  table?: string | undefined
+  variant?: string | undefined
   drawn: Drawn
   /** The caption notes, numbered where they have a flag. */
   notes: { flagNumber?: number }[]

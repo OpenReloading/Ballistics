@@ -21,33 +21,39 @@ export type BaseType =
 export interface BulletDimensions {
   diameter: number
   length: number
-  noseLength?: number
-  baseToOgive?: number
-  bearingLength?: number
+  noseLength?: number | undefined
+  baseToOgive?: number | undefined
+  bearingLength?: number | undefined
   /** 0 for a sharp point. */
-  meplatDiameter?: number
-  base?: {
-    type?: BaseType
-    length?: number
-    /** Diameter of the base face at the end of the boat tail. */
-    diameter?: number
-    /** Half angle of the boat-tail cone to the axis. */
-    angle?: number
-    /** Diameter of the cavity of a hollow base where it opens in the base face. */
-    cavityDiameter?: number
-  }
+  meplatDiameter?: number | undefined
+  base?:
+    | {
+        type?: BaseType | undefined
+        length?: number | undefined
+        /** Diameter of the base face at the end of the boat tail. */
+        diameter?: number | undefined
+        /** Half angle of the boat-tail cone to the axis. */
+        angle?: number | undefined
+        /** Diameter of the cavity of a hollow base where it opens in the base face. */
+        cavityDiameter?: number | undefined
+      }
+    | undefined
   /**
    * `form`: `tangent`, `secant`, `hybrid`, or for designer input `round-nose` and `flat-nose`.
    * `radius` is the ogive radius R; `radiusRatio` is Rt/R (1 tangent, 0 a cone).
    */
-  ogive?: { form?: string; radius?: number; radiusRatio?: number }
+  ogive?:
+    | { form?: string | undefined; radius?: number | undefined; radiusRatio?: number | undefined }
+    | undefined
   /** `length`: polymer tip forward of the jacket opening; `mouthDiameter`: hollow-point opening. */
-  tip?: { type: string; length?: number; mouthDiameter?: number }
+  tip?:
+    | { type: string; length?: number | undefined; mouthDiameter?: number | undefined }
+    | undefined
   /**
    * `start` is the z of the groove's rear edge from the base, `width` its axial width, `depth`
    * its radial depth.
    */
-  cannelure?: { start: number; width: number; depth?: number }
+  cannelure?: { start: number; width: number; depth?: number | undefined } | undefined
 }
 
 /** Why input cannot form an outline, and the record paths of the fields involved. */
@@ -308,9 +314,9 @@ interface Tail {
 
 /** What the cases of a boat tail share: the given values, the cone top radius ac, the start. */
 interface TailInput {
-  gl?: number
-  gd?: number
-  ga?: number
+  gl?: number | undefined
+  gd?: number | undefined
+  ga?: number | undefined
   ac: number
   given: 'sourced' | 'entered'
   start: Tail
@@ -864,8 +870,8 @@ interface Parts {
   a: number
   L: number
   base: BaseGeometry
-  cavity?: Cavity
-  groove?: Groove
+  cavity?: Cavity | undefined
+  groove?: Groove | undefined
   z0: number
   nTag: Tag
   noseTag: Tag

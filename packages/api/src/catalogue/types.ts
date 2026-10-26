@@ -248,7 +248,7 @@ export interface CatalogueSource {
   targetMappings: TargetMapping[]
   caliberClasses: CaliberClass[]
   /** `renames.json` of the records; absent: none. */
-  renames?: Renames
+  renames?: Renames | undefined
 }
 
 /** What `openCatalogue` opens: the index and the record file, or a function that reads it on the first `get`. */

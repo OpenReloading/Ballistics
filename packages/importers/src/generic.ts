@@ -35,11 +35,11 @@ export type Delimiter = ',' | ';' | '\t' | 'none'
 export interface DelimitedOptions extends ChronoParserOptions {
   columns: ColumnMap
   /** Cell separator; detected when absent. */
-  delimiter?: Delimiter
+  delimiter?: Delimiter | undefined
   /** File rows before the data, used when every mapped column is a number. */
-  skipRows?: number
+  skipRows?: number | undefined
   /** Device of the session; kind `other` without manufacturer name or model when absent. */
-  device?: SessionCandidate['device']
+  device?: SessionCandidate['device'] | undefined
 }
 
 const falsy = ['', '0', 'no', 'false']
@@ -161,7 +161,7 @@ function findHeader(
   rows: Row[],
   names: string[],
   velocity: Column,
-): { header?: string[]; headerText?: string; data: Row[] } {
+): { header?: string[] | undefined; headerText?: string | undefined; data: Row[] } {
   if (names.length === 0) return { data: rows }
   const h = headerIndex(
     rows.map((r) => r.cells),
