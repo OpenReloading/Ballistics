@@ -1,0 +1,36 @@
+# Spell check of code, comments, docs and UI text (typos, run by ci.yml `check`).
+# Locally: `typos` from https://github.com/crate-ci/typos, or `docker run`-free: any 1.51 binary on the PATH.
+
+[files]
+ignore-hidden = false
+extend-exclude = [
+  ".git/",
+  # records quote names, titles and units in the language of their source
+  "packages/data/records/",
+  # generated or copied byte for byte from a tool
+  "package-lock.json",
+  "*.snap",
+  "**/*-snapshots/",
+  "apps/web/test/golden/",
+]
+
+[default]
+# Each pattern is one German string or citation, so a misspelling elsewhere still fails.
+extend-ignore-re = [
+  # commit hashes in the generated CHANGELOG.md links
+  "\\(\\[[0-9a-f]{7}\\]",
+  # German month names of the ShotView export, a German CSV fixture line and a German stage label
+  "januar februar [^']*dezember",
+  "8\\. Februar 2026",
+  "Alle Sch\\\\u00FCsse",
+  "Sek\\. Serie",
+  # German organization name in the bibliography
+  "Bund Deutscher",
+]
+
+[default.extend-words]
+# English verb of gyrodynamics (the spin axis precesses)
+precess = "precess"
+# symbols of the equations in packages/core: transverse moment of inertia, burn rate factor
+iy = "iy"
+ba = "ba"

@@ -131,8 +131,9 @@ jobs:
 
   # Fails when a part failed or was cancelled; a skipped part (the plan, the promotion pull request) passes, as the
   # old single job did when skipped. Stays the name the rulesets require. It also checks the relative links and
-  # anchors of the Markdown files on every run: the plan skips `static` for prose that no other check reads, which
-  # is where a link breaks. External links: links.yml.
+  # anchors of the Markdown files and the spelling of every tracked text file (typos, `_typos.toml`) on every run:
+  # the plan skips `static` for prose that no other check reads, which is where a link or a word breaks. External
+  # links: links.yml.
   check:
     needs: [static, test]
     if: ${{ always() && !(github.event_name == 'pull_request' && github.head_ref == 'develop' && github.base_ref == 'main' && github.event.pull_request.head.repo.full_name == github.repository) }}
@@ -146,6 +147,8 @@ jobs:
           persist-credentials: false
       - name: Relative links and anchors of the Markdown files (lychee, offline)
         run: git ls-files '*.md' '*.mdx' | docker run --rm --interactive -v "$PWD:/repo:ro" -w /repo "$LYCHEE_IMAGE" --config lychee.toml --offline --files-from -
+      - name: Spelling of code, comments, docs and UI text (typos)
+        uses: crate-ci/typos@7f9d0819ca1c008ade73f4b41fa9d258d48f605b # v1.51.1
       - env:
           RESULTS: ${{ needs.static.result }} ${{ needs.test.result }}
         run: |
