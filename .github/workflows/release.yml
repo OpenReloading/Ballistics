@@ -186,7 +186,7 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-  # Own job, so that only this one holds contents: write and no step that builds or runs image code does.
+  # Own job, so that no step that builds or runs image code holds contents: write.
   sbom-release:
     needs: [release-please, images]
     runs-on: ubuntu-latest
