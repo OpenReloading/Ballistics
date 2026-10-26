@@ -3,7 +3,6 @@
  * kept in the same database (`workspace-folder.ts`).
  */
 import type { UserRecord } from '@open-reloading/schema'
-import { pagesPreview } from './edition.ts'
 import { validRecords } from './user-data.ts'
 import { photoIds } from './user-photos.ts'
 
@@ -21,12 +20,7 @@ type Store = 'records' | 'handles' | 'files'
  */
 const version = 2
 
-/**
- * The database's name. The development preview shares the browser's origin with the released site:
- * a database of its own keeps a newer version or format of the preview away from the released site.
- */
-export const databaseName = (preview = pagesPreview) =>
-  preview ? 'openreloading-user-data-preview' : 'openreloading-user-data'
+const databaseName = 'openreloading-user-data'
 
 /** Brings a new or older database to `version`: adds the stores it lacks, touches no record. */
 function upgrade(db: IDBDatabase) {
@@ -39,7 +33,7 @@ let opened: Promise<IDBDatabase> | undefined
 /** Opens the database at `version`, upgrading an older one in place. */
 const database = () =>
   (opened ??= new Promise<IDBDatabase>((resolve, reject) => {
-    const r = indexedDB.open(databaseName(), version)
+    const r = indexedDB.open(databaseName, version)
     r.onupgradeneeded = () => upgrade(r.result)
     r.onsuccess = () => {
       // another tab deletes the database: close, the next call opens again

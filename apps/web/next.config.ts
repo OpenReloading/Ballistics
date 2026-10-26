@@ -22,8 +22,6 @@ const nextConfig: NextConfig = {
     trailingSlash: true,
     env: {
       NEXT_PUBLIC_PAGES_BASE_PATH: pagesBasePath,
-      // the development preview of `develop` (`pages.yml`), which shares the origin with the released site
-      ...(process.env.PAGES_PREVIEW && { NEXT_PUBLIC_PAGES_PREVIEW: '1' }),
     },
   }),
   outputFileTracingRoot: path.join(import.meta.dirname, '../..'),

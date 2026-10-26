@@ -18,34 +18,48 @@ export type FigureView = 'cartridge' | 'chamber' | 'combined'
  * scale bar of the lowest, so the outline keeps its place and scale when a view hides or shows the
  * dimensions. Laid out for `medium`: upright on screen, level (head left) for print. Only the
  * `views` are built, and the shared frame is theirs.
+ *
+ * Built in two steps by what a slider move changes: the Combined and Chamber models and the text
+ * size once, then each call for seated lengths lays out only the Cartridge side and shares the
+ * frame again.
  */
-export function figureViews(
+export function figureViewBuilder(
   spec: Parameters<typeof recordFigures>[0],
   preview: Drawn | undefined,
   unit: LengthUnit,
-  seated?: SeatedLengths,
   medium: Medium = 'screen',
   views: readonly FigureView[] = ['cartridge', 'chamber', 'combined'],
-): Partial<Record<FigureView, FigureModel>> {
+): (seated?: SeatedLengths) => Partial<Record<FigureView, FigureModel>> {
   const record = recordFigures(spec).find((f) => f.drawn.length)?.drawn
   const shown = record ?? preview
-  if (!shown) return {}
+  if (!shown) return () => ({})
   const em = screenEm([shown], unit)
-  const models: Partial<Record<FigureView, FigureModel>> = {}
+  const lay = (d: Drawn[number]) => figureModel([d], medium, em, 0, [], false, unit)
+  const fixed: Partial<Record<FigureView, FigureModel>> = {}
   if (preview && views.includes('combined'))
-    models.combined = figureModel(preview, medium, em, 0, [], false, unit)
-  for (const d of record ?? [])
-    if (views.includes(d.side))
-      models[d.side] = figureModel(
-        [seated && d.side === 'cartridge' ? seatedSide(d, seated, unit) : d],
-        medium,
-        em,
-        0,
-        [],
-        false,
-        unit,
-      )
-  const all = Object.values(models)
+    fixed.combined = figureModel(preview, medium, em, 0, [], false, unit)
+  const sides = (record ?? []).filter((d) => views.includes(d.side))
+  for (const d of sides) if (d.side !== 'cartridge') fixed[d.side] = lay(d)
+  const cartridge = sides.find((d) => d.side === 'cartridge')
+  // the order of the models: Combined, then the sides as the record has them
+  const order = [...(fixed.combined ? (['combined'] as const) : []), ...sides.map((d) => d.side)]
+  return (seated) =>
+    sharedFrame(
+      order.flatMap((view): [FigureView, FigureModel][] => {
+        const model =
+          view === 'cartridge' && cartridge
+            ? lay(seated ? seatedSide(cartridge, seated, unit) : cartridge)
+            : fixed[view]
+        return model ? [[view, model]] : []
+      }),
+    )
+}
+
+/** The models with the union of their frames and the scale bar of the lowest. */
+function sharedFrame(
+  models: [FigureView, FigureModel][],
+): Partial<Record<FigureView, FigureModel>> {
+  const all = models.map(([, m]) => m)
   if (all.length === 0) return {}
   const left = Math.min(...all.map((m) => m.frame[0]))
   const top = Math.min(...all.map((m) => m.frame[1]))
@@ -53,9 +67,7 @@ export function figureViews(
   const bottom = Math.max(...all.map((m) => m.frame[1] + m.frame[3]))
   const frame: FigureModel['frame'] = [left, top, right - left, bottom - top]
   const { scale } = all.find((m) => m.frame[1] + m.frame[3] === bottom) as FigureModel
-  return Object.fromEntries(
-    Object.entries(models).map(([view, m]) => [view, { ...m, frame, scale }]),
-  )
+  return Object.fromEntries(models.map(([view, m]) => [view, { ...m, frame, scale }]))
 }
 
 /** COAL and CBTO of the seated bullet, mm; CBTO only with the bullet's base-to-ogive. */

@@ -1,8 +1,8 @@
 /**
  * Writes public/sw.js after `next build` (out/sw.js in the Pages edition, `PAGES_BASE_PATH` set):
  * the build id as `version`, the files of .next/static (in the Pages edition also the catalogue
- * index) as `precache`, the base path as `base`, the pages' trailing slash as `slash`, the cache `scope` (`preview-` with `PAGES_PREVIEW` set), every export of src/lib/offline.ts (Node strips their
- * types, so their source is JavaScript), then src/service-worker.js.
+ * index) as `precache`, the base path as `base`, the pages' trailing slash as `slash`, every export of
+ * src/lib/offline.ts (Node strips their types, so their source is JavaScript), then src/service-worker.js.
  */
 import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import * as offline from '../src/lib/offline.ts'
@@ -19,8 +19,6 @@ const constants = {
   precache: offline.precacheList(files, base, base !== undefined),
   base: base ?? '',
   slash: base === undefined ? '' : '/',
-  // the development preview shares the origin with the released site: its own cache names
-  scope: process.env.PAGES_PREVIEW ? 'preview-' : '',
 }
 const helpers = Object.entries({ ...constants, ...offline }).map(
   ([name, v]) => `const ${name} = ${typeof v === 'function' ? String(v) : JSON.stringify(v)}`,
