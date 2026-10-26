@@ -17,11 +17,13 @@ import {
 } from '@open-reloading/core'
 import {
   type Bullet,
+  type Firearm,
   fromSi,
   type Load,
   type Powder,
   parseRef,
   type SessionRecord,
+  type SessionSnapshot,
   toSi,
   type UserRecord,
   userRecord,
@@ -51,7 +53,7 @@ import {
   siValues,
 } from '../lib/field-spec.ts'
 import type { FigureView } from '../lib/figure-views.ts'
-import { gunValues, sightOptions } from '../lib/firearm.ts'
+import { gunValues, sightOptions, storedOf } from '../lib/firearm.ts'
 import {
   cartridgeClass,
   type DefaultSources,
@@ -62,6 +64,14 @@ import {
   suggestDefaults,
 } from '../lib/input-defaults.ts'
 import { burnFormError, interiorBody, interiorFields } from '../lib/interior-input.ts'
+import {
+  dismissed,
+  effectiveSnapshots,
+  type Lots,
+  lotsFrom,
+  noLots,
+  notesOf,
+} from '../lib/load-notes.ts'
 import {
   capacityOfRecord,
   capacityRecord,
@@ -142,6 +152,7 @@ import type { TrajectoryHandle } from './trajectory-form.tsx'
 import { useFieldUnits, useUnits } from './units-settings.tsx'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 import { useManufacturers } from './use-manufacturers.ts'
+import type { LoadNotesState } from './workbench-context.ts'
 import {
   type CartridgeChoice,
   directionOf,
@@ -1280,6 +1291,11 @@ export function useWorkbenchState() {
    */
   const [chronoSessions, setSessionsState] = useState<SessionRecord[]>([])
   const [sessionRefs, setSessionRefs] = useState<string[]>([])
+  /** The lots of the load and what it was at each session (`Load.snapshots`). */
+  const [lots, setLots] = useState<Lots>(noLots)
+  const [snapshots, setSnapshots] = useState<SessionSnapshot[]>([])
+  /** The snapshots of the render, the stored ones or the load as it is: what Save writes. */
+  const snapshotsNow = useRef<SessionSnapshot[]>([])
   const sessionsNow = useRef<SessionRecord[]>([])
   const sessionsOpened = useRef(0)
   const manufacturers = useManufacturers()
@@ -1582,6 +1598,8 @@ export function useWorkbenchState() {
     sessionsNow.current = []
     setSessionsState([])
     setSessionRefs([])
+    setLots(noLots)
+    setSnapshots([])
     lastWarnings.current = ''
   }
 
@@ -2342,6 +2360,8 @@ export function useWorkbenchState() {
     const powderId = catalogueIdIn(d.powder)
     if (powderId) void choosePowder(powderId, true, typed)
     setNotes(d.note ?? '')
+    setLots(lotsFrom(d))
+    setSnapshots(d.snapshots ?? [])
     openSessions(sessions)
   }
 
@@ -2380,7 +2400,11 @@ export function useWorkbenchState() {
     opening.current(d)
     setCustomName(name)
   }, [])
-  const onStored = useCallback(() => setStoredTick((n) => n + 1), [])
+  // a saved load keeps each session's snapshot as it was then, not as the load becomes
+  const onStored = useCallback(() => {
+    setSnapshots(snapshotsNow.current)
+    setStoredTick((n) => n + 1)
+  }, [])
   const unresolved = (['cartridge', 'bullet', 'powder', 'capacity'] as const).flatMap((k) =>
     asked[k]?.failed ? [`${k} ${asked[k].id}`] : [],
   )
@@ -2495,7 +2519,36 @@ export function useWorkbenchState() {
     },
     [measuredCapacity],
   )
+  const firearmData: Firearm | undefined = firearms.find((f) => f.id === firearm)?.data
+  const effective = effectiveSnapshots(sessionRefs, snapshots, {
+    lots,
+    seating: seating && { by: seating.by, value: storedOf('length', seating.value).value },
+    roundCount: firearmData?.roundCount,
+  })
+  snapshotsNow.current = effective
+  const noteList = notesOf(
+    sessionRefs,
+    effective,
+    chronoSessions,
+    fieldValues.charge,
+    firearmData?.noteAtRoundCount,
+  )
+  const sessionNames = Object.fromEntries(chronoSessions.map((r) => [sessionRef(r.id), r.name]))
+  const noteKey = JSON.stringify([lots, noteList, sessionNames])
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `noteKey` holds the values
+  const loadNotes = useMemo<LoadNotesState>(
+    () => ({
+      lots,
+      setLots,
+      notes: noteList,
+      sessionName: (ref) => sessionNames[ref] ?? 'a session of another browser',
+      dismiss: (session, rule) => setSnapshots(dismissed(snapshotsNow.current, session, rule)),
+    }),
+    [noteKey],
+  )
   const loadParts: LoadParts = {
+    lots,
+    snapshots: effective,
     values: fieldValues,
     given,
     cartridge: cartridgeRef,
@@ -2741,6 +2794,7 @@ export function useWorkbenchState() {
     setChronoSessions,
     manufacturerRef,
     manufacturerName: manufacturers.nameOf,
+    loadNotes,
     sessionRefCount: sessionRefs.length,
     setSeen,
     setStepsDraft,

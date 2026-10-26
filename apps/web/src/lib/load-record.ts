@@ -8,11 +8,13 @@ import {
   analysisKinds,
   type Load,
   ladderStepKinds,
+  type SessionSnapshot,
   toSi,
   type UserRecord,
   userRecord,
 } from '@open-reloading/schema'
 import { storedOf } from './firearm.ts'
+import type { Lots } from './load-notes.ts'
 import type { LadderDirection, RunnableLadderKind } from './seating-ladder.ts'
 import { waterGrams } from './units.ts'
 
@@ -154,6 +156,9 @@ export interface LoadParts {
     | undefined
   /** The chronograph sessions of the Measurements tab, as references. */
   sessions: readonly string[]
+  /** The lots as typed, and what the load was at each session. */
+  lots?: Lots | undefined
+  snapshots?: readonly SessionSnapshot[] | undefined
 }
 
 type Analysis = NonNullable<Load['analysis']>
@@ -202,6 +207,18 @@ export function toLoad(p: LoadParts): Load {
     note: p.notes || undefined,
     analysis: analysisOf(overrides, ladder),
     sessions: p.sessions.length > 0 ? [...p.sessions] : undefined,
+    ...lotsOf(p.lots),
+    snapshots: p.snapshots?.length ? [...p.snapshots] : undefined,
+  }
+}
+
+/** The lots typed, as the load's fields; a lot left empty is left out. */
+function lotsOf(lots: Lots | undefined) {
+  const [powder, primer, kase] = [lots?.powder.trim(), lots?.primer.trim(), lots?.case.trim()]
+  return {
+    powderLot: powder || undefined,
+    primer: primer ? { lot: primer } : undefined,
+    case: kase ? { lot: kase } : undefined,
   }
 }
 
@@ -231,6 +248,8 @@ export function toApiLoad(
     capacity: undefined,
     ladder: charge ? p.ladder : undefined,
     sessions: [],
+    lots: undefined,
+    snapshots: undefined,
   })
 }
 

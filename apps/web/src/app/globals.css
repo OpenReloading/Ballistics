@@ -3716,6 +3716,20 @@ main .library-head.page-panel-head > .page-panel-title {
   margin: 0;
 }
 
+.load-lots {
+  margin: 0 0 0.75rem;
+}
+
+.load-lots .field-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 0.5rem;
+}
+
+.session-notes {
+  margin: 0.5rem 0;
+}
+
 .measured-series .field {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

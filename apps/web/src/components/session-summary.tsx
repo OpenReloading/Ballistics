@@ -14,11 +14,11 @@ import {
   sessionCsvBlob,
   sessionJsonBlob,
   stringName,
-  stringStats,
 } from '../lib/chrono.ts'
 import { localDay } from '../lib/dates.ts'
 import { download } from '../lib/download.ts'
 import { errorText } from '../lib/error-text.ts'
+import { stringStats } from '../lib/string-stats.ts'
 import { controlSize } from '../lib/theme.ts'
 import { formatNumber, type UnitSystem, withUnit } from '../lib/units.ts'
 import { ChronoDropZone } from './chrono-drop-zone.tsx'
