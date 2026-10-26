@@ -56,6 +56,8 @@ jobs:
       # One open issue, created by this workflow's token, holds the report of the last run: opened on the first
       # failure, edited on the next, closed on a clean run.
       - name: Report in one issue
+        # not the default success(): a failed cache save must not skip the report
+        if: ${{ !cancelled() }}
         env:
           GH_TOKEN: ${{ github.token }}
           STATUS: ${{ steps.lychee.outputs.status }}
