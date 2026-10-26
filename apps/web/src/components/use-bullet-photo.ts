@@ -5,7 +5,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { type Design, evaluate } from '../lib/bullet-designer.ts'
 import { paintDisc, type ScaleSpan, scaleOf } from '../lib/bullet-photo.ts'
 import { tintBox, tintOf } from '../lib/bullet-photo-canvas.ts'
-import { photoDesign, photoRows } from '../lib/bullet-photo-design.ts'
+import {
+  type MeasuredInputs,
+  measuredFor,
+  photoDesign,
+  photoRows,
+} from '../lib/bullet-photo-design.ts'
 import type { BulletMeasurement } from '../lib/bullet-photo-measure.ts'
 import type { Outline } from '../lib/bullet-photo-outline.ts'
 import type { WorkerReply, WorkerRequest } from '../lib/bullet-photo-protocol.ts'
@@ -67,6 +72,8 @@ export interface Cut {
 interface Found {
   outline?: Outline
   measurement?: BulletMeasurement
+  /** What the worker measured: the design waits for a measurement of the inputs as they are now. */
+  made: MeasuredInputs
 }
 
 /**
@@ -143,6 +150,7 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
       if (r.kind === 'error') setFailure(r.message)
       if (r.kind === 'measured')
         setFound({
+          made: { cut, scale, axis },
           ...(r.outline && { outline: r.outline }),
           ...(r.measurement && { measurement: r.measurement }),
         })
@@ -248,6 +256,8 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
     () => (design ? evaluate(design, system).drawing : undefined),
     [design, system],
   )
+  const ready =
+    found !== undefined && design !== undefined && measuredFor(found.made, { cut, scale, axis })
   const rows = useMemo(
     () => (found?.measurement && facts ? photoRows(found.measurement, record?.si) : []),
     [found, facts, record],
@@ -271,6 +281,7 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
     failure,
     design,
     drawing,
+    ready,
     rows,
     read,
     sample,

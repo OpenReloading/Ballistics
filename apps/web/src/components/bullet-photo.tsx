@@ -341,7 +341,7 @@ function PhotoTool({
         {t.rows.length > 0 && <ValuesTable rows={t.rows} system={system} record={record} />}
         <Flex gap="xs" mt="sm" align="center" wrap="wrap">
           <Button
-            disabled={!(t.design && drawing)}
+            disabled={!(t.ready && t.design && drawing)}
             onClick={() => t.design && void onOpen(t.design)}
           >
             Open in designer

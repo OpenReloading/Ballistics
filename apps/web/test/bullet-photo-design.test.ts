@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { designerSpecs, evaluate, fileData } from '../src/lib/bullet-designer.ts'
 import { grayOf, scaleOf, segment } from '../src/lib/bullet-photo.ts'
 import {
+  measuredFor,
   photoDesign,
   photoNote,
   photoRows,
@@ -117,4 +118,18 @@ it('saves a user bullet the schema accepts, and over a base a record it accepts'
   const saved = userBullet.parse(fileData(photoDesign(m, facts, system)))
   const resolved = bullet.parse(applyOverrides<Bullet>(targetBullet, saved.overrides ?? {}))
   expect(resolved.note).toMatch(/Measured from a photograph/)
+})
+
+describe('measuredFor', () => {
+  const cut = { alpha: new Uint8Array(4), rev: 1 }
+  const scale = { pxPerMm: 30, relUncertainty: 0.001 }
+
+  it('holds only while the cut-out, the scale and the axis are those it was measured from', () => {
+    const made = { cut, scale, axis: undefined }
+    expect(measuredFor(made, { cut, scale, axis: undefined })).toBe(true)
+    expect(measuredFor(made, { cut: { ...cut, rev: 2 }, scale, axis: undefined })).toBe(false)
+    expect(measuredFor(made, { cut, scale: { ...scale }, axis: undefined })).toBe(false)
+    expect(measuredFor(made, { cut, scale: undefined, axis: undefined })).toBe(false)
+    expect(measuredFor(made, { cut, scale, axis: 0.1 })).toBe(false)
+  })
 })
