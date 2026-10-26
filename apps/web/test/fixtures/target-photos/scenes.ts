@@ -19,7 +19,7 @@ export type Scene = {
   caliberMm: number
   /** Visible hole diameter over the bullet diameter. */
   visible: number
-  face: 'rings' | 'dark' | 'orange'
+  face: 'rings' | 'dark' | 'night' | 'orange'
   /** Hole centres in scene px (before the tilt). */
   holes: { x: number; y: number }[]
   /** Photo tilt, degrees counter-clockwise. */
@@ -34,6 +34,10 @@ export type Scene = {
 
 const PAPER: Rgb = [232, 230, 222]
 const BLACK: Rgb = [28, 28, 30]
+/** A dark face seen by a phone in dim light, and the backing seen through its holes. */
+const NIGHT: Rgb = [46, 46, 50]
+const NIGHT_HOLE: Rgb = [10, 10, 12]
+const NIGHT_RIM: Rgb = [76, 74, 72]
 
 export const scenes: Scene[] = [
   {
@@ -109,6 +113,34 @@ export const scenes: Scene[] = [
     jpeg: 75,
   },
   {
+    file: 'phone-night.jpg',
+    about:
+      'phone photo of a dark face in dim light: holes as dark as the backing behind them, lighter torn rims, 0.7 of the bullet',
+    width: 640,
+    height: 640,
+    pxPerMm: 6,
+    caliberMm: 7.62,
+    visible: 0.7,
+    face: 'night',
+    holes: [
+      { x: 262, y: 250 },
+      { x: 304, y: 236 },
+      { x: 372, y: 262 },
+      { x: 236, y: 318 },
+      { x: 318, y: 316 },
+      { x: 396, y: 340 },
+      { x: 270, y: 392 },
+      { x: 346, y: 404 },
+      { x: 300, y: 448 },
+      { x: 412, y: 410 },
+    ],
+    tilt: -3,
+    gradient: 0.2,
+    noise: 5,
+    blur: 1,
+    jpeg: 75,
+  },
+  {
     file: 'scan-orange.jpg',
     about:
       'scan of an orange face on a black diamond: light holes with burnt dark rims, 0.8 of the bullet',
@@ -139,6 +171,7 @@ function faceAt(s: Scene, x: number, y: number): Rgb {
   const r = Math.hypot(x - cx, y - cy) / s.pxPerMm
   if (s.face === 'rings') return ringsFaceAt(r)
   if (s.face === 'dark') return darkFaceAt(r)
+  if (s.face === 'night') return nightFaceAt(r)
   // orange: a black diamond holding an orange disc
   if (Math.abs(x - cx) + Math.abs(y - cy) > 30 * s.pxPerMm) return PAPER
   return r < 18 ? [228, 112, 34] : BLACK
@@ -148,6 +181,12 @@ function ringsFaceAt(r: number): Rgb {
   if (r < 6) return BLACK
   for (const ring of [12, 20, 28, 36]) if (Math.abs(r - ring) < 0.35) return BLACK
   return PAPER
+}
+
+function nightFaceAt(r: number): Rgb {
+  if (r >= 32) return PAPER
+  for (const ring of [10, 18, 26]) if (Math.abs(r - ring) < 0.3) return [140, 140, 136]
+  return NIGHT
 }
 
 function darkFaceAt(r: number): Rgb {
@@ -161,10 +200,12 @@ function holeColourAt(s: Scene, d: number, edge: number, rv: number): Rgb | unde
   if (d <= edge) {
     if (s.face === 'rings') return [58, 56, 54]
     if (s.face === 'dark') return [226, 224, 216]
+    if (s.face === 'night') return NIGHT_HOLE
     return [240, 234, 214]
   }
   // bullet wipe on paper, a burnt rim on the orange face
   if (s.face === 'rings' && d <= edge + 0.12 * rv) return [90, 88, 86]
+  if (s.face === 'night' && d <= edge + 0.15 * rv) return NIGHT_RIM
   if (s.face === 'orange' && d <= edge + 0.2 * rv) return [46, 34, 26]
   return undefined
 }

@@ -1,5 +1,7 @@
-import { describe, expect, it } from 'vitest'
+import sharp from 'sharp'
+import { beforeAll, describe, expect, it } from 'vitest'
 import { autoDetect, detectFromExample, type HoleProposal } from '../src/lib/hole-detection.ts'
+import type { RgbaImage } from '../src/lib/image.ts'
 import { faceLabel } from '../src/lib/target-face.ts'
 import { defined } from './defined.ts'
 import { photoScene } from './face-photos.ts'
@@ -86,6 +88,24 @@ describe('hole detection with the face label', () => {
   })
 })
 
+// Seven holes on a 25 m pistol face and the numerals between its rings, shared by the numeral scenes.
+const seven = [
+  { x: 30, y: 20 },
+  { x: -45, y: 35 },
+  { x: 55, y: -40 },
+  { x: -20, y: -55 },
+  { x: 15, y: 70 },
+  { x: -65, y: -25 },
+  { x: 40, y: 60 },
+]
+// a digit: a bar of 4 x 7 mm
+const digit = (x: number, y: number) => [{ x, y, width: 4, height: 7 }]
+const gaps = [37.5, 62.5, 87.5]
+const numeralMarks = gaps
+  .flatMap((r) => [digit(r, 0), digit(-r, 0), digit(0, r), digit(0, -r)])
+  .flat()
+  .map((m) => ({ ...m, grey: 226 }))
+
 // Ring numerals (`apps/docs/docs/models/hole-detection.md`): a 25 m pistol face, light holes on its black
 // area, and light numerals (bars of the size of a digit) between the rings on both axes.
 describe('hole detection with the numerals of the face', () => {
@@ -93,22 +113,7 @@ describe('hole detection with the numerals of the face', () => {
   const size = 1400
   const scale = (0.45 * size) / 250
   const mm = 7.6
-  const seven = [
-    { x: 30, y: 20 },
-    { x: -45, y: 35 },
-    { x: 55, y: -40 },
-    { x: -20, y: -55 },
-    { x: 15, y: 70 },
-    { x: -65, y: -25 },
-    { x: 40, y: 60 },
-  ]
-  // a digit: a bar of 4 x 7 mm
-  const digit = (x: number, y: number) => [{ x, y, width: 4, height: 7 }]
-  const gaps = [37.5, 62.5, 87.5]
-  const marks = gaps
-    .flatMap((r) => [digit(r, 0), digit(-r, 0), digit(0, r), digit(0, -r)])
-    .flat()
-    .map((m) => ({ ...m, grey: 226 }))
+  const marks = numeralMarks
   const { image, h } = render({
     face: pistol,
     camera: { width: size, height: size, pxPerMm: scale, depth: 6 },
@@ -142,6 +147,143 @@ describe('hole detection with the numerals of the face', () => {
     const found = detectFromExample({ ...input, face: faceLabel(geometry, mm) }, defined(truth[0]))
     expect(hits(found?.proposals ?? [])).toBe(seven.length)
     expect(extra(found?.proposals ?? [])).toBe(0)
+  })
+})
+
+/** The photo as a JPEG of `quality` read back, so its artefacts are part of the scene. */
+async function viaJpeg(image: RgbaImage, quality: number): Promise<RgbaImage> {
+  const raw = Buffer.from(image.data.buffer, image.data.byteOffset, image.data.length)
+  const jpeg = await sharp(raw, { raw: { width: image.width, height: image.height, channels: 4 } })
+    .jpeg({ quality })
+    .toBuffer()
+  const { data, info } = await sharp(jpeg).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+  return {
+    width: info.width,
+    height: info.height,
+    data: new Uint8ClampedArray(data.buffer, data.byteOffset, data.length),
+  }
+}
+
+// Print that holes can hide in: a hole on a ring numeral stands where the numerals do, and the
+// quarter marks of the bull (light squares of 5 mm where the axes meet the black area's edge) look
+// like holes on the black area. Blur, noise and JPEG are part of the scenes.
+describe('hole detection with holes on the print of the face', () => {
+  const pistol = faceById('issf-25m-precision-50m-pistol')
+  const size = 1400
+  const scale = (0.45 * size) / 250
+  const mm = 7.6
+  const D = mm * scale
+  const numerals = numeralMarks
+  const quarter = [
+    { x: 96, y: 0 },
+    { x: -96, y: 0 },
+    { x: 0, y: 96 },
+    { x: 0, y: -96 },
+  ].map((m) => ({ ...m, width: 5, height: 5, grey: 226 }))
+  const radii = pistol.rings.map((r) => r.diameter.value / 2)
+
+  async function scene(extra: { x: number; y: number }[], marks: typeof numerals) {
+    const holes = [...seven, ...extra]
+    const { image, h } = render({
+      face: pistol,
+      camera: { width: size, height: size, pxPerMm: scale, depth: 6 },
+      line: 1.5 / scale,
+      noise: 3,
+      blur: 1,
+      holes: holes.map((q) => ({ ...q, diameter: mm })),
+      marks,
+    })
+    const truth = holes.map((q) => project(h, q))
+    const geometry = { toFace: invert(h), outer: 250, black: 100, rings: radii }
+    return {
+      truth,
+      geometry,
+      label: faceLabel(geometry, mm / 0.9),
+      input: {
+        image: await viaJpeg(image, 75),
+        pxPerM: scale * 1000,
+        expectedHoleDiameter: mm / 1000 / 0.9,
+      },
+    }
+  }
+  const near = (p: { x: number; y: number }, t: { x: number; y: number }) =>
+    Math.hypot(p.x - t.x, p.y - t.y) <= D / 2
+  const hits = (found: readonly HoleProposal[], truth: { x: number; y: number }[]) =>
+    truth.map((t) => found.some((p) => near(p, t)))
+  const extra = (found: readonly HoleProposal[], truth: { x: number; y: number }[]) =>
+    found.filter((p) => !truth.some((t) => near(p, t))).length
+
+  describe('a hole on a ring numeral', () => {
+    let s: Awaited<ReturnType<typeof scene>>
+    beforeAll(async () => {
+      // on the numeral between the rings of 50 and 75 mm, and beside the one at 87.5 mm
+      s = await scene(
+        [
+          { x: 62.5, y: 1 },
+          { x: 87.5, y: -5 },
+        ],
+        numerals,
+      )
+    })
+
+    it('is kept in the automatic run, with the numerals still left out', () => {
+      const found = autoDetect({ ...s.input, face: s.label })?.proposals ?? []
+      expect(hits(found, s.truth).every(Boolean)).toBe(true)
+      expect(extra(found, s.truth)).toBe(0)
+    })
+
+    it('leaves numerals of two sizes out, 5 and 4 mm wide', async () => {
+      const wide = numerals.map((m) => (m.x === 62.5 || m.x === -62.5 ? { ...m, width: 5 } : m))
+      const mixed = await scene([], wide)
+      const found = autoDetect({ ...mixed.input, face: mixed.label })?.proposals ?? []
+      expect(hits(found, mixed.truth).every(Boolean)).toBe(true)
+      expect(extra(found, mixed.truth)).toBe(0)
+    })
+
+    it('is kept from an example hole as well', () => {
+      const found = detectFromExample({ ...s.input, face: s.label }, defined(s.truth[0]))
+      expect(hits(found?.proposals ?? [], s.truth).every(Boolean)).toBe(true)
+      expect(extra(found?.proposals ?? [], s.truth)).toBe(0)
+    })
+  })
+
+  describe('the quarter marks of the bull', () => {
+    let s: Awaited<ReturnType<typeof scene>>
+    let onMark: Awaited<ReturnType<typeof scene>>
+    beforeAll(async () => {
+      s = await scene([], quarter)
+      onMark = await scene([{ x: 96, y: 1 }], quarter)
+    })
+
+    it('are proposed as holes without the face label of the bull', () => {
+      const found = autoDetect({ ...s.input, face: { ...s.label, quarter: undefined } })
+      expect(extra(found?.proposals ?? [], s.truth)).toBeGreaterThanOrEqual(3)
+    })
+
+    it('are not proposed with it, and every hole is found', () => {
+      const found = autoDetect({ ...s.input, face: s.label })?.proposals ?? []
+      expect(hits(found, s.truth).every(Boolean)).toBe(true)
+      expect(extra(found, s.truth)).toBe(0)
+    })
+
+    it('are not proposed on a face without ring radii either', () => {
+      const { rings: _, ...bare } = s.geometry
+      const found = autoDetect({ ...s.input, face: faceLabel(bare, mm / 0.9) })?.proposals ?? []
+      expect(hits(found, s.truth).every(Boolean)).toBe(true)
+      expect(extra(found, s.truth)).toBe(0)
+    })
+
+    it('are not proposed from an example hole either', () => {
+      const found = detectFromExample({ ...s.input, face: s.label }, defined(s.truth[0]))
+      expect(hits(found?.proposals ?? [], s.truth).every(Boolean)).toBe(true)
+      expect(extra(found?.proposals ?? [], s.truth)).toBe(0)
+    })
+
+    it('leave a hole on one of them proposed', () => {
+      const found = autoDetect({ ...onMark.input, face: onMark.label })?.proposals ?? []
+      expect(hits(found, onMark.truth).every(Boolean)).toBe(true)
+      expect(extra(found, onMark.truth)).toBe(0)
+    })
   })
 })
 
