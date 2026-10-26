@@ -15,6 +15,7 @@ import {
 } from '../src/lib/query.ts'
 import { shotFields } from '../src/lib/trajectory-input.ts'
 import { presetUnits } from '../src/lib/units.ts'
+import { defined } from './defined.ts'
 
 const us = presetUnits('us')
 const metric = presetUnits('metric-grams')
@@ -179,7 +180,7 @@ it('carries the records a run reads, so the link gives the same bore resistance 
       name: 'Demo Powder Co. DP40',
       bulkDensity: 920,
       boreFriction: resistance?.friction,
-      engravingPressure: resistance?.engraving?.[0].pressure,
+      engravingPressure: defined(resistance?.engraving?.[0]).pressure,
       engravingLength: resistance?.engraving?.at(-1)?.travel,
     },
   }

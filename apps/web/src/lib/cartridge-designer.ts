@@ -31,6 +31,7 @@ import {
   storedToSi,
 } from './field-spec.ts'
 import { designReduce, type History as H, historyOf, pushHistory } from './history.ts'
+import { nth } from './nth.ts'
 import { exactFieldText, type UnitSystem } from './units.ts'
 import { type ResolvedCartridge, revisionOf } from './variants.ts'
 
@@ -142,8 +143,8 @@ export interface Origin {
   id: string
   title: string
   /** The `revision` of the catalogue record, as the API answered it. */
-  revision?: string
-  table?: string
+  revision?: string | undefined
+  table?: string | undefined
   values: SpecValue[]
   si: Record<string, number | undefined>
 }
@@ -152,7 +153,7 @@ export interface Design {
   /** The CIP table whose drawing rules apply (table III: belt). */
   table: string
   fields: Fields
-  origin?: Origin
+  origin?: Origin | undefined
   /** The catalogue cartridge the design is based on, `catalogue:<id>`, kept through files. */
   basedOn?: string
   /** The base changed since the design was saved: the values not overridden follow it. */
@@ -383,7 +384,7 @@ export function reduce(h: History, a: Action): History {
  */
 export type FieldState =
   | { kind: 'record' }
-  | { kind: 'entered'; changed: boolean; record?: number }
+  | { kind: 'entered'; changed: boolean; record?: number | undefined }
   | { kind: 'cleared'; record: number }
   | { kind: 'derived'; si: number }
   | { kind: 'notPrinted' }
@@ -403,7 +404,7 @@ export interface Evaluation {
   spec?: DraftSpec
   figures?: Figure[]
   /** Why there is no drawing for this input, and the field to show it at. */
-  refusal?: { reason: string; field: string }
+  refusal?: { reason: string; field: string } | undefined
   states: Record<string, FieldState>
   /** CIP plausibility findings by field key, shown as the field's error. */
   checks: Record<string, string[]>
@@ -491,7 +492,7 @@ function refuseUnlayable(
     return {
       refusal: {
         reason: 'These dimensions do not form an outline.',
-        field: last ?? fieldSpecs[0].key,
+        field: last ?? nth(fieldSpecs, 0).key,
       },
     }
   }
@@ -504,7 +505,7 @@ function refuseUnlayable(
     return {
       refusal: {
         reason: [...missing, missingHint].join(' '),
-        field: keys.find((k) => k === last) ?? keys[0] ?? fieldSpecs[0].key,
+        field: keys.find((k) => k === last) ?? keys[0] ?? nth(fieldSpecs, 0).key,
       },
     }
   }
@@ -576,8 +577,9 @@ export function evaluate(design: Design, system: UnitSystem, last?: string): Eva
 
   const checks = plausibilityChecks(spec)
   const notes = outlineNotes(shown)
-  const derived = design.table === 'VII' ? [] : derive(shown[0], spec.values)
-  for (const { side, p } of shown[0].drawn)
+  const lead = nth(shown, 0)
+  const derived = design.table === 'VII' ? [] : derive(lead, spec.values)
+  for (const { side, p } of lead.drawn)
     if (
       side === 'cartridge' &&
       p.derivedE !== undefined &&
@@ -639,7 +641,7 @@ function approximateCaseVolume(figure: Figure, values: SpecValue[]): Derived | u
   let mm3 = 0
   const pts = c.p.points
   for (let k = 1; k < pts.length; k++) {
-    const [[ra, za], [rb, zb]] = [pts[k - 1], pts[k]]
+    const [[ra, za], [rb, zb]] = [nth(pts, k - 1), nth(pts, k)]
     const lo = Math.max(za, head)
     const hi = Math.min(zb, L3)
     if (hi <= lo) continue

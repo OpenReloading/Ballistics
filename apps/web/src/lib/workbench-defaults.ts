@@ -29,7 +29,7 @@ export const citedDefaults = {
 export type DefaultKey = keyof typeof citedDefaults
 export const defaultKeys = Object.keys(citedDefaults) as DefaultKey[]
 /** The cited defaults, and the user's barrel length: no cited value, empty means by cartridge class. */
-export type WorkbenchDefaults = Record<DefaultKey, number> & { barrelLength?: number }
+export type WorkbenchDefaults = Record<DefaultKey, number> & { barrelLength?: number | undefined }
 
 const cited = () =>
   Object.fromEntries(defaultKeys.map((k) => [k, citedDefaults[k].si])) as WorkbenchDefaults

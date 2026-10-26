@@ -8,20 +8,20 @@ export interface FaceRing {
   value: number
   diameter: FaceLength
   /** Height of an oval ring; absent: a circle. */
-  height?: FaceLength
+  height?: FaceLength | undefined
   /** `square`: a square of edge `diameter`; absent or `circle`: a circle or oval. */
-  shape?: 'circle' | 'square'
-  fill?: string
-  line?: string
+  shape?: 'circle' | 'square' | undefined
+  fill?: string | undefined
+  line?: string | undefined
 }
 
 /** The fields of a target face the figure reads; a `TargetFace` record fits. */
 export interface FaceShape {
   /** Outer to inner. */
   rings: FaceRing[]
-  innerTen?: { diameter: FaceLength; height?: FaceLength }
+  innerTen?: { diameter: FaceLength; height?: FaceLength | undefined } | undefined
   blackDiameter: FaceLength
-  blackHeight?: FaceLength
+  blackHeight?: FaceLength | undefined
 }
 
 /** An ellipse, or a rectangle when `square`, centred on the scoring centre, radii in mm. */
@@ -70,6 +70,7 @@ const ellipse = (
  */
 export function targetFaceFigure(face: FaceShape): FaceFigure {
   const outer = face.rings[0]
+  if (!outer) throw new Error('A target face needs at least one ring.')
   const w = outer.diameter.value
   const h = outer.height?.value ?? w
   const pad = w * 0.02

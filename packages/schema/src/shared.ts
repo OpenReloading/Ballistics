@@ -27,7 +27,7 @@ export const text = (max: number) => z.string().max(max)
  * supports no country.
  */
 export function needsCountrySource(
-  r: { country?: string; provenance: Provenance },
+  r: { country?: string | undefined; provenance: Provenance },
   ctx: z.RefinementCtx,
 ) {
   if (r.country && !r.provenance.sources.some((s) => s.fields?.includes('country')))

@@ -12,6 +12,7 @@ import {
   templateJson,
 } from '../src/lib/chrono.ts'
 import { unitsOf } from '../src/lib/units.ts'
+import { defined } from './defined.ts'
 
 /** OpenReloading CSV template with made-up velocities. */
 const template = [
@@ -34,7 +35,7 @@ describe('readChrono', () => {
     expect(r.format).toBe('openreloading-csv')
     expect(r.stringLabels).toEqual(['A', 'B'])
     expect(r.session.strings.map((s) => s.shots.length)).toEqual([3, 1])
-    expect(r.session.strings[0].shots[2].excluded).toBe('flyer')
+    expect(defined(defined(r.session.strings[0]).shots[2]).excluded).toBe('flyer')
   })
 
   it('reads UTF-16 LE after a byte order mark', async () => {
@@ -104,7 +105,7 @@ describe('readSession', () => {
   it('uses the fallback unit only when the file names none', async () => {
     const r = await readSession(bytes('string,velocity\nA,812\nA,815'), 'a.csv', 'm/s')
     expect(r.velocityUnits).toEqual([{ unit: 'm/s', source: 'caller' }])
-    expect(r.session.strings[0].shots[0].velocity.value).toBe(812)
+    expect(defined(defined(r.session.strings[0]).shots[0]).velocity.value).toBe(812)
   })
 
   it('keeps the first reason when the file names its unit', async () => {

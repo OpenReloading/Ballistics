@@ -1,7 +1,11 @@
 import { type FaceEllipse, type FaceShape, targetFaceFigure } from '@open-reloading/drawing/target'
 import type { TargetFace } from '@open-reloading/schema'
 
-type Paint = { fill?: string; stroke?: string; vectorEffect?: 'non-scaling-stroke' }
+type Paint = {
+  fill?: string | undefined
+  stroke?: string | undefined
+  vectorEffect?: 'non-scaling-stroke' | undefined
+}
 
 // a square ring is a rectangle, any other an ellipse
 const Outline = ({ e, ...paint }: { e: FaceEllipse } & Paint) =>
@@ -42,6 +46,6 @@ export function TargetFaceFigure({ shape, label }: { shape: FaceShape; label: st
 export const TargetFaceDrawing = ({ face }: { face: TargetFace }) => (
   <TargetFaceFigure
     shape={face}
-    label={`${face.name}: ${face.rings.length} rings, ${face.rings[0].diameter.value} mm across`}
+    label={`${face.name}: ${face.rings.length} rings, ${face.rings[0]?.diameter.value} mm across`}
   />
 )

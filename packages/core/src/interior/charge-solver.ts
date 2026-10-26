@@ -6,7 +6,9 @@
  * charge. A simulation, not load data: the answer is the charge at which the model reaches the
  * target, not a charge to load.
  */
-import { need } from '../errors.ts'
+
+import type { Settings } from '../errors.ts'
+import { need, nth } from '../errors.ts'
 import { solidFillLimit } from './load-file.ts'
 import {
   type InteriorLoad,
@@ -47,11 +49,11 @@ const scanSpan = 1e-3
 /** Options of `solveCharge`. */
 export interface ChargeSolverOptions {
   /** Bulk density, kg/m3: needed for the load ratio target. */
-  bulkDensity?: number
+  bulkDensity?: number | undefined
   /** Overrides of `interiorDefaults` for every run. */
-  options?: Partial<InteriorOptions>
+  options?: Settings<InteriorOptions> | undefined
   /** The model run, `interior` by default; a seam for tests with synthetic curves. */
-  run?: (load: InteriorLoad, options?: Partial<InteriorOptions>) => InteriorResult
+  run?: ((load: InteriorLoad, options?: Settings<InteriorOptions>) => InteriorResult) | undefined
 }
 
 /** Why a run was not valid: `reason` and `field` of `interior`. */
@@ -316,6 +318,6 @@ export function solveCharge(
   if (brackets.length > 1) return refuse('notMonotone')
   if (brackets.length === 0) return refuse('bracketFailed')
 
-  const root = illinoisRoot(brackets[0], target.value, runs.evaluate)
+  const root = illinoisRoot(nth(brackets, 0), target.value, runs.evaluate)
   return typeof root === 'string' ? refuse(root) : done(root)
 }

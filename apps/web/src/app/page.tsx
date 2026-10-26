@@ -16,7 +16,11 @@ import { sections } from '../lib/sections.ts'
 import { controlSize } from '../lib/theme.ts'
 
 /** A list's record count, nothing while the API is unavailable (at run time `apiGet` throws). */
-async function Count({ list }: { list: () => Promise<{ status: string; data?: unknown[] }> }) {
+async function Count({
+  list,
+}: {
+  list: () => Promise<{ status: string; data?: unknown[] | undefined }>
+}) {
   const r = await list().catch(() => undefined)
   return r?.status === 'ok' && r.data ? countText(r.data.length, r.data.length, 'records') : null
 }

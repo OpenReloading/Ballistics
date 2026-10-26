@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { InputError } from '../src/errors.ts'
+import { InputError, nth } from '../src/errors.ts'
 import { chiSquareCdf, chiSquareQuantile, chiSquareSurvival } from '../src/groups/chi-square.ts'
 import { fQuantileTwoNumeratorDegrees } from '../src/groups/f-distribution.ts'
 import {
@@ -599,7 +599,7 @@ describe('ellipse and CEP coverage (seeded simulation)', () => {
     let sampled = 0
     for (let t = 0; t < trials; t++) {
       const group = groupStatistics({ shots: draw(rng, n), distance: 100 })
-      const [next] = draw(rng, 1)
+      const next = nth(draw(rng, 1), 0)
       const pe = predictionEllipse(group, 0.9)
       const se = dispersionEllipse(group, 0.9)
       if (!pe || !se || !group.centre) throw new Error('no ellipse')

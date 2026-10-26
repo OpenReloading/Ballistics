@@ -15,7 +15,7 @@ export type ReportOption = {
 }
 
 /** The options of the page shown, set while it is mounted. */
-export const reportHost: { options?: () => ReportOption[] } = {}
+export const reportHost: { options?: (() => ReportOption[]) | undefined } = {}
 
 /** Offers `options` to the Report issue dialog while the calling page is mounted; none when undefined. */
 export function useReportOptions(options: ReportOption[] | undefined) {

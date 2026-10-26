@@ -126,12 +126,12 @@ const stopText: Record<Exclude<Trajectory['stop'], 'done'>, string> = {
  */
 type Result = TrajectoryResult & {
   bullet: string
-  design?: string
+  design?: string | undefined
   si: Record<string, number | undefined>
   /** The bullet values came from the manual fields, so the card lists mass and BC. */
   manual: boolean
   /** The chosen optic's turret click: the card gives the holds in clicks too. */
-  click?: { value: number; unit?: 'MOA' | 'mrad' }
+  click?: { value: number; unit?: 'MOA' | 'mrad' | undefined }
   /** Where the applied drag factor comes from: the mount it was filled from. */
   dragSource?: string
 }
@@ -438,7 +438,7 @@ function ResultDetail({
   result: Result
   system: UnitSystem
   /** The chart's height, px; without it the chart fills the height its column leaves. */
-  chartHeight?: number
+  chartHeight?: number | undefined
   /** Over the chart's top right corner, so it shows and goes without moving the chart. */
   staleLine?: ReactNode
 }) {
@@ -508,9 +508,9 @@ function readLink(system: UnitSystem) {
   return {
     fields,
     touched: Object.fromEntries(
-      allFields.filter((s) => fields[s.key].text).map((s) => [s.key, true]),
+      allFields.filter((s) => fields[s.key]?.text).map((s) => [s.key, true]),
     ),
-    showZero: zeroKeys.some((k) => fields[k].text),
+    showZero: zeroKeys.some((k) => fields[k]?.text),
     model: query.get('drag') as DragModel | null,
     bullet,
     choice: Number.isInteger(choice) ? choice : undefined,
@@ -975,20 +975,20 @@ export function TrajectoryForm({
   ref,
 }: {
   load: {
-    muzzleVelocity?: number
-    bullet?: string
-    twist?: number
+    muzzleVelocity?: number | undefined
+    bullet?: string | undefined
+    twist?: number | undefined
     /** The chosen firearm's sight, SI. */
-    sightHeight?: number
-    zeroRange?: number
+    sightHeight?: number | undefined
+    zeroRange?: number | undefined
     /** The chosen firearm's zero air and drag factor with its source, SI. */
-    zeroTemperature?: number
-    zeroPressure?: number
-    zeroHumidity?: number
-    dragFactor?: number
-    dragFactorSource?: string
+    zeroTemperature?: number | undefined
+    zeroPressure?: number | undefined
+    zeroHumidity?: number | undefined
+    dragFactor?: number | undefined
+    dragFactorSource?: string | undefined
   }
-  ref?: Ref<TrajectoryHandle>
+  ref?: Ref<TrajectoryHandle> | undefined
 }) {
   const { choice: unitChoice, system, ready } = useUnits()
   const names = useManufacturerNames()

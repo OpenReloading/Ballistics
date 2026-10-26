@@ -73,7 +73,7 @@ export function CartridgeList({ packed }: { packed: PackedCartridge[] }) {
   const on = readOrigins(state.sources)
   const count = countText(shown.length, items.length, 'cartridges')
   const named = [
-    on.length < origins.length && `${originNames[on[0]]} only`,
+    on.length < origins.length && on[0] && `${originNames[on[0]]} only`,
     state.query.trim() && `matching "${state.query.trim()}"`,
   ].filter(Boolean)
   const lengthUnit = system.length.symbol

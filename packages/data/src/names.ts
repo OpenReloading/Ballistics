@@ -112,14 +112,17 @@ export function checkNames(
     ),
     // One projectile may appear in several reports.
     ...duplicates(
-      bundle.rangeFirings.map((r) => ({
-        file: at('range', r.id),
-        scope:
-          r.provenance.sources[0].sha256 ??
-          r.provenance.sources[0].url ??
-          r.provenance.sources[0].title,
-        names: [r.projectile],
-      })),
+      bundle.rangeFirings.flatMap((r) => {
+        const [source] = r.provenance.sources
+        if (!source) return []
+        return [
+          {
+            file: at('range', r.id),
+            scope: source.sha256 ?? source.url ?? source.title,
+            names: [r.projectile],
+          },
+        ]
+      }),
     ),
     ...duplicates(
       bundle.targetFaces.map((f) => ({

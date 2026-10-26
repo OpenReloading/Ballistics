@@ -15,6 +15,7 @@ import {
   sortForMode,
   sortPowderRows,
 } from '../src/lib/powder-compare.ts'
+import { defined } from './defined.ts'
 
 afterEach(() => {
   vi.useRealTimers()
@@ -145,7 +146,7 @@ describe('compareKey', () => {
           ? b.load
           : b.load.propellant.burn) as unknown as Record<string, number>
       expect(owner[k], k).toBeTypeOf('number')
-      owner[k] *= 1.1
+      owner[k] = defined(owner[k]) * 1.1
     }
     for (const k of [
       'specificEnergy',
@@ -530,7 +531,7 @@ describe('computeRows in the target mode', () => {
         done: () => {},
       },
     )
-    expect(done?.rows[1].flag).toBeUndefined()
+    expect(defined(done?.rows[1]).flag).toBeUndefined()
   })
 
   it('stops after the first answer that the cartridge has no comparable limit', async () => {
@@ -550,7 +551,7 @@ describe('computeRows in the target mode', () => {
     expect(requests.length).toBeLessThanOrEqual(3)
     expect(done?.noLimit?.reason).toBe('noComparableLimit')
     expect(done?.rows).toHaveLength(40)
-    expect(done?.rows[0].reason).toBe('No fitted model parameters')
+    expect(defined(done?.rows[0]).reason).toBe('No fitted model parameters')
     for (const r of done?.rows.slice(1) ?? []) {
       expect(r.values).toBeUndefined()
       expect(r.refusal?.reason).toBe('noComparableLimit')

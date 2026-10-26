@@ -59,7 +59,7 @@ describe('parseDelimited', () => {
       columns: { velocity: 1, excluded: 3 },
       velocityUnit: 'm/s',
     })
-    expect(tab.session.strings[0].shots).toEqual([
+    expect(tab.session.strings[0]?.shots).toEqual([
       { velocity: { value: 812.5, raw: '812.5' }, excluded: 'x' },
       { velocity: { value: 813, raw: '813' } },
     ])
@@ -74,7 +74,7 @@ describe('parseDelimited', () => {
       '2,"857,5",m/s',
     ].join('\n')
     const r = parseDelimited(text, { columns: { velocity: 'speed', velocityUnit: 'UNITS' } })
-    expect(r.session.strings[0].shots.map((s) => s.velocity)).toEqual([
+    expect(r.session.strings[0]?.shots.map((s) => s.velocity)).toEqual([
       { value: 853.44, raw: '2800 fps' },
       { value: 857.5, raw: '857,5 m/s' },
     ])
@@ -86,7 +86,7 @@ describe('parseDelimited', () => {
       skipRows: 2,
       velocityUnit: 'ft/s',
     })
-    expect(r.session.strings[0].shots).toHaveLength(2)
+    expect(r.session.strings[0]?.shots).toHaveLength(2)
   })
 
   it('groups consecutive rows by string label and warns when a label returns', () => {
@@ -110,8 +110,8 @@ describe('parseDelimited', () => {
       columns: { velocity: 'v', coldBore: 'cold', excluded: 'ex' },
       velocityUnit: 'm/s',
     })
-    const shots = r.session.strings[0].shots
-    expect(shots.map((s) => s.coldBore ?? false)).toEqual([
+    const shots = r.session.strings[0]?.shots
+    expect(shots?.map((s) => s.coldBore ?? false)).toEqual([
       true,
       true,
       true,
@@ -121,7 +121,7 @@ describe('parseDelimited', () => {
       false,
       false,
     ])
-    expect(shots.map((s) => s.excluded)).toEqual([
+    expect(shots?.map((s) => s.excluded)).toEqual([
       '1',
       'x',
       'YES',
@@ -208,7 +208,7 @@ describe('parseDelimited', () => {
       ...ms,
       columns: { velocity: 'v', coldBore: 'cold' },
     })
-    expect(r.session.strings[0].shots).toEqual([
+    expect(r.session.strings[0]?.shots).toEqual([
       { velocity: { value: 812, raw: '812' }, coldBore: true },
     ])
     expect(r.warnings.some((w) => w.includes('may be a velocity'))).toBe(false)
@@ -293,9 +293,9 @@ describe('parseDelimited', () => {
     ]
     for (const [header, value, token] of cases) {
       const r = parseDelimited(`n,${header}\n1,1000`, { columns: { velocity: header } })
-      expect(r.session.strings[0].shots[0].velocity).toEqual({ value, raw: `1000 ${token}` })
+      expect(r.session.strings[0]?.shots[0]?.velocity).toEqual({ value, raw: `1000 ${token}` })
       expect(r.warnings).toEqual([])
-      expect(r.velocityUnits[0].source).toBe('file')
+      expect(r.velocityUnits[0]?.source).toBe('file')
     }
   })
 
@@ -304,7 +304,7 @@ describe('parseDelimited', () => {
       columns: { velocity: 'Speed (avg)' },
       velocityUnit: 'm/s',
     })
-    expect(r.session.strings[0].shots[0].velocity).toEqual({ value: 800, raw: '800' })
+    expect(r.session.strings[0]?.shots[0]?.velocity).toEqual({ value: 800, raw: '800' })
     expect(r.warnings.join()).not.toContain('avg')
     expect(r.velocityUnits).toEqual([{ unit: 'm/s', source: 'caller' }])
   })
@@ -313,7 +313,7 @@ describe('parseDelimited', () => {
     const r = parseDelimited('n,Speed (fps),unit\n1,1000,foo', {
       columns: { velocity: 'Speed (fps)', velocityUnit: 'unit' },
     })
-    expect(r.session.strings[0].shots[0].velocity).toEqual({ value: 304.8, raw: '1000 fps' })
+    expect(r.session.strings[0]?.shots[0]?.velocity).toEqual({ value: 304.8, raw: '1000 fps' })
   })
 
   it('uses the caller unit when the velocity header has no token', () => {
@@ -321,7 +321,7 @@ describe('parseDelimited', () => {
       columns: { velocity: 'muzzle velocity' },
       velocityUnit: 'm/s',
     })
-    expect(r.session.strings[0].shots[0].velocity).toEqual({ value: 812, raw: '812' })
+    expect(r.session.strings[0]?.shots[0]?.velocity).toEqual({ value: 812, raw: '812' })
     expect(r.velocityUnits).toEqual([{ unit: 'm/s', source: 'caller' }])
     expect(() => parseDelimited('Velocity\n812', { columns: { velocity: 'velocity' } })).toThrow(
       'row 2: velocity unit missing',
@@ -331,7 +331,7 @@ describe('parseDelimited', () => {
   it('takes the token for an empty unit cell and refuses a unit cell that differs', () => {
     const columns = { velocity: 'Speed (fps)', velocityUnit: 'unit' }
     const same = parseDelimited('Speed (fps),unit\n2800,\n2810,FPS', { columns })
-    expect(same.session.strings[0].shots.map((s) => s.velocity)).toEqual([
+    expect(same.session.strings[0]?.shots.map((s) => s.velocity)).toEqual([
       { value: 853.44, raw: '2800 fps' },
       { value: 856.488, raw: '2810 FPS' },
     ])
@@ -366,7 +366,7 @@ describe('parseOpenReloadingCsv', () => {
     const r = parseOpenReloadingCsv(template, { fileName: 'log.csv' })
     expect(r.format).toBe('openreloading-csv')
     expect(r.stringLabels).toEqual(['42.0 gr', '42.5 gr'])
-    expect(r.session.strings[0].shots).toEqual([
+    expect(r.session.strings[0]?.shots).toEqual([
       { velocity: { value: 851.916, raw: '2795 fps' }, coldBore: true },
       { velocity: { value: 856.488, raw: '2810 fps' } },
       { velocity: { value: 854.3544, raw: '2803 fps' }, excluded: 'flyer' },
@@ -376,12 +376,12 @@ describe('parseOpenReloadingCsv', () => {
 
   it('reads ";" with decimal commas', () => {
     const r = parseOpenReloadingCsv('velocity;velocityUnit\n812,5;m/s\n813;m/s')
-    expect(r.session.strings[0].shots.map((s) => s.velocity.value)).toEqual([812.5, 813])
+    expect(r.session.strings[0]?.shots.map((s) => s.velocity.value)).toEqual([812.5, 813])
   })
 
   it('reads names in any case and ignores a trailing delimiter in the header', () => {
     const r = parseOpenReloadingCsv('String,Velocity,VelocityUnit,ColdBore,\nA,2795,fps,yes,\n')
-    expect(r.session.strings[0].shots).toEqual([
+    expect(r.session.strings[0]?.shots).toEqual([
       { velocity: { value: 851.916, raw: '2795 fps' }, coldBore: true },
     ])
   })

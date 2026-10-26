@@ -5,7 +5,7 @@ import { fitOf, fitsOf, summaryFitSource } from '../src/lib/bullet-fit.ts'
 const summary = (
   id: string,
   name: string,
-  fit: { g1?: number; land?: number; groove?: number },
+  fit: { g1?: number | undefined; land?: number | undefined; groove?: number | undefined },
 ): CartridgeSummary => ({
   id,
   name,

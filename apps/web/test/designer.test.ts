@@ -25,6 +25,7 @@ import { seededRandom } from '../src/lib/ellipse.ts'
 import { fieldValueFromText } from '../src/lib/field-spec.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import type { ResolvedBullet } from '../src/lib/variants.ts'
+import { defined } from './defined.ts'
 import { matchBullet, targetBullet } from './fixtures/bullets.ts'
 
 describe('choice lists', () => {
@@ -61,10 +62,10 @@ const run = (start: Design, ...actions: Action[]) =>
 
 describe('start', () => {
   it('a new bullet starts at .308 in exactly', () => {
-    expect(newDesign(us).fields.diameter.text).toBe('0.308')
+    expect(defined(newDesign(us).fields.diameter).text).toBe('0.308')
     // shown rounded to the unit's decimals, held exactly
-    expect(newDesign(metric).fields.diameter.text).toBe('7.82')
-    expect(newDesign(metric).fields.diameter.si).toBeCloseTo(0.308 * 25.4e-3, 12)
+    expect(defined(newDesign(metric).fields.diameter).text).toBe('7.82')
+    expect(defined(newDesign(metric).fields.diameter).si).toBeCloseTo(0.308 * 25.4e-3, 12)
   })
 
   it('a new bullet keeps only the calibre and mass, and draws with an assumed length of 4 d', () => {
@@ -72,7 +73,7 @@ describe('start', () => {
     const d = newDesign(metric, from)
     expect(d.fields.diameter).toEqual(from.fields.diameter)
     expect(d.fields.mass).toEqual(from.fields.mass)
-    expect(d.fields.length.text).toBe('')
+    expect(defined(d.fields.length).text).toBe('')
     expect(d.origin).toBeUndefined()
     const e = evaluate(d, metric)
     expect(e.drawing).toBeDefined()
@@ -86,8 +87,8 @@ describe('start', () => {
     const d = fromRecord(targetBullet, metric)
     expect(d.fields.length).toEqual({ text: '32', si: 32e-3 })
     // shown rounded, held as recorded
-    expect(d.fields.noseLength.text).toBe('20')
-    expect(d.fields.noseLength.si).toBeCloseTo(20e-3, 12)
+    expect(defined(d.fields.noseLength).text).toBe('20')
+    expect(defined(d.fields.noseLength).si).toBeCloseTo(20e-3, 12)
     expect(d.manufacturer).toBe(`catalogue:${targetBullet.manufacturer}`)
     const e = evaluate(d, metric)
     for (const k of ['diameter', 'mass', 'length', 'noseLength', 'bearingLength', 'baseToOgive'])
@@ -214,13 +215,13 @@ describe('history', () => {
     const h0 = run(newDesign(metric), type('length', '30'), type('length', '31'))
     const h1 = reduce(h0, type('meplatDiameter', '1'))
     const back = reduce(reduce(h1, { type: 'undo' }), { type: 'undo' })
-    expect(back.present.fields.length.text).toBe('')
-    expect(back.present.fields.meplatDiameter.text).toBe('')
+    expect(defined(back.present.fields.length).text).toBe('')
+    expect(defined(back.present.fields.meplatDiameter).text).toBe('')
     const once = reduce(h1, { type: 'undo' })
-    expect(once.present.fields.length.text).toBe('31')
-    expect(once.present.fields.meplatDiameter.text).toBe('')
+    expect(defined(once.present.fields.length).text).toBe('31')
+    expect(defined(once.present.fields.meplatDiameter).text).toBe('')
     const again = reduce(once, { type: 'redo' })
-    expect(again.present.fields.meplatDiameter.text).toBe('1')
+    expect(defined(again.present.fields.meplatDiameter).text).toBe('1')
     // a new edit after an undo drops the redo steps
     expect(reduce(once, type('length', '29')).future).toEqual([])
   })
@@ -232,15 +233,15 @@ describe('history', () => {
       system: metric,
     })
     expect(h.present.fields).toEqual(start.fields)
-    expect(reduce(h, { type: 'undo' }).present.fields.noseLength.text).toBe('21')
+    expect(defined(reduce(h, { type: 'undo' }).present.fields.noseLength).text).toBe('21')
   })
 
   it('a unit switch rewrites the text of every step and keeps the SI values', () => {
     const h = run(newDesign(metric), type('length', '30'), type('meplatDiameter', '1'))
     const u = reduce(h, { type: 'units', system: us })
     expect(u.present.fields.length).toEqual({ text: '1.1811', si: 30e-3 })
-    expect(u.past.at(-1)?.fields.length.text).toBe('1.1811')
-    expect(u.present.fields.mass.text).toBe('168')
+    expect(defined(u.past.at(-1)?.fields.length).text).toBe('1.1811')
+    expect(defined(u.present.fields.mass).text).toBe('168')
     // the same outline, its labels in inches
     const [inch, mm] = [evaluate(u.present, us).drawing, evaluate(h.present, metric).drawing]
     expect(inch?.profile).toEqual(mm?.profile)
@@ -312,14 +313,15 @@ type Choices = readonly (readonly [ChoiceKey, readonly string[]])[]
 function randomAction(rnd: () => number, h: History, choices: Choices): Action {
   const r = rnd()
   if (r < 0.15) {
-    const [key, opts] = choices[Math.floor(rnd() * choices.length)]
-    return { type: 'choice', key, value: opts[Math.floor(rnd() * opts.length)] }
+    const [key, opts] = defined(choices[Math.floor(rnd() * choices.length)])
+    return { type: 'choice', key, value: defined(opts[Math.floor(rnd() * opts.length)]) }
   }
   if (r < 0.2) return { type: rnd() < 0.5 ? 'undo' : 'redo' }
-  const spec = designerSpecs[Math.floor(rnd() * designerSpecs.length)]
+  const spec = defined(designerSpecs[Math.floor(rnd() * designerSpecs.length)])
   const key = spec.key
   // parts along the axis up to the current length, as a user would set them
-  const length = h.present.fields.length.si ?? 4 * (h.present.fields.diameter.si ?? 0)
+  const length =
+    defined(h.present.fields.length).si ?? 4 * (defined(h.present.fields.diameter).si ?? 0)
   const axial = spec.quantity === 'length' && !['length', 'diameter', 'ogive.radius'].includes(key)
   const max = metric[spec.quantity].fromSi(
     axial ? Math.min(sliderMax(key, h.present), length) : sliderMax(key, h.present),
@@ -459,7 +461,7 @@ describe('drafts', () => {
     })
     // opened again, the resolved design is the edited one and saves the same overrides
     const again = fromUser(fileData(cleared), resolvedOf(fileData(cleared), matchBullet), metric)
-    expect(again.fields.length.si).toBeUndefined()
+    expect(defined(again.fields.length).si).toBeUndefined()
     expect(again.choices['ogive.form']).toBe('')
     expect(again.name).toBe('Mine')
     expect(fileData(again)).toEqual(fileData(cleared))

@@ -28,6 +28,7 @@ import {
 } from './field-spec.ts'
 import { designReduce, editHistory, type History as H, historyOf, pushHistory } from './history.ts'
 import { type ManufacturerNames, noManufacturerNames, productLabel } from './manufacturers.ts'
+import { nth } from './nth.ts'
 import type { FieldRow } from './record-fields.ts'
 import { drawingLengthUnit, kilogramsPerGrain, metersPerInch, type UnitSystem } from './units.ts'
 import { dropPath, type ResolvedBullet, revisionOf, setPath } from './variants.ts'
@@ -109,7 +110,7 @@ export interface Origin {
   id: string
   title: string
   /** The `revision` of the catalogue record, as the API answered it. */
-  revision?: string
+  revision?: string | undefined
   /** The base's manufacturer, `catalogue:<id>`. */
   manufacturer: string
   name: string
@@ -119,11 +120,11 @@ export interface Origin {
 
 export interface Design {
   /** The manufacturer, `catalogue:<id>` or `user:<id>`; undefined while none is named. */
-  manufacturer?: string
+  manufacturer?: string | undefined
   name: string
   choices: Choices
   fields: Fields
-  origin?: Origin
+  origin?: Origin | undefined
   /** The catalogue bullet the design is based on, `catalogue:<id>`, kept through files. */
   basedOn?: string
   /** The base changed since the design was saved: the fields not overridden follow it. */
@@ -372,7 +373,7 @@ export function reduce(h: History, a: Action): History {
  */
 export type FieldState =
   | { kind: 'record' }
-  | { kind: 'entered'; changed: boolean; record?: number }
+  | { kind: 'entered'; changed: boolean; record?: number | undefined }
   | { kind: 'derived' | 'assumed'; si: number; basis?: string }
   | { kind: 'empty' }
 
@@ -388,7 +389,7 @@ export interface Drawing {
 interface Evaluation {
   drawing?: Drawing
   /** Why there is no drawing for this input, and the field to show it at. */
-  refusal?: { reason: string; field: string }
+  refusal?: { reason: string; field: string } | undefined
   states: Record<string, FieldState>
   /** The computed rows of a bullet page (sectional density, Miller twist with a given length); none without a mass and diameter. */
   computed: FieldRow[]
@@ -558,7 +559,7 @@ function derivedFills(
   const tag = (i: number) => (o.tags[i] === 'approximate' ? 'assumed' : 'derived')
   const baseAssumed = o.approximate.some(([z]) => z === 0)
   const tipIndex = o.points.findIndex(([, z]) => z === L)
-  const m = o.points[tipIndex][0]
+  const m = nth(o.points, tipIndex)[0]
   const fill: Fill = {
     length: [L, 'assumed', assumedLength],
     noseLength: [o.noseLength, noseFromRadius ? 'derived' : o.noseAssumed ? 'assumed' : 'derived'],
@@ -577,7 +578,7 @@ function derivedFills(
   return fill
 }
 
-type Fill = Record<string, [number, 'derived' | 'assumed', string?]>
+type Fill = Record<string, [number, 'derived' | 'assumed', (string | undefined)?]>
 
 function boatTailFills(
   fill: Fill,
@@ -587,15 +588,16 @@ function boatTailFills(
 ) {
   // a boat tail starts at a base edge inside the shank radius; its top is the next point
   const e = o.baseEdge
-  if (!(o.points[e][0] < d / 2 - 1e-12)) return
-  const t = o.points[e + 1][1]
+  const base = nth(o.points, e)
+  if (!(base[0] < d / 2 - 1e-12)) return
+  const top = nth(o.points, e + 1)
+  const t = top[1]
   const tagT = tag(e + 1)
   const tagB = tag(e)
   fill['base.length'] = [t, tagT]
-  fill['base.diameter'] = [2 * o.points[e][0], tagB]
-  const top = o.points[e + 1]
+  fill['base.diameter'] = [2 * base[0], tagB]
   fill['base.angle'] = [
-    fromSi('angle', Math.atan((top[0] - o.points[e][0]) / t)),
+    fromSi('angle', Math.atan((top[0] - base[0]) / t)),
     tagT === 'assumed' || tagB === 'assumed' ? 'assumed' : 'derived',
   ]
 }
@@ -655,7 +657,7 @@ export function evaluate(design: Design, system: UnitSystem, last?: string): Eva
     const field =
       p.fields.find((f) => f === last) ??
       p.fields.find((f) => v[f] !== undefined || f in choices) ??
-      p.fields[0]
+      nth(p.fields, 0)
     return done({ reason: p.reason, field })
   }
 

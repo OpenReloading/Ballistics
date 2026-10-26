@@ -1,5 +1,6 @@
 import { type CatalogueSession, catalogueSession } from '@open-reloading/schema'
 import type { ChronoImport } from '../src/index.ts'
+import { defined } from './defined.ts'
 
 const fill: Record<string, unknown> = {
   id: 'test-session',
@@ -21,12 +22,12 @@ export function complete(result: ChronoImport): CatalogueSession {
   }
   for (const path of result.missingPaths) {
     const keys = path.split('.')
+    const last = defined(keys.pop(), 'path')
     let node = record
-    for (const key of keys.slice(0, -1)) {
+    for (const key of keys) {
       node[key] ??= {}
       node = node[key] as Record<string, unknown>
     }
-    const last = keys[keys.length - 1]
     node[last] = fill[last]
   }
   return catalogueSession.parse(record)

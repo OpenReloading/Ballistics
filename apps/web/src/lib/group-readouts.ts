@@ -21,9 +21,9 @@ type Readout = {
   help: string
   value: number
   angle: number
-  interval?: Interval
+  interval?: Interval | undefined
   /** CEP only: the circular-normal estimate `cep` and its interval, for the hover detail. */
-  circular?: { value: number; interval?: Interval }
+  circular?: { value: number; interval?: Interval | undefined } | undefined
 }
 
 /** Key, label and definition of each readout row, in display order. */

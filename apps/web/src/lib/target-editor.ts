@@ -16,6 +16,7 @@ import {
   type TargetSheet,
   toSi,
 } from '@open-reloading/schema'
+import { nth } from './nth.ts'
 import {
   applyMatrix,
   type Calibration,
@@ -161,7 +162,7 @@ export function newGroup(sheet: TargetSheet, id: string, distance: number): Shot
   return {
     id,
     name: `Group ${n}`,
-    colour: groupColours[(n - 1) % groupColours.length],
+    colour: nth(groupColours, (n - 1) % groupColours.length),
     distance,
     shots: [],
   }
@@ -189,7 +190,8 @@ export function ladderExtremeSpreads(groups: ShotGroup[], charges: number[]) {
     const es = g.ladderStep === undefined ? undefined : groupStatisticsOf(g).extremeSpread
     return es === undefined ? [] : [{ step: g.ladderStep, es, distance: g.distance }]
   })
-  const one = sized.every((x) => x.distance === sized[0].distance)
+  const [first] = sized
+  const one = sized.every((x) => x.distance === first?.distance)
   return charges.flatMap((charge, step) => {
     const at = sized.filter((x) => x.step === step)
     const mean = (f: (x: (typeof at)[number]) => number) =>
@@ -211,10 +213,10 @@ export function ladderExtremeSpreads(groups: ShotGroup[], charges: number[]) {
 export function extremePairIndices(shots: ShotGroup['shots']): [number, number] | undefined {
   let best: [number, number] | undefined
   let max = -1
-  for (let i = 0; i < shots.length; i++)
-    for (let j = i + 1; j < shots.length; j++) {
-      if (shots[i].excluded || shots[j].excluded) continue
-      const d = Math.hypot(shots[i].x - shots[j].x, shots[i].y - shots[j].y)
+  for (const [i, a] of shots.entries())
+    for (const [j, b] of shots.entries()) {
+      if (j <= i || a.excluded || b.excluded) continue
+      const d = Math.hypot(a.x - b.x, a.y - b.y)
       if (d > max) [max, best] = [d, [i, j]]
     }
   return best
@@ -256,7 +258,7 @@ export function ellipsePoints(
 
 /** Ends of the principal axis through the centre, as long as the 95 % dispersion ellipse. */
 export function axisEnds(s: GroupStatistics): [Point, Point] | undefined {
-  const e = dispersionEllipse(s, coverages[coverages.length - 1])
+  const e = dispersionEllipse(s, nth(coverages, coverages.length - 1))
   if (!e || !s.centre || s.principalAxisAngle === undefined) return undefined
   const [dx, dy] = [e.semiMajor * Math.cos(e.angle), e.semiMajor * Math.sin(e.angle)]
   const c = s.centre

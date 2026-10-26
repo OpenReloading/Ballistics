@@ -11,6 +11,7 @@ import {
 } from '../lib/field-spec.ts'
 import { barrelLengthByClass } from '../lib/input-defaults.ts'
 import { interiorFields } from '../lib/interior-input.ts'
+import { nth } from '../lib/nth.ts'
 import { controlSize } from '../lib/theme.ts'
 import { fixedFieldText, type UnitSystem, withUnit } from '../lib/units.ts'
 import {
@@ -58,7 +59,7 @@ export function WorkbenchDefaultsForm() {
     setStored(d)
     setFields(
       initialFields(
-        specs.map((s, i) => ({ ...s, initial: d[keys[i]] })),
+        specs.map((s, i) => ({ ...s, initial: d[nth(keys, i)] })),
         system,
         fixedFieldText,
       ),
@@ -70,7 +71,7 @@ export function WorkbenchDefaultsForm() {
 
   /** The message of a default field in the units `shown` by the field; none for an empty barrel length (by cartridge class). */
   function errorOf(key: (typeof keys)[number], value: FieldValue, shown: UnitSystem) {
-    const spec = specs[keys.indexOf(key)]
+    const spec = nth(specs, keys.indexOf(key))
     if (key === 'barrelLength')
       return value.text.trim() === ''
         ? undefined
@@ -111,7 +112,7 @@ export function WorkbenchDefaultsForm() {
     setErrors({})
     setFields(
       initialFields(
-        specs.map((s, i) => ({ ...s, initial: cited[keys[i]] })),
+        specs.map((s, i) => ({ ...s, initial: cited[nth(keys, i)] })),
         system,
         fixedFieldText,
       ),
@@ -120,26 +121,28 @@ export function WorkbenchDefaultsForm() {
 
   return (
     <Stack gap="sm" maw="40rem" className="workbench-defaults">
-      {specs.map((spec, i) => (
-        <NumberField
-          key={spec.key}
-          spec={spec}
-          help={spec.key === 'barrelLength' ? barrelHelp : undefined}
-          system={system}
-          value={fields[spec.key]}
-          error={
-            errors[spec.key]
-              ? (s) => errorOf(keys[i], fields[spec.key], s) ?? errors[spec.key]
-              : undefined
-          }
-          mark={
-            i < defaultKeys.length
-              ? `Cited default: ${citedDefaults[defaultKeys[i]].source}.`
-              : undefined
-          }
-          onChange={(value) => change(keys[i], value)}
-        />
-      ))}
+      {specs.map((spec, i) => {
+        const key = nth(keys, i)
+        const value = fields[spec.key]
+        return (
+          <NumberField
+            key={spec.key}
+            spec={spec}
+            help={spec.key === 'barrelLength' ? barrelHelp : undefined}
+            system={system}
+            value={value}
+            error={
+              errors[spec.key] && value
+                ? (s) => errorOf(key, value, s) ?? errors[spec.key]
+                : undefined
+            }
+            mark={
+              key === 'barrelLength' ? undefined : `Cited default: ${citedDefaults[key].source}.`
+            }
+            onChange={(v) => change(key, v)}
+          />
+        )
+      })}
       <Button
         variant="default"
         size={controlSize.row.button}

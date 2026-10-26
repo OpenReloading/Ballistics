@@ -28,9 +28,9 @@ const same = (from: number | undefined, si: number | undefined) =>
 /** What gives a field its value without the user typing it. All SI. */
 export interface Givers {
   /** The powder record's model values, only while the load keeps a reference to that record. */
-  origin?: Record<string, number>
+  origin?: Record<string, number> | undefined
   /** The bullet record's or design's mass, only while the load keeps a reference to it. */
-  bulletMass?: number
+  bulletMass?: number | undefined
   /** The Settings defaults and the fields still holding one. */
   defaults: Record<string, number | undefined>
   defaulted: ReadonlySet<string>
@@ -134,22 +134,24 @@ export interface LoadParts {
   /** The value of each field; the solver values of `given` stay out of the load. */
   values: Record<string, number | undefined>
   given: ReadonlySet<string>
-  cartridge?: string
-  firearm?: string
-  bullet?: string
-  powder?: string
+  cartridge?: string | undefined
+  firearm?: string | undefined
+  bullet?: string | undefined
+  powder?: string | undefined
   notes: string
   /** The case capacity: a catalogue capacity, or the user record of the measured one. */
-  capacity?: string
+  capacity?: string | undefined
   /** m. */
-  seating?: { by: 'overallLength' | 'baseToOgive'; value: number }
-  ladder?: {
-    kind: RunnableLadderKind
-    stepCount: number
-    /** In the SI unit of the kind: kg, m or K. */
-    step?: number
-    direction: LadderDirection
-  }
+  seating?: { by: 'overallLength' | 'baseToOgive'; value: number } | undefined
+  ladder?:
+    | {
+        kind: RunnableLadderKind
+        stepCount: number
+        /** In the SI unit of the kind: kg, m or K. */
+        step?: number | undefined
+        direction: LadderDirection
+      }
+    | undefined
   /** The chronograph sessions of the Measurements tab, as references. */
   sessions: readonly string[]
 }
@@ -212,7 +214,11 @@ export function toLoad(p: LoadParts): Load {
  */
 export function toApiLoad(
   p: LoadParts,
-  catalogue: { cartridge?: string; bullet?: string; powder?: string },
+  catalogue: {
+    cartridge?: string | undefined
+    bullet?: string | undefined
+    powder?: string | undefined
+  },
 ): Load {
   const charge = p.ladder?.kind === 'charge'
   return toLoad({

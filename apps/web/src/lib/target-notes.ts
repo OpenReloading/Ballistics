@@ -19,7 +19,7 @@ const unitNames: Record<Unit, (s: UnitSystem) => string> = {
 export const notePlaceholders: {
   label: string
   help: string
-  tokens: { token: string; unit?: Unit }[]
+  tokens: { token: string; unit?: Unit | undefined }[]
 }[] = [
   { label: 'Group name', help: 'The name of the group.', tokens: [{ token: '{name}' }] },
   { label: 'Shots', help: 'Shots in the statistics.', tokens: [{ token: '{shots}' }] },

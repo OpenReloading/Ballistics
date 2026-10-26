@@ -174,7 +174,7 @@ describe('userDataFile', () => {
   it('takes a user manufacturer as a name and refuses another origin', () => {
     expect(userRecord.parse(manufacturerRecord)).toEqual(manufacturerRecord)
     const shared = { ...manufacturerRecord, data: { origin: 'shared' } }
-    expect(userRecord.safeParse(shared).error?.issues[0].path).toEqual(['data', 'origin'])
+    expect(userRecord.safeParse(shared).error?.issues[0]?.path).toEqual(['data', 'origin'])
   })
 
   it('refuses the manufacturer name of an older bullet or firearm', () => {
@@ -199,7 +199,7 @@ describe('userDataFile', () => {
     const draft = { ...faceRecord, data: { rings: [{}], events: [{ name: '' }] } }
     expect(userRecord.safeParse(draft).success).toBe(true)
     const zero = { ...faceRecord, data: { ...faceRecord.data, blackDiameter: 0 } }
-    expect(userRecord.safeParse(zero).error?.issues[0].path).toEqual(['data', 'blackDiameter'])
+    expect(userRecord.safeParse(zero).error?.issues[0]?.path).toEqual(['data', 'blackDiameter'])
   })
 
   it('takes a catalogue reference as the base of a variant and refuses another text', () => {
@@ -271,21 +271,21 @@ describe('userDataFile', () => {
 
   it('refuses the design kinds of the older format', () => {
     for (const kind of ['bulletDesign', 'cartridgeDesign'])
-      expect(userRecord.safeParse({ ...bulletRecord, kind }).error?.issues[0].path).toEqual([
+      expect(userRecord.safeParse({ ...bulletRecord, kind }).error?.issues[0]?.path).toEqual([
         'kind',
       ])
   })
 
   it('rejects two records with one id', () => {
     const twin = { ...loadRecord, name: 'Another load' }
-    expect(userDataFile.safeParse(file([loadRecord, twin])).error?.issues[0].path).toEqual([
+    expect(userDataFile.safeParse(file([loadRecord, twin])).error?.issues[0]?.path).toEqual([
       'records',
     ])
   })
 
   it('rejects another format and a newer version', () => {
     expect(userDataFile.safeParse({ ...file([]), format: 'other' }).success).toBe(false)
-    expect(userDataFile.safeParse(file([], 5)).error?.issues[0].path).toEqual(['version'])
+    expect(userDataFile.safeParse(file([], 5)).error?.issues[0]?.path).toEqual(['version'])
   })
 
   it('rejects an unknown kind, a bad date, a non-finite value and an invalid spec value', () => {
@@ -357,7 +357,7 @@ describe('a record of the earlier load format', () => {
   it('is refused with a message that names the new kind', () => {
     const r = userRecord.safeParse(old)
     expect(r.success).toBe(false)
-    expect(r.error?.issues[0].message).toBe(legacyLoadProblem)
+    expect(r.error?.issues[0]?.message).toBe(legacyLoadProblem)
     expect(legacyLoadProblem).toContain('"load"')
     const f = userDataFile.safeParse(file([old]))
     expect(f.success).toBe(false)
@@ -367,7 +367,7 @@ describe('a record of the earlier load format', () => {
   it('does not hide the usual message for another unknown kind', () => {
     const r = userRecord.safeParse({ ...old, kind: 'other' })
     expect(r.success).toBe(false)
-    expect(r.error?.issues[0].message).not.toBe(legacyLoadProblem)
+    expect(r.error?.issues[0]?.message).not.toBe(legacyLoadProblem)
   })
 })
 
@@ -496,7 +496,7 @@ describe('firearm', () => {
     const props = z.toJSONSchema(firearm).properties as Record<string, { unit?: string }>
     expect(
       Object.fromEntries(
-        ['barrelLength', 'twist', 'grooveDiameter', 'firearmMass'].map((k) => [k, props[k].unit]),
+        ['barrelLength', 'twist', 'grooveDiameter', 'firearmMass'].map((k) => [k, props[k]?.unit]),
       ),
     ).toEqual({
       barrelLength: units.length,

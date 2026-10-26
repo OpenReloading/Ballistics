@@ -70,17 +70,23 @@ class Cursor {
   private advance(): boolean {
     const s = this.s
     const e = this.end
-    if (e + 4 > s.length || (s[e] | (s[e + 1] << 8)) !== CONTINUE) return false
+    if (e + 4 > s.length || (this.byte(e) | (this.byte(e + 1) << 8)) !== CONTINUE) return false
     this.at = e + 4
-    this.end = this.at + (s[e + 2] | (s[e + 3] << 8))
+    this.end = this.at + (this.byte(e + 2) | (this.byte(e + 3) << 8))
     return true
+  }
+  /** Byte `k` of the stream; the records and Continue chunks were checked to lie inside it. */
+  private byte(k: number): number {
+    const b = this.s[k]
+    if (b === undefined) throw new Short()
+    return b
   }
   private ready() {
     while (this.at >= this.end) if (!this.advance()) throw new Short()
   }
   u8(): number {
     this.ready()
-    return this.s[this.at++]
+    return this.byte(this.at++)
   }
   u16(): number {
     return this.u8() | (this.u8() << 8)
@@ -119,11 +125,10 @@ class Cursor {
   }
   /** `n` characters from the cursor inside the current chunk, one or two bytes each. */
   private codeUnits(n: number, wide: boolean): string {
-    const s = this.s
     const codes = new Array<number>(n)
     for (let i = 0; i < n; i++) {
       const k = this.at + (wide ? 2 * i : i)
-      codes[i] = wide ? s[k] | (s[k + 1] << 8) : s[k]
+      codes[i] = wide ? this.byte(k) | (this.byte(k + 1) << 8) : this.byte(k)
     }
     this.at += wide ? 2 * n : n
     return String.fromCharCode(...codes)
@@ -278,7 +283,7 @@ interface SheetState {
   rows: Map<number, string[]>
   remaining: CellBudget
   /** A formula with a string result waits for its String record (2.1.7.20.5 FORMULA). */
-  pending?: { row: number; col: number }
+  pending?: { row: number; col: number } | undefined
 }
 
 function put(st: SheetState, row: number, col: number, text: string): void {
@@ -317,6 +322,13 @@ function need(c: CellRecord, size: number): void {
   if (c.d.length < size) throw new Error(`XLS record at byte ${c.r.at} is too short`)
 }
 
+/** Byte `k` of the record's data; a record shorter than the fields it must hold is refused. */
+function dataByte(c: CellRecord, k: number): number {
+  const b = c.d[k]
+  if (b === undefined) throw new Error(`XLS record at byte ${c.r.at} is too short`)
+  return b
+}
+
 function numberText(c: CellRecord, x: number, col = c.col): string {
   if (!Number.isFinite(x))
     throw new Error(`cell ${cellRef(c, col)} holds a number that is not finite`)
@@ -353,10 +365,10 @@ function putFormula(reader: RecordReader, c: CellRecord, st: SheetState): void {
     put(st, c.row, c.col, numberText(c, view.getFloat64(c.o + 6, true)))
     return
   }
-  const type = c.d[6]
+  const type = dataByte(c, 6)
   if (type === 0) st.pending = { row: c.row, col: c.col }
-  else if (type === 1) put(st, c.row, c.col, c.d[8] ? '1' : '')
-  else if (type === 2) put(st, c.row, c.col, errorText(c, c.d[8]))
+  else if (type === 1) put(st, c.row, c.col, dataByte(c, 8) ? '1' : '')
+  else if (type === 2) put(st, c.row, c.col, errorText(c, dataByte(c, 8)))
   else if (type === 3) put(st, c.row, c.col, '')
   else throw new Error(`formula cell ${cellRef(c)} holds an unknown value type ${type}`)
 }
@@ -365,17 +377,18 @@ function putFormula(reader: RecordReader, c: CellRecord, st: SheetState): void {
 function sharedCell(view: DataView, c: CellRecord, strings: string[]): string {
   need(c, 10)
   const k = view.getUint32(c.o + 6, true)
-  if (k >= strings.length) {
+  const text = strings[k]
+  if (text === undefined) {
     throw new Error(`cell ${cellRef(c)} refers to shared string ${k} of ${strings.length}`)
   }
-  return strings[k]
+  return text
 }
 
 /** BoolErr (2.4.24): an error code as its text, TRUE as `1`, FALSE as empty text. */
 function boolErrText(c: CellRecord): string {
   need(c, 8)
-  if (c.d[7]) return errorText(c, c.d[6])
-  return c.d[6] ? '1' : ''
+  if (dataByte(c, 7)) return errorText(c, dataByte(c, 6))
+  return dataByte(c, 6) ? '1' : ''
 }
 
 /** Places the cell or cells of one cell record. */
@@ -489,7 +502,12 @@ function assembleWorksheets(
     }
   }
   ranges.sort((a, b) => a[0] - b[0])
-  if (ranges.some((r, k) => k > 0 && r[0] < ranges[k - 1][1])) {
+  if (
+    ranges.some(([start], k) => {
+      const before = ranges[k - 1]
+      return before !== undefined && start < before[1]
+    })
+  ) {
     throw new Error('XLS sheet substreams overlap')
   }
   return worksheets

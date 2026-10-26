@@ -59,7 +59,7 @@ export function figureViews(
 }
 
 /** COAL and CBTO of the seated bullet, mm; CBTO only with the bullet's base-to-ogive. */
-type SeatedLengths = { coal: number; cbto?: number }
+type SeatedLengths = { coal: number; cbto?: number | undefined }
 
 /**
  * The cartridge side as the workbench's Cartridge view draws it: the record figure with the seated

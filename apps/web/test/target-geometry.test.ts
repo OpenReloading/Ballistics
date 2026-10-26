@@ -13,6 +13,7 @@ import {
   toImage,
   toTarget,
 } from '../src/lib/target-geometry.ts'
+import { defined } from './defined.ts'
 
 const dist = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y)
 const close = (a: Point, b: Point, tol: number) => expect(dist(a, b)).toBeLessThan(tol)
@@ -116,7 +117,7 @@ describe('calibrate', () => {
       { x: 140, y: 95 },
       { x: 152, y: 103 },
     ].entries())
-      close(toTarget(c, holes[i]), { x: q.x - 150, y: q.y - 100 }, 1e-6)
+      close(toTarget(c, defined(holes[i])), { x: q.x - 150, y: q.y - 100 }, 1e-6)
     // a ring of 50 mm drawn on the sheet, measured after rectifying
     const ring = (a: number) => photo({ x: 150 + 25 * Math.cos(a), y: 100 + 25 * Math.sin(a) })
     const both = calibrate(
@@ -144,10 +145,10 @@ describe('keepOnPhoto', () => {
   const check = (after: Calibration, ratio: number) => {
     const moved = shots.map((q) => keepOnPhoto(q, before, after))
     moved.forEach((q, i) => {
-      close(toImage(after, q), holes[i], 1e-9)
+      close(toImage(after, q), defined(holes[i]), 1e-9)
     })
     pairs(moved).forEach((d, i) => {
-      expect(d).toBeCloseTo(pairs(shots)[i] * ratio, 9)
+      expect(d).toBeCloseTo(defined(pairs(shots)[i]) * ratio, 9)
     })
     return moved
   }
@@ -158,7 +159,14 @@ describe('keepOnPhoto', () => {
     // target axes turned by +37 degrees: coordinates turn by -37 degrees
     const [c, s] = [Math.cos(-angle), Math.sin(-angle)]
     moved.forEach((q, i) => {
-      close(q, { x: c * shots[i].x - s * shots[i].y, y: s * shots[i].x + c * shots[i].y }, 1e-9)
+      close(
+        q,
+        {
+          x: c * defined(shots[i]).x - s * defined(shots[i]).y,
+          y: s * defined(shots[i]).x + c * defined(shots[i]).y,
+        },
+        1e-9,
+      )
     })
   })
 

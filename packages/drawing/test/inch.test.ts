@@ -16,6 +16,7 @@ import type { PartPoint } from '../src/core/section.ts'
 import { labelText } from '../src/core/text.ts'
 import type { Layout } from '../src/core/types.ts'
 import { lengthText, scaleLength } from '../src/core/units.ts'
+import { defined } from './defined.ts'
 import { sheets } from './sheets.ts'
 
 // Labels in inches: the geometry stays in mm, only the length texts change.
@@ -65,7 +66,7 @@ function labelFailures(
   inside: (p: PartPoint) => boolean,
 ) {
   const failures: string[] = []
-  const l = layout.labels[k]
+  const l = defined(layout.labels[k])
   const corners = labelCorners(l)
   if (!corners.every(inside)) failures.push(what(`${l.owner} text outside`))
   for (const m of layout.labels.slice(k + 1))
@@ -108,7 +109,7 @@ function figureFailures(record: (typeof current)[number], f: Shown, em: number, 
     ['screen', figureModel(f.drawn, 'screen', em, across, list, true, 'in')],
     ['print', figureModel(f.drawn, 'print', face.printEm, 0, list, false, 'in')],
   ]
-  const screen = models[0][1]
+  const screen = defined(models[0])[1]
   for (const column of [358, 1120]) {
     const px = em * Math.min(face.pxPerMm, column / screen.frame[2])
     if (px < face.minTextPx - 1e-9) failures.push(`${f.id} text ${px} px at ${column}`)

@@ -1,5 +1,6 @@
 /** The load-file formats the File menu opens, and reading files with them. */
 import type { EmbeddedFile, UserRecord } from '@open-reloading/schema'
+import { nth } from './nth.ts'
 import {
   maxFileBytes,
   type ParsedUserFile,
@@ -37,7 +38,7 @@ export const loadFileFormats: LoadFileFormat[] = [
 /** One file read by the first format of `formats` that detects it. */
 export function readLoadFile(text: string, formats = loadFileFormats): ParsedUserFile {
   if (text.length > maxFileBytes) return { ok: false, reason: tooLargeMessage }
-  const format = formats.find((f) => f.detect(text)) ?? formats[formats.length - 1]
+  const format = formats.find((f) => f.detect(text)) ?? nth(formats, formats.length - 1)
   return format.parse(text)
 }
 
@@ -51,7 +52,10 @@ export const readNote = (p: ParsedUserFile) =>
     : ''
 
 /** Every valid file's records, photos, `invalid` entries and notes, and each skipped file with its reason. */
-export function parseFiles(files: { name: string; text?: string }[], formats = loadFileFormats) {
+export function parseFiles(
+  files: { name: string; text?: string | undefined }[],
+  formats = loadFileFormats,
+) {
   const records: UserRecord[] = []
   const embedded: EmbeddedFile[] = []
   const invalid: unknown[] = []

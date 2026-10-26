@@ -5,9 +5,19 @@
  * uses m; "mm" below reads as that unit). Pure: no React, DOM or Next.js.
  */
 
+import { nth } from './nth.ts'
+
 export type Point = { x: number; y: number }
+type Nine<T> = [T, T, T, T, T, T, T, T, T]
 /** A 3 x 3 matrix in row-major order, acting on homogeneous points (x, y, 1). */
 export type Matrix = readonly number[]
+/** A matrix known to have its nine entries, as the functions of this module return it. */
+export type Mat3 = Readonly<Nine<number>>
+/** A homogeneous point or direction. */
+export type Vector3 = [number, number, number]
+
+/** The nine entries of `m`: a matrix always has them, a plain array type cannot say so. */
+const nine = (m: Matrix) => m as Mat3
 
 /** A scale reference on the photo, its points in image pixels and its lengths in mm. */
 export type Reference =
@@ -33,50 +43,99 @@ export type Calibration = {
   spread: number
 }
 
-/** `a b` (row-major). */
-export function mul3(a: Matrix, b: Matrix): number[] {
-  const out: number[] = []
-  for (let r = 0; r < 3; r++)
-    for (let c = 0; c < 3; c++)
-      out.push(a[3 * r] * b[c] + a[3 * r + 1] * b[3 + c] + a[3 * r + 2] * b[6 + c])
-  return out
+/** The matrix of 9 row-major entries; throws for any other count. */
+export function toMatrix(v: readonly number[]): Mat3 {
+  if (v.length !== 9) throw new RangeError(`A 3 x 3 matrix has 9 entries, not ${v.length}`)
+  return [
+    nth(v, 0),
+    nth(v, 1),
+    nth(v, 2),
+    nth(v, 3),
+    nth(v, 4),
+    nth(v, 5),
+    nth(v, 6),
+    nth(v, 7),
+    nth(v, 8),
+  ]
 }
 
-export const transpose3 = (m: Matrix) => [m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8]]
+/** `a b` (row-major). */
+export function mul3(a: Matrix, b: Matrix): Nine<number> {
+  const [a0, a1, a2, a3, a4, a5, a6, a7, a8] = nine(a)
+  const [b0, b1, b2, b3, b4, b5, b6, b7, b8] = nine(b)
+  return [
+    a0 * b0 + a1 * b3 + a2 * b6,
+    a0 * b1 + a1 * b4 + a2 * b7,
+    a0 * b2 + a1 * b5 + a2 * b8,
+    a3 * b0 + a4 * b3 + a5 * b6,
+    a3 * b1 + a4 * b4 + a5 * b7,
+    a3 * b2 + a4 * b5 + a5 * b8,
+    a6 * b0 + a7 * b3 + a8 * b6,
+    a6 * b1 + a7 * b4 + a8 * b7,
+    a6 * b2 + a7 * b5 + a8 * b8,
+  ]
+}
 
-/** `m v` for a 3-vector `v` (a homogeneous point stays undivided). */
-export const apply3 = (m: Matrix, v: readonly number[]) => [
-  m[0] * v[0] + m[1] * v[1] + m[2] * v[2],
-  m[3] * v[0] + m[4] * v[1] + m[5] * v[2],
-  m[6] * v[0] + m[7] * v[1] + m[8] * v[2],
+export const transpose3 = (m: Matrix): Nine<number> => {
+  const k = nine(m)
+  return [k[0], k[3], k[6], k[1], k[4], k[7], k[2], k[5], k[8]]
+}
+
+/** The matrix with `f` applied to each entry (value, row-major index). */
+export const mapMatrix = (m: Mat3, f: (v: number, i: number) => number): Nine<number> => [
+  f(m[0], 0),
+  f(m[1], 1),
+  f(m[2], 2),
+  f(m[3], 3),
+  f(m[4], 4),
+  f(m[5], 5),
+  f(m[6], 6),
+  f(m[7], 7),
+  f(m[8], 8),
 ]
 
-export const det3 = (m: Matrix) =>
-  m[0] * (m[4] * m[8] - m[5] * m[7]) -
-  m[1] * (m[3] * m[8] - m[5] * m[6]) +
-  m[2] * (m[3] * m[7] - m[4] * m[6])
+/** `m v` for a 3-vector `v` (a homogeneous point stays undivided). */
+export const apply3 = (m: Matrix, v: Readonly<Vector3>): Vector3 => {
+  const k = nine(m)
+  return [
+    k[0] * v[0] + k[1] * v[1] + k[2] * v[2],
+    k[3] * v[0] + k[4] * v[1] + k[5] * v[2],
+    k[6] * v[0] + k[7] * v[1] + k[8] * v[2],
+  ]
+}
+
+export const det3 = (m: Matrix) => {
+  const k = nine(m)
+  return (
+    k[0] * (k[4] * k[8] - k[5] * k[7]) -
+    k[1] * (k[3] * k[8] - k[5] * k[6]) +
+    k[2] * (k[3] * k[7] - k[4] * k[6])
+  )
+}
 
 /** Inverse of `m` by its adjugate; undefined when `m` is singular or not finite. */
-export function inv3(m: Matrix): number[] | undefined {
+export function inv3(m: Matrix): Nine<number> | undefined {
   const d = det3(m)
   if (!d || !Number.isFinite(d)) return undefined
+  const k = nine(m)
   return [
-    (m[4] * m[8] - m[5] * m[7]) / d,
-    (m[2] * m[7] - m[1] * m[8]) / d,
-    (m[1] * m[5] - m[2] * m[4]) / d,
-    (m[5] * m[6] - m[3] * m[8]) / d,
-    (m[0] * m[8] - m[2] * m[6]) / d,
-    (m[2] * m[3] - m[0] * m[5]) / d,
-    (m[3] * m[7] - m[4] * m[6]) / d,
-    (m[1] * m[6] - m[0] * m[7]) / d,
-    (m[0] * m[4] - m[1] * m[3]) / d,
+    (k[4] * k[8] - k[5] * k[7]) / d,
+    (k[2] * k[7] - k[1] * k[8]) / d,
+    (k[1] * k[5] - k[2] * k[4]) / d,
+    (k[5] * k[6] - k[3] * k[8]) / d,
+    (k[0] * k[8] - k[2] * k[6]) / d,
+    (k[2] * k[3] - k[0] * k[5]) / d,
+    (k[3] * k[7] - k[4] * k[6]) / d,
+    (k[1] * k[6] - k[0] * k[7]) / d,
+    (k[0] * k[4] - k[1] * k[3]) / d,
   ]
 }
 
 /** `p` mapped by `m` and divided by the third coordinate. */
 export function applyMatrix(m: Matrix, p: Point): Point {
-  const w = m[6] * p.x + m[7] * p.y + m[8]
-  return { x: (m[0] * p.x + m[1] * p.y + m[2]) / w, y: (m[3] * p.x + m[4] * p.y + m[5]) / w }
+  const k = nine(m)
+  const w = k[6] * p.x + k[7] * p.y + k[8]
+  return { x: (k[0] * p.x + k[1] * p.y + k[2]) / w, y: (k[3] * p.x + k[4] * p.y + k[5]) / w }
 }
 
 /** Inverse of `m`; throws when it is singular. */
@@ -98,16 +157,18 @@ function normalizing(points: readonly Point[]): Matrix {
 /** Solves a x = b in place by Gaussian elimination with partial pivoting. */
 export function solve(a: number[][], b: number[]): number[] {
   const n = b.length
+  const cell = (r: number, c: number) => nth(nth(a, r), c)
   for (let k = 0; k < n; k++) {
     let p = k
-    for (let r = k + 1; r < n; r++) if (Math.abs(a[r][k]) > Math.abs(a[p][k])) p = r
-    if (Math.abs(a[p][k]) < 1e-10) throw new Error('Points are degenerate')
-    ;[a[k], a[p]] = [a[p], a[k]]
-    ;[b[k], b[p]] = [b[p], b[k]]
+    for (let r = k + 1; r < n; r++) if (Math.abs(cell(r, k)) > Math.abs(cell(p, k))) p = r
+    if (Math.abs(cell(p, k)) < 1e-10) throw new Error('Points are degenerate')
+    const [rowK, rowP, bk, bp] = [nth(a, k), nth(a, p), nth(b, k), nth(b, p)]
+    ;[a[k], a[p], b[k], b[p]] = [rowP, rowK, bp, bk]
     for (let r = k + 1; r < n; r++) {
-      const f = a[r][k] / a[k][k]
-      for (let c = k; c < n; c++) a[r][c] -= f * a[k][c]
-      b[r] -= f * b[k]
+      const row = nth(a, r)
+      const f = cell(r, k) / cell(k, k)
+      for (let c = k; c < n; c++) row[c] = cell(r, c) - f * cell(k, c)
+      b[r] = nth(b, r) - f * nth(b, k)
     }
   }
   return backSubstitute(a, b)
@@ -118,9 +179,10 @@ function backSubstitute(a: number[][], b: number[]): number[] {
   const n = b.length
   const x = new Array<number>(n)
   for (let k = n - 1; k >= 0; k--) {
-    let s = b[k]
-    for (let c = k + 1; c < n; c++) s -= a[k][c] * x[c]
-    x[k] = s / a[k][k]
+    const row = nth(a, k)
+    let s = nth(b, k)
+    for (let c = k + 1; c < n; c++) s -= nth(row, c) * nth(x, c)
+    x[k] = s / nth(row, k)
   }
   return x
 }
@@ -138,7 +200,8 @@ export function solveHomography(from: readonly Point[], to: readonly Point[]): M
   const qs = to.map((q) => applyMatrix(t2, q))
   for (const set of [ps, qs])
     for (let skip = 0; skip < 4; skip++) {
-      const [a, b, c] = set.filter((_, i) => i !== skip)
+      const rest = set.filter((_, i) => i !== skip)
+      const [a, b, c] = [nth(rest, 0), nth(rest, 1), nth(rest, 2)]
       // normalized points lie about 1 from their centroid, so an absolute bound fits
       if (Math.abs((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)) < 1e-9)
         throw new Error('Three points lie on one line')
@@ -146,13 +209,13 @@ export function solveHomography(from: readonly Point[], to: readonly Point[]): M
   const a: number[][] = []
   const b: number[] = []
   ps.forEach((p, i) => {
-    const q = qs[i]
+    const q = nth(qs, i)
     a.push([p.x, p.y, 1, 0, 0, 0, -q.x * p.x, -q.x * p.y])
     b.push(q.x)
     a.push([0, 0, 0, p.x, p.y, 1, -q.y * p.x, -q.y * p.y])
     b.push(q.y)
   })
-  return mul3(invertMatrix(t2), mul3([...solve(a, b), 1], t1))
+  return mul3(invertMatrix(t2), mul3(toMatrix([...solve(a, b), 1]), t1))
 }
 
 /** Corners of a width x height rectangle in mm, y up: top left, top right, bottom right, bottom left. */

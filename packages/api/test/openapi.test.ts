@@ -75,7 +75,7 @@ describe('buildOpenApi', () => {
             $ref: '#/components/schemas/Error',
           })
       }
-    expect(d.components.schemas.Error.required).toEqual(['statusCode', 'error', 'message'])
+    expect(d.components.schemas.Error?.required).toEqual(['statusCode', 'error', 'message'])
     // the read routes' bodies come from the record schemas
     const record = d.paths['/v1/powders/{id}']?.get?.responses[200]?.content?.['application/json']
     expect(record?.schema).toMatchObject({ type: 'object', additionalProperties: false })

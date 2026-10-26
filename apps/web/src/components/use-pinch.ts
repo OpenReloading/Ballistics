@@ -1,4 +1,5 @@
 import { type RefObject, useEffect, useRef } from 'react'
+import { nth } from '../lib/nth.ts'
 import { pinchView, type ViewBox } from '../lib/target-view.ts'
 import { viewPoint } from './svg-point.ts'
 
@@ -19,7 +20,8 @@ type PinchState = {
 
 /** The middle and the distance of the first two touches. */
 function pair(touches: Map<number, Pt>) {
-  const [a, b] = [...touches.values()]
+  const both = [...touches.values()]
+  const [a, b] = [nth(both, 0), nth(both, 1)]
   return { m: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, d: Math.hypot(a.x - b.x, a.y - b.y) }
 }
 

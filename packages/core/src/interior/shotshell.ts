@@ -1,3 +1,4 @@
+import type { Settings } from '../errors.ts'
 /**
  * Experimental shotshell interior model, `apps/docs/docs/models/interior-shotshell.md`: a shotshell load
  * mapped onto the M3 model `interior`. SI in and out, temperatures in K.
@@ -50,7 +51,7 @@ const nonNeg = (v: number) => Number.isFinite(v) && v >= 0
 /** Runs `interior` on the mapped load; every result is labelled experimental. */
 export function shotshellInterior(
   load: ShotshellLoad,
-  options: Partial<InteriorOptions> = {},
+  options: Settings<InteriorOptions> = {},
 ): ShotshellResult {
   const checks: [string, boolean][] = [
     ['chamber.boreDiameter', pos(load.chamber.boreDiameter)],

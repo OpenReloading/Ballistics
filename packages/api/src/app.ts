@@ -20,7 +20,7 @@ import { API_PREFIX } from './version.ts'
 /** `compute` defaults to a worker pool with `poolDefaults`, closed with the app. */
 type AppOptions = FastifyServerOptions & {
   catalogue: Catalogue
-  compute?: ComputeRunner
+  compute?: ComputeRunner | undefined
   /** Sees every route as it is registered (the contract document of `openapi.ts`). */
   onRoute?: (route: RouteOptions) => void
   /** The contract document: served with its reference viewer under `API_PREFIX` when given. */

@@ -1,6 +1,7 @@
 import type { Discipline, Federation, TargetFace, TargetMapping } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { checkFederations } from '../src/federations.ts'
+import { defined } from './defined.ts'
 
 const provenance = { kind: 'published' as const, sources: [{ title: 'Test rule book' }] }
 const document = {
@@ -76,7 +77,7 @@ const valid = {
 
 describe('checkFederations', () => {
   it('reports a face or event federation that is no record, and a face without one', () => {
-    const events = [{ ...face.events[0], federation: 'gone' }, face.events[1]]
+    const events = [{ ...defined(face.events[0]), federation: 'gone' }, defined(face.events[1])]
     expect(
       checkFederations({
         ...valid,
@@ -112,7 +113,7 @@ describe('checkFederations', () => {
     expect(
       checkFederations({
         ...valid,
-        federations: [federations[0], fed('nation', 'N', 'DE', 'nation')],
+        federations: [defined(federations[0]), fed('nation', 'N', 'DE', 'nation')],
         disciplines: [
           disc('world-d', 'world'),
           disc('nation-d', 'nation', 'nation-d'),

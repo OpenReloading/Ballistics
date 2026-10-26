@@ -19,7 +19,7 @@ export const sideName = { cartridge: 'Cartridge', chamber: 'Chamber' }
 export interface Figure {
   /** `<record id>-drawing`, or `<record id>-drawing-<k>` for the variant at index k. */
   id: string
-  variant?: string
+  variant?: string | undefined
   drawn: { side: Side; p: Profile }[]
   /**
    * closedFront first, then per side its missing symbols (code `missing`) or its notes; a note of
@@ -41,7 +41,7 @@ export const flagged = (drawn: { side: Side; p: Profile }[]) =>
 export function recordFigures(spec: {
   id: string
   standard: string
-  table?: string
+  table?: string | undefined
   values: SpecValue[]
 }): Figure[] {
   const cip = spec.standard === 'CIP'

@@ -22,12 +22,13 @@ import type { FigureModel } from '@open-reloading/drawing/cartridge'
 import type { SpecValue } from '@open-reloading/schema'
 import type { CartridgeDetail } from '../src/lib/api-types.ts'
 import { drawable } from '../src/lib/cartridge-sheet.ts'
+import { defined } from './defined.ts'
 
 /** A cartridge record as the drawing reads it: `id` is its C.I.P. sheet id. */
 export interface SpecRecord {
   id: string
   standard: string
-  table?: string
+  table?: string | undefined
   verification?: string
   values: SpecValue[]
 }
@@ -51,9 +52,9 @@ export interface Laid {
   em: number
   /** The record's values and the figure's table VII variant. */
   values: SpecValue[]
-  variant?: string
+  variant?: string | undefined
   /** The unit of the length texts, mm by default. */
-  unit?: LengthUnit
+  unit?: LengthUnit | undefined
 }
 
 /** Distance from p to the segment from a to b. */
@@ -64,7 +65,7 @@ function segDistance([x, y]: PartPoint, [ax, ay]: PartPoint, [bx, by]: PartPoint
 }
 
 const polyDistance = (q: PartPoint, line: PartPoint[]) =>
-  Math.min(...line.slice(1).map((b, n) => segDistance(q, line[n], b)))
+  Math.min(...line.slice(1).map((b, n) => segDistance(q, defined(line[n]), b)))
 
 /** Every value text shows the record's stored value of its symbol, side and variant. */
 export function storedValues({ side, p, layout, values, variant, unit }: Laid) {
@@ -91,7 +92,7 @@ export function storedValues({ side, p, layout, values, variant, unit }: Laid) {
 /** The strokes an extension line may start from: the outline, axis, steel edge, head face. */
 function strokes({ side, p, em, axis }: Laid): PartPoint[][] {
   const section = fullSection(p.points)
-  const mirrored = [[...section, section[0]], axis.map((z): PartPoint => [z, 0])]
+  const mirrored = [[...section, defined(section[0])], axis.map((z): PartPoint => [z, 0])]
   if (side === 'cartridge') return mirrored
   const head = headFace(p.points, p.annotation)
   return [

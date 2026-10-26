@@ -21,7 +21,7 @@ import type { UnitSystem } from './units.ts'
 /** A row of the comparison: one value per bullet as shown in the preset, undefined where absent. */
 interface CompareRow {
   label: string
-  symbol?: string
+  symbol?: string | undefined
   unit: string
   values: (string | undefined)[]
 }

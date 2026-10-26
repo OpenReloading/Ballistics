@@ -15,7 +15,7 @@ import { Panel } from './panel.tsx'
 import { RateBar, RateTicks } from './rate-scale.tsx'
 
 /** A powder of the burn-rate order as a neighbour link. */
-export type Neighbour = { id: string; label: string; order: number; rate?: number }
+export type Neighbour = { id: string; label: string; order: number; rate?: number | undefined }
 
 /** The powder's place in the burn-rate order of all fitted powders (`neighbours` in `burn-rate.ts`). */
 export interface BurnRatePlace {
@@ -65,7 +65,7 @@ export function BurnRateSummary({
   names,
 }: {
   powder: Powder
-  place?: BurnRatePlace
+  place?: BurnRatePlace | undefined
   names: ManufacturerNames
 }) {
   const p = classifyPowder(powder, names)

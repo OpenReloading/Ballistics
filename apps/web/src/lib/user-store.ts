@@ -78,7 +78,7 @@ export const storedRecords = async () =>
 
 /** The photo id a stored value points at as a target sheet, whether or not it passes the schema. */
 export const rawPhotoId = (raw: unknown) => {
-  const photo = (raw as { data?: { photo?: unknown } } | null)?.data?.photo
+  const photo = (raw as { data?: { photo?: unknown | undefined } } | null)?.data?.photo
   return typeof photo === 'string' ? photo : undefined
 }
 

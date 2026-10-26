@@ -130,7 +130,7 @@ describe('targetSheet', () => {
   it('refuses detection choices out of range: a region of 2 points, a hole size of zero, a backing that is no colour, a contrast above 1', () => {
     const g = sheet.groups[0]
     for (const [detection, field] of [
-      [{ region: g.detection?.region.slice(0, 2) }, 'region'],
+      [{ region: g?.detection?.region.slice(0, 2) }, 'region'],
       [{ expectedHoleDiameter: 0 }, 'expectedHoleDiameter'],
       [{ backing: 'yellow' }, 'backing'],
       [{ minContrast: 1.5 }, 'minContrast'],
@@ -147,7 +147,7 @@ describe('targetSheet', () => {
 
   it('refuses a face alignment of fewer than four marks or marks on one ring', () => {
     const g = sheet.groups[0]
-    const marks = g.face?.marks ?? []
+    const marks = g?.face?.marks ?? []
     for (const [face, path] of [
       [{ id: 'issf-50m-rifle', marks: marks.slice(0, 3) }, 'marks'],
       [{ id: 'issf-50m-rifle', marks: marks.map((m) => ({ ...m, ring: 8 })) }, 'marks'],
@@ -163,7 +163,7 @@ describe('targetSheet', () => {
 
   it('refuses lengths of zero and unknown shot origins', () => {
     const line = { ...sheet.references[0], length: 0 }
-    const shot = { ...sheet.groups[0].shots[0], placement: 'typed' }
+    const shot = { ...sheet.groups[0]?.shots[0], placement: 'typed' }
     expectIssueAt(targetSheet, { ...sheet, references: [line] }, 'references.0.length')
     expectIssueAt(
       targetSheet,

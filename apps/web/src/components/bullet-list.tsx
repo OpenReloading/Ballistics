@@ -105,7 +105,7 @@ export function BulletList({
   const count = countText(shown.length, items.length, 'bullets')
   const named = [
     fits && `fitting ${fits.name}`,
-    on.length < origins.length && `${originNames[on[0]]} only`,
+    on.length < origins.length && on[0] && `${originNames[on[0]]} only`,
     state.query.trim() && `matching "${state.query.trim()}"`,
   ].filter(Boolean)
   const lengthUnit = system.length.symbol

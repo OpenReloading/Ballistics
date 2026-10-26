@@ -16,9 +16,9 @@ export type BulletItem = BulletSummary & {
  * may have no mass and names its manufacturer as text only.
  */
 export type BulletRow = Omit<BulletItem, 'mass' | 'manufacturer'> & {
-  manufacturer?: string
+  manufacturer?: string | undefined
   mass: number | null
-  origin?: 'user'
+  origin?: 'user' | undefined
 }
 
 /** Search text of a bullet: manufacturer, name, diameter in mm and inches, mass in grains and grams. */
@@ -41,7 +41,13 @@ export function bulletSearchText(b: BulletRow): string {
 export const bulletKey = (b: BulletRow) => searchKey([bulletSearchText(b)], b.name)
 
 /** A number with an optional unit as typed: "168", "168gr", "10.9g". */
-export const massWord = /^(\d+(?:\.\d+)?)(gr|g)?$/
+const massWord = /^(\d+(?:\.\d+)?)(gr|g)?$/
+
+/** The number and unit of a typed mass word ("168gr"); undefined for any other word. */
+export function typedMass(word: string): { number: string; unit: string | undefined } | undefined {
+  const [, number, unit] = massWord.exec(word) ?? []
+  return number === undefined ? undefined : { number, unit }
+}
 
 /** The typed words, folded; a number and grains apart ("168 gr") count as one word ("168gr"). */
 export const typedWords = (query: string) =>
@@ -67,9 +73,9 @@ export function sameMass(b: BulletRow, number: string, unit: string | undefined)
  */
 export function bulletScore(b: BulletRow, key: string, query: string): number | undefined {
   const words = typedWords(query)
-  const weights = words.map((w) => massWord.exec(w)).filter((m) => m?.[2])
-  if (!weights.every((w) => w && sameMass(b, w[1], w[2]))) return undefined
-  return score(key, words.filter((w) => !massWord.exec(w)?.[2]).join(' '))
+  const weights = words.map(typedMass).filter((m) => m?.unit)
+  if (!weights.every((w) => w && sameMass(b, w.number, w.unit))) return undefined
+  return score(key, words.filter((w) => !typedMass(w)?.unit).join(' '))
 }
 
 /** Whether a bullet matches the search `query`; `key` precomputed for speed. */

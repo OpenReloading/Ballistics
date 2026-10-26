@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { nth } from '../src/errors.ts'
 import {
   type Chronograph,
   fitTruingStrings,
@@ -225,7 +226,7 @@ describe('weakly identified parameters', () => {
     expect(r.shot.muzzleVelocity).toBe(find(r, 'muzzleVelocity').value)
     // the residuals and chi-square are those of the reported shot
     const t = trajectory(r.shot, [150, 0], tight)
-    const predicted = [t.points.find((p) => p.range === 150)?.height, t.points[0].velocity]
+    const predicted = [t.points.find((p) => p.range === 150)?.height, nth(t.points, 0).velocity]
     for (const [i, x] of r.residuals.entries())
       expect(Math.abs((x.predicted - (predicted[i] as number)) / x.predicted)).toBeLessThan(1e-9)
     expect(r.chiSquare).toBeCloseTo(
@@ -263,7 +264,7 @@ describe('weakly identified parameters', () => {
       chronograph: { shotCount: 10, standardDeviation: 4 },
     })
     expect(plan.parameters.map((p) => p.status)).toEqual(['identified', 'identified', 'unresolved'])
-    expect(plan.parameters[2].reasons).toEqual(['no-information'])
+    expect(nth(plan.parameters, 2).reasons).toEqual(['no-information'])
   })
 
   it('reports an impact at the zero range as carrying no information', () => {
@@ -295,13 +296,16 @@ describe('weakly identified parameters', () => {
 
   it('improves with more distances and shots', () => {
     const sigma = (entries: { range: number; shotCount: number }[]) =>
-      planTruingStrings({
-        shot: nominal,
-        clickValue: click,
-        dispersion,
-        entries: entries.map((e) => ({ kind: 'impact' as const, ...e })),
-        chronograph: { shotCount: 10, standardDeviation: 4 },
-      }).parameters[1].relativeStandardUncertainty as number
+      nth(
+        planTruingStrings({
+          shot: nominal,
+          clickValue: click,
+          dispersion,
+          entries: entries.map((e) => ({ kind: 'impact' as const, ...e })),
+          chronograph: { shotCount: 10, standardDeviation: 4 },
+        }).parameters,
+        1,
+      ).relativeStandardUncertainty as number
     const few = sigma([
       { range: 300, shotCount: 3 },
       { range: 600, shotCount: 3 },
@@ -360,8 +364,11 @@ describe('groups and rounding', () => {
   it('rounds a dial to whole clicks unless told otherwise', () => {
     const entries = [impact, { ...impact, range: 600 }, { ...impact, range: 900 }]
     const click_ = (rounding?: number) =>
-      plan([...entries, { ...dial, range: 450, rounding }, { ...dial, range: 800, rounding }])
-        .parameters[2].relativeStandardUncertainty as number
+      nth(
+        plan([...entries, { ...dial, range: 450, rounding }, { ...dial, range: 800, rounding }])
+          .parameters,
+        2,
+      ).relativeStandardUncertainty as number
     expect(click_()).toBe(click_(1))
     expect(click_(0)).toBeLessThan(click_())
     expect(click_(2)).toBeGreaterThan(click_())
@@ -385,8 +392,9 @@ describe('residual check', () => {
   it('rejects strings that disagree with the stated uncertainties', () => {
     const s = strings(normals(5))
     s.entries[1] = {
-      ...s.entries[1],
-      value: s.entries[1].value + 20 * (s.entries[1].standardDeviation / Math.sqrt(shots)),
+      ...nth(s.entries, 1),
+      value:
+        nth(s.entries, 1).value + 20 * (nth(s.entries, 1).standardDeviation / Math.sqrt(shots)),
     }
     const r = fitTruingStrings(s)
     expect(r.consistent).toBe(false)
@@ -399,8 +407,9 @@ describe('residual check', () => {
   it('marks the intervals as not trusted when the check fails, and scales them on request', () => {
     const s = strings(normals(5))
     s.entries[1] = {
-      ...s.entries[1],
-      value: s.entries[1].value + 20 * (s.entries[1].standardDeviation / Math.sqrt(shots)),
+      ...nth(s.entries, 1),
+      value:
+        nth(s.entries, 1).value + 20 * (nth(s.entries, 1).standardDeviation / Math.sqrt(shots)),
     }
     const r = fitTruingStrings(s)
     expect(r.intervalsTrusted).toBe(false)
@@ -457,8 +466,9 @@ describe('residual check', () => {
 
 describe('errors', () => {
   const base = strings()
-  const bad = (change: Partial<typeof base>) => () => fitTruingStrings({ ...base, ...change })
-  const entry = base.entries[0]
+  const bad = (change: Partial<Parameters<typeof fitTruingStrings>[0]>) => () =>
+    fitTruingStrings({ ...base, ...change })
+  const entry = nth(base.entries, 0)
   it('rejects malformed input before any trajectory runs', () => {
     expect(bad({ entries: [], chronograph: undefined })).toThrow(InputError)
     expect(bad({ entries: [{ ...entry, shotCount: 0 }] })).toThrow(InputError)

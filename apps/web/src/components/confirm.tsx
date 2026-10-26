@@ -142,7 +142,7 @@ export function ConfirmHost() {
           <Button variant="default" data-autofocus onClick={() => answer(shown, false)}>
             {shown?.cancelLabel ?? 'Cancel'}
           </Button>
-          <Button color={shown?.danger ? 'red' : undefined} onClick={() => answer(shown, true)}>
+          <Button {...(shown?.danger && { color: 'red' })} onClick={() => answer(shown, true)}>
             {shown?.confirmLabel}
           </Button>
         </Group>

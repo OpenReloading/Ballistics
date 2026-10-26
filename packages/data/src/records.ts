@@ -113,7 +113,7 @@ export type Bundle = {
   disciplines: Discipline[]
   targetMappings: TargetMapping[]
   /** `renames.json` of the records roots; absent: none. */
-  renames?: Renames
+  renames?: Renames | undefined
 }
 
 /**
@@ -205,7 +205,7 @@ function checkRangeRounds(records: RangeFirings[], errors: string[]) {
   for (const r of records) {
     for (const { label: round } of r.rounds) {
       // The base round number: a split reduction "(a)" or a yaw-card mark "*" is part of one round.
-      const key = `${r.provenance.sources[0].sha256} ${round.replace(/\(.\)|\*/g, '')}`
+      const key = `${r.provenance.sources[0]?.sha256} ${round.replace(/\(.\)|\*/g, '')}`
       const owner = roundOwner.get(key)
       if (owner && owner !== r.id) {
         errors.push(`range/${r.id}.json: round ${round} is also in ${owner}`)
@@ -245,7 +245,9 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
   errors.push(...checkFederations(bundle))
   errors.push(...checkCaliberClasses(bundle))
   checkRenames(bundle, errors)
-  const loadTables = readLoadTables(roots[1] ?? roots[0], errors)
+  const loadRoot = roots[1] ?? roots[0]
+  if (loadRoot === undefined) throw new Error('readRecords needs at least one records root')
+  const loadTables = readLoadTables(loadRoot, errors)
   for (const p of bundle.powders) {
     for (const error of checkFittedSources(p, loadTables))
       errors.push(`powders/${p.id}.json: ${error}`)

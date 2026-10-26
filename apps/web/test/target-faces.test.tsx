@@ -12,6 +12,7 @@ import {
   targetFaceRow,
   targetFaceStrip,
 } from '../src/lib/target-faces.ts'
+import { defined, missing } from './defined.ts'
 import { faceById, faces } from './face-render.ts'
 import { readRecord } from './read-record.ts'
 
@@ -62,7 +63,7 @@ it('gives the strip, then the scoring values and the ring diameters outer to inn
     'Black area',
     'Rings',
   ])
-  const [face, rings] = targetFaceGroups(precision)
+  const [face = missing(), rings = missing()] = targetFaceGroups(precision)
   expect(face.rows.find((r) => r.label === 'Numerals printed')?.text).toBe('Yes')
   expect(face.rows.find((r) => r.label === 'Tenth-ring values')?.text).toBe('Yes')
   const unstated = {
@@ -73,7 +74,7 @@ it('gives the strip, then the scoring values and the ring diameters outer to inn
   }
   const stated = ['Inner ten rule', 'Tenth-ring values', 'Numerals printed']
   expect(
-    targetFaceGroups(unstated)[0]
+    defined(targetFaceGroups(unstated)[0])
       .rows.filter((r) => stated.includes(r.label))
       .map((r) => r.text),
   ).toEqual(['Not stated', 'Not stated', 'Not stated'])
@@ -81,7 +82,7 @@ it('gives the strip, then the scoring values and the ring diameters outer to inn
     ...precision.rings.map((r) => `Ring ${r.value}`),
     'Inner ten',
   ])
-  expect(rings.rows[0].value).toEqual({ quantity: 'length', si: 0.5 })
+  expect(defined(rings.rows[0]).value).toEqual({ quantity: 'length', si: 0.5 })
 })
 
 it('gives one row per face event: its discipline where a mapping names it, else the event', () => {
@@ -128,7 +129,7 @@ it('gives one row per face event: its discipline where a mapping names it, else 
 })
 
 it('keeps an event without a mapping and one row per mapping of an event mapped twice', () => {
-  const [a, b] = precision.events
+  const [a = missing(), b = missing()] = precision.events
   const twice = [
     { id: 'x', discipline: 'x', event: a.id },
     { id: 'y', discipline: 'y', event: a.id },
@@ -160,7 +161,7 @@ it('draws recorded zone colours: a white ten inside a black ring, its lines whit
 })
 
 it('draws a square ring as a rectangle of its edge and a circle ring as an ellipse', () => {
-  const [outer, inner] = precision.rings.slice(0, 2)
+  const [outer = missing(), inner = missing()] = precision.rings.slice(0, 2)
   const rings = [{ ...outer, shape: 'square' as const }, inner]
   const out = renderToStaticMarkup(<TargetFaceDrawing face={{ ...precision, rings }} />)
   const edge = outer.diameter.value

@@ -1,7 +1,7 @@
 export * from './bullet-fit.ts'
 export * from './cartridge-specs.ts'
 export * from './drag-tables.ts'
-export { InputError } from './errors.ts'
+export { InputError, overlay, type Settings } from './errors.ts'
 export * from './exterior/atmosphere.ts'
 export * from './exterior/drag.ts'
 export * from './exterior/modified.ts'

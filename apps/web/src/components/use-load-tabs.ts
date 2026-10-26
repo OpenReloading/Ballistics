@@ -10,6 +10,7 @@ import {
   tabAfterClose,
   tabTitles,
 } from '../lib/load-tabs.ts'
+import { nth } from '../lib/nth.ts'
 import { linkParams } from '../lib/query.ts'
 import { namedKey, renamedKey } from '../lib/user-data.ts'
 import { storedRecords } from '../lib/user-store.ts'
@@ -25,15 +26,15 @@ import type { UseWorkbenchStateResult } from './use-workbench-load.ts'
 type Tab = {
   key: string
   /** The saved record the tab was installed from, if any. */
-  recordId?: string
+  recordId?: string | undefined
   title: string
   /** The name the user typed or the record carries; undefined: the generated name. */
-  custom?: string
+  custom?: string | undefined
   /** Undefined: a load with nothing chosen or typed, restored by `reset()`. */
-  data?: Load
+  data?: Load | undefined
   outcome?: UseWorkbenchStateResult['outcome']
   changed: boolean
-  file?: FileState
+  file?: FileState | undefined
   unsaved: boolean
 }
 
@@ -67,7 +68,7 @@ const urlAsksForLoad = () =>
 /** The open loads: the tabs, switching, opening saved loads and the stored open set. */
 export function useLoadTabs(load: UseWorkbenchStateResult) {
   const [tabs, setTabs] = useState<Tab[]>(() => [blank()])
-  const [active, setActive] = useState(() => tabs[0].key)
+  const [active, setActive] = useState(() => nth(tabs, 0).key)
   /** Whether the shown load has unsaved changes (the File menu reports it). */
   const [unsaved, setUnsaved] = useState(false)
   const [restored, setRestored] = useState(false)
@@ -81,7 +82,7 @@ export function useLoadTabs(load: UseWorkbenchStateResult) {
   function snapshot(): Tab {
     const { load, tabs, active, unsaved } = live.current
     const menu = load.fileMenu.current
-    const t = tabs.find((x) => x.key === active) ?? tabs[0]
+    const t = tabs.find((x) => x.key === active) ?? nth(tabs, 0)
     return {
       key: t.key,
       recordId: menu?.id(),
@@ -263,7 +264,7 @@ export function useLoadTabs(load: UseWorkbenchStateResult) {
   return {
     items: tabs.map((t, i) => ({
       key: t.key,
-      title: titles[i],
+      title: nth(titles, i),
       active: t.key === active,
       unsaved: t.key === active ? unsaved : t.unsaved,
     })),

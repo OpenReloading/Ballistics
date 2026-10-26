@@ -139,7 +139,7 @@ export function burnFormError(values: Record<string, number | undefined>, key: s
 
 export type InteriorKey = (typeof interiorFields)[number]['key']
 
-export type InteriorBody = { model: 'm3'; load: InteriorLoad; cartridge?: string }
+export type InteriorBody = { model: 'm3'; load: InteriorLoad; cartridge?: string | undefined }
 
 /**
  * `POST /interior` body from SI field values; the mapping is `interiorLoad` of core, shared with
@@ -147,8 +147,8 @@ export type InteriorBody = { model: 'm3'; load: InteriorLoad; cartridge?: string
  */
 export function interiorBody(
   values: Record<string, number | undefined>,
-  cartridge?: string,
-  grooveDiameter?: number,
+  cartridge?: string | undefined,
+  grooveDiameter?: number | undefined,
 ): InteriorBody {
   const label = (key: string) => interiorFields.find((s) => s.key === key)?.label ?? key
   return {

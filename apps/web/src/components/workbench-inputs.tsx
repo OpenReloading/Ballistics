@@ -172,9 +172,9 @@ function PanelIcon({ panel }: { panel: InputPanel }) {
 export type CartridgeChoice = {
   id: string
   name: string
-  g1?: number
-  land?: number
-  groove?: number
+  g1?: number | undefined
+  land?: number | undefined
+  groove?: number | undefined
 }
 
 /**
@@ -249,7 +249,7 @@ function StepSizeField() {
       : ladderKind === 'temperature'
         ? tempStep.tempStep
         : ladder.ladderStep
-  const setValue = (v: typeof value) => {
+  const setValue = (v: FieldValue) => {
     if (ladderKind === 'seating') setSeatStep({ seatStep: v })
     else if (ladderKind === 'temperature') setTempStep({ tempStep: v })
     else setLadder({ ladderStep: v })
@@ -407,7 +407,7 @@ export function Checklist({
   todo,
   next,
 }: {
-  todo: { label: string; done: boolean; value?: string }[]
+  todo: { label: string; done: boolean; value?: string | undefined }[]
   next: number
 }) {
   return (

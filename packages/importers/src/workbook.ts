@@ -59,10 +59,11 @@ const columnOf = (letters: string) =>
 /** The shared string a cell's `v` text indexes; refused when the index is not in the table. */
 function sharedString(text: string, strings: string[], ref: () => string): string {
   const k = /^\d+$/.test(text.trim()) ? Number(text) : Number.NaN
-  if (!(k < strings.length)) {
+  const shared = strings[k]
+  if (shared === undefined) {
     throw new Error(`cell ${ref()} refers to shared string ${text} of ${strings.length}`)
   }
-  return strings[k]
+  return shared
 }
 
 /**
@@ -114,10 +115,10 @@ function sharedStrings(text: string, xmlRemaining: XmlBudget): string[] {
 }
 
 interface CellState {
-  t?: string
-  r?: string
-  v?: string
-  is?: string
+  t?: string | undefined
+  r?: string | undefined
+  v?: string | undefined
+  is?: string | undefined
   vs: number
   iss: number
 }
@@ -138,9 +139,9 @@ function closeCell(
   const ref = cell.r
   let column = cells.length + 1
   if (ref !== undefined) {
-    const m = /^([A-Z]{1,3})[0-9]+$/.exec(ref)
-    if (!m) throw new Error(`cell reference "${ref}" is malformed`)
-    column = columnOf(m[1])
+    const letters = /^([A-Z]{1,3})[0-9]+$/.exec(ref)?.[1]
+    if (letters === undefined) throw new Error(`cell reference "${ref}" is malformed`)
+    column = columnOf(letters)
   }
   const name = () => ref ?? `at column ${column}`
   placeCell(cells, column, cellText(cell.t, cell.v, cell.is, strings, name), name, remaining)

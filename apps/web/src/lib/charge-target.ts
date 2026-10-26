@@ -83,7 +83,11 @@ export function targetError(typed: string | number, unit: TargetUnit): string | 
  * `load.propellant.bulkDensity`.
  */
 export function chargeTargetBody(
-  base: { model?: string; load: { propellant: object }; cartridge?: string },
+  base: {
+    model?: string | undefined
+    load: { propellant: object }
+    cartridge?: string | undefined
+  },
   bulkDensity: number | undefined,
   target: { kind: TargetKind; value: number; percent: boolean },
 ) {

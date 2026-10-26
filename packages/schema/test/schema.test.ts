@@ -256,12 +256,12 @@ describe('bullet', () => {
     const unit = (s: unknown) => JSON.stringify(s).match(/"unit":"([^"]+)"/)?.[1]
     const { meplatDiameter, base, ogive, tip } = json.properties
     expect(unit(meplatDiameter)).toBe('mm')
-    expect(unit(base.properties?.diameter)).toBe('mm')
-    expect(unit(base.properties?.angle)).toBe('deg')
-    expect(unit(ogive.properties?.radius)).toBe('mm')
-    expect(unit(ogive.properties?.radiusRatio)).toBe('1')
-    expect(unit(tip.properties?.length)).toBe('mm')
-    expect(unit(tip.properties?.mouthDiameter)).toBe('mm')
+    expect(unit(base?.properties?.diameter)).toBe('mm')
+    expect(unit(base?.properties?.angle)).toBe('deg')
+    expect(unit(ogive?.properties?.radius)).toBe('mm')
+    expect(unit(ogive?.properties?.radiusRatio)).toBe('1')
+    expect(unit(tip?.properties?.length)).toBe('mm')
+    expect(unit(tip?.properties?.mouthDiameter)).toBe('mm')
   })
 
   const rejectsAt = (patch: Record<string, unknown>, path: string) =>
@@ -403,17 +403,17 @@ describe('bullet', () => {
     }
     const value = (s: { properties?: Record<string, unknown> } | undefined) => s?.properties?.value
     const { meplatDiameter, base, ogive, tip } = json.properties
-    expect(meplatDiameter.properties?.value).toMatchObject({ minimum: 0 })
-    expect(value(base.properties?.diameter)).toMatchObject({ exclusiveMinimum: 0 })
-    expect(value(base.properties?.angle)).toMatchObject({
+    expect(meplatDiameter?.properties?.value).toMatchObject({ minimum: 0 })
+    expect(value(base?.properties?.diameter)).toMatchObject({ exclusiveMinimum: 0 })
+    expect(value(base?.properties?.angle)).toMatchObject({
       exclusiveMinimum: 0,
       exclusiveMaximum: 90,
     })
-    expect(value(base.properties?.cavityDiameter)).toMatchObject({ exclusiveMinimum: 0 })
-    expect(value(ogive.properties?.radius)).toMatchObject({ exclusiveMinimum: 0 })
-    expect(value(ogive.properties?.radiusRatio)).toMatchObject({ minimum: 0, maximum: 1 })
-    expect(value(tip.properties?.length)).toMatchObject({ exclusiveMinimum: 0 })
-    expect(value(tip.properties?.mouthDiameter)).toMatchObject({ exclusiveMinimum: 0 })
+    expect(value(base?.properties?.cavityDiameter)).toMatchObject({ exclusiveMinimum: 0 })
+    expect(value(ogive?.properties?.radius)).toMatchObject({ exclusiveMinimum: 0 })
+    expect(value(ogive?.properties?.radiusRatio)).toMatchObject({ minimum: 0, maximum: 1 })
+    expect(value(tip?.properties?.length)).toMatchObject({ exclusiveMinimum: 0 })
+    expect(value(tip?.properties?.mouthDiameter)).toMatchObject({ exclusiveMinimum: 0 })
   })
 })
 
@@ -611,7 +611,7 @@ describe('powder', () => {
     const json = z.toJSONSchema(powder, { io: 'input' }) as {
       properties: Record<string, { properties?: Record<string, { unit?: string }> }>
     }
-    const fields = json.properties.thermochemistry.properties ?? {}
+    const fields = json.properties.thermochemistry?.properties ?? {}
     const units = Object.fromEntries(Object.entries(fields).map(([k, v]) => [k, v.unit]))
     expect(units).toEqual({
       loadingDensity: 'g/cm3',

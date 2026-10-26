@@ -15,7 +15,7 @@ export function countText(shown: number, total: number, noun: string) {
 /** The filters set, as the no-match note names them: 'Caliber .308, matching "zz".' */
 export function filterText(named: readonly (string | false | undefined)[]) {
   const text = named.filter(Boolean).join(', ')
-  return text && `${text[0].toUpperCase()}${text.slice(1)}.`
+  return text && `${text.charAt(0).toUpperCase()}${text.slice(1)}.`
 }
 
 /**

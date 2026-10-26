@@ -99,7 +99,7 @@ const StartSearch = memo(function StartSearch({
   system: UnitSystem
   start: (id: string) => void
   /** The bullet the design started from, shown in the empty field. */
-  chosen?: string
+  chosen?: string | undefined
 }) {
   const names = useManufacturerNames()
   return (
@@ -126,7 +126,7 @@ const ChoiceSelect = memo(function ChoiceSelect({
 }: {
   k: ChoiceKey
   value: string
-  error?: string
+  error?: string | undefined
   dispatch: (a: Action) => void
 }) {
   return (
@@ -190,7 +190,7 @@ const fieldLabel = (key: string) =>
   (key in choiceLabels ? choiceLabels[key as ChoiceKey][0] : key)
 
 const changedText = (changed: DesignerSpec, design: Design) =>
-  `${changed.label} ${design.fields[changed.key].text || 'cleared'}. `
+  `${changed.label} ${design.fields[changed.key]?.text || 'cleared'}. `
 
 /** The polite line: the refusal, else the last change and that the drawing updated. */
 const announcement = (refusal: { reason: string } | undefined, change: string | undefined) =>
@@ -245,7 +245,7 @@ const printRows = (design: Design, manufacturer: string | undefined): FieldRow[]
     design.choices[k] ? [{ label: choiceLabels[k][0], text: optionLabel(design.choices[k]) }] : [],
   ),
   ...designerSpecs.flatMap((s): FieldRow[] => {
-    const { si } = design.fields[s.key]
+    const si = design.fields[s.key]?.si
     return si === undefined ? [] : [{ label: s.label, value: { quantity: s.quantity, si } }]
   }),
 ]
@@ -308,13 +308,15 @@ export function BulletDesigner() {
         .filter((s) => s.group === g && fieldInUse(s.key, design))
         .map((s) => {
           const state = e.states[s.key]
+          const value = design.fields[s.key]
+          if (!(state && value)) return null
           const changed = state.kind === 'entered' && state.changed
           return (
             <DesignerField
               key={s.key}
               spec={s}
               system={system}
-              value={design.fields[s.key]}
+              value={value}
               help={stateText(s, state, system)}
               flag={changed ? 'changed' : flagOf[state.kind]}
               changed={changed}

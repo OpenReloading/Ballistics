@@ -238,8 +238,8 @@ export function BulletSearchDialog({
   text: string
   /** The browser's bullet designs as rows (`userBulletRows`). */
   designs: readonly BulletRow[]
-  fit?: CartridgeDiameters
-  fitName?: string
+  fit?: CartridgeDiameters | undefined
+  fitName?: string | undefined
   system: UnitSystem
   onChoose: (row: BulletRow) => void
 }) {

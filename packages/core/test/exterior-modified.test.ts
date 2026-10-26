@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { nth } from '../src/errors.ts'
 import {
   airDensity,
   type CoefficientOverMach,
@@ -79,7 +80,7 @@ describe('modified point-mass helpers', () => {
     const area = (Math.PI / 4) * 0.00782 ** 2
     const f = (-2 * ix * p0) / (1.2 * area * 0.00782 * 2.8 * v2 * v2)
     const cross = [30 * 3 - -5 * -12, -5 * -400 - 700 * 3, 700 * -12 - 30 * -400]
-    for (let k = 0; k < 3; k++) expect(yaw[k]).toBeCloseTo(f * cross[k], 18)
+    for (let k = 0; k < 3; k++) expect(yaw[k]).toBeCloseTo(f * nth(cross, k), 18)
     expect(Math.abs(yaw[0] * va[0] + yaw[1] * va[1] + yaw[2] * va[2])).toBeLessThan(1e-15)
   })
 
@@ -124,13 +125,13 @@ describe('modified point mass', () => {
     const a = trajectory(shot, ranges, { ...tight, ...mpm })
     const b = trajectory(shot, ranges, { ...tight, spinDrift: false, jump: false })
     for (let k = 0; k < ranges.length; k++) {
-      expect(Math.abs(a.points[k].height - b.points[k].height)).toBeLessThan(1e-8)
-      expect(Math.abs(a.points[k].windage - b.points[k].windage)).toBeLessThan(1e-8)
-      expect(Math.abs(a.points[k].spinDrift)).toBeLessThan(1e-8)
-      expect(a.points[k].yaw).toBeGreaterThan(0)
-      expect(a.points[k].spin).toBeLessThan(p0)
+      expect(Math.abs(nth(a.points, k).height - nth(b.points, k).height)).toBeLessThan(1e-8)
+      expect(Math.abs(nth(a.points, k).windage - nth(b.points, k).windage)).toBeLessThan(1e-8)
+      expect(Math.abs(nth(a.points, k).spinDrift)).toBeLessThan(1e-8)
+      expect(nth(a.points, k).yaw).toBeGreaterThan(0)
+      expect(nth(a.points, k).spin).toBeLessThan(p0)
     }
-    expect(b.points[0].yaw).toBeUndefined()
+    expect(nth(b.points, 0).yaw).toBeUndefined()
   })
 
   it('equals the point mass on a vertical shot', () => {
@@ -139,9 +140,9 @@ describe('modified point mass', () => {
     const a = trajectory(shot, ranges, { ...tight, ...mpm })
     const b = trajectory(shot, ranges, { ...tight, spinDrift: false, jump: false })
     for (let k = 0; k < ranges.length; k++) {
-      expect(a.points[k].yaw).toBeLessThan(1e-15)
-      expect(Math.abs(a.points[k].time - b.points[k].time)).toBeLessThan(1e-10)
-      expect(Math.abs(a.points[k].windage - b.points[k].windage)).toBeLessThan(1e-8)
+      expect(nth(a.points, k).yaw).toBeLessThan(1e-15)
+      expect(Math.abs(nth(a.points, k).time - nth(b.points, k).time)).toBeLessThan(1e-10)
+      expect(Math.abs(nth(a.points, k).windage - nth(b.points, k).windage)).toBeLessThan(1e-8)
     }
   })
 
@@ -182,7 +183,7 @@ describe('modified point mass', () => {
       [150, 0],
       [0, -0.01],
       [150, -0.01],
-    ]) {
+    ] as const) {
       const shot: TrajectoryInput = {
         ...withAero(base, { spinDamping: clp }),
         projectile: { ...withAero(base, { spinDamping: clp }).projectile, drag: flat(0) },
@@ -216,7 +217,7 @@ describe('modified point mass', () => {
 
   it('scales the drift with lift slope times axial inertia over moment slope', () => {
     const run = (a: object) =>
-      trajectory(withAero(base, a), [800], { coriolis: false, ...mpm }).points[0].spinDrift
+      nth(trajectory(withAero(base, a), [800], { coriolis: false, ...mpm }).points, 0).spinDrift
     const d0 = run({})
     expect(d0).toBeGreaterThan(0)
     for (const a of [{ liftSlope: 5.2 }, { axialInertia: 2 * ix }, { momentSlope: 1.4 }])
@@ -231,10 +232,11 @@ describe('modified point mass', () => {
       const a = trajectory(right, ranges, { coriolis: false, ...mpm })
       const b = trajectory(left, ranges, { coriolis: false, ...mpm })
       for (let k = 0; k < ranges.length; k++) {
-        expect(a.points[k].windage).toBeCloseTo(-b.points[k].windage, 12)
-        expect(a.points[k].spinDrift).toBeCloseTo(-b.points[k].spinDrift, 12)
-        expect(a.points[k].height).toBeCloseTo(b.points[k].height, 12)
-        if (k > 0) expect(a.points[k].spinDrift).toBeGreaterThan(a.points[k - 1].spinDrift)
+        expect(nth(a.points, k).windage).toBeCloseTo(-nth(b.points, k).windage, 12)
+        expect(nth(a.points, k).spinDrift).toBeCloseTo(-nth(b.points, k).spinDrift, 12)
+        expect(nth(a.points, k).height).toBeCloseTo(nth(b.points, k).height, 12)
+        if (k > 0)
+          expect(nth(a.points, k).spinDrift).toBeGreaterThan(nth(a.points, k - 1).spinDrift)
       }
     }
   })
@@ -253,11 +255,11 @@ describe('modified point mass', () => {
     const one = lift(0.5)
     const two = lift(1)
     for (let k = 0; k < ranges.length; k++) {
-      const dh = one.points[k].height - without.points[k].height
+      const dh = nth(one.points, k).height - nth(without.points, k).height
       expect(dh).toBeLessThan(0)
-      expect(one.points[k].windage).toBe(0)
+      expect(nth(one.points, k).windage).toBe(0)
       expect(
-        Math.abs((two.points[k].height - without.points[k].height) / (2 * dh) - 1),
+        Math.abs((nth(two.points, k).height - nth(without.points, k).height) / (2 * dh) - 1),
       ).toBeLessThan(1e-3)
     }
   })
@@ -274,12 +276,15 @@ describe('modified point mass', () => {
       ],
     })
     const run = (tol: number) =>
-      trajectory(shot, [1000], {
-        relativeTolerance: tol,
-        absoluteTolerance: tol,
-        coriolis: false,
-        ...mpm,
-      }).points[0].windage
+      nth(
+        trajectory(shot, [1000], {
+          relativeTolerance: tol,
+          absoluteTolerance: tol,
+          coriolis: false,
+          ...mpm,
+        }).points,
+        0,
+      ).windage
     const ref = run(1e-13)
     const coarse = Math.abs(run(1e-6) - ref)
     const fine = Math.abs(run(1e-10) - ref)
@@ -333,8 +338,8 @@ describe('modified point mass', () => {
     const a = trajectory(cubic, [300, 1000], o)
     const b = trajectory(tabled, [300, 1000], o)
     a.points.forEach((p, k) => {
-      expect(Math.abs(b.points[k].height - p.height)).toBeLessThan(1e-6)
-      expect(Math.abs(b.points[k].velocity - p.velocity)).toBeLessThan(1e-6)
+      expect(Math.abs(nth(b.points, k).height - p.height)).toBeLessThan(1e-6)
+      expect(Math.abs(nth(b.points, k).velocity - p.velocity)).toBeLessThan(1e-6)
     })
   })
 
@@ -350,7 +355,7 @@ describe('modified point mass', () => {
 
   it('stops at the muzzle when the yaw of repose already exceeds the limit', () => {
     const r = trajectory(base, [0, 100, 500], { ...mpm, maxYaw: 1e-5 })
-    expect(r.points[0].yaw).toBeGreaterThan(1e-5)
+    expect(nth(r.points, 0).yaw).toBeGreaterThan(1e-5)
     expect(r.stop).toBe('yaw')
     expect(r.points.length).toBe(1)
   })
@@ -365,8 +370,8 @@ describe('modified point mass', () => {
       jump: false,
     })
     for (let k = 0; k < ranges.length; k++) {
-      const q = a.points[k]
-      expect(q.spinDrift).toBeCloseTo(q.windage - b.points[k].windage, 12)
+      const q = nth(a.points, k)
+      expect(q.spinDrift).toBeCloseTo(q.windage - nth(b.points, k).windage, 12)
       expect(Math.abs(q.spinDrift - q.windage)).toBeGreaterThan(1e-3)
     }
   })
@@ -382,7 +387,10 @@ describe('modified point mass', () => {
     for (const [key, c, lo, measure] of cases) {
       const run = (k: CoefficientOverMach) =>
         measure(
-          trajectory(withAero(base, { [key]: k }), [1000], { coriolis: false, ...mpm }).points[0],
+          nth(
+            trajectory(withAero(base, { [key]: k }), [1000], { coriolis: false, ...mpm }).points,
+            0,
+          ),
         )
       const a = run(c)
       const x =
@@ -405,7 +413,7 @@ describe('modified point mass', () => {
     })
     const r = trajectory(clamped, [100, 1000], mpm)
     expect(r.points.map((q) => q.dragClamped)).toEqual([false, true])
-    expect(trajectory(clamped, [1000]).points[0].dragClamped).toBe(false)
+    expect(nth(trajectory(clamped, [1000]).points, 0).dragClamped).toBe(false)
   })
 
   it('reports the linear-theory jump with a crosswind', () => {
@@ -422,7 +430,7 @@ describe('modified point mass', () => {
       crosswind: 4,
     })
     expect(angle).toBeLessThan(0)
-    expect(r.points[0].jump).toBeCloseTo(300 * Math.tan(angle), 14)
+    expect(nth(r.points, 0).jump).toBeCloseTo(300 * Math.tan(angle), 14)
     // with a lift-slope table the jump takes the value at the muzzle Mach number
     const table: CoefficientOverMach = [
       [2, 2.6],
@@ -442,9 +450,9 @@ describe('modified point mass', () => {
       momentSlope: 2.8,
       crosswind: 4,
     })
-    expect(tabled.points[0].jump).toBeCloseTo(300 * Math.tan(atMuzzle), 14)
+    expect(nth(tabled.points, 0).jump).toBeCloseTo(300 * Math.tan(atMuzzle), 14)
     const off = trajectory({ ...base, wind }, [300], { coriolis: false, ...mpm, jump: false })
-    expect(off.points[0].jump).toBe(0)
+    expect(nth(off.points, 0).jump).toBe(0)
     expect(off.omitted).toContain('jump')
   })
 
@@ -456,8 +464,8 @@ describe('modified point mass', () => {
           firearm: { ...base.firearm, twistHand },
           wind: [{ endDistance: Infinity, speed: 4, fromDirection: from }],
         }
-        const pm = trajectory(shot, [300], { coriolis: false }).points[0].jump
-        const m2b = trajectory(shot, [300], { coriolis: false, ...mpm }).points[0].jump
+        const pm = nth(trajectory(shot, [300], { coriolis: false }).points, 0).jump
+        const m2b = nth(trajectory(shot, [300], { coriolis: false, ...mpm }).points, 0).jump
         // right-hand twist, wind from the left: the impact goes low
         const down = (twistHand === 'right') === from < 0
         expect(Math.sign(pm)).toBe(down ? -1 : 1)
@@ -474,8 +482,8 @@ describe('modified point mass', () => {
       zero: { range: 300, wind },
     }
     const r = trajectory(shot, [300], mpm)
-    expect(Math.abs(r.points[0].height)).toBeLessThan(1e-6)
-    expect(Math.abs(r.points[0].windage)).toBeLessThan(1e-6)
+    expect(Math.abs(nth(r.points, 0).height)).toBeLessThan(1e-6)
+    expect(Math.abs(nth(r.points, 0).windage)).toBeLessThan(1e-6)
     expect(r.omitted).toEqual([])
   })
 

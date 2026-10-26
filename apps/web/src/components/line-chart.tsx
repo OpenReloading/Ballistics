@@ -4,7 +4,7 @@ import type { ECharts } from 'echarts/core'
 import { createContext, type ReactNode, useContext, useMemo, useState } from 'react'
 import { niceTicks, tickDecimals } from '../lib/ticks.ts'
 import { formatNumber } from '../lib/units.ts'
-import { EChart, useChartTokens } from './echart.tsx'
+import { EChart, tickStep, useChartTokens } from './echart.tsx'
 
 const lineTokens = { muted: '--muted', border: '--border', link: '--link', bg: '--bg', fg: '--fg' }
 
@@ -66,7 +66,7 @@ export function LineChart({
   description: string
   zeroLine?: boolean
   /** Rendered height, px. */
-  height?: number
+  height?: number | undefined
   /** The height its box has by CSS, not `height`. */
   fill?: boolean
   limits?: { y: number; label: string }[]
@@ -91,11 +91,11 @@ export function LineChart({
     if (!tokens || !ok) return {}
     const [dx, dy] = [tickDecimals(xt), tickDecimals(yt)]
     const text = { color: tokens.muted, fontSize: 12 }
-    const axis = (ticks: number[], name: string, d: number, max: number) => ({
+    const axis = (ticks: number[], name: string, d: number, max: number | undefined) => ({
       type: 'value',
       min: ticks[0],
       max,
-      interval: ticks[1] - ticks[0],
+      interval: tickStep(ticks),
       name,
       nameLocation: 'middle',
       nameTextStyle: text,
@@ -143,7 +143,7 @@ export function LineChart({
             symbol: 'none',
             animation: false,
             data: [
-              ...(zeroLine && yt[0] < 0
+              ...(zeroLine && (yt[0] ?? 0) < 0
                 ? [
                     {
                       yAxis: 0,
@@ -174,11 +174,13 @@ export function LineChart({
     // undefined before the grid is laid out and after the chart is disposed
     const at = (point: number[], k: number) => {
       const p = c.isDisposed() ? undefined : c.convertToPixel({ gridIndex: 0 }, point)
-      return Array.isArray(p) ? p[k] : Number.NaN
+      return (Array.isArray(p) ? p[k] : undefined) ?? Number.NaN
     }
-    const X = (v: number) => at([v, yt[0]], 0)
-    const Y = (v: number) => at([xt[0], v], 1)
-    const [x0, x1, y0, y1] = [X(xt[0]), X(xMax), Y(yt[yt.length - 1]), Y(yt[0])]
+    const [xLow, yLow, yHigh] = [xt[0], yt[0], yt[yt.length - 1]]
+    if (xLow === undefined || yLow === undefined || yHigh === undefined) return
+    const X = (v: number) => at([v, yLow], 0)
+    const Y = (v: number) => at([xLow, v], 1)
+    const [x0, x1, y0, y1] = [X(xLow), X(xMax), Y(yHigh), Y(yLow)]
     if (![x0, x1, y0, y1].every(Number.isFinite)) return
     const area = { x: x0, y: y0, width: x1 - x0, height: y1 - y0 }
     setScale((s) =>

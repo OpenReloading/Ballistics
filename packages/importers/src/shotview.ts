@@ -80,9 +80,12 @@ const footerLabels: [string[], string[], string[]] = [
 export function parseShotView(text: string, options: ChronoParserOptions = {}): ChronoImport {
   const lines = splitLines(text)
   const h = shotViewHeaderIndex(lines)
-  if (h < 0) throw new Error('not a ShotView CSV: no "#" header row with a velocity unit')
+  const headerLine = lines[h]
+  if (headerLine === undefined) {
+    throw new Error('not a ShotView CSV: no "#" header row with a velocity unit')
+  }
   const warnings: string[] = []
-  const unitText = bracketed(splitDelimited(lines[h])[1])
+  const unitText = bracketed(splitDelimited(headerLine)[1] ?? '')
   const unit = resolveUnit(unitText, options, warnings)
 
   const nameLine = lines.slice(0, h).find((l) => l.trim()) ?? ''
@@ -140,7 +143,8 @@ export function parseShotViewWorkbook(book: Workbook, options: WorkbookOptions =
   book.worksheets.forEach((sheet, k) => {
     const n = k + 1
     const h = sheet.rows.findIndex(isShotViewHeader)
-    if (h < 0) {
+    const headerCells = sheet.rows[h]
+    if (headerCells === undefined) {
       warnings.push(`worksheet ${n}: no ShotView header row; skipped`)
       return
     }
@@ -154,7 +158,7 @@ export function parseShotViewWorkbook(book: Workbook, options: WorkbookOptions =
       position: n,
       ...(date ? { date } : { dateWarning }),
       read: (warnings) => {
-        const unitText = bracketed(sheet.rows[h][1])
+        const unitText = bracketed(headerCells[1] ?? '')
         const unit = resolveUnit(unitText, options, warnings)
         const r = readShotRows(after, unitText, unit, workbookFooterStarts)
         if (r.shots.length === 0) return

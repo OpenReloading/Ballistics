@@ -2,6 +2,7 @@ import {
   convectiveDefaults,
   icao,
   interiorDefaults,
+  overlay,
   pressureToleranceDefaults,
 } from '@open-reloading/core'
 import { z } from 'zod'
@@ -110,7 +111,7 @@ const tolerances = z
     ),
     startPressureFraction: fraction('the shot-start pressure', 1, tol.startPressureFraction),
   })
-  .refine((t) => Object.values({ ...pressureToleranceDefaults, ...t }).some((v) => v > 0), {
+  .refine((t) => Object.values(overlay(pressureToleranceDefaults, t)).some((v) => v > 0), {
     message: 'at least one tolerance must be above 0',
   })
   .describe(

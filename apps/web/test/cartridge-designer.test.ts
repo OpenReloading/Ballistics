@@ -20,6 +20,7 @@ import { seededRandom } from '../src/lib/ellipse.ts'
 import { fieldValueFromText } from '../src/lib/field-spec.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import type { ResolvedCartridge } from '../src/lib/variants.ts'
+import { defined } from './defined.ts'
 import { verified } from './drawing-rules.ts'
 import { sheetRecord } from './records.ts'
 import { resolvedCartridge } from './resolved.ts'
@@ -46,7 +47,7 @@ describe('start', () => {
     const d = win308()
     expect(d.fields['cartridge.L3']).toEqual({ text: '51.18', si: 51.18e-3 })
     // shown rounded, the SI value the record's
-    expect(d.fields['chamber.alpha1'].text).toBe('71.4')
+    expect(defined(d.fields['chamber.alpha1']).text).toBe('71.4')
     expect(d.table).toBe('I')
     const e = evaluate(d, metric)
     expect(e.states['cartridge.L3']).toEqual({ kind: 'record' })
@@ -88,9 +89,9 @@ describe('start', () => {
     const h = run(win308(), { type: 'new' })
     const d = h.present
     expect(d.origin).toBeUndefined()
-    expect(d.fields['cartridge.L3'].text).toBe('51.18')
-    expect(d.fields['chamber.H2'].text).toBe('8.74')
-    expect(d.fields['cartridge.L1'].text).toBe('')
+    expect(defined(d.fields['cartridge.L3']).text).toBe('51.18')
+    expect(defined(d.fields['chamber.H2']).text).toBe('8.74')
+    expect(defined(d.fields['cartridge.L1']).text).toBe('')
     const e = evaluate(d, metric)
     expect(e.spec).toBeDefined()
     expect(e.states['cartridge.L3']).toEqual({ kind: 'entered', changed: false })
@@ -133,8 +134,8 @@ describe('changes', () => {
     const h = run(win308(), type('cartridge.L3', '52'))
     const before = draftSpec(h.present)
     const after = reduce(h, { type: 'units', system: us })
-    expect(after.present.fields['cartridge.L3'].text).toBe('2.0472')
-    expect(after.past[0].fields['cartridge.L3'].text).toBe('2.015')
+    expect(defined(after.present.fields['cartridge.L3']).text).toBe('2.0472')
+    expect(defined(defined(after.past[0]).fields['cartridge.L3']).text).toBe('2.015')
     expect(draftSpec(after.present)).toEqual(before)
   })
 })
@@ -155,7 +156,7 @@ describe('checks', () => {
     expect(e.checks['cartridge.L3']).toContain(
       'cartridge L3 = 52.5 mm exceeds chamber L3 = 51.44 mm',
     )
-    expect(e.checks['chamber.L3']).toContain(e.checks['cartridge.L3'][0])
+    expect(e.checks['chamber.L3']).toContain(defined(e.checks['cartridge.L3'])[0])
     const order = evaluate(run(win308(), type('cartridge.L2', '38')).present, metric)
     expect(order.checks['cartridge.L1']).toContain(
       'cartridge L1 = 39.62 mm is not below L2 = 38 mm',
@@ -219,15 +220,15 @@ describe('derived values', () => {
   it('gives neck length, shoulder angle, body taper and an approximate case volume', () => {
     const e = evaluate(win308(), metric)
     const by = Object.fromEntries(e.derived.map((d) => [d.key, d]))
-    expect(by['cartridge.neck'].si).toBeCloseTo((51.18 - 43.48) * 1e-3, 9)
+    expect(defined(by['cartridge.neck']).si).toBeCloseTo((51.18 - 43.48) * 1e-3, 9)
     // 2 atan((11.53 - 8.72) / 2 / (43.48 - 39.62)): the stored alpha is 40 deg
-    expect(by['cartridge.shoulder'].si).toBeCloseTo(2 * Math.atan(2.81 / 2 / 3.86), 9)
-    expect(by['cartridge.taper'].si).toBeGreaterThan(0)
-    expect(by['cartridge.taper'].si).toBeLessThan(Math.PI / 180)
+    expect(defined(by['cartridge.shoulder']).si).toBeCloseTo(2 * Math.atan(2.81 / 2 / 3.86), 9)
+    expect(defined(by['cartridge.taper']).si).toBeGreaterThan(0)
+    expect(defined(by['cartridge.taper']).si).toBeLessThan(Math.PI / 180)
     // 308 Win. cases hold about 3.5 to 3.7 cm3 of water to the mouth
-    expect(by.volume.si).toBeGreaterThan(3.2e-6)
-    expect(by.volume.si).toBeLessThan(4.2e-6)
-    expect(by.volume.basis).toMatch(/wall .* \(H2 - G1\) \/ 2/)
+    expect(defined(by.volume).si).toBeGreaterThan(3.2e-6)
+    expect(defined(by.volume).si).toBeLessThan(4.2e-6)
+    expect(defined(by.volume).basis).toMatch(/wall .* \(H2 - G1\) \/ 2/)
   })
 
   it('leaves out what the design does not give', () => {
@@ -243,8 +244,8 @@ describe('history', () => {
     const h = run(win308(), type('cartridge.L3', '5'), type('cartridge.L3', '52'))
     expect(h.past).toHaveLength(1)
     const back = reduce(h, { type: 'undo' })
-    expect(back.present.fields['cartridge.L3'].text).toBe('51.18')
-    expect(reduce(back, { type: 'redo' }).present.fields['cartridge.L3'].text).toBe('52')
+    expect(defined(back.present.fields['cartridge.L3']).text).toBe('51.18')
+    expect(defined(reduce(back, { type: 'redo' }).present.fields['cartridge.L3']).text).toBe('52')
   })
 
   it('resets to the record as one step', () => {
@@ -252,7 +253,7 @@ describe('history', () => {
       type: 'reset',
       system: metric,
     })
-    expect(h.present.fields['cartridge.L3'].text).toBe('51.18')
+    expect(defined(h.present.fields['cartridge.L3']).text).toBe('51.18')
     expect(h.past).toHaveLength(3)
   })
 
@@ -283,10 +284,11 @@ function randomText(r: number, now: number, next: () => number): string {
 
 /** One random edit of a field and its evaluation: the new history, and whether it draws. */
 function randomEdit(h: History, next: () => number) {
-  const s = fieldSpecs[Math.floor(next() * fieldSpecs.length)]
+  const s = defined(fieldSpecs[Math.floor(next() * fieldSpecs.length)])
   // mostly near the present value (else a tenth of the slider range), sometimes extreme
   const now =
-    (h.present.fields[s.key].si ?? s.range / 10) * (s.quantity === 'angle' ? 180 / Math.PI : 1e3)
+    (defined(h.present.fields[s.key]).si ?? s.range / 10) *
+    (s.quantity === 'angle' ? 180 / Math.PI : 1e3)
   const r = next()
   const text = randomText(r, now, next)
   let out = reduce(h, type(s.key, text))
@@ -362,8 +364,8 @@ describe('drafts', () => {
     )
     // the base with these overrides applied is the edited design again, and saves the same
     const opened = fromUser(data, resolvedOf(data), metric)
-    expect(opened.fields['cartridge.L3'].si).toBeCloseTo(52e-3, 12)
-    expect(opened.fields['cartridge.L6'].si).toBeUndefined()
+    expect(defined(opened.fields['cartridge.L3']).si).toBeCloseTo(52e-3, 12)
+    expect(defined(opened.fields['cartridge.L6']).si).toBeUndefined()
     expect(fileData(opened)).toEqual(data)
     expect(draftSpec(opened).values).toEqual(draftSpec(edited).values)
   })

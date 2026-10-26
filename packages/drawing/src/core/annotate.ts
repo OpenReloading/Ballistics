@@ -15,7 +15,7 @@ import type {
   Part,
   SectionPoint,
 } from './types.ts'
-import { add, polar, unit } from './vector.ts'
+import { add, pairs, polar, unit } from './vector.ts'
 
 const arcSegs = (c: Arc, n = 12): LineSegment[] =>
   Array.from({ length: n }, (_, k) => ({
@@ -167,8 +167,12 @@ function stackLanes(
     ]
     // spans may touch: a chain continues from the end of the length before it
     let n = lanes.findIndex((lane) => lane.every(([a, b]) => reach[1] <= a || b <= reach[0]))
-    if (n < 0) n = lanes.push([]) - 1
-    lanes[n].push(reach)
+    let lane = lanes[n]
+    if (!lane) {
+      lane = []
+      n = lanes.push(lane) - 1
+    }
+    lane.push(reach)
     laneOf.set(d, n)
   }
   return { lanes, laneOf }
@@ -569,7 +573,7 @@ function layoutRadii(placer: Placer) {
     const corner: PartPoint = [c.corner[1], c.corner[0]]
     const text = labelText({ kind: 'radius', symbol: c.symbol, value: c.value }, lengthUnit)
     const w = textWidth(text, em)
-    const options = [
+    const options: [number, number][] = [
       [-1, -1],
       [1, -1],
       [-1, 1],
@@ -752,7 +756,8 @@ function angleVariants(
   side: number,
 ) {
   const v: PartPoint = [a.vertex[1], side * a.vertex[0]]
-  const [f0, f1] = a.flanks.map(([r, z]): PartPoint => [z, side * r])
+  const flank = ([r, z]: SectionPoint): PartPoint => [z, side * r]
+  const [f0, f1] = [flank(a.flanks[0]), flank(a.flanks[1])]
   let t0 = Math.atan2(f0[1] - v[1], f0[0] - v[0])
   let t1 = Math.atan2(f1[1] - v[1], f1[0] - v[0])
   if (t1 - t0 > Math.PI) t1 -= 2 * Math.PI
@@ -931,14 +936,15 @@ function layoutBox(placer: Placer): [number, number, number, number] {
   }
   for (const s of segs) if (s.owner !== 'axis') [s.a, s.b].forEach(grow)
   for (const a of arcs) for (const s of arcSegs(a)) [s.a, s.b].forEach(grow)
+  const signs: [number, number][] = [
+    [1, 1],
+    [1, -1],
+    [-1, 1],
+    [-1, -1],
+  ]
   for (const l of labels) {
     const [ux, uy] = l.dir
-    for (const [s, t] of [
-      [1, 1],
-      [1, -1],
-      [-1, 1],
-      [-1, -1],
-    ])
+    for (const [s, t] of signs)
       grow([
         l.c[0] + (s * l.w * ux) / 2 - (t * l.h * uy) / 2,
         l.c[1] + (s * l.w * uy) / 2 + (t * l.h * ux) / 2,
@@ -978,8 +984,7 @@ function stations(points: SectionPoint[], d: Dimension, annotation: Annotation) 
 
 /** z where the half profile first reaches radius r (within 0.01 mm at a point), across a slope. */
 function reach(points: SectionPoint[], r: number) {
-  for (let k = 1; k < points.length; k++) {
-    const [[r0, z0], [r1, z1]] = [points[k - 1], points[k]]
+  for (const [[r0, z0], [r1, z1]] of pairs(points)) {
     if (r1 >= r) return z0 + ((r - r0) / (r1 - r0)) * (z1 - z0)
     if (r1 >= r - 0.01) return z1
   }

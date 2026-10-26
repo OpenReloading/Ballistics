@@ -15,6 +15,7 @@ import {
   federationRow,
   federationScope,
 } from '../src/lib/disciplines.ts'
+import { defined } from './defined.ts'
 
 const { bundle } = readRecords()
 const records = bundle.disciplines as unknown as DisciplineRecord[]
@@ -74,7 +75,7 @@ it('gives the strip, the number, section, page and caliber classes, and the rule
     ['Federation', 'DSB'],
     ['Distance', '25'],
   ])
-  const rowsOf = disciplineGroups(pistol, classes)[0].rows
+  const rowsOf = defined(disciplineGroups(pistol, classes)[0]).rows
   expect(rowsOf.map((r) => r.label)).toEqual([
     'Number',
     'Section',
@@ -82,7 +83,9 @@ it('gives the strip, the number, section, page and caliber classes, and the rule
     'Caliber classes',
     'Caliber classes from',
   ])
-  expect(rowsOf[3].text).toBe('9 mm pistol, .357 and .38 revolver, .44 revolver, .45 ACP pistol')
+  expect(defined(rowsOf[3]).text).toBe(
+    '9 mm pistol, .357 and .38 revolver, .44 revolver, .45 ACP pistol',
+  )
   expect(disciplineRuleBook(pistol)).toMatchObject({
     title: 'Sportordnung des Deutschen Schützenbundes, Stand 01.01.2027',
     section: '2.21',

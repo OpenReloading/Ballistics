@@ -10,6 +10,7 @@ import {
   type UserRecord,
 } from '@open-reloading/schema'
 import type { FieldSpec } from './field-spec.ts'
+import { nth } from './nth.ts'
 import {
   formatNumber,
   formatQuantity,
@@ -140,14 +141,17 @@ type FirearmIssue = ReturnType<typeof firearmIssues>[number]
 function issueWhere(f: Firearm, path: FirearmIssue['path']): string {
   const [list, i, , j] = path
   if (typeof i !== 'number') return ''
-  if (list === 'optics') return ` in optic ${f.optics[i].name || f.optics[i].id}`
+  if (list === 'optics') {
+    const optic = nth(f.optics, i)
+    return ` in optic ${optic.name || optic.id}`
+  }
   if (list !== 'configurations') return ''
-  const c = f.configurations[i]
+  const c = nth(f.configurations, i)
   return ` in configuration ${c.name || c.id}${typeof j === 'number' ? `, mount ${j + 1}` : ''}`
 }
 
 function issueReason(issue: FirearmIssue, field: string): string {
-  if (issue.code === 'custom') return issue.message[0].toLowerCase() + issue.message.slice(1)
+  if (issue.code === 'custom') return issue.message.charAt(0).toLowerCase() + issue.message.slice(1)
   if (issue.code === 'too_small' && field === 'zeroTemperature')
     return 'must be above absolute zero'
   if (issue.code === 'too_small' && issue.origin === 'number')
@@ -226,7 +230,7 @@ type SightFill = {
   sightHeight: number
   zeroRange: number
   /** The mounted optic's turret click, rad, with how the turrets are marked. */
-  click?: { value: number; unit?: 'MOA' | 'mrad' }
+  click?: { value: number; unit?: 'MOA' | 'mrad' | undefined }
   twist?: number
   twistHand: 'right' | 'left'
   /** The zero air: K, Pa and a fraction. */
@@ -335,7 +339,7 @@ export const twistText = (f: Firearm, system: UnitSystem) =>
 
 /** A click value (rad) in the turret marking `clickUnit`, else in the units of `system`. */
 export function clickText(
-  o: { clickValue?: number; clickUnit?: 'MOA' | 'mrad' },
+  o: { clickValue?: number | undefined; clickUnit?: 'MOA' | 'mrad' | undefined },
   system: UnitSystem,
 ) {
   if (!o.clickValue) return

@@ -198,7 +198,8 @@ function checkSheet(f: z.infer<typeof targetFaceFields>, issue: Issue) {
   if (!f.paper) return
   const { format, width, height } = f.paper
   const size = format ? isoA[format] : undefined
-  const [short, long] = [width.value, height.value].sort((a, b) => a - b)
+  const short = Math.min(width.value, height.value)
+  const long = Math.max(width.value, height.value)
   if (size && (Math.abs(short - size[0]) > 1 || Math.abs(long - size[1]) > 1))
     issue(['paper'], `must have the size of ${format}`)
   f.bulls?.forEach((b, i) => {

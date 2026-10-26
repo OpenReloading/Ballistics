@@ -19,6 +19,7 @@ import {
   WORK_DIAMETER,
 } from './hole-detection.ts'
 import type { Photo, WorkerReply, WorkerRequest } from './hole-detection-protocol.ts'
+import { nth } from './nth.ts'
 import { clamp } from './raster-ops.ts'
 import { faceLabel, findFace, onPhoto } from './target-face.ts'
 import { mul3, type Point, turnedBox } from './target-geometry.ts'
@@ -99,16 +100,21 @@ async function handleColour(r: Extract<WorkerRequest, { kind: 'colour' }>): Prom
   if (x1 <= x0 || y1 <= y0) throw new Error('The point is outside the photo.')
   const img = await pixels(r, x0, y0, x1, y1)
   // the median per channel inside the circle: a torn rim or a fibre does not shift it
-  const ch: number[][] = [[], [], []]
+  const [reds, greens, blues]: [number[], number[], number[]] = [[], [], []]
+  const ch = [reds, greens, blues]
   for (let y = 0; y < img.height; y++)
     for (let x = 0; x < img.width; x++) {
       if (Math.hypot(x0 + x - r.at.x, y0 + y - r.at.y) > r.radius) continue
       const i = (y * img.width + x) * 4
-      for (let c = 0; c < 3; c++) ch[c].push(img.data[i + c])
+      for (const [c, v] of img.data.subarray(i, i + 3).entries()) ch[c]?.push(v)
     }
-  if (!ch[0].length) throw new Error('The point is outside the photo.')
-  const [red, green, blue] = ch.map((v) => v.sort((a, b) => a - b)[v.length >> 1])
-  return { kind: 'colour', rgb: { r: red, g: green, b: blue } }
+  if (!reds.length) throw new Error('The point is outside the photo.')
+  const median = (v: number[]) =>
+    nth(
+      v.sort((a, b) => a - b),
+      v.length >> 1,
+    )
+  return { kind: 'colour', rgb: { r: median(reds), g: median(greens), b: median(blues) } }
 }
 
 /** The face search over the whole turned photo, resized to `FACE_LONG` px on its longer side. */
@@ -156,7 +162,7 @@ async function handleDetect(
     faceLabel(
       {
         ...r.face,
-        toFace: mul3(r.face.toFace as number[], [1 / k, 0, x0, 0, 1 / k, y0, 0, 0, 1]),
+        toFace: mul3(r.face.toFace, [1 / k, 0, x0, 0, 1 / k, y0, 0, 0, 1]),
       },
       holeMm,
     )

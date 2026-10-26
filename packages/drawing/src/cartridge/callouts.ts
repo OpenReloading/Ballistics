@@ -18,7 +18,9 @@ export function regionStations({ points, annotation }: Profile): Record<RegionNa
   const zMax = Math.max(...points.map(([, z]) => z))
   // the rim length R, not a point index: a chamfer or r0 adds points before the rim top
   const rim =
-    annotation.dimensions.find((d) => d.kind === 'length' && d.symbol === 'R')?.to ?? points[2][1]
+    annotation.dimensions.find((d) => d.kind === 'length' && d.symbol === 'R')?.to ?? points[2]?.[1]
+  if (rim === undefined)
+    throw new Error('The rim length R is not dimensioned and the outline has no rim point.')
   const start = at('P1') ?? rim
   const end = at('H2') ?? zMax
   const [p2, h1] = [at('P2'), at('H1')]

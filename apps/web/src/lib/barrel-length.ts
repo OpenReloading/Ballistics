@@ -2,6 +2,7 @@ import { fromSi } from '@open-reloading/schema'
 import type { InteriorResponse } from './api-types.ts'
 import { firstIndexBeyondTravel } from './interior-chart.ts'
 import type { InteriorBody } from './interior-input.ts'
+import { nth } from './nth.ts'
 import type { LadderDirection } from './seating-ladder.ts'
 import { formatQuantity, type UnitSystem, unitsOf } from './units.ts'
 
@@ -28,9 +29,9 @@ export type BarrelRow = {
   /** Which run the values are read from. */
   source: 'run' | 'longer run'
   /** None while the longer run is missing or did not give a result. */
-  values?: BarrelValues
+  values?: BarrelValues | undefined
   /** Why a longer run that answered gave no values. */
-  reason?: string
+  reason?: string | undefined
 }
 
 /** What a longer run gave for one ladder step: its run, or the model's reason for none. */
@@ -63,9 +64,10 @@ export function barrelDefaults(system: UnitSystem) {
 export function inEveryUnit(system: UnitSystem, length: number): string {
   const own = system.barrelLength
   const units = [own, ...Object.values(unitsOf.barrelLength).filter((u) => u.symbol !== own.symbol)]
-  const [first, ...others] = units.map(
-    (u) => `${formatQuantity('barrelLength', { ...system, barrelLength: u }, length)} ${u.symbol}`,
-  )
+  const text = (u: typeof own) =>
+    `${formatQuantity('barrelLength', { ...system, barrelLength: u }, length)} ${u.symbol}`
+  const first = text(own)
+  const others = units.slice(1).map(text)
   return others.length > 0 ? `${first} (${others.join(', ')})` : first
 }
 
@@ -101,7 +103,9 @@ export function valuesAtTravel(run: Run, travel: number, mass: number): BarrelVa
   const { points } = run
   const lo = firstIndexBeyondTravel(points, travel)
   const [a, b] =
-    lo === 0 ? [points[0], points[0]] : [points[lo - 1], points[Math.min(lo, points.length - 1)]]
+    lo === 0
+      ? [nth(points, 0), nth(points, 0)]
+      : [nth(points, lo - 1), nth(points, Math.min(lo, points.length - 1))]
   const f = a === b ? 0 : (travel - a.travel) / (b.travel - a.travel)
   const mix = (k: 'velocity' | 'burntFraction' | 'breechPressure' | 'time') =>
     a[k] * (1 - f) + b[k] * f
@@ -137,7 +141,7 @@ function rowFromLongerRun(
   mass: number,
 ): BarrelRow {
   const run = longer && 'points' in longer ? longer : undefined
-  const reached = run && travel <= run.points[run.points.length - 1].travel + same
+  const reached = run && travel <= nth(run.points, run.points.length - 1).travel + same
   return {
     length,
     current: false,
@@ -165,7 +169,7 @@ export function barrelRows({
   lengths,
 }: {
   result: Result
-  longer?: LongerRun
+  longer?: LongerRun | undefined
   /** Bullet mass, kg. */
   mass: number
   /** Seated bullet base from the head, m. */
@@ -173,7 +177,7 @@ export function barrelRows({
   /** m. */
   lengths: number[]
 }): BarrelRow[] {
-  const muzzle = result.points[result.points.length - 1].travel
+  const muzzle = nth(result.points, result.points.length - 1).travel
   const current = baseFromHead + muzzle
   const own: BarrelValues = {
     velocity: result.muzzleVelocity,
@@ -212,7 +216,7 @@ export function longerBody(
     model: 'm3' as const,
     load: { ...load, barrel, charge: start },
     ladder: {
-      chargeStep: Math.abs(charges[1] - charges[0]),
+      chargeStep: Math.abs(nth(charges, 1) - nth(charges, 0)),
       stepCount: charges.length,
       direction,
     },

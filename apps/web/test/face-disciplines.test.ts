@@ -9,6 +9,7 @@ import {
   mappedFace,
 } from '../src/lib/face-disciplines.ts'
 import { type Face, withOrganization } from '../src/lib/face-organization.ts'
+import { defined } from './defined.ts'
 
 const { bundle } = readRecords()
 const faces = bundle.targetFaces.map((f) => withOrganization(f, bundle.federations))
@@ -41,8 +42,8 @@ describe('disciplines', () => {
   })
 
   it('keeps the events of one organization together', () => {
-    const a = own(issf[0])
-    const b = own(issf[1])
+    const a = own(defined(issf[0]))
+    const b = own(defined(issf[1]))
     const other = { ...a, id: 'x-face', organization: 'XYZ' }
     const orgs = disciplineOptions([a, other, b]).map((i) => i.label.split(' ')[0])
     expect(orgs).toEqual([
@@ -52,9 +53,12 @@ describe('disciplines', () => {
   })
 
   it('orders an event of another organization with that organization', () => {
-    const a = own(issf[0])
-    const b = own(issf[1])
-    const face = { ...a, events: [{ ...a.events[0], name: 'XYZ Event', organization: 'XYZ' }] }
+    const a = own(defined(issf[0]))
+    const b = own(defined(issf[1]))
+    const face = {
+      ...a,
+      events: [{ ...defined(a.events[0]), name: 'XYZ Event', organization: 'XYZ' }],
+    }
     const labels = disciplineOptions([b, face]).map((i) => i.label)
     expect(labels).toEqual([...b.events.map((e) => `ISSF ${e.name}`), 'XYZ Event'])
   })
@@ -74,7 +78,7 @@ describe('disciplines', () => {
   })
 
   it('has no entry for a group without an event or without a face', () => {
-    expect(disciplineValue({ id: faces[0].id })).toBeNull()
+    expect(disciplineValue({ id: defined(faces[0]).id })).toBeNull()
     expect(disciplineValue(undefined)).toBeNull()
   })
 })
@@ -117,9 +121,9 @@ describe('disciplines of the federations', () => {
 
   it('keeps a face event no mapping names as its own entry', () => {
     const extra = {
-      ...faces[0],
+      ...defined(faces[0]),
       id: 'x-face',
-      events: [{ ...faces[0].events[0], id: 'own', name: 'Own' }],
+      events: [{ ...defined(defined(faces[0]).events[0]), id: 'own', name: 'Own' }],
     }
     const items = disciplineOptions([...faces, extra], data)
     expect(items.at(-1)).toEqual({ value: 'x-face|own', label: `${extra.organization} Own` })

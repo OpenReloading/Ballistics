@@ -7,7 +7,7 @@
  * minimum shot count is not met is `undefined`.
  */
 import { bisect } from '../bisect.ts'
-import { need } from '../errors.ts'
+import { need, nth } from '../errors.ts'
 import { chiSquareQuantile } from './chi-square.ts'
 import { fQuantileTwoNumeratorDegrees } from './f-distribution.ts'
 
@@ -196,9 +196,10 @@ function pairDistances(points: GroupPoint[]) {
   let max = 0
   let min = Number.POSITIVE_INFINITY
   let sum = 0
-  for (let i = 0; i < points.length; i++)
+  for (const [i, p] of points.entries())
     for (let j = i + 1; j < points.length; j++) {
-      const d = Math.hypot(points[i].x - points[j].x, points[i].y - points[j].y)
+      const q = nth(points, j)
+      const d = Math.hypot(p.x - q.x, p.y - q.y)
       max = Math.max(max, d)
       min = Math.min(min, d)
       sum += d
@@ -244,7 +245,7 @@ function compassOf(dx: number, dy: number, distance: number): CompassPoint {
   if (distance < 1e-9) return 'centre'
   // bearing clockwise from up, 8 sectors of 45 degrees centred on N, NE, ...
   const bearing = Math.atan2(dx, dy)
-  return compassPoints[(Math.round(bearing / (Math.PI / 4)) + 8) % 8]
+  return nth(compassPoints, (Math.round(bearing / (Math.PI / 4)) + 8) % 8)
 }
 
 function velocityCorrelationOf(shots: GroupShot[]): VelocityCorrelation | undefined {
@@ -466,7 +467,7 @@ export function pooledGroupStatistics(
   }
   if (df === 0) return out
   out.angular = pooledValues(axx, ayy, df, spreads, confidenceLevel)
-  const d = distances[0]
+  const d = nth(distances, 0)
   if (distances.every((x) => Math.abs(x - d) <= 1e-9 * d))
     Object.assign(
       out,

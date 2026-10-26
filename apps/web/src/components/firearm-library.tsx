@@ -94,7 +94,7 @@ const tableCaption = (named: unknown[]) =>
 /** The filters set, named for the empty list and the caption. */
 const namedFilters = (on: ReturnType<typeof readOrigins>, query: string) =>
   [
-    on.length < origins.length && `${originNames[on[0]]} only`,
+    on.length < origins.length && on[0] && `${originNames[on[0]]} only`,
     query.trim() && `matching "${query.trim()}"`,
   ].filter(Boolean)
 
@@ -199,7 +199,7 @@ function RowActions({
   onDelete,
 }: {
   record: FirearmRecord
-  tabIndex?: number
+  tabIndex?: number | undefined
   onOpen: () => void
   onDuplicate: () => void
   onDelete: () => void

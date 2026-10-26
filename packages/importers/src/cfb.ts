@@ -8,8 +8,13 @@
 const lastRegular = 0xfffffff9
 const noStream = 0xffffffff
 
-const fail = (cause: string): never => {
+function fail(cause: string): never {
   throw new Error(`not an XLS workbook: ${cause}`)
+}
+
+/** Sector `k` of `chain`; the callers' bounds checks keep `k` inside it. */
+function inChain(chain: readonly number[], k: number): number {
+  return chain[k] ?? fail(`sector index ${k} lies outside its chain of ${chain.length}`)
 }
 
 // assumed bound, not a cited one: a workbook's root storage holds a few entries
@@ -161,7 +166,7 @@ function streamReader(
     const miniNext = tableNext(file, miniFat, 'mini sector', 'mini FAT')
     readChain(file, start, Math.ceil(declared / 64), miniNext, false).forEach((m, k) => {
       if ((m + 1) * 64 > miniLength) fail(`mini sector ${m} lies outside the mini stream`)
-      const from = offset(rootChain[Math.floor((m * 64) / size)]) + ((m * 64) % size)
+      const from = offset(inChain(rootChain, Math.floor((m * 64) / size))) + ((m * 64) % size)
       copy(from, Math.min(64, declared - k * 64), k * 64)
     })
     return out
@@ -197,7 +202,7 @@ function readDirectory(
   const perSector = size / 128
   const entries = directory.length * perSector
   const entry = (id: number) =>
-    within(offset(directory[Math.floor(id / perSector)]) + (id % perSector) * 128, 128)
+    within(offset(inChain(directory, Math.floor(id / perSector))) + (id % perSector) * 128, 128)
   if (entries === 0 || bytes[entry(0) + 0x42] !== 5) fail('the directory has no root entry')
   const root = entry(0)
   const streams = new Map<string, (limit: number) => Uint8Array>()

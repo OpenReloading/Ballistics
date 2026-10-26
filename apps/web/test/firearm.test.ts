@@ -17,6 +17,7 @@ import {
   sightOptions,
 } from '../src/lib/firearm.ts'
 import { presetUnits } from '../src/lib/units.ts'
+import { defined, missing } from './defined.ts'
 
 const saved = '2026-10-13T10:00:00.000Z'
 const rifle: UserRecord = {
@@ -89,13 +90,17 @@ describe('sightOptions', () => {
   })
 
   it('fills sight height and zero range of the mount and the twist of the firearm, in SI', () => {
-    expect(options[1].fill).toEqual({
+    expect(defined(options[1]).fill).toEqual({
       sightHeight: 0.04,
       zeroRange: 50,
       twist: 0.254,
       twistHand: 'left',
     })
-    expect(options[3].fill).toEqual({ sightHeight: 0.07, zeroRange: 25, twistHand: 'right' })
+    expect(defined(options[3]).fill).toEqual({
+      sightHeight: 0.07,
+      zeroRange: 25,
+      twistHand: 'right',
+    })
   })
 
   it('fills the zero air and the drag factor with its source of a mount that has them', () => {
@@ -117,7 +122,7 @@ describe('sightOptions', () => {
     expect(zeroed.zeroPressure).toBeCloseTo(98000, 6)
     expect(zeroed.zeroHumidity).toBeCloseTo(0.4, 12)
     const data = (rifle as Extract<UserRecord, { kind: 'firearm' }>).data
-    const [scope, dot] = data.configurations[1].mounts
+    const [scope, dot] = defined(data.configurations[1]).mounts
     const withZero = {
       ...rifle,
       data: {
@@ -128,7 +133,7 @@ describe('sightOptions', () => {
         ],
       },
     } as UserRecord
-    const [first, second] = sightOptions([withZero])
+    const [first = missing(), second = missing()] = sightOptions([withZero])
     expect(first.fill).toMatchObject({ sightHeight: 0.055, ...zeroed })
     // a mount without them leaves the keys out, so a choice empties the fields
     for (const key of Object.keys(zeroed)) expect(second.fill).not.toHaveProperty(key)
@@ -136,7 +141,7 @@ describe('sightOptions', () => {
 
   it('does not fill a twist of 0', () => {
     const flat = { ...rifle, data: { ...rifle.data, twist: { value: 0 } } } as UserRecord
-    expect(sightOptions([flat])[0].fill).not.toHaveProperty('twist')
+    expect(defined(sightOptions([flat])[0]).fill).not.toHaveProperty('twist')
   })
 })
 
@@ -144,12 +149,14 @@ describe('firearm helpers', () => {
   it('a blank firearm is a valid record once named', () => {
     const r = { kind: 'firearm', id: 'x', name: 'New', saved, data: blankFirearm() }
     expect(userRecord.safeParse(r).success).toBe(true)
-    expect(userRecord.safeParse({ ...r, name: '' }).error?.issues[0].path).toEqual(['name'])
+    expect(defined(userRecord.safeParse({ ...r, name: '' }).error?.issues[0]).path).toEqual([
+      'name',
+    ])
   })
 
   it('names the field and its place when a firearm is not valid, never a path', () => {
     const data = (rifle as Extract<UserRecord, { kind: 'firearm' }>).data
-    const [winter, summer] = data.configurations
+    const [winter, summer = missing()] = data.configurations
     const dot = summer.mounts[1]
     expect(firearmProblem('Range rifle', data)).toBeUndefined()
     expect(firearmProblem('', data)).toBe('Enter a name.')

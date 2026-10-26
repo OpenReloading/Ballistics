@@ -13,7 +13,10 @@ const matchesRecordValue = (from: number, si: number | undefined) =>
 export const unchangedFromRecord = (
   origin: Record<string, number>,
   values: Record<string, number | undefined>,
-) => Object.keys(origin).filter((k) => matchesRecordValue(origin[k], values[k]))
+) =>
+  Object.entries(origin)
+    .filter(([k, from]) => matchesRecordValue(from, values[k]))
+    .map(([k]) => k)
 
 type FittedKey = NonNullable<Powder['interior']>['fitted'][number]
 
@@ -40,7 +43,7 @@ export function recordMark(
   if (matchesRecordValue(from, si) && key === 'startPressure' && !p.interior?.startPressure)
     return "From the fit's start pressure rule for barrels of 300 mm and longer."
   if (matchesRecordValue(from, si))
-    return `From the record (${p.interior?.fitted.includes(fittedKey[key]) ? 'fitted' : 'input of the fit'}).`
+    return `From the record (${p.interior?.fitted.some((k) => k === fittedKey[key]) ? 'fitted' : 'input of the fit'}).`
   return `Changed from the record value ${shown(from)}.`
 }
 

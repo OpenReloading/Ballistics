@@ -4,6 +4,7 @@
  * target sheet stores them; face records in mm. Pure: no React, DOM or Next.js.
  */
 import { fromSi, type TargetFace, toSi } from '@open-reloading/schema'
+import { nth } from './nth.ts'
 import { type Point, solve } from './target-geometry.ts'
 
 export type RingScore = {
@@ -14,7 +15,7 @@ export type RingScore = {
   /** True when the hole is in the inner ten under the face's `innerTen.rule`. */
   innerTen: boolean
   /** Zone label of the bull the shot belongs to, where the face's bull has one. */
-  zone?: string
+  zone?: string | undefined
 }
 
 type GroupScore = {
@@ -85,7 +86,7 @@ function touches(ring: Shape, p: Point, g: number): boolean {
 }
 
 /** The bull a shot belongs to: the nearest centre (the first of the record on a tie). */
-function nearestBull(face: TargetFace, shot: Point): { centre: Point; zone?: string } {
+function nearestBull(face: TargetFace, shot: Point): { centre: Point; zone?: string | undefined } {
   let best = { centre: { x: 0, y: 0 }, zone: undefined as string | undefined }
   let bestD = Number.POSITIVE_INFINITY
   for (const b of face.bulls ?? []) {
@@ -114,7 +115,8 @@ function scoreOnBull(face: TargetFace, shot: Point, hole: number): RingScore {
   const rings = face.rings
   const i = rings.findLastIndex((r) => touches(r, shot, g))
   if (i < 0) return { value: 0, ...(face.decimal && { decimal: 0 }), innerTen: false }
-  const value = rings[i].value
+  const ring = nth(rings, i)
+  const value = ring.value
   const inner = face.innerTen
   const x =
     i === rings.length - 1 &&
@@ -122,9 +124,9 @@ function scoreOnBull(face: TargetFace, shot: Point, hole: number): RingScore {
     (inner.rule === 'cover' ? d + radius(inner.diameter) <= g + touch : touches(inner, shot, g))
   if (!face.decimal) return { value, innerTen: x }
   // ring width: to the next ring inward, for the innermost ring to the next ring outward
-  const [a, b] = i < rings.length - 1 ? [rings[i], rings[i + 1]] : [rings[i - 1], rings[i]]
+  const [a, b] = i < rings.length - 1 ? [ring, nth(rings, i + 1)] : [nth(rings, i - 1), ring]
   const width = radius(a.diameter) - radius(b.diameter)
-  const depth = (radius(rings[i].diameter) + g - d) / width
+  const depth = (radius(ring.diameter) + g - d) / width
   const tenth = Math.min(9, Math.max(0, Math.floor(depth * 10 + 1e-9)))
   return { value, decimal: (value * 10 + tenth) / 10, innerTen: x }
 }
@@ -192,12 +194,14 @@ function solveCircleFit(
     const x = (p.x - mx) / sp
     const y = (p.y - my) / sp
     const row = [2 * x, 2 * y, (r / sr) ** 2, -1]
-    for (let i = 0; i < 4; i++) {
-      atb[i] += row[i] * (x * x + y * y)
-      for (let j = 0; j < 4; j++) ata[i][j] += row[i] * row[j]
+    for (const [i, ri] of row.entries()) {
+      atb[i] = nth(atb, i) + ri * (x * x + y * y)
+      const line = nth(ata, i)
+      for (const [j, rj] of row.entries()) line[j] = nth(line, j) + ri * rj
     }
   }
-  const [cx, cy, u] = solve(ata, atb)
+  const solution = solve(ata, atb)
+  const [cx, cy, u] = [nth(solution, 0), nth(solution, 1), nth(solution, 2)]
   if (!(u > 0)) throw new Error('Points are degenerate')
   return { centre: { x: mx + cx * sp, y: my + cy * sp }, scale: (Math.sqrt(u) * sp) / sr }
 }
@@ -258,7 +262,10 @@ export function ringPath(a: FaceAlignment, diameter: number): Point[] {
  * project's own rule, not the rule book's (`apps/docs/docs/models/ring-scoring.md`, "Tenth-ring value").
  */
 export function usesOwnTenthRule(face: TargetFace, hole: number): boolean {
-  const [outer, inner] = face.rings.slice(-2).map((r) => radius(r.diameter))
+  // a face of one ring has no inner ring: both sides are NaN and the answer false
+  const [outer = Number.NaN, inner = Number.NaN] = face.rings
+    .slice(-2)
+    .map((r) => radius(r.diameter))
   return inner + hole / 2 > outer - inner + touch
 }
 
@@ -270,8 +277,16 @@ export function usesOwnTenthRule(face: TargetFace, hole: number): boolean {
  */
 export function scoreGroupOnFace(
   face: TargetFace,
-  choice: { id: string; event?: string; marks?: readonly FaceMark[]; gauge?: number },
-  group: { aim?: Point; shots: readonly (Point & { excluded?: boolean })[] },
+  choice: {
+    id: string
+    event?: string | undefined
+    marks?: readonly FaceMark[] | undefined
+    gauge?: number | undefined
+  },
+  group: {
+    aim?: Point | undefined
+    shots: readonly (Point & { excluded?: boolean | undefined })[]
+  },
   bullet: number | undefined,
 ):
   | { alignment: FaceAlignment; hole: number; usesOwnTenthRule: boolean; score: GroupScore }

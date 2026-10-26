@@ -1,6 +1,7 @@
 import type { TargetFace } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { faceAlignment, scoreShot } from '../src/lib/ring-scoring.ts'
+import { defined } from './defined.ts'
 
 const mmq = (value: number) => ({ value })
 const mm = 1e-3
@@ -22,7 +23,7 @@ function faceOf(
       ...(r.h && { height: mmq(r.h) }),
       ...(r.shape && { shape: r.shape }),
     })),
-    blackDiameter: mmq(rings[0].w),
+    blackDiameter: mmq(defined(rings[0]).w),
     events: [{ name: 'Test event', distance: mmq(10000) }],
     provenance: { kind: 'published', sources: [{ title: 'Test rule book' }] },
     ...extra,
@@ -89,7 +90,7 @@ describe('scoreShot on an oval face', () => {
       [20, 38],
       [-45, 30],
       [3, -33],
-    ]) {
+    ] satisfies [number, number][]) {
       const gap = nearest(x, y)
       expect(scoreShot(oval, shot(x, y), 2 * (gap + 1e-3) * mm).value).toBe(9)
       expect(scoreShot(oval, shot(x, y), 2 * (gap - 1e-3) * mm).value).toBe(0)
@@ -123,7 +124,7 @@ describe('scoreShot on a face with several bulls', () => {
   it('gives an equidistant shot to the first bull of the record', () => {
     // 9.43 mm from both bulls: ring 9 for either
     expect(scoreShot(two, shot(0, 5), 0)).toMatchObject({ value: 9, zone: 'left' })
-    const swapped = faceOf(rings, { bulls: [bulls[1], bulls[0]] })
+    const swapped = faceOf(rings, { bulls: [defined(bulls[1]), defined(bulls[0])] })
     expect(scoreShot(swapped, shot(0, 5), 0)).toMatchObject({ value: 9, zone: 'right' })
   })
 
@@ -188,7 +189,7 @@ describe('scoreShot with a square area', () => {
       [0, 50],
       [20, -50],
       [50, 50],
-    ]) {
+    ] satisfies [number, number][]) {
       expect(scoreShot(square, shot(x, y), 0).value).toBe(4)
     }
     expect(scoreShot(square, shot(50 + off, 0), 0).value).toBe(0)

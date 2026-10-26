@@ -19,6 +19,7 @@ import {
   valueParts,
 } from '@open-reloading/drawing/cartridge'
 import type { drawable } from '../lib/cartridge-sheet.ts'
+import { nth } from '../lib/nth.ts'
 import { controlSize } from '../lib/theme.ts'
 import { type Linked, TechnicalDrawing } from './technical-drawing.tsx'
 
@@ -54,21 +55,21 @@ export function CartridgeDrawing({
 }: {
   spec: Drawable
   /** Replaces "Outline, <standard> <name>" in the title. */
-  heading?: string
-  list?: Figure[]
+  heading?: string | undefined
+  list?: Figure[] | undefined
   /**
    * One side only: the record page draws cartridge and chamber in sections of their own, and
    * `combined` both outlines with the region differences, screen only.
    */
-  side?: Side | 'combined'
+  side?: Side | 'combined' | undefined
   /** With `side`: the figure of this shotshell variant only, at the scale of all. */
-  variant?: string
+  variant?: string | undefined
   /** A sentence that starts the caption of the designer's figure. */
-  caption?: string
+  caption?: string | undefined
   /** The view picked in the designer; shown while it draws, else Combined, else the drawn side. */
-  view?: View
-  onView?: (view: View) => void
-  unit?: LengthUnit
+  view?: View | undefined
+  onView?: ((view: View) => void) | undefined
+  unit?: LengthUnit | undefined
 }) {
   const all = list.filter((f) => f.drawn.length)
   if (side === undefined) {
@@ -133,10 +134,10 @@ export function CartridgeDrawing({
   // one frame width and one height in both length units: the scale stays when the unit changes
   // (a switch, or the Settings unit read after hydration)
   const across = Math.max(
-    ...units.flatMap((u, i) => all.map((f) => screenWidth(f.drawn, ems[i], u))),
+    ...units.flatMap((u, i) => all.map((f) => screenWidth(f.drawn, nth(ems, i), u))),
   )
   const model = (f: { drawn: Drawn }, u: LengthUnit) =>
-    sideModel(f.drawn[0], ems[units.indexOf(u)], across, u)
+    sideModel(nth(f.drawn, 0), nth(ems, units.indexOf(u)), across, u)
   // the figures of a record fit the window at one scale, the tallest's, the sides not shown here too
   const tallest = Math.max(...units.flatMap((u) => split.map((f) => model(f, u).frame[3])))
   const layout = (u: LengthUnit) => ({ models: shown.map((f) => model(f, u)), tallest })
@@ -150,9 +151,9 @@ export function CartridgeDrawing({
       spec={spec}
       heading={heading}
       figure={figure}
-      model={models[k]}
+      model={nth(models, k)}
       tallest={tallest}
-      reserve={{ model: other.models[k], tallest: other.tallest }}
+      reserve={{ model: nth(other.models, k), tallest: other.tallest }}
       print={figure.print}
       scale={scale}
       unit={unit}
@@ -186,7 +187,7 @@ function Combined({
 }: {
   spec: Drawable
   list: Figure[]
-  variant?: string
+  variant?: string | undefined
   unit: LengthUnit
 }) {
   const all = list.filter((f) => f.drawn.length)
@@ -215,7 +216,7 @@ function Combined({
       key={f.id}
       spec={spec}
       figure={{ ...f, id: `${f.id}-combined` }}
-      model={models[k]}
+      model={nth(models, k)}
       tallest={tallest}
       unit={unit}
       differences={differences}
@@ -227,7 +228,7 @@ function Combined({
 /**
  * Why nothing is drawn: for one side its own note (missing values, closed front), else every note.
  */
-function Undrawn({ list, side }: { list: Figure[]; side?: Side }) {
+function Undrawn({ list, side }: { list: Figure[]; side?: Side | undefined }) {
   const notes = list
     .flatMap((f) => f.notes)
     .filter(
@@ -284,7 +285,9 @@ function described(
   unit: LengthUnit,
   angle = false,
 ) {
-  const [symbol, value, ...rest] = d.stored ? valueParts(d.stored) : [d.symbol, String(d.value)]
+  const [symbol, value = '', ...rest] = d.stored
+    ? valueParts(d.stored)
+    : [d.symbol, String(d.value)]
   const length = (text: string) =>
     angle || unit === 'mm' ? text : text.replace(/\d+(\.\d+)?/g, (x) => lengthText(Number(x), unit))
   const shown = angle ? angleText(Number(value)) : `${length(value)} ${unit}`
@@ -368,7 +371,7 @@ function ViewSwitch({
   shown: string
   reason: Reason
   enabled: (v: string) => boolean
-  onView?: (view: View) => void
+  onView?: ((view: View) => void) | undefined
 }) {
   return (
     <>
@@ -410,8 +413,8 @@ function PrintFigures({
   id: string
   title: string
   print: FigureModel
-  scale?: number
-  sides?: Side[]
+  scale?: number | undefined
+  sides?: Side[] | undefined
 }) {
   if (!sides)
     return (
@@ -444,12 +447,12 @@ function FigureCaption({
   notes,
   scale,
 }: {
-  caption?: string
-  differences?: Region[]
+  caption?: string | undefined
+  differences?: Region[] | undefined
   unit: LengthUnit
-  variant?: string
+  variant?: string | undefined
   notes: Figure['notes']
-  scale?: number
+  scale?: number | undefined
 }) {
   return (
     <figcaption>
@@ -496,24 +499,24 @@ function Outline({
   reserve,
 }: {
   spec: Drawable
-  heading?: string
-  caption?: string
+  heading?: string | undefined
+  caption?: string | undefined
   unit: LengthUnit
   /** The record page's linked hover: the screen drawing's dimensions named by symbol. */
-  linked?: Linked
-  view?: View
-  onView?: (view: View) => void
+  linked?: Linked | undefined
+  view?: View | undefined
+  onView?: ((view: View) => void) | undefined
   figure: Figure
   /** The screen model. */
   model: FigureModel
   tallest: number
   /** The upright print model and the record's print scale; none for the record's Combined view. */
   print?: FigureModel
-  scale?: number
+  scale?: number | undefined
   /** The designer's figure of both sides: the region differences of its Combined view. */
-  differences?: Region[]
+  differences?: Region[] | undefined
   /** The record page: the screen figure in the other length unit, whose room the drawing keeps. */
-  reserve?: { model: FigureModel; tallest: number }
+  reserve?: { model: FigureModel; tallest: number } | undefined
 }) {
   const title = `${heading ?? `Outline, ${spec.standard} ${spec.name}`}${variant === undefined ? '' : ` (${variant})`}`
   const desc = description(drawn, differences ?? [], unit)

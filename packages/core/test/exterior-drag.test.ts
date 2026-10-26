@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { nth } from '../src/errors.ts'
 import {
   airAt,
   type DragInput,
@@ -50,8 +51,8 @@ describe('drag tables', () => {
   it('returns the mean at the midpoint between nodes', () => {
     for (const table of Object.values(dragTables))
       for (let k = 1; k < table.length; k++) {
-        const [m0, c0] = table[k - 1]
-        const [m1, c1] = table[k]
+        const [m0, c0] = nth(table, k - 1)
+        const [m1, c1] = nth(table, k)
         expect(dragCoefficient(table, (m0 + m1) / 2)).toBeCloseTo((c0 + c1) / 2, 14)
       }
   })
@@ -101,7 +102,7 @@ describe('drag inputs', () => {
       const b = trajectory(shot({ kind: 'curve', curve, interpolation }), ranges, tight)
       expect(b.dragModel).toBe('custom')
       a.points.forEach((p, k) => {
-        const q = b.points[k]
+        const q = nth(b.points, k)
         expect(Math.abs(q.height - p.height)).toBeLessThan(1e-9 * Math.abs(p.height))
         expect(Math.abs(q.velocity / p.velocity - 1)).toBeLessThan(1e-9)
       })
@@ -127,8 +128,8 @@ describe('drag inputs', () => {
       tight,
     )
     two.points.forEach((p, k) => {
-      expect(Math.abs(p.height - one.points[k].height)).toBeLessThan(1e-8)
-      expect(Math.abs(p.time - one.points[k].time)).toBeLessThan(1e-9)
+      expect(Math.abs(p.height - nth(one.points, k).height)).toBeLessThan(1e-8)
+      expect(Math.abs(p.time - nth(one.points, k).time)).toBeLessThan(1e-9)
     })
   })
 
@@ -159,7 +160,7 @@ describe('drag inputs', () => {
     let close = 0
     let after = 0
     banded.points.forEach((p, k) => {
-      const q = upper.points[k]
+      const q = nth(upper.points, k)
       const airspeed = q.mach * speedOfSound(airAt(air, q.heightAboveFiringPoint))
       if (airspeed > 600.25) {
         before++
@@ -244,8 +245,8 @@ describe('monotone cubic interpolation', () => {
   /** Samples every segment 50 times: monotone along the secant and between the node values. */
   const checkShape = (table: DragTable) => {
     for (let k = 0; k + 1 < table.length; k++) {
-      const [m0, c0] = table[k]
-      const [m1, c1] = table[k + 1]
+      const [m0, c0] = nth(table, k)
+      const [m1, c1] = nth(table, k + 1)
       let previous = c0
       for (let i = 1; i <= 50; i++) {
         const c = cubic(table, i === 50 ? m1 : m0 + ((m1 - m0) * i) / 50)
@@ -353,7 +354,7 @@ describe('monotone cubic interpolation', () => {
     let linear = 0
     for (const table of Object.values(dragTables))
       for (let j = 1; j + 1 < table.length; j++) {
-        const [m, c] = table[j]
+        const [m, c] = nth(table, j)
         const jump = (read: (x: number) => number) =>
           Math.abs((read(m + h) - c) / h - (c - read(m - h)) / h)
         worst = Math.max(
@@ -395,20 +396,20 @@ describe('monotone cubic interpolation', () => {
       muzzleVelocity: 310,
       air: standardAtmosphere(0),
     })
-    const at = [100, 200, 300]
-    const a = trajectory(slow({ ...drag, interpolation: 'monotone-cubic' }), at)
+    const ranges = [100, 200, 300]
+    const a = trajectory(slow({ ...drag, interpolation: 'monotone-cubic' }), ranges)
     const i = mass / (g1bc * diameter ** 2)
     const curve = Array.from(
       { length: 10001 },
       (_, k) => [k / 2000, i * cubic(dragTables.G1, k / 2000)] as const,
     )
-    const b = trajectory(slow({ kind: 'curve', curve }), at)
-    const linear = trajectory(slow(drag), at)
+    const b = trajectory(slow({ kind: 'curve', curve }), ranges)
+    const linear = trajectory(slow(drag), ranges)
     a.points.forEach((p, k) => {
-      expect(Math.abs(p.height - b.points[k].height)).toBeLessThan(1e-5)
-      expect(Math.abs(p.time - b.points[k].time)).toBeLessThan(1e-6)
+      expect(Math.abs(p.height - nth(b.points, k).height)).toBeLessThan(1e-5)
+      expect(Math.abs(p.time - nth(b.points, k).time)).toBeLessThan(1e-6)
     })
-    expect(Math.abs(a.points[2].height - linear.points[2].height)).toBeGreaterThan(5e-4)
+    expect(Math.abs(nth(a.points, 2).height - nth(linear.points, 2).height)).toBeGreaterThan(5e-4)
   })
 
   it('keeps the error proportional to the tolerance (G1)', () => {
@@ -416,7 +417,7 @@ describe('monotone cubic interpolation', () => {
     for (const [v0, elevation, range] of [
       [300, 0.1178, 1200],
       [450, 0.06, 1000],
-    ]) {
+    ] as const) {
       const s: TrajectoryInput = {
         projectile: {
           mass: 0.01,
@@ -434,8 +435,11 @@ describe('monotone cubic interpolation', () => {
         zero: { elevationAngle: elevation, windageAngle: 0 },
       }
       const height = (tol: number) =>
-        trajectory(s, [range], { relativeTolerance: tol, absoluteTolerance: tol, maxSteps: 1e6 })
-          .points[0].height
+        nth(
+          trajectory(s, [range], { relativeTolerance: tol, absoluteTolerance: tol, maxSteps: 1e6 })
+            .points,
+          0,
+        ).height
       const exact = height(1e-13)
       for (const tol of [1e-6, 1e-8, 1e-10])
         expect(Math.abs(height(tol) - exact)).toBeLessThan(tol * range)

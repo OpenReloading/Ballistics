@@ -13,6 +13,7 @@ import {
 } from '../src/core/geometry.ts'
 import { edgeLines, fullSection, steelBand } from '../src/core/section.ts'
 import type { Annotation, Layout } from '../src/core/types.ts'
+import { defined } from './defined.ts'
 import { sheet } from './sheets.ts'
 
 const record = sheet
@@ -41,7 +42,7 @@ describe('annotate', () => {
   const p = side('cip-308-win-2008-09-23', 'cartridge')
   const l = lay(p)
   /** The +r distance of a length's rule from the axis. */
-  const lane = (owner: string) => rule(l, owner)[0].a[1]
+  const lane = (owner: string) => defined(rule(l, owner)[0]).a[1]
 
   it('stacks the 308 Win. lengths on +r, shortest innermost, S on -r', () => {
     expect(lane('L1')).toBeLessThan(lane('L2'))
@@ -71,13 +72,13 @@ describe('annotate', () => {
     for (const [r, d] of [
       ['r1', 'P2'],
       ['r2', 'H1'],
-    ])
+    ] as const)
       for (const a of tips(r)) for (const b of tips(d)) expect(polygonsOverlap(a, b)).toBe(false)
     expectTipsOffOtherTexts(l)
   })
 
   it('puts the head diameters behind the face, the smaller radius nearer', () => {
-    const at = (owner: string) => rule(l, owner)[0].a[0]
+    const at = (owner: string) => defined(rule(l, owner)[0]).a[0]
     expect(at('E1')).toBeLessThan(0)
     expect(at('R1')).toBeLessThan(at('E1'))
   })
@@ -122,7 +123,7 @@ describe('annotate', () => {
   })
 
   it('keeps the 458 SOCOM print chamber r2 leader short and off the axis and the length stack', () => {
-    const drawn = recordFigures(record('cip-458-socom-2021-11-09'))[0].drawn
+    const drawn = defined(recordFigures(record('cip-458-socom-2021-11-09'))[0]).drawn
     const chamber = figureModel(drawn, 'print', face.printEm).layers.chamber as Layout
     const leader = chamber.segs.find((s) => s.owner === 'r2' && s.leader)
     if (!leader) throw new Error('no r2 leader')
@@ -137,7 +138,7 @@ describe('annotate', () => {
   })
 
   it('moves a 22 Long Rifle chamber diameter label along the axis where two share a station', () => {
-    const drawn = recordFigures(record('cip-22-long-rifle-2024-05-14'))[0].drawn
+    const drawn = defined(recordFigures(record('cip-22-long-rifle-2024-05-14'))[0]).drawn
     const out = figureModel(drawn, 'screen', face.minEm).layers.chamber as Layout
     const [H2, G1] = [label(out, 'H2'), label(out, 'G1')]
     expect(H2 && G1 && boxesOverlap(H2, G1)).toBe(false)
@@ -190,12 +191,12 @@ describe('section', () => {
   it('draws the steel band 3 mm beyond the widest bore radius, its stroke open at the cut end', () => {
     const { outer, sides } = steelBand(p.points, face.minEm)
     expect(outer).toBeCloseTo(6.015 + 3, 9)
-    const [top] = sides
+    const top = defined(sides[0])
     // the polygon closes along the bore; the stroke leaves out the cut at the bore end
     expect(top.polygon.at(-1)).toEqual([0, outer])
     expect(top.stroke[0]).toEqual([(p.points.at(-1) as [number, number])[1], outer])
     expect(top.stroke.at(-1)).toEqual([(p.points.at(-1) as [number, number])[1], 3.81])
-    expect(top.zig[0][1]).toBe(3.81)
+    expect(defined(top.zig[0])[1]).toBe(3.81)
     expect(top.zig.at(-1)?.[1]).toBe(outer)
   })
 
@@ -213,7 +214,7 @@ describe('section', () => {
   })
 
   it('keeps one frame for every view and the print life size under 190 mm', () => {
-    const drawn = recordFigures(record('cip-308-win-2008-09-23'))[0].drawn
+    const drawn = defined(recordFigures(record('cip-308-win-2008-09-23'))[0]).drawn
     const screen = figureModel(drawn, 'screen', face.minEm)
     expect(Object.keys(screen.layers)).toEqual(['cartridge', 'chamber'])
     const print = figureModel(drawn, 'print', face.printEm)

@@ -1,7 +1,11 @@
 /** The reminder to export the saved loads: its counts, stored state and text. */
 
 /** What the export reminder counts (`localStorage` `exportReminder`). */
-export type ExportReminder = { exportedAt?: string; firstChangeAt?: string; changes: number }
+export type ExportReminder = {
+  exportedAt?: string | undefined
+  firstChangeAt?: string | undefined
+  changes: number
+}
 
 export const reminderKey = 'exportReminder'
 const reminderChanges = 10

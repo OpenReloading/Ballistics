@@ -53,7 +53,7 @@ export function FieldStrip({
   tags = [],
 }: {
   items: StripItem[]
-  country?: { name: string; code?: string }
+  country?: { name: string; code?: string | undefined } | undefined
   tags?: string[]
 }) {
   const { system } = useUnits()
@@ -61,7 +61,8 @@ export function FieldStrip({
   return (
     <FactCards>
       {items.map((i) => {
-        const [now, ...also] = [system, ...slotUnits].map((u) => rowParts(i.row, u))
+        const now = rowParts(i.row, system)
+        const also = slotUnits.map((u) => rowParts(i.row, u))
         return (
           <FactCard key={i.icon} icon={icons[i.icon]}>
             <Fact

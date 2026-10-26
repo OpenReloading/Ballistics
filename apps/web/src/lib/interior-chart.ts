@@ -1,5 +1,6 @@
 /** The workbench interior chart: curves, events, limit lines and the ECharts option. */
 import type { InteriorResponse } from './api-types.ts'
+import { nth } from './nth.ts'
 import { type PlaybackResult, type PlaybackSample, sampler } from './playback.ts'
 import { type UnitSystem, withUnit } from './units.ts'
 import { firstPressureLimit } from './workbench.ts'
@@ -48,8 +49,8 @@ const burntFractionLine = 0.95
 function burntTime(points: readonly Point[], f: number) {
   const i = points.findIndex((p) => p.burntFraction >= f)
   if (i < 0) return
-  if (i === 0) return points[0].time
-  const [a, b] = [points[i - 1], points[i]]
+  if (i === 0) return nth(points, 0).time
+  const [a, b] = [nth(points, i - 1), nth(points, i)]
   return a.time + ((f - a.burntFraction) / (b.burntFraction - a.burntFraction)) * (b.time - a.time)
 }
 
@@ -109,7 +110,7 @@ export function eventLabelRows(
     const from = e.key === 'muzzle' ? e.x - w : e.x - w / 2
     const row = taken.findIndex((spans) => spans.every(([a, b]) => b <= from || from + w <= a))
     if (row < 0) continue
-    taken[row].push([from, from + w])
+    nth(taken, row).push([from, from + w])
     rows.set(e.key, row)
   }
   return rows
@@ -124,9 +125,9 @@ export function sampleAtX(points: readonly Point[], x: ChartX, value: number, sy
   if (x === 'time') return at(value / 1e3)
   const travel = system.length.toSi(value)
   const lo = firstIndexBeyondTravel(points, travel)
-  if (lo === 0) return at(points[0].time)
-  if (lo === points.length) return at(points[lo - 1].time)
-  const [a, b] = [points[lo - 1], points[lo]]
+  if (lo === 0) return at(nth(points, 0).time)
+  if (lo === points.length) return at(nth(points, lo - 1).time)
+  const [a, b] = [nth(points, lo - 1), nth(points, lo)]
   return at(a.time + ((travel - a.travel) / (b.travel - a.travel)) * (b.time - a.time))
 }
 
@@ -135,7 +136,7 @@ export function firstIndexBeyondTravel(points: readonly { travel: number }[], tr
   let [lo, hi] = [0, points.length]
   while (lo < hi) {
     const mid = (lo + hi) >> 1
-    if (points[mid].travel > travel) hi = mid
+    if (nth(points, mid).travel > travel) hi = mid
     else lo = mid + 1
   }
   return lo
@@ -144,7 +145,7 @@ export function firstIndexBeyondTravel(points: readonly { travel: number }[], tr
 /** `n` samples evenly spaced in time from the first point to the muzzle, for the data table. */
 export function chartRows(points: readonly Point[], n = 20): PlaybackSample[] {
   const at = sampler(points)
-  const [t0, t1] = [points[0].time, points[points.length - 1].time]
+  const [t0, t1] = [nth(points, 0).time, nth(points, points.length - 1).time]
   return Array.from({ length: n }, (_, k) => at(t0 + ((t1 - t0) * k) / (n - 1)))
 }
 
@@ -202,7 +203,7 @@ export type ChartTheme = Record<
   string
 >
 
-type Step = { n: number; label?: string; result: PlaybackResult }
+type Step = { n: number; label?: string | undefined; result: PlaybackResult }
 
 const axisNames: Record<ChartQuantity, string> = {
   pressure: 'Breech pressure',
@@ -408,7 +409,7 @@ export function alignedAxes(maxima: readonly number[]) {
       const interval = niceStep(Math.max(m, Number.MIN_VALUE) / n)
       return { max: Number((n * interval).toPrecision(12)), interval }
     })
-    const waste = Math.max(...axes.map((a, i) => 1 - maxima[i] / a.max))
+    const waste = Math.max(...axes.map((a, i) => 1 - nth(maxima, i) / a.max))
     if (!best || waste < best.waste - 1e-9) best = { waste, axes }
   }
   return best?.axes ?? []
@@ -438,8 +439,8 @@ function yAxisOptions(
     position: i === 0 ? ('left' as const) : ('right' as const),
     offset: i === 2 ? 48 : 0,
     min: 0,
-    max: axes[i].max,
-    interval: axes[i].interval,
+    max: nth(axes, i).max,
+    interval: nth(axes, i).interval,
     axisLine: axisLine(theme.border),
     axisLabel: { color: theme[`${q}Text`], formatter: plain },
     splitLine: { show: i === 0, lineStyle: { color: theme.grid } },
@@ -474,10 +475,10 @@ export function interiorOption({
   theme: ChartTheme
   animate: boolean
   /** The run's burn form z1, for its event line. */
-  z1?: number
+  z1?: number | undefined
 }) {
   const shown = shownQuantities(show)
-  const r = steps[selected].result
+  const r = nth(steps, selected).result
   const at = sampler(r.points)
   const xs = steps.flatMap((s) => s.result.points.map((p) => chartX(p, x, system)))
   const events = chartEvents(r, z1)

@@ -1,5 +1,12 @@
 /** Raster operations on working images held as flat arrays, row by row: masks, morphology, distances, components. */
+
+import { nth } from './nth.ts'
 import type { Point } from './target-geometry.ts'
+
+// Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
+const f32 = (a: Float32Array, i: number) => a[i] as number
+const f64 = (a: Float64Array, i: number) => a[i] as number
+const i32 = (a: Int32Array, i: number) => a[i] as number
 
 export const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v))
 
@@ -13,10 +20,13 @@ export const rectangle = (r: { x: number; y: number; width: number; height: numb
 /** Even-odd rule. */
 export function insidePolygon(p: Point, poly: readonly Point[]): boolean {
   let inside = false
-  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
-    const [a, b] = [poly[i], poly[j]]
+  let b = poly[poly.length - 1]
+  if (!b) return inside
+  // each vertex against the one before it, the first against the last
+  for (const a of poly) {
     if (a.y > p.y !== b.y > p.y && p.x < ((b.x - a.x) * (p.y - a.y)) / (b.y - a.y) + a.x)
       inside = !inside
+    b = a
   }
   return inside
 }
@@ -26,8 +36,8 @@ export function median1(v: readonly number[]): number {
   const s = [...v].sort((a, b) => a - b)
   return s.length
     ? s.length % 2
-      ? s[s.length >> 1]
-      : (s[s.length / 2 - 1] + s[s.length / 2]) / 2
+      ? nth(s, s.length >> 1)
+      : (nth(s, s.length / 2 - 1) + nth(s, s.length / 2)) / 2
     : 0
 }
 type Pick = (a: number, b: number) => number
@@ -41,9 +51,10 @@ function blockExtremes(
   g: Float32Array,
   f: Float32Array,
 ) {
-  for (let i = 0; i < len; i++) g[i] = i % size === 0 ? line[i] : pick(g[i - 1], line[i])
+  for (let i = 0; i < len; i++)
+    g[i] = i % size === 0 ? f32(line, i) : pick(f32(g, i - 1), f32(line, i))
   for (let i = len - 1; i >= 0; i--)
-    f[i] = i === len - 1 || (i + 1) % size === 0 ? line[i] : pick(f[i + 1], line[i])
+    f[i] = i === len - 1 || (i + 1) % size === 0 ? f32(line, i) : pick(f32(f, i + 1), f32(line, i))
 }
 
 /** The extreme of each window of 2k + 1 pixels from the block extremes. */
@@ -60,8 +71,8 @@ function windowExtremes(
     const lo = Math.max(0, i - k)
     const hi = Math.min(len - 1, i + k)
     // One block: the window starts at its first pixel or ends at its last one.
-    if (Math.floor(lo / size) !== Math.floor(hi / size)) res[i] = pick(f[lo], g[hi])
-    else res[i] = lo % size === 0 ? g[hi] : f[lo]
+    if (Math.floor(lo / size) !== Math.floor(hi / size)) res[i] = pick(f32(f, lo), f32(g, hi))
+    else res[i] = lo % size === 0 ? f32(g, hi) : f32(f, lo)
   }
 }
 
@@ -90,10 +101,10 @@ function minMax(src: Float32Array, w: number, h: number, k: number, max: boolean
   ) => {
     const size = 2 * k + 1
     for (let l = 0; l < lines; l++) {
-      for (let i = 0; i < len; i++) line[i] = from[l * stride + i * step]
+      for (let i = 0; i < len; i++) line[i] = f32(from, l * stride + i * step)
       blockExtremes(line, len, size, pick, g, f)
       windowExtremes(len, k, size, pick, g, f, res)
-      for (let i = 0; i < len; i++) to[l * stride + i * step] = res[i]
+      for (let i = 0; i < len; i++) to[l * stride + i * step] = f32(res, i)
     }
   }
   pass(src, rows, w, h, 1, w)
@@ -111,7 +122,7 @@ function morph(src: Float32Array, w: number, h: number, k: number, closing: bool
   const padded = new Float32Array(pw * ph)
   for (let y = 0; y < ph; y++)
     for (let x = 0; x < pw; x++)
-      padded[y * pw + x] = src[clamp(y - k, 0, h - 1) * w + clamp(x - k, 0, w - 1)]
+      padded[y * pw + x] = f32(src, clamp(y - k, 0, h - 1) * w + clamp(x - k, 0, w - 1))
   const out = minMax(minMax(padded, pw, ph, k, closing), pw, ph, k, !closing)
   const res = new Float32Array(w * h)
   for (let y = 0; y < h; y++) res.set(out.subarray((y + k) * pw + k, (y + k) * pw + k + w), y * w)
@@ -123,7 +134,7 @@ export const open = (src: Float32Array, w: number, h: number, k: number) =>
 
 /** Where the parabola rooted at `q` overtakes the one rooted at `p`. */
 const crossing = (f: Float64Array, q: number, p: number) =>
-  (f[q] + q * q - (f[p] + p * p)) / (2 * q - 2 * p)
+  (f64(f, q) + q * q - (f64(f, p) + p * p)) / (2 * q - 2 * p)
 
 /** The parabolas of the lower envelope of the samples `f`: roots in `v`, the bounds between them in `z`. */
 function lowerEnvelope(f: Float64Array, len: number, v: Int32Array, z: Float64Array) {
@@ -132,10 +143,10 @@ function lowerEnvelope(f: Float64Array, len: number, v: Int32Array, z: Float64Ar
   z[0] = -Infinity
   z[1] = Infinity
   for (let q = 1; q < len; q++) {
-    let s = crossing(f, q, v[j])
-    while (s <= z[j]) {
+    let s = crossing(f, q, i32(v, j))
+    while (s <= f64(z, j)) {
       j--
-      s = crossing(f, q, v[j])
+      s = crossing(f, q, i32(v, j))
     }
     j++
     v[j] = q
@@ -153,8 +164,8 @@ function readEnvelope(
 ) {
   let j = 0
   for (let q = 0; q < len; q++) {
-    while (z[j + 1] < q) j++
-    out[q] = (q - v[j]) ** 2 + f[v[j]]
+    while (f64(z, j + 1) < q) j++
+    out[q] = (q - i32(v, j)) ** 2 + f64(f, i32(v, j))
   }
 }
 
@@ -180,10 +191,10 @@ export function distanceSquared(
   ]
   const pass = (len: number, lines: number, step: number, stride: number) => {
     for (let l = 0; l < lines; l++) {
-      for (let i = 0; i < len; i++) f[i] = d[l * stride + i * step]
+      for (let i = 0; i < len; i++) f[i] = f64(d, l * stride + i * step)
       lowerEnvelope(f, len, v, z)
       readEnvelope(f, len, v, z, out)
-      for (let i = 0; i < len; i++) d[l * stride + i * step] = out[i]
+      for (let i = 0; i < len; i++) d[l * stride + i * step] = f64(out, i)
     }
   }
   pass(w, h, 1, w)
@@ -216,7 +227,7 @@ function flood(
   stack[top++] = start
   seen[start] = 1
   while (top) {
-    const i = stack[--top]
+    const i = i32(stack, --top)
     pixels.push(i)
     const [x, y] = [i % w, Math.floor(i / w)]
     for (let dy = -1; dy <= 1; dy++)

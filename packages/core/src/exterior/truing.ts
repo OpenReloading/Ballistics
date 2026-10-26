@@ -5,7 +5,7 @@
  * ordinary `trajectory` call with candidate inputs. SI in and out; angles in rad.
  */
 import type { DragTable } from '../drag-tables.ts'
-import { InputError, need } from '../errors.ts'
+import { InputError, need, nth, overlay, type Settings } from '../errors.ts'
 import { type LogFitResult, logLeastSquares } from '../least-squares.ts'
 import { type DragInput, dragCoefficient, dragTableOf } from './drag.ts'
 import type { StepBudget } from './rk45.ts'
@@ -26,26 +26,26 @@ export interface Observation {
   /** m, rad or m/s, in the signs of `TrajectoryPoint`. */
   value: number
   /** One standard deviation in the unit of `value`; all observations or none. */
-  standardUncertainty?: number
+  standardUncertainty?: number | undefined
 }
 
 /**
  * Trajectory options of every evaluation (`budget` excluded: the fit sets it) and the limits of
  * the fit. The integrator defaults are relativeTolerance 1e-10, absoluteTolerance 1e-9 and zeroTolerance 1e-9.
  */
-export interface TruingOptions extends Partial<Omit<TrajectoryOptions, 'budget'>> {
+export interface TruingOptions extends Settings<Omit<TrajectoryOptions, 'budget'>> {
   /**
    * Levenberg-Marquardt iterations (accepted plus rejected steps) before the fit fails with reason
    * `not-converged`; default 30.
    */
-  maxIterations?: number
+  maxIterations?: number | undefined
   /** Largest condition number of the column-scaled Jacobian; default 1e3. */
-  maxCondition?: number
+  maxCondition?: number | undefined
   /**
    * Integration steps of all trajectories of the fit together, zero searches and point-mass twins
    * included, before it fails with reason `step-budget`; positive, default no limit.
    */
-  maxTotalSteps?: number
+  maxTotalSteps?: number | undefined
 }
 
 /** A fitted parameter: start value, result and uncertainty. */
@@ -129,22 +129,22 @@ export type TruingReason =
  */
 export class TruingError extends InputError {
   readonly reason: TruingReason
-  readonly conditionNumber?: number
+  readonly conditionNumber?: number | undefined
   /** Indices of parameters the observations do not resolve. */
-  readonly unresolved?: number[]
+  readonly unresolved?: number[] | undefined
   /** Parameter combination (in log parameters, column-scaled) with the smallest eigenvalue. */
-  readonly direction?: number[]
-  readonly estimate?: TruedParameter[]
+  readonly direction?: number[] | undefined
+  readonly estimate?: TruedParameter[] | undefined
 
   constructor(
     reason: TruingReason,
     extra: {
-      conditionNumber?: number
-      unresolved?: number[]
-      direction?: number[]
-      estimate?: TruedParameter[]
+      conditionNumber?: number | undefined
+      unresolved?: number[] | undefined
+      direction?: number[] | undefined
+      estimate?: TruedParameter[] | undefined
       /** What the solver reported, appended to the message. */
-      detail?: string
+      detail?: string | undefined
     } = {},
   ) {
     super(extra.detail ? `truing: ${reason} (${extra.detail})` : `truing: ${reason}`)
@@ -207,12 +207,14 @@ interface Predictor {
 function observedPoints(u: Run, t: ReturnType<typeof trajectory>): Prediction | null {
   const at = new Map(t.points.map((p) => [p.range, p]))
   const points: TrajectoryPoint[] = []
+  const values: number[] = []
   for (const x of u.observations) {
     const p = at.get(x.range)
     if (p === undefined) return null
     points.push(p)
+    values.push(p[x.kind])
   }
-  return { values: points.map((p, i) => p[u.observations[i].kind]), points }
+  return { values, points }
 }
 
 /**
@@ -222,7 +224,7 @@ function observedPoints(u: Run, t: ReturnType<typeof trajectory>): Prediction | 
 function predictSessions(
   runs: readonly Run[],
   q: (theta: number[]) => number[],
-  o: Partial<TrajectoryOptions>,
+  o: Settings<TrajectoryOptions>,
   budget: StepBudget,
   estimate: (theta: number[]) => TruedParameter[],
 ): Predictor {
@@ -279,23 +281,30 @@ function truingResult(
   const owner = runs.flatMap((u, k) => u.observations.map(() => k))
   return {
     shots: runs.map((u) => u.apply(values)),
-    parameters: specs.map((s, k) => ({
-      ...s,
-      value: values[k],
-      ...(fit.standardUncertainty
-        ? { standardUncertainty: values[k] * fit.standardUncertainty[k] }
-        : {}),
-    })),
+    parameters: specs.map((s, k) => {
+      const value = nth(values, k)
+      return {
+        ...s,
+        value,
+        ...(fit.standardUncertainty
+          ? { standardUncertainty: value * nth(fit.standardUncertainty, k) }
+          : {}),
+      }
+    }),
     ...(fit.correlation ? { correlation: fit.correlation } : {}),
-    residuals: observations.map((x, i) => ({
-      kind: x.kind,
-      range: x.range,
-      observed: x.value,
-      predicted: final.values[i],
-      residual: final.values[i] - x.value,
-      mach: final.points[i].mach,
-      ...(runs[owner[i]].session === undefined ? {} : { session: owner[i] }),
-    })),
+    residuals: observations.map((x, i) => {
+      const predicted = nth(final.values, i)
+      const run = nth(owner, i)
+      return {
+        kind: x.kind,
+        range: x.range,
+        observed: x.value,
+        predicted,
+        residual: predicted - x.value,
+        mach: nth(final.points, i).mach,
+        ...(nth(runs, run).session === undefined ? {} : { session: run }),
+      }
+    }),
     chiSquare: fit.chiSquare,
     degreesOfFreedom: observations.length - specs.length,
     conditionNumber: fit.conditionNumber,
@@ -321,11 +330,11 @@ function leastSquares(
   need(maxTotalSteps > 0, 'maxTotalSteps must be positive')
   if (n < np) throw new TruingError('underdetermined')
   const budget = { used: 0, max: maxTotalSteps }
-  const o: Partial<TrajectoryOptions> = {
-    relativeTolerance: 1e-10,
-    absoluteTolerance: 1e-9,
-    zeroTolerance: 1e-9,
-    ...rest,
+  const o: Settings<TrajectoryOptions> = {
+    ...overlay<Settings<TrajectoryOptions>>(
+      { relativeTolerance: 1e-10, absoluteTolerance: 1e-9, zeroTolerance: 1e-9 },
+      rest,
+    ),
     budget,
   }
   const sigma = observations.map((x) => x.standardUncertainty ?? 1)
@@ -333,11 +342,13 @@ function leastSquares(
   const floor = observations.map(
     (x, i) =>
       (1e-6 * (x.kind === 'height' ? x.range : x.kind === 'velocity' ? Math.abs(x.value) : 1)) /
-      sigma[i],
+      nth(sigma, i),
   )
-  const q = (theta: number[]) => specs.map((s, j) => s.initial * Math.exp(theta[j]))
-  const estimate = (theta: number[]): TruedParameter[] =>
-    specs.map((s, j) => ({ ...s, value: q(theta)[j] }))
+  const q = (theta: number[]) => specs.map((s, j) => s.initial * Math.exp(nth(theta, j)))
+  const estimate = (theta: number[]): TruedParameter[] => {
+    const values = q(theta)
+    return specs.map((s, j) => ({ ...s, value: nth(values, j) }))
+  }
   const predictor = predictSessions(runs, q, o, budget, estimate)
   const { predictRun, predict } = predictor
 
@@ -354,14 +365,18 @@ function leastSquares(
     floor,
     first: first.values,
     predict: (trial, current, run) => {
-      if (run !== undefined) return predictRun(runs[run], trial, current, false)?.values ?? null
+      if (run !== undefined)
+        return predictRun(nth(runs, run), trial, current, false)?.values ?? null
       const p = predict(trial, current)
       if (p) full.set(p.values, p)
       return p?.values ?? null
     },
     runs: runs.map((u) => u.observations.length),
     // a session parameter moves only its own session's predictions
-    moves: (j, run) => specs[j].session === undefined || specs[j].session === run,
+    moves: (j, run) => {
+      const { session } = nth(specs, j)
+      return session === undefined || session === run
+    },
     maxIterations,
     maxCondition,
     fail: (reason, theta, extra = {}) => {
@@ -408,15 +423,15 @@ export function trueMuzzleVelocity(
   checkObservations(observations)
   return single(
     leastSquares(
-      [{ observations, apply: ([v]) => ({ ...shot, muzzleVelocity: v }) }],
+      [{ observations, apply: (q) => ({ ...shot, muzzleVelocity: nth(q, 0) }) }],
       [{ name: 'muzzleVelocity', initial: shot.muzzleVelocity }],
       options,
     ),
   )
 }
 
-const single = ({ shots: [shot], ...rest }: SessionsTruingResult): TruingResult => ({
-  shot,
+const single = ({ shots, ...rest }: SessionsTruingResult): TruingResult => ({
+  shot: nth(shots, 0),
   ...rest,
 })
 
@@ -431,8 +446,9 @@ export function dragCorrection(
 ): (f: number[]) => DragInput {
   const drag = p.drag
   if (knots === undefined)
-    return ([k]) =>
-      drag.kind === 'bc'
+    return (f) => {
+      const k = nth(f, 0)
+      return drag.kind === 'bc'
         ? {
             ...drag,
             bands: drag.bands.map((b) => ({
@@ -441,10 +457,11 @@ export function dragCorrection(
             })),
           }
         : { ...drag, curve: drag.curve.map(([m, c]) => [m, c * k] as const) }
+    }
   need(knots.length >= 2, 'at least two knots')
   knots.forEach((m, k) => {
     need(m > 0 && Number.isFinite(m), 'knot Mach must be positive')
-    need(k === 0 || m > knots[k - 1], 'knots must rise')
+    need(k === 0 || m > nth(knots, k - 1), 'knots must rise')
   })
   need(drag.kind === 'curve' || drag.bands.length === 1, 'knots need a single-band BC or a curve')
   // the curve built below drops the reference, so trajectory cannot reject a misspelled one
@@ -458,13 +475,13 @@ export function dragCorrection(
     drag.kind === 'curve'
       ? dragCoefficient(drag.curve, m, drag.interpolation)
       : (dragCoefficient(base, m, drag.interpolation) * p.mass) /
-        (drag.bands[0].ballisticCoefficient * p.diameter ** 2)
+        (nth(drag.bands, 0).ballisticCoefficient * p.diameter ** 2)
   // a knot replaces a base node within 1e-9 relative: a closer pair makes the cubic's node slopes
   // rounding noise
   const near = (m: number) => knots.some((k) => Math.abs(m - k) <= 1e-9 * k)
   const nodes = [...base.map((x) => x[0]).filter((m) => !near(m)), ...knots].sort((a, b) => a - b)
   return (f) => {
-    const factor: DragTable = knots.map((m, k) => [m, f[k]] as const)
+    const factor: DragTable = knots.map((m, k) => [m, nth(f, k)] as const)
     return {
       kind: 'curve',
       curve: nodes.map((m) => [m, dragCoefficient(factor, m) * own(m)] as const),
@@ -486,7 +503,7 @@ const factorSpecs = (knots?: readonly number[]): Spec[] =>
 export function trueDrag(
   shot: TrajectoryInput,
   observations: readonly Observation[],
-  spec: { knots?: readonly number[]; fitMuzzleVelocity?: boolean } = {},
+  spec: { knots?: readonly number[] | undefined; fitMuzzleVelocity?: boolean | undefined } = {},
   options?: TruingOptions,
 ): TruingResult {
   const { knots, fitMuzzleVelocity = false } = spec
@@ -504,7 +521,7 @@ export function trueDrag(
 export function trueDragSessions(
   projectile: Projectile,
   sessions: readonly TruingSession[],
-  spec: { knots?: readonly number[] } = {},
+  spec: { knots?: readonly number[] | undefined } = {},
   options?: TruingOptions,
 ): SessionsTruingResult {
   return fitDrag(projectile, sessions, spec.knots, options, true)
@@ -543,7 +560,7 @@ function fitDrag(
       apply: (q) => ({
         ...x.shot,
         projectile: { ...projectile, drag: drag(q.slice(off)) },
-        muzzleVelocity: v < 0 ? x.shot.muzzleVelocity : q[v],
+        muzzleVelocity: v < 0 ? x.shot.muzzleVelocity : nth(q, v),
       }),
     }
   })

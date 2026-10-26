@@ -17,8 +17,8 @@ function shotStatistics(values: number[]): {
     values.reduce((a, v) => a + (v - mean) ** 2, 0) / values.length,
   )
   const extremeSpread =
-    values.reduce((a, b) => Math.max(a, b), values[0]) -
-    values.reduce((a, b) => Math.min(a, b), values[0])
+    values.reduce((a, b) => Math.max(a, b), Number.NEGATIVE_INFINITY) -
+    values.reduce((a, b) => Math.min(a, b), Number.POSITIVE_INFINITY)
   return { mean, standardDeviation, extremeSpread }
 }
 
@@ -34,8 +34,13 @@ function compareStatistics(
   readNumber: (cell: string) => number,
 ): { row: string[]; computed: number; withinTolerance: boolean; unreadable: boolean }[] {
   const { mean, standardDeviation, extremeSpread } = shotStatistics(values)
-  return [mean, standardDeviation, extremeSpread].flatMap((computed, k) => {
-    const row = rows.find((cells) => rowLabels[k].includes((cells[0] ?? '').toUpperCase()))
+  const compared: [number, string[]][] = [
+    [mean, rowLabels[0]],
+    [standardDeviation, rowLabels[1]],
+    [extremeSpread, rowLabels[2]],
+  ]
+  return compared.flatMap(([computed, labels]) => {
+    const row = rows.find((cells) => labels.includes((cells[0] ?? '').toUpperCase()))
     if (!row) return []
     const printed = readNumber(row[1] ?? '')
     const unreadable = Number.isNaN(printed)

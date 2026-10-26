@@ -29,7 +29,7 @@ type Outcome =
 type Answer = { request: string } & Outcome
 
 /** The load request as text, to compare the load an answer was solved for with the current one. */
-function requestKey(loadRequest: () => { body: object; bulkDensity?: number }) {
+function requestKey(loadRequest: () => { body: object; bulkDensity?: number | undefined }) {
   try {
     const { body, bulkDensity } = loadRequest()
     return JSON.stringify([body, bulkDensity])

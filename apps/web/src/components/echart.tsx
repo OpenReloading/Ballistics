@@ -24,6 +24,9 @@ use([
   SVGRenderer,
 ])
 
+/** The distance between the first two ticks; NaN when there are fewer than two. */
+export const tickStep = (ticks: number[]) => (ticks[1] ?? Number.NaN) - (ticks[0] ?? Number.NaN)
+
 /**
  * The chart colours: each key's CSS custom property of the page (`globals.css`), read after the
  * colour scheme attribute is set and again on a scheme change; undefined before the first read.
@@ -73,14 +76,14 @@ export function EChart({
 }: {
   option: EChartsCoreOption
   /** Px; without it the box's CSS height, which the chart follows. */
-  height?: number
+  height?: number | undefined
   title: string
   description: string
   /** Index of the series the keyboard walks. */
   focus?: number
   readout?: (dataIndex: number) => string
   /** Called after each draw, for an overlay that reads the chart's scales. */
-  onRender?: (chart: ECharts) => void
+  onRender?: ((chart: ECharts) => void) | undefined
 }) {
   const box = useRef<HTMLDivElement>(null)
   const chart = useRef<ECharts | null>(null)
@@ -177,7 +180,9 @@ export function EChart({
 
   const onKey = (e: KeyboardEvent<HTMLInputElement>) => {
     const c = chart.current
-    const series = (c?.getOption().series as { data?: unknown[] }[] | undefined)?.[focus]
+    const series = (c?.getOption().series as { data?: unknown[] | undefined }[] | undefined)?.[
+      focus
+    ]
     const n = series?.data?.length ?? 0
     if (!c || n === 0) return
     const step = Math.max(1, Math.round(n / 50))
@@ -187,12 +192,14 @@ export function EChart({
       Home: 0,
       End: n - 1,
     }
-    if (!(e.key in moves)) return
+    const target = moves[e.key]
+    if (target === undefined) return
     e.preventDefault()
-    moveTo(moves[e.key])
+    moveTo(target)
   }
 
-  const points = (option.series as { data?: unknown[] }[] | undefined)?.[focus]?.data?.length ?? 0
+  const points =
+    (option.series as { data?: unknown[] | undefined }[] | undefined)?.[focus]?.data?.length ?? 0
   return (
     <div className="echart">
       <div

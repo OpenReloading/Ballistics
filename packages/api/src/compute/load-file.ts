@@ -92,9 +92,9 @@ export function readLoadFile(json: unknown): { path: Path; record: Load; name: s
 /** The records of a load the catalogue gives values from. */
 export interface LoadRecords {
   /** The powder record the load names. */
-  powder?: Powder
+  powder?: Powder | undefined
   /** The bullet record the load names. */
-  bullet?: Bullet
+  bullet?: Bullet | undefined
 }
 
 /**

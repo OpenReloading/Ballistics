@@ -18,6 +18,7 @@ import {
   refName,
   withUserManufacturers,
 } from './manufacturers.ts'
+import { nth } from './nth.ts'
 
 /** The base record of a variant: none given, read, no longer in the catalogue, or not read. */
 export type Base<T> =
@@ -99,7 +100,7 @@ export interface ResolvedBullet {
   /** The base with the overrides applied; the overrides alone without a base or while it is missing. */
   record: Partial<Bullet>
   /** Why the record is read only. */
-  problem?: string
+  problem?: string | undefined
   /** The base changed since the bullet was saved. */
   changed?: boolean
 }
@@ -108,8 +109,8 @@ export interface ResolvedBullet {
 export interface ResolvedCartridge {
   base: Base<CartridgeDetail>
   /** The base with the overrides applied; the overrides alone without a base or while it is missing. */
-  record: { table?: string; values: SpecValue[] }
-  problem?: string
+  record: { table?: string | undefined; values: SpecValue[] }
+  problem?: string | undefined
   /** The base changed since the cartridge was saved. */
   changed?: boolean
 }
@@ -142,7 +143,10 @@ export async function resolveCartridge(
       : { values: [] }
   return {
     base,
-    record: applyOverrides<{ table?: string; values: SpecValue[] }>(from, data.overrides),
+    record: applyOverrides<{ table?: string | undefined; values: SpecValue[] }>(
+      from,
+      data.overrides,
+    ),
     problem: baseProblem(base),
     changed: baseChanged(data.basedOnRevision, base),
   }
@@ -159,7 +163,7 @@ export interface UserBulletView {
   /** The name of the bullet's manufacturer; empty while it is not known. */
   manufacturerName: string
   /** Mass, diameter and length of the resolved record in SI; absent where it gives none. */
-  si: { mass?: number; diameter?: number; length?: number }
+  si: { mass?: number | undefined; diameter?: number | undefined; length?: number | undefined }
 }
 
 /** A user cartridge of the browser whose base resolves. */
@@ -242,9 +246,9 @@ export function dropPath(target: Record<string, unknown>, path: string) {
     if (typeof next !== 'object' || next === null || Array.isArray(next)) return
     chain.push(next as Record<string, unknown>)
   }
-  delete chain[keys.length][last]
-  for (let i = keys.length; i > 0 && Object.keys(chain[i]).length === 0; i--)
-    delete chain[i - 1][keys[i - 1]]
+  delete nth(chain, keys.length)[last]
+  for (let i = keys.length; i > 0 && Object.keys(nth(chain, i)).length === 0; i--)
+    delete nth(chain, i - 1)[nth(keys, i - 1)]
 }
 
 /** The reference a load file keeps for a catalogue record: a plain id is a catalogue record. */

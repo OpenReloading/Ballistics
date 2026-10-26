@@ -7,23 +7,26 @@
  */
 import { type ShotGroup, type TargetFace, type TargetSheet, toSi } from '@open-reloading/schema'
 import { type FederationData, mappingOf } from './face-disciplines.ts'
+import { nth } from './nth.ts'
 import { faceAlignment } from './ring-scoring.ts'
 import type { FaceGeometry, FacePlane } from './target-face.ts'
 import { type Matrix, mul3, type Point } from './target-geometry.ts'
 
 export type FoundFace = Pick<FacePlane, 'centre' | 'corners' | 'outer'> & {
   /** Id of the face record; absent for a plane from a typed diameter. */
-  id?: string
+  id?: string | undefined
   /** Id of the event the user chose; absent: the group's discipline, else an event at the group's distance. */
   event?: string
   /** Id of the federation that publishes the face. */
-  federation?: string
+  federation?: string | undefined
   /** The events of the face with their distances, m, and the federation of an event of another one. */
-  events?: ReadonlyArray<{ id: string; distance: number; federation?: string }>
+  events?:
+    | ReadonlyArray<{ id: string; distance: number; federation?: string | undefined }>
+    | undefined
 }
 
 /** The federation the user chose for the Discipline list, and the federations' disciplines and mappings. */
-export type FaceScope = { federation?: string; data?: FederationData }
+export type FaceScope = { federation?: string | undefined; data?: FederationData | undefined }
 
 /** `sheet` calibrated on `found`; the active group `groupId` takes the face for ring scoring. */
 export function calibrateSheetOnFace(
@@ -81,7 +84,7 @@ function eventAt(distance: number, found: FoundFace, { federation }: FaceScope) 
   if (federation) return near.find((e) => of(e) === federation)?.id
   const own = near.find((e) => !e.federation)
   if (own) return own.id
-  return new Set(near.map(of)).size === 1 ? near[0].id : undefined
+  return new Set(near.map(of)).size === 1 ? nth(near, 0).id : undefined
 }
 
 /**
@@ -102,7 +105,7 @@ export function faceGeometry(o: {
   const { sheet, group, record, toTarget } = o
   const choice = group?.face
   if (!toTarget || !group || !choice || !record || record.id !== choice.id) return undefined
-  const outer = record.rings[0].diameter.value / 2
+  const outer = nth(record.rings, 0).diameter.value / 2
   const size = toSi('length', 2 * outer)
   const onFace = sheet.references.some(
     (r) =>

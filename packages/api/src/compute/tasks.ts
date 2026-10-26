@@ -54,7 +54,7 @@ export type Task =
       options: Partial<InteriorOptions>
       tolerances: PressureTolerances
       /** With it the answer also holds the sampled band (the clock is the runner's). */
-      sampling?: Omit<SamplingOptions, 'now'>
+      sampling?: Omit<SamplingOptions, 'now'> | undefined
     }
   | { kind: 'chargeSolve'; load: InteriorLoad; target: ChargeTarget; options: ChargeSolverOptions }
 
@@ -94,11 +94,11 @@ export function runTask<T extends Task>(task: T): Results[T['kind']] {
 export type SerializedError = {
   name: 'TruingError' | 'InputError' | 'Error'
   message: string
-  reason?: TruingReason
-  conditionNumber?: number
-  unresolved?: number[]
-  direction?: number[]
-  estimate?: TruedParameter[]
+  reason?: TruingReason | undefined
+  conditionNumber?: number | undefined
+  unresolved?: number[] | undefined
+  direction?: number[] | undefined
+  estimate?: TruedParameter[] | undefined
 }
 
 /** Plain-object form of `error`: `TruingError` and `InputError` keep their fields, any other value becomes an `Error` with its message. */

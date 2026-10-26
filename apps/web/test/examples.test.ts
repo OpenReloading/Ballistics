@@ -34,9 +34,15 @@ import {
   zeroKeys,
 } from '../src/lib/trajectory-input.ts'
 import { presetUnits, waterDensityGramsPerCm3 } from '../src/lib/units.ts'
+import { defined } from './defined.ts'
 import { readRecord } from './read-record.ts'
 
-type Value = { side?: string; symbol: string; value: number; variant?: string }
+type Value = {
+  side?: string | undefined
+  symbol: string
+  value: number
+  variant?: string | undefined
+}
 
 function record(kind: string, id: string) {
   return readRecord(`${kind}/${id}.json`)
@@ -112,7 +118,8 @@ describe('interior example', () => {
 
   it('fills every field but the optional ones: Sébert factor (Lagrange), leak area, bore friction and engraving', () => {
     const optional = ['sebert', 'leakArea', 'boreFriction', 'engravingPressure', 'engravingLength']
-    for (const f of interiorFields) expect(filled[f.key].text === '').toBe(optional.includes(f.key))
+    for (const f of interiorFields)
+      expect(defined(filled[f.key]).text === '').toBe(optional.includes(f.key))
     expect(load).not.toHaveProperty('gradient')
     expect(load).not.toHaveProperty('leakage')
   })
@@ -140,12 +147,13 @@ describe('trajectory example', () => {
       presetUnits('metric-grams'),
     )
     for (const f of [...shotFields, ...manualBulletFields])
-      if (!(zeroKeys as readonly string[]).includes(f.key)) expect(filled[f.key].text).not.toBe('')
-    expect(filled.ballisticCoefficient.text).toBe('0.221')
+      if (!(zeroKeys as readonly string[]).includes(f.key))
+        expect(defined(filled[f.key]).text).not.toBe('')
+    expect(defined(filled.ballisticCoefficient).text).toBe('0.221')
     const si = siValues(filled)
     const t = trajectory(shotFromValues(si, manualProjectile(si, 'G7'), 'right'), [100, 1000])
     expect(t.stop).toBe('done')
-    expect(Math.abs(t.points[0].height)).toBeLessThan(1e-5)
+    expect(Math.abs(defined(t.points[0]).height)).toBeLessThan(1e-5)
   })
 })
 

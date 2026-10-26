@@ -76,6 +76,7 @@ import {
 import { generatedName, loadName } from '../lib/load-tabs.ts'
 import { type ManufacturerNames, productLabel } from '../lib/manufacturers.ts'
 import { attachLoad, sessionRef } from '../lib/measurements.ts'
+import { nth } from '../lib/nth.ts'
 import { powderValues } from '../lib/powder-compare.ts'
 import { unchangedFromRecord } from '../lib/powder-record.ts'
 import {
@@ -202,7 +203,7 @@ type Answer = { res: Response; json: (InteriorResponse & ErrorBody) | undefined 
 
 type Kind = 'cartridge' | 'bullet' | 'powder' | 'capacity'
 type Asked = Partial<Record<Kind, { id: string; failed?: true }>>
-type Groove = { id: string; z?: number; record?: CartridgeDetail }
+type Groove = { id: string; z?: number | undefined; record?: CartridgeDetail }
 
 /**
  * The chosen cartridge's loaded record: its groove diameter Z, m, the bore area Q, m2, an empty
@@ -262,9 +263,10 @@ function ladderStepField(
   kind: RunnableLadderKind,
   steps: { seat: Fields; temp: Fields; charge: Fields },
 ) {
-  if (kind === 'seating') return [seatingStepSpec, steps.seat.seatStep] as const
-  if (kind === 'temperature') return [temperatureStepSpec, steps.temp.tempStep] as const
-  return [ladderSpec, steps.charge.ladderStep] as const
+  if (kind === 'seating') return [seatingStepSpec, steps.seat.seatStep ?? emptyStep] as const
+  if (kind === 'temperature')
+    return [temperatureStepSpec, steps.temp.tempStep ?? emptyStep] as const
+  return [ladderSpec, steps.charge.ladderStep ?? emptyStep] as const
 }
 
 /**
@@ -303,7 +305,7 @@ function measuredCapacityOf(
   key: string | undefined,
   measured: Fields,
 ): number | undefined {
-  const si = measured.measuredWaterCapacity.si
+  const si = measured.measuredWaterCapacity?.si
   return typedFor === key && (si ?? 0) > 0 ? si : undefined
 }
 
@@ -373,7 +375,7 @@ function cartridgeSource(a: CartridgeSource): DefaultSources['cartridge'] {
 /** The mass of the bullet record, else of a user design that has a reference, kg. */
 function bulletMassOf(
   bullet: Bullet | undefined,
-  design: { id: string; mass?: number } | undefined,
+  design: { id: string; mass?: number | undefined } | undefined,
 ) {
   if (bullet) return toSi('mass', bullet.mass.value)
   return design && userRef(design.id) ? design.mass : undefined
@@ -482,7 +484,11 @@ function recordLinkOf(a: {
   powder: Powder | undefined
   names: ManufacturerNames
   recordBore:
-    | { boreFriction?: number; engravingPressure?: number; engravingLength?: number }
+    | {
+        boreFriction?: number | undefined
+        engravingPressure?: number | undefined
+        engravingLength?: number | undefined
+      }
     | undefined
   linkedBullet: LinkedBullet | undefined
   linkedPowder: LinkedPowder | undefined
@@ -515,7 +521,8 @@ const labelOf = (record: Bullet | Powder | undefined, names: ManufacturerNames) 
 const userRefOf = (id: string | undefined) => (id ? userRef(id) : undefined)
 
 /** The gun weight when above 0: a weight of 0 or less is no weight. */
-const usableWeight = (weight: FieldValue) => ((weight.si ?? 0) > 0 ? weight : emptyStep)
+const usableWeight = (weight: FieldValue | undefined) =>
+  weight && (weight.si ?? 0) > 0 ? weight : emptyStep
 
 /** The bullet length a run reads, mm: the record's, else the link's. */
 function bulletLengthOf(bullet: Bullet | undefined, linked: LinkedBullet | undefined) {
@@ -554,10 +561,12 @@ const resultLineOf = (outcome: Outcome, system: UnitSystem) =>
 
 /** The firearm the defaults read: its name, twist and barrel length. */
 const gunSource = (
-  gun: { name: string; data: { twist?: number; barrelLength?: number } } | undefined,
+  gun:
+    | { name: string; data: { twist?: number | undefined; barrelLength?: number | undefined } }
+    | undefined,
 ) => gun && { name: gun.name, twist: gun.data.twist, barrelLength: gun.data.barrelLength }
 
-type PreviewFields = Partial<Record<PreviewKey, FieldValue>>
+type PreviewFields = Partial<Record<PreviewKey, FieldValue | undefined>>
 
 /**
  * What the seated bullet changes of volume and travel: the fields to write (empty, or still the
@@ -568,7 +577,7 @@ function followPlan(
   now: Fields,
   a: {
     followed: ReadonlySet<FollowKey>
-    written: Partial<Record<FollowKey, number>>
+    written: Partial<Record<FollowKey, number | undefined>>
     previewed: Partial<Record<PreviewKey, number>>
     field: (k: PreviewKey, v: number) => FieldValue
   },
@@ -765,7 +774,7 @@ const gasFactorOf = (table: string | undefined) =>
 /** The rows of a planned ladder: the answers become steps, an error step keeps the API's message. */
 function planSteps(plan: Partial<Step>[], answers: Answer[], charge: number): Step[] {
   return plan.map((row, i) => {
-    const { res, json } = answers[i]
+    const { res, json } = nth(answers, i)
     if (res.ok && json !== undefined) return { charge, body: json, ...row }
     const message = json?.message ?? `The API answered ${res.status}.`
     return { charge, error: { message, reason: json?.reason }, ...row }
@@ -802,7 +811,7 @@ async function runRequest(
   // a busy API or a step past its deadline (503) is a failed request, not a model error; the first
   // answer stands for the run's status when no step has a result
   const shown =
-    answers.find((a) => a.res.status === 503) ?? answers.find((a) => !a.res.ok) ?? answers[0]
+    answers.find((a) => a.res.status === 503) ?? answers.find((a) => !a.res.ok) ?? nth(answers, 0)
   return { ...shown, steps: shown.res.status === 503 ? [] : planSteps(plan, answers, charge) }
 }
 
@@ -821,7 +830,7 @@ const ladderOf = (
   seatingBy: plan && kind === 'seating' ? seatingBy : undefined,
 })
 
-type Named = { name?: string } | undefined
+type Named = { name?: string | undefined } | undefined
 
 /** The names the printed sheet shows for the load's records. */
 function identityOf(a: {
@@ -895,7 +904,7 @@ function linkedFieldsOf(
   withDefaults: boolean,
 ) {
   const linked = queryFields(query, interiorFields, system, fixedFieldText)
-  const missing = withDefaults ? defaultKeys.filter((k) => linked[k].si === undefined) : []
+  const missing = withDefaults ? defaultKeys.filter((k) => linked[k]?.si === undefined) : []
   for (const k of missing) {
     const spec = interiorFields.find((s) => s.key === k) as FieldSpec
     linked[k] = { text: fixedFieldText(spec.quantity, system, defaults[k]), si: defaults[k] }
@@ -907,7 +916,7 @@ function linkedFieldsOf(
 const fieldErrorsOf = (linked: Fields, system: UnitSystem) =>
   Object.fromEntries(
     interiorFields.flatMap((s) => {
-      const error = linked[s.key].text && fieldError(s, linked[s.key], system)
+      const error = linked[s.key]?.text && fieldError(s, linked[s.key], system)
       return error ? [[s.key, error]] : []
     }),
   )
@@ -927,7 +936,7 @@ function queryLadder(query: URLSearchParams, system: UnitSystem) {
   if (!fits) return
   const kind = runKindOf(query.get('ladderKind'))
   const spec = stepSpecOf(kind)
-  const { ladderStep } = queryFields(
+  const { ladderStep = emptyStep } = queryFields(
     query,
     [{ ...spec, key: 'ladderStep' }],
     system,
@@ -983,7 +992,7 @@ function followWrites(a: {
   seatedVolume: boolean
   now: Fields
   suggestions: Suggestions
-  written: Partial<Record<FollowKey, number>>
+  written: Partial<Record<FollowKey, number | undefined>>
   system: UnitSystem
 }) {
   const writes: [FollowKey, FieldValue][] = []
@@ -1102,7 +1111,11 @@ export function useWorkbenchState() {
   /** The card whose More popover is open; the model parameters drawer. */
   const [more, setMore] = useState<InputPanel>()
   /** The user bullet design that filled the bullet mass; an edit of the mass leaves it. */
-  const [bulletDesign, setBulletDesign] = useState<{ id: string; name: string; mass?: number }>()
+  const [bulletDesign, setBulletDesign] = useState<{
+    id: string
+    name: string
+    mass?: number | undefined
+  }>()
   /** The full form without a cartridge, chosen on the start card. */
   const [byHand, setByHand] = useState(false)
   /** The browser's bullet designs, read on load and again on focus. */
@@ -1217,7 +1230,7 @@ export function useWorkbenchState() {
   // remounts the cartridge search so it drops an earlier query when a preset chooses the cartridge
   const [searchKey, setSearchKey] = useState(0)
   const [previewInitial, setPreviewInitial] = useState<{
-    bullet?: string
+    bullet?: string | undefined
     barrel?: number
     seating?: Seating
   }>()
@@ -1446,7 +1459,7 @@ export function useWorkbenchState() {
   })
 
   /** `fields` with volume and travel that follow the seated bullet in the seating's text. */
-  const withSeatedText = <F extends Partial<Record<PreviewKey, FieldValue>>>(
+  const withSeatedText = <F extends Partial<Record<PreviewKey, FieldValue | undefined>>>(
     fields: F,
     seatedValues = previewed,
   ): F => {
@@ -1505,7 +1518,10 @@ export function useWorkbenchState() {
   /** The record ids of the link the schema refuses, left out of the load (`droppedIds`). */
   const [dropped, setDropped] = useState<string[]>([])
   /** What a link carried of its bullet and powder records, with their ids. */
-  const [linked, setLinked] = useState<{ bullet?: LinkedBullet; powder?: LinkedPowder }>({})
+  const [linked, setLinked] = useState<{
+    bullet?: LinkedBullet | undefined
+    powder?: LinkedPowder | undefined
+  }>({})
   // the link's values while its record is asked for, loading or missing
   const linkedBullet = pendingLink(bullet, asked.bullet?.id, linked.bullet)
   const linkedPowder = pendingLink(powder, asked.powder?.id, linked.powder)
@@ -1726,7 +1742,7 @@ export function useWorkbenchState() {
   /** The steps of the seating ladder from the seating field, or what stops it, in the shown units. */
   function seatingPlan(shown = system) {
     const start = seatAt && seated[seatAt.lengthKind]
-    const step = seatStep.seatStep.si
+    const step = seatStep.seatStep?.si
     if (!seatAt || step === undefined)
       return { error: seatingBlock ?? `${seatingStepSpec.label} is empty.` }
     const show = (m: number) => withUnit('length', shown, m)
@@ -1741,9 +1757,9 @@ export function useWorkbenchState() {
 
   /** The propellant temperatures of the temperature ladder from the Powder temperature field, or what stops it. */
   function temperaturePlan(shown = system) {
-    const step = tempStep.tempStep.si
+    const step = tempStep.tempStep?.si
     if (step === undefined) return { error: `${temperatureStepSpec.label} is empty.` }
-    return temperatureLadder(fields.propellantTemperature.si, step, ladderSteps, direction, (k) =>
+    return temperatureLadder(fields.propellantTemperature?.si, step, ladderSteps, direction, (k) =>
       withUnit('temperature', shown, k),
     )
   }
@@ -1877,8 +1893,8 @@ export function useWorkbenchState() {
     runs.current += 1
     const ok = {
       kind: 'ok' as const,
-      body: steps[first].body as InteriorResponse,
-      load: stepLoad(body.load, steps[first]),
+      body: nth(steps, first).body as InteriorResponse,
+      load: stepLoad(body.load, nth(steps, first)),
       steps,
       selected: first,
       direction,
@@ -1920,7 +1936,7 @@ export function useWorkbenchState() {
     const bandController = new AbortController()
     bandRequest.current = bandController
     void fetchBand(
-      { ...body, load: stepLoad(body.load, steps[first]), sampling: {} },
+      { ...body, load: stepLoad(body.load, nth(steps, first)), sampling: {} },
       bandController.signal,
     ).then((sampled) => {
       if (!bandController.signal.aborted) setOutcome((o) => withBand(o, ok.id, first, sampled))
@@ -1951,7 +1967,7 @@ export function useWorkbenchState() {
       return
     }
     const plan = planned && planRows(ladderKind, planned.steps)
-    const request = ladderRequest(body, plan, ladderSteps, ladder.ladderStep.si, direction)
+    const request = ladderRequest(body, plan, ladderSteps, ladder.ladderStep?.si, direction)
     const controller = new AbortController()
     running.current = controller
     setPending(true)
@@ -2024,7 +2040,7 @@ export function useWorkbenchState() {
     // a record arriving later marks the load changed and would abort the run: wait for them all
     const loading = Object.values(asked).some((a) => a && !a.failed)
     // the run keeps the seated figure the chart's barrel strip draws; the example seats its bullet
-    if (!runWhenFilled || fields.charge.si === undefined || loading || !seated.figure) return
+    if (!runWhenFilled || fields.charge?.si === undefined || loading || !seated.figure) return
     setRunWhenFilled(false)
     run()
   }, [runWhenFilled, fields, asked, seated.figure])
@@ -2107,7 +2123,7 @@ export function useWorkbenchState() {
     setDefaults(d)
     setDefaulted(new Set(missing))
     // a link follows the defaults of the fields it leaves out; a file opens as saved
-    setFollowed(new Set(withDefaults ? followKeys.filter((k) => linked[k].si === undefined) : []))
+    setFollowed(new Set(withDefaults ? followKeys.filter((k) => linked[k]?.si === undefined) : []))
     form.setValues(linked)
     // a linked value outside its bounds shows as written with its error
     form.setErrors(fieldErrorsOf(linked, system))
@@ -2136,10 +2152,15 @@ export function useWorkbenchState() {
     const firearmId = query.get('firearm')
     if (firearmId && firearmId.length <= 64) setFirearm(firearmId)
     gunFromFirearm.current = false
-    const { firearmMass } = queryFields(query, [firearmMassSpec], system, fixedFieldText)
+    const { firearmMass = emptyStep } = queryFields(
+      query,
+      [firearmMassSpec],
+      system,
+      fixedFieldText,
+    )
     setGunFields({ firearmMass: (firearmMass.si ?? 0) > 0 ? firearmMass : emptyStep })
     const own = queryFields(query, [measuredWaterCapacitySpec], system, fixedFieldText)
-    if ((own.measuredWaterCapacity.si ?? 0) > 0) {
+    if ((own.measuredWaterCapacity?.si ?? 0) > 0) {
       setMeasured(own)
       setMeasuredFor(linkedId(query.get('cartridge')))
     }

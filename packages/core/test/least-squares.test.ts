@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { nth } from '../src/errors.ts'
 import { identifiability, logLeastSquares } from '../src/least-squares.ts'
 
 describe('shared least-squares loop', () => {
@@ -12,7 +13,9 @@ describe('shared least-squares loop', () => {
       weighted: true,
       floor: [0],
       first: [1],
-      predict: ([trial], [current]) => {
+      predict: (theta, accepted) => {
+        const trial = nth(theta, 0)
+        const current = nth(accepted, 0)
         const ok = trial <= 1.5
         // Jacobian calls sit one central-difference step (1e-3) from the accepted iterate
         if (Math.abs(Math.abs(trial - current) - 1e-3) > 1e-12)
@@ -25,7 +28,7 @@ describe('shared least-squares loop', () => {
         throw new Error(reason)
       },
     })
-    expect(Math.abs(r.theta[0] - 1)).toBeLessThan(1e-8)
+    expect(Math.abs(nth(r.theta, 0) - 1)).toBeLessThan(1e-8)
     const rejected = candidates.filter((c) => !c.ok)
     expect(rejected.length).toBeGreaterThan(0)
     expect(r.iterations).toBeGreaterThan(candidates.length - rejected.length)
@@ -36,8 +39,11 @@ describe('shared least-squares loop', () => {
 
   it('reports the weak direction of an ill-conditioned fit', () => {
     // y depends on theta_0 - theta_1 only: J d = 0 for d = (1, 1)/sqrt(2)
-    const at = (t: number[]) => [Math.exp(t[0] - t[1]), 2 * Math.exp(t[0] - t[1])]
-    let failure: { reason: string; direction?: number[] } | undefined
+    const at = (t: number[]) => [
+      Math.exp(nth(t, 0) - nth(t, 1)),
+      2 * Math.exp(nth(t, 0) - nth(t, 1)),
+    ]
+    let failure: { reason: string; direction?: number[] | undefined } | undefined
     try {
       logLeastSquares({
         parameterCount: 2,
@@ -56,14 +62,17 @@ describe('shared least-squares loop', () => {
       })
     } catch {}
     expect(failure?.reason).toBe('ill-conditioned')
-    const [d0, d1] = failure?.direction ?? []
+    const direction = failure?.direction ?? []
+    const d0 = nth(direction, 0)
+    const d1 = nth(direction, 1)
     expect(Math.abs(Math.abs(d0) - Math.SQRT1_2)).toBeLessThan(1e-9)
     expect(Math.abs(d0 - d1)).toBeLessThan(1e-9)
   })
 
   it('evaluates a run only for the parameters that move it', () => {
     // run 0: y = exp(t0 + t1); run 1: y = exp(t1); parameter 0 does not move run 1
-    const run = (t: number[], k: number) => (k === 0 ? [Math.exp(t[0] + t[1])] : [Math.exp(t[1])])
+    const run = (t: number[], k: number) =>
+      k === 0 ? [Math.exp(nth(t, 0) + nth(t, 1))] : [Math.exp(nth(t, 1))]
     const calls: { k: number; moved: number }[] = []
     const r = logLeastSquares({
       parameterCount: 2,
@@ -85,8 +94,8 @@ describe('shared least-squares loop', () => {
         throw new Error(reason)
       },
     })
-    expect(Math.abs(r.theta[0] - 0.5)).toBeLessThan(1e-6)
-    expect(Math.abs(r.theta[1] - 0.5)).toBeLessThan(1e-6)
+    expect(Math.abs(nth(r.theta, 0) - 0.5)).toBeLessThan(1e-6)
+    expect(Math.abs(nth(r.theta, 1) - 0.5)).toBeLessThan(1e-6)
     expect(calls.some((c) => c.k === 1 && c.moved === 1)).toBe(true)
     expect(calls.some((c) => c.k === 1 && c.moved === 0)).toBe(false)
   })
@@ -94,9 +103,10 @@ describe('shared least-squares loop', () => {
   it('reuses the accepted prediction and Jacobian at the solution', () => {
     // y_i = 2 e^t0 exp(-0.3 e^t1 x_i) with fixed noise; the loop ends on a step below 1e-8
     const xs = [0, 1, 2, 3, 4, 5]
-    const model = (t: number[]) => xs.map((x) => 2 * Math.exp(t[0] - 0.3 * Math.exp(t[1]) * x))
+    const model = (t: number[]) =>
+      xs.map((x) => 2 * Math.exp(nth(t, 0) - 0.3 * Math.exp(nth(t, 1)) * x))
     const noise = [1, -1, 0.5, -1.5, 0.8, 0.3]
-    const observed = model([0.4, -0.2]).map((v, i) => v + 0.01 * noise[i])
+    const observed = model([0.4, -0.2]).map((v, i) => v + 0.01 * nth(noise, i))
     const returned: (readonly number[])[] = []
     let calls = 0
     const r = logLeastSquares({
@@ -138,10 +148,10 @@ describe('identifiability', () => {
     const r = identifiability(jac(rho))
     expect(r.varianceInflation[0]).toBeCloseTo(1 / (1 - rho * rho), 9)
     expect(r.conditionNumber ** 2).toBeCloseTo((1 + rho) / (1 - rho), 9)
-    expect(r.correlation[0][1]).toBeCloseTo(-rho, 12)
+    expect(nth(r.correlation, 0)[1]).toBeCloseTo(-rho, 12)
     expect(r.conditionalSigma).toEqual([1, 1])
     expect(r.standardUncertainty[0]).toBeCloseTo(
-      r.conditionalSigma[0] * Math.sqrt(r.varianceInflation[0]),
+      nth(r.conditionalSigma, 0) * Math.sqrt(nth(r.varianceInflation, 0)),
       12,
     )
   })

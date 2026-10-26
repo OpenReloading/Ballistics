@@ -3,7 +3,10 @@
  * (`apps/docs/docs/models/exterior-point-mass.md`, "Numerical method"; Dormand and Prince 1980; Hairer,
  * Norsett and Wanner 1993, sections II.4 to II.6). Generic over the state length.
  */
-import { InputError } from '../errors.ts'
+import { InputError, nth } from '../errors.ts'
+
+/** Unchecked read of a state vector the caller sizes and indexes by the same count (kept in this module so the integrator loops inline it). */
+const el = (a: Float64Array, i: number): number => a[i] as number
 
 /** Right-hand side: writes dy/dt at (t, y) into `dy`. */
 export type Rhs = (t: number, y: Float64Array, dy: Float64Array) => void
@@ -27,13 +30,13 @@ export interface Rk45Options {
   /** Accepted plus rejected steps before the call fails, counting `stepsBefore`. */
   maxSteps: number
   /** Steps already taken by earlier calls of the same run; default 0. */
-  stepsBefore?: number
+  stepsBefore?: number | undefined
   /** Shared by several calls: each step adds 1 to `used`; a call fails once `used` is `max`. */
-  budget?: StepBudget
+  budget?: StepBudget | undefined
   /** The call ends at this time (s) when no terminal event comes first. */
   maxTime: number
   /** First step size, s; estimated when absent. */
-  initialStep?: number
+  initialStep?: number | undefined
 }
 
 /** Step count shared by several `rk45` calls of one run. */
@@ -189,25 +192,38 @@ function dormandPrinceStep(
   absoluteTolerance: number,
 ): number {
   const { n, k1, k2, k3, k4, k5, k6, k7, tmp } = work
-  for (let i = 0; i < n; i++) tmp[i] = y[i] + h * a21 * k1[i]
+  for (let i = 0; i < n; i++) tmp[i] = el(y, i) + h * a21 * el(k1, i)
   f(t + c2 * h, tmp, k2)
-  for (let i = 0; i < n; i++) tmp[i] = y[i] + h * (a31 * k1[i] + a32 * k2[i])
+  for (let i = 0; i < n; i++) tmp[i] = el(y, i) + h * (a31 * el(k1, i) + a32 * el(k2, i))
   f(t + c3 * h, tmp, k3)
-  for (let i = 0; i < n; i++) tmp[i] = y[i] + h * (a41 * k1[i] + a42 * k2[i] + a43 * k3[i])
+  for (let i = 0; i < n; i++)
+    tmp[i] = el(y, i) + h * (a41 * el(k1, i) + a42 * el(k2, i) + a43 * el(k3, i))
   f(t + c4 * h, tmp, k4)
   for (let i = 0; i < n; i++)
-    tmp[i] = y[i] + h * (a51 * k1[i] + a52 * k2[i] + a53 * k3[i] + a54 * k4[i])
+    tmp[i] = el(y, i) + h * (a51 * el(k1, i) + a52 * el(k2, i) + a53 * el(k3, i) + a54 * el(k4, i))
   f(t + c5 * h, tmp, k5)
   for (let i = 0; i < n; i++)
-    tmp[i] = y[i] + h * (a61 * k1[i] + a62 * k2[i] + a63 * k3[i] + a64 * k4[i] + a65 * k5[i])
+    tmp[i] =
+      el(y, i) +
+      h * (a61 * el(k1, i) + a62 * el(k2, i) + a63 * el(k3, i) + a64 * el(k4, i) + a65 * el(k5, i))
   f(t + h, tmp, k6)
   for (let i = 0; i < n; i++)
-    out[i] = y[i] + h * (a71 * k1[i] + a73 * k3[i] + a74 * k4[i] + a75 * k5[i] + a76 * k6[i])
+    out[i] =
+      el(y, i) +
+      h * (a71 * el(k1, i) + a73 * el(k3, i) + a74 * el(k4, i) + a75 * el(k5, i) + a76 * el(k6, i))
   f(t + h, out, k7)
   return rms(n, (i) => {
-    const err = h * (e1 * k1[i] + e3 * k3[i] + e4 * k4[i] + e5 * k5[i] + e6 * k6[i] + e7 * k7[i])
+    const err =
+      h *
+      (e1 * el(k1, i) +
+        e3 * el(k3, i) +
+        e4 * el(k4, i) +
+        e5 * el(k5, i) +
+        e6 * el(k6, i) +
+        e7 * el(k7, i))
     return (
-      err / (absoluteTolerance + relativeTolerance * Math.max(Math.abs(y[i]), Math.abs(out[i])))
+      err /
+      (absoluteTolerance + relativeTolerance * Math.max(Math.abs(el(y, i)), Math.abs(el(out, i))))
     )
   })
 }
@@ -222,13 +238,13 @@ function startingStep(
   absoluteTolerance: number,
 ): number {
   const { n, k1, k2, tmp } = work
-  const sc = (i: number) => absoluteTolerance + relativeTolerance * Math.abs(y[i])
-  const dy0 = rms(n, (i) => y[i] / sc(i))
-  const df0 = rms(n, (i) => k1[i] / sc(i))
+  const sc = (i: number) => absoluteTolerance + relativeTolerance * Math.abs(el(y, i))
+  const dy0 = rms(n, (i) => el(y, i) / sc(i))
+  const df0 = rms(n, (i) => el(k1, i) / sc(i))
   const h0 = dy0 < 1e-5 || df0 < 1e-5 ? 1e-6 : (0.01 * dy0) / df0
-  for (let i = 0; i < n; i++) tmp[i] = y[i] + h0 * k1[i]
+  for (let i = 0; i < n; i++) tmp[i] = el(y, i) + h0 * el(k1, i)
   f(t + h0, tmp, k2)
-  const d2 = rms(n, (i) => (k2[i] - k1[i]) / sc(i)) / h0
+  const d2 = rms(n, (i) => (el(k2, i) - el(k1, i)) / sc(i)) / h0
   const dmax = Math.max(df0, d2)
   return Math.min(100 * h0, dmax <= 1e-15 ? Math.max(1e-6, h0 * 1e-3) : (0.01 / dmax) ** 0.2)
 }
@@ -242,15 +258,23 @@ function denseOutput(
 ): (s: number) => Float64Array {
   const { n, k1, k3, k4, k5, k6, k7, r2, r3, r4, r5 } = work
   for (let i = 0; i < n; i++) {
-    r2[i] = ynew[i] - y[i]
-    r3[i] = h * k1[i] - r2[i]
-    r4[i] = r2[i] - h * k7[i] - r3[i]
-    r5[i] = h * (d1 * k1[i] + d3 * k3[i] + d4 * k4[i] + d5 * k5[i] + d6 * k6[i] + d7 * k7[i])
+    r2[i] = el(ynew, i) - el(y, i)
+    r3[i] = h * el(k1, i) - el(r2, i)
+    r4[i] = el(r2, i) - h * el(k7, i) - el(r3, i)
+    r5[i] =
+      h *
+      (d1 * el(k1, i) +
+        d3 * el(k3, i) +
+        d4 * el(k4, i) +
+        d5 * el(k5, i) +
+        d6 * el(k6, i) +
+        d7 * el(k7, i))
   }
   return (s: number): Float64Array => {
     const out = new Float64Array(n)
     for (let i = 0; i < n; i++)
-      out[i] = y[i] + s * (r2[i] + (1 - s) * (r3[i] + s * (r4[i] + (1 - s) * r5[i])))
+      out[i] =
+        el(y, i) + s * (el(r2, i) + (1 - s) * (el(r3, i) + s * (el(r4, i) + (1 - s) * el(r5, i))))
     return out
   }
 }
@@ -271,13 +295,14 @@ function locateEvents(
 ): { i: number; s: number } | null {
   const tol = minStep / h
   const roots = crossed.map((i) => {
-    const s = root((x) => events[i].eventFunction(t + x * h, dense(x)), gPrev[i], gNew[i], tol)
+    const { eventFunction } = nth(events, i)
+    const s = root((x) => eventFunction(t + x * h, dense(x)), nth(gPrev, i), nth(gNew, i), tol)
     return { i, s }
   })
   let stop: { i: number; s: number } | null = null
-  for (const r of roots) if (events[r.i].terminal && (!stop || r.s < stop.s)) stop = r
+  for (const r of roots) if (nth(events, r.i).terminal && (!stop || r.s < stop.s)) stop = r
   for (const r of roots.sort((p, q) => p.s - q.s)) {
-    if (events[r.i].terminal || (stop && r.s > stop.s)) continue
+    if (nth(events, r.i).terminal || (stop && r.s > stop.s)) continue
     hits.push({ event: r.i, t: t + r.s * h, y: dense(r.s) })
   }
   return stop
@@ -315,8 +340,8 @@ function checkStepLimits(steps: number, options: Rk45Options) {
 /** The events whose function changed sign over the step, in the direction they watch. */
 function crossedEvents(events: readonly Rk45Event[], gPrev: number[], gNew: number[]) {
   const crossed: number[] = []
-  for (let i = 0; i < events.length; i++)
-    if (crosses(gPrev[i], gNew[i], events[i].direction)) crossed.push(i)
+  for (const [i, event] of events.entries())
+    if (crosses(nth(gPrev, i), nth(gNew, i), event.direction)) crossed.push(i)
   return crossed
 }
 

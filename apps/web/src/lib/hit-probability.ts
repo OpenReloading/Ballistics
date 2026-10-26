@@ -1,5 +1,6 @@
 import type { ScoringZone, TrajectoryPoint } from '@open-reloading/core'
 import { type TargetFace, toSi } from '@open-reloading/schema'
+import { nth } from './nth.ts'
 
 /**
  * The scoring zones of a face for a hole of diameter `hole` m, outermost first: each ring grown by
@@ -32,11 +33,12 @@ export function impactSensitivity(
   windHold: readonly number[],
   i: number,
 ): ImpactSensitivity | undefined {
-  if (points.length < 2 || !points[i]) return undefined
-  const a = points[Math.max(0, i - 1)]
-  const b = points[Math.min(points.length - 1, i + 1)]
+  const at = points[i]
+  if (points.length < 2 || !at) return undefined
+  const a = nth(points, Math.max(0, i - 1))
+  const b = nth(points, Math.min(points.length - 1, i + 1))
   return {
-    perCrosswind: (windHold[i] ?? 0) * points[i].range,
+    perCrosswind: (windHold[i] ?? 0) * at.range,
     verticalPerMetre: (b.height - a.height) / (b.range - a.range),
   }
 }

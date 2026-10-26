@@ -15,6 +15,7 @@ import {
   lots,
 } from '../src/lib/lot-rows.ts'
 import { presetUnits } from '../src/lib/units.ts'
+import { defined } from './defined.ts'
 
 const filled = exampleFields(interiorFields, exampleInterior, presetUnits('us'))
 const { load } = interiorBody(siValues(filled), exampleRecords.cartridge.id)
@@ -24,7 +25,7 @@ const charges = chargeLadder(load.charge, step, steps, direction)
 /** The run of a body's ladder, as the API runs it: one model run per charge. */
 const ladderRuns = (body: ReturnType<typeof lotBody>) => {
   const { chargeStep, stepCount, direction: d } = body.ladder as NonNullable<typeof body.ladder>
-  return chargeLadder(body.load.charge, chargeStep, stepCount, d).map((charge) => {
+  return chargeLadder(defined(body.load.charge), chargeStep, stepCount, d).map((charge) => {
     const run = interior({ ...body.load, charge })
     if (run.valid === false) throw new Error(`run at ${charge} kg is invalid`)
     return run
@@ -45,12 +46,12 @@ describe('lot rows', () => {
   it('ask for the charges of the run', () => {
     const body = lotBody(load, charges, direction, 'high', 0.03)
     const asked = chargeLadder(
-      body.load.charge,
+      defined(body.load.charge),
       (body.ladder as NonNullable<typeof body.ladder>).chargeStep,
       steps,
       direction,
     )
-    for (const [i, c] of asked.entries()) expect(c).toBeCloseTo(charges[i], 12)
+    for (const [i, c] of asked.entries()) expect(c).toBeCloseTo(defined(charges[i]), 12)
   })
 
   it('scale the burn rate of the load alone', () => {
@@ -73,12 +74,12 @@ describe('lot rows', () => {
       const { low, nominal, high } = at(fraction)
       expect(nominal).toHaveLength(steps)
       nominal.forEach((n, i) => {
-        expect(high[i].muzzleVelocity).toBeGreaterThan(n.muzzleVelocity)
-        expect(low[i].muzzleVelocity).toBeLessThan(n.muzzleVelocity)
-        expect(high[i].peakBreechPressure).toBeGreaterThan(n.peakBreechPressure)
-        expect(low[i].peakBreechPressure).toBeLessThan(n.peakBreechPressure)
-        expect(high[i].barrelTime).toBeLessThan(n.barrelTime)
-        expect(low[i].barrelTime).toBeGreaterThan(n.barrelTime)
+        expect(defined(high[i]).muzzleVelocity).toBeGreaterThan(n.muzzleVelocity)
+        expect(defined(low[i]).muzzleVelocity).toBeLessThan(n.muzzleVelocity)
+        expect(defined(high[i]).peakBreechPressure).toBeGreaterThan(n.peakBreechPressure)
+        expect(defined(low[i]).peakBreechPressure).toBeLessThan(n.peakBreechPressure)
+        expect(defined(high[i]).barrelTime).toBeLessThan(n.barrelTime)
+        expect(defined(low[i]).barrelTime).toBeGreaterThan(n.barrelTime)
       })
     })
   }
@@ -88,7 +89,7 @@ describe('lot rows', () => {
     small.nominal.forEach((_, i) => {
       for (const quantity of ['muzzleVelocity', 'peakBreechPressure', 'barrelTime'] as const) {
         const spread = (r: ReturnType<typeof at>) =>
-          Math.abs(r.high[i][quantity] - r.low[i][quantity])
+          Math.abs(defined(r.high[i])[quantity] - defined(r.low[i])[quantity])
         expect(spread(large)).toBeGreaterThan(spread(small))
       }
     })

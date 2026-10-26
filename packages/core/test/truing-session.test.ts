@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { nth } from '../src/errors.ts'
 import {
   comparePlanCandidates,
   fitTruingStrings,
@@ -68,7 +69,7 @@ describe('zero offset', () => {
       ...planOf([100], []),
       chronograph: undefined,
     })
-    expect(plain.parameters[0].status).toBe('unresolved')
+    expect(nth(plain.parameters, 0).status).toBe('unresolved')
     const on = planTruingStrings({ ...planOf([100], []), chronograph: undefined }, options)
     expect(find(on, 'zeroOffset').status).not.toBe('unresolved')
   })
@@ -330,17 +331,17 @@ describe('comparePlanCandidates', () => {
     const plans = comparePlanCandidates(input, candidates)
     expect(plans.map((p) => p.name)).toEqual(['short', 'two', 'full'])
     expect(plans.map((p) => p.shotCount)).toEqual([5, 10, 40])
-    expect(plans[0].plan.parameters.some((p) => p.status === 'weak')).toBe(true)
-    expect(plans[2].plan.parameters.every((p) => p.status === 'identified')).toBe(true)
+    expect(nth(plans, 0).plan.parameters.some((p) => p.status === 'weak')).toBe(true)
+    expect(nth(plans, 2).plan.parameters.every((p) => p.status === 'identified')).toBe(true)
   })
 
   it('matches planTruingStrings for the same candidate', () => {
-    const [, , full] = comparePlanCandidates(input, candidates)
+    const full = nth(comparePlanCandidates(input, candidates), 2)
     expect(full.plan).toEqual(
       planTruingStrings({
         ...input,
-        entries: candidates[2].entries,
-        chronograph: candidates[2].chronograph,
+        entries: nth(candidates, 2).entries,
+        chronograph: nth(candidates, 2).chronograph,
       }),
     )
   })
@@ -351,15 +352,18 @@ describe('comparePlanCandidates', () => {
 
   it('predicts the interval widths the fit reports', () => {
     const options = { fitZeroOffset: true, priors: { zeroOffset: 0.3e-3, muzzleVelocity: 0.02 } }
-    const [full] = comparePlanCandidates(
-      input,
-      [
-        {
-          entries: planOf(impacts, dials).entries,
-          chronograph: { shotCount: 10, standardDeviation: 4 },
-        },
-      ],
-      options,
+    const full = nth(
+      comparePlanCandidates(
+        input,
+        [
+          {
+            entries: planOf(impacts, dials).entries,
+            chronograph: { shotCount: 10, standardDeviation: 4 },
+          },
+        ],
+        options,
+      ),
+      0,
     )
     const fit = fitTruingStrings(strings(base, normals(3)), options)
     for (const p of full.plan.parameters) {
@@ -383,7 +387,7 @@ describe('comparePlanCandidates', () => {
       },
     ])
     const width = (i: number) => {
-      const iv = find(plans[i].plan, 'dragFactor').interval as { lower: number; upper: number }
+      const iv = find(nth(plans, i).plan, 'dragFactor').interval as { lower: number; upper: number }
       return Math.log(iv.upper / iv.lower)
     }
     expect(width(1)).toBeLessThan(width(0))

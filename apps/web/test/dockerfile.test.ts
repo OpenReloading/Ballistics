@@ -1,13 +1,14 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { posix } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { defined, missing } from './defined.ts'
 
 const repo = new URL('../../../', import.meta.url)
 const read = (path: string) => readFileSync(new URL(path, repo), 'utf8')
 
 /** The build stage of the web image: its COPY sources and RUN commands. */
 function buildStage(dockerfile: string) {
-  const stage = dockerfile.split(/^FROM /m)[1]
+  const stage = defined(dockerfile.split(/^FROM /m)[1])
   const lines = stage.replace(/\\\n/g, ' ').split('\n')
   return {
     copied: lines.flatMap((l) => (l.startsWith('COPY ') ? l.split(/\s+/).slice(1, -1) : [])),
@@ -23,7 +24,8 @@ function webImports(dir = 'apps/web'): Set<string> {
     const path = `${dir}/${entry.name}`
     if (entry.isDirectory()) for (const spec of webImports(path)) found.add(spec)
     else if (/\.(m?ts|tsx)$/.test(entry.name))
-      for (const [, spec] of read(path).matchAll(/'(@open-reloading\/[^']+)'/g)) found.add(spec)
+      for (const [, spec = missing()] of read(path).matchAll(/'(@open-reloading\/[^']+)'/g))
+        found.add(spec)
   }
   return found
 }
@@ -34,7 +36,7 @@ function reached(pkg: string, entries: string[]): Set<string> {
   const visit = (file: string) => {
     if (files.has(file)) return
     files.add(file)
-    for (const [, spec] of read(`packages/${pkg}/${file}`).matchAll(
+    for (const [, spec = missing()] of read(`packages/${pkg}/${file}`).matchAll(
       /(?:from|import)\s*\(?\s*'(\.[^']*)'/g,
     ))
       visit(posix.join(posix.dirname(file), spec))
@@ -66,7 +68,7 @@ describe('web image', () => {
   })
 
   it.each(imports)('builds %s', (spec) => {
-    const [, pkg, ...rest] = spec.split('/')
+    const [, pkg = missing(), ...rest] = spec.split('/')
     const manifest = JSON.parse(read(`packages/${pkg}/package.json`))
     const target: string = manifest.exports[rest.length ? `./${rest.join('/')}` : '.'].default
 

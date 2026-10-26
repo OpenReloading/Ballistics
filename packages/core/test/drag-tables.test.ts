@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { nth } from '../src/errors.ts'
 import { dragTables } from '../src/index.ts'
 
 describe('dragTables', () => {
@@ -22,7 +23,7 @@ describe('dragTables', () => {
     for (const table of Object.values(dragTables)) {
       table.forEach(([mach, cd], k) => {
         expect(cd).toBeGreaterThan(0)
-        if (k > 0) expect(mach).toBeGreaterThan(table[k - 1][0])
+        if (k > 0) expect(mach).toBeGreaterThan(nth(table, k - 1)[0])
       })
     }
   })

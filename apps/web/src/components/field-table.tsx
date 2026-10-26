@@ -56,7 +56,7 @@ export function Noted({
   inline?: boolean
   className?: string
   /** `inline` only: -1 for a symbol in a list with one tab stop. */
-  tabIndex?: number
+  tabIndex?: number | undefined
 }) {
   const id = useId()
   return (
@@ -343,7 +343,7 @@ export function FieldTable({
   groups,
 }: {
   caption: string
-  labelledBy?: string
+  labelledBy?: string | undefined
   groups: FieldGroup[]
 }) {
   const { system } = useUnits()

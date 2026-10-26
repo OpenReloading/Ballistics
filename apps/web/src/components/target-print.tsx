@@ -48,12 +48,12 @@ export function TargetPrint({
 }: {
   name: string
   sheet: TargetSheet
-  frame?: Frame
+  frame?: Frame | undefined
   box: ViewBox
-  photo?: { url: string; width: number; height: number }
+  photo?: { url: string; width: number; height: number } | undefined
   still: StillCanvas
   system: UnitSystem
-  summary?: LoadSummary
+  summary?: LoadSummary | undefined
   /** The printed photo, loaded before the print starts. */
   photoRef: Ref<HTMLImageElement>
   /** A group's ring score as one line, when it has a face. */

@@ -7,6 +7,7 @@ import { dynamicVivacity, meanDynamicVivacity, type VivacityBurn } from '@open-r
 import { type Powder, toSi } from '@open-reloading/schema'
 import type { PowderSummary } from './api-types.ts'
 import { type ManufacturerNames, productLabel } from './manufacturers.ts'
+import { nth } from './nth.ts'
 import { formatNumber } from './units.ts'
 
 /** Dash pattern per colour slot of the burn-rate charts: identity is not carried by colour alone. */
@@ -21,11 +22,11 @@ export interface FittedPowder {
   label: string
   /** Id of the manufacturer record; empty for typed parameters. */
   manufacturer: string
-  form?: string
-  base?: string
+  form?: string | undefined
+  base?: string | undefined
   burn: VivacityBurn
   /** `uncertaintyFactor` times sigma / vivacity; absent when the record has no sigma. */
-  spread?: number
+  spread?: number | undefined
 }
 
 /** Why a powder has no curve: no fit, a pressure exponent other than 1, an interval reaching 0. */
@@ -42,8 +43,8 @@ export interface UnfittedPowder {
 
 interface RateInterval {
   value: number
-  low?: number
-  high?: number
+  low?: number | undefined
+  high?: number | undefined
 }
 
 const noFitReason =
@@ -194,7 +195,7 @@ function meanText(p: FittedPowder): string {
 export function describeCurve(p: FittedPowder): string {
   const values = chartBurntFractions.map((z) => curveAt(p, z).value)
   const peak = values.indexOf(Math.max(...values))
-  return `Dynamic vivacity of ${p.label} over burnt fraction 0 to 1: ${n2(values[0])} ${vivacityUnit} at z 0, highest ${n2(values[peak])} at z ${formatNumber(chartBurntFractions[peak], 2)}, ${n2(values.at(-1) ?? 0)} at z 1. Mean over z 0.1 to 0.9: ${meanText(p)}.`
+  return `Dynamic vivacity of ${p.label} over burnt fraction 0 to 1: ${n2(nth(values, 0))} ${vivacityUnit} at z 0, highest ${n2(values[peak] ?? Number.NaN)} at z ${formatNumber(chartBurntFractions[peak] ?? Number.NaN, 2)}, ${n2(values.at(-1) ?? 0)} at z 1. Mean over z 0.1 to 0.9: ${meanText(p)}.`
 }
 
 /** The sentence of each group of powders without a curve. */
@@ -221,12 +222,12 @@ export interface PowderRow {
   /** Other names of the manufacturer, searched by the list. */
   manufacturerAliases?: string[]
   name: string
-  grainForm?: string
-  propellantBase?: string
+  grainForm?: string | undefined
+  propellantBase?: string | undefined
   /** Mean dynamic vivacity with its interval, 1/(MPa s); absent without a curve. */
-  meanVivacity?: number
-  low?: number
-  high?: number
+  meanVivacity?: number | undefined
+  low?: number | undefined
+  high?: number | undefined
   /** 1 for the fastest fitted powder; kept when a filter hides others. */
   burnRateOrder?: number
 }

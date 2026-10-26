@@ -1,10 +1,12 @@
 /** `POST /interior`: one run or a charge ladder of the M3 model, with range, limits and warnings. */
 import {
   chargeLadder,
+  overlay,
   type PressureRange,
   type PressureTolerances,
   pressureToleranceDefaults,
   type SampledBand,
+  type SamplingOptions,
 } from '@open-reloading/core'
 import { assertFinite, notice, unprocessable } from './answer.ts'
 import { type InteriorBody, m3Options, maxPoints, samplingDefaults } from './interior-schema.ts'
@@ -40,11 +42,18 @@ type Run =
   | {
       result: unknown
       pressureRange: PressureRange
-      sampled?: SampledBand
+      sampled?: SampledBand | undefined
       limits?: unknown
       warnings: unknown
     }
-  | { error: { message: string; reason?: string; field?: string; flags?: unknown } }
+  | {
+      error: {
+        message: string
+        reason?: string | undefined
+        field?: string | undefined
+        flags?: unknown
+      }
+    }
 
 /** The `resolved` part of an interior answer, set by a valid run. */
 type Resolved = { cartridge?: ResolvedCartridge }
@@ -71,7 +80,8 @@ type RunSetup = {
 /** The runs of an M3 body by charge. */
 function m3Runner(body: InteriorBody, { compute, cartridge, tolerances, resolved }: RunSetup) {
   const options = m3Options(caps.interiorSteps, body.options)
-  const sampling = body.sampling && { ...samplingDefaults, ...body.sampling }
+  const sampling =
+    body.sampling && overlay<Omit<SamplingOptions, 'now'>>(samplingDefaults, body.sampling)
   return async (charge: number): Promise<Run> => {
     const load = { ...body.load, charge }
     const { result, range, sampled } = await compute.run({
@@ -172,7 +182,7 @@ export async function runInterior(
   const cartridge =
     known ??
     (body.cartridge === undefined ? undefined : await context.findCartridge(body.cartridge))
-  const tolerances = { ...pressureToleranceDefaults, ...body.tolerances }
+  const tolerances = overlay(pressureToleranceDefaults, body.tolerances)
   const { ladder } = body
   const charges =
     ladder &&

@@ -89,7 +89,7 @@ export function rangeCardFacts(
 /** What the card adds to a trajectory table: the optic's turret click and the wind brackets. */
 export interface RangeCardExtras {
   /** Angle of one turret click, rad: the elevation and wind holds are also given in clicks. */
-  click?: number
+  click?: number | undefined
   /** Windage hold per 1 m/s and per 1 mph of crosswind at each point, rad. */
   wind?: { mps: number[]; mph: number[] }
 }

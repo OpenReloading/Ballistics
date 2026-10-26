@@ -45,13 +45,13 @@ export interface OpenApiDocument {
 /** One operation: parameters, a JSON request body and the JSON responses by status. */
 interface OpenApiOperation {
   /** `<method><path words>`, for example `getBulletsById`; unique per operation. */
-  operationId?: string
+  operationId?: string | undefined
   /** The group of the route in the reference: one of `tags`. */
-  tags?: string[]
+  tags?: string[] | undefined
   /** One line on what the route answers. */
-  summary?: string
+  summary?: string | undefined
   /** What the route reads or computes. */
-  description?: string
+  description?: string | undefined
   parameters?: {
     name: string
     in: 'query' | 'path'
@@ -115,7 +115,8 @@ const tags = [
 ]
 
 const tagOf = (url: string) => {
-  const tag = tags.find((t) => t.segments.includes(segments(url)[0]))
+  const first = segments(url)[0]
+  const tag = tags.find((t) => t.segments.some((s) => s === first))
   if (!tag) throw new Error(`no tag for ${url}`)
   return tag.name
 }

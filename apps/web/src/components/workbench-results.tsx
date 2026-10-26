@@ -113,7 +113,7 @@ export const measuredSteps = (
     : undefined
 
 /** The ladder bar; before a run it shows the charge field's value. */
-export function ShownStrip({ name }: { name?: string } = {}) {
+export function ShownStrip({ name }: { name?: string | undefined } = {}) {
   const { ok, steps, stale, oneFlag, stepValue, select } = useResult()
   const { chargeText } = useInputEcho()
   return useMemo(
@@ -337,7 +337,7 @@ function RunLine({
   status: string
   echoed: boolean
   online: boolean
-  warnings: { text: string; name?: string }[] | undefined
+  warnings: { text: string; name?: string | undefined }[] | undefined
 }) {
   return (
     <div className="run-line">
@@ -411,7 +411,8 @@ function useTabFit(tab: ResultTab, setTab: (tab: ResultTab) => void, hasOutcome:
     const measure = () => {
       // a tab moved into the menu has no width: it keeps the one it was measured with
       row.querySelectorAll<HTMLElement>('[role="tab"]').forEach((t, i) => {
-        if (t.offsetWidth) widths.current.set(shownTabs[i][0], t.offsetWidth)
+        const tab = shownTabs[i]
+        if (tab && t.offsetWidth) widths.current.set(tab[0], t.offsetWidth)
       })
       setFit(
         resultTabsFit(

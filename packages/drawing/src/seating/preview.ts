@@ -19,17 +19,16 @@ export function previewDrawn(
   table: string | undefined,
   tip: number,
 ): Drawn<Side, Profile> | { missing: string[] } {
-  const [cartridge, chamber] = (['cartridge', 'chamber'] as const).map((side) =>
-    cipProfile(values, side, table),
-  )
+  const cartridge = cipProfile(values, 'cartridge', table)
+  const chamber = cipProfile(values, 'chamber', table)
   const missing = [
     ...('missing' in cartridge ? cartridge.missing.map((m) => `cartridge ${m}`) : []),
     ...('missing' in chamber ? chamber.missing.map((m) => `chamber ${m}`) : []),
   ]
   if ('missing' in cartridge || 'missing' in chamber) return { missing }
   const points = [...chamber.points]
-  const [r, z] = points[points.length - 1]
-  points[points.length - 1] = [r, Math.max(z, tip)]
+  const last = points.pop()
+  if (last) points.push([last[0], Math.max(last[1], tip)])
   return [
     { side: 'cartridge', p: bare(cartridge) },
     { side: 'chamber', p: bare({ ...chamber, points }) },

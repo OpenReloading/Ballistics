@@ -19,9 +19,9 @@ function checkDifferences(id: string, values: Values, conflicts: string[]) {
     for (const { symbol, value } of region.values) {
       count++
       expect(regionSymbols[region.name]).toContain(symbol)
-      const [c, ch] = (['cartridge', 'chamber'] as const).map(
-        (side) => storedValue(values, side, symbol)?.value as number,
-      )
+      const stored = (side: 'cartridge' | 'chamber') =>
+        storedValue(values, side, symbol)?.value as number
+      const [c, ch] = [stored('cartridge'), stored('chamber')]
       expect(value, `${id} ${symbol}`).toBe(Number((ch - c).toFixed(3)))
       if (value < 0) conflicts.push(`${id} ${symbol} ${value}`)
     }

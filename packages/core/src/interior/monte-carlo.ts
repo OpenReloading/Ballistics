@@ -4,6 +4,9 @@
  * draw and the 5th, 50th and 95th percentiles of the peak pressure and the muzzle velocity are reported.
  * It covers input tolerances only, not model error.
  */
+
+import type { Settings } from '../errors.ts'
+import { nth } from '../errors.ts'
 import { type InteriorLoad, type InteriorOptions, interior } from './model.ts'
 import {
   type ApplyTolerance,
@@ -84,7 +87,8 @@ function uniforms(seed: number): () => number {
 function percentile(sorted: number[], q: number) {
   const rank = q * (sorted.length - 1)
   const i = Math.floor(rank)
-  return sorted[i] + (rank - i) * ((sorted[i + 1] ?? sorted[i]) - sorted[i])
+  const low = nth(sorted, i)
+  return low + (rank - i) * ((sorted[i + 1] ?? low) - low)
 }
 
 const bandOf = (values: number[]): Percentiles => {
@@ -146,7 +150,7 @@ export function interiorSampledBand(
   load: InteriorLoad,
   tolerances: PressureTolerances,
   sampling: SamplingOptions,
-  options: Partial<InteriorOptions> = {},
+  options: Settings<InteriorOptions> = {},
 ): SampledBand {
   const run = (l: InteriorLoad) => {
     const r = interior(l, options)

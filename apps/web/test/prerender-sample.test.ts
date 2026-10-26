@@ -1,7 +1,8 @@
 import { expect, it } from 'vitest'
 import { isSampling, pickIds, sampleIds } from '../src/lib/prerender-sample.ts'
+import { defined } from './defined.ts'
 
-const first = (what: string) => sampleIds[what][0]
+const first = (what: string) => defined(defined(sampleIds[what])[0])
 const all = ['x-1', first('bullet'), 'x-2', '308-win', first('powder')]
 
 it('returns every id unless PRERENDER is exactly sample', () => {

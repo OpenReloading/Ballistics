@@ -15,7 +15,7 @@ export interface FieldSpec {
   key: string
   label: string
   /** Field help, shown as the field description. */
-  help?: string
+  help?: string | undefined
   quantity: Quantity
   required?: boolean
   /** Bounds in display units, only where they hold in every unit of the quantity. */
@@ -26,7 +26,7 @@ export interface FieldSpec {
   /** The value must be a whole number. */
   integer?: boolean
   /** Initial SI value. */
-  initial?: number
+  initial?: number | undefined
 }
 
 export type Fields = Record<string, FieldValue>

@@ -45,7 +45,7 @@ async function forward(request: Request, segments: string[], method: 'GET' | 'PO
     const res = await fetch(target, {
       method,
       headers: contentType ? { 'content-type': contentType } : {},
-      body,
+      ...(body !== undefined && { body }),
       signal: AbortSignal.timeout(15_000),
     })
     const headers = new Headers()

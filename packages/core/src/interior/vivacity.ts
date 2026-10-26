@@ -2,7 +2,7 @@
  * Dynamic vivacity of a vivacity burn law, `apps/docs/docs/models/interior-burn-forms.md`, "Dynamic vivacity": the burn rate per
  * pressure (1/p) dz/dt = B_a phi(z) / p_ref, in 1/(Pa s), for exponent 1.
  */
-import { need } from '../errors.ts'
+import { need, nth } from '../errors.ts'
 import { type Burn, burnForm } from './form.ts'
 
 /** A vivacity law whose form function is in z throughout (no `threeStage`, whose third stage is integrated in another variable). */
@@ -24,8 +24,10 @@ export function meanDynamicVivacity(burn: VivacityBurn, from = 0.1, to = 0.9): n
   const n = 64
   let sum = 0
   for (let k = 1; k < edges.length; k++) {
-    const [lo, h] = [edges[k - 1], (edges[k] - edges[k - 1]) / n]
-    let s = dynamicVivacity(burn, lo) + dynamicVivacity(burn, edges[k])
+    const lo = nth(edges, k - 1)
+    const hi = nth(edges, k)
+    const h = (hi - lo) / n
+    let s = dynamicVivacity(burn, lo) + dynamicVivacity(burn, hi)
     for (let i = 1; i < n; i++) s += (i % 2 ? 4 : 2) * dynamicVivacity(burn, lo + i * h)
     sum += (s * h) / 3
   }

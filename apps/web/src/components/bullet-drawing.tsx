@@ -39,7 +39,7 @@ export function BulletDrawing({
 }: {
   record: Bullet
   label: string
-  unit?: LengthUnit
+  unit?: LengthUnit | undefined
 }) {
   const p = recordProfile(record)
   if ('reason' in p)

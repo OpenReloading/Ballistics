@@ -3,6 +3,8 @@
 // Test .xls files written with Buffer, independent of the reader under test: BIFF8 records
 // ([MS-XLS] 2.1.4, 2.4) in a compound file ([MS-CFB] 2.2 to 2.6).
 
+import { defined } from './defined.ts'
+
 const BOF = 0x0809
 export const EOF = 0x000a
 const CONTINUE = 0x003c
@@ -140,7 +142,7 @@ class Records {
       const narrow = Math.min(this.room, codes.length - k)
       const high = codes.slice(k, k + narrow).some((c) => c > 0xff)
       const n = high ? Math.min(Math.floor(this.room / 2), codes.length - k) : narrow
-      this.current[flagPos] = (this.current[flagPos] & ~1) | (high ? 1 : 0)
+      this.current[flagPos] = (defined(this.current[flagPos]) & ~1) | (high ? 1 : 0)
       this.current.push(...chars(codes.slice(k, k + n), high))
       k += n
       first = false
@@ -219,7 +221,7 @@ interface WorkbookStreamOptions {
   /** Leave out the EOF of each worksheet. */
   noSheetEof?: boolean
   /** Extra strings at the end of the shared string table. */
-  strings?: (string | RichString)[]
+  strings?: (string | RichString)[] | undefined
 }
 
 /** A BIFF8 Workbook stream; every non-empty text is a LabelSst cell at its row and column. */
@@ -263,7 +265,7 @@ export function workbookStream(sheets: XlsSheet[], options: WorkbookStreamOption
       bof(0x0005, options.bofVersion),
       options.filePass ? record(0x002f, Buffer.alloc(6)) : Buffer.alloc(0),
       record(0x0042, u16(1200)),
-      ...sheets.map((s, i) => boundSheet(s, positions[i])),
+      ...sheets.map((s, i) => boundSheet(s, defined(positions[i]))),
       sst(strings, options.sstChunk),
       record(EOF),
     ])
@@ -382,7 +384,7 @@ function planCompound(streams: CompoundStream[], options: CompoundOptions): Comp
   const dirStart = run(dirSectors)
   const miniFatStart = run(miniFatSectors)
   const miniStart = run(miniSectors)
-  const starts = streams.map((_, i) => (big[i] ? run(bigSectors[i]) : undefined))
+  const starts = streams.map((_, i) => (big[i] ? run(defined(bigSectors[i])) : undefined))
   return {
     version,
     sectorSize,
@@ -436,8 +438,8 @@ function writeCompoundTables(
     }
     file.writeUInt32LE(d === difat - 1 ? ENDOFCHAIN : difatStart + d + 1, at + S - 4)
   }
-  for (let n = 0; n < table.length; n++) {
-    file.writeUInt32LE(table[n], offset(fatStart + Math.floor(n / per)) + 4 * (n % per))
+  for (const [n, entry] of table.entries()) {
+    file.writeUInt32LE(entry, offset(fatStart + Math.floor(n / per)) + 4 * (n % per))
   }
 }
 
@@ -470,7 +472,7 @@ function writeCompoundDirectory(
   const { miniStream, miniStart } = plan
   writeEntry(0, 'Root Entry', 5, miniStream.length ? miniStart : ENDOFCHAIN, miniStream.length)
   for (const [i, s] of streams.entries()) {
-    writeEntry(i + 1, s.name, 2, plan.starts[i] ?? plan.miniStarts[i], s.data.length)
+    writeEntry(i + 1, s.name, 2, plan.starts[i] ?? defined(plan.miniStarts[i]), s.data.length)
   }
 }
 
@@ -489,13 +491,14 @@ function writeCompoundData(
   for (const [i, s] of streams.entries()) {
     if (big[i] || !s.data.length) continue
     const n = Math.ceil(s.data.length / 64)
+    const start = defined(miniStarts[i])
     for (let k = 0; k < n; k++) {
-      miniTable[miniStarts[i] + k] = k === n - 1 ? ENDOFCHAIN : miniStarts[i] + k + 1
+      miniTable[start + k] = k === n - 1 ? ENDOFCHAIN : start + k + 1
     }
   }
-  for (let m = 0; m < miniTable.length; m++) {
+  for (const [m, entry] of miniTable.entries()) {
     const at = offset(plan.miniFatStart + Math.floor(m / per)) + 4 * (m % per)
-    file.writeUInt32LE(miniTable[m], at)
+    file.writeUInt32LE(entry, at)
   }
   if (plan.miniSectors) plan.miniStream.copy(file, offset(plan.miniStart))
 }

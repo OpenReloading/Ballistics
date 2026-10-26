@@ -18,8 +18,8 @@ const f = (v: number | undefined) => (v === undefined ? '' : formatNumber(v, 2))
  * one value column per powder for several.
  */
 export function CurveTable({ powders, caption }: { powders: FittedPowder[]; caption: string }) {
-  const one = powders.length === 1
-  const heads = one
+  const only = powders.length === 1 ? powders[0] : undefined
+  const heads = only
     ? [`Value, ${vivacityUnit}`, 'Low', 'High']
     : powders.map((p) => `${p.label}, ${vivacityUnit}`)
   return (
@@ -40,9 +40,9 @@ export function CurveTable({ powders, caption }: { powders: FittedPowder[]; capt
           {tableBurntFractions.map((z) => (
             <TableTr key={z}>
               <TableTh scope="row">{formatNumber(z, 1)}</TableTh>
-              {one
+              {only
                 ? (() => {
-                    const v = curveAt(powders[0], z)
+                    const v = curveAt(only, z)
                     return [v.value, v.low, v.high].map((x, i) => (
                       <TableTd key={heads[i]} className="num">
                         {f(x)}

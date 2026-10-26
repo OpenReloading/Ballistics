@@ -30,13 +30,13 @@ export const DesignerField = memo(function DesignerField({
   value: FieldValue
   help: string
   /** The state's flag kind; an error flags the field whatever its state. */
-  flag?: FieldFlag['kind']
+  flag?: FieldFlag['kind'] | undefined
   changed: boolean
-  error?: string
+  error?: string | undefined
   /** `none` where the grid's column header names the unit. */
-  unit?: 'text' | 'none'
+  unit?: 'text' | 'none' | undefined
   /** The drawing's symbol of the value, shown before the label; focus marks it in the drawing. */
-  symbol?: string
+  symbol?: string | undefined
   dispatch: (a: FieldAction) => void
 }) {
   // the message leads the help: the description, the label's title and the flag's tooltip

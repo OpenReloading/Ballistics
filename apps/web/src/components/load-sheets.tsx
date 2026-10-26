@@ -10,11 +10,11 @@ type SheetStep = {
   /** The step relative to the main charge, 0. */
   label: string
   charge: string
-  pressure?: string
-  ofMax?: string
-  velocity?: string
-  energy?: string
-  flag?: string
+  pressure?: string | undefined
+  ofMax?: string | undefined
+  velocity?: string | undefined
+  energy?: string | undefined
+  flag?: string | undefined
 }
 
 /**
@@ -31,11 +31,11 @@ export function LoadSheets({
 }: {
   title: string
   /** Printed after the date: that inputs changed since the run, values that are approximate. */
-  note?: string
+  note?: string | undefined
   /** Label and value rows: cartridge, bullet, powder, seating, firearm. */
   components: [string, string][]
   /** What the steps vary: the charge, or the length the bullet is seated by. */
-  by?: string
+  by?: string | undefined
   steps: SheetStep[]
 }) {
   // the portal target exists after mounting only (server render has no document)

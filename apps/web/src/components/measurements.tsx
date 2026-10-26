@@ -16,6 +16,7 @@ import {
   withCharge,
 } from '../lib/measurements.ts'
 import { newId } from '../lib/new-id.ts'
+import { nth } from '../lib/nth.ts'
 import { controlSize } from '../lib/theme.ts'
 import { formatNumber, type UnitSystem, withUnit } from '../lib/units.ts'
 import { ChronoFileInput } from './chrono-file-input.tsx'
@@ -27,7 +28,7 @@ import { useResult } from './workbench-context.ts'
 
 /** A step of the last run as the Measurements tab needs it. */
 /** `label`: the step relative to the main charge. */
-type MeasuredStep = SimulatedStep & { n: number; label?: string }
+type MeasuredStep = SimulatedStep & { n: number; label?: string | undefined }
 
 const columns = [
   'Series',
@@ -50,7 +51,17 @@ const chartName = 'Measured mean velocity and simulated muzzle velocity against 
 const shapes = ['circle', 'square', 'triangle', 'diamond'] as const
 type Shape = (typeof shapes)[number]
 
-function Marker({ shape, x, y, r = 5 }: { shape: Shape; x: number; y: number; r?: number }) {
+function Marker({
+  shape,
+  x,
+  y,
+  r = 5,
+}: {
+  shape: Shape
+  x: number
+  y: number
+  r?: number | undefined
+}) {
   if (shape === 'circle') return <circle cx={x} cy={y} r={r} />
   if (shape === 'square') return <rect x={x - r} y={y - r} width={2 * r} height={2 * r} />
   const points =
@@ -283,7 +294,7 @@ export function Measurements({
   const curve = simulatedCurve(runSteps)
   const plotted = sessions.map((s, k) => ({
     s,
-    shape: shapes[k % shapes.length],
+    shape: nth(shapes, k % shapes.length),
     rows: chargeRows(
       s.data.strings.map((str) => ({ charge: stringCharge(str), shots: str.shots })),
       runSteps,
@@ -305,7 +316,8 @@ export function Measurements({
       all.map((s) => {
         if (s.id !== id) return s
         const strings = [...s.data.strings]
-        strings[i] = withCharge(strings[i], value === '' ? undefined : Number(value))
+        const current = strings[i]
+        if (current) strings[i] = withCharge(current, value === '' ? undefined : Number(value))
         return { ...s, data: { ...s.data, strings } }
       }),
     )

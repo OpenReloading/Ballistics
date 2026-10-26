@@ -46,7 +46,11 @@ interface BulletProjectile {
  */
 export function bulletProjectile(
   record: Bullet,
-  ref: { dragModel: 'G1' | 'G7'; length?: number; aerodynamics?: Aerodynamics },
+  ref: {
+    dragModel: 'G1' | 'G7'
+    length?: number | undefined
+    aerodynamics?: Aerodynamics | undefined
+  },
 ): BulletProjectile {
   const bands = (record.ballisticCoefficients ?? [])
     .filter((c) => c.dragModel === ref.dragModel)

@@ -7,7 +7,13 @@ const label = 'Source code on GitHub'
  * The link to the source repository: an icon next to the theme switch in the top bar from
  * 75em, a labelled row in the phone drawer. Renders nothing without a URL.
  */
-export function RepositoryLink({ url, drawer }: { url?: string; drawer?: boolean }) {
+export function RepositoryLink({
+  url,
+  drawer,
+}: {
+  url?: string | undefined
+  drawer?: boolean | undefined
+}) {
   if (!url) return null
   if (drawer)
     return (

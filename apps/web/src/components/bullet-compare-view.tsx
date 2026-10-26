@@ -16,6 +16,7 @@ import {
   productLabel,
   withManufacturerName,
 } from '../lib/manufacturers.ts'
+import { nth } from '../lib/nth.ts'
 import { controlSize } from '../lib/theme.ts'
 import { BulletCompare } from './bullet-compare.tsx'
 import { description } from './bullet-drawing.tsx'
@@ -26,7 +27,15 @@ import { DataError, EmptyNote, Loading } from './states.tsx'
 import { TechnicalDrawing } from './technical-drawing.tsx'
 
 /** The compare view cannot show these ids: what is wrong and the way back to the list. */
-function Problem({ title, text, rest }: { title: string; text: string; rest?: string[] }) {
+function Problem({
+  title,
+  text,
+  rest,
+}: {
+  title: string
+  text: string
+  rest?: string[] | undefined
+}) {
   return (
     <EmptyNote
       icon={<WarningCircle size={24} aria-hidden="true" />}
@@ -58,14 +67,14 @@ function drawings(records: (Bullet & { manufacturerName: string })[], unit: Leng
   const { models, tallest } =
     drawn.length > 0 ? sharedScale(drawn, undefined, unit) : { models: [], tallest: 0 }
   return records.map((b, i) => {
-    const p = profiles[i]
+    const p = nth(profiles, i)
     if ('reason' in p)
       return (
         <Text component="p" inherit m={0} c="dimmed" fz="xs">
           No drawing: {p.reason}
         </Text>
       )
-    const model = models[drawn.indexOf(p)]
+    const model = nth(models, drawn.indexOf(p))
     const id = `${b.id}-compare`
     const title = `Outline, ${productLabel(b)}`
     return (
@@ -191,7 +200,7 @@ function CompareBody({
     <BulletCompare
       bullets={records}
       drawings={drawings(records, 'mm').map((mm, i) => (
-        <ByLengthUnit key={records[i].id} mm={mm} inch={inch[i]} />
+        <ByLengthUnit key={nth(records, i).id} mm={mm} inch={inch[i]} />
       ))}
     />
   )

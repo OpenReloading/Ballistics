@@ -1,5 +1,6 @@
 import * as face from './face.ts'
 import type { Annotation, SectionPoint } from './types.ts'
+import { pairs } from './vector.ts'
 
 /** A point of the part frame in mm: x along the axis from the head (z), y across it (signed r). */
 export type PartPoint = [x: number, y: number]
@@ -61,7 +62,8 @@ export function headFace(
   chamber: SectionPoint[],
   annotation: Annotation,
 ): [PartPoint, PartPoint] | undefined {
-  const head = chamber[1][0]
+  const head = chamber[1]?.[0]
+  if (head === undefined) return
   if (
     !annotation.dimensions.some(
       (d) => d.kind === 'diameter' && d.behindHeadFace && (d.radius as number) < head - 0.01,
@@ -84,8 +86,7 @@ export const edgeLines = (edges: number[], r: number) =>
 /** Radius of a half profile at z: the largest where it steps there, undefined outside it. */
 export function radiusAt(points: SectionPoint[], z: number): number | undefined {
   let found: number | undefined
-  for (let k = 1; k < points.length; k++) {
-    const [[r0, z0], [r1, z1]] = [points[k - 1], points[k]]
+  for (const [[r0, z0], [r1, z1]] of pairs(points)) {
     if (z < Math.min(z0, z1) - 1e-9 || z > Math.max(z0, z1) + 1e-9) continue
     const r = Math.abs(z1 - z0) < 1e-12 ? Math.max(r0, r1) : r0 + ((r1 - r0) * (z - z0)) / (z1 - z0)
     found = found === undefined ? r : Math.max(found, r)

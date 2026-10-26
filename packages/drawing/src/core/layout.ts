@@ -1,7 +1,7 @@
 import * as face from './face.ts'
 import type { PartPoint } from './section.ts'
 import { textWidth } from './text.ts'
-import type { Profile } from './types.ts'
+import type { Layout, Profile } from './types.ts'
 import { type LengthUnit, perUnit, scaleLength, unitNote } from './units.ts'
 
 /** The sides of one figure, each with its profile. */
@@ -30,7 +30,12 @@ export function axisReach(p: Profile): [number, number] {
 }
 
 /** Width of the drawing across the medium's page direction, in mm, with its margins. */
-export const frameWidth = (box: number[], medium: Medium, em: number, unit: LengthUnit = 'mm') =>
+export const frameWidth = (
+  box: Layout['box'],
+  medium: Medium,
+  em: number,
+  unit: LengthUnit = 'mm',
+) =>
   Math.max(
     (medium === 'screen' ? box[3] - box[1] : box[2] - box[0]) + 2 * face.frameMargin,
     textWidth(unitNote(unit), em) + 2 * face.frameMargin,

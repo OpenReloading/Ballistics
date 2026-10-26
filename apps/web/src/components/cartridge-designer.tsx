@@ -96,7 +96,7 @@ function helpText(
         return 'Not given'
     }
   })()
-  const meaning = s.meaning[0].toUpperCase() + s.meaning.slice(1)
+  const meaning = s.meaning.charAt(0).toUpperCase() + s.meaning.slice(1)
   return [`${meaning}. ${from}.`, ...notes].join(' ')
 }
 
@@ -128,7 +128,7 @@ const StartSearch = memo(function StartSearch({
 }: {
   start: (id: string) => void
   /** The record the design started from, shown in the empty field. */
-  chosen?: string
+  chosen?: string | undefined
 }) {
   return (
     <RecordSearch<CartridgeSummary>
@@ -203,7 +203,9 @@ function announcement(
   derivedText: string,
 ) {
   if (e.refusal) return `Drawing not updated: ${e.refusal.reason}`
-  const change = changed ? `${changed.label} ${design.fields[changed.key].text || 'cleared'}. ` : ''
+  const change = changed
+    ? `${changed.label} ${design.fields[changed.key]?.text || 'cleared'}. `
+    : ''
   return `${change}Drawing updated.${derivedText ? ` ${derivedText}.` : ''}`
 }
 
@@ -358,7 +360,7 @@ export function CartridgeDesigner() {
   useFieldUnits(
     [measuredWaterCapacitySpec],
     system,
-    (update) => setCapacity((f) => update({ measuredWaterCapacity: f }).measuredWaterCapacity),
+    (update) => setCapacity((f) => update({ measuredWaterCapacity: f }).measuredWaterCapacity ?? f),
     fixedFieldText,
   )
   const designName = design.origin ? `design from ${design.origin.title}` : 'new cartridge'
@@ -385,13 +387,15 @@ export function CartridgeDesigner() {
   const shotshell = design.table === 'VII'
   const field = (s: CartridgeFieldSpec) => {
     const state = e.states[s.key]
+    const value = design.fields[s.key]
+    if (!(state && value)) return null
     const changed = isChanged(state)
     return (
       <DesignerField
         key={s.key}
         spec={s}
         system={system}
-        value={design.fields[s.key]}
+        value={value}
         help={helpText(s, state, system, e.notes[s.key])}
         flag={fieldFlag(state)}
         changed={changed}
@@ -495,7 +499,7 @@ export function CartridgeDesigner() {
 
   // print: the drawing and the values, not the form
   const values = fieldSpecs.flatMap((s): FieldRow[] => {
-    const { si } = design.fields[s.key]
+    const si = design.fields[s.key]?.si
     return si === undefined ? [] : [{ label: s.label, value: { quantity: s.quantity, si } }]
   })
 

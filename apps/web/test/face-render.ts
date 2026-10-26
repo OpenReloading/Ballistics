@@ -4,7 +4,8 @@ import { readdirSync, readFileSync } from 'node:fs'
 import type { Federation, TargetFace } from '@open-reloading/schema'
 import { type Face, withOrganization } from '../src/lib/face-organization.ts'
 import type { RgbaImage } from '../src/lib/image.ts'
-import type { Point } from '../src/lib/target-geometry.ts'
+import { mul3, type Point, type Vector3 } from '../src/lib/target-geometry.ts'
+import { defined } from './defined.ts'
 
 const dir = new URL('../../../packages/data/records/target-faces/', import.meta.url)
 const federationDir = new URL('../../../packages/data/records/federations/', import.meta.url)
@@ -23,7 +24,17 @@ export const faceById = (id: string) => {
 }
 
 /** Face mm (x right, y up) to image px, a 3 x 3 matrix. */
-type Homography = number[]
+export type Homography = readonly [
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+]
 
 export type Camera = {
   width: number
@@ -37,7 +48,7 @@ export type Camera = {
   /** Roll of the photo, degrees. */
   roll?: number
   /** Image position of the face centre, px; default the middle. */
-  at?: Point
+  at?: Point | undefined
   /** Distance of the camera in focal lengths of the 1 px/mm view: smaller is more perspective. */
   depth?: number
 }
@@ -47,42 +58,33 @@ function camera(c: Camera): Homography {
   const rad = Math.PI / 180
   const [tx, ty, tz] = [(c.tilt ?? 0) * rad, (c.yaw ?? 0) * rad, (c.roll ?? 0) * rad]
   // rotation of the face plane: yaw about y, then tilt about x, then roll about z
-  const rx = [1, 0, 0, 0, Math.cos(tx), -Math.sin(tx), 0, Math.sin(tx), Math.cos(tx)]
-  const ry = [Math.cos(ty), 0, Math.sin(ty), 0, 1, 0, -Math.sin(ty), 0, Math.cos(ty)]
-  const rz = [Math.cos(tz), -Math.sin(tz), 0, Math.sin(tz), Math.cos(tz), 0, 0, 0, 1]
-  const mul = (a: number[], b: number[]) => {
-    const o: number[] = []
-    for (let r = 0; r < 3; r++)
-      for (let k = 0; k < 3; k++)
-        o.push(a[3 * r] * b[k] + a[3 * r + 1] * b[3 + k] + a[3 * r + 2] * b[6 + k])
-    return o
-  }
-  const R = mul(rz, mul(rx, ry))
+  const rx: Homography = [1, 0, 0, 0, Math.cos(tx), -Math.sin(tx), 0, Math.sin(tx), Math.cos(tx)]
+  const ry: Homography = [Math.cos(ty), 0, Math.sin(ty), 0, 1, 0, -Math.sin(ty), 0, Math.cos(ty)]
+  const rz: Homography = [Math.cos(tz), -Math.sin(tz), 0, Math.sin(tz), Math.cos(tz), 0, 0, 0, 1]
+  const R = mul3(rz, mul3(rx, ry))
   // the camera looks along z; the face plane lies `d` mm in front, a focal length of f px
   const depth = c.depth ?? 6
   const f = c.pxPerMm * 1000 * depth
   const d = 1000 * depth
   const at = c.at ?? { x: c.width / 2, y: c.height / 2 }
   // face (X, Y, 0) with Y up becomes camera coordinates (X, -Y, 0) then R, then z + d
-  const cols = [
+  const cols: [Vector3, Vector3] = [
     [R[0], R[3], R[6]],
     [-R[1], -R[4], -R[7]],
   ]
-  const t = [0, 0, d]
-  const P = [
-    [
-      f * cols[0][0] + at.x * cols[0][2],
-      f * cols[1][0] + at.x * cols[1][2],
-      f * t[0] + at.x * t[2],
-    ],
-    [
-      f * cols[0][1] + at.y * cols[0][2],
-      f * cols[1][1] + at.y * cols[1][2],
-      f * t[1] + at.y * t[2],
-    ],
-    [cols[0][2], cols[1][2], t[2]],
+  const t: Vector3 = [0, 0, d]
+  const [c0, c1] = cols
+  return [
+    f * c0[0] + at.x * c0[2],
+    f * c1[0] + at.x * c1[2],
+    f * t[0] + at.x * t[2],
+    f * c0[1] + at.y * c0[2],
+    f * c1[1] + at.y * c1[2],
+    f * t[1] + at.y * t[2],
+    c0[2],
+    c1[2],
+    t[2],
   ]
-  return P.flat()
 }
 
 export const project = (h: Homography, p: Point): Point => {
@@ -90,9 +92,9 @@ export const project = (h: Homography, p: Point): Point => {
   return { x: (h[0] * p.x + h[1] * p.y + h[2]) / w, y: (h[3] * p.x + h[4] * p.y + h[5]) / w }
 }
 
-export function invert(m: number[]): number[] {
+export function invert(m: Homography): Homography {
   const [a, b, c, d, e, f, g, h, i] = m
-  const adj = [
+  const adj: Homography = [
     e * i - f * h,
     c * h - b * i,
     b * f - c * e,
@@ -104,7 +106,8 @@ export function invert(m: number[]): number[] {
     a * e - b * d,
   ]
   const det = a * adj[0] + b * adj[3] + c * adj[6]
-  return adj.map((v) => v / det)
+  const [n0, n1, n2, n3, n4, n5, n6, n7, n8] = adj
+  return [n0 / det, n1 / det, n2 / det, n3 / det, n4 / det, n5 / det, n6 / det, n7 / det, n8 / det]
 }
 
 export type Scene = {
@@ -121,7 +124,7 @@ export type Scene = {
   holes?: Array<{ x: number; y: number; diameter: number }>
   holeGrey?: number
   /** Print marks (numerals): boxes centred at face mm, width and height in mm, drawn with this grey. */
-  marks?: Array<{ x: number; y: number; width: number; height: number; grey: number }>
+  marks?: Array<{ x: number; y: number; width: number; height: number; grey: number }> | undefined
   /** Dark patches in image px: [x0, y0, x1, y1], grey. */
   patches?: Array<{ box: [number, number, number, number]; grey: number }>
   /** Brightness falling by this share across the image width. */
@@ -167,8 +170,8 @@ export function render(scene: Scene): { image: RgbaImage; h: Homography } {
   if (scene.blur) boxBlur(grey, width, height, scene.blur)
   if (scene.noise) addNoise(grey, scene.noise)
   const data = new Uint8ClampedArray(width * height * 4)
-  for (let i = 0; i < width * height; i++) {
-    data[4 * i] = data[4 * i + 1] = data[4 * i + 2] = grey[i]
+  for (const [i, v] of grey.entries()) {
+    data[4 * i] = data[4 * i + 1] = data[4 * i + 2] = v
     data[4 * i + 3] = 255
   }
   return { image: { width, height, data }, h }
@@ -222,10 +225,10 @@ function ringGrey({ radii, blackR, line, paper, black }: Look, r: number, v: num
 
 function addNoise(grey: Float32Array, noise: number) {
   const rand = rng(11)
-  for (let i = 0; i < grey.length; i++) {
+  for (const [i, v] of grey.entries()) {
     // Box-Muller
     const g = Math.sqrt(-2 * Math.log(rand() + 1e-9)) * Math.cos(2 * Math.PI * rand())
-    grey[i] += noise * g
+    grey[i] = v + noise * g
   }
 }
 
@@ -235,10 +238,10 @@ function boxBlur(g: Float32Array, w: number, h: number, r: number) {
   const pass = (n: number, len: number, at: (i: number, j: number) => number) => {
     const line = new Float32Array(len)
     for (let i = 0; i < n; i++) {
-      for (let j = 0; j < len; j++) line[j] = g[at(i, j)]
+      for (let j = 0; j < len; j++) line[j] = defined(g[at(i, j)])
       for (let j = 0; j < len; j++) {
         let s = 0
-        for (let d = -k; d <= k; d++) s += line[Math.min(len - 1, Math.max(0, j + d))]
+        for (let d = -k; d <= k; d++) s += defined(line[Math.min(len - 1, Math.max(0, j + d))])
         g[at(i, j)] = s / (2 * k + 1)
       }
     }

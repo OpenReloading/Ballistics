@@ -19,6 +19,7 @@ import {
   sampleAtX,
   shownQuantities,
 } from '../lib/interior-chart.ts'
+import { nth } from '../lib/nth.ts'
 import {
   energySplit,
   type PlaybackResult,
@@ -102,7 +103,12 @@ export function InteriorChart({
   z1,
 }: {
   /** Valid steps in ladder order, one without a ladder. `label`: the step as the page names it, relative to the main charge; `value`: its charge or seating as shown. */
-  steps: { n: number; label?: string; value?: string; result: PlaybackResult }[]
+  steps: {
+    n: number
+    label?: string | undefined
+    value?: string | undefined
+    result: PlaybackResult
+  }[]
   /** Index into `steps`. */
   selected: number
   /** Bullet mass, kg. */
@@ -112,26 +118,27 @@ export function InteriorChart({
   view: ChartView
   onView: (v: ChartView) => void
   /** After each draw, also in a hidden tab: the workbench copies the chart for its report. */
-  onRender?: (chart: ECharts) => void
+  onRender?: ((chart: ECharts) => void) | undefined
   /** What the barrel strip above the chart draws, from the run's seating. */
-  strip?: StripFigure
+  strip?: StripFigure | undefined
   /** A new key starts the playback afresh at ignition: a new run or step. */
   playKey?: string
   /** The run's burn form z1 (the two-stage form), for its event line. */
-  z1?: number
+  z1?: number | undefined
 }) {
   const { x, quantity } = view
   const theme = useChartTokens(themeTokens)
   const reduce = useReducedMotion(false, { getInitialValueInEffect: false })
   const [dataOpen, setDataOpen] = useState(false)
-  const r = steps[selected].result
+  const step = nth(steps, selected)
+  const r = step.result
   const ladder = steps.length > 1
   const shown = shownQuantities(quantity)
   const withPressure = shown.includes('pressure')
   const lines = withPressure ? limitLines(limits, system) : undefined
   const events = chartEvents(r, z1)
   const at = sampler(r.points)
-  const values = (s: ReturnType<typeof at>) => [
+  const values = (s: ReturnType<typeof at>): [string, string][] => [
     ['Time', msText(s.time)],
     ['Travel', shownLength('travel', system, s.travel)],
     ['Breech pressure', withUnit('pressure', system, s.breechPressure)],
@@ -139,16 +146,14 @@ export function InteriorChart({
     ['Energy', withUnit('energy', system, 0.5 * mass * s.velocity ** 2)],
     ['Burnt', percentText(s.burntFraction)],
   ]
-  const stepName = ladder
-    ? (steps[selected].value ?? `Step ${steps[selected].label ?? steps[selected].n}`)
-    : 'Nominal load'
+  const stepName = ladder ? (step.value ?? `Step ${step.label ?? step.n}`) : 'Nominal load'
   const readout = (s: ReturnType<typeof at>) =>
     `${stepName}: ${values(s)
       .map(([k, v]) => `${k} ${v}`)
       .join(', ')}`
   const [stage, setStage] = useState<HTMLDivElement | null>(null)
   const [railHost, setRailHost] = useState<HTMLDivElement | null>(null)
-  const muzzleTravel = r.points[r.points.length - 1].travel
+  const muzzleTravel = nth(r.points, r.points.length - 1).travel
   const stripDrawn = useMemo(() => strip && stripModel(strip, muzzleTravel), [strip, muzzleTravel])
   // what the chart draws; a new option only when this changes, so typing elsewhere never redraws it
   const signature = [
@@ -273,7 +278,7 @@ export function InteriorChart({
               lines ? `, and ${lines.map((l) => l.label).join(', ')}` : ''
             }. ${ladder ? 'The Ladder table gives the values.' : 'The readouts give the values.'}`}
             focus={focus}
-            readout={(i) => readout(at(r.points[Math.min(i, r.points.length - 1)].time))}
+            readout={(i) => readout(at(nth(r.points, Math.min(i, r.points.length - 1)).time))}
             onRender={(c) => {
               chart.current = c
               redraw.current?.()

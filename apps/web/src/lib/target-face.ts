@@ -27,7 +27,8 @@ import {
 } from './face-image.ts'
 import type { FaceLabel } from './hole-detection.ts'
 import type { RgbaImage } from './image.ts'
-import { applyMatrix, inv3, type Matrix, mul3, type Point } from './target-geometry.ts'
+import { nth } from './nth.ts'
+import { applyMatrix, inv3, type Matrix, mapMatrix, mul3, type Point } from './target-geometry.ts'
 
 /** A ring line found on the photo. */
 export type Ring = {
@@ -208,7 +209,8 @@ function groupFragments(components: Point[][], uOf: RadiusOf): Point[][] {
   const groups: Array<typeof frags> = []
   for (const f of frags) {
     const last = groups[groups.length - 1]
-    if (last && f.mean - last[last.length - 1].mean <= 0.04) last.push(f)
+    const tail = last?.[last.length - 1]
+    if (last && tail && f.mean - tail.mean <= 0.04) last.push(f)
     else groups.push([f])
   }
   return groups.map((group) => group.flatMap((f) => f.pts))
@@ -232,7 +234,7 @@ function fitRingGroups(fine: Grid, groups: Point[][], rb: number): Ring[] {
       rnd,
     )
     if (!fit) continue
-    const inl = fit.inliers.map((i) => pts[i])
+    const inl = fit.inliers.map((i) => nth(pts, i))
     const arc = 1 - largestGap(inl, fit.ellipse.centreX, fit.ellipse.centreY) / (2 * Math.PI)
     if (arc >= 0.3 && fit.rms < 0.8)
       rings.push({ ellipse: toImageEllipse(fine, fit.ellipse), arc, points: inl.length })
@@ -299,7 +301,7 @@ export function matchFaces(
   rings: readonly Ring[],
   faces: readonly TargetFace[],
   frame?: { width: number; height: number },
-  scale?: number,
+  scale?: number | undefined,
 ): FaceMatch[] {
   const rho = meanRadius(black)
   const found = concentric(black, rings)
@@ -362,10 +364,11 @@ function matchGreedily(pairs: readonly Pair[], list: readonly FaceRing[]): FaceM
     if (usedFace.has(p.i) || usedFound.has(p.j)) continue
     usedFace.add(p.i)
     usedFound.add(p.j)
+    const face = nth(list, p.i)
     matched.push({
       ring: p.ring,
-      label: list[p.i].label,
-      radius: list[p.i].radius,
+      label: face.label,
+      radius: face.radius,
       error: p.error,
     })
   }
@@ -419,7 +422,7 @@ export type FaceFit = FacePlane & { face: TargetFace }
 type Member = { ellipse: Ellipse; radius: number; arc: number }
 
 /** A plane map (image px to unit circle) turned and mirrored so the face has x right and y up, scaled to mm. */
-function oriented(toPlane: number[], radius: number, centre: Point): number[] {
+function oriented(toPlane: Matrix, radius: number, centre: Point): Matrix {
   const at = (p: Point) => applyMatrix(toPlane, p)
   const [c, ex, ey] = [
     at(centre),
@@ -439,19 +442,19 @@ function oriented(toPlane: number[], radius: number, centre: Point): number[] {
     mul3([cs, -sn, 0, sn, cs, 0, 0, 0, 1], mul3([1, 0, 0, 0, flip, 0, 0, 0, 1], toPlane)),
   )
   const w = out[6] * centre.x + out[7] * centre.y + out[8]
-  return out.map((v) => v / w)
+  return mapMatrix(out, (v) => v / w)
 }
 
 /** The plane of `members` from a map to the unit circle of the first; undefined when it is singular. */
 function planeOf(
-  toPlane: number[],
+  toPlane: Matrix,
   centre: Point,
   members: Member[],
   outer: number,
   black: number,
   approximate: boolean,
 ): FacePlane | undefined {
-  const toFace = oriented(toPlane, members[0].radius, centre)
+  const toFace = oriented(toPlane, nth(members, 0).radius, centre)
   const inv = inv3(toFace)
   if (!inv) return undefined
   const toImg = (p: Point) => applyMatrix(inv, p)
@@ -543,7 +546,7 @@ function planeFromOne(
   black: number,
 ): FacePlane | undefined {
   const [c, s] = [Math.cos(e.angle), Math.sin(e.angle)]
-  const toPlane = [
+  const toPlane: Matrix = [
     c / e.semiMajor,
     s / e.semiMajor,
     -(e.centreX * c + e.centreY * s) / e.semiMajor,
@@ -571,7 +574,7 @@ function planeFromOne(
 function fitFace(black: Ellipse, match: FaceMatch): FaceFit | undefined {
   const face = match.face
   const blackRadius = face.blackDiameter.value / 2
-  const outer = face.rings[0].diameter.value / 2
+  const outer = nth(face.rings, 0).diameter.value / 2
   let members: Member[] = [
     { ellipse: black, radius: blackRadius, arc: 1 },
     ...match.matched.map((m) => ({ ellipse: m.ring.ellipse, radius: m.radius, arc: m.ring.arc })),
@@ -627,7 +630,7 @@ export type FaceSearch = {
 export function findFace(
   image: RgbaImage,
   faces: readonly TargetFace[],
-  scale?: number,
+  scale?: number | undefined,
 ): FaceSearch {
   const s0 = Math.max(1, Math.ceil(Math.max(image.width, image.height) / COARSE))
   const coarse = grayGrid(image, s0)
@@ -674,14 +677,14 @@ export function findFace(
  */
 export function fitPicked(search: FaceSearch, face: TargetFace): FaceFit | undefined {
   if (!search.black) return undefined
-  const match = matchFaces(search.black, search.rings, [face])[0]
+  const match = nth(matchFaces(search.black, search.rings, [face]), 0)
   const full = match.matched.length >= MIN_RINGS ? fitFace(search.black, match) : undefined
   if (full) return full
   const blackRadius = face.blackDiameter.value / 2
   const plane = planeFromOne(
     search.black,
     blackRadius,
-    face.rings[0].diameter.value / 2,
+    nth(face.rings, 0).diameter.value / 2,
     blackRadius,
   )
   return plane && { ...plane, face }
@@ -707,7 +710,7 @@ export function onPhoto(search: FaceSearch, k: number, x0: number, y0: number): 
     }
   }
   // photo to work: x' = k (x - x0)
-  const toWork = [k, 0, -k * x0, 0, k, -k * y0, 0, 0, 1]
+  const toWork: Matrix = [k, 0, -k * x0, 0, k, -k * y0, 0, 0, 1]
   return {
     ...(search.black && { black: e(search.black) }),
     ellipses: search.ellipses.map(e),
@@ -754,12 +757,13 @@ export function faceLabel(g: FaceGeometry, hole: number): FaceLabel {
         const [c, s] = [Math.cos(roll), Math.sin(roll)]
         const q = { x: c * f.x + s * f.y, y: c * f.y - s * f.x }
         const r = Math.hypot(q.x, q.y)
-        const i = radii.findIndex((v) => v > r) - 1
-        if (i < 0) return false
-        const gap = radii[i + 1] - radii[i]
+        const next = radii.findIndex((v) => v > r)
+        const [lo, hi] = [radii[next - 1], radii[next]]
+        if (next < 1 || lo === undefined || hi === undefined) return false
+        const gap = hi - lo
         return (
           Math.min(Math.abs(q.x), Math.abs(q.y)) <= Math.min(NUMERAL_WIDTH, 0.3 * gap) &&
-          Math.min(r - radii[i], radii[i + 1] - r) >= 0.2 * gap
+          Math.min(r - lo, hi - r) >= 0.2 * gap
         )
       },
       polar: (p) => {

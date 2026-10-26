@@ -1,5 +1,11 @@
 {
   "extends": "@docusaurus/tsconfig",
-  "compilerOptions": { "baseUrl": ".", "noEmit": true },
+  "compilerOptions": {
+    "baseUrl": ".",
+    "noEmit": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true
+  },
   "include": ["docusaurus.config.ts", "sidebars.ts"]
 }

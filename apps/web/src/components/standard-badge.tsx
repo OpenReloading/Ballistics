@@ -18,7 +18,13 @@ export function StandardBadge({ label }: { label: string }) {
 }
 
 /** A record fact as a quiet badge: line, caliber, product number, the gap mark. */
-export function MutedBadge({ className, children }: { className?: string; children: ReactNode }) {
+export function MutedBadge({
+  className,
+  children,
+}: {
+  className?: string | undefined
+  children: ReactNode
+}) {
   return (
     <Badge component="span" variant="light" size="sm" color="gray" tt="none" className={className}>
       {children}

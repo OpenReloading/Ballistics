@@ -55,7 +55,7 @@ export const opticKinds = [
 const empty = undefined as unknown as QuantityValue
 
 /** A field's help on hover, focus and touch; the field shows no description line. */
-function Tip({ help, children }: { help?: string; children: ReactElement }) {
+function Tip({ help, children }: { help?: string | undefined; children: ReactElement }) {
   if (!help) return children
   return (
     <Tooltip label={help} events={tipEvents} multiline maw={280} position="top-start">
@@ -77,7 +77,7 @@ function SiField({
   si: number | undefined
   onChange: (si: number | undefined) => void
   /** A cross-field error of the schema, shown when the field itself is valid. */
-  error?: string
+  error?: string | undefined
 }) {
   const shown = (x: number | undefined) => ({
     text: x === undefined ? '' : roundedFieldText(spec.quantity, system, x),
@@ -563,12 +563,15 @@ export function FirearmEditor({
                   disabled={c.mounts.length >= 4}
                   style={{ alignSelf: 'flex-start' }}
                   onClick={() => {
-                    const free = data.optics.find((o) => !c.mounts.some((m) => m.optic === o.id))
+                    const optic =
+                      data.optics.find((o) => !c.mounts.some((m) => m.optic === o.id)) ??
+                      data.optics[0]
+                    if (!optic) return
                     setConfig(i, {
                       mounts: [
                         ...c.mounts,
                         {
-                          optic: (free ?? data.optics[0]).id,
+                          optic: optic.id,
                           sightHeight: empty,
                           zeroRange: empty,
                         },
@@ -588,6 +591,8 @@ export function FirearmEditor({
               leftSection={<Plus size={14} aria-hidden="true" />}
               disabled={!data.optics.length}
               onClick={() => {
+                const [firstOptic] = data.optics
+                if (!firstOptic) return
                 const id = freeId(
                   'c',
                   data.configurations.map((c) => c.id),
@@ -598,7 +603,7 @@ export function FirearmEditor({
                     {
                       id,
                       name: '',
-                      mounts: [{ optic: data.optics[0].id, sightHeight: empty, zeroRange: empty }],
+                      mounts: [{ optic: firstOptic.id, sightHeight: empty, zeroRange: empty }],
                     },
                   ],
                   active: data.active ?? id,

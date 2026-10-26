@@ -3,6 +3,7 @@ import { fromSi } from '@open-reloading/schema'
 import type { ErrorBody, InteriorLadderResponse, InteriorResponse } from '../lib/api-types.ts'
 import { pagesBasePath } from '../lib/edition.ts'
 import type { InteriorBody } from '../lib/interior-input.ts'
+import { nth } from '../lib/nth.ts'
 import type {
   LadderDirection,
   RunnableLadderKind,
@@ -30,7 +31,7 @@ export const isPreviewKey = (key: string): key is PreviewKey =>
 export type Step = {
   charge: number
   body?: InteriorResponse
-  error?: { message: string; reason?: string }
+  error?: { message: string; reason?: string | undefined }
   /** A seating ladder's step: the length the bullet is seated by and what follows from it. */
   seating?: SeatingStep
   /** A temperature ladder's step: the propellant temperature, K. */
@@ -65,25 +66,29 @@ export type Outcome =
       /** A powder record was chosen at the run. */
       powderChosen: boolean
       /** The record's bore-resistance law the run could not apply, with what was missing. */
-      resistanceMissing?: { powder: string; missing: string[] }
+      resistanceMissing?: { powder: string; missing: string[] } | undefined
       /** The user bullet design whose mass the run used. */
-      design?: string
+      design?: string | undefined
       /** The user cartridge design whose values the run's fields took. */
-      cartridgeDesign?: string
+      cartridgeDesign?: string | undefined
       /** Id of the cartridge record the run compared its limits with. */
-      cartridge?: string
+      cartridge?: string | undefined
       /** Cartridge, bullet and powder of the run, as their records name them. */
-      identity: { cartridge?: string; bullet?: string; powder?: string }
+      identity: {
+        cartridge?: string | undefined
+        bullet?: string | undefined
+        powder?: string | undefined
+      }
       /** Inputs the prints show that the load does not carry, at the run: the seating and the firearm. */
       printed: {
         seated: Seated
-        firearm?: string
+        firearm?: string | undefined
         /** Gun weight at the run, kg; the free recoil readout needs it. */
-        firearmMass?: number
+        firearmMass?: number | undefined
         /** Gas velocity over muzzle velocity of the run's cartridge class (`apps/docs/docs/models/free-recoil.md`). */
         gasFactor: number
         /** Why a cartridge with a record id got the rifle factor without a CIP table. */
-        gasFactorNote?: string
+        gasFactorNote?: string | undefined
         /** Volume or travel held the seated bullet's value. */
         fromSeating: PreviewKey[]
       }
@@ -96,7 +101,7 @@ export type Outcome =
       /** The ladder's direction, which places the main charge among the steps. */
       direction: LadderDirection
       /** What the ladder varies; a seating ladder seats the bullet by `seatingBy`. */
-      ladder: { kind: RunnableLadderKind; seatingBy?: SeatingLengthKind }
+      ladder: { kind: RunnableLadderKind; seatingBy?: SeatingLengthKind | undefined }
     }
   | {
       kind: 'error'
@@ -172,7 +177,10 @@ export function warningLines(ok: Extract<Outcome, { kind: 'ok' }>, system: UnitS
 }
 
 /** The summary line of the warnings: their count, the step of a ladder and their names. */
-export function warningsLine(ok: Extract<Outcome, { kind: 'ok' }>, lines: { name?: string }[]) {
+export function warningsLine(
+  ok: Extract<Outcome, { kind: 'ok' }>,
+  lines: { name?: string | undefined }[],
+) {
   const names = lines.flatMap((l) => (l.name ? [l.name] : []))
   const step = ok.steps.length > 1 ? ` for step ${selectedLabel(ok)}` : ''
   return `${warningCountText(lines.length)}${step}${names.length > 0 ? `: ${names.join(', ')}` : ''}`
@@ -227,7 +235,7 @@ export function stepFlag(ok: Shown) {
 
 /** The outcome showing step `i`. */
 export function atStep(ok: Extract<Outcome, { kind: 'ok' }>, i: number) {
-  const s = ok.steps[i]
+  const s = nth(ok.steps, i)
   return { ...ok, body: s.body ?? ok.body, load: stepLoad(ok.load, s), selected: i }
 }
 
