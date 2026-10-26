@@ -41,10 +41,10 @@ describe('checkCoverage', () => {
     expect(checkCoverage(record)).toEqual([])
     const mistyped = provenance([
       { title: 'Data sheet', fields: ['diameter', 'mass'] },
-      { title: 'Photograph', kind: 'measured', fields: ['meplatDiamter'] },
+      { title: 'Photograph', kind: 'measured', fields: ['meplatDiameters'] },
     ])
     expect(checkCoverage({ ...record, provenance: mistyped })).toEqual([
-      'source "Photograph" names missing field meplatDiamter',
+      'source "Photograph" names missing field meplatDiameters',
       'field meplatDiameter has no source',
     ])
   })
