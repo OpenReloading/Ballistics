@@ -87,6 +87,8 @@ jobs:
       - name: Breaking changes of the API document (oasdiff)
         run: docker run --rm -v "$PWD:/repo:ro" -v "$RUNNER_TEMP:/doc:ro" -w /repo "$OASDIFF_IMAGE" breaking packages/api/openapi.baseline.json /doc/openapi.json --fail-on ERR
       - run: node tools/src/audit.ts
+      # licences of the production dependencies of the images and the generated list in NOTICE
+      - run: node tools/src/licences.ts
 
   # Together the groups are what the root `npm test` runs. The workspaces import each other's dist/, so each job builds.
   test:
@@ -166,8 +168,13 @@ jobs:
     permissions:
       contents: read
     steps:
+      # the action reads a local config-file from disk
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
         with:
+          config-file: ./.github/dependency-review-config.yml
           fail-on-severity: high
           fail-on-scopes: runtime, development, unknown
 

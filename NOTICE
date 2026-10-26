@@ -84,18 +84,18 @@ The Apache Software Foundation (https://www.apache.org/).
 The web app, the Pages edition and the docs site bundle these packages, each under the MIT
 License, whose text is the same as above, with these copyright notices:
 
-- react 19.3.0, react-dom 19.3.0, scheduler 0.28.0 (https://github.com/facebook/react):
+- react 19.3.1, react-dom 19.3.1, scheduler 0.28.0 (https://github.com/facebook/react):
   Copyright (c) Meta Platforms, Inc. and affiliates.
-- next 16.4.0 (https://github.com/vercel/next.js): Copyright (c) 2025 Vercel, Inc.
+- next 16.4.2 (https://github.com/vercel/next.js): Copyright (c) 2025 Vercel, Inc.
 - styled-jsx 5.1.6 (https://github.com/vercel/styled-jsx): Copyright (c) 2016-present Vercel, Inc.
-- @mantine/core, @mantine/form, @mantine/hooks, @mantine/spotlight 9.7.2
+- @mantine/core, @mantine/form, @mantine/hooks, @mantine/spotlight 9.7.3
   (https://github.com/mantinedev/mantine): Copyright (c) 2021 Vitaly Rtishchev
 - @phosphor-icons/react 2.1.10 (https://github.com/phosphor-icons/react):
   Copyright (c) 2020 Phosphor Icons
-- zod 4.6.5 (https://github.com/colinhacks/zod): Copyright (c) 2025 Colin McDonnell
+- zod 4.6.7 (https://github.com/colinhacks/zod): Copyright (c) 2025 Colin McDonnell
 - @docusaurus/core, @docusaurus/preset-classic, @docusaurus/plugin-content-docs 3.10.2, docs
   site (https://github.com/facebook/docusaurus): Copyright (c) Facebook, Inc. and its affiliates.
-- katex 0.16.47 with its fonts, docs site (https://github.com/KaTeX/KaTeX):
+- katex 0.19.0 with its fonts, docs site (https://github.com/KaTeX/KaTeX):
   Copyright (c) 2013-2020 Khan Academy and other contributors
 - pagefind 1.5.2, the search script and index of the docs site (https://github.com/Pagefind/pagefind):
   Copyright (c) Pagefind
@@ -178,3 +178,142 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+BEGIN GENERATED: shipped packages
+Third-party packages installed for the API and web images, by name, version and the licence
+package-lock.json declares. Written by `node tools/src/licences.ts --write`.
+
+@fastify/ajv-compiler 4.0.6 MIT
+@fastify/error 4.2.0 MIT
+@fastify/fast-json-stringify-compiler 5.1.0 MIT
+@fastify/forwarded 3.0.2 MIT
+@fastify/merge-json-schemas 0.2.1 MIT
+@fastify/proxy-addr 5.1.1 MIT
+@fastify/sensible 6.0.7 MIT
+@floating-ui/core 1.8.0 MIT
+@floating-ui/dom 1.8.0 MIT
+@floating-ui/react-dom 2.1.9 MIT
+@floating-ui/react 0.27.20 MIT
+@floating-ui/utils 0.2.12 MIT
+@lukeed/ms 2.0.2 MIT
+@mantine/core 9.7.3 MIT
+@mantine/form 9.7.3 MIT
+@mantine/hooks 9.7.3 MIT
+@mantine/spotlight 9.7.3 MIT
+@mantine/store 9.7.3 MIT
+@next/env 16.4.2 MIT
+@next/swc-linux-arm64-gnu 16.4.2 MIT
+@next/swc-linux-x64-gnu 16.4.2 MIT
+@opentelemetry/api 1.10.0 Apache-2.0
+@phosphor-icons/react 2.1.10 MIT
+@pinojs/redact 0.4.0 MIT
+@playwright/test 1.64.1 Apache-2.0
+@scalar/client-side-rendering 0.4.12 MIT
+@scalar/fastify-api-reference 1.75.1 MIT
+@scalar/helpers 0.16.4 MIT
+@scalar/json-magic 0.16.1 MIT
+@scalar/schemas 0.14.0 MIT
+@scalar/types 0.24.0 MIT
+@scalar/validation 0.6.7 MIT
+@standard-schema/spec 1.1.0 MIT
+@swc/helpers 0.5.23 Apache-2.0
+@types/react 19.3.0 MIT
+abstract-logging 2.0.1 MIT
+ajv-formats 3.0.1 MIT
+ajv 8.20.0 MIT
+atomic-sleep 1.0.0 MIT
+avvio 9.3.0 MIT
+baseline-browser-mapping 2.11.30 Apache-2.0
+caniuse-lite 1.0.30001817 CC-BY-4.0
+client-only 0.0.1 MIT
+clsx 2.1.1 MIT
+content-type 2.1.0 MIT
+cookie 1.1.1 MIT
+country-flag-icons 1.6.20 MIT
+csstype 3.2.3 MIT
+depd 2.0.0 MIT
+dequal 2.0.3 MIT
+detect-node-es 1.1.0 MIT
+echarts 6.1.0 Apache-2.0
+fast-decode-uri-component 1.0.1 MIT
+fast-deep-equal 3.1.3 MIT
+fast-json-stringify 7.0.1 MIT
+fast-querystring 1.1.2 MIT
+fast-uri 3.1.9 BSD-3-Clause
+fast-uri 4.2.3 BSD-3-Clause
+fastify-plugin 4.5.1 MIT
+fastify-plugin 6.0.0 MIT
+fastify 5.12.7 MIT
+fastq 1.20.3 ISC
+find-my-way 9.9.0 MIT
+forwarded 0.2.0 MIT
+get-nonce 1.0.1 MIT
+github-slugger 2.0.0 ISC
+http-errors 2.0.1 MIT
+inherits 2.0.4 ISC
+ipaddr.js 2.5.0 MIT
+json-schema-ref-resolver 3.0.0 MIT
+json-schema-traverse 1.0.0 MIT
+klona 2.0.6 MIT
+light-my-request 6.6.0 BSD-3-Clause
+media-typer 1.1.1 MIT
+mime-db 1.54.0 MIT
+mime-types 3.0.2 MIT
+nanoid 3.3.20 MIT
+nanoid 5.1.16 MIT
+next 16.4.2 MIT
+on-exit-leak-free 2.1.2 MIT
+pathe 2.0.3 MIT
+picocolors 1.1.1 ISC
+pino-abstract-transport 3.0.0 MIT
+pino-std-serializers 7.1.0 MIT
+pino 10.4.0 MIT
+playwright-core 1.64.1 Apache-2.0
+playwright 1.64.1 Apache-2.0
+postcss 8.5.23 MIT
+process-warning 4.0.1 MIT
+process-warning 5.1.0 MIT
+quick-format-unescaped 4.0.4 MIT
+react-dom 19.3.0 MIT
+react-dom 19.3.1 MIT
+react-number-format 5.4.5 MIT
+react-remove-scroll-bar 2.3.8 MIT
+react-remove-scroll 2.7.2 MIT
+react-style-singleton 2.2.3 MIT
+react 19.3.1 MIT
+real-require 1.0.0 MIT
+require-from-string 2.0.2 MIT
+ret 0.5.0 MIT
+reusify 1.1.0 MIT
+rfdc 1.4.1 MIT
+safe-regex2 5.1.1 MIT
+safe-stable-stringify 2.5.0 MIT
+scheduler 0.28.0 MIT
+secure-json-parse 4.1.0 BSD-3-Clause
+semver 7.8.5 ISC
+set-cookie-parser 2.7.2 MIT
+setprototypeof 1.2.0 ISC
+sonic-boom 4.2.1 MIT
+source-map-js 1.2.2 BSD-3-Clause
+split2 4.2.0 ISC
+statuses 2.0.2 MIT
+styled-jsx 5.1.6 MIT
+tabbable 6.5.0 MIT
+tagged-tag 1.0.0 MIT
+thread-stream 4.2.0 MIT
+toad-cache 3.7.4 MIT
+toidentifier 1.0.1 MIT
+tslib 2.3.0 0BSD
+tslib 2.8.1 0BSD
+type-fest 5.10.0 (MIT OR CC0-1.0)
+type-is 2.1.0 MIT
+undici 7.30.1 MIT
+use-callback-ref 1.3.3 MIT
+use-sidecar 1.1.3 MIT
+vary 1.1.2 MIT
+yaml 2.9.1 ISC
+zod 4.6.7 MIT
+zrender 6.1.0 BSD-3-Clause
+END GENERATED: shipped packages
