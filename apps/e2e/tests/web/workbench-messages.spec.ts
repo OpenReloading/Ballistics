@@ -82,6 +82,8 @@ test('the ladder target messages move nothing: none, a warning and an error keep
     /^Error: .*Shooting distance/,
   )
   await expect(distance).toHaveAttribute('aria-invalid', 'true')
+  // the error stays the field's description for screen readers, though it is drawn in the slot
+  await expect(distance).toHaveAccessibleDescription(/Enter a number/)
   expect(await positions(section)).toEqual(before)
 
   // typing a key at a time, through valid, too big and empty values
