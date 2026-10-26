@@ -577,3 +577,115 @@ describe('powder fit prediction bands', () => {
     expect(e.charge).toBe(3.6e-3)
   })
 })
+
+describe('powder fit chamber volume factor', () => {
+  const scaled = (f: number): InteriorLoad => {
+    const l = load()
+    return { ...l, chamber: { ...l.chamber, volume: l.chamber.volume * f } }
+  }
+  const pair = ['burnRate', 'volumeFactor'] as const
+
+  it('leaves the fit as it was with the factor off', () => {
+    // values of the fit before the option existed: the default and a start pressure with pressures
+    const a = fitPowder(load(0.38), ladder(load(), 3, 0))
+    expect(a.parameters).toEqual([
+      {
+        name: 'burnRate',
+        initial: 0.38,
+        value: 0.44999999999390017,
+        standardUncertainty: 0.0011723744763966735,
+      },
+    ])
+    expect([a.chiSquare, a.iterations, a.runCount, a.conditionNumber]).toEqual([
+      2.7069839386665625e-17, 5, 75, 1,
+    ])
+    expect(a.covariance).toEqual([[0.000006787466236758699]])
+    expect(a.load.chamber).toEqual(load().chamber)
+    const b = fitPowder(load(0.38, 35e6), ladder(load(), 3, 20e5, 1), {
+      parameters: ['burnRate', 'startPressure'],
+    })
+    expect(b.parameters.map((p) => [p.name, p.initial, p.value, p.standardUncertainty])).toEqual([
+      ['burnRate', 0.38, 0.44898402378354746, 0.0031280266903437183],
+      ['startPressure', 35000000, 30832507.00046043, 2731555.1106499513],
+    ])
+    expect([b.chiSquare, b.iterations, b.runCount, b.conditionNumber]).toEqual([
+      10.159271541073892, 15, 240, 14.834930640212603,
+    ])
+    expect(b.load.chamber).toEqual(load().chamber)
+  })
+
+  it('recovers a chamber volume 8 % above the record and scales the load by the factor', () => {
+    const r = fitPowder(load(0.4), ladder(scaled(1.08), 3, 0), { parameters: pair })
+    const factor = nth(r.parameters, 1)
+    expect(rel(nth(r.parameters, 0).value, 0.45)).toBeLessThan(1e-3)
+    expect(nth(r.parameters, 1).name).toBe('volumeFactor')
+    expect(nth(r.parameters, 1).initial).toBe(1)
+    expect(rel(nth(r.parameters, 1).value, 1.08)).toBeLessThan(1e-3)
+    expect(nth(r.parameters, 0).name).toBe('burnRate')
+    expect(factor.standardUncertainty).toBeGreaterThan(0)
+    expect(r.load.chamber.volume).toBe(load().chamber.volume * nth(r.parameters, 1).value)
+    expect(r.load.chamber.boreArea).toBe(load().chamber.boreArea)
+    expect(r.degreesOfFreedom).toBe(3)
+  })
+
+  it('reports the factor within its uncertainty of the truth on noisy rows', () => {
+    const r = fitPowder(load(0.4), ladder(scaled(1.08), 3, 20e5, 1), { parameters: pair })
+    const f = nth(r.parameters, 1)
+    expect(Math.abs(f.value - 1.08)).toBeLessThan(3 * (f.standardUncertainty ?? 0))
+  })
+
+  it('pulls the factor toward a prior centred on 1', () => {
+    const points = ladder(scaled(1.08), 3, 0, 1)
+    const free = fitPowder(load(0.4), points, { parameters: pair })
+    const held = fitPowder(load(0.4), points, {
+      parameters: pair,
+      priors: { volumeFactor: { value: 1, sigma: 0.05 } },
+    })
+    const [a, b] = [nth(free.parameters, 1), nth(held.parameters, 1)]
+    expect(b.value).toBeGreaterThan(1)
+    expect(b.value).toBeLessThan(a.value)
+    expect(b.standardUncertainty).toBeLessThan(a.standardUncertainty ?? 0)
+    expect(held.priorChiSquare).toBeGreaterThan(0)
+  })
+
+  it('fits the factor beside the start pressure and predicts with the corrected volume', () => {
+    const r = fitPowder(load(0.4), ladder(scaled(1.08), 3, 20e5, 1), {
+      parameters: ['burnRate', 'startPressure', 'volumeFactor'],
+      priors: { volumeFactor: { value: 1, sigma: 0.1 } },
+    })
+    expect(r.parameters.map((p) => p.name)).toEqual(['burnRate', 'startPressure', 'volumeFactor'])
+    const p = predictPowder(r, 2.8e-3)
+    const direct = interior({ ...r.load, charge: 2.8e-3 })
+    if (!direct.valid) throw new Error(direct.reason)
+    expect(p.velocity.value).toBeCloseTo(direct.muzzleVelocity, 9)
+    expect(p.pressure.standardUncertainty).toBeGreaterThan(0)
+  })
+
+  it('needs a prior on the factor where the ladder is too narrow to separate it from the burn rate', () => {
+    const points = ladder(scaled(1.08), 3, 0)
+      .slice(1, 3)
+      .map((x, i) => ({ ...x, charge: 2.8e-3 + i * 5e-6 }))
+      .map((x) => {
+        const r = interior({ ...scaled(1.08), charge: x.charge })
+        if (!r.valid) throw new Error(r.reason)
+        return { ...x, muzzleVelocity: r.muzzleVelocity }
+      })
+    expect(failure(() => fitPowder(load(0.4), points, { parameters: pair })).reason).not.toBe(
+      'invalid',
+    )
+    const r = fitPowder(load(0.4), points, {
+      parameters: pair,
+      priors: { volumeFactor: { value: 1, sigma: 0.1 } },
+    })
+    expect(nth(r.parameters, 1).standardUncertainty).toBeGreaterThan(0)
+    expect(nth(r.parameters, 1).standardUncertainty).toBeLessThan(0.1 * nth(r.parameters, 1).value)
+  })
+
+  it('rejects a prior on the factor when the factor is not fitted', () => {
+    expect(() =>
+      fitPowder(load(0.4), ladder(load(), 3, 0), {
+        priors: { volumeFactor: { value: 1, sigma: 0.05 } },
+      }),
+    ).toThrow(InputError)
+  })
+})
