@@ -5,7 +5,7 @@ sidebar_position: 3
 
 # CI, quality and supply-chain tools
 
-One tool per job, each free for a public repository. Terms checked on 2026-10-20 on the pages linked (oasdiff and Schemathesis on 2026-10-21, dependency-cruiser, swc, knip and yaml on 2026-10-26). Recheck a term before use.
+One tool per job, each free for a public repository. Terms checked on 2026-10-20 on the pages linked (oasdiff and Schemathesis on 2026-10-21, dependency-cruiser, swc, knip, yaml and lychee on 2026-10-26). Recheck a term before use.
 
 | Job | Tool | Runs in | Free terms (public repository) |
 |---|---|---|---|
@@ -19,6 +19,7 @@ One tool per job, each free for a public repository. Terms checked on 2026-10-20
 | Licence policy | `tools/src/licences.ts` (Node, `yaml` 2, ISC) over package-lock.json | `ci.yml` `check` (`static`) | Local. [yaml](https://github.com/eemeli/yaml), [license](https://github.com/eemeli/yaml/blob/main/LICENSE) |
 | Import rules | dependency-cruiser, parsing TypeScript with @swc/core | `ci.yml` `check` (`static`) | MIT and Apache-2.0, local. [dependency-cruiser](https://github.com/sverweij/dependency-cruiser), [license](https://github.com/sverweij/dependency-cruiser/blob/main/LICENSE), [swc](https://github.com/swc-project/swc), [license](https://github.com/swc-project/swc/blob/main/LICENSE) |
 | Unused files, exports and dependencies | knip 6 (`knip.jsonc`) | `ci.yml` `check` (`static`) | ISC, local. [knip](https://github.com/webpro-nl/knip), [license](https://github.com/webpro-nl/knip/blob/main/LICENSE) |
+| Link check | lychee 0.24.2 (`lychee.toml`): relative links and anchors of the Markdown files offline in every pull request, external links in a scheduled run that keeps one issue | `ci.yml` `check`, `links.yml` | Apache-2.0 or MIT, local. [lychee](https://github.com/lycheeverse/lychee), [license](https://github.com/lycheeverse/lychee/blob/master/LICENSE-APACHE) |
 | Web JavaScript budget | `apps/web/scripts/check-weight.mts` (Node, no dependency) over `.next` and `apps/web/weight-budget.json` | `ci.yml` `e2e`, after the web build | Local. |
 | Workflow lint and security | actionlint 1.7.12, zizmor 1.31.1 | `ci.yml` `workflows` | MIT, local. [actionlint](https://github.com/rhysd/actionlint), [zizmor](https://github.com/zizmorcore/zizmor) |
 | Image vulnerabilities | Grype (`anchore/scan-action`), fails on fixable critical findings | `release.yml` `images` | Apache-2.0, local. [scan-action](https://github.com/anchore/scan-action) |
