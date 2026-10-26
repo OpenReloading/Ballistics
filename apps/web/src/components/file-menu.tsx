@@ -114,6 +114,7 @@ const kindNames: Record<UserRecordKind, string> = {
   cartridge: 'cartridge designs',
   powder: 'powder designs',
   caseCapacity: 'measured capacities',
+  case: 'case groups',
   load: 'loads',
   firearm: 'firearms',
   session: 'chronograph sessions',

@@ -41,6 +41,7 @@ import type {
 import { runBatch } from '../lib/batch.ts'
 import { fitOf } from '../lib/bullet-fit.ts'
 import { workbenchDesign } from '../lib/cartridge-designer.ts'
+import { type OwnCase, ownCases } from '../lib/case-group.ts'
 import { pagesBasePath } from '../lib/edition.ts'
 import { errorText } from '../lib/error-text.ts'
 import { loadExample } from '../lib/example-data.ts'
@@ -1158,6 +1159,7 @@ export function useWorkbenchState() {
         )
         setPowderDesignList(powderDesigns(records))
         setFirearms(records.filter((r): r is (typeof firearms)[number] => r.kind === 'firearm'))
+        setCases(ownCases(records))
       })
       .catch(() => {})
   // biome-ignore lint/correctness/useExhaustiveDependencies: once on mount
@@ -1365,8 +1367,13 @@ export function useWorkbenchState() {
   const [capacityChoice, setCapacityChoice] = useState<{ cartridge: string; id: string }>()
   /** The catalogue case record the user chose in the Cartridge card, kept for the cartridge it belongs to. */
   const [caseChoice, setCaseChoice] = useState<{ cartridge: string; id: string }>()
+  /** The user's cases of this browser, and the group of them the user chose for the cartridge it belongs to. */
+  const [cases, setCases] = useState<OwnCase[]>([])
+  const [ownCaseChoice, setOwnCaseChoice] = useState<{ cartridge: string; id: string }>()
   /** The user capacity reference of the load being opened: a slower read than a newer open leaves alone. */
   const openingCapacity = useRef<string>(undefined)
+  /** Whether the measured capacity field holds the value a chosen group of cases named, not a typed or loaded one. */
+  const measuredFromGroup = useRef(false)
   /** The Gun and barrel card's gun weight (free recoil only); the load's typed values and links carry it. */
   const [gunFields, setGunFields] = useState<Fields>({ firearmMass: emptyStep })
   const gunWeight = gunFields.firearmMass
@@ -1599,7 +1606,9 @@ export function useWorkbenchState() {
     setMeasuredFor(undefined)
     setCapacityChoice(undefined)
     setCaseChoice(undefined)
+    setOwnCaseChoice(undefined)
     openingCapacity.current = undefined
+    measuredFromGroup.current = false
     setGunFields({ firearmMass: emptyStep })
     gunFromFirearm.current = false
     gunPending.current = false
@@ -2331,7 +2340,7 @@ export function useWorkbenchState() {
    * capacity and fills its field. A user record the store does not answer, or one of another
    * cartridge, stays in the load as asked.
    */
-  function openCapacity(ref: string, forCartridge: string | undefined) {
+  function openCapacity(ref: string, forCartridge: string | undefined, fromGroup = false) {
     const target = parseRef(ref)
     if (!target) return
     const cartridgeId = forCartridge && parseRef(forCartridge)?.id
@@ -2354,6 +2363,7 @@ export function useWorkbenchState() {
           measuredWaterCapacity: { text: fixedFieldText('capacity', unitsNow.current, si), si },
         })
         setMeasuredFor(cartridgeId)
+        measuredFromGroup.current = fromGroup
         got('capacity')
       })
       .catch(() => {
@@ -2361,11 +2371,43 @@ export function useWorkbenchState() {
       })
   }
 
-  /** The case record `ref` of an opened load is chosen for the cartridge it names. */
+  /**
+   * The case `ref` of an opened load is chosen for the cartridge it names: a catalogue product, or
+   * a group of the user's cases. The group's measured capacity comes with the load's own capacity.
+   */
   function openCase(ref: string | undefined, forCartridge: string | undefined) {
-    const id = ref && catalogueIdIn(ref)
+    const target = ref ? parseRef(ref) : undefined
     const cartridgeId = forCartridge && parseRef(forCartridge)?.id
-    if (id && cartridgeId) setCaseChoice({ cartridge: cartridgeId, id })
+    if (!target || !cartridgeId) return
+    if (target.scope === 'catalogue') setCaseChoice({ cartridge: cartridgeId, id: target.id })
+    else setOwnCaseChoice({ cartridge: cartridgeId, id: target.id })
+  }
+
+  /** A catalogue case product chosen in the figure replaces a group of the user's cases. */
+  function chooseCase(choice: { cartridge: string; id: string } | undefined) {
+    setOwnCaseChoice(undefined)
+    setCaseChoice(choice)
+  }
+
+  /**
+   * A group of the user's cases chosen in the figure: its measured capacity fills the measured
+   * capacity field, where it replaces the record's value and shows as measured.
+   */
+  function chooseOwnCase(id: string | undefined) {
+    const cartridgeId = cartridge?.id
+    if (!cartridgeId) return
+    setOwnCaseChoice(id ? { cartridge: cartridgeId, id } : undefined)
+    if (!id) return
+    setCaseChoice(undefined)
+    const capacity = cases.find((c) => c.id === id)?.capacity
+    if (capacity) return openCapacity(capacity, `catalogue:${cartridgeId}`, true)
+    // a group without a measured capacity leaves none of the previous group's in the field
+    openingCapacity.current = undefined
+    if (!measuredFromGroup.current) return
+    measuredFromGroup.current = false
+    setMeasured({ measuredWaterCapacity: emptyStep })
+    setMeasuredFor(undefined)
+    got('capacity')
   }
 
   /** A capacity chosen in the figure replaces the one the opened load still asks for. */
@@ -2381,6 +2423,7 @@ export function useWorkbenchState() {
    */
   function typeMeasured(value: FieldValue) {
     openingCapacity.current = undefined
+    measuredFromGroup.current = false
     if (value.si !== undefined || value.text.trim() === '') got('capacity')
     else setAsked((a) => (a.capacity ? { ...a, capacity: { id: a.capacity.id, failed: true } } : a))
     setMeasured({ measuredWaterCapacity: value })
@@ -2462,6 +2505,10 @@ export function useWorkbenchState() {
   const measuredWaterCapacity = measuredCapacityOf(measuredFor, cartridgeKey, measured)
   const chosenCapacity = chosenCapacityOf(capacityChoice, cartridgeKey)
   const chosenCase = chosenCapacityOf(caseChoice, cartridgeKey)
+  const chosenOwnCase = chosenCapacityOf(ownCaseChoice, cartridgeKey)
+  const cartridgeCases = cartridge
+    ? cases.filter((c) => c.cartridge === `catalogue:${cartridge.id}`)
+    : []
 
   const activeStep = ladderStepField(ladderKind, {
     seat: seatStep,
@@ -2642,7 +2689,8 @@ export function useWorkbenchState() {
     powder: savedRef(asked.powder?.id, powderDesign?.id, powder?.id),
     notes,
     capacity: capacityRef,
-    caseRecord: chosenCase && catalogueRef(chosenCase),
+    caseRecord:
+      (chosenOwnCase && userRefOf(chosenOwnCase)) || (chosenCase && catalogueRef(chosenCase)),
     seating,
     ladder: ladderPartOf(ladderSteps, ladderKind, activeStep.si, direction),
     sessions: sessionRefs,
@@ -2828,7 +2876,10 @@ export function useWorkbenchState() {
     capacityId: chosenCapacity,
     setCapacityChoice: chooseCapacity,
     caseId: chosenCase,
-    setCaseChoice,
+    setCaseChoice: chooseCase,
+    ownCases: cartridgeCases,
+    ownCaseId: chosenOwnCase,
+    chooseOwnCase,
     storeLoad,
     pending,
     powder: chosenPowder,

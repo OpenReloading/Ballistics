@@ -13,7 +13,7 @@ The cartridge designer seats a bullet in the case and chamber of its own values:
 
 ## Which capacity a load uses
 
-A load can name a case record (`case.record`, [Cases](../data/cases.md)) and a case capacity record (`capacity`). The capacity record is a figure the user measured on fired cases, or a catalogue figure chosen for the cartridge. The case record states the water capacity of the product as its manufacturer gives it. The capacity record takes precedence; without one the stated capacity of the case record is the default, and without either the capacity is not given. A stated capacity is never saved into the load: opening a load reads it again from the case record. Code: `packages/schema/src/case-capacity.ts`, `loadWaterCapacity`.
+A load can name a case record (`case.record`, [Cases](../data/cases.md): a catalogue product, or a group of the user's own cases) and a case capacity record (`capacity`). A group of the user's cases names the capacity record that holds the water the user measured on it, and choosing the group in the workbench makes that record the load's capacity. The capacity record is a figure the user measured on fired cases, or a catalogue figure chosen for the cartridge. The case record states the water capacity of the product as its manufacturer gives it. The capacity record takes precedence; without one the stated capacity of the case record is the default, and without either the capacity is not given. A stated capacity is never saved into the load: opening a load reads it again from the case record. Code: `packages/schema/src/case-capacity.ts`, `loadWaterCapacity`.
 
 The seating geometry is in `packages/drawing/src/seating/seating.ts`, the outline in `packages/drawing/src/bullet/outline.ts`.
 

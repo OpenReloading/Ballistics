@@ -66,6 +66,12 @@ export const sections = [
         description:
           'Your firearms with their optics and zeros, kept in this browser and in files; they fill the rifle fields of the workbench.',
       },
+      {
+        href: '/my-cases',
+        label: 'My cases',
+        description:
+          'Your groups of cases with their measured water capacity, trim length and neck wall, kept in this browser and in files; the workbench picks them.',
+      },
     ],
   },
 ] as const

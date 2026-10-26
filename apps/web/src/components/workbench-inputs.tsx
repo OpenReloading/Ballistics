@@ -1154,6 +1154,9 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
     setCapacityChoice,
     caseId,
     setCaseChoice,
+    ownCases,
+    ownCaseId,
+    chooseOwnCase,
     setSeatAt,
     suggestions,
   } = useLoad()
@@ -1223,6 +1226,9 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
       onCaseId={(id) =>
         cartridge && setCaseChoice(id ? { cartridge: cartridge.id, id } : undefined)
       }
+      ownCases={ownCases}
+      ownCaseId={ownCaseId}
+      onOwnCaseId={chooseOwnCase}
       onMeasuredWaterCapacity={(v) => {
         typeMeasured(v)
         setMeasuredFor(measuredId)

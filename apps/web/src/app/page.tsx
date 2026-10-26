@@ -35,6 +35,7 @@ const inData: Record<string, ReactNode> = {
   '/targets': <Count list={listAllTargetFaces} />,
   '/disciplines': <Count list={listDisciplines} />,
   '/firearms': 'In this browser',
+  '/my-cases': 'In this browser',
 }
 
 /** A card's head: the page's icon left of its linked title. */

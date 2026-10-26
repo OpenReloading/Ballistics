@@ -31,7 +31,7 @@ export function useShellActions(): { pages: Command[]; commands: Command[] } {
     commands: [
       { label: 'Settings', run: () => openSettings() },
       { label: 'Units settings', run: () => openSettings('units') },
-      { label: 'Workbench defaults', run: () => openSettings('defaults') },
+      { label: 'Workbench settings', run: () => openSettings('workbench') },
       { label: 'Safety notice', run: openSafety },
       { label: 'Keyboard shortcuts', run: openShortcuts, keys: shortcutLabel('help') },
       { label: 'Theme: system', run: () => setColorScheme('auto') },

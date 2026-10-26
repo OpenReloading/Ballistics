@@ -220,7 +220,11 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
     {
       schema: { params: idParams },
       config: {
-        response: cartridgeCase.extend({ revision }),
+        // a catalogue case always names its manufacturer
+        response: cartridgeCase.safeExtend({
+          manufacturer: cartridgeCase.shape.manufacturer.unwrap(),
+          revision,
+        }),
         errors: [404],
         moved: true,
         summary: 'Get a case',
