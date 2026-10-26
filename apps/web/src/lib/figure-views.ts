@@ -27,35 +27,47 @@ export function figureViews(
   medium: Medium = 'screen',
   views: readonly FigureView[] = ['cartridge', 'chamber', 'combined'],
 ): Partial<Record<FigureView, FigureModel>> {
+  return figureViewBuilder(spec, preview, unit, medium, views)(seated)
+}
+
+/**
+ * `figureViews` split by what a slider move changes: the Combined and Chamber models and the text
+ * size are built once, each call lays out only the Cartridge side for its seated lengths and
+ * shares the frame again. The result equals `figureViews` for the same arguments.
+ */
+export function figureViewBuilder(
+  spec: Parameters<typeof recordFigures>[0],
+  preview: Drawn | undefined,
+  unit: LengthUnit,
+  medium: Medium = 'screen',
+  views: readonly FigureView[] = ['cartridge', 'chamber', 'combined'],
+): (seated?: SeatedLengths) => Partial<Record<FigureView, FigureModel>> {
   const record = recordFigures(spec).find((f) => f.drawn.length)?.drawn
   const shown = record ?? preview
-  if (!shown) return {}
+  if (!shown) return () => ({})
   const em = screenEm([shown], unit)
-  const models: Partial<Record<FigureView, FigureModel>> = {}
+  const lay = (d: Drawn[number]) => figureModel([d], medium, em, 0, [], false, unit)
+  const fixed: Partial<Record<FigureView, FigureModel>> = {}
   if (preview && views.includes('combined'))
-    models.combined = figureModel(preview, medium, em, 0, [], false, unit)
-  for (const d of record ?? [])
-    if (views.includes(d.side))
-      models[d.side] = figureModel(
-        [seated && d.side === 'cartridge' ? seatedSide(d, seated, unit) : d],
-        medium,
-        em,
-        0,
-        [],
-        false,
-        unit,
-      )
-  const all = Object.values(models)
-  if (all.length === 0) return {}
-  const left = Math.min(...all.map((m) => m.frame[0]))
-  const top = Math.min(...all.map((m) => m.frame[1]))
-  const right = Math.max(...all.map((m) => m.frame[0] + m.frame[2]))
-  const bottom = Math.max(...all.map((m) => m.frame[1] + m.frame[3]))
-  const frame: FigureModel['frame'] = [left, top, right - left, bottom - top]
-  const { scale } = all.find((m) => m.frame[1] + m.frame[3] === bottom) as FigureModel
-  return Object.fromEntries(
-    Object.entries(models).map(([view, m]) => [view, { ...m, frame, scale }]),
-  )
+    fixed.combined = figureModel(preview, medium, em, 0, [], false, unit)
+  const sides = (record ?? []).filter((d) => views.includes(d.side))
+  for (const d of sides) if (d.side !== 'cartridge') fixed[d.side] = lay(d)
+  return (seated) => {
+    const models = { ...fixed }
+    for (const d of sides)
+      if (d.side === 'cartridge') models.cartridge = lay(seated ? seatedSide(d, seated, unit) : d)
+    const all = Object.values(models)
+    if (all.length === 0) return {}
+    const left = Math.min(...all.map((m) => m.frame[0]))
+    const top = Math.min(...all.map((m) => m.frame[1]))
+    const right = Math.max(...all.map((m) => m.frame[0] + m.frame[2]))
+    const bottom = Math.max(...all.map((m) => m.frame[1] + m.frame[3]))
+    const frame: FigureModel['frame'] = [left, top, right - left, bottom - top]
+    const { scale } = all.find((m) => m.frame[1] + m.frame[3] === bottom) as FigureModel
+    return Object.fromEntries(
+      Object.entries(models).map(([view, m]) => [view, { ...m, frame, scale }]),
+    )
+  }
 }
 
 /** COAL and CBTO of the seated bullet, mm; CBTO only with the bullet's base-to-ogive. */

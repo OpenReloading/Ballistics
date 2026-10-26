@@ -4,7 +4,7 @@ import { chamberOf, coalRange, previewDrawn } from '@open-reloading/drawing/seat
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { drawable } from '../src/lib/cartridge-sheet.ts'
-import { figureViews } from '../src/lib/figure-views.ts'
+import { figureViewBuilder, figureViews } from '../src/lib/figure-views.ts'
 import { defined, missing } from './defined.ts'
 import { sheetRecord } from './records.ts'
 
@@ -127,6 +127,14 @@ describe("the workbench card's Cartridge view", () => {
     // angles and radii stay as on the record page
     expect(seated?.labels.length).toBe((page?.labels.length ?? 0) + 1)
     expect(seated?.labels.map((l) => l.text)).toContain('COAL 68.74')
+  })
+
+  it('a builder reused across seatings gives what a fresh one gives, with the shared frame', () => {
+    const reused = figureViewBuilder(spec, undefined, 'mm')
+    for (const seated of [{ coal: 68.74, cbto: 52.74 }, { coal: 72.1 }, undefined, { coal: 60 }]) {
+      const fresh = figureViews(spec, undefined, 'mm', seated)
+      expect(reused(seated)).toEqual(fresh)
+    }
   })
 
   it('the level figure carries the same dimensions as the upright one, on screen', () => {
