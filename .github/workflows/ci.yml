@@ -289,6 +289,9 @@ jobs:
         with:
           path: apps/web/.next/cache/turbopack
           key: ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'package-lock.json', 'patches/**', 'apps/web/next.config.ts') }}-${{ hashFiles('apps/web/src/**', 'packages/*/src/**') }}
+      - name: JavaScript budget per route
+        if: env.BUILD_WEB == 'true'
+        run: npm run check-weight -w @open-reloading/web
       - run: node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON apps/web/scripts/check-prerender.mts
         if: env.BUILD_WEB == 'true'
         env:
