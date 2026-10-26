@@ -209,6 +209,12 @@ describe('userDataFile', () => {
     expect(userRecord.safeParse(kind).success).toBe(false)
   })
 
+  it('keeps a powder draft whose numbers are out of the finished record bounds', () => {
+    const interior = { gamma: 1, pressureExponent: 0, burnForm: { z1: 0 } }
+    const draft = { ...powderRecord, data: { ...powderRecord.data, draft: { interior } } }
+    expect(userRecord.safeParse(draft).success).toBe(true)
+  })
+
   it('refuses a powder with an id that is no UUID, and says why', () => {
     const r = userRecord.safeParse({ ...powderRecord, id: 'old-1' })
     expect(r.error?.issues[0]).toMatchObject({ path: ['id'], message: designIdProblem })

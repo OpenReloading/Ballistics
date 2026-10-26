@@ -17299,15 +17299,7 @@
                                           "properties": {
                                             "value": {
                                               "description": "In g/cm3.",
-                                              "anyOf": [
-                                                {
-                                                  "type": "number",
-                                                  "description": "In g/cm3."
-                                                },
-                                                {
-                                                  "type": "null"
-                                                }
-                                              ]
+                                              "type": ["number", "null"]
                                             },
                                             "raw": {
                                               "description": "The value as written in the source, when it differed.",
@@ -17343,15 +17335,7 @@
                                                   "properties": {
                                                     "value": {
                                                       "description": "In g/cm3.",
-                                                      "anyOf": [
-                                                        {
-                                                          "type": "number",
-                                                          "description": "In g/cm3."
-                                                        },
-                                                        {
-                                                          "type": "null"
-                                                        }
-                                                      ]
+                                                      "type": ["number", "null"]
                                                     },
                                                     "raw": {
                                                       "description": "The value as written in the source, when it differed.",
@@ -17551,15 +17535,7 @@
                                                     },
                                                     "standardUncertainty": {
                                                       "description": "The `interior.vivacity.standardUncertainty` of the powder record. `null` removes it.",
-                                                      "anyOf": [
-                                                        {
-                                                          "type": "number",
-                                                          "minimum": 0
-                                                        },
-                                                        {
-                                                          "type": "null"
-                                                        }
-                                                      ]
+                                                      "type": ["number", "null"]
                                                     }
                                                   }
                                                 },
@@ -17580,15 +17556,7 @@
                                                     },
                                                     "standardUncertainty": {
                                                       "description": "The `interior.energy.standardUncertainty` of the powder record. `null` removes it.",
-                                                      "anyOf": [
-                                                        {
-                                                          "type": "number",
-                                                          "minimum": 0
-                                                        },
-                                                        {
-                                                          "type": "null"
-                                                        }
-                                                      ]
+                                                      "type": ["number", "null"]
                                                     }
                                                   }
                                                 },
@@ -17599,15 +17567,7 @@
                                             },
                                             "gamma": {
                                               "description": "The `interior.gamma` of the powder record. `null` removes it.",
-                                              "anyOf": [
-                                                {
-                                                  "type": "number",
-                                                  "exclusiveMinimum": 1
-                                                },
-                                                {
-                                                  "type": "null"
-                                                }
-                                              ]
+                                              "type": ["number", "null"]
                                             },
                                             "covolume": {
                                               "description": "The `interior.covolume` of the powder record. `null` removes it.",
@@ -17617,16 +17577,7 @@
                                                   "properties": {
                                                     "value": {
                                                       "description": "In m3/kg.",
-                                                      "anyOf": [
-                                                        {
-                                                          "type": "number",
-                                                          "minimum": 0,
-                                                          "description": "In m3/kg."
-                                                        },
-                                                        {
-                                                          "type": "null"
-                                                        }
-                                                      ]
+                                                      "type": ["number", "null"]
                                                     },
                                                     "raw": {
                                                       "description": "The value as written in the source, when it differed.",
@@ -17656,16 +17607,7 @@
                                                   "properties": {
                                                     "value": {
                                                       "description": "In g/cm3.",
-                                                      "anyOf": [
-                                                        {
-                                                          "type": "number",
-                                                          "exclusiveMinimum": 0,
-                                                          "description": "In g/cm3."
-                                                        },
-                                                        {
-                                                          "type": "null"
-                                                        }
-                                                      ]
+                                                      "type": ["number", "null"]
                                                     },
                                                     "raw": {
                                                       "description": "The value as written in the source, when it differed.",
@@ -17689,15 +17631,7 @@
                                             },
                                             "pressureExponent": {
                                               "description": "The `interior.pressureExponent` of the powder record. `null` removes it.",
-                                              "anyOf": [
-                                                {
-                                                  "type": "number",
-                                                  "exclusiveMinimum": 0
-                                                },
-                                                {
-                                                  "type": "null"
-                                                }
-                                              ]
+                                              "type": ["number", "null"]
                                             },
                                             "referencePressure": {
                                               "description": "The `interior.referencePressure` of the powder record. `null` removes it.",
@@ -17707,16 +17641,7 @@
                                                   "properties": {
                                                     "value": {
                                                       "description": "In bar.",
-                                                      "anyOf": [
-                                                        {
-                                                          "type": "number",
-                                                          "exclusiveMinimum": 0,
-                                                          "description": "In bar."
-                                                        },
-                                                        {
-                                                          "type": "null"
-                                                        }
-                                                      ]
+                                                      "type": ["number", "null"]
                                                     },
                                                     "raw": {
                                                       "description": "The value as written in the source, when it differed.",
@@ -17746,16 +17671,7 @@
                                                   "properties": {
                                                     "value": {
                                                       "description": "In bar.",
-                                                      "anyOf": [
-                                                        {
-                                                          "type": "number",
-                                                          "exclusiveMinimum": 0,
-                                                          "description": "In bar."
-                                                        },
-                                                        {
-                                                          "type": "null"
-                                                        }
-                                                      ]
+                                                      "type": ["number", "null"]
                                                     },
                                                     "raw": {
                                                       "description": "The value as written in the source, when it differed.",
@@ -17785,16 +17701,7 @@
                                                   "properties": {
                                                     "value": {
                                                       "description": "In bar.",
-                                                      "anyOf": [
-                                                        {
-                                                          "type": "number",
-                                                          "minimum": 0,
-                                                          "description": "In bar."
-                                                        },
-                                                        {
-                                                          "type": "null"
-                                                        }
-                                                      ]
+                                                      "type": ["number", "null"]
                                                     },
                                                     "raw": {
                                                       "description": "The value as written in the source, when it differed.",
@@ -17824,15 +17731,7 @@
                                                   "properties": {
                                                     "value": {
                                                       "description": "In degC.",
-                                                      "anyOf": [
-                                                        {
-                                                          "type": "number",
-                                                          "description": "In degC."
-                                                        },
-                                                        {
-                                                          "type": "null"
-                                                        }
-                                                      ]
+                                                      "type": ["number", "null"]
                                                     },
                                                     "raw": {
                                                       "description": "The value as written in the source, when it differed.",
@@ -17884,15 +17783,7 @@
                                                             },
                                                             "standardUncertainty": {
                                                               "description": "The `interior.burnForm.a.standardUncertainty` of the powder record. `null` removes it.",
-                                                              "anyOf": [
-                                                                {
-                                                                  "type": "number",
-                                                                  "minimum": 0
-                                                                },
-                                                                {
-                                                                  "type": "null"
-                                                                }
-                                                              ]
+                                                              "type": ["number", "null"]
                                                             }
                                                           }
                                                         },
@@ -17907,28 +17798,11 @@
                                                     },
                                                     "q": {
                                                       "description": "The `interior.burnForm.q` of the powder record. `null` removes it.",
-                                                      "anyOf": [
-                                                        {
-                                                          "type": "number",
-                                                          "minimum": 0
-                                                        },
-                                                        {
-                                                          "type": "null"
-                                                        }
-                                                      ]
+                                                      "type": ["number", "null"]
                                                     },
                                                     "z1": {
                                                       "description": "The `interior.burnForm.z1` of the powder record. `null` removes it.",
-                                                      "anyOf": [
-                                                        {
-                                                          "type": "number",
-                                                          "exclusiveMinimum": 0,
-                                                          "maximum": 1
-                                                        },
-                                                        {
-                                                          "type": "null"
-                                                        }
-                                                      ]
+                                                      "type": ["number", "null"]
                                                     }
                                                   }
                                                 },
@@ -17951,16 +17825,7 @@
                                                           "properties": {
                                                             "value": {
                                                               "description": "In bar.",
-                                                              "anyOf": [
-                                                                {
-                                                                  "type": "number",
-                                                                  "minimum": 0,
-                                                                  "description": "In bar."
-                                                                },
-                                                                {
-                                                                  "type": "null"
-                                                                }
-                                                              ]
+                                                              "type": ["number", "null"]
                                                             },
                                                             "raw": {
                                                               "description": "The value as written in the source, when it differed.",
@@ -17984,27 +17849,11 @@
                                                     },
                                                     "oversize": {
                                                       "description": "The `interior.resistance.oversize` of the powder record. `null` removes it.",
-                                                      "anyOf": [
-                                                        {
-                                                          "type": "number",
-                                                          "minimum": 0
-                                                        },
-                                                        {
-                                                          "type": "null"
-                                                        }
-                                                      ]
+                                                      "type": ["number", "null"]
                                                     },
                                                     "engraving": {
                                                       "description": "The `interior.resistance.engraving` of the powder record. `null` removes it.",
-                                                      "anyOf": [
-                                                        {
-                                                          "type": "number",
-                                                          "minimum": 0
-                                                        },
-                                                        {
-                                                          "type": "null"
-                                                        }
-                                                      ]
+                                                      "type": ["number", "null"]
                                                     }
                                                   }
                                                 },
@@ -18015,29 +17864,11 @@
                                             },
                                             "trainingRows": {
                                               "description": "The `interior.trainingRows` of the powder record. `null` removes it.",
-                                              "anyOf": [
-                                                {
-                                                  "type": "integer",
-                                                  "exclusiveMinimum": 0,
-                                                  "maximum": 9007199254740991
-                                                },
-                                                {
-                                                  "type": "null"
-                                                }
-                                              ]
+                                              "type": ["number", "null"]
                                             },
                                             "trainingCartridges": {
                                               "description": "The `interior.trainingCartridges` of the powder record. `null` removes it.",
-                                              "anyOf": [
-                                                {
-                                                  "type": "integer",
-                                                  "exclusiveMinimum": 0,
-                                                  "maximum": 9007199254740991
-                                                },
-                                                {
-                                                  "type": "null"
-                                                }
-                                              ]
+                                              "type": ["number", "null"]
                                             }
                                           }
                                         },

@@ -293,6 +293,8 @@ export interface Design {
   fitted: FittedKey[]
   rows: Ingredient[]
   fields: Fields
+  /** The burn-law fields of an opened record that the designer has no input for, kept as they were. */
+  unoffered: Tree
 }
 
 let counter = 0
@@ -314,6 +316,7 @@ export const newDesign = (): Design => ({
   fitted: [],
   rows: [{ id: rowId(), name: '', cas: '' }],
   fields: {},
+  unoffered: {},
 })
 
 const rowKeys = (id: string) => [`comp.${id}.min`, `comp.${id}.max`]
@@ -396,13 +399,20 @@ export function fileData(d: Design): UserPowder {
   })
   if (rows.length > 0) draft.composition = rows
   const interior = interiorOf(draft.interior as Tree | undefined, d.fitted)
-  if (interior) draft.interior = interior
+  if (interior) draft.interior = { ...interior, ...d.unoffered }
   return {
     origin: 'user',
     ...(d.provenanceKind && { provenanceKind: d.provenanceKind }),
     ...(Object.keys(draft).length > 0 && { draft: draft as NonNullable<UserPowder['draft']> }),
   }
 }
+
+const unofferedKeys = ['resistance', 'trainingRows', 'trainingCartridges'] as const
+
+const unofferedOf = (interior: Tree | undefined): Tree =>
+  Object.fromEntries(
+    unofferedKeys.flatMap((k) => (interior?.[k] === undefined ? [] : [[k, interior[k]]])),
+  )
 
 /** The draft of record data `data` named `name`, its numbers shown in `system`. */
 export function fromFile(data: UserPowder, name: string, system: UnitSystem): Design {
@@ -428,6 +438,7 @@ export function fromFile(data: UserPowder, name: string, system: UnitSystem): De
     fitted: [...(draft?.interior?.fitted ?? [])],
     rows: rows.length > 0 ? rows : [{ id: rowId(), name: '', cas: '' }],
     fields,
+    unoffered: unofferedOf(draft?.interior as Tree | undefined),
   }
 }
 
@@ -538,7 +549,12 @@ export const powderDesigns = (records: readonly UserRecord[]): PowderDesign[] =>
 /** The powder the draft builds as the tools use it, or the problems with the draft. */
 export function checkDesign(d: Design, id: string): { powder: Powder } | { problems: Problem[] } {
   const built = powderOf(fileData(d), d.name, id)
-  return 'powder' in built ? built : { problems: problemsOf(d, built.issues) }
+  // a typed text that reads as no number is left out of the record, so the record is not done
+  const unread = Object.entries(d.fields)
+    .filter(([, v]) => v.text.trim() !== '' && v.si === undefined)
+    .map(([key]) => ({ key, message: 'Not a number.' }))
+  if ('powder' in built) return unread.length > 0 ? { problems: unread } : built
+  return { problems: [...unread, ...problemsOf(d, built.issues)] }
 }
 
 export type Action =

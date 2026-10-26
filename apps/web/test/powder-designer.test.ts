@@ -202,6 +202,35 @@ describe('the draft file', () => {
     expect(parseUserDataFile(userDataText([record(d)])).ok).toBe(true)
   })
 
+  it('stores a half-typed number that the finished record would refuse', () => {
+    const d = typed(typed(newDesign(), 'interior.gamma', '1'), 'interior.burnForm.z1', '0')
+    const data = fileData(d)
+    expect(data.draft?.interior?.gamma).toBe(1)
+    expect(parseUserDataFile(userDataText([record(d)])).ok).toBe(true)
+  })
+
+  it('keeps the burn-law values of an opened record that it has no input for', () => {
+    const resistance = { stress: { value: 2e6 }, oversize: 0.1, engraving: 0.2 }
+    const opened: UserPowder = {
+      ...sample,
+      draft: {
+        ...sample.draft,
+        interior: { ...sample.draft?.interior, resistance, trainingRows: 40 },
+      },
+    }
+    const back = fileData(fromFile(opened, 'Opened', metric))
+    expect(back.draft?.interior?.resistance).toEqual(resistance)
+    expect(back.draft?.interior?.trainingRows).toBe(40)
+  })
+
+  it('is not done while a field holds text that reads as no number', () => {
+    const d = typed(fromFile(sample, 'Sample powder', metric), 'bulkDensity.value', '1,4x')
+    const checked = checkDesign(d, id)
+    expect('problems' in checked && checked.problems.map((p) => p.key)).toContain(
+      'bulkDensity.value',
+    )
+  })
+
   it('builds the powder of a stored record', () => {
     const built = powderOf(sample, 'Stored', id)
     expect('powder' in built && built.powder.interior?.energy.value).toBe(3.8e6)
