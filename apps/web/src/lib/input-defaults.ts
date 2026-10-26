@@ -58,6 +58,25 @@ export type DefaultSources = {
 
 const positive = (x: number | undefined): x is number => x !== undefined && x > 0
 
+/**
+ * Whether the chamber volume of a run is a measured case capacity: one was entered for the
+ * cartridge and the volume field still holds a value that capacity gives (its followed default or
+ * the seated bullet's), not a typed one. A record's capacity and a typed volume are estimates.
+ */
+export function volumeMeasured(a: {
+  measuredCapacity: number | undefined
+  volume: number | undefined
+  /** The values the measured capacity gives the field: the followed default, the seated volume. */
+  derived: readonly (number | undefined)[]
+}): boolean {
+  const { volume } = a
+  return (
+    positive(a.measuredCapacity) &&
+    positive(volume) &&
+    a.derived.some((v) => positive(v) && Math.abs(v - volume) <= 1e-9 * v)
+  )
+}
+
 /** The default of each field from what is chosen, in the order firearm, cartridge record, Settings, class. */
 export function suggestDefaults({
   firearm: gun,
