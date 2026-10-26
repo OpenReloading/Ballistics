@@ -79,6 +79,9 @@ Parsers for chronograph export files, ESM. Pure functions from file text, or fro
   - A row with more cells than the header throws, naming the unquoted-comma cause when the comma was detected. Headerless rows with different counts throw. `skipRows` must be a whole number and is refused with a header-text column.
   - Unit per row from a recognised `velocityUnit` cell, else the token of a header-text velocity column (recognised bracketed text, else a recognised last word), else a non-empty `velocityUnit` cell, else the `velocityUnit` option. A `velocityUnit` cell naming another recognised unit than the token throws.
   - Empty velocity skipped with a warning. Consecutive equal `string` labels form one string. `coldBore` accepts `1 x yes true` and `0 no false` or empty. Any other `excluded` text is the reason. Default device kind `other` without manufacturer name or model.
+- `parsePressureHistory(text, { sensor, pressureUnit?, timeUnit?, columns?, delimiter?, lowPass? })` (`src/pressure-history.ts`): a pressure-time trace for `fitPressureCurve` of core (no dependency on it). Times in s, `pressureBar` in bar.
+  - Units from the header (text in `(...)` or `[...]`, else a recognised last word) or the options. A missing unit throws `pressure unit is missing: ...` (time likewise), a file unit that differs from the option throws. The sensor position (`breech`, `mean`, `base`) is always the caller's.
+  - Throws on a non-number (`line <n>: ...`), times that do not increase and fewer than 3 samples. `lowPass: { cutoff }` is a zero-phase one-pole filter.
 - `parseOpenReloadingCsv`: first row of names from `string velocity velocityUnit coldBore excluded` (any case, trailing empty cells ignored, `velocity` required), delimiter from that row.
 
 ## Unverified and tests
