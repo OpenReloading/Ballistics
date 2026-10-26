@@ -1,0 +1,19 @@
+# Licence policy. Read by the `dependency-review` step of ci.yml (a pull request that adds a package
+# under another licence fails) and by tools/src/licences.ts (the production dependencies of the images).
+# Review of a licence outside the list: a person adds the package to allow-dependencies-licenses with
+# the reason on its line. The review step matches the package by name, any version.
+allow-licenses:
+  - MIT
+  - MIT-0
+  - Apache-2.0
+  - BSD-2-Clause
+  - BSD-3-Clause
+  - ISC
+  - 0BSD
+  - CC0-1.0
+  - Unlicense
+  - BlueOak-1.0.0
+  - Python-2.0
+allow-dependencies-licenses:
+  - pkg:npm/caniuse-lite # CC-BY-4.0, a browser-support data table without code
+

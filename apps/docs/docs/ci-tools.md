@@ -5,7 +5,7 @@ sidebar_position: 3
 
 # CI, quality and supply-chain tools
 
-One tool per job, each free for a public repository. Terms checked on 2026-10-20 on the pages linked (oasdiff and Schemathesis on 2026-10-21, dependency-cruiser, swc and knip on 2026-10-26). Recheck a term before use.
+One tool per job, each free for a public repository. Terms checked on 2026-10-20 on the pages linked (oasdiff and Schemathesis on 2026-10-21, dependency-cruiser, swc, knip and yaml on 2026-10-26). Recheck a term before use.
 
 | Job | Tool | Runs in | Free terms (public repository) |
 |---|---|---|---|
@@ -14,8 +14,9 @@ One tool per job, each free for a public repository. Terms checked on 2026-10-20
 | Static analysis for security | CodeQL default setup (JavaScript/TypeScript, Actions) | repository settings | Free for public repositories. [Security features](https://docs.github.com/en/code-security/getting-started/github-security-features), [default setup](https://docs.github.com/en/code-security/how-tos/scan-code-for-vulnerabilities/configure-code-scanning/configuring-default-setup-for-code-scanning) |
 | AI review | CodeRabbit, OSS plan (`.coderabbit.yaml`) | GitHub App | Free for public repositories. 1 to 10 reviews per hour by star count. Below 10 stars a review starts with `@coderabbitai review`. Code goes to the model providers and is not used for training. [Plans](https://docs.coderabbit.ai/management/plans), [FAQ](https://docs.coderabbit.ai/faq) |
 | Dependency updates | Dependabot (`.github/dependabot.yml`) | GitHub | Free on all plans. [Options](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference) |
-| Dependency review | `actions/dependency-review-action` | `ci.yml` `dependency-review` | Free for public repositories. [About](https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/about-dependency-review) |
+| Dependency review | `actions/dependency-review-action`, licence list in `.github/dependency-review-config.yml` | `ci.yml` `dependency-review` | Free for public repositories. [About](https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/about-dependency-review) |
 | Secrets | Secret scanning with push protection | repository settings | Free for public repositories. [About](https://docs.github.com/en/code-security/secret-scanning/introduction/about-secret-scanning) |
+| Licence policy | `tools/src/licences.ts` (Node, `yaml` 2, ISC) over package-lock.json | `ci.yml` `check` (`static`) | Local. [yaml](https://github.com/eemeli/yaml), [license](https://github.com/eemeli/yaml/blob/main/LICENSE) |
 | Import rules | dependency-cruiser, parsing TypeScript with @swc/core | `ci.yml` `check` (`static`) | MIT and Apache-2.0, local. [dependency-cruiser](https://github.com/sverweij/dependency-cruiser), [license](https://github.com/sverweij/dependency-cruiser/blob/main/LICENSE), [swc](https://github.com/swc-project/swc), [license](https://github.com/swc-project/swc/blob/main/LICENSE) |
 | Unused files, exports and dependencies | knip 6 (`knip.jsonc`) | `ci.yml` `check` (`static`) | ISC, local. [knip](https://github.com/webpro-nl/knip), [license](https://github.com/webpro-nl/knip/blob/main/LICENSE) |
 | Workflow lint and security | actionlint 1.7.12, zizmor 1.31.1 | `ci.yml` `workflows` | MIT, local. [actionlint](https://github.com/rhysd/actionlint), [zizmor](https://github.com/zizmorcore/zizmor) |
