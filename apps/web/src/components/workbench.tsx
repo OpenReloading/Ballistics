@@ -62,6 +62,7 @@ import {
   shownSteps,
   singleCharge,
   stepFlag,
+  volumeNoteText,
   warningLines,
 } from './workbench-outcome.ts'
 import { RangeView } from './workbench-range.tsx'
@@ -768,7 +769,8 @@ function PrintViews({
     : ''
   const seatingRows = seatingRowsOf(ok, system)
   const runTemperature = ok && withUnit('temperature', system, ok.load.propellantTemperature)
-  const approximate = approximateNote(ok)
+  const approximate =
+    [approximateNote(ok), volumeNoteText(ok)].filter(Boolean).join(' ') || undefined
   /** Said on every print and result that took values from a user cartridge design. */
   const fromDesign = ok?.cartridgeDesign
     ? `Case values from the user design ${ok.cartridgeDesign}, not a catalogue record.`

@@ -62,6 +62,7 @@ import {
   type Suggestion,
   type Suggestions,
   suggestDefaults,
+  volumeMeasured,
 } from '../lib/input-defaults.ts'
 import { burnFormError, interiorBody, interiorFields } from '../lib/interior-input.ts'
 import {
@@ -1926,6 +1927,11 @@ export function useWorkbenchState() {
       resistanceMissing: a.resistanceMissing,
       design: bulletDesign?.name,
       cartridgeDesign: cartridgeDesign?.name,
+      volumeMeasured: volumeMeasured({
+        measuredCapacity: measuredWaterCapacity,
+        volume: fields.volume?.si,
+        derived: [suggestions.volume?.si, seated.volume],
+      }),
       identity: identityOf({
         cartridge,
         cartridgeDesign,

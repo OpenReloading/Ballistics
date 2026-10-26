@@ -71,6 +71,8 @@ export type Outcome =
       design?: string | undefined
       /** The user cartridge design whose values the run's fields took. */
       cartridgeDesign?: string | undefined
+      /** The run's chamber volume is a measured case capacity (`volumeMeasured`), not an estimate. */
+      volumeMeasured: boolean
       /** Id of the cartridge record the run compared its limits with. */
       cartridge?: string | undefined
       /** Cartridge, bullet and powder of the run, as their records name them. */
@@ -111,6 +113,16 @@ export type Outcome =
       /** The run failed while the browser reported no network. */
       offline?: boolean
     }
+
+/** The note of a run whose chamber volume is not a measured capacity: what is estimated and what to enter. */
+export const volumeNote = {
+  title: 'Chamber volume not measured',
+  text: 'The volume comes from a record or a typed value, and the peak pressure and muzzle velocity follow it. Enter a measured case capacity in the Cartridge card to replace it.',
+}
+
+/** The note as one sentence pair for the prints, none when the run's volume is measured. */
+export const volumeNoteText = (ok: { volumeMeasured: boolean } | undefined) =>
+  ok && !ok.volumeMeasured ? `${volumeNote.title}: ${volumeNote.text}` : undefined
 
 export const notReached = 'The API is unreachable.'
 export const needsNetwork =

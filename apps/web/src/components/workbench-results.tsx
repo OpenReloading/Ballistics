@@ -18,7 +18,7 @@ import { LotPanel } from './lot-rows.tsx'
 import { NavIcon } from './nav-icons.tsx'
 import { PowderCompare } from './powder-compare.tsx'
 import { chartCopy } from './print-report.tsx'
-import { ErrorNote, Loading } from './states.tsx'
+import { ErrorNote, Loading, Message } from './states.tsx'
 import { TrajectoryForm } from './trajectory-form.tsx'
 import { useInputEcho, useResult } from './workbench-context.ts'
 import { FigureTab } from './workbench-figure.tsx'
@@ -29,6 +29,7 @@ import {
   type ShownStep,
   singleCharge,
   stripFigureOf,
+  volumeNote,
   warningsLine,
 } from './workbench-outcome.ts'
 import {
@@ -465,7 +466,7 @@ function ResultsHead({
   )
 }
 
-/** What the run took from the user's designs instead of a catalogue record. */
+/** What the run took from the user's designs instead of a catalogue record, and the volume note. */
 function DesignNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> | undefined }) {
   return (
     <>
@@ -478,6 +479,11 @@ function DesignNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> | undefined 
         <p className="note user-design">
           Computed with the bullet mass of the user design {ok.design}, not a catalogue record.
         </p>
+      )}
+      {ok && !ok.volumeMeasured && (
+        <Message severity="info" title={volumeNote.title} compact>
+          {volumeNote.text}
+        </Message>
       )}
     </>
   )

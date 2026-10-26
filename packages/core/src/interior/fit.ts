@@ -1,7 +1,8 @@
 /**
- * Powder fit: fits the burn coefficient and, on request, the start pressure of the M3 interior
- * model to a chronograph ladder by weighted least squares, with optional Gaussian priors and a
- * Huber loss, and the prediction band of the fitted load at any charge,
+ * Powder fit: fits the burn coefficient and, on request, the start pressure and a correction
+ * factor of the chamber volume of the M3 interior model to a chronograph ladder by weighted least
+ * squares, with optional Gaussian priors and a Huber loss, and the prediction band of the fitted
+ * load at any charge,
  * `apps/docs/docs/models/interior-powder-fit.md`.
  * Every evaluation runs `interior` once per distinct charge. SI in and out.
  */
@@ -34,10 +35,10 @@ export interface LadderPoint {
 }
 
 /**
- * Parameter of the fit: the burn coefficient (or vivacity, by the load's burn kind) and the start
- * pressure, Pa.
+ * Parameter of the fit: the burn coefficient (or vivacity, by the load's burn kind), the start
+ * pressure, Pa, and the factor that multiplies the chamber volume (1 leaves it as given).
  */
-export type PowderParameter = 'burnRate' | 'startPressure'
+export type PowderParameter = 'burnRate' | 'startPressure' | 'volumeFactor'
 
 /**
  * Gaussian prior of one fitted parameter in its log parameter
@@ -45,19 +46,21 @@ export type PowderParameter = 'burnRate' | 'startPressure'
  */
 export interface PowderPrior {
   /**
-   * Centre of the prior, in the unit of the parameter. Burn coefficient: above 0. Start pressure:
-   * above the floor of the shot start, as the fitted value is.
+   * Centre of the prior, in the unit of the parameter. Burn coefficient and volume factor: above 0
+   * (a volume factor prior is centred on 1 where the volume is a record's nominal one). Start
+   * pressure: above the floor of the shot start, as the fitted value is.
    */
   value: number
-  /** Standard deviation of the log parameter: of ln(value) for the burn coefficient, of ln(value - floor) for the start pressure. */
+  /** Standard deviation of the log parameter: of ln(value) for the burn coefficient and the volume factor, of ln(value - floor) for the start pressure. */
   sigma: number
 }
 
 /** Options of `fitPowder`. */
 export interface PowderFitOptions {
   /**
-   * Default ['burnRate']; `startPressure` is resolved only with measured pressures
-   * (`apps/docs/docs/models/interior-powder-fit.md`, "Identifiability").
+   * Default ['burnRate']; `startPressure` is resolved only with measured pressures. `volumeFactor`
+   * corrects the load's chamber volume and, like the burn rate, is resolved only with a prior or
+   * measured pressures (`apps/docs/docs/models/interior-powder-fit.md`, "Identifiability").
    */
   parameters?: readonly PowderParameter[] | undefined
   /**
@@ -81,7 +84,7 @@ export interface PowderFitOptions {
   options?: Settings<InteriorOptions> | undefined
 }
 
-/** A fitted parameter: start value, result and uncertainty. */
+/** A fitted parameter: start value, result and uncertainty. A volume factor starts at 1. */
 export interface FittedPowderParameter {
   /** Which parameter. */
   name: PowderParameter
@@ -109,7 +112,7 @@ export interface PowderFitResidual {
 
 /** Result of `fitPowder`. */
 export interface PowderFit {
-  /** The input load with the fitted values applied; its charge is the input's. */
+  /** The input load with the fitted values applied (a volume factor scales its chamber volume); its charge is the input's. */
   load: InteriorLoad
   /** Fitted parameters, in the order of `PowderFitOptions.parameters`. */
   parameters: FittedPowderParameter[]
@@ -271,19 +274,22 @@ function powderParameterMap(
 ) {
   const fitsStart = parameters.includes('startPressure')
   const burn = load.propellant.burn
-  const initial = parameters.map((p) =>
-    p === 'startPressure'
-      ? load.startPressure
-      : burn.kind === 'vivacity'
-        ? burn.vivacity
-        : burn.coefficient,
-  )
+  const startValue = (p: PowderParameter) => {
+    if (p === 'startPressure') return load.startPressure
+    if (p === 'volumeFactor') return 1
+    return burn.kind === 'vivacity' ? burn.vivacity : burn.coefficient
+  }
+  const initial = parameters.map(startValue)
   const apply = (values: number[]): InteriorLoad => {
     const at = (name: PowderParameter) => values[parameters.indexOf(name)]
     const rate = parameters.includes('burnRate') ? at('burnRate') : undefined
+    const factor = parameters.includes('volumeFactor') ? at('volumeFactor') : undefined
     return {
       ...load,
       ...(fitsStart ? { startPressure: at('startPressure') } : {}),
+      ...(factor === undefined
+        ? {}
+        : { chamber: { ...load.chamber, volume: load.chamber.volume * factor } }),
       ...(rate === undefined
         ? {}
         : {
@@ -311,7 +317,7 @@ function powderParameterMap(
   return { initial, apply, offset, q, estimate }
 }
 
-/** Fits burn coefficient and optionally start pressure of `load` to the ladder. */
+/** Fits burn coefficient and optionally start pressure and chamber volume factor of `load` to the ladder. */
 export function fitPowder(
   load: InteriorLoad,
   ladder: readonly LadderPoint[],
@@ -322,8 +328,8 @@ export function fitPowder(
   need(
     parameters.length > 0 &&
       new Set(parameters).size === parameters.length &&
-      parameters.every((p) => p === 'burnRate' || p === 'startPressure'),
-    'parameters: burnRate and startPressure, each at most once',
+      parameters.every((p) => p === 'burnRate' || p === 'startPressure' || p === 'volumeFactor'),
+    'parameters: burnRate, startPressure and volumeFactor, each at most once',
   )
   need(
     Number.isInteger(maxIterations) && maxIterations > 0,
