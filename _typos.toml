@@ -20,7 +20,7 @@ extend-ignore-re = [
   # commit hashes in the generated CHANGELOG.md links
   "\\(\\[[0-9a-f]{7}\\]",
   # German month names of the ShotView export, a German CSV fixture line and a German stage label
-  "januar februar [^']*dezember",
+  "januar februar m\\\\u00E4rz april mai juni juli august september oktober november dezember",
   "8\\. Februar 2026",
   "Alle Sch\\\\u00FCsse",
   "Sek\\. Serie",
