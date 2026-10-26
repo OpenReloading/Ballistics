@@ -92,6 +92,30 @@ describe('case records', () => {
     )
   })
 
+  it('reports a load whose case record is no record', () => {
+    const load = {
+      id: 'test-load',
+      origin: 'catalogue',
+      name: 'Test load',
+      cartridge: 'catalogue:test-cartridge',
+      bullet: 'catalogue:test-bullet',
+      powder: 'catalogue:test-powder',
+      charge: { value: 3 },
+      case: { record: 'catalogue:missing-case' },
+      provenance,
+    }
+    const root = mkdtempSync(join(tmpdir(), 'cases-'))
+    cpSync(fixtures, root, { recursive: true })
+    try {
+      writeFileSync(join(root, 'loads', 'test-load.json'), JSON.stringify(load))
+      expect(readRecords(root).errors).toContain(
+        'loads/test-load.json: unknown case "catalogue:missing-case"',
+      )
+    } finally {
+      rmSync(root, { recursive: true })
+    }
+  })
+
   it('accepts the demo case of the committed records', () => {
     const { bundle, errors } = readRecords()
     expect(errors).toEqual([])

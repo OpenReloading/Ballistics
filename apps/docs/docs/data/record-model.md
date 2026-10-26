@@ -17,6 +17,7 @@ Writers: catalogue (git records, checked by `readRecords`), user (browser, `pack
 | Cartridge | `cartridge.ts` | `records/cartridges` | catalogue, generated from the C.I.P. sheets |
 | Bullet | `bullet.ts` | `records/bullets` | catalogue |
 | Powder | `powder.ts` | `records/powders` | catalogue |
+| Case | `case.ts` | `records/cases`, named by `Load.case.record` | catalogue |
 | Case capacity | `case-capacity.ts` | `records/capacities`, embedded in `GET /cartridges/:id`; user record `caseCapacity` (step 8) | catalogue, user |
 | Load | `load.ts` | `records/loads` (empty), bundle only: no route or web reader | catalogue |
 | Chronograph session | `chrono-session.ts` | `records/chrono` (empty), bundle only; user record `session` (step 7) | catalogue, user, importers |

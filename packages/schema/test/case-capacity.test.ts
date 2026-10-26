@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { caseCapacity, catalogueCaseCapacity, userRecord } from '../src/index.ts'
+import { caseCapacity, catalogueCaseCapacity, loadWaterCapacity, userRecord } from '../src/index.ts'
 import { expectIssueAt } from './issue-at.ts'
 
 const provenance = { kind: 'published', sources: [{ title: 'Example manual' }] }
@@ -53,5 +53,27 @@ describe('CaseCapacity', () => {
       data: user,
     }
     expect(userRecord.safeParse(record).success).toBe(true)
+  })
+})
+
+describe('loadWaterCapacity', () => {
+  const measured = { waterCapacity: { value: 3.52 } }
+  const stated = { waterCapacity: { value: 3.6 } }
+
+  it('uses the capacity record of a load that also names a case record', () => {
+    expect(loadWaterCapacity({ capacity: measured, case: stated })).toEqual({
+      grams: 3.52,
+      source: 'capacity',
+    })
+  })
+
+  it('falls back to the stated capacity of the case record', () => {
+    expect(loadWaterCapacity({ case: stated })).toEqual({ grams: 3.6, source: 'case' })
+    expect(loadWaterCapacity({ capacity: undefined, case: stated })?.source).toBe('case')
+  })
+
+  it('is unknown without a capacity record and without a stated capacity', () => {
+    expect(loadWaterCapacity({})).toBeUndefined()
+    expect(loadWaterCapacity({ case: {} })).toBeUndefined()
   })
 })

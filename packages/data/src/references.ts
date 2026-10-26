@@ -71,6 +71,16 @@ export function checkLoadCapacityReferences(
       errors.push(`loads/${l.id}.json: unknown capacity "${l.capacity}"`)
 }
 
+/** The case record of every load that names one. */
+export function checkLoadCaseReferences(bundle: Pick<Bundle, 'loads' | 'cases'>, errors: string[]) {
+  const known = new Set(bundle.cases.map((c) => c.id))
+  for (const l of bundle.loads) {
+    const record = l.case?.record
+    if (record !== undefined && !known.has(parseRef(record)?.id ?? record))
+      errors.push(`loads/${l.id}.json: unknown case "${record}"`)
+  }
+}
+
 /** The session of every load that names one. */
 export function checkLoadSessionReferences(
   bundle: Pick<Bundle, 'loads' | 'chronoSessions'>,
