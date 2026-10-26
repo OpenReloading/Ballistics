@@ -7607,14 +7607,14 @@ main .field-table tr.field-group > th {
 }
 
 /* one look for messages: the severity's fill and text, an edge in the text colour, and with it the
-   icon and the word, so colour is never the only signal */
+   icon and the word, so colour is never the only signal. Set here, not through Alert's variables,
+   which Mantine writes inline */
 .message {
-  --alert-bd: 1px solid var(--message-fg);
-  --alert-bg: var(--message-bg);
-  --alert-color: var(--message-fg);
-
   padding: 0.25rem 0.5rem;
-  border-inline-start: 4px solid var(--message-fg);
+  border: 1px solid var(--message-fg);
+  border-inline-start-width: 4px;
+  background-color: var(--message-bg);
+  color: var(--message-fg);
   font-size: var(--mantine-font-size-sm);
   line-height: 1.3;
 }
@@ -7638,8 +7638,7 @@ main .field-table tr.field-group > th {
   gap: 0.5rem;
 }
 
-.message .mantine-Alert-title,
-.message .mantine-Alert-body {
+.message :is(.mantine-Alert-title, .mantine-Alert-message, .mantine-Alert-icon) {
   color: var(--message-fg);
 }
 

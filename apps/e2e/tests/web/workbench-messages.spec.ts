@@ -73,7 +73,7 @@ test('the ladder target messages move nothing: none, a warning and an error keep
   const distance = section.getByLabel(/^Shooting distance/)
   const original = await distance.inputValue()
   await distance.fill('20000')
-  await expect(slot.getByRole('status')).toContainText('Warning: A mark of')
+  await expect(slot.locator('.message')).toContainText('Warning: A mark of')
   expect(await positions(section)).toEqual(before)
 
   // an invalid field: an error, announced at once, the field marked invalid
@@ -90,54 +90,92 @@ test('the ladder target messages move nothing: none, a warning and an error keep
   await expect(slot.locator('.message')).toHaveCount(0)
 })
 
-for (const count of [1, 3, 10])
-  test(`the message slot keeps its size with ${count} messages and its list is reached by keyboard`, async ({
-    page,
-  }) => {
-    test.setTimeout(60_000)
-    const section = await ladderTarget(page)
-    const slot = slotOf(section)
-    const before = await positions(section)
-    await section.getByLabel(/^Shooting distance/).fill('20000')
-    await expect(slot.locator('.message')).toHaveCount(1)
+test('the slot keeps its size with 1, 3 and 10 messages and its list is reached by keyboard', async ({
+  page,
+}) => {
+  test.setTimeout(60_000)
+  const section = await ladderTarget(page)
+  const slot = slotOf(section)
+  const before = await positions(section)
+  await section.getByLabel(/^Shooting distance/).fill('20000')
+  await expect(slot.locator('.message')).toHaveCount(1)
+  for (const count of [1, 3, 10]) {
     // more messages than the ladder can raise, cloned from the one shown
     await slot.evaluate((el, n) => {
-      const first = el.querySelector('.message') as HTMLElement
+      const [first, ...rest] = el.querySelectorAll('.message')
+      for (const e of rest) e.remove()
       for (let k = 1; k < n; k++) {
-        const copy = first.cloneNode(true) as HTMLElement
+        const copy = (first as HTMLElement).cloneNode(true) as HTMLElement
         copy.querySelector('.mantine-Alert-message')?.append(` (${k + 1})`)
         el.append(copy)
       }
+      el.scrollTop = 0
     }, count)
     await expect(slot.locator('.message')).toHaveCount(count)
     expect(await positions(section)).toEqual(before)
-    // the slot takes focus and End scrolls it to the last message
+    // the slot takes focus and End scrolls it to the last message, with an animation
     await slot.focus()
     await expect(slot).toBeFocused()
     await page.keyboard.press('End')
-    // the key scrolls with an animation: the last message comes into the slot's box
-    const reached = () =>
-      slot.evaluate((el) => {
-        const [slotBox, lastBox] = [el, el.lastElementChild as Element].map((e) =>
-          e.getBoundingClientRect(),
-        )
-        return (lastBox?.bottom ?? 0) <= (slotBox?.bottom ?? 0) + 1
-      })
-    await expect.poll(reached).toBe(true)
-  })
+    await expect
+      .poll(() =>
+        slot.evaluate((el) => {
+          const last = (el.lastElementChild as Element).getBoundingClientRect()
+          return last.bottom <= el.getBoundingClientRect().bottom + 1
+        }),
+      )
+      .toBe(true)
+  }
+})
 
-for (const colorScheme of ['light', 'dark'] as const)
-  test(`the ladder target messages are axe clean in ${colorScheme}`, async ({ page }) => {
-    test.setTimeout(60_000)
+test('each severity paints its own fill and text, axe clean in light and dark', async ({
+  page,
+}) => {
+  test.setTimeout(60_000)
+  const section = await ladderTarget(page)
+  const slot = slotOf(section)
+  await section.getByLabel(/^Shooting distance/).fill('20000')
+  await expect(slot.locator('.message')).toHaveCount(1)
+  for (const colorScheme of ['light', 'dark'] as const) {
     await page.emulateMedia({ colorScheme })
-    const section = await ladderTarget(page)
-    for (const typed of ['20000', '']) {
-      await section.getByLabel(/^Shooting distance/).fill(typed)
-      await expect(section.locator('.message')).toHaveCount(1)
+    for (const [severity, token] of [
+      ['info', 'info'],
+      ['warning', 'warn'],
+      ['error', 'error'],
+    ] as const) {
+      // the one message shown takes each severity in turn (info is not raised anywhere yet)
+      const painted = await slot.locator('.message').evaluate(
+        (el, [severity, token]) => {
+          el.setAttribute('data-severity', severity as string)
+          const colour = (variable: string) => {
+            const probe = document.createElement('i')
+            probe.style.color = `var(${variable})`
+            el.append(probe)
+            const value = getComputedStyle(probe).color
+            probe.remove()
+            return value
+          }
+          const text = el.querySelector('.mantine-Alert-message') as Element
+          return {
+            fill: [getComputedStyle(el).backgroundColor, colour(`--${token}-bg`)],
+            text: [getComputedStyle(text).color, colour(`--${token}-fg`)],
+          }
+        },
+        [severity, token],
+      )
+      expect(painted.fill[0], `${severity} fill in ${colorScheme}`).toBe(painted.fill[1])
+      expect(painted.text[0], `${severity} text in ${colorScheme}`).toBe(painted.text[1])
       const axe = await new AxeBuilder({ page }).include('.ladder-target-controls').analyze()
       expect(axe.violations.map((v) => `${v.id}: ${v.nodes.length}`)).toEqual([])
     }
-  })
+    // the error from an invalid field
+    await section.getByLabel(/^Shooting distance/).fill('')
+    await expect(slot.locator('.message')).toHaveCount(1)
+    const axe = await new AxeBuilder({ page }).include('.ladder-target-controls').analyze()
+    expect(axe.violations.map((v) => `${v.id}: ${v.nodes.length}`)).toEqual([])
+    await section.getByLabel(/^Shooting distance/).fill('20000')
+  }
+})
 
 test('the notice line keeps its box through a result with warnings, an error and no warnings', async ({
   page,
@@ -150,6 +188,8 @@ test('the notice line keeps its box through a result with warnings, an error and
   const charge = loadForm(page).getByLabel(/^Charge mass/)
   const seen = async () => ({
     line: await box(line),
+    // what follows the line starts where it did
+    below: (await box(line.locator('xpath=following-sibling::*[1]'))).top,
     slot: { ...(await box(slot)), top: 0, height: 0 },
   })
   const idle = await seen()
@@ -189,4 +229,31 @@ test('the warnings list scrolls inside the popover and takes focus to do so', as
   })
   expect(overflowY).toBe('auto')
   expect(maxHeight).not.toBe('none')
+})
+
+test('a ladder step size error in the Powder card moves no card and adds no scroll', async ({
+  page,
+}) => {
+  test.setTimeout(60_000)
+  await page.setViewportSize({ width: 1280, height: 650 })
+  await page.goto('/workbench')
+  await applyExampleLoad(page)
+  const form = loadForm(page)
+  await form.getByLabel(/^Ladder steps/).fill('5')
+  const step = form.getByLabel(/^Step size/)
+  const panels = () =>
+    page.locator('.workbench .panel').evaluateAll((els) =>
+      els.map((e) => {
+        const r = e.getBoundingClientRect()
+        return [Math.round(r.top), Math.round(r.height)]
+      }),
+    )
+  const before = await panels()
+  await step.fill('')
+  await step.press('Control+Enter')
+  await expect(form.getByText('Enter a number for Step size.')).toBeVisible()
+  expect(await panels()).toEqual(before)
+  expect(
+    await page.locator('.workspace-inputs').evaluate((e) => e.scrollHeight - e.clientHeight),
+  ).toBe(0)
 })

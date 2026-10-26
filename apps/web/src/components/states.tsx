@@ -88,6 +88,7 @@ export function Message({
   children,
   onRetry,
   compact = false,
+  announce = true,
 }: {
   severity: Severity
   title?: string | undefined
@@ -96,6 +97,8 @@ export function Message({
   onRetry?: (() => void) | undefined
   /** No margin: for a slot that sets the room. */
   compact?: boolean | undefined
+  /** False where a live region around it announces it: no role of its own. */
+  announce?: boolean | undefined
 }) {
   const { word, color, Icon } = severities[severity]
   const label = <span className="message-label">{word}:</span>
@@ -105,7 +108,7 @@ export function Message({
       data-severity={severity}
       color={color}
       variant="light"
-      role={severity === 'error' ? 'alert' : 'status'}
+      role={announce ? (severity === 'error' ? 'alert' : 'status') : 'none'}
       title={
         title && (
           <>
@@ -150,13 +153,15 @@ export function MessageSlot({
     <fieldset
       className="message-slot"
       aria-label={label}
+      // the polite region of the notes and warnings that appear; an error announces itself
+      aria-live="polite"
       // a box that may scroll takes focus, so the keyboard reaches the rest of the list
       tabIndex={messages.length > 0 ? 0 : undefined}
       data-count={messages.length}
     >
       {messages.map((m, k) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: messages have no identity
-        <Message key={k} severity={m.severity} compact>
+        <Message key={k} severity={m.severity} compact announce={m.severity === 'error'}>
           {m.text}
         </Message>
       ))}
