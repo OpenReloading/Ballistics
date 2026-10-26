@@ -3,7 +3,7 @@
 import { Alert, Button, EmptyState, Group, Skeleton, Stack, Text } from '@mantine/core'
 import { FunnelX, Info, Warning, WarningOctagon } from '@phosphor-icons/react'
 import { useRouter } from 'next/navigation'
-import type { ReactNode } from 'react'
+import { type ReactNode, useLayoutEffect, useState } from 'react'
 import { controlSize } from '../lib/theme.ts'
 import { PageBar } from './page-bar.tsx'
 
@@ -97,7 +97,7 @@ export function Message({
   onRetry?: (() => void) | undefined
   /** No margin: for a slot that sets the room. */
   compact?: boolean | undefined
-  /** False where a live region around it announces it: no role of its own. */
+  /** False where a live region around it announces it: a plain note, no live role of its own. */
   announce?: boolean | undefined
 }) {
   const { word, color, Icon } = severities[severity]
@@ -108,7 +108,7 @@ export function Message({
       data-severity={severity}
       color={color}
       variant="light"
-      role={announce ? (severity === 'error' ? 'alert' : 'status') : 'none'}
+      role={announce ? (severity === 'error' ? 'alert' : 'status') : 'note'}
       title={
         title && (
           <>
@@ -138,9 +138,35 @@ export function Message({
 }
 
 /**
+ * Whether a scroll area has more than its box shows, so it takes focus only then (a keyboard user
+ * reaches the rest of its list) and is no empty tab stop otherwise. `ref` goes on the area; as a
+ * callback it also follows an area that mounts later, as a popover's.
+ */
+export function useScrolls() {
+  const [el, ref] = useState<HTMLElement | null>(null)
+  const [scrolls, setScrolls] = useState(false)
+  useLayoutEffect(() => {
+    if (!el) return
+    const measure = () => setScrolls(el.scrollHeight > el.clientHeight)
+    measure()
+    // its box (a narrower window wraps the text) and its content
+    const resize = new ResizeObserver(measure)
+    const mutation = new MutationObserver(measure)
+    resize.observe(el)
+    mutation.observe(el, { childList: true, subtree: true, characterData: true })
+    return () => {
+      resize.disconnect()
+      mutation.disconnect()
+    }
+  }, [el])
+  return { ref, scrolls }
+}
+
+/**
  * A place for messages that keeps one size whether it holds none, one or many: a box of fixed
- * height whose list scrolls, reachable with Tab while it holds a message. `label` names the
- * region. It stays mounted, so a message that appears is announced and nothing below moves.
+ * height whose list scrolls and takes focus once it has more than its box shows. `label` names the
+ * region. It stays mounted as a polite live region, so a message that appears is announced and
+ * nothing below moves.
  */
 export function MessageSlot({
   label,
@@ -149,19 +175,20 @@ export function MessageSlot({
   label: string
   messages: readonly MessageEntry[]
 }) {
+  const { ref, scrolls } = useScrolls()
   return (
     <fieldset
+      ref={ref}
       className="message-slot"
       aria-label={label}
-      // the polite region of the notes and warnings that appear; an error announces itself
+      // the polite region of every message that appears, an error included
       aria-live="polite"
-      // a box that may scroll takes focus, so the keyboard reaches the rest of the list
-      tabIndex={messages.length > 0 ? 0 : undefined}
+      tabIndex={scrolls ? 0 : undefined}
       data-count={messages.length}
     >
       {messages.map((m, k) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: messages have no identity
-        <Message key={k} severity={m.severity} compact announce={m.severity === 'error'}>
+        <Message key={k} severity={m.severity} compact announce={false}>
           {m.text}
         </Message>
       ))}

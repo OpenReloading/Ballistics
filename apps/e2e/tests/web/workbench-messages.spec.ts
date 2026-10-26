@@ -78,7 +78,9 @@ test('the ladder target messages move nothing: none, a warning and an error keep
 
   // an invalid field: an error, announced at once, the field marked invalid
   await distance.fill('')
-  await expect(slot.getByRole('alert')).toContainText(/^Error: .*Shooting distance/)
+  await expect(slot.locator('.message[data-severity="error"]')).toContainText(
+    /^Error: .*Shooting distance/,
+  )
   await expect(distance).toHaveAttribute('aria-invalid', 'true')
   expect(await positions(section)).toEqual(before)
 
@@ -113,7 +115,13 @@ test('the slot keeps its size with 1, 3 and 10 messages and its list is reached 
     }, count)
     await expect(slot.locator('.message')).toHaveCount(count)
     expect(await positions(section)).toEqual(before)
-    // the slot takes focus and End scrolls it to the last message, with an animation
+    // a slot takes focus only where it scrolls; End then scrolls it to the last message, with an
+    // animation
+    if (count === 1) {
+      await expect(slot).not.toHaveAttribute('tabindex')
+      continue
+    }
+    await expect(slot).toHaveAttribute('tabindex', '0')
     await slot.focus()
     await expect(slot).toBeFocused()
     await page.keyboard.press('End')
@@ -170,7 +178,7 @@ test('each severity paints its own fill and text, axe clean in light and dark', 
     }
     // the error from an invalid field
     await section.getByLabel(/^Shooting distance/).fill('')
-    await expect(slot.locator('.message')).toHaveCount(1)
+    await expect(slot.locator('.message')).toContainText(/Enter a number/)
     const axe = await new AxeBuilder({ page }).include('.ladder-target-controls').analyze()
     expect(axe.violations.map((v) => `${v.id}: ${v.nodes.length}`)).toEqual([])
     await section.getByLabel(/^Shooting distance/).fill('20000')
@@ -196,10 +204,10 @@ test('the notice line keeps its box through a result with warnings, an error and
   // 2.4 g: a result without warnings; 2.8 g: a result over its limit with a warning; 60 g: the
   // model refuses the load, an error in the line and in the results
   for (const [grams, outcome] of [
-    ['2.4', /^Simulation done\. /],
-    ['2.8', /^Simulation done\. /],
+    ['2.4', /^Simulation done\. Step 0, 2\.40 g/],
+    ['2.8', /^Simulation done\. Step 0, 2\.80 g/],
     ['60', /^The API answered 422\./],
-    ['2.4', /^Simulation done\. /],
+    ['2.4', /^Simulation done\. Step 0, 2\.40 g/],
   ] as const) {
     await charge.fill(grams)
     await charge.press('Control+Enter')
@@ -208,11 +216,13 @@ test('the notice line keeps its box through a result with warnings, an error and
     })
     const warnings = page.locator('.run-line .warnings-slot').getByRole('button')
     await expect(warnings).toHaveCount(grams === '2.8' ? 1 : 0)
-    expect(await seen()).toEqual(idle)
+    await expect.poll(seen).toEqual(idle)
   }
 })
 
-test('the warnings list scrolls inside the popover and takes focus to do so', async ({ page }) => {
+test('the warnings list keeps its height, scrolls and takes focus only once it scrolls', async ({
+  page,
+}) => {
   test.setTimeout(60_000)
   await page.goto('/workbench')
   await applyExampleLoad(page)
@@ -222,13 +232,18 @@ test('the warnings list scrolls inside the popover and takes focus to do so', as
   await page.locator('.warnings-slot').getByRole('button').click()
   const list = page.getByRole('list', { name: 'Warnings' })
   await expect(list).toBeVisible()
-  await expect(list).toHaveAttribute('tabindex', '0')
-  const { overflowY, maxHeight } = await list.evaluate((el) => {
-    const s = getComputedStyle(el)
-    return { overflowY: s.overflowY, maxHeight: s.maxHeight }
+  // one warning fits: no tab stop
+  await expect(list).not.toHaveAttribute('tabindex')
+  const height = () => list.evaluate((el) => el.getBoundingClientRect().height)
+  const one = await height()
+  // many (cloned from the one shown): the list stops at the window's share and scrolls
+  await list.evaluate((el) => {
+    for (let k = 0; k < 40; k++) el.append((el.firstElementChild as Element).cloneNode(true))
   })
-  expect(overflowY).toBe('auto')
-  expect(maxHeight).not.toBe('none')
+  await expect(list).toHaveAttribute('tabindex', '0')
+  expect(await height()).toBeGreaterThan(one)
+  expect(await height()).toBeLessThanOrEqual((await page.evaluate(() => innerHeight)) * 0.4 + 1)
+  expect(await list.evaluate((el) => el.scrollHeight > el.clientHeight)).toBe(true)
 })
 
 test('a ladder step size error in the Powder card moves no card and adds no scroll', async ({

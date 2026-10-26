@@ -7638,6 +7638,10 @@ main .field-table tr.field-group > th {
   gap: 0.5rem;
 }
 
+.message .mantine-Alert-icon {
+  margin-inline-end: 0;
+}
+
 .message :is(.mantine-Alert-title, .mantine-Alert-message, .mantine-Alert-icon) {
   color: var(--message-fg);
 }

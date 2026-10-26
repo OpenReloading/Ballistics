@@ -49,17 +49,16 @@ it('the message slot is one region of the same markup for none, one and many mes
       />,
     )
   expect(slot(0)).toContain('aria-label="Messages"')
-  // a polite region the messages appear in: its notes carry no role of their own
+  // a polite region the messages appear in: a message in it carries no live role of its own
   expect(slot(0)).toContain('aria-live="polite"')
-  expect(slot(1)).toContain('role="none"')
-  expect(
-    html(<MessageSlot label="Messages" messages={[{ severity: 'error', text: 'x' }]} />),
-  ).toContain('role="alert"')
-  expect(slot(0)).not.toContain('tabindex')
-  // a list that may scroll takes focus
-  for (const n of [1, 3, 10]) {
+  expect(slot(1)).toContain('role="note"')
+  const error = html(<MessageSlot label="Messages" messages={[{ severity: 'error', text: 'x' }]} />)
+  expect(error).toContain('data-severity="error"')
+  expect(error).not.toContain('role="alert"')
+  // it takes focus once it scrolls, which only a browser measures (workbench-messages.spec.ts)
+  for (const n of [0, 1, 3, 10]) {
     const out = slot(n)
-    expect(out).toContain('tabindex="0"')
-    expect(out.match(/data-severity="info"/g)).toHaveLength(n)
+    expect(out).not.toContain('tabindex')
+    expect(out.match(/data-severity="info"/g) ?? []).toHaveLength(n)
   }
 })
