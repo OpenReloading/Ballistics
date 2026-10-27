@@ -1,17 +1,19 @@
+import { type Message, msg } from '../i18n/translate.ts'
+
 /** A tab of a library page: another route of it, listed in the page's tab bar. */
 interface LibraryTab {
   href: string
-  label: string
-  description: string
+  label: Message
+  description: Message
 }
 
 /** A page of the sidebar, drawer, search and home cards. */
 interface PageEntry {
   href: string
-  label: string
+  label: Message
   /** The icon's name in `nav-icons.tsx`. */
   icon: string
-  description: string
+  description: Message
   /** The routes the page shows as tabs, in the tab bar's order; each is current under this page. */
   tabs?: readonly LibraryTab[]
   /** Routes under no tab that the page links to and that link back to it (`/my-cases`). */
@@ -22,100 +24,113 @@ interface PageEntry {
 export const databaseTabs: readonly LibraryTab[] = [
   {
     href: '/firearms',
-    label: 'Firearms',
-    description:
+    label: msg('Firearms'),
+    description: msg(
       'Your firearms with their optics and zeros, kept in this browser and in files; they fill the rifle fields of the workbench.',
+    ),
   },
   {
     href: '/cartridges',
-    label: 'Cartridges',
-    description: 'CIP dimensions, drawings and maximum pressures, each with its source document.',
+    label: msg('Cartridges'),
+    description: msg(
+      'CIP dimensions, drawings and maximum pressures, each with its source document.',
+    ),
   },
   {
     href: '/cases',
-    label: 'Cases',
-    description:
+    label: msg('Cases'),
+    description: msg(
       'Cartridge case products with material, primer pocket and stated water capacity, each with its sources.',
+    ),
   },
   {
     href: '/primers',
-    label: 'Primers',
-    description: 'Primer products with size, cup and priming compound, each with its sources.',
+    label: msg('Primers'),
+    description: msg('Primer products with size, cup and priming compound, each with its sources.'),
   },
   {
     href: '/powders',
-    label: 'Powders',
-    description: 'Propellants and their recorded properties, each with its sources.',
+    label: msg('Powders'),
+    description: msg('Propellants and their recorded properties, each with its sources.'),
   },
   {
     href: '/bullets',
-    label: 'Bullets',
-    description: 'Diameters, masses, lengths and ballistic coefficients, each with its source.',
+    label: msg('Bullets'),
+    description: msg(
+      'Diameters, masses, lengths and ballistic coefficients, each with its source.',
+    ),
   },
   {
     href: '/targets',
-    label: 'Targets',
-    description:
+    label: msg('Targets'),
+    description: msg(
       'Rule-book target faces: ring diameters, black area and the disciplines shot on them, each with its source.',
+    ),
   },
   {
     href: '/disciplines',
-    label: 'Disciplines',
-    description:
+    label: msg('Disciplines'),
+    description: msg(
       'Rule-book disciplines and their federations: distance, caliber classes and the faces they are shot on, each with its source.',
+    ),
   },
   {
     href: '/federations',
-    label: 'Federations',
-    description:
+    label: msg('Federations'),
+    description: msg(
       'Shooting federations with the rule books their disciplines and target faces are read from, each with its source.',
+    ),
   },
 ]
 
 /** Information architecture (two groups, tools first): the sidebar, drawer, search, home cards and not-found page read it. */
 export const sections = [
   {
-    title: 'Tools',
+    title: msg('Tools'),
     pages: [
       {
         href: '/workbench',
-        label: 'Load workbench',
+        label: msg('Load workbench'),
         icon: '/workbench',
-        description:
+        description: msg(
           'Cartridge, bullet, powder and firearm in one view, with simulated velocity, pressure compared against CIP limits, and the trajectory in your browser.',
+        ),
       },
       {
         href: '/session',
-        label: 'Session summary',
+        label: msg('Session summary'),
         icon: '/session',
-        description:
+        description: msg(
           'Shots and statistics per string from a chronograph export, read in your browser.',
+        ),
         covers: ['/range'],
       },
       {
         href: '/groups',
-        label: 'Shot groups',
+        label: msg('Shot groups'),
         icon: '/groups',
-        description:
+        description: msg(
           'Group size and dispersion from a target photo or a drawn target; the photo stays in your browser.',
+        ),
       },
     ],
   },
   {
-    title: 'Library',
+    title: msg('Library'),
     pages: [
       {
         href: '/cartridges',
-        label: 'Database',
+        label: msg('Database'),
         icon: 'database',
-        description:
+        description: msg(
           'The published records, each with its source, and your own next to them: your firearms, cartridges, cases, primers, powders, bullets, target faces, disciplines and federations.',
+        ),
         tabs: databaseTabs,
         covers: ['/my-cases'],
       },
     ],
   },
-] as const satisfies readonly { title: string; pages: readonly PageEntry[] }[]
+] as const satisfies readonly { title: Message; pages: readonly PageEntry[] }[]
 
 /** Tool pages: no reading measure on their text; every other page is a document page. */
 export const toolRoutes = [

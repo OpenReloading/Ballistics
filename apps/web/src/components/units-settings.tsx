@@ -21,6 +21,8 @@ import {
   useState,
   useSyncExternalStore,
 } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import { type Message, msg } from '../i18n/translate.ts'
 import { storageName } from '../lib/edition.ts'
 import { type FieldSpec, type Fields, switchFields } from '../lib/field-spec.ts'
 import { controlSize } from '../lib/theme.ts'
@@ -227,30 +229,31 @@ export function useFieldUnits(
 }
 
 /** Quantities with a unit choice, in the order of the presets table. */
-const choices: [Quantity, string][] = [
-  ['charge', 'Powder charge'],
-  ['mass', 'Bullet mass'],
-  ['length', 'Lengths'],
-  ['twist', 'Barrel twist'],
-  ['barrelLength', 'Barrel length'],
-  ['area', 'Areas'],
-  ['capacity', 'Case capacity'],
-  ['velocity', 'Velocity'],
-  ['pressure', 'Pressure'],
-  ['energy', 'Energy'],
-  ['temperature', 'Temperature'],
-  ['range', 'Range, distance'],
-  ['lineOfSightOffset', 'Drop, windage'],
-  ['windSpeed', 'Wind speed'],
-  ['altitude', 'Altitude'],
-  ['airPressure', 'Air pressure'],
-  ['correction', 'Corrections'],
-  ['firearmMass', 'Firearm mass'],
+const choices: [Quantity, Message][] = [
+  ['charge', msg('Powder charge')],
+  ['mass', msg('Bullet mass')],
+  ['length', msg('Lengths')],
+  ['twist', msg('Barrel twist')],
+  ['barrelLength', msg('Barrel length')],
+  ['area', msg('Areas')],
+  ['capacity', msg('Case capacity')],
+  ['velocity', msg('Velocity')],
+  ['pressure', msg('Pressure')],
+  ['energy', msg('Energy')],
+  ['temperature', msg('Temperature')],
+  ['range', msg('Range, distance')],
+  ['lineOfSightOffset', msg('Drop, windage')],
+  ['windSpeed', msg('Wind speed')],
+  ['altitude', msg('Altitude')],
+  ['airPressure', msg('Air pressure')],
+  ['correction', msg('Corrections')],
+  ['firearmMass', msg('Firearm mass')],
 ]
 
 /** The unit settings of the settings dialog: the preset, one unit per quantity and "Reset to preset"; every change is stored. */
 export function UnitsForm() {
   const { choice, choose, custom, ready } = useUnits()
+  const { t } = useTranslation()
   // four segments do not fit a phone in a row
   const narrow = useMediaQuery('(max-width: 35.99em)')
   const isCustom = hasOverrides(choice)
@@ -267,7 +270,7 @@ export function UnitsForm() {
     <Stack gap="sm" maw="40rem">
       <div>
         <p className="segment-label" id="units-preset">
-          Preset
+          {t('Preset')}
         </p>
         <SegmentedControl
           aria-labelledby="units-preset"
@@ -279,11 +282,11 @@ export function UnitsForm() {
           // alphabetical, the custom variant last
           data={[
             ...(Object.keys(presetNames) as PresetId[])
-              .sort((a, b) => presetNames[a].localeCompare(presetNames[b]))
-              .map((p) => ({ value: p, label: presetNames[p] })),
+              .sort((a, b) => t(presetNames[a]).localeCompare(t(presetNames[b])))
+              .map((p) => ({ value: p, label: t(presetNames[p]) })),
             {
               value: 'custom',
-              label: 'Custom',
+              label: t('Custom'),
               disabled: !custom && !isCustom,
             },
           ]}
@@ -293,7 +296,7 @@ export function UnitsForm() {
         {choices.map(([q, label]) => (
           <NativeSelect
             key={q}
-            label={label}
+            label={t(label)}
             size={controlSize.row.input}
             value={choice.overrides[q] ?? presetUnitIds[choice.preset][q]}
             data={Object.entries(unitsOf[q]).map(([id, u]) => ({
@@ -313,7 +316,7 @@ export function UnitsForm() {
         disabled={!hasOverrides(choice)}
         onClick={() => set(choice.preset, {})}
       >
-        Reset to preset
+        {t('Reset to preset')}
       </Button>
     </Stack>
   )

@@ -1,5 +1,6 @@
 import { radPerMoa, radPerMrad, waterDensityGramsPerCm3 } from '@open-reloading/core'
 import { fromSi, type QuantityKind, toSi } from '@open-reloading/schema'
+import { type Message, msg } from '../i18n/translate.ts'
 
 /**
  * Display units. Every value is held in SI; a unit converts to and from SI and has a fixed number
@@ -150,10 +151,10 @@ type UnitId<Q extends Quantity = Quantity> = keyof (typeof unitsOf)[Q] & string
 
 export type PresetId = 'metric-grains' | 'us' | 'metric-grams'
 
-export const presetNames: Record<PresetId, string> = {
-  'metric-grains': 'Metric, common use',
-  us: 'US customary',
-  'metric-grams': 'Metric (SI)',
+export const presetNames: Record<PresetId, Message> = {
+  'metric-grains': msg('Metric, common use'),
+  us: msg('US customary'),
+  'metric-grams': msg('Metric (SI)'),
 }
 
 const metricBase = {

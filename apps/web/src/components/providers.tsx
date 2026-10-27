@@ -3,6 +3,7 @@
 import { Button, Group, localStorageColorSchemeManager, MantineProvider } from '@mantine/core'
 import dynamic from 'next/dynamic'
 import { type ReactNode, useCallback, useEffect, useState } from 'react'
+import { startLanguage, useTranslation } from '../i18n/language.ts'
 import { useRoute } from './use-route.ts'
 import '../lib/navigation-guard.ts'
 import { colorSchemeKey, theme } from '../lib/theme.ts'
@@ -22,6 +23,7 @@ const colorSchemeManager = localStorageColorSchemeManager({ key: colorSchemeKey 
 
 /** The settings dialog over any page: every Settings and Units button opens it through `SettingsDialog`. */
 function SettingsDialogProvider({ children }: { children: ReactNode }) {
+  const { t } = useTranslation()
   const [opened, setOpened] = useState(false)
   const [tab, setTab] = useState<SettingsTab>('units')
   const close = () => setOpened(false)
@@ -41,13 +43,13 @@ function SettingsDialogProvider({ children }: { children: ReactNode }) {
         opened={opened}
         onClose={close}
         size="xl"
-        title="Settings"
+        title={t('Settings')}
         className="settings-dialog"
-        closeButton={{ 'aria-label': 'Close settings' }}
+        closeButton={{ 'aria-label': t('Close settings') }}
         footer={
           <Group justify="flex-end" className="settings-foot">
             <Button variant="default" onClick={close}>
-              Close
+              {t('Close')}
             </Button>
           </Group>
         }
@@ -64,6 +66,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     document.documentElement.dataset.hydrated = ''
   }, [])
+  // the stored language applies after mounting: the server render and hydration are English
+  useEffect(startLanguage, [])
   return (
     <MantineProvider
       theme={theme}

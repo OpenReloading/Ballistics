@@ -99,7 +99,7 @@ test('an invalid record is deleted after a confirmation and Import restores it',
   await page.getByRole('menuitem', { name: 'Import…' }).click()
   const report = page.getByRole('dialog', { name: 'Import' })
   await expect(report.getByText('1 invalid record restored.')).toBeVisible()
-  await report.getByRole('button', { name: 'Close' }).click()
+  await report.getByRole('button', { name: 'Close' }).last().click()
   await (await barButton(page, 'Open')).click()
   await expect(page.getByRole('menuitem', { name: 'Invalid records (1)…' })).toBeVisible()
 })

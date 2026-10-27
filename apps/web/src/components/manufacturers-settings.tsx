@@ -2,6 +2,7 @@
 
 import { Button, Group, Stack, Text } from '@mantine/core'
 import { useCallback, useEffect, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { errorText } from '../lib/error-text.ts'
 import {
   type ManufacturerUse,
@@ -18,6 +19,7 @@ import { ErrorNote, Loading } from './states.tsx'
  * with the number of records that name it. One that nothing names is deleted at once, with Undo.
  */
 export function ManufacturersForm() {
+  const { t } = useTranslation()
   const [rows, setRows] = useState<ManufacturerUse[]>()
   const [failure, setFailure] = useState('')
   const read = useCallback(
@@ -29,10 +31,12 @@ export function ManufacturersForm() {
         },
         (e) => {
           setRows([])
-          setFailure(`The browser's records could not be read: ${errorText(e)}`)
+          setFailure(
+            t("The browser's records could not be read: {reason}", { reason: errorText(e) }),
+          )
         },
       ),
-    [],
+    [t],
   )
   useEffect(() => {
     void read()
@@ -44,22 +48,25 @@ export function ManufacturersForm() {
       const { records, invalid } = await storedRecords()
       if (manufacturerUses(records, invalid).find((m) => m.record.id === record.id)?.uses !== 0) {
         await read()
-        setFailure(`${record.name} was not deleted: a record names it now.`)
+        setFailure(t('{name} was not deleted: a record names it now.', { name: record.name }))
         return
       }
       await deleteRecord(record.id)
     } catch (e) {
-      setFailure(`${record.name} was not deleted: ${errorText(e)}`)
+      setFailure(t('{name} was not deleted: {reason}', { name: record.name, reason: errorText(e) }))
       return
     }
     await read()
     window.dispatchEvent(new Event(manufacturersChanged))
-    offerUndo(`Deleted ${record.name} from this browser.`, () =>
+    offerUndo(t('Deleted {name} from this browser.', { name: record.name }), () =>
       putRecords([record])
         .then(read)
         .then(
           () => void window.dispatchEvent(new Event(manufacturersChanged)),
-          (e) => setFailure(`Undo of ${record.name} failed: ${errorText(e)}`),
+          (e) =>
+            setFailure(
+              t('Undo of {name} failed: {reason}', { name: record.name, reason: errorText(e) }),
+            ),
         ),
     )
   }
@@ -67,14 +74,15 @@ export function ManufacturersForm() {
   return (
     <Stack gap="xs">
       <Text size="sm" c="dimmed">
-        A name typed in a manufacturer field that the catalogue does not have is kept here. One that
-        no record uses can be deleted.
+        {t(
+          'A name typed in a manufacturer field that the catalogue does not have is kept here. One that no record uses can be deleted.',
+        )}
       </Text>
       {failure && <ErrorNote>{failure}</ErrorNote>}
       {rows === undefined ? (
         <Loading what="manufacturers" rows={2} />
       ) : rows.length === 0 ? (
-        <Text size="sm">No manufacturers of your own in this browser.</Text>
+        <Text size="sm">{t('No manufacturers of your own in this browser.')}</Text>
       ) : (
         <Stack component="ul" gap={6} m={0} p={0} style={{ listStyle: 'none' }}>
           {rows.map((row) => (
@@ -83,17 +91,17 @@ export function ManufacturersForm() {
                 <Text span>{row.record.name}</Text>
                 <Text span size="sm" c="dimmed">
                   {' '}
-                  {row.uses === 0 ? 'unused' : `used by ${row.uses}`}
+                  {row.uses === 0 ? t('unused') : t('used by {count}', { count: row.uses })}
                 </Text>
               </span>
               {row.uses === 0 && (
                 <Button
                   size={controlSize.row.button}
                   variant="default"
-                  aria-label={`Delete ${row.record.name}`}
+                  aria-label={t('Delete {name}', { name: row.record.name })}
                   onClick={() => void remove(row)}
                 >
-                  Delete
+                  {t('Delete')}
                 </Button>
               )}
             </Group>

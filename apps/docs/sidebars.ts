@@ -54,7 +54,7 @@ const sidebars: SidebarsConfig = {
     'data/catalogue-storage',
     'bibliography',
   ],
-  contributing: ['release', 'ci-tools', 'workbench-search'],
+  contributing: ['release', 'ci-tools', 'workbench-search', 'translating'],
 }
 
 export default sidebars
