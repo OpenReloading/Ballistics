@@ -1,5 +1,5 @@
 /**
- * Licence policy of the production dependencies of the API and web images, read from
+ * Licence policy of the production dependencies of the API image and the web app, read from
  * package-lock.json: fails on a package whose licence is not in `allow-licenses` of
  * .github/dependency-review-config.yml (the list the dependency review step reads) and not excepted
  * there by `allow-dependencies-licenses`, and on a package without a declared licence. Fails too
@@ -10,13 +10,13 @@ import { appendFileSync, readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { parse } from 'yaml'
 
-/** The two images: the workspaces whose production dependencies ship. */
+/** The API image and the web app (its bundles ship in the static site): the workspaces whose production dependencies ship. */
 const images = ['packages/api', 'apps/web']
 
-/** Packages the image build deletes after the install, by name or `@scope/*`, with why. */
+/** Packages installed for a shipped workspace that no shipped file contains, by name or `@scope/*`, with why. */
 export const notShipped: Record<string, string> = {
-  sharp: 'apps/web/Dockerfile removes node_modules/sharp from the image (no image optimisation)',
-  '@img/*': 'apps/web/Dockerfile removes node_modules/@img from the image (the sharp binaries)',
+  sharp: 'the static export has no image optimisation, so the site holds no sharp code',
+  '@img/*': 'the sharp binaries: the static export holds none',
 }
 
 const begin = 'BEGIN GENERATED: shipped packages'
@@ -72,7 +72,7 @@ const excludes = (list: string[] | undefined, value: string) =>
   list !== undefined &&
   (list.includes(`!${value}`) || (list.some((c) => !c.startsWith('!')) && !list.includes(value)))
 
-/** A platform package that the Linux images (glibc, x64 or arm64) never install. */
+/** A platform package that the API image and the static site (built on Linux, glibc, x64 or arm64) never contain. */
 const otherPlatform = (e: Lock['packages'][string]) =>
   excludes(e.os, 'linux') ||
   (excludes(e.cpu, 'x64') && excludes(e.cpu, 'arm64')) ||
@@ -93,7 +93,7 @@ function dependenciesOf(lock: Lock, key: string) {
   return names.map((name) => resolve(lock, key, name)).filter((found) => found !== undefined)
 }
 
-/** Every third-party package installed for the production dependencies of the image workspaces. */
+/** Every third-party package installed for the production dependencies of the shipped workspaces. */
 export function shippedPackages(lock: Lock, roots = images, skip = isNotShipped): Shipped[] {
   const seen = new Set<string>()
   const todo = [...roots]
@@ -205,7 +205,7 @@ export function noticeBlock(packages: Shipped[]) {
   const rows = packages.map((p) => `${p.name} ${p.version} ${p.license ?? 'UNDECLARED'}`)
   return [
     begin,
-    'Third-party packages installed for the API and web images, by name, version and the licence',
+    'Third-party packages installed for the API image and the web app, by name, version and the licence',
     'package-lock.json declares. Written by `node tools/src/licences.ts --write`.',
     '',
     ...rows,
@@ -223,7 +223,7 @@ export function summary(packages: Shipped[], excepted: Set<string>) {
   const table = [...count].sort((a, b) => b[1] - a[1]).map(([l, n]) => `| ${l} | ${n} |`)
   const named = packages.filter((p) => excepted.has(p.name)).map((p) => `${p.name} ${p.version}`)
   return [
-    '### Licences of the production dependencies of the API and web images',
+    '### Licences of the production dependencies of the API image and the web app',
     '',
     '| Licence | Packages |',
     '| --- | --- |',

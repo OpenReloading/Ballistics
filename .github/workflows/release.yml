@@ -2,8 +2,8 @@ name: Release
 
 # release-please keeps one release pull request open from the Conventional Commits on main. Nothing merges it
 # but the owner: no step here enables auto-merge. Merging it tags each changed component <component>-vX.Y.Z and
-# writes its CHANGELOG.md and GitHub Release; the images job publishes the api and web images of the components
-# released (with an SBOM attestation each), the sbom-release job attaches those SBOMs to the GitHub Releases,
+# writes its CHANGELOG.md and GitHub Release; the images job publishes the api image when the api component
+# is released (with an SBOM attestation), the sbom-release job attaches that SBOM to the GitHub Release,
 # and the publish job pushes the libraries to npm (trusted publishing, no token) once the repository variable
 # NPM_PUBLISH is `true`; it is unset until npm is set up. A push to main that merges no release pull request
 # releases and publishes nothing.
@@ -40,7 +40,7 @@ jobs:
       - id: app
         if: vars.RELEASE_APP_CLIENT_ID != ''
         continue-on-error: true
-        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         with:
           client-id: ${{ vars.RELEASE_APP_CLIENT_ID }}
           private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
@@ -62,15 +62,11 @@ jobs:
         env:
           API_VERSION: ${{ steps.release.outputs['packages/api--version'] }}
           API_TAG: ${{ steps.release.outputs['packages/api--tag_name'] }}
-          WEB_VERSION: ${{ steps.release.outputs['apps/web--version'] }}
-          WEB_TAG: ${{ steps.release.outputs['apps/web--tag_name'] }}
         run: |
           matrix=$(jq -nc \
-            --arg av "$API_VERSION" --arg at "$API_TAG" --arg wv "$WEB_VERSION" --arg wt "$WEB_TAG" \
+            --arg av "$API_VERSION" --arg at "$API_TAG" \
             '[{name: "api", dockerfile: "packages/api/Dockerfile", version: $av, tag: $at,
-               licenses: "MIT AND CC-BY-4.0 AND Apache-2.0"},
-              {name: "web", dockerfile: "apps/web/Dockerfile", version: $wv, tag: $wt,
-               licenses: "MIT AND CC-BY-4.0 AND Apache-2.0 AND BSD-3-Clause AND OFL-1.1"}]
+               licenses: "MIT AND CC-BY-4.0 AND Apache-2.0"}]
              | map(select(.version != ""))')
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
       - id: libraries

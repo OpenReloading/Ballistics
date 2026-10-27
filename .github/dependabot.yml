@@ -21,7 +21,7 @@ updates:
       actions:
         patterns: ['*']
   - package-ecosystem: docker
-    directories: [/packages/api, /apps/web, /apps/docs, /.devcontainer]
+    directories: [/packages/api, /apps/docs, /.devcontainer]
     schedule:
       interval: weekly
     cooldown:
