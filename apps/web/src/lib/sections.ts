@@ -92,7 +92,7 @@ export const isToolRoute = (route: string) => toolRoutes.includes(route)
 export const routeOf = (pathname: string) => pathname.replace(/(.)\/$/, '$1')
 
 /** Pages without a link of their own that a listed page links to and that link back to it. */
-const linkedFrom: Record<string, string> = { '/federations': '/disciplines' }
+const linkedFrom: Record<string, string> = { '/federations': '/disciplines', '/range': '/session' }
 
 /**
  * Whether a listed page covers a route: the page itself, or a page under it that it links to and

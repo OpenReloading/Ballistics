@@ -50,6 +50,21 @@ export const shotString = z.object({
   propellantTemperature: quantity('temperature')
     .describe('Temperature of the powder in this string.')
     .optional(),
+  conditions: z
+    .object({
+      airTemperature: quantity('temperature').describe('Air temperature at the string.').optional(),
+      stationPressure: quantity('pressure')
+        .describe('Absolute air pressure at the string.')
+        .optional(),
+      windSpeed: quantity('velocity', z.number().nonnegative())
+        .describe('Wind speed at the string.')
+        .optional(),
+    })
+    .describe(
+      'The weather at this string, where it differs from the session or was entered by hand.',
+    )
+    .optional(),
+  note: text(2000).describe('Note on the string, plain text.').optional(),
   shots: z.array(chronoShot).min(1).max(5000).describe('Shots of the string in file order.'),
 })
 
