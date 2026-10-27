@@ -216,3 +216,45 @@ test('Appearance in General stores the theme as System, Light or Dark', async ({
   await expect(html).toHaveAttribute('data-mantine-color-scheme', 'light')
   expect(await page.evaluate(() => localStorage.getItem('theme'))).not.toMatch(/^(light|dark)$/)
 })
+
+test('Settings turns the single-key shortcuts off: "/" and "?" do nothing, the choice stays over a reload', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/powders')
+  const search = page.getByRole('searchbox', { name: 'Search' })
+  const help = page.getByRole('dialog', { name: 'Keyboard shortcuts' })
+  const press = async (key: string) => {
+    await page.locator('body').click({ position: { x: 2, y: 2 } })
+    await page.keyboard.type(key)
+  }
+  await press('/')
+  await expect(search).toBeFocused()
+  await expect(search).toHaveAttribute('aria-keyshortcuts', '/')
+
+  const dialog = await openFrom(page, sidebarSettings(page))
+  await dialog.getByRole('tab', { name: 'General' }).click()
+  const box = dialog.getByRole('checkbox', { name: 'Single-key shortcuts' })
+  await expect(box).toBeChecked()
+  await expect(dialog.getByText('Off, every shortcut needs Ctrl or Cmd.')).toBeVisible()
+  await box.uncheck()
+  await page.keyboard.press('Escape')
+  await expect(dialog).toBeHidden()
+
+  await expect(search).not.toHaveAttribute('aria-keyshortcuts')
+  await press('/')
+  await expect(search).not.toBeFocused()
+  await press('?')
+  await expect(help).toBeHidden()
+
+  await gotoHydrated(page, '/powders')
+  await press('?')
+  await expect(help).toBeHidden()
+
+  const again = await openFrom(page, sidebarSettings(page))
+  await again.getByRole('tab', { name: 'General' }).click()
+  await again.getByRole('checkbox', { name: 'Single-key shortcuts' }).check()
+  await page.keyboard.press('Escape')
+  await expect(again).toBeHidden()
+  await press('?')
+  await expect(help).toBeVisible()
+})

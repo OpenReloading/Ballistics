@@ -26,6 +26,15 @@ export type ShortcutId = keyof typeof table
 export const shortcuts: Record<ShortcutId, Shortcut> = table
 
 const keysOf = (id: ShortcutId) => shortcuts[id].keys
+
+/** `localStorage` key of the choice to turn the single-key shortcuts off (`off`); absent, they are on. */
+export const singleKeysKey = 'single-key-shortcuts'
+
+/** Whether a stored choice leaves the single-key shortcuts on: anything but `off`. */
+export const parseSingleKeys = (text: string | null) => text !== 'off'
+
+/** Whether `id` is bound to one character alone, which Settings can turn off. */
+export const isSingleKey = (id: ShortcutId) => keysOf(id).every((k) => k.length === 1)
 const parts = (k: string) => k.split('+')
 const cap = (p: string) => p.charAt(0).toUpperCase() + p.slice(1)
 

@@ -33,7 +33,7 @@ import { controlSize, tipEvents } from '../lib/theme.ts'
 import { Noted } from './field-table.tsx'
 import { usePrintEvents } from './print.ts'
 import { watchOverflow } from './scroll-region.tsx'
-import { useShortcuts } from './shortcuts.tsx'
+import { useShortcuts, useSingleKeys } from './shortcuts.tsx'
 
 export interface DirectoryColumn<T> {
   key: string
@@ -816,13 +816,14 @@ export function DirectoryFilters({
 }) {
   const search = useRef<HTMLInputElement>(null)
   useShortcuts({ focusSearch: () => search.current?.focus() })
+  const singleKeys = useSingleKeys()
   return (
     <Group className="directory-filters" gap="xs" py="xs">
       <TextInput
         ref={search}
         className="directory-search"
         aria-label="Search"
-        aria-keyshortcuts={shortcutAriaKeys('focusSearch')}
+        aria-keyshortcuts={singleKeys ? shortcutAriaKeys('focusSearch') : undefined}
         title={placeholder}
         placeholder={placeholder}
         name="q"

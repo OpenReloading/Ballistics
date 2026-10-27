@@ -3,6 +3,7 @@
 import {
   Box,
   Button,
+  Checkbox,
   type MantineColorScheme,
   SegmentedControl,
   Stack,
@@ -17,6 +18,7 @@ import { pagesBasePath } from '../lib/edition.ts'
 import { useInstall } from './install-button.tsx'
 import { ManufacturersForm } from './manufacturers-settings.tsx'
 import type { SettingsTab } from './settings-dialog.ts'
+import { setSingleKeys, useSingleKeys } from './shortcuts.tsx'
 import { UnitsForm } from './units-settings.tsx'
 import { WorkbenchDefaultsForm } from './workbench-defaults.tsx'
 
@@ -38,6 +40,18 @@ function Appearance() {
         onChange={(v) => setColorScheme(v as MantineColorScheme)}
       />
     </div>
+  )
+}
+
+function Keyboard() {
+  const on = useSingleKeys()
+  return (
+    <Checkbox
+      checked={on}
+      onChange={(e) => setSingleKeys(e.currentTarget.checked)}
+      label="Single-key shortcuts"
+      description="? opens the shortcut list and / searches the list on a page. Off, every shortcut needs Ctrl or Cmd."
+    />
   )
 }
 
@@ -108,6 +122,9 @@ export function SettingsSections({
         <Stack gap="lg">
           <Section id="settings-appearance" title="Appearance">
             <Appearance />
+          </Section>
+          <Section id="settings-keyboard" title="Keyboard">
+            <Keyboard />
           </Section>
           <Section id="settings-offline" title="Offline">
             <Offline />
