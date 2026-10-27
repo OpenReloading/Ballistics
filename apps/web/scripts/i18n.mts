@@ -75,7 +75,7 @@ export function messages(root = webRoot): string[] {
   const all = new Set<string>()
   for (const file of globSync('src/**/*.{ts,tsx}', { cwd: root }))
     for (const text of extract(readFileSync(path.join(root, file), 'utf8'), file)) all.add(text)
-  return [...all].sort()
+  return [...all].sort((a, b) => a.localeCompare(b, 'en'))
 }
 
 /** What `catalogue` lacks of `source` and what it has that `source` lacks. */
