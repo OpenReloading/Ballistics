@@ -89,6 +89,59 @@ describe('a photograph that is hard to cut out', () => {
   })
 })
 
+describe('a bullet darker than the paper on one side and brighter on the other', () => {
+  /** The photograph of `s` with the bullet's lower half recoloured pale copper, brighter than the grey paper. */
+  function highlighted(s: PhotoSpec) {
+    const photo = renderPhoto(s)
+    const { data, width } = photo.image
+    for (let y = s.base.y + 1; y < s.base.y + 100; y++)
+      for (let x = s.base.x; x < s.base.x + 30 * s.pxPerMm; x++) {
+        const i = 4 * (y * width + x)
+        const cover = Math.min(1, Math.max(0, (s.paper - (data[i] ?? 0)) / (s.paper - s.bullet)))
+        ;[235, 190, 170].forEach((v, c) => {
+          data[i + c] = s.paper + cover * (v - s.paper)
+        })
+      }
+    return photo
+  }
+
+  it('is cut out whole where the brightness alone gives the dark half', () => {
+    const s = spec({ paper: 150, bullet: 100, angle: 0 })
+    const photo = highlighted(s)
+    const span = defined(photo.span)
+    const covered = (a: Uint8Array) => a.filter((v) => v >= 128).length
+    const luma = segment(grayOf(photo.image), [span.a, span.b])
+    const seg = segmentPhoto(photo.image, [span.a, span.b])
+    expect(covered(luma.alpha)).toBeLessThan(0.7 * covered(seg.alpha))
+    const outline = defined(fitOutline(seg, { edgeSpread: seg.edgeSpread }))
+    const scale = defined(scaleOf([span]))
+    expect(Math.abs(outline.length / scale.pxPerMm - 30)).toBeLessThan(0.2)
+    expect(defined(measureOutline(outline, scale).values.diameter).value).toBeCloseTo(7.82, 0)
+  })
+})
+
+describe('more than one bullet in the photograph', () => {
+  it('says that the largest was cut out, and says nothing for a single bullet', () => {
+    const tall = {
+      height: 560,
+      ruler: { x0: 20, y: 470, heightPx: 50, lengthMm: 30, toEdges: true },
+    }
+    const [a, b] = [
+      spec({ ...tall, base: { x: 130, y: 100 } }),
+      spec({ ...tall, base: { x: 130, y: 290 } }),
+    ]
+    const [one, two] = [renderPhoto(a), renderPhoto(b)]
+    const both = one.image.data.map((v, i) => Math.min(v, two.image.data[i] ?? v))
+    const image = { ...one.image, data: both }
+    const span = defined(one.span)
+    const seg = segmentPhoto(image, [span.a, span.b])
+    expect(seg.warnings.join(' ')).toMatch(/Another object/)
+    expect(segmentPhoto(one.image, [span.a, span.b]).warnings.join(' ')).not.toMatch(
+      /Another object/,
+    )
+  })
+})
+
 describe('soft edges', () => {
   it('flags a blurred photograph and widens the uncertainty', () => {
     const sharp = measured(spec())

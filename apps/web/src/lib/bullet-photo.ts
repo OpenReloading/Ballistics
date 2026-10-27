@@ -324,7 +324,7 @@ function localLevels(
 }
 
 /** Applies a 3 x 3 erosion (`erode`) or dilation to `mask` `n` times, inside the box. */
-const morphN = (mask: Uint8Array, w: number, box: Box, erode: boolean, n: number) =>
+export const morphN = (mask: Uint8Array, w: number, box: Box, erode: boolean, n: number) =>
   Array.from({ length: n }).reduce<Uint8Array>((m) => morph3(m, w, box, erode), mask)
 
 /**
@@ -371,8 +371,19 @@ function bestPart(inside: Uint8Array, w: number, h: number, exclude: readonly Po
     .map((pixels, k) => ({ pixels, ...boxOf(pixels, w, h), skip: near.has(k) }))
     .filter((p) => !p.skip && p.pixels.length >= 0.0003 * w * h)
     .sort((a, b) => b.pixels.length - a.pixels.length)
-  return candidates.find((p) => !p.edge) ?? candidates[0]
+  const chosen = candidates.find((p) => !p.edge) ?? candidates[0]
+  return (
+    chosen && {
+      ...chosen,
+      rivals: candidates.filter(
+        (p) => p !== chosen && p.pixels.length >= rivalShare * chosen.pixels.length,
+      ).length,
+    }
+  )
 }
+
+/** Another part of the mask this share of the chosen part's size or more is a second object in the photograph. */
+const rivalShare = 0.3
 
 /** The share of the bullet's mean grey, from the background, that a pixel needs in the first pass to be a candidate. */
 const generous = 0.25
@@ -384,6 +395,8 @@ interface Cover {
   contrast: (i: number) => number
   best: NonNullable<ReturnType<typeof bestPart>>
   thickness: number
+  /** The other parts of the first pass as large as a share of the bullet's. */
+  rivals: number
 }
 
 const padded = (p: Box, k: number, w: number, h: number): Box => ({
@@ -426,7 +439,15 @@ function coverOf(
     for (let x = roughBox.x0; x <= roughBox.x1; x++)
       inside[y * w + x] = soft(y * w + x) >= 0.5 ? 1 : 0
   const best = bestPart(inside, w, h, exclude)
-  return best && { soft, contrast: (i) => Math.abs(levelAt(i) - bg), best, thickness }
+  return (
+    best && {
+      soft,
+      contrast: (i) => Math.abs(levelAt(i) - bg),
+      best,
+      thickness,
+      rivals: rough.rivals,
+    }
+  )
 }
 
 /**
@@ -464,7 +485,7 @@ export function segment(g: Gray, exclude: readonly Point[] = []): Segmentation {
   if (!cover)
     return none('No bullet found: no part of the photograph stands out from the background.')
 
-  const { soft, contrast, best, thickness } = cover
+  const { soft, contrast, best, thickness, rivals } = cover
   const box = padded(best, 4, w, h)
   const mask = filled(best.pixels, w, h, box)
   const eroded = morphN(mask, w, box, true, 2)
@@ -480,6 +501,11 @@ export function segment(g: Gray, exclude: readonly Point[] = []): Segmentation {
     ...(gap < lowContrast
       ? [
           `The bullet differs from the background by ${Math.round(gap)} grey levels only: the outline may be rough. A plainer background, or one much lighter or darker than the bullet, gives a better cut-out.`,
+        ]
+      : []),
+    ...(rivals
+      ? [
+          'Another object about as large as the bullet is in the photograph and the largest was cut out. Photograph one bullet alone, or paint the others out with the brush.',
         ]
       : []),
     ...softEdgeWarning(edgeSpread, thickness),
