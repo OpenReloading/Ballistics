@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { sections } from '../../../web/src/lib/sections.ts'
-import { followNav, gotoHydrated } from './nav.ts'
+import { exported, followNav, gotoHydrated } from './nav.ts'
 
 const pages = sections.flatMap((s) => s.pages)
 // a tool page and a data page: the links all come from `sections`, the lists below check every one
@@ -16,7 +16,7 @@ test('at 1280 px a tool page and a data page are one sidebar click from a record
   expect(visited).toHaveLength(2)
   for (const { href, label } of visited) {
     await followNav(page, label)
-    await expect(page).toHaveURL(href)
+    await expect(page).toHaveURL(exported(href))
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
   }
 })
@@ -46,7 +46,7 @@ test('at 390 px the drawer lists every section page under its section, and two p
   for (const { href, label } of visited) {
     await button.click()
     await page.getByRole('dialog').getByRole('link', { name: label, exact: true }).click()
-    await expect(page).toHaveURL(href)
+    await expect(page).toHaveURL(exported(href))
     await expect(page.getByRole('dialog')).toBeHidden()
   }
 })
@@ -72,7 +72,7 @@ test('the home page lists the tools and the library with its counts, and opens t
         .filter({ has: page.getByRole('link', { name: label }) }),
     ).toContainText(/\b[1-9]\d* records?$/)
   await toolPanel.getByRole('link', { name: 'Open load workbench' }).click()
-  await expect(page).toHaveURL('/workbench')
+  await expect(page).toHaveURL(exported('/workbench'))
 })
 
 test('a cartridge, after a search, and a report are two clicks from the home page', async ({
@@ -83,13 +83,13 @@ test('a cartridge, after a search, and a report are two clicks from the home pag
     .getByRole('region', { name: 'Library', exact: true })
     .getByRole('link', { name: 'Cartridges' })
     .click()
-  await expect(page).toHaveURL('/cartridges')
+  await expect(page).toHaveURL(exported('/cartridges'))
   // the directory shows the rows in view: a search finds the record
-  const link = page.locator('a[href="/cartridges/308-win"]')
+  const link = page.locator('a[href="/cartridges/308-win/"]')
   await page.getByRole('searchbox', { name: 'Search' }).fill('308 win')
   await expect(link).toBeVisible()
   await link.click()
-  await expect(page).toHaveURL('/cartridges/308-win')
+  await expect(page).toHaveURL(exported('/cartridges/308-win'))
 })
 
 test('the Database tabs follow the tabs pattern and carry the search to the next kind', async ({
@@ -115,9 +115,9 @@ test('the Database tabs follow the tabs pattern and carry the search to the next
   await tabs.getByRole('tab', { selected: true }).focus()
   await page.keyboard.press('ArrowRight')
   await expect(tabs.getByRole('tab', { name: 'Cases' })).toBeFocused()
-  await expect(page).toHaveURL(/\/cartridges\?q=win$/)
+  await expect(page).toHaveURL(/\/cartridges\/\?q=win$/)
   await page.keyboard.press('Enter')
-  await expect(page).toHaveURL('/cases?q=win')
+  await expect(page).toHaveURL(exported('/cases?q=win'))
   await expect(page.getByRole('tab', { selected: true })).toHaveText('Cases')
   // the sidebar names the Database as the current page on every tab
   await expect(
@@ -153,7 +153,10 @@ test('an unknown path answers 404 with the section links', async ({ page }) => {
   await expect(page.getByText('This page could not be found.')).toBeVisible()
   const main = page.getByRole('main')
   for (const { href, label } of pages)
-    await expect(main.getByRole('link', { name: label, exact: true })).toHaveAttribute('href', href)
+    await expect(main.getByRole('link', { name: label, exact: true })).toHaveAttribute(
+      'href',
+      exported(href),
+    )
 })
 
 test('the drawer marks the current page and its rows are at least 44 px high', async ({ page }) => {

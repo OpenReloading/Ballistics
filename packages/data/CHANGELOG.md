@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.0.3](https://github.com/OpenReloading/Ballistics/compare/data-v0.0.2...data-v0.0.3) (2026-10-27)
+
+
+### Features
+
+* **schema,data,api,web:** primer records, API and workbench picker ([#263](https://github.com/OpenReloading/Ballistics/issues/263)) ([5589507](https://github.com/OpenReloading/Ballistics/commit/558950741a48ce15623f99da0f5fe556f254611a))
+* **schema,drawing,web,data:** DSU oval-ring faces b2 to b5 with their disciplines ([#260](https://github.com/OpenReloading/Ballistics/issues/260)) ([713ec86](https://github.com/OpenReloading/Ballistics/commit/713ec86c6eef3d26c2d2e4ae1632bfc34d380fa5))
+* **schema,web:** structured bullet construction fields and a derived lead-free flag ([#259](https://github.com/OpenReloading/Ballistics/issues/259)) ([360326e](https://github.com/OpenReloading/Ballistics/commit/360326e6d51d29eea15478e82b2b2333c1d08540))
+* **schema:** manufacturer references on the components of a load ([#223](https://github.com/OpenReloading/Ballistics/issues/223)) ([5009a62](https://github.com/OpenReloading/Ballistics/commit/5009a625f896e8e5eccb0f31caed4c475dbd1b20))
+* **web,api,schema,data:** case records per cartridge ([#228](https://github.com/OpenReloading/Ballistics/issues/228)) ([dc70ef0](https://github.com/OpenReloading/Ballistics/commit/dc70ef0b64ec950f5c0f5b6ac7d0ba7107bcc199))
+* **web:** Federations as a Database tab ([#329](https://github.com/OpenReloading/Ballistics/issues/329)) ([ea786c6](https://github.com/OpenReloading/Ballistics/commit/ea786c6f00047377b73f4df732106fcfe55fc8a0))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @open-reloading/schema bumped from 0.0.2 to 0.0.3
+
 ## [0.0.2](https://github.com/OpenReloading/Ballistics/compare/data-v0.0.1...data-v0.0.2) (2026-10-26)
 
 

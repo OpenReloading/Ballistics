@@ -9,7 +9,7 @@ test('a bullet record lists the cartridges it fits, linked', async ({ page }) =>
   const list = page.getByRole('list', { name: 'Cartridges' })
   await expect(list.getByRole('link', { name: '308 Win.', exact: true })).toHaveAttribute(
     'href',
-    '/cartridges/308-win',
+    '/cartridges/308-win/',
   )
   await expect(page.getByRole('table', { name: 'Ballistic coefficients' })).toContainText('G7')
   // the symbol keys move over the rows the group filter shows only
@@ -29,12 +29,12 @@ test('a cartridge record links the bullet list of the bullets that fit it, the r
 }) => {
   await page.goto('/cartridges/308-win')
   const link = page.getByRole('link', { name: /^Bullets \(\d+\)$/ })
-  await expect(link).toHaveAttribute('href', '/bullets?fits=308-win')
+  await expect(link).toHaveAttribute('href', '/bullets/?fits=308-win')
   await link.focus()
   await expect(page.getByRole('tooltip')).toContainText('over the middle of the land and groove')
   const count = Number((await link.innerText()).match(/\d+/)?.[0])
   await link.click()
-  await expect(page).toHaveURL(/\/bullets\?fits=308-win$/)
+  await expect(page).toHaveURL(/\/bullets\/\?fits=308-win$/)
   await expect(page.getByRole('link', { name: '30 Cal 168 gr HPBT Demo' })).toBeVisible()
   await expect(page.getByRole('table', { name: 'Bullets, fitting 308 Win.' })).toBeVisible()
   // "n of m bullets", or "n bullets" where every bullet fits

@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.0.3](https://github.com/OpenReloading/Ballistics/compare/schema-v0.0.2...schema-v0.0.3) (2026-10-27)
+
+
+### Features
+
+* **schema,data,api,web:** primer records, API and workbench picker ([#263](https://github.com/OpenReloading/Ballistics/issues/263)) ([5589507](https://github.com/OpenReloading/Ballistics/commit/558950741a48ce15623f99da0f5fe556f254611a))
+* **schema,drawing,web,data:** DSU oval-ring faces b2 to b5 with their disciplines ([#260](https://github.com/OpenReloading/Ballistics/issues/260)) ([713ec86](https://github.com/OpenReloading/Ballistics/commit/713ec86c6eef3d26c2d2e4ae1632bfc34d380fa5))
+* **schema,web:** structured bullet construction fields and a derived lead-free flag ([#259](https://github.com/OpenReloading/Ballistics/issues/259)) ([360326e](https://github.com/OpenReloading/Ballistics/commit/360326e6d51d29eea15478e82b2b2333c1d08540))
+* **schema:** cite the cannelure datum and refuse a groove off the shank ([#240](https://github.com/OpenReloading/Ballistics/issues/240)) ([780449b](https://github.com/OpenReloading/Ballistics/commit/780449be8ad7d2b2063dabc53aa4c60b5af273ab))
+* **schema:** manufacturer references on the components of a load ([#223](https://github.com/OpenReloading/Ballistics/issues/223)) ([5009a62](https://github.com/OpenReloading/Ballistics/commit/5009a625f896e8e5eccb0f31caed4c475dbd1b20))
+* **web,api,schema,data:** case records per cartridge ([#228](https://github.com/OpenReloading/Ballistics/issues/228)) ([dc70ef0](https://github.com/OpenReloading/Ballistics/commit/dc70ef0b64ec950f5c0f5b6ac7d0ba7107bcc199))
+* **web,api,schema:** own cases as user records, listed and picked in the workbench ([#250](https://github.com/OpenReloading/Ballistics/issues/250)) ([0347181](https://github.com/OpenReloading/Ballistics/commit/03471817fd80d0ad34e275434eb6608d1ab30a0c))
+* **web,schema,drawing:** measured lands contact of a firearm gives the jump ([#257](https://github.com/OpenReloading/Ballistics/issues/257)) ([e8e90e5](https://github.com/OpenReloading/Ballistics/commit/e8e90e58259020c62ab51cc243716e0432b24ab3))
+* **web,schema:** range mode for offline entry of velocities, conditions and notes ([#262](https://github.com/OpenReloading/Ballistics/issues/262)) ([7aa702f](https://github.com/OpenReloading/Ballistics/commit/7aa702febf0e263a4ce656769a95fc91147caf2b))
+* **web:** Federations as a Database tab ([#329](https://github.com/OpenReloading/Ballistics/issues/329)) ([ea786c6](https://github.com/OpenReloading/Ballistics/commit/ea786c6f00047377b73f4df732106fcfe55fc8a0))
+* **web:** notes on a saved load when lots, seating, velocity or round count change ([#215](https://github.com/OpenReloading/Ballistics/issues/215)) ([98409f1](https://github.com/OpenReloading/Ballistics/commit/98409f16f4fef64cd90bffb4f8d49411ea1fd6de))
+* **web:** powder designer ([#226](https://github.com/OpenReloading/Ballistics/issues/226)) ([f06205c](https://github.com/OpenReloading/Ballistics/commit/f06205c6b61e701f8535a394b66b9e102408f001))
+
 ## [0.0.2](https://github.com/OpenReloading/Ballistics/compare/schema-v0.0.1...schema-v0.0.2) (2026-10-26)
 
 

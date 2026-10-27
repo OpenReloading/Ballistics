@@ -1,9 +1,10 @@
 /**
  * Decides which CI jobs a run needs and how much of the web app it builds, from the files changed
  * since a base commit. Prints `check=true|false` (lint, build, types and unit tests), `e2e=true|false`
- * (the compose stack with the e2e tests), `web=true|false` (build the web app) and
- * `prerender=full|sample` (every record page or the sample of `src/lib/prerender-sample.ts`) as lines
- * for $GITHUB_OUTPUT; the reason goes to stderr.
+ * (the API's conformance run and the e2e tests on the static export), `web=true|false` (build the web
+ * app: the `e2e` job always builds the export it tests, so only a local run reads this) and
+ * `prerender=full|sample` (every record page or the cartridge sample of `src/lib/prerender-sample.ts`)
+ * as lines for $GITHUB_OUTPUT; the reason goes to stderr.
  *
  * Fail closed: anything but a pull request, a missing base commit, a failed git call or an empty change
  * list gives every job and `prerender=full`.
@@ -37,11 +38,25 @@ const docsOnly = [
   /^(LICENSE|NOTICE|\.coderabbit\.yaml)$/,
 ]
 
-/** Files the e2e job reads besides those that feed the web build: its specs and the compose stack. */
-const e2eInputs = [/^apps\/e2e\//, /^compose\.yaml$/]
+/**
+ * Files the e2e job reads besides those that feed the web build: its specs, the compose stack that runs
+ * the API and the scripts that build and serve the export.
+ */
+const e2eInputs = [
+  /^apps\/e2e\//,
+  /^compose\.yaml$/,
+  /^tools\/src\/(pages|pages-serve|pages-payload|executable)\.ts$/,
+]
 
-/** Tests and notes of the packages and the web app do not change the build. */
-const ignored = [/^(apps|packages)\/[^/]+\/test\//, /^(apps|packages)\/[^/]+\/[^/]*\.md$/]
+/**
+ * Tests and notes of the packages and the web app do not change the build, and no job reads the web
+ * app's Dockerfile.
+ */
+const ignored = [
+  /^(apps|packages)\/[^/]+\/test\//,
+  /^(apps|packages)\/[^/]+\/[^/]*\.md$/,
+  /^apps\/web\/Dockerfile$/,
+]
 
 /** Files whose change needs every record page prerendered (`prerender=full`), besides the import closure. */
 const recordInputs = [
@@ -51,7 +66,7 @@ const recordInputs = [
   /^(package\.json|package-lock\.json|tsconfig\.base\.json|\.nvmrc)$/,
   /^patches\//,
   /^\.github\/workflows\/ci\.yml$/,
-  /^apps\/web\/(package\.json|next\.config\.ts|tsconfig\.json|Dockerfile)$/,
+  /^apps\/web\/(package\.json|next\.config\.ts|tsconfig\.json)$/,
   /^apps\/web\/scripts\/(ci-plan|check-prerender)\.mts$/,
   /^apps\/web\/src\/lib\/prerender-sample\.ts$/,
 ]

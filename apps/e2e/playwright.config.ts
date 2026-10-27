@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 import { safetyAck } from './tests/web/nav.ts'
 
-const webUrl = process.env.WEB_URL ?? 'http://localhost:3001'
+const webUrl = process.env.WEB_URL ?? 'http://localhost:3003'
 /** The Pages site (`npm run pages:serve`), with its base path and a trailing slash. Unset: no project `pages`. */
 const pagesUrl = process.env.PAGES_URL
 

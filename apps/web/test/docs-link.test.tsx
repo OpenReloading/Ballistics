@@ -25,4 +25,6 @@ it('docsUrl: the set value, else the Pages edition docs folder, else none', () =
   expect(docsUrl('  ', '/Ballistics')).toBe('/Ballistics/docs/')
   expect(docsUrl(undefined, '')).toBe('/docs/')
   expect(docsUrl(undefined, undefined)).toBeUndefined()
+  expect(docsUrl(undefined, '', '1')).toBeUndefined()
+  expect(docsUrl('https://example.org/docs/', '', '1')).toBe('https://example.org/docs/')
 })

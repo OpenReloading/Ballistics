@@ -1,9 +1,10 @@
 # @open-reloading/e2e
 
-Playwright tests against a running API and web app, on the CIP cartridge records, the target faces and the invented example records.
+Playwright tests against the static export of the web app (`pages/`, served by `npm run pages:serve`) and a running API, on the CIP cartridge records, the target faces and the invented example records. The export has no API: the pages read data files (`/api/<kind>/<id>.json`, `/api/catalogue/index.json`) and run the compute in Web Workers, so a spec that waits for or mocks a data request names that file. Every page path has a trailing slash (`exported` of `web/nav.ts` for an expected URL).
 
-- Project `full` (`tests/web/`): Chromium against the web app.
-- Project `pages`, only with `PAGES_URL` set (the Pages site with its base path and a trailing slash, `npm run pages:serve` at the root): `web/smoke.spec.ts` against the Pages edition, and its workbench result for the example load against the server edition's at `WEB_URL`. Pages are opened by relative paths (`./workbench`), so the base path stays.
+- Project `full` (`tests/web/`): Chromium against the export at the site root on `WEB_URL` (default `http://localhost:3003`). The API on `API_URL` (default `http://localhost:3000`) is read by `web/smoke.spec.ts` and `web/workbench-load-roundtrip.spec.ts` only.
+- Project `pages`, only with `PAGES_URL` set (an export under a base path, with a trailing slash, served by `npm run pages:serve` with the same `PAGES_BASE_PATH`): `web/smoke.spec.ts` against that site. Smoke pages are opened by relative paths (`./workbench`), so the base path stays.
+- A record a spec opens is in the export's sample (`apps/web/src/lib/prerender-sample.ts`, cartridge pages only: any other cartridge answers 404, and the link to it logs a failed request). A spec that clicks through records and checks the console or the failed requests starts where every cartridge it links is in the sample (`smoke.spec.ts`: a case record, which links one cartridge).
 - One spec per area. No spec needs manufacturer data or load data.
 - Every test has its own browser context and `fullyParallel` is on: the tests of one file run on several workers, so a test never relies on another.
 - A spec that clicks or types right after loading a page opens it with `gotoHydrated` (`web/nav.ts`): it waits for `html[data-hydrated]`, which `Providers` sets after mount, and for `data-hydrated` on the `h1` of `PageBar`, set once the page itself has mounted (the page hydrates after the layout). No `toPass` retry for a click before hydration.
@@ -13,7 +14,7 @@ Playwright tests against a running API and web app, on the CIP cartridge records
 
 | Spec | What only a browser checks |
 |---|---|
-| `web/smoke.spec.ts` | pages load with a heading and no console error, the forwarding route answers (not in `pages`), the Pages workbench's start card in the window and its example load result equal to the server edition's, a client navigation between two record pages with back and forward and no failed RSC file (`pages` only) |
+| `web/smoke.spec.ts` | pages load with a heading and no console error, four exported data files equal the API's answers, the workbench's start card in the window and its example load result equal to the API's run of the downloaded load file, a client navigation between two record pages with back and forward and no failed RSC file |
 | `web/a11y-sweep.spec.ts` | axe (WCAG 2.0 to 2.2 A and AA) on every page without a dynamic segment (the folders of `apps/web/src/app`) at 390 and 1280 px, light and dark, the failure naming rule id and node; a page that no entry of `sections` covers fails the spec. Violations not yet fixed go in `known` of the spec with their issue |
 | `web/cartridges.spec.ts` | list search and source choice, the ticked rows of the powder and bullet lists (kept in the URL, shift click range, Clear selection, a click on a row opening its record), record page, print layout, CIP outline drawing geometry |
 | `web/directory-window.spec.ts` | axe on the cartridge, bullet and powder lists in light and dark, the cartridge list scrolled to its last row with a bounded number of row elements, and left where it is when the browser's records arrive late |
@@ -50,13 +51,13 @@ Playwright tests against a running API and web app, on the CIP cartridge records
 
 ## Commands (this directory, or `-w @open-reloading/e2e` from the root)
 
-- Run the API on `API_URL` and the web app on `WEB_URL` first (the compose stack, or `node packages/api/dist/server.js` and `next start` on a web build made by `npm run build -w @open-reloading/web`)
+- Build and serve the export first (root, after `npm run build`): `npm run static:build` (the sample, about 15 s) and `npm run pages:serve`, or the full export `PAGES_BASE_PATH= npm run pages -w @open-reloading/tools -- --no-docs`. Run the API on `API_URL` (`node packages/api/dist/server.js`, or `docker compose up api`).
 - Browser, once: `npx playwright install --with-deps chromium`
 - Specs that import web sources (`../../apps/web/src/...`) load the workspace packages from their `dist/`. Run `npm run build` at the root first (CI builds schema, importers, core and drawing before `npm run test:e2e`).
-- Web pages and the web app's `/api/*` forwarding route carry no version prefix. HTTP requests and responses of the API are tested in `packages/api/test/` and with Schemathesis (`npm run api:conformance`).
-- Test: `npm test` (`WEB_URL` default `http://localhost:3001`)
+- Web pages and the export's `/api/*` data files carry no version prefix; the API's routes are under `/v1`. HTTP requests and responses of the API are tested in `packages/api/test/` and with Schemathesis (`npm run api:conformance`).
+- Test: `npm test` (`WEB_URL` default `http://localhost:3003`)
 - When to run which:
-  - Smoke, fast: `npm run smoke` (root: `npm run e2e:smoke`), `web/smoke.spec.ts` only, about 2 s. The check of a fresh web build in CI.
+  - Smoke, fast: `npm run smoke` (root: `npm run e2e:smoke`), `web/smoke.spec.ts` only, a few seconds. Needs the export and the API.
   - Default, everywhere (local, CI, before a change lands): `npm test` and `npm run drawing-baseline`.
   - Full, on demand (a drawing change that may touch other figures, a font or Playwright upgrade): `npm run drawing-baseline:full`, every sample and verified figure, light and dark, verified ones also at 1280 px (about 420 shots, 3 minutes).
 - Single test: `npx playwright test tests/web/smoke.spec.ts -g "<name>"`
@@ -70,4 +71,6 @@ Playwright tests against a running API and web app, on the CIP cartridge records
   - `VISUAL_LOADS=<n>`: n open loads. `VISUAL_DEFAULTS=1`: that load with the defaulted inputs left out.
   - `VISUAL_TALL=<height>`: one more shot per page in a window that tall.
 - Unit tests of the scripts (Vitest): `npm run test:unit`
-- `user-data-folder.spec.ts` needs a secure origin (`localhost` or https). From the dev container, `http://host.containers.internal` is not one and its two tests fail. Against the host stack, run the suite in the Playwright image on the host network: `podman run --rm --network=host --userns=keep-id -v "$PWD":"$PWD":z -w "$PWD/apps/e2e" -e CI=1 mcr.microsoft.com/playwright:v<@playwright/test version>-noble npx playwright test`
+- The drawing baseline needs docker or podman, so in the dev container setup it runs on the host: build the export in the container (`npm run static:build`), then on the host `npm run pages:serve` and `npm run drawing-baseline` (the default set is in the sample, the full set needs a full export at the site root, `PAGES_BASE_PATH= npm run pages -w @open-reloading/tools -- --no-docs`). The `pages/` folder is shared by the bind mount.
+- Pages under a base path (`pages.yml`'s layout): `PAGES_BASE_PATH=/Ballistics npm run pages:build`, `PAGES_BASE_PATH=/Ballistics npm run pages:serve`, then `PAGES_URL=http://localhost:3003/Ballistics/ npm test -- --project=pages` (the API on `API_URL`).
+- `user-data-folder.spec.ts` needs a secure origin (`localhost` or https). From the dev container, `http://host.containers.internal` is not one and its two tests fail. Against a site and API served on the host, run the suite in the Playwright image on the host network: `podman run --rm --network=host --userns=keep-id -v "$PWD":"$PWD":z -w "$PWD/apps/e2e" -e CI=1 mcr.microsoft.com/playwright:v<@playwright/test version>-noble npx playwright test`

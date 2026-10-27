@@ -18,6 +18,17 @@ export const sampleIds: Record<string, readonly string[]> = {
     '18-x-81',
     '243-win-super-short-mag',
     '8-x-51-r-lebel',
+    // the rest of the default drawing baseline (`common` of drawing-baseline.spec.ts)
+    '6-5-creedmoor',
+    '284-win',
+    '30-30-win',
+    '300-win-mag',
+    '9-mm-luger',
+    '12',
+    // the specs of the record page and its drawing text
+    '6mm-me-flobert-court',
+    '40-x-46-deftec',
+    '223-rem',
   ],
   bullet: ['demo-bullet-168', 'demo-bullet-150'],
   powder: ['demo-powder-dp40'],
@@ -47,4 +58,16 @@ export function pickIds(
   const wanted = new Set(sampleIds[what] ?? [])
   const picked = ids.filter((id) => wanted.has(id))
   return picked.length > 0 ? picked : ids.slice(0, 1)
+}
+
+/**
+ * The ids of `what` the Pages edition prerenders. A page the export leaves out answers 404 and the
+ * links to it log that, so the sample cuts the cartridge pages only (about 85 % of the export).
+ */
+export function exportIds(
+  what: string,
+  ids: string[],
+  env: Record<string, string | undefined> = process.env,
+) {
+  return what === 'cartridge' ? pickIds(what, ids, env) : ids
 }

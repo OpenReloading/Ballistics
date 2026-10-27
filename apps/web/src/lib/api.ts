@@ -28,7 +28,7 @@ import type {
 import { pagesBasePath } from './edition.ts'
 import type { DisciplineSummary, MappingSummary } from './face-disciplines.ts'
 import { type ManufacturerNames, manufacturerNames } from './manufacturers.ts'
-import { pickIds } from './prerender-sample.ts'
+import { exportIds, pickIds } from './prerender-sample.ts'
 
 type Fetched<T> = { status: 'ok'; data: T } | { status: 'notFound' } | { status: 'unavailable' }
 
@@ -125,21 +125,18 @@ export const buildPlaceholderId = '_build'
 
 /**
  * `generateStaticParams` of a detail route: every id of the list (the sample of `PRERENDER=sample`,
- * `prerender-sample.ts`), or the placeholder without the API. The Pages edition has no page it
- * does not prerender: every id, and a build without the API fails.
+ * `prerender-sample.ts`), or the placeholder without the API. The Pages edition has no placeholder:
+ * a build without the API fails, and the sample cuts the cartridge pages only (`exportIds`).
  */
 export async function staticIds(list: () => Promise<Fetched<{ id: string }[]>>, what: string) {
   const r = await list()
-  if (pagesBasePath !== undefined) {
-    if (r.status !== 'ok') throw new Error(`API unavailable at build: no ${what} pages`)
-    return r.data.map(({ id }) => ({ id }))
-  }
   if (r.status !== 'ok') {
+    if (pagesBasePath !== undefined) throw new Error(`API unavailable at build: no ${what} pages`)
     console.warn(`API unavailable at build: ${what} pages render on first request`)
     return [{ id: buildPlaceholderId }]
   }
-  return pickIds(
-    what,
-    r.data.map((c) => c.id),
-  ).map((id) => ({ id }))
+  const ids = r.data.map((c) => c.id)
+  return (pagesBasePath !== undefined ? exportIds(what, ids) : pickIds(what, ids)).map((id) => ({
+    id,
+  }))
 }

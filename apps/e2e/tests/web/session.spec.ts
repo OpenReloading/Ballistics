@@ -30,7 +30,8 @@ test('names a file of no known format, then reads a template file of the same na
   await gotoHydrated(page, '/session')
   const sent: Request[] = []
   page.on('request', (r) => {
-    if (r.method() !== 'GET' || r.postData()) sent.push(r)
+    // the export's pages check the pages they link with HEAD requests, which carry no file
+    if ((r.method() !== 'GET' && r.method() !== 'HEAD') || r.postData()) sent.push(r)
   })
   await choose(page, 'session.csv', 'a,b\n1,2')
   await expect(

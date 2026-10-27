@@ -1,5 +1,42 @@
 # Changelog
 
+## [0.0.3](https://github.com/OpenReloading/Ballistics/compare/docs-v0.0.2...docs-v0.0.3) (2026-10-27)
+
+
+### Features
+
+* **core:** fit a chamber volume correction and note a volume that is not measured ([#229](https://github.com/OpenReloading/Ballistics/issues/229)) ([3b4c161](https://github.com/OpenReloading/Ballistics/commit/3b4c161004d42e4cca00287eb72285e8aee5e934))
+* **core:** fit burn form and pressure exponent from a pressure-time curve ([#225](https://github.com/OpenReloading/Ballistics/issues/225)) ([211b9ce](https://github.com/OpenReloading/Ballistics/commit/211b9ce117de37b4fa8371aa568c477d2adbf235))
+* **core:** fit energy and temperature factor from sessions at several barrel lengths and temperatures ([#233](https://github.com/OpenReloading/Ballistics/issues/233)) ([11a96ab](https://github.com/OpenReloading/Ballistics/commit/11a96abc92c2b3698e027bdd4a807b75a9460277))
+* **core:** pressure range, similar-powder prior and confidence label of a powder fit ([#261](https://github.com/OpenReloading/Ballistics/issues/261)) ([9b59440](https://github.com/OpenReloading/Ballistics/commit/9b594400524501cdfa3d72c5f1df8697de045bc2))
+* **schema,data,api,web:** primer records, API and workbench picker ([#263](https://github.com/OpenReloading/Ballistics/issues/263)) ([5589507](https://github.com/OpenReloading/Ballistics/commit/558950741a48ce15623f99da0f5fe556f254611a))
+* **schema,drawing,web,data:** DSU oval-ring faces b2 to b5 with their disciplines ([#260](https://github.com/OpenReloading/Ballistics/issues/260)) ([713ec86](https://github.com/OpenReloading/Ballistics/commit/713ec86c6eef3d26c2d2e4ae1632bfc34d380fa5))
+* **schema,web:** structured bullet construction fields and a derived lead-free flag ([#259](https://github.com/OpenReloading/Ballistics/issues/259)) ([360326e](https://github.com/OpenReloading/Ballistics/commit/360326e6d51d29eea15478e82b2b2333c1d08540))
+* **schema:** cite the cannelure datum and refuse a groove off the shank ([#240](https://github.com/OpenReloading/Ballistics/issues/240)) ([780449b](https://github.com/OpenReloading/Ballistics/commit/780449be8ad7d2b2063dabc53aa4c60b5af273ab))
+* **schema:** manufacturer references on the components of a load ([#223](https://github.com/OpenReloading/Ballistics/issues/223)) ([5009a62](https://github.com/OpenReloading/Ballistics/commit/5009a625f896e8e5eccb0f31caed4c475dbd1b20))
+* **web,api,schema,data:** case records per cartridge ([#228](https://github.com/OpenReloading/Ballistics/issues/228)) ([dc70ef0](https://github.com/OpenReloading/Ballistics/commit/dc70ef0b64ec950f5c0f5b6ac7d0ba7107bcc199))
+* **web,api,schema:** own cases as user records, listed and picked in the workbench ([#250](https://github.com/OpenReloading/Ballistics/issues/250)) ([0347181](https://github.com/OpenReloading/Ballistics/commit/03471817fd80d0ad34e275434eb6608d1ab30a0c))
+* **web,schema,drawing:** measured lands contact of a firearm gives the jump ([#257](https://github.com/OpenReloading/Ballistics/issues/257)) ([e8e90e5](https://github.com/OpenReloading/Ballistics/commit/e8e90e58259020c62ab51cc243716e0432b24ab3))
+* **web,schema:** range mode for offline entry of velocities, conditions and notes ([#262](https://github.com/OpenReloading/Ballistics/issues/262)) ([7aa702f](https://github.com/OpenReloading/Ballistics/commit/7aa702febf0e263a4ce656769a95fc91147caf2b))
+* **web:** bullet from a photo, outline and measurements with uncertainty, open in designer ([#230](https://github.com/OpenReloading/Ballistics/issues/230)) ([3feb6a2](https://github.com/OpenReloading/Ballistics/commit/3feb6a2c3a0dbc308d2c2dde6f14886dc94affb2))
+* **web:** Federations as a Database tab ([#329](https://github.com/OpenReloading/Ballistics/issues/329)) ([ea786c6](https://github.com/OpenReloading/Ballistics/commit/ea786c6f00047377b73f4df732106fcfe55fc8a0))
+* **web:** fold My gear into the Database and add Your data to Settings ([#270](https://github.com/OpenReloading/Ballistics/issues/270)) ([5dd0279](https://github.com/OpenReloading/Ballistics/commit/5dd027928715434300d48e53a966b3fc1df5faba))
+* **web:** hole detection on dark faces, on printed numerals and at bull quarter marks ([#224](https://github.com/OpenReloading/Ballistics/issues/224)) ([82f1ca0](https://github.com/OpenReloading/Ballistics/commit/82f1ca0473d4f2ebb6e40b5b04027214e1af0065))
+* **web:** notes on a saved load when lots, seating, velocity or round count change ([#215](https://github.com/OpenReloading/Ballistics/issues/215)) ([98409f1](https://github.com/OpenReloading/Ballistics/commit/98409f16f4fef64cd90bffb4f8d49411ea1fd6de))
+* **web:** one Database page and a My gear page in the navigation ([#258](https://github.com/OpenReloading/Ballistics/issues/258)) ([79b68f9](https://github.com/OpenReloading/Ballistics/commit/79b68f95b6ed44c4e6c62ba23a6e7c72b6e8d642))
+
+
+### Documentation
+
+* **docs:** list SonarQube Cloud as a used tool and match the rulesets ([#239](https://github.com/OpenReloading/Ballistics/issues/239)) ([7d3c237](https://github.com/OpenReloading/Ballistics/commit/7d3c23793f0fea3aad9b1f35640fcde30264253a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @open-reloading/api bumped from 0.0.2 to 0.0.3
+
 ## [0.0.2](https://github.com/OpenReloading/Ballistics/compare/docs-v0.0.1...docs-v0.0.2) (2026-10-26)
 
 

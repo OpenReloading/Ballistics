@@ -203,7 +203,7 @@ test('the Gun card keeps its weight error, firearm query and focus when the wind
   }
 })
 
-// a run the API refuses leaves its message in the results area, which keeps the no-scroll rule
+// a run the compute refuses (a charge that does not fit the chamber) leaves its message in the results area, which keeps the no-scroll rule
 for (const [width, height] of [
   [1280, 650],
   [1920, 1080],
@@ -213,18 +213,11 @@ for (const [width, height] of [
   }) => {
     test.setTimeout(60_000)
     await page.setViewportSize({ width, height })
-    await page.route('**/api/interior', (route) =>
-      route.fulfill({
-        status: 422,
-        contentType: 'application/json',
-        body: JSON.stringify({ error: 'The charge is above what the case holds.' }),
-      }),
-    )
     await page.goto('/workbench')
     await applyExampleLoad(page)
-    await loadForm(page)
-      .getByLabel(/^Charge mass/)
-      .press('Control+Enter')
+    const charge = loadForm(page).getByLabel(/^Charge mass/)
+    await charge.fill('20')
+    await charge.press('Control+Enter')
     await expect(page.getByText('The simulation did not run.')).toBeVisible()
     await expect.poll(() => overflowing(page)).toEqual([])
     expect(await cut(page)).toEqual([])

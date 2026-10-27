@@ -9,6 +9,12 @@
  * both editions share one origin.
  * `PAGES_URL` (the site's origin) sets the docs' `url` and the app's `metadataBase`. Needs
  * `npm run build` at the root first.
+ * `--sample`: only the cartridge pages of `apps/web/src/lib/prerender-sample.ts` prerendered (the
+ * data files stay complete) and no docs site, for the review and e2e loop.
+ * `--no-docs`: no docs site, every record prerendered (the e2e job's full export).
+ * `--keep-build`: leaves `apps/web/.next` as it is before and after the build, the Turbopack cache
+ * a CI run restored and the manifests `check-weight` reads. Only for a run that builds this edition
+ * alone: one edition's cache fails the other's build.
  */
 import { spawn } from 'node:child_process'
 import { cpSync, rmSync, writeFileSync } from 'node:fs'
@@ -27,6 +33,9 @@ if (edition !== 'stable' && edition !== 'next')
 // the path of this edition's app: the site root's (`PAGES_BASE_PATH`) for stable, `/next` below it for next
 const base = edition === 'next' ? `${siteBase}/next` : siteBase
 
+const sample = process.argv.includes('--sample')
+const keepBuild = process.argv.includes('--keep-build')
+const docs = !sample && !process.argv.includes('--no-docs')
 const at = (p: string) => fileURLToPath(new URL(`../../${p}`, import.meta.url))
 const site = at('pages')
 
@@ -46,16 +55,22 @@ function run(args: string[], env: Record<string, string | undefined>) {
 }
 
 // the web app's build directory and Turbopack cache: one edition's cache fails the other's build
-const clearWebBuild = () => rmSync(at('apps/web/.next'), { recursive: true, force: true })
+const clearWebBuild = () => {
+  if (!keepBuild) rmSync(at('apps/web/.next'), { recursive: true, force: true })
+}
+// the data files of `npm run dev:static` would end in the export beside the ones written below
+rmSync(at('apps/web/public/api'), { recursive: true, force: true })
 const api = await startBundleApi()
 clearWebBuild()
 try {
-  // `full`: the dev container sets `sample`, and an export has no page it did not prerender
+  // never the inherited value: the dev container sets `sample`, which leaves record pages out of the export
   await run(['run', 'build', '-w', '@open-reloading/web'], {
     API_URL: api.url,
-    PRERENDER: 'full',
+    PRERENDER: sample ? 'sample' : 'full',
     PAGES_BASE_PATH: base,
     PAGES_EDITION: edition,
+    // no docs site: no Docs link to a 404
+    NEXT_PUBLIC_NO_DOCS: docs ? undefined : '1',
   })
   rmSync(site, { recursive: true, force: true })
   cpSync(at('apps/web/out'), site, { recursive: true })
@@ -73,10 +88,14 @@ const docsEnv = {
   PAGES_BASE_PATH: undefined,
   PAGES_EDITION: undefined,
 }
-await run(['run', 'site:build', '-w', '@open-reloading/docs', '--', '--out-dir', `${site}/docs`], {
-  ...docsEnv,
-  ...(process.env.PAGES_URL && { DOCS_URL: process.env.PAGES_URL }),
-})
+if (docs)
+  await run(
+    ['run', 'site:build', '-w', '@open-reloading/docs', '--', '--out-dir', `${site}/docs`],
+    {
+      ...docsEnv,
+      ...(process.env.PAGES_URL && { DOCS_URL: process.env.PAGES_URL }),
+    },
+  )
 for (const file of ['LICENSE', 'NOTICE']) cpSync(at(file), `${site}/${file}`)
 cpSync(at('packages/data/LICENSE'), `${site}/data/LICENSE`)
 // GitHub Pages serves the files as they are, `_next/` among them, without Jekyll

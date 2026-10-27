@@ -22,7 +22,7 @@ async function facePng(page: Page, id: string, holes: [number, number][], rings 
   await gotoHydrated(page, '/groups')
   const b64 = await page.evaluate(
     async ({ id, holes, rings, k, c }) => {
-      const face = (await (await fetch(`/api/target-faces/${id}`)).json()) as {
+      const face = (await (await fetch(`/api/target-faces/${id}.json`)).json()) as {
         rings: { diameter: { value: number } }[]
         blackDiameter: { value: number }
       }
@@ -91,7 +91,7 @@ for (const response of ['success', 'failure'] as const) {
     const gate = new Promise<void>((resolve) => {
       release = resolve
     })
-    const path = '/api/target-faces/issf-10m-air-rifle'
+    const path = '/api/target-faces/issf-10m-air-rifle.json'
     await page.route(`**${path}`, async (route) => {
       await gate
       if (response === 'failure') await route.fulfill({ status: 503, body: '{}' })
