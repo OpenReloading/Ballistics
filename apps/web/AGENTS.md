@@ -170,6 +170,7 @@ Next.js App Router (TypeScript, React). A static export: the browser reads data 
   - `install-button.tsx` shows Install while the browser offers it. `/offline` answers pages never opened while offline. Playwright blocks the worker.
 - Safety: the README Safety text (`src/lib/safety.ts`, checked against `README.md` by `test/safety.test.ts`) is on screen in the Safety dialog (`src/components/safety-dialog.tsx`).
   - Accepted on the first visit (value `3` in `safety-ack`), opened again by `SafetyBarButton`, the light yellow and only Safety button of the top bar: labelled with its icon in the page bar from 75em (on the workbench an icon only), an icon in the phone top bar.
+  - English is the binding text and `safety.ts` its single source (each line a `msg`). Under another language the dialog adds that language's translation from the catalogue beside the English text (below it under 48em), each column with the line that the English text is binding, and `lang` on each column. English alone shows no such line. `test/safety.test.ts` checks that the catalogue translates every line and says "sicher" only where English says "safe". The owner approves a translation's wording. `tests/web/language.spec.ts` checks the German dialog and its axe result.
   - Printed pages and downloaded files: root `AGENTS.md`, Conventions. On-screen notes keep their notice.
 
 ## Static site
