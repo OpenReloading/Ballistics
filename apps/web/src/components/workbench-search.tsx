@@ -1,5 +1,6 @@
 'use client'
 
+import { Modal } from '@mantine/core'
 import { useDebouncedValue } from '@mantine/hooks'
 import { type createSpotlight, Spotlight, spotlight } from '@mantine/spotlight'
 import type { CartridgeDiameters } from '@open-reloading/core'
@@ -152,6 +153,8 @@ export function WorkbenchSearch({
       scrollable
       maxHeight="min(28rem, 60dvh)"
     >
+      {/* names the dialog; its content is the search box */}
+      <Modal.Title className="visually-hidden">Search</Modal.Title>
       {/* caught before the search input, whose Enter would also trigger the selected action */}
       <div
         onKeyDownCapture={(e) => {

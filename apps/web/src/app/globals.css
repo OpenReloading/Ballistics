@@ -115,6 +115,17 @@ body {
   line-height: 1.5;
 }
 
+/* the border of a field: at least 3:1 against --bg and --surface (WCAG 1.4.11), mixed from the
+   tokens, so it follows both themes */
+:root {
+  --input-border: color-mix(in srgb, var(--fg) 55%, var(--bg));
+}
+
+/* Mantine's field border is gray-4, about 1.5:1 on white */
+:root[data-mantine-color-scheme] .mantine-Input-wrapper[data-variant="default"] {
+  --input-bd: var(--input-border);
+}
+
 /* the top bar's right end: Install slot, Safety, theme switch */
 .top-end {
   display: flex;
@@ -4329,7 +4340,7 @@ main .library-head.page-panel-head > .page-panel-title {
     font-size: var(--mantine-font-size-xs);
   }
 
-  /* a value cell: Mantine's input with square corners and its whole border at 3:1 (WCAG 1.4.11), as
+  /* a value cell: Mantine's input with square corners and its whole border (--input-border), as
      table cells (no lone bottom rule) */
   .workbench
     .workspace-inputs
@@ -4344,7 +4355,7 @@ main .library-head.page-panel-head > .page-panel-title {
     :is(.panel-fields, .seating-slot)
     .mantine-Input-input:where(:not([data-error])),
   .workbench .embedded-calculator .mantine-Input-input:where(:not([data-error])) {
-    border-color: color-mix(in srgb, var(--fg) 45%, var(--bg));
+    border-color: var(--input-border);
   }
 
   .workbench .workspace-inputs :is(.panel-fields, .seating-slot) .mantine-Input-input:focus,
@@ -6929,6 +6940,9 @@ main .field-table tr.field-group > th {
 /* the aliases after the badges, cut to one line, the whole list on hover */
 .record-aliases {
   min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
   max-width: 16rem;
   overflow: hidden;
   color: var(--muted);

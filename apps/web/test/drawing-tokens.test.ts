@@ -73,6 +73,39 @@ describe('drawing tokens', () => {
           variant,
         ).toBeGreaterThanOrEqual(4.5)
     })
+  // a token's colour: a hex value, or the `color-mix(in srgb, …)` of two tokens that --input-border is
+  const colour = (tokens: Map<string | undefined, string>, name: string): string => {
+    const value = tokens.get(name) ?? missing()
+    const mix = value.match(/^color-mix\(in srgb, var\((--[\w-]+)\) (\d+)%, var\((--[\w-]+)\)\)$/)
+    if (!mix) return value
+    const [, a = missing(), percent = missing(), b = missing()] = mix
+    const from = colour(tokens, a)
+    const to = colour(tokens, b)
+    const channel = (hex: string, k: number) => Number.parseInt(hex.slice(k, k + 2), 16)
+    const share = Number(percent) / 100
+    return `#${[1, 3, 5]
+      .map((k) =>
+        Math.round(channel(from, k) * share + channel(to, k) * (1 - share))
+          .toString(16)
+          .padStart(2, '0'),
+      )
+      .join('')}`
+  }
+  // outside the literal tokens: it is mixed from --fg and --bg
+  const inputBorder = css.match(/--input-border:\s*([^;]+);/)?.[1] ?? missing()
+  // the page and the panels, cards and table heads that sit on --surface
+  for (const [theme, tokens] of [
+    ['light', new Map([...light, ['--input-border', inputBorder]])],
+    ['dark', new Map([...light, ...dark, ['--input-border', inputBorder]])],
+  ] as const)
+    for (const surface of ['--bg', '--surface'])
+      it(`gives text 4.5:1, the focus ring and the field border 3:1 on ${surface} in ${theme}`, () => {
+        const ground = colour(tokens, surface)
+        for (const text of ['--fg', '--muted', '--link', '--standard-cip'])
+          expect(ratio(colour(tokens, text), ground), text).toBeGreaterThanOrEqual(4.5)
+        for (const edge of ['--focus', '--input-border'])
+          expect(ratio(colour(tokens, edge), ground), edge).toBeGreaterThanOrEqual(3)
+      })
   it('gives shot groups the light chart series colours', () => {
     const series = new Set([1, 2, 3, 4, 5, 6].map((k) => light.get(`--series-${k}`)))
     for (const colour of groupColours) expect(series.has(colour), colour).toBe(true)
