@@ -50,7 +50,7 @@ $$
 u_e = \sqrt{0.3^2 + \max(0, s - 3)^2}\ \text{px}
 $$
 
-Code: `apps/web/src/lib/bullet-photo.ts`, `edgeSpreadOf`; `bullet-photo-outline.ts`, `edgeUncertaintyOf`. The spread is not kept for a cut-out the user has corrected by hand, which is taken as sharp.
+Code: `apps/web/src/lib/bullet-photo.ts`, `edgeSpreadOf`; `apps/web/src/lib/bullet-photo-outline.ts`, `edgeUncertaintyOf`. The spread is not kept for a cut-out the user has corrected by hand, which is taken as sharp.
 
 ### Axis and profile
 
