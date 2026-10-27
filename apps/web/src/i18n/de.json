@@ -4,6 +4,7 @@
   "A name typed in a manufacturer field that the catalogue does not have is kept here. One that no record uses can be deleted.": "Ein Name, der in einem Herstellerfeld eingetippt wurde und im Katalog fehlt, wird hier gespeichert. Ein Name, den kein Datensatz verwendet, kann gelöscht werden.",
   "Air pressure": "Luftdruck",
   "Altitude": "Höhenlage",
+  "Ambiguous: write {decimal} for a decimal or {grouped} for a whole number.": "Mehrdeutig: Schreiben Sie {decimal} für eine Dezimalzahl oder {grouped} für eine ganze Zahl.",
   "Appearance": "Darstellung",
   "Areas": "Flächen",
   "Barrel length": "Lauflänge",
@@ -31,6 +32,8 @@
   "Disciplines": "Disziplinen",
   "Drop, windage": "Flugbahnabfall, Seitenabweichung",
   "Energy": "Energie",
+  "Enter a number for {label}.": "Geben Sie eine Zahl für {label} ein.",
+  "Enter a twist as 1:8 or 8.": "Geben Sie den Drall als 1:8 oder 8 ein.",
   "Federations": "Verbände",
   "Firearm mass": "Masse der Schusswaffe",
   "Firearms": "Schusswaffen",
@@ -87,6 +90,7 @@
   "Tools": "Werkzeuge",
   "US customary": "US-amerikanisch",
   "Undo of {name} failed: {reason}": "Rückgängig machen von {name} fehlgeschlagen: {reason}",
+  "Unit of {label}: {unit}": "Einheit von {label}: {unit}",
   "Units": "Einheiten",
   "Values are kept in SI units: a change converts what is shown, never a value.": "Werte werden in SI-Einheiten gehalten: Eine Änderung rechnet die Anzeige um, nie einen Wert.",
   "Velocity": "Geschwindigkeit",
@@ -101,6 +105,11 @@
     "one": "{count} Datensatz",
     "other": "{count} Datensätze"
   },
+  "{label} must be a whole number.": "{label} muss eine ganze Zahl sein.",
+  "{label} must be at least {min}{unit}.": "{label} muss mindestens {min}{unit} betragen.",
+  "{label} must be at most {max}{unit}.": "{label} darf höchstens {max}{unit} betragen.",
+  "{label} must be greater than 0{unit}.": "{label} muss größer als 0{unit} sein.",
   "{name} was not deleted: a record names it now.": "{name} wurde nicht gelöscht: Ein Datensatz verwendet den Namen jetzt.",
-  "{name} was not deleted: {reason}": "{name} wurde nicht gelöscht: {reason}"
+  "{name} was not deleted: {reason}": "{name} wurde nicht gelöscht: {reason}",
+  "{unit}, switch {label} to {next}": "{unit}, {label} auf {next} umschalten"
 }

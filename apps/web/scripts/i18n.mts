@@ -75,9 +75,9 @@ function pluralAt(source: string, at: number) {
   return one && other ? `${one.text}|${other.text}` : undefined
 }
 
-/** The messages of one source file (none unless it imports from `i18n/`); a call that is not extractable throws. */
+/** The messages of one source file (none unless it imports from `i18n/`, or from `./translate.ts` in that folder); a call that is not extractable throws. */
 export function extract(source: string, file = 'source'): string[] {
-  if (!/from '[^']*\/i18n\/[^']*'/.test(source)) return []
+  if (!/from '(?:[^']*\/i18n\/[^']*|\.\/translate\.ts)'/.test(source)) return []
   const found: string[] = []
   for (const m of source.matchAll(call)) {
     const start = m.index + m[0].length

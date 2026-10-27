@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from 'react'
 import { storageName } from '../lib/edition.ts'
 import { setShownLanguage } from './shown.ts'
-import { type Catalogue, type Translator, translator } from './translate.ts'
+import { type Catalogue, english as englishText, type Translator, translator } from './translate.ts'
 
 /**
  * The languages of the interface. English is the source text of the code and has no catalogue;
@@ -25,7 +25,7 @@ const languageKey = storageName('language')
 /** The chosen language, with the functions of the language shown (English until its catalogue is loaded). */
 type Translation = Translator & { chosen: Language }
 
-const english: Translation = { chosen: 'en', ...translator() }
+const english: Translation = { chosen: 'en', ...englishText }
 
 let current = english
 const listeners = new Set<() => void>()

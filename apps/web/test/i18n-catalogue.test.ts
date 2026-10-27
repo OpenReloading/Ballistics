@@ -37,6 +37,10 @@ describe('message extraction', () => {
     expect(() => extract(`${head}msg(\`a \${b}\`)`)).toThrow(/source:2: msg\(\)/)
   })
 
+  it('reads a file of the i18n folder that imports the translate module', () => {
+    expect(extract("import { type Translator } from './translate.ts'\nt('A')")).toEqual(['A'])
+  })
+
   it('reads no file that does not import from i18n', () => {
     expect(extract("const t = (x) => x; t('A')")).toEqual([])
   })

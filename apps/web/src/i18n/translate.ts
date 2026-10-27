@@ -78,3 +78,9 @@ export function translator(catalogue?: Catalogue, language = 'en'): Translator {
     },
   }
 }
+
+/**
+ * The English functions: what a file, the clipboard or a link carries whatever language is shown,
+ * and the text of a test.
+ */
+export const english: Translator = translator()
