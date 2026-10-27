@@ -249,7 +249,11 @@ export const federationRow = (f: Federation): IndexRow<FederationItem> => ({
     id: f.id,
     name: f.name,
     abbreviation: f.abbreviation,
-    ...compact({ country: f.country, internationalFederation: f.internationalFederation }),
+    ...compact({
+      country: f.country,
+      internationalFederation: f.internationalFederation,
+      website: f.website,
+    }),
   },
   sortKey: sortKey(f.abbreviation),
   search: searchKey([f.abbreviation, f.name]),

@@ -201,6 +201,7 @@ export const bundle: Bundle = {
       name: 'Test Federation',
       abbreviation: 'Test',
       country: 'international',
+      website: 'https://example.org/',
       ruleBooks: [
         {
           title: 'Test rule book',

@@ -26,6 +26,7 @@ Three record kinds describe who defines a discipline, what the discipline is and
 | `abbreviation` | Short name ("ISSF", "DSB"), shown as the organization of a face and of a face event |
 | `country` | ISO 3166-1 alpha-2 code, or `international` for a world body |
 | `internationalFederation` | Id of the international federation the rule book names this one a member of |
+| `website` | https URL of the federation's own homepage, checked by loading it: it answers and names the federation. Absent where no address was verified |
 | `ruleBooks` | Ids of the source records of the rule books the records cite. The API returns title, edition, URL and SHA-256 |
 | `provenance` | Sources with the page each value was read at |
 
@@ -83,7 +84,7 @@ Served under `/v1` (`packages/api/src/routes/federations.ts`). Each `/:id` route
 
 | Route | Items |
 |---|---|
-| `GET /federations` | `{ id, name, abbreviation, country, internationalFederation? }` |
+| `GET /federations` | `{ id, name, abbreviation, country, internationalFederation?, website? }` |
 | `GET /disciplines?federation=` | `{ id, federation, name, number?, distanceMm, category? }` |
 | `GET /target-mappings?discipline=&face=` | `{ id, discipline, face, event, stage?, gaugeMm? }`, `gaugeMm` in mm |
 | `GET /caliber-classes` | `{ id, name, diameterMm }`, by diameter |

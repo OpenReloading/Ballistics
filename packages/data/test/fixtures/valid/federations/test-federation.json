@@ -3,6 +3,7 @@
   "name": "Test Federation",
   "abbreviation": "Test",
   "country": "DE",
+  "website": "https://example.org/",
   "ruleBooks": ["test-rule-book"],
   "provenance": {
     "kind": "published",

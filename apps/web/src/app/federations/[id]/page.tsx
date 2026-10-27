@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { FieldTable } from '../../../components/field-table.tsx'
+import { HomepageLink } from '../../../components/homepage-link.tsx'
 import { Panel } from '../../../components/panel.tsx'
 import { LinkButton } from '../../../components/record-actions.tsx'
 import { RecordPage } from '../../../components/record-page.tsx'
@@ -112,14 +113,26 @@ export default async function FederationPage({ params }: PageProps<'/federations
               },
             ]}
           />
-          {f.internationalFederation && (
+          {(f.internationalFederation || f.website) && (
             <dl className="record-links">
-              <dt>Member of</dt>
-              <dd>
-                <Link href={`/federations/${f.internationalFederation}`}>
-                  {international?.name ?? f.internationalFederation}
-                </Link>
-              </dd>
+              {f.internationalFederation && (
+                <>
+                  <dt>Member of</dt>
+                  <dd>
+                    <Link href={`/federations/${f.internationalFederation}`}>
+                      {international?.name ?? f.internationalFederation}
+                    </Link>
+                  </dd>
+                </>
+              )}
+              {f.website && (
+                <>
+                  <dt>Homepage</dt>
+                  <dd>
+                    <HomepageLink url={f.website} />
+                  </dd>
+                </>
+              )}
             </dl>
           )}
         </Panel>

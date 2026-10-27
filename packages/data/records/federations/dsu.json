@@ -4,6 +4,7 @@
   "abbreviation": "DSU",
   "country": "DE",
   "ruleBooks": ["dsu-sporthandbuch-2018"],
+  "website": "https://www.d-s-u.de/",
   "provenance": {
     "kind": "published",
     "sources": [
@@ -12,6 +13,15 @@
         "page": "Titelseite (PDF p. 1), Inhalt (PDF p. 2)",
         "fields": ["name", "abbreviation", "country", "ruleBooks"],
         "note": "Seat Weißenthurm, Amtsgericht Koblenz VR 11284, recognised under § 15 WaffG as printed on the title page. The document names no international federation membership. The DSU also publishes the sheets for K 18 to K 23 and the Admiral-Pokal (2024, headed \"DSU Sporthandbuch, Kurzwaffen\") on d-s-u.de; the list of approved rule books of the Bundesverwaltungsamt shows only the 2018 handbook for the DSU (04.05.2018), so those sheets are not a rule book of this record."
+      },
+      {
+        "title": "Homepage of Deutsche Schießsport Union e.V.",
+        "publisher": "Deutsche Schießsport Union e.V.",
+        "url": "https://www.d-s-u.de/",
+        "retrieved": "2026-10-27",
+        "origin": "public",
+        "fields": ["website"],
+        "note": "The page was loaded on the retrieval date: it answers and names the federation."
       }
     ]
   }

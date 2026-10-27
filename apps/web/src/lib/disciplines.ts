@@ -155,17 +155,21 @@ export function disciplineRuleBook(
   return s && { ...s, section: d.section, page: d.page }
 }
 
+/** A federation as `GET /federations` lists it. */
+export type FederationListItem = FederationSummary & Pick<Federation, 'country' | 'website'>
+
 /** One row of the federation list. */
 export type FederationRow = {
   id: string
   name: string
   abbreviation: string
   country: string
-  ruleBooks: number
   disciplines: number
-  /** Distinct faces of the mappings of its disciplines. */
-  faces: number
+  website?: string
 }
+
+/** The host of a link without a leading `www.`: the readable name of a homepage link. */
+export const hostText = (url: string) => new URL(url).host.replace(/^www\./, '')
 
 /** "International" for a world body, else the ISO country code. */
 export const countryText = (country: string) =>
@@ -185,19 +189,16 @@ export function federationScope(
 
 /** The list row of a federation. */
 export function federationRow(
-  f: Pick<FederationRecord, 'id' | 'name' | 'abbreviation' | 'country' | 'ruleBooks'>,
+  f: FederationListItem,
   disciplines: readonly DisciplineSummary[],
-  mappings: readonly MappingSummary[],
 ): FederationRow {
-  const scope = federationScope(f.id, disciplines, mappings)
   return {
     id: f.id,
     name: f.name,
     abbreviation: f.abbreviation,
     country: countryText(f.country),
-    ruleBooks: f.ruleBooks.length,
-    disciplines: scope.disciplines.length,
-    faces: scope.faces.length,
+    disciplines: disciplines.filter((d) => d.federation === f.id).length,
+    ...(f.website && { website: f.website }),
   }
 }
 

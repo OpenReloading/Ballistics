@@ -4,6 +4,7 @@
   "abbreviation": "ISSF",
   "country": "international",
   "ruleBooks": ["issf-rules-2025-third-print", "issf-paper-target-scoring-2022"],
+  "website": "https://www.issf-sports.org/",
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,6 +23,15 @@
         "source": "issf-paper-target-scoring-2022",
         "page": "Heading and footer, p. 320 (PDF p. 1)",
         "fields": ["ruleBooks"]
+      },
+      {
+        "title": "Homepage of International Shooting Sport Federation",
+        "publisher": "International Shooting Sport Federation",
+        "url": "https://www.issf-sports.org/",
+        "retrieved": "2026-10-27",
+        "origin": "public",
+        "fields": ["website"],
+        "note": "The page was loaded on the retrieval date: it answers and names the federation."
       }
     ]
   }
