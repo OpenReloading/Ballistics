@@ -18,6 +18,13 @@ export const sampleIds: Record<string, readonly string[]> = {
     '18-x-81',
     '243-win-super-short-mag',
     '8-x-51-r-lebel',
+    // the rest of the default drawing baseline (`common` of drawing-baseline.spec.ts)
+    '6-5-creedmoor',
+    '284-win',
+    '30-30-win',
+    '300-win-mag',
+    '9-mm-luger',
+    '12',
   ],
   bullet: ['demo-bullet-168', 'demo-bullet-150'],
   powder: ['demo-powder-dp40'],

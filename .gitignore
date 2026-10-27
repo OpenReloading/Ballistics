@@ -8,6 +8,7 @@ playwright-report
 visual-check-out
 .schemathesis/
 /pages/
+/apps/web/public/api/
 # agent skills and setup state, installed per checkout from skills-lock.json
 /.agents/skills/
 /.claude/skills/
