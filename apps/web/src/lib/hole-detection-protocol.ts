@@ -1,6 +1,7 @@
 /** Messages between the target editor and the hole detection worker, in photo px of the turned photo. */
 import type { TargetFace } from '@open-reloading/schema'
 import type { FlaggedRegion, HoleExample, HoleProposal } from './hole-detection.ts'
+import type { QualityIssue } from './photo-quality.ts'
 import type { FaceGeometry, FaceSearch } from './target-face.ts'
 import type { Point } from './target-geometry.ts'
 
@@ -36,8 +37,11 @@ export type WorkerRequest =
         auto?: boolean
       })
   | (Photo & { kind: 'colour'; at: Point; radius: number })
-  /** The face search over the whole turned photo against `faces`; `pxPerMm` is the photo's known scale. */
-  | (Photo & { kind: 'face'; faces: TargetFace[]; pxPerMm?: number })
+  /**
+   * The face search over the whole turned photo against `faces`; `pxPerMm` is the photo's known
+   * scale, `holeDiameter` (m) the bullet's, for the quality check's hole size.
+   */
+  | (Photo & { kind: 'face'; faces: TargetFace[]; pxPerMm?: number; holeDiameter?: number })
   /** Detection from the hole under `at` (`detectFromExample`); `holeDiameter` sets the sizes it tries. */
   | (Photo & Search & { kind: 'example'; at: Point })
 
@@ -53,6 +57,6 @@ export type WorkerReply =
       example?: HoleExample
     }
   | { kind: 'colour'; rgb: Rgb }
-  /** The search on the photo's px; `fits` is empty when no face is proposed. */
-  | { kind: 'face'; search: FaceSearch }
+  /** The search on the photo's px (`fits` is empty when no face is proposed) and the photo's quality problems. */
+  | { kind: 'face'; search: FaceSearch; quality: QualityIssue[] }
   | { kind: 'error'; message: string }

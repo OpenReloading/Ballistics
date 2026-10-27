@@ -20,6 +20,7 @@ import {
 } from './hole-detection.ts'
 import type { Photo, WorkerReply, WorkerRequest } from './hole-detection-protocol.ts'
 import { nth } from './nth.ts'
+import { photoQuality } from './photo-quality.ts'
 import { clamp } from './raster-ops.ts'
 import { faceLabel, findFace, onPhoto } from './target-face.ts'
 import { mul3, type Point, turnedBox } from './target-geometry.ts'
@@ -117,7 +118,7 @@ async function handleColour(r: Extract<WorkerRequest, { kind: 'colour' }>): Prom
   return { kind: 'colour', rgb: { r: median(reds), g: median(greens), b: median(blues) } }
 }
 
-/** The face search over the whole turned photo, resized to `FACE_LONG` px on its longer side. */
+/** The face search and the quality check over the whole turned photo, resized to `FACE_LONG` px on its longer side. */
 async function handleFace(r: Extract<WorkerRequest, { kind: 'face' }>): Promise<WorkerReply> {
   const t = turnedBox(r.width, r.height, r.photoRotation)
   const [fx0, fy0] = [Math.floor(t.x), Math.floor(t.y)]
@@ -130,7 +131,11 @@ async function handleFace(r: Extract<WorkerRequest, { kind: 'face' }>): Promise<
     r.faces,
     r.pxPerMm && r.pxPerMm * fk,
   )
-  return { kind: 'face', search: onPhoto(found, fk, fx0, fy0) }
+  // the hole on the resized photo, from the scale of the best fit
+  const [fit] = found.fits
+  const holePx = fit && r.holeDiameter ? fit.pxPerMm * fromSi('length', r.holeDiameter) : undefined
+  const quality = photoQuality({ image: shot, scale: fk, black: found.black, holePx })
+  return { kind: 'face', search: onPhoto(found, fk, fx0, fy0), quality }
 }
 
 /** A detection run on the region (or the face, or the whole turned photo) at the working size. */

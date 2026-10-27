@@ -404,7 +404,7 @@ function blobOf(grid: Grid, t: number, f: Filled, m: Moments): Blob | undefined 
 }
 
 /** Share of the ellipse's area inside the grid of `w` by `h` px, from a 40 x 40 lattice over it. */
-function shareInside(e: Ellipse, w: number, h: number): number {
+export function shareInside(e: Ellipse, w: number, h: number): number {
   const [c, s] = [Math.cos(e.angle), Math.sin(e.angle)]
   let [inside, total] = [0, 0]
   for (let i = 0; i < 40; i++)
