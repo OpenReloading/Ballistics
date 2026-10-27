@@ -231,6 +231,12 @@ A static site without a server for GitHub Pages: the web app with the records as
   - A button for two units, a menu for three or more. Nothing is stored. The Settings (`UnitsForm`) store units. A change of the Settings or a reload resets the field.
   - A numeric `placeholder` and a message, mark or help that names a unit (`error`, `mark`, `help`, `action.text`, `fieldError(spec, value, shown)`) are functions of the units shown. `unit="text"` or `"none"` leaves a page without switches.
 
+## German terms
+
+- `src/i18n/german-terms.json`: the term table of the German interface, one row per term with its key, English term, group, status (`verified`, `disputed`, `unverified`), the German word, and its sources as a document id and a place (section or page), never a passage. The document ids and their editions are the file's `sources`.
+  - Verified: one German word and at least one source. Disputed: `german` is null, at least two candidates, each with its own source; the owner picks one. Unverified: a candidate or null, and a note on what was searched. A candidate is never a source.
+  - Rows are edited by hand. `test/german-terms.test.ts` checks the format.
+
 ## Streamed pages and the Mantine patch
 
 - In a build made without the API the list pages stream. React 19.3 reveals a streamed boundary up to about 300 ms after the first paint.
