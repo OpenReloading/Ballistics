@@ -50,7 +50,7 @@ function Keyboard() {
       checked={on}
       onChange={(e) => setSingleKeys(e.currentTarget.checked)}
       label="Single-key shortcuts"
-      description="? opens the shortcut list and / searches the list on a page. Off, every shortcut needs Ctrl or Cmd."
+      description="? opens the shortcut list and / searches the list on a page. Off, they do nothing; the shortcuts with Ctrl or Cmd stay."
     />
   )
 }

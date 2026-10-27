@@ -235,7 +235,9 @@ test('Settings turns the single-key shortcuts off: "/" and "?" do nothing, the c
   await dialog.getByRole('tab', { name: 'General' }).click()
   const box = dialog.getByRole('checkbox', { name: 'Single-key shortcuts' })
   await expect(box).toBeChecked()
-  await expect(dialog.getByText('Off, every shortcut needs Ctrl or Cmd.')).toBeVisible()
+  await expect(
+    dialog.getByText('Off, they do nothing; the shortcuts with Ctrl or Cmd stay.'),
+  ).toBeVisible()
   await box.uncheck()
   await page.keyboard.press('Escape')
   await expect(dialog).toBeHidden()
