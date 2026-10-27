@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 import {
   bullet,
+  type ConstructionFields,
   cartridge,
   caseTypes,
   chronoSession,
   firingSeries,
+  leadFree,
   load,
   manufacturer,
   powder,
@@ -193,6 +195,37 @@ describe('caseTypes', () => {
   })
 })
 
+describe('leadFree', () => {
+  const of = (fields: Omit<ConstructionFields, 'raw'>) => leadFree({ raw: 'x', ...fields })
+
+  it('is false for a lead core, with or without a jacket', () => {
+    expect(of({ core: { material: 'lead' } })).toBe(false)
+    expect(of({ core: { material: 'lead-alloy' }, jacket: { material: 'gilding-metal' } })).toBe(
+      false,
+    )
+  })
+
+  it('is true for a core without lead under a jacket, and for the other named materials', () => {
+    expect(of({ core: { material: 'steel' }, jacket: { material: 'copper' } })).toBe(true)
+    for (const material of ['copper', 'copper-alloy', 'tin', 'tungsten', 'steel'] as const)
+      expect(of({ core: { material } })).toBe(true)
+  })
+
+  it('is false when a coating contains lead, whatever the core', () => {
+    expect(of({ core: { material: 'copper' }, surface: ['lead-wash'] })).toBe(false)
+    expect(of({ surface: ['moly', 'lead-wash'] })).toBe(false)
+    expect(of({ core: { material: 'copper' }, surface: ['moly', 'copper-wash'] })).toBe(true)
+  })
+
+  it('is not set for unmapped wording, a missing construction or a core that is not settled', () => {
+    expect(leadFree(undefined)).toBeUndefined()
+    expect(leadFree({ raw: 'Copper', unmapped: true })).toBeUndefined()
+    expect(of({ structure: 'monolithic' })).toBeUndefined()
+    expect(of({ jacket: { material: 'copper' } })).toBeUndefined()
+    expect(of({ structure: 'frangible', core: { material: 'compressed-powder' } })).toBeUndefined()
+  })
+})
+
 describe('bullet', () => {
   const base = {
     id: 'test-bullet-1',
@@ -319,13 +352,81 @@ describe('bullet', () => {
     })
     accepts({ construction: { raw: 'Copper', unmapped: true } })
     rejectsAt({ construction: 'Jacketed Lead' }, 'construction')
-    rejectsAt({ construction: { raw: 'x', structure: 'frangible' } }, 'construction.structure')
+    rejectsAt({ construction: { raw: 'x', structure: 'solid' } }, 'construction.structure')
     rejectsAt(
-      { construction: { raw: 'x', core: { material: 'tungsten' } } },
+      { construction: { raw: 'x', core: { material: 'bismuth' } } },
       'construction.core.material',
     )
     rejectsAt({ construction: { raw: 'x', surface: [] } }, 'construction.surface')
     rejectsAt({ construction: { raw: 'x', unmapped: true, structure: 'bonded' } }, 'construction')
+  })
+
+  it('takes the added structure, core, jacket and surface values', () => {
+    accepts({ construction: { raw: 'x', structure: 'frangible' } })
+    for (const material of ['tin', 'tungsten', 'steel', 'compressed-powder'])
+      accepts({ construction: { raw: 'x', core: { material } } })
+    accepts({ construction: { raw: 'x', jacket: { material: 'steel' } } })
+    for (const surface of [
+      'powder-coat',
+      'polymer-coat',
+      'paint',
+      'wax-lube',
+      'boron-nitride',
+      'tungsten-disulfide',
+      'copper-wash',
+    ])
+      accepts({ construction: { raw: 'x', surface: [surface] } })
+  })
+
+  it('takes the core hardness for a lead core and the jacket thickness below the radius', () => {
+    const core = (material: string, hardness = 12) => ({
+      construction: { raw: 'x', core: { material, hardness: { value: hardness } } },
+    })
+    accepts(core('lead-alloy'))
+    accepts(core('lead'))
+    rejectsAt(core('copper'), 'construction.core.hardness')
+    rejectsAt(core('lead', 0), 'construction.core.hardness.value')
+    const jacket = (value: number) => ({
+      construction: { raw: 'x', jacket: { thickness: { value } } },
+    })
+    accepts(jacket(0.3))
+    rejectsAt(jacket(0), 'construction.jacket.thickness.value')
+    rejectsAt(jacket(base.diameter.value / 2), 'construction.jacket.thickness')
+  })
+
+  it('takes a gas check only for a cast bullet and driving bands only for a monolithic one', () => {
+    accepts({ construction: { raw: 'x', structure: 'cast', gasCheck: true } })
+    accepts({ construction: { raw: 'x', structure: 'cast', gasCheck: false } })
+    rejectsAt(
+      { construction: { raw: 'x', structure: 'swaged', gasCheck: true } },
+      'construction.gasCheck',
+    )
+    rejectsAt({ construction: { raw: 'x', gasCheck: false } }, 'construction.gasCheck')
+    accepts({ construction: { raw: 'x', structure: 'monolithic', drivingBands: 2 } })
+    rejectsAt(
+      { construction: { raw: 'x', structure: 'cast', drivingBands: 2 } },
+      'construction.drivingBands',
+    )
+    rejectsAt(
+      { construction: { raw: 'x', structure: 'monolithic', drivingBands: 0 } },
+      'construction.drivingBands',
+    )
+    rejectsAt(
+      { construction: { raw: 'x', structure: 'monolithic', drivingBands: 1.5 } },
+      'construction.drivingBands',
+    )
+  })
+
+  it('refuses unmapped wording together with any new structured field', () => {
+    const unmapped = { raw: 'x', unmapped: true }
+    for (const fields of [
+      { core: { material: 'tin' } },
+      { jacket: { thickness: { value: 0.3 } } },
+      { surface: ['paint'] },
+      { structure: 'cast', gasCheck: true },
+      { structure: 'monolithic', drivingBands: 2 },
+    ])
+      rejectsAt({ construction: { ...unmapped, ...fields } }, 'construction')
   })
 
   it('needs a source that names the country, from a code of two capital letters', () => {
