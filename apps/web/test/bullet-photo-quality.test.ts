@@ -8,6 +8,8 @@ import { minWidthPx, outlineHints } from '../src/lib/bullet-photo-quality.ts'
 import { type PhotoSpec, renderPhoto } from '../src/lib/bullet-photo-sample.ts'
 import { defined } from './defined.ts'
 
+const area = (s: { alpha: Uint8Array }) => s.alpha.reduce((n, v) => n + (v >= 128 ? 1 : 0), 0)
+
 const shape: BulletDimensions = {
   diameter: 7.82,
   length: 30,
@@ -188,6 +190,13 @@ describe('the size of the bullet in the photograph', () => {
     r: Array.from({ length: length - 2 }, () => halfWidth),
     ambiguous: false,
     edge: 0.3,
+  })
+
+  it('names no ragged edge where no cut-out was found', () => {
+    const grey = { width: 80, height: 60, data: new Uint8ClampedArray(80 * 60 * 4).fill(120) }
+    const seg = segmentPhoto(grey)
+    expect(area(seg)).toBe(0)
+    expect(seg.warnings.join(' ')).not.toMatch(/ragged/)
   })
 
   it('refuses a bullet too narrow to measure and says how to fix it', () => {

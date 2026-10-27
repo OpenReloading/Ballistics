@@ -316,7 +316,7 @@ function pickCut(img: RgbaImage, exclude: readonly Point[]): Pick {
     colour && { seg: colour, cut: byColour },
   ].find((c) => c && c.seg !== first && takesIn(c.seg, first))
   const picked: Pick = wide ?? { seg: first, cut: firstCut }
-  if (!rough(picked.seg)) return picked
+  if (area(picked.seg) === 0 || !rough(picked.seg)) return picked
   const plainKnown = new Uint8Array(img.width * img.height)
   const plain = byDeviation(img, exclude, plainKnown) as Segmentation
   const options: Pick[] = [
