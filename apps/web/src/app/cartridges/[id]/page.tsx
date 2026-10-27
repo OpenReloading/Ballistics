@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { CartridgeRecordPage } from '../../../components/cartridge-record-page.tsx'
 import { ServerDataError } from '../../../components/states.tsx'
 import { getCartridge, listAllCartridges, staticIds } from '../../../lib/api.ts'
-import { recordMetadata } from '../../../lib/record-metadata.ts'
+import { cartridgeHeadText, recordMetadata } from '../../../lib/record-metadata.ts'
 
 export function generateStaticParams() {
   return staticIds(listAllCartridges, 'cartridge')
@@ -17,11 +17,8 @@ export async function generateMetadata(
   const r = await getCartridge(id)
   if (r.status === 'notFound') notFound()
   if (r.status !== 'ok') return { robots: { index: false } }
-  return recordMetadata(
-    parent,
-    `${r.data.name} dimensions and pressures`,
-    `CIP dimensions and maximum pressures of ${r.data.name}, with sources.`,
-  )
+  const { title, description } = cartridgeHeadText(r.data.name)
+  return recordMetadata(parent, title, description)
 }
 
 // no Suspense above notFound(): a streamed response keeps status 200

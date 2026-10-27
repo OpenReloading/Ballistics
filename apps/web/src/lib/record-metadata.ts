@@ -24,3 +24,11 @@ export async function recordMetadata(
     },
   }
 }
+
+/** The title and description of a cartridge record page, shared by its page and the prerender check. */
+export function cartridgeHeadText(name: string) {
+  return {
+    title: `${name} dimensions and pressures`,
+    description: `CIP dimensions and maximum pressures of ${name}, with sources.`,
+  }
+}
