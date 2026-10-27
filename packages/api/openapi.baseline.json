@@ -19744,6 +19744,29 @@
                                   "unit": "mm",
                                   "description": "Cartridge base to ogive with the bullet touching the lands, measured."
                                 },
+                                "overallLengthAtLands": {
+                                  "type": "object",
+                                  "properties": {
+                                    "value": {
+                                      "type": "number",
+                                      "minimum": 0,
+                                      "description": "In mm."
+                                    },
+                                    "raw": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "description": "The value as written in the source, when it differed."
+                                    }
+                                  },
+                                  "required": ["value"],
+                                  "unit": "mm",
+                                  "description": "Cartridge overall length with the bullet touching the lands, measured."
+                                },
+                                "landsBullet": {
+                                  "type": "string",
+                                  "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                  "description": "Reference to the bullet the lands contact was measured with."
+                                },
                                 "firearmMass": {
                                   "type": "object",
                                   "properties": {
@@ -20317,6 +20340,69 @@
                                         "required": ["value"],
                                         "unit": "degC",
                                         "description": "Temperature of the powder in this string."
+                                      },
+                                      "conditions": {
+                                        "type": "object",
+                                        "properties": {
+                                          "airTemperature": {
+                                            "type": "object",
+                                            "properties": {
+                                              "value": {
+                                                "type": "number",
+                                                "description": "In degC."
+                                              },
+                                              "raw": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "description": "The value as written in the source, when it differed."
+                                              }
+                                            },
+                                            "required": ["value"],
+                                            "unit": "degC",
+                                            "description": "Air temperature at the string."
+                                          },
+                                          "stationPressure": {
+                                            "type": "object",
+                                            "properties": {
+                                              "value": {
+                                                "type": "number",
+                                                "description": "In bar."
+                                              },
+                                              "raw": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "description": "The value as written in the source, when it differed."
+                                              }
+                                            },
+                                            "required": ["value"],
+                                            "unit": "bar",
+                                            "description": "Absolute air pressure at the string."
+                                          },
+                                          "windSpeed": {
+                                            "type": "object",
+                                            "properties": {
+                                              "value": {
+                                                "type": "number",
+                                                "minimum": 0,
+                                                "description": "In m/s."
+                                              },
+                                              "raw": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "description": "The value as written in the source, when it differed."
+                                              }
+                                            },
+                                            "required": ["value"],
+                                            "unit": "m/s",
+                                            "description": "Wind speed at the string."
+                                          }
+                                        },
+                                        "description": "The weather at this string, where it differs from the session or was entered by hand."
+                                      },
+                                      "note": {
+                                        "type": "string",
+                                        "maxLength": 2000,
+                                        "description": "Note on the string, plain text."
                                       },
                                       "shots": {
                                         "minItems": 1,
