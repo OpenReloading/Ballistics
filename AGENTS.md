@@ -59,7 +59,7 @@
 ## Conventions
 
 - Changes start from a GitHub issue. `main` is the only long-lived branch: branches are short-lived, cut from `main` and squash-merged back into it; the release pull request of release-please also targets `main`.
-- Published to npmjs.com: schema, core, drawing, importers, data (`apps/docs/docs/release.md`). Every other workspace stays `private`.
+- To be published to npmjs.com (off until the repository variable `NPM_PUBLISH` is `true`): schema, core, drawing, importers, data (`apps/docs/docs/release.md`). Every other workspace stays `private`.
 - Package rules (`npm run deps:check` checks them):
   - `packages/core`: no runtime dependencies, no I/O, no database, no HTTP.
   - `packages/importers`: no I/O. Depends on `@open-reloading/schema` for types only.
