@@ -91,7 +91,7 @@ Rules:
 | Every part of a build (receiver, handguard, stock, gas system) as a catalogue record | Only the barrel carries ballistic data; the other parts would be records no solver reads, with far more sources to clear and keep current. They stay descriptive fields of the user's build. A barrel record is a phase 2 option. |
 | A build as its own record kind next to `firearm` | The `firearm` user record already holds barrel, twist, optics and configurations, and `workbench.firearm` and `Load.firearm` are tied to it. A second kind would double the picker, the file format and the editor. |
 | Compute the sight height from receiver, mount and optic heights | The bore axis height over the rail is unverified for most receivers, so the sum would carry unknown offsets. Sight height stays a measured input of the optic mount. |
-| A live reference from the workbench to the catalogue id | A saved workbench file would dangle when a record changes or the catalogue is absent (static site, offline). A copy into the user record keeps files self-contained. |
+| A live reference from the workbench to the catalogue id | A saved workbench file would dangle when a record is removed or unavailable offline. A copy into the user record keeps files self-contained. |
 | Chamber only as a cartridge id | Many chamberings have no cartridge record; a required id would drop those guns. The printed name is stored, the id is optional. |
 
 ## Data sources
