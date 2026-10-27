@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.3](https://github.com/OpenReloading/Ballistics/compare/drawing-v0.0.2...drawing-v0.0.3) (2026-10-27)
+
+
+### Features
+
+* **schema,drawing,web,data:** DSU oval-ring faces b2 to b5 with their disciplines ([#260](https://github.com/OpenReloading/Ballistics/issues/260)) ([713ec86](https://github.com/OpenReloading/Ballistics/commit/713ec86c6eef3d26c2d2e4ae1632bfc34d380fa5))
+* **web,schema,drawing:** measured lands contact of a firearm gives the jump ([#257](https://github.com/OpenReloading/Ballistics/issues/257)) ([e8e90e5](https://github.com/OpenReloading/Ballistics/commit/e8e90e58259020c62ab51cc243716e0432b24ab3))
+
 ## [0.0.2](https://github.com/OpenReloading/Ballistics/compare/drawing-v0.0.1...drawing-v0.0.2) (2026-10-26)
 
 
