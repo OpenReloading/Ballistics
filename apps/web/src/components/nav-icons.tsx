@@ -11,7 +11,6 @@ import {
   Info,
   MagnifyingGlass,
   Target,
-  Toolbox,
   Warning,
 } from '@phosphor-icons/react'
 import type { ReactNode } from 'react'
@@ -22,9 +21,8 @@ import type { ReactNode } from 'react'
  * stroke style.
  */
 const icons: Record<string, Icon> = {
-  // the Library pages: the catalogue, and what the user owns
+  // the Library page: the Database
   database: Database,
-  'my-gear': Toolbox,
   '/powders': Grains,
   '/workbench': Flask,
   '/session': ChartBar,

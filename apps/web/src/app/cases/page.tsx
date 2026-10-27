@@ -38,6 +38,7 @@ async function Cases() {
         manufacturerAliases(manufacturers),
         cartridgeNames,
       )}
+      cartridgeNames={Object.fromEntries(cartridgeNames)}
     />
   )
 }

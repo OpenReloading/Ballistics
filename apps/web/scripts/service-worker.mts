@@ -1,7 +1,8 @@
 /**
  * Writes public/sw.js after `next build` (out/sw.js in the Pages edition, `PAGES_BASE_PATH` set):
  * the build id as `version`, the files of .next/static (in the Pages edition also the catalogue
- * index) as `precache`, the base path as `base`, the pages' trailing slash as `slash`, every export of
+ * index) as `precache`, the base path as `base`, the pages' trailing slash as `slash`, the Pages edition
+ * (`next` or empty) as `edition`, every export of
  * src/lib/offline.ts (Node strips their types, so their source is JavaScript), then src/service-worker.js.
  */
 import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
@@ -19,6 +20,7 @@ const constants = {
   precache: offline.precacheList(files, base, base !== undefined),
   base: base ?? '',
   slash: base === undefined ? '' : '/',
+  edition: process.env.PAGES_EDITION === 'next' ? 'next' : '',
 }
 const helpers = Object.entries({ ...constants, ...offline }).map(
   ([name, v]) => `const ${name} = ${typeof v === 'function' ? String(v) : JSON.stringify(v)}`,

@@ -4,6 +4,9 @@
  * catalogue built from the data bundle (`@open-reloading/api/static`), the catalogue index and the
  * records as data files under `api/`, the docs site under `docs/`, LICENSE, NOTICE, the data
  * license (`data/LICENSE`) and `.nojekyll`.
+ * `PAGES_EDITION` is `stable` (default) or `next`: `next` is built to be served under `<base>/next`, the app's
+ * base path then, and its browser store (database, local storage keys, caches) has names of its own, because
+ * both editions share one origin.
  * `PAGES_URL` (the site's origin) sets the docs' `url` and the app's `metadataBase`. Needs
  * `npm run build` at the root first.
  * `--sample`: only the cartridge pages of `apps/web/src/lib/prerender-sample.ts` prerendered (the
@@ -20,10 +23,15 @@ import { startBundleApi, writeStaticApi } from '@open-reloading/api/static'
 import { executable } from './executable.ts'
 import { dropFullPayloads } from './pages-payload.ts'
 
-const base = process.env.PAGES_BASE_PATH
+const siteBase = process.env.PAGES_BASE_PATH
 // Next's basePath: empty, or a path that starts with a slash and does not end in one
-if (base === undefined || !/^(\/[^/]+)*$/.test(base))
+if (siteBase === undefined || !/^(\/[^/]+)*$/.test(siteBase))
   throw new Error('PAGES_BASE_PATH must be set: "" or a path such as /Ballistics')
+const edition = process.env.PAGES_EDITION ?? 'stable'
+if (edition !== 'stable' && edition !== 'next')
+  throw new Error('PAGES_EDITION must be "stable" or "next"')
+// the path of this edition's app: the site root's (`PAGES_BASE_PATH`) for stable, `/next` below it for next
+const base = edition === 'next' ? `${siteBase}/next` : siteBase
 
 const sample = process.argv.includes('--sample')
 const keepBuild = process.argv.includes('--keep-build')
@@ -59,6 +67,8 @@ try {
   await run(['run', 'build', '-w', '@open-reloading/web'], {
     API_URL: api.url,
     PRERENDER: sample ? 'sample' : 'full',
+    PAGES_BASE_PATH: base,
+    PAGES_EDITION: edition,
     // no docs site: no Docs link to a 404
     NEXT_PUBLIC_NO_DOCS: docs ? undefined : '1',
   })
@@ -76,6 +86,7 @@ const docsEnv = {
   APP_URL: process.env.PAGES_URL && `${process.env.PAGES_URL}${base}/`,
   API_URL: undefined,
   PAGES_BASE_PATH: undefined,
+  PAGES_EDITION: undefined,
 }
 if (docs)
   await run(

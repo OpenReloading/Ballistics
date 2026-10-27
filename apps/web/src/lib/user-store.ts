@@ -3,6 +3,7 @@
  * kept in the same database (`workspace-folder.ts`).
  */
 import type { UserRecord } from '@open-reloading/schema'
+import { storageName } from './edition.ts'
 import { validRecords } from './user-data.ts'
 import { photoIds } from './user-photos.ts'
 
@@ -20,7 +21,7 @@ type Store = 'records' | 'handles' | 'files'
  */
 const version = 2
 
-const databaseName = 'openreloading-user-data'
+const databaseName = storageName('openreloading-user-data')
 
 /** Brings a new or older database to `version`: adds the stores it lacks, touches no record. */
 function upgrade(db: IDBDatabase) {

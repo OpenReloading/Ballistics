@@ -21,6 +21,7 @@ import {
   useState,
   useSyncExternalStore,
 } from 'react'
+import { storageName } from '../lib/edition.ts'
 import { type FieldSpec, type Fields, switchFields } from '../lib/field-spec.ts'
 import { controlSize } from '../lib/theme.ts'
 import {
@@ -40,9 +41,9 @@ import { SettingsDialog } from './settings-dialog.ts'
 import { Loading } from './states.tsx'
 
 /** `localStorage` key of the viewer's unit choice. */
-const unitsKey = 'units'
+const unitsKey = storageName('units')
 /** `localStorage` key of the saved custom variant: kept while a preset is chosen. */
-const customUnitsKey = 'units-custom'
+const customUnitsKey = storageName('units-custom')
 
 type Units = {
   choice: UnitChoice

@@ -53,7 +53,7 @@
   - `e2e` starts the API from `docker compose up api` and runs Schemathesis against it. It builds the static export (`npm run pages -w @open-reloading/tools -- --keep-build`, with `--sample` or `--no-docs`) and runs `npm run check-weight -w @open-reloading/web` and `node apps/web/scripts/check-prerender.mts` on it. It serves the export with `tools/src/pages-serve.ts` at `WEB_URL`, runs `npm run test:e2e` (project `full`) and the drawing pixel baseline in the Playwright image (`npm run drawing-baseline -w @open-reloading/e2e`).
   - On a pull request the `changes` job (`apps/web/scripts/ci-plan.mts`) can skip the `check` job (only prose changed) or the `e2e` job (no change to what the API, the web app, the export scripts or the e2e specs read). It can export with `PRERENDER=sample` (no change to record data, record page code or the packages they read): the cartridge pages of the sample only. A spec that opens a cartridge record has it in the sample (`apps/web/src/lib/prerender-sample.ts`). The Turbopack cache (`apps/web/.next/cache/turbopack`, key prefix `next-export`) is restored.
   - A push to the default branch or any doubt builds from nothing, every record page prerendered and checked in full.
-- Other workflows: `links.yml` (daily lychee run over the external links of the Markdown files, one open issue "Broken external links" with the report), `release.yml` (release-please, images with provenance and SBOM, `apps/docs/docs/release.md`), `pages.yml` (Pages edition from `main`), `pr-title.yml`, `scorecard.yml`. Tools, rules and their free terms: `apps/docs/docs/ci-tools.md`.
+- Other workflows: `links.yml` (daily lychee run over the external links of the Markdown files, one open issue "Broken external links" with the report), `release.yml` (release-please, images with provenance and SBOM, `apps/docs/docs/release.md`: nothing releases until the owner merges the release pull request), `pages.yml` (the Pages site: root = latest release built from its tag, `/next/` = `main`, `apps/web/AGENTS.md`, Pages edition), `pr-title.yml`, `scorecard.yml`. Tools, rules and their free terms: `apps/docs/docs/ci-tools.md`.
 - Commits and pull request titles: Conventional Commits (`CONTRIBUTING.md`).
 
 ## Conventions
@@ -91,8 +91,8 @@
 - `NEXT_PUBLIC_REPOSITORY_URL`: URL of the public source repository, inlined at web build time (no Dockerfile `ARG`). Unset (`apps/web/src/lib/repository-url.ts`): no repository link in the header or the drawer. Set only by `pages.yml`, to the repository the workflow runs in.
 - `NEXT_PUBLIC_DOCS_URL`: URL of the docs site, inlined at web build time (no Dockerfile `ARG`). Unset (`apps/web/src/lib/docs-url.ts`): no Docs link in the sidebar or the drawer, except in the Pages edition, which links its own `docs/` folder.
 - `NEXT_PUBLIC_NO_DOCS`: set by `npm run static:build` and `npm run dev:static`, which build no docs site: the Pages edition's own `docs/` link is left out.
-- `APP_URL`: URL of the web app, read at docs site build time for the docs navbar's Web app link (`ARG` of `apps/docs/Dockerfile`, set by `compose.yaml`; `tools/src/pages.ts` sets it to the Pages site root from `PAGES_URL`). A full URL; unset: no link.
-- `PAGES_BASE_PATH`, `PAGES_URL`: Pages edition (`apps/web/AGENTS.md`).
+- `APP_URL`: URL of the web app, read at docs site build time for the docs navbar's Web app link (`ARG` of `apps/docs/Dockerfile`, set by `compose.yaml`; `tools/src/pages.ts` sets it to the app's root, `<site root>/next/` for the next edition, from `PAGES_URL`). A full URL; unset: no link.
+- `PAGES_BASE_PATH`, `PAGES_EDITION`, `PAGES_URL`: Pages edition (`apps/web/AGENTS.md`).
 - `PRERENDER`:
   - `sample`: a web build prerenders the records selected in `apps/web/src/lib/prerender-sample.ts`. Every other record renders on its first visit. The export (`pages.ts`) takes the mode from `--sample` and never from this variable; it cuts the cartridge pages only.
   - Unset or any other value: every record.
