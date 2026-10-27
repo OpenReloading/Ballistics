@@ -5,6 +5,7 @@ import { FunnelX, Info, Warning, WarningOctagon } from '@phosphor-icons/react'
 import { useRouter } from 'next/navigation'
 import { type ReactNode, useLayoutEffect, useState } from 'react'
 import { controlSize } from '../lib/theme.ts'
+import { LibraryTabs } from './library-tabs.tsx'
 import { PageBar } from './page-bar.tsx'
 
 /** The one empty state of the app: nothing to show yet, and the action that adds it. */
@@ -240,6 +241,7 @@ export function ListError({
   return (
     <>
       <PageBar title={title} />
+      <LibraryTabs />
       <DataError what={what} retry={retry} />
     </>
   )
@@ -248,7 +250,12 @@ export function ListError({
 /** `DataError` in a server page: Retry renders the page's server data again. */
 export function ServerDataError({ what }: { what: string }) {
   const router = useRouter()
-  return <DataError what={what} retry={() => router.refresh()} />
+  return (
+    <>
+      <LibraryTabs />
+      <DataError what={what} retry={() => router.refresh()} />
+    </>
+  )
 }
 
 /** Row widths of the list skeleton, in percent of the name column: uneven, so it reads as text. */
@@ -260,23 +267,26 @@ const skeletonWidths = [62, 48, 70, 55, 66, 42, 58, 74, 50, 64, 46, 68]
  */
 export function ListLoading({ what }: { what: string }) {
   return (
-    <div className="directory" role="status">
-      <span className="visually-hidden">Loading {what}…</span>
-      {/* the metrics of the real filter row (DirectoryFilters), so the frame stays where it is */}
-      <Group className="directory-filters" gap="xs" py="xs" aria-hidden="true">
-        <Skeleton height={30} className="directory-search" />
-        <Skeleton height={30} width="7.5rem" />
-      </Group>
-      <div className="directory-scroll page-panel page-panel-flush" aria-hidden="true">
-        <div className="list-skeleton-head" />
-        {Array.from({ length: 32 }, (_, k) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: placeholders without identity
-          <div key={k} className="list-skeleton-row">
-            <Skeleton height={12} width={`${skeletonWidths[k % skeletonWidths.length]}%`} />
-          </div>
-        ))}
+    <>
+      <LibraryTabs />
+      <div className="directory" role="status">
+        <span className="visually-hidden">Loading {what}…</span>
+        {/* the metrics of the real filter row (DirectoryFilters), so the frame stays where it is */}
+        <Group className="directory-filters" gap="xs" py="xs" aria-hidden="true">
+          <Skeleton height={30} className="directory-search" />
+          <Skeleton height={30} width="7.5rem" />
+        </Group>
+        <div className="directory-scroll page-panel page-panel-flush" aria-hidden="true">
+          <div className="list-skeleton-head" />
+          {Array.from({ length: 32 }, (_, k) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: placeholders without identity
+            <div key={k} className="list-skeleton-row">
+              <Skeleton height={12} width={`${skeletonWidths[k % skeletonWidths.length]}%`} />
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 

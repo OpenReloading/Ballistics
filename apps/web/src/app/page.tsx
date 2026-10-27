@@ -26,7 +26,7 @@ async function Count({
   return r?.status === 'ok' && r.data ? countText(r.data.length, r.data.length, 'records') : null
 }
 
-// the records the API lists at build time. The firearms are the viewer's own
+// the records the API lists at build time. The firearms and cases of My gear are the viewer's own
 const inData: Record<string, ReactNode> = {
   '/cartridges': <Count list={listAllCartridges} />,
   '/bullets': <Count list={listAllBullets} />,
@@ -39,17 +39,17 @@ const inData: Record<string, ReactNode> = {
 }
 
 /** A card's head: the page's icon left of its linked title. */
-function CardTitle({ href, label }: { href: string; label: string }) {
+function CardTitle({ href, label, icon }: { href: string; label: string; icon: string }) {
   return (
     <h3>
-      <NavIcon name={href} size={22} />
+      <NavIcon name={icon} size={22} />
       <Link href={href}>{label}</Link>
     </h3>
   )
 }
 
 export default function Home() {
-  const [tools, data] = sections
+  const [tools, library] = sections
   return (
     <>
       <PageBar title="OpenReloading Ballistics" titleHidden />
@@ -62,7 +62,7 @@ export default function Home() {
         <ul className="home-cards">
           {tools.pages.map((p) => (
             <li key={p.href}>
-              <CardTitle href={p.href} label={p.label} />
+              <CardTitle href={p.href} label={p.label} icon={p.icon} />
               <p>{p.description}</p>
               <LinkButton
                 href={p.href}
@@ -76,15 +76,22 @@ export default function Home() {
           ))}
         </ul>
       </Panel>
-      <Panel id="home-data" title={data.title}>
+      <Panel id="home-library" title={library.title}>
         <ul className="home-cards">
-          {data.pages.map((p) => (
+          {library.pages.map((p) => (
             <li key={p.href}>
-              <CardTitle href={p.href} label={p.label} />
+              <CardTitle href={p.href} label={p.label} icon={p.icon} />
               <p>{p.description}</p>
-              <p className="home-count">
-                <Suspense>{inData[p.href]}</Suspense>
-              </p>
+              <ul className="home-tabs">
+                {p.tabs.map((t) => (
+                  <li key={t.href}>
+                    <Link href={t.href}>{t.label}</Link>{' '}
+                    <span className="home-count">
+                      <Suspense>{inData[t.href]}</Suspense>
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </li>
           ))}
         </ul>

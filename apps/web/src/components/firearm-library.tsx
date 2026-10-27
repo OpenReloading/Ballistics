@@ -58,6 +58,7 @@ import {
 import { FileMenu, type FileMenuHandle } from './file-menu.tsx'
 import { DataCard } from './firearm-data-card.tsx'
 import { FirearmEditor } from './firearm-editor.tsx'
+import { LibraryTabs } from './library-tabs.tsx'
 import { SourceFilter } from './list-sources.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
 import { PrintButton } from './record-actions.tsx'
@@ -688,6 +689,7 @@ export function FirearmLibrary() {
           </>
         }
       />
+      <LibraryTabs />
       <div className="library" data-editing={compact || undefined}>
         <section aria-labelledby="library-list" className={compact ? 'library-list' : 'directory'}>
           <Title order={2} id="library-list" className="visually-hidden">

@@ -17,6 +17,7 @@ import {
   DirectoryTable,
   useListState,
 } from './directory-table.tsx'
+import { LibraryTabs } from './library-tabs.tsx'
 import { SourceFilter } from './list-sources.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
 import { LinkButton } from './record-actions.tsx'
@@ -91,6 +92,7 @@ export function DisciplineList({ items }: { items: DisciplineRow[] }) {
         }
         actions={<LinkButton href="/federations">Federations</LinkButton>}
       />
+      <LibraryTabs />
       <div className="directory">
         <DirectoryFilters
           query={state.query}

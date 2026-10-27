@@ -38,6 +38,7 @@ import {
   useListState,
 } from './directory-table.tsx'
 import { Noted } from './field-table.tsx'
+import { LibraryTabs } from './library-tabs.tsx'
 import {
   DeleteRow,
   SourceFilter,
@@ -240,6 +241,7 @@ export function BulletList({
           </>
         }
       />
+      <LibraryTabs />
       <div className="directory">
         <DirectoryFilters
           query={state.query}
