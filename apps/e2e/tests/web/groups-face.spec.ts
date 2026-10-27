@@ -326,6 +326,11 @@ test('the sheet pans by arrow keys and zooms in at a double click, no drag neede
   expect(w1).toBeLessThan(w0)
 
   await sheet.focus()
+  // reached by a key, the focus ring is drawn inside the box, which clips what lies outside it
+  await sheet.press('Shift+Tab')
+  await page.keyboard.press('Tab')
+  await expect(sheet).toBeFocused()
+  await expect(sheet).toHaveCSS('outline-offset', '-3px')
   await sheet.press('ArrowRight')
   await sheet.press('ArrowDown')
   const [x2, y2, w2] = await view()
