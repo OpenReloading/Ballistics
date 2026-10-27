@@ -73,6 +73,10 @@ it('names existing routes as tool pages, the workbench, the shot groups and the 
   expect(isToolRoute('/cartridges')).toBe(false)
 })
 
+it('marks Session summary current on Range mode, which it links to and which links back', () => {
+  expect(hrefs.filter((h) => pageCoversRoute(h, '/range'))).toEqual(['/session'])
+})
+
 it('covers each designer by the Database, not by a link of its own', () => {
   for (const list of ['/bullets', '/cartridges', '/targets', '/powders']) {
     expect(routes).toContain(`${list}/designer`)

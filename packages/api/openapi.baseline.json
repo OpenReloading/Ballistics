@@ -20343,6 +20343,69 @@
                                         "unit": "degC",
                                         "description": "Temperature of the powder in this string."
                                       },
+                                      "conditions": {
+                                        "type": "object",
+                                        "properties": {
+                                          "airTemperature": {
+                                            "type": "object",
+                                            "properties": {
+                                              "value": {
+                                                "type": "number",
+                                                "description": "In degC."
+                                              },
+                                              "raw": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "description": "The value as written in the source, when it differed."
+                                              }
+                                            },
+                                            "required": ["value"],
+                                            "unit": "degC",
+                                            "description": "Air temperature at the string."
+                                          },
+                                          "stationPressure": {
+                                            "type": "object",
+                                            "properties": {
+                                              "value": {
+                                                "type": "number",
+                                                "description": "In bar."
+                                              },
+                                              "raw": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "description": "The value as written in the source, when it differed."
+                                              }
+                                            },
+                                            "required": ["value"],
+                                            "unit": "bar",
+                                            "description": "Absolute air pressure at the string."
+                                          },
+                                          "windSpeed": {
+                                            "type": "object",
+                                            "properties": {
+                                              "value": {
+                                                "type": "number",
+                                                "minimum": 0,
+                                                "description": "In m/s."
+                                              },
+                                              "raw": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "description": "The value as written in the source, when it differed."
+                                              }
+                                            },
+                                            "required": ["value"],
+                                            "unit": "m/s",
+                                            "description": "Wind speed at the string."
+                                          }
+                                        },
+                                        "description": "The weather at this string, where it differs from the session or was entered by hand."
+                                      },
+                                      "note": {
+                                        "type": "string",
+                                        "maxLength": 2000,
+                                        "description": "Note on the string, plain text."
+                                      },
                                       "shots": {
                                         "minItems": 1,
                                         "maxItems": 5000,

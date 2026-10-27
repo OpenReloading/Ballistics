@@ -434,7 +434,7 @@ One shape for the catalogue (a record of kind `chrono`), the user record of kind
 `conditions`: `airTemperature` (degC), `stationPressure` (absolute air pressure at the site, bar) and `relativeHumidity` (%) of a session. The truing nominal holds the same three.
 
 **Shot string**:
-One entry of a session's `strings`: the shots of one load, with `load`, `label`, `variation`, `propellantTemperature` and `shots`.
+One entry of a session's `strings`: the shots of one load, with `load`, `label`, `variation`, `propellantTemperature`, `conditions`, `note` and `shots`.
 
 **String variation**:
 `variation`: what a shot string varies against its load: `kind` `charge` (the charge, g) or `seating` (the length the load seats the bullet by, mm) and its `value`. Absent: the string is not mapped on the Measurements tab. A temperature ladder is the string's `propellantTemperature`.
