@@ -12,6 +12,8 @@ for (const cartridge of pages)
   }) => {
     const over: string[] = []
     await page.goto(`/cartridges/${cartridge}`)
+    // the page draws once it has read the record
+    await page.locator('svg.drawing.screen-only .dims text').first().waitFor()
     await page.evaluate(() => document.fonts.ready)
     const texts = await page.locator('svg.drawing.screen-only .dims text').evaluateAll((all) =>
       all.map((t) => ({
@@ -99,48 +101,34 @@ test("the designer's views switch by keyboard, keeping the frame and the axis", 
   expect((await drawing.boundingBox())?.width).toBe(before.width)
 })
 
-test.describe('without JavaScript', () => {
-  test.use({ javaScriptEnabled: false })
-
-  // the record page draws each side in its own panel at one scale, both always shown
-  test('both sides render without JavaScript, at one scale', async ({ page }) => {
-    // the page streams its content into a hidden block that a script reveals; a style added to the
-    // response reveals it here, so the drawings below are the server's alone
-    await page.route('**/cartridges/308-win', async (route) => {
-      const response = await route.fetch()
-      const body = (await response.text()).replace(
-        '</head>',
-        '<style>div[hidden][id^="S:"] { display: block !important }</style></head>',
-      )
-      await route.fulfill({ response, body })
+// the record page draws each side in its own panel at one scale, both always shown
+test('both sides are drawn at one scale', async ({ page }) => {
+  await page.goto('/cartridges/308-win')
+  const cip = page.locator('main')
+  const drawing = (side: string) =>
+    cip
+      .getByRole('region', { name: side, exact: true })
+      .getByRole('group', { name: 'Outline, CIP 308 Win.', exact: true })
+  const cartridge = drawing('Cartridge')
+  const chamber = drawing('Chamber')
+  await expect(cartridge.locator('.dims-cartridge')).toBeVisible()
+  await expect(cartridge.locator('.part-chamber')).toHaveCount(0)
+  await expect(chamber.locator('.dims-chamber')).toBeVisible()
+  await expect(chamber.locator('.part-cartridge')).toHaveCount(0)
+  // one scale for both sides: the same CSS px per drawing unit
+  const scale = (svg: typeof cartridge) =>
+    svg.evaluate((e) => {
+      // the fitted scale of a viewBox shown with "meet"
+      const [r, v] = [e.getBoundingClientRect(), (e as SVGSVGElement).viewBox.baseVal]
+      return Math.min(r.width / v.width, r.height / v.height)
     })
-    await page.goto('/cartridges/308-win')
-    const cip = page.locator('main')
-    const drawing = (side: string) =>
-      cip
-        .getByRole('region', { name: side, exact: true })
-        .getByRole('group', { name: 'Outline, CIP 308 Win.', exact: true })
-    const cartridge = drawing('Cartridge')
-    const chamber = drawing('Chamber')
-    await expect(cartridge.locator('.dims-cartridge')).toBeVisible()
-    await expect(cartridge.locator('.part-chamber')).toHaveCount(0)
-    await expect(chamber.locator('.dims-chamber')).toBeVisible()
-    await expect(chamber.locator('.part-cartridge')).toHaveCount(0)
-    // one scale for both sides: the same CSS px per drawing unit
-    const scale = (svg: typeof cartridge) =>
-      svg.evaluate((e) => {
-        // the fitted scale of a viewBox shown with "meet"
-        const [r, v] = [e.getBoundingClientRect(), (e as SVGSVGElement).viewBox.baseVal]
-        return Math.min(r.width / v.width, r.height / v.height)
-      })
-    expect(await scale(chamber)).toBeCloseTo(await scale(cartridge), 3)
-  })
+  expect(await scale(chamber)).toBeCloseTo(await scale(cartridge), 3)
 })
 
 test('a tall figure fits the window, no smaller than 11 px text', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 })
   await page.goto('/cartridges/18-x-81')
-  // the figure is the server's (millimetres) until the page has read the stored units
+  // the figure is in millimetres until the page has read the stored units
   await page.waitForLoadState('networkidle')
   const cip = page.locator('main')
   // the cartridge side's figure
@@ -177,11 +165,14 @@ test('the record sheet prints on one A4 page; other prints keep the browser page
         .matchAll(/\/MediaBox\s*\[\s*0 0 ([\d.]+) ([\d.]+)\s*\]/g),
     ].map(([, w, h]) => [Math.round(Number(w)), Math.round(Number(h))])
   await page.goto('/cartridges/308-win')
+  // the sheet's page rule comes with the drawn record
+  await expect(figure308(page)).toHaveCount(2)
   expect(await sizes()).toEqual([[595, 842]])
   await page.goto('/firearms')
   expect((await sizes())[0]).toEqual([612, 792])
   // a record page left by a client navigation stays in the document, hidden
   await page.goto('/cartridges/308-win')
+  await expect(figure308(page)).toHaveCount(2)
   await page
     .getByRole('navigation', { name: 'Main' })
     .getByRole('link', { name: 'Database', exact: true })
