@@ -88,7 +88,7 @@ License, whose text is the same as above, with these copyright notices:
   Copyright (c) Meta Platforms, Inc. and affiliates.
 - next 16.4.2 (https://github.com/vercel/next.js): Copyright (c) 2025 Vercel, Inc.
 - styled-jsx 5.1.6 (https://github.com/vercel/styled-jsx): Copyright (c) 2016-present Vercel, Inc.
-- @mantine/core, @mantine/form, @mantine/hooks, @mantine/spotlight 9.7.3
+- @mantine/core, @mantine/form, @mantine/hooks, @mantine/spotlight 9.7.4
   (https://github.com/mantinedev/mantine): Copyright (c) 2021 Vitaly Rtishchev
 - @phosphor-icons/react 2.1.10 (https://github.com/phosphor-icons/react):
   Copyright (c) 2020 Phosphor Icons
@@ -147,12 +147,6 @@ SIL Open Font License, Version 1.1; the license text is in apps/web/src/app/font
 
 ---
 
-patches/apply.mjs holds short fragments of @mantine/core
-(https://github.com/mantinedev/mantine), Copyright (c) 2021 Vitaly Rtishchev, under the
-MIT License, whose text is the same as above.
-
----
-
 The API server serves the Scalar API reference viewer from @scalar/fastify-api-reference 1.75.1,
 and the docs site serves it from @scalar/api-reference 1.75.1 (https://github.com/scalar/scalar,
 npm packages @scalar/fastify-api-reference and @scalar/api-reference), under the MIT License that
@@ -199,11 +193,11 @@ package-lock.json declares. Written by `node tools/src/licences.ts --write`.
 @floating-ui/react 0.27.20 MIT
 @floating-ui/utils 0.2.12 MIT
 @lukeed/ms 2.0.2 MIT
-@mantine/core 9.7.3 MIT
-@mantine/form 9.7.3 MIT
-@mantine/hooks 9.7.3 MIT
-@mantine/spotlight 9.7.3 MIT
-@mantine/store 9.7.3 MIT
+@mantine/core 9.7.4 MIT
+@mantine/form 9.7.4 MIT
+@mantine/hooks 9.7.4 MIT
+@mantine/spotlight 9.7.4 MIT
+@mantine/store 9.7.4 MIT
 @next/env 16.4.2 MIT
 @next/swc-linux-arm64-gnu 16.4.2 MIT
 @next/swc-linux-x64-gnu 16.4.2 MIT

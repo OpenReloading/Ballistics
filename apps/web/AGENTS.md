@@ -256,14 +256,11 @@ The language is a setting: one page tree, one set of URLs, no locale in paths. E
   - Verified: one German word and at least one source. Disputed: `german` is null, at least two candidates, each with its own source; the owner picks one. Unverified: a candidate or null, and a note on what was searched. A candidate is never a source.
   - Rows are edited by hand. `test/german-terms.test.ts` checks the format.
 
-## Streamed pages and the Mantine patch
+## Streamed pages
 
 - A page that waits for its data inside a Suspense boundary (the list pages, `src/app/cartridges/page.tsx`) streams. React 19.3 reveals a streamed boundary up to about 300 ms after the first paint.
-- A provider above the page whose context value changes after mounting (Mantine's `AppShell` does, `UnitsProvider` did) makes React client-render the waiting boundary. A hidden `div#S:n` copy of the page stays until the reveal.
-- Providers above `main` keep one context value for the page's life. `useUnits` reads a store behind a constant context.
-- The page sits in `AppShell.Main` only because `patches/apply.mjs` (root `postinstall`, the Dockerfiles copy `patches/` before `npm ci`) memoizes AppShell's context value in `@mantine/core` 9.7.2.
-- A Mantine upgrade that changes `AppShell.mjs` or `AppShell.cjs` stops the install. Check whether Mantine fixed the context value (upstream links in `patches/apply.mjs`), then remove the patch or adapt it.
-- `npm run dev` and `npm run build` here run `node ../../patches/apply.mjs --check` first and stop when the installed files lack the patch (after a rebase onto the patch without `npm ci`).
+- A provider above the page whose context value changes after mounting makes React client-render the waiting boundary. A hidden `div#S:n` copy of the page stays until the reveal.
+- Providers above `main` keep one context value for the page's life. `useUnits` reads a store behind a constant context. The page sits in `AppShell.Main`: AppShell keeps its context value stable (`@mantine/core` 9.7.4 and later), so the streamed page is not client-rendered twice.
 
 ## Commands (this directory, or `-w @open-reloading/web` from the root)
 

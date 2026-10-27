@@ -25,7 +25,6 @@ const webInputs = [
   /^apps\/web\//,
   /^packages\/(schema|importers|core|drawing|data|api)\//,
   /^(package\.json|package-lock\.json|tsconfig\.base\.json|\.nvmrc)$/,
-  /^patches\//,
   /^\.github\/workflows\/ci\.yml$/,
 ]
 
@@ -56,7 +55,6 @@ const recordInputs = [
   /^packages\/schema\//,
   /^packages\/api\//,
   /^(package\.json|package-lock\.json|tsconfig\.base\.json|\.nvmrc)$/,
-  /^patches\//,
   /^\.github\/workflows\/ci\.yml$/,
   /^apps\/web\/(package\.json|next\.config\.ts|tsconfig\.json)$/,
   /^apps\/web\/scripts\/(ci-plan|check-prerender)\.mts$/,

@@ -2,7 +2,6 @@
 FROM docker.io/library/node:26-bookworm-slim@sha256:28147155d47dc31abe0a46e0d12b59b2fb3d0a2dcc5dc65fce76a074180b16fe AS build
 WORKDIR /app
 COPY package.json package-lock.json tsconfig.base.json ./
-COPY patches patches
 COPY packages/schema/package.json packages/schema/
 COPY packages/importers/package.json packages/importers/
 COPY packages/core/package.json packages/core/
@@ -24,7 +23,6 @@ FROM docker.io/library/node:26-bookworm-slim@sha256:28147155d47dc31abe0a46e0d12b
 ENV NODE_ENV=production
 WORKDIR /app
 COPY package.json package-lock.json ./
-COPY patches patches
 COPY packages/schema/package.json packages/schema/
 COPY packages/importers/package.json packages/importers/
 COPY packages/core/package.json packages/core/
