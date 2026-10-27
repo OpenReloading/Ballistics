@@ -62,6 +62,23 @@ export function checkLoadComponentReferences(
     }
 }
 
+/** The primer of every load that names one. */
+export function checkLoadPrimerReferences(
+  bundle: Pick<Bundle, 'loads' | 'primers' | 'renames'>,
+  errors: string[],
+) {
+  // an old id counts as the record that replaced it
+  const known = new Set([
+    ...bundle.primers.map((p) => p.id),
+    ...Object.keys(bundle.renames?.primers ?? {}),
+  ])
+  for (const l of bundle.loads) {
+    const record = l.primer?.record
+    if (record !== undefined && !known.has(parseRef(record)?.id ?? record))
+      errors.push(`loads/${l.id}.json: unknown primer "${record}"`)
+  }
+}
+
 /** The capacity of every load that names one. */
 export function checkLoadCapacityReferences(
   bundle: Pick<Bundle, 'loads' | 'capacities'>,
@@ -127,15 +144,14 @@ export function checkLoadReferences(
   }
 }
 
-/** The manufacturers a load names: a described bullet or powder, the primer and the case. */
+/** The manufacturers a load names: a described bullet or powder and the case. */
 function checkLoadMakers(
-  l: Pick<Bundle['loads'][number], 'id' | 'bullet' | 'powder' | 'primer' | 'case'>,
+  l: Pick<Bundle['loads'][number], 'id' | 'bullet' | 'powder' | 'case'>,
   check: (where: string, field: string, id: string | undefined) => void,
 ) {
   const named = [
     ['bullet.manufacturer', typeof l.bullet === 'object' ? l.bullet.manufacturer : undefined],
     ['powder.manufacturer', typeof l.powder === 'object' ? l.powder.manufacturer : undefined],
-    ['primer.manufacturer', l.primer?.manufacturer],
     ['case.manufacturer', l.case?.manufacturer],
   ] as const
   for (const [field, maker] of named)
@@ -143,12 +159,15 @@ function checkLoadMakers(
 }
 
 /**
- * The manufacturer of every powder, bullet, case and listed load table, the case manufacturer of a
+ * The manufacturer of every powder, primer, bullet, case and listed load table, the case manufacturer of a
  * capacity, the device manufacturer of a chronograph session and the manufacturers a load names
- * (a described bullet or powder, the primer and the case).
+ * (a described bullet or powder and the case).
  */
 export function checkManufacturerReferences(
-  bundle: Pick<Bundle, 'powders' | 'bullets' | 'cases' | 'capacities' | 'chronoSessions' | 'loads'>,
+  bundle: Pick<
+    Bundle,
+    'powders' | 'primers' | 'bullets' | 'cases' | 'capacities' | 'chronoSessions' | 'loads'
+  >,
   loadTables: LoadTables,
   ids: RecordIds,
   errors: string[],
@@ -158,6 +177,7 @@ export function checkManufacturerReferences(
       errors.push(`${where}: unknown ${field} "${id}"`)
   }
   for (const p of bundle.powders) check(`powders/${p.id}.json`, 'manufacturer', p.manufacturer)
+  for (const p of bundle.primers) check(`primers/${p.id}.json`, 'manufacturer', p.manufacturer)
   for (const b of bundle.bullets) check(`bullets/${b.id}.json`, 'manufacturer', b.manufacturer)
   for (const c of bundle.cases)
     check(`cases/${c.id}.json`, 'manufacturer', parseRef(c.manufacturer)?.id)

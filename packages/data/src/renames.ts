@@ -10,6 +10,7 @@ function currentIds(bundle: Bundle): Record<RenameKind, Set<string>> {
     cartridges: ids(bundle.cartridges),
     manufacturers: ids(bundle.manufacturers),
     powders: ids(bundle.powders),
+    primers: ids(bundle.primers),
     bullets: ids(bundle.bullets),
     cases: ids(bundle.cases),
     'target-faces': ids(bundle.targetFaces),

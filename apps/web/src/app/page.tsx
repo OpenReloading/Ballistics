@@ -9,6 +9,7 @@ import {
   listAllCartridges,
   listAllCases,
   listAllPowders,
+  listAllPrimers,
   listAllTargetFaces,
   listDisciplines,
 } from '../lib/api.ts'
@@ -32,6 +33,7 @@ const inData: Record<string, ReactNode> = {
   '/bullets': <Count list={listAllBullets} />,
   '/powders': <Count list={listAllPowders} />,
   '/cases': <Count list={listAllCases} />,
+  '/primers': <Count list={listAllPrimers} />,
   '/targets': <Count list={listAllTargetFaces} />,
   '/disciplines': <Count list={listDisciplines} />,
   '/firearms': 'In this browser',

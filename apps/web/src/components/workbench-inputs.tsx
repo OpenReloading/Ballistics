@@ -47,6 +47,7 @@ import { AppPopover, popoverWidth } from './app-popover.tsx'
 import { Noted } from './field-table.tsx'
 import { NavIcon } from './nav-icons.tsx'
 import { NumberField } from './number-field.tsx'
+import { PrimerChoice } from './primer-choice.tsx'
 import { RecordSearch } from './record-search.tsx'
 import { SegmentedRow } from './segmented-row.tsx'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
@@ -1100,7 +1101,7 @@ function CardPicker({ panel }: { panel: InputPanel }) {
 
 /** Rarely needed rows of a card, in its More popover: no accordion moves the layout. */
 function CardMore({ panel }: { panel: InputPanel }) {
-  const { specValue, system, allDiameters, setAllDiameters } = useLoad()
+  const { specValue, system, allDiameters, setAllDiameters, primerId, setPrimerChoice } = useLoad()
   const l6 = specValue('cartridge', 'L6')
   if (panel === 'cartridge')
     return (
@@ -1112,6 +1113,7 @@ function CardMore({ panel }: { panel: InputPanel }) {
         )}
         <SeatingSlot name="more" />
         <SeatingSlot name="moreValues" />
+        <PrimerChoice id={primerId} onChange={setPrimerChoice} />
       </>
     )
   if (panel === 'powder') return <>{fieldsOf(powderMoreFields)}</>

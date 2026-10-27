@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { recordId, ref } from './ids.ts'
+import { catalogueRef, recordId, ref } from './ids.ts'
 import { type Provenance, provenance } from './provenance.ts'
 import { text } from './shared.ts'
 import { type QuantityKind, quantity, units } from './units.ts'
@@ -195,11 +195,10 @@ const loadShape = z.object({
     .optional(),
   primer: z
     .strictObject({
-      manufacturer: component.manufacturer.optional(),
       lot: component.lot,
-      model: z.string().min(1).describe('Model name of the primer.').optional(),
+      record: catalogueRef('primer').describe('The primer: a catalogue product.').optional(),
     })
-    .describe('The primer as described.')
+    .describe('The primer: the catalogue product and the lot.')
     .optional(),
   case: z
     .strictObject({
@@ -265,7 +264,6 @@ const checkComponentMakers = (l: LoadFields, issue: LoadIssue) => {
   const makers: [PropertyKey[], string | undefined][] = [
     [['bullet', 'manufacturer'], typeof l.bullet === 'object' ? l.bullet.manufacturer : undefined],
     [['powder', 'manufacturer'], typeof l.powder === 'object' ? l.powder.manufacturer : undefined],
-    [['primer', 'manufacturer'], l.primer?.manufacturer],
     [['case', 'manufacturer'], l.case?.manufacturer],
   ]
   for (const [path, maker] of makers)

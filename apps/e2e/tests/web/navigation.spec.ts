@@ -103,6 +103,7 @@ test('the Database tabs follow the tabs pattern and carry the search to the next
     'Bullets',
     'Powders',
     'Cases',
+    'Primers',
     'Targets',
     'Disciplines',
   ])

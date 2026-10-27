@@ -20,7 +20,7 @@ import {
   runInterior,
   taskTimeoutMs,
 } from '@open-reloading/api/compute'
-import type { Powder } from '@open-reloading/schema'
+import { type Powder, primerCompounds, primerSizes } from '@open-reloading/schema'
 import { basePath } from './edition.ts'
 
 const listKinds = new Set([
@@ -28,6 +28,7 @@ const listKinds = new Set([
   'bullets',
   'powders',
   'cases',
+  'primers',
   'manufacturers',
   'target-faces',
   'federations',
@@ -35,7 +36,7 @@ const listKinds = new Set([
   'target-mappings',
   'caliber-classes',
 ])
-const searchKinds = new Set(['cartridges', 'bullets', 'powders', 'cases'])
+const searchKinds = new Set(['cartridges', 'bullets', 'powders', 'cases', 'primers'])
 const recordId = /^[a-z0-9]+(-[a-z0-9]+)*$/
 /** The forwarding route's cap on a compute body (`src/app/api/[...path]/route.server.ts`). */
 const maxBody = 64 * 1024
@@ -74,6 +75,7 @@ const filters: Record<string, string[]> = {
   bullets: ['manufacturer', 'cartridge'],
   powders: ['manufacturer'],
   cases: ['manufacturer', 'cartridge'],
+  primers: ['manufacturer', 'size', 'compound'],
   disciplines: ['federation'],
   'target-mappings': ['discipline', 'face'],
 }
@@ -102,8 +104,8 @@ async function catalogue() {
 
 /**
  * A list answer, from the catalogue as the API's routes answer it: the same paging, `q`, filters and
- * order, the refusals of its query schemas. Cartridges, bullets, powders and cases page (`limit`, `offset`)
- * and search (`q`); the filters are `table` (cartridges), `manufacturer` (bullets, powders, cases),
+ * order, the refusals of its query schemas. Cartridges, bullets, powders, primers and cases page (`limit`, `offset`)
+ * and search (`q`); the filters are `table` (cartridges), `manufacturer` (bullets, powders, primers, cases), `size` and `compound` (primers),
  * `cartridge` (bullets, cases), `federation` (disciplines) and `discipline` and `face` (target mappings).
  * Other keys are dropped, as the API drops them.
  */
@@ -114,14 +116,18 @@ async function list(kind: string, query: URLSearchParams) {
   const limit = paged ? integer(query.get('limit'), 50, 1, 200) : 0
   const offset = paged ? integer(query.get('offset'), 0, 0, Number.MAX_SAFE_INTEGER) : 0
   const q = paged ? (query.get('q') ?? undefined) : undefined
-  const [table, manufacturer, cartridge, federation, discipline, face] = [
+  const [table, manufacturer, cartridge, federation, discipline, face, size, compound] = [
     'table',
     'manufacturer',
     'cartridge',
     'federation',
     'discipline',
     'face',
+    'size',
+    'compound',
   ].map(own)
+  const sizeOf = primerSizes.options.find((o) => o === size)
+  const compoundOf = primerCompounds.options.find((o) => o === compound)
   const text = (v: string | undefined, max: number) =>
     v === undefined || (v.length >= 1 && v.length <= max && !v.includes('\0'))
   const id = (v: string | undefined) => v === undefined || (v.length <= 100 && recordId.test(v))
@@ -130,7 +136,9 @@ async function list(kind: string, query: URLSearchParams) {
     Number.isNaN(offset) ||
     !text(q, 100) ||
     !text(table, 10) ||
-    ![manufacturer, cartridge, federation, discipline, face].every(id)
+    ![manufacturer, cartridge, federation, discipline, face].every(id) ||
+    (size !== undefined && sizeOf === undefined) ||
+    (compound !== undefined && compoundOf === undefined)
   )
     return refusal(400, 'Bad Request', 'querystring does not match the schema')
   const c = await catalogue()
@@ -142,6 +150,11 @@ async function list(kind: string, query: URLSearchParams) {
       return answer(200, c.bullets({ q, manufacturer, cartridge, ...paging }))
     case 'powders':
       return answer(200, c.powders({ q, manufacturer, ...paging }))
+    case 'primers':
+      return answer(
+        200,
+        c.primers({ q, manufacturer, size: sizeOf, compound: compoundOf, ...paging }),
+      )
     case 'cases':
       return answer(200, c.cases({ q, manufacturer, cartridge, ...paging }))
     case 'manufacturers':

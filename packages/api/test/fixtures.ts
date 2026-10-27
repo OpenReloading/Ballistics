@@ -84,6 +84,34 @@ export const bundle: Bundle = {
     },
     { id: 'example-b-slow', manufacturer: 'example-b', name: 'Slow', provenance: published },
   ],
+  primers: [
+    {
+      id: 'example-a-large-rifle',
+      manufacturer: 'example-a',
+      name: 'Large Rifle',
+      productNumber: 'LR-1',
+      size: 'large-rifle',
+      magnum: false,
+      compound: 'lead-styphnate',
+      provenance: published,
+    },
+    {
+      id: 'example-a-small-pistol',
+      manufacturer: 'example-a',
+      name: 'Small Pistol',
+      size: 'small-pistol',
+      compound: 'lead-free',
+      provenance: published,
+    },
+    {
+      id: 'example-b-large-rifle-magnum',
+      manufacturer: 'example-b',
+      name: 'Large Rifle Magnum',
+      size: 'large-rifle',
+      magnum: true,
+      provenance: published,
+    },
+  ],
   bullets: [
     {
       id: 'example-a-1',

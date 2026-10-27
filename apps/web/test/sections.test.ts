@@ -22,6 +22,7 @@ it('lists the two groups in order: Tools, Library, five pages in all', () => {
     '/bullets',
     '/powders',
     '/cases',
+    '/primers',
     '/targets',
     '/disciplines',
   ])

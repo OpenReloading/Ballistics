@@ -51,6 +51,15 @@ export function openCatalogue({ index, records }: CatalogueData): Catalogue {
     manufacturers: () => select(index.manufacturers, {}),
     powders: ({ manufacturer, ...paging } = {}) =>
       select(index.powders, paging, (p) => !manufacturer || p.manufacturer === manufacturer),
+    primers: ({ manufacturer, size, compound, ...paging } = {}) =>
+      select(
+        index.primers,
+        paging,
+        (p) =>
+          (!manufacturer || p.manufacturer === manufacturer) &&
+          (!size || p.size === size) &&
+          (!compound || p.compound === compound),
+      ),
     bullets: ({ manufacturer, cartridge, ...paging } = {}) => {
       let window: ReturnType<typeof bulletWindow> | undefined
       if (cartridge) {

@@ -3,6 +3,7 @@ import type {
   Cartridge,
   Manufacturer,
   Powder,
+  Primer,
   RangeFirings,
   TargetFace,
 } from '@open-reloading/schema'
@@ -14,6 +15,7 @@ const empty = {
   cartridges: [],
   manufacturers: [],
   powders: [],
+  primers: [],
   bullets: [],
   cases: [],
   rangeFirings: [],
@@ -43,6 +45,13 @@ const powder = (id: string, manufacturer: string, name: string, aliases?: string
   manufacturer,
   name,
   aliases,
+  provenance,
+})
+const primer = (id: string, manufacturer: string, name: string): Primer => ({
+  id,
+  manufacturer,
+  name,
+  size: 'large-rifle',
   provenance,
 })
 const bullet = (id: string, manufacturer: string, name: string): Bullet => ({
@@ -131,6 +140,15 @@ describe('checkNames', () => {
     expect(
       lines({ powders: [powder('a', 'M', 'A', ['O-1']), powder('b', 'N', 'B', ['o 1'])] }),
     ).toEqual(['powders/b.json: duplicate-normalised-name:o1'])
+  })
+
+  it('compares primer names within a manufacturer', () => {
+    expect(
+      lines({ primers: [primer('a', 'M', 'Large Rifle'), primer('b', 'N', 'Large Rifle')] }),
+    ).toEqual([])
+    expect(
+      lines({ primers: [primer('a', 'M', 'Large Rifle'), primer('b', 'M', 'Large Rifle')] }),
+    ).toEqual(['primers/b.json: duplicate-name:Large Rifle'])
   })
 
   it('compares manufacturer names and aliases across manufacturers', () => {

@@ -67,7 +67,7 @@ function duplicates(records: Named[]): LocatedFinding[] {
 /**
  * Reports records that share a name, exactly or after `normaliseName`, with an earlier record of
  * their kind and scope. Scopes: none for cartridges, manufacturers and powder aliases, manufacturer id
- * for powders and bullets, manufacturer and cartridge for cases, the report for range
+ * for powders, primers and bullets, manufacturer and cartridge for cases, the report for range
  * records, federation id for target faces.
  */
 export function checkNames(
@@ -76,6 +76,7 @@ export function checkNames(
     | 'cartridges'
     | 'manufacturers'
     | 'powders'
+    | 'primers'
     | 'bullets'
     | 'cases'
     | 'rangeFirings'
@@ -108,6 +109,13 @@ export function checkNames(
     // An alias names a brand and name of another manufacturer, so aliases are compared with aliases only.
     ...duplicates(
       bundle.powders.map((p) => ({ file: at('powders', p.id), scope: '', names: p.aliases ?? [] })),
+    ),
+    ...duplicates(
+      bundle.primers.map((p) => ({
+        file: at('primers', p.id),
+        scope: p.manufacturer,
+        names: [p.name],
+      })),
     ),
     ...duplicates(
       bundle.bullets.map((b) => ({

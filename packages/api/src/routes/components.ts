@@ -4,11 +4,20 @@ import {
   constructionFields,
   manufacturer,
   powder,
+  primer,
+  primerCompounds,
+  primerSizes,
   recordId,
 } from '@open-reloading/schema'
 import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
-import type { BulletQuery, CaseQuery, Catalogue, Catalogued } from '../catalogue/types.ts'
+import type {
+  BulletQuery,
+  CaseQuery,
+  Catalogue,
+  Catalogued,
+  PrimerQuery,
+} from '../catalogue/types.ts'
 import {
   idParams,
   listQuery,
@@ -40,6 +49,23 @@ const bulletQuery = {
       maxLength: 100,
       description:
         'Cartridge id: only bullets that fit its CIP bullet diameter G1, bore F and groove Z.',
+    },
+  },
+} as const
+
+const primerQuery = {
+  ...powderQuery,
+  properties: {
+    ...powderQuery.properties,
+    size: {
+      type: 'string',
+      enum: primerSizes.options,
+      description: 'Primer size: only the primers of that size.',
+    },
+    compound: {
+      type: 'string',
+      enum: primerCompounds.options,
+      description: 'Priming compound: only the primers with it.',
     },
   },
 } as const
@@ -93,6 +119,18 @@ const bulletList = page(
   }),
 )
 
+const primerList = page(
+  z.object({
+    id: recordId,
+    manufacturer: recordId,
+    name: primer.shape.name,
+    productNumber: primer.shape.productNumber,
+    size: primer.shape.size,
+    magnum: primer.shape.magnum,
+    compound: primer.shape.compound,
+  }),
+)
+
 const caseList = page(
   z.object({
     id: recordId,
@@ -111,7 +149,7 @@ const manufacturerList = page(
   manufacturer.pick({ id: true, name: true, aliases: true, website: true }),
 )
 
-/** `GET /manufacturers`, `GET /powders`, `GET /bullets`, `GET /cases` and their `/:id` routes. */
+/** `GET /manufacturers`, `GET /powders`, `GET /primers`, `GET /bullets`, `GET /cases` and their `/:id` routes. */
 // biome-ignore lint/suspicious/useAwait: FastifyPluginAsync returns a promise
 export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = async (
   app,
@@ -202,6 +240,37 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
       },
     )
   }
+  app.get<{ Querystring: PrimerQuery }>(
+    '/primers',
+    {
+      schema: { querystring: primerQuery },
+      config: {
+        response: primerList,
+        summary: 'List primers',
+        description:
+          'A page of primer products ordered by manufacturer name and name, digit runs in numeric order. `q` keeps the primers whose manufacturer name or alias followed by the product name, or by the product number, holds every word of it, in any order, and ranks them by match. `size` and `compound` keep one size and one priming compound. Each item carries the size, the magnum flag and the priming compound where the record has them.',
+      },
+    },
+    (request, reply) => reply.send(catalogue.primers(request.query)),
+  )
+  app.get<{ Params: { id: string } }>(
+    '/primers/:id',
+    {
+      schema: { params: idParams },
+      config: {
+        response: primer,
+        errors: [404],
+        moved: true,
+        summary: 'Get a primer',
+        description: 'The whole primer record with its provenance.',
+      },
+    },
+    (request, reply) => {
+      const found = catalogue.get('primer', request.params.id)
+      if (!found) return missing(reply, catalogue, 'primers', request.params.id, 'primer')
+      return reply.send(stored(found))
+    },
+  )
   app.get<{ Querystring: CaseQuery }>(
     '/cases',
     {
