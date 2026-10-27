@@ -1,13 +1,9 @@
-import { pagesBasePath } from './edition.ts'
-
 /**
  * One API call of the browser, `path` the API path without its version prefix and with its query
- * (`cartridges/308-win`, `powders?limit=200`). Server edition: through the forwarding route
- * `/api/`. Pages edition: from the static data files and the compute worker (`static-api.ts`),
- * with the API's statuses and bodies.
+ * (`cartridges/308-win`, `powders?limit=200`): answered from the static data files and the compute
+ * worker (`static-api.ts`), with the API's statuses and bodies.
  */
 export async function apiFetch(path: string, init?: RequestInit): Promise<Response> {
-  if (pagesBasePath === undefined) return fetch(`/api/${path}`, init)
   const { staticFetch } = await import('./static-api.ts')
   return staticFetch(path, init)
 }

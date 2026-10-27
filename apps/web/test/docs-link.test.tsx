@@ -20,11 +20,10 @@ it('the sidebar link is an icon named Documentation, the drawer row shows the na
   expect(render('https://example.org/docs/', true)).toContain('>Documentation<')
 })
 
-it('docsUrl: the set value, else the Pages edition docs folder, else none', () => {
-  expect(docsUrl('https://example.org/docs/', undefined)).toBe('https://example.org/docs/')
+it('docsUrl: the set value, else the docs folder of the site, else none', () => {
+  expect(docsUrl('https://example.org/docs/', '')).toBe('https://example.org/docs/')
   expect(docsUrl('  ', '/Ballistics')).toBe('/Ballistics/docs/')
   expect(docsUrl(undefined, '')).toBe('/docs/')
-  expect(docsUrl(undefined, undefined)).toBeUndefined()
   expect(docsUrl(undefined, '', '1')).toBeUndefined()
   expect(docsUrl('https://example.org/docs/', '', '1')).toBe('https://example.org/docs/')
 })

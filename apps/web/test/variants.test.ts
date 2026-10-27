@@ -14,6 +14,11 @@ import {
 import { matchBullet } from './fixtures/bullets.ts'
 import { sheetRecord } from './records.ts'
 
+// these tests stub `fetch` as the API's own answers: the browser's calls go to it as written, in place of the data files and the compute worker
+vi.mock('../src/lib/static-api.ts', () => ({
+  staticFetch: (path: string, init?: RequestInit) => fetch(`/api/${path}`, init),
+}))
+
 afterEach(() => vi.unstubAllGlobals())
 
 /** A `localStorage` in memory, as the browser keeps the last read of each base. */

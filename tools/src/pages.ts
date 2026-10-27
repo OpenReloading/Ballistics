@@ -1,6 +1,6 @@
 /**
  * Builds the Pages site into `pages/` at the repository root (README, Pages edition): the web app
- * as a static export under `PAGES_BASE_PATH`, every record page prerendered from the API over the
+ * as a static export under `PAGES_BASE_PATH` (`''`, the site root, when unset), every record page prerendered from the API over the
  * catalogue built from the data bundle (`@open-reloading/api/static`), the catalogue index and the
  * records as data files under `api/`, the docs site under `docs/`, LICENSE, NOTICE, the data
  * license (`data/LICENSE`) and `.nojekyll`.
@@ -12,9 +12,8 @@
  * `--sample`: only the cartridge pages of `apps/web/src/lib/prerender-sample.ts` prerendered (the
  * data files stay complete) and no docs site, for the review and e2e loop.
  * `--no-docs`: no docs site, every record prerendered (the e2e job's full export).
- * `--keep-build`: leaves `apps/web/.next` as it is before and after the build, the Turbopack cache
- * a CI run restored and the manifests `check-weight` reads. Only for a run that builds this edition
- * alone: one edition's cache fails the other's build.
+ * `apps/web/.next` stays after the build: the Turbopack cache a CI run restores and the manifests
+ * `check-weight` reads.
  */
 import { spawn } from 'node:child_process'
 import { cpSync, rmSync, writeFileSync } from 'node:fs'
@@ -23,10 +22,10 @@ import { startBundleApi, writeStaticApi } from '@open-reloading/api/static'
 import { executable } from './executable.ts'
 import { dropFullPayloads } from './pages-payload.ts'
 
-const siteBase = process.env.PAGES_BASE_PATH
+const siteBase = process.env.PAGES_BASE_PATH ?? ''
 // Next's basePath: empty, or a path that starts with a slash and does not end in one
-if (siteBase === undefined || !/^(\/[^/]+)*$/.test(siteBase))
-  throw new Error('PAGES_BASE_PATH must be set: "" or a path such as /Ballistics')
+if (!/^(\/[^/]+)*$/.test(siteBase))
+  throw new Error('PAGES_BASE_PATH must be "" or a path such as /Ballistics')
 const edition = process.env.PAGES_EDITION ?? 'stable'
 if (edition !== 'stable' && edition !== 'next')
   throw new Error('PAGES_EDITION must be "stable" or "next"')
@@ -34,7 +33,6 @@ if (edition !== 'stable' && edition !== 'next')
 const base = edition === 'next' ? `${siteBase}/next` : siteBase
 
 const sample = process.argv.includes('--sample')
-const keepBuild = process.argv.includes('--keep-build')
 const docs = !sample && !process.argv.includes('--no-docs')
 const at = (p: string) => fileURLToPath(new URL(`../../${p}`, import.meta.url))
 const site = at('pages')
@@ -54,14 +52,9 @@ function run(args: string[], env: Record<string, string | undefined>) {
   })
 }
 
-// the web app's build directory and Turbopack cache: one edition's cache fails the other's build
-const clearWebBuild = () => {
-  if (!keepBuild) rmSync(at('apps/web/.next'), { recursive: true, force: true })
-}
 // the data files of `npm run dev:static` would end in the export beside the ones written below
 rmSync(at('apps/web/public/api'), { recursive: true, force: true })
 const api = await startBundleApi()
-clearWebBuild()
 try {
   // never the inherited value: the dev container sets `sample`, which leaves record pages out of the export
   await run(['run', 'build', '-w', '@open-reloading/web'], {
@@ -77,7 +70,6 @@ try {
   dropFullPayloads(site)
   await writeStaticApi(api.data, `${site}/api`)
 } finally {
-  clearWebBuild()
   await api.close()
 }
 // no API on the Pages site: the docs' REST page has no link to one

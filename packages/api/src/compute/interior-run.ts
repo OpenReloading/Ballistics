@@ -19,7 +19,8 @@ import { responseUnits } from './units.ts'
 const ladderBatch = 4
 /**
  * A ladder batch starts only if it can end, at its tasks' deadline, within this many ms of the
- * request: the answer stays within the web proxy's 15 s (`apps/web/src/app/api/[...path]/route.server.ts`).
+ * request: a ladder answers within 15 s, so a client that waits 20 s (`requestTimeout` of the web
+ * app) never gives up first.
  */
 const ladderBudgetMs = 14_000
 /** Output points of a whole ladder at most: five runs at the point cap, about 25 MB of JSON. */

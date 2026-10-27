@@ -92,8 +92,7 @@ function PeakPressure({
  * result context, so it shows what the Results tab shows.
  */
 export function RangeView() {
-  const { ok, steps, stale, system, setSeen, chronoSessions, setChronoSessions, online } =
-    useResult()
+  const { ok, steps, stale, system, setSeen, chronoSessions, setChronoSessions } = useResult()
   const { run, pending } = useLoad()
   const { trajectoryLoad } = useInputEcho()
   const [chrono, setChrono] = useState(false)
@@ -153,7 +152,6 @@ export function RangeView() {
           variant={stale || !ok ? 'filled' : 'default'}
           loading={pending}
           loaderProps={{ type: 'dots' }}
-          aria-describedby={online ? undefined : 'run-network-hint'}
           onClick={() => run()}
         >
           Run simulation

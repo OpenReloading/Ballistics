@@ -58,7 +58,7 @@
       "entry": [
         "scripts/glyph-advances.mts",
         "src/service-worker.js",
-        // scripts/service-worker.mts copies every export into public/sw.js through a namespace import
+        // scripts/service-worker.mts copies every export into out/sw.js through a namespace import
         "src/lib/offline.ts",
         "test/fixtures/target-photos/make.mts"
       ]

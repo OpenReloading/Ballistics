@@ -1,7 +1,7 @@
 'use client'
 
 import { useForm } from '@mantine/form'
-import { useMediaQuery, useNetwork } from '@mantine/hooks'
+import { useMediaQuery } from '@mantine/hooks'
 import {
   boreArea,
   bulletFits,
@@ -42,7 +42,6 @@ import { runBatch } from '../lib/batch.ts'
 import { fitOf } from '../lib/bullet-fit.ts'
 import { workbenchDesign } from '../lib/cartridge-designer.ts'
 import { type OwnCase, ownCases } from '../lib/case-group.ts'
-import { pagesBasePath } from '../lib/edition.ts'
 import { errorText } from '../lib/error-text.ts'
 import { loadExample } from '../lib/example-data.ts'
 import { exampleFields } from '../lib/examples.ts'
@@ -1283,9 +1282,6 @@ export function useWorkbenchState() {
   const [seen, setSeen] = useState<ReadonlySet<ResultTab>>(() => new Set(['results']))
   const [printing, setPrinting] = useState(false)
   const printMedia = useMediaQuery('print')
-  // the server edition runs the interior in the API: offline, the run bar says so; a run still goes
-  // out, since a server on this machine answers without a network. The Pages edition runs it here.
-  const online = useNetwork().online || pagesBasePath !== undefined
   // every tab renders for the print snapshot
   usePrintEvents(
     () => flushSync(() => setPrinting(true)),
@@ -2893,7 +2889,6 @@ export function useWorkbenchState() {
     chronoSessions,
     onOpenFile,
     onStored,
-    online,
     opened,
     origin,
     outcome,

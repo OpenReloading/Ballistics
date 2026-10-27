@@ -38,7 +38,7 @@ const listKinds = new Set([
 ])
 const searchKinds = new Set(['cartridges', 'bullets', 'powders', 'cases', 'primers'])
 const recordId = /^[a-z0-9]+(-[a-z0-9]+)*$/
-/** The forwarding route's cap on a compute body (`src/app/api/[...path]/route.server.ts`). */
+/** A compute body above this many bytes is refused with 413: an interior body is under 1 KiB, so the cap keeps a pasted file out of the Worker. */
 const maxBody = 64 * 1024
 
 const answer = (status: number, body: unknown) => Response.json(body, { status })

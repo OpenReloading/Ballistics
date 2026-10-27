@@ -230,7 +230,7 @@ export type InteriorLadderResponse = Omit<
   'result' | 'pressureRange' | 'limits' | 'warnings'
 > & { ladderSteps: InteriorLadderStep[] }
 
-/** Error bodies of the API and of the forwarding route. */
+/** Error bodies of the API, which `static-api.ts` answers in the same shape. */
 export interface ErrorBody {
   statusCode: number
   error?: string | undefined

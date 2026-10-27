@@ -88,7 +88,6 @@ export type ReportContext = {
   title: string
   record?: { kind: string; id: string; name?: string | undefined }
   version: string
-  edition: 'server' | 'Pages'
   userAgent: string
   window: string
   colourScheme: string
@@ -125,7 +124,6 @@ const contextLines = (r: Report) => {
         ]
       : []),
     `- Version: ${c.version}`,
-    `- Edition: ${c.edition}`,
     `- Browser: ${c.userAgent}`,
     `- Window: ${c.window}`,
     `- Colour scheme: ${c.colourScheme}`,

@@ -73,7 +73,7 @@ import { uiFont } from './fonts/ui.ts'
 export const metadata: Metadata = {
   title: { default: 'OpenReloading Ballistics', template: '%s · OpenReloading Ballistics' },
   description: 'A ballistics database with interior and exterior ballistics simulations.',
-  // the social image needs an absolute URL: only the Pages edition knows its origin (`PAGES_URL`)
+  // the social image needs an absolute URL: only the deployment knows its origin (`PAGES_URL`)
   ...(process.env.PAGES_URL && {
     metadataBase: new URL(`${process.env.PAGES_URL}${basePath}/`),
     openGraph: {

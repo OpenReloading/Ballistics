@@ -32,7 +32,7 @@ beforeAll(async () => {
   api = await startBundleApi()
   dir = await mkdtemp(path.join(tmpdir(), 'static-api-'))
   await writeStaticApi(api.data, dir)
-  // the data files as a static host serves them under the server edition's base path ''
+  // the data files as a static host serves them at the site root
   vi.stubGlobal('fetch', async (url: string) => {
     const file = path.join(dir, url.replace(/^\/api\//, ''))
     try {

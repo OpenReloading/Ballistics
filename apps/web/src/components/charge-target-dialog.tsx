@@ -86,7 +86,7 @@ function answerOf(
  * the pressure range at that charge, and Apply, which writes the charge into the field. It posts the load of the fields as Run does.
  */
 export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClose: () => void }) {
-  const { system, cartridge, loadRequest, applyCharge, online, powderDesign } = useLoad()
+  const { system, cartridge, loadRequest, applyCharge, powderDesign } = useLoad()
   const [kind, setKind] = useState<TargetKind>('peakPressure')
   const [percent, setPercent] = useState(false)
   const [value, setValue] = useState<string | number>('')
@@ -213,12 +213,7 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
               </Button>
             )}
           </Group>
-          <Button
-            type="submit"
-            loading={pending}
-            disabled={!online}
-            title={online ? undefined : 'Needs the network: the simulation runs on the server.'}
-          >
+          <Button type="submit" loading={pending}>
             Find charge
           </Button>
         </Stack>

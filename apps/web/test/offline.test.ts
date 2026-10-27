@@ -90,16 +90,16 @@ it('precaches the static output as /_next/static URLs, sorted, without maps', ()
     '/_next/static/chunks/b.js',
     '/_next/static/media/Inter_Regular.woff2',
     '/_next/static/media/icon.0x.png',
+    '/api/catalogue/index.json',
   ])
 })
 
-it('precaches the catalogue index in the Pages edition only, and answers it from the shell cache', () => {
-  expect(precacheList(['chunks/a.js'])).toEqual(['/_next/static/chunks/a.js'])
-  expect(precacheList(['chunks/a.js'], '/OpenReloading', true)).toEqual([
+it('precaches the catalogue index, and answers it from the shell cache', () => {
+  expect(precacheList(['chunks/a.js'], '/OpenReloading')).toEqual([
     '/OpenReloading/_next/static/chunks/a.js',
     '/OpenReloading/api/catalogue/index.json',
   ])
-  expect(precacheList([], '', true)).toEqual(['/api/catalogue/index.json'])
+  expect(precacheList([])).toEqual(['/api/catalogue/index.json'])
   const index = req('/OpenReloading/api/catalogue/index.json')
   expect(strategyOf(index, origin, '/OpenReloading')).toBe('static')
   expect(
@@ -134,20 +134,19 @@ it('answers static files from the cache, records and pages network-first', () =>
   expect(strategyOf(req('/groups', { mode: 'navigate' }), origin)).toBe('page')
 })
 
-it('leaves the interior run, other methods and other origins to the network', () => {
-  expect(strategyOf(req('/api/interior', { method: 'POST' }), origin)).toBeUndefined()
+it('leaves other methods and other origins to the network', () => {
+  expect(strategyOf(req('/api/bullets', { method: 'POST' }), origin)).toBeUndefined()
   expect(strategyOf(req('/groups', { method: 'POST', mode: 'navigate' }), origin)).toBeUndefined()
   expect(strategyOf(req('https://other.test/_next/static/a.js'), origin)).toBeUndefined()
   expect(strategyOf(req('/sw.js'), origin)).toBeUndefined()
 })
 
-it('in the Pages edition, serves under the base path and leaves the docs site to the network', () => {
+it('serves under the base path and leaves the docs site to the network', () => {
   const base = '/OpenReloading'
   expect(appUrl(base, '/', '/')).toBe('/OpenReloading/')
   expect(appUrl(base, '/workbench', '/')).toBe('/OpenReloading/workbench/')
   expect(appUrl(base, '/icon.png')).toBe('/OpenReloading/icon.png')
   expect(appUrl('', '/workbench')).toBe('/workbench')
-  expect(precacheList(['chunks/a.js'], base)).toEqual(['/OpenReloading/_next/static/chunks/a.js'])
   expect(strategyOf(req('/OpenReloading/_next/static/chunks/a.js'), origin, base)).toBe('static')
   expect(strategyOf(req('/OpenReloading/icon.png'), origin, base)).toBe('static')
   expect(strategyOf(req('/OpenReloading/api/cartridges/308-win.json'), origin, base)).toBe(

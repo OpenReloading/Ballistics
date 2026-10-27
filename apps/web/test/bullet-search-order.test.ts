@@ -3,6 +3,11 @@ import { paletteSearch } from '../src/components/workbench-search.tsx'
 import type { BulletRow } from '../src/lib/bullet-rows.ts'
 import { findBullets, searchBullets } from '../src/lib/bullet-search.ts'
 
+// these tests stub `fetch` as the API's own answers: the browser's calls go to it as written, in place of the data files and the compute worker
+vi.mock('../src/lib/static-api.ts', () => ({
+  staticFetch: (path: string, init?: RequestInit) => fetch(`/api/${path}`, init),
+}))
+
 // invented bullets, mass in g and diameter in mm
 const bullet = (id: string, name: string, mass: number, origin?: 'user'): BulletRow => ({
   id,

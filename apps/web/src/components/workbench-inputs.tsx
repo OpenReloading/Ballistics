@@ -478,7 +478,6 @@ export function InputCards() {
     more,
     setMore,
     nextPanel,
-    online,
     pending,
     cartridge,
     cartridgeDesign,
@@ -563,7 +562,7 @@ export function InputCards() {
       <LoadFigure host={short ? figureTab : figureCard} />
       <div className="run-bar">
         <RunButton />
-        {online && <span className="run-hint">or {shortcutLabel('run')}</span>}
+        <span className="run-hint">or {shortcutLabel('run')}</span>
         {pending && <Loader size="xs" aria-hidden="true" />}
       </div>
     </form>

@@ -1,7 +1,6 @@
 import { loadRatio } from '@open-reloading/core'
 import { fromSi } from '@open-reloading/schema'
 import type { ErrorBody, InteriorLadderResponse, InteriorResponse } from '../lib/api-types.ts'
-import { pagesBasePath } from '../lib/edition.ts'
 import type { InteriorBody } from '../lib/interior-input.ts'
 import { nth } from '../lib/nth.ts'
 import type {
@@ -128,9 +127,7 @@ export const volumeNoteText = (ok: { volumeMeasured: boolean } | undefined) =>
 
 export const notReached = 'The API is unreachable.'
 export const needsNetwork =
-  pagesBasePath === undefined
-    ? 'Needs the network: the interior simulation runs on the server.'
-    : 'Simulations run in this browser. Offline use requires the needed records to be cached.'
+  'Simulations run in this browser. Offline use requires the needed records to be cached.'
 
 /**
  * The barrel strip's figure at the shown step: a seating ladder's step seats the bullet at its own
