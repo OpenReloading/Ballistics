@@ -18,7 +18,7 @@ interface PageEntry {
   covers?: readonly string[]
 }
 
-/** The catalogue lists, read-only records each with its sources. */
+/** The lists of the Database: catalogue records each with its sources, and the user's own records next to them. */
 export const databaseTabs: readonly LibraryTab[] = [
   {
     href: '/cartridges',
@@ -58,21 +58,11 @@ export const databaseTabs: readonly LibraryTab[] = [
     description:
       'Rule-book disciplines and their federations: distance, caliber classes and the faces they are shot on, each with its source.',
   },
-]
-
-/** What the user owns or measured, kept in this browser and in files. */
-export const gearTabs: readonly LibraryTab[] = [
   {
     href: '/firearms',
     label: 'Firearms',
     description:
-      'Your firearms with their optics and zeros; they fill the rifle fields of the workbench.',
-  },
-  {
-    href: '/my-cases',
-    label: 'My cases',
-    description:
-      'Your groups of cases with their measured water capacity, trim length and neck wall; the workbench picks them.',
+      'Your firearms with their optics and zeros, kept in this browser and in files; they fill the rifle fields of the workbench.',
   },
 ]
 
@@ -113,17 +103,9 @@ export const sections = [
         label: 'Database',
         icon: 'database',
         description:
-          'The published records, each with its source: cartridges, bullets, powders, cases, primers, target faces and disciplines.',
+          'The published records, each with its source, and your own next to them: cartridges, bullets, powders, cases, primers, target faces, disciplines and your firearms.',
         tabs: databaseTabs,
-        covers: ['/federations'],
-      },
-      {
-        href: '/firearms',
-        label: 'My gear',
-        icon: 'my-gear',
-        description:
-          'What you own or measured, kept in this browser and in files: your firearms with their optics and zeros, and your groups of cases.',
-        tabs: gearTabs,
+        covers: ['/federations', '/my-cases'],
       },
     ],
   },

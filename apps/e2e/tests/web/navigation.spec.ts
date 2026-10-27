@@ -106,6 +106,7 @@ test('the Database tabs follow the tabs pattern and carry the search to the next
     'Primers',
     'Targets',
     'Disciplines',
+    'Firearms',
   ])
   await expect(tabs.getByRole('tab', { selected: true })).toHaveText('Cartridges')
   await page.getByRole('searchbox', { name: 'Search' }).fill('win')

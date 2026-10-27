@@ -60,7 +60,7 @@ export function countOrigins(
 }
 
 const prefix = 'user:'
-const userRowId = (recordId: string) => `${prefix}${recordId}`
+export const userRowId = (recordId: string) => `${prefix}${recordId}`
 /** The browser record of a user row's id; undefined for a catalogue id. */
 export const userRecordId = (rowId: string) =>
   rowId.startsWith(prefix) ? rowId.slice(prefix.length) : undefined

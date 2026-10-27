@@ -110,7 +110,13 @@ it('precaches the catalogue index in the Pages edition only, and answers it from
 it('the shell holds the offline page, the tools, the manifest and its icons', () => {
   for (const u of ['/', '/offline', '/workbench', '/groups', '/session'])
     expect(shellPages).toContain(u)
-  for (const u of ['/firearms', '/my-cases', '/range', '/bullets/designer', '/cartridges/designer'])
+  for (const u of [
+    '/firearms',
+    '/cases/editor',
+    '/range',
+    '/bullets/designer',
+    '/cartridges/designer',
+  ])
     expect(shellPages).toContain(u)
   // Settings is a dialog, no page
   expect(shellPages).not.toContain('/settings')
@@ -212,7 +218,7 @@ it('answers a worker script from the cache with a copy that has no URL of its ow
 
 it('a worker update deletes shell caches only and its source never opens the browser store', () => {
   // the records cache and unknown caches stay; entered data lives in IndexedDB, which no cache name reaches
-  const names = [shellCache('a'), recordsCache, 'openreloading-user-data', shellCache('b')]
+  const names = [shellCache('a'), recordsCache(), 'openreloading-user-data', shellCache('b')]
   expect(staleCaches(names, 'b')).toEqual([])
   expect(staleCaches([...names, shellCache('c')], 'c')).toEqual([shellCache('a')])
   const source = readFileSync(new URL('../src/service-worker.js', import.meta.url), 'utf8')
