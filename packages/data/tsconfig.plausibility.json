@@ -1,5 +1,0 @@
-{
-  "extends": "./tsconfig.build.json",
-  "include": [],
-  "files": ["src/plausibility.ts"]
-}
