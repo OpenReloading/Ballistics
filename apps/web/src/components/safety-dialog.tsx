@@ -2,12 +2,13 @@
 
 import { ActionIcon, Button, Group, Tooltip } from '@mantine/core'
 import { useEffect, useState } from 'react'
+import { storageName } from '../lib/edition.ts'
 import { safety } from '../lib/safety.ts'
 import { AppModal } from './app-modal.tsx'
 import { NavIcon } from './nav-icons.tsx'
 
 /** Browser storage key of the acceptance; a new value asks again after the text changes. */
-const ackKey = 'safety-ack'
+const ackKey = storageName('safety-ack')
 const ackValue = '3'
 /** Where Decline leads: away from the site to the browser's empty page, naming no other site. */
 const declineUrl = 'about:blank'

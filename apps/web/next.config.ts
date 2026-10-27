@@ -22,6 +22,7 @@ const nextConfig: NextConfig = {
     trailingSlash: true,
     env: {
       NEXT_PUBLIC_PAGES_BASE_PATH: pagesBasePath,
+      NEXT_PUBLIC_PAGES_EDITION: process.env.PAGES_EDITION === 'next' ? 'next' : '',
     },
   }),
   outputFileTracingRoot: path.join(import.meta.dirname, '../..'),

@@ -12,6 +12,7 @@ import {
 } from '@open-reloading/schema'
 import { fetchRecord } from './api-fetch.ts'
 import type { CartridgeDetail } from './api-types.ts'
+import { storageName } from './edition.ts'
 import {
   fetchManufacturerNames,
   noManufacturerNames,
@@ -26,7 +27,7 @@ export type Base<T> =
   | { status: 'found'; record: T }
   | { status: 'missing' | 'unreachable'; ref: string }
 
-const baseKey = (kind: string, id: string) => `openreloading-base:${kind}/${id}`
+const baseKey = (kind: string, id: string) => storageName(`openreloading-base:${kind}/${id}`)
 
 /** The base last read from the API, kept in this browser; undefined without one or without storage. */
 function recalled<T>(key: string): T | undefined {

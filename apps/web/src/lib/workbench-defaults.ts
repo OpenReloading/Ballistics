@@ -1,8 +1,9 @@
 import { defaultStartPressure, handgunBarrelLengthLimit } from '@open-reloading/core'
+import { storageName } from './edition.ts'
 import { interiorFields } from './interior-input.ts'
 
 /** `localStorage` key of the user's workbench defaults: JSON of the tuned values, SI. */
-const defaultsKey = 'workbenchDefaults'
+const defaultsKey = storageName('workbenchDefaults')
 
 /**
  * Ambient and secondary workbench inputs with their cited default, SI: `source` names where the

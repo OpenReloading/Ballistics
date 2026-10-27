@@ -1,10 +1,11 @@
 name: Release
 
-# release-please keeps one release pull request open from the Conventional Commits on main; merging it
-# tags each changed component <component>-vX.Y.Z, writes its CHANGELOG.md and GitHub Release, the
-# images job publishes the api and web images of the components released (with an SBOM attestation each),
-# the sbom-release job attaches those SBOMs to the GitHub Releases, and the publish job pushes the
-# libraries to npm (trusted publishing, no token).
+# release-please keeps one release pull request open from the Conventional Commits on main. Nothing merges it
+# but the owner: no step here enables auto-merge. Merging it tags each changed component <component>-vX.Y.Z and
+# writes its CHANGELOG.md and GitHub Release; the images job publishes the api and web images of the components
+# released (with an SBOM attestation each), the sbom-release job attaches those SBOMs to the GitHub Releases,
+# and the publish job pushes the libraries to npm (trusted publishing, no token). A push to main that merges
+# no release pull request releases and publishes nothing.
 # Steps and versioning: apps/docs/docs/release.md.
 on:
   push:
@@ -26,39 +27,35 @@ jobs:
       issues: write
       pull-requests: write
     outputs:
+      released: ${{ steps.release.outputs.releases_created }}
+      app: ${{ steps.app.outcome == 'success' }}
       images: ${{ steps.images.outputs.matrix }}
       libraries: ${{ steps.libraries.outputs.names }}
     steps:
+      # The release pull request is opened as the organisation's release GitHub App, so its required checks run
+      # without anyone approving them (a pull request opened with GITHUB_TOKEN waits for that approval). GitHub signs
+      # the App's API commits, which main requires. Without the App (variable or installation missing) the step is
+      # skipped, GITHUB_TOKEN opens the pull request and the owner approves its workflow runs.
+      - id: app
+        if: vars.RELEASE_APP_CLIENT_ID != ''
+        continue-on-error: true
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.RELEASE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-issues: write
+          permission-pull-requests: write
+      - if: steps.app.outcome != 'success'
+        run: |
+          echo "::warning::No release GitHub App token, so the release pull request is opened with GITHUB_TOKEN. Approve its workflow runs by hand (Approve workflows to run on the pull request)."
       - id: release
         uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
         with:
-          # GITHUB_TOKEN, so GitHub signs the release commits (main requires signed commits; a personal token's
-          # API commits are unsigned)
+          token: ${{ steps.app.outputs.token || github.token }}
           target-branch: main
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
-      # The release PR's CI runs wait for a maintainer's approval, because github-actions opened the PR. Auto-merge
-      # squashes it once its required checks pass. Enabled with RELEASE_PLEASE_TOKEN (fine-grained token, this
-      # repository only, Contents and Pull requests read and write), so the push of that merge starts this workflow
-      # again, which tags the release and builds the images; a merge by GITHUB_TOKEN would start no workflow.
-      # Every run, not only when the PR changed: an unchanged release PR may still lack auto-merge.
-      - if: steps.release.outcome == 'success'
-        continue-on-error: true   # never blocks the release or the images
-        env:
-          GH_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
-          PR: ${{ steps.release.outputs.pr && fromJSON(steps.release.outputs.pr).number || '' }}
-        run: |
-          if [ -z "$GH_TOKEN" ]; then echo "::warning::RELEASE_PLEASE_TOKEN not set: merge the release pull request by hand"; exit 0; fi
-          prs=$PR
-          # the action's pr output can be empty after an update; the label search lags a few seconds behind the PR
-          for _ in $(seq 6); do
-            [ -n "$prs" ] && break
-            sleep 5
-            prs=$(gh pr list -R "$GITHUB_REPOSITORY" --state open --label 'autorelease: pending' --json number --jq '.[].number')
-          done
-          for pr in $prs; do
-            gh pr merge "$pr" --auto --squash -R "$GITHUB_REPOSITORY"
-          done
       # per-path outputs exist only for the components released in this run
       - id: images
         env:
@@ -89,6 +86,20 @@ jobs:
             '[["schema", $schema], ["core", $core], ["drawing", $drawing], ["importers", $importers], ["data", $data]]
              | map(select(.[1] == "true") | .[0])')
           echo "names=$names" >> "$GITHUB_OUTPUT"
+
+  # A release created with GITHUB_TOKEN starts no `release: published` workflow, so without the App token this run
+  # starts the Pages build for the new release itself (workflow_dispatch by GITHUB_TOKEN is allowed).
+  pages:
+    needs: release-please
+    if: needs.release-please.outputs.released == 'true' && needs.release-please.outputs.app != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions:
+      actions: write
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --ref main -R "$GITHUB_REPOSITORY"
 
   # The images are built in the run that made the release; no workflow triggers on releases or tags.
   images:

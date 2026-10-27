@@ -1,10 +1,16 @@
 name: Pages
 
-# Builds the Pages edition (`npm run pages:build`, README) from main and deploys it to GitHub Pages. The
-# repository's Pages source must be "GitHub Actions" and the `github-pages` environment must accept main.
+# One deployment holds both editions of the Pages site (a deployment replaces the whole site): the root is the
+# latest release, built from its tag, and `/next/` is main, rebuilt on every push to main. Until the first release
+# exists the root redirects to `/next/`. `release: published` runs when a release is created with the release
+# GitHub App token; a release created with GITHUB_TOKEN starts no workflow, so release.yml dispatches this one.
+# The repository's Pages source must be "GitHub Actions" and the `github-pages` environment must accept main and
+# the release tags. Editions and storage names: apps/web/AGENTS.md, Pages edition.
 on:
   push:
     branches: [main]
+  release:
+    types: [published]
   workflow_dispatch:
 
 permissions: {}
@@ -14,36 +20,66 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  plan:
     if: github.repository == 'OpenReloading/Ballistics'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      contents: read
+    outputs:
+      tag: ${{ steps.latest.outputs.tag }}
+      editions: ${{ steps.latest.outputs.editions }}
+    steps:
+      # the newest release of any component: every tag of one release pull request points at the same commit
+      - id: latest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=$(gh release list -R "$GITHUB_REPOSITORY" --exclude-drafts --limit 1 --json tagName --jq '.[0].tagName // ""')
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          if [ -n "$tag" ]; then echo 'editions=["stable","next"]' >> "$GITHUB_OUTPUT"; else echo 'editions=["next"]' >> "$GITHUB_OUTPUT"; fi
+
+  build:
+    needs: plan
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
       contents: read
       pages: read
+    strategy:
+      matrix:
+        edition: ${{ fromJSON(needs.plan.outputs.editions) }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: main
+          ref: ${{ matrix.edition == 'stable' && needs.plan.outputs.tag || 'main' }}
           persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
-          cache: npm
+          # no npm cache: this job builds what is deployed (zizmor cache-poisoning)
+          package-manager-cache: false
       - run: npm ci --ignore-scripts && node patches/apply.mjs
       - run: npm run build
       - id: pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
       - run: npm run pages:build
         env:
+          # the site root's path: the next edition builds under `<path>/next` (tools/src/pages.ts)
           PAGES_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          PAGES_EDITION: ${{ matrix.edition }}
           PAGES_URL: ${{ steps.pages.outputs.origin }}
           NEXT_PUBLIC_REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
           # the docs navbar's repository widget reads stars, forks and the release at build time
           GITHUB_TOKEN: ${{ github.token }}
-      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+      # `.nojekyll` is a hidden file
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
+          name: pages-${{ matrix.edition }}
           path: pages
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1
 
   deploy:
     needs: build
@@ -56,5 +92,22 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: pages-*
+          path: editions
+      # stable at the root, next below it; with no release the root is a page that forwards to next/
+      - run: |
+          mkdir site
+          if [ -d editions/pages-stable ]; then
+            cp -a editions/pages-stable/. site/
+          else
+            touch site/.nojekyll
+            printf '%s\n' '<!doctype html>' '<meta charset="utf-8">' '<meta http-equiv="refresh" content="0; url=next/">' '<title>OpenReloading Ballistics</title>' '<a href="next/">OpenReloading Ballistics</a>' > site/index.html
+          fi
+          cp -a editions/pages-next site/next
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: site
       - id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
