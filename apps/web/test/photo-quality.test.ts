@@ -127,6 +127,13 @@ describe('a photo without a black area', () => {
     expect(belowMinimum(issues)).toBe(true)
   })
 
+  it('is judged on glare over the whole photo', () => {
+    const image = flat(900, 700, 200)
+    for (let y = 0; y < 700; y++)
+      for (let x = 0; x < 180; x++) image.data.set([255, 255, 255, 255], (y * 900 + x) * 4)
+    expect(level(photoQuality({ image, scale: 1 }), 'glare')).toBe('bad')
+  })
+
   it('is judged on its size', () => {
     const issues = photoQuality({ image: flat(200, 150, 128), scale: 1 })
     expect(level(issues, 'resolution')).toBe('bad')

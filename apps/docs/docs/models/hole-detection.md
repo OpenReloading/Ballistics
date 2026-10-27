@@ -249,7 +249,7 @@ Code: `apps/web/src/lib/hole-detection.ts`, `autoDetect`, `runSeeds`, `SEED_MIN_
 
 ### Photo quality
 
-The face search also checks the photo for what makes holes hard to find, on the photo resized to 2000 px on its longer side, and says what to change when retaking it. A problem has a level: fair (a note) or bad. A photo with a bad problem is below the minimum quality: the one-click run applies the face and waits, and the button reads Detect anyway. Every other problem is a note beside the run. The check never says that a photo is good or that a detection is right.
+The face search also checks the photo for what makes holes hard to find, on the photo resized to 2000 px on its longer side, and says what to change when retaking it. A problem has a level: fair (a note) or bad. A photo with a bad problem is below the minimum quality: when the face search finds exactly one sure fit, the one-click run applies the face and waits, and the button reads Detect anyway. With several fits or none the run goes on in the guided steps, which show no Detect anyway. Every other problem is a note beside the run. The check never says that a photo is good or that a detection is right.
 
 With the black area found (ellipse axes $a \ge b$, centre $c$), the measures are:
 
@@ -269,11 +269,11 @@ Code: `apps/web/src/lib/photo-quality.ts`, `sidesDifference`.
 
 Sharpness is the width of the black area's edge in holes. On 120 rays along the ellipse's normals the grey profile across the edge is aligned at its steepest rise and averaged. With the grey step $\Delta g$ and the steepest rise $g'$ per px, the edge width is $w = \Delta g / g'$, and the measure is $w / D_\mathrm{px}$. Rays whose step is below 25 grey levels are left out, and no measure is given when fewer than a quarter of the rays remain. Without a fitted face the hole diameter in this ratio is taken as 6 % of the black area's mean diameter.
 
-The hole diameter on the photo as taken is $D_\mathrm{px} / k$ for the resize factor $k$ (the face's scale times the bullet diameter, or the same 6 % without a fitted face). A photo with no black area found is judged by its contrast over the whole photo (5th to 95th percentile) and its size.
+The hole diameter on the photo as taken is $D_\mathrm{px} / k$ for the resize factor $k$ (the face's scale times the bullet diameter, or the same 6 % without a fitted face). A photo with no black area found is judged by its contrast over the whole photo (5th to 95th percentile), by glare counted over the whole photo, and by its size.
 
 | Problem | Fair from | Bad from | Message and fix |
 | --- | --- | --- | --- |
-| Tilt | $\theta \ge 30^\circ$ | $55^\circ$ | "The target is photographed at a slant of about N degrees." Retake from straight above, with the camera parallel to the paper. |
+| Tilt | $\theta > 30^\circ$ | $55^\circ$ | "The target is photographed at a slant of about N degrees." Retake from straight above, with the camera parallel to the paper. |
 | Framing | $s_\mathrm{in} < 0.9$ | $0.5$ | "The black area of the target is cut off by the edge of the photo." Retake with the whole target and some paper around it in the frame. |
 | Sharpness | $w / D_\mathrm{px} > 0.3$ | $0.6$ | "The photo is soft: the edge of the black area is blurred." Hold the camera steady or rest it on something, let it focus on the target and retake. |
 | Hole size | under 6 px | 3.5 px | "A bullet hole is only about N px across in this photo." Move closer so the target fills more of the frame, or use the full resolution of the camera. |
