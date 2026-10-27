@@ -1,0 +1,220 @@
+{
+  "known": [
+    {
+      "rule": "target-size",
+      "node": "class=\"field-note\"",
+      "where": "/cartridges",
+      "reason": "The symbol and value buttons of the cartridge dimensions table are 16 px high with 18 px between neighbours, under the 24 px of WCAG 2.5.8 (2.2 AA), and they are not text in a sentence.",
+      "workaround": "The note is the button's description for a screen reader, and the arrow keys move between the symbols. No pointer alternative for a touch user yet."
+    },
+    {
+      "rule": "target-size",
+      "node": "class=\"symbol-stop\"",
+      "where": "/cartridges",
+      "reason": "The symbol buttons of the cartridge dimensions table are 16 px high with 18 px between neighbours, under the 24 px of WCAG 2.5.8 (2.2 AA).",
+      "workaround": "The arrow keys move between the symbols. No pointer alternative for a touch user yet."
+    }
+  ],
+  "reviewed": [
+    {
+      "rule": "color-contrast",
+      "node": "<text ",
+      "reason": "Text of a drawing or chart, which axe cannot match to a background. It is drawn in the muted or drawing ink on the page background, 5:1 or more in both themes by measurement, and the token pairs are asserted in apps/web/test/drawing-tokens.test.ts."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "class=\"field-note\"",
+      "reason": "Value on the scroll shadow of its table box, a gradient axe cannot resolve. The shadow shows at an edge with more content behind it and fades to the page background; measured against that background the text has 5:1 or more in both themes."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "class=\"symbol-stop\"",
+      "reason": "Symbol on the scroll shadow of its table box, a gradient axe cannot resolve. Measured against the page background the text has 5:1 or more in both themes."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "[data-a=",
+      "reason": "Value of the dimensions table on the scroll shadow of its box, a gradient axe cannot resolve. Measured against the page background the text has 5:1 or more in both themes."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "class=\"clearance\"",
+      "reason": "Clearance note on the scroll shadow of its table box, a gradient axe cannot resolve. Measured against the page background the text has 5:1 or more in both themes."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "dim-slot",
+      "reason": "Tolerance on the scroll shadow of its table box, a gradient axe cannot resolve. Measured against the page background the text has 5:1 or more in both themes."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "<t",
+      "where": ["/disciplines", "/federations", "/targets"],
+      "reason": "Cell or column header of a table in a scroll box, which sideways scrolling or the box's edge covers in part. Measured against the page background the text has 5:1 or more in both themes."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "<a href=\"/cartridges/",
+      "where": "/bullets",
+      "reason": "Link in the cartridge list of the bullet, a scroll box: the part outside the box counts as covered. Measured against the page background the link has 5:1 or more in both themes."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "aria-label=\"Open ",
+      "where": "/disciplines",
+      "reason": "Link of the events table, a scroll box: the part outside the box counts as covered. Measured against the page background the link has 5:1 or more in both themes."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "<a href=\"/disciplines/",
+      "reason": "Link in a table that scrolls sideways: the part outside the box counts as covered. Measured against the page background the link has 5:1 or more in both themes."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "-description",
+      "reason": "Help text of a field in a dialog: axe reports it as overlapping another box and cannot find its background. It sits on the dialog surface, 5:1 or more in both themes by measurement."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "panel-",
+      "reason": "Text of a dialog panel that axe reports as overlapping another box. It sits on the dialog surface, 5:1 or more in both themes by measurement."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "Chart data",
+      "reason": "Caption or note of the chart data table in its dialog, reported as overlapping another box. It sits on the dialog surface, 5:1 or more in both themes by measurement."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "Pill-label",
+      "reason": "Label of a filter chip in a dialog, reported as overlapping another box. It sits on the chip's own surface, 5:1 or more in both themes by measurement."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "saved-storage",
+      "reason": "Storage note of the Saved loads drawer, reported as overlapping another box. It sits on the drawer surface, 5:1 or more in both themes by measurement."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "file-reason",
+      "reason": "Date of a saved load, reported as overlapping another box. It sits on the drawer surface, 5:1 or more in both themes by measurement."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "mantine-NumberInput-input",
+      "reason": "Value of a number field in the workbench, whose box overlaps its unit section. It sits on the field's own surface, 5:1 or more in both themes by measurement."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "cell-percent",
+      "where": "workbench",
+      "reason": "Share of a ladder step, outside the part of the ladder that shows (it scrolls sideways). Measured against the page background it has 5:1 or more in both themes."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "ladder-cell",
+      "where": "workbench",
+      "reason": "Charge of a ladder step, outside the part of the ladder that shows (it scrolls sideways). Measured against the page background it has 5:1 or more in both themes."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "Tabs-tabLabel",
+      "where": "workbench",
+      "reason": "Label of a result tab, outside the part of the tab row that shows (it scrolls sideways at the narrow widths). Measured against the page background the label has 5:1 or more in both themes."
+    },
+    {
+      "rule": "th-has-data-cells",
+      "node": "symbol-table",
+      "reason": "The group title row is one header cell across all four columns (scope rowgroup, colspan 4) over the rows of its group; axe cannot map a spanning row group header to data cells."
+    },
+    {
+      "rule": "label-content-name-mismatch",
+      "node": "field-unit-switch",
+      "reason": "The visible text is the unit symbol and the name starts with it (\"g, switch Charge mass to gr\"); axe cannot judge a one-character label."
+    },
+    {
+      "rule": "heading-order",
+      "node": "burn-rate-title",
+      "where": "workbench",
+      "reason": "The h3 follows the visible h2 Result; the headings between them are in hidden tab panels, which axe cannot place."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "readout",
+      "where": "workbench",
+      "reason": "Result readout below the visible part of the window or of its scroll box (the page scrolls to it), which axe reports as covered. Measured against the page background it has 5:1 or more in both themes."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "load-identity",
+      "where": "workbench",
+      "reason": "Name of the open load below the visible part of the window or of its scroll box (the page scrolls to it), which axe reports as covered. Measured against the page background it has 5:1 or more in both themes."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "band-line",
+      "where": "workbench",
+      "reason": "Band line under the results head below the visible part of the window or of its scroll box (the page scrolls to it), which axe reports as covered. Measured against the page background it has 5:1 or more in both themes."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "InputWrapper-label",
+      "where": "workbench",
+      "reason": "Label of a field below the visible part of the window or of its scroll box (the page scrolls to it), which axe reports as covered. Measured against the page background it has 5:1 or more in both themes."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "canvas-start",
+      "where": "/groups",
+      "reason": "Prompt over the empty target canvas, which axe reports as overlapping the canvas. It sits on the page background, 5:1 or more in both themes by measurement."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "aria-label=\"Zoom out\"",
+      "where": "/groups",
+      "reason": "The button's text is the minus sign U+2212, a character axe cannot read; it is named Zoom out. Measured against the page background it has 5:1 or more in both themes."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "aria-hidden=\"true\"",
+      "where": "/groups",
+      "reason": "Score label drawn with generated content, which axe cannot read. Measured against the page background it has 5:1 or more in both themes."
+    },
+    {
+      "rule": "label-content-name-mismatch",
+      "node": "aria-label=\"Zoom ",
+      "where": "/groups",
+      "reason": "The visible text is the plus or the minus sign and the name is Zoom in or Zoom out: a symbol for the action, which axe cannot compare with words."
+    },
+    {
+      "rule": "th-has-data-cells",
+      "node": "shot-table",
+      "where": "/groups",
+      "reason": "A group without shots shows the table headers over no rows yet; the rows are windowed in as shots are added."
+    },
+    {
+      "rule": "skip-link",
+      "node": "skip-link",
+      "where": "/workbench",
+      "reason": "\"Skip to results\" targets the results section. At the narrow widths the section is in the Results tab, which the link opens before it moves focus (the show-results handler of the workspace), so axe finds no visible target."
+    },
+    {
+      "rule": "scrollable-region-focusable",
+      "node": "ScrollArea-viewport",
+      "where": "Site search",
+      "reason": "The result list of the search is driven from the search box (arrows and Enter), so a keyboard user never needs the scroll box itself to take focus."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "title=\"Main charge\"",
+      "where": "workbench",
+      "reason": "Main charge of the ladder, outside the part of the window or scroll box that shows (the page scrolls to it), which axe reports as covered. Measured against the page background it has 5:1 or more in both themes."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "<td",
+      "where": "Keyboard shortcuts",
+      "reason": "Cell of the shortcuts table in a dialog that scrolls sideways at the narrow widths; the part outside the box counts as covered. It sits on the dialog surface, 5:1 or more in both themes by measurement."
+    }
+  ]
+}

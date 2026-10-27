@@ -1,5 +1,5 @@
 /**
- * One matcher and one ranker for every list and picker (API, static edition, browser). A row's
+ * One matcher and one ranker for every list and picker (API, browser). A row's
  * search key is built once; a query is matched word by word, so the order of the words does not
  * matter.
  */

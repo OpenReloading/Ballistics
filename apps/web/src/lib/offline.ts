@@ -1,6 +1,6 @@
 /**
  * The pure parts of the offline layer. `scripts/service-worker.mts`
- * writes every export of this module into `public/sw.js` ahead of `src/service-worker.js`, so these
+ * writes every export of this module into `out/sw.js` ahead of `src/service-worker.js`, so these
  * are the functions the worker runs: no imports, and each refers only to other exports.
  */
 

@@ -4,7 +4,7 @@ import type { NextConfig } from 'next'
 
 /**
  * The static export, served under this path (`''` at a domain root, `/Ballistics` on a project
- * site). Its data files and compute run in the browser (README, Pages edition).
+ * site). Its data files and compute run in the browser (apps/web/AGENTS.md, Static site).
  */
 const basePath = process.env.PAGES_BASE_PATH ?? ''
 

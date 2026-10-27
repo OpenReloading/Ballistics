@@ -476,7 +476,7 @@ export function ChartPlayback({
                     size={controlSize.row.button}
                     px={0}
                     className="play-speed"
-                    aria-label={`Slow-down factor: ${factor}×`}
+                    aria-label={`Slow-down factor: ${factor / 1000}k×`}
                     title={`Slowed down ${factor} times`}
                   >
                     {factor / 1000}k×

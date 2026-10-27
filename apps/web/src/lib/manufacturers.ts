@@ -1,6 +1,6 @@
 /**
  * Manufacturer names for the powders and bullets that name their manufacturer by id: from
- * `GET /manufacturers` through `apiFetch`, one request per page load, or on the server
+ * `GET /manufacturers` through `apiFetch`, one request per page load, or at build time
  * from `getManufacturerNames` (`api.ts`).
  */
 

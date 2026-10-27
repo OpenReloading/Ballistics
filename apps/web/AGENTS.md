@@ -166,14 +166,14 @@ Next.js App Router (TypeScript, React). A static export: the browser reads data 
   - Opened by Settings in the sidebar rail and the drawer, the search's commands, and `UnitsIconButton` in the page bar of the records, the bullet and cartridge lists, the session summary and the firearm library. Print in a page bar is `PrintButton` (`record-actions.tsx`).
 - Browser API calls go through `apiFetch` (`src/lib/api-fetch.ts`, paths without the version prefix), never `fetch('/api/...')`. `API_PREFIX` of `src/lib/api-version.ts` is the version prefix of the build's reads (`apiGet`).
 - Offline layer (manifest `src/app/manifest.ts`):
-  - `npm run build` writes the service worker to `out/sw.js` from `src/lib/offline.ts` (pure rules, Vitest) and `src/service-worker.js`, its URLs under the base path (`appUrl`), `<base>/docs/` left to the network.
+  - `npm run build` writes the service worker to `out/sw.js` from `src/lib/offline.ts` (pure rules, Vitest) and `src/service-worker.js`, its URLs under the base path (`appUrl`), `<base>/docs/` left to the network. The worker is never written into `public/`: a `public/sw.js` left by an older build is no longer ignored by the version control and fails `npm run lint`, so delete it.
   - `src/components/offline-layer.tsx` registers it in production builds only (and unregisters a leftover one under `next dev`) and shows "New version".
   - `install-button.tsx` shows Install while the browser offers it. `/offline` answers pages never opened while offline. Playwright blocks the worker.
 - Safety: the README Safety text (`src/lib/safety.ts`, checked against `README.md` by `test/safety.test.ts`) is on screen in the Safety dialog (`src/components/safety-dialog.tsx`).
   - Accepted on the first visit (value `3` in `safety-ack`), opened again by `SafetyBarButton`, the light yellow and only Safety button of the top bar: labelled with its icon in the page bar from 75em (on the workbench an icon only), an icon in the phone top bar.
   - Printed pages and downloaded files: root `AGENTS.md`, Conventions. On-screen notes keep their notice.
 
-## Pages edition
+## Static site
 
 The web app is a static site without a server, for GitHub Pages or any static host: the records as data files and the simulations in the browser, with the docs site and the licenses beside it. `pages.yml` builds two editions into one deployment: the stable edition at the site root from the tag of the latest release, the next edition at `<root>/next/` from `main` (process: `apps/docs/docs/release.md`, Pages site). The e2e job of `ci.yml` builds its own export to test.
 
@@ -240,7 +240,7 @@ The web app is a static site without a server, for GitHub Pages or any static ho
 
 ## Streamed pages and the Mantine patch
 
-- In a build made without the API the list pages stream. React 19.3 reveals a streamed boundary up to about 300 ms after the first paint.
+- A page that waits for its data inside a Suspense boundary (the list pages, `src/app/cartridges/page.tsx`) streams. React 19.3 reveals a streamed boundary up to about 300 ms after the first paint.
 - A provider above the page whose context value changes after mounting (Mantine's `AppShell` does, `UnitsProvider` did) makes React client-render the waiting boundary. A hidden `div#S:n` copy of the page stays until the reveal.
 - Providers above `main` keep one context value for the page's life. `useUnits` reads a store behind a constant context.
 - The page sits in `AppShell.Main` only because `patches/apply.mjs` (root `postinstall`, the Dockerfiles copy `patches/` before `npm ci`) memoizes AppShell's context value in `@mantine/core` 9.7.2.
