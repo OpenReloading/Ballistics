@@ -61,7 +61,7 @@ function stateMessages(t: PhotoState): MessageEntry[] {
       ? [
           {
             severity: 'info',
-            text: 'Place two points on the ruler and enter the distance between them to get values.',
+            text: 'Place two points on the ruler and enter the distance between them, or enter the diameter or overall length you measured with a caliper, to get values.',
           } as const,
         ]
       : []),
@@ -84,10 +84,12 @@ function valueMessages(t: PhotoState, record: Design['origin']): MessageEntry[] 
   ]
 }
 
-/** The scale controls: the two distances and the readout. */
+/** The scale controls: the two distances on the ruler and the sizes read off a caliper. */
 function ScaleControls({ system, t }: { system: UnitSystem; t: PhotoState }) {
   const set = (i: 0 | 1) => (v: FieldValue) =>
     t.setDistances(([a, b]) => (i === 0 ? [v, b] : [a, v]))
+  const setKnown = (i: 0 | 1) => (v: FieldValue) =>
+    t.setKnown(([a, b]) => (i === 0 ? [v, b] : [a, v]))
   return (
     <>
       <Text fz="sm">
@@ -119,6 +121,23 @@ function ScaleControls({ system, t }: { system: UnitSystem; t: PhotoState }) {
       >
         Clear the scale
       </Button>
+      <Text fz="sm">
+        Sizes measured with a caliper give the scale where the photograph has no ruler, and check
+        the ruler where it has. Both together also show a bullet that is tilted or a cut-out that
+        includes a shadow.
+      </Text>
+      <NumberField
+        spec={distanceSpec('Diameter, caliper (optional)')}
+        system={system}
+        value={t.known[0]}
+        onChange={setKnown(0)}
+      />
+      <NumberField
+        spec={distanceSpec('Overall length, caliper (optional)')}
+        system={system}
+        value={t.known[1]}
+        onChange={setKnown(1)}
+      />
     </>
   )
 }

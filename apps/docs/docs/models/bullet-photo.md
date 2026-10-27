@@ -31,6 +31,14 @@ $$
 
 Code: `apps/web/src/lib/bullet-photo.ts`, `scaleOf`.
 
+**Sizes read off a caliper.** The user can also enter the bullet's diameter and overall length, measured with a caliper. Each gives a scale $k_i = \ell_i / L_i$ from the photograph's own measurement $\ell_i$ (px) of that size and its standard uncertainty $u(\ell_i)$, with the caliper's $u(L_i) = 0.02$ mm:
+
+$$
+\frac{u(k_i)}{k_i} = \sqrt{\left(\frac{u(\ell_i)}{\ell_i}\right)^2 + \left(\frac{u(L_i)}{L_i}\right)^2}
+$$
+
+Where the photograph has no ruler points, the scale is the mean of these weighted by $1/(u(k_i)/k_i)^2$, with the same rectangular term for the disagreement of the two as above. Where it has, the ruler's scale is used and each size is a check. A size is flagged when its scale is away from the ruler's (or the two sizes' scales from each other) by more than three standard uncertainties and 2 %. The note gives the difference in percent and names what to check: the scale points, the cut-out, and that the bullet lies flat and square to the camera. A tilted bullet shortens its length and not its diameter, so a flagged pair tells a tilt that the cut-out alone does not. Code: `apps/web/src/lib/bullet-photo-scale.ts`, `resolveScale`.
+
 ### Cut-out
 
 1. The photograph is turned into luma with the weights of [ITU-R BT.601](../bibliography.md#itu-r-bt-601).
@@ -167,20 +175,20 @@ Code: `apps/web/src/lib/bullet-photo-quality.ts`, `outlineHints`; `bullet-photo.
 - Lens distortion is not corrected: a wide-angle lens near its edge distorts lengths. Keep the bullet and the ruler near the middle, with a long focal length.
 - The bullet is a body of revolution, so its silhouette is symmetric about the axis.
 - The bullet differs from the background in brightness (at least 25 grey levels) or, where it does not, in colour.
-- The two points a user places on the ruler are at known graduation marks.
+- The two points a user places on the ruler are at known graduation marks, and a size entered from a caliper is the bullet's own (a diameter of the shank, an overall length from base to tip).
 
 ## Limits
 
 - The mouth of a hollow point is not seen in a side silhouette: it is not measured, the meplat is the width of the rim.
 - A hybrid or other nose that is not a circle arc is not classified: no ogive radius or $R_t/R$ is seeded, and a note says so.
 - A rebated boat tail or a cone that is not straight raises a note; the line fit then represents it poorly.
-- The standard uncertainties include the edge position, the fits and the scale's placement. They do not include the ruler's own error, lens distortion or perspective, and they are not a confidence interval of the real bullet's size: a manufacturing spread among bullets of one product is larger than the measurement uncertainty.
+- The standard uncertainties include the edge position, the fits and the scale's placement. They do not include the ruler's own error, lens distortion or perspective (a caliper size entered with the length and the diameter flags a tilt, not corrects it), and they are not a confidence interval of the real bullet's size: a manufacturing spread among bullets of one product is larger than the measurement uncertainty.
 - The seeded design is a starting point. Its mass and manufacturer stay empty, and the note kept in it says the values are measured from a photograph, with the scale and every value's uncertainty. No image is stored.
 - A shadow beside the bullet is not taken out of the cut-out. It is told by its soft edge, which raises the uncertainty and adds a note; brushing it out of the cut-out measures the bullet alone. A shadow with a sharp edge cannot be told from the bullet.
 - Perspective is not detected: a bullet or a camera tilted so that one end is nearer makes the sides of the shank converge, and no note says so.
 - A reflection that reaches the bullet's edge cuts into the outline there, with no note unless it makes the edge ragged.
 - A photograph of more than 2400 px on its longer side is shrunk to that while it is read.
-- Tested on synthetic photographs rendered from the bullet drawing with known size, lighting gradient, side shading, noise and blur (`apps/web/test/bullet-photo.test.ts`), and with a pale tip, a reflection along the axis, bars along the edges, a colour that differs from the background's at the same brightness, a bullet darker than the paper on one side and brighter on the other, a soft shadow, strong blur, low contrast and a small bullet (`apps/web/test/bullet-photo-quality.test.ts`). For each of these the values are within three uncertainties of the truth, or a note says they may not be, or none are given. Real photographs are unverified.
+- Tested on synthetic photographs rendered from the bullet drawing with known size, lighting gradient, side shading, noise and blur (`apps/web/test/bullet-photo.test.ts`), and with a pale tip, a reflection along the axis, bars along the edges, a colour that differs from the background's at the same brightness, a bullet darker than the paper on one side and brighter on the other, a soft shadow, strong blur, low contrast and a small bullet (`apps/web/test/bullet-photo-quality.test.ts`), and the scale from caliper sizes without a ruler, and their checks against a ruler and each other (`apps/web/test/bullet-photo-scale.test.ts`). For each of these the values are within three uncertainties of the truth, or a note says they may not be, or none are given. Real photographs are unverified.
 
 ## Sources
 
