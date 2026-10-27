@@ -42,7 +42,6 @@ import {
 } from '../lib/firearm.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { countText, filterText, matchesQuery } from '../lib/lists.ts'
-import { originNames, origins, readOrigins } from '../lib/sources.ts'
 import { controlSize } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { copyName } from '../lib/user-file-names.ts'
@@ -59,7 +58,6 @@ import { FileMenu, type FileMenuHandle } from './file-menu.tsx'
 import { DataCard } from './firearm-data-card.tsx'
 import { FirearmEditor } from './firearm-editor.tsx'
 import { LibraryTabs } from './library-tabs.tsx'
-import { SourceFilter } from './list-sources.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
 import { PrintButton } from './record-actions.tsx'
 import { EmptyList, ErrorNote, Loading } from './states.tsx'
@@ -94,11 +92,8 @@ const tableCaption = (named: unknown[]) =>
   named.length > 0 ? `Firearms, ${named.join(', ')}` : 'Firearms in this browser and the example'
 
 /** The filters set, named for the empty list and the caption. */
-const namedFilters = (on: ReturnType<typeof readOrigins>, query: string) =>
-  [
-    on.length < origins.length && on[0] && `${originNames[on[0]]} only`,
-    query.trim() && `matching "${query.trim()}"`,
-  ].filter(Boolean)
+const namedFilters = (query: string) =>
+  [query.trim() && `matching "${query.trim()}"`].filter(Boolean)
 
 type Cells = ReturnType<typeof firearmCells>
 
@@ -318,14 +313,10 @@ const opticNameIn = (f: Firearm) => (id: string) => {
   return f.optics[i]?.name || (i < 0 ? 'Removed optic' : `Optic ${i + 1}`)
 }
 
-/** The listed firearms and the example that the sources and the search keep. */
-function matching(
-  list: FirearmRecord[] | undefined,
-  on: ReturnType<typeof readOrigins>,
-  matches: (r: FirearmRecord) => boolean,
-) {
-  const shown = list?.filter((r) => on.includes('user') && matches(r))
-  const exampleShown = on.includes('openreloading') && matches(example) ? example : undefined
+/** The listed firearms and the example that the search keeps. */
+function matching(list: FirearmRecord[] | undefined, matches: (r: FirearmRecord) => boolean) {
+  const shown = list?.filter(matches)
+  const exampleShown = matches(example) ? example : undefined
   // the browser's firearms first, the example last under the group rule
   const rows = exampleShown ? [...(shown ?? []), exampleShown] : (shown ?? [])
   return { shown, exampleShown, rows }
@@ -616,17 +607,15 @@ export function FirearmLibrary() {
   const newFirearm = () => start(blankFirearm())
   /** An open firearm or the example narrows the list to cards beside it. */
   const compact = editing || viewing
-  // the shared list pattern: search and Source, kept in the URL
+  // the shared list pattern: the search, kept in the URL
   const [filters, setFilters, clearFilters] = useListState()
-  // the example is OpenReloading's, the firearms of this browser are Mine
-  const on = readOrigins(filters.sources)
   const lines = (r: FirearmRecord) => {
     const facts = cardFacts(r.data, system)
     return [cartridgeName(r.data.cartridge), facts.barrel, facts.sight]
   }
   const matches = (r: FirearmRecord) => matchesQuery([r.name, ...lines(r)], filters.query)
-  const { shown, exampleShown, rows } = matching(list, on, matches)
-  const named = namedFilters(on, filters.query)
+  const { shown, exampleShown, rows } = matching(list, matches)
+  const named = namedFilters(filters.query)
   const duplicate = (r: FirearmRecord) => start({ ...r.data, name: copyName(r.data.name) })
   const actionsMenu = (r: FirearmRecord, tabIndex?: number) => (
     <RowActions
@@ -704,13 +693,7 @@ export function FirearmLibrary() {
                 ? undefined
                 : { columns, sort: filters.sort, onSort: (sort) => setFilters({ sort }) }
             }
-          >
-            <SourceFilter
-              src={filters.sources}
-              counts={{ openreloading: 1, user: list?.length ?? 0 }}
-              onChange={(src) => setFilters({ sources: src })}
-            />
-          </DirectoryFilters>
+          />
           {failure && <ErrorNote>{failure}</ErrorNote>}
           <LibraryBody
             readError={readError}

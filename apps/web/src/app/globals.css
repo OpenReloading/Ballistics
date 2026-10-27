@@ -428,7 +428,7 @@ main .home-cards h3 {
   flex: none;
 }
 
-/* the tab bar of Database and My gear, between the page bar and the list */
+/* the tab bar of the Database, between the page bar and the list */
 .library-tabs {
   flex: none;
   margin-bottom: 0.5rem;
@@ -7879,6 +7879,11 @@ main .field-table tr.field-group > th {
 /* the title as heavy as the panel headings */
 .settings-dialog .mantine-Modal-title {
   font-weight: 600;
+}
+
+.your-data {
+  width: 100%;
+  margin: 0;
 }
 
 .settings-foot {

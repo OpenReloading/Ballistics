@@ -1,13 +1,23 @@
 'use client'
 
+import { Button } from '@mantine/core'
 import { toSi } from '@open-reloading/schema'
+import { Plus } from '@phosphor-icons/react'
+import Link from 'next/link'
 import { useDeferredValue, useMemo } from 'react'
-import { type CaseRow, caseMatches } from '../lib/case-rows.ts'
+import { type CaseRow, caseMatches, userCaseRows } from '../lib/case-rows.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { countText, filterText } from '../lib/lists.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import { titleFromKebab } from '../lib/record-fields.ts'
-import type { Origin } from '../lib/sources.ts'
+import {
+  countOrigins,
+  inOrigins,
+  originNames,
+  origins,
+  readOrigins,
+  userRecordId,
+} from '../lib/sources.ts'
 import { formatQuantity, waterVolume } from '../lib/units.ts'
 import {
   type DirectoryColumn,
@@ -16,22 +26,43 @@ import {
   useListState,
 } from './directory-table.tsx'
 import { LibraryTabs } from './library-tabs.tsx'
-import { SourceFilter } from './list-sources.tsx'
+import { DeleteRow, SourceFilter, sourceColumn, useUserRecords } from './list-sources.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
 import { EmptyList } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
 
-/** No user record holds a case: the catalogue is the list's one source, so the filter filters nothing. */
-const caseSources: readonly Origin[] = ['openreloading']
-
-/** The case directory: manufacturer, name, cartridge, material, empty mass and the stated water capacity. */
-export function CaseList({ rows }: { rows: CaseRow[] }) {
+/**
+ * The case directory: manufacturer, name, cartridge, material, empty mass and the stated water
+ * capacity of the catalogue's products, with the user's groups of cases as Mine rows (opened in the
+ * case group editor, whose cartridge names come from `cartridgeNames`, by cartridge id).
+ */
+export function CaseList({
+  rows: catalogue,
+  cartridgeNames,
+}: {
+  rows: CaseRow[]
+  cartridgeNames: Record<string, string>
+}) {
   const { system } = useUnits()
+  const [records, removeRow] = useUserRecords()
+  // the browser's groups first: a few rows would sit unseen behind the catalogue's
+  const rows = useMemo(
+    () => [...userCaseRows(records, new Map(Object.entries(cartridgeNames))), ...catalogue],
+    [records, cartridgeNames, catalogue],
+  )
   const [state, set, clear] = useListState()
   const filters = useDeferredValue(state)
-  const shown = useMemo(() => rows.filter((r) => caseMatches(r, filters.query)), [rows, filters])
+  const counts = useMemo(() => countOrigins(rows), [rows])
+  const shown = useMemo(
+    () => rows.filter((r) => inOrigins(r, filters.sources) && caseMatches(r, filters.query)),
+    [rows, filters],
+  )
   const query = state.query.trim()
-  const named = [query && `matching "${query}"`].filter(Boolean)
+  const on = readOrigins(state.sources)
+  const named = [
+    on.length < origins.length && on[0] && `${originNames[on[0]]} only`,
+    query && `matching "${query}"`,
+  ].filter(Boolean)
   const columns: DirectoryColumn<CaseRow>[] = [
     {
       key: 'manufacturer',
@@ -79,9 +110,17 @@ export function CaseList({ rows }: { rows: CaseRow[] }) {
           ? ''
           : formatQuantity('capacity', system, waterVolume(r.waterCapacity)),
     },
+    ...(counts.user > 0 ? [sourceColumn<CaseRow>(productLabel, removeRow)] : []),
   ]
   const facts = (r: CaseRow) =>
-    [r.manufacturerName, r.cartridgeName, titleFromKebab(r.material)].filter(Boolean).join(' · ')
+    [
+      r.origin === 'user' && originNames.user,
+      r.manufacturerName,
+      r.cartridgeName,
+      titleFromKebab(r.material),
+    ]
+      .filter(Boolean)
+      .join(' · ')
   return (
     <>
       <PageBar
@@ -91,7 +130,14 @@ export function CaseList({ rows }: { rows: CaseRow[] }) {
             {countText(shown.length, rows.length, 'cases')}
           </BarCount>
         }
-        actions={<UnitsIconButton />}
+        actions={
+          <>
+            <Button component={Link} href="/cases/editor" leftSection={<Plus aria-hidden="true" />}>
+              New case group
+            </Button>
+            <UnitsIconButton />
+          </>
+        }
       />
       <LibraryTabs />
       <div className="directory">
@@ -103,8 +149,7 @@ export function CaseList({ rows }: { rows: CaseRow[] }) {
         >
           <SourceFilter
             src={state.sources}
-            counts={{ openreloading: rows.length, user: 0 }}
-            sources={caseSources}
+            counts={counts}
             onChange={(src) => set({ sources: src })}
           />
         </DirectoryFilters>
@@ -112,13 +157,23 @@ export function CaseList({ rows }: { rows: CaseRow[] }) {
           rows={shown}
           columns={columns}
           link="name"
-          href={(r) => `/cases/${r.id}`}
+          href={(r) =>
+            r.origin === 'user'
+              ? `/cases/editor?record=${encodeURIComponent(userRecordId(r.id) ?? r.id)}`
+              : `/cases/${r.id}`
+          }
           facts={facts}
           label={productLabel}
           caption={named.length === 0 ? 'All cases' : `Cases, ${named.join(', ')}`}
           noun="cases"
           sort={state.sort}
           onSort={(sort) => set({ sort })}
+          phoneAction={(r, tabIndex) =>
+            r.origin === 'user' ? (
+              <DeleteRow row={r} name={productLabel(r)} onDelete={removeRow} tabIndex={tabIndex} />
+            ) : null
+          }
+          breakBefore={state.sort ? undefined : (r, previous) => r.origin !== previous.origin}
           empty={<EmptyList noun="cases" filters={filterText(named)} onClear={clear} />}
         />
       </div>

@@ -1,5 +1,6 @@
 /** The workbench loads, tabs and the saved-loads list. */
 import type { UserRecord } from '@open-reloading/schema'
+import { storageName } from './edition.ts'
 import { matchesQuery } from './lists.ts'
 import { copyName } from './user-file-names.ts'
 import { putRecords, storedRecord } from './user-store.ts'
@@ -105,7 +106,7 @@ export function loadGroups(
 /** The saved loads open in the tabs and the one shown, stored in `localStorage` (`openLoads`). */
 type OpenLoads = { ids: string[]; active?: string | undefined }
 
-export const openLoadsKey = 'openLoads'
+export const openLoadsKey = storageName('openLoads')
 
 export const openLoadsText = (set: OpenLoads) => JSON.stringify(set)
 

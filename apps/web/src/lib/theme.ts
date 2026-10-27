@@ -1,7 +1,8 @@
 import { createTheme } from '@mantine/core'
+import { storageName } from './edition.ts'
 
 /** `localStorage` key of the viewer's choice, `light` or `dark`; absent, the system setting applies. */
-export const colorSchemeKey = 'theme'
+export const colorSchemeKey = storageName('theme')
 
 /**
  * Inline `<head>` script: sets `data-mantine-color-scheme` to the stored choice, else the system setting, before the first paint.
