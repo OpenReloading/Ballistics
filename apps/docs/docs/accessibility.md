@@ -19,7 +19,7 @@ An agent drove the app with Playwright and read the browser's accessibility tree
 
 | Item | Value |
 |---|---|
-| Browser | Chromium 156.0.8078.4 (Playwright's headless build), Linux. Firefox 1555 was installed with Playwright but cannot start in the audit container (system libraries `libgtk-3` and others are missing), so no Firefox run was made. Safari was not available |
+| Browser | Chromium 156.0.8078.4 (Playwright's headless build), Linux. Firefox 157.0 (Playwright build 1555) was installed but cannot start in the audit container (system libraries `libgtk-3` and others are missing), so no Firefox run was made. Safari was not available |
 | Assistive technology | none. Keyboard only (Tab, Shift+Tab, arrows, Enter, Space, Escape and the app's own keys), the browser's accessibility tree (`ariaSnapshot`) and live-region observers |
 | Settings and modes | widths 320, 390 and 1280 CSS px, light and dark, text spacing of WCAG 1.4.12 injected, text size 200 %, a 640 px window as 200 % browser zoom, reduced motion, forced colours (Chromium's emulation) |
 | Build | the static sample export of the tree at the date of the audit (`npm run static:build`, `npm run pages:serve`), and a full export for the random sample |
