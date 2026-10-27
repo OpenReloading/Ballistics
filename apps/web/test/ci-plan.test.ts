@@ -56,7 +56,6 @@ it('runs no e2e for unit tests, tools and other workflows, and nothing for prose
     'apps/web/test/api.test.ts',
     'tools/src/load-fit.ts',
     'tools/src/audit.ts',
-    'apps/web/Dockerfile',
     '.github/workflows/release.yml',
     'README.md',
     'apps/docs/docs/models/bullet-fit.md',

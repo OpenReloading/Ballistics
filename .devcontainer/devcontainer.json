@@ -8,6 +8,6 @@
   "dockerComposeFile": "compose.yaml",
   "service": "app",
   "workspaceFolder": "${localWorkspaceFolder}",
-  "forwardPorts": [3000, 3001, 5432],
+  "forwardPorts": [3000, 3003],
   "postCreateCommand": "npm ci && cd apps/e2e && npx playwright install --only-shell chromium"
 }
