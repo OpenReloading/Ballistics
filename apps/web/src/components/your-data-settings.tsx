@@ -3,6 +3,7 @@
 import { Text } from '@mantine/core'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { errorText } from '../lib/error-text.ts'
 import { storedRecords } from '../lib/user-store.ts'
 import { yourDataRows } from '../lib/your-data.ts'
@@ -15,6 +16,8 @@ import { ErrorNote, Loading } from './states.tsx'
  */
 export function YourDataForm({ onNavigate }: { onNavigate: () => void }) {
   const [rows, setRows] = useState<ReturnType<typeof yourDataRows>>()
+  const { t } = useTranslation()
+  // the reason only: the sentence around it is built when shown, in the language shown
   const [failure, setFailure] = useState('')
   useEffect(() => {
     let live = true
@@ -23,7 +26,7 @@ export function YourDataForm({ onNavigate }: { onNavigate: () => void }) {
       (e) => {
         if (!live) return
         setRows(yourDataRows([]))
-        setFailure(`The browser's records could not be read: ${errorText(e)}`)
+        setFailure(errorText(e))
       },
     )
     return () => {
@@ -33,18 +36,22 @@ export function YourDataForm({ onNavigate }: { onNavigate: () => void }) {
   return (
     <>
       <Text size="sm" c="dimmed">
-        What you keep in this browser. A row opens its list with your records.
+        {t('What you keep in this browser. A row opens its list with your records.')}
       </Text>
-      {failure && <ErrorNote>{failure}</ErrorNote>}
+      {failure && (
+        <ErrorNote>
+          {t("The browser's records could not be read: {reason}", { reason: failure })}
+        </ErrorNote>
+      )}
       {rows === undefined ? (
         <Loading what="your data" rows={2} />
       ) : (
         <table className="your-data">
           <thead>
             <tr>
-              <th scope="col">Records</th>
+              <th scope="col">{t('Records')}</th>
               <th scope="col" className="num">
-                Yours
+                {t('Yours')}
               </th>
             </tr>
           </thead>
@@ -53,7 +60,7 @@ export function YourDataForm({ onNavigate }: { onNavigate: () => void }) {
               <tr key={r.kind}>
                 <th scope="row">
                   <Link href={r.href} onClick={onNavigate}>
-                    {r.label}
+                    {t(r.label)}
                   </Link>
                 </th>
                 <td className="num">{r.count}</td>

@@ -2,6 +2,7 @@
 
 import { Button, Stack } from '@mantine/core'
 import { useEffect, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import {
   type FieldSpec,
   type Fields,
@@ -50,6 +51,7 @@ const barrelHelp = (system: UnitSystem) =>
 /** The workbench defaults of the settings dialog: one field per default, stored at once when valid, and a reset. */
 export function WorkbenchDefaultsForm() {
   const { system, ready } = useUnits()
+  const { t } = useTranslation()
   const [stored, setStored] = useState<WorkbenchDefaults>()
   const [fields, setFields] = useState<Fields>({})
   const [errors, setErrors] = useState<Record<string, string | undefined>>({})
@@ -137,7 +139,9 @@ export function WorkbenchDefaultsForm() {
                 : undefined
             }
             mark={
-              key === 'barrelLength' ? undefined : `Cited default: ${citedDefaults[key].source}.`
+              key === 'barrelLength'
+                ? undefined
+                : t('Cited default: {source}.', { source: citedDefaults[key].source })
             }
             onChange={(v) => change(key, v)}
           />
@@ -150,7 +154,7 @@ export function WorkbenchDefaultsForm() {
         disabled={defaultsText(stored) === undefined}
         onClick={reset}
       >
-        Reset to cited defaults
+        {t('Reset to cited defaults')}
       </Button>
     </Stack>
   )
