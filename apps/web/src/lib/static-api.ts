@@ -38,7 +38,7 @@ const listKinds = new Set([
 ])
 const searchKinds = new Set(['cartridges', 'bullets', 'powders', 'cases', 'primers'])
 const recordId = /^[a-z0-9]+(-[a-z0-9]+)*$/
-/** The forwarding route's cap on a compute body (`src/app/api/[...path]/route.server.ts`). */
+/** A compute body above this many bytes is refused with 413: an interior body is under 1 KiB, so the cap keeps a pasted file out of the Worker. */
 const maxBody = 64 * 1024
 
 const answer = (status: number, body: unknown) => Response.json(body, { status })
@@ -280,7 +280,24 @@ function failure(error: unknown, signal: AbortSignal | undefined) {
 
 /** `apiFetch` of the Pages edition: GET from the data files, POST from the compute worker. */
 export async function staticFetch(path: string, init?: RequestInit): Promise<Response> {
-  const res = await (init?.method === 'POST' ? post(path, init) : get(path))
-  if (init?.signal?.aborted) throw init.signal.reason
+  const signal = init?.signal ?? undefined
+  if (signal?.aborted) throw signal.reason
+  const answered = init?.method === 'POST' ? post(path, init) : get(path)
+  // an abort settles this caller at once; the data file read it waits for is shared and keeps going
+  let onAbort: (() => void) | undefined
+  const aborted =
+    signal &&
+    new Promise<never>((_, reject) => {
+      onAbort = () => reject(signal.reason)
+      signal.addEventListener('abort', onAbort, { once: true })
+    })
+  let res: Response
+  try {
+    res = await (aborted ? Promise.race([answered, aborted]) : answered)
+  } finally {
+    // a signal reused across calls keeps no listener of a settled one
+    if (signal && onAbort) signal.removeEventListener('abort', onAbort)
+  }
+  if (signal?.aborted) throw signal.reason
   return res
 }

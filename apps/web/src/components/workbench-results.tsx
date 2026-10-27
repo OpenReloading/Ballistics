@@ -332,14 +332,12 @@ function RunLine({
   identity,
   status,
   echoed,
-  online,
   warnings,
 }: {
   ok: Extract<Outcome, { kind: 'ok' }> | undefined
   identity: string[] | undefined
   status: string
   echoed: boolean
-  online: boolean
   warnings: { text: string; name?: string | undefined }[] | undefined
 }) {
   return (
@@ -361,15 +359,6 @@ function RunLine({
       >
         {status}
       </p>
-      {!online && (
-        <span
-          id="run-network-hint"
-          className="run-hint"
-          title="The interior simulation runs on the server"
-        >
-          Needs the network
-        </span>
-      )}
       <span className="notice-text screen-only">
         <NavIcon name="safety" size={14} />
         Simulation, not load data
@@ -628,7 +617,6 @@ export const ResultsArea = memo(function ResultsArea() {
     setTab,
     setSeen,
     status,
-    online,
     pending,
   } = useResult()
   const next = todo.findIndex((s) => !s.done)
@@ -680,7 +668,6 @@ export const ResultsArea = memo(function ResultsArea() {
             identity={identity}
             status={status}
             echoed={echoed}
-            online={online}
             warnings={warnings}
           />
           {/* the results list with the chosen powder's burn rate beside it; an error in their place */}

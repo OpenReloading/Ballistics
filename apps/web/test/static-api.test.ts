@@ -32,7 +32,7 @@ beforeAll(async () => {
   api = await startBundleApi()
   dir = await mkdtemp(path.join(tmpdir(), 'static-api-'))
   await writeStaticApi(api.data, dir)
-  // the data files as a static host serves them under the server edition's base path ''
+  // the data files as a static host serves them at the site root
   vi.stubGlobal('fetch', async (url: string) => {
     const file = path.join(dir, url.replace(/^\/api\//, ''))
     try {
@@ -340,6 +340,34 @@ describe('the Pages edition computes as the API', () => {
     } finally {
       vi.stubGlobal('fetch', online)
     }
+  })
+
+  it('settles a record read when its signal aborts while the data file is pending', async () => {
+    const online = globalThis.fetch
+    vi.stubGlobal('fetch', () => new Promise<Response>(() => {}))
+    try {
+      const abort = new AbortController()
+      const read = staticFetch('powders/stalled-powder', { signal: abort.signal })
+      const outcome = expect(read).rejects.toMatchObject({ name: 'AbortError' })
+      abort.abort()
+      await outcome
+    } finally {
+      vi.stubGlobal('fetch', online)
+    }
+  })
+
+  it('leaves no abort listener on a signal after the call settles', async () => {
+    const abort = new AbortController()
+    const added = vi.spyOn(abort.signal, 'addEventListener')
+    const removed = vi.spyOn(abort.signal, 'removeEventListener')
+    const res = await staticFetch('interior', {
+      method: 'POST',
+      body: 'x'.repeat(64 * 1024 + 1),
+      signal: abort.signal,
+    })
+    expect(res.status).toBe(413)
+    expect(added).toHaveBeenCalledTimes(1)
+    expect(removed).toHaveBeenCalledWith('abort', added.mock.calls[0]?.[1])
   })
 
   it('refuses a body above 64 KiB with 413', async () => {

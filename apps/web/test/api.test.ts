@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 
 vi.mock('next/cache', () => ({ cacheLife: () => {} }))
-const { listAllBullets, buildPlaceholderId, staticIds } = await import('../src/lib/api.ts')
+const { listAllBullets, staticIds } = await import('../src/lib/api.ts')
 
 const offsets: number[] = []
 
@@ -20,7 +20,6 @@ function serve(total: number, failAt = -1) {
 
 beforeEach(() => {
   offsets.length = 0
-  vi.stubEnv('NEXT_PHASE', 'phase-production-build')
   vi.stubEnv('PRERENDER', '')
 })
 afterEach(() => {
@@ -42,35 +41,19 @@ it('stops after 50 pages', async () => {
   expect(r.status === 'ok' && r.data.length).toBe(10_000)
 })
 
-it('fails the whole list when one page fails, and the detail routes fall back to the placeholder', async () => {
+it('fails the whole list when one page fails, and so the detail routes of the build', async () => {
   serve(1684, 400)
-  expect(await listAllBullets()).toEqual({ status: 'unavailable' })
-  vi.spyOn(console, 'warn').mockImplementation(() => {})
-  expect(await staticIds(listAllBullets, 'bullet')).toEqual([{ id: buildPlaceholderId }])
+  await expect(listAllBullets()).rejects.toThrow('API answered 500')
+  await expect(staticIds(listAllBullets, 'bullet')).rejects.toThrow('API answered 500')
   serve(2)
   expect(await staticIds(listAllBullets, 'bullet')).toEqual([{ id: 'b-0' }, { id: 'b-1' }])
 })
 
-it('prerenders the sample ids only with PRERENDER=sample, else every id', async () => {
+it('cuts the cartridge pages only with PRERENDER=sample', async () => {
   serve(1684)
   vi.stubEnv('PRERENDER', 'sample')
-  expect(await staticIds(listAllBullets, 'bullet')).toEqual([{ id: 'b-0' }])
-  vi.stubEnv('PRERENDER', 'full')
+  expect(await staticIds(listAllBullets, 'cartridge')).toEqual([{ id: 'b-0' }])
   expect(await staticIds(listAllBullets, 'bullet')).toHaveLength(1684)
-})
-
-it('cuts the cartridge pages of the Pages edition with PRERENDER=sample, and fails without the API', async () => {
-  vi.stubEnv('NEXT_PUBLIC_PAGES_BASE_PATH', '')
-  vi.resetModules()
-  const pages = await import('../src/lib/api.ts')
-  serve(1684)
-  vi.stubEnv('PRERENDER', 'sample')
-  expect(await pages.staticIds(pages.listAllBullets, 'cartridge')).toEqual([{ id: 'b-0' }])
-  expect(await pages.staticIds(pages.listAllBullets, 'bullet')).toHaveLength(1684)
   vi.stubEnv('PRERENDER', 'full')
-  expect(await pages.staticIds(pages.listAllBullets, 'cartridge')).toHaveLength(1684)
-  serve(1684, 400)
-  await expect(pages.staticIds(pages.listAllBullets, 'bullet')).rejects.toThrow(
-    'API unavailable at build: no bullet pages',
-  )
+  expect(await staticIds(listAllBullets, 'cartridge')).toHaveLength(1684)
 })

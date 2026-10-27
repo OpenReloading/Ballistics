@@ -5,13 +5,7 @@ import { FieldTable } from '../../../components/field-table.tsx'
 import { Panel } from '../../../components/panel.tsx'
 import { RecordPage } from '../../../components/record-page.tsx'
 import { ServerDataError } from '../../../components/states.tsx'
-import {
-  buildPlaceholderId,
-  getManufacturerNames,
-  getPrimer,
-  listAllPrimers,
-  staticIds,
-} from '../../../lib/api.ts'
+import { getManufacturerNames, getPrimer, listAllPrimers, staticIds } from '../../../lib/api.ts'
 import { productLabel } from '../../../lib/manufacturers.ts'
 import { primerRowGroups, primerStrip } from '../../../lib/record-fields.ts'
 
@@ -21,7 +15,6 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps<'/primers/[id]'>): Promise<Metadata> {
   const { id } = await params
-  if (id === buildPlaceholderId) notFound()
   const r = await getPrimer(id)
   if (r.status === 'notFound') notFound()
   if (r.status !== 'ok') return { robots: { index: false } }
@@ -36,7 +29,6 @@ export async function generateMetadata({ params }: PageProps<'/primers/[id]'>): 
 // no Suspense above notFound(): a streamed response keeps status 200
 export default async function PrimerPage({ params }: PageProps<'/primers/[id]'>) {
   const { id } = await params
-  if (id === buildPlaceholderId) notFound()
   const r = await getPrimer(id)
   if (r.status === 'notFound') notFound()
   if (r.status !== 'ok') return <ServerDataError what="Primer" />

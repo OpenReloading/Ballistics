@@ -17,7 +17,6 @@ import {
 import { Bug } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import web from '../../package.json'
-import { pagesBasePath } from '../lib/edition.ts'
 import {
   type ReportArea,
   type ReportBlock,
@@ -86,7 +85,6 @@ function useContextNow(opened: boolean, route: string): ReportContext | undefine
       title: document.title,
       ...(record && { record: { ...record, ...(name && { name }) } }),
       version: web.version,
-      edition: pagesBasePath === undefined ? 'server' : 'Pages',
       userAgent: navigator.userAgent,
       window: `${window.innerWidth} x ${window.innerHeight}`,
       colourScheme: scheme,

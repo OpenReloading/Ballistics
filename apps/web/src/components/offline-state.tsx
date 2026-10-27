@@ -4,7 +4,6 @@ import { Button, Code, EmptyState, Group } from '@mantine/core'
 import { type Icon, MagnifyingGlass, WifiSlash } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { type ReactNode, useSyncExternalStore } from 'react'
-import { pagesBasePath } from '../lib/edition.ts'
 import { openSiteSearch } from './search-host.ts'
 
 const none = () => () => {}
@@ -66,9 +65,7 @@ export function OfflineState({ links }: { links: PageLinks }) {
         <>
           The page {/* a space-holder before hydration keeps the line height */}
           <Code>{address || ' '}</Code> was not opened on this device before, so it is not stored.
-          {pagesBasePath === undefined
-            ? 'The session summary, shot groups, your own records and the pages you opened before work without the network.'
-            : 'The tools, your own records and the pages you opened before work without the network.'}
+          The tools, your own records and the pages you opened before work without the network.
         </>
       }
       action={<Button onClick={() => window.location.reload()}>Retry</Button>}

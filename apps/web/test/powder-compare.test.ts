@@ -17,6 +17,11 @@ import {
 } from '../src/lib/powder-compare.ts'
 import { defined } from './defined.ts'
 
+// these tests stub `fetch` as the API's own answers: the browser's calls go to it as written, in place of the data files and the compute worker
+vi.mock('../src/lib/static-api.ts', () => ({
+  staticFetch: (path: string, init?: RequestInit) => fetch(`/api/${path}`, init),
+}))
+
 afterEach(() => {
   vi.useRealTimers()
   vi.unstubAllGlobals()

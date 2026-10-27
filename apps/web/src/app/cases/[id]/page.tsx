@@ -7,7 +7,6 @@ import { Panel } from '../../../components/panel.tsx'
 import { RecordPage } from '../../../components/record-page.tsx'
 import { ServerDataError } from '../../../components/states.tsx'
 import {
-  buildPlaceholderId,
   getCase,
   getManufacturerNames,
   listAllCartridges,
@@ -26,7 +25,6 @@ const idOf = (ref: string) => ref.slice(ref.indexOf(':') + 1)
 
 export async function generateMetadata({ params }: PageProps<'/cases/[id]'>): Promise<Metadata> {
   const { id } = await params
-  if (id === buildPlaceholderId) notFound()
   const r = await getCase(id)
   if (r.status === 'notFound') notFound()
   if (r.status !== 'ok') return { robots: { index: false } }
@@ -44,7 +42,6 @@ export async function generateMetadata({ params }: PageProps<'/cases/[id]'>): Pr
 // no Suspense above notFound(): a streamed response keeps status 200
 export default async function CasePage({ params }: PageProps<'/cases/[id]'>) {
   const { id } = await params
-  if (id === buildPlaceholderId) notFound()
   const r = await getCase(id)
   if (r.status === 'notFound') notFound()
   if (r.status !== 'ok') return <ServerDataError what="Case" />

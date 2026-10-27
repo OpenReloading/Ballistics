@@ -1,8 +1,7 @@
 /**
  * Decides which CI jobs a run needs and how much of the web app it builds, from the files changed
  * since a base commit. Prints `check=true|false` (lint, build, types and unit tests), `e2e=true|false`
- * (the API's conformance run and the e2e tests on the static export), `web=true|false` (build the web
- * app: the `e2e` job always builds the export it tests, so only a local run reads this) and
+ * (the API's conformance run and the e2e tests on the static export) and
  * `prerender=full|sample` (every record page or the cartridge sample of `src/lib/prerender-sample.ts`)
  * as lines for $GITHUB_OUTPUT; the reason goes to stderr.
  *
@@ -21,7 +20,7 @@ import path from 'node:path'
 const webRoot = path.join(import.meta.dirname, '..')
 const repoRoot = path.join(webRoot, '../..')
 
-/** Files whose change needs a build of the web app (`web=true`). */
+/** Files whose change feeds the web build: without one, only the checks and the jobs of `e2eInputs` run. */
 const webInputs = [
   /^apps\/web\//,
   /^packages\/(schema|importers|core|drawing|data|api)\//,
@@ -135,7 +134,6 @@ export function recordClosure(root = repoRoot) {
 export type Plan = {
   check: boolean
   e2e: boolean
-  web: boolean
   prerender: 'full' | 'sample'
   reason: string
 }
@@ -143,7 +141,6 @@ export type Plan = {
 const everything = (reason: string): Plan => ({
   check: true,
   e2e: true,
-  web: true,
   prerender: 'full',
   reason,
 })
@@ -155,7 +152,6 @@ export function plan(all: string[], closure = recordClosure()): Plan {
     return {
       check: false,
       e2e: false,
-      web: false,
       prerender: 'sample',
       reason: 'only prose changed',
     }
@@ -165,7 +161,6 @@ export function plan(all: string[], closure = recordClosure()): Plan {
     return {
       check: true,
       e2e,
-      web: false,
       prerender: 'sample',
       reason: 'no changed file feeds the web build',
     }
@@ -214,7 +209,6 @@ function argument(name: string) {
 const nothingChanged: Plan = {
   check: false,
   e2e: false,
-  web: false,
   prerender: 'sample',
   reason: 'nothing changed since the recorded build',
 }
@@ -222,7 +216,7 @@ const nothingChanged: Plan = {
 function settle(p: Plan, stamped: boolean, built: string): Plan {
   if (argument('--require') === 'full' && p.prerender === 'sample') p.prerender = 'full'
   // an earlier sample build does not stand in for a full one
-  if (stamped && !p.web && p.prerender === 'full' && built !== 'full')
+  if (stamped && p.prerender === 'full' && built !== 'full')
     return everything('the earlier build is a sample')
   return p
 }
@@ -264,7 +258,7 @@ if (import.meta.main) {
     writeFileSync(stamp, `${git('rev-parse', 'HEAD').trim()} ${mode}\n`)
   } else {
     const p = decide()
-    const out = `check=${p.check}\ne2e=${p.e2e}\nweb=${p.web}\nprerender=${p.prerender}`
+    const out = `check=${p.check}\ne2e=${p.e2e}\nprerender=${p.prerender}`
     console.log(out)
     console.error(`ci-plan: ${out.replaceAll('\n', ' ')}: ${p.reason}`)
   }

@@ -6,7 +6,7 @@ import type { ErrorBody, InteriorResponse, PowderSummary } from './api-types.ts'
 
 /** Answers of a busy pool (503) are asked again this often before the powder counts as failed. */
 const busyRetries = 5
-/** A request that has not answered after this many ms counts as failed (the proxy gives up at 15 s). */
+/** A request that has not answered after this many ms counts as failed (a ladder answers within 15 s, `ladderBudgetMs` of the API). */
 export const requestTimeout = 20_000
 
 const records = new Map<string, Powder>()

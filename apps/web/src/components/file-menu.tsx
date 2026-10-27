@@ -848,7 +848,6 @@ function InvalidItem({ record: r, onDelete }: { record: InvalidRecord; onDelete:
 /**
  * The page bar's Open menu (the browser's records, a file, Import, Paste JSON, the page's examples)
  * and Save with its menu (Save as, share link, JSON, Export all, the optional workspace folder).
- * The same in every edition.
  */
 function FileMenuOf<K extends UserRecordKind>({
   kind,

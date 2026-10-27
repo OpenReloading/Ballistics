@@ -47,7 +47,7 @@ it('builds nothing when no changed file feeds the web build', () => {
     ],
     closure,
   )
-  expect(p).toMatchObject({ check: true, e2e: true, web: false, prerender: 'sample' })
+  expect(p).toMatchObject({ check: true, e2e: true, prerender: 'sample' })
 })
 
 it('runs no e2e for unit tests, tools and other workflows, and nothing for prose alone', () => {
@@ -68,8 +68,8 @@ it('runs no e2e for unit tests, tools and other workflows, and nothing for prose
     '.github/ISSUE_TEMPLATE/bug.yml',
     '.github/pull_request_template.md',
   ])
-    expect(plan([f], closure), f).toMatchObject({ check: false, e2e: false, web: false })
-  expect(plan(['compose.yaml'], closure)).toMatchObject({ check: true, e2e: true, web: false })
+    expect(plan([f], closure), f).toMatchObject({ check: false, e2e: false })
+  expect(plan(['compose.yaml'], closure)).toMatchObject({ check: true, e2e: true })
 })
 
 it('runs the e2e job for the scripts that build and serve the export', () => {
@@ -79,16 +79,14 @@ it('runs the e2e job for the scripts that build and serve the export', () => {
     'tools/src/pages-payload.ts',
     'tools/src/executable.ts',
   ])
-    expect(plan([f], closure), f).toMatchObject({ check: true, e2e: true, web: false })
+    expect(plan([f], closure), f).toMatchObject({ check: true, e2e: true })
 })
 
 it('builds with the sample when the web app changed outside the record pages', () => {
   expect(plan(['apps/web/src/components/workbench.tsx'], closure)).toMatchObject({
-    web: true,
     prerender: 'sample',
   })
   expect(plan(['apps/web/src/app/layout.tsx'], closure)).toMatchObject({
-    web: true,
     prerender: 'sample',
   })
 })
@@ -110,13 +108,12 @@ it('prerenders every record when record data, page code or shared parts changed'
     expect(plan(['README.md', f], closure), f).toMatchObject({
       check: true,
       e2e: true,
-      web: true,
       prerender: 'full',
     })
 })
 
 it('falls back to a full build when the change list is empty', () => {
-  expect(plan([], closure)).toMatchObject({ check: true, e2e: true, web: true, prerender: 'full' })
+  expect(plan([], closure)).toMatchObject({ check: true, e2e: true, prerender: 'full' })
 })
 
 const run = (env: Record<string, string>, ...args: string[]) =>
@@ -126,7 +123,7 @@ const run = (env: Record<string, string>, ...args: string[]) =>
   }).toString()
 
 it('is full unless the event is a pull request with a base commit that exists', () => {
-  const full = 'check=true\ne2e=true\nweb=true\nprerender=full\n'
+  const full = 'check=true\ne2e=true\nprerender=full\n'
   expect(run({ EVENT_NAME: 'push', BASE_SHA: 'HEAD' })).toBe(full)
   expect(run({ EVENT_NAME: 'release', BASE_SHA: 'HEAD' })).toBe(full)
   expect(run({})).toBe(full)

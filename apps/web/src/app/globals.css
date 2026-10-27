@@ -900,7 +900,7 @@ td.nowrap {
 }
 
 .run-hint {
-  /* the width of "Needs the network", so a network change moves nothing after it */
+  /* a fixed width: the shortcut's label differs by platform, and the loader after it stays in place */
   min-width: 9.5em;
   color: var(--muted);
   font-size: var(--mantine-font-size-sm);
@@ -2994,12 +2994,6 @@ main .library-head.page-panel-head > .page-panel-title {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.run-line > .run-hint {
-  flex: none;
-  margin-left: auto;
-  color: var(--muted);
 }
 
 .burn-rate p {

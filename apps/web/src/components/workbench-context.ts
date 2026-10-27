@@ -93,7 +93,6 @@ export type ResultState = {
   showChart: (copy: SVGSVGElement | undefined) => void
   /** The run's status line; the Run button sits in the page bar. */
   status: string
-  online: boolean
 }
 export const ResultContext = createContext<ResultState | null>(null)
 
