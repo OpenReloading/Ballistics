@@ -284,12 +284,20 @@ export async function staticFetch(path: string, init?: RequestInit): Promise<Res
   if (signal?.aborted) throw signal.reason
   const answered = init?.method === 'POST' ? post(path, init) : get(path)
   // an abort settles this caller at once; the data file read it waits for is shared and keeps going
+  let onAbort: (() => void) | undefined
   const aborted =
     signal &&
     new Promise<never>((_, reject) => {
-      signal.addEventListener('abort', () => reject(signal.reason), { once: true })
+      onAbort = () => reject(signal.reason)
+      signal.addEventListener('abort', onAbort, { once: true })
     })
-  const res = await (aborted ? Promise.race([answered, aborted]) : answered)
+  let res: Response
+  try {
+    res = await (aborted ? Promise.race([answered, aborted]) : answered)
+  } finally {
+    // a signal reused across calls keeps no listener of a settled one
+    if (signal && onAbort) signal.removeEventListener('abort', onAbort)
+  }
   if (signal?.aborted) throw signal.reason
   return res
 }

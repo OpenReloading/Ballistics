@@ -356,6 +356,20 @@ describe('the Pages edition computes as the API', () => {
     }
   })
 
+  it('leaves no abort listener on a signal after the call settles', async () => {
+    const abort = new AbortController()
+    const added = vi.spyOn(abort.signal, 'addEventListener')
+    const removed = vi.spyOn(abort.signal, 'removeEventListener')
+    const res = await staticFetch('interior', {
+      method: 'POST',
+      body: 'x'.repeat(64 * 1024 + 1),
+      signal: abort.signal,
+    })
+    expect(res.status).toBe(413)
+    expect(added).toHaveBeenCalledTimes(1)
+    expect(removed).toHaveBeenCalledWith('abort', added.mock.calls[0]?.[1])
+  })
+
   it('refuses a body above 64 KiB with 413', async () => {
     const res = await staticFetch('interior', { method: 'POST', body: 'x'.repeat(64 * 1024 + 1) })
     expect(res.status).toBe(413)
