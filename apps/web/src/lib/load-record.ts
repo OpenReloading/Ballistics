@@ -145,6 +145,8 @@ export interface LoadParts {
   capacity?: string | undefined
   /** The case product of the catalogue the load names, a reference: its stated capacity is the default of `capacity`. */
   caseRecord?: string | undefined
+  /** The catalogue primer the load names, a reference. */
+  primerRecord?: string | undefined
   /** m. */
   seating?: { by: 'overallLength' | 'baseToOgive'; value: number } | undefined
   ladder?:
@@ -209,19 +211,18 @@ export function toLoad(p: LoadParts): Load {
     note: p.notes || undefined,
     analysis: analysisOf(overrides, ladder),
     sessions: p.sessions.length > 0 ? [...p.sessions] : undefined,
-    ...lotsOf(p.lots),
+    powderLot: p.lots?.powder.trim() || undefined,
+    primer: primerOf(p.primerRecord, p.lots),
     case: caseOf(p.caseRecord, p.lots),
     snapshots: p.snapshots?.length ? [...p.snapshots] : undefined,
   }
 }
 
-/** The lots typed, as the load's fields; a lot left empty is left out. */
-function lotsOf(lots: Lots | undefined) {
-  const [powder, primer] = [lots?.powder.trim(), lots?.primer.trim()]
-  return {
-    powderLot: powder || undefined,
-    primer: primer ? { lot: primer } : undefined,
-  }
+/** The load's `primer`: the primer record chosen and the primer lot typed; none when neither is set. */
+function primerOf(record: string | undefined, lots: Lots | undefined): Load['primer'] {
+  const lot = lots?.primer.trim()
+  if (!record && !lot) return undefined
+  return { ...(record && { record }), ...(lot && { lot }) } as NonNullable<Load['primer']>
 }
 
 /** The load's `case`: the case record chosen and the case lot typed; none when neither is set. */
@@ -256,6 +257,7 @@ export function toApiLoad(
     firearm: undefined,
     capacity: undefined,
     caseRecord: undefined,
+    primerRecord: undefined,
     ladder: charge ? p.ladder : undefined,
     sessions: [],
     lots: undefined,

@@ -980,6 +980,8 @@ const carriedRecords = (
   ...(powderId && carried.powder && { powder: { ...carried.powder, id: powderId } }),
 })
 
+/** The `catalogue:` reference of a record id, none for no id. */
+const catalogueRefIn = (id: string | undefined) => (id ? catalogueRef(id) : undefined)
 const catalogueIdIn = (ref: unknown) => (typeof ref === 'string' ? catalogueIdOf(ref) : undefined)
 
 /** The id of a firearm of this browser's library, from a load's firearm reference. */
@@ -1374,6 +1376,8 @@ export function useWorkbenchState() {
   const [capacityChoice, setCapacityChoice] = useState<{ cartridge: string; id: string }>()
   /** The catalogue case record the user chose in the Cartridge card, kept for the cartridge it belongs to. */
   const [caseChoice, setCaseChoice] = useState<{ cartridge: string; id: string }>()
+  /** The id of the catalogue primer the user chose in the Cartridge card's More. */
+  const [primerChoice, setPrimerChoice] = useState<string>()
   /** The user's cases of this browser, and the group of them the user chose for the cartridge it belongs to. */
   const [cases, setCases] = useState<OwnCase[]>([])
   const [ownCaseChoice, setOwnCaseChoice] = useState<{ cartridge: string; id: string }>()
@@ -1613,6 +1617,7 @@ export function useWorkbenchState() {
     setMeasuredFor(undefined)
     setCapacityChoice(undefined)
     setCaseChoice(undefined)
+    setPrimerChoice(undefined)
     setOwnCaseChoice(undefined)
     openingCapacity.current = undefined
     measuredFromGroup.current = false
@@ -2483,6 +2488,7 @@ export function useWorkbenchState() {
     if (userCartridge) openCartridgeDesign(userCartridge)
     if (d.capacity) openCapacity(d.capacity, d.cartridge)
     openCase(d.case?.record, d.cartridge)
+    setPrimerChoice(catalogueIdIn(d.primer?.record))
     openBullet(d.bullet, !typed.has('bulletMass'))
     openPowder(d.powder, typed)
     setNotes(d.note ?? '')
@@ -2698,6 +2704,7 @@ export function useWorkbenchState() {
     capacity: capacityRef,
     caseRecord:
       (chosenOwnCase && userRefOf(chosenOwnCase)) || (chosenCase && catalogueRef(chosenCase)),
+    primerRecord: catalogueRefIn(primerChoice),
     seating,
     ladder: ladderPartOf(ladderSteps, ladderKind, activeStep.si, direction),
     sessions: sessionRefs,
@@ -2884,6 +2891,8 @@ export function useWorkbenchState() {
     setCapacityChoice: chooseCapacity,
     caseId: chosenCase,
     setCaseChoice: chooseCase,
+    primerId: primerChoice,
+    setPrimerChoice,
     ownCases: cartridgeCases,
     ownCaseId: chosenOwnCase,
     chooseOwnCase,

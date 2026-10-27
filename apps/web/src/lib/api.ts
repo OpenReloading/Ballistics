@@ -2,6 +2,7 @@ import type {
   Bullet,
   CatalogueCase,
   Powder,
+  Primer,
   TargetFace,
   TargetMapping,
 } from '@open-reloading/schema'
@@ -15,6 +16,7 @@ import type {
   ListOf,
   ManufacturerSummary,
   PowderSummary,
+  PrimerSummary,
 } from './api-types.ts'
 import { API_PREFIX } from './api-version.ts'
 import type { CaliberClassSummary, DisciplineRecord, FederationRecord } from './disciplines.ts'
@@ -69,6 +71,7 @@ async function listAll<T>(path: string): Promise<Fetched<T[]>> {
 export const listAllCartridges = () => listAll<CartridgeSummary>('/cartridges')
 export const listAllBullets = () => listAll<BulletSummary>('/bullets')
 export const listAllPowders = () => listAll<PowderSummary>('/powders')
+export const listAllPrimers = () => listAll<PrimerSummary>('/primers')
 export const listAllCases = () => listAll<CaseSummary>('/cases')
 
 /** Every manufacturer; none while the API is unavailable at build. */
@@ -89,6 +92,7 @@ const getOne =
 export const getCartridge = getOne<CartridgeDetail>('/cartridges')
 export const getBullet = getOne<Bullet>('/bullets')
 export const getPowder = getOne<Powder>('/powders')
+export const getPrimer = getOne<Primer>('/primers')
 export const getCase = getOne<CatalogueCase>('/cases')
 export const getTargetFace = getOne<TargetFace>('/target-faces')
 export const getTargetMapping = getOne<TargetMapping>('/target-mappings')

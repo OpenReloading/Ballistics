@@ -65,6 +65,10 @@
         "/cases": {
           "initial": 408999,
           "total": 457018
+        },
+        "/primers": {
+          "initial": 414490,
+          "total": 459954
         }
       }
     },
@@ -105,6 +109,10 @@
         "/cases/[id]": {
           "initial": 416980,
           "total": 464999
+        },
+        "/primers/[id]": {
+          "initial": 422493,
+          "total": 467957
         }
       }
     },
@@ -175,8 +183,8 @@
       },
       "routes": {
         "/workbench": {
-          "initial": 612322,
-          "total": 947192
+          "initial": 607230,
+          "total": 957935
         }
       }
     }

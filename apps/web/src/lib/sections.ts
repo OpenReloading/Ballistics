@@ -42,6 +42,11 @@ export const databaseTabs: readonly LibraryTab[] = [
       'Cartridge case products with material, primer pocket and stated water capacity, each with its sources.',
   },
   {
+    href: '/primers',
+    label: 'Primers',
+    description: 'Primer products with size, cup and priming compound, each with its sources.',
+  },
+  {
     href: '/targets',
     label: 'Targets',
     description:
@@ -107,7 +112,7 @@ export const sections = [
         label: 'Database',
         icon: 'database',
         description:
-          'The published records, each with its source: cartridges, bullets, powders, cases, target faces and disciplines.',
+          'The published records, each with its source: cartridges, bullets, powders, cases, primers, target faces and disciplines.',
         tabs: databaseTabs,
         covers: ['/federations'],
       },

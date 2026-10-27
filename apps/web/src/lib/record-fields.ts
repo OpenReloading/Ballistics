@@ -3,6 +3,7 @@ import {
   type Case,
   leadFree,
   type Powder,
+  type Primer,
   type QuantityValue,
   toSi,
 } from '@open-reloading/schema'
@@ -581,6 +582,44 @@ export function caseStrip(c: Case, manufacturerName?: string): StripItem[] {
     ...item('material', 'Material', text('Material', titleFromKebab(c.material))),
     ...item('mass', 'Mass', stored('mass', 'g')('Mass', c.mass)),
     ...item('capacity', 'Water capacity', capacityRow(c)),
+  ]
+}
+
+/**
+ * The primer strip: manufacturer (`manufacturerName`), size and priming compound; only what the
+ * record has.
+ */
+export function primerStrip(p: Primer, manufacturerName?: string): StripItem[] {
+  const item = (icon: StripItem['icon'], label: string, rows: FieldRow[]): StripItem[] =>
+    rows[0] ? [{ icon, label, row: rows[0] }] : []
+  return [
+    ...item('manufacturer', 'Manufacturer', text('Manufacturer', manufacturerName || undefined)),
+    ...item('form', 'Size', text('Size', titleFromKebab(p.size))),
+    ...item(
+      'material',
+      'Priming compound',
+      text('Priming compound', p.compound && titleFromKebab(p.compound)),
+    ),
+  ]
+}
+
+/**
+ * The groups of a primer page's Properties table: product number, magnum flag, cup metal and
+ * thickness, intended use and the published figures, each as the source prints it. Manufacturer,
+ * size and compound are the cards of `primerStrip`.
+ */
+export function primerRowGroups(p: Primer): FieldGroup[] {
+  return [
+    {
+      rows: [
+        ...text('Product number', p.productNumber),
+        ...text('Magnum', p.magnum === undefined ? undefined : p.magnum ? 'Yes' : 'No'),
+        ...text('Cup material', p.cup?.material && titleFromKebab(p.cup.material)),
+        ...length('Cup thickness', p.cup?.thickness),
+        ...text('Intended use', p.intendedUse),
+        ...(p.performance ?? []).flatMap((f) => text(f.property, f.value)),
+      ],
+    },
   ]
 }
 

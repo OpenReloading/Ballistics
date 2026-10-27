@@ -327,6 +327,26 @@ describe('the measured case capacity of a load', () => {
     expect(toApiLoad(base, { cartridge: 'catalogue:308-win' }).case).toBeUndefined()
   })
 
+  it('names a primer record next to the lot, keeps both through a saved file and refuses the older text', () => {
+    const base = parts({
+      cartridge: 'catalogue:308-win',
+      primerRecord: 'catalogue:demo-primer-large-rifle',
+      lots: { powder: '', primer: 'R1', case: '' },
+    })
+    const l = toLoad(base)
+    expect(l.primer).toEqual({ record: 'catalogue:demo-primer-large-rifle', lot: 'R1' })
+    const reopened = loadSchema.parse(JSON.parse(JSON.stringify(l)))
+    expect(reopened.primer).toEqual(l.primer)
+    expect(toLoad(parts({ lots: { powder: '', primer: 'R1', case: '' } })).primer).toEqual({
+      lot: 'R1',
+    })
+    expect(toLoad(parts({})).primer).toBeUndefined()
+    expect(toApiLoad(base, { cartridge: 'catalogue:308-win' }).primer).toBeUndefined()
+    expect(
+      loadSchema.safeParse({ ...l, primer: { manufacturer: 'catalogue:m', model: 'LR' } }).success,
+    ).toBe(false)
+  })
+
   it('has an id of one measurement: same value, same record, another value another one', () => {
     const id = measuredCapacityId(cartridge, m3)
     expect(userId.safeParse(id).success).toBe(true)

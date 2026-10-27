@@ -62,6 +62,7 @@ const recordRoutes = [
   'bullets',
   'powders',
   'cases',
+  'primers',
   'targets',
   'disciplines',
   'federations',
