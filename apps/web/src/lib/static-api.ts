@@ -1,5 +1,5 @@
 /**
- * The API of the Pages edition, in the browser. Reads answer from the data files the Pages build
+ * The API of the static site, in the browser. Reads answer from the data files the Pages build
  * writes under `<base>/api/` (`writeStaticApi` of `@open-reloading/api/static`): lists from the
  * catalogue over `catalogue/index.json`, the code the API's routes run, and records from
  * `<kind>/<id>.json`. `POST interior` and
@@ -278,7 +278,7 @@ function failure(error: unknown, signal: AbortSignal | undefined) {
   return refusal(500, 'Internal Server Error', 'internal server error')
 }
 
-/** `apiFetch` of the Pages edition: GET from the data files, POST from the compute worker. */
+/** `apiFetch` of the static site: GET from the data files, POST from the compute worker. */
 export async function staticFetch(path: string, init?: RequestInit): Promise<Response> {
   const signal = init?.signal ?? undefined
   if (signal?.aborted) throw signal.reason

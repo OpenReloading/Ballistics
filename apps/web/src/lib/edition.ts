@@ -4,8 +4,8 @@ import { editionName } from './offline.ts'
 export const basePath = process.env.NEXT_PUBLIC_PAGES_BASE_PATH ?? ''
 
 /**
- * `'next'` in the Pages edition built from `main` (`PAGES_EDITION`), else `''`: the stable edition at the
- * site root. Both Pages editions share one origin and so one browser store.
+ * `'next'` in the next edition of the site, built from `main` (`PAGES_EDITION`), else `''`: the stable
+ * edition at the site root. Both editions share one origin and so one browser store.
  */
 const edition = process.env.NEXT_PUBLIC_PAGES_EDITION ?? ''
 

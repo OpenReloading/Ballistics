@@ -1,5 +1,5 @@
 /**
- * The API over the catalogue of the data bundle, and the data files the web app's Pages edition
+ * The API over the catalogue of the data bundle, and the data files the web app
  * serves instead of an API (`@open-reloading/api/static`, used at build time only).
  */
 import { mkdir, writeFile } from 'node:fs/promises'
@@ -49,7 +49,7 @@ function recordAnswer(catalogue: Catalogue, kind: CatalogueKind, id: string) {
 }
 
 /**
- * Writes the data files of the Pages edition under `dir`: `catalogue/index.json` (the catalogue
+ * Writes the data files of the static site under `dir`: `catalogue/index.json` (the catalogue
  * index, which the browser opens with `openCatalogue` and answers every list from) and
  * `<kind>/<id>.json` for each record, the body of the API's `GET /<kind>/<id>`.
  */
