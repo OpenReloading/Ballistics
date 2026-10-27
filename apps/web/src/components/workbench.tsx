@@ -35,6 +35,7 @@ import { mmLength, shownLength } from '../lib/workbench.ts'
 import { BarrelTable } from './barrel-length.tsx'
 import { ChargeTargetDialog } from './charge-target-dialog.tsx'
 import { FileMenu } from './file-menu.tsx'
+import { focusBack } from './focus-back.ts'
 import { preloadInteriorChart } from './lazy-chart.tsx'
 import { LoadSheets, printSheets } from './load-sheets.tsx'
 import { LoadTabs } from './load-tabs.tsx'
@@ -918,6 +919,14 @@ export function Workbench() {
   const designRows = useMemo(() => userBulletRows(designs), [designs])
 
   useIdlePreload(fresh)
+  // the cards replace the start card, and with it the button the visitor pressed
+  const wasFresh = useRef(fresh)
+  useEffect(() => {
+    const replaced = wasFresh.current && !fresh
+    wasFresh.current = fresh
+    if (replaced && document.activeElement === document.body)
+      focusBack('.panel[data-next] :is(input, button)', '.panel :is(input, button)')
+  }, [fresh])
 
   const ok = outcome?.kind === 'ok' ? outcome : undefined
   const stale = Boolean(ok && changed)
@@ -1257,7 +1266,11 @@ export function Workbench() {
             />
             <SavedLoads
               opened={listOpen}
-              onClose={() => setListOpen(false)}
+              onClose={() => {
+                setListOpen(false)
+                // the menu item that opened it is gone: Open is the way back, or Page actions
+                focusBack('.file-menu button', '.page-bar button[aria-label="Page actions"]')
+              }}
               tick={storedTick}
               openIds={tabs.openIds}
               onOpen={tabs.openRecord}

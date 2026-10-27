@@ -58,7 +58,7 @@ The sixth process of the evaluation plan (design a target, save, use it as the f
 
 ## Findings
 
-Severity: blocker is a failure of a Level A criterion in the gated scope. Major is a failure of a Level AA criterion. Minor is everything else, including checks without a success criterion and failures that depend on how a criterion is read. Counts: 1 blocker (fixed), 5 major (1 fixed), 7 minor.
+Severity: blocker is a failure of a Level A criterion in the gated scope. Major is a failure of a Level AA criterion. Minor is everything else, including checks without a success criterion and failures that depend on how a criterion is read. Counts: 2 blockers (both fixed), 5 major (1 fixed), 6 minor.
 
 | Id | Severity | Criterion | Page and state | Evidence | Status |
 |---|---|---|---|---|---|
@@ -68,7 +68,7 @@ Severity: blocker is a failure of a Level A criterion in the gated scope. Major 
 | A-04 | major | 1.4.12 Text Spacing (AA) | Workbench at 1280 px with the spacing of the criterion applied; groups; designers at 320 px | Labels cut with an ellipsis: "Usable case v...", "Powder temper...", "Ladder steps...", "Diameter x le...", "Ballistic coeffi..."; the readout bar and the result head are cut; the tabs Groups and Notes move into More. On the shot groups the Set and Clear button labels are clipped by 3 px; at 320 px the labels of the bullet, powder and target designers are cut. In the random sample the record page's title (and a cartridge's alias badge) is cut in 3 of 106 pages at 1280 px or 320 px. The full text stays in each control's accessible name | Open. Workaround: a wider window or a lower browser zoom |
 | A-05 | major | 1.4.13 Content on Hover or Focus (AA) | Tooltips of buttons and symbols (record page symbols such as Pmax, sidebar and header icon buttons) | Escape dismisses them and they stay while hovered (4 s), but moving the pointer from the trigger onto the tooltip closes it, so it is not hoverable. The chart tooltip passes: it ignores the pointer and Escape hides it | Open. Workaround: the same text is the control's name or description for assistive technology and for the keyboard focus; a magnifier user can keep the pointer on the trigger |
 | A-06 | minor | none of its own; 1.4.1 and 1.4.11 read under forced colours | Workbench in forced colours: segmented controls (COAL and CBTO, Charge, Seating and Temperature, Up, Down and Around, Cartridge, Chamber and Combined, the chart's series and axis toggles) | Chromium's forced-colours emulation removes the selected segment's fill, and no border or mark remains, so the selected value cannot be seen. The selected tab keeps its underline. The controls expose their state to assistive technology | Open. No visual workaround under forced colours |
-| A-07 | minor | 2.4.3 Focus Order (A) as an advisory | Workbench start card, Saved loads drawer, photo tool | Focus falls to the start of the page after choosing a cartridge or "Try the example load" (the start card is replaced), after closing Saved loads with Escape (its opener, a menu item, is gone) and after closing the photo tool with Escape although its button still exists. The focus order itself is in reading order everywhere else | Open. Workaround: Tab from the start, the skip links "Skip to content" and "Skip to results" |
+| A-07 | blocker | 2.4.3 Focus Order (A) | Workbench start card, Saved loads drawer, photo tool | Focus falls to the start of the page after choosing a cartridge or "Try the example load" (the start card is replaced), after closing Saved loads with Escape (its opener, a menu item, is gone) and after closing the photo tool with Escape although its button still exists. The focus order itself is in reading order everywhere else | Fixed: the focus goes to the first control of the load form after the start card is replaced, back to Open (or Page actions below 75em) after Saved loads closes and back to From a photo (or Page actions) after the photo tool closes. It was a Level A failure in the gated scope, so a blocker for 1.0. `focus-return.spec.ts` |
 | A-08 | minor | 3.3.1 wording | Workbench, status line after a refused run | The status text is "The API answered 422." although the browser app has no server, and it is announced | Open. The error panel (A-01) states the fault |
 | A-09 | minor | 1.4.11 Non-text Contrast (AA) | Workbench chart, light theme | Rendered pixels: pressure line 3.20:1, velocity 4.42:1, energy 3.22:1 against white; one colour of the chart measured 2.78:1 (47 px of about 200,000, most likely the fainter lines of the other ladder steps). Dark theme: 4.66:1, 4.97:1, 5.31:1, no colour under 4.7:1 | Open. The Ladder table tab lists every step |
 | A-10 | minor | none (axe best practice `region`) | An open tooltip, for example the sidebar's Search button focused on a record page | The tooltip is outside every landmark | Open |
@@ -91,7 +91,7 @@ The random sample (106 pages, 424 states) found one failure type that the struct
 
 ## Known list
 
-Open findings with the reason they are not fixed yet and the way round them. The Level A failure found in the gated scope (A-01) is fixed.
+Open findings with the reason they are not fixed yet and the way round them. The two Level A failures found in the gated scope (A-01 and A-07) are fixed.
 
 | Id | Why it stays | Workaround |
 |---|---|---|
@@ -100,7 +100,6 @@ Open findings with the reason they are not fixed yet and the way round them. The
 | A-05 | The tooltip component of the UI library cannot be hovered; a fix replaces it with a hover card in about 40 places | The text is the accessible name or description |
 | A-13 | The note buttons sit in the table's symbol column and are text-sized by design; a fix gives them a 24 px target or moves the note into the cell | The note is the button's description; arrow keys move between the symbols |
 | A-06 | The segmented control draws its selected state with a fill only; a forced-colours rule for its indicator is not written | Selected state through assistive technology |
-| A-07 | The focus return needs a decision per dialog and menu | Skip links; Tab from the start |
 | A-08 to A-12 | Minor; wording, one chart colour, the title bar and a status message | See each row |
 
 ## Not covered by this audit
@@ -132,7 +131,7 @@ Set up: a release candidate build, a fresh browser profile (so the Safety dialog
 
 1. Open the app. The Safety dialog is announced as a dialog with its name. Tab cycles between Decline and I accept and never leaves the dialog. Press Enter on I accept.
 2. Read the home page: one heading level 1, the Tools and Library regions, the links with their purpose (NVDA: H to walk the headings, D the landmarks. VoiceOver: rotor, Headings and Landmarks).
-3. Open the Load workbench link. On the start card press Try the example load. Where does the focus go? (Known: the start of the page.)
+3. Open the Load workbench link. On the start card press Try the example load. Where does the focus go? (Expected: the first field of the load form.)
 4. Tab to Charge mass, press Control+Enter. Listen for "Simulating", then "Simulation done" with the peak pressure and velocity, without the focus moving.
 5. Read the result tiles and list. Each value has its label and unit.
 6. Reach the chart by Tab. It is announced as an image with a name and a description. Tab to its readout slider and press the arrow keys: each press speaks time, travel, pressure, velocity, energy and the burnt share. Press Home and End.
@@ -165,7 +164,7 @@ Set up: a release candidate build, a fresh browser profile (so the Safety dialog
 3. Tab to the photograph. It is announced as an application named "Photograph of the bullet", with the description of its keys. Switch the screen reader to the mode it needs for applications (NVDA: it switches by itself; VoiceOver: interact with VO+Shift+Down).
 4. Press the arrow keys, then Enter: "Point C placed." is announced. Press Control with an arrow for a large step and Shift for one pixel. Choose the Brush: add tool and press Enter: "Added to the bullet." is announced.
 5. Press Open in designer. The length field holds the measured value.
-6. Press Escape in an open photo tool: where does the focus go? (Known: the start of the page.)
+6. Press Escape in an open photo tool: where does the focus go? (Expected: the From a photo button.)
 
 ### 5. Range mode on a phone width
 
