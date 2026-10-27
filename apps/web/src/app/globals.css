@@ -9781,6 +9781,14 @@ main .page-bar h1 {
   }
 }
 
+/* the bar ends --top-end before the window's edge, so below 22.5em the panel would reach past the
+   window's left edge: it ends 0.5rem before the window's edge instead */
+@media screen and (max-width: 22.5em) {
+  .page-bar .page-bar-actions {
+    right: calc(0.5rem - var(--top-end));
+  }
+}
+
 /* from 75em the bar sits in the top bar between the wordmark's column and the theme switch: its
    title starts where the content starts, and the bar is centred in the 56 px band with 8 px above
    and below */

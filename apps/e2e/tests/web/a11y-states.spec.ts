@@ -181,6 +181,16 @@ const states: State[] = [
     },
   },
   {
+    name: 'Page actions',
+    open: async (page, check) => {
+      await gotoHydrated(page, '/workbench')
+      // from 75em the bar shows its actions without the panel
+      const toggle = page.getByRole('button', { name: 'Page actions' }).locator('visible=true')
+      if (await toggle.count()) await toggle.click()
+      await check('panel', '.page-bar')
+    },
+  },
+  {
     name: 'Choose a bullet',
     open: async (page, check) => {
       await gotoHydrated(page, '/workbench?cartridge=308-win')
@@ -221,3 +231,14 @@ for (const width of widths)
         })
         expect(found).toEqual([])
       })
+
+for (const width of [320, 390]) {
+  test(`the Page actions panel is inside the window at ${width} px`, async ({ page }) => {
+    await page.setViewportSize({ width, height })
+    await gotoHydrated(page, '/workbench')
+    await page.getByRole('button', { name: 'Page actions' }).click()
+    const box = await page.locator('.page-bar-actions').boundingBox()
+    expect(box?.x).toBeGreaterThanOrEqual(0)
+    expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(width)
+  })
+}
