@@ -10,7 +10,7 @@ const off = 1e-6
 
 /** A face of the given rings (value, width, height or shape) and the extras of one test. */
 function faceOf(
-  rings: { value: number; w: number; h?: number; shape?: 'circle' | 'square' }[],
+  rings: { value: number; w: number; h?: number; shape?: 'circle' | 'square' | 'stadium' }[],
   extra: Partial<TargetFace> = {},
 ): TargetFace {
   return {
@@ -95,6 +95,76 @@ describe('scoreShot on an oval face', () => {
       expect(scoreShot(oval, shot(x, y), 2 * (gap + 1e-3) * mm).value).toBe(9)
       expect(scoreShot(oval, shot(x, y), 2 * (gap - 1e-3) * mm).value).toBe(0)
     }
+  })
+})
+
+describe('scoreShot on a stadium face', () => {
+  // 9: 100 wide, 160 high (half circle ends of radius 50 about y = +-30); 10: 40 wide, 100 high,
+  // its inner ten 20 wide and 60 high
+  const stadium = faceOf(
+    [
+      { value: 9, w: 100, h: 160, shape: 'stadium' },
+      { value: 10, w: 40, h: 100, shape: 'stadium' },
+    ],
+    { innerTen: { diameter: mmq(20), height: mmq(60), rule: 'touch' } },
+  )
+
+  it('counts a hole centre on the straight sides and the ends as inside', () => {
+    // the straight side holds for every height up to the end of the straight part
+    for (const y of [0, 15, 30, -30]) expect(scoreShot(stadium, shot(50, y), 0).value).toBe(9)
+    expect(scoreShot(stadium, shot(0, 80), 0).value).toBe(9)
+    expect(scoreShot(stadium, shot(0, -80), 0).value).toBe(9)
+    // 45 degrees on the end half circle: 50 cos 45 = 35.355 across, 30 + 35.355 up
+    const k = 50 * Math.SQRT1_2
+    expect(scoreShot(stadium, shot(k, 30 + k), 0).value).toBe(9)
+    expect(scoreShot(stadium, shot(-k, -30 - k), 0).value).toBe(9)
+  })
+
+  it('misses just outside the straight sides and the ends', () => {
+    for (const y of [0, 30, -30]) expect(scoreShot(stadium, shot(50 + off, y), 0).value).toBe(0)
+    expect(scoreShot(stadium, shot(0, 80 + off), 0).value).toBe(0)
+    const k = 50 * Math.SQRT1_2
+    expect(scoreShot(stadium, shot(k + off, 30 + k + off), 0).value).toBe(0)
+  })
+
+  it('is not the ellipse of the same width and height', () => {
+    // the ellipse of 100 by 160 leaves this point out; the stadium holds it
+    expect(scoreShot(stadium, shot(48, 25), 0).value).toBe(9)
+  })
+
+  it('takes the nearest inner ring on the straight part and on the end', () => {
+    expect(scoreShot(stadium, shot(20, 10), 0).value).toBe(10)
+    expect(scoreShot(stadium, shot(20 + off, 10), 0).value).toBe(9)
+    expect(scoreShot(stadium, shot(0, 50), 0).value).toBe(10)
+    expect(scoreShot(stadium, shot(0, 50 + off), 0).value).toBe(9)
+  })
+
+  it('adds the hole radius to the straight sides and round the ends', () => {
+    const hole = 4 * mm
+    expect(scoreShot(stadium, shot(52, 0), hole).value).toBe(9)
+    expect(scoreShot(stadium, shot(52 + off, 0), hole).value).toBe(0)
+    expect(scoreShot(stadium, shot(0, 82), hole).value).toBe(9)
+    expect(scoreShot(stadium, shot(0, 82 + off), hole).value).toBe(0)
+    // a hole beside the end reaches the half circle at its radius from the circle's centre (0, 30)
+    const k = 52 * Math.SQRT1_2
+    expect(scoreShot(stadium, shot(k, 30 + k), hole).value).toBe(9)
+    expect(scoreShot(stadium, shot(k + off, 30 + k + off), hole).value).toBe(0)
+  })
+
+  it('scores the inner ten as a stadium by touch', () => {
+    expect(scoreShot(stadium, shot(10, 0), 0).innerTen).toBe(true)
+    expect(scoreShot(stadium, shot(10, 20), 0).innerTen).toBe(true)
+    expect(scoreShot(stadium, shot(10 + off, 20), 0).innerTen).toBe(false)
+    expect(scoreShot(stadium, shot(0, 30), 0).innerTen).toBe(true)
+    expect(scoreShot(stadium, shot(0, 30 + off), 0).innerTen).toBe(false)
+    // inside the ring 10 but outside the inner ten
+    expect(scoreShot(stadium, shot(15, 20), 0)).toEqual({ value: 10, innerTen: false })
+  })
+
+  it('refuses ring marks like any non-circular face', () => {
+    expect(() => faceAlignment(stadium, [{ ring: 9, x: 0.05, y: 0 }], undefined)).toThrow(
+      'Ring marks fit circular rings',
+    )
   })
 })
 

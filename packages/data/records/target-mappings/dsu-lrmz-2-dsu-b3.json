@@ -1,0 +1,17 @@
+{
+  "id": "dsu-lrmz-2-dsu-b3",
+  "discipline": "dsu-lrmz-2",
+  "face": "dsu-b3",
+  "event": "lrmz-2-repetier-mehrdistanz-100-m-zielfernrohr-dot",
+  "shotCount": 30,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 39, PDF p. 97",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

@@ -20,6 +20,12 @@ import { defined, missing } from './defined.ts'
 import { replaceUntilStable } from './markup.ts'
 import { sheetRecord } from './records.ts'
 
+// the list renders its tab bar, which reads the route and the router
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/cartridges',
+  useRouter: () => ({ push: () => {} }),
+}))
+
 // the units of the Settings, as a test sets them: `useUnits` reads this preset
 const settings = vi.hoisted(() => ({ preset: 'metric-grams' as PresetId }))
 vi.mock('../src/components/units-settings.tsx', async (original) => ({

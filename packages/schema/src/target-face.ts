@@ -41,7 +41,10 @@ const targetFaceFields = z.object({
   /**
    * Outer to inner; values rise by one ring to ring. `diameter` is the width of the ring; for an
    * oval ring `height` is its height (axis-aligned, the face upright; absent: a circle). A
-   * `square` ring has the edge `diameter` and no `height` (absent: a circle).
+   * `square` ring has the edge `diameter` and no `height` (absent: a circle). A `stadium` ring has
+   * straight vertical sides and a half circle of the radius `diameter / 2` at each end, so its
+   * `height` is at least its `diameter`; a face has stadium rings on all rings or on none, and its
+   * inner ten and black area are stadiums too.
    * `fill` is the colour of the zone that the ring line bounds on the outside (the area up to the
    * next ring, for the innermost ring the whole disc), `line` the colour of the ring line.
    */
@@ -51,7 +54,7 @@ const targetFaceFields = z.object({
         value: z.int().positive(),
         diameter: positiveLength(),
         height: positiveLength().optional(),
-        shape: z.enum(['circle', 'square']).optional(),
+        shape: z.enum(['circle', 'square', 'stadium']).optional(),
         fill: faceColour.optional(),
         line: faceColour.optional(),
       }),
@@ -160,6 +163,7 @@ function checkRings(f: z.infer<typeof targetFaceFields>, issue: Issue) {
     if (r.shape === 'square' && r.height) issue(['rings', i, 'height'], 'a square has no height')
   })
   if (oval > 0 && oval < f.rings.length) issue(['rings'], 'height on all rings or on none')
+  checkStadium(f, issue)
   if (f.decimal && (oval > 0 || f.rings.some((r) => r.shape === 'square')))
     issue(['decimal'], 'tenth-ring values need circular rings')
   if (f.innerTen?.height && f.innerTen.rule === 'cover')
@@ -171,6 +175,26 @@ function checkRings(f: z.infer<typeof targetFaceFields>, issue: Issue) {
     if (r.height && outer?.height && r.height.value >= outer.height.value)
       issue(['rings', i, 'height'], 'must be below the ring outside it')
   })
+}
+
+/** Stadium rings on all rings, each with its height, the inner ten a stadium too. */
+function checkStadium(f: z.infer<typeof targetFaceFields>, issue: Issue) {
+  const stadiums = f.rings.filter((r) => r.shape === 'stadium').length
+  if (stadiums === 0) return
+  if (stadiums < f.rings.length) issue(['rings'], 'stadium on all rings or on none')
+  f.rings.forEach((r, i) => {
+    if (r.shape !== 'stadium') return
+    if (!r.height) issue(['rings', i, 'height'], 'a stadium needs a height')
+    else if (r.height.value < r.diameter.value)
+      issue(['rings', i, 'height'], 'a stadium is at least as high as it is wide')
+  })
+  const { innerTen } = f
+  if (innerTen && !innerTen.height)
+    issue(['innerTen', 'height'], 'a stadium inner ten needs a height')
+  else if (innerTen?.height && innerTen.height.value < innerTen.diameter.value)
+    issue(['innerTen', 'height'], 'a stadium is at least as high as it is wide')
+  if (f.blackHeight && f.blackHeight.value < f.blackDiameter.value)
+    issue(['blackHeight'], 'a stadium is at least as high as it is wide')
 }
 
 /** Event ids are unique within the face. */

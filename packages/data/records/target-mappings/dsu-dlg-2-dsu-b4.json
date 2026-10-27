@@ -1,0 +1,17 @@
+{
+  "id": "dsu-dlg-2-dsu-b4",
+  "discipline": "dsu-dlg-2",
+  "face": "dsu-b4",
+  "event": "dlg-2-luftgewehr-50-25",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 5, Seite 8, PDF p. 152",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

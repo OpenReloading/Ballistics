@@ -129,6 +129,32 @@ describe('targetFace extended geometry', () => {
     expectIssueAt(targetFace, faceWith({ blackHeight: mm(26) }), 'rings')
   })
 
+  it('accepts stadium rings on all rings, each at least as high as wide, with a stadium inner ten', () => {
+    const stadium = [40, 26, 12].map((height, i) => ({
+      ...rings[i],
+      height: mm(height),
+      shape: 'stadium',
+    }))
+    const innerTen = { diameter: mm(5), height: mm(8), rule: 'touch' }
+    expect(ok({ rings: stadium, innerTen }).success).toBe(true)
+    expectIssueAt(targetFace, faceWith({ rings: [stadium[0], rings[1], rings[2]] }), 'rings')
+    const flat = [{ ...stadium[0], height: mm(15) }, stadium[1], stadium[2]]
+    expectIssueAt(targetFace, faceWith({ rings: flat }), 'rings.0.height')
+    const noHeight = [{ ...rings[0], shape: 'stadium' }, rings[1], rings[2]]
+    expectIssueAt(targetFace, faceWith({ rings: noHeight }), 'rings')
+    expectIssueAt(
+      targetFace,
+      faceWith({ rings: stadium, innerTen: { diameter: mm(5) } }),
+      'innerTen.height',
+    )
+    expectIssueAt(
+      targetFace,
+      faceWith({ rings: stadium, innerTen: { ...innerTen, height: mm(4) } }),
+      'innerTen.height',
+    )
+    expectIssueAt(targetFace, faceWith({ rings: stadium, decimal: true }), 'decimal')
+  })
+
   it('accepts a square ring and refuses a square with a height', () => {
     const square = [{ ...rings[0], shape: 'square' }, rings[1], rings[2]]
     expect(ok({ rings: square }).success).toBe(true)

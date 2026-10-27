@@ -1,0 +1,18 @@
+{
+  "id": "dsu-lper-1-dsu-b5-precision",
+  "discipline": "dsu-lper-1",
+  "face": "dsu-b5-precision",
+  "event": "lper-1-zielfernrohrgewehr-praezision-100-m",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 31, PDF p. 89",
+        "fields": ["discipline", "face", "event", "shotCount"],
+        "note": "20 scoring shots on 4 sheets of 5; 5 sighting shots on a separate sheet are not counted."
+      }
+    ]
+  }
+}

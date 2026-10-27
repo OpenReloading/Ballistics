@@ -14,6 +14,7 @@ const kindLabel = (k: Optic['kind']) => opticKinds.find((o) => o.value === k)?.l
 export function DataCard({
   f,
   cartridge,
+  landsBullet,
   manufacturer,
   system,
   opticName,
@@ -21,6 +22,8 @@ export function DataCard({
 }: {
   f: Firearm
   cartridge?: string | undefined
+  /** The name of the bullet the lands contact was measured with. */
+  landsBullet?: string | undefined
   /** The name of the maker, `f.manufacturer` resolved. */
   manufacturer?: string | undefined
   system: UnitSystem
@@ -38,6 +41,7 @@ export function DataCard({
       const si = fieldSi(s, f[s.key])
       return [s.label, si === undefined ? undefined : withUnit(s.quantity, system, si)]
     }),
+    ['Bullet of the lands contact', landsBullet],
     ['Notes', f.notes || undefined],
   ]
   const opt = (si: number | undefined, q: FieldSpec['quantity']) =>

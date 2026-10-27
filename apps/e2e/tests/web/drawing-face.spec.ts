@@ -184,7 +184,7 @@ test('the record sheet prints on one A4 page; other prints keep the browser page
   await page.goto('/cartridges/308-win')
   await page
     .getByRole('navigation', { name: 'Main' })
-    .getByRole('link', { name: 'Firearms', exact: true })
+    .getByRole('link', { name: 'My gear', exact: true })
     .click()
   await expect(page).toHaveURL(/\/firearms$/)
   expect((await sizes())[0]).toEqual([612, 792])

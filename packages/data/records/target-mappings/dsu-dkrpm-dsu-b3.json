@@ -1,0 +1,18 @@
+{
+  "id": "dsu-dkrpm-dsu-b3",
+  "discipline": "dsu-dkrpm",
+  "face": "dsu-b3",
+  "event": "dkrpm-repetier-luftpistole-mehrdistanz",
+  "stage": "Linke und rechte Scheibe",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 5, Seiten 5 bis 6, PDF pp. 149 to 150",
+        "fields": ["discipline", "face", "event", "stage"],
+        "note": "Left and right sheet, three series of 5 shots on each. The 35 shots are 7 series of 5; the middle sheet is on b4."
+      }
+    ]
+  }
+}

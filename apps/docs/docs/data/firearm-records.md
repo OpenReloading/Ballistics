@@ -24,7 +24,7 @@ No source found can be imported in bulk: every source with firearm models, barre
 - `manufacturer` has `id`, `name`, `website`, `aliases` and `provenance`, and is documented as a maker of powders or bullets (`packages/schema/src/manufacturer.ts:11`, [Manufacturers](manufacturers.md)). Powder and bullet records reference it by id. Demo records use an invented name and a source of `synthetic-test-data`.
 - No field of `packages/core/src` or `packages/schema/src` mentions a gas port or gas system (search for `gas port`, `gasPort`, `gas system`). It has no effect on any computed quantity.
 - Sight height lives on the optic mount, not on the gun. A catalogue gun cannot supply it unless the record includes optic and mount.
-- `freebore` and `baseToOgiveAtLands` of the user firearm (`firearm.ts`) are measured values of one barrel. No source of the table below was seen to print them, so the catalogue does not carry them.
+- `freebore`, `baseToOgiveAtLands` and `overallLengthAtLands` of the user firearm (`firearm.ts`) are measured values of one barrel. The two lands lengths need `landsBullet`, the reference to the bullet they were measured with; the workbench uses them for the jump only with that bullet. No source of the table below was seen to print them, so the catalogue does not carry them.
 
 ## Recommended schema
 

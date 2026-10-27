@@ -130,18 +130,26 @@ describe('findFace on drawn faces', () => {
         expect(Math.abs(fit.pxPerMm / local - 1)).toBeLessThan(0.01)
       })
 
-  it('never offers a face with photoSearch false, also on a photo of that face', () => {
-    const skipped = faces.filter((f) => f.photoSearch === false)
+  const skipped = faces.filter((f) => f.photoSearch === false)
+  it('has faces with photoSearch false', () => {
     expect(skipped.length).toBeGreaterThan(0)
-    // a skipped copy of a face the search finds: the record itself is found, the copy never
-    const face = faceById('issf-25m-rapid-fire-pistol')
-    const copy = { ...face, id: 'skipped-copy', photoSearch: false }
-    for (const f of [...skipped, copy]) {
-      const found = findFace(render(scene(f, defined(views[0]))).image, [...faces, copy])
+  })
+
+  // one test per face: each renders and searches a whole photo
+  for (const f of skipped)
+    it(`never offers ${f.id}, which has photoSearch false, on a photo of it`, () => {
+      const found = findFace(render(scene(f, defined(views[0]))).image, faces)
       const ids = [...found.fits.map((x) => x.face.id), ...found.ranked.map((x) => x.id)]
       expect(ids).not.toContain(f.id)
-      if (f === copy) expect(found.fits[0]?.face.id).toBe(face.id)
-    }
+    })
+
+  it('never offers a skipped copy of a face the search finds, which finds the record itself', () => {
+    const face = faceById('issf-25m-rapid-fire-pistol')
+    const copy = { ...face, id: 'skipped-copy', photoSearch: false }
+    const found = findFace(render(scene(copy, defined(views[0]))).image, [...faces, copy])
+    const ids = [...found.fits.map((x) => x.face.id), ...found.ranked.map((x) => x.id)]
+    expect(ids).not.toContain(copy.id)
+    expect(found.fits[0]?.face.id).toBe(face.id)
   })
 
   it('rectifies: under tilt the black ellipse centre is off by millimetres, the fit centre is not', () => {

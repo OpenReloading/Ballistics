@@ -1,0 +1,18 @@
+{
+  "id": "dsu-k-36-dsu-b2",
+  "discipline": "dsu-k-36",
+  "face": "dsu-b2",
+  "event": "k-36-kurzwaffe-36",
+  "shotCount": 45,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 2, Seite 21, PDF p. 53",
+        "fields": ["discipline", "face", "event", "shotCount"],
+        "note": "Three sheets side by side, 45 shots on the rings; the time credit or deduction is not a shot."
+      }
+    ]
+  }
+}

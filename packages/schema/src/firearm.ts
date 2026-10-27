@@ -133,6 +133,12 @@ export const firearm = z
     baseToOgiveAtLands: length()
       .describe('Cartridge base to ogive with the bullet touching the lands, measured.')
       .optional(),
+    overallLengthAtLands: length()
+      .describe('Cartridge overall length with the bullet touching the lands, measured.')
+      .optional(),
+    landsBullet: ref('bullet')
+      .describe('Reference to the bullet the lands contact was measured with.')
+      .optional(),
     firearmMass: quantity('mass', z.number().positive())
       .describe('Mass of the firearm.')
       .optional(),
@@ -153,6 +159,15 @@ export const firearm = z
     active: localId.describe('Id of the configuration on the firearm now.').optional(),
   })
   .superRefine((f, ctx) => {
+    if (
+      (f.baseToOgiveAtLands !== undefined || f.overallLengthAtLands !== undefined) &&
+      f.landsBullet === undefined
+    )
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Name the bullet the lands contact was measured with',
+        path: ['landsBullet'],
+      })
     const optics = f.optics.map((o) => o.id)
     const configs = f.configurations.map((c) => c.id)
     unique(optics, (i) => ['optics', i, 'id'], ctx)

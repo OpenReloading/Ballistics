@@ -52,13 +52,15 @@ Muzzle-loading disciplines carry no caliber classes: the classes group cartridge
 `records/target-mappings/<id>.json`, schema `targetMapping`. One record per face event:
 
 - the discipline, the face and the id of the face event that scores it
-- where the rule book states them: the `stage` (a discipline with a precision and a rapid-fire part has one mapping per face), the scoring `gauge` and the number of record shots `shotCount` (sighters not counted)
+- where the rule book states them: the `stage` (a discipline with a precision and a rapid-fire part has one mapping per face; a discipline whose caliber groups shoot on different faces has one mapping per face with the groups as its `stage`), the scoring `gauge` and the number of record shots `shotCount` (sighters not counted)
 
 A mapping gauge equals the event's where both are given. Which gauge scores a group: [Ring scoring](../models/ring-scoring.md).
 
 A face names its federation by `federation` (a federation record id). A face without one is a user's own design. The face record keeps its `events` (`id`, name, distance, gauge, scoring, `federation`, section, category). An event `id` is a record id, unique within the face. An event of another federation than the face's names that federation by id and cites its `section`. `GET /target-faces` items carry `federation` and, derived from it, the `organization` abbreviation. A face event has no caliber classes: a face file with `events[].caliber` is rejected.
 
 The scoring rules of a face (`decimal`, `innerTen.rule`, `events[].scoring`) are set only where a cited rule book states them, with its page in the provenance. Absent means not stated: the face page shows "Not stated", and the app scores whole rings and counts the hole edge.
+
+A ring is a circle (an oval where it has a `height`) unless its `shape` is `square` or `stadium`. A stadium has straight vertical sides and a half circle of half its width at each end, and a `height` of at least its width. A face has stadium rings on all rings or on none, and its inner ten and black area are stadiums too (the DSU oval-ring faces).
 
 A face with `photoSearch: false` is skipped by the photo face search. The user picks it from the face list. Absent: the face search tries it.
 

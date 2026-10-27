@@ -1,0 +1,18 @@
+{
+  "id": "dsu-shsa-dsu-b2",
+  "discipline": "dsu-shsa",
+  "face": "dsu-b2",
+  "event": "shsa-schwarzpulver-single-action-revolver",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 4, Seite 18, PDF p. 140",
+        "fields": ["discipline", "face", "event", "shotCount"],
+        "note": "Two sheets of 10 shots, all 20 count; one-handed standing, then two-handed lying."
+      }
+    ]
+  }
+}

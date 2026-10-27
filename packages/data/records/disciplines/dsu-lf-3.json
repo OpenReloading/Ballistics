@@ -1,0 +1,28 @@
+{
+  "id": "dsu-lf-3",
+  "federation": "dsu",
+  "name": "Flintenübung F 3 50 m",
+  "number": "LF 3",
+  "section": "Kapitel 3, Flintenübungen, LF 3",
+  "page": "Seite 59, PDF p. 117",
+  "distance": {
+    "value": 50000,
+    "raw": "50 Meter"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 59, PDF p. 117",
+        "fields": ["federation", "section", "page", "distance"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Inhaltsverzeichnis Langwaffen, Seite 3 (PDF p. 61)",
+        "fields": ["name", "number"],
+        "note": "The distance is printed with the name in the table of Kapitel 9 (Seite 5, PDF p. 231)."
+      }
+    ]
+  }
+}

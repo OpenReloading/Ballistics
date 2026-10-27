@@ -33,6 +33,7 @@ import {
   useListState,
 } from './directory-table.tsx'
 import { FileMenu, type FileMenuHandle } from './file-menu.tsx'
+import { LibraryTabs } from './library-tabs.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
 import { EmptyList, ErrorNote, Loading } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
@@ -402,6 +403,7 @@ export function CaseLibrary() {
           </>
         }
       />
+      <LibraryTabs />
       <div className="library" data-editing={editing || undefined}>
         <section aria-labelledby="library-list" className={editing ? 'library-list' : 'directory'}>
           <Title order={2} id="library-list" className="visually-hidden">

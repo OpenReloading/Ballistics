@@ -1,0 +1,17 @@
+{
+  "id": "dsu-lrg-1-dsu-b4",
+  "discipline": "dsu-lrg-1",
+  "face": "dsu-b4",
+  "event": "lrg-1-repetiergewehr-50-m",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 25, PDF p. 83",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

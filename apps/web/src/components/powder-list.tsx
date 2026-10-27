@@ -24,6 +24,7 @@ import {
   DirectoryTable,
   useListState,
 } from './directory-table.tsx'
+import { LibraryTabs } from './library-tabs.tsx'
 import { SourceFilter } from './list-sources.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
 import { RateBar, RateTicks, scaleWidth } from './rate-scale.tsx'
@@ -154,6 +155,7 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
           </>
         }
       />
+      <LibraryTabs />
       <div className="directory">
         <DirectoryFilters
           query={state.query}
