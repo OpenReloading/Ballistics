@@ -24,6 +24,9 @@ export const primerCupMaterials = z.enum(['brass', 'nickel-plated-brass', 'coppe
 /** Priming compounds of a primer: `lead-styphnate` based or `lead-free`. */
 export const primerCompounds = z.enum(['lead-styphnate', 'lead-free'])
 
+/** A compound of {@link primerCompounds}. */
+export type PrimerCompound = z.infer<typeof primerCompounds>
+
 /** The cup of a primer: its metal and wall thickness, where the source gives them. */
 const primerCup = z.strictObject({
   material: primerCupMaterials.describe('Metal of the cup.').optional(),

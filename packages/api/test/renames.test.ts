@@ -10,6 +10,7 @@ const renames = {
   cartridges: { 'old-alpha': 'alpha-rifle' },
   manufacturers: { 'old-a': 'example-a' },
   powders: { 'old-powder': 'example-a-fast' },
+  primers: { 'old-primer': 'example-a-large-rifle' },
   bullets: { 'old-bullet': 'example-a-1' },
   cases: { 'old-case': 'alpha-brass' },
   'target-faces': { 'old-face': 'test-face' },

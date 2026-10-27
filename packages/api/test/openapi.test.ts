@@ -32,6 +32,8 @@ describe('buildOpenApi', () => {
         'GET /v1/manufacturers/{id}',
         'GET /v1/powders',
         'GET /v1/powders/{id}',
+        'GET /v1/primers',
+        'GET /v1/primers/{id}',
         'GET /v1/target-faces',
         'GET /v1/target-faces/{id}',
         'GET /v1/target-mappings',

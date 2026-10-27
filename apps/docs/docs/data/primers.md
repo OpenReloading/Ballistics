@@ -33,7 +33,7 @@ Every data field needs a source that lists it in `fields`. A value a source does
 
 ## API
 
-Served under `/v1` (`packages/api/src/routes/components.ts`): `GET /primers` filters by `manufacturer=<id>`, `size=<size>`, `compound=<compound>` and `magnum`, orders by manufacturer name and name, and its `q` matches the manufacturer name with the product name or the product number. `GET /primers/:id` answers the record with its `revision`.
+Served under `/v1` (`packages/api/src/routes/components.ts`): `GET /primers` filters by `manufacturer=<id>`, `size=<size>` and `compound=<compound>`, orders by manufacturer name and name, and its `q` matches the manufacturer name with the product name or the product number. `GET /primers/:id` answers the record.
 
 ## Validation
 

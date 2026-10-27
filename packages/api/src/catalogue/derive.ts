@@ -10,6 +10,7 @@ import {
   type Federation,
   type Manufacturer,
   type Powder,
+  type Primer,
   searchKey,
   sortKey,
   type TargetFace,
@@ -25,6 +26,7 @@ import type {
   IndexRow,
   ManufacturerItem,
   PowderItem,
+  PrimerItem,
   TargetFaceItem,
   TargetMappingItem,
 } from './types.ts'
@@ -159,6 +161,18 @@ export const powderRow = (p: Powder, m: Manufacturer): IndexRow<PowderItem> => (
     }),
   },
   ...componentKeys(m, p),
+})
+
+/** The index row of a primer of manufacturer `m`, searched by the manufacturer with its name or product number. */
+export const primerRow = (p: Primer, m: Manufacturer): IndexRow<PrimerItem> => ({
+  item: {
+    id: p.id,
+    manufacturer: p.manufacturer,
+    name: p.name,
+    size: p.size,
+    ...compact({ productNumber: p.productNumber, magnum: p.magnum, compound: p.compound }),
+  },
+  ...componentKeys(m, { name: p.name, aliases: p.productNumber ? [p.productNumber] : undefined }),
 })
 
 /** The first coefficient of a drag model, null without one (a banded sheet lists the top band first). */
