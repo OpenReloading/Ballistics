@@ -43,12 +43,12 @@ const subscribeSingleKeys = (l: () => void) => {
 
 /** Turns the single-key shortcuts (`?`, `/`) on or off for this browser. */
 export function setSingleKeys(on: boolean) {
+  sessionSingleKeys = on
   try {
     if (on) localStorage.removeItem(singleKeysKey)
     else localStorage.setItem(singleKeysKey, 'off')
   } catch {
     // shortcut: without storage the choice lasts until the page reloads
-    sessionSingleKeys = on
   }
   window.dispatchEvent(new Event(singleKeysEvent))
 }
