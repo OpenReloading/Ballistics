@@ -1,0 +1,9 @@
+{
+  "id": "insecure-site",
+  "name": "Insecure Site",
+  "abbreviation": "IS",
+  "country": "DE",
+  "website": "http://example.org/",
+  "ruleBooks": ["test-rule-book"],
+  "provenance": { "kind": "published", "sources": [{ "source": "test-rule-book" }] }
+}

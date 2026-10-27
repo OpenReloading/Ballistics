@@ -262,6 +262,7 @@ describe('GET /federations, /disciplines, /target-mappings and /caliber-classes'
           name: 'Test Federation',
           abbreviation: 'Test',
           country: 'international',
+          website: 'https://example.org/',
         },
       ],
     })

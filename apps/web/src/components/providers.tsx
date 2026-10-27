@@ -52,7 +52,7 @@ function SettingsDialogProvider({ children }: { children: ReactNode }) {
           </Group>
         }
       >
-        <SettingsSections tab={tab} onTab={setTab} />
+        <SettingsSections tab={tab} onTab={setTab} onClose={close} />
       </AppModal>
     </SettingsDialog>
   )

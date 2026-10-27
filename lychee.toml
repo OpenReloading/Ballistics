@@ -18,6 +18,10 @@ max_cache_age = "6d"
 # not broken links as far as can be told, only unreachable for a check. Recheck by hand when the page is edited.
 exclude = [
   '^https://doi\.org/10\.1111/j\.1469-1809\.1936\.tb02137\.x$', # Wiley refuses automated clients
+  '^https://doi\.org/10\.1103/RevModPhys\.93\.025010$', # the DOI resolver answers 403 to automated clients
+  '^https://query\.wikidata\.org/sparql\?format=json\&query=SELECT%20\(COUNT\(\*\)%20AS%20%3Fc\)%20WHERE%20%7B%3Fi%20wdt%3AP31%20wd%3AQ22704163%7D$', # the query service answers 403 to automated clients
+  '^https://support\.gunbroker\.com/hc/en-us/articles/37115383662491-Current-User-Agreement$', # help centre answers 403 to automated clients
+  '^https://www\.npmjs\.com/org/open-reloading$', # npmjs.com answers 403 to automated clients
   '^https://nso\.nato\.int/nso/nsdd/main/standards$',
   '^https://www\.acic\.gov\.au/copyright$',
   '^https://www\.brownells\.com/help/technical-support/terms-of-use/$',

@@ -63,8 +63,8 @@
           "total": 460791
         },
         "/cases": {
-          "initial": 415761,
-          "total": 461400
+          "initial": 419873,
+          "total": 465789
         },
         "/primers": {
           "initial": 415650,
@@ -162,6 +162,10 @@
         "total": 585000
       },
       "routes": {
+        "/cases/editor": {
+          "initial": 458439,
+          "total": 481399
+        },
         "/firearms": {
           "initial": 477921,
           "total": 514163

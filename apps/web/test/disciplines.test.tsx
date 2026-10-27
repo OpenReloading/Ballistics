@@ -14,12 +14,14 @@ import {
   type FederationRecord,
   federationRow,
   federationScope,
+  hostText,
 } from '../src/lib/disciplines.ts'
 import { defined } from './defined.ts'
 
 // the list renders its tab bar, which reads the route and the router
+const route = vi.hoisted(() => ({ path: '/disciplines' }))
 vi.mock('next/navigation', () => ({
-  usePathname: () => '/disciplines',
+  usePathname: () => route.path,
   useRouter: () => ({ push: () => {} }),
 }))
 
@@ -65,7 +67,7 @@ it('scopes by federation, searches the rest and keeps the federation in the URL'
   expect(readDirectory(url)).toMatchObject(state)
 })
 
-it('renders the discipline list: one row per discipline linking its page, the federation link', () => {
+it('renders the discipline list: one row per discipline linking its page, no federation button', () => {
   const out = renderToStaticMarkup(
     <MantineProvider>
       <DisciplineList items={rows} />
@@ -73,7 +75,7 @@ it('renders the discipline list: one row per discipline linking its page, the fe
   )
   expect(out).toContain(`${records.length} disciplines`)
   expect(out).toContain(`href="/disciplines/${pistol.id}"`)
-  expect(out).toContain('href="/federations"')
+  expect(out).not.toContain('href="/federations"')
   // under the Database tab bar, the Disciplines tab selected
   expect(out).toMatch(/role="tablist"[^>]*aria-label="Database"/)
   expect(out).toMatch(/aria-selected="true"[^>]*>(?:<[^>]+>)*Disciplines/)
@@ -102,20 +104,22 @@ it('gives the strip, the number, section, page and caliber classes, and the rule
   })
 })
 
-it('counts per federation its rule books, disciplines and the faces they use, and renders the list', () => {
+it('counts per federation its disciplines and renders the list with the tabs and the homepage link', () => {
   const dsb = federationRecords.find((f) => f.id === 'dsb') as FederationRecord
   const scope = federationScope('dsb', summaries, mappings)
   expect(scope.faces).toContain('issf-25m-precision-50m-pistol')
-  expect(federationRow(dsb, summaries, mappings)).toEqual({
+  expect(federationRow(dsb, summaries)).toEqual({
     id: 'dsb',
     name: 'Deutscher Schützenbund e.V.',
     abbreviation: 'DSB',
     country: 'DE',
-    ruleBooks: 1,
     disciplines: scope.disciplines.length,
-    faces: scope.faces.length,
+    website: 'https://www.dsb.de/',
   })
-  const items = federationRecords.map((f) => federationRow(f, summaries, mappings))
+  const { website, ...bare } = dsb
+  expect(federationRow(bare, summaries)).not.toHaveProperty('website')
+  const items = federationRecords.map((f) => federationRow(f, summaries))
+  route.path = '/federations'
   expect(items.find((r) => r.id === 'issf')?.country).toBe('International')
   const out = renderToStaticMarkup(
     <MantineProvider>
@@ -124,4 +128,16 @@ it('counts per federation its rule books, disciplines and the faces they use, an
   )
   expect(out).toContain(`${federationRecords.length} federations`)
   expect(out).toContain('href="/federations/dsb"')
+  expect(out).not.toContain('href="/disciplines"')
+  expect(out).toMatch(/role="tablist"[^>]*aria-label="Database"/)
+  expect(out).toMatch(/aria-selected="true"[^>]*>(?:<[^>]+>)*Federations/)
+  // the homepage link: the host as its name, no new window, no referrer
+  expect(out).toMatch(
+    /<a href="https:\/\/www\.dsb\.de\/"[^>]*rel="noopener noreferrer"[^>]*>dsb\.de<\/a>/,
+  )
+})
+
+it('names a homepage by its host without www', () => {
+  expect(hostText('https://www.issf-sports.org/')).toBe('issf-sports.org')
+  expect(hostText('https://example.org/a/b')).toBe('example.org')
 })

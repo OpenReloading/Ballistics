@@ -10,6 +10,7 @@
     "bds-sporthandbuch-allgemein-2026",
     "bds-sporthandbuch-kommentar-2026"
   ],
+  "website": "https://www.bdsnet.de/",
   "provenance": {
     "kind": "published",
     "sources": [
@@ -38,6 +39,15 @@
         "source": "bds-sporthandbuch-kommentar-2026",
         "page": "Titelseite, Seite 1 von 76, PDF p. 1",
         "fields": ["ruleBooks"]
+      },
+      {
+        "title": "Homepage of Bund Deutscher Sportschützen 1975 e. V.",
+        "publisher": "Bund Deutscher Sportschützen 1975 e. V.",
+        "url": "https://www.bdsnet.de/",
+        "retrieved": "2026-10-27",
+        "origin": "public",
+        "fields": ["website"],
+        "note": "The page was loaded on the retrieval date: it answers and names the federation."
       }
     ]
   }

@@ -11,7 +11,7 @@ import {
 } from '@mantine/core'
 import { type Case, caseMaterials } from '@open-reloading/schema'
 import { X } from '@phosphor-icons/react'
-import { type Dispatch, type SetStateAction, useEffect, useState } from 'react'
+import { type Dispatch, type SetStateAction, useEffect, useRef, useState } from 'react'
 import { apiFetch } from '../lib/api-fetch.ts'
 import type { CartridgeSummary, CaseSummary } from '../lib/api-types.ts'
 import { caseGroupCapacitySpec, caseGroupFields } from '../lib/case-group.ts'
@@ -74,6 +74,8 @@ export function CaseEditor({
 }) {
   const names = useManufacturerNames()
   const products = useProducts(data.cartridge)
+  // the last chosen cartridge: clearing the field does not make the next choice a first one
+  const chosen = useRef(data.cartridge ?? '')
   const product = (id: string) => products.find((p) => p.id === id)
   const label = (p: CaseSummary) =>
     productLabel({ name: p.name, manufacturer: p.manufacturer }, names)
@@ -134,7 +136,8 @@ export function CaseEditor({
               setCartridgeNames((n) => ({ ...n, [c.id]: c.name }))
               const cartridge = `catalogue:${c.id}`
               // a measured capacity belongs to its cartridge: another one starts without it
-              if (data.cartridge && data.cartridge !== cartridge) setCapacity(undefined)
+              if (chosen.current !== '' && chosen.current !== cartridge) setCapacity(undefined)
+              chosen.current = cartridge
               patch({ cartridge, basedOn: undefined })
             }}
             noneText="No cartridge found"

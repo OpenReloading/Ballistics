@@ -64,7 +64,7 @@ Measurement data imported as values carry their license: public domain in the US
 - <a id="gil-1993"></a>**Gil 1993.** J. Gil, M. Werman: *Computing 2-D min, median, and max filters*. IEEE Transactions on Pattern Analysis and Machine Intelligence 15(5), 504-507, 1993. doi:10.1109/34.211471. <https://doi.org/10.1109/34.211471>
 - <a id="gurdjos-2002"></a>**Gurdjos 2002.** P. Gurdjos, A. Crouzil, R. Payrissat: *Another way of looking at plane-based calibration: the centre circle constraint*. Computer Vision, ECCV 2002, Lecture Notes in Computer Science, Springer, Berlin, 2002, pp. 252-266. doi:10.1007/3-540-47979-1_17. <https://doi.org/10.1007/3-540-47979-1_17>
 - <a id="gurdjos-2006"></a>**Gurdjos 2006.** P. Gurdjos, P. Sturm, Y. Wu: *Euclidean structure from N ≥ 2 parallel circles: theory and algorithms*. Computer Vision, ECCV 2006, Lecture Notes in Computer Science, Springer, Berlin, 2006, pp. 238-252. doi:10.1007/11744023_19. <https://doi.org/10.1007/11744023_19>
-- <a id="halir-1998"></a>**Halir 1998.** R. Halíř, J. Flusser: *Numerically stable direct least squares fitting of ellipses*. WSCG '98, 6th International Conference in Central Europe on Computer Graphics and Visualization, Plzeň, 1998, pp. 125-132. <https://asep.lib.cas.cz/arl-cav/en/detail-cav_un_epca.1-0409786-Numerically-stable-direct-least-squares-fitting-of-ellipses>
+- <a id="halir-1998"></a>**Halir 1998.** R. Halíř, J. Flusser: *Numerically stable direct least squares fitting of ellipses*. WSCG '98, 6th International Conference in Central Europe on Computer Graphics and Visualization, Plzeň, 1998, pp. 125-132. <https://asep.lib.cas.cz/arl-cav/en/detail-cav_un_epca.1-0409786-Numerically-stable-direct-least-squares-fitting-of-ellipses/>
 - <a id="heckbert-1990"></a>**Heckbert 1990.** P. S. Heckbert: *Nice numbers for graph labels*. In A. S. Glassner (ed.): Graphics Gems, Academic Press, Boston, 1990, pp. 61-63. doi:10.1016/B978-0-08-050753-8.50025-5. <https://doi.org/10.1016/B978-0-08-050753-8.50025-5>
 - <a id="hu-1962"></a>**Hu 1962.** M.-K. Hu: *Visual pattern recognition by moment invariants*. IRE Transactions on Information Theory 8(2), 179-187, 1962. doi:10.1109/TIT.1962.1057692. <https://doi.org/10.1109/TIT.1962.1057692>
 - <a id="huber-1964"></a>**Huber 1964.** P. J. Huber: *Robust estimation of a location parameter*. Annals of Mathematical Statistics 35(1), 73-101, 1964. doi:10.1214/aoms/1177703732.
@@ -107,8 +107,14 @@ Measurement data imported as values carry their license: public domain in the US
 
 ## Online references
 
+- <a id="bdmp-home"></a>**BDMP.** Bund Deutscher Militär- und Polizeischützen e.V.: *Homepage*. <https://www.bdmp.de/>
+- <a id="bds-home"></a>**BDS.** Bund Deutscher Sportschützen 1975 e. V.: *Homepage*. <https://www.bdsnet.de/>
 - <a id="dlmf"></a>**DLMF.** F. W. J. Olver, A. B. Olde Daalhuis, D. W. Lozier, B. I. Schneider, R. F. Boisvert, C. W. Clark, B. R. Miller, B. V. Saunders, H. S. Cohl, M. A. McClain (eds.): *NIST Digital Library of Mathematical Functions*. NIST, Gaithersburg, MD. <https://dlmf.nist.gov/>
+- <a id="dsb-home"></a>**DSB.** Deutscher Schützenbund e.V.: *Homepage*. <https://www.dsb.de/>
+- <a id="dsu-home"></a>**DSU.** Deutsche Schießsport Union e.V.: *Homepage*. <https://www.d-s-u.de/>
+- <a id="issf-home"></a>**ISSF.** International Shooting Sport Federation: *Homepage*. <https://www.issf-sports.org/>
 - <a id="nist-sematech"></a>**NIST/SEMATECH.** National Institute of Standards and Technology, SEMATECH: *NIST/SEMATECH e-Handbook of Statistical Methods*. NIST, Gaithersburg, MD. <https://www.itl.nist.gov/div898/handbook/>
+- <a id="vdrbw-home"></a>**VdRBw.** Verband der Reservisten der Deutschen Bundeswehr e.V.: *Homepage*. <https://www.reservistenverband.de/>
 - <a id="wmo-2025"></a>**WMO 2025.** World Meteorological Organization: *Records of Weather and Climate Extremes*, as of 31 July 2025. Table of the WMO World Weather and Climate Extremes Archive. <https://wmo.int/sites/default/files/2025-07/Table_Records_25Jul2025.pdf>
 
 ## Patents

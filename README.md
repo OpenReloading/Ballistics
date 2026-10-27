@@ -4,7 +4,7 @@
 
 [![CI](https://github.com/OpenReloading/Ballistics/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenReloading/Ballistics/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-[![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/KkYJ5fdukR)
+[![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/hUCSjDYNaa)
 
 Simulate a handload before you take it to the range: muzzle velocity, peak pressure against the C.I.P. limit, and the bullet's trajectory, from cartridge, bullet, powder and firearm records that each name their source. The same app summarizes a chronograph session and measures group size from a target photo.
 
@@ -44,7 +44,7 @@ Reloading and shooting are done at your own risk. This software comes without wa
 
 ## Community and contributing
 
-- Questions and ideas: [GitHub Discussions](https://github.com/OpenReloading/Ballistics/discussions) and [Discord](https://discord.gg/KkYJ5fdukR).
+- Questions and ideas: [GitHub Discussions](https://github.com/OpenReloading/Ballistics/discussions) and [Discord](https://discord.gg/hUCSjDYNaa).
 - Bugs, features and record requests: [issues](https://github.com/OpenReloading/Ballistics/issues/new/choose).
 - How to contribute: [CONTRIBUTING.md](CONTRIBUTING.md).
 - Security reports: [security policy](https://github.com/OpenReloading/.github/blob/main/SECURITY.md).

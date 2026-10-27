@@ -12,6 +12,7 @@
     "bdmp-sportordnung-2026-register-11",
     "bdmp-sportordnung-2026-teile-b-c-d"
   ],
+  "website": "https://www.bdmp.de/",
   "provenance": {
     "kind": "published",
     "sources": [
@@ -59,6 +60,15 @@
         "source": "bdmp-sportordnung-2026-register-11",
         "page": "Titelseite und Fußzeile, Register 11, PDF p. 1",
         "fields": ["ruleBooks"]
+      },
+      {
+        "title": "Homepage of BDMP e.V.",
+        "publisher": "BDMP e.V.",
+        "url": "https://www.bdmp.de/",
+        "retrieved": "2026-10-27",
+        "origin": "public",
+        "fields": ["website"],
+        "note": "The page was loaded on the retrieval date: it answers and names the federation."
       }
     ],
     "note": "The document names no international federation as a parent or membership."

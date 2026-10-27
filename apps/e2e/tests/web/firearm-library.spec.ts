@@ -54,19 +54,8 @@ test('the firearm library searches its table, counts the example and offers to c
   await expect(page.getByText('No firearms match these filters.')).toBeVisible()
   await page.getByRole('button', { name: 'Clear filters' }).last().click()
   await expect(status(page)).toHaveText('3 firearms')
-  // the example is the OpenReloading source, the browser's firearms are Mine
-  await page.getByRole('button', { name: /^Source: / }).click()
-  await page
-    .getByRole('dialog', { name: /^Source: / })
-    .getByRole('checkbox', { name: /^OpenReloading/ })
-    .uncheck()
-  await expect(status(page)).toHaveText('2 of 3 firearms')
-  await expect(page).toHaveURL(/[?&]src=user/)
-  await page.keyboard.press('Escape')
-  await search.fill('example')
-  await expect(page.getByText('Mine only, matching "example".', { exact: true })).toBeVisible()
-  await page.getByRole('button', { name: 'Clear filters' }).last().click()
-  await expect(status(page)).toHaveText('3 firearms')
+  // no catalogue of firearms: one source, no source filter
+  await expect(page.getByRole('button', { name: /^Source: / })).toHaveCount(0)
   // a row's link opens the firearm in the editor beside the cards
   await page.getByRole('link', { name: 'Bench rifle', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Bench rifle', level: 2 })).toBeVisible()

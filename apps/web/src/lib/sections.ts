@@ -12,28 +12,24 @@ interface PageEntry {
   /** The icon's name in `nav-icons.tsx`. */
   icon: string
   description: string
-  /** The routes the page shows as tabs; the first is `href`, and each is current under this page. */
+  /** The routes the page shows as tabs, in the tab bar's order; each is current under this page. */
   tabs?: readonly LibraryTab[]
-  /** Routes under no tab that the page links to and that link back to it (`/federations`). */
+  /** Routes under no tab that the page links to and that link back to it (`/my-cases`). */
   covers?: readonly string[]
 }
 
-/** The catalogue lists, read-only records each with its sources. */
+/** The lists of the Database: catalogue records each with its sources, and the user's own records next to them. */
 export const databaseTabs: readonly LibraryTab[] = [
+  {
+    href: '/firearms',
+    label: 'Firearms',
+    description:
+      'Your firearms with their optics and zeros, kept in this browser and in files; they fill the rifle fields of the workbench.',
+  },
   {
     href: '/cartridges',
     label: 'Cartridges',
     description: 'CIP dimensions, drawings and maximum pressures, each with its source document.',
-  },
-  {
-    href: '/bullets',
-    label: 'Bullets',
-    description: 'Diameters, masses, lengths and ballistic coefficients, each with its source.',
-  },
-  {
-    href: '/powders',
-    label: 'Powders',
-    description: 'Propellants and their recorded properties, each with its sources.',
   },
   {
     href: '/cases',
@@ -47,6 +43,16 @@ export const databaseTabs: readonly LibraryTab[] = [
     description: 'Primer products with size, cup and priming compound, each with its sources.',
   },
   {
+    href: '/powders',
+    label: 'Powders',
+    description: 'Propellants and their recorded properties, each with its sources.',
+  },
+  {
+    href: '/bullets',
+    label: 'Bullets',
+    description: 'Diameters, masses, lengths and ballistic coefficients, each with its source.',
+  },
+  {
     href: '/targets',
     label: 'Targets',
     description:
@@ -58,21 +64,11 @@ export const databaseTabs: readonly LibraryTab[] = [
     description:
       'Rule-book disciplines and their federations: distance, caliber classes and the faces they are shot on, each with its source.',
   },
-]
-
-/** What the user owns or measured, kept in this browser and in files. */
-export const gearTabs: readonly LibraryTab[] = [
   {
-    href: '/firearms',
-    label: 'Firearms',
+    href: '/federations',
+    label: 'Federations',
     description:
-      'Your firearms with their optics and zeros; they fill the rifle fields of the workbench.',
-  },
-  {
-    href: '/my-cases',
-    label: 'My cases',
-    description:
-      'Your groups of cases with their measured water capacity, trim length and neck wall; the workbench picks them.',
+      'Shooting federations with the rule books their disciplines and target faces are read from, each with its source.',
   },
 ]
 
@@ -113,17 +109,9 @@ export const sections = [
         label: 'Database',
         icon: 'database',
         description:
-          'The published records, each with its source: cartridges, bullets, powders, cases, primers, target faces and disciplines.',
+          'The published records, each with its source, and your own next to them: your firearms, cartridges, cases, primers, powders, bullets, target faces, disciplines and federations.',
         tabs: databaseTabs,
-        covers: ['/federations'],
-      },
-      {
-        href: '/firearms',
-        label: 'My gear',
-        icon: 'my-gear',
-        description:
-          'What you own or measured, kept in this browser and in files: your firearms with their optics and zeros, and your groups of cases.',
-        tabs: gearTabs,
+        covers: ['/my-cases'],
       },
     ],
   },

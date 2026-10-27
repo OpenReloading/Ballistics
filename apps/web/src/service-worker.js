@@ -1,9 +1,10 @@
 // The service worker of the offline layer. `scripts/service-worker.mts`
 // writes it to public/sw.js after `next build` (out/sw.js in the Pages edition), preceded by
-// `version` (the build id), `precache` (the static output), `base` and `slash` (`appUrl`) and the
+// `version` (the build id), `precache` (the static output), `base` and `slash` (`appUrl`), `edition` and the
 // exports of src/lib/offline.ts. It never opens IndexedDB.
 
-const shell = shellCache(version)
+const shell = shellCache(version, edition)
+const records = recordsCache(edition)
 
 /** Stores a page's HTML once per build; failures are ignored (the page is fetched again later). */
 async function keepPage(key) {
@@ -63,8 +64,8 @@ async function fromNetworkPage(event) {
 }
 
 async function fromNetworkRecord(event) {
-  const cached = await caches.match(event.request, { cacheName: recordsCache })
-  return networkFirst(event, recordsCache, event.request, cached)
+  const cached = await caches.match(event.request, { cacheName: records })
+  return networkFirst(event, records, event.request, cached)
 }
 
 self.addEventListener('install', (event) => {
@@ -84,7 +85,7 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
       const names = await caches.keys()
-      await Promise.all(staleCaches(names, version).map((n) => caches.delete(n)))
+      await Promise.all(staleCaches(names, version, edition).map((n) => caches.delete(n)))
       await self.clients.claim()
       // the page that registered the worker loaded before it: store it too
       const windows = await self.clients.matchAll({ type: 'window' })

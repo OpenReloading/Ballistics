@@ -17,10 +17,10 @@ import {
   DirectoryTable,
   useListState,
 } from './directory-table.tsx'
+import { HomepageLink } from './homepage-link.tsx'
 import { LibraryTabs } from './library-tabs.tsx'
 import { SourceFilter } from './list-sources.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
-import { LinkButton } from './record-actions.tsx'
 import { EmptyList } from './states.tsx'
 
 /** Disciplines and federations are rule-book records only: the catalogue is the lists' one source. */
@@ -90,7 +90,6 @@ export function DisciplineList({ items }: { items: DisciplineRow[] }) {
             {countText(shown.length, items.length, 'disciplines')}
           </BarCount>
         }
-        actions={<LinkButton href="/federations">Federations</LinkButton>}
       />
       <LibraryTabs />
       <div className="directory">
@@ -143,14 +142,6 @@ export function FederationList({ items }: { items: FederationRow[] }) {
   const filters = useDeferredValue(state)
   const shown = useMemo(() => items.filter((r) => federationMatches(r, filters)), [items, filters])
   const query = state.query.trim()
-  const count = (key: 'ruleBooks' | 'disciplines' | 'faces', label: string) => ({
-    key,
-    label,
-    num: true,
-    width: '7rem',
-    value: (r: FederationRow) => r[key],
-    cell: (r: FederationRow) => r[key],
-  })
   const columns: DirectoryColumn<FederationRow>[] = [
     { key: 'name', label: 'Name', value: (r) => r.name, cell: (r) => r.name },
     {
@@ -167,9 +158,21 @@ export function FederationList({ items }: { items: FederationRow[] }) {
       value: (r) => r.country,
       cell: (r) => r.country,
     },
-    count('ruleBooks', 'Rule books'),
-    count('disciplines', 'Disciplines'),
-    count('faces', 'Faces'),
+    {
+      key: 'disciplines',
+      label: 'Disciplines',
+      num: true,
+      width: '7rem',
+      value: (r) => r.disciplines,
+      cell: (r) => r.disciplines,
+    },
+    {
+      key: 'website',
+      label: 'Homepage',
+      width: '12rem',
+      value: (r) => r.website ?? '',
+      cell: (r, tabIndex) => r.website && <HomepageLink url={r.website} tabIndex={tabIndex} />,
+    },
   ]
   const facts = (r: FederationRow) =>
     [r.abbreviation, r.country, countText(r.disciplines, r.disciplines, 'disciplines')].join(' · ')
@@ -184,8 +187,8 @@ export function FederationList({ items }: { items: FederationRow[] }) {
             {countText(shown.length, items.length, 'federations')}
           </BarCount>
         }
-        actions={<LinkButton href="/disciplines">Disciplines</LinkButton>}
       />
+      <LibraryTabs />
       <div className="directory">
         <DirectoryFilters
           query={state.query}
