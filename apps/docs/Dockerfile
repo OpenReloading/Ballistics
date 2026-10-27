@@ -19,8 +19,6 @@ RUN npm run build -w @open-reloading/schema -w @open-reloading/core -w @open-rel
 COPY apps/docs apps/docs
 # the API the REST page links to, no link when unset
 ARG API_URL
-# the web app the navbar links to, no link when unset
-ARG APP_URL
 RUN npm run site:build -w @open-reloading/docs
 
 # unprivileged variant: listens on 8080, runs as `nginx`
