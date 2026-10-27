@@ -1,0 +1,3736 @@
+{
+  "sources": {
+    "DSB": {
+      "document": "Sportordnung des Deutschen Schützenbundes",
+      "edition": "Stand 01.01.2027",
+      "url": "https://www.dsb.de/fileadmin/DSB.DE/PDF/PDF_2026/DSB-Sportordnung_2027.pdf",
+      "pages": "section number, PDF page"
+    },
+    "BDS-Z": {
+      "document": "BDS Sporthandbuch Zielscheiben",
+      "edition": "Fassung des BVA-Genehmigungsbescheids vom 27.06.2025, Red. 30.06.2025",
+      "pages": "printed page Z-n, PDF page n+1"
+    },
+    "BDS-A": {
+      "document": "BDS Sporthandbuch Allgemeiner Teil",
+      "edition": "2026, Änderungsversion auf Basis des Bescheids vom 30.06.2026",
+      "pages": "section number, PDF page"
+    },
+    "BDS-L": {
+      "document": "BDS Sporthandbuch Langwaffen",
+      "edition": "2026",
+      "pages": "section number, PDF page"
+    },
+    "BDS-K": {
+      "document": "BDS Sporthandbuch Kurzwaffen",
+      "edition": "2026",
+      "pages": "section number, PDF page"
+    },
+    "BDS-Komm": {
+      "document": "BDS Sporthandbuch Kommentar",
+      "edition": "2026",
+      "pages": "section number, PDF page"
+    },
+    "BDMP": {
+      "document": "BDMP-Handbuch Sportordnung, Teile A bis F, Register 6 and 9",
+      "edition": "Sportordnung v. 24.02.2026, Stand 04.12.2025",
+      "pages": "section number, PDF page of the named file"
+    },
+    "VdRBw": {
+      "document": "Schießsportordnung des VdRBw e.V.",
+      "edition": "bewilligt 18.12.2023",
+      "pages": "PDF page"
+    },
+    "DSU": {
+      "document": "DSU Sporthandbuch",
+      "edition": "Ausgabe Stand 2018",
+      "pages": "PDF page"
+    },
+    "CIP-TDCC": {
+      "document": "C.I.P. TDCC sheet \"44 Rem. Mag.\", German version, TAB. IV",
+      "edition": "Datum 86-12-14, Revision 20-11-10",
+      "url": "https://bobp.cip-bobp.org/uploads/tdcc/tab-iv/44-rem-mag-200922-de.pdf",
+      "pages": "one page"
+    },
+    "CIP-CR1": {
+      "document": "C.I.P. Anlage III, Tab. I-IV CR 1, Messläufe, German version",
+      "edition": "Datum 02-05-15, Revision 03-04-11",
+      "url": "https://bobp.cip-bobp.org/uploads/annexe/anliii-de-cr1.pdf",
+      "pages": "one page"
+    },
+    "WaffG": {
+      "document": "Waffengesetz, Anlage 1 (Waffen- und munitionstechnische Begriffe) and § 15",
+      "edition": "as published on gesetze-im-internet.de, read 2026-10-27",
+      "url": "https://www.gesetze-im-internet.de/waffg_2002/",
+      "pages": "Abschnitt, Unterabschnitt, Nummer"
+    },
+    "RWS": {
+      "document": "RWS (RUAG Ammotec, Dynamit Nobel), Wiederladen (Handbuch für Jäger und Schützen), one PDF per chapter (Kap. 1 to 4, 6, 8, 9)",
+      "edition": "9th edition 2002",
+      "url": "https://rws-ammunition.com/de/service/downloads",
+      "pages": "chapter and PDF page of the chapter file; Kap. 9 printed page = PDF page + 569"
+    },
+    "RWS-web": {
+      "document": "RWS German web pages (Wiederladekomponenten, Glossar, a product page)",
+      "edition": "read 2026-10-27",
+      "url": "https://rws-ammunition.com/de/",
+      "pages": "page name"
+    },
+    "RCBS": {
+      "document": "RCBS, Bedienungsanleitung für Reloading Dies (German)",
+      "edition": "undated, PDF created 2007",
+      "url": "https://rcbs.com/wp-content/uploads/2024/09/MATRIZEN.pdf",
+      "pages": "Seite n von 9"
+    }
+  },
+  "terms": [
+    {
+      "key": "bullet",
+      "group": "components",
+      "english": "Bullet",
+      "status": "verified",
+      "german": "Geschoss",
+      "sources": [
+        {
+          "doc": "WaffG",
+          "at": "Anlage 1 Abschn. 1 Unterabschn. 3 Nr. 3"
+        },
+        {
+          "doc": "CIP-TDCC",
+          "at": "block \"Geschoss\""
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 3 p. 1"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "powder",
+      "group": "components",
+      "english": "Powder, propellant",
+      "status": "verified",
+      "german": "Treibladungspulver",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 3 p. 1"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 3 p. 11"
+        },
+        {
+          "doc": "BDMP",
+          "at": "Register 9 D.6.1 p. 29"
+        },
+        {
+          "doc": "RCBS",
+          "at": "Seite 1"
+        }
+      ],
+      "candidates": [],
+      "note": "Short form: Pulver (the RWS, BDMP and RCBS pages cite Pulver or Nitro-Treibladungspulver)."
+    },
+    {
+      "key": "primer",
+      "group": "components",
+      "english": "Primer",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Zündhütchen",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 3 p. 1"
+            },
+            {
+              "doc": "RCBS",
+              "at": "Seite 1"
+            },
+            {
+              "doc": "DSB",
+              "at": "7.2.1.3 p. 340"
+            },
+            {
+              "doc": "BDMP",
+              "at": "Teile E.0.3 p. 540"
+            }
+          ]
+        },
+        {
+          "german": "Anzündhütchen",
+          "sources": [
+            {
+              "doc": "RWS-web",
+              "at": "Wiederladekomponenten"
+            },
+            {
+              "doc": "RWS-web",
+              "at": "Glossar"
+            }
+          ]
+        },
+        {
+          "german": "Zünder",
+          "sources": [
+            {
+              "doc": "RCBS",
+              "at": "Seite 1"
+            }
+          ]
+        },
+        {
+          "german": "Zündung",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 9 p. 16"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "case",
+      "group": "components",
+      "english": "Case, brass",
+      "status": "verified",
+      "german": "Hülse",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 16"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 3 p. 2"
+        },
+        {
+          "doc": "RCBS",
+          "at": "Seite 3"
+        },
+        {
+          "doc": "BDMP",
+          "at": "Teile C.1.6 p. 108"
+        }
+      ],
+      "candidates": [],
+      "note": "Also Patronenhülse; brass: Messinghülse (RWS Kap. 3 p. 2)."
+    },
+    {
+      "key": "cartridge",
+      "group": "components",
+      "english": "Cartridge",
+      "status": "verified",
+      "german": "Patrone",
+      "sources": [
+        {
+          "doc": "WaffG",
+          "at": "Anlage 1 Abschn. 1 Unterabschn. 3 Nr. 1.1"
+        },
+        {
+          "doc": "CIP-TDCC",
+          "at": "header \"PATRONE\""
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 24"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "ammunition",
+      "group": "components",
+      "english": "Ammunition",
+      "status": "verified",
+      "german": "Munition",
+      "sources": [
+        {
+          "doc": "WaffG",
+          "at": "Anlage 1 Abschn. 1 Unterabschn. 3 Nr. 1"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "chamber",
+      "group": "components",
+      "english": "Chamber",
+      "status": "verified",
+      "german": "Patronenlager",
+      "sources": [
+        {
+          "doc": "WaffG",
+          "at": "Anlage 1 Abschn. 1 Unterabschn. 1 Nr. 1.3.1.3"
+        },
+        {
+          "doc": "CIP-TDCC",
+          "at": "header \"PATRONENLAGER\""
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "barrel",
+      "group": "components",
+      "english": "Barrel",
+      "status": "verified",
+      "german": "Lauf",
+      "sources": [
+        {
+          "doc": "WaffG",
+          "at": "Anlage 1 Abschn. 1 Unterabschn. 1 Nr. 1.3.1.1"
+        },
+        {
+          "doc": "CIP-TDCC",
+          "at": "block \"Lauf\""
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "lands",
+      "group": "components",
+      "english": "Lands",
+      "status": "verified",
+      "german": "Felder",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 3"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 4 p. 27"
+        },
+        {
+          "doc": "BDMP",
+          "at": "Register 9 D.6.1 p. 29"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "grooves",
+      "group": "components",
+      "english": "Grooves",
+      "status": "verified",
+      "german": "Züge",
+      "sources": [
+        {
+          "doc": "CIP-TDCC",
+          "at": "block \"Züge\""
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 3"
+        },
+        {
+          "doc": "BDMP",
+          "at": "Register 9 D.6.1 p. 29"
+        }
+      ],
+      "candidates": [],
+      "note": "Singular: Zug."
+    },
+    {
+      "key": "bore-groove-diameter",
+      "group": "components",
+      "english": "Bore diameter, groove diameter",
+      "status": "unverified",
+      "german": "Felddurchmesser",
+      "sources": [
+        {
+          "doc": "CIP-TDCC",
+          "at": "block \"Lauf\""
+        }
+      ],
+      "candidates": [],
+      "note": "Candidates Felddurchmesser and Zugdurchmesser. The sheet prints only the symbols F and Z; no searched document spells the compounds."
+    },
+    {
+      "key": "twist",
+      "group": "components",
+      "english": "Twist (rate of rifling)",
+      "status": "verified",
+      "german": "Drall",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 3"
+        },
+        {
+          "doc": "BDMP",
+          "at": "Register 9 D.6.1 p. 29"
+        }
+      ],
+      "candidates": [],
+      "note": "Length per turn: Dralllänge (BDMP)."
+    },
+    {
+      "key": "twist-hand",
+      "group": "components",
+      "english": "Twist hand",
+      "status": "unverified",
+      "german": "Drallrichtung",
+      "sources": [],
+      "candidates": [],
+      "note": "Candidates Drallrichtung and Rechtsdrall. Searched all documents of the research, no hit."
+    },
+    {
+      "key": "case-neck",
+      "group": "components",
+      "english": "Case neck",
+      "status": "verified",
+      "german": "Hülsenhals",
+      "sources": [
+        {
+          "doc": "CIP-TDCC",
+          "at": "block \"Hülsenhals\""
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 3 p. 4"
+        },
+        {
+          "doc": "RCBS",
+          "at": "Seite 3"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "case-shoulder",
+      "group": "components",
+      "english": "Case shoulder",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Schulter",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 3 p. 4"
+            }
+          ]
+        },
+        {
+          "german": "Schulterkonus",
+          "sources": [
+            {
+              "doc": "CIP-TDCC",
+              "at": "block \"Schulterkonus\""
+            }
+          ]
+        }
+      ],
+      "note": "RWS also writes the compound Hülsenschulter (Kap. 3 p. 4)."
+    },
+    {
+      "key": "case-mouth",
+      "group": "components",
+      "english": "Case mouth",
+      "status": "verified",
+      "german": "Hülsenmund",
+      "sources": [
+        {
+          "doc": "RCBS",
+          "at": "Seite 3"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 6 p. 1"
+        },
+        {
+          "doc": "BDMP",
+          "at": "Register 9 D.17.6 p. 138"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "case-head-base",
+      "group": "components",
+      "english": "Case head, case base",
+      "status": "verified",
+      "german": "Hülsenboden",
+      "sources": [
+        {
+          "doc": "CIP-TDCC",
+          "at": "block \"Hülsenboden\""
+        },
+        {
+          "doc": "CIP-TDCC",
+          "at": "block \"Stoßboden\""
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 3 p. 3"
+        }
+      ],
+      "candidates": [],
+      "note": "Hülsenboden is the word of the cartridge column and Stoßboden the word of the chamber column of the C.I.P. sheet."
+    },
+    {
+      "key": "rim-rimless-belted",
+      "group": "components",
+      "english": "Rim, rimless, belted",
+      "status": "verified",
+      "german": "Rand, randlos, Gürtelhülse",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 16"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "headstamp",
+      "group": "components",
+      "english": "Headstamp",
+      "status": "verified",
+      "german": "Bodenstempel",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 3 p. 5"
+        }
+      ],
+      "candidates": [],
+      "note": "Also Hülsenprägung."
+    },
+    {
+      "key": "primer-pocket",
+      "group": "components",
+      "english": "Primer pocket",
+      "status": "verified",
+      "german": "Zündglocke",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 3 p. 2"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 3 p. 3"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 2"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "flash-hole",
+      "group": "components",
+      "english": "Flash hole",
+      "status": "verified",
+      "german": "Zündloch",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 3"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 4 p. 2"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "primer-size",
+      "group": "components",
+      "english": "Primer size small, large",
+      "status": "verified",
+      "german": "kleines Zündhütchen, großes Zündhütchen",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 16"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "primer-rifle-pistol-magnum",
+      "group": "components",
+      "english": "Primer, rifle or pistol, magnum",
+      "status": "unverified",
+      "german": null,
+      "sources": [],
+      "candidates": [],
+      "note": "No German pair for rifle, pistol and magnum primers found in the searched documents."
+    },
+    {
+      "key": "primer-compound",
+      "group": "components",
+      "english": "Primer compound (lead-free)",
+      "status": "verified",
+      "german": "Zündsatz",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 2"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 3 p. 8"
+        }
+      ],
+      "candidates": [],
+      "note": "Lead-free: bleifreier Zündsatz (RWS Kap. 9 p. 2)."
+    },
+    {
+      "key": "grain-ball",
+      "group": "components",
+      "english": "Grain form: ball",
+      "status": "verified",
+      "german": "Kugelpulver",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 3 p. 14"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 8"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "grain-extruded",
+      "group": "components",
+      "english": "Grain form: extruded (tube)",
+      "status": "verified",
+      "german": "Röhrchenpulver",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 3 p. 13"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 10"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "grain-flake",
+      "group": "components",
+      "english": "Grain form: flake",
+      "status": "verified",
+      "german": "Blättchenpulver",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 3 p. 12"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "propellant-base",
+      "group": "components",
+      "english": "Propellant base: single, double, triple",
+      "status": "verified",
+      "german": "einbasig, zweibasig, dreibasig",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 3 p. 14"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 3"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 4"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "bulk-density",
+      "group": "components",
+      "english": "Bulk density",
+      "status": "verified",
+      "german": "Schüttgewicht",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 3 p. 15"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 3 p. 18"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 8 p. 52"
+        }
+      ],
+      "candidates": [],
+      "note": "Schüttdichte is not used in any searched document. Schüttvolumen appears at RWS Kap. 8 p. 52."
+    },
+    {
+      "key": "burn-rate",
+      "group": "components",
+      "english": "Burn rate",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Abbrandgeschwindigkeit",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 3 p. 11"
+            }
+          ]
+        },
+        {
+          "german": "Verbrennungsgeschwindigkeit",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 2 p. 3"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "jacket",
+      "group": "components",
+      "english": "Jacket",
+      "status": "verified",
+      "german": "Mantel",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 16"
+        },
+        {
+          "doc": "BDMP",
+          "at": "Teile C.4.3 p. 114"
+        }
+      ],
+      "candidates": [],
+      "note": "Also Mantelgeschoss."
+    },
+    {
+      "key": "core",
+      "group": "components",
+      "english": "Core",
+      "status": "verified",
+      "german": "Kern",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 3 p. 20"
+        }
+      ],
+      "candidates": [],
+      "note": "Also Geschosskern."
+    },
+    {
+      "key": "full-metal-jacket",
+      "group": "components",
+      "english": "Full metal jacket",
+      "status": "verified",
+      "german": "Vollmantel",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 16"
+        },
+        {
+          "doc": "BDMP",
+          "at": "Teile C.4.3 p. 114"
+        }
+      ],
+      "candidates": [],
+      "note": "Also Vollmantelgeschoss."
+    },
+    {
+      "key": "soft-point",
+      "group": "components",
+      "english": "Soft point",
+      "status": "verified",
+      "german": "Teilmantelgeschoss",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 16"
+        },
+        {
+          "doc": "BDMP",
+          "at": "Teile C.3.3 p. 111"
+        }
+      ],
+      "candidates": [],
+      "note": "RWS names Teilmantel the general sense of softpoint."
+    },
+    {
+      "key": "hollow-point",
+      "group": "components",
+      "english": "Hollow point",
+      "status": "verified",
+      "german": "Hohlspitze",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 16"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 6"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 3 p. 21"
+        }
+      ],
+      "candidates": [],
+      "note": "Also Hohlspitzgeschoss."
+    },
+    {
+      "key": "boat-tail",
+      "group": "components",
+      "english": "Boat tail",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Bootsheck",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 9 p. 16"
+            }
+          ]
+        },
+        {
+          "german": "Heckkonus",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 9 p. 14"
+            },
+            {
+              "doc": "RWS",
+              "at": "Kap. 2 p. 6"
+            }
+          ]
+        }
+      ],
+      "note": "Bootsheck is the word of the RWS translation list, Heckkonus of its entries."
+    },
+    {
+      "key": "gas-check",
+      "group": "components",
+      "english": "Gas check",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Kupferschuh",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 9 p. 16"
+            },
+            {
+              "doc": "RWS",
+              "at": "Kap. 9 p. 5"
+            }
+          ]
+        },
+        {
+          "german": "Geschossschuh",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 9 p. 16"
+            },
+            {
+              "doc": "RWS",
+              "at": "Kap. 9 p. 5"
+            }
+          ]
+        }
+      ],
+      "note": "The research does not say which of the two pages carries which word."
+    },
+    {
+      "key": "lead-bullet",
+      "group": "components",
+      "english": "Lead bullet (cast)",
+      "status": "verified",
+      "german": "Bleigeschoss",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 8 p. 1"
+        }
+      ],
+      "candidates": [],
+      "note": "Cast: selbstgegossen."
+    },
+    {
+      "key": "cannelure",
+      "group": "components",
+      "english": "Cannelure",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Rändelung",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 9 p. 16"
+            },
+            {
+              "doc": "RWS",
+              "at": "Kap. 4 p. 28"
+            }
+          ]
+        },
+        {
+          "german": "Crimprille",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 9 p. 16"
+            },
+            {
+              "doc": "RWS",
+              "at": "Kap. 4 p. 28"
+            }
+          ]
+        }
+      ],
+      "note": "The research does not say which of the two pages carries which word."
+    },
+    {
+      "key": "ogive",
+      "group": "components",
+      "english": "Ogive",
+      "status": "verified",
+      "german": "Ogive",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 4 p. 27"
+        }
+      ],
+      "candidates": [],
+      "note": "Used as the German word for the nose form of the bullet."
+    },
+    {
+      "key": "bearing-length",
+      "group": "components",
+      "english": "Bearing length",
+      "status": "verified",
+      "german": "Führungsteil",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 3 p. 20"
+        }
+      ],
+      "candidates": [],
+      "note": "Führungsteil of the bullet."
+    },
+    {
+      "key": "meplat-polymer-tip",
+      "group": "components",
+      "english": "Meplat, polymer tip",
+      "status": "unverified",
+      "german": null,
+      "sources": [],
+      "candidates": [],
+      "note": "None found in any searched document."
+    },
+    {
+      "key": "caliber",
+      "group": "components",
+      "english": "Caliber",
+      "status": "verified",
+      "german": "Kaliber",
+      "sources": [
+        {
+          "doc": "WaffG",
+          "at": "Anlage 1 Abschn. 1 Unterabschn. 1 Nr. 1.3.1.1"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 1 p. 13"
+        },
+        {
+          "doc": "BDS-A",
+          "at": "throughout"
+        },
+        {
+          "doc": "DSB",
+          "at": "throughout"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "bullet-diameter",
+      "group": "components",
+      "english": "Bullet diameter",
+      "status": "verified",
+      "german": "Geschossdurchmesser",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 1 p. 13"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 4 p. 14"
+        },
+        {
+          "doc": "CIP-TDCC",
+          "at": "symbol G1 under \"Geschoss\""
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "bullet-mass",
+      "group": "components",
+      "english": "Bullet mass, bullet weight",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Geschossgewicht",
+          "sources": [
+            {
+              "doc": "DSB",
+              "at": "2.16.1 p. 151"
+            },
+            {
+              "doc": "BDS-K",
+              "at": "K 7.06 p. 28"
+            }
+          ]
+        },
+        {
+          "german": "Geschossmasse",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 9 p. 4"
+            }
+          ]
+        }
+      ],
+      "note": "Geschossmasse is an RWS headword."
+    },
+    {
+      "key": "mass",
+      "group": "components",
+      "english": "Mass (generic label)",
+      "status": "verified",
+      "german": "Masse",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 4"
+        }
+      ],
+      "candidates": [],
+      "note": "Cited through the headword Geschossmasse."
+    },
+    {
+      "key": "firearm",
+      "group": "components",
+      "english": "Firearm",
+      "status": "verified",
+      "german": "Schusswaffe",
+      "sources": [
+        {
+          "doc": "WaffG",
+          "at": "Anlage 1 Abschn. 1 Unterabschn. 1 Nr. 1.1"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "rifle",
+      "group": "components",
+      "english": "Rifle",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Gewehr",
+          "sources": [
+            {
+              "doc": "DSB",
+              "at": "p. 95"
+            }
+          ]
+        },
+        {
+          "german": "Langwaffe",
+          "sources": [
+            {
+              "doc": "DSB",
+              "at": "p. 95"
+            }
+          ]
+        },
+        {
+          "german": "Büchse",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 4 p. 1"
+            }
+          ]
+        }
+      ],
+      "note": "DSB p. 95 is a table; Büchse is the word of the hunting and reloading texts (Büchsenpatronen)."
+    },
+    {
+      "key": "pistol-revolver-handgun",
+      "group": "components",
+      "english": "Pistol, revolver, handgun",
+      "status": "verified",
+      "german": "Pistole, Revolver, Kurzwaffe",
+      "sources": [
+        {
+          "doc": "DSB",
+          "at": "p. 98"
+        },
+        {
+          "doc": "BDS-K",
+          "at": "K 1.11 p. 4"
+        }
+      ],
+      "candidates": [],
+      "note": "DSB p. 98 is a table (Kurzwaffe, Pistolentabelle); Revolver at BDS-K K 1.11."
+    },
+    {
+      "key": "scope",
+      "group": "components",
+      "english": "Scope",
+      "status": "verified",
+      "german": "Zielfernrohr",
+      "sources": [
+        {
+          "doc": "DSB",
+          "at": "p. 95"
+        },
+        {
+          "doc": "BDMP",
+          "at": "Register 9 D.11.4 p. 67"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "reticle",
+      "group": "components",
+      "english": "Reticle",
+      "status": "verified",
+      "german": "Absehen",
+      "sources": [
+        {
+          "doc": "BDMP",
+          "at": "Register 9 D.11.4 p. 67"
+        },
+        {
+          "doc": "DSB",
+          "at": "1.8.6 p. 131"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "iron-sights",
+      "group": "components",
+      "english": "Iron sights",
+      "status": "verified",
+      "german": "offene Visierung",
+      "sources": [
+        {
+          "doc": "VdRBw",
+          "at": "p. 93"
+        },
+        {
+          "doc": "BDS-L",
+          "at": "L 14.01 p. 9"
+        }
+      ],
+      "candidates": [],
+      "note": "Also Visierung."
+    },
+    {
+      "key": "red-dot",
+      "group": "components",
+      "english": "Red dot",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Leuchtpunktvisier",
+          "sources": [
+            {
+              "doc": "BDMP",
+              "at": "Teile D.16.16 p. 338"
+            },
+            {
+              "doc": "BDS-L",
+              "at": "L 14.07 p. 80"
+            }
+          ]
+        },
+        {
+          "german": "Leuchtpunktvisierung",
+          "sources": [
+            {
+              "doc": "DSU",
+              "at": "p. 11"
+            }
+          ]
+        },
+        {
+          "german": "Rotpunktvisier",
+          "sources": [
+            {
+              "doc": "BDS-L",
+              "at": "L 14.07 p. 80"
+            }
+          ]
+        },
+        {
+          "german": "Reflexvisier",
+          "sources": [
+            {
+              "doc": "VdRBw",
+              "at": "p. 53"
+            }
+          ]
+        },
+        {
+          "german": "elektrooptische Visierung",
+          "sources": [
+            {
+              "doc": "VdRBw",
+              "at": "p. 53"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "front-rear-sight",
+      "group": "components",
+      "english": "Front sight, rear sight",
+      "status": "verified",
+      "german": "Korn, Kimme",
+      "sources": [
+        {
+          "doc": "DSB",
+          "at": "0.5.3.1 p. 32"
+        },
+        {
+          "doc": "DSB",
+          "at": "p. 98"
+        }
+      ],
+      "candidates": [],
+      "note": "Diopter for the aperture sight. DSB p. 98 is a table."
+    },
+    {
+      "key": "elevation-turret",
+      "group": "components",
+      "english": "Elevation (turret)",
+      "status": "verified",
+      "german": "Höhenverstellung",
+      "sources": [
+        {
+          "doc": "BDS-Komm",
+          "at": "p. 16"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "windage-turret",
+      "group": "components",
+      "english": "Windage (turret)",
+      "status": "verified",
+      "german": "Seitenverstellung",
+      "sources": [
+        {
+          "doc": "BDS-K",
+          "at": "p. 9"
+        },
+        {
+          "doc": "VdRBw",
+          "at": "p. 93"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "click-turret",
+      "group": "components",
+      "english": "Click (turret)",
+      "status": "verified",
+      "german": "Klickverstellung",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 8 p. 27"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "manufacturer",
+      "group": "components",
+      "english": "Manufacturer",
+      "status": "verified",
+      "german": "Hersteller",
+      "sources": [
+        {
+          "doc": "RCBS",
+          "at": "Seite 1"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "lot",
+      "group": "components",
+      "english": "Lot",
+      "status": "verified",
+      "german": "Los",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 16"
+        }
+      ],
+      "candidates": [],
+      "note": "Pulverlos, Munitionslos."
+    },
+    {
+      "key": "country-of-origin",
+      "group": "components",
+      "english": "Country (of origin)",
+      "status": "verified",
+      "german": "Ursprungsland",
+      "sources": [
+        {
+          "doc": "CIP-TDCC",
+          "at": "header"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "alias",
+      "group": "components",
+      "english": "Alias, other names",
+      "status": "verified",
+      "german": "Alternative Namen",
+      "sources": [
+        {
+          "doc": "CIP-TDCC",
+          "at": "header"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "name",
+      "group": "components",
+      "english": "Name, designation",
+      "status": "verified",
+      "german": "Name",
+      "sources": [
+        {
+          "doc": "CIP-TDCC",
+          "at": "header"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 24"
+        }
+      ],
+      "candidates": [],
+      "note": "Plural Namen; Bezeichnung (RWS Kap. 9 p. 24, Bezeichnung der Munition)."
+    },
+    {
+      "key": "standard-table",
+      "group": "components",
+      "english": "Standard table",
+      "status": "verified",
+      "german": "Tabelle",
+      "sources": [
+        {
+          "doc": "CIP-TDCC",
+          "at": "header"
+        }
+      ],
+      "candidates": [],
+      "note": "TAB. I to VII; date: Datum; revision: Revision."
+    },
+    {
+      "key": "tolerance",
+      "group": "components",
+      "english": "Tolerance",
+      "status": "verified",
+      "german": "Toleranzen",
+      "sources": [
+        {
+          "doc": "CIP-CR1",
+          "at": "section 1"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "dimensions",
+      "group": "components",
+      "english": "Dimensions",
+      "status": "verified",
+      "german": "Maße",
+      "sources": [
+        {
+          "doc": "CIP-TDCC",
+          "at": "footer"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 24"
+        }
+      ],
+      "candidates": [],
+      "note": "Maße in mm (C.I.P. sheet footer); Maßtabelle (RWS)."
+    },
+    {
+      "key": "muzzle-velocity",
+      "group": "measurements",
+      "english": "Muzzle velocity",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Mündungsgeschwindigkeit",
+          "sources": [
+            {
+              "doc": "BDS-K",
+              "at": "K 7.06 p. 28"
+            },
+            {
+              "doc": "DSB",
+              "at": "2.16.1 p. 151"
+            },
+            {
+              "doc": "BDMP",
+              "at": "Register 9 D.23.1.4 p. 212"
+            },
+            {
+              "doc": "RWS",
+              "at": "Kap. 9 p. 9"
+            }
+          ]
+        },
+        {
+          "german": "Anfangsgeschwindigkeit",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 2 p. 5"
+            }
+          ]
+        }
+      ],
+      "note": "Abbreviation of the first word: V0."
+    },
+    {
+      "key": "muzzle-energy",
+      "group": "measurements",
+      "english": "Muzzle energy",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Mündungsenergie",
+          "sources": [
+            {
+              "doc": "DSB",
+              "at": "0.2 p. 22"
+            },
+            {
+              "doc": "DSB",
+              "at": "0.5.1 p. 32"
+            },
+            {
+              "doc": "RWS",
+              "at": "Kap. 9 p. 9"
+            }
+          ]
+        },
+        {
+          "german": "Geschossenergie",
+          "sources": [
+            {
+              "doc": "DSB",
+              "at": "0.2 p. 22"
+            },
+            {
+              "doc": "DSB",
+              "at": "0.5.1 p. 32"
+            }
+          ]
+        }
+      ],
+      "note": "The research does not say which DSB section carries Geschossenergie."
+    },
+    {
+      "key": "muzzle-pressure",
+      "group": "measurements",
+      "english": "Muzzle pressure",
+      "status": "verified",
+      "german": "Mündungsgasdruck",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 3"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 4"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "momentum-index",
+      "group": "measurements",
+      "english": "MIP factor (momentum index)",
+      "status": "verified",
+      "german": "Mindestimpuls",
+      "sources": [
+        {
+          "doc": "BDS-K",
+          "at": "K 7.06 p. 28"
+        },
+        {
+          "doc": "DSB",
+          "at": "2.21.1 p. 157"
+        },
+        {
+          "doc": "BDMP",
+          "at": "Teile C.13A.3 p. 183"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "peak-pressure",
+      "group": "measurements",
+      "english": "Peak pressure, chamber pressure",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Gasdruck",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 9 p. 5"
+            },
+            {
+              "doc": "BDMP",
+              "at": "Teile C.6C.1 p. 132"
+            }
+          ]
+        },
+        {
+          "german": "Maximalgasdruck",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 4 p. 12"
+            }
+          ]
+        },
+        {
+          "german": "Maximaldruck",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 2 p. 3"
+            }
+          ]
+        }
+      ],
+      "note": "The research also names Kammerdruck, without a source. The C.I.P. sheet says only Drücke and Pmax."
+    },
+    {
+      "key": "pmax",
+      "group": "measurements",
+      "english": "Pmax (C.I.P. maximum pressure)",
+      "status": "verified",
+      "german": "Pmax",
+      "sources": [
+        {
+          "doc": "CIP-TDCC",
+          "at": "block \"Drücke (Energien)\""
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 24"
+        }
+      ],
+      "candidates": [],
+      "note": "Limit tables: zulässige höchste Gebrauchsgasdrücke."
+    },
+    {
+      "key": "pressure-transducer",
+      "group": "measurements",
+      "english": "Pressure by transducer",
+      "status": "verified",
+      "german": "mechanisch-elektrischer Wandler",
+      "sources": [
+        {
+          "doc": "CIP-TDCC",
+          "at": "block \"Drücke (Energien)\""
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "pressure-piezo",
+      "group": "measurements",
+      "english": "Pressure by piezo",
+      "status": "verified",
+      "german": "Piezo-Messquarz",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 3"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "pressure-crusher",
+      "group": "measurements",
+      "english": "Pressure by crusher",
+      "status": "verified",
+      "german": "Kupferstauchzylinder",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 3"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "measuring-barrel",
+      "group": "measurements",
+      "english": "Measuring barrel, measuring position",
+      "status": "verified",
+      "german": "Messlauf",
+      "sources": [
+        {
+          "doc": "CIP-CR1",
+          "at": "title"
+        },
+        {
+          "doc": "CIP-CR1",
+          "at": "section 3"
+        }
+      ],
+      "candidates": [],
+      "note": "Measuring position: Messstelle (M)."
+    },
+    {
+      "key": "case-capacity",
+      "group": "measurements",
+      "english": "Case capacity",
+      "status": "verified",
+      "german": "Hülsenvolumen",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 4 p. 3"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "water-capacity",
+      "group": "measurements",
+      "english": "Water capacity",
+      "status": "unverified",
+      "german": "Wasserkapazität",
+      "sources": [],
+      "candidates": [],
+      "note": "Candidates Wasserkapazität and Wasserinhalt. Searched all documents, no hit."
+    },
+    {
+      "key": "overall-length",
+      "group": "measurements",
+      "english": "Overall length (COAL)",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Patronenlänge",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 9 p. 16"
+            }
+          ]
+        },
+        {
+          "german": "Gesamtlänge",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 4 p. 27"
+            }
+          ]
+        },
+        {
+          "german": "Gesamt-Patronenlänge",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 1 p. 18"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "case-length",
+      "group": "measurements",
+      "english": "Case length",
+      "status": "verified",
+      "german": "Hülsenlänge",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 4 p. 9"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 4 p. 10"
+        },
+        {
+          "doc": "DSB",
+          "at": "0.5.1 p. 32"
+        },
+        {
+          "doc": "BDS-L",
+          "at": "L 14.01 p. 14"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "barrel-length",
+      "group": "measurements",
+      "english": "Barrel length",
+      "status": "verified",
+      "german": "Lauflänge",
+      "sources": [
+        {
+          "doc": "BDS-K",
+          "at": "K 2.02 p. 9"
+        },
+        {
+          "doc": "BDMP",
+          "at": "Teile C.1.5 p. 107"
+        },
+        {
+          "doc": "DSB",
+          "at": "0.5.1 p. 32"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 20"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "trim",
+      "group": "measurements",
+      "english": "Trim, trim length",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "kürzen",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 4 p. 10"
+            },
+            {
+              "doc": "RWS",
+              "at": "Kap. 9 p. 7"
+            }
+          ]
+        },
+        {
+          "german": "trimmen",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 4 p. 10"
+            },
+            {
+              "doc": "RWS",
+              "at": "Kap. 9 p. 7"
+            }
+          ]
+        }
+      ],
+      "note": "trimmen and Trimmer are colloquial in RWS; the tool is called Hülsenkürzer. The research does not say which of the two pages carries which word."
+    },
+    {
+      "key": "neck-wall",
+      "group": "measurements",
+      "english": "Neck wall",
+      "status": "verified",
+      "german": "Hülsenhalsstärke",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 8 p. 14"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 2"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "seating-depth",
+      "group": "measurements",
+      "english": "Seating depth",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Setztiefe",
+          "sources": [
+            {
+              "doc": "RCBS",
+              "at": "Seite 5"
+            },
+            {
+              "doc": "RWS",
+              "at": "Kap. 9 p. 13"
+            }
+          ]
+        },
+        {
+          "german": "Einsetztiefe",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 4 p. 19"
+            },
+            {
+              "doc": "RWS",
+              "at": "Kap. 4 p. 27"
+            }
+          ]
+        }
+      ],
+      "note": "The research also cites RWS Kap. 3 for Einsetztiefe, without a page."
+    },
+    {
+      "key": "seating-verb",
+      "group": "measurements",
+      "english": "Seating (verb), seating die",
+      "status": "verified",
+      "german": "Geschoss setzen",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 4 p. 1"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 16"
+        },
+        {
+          "doc": "RCBS",
+          "at": "Seite 4"
+        }
+      ],
+      "candidates": [],
+      "note": "Seating die: Setzmatrize (RCBS Seite 4)."
+    },
+    {
+      "key": "jump",
+      "group": "measurements",
+      "english": "Jump (to the lands)",
+      "status": "verified",
+      "german": "Freiflug",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 5"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 4 p. 27"
+        }
+      ],
+      "candidates": [],
+      "note": "The distance the bullet travels from the case to the rifling. RWS notes that the word is often confused with the non-rotating path."
+    },
+    {
+      "key": "throat",
+      "group": "measurements",
+      "english": "Throat, leade",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Übergangskegel",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 9 p. 14"
+            }
+          ]
+        },
+        {
+          "german": "Übergangskonus",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 4 p. 25"
+            }
+          ]
+        }
+      ],
+      "note": "RWS defines Übergangskegel for rifle barrels and Übergangskonus for shotgun barrels (Kap. 9 p. 14) and uses Übergangskonus for a rifle at Kap. 4 p. 25."
+    },
+    {
+      "key": "freebore",
+      "group": "measurements",
+      "english": "Freebore",
+      "status": "unverified",
+      "german": null,
+      "sources": [],
+      "candidates": [],
+      "note": "No German word found that separates it from Freiflug."
+    },
+    {
+      "key": "case-fill",
+      "group": "measurements",
+      "english": "Case fill, load ratio",
+      "status": "verified",
+      "german": "Ladedichte",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 8"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 8 p. 6"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "charge",
+      "group": "measurements",
+      "english": "Charge",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Ladung",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 1 p. 17"
+            }
+          ]
+        },
+        {
+          "german": "Pulverladung",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 2 p. 3"
+            }
+          ]
+        },
+        {
+          "german": "Treibladung",
+          "sources": [
+            {
+              "doc": "WaffG",
+              "at": "Anlage 1 Abschn. 1 Unterabschn. 3 Nr. 2"
+            },
+            {
+              "doc": "DSB",
+              "at": "0.11.3.1 p. 58"
+            }
+          ]
+        }
+      ],
+      "note": "The law writes Ladungen (WaffG), the DSB Trockenschuss definition Treibladung."
+    },
+    {
+      "key": "load-recipe",
+      "group": "measurements",
+      "english": "Load (the recipe)",
+      "status": "verified",
+      "german": "Laborierung",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 4 p. 3"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 8"
+        }
+      ],
+      "candidates": [],
+      "note": "Bestlaborierung for the best load."
+    },
+    {
+      "key": "starting-maximum-load",
+      "group": "measurements",
+      "english": "Starting load, maximum load",
+      "status": "verified",
+      "german": "Anfangsladung, Maximalladung",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 1 p. 17"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "reduced-load",
+      "group": "measurements",
+      "english": "Reduced load",
+      "status": "verified",
+      "german": "reduzierte Ladung",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 8 p. 1"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 8 p. 4"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "crimp",
+      "group": "measurements",
+      "english": "Crimp",
+      "status": "verified",
+      "german": "Bördelung",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 16"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 2"
+        },
+        {
+          "doc": "RCBS",
+          "at": "Seite 4"
+        }
+      ],
+      "candidates": [],
+      "note": "Also Hülsenmundbördelung. RWS calls crimpen neudeutsch."
+    },
+    {
+      "key": "full-length-sizing",
+      "group": "measurements",
+      "english": "Full-length sizing",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Vollkalibrieren",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 9 p. 16"
+            }
+          ]
+        },
+        {
+          "german": "Rekalibrieren",
+          "sources": [
+            {
+              "doc": "RCBS",
+              "at": "Seite 4"
+            }
+          ]
+        }
+      ],
+      "note": "RWS also writes Vollkalibriermatrize for the die."
+    },
+    {
+      "key": "neck-sizing",
+      "group": "measurements",
+      "english": "Neck sizing",
+      "status": "verified",
+      "german": "Hülsenhalskalibrierung",
+      "sources": [
+        {
+          "doc": "RCBS",
+          "at": "Seite 4"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 16"
+        }
+      ],
+      "candidates": [],
+      "note": "Tool: Halskalibrierer."
+    },
+    {
+      "key": "deprime",
+      "group": "measurements",
+      "english": "Deprime",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Zündhütchen ausstoßen",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 4 p. 1"
+            }
+          ]
+        },
+        {
+          "german": "entzündern",
+          "sources": [
+            {
+              "doc": "RCBS",
+              "at": "Seite 4"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "expand",
+      "group": "measurements",
+      "english": "Expand (case mouth)",
+      "status": "verified",
+      "german": "Aufweiten",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 6 p. 1"
+        },
+        {
+          "doc": "RCBS",
+          "at": "Seite 4"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "reload",
+      "group": "measurements",
+      "english": "Reload (verb), reloader",
+      "status": "verified",
+      "german": "Wiederladen",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 1 p. 1"
+        },
+        {
+          "doc": "RCBS",
+          "at": "Seite 1"
+        }
+      ],
+      "candidates": [],
+      "note": "Reloader: Wiederlader."
+    },
+    {
+      "key": "times-fired",
+      "group": "measurements",
+      "english": "Times fired (case)",
+      "status": "unverified",
+      "german": "Anzahl der Abschüsse",
+      "sources": [],
+      "candidates": [],
+      "note": "Candidate; searched all documents, no hit."
+    },
+    {
+      "key": "ballistic-coefficient",
+      "group": "measurements",
+      "english": "Ballistic coefficient (BC)",
+      "status": "verified",
+      "german": "Ballistischer Koeffizient",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 2"
+        },
+        {
+          "doc": "RWS-web",
+          "at": "product page of a rifle cartridge"
+        }
+      ],
+      "candidates": [],
+      "note": "Abbreviation BC. The RWS product page labels it BC Wert."
+    },
+    {
+      "key": "drag",
+      "group": "measurements",
+      "english": "Drag",
+      "status": "verified",
+      "german": "Luftwiderstand",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 3"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 6"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 2"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "drag-model",
+      "group": "measurements",
+      "english": "Drag model (G1, G7), drag coefficient",
+      "status": "unverified",
+      "german": null,
+      "sources": [],
+      "candidates": [],
+      "note": "None found in any searched document."
+    },
+    {
+      "key": "sectional-density",
+      "group": "measurements",
+      "english": "Sectional density",
+      "status": "verified",
+      "german": "Querschnittsbelastung",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 11"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "form-factor",
+      "group": "measurements",
+      "english": "Form factor",
+      "status": "verified",
+      "german": "Formfaktor",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 5"
+        }
+      ],
+      "candidates": [],
+      "note": "The shape of the bullet, shown in the ballistic form value."
+    },
+    {
+      "key": "trajectory",
+      "group": "measurements",
+      "english": "Trajectory",
+      "status": "verified",
+      "german": "Flugbahn",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 5"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 6"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "time-of-flight",
+      "group": "measurements",
+      "english": "Time of flight",
+      "status": "verified",
+      "german": "Flugzeit",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 5"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 15"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "drop",
+      "group": "measurements",
+      "english": "Drop",
+      "status": "verified",
+      "german": "Flugbahnabfall",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 15"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "wind-drift",
+      "group": "measurements",
+      "english": "Wind drift",
+      "status": "verified",
+      "german": "Seitenwindabdrift",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 6"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "wind-speed-direction",
+      "group": "measurements",
+      "english": "Wind speed, wind direction",
+      "status": "unverified",
+      "german": "Windgeschwindigkeit",
+      "sources": [],
+      "candidates": [],
+      "note": "Candidates Windgeschwindigkeit and Windrichtung. Searched all documents, no hit."
+    },
+    {
+      "key": "air-pressure",
+      "group": "measurements",
+      "english": "Air pressure",
+      "status": "verified",
+      "german": "Luftdruck",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 16"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "air-density",
+      "group": "measurements",
+      "english": "Air density",
+      "status": "verified",
+      "german": "Luftdichte",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 6"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "altitude",
+      "group": "measurements",
+      "english": "Altitude",
+      "status": "verified",
+      "german": "Höhenlage",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 15"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "humidity",
+      "group": "measurements",
+      "english": "Humidity",
+      "status": "verified",
+      "german": "Luftfeuchte",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 8 p. 56"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "line-of-sight",
+      "group": "measurements",
+      "english": "Line of sight",
+      "status": "verified",
+      "german": "Visierlinie",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 6"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 8 p. 46"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "sight-height",
+      "group": "measurements",
+      "english": "Sight height",
+      "status": "unverified",
+      "german": "Visierhöhe",
+      "sources": [],
+      "candidates": [],
+      "note": "Candidate; searched all documents, no hit."
+    },
+    {
+      "key": "zeroing",
+      "group": "measurements",
+      "english": "Zero, zeroing",
+      "status": "verified",
+      "german": "Einschießen",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 8 p. 26"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "zero-range",
+      "group": "measurements",
+      "english": "Zero range",
+      "status": "verified",
+      "german": "Einschießentfernung",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 6"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 7"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "stability",
+      "group": "measurements",
+      "english": "Stability",
+      "status": "verified",
+      "german": "Stabilität",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 6"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 3"
+        }
+      ],
+      "candidates": [],
+      "note": "Also Stabilisierung (of the bullet)."
+    },
+    {
+      "key": "stability-spin-drift-coriolis",
+      "group": "measurements",
+      "english": "Stability factor, spin drift, Coriolis",
+      "status": "unverified",
+      "german": null,
+      "sources": [],
+      "candidates": [],
+      "note": "None found in any searched document."
+    },
+    {
+      "key": "recoil",
+      "group": "measurements",
+      "english": "Recoil",
+      "status": "verified",
+      "german": "Rückstoß",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 4 p. 28"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 8 p. 11"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "interior-ballistics",
+      "group": "measurements",
+      "english": "Interior ballistics",
+      "status": "verified",
+      "german": "Innenballistik",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 1"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "exterior-ballistics",
+      "group": "measurements",
+      "english": "Exterior ballistics",
+      "status": "verified",
+      "german": "Außenballistik",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 1"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "terminal-ballistics",
+      "group": "measurements",
+      "english": "Terminal ballistics",
+      "status": "verified",
+      "german": "Zielballistik",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 1"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "transitional-ballistics",
+      "group": "measurements",
+      "english": "Transitional ballistics",
+      "status": "verified",
+      "german": "Übergangsballistik",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 1"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "dispersion",
+      "group": "measurements",
+      "english": "Dispersion",
+      "status": "verified",
+      "german": "Streuung",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 8 p. 28"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "standard-deviation",
+      "group": "measurements",
+      "english": "Standard deviation",
+      "status": "verified",
+      "german": "Standardabweichung",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 8 p. 32"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "group-size",
+      "group": "measurements",
+      "english": "Group size",
+      "status": "verified",
+      "german": "Streukreis",
+      "sources": [
+        {
+          "doc": "BDMP",
+          "at": "Teile B.12 p. 102"
+        },
+        {
+          "doc": "VdRBw",
+          "at": "p. 24"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 9 p. 2"
+        }
+      ],
+      "candidates": [],
+      "note": "The smallest circle decides ties."
+    },
+    {
+      "key": "shot-group",
+      "group": "measurements",
+      "english": "Shot group",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Schussgruppe",
+          "sources": [
+            {
+              "doc": "DSU",
+              "at": "p. 5"
+            }
+          ]
+        },
+        {
+          "german": "Schussbild",
+          "sources": [
+            {
+              "doc": "DSB",
+              "at": "p. 154"
+            }
+          ]
+        },
+        {
+          "german": "Trefferbild",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 8 p. 28"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "point-of-aim",
+      "group": "measurements",
+      "english": "Point of aim",
+      "status": "verified",
+      "german": "Haltepunkt",
+      "sources": [
+        {
+          "doc": "BDS-L",
+          "at": "L 14.08.3 p. 82"
+        },
+        {
+          "doc": "RWS",
+          "at": "Kap. 2 p. 7"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "point-of-impact",
+      "group": "measurements",
+      "english": "Point of impact",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Treffpunkt",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 2 p. 5"
+            },
+            {
+              "doc": "RWS",
+              "at": "Kap. 2 p. 7"
+            }
+          ]
+        },
+        {
+          "german": "Trefferlage",
+          "sources": [
+            {
+              "doc": "BDMP",
+              "at": "Register 9 D.1.2.1 p. 7"
+            },
+            {
+              "doc": "VdRBw",
+              "at": "p. 59"
+            },
+            {
+              "doc": "DSB",
+              "at": "p. 287"
+            }
+          ]
+        }
+      ],
+      "note": "RWS also writes Treffpunktlage."
+    },
+    {
+      "key": "extreme-spread-mean-radius",
+      "group": "measurements",
+      "english": "Extreme spread, mean radius",
+      "status": "unverified",
+      "german": null,
+      "sources": [],
+      "candidates": [],
+      "note": "None found in any searched document."
+    },
+    {
+      "key": "hit-probability",
+      "group": "measurements",
+      "english": "Hit probability",
+      "status": "unverified",
+      "german": "Trefferwahrscheinlichkeit",
+      "sources": [],
+      "candidates": [],
+      "note": "Candidate; searched all documents, no hit."
+    },
+    {
+      "key": "chronograph",
+      "group": "measurements",
+      "english": "Chronograph",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Chronograph",
+          "sources": [
+            {
+              "doc": "BDMP",
+              "at": "Teile C.14.5 p. 195"
+            },
+            {
+              "doc": "RWS",
+              "at": "Kap. 9 p. 3"
+            },
+            {
+              "doc": "RWS",
+              "at": "Kap. 9 p. 5"
+            },
+            {
+              "doc": "RWS",
+              "at": "Kap. 8 p. 31"
+            }
+          ]
+        },
+        {
+          "german": "Geschwindigkeitsmesser",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 9 p. 3"
+            },
+            {
+              "doc": "RWS",
+              "at": "Kap. 9 p. 5"
+            }
+          ]
+        },
+        {
+          "german": "Geschossgeschwindigkeitsmessgerät",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 9 p. 3"
+            },
+            {
+              "doc": "RWS",
+              "at": "Kap. 9 p. 5"
+            }
+          ]
+        }
+      ],
+      "note": "The last two are RWS definition words; the research does not split the two Kap. 9 pages by word. RWS Kap. 8 p. 31 has Wiederladerchronograph."
+    },
+    {
+      "key": "shot-string",
+      "group": "measurements",
+      "english": "Shot string (chronograph)",
+      "status": "unverified",
+      "german": "Schussreihe",
+      "sources": [],
+      "candidates": [],
+      "note": "Candidate; searched all documents, no hit."
+    },
+    {
+      "key": "cold-bore",
+      "group": "measurements",
+      "english": "Cold bore",
+      "status": "unverified",
+      "german": "Kaltschuss",
+      "sources": [],
+      "candidates": [],
+      "note": "Candidate; searched all documents, no hit."
+    },
+    {
+      "key": "burnout-vivacity-covolume-impetus",
+      "group": "measurements",
+      "english": "Burnout, vivacity, covolume, specific energy (impetus)",
+      "status": "unverified",
+      "german": null,
+      "sources": [],
+      "candidates": [],
+      "note": "None found in the searched RWS chapters."
+    },
+    {
+      "key": "barrel-time",
+      "group": "measurements",
+      "english": "Barrel time",
+      "status": "unverified",
+      "german": "Rohrlaufzeit",
+      "sources": [],
+      "candidates": [],
+      "note": "Candidate; searched all documents, no hit."
+    },
+    {
+      "key": "safety-notice",
+      "group": "measurements",
+      "english": "Safety notice",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Sicherheitsregeln",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 1 p. 15"
+            },
+            {
+              "doc": "RWS",
+              "at": "Kap. 8 p. 5"
+            },
+            {
+              "doc": "RCBS",
+              "at": "Seite 1"
+            }
+          ]
+        },
+        {
+          "german": "Vorsichtsmaßnahmen",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 1 p. 15"
+            },
+            {
+              "doc": "RWS",
+              "at": "Kap. 8 p. 5"
+            },
+            {
+              "doc": "RCBS",
+              "at": "Seite 1"
+            }
+          ]
+        }
+      ],
+      "note": "The research does not split the three places by word. The binding Safety text of the app stays English."
+    },
+    {
+      "key": "ladder",
+      "group": "procedures",
+      "english": "Ladder (charge, seating, temperature)",
+      "status": "unverified",
+      "german": "Ladeleiter",
+      "sources": [],
+      "candidates": [],
+      "note": "Candidates Ladeleiter, Ladungsleiter and Ladungsreihe. Searched the RWS chapters, RCBS and the rule books, no hit."
+    },
+    {
+      "key": "truing",
+      "group": "procedures",
+      "english": "Truing",
+      "status": "unverified",
+      "german": null,
+      "sources": [],
+      "candidates": [],
+      "note": "None found in any searched document."
+    },
+    {
+      "key": "range-card",
+      "group": "procedures",
+      "english": "Range card",
+      "status": "unverified",
+      "german": "Schusstafel",
+      "sources": [],
+      "candidates": [],
+      "note": "Candidate; searched all documents, no hit."
+    },
+    {
+      "key": "case-preparation",
+      "group": "procedures",
+      "english": "Case preparation",
+      "status": "verified",
+      "german": "Vorbereitung der Hülse",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 4 p. 1"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "powder-charging",
+      "group": "procedures",
+      "english": "Powder charging",
+      "status": "verified",
+      "german": "Pulver einfüllen",
+      "sources": [
+        {
+          "doc": "RWS",
+          "at": "Kap. 4 p. 1"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "powder-measure",
+      "group": "procedures",
+      "english": "Powder measure",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Pulvermessgerät",
+          "sources": [
+            {
+              "doc": "RCBS",
+              "at": "Seite 2"
+            }
+          ]
+        },
+        {
+          "german": "Pulverdosierer",
+          "sources": [
+            {
+              "doc": "RWS",
+              "at": "Kap. 4 p. 3"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "test-shot",
+      "group": "procedures",
+      "english": "Test shooting, sighting shot",
+      "status": "verified",
+      "german": "Probeschuss",
+      "sources": [
+        {
+          "doc": "DSB",
+          "at": "0.8.1.1 p. 45"
+        },
+        {
+          "doc": "BDMP",
+          "at": "Teile A.4.11.2.2 p. 21"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "target",
+      "group": "target-shooting",
+      "english": "Target",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Scheibe",
+          "sources": [
+            {
+              "doc": "DSB",
+              "at": "0.4.1.2 p. 28"
+            }
+          ]
+        },
+        {
+          "german": "Zielscheibe",
+          "sources": [
+            {
+              "doc": "BDS-Z",
+              "at": "p. 1"
+            },
+            {
+              "doc": "DSB",
+              "at": "0.19.2.3 p. 79"
+            }
+          ]
+        }
+      ],
+      "note": "BDS-Z p. 1 is the document title; DSB 0.19.2.3 is the electronic target. BDMP and VdRBw also use Scheibe."
+    },
+    {
+      "key": "target-face",
+      "group": "target-shooting",
+      "english": "Target face",
+      "status": "verified",
+      "german": "Scheibe",
+      "sources": [
+        {
+          "doc": "BDS-Z",
+          "at": "Z1 p. 2"
+        },
+        {
+          "doc": "DSB",
+          "at": "p. 94"
+        }
+      ],
+      "candidates": [],
+      "note": "With the printed name such as BDS-100m-Scheibe. DSB p. 94 is a table."
+    },
+    {
+      "key": "ring",
+      "group": "target-shooting",
+      "english": "Ring",
+      "status": "verified",
+      "german": "Ring",
+      "sources": [
+        {
+          "doc": "DSB",
+          "at": "0.11.3.3 p. 58"
+        },
+        {
+          "doc": "BDS-Z",
+          "at": "Z1 p. 2"
+        }
+      ],
+      "candidates": [],
+      "note": "Plural Ringe."
+    },
+    {
+      "key": "inner-ten",
+      "group": "target-shooting",
+      "english": "Inner ten",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Innenzehner",
+          "sources": [
+            {
+              "doc": "DSB",
+              "at": "0.11.3.2 p. 58"
+            },
+            {
+              "doc": "BDMP",
+              "at": "Teile B.11.7 p. 58"
+            }
+          ]
+        },
+        {
+          "german": "Innenzehn",
+          "sources": [
+            {
+              "doc": "BDS-A",
+              "at": "A 9.03 p. 22"
+            },
+            {
+              "doc": "BDMP",
+              "at": "Teile B.11.7 p. 58"
+            }
+          ]
+        },
+        {
+          "german": "Innen-10",
+          "sources": [
+            {
+              "doc": "BDS-Z",
+              "at": "Z1 p. 2"
+            },
+            {
+              "doc": "DSU",
+              "at": "p. 28"
+            }
+          ]
+        },
+        {
+          "german": "Mouche",
+          "sources": [
+            {
+              "doc": "BDMP",
+              "at": "Teile B.11.7 p. 58"
+            }
+          ]
+        }
+      ],
+      "note": "BDS-L also writes Innenzehn. Mouche is the text of the BDMP scoring sheet. The research does not split the BDMP page by word."
+    },
+    {
+      "key": "ten",
+      "group": "target-shooting",
+      "english": "Ten",
+      "status": "verified",
+      "german": "Zehner",
+      "sources": [
+        {
+          "doc": "DSB",
+          "at": "0.12.1 p. 61"
+        },
+        {
+          "doc": "BDS-Z",
+          "at": "Z1 p. 2"
+        }
+      ],
+      "candidates": [],
+      "note": "Also the numeral 10."
+    },
+    {
+      "key": "black",
+      "group": "target-shooting",
+      "english": "Black (aiming area)",
+      "status": "verified",
+      "german": "Spiegel",
+      "sources": [
+        {
+          "doc": "BDS-Z",
+          "at": "Z1 p. 2"
+        },
+        {
+          "doc": "DSB",
+          "at": "0.3 p. 24"
+        },
+        {
+          "doc": "BDMP",
+          "at": "Teile A.4.8.2 p. 19"
+        }
+      ],
+      "candidates": [],
+      "note": "Also Scheibenspiegel."
+    },
+    {
+      "key": "score",
+      "group": "target-shooting",
+      "english": "Score, ring value",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Ringzahl",
+          "sources": [
+            {
+              "doc": "DSB",
+              "at": "0.9.4.1 p. 52"
+            }
+          ]
+        },
+        {
+          "german": "Ergebnis",
+          "sources": [
+            {
+              "doc": "DSB",
+              "at": "0.9.4.1 p. 52"
+            }
+          ]
+        },
+        {
+          "german": "Ringwert",
+          "sources": [
+            {
+              "doc": "DSB",
+              "at": "0.4.3.2 p. 30"
+            }
+          ]
+        },
+        {
+          "german": "Schusswert",
+          "sources": [
+            {
+              "doc": "DSB",
+              "at": "0.4.3.1 p. 28"
+            }
+          ]
+        },
+        {
+          "german": "Wertung",
+          "sources": [
+            {
+              "doc": "BDS-A",
+              "at": "A9 p. 1"
+            }
+          ]
+        }
+      ],
+      "note": "Ringzahl and Ergebnis name a total, Ringwert and Schusswert a single shot."
+    },
+    {
+      "key": "decimal-scoring",
+      "group": "target-shooting",
+      "english": "Decimal scoring",
+      "status": "verified",
+      "german": "Zehntelwertung",
+      "sources": [
+        {
+          "doc": "DSB",
+          "at": "9.4 p. 412"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "series",
+      "group": "target-shooting",
+      "english": "Series",
+      "status": "verified",
+      "german": "Serien",
+      "sources": [
+        {
+          "doc": "DSB",
+          "at": "0.11.5.2 p. 61"
+        },
+        {
+          "doc": "DSB",
+          "at": "0.4.3.2 p. 30"
+        },
+        {
+          "doc": "BDS-A",
+          "at": "A 9.05 p. 22"
+        },
+        {
+          "doc": "VdRBw",
+          "at": "p. 16"
+        }
+      ],
+      "candidates": [],
+      "note": "Plural form; the rule books also use the singular."
+    },
+    {
+      "key": "discipline",
+      "group": "target-shooting",
+      "english": "Discipline",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Disziplin",
+          "sources": [
+            {
+              "doc": "DSB",
+              "at": "Teil 0 p. 19"
+            },
+            {
+              "doc": "BDS-A",
+              "at": "A 1.04 p. 2"
+            },
+            {
+              "doc": "BDMP",
+              "at": "Teile A.0 p. 3"
+            }
+          ]
+        },
+        {
+          "german": "Wettbewerb",
+          "sources": [
+            {
+              "doc": "DSB",
+              "at": "p. 94"
+            }
+          ]
+        }
+      ],
+      "note": "The DSB table uses Wettbewerb for the single event."
+    },
+    {
+      "key": "discipline-category",
+      "group": "target-shooting",
+      "english": "Discipline category",
+      "status": "verified",
+      "german": "Waffenart",
+      "sources": [
+        {
+          "doc": "DSB",
+          "at": "p. 94"
+        }
+      ],
+      "candidates": [],
+      "note": "Table header."
+    },
+    {
+      "key": "event",
+      "group": "target-shooting",
+      "english": "Event (face event)",
+      "status": "verified",
+      "german": "Wettbewerb",
+      "sources": [
+        {
+          "doc": "DSB",
+          "at": "p. 94"
+        },
+        {
+          "doc": "DSB",
+          "at": "0.4.1.2 p. 28"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "shot",
+      "group": "target-shooting",
+      "english": "Shot",
+      "status": "verified",
+      "german": "Schuss",
+      "sources": [
+        {
+          "doc": "DSB",
+          "at": "0.8.4 p. 46"
+        },
+        {
+          "doc": "BDS-A",
+          "at": "A 9.05 p. 22"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "shot-count",
+      "group": "target-shooting",
+      "english": "Shot count",
+      "status": "verified",
+      "german": "Schusszahl",
+      "sources": [
+        {
+          "doc": "DSB",
+          "at": "0.4.1.2 p. 28"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "hit",
+      "group": "target-shooting",
+      "english": "Hit",
+      "status": "verified",
+      "german": "Treffer",
+      "sources": [
+        {
+          "doc": "BDS-A",
+          "at": "A 9.03 p. 22"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "miss",
+      "group": "target-shooting",
+      "english": "Miss",
+      "status": "verified",
+      "german": "Fehlschuss",
+      "sources": [
+        {
+          "doc": "DSB",
+          "at": "0.11.4.2 p. 60"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "scoring-shot",
+      "group": "target-shooting",
+      "english": "Scoring shot",
+      "status": "verified",
+      "german": "Wertungsschuss",
+      "sources": [
+        {
+          "doc": "DSB",
+          "at": "0.8.4 p. 46"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "distance",
+      "group": "target-shooting",
+      "english": "Distance",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Entfernung",
+          "sources": [
+            {
+              "doc": "DSB",
+              "at": "0.3 p. 24"
+            }
+          ]
+        },
+        {
+          "german": "Schießentfernung",
+          "sources": [
+            {
+              "doc": "DSB",
+              "at": "0.3 p. 24"
+            }
+          ]
+        },
+        {
+          "german": "Schussentfernung",
+          "sources": [
+            {
+              "doc": "BDMP",
+              "at": "Teile C.15.8 p. 210"
+            }
+          ]
+        },
+        {
+          "german": "Scheibenentfernung",
+          "sources": [
+            {
+              "doc": "BDMP",
+              "at": "Teile C.13A.6 p. 183"
+            }
+          ]
+        }
+      ],
+      "note": "The research does not say which DSB word is on page 24 beyond Schießentfernung."
+    },
+    {
+      "key": "caliber-class",
+      "group": "target-shooting",
+      "english": "Caliber class",
+      "status": "verified",
+      "german": "Kaliberklasse",
+      "sources": [
+        {
+          "doc": "BDMP",
+          "at": "Teile C.13A.1 p. 182"
+        },
+        {
+          "doc": "BDMP",
+          "at": "Teile C.13A.2 p. 182"
+        },
+        {
+          "doc": "DSU",
+          "at": "p. 10"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "federation",
+      "group": "target-shooting",
+      "english": "Federation",
+      "status": "verified",
+      "german": "Verband",
+      "sources": [
+        {
+          "doc": "VdRBw",
+          "at": "p. 4"
+        },
+        {
+          "doc": "WaffG",
+          "at": "§ 15"
+        }
+      ],
+      "candidates": [],
+      "note": "The law uses Schießsportverband (heading of § 15)."
+    },
+    {
+      "key": "rule-book",
+      "group": "target-shooting",
+      "english": "Rule book",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Sportordnung",
+          "sources": [
+            {
+              "doc": "DSB",
+              "at": "title"
+            },
+            {
+              "doc": "BDMP",
+              "at": "title"
+            },
+            {
+              "doc": "VdRBw",
+              "at": "title"
+            }
+          ]
+        },
+        {
+          "german": "Sporthandbuch",
+          "sources": [
+            {
+              "doc": "BDS-A",
+              "at": "title"
+            },
+            {
+              "doc": "DSU",
+              "at": "title"
+            }
+          ]
+        }
+      ],
+      "note": "VdRBw titles its document Schießsportordnung."
+    },
+    {
+      "key": "hole-gauge",
+      "group": "target-shooting",
+      "english": "Hole gauge",
+      "status": "verified",
+      "german": "Schusslochprüfer",
+      "sources": [
+        {
+          "doc": "DSB",
+          "at": "0.11.3.2 p. 58"
+        },
+        {
+          "doc": "BDMP",
+          "at": "Teile A.3.21.2 p. 15"
+        }
+      ],
+      "candidates": [],
+      "note": "Outer gauge: Außenlehre; inner gauge: Innenlehre."
+    },
+    {
+      "key": "gauge-diameter",
+      "group": "target-shooting",
+      "english": "Gauge diameter (hole as scored)",
+      "status": "verified",
+      "german": "Messring A",
+      "sources": [
+        {
+          "doc": "DSB",
+          "at": "0.11.3.2 p. 58"
+        }
+      ],
+      "candidates": [],
+      "note": "Messring A of the Schusslochprüfer."
+    },
+    {
+      "key": "bullet-hole",
+      "group": "target-shooting",
+      "english": "Bullet hole",
+      "status": "verified",
+      "german": "Schussloch",
+      "sources": [
+        {
+          "doc": "DSB",
+          "at": "0.11.3.3 p. 58"
+        },
+        {
+          "doc": "BDMP",
+          "at": "Teile A.3.21.2 p. 15"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "tie",
+      "group": "target-shooting",
+      "english": "Tie (equal rings)",
+      "status": "disputed",
+      "german": null,
+      "sources": [],
+      "candidates": [
+        {
+          "german": "Ringgleichheit",
+          "sources": [
+            {
+              "doc": "BDS-A",
+              "at": "A 9.03 p. 22"
+            }
+          ]
+        },
+        {
+          "german": "Ergebnisgleichheit",
+          "sources": [
+            {
+              "doc": "DSB",
+              "at": "0.12.1 p. 61"
+            },
+            {
+              "doc": "VdRBw",
+              "at": "p. 24"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "target-format",
+      "group": "target-shooting",
+      "english": "Target format",
+      "status": "verified",
+      "german": "Scheibenformat",
+      "sources": [
+        {
+          "doc": "BDS-Z",
+          "at": "Z1 p. 2"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "firing-line",
+      "group": "target-shooting",
+      "english": "Firing line",
+      "status": "verified",
+      "german": "Feuerlinie",
+      "sources": [
+        {
+          "doc": "DSB",
+          "at": "0.3 p. 24"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "shooting-range",
+      "group": "target-shooting",
+      "english": "Shooting range",
+      "status": "verified",
+      "german": "Schießstand",
+      "sources": [
+        {
+          "doc": "DSB",
+          "at": "0.3 p. 24"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "position",
+      "group": "target-shooting",
+      "english": "Position",
+      "status": "verified",
+      "german": "Anschlag",
+      "sources": [
+        {
+          "doc": "DSB",
+          "at": "0.3 p. 24"
+        }
+      ],
+      "candidates": [],
+      "note": "Liegendanschlag, Stehendanschlag."
+    },
+    {
+      "key": "electronic-target",
+      "group": "target-shooting",
+      "english": "Electronic target",
+      "status": "verified",
+      "german": "elektronische Scheibe",
+      "sources": [
+        {
+          "doc": "DSB",
+          "at": "0.4.3.2 p. 30"
+        }
+      ],
+      "candidates": []
+    },
+    {
+      "key": "stage",
+      "group": "target-shooting",
+      "english": "Stage, course of fire",
+      "status": "unverified",
+      "german": null,
+      "sources": [],
+      "candidates": [],
+      "note": "Not researched."
+    },
+    {
+      "key": "paper-size-bull-numerals",
+      "group": "target-shooting",
+      "english": "Paper size, bull, printed numerals",
+      "status": "unverified",
+      "german": null,
+      "sources": [],
+      "candidates": [],
+      "note": "Not researched."
+    }
+  ]
+}
