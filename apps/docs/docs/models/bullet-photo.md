@@ -56,6 +56,8 @@ Code: `apps/web/src/lib/bullet-photo.ts`, `segment`, `coverOf`, `localLevels`, `
 
 **Ragged edges.** A cut-out whose edge, after a closing of 2 px that takes thin slits out, has more than 9 boundary pixels per root of its area is a patch of the background's texture, not a bullet: a smooth body of length L and width d has 2 (L + d) / sqrt(L d), 7 at ten diameters long. The largest of the other cut-outs with a smooth edge is taken instead. When none is, the user is told that the background may be textured or busy. Code: `segmentPhoto`, `pickCut`, `deviation`, `raggedness`.
 
+**A second object.** When another part of the first pass is at least 30% as large as the part chosen (a second bullet, a cartridge, a ruler whose points are not placed yet), a note says so and asks the user to check that the one cut out is the bullet, to photograph one bullet alone or to paint the others out with the brush. The part chosen is the largest that does not touch the photograph's edge, else the largest. Code: `bestPart` in `apps/web/src/lib/bullet-photo.ts`.
+
 **Edge spread.** The width $s$ the grey takes to go from the background to the bullet at the cut-out's edge is the contrast over the steepest slope, taken along the boundary and kept at its upper quartile (a shadow lies along one side only). A sharp edge reads 1 to 3 px. Above 4 px and 4 % of the bullet's thickness the cut-out carries a note that the edges are soft (a shadow beside the bullet, or an out-of-focus or moved photograph), and each edge position's standard uncertainty grows:
 
 $$

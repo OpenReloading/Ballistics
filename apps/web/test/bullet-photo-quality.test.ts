@@ -121,7 +121,7 @@ describe('a bullet darker than the paper on one side and brighter on the other',
 })
 
 describe('more than one bullet in the photograph', () => {
-  it('says that the largest was cut out, and says nothing for a single bullet', () => {
+  it('says that another object is in the photograph, and says nothing for a single bullet', () => {
     const tall = {
       height: 560,
       ruler: { x0: 20, y: 470, heightPx: 50, lengthMm: 30, toEdges: true },
@@ -139,6 +139,24 @@ describe('more than one bullet in the photograph', () => {
     expect(segmentPhoto(one.image, [span.a, span.b]).warnings.join(' ')).not.toMatch(
       /Another object/,
     )
+  })
+})
+
+describe('a photograph of more than 900 px', () => {
+  it('is cut at its own size and gives the same bullet', () => {
+    const big = spec({
+      pxPerMm: 40,
+      width: 1800,
+      height: 840,
+      base: { x: 260, y: 400 },
+      ruler: { x0: 40, y: 680, heightPx: 100, lengthMm: 30, toEdges: true },
+    })
+    const photo = renderPhoto(big)
+    const span = defined(photo.span)
+    const seg = segmentPhoto(photo.image, [span.a, span.b])
+    expect([seg.width, seg.height, seg.alpha.length]).toEqual([1800, 840, 1800 * 840])
+    const outline = defined(fitOutline(seg, { edgeSpread: seg.edgeSpread }))
+    expect(Math.abs(outline.length / 40 - 30)).toBeLessThan(0.2)
   })
 })
 

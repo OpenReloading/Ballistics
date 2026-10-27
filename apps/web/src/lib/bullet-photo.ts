@@ -505,7 +505,7 @@ export function segment(g: Gray, exclude: readonly Point[] = []): Segmentation {
       : []),
     ...(rivals
       ? [
-          'Another object about as large as the bullet is in the photograph and the largest was cut out. Photograph one bullet alone, or paint the others out with the brush.',
+          'Another object about as large as the bullet is in the photograph. Check that the one cut out is the bullet, or photograph one bullet alone, or paint the others out with the brush.',
         ]
       : []),
     ...softEdgeWarning(edgeSpread, thickness),

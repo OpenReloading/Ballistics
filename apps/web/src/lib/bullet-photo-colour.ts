@@ -264,6 +264,9 @@ function raggedness({ alpha, width: w, height: h }: Segmentation): number {
 /** Above this the edge of a cut-out is a surface's texture, not a bullet's outline. */
 const ragged = 9
 
+const raggedNote =
+  'The cut-out has a ragged edge: the background may be textured or busy. A plain background gives a better cut-out.'
+
 const rough = (s: Segmentation) => raggedness(s) > ragged
 
 const area = (s: Segmentation) => s.alpha.reduce((n, v) => n + (v >= 128 ? 1 : 0), 0)
@@ -290,6 +293,8 @@ interface Pick {
   cut: Cut
   /** The cut-out `cut` reads the background around, when it is not the photograph's own. */
   known?: Uint8Array
+  /** Sentences for the user about the choice itself, which the cut-out made on the photograph needs too. */
+  notes?: string[]
 }
 
 /**
@@ -324,18 +329,7 @@ function pickCut(img: RgbaImage, exclude: readonly Point[]): Pick {
   const smooth = options
     .filter((o) => area(o.seg) > 0 && !rough(o.seg))
     .sort((a, b) => area(b.seg) - area(a.seg))[0]
-  return (
-    smooth ?? {
-      ...picked,
-      seg: {
-        ...picked.seg,
-        warnings: [
-          ...picked.seg.warnings,
-          'The cut-out has a ragged edge: the background may be textured or busy. A plain background gives a better cut-out.',
-        ],
-      },
-    }
-  )
+  return smooth ?? { ...picked, notes: [raggedNote] }
 }
 
 /** The longest side of the photograph the cut is chosen on, px. */
@@ -375,12 +369,16 @@ function enlarged(small: Uint8Array, k: number, sw: number, [w, h]: [number, num
  */
 export function segmentPhoto(img: RgbaImage, exclude: readonly Point[] = []): Segmentation {
   const k = Math.max(1, Math.ceil(Math.max(img.width, img.height) / chooseLong))
-  if (k === 1) return pickCut(img, exclude).seg
-  const small = reduced(img, k)
+  const small = k === 1 ? img : reduced(img, k)
   const picked = pickCut(
     small,
     exclude.map((p) => ({ x: p.x / k, y: p.y / k })),
   )
   const known = picked.known && enlarged(picked.known, k, small.width, [img.width, img.height])
-  return picked.cut(img, exclude, known ?? new Uint8Array(0)) ?? picked.seg
+  // a cut that finds nothing at full size (its colour is judged on a sample) falls back to luma, of the photograph's size
+  const seg =
+    k === 1
+      ? picked.seg
+      : (picked.cut(img, exclude, known ?? new Uint8Array(0)) ?? segment(grayOf(img), exclude))
+  return picked.notes ? { ...seg, warnings: [...seg.warnings, ...picked.notes] } : seg
 }
