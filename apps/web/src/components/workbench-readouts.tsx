@@ -4,7 +4,7 @@ import { Button, Popover, UnstyledButton } from '@mantine/core'
 import { freeRecoil } from '@open-reloading/core'
 import { fromSi } from '@open-reloading/schema'
 import { memo, useEffect, useRef } from 'react'
-import type { InteriorResponse } from '../lib/api-types.ts'
+import type { ErrorBody, InteriorResponse } from '../lib/api-types.ts'
 import {
   describeCurve,
   type FittedPowder,
@@ -53,6 +53,21 @@ import {
 
 const reasonText: Record<string, string> = { noValue: 'no value' }
 
+/** What an invalid run (the reasons of `InteriorReason` in core) means and what to change. */
+const invalidRunText: Record<string, string> = {
+  input: 'A value is outside what the model accepts. Check the field named below.',
+  chamberVolume:
+    'The charge does not fit the chamber: the solid powder and its covolume fill the usable case volume. Lower the charge or enter a larger usable case volume.',
+  noShotStart:
+    'The powder burned out before the bullet started to move. Raise the charge or lower the start pressure.',
+  stuck:
+    'The bullet stopped in the bore before the muzzle. Raise the charge or lower the bore resistance.',
+  integration:
+    'The calculation did not converge. Check that the values are plausible, in particular the charge and the usable case volume.',
+  maxTime:
+    'The bullet did not reach the muzzle within the run time. Raise the charge or check the bullet travel and the barrel length.',
+}
+
 /** A limit as stored: bar with the record's decimals, and psi. */
 function limitValue(l: NonNullable<InteriorResponse['limits']>[number]) {
   if (l.pressure === undefined) return ''
@@ -62,6 +77,12 @@ function limitValue(l: NonNullable<InteriorResponse['limits']>[number]) {
 function yesNo(value: boolean | undefined) {
   if (value === undefined) return ''
   return value ? <strong className="exceeded">yes</strong> : 'no'
+}
+
+/** The sentence for an error answer: for a refused run what is wrong and what to change. */
+function errorHeadline(status: number, b: Pick<ErrorBody, 'reason' | 'message'>) {
+  const sentence = status === 422 && b.reason ? invalidRunText[b.reason] : undefined
+  return sentence ?? b.message ?? `HTTP ${status}`
 }
 
 export function ErrorView({ outcome }: { outcome: Extract<Outcome, { kind: 'error' }> }) {
@@ -82,7 +103,7 @@ export function ErrorView({ outcome }: { outcome: Extract<Outcome, { kind: 'erro
           </ul>
         </>
       ) : (
-        <p>{b.message ?? `HTTP ${outcome.status}`}</p>
+        <p>{errorHeadline(outcome.status, b)}</p>
       )}
       {outcome.status === 422 && (b.reason || b.field) && (
         <p>
