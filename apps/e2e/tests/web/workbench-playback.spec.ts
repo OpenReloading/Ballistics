@@ -74,3 +74,27 @@ test('the chart readout slider follows the keys and a value change, and is clear
   await expect(readout).not.toHaveAttribute('aria-valuetext')
   await expect(readout).toHaveValue('0')
 })
+
+test('Escape hides the chart tooltip with the pointer or the focus where it is', async ({
+  page,
+}) => {
+  await runExample(page)
+  const chart = page.locator('.echart [role="img"]').last()
+  const tip = page.locator('.echart div[style*="position: absolute"]')
+  const box = await chart.boundingBox()
+  if (!box) throw new Error('no chart box')
+
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 5 })
+  await page.mouse.move(box.x + box.width / 2 + 30, box.y + box.height / 2, { steps: 5 })
+  await expect(tip).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(tip).toBeHidden()
+
+  const readout = page.locator('.echart-keys').last()
+  await readout.focus()
+  await readout.press('ArrowRight')
+  await expect(tip).toBeVisible()
+  await readout.press('Escape')
+  await expect(tip).toBeHidden()
+  await expect(readout).toBeFocused()
+})

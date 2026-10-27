@@ -8397,6 +8397,11 @@ main .session-shots th:nth-child(-n + 2) {
   user-select: none;
 }
 
+/* inside the box: the canvas clips what lies outside it */
+.target-canvas > svg:focus-visible {
+  outline-offset: -3px;
+}
+
 .target-canvas[data-tool="shot"] > svg,
 .target-canvas:not([data-tool="select"]) > svg {
   cursor: crosshair;
@@ -10171,6 +10176,8 @@ main .page-bar h1 {
 
 /* a note on a value (the caliber's diameter, the other BC) is underlined while pointed at only */
 .directory-table .field-note {
+  min-width: 1.5rem;
+  min-height: 1.5rem;
   text-decoration: none;
 }
 
@@ -10187,14 +10194,6 @@ main .page-bar h1 {
    the catalogue's) */
 .directory-table tr[data-break] > td {
   border-top: 2px solid color-mix(in srgb, var(--muted) 55%, var(--border));
-}
-
-/* a finger's box: 24 px, the cell is 36 px wide */
-@media (pointer: coarse) {
-  .directory-table .select-cell input {
-    width: 1.5rem;
-    height: 1.5rem;
-  }
 }
 
 @media screen {
@@ -10487,7 +10486,7 @@ main .page-bar h1 {
 /* row selection of the bullet list: a narrow checkbox column above the row's link, on
    phones too, not printed */
 .directory-table col.select-cell {
-  width: 2.25rem;
+  width: 2.5rem;
 }
 
 .directory-table .select-cell {
@@ -10508,9 +10507,10 @@ main .page-bar h1 {
   z-index: 2;
 }
 
+/* 24 px (WCAG 2.5.8): the row's link covers the row, so a smaller box would sit inside its target */
 .directory-table .select-cell input {
-  width: 1rem;
-  height: 1rem;
+  width: 1.5rem;
+  height: 1.5rem;
   margin: 0;
   vertical-align: middle;
 }

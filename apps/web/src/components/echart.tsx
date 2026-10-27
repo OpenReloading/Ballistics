@@ -146,11 +146,17 @@ export function EChart({
     const after = () => {
       if (node.clientWidth > 0) redraw(node.clientWidth)
     }
+    // Escape hides the tooltip (WCAG 1.4.13) wherever the pointer or the focus is
+    const dismiss = (e: globalThis.KeyboardEvent) => {
+      if (e.key === 'Escape') c?.dispatchAction({ type: 'hideTip' })
+    }
     addEventListener('beforeprint', before)
     addEventListener('afterprint', after)
+    addEventListener('keydown', dismiss)
     return () => {
       removeEventListener('beforeprint', before)
       removeEventListener('afterprint', after)
+      removeEventListener('keydown', dismiss)
       seen.disconnect()
       c?.dispose()
       chart.current = null

@@ -123,6 +123,22 @@ test('a shift click ticks the rows between two boxes and Clear selection unticks
   await expect(boxes.last()).toBeChecked()
 })
 
+test('the tick boxes and value notes of a row are at least 24 px, as the row keeps its height', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/bullets')
+  const row = page.locator('.directory-table tbody tr[data-row]').first()
+  const sizes = await row.locator('input[type="checkbox"], button.field-note').evaluateAll((els) =>
+    els.map((e) => {
+      const r = e.getBoundingClientRect()
+      return Math.min(r.width, r.height)
+    }),
+  )
+  expect(sizes.length).toBeGreaterThan(1)
+  for (const s of sizes) expect(s).toBeGreaterThanOrEqual(24)
+  expect((await row.boundingBox())?.height).toBe(32)
+})
+
 test('the list sorts by L3 through its header button', async ({ page }) => {
   await gotoHydrated(page, '/cartridges')
   const header = page.getByRole('columnheader', { name: /^Case length L3 \(in\)/ })

@@ -12,7 +12,7 @@ import {
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { fromSi, toSi } from '@open-reloading/schema'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import type { Design } from '../lib/bullet-designer.ts'
 import { paintPhoto } from '../lib/bullet-photo-canvas.ts'
 import { type PhotoRow, storedText, valueText } from '../lib/bullet-photo-design.ts'
@@ -174,6 +174,7 @@ function PhotoTool({
   onOpen: (d: Design) => Promise<boolean>
 }) {
   const t = useBulletPhoto(system, record)
+  const id = useId()
   const { size, points, found, scale, drawing } = t
   const shown = useRef<HTMLCanvasElement>(null)
   const [tool, setTool] = useState<Tool>('scale')
@@ -212,12 +213,15 @@ function PhotoTool({
   return (
     <Flex gap="md" wrap="wrap" align="flex-start" className="bullet-photo">
       <div style={{ flex: '2 1 28rem', minWidth: 0 }}>
+        {/* biome-ignore lint/a11y/noInteractiveElementToNoninteractiveRole: a canvas with its own keys is announced as an application, as the target sheet is */}
         <canvas
           ref={shown}
           width={size?.width ?? 1}
           height={size?.height ?? 1}
           tabIndex={size ? 0 : -1}
-          aria-label="Photograph of the bullet. Arrow keys move the cursor, Shift for single pixels, Control for large steps. Enter places a scale point or paints with the brush."
+          role="application"
+          aria-label="Photograph of the bullet"
+          aria-describedby={`${id}-keys`}
           onPointerDown={pointer.down}
           onPointerMove={pointer.move}
           onPointerUp={pointer.up}
@@ -233,6 +237,10 @@ function PhotoTool({
             border: '1px solid var(--mantine-color-default-border)',
           }}
         />
+        <p id={`${id}-keys`} className="visually-hidden">
+          Arrow keys move the cursor, Shift for single pixels, Control for large steps. Enter places
+          a scale point or paints with the brush.
+        </p>
         {!size && (
           <Text c="dimmed" fz="sm">
             Choose a photograph of the bullet beside a ruler, or try the sample. It is read in this

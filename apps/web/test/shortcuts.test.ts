@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
+  isSingleKey,
+  parseSingleKeys,
   type ShortcutId,
   shortcutAriaKeys,
   shortcutLabel,
@@ -43,6 +45,13 @@ describe('shortcuts', () => {
   it('fires a single key only outside text fields', () => {
     for (const id of ids)
       if (shortcuts[id].keys.some((k) => !k.includes('+'))) expect(shortcuts[id].fields).toBeFalsy()
+  })
+
+  it('names the single-key shortcuts Settings can turn off, and reads the stored choice', () => {
+    expect(ids.filter(isSingleKey)).toEqual(['help', 'focusSearch'])
+    expect(parseSingleKeys(null)).toBe(true)
+    expect(parseSingleKeys('off')).toBe(false)
+    expect(parseSingleKeys('anything else')).toBe(true)
   })
 
   it('shows Ctrl and names Cmd to screen readers', () => {

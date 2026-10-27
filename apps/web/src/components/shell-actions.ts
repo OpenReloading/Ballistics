@@ -7,7 +7,7 @@ import { sections } from '../lib/sections.ts'
 import { shortcutLabel } from '../lib/shortcuts.ts'
 import { openSafety } from './safety-dialog.tsx'
 import { SettingsDialog } from './settings-dialog.ts'
-import { openShortcuts } from './shortcuts.tsx'
+import { openShortcuts, useSingleKeys } from './shortcuts.tsx'
 
 /** A command of the search; `keys` names its shortcut, shown beside it. */
 export type Command = { label: string; run: () => void; keys?: string }
@@ -21,6 +21,7 @@ export function useShellActions(): { pages: Command[]; commands: Command[] } {
   const router = useRouter()
   const openSettings = useContext(SettingsDialog)
   const { setColorScheme } = useMantineColorScheme()
+  const singleKeys = useSingleKeys()
   return {
     pages: [
       { label: 'Home', run: () => router.push('/') },
@@ -39,7 +40,11 @@ export function useShellActions(): { pages: Command[]; commands: Command[] } {
       { label: 'Units settings', run: () => openSettings('units') },
       { label: 'Workbench settings', run: () => openSettings('workbench') },
       { label: 'Safety notice', run: openSafety },
-      { label: 'Keyboard shortcuts', run: openShortcuts, keys: shortcutLabel('help') },
+      {
+        label: 'Keyboard shortcuts',
+        run: openShortcuts,
+        ...(singleKeys && { keys: shortcutLabel('help') }),
+      },
       { label: 'Theme: system', run: () => setColorScheme('auto') },
       { label: 'Theme: light', run: () => setColorScheme('light') },
       { label: 'Theme: dark', run: () => setColorScheme('dark') },
