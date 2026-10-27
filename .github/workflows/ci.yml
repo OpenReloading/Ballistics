@@ -1,9 +1,11 @@
 name: CI
 
 on:
+  # Release tags and images: release.yml.
+  push:
+    branches: [main]
   pull_request:
-  # The merge queue runs every check on the exact commit that lands on main, so there is no push run. Release tags
-  # and images: release.yml.
+  # Ready for a merge queue on `main`; without one the push run checks every merge.
   merge_group:
 
 permissions: {}
@@ -26,7 +28,7 @@ env:
 jobs:
   # Which jobs run and what the e2e job exports: only a pull request may skip `check` (prose only) or `e2e` (no
   # change to what the API, the web app, the export scripts or the e2e specs read), or export a sample of the
-  # cartridge pages. Every other event (the merge queue) and every doubt runs everything; see
+  # cartridge pages. Every other event (the default branch, the merge queue) and every doubt runs everything; see
   # apps/web/scripts/ci-plan.mts.
   changes:
     runs-on: ubuntu-latest
