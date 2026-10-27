@@ -15,3 +15,30 @@ export function devExit(child: ChildProcess, stopped: () => boolean): Promise<vo
       )
   })
 }
+
+/**
+ * Registers SIGINT and SIGTERM handlers that mark the run as stopped and pass the signal on to the
+ * process group `group()` returns, none while it returns `undefined` (before the server started).
+ * Returns `stopped()`, which `devExit` takes, and the function that removes the handlers.
+ */
+export function stopOnSignal(
+  group: () => number | undefined,
+  kill: (pid: number, signal: NodeJS.Signals) => unknown = process.kill,
+): { stopped: () => boolean; dispose: () => void } {
+  let stopped = false
+  const handlers = (['SIGINT', 'SIGTERM'] as const).map((signal) => {
+    const handler = () => {
+      stopped = true
+      const pid = group()
+      if (pid !== undefined) kill(-pid, signal)
+    }
+    process.on(signal, handler)
+    return [signal, handler] as const
+  })
+  return {
+    stopped: () => stopped,
+    dispose: () => {
+      for (const [signal, handler] of handlers) process.off(signal, handler)
+    },
+  }
+}
