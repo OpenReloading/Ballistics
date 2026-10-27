@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.0.3](https://github.com/OpenReloading/Ballistics/compare/importers-v0.0.2...importers-v0.0.3) (2026-10-27)
+
+
+### Features
+
+* **core:** fit burn form and pressure exponent from a pressure-time curve ([#225](https://github.com/OpenReloading/Ballistics/issues/225)) ([211b9ce](https://github.com/OpenReloading/Ballistics/commit/211b9ce117de37b4fa8371aa568c477d2adbf235))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @open-reloading/schema bumped from 0.0.2 to 0.0.3
+
 ## [0.0.2](https://github.com/OpenReloading/Ballistics/compare/importers-v0.0.1...importers-v0.0.2) (2026-10-26)
 
 

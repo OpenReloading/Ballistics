@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.0.3](https://github.com/OpenReloading/Ballistics/compare/core-v0.0.2...core-v0.0.3) (2026-10-27)
+
+
+### Features
+
+* **core:** fit a chamber volume correction and note a volume that is not measured ([#229](https://github.com/OpenReloading/Ballistics/issues/229)) ([3b4c161](https://github.com/OpenReloading/Ballistics/commit/3b4c161004d42e4cca00287eb72285e8aee5e934))
+* **core:** fit burn form and pressure exponent from a pressure-time curve ([#225](https://github.com/OpenReloading/Ballistics/issues/225)) ([211b9ce](https://github.com/OpenReloading/Ballistics/commit/211b9ce117de37b4fa8371aa568c477d2adbf235))
+* **core:** fit energy and temperature factor from sessions at several barrel lengths and temperatures ([#233](https://github.com/OpenReloading/Ballistics/issues/233)) ([11a96ab](https://github.com/OpenReloading/Ballistics/commit/11a96abc92c2b3698e027bdd4a807b75a9460277))
+* **core:** pressure range, similar-powder prior and confidence label of a powder fit ([#261](https://github.com/OpenReloading/Ballistics/issues/261)) ([9b59440](https://github.com/OpenReloading/Ballistics/commit/9b594400524501cdfa3d72c5f1df8697de045bc2))
+* **web:** notes on a saved load when lots, seating, velocity or round count change ([#215](https://github.com/OpenReloading/Ballistics/issues/215)) ([98409f1](https://github.com/OpenReloading/Ballistics/commit/98409f16f4fef64cd90bffb4f8d49411ea1fd6de))
+
 ## [0.0.2](https://github.com/OpenReloading/Ballistics/compare/core-v0.0.1...core-v0.0.2) (2026-10-26)
 
 

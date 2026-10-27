@@ -1,6 +1,6 @@
 {
   "name": "@open-reloading/importers",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -30,7 +30,7 @@
     "test": "vitest run --coverage"
   },
   "dependencies": {
-    "@open-reloading/schema": "0.0.2"
+    "@open-reloading/schema": "0.0.3"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^5.0.5",
