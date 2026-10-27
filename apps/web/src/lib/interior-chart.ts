@@ -384,7 +384,8 @@ function xAxisOption(
       padding: [8, 0, 0, 0],
     },
     axisLine: axisLine(theme.border),
-    axisLabel: { formatter: plain, showMaxLabel: false },
+    // the muted ink: a label takes the axis line's colour (the border) unless one is given
+    axisLabel: { formatter: plain, showMaxLabel: false, color: theme.muted },
     splitLine: { lineStyle: { color: theme.grid } },
   }
 }

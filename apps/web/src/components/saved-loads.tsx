@@ -230,124 +230,134 @@ export function SavedLoads({
   ])
   const groups = loadGroups(records, query, names)
   return (
-    <Drawer opened={opened} onClose={onClose} title="Saved loads" size="sm" position="left">
-      <TextInput
-        aria-label="Search saved loads"
-        placeholder="Search"
-        value={query}
-        onChange={(e) => setQuery(e.currentTarget.value)}
-        mb="sm"
-      />
-      <div className="saved-loads">
-        {groups.map((g) => (
-          <section key={g.key} aria-label={g.title}>
-            <Text fw={600} size="sm">
-              {g.title}
-            </Text>
-            <ul>
-              {g.records.map((r) => (
-                <li key={r.id}>
-                  {renaming?.id === r.id ? (
-                    <input
-                      className="saved-rename"
-                      aria-label={`Name of ${r.name}`}
-                      maxLength={200}
-                      ref={focusField}
-                      value={renaming.text}
-                      onFocus={(e) => e.currentTarget.select()}
-                      onChange={(e) => setRenaming({ id: r.id, text: e.currentTarget.value })}
-                      onBlur={(e) => rename(r, e.currentTarget.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') void rename(r, renaming.text)
-                        else if (e.key === 'Escape') {
-                          // the drawer stays open
-                          e.stopPropagation()
-                          stopEdit()
-                        }
-                      }}
-                    />
-                  ) : (
-                    <Button
-                      variant="subtle"
-                      size={controlSize.row.button}
-                      className="saved-open"
-                      aria-current={openIds.includes(r.id) || undefined}
-                      onClick={() => {
-                        onOpen(r)
-                        onClose()
-                      }}
-                    >
-                      {r.name}
-                    </Button>
-                  )}
-                  <span className="file-reason">{new Date(r.saved).toLocaleString()}</span>
-                  <ActionIcon
-                    size={controlSize.row.icon}
-                    variant="subtle"
-                    aria-label={`Rename ${r.name}`}
-                    title="Rename"
-                    onClick={() => edit(r.id, r.name)}
-                  >
-                    <PencilSimple size={16} aria-hidden="true" />
-                  </ActionIcon>
-                  <ActionIcon
-                    size={controlSize.row.icon}
-                    variant="subtle"
-                    aria-label={`Duplicate ${r.name}`}
-                    title="Duplicate"
-                    onClick={() => duplicate(r)}
-                  >
-                    <Copy size={16} aria-hidden="true" />
-                  </ActionIcon>
-                  <ActionIcon
-                    size={controlSize.row.icon}
-                    variant="subtle"
-                    aria-label={`Export ${r.name}`}
-                    title="Export to a file"
-                    onClick={() => exportOne(r)}
-                  >
-                    <DownloadSimple size={16} aria-hidden="true" />
-                  </ActionIcon>
-                  <ActionIcon
-                    size={controlSize.row.icon}
-                    variant="subtle"
-                    color="red"
-                    aria-label={`Delete ${r.name}`}
-                    title="Delete"
-                    onClick={() => remove(r)}
-                  >
-                    <Trash size={16} aria-hidden="true" />
-                  </ActionIcon>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))}
-        {groups.length === 0 && (
-          <Text size="sm" c="dimmed">
-            {records.length === 0 ? 'No saved loads.' : 'No match.'}
-          </Text>
-        )}
-      </div>
-      <div className="saved-storage" role="status">
-        {message && <p>{message}</p>}
-        {older > 0 && (
-          <p>
-            {older === 1 ? '1 saved load is' : `${older} saved loads are`} in the format of an
-            earlier version, which this app no longer reads. Open lists{' '}
-            {older === 1 ? 'it' : 'them'} under Invalid records.
-          </p>
-        )}
-        {storage.persisted !== undefined && (
-          <p>
-            {storage.persisted
-              ? 'Persistent storage: granted.'
-              : 'Persistent storage: not granted, the browser may clear the saved loads.'}
-          </p>
-        )}
-        {storage.used !== undefined && <p>Storage used: {megabytes(storage.used)}.</p>}
-        {reminder && <p data-due>{reminder} Export all (Save options) keeps a copy.</p>}
-      </div>
-    </Drawer>
+    <Drawer.Root opened={opened} onClose={onClose} size="sm" position="left">
+      <Drawer.Overlay />
+      <Drawer.Content>
+        {/* a div: a second <header> beside the site header would be another banner landmark */}
+        <Drawer.Header component="div">
+          <Drawer.Title>Saved loads</Drawer.Title>
+          <Drawer.CloseButton aria-label="Close saved loads" />
+        </Drawer.Header>
+        <Drawer.Body>
+          <TextInput
+            aria-label="Search saved loads"
+            placeholder="Search"
+            value={query}
+            onChange={(e) => setQuery(e.currentTarget.value)}
+            mb="sm"
+          />
+          <div className="saved-loads">
+            {groups.map((g) => (
+              <section key={g.key} aria-label={g.title}>
+                <Text fw={600} size="sm">
+                  {g.title}
+                </Text>
+                <ul>
+                  {g.records.map((r) => (
+                    <li key={r.id}>
+                      {renaming?.id === r.id ? (
+                        <input
+                          className="saved-rename"
+                          aria-label={`Name of ${r.name}`}
+                          maxLength={200}
+                          ref={focusField}
+                          value={renaming.text}
+                          onFocus={(e) => e.currentTarget.select()}
+                          onChange={(e) => setRenaming({ id: r.id, text: e.currentTarget.value })}
+                          onBlur={(e) => rename(r, e.currentTarget.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') void rename(r, renaming.text)
+                            else if (e.key === 'Escape') {
+                              // the drawer stays open
+                              e.stopPropagation()
+                              stopEdit()
+                            }
+                          }}
+                        />
+                      ) : (
+                        <Button
+                          variant="subtle"
+                          size={controlSize.row.button}
+                          className="saved-open"
+                          aria-current={openIds.includes(r.id) || undefined}
+                          onClick={() => {
+                            onOpen(r)
+                            onClose()
+                          }}
+                        >
+                          {r.name}
+                        </Button>
+                      )}
+                      <span className="file-reason">{new Date(r.saved).toLocaleString()}</span>
+                      <ActionIcon
+                        size={controlSize.row.icon}
+                        variant="subtle"
+                        aria-label={`Rename ${r.name}`}
+                        title="Rename"
+                        onClick={() => edit(r.id, r.name)}
+                      >
+                        <PencilSimple size={16} aria-hidden="true" />
+                      </ActionIcon>
+                      <ActionIcon
+                        size={controlSize.row.icon}
+                        variant="subtle"
+                        aria-label={`Duplicate ${r.name}`}
+                        title="Duplicate"
+                        onClick={() => duplicate(r)}
+                      >
+                        <Copy size={16} aria-hidden="true" />
+                      </ActionIcon>
+                      <ActionIcon
+                        size={controlSize.row.icon}
+                        variant="subtle"
+                        aria-label={`Export ${r.name}`}
+                        title="Export to a file"
+                        onClick={() => exportOne(r)}
+                      >
+                        <DownloadSimple size={16} aria-hidden="true" />
+                      </ActionIcon>
+                      <ActionIcon
+                        size={controlSize.row.icon}
+                        variant="subtle"
+                        color="red"
+                        aria-label={`Delete ${r.name}`}
+                        title="Delete"
+                        onClick={() => remove(r)}
+                      >
+                        <Trash size={16} aria-hidden="true" />
+                      </ActionIcon>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))}
+            {groups.length === 0 && (
+              <Text size="sm" c="dimmed">
+                {records.length === 0 ? 'No saved loads.' : 'No match.'}
+              </Text>
+            )}
+          </div>
+          <div className="saved-storage" role="status">
+            {message && <p>{message}</p>}
+            {older > 0 && (
+              <p>
+                {older === 1 ? '1 saved load is' : `${older} saved loads are`} in the format of an
+                earlier version, which this app no longer reads. Open lists{' '}
+                {older === 1 ? 'it' : 'them'} under Invalid records.
+              </p>
+            )}
+            {storage.persisted !== undefined && (
+              <p>
+                {storage.persisted
+                  ? 'Persistent storage: granted.'
+                  : 'Persistent storage: not granted, the browser may clear the saved loads.'}
+              </p>
+            )}
+            {storage.used !== undefined && <p>Storage used: {megabytes(storage.used)}.</p>}
+            {reminder && <p data-due>{reminder} Export all (Save options) keeps a copy.</p>}
+          </div>
+        </Drawer.Body>
+      </Drawer.Content>
+    </Drawer.Root>
   )
 }
