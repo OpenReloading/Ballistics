@@ -21,7 +21,7 @@ import {
   taskTimeoutMs,
 } from '@open-reloading/api/compute'
 import { type Powder, primerCompounds, primerSizes } from '@open-reloading/schema'
-import { basePath } from './edition.ts'
+import { dataFile } from './data-file.ts'
 
 const listKinds = new Set([
   'cartridges',
@@ -44,23 +44,6 @@ const maxBody = 64 * 1024
 const answer = (status: number, body: unknown) => Response.json(body, { status })
 const refusal = (status: number, error: string, message: string) =>
   answer(status, { statusCode: status, error, message })
-
-const files = new Map<string, Promise<unknown>>()
-
-/** A data file (`name` without `.json`), undefined when there is none, kept for the page load. */
-function dataFile<T>(name: string): Promise<T | undefined> {
-  let file = files.get(name)
-  if (!file) {
-    file = fetch(`${basePath}/api/${name}.json`).then((res) => {
-      if (res.status === 404) return
-      if (!res.ok) throw new Error(`${name}.json answered ${res.status}`)
-      return res.json()
-    })
-    file.catch(() => files.delete(name))
-    files.set(name, file)
-  }
-  return file as Promise<T | undefined>
-}
 
 /** An integer query value within `min` and `max`, `fallback` when absent, NaN when invalid. */
 function integer(value: string | null, fallback: number, min: number, max: number) {

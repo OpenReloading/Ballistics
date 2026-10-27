@@ -96,3 +96,45 @@ test.describe('offline', () => {
     await context.setOffline(false)
   })
 })
+
+test.describe('Safety notice', () => {
+  // a first visit: nothing accepted yet
+  test.use({ storageState: { cookies: [], origins: [] } })
+
+  test('German stands beside the English text, each with the line that English is binding', async ({
+    page,
+  }) => {
+    await page.addInitScript(() => localStorage.setItem('language', 'de'))
+    const dialog = page.getByRole('dialog', { name: 'Sicherheitshinweis und Haftungsausschluss' })
+    const english = dialog.locator('[lang="en"]').first()
+    const german = dialog.locator('[lang="de"]').first()
+    for (const width of [1280, 390]) {
+      await page.setViewportSize({ width, height: 800 })
+      await page.goto('/')
+      await expect(dialog).toBeVisible()
+      await expect(dialog).toHaveCSS('opacity', '1')
+      await expect(english).toContainText('Reloading ammunition is dangerous.')
+      await expect(english).toContainText('The English text is binding.')
+      await expect(german).toContainText('Wiederladen von Munition')
+      await expect(german).toContainText('verbindlich')
+      const [e, g] = await Promise.all([english.boundingBox(), german.boundingBox()])
+      // side by side on a wide screen, the translation below the English text on a narrow one
+      if (width > 800) expect(g?.x).toBeGreaterThan((e?.x ?? 0) + (e?.width ?? 0) - 1)
+      else expect(g?.y).toBeGreaterThan((e?.y ?? 0) + (e?.height ?? 0) - 1)
+      // the first focus stays on the text
+      await expect(dialog.locator('.safety-text')).toBeFocused()
+      expect(
+        (
+          await new AxeBuilder({ page })
+            .include('[role="dialog"]')
+            .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+            .analyze()
+        ).violations,
+      ).toEqual([])
+    }
+    await page.keyboard.press('Escape')
+    await expect(dialog).toBeVisible()
+    await dialog.getByRole('button', { name: 'Ich akzeptiere' }).click()
+    await expect(dialog).toBeHidden()
+  })
+})

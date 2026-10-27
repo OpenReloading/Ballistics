@@ -4523,6 +4523,33 @@ main .library-head.page-panel-head > .page-panel-title {
   color: var(--mantine-color-yellow-7);
 }
 
+/* the English text and its translation: side by side from 48em, stacked below */
+.safety-columns {
+  display: grid;
+  gap: 1rem 2rem;
+}
+
+.safety-columns > :nth-child(2) {
+  border-top: 1px solid var(--mantine-color-default-border);
+  padding-top: 1rem;
+}
+
+.safety-binding {
+  font-weight: 700;
+}
+
+@media (min-width: 48em) {
+  .safety-columns:has(> :nth-child(2)) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .safety-columns > :nth-child(2) {
+    border-top: 0;
+    border-left: 1px solid var(--mantine-color-default-border);
+    padding: 0 0 0 2rem;
+  }
+}
+
 /* the card of the next open step before the first result (checklist) */
 .workbench .panel[data-next] {
   border-color: var(--link);

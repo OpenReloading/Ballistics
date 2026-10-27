@@ -39,6 +39,8 @@ function stateMessages(t: PhotoState): MessageEntry[] {
   return [
     ...(t.failure ? [{ severity: 'error', text: t.failure } as const] : []),
     ...t.warnings.map((text) => ({ severity: 'warning', text }) as const),
+    ...(t.found?.unusable ? [{ severity: 'error', text: t.found.unusable } as const] : []),
+    ...(t.found?.hints ?? []).map((text) => ({ severity: 'warning', text }) as const),
     ...(empty
       ? [
           {

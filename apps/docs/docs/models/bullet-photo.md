@@ -34,12 +34,23 @@ Code: `apps/web/src/lib/bullet-photo.ts`, `scaleOf`.
 ### Cut-out
 
 1. The photograph is turned into luma with the weights of [ITU-R BT.601](../bibliography.md#itu-r-bt-601).
-2. Otsu's threshold ([Otsu 1979](../bibliography.md#otsu-1979)) splits the greys. The side the photograph's border lies on is the background.
-3. A plane $a + b x + c y$ is fitted by least squares to the background pixels and taken off (a lighting gradient), the background's mean kept. The threshold is then taken again on the flattened greys, with the mean greys of the two sides $g_\mathrm{bg}$ and $g_\mathrm{fg}$. Below a gap of 25 grey levels nothing is cut out.
-4. Each pixel's coverage is $\alpha = \operatorname{clamp}\left(\frac{g - g_\mathrm{bg}}{g_\mathrm{fg} - g_\mathrm{bg}}, 0, 1\right)$. Pixels with $\alpha \ge 0.5$ form the mask.
-5. The bullet is the largest connected part of the mask that does not touch the photograph's edge and is not within a few pixels of a point the user placed on the ruler (the ruler is a part of its own). Holes in it (glare) are filled. A band of 2 px at its edge keeps $\alpha$, so the edge has a position finer than a pixel.
+2. Otsu's threshold ([Otsu 1979](../bibliography.md#otsu-1979)) splits the greys. The side the median of the photograph's border pixels lies on is the background, so bars or a ruler along some of the edges do not decide it.
+3. A plane $a + b x + c y$ is fitted by least squares to the background pixels and taken off (a lighting gradient), the background's mean kept. The threshold is then taken again on the flattened greys, with the mean greys of the two sides $g_\mathrm{bg}$ and $g_\mathrm{fg}$. Below a gap of 25 grey levels nothing is cut out; below 60 the cut-out carries a note that the outline may be rough.
+4. First pass: the pixels a quarter of the way from $g_\mathrm{bg}$ to $g_\mathrm{fg}$ or further. Rows and columns along the photograph's edges that are 90 % or more of these pixels (bars) are cleared, and the largest connected part is taken (below).
+5. Second pass: the bullet's own grey near each pixel replaces $g_\mathrm{fg}$. The rim of the first pass's part (the pixels 2 to 5 px inside its boundary) is averaged within a radius of 0.3 of the bullet's thickness, widened where the rim is out of reach, so a pale tip (bright metal) is told from the background by its own grey and not by the shank's. Each pixel's coverage is $\alpha = \operatorname{clamp}\left(\frac{g - g_\mathrm{bg}}{g_\mathrm{rim} - g_\mathrm{bg}}, 0, 1\right)$ and the pixels with $\alpha \ge 0.5$ form the mask.
+6. The bullet is the largest connected part of the mask that is not within a few pixels of a point the user placed on the ruler (the ruler is a part of its own), preferring a part that does not touch the photograph's edge. When every part touches it, the largest is taken and the cut-out carries a frame-contact note (below). Holes in it (glare) are filled. A band of 2 px at its edge keeps $\alpha$, so the edge has a position finer than a pixel.
 
-Code: `apps/web/src/lib/bullet-photo.ts`, `segment`, `flatten`, `levels`. The user can correct the cut-out with a brush.
+Code: `apps/web/src/lib/bullet-photo.ts`, `segment`, `coverOf`, `localLevels`, `clearBars`, `flatten`, `levels`. The user can correct the cut-out with a brush.
+
+**Colour.** When the bullet is within 60 grey levels of the background in luma, the cut-out is also made on the colour distance of each pixel from the background colour along the line to the bullet's colour (the background's median colour of the border, the bullet's mean of the pixels furthest from it, not counting the colours at the points the user placed on the ruler), and the colour cut-out replaces the luma one only when its contrast is more than 1.5 times greater; otherwise the luma cut-out is kept. Code: `apps/web/src/lib/bullet-photo-colour.ts`, `segmentPhoto`, `colourSeparation`.
+
+**Edge spread.** The width $s$ the grey takes to go from the background to the bullet at the cut-out's edge is the contrast over the steepest slope, taken along the boundary and kept at its upper quartile (a shadow lies along one side only). A sharp edge reads 1 to 3 px. Above 4 px and 4 % of the bullet's thickness the cut-out carries a note that the edges are soft (a shadow beside the bullet, or an out-of-focus or moved photograph), and each edge position's standard uncertainty grows:
+
+$$
+u_e = \sqrt{0.3^2 + \max(0, s - 3)^2}\ \text{px}
+$$
+
+Code: `apps/web/src/lib/bullet-photo.ts`, `edgeSpreadOf`; `apps/web/src/lib/bullet-photo-outline.ts`, `edgeUncertaintyOf`. The spread is not kept for a cut-out the user has corrected by hand, which is taken as sharp.
 
 ### Axis and profile
 
@@ -51,7 +62,7 @@ $$
 
 Code: `apps/web/src/lib/bullet-photo-outline.ts`, `momentsOf`.
 
-with $\mu$ the central second moments. It is then turned and shifted over four passes of a least squares line through the middles of the two edges of every column (columns at least 0.3 of the widest), until the middle of both edges lies on it: the symmetry line. Along it, the position of each edge at half coverage is found by linear interpolation of the bilinear coverage, at every pixel step. This gives the half width $r(z)$, with $z$ from the base to the tip. The nose end is the end whose taper to 90 % of the widest width is longer; when the two differ by less than 15 % the tool says so and the user can flip the nose or type the axis direction.
+with $\mu$ the central second moments. It is then turned and shifted over four passes of a least squares line through the middles of the two edges of every column (columns at least 0.3 of the widest), until the middle of both edges lies on it: the symmetry line. Along it, the position of each edge at half coverage is found by linear interpolation of the bilinear coverage, at every pixel step. This gives the half width $r(z)$, with $z$ from the base to the tip. The ends of the bullet are where the axis leaves the cut-out; where a reflection or the mouth of a hollow point leaves the axis itself uncovered, an end the axis finds more than 3 px inside the extent of the cut-out is taken from the extent. The nose end is the end whose taper to 90 % of the widest width is longer; when the two differ by less than 15 % the tool says so and the user can flip the nose or type the axis direction.
 
 Code: `apps/web/src/lib/bullet-photo-outline.ts`, `fitOutline`.
 
@@ -65,9 +76,9 @@ $$
 
 Code: `apps/web/src/lib/bullet-photo-measure.ts`, `shankOf`.
 
-with $u_e = 0.3$ px the standard uncertainty of an edge position (a uniform rounding error of one pixel, $1/\sqrt{12} \approx 0.29$ px, plus the grey's noise) and $n$ the number of samples. The diameter is $d = 2a$.
+with $u_e = 0.3$ px the standard uncertainty of an edge position at a sharp edge (a uniform rounding error of one pixel, $1/\sqrt{12} \approx 0.29$ px, plus the grey's noise; more where the edge is spread, above) and $n$ the number of samples. The diameter is $d = 2a$.
 
-A **boat tail** is present when the radius at the base is lower than $a$ by more than 4 % (at least 2.5 px). Its cone is the line $r = r_0 + c z$ fitted to the lower part of the cone, and
+A **boat tail** is present when the radius at the base is lower than $a$ by more than 4 % (at least 2.5 px). Its cone is the line $r = r_0 + c z$ fitted to the middle of the cone (from a quarter to 85 % of the way to where the shank starts, clear of the rounded corner at the base and of the one where the cone meets the shank), and
 
 $$
 z_b = \frac{a - r_0}{c}, \qquad \text{base diameter } 2 r_0, \qquad \text{angle } \arctan c
@@ -113,6 +124,22 @@ Code: `apps/web/src/lib/bullet-photo-measure.ts`, `measureOutline`.
 
 Ratios and angles take the scale out and carry the fit's uncertainty only. The fits' covariance comes from `lsq`.
 
+### Quality of the photograph
+
+A photograph too poor to measure gets sentences that say what is wrong and what to do, and no values, rather than a wrong outline. The outline stays on the canvas, so the cut-out can be corrected with the brush and measured again.
+
+| Finding | When | What the user is told |
+| --- | --- | --- |
+| Too small | The bullet is narrower than 16 px | No values; take the photograph closer or crop to the bullet, at least 80 px across |
+| Not a bullet's proportions | The cut-out is shorter than wide or more than 10 times as long | No values; brush the bullet in and the rest out, or retake it alone on a plain background |
+| Narrow | Narrower than 40 px | Values, with the best case of their uncertainty ($\sqrt{2} u_e$ over the width, below 40 px it is more than 1 %) |
+| Ragged | The scatter of the shank's sides is above 1.5 px or 2 % of the width | A reflection, a shadow or noise; retake in even soft light or brush the cut-out |
+| Soft edges | Edge spread above 4 px and 4 % of the thickness | Shadow beside the bullet, or out of focus or moved; values are less certain |
+| Low contrast | The cut-out used has the bullet within 60 grey levels of the background | The outline may be rough; a plainer or much lighter or darker background |
+| Cut at the frame | The cut-out touches the photograph's edge | The whole bullet may not be in it |
+
+Code: `apps/web/src/lib/bullet-photo-quality.ts`, `outlineHints`; `bullet-photo.ts`, `segment`.
+
 ## Symbols
 
 | Symbol | Meaning | Stored unit | Unit in code |
@@ -135,7 +162,7 @@ Ratios and angles take the scale out and carry the fit's uncertainty only. The f
 - The photograph is a side view of the bullet lying level, taken square on, with the ruler in the same plane as the bullet's axis. A ruler at another distance from the camera, or a bullet tilted towards the camera, changes the scale. This is not corrected and not part of the stated uncertainty.
 - Lens distortion is not corrected: a wide-angle lens near its edge distorts lengths. Keep the bullet and the ruler near the middle, with a long focal length.
 - The bullet is a body of revolution, so its silhouette is symmetric about the axis.
-- The bullet differs in brightness from the background (at least 25 grey levels).
+- The bullet differs from the background in brightness (at least 25 grey levels) or, where it does not, in colour.
 - The two points a user places on the ruler are at known graduation marks.
 
 ## Limits
@@ -145,8 +172,11 @@ Ratios and angles take the scale out and carry the fit's uncertainty only. The f
 - A rebated boat tail or a cone that is not straight raises a note; the line fit then represents it poorly.
 - The standard uncertainties include the edge position, the fits and the scale's placement. They do not include the ruler's own error, lens distortion or perspective, and they are not a confidence interval of the real bullet's size: a manufacturing spread among bullets of one product is larger than the measurement uncertainty.
 - The seeded design is a starting point. Its mass and manufacturer stay empty, and the note kept in it says the values are measured from a photograph, with the scale and every value's uncertainty. No image is stored.
+- A shadow beside the bullet is not taken out of the cut-out. It is told by its soft edge, which raises the uncertainty and adds a note; brushing it out of the cut-out measures the bullet alone. A shadow with a sharp edge cannot be told from the bullet.
+- Perspective is not detected: a bullet or a camera tilted so that one end is nearer makes the sides of the shank converge, and no note says so.
+- A reflection that reaches the bullet's edge cuts into the outline there, with no note unless it makes the edge ragged.
 - A photograph of more than 2400 px on its longer side is shrunk to that while it is read.
-- Tested on synthetic photographs rendered from the bullet drawing with known size, lighting gradient, side shading, noise and blur (`apps/web/test/bullet-photo.test.ts`). Real photographs are unverified.
+- Tested on synthetic photographs rendered from the bullet drawing with known size, lighting gradient, side shading, noise and blur (`apps/web/test/bullet-photo.test.ts`), and with a pale tip, a reflection along the axis, bars along the edges, a colour that differs from the background's at the same brightness, a soft shadow, strong blur, low contrast and a small bullet (`apps/web/test/bullet-photo-quality.test.ts`). For each of these the values are within three uncertainties of the truth, or a note says they may not be, or none are given. Real photographs are unverified.
 
 ## Sources
 

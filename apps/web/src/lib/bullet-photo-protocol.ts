@@ -18,11 +18,20 @@ export type WorkerRequest =
       height: number
       scale: Scale
       angle?: number | undefined
+      /** The width the cut-out's edge is spread over, px, as `segmented` told; absent for a cut-out corrected by hand. */
+      edgeSpread?: number | undefined
     }
 
 export type WorkerReply =
   | { kind: 'loaded'; id: number }
-  | { kind: 'segmented'; id: number; alpha: Uint8Array; warnings: string[] }
-  /** `outline` is absent when no bullet is outlined; the measurement is absent then too. */
-  | { kind: 'measured'; id: number; outline?: Outline; measurement?: BulletMeasurement }
+  | { kind: 'segmented'; id: number; alpha: Uint8Array; warnings: string[]; edgeSpread: number }
+  /** `outline` is absent when no bullet is outlined; the measurement is absent then too, and when the photograph is too poor to measure (`unusable` says why). */
+  | {
+      kind: 'measured'
+      id: number
+      outline?: Outline
+      measurement?: BulletMeasurement
+      hints: string[]
+      unusable?: string
+    }
   | { kind: 'error'; id: number; message: string }

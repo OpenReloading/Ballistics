@@ -67,11 +67,12 @@ import { Providers } from '../components/providers.tsx'
 import { ResultsSkipLink } from '../components/results-skip-link.tsx'
 import { SafetyDialog } from '../components/safety-dialog.tsx'
 import { basePath } from '../lib/edition.ts'
+import { titleTemplate } from '../lib/record-metadata.ts'
 import { colorSchemeScript, pageWidth } from '../lib/theme.ts'
 import { uiFont } from './fonts/ui.ts'
 
 export const metadata: Metadata = {
-  title: { default: 'OpenReloading Ballistics', template: '%s · OpenReloading Ballistics' },
+  title: { default: 'OpenReloading Ballistics', template: titleTemplate },
   description: 'A ballistics database with interior and exterior ballistics simulations.',
   // the social image needs an absolute URL: only the deployment knows its origin (`PAGES_URL`)
   ...(process.env.PAGES_URL && {

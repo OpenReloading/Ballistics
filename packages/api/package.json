@@ -1,6 +1,6 @@
 {
   "name": "@open-reloading/api",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "private": true,
   "license": "MIT",
   "type": "module",
@@ -33,8 +33,8 @@
   "dependencies": {
     "@fastify/sensible": "^6.0.7",
     "@open-reloading/core": "0.0.3",
-    "@open-reloading/data": "0.0.3",
-    "@open-reloading/schema": "0.0.3",
+    "@open-reloading/data": "0.0.4",
+    "@open-reloading/schema": "0.0.4",
     "@scalar/fastify-api-reference": "1.75.1",
     "fastify": "^5.12.7",
     "zod": "^4.6.7"
