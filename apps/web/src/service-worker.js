@@ -26,6 +26,14 @@ function store(event, name, key, res) {
   )
 }
 
+/** Stores the data file the page at `url` reads, if it has one (a record page): the page loaded before the worker took over, so its own read was not stored. */
+async function keepRecord(url) {
+  const file = recordFile(new URL(url).pathname, base)
+  if (!file) return
+  const res = await fetch(file)
+  if (res.ok) await (await caches.open(records)).put(file, res)
+}
+
 async function fromShell(event) {
   // this build's shell first: the manifest and icons keep their names across builds; the previous
   // shell then answers the chunks of tabs still on that build
@@ -89,7 +97,14 @@ self.addEventListener('activate', (event) => {
       await self.clients.claim()
       // the page that registered the worker loaded before it: store it too
       const windows = await self.clients.matchAll({ type: 'window' })
-      await Promise.all(windows.map((w) => keepPage(pageKey(w.url)).catch(() => {})))
+      await Promise.all(
+        windows.map((w) =>
+          Promise.all([
+            keepPage(pageKey(w.url)).catch(() => {}),
+            keepRecord(w.url).catch(() => {}),
+          ]),
+        ),
+      )
     })(),
   )
 })
