@@ -11,6 +11,7 @@
     "start": "next start",
     "typecheck": "next typegen && tsc --noEmit",
     "check-weight": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-weight.mts",
+    "i18n": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/i18n.mts",
     "test": "vitest run --dir test"
   },
   "dependencies": {
