@@ -22,7 +22,7 @@ ARG API_URL
 RUN npm run site:build -w @open-reloading/docs
 
 # unprivileged variant: listens on 8080, runs as `nginx`
-FROM docker.io/nginxinc/nginx-unprivileged:1.29-alpine@sha256:0c79d56aee561a1d81c63f00eee5fb5fe29279560cdc55e91425133104c7fbe6
+FROM docker.io/nginxinc/nginx-unprivileged:1.31-alpine@sha256:b5047b9b76845eac124358373c6852377c52e4b05834a47647e955dd91cb8f1e
 COPY apps/docs/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/apps/docs/build /usr/share/nginx/html
 COPY LICENSE NOTICE /usr/share/nginx/html/
