@@ -37,6 +37,8 @@ $$
 \frac{u(k_i)}{k_i} = \sqrt{\left(\frac{u(\ell_i)}{\ell_i}\right)^2 + \left(\frac{u(L_i)}{L_i}\right)^2}
 $$
 
+Code: `apps/web/src/lib/bullet-photo-scale.ts`, `estimatesOf`.
+
 Where the photograph has no ruler points, the scale is the mean of these weighted by $1/(u(k_i)/k_i)^2$, with the same rectangular term for the disagreement of the two as above. Where it has, the ruler's scale is used and each size is a check. A size is flagged when its scale is away from the ruler's (or the two sizes' scales from each other) by more than three standard uncertainties and 2 %. The note gives the difference in percent and names what to check: the scale points, the cut-out, and that the bullet lies flat and square to the camera. A tilted bullet shortens its length and not its diameter, so a flagged pair tells a tilt that the cut-out alone does not. Code: `apps/web/src/lib/bullet-photo-scale.ts`, `resolveScale`.
 
 ### Cut-out
