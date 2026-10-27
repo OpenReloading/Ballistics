@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest'
-import { isSampling, pickIds, sampleIds } from '../src/lib/prerender-sample.ts'
+import { exportIds, isSampling, pickIds, sampleIds } from '../src/lib/prerender-sample.ts'
 import { defined } from './defined.ts'
 
 const first = (what: string) => defined(defined(sampleIds[what])[0])
@@ -21,6 +21,14 @@ it('keeps the sampled ids of the route that exist', () => {
 it('falls back to the first id when no sampled id exists, never to none', () => {
   expect(pickIds('bullet', ['x-1', 'x-2'], { PRERENDER: 'sample' })).toEqual(['x-1'])
   expect(pickIds('unknown', ['x-1', 'x-2'], { PRERENDER: 'sample' })).toEqual(['x-1'])
+})
+
+it('cuts only the cartridge pages of the Pages edition when sampling', () => {
+  const env = { PRERENDER: 'sample' }
+  expect(exportIds('cartridge', all, env)).toEqual(['308-win'])
+  for (const what of ['bullet', 'powder', 'target-face'])
+    expect(exportIds(what, all, env)).toEqual(all)
+  expect(exportIds('cartridge', all, {})).toEqual(all)
 })
 
 it('samples at least one id per route', () => {

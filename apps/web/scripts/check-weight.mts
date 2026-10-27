@@ -3,7 +3,8 @@
  * `weight-budget.json`, and prints a table of the change per route against the recorded values (to
  * $GITHUB_STEP_SUMMARY too, when set).
  *
- * Read from `.next` after `next build` (server edition): the routes of `app-path-routes-manifest.json`,
+ * Read from `.next` after the export build (`npm run static:build -- --keep-build`, which leaves it in
+ * place): the routes of `app-path-routes-manifest.json`,
  * for each its client reference manifest (client component chunks, `entryJSFiles`), the root main and polyfill
  * files of `build-manifest.json` and the `react-loadable-manifest.json` of the page (lazy `next/dynamic` chunks).
  * Counted per route, in bytes of gzip level 9, each file once:
@@ -171,7 +172,14 @@ export function table(measured: Record<string, Weight>, budget: Budget) {
 
 if (import.meta.main) {
   const budget = readJson(path.join(webRoot, 'weight-budget.json')) as Budget
-  const measured = measure(path.join(webRoot, '.next'))
+  const next = path.join(webRoot, '.next')
+  if (!existsSync(path.join(next, 'app-path-routes-manifest.json'))) {
+    console.error(
+      'check-weight: no build in .next, run `npm run static:build -- --keep-build` first',
+    )
+    process.exit(1)
+  }
+  const measured = measure(next)
   const failures = violations(measured, budget)
   const report = `## Web JavaScript per route (gzip)\n\n${table(measured, budget)}\n`
   console.log(report)

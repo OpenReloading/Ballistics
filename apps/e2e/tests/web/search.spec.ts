@@ -1,6 +1,6 @@
 import { expect, type Page, test } from '@playwright/test'
 import { sections } from '../../../web/src/lib/sections.ts'
-import { gotoHydrated } from './nav.ts'
+import { exported, gotoHydrated } from './nav.ts'
 import { putRecords } from './user-store.ts'
 
 // Ctrl+K on every page: pages, the shell's commands and records; the workbench opens its own
@@ -36,7 +36,7 @@ test('a page found by Ctrl+K opens', async ({ page }) => {
   await open(page)
   await field(page).fill('shot gr')
   await search(page).getByRole('button', { name: 'Shot groups', exact: true }).click()
-  await expect(page).toHaveURL('/groups')
+  await expect(page).toHaveURL(exported('/groups'))
 })
 
 test('a record found by Ctrl+K opens its page', async ({ page }) => {
@@ -46,7 +46,7 @@ test('a record found by Ctrl+K opens its page', async ({ page }) => {
   await search(page)
     .getByRole('button', { name: /^308 Win\., CIP/ })
     .click()
-  await expect(page).toHaveURL('/cartridges/308-win')
+  await expect(page).toHaveURL(exported('/cartridges/308-win'))
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('308 Win.')
 })
 
@@ -75,7 +75,7 @@ test('a bullet design of this browser is found by Ctrl+K and opens in its design
   await open(page)
   await field(page).fill('slug test')
   await search(page).getByRole('button', { name: 'Slug test design (your design)' }).click()
-  await expect(page).toHaveURL(`/bullets/designer?record=${id}`)
+  await expect(page).toHaveURL(exported(`/bullets/designer?record=${id}`))
 })
 
 test('commands found by Ctrl+K open the settings and set the theme', async ({ page }) => {
@@ -129,7 +129,7 @@ test('on the workbench Ctrl+K and the sidebar Search open one search, with the p
   await expect(field(page)).toHaveCount(1)
   await field(page).fill('powders')
   await search(page).getByRole('button', { name: 'Powders', exact: true }).click()
-  await expect(page).toHaveURL('/powders')
+  await expect(page).toHaveURL(exported('/powders'))
   // the site search after the workbench: still one
   await open(page)
   await expect(field(page)).toHaveCount(1)

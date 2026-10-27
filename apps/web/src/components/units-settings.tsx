@@ -165,9 +165,10 @@ const noSubscription = () => () => {}
 export function useUnits() {
   const s = useContext(UnitsContext)
   const first = useSyncExternalStore(noSubscription, s.get, () => s.server)
-  const [later, setLater] = useState<Units>()
-  useEffect(() => s.subscribe(() => setLater(s.get())), [s])
-  return later ?? first
+  // the store a later snapshot came from: a new store (`LengthOverride`) starts at its own live units
+  const [later, setLater] = useState<{ from: UnitsStore; units: Units }>()
+  useEffect(() => s.subscribe(() => setLater({ from: s, units: s.get() })), [s])
+  return later?.from === s ? later.units : first
 }
 
 /**

@@ -58,3 +58,19 @@ it('prerenders the sample ids only with PRERENDER=sample, else every id', async 
   vi.stubEnv('PRERENDER', 'full')
   expect(await staticIds(listAllBullets, 'bullet')).toHaveLength(1684)
 })
+
+it('cuts the cartridge pages of the Pages edition with PRERENDER=sample, and fails without the API', async () => {
+  vi.stubEnv('NEXT_PUBLIC_PAGES_BASE_PATH', '')
+  vi.resetModules()
+  const pages = await import('../src/lib/api.ts')
+  serve(1684)
+  vi.stubEnv('PRERENDER', 'sample')
+  expect(await pages.staticIds(pages.listAllBullets, 'cartridge')).toEqual([{ id: 'b-0' }])
+  expect(await pages.staticIds(pages.listAllBullets, 'bullet')).toHaveLength(1684)
+  vi.stubEnv('PRERENDER', 'full')
+  expect(await pages.staticIds(pages.listAllBullets, 'cartridge')).toHaveLength(1684)
+  serve(1684, 400)
+  await expect(pages.staticIds(pages.listAllBullets, 'bullet')).rejects.toThrow(
+    'API unavailable at build: no bullet pages',
+  )
+})

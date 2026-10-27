@@ -11,6 +11,7 @@
     "api-conformance": "f=\"${TMPDIR:-/tmp}/openapi.json\" && TMPDIR=\"${TMPDIR:-/tmp}\" node src/openapi.ts && schemathesis run \"$f\" --url \"${API_URL:-http://localhost:3000}\" --checks not_a_server_error,status_code_conformance,content_type_conformance,response_schema_conformance",
     "pages": "node src/pages.ts",
     "pages:serve": "node src/pages-serve.ts",
+    "dev:static": "node src/static-dev.ts",
     "test": "vitest run"
   },
   "dependencies": {

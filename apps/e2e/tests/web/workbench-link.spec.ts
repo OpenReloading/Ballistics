@@ -25,7 +25,7 @@ test('a copied link runs the same load where its bullet and powder records are m
   const missing = await context.newPage()
   await storeUnits(missing)
   for (const record of ['bullets/demo-bullet-168', 'powders/demo-powder-dp40'])
-    await missing.route(`**/api/${record}`, (r) => r.fulfill({ status: 404, body: '{}' }))
+    await missing.route(`**/api/${record}.json`, (r) => r.fulfill({ status: 404, body: '{}' }))
   await missing.goto(link.href)
   const form = loadForm(missing)
   await expect(form.getByLabel(/^Charge mass/)).toHaveValue('2.40')
@@ -38,5 +38,7 @@ test('a copied link runs the same load where its bullet and powder records are m
     'placeholder',
     'Demo Powder Co. DP40 (from the link)',
   )
+  // the cartridge record's limit is read from its file after the page loads
+  await expect(form.getByText('CIP Pmax', { exact: true }).locator('..')).toContainText('4150')
   expect(await runLine(missing)).toBe(withRecords)
 })
