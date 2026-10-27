@@ -26,6 +26,9 @@ test('an acceptance of the earlier Safety text asks again', async ({ page }) => 
   const dialog = page.getByRole('dialog', { name: /Safety notice and disclaimer/ })
   await expect(dialog).toBeVisible()
   await expect(dialog).toContainText('Reloading ammunition is dangerous.')
+  // English only: no translation, no line about which text binds
+  await expect(dialog.locator('[lang="de"]')).toHaveCount(0)
+  await expect(dialog).not.toContainText('binding')
 })
 
 test('the first focus is on the text: Enter neither accepts nor declines', async ({ page }) => {
