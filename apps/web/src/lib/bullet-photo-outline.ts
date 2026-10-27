@@ -3,7 +3,7 @@
  * symmetry line of both edges, and the half-width profile along it. Lengths are in photo px, y
  * down. Pure: no React, DOM or Next.js, so it can run in a Web Worker.
  */
-import type { Segmentation } from './bullet-photo.ts'
+import type { Cutout } from './bullet-photo.ts'
 import type { Point } from './target-geometry.ts'
 
 // Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
@@ -23,12 +23,25 @@ export interface Outline {
   r: number[]
   /** Whether the nose end was told apart from the base end by its longer taper only within 15 %, so a flip may be right. */
   ambiguous: boolean
+  /** Standard uncertainty of an edge position, px: `edgeUncertainty` of a sharp edge, more where the edge is spread. */
+  edge: number
 }
 
-/** What the outline search is told: the axis direction (base to tip) when the user fixed it. */
+/** What the outline search is told: the axis direction (base to tip) when the user fixed it, and the width the cut-out's edge is spread over, px. */
 export interface OutlineOptions {
   angle?: number | undefined
+  edgeSpread?: number | undefined
 }
+
+/** Standard uncertainty of an edge position at a sharp edge, px: the edge is found at half coverage between samples, a uniform error of one px (1/sqrt(12) = 0.29 px) plus the noise of the grey. */
+export const edgeUncertainty = 0.3
+
+/** Edges spread over this many px or less keep the sharp edge's uncertainty. */
+const sharpSpread = 3
+
+/** The standard uncertainty of an edge position where the edge is spread over `spread` px: one px more for each px beyond a sharp edge's spread, in quadrature (the edge of a soft shadow can lie anywhere within its spread). */
+const edgeUncertaintyOf = (spread: number) =>
+  Math.hypot(edgeUncertainty, Math.max(0, spread - sharpSpread))
 
 interface Frame {
   ox: number
@@ -46,7 +59,7 @@ const frameOf = (o: Point, theta: number): Frame => ({
 })
 
 /** The coverage of `alpha` (0..1) at a point, bilinear between pixel centres; 0 outside. */
-function coverage(seg: Segmentation, x: number, y: number): number {
+function coverage(seg: Cutout, x: number, y: number): number {
   const { width: w, height: h, alpha } = seg
   const [fx, fy] = [x - 0.5, y - 0.5]
   const [i, j] = [Math.floor(fx), Math.floor(fy)]
@@ -93,7 +106,7 @@ interface Extent {
 }
 
 /** The extent of the pixels of at least half coverage in the frame. */
-function extents(seg: Segmentation, f: Frame): Extent {
+function extents(seg: Cutout, f: Frame): Extent {
   const { width: w, alpha } = seg
   const e = { sLo: Infinity, sHi: -Infinity, tLo: Infinity, tHi: -Infinity }
   for (let i = 0; i < alpha.length; i++) {
@@ -109,7 +122,7 @@ function extents(seg: Segmentation, f: Frame): Extent {
 }
 
 /** The edges of the bullet across the axis at each integer `s` from `sLo` to `sHi`; columns without two edges are left out. */
-function columns(seg: Segmentation, f: Frame, sLo: number, sHi: number, e: Extent): Column[] {
+function columns(seg: Cutout, f: Frame, sLo: number, sHi: number, e: Extent): Column[] {
   const out: Column[] = []
   for (let s = sLo; s <= sHi; s++) {
     const across = (t: number) =>
@@ -122,11 +135,11 @@ function columns(seg: Segmentation, f: Frame, sLo: number, sHi: number, e: Exten
 }
 
 /** The columns between the ends of the extent, 2 px in from each. */
-const columnsOf = (seg: Segmentation, f: Frame, e: Extent) =>
+const columnsOf = (seg: Cutout, f: Frame, e: Extent) =>
   columns(seg, f, Math.ceil(e.sLo) + 2, Math.floor(e.sHi) - 2, e)
 
 /** The centroid and the long axis (image moments, Hu 1962) of the pixels of at least half coverage. */
-function momentsOf(seg: Segmentation): { x: number; y: number; theta: number } | undefined {
+function momentsOf(seg: Cutout): { x: number; y: number; theta: number } | undefined {
   const { width: w, alpha } = seg
   let [n, sx, sy, sxx, sxy, syy] = [0, 0, 0, 0, 0, 0]
   for (let i = 0; i < alpha.length; i++) {
@@ -146,7 +159,7 @@ const sum = (xs: readonly number[]) => xs.reduce((a, v) => a + v, 0)
  * The line `c = a + b s` through the middles of the two edges where the bullet is at least 0.3 of
  * its widest, `s` from the origin of the frame; `b` is 0 for a fixed axis. Undefined for fewer than 10 columns.
  */
-function middleLine(seg: Segmentation, o: Point, theta: number, fixed: boolean) {
+function middleLine(seg: Cutout, o: Point, theta: number, fixed: boolean) {
   const f = frameOf(o, theta)
   const cols = columnsOf(seg, f, extents(seg, f))
   const widest = Math.max(...cols.map((c) => c.bottom - c.top))
@@ -167,7 +180,7 @@ interface Axis {
 }
 
 /** Turns and shifts the axis until the middle of the two edges lies on it (4 passes of a least squares line); a fixed axis is only shifted. */
-function settleAxis(seg: Segmentation, start: Axis, fixed: boolean): Axis | undefined {
+function settleAxis(seg: Cutout, start: Axis, fixed: boolean): Axis | undefined {
   let { o, theta } = start
   for (let pass = 0; pass < 4; pass++) {
     const line = middleLine(seg, o, theta, fixed)
@@ -191,7 +204,7 @@ function tapers(cols: readonly Column[]): [number, number] {
 }
 
 /** The axis turned so the nose, the end with the longer taper, is at the tip; whether the two tapers are within 15 %. */
-function orient(seg: Segmentation, axis: Axis): (Axis & { ambiguous: boolean }) | undefined {
+function orient(seg: Cutout, axis: Axis): (Axis & { ambiguous: boolean }) | undefined {
   const f = frameOf(axis.o, axis.theta)
   const cols = columnsOf(seg, f, extents(seg, f))
   if (cols.length < 10) return
@@ -203,15 +216,24 @@ function orient(seg: Segmentation, axis: Axis): (Axis & { ambiguous: boolean }) 
   }
 }
 
+/** How far the end of a cut-out lies beyond its extreme pixel centre along the axis, px (half a pixel's reach, a pixel being 1 px square). */
+const extentReach = 0.35
+
 /** The profile along the axis, from where it crosses the base to where it leaves the tip. */
-function profileOf(seg: Segmentation, axis: Axis, ambiguous: boolean): Outline | undefined {
+function profileOf(seg: Cutout, axis: Axis, ambiguous: boolean, edge: number): Outline | undefined {
   const f = frameOf(axis.o, axis.theta)
   const e = extents(seg, f)
   const along = (s: number) => coverage(seg, f.ox + f.ux * s, f.oy + f.uy * s)
   const quarter = 0.25 * (e.sHi - e.sLo)
-  const base = crossing(along, e.sLo - 3, e.sLo + quarter, 0.25)
-  const tip = crossing(along, e.sHi + 3, e.sHi - quarter, 0.25)
-  if (base === undefined || tip === undefined || tip - base < 20) return
+  // a reflection or the mouth of a hollow point can leave the axis itself uncovered: an end the
+  // axis finds more than 3 px inside the extent of the cut-out is taken from the extent
+  const [baseAxis, tipAxis] = [
+    crossing(along, e.sLo - 3, e.sLo + quarter, 0.25),
+    crossing(along, e.sHi + 3, e.sHi - quarter, 0.25),
+  ]
+  const base = baseAxis !== undefined && baseAxis - e.sLo < 3 ? baseAxis : e.sLo - extentReach
+  const tip = tipAxis !== undefined && e.sHi - tipAxis < 3 ? tipAxis : e.sHi + extentReach
+  if (tip - base < 20) return
   const cols = columns(seg, f, Math.ceil(base) + 1, Math.floor(tip) - 1, e)
   return {
     origin: { x: f.ox + f.ux * base, y: f.oy + f.uy * base },
@@ -220,6 +242,7 @@ function profileOf(seg: Segmentation, axis: Axis, ambiguous: boolean): Outline |
     z: cols.map((c) => c.s - base),
     r: cols.map((c) => (c.bottom - c.top) / 2),
     ambiguous,
+    edge,
   }
 }
 
@@ -229,12 +252,12 @@ function profileOf(seg: Segmentation, axis: Axis, ambiguous: boolean): Outline |
  * edges. The nose end is the end with the longer taper. A fixed `angle` is kept and only the offset
  * is fitted. Undefined without a bullet.
  */
-export function fitOutline(seg: Segmentation, opt: OutlineOptions = {}): Outline | undefined {
+export function fitOutline(seg: Cutout, opt: OutlineOptions = {}): Outline | undefined {
   const m = momentsOf(seg)
   if (!m) return
   const fixed = opt.angle !== undefined
   const axis = settleAxis(seg, { o: { x: m.x, y: m.y }, theta: opt.angle ?? m.theta }, fixed)
   if (!axis) return
   const turned = fixed ? { ...axis, ambiguous: false } : orient(seg, axis)
-  return turned && profileOf(seg, turned, turned.ambiguous)
+  return turned && profileOf(seg, turned, turned.ambiguous, edgeUncertaintyOf(opt.edgeSpread ?? 0))
 }

@@ -6,7 +6,7 @@
  */
 import { fromSi } from '@open-reloading/schema'
 import { type Scale, solve } from './bullet-photo.ts'
-import type { Outline } from './bullet-photo-outline.ts'
+import { edgeUncertainty, type Outline } from './bullet-photo-outline.ts'
 import { median1 } from './raster-ops.ts'
 
 // Unchecked reads inside loops whose bounds keep the index in range; module-local so the calls inline.
@@ -46,12 +46,6 @@ export interface BulletMeasurement {
   /** Sentences about what is missing or doubtful. */
   notes: string[]
 }
-
-/**
- * Standard uncertainty of an edge position, px: the edge is found at half coverage between
- * samples, a uniform error of one px (1/sqrt(12) = 0.29 px) plus the noise of the grey.
- */
-const edgeUncertainty = 0.3
 
 /** Standard uncertainty of where a pointed tip ends along the axis, px. */
 const tipUncertainty = 1
@@ -264,7 +258,7 @@ interface Shank {
   last: number
 }
 
-function shankOf(o: Outline): Shank {
+export function shankOf(o: Outline): Shank {
   const rs = o.r.map((_, i) => median1(o.r.slice(Math.max(0, i - 2), i + 3)))
   const rMax = Math.max(...rs)
   const tol = Math.max(1, 0.01 * rMax)
@@ -284,8 +278,8 @@ function boatTailOf(o: Outline, s: Shank, put: Put, m: BulletMeasurement) {
   const base = median1(o.r.slice(0, 5))
   const deficit = s.rRef - base
   if (deficit < Math.max(2.5, 0.04 * s.rRef) || s.first < 6) return flat
-  // the lower part of the cone, clear of the corner where it meets the shank
-  const idx = o.r.flatMap((v, i) => (i < s.first && v <= s.rRef - 0.35 * deficit ? [i] : []))
+  // the middle of the cone, clear of the rounded corner at the base and of the one where it meets the shank
+  const idx = o.r.flatMap((_, i) => (i >= 0.25 * s.first && i < 0.85 * s.first ? [i] : []))
   if (idx.length < 5) return flat
   const fit = line(
     idx.map((i) => at(o.z, i)),
@@ -400,11 +394,17 @@ export function measureOutline(o: Outline, scale: Scale): BulletMeasurement {
     m.notes.push('The bullet is too short in the photograph to measure.')
     return m
   }
+  // a spread edge adds its position's uncertainty to every length, twice over for a width
+  const extra = Math.sqrt(Math.max(0, o.edge ** 2 - edgeUncertainty ** 2))
   const put: Put = (key, px, uPx) => {
     const value = px / scale.pxPerMm
+    const widths = key === 'diameter' || key === 'meplatDiameter' || key === 'base.diameter'
     m.values[key] = {
       value,
-      uncertainty: Math.hypot(uPx / scale.pxPerMm, value * scale.relUncertainty),
+      uncertainty: Math.hypot(
+        Math.hypot(uPx, (widths ? 2 : 1) * extra) / scale.pxPerMm,
+        value * scale.relUncertainty,
+      ),
     }
   }
   const s = shankOf(o)

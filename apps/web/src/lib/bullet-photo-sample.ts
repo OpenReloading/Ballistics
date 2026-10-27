@@ -47,6 +47,16 @@ export interface PhotoSpec {
   blur: number
   ruler?: RulerSpec | undefined
   seed: number
+  /** A soft shadow beside the bullet: its silhouette moved by (dx, dy) px and blurred by `blur` px darkens the paper by `depth` (0 to 1). */
+  shadow?: { dx: number; dy: number; blur: number; depth: number } | undefined
+  /** A reflection along the axis from `from` mm to the tip, `widthPx` wide, as light as the paper. */
+  glare?: { from: number; widthPx: number } | undefined
+  /** The nose beyond `from` mm is of this grey (a bright metal tip). */
+  tip?: { from: number; grey: number } | undefined
+  /** Black bars of this width at the left and right edges of the photograph. */
+  bars?: number | undefined
+  /** The bullet's red is raised and its blue lowered by this many grey levels at the same luma, so it differs from the paper by colour more than by brightness. */
+  chroma?: number | undefined
 }
 
 /** The photograph with the truth it was made from. */
@@ -186,20 +196,34 @@ function rulerLayers(spec: PhotoSpec): { strip: Float32Array; ticks: Float32Arra
   return { strip, ticks }
 }
 
-/** The grey of each pixel before blur and noise: the lit paper, the ruler, then the bullet over them by its coverage. */
-function composite(spec: PhotoSpec, bullet: Float32Array, rMax: number): Float32Array {
+/** The grey of each pixel before blur and noise: the lit paper with its shadow, the ruler, then the bullet over them by its coverage. */
+function composite(
+  spec: PhotoSpec,
+  bullet: Float32Array,
+  shadow: Float32Array | undefined,
+  rMax: number,
+): Float32Array {
   const { width: w, height: h } = spec
   const { strip, ticks } = rulerLayers(spec)
-  const [vx, vy] = [-Math.sin(spec.angle), Math.cos(spec.angle)]
+  const [ux, uy] = [Math.cos(spec.angle), Math.sin(spec.angle)]
+  const [vx, vy] = [-uy, ux]
   const grey = new Float32Array(w * h)
   for (let i = 0; i < grey.length; i++) {
     const [x, y] = [(i % w) + 0.5, Math.floor(i / w) + 0.5]
-    const paper = spec.paper + spec.gradient * (x / w - 0.5)
+    const [dx, dy] = [x - spec.base.x, y - spec.base.y]
+    const paper =
+      (spec.paper + spec.gradient * (x / w - 0.5)) *
+      (1 - (spec.shadow?.depth ?? 0) * clamp(shadow ? nth(shadow, i) : 0, 0, 1))
     const bg = paper + 0.85 * (60 - paper) * nth(strip, i)
     const withTicks = bg + (25 - bg) * clamp(nth(ticks, i), 0, 1)
-    const side = ((x - spec.base.x) * vx + (y - spec.base.y) * vy) / rMax
-    const fg = spec.bullet + spec.shading * clamp(side, -1, 1)
+    const side = (dx * vx + dy * vy) / rMax
+    const z = (dx * ux + dy * uy) / spec.pxPerMm
+    const lit = spec.tip && z > spec.tip.from ? spec.tip.grey : spec.bullet
+    const glare =
+      spec.glare && z > spec.glare.from && Math.abs(dx * vx + dy * vy) < spec.glare.widthPx / 2
+    const fg = glare ? spec.paper - 4 : lit + spec.shading * clamp(side, -1, 1)
     grey[i] = withTicks + (fg - withTicks) * clamp(nth(bullet, i), 0, 1)
+    if (spec.bars && (x < spec.bars || x > w - spec.bars)) grey[i] = 0
   }
   return grey
 }
@@ -223,16 +247,32 @@ export function renderPhoto(spec: PhotoSpec): BulletPhoto {
   const profile = p.outline.points
   const bullet = new Float32Array(w * h)
   fillPolygon(bullet, w, h, silhouette(profile, spec))
+  const shadow = spec.shadow && shadowOf(spec, profile)
   const rMax = Math.max(...profile.map(([q]) => q)) * spec.pxPerMm
-  const soft = blurred(composite(spec, bullet, rMax), w, h, spec.blur)
+  const soft = blurred(composite(spec, bullet, shadow, rMax), w, h, spec.blur)
+  const cover = spec.chroma ? blurred(bullet, w, h, spec.blur) : undefined
   const rand = random(spec.seed)
   const data = new Uint8ClampedArray(4 * w * h)
   for (let i = 0; i < w * h; i++) {
     // Box-Muller
     const g = Math.sqrt(-2 * Math.log(1 - rand())) * Math.cos(2 * Math.PI * rand())
     const v = nth(soft, i) + spec.noise * g
-    data.set([v, v, v, 255], 4 * i)
+    const c = (spec.chroma ?? 0) * (cover ? nth(cover, i) : 0)
+    // red up and blue down by c at the same luma
+    data.set([v + c, v - 0.3151 * c, v - c, 255], 4 * i)
   }
   const span = rulerSpan(spec)
   return { image: { width: w, height: h, data }, ...(span && { span }), profile }
+}
+
+/** The coverage of the shadow: the silhouette moved by the shadow's offset and blurred. */
+function shadowOf(spec: PhotoSpec, profile: readonly [number, number][]): Float32Array {
+  const { width: w, height: h } = spec
+  const moved = silhouette(profile, spec).map((q) => ({
+    x: q.x + (spec.shadow?.dx ?? 0),
+    y: q.y + (spec.shadow?.dy ?? 0),
+  }))
+  const cov = new Float32Array(w * h)
+  fillPolygon(cov, w, h, moved)
+  return blurred(cov, w, h, spec.shadow?.blur ?? 0)
 }
