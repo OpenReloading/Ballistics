@@ -19,7 +19,7 @@ export function devExit(child: ChildProcess, stopped: () => boolean): Promise<vo
 /**
  * Registers SIGINT and SIGTERM handlers that mark the run as stopped and pass the signal on to the
  * process group `group()` returns, none while it returns `undefined` (before the server started).
- * Returns `stopped()`, which `devExit` takes, and the function that removes the handlers.
+ * A group that already exited is ignored, so cleanup still runs. Returns `stopped()`, which `devExit` takes, and the function that removes the handlers.
  */
 export function stopOnSignal(
   group: () => number | undefined,
@@ -30,7 +30,13 @@ export function stopOnSignal(
     const handler = () => {
       stopped = true
       const pid = group()
-      if (pid !== undefined) kill(-pid, signal)
+      if (pid === undefined) return
+      try {
+        kill(-pid, signal)
+      } catch (error) {
+        // The group exited between the signal and the cleanup that follows it.
+        if ((error as NodeJS.ErrnoException).code !== 'ESRCH') throw error
+      }
     }
     process.on(signal, handler)
     return [signal, handler] as const

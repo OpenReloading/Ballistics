@@ -40,6 +40,30 @@ it('passes a signal on to the process group once the server started', () => {
   }
 })
 
+it('ignores a signal sent to a process group that already exited', () => {
+  const kill = vi.fn(() => {
+    throw Object.assign(new Error('kill ESRCH'), { code: 'ESRCH' })
+  })
+  const { dispose } = stopOnSignal(() => 4242, kill)
+  try {
+    expect(() => process.emit('SIGINT')).not.toThrow()
+  } finally {
+    dispose()
+  }
+})
+
+it('lets any other error of the signal pass through', () => {
+  const kill = vi.fn(() => {
+    throw Object.assign(new Error('kill EPERM'), { code: 'EPERM' })
+  })
+  const { dispose } = stopOnSignal(() => 4242, kill)
+  try {
+    expect(() => process.emit('SIGINT')).toThrow('EPERM')
+  } finally {
+    dispose()
+  }
+})
+
 it('removes its handlers on dispose', () => {
   const before = process.listenerCount('SIGINT')
   stopOnSignal(() => undefined).dispose()
