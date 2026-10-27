@@ -29,8 +29,7 @@ const frameRoutes = new Set([
  * The Mantine app shell: the top bar across the whole window (52 px, 56 px from 75em), the
  * icon rail under it from 75em (4.5rem), and the page in `AppShell.Main`. Sets the page width (`data-width`)
  * and the workbench frame (`data-frame`) from the route, not from the page's content: a page left
- * by a client navigation stays hidden in the document (Cache Components). A streamed page inside
- * AppShell stays server-rendered only with the `@mantine/hooks` patch of `patches/`.
+ * by a client navigation stays hidden in the document (Cache Components).
  */
 export function PageShell({ children }: { children: ReactNode }) {
   const route = useRoute()

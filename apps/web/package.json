@@ -4,9 +4,8 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "predev": "node ../../patches/apply.mjs --check",
     "dev": "next dev",
-    "prebuild": "node ../../patches/apply.mjs --check && node -e \"fs.rmSync('.next/cache/fetch-cache', { recursive: true, force: true })\"",
+    "prebuild": "node -e \"fs.rmSync('.next/cache/fetch-cache', { recursive: true, force: true })\"",
     "build": "next build && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/service-worker.mts",
     "start": "next start",
     "typecheck": "next typegen && tsc --noEmit",
@@ -15,10 +14,10 @@
     "test": "vitest run --dir test"
   },
   "dependencies": {
-    "@mantine/core": "9.7.3",
-    "@mantine/form": "9.7.3",
-    "@mantine/hooks": "9.7.3",
-    "@mantine/spotlight": "9.7.3",
+    "@mantine/core": "9.7.4",
+    "@mantine/form": "9.7.4",
+    "@mantine/hooks": "9.7.4",
+    "@mantine/spotlight": "9.7.4",
     "@open-reloading/api": "0.0.4",
     "@open-reloading/core": "0.0.3",
     "@open-reloading/data": "0.0.4",

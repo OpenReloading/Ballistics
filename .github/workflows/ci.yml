@@ -73,7 +73,7 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci --ignore-scripts && node patches/apply.mjs
+      - run: npm ci --ignore-scripts
       - run: npm run lint
       - run: npm run build
       - run: npm run typecheck
@@ -118,7 +118,7 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci --ignore-scripts && node patches/apply.mjs
+      - run: npm ci --ignore-scripts
       - run: npm run build
       - run: |
           # unquoted on purpose: the value is several `-w name` words
@@ -222,7 +222,7 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci --ignore-scripts && node patches/apply.mjs
+      - run: npm ci --ignore-scripts
       - run: ../../node_modules/.bin/playwright install --with-deps chromium
         working-directory: apps/e2e
       # the export build and the specs import the workspace packages from their dist/
@@ -257,9 +257,9 @@ jobs:
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: apps/web/.next/cache/turbopack
-          key: ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'package-lock.json', 'patches/**', 'apps/web/next.config.ts') }}-${{ hashFiles('apps/web/src/**', 'packages/*/src/**') }}
+          key: ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'package-lock.json', 'apps/web/next.config.ts') }}-${{ hashFiles('apps/web/src/**', 'packages/*/src/**') }}
           restore-keys: |
-            ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'package-lock.json', 'patches/**', 'apps/web/next.config.ts') }}-
+            ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'package-lock.json', 'apps/web/next.config.ts') }}-
       # the export leaves .next to the cache and to the JavaScript budget; the docs site is no part of this job
       - name: Export the static site
         run: |
@@ -273,7 +273,7 @@ jobs:
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: apps/web/.next/cache/turbopack
-          key: ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'package-lock.json', 'patches/**', 'apps/web/next.config.ts') }}-${{ hashFiles('apps/web/src/**', 'packages/*/src/**') }}
+          key: ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'package-lock.json', 'apps/web/next.config.ts') }}-${{ hashFiles('apps/web/src/**', 'packages/*/src/**') }}
       - name: JavaScript budget per route
         run: npm run check-weight -w @open-reloading/web
       - run: node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON apps/web/scripts/check-prerender.mts
