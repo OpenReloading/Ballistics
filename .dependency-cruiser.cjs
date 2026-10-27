@@ -99,7 +99,7 @@ module.exports = {
       name: 'web-reads-api-only',
       severity: 'error',
       comment:
-        'apps/web reads records through the API. Of @open-reloading/data only the plausibility checks and of @open-reloading/api only the compute and catalogue entries of the Pages edition run in the web app.',
+        'apps/web reads records through the API. Of @open-reloading/data only the plausibility checks and of @open-reloading/api only the compute and catalogue entries of the static site run in the web app.',
       from: { path: own('apps/web/src') },
       to: {
         path: `^(${pkg('data')}|${pkg('api')}|(node_modules/)?(@fastify/|fastify(/|$)))`,

@@ -1,7 +1,7 @@
 /**
  * Writes out/sw.js after `next build`: the build id as `version`, the files of .next/static and the
  * catalogue index as `precache`, the base path (`PAGES_BASE_PATH`, `''` at a domain root) as `base`,
- * the pages' trailing slash as `slash`, the Pages edition (`next` or empty) as `edition`, every
+ * the pages' trailing slash as `slash`, the site's edition (`next` or empty) as `edition`, every
  * export of src/lib/offline.ts (Node strips their types, so their source is JavaScript), then
  * src/service-worker.js.
  */

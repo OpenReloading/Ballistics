@@ -75,7 +75,7 @@ async function both(path: string, body?: object) {
   }
 }
 
-describe('the Pages edition answers reads as the API', () => {
+describe('the static site answers reads as the API', () => {
   const kinds = [
     'cartridges',
     'bullets',
@@ -255,7 +255,7 @@ describe('the Pages edition answers reads as the API', () => {
   })
 })
 
-describe('the data files of the Pages edition', () => {
+describe('the data files of the static site', () => {
   it('are the catalogue index and one file per record, no list, search or per-cartridge file', async () => {
     const files = await readdir(dir, { recursive: true })
     expect(files).toContain(path.join('catalogue', 'index.json'))
@@ -267,7 +267,7 @@ describe('the data files of the Pages edition', () => {
   })
 })
 
-describe('the Pages edition computes as the API', () => {
+describe('the static site computes as the API', () => {
   const interior = interiorExample as unknown as Record<string, unknown>
 
   it('answers an interior run, a ladder and a cartridge limit check with the API body', async () => {
