@@ -12,7 +12,9 @@ test.beforeEach(({ page }) => storeUnits(page))
  * is an override): the values of a record's sides without the chamber's bore diameter F, bore area Q and twist u.
  */
 async function seedDesign(page: Page) {
-  const record = await page.evaluate(async () => (await fetch('/api/cartridges/308-win')).json())
+  const record = await page.evaluate(async () =>
+    (await fetch('/api/cartridges/308-win.json')).json(),
+  )
   const lacking = ['F', 'Q', 'u']
   const values = record.values.filter(
     (v: { side?: string; symbol: string; variant?: string }) =>

@@ -186,7 +186,7 @@ test('the record sheet prints on one A4 page; other prints keep the browser page
     .getByRole('navigation', { name: 'Main' })
     .getByRole('link', { name: 'My gear', exact: true })
     .click()
-  await expect(page).toHaveURL(/\/firearms$/)
+  await expect(page).toHaveURL(/\/firearms\/$/)
   expect((await sizes())[0]).toEqual([612, 792])
 })
 

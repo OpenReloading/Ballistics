@@ -32,7 +32,7 @@ test('the cartridge list and page link to the designer, which starts from the re
 
   await page.goto('/cartridges/308-win')
   await page.getByRole('link', { name: 'Open in designer' }).click()
-  await expect(page).toHaveURL(/\/cartridges\/designer\?from=308-win$/)
+  await expect(page).toHaveURL(/\/cartridges\/designer\/\?from=308-win$/)
   await expect(field(page, 'Cartridge L3')).toHaveValue('51.18')
   await expect(field(page, 'Cartridge L3')).toHaveAccessibleDescription(
     'Case length. From the record.',

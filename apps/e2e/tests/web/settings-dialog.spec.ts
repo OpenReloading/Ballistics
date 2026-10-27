@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, type Locator, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
-import { gotoHydrated } from './nav.ts'
+import { exported, gotoHydrated } from './nav.ts'
 import { settingsEntry, storeUnits } from './units.ts'
 
 // Settings is a dialog only, no page: every entry is a button opening it over the page, on every
@@ -45,7 +45,7 @@ for (const path of ['/cartridges/308-win', '/firearms'])
     await choose(dialog, 'US customary')
     await page.keyboard.press('Escape')
     await expect(dialog).toBeHidden()
-    await expect(page).toHaveURL(path)
+    await expect(page).toHaveURL(exported(path))
     await expect(sidebarSettings(page)).toBeFocused()
     expect(await stored(page)).toBe('us')
     if (path === '/firearms')
@@ -59,7 +59,7 @@ for (const path of ['/session', '/firearms'])
     await choose(dialog, 'Metric, common use')
     await page.keyboard.press('Escape')
     await expect(dialog).toBeHidden()
-    await expect(page).toHaveURL(path)
+    await expect(page).toHaveURL(exported(path))
     await expect(unitsButton(page)).toBeFocused()
     await expect(unitsButton(page)).toHaveAccessibleName('Units: Metric, common use')
   })
@@ -86,7 +86,7 @@ test('at 390 px Settings in the drawer closes the drawer, then opens the dialog'
   await expect(page.getByRole('navigation', { name: 'Main' })).toHaveCount(0)
   await page.keyboard.press('Escape')
   await expect(dialog).toBeHidden()
-  await expect(page).toHaveURL('/powders')
+  await expect(page).toHaveURL(exported('/powders'))
   await expect(button).toBeFocused()
 })
 
@@ -111,7 +111,7 @@ test('with unsaved firearm edits Settings and Units open the dialog without a qu
     // nor the app's confirm dialog
     await expect(page.getByRole('dialog', { name: /\?/ })).toHaveCount(0)
   }
-  await expect(page).toHaveURL('/firearms')
+  await expect(page).toHaveURL(exported('/firearms'))
   await expect(name).toHaveValue('Range rifle')
   expect(asked).toEqual([])
 })
@@ -120,7 +120,7 @@ test('the Manufacturers section of General deletes a user manufacturer that no r
   page,
 }) => {
   // the catalogue's list answered: a name is committed at once, not after a retry
-  const listed = page.waitForResponse((r) => r.url().includes('manufacturers'))
+  const listed = page.waitForResponse((r) => r.url().endsWith('/api/catalogue/index.json'))
   await gotoHydrated(page, '/bullets/designer')
   await (await listed).finished()
   const field = page.getByRole('combobox', { name: 'Manufacturer' })

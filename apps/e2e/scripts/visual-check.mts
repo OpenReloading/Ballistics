@@ -212,7 +212,7 @@ if (import.meta.main) {
   const shots = path.join(root, 'shots')
   rmSync(root, { recursive: true, force: true })
   mkdirSync(shots, { recursive: true })
-  const base = process.env.WEB_URL ?? 'http://localhost:3001'
+  const base = process.env.WEB_URL ?? 'http://localhost:3003'
   const widths = (process.env.VISUAL_WIDTHS ?? '390,1280').split(',').map(Number)
   const browser = await chromium.launch()
   try {
