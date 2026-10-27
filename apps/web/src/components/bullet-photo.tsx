@@ -13,6 +13,7 @@ import {
 import { useMediaQuery } from '@mantine/hooks'
 import { fromSi, toSi } from '@open-reloading/schema'
 import { useEffect, useId, useRef, useState } from 'react'
+import { fixedNumber } from '../i18n/number.ts'
 import type { Design } from '../lib/bullet-designer.ts'
 import { paintPhoto } from '../lib/bullet-photo-canvas.ts'
 import { type PhotoRow, storedText, valueText } from '../lib/bullet-photo-design.ts'
@@ -298,7 +299,7 @@ function PhotoTool({
             )}
             <Text fz="sm" aria-live="polite">
               {scale
-                ? `Scale ${scale.pxPerMm.toFixed(2)} px/mm, uncertainty ${(100 * scale.relUncertainty).toFixed(2)} %.`
+                ? `Scale ${fixedNumber(scale.pxPerMm, 2)} px/mm, uncertainty ${fixedNumber(100 * scale.relUncertainty, 2)} %.`
                 : 'No scale yet.'}
             </Text>
             <Flex gap="xs" wrap="wrap">

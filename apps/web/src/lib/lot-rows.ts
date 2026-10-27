@@ -1,7 +1,7 @@
 import { type InteriorLoad, interiorApply } from '@open-reloading/core'
+import { formatNumber } from '../i18n/number.ts'
 import { longerBody } from './barrel-length.ts'
 import type { LadderDirection } from './seating-ladder.ts'
-import { formatNumber } from './units.ts'
 
 /** The burn-rate change of the lot rows when none is typed, as a fraction. */
 export const defaultLotFraction = 0.03

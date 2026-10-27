@@ -99,5 +99,14 @@ export const theme = createTheme({
   },
 })
 
+/** The theme with the number inputs writing the decimal mark `mark` (they read both marks). */
+export const themeFor = (mark: '.' | ','): typeof theme => ({
+  ...theme,
+  components: {
+    ...theme.components,
+    NumberInput: { defaultProps: { size: controlSize.bar.input, decimalSeparator: mark } },
+  },
+})
+
 /** Tooltip events: hover, keyboard focus and touch, so help reaches every input. */
 export const tipEvents = { hover: true, focus: true, touch: true }

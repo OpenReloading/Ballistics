@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { formatNumber } from '../src/i18n/number.ts'
 import { fieldError, fieldValueFromText, switchFields } from '../src/lib/field-spec.ts'
 import { interiorFields } from '../src/lib/interior-input.ts'
 import { shotFields } from '../src/lib/trajectory-input.ts'
@@ -7,7 +8,6 @@ import {
   exactFieldText,
   fixedFieldText,
   footPound,
-  formatNumber,
   formatQuantity,
   inchText,
   kilogramsPerGrain,

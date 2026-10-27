@@ -9,16 +9,10 @@ import {
   toSi,
   type UserRecord,
 } from '@open-reloading/schema'
+import { formatNumber } from '../i18n/number.ts'
 import type { FieldSpec } from './field-spec.ts'
 import { nth } from './nth.ts'
-import {
-  formatNumber,
-  formatQuantity,
-  type Quantity,
-  type UnitSystem,
-  unitsOf,
-  withUnit,
-} from './units.ts'
+import { formatQuantity, type Quantity, type UnitSystem, unitsOf, withUnit } from './units.ts'
 
 export const firearmFields = [
   { key: 'barrelLength', label: 'Barrel length', quantity: 'barrelLength', min: 0 },

@@ -1,5 +1,6 @@
 import type { Load, SessionRecord, UserRecord } from '@open-reloading/schema'
 import { chronoSession, fromSi, toSi, userRecord } from '@open-reloading/schema'
+import { ambiguousMessage, parseNumber } from '../i18n/number.ts'
 import { stringStats } from './string-stats.ts'
 import { type Unit, type UnitSystem, withUnit } from './units.ts'
 
@@ -204,16 +205,17 @@ export const rangeStats = (s: SessionString | undefined) => s && stringStats(s.s
 
 /**
  * A velocity typed as text, in the unit `toSi` converts from: m/s, or the reason it is refused.
- * Decimal comma accepted.
+ * Either decimal mark is accepted ({@link parseNumber}).
  */
 export function parseVelocity(
   text: string,
   toSi: (x: number) => number,
 ): { velocity: number } | { error: string } {
-  const x = Number(text.trim().replace(',', '.'))
-  if (text.trim() === '' || !Number.isFinite(x) || x <= 0)
+  const p = parseNumber(text)
+  if (p.kind === 'ambiguous') return { error: ambiguousMessage(p) }
+  if (p.kind !== 'number' || p.value <= 0)
     return { error: 'Enter the velocity as a number above zero.' }
-  const si = toSi(x)
+  const si = toSi(p.value)
   return si > maxVelocity ? { error: 'That is too fast for a velocity.' } : { velocity: si }
 }
 
@@ -273,14 +275,17 @@ export function parseWeather(
   units: { temperature: Unit; airPressure: Unit; windSpeed: Unit },
 ): { conditions: Conditions } | { error: string } {
   const conditions: Conditions = {}
+  let ambiguous: string | undefined
   const read = (typed: string, name: string, valid: (x: number) => boolean) => {
-    if (typed.trim() === '') return
-    const x = Number(typed.trim().replace(',', '.'))
-    return Number.isFinite(x) && valid(x) ? x : name
+    const p = parseNumber(typed)
+    if (p.kind === 'empty') return
+    if (p.kind === 'ambiguous') ambiguous ??= ambiguousMessage(p)
+    return p.kind === 'number' && valid(p.value) ? p.value : name
   }
   const temperature = read(text.temperature, 'temperature', () => true)
   const pressure = read(text.pressure, 'air pressure', (x) => x > 0)
   const wind = read(text.wind, 'wind speed', (x) => x >= 0)
+  if (ambiguous) return { error: ambiguous }
   for (const [x, name] of [
     [temperature, 'temperature'],
     [pressure, 'air pressure'],

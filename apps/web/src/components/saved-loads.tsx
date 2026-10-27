@@ -4,7 +4,9 @@ import { ActionIcon, Button, Drawer, Text, TextInput } from '@mantine/core'
 import { parseRef } from '@open-reloading/schema'
 import { Copy, DownloadSimple, PencilSimple, Trash } from '@phosphor-icons/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { fixedNumber } from '../i18n/number.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
+import { dateTimeText } from '../lib/dates.ts'
 import { errorText } from '../lib/error-text.ts'
 import {
   afterChange,
@@ -105,7 +107,7 @@ function useCartridgeNames(ids: string[]) {
 }
 
 const megabytes = (bytes: number) =>
-  bytes < 1e5 ? `${Math.max(1, Math.round(bytes / 1e3))} kB` : `${(bytes / 1e6).toFixed(1)} MB`
+  bytes < 1e5 ? `${Math.max(1, Math.round(bytes / 1e3))} kB` : `${fixedNumber(bytes / 1e6, 1)} MB`
 
 /** The field that replaces the button that was pressed takes the focus the button had. */
 const focusField = (field: HTMLInputElement | null) => field?.focus()
@@ -288,7 +290,7 @@ export function SavedLoads({
                           {r.name}
                         </Button>
                       )}
-                      <span className="file-reason">{new Date(r.saved).toLocaleString()}</span>
+                      <span className="file-reason">{dateTimeText(new Date(r.saved))}</span>
                       <ActionIcon
                         size={controlSize.row.icon}
                         variant="subtle"

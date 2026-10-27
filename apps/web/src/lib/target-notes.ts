@@ -4,9 +4,10 @@
  */
 import type { GroupStatistics } from '@open-reloading/core'
 import type { ShotGroup } from '@open-reloading/schema'
+import { formatNumber } from '../i18n/number.ts'
 import { readoutRows, readouts } from './group-readouts.ts'
 import { groupStatisticsOf } from './target-groups.ts'
-import { formatNumber, type UnitSystem, unitsOf, withUnit } from './units.ts'
+import { type UnitSystem, unitsOf, withUnit } from './units.ts'
 
 type Unit = 'length' | 'moa' | 'mrad'
 const unitNames: Record<Unit, (s: UnitSystem) => string> = {

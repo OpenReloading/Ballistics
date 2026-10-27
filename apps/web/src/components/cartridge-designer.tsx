@@ -7,6 +7,7 @@ import type { UserCartridge } from '@open-reloading/schema'
 import { Ruler } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
 import { memo, useCallback, useDeferredValue, useMemo, useRef, useState } from 'react'
+import { formatNumber } from '../i18n/number.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { CartridgeDetail, CartridgeSummary } from '../lib/api-types.ts'
 import {
@@ -32,13 +33,7 @@ import {
 import { symbolText } from '../lib/cartridge-record.ts'
 import { type FieldValue, fieldError } from '../lib/field-spec.ts'
 import type { FieldRow } from '../lib/record-fields.ts'
-import {
-  drawingLengthUnit,
-  fixedFieldText,
-  formatNumber,
-  formatQuantity,
-  type UnitSystem,
-} from '../lib/units.ts'
+import { drawingLengthUnit, fixedFieldText, formatQuantity, type UnitSystem } from '../lib/units.ts'
 import { resolveCartridge } from '../lib/variants.ts'
 import { CartridgeDrawing, type View } from './cartridge-drawing.tsx'
 import { DesignerField } from './designer-field.tsx'

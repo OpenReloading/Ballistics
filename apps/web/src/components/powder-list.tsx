@@ -4,6 +4,7 @@ import { Box, Button, Text } from '@mantine/core'
 import { Plus } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useDeferredValue, useMemo } from 'react'
+import { formatNumber } from '../i18n/number.ts'
 import {
   maxOverlay,
   overlayHref,
@@ -16,7 +17,6 @@ import { countText, filterText } from '../lib/lists.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import { type PackedPowder, powderMatches, unpackPowders } from '../lib/powder-rows.ts'
 import type { Origin } from '../lib/sources.ts'
-import { formatNumber } from '../lib/units.ts'
 import { CompareButton, PickedChips, usePicks } from './compare-picks.tsx'
 import {
   type DirectoryColumn,

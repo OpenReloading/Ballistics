@@ -18,6 +18,7 @@ import {
   signedLengthText,
   valueParts,
 } from '@open-reloading/drawing/cartridge'
+import { plainNumber } from '../i18n/number.ts'
 import type { drawable } from '../lib/cartridge-sheet.ts'
 import { nth } from '../lib/nth.ts'
 import { controlSize } from '../lib/theme.ts'
@@ -274,7 +275,7 @@ function printScale(split: { group: string; print: FigureModel }[]) {
 const scaleWords = (k: number) =>
   k === 1
     ? 'life size (1:1)'
-    : `at 1:${Number((1 / k).toFixed(2))} (${Math.round(k * 100)} % of life size)`
+    : `at 1:${plainNumber(Number((1 / k).toFixed(2)))} (${Math.round(k * 100)} % of life size)`
 
 /**
  * A value in the description: symbol, value with its unit, then tolerance, limit or "derived";

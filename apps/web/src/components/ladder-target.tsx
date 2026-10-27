@@ -4,6 +4,7 @@ import { Button } from '@mantine/core'
 import { radPerMoa } from '@open-reloading/core'
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
+import { plainNumber } from '../i18n/number.ts'
 import { localDay } from '../lib/dates.ts'
 import { type FieldSpec, type Fields, fieldError, initialFields } from '../lib/field-spec.ts'
 import { cssMm, ladderMarks, markDiameterMm, maxMarkMm, rulerMm } from '../lib/ladder-target.ts'
@@ -107,7 +108,7 @@ export function LadderTarget({
             <p>
               Distance {formatQuantity('range', system, distance)} {system.range.symbol}, mark size{' '}
               {formatQuantity('correction', system, size)} {system.correction.symbol}
-              {` (${Math.round((diameter ?? 0) * 10) / 10} mm).`}
+              {` (${plainNumber(Math.round((diameter ?? 0) * 10) / 10)} mm).`}
             </p>
             <div className="ladder-marks">
               {marks.map((m, i) => (

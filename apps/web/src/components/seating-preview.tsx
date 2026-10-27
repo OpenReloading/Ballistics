@@ -31,6 +31,7 @@ import {
   useState,
 } from 'react'
 import { createPortal } from 'react-dom'
+import { plainNumber } from '../i18n/number.ts'
 import { apiFetch } from '../lib/api-fetch.ts'
 import type { BulletSummary, CartridgeDetail, CaseSummary } from '../lib/api-types.ts'
 import type { StripFigure } from '../lib/barrel-strip.ts'
@@ -1083,7 +1084,7 @@ function capacityText(c: Capacity, names: Model['names']) {
   const maker = c.caseManufacturer
     ? `, ${refName(names, c.caseManufacturer) || c.caseManufacturer}`
     : ''
-  return `${c.id}: ${c.waterCapacity.value} g water${maker}`
+  return `${c.id}: ${plainNumber(c.waterCapacity.value)} g water${maker}`
 }
 
 function BarrelField({ m }: { m: Model }) {

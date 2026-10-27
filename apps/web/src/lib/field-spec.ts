@@ -1,10 +1,12 @@
 /** Form fields: specs, typed text and SI values, validation messages. */
 import { fromSi, type QuantityKind, toSi } from '@open-reloading/schema'
+import { ambiguousMessage, type NumberRange, parseNumber } from '../i18n/number.ts'
 import {
   exactFieldText,
   parseTwist,
   type Quantity,
   roundedFieldText,
+  typedTwist,
   type UnitSystem,
 } from './units.ts'
 
@@ -56,13 +58,41 @@ export const fieldOf = (system: UnitSystem, s: FieldSpec, si: number | undefined
 export const close = (a: number, b: number | undefined) =>
   b !== undefined && Math.abs(a - b) <= 1e-9 * Math.max(Math.abs(b), 1e-12)
 
-/** Field state from typed text. */
+/** The range a field's typed text is read against: the bounds of its spec. */
+export const rangeOf = (spec: FieldSpec): NumberRange => ({
+  min: spec.min,
+  max: spec.max,
+  integer: spec.integer,
+})
+
+/**
+ * Field state from canonical text (a point as the decimal mark, what the app stores and
+ * generates). Text a person typed goes through {@link typedFieldValue}.
+ */
 export function fieldValueFromText(q: Quantity, system: UnitSystem, text: string): FieldValue {
   const x = q === 'twist' ? (parseTwist(text) ?? Number.NaN) : Number(text)
   return {
     text,
     si: text.trim() === '' || !Number.isFinite(x) ? undefined : system[q].toSi(x),
   }
+}
+
+/**
+ * Field state from text a person typed or pasted: either decimal mark is read ({@link parseNumber}).
+ * The state's text is the canonical form; text that is no number stays as typed, with no value.
+ */
+export function typedFieldValue(
+  q: Quantity,
+  system: UnitSystem,
+  raw: string,
+  range: NumberRange = {},
+): FieldValue {
+  if (q === 'twist') {
+    const text = typedTwist(raw)
+    return text === undefined ? { text: raw, si: undefined } : fieldValueFromText(q, system, text)
+  }
+  const p = parseNumber(raw, range)
+  return p.kind === 'number' ? fieldValueFromText(q, system, p.text) : { text: raw, si: undefined }
 }
 
 export function initialFields(
@@ -111,10 +141,11 @@ export function fieldError(
 ): string | undefined {
   const text = value?.text.trim() ?? ''
   if (text === '') return spec.required ? `Enter a number for ${spec.label}.` : undefined
-  if (value?.si === undefined)
-    return spec.quantity === 'twist'
-      ? 'Enter a twist as 1:8 or 8.'
-      : `Enter a number for ${spec.label}.`
+  if (value?.si === undefined) {
+    if (spec.quantity === 'twist') return 'Enter a twist as 1:8 or 8.'
+    const p = parseNumber(text, rangeOf(spec))
+    return p.kind === 'ambiguous' ? ambiguousMessage(p) : `Enter a number for ${spec.label}.`
+  }
   const symbol = shown[spec.quantity].symbol
   const unit = symbol ? ` ${symbol}` : ''
   const x = spec.quantity === 'twist' ? (parseTwist(text) ?? Number.NaN) : Number(text)

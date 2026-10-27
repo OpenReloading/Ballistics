@@ -8,7 +8,22 @@ import {
   WarningCircle,
 } from '@phosphor-icons/react'
 import { type ReactNode, useState } from 'react'
-import { type FieldSpec, type FieldValue, fieldValueFromText } from '../lib/field-spec.ts'
+import { useTranslation } from '../i18n/language.ts'
+import {
+  ambiguousMessage,
+  decimalMark,
+  localizeNumber,
+  type NumberRange,
+  type ParsedNumber,
+  parseNumber,
+} from '../i18n/number.ts'
+import {
+  type FieldSpec,
+  type FieldValue,
+  fieldValueFromText,
+  rangeOf,
+  typedFieldValue,
+} from '../lib/field-spec.ts'
 import {
   livePick,
   pickedSystem,
@@ -242,32 +257,43 @@ function FieldEnd({
   )
 }
 
-/** A twist is "1:8" or "8": text, not a number; a field that accepts negatives is a native number input. */
+/**
+ * A twist is "1:8" or "8": text, not a number. Under a decimal point a field that accepts negatives
+ * is a native number input (it keeps the iOS minus key) and the others are `NumberInput`s. Under a
+ * decimal comma every field is a text input read by `parseNumber`: a native number input and the
+ * `NumberInput` take the point only from a key press, not from pasted, filled or composed text.
+ * `onText` gets what a person typed (`typed`) or the canonical text of a `NumberInput`.
+ */
 function FieldInput({
   common,
   quantity,
-  min,
+  range,
   text,
   step,
   onText,
+  onRefused,
 }: {
   common: object
   quantity: Quantity
-  min: number | undefined
+  range: NumberRange
   text: string
   step: number | undefined
-  onText: (text: string) => void
+  onText: (text: string, typed: boolean) => void
+  onRefused: (p: Extract<ParsedNumber, { kind: 'ambiguous' }>) => void
 }) {
-  if (quantity === 'twist')
-    return <TextInput {...common} value={text} onChange={(e) => onText(e.currentTarget.value)} />
-  if (min === undefined || min < 0)
+  const comma = decimalMark() !== '.'
+  const signed = range.min === undefined || range.min < 0
+  if (quantity === 'twist' || comma || signed)
     return (
       <TextInput
         {...common}
-        type="number"
-        step="any"
+        {...(quantity !== 'twist' &&
+          (comma
+            ? // the decimal keypad of a phone has no minus key: a signed field keeps the full keyboard
+              !signed && { inputMode: 'decimal' as const }
+            : { type: 'number', step: 'any' }))}
         value={text}
-        onChange={(e) => onText(e.currentTarget.value)}
+        onChange={(e) => onText(e.currentTarget.value, true)}
       />
     )
   return (
@@ -279,7 +305,20 @@ function FieldInput({
       // Trimming on blur turns the text into a number and calls onChange although nothing was typed.
       trimLeadingZeroesOnBlur={false}
       value={text}
-      onChange={(v) => onText(String(v))}
+      onChange={(v) => onText(String(v), false)}
+      // pasted text is read by `parseNumber`, not by the input's own rule for a lone separator
+      onPasteCapture={(e) => {
+        // the text the field would hold after a native paste: at the caret, over the selection
+        const el = e.currentTarget
+        const at = (n: number | null) => n ?? el.value.length
+        const after = `${el.value.slice(0, at(el.selectionStart))}${e.clipboardData.getData('text')}${el.value.slice(at(el.selectionEnd))}`
+        const p = parseNumber(after, range)
+        if (p.kind !== 'number' && p.kind !== 'ambiguous') return
+        e.preventDefault()
+        e.stopPropagation()
+        if (p.kind === 'number') onText(p.text, false)
+        else onRefused(p)
+      }}
     />
   )
 }
@@ -347,6 +386,13 @@ export function NumberField({
   unit?: 'switch' | 'text' | 'none' | undefined
 }) {
   const value = given ?? noValue
+  // the language shown: the field writes its decimal mark and reads text in it
+  useTranslation()
+  // what was typed where it differs from the text shown for the value (a point under a decimal comma,
+  // text that is no number), until the field is left with a value; `text` is the state's text it gave
+  const [draft, setDraft] = useState<{ raw: string; text: string }>()
+  // the message of a pasted text that could be read two ways
+  const [refused, setRefused] = useState<string>()
   const [pick, setPick] = useState<UnitPick>()
   // the field's own unit, held in memory: gone with a change of the Settings or a reload
   if (livePick(pick, system) !== pick) setPick(undefined)
@@ -354,6 +400,7 @@ export function NumberField({
   const own = shown !== system
   const shownValue = own ? { ...value, text: pickedText(spec.quantity, shown, value, pick) } : value
   const { step } = shown[spec.quantity]
+  const range = rangeOf(spec)
   const label = shown[spec.quantity].symbol
   const symbol = unit === 'none' ? '' : label
   const at = <T,>(v: OfShown<T>): T =>
@@ -378,9 +425,11 @@ export function NumberField({
     required: spec.required,
     placeholder: typeof placeholder === 'function' ? placeholder(shown) : placeholder,
     withAsterisk: false,
-    error: at(error),
+    error: refused ?? at(error),
     // a twist typed as "8" or "1 in 8" reads "1:8" once the field is left
     onBlur: () => {
+      setRefused(undefined)
+      if (value.si !== undefined) setDraft(undefined)
       const text = retypedTwist(spec.quantity, shownValue.text, value.si)
       if (text !== undefined && value.si !== undefined) {
         if (pick && own) setPick({ ...pick, typed: { text, si: value.si } })
@@ -403,9 +452,17 @@ export function NumberField({
     }),
     ...errorProps(muted, hiddenError),
   }
-  const change = (text: string) => {
-    if (!own) return onChange(fieldValueFromText(spec.quantity, system, text))
-    const next = pickedTyped(spec.quantity, system, shown, text)
+  const change = (raw: string, typed: boolean) => {
+    const v = typed
+      ? typedFieldValue(spec.quantity, shown, raw, range)
+      : fieldValueFromText(spec.quantity, shown, raw)
+    setRefused(undefined)
+    setDraft(typed && raw !== localizeNumber(v.text) ? { raw, text: v.text } : undefined)
+    if (!own) return onChange(v)
+    const next =
+      v.si === undefined
+        ? { value: v, typed: undefined }
+        : pickedTyped(spec.quantity, system, shown, v.text)
     setPick(pick && { ...pick, typed: next.typed })
     onChange(next.value)
   }
@@ -413,10 +470,14 @@ export function NumberField({
     <FieldInput
       common={common}
       quantity={spec.quantity}
-      min={spec.min}
-      text={shownValue.text}
+      range={range}
+      text={draft?.text === shownValue.text ? draft.raw : localizeNumber(shownValue.text)}
       step={step}
       onText={change}
+      onRefused={(p) => {
+        setRefused(ambiguousMessage(p))
+        setDraft(undefined)
+      }}
     />
   )
 }
