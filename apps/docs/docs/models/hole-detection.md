@@ -247,6 +247,49 @@ Code: `apps/web/src/lib/target-face.ts`, `findFace`, `ringLines`, `ringPlane`, `
 
 Code: `apps/web/src/lib/hole-detection.ts`, `autoDetect`, `runSeeds`, `SEED_MIN_SIZE`. `apps/web/src/lib/colour-axis.ts`, `rescale`, `logLuma`.
 
+### Photo quality
+
+The face search also checks the photo for what makes holes hard to find, on the photo resized to 2000 px on its longer side, and says what to change when retaking it. A problem has a level: fair (a note) or bad. A photo with a bad problem is below the minimum quality: when the face search finds exactly one sure fit, the one-click run applies the face and waits, and the button reads Detect anyway. With several fits or none the run goes on in the guided steps, which show no Detect anyway. Every other problem is a note beside the run. The check never says that a photo is good or that a detection is right.
+
+With the black area found (ellipse axes $a \ge b$, centre $c$), the measures are:
+
+$$
+\theta = \arccos\frac{b}{a}, \qquad s_\mathrm{in} = \frac{\text{area of the ellipse inside the photo}}{\text{area of the ellipse}}
+$$
+
+Code: `apps/web/src/lib/photo-quality.ts`, `photoQuality`. `apps/web/src/lib/face-image.ts`, `shareInside`.
+
+The paper level $P$ is the 75th percentile of the grey blocks in the ring from 1.12 to 1.4 radii of the ellipse, the black level $K$ the 20th percentile of the blocks inside 0.8 radii (a white zone inside the black area does not raise it), and the contrast is $P - K$. Without paper blocks in the frame (the black area fills it) there is no contrast. The grey blocks come from a grid of about 700 blocks on the longer side. Glare is the share of the ring's lit blocks (grey of 120 or more) that are saturated (250 or more), counted only while the median of the other lit blocks is at most 232, so a white scan is not glare. Uneven light is the spread of the median grey levels $m_j$ of the ring's four sides, left and right, above and below the centre (three sides suffice), relative to the largest:
+
+$$
+u = \frac{\max_j m_j - \min_j m_j}{\max_j m_j}
+$$
+
+Code: `apps/web/src/lib/photo-quality.ts`, `sidesDifference`.
+
+Sharpness is the width of the black area's edge in holes. On 120 rays along the ellipse's normals the grey profile across the edge is aligned at its steepest rise and averaged. With the grey step $\Delta g$ and the steepest rise $g'$ per px, the edge width is $w = \Delta g / g'$, and the measure is $w / D_\mathrm{px}$. Rays whose step is below 25 grey levels are left out, and no measure is given when fewer than a quarter of the rays remain. Without a fitted face the hole diameter in this ratio is taken as 6 % of the black area's mean diameter.
+
+Without a black area, or where its edge gives no measure, the sharpness is read from the edges the photo has, whatever the pattern of the target. On a lattice of 3 px the 6000 points of strongest grey gradient are tried in that order. At each the grey profile along the gradient, over 0.75 hole diameters to each side, gives the same width $w$ when its two ends differ by at least 40 grey levels (the edge of a filled zone or of a hole); thin lines do not qualify. The median of up to 300 widths is divided by $D_\mathrm{px}$, with the hole taken as one eightieth of the longer side without a fitted face. No measure is given when fewer than 20 points qualify, so a photo of thin rings and no hole, or of no edge at all, gets none.
+
+The hole diameter on the photo as taken is $D_\mathrm{px} / k$ for the resize factor $k$ (the face's scale times the bullet diameter, or the same 6 % without a fitted face). A photo with no black area found is judged by its brightness, by glare and uneven light counted over the whole photo, and by its size, none of which needs a black area. Brightness $B$ is the 95th percentile of the grey blocks of the whole photo. The light is the spread of the 90th percentile of each quarter of the photo (as $u$ above), given when at least three quarters have a 90th percentile of 120 or more, so a photo filled by a black zone has none.
+
+| Problem | Fair from | Bad from | Message and fix |
+| --- | --- | --- | --- |
+| Tilt, with the black area at least 0.9 inside | $\theta > 30^\circ$ | $55^\circ$ | "The target is photographed at a slant of about N degrees." Retake from straight above, with the camera parallel to the paper. |
+| Framing, with no target selected or recognised | $s_\mathrm{in} < 0.9$ | $0.5$ | "The black area of the target is cut off by the edge of the photo." Retake with the whole target and some paper around it in the frame. |
+| Sharpness | $w / D_\mathrm{px} > 0.3$ | $0.6$ | "The photo is soft: the edges of the target are blurred." Hold the camera steady or rest it on something, let it focus on the target and retake. |
+| Hole size | under 6 px | 3.5 px | "A bullet hole is only about N px across in this photo." Move closer so the target fills more of the frame, or use the full resolution of the camera. |
+| Contrast, with a black area | $P - K < 80$ | $45$ | "The black area and the paper are close in brightness." Retake with more light on the target and without a photo filter. |
+| Brightness, without contrast | $B < 90$ | $50$, for a selected target without a black zone only | "The photo is dark: even its brightest part is dim." Retake with more light on the target and without a photo filter. |
+| Glare | share $> 0.04$ | $0.15$ | "A bright reflection covers part of the paper." Retake with the light from the side, or turn the sheet a little to move the reflection off the target. |
+| Uneven light | $u > 0.25$ | $0.45$ | "The light is uneven: one side of the target is much darker than another." Retake in an even light with no shadow of your hand or phone on the sheet. |
+
+Without a black area and with no edge of a target or a hole found, the photo is reported at the bad level with "No edge of a target or a hole was found in this photo." and the fix "Retake with the target in the frame, in even light and held steady, or set the scale by hand." (the run is not held: with no face applied it already asks for the scale). With edges, a target without a black area (all white, or rings only) is not told that something is missing. Its size message reads "The photo is only N px on its longer side." with the hole size's fix, judged as a hole of one eightieth of the longer side (fair under 480 px, bad under 280 px).
+
+A selected target (the group's face record, or the face found for sure) is a hint, never a requirement: the photo may show only its centre, cut through its rings or show the whole sheet, so no ring, outer border or size is expected and none is warned about. The one thing used is whether a ring's fill is black (`layoutOf`; a record with no fills gives none, as do most records today). With a black zone, a photo with no black area found (it may fill the frame) is not judged by its brightness, and its darkest 5 % above grey level 110 (fair) or 150 (bad) says "The black zones of the target look grey." With a target without a black zone, a dark photo is at the bad level; without a target it stays at the fair level, since a photo filled by a black zone looks the same. The framing note is left out as soon as a target is known, and tilt is not given for a black area the frame cuts.
+
+Code: `apps/web/src/lib/photo-quality.ts`, `photoQuality`, `belowMinimum`, `layoutOf`, `limits`, `edgeWidth`, `edgeSharpness`, `gridMeasures`. `apps/web/src/lib/hole-detection.worker.ts`, `handleFace`. `apps/web/src/components/hole-detection.tsx`, `QualityNotes`.
+
 ## Symbols
 
 | Symbol | Meaning | Stored unit | Unit in `apps/web` |
@@ -260,6 +303,8 @@ Code: `apps/web/src/lib/hole-detection.ts`, `autoDetect`, `runSeeds`, `SEED_MIN_
 | $\bar I_c$, $F_c$ | Mean colour of a block (0 to 255) and its logarithm | no kind | 1 |
 | $\mu$, $m$, $\Sigma$ | Hole colour, median and covariance of the surroundings in log RGB | no kind | 1 |
 | $w$, $\Delta$ | Unit colour axis and the separation of hole and surroundings along it | no kind | 1 |
+| $\theta$, $s_\mathrm{in}$ | Tilt of the black area's plane and its share inside the photo | degree, 1 | degree, 1 |
+| $P$, $K$, $u$ | Paper level, black level (0 to 255) and the relative difference of the light between the paper's four sides | no kind | 1 |
 | $P$ | Projection onto the colour axis, 0 to 255 | no kind | 1 |
 | $r$, $\sigma$, $f$ | Box radius, scale, scale over hole diameter | no kind | px, px, 1 |
 | $L_{xx}, L_{yy}, L_{xy}$ | Second differences of the smoothed projection | no kind | 1/px² |
@@ -290,7 +335,8 @@ Code: `apps/web/src/lib/hole-detection.ts`, `autoDetect`, `runSeeds`, `SEED_MIN_
 
 ## Limits
 
-- The thresholds and scale sets are the app's own values from a prototype, without a published source.
+- The thresholds and scale sets are the app's own values from a prototype, without a published source. So are the limits of the photo quality check.
+- The photo quality check reads the black area's ellipse: a face whose black area is not found is judged by brightness, glare and light over the whole photo, edge sharpness and size. A tilt of a photo whose face shows no black area, and a reflection on the black area, are not measured. A black zone that fills the photo of a target that is not selected looks like a dark photo (a fair note). The blur of a photo with thin rings and no hole is not measured. A photo with none of the problems may still give wrong or missing holes.
 - Torn or elongated holes, holes in a printed line and very close holes may be missed or miscounted. The user confirms, moves or deletes each proposal.
 - A hole within half a hole of the photo's edge is not proposed.
 - A shadow confined to the outer paper can be mistaken for the sheet edge while the black area stays lit, so holes in that shadow can be omitted. Marking a region bypasses the automatic sheet boundary.

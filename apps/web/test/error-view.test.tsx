@@ -24,3 +24,40 @@ it('a schema error lists each issue with the notice', () => {
   expect(html).toContain('<li>load.charge: Too small</li>')
   expect(html).toContain(`Notice: ${notice}`)
 })
+
+it.each([
+  ['chamberVolume', 'The charge does not fit the chamber'],
+  ['noShotStart', 'burned out before the bullet started to move'],
+  ['stuck', 'The bullet stopped in the bore'],
+  ['integration', 'The calculation did not converge'],
+  ['maxTime', 'did not reach the muzzle'],
+  ['input', 'A value is outside what the model accepts'],
+])('an invalid run with reason %s says what is wrong in words', (reason, text) => {
+  const html = renderToStaticMarkup(
+    <ErrorView
+      outcome={{
+        kind: 'error',
+        status: 422,
+        retryAfter: null,
+        body: { statusCode: 422, message: `interior: ${reason}`, reason, notice },
+      }}
+    />,
+  )
+  expect(html).toContain(text)
+  expect(html).not.toContain(`interior: ${reason}`)
+  expect(html).toContain(`Reason: ${reason}`)
+})
+
+it('an unknown reason keeps the message of the answer', () => {
+  const html = renderToStaticMarkup(
+    <ErrorView
+      outcome={{
+        kind: 'error',
+        status: 422,
+        retryAfter: null,
+        body: { statusCode: 422, message: 'a new kind of refusal', reason: 'other' },
+      }}
+    />,
+  )
+  expect(html).toContain('a new kind of refusal')
+})

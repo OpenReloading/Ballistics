@@ -216,6 +216,11 @@ test('the notice line keeps its box through a result with warnings, an error and
     await expect(line.locator('.status, .status + *').getByText(outcome).first()).toBeAttached({
       timeout: 15_000,
     })
+    // the error says in words what is wrong, not the model's reason code alone
+    if (grams === '60')
+      await expect(page.locator('.results-error')).toContainText(
+        'The charge does not fit the chamber',
+      )
     const warnings = page.locator('.run-line .warnings-slot').getByRole('button')
     await expect(warnings).toHaveCount(grams === '2.8' ? 1 : 0)
     await expect.poll(seen).toEqual(idle)
