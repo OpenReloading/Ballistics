@@ -4,8 +4,9 @@ name: Release
 # but the owner: no step here enables auto-merge. Merging it tags each changed component <component>-vX.Y.Z and
 # writes its CHANGELOG.md and GitHub Release; the images job publishes the api and web images of the components
 # released (with an SBOM attestation each), the sbom-release job attaches those SBOMs to the GitHub Releases,
-# and the publish job pushes the libraries to npm (trusted publishing, no token). A push to main that merges
-# no release pull request releases and publishes nothing.
+# and the publish job pushes the libraries to npm (trusted publishing, no token) once the repository variable
+# NPM_PUBLISH is `true`; it is unset until npm is set up. A push to main that merges no release pull request
+# releases and publishes nothing.
 # Steps and versioning: apps/docs/docs/release.md.
 on:
   push:
@@ -223,7 +224,7 @@ jobs:
   # repository and workflow. The pushed commit is the release commit, the one every tag points at.
   publish:
     needs: release-please
-    if: needs.release-please.outputs.libraries != '[]' && needs.release-please.outputs.libraries != ''
+    if: vars.NPM_PUBLISH == 'true' && needs.release-please.outputs.libraries != '[]' && needs.release-please.outputs.libraries != ''
     runs-on: ubuntu-latest
     permissions:
       contents: read
