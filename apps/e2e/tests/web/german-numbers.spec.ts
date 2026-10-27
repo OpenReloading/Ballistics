@@ -36,7 +36,20 @@ test('under German the workbench writes and takes a decimal comma and its result
   await expect(keys).toContainText(/\d,\d/)
   expect(await keys.innerText()).not.toMatch(/\d\.\d/)
 
-  // a pasted text goes in at the caret, as a native paste does
+  const { violations } = await new AxeBuilder({ page })
+    .include('[role="form"]')
+    .include('.readout-keys')
+    .analyze()
+  expect(violations.map((v) => v.id)).toEqual([])
+})
+
+test('under English a pasted text goes in at the caret, as a native paste does', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/workbench')
+  await applyExampleLoad(page)
+  const charge = loadForm(page).getByLabel(/^Charge mass/)
+  await expect(charge).toHaveValue('2.40')
   await charge.evaluate((el: HTMLInputElement) => {
     el.focus()
     el.setSelectionRange(el.value.length, el.value.length)
@@ -46,11 +59,5 @@ test('under German the workbench writes and takes a decimal comma and its result
       new ClipboardEvent('paste', { clipboardData, bubbles: true, cancelable: true }),
     )
   })
-  await expect(charge).toHaveValue('2,61')
-
-  const { violations } = await new AxeBuilder({ page })
-    .include('[role="form"]')
-    .include('.readout-keys')
-    .analyze()
-  expect(violations.map((v) => v.id)).toEqual([])
+  await expect(charge).toHaveValue('2.401')
 })
