@@ -2,6 +2,7 @@
 
 import { Tabs } from '@mantine/core'
 import { useRouter } from 'next/navigation'
+import { useTranslation } from '../i18n/language.ts'
 import { libraryOf } from '../lib/sections.ts'
 import { useRoute } from './use-route.ts'
 
@@ -14,6 +15,7 @@ import { useRoute } from './use-route.ts'
 export function LibraryTabs() {
   const route = useRoute()
   const router = useRouter()
+  const { t } = useTranslation()
   const page = libraryOf(route)
   if (!page?.tabs) return null
   return (
@@ -28,10 +30,10 @@ export function LibraryTabs() {
         router.push(q ? `${href}?${new URLSearchParams({ q })}` : href)
       }}
     >
-      <Tabs.List aria-label={page.label}>
-        {page.tabs.map((t) => (
-          <Tabs.Tab key={t.href} value={t.href}>
-            {t.label}
+      <Tabs.List aria-label={t(page.label)}>
+        {page.tabs.map((tab) => (
+          <Tabs.Tab key={tab.href} value={tab.href}>
+            {t(tab.label)}
           </Tabs.Tab>
         ))}
       </Tabs.List>

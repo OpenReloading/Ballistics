@@ -27,7 +27,7 @@ async function Bullets() {
   if (r.status !== 'ok')
     return (
       <>
-        <PageBar title={listTitles.bullets} />
+        <PageBar title={listTitles.bullets} translated />
         <ServerDataError what="Bullet" />
       </>
     )
@@ -50,7 +50,7 @@ export default function BulletsPage() {
     <Suspense
       fallback={
         <>
-          <PageBar title={listTitles.bullets} />
+          <PageBar title={listTitles.bullets} translated />
           <ListLoading what="bullets" />
         </>
       }

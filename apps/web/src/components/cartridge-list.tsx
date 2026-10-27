@@ -172,6 +172,7 @@ export function CartridgeList({ packed }: { packed: PackedCartridge[] }) {
     <>
       <PageBar
         title={listTitles.cartridges}
+        translated
         status={
           <BarCount
             widest={`${items.length} of ${countText(items.length, items.length, 'cartridges')}`}

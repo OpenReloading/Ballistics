@@ -203,6 +203,7 @@ export function BulletList({
     <>
       <PageBar
         title={listTitles.bullets}
+        translated
         status={
           <>
             <BarCount

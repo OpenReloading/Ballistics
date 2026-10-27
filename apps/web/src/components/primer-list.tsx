@@ -75,6 +75,7 @@ export function PrimerList({ rows }: { rows: PrimerRow[] }) {
     <>
       <PageBar
         title={listTitles.primers}
+        translated
         status={
           <BarCount widest={`${rows.length} of ${countText(rows.length, rows.length, 'primers')}`}>
             {countText(shown.length, rows.length, 'primers')}

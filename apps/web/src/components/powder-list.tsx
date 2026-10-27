@@ -118,6 +118,7 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
     <>
       <PageBar
         title={listTitles.powders}
+        translated
         status={
           <>
             <BarCount

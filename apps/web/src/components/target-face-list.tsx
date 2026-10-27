@@ -90,6 +90,7 @@ export function TargetFaceList({ items }: { items: TargetFaceRow[] }) {
     <>
       <PageBar
         title={listTitles.targets}
+        translated
         status={
           <BarCount widest={`${items.length} of ${countText(items.length, items.length, 'faces')}`}>
             {countText(shown.length, items.length, 'faces')}

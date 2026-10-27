@@ -12,6 +12,8 @@ import {
   useRef,
   useState,
 } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import type { Message } from '../i18n/translate.ts'
 import { SafetyBarButton } from './safety-dialog.tsx'
 
 /**
@@ -51,7 +53,8 @@ export function BarCount({
  * text: one instance at every width, so no menu or form is mounted twice.
  */
 export function PageBar({
-  title,
+  title: given,
+  translated,
   after,
   status,
   actions,
@@ -60,7 +63,10 @@ export function PageBar({
   titleHidden = false,
   compact = false,
 }: {
-  title: string
+  /** The h1: a record's name, as published, or with `translated` a message of the catalogue (a list's title). */
+  title: string | Message
+  /** `title` is a message that the language shown translates. */
+  translated?: boolean
   /** The h1 for screen readers only: the home page shows the wordmark instead. */
   titleHidden?: boolean
   /** Beside the title: the workbench's open loads, a record's standard badges. */
@@ -78,6 +84,9 @@ export function PageBar({
   /** The Safety button as an icon, as the workbench's other secondary actions. */
   compact?: boolean
 }) {
+  const { t } = useTranslation()
+  // the type of `title` says a translated one is a Message
+  const title = translated ? t(given as Message) : given
   const [statusLine, setStatusLine] = useState<HTMLDivElement | null>(null)
   const [open, setOpen] = useState(false)
   const toggle = useRef<HTMLButtonElement>(null)
@@ -128,7 +137,7 @@ export function PageBar({
             ref={toggle}
             className="page-bar-toggle"
             variant="default"
-            aria-label="Page actions"
+            aria-label={t('Page actions')}
             aria-expanded={open}
             aria-controls={id}
             onClick={() => setOpen((o) => !o)}

@@ -35,7 +35,7 @@ async function Targets() {
   )
     return (
       <>
-        <PageBar title={listTitles.targets} />
+        <PageBar title={listTitles.targets} translated />
         <ServerDataError what="Target face" />
       </>
     )
@@ -52,7 +52,7 @@ export default function TargetsPage() {
     <Suspense
       fallback={
         <>
-          <PageBar title={listTitles.targets} />
+          <PageBar title={listTitles.targets} translated />
           <ListLoading what="target faces" />
         </>
       }

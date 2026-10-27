@@ -83,6 +83,7 @@ export function DisciplineList({ items }: { items: DisciplineRow[] }) {
     <>
       <PageBar
         title={listTitles.disciplines}
+        translated
         status={
           <BarCount
             widest={`${items.length} of ${countText(items.length, items.length, 'disciplines')}`}
@@ -180,6 +181,7 @@ export function FederationList({ items }: { items: FederationRow[] }) {
     <>
       <PageBar
         title={listTitles.federations}
+        translated
         status={
           <BarCount
             widest={`${items.length} of ${countText(items.length, items.length, 'federations')}`}

@@ -38,7 +38,7 @@ async function Disciplines() {
   )
     return (
       <>
-        <PageBar title={listTitles.disciplines} />
+        <PageBar title={listTitles.disciplines} translated />
         <ServerDataError what="Discipline" />
       </>
     )
@@ -53,7 +53,7 @@ export default function DisciplinesPage() {
     <Suspense
       fallback={
         <>
-          <PageBar title={listTitles.disciplines} />
+          <PageBar title={listTitles.disciplines} translated />
           <ListLoading what="disciplines" />
         </>
       }

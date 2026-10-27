@@ -125,6 +125,7 @@ export function CaseList({
     <>
       <PageBar
         title={listTitles.cases}
+        translated
         status={
           <BarCount widest={`${rows.length} of ${countText(rows.length, rows.length, 'cases')}`}>
             {countText(shown.length, rows.length, 'cases')}

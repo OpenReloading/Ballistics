@@ -652,6 +652,7 @@ export function FirearmLibrary() {
     <>
       <PageBar
         title={listTitles.firearms}
+        translated
         status={
           list && (
             <BarCount widest={`${total} of ${countText(total, total, 'firearms')}`}>
