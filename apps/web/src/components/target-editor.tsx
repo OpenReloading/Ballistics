@@ -73,6 +73,7 @@ import {
 } from 'react'
 import { flushSync } from 'react-dom'
 import { z } from 'zod'
+import { storageName } from '../lib/edition.ts'
 import { isFaceId } from '../lib/face-records.ts'
 import { calibrateSheetOnFace } from '../lib/face-sheet.ts'
 import { fieldValueFromText } from '../lib/field-spec.ts'
@@ -151,9 +152,9 @@ import { useUnits } from './units-settings.tsx'
 type Photo = { url: string; width: number; height: number }
 type RefKind = CalibrationReference['kind']
 
-const lastSheet = 'target-sheet-last'
+const lastSheet = storageName('target-sheet-last')
 /** Copies of the sheets whose save had not landed when the page went. */
-const waitingCopy = 'target-sheet-waiting'
+const waitingCopy = storageName('target-sheet-waiting')
 /** A sheet to save, with the `saved` of the stored version it was edited from (none: a new sheet). */
 type WaitingRecord = TargetSheetRecord & { base?: string | undefined }
 
@@ -190,7 +191,7 @@ function dropCopy(id: string, saved?: string) {
     else localStorage.removeItem(waitingCopy)
   } catch {}
 }
-const overlayKey = 'target-overlays'
+const overlayKey = storageName('target-overlays')
 const defaultOverlays: Record<Overlay, boolean> = {
   spread: true,
   box: false,

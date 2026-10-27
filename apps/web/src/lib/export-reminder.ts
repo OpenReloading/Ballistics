@@ -1,4 +1,5 @@
 /** The reminder to export the saved loads: its counts, stored state and text. */
+import { storageName } from './edition.ts'
 
 /** What the export reminder counts (`localStorage` `exportReminder`). */
 export type ExportReminder = {
@@ -7,7 +8,7 @@ export type ExportReminder = {
   changes: number
 }
 
-export const reminderKey = 'exportReminder'
+export const reminderKey = storageName('exportReminder')
 const reminderChanges = 10
 const reminderDays = 7
 
