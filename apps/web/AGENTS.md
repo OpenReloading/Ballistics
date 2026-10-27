@@ -244,7 +244,7 @@ The language is a setting: one page tree, one set of URLs, no locale in paths. E
 - `src/i18n/<code>.json`: key to text, or to `{ one, other }` (the CLDR plural categories of the language). `npm run i18n -w @open-reloading/web -- missing <code>` lists the English messages the catalogue lacks and exits 1 for a key no message matches; `-- messages` lists every message (`scripts/i18n.mts`, a text scan of the files that import from `src/i18n/`).
 - `test/i18n-catalogue.test.ts`: no catalogue key without a message in the sources, the placeholders of a text equal those of its key, and the German catalogue writes a verified term of the table as the table does where its English word occurs. `test/i18n.test.ts`: the fallback, plurals, numbers, the stored choice and the document language.
 - Offline: the catalogue is a chunk under `.next/static`, so the worker precaches it with the other chunks (`precacheList`) and answers it from the shell cache. `tests/web/language.spec.ts` reopens the German home page offline.
-- Translated so far: Settings (the dialog, General, and the intro texts of the Units and Workbench tabs; the unit presets, the quantity names of the Units form, the Workbench defaults form and Manufacturers form are English) and the home page.
+- Translated so far: the home page and Settings (the dialog, General, `UnitsForm`, the Workbench tab's intro text and its Reset button and cited-default mark, the Manufacturers section). Still English in Settings: the field labels and errors of the Workbench defaults form (they are the workbench field specs), the `Loading` lines (`states.tsx` joins its text) and the Units button names.
 
 ## German terms
 

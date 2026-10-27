@@ -1,3 +1,4 @@
+import AxeBuilder from '@axe-core/playwright'
 import { expect, type Page, test } from '@playwright/test'
 import { gotoHydrated } from './nav.ts'
 import { settingsEntry, storeUnits } from './units.ts'
@@ -37,11 +38,26 @@ test('German is chosen in Settings, switches the home page and the dialog, and i
   await expect(dialog).toHaveAccessibleName('Einstellungen')
   await expect(page.locator('html')).toHaveAttribute('lang', 'de')
   await expect(dialog.getByRole('tab', { name: 'Allgemein' })).toBeVisible()
+  await dialog.getByRole('tab', { name: 'Einheiten' }).click()
+  await expect(dialog.getByRole('radiogroup', { name: 'Voreinstellung' })).toBeVisible()
+  await expect(dialog).toHaveCSS('opacity', '1')
+  expect(
+    (
+      await new AxeBuilder({ page })
+        .include('[role="dialog"]')
+        .withTags(['wcag2a', 'wcag2aa'])
+        .analyze()
+    ).violations,
+  ).toEqual([])
   await page.keyboard.press('Escape')
   await expect(dialog).toBeHidden()
   await expect(page.getByText(lead.de)).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Werkzeuge' })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Patronen' })).toBeVisible()
+  // the page and the dialog in German have no accessibility violation, the page language included
+  const axe = () =>
+    new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+  expect((await axe().analyze()).violations).toEqual([])
   // a count with the plural of the language
   await expect(
     page

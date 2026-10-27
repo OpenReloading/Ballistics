@@ -52,7 +52,10 @@ function LanguageChoice() {
     <SegmentedControl
       aria-labelledby="settings-language"
       value={chosen}
-      data={languages.map((l) => ({ value: l.code, label: l.name }))}
+      data={languages.map((l) => ({
+        value: l.code,
+        label: <span lang={l.code}>{l.name}</span>,
+      }))}
       onChange={(v) => chooseLanguage(v as Language)}
     />
   )
