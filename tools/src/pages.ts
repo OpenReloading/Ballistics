@@ -51,6 +51,8 @@ try {
   await run(['run', 'build', '-w', '@open-reloading/web'], {
     API_URL: api.url,
     PRERENDER: sample ? 'sample' : 'full',
+    // no docs site in a sample: no Docs link to a 404
+    NEXT_PUBLIC_NO_DOCS: sample ? '1' : undefined,
   })
   rmSync(site, { recursive: true, force: true })
   cpSync(at('apps/web/out'), site, { recursive: true })

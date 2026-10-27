@@ -72,7 +72,7 @@ Playwright tests against a running API and web app, on the CIP cartridge records
 - Unit tests of the scripts (Vitest): `npm run test:unit`
 - Against the static export (no API, no server edition), after the root `npm run build`, `npm run static:build` and `npm run pages:serve` (`apps/web/AGENTS.md`, Pages edition, Static loop), with `WEB_URL=http://localhost:3003` on the host (the baseline needs docker or podman there):
   - Visual check: `npm run visual-check -- --preset drawing|calculators` (or page paths)
-  - Drawing baseline: `npm run drawing-baseline` (the default set is in the sample, the full set needs a full export, `npm run pages:build`)
+  - Drawing baseline: `npm run drawing-baseline` (the default set is in the sample, the full set needs a full export at the site root, `PAGES_BASE_PATH= npm run pages:build`)
   - Smoke: `PAGES_URL=http://localhost:3003/ npm test -- --project=pages`. The project `pages` skips the forwarding route and compares the workbench's example result with `WEB_URL`, here the same site.
   - The other specs of project `full` open records outside the sample and use the forwarding route's URLs: not run against the export yet.
 - `user-data-folder.spec.ts` needs a secure origin (`localhost` or https). From the dev container, `http://host.containers.internal` is not one and its two tests fail. Against the host stack, run the suite in the Playwright image on the host network: `podman run --rm --network=host --userns=keep-id -v "$PWD":"$PWD":z -w "$PWD/apps/e2e" -e CI=1 mcr.microsoft.com/playwright:v<@playwright/test version>-noble npx playwright test`

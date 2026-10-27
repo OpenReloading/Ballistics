@@ -90,6 +90,7 @@
 - `WEB_URL`: base URL of the web app for the e2e browser tests.
 - `NEXT_PUBLIC_REPOSITORY_URL`: URL of the public source repository, inlined at web build time (no Dockerfile `ARG`). Unset (`apps/web/src/lib/repository-url.ts`): no repository link in the header or the drawer. Set only by `pages.yml`, to the repository the workflow runs in.
 - `NEXT_PUBLIC_DOCS_URL`: URL of the docs site, inlined at web build time (no Dockerfile `ARG`). Unset (`apps/web/src/lib/docs-url.ts`): no Docs link in the sidebar or the drawer, except in the Pages edition, which links its own `docs/` folder.
+- `NEXT_PUBLIC_NO_DOCS`: set by `npm run static:build` and `npm run dev:static`, which build no docs site: the Pages edition's own `docs/` link is left out.
 - `APP_URL`: URL of the web app, read at docs site build time for the docs navbar's Web app link (`ARG` of `apps/docs/Dockerfile`, set by `compose.yaml`; `tools/src/pages.ts` sets it to the Pages site root from `PAGES_URL`). A full URL; unset: no link.
 - `PAGES_BASE_PATH`, `PAGES_URL`: Pages edition (`apps/web/AGENTS.md`).
 - `PRERENDER`:

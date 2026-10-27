@@ -9,6 +9,7 @@ import { spawn } from 'node:child_process'
 import { rmSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { startBundleApi, writeStaticApi } from '@open-reloading/api/static'
+import { devExit } from './dev-exit.ts'
 import { executable } from './executable.ts'
 
 const at = (p: string) => fileURLToPath(new URL(`../../${p}`, import.meta.url))
@@ -17,23 +18,39 @@ const dataDir = at('apps/web/public/api')
 const clearWebBuild = () => rmSync(at('apps/web/.next'), { recursive: true, force: true })
 
 const api = await startBundleApi()
-clearWebBuild()
-rmSync(dataDir, { recursive: true, force: true })
+let stopped = false
 try {
+  clearWebBuild()
+  rmSync(dataDir, { recursive: true, force: true })
   await writeStaticApi(api.data, dataDir)
   const dev = spawn(executable('npm'), ['run', 'dev', '-w', '@open-reloading/web'], {
     cwd: at(''),
     // `full`: the inherited `sample` would leave records out of the generated routes
-    env: { ...process.env, API_URL: api.url, PAGES_BASE_PATH: '', PRERENDER: 'full' },
+    env: {
+      ...process.env,
+      API_URL: api.url,
+      PAGES_BASE_PATH: '',
+      PRERENDER: 'full',
+      // the docs site is not built here: no Docs link to a 404
+      NEXT_PUBLIC_NO_DOCS: '1',
+    },
     stdio: 'inherit',
     // a group of its own: npm does not pass a signal on to `next`, so the signal goes to the group
     detached: true,
   })
   for (const signal of ['SIGINT', 'SIGTERM'] as const)
-    process.on(signal, () => process.kill(-(dev.pid ?? 0), signal))
-  await new Promise<void>((resolve, reject) => dev.on('error', reject).on('exit', () => resolve()))
+    process.on(signal, () => {
+      stopped = true
+      process.kill(-(dev.pid ?? 0), signal)
+    })
+  await devExit(dev, () => stopped)
 } finally {
-  clearWebBuild()
-  rmSync(dataDir, { recursive: true, force: true })
+  // one failed removal must not leave the API open
+  for (const clean of [clearWebBuild, () => rmSync(dataDir, { recursive: true, force: true })])
+    try {
+      clean()
+    } catch (error) {
+      console.error(error)
+    }
   await api.close()
 }

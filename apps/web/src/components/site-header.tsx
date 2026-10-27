@@ -50,7 +50,7 @@ const name = 'OpenReloading Ballistics'
 
 // inlined at build; no link without it
 const repository = repositoryUrl(process.env.NEXT_PUBLIC_REPOSITORY_URL)
-const docs = docsUrl(process.env.NEXT_PUBLIC_DOCS_URL)
+const docs = docsUrl(process.env.NEXT_PUBLIC_DOCS_URL, undefined, process.env.NEXT_PUBLIC_NO_DOCS)
 
 type Section = (typeof sections)[number]
 
