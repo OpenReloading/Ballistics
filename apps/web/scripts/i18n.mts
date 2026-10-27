@@ -19,12 +19,32 @@ const webRoot = path.join(import.meta.dirname, '..')
 const literal = /'((?:[^'\\\n]|\\.)*)'|"((?:[^"\\\n]|\\.)*)"|`((?:[^`\\$]|\\.)*)`/y
 const call = /(?<![.\w])(msg|tn|t)\(\s*/g
 
+const escapes: Record<string, string> = {
+  n: '\n',
+  t: '\t',
+  r: '\r',
+  b: '\b',
+  f: '\f',
+  v: '\v',
+  0: '\0',
+}
+
+/** The value of a literal's body: its escapes read as JavaScript does (`\n`, `\xHH`, `\uHHHH`, `\u{H}`). */
+const decode = (body: string) =>
+  body.replace(
+    /\\(?:u\{([0-9a-fA-F]+)\}|u([0-9a-fA-F]{4})|x([0-9a-fA-F]{2})|(.))/g,
+    (_, braced, unit, hex, other: string) =>
+      braced || unit || hex
+        ? String.fromCodePoint(Number.parseInt(braced ?? unit ?? hex, 16))
+        : (escapes[other] ?? other),
+  )
+
 /** The text of the string literal at `at` and the index after it, or undefined. */
 function literalAt(source: string, at: number) {
   literal.lastIndex = at
   const m = literal.exec(source)
   if (!m) return
-  return { text: (m[1] ?? m[2] ?? m[3] ?? '').replace(/\\(.)/g, '$1'), end: literal.lastIndex }
+  return { text: decode(m[1] ?? m[2] ?? m[3] ?? ''), end: literal.lastIndex }
 }
 
 /** The index of the first comma at bracket depth 0 from `at`, or -1. */

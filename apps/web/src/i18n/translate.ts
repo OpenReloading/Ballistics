@@ -74,7 +74,7 @@ export function translator(catalogue?: Catalogue, language = 'en'): Translator {
           : new Intl.PluralRules('en').select(count) === 'one'
             ? one
             : other
-      return fill(text, { count, ...values }, shown)
+      return fill(text, { ...values, count }, shown)
     },
   }
 }

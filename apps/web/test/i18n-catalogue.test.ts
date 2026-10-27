@@ -22,6 +22,11 @@ describe('message extraction', () => {
     ).toEqual(['A', 'B "q"', 'C', '{count} row|{count} rows', 'one|other'])
   })
 
+  it('reads escapes as JavaScript does, so the key equals the runtime string', () => {
+    const source = String.raw`${head}t('Line\nTwo'); t("Tab\there \x41 ä \u{1F600} \\ \'")`
+    expect(extract(source)).toEqual(['Line\nTwo', "Tab\there A ä \u{1F600} \\ '"])
+  })
+
   it('leaves `t(label)` of a marked message to the place that marks it', () => {
     expect(extract(`${head}t(label)`)).toEqual([])
   })

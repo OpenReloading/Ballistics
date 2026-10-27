@@ -56,6 +56,10 @@ describe('translator', () => {
     expect(german.tn(1234, ...count)).toBe('1234 Datensätze')
   })
 
+  it('shows the count argument, not a count value, so the form and the number agree', () => {
+    expect(english.tn(2, ...count, { count: 1 })).toBe('2 records')
+  })
+
   it('leaves a placeholder without a value in place', () => {
     expect(english.t('Value {n}', { m: 1 })).toBe('Value {n}')
   })
