@@ -36,3 +36,27 @@ export function useRecord<T>(kind: string, id: string) {
   }, [])
   return { state, retry }
 }
+
+/**
+ * What a record page reads besides its record (lists, other records) through `load`, once per
+ * attempt: the states of `useRecord` without `notFound`. `load` is not a dependency: it closes over
+ * the record, which does not change while the page is mounted.
+ */
+export function useRead<T>(load: (signal: AbortSignal) => Promise<T>) {
+  const [state, setState] = useState<RecordState<T>>({ status: 'loading' })
+  const [attempt, setAttempt] = useState(0)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `attempt` reads again
+  useEffect(() => {
+    const read = new AbortController()
+    load(read.signal).then(
+      (data) => setState({ status: 'ok', data }),
+      () => read.signal.aborted || setState({ status: 'error' }),
+    )
+    return () => read.abort()
+  }, [attempt])
+  const retry = useCallback(() => {
+    setState({ status: 'loading' })
+    setAttempt((n) => n + 1)
+  }, [])
+  return { state, retry }
+}
