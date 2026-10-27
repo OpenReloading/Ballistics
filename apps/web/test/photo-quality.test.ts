@@ -138,6 +138,37 @@ describe('a photo without a black area', () => {
   })
 })
 
+describe('the edge of the black area', () => {
+  /** A dark disc of radius 100 px on paper, edge blurred by a ramp of `ramp` px. */
+  function disc(ramp: number): RgbaImage {
+    const size = 500
+    const data = new Uint8ClampedArray(size * size * 4)
+    for (let y = 0; y < size; y++)
+      for (let x = 0; x < size; x++) {
+        const t = Math.min(1, Math.max(0, (Math.hypot(x - 250, y - 250) - 100) / ramp + 0.5))
+        data.set([30 + 190 * t, 30 + 190 * t, 30 + 190 * t, 255], (y * size + x) * 4)
+      }
+    return { width: size, height: size, data }
+  }
+  const at = (r: number, dx = 0) => ({
+    centreX: 250 + dx,
+    centreY: 250,
+    semiMajor: r,
+    semiMinor: r,
+    angle: 0,
+  })
+
+  it('is measured when the ellipse is off by a few px', () => {
+    const issues = photoQuality({ image: disc(1.5), scale: 1, black: at(106, 4), holePx: 20 })
+    expect(problems(issues)).not.toContain('blur')
+  })
+
+  it('shows a soft edge off the same ellipse', () => {
+    const issues = photoQuality({ image: disc(24), scale: 1, black: at(106, 4), holePx: 20 })
+    expect(level(issues, 'blur')).toBe('bad')
+  })
+})
+
 describe('belowMinimum', () => {
   it('holds only for a problem at the bad level', () => {
     const issue = { problem: 'tilt', text: '', fix: '' } as const

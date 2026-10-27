@@ -76,8 +76,9 @@ const levelOf = (
   return past(fair) ? 'fair' : undefined
 }
 
-function median(v: number[]): number {
-  const s = [...v].sort((a, b) => a - b)
+/** Median of the numbers in `v`, NaN when it has none (a bin no ray reached is NaN and left out). */
+function median(v: readonly number[]): number {
+  const s = v.filter((x) => !Number.isNaN(x)).sort((a, b) => a - b)
   return s.length ? nth(s, s.length >> 1) : Number.NaN
 }
 

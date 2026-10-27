@@ -215,6 +215,8 @@ export function useHoleDetection({
 
   /** One request to a worker of its own; its replies until the last. */
   function ask(request: WorkerRequest, onReply: (m: WorkerReply) => void) {
+    // any detection run, from the Detect step or an example hole too, ends the wait
+    if (request.kind !== 'face' && request.kind !== 'colour') setHeld(false)
     worker.current?.terminate()
     const w = new Worker(new URL('../lib/hole-detection.worker.ts', import.meta.url), {
       type: 'module',
