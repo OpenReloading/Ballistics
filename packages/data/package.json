@@ -1,6 +1,6 @@
 {
   "name": "@open-reloading/data",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "license": "MIT AND CC-BY-4.0",
   "repository": {
     "type": "git",
@@ -35,7 +35,7 @@
     "test": "vitest run --coverage"
   },
   "dependencies": {
-    "@open-reloading/schema": "0.0.3"
+    "@open-reloading/schema": "0.0.4"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",

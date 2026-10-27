@@ -33,6 +33,7 @@ import {
   proposalsClearOfShots,
   rectangleFromDiagonal,
 } from '../lib/hole-proposals.ts'
+import { belowMinimum, layoutOf, type QualityIssue } from '../lib/photo-quality.ts'
 import type { Frame } from '../lib/target-editor.ts'
 import {
   type FaceFit,
@@ -48,6 +49,7 @@ import { formatQuantity, type UnitSystem } from '../lib/units.ts'
 import { storedPhoto } from '../lib/user-store.ts'
 import { usePopoverReturn } from './popover-return.ts'
 import { SiField } from './si-field.tsx'
+import { Message } from './states.tsx'
 import { arrows, viewPoint } from './svg-point.ts'
 import type { Tool } from './target-canvas.tsx'
 import { useUnits } from './units-settings.tsx'
@@ -120,6 +122,10 @@ export function useHoleDetection({
   const [record, setRecord] = useState<TargetFace>()
   /** The black diameter typed when no face fits, m. */
   const [diameter, setDiameter] = useState<number>()
+  /** The photo's quality problems from the last face search; undefined before one. */
+  const [quality, setQuality] = useState<QualityIssue[]>()
+  /** The one-click run waits for the user: the photo is below the minimum quality. */
+  const [held, setHeld] = useState(false)
   /** A face was applied and the auto run waits for the sheet to follow. */
   const awaiting = useRef(false)
   const [settings, setSettings] = useState(false)
@@ -167,6 +173,8 @@ export function useHoleDetection({
     setFlagged([])
     setStep(undefined)
     setFound(undefined)
+    setQuality(undefined)
+    setHeld(false)
     awaiting.current = false
     return stop
   }, [sheet.photo, sheetId, group?.id])
@@ -207,6 +215,8 @@ export function useHoleDetection({
 
   /** One request to a worker of its own; its replies until the last. */
   function ask(request: WorkerRequest, onReply: (m: WorkerReply) => void) {
+    // any detection run, from the Detect step or an example hole too, ends the wait
+    if (request.kind !== 'face' && request.kind !== 'colour') setHeld(false)
     worker.current?.terminate()
     const w = new Worker(new URL('../lib/hole-detection.worker.ts', import.meta.url), {
       type: 'module',
@@ -356,13 +366,23 @@ export function useHoleDetection({
         // a calibrated sheet gives the size, so faces of another size drop out of the search
         ...(frame?.calibration &&
           region && { pxPerMm: localPxPerM(frame, region) * toSi('length', 1) }),
+        ...(size && { holeDiameter: size.diameter }),
+        layout: layoutOf(record),
       },
       (m) => {
         if (m.kind !== 'face') return
         setFound(m.search)
+        setQuality(m.quality)
         const { fits } = m.search
         const [only] = fits
-        if (only && fits.length === 1 && m.search.sure) return applyFit(only, thenDetect)
+        if (only && fits.length === 1 && m.search.sure) {
+          // below the minimum quality the face is applied and the run waits for Detect anyway
+          const hold = thenDetect && belowMinimum(m.quality)
+          setHeld(hold)
+          applyFit(only, thenDetect && !hold)
+          if (hold) setStep(undefined)
+          return
+        }
         const next = faceFollowUp(m.search)
         setStep(next.step)
         say(next.text)
@@ -423,6 +443,7 @@ export function useHoleDetection({
 
   /** The one-click start: the face search, auto detection, else the first guided step that needs the user. */
   function start() {
+    setHeld(false)
     if (!frame?.calibration) return void recognise(true)
     if (!size) {
       setStep(2)
@@ -667,7 +688,8 @@ export function useHoleDetection({
       settingsPanel={settingsPanel}
       step={step}
       setStep={setStep}
-      start={runButton('Detect holes', true)}
+      start={runButton(held ? 'Detect anyway' : 'Detect holes', true)}
+      notes={quality && <QualityNotes issues={quality} held={held} />}
       body={step === undefined ? undefined : stepBody[step]}
     />
   )
@@ -794,6 +816,25 @@ function chosenFace(group: ShotGroup | undefined, choices: FaceChoice[]) {
   const chosen = group?.face && `${group.face.id}|${group.face.event ?? ''}`
   if (chosen && choices.some((c) => c.value === chosen)) return chosen
   return choices.find((c) => c.value === group?.face?.id)?.value ?? ''
+}
+
+/** The photo's quality problems, each with what to change when retaking it; `held` says the run waits. */
+function QualityNotes({ issues, held }: { issues: readonly QualityIssue[]; held: boolean }) {
+  if (!issues.length) return null
+  return (
+    <div className="quality-notes">
+      {issues.map((i) => (
+        <Message key={i.problem} severity={i.level === 'bad' ? 'warning' : 'info'}>
+          {i.text} {i.fix}
+        </Message>
+      ))}
+      {held && (
+        <Message severity="info">
+          Detection waits. Detect anyway runs it on this photo; check every proposed hole.
+        </Message>
+      )}
+    </div>
+  )
 }
 
 function RunButton({
@@ -1200,6 +1241,7 @@ function DetectPanel({
   step,
   setStep,
   start,
+  notes,
   body,
 }: {
   settings: boolean
@@ -1210,6 +1252,8 @@ function DetectPanel({
   setStep: (update: number | undefined | ((s: number | undefined) => number | undefined)) => void
   /** The one-click start, shown before a step is chosen. */
   start: ReactNode
+  /** The photo's quality problems, above the step. */
+  notes: ReactNode
   /** The body of the step shown. */
   body: ReactNode
 }) {
@@ -1262,6 +1306,7 @@ function DetectPanel({
           </li>
         ))}
       </ol>
+      {notes}
       <div className="detect-step" data-step={step === undefined ? 'start' : detectSteps[step]}>
         {step === undefined ? <div className="prop-grid">{start}</div> : body}
       </div>

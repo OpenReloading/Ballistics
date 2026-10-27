@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.4](https://github.com/OpenReloading/Ballistics/compare/schema-v0.0.3...schema-v0.0.4) (2026-10-27)
+
+
+### Documentation
+
+* describe the single static edition and the API as its own product ([#381](https://github.com/OpenReloading/Ballistics/issues/381)) ([53dbcd4](https://github.com/OpenReloading/Ballistics/commit/53dbcd4a4fda15a7597668640dd28426cd7ef313))
+
 ## [0.0.3](https://github.com/OpenReloading/Ballistics/compare/schema-v0.0.2...schema-v0.0.3) (2026-10-27)
 
 

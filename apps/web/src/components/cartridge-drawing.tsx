@@ -37,7 +37,7 @@ export type View = (typeof views)[number][0]
 
 /**
  * The technical drawing of a CIP record: one figure, a table VII shotshell one per variant of l,
- * all at the scale of the widest. Server-rendered SVG; with `side` one side alone (the record pages),
+ * all at the scale of the widest. SVG; with `side` one side alone (the record pages),
  * else both sides in one figure, the views Cartridge, Chamber and Combined switched by a
  * segmented control (the cartridge designer, which holds `view`; CSS on the figure's `data-view`);
  * the tables carry the data. The cartridge designer passes its own heading and the figures it laid
