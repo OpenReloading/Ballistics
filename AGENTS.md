@@ -130,8 +130,3 @@ In order, before a change reaches the default branch:
    - A change to the `exports` of a package the web app imports, to the web app's imports of a package, or to a Dockerfile: also that image's build on the host, `podman compose build api` or `docs` (or `docker compose build ...`). CI builds the API image only (the `e2e` job and `release.yml`), from the files its Dockerfile copies, so a local build over the whole workspace does not show a missing one.
 5. Commits signed (`commit.gpgsign` with an SSH key). Never `git filter-branch` (it drops signatures). Re-sign with `git rebase -f --exec 'git commit --amend --no-edit -S' <base>`. Never `--no-verify`.
 6. Push, then CI green on the pushed commit.
-
-<!-- benchkeeper:project start -->
-- The agent, Git and file edits run on the host. Installs, builds, lint, tests and local MCP or browser tools run in the dev container: prefix `devcontainer exec --workspace-folder .`, compound commands as `devcontainer exec --workspace-folder . sh -lc '...'`. If the container cannot start, report it and stop that command.
-- UI screens and user-facing text: load the designing-technical-uis skill first.
-<!-- benchkeeper:project end -->
