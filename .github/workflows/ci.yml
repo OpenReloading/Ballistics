@@ -5,6 +5,8 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Ready for a merge queue on `main`; without one the push run checks every merge.
+  merge_group:
 
 permissions: {}
 
@@ -26,7 +28,7 @@ env:
 jobs:
   # Which jobs run and what the e2e job exports: only a pull request may skip `check` (prose only) or `e2e` (no
   # change to what the API, the web app, the export scripts or the e2e specs read), or export a sample of the
-  # cartridge pages. Every other event (the default branch) and every doubt runs everything; see
+  # cartridge pages. Every other event (the default branch, the merge queue) and every doubt runs everything; see
   # apps/web/scripts/ci-plan.mts.
   changes:
     runs-on: ubuntu-latest
@@ -174,8 +176,9 @@ jobs:
           version: 1.31.1
           advanced-security: false
 
+  # It compares a pull request's dependencies with its base, so only a pull request runs the step; the job still
+  # reports on `merge_group`, where the queue needs its required status.
   dependency-review:
-    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -185,7 +188,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+      - if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
         with:
           config-file: ./.github/dependency-review-config.yml
           fail-on-severity: high
@@ -240,8 +244,8 @@ jobs:
             run /doc/openapi.json --url http://localhost:3000 --checks not_a_server_error,status_code_conformance,content_type_conformance,response_schema_conformance
       # The Turbopack compile cache only (.next/cache/fetch-cache holds API responses, so it never leaves the run).
       # A pull request restores the newest cache of its own branch or of the default branch (GitHub scopes caches
-      # that way, so a fork's cache cannot reach another branch); a push to the default branch
-      # builds from nothing and saves the cache that pull requests start from.
+      # that way, so a fork's cache cannot reach another branch). A merge queue run builds from nothing and saves
+      # nothing: its cache is scoped to the queue branch, which no pull request reads.
       - name: Key of the Turbopack cache
         id: next
         run: |
@@ -265,7 +269,7 @@ jobs:
             npm run pages -w @open-reloading/tools -- --no-docs
           fi
       - name: Save the Turbopack cache
-        if: steps.cache.outputs.cache-hit != 'true' && (github.event_name == 'pull_request' || github.ref == format('refs/heads/{0}', github.event.repository.default_branch))
+        if: github.event_name == 'pull_request' && steps.cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: apps/web/.next/cache/turbopack
@@ -284,7 +288,7 @@ jobs:
       - name: Paired contact sheet of the baseline drawings when drawing code changed
         id: sheet
         env:
-          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          BASE: ${{ github.event.pull_request.base.sha }}
         run: |
           git cat-file -e "$BASE^{commit}" 2>/dev/null || { echo "no base commit"; exit 0; }
           if git diff --quiet "$BASE" HEAD -- packages/drawing/src 'apps/web/src/components/*drawing*'; then
