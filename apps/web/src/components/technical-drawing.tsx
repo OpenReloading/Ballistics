@@ -14,6 +14,7 @@ import type { FigureModel, Side } from '@open-reloading/drawing/cartridge'
 import { fromSi, toSi } from '@open-reloading/schema'
 import type { CSSProperties, ReactNode } from 'react'
 import { drawingFont } from '../app/fonts/drawing.ts'
+import { Decimal } from './decimal.tsx'
 
 const n = (x: number) => Number(x.toFixed(2))
 /** Drawing units per mm: on screen one unit is one CSS px at full size. */
@@ -61,7 +62,7 @@ function Text({
       y={n(l.c[1] + 0.25 * em)}
       transform={`rotate(${rotation(l, turn)} ${n(l.c[0])} ${n(l.c[1])})`}
     >
-      {l.text}
+      <Decimal text={l.text} />
     </text>
   )
   if (!l.ring) return text
@@ -356,7 +357,7 @@ export function TechnicalDrawing({
             d={`M${n(scale.x)} ${n(scale.y - 0.3 * em)}V${n(scale.y)}H${n(scale.x + scale.length)}V${n(scale.y - 0.3 * em)}`}
           />
           <text x={n(scale.x + scale.length + 0.4 * em)} y={n(scale.y)}>
-            {scale.label}
+            <Decimal text={scale.label} />
           </text>
           <text x={n(scale.text[0])} y={n(scale.text[1])}>
             {scale.note}

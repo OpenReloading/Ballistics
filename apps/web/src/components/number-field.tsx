@@ -258,11 +258,11 @@ function FieldEnd({
 }
 
 /**
- * A twist is "1:8" or "8": text, not a number. A field that accepts negatives is a native number
- * input, which keeps the iOS minus key but reads and writes the point only: under a language with a
- * decimal comma it is a text input. The other fields are `NumberInput`s, which write the language's
- * decimal mark (set by the theme) and take either mark. `onText` gets what a person typed
- * (`typed`) or the canonical text of a `NumberInput`.
+ * A twist is "1:8" or "8": text, not a number. Under a decimal point a field that accepts negatives
+ * is a native number input (it keeps the iOS minus key) and the others are `NumberInput`s. Under a
+ * decimal comma every field is a text input read by `parseNumber`: a native number input and the
+ * `NumberInput` take the point only from a key press, not from pasted, filled or composed text.
+ * `onText` gets what a person typed (`typed`) or the canonical text of a `NumberInput`.
  */
 function FieldInput({
   common,
@@ -281,15 +281,17 @@ function FieldInput({
   onText: (text: string, typed: boolean) => void
   onRefused: (p: Extract<ParsedNumber, { kind: 'ambiguous' }>) => void
 }) {
-  if (quantity === 'twist')
-    return (
-      <TextInput {...common} value={text} onChange={(e) => onText(e.currentTarget.value, true)} />
-    )
-  if (range.min === undefined || range.min < 0)
+  const comma = decimalMark() !== '.'
+  const signed = range.min === undefined || range.min < 0
+  if (quantity === 'twist' || comma || signed)
     return (
       <TextInput
         {...common}
-        {...(decimalMark() === '.' && { type: 'number', step: 'any' })}
+        {...(quantity !== 'twist' &&
+          (comma
+            ? // the decimal keypad of a phone has no minus key: a signed field keeps the full keyboard
+              !signed && { inputMode: 'decimal' as const }
+            : { type: 'number', step: 'any' }))}
         value={text}
         onChange={(e) => onText(e.currentTarget.value, true)}
       />

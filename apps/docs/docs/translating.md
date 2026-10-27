@@ -10,12 +10,32 @@ The web app's language is a setting (Settings, General, Language). There is one 
 ## Write a text
 
 - Use `useTranslation()` from `src/i18n/language.ts` in a component: `const { t, tn } = useTranslation()`.
-- `t('Close settings')` translates one text. Placeholders are `{name}`: `t('Value {n}', { n: 12.5 })`. A number value is written with the decimal separator of the language and no digit grouping.
+- `t('Close settings')` translates one text. Placeholders are `{name}`: `t('Value {n}', { n: 12.5 })`. A number value is written with the decimal mark of the language and no digit grouping.
 - `tn(count, '{count} record', '{count} records')` picks the plural form of the language shown. `{count}` is filled in.
 - Data that is shown later (page labels, table headings) is marked where it is defined with `msg('Cartridges')`, which returns the text itself, and translated where it is shown with `t(label)`.
 - Pass literals only. A text built at run time does not compile, because the extraction reads the source. Build a sentence from placeholders, not by joining pieces: word order differs between languages.
 - Text in JSX goes through an expression: `{t('Close')}`.
 - Record names as published, exported file field names and the text inside the packages are not translated.
+
+## Numbers, dates and country names
+
+These follow the language shown and need no catalogue text. Under German a decimal is written with a comma (`2,5`), a date and a country name come from `Intl`. English is unchanged.
+
+What the app stores and exports never changes: field values, URLs, share links, saved loads, your data files, CSV, JSON, downloads and the table copied as CSV keep the point (`2.5`).
+
+- Write a number on screen with `formatNumber`, `fixedNumber`, `plainNumber` or `localizeNumber` (a canonical text) from `src/i18n/number.ts`. Never `toFixed`, `String(n)` or a number in a template string. A number inside a `t` placeholder is already written with the language's mark.
+- A number inside text that a server build wrote takes `<Decimal text>` or a `numeric` field row; a date `dayText` and a country `countryName`.
+- A file or the clipboard writes the canonical form: pass `'en'` to `formatNumber`, or `canonicalNumberText` for text that came from the screen.
+- Read typed or pasted text only with `parseNumber(input, { min, max, integer }, language)`. Do not run text the app generated through it.
+
+### What a typed number means
+
+Surrounding spaces and the minus sign U+2212 are tolerated. An empty text is empty. The rest must be an optional sign, digits with `.` or `,`, and an optional exponent (`e5`, `E-3`). A unit, a letter, a space inside the number, an apostrophe, `0x10` and `Infinity` are invalid. A leading (`,5`) or trailing (`1,`) mark is read.
+
+- Both marks present: the last one is the decimal mark and the other must group digits in threes (`1.234,5` in German, `1,234.5` in English). Anything else is invalid.
+- One mark, the language's own (the comma in German, the point in English): a decimal mark, always. `2.800` in English and `2,800` in German are 2.8.
+- One mark, the other one: a decimal mark (`1,5` in English is 1.5, `2.5` in German is 2,5), with one exception. When exactly three digits follow and the whole part has one to three digits and does not start with 0 (`1,234` in English, `1.234` in German) it may be a thousands group. The reading that lies inside the field's range and whole-number rule is taken when only one does. When both fit, the text is ambiguous: it is refused with a message that asks for `1,234` as a decimal or `1234` as a whole number. When neither fits, the decimal reading stands and the range error follows.
+- A mark that repeats groups in threes only when it is not the language's own (`1.234.567` is 1234567 in German and invalid in English; `1,234,567` the other way round).
 
 ## Find what is untranslated
 

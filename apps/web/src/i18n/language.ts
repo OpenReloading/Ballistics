@@ -82,15 +82,18 @@ export function startLanguage() {
   return () => window.removeEventListener('storage', follow)
 }
 
-const subscribe = (listener: () => void) => {
+/** Calls `listener` when the language shown changes; the function it returns stops that. */
+export const onLanguageChange = (listener: () => void) => {
   listeners.add(listener)
-  return () => listeners.delete(listener)
+  return () => {
+    listeners.delete(listener)
+  }
 }
 
 /** The translation functions of the language shown and the language chosen, re-rendering on a change. */
 export const useTranslation = () =>
   useSyncExternalStore(
-    subscribe,
+    onLanguageChange,
     () => current,
     () => english,
   )

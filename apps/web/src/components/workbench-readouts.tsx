@@ -4,6 +4,7 @@ import { Button, Popover, UnstyledButton } from '@mantine/core'
 import { freeRecoil } from '@open-reloading/core'
 import { fromSi } from '@open-reloading/schema'
 import { memo, useEffect, useRef } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { formatNumber, plainNumber } from '../i18n/number.ts'
 import type { InteriorResponse } from '../lib/api-types.ts'
 import {
@@ -592,6 +593,8 @@ export const BurnRate = memo(function BurnRate({
   /** The chart's height, px. */
   height: number
 }) {
+  // memoized: the numbers of its text and chart are written in the language shown
+  useTranslation()
   return (
     <div className="burn-rate">
       {isFitted(p) ? (

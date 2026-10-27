@@ -1,5 +1,5 @@
 import type { TrajectoryPoint } from '@open-reloading/core'
-import { formatNumber } from '../i18n/number.ts'
+import { formatNumber, localizeNumber } from '../i18n/number.ts'
 import {
   formatQuantity,
   inchText,
@@ -12,7 +12,7 @@ import {
 function valueText(system: UnitSystem, q: Quantity, x: number | undefined) {
   return x === undefined
     ? 'not given'
-    : `${inchText(roundedFieldText(q, system, x), system[q].symbol)} ${system[q].symbol}`
+    : `${inchText(localizeNumber(roundedFieldText(q, system, x)), system[q].symbol)} ${system[q].symbol}`
 }
 
 /**

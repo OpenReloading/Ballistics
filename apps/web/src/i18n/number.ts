@@ -31,6 +31,16 @@ export function localizeNumber(text: string, language = shownLanguage()): string
   return mark === '.' || text.split('.').length !== 2 ? text : text.replace('.', mark)
 }
 
+/**
+ * Text made of numbers written with a point (built on the server, which writes English): each
+ * point between digits written as the language's decimal mark. For text that is only numbers and
+ * their units: a name or an identifier such as "2.21.1" is no such text.
+ */
+export function localizeDecimals(text: string, language = shownLanguage()): string {
+  const mark = decimalMark(language)
+  return mark === '.' ? text : text.replace(/(?<=\d)\.(?=\d)/g, mark)
+}
+
 /** A number shown on screen as the canonical text, for a file or the clipboard; other text as it is. */
 export function canonicalNumberText(text: string, language = shownLanguage()): string {
   const mark = decimalMark(language)

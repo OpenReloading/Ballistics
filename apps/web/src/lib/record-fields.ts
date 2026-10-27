@@ -7,7 +7,7 @@ import {
   type QuantityValue,
   toSi,
 } from '@open-reloading/schema'
-import { formatNumber } from '../i18n/number.ts'
+import { formatNumber, localizeDecimals } from '../i18n/number.ts'
 import { computedBulletRows } from './bullet.ts'
 import {
   degreeText,
@@ -30,6 +30,8 @@ export interface FieldRow {
   symbol?: string | undefined
   /** Shown as is: names, forms, values without a unit choice. */
   text?: string
+  /** `text` is numbers written with a point (built on the server, in English): shown with the language's decimal mark. */
+  numeric?: boolean
   /** A text's unit, shown after it. */
   unit?: string | undefined
   /** `sig`: that many significant digits instead of the unit's decimals. */
@@ -53,7 +55,10 @@ export const turnPrefix = '1 turn in '
 
 /** A row's value as shown in `system`: rounded to the unit's decimals, with its symbol. */
 export function rowValue(row: FieldRow, system: UnitSystem): string {
-  if (!row.value) return row.unit ? `${row.text} ${row.unit}` : (row.text ?? '')
+  if (!row.value) {
+    const text = row.numeric ? localizeDecimals(row.text ?? '') : row.text
+    return row.unit ? `${text} ${row.unit}` : (text ?? '')
+  }
   const { quantity: q, si, significantDigits: sig } = row.value
   const shown = `${sig ? inchText(formatSignificant(system[q].fromSi(si), sig), system[q].symbol) : formatQuantity(q, system, si)}${system[q].symbol ? ` ${system[q].symbol}` : ''}`
   return q === 'twist' ? `${turnPrefix}${shown}` : shown
@@ -203,6 +208,7 @@ export function bulletDataGroups(b: Bullet): FieldGroup[] {
               {
                 label: 'Boat-tail angle',
                 text: degreeText(angle.value),
+                numeric: true as const,
                 unit: 'deg',
                 ...(angle.raw && { printed: angle.raw }),
               },
@@ -241,6 +247,7 @@ type ComputedRange = NonNullable<Powder['thermochemistry']>['gamma']
 const computed = (label: string, unit: string, r: ComputedRange): FieldRow => ({
   label,
   text: `${r.value}${unit}`,
+  numeric: true,
   method: `Over the composition ranges: ${r.min} to ${r.max}.`,
 })
 
@@ -258,6 +265,7 @@ export function powderRowGroups(p: Powder): FieldGroup[] {
         (c): FieldRow => ({
           label: c.name,
           text: c.min === c.max ? `${c.min} %` : `${c.min} to ${c.max} %`,
+          numeric: true,
           ...(c.raw && { printed: c.raw }),
         }),
       ),
@@ -266,7 +274,7 @@ export function powderRowGroups(p: Powder): FieldGroup[] {
       title: 'Thermochemistry',
       rows: t
         ? [
-            { label: 'Loading density', text: `${t.loadingDensity.value} g/cm³` },
+            { label: 'Loading density', text: `${t.loadingDensity.value} g/cm³`, numeric: true },
             computed('Flame temperature', ' K', t.flameTemperature),
             computed('Impetus', ' J/kg', t.impetus),
             computed('Ratio of specific heats', '', t.gamma),
@@ -313,6 +321,7 @@ export function fittedParameterRows(
   ): FieldRow => ({
     label,
     text: intervalText(value, sigma === undefined ? undefined : k * sigma),
+    numeric: true,
     ...(unit && { unit }),
     method: fittedNote(k),
   })
@@ -345,6 +354,7 @@ export function fittedParameterRows(
           {
             label: 'Energy ratio',
             text: formatNumber(ratio.value, 2),
+            numeric: true,
             method: `The fitted energy over the energy of the thermochemistry (impetus over gamma minus 1)${
               ratio.median === undefined
                 ? ''
@@ -372,7 +382,7 @@ export function modelInputRows(p: Powder): FieldRow[] {
       : []
   const r = i.resistance
   return [
-    { label: 'Ratio of specific heats', text: formatSignificant(i.gamma, 4) },
+    { label: 'Ratio of specific heats', text: formatSignificant(i.gamma, 4), numeric: true },
     {
       label: 'Covolume',
       value: { quantity: 'covolume', si: i.covolume.value, significantDigits: 3 },
@@ -398,7 +408,7 @@ export function modelInputRows(p: Powder): FieldRow[] {
       label: 'Propellant temperature',
       value: { quantity: 'temperature', si: toSi('temperature', i.propellantTemperature.value) },
     },
-    { label: 'Pressure exponent', text: String(i.pressureExponent) },
+    { label: 'Pressure exponent', text: String(i.pressureExponent), numeric: true },
     ...(r
       ? bar('Bore resistance', r.stress).map((row) => ({
           ...row,
@@ -416,6 +426,7 @@ export function burnFormRows(p: Powder): FieldRow[] {
     symbol,
     label: `Burn form ${symbol}`,
     text: String(value),
+    numeric: true,
   })
   return [
     ...(p.interior?.fitted.includes('form.a') ? [] : [row('a', f.a.value)]),
@@ -549,6 +560,7 @@ export function powderStrip(
             row: {
               label: 'Bulk density',
               text: `${p.bulkDensity.value}`,
+              numeric: true as const,
               unit: 'g/cm³',
               ...(p.bulkDensity.raw && { printed: p.bulkDensity.raw }),
             },

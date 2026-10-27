@@ -2,6 +2,7 @@
 
 import { Button } from '@mantine/core'
 import { useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
 import { bandNote, describeCurve, type FittedPowder, modelCaption } from '../lib/burn-rate.ts'
 import { CurveTable } from './curve-table.tsx'
@@ -14,6 +15,8 @@ import { Panel } from './panel.tsx'
  * button in the title row (printed open).
  */
 export function VivacityPanel({ powder, z1 }: { powder: FittedPowder; z1?: number | undefined }) {
+  // the numbers of its text and chart are written in the language shown
+  useTranslation()
   const [open, setOpen] = useState(false)
   // z1 of 1 is the end of the axis: a one-stage form, nothing to mark
   const marks = z1 !== undefined && z1 < 1 ? [{ z: z1, label: `z1 ${formatNumber(z1, 1)}` }] : []

@@ -15,7 +15,7 @@ import {
   useRef,
   useState,
 } from 'react'
-import { formatNumber } from '../i18n/number.ts'
+import { formatNumber, plainNumber } from '../i18n/number.ts'
 import type { InteriorResponse } from '../lib/api-types.ts'
 import { summaryFitSource } from '../lib/bullet-fit.ts'
 import { classifyPowder, typedBurn } from '../lib/burn-rate.ts'
@@ -156,7 +156,7 @@ function bulletPrintRows(load: Load): PrintRows {
     ['Bullet', bulletLabel ?? bulletDesign?.name],
     ['Diameter', bullet && mmText(bullet.diameter.value)],
     ['Length', bullet?.length && mmText(bullet.length.value)],
-    ['Ballistic coefficient', bc && `${bc.dragModel} ${bc.value}`],
+    ['Ballistic coefficient', bc && `${bc.dragModel} ${plainNumber(bc.value)}`],
     printRow(load, 'bulletMass'),
   ]
 }
