@@ -257,11 +257,15 @@ $$
 \theta = \arccos\frac{b}{a}, \qquad s_\mathrm{in} = \frac{\text{area of the ellipse inside the photo}}{\text{area of the ellipse}}
 $$
 
+Code: `apps/web/src/lib/photo-quality.ts`, `photoQuality`. `apps/web/src/lib/face-image.ts`, `shareInside`.
+
 The paper level $P$ is the 75th percentile of the grey blocks in the ring from 1.12 to 1.4 radii of the ellipse, the black level $K$ the median of the blocks inside 0.8 radii, and the contrast is $P - K$. The grey blocks come from a grid of about 700 blocks on the longer side. Glare is the share of the ring's lit blocks (grey of 120 or more) that are saturated (250 or more), counted only while the median of the other lit blocks is at most 232, so a white scan is not glare. Uneven light is
 
 $$
 u = \frac{\max_j m_j - \min_j m_j}{\max_j m_j}
 $$
+
+Code: `apps/web/src/lib/photo-quality.ts`, `sidesDifference`.
 
 over the median grey levels $m_j$ of the ring's four sides, left and right, above and below the centre (three sides suffice).
 
