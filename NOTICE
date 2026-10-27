@@ -183,7 +183,7 @@ SOFTWARE.
 ---
 
 BEGIN GENERATED: shipped packages
-Third-party packages installed for the API and web images, by name, version and the licence
+Third-party packages installed for the API image and the web app, by name, version and the licence
 package-lock.json declares. Written by `node tools/src/licences.ts --write`.
 
 @fastify/ajv-compiler 4.0.6 MIT
