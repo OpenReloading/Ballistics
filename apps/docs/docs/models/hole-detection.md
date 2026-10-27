@@ -265,9 +265,9 @@ $$
 u = \frac{\max_j m_j - \min_j m_j}{\max_j m_j}
 $$
 
-Code: `apps/web/src/lib/photo-quality.ts`, `sidesDifference`.
-
 over the median grey levels $m_j$ of the ring's four sides, left and right, above and below the centre (three sides suffice).
+
+Code: `apps/web/src/lib/photo-quality.ts`, `sidesDifference`.
 
 Sharpness is the width of the black area's edge in holes. On 120 rays along the ellipse's normals the grey profile across the edge is aligned at its steepest rise and averaged. With the grey step $\Delta g$ and the steepest rise $g'$ per px, the edge width is $w = \Delta g / g'$, and the measure is $w / D_\mathrm{px}$. Rays whose step is below 25 grey levels are left out, and no measure is given when fewer than a quarter of the rays remain. Without a fitted face the hole diameter in this ratio is taken as 6 % of the black area's mean diameter.
 
