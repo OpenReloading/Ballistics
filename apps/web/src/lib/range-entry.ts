@@ -275,14 +275,17 @@ export function parseWeather(
   units: { temperature: Unit; airPressure: Unit; windSpeed: Unit },
 ): { conditions: Conditions } | { error: string } {
   const conditions: Conditions = {}
+  let ambiguous: string | undefined
   const read = (typed: string, name: string, valid: (x: number) => boolean) => {
     const p = parseNumber(typed)
     if (p.kind === 'empty') return
+    if (p.kind === 'ambiguous') ambiguous ??= ambiguousMessage(p)
     return p.kind === 'number' && valid(p.value) ? p.value : name
   }
   const temperature = read(text.temperature, 'temperature', () => true)
   const pressure = read(text.pressure, 'air pressure', (x) => x > 0)
   const wind = read(text.wind, 'wind speed', (x) => x >= 0)
+  if (ambiguous) return { error: ambiguous }
   for (const [x, name] of [
     [temperature, 'temperature'],
     [pressure, 'air pressure'],

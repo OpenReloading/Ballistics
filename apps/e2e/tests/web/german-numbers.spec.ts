@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
+import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { applyExampleLoad, loadForm } from './workbench.ts'
 
@@ -10,7 +11,7 @@ test('under German the workbench writes and takes a decimal comma and its result
 }) => {
   test.setTimeout(60_000)
   await page.addInitScript(() => localStorage.setItem('language', 'de'))
-  await page.goto('/workbench')
+  await gotoHydrated(page, '/workbench')
   await expect(page.locator('html')).toHaveAttribute('lang', 'de')
   await applyExampleLoad(page)
 
@@ -34,6 +35,18 @@ test('under German the workbench writes and takes a decimal comma and its result
   const keys = page.locator('.readout-keys').first()
   await expect(keys).toContainText(/\d,\d/)
   expect(await keys.innerText()).not.toMatch(/\d\.\d/)
+
+  // a pasted text goes in at the caret, as a native paste does
+  await charge.evaluate((el: HTMLInputElement) => {
+    el.focus()
+    el.setSelectionRange(el.value.length, el.value.length)
+    const clipboardData = new DataTransfer()
+    clipboardData.setData('text', '1')
+    el.dispatchEvent(
+      new ClipboardEvent('paste', { clipboardData, bubbles: true, cancelable: true }),
+    )
+  })
+  await expect(charge).toHaveValue('2,61')
 
   const { violations } = await new AxeBuilder({ page })
     .include('[role="form"]')

@@ -20,6 +20,7 @@ import {
   useState,
 } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from '../i18n/language.ts'
 import { dateTimeText, localDay } from '../lib/dates.ts'
 import { download } from '../lib/download.ts'
 import { errorText } from '../lib/error-text.ts'
@@ -783,6 +784,8 @@ function SavedList<R extends UserRecord>({
   onDelete: (record: R) => void
   onDeleteAll: () => void
 }) {
+  // the dates follow the language shown
+  useTranslation()
   return (
     <>
       {list?.length ? (

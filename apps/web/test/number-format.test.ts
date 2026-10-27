@@ -213,7 +213,9 @@ describe('reading typed numbers', () => {
   it('writes a number shown on screen as the canonical text for a file or the clipboard', () => {
     expect(canonicalNumberText('1,5', 'de')).toBe('1.5')
     expect(canonicalNumberText('-0,25', 'de')).toBe('-0.25')
-    expect(canonicalNumberText('1,5 gr', 'de')).toBe('1,5 gr')
+    expect(canonicalNumberText('2,40 gr', 'de')).toBe('2.40 gr')
+    expect(canonicalNumberText('1,234 ms', 'de')).toBe('1.234 ms')
+    expect(canonicalNumberText('45 %', 'de')).toBe('45 %')
     expect(canonicalNumberText('a,b', 'de')).toBe('a,b')
     expect(canonicalNumberText('1.5', 'en')).toBe('1.5')
     expect(canonicalNumberText('1,5', 'en')).toBe('1,5')

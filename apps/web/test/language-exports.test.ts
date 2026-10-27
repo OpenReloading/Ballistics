@@ -48,10 +48,10 @@ describe('the language shown never changes what is exported', () => {
   })
 
   it('copies a table of the screen as CSV with points', async () => {
-    const cells = ['Charge', '2,40', '-0,5', '1,5 gr', '3185', '']
+    const cells = ['Charge', '2,40', '-0,5', '1,5 gr', '1,234 ms', '3185', '']
     const csv = (language: string) =>
       under(language, () => toCsv([cells.map((c) => canonicalNumberText(c))]))
-    expect(await csv('de')).toBe('Charge,2.40,-0.5,"1,5 gr",3185,')
+    expect(await csv('de')).toBe('Charge,2.40,-0.5,1.5 gr,1.234 ms,3185,')
   })
 
   it('writes the same canonical field texts, the stored form of a link', async () => {

@@ -41,12 +41,13 @@ export function localizeDecimals(text: string, language = shownLanguage()): stri
   return mark === '.' ? text : text.replace(/(?<=\d)\.(?=\d)/g, mark)
 }
 
-/** A number shown on screen as the canonical text, for a file or the clipboard; other text as it is. */
+/**
+ * Text of numbers and their units as shown on screen ("2,40 gr"), with each decimal mark between
+ * digits written as a point, for a file or the clipboard: the inverse of {@link localizeDecimals}.
+ */
 export function canonicalNumberText(text: string, language = shownLanguage()): string {
   const mark = decimalMark(language)
-  return mark !== '.' && new RegExp(`^[+-]?\\d*\\${mark}\\d+$`).test(text)
-    ? text.replace(mark, '.')
-    : text
+  return mark === '.' ? text : text.replaceAll(new RegExp(`(?<=\\d)\\${mark}(?=\\d)`, 'g'), '.')
 }
 
 const formats = new Map<string, Intl.NumberFormat>()

@@ -308,7 +308,11 @@ function FieldInput({
       onChange={(v) => onText(String(v), false)}
       // pasted text is read by `parseNumber`, not by the input's own rule for a lone separator
       onPasteCapture={(e) => {
-        const p = parseNumber(e.clipboardData.getData('text'), range)
+        // the text the field would hold after a native paste: at the caret, over the selection
+        const el = e.currentTarget
+        const at = (n: number | null) => n ?? el.value.length
+        const after = `${el.value.slice(0, at(el.selectionStart))}${e.clipboardData.getData('text')}${el.value.slice(at(el.selectionEnd))}`
+        const p = parseNumber(after, range)
         if (p.kind !== 'number' && p.kind !== 'ambiguous') return
         e.preventDefault()
         e.stopPropagation()
