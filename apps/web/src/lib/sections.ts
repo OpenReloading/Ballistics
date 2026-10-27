@@ -89,6 +89,7 @@ export const sections = [
         icon: '/session',
         description:
           'Shots and statistics per string from a chronograph export, read in your browser.',
+        covers: ['/range'],
       },
       {
         href: '/groups',

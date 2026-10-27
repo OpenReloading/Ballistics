@@ -101,6 +101,7 @@ import {
   type RecordValues,
   recordValues,
 } from '../lib/query.ts'
+import { withStoredSessions } from '../lib/range-entry.ts'
 import {
   type LadderDirection,
   type RunnableLadderKind,
@@ -1319,6 +1320,8 @@ export function useWorkbenchState() {
   /** The snapshots of the last committed render, the stored ones or the load as it is: what Save writes. */
   const snapshotsNow = useRef<SessionSnapshot[]>([])
   const sessionsNow = useRef<SessionRecord[]>([])
+  /** The session references the load was opened or last saved with: what another tab's additions are told from. */
+  const openedRefs = useRef<string[]>([])
   const sessionsOpened = useRef(0)
   const manufacturers = useManufacturers()
   const { ensure: ensureManufacturer, newId: freshId } = manufacturers
@@ -1631,6 +1634,7 @@ export function useWorkbenchState() {
     sessionsNow.current = []
     setSessionsState([])
     setSessionRefs([])
+    openedRefs.current = []
     setLots(noLots)
     setSnapshots([])
     lastWarnings.current = ''
@@ -2443,6 +2447,7 @@ export function useWorkbenchState() {
    */
   function openSessions(refs: string[]) {
     setSessionRefs(refs)
+    openedRefs.current = refs
     const token = ++sessionsOpened.current
     Promise.all(
       refs.map(async (ref) => {
@@ -2642,11 +2647,17 @@ export function useWorkbenchState() {
       const ref = userRef(record.id)
       const attached = sessionsNow.current.map((s) => attachLoad(s, ref))
       const changed = attached.filter((s, i) => s !== sessionsNow.current[i])
+      // a session another tab (the range page) added to the stored load since this one opened it stays
+      const stored = await storedRecord(record.id).catch(() => undefined)
+      const merged = withStoredSessions(record, stored, openedRefs.current)
       await putRecords([
         ...(c ? [capacityRecord(c.cartridge, c.m3, new Date())] : []),
         ...changed,
-        record,
+        merged,
       ])
+      // the page does not show a session another tab added: it stays unknown here, so every Save
+      // keeps it until the load is opened again
+      openedRefs.current = record.kind === 'load' ? (record.data.sessions ?? []) : []
       // edits made while the store wrote are kept; the strings they mapped name the load too
       const latest = sessionsNow.current.map((s) => attachLoad(s, ref))
       const late = latest.filter((s, i) => s !== sessionsNow.current[i])

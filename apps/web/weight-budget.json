@@ -165,6 +165,10 @@
         "/my-cases": {
           "initial": 469782,
           "total": 502437
+        },
+        "/range": {
+          "initial": 408159,
+          "total": 453623
         }
       }
     },

@@ -4,6 +4,7 @@ import { Alert, Badge, Button, Flex, Group, NativeSelect, Tabs } from '@mantine/
 import type { ChronoImport, VelocityUnit } from '@open-reloading/importers'
 import { toSi } from '@open-reloading/schema'
 import { FileArrowUp } from '@phosphor-icons/react'
+import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import {
   chronoFileBytes,
@@ -98,6 +99,9 @@ export function SessionSummary() {
         }
         actions={
           <>
+            <Button component={Link} href="/range" variant="default">
+              Range mode
+            </Button>
             <Button
               variant="default"
               disabled={!read}

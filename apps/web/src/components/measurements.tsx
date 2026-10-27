@@ -3,6 +3,7 @@
 import { Button } from '@mantine/core'
 import type { VelocityUnit } from '@open-reloading/importers'
 import { chronoSession, type SessionRecord, toSi } from '@open-reloading/schema'
+import Link from 'next/link'
 import { type Dispatch, type ReactNode, type SetStateAction, useRef, useState } from 'react'
 import { chronoFileBytes, readChrono } from '../lib/chrono.ts'
 import { errorText } from '../lib/error-text.ts'
@@ -18,6 +19,7 @@ import {
 } from '../lib/measurements.ts'
 import { newId } from '../lib/new-id.ts'
 import { nth } from '../lib/nth.ts'
+import { conditionsText } from '../lib/range-entry.ts'
 import { controlSize } from '../lib/theme.ts'
 import { formatNumber, type UnitSystem, withUnit } from '../lib/units.ts'
 import { ChronoFileInput } from './chrono-file-input.tsx'
@@ -381,7 +383,9 @@ export function Measurements({
     <div className="measurements">
       <p className="note">
         Sessions are kept in this browser and the saved load names them; a load file or copied link
-        does not carry their shots. Chronograph velocities are not corrected to the muzzle
+        does not carry their shots. Velocities shot without a network are entered on the{' '}
+        <Link href="/range">Range mode</Link> page. Chronograph velocities are not corrected to the
+        muzzle
         {distances.length > 0 ? `; measured at ${distances.join(', ')} from the muzzle` : ''}.
       </p>
       <ChronoFileInput
@@ -493,6 +497,11 @@ export function Measurements({
                     <option value={String(at)}>{charge(at)} (not in this run)</option>
                   )}
                 </select>
+                {(str.conditions || str.note) && (
+                  <p className="note">
+                    {[conditionsText(str.conditions, system), str.note].filter((x) => x).join('. ')}
+                  </p>
+                )}
               </div>
             )
           })}
