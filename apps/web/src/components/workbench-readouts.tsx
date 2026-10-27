@@ -547,6 +547,7 @@ export function LimitsView({
   body: InteriorResponse
   system?: UnitSystem | undefined
 }) {
+  useTranslation()
   const resolved = body.resolved?.cartridge
   if (!body.limits || body.limits.length === 0)
     return (
