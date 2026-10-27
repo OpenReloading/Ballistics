@@ -1,6 +1,6 @@
 ---
 title: Powder fit from a chronograph ladder
-description: Weighted least-squares fit of the burn coefficient and, on request, the start pressure, a chamber volume correction factor, the specific energy and a factor on the temperature sensitivities of the M3 interior model to measured muzzle velocities and peak pressures of a charge ladder or of sessions at several barrel lengths and powder temperatures, with optional Gaussian priors and a Huber loss, and the prediction band of the fitted load at a charge that was not fired.
+description: Weighted least-squares fit of the burn coefficient and, on request, the start pressure, a chamber volume correction factor, the specific energy and a factor on the temperature sensitivities of the M3 interior model to measured muzzle velocities and peak pressures of a charge ladder or of sessions at several barrel lengths and powder temperatures, with optional Gaussian priors and a Huber loss, the prediction band of the fitted load at a charge that was not fired, and the peak-pressure range that the fixed inputs add, with a prior from similar powders and a confidence label of the range.
 ---
 
 # Powder fit from a chronograph ladder
@@ -145,6 +145,85 @@ Code: `packages/core/src/interior/fit.ts`, `predictPowder` (`quantile`), `packag
 
 A charge below the smallest or above the largest ladder charge (`chargeRange`) is returned with `extrapolation` set to `below` or `above`. Nothing else changes there. How the band behaves outside the range follows from the covariance: with both parameters fitted it widens quickly beyond the ladder, because the data no longer separate the two effects. With the burn coefficient alone the band follows the sensitivity of the model to that one parameter and can narrow where the sensitivity falls, the velocity band above the ladder for example. The band holds parameter uncertainty only. It contains no model error: a wrong form function, energy or heat loss shifts the true value away from the band, and the farther from the ladder, the more so. A charge at which the model has no valid run, or the perturbed parameters have none, throws a `PowderFitError` with reason `invalid`. A fit without a covariance (as many rows as parameters and no uncertainties) cannot predict.
 
+### Pressure range from the fixed inputs
+
+The prediction band holds the covariance of the fitted parameters only. A fitted burn coefficient absorbs the errors of every fixed input (see [Identifiability](#identifiability)), so a velocity-only ladder pins the coefficient while the peak pressure stays loosely known. `powderPressureRange` adds that part. For each input $j$ that the fit holds fixed, with standard uncertainty $u_j$, it moves the input of the fitted load to $x_j + u_j$ and to $x_j - u_j$, fits the same ladder again with the same parameters, priors and loss (starting from the fitted values), and runs the refitted load at the point. The effect of the input on the peak pressure $\hat p$ is half the difference of the two refits:
+
+$$
+c_j = \frac{\hat p(x_j + u_j) - \hat p(x_j - u_j)}{2}
+$$
+
+Code: `packages/core/src/interior/fit-confidence.ts`, `powderPressureRange` (`side`, `effects`).
+
+Because the refit sees the same ladder, an input that the ladder constrains moves the peak pressure little. Measured pressure rows therefore narrow the range through the fit itself: with a pressure row, the refit has to keep the row, and the burn coefficient cannot absorb the shift. A shift common to every point that the burn coefficient absorbs exactly, such as one temperature offset on a ladder at one temperature, has an effect of about 0.
+
+The effects combine with the fit's own standard uncertainty $u_\text{fit}$ (the pressure standard uncertainty of `predictPowder` at the point) by the law of propagation of uncertainty ([JCGM 100:2008](../bibliography.md#jcgm-100-2008), independent inputs), and the range is the coverage factor $k$ of the prediction times the combined uncertainty:
+
+$$
+u_c = \sqrt{u_\text{fit}^2 + \sum_j c_j^2}, \qquad
+\hat p \pm k\,u_c, \qquad
+h = \frac{k\,u_c}{\hat p}, \qquad
+u_\text{corr} = u_\text{fit} + \sum_j |c_j|
+$$
+
+Code: `packages/core/src/interior/fit-confidence.ts`, `powderPressureRange` (`standardUncertainty`, `correlatedLimit`, `relativeHalfWidth`).
+
+$h$ is the relative half-width of the range at a point, and the label uses its largest value over the points. $u_\text{corr}$ is the limit for inputs that are fully correlated in the direction that adds their effects, and it is reported next to $u_c$: the independence of the inputs is an assumption, and real errors of capacity, energy and burn rate are partly correlated. Nothing in the range models such correlation. The coverage factor is not corrected for the effective degrees of freedom of the combination.
+
+The inputs and their default standard uncertainties, used where the caller states none, are in one table (`powderInputDefaults`). They are assumptions for a start, to be tuned against real sessions, not measurements:
+
+| Input | Measured or entered | Estimated or assumed |
+| --- | --- | --- |
+| Case capacity (chamber volume) | 0.5 % | 3 % |
+| Propellant energy | | 3 % |
+| Start pressure | | 25 % |
+| Bore friction | | 30 % |
+| Propellant temperature | 3 K | 10 K |
+
+The caller states per input whether it is measured or estimated and may give its own standard uncertainty (a fraction of the value, or K for the temperature; 0 leaves the input out). Ignition pressure, the ratio of specific heats, the covolume and the bullet mass are shifted only when the caller states an uncertainty. The burn form, the pressure exponent, the heat loss, the pressure gradient and the bore area are not shifted, so the range does not hold them. An input that is itself a fitted parameter (start pressure, case capacity with a volume factor, energy) is skipped, since the covariance holds it, and so is an input the load does not carry (a bore friction of 0, a load without temperature sensitivity). An input whose refit fails is skipped and named. The range needs a single fit with a covariance, not `fitPowderSessions`, and its points are the ladder's charges (with their barrel lengths and temperatures) or points the caller names.
+
+### Prior from similar powders
+
+A prior on the burn coefficient comes from `similarPowdersPrior`: the powders of the same burn law that lie nearest the target in the natural logarithm of the burn coefficient and of the specific energy (Euclidean distance in the two logarithms, the five nearest). The prior of [the section above](#prior-and-robust-loss) is centred on the geometric mean of their burn coefficients, with the sample standard deviation of their logarithms as $s$:
+
+$$
+\mu = \frac1n\sum_i \ln B_i, \qquad
+s = \max\Bigl(0.05,\ \sqrt{\tfrac{1}{n-1}\sum_i (\ln B_i - \mu)^2}\Bigr), \qquad
+q^\ast = e^{\mu}
+$$
+
+Code: `packages/core/src/interior/fit-confidence.ts`, `similarPowdersPrior`, `similarPowderRules`.
+
+With fewer than 3 neighbours the prior is weak: it is centred on the target's own value with $s = 1$, and `weak` is set. The floor of 0.05 keeps neighbours with nearly equal coefficients from fixing the fit. The caller passes plain values of the powders and takes the prior from the result into `priors.burnRate`. Core reads no records. A prior from one known powder is a `PowderPrior` the caller builds from that powder's value and the spread it states. The fit states its basis: `refined` when a prior on the burn coefficient was given, else `from-scratch` (Bard 1974 and Gelman 2013 for the estimate with a prior, see Sources). A prior pulls a short ladder toward its centre by its weight $1/s^2$ against the ladder rows.
+
+### Confidence label
+
+`powderConfidence` sets a label from the relative half-width $h$ of the range and lists the reasons that apply. The label describes the width of the simulation's pressure range, not a load:
+
+| Label | $h$ |
+| --- | --- |
+| `tight` | up to 10 % |
+| `moderate` | up to 25 % |
+| `loose` | above 25 % |
+
+Code: `packages/core/src/interior/fit-confidence.ts`, `powderConfidence`, `powderConfidenceRules`.
+
+The reasons do not change the label. They say what the range rests on or does not hold, in a fixed order:
+
+| Reason | When |
+| --- | --- |
+| `no-pressure` | the ladder has no pressure row |
+| `capacity-estimated` | the case capacity enters the range with its estimated uncertainty |
+| `narrow-ladder` | the largest ladder charge is less than 1.1 times the smallest |
+| `residual-trend` | with velocity uncertainties, at least 5 velocity rows, the residuals ordered by charge change sign at most once, and $\chi^2_\text{data}$ per row is above 1 |
+| `start-pressure-correlated` | the start pressure is fitted and its correlation with the burn coefficient is above 0.9 in magnitude |
+| `weak-prior` | the prior from `similarPowdersPrior` is weak |
+| `outside-similar-powders` | the fitted burn coefficient lies more than 2 standard deviations of the prior from its centre |
+| `extrapolated` | a point of the range lies outside the ladder's charge range |
+| `input-refit-failed` | the refit for an input failed, so the input is not in the range |
+
+The result also carries the fit's basis. The thresholds are assumptions, to be tuned against real sessions. A `tight` label says that the inputs the range holds move the pressure little. It does not cover the model error of the inputs it leaves out, and a trend in the residuals, a prior far from the data or an extrapolation weaken it as the reasons say.
+
 ### Identifiability
 
 On a velocity-only ladder a higher burn coefficient and a higher start pressure both raise the early pressure and the muzzle velocity. The ratio of the two effects changes little over the ladder. Their Jacobian columns are nearly parallel and the correlation of the two parameters is near $-1$. The condition check does not reject such a fit, but the start-pressure uncertainty is large. Measured peak pressures and wider ladders separate the two. A fitted burn coefficient absorbs the errors of every fixed input that moves the velocity: energy, isentropic exponent, covolume, chamber volume, form function, exponent, bore resistance and heat loss.
@@ -212,6 +291,10 @@ Malformed input (an empty ladder, a value that is not finite and above 0, uncert
 | $m$, $\hat y$ | Charge of a prediction, predicted muzzle velocity or peak breech pressure | g, m/s or bar | kg, m/s or Pa |
 | $u(\hat y)$, $g_j$ | Standard uncertainty of a prediction, its gradient in the log parameters | as $\hat y$ | as $\hat y$ |
 | $k$, $z$, $t$, $\alpha$ | Coverage factor, normal and Student quantile, one minus the coverage | 1 | 1 |
+| $c_j$, $u_j$ | Effect of input $j$ on the peak pressure, its standard uncertainty | Pa, as the input | Pa, as the input |
+| $u_\text{fit}$, $u_c$, $u_\text{corr}$ | Fit, combined and fully correlated standard uncertainty of the peak pressure | bar | Pa |
+| $h$ | Relative half-width of the pressure range | 1 | 1 |
+| $B_i$, $n$ | Burn coefficients of the similar powders, their number | as the parameter, 1 | as the parameter, 1 |
 | $J_\text{floor,i}$ | Noise floor of a Jacobian entry per unit log parameter | 1 | 1 |
 
 ## Assumptions
@@ -220,6 +303,7 @@ Malformed input (an empty ladder, a value that is not finite and above 0, uncert
 - Velocities are mean muzzle velocities. A chronograph reading at a distance from the muzzle is converted to the muzzle by the caller, for example with [truing](exterior-truing.md).
 - A pressure row is compared with the peak breech pressure. The gauge position is not modelled.
 - Observations are independent, with the stated standard uncertainties.
+- The inputs of the range are independent, each with the stated standard uncertainty. The default uncertainties are assumptions, not measurements.
 - A prior describes the powder's parameter, not this ladder: it comes from a record or a family of powders. A prior far from the data drags the fit, and the result then shows a large $\chi^2_\text{prior}$.
 
 ## Limits
@@ -231,6 +315,7 @@ Malformed input (an empty ladder, a value that is not finite and above 0, uncert
 - The posterior uncertainty is the first-order Laplace approximation, no sampling. With a Huber loss it is approximate.
 - The burn coefficient, start pressure, volume factor, energy and temperature factor are fitted. Exponent, form parameters and the ratio of the two temperature sensitivities stay as given. Pooling over lots and over shooters is not supported: the sessions of one fit share one rifle's load, one lot and one set of fixed inputs.
 - Each session is one barrel length and one temperature, and the barrel length is the one the sessions' bore and chamber share. A session fired from a barrel with another bore, chamber or twist is another load.
+- The pressure range holds the inputs it shifts, linearized by the refit at one standard uncertainty each. It holds no model error of the burn form, exponent, heat loss or pressure gradient, and not the correlation of inputs.
 - Each prediction costs one `interior` run per distinct charge, barrel length and temperature, and each Jacobian two predictions per parameter.
 
 ## Sources
@@ -238,4 +323,5 @@ Malformed input (an empty ladder, a value that is not finite and above 0, uncert
 - [Levenberg 1944](../bibliography.md#levenberg-1944) and [Marquardt 1963](../bibliography.md#marquardt-1963): the damped least-squares iteration.
 - [Gelman 2013](../bibliography.md#gelman-2013): the maximum a posteriori estimate and the Laplace approximation of a posterior.
 - [Huber 1964](../bibliography.md#huber-1964): the Huber loss.
-- [JCGM 100:2008](../bibliography.md#jcgm-100-2008), the law of propagation of uncertainty (section 5.1.2, unverified) for the prediction band, and section 4.2.3 (section number unverified): the standard uncertainty of a mean of $N$ readings, the sample standard deviation over $\sqrt N$, which a caller uses as the velocity uncertainty of a string.
+- [Bard 1974](../bibliography.md#bard-1974) (chapter unverified): the estimate of a nonlinear least-squares problem with prior information on the parameters, as extra rows.
+- [JCGM 100:2008](../bibliography.md#jcgm-100-2008), the law of propagation of uncertainty (section 5.1.2, unverified) for the prediction band and the combination of the fixed inputs' effects with the fit's uncertainty, and section 4.2.3 (section number unverified): the standard uncertainty of a mean of $N$ readings, the sample standard deviation over $\sqrt N$, which a caller uses as the velocity uncertainty of a string.

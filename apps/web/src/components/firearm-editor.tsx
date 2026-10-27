@@ -26,7 +26,7 @@ import type {
 } from '@open-reloading/schema'
 import { Plus, Trash, X } from '@phosphor-icons/react'
 import { type Dispatch, type ReactElement, type SetStateAction, useState } from 'react'
-import type { CartridgeSummary } from '../lib/api-types.ts'
+import type { BulletSummary, CartridgeSummary } from '../lib/api-types.ts'
 import { close, type FieldSpec, fieldError } from '../lib/field-spec.ts'
 import {
   fieldSi,
@@ -120,6 +120,8 @@ export function FirearmEditor({
   setNameLeft,
   setCartridgeNames,
   cartridgeName,
+  setBulletNames,
+  bulletName,
   manufacturers,
   patch,
   setOptic,
@@ -135,6 +137,8 @@ export function FirearmEditor({
   setNameLeft: (left: boolean) => void
   setCartridgeNames: Dispatch<SetStateAction<Record<string, string>>>
   cartridgeName: (ref: string | undefined) => string | undefined
+  setBulletNames: Dispatch<SetStateAction<Record<string, string>>>
+  bulletName: (ref: string | undefined) => string | undefined
   manufacturers: ReturnType<typeof useManufacturers>
   patch: (p: Partial<Firearm>) => void
   setOptic: (i: number, p: Partial<Optic>) => void
@@ -233,6 +237,24 @@ export function FirearmEditor({
                 onChange={(si) => patch({ [spec.key]: fieldStored(spec, si) })}
               />
             ))}
+            <div className="firearm-row">
+              <span className="firearm-label" aria-hidden="true">
+                Bullet of the lands contact
+              </span>
+              <RecordSearch<BulletSummary>
+                kind="bullets"
+                label="Bullet of the lands contact"
+                chosen={bulletName(data.landsBullet) ?? 'Search bullets'}
+                picked={data.landsBullet !== undefined}
+                describe={(b) => b.name}
+                onSelect={(b) => {
+                  setBulletNames((n) => ({ ...n, [b.id]: b.name }))
+                  patch({ landsBullet: `catalogue:${b.id}` })
+                }}
+                noneText="No bullet found"
+                unreachableText="The database is unreachable; the bullet can be chosen later."
+              />
+            </div>
             <div className="firearm-row">
               <span className="firearm-label" id="firearm-twist-hand">
                 Twist direction

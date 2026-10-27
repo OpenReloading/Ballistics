@@ -1,0 +1,17 @@
+{
+  "id": "dsu-ldg-1-dsu-b2",
+  "discipline": "dsu-ldg-1",
+  "face": "dsu-b2",
+  "event": "ldg-1-dienstsportgewehr-100-m",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 11, PDF p. 69",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

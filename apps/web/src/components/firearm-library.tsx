@@ -11,12 +11,13 @@ import {
   Title,
   UnstyledButton,
 } from '@mantine/core'
-import type {
-  Firearm,
-  Optic,
-  OpticConfiguration,
-  OpticMount,
-  UserRecord,
+import {
+  type Firearm,
+  type Optic,
+  type OpticConfiguration,
+  type OpticMount,
+  parseRef,
+  type UserRecord,
 } from '@open-reloading/schema'
 import { DotsThreeVertical, Plus } from '@phosphor-icons/react'
 import {
@@ -29,7 +30,6 @@ import {
   useState,
 } from 'react'
 import { fetchRecord } from '../lib/api-fetch.ts'
-import type { CartridgeDetail } from '../lib/api-types.ts'
 import { errorText } from '../lib/error-text.ts'
 import { loadExample } from '../lib/example-data.ts'
 import {
@@ -42,11 +42,11 @@ import {
 } from '../lib/firearm.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { countText, filterText, matchesQuery } from '../lib/lists.ts'
-import { originNames, origins, readOrigins } from '../lib/sources.ts'
 import { controlSize } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { copyName } from '../lib/user-file-names.ts'
 import { deleteRecord, putRecords, storedRecords } from '../lib/user-store.ts'
+import { catalogueIdOf } from '../lib/variants.ts'
 import { offerUndo } from './confirm.tsx'
 import {
   type DirectoryColumn,
@@ -57,7 +57,7 @@ import {
 import { FileMenu, type FileMenuHandle } from './file-menu.tsx'
 import { DataCard } from './firearm-data-card.tsx'
 import { FirearmEditor } from './firearm-editor.tsx'
-import { SourceFilter } from './list-sources.tsx'
+import { LibraryTabs } from './library-tabs.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
 import { PrintButton } from './record-actions.tsx'
 import { EmptyList, ErrorNote, Loading } from './states.tsx'
@@ -92,11 +92,8 @@ const tableCaption = (named: unknown[]) =>
   named.length > 0 ? `Firearms, ${named.join(', ')}` : 'Firearms in this browser and the example'
 
 /** The filters set, named for the empty list and the caption. */
-const namedFilters = (on: ReturnType<typeof readOrigins>, query: string) =>
-  [
-    on.length < origins.length && on[0] && `${originNames[on[0]]} only`,
-    query.trim() && `matching "${query.trim()}"`,
-  ].filter(Boolean)
+const namedFilters = (query: string) =>
+  [query.trim() && `matching "${query.trim()}"`].filter(Boolean)
 
 type Cells = ReturnType<typeof firearmCells>
 
@@ -316,14 +313,10 @@ const opticNameIn = (f: Firearm) => (id: string) => {
   return f.optics[i]?.name || (i < 0 ? 'Removed optic' : `Optic ${i + 1}`)
 }
 
-/** The listed firearms and the example that the sources and the search keep. */
-function matching(
-  list: FirearmRecord[] | undefined,
-  on: ReturnType<typeof readOrigins>,
-  matches: (r: FirearmRecord) => boolean,
-) {
-  const shown = list?.filter((r) => on.includes('user') && matches(r))
-  const exampleShown = on.includes('openreloading') && matches(example) ? example : undefined
+/** The listed firearms and the example that the search keeps. */
+function matching(list: FirearmRecord[] | undefined, matches: (r: FirearmRecord) => boolean) {
+  const shown = list?.filter(matches)
+  const exampleShown = matches(example) ? example : undefined
   // the browser's firearms first, the example last under the group rule
   const rows = exampleShown ? [...(shown ?? []), exampleShown] : (shown ?? [])
   return { shown, exampleShown, rows }
@@ -360,8 +353,9 @@ function readFirearms(
     })
 }
 
-/** Asks the API once for the name of each cartridge id (newline separated), `asked` holds the ones asked. */
-function askCartridgeNames(
+/** Asks the API once for the name of each record id (newline separated), `asked` holds the ones asked. */
+function askNames(
+  kind: 'cartridges' | 'bullets',
   ids: string,
   asked: Set<string>,
   setNames: (update: (n: Record<string, string>) => Record<string, string>) => void,
@@ -369,11 +363,29 @@ function askCartridgeNames(
   for (const id of new Set(ids.split('\n'))) {
     if (!id || asked.has(id)) continue
     asked.add(id)
-    fetchRecord<CartridgeDetail>('cartridges', id)
+    fetchRecord<{ id: string; name: string }>(kind, id)
       .then((c) => c && setNames((n) => ({ ...n, [c.id]: c.name })))
       // unreachable or unknown: the stored id shows
       .catch(() => {})
   }
+}
+
+/** The names of the records of `kind` among the newline separated `ids`, each asked once. */
+function useRecordNames(kind: 'cartridges' | 'bullets', ids: string) {
+  const [names, setNames] = useState<Record<string, string>>({})
+  const asked = useRef(new Set<string>())
+  useEffect(() => askNames(kind, ids, asked.current, setNames), [kind, ids])
+  return [names, setNames] as const
+}
+
+/** The catalogue id of the bullet of a firearm's lands contact; '' without one. */
+const catalogueBulletId = (f: Firearm) =>
+  (f.landsBullet === undefined ? undefined : catalogueIdOf(f.landsBullet)) ?? ''
+
+const nameOfBullet = (names: Record<string, string>, ref: string | undefined) => {
+  const parsed = ref === undefined ? undefined : parseRef(ref)
+  if (parsed?.scope === 'user') return 'A bullet design of this browser'
+  return parsed ? (names[parsed.id] ?? parsed.id) : ref
 }
 
 const nameOfCartridge = (names: Record<string, string>, ref: string | undefined) => {
@@ -387,6 +399,7 @@ function PrintCards({
   viewing,
   data,
   cartridgeName,
+  bulletName,
   manufacturer,
   system,
   opticName,
@@ -395,6 +408,7 @@ function PrintCards({
   viewing: boolean
   data: Firearm
   cartridgeName: (ref: string | undefined) => string | undefined
+  bulletName: (ref: string | undefined) => string | undefined
   manufacturer: string | undefined
   system: UnitSystem
   opticName: (id: string) => string
@@ -405,6 +419,7 @@ function PrintCards({
         <DataCard
           f={data}
           cartridge={cartridgeName(data.cartridge)}
+          landsBullet={bulletName(data.landsBullet)}
           manufacturer={manufacturer}
           system={system}
           opticName={opticName}
@@ -476,9 +491,6 @@ export function FirearmLibrary() {
   const [viewing, setViewing] = useState(false)
   /** A new or opened firearm remounts the editor, so no field starts as left. */
   const [generation, setGeneration] = useState(0)
-  /** Cartridge names by record id: chosen in the search or read from the API. */
-  const [cartridgeNames, setCartridgeNames] = useState<Record<string, string>>({})
-  const asked = useRef(new Set<string>())
   const manufacturers = useManufacturers()
   const menu = useRef<FileMenuHandle>(null)
   // a row's link in a new tab: `?record=<id>` opens that firearm
@@ -514,7 +526,11 @@ export function FirearmLibrary() {
     .map(catalogueCartridgeId)
     .filter((c): c is string => !!c)
     .join('\n')
-  useEffect(() => askCartridgeNames(cartridgeIds, asked.current, setCartridgeNames), [cartridgeIds])
+  /** Cartridge names by record id: chosen in the search or read from the API. */
+  const [cartridgeNames, setCartridgeNames] = useRecordNames('cartridges', cartridgeIds)
+  /** Bullet names by record id, for the bullet of the lands contact. */
+  const [bulletNames, setBulletNames] = useRecordNames('bullets', catalogueBulletId(data))
+  const bulletName = (ref: string | undefined) => nameOfBullet(bulletNames, ref)
   /** The name of the cartridge a reference names, else the reference as stored. */
   const cartridgeName = (ref: string | undefined) => nameOfCartridge(cartridgeNames, ref)
 
@@ -591,17 +607,15 @@ export function FirearmLibrary() {
   const newFirearm = () => start(blankFirearm())
   /** An open firearm or the example narrows the list to cards beside it. */
   const compact = editing || viewing
-  // the shared list pattern: search and Source, kept in the URL
+  // the shared list pattern: the search, kept in the URL
   const [filters, setFilters, clearFilters] = useListState()
-  // the example is OpenReloading's, the firearms of this browser are Mine
-  const on = readOrigins(filters.sources)
   const lines = (r: FirearmRecord) => {
     const facts = cardFacts(r.data, system)
     return [cartridgeName(r.data.cartridge), facts.barrel, facts.sight]
   }
   const matches = (r: FirearmRecord) => matchesQuery([r.name, ...lines(r)], filters.query)
-  const { shown, exampleShown, rows } = matching(list, on, matches)
-  const named = namedFilters(on, filters.query)
+  const { shown, exampleShown, rows } = matching(list, matches)
+  const named = namedFilters(filters.query)
   const duplicate = (r: FirearmRecord) => start({ ...r.data, name: copyName(r.data.name) })
   const actionsMenu = (r: FirearmRecord, tabIndex?: number) => (
     <RowActions
@@ -664,6 +678,7 @@ export function FirearmLibrary() {
           </>
         }
       />
+      <LibraryTabs />
       <div className="library" data-editing={compact || undefined}>
         <section aria-labelledby="library-list" className={compact ? 'library-list' : 'directory'}>
           <Title order={2} id="library-list" className="visually-hidden">
@@ -678,13 +693,7 @@ export function FirearmLibrary() {
                 ? undefined
                 : { columns, sort: filters.sort, onSort: (sort) => setFilters({ sort }) }
             }
-          >
-            <SourceFilter
-              src={filters.sources}
-              counts={{ openreloading: 1, user: list?.length ?? 0 }}
-              onChange={(src) => setFilters({ sources: src })}
-            />
-          </DirectoryFilters>
+          />
           {failure && <ErrorNote>{failure}</ErrorNote>}
           <LibraryBody
             readError={readError}
@@ -734,6 +743,8 @@ export function FirearmLibrary() {
             setNameLeft={setNameLeft}
             setCartridgeNames={setCartridgeNames}
             cartridgeName={cartridgeName}
+            setBulletNames={setBulletNames}
+            bulletName={bulletName}
             manufacturers={manufacturers}
             patch={patch}
             setOptic={setOptic}
@@ -750,6 +761,7 @@ export function FirearmLibrary() {
         viewing={viewing}
         data={data}
         cartridgeName={cartridgeName}
+        bulletName={bulletName}
         manufacturer={manufacturers.nameOf(data.manufacturer)}
         system={system}
         opticName={opticName}

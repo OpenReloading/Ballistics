@@ -6,6 +6,7 @@ import {
   bulletDataGroups,
   bulletStrip,
   burnFormRows,
+  constructionRows,
   type FieldRow,
   fittedParameterRows,
   intervalText,
@@ -46,8 +47,9 @@ it('splits the build into structure, jacket, core and surface, the manufacturer 
   expect(row(mapped)).toEqual([
     ['Jacket', 'yes'],
     ['Core', 'lead'],
+    ['Lead-free', 'no'],
   ])
-  expect(notes(mapped)).toEqual([['As printed: Jacketed Lead'], []])
+  expect(notes(mapped)).toEqual([['As printed: Jacketed Lead'], [], []])
   const amp = {
     raw: 'AMP',
     structure: 'cup-and-core',
@@ -58,12 +60,66 @@ it('splits the build into structure, jacket, core and surface, the manufacturer 
     ['Structure', 'cup-and-core'],
     ['Jacket', 'gilding metal'],
     ['Core', 'lead alloy'],
+    ['Lead-free', 'no'],
   ])
   expect(row({ raw: 'Moly', surface: ['moly'] })).toEqual([['Surface', 'moly']])
   const raw = { raw: 'Copper', unmapped: true } as const
   expect(row(raw)).toEqual([['Construction', 'Copper']])
   expect(notes(raw)).toEqual([[]])
   expect(row(undefined)).toEqual([])
+})
+
+it('shows the jacket wall, core hardness, gas check, driving bands and the derived lead-free flag', () => {
+  const rows = (construction: Bullet['construction']) =>
+    buildRows(construction).map((r) => [r.label, r.text ?? r.value?.si])
+  expect(
+    rows({
+      raw: 'x',
+      structure: 'cast',
+      core: { material: 'lead-alloy', hardness: { value: 12 } },
+      surface: ['powder-coat'],
+      gasCheck: true,
+    }),
+  ).toEqual([
+    ['Structure', 'cast'],
+    ['Core', 'lead alloy'],
+    ['Core hardness (HBW)', '12'],
+    ['Surface', 'powder coat'],
+    ['Gas check', 'yes'],
+    ['Lead-free', 'no'],
+  ])
+  expect(
+    rows({
+      raw: 'x',
+      structure: 'monolithic',
+      core: { material: 'copper' },
+      drivingBands: 2,
+    }),
+  ).toEqual([
+    ['Structure', 'monolithic'],
+    ['Core', 'copper'],
+    ['Driving bands', '2'],
+    ['Lead-free', 'yes'],
+  ])
+  expect(rows({ raw: 'x', jacket: { material: 'steel', thickness: { value: 0.25 } } })).toEqual([
+    ['Jacket', 'steel'],
+    ['Jacket thickness', 0.00025],
+  ])
+})
+
+it('names the added construction values in one line', () => {
+  expect(
+    constructionRows({ raw: 'x', structure: 'cast', core: { material: 'lead' }, gasCheck: true })[0]
+      ?.text,
+  ).toBe('Cast, lead core, gas check')
+  expect(
+    constructionRows({
+      raw: 'x',
+      structure: 'monolithic',
+      core: { material: 'copper' },
+      drivingBands: 3,
+    })[0]?.text,
+  ).toBe('Monolithic, copper core, 3 driving bands, lead free')
 })
 
 it('shows each bullet dimension once, in the unit of each preset, rounded', () => {

@@ -1,0 +1,18 @@
+{
+  "id": "dsu-dlrms-dsu-b4",
+  "discipline": "dsu-dlrms",
+  "face": "dsu-b4",
+  "event": "dlrms-repetier-luftgewehr-mehrdistanz-silhouette",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 5, Seite 15, PDF p. 159",
+        "fields": ["discipline", "face", "event", "shotCount"],
+        "note": "Scored by field: 3 points inner white area, 2 points green area, 1 point outer white area, 60 points at most."
+      }
+    ]
+  }
+}

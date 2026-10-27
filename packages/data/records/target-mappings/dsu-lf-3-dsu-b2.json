@@ -1,0 +1,17 @@
+{
+  "id": "dsu-lf-3-dsu-b2",
+  "discipline": "dsu-lf-3",
+  "face": "dsu-b2",
+  "event": "lf-3-flintenuebung-f-3-50-m",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 59, PDF p. 117",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

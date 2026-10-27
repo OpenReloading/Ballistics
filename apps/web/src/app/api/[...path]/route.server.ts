@@ -7,7 +7,7 @@
 import { API_PREFIX } from '../../../lib/api-version.ts'
 
 const allowed = {
-  GET: /^(cartridges|bullets|powders|cases|manufacturers|target-faces|federations|disciplines|target-mappings|caliber-classes)(\/[a-z0-9]+(-[a-z0-9]+)*)?$/,
+  GET: /^(cartridges|bullets|powders|primers|cases|manufacturers|target-faces|federations|disciplines|target-mappings|caliber-classes)(\/[a-z0-9]+(-[a-z0-9]+)*)?$/,
   POST: /^interior(\/charge-target)?$/,
 }
 const copied = ['content-type', 'retry-after']

@@ -1,0 +1,318 @@
+{
+  "id": "dsu-b4",
+  "name": "DSU-Scheibe b4",
+  "federation": "dsu",
+  "rings": [
+    {
+      "value": 1,
+      "diameter": {
+        "value": 178
+      },
+      "height": {
+        "value": 278
+      },
+      "shape": "stadium",
+      "fill": "white",
+      "line": "green"
+    },
+    {
+      "value": 2,
+      "diameter": {
+        "value": 161.9
+      },
+      "height": {
+        "value": 252.8
+      },
+      "shape": "stadium",
+      "fill": "white",
+      "line": "green"
+    },
+    {
+      "value": 3,
+      "diameter": {
+        "value": 145.8
+      },
+      "height": {
+        "value": 227.6
+      },
+      "shape": "stadium",
+      "fill": "white",
+      "line": "green"
+    },
+    {
+      "value": 4,
+      "diameter": {
+        "value": 129.7
+      },
+      "height": {
+        "value": 202.3
+      },
+      "shape": "stadium",
+      "fill": "white",
+      "line": "green"
+    },
+    {
+      "value": 5,
+      "diameter": {
+        "value": 113.6
+      },
+      "height": {
+        "value": 177.1
+      },
+      "shape": "stadium",
+      "fill": "green",
+      "line": "green"
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 97.4
+      },
+      "height": {
+        "value": 151.9
+      },
+      "shape": "stadium",
+      "fill": "green",
+      "line": "white"
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 81.3
+      },
+      "height": {
+        "value": 126.7
+      },
+      "shape": "stadium",
+      "fill": "green",
+      "line": "white"
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 65.2
+      },
+      "height": {
+        "value": 101.4
+      },
+      "shape": "stadium",
+      "fill": "green",
+      "line": "white"
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 49.1
+      },
+      "height": {
+        "value": 76.2
+      },
+      "shape": "stadium",
+      "fill": "white",
+      "line": "green"
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 33
+      },
+      "height": {
+        "value": 51
+      },
+      "shape": "stadium",
+      "fill": "white",
+      "line": "green"
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 16
+    },
+    "height": {
+      "value": 25
+    }
+  },
+  "blackDiameter": {
+    "value": 113.6
+  },
+  "blackHeight": {
+    "value": 177.1
+  },
+  "events": [
+    {
+      "id": "dkp-1-druckluftwaffenuebung-lp-1",
+      "name": "DKP 1 Druckluftwaffenübung LP 1",
+      "distance": {
+        "value": 10000,
+        "raw": "10 / 7,50 / 5 Meter"
+      },
+      "section": "Kapitel 5, Druckluftwaffen und Zimmerstutzen, DKP 1",
+      "category": "air-pistol",
+      "scoring": "touch"
+    },
+    {
+      "id": "dkrpm-repetier-luftpistole-mehrdistanz",
+      "name": "DKRPM Repetier-Luftpistole Mehrdistanz",
+      "distance": {
+        "value": 25000,
+        "raw": "25, 20, 15 und 10 Meter"
+      },
+      "section": "Kapitel 5, Druckluftwaffen und Zimmerstutzen, DKRPM",
+      "category": "air-pistol",
+      "scoring": "touch"
+    },
+    {
+      "id": "dlhm-halbautomatisches-luftgewehr-mehrdistanz",
+      "name": "DLHM Halbautomatisches Luftgewehr Mehrdistanz",
+      "distance": {
+        "value": 25000,
+        "raw": "25, 20, 15 und 10 Meter"
+      },
+      "section": "Kapitel 5, Druckluftwaffen und Zimmerstutzen, DLHM",
+      "scoring": "touch",
+      "category": "air-rifle"
+    },
+    {
+      "id": "dlrm-2-repetier-luftgewehr-mehrdistanz",
+      "name": "DLRM 2 Repetier-Luftgewehr Mehrdistanz",
+      "distance": {
+        "value": 25000,
+        "raw": "25, 20, 15 und 10 Meter"
+      },
+      "section": "Kapitel 5, Druckluftwaffen und Zimmerstutzen, DLRM 2",
+      "scoring": "touch",
+      "category": "air-rifle"
+    },
+    {
+      "id": "dlg-2-luftgewehr-50-25",
+      "name": "DLG 2 Luftgewehr 50/25",
+      "distance": {
+        "value": 50000,
+        "raw": "50 und 25 Meter"
+      },
+      "section": "Kapitel 5, Druckluftwaffen und Zimmerstutzen, DLG 2",
+      "scoring": "touch",
+      "category": "air-rifle"
+    },
+    {
+      "id": "dlhms-halbautomatisches-luftgewehr-mehrdistanz-silhouette",
+      "name": "DLHMS Halbautomatisches Luftgewehr Mehrdistanz-Silhouette",
+      "distance": {
+        "value": 50000,
+        "raw": "50, 40, 30 und 20 Meter"
+      },
+      "section": "Kapitel 5, Druckluftwaffen und Zimmerstutzen, DLHMS",
+      "scoring": "touch",
+      "category": "air-rifle"
+    },
+    {
+      "id": "dlrms-repetier-luftgewehr-mehrdistanz-silhouette",
+      "name": "DLRMS Repetier-Luftgewehr Mehrdistanz-Silhouette",
+      "distance": {
+        "value": 50000,
+        "raw": "50, 40, 30 und 20 Meter"
+      },
+      "section": "Kapitel 5, Druckluftwaffen und Zimmerstutzen, DLRMS",
+      "scoring": "touch",
+      "category": "air-rifle"
+    },
+    {
+      "id": "lel-1-einzellader-gewehr-50-m",
+      "name": "LEL 1 Einzellader Gewehr 50 m",
+      "distance": {
+        "value": 50000,
+        "raw": "50 Meter"
+      },
+      "section": "Kapitel 3, Langwaffenübungen, LEL 1",
+      "category": "rifle",
+      "scoring": "touch"
+    },
+    {
+      "id": "lhg-1-halbautomatisches-gewehr-50-m",
+      "name": "LHG 1 Halbautomatisches Gewehr 50 m",
+      "distance": {
+        "value": 50000,
+        "raw": "50 Meter"
+      },
+      "section": "Kapitel 3, Langwaffenübungen, LHG 1",
+      "scoring": "touch",
+      "category": "rifle"
+    },
+    {
+      "id": "lhz-1-halbautomatisches-gewehr-zielfernrohr-50-m",
+      "name": "LHZ 1 Halbautomatisches Gewehr Zielfernrohr 50 m",
+      "distance": {
+        "value": 50000,
+        "raw": "50 Meter"
+      },
+      "section": "Kapitel 3, Langwaffenübungen, LHZ 1",
+      "scoring": "touch",
+      "category": "rifle"
+    },
+    {
+      "id": "lrg-1-repetiergewehr-50-m",
+      "name": "LRG 1 Repetiergewehr 50 m",
+      "distance": {
+        "value": 50000,
+        "raw": "50 Meter"
+      },
+      "section": "Kapitel 3, Langwaffenübungen, LRG 1",
+      "category": "rifle",
+      "scoring": "touch"
+    },
+    {
+      "id": "lri-1-repetiergewehr-50-m-intervall",
+      "name": "LRI 1 Repetiergewehr 50 m Intervall",
+      "distance": {
+        "value": 50000,
+        "raw": "50 Meter"
+      },
+      "section": "Kapitel 3, Langwaffenübungen, LRI 1",
+      "category": "rifle",
+      "scoring": "touch"
+    }
+  ],
+  "paper": {
+    "format": "A4",
+    "width": {
+      "value": 210
+    },
+    "height": {
+      "value": 297
+    }
+  },
+  "numerals": true,
+  "photoSearch": false,
+  "note": "Stadium rings: straight vertical sides and half circle ends of half the ring width. The book prints the outer width and height of the scoring area, the width and height of the ten and of the Mouche, and ring widths that are rounded, so nine of them do not add up to the printed totals; rings 2 to 9 are spaced evenly between the outer ring and the ten, which is how the printed figure draws them. The green mirror runs from ring 5 to ring 8 (rings 6 to 8 have white lines), the centre inside ring 9 is white. The Mouche is the inner ten; the book states no rule for it beyond the touch rule for rings.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 1, Scheiben, Seite 14 (PDF p. 16)",
+        "fields": [
+          "name",
+          "rings",
+          "innerTen.diameter",
+          "innerTen.height",
+          "blackDiameter",
+          "blackHeight",
+          "paper",
+          "numerals"
+        ]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 1, Scheiben, Seite 14 (PDF p. 16)",
+        "fields": ["rings"],
+        "kind": "derived",
+        "note": "Rings 2 to 9 are the printed outer ring and the ten spaced evenly, to 0.1 mm; the book prints no width or height for them."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 1, Auswertung der Scheiben, Seite 27 (PDF p. 29)",
+        "fields": ["events.scoring"]
+      }
+    ]
+  }
+}

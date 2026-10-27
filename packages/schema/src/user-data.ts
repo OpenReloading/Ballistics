@@ -267,7 +267,7 @@ export interface DanglingRef {
 
 /**
  * The references of `records` to user records that no record of `records` answers: a load's
- * `firearm`, `cartridge`, `bullet`, `powder`, `capacity` and `case.record`, the `manufacturer` of its primer and case, a bullet's and a firearm's `manufacturer`, a capacity's
+ * `firearm`, `cartridge`, `bullet`, `powder`, `capacity` and `case.record`, the `manufacturer` of its case, a bullet's and a firearm's `manufacturer`, a firearm's `landsBullet`, a capacity's
  * `cartridge` and `caseManufacturer` (only as `user:<id>`), a case's `cartridge`, `manufacturer` and `capacity`, a load's `sessions`, a session's device
  * `manufacturer` and the `load` of its strings, and a target sheet's `load` and the `session` of
  * its group shots. A
@@ -319,7 +319,6 @@ function userRefsOf(r: UserRecord): [string, string | undefined, UserRecordKind,
         ['powder', typeof r.data.powder === 'string' ? r.data.powder : undefined, 'powder', true],
         ['capacity', r.data.capacity, 'caseCapacity', true],
         ['case.record', r.data.case?.record, 'case', true],
-        ['primer.manufacturer', r.data.primer?.manufacturer, 'manufacturer', true],
         ['case.manufacturer', r.data.case?.manufacturer, 'manufacturer', true],
         ...(r.data.sessions ?? []).map(
           (s, i): [string, string | undefined, UserRecordKind, boolean] => [
@@ -364,8 +363,12 @@ function userRefsOf(r: UserRecord): [string, string | undefined, UserRecordKind,
         ]),
       ]
     case 'bullet':
-    case 'firearm':
       return [['manufacturer', r.data.manufacturer, 'manufacturer', true]]
+    case 'firearm':
+      return [
+        ['manufacturer', r.data.manufacturer, 'manufacturer', true],
+        ['landsBullet', r.data.landsBullet, 'bullet', true],
+      ]
     default:
       return []
   }

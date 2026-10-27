@@ -144,6 +144,8 @@ export interface PowderFit {
   covariance?: number[][]
   /** Whether the ladder carried velocity uncertainties; without them the covariance is scaled by the residual. */
   weighted: boolean
+  /** `refined` when a prior on the burn coefficient was given, else `from-scratch`. */
+  basis: PowderFitBasis
   /** One row per velocity, then pressure, of each ladder point in input order. */
   residuals: PowderFitResidual[]
   /** Sum of squared residuals over sigma (sigma 1 where the ladder has none), plus `priorChiSquare`. */
@@ -165,6 +167,9 @@ export interface PowderFit {
   /** `interior` runs of the fit. */
   runCount: number
 }
+
+/** What a fit started from: a prior on the burn coefficient (`refined`) or the ladder alone. */
+export type PowderFitBasis = 'refined' | 'from-scratch'
 
 /** Why a fit failed, the `reason` of a `PowderFitError`; `invalid` is an invalid `interior` run. */
 export type PowderFitReason =
@@ -524,6 +529,7 @@ export function fitPowder(
     ...(fit.correlation ? { correlation: fit.correlation } : {}),
     ...(fit.covariance ? { covariance: fit.covariance } : {}),
     weighted: withSigma > 0,
+    basis: priors.burnRate === undefined ? 'from-scratch' : 'refined',
     residuals: rows.map((o, i) => {
       const predicted = nth(fit.predicted, i)
       return {
@@ -553,6 +559,10 @@ export function fitPowder(
 export interface PowderPredictionOptions {
   /** Coverage of the interval, in (0, 1); default 0.9. */
   level?: number | undefined
+  /** Barrel length of the prediction, m; default the load's. */
+  barrelLength?: number | undefined
+  /** Propellant temperature of the prediction, K; default the load's. */
+  propellantTemperature?: number | undefined
   /** Integration settings of the `interior` runs; use the fit's own, default `interiorDefaults`. */
   options?: Settings<InteriorOptions> | undefined
 }
@@ -575,6 +585,8 @@ export interface PowderPrediction {
   charge: number
   /** Coverage of the intervals. */
   level: number
+  /** Factor on the standard uncertainty that gives the intervals: normal or Student quantile. */
+  coverageFactor: number
   /** Muzzle velocity. */
   velocity: PowderPredictionBand
   /** Peak breech pressure. */
@@ -596,9 +608,11 @@ export function predictPowder(
   charge: number,
   options: PowderPredictionOptions = {},
 ): PowderPrediction {
-  const { level = 0.9 } = options
+  const { level = 0.9, barrelLength, propellantTemperature } = options
   need(Number.isFinite(charge) && charge > 0, 'charge must be positive')
   need(level > 0 && level < 1, 'level must lie in (0, 1)')
+  need(positive(barrelLength), 'barrelLength must be positive')
+  need(positive(propellantTemperature), 'propellantTemperature must be positive')
   const { covariance } = fit
   if (!covariance) throw new InputError('the fit has no covariance: add rows or velocity sigmas')
   const names = fit.parameters.map((p) => p.name)
@@ -606,7 +620,18 @@ export function predictPowder(
   let runCount = 0
   const run = (theta: number[]): [number, number] => {
     runCount++
-    const r = interior({ ...apply(q(theta)), charge }, options.options)
+    const fitted = apply(q(theta))
+    const r = interior(
+      {
+        ...fitted,
+        charge,
+        ...(barrelLength === undefined
+          ? {}
+          : { barrel: { ...fitted.barrel, length: barrelLength } }),
+        ...(propellantTemperature === undefined ? {} : { propellantTemperature }),
+      },
+      options.options,
+    )
     if (!r.valid) throw new PowderFitError('invalid', { charge, result: r })
     return [r.muzzleVelocity, r.peakBreechPressure]
   }
@@ -641,6 +666,7 @@ export function predictPowder(
   return {
     charge,
     level,
+    coverageFactor: quantile,
     velocity: band(velocity, 0),
     pressure: band(pressure, 1),
     ...(charge < min ? { extrapolation: 'below' as const } : {}),

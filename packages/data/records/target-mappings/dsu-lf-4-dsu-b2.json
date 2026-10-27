@@ -1,0 +1,17 @@
+{
+  "id": "dsu-lf-4-dsu-b2",
+  "discipline": "dsu-lf-4",
+  "face": "dsu-b2",
+  "event": "lf-4-flintenuebung-f-4-25-m",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 60, PDF p. 118",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

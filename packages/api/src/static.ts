@@ -18,6 +18,7 @@ const recordFiles = [
   ['cartridges', 'cartridge', 'cartridges'],
   ['bullets', 'bullet', 'bullets'],
   ['powders', 'powder', 'powders'],
+  ['primers', 'primer', 'primers'],
   ['cases', 'case', 'cases'],
   ['manufacturers', 'manufacturer', 'manufacturers'],
   ['target-faces', 'targetFace', 'targetFaces'],

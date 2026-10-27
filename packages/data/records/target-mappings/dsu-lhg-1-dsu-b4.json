@@ -1,0 +1,19 @@
+{
+  "id": "dsu-lhg-1-dsu-b4",
+  "discipline": "dsu-lhg-1",
+  "face": "dsu-b4",
+  "event": "lhg-1-halbautomatisches-gewehr-50-m",
+  "stage": "Gruppe 1",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 41, PDF p. 99",
+        "fields": ["discipline", "face", "event", "stage", "shotCount"],
+        "note": "The sheet page of b3 (Kapitel 1, Seite 13) lists LHG 1 as Gr.1+3. The discipline page and the table of Kapitel 9 put Gruppe 1 on b4 and Gruppe 2 and 3 on b3, and the sheet page of b4 lists Gr.1."
+      }
+    ]
+  }
+}

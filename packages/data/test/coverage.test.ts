@@ -26,6 +26,31 @@ describe('checkCoverage', () => {
     expect(checkCoverage(record)).toEqual([])
   })
 
+  it('asks a source for each new construction field, and takes the construction path as covering them', () => {
+    const construction = {
+      raw: 'x',
+      structure: 'cast',
+      core: { material: 'lead-alloy', hardness: { value: 12 } },
+      jacket: { thickness: { value: 0.3 } },
+      gasCheck: true,
+    }
+    const record = (fields: string[]) => ({
+      id: 'x',
+      name: 'X',
+      construction,
+      provenance: provenance([{ title: 'S', fields }]),
+    })
+    expect(checkCoverage(record(['construction']))).toEqual([])
+    expect(checkCoverage(record(['construction.structure', 'construction.core']))).toEqual([
+      'field construction.raw has no source',
+      'field construction.jacket.thickness has no source',
+      'field construction.gasCheck has no source',
+    ])
+    expect(checkCoverage(record(['construction.drivingBands']))).toContain(
+      'source "S" names missing field construction.drivingBands',
+    )
+  })
+
   it('accepts a measured geometry value covered by its own source and reports a mistyped path', () => {
     const record = {
       id: 'x',

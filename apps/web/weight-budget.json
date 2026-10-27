@@ -63,8 +63,12 @@
           "total": 455037
         },
         "/cases": {
-          "initial": 408999,
-          "total": 457018
+          "initial": 419873,
+          "total": 465789
+        },
+        "/primers": {
+          "initial": 414490,
+          "total": 459954
         }
       }
     },
@@ -105,6 +109,10 @@
         "/cases/[id]": {
           "initial": 416980,
           "total": 464999
+        },
+        "/primers/[id]": {
+          "initial": 422493,
+          "total": 467957
         }
       }
     },
@@ -154,17 +162,25 @@
         "total": 585000
       },
       "routes": {
+        "/cases/editor": {
+          "initial": 458439,
+          "total": 481399
+        },
         "/firearms": {
-          "initial": 473468,
-          "total": 512076
+          "initial": 475314,
+          "total": 511833
         },
         "/groups": {
           "initial": 534251,
           "total": 572859
         },
         "/my-cases": {
-          "initial": 469782,
-          "total": 502437
+          "initial": 398549,
+          "total": 444465
+        },
+        "/range": {
+          "initial": 408159,
+          "total": 453623
         }
       }
     },
@@ -175,8 +191,8 @@
       },
       "routes": {
         "/workbench": {
-          "initial": 612322,
-          "total": 947192
+          "initial": 607230,
+          "total": 957935
         }
       }
     }

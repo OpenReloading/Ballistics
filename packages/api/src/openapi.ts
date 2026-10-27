@@ -92,8 +92,8 @@ const tags = [
   {
     name: 'Records',
     description:
-      'Cartridges with their C.I.P. sheet values, manufacturers, powders, bullets and cartridge cases.',
-    segments: ['cartridges', 'manufacturers', 'powders', 'bullets', 'cases'],
+      'Cartridges with their C.I.P. sheet values, manufacturers, powders, primers, bullets and cartridge cases.',
+    segments: ['cartridges', 'manufacturers', 'powders', 'primers', 'bullets', 'cases'],
   },
   {
     name: 'Competition',

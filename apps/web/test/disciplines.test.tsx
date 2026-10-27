@@ -1,7 +1,7 @@
 import { MantineProvider } from '@mantine/core'
 import { readRecords } from '@open-reloading/data'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { expect, it } from 'vitest'
+import { expect, it, vi } from 'vitest'
 import { DisciplineList, FederationList } from '../src/components/discipline-list.tsx'
 import { emptyDirectory, readDirectory, writeDirectory } from '../src/lib/directory.ts'
 import {
@@ -16,6 +16,12 @@ import {
   federationScope,
 } from '../src/lib/disciplines.ts'
 import { defined } from './defined.ts'
+
+// the list renders its tab bar, which reads the route and the router
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/disciplines',
+  useRouter: () => ({ push: () => {} }),
+}))
 
 const { bundle } = readRecords()
 const records = bundle.disciplines as unknown as DisciplineRecord[]
@@ -68,6 +74,9 @@ it('renders the discipline list: one row per discipline linking its page, the fe
   expect(out).toContain(`${records.length} disciplines`)
   expect(out).toContain(`href="/disciplines/${pistol.id}"`)
   expect(out).toContain('href="/federations"')
+  // under the Database tab bar, the Disciplines tab selected
+  expect(out).toMatch(/role="tablist"[^>]*aria-label="Database"/)
+  expect(out).toMatch(/aria-selected="true"[^>]*>(?:<[^>]+>)*Disciplines/)
 })
 
 it('gives the strip, the number, section, page and caliber classes, and the rule book with its page', () => {

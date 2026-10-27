@@ -1,0 +1,53 @@
+{
+  "id": "dsu-lri-2",
+  "federation": "dsu",
+  "name": "Repetiergewehr 100 m Intervall",
+  "number": "LRI 2",
+  "section": "Kapitel 3, Langwaffenübungen, LRI 2",
+  "page": "Seite 28, PDF p. 86",
+  "distance": {
+    "value": 100000,
+    "raw": "100 Meter"
+  },
+  "category": "rifle",
+  "caliberClasses": {
+    "ids": [
+      "rifle-22-cf",
+      "rifle-6mm",
+      "rifle-25",
+      "rifle-6-5",
+      "rifle-270",
+      "rifle-7mm",
+      "rifle-30",
+      "rifle-8mm",
+      "rifle-338"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 28, PDF p. 86",
+        "fields": ["federation", "section", "page", "distance", "category", "caliberClasses"],
+        "note": "Three calibre groups, scored separately: .22 centre-fire, 6 to 8 mm, magnum (6.5 mm to .460 in the summary table)."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Inhaltsverzeichnis Langwaffen, Seite 2 (PDF p. 60)",
+        "fields": ["name", "number"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 9, Kurzbezeichnungen Langwaffen, Seite 2 (PDF p. 228)",
+        "fields": ["caliberClasses"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Kalibereinteilung, Seite 10 (PDF p. 68)",
+        "fields": ["caliberClasses"]
+      }
+    ]
+  }
+}

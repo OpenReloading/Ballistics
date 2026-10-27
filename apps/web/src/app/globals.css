@@ -403,6 +403,43 @@ main .home-cards h3 {
   font-variant-numeric: tabular-nums;
 }
 
+/* the tabs of a Library card: each a link with its record count */
+.home-cards .home-tabs {
+  display: grid;
+  color: var(--muted);
+  font-size: var(--mantine-font-size-sm);
+  gap: 0.125rem;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.home-cards .home-tabs li {
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0.125rem 0;
+  border: 0;
+}
+
+/* a card with tabs keeps them under its text, not at the card's foot */
+.home-cards li:has(> .home-tabs) > p {
+  flex: none;
+}
+
+/* the tab bar of the Database, between the page bar and the list */
+.library-tabs {
+  flex: none;
+  margin-bottom: 0.5rem;
+}
+
+@media print {
+  .library-tabs {
+    display: none;
+  }
+}
+
 @media (max-width: 47.99em) {
   .home-lead {
     margin-top: 0.75rem;
@@ -7842,6 +7879,11 @@ main .field-table tr.field-group > th {
 /* the title as heavy as the panel headings */
 .settings-dialog .mantine-Modal-title {
   font-weight: 600;
+}
+
+.your-data {
+  width: 100%;
+  margin: 0;
 }
 
 .settings-foot {

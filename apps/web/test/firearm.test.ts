@@ -14,6 +14,8 @@ import {
   firearmProblem,
   freeId,
   gunValues,
+  landsFor,
+  landsOf,
   sightOptions,
 } from '../src/lib/firearm.ts'
 import { presetUnits } from '../src/lib/units.ts'
@@ -227,10 +229,30 @@ describe('stored units at the form edge', () => {
       gunValues({ ...data, barrelLength: { value: 610 }, firearmMass: { value: 4200 } }),
     ).toEqual({ twist: 0.254, barrelLength: 0.61, firearmMass: 4.2 })
     expect(gunValues(blankFirearm())).toEqual({
+      lands: undefined,
       twist: undefined,
       barrelLength: undefined,
       firearmMass: undefined,
     })
+  })
+
+  it('gives the lands contact in SI only with a length and the bullet it was measured with', () => {
+    const data = (rifle as Extract<UserRecord, { kind: 'firearm' }>).data
+    const bullet = 'catalogue:test-bullet'
+    expect(landsOf(data)).toBeUndefined()
+    expect(landsOf({ ...data, baseToOgiveAtLands: { value: 28.4 } })).toBeUndefined()
+    expect(landsOf({ ...data, landsBullet: bullet })).toBeUndefined()
+    const both = { ...data, landsBullet: bullet, overallLengthAtLands: { value: 71.2 } }
+    expect(landsOf(both)).toEqual({ bullet, baseToOgive: undefined, overallLength: 0.0712 })
+    expect(gunValues(both).lands).toEqual(landsOf(both))
+  })
+
+  it('uses a lands contact only for the bullet it was measured with', () => {
+    const lands = { bullet: 'catalogue:a', baseToOgive: 0.0284 }
+    expect(landsFor(lands, 'catalogue:a')).toEqual({ contact: lands, other: false })
+    expect(landsFor(lands, 'catalogue:b')).toEqual({ contact: undefined, other: true })
+    expect(landsFor(lands, undefined)).toEqual({ contact: undefined, other: true })
+    expect(landsFor(undefined, 'catalogue:a')).toEqual({ contact: undefined, other: false })
   })
 
   it('names the catalogue record of a cartridge reference only', () => {

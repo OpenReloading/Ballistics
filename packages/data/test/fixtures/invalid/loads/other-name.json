@@ -18,8 +18,7 @@
     "value": 3
   },
   "primer": {
-    "manufacturer": "catalogue:test-manufacturer",
-    "model": "LR"
+    "record": "catalogue:test-primer"
   },
   "case": {
     "manufacturer": "catalogue:test-manufacturer"

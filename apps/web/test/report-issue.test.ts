@@ -50,6 +50,7 @@ it('maps every route group to its area, designers before their lists', () => {
     ['/bullets/x', 'Bullets'],
     ['/powders/burn-rates', 'Powders'],
     ['/cases/demo-case-308-brass', 'Cases'],
+    ['/primers/demo-primer-large-rifle', 'Primers'],
     ['/targets/issf-25m-precision-50m-pistol', 'Targets'],
     ['/disciplines/dsb-25m-pistole-revolver', 'Disciplines'],
     ['/federations/dsb', 'Federations'],

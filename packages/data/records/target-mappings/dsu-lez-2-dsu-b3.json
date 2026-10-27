@@ -1,0 +1,17 @@
+{
+  "id": "dsu-lez-2-dsu-b3",
+  "discipline": "dsu-lez-2",
+  "face": "dsu-b3",
+  "event": "lez-2-einzellader-zielfernrohrgewehr-100-m",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 21, PDF p. 79",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

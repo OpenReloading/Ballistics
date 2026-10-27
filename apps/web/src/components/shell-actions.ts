@@ -24,8 +24,14 @@ export function useShellActions(): { pages: Command[]; commands: Command[] } {
   return {
     pages: [
       { label: 'Home', run: () => router.push('/') },
+      // the pages, and each tab of the Library pages by its own name (Powders, Firearms…)
       ...sections.flatMap((s) =>
-        s.pages.map((p) => ({ label: p.label, run: () => router.push(p.href) })),
+        s.pages.flatMap((p) =>
+          [p, ...('tabs' in p ? p.tabs : [])].map((x) => ({
+            label: x.label,
+            run: () => router.push(x.href),
+          })),
+        ),
       ),
     ],
     commands: [

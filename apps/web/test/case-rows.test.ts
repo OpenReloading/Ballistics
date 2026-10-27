@@ -1,7 +1,7 @@
-import type { Case } from '@open-reloading/schema'
+import type { Case, UserRecord } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
 import type { CaseSummary } from '../src/lib/api-types.ts'
-import { caseMatches, caseRows } from '../src/lib/case-rows.ts'
+import { caseMatches, caseRows, userCaseRows } from '../src/lib/case-rows.ts'
 import { caseRowGroups, caseStrip } from '../src/lib/record-fields.ts'
 import { defined } from './defined.ts'
 
@@ -86,4 +86,62 @@ it('the table has the product number, headstamp, primer pocket, flash hole and a
       (r) => r.label,
     ),
   ).toEqual(['Product number', 'Primer pocket', 'Flash hole diameter'])
+})
+
+const capacityId = '7a2d9c10-5b3e-4f68-9d41-0c8e2b6a1f57'
+const groupId = '5d6e7f80-1a2b-4c3d-8e4f-5a6b7c8d9e0f'
+const saved = '2026-10-26T10:00:00.000Z'
+const stored: UserRecord[] = [
+  {
+    kind: 'caseCapacity',
+    id: capacityId,
+    name: 'Measured case capacity 3.62 g water',
+    saved,
+    data: { origin: 'user', cartridge: 'catalogue:308-win', waterCapacity: { value: 3.62 } },
+  },
+  {
+    kind: 'case',
+    id: groupId,
+    name: 'Match brass, lot 3',
+    saved,
+    data: {
+      origin: 'user',
+      name: 'Match brass, lot 3',
+      cartridge: 'catalogue:308-win',
+      material: 'brass',
+      mass: { value: 11.2 },
+      capacity: `user:${capacityId}`,
+    },
+  },
+  {
+    kind: 'case',
+    id: '2c4e6a80-3b5d-4f71-9a2c-6e8f0a1b3c5d',
+    name: 'Plain brass',
+    saved,
+    data: { origin: 'user', name: 'Plain brass', cartridge: 'user:gone', material: 'brass' },
+  },
+]
+
+it("lists the browser's case groups as Mine rows with the measured capacity and the cartridge name", () => {
+  const [group, plain, ...more] = userCaseRows(stored, cartridges)
+  expect(more).toEqual([])
+  expect(defined(group)).toMatchObject({
+    id: `user:${groupId}`,
+    origin: 'user',
+    name: 'Match brass, lot 3',
+    cartridgeName: '308 Win.',
+    material: 'brass',
+    mass: 11.2,
+    waterCapacity: 3.62,
+    manufacturerName: '',
+  })
+  // no measured capacity, a cartridge no record names: both stay empty
+  expect(defined(plain)).toMatchObject({ cartridgeName: '', waterCapacity: undefined })
+  expect(userCaseRows([], cartridges)).toEqual([])
+})
+
+it('searches a Mine row by its name and cartridge', () => {
+  const row = defined(userCaseRows(stored, cartridges)[0])
+  expect(caseMatches(row, 'lot 3 308')).toBe(true)
+  expect(caseMatches(row, 'c308')).toBe(false)
 })

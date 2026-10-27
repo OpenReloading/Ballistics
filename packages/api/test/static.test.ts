@@ -23,6 +23,7 @@ describe('writeStaticApi', () => {
       ['cartridges', data.index.cartridges],
       ['bullets', data.index.bullets],
       ['powders', data.index.powders],
+      ['primers', data.index.primers],
       ['cases', data.index.cases],
       ['manufacturers', data.index.manufacturers],
       ['target-faces', data.index.targetFaces],

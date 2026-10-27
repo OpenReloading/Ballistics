@@ -1,0 +1,17 @@
+{
+  "id": "dsu-lhmov-2-dsu-b2",
+  "discipline": "dsu-lhmov-2",
+  "face": "dsu-b2",
+  "event": "lhmov-2-halbautomatisches-gewehr-mehrdistanz-100-m-offene-visierung",
+  "shotCount": 30,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 49, PDF p. 107",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

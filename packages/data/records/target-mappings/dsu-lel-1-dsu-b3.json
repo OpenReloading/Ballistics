@@ -1,0 +1,18 @@
+{
+  "id": "dsu-lel-1-dsu-b3",
+  "discipline": "dsu-lel-1",
+  "face": "dsu-b3",
+  "event": "lel-1-einzellader-gewehr-50-m",
+  "stage": "Gruppe 2",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 15, PDF p. 73",
+        "fields": ["discipline", "face", "event", "stage", "shotCount"]
+      }
+    ]
+  }
+}

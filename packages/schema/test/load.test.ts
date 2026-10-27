@@ -116,17 +116,11 @@ describe('Load', () => {
   })
 
   it('names a component maker by a reference, a catalogue load by a catalogue one', () => {
-    const maker = (m: string) => ({ ...catalogueLoad, primer: { manufacturer: m } })
-    expect(issuePaths(load, maker('catalogue:maker'))).toEqual([])
-    expectIssueAt(load, maker(`user:${uuid}`), 'primer.manufacturer')
     expectIssueAt(
       load,
       { ...catalogueLoad, case: { manufacturer: `user:${uuid}` } },
       'case.manufacturer',
     )
-    expectIssueAt(load, maker('Maker'), 'primer.manufacturer')
-    expectIssueAt(load, { ...catalogueLoad, primer: { manufacturerName: 'Maker' } }, 'primer')
-    expect(issuePaths(load, { ...userLoad, primer: { manufacturer: `user:${uuid}` } })).toEqual([])
     const measured = { provenance: { kind: 'measured', sources: [{ title: 'Own measurement' }] } }
     const legacy = { manufacturer: 'catalogue:maker', manufacturerName: 'Maker' }
     expectIssueAt(
@@ -143,6 +137,15 @@ describe('Load', () => {
       { ...catalogueLoad, ...measured, powder: { ...legacy, name: 'Fast' } },
       'powder',
     )
+  })
+
+  it('names the primer by a catalogue record and refuses the older maker and model text', () => {
+    const primer = (p: unknown) => ({ ...userLoad, primer: p })
+    expect(issuePaths(load, primer({ record: 'catalogue:example-primer', lot: 'R-2' }))).toEqual([])
+    expect(issuePaths(load, primer({ lot: 'R-2' }))).toEqual([])
+    expectIssueAt(load, primer({ record: `user:${uuid}` }), 'primer.record')
+    expectIssueAt(load, primer({ record: 'example-primer' }), 'primer.record')
+    expectIssueAt(load, primer({ manufacturer: 'catalogue:maker', model: 'LR' }), 'primer')
   })
 
   it('keeps lots and one snapshot per session of the load, and a firearm round count to note', () => {

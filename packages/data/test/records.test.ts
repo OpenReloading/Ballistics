@@ -54,6 +54,7 @@ describe('readRecords', () => {
     expect(errors).toContain('disciplines/test-discipline.json: no target mapping names it')
     expect(errors).toContain('bullets/: missing directory')
     expect(errors).toContain('powders/: missing directory')
+    expect(errors).toContain('primers/: missing directory')
     expect(errors).not.toContain('cartridges/: missing directory')
   })
 
@@ -165,15 +166,15 @@ describe('readRecords', () => {
     )
   })
 
-  it('reports a load whose bullet, powder, primer or case maker is no record', () => {
+  it('reports a load whose bullet, powder or case maker is no record', () => {
     const errors = errorsAfter((root) => {
       const path = join(root, 'loads', 'test-load.json')
       const l = JSON.parse(readFileSync(path, 'utf8'))
-      for (const k of ['bullet', 'powder', 'primer', 'case'])
+      for (const k of ['bullet', 'powder', 'case'])
         l[k].manufacturer = `catalogue:missing-${k}-maker`
       writeFileSync(path, JSON.stringify(l))
     })
-    for (const k of ['bullet', 'powder', 'primer', 'case'])
+    for (const k of ['bullet', 'powder', 'case'])
       expect(errors).toContain(
         `loads/test-load.json: unknown ${k}.manufacturer "missing-${k}-maker"`,
       )

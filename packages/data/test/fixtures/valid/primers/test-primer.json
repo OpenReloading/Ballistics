@@ -1,0 +1,14 @@
+{
+  "id": "test-primer",
+  "manufacturer": "test-manufacturer",
+  "name": "Test primer",
+  "size": "large-rifle",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Test primer data sheet"
+      }
+    ]
+  }
+}

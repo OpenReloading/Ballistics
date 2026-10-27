@@ -1,0 +1,52 @@
+{
+  "id": "dsu-lper-1",
+  "federation": "dsu",
+  "name": "Zielfernrohrgewehr Präzision 100 m",
+  "number": "LPER 1",
+  "section": "Kapitel 3, Langwaffenübungen, LPER 1",
+  "page": "Seite 31, PDF p. 89",
+  "distance": {
+    "value": 100000,
+    "raw": "100 Meter"
+  },
+  "category": "precision-rifle",
+  "caliberClasses": {
+    "ids": [
+      "rifle-22-cf",
+      "rifle-6mm",
+      "rifle-25",
+      "rifle-6-5",
+      "rifle-270",
+      "rifle-7mm",
+      "rifle-30",
+      "rifle-8mm"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 31, PDF p. 89",
+        "fields": ["federation", "section", "page", "distance", "category", "caliberClasses"],
+        "note": "Three calibre groups, scored separately: .222/.223/.22-250, 6 mm BR and PPC, 6 to 8 mm."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Inhaltsverzeichnis Langwaffen, Seite 2 (PDF p. 60)",
+        "fields": ["name", "number"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 9, Kurzbezeichnungen Langwaffen, Seiten 2 bis 3 (PDF pp. 228 to 229)",
+        "fields": ["caliberClasses"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Kalibereinteilung, Seite 10 (PDF p. 68)",
+        "fields": ["caliberClasses"]
+      }
+    ]
+  }
+}

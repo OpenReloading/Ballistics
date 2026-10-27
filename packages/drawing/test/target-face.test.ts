@@ -42,6 +42,23 @@ describe('targetFaceFigure', () => {
     expect(targetFaceFigure(flat).lines[0]).not.toHaveProperty('square')
   })
 
+  it('draws a stadium ring, its inner ten and its black area as stadiums', () => {
+    const { zones, lines } = targetFaceFigure({
+      ...flat,
+      rings: flat.rings.map((r) => ({
+        ...r,
+        height: mm(r.diameter.value * 1.5),
+        shape: 'stadium' as const,
+      })),
+      innerTen: { diameter: mm(10), height: mm(15) },
+      blackHeight: mm(45),
+    })
+    expect(lines[1]).toMatchObject({ rx: 40, ry: 60, stadium: true })
+    expect(lines.at(-1)).toMatchObject({ rx: 5, ry: 7.5, stadium: true })
+    expect(zones.map((z) => z.stadium)).toEqual([true, true])
+    expect(lines[0]).not.toHaveProperty('square')
+  })
+
   it('fills the black area, or each ring in its colour when the rings have one', () => {
     expect(targetFaceFigure(flat).zones.map((z) => [z.colour, z.rx])).toEqual([
       ['white', 50],

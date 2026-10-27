@@ -1,0 +1,18 @@
+{
+  "id": "dsu-shfr-dsu-b2",
+  "discipline": "dsu-shfr",
+  "face": "dsu-b2",
+  "event": "shfr-schwarzpulver-fruehe-repetiergewehre-fuer-schwarzpulverpatronen",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 4, Seite 22, PDF p. 144",
+        "fields": ["discipline", "face", "event", "shotCount"],
+        "note": "Two sheets of 10 shots in 4 series of 5, all 20 count."
+      }
+    ]
+  }
+}

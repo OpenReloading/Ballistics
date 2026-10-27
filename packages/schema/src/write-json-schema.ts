@@ -13,6 +13,7 @@ import { load } from './load.ts'
 import { loadTables } from './load-tables.ts'
 import { manufacturer } from './manufacturer.ts'
 import { powder } from './powder.ts'
+import { primer } from './primer.ts'
 import { sourceRecord } from './provenance.ts'
 import { rangeFirings } from './range.ts'
 import { targetFace } from './target-face.ts'
@@ -26,6 +27,7 @@ for (const [name, schema] of Object.entries({
   'chrono-session': chronoSession,
   cartridge,
   powder,
+  primer,
   bullet,
   case: cartridgeCase,
   'case-capacity': caseCapacity,

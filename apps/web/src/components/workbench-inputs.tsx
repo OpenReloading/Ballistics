@@ -23,6 +23,7 @@ import type { BulletRow } from '../lib/bullet-rows.ts'
 import { findBullets } from '../lib/bullet-search.ts'
 import { quickCartridges } from '../lib/examples.ts'
 import { type FieldSpec, type FieldValue, fieldError, siValues } from '../lib/field-spec.ts'
+import { landsFor } from '../lib/firearm.ts'
 import { type FollowKey, followKeys } from '../lib/input-defaults.ts'
 import { burnFormError, interiorFields } from '../lib/interior-input.ts'
 import { productLabel } from '../lib/manufacturers.ts'
@@ -39,12 +40,14 @@ import { userBulletRows, userRecordId } from '../lib/sources.ts'
 import { cartridgeOptionText } from '../lib/standards.ts'
 import { controlSize } from '../lib/theme.ts'
 import { formatQuantity, inchText, type UnitSystem } from '../lib/units.ts'
+import { catalogueRef, userRef } from '../lib/variants.ts'
 import { type InputPanel, lengthText } from '../lib/workbench.ts'
 import { citedDefaults, type DefaultKey } from '../lib/workbench-defaults.ts'
 import { AppPopover, popoverWidth } from './app-popover.tsx'
 import { Noted } from './field-table.tsx'
 import { NavIcon } from './nav-icons.tsx'
 import { NumberField } from './number-field.tsx'
+import { PrimerChoice } from './primer-choice.tsx'
 import { RecordSearch } from './record-search.tsx'
 import { SegmentedRow } from './segmented-row.tsx'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
@@ -1098,7 +1101,7 @@ function CardPicker({ panel }: { panel: InputPanel }) {
 
 /** Rarely needed rows of a card, in its More popover: no accordion moves the layout. */
 function CardMore({ panel }: { panel: InputPanel }) {
-  const { specValue, system, allDiameters, setAllDiameters } = useLoad()
+  const { specValue, system, allDiameters, setAllDiameters, primerId, setPrimerChoice } = useLoad()
   const l6 = specValue('cartridge', 'L6')
   if (panel === 'cartridge')
     return (
@@ -1110,6 +1113,7 @@ function CardMore({ panel }: { panel: InputPanel }) {
         )}
         <SeatingSlot name="more" />
         <SeatingSlot name="moreValues" />
+        <PrimerChoice id={primerId} onChange={setPrimerChoice} />
       </>
     )
   if (panel === 'powder') return <>{fieldsOf(powderMoreFields)}</>
@@ -1121,6 +1125,16 @@ function CardMore({ panel }: { panel: InputPanel }) {
       onChange={(e) => setAllDiameters(e.currentTarget.checked)}
     />
   )
+}
+
+/** The lands contact of the chosen firearm as it applies to the chosen bullet record or design. */
+function landsChoice(
+  lands: Parameters<typeof landsFor>[0],
+  bullet: { id: string } | undefined,
+  design: { id: string } | undefined,
+) {
+  const ref = design ? userRef(design.id) : bullet && catalogueRef(bullet.id)
+  return landsFor(lands, ref)
 }
 
 /**
@@ -1180,6 +1194,11 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
   useEffect(() => {
     if (node && host) host.append(node)
   }, [node, host])
+  const lands = landsChoice(
+    firearmList.find((f) => f.id === firearm)?.data.lands,
+    bullet,
+    bulletDesign,
+  )
   const shown = cartridge !== undefined || cartridgeDesign !== undefined
   const moreOpen = more === 'cartridge'
   useEffect(() => {
@@ -1204,6 +1223,8 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
       system={system}
       initial={previewInitial}
       barrelLength={firearmList.find((f) => f.id === firearm)?.data.barrelLength}
+      lands={lands.contact}
+      landsOther={lands.other}
       barrelDefault={suggestions.barrelLength}
       linked={{ bullet: bullet?.id, design: bulletDesign?.id }}
       slots={{
