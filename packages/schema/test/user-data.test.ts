@@ -547,6 +547,30 @@ describe('firearm', () => {
     })
   })
 
+  it('takes a lands contact with the bullet it was measured with, and none without that bullet', () => {
+    const contact = { baseToOgiveAtLands: { value: 28.4 }, overallLengthAtLands: { value: 71.2 } }
+    expect(paths({ ...contact, landsBullet: 'catalogue:test-bullet' })).toBeUndefined()
+    expect(paths({ ...contact, landsBullet: `user:${uuid}` })).toBeUndefined()
+    expect(paths({ baseToOgiveAtLands: { value: 28.4 } })).toEqual(['data.landsBullet'])
+    expect(paths({ overallLengthAtLands: { value: 71.2 } })).toEqual(['data.landsBullet'])
+    expect(paths({ landsBullet: 'Bullet' })).toEqual(['data.landsBullet'])
+    // a firearm without a contact needs no bullet
+    expect(paths({})).toBeUndefined()
+  })
+
+  it('round trips a lands contact through a user data file', () => {
+    const data = {
+      ...firearmRecord.data,
+      baseToOgiveAtLands: { value: 28.4 },
+      landsBullet: 'catalogue:test-bullet',
+    }
+    const parsed = userDataFile.parse({ ...file([{ ...firearmRecord, data }]) })
+    expect(parsed.records[0]?.data).toMatchObject({
+      baseToOgiveAtLands: { value: 28.4 },
+      landsBullet: 'catalogue:test-bullet',
+    })
+  })
+
   it('keeps a firearm without optics', () => {
     expect(paths({ optics: [], configurations: [], active: undefined })).toBeUndefined()
   })
@@ -682,6 +706,19 @@ describe('checkUserRefs', () => {
     // a catalogue manufacturer is the catalogue's to answer
     const own = { ...records[0], data: { ...records[0]?.data, manufacturer: 'catalogue:beta' } }
     expect(checkUserRefs([own as UserRecord])).toEqual([])
+  })
+
+  it('reports a firearm whose lands bullet is a user bullet nobody answers', () => {
+    const lands = userRecord.parse({
+      ...firearmRecord,
+      data: { ...firearmRecord.data, landsBullet: `user:${uuid}` },
+    })
+    expect(checkUserRefs([lands]).map((d) => [d.kind, d.field, d.target])).toEqual([
+      ['firearm', 'landsBullet', `user:${uuid}`],
+    ])
+    expect(checkUserRefs([{ ...userRecord.parse(bulletRecord), id: uuid }, lands])).toEqual([])
+    const catalogue = { ...lands, data: { ...lands.data, landsBullet: 'catalogue:a' } }
+    expect(checkUserRefs([catalogue as UserRecord])).toEqual([])
   })
 
   it('reports a load whose primer or case names a user manufacturer nobody answers', () => {
