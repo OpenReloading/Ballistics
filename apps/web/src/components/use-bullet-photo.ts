@@ -72,6 +72,9 @@ export interface Cut {
 interface Found {
   outline?: Outline
   measurement?: BulletMeasurement
+  /** Sentences about the photograph's quality, and why it cannot be measured when it cannot. */
+  hints: string[]
+  unusable?: string
   /** What the worker measured: the design waits for a measurement of the inputs as they are now. */
   made: MeasuredInputs
 }
@@ -94,6 +97,8 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
   const [axis, setAxis] = useState<number>()
   const [found, setFound] = useState<Found>()
   const [warnings, setWarnings] = useState<string[]>([])
+  /** The width the cut-out's edge is spread over, px; 0 once the cut-out is corrected by hand. */
+  const [spread, setSpread] = useState(0)
   const [busy, setBusy] = useState<string>()
   const [failure, setFailure] = useState<string>()
   const ask = useWorker(setFailure)
@@ -119,6 +124,7 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
       tintOf(r.alpha, size.width, size.height, tint.current)
       edited.current = false
       setWarnings(r.warnings)
+      setSpread(r.edgeSpread)
       setCut((c) => ({ alpha: r.alpha, rev: (c?.rev ?? 0) + 1 }))
     },
     [ask, size],
@@ -145,12 +151,15 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
         height: size.height,
         scale: scale ?? { pxPerMm: 1, relUncertainty: 0 },
         angle: axis,
+        edgeSpread: spread,
       })
       if (stale) return
       if (r.kind === 'error') setFailure(r.message)
       if (r.kind === 'measured')
         setFound({
           made: { cut, scale, axis },
+          hints: r.hints,
+          ...(r.unusable && { unusable: r.unusable }),
           ...(r.outline && { outline: r.outline }),
           ...(r.measurement && { measurement: r.measurement }),
         })
@@ -159,7 +168,7 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
       stale = true
       clearTimeout(t)
     }
-  }, [ask, cut, size, scale, axis])
+  }, [ask, cut, size, scale, axis, spread])
 
   /** Takes a canvas as the working photograph: its pixels go to the worker, the state starts over. */
   const adopt = async (canvas: HTMLCanvasElement, span?: ScaleSpan) => {
@@ -180,6 +189,7 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
     setFound(undefined)
     setAxis(undefined)
     setWarnings([])
+    setSpread(0)
     setPoints(span ? [span.a, span.b] : [])
     setDistances([
       span ? fieldOf(system, distanceSpec('Distance A to B'), toSi('length', span.mm)) : empty,
@@ -234,7 +244,7 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
   /** Paints a disc of the brush into the cut-out, by hand: the automatic cut stops redoing it. */
   const stamp = (p: Point, value: 0 | 255, radius: number) => {
     if (!(cut && size && tint.current)) return
-    paintDisc({ ...size, alpha: cut.alpha, warnings: [] }, p, radius, value)
+    paintDisc({ ...size, alpha: cut.alpha }, p, radius, value)
     const box: [number, number, number, number] = [
       Math.max(0, Math.floor(p.x - radius)),
       Math.max(0, Math.floor(p.y - radius)),
@@ -244,6 +254,7 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
     tintBox(cut.alpha, size.width, tint.current, box)
     edited.current = true
     strokes.current++
+    setSpread(0)
     setCut({ alpha: cut.alpha, rev: cut.rev + 1 })
   }
 

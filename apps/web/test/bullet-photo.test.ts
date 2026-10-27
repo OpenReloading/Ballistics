@@ -1,10 +1,10 @@
 import { type BulletDimensions, bulletProfile } from '@open-reloading/drawing/bullet'
 import { describe, expect, it } from 'vitest'
 import {
+  type Cutout,
   grayOf,
   paintDisc,
   pointUncertainty,
-  type Segmentation,
   scaleOf,
   segment,
 } from '../src/lib/bullet-photo.ts'
@@ -225,7 +225,7 @@ describe('segment', () => {
 
 describe('the brush', () => {
   it('paints a disc of its radius with the bullet or the background, clipped at the photograph edge', () => {
-    const seg: Segmentation = { width: 20, height: 20, alpha: new Uint8Array(400), warnings: [] }
+    const seg: Cutout = { width: 20, height: 20, alpha: new Uint8Array(400) }
     paintDisc(seg, { x: 10, y: 10 }, 3, 255)
     expect(seg.alpha[10 * 20 + 10]).toBe(255)
     expect(seg.alpha[10 * 20 + 14]).toBe(0)
@@ -241,8 +241,8 @@ describe('the brush', () => {
     const span = defined(photo.span)
     const seg = segment(grayOf(photo.image), [span.a, span.b])
     const before = defined(fitOutline(seg))
-    // the base end rubbed out
-    paintDisc(seg, { x: 195, y: 252 }, 40, 0)
+    // the base end rubbed out over its whole width
+    paintDisc(seg, { x: 195, y: 252 }, 130, 0)
     expect(defined(fitOutline(seg)).length).toBeLessThan(before.length - 20)
   })
 })
