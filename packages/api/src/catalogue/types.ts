@@ -203,6 +203,7 @@ export interface FederationItem {
   abbreviation: string
   country?: string
   internationalFederation?: string
+  website?: string
 }
 
 /** A discipline of the list. */

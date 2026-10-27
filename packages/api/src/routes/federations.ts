@@ -48,6 +48,7 @@ const federationList = page(
     abbreviation: true,
     country: true,
     internationalFederation: true,
+    website: true,
   }),
 )
 const disciplineList = page(

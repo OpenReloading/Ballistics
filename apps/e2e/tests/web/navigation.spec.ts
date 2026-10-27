@@ -99,25 +99,26 @@ test('the Database tabs follow the tabs pattern and carry the search to the next
   await gotoHydrated(page, '/cartridges')
   const tabs = page.getByRole('tablist', { name: 'Database' })
   await expect(tabs.getByRole('tab')).toHaveText([
+    'Firearms',
     'Cartridges',
-    'Bullets',
-    'Powders',
     'Cases',
     'Primers',
+    'Powders',
+    'Bullets',
     'Targets',
     'Disciplines',
-    'Firearms',
+    'Federations',
   ])
   await expect(tabs.getByRole('tab', { selected: true })).toHaveText('Cartridges')
   await page.getByRole('searchbox', { name: 'Search' }).fill('win')
   // the arrow key moves the focus only: Enter opens the tab
   await tabs.getByRole('tab', { selected: true }).focus()
   await page.keyboard.press('ArrowRight')
-  await expect(tabs.getByRole('tab', { name: 'Bullets' })).toBeFocused()
+  await expect(tabs.getByRole('tab', { name: 'Cases' })).toBeFocused()
   await expect(page).toHaveURL(/\/cartridges\?q=win$/)
   await page.keyboard.press('Enter')
-  await expect(page).toHaveURL('/bullets?q=win')
-  await expect(page.getByRole('tab', { selected: true })).toHaveText('Bullets')
+  await expect(page).toHaveURL('/cases?q=win')
+  await expect(page.getByRole('tab', { selected: true })).toHaveText('Cases')
   // the sidebar names the Database as the current page on every tab
   await expect(
     page.getByRole('navigation', { name: 'Main' }).locator('[aria-current="page"]'),
