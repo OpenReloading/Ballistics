@@ -43,7 +43,7 @@ Not used: a hosted coverage service (Codecov), jscpd, Trivy (its action tags wer
 - `permissions`: none at the workflow level, set per job. `persist-credentials: false` on every checkout.
 - Every job has a `timeout-minutes` of about three times its median run, except `publish` in `release.yml`.
 - `ci.yml` and `pr-title.yml` cancel a superseded pull request run (`concurrency`).
-- `ci.yml` runs on pushes to `main` and on pull requests.
+- `ci.yml` and `pr-title.yml` run on pull requests and on `merge_group`: the `main` ruleset has a squash merge queue, and every required check reports under its own name on both events (`dependency-review` and `conventional` check the pull request only and succeed on `merge_group`). `ci.yml` has no push run.
 - Tool images of `docker run` steps are set in the `env` block of `ci.yml` and `release.yml`. Dependabot does not read them: update them by hand.
 - Jobs that publish or need secrets run only in `OpenReloading/Ballistics` (`if: github.repository == ...`).
 

@@ -1,7 +1,8 @@
 name: Release
 
-# release-please keeps one release pull request open from the Conventional Commits on main. Nothing merges it
-# but the owner: no step here enables auto-merge. Merging it tags each changed component <component>-vX.Y.Z and
+# release-please keeps one release pull request open from the Conventional Commits on main. release-weekly.yml
+# merges it every Monday 05:00 UTC (or when started by hand) and dispatches this workflow; the owner can also merge
+# it by hand. No step here enables auto-merge. Merging it tags each changed component <component>-vX.Y.Z and
 # writes its CHANGELOG.md and GitHub Release; the images job publishes the api image when the api component
 # is released (with an SBOM attestation), the sbom-release job attaches that SBOM to the GitHub Release,
 # and the publish job pushes the libraries to npm (trusted publishing, no token) once the repository variable
@@ -11,6 +12,7 @@ name: Release
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 permissions: {}
 

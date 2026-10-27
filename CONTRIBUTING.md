@@ -32,10 +32,10 @@ Where questions, ideas, bugs and record requests go: [README](README.md#communit
   - Breaking change: no marker before 1.0.0. From 1.0.0 on, `!` after the type or scope, or a `BREAKING CHANGE:` footer.
 - Commits are signed (`git commit -S`, or `commit.gpgsign` with an SSH or GPG key).
 - Branches: `main` is the only long-lived branch and cannot be deleted or force-pushed. Cut a short-lived branch from it, named `<type>/<issue>-<slug>` (for example `fix/123-powder-search`), and open the pull request against `main`. Delete the branch after the merge.
-- Pull requests are squash-merged into `main`, so history stays linear. The title becomes the commit on `main` and the changelog line, so the `PR title` check enforces the format.
+- Pull requests are squash-merged into `main`, so history stays linear. The title becomes the commit on `main` and the changelog line, so the `PR title` check enforces the format. A merge queue merges them once the required checks pass.
 - Reference the issue in the description (`Closes #123`).
 
 ## Releases
 
-- [Releases and versions](apps/docs/docs/release.md)
+- The release pull request is merged automatically every Monday at 05:00 UTC (the label `hold` skips a week; the owner can also start the merge by hand): [Releases and versions](apps/docs/docs/release.md)
 - CI tools and their settings: [CI tools](apps/docs/docs/ci-tools.md)
