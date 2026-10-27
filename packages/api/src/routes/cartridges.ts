@@ -65,7 +65,7 @@ export interface CartridgeAnswer extends Cartridge {
 
 /**
  * The body of `GET /cartridges/:id`: the stored record with its aliases (empty where it has none),
- * case type and case capacities. Undefined for an unknown id. The Pages edition's data files hold
+ * case type and case capacities. Undefined for an unknown id. The static site's data files hold
  * the same body.
  */
 export function cartridgeAnswer(catalogue: Catalogue, id: string): CartridgeAnswer | undefined {

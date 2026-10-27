@@ -81,7 +81,7 @@ The Apache Software Foundation (https://www.apache.org/).
 
 ---
 
-The web app, the Pages edition and the docs site bundle these packages, each under the MIT
+The web app and the docs site bundle these packages, each under the MIT
 License, whose text is the same as above, with these copyright notices:
 
 - react 19.3.1, react-dom 19.3.1, scheduler 0.28.0 (https://github.com/facebook/react):
@@ -183,7 +183,7 @@ SOFTWARE.
 ---
 
 BEGIN GENERATED: shipped packages
-Third-party packages installed for the API and web images, by name, version and the licence
+Third-party packages installed for the API image and the web app, by name, version and the licence
 package-lock.json declares. Written by `node tools/src/licences.ts --write`.
 
 @fastify/ajv-compiler 4.0.6 MIT

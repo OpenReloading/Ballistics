@@ -43,17 +43,17 @@
   - `npm run test:e2e`: the static export served on `WEB_URL` (default `http://localhost:3003`: `npm run static:build`, then `npm run pages:serve`) and the API on `API_URL` (default `http://localhost:3000`, `node packages/api/dist/server.js`), which the smoke spec's comparison and the load file spec read.
   - In `apps/e2e/`: install the browser once with `npx playwright install --with-deps chromium`.
   - `npm run e2e:smoke`: the smoke spec (the pages, the exported data files and the workbench's example run against the API's answers) against an already running export and API, no build.
-- The static site (GitHub Pages, no server): `apps/web/AGENTS.md`, Pages edition.
-- Static loop (the web app on data files, no API to start; details in `apps/web/AGENTS.md`, Pages edition, and `apps/e2e/AGENTS.md`), after `npm run build`:
+- The static site (GitHub Pages, no server): `apps/web/AGENTS.md`, Static site.
+- Static loop (the web app on data files, no API to start; details in `apps/web/AGENTS.md`, Static site, and `apps/e2e/AGENTS.md`), after `npm run build`:
   - Develop: `npm run dev:static` (http://localhost:3000, `PORT` for another).
-  - Review and test: `npm run static:build` (sample export of the site root into `pages/`), `npm run pages:serve` (http://localhost:3003, the default `WEB_URL`), then `npm run visual-check -w @open-reloading/e2e -- --preset drawing`, `npm run drawing-baseline` and `npm run test:e2e` (the last with the API on `API_URL`).
+  - Review and test: `npm run static:build` (sample export of the site root into `pages/`), `npm run pages:serve` (http://localhost:3003, the default `WEB_URL`), then `npm run visual-check -w @open-reloading/e2e -- --preset drawing`, `npm run drawing-baseline -w @open-reloading/e2e` and `npm run test:e2e` (the last with the API on `API_URL`).
 - One workspace: `npm run <script> -w @open-reloading/<name>`
 - CI (`.github/workflows/ci.yml`) runs the checks above except the docs site build and the Pages site.
   - The required checks of the `main` ruleset are `check`, `e2e`, `workflows`, `conventional`, `dependency-review` and the SonarQube Cloud check `SonarCloud Code Analysis` (a GitHub App, no workflow in the repository) (`apps/docs/docs/ci-tools.md`). `check` is the job that waits for `static` (lint, build, typecheck, import rules, docs check, data validation, API breaking changes, audit, licence policy) and `test (drawing)`, `test (web)`, `test (packages)`, which run in parallel and together run what `npm test` runs. `check` itself also runs lychee offline over the tracked Markdown files (relative links and anchors, `lychee.toml`), on every run including a prose-only one (the command is in `ci.yml`), and runs typos over the tracked text files (`_typos.toml`, which typos skips itself: the records, lockfile, snapshots and golden files are excluded, each accepted term has its reason there; run `typos` from the repository root with a binary from https://github.com/crate-ci/typos/releases). Add a workspace's tests to one of the `test` groups in `ci.yml` when the root `test` script gains it.
   - `e2e` starts the API from `docker compose up api` and runs Schemathesis against it. It builds the static export (`npm run pages -w @open-reloading/tools`, with `--sample` or `--no-docs`) and runs `npm run check-weight -w @open-reloading/web` and `node apps/web/scripts/check-prerender.mts` on it. It serves the export with `tools/src/pages-serve.ts` at `WEB_URL`, runs `npm run test:e2e` (project `full`) and the drawing pixel baseline in the Playwright image (`npm run drawing-baseline -w @open-reloading/e2e`).
   - On a pull request the `changes` job (`apps/web/scripts/ci-plan.mts`) can skip the `check` job (only prose changed) or the `e2e` job (no change to what the API, the web app, the export scripts or the e2e specs read). It can export with `PRERENDER=sample` (no change to record data, record page code or the packages they read): the cartridge pages of the sample only. A spec that opens a cartridge record has it in the sample (`apps/web/src/lib/prerender-sample.ts`). The Turbopack cache (`apps/web/.next/cache/turbopack`, key prefix `next-export`) is restored.
   - A push to the default branch or any doubt builds from nothing, every record page prerendered and checked in full.
-- Other workflows: `links.yml` (daily lychee run over the external links of the Markdown files, one open issue "Broken external links" with the report), `release.yml` (release-please, images with provenance and SBOM, `apps/docs/docs/release.md`: nothing releases until the owner merges the release pull request), `pages.yml` (the Pages site: root = latest release built from its tag, `/next/` = `main`, `apps/web/AGENTS.md`, Pages edition), `pr-title.yml`, `scorecard.yml`. Tools, rules and their free terms: `apps/docs/docs/ci-tools.md`.
+- Other workflows: `links.yml` (daily lychee run over the external links of the Markdown files, one open issue "Broken external links" with the report), `release.yml` (release-please, the API image with provenance and SBOM, `apps/docs/docs/release.md`: nothing releases until the owner merges the release pull request), `pages.yml` (the Pages site: root = latest release built from its tag, `/next/` = `main`, `apps/web/AGENTS.md`, Static site), `pr-title.yml`, `scorecard.yml`. Tools, rules and their free terms: `apps/docs/docs/ci-tools.md`.
 - Commits and pull request titles: Conventional Commits (`CONTRIBUTING.md`).
 
 ## Conventions
@@ -86,22 +86,23 @@
 
 ## Environment
 
-- `API_URL`: base URL of the API for e2e tests, the web app (read at build time for static pages and at run time) and the link of the docs REST API page (site build).
+- `API_URL`: base URL of the API for e2e tests, the web app (read at build time for the record pages, and by the dev server) and the link of the docs REST API page (site build).
 - `WEB_URL`: base URL of the static export for the e2e browser tests (default `http://localhost:3003`).
-- `NEXT_PUBLIC_REPOSITORY_URL`: URL of the public source repository, inlined at web build time (no Dockerfile `ARG`). Unset (`apps/web/src/lib/repository-url.ts`): no repository link in the header or the drawer. Set only by `pages.yml`, to the repository the workflow runs in.
-- `NEXT_PUBLIC_DOCS_URL`: URL of the docs site, inlined at web build time (no Dockerfile `ARG`). Unset (`apps/web/src/lib/docs-url.ts`): no Docs link in the sidebar or the drawer, except where the site has its own `docs/` folder, which the link then opens.
+- `NEXT_PUBLIC_REPOSITORY_URL`: URL of the public source repository, inlined at web build time. Unset (`apps/web/src/lib/repository-url.ts`): no repository link in the header or the drawer. Set only by `pages.yml`, to the repository the workflow runs in.
+- `NEXT_PUBLIC_DOCS_URL`: URL of the docs site, inlined at web build time. Unset (`apps/web/src/lib/docs-url.ts`): no Docs link in the sidebar or the drawer, except where the site has its own `docs/` folder, which the link then opens.
 - `NEXT_PUBLIC_NO_DOCS`: set by `npm run static:build` and `npm run dev:static`, which build no docs site: the link to the site's own `docs/` folder is left out.
-- `APP_URL`: URL of the web app, read at docs site build time for the docs navbar's Web app link (`ARG` of `apps/docs/Dockerfile`, set by `compose.yaml`; `tools/src/pages.ts` sets it to the app's root, `<site root>/next/` for the next edition, from `PAGES_URL`). A full URL; unset: no link.
-- `PAGES_BASE_PATH` (default `''`, the site root), `PAGES_EDITION`, `PAGES_URL`: the static site (`apps/web/AGENTS.md`, Pages edition).
+- `APP_URL`: URL of the web app, read at docs site build time for the docs navbar's Web app link. Set only by `tools/src/pages.ts` for the docs of the Pages site, to the app's root (`<site root>/next/` for the next edition, from `PAGES_URL`). A full URL; unset (the docs image, a local docs build): no link.
+- `PAGES_BASE_PATH` (default `''`, the site root), `PAGES_EDITION`, `PAGES_URL`: the static site (`apps/web/AGENTS.md`, Static site).
 - `PRERENDER`:
-  - `sample`: a web build prerenders the records selected in `apps/web/src/lib/prerender-sample.ts`. Every other record renders on its first visit. The export (`pages.ts`) takes the mode from `--sample` and never from this variable; it cuts the cartridge pages only.
+  - `sample`: a web build prerenders the records selected in `apps/web/src/lib/prerender-sample.ts` and leaves out the other cartridge pages, which a static host answers with 404. The export (`pages.ts`) takes the mode from `--sample` and never from this variable.
   - Unset or any other value: every record.
-  - The dev container sets `sample` (`.devcontainer/compose.yaml`). The deploy image, releases and the default branch build in full.
+  - The dev container sets `sample` (`.devcontainer/compose.yaml`). Releases, the Pages deployment and the default branch build in full.
   - `check-prerender.mts` reads it too: give it the mode of the export it checks (`full` for the full verify, Review and land, step 4, built with `npm run pages -w @open-reloading/tools -- --no-docs`).
 
 ## Containers
 
-- `compose.yaml`: `api` (`packages/api/Dockerfile`, port 3000), `web` (`apps/web/Dockerfile`, port 3001) and `docs` (`apps/docs/Dockerfile`, the static site on nginx, port 3002). Build context is the repository root. Run: `docker compose up` or `podman compose up`.
+- `compose.yaml`: `api` (`packages/api/Dockerfile`, port 3000) and `docs` (`apps/docs/Dockerfile`, the static site on nginx, port 3002). Build context is the repository root. Run: `docker compose up` or `podman compose up`.
+- The API image is the only image `release.yml` publishes. The web app has none: it is the static export, which any static host serves (README, Try it).
 - `.devcontainer/`: Node 26 dev container.
   - Rootless podman only: the `app` service sets `userns_mode: keep-id`, which Docker Engine does not accept.
   - `initializeCommand` writes `.devcontainer/.env` (git-ignored), so the workspace and, in a git worktree, the shared git directory are mounted at their host paths.
@@ -126,7 +127,7 @@ In order, before a change reaches the default branch:
    - Look at `apps/e2e/visual-check-out/sheet.png` (git-ignored, 390 and 1280 px, light and dark).
    - The dev container image holds the e2e Chromium. An older container needs `cd apps/e2e && npx playwright install --only-shell chromium` once.
 4. Full verify once, in the dev container: `npm run build`, `npm run typecheck`, `npm run lint`, `npm test`, the full export (`npm run pages -w @open-reloading/tools -- --no-docs`) served by `npm run pages:serve`, `npm run check-weight -w @open-reloading/web`, `PRERENDER=full node apps/web/scripts/check-prerender.mts`, `npm run test:e2e` with the API running, and the drawing baseline (`npm run drawing-baseline -w @open-reloading/e2e`).
-   - A change to the `exports` of a package the web app imports, to the web app's imports of a package, or to a Dockerfile: also the image build on the host, `podman compose build web` (or `docker compose build web`). CI does not build the web image (`release.yml` does, from the files the Dockerfile copies only), so a local build over the whole workspace does not show a missing one.
+   - A change to the `exports` of a package the web app imports, to the web app's imports of a package, or to a Dockerfile: also that image's build on the host, `podman compose build api` or `docs` (or `docker compose build ...`). CI builds the API image only (the `e2e` job and `release.yml`), from the files its Dockerfile copies, so a local build over the whole workspace does not show a missing one.
 5. Commits signed (`commit.gpgsign` with an SSH key). Never `git filter-branch` (it drops signatures). Re-sign with `git rebase -f --exec 'git commit --amend --no-edit -S' <base>`. Never `--no-verify`.
 6. Push, then CI green on the pushed commit.
 

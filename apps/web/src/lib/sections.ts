@@ -129,7 +129,7 @@ export const toolRoutes = [
 
 export const isToolRoute = (route: string) => toolRoutes.includes(route)
 
-/** The route without the trailing slash of the Pages edition's URLs (`trailingSlash`), `/` as is. */
+/** The route without the trailing slash of the static site's URLs (`trailingSlash`), `/` as is. */
 export const routeOf = (pathname: string) => pathname.replace(/(.)\/$/, '$1')
 
 const pages = sections.flatMap((s): readonly PageEntry[] => s.pages)

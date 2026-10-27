@@ -61,7 +61,7 @@ export function pickIds(
 }
 
 /**
- * The ids of `what` the Pages edition prerenders. A page the export leaves out answers 404 and the
+ * The ids of `what` the static site prerenders. A page the export leaves out answers 404 and the
  * links to it log that, so the sample cuts the cartridge pages only (about 85 % of the export).
  */
 export function exportIds(

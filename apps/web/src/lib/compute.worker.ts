@@ -1,4 +1,4 @@
-/** Web Worker of the Pages edition: runs one compute task of `@open-reloading/api/compute` per message. */
+/** Web Worker of the static site: runs one compute task of `@open-reloading/api/compute` per message. */
 import { runTask, serializeError, type Task } from '@open-reloading/api/compute'
 
 self.onmessage = (e: MessageEvent<Task>) => {

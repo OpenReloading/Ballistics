@@ -16,7 +16,7 @@ Option C (inline field and dialog) with matching in the browser (E) and a "Sort 
 ## What the search does today
 
 - `RecordSearch` (`apps/web/src/components/record-search.tsx:43`) sends `GET <kind>?q=<text>&limit=20` 300 ms after the last key (`:110`), from 2 characters on. The Ctrl+K palette (`apps/web/src/components/workbench-search.tsx`) sends the same `q` per kind with 8 matches each.
-- `q` was one substring test (`ilike '%q%'`) over the manufacturer name or an alias, a space, and the product name; for cartridges it tested names and aliases. The numbers below were measured with it. The API and the Pages edition now rank with the schema's matcher (`apps/docs/docs/data/catalogue-storage.md`).
+- `q` was one substring test (`ilike '%q%'`) over the manufacturer name or an alias, a space, and the product name; for cartridges it tested names and aliases. The numbers below were measured with it. The API and the browser's data files now rank with the schema's matcher (`apps/docs/docs/data/catalogue-storage.md`).
 - The words must stand next to each other in that order. Nothing else is searched (no caliber, no weight), and a number is a substring (`168` also matches `0.168`).
 - The answer is ordered by manufacturer name, name, id: no relevance order, and no way to narrow other than typing more.
 - Enter chooses only when exactly one row is shown and none is highlighted.
@@ -75,9 +75,9 @@ Cost of the current path: the API answers `q` in a median of 4.5 ms (bullets), 2
 
 ## Search technology
 
-All three work in the server edition and the Pages edition.
+All three work in the browser and against the API.
 
-**D. Server `q` with tokens.** Keep the list routes, make `q` token based on the server, add query parameters for caliber and mass ranges. One request per search, about 4 KB for 20 rows (a 200-row page is 41 KB at 10,000 bullets). Needs a contract change (baseline, schema, docs) and the same rule a second time in the Pages edition's file reader (`static-api.ts`), tested against the API. Server time at 10,000 records is not measured (unverified; the current substring scan is linear).
+**D. Server `q` with tokens.** Keep the list routes, make `q` token based on the server, add query parameters for caliber and mass ranges. One request per search, about 4 KB for 20 rows (a 200-row page is 41 KB at 10,000 bullets). Needs a contract change (baseline, schema, docs) and the same rule a second time in the browser's file reader (`static-api.ts`), tested against the API. Server time at 10,000 records is not measured (unverified; the current substring scan is linear).
 
 **E. The browser reads the whole list through the existing routes once, then matches and orders.** No API change. The browser's own designs and the cartridge fit filter (`bulletFits` of core) are already client side.
 
@@ -103,7 +103,7 @@ All three work in the server edition and the Pages edition.
 | later searches | 0 to 18 files, 0 to 12 KB | 0 to 20 files, 0 to 7 KB |
 | search time | 1 to 77 ms | 4 to 81 ms |
 
-F has small first loads and scales further than E, but it adds ten thousand files to the Pages edition (about 300 MB already), a separate build step in both editions, no numeric range filter (weight and diameter ranges need buckets as filters), ranking weights per field only, and the browser's own designs and the cartridge fit are outside the index, which needs a second code path to merge them.
+F has small first loads and scales further than E, but it adds ten thousand files to the static site (about 300 MB already), a separate build step, no numeric range filter (weight and diameter ranges need buckets as filters), ranking weights per field only, and the browser's own designs and the cartridge fit are outside the index, which needs a second code path to merge them.
 
 Where E stops: the whole-list read is linear, so 10,000 rows per kind cost about 0.2 MB gzip and 1 to 2 s on a slow device. Past about 50,000 rows (unverified) D or F is the better base.
 
@@ -145,11 +145,11 @@ Decision 3, sorting the result:
 3. **Powder and cartridge dialogs on the same shell.** Filters of their lists (powders: base, grain form, burn-rate order; cartridges: case type, caliber, Pmax); the shell is extracted from the bullet dialog.
    - Each of the three cards opens its dialog from the button of its field.
    - One keyboard spec covers the shared shell; kinds differ only by columns and filters.
-4. **Catalogue loading and indexing.** Keep the list across page loads (the offline layer's cache), read pages together, move the index build to a worker above a measured row count, and check the Pages edition against the server edition.
+4. **Catalogue loading and indexing.** Keep the list across page loads (the offline layer's cache), read pages together, move the index build to a worker above a measured row count, and check the browser's answers against the API's.
    - The dialog opens from a warm cache without a request.
-   - A test compares the Pages edition's pages with the API's.
+   - A test compares the browser's pages with the API's.
 5. **Server `q` with tokens**, only if decision 2 is D, or for callers that stay on the API (the designers, the seating preview and the trajectory form pickers). Same rule in the API and in `static-api.ts`; the contract baseline rewritten in the same change.
-   - The queries of follow-up 1 give the same hits from the API and from the Pages edition.
+   - The queries of follow-up 1 give the same hits from the API and from the browser.
    - `api:check` and `api:conformance` pass.
 6. **Firearm catalogue search**, after the firearm records decision. Manufacturer, model, variant, barrel length and caliber as fields and filters in the same shell, measured with a generated list of 10,000 firearms.
    - A firearm is found by `<manufacturer> <caliber>` and `<model> <barrel length>` in any word order.
