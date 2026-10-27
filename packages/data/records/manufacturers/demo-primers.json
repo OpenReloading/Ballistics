@@ -1,0 +1,13 @@
+{
+  "id": "demo-primers",
+  "name": "Demo Primers",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "synthetic-test-data",
+        "note": "Invented name for tests and the example; not a real company."
+      }
+    ]
+  }
+}

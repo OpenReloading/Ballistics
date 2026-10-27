@@ -1,0 +1,78 @@
+import { z } from 'zod'
+import { recordId } from './ids.ts'
+import { provenance } from './provenance.ts'
+import { quantity } from './units.ts'
+
+/**
+ * Sizes of a primer: small or large, for rifle or pistol cartridges, or the shotshell primer.
+ * Inferred type: {@link PrimerSize}.
+ */
+export const primerSizes = z.enum([
+  'small-rifle',
+  'large-rifle',
+  'small-pistol',
+  'large-pistol',
+  'shotshell',
+])
+
+/** A size of {@link primerSizes}. */
+export type PrimerSize = z.infer<typeof primerSizes>
+
+/** Cup metals of a primer: `brass` and `nickel-plated-brass`, `copper`, `steel`. */
+export const primerCupMaterials = z.enum(['brass', 'nickel-plated-brass', 'copper', 'steel'])
+
+/** Priming compounds of a primer: `lead-styphnate` based or `lead-free`. */
+export const primerCompounds = z.enum(['lead-styphnate', 'lead-free'])
+
+/** The cup of a primer: its metal and wall thickness, where the source gives them. */
+const primerCup = z.strictObject({
+  material: primerCupMaterials.describe('Metal of the cup.').optional(),
+  thickness: quantity('length', z.number().positive())
+    .describe('Wall thickness of the cup.')
+    .optional(),
+})
+
+/** One figure of output or sensitivity a source publishes, kept as the source states it. */
+const primerFigure = z.strictObject({
+  property: z
+    .string()
+    .min(1)
+    .describe('What the figure describes, as the source names it, for example a drop height.'),
+  value: z.string().min(1).describe('The figure as the source prints it, with its unit.'),
+})
+
+/**
+ * A primer as its manufacturer sells it. No primer value enters a solver.
+ * Inferred type: {@link Primer}.
+ */
+export const primer = z.strictObject({
+  id: recordId,
+  /** Id of the manufacturer record. */
+  manufacturer: recordId,
+  name: z.string().min(1).describe('Name of the product as the manufacturer prints it.'),
+  productNumber: z.string().min(1).describe('Product number.').optional(),
+  size: primerSizes.describe('Small or large, for rifle or pistol, or the shotshell primer.'),
+  magnum: z
+    .boolean()
+    .describe('Whether the manufacturer sells the primer as a magnum primer.')
+    .optional(),
+  cup: primerCup.describe('The cup of the primer.').optional(),
+  compound: primerCompounds
+    .describe('The priming compound: lead styphnate or lead-free.')
+    .optional(),
+  intendedUse: z
+    .string()
+    .min(1)
+    .describe('What the manufacturer sells the primer for, in the words of this record.')
+    .optional(),
+  performance: z
+    .array(primerFigure)
+    .min(1)
+    .describe('Output or sensitivity figures the source publishes.')
+    .optional(),
+  note: z.string().min(1).describe('Notes on the product.').optional(),
+  provenance,
+})
+
+/** A primer record: product, size, magnum flag, cup, priming compound and published figures. */
+export interface Primer extends z.infer<typeof primer> {}

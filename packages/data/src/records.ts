@@ -26,8 +26,10 @@ import {
   type Manufacturer,
   manufacturer,
   type Powder,
+  type Primer,
   parseRef,
   powder,
+  primer,
   type RangeFirings,
   type Renames,
   rangeFirings,
@@ -57,6 +59,7 @@ import {
   checkLoadCapacityReferences,
   checkLoadCaseReferences,
   checkLoadComponentReferences,
+  checkLoadPrimerReferences,
   checkLoadReferences,
   checkLoadSessionReferences,
   checkManufacturerReferences,
@@ -107,6 +110,7 @@ export type Bundle = {
   caliberClasses: CaliberClass[]
   manufacturers: Manufacturer[]
   powders: Powder[]
+  primers: Primer[]
   bullets: Bullet[]
   cases: CatalogueCase[]
   capacities: CatalogueCaseCapacity[]
@@ -140,6 +144,7 @@ function readBundle(roots: string[], errors: string[]): Bundle {
     caliberClasses: read('caliber-classes', caliberClass),
     manufacturers: read('manufacturers', manufacturer),
     powders: read('powders', powder),
+    primers: read('primers', primer),
     bullets: read('bullets', bullet),
     cases: read('cases', catalogueCase),
     capacities: read('capacities', catalogueCaseCapacity),
@@ -191,6 +196,7 @@ function checkSourceCoverage(bundle: Bundle, errors: string[]) {
     ['manufacturers', bundle.manufacturers],
     ['caliber-classes', bundle.caliberClasses],
     ['powders', bundle.powders],
+    ['primers', bundle.primers],
     ['bullets', bundle.bullets],
     ['cases', bundle.cases],
     ['capacities', bundle.capacities],
@@ -275,6 +281,7 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
   checkRangeRounds(bundle.rangeFirings, errors)
   checkLoadReferences(bundle, ids, errors)
   checkLoadComponentReferences(bundle, errors)
+  checkLoadPrimerReferences(bundle, errors)
   checkLoadCapacityReferences(bundle, errors)
   checkLoadCaseReferences(bundle, ids, errors)
   checkLoadSessionReferences(bundle, errors)

@@ -44,7 +44,7 @@ The budgets, tested as the best of fifteen runs after a warm-up (other test file
 
 ## Renames and the format guard
 
-`packages/data/records/renames.json` lists, per kind directory that has an id route (`cartridges`, `manufacturers`, `powders`, `bullets`, `cases`, `target-faces`, `federations`, `disciplines`, `target-mappings`, `caliber-classes`), the ids that no longer name a record, each with the id of the record that replaced it (`renames` in `packages/schema/src/renames.ts`). A record that was removed names its successor. The file is `{}` until an id changes.
+`packages/data/records/renames.json` lists, per kind directory that has an id route (`cartridges`, `manufacturers`, `powders`, `primers`, `bullets`, `cases`, `target-faces`, `federations`, `disciplines`, `target-mappings`, `caliber-classes`), the ids that no longer name a record, each with the id of the record that replaced it (`renames` in `packages/schema/src/renames.ts`). A record that was removed names its successor. The file is `{}` until an id changes.
 
 - `data:validate` (`src/renames.ts`, `src/references.ts`, `src/federations.ts`): a reference to an unknown id fails, unless the id is an old id of `renames.json`. An old id must be no current record, and its replacement must be one, so a rename never chains. A kind without an id route, an id that is no record id or a file that is not JSON fails.
 - The catalogue carries the renames in its index. A reference to an old id joins the record that replaced it (a component's manufacturer, a capacity's cartridge, a mapping's discipline and face). A record is answered as stored, so the reference in its body keeps the old id.

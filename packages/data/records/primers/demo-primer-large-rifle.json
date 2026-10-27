@@ -1,0 +1,27 @@
+{
+  "id": "demo-primer-large-rifle",
+  "manufacturer": "demo-primers",
+  "name": "Large Rifle Demo",
+  "productNumber": "DP-LR",
+  "size": "large-rifle",
+  "magnum": false,
+  "cup": {
+    "material": "brass",
+    "thickness": {
+      "value": 0.5
+    }
+  },
+  "compound": "lead-styphnate",
+  "intendedUse": "General rifle loads (invented).",
+  "provenance": {
+    "kind": "computed",
+    "sources": [
+      {
+        "source": "synthetic-test-data",
+        "kind": "computed",
+        "fields": ["size", "magnum", "cup", "compound", "intendedUse"],
+        "note": "Invented values for tests and the example; not a real product."
+      }
+    ]
+  }
+}

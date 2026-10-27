@@ -4,16 +4,16 @@ Canonical records in git, validated against `@open-reloading/schema`, bundled fo
 
 ## Layout
 
-`readRecords` reads one records root or several read as one set (`src/records.ts`). `records/powders`, `records/bullets` and `records/cases` hold the synthetic demo records (CC0-1.0). `records/capacities`, `records/loads` and `records/chrono` hold none. `firings` and `range` have no folder: `readRecords` reads them where a records root has one.
+`readRecords` reads one records root or several read as one set (`src/records.ts`). `records/powders`, `records/primers`, `records/bullets` and `records/cases` hold the synthetic demo records (CC0-1.0). `records/capacities`, `records/loads` and `records/chrono` hold none. `firings` and `range` have no folder: `readRecords` reads them where a records root has one.
 
 | Path | Kind and rules |
 |---|---|
 | `records/cartridges/<id>.json` | `Cartridge`, one per C.I.P. sheet: names (aliases printed on the sheet), table, dates and values. Its source cites `cip-tdcc` with the sheet's URL, SHA-256 and retrieval date. |
 | `records/manufacturers/<id>.json` | `Manufacturer` (name, website, aliases). The id is the slug of the name without the legal form and never changes (`apps/docs/docs/data/manufacturers.md`). |
-| `records/powders/<id>.json`, `records/bullets/<id>.json` | Components as their manufacturers sell them. `manufacturer` must exist. |
+| `records/powders/<id>.json`, `records/primers/<id>.json`, `records/bullets/<id>.json` | Components as their manufacturers sell them. `manufacturer` must exist. A primer carries no value a solver reads (`apps/docs/docs/data/primers.md`); `demo-primer-*` are synthetic (CC0-1.0). |
 | `records/cases/<id>.json` | `Case` (`origin` `catalogue`, `manufacturer` and `cartridge` as `catalogue:<id>` references), a case product per cartridge. `cartridge` and `manufacturer` must exist. `demo-case-308-brass` is synthetic (CC0-1.0). |
 | `records/capacities/<id>.json` | `CaseCapacity` (`origin` `catalogue`, `cartridge` and `caseManufacturer` as `catalogue:<id>` references), one figure from one source. `cartridge` must exist, and `caseManufacturer` where set. |
-| `records/loads/<id>.json` | `Load` records (`origin` `catalogue`, records named by `catalogue:<id>` references). `cartridge`, `bullet`, `powder`, `capacity` and `case.record` (where set) must exist, and a case record must be a case of the load's cartridge, except a bullet or powder a measured load describes by maker and name. |
+| `records/loads/<id>.json` | `Load` records (`origin` `catalogue`, records named by `catalogue:<id>` references). `cartridge`, `bullet`, `powder`, `capacity`, `primer.record` and `case.record` (where set) must exist, and a case record must be a case of the load's cartridge, except a bullet or powder a measured load describes by maker and name. |
 | `records/chrono/<id>.json` | `ChronoSession` records. Every `load` of a shot string must name a load record. |
 | `records/range/<id>.json` | `RangeFirings`, spark-range rounds of one projectile from a report (Mach, total yaw, drag coefficient at that yaw). Not served by the API yet. |
 | `records/firings/<id>.json` | `FiringSeries`, rounds fired and measured by others as a publication reports them. `cartridge` must exist. Every source names its URL and `license`. |
@@ -67,8 +67,8 @@ Every finding below fails validation.
 - Capacities, powders and chronograph sessions: `checkCapacity`, `checkPowder`, `checkChronoSession` in `src/plausibility.ts`.
 - Renames (`src/renames.ts`): an old id that is still a record, a replacement that is no record and a file that breaks the schema fail. Where a reference check names an unknown id, an old id of `renames.json` counts as known (`src/references.ts`, `src/federations.ts`).
 - Caliber classes (`checkCaliberClasses`, `src/caliber-classes.ts`): a member that is no cartridge record, a cartridge in two classes, a member without G1 on its cartridge side, a nominal diameter more than 0.15 mm from G1 of a member, and a class id of a discipline that is no record.
-- Duplicate names (`src/names.ts`): cartridges, powders (names and aliases), bullets, cases (per manufacturer and cartridge), range records and target faces.
-- Sources (`checkCoverage`, `src/coverage.ts`): in powders, bullets, cases, capacities, federations, disciplines, target mappings and caliber classes, every data field must be supported by a source.
+- Duplicate names (`src/names.ts`): cartridges, powders (names and aliases), primers (per manufacturer), bullets, cases (per manufacturer and cartridge), range records and target faces.
+- Sources (`checkCoverage`, `src/coverage.ts`): in powders, primers, bullets, cases, capacities, federations, disciplines, target mappings and caliber classes, every data field must be supported by a source.
   - A source with `fields` supports only those dot paths (`base.length`, `ballisticCoefficients`).
   - Identity fields (`manufacturer`, `name`, `productNumber`, ...) need no field-level source.
 - Powder `interior` (`checkFittedSources` in `src/load-tables.ts`): only `fitted` sources for `interior` that name a manufacturer load table listed in `load-tables.json` of a records root (`readLoadTables` in `src/records.ts`) and the fit run (`run`: model version, report). The load table's `manufacturer` must exist (`checkManufacturerReferences` in `src/references.ts`).

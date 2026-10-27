@@ -1,0 +1,26 @@
+{
+  "id": "demo-primer-small-pistol-lead-free",
+  "manufacturer": "demo-primers",
+  "name": "Small Pistol Lead-Free Demo",
+  "productNumber": "DP-SP",
+  "size": "small-pistol",
+  "magnum": false,
+  "compound": "lead-free",
+  "performance": [
+    {
+      "property": "Invented drop height",
+      "value": "30 mm"
+    }
+  ],
+  "provenance": {
+    "kind": "computed",
+    "sources": [
+      {
+        "source": "synthetic-test-data",
+        "kind": "computed",
+        "fields": ["size", "magnum", "compound", "performance"],
+        "note": "Invented values for tests and the example; not a real product."
+      }
+    ]
+  }
+}

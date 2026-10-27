@@ -32,7 +32,7 @@ const validLoad = {
   },
   powder: { manufacturer: 'catalogue:test-manufacturer', name: 'Powder' },
   charge: { value: 3 },
-  primer: { manufacturer: 'catalogue:test-manufacturer', model: 'LR' },
+  primer: { record: 'catalogue:test-primer', lot: 'R-1' },
   case: { manufacturer: 'catalogue:test-manufacturer', firingCount: 1 },
   provenance: measured,
 }

@@ -721,21 +721,17 @@ describe('checkUserRefs', () => {
     expect(checkUserRefs([catalogue as UserRecord])).toEqual([])
   })
 
-  it('reports a load whose primer or case names a user manufacturer nobody answers', () => {
+  it('reports a load whose case names a user manufacturer nobody answers', () => {
     const base = userRecord.parse(loadRecord)
     const withMakers = {
       ...base,
       data: {
         ...base.data,
-        primer: { manufacturer: `user:${uuid}` },
         case: { manufacturer: `user:${uuid}` },
       },
     } as UserRecord
-    expect(checkUserRefs([withMakers]).map((d) => d.field)).toEqual([
-      'primer.manufacturer',
-      'case.manufacturer',
-    ])
-    expect(userRefFields(withMakers)).toEqual(['primer.manufacturer', 'case.manufacturer'])
+    expect(checkUserRefs([withMakers]).map((d) => d.field)).toEqual(['case.manufacturer'])
+    expect(userRefFields(withMakers)).toEqual(['case.manufacturer'])
     expect(checkUserRefs([withMakers, userRecord.parse(manufacturerRecord)])).toEqual([])
   })
 
