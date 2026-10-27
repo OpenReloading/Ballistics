@@ -275,6 +275,8 @@ describe('interiorOption', () => {
     const counts = o.yAxis.map((a) => a.max / a.interval)
     expect(new Set(counts).size).toBe(1)
     expect(o.xAxis.name).toBe('in')
+    // the tick labels are text, not the border colour of the axis line
+    expect(o.xAxis.axisLabel.color).toBe(theme.muted)
     expect(o.series).toHaveLength(6)
     const own = o.series.filter((s) => s.lineStyle.opacity === 1)
     expect(own.map((s) => s.name)).toEqual([

@@ -164,7 +164,7 @@ export function CopyHash({ hash }: { hash: string }) {
           >
             <UnstyledButton
               className="hash-copy"
-              aria-label={copied ? 'Hash copied' : `Copy hash ${hash}`}
+              aria-label={copied ? 'Hash copied' : `Copy hash ${hash.slice(0, shortDigits)}`}
               onClick={copy}
             >
               {/* the rest stays in the text for print */}

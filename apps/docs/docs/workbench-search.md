@@ -130,7 +130,7 @@ Decision 3, sorting the result:
 - Filters: manufacturer, caliber (with counts), mass range in the preset's unit, source (all, catalogue, my designs; shown with designs), the cartridge fit as a removable chip, and the sort choice.
 - Mixing records: the browser's designs are listed with a "Your design" badge, found by the same words and filters, first among equals.
 - Phone: full screen; the filters sit behind a Filters button (Sort stays visible), each row stacks the name over caliber, mass and BC, the preview is left out. At 1280 px the result list and the preview sit side by side.
-- Tests: `apps/web/test/bullet-search.test.ts` (the query patterns of the failure table that returned too few rows, ranking and filters) and `apps/e2e/tests/web/bullet-search-dialog.spec.ts` (keyboard flow, Sort by, the card's field; axe clean in light and dark at 390 and 1280 px).
+- Tests: `apps/web/test/bullet-search.test.ts` (the query patterns of the failure table that returned too few rows, ranking and filters) and `apps/e2e/tests/web/bullet-search-dialog.spec.ts` (keyboard flow, Sort by, the card's field); the dialog is swept by axe in `a11y-states.spec.ts`.
 - Not done: rows beyond the first 100 are not drawn (a window as the directory tables use is needed), no typo tolerance, no sortable headers, no powder or cartridge dialog, and the catalogue is read again on each page load. The cartridge and powder fields and the cartridge and powder groups of Ctrl+K still use the API's `q`.
 
 ## Follow-up issues (proposed)
