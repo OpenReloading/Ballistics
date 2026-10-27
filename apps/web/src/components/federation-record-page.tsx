@@ -19,6 +19,7 @@ import type { DisciplineSummary, MappingSummary } from '../lib/face-disciplines.
 import { titleFromKebab } from '../lib/record-fields.ts'
 import { readItems, readRecord } from '../lib/record-reads.ts'
 import { controlSize } from '../lib/theme.ts'
+import { Decimal } from './decimal.tsx'
 import { FieldTable } from './field-table.tsx'
 import { HomepageLink } from './homepage-link.tsx'
 import { Panel } from './panel.tsx'
@@ -144,7 +145,9 @@ function FederationRecordView({
                     <th scope="row">
                       <Link href={`/disciplines/${d.id}`}>{d.name}</Link>
                     </th>
-                    <td className="nowrap">{`${toSi('length', d.distanceMm)} m`}</td>
+                    <td className="nowrap">
+                      <Decimal text={String(toSi('length', d.distanceMm))} /> m
+                    </td>
                     <td>{d.category && titleFromKebab(d.category)}</td>
                     <td className="num">{disciplineFaceIds(mappings, d.id).length}</td>
                   </tr>
