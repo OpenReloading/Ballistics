@@ -6,8 +6,12 @@
  * license (`data/LICENSE`) and `.nojekyll`.
  * `PAGES_URL` (the site's origin) sets the docs' `url` and the app's `metadataBase`. Needs
  * `npm run build` at the root first.
- * `--sample`: only the records of `apps/web/src/lib/prerender-sample.ts` prerendered and no docs
- * site, for the review and e2e loop (the data files stay complete).
+ * `--sample`: only the cartridge pages of `apps/web/src/lib/prerender-sample.ts` prerendered (the
+ * data files stay complete) and no docs site, for the review and e2e loop.
+ * `--no-docs`: no docs site, every record prerendered (the e2e job's full export).
+ * `--keep-build`: leaves `apps/web/.next` as it is before and after the build, the Turbopack cache
+ * a CI run restored and the manifests `check-weight` reads. Only for a run that builds this edition
+ * alone: one edition's cache fails the other's build.
  */
 import { spawn } from 'node:child_process'
 import { cpSync, rmSync, writeFileSync } from 'node:fs'
@@ -22,6 +26,8 @@ if (base === undefined || !/^(\/[^/]+)*$/.test(base))
   throw new Error('PAGES_BASE_PATH must be set: "" or a path such as /Ballistics')
 
 const sample = process.argv.includes('--sample')
+const keepBuild = process.argv.includes('--keep-build')
+const docs = !sample && !process.argv.includes('--no-docs')
 const at = (p: string) => fileURLToPath(new URL(`../../${p}`, import.meta.url))
 const site = at('pages')
 
@@ -41,7 +47,9 @@ function run(args: string[], env: Record<string, string | undefined>) {
 }
 
 // the web app's build directory and Turbopack cache: one edition's cache fails the other's build
-const clearWebBuild = () => rmSync(at('apps/web/.next'), { recursive: true, force: true })
+const clearWebBuild = () => {
+  if (!keepBuild) rmSync(at('apps/web/.next'), { recursive: true, force: true })
+}
 // the data files of `npm run dev:static` would end in the export beside the ones written below
 rmSync(at('apps/web/public/api'), { recursive: true, force: true })
 const api = await startBundleApi()
@@ -51,8 +59,8 @@ try {
   await run(['run', 'build', '-w', '@open-reloading/web'], {
     API_URL: api.url,
     PRERENDER: sample ? 'sample' : 'full',
-    // no docs site in a sample: no Docs link to a 404
-    NEXT_PUBLIC_NO_DOCS: sample ? '1' : undefined,
+    // no docs site: no Docs link to a 404
+    NEXT_PUBLIC_NO_DOCS: docs ? undefined : '1',
   })
   rmSync(site, { recursive: true, force: true })
   cpSync(at('apps/web/out'), site, { recursive: true })
@@ -69,7 +77,7 @@ const docsEnv = {
   API_URL: undefined,
   PAGES_BASE_PATH: undefined,
 }
-if (!sample)
+if (docs)
   await run(
     ['run', 'site:build', '-w', '@open-reloading/docs', '--', '--out-dir', `${site}/docs`],
     {

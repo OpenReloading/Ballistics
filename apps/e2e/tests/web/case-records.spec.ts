@@ -11,7 +11,7 @@ test('the case list opens a case record with its cartridge', async ({ page }) =>
   await expect(page.getByRole('heading', { level: 1 })).toContainText('308 Win. Brass Demo')
   await expect(page.getByRole('link', { name: '308 Win.' })).toHaveAttribute(
     'href',
-    '/cartridges/308-win',
+    '/cartridges/308-win/',
   )
 })
 

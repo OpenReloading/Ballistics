@@ -24,9 +24,10 @@ env:
   SCHEMATHESIS_IMAGE: docker.io/schemathesis/schemathesis:v4.29.4@sha256:16d21ecba0097fc8a3ca71b8d1db3797d2a057610d808715871216450e63f0a6
 
 jobs:
-  # Which jobs run and what the e2e job builds: only a pull request may skip `check` (prose only), `e2e` (no
-  # change to what the API, the web app or the e2e specs read) or the web build, or prerender a sample of the
-  # records. Every other event (the default branch) and every doubt runs everything; see apps/web/scripts/ci-plan.mts.
+  # Which jobs run and what the e2e job exports: only a pull request may skip `check` (prose only) or `e2e` (no
+  # change to what the API, the web app, the export scripts or the e2e specs read), or export a sample of the
+  # cartridge pages. Every other event (the default branch) and every doubt runs everything; see
+  # apps/web/scripts/ci-plan.mts.
   changes:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -35,7 +36,6 @@ jobs:
     outputs:
       check: ${{ steps.plan.outputs.check }}
       e2e: ${{ steps.plan.outputs.e2e }}
-      web: ${{ steps.plan.outputs.web }}
       prerender: ${{ steps.plan.outputs.prerender }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -191,17 +191,23 @@ jobs:
           fail-on-severity: high
           fail-on-scopes: runtime, development, unknown
 
+  # The API runs from its compose service, as shipped: Schemathesis checks it against its document and the load
+  # file spec posts to it. The tests, the drawing baseline, the JavaScript budget and the prerender check run on the
+  # static export (`npm run pages -w @open-reloading/tools`, served at the site root by `pages-serve`), which holds
+  # no API: the smoke spec compares its data files and its workbench with the API's answers.
   e2e:
     needs: changes
-    # a failed `changes` job still runs e2e, with empty outputs: the web app and every record page are built
+    # a failed `changes` job still runs e2e, with empty outputs: every record page is exported
     if: ${{ !cancelled() && needs.changes.outputs.e2e != 'false' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
       contents: read
     env:
-      # only a pull request with outputs that say so skips the web build
-      BUILD_WEB: ${{ github.event_name != 'pull_request' || needs.changes.outputs.web != 'false' }}
+      API_URL: http://localhost:3000
+      WEB_URL: http://localhost:3003
+      # only a pull request whose plan says so exports the sample of the cartridge pages
+      PRERENDER: ${{ github.event_name == 'pull_request' && needs.changes.outputs.prerender == 'sample' && 'sample' || 'full' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -215,13 +221,13 @@ jobs:
       - run: npm ci --ignore-scripts && node patches/apply.mjs
       - run: ../../node_modules/.bin/playwright install --with-deps chromium
         working-directory: apps/e2e
-      # specs import web sources, which import the workspace packages from their dist/
-      - run: npm run build -w @open-reloading/schema && npm run build -w @open-reloading/importers && npm run build -w @open-reloading/core && npm run build -w @open-reloading/drawing
-      - run: docker compose up --detach --build api web
-      - name: Wait for the API and the web app
+      # the export build and the specs import the workspace packages from their dist/
+      - run: npm run build -w @open-reloading/schema && npm run build -w @open-reloading/importers && npm run build -w @open-reloading/core && npm run build -w @open-reloading/drawing && npm run build -w @open-reloading/data && npm run build -w @open-reloading/api
+      - run: docker compose up --detach --build api
+      - name: Wait for the API
         run: |
           for _ in $(seq 1 60); do
-            curl --silent --fail http://localhost:3000/ && curl --silent --fail http://localhost:3001/ && exit 0
+            curl --silent --fail http://localhost:3000/ && exit 0
             sleep 2
           done
           docker compose logs
@@ -229,10 +235,53 @@ jobs:
       # `npm run api:conformance` in the dev container; the same Schemathesis version and checks
       - name: API conformance to its document (Schemathesis)
         run: |
-          npm run build -w @open-reloading/data -w @open-reloading/api
           TMPDIR="$RUNNER_TEMP" node tools/src/openapi.ts
           docker run --rm --network=host -v "$RUNNER_TEMP:/doc:ro" "$SCHEMATHESIS_IMAGE" \
             run /doc/openapi.json --url http://localhost:3000 --checks not_a_server_error,status_code_conformance,content_type_conformance,response_schema_conformance
+      # The Turbopack compile cache only (.next/cache/fetch-cache holds API responses, so it never leaves the run).
+      # A pull request restores the newest cache of its own branch or of the default branch (GitHub scopes caches
+      # that way, so a fork's cache cannot reach another branch); a push to the default branch
+      # builds from nothing and saves the cache that pull requests start from.
+      - name: Key of the Turbopack cache
+        id: next
+        run: |
+          next=$(node -p "require('./apps/web/package.json').dependencies.next")
+          echo "prefix=next-export-$RUNNER_OS-$RUNNER_ARCH-$next" >> "$GITHUB_OUTPUT"
+      - name: Restore the Turbopack cache
+        id: cache
+        if: github.event_name == 'pull_request'
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: apps/web/.next/cache/turbopack
+          key: ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'package-lock.json', 'patches/**', 'apps/web/next.config.ts') }}-${{ hashFiles('apps/web/src/**', 'packages/*/src/**') }}
+          restore-keys: |
+            ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'package-lock.json', 'patches/**', 'apps/web/next.config.ts') }}-
+      # `--keep-build` leaves .next to the cache and to the JavaScript budget; the docs site is no part of this job
+      - name: Export the static site
+        run: |
+          if [ "$PRERENDER" = sample ]; then
+            npm run pages -w @open-reloading/tools -- --sample --keep-build
+          else
+            npm run pages -w @open-reloading/tools -- --no-docs --keep-build
+          fi
+        env:
+          PAGES_BASE_PATH: ''
+      - name: Save the Turbopack cache
+        if: steps.cache.outputs.cache-hit != 'true' && (github.event_name == 'pull_request' || github.ref == format('refs/heads/{0}', github.event.repository.default_branch))
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: apps/web/.next/cache/turbopack
+          key: ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'package-lock.json', 'patches/**', 'apps/web/next.config.ts') }}-${{ hashFiles('apps/web/src/**', 'packages/*/src/**') }}
+      - name: JavaScript budget per route
+        run: npm run check-weight -w @open-reloading/web
+      - run: node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON apps/web/scripts/check-prerender.mts
+      - name: Serve the export
+        run: |
+          node tools/src/pages-serve.ts &
+          for _ in $(seq 1 30); do curl --silent --fail http://localhost:3003/ > /dev/null && exit 0; sleep 1; done
+          exit 1
+        env:
+          PAGES_BASE_PATH: ''
       - run: npm run test:e2e
       - name: Drawing baseline in the Playwright image
         run: npm run drawing-baseline -w @open-reloading/e2e
@@ -271,55 +320,5 @@ jobs:
         with:
           name: e2e-test-results
           path: apps/e2e/test-results
-      # The Turbopack compile cache only (.next/cache/fetch-cache holds API responses, so it never leaves the run).
-      # A pull request restores the newest cache of its own branch or of the default branch (GitHub scopes caches
-      # that way, so a fork's cache cannot reach another branch); a push to the default branch
-      # builds from nothing and saves the cache that pull requests start from.
-      - name: Key of the Turbopack cache
-        id: next
-        if: env.BUILD_WEB == 'true'
-        run: |
-          next=$(node -p "require('./apps/web/package.json').dependencies.next")
-          echo "prefix=next-$RUNNER_OS-$RUNNER_ARCH-$next" >> "$GITHUB_OUTPUT"
-      - name: Restore the Turbopack cache
-        id: cache
-        if: env.BUILD_WEB == 'true' && github.event_name == 'pull_request'
-        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: apps/web/.next/cache/turbopack
-          key: ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'package-lock.json', 'patches/**', 'apps/web/next.config.ts') }}-${{ hashFiles('apps/web/src/**', 'packages/*/src/**') }}
-          restore-keys: |
-            ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'package-lock.json', 'patches/**', 'apps/web/next.config.ts') }}-
-      - name: Build the web app against the API
-        if: env.BUILD_WEB == 'true'
-        run: npm run build -w @open-reloading/web
-        env:
-          API_URL: http://localhost:3000
-          PRERENDER: ${{ github.event_name == 'pull_request' && needs.changes.outputs.prerender == 'sample' && 'sample' || 'full' }}
-      - name: Save the Turbopack cache
-        if: env.BUILD_WEB == 'true' && steps.cache.outputs.cache-hit != 'true' && (github.event_name == 'pull_request' || github.ref == format('refs/heads/{0}', github.event.repository.default_branch))
-        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: apps/web/.next/cache/turbopack
-          key: ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'package-lock.json', 'patches/**', 'apps/web/next.config.ts') }}-${{ hashFiles('apps/web/src/**', 'packages/*/src/**') }}
-      - name: JavaScript budget per route
-        if: env.BUILD_WEB == 'true'
-        run: npm run check-weight -w @open-reloading/web
-      - run: node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON apps/web/scripts/check-prerender.mts
-        if: env.BUILD_WEB == 'true'
-        env:
-          API_URL: http://localhost:3000
-          PRERENDER: ${{ github.event_name == 'pull_request' && needs.changes.outputs.prerender == 'sample' && 'sample' || 'full' }}
-      - name: Smoke check of the build against the API
-        if: env.BUILD_WEB == 'true'
-        run: |
-          cp -r apps/web/.next/static apps/web/.next/standalone/apps/web/.next/static
-          node apps/web/.next/standalone/apps/web/server.js &
-          for _ in $(seq 1 30); do curl --silent --fail http://localhost:3002/ > /dev/null && break; sleep 1; done
-          npm run e2e:smoke
-        env:
-          API_URL: http://localhost:3000
-          PORT: '3002'
-          WEB_URL: http://localhost:3002
       - if: always()
         run: docker compose down --volumes

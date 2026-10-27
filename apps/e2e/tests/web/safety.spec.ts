@@ -35,7 +35,7 @@ test('the first focus is on the text: Enter neither accepts nor declines', async
   await expect(text).toBeFocused()
   await expect(text).toContainText('By selecting I accept')
   await page.keyboard.press('Enter')
-  await expect(page).toHaveURL(/\/cartridges$/)
+  await expect(page).toHaveURL(/\/cartridges\/$/)
   await expect(dialog).toBeVisible()
   await expect(text).toBeFocused()
   await page.reload()

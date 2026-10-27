@@ -55,6 +55,8 @@ it('runs no e2e for unit tests, tools and other workflows, and nothing for prose
     'packages/core/test/recoil.test.ts',
     'apps/web/test/api.test.ts',
     'tools/src/load-fit.ts',
+    'tools/src/audit.ts',
+    'apps/web/Dockerfile',
     '.github/workflows/release.yml',
     'README.md',
     'apps/docs/docs/models/bullet-fit.md',
@@ -68,6 +70,16 @@ it('runs no e2e for unit tests, tools and other workflows, and nothing for prose
   ])
     expect(plan([f], closure), f).toMatchObject({ check: false, e2e: false, web: false })
   expect(plan(['compose.yaml'], closure)).toMatchObject({ check: true, e2e: true, web: false })
+})
+
+it('runs the e2e job for the scripts that build and serve the export', () => {
+  for (const f of [
+    'tools/src/pages.ts',
+    'tools/src/pages-serve.ts',
+    'tools/src/pages-payload.ts',
+    'tools/src/executable.ts',
+  ])
+    expect(plan([f], closure), f).toMatchObject({ check: true, e2e: true, web: false })
 })
 
 it('builds with the sample when the web app changed outside the record pages', () => {

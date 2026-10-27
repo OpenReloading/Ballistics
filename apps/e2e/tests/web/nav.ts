@@ -15,6 +15,9 @@ export async function gotoHydrated(page: Page, path: string) {
   return response
 }
 
+/** `path` as the static export serves it: with a trailing slash before any query or fragment. */
+export const exported = (path: string) => path.replace(/\/?(?=[?#]|$)/, '/')
+
 /** Follows a page link of the sidebar from 75em. */
 export const followNav = (page: Page, label: string) =>
   page

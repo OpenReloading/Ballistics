@@ -1,7 +1,9 @@
-import { expect, type Page, test } from '@playwright/test'
-import { gotoHydrated, safetyAck } from './nav.ts'
+import { readFile } from 'node:fs/promises'
+import { expect, test } from '@playwright/test'
+import { barButton } from './bar.ts'
+import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
-import { applyExampleLoad, loadForm } from './workbench.ts'
+import { loadForm } from './workbench.ts'
 import { runLine } from './workbench-run.ts'
 
 const pages = [
@@ -30,75 +32,74 @@ for (const [path, title] of pages)
     expect(errors).toEqual([])
   })
 
-test('the forwarding route answers 200 with the 308 Win. record', async ({ request }, info) => {
-  test.skip(info.project.name === 'pages', 'the Pages edition has no forwarding route')
-  const res = await request.get('/api/cartridges/308-win')
-  expect(res.status()).toBe(200)
-  expect(res.headers()['content-type']).toContain('application/json')
-  expect((await res.json()).id).toBe('308-win')
+/** The live API: a separate origin from the exported site the project's `baseURL` names. */
+const apiUrl = process.env.API_URL ?? 'http://localhost:3000'
+
+test('the exported data files are what the API answers', async ({ request }) => {
+  for (const [kind, id] of [
+    ['cartridges', '308-win'],
+    ['bullets', 'demo-bullet-168'],
+    ['powders', 'demo-powder-dp40'],
+    ['target-faces', 'issf-25m-precision-50m-pistol'],
+  ] as const) {
+    // relative, so the Pages base path stays
+    const exported = await request.get(`./api/${kind}/${id}.json`)
+    const live = await request.get(`${apiUrl}/v1/${kind}/${id}`)
+    expect(exported.status(), `${kind}/${id} exported`).toBe(200)
+    expect(exported.headers()['content-type']).toContain('application/json')
+    expect(live.status(), `${kind}/${id} live`).toBe(200)
+    expect(await exported.json(), `${kind}/${id}`).toEqual(await live.json())
+  }
 })
 
-test('a Pages record page opens another without a page load, back and forward too', async ({
-  page,
-}, info) => {
-  test.skip(info.project.name !== 'pages', 'checks the RSC files of the static export')
+test('a record page opens another without a page load, back and forward too', async ({ page }) => {
   const failed: string[] = []
   page.on('response', (r) => {
     if (new URL(r.url()).pathname.endsWith('.txt') && r.status() >= 400)
       failed.push(`${r.status()} ${r.url()}`)
   })
-  await gotoHydrated(page, './bullets/demo-bullet-168')
+  // the only record this case links is in the sample: a link to a cartridge page the sample leaves out would log a 404
+  await gotoHydrated(page, './cases/demo-case-308-brass')
   // a full page load drops the marker
   await page.evaluate(() => Object.assign(window, { softNav: true }))
-  await page
-    .getByRole('list', { name: 'Cartridges' })
-    .getByRole('link', { name: '308 Win.', exact: true })
-    .click()
+  await page.getByRole('link', { name: '308 Win.', exact: true }).click()
   const h1 = page.getByRole('heading', { level: 1 })
   await expect(h1).toHaveText('308 Win.')
   await page.goBack()
-  await expect(h1).toContainText('168')
+  await expect(h1).toContainText('Brass Demo')
   await page.goForward()
   await expect(h1).toHaveText('308 Win.')
   expect(await page.evaluate(() => 'softNav' in window)).toBe(true)
   expect(failed).toEqual([])
 })
 
-/** Runs the example load on `page` and gives the result line: step, charge, peak pressure and muzzle velocity. */
-async function exampleResult(page: Page, url: string) {
-  await storeUnits(page)
-  await page.goto(url)
-  await applyExampleLoad(page)
-  return runLine(page)
-}
-
-test('the Pages workbench runs the example load in the browser as the API does', async ({
+test('the workbench runs the example load in the browser as the API runs its file', async ({
   page,
-  browser,
-}, info) => {
-  test.skip(info.project.name !== 'pages', 'compares the Pages edition with the server edition')
-  const webUrl = process.env.WEB_URL ?? 'http://localhost:3001'
-  // the Safety dialog accepted, as the projects' storage state does
-  const server = await browser.newPage({
-    serviceWorkers: 'block',
-    storageState: {
-      cookies: [],
-      origins: [
-        {
-          origin: webUrl,
-          localStorage: [{ name: 'safety-ack', value: safetyAck }],
-        },
-      ],
-    },
-  })
-  const expected = await exampleResult(server, `${webUrl}/workbench`)
-  expect(expected).toMatch(/peak \d+ bar, .* \d+ m\/s/)
+  request,
+}) => {
   await storeUnits(page)
+  // the file of Save options > Download for the API goes to a file in the browser's own storage
+  await page.addInitScript(() => {
+    ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
+      (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
+  })
   await gotoHydrated(page, './workbench')
   // the start card inside the window: in the frame the workspace keeps its height
   const example = page.getByRole('button', { name: 'Try the example load' })
   await expect(example).toBeInViewport()
   await example.click()
   await expect(loadForm(page).locator('.field-flag-seating')).toHaveCount(2)
-  expect(await runLine(page)).toBe(expected)
+  const line = await runLine(page)
+  const shown = /peak (\d+) bar, .* (\d+) m\/s/.exec(line ?? '')
+  expect(shown, line ?? 'no result line').not.toBeNull()
+  await (await barButton(page, 'Save options')).click()
+  const download = page.waitForEvent('download')
+  await page.getByRole('menuitem', { name: 'Download for the API' }).click()
+  const file = JSON.parse(await readFile(await (await download).path(), 'utf8'))
+  const res = await request.post(`${apiUrl}/v1/interior/load-file`, { data: file })
+  expect(res.status(), await res.text()).toBe(200)
+  const { peakPressure, muzzleVelocity } = (await res.json()).summary
+  // the line's rounding: bar and m/s without decimals
+  expect(Number(shown?.[1])).toBeCloseTo(peakPressure / 1e5, 0)
+  expect(Number(shown?.[2])).toBeCloseTo(muzzleVelocity, 0)
 })

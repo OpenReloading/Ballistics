@@ -42,7 +42,7 @@ test('the list searches names and aliases and keeps the search in the URL', asyn
   await gotoHydrated(page, '/cartridges?q=lapua')
   await page.getByRole('button', { name: 'Clear search' }).click()
   await expect(status(page)).toHaveText(`${n} cartridges`)
-  await expect(page).toHaveURL(/\/cartridges$/)
+  await expect(page).toHaveURL(/\/cartridges\/$/)
 })
 
 test('the source filter names the sources shown, keeps them in the URL and one stays on', async ({
@@ -87,7 +87,7 @@ test('the rows ticked for Compare stay in the URL and come back on reload', asyn
   await expect(tick).toBeChecked()
   // a click on the row opens the record while rows are ticked
   await page.getByRole('link', { name: 'DP40' }).click()
-  await expect(page).toHaveURL(/\/powders\/demo-powder-dp40$/)
+  await expect(page).toHaveURL(/\/powders\/demo-powder-dp40\/$/)
   await page.goBack()
   await page.locator('html[data-hydrated]').waitFor({ state: 'attached' })
   await tick.uncheck()
@@ -220,7 +220,7 @@ test('the record bar holds the badges and actions, the fact cards the pressures 
   // the record actions of every record page: Use in workbench filled, then Open in designer
   await expect(bar.getByRole('link', { name: 'Use in workbench' })).toHaveAttribute(
     'href',
-    '/workbench?cartridge=308-win',
+    '/workbench/?cartridge=308-win',
   )
   await expect(bar.getByRole('link', { name: 'Use in workbench' })).toHaveAttribute(
     'data-variant',
@@ -228,7 +228,7 @@ test('the record bar holds the badges and actions, the fact cards the pressures 
   )
   await expect(bar.getByRole('link', { name: 'Open in designer' })).toHaveAttribute(
     'href',
-    '/cartridges/designer?from=308-win',
+    '/cartridges/designer/?from=308-win',
   )
   for (const name of ['Copy link', 'Print'])
     await expect(bar.getByRole('button', { name })).toBeVisible()
@@ -269,7 +269,7 @@ test('the strip and table follow the US preset: psi and inches', async ({ page }
 
 test('the clearance note keeps its slot when the length unit switches', async ({ page }) => {
   await storeUnits(page, 'metric-grams', {})
-  await page.goto('/cartridges/308-win')
+  await gotoHydrated(page, '/cartridges/308-win')
   const cell = symbolRow(page, 'Chamber', 'R1').getByRole('cell')
   const slot = async () => (await cell.locator('.dim-slot').boundingBox())?.width
   const metric = await slot()
@@ -647,7 +647,7 @@ test("the record's unit switch changes the drawings, the facts and the tables, n
   page,
 }) => {
   await storeUnits(page, 'metric-grams', {})
-  await page.goto('/cartridges/308-win')
+  await gotoHydrated(page, '/cartridges/308-win')
   await expect(figureOf(page, 'Cartridge').getByText('Dimensions in mm')).toHaveCount(1)
   await page
     .getByRole('radiogroup', { name: 'Cartridge length unit' })
