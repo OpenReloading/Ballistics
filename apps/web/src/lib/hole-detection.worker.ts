@@ -20,7 +20,7 @@ import {
 } from './hole-detection.ts'
 import type { Photo, WorkerReply, WorkerRequest } from './hole-detection-protocol.ts'
 import { nth } from './nth.ts'
-import { photoQuality } from './photo-quality.ts'
+import { layoutOf, photoQuality } from './photo-quality.ts'
 import { clamp } from './raster-ops.ts'
 import { faceLabel, findFace, onPhoto } from './target-face.ts'
 import { mul3, type Point, turnedBox } from './target-geometry.ts'
@@ -134,7 +134,9 @@ async function handleFace(r: Extract<WorkerRequest, { kind: 'face' }>): Promise<
   // the hole on the resized photo, from the scale of the best fit
   const [fit] = found.fits
   const holePx = fit && r.holeDiameter ? fit.pxPerMm * fromSi('length', r.holeDiameter) : undefined
-  const quality = photoQuality({ image: shot, scale: fk, black: found.black, holePx })
+  // the selected target's layout, else the one of a face found for sure; a weaker match is no hint
+  const layout = r.layout ?? (found.sure && fit ? layoutOf(fit.face) : undefined)
+  const quality = photoQuality({ image: shot, scale: fk, black: found.black, holePx, layout })
   return { kind: 'face', search: onPhoto(found, fk, fx0, fy0), quality }
 }
 

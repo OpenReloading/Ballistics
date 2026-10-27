@@ -1,11 +1,12 @@
 /**
  * Quality of a target photo for hole detection (`apps/docs/docs/models/hole-detection.md`, Photo
- * quality): tilt, contrast, sharpness, resolution, framing, glare and uneven light, measured on the
- * photo and on the black area the face search found. Each problem comes with a level and a plain
+ * quality): tilt, contrast, exposure, sharpness, resolution, framing, glare and uneven light,
+ * measured on the photo, on the black area the face search found when there is one, and on the
+ * edges of the photo when there is not: a target may have no black area, or no unfilled paper. Each problem comes with a level and a plain
  * sentence on what to change when retaking the photo. The check says what the photo makes hard for
  * detection, never that a detection is right. Pure: no React, DOM or Next.js.
  */
-import { fromSi } from '@open-reloading/schema'
+import { fromSi, type TargetFace } from '@open-reloading/schema'
 import type { Ellipse } from './ellipse.ts'
 import { grayGrid, shareInside } from './face-image.ts'
 import type { RgbaImage } from './image.ts'
@@ -17,6 +18,7 @@ type QualityProblem =
   | 'face'
   | 'tilt'
   | 'contrast'
+  | 'exposure'
   | 'blur'
   | 'glare'
   | 'shadow'
@@ -35,6 +37,23 @@ export type QualityIssue = {
   fix: string
 }
 
+/**
+ * What a selected target says about the photo, as a hint: the photo may show only its centre or cut
+ * through its rings, so only the presence of a black zone is used, never a ring, a size or an extent.
+ */
+export type TargetLayout = {
+  /** Whether the target has a black zone; absent when the record does not give the zone colours. */
+  dark?: boolean | undefined
+}
+
+/** The layout of a target face record: a black zone when a ring's fill is black, none when every fill is given and none is. No record: no layout. */
+export function layoutOf(face: Pick<TargetFace, 'rings'> | undefined): TargetLayout | undefined {
+  if (!face) return undefined
+  const fills = face.rings.flatMap((r) => (r.fill ? [r.fill] : []))
+  if (fills.includes('black')) return { dark: true }
+  return { dark: fills.length === face.rings.length ? false : undefined }
+}
+
 /** The photo as the face search saw it: `image` is the photo resized by `scale` (image px per photo px). */
 type PhotoView = {
   image: RgbaImage
@@ -43,6 +62,8 @@ type PhotoView = {
   black?: Ellipse | undefined
   /** The hole diameter on `image`, px, from the scale of the face found; absent when no face fit. */
   holePx?: number | undefined
+  /** The selected target's layout, or the one of the face found for sure; absent: no target known. */
+  layout?: TargetLayout | undefined
 }
 
 /** Grey levels of the grid the photo is judged on: its longer side in blocks. */
@@ -54,6 +75,8 @@ const limits = {
   tilt: [30, 55],
   /** Paper over black area, grey levels (below). */
   contrast: [80, 45],
+  /** Brightest part of the photo, grey levels (below). */
+  exposure: [90, 50],
   /** Width of the black area's edge in holes (above). */
   blur: [0.3, 0.6],
   /** Share of saturated paper (above). */
@@ -196,121 +219,155 @@ function aroundBlack(grid: ReturnType<typeof grayGrid>, black: Ellipse, s: numbe
   return { inside, ring }
 }
 
-/** Largest relative difference between the median grey levels of the ring's four sides; undefined with fewer than three sides. */
-function sidesDifference(ring: readonly Spot[], at: Ellipse): number | undefined {
-  const sides = [0, 1, 2, 3]
-    .map((k) =>
-      median(
-        ring
-          .filter((p) => (p.x >= at.centreX ? 1 : 0) + (p.y >= at.centreY ? 2 : 0) === k)
-          .map((p) => p.g),
-      ),
-    )
-    .filter((v) => !Number.isNaN(v))
+/** Largest relative difference between four sides' grey levels; undefined with fewer than three sides. */
+function sidesDifference(levels: readonly number[]): number | undefined {
+  const sides = levels.filter((v) => !Number.isNaN(v))
   const top = Math.max(...sides)
   return sides.length >= 3 && top > 0 ? (top - Math.min(...sides)) / top : undefined
 }
+
+/** The ring's four sides, left and right, above and below the centre, by their median grey level. */
+const ringSides = (ring: readonly Spot[], at: Ellipse) =>
+  [0, 1, 2, 3].map((k) =>
+    median(
+      ring
+        .filter((p) => (p.x >= at.centreX ? 1 : 0) + (p.y >= at.centreY ? 2 : 0) === k)
+        .map((p) => p.g),
+    ),
+  )
 
 const quantileOf = (v: readonly number[], p: number) => {
   const s = [...v].sort((a, b) => a - b)
   return s.length ? nth(s, Math.min(s.length - 1, Math.floor(p * s.length))) : Number.NaN
 }
 
+/** Grey level that counts as lit paper. */
+const LIT = 120
+
 /**
- * Contrast, glare and uneven light on the grey grid. With a black area: its median against the
- * paper just around it, glare as saturated paper, the four sides of that ring for the light.
- * Without one: the 5th to 95th percentile of the photo.
+ * The 90th percentile of each quarter of the photo, the paper level of a target of any pattern;
+ * undefined when fewer than three quarters show lit paper (the photo may be filled by a black zone).
+ */
+function quarterLight(grid: ReturnType<typeof grayGrid>): number | undefined {
+  const parts: number[][] = [[], [], [], []]
+  grid.grey.forEach((g, i) => {
+    const [x, y] = [i % grid.width, Math.floor(i / grid.width)]
+    parts[(x * 2 >= grid.width ? 1 : 0) + (y * 2 >= grid.height ? 2 : 0)]?.push(g)
+  })
+  const levels = parts.map((q) => quantileOf(q, 0.9))
+  return levels.filter((v) => v >= LIT).length >= 3 ? sidesDifference(levels) : undefined
+}
+
+/**
+ * Contrast, brightness, glare and uneven light on the grey grid. With a black area: its darkest
+ * fifth against the paper just around it (a white zone inside it does not count), glare as
+ * saturated paper, the four sides of that ring for the light. Without one, or with its ring out of
+ * the frame, the brightness of the photo (95th percentile), its darkest 5 % and its quarters for
+ * the light, whatever the pattern of the target.
  */
 function gridMeasures(image: RgbaImage, black: Ellipse | undefined, s: number) {
   const grid = grayGrid(image, s)
   const whole = Array.from(grid.grey)
   const { inside, ring } = black ? aroundBlack(grid, black, s) : { inside: [], ring: [] }
-  const paper = black ? ring.map((p) => p.g) : whole
-  const spread = quantileOf(whole, 0.95) - quantileOf(whole, 0.05)
+  const paper = black && ring.length ? ring.map((p) => p.g) : whole
   const step =
-    quantileOf(paper, black ? 0.75 : 0.95) -
-    (inside.length ? median(inside) : quantileOf(whole, 0.05))
+    quantileOf(
+      ring.map((p) => p.g),
+      0.75,
+    ) - quantileOf(inside, 0.2)
   // saturated paper against paper that is lit: an all white photo is not glare
-  const lit = paper.filter((g) => g >= 120)
+  const lit = paper.filter((g) => g >= LIT)
   const open = lit.filter((g) => g < 250)
   return {
-    contrast: Number.isNaN(step) ? spread : step,
+    contrast: Number.isNaN(step) ? undefined : step,
+    exposure: quantileOf(whole, 0.95),
+    dark: quantileOf(whole, 0.05),
     glare: lit.length && median(open) <= 232 ? (lit.length - open.length) / lit.length : 0,
-    shadow: black ? sidesDifference(ring, black) : undefined,
+    shadow: black && ring.length ? sidesDifference(ringSides(ring, black)) : quarterLight(grid),
   }
 }
 
+/** The grey step of a profile over its steepest slope, px; undefined when the step is below 40 grey levels. */
+function stepWidth(p: readonly number[], step: number): number | undefined {
+  const [lo, hi] = ends(p)
+  if (Math.abs(hi - lo) < 40) return undefined
+  // the profile rises along the gradient; a falling one is turned over
+  const { rise } = steepestRise(hi > lo ? p : p.map((v) => -v))
+  return rise > 0 ? Math.abs(hi - lo) / (rise / step) : undefined
+}
+
 /**
- * The problems of the photo that make hole detection harder, the worst first, each with how to
- * retake it. Empty when none of the measures is past its limit; that is no statement that the
- * holes will be found right.
+ * Width in image px of the sharpest edges of the photo, whatever the target: at the 6000 points of
+ * strongest grey gradient (on a lattice of 3 px) the profile across the edge, the grey step over the
+ * steepest slope, the median over the points whose step is at least 40 grey levels. Thin lines are
+ * left out by that step, so a photo of rings alone, with no hole, gives no measure. Undefined when fewer than 20 points qualify: the photo shows no edge.
  */
-export function photoQuality(view: PhotoView): QualityIssue[] {
-  const { image, scale, black, holePx } = view
-  const issues: QualityIssue[] = []
-  const add = (
-    problem: keyof typeof limits,
-    value: number,
-    text: (level: QualityLevel) => string,
-    fix: string,
-  ) => {
-    const level = levelOf(value, limits[problem])
-    if (level) issues.push({ problem, level, text: text(level), fix })
+function edgeSharpness(image: RgbaImage, hole: number): number | undefined {
+  const { width, height } = image
+  const [span, step] = [clamp(0.75 * hole, 6, 30), 0.5]
+  const n = Math.round((2 * span) / step) + 1
+  const points: Array<{ x: number; y: number; gx: number; gy: number; g: number }> = []
+  for (let y = 2; y < height - 2; y += 3)
+    for (let x = 2; x < width - 2; x += 3) {
+      const gx = (lumaAt(image, x + 1, y) - lumaAt(image, x - 1, y)) / 2
+      const gy = (lumaAt(image, x, y + 1) - lumaAt(image, x, y - 1)) / 2
+      const g = Math.hypot(gx, gy)
+      if (g >= 3) points.push({ x, y, gx, gy, g })
+    }
+  points.sort((a, b) => b.g - a.g)
+  const widths: number[] = []
+  for (const { x, y, gx, gy, g } of points.slice(0, 6000)) {
+    const p = smooth(
+      Array.from({ length: n }, (_, i) =>
+        lumaAt(image, x + (gx / g) * (i - (n >> 1)) * step, y + (gy / g) * (i - (n >> 1)) * step),
+      ),
+    )
+    const w = stepWidth(p, step)
+    if (w !== undefined) widths.push(w)
+    if (widths.length >= 300) break
   }
-  const s = Math.max(1, Math.ceil(Math.max(image.width, image.height) / GRID))
-  const m = gridMeasures(image, black, s)
-  if (black) {
-    const tilt = fromSi('angle', Math.acos(clamp(black.semiMinor / black.semiMajor, 0, 1)))
+  return widths.length >= 20 ? median(widths) : undefined
+}
+
+type Add = (
+  problem: keyof typeof limits,
+  value: number,
+  text: (level: QualityLevel) => string,
+  fix: string,
+  limit?: readonly [number, number],
+) => void
+
+/** Contrast or brightness, glare and uneven light. */
+function lightIssues(
+  add: Add,
+  m: ReturnType<typeof gridMeasures>,
+  layout: TargetLayout | undefined,
+) {
+  if (m.contrast !== undefined)
     add(
-      'tilt',
-      tilt,
-      () => `The target is photographed at a slant of about ${Math.round(tilt)} degrees.`,
-      'Retake from straight above, with the camera parallel to the paper.',
+      'contrast',
+      m.contrast,
+      () => 'The black area and the paper are close in brightness.',
+      'Retake with more light on the target and without a photo filter.',
     )
+  else if (layout?.dark === true)
+    // the target has a black zone and the photo may be filled with it: judge the black itself
     add(
-      'framing',
-      shareInside(black, image.width, image.height),
-      () => 'The black area of the target is cut off by the edge of the photo.',
-      'Retake with the whole target and some paper around it in the frame.',
+      'contrast',
+      m.dark,
+      () => 'The black zones of the target look grey.',
+      'Retake with less light on the target, without a reflection and without a photo filter.',
+      [110, 150],
     )
-    const width = edgeWidth(image, black)
-    // without a face's scale a hole is taken as 6 % of the black area's diameter
-    const hole = holePx ?? 0.06 * (black.semiMajor + black.semiMinor)
-    if (width !== undefined)
-      add(
-        'blur',
-        width / hole,
-        () => 'The photo is soft: the edge of the black area is blurred.',
-        'Hold the camera steady or rest it on something, let it focus on the target and retake.',
-      )
-    const px = hole / scale
+  // a dark photo may show a black zone alone, so only a target without one makes this a bad level
+  else
     add(
-      'resolution',
-      px,
-      () => `A bullet hole is only about ${Math.max(1, Math.round(px))} px across in this photo.`,
-      'Move closer so the target fills more of the frame, or use the full resolution of the camera.',
+      'exposure',
+      m.exposure,
+      () => 'The photo is dark: even its brightest part is dim.',
+      'Retake with more light on the target and without a photo filter.',
+      layout?.dark === false ? limits.exposure : [limits.exposure[0], 0],
     )
-  } else {
-    issues.push({
-      problem: 'face',
-      level: 'bad',
-      text: 'No black target area was found in this photo.',
-      fix: 'Retake with the whole target in the frame, in even light and held steady, or set the scale by hand.',
-    })
-    const long = Math.max(image.width, image.height) / scale
-    add(
-      'resolution',
-      long / 80,
-      () => `The photo is only ${Math.round(long)} px on its longer side.`,
-      'Move closer so the target fills more of the frame, or use the full resolution of the camera.',
-    )
-  }
-  add(
-    'contrast',
-    m.contrast,
-    () => 'The black area and the paper are close in brightness.',
-    'Retake with more light on the target and without a photo filter.',
-  )
   add(
     'glare',
     m.glare,
@@ -324,6 +381,89 @@ export function photoQuality(view: PhotoView): QualityIssue[] {
       () => 'The light is uneven: one side of the target is much darker than another.',
       'Retake in an even light with no shadow of your hand or phone on the sheet.',
     )
+}
+
+/**
+ * Tilt and framing of the black area. A black area cut by the frame gives no tilt, and with a
+ * known target no framing note: the photo may show only its centre or cut through its rings.
+ */
+function shapeIssues(add: Add, black: Ellipse, image: RgbaImage, layout: TargetLayout | undefined) {
+  const framed = shareInside(black, image.width, image.height)
+  if (framed >= limits.framing[0]) {
+    const tilt = fromSi('angle', Math.acos(clamp(black.semiMinor / black.semiMajor, 0, 1)))
+    add(
+      'tilt',
+      tilt,
+      () => `The target is photographed at a slant of about ${Math.round(tilt)} degrees.`,
+      'Retake from straight above, with the camera parallel to the paper.',
+    )
+  }
+  if (!layout)
+    add(
+      'framing',
+      framed,
+      () => 'The black area of the target is cut off by the edge of the photo.',
+      'Retake with the whole target and some paper around it in the frame.',
+    )
+}
+
+/**
+ * The problems of the photo that make hole detection harder, the worst first, each with how to
+ * retake it. Empty when none of the measures is past its limit; that is no statement that the
+ * holes will be found right.
+ */
+export function photoQuality(view: PhotoView): QualityIssue[] {
+  const { image, scale, black, holePx, layout } = view
+  const issues: QualityIssue[] = []
+  const add: Add = (
+    problem: keyof typeof limits,
+    value: number,
+    text: (level: QualityLevel) => string,
+    fix: string,
+    limit: readonly [number, number] = limits[problem],
+  ) => {
+    const level = levelOf(value, limit)
+    if (level) issues.push({ problem, level, text: text(level), fix })
+  }
+  const long = Math.max(image.width, image.height)
+  const s = Math.max(1, Math.ceil(long / GRID))
+  const m = gridMeasures(image, black, s)
+  // without a face's scale a hole is taken as 6 % of the black area's diameter, else of the photo's 1/80
+  const hole = holePx ?? (black ? 0.06 * (black.semiMajor + black.semiMinor) : long / 80)
+  if (black) shapeIssues(add, black, view.image, layout)
+  const width = (black && edgeWidth(image, black)) || edgeSharpness(image, hole)
+  if (width !== undefined)
+    add(
+      'blur',
+      width / hole,
+      () => 'The photo is soft: the edges of the target are blurred.',
+      'Hold the camera steady or rest it on something, let it focus on the target and retake.',
+    )
+  if (black) {
+    const px = hole / scale
+    add(
+      'resolution',
+      px,
+      () => `A bullet hole is only about ${Math.max(1, Math.round(px))} px across in this photo.`,
+      'Move closer so the target fills more of the frame, or use the full resolution of the camera.',
+    )
+  } else {
+    if (width === undefined)
+      issues.push({
+        problem: 'face',
+        level: 'bad',
+        text: 'No edge of a target or a hole was found in this photo.',
+        fix: 'Retake with the target in the frame, in even light and held steady, or set the scale by hand.',
+      })
+    const longPhoto = long / scale
+    add(
+      'resolution',
+      longPhoto / 80,
+      () => `The photo is only ${Math.round(longPhoto)} px on its longer side.`,
+      'Move closer so the target fills more of the frame, or use the full resolution of the camera.',
+    )
+  }
+  lightIssues(add, m, layout)
   return issues.sort((a, b) => Number(b.level === 'bad') - Number(a.level === 'bad'))
 }
 

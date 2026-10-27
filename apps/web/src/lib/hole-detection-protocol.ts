@@ -1,7 +1,7 @@
 /** Messages between the target editor and the hole detection worker, in photo px of the turned photo. */
 import type { TargetFace } from '@open-reloading/schema'
 import type { FlaggedRegion, HoleExample, HoleProposal } from './hole-detection.ts'
-import type { QualityIssue } from './photo-quality.ts'
+import type { QualityIssue, TargetLayout } from './photo-quality.ts'
 import type { FaceGeometry, FaceSearch } from './target-face.ts'
 import type { Point } from './target-geometry.ts'
 
@@ -39,9 +39,16 @@ export type WorkerRequest =
   | (Photo & { kind: 'colour'; at: Point; radius: number })
   /**
    * The face search over the whole turned photo against `faces`; `pxPerMm` is the photo's known
-   * scale, `holeDiameter` (m) the bullet's, for the quality check's hole size.
+   * scale, `holeDiameter` (m) the bullet's, for the quality check's hole size; `layout` is the
+   * selected target's, a hint for the quality check.
    */
-  | (Photo & { kind: 'face'; faces: TargetFace[]; pxPerMm?: number; holeDiameter?: number })
+  | (Photo & {
+      kind: 'face'
+      faces: TargetFace[]
+      pxPerMm?: number
+      holeDiameter?: number
+      layout?: TargetLayout | undefined
+    })
   /** Detection from the hole under `at` (`detectFromExample`); `holeDiameter` sets the sizes it tries. */
   | (Photo & Search & { kind: 'example'; at: Point })
 

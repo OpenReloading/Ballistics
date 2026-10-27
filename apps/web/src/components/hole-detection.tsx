@@ -33,7 +33,7 @@ import {
   proposalsClearOfShots,
   rectangleFromDiagonal,
 } from '../lib/hole-proposals.ts'
-import { belowMinimum, type QualityIssue } from '../lib/photo-quality.ts'
+import { belowMinimum, layoutOf, type QualityIssue } from '../lib/photo-quality.ts'
 import type { Frame } from '../lib/target-editor.ts'
 import {
   type FaceFit,
@@ -367,6 +367,7 @@ export function useHoleDetection({
         ...(frame?.calibration &&
           region && { pxPerMm: localPxPerM(frame, region) * toSi('length', 1) }),
         ...(size && { holeDiameter: size.diameter }),
+        layout: layoutOf(record),
       },
       (m) => {
         if (m.kind !== 'face') return
