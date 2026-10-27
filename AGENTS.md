@@ -27,6 +27,7 @@
   - Coverage: the `test` script of schema, core, importers, drawing, data and api is `vitest run --coverage` (v8, summary in the log, so the CI `test` groups run it). The floors (`coverage.thresholds`) and the excluded files, each with its reason, are in `packages/<name>/vitest.config.ts`. A floor is the measured value rounded down, minus one: raise it in the same pull request when coverage rises, never lower it to make a check pass.
   - A single file or test runs without coverage: `npx vitest run <file>` in the package.
 - Web JavaScript budget per route: `npm run check-weight -w @open-reloading/web` (after `npm run static:build`, which leaves `.next` for it; details in `apps/web/AGENTS.md`). CI runs it in the `e2e` job after the export build.
+- Evaluate the interior model on load rows (after `build`, details in `packages/cli/AGENTS.md`): `npx ballistics verify --rows <path>`, `npx ballistics compare ...`. Rows are passed by path and never committed.
 - Validate data records: `npm run data:validate`
 - Docs site (Docusaurus, `apps/docs`): `npm run site:build -w @open-reloading/docs` (after `build`)
   - Generated, git-ignored: the TypeDoc site of the six packages (`static/library/`, configured by `apps/docs/typedoc.config.mjs` with the landing page `apps/docs/library.md`), served at `/library/`, the REST API page (`static/rest/`: the API document, the Scalar viewer and its page, `scripts/openapi.mts`), served at `/rest/`. Its link to the API's own reference (`/v1/reference/`) uses `API_URL`, no link when it is unset.
@@ -66,6 +67,7 @@
   - `packages/drawing`: no runtime dependencies, no I/O, no React, DOM or Next.js. Values in stored mm and degrees.
   - `packages/data`: git is the source of truth for records.
   - `packages/api`: depends on core, data and schema.
+  - `packages/cli`: depends on core, data, drawing and schema, never on the API or the web app. No model logic of its own.
   - `apps/web`: reads from the API, renders the figure models of `@open-reloading/drawing`. No database access or solver logic in route handlers.
     - The web app is a static export: it runs the API's compute entry (`@open-reloading/api/compute`) in the browser and reads data files the API wrote at build time. Only the build reads the API itself, for the record pages.
 - Mantine docs: the Mantine MCP server (`.mcp.json`, `.codex/config.toml`) or the docs index https://mantine.dev/llms.txt.

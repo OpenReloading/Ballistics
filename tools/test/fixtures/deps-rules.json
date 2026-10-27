@@ -139,6 +139,26 @@
     "source": "import { parse } from '@open-reloading/importers'\nexport { parse }",
     "rules": ["api-imports-core-data-schema-only", "not-to-unresolvable"]
   },
+  "packages/cli/src/rows.ts": {
+    "source": "export const rows = 1",
+    "rules": []
+  },
+  "packages/cli/src/own.ts": {
+    "source": "import { rows } from './rows.ts'\nexport { rows }",
+    "rules": []
+  },
+  "packages/cli/src/libraries.ts": {
+    "source": "import { interior } from '@open-reloading/core'\nimport { readRecords } from '@open-reloading/data'\nimport { seat } from '@open-reloading/drawing/seating'\nimport { toSi } from '@open-reloading/schema'\nexport { interior, readRecords, seat, toSi }",
+    "rules": ["not-to-unresolvable"]
+  },
+  "packages/cli/src/api.ts": {
+    "source": "import { buildApp } from '@open-reloading/api'\nexport { buildApp }",
+    "rules": ["cli-imports-core-data-drawing-schema-only", "not-to-unresolvable"]
+  },
+  "packages/cli/src/web.ts": {
+    "source": "import type { SpecValue } from '../../../apps/web/src/lib/api-types.ts'\nexport type Spec = SpecValue",
+    "rules": ["cli-imports-core-data-drawing-schema-only"]
+  },
   "packages/api/src/web.ts": {
     "source": "import type { SpecValue } from '../../../apps/web/src/lib/api-types.ts'\nexport type Spec = SpecValue",
     "rules": ["api-imports-core-data-schema-only"]

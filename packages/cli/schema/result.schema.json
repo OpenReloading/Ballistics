@@ -1,0 +1,1885 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "split": {
+          "type": "string",
+          "enum": ["test", "validation", "training"]
+        },
+        "final": {
+          "type": "boolean",
+          "description": "True for a run of the test split, which needs `--final`."
+        },
+        "inputs": {
+          "type": "object",
+          "properties": {
+            "rows": {
+              "type": "string",
+              "description": "SHA-256 over the SHA-256 of each rows file."
+            },
+            "records": {
+              "type": "string",
+              "description": "SHA-256 over the records the rows name."
+            }
+          },
+          "required": ["rows", "records"],
+          "additionalProperties": false
+        },
+        "command": {
+          "type": "string",
+          "const": "verify"
+        },
+        "model": {
+          "type": "string",
+          "description": "The name or module path the model was selected by."
+        },
+        "modelVersion": {
+          "type": "string",
+          "description": "SHA-256 over the model sources, the records the rows name and the rows bytes."
+        },
+        "interval": {
+          "type": "object",
+          "properties": {
+            "basis": {
+              "type": "string",
+              "const": "training"
+            },
+            "halfWidth": {
+              "description": "The 90th percentile of the absolute relative velocity error on the training split: a printed velocity is inside the interval when its error is at most this. Null without a training row.",
+              "type": ["number", "null"]
+            },
+            "trainingRows": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "description": "Used training rows the half width comes from."
+            }
+          },
+          "required": ["basis", "halfWidth", "trainingRows"],
+          "additionalProperties": false
+        },
+        "overall": {
+          "type": "object",
+          "properties": {
+            "rows": {
+              "type": "object",
+              "properties": {
+                "inSplit": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991,
+                  "description": "Rows of the split in this group."
+                },
+                "used": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991,
+                  "description": "Rows the model gave a result for."
+                },
+                "notUsed": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string",
+                    "enum": [
+                      "unknownCartridge",
+                      "unknownBullet",
+                      "unknownPowder",
+                      "noPowderModel",
+                      "noCaseCapacity",
+                      "noBulletLength",
+                      "noBulletShape",
+                      "noBarrelLength",
+                      "missingCartridgeValue",
+                      "modelRefused"
+                    ]
+                  },
+                  "additionalProperties": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "description": "Rows not used, by reason; a reason without rows is left out."
+                }
+              },
+              "required": ["inSplit", "used", "notUsed"],
+              "additionalProperties": false
+            },
+            "velocity": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "median": {
+                      "type": "number",
+                      "description": "Median of the absolute relative error, as a fraction."
+                    },
+                    "p90": {
+                      "type": "number",
+                      "description": "90th percentile of the absolute relative error, as a fraction."
+                    }
+                  },
+                  "required": ["median", "p90"],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Absolute relative error of the muzzle velocity over the used rows; null without one."
+            },
+            "pressure": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "median": {
+                      "type": "number",
+                      "description": "Median of the absolute relative error, as a fraction."
+                    },
+                    "p90": {
+                      "type": "number",
+                      "description": "90th percentile of the absolute relative error, as a fraction."
+                    },
+                    "rows": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991,
+                      "description": "Used rows that print a peak pressure."
+                    }
+                  },
+                  "required": ["median", "p90", "rows"],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Absolute relative error of the peak pressure over the used rows that print one."
+            },
+            "interval": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "coverage": {
+                      "type": "number",
+                      "description": "Share of the used rows inside the interval."
+                    }
+                  },
+                  "required": ["coverage"],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Coverage of the 90 % interval; null without rows or without an interval."
+            }
+          },
+          "required": ["rows", "velocity", "pressure", "interval"],
+          "additionalProperties": false
+        },
+        "byFamily": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "rows": {
+                "type": "object",
+                "properties": {
+                  "inSplit": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991,
+                    "description": "Rows of the split in this group."
+                  },
+                  "used": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991,
+                    "description": "Rows the model gave a result for."
+                  },
+                  "notUsed": {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string",
+                      "enum": [
+                        "unknownCartridge",
+                        "unknownBullet",
+                        "unknownPowder",
+                        "noPowderModel",
+                        "noCaseCapacity",
+                        "noBulletLength",
+                        "noBulletShape",
+                        "noBarrelLength",
+                        "missingCartridgeValue",
+                        "modelRefused"
+                      ]
+                    },
+                    "additionalProperties": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "description": "Rows not used, by reason; a reason without rows is left out."
+                  }
+                },
+                "required": ["inSplit", "used", "notUsed"],
+                "additionalProperties": false
+              },
+              "velocity": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "median": {
+                        "type": "number",
+                        "description": "Median of the absolute relative error, as a fraction."
+                      },
+                      "p90": {
+                        "type": "number",
+                        "description": "90th percentile of the absolute relative error, as a fraction."
+                      }
+                    },
+                    "required": ["median", "p90"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Absolute relative error of the muzzle velocity over the used rows; null without one."
+              },
+              "pressure": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "median": {
+                        "type": "number",
+                        "description": "Median of the absolute relative error, as a fraction."
+                      },
+                      "p90": {
+                        "type": "number",
+                        "description": "90th percentile of the absolute relative error, as a fraction."
+                      },
+                      "rows": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991,
+                        "description": "Used rows that print a peak pressure."
+                      }
+                    },
+                    "required": ["median", "p90", "rows"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Absolute relative error of the peak pressure over the used rows that print one."
+              },
+              "interval": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "coverage": {
+                        "type": "number",
+                        "description": "Share of the used rows inside the interval."
+                      }
+                    },
+                    "required": ["coverage"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Coverage of the 90 % interval; null without rows or without an interval."
+              }
+            },
+            "required": ["rows", "velocity", "pressure", "interval"],
+            "additionalProperties": false
+          },
+          "description": "By powder family, `<propellant base>/<grain form>` of the powder record."
+        },
+        "byPowder": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "rows": {
+                "type": "object",
+                "properties": {
+                  "inSplit": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991,
+                    "description": "Rows of the split in this group."
+                  },
+                  "used": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991,
+                    "description": "Rows the model gave a result for."
+                  },
+                  "notUsed": {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string",
+                      "enum": [
+                        "unknownCartridge",
+                        "unknownBullet",
+                        "unknownPowder",
+                        "noPowderModel",
+                        "noCaseCapacity",
+                        "noBulletLength",
+                        "noBulletShape",
+                        "noBarrelLength",
+                        "missingCartridgeValue",
+                        "modelRefused"
+                      ]
+                    },
+                    "additionalProperties": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "description": "Rows not used, by reason; a reason without rows is left out."
+                  }
+                },
+                "required": ["inSplit", "used", "notUsed"],
+                "additionalProperties": false
+              },
+              "velocity": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "median": {
+                        "type": "number",
+                        "description": "Median of the absolute relative error, as a fraction."
+                      },
+                      "p90": {
+                        "type": "number",
+                        "description": "90th percentile of the absolute relative error, as a fraction."
+                      }
+                    },
+                    "required": ["median", "p90"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Absolute relative error of the muzzle velocity over the used rows; null without one."
+              },
+              "pressure": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "median": {
+                        "type": "number",
+                        "description": "Median of the absolute relative error, as a fraction."
+                      },
+                      "p90": {
+                        "type": "number",
+                        "description": "90th percentile of the absolute relative error, as a fraction."
+                      },
+                      "rows": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991,
+                        "description": "Used rows that print a peak pressure."
+                      }
+                    },
+                    "required": ["median", "p90", "rows"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Absolute relative error of the peak pressure over the used rows that print one."
+              },
+              "interval": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "coverage": {
+                        "type": "number",
+                        "description": "Share of the used rows inside the interval."
+                      }
+                    },
+                    "required": ["coverage"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Coverage of the 90 % interval; null without rows or without an interval."
+              }
+            },
+            "required": ["rows", "velocity", "pressure", "interval"],
+            "additionalProperties": false
+          },
+          "description": "By powder id."
+        },
+        "grouped": {
+          "description": "The groups of `--group-by`: the key by which the rows are grouped and the groups.",
+          "type": "object",
+          "properties": {
+            "by": {
+              "type": "string",
+              "enum": ["powder", "family", "cartridge", "bullet", "construction"]
+            },
+            "groups": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "rows": {
+                    "type": "object",
+                    "properties": {
+                      "inSplit": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991,
+                        "description": "Rows of the split in this group."
+                      },
+                      "used": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991,
+                        "description": "Rows the model gave a result for."
+                      },
+                      "notUsed": {
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string",
+                          "enum": [
+                            "unknownCartridge",
+                            "unknownBullet",
+                            "unknownPowder",
+                            "noPowderModel",
+                            "noCaseCapacity",
+                            "noBulletLength",
+                            "noBulletShape",
+                            "noBarrelLength",
+                            "missingCartridgeValue",
+                            "modelRefused"
+                          ]
+                        },
+                        "additionalProperties": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "description": "Rows not used, by reason; a reason without rows is left out."
+                      }
+                    },
+                    "required": ["inSplit", "used", "notUsed"],
+                    "additionalProperties": false
+                  },
+                  "velocity": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "median": {
+                            "type": "number",
+                            "description": "Median of the absolute relative error, as a fraction."
+                          },
+                          "p90": {
+                            "type": "number",
+                            "description": "90th percentile of the absolute relative error, as a fraction."
+                          }
+                        },
+                        "required": ["median", "p90"],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Absolute relative error of the muzzle velocity over the used rows; null without one."
+                  },
+                  "pressure": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "median": {
+                            "type": "number",
+                            "description": "Median of the absolute relative error, as a fraction."
+                          },
+                          "p90": {
+                            "type": "number",
+                            "description": "90th percentile of the absolute relative error, as a fraction."
+                          },
+                          "rows": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "description": "Used rows that print a peak pressure."
+                          }
+                        },
+                        "required": ["median", "p90", "rows"],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Absolute relative error of the peak pressure over the used rows that print one."
+                  },
+                  "interval": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "coverage": {
+                            "type": "number",
+                            "description": "Share of the used rows inside the interval."
+                          }
+                        },
+                        "required": ["coverage"],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Coverage of the 90 % interval; null without rows or without an interval."
+                  }
+                },
+                "required": ["rows", "velocity", "pressure", "interval"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": ["by", "groups"],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "split",
+        "final",
+        "inputs",
+        "command",
+        "model",
+        "modelVersion",
+        "interval",
+        "overall",
+        "byFamily",
+        "byPowder"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "split": {
+          "type": "string",
+          "enum": ["test", "validation", "training"]
+        },
+        "final": {
+          "type": "boolean",
+          "description": "True for a run of the test split, which needs `--final`."
+        },
+        "inputs": {
+          "type": "object",
+          "properties": {
+            "rows": {
+              "type": "string",
+              "description": "SHA-256 over the SHA-256 of each rows file."
+            },
+            "records": {
+              "type": "string",
+              "description": "SHA-256 over the records the rows name."
+            }
+          },
+          "required": ["rows", "records"],
+          "additionalProperties": false
+        },
+        "command": {
+          "type": "string",
+          "const": "compare"
+        },
+        "baseline": {
+          "type": "object",
+          "properties": {
+            "model": {
+              "type": "string",
+              "description": "The name or module path the model was selected by."
+            },
+            "modelVersion": {
+              "type": "string",
+              "description": "SHA-256 over the model sources, the records the rows name and the rows bytes."
+            },
+            "interval": {
+              "type": "object",
+              "properties": {
+                "basis": {
+                  "type": "string",
+                  "const": "training"
+                },
+                "halfWidth": {
+                  "description": "The 90th percentile of the absolute relative velocity error on the training split: a printed velocity is inside the interval when its error is at most this. Null without a training row.",
+                  "type": ["number", "null"]
+                },
+                "trainingRows": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991,
+                  "description": "Used training rows the half width comes from."
+                }
+              },
+              "required": ["basis", "halfWidth", "trainingRows"],
+              "additionalProperties": false
+            },
+            "overall": {
+              "type": "object",
+              "properties": {
+                "rows": {
+                  "type": "object",
+                  "properties": {
+                    "inSplit": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991,
+                      "description": "Rows of the split in this group."
+                    },
+                    "used": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991,
+                      "description": "Rows the model gave a result for."
+                    },
+                    "notUsed": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string",
+                        "enum": [
+                          "unknownCartridge",
+                          "unknownBullet",
+                          "unknownPowder",
+                          "noPowderModel",
+                          "noCaseCapacity",
+                          "noBulletLength",
+                          "noBulletShape",
+                          "noBarrelLength",
+                          "missingCartridgeValue",
+                          "modelRefused"
+                        ]
+                      },
+                      "additionalProperties": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "description": "Rows not used, by reason; a reason without rows is left out."
+                    }
+                  },
+                  "required": ["inSplit", "used", "notUsed"],
+                  "additionalProperties": false
+                },
+                "velocity": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "median": {
+                          "type": "number",
+                          "description": "Median of the absolute relative error, as a fraction."
+                        },
+                        "p90": {
+                          "type": "number",
+                          "description": "90th percentile of the absolute relative error, as a fraction."
+                        }
+                      },
+                      "required": ["median", "p90"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Absolute relative error of the muzzle velocity over the used rows; null without one."
+                },
+                "pressure": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "median": {
+                          "type": "number",
+                          "description": "Median of the absolute relative error, as a fraction."
+                        },
+                        "p90": {
+                          "type": "number",
+                          "description": "90th percentile of the absolute relative error, as a fraction."
+                        },
+                        "rows": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991,
+                          "description": "Used rows that print a peak pressure."
+                        }
+                      },
+                      "required": ["median", "p90", "rows"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Absolute relative error of the peak pressure over the used rows that print one."
+                },
+                "interval": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "coverage": {
+                          "type": "number",
+                          "description": "Share of the used rows inside the interval."
+                        }
+                      },
+                      "required": ["coverage"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Coverage of the 90 % interval; null without rows or without an interval."
+                }
+              },
+              "required": ["rows", "velocity", "pressure", "interval"],
+              "additionalProperties": false
+            },
+            "byFamily": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "rows": {
+                    "type": "object",
+                    "properties": {
+                      "inSplit": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991,
+                        "description": "Rows of the split in this group."
+                      },
+                      "used": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991,
+                        "description": "Rows the model gave a result for."
+                      },
+                      "notUsed": {
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string",
+                          "enum": [
+                            "unknownCartridge",
+                            "unknownBullet",
+                            "unknownPowder",
+                            "noPowderModel",
+                            "noCaseCapacity",
+                            "noBulletLength",
+                            "noBulletShape",
+                            "noBarrelLength",
+                            "missingCartridgeValue",
+                            "modelRefused"
+                          ]
+                        },
+                        "additionalProperties": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "description": "Rows not used, by reason; a reason without rows is left out."
+                      }
+                    },
+                    "required": ["inSplit", "used", "notUsed"],
+                    "additionalProperties": false
+                  },
+                  "velocity": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "median": {
+                            "type": "number",
+                            "description": "Median of the absolute relative error, as a fraction."
+                          },
+                          "p90": {
+                            "type": "number",
+                            "description": "90th percentile of the absolute relative error, as a fraction."
+                          }
+                        },
+                        "required": ["median", "p90"],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Absolute relative error of the muzzle velocity over the used rows; null without one."
+                  },
+                  "pressure": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "median": {
+                            "type": "number",
+                            "description": "Median of the absolute relative error, as a fraction."
+                          },
+                          "p90": {
+                            "type": "number",
+                            "description": "90th percentile of the absolute relative error, as a fraction."
+                          },
+                          "rows": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "description": "Used rows that print a peak pressure."
+                          }
+                        },
+                        "required": ["median", "p90", "rows"],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Absolute relative error of the peak pressure over the used rows that print one."
+                  },
+                  "interval": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "coverage": {
+                            "type": "number",
+                            "description": "Share of the used rows inside the interval."
+                          }
+                        },
+                        "required": ["coverage"],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Coverage of the 90 % interval; null without rows or without an interval."
+                  }
+                },
+                "required": ["rows", "velocity", "pressure", "interval"],
+                "additionalProperties": false
+              },
+              "description": "By powder family, `<propellant base>/<grain form>` of the powder record."
+            },
+            "byPowder": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "rows": {
+                    "type": "object",
+                    "properties": {
+                      "inSplit": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991,
+                        "description": "Rows of the split in this group."
+                      },
+                      "used": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991,
+                        "description": "Rows the model gave a result for."
+                      },
+                      "notUsed": {
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string",
+                          "enum": [
+                            "unknownCartridge",
+                            "unknownBullet",
+                            "unknownPowder",
+                            "noPowderModel",
+                            "noCaseCapacity",
+                            "noBulletLength",
+                            "noBulletShape",
+                            "noBarrelLength",
+                            "missingCartridgeValue",
+                            "modelRefused"
+                          ]
+                        },
+                        "additionalProperties": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "description": "Rows not used, by reason; a reason without rows is left out."
+                      }
+                    },
+                    "required": ["inSplit", "used", "notUsed"],
+                    "additionalProperties": false
+                  },
+                  "velocity": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "median": {
+                            "type": "number",
+                            "description": "Median of the absolute relative error, as a fraction."
+                          },
+                          "p90": {
+                            "type": "number",
+                            "description": "90th percentile of the absolute relative error, as a fraction."
+                          }
+                        },
+                        "required": ["median", "p90"],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Absolute relative error of the muzzle velocity over the used rows; null without one."
+                  },
+                  "pressure": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "median": {
+                            "type": "number",
+                            "description": "Median of the absolute relative error, as a fraction."
+                          },
+                          "p90": {
+                            "type": "number",
+                            "description": "90th percentile of the absolute relative error, as a fraction."
+                          },
+                          "rows": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "description": "Used rows that print a peak pressure."
+                          }
+                        },
+                        "required": ["median", "p90", "rows"],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Absolute relative error of the peak pressure over the used rows that print one."
+                  },
+                  "interval": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "coverage": {
+                            "type": "number",
+                            "description": "Share of the used rows inside the interval."
+                          }
+                        },
+                        "required": ["coverage"],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Coverage of the 90 % interval; null without rows or without an interval."
+                  }
+                },
+                "required": ["rows", "velocity", "pressure", "interval"],
+                "additionalProperties": false
+              },
+              "description": "By powder id."
+            },
+            "grouped": {
+              "description": "The groups of `--group-by`: the key by which the rows are grouped and the groups.",
+              "type": "object",
+              "properties": {
+                "by": {
+                  "type": "string",
+                  "enum": ["powder", "family", "cartridge", "bullet", "construction"]
+                },
+                "groups": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "rows": {
+                        "type": "object",
+                        "properties": {
+                          "inSplit": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "description": "Rows of the split in this group."
+                          },
+                          "used": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "description": "Rows the model gave a result for."
+                          },
+                          "notUsed": {
+                            "type": "object",
+                            "propertyNames": {
+                              "type": "string",
+                              "enum": [
+                                "unknownCartridge",
+                                "unknownBullet",
+                                "unknownPowder",
+                                "noPowderModel",
+                                "noCaseCapacity",
+                                "noBulletLength",
+                                "noBulletShape",
+                                "noBarrelLength",
+                                "missingCartridgeValue",
+                                "modelRefused"
+                              ]
+                            },
+                            "additionalProperties": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 9007199254740991
+                            },
+                            "description": "Rows not used, by reason; a reason without rows is left out."
+                          }
+                        },
+                        "required": ["inSplit", "used", "notUsed"],
+                        "additionalProperties": false
+                      },
+                      "velocity": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "median": {
+                                "type": "number",
+                                "description": "Median of the absolute relative error, as a fraction."
+                              },
+                              "p90": {
+                                "type": "number",
+                                "description": "90th percentile of the absolute relative error, as a fraction."
+                              }
+                            },
+                            "required": ["median", "p90"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "description": "Absolute relative error of the muzzle velocity over the used rows; null without one."
+                      },
+                      "pressure": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "median": {
+                                "type": "number",
+                                "description": "Median of the absolute relative error, as a fraction."
+                              },
+                              "p90": {
+                                "type": "number",
+                                "description": "90th percentile of the absolute relative error, as a fraction."
+                              },
+                              "rows": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991,
+                                "description": "Used rows that print a peak pressure."
+                              }
+                            },
+                            "required": ["median", "p90", "rows"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "description": "Absolute relative error of the peak pressure over the used rows that print one."
+                      },
+                      "interval": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "coverage": {
+                                "type": "number",
+                                "description": "Share of the used rows inside the interval."
+                              }
+                            },
+                            "required": ["coverage"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "description": "Coverage of the 90 % interval; null without rows or without an interval."
+                      }
+                    },
+                    "required": ["rows", "velocity", "pressure", "interval"],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": ["by", "groups"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["model", "modelVersion", "interval", "overall", "byFamily", "byPowder"],
+          "additionalProperties": false
+        },
+        "candidate": {
+          "type": "object",
+          "properties": {
+            "model": {
+              "type": "string",
+              "description": "The name or module path the model was selected by."
+            },
+            "modelVersion": {
+              "type": "string",
+              "description": "SHA-256 over the model sources, the records the rows name and the rows bytes."
+            },
+            "interval": {
+              "type": "object",
+              "properties": {
+                "basis": {
+                  "type": "string",
+                  "const": "training"
+                },
+                "halfWidth": {
+                  "description": "The 90th percentile of the absolute relative velocity error on the training split: a printed velocity is inside the interval when its error is at most this. Null without a training row.",
+                  "type": ["number", "null"]
+                },
+                "trainingRows": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991,
+                  "description": "Used training rows the half width comes from."
+                }
+              },
+              "required": ["basis", "halfWidth", "trainingRows"],
+              "additionalProperties": false
+            },
+            "overall": {
+              "type": "object",
+              "properties": {
+                "rows": {
+                  "type": "object",
+                  "properties": {
+                    "inSplit": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991,
+                      "description": "Rows of the split in this group."
+                    },
+                    "used": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991,
+                      "description": "Rows the model gave a result for."
+                    },
+                    "notUsed": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string",
+                        "enum": [
+                          "unknownCartridge",
+                          "unknownBullet",
+                          "unknownPowder",
+                          "noPowderModel",
+                          "noCaseCapacity",
+                          "noBulletLength",
+                          "noBulletShape",
+                          "noBarrelLength",
+                          "missingCartridgeValue",
+                          "modelRefused"
+                        ]
+                      },
+                      "additionalProperties": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "description": "Rows not used, by reason; a reason without rows is left out."
+                    }
+                  },
+                  "required": ["inSplit", "used", "notUsed"],
+                  "additionalProperties": false
+                },
+                "velocity": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "median": {
+                          "type": "number",
+                          "description": "Median of the absolute relative error, as a fraction."
+                        },
+                        "p90": {
+                          "type": "number",
+                          "description": "90th percentile of the absolute relative error, as a fraction."
+                        }
+                      },
+                      "required": ["median", "p90"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Absolute relative error of the muzzle velocity over the used rows; null without one."
+                },
+                "pressure": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "median": {
+                          "type": "number",
+                          "description": "Median of the absolute relative error, as a fraction."
+                        },
+                        "p90": {
+                          "type": "number",
+                          "description": "90th percentile of the absolute relative error, as a fraction."
+                        },
+                        "rows": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991,
+                          "description": "Used rows that print a peak pressure."
+                        }
+                      },
+                      "required": ["median", "p90", "rows"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Absolute relative error of the peak pressure over the used rows that print one."
+                },
+                "interval": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "coverage": {
+                          "type": "number",
+                          "description": "Share of the used rows inside the interval."
+                        }
+                      },
+                      "required": ["coverage"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Coverage of the 90 % interval; null without rows or without an interval."
+                }
+              },
+              "required": ["rows", "velocity", "pressure", "interval"],
+              "additionalProperties": false
+            },
+            "byFamily": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "rows": {
+                    "type": "object",
+                    "properties": {
+                      "inSplit": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991,
+                        "description": "Rows of the split in this group."
+                      },
+                      "used": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991,
+                        "description": "Rows the model gave a result for."
+                      },
+                      "notUsed": {
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string",
+                          "enum": [
+                            "unknownCartridge",
+                            "unknownBullet",
+                            "unknownPowder",
+                            "noPowderModel",
+                            "noCaseCapacity",
+                            "noBulletLength",
+                            "noBulletShape",
+                            "noBarrelLength",
+                            "missingCartridgeValue",
+                            "modelRefused"
+                          ]
+                        },
+                        "additionalProperties": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "description": "Rows not used, by reason; a reason without rows is left out."
+                      }
+                    },
+                    "required": ["inSplit", "used", "notUsed"],
+                    "additionalProperties": false
+                  },
+                  "velocity": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "median": {
+                            "type": "number",
+                            "description": "Median of the absolute relative error, as a fraction."
+                          },
+                          "p90": {
+                            "type": "number",
+                            "description": "90th percentile of the absolute relative error, as a fraction."
+                          }
+                        },
+                        "required": ["median", "p90"],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Absolute relative error of the muzzle velocity over the used rows; null without one."
+                  },
+                  "pressure": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "median": {
+                            "type": "number",
+                            "description": "Median of the absolute relative error, as a fraction."
+                          },
+                          "p90": {
+                            "type": "number",
+                            "description": "90th percentile of the absolute relative error, as a fraction."
+                          },
+                          "rows": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "description": "Used rows that print a peak pressure."
+                          }
+                        },
+                        "required": ["median", "p90", "rows"],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Absolute relative error of the peak pressure over the used rows that print one."
+                  },
+                  "interval": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "coverage": {
+                            "type": "number",
+                            "description": "Share of the used rows inside the interval."
+                          }
+                        },
+                        "required": ["coverage"],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Coverage of the 90 % interval; null without rows or without an interval."
+                  }
+                },
+                "required": ["rows", "velocity", "pressure", "interval"],
+                "additionalProperties": false
+              },
+              "description": "By powder family, `<propellant base>/<grain form>` of the powder record."
+            },
+            "byPowder": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "rows": {
+                    "type": "object",
+                    "properties": {
+                      "inSplit": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991,
+                        "description": "Rows of the split in this group."
+                      },
+                      "used": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991,
+                        "description": "Rows the model gave a result for."
+                      },
+                      "notUsed": {
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string",
+                          "enum": [
+                            "unknownCartridge",
+                            "unknownBullet",
+                            "unknownPowder",
+                            "noPowderModel",
+                            "noCaseCapacity",
+                            "noBulletLength",
+                            "noBulletShape",
+                            "noBarrelLength",
+                            "missingCartridgeValue",
+                            "modelRefused"
+                          ]
+                        },
+                        "additionalProperties": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "description": "Rows not used, by reason; a reason without rows is left out."
+                      }
+                    },
+                    "required": ["inSplit", "used", "notUsed"],
+                    "additionalProperties": false
+                  },
+                  "velocity": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "median": {
+                            "type": "number",
+                            "description": "Median of the absolute relative error, as a fraction."
+                          },
+                          "p90": {
+                            "type": "number",
+                            "description": "90th percentile of the absolute relative error, as a fraction."
+                          }
+                        },
+                        "required": ["median", "p90"],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Absolute relative error of the muzzle velocity over the used rows; null without one."
+                  },
+                  "pressure": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "median": {
+                            "type": "number",
+                            "description": "Median of the absolute relative error, as a fraction."
+                          },
+                          "p90": {
+                            "type": "number",
+                            "description": "90th percentile of the absolute relative error, as a fraction."
+                          },
+                          "rows": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "description": "Used rows that print a peak pressure."
+                          }
+                        },
+                        "required": ["median", "p90", "rows"],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Absolute relative error of the peak pressure over the used rows that print one."
+                  },
+                  "interval": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "coverage": {
+                            "type": "number",
+                            "description": "Share of the used rows inside the interval."
+                          }
+                        },
+                        "required": ["coverage"],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Coverage of the 90 % interval; null without rows or without an interval."
+                  }
+                },
+                "required": ["rows", "velocity", "pressure", "interval"],
+                "additionalProperties": false
+              },
+              "description": "By powder id."
+            },
+            "grouped": {
+              "description": "The groups of `--group-by`: the key by which the rows are grouped and the groups.",
+              "type": "object",
+              "properties": {
+                "by": {
+                  "type": "string",
+                  "enum": ["powder", "family", "cartridge", "bullet", "construction"]
+                },
+                "groups": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "rows": {
+                        "type": "object",
+                        "properties": {
+                          "inSplit": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "description": "Rows of the split in this group."
+                          },
+                          "used": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "description": "Rows the model gave a result for."
+                          },
+                          "notUsed": {
+                            "type": "object",
+                            "propertyNames": {
+                              "type": "string",
+                              "enum": [
+                                "unknownCartridge",
+                                "unknownBullet",
+                                "unknownPowder",
+                                "noPowderModel",
+                                "noCaseCapacity",
+                                "noBulletLength",
+                                "noBulletShape",
+                                "noBarrelLength",
+                                "missingCartridgeValue",
+                                "modelRefused"
+                              ]
+                            },
+                            "additionalProperties": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 9007199254740991
+                            },
+                            "description": "Rows not used, by reason; a reason without rows is left out."
+                          }
+                        },
+                        "required": ["inSplit", "used", "notUsed"],
+                        "additionalProperties": false
+                      },
+                      "velocity": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "median": {
+                                "type": "number",
+                                "description": "Median of the absolute relative error, as a fraction."
+                              },
+                              "p90": {
+                                "type": "number",
+                                "description": "90th percentile of the absolute relative error, as a fraction."
+                              }
+                            },
+                            "required": ["median", "p90"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "description": "Absolute relative error of the muzzle velocity over the used rows; null without one."
+                      },
+                      "pressure": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "median": {
+                                "type": "number",
+                                "description": "Median of the absolute relative error, as a fraction."
+                              },
+                              "p90": {
+                                "type": "number",
+                                "description": "90th percentile of the absolute relative error, as a fraction."
+                              },
+                              "rows": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991,
+                                "description": "Used rows that print a peak pressure."
+                              }
+                            },
+                            "required": ["median", "p90", "rows"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "description": "Absolute relative error of the peak pressure over the used rows that print one."
+                      },
+                      "interval": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "coverage": {
+                                "type": "number",
+                                "description": "Share of the used rows inside the interval."
+                              }
+                            },
+                            "required": ["coverage"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ],
+                        "description": "Coverage of the 90 % interval; null without rows or without an interval."
+                      }
+                    },
+                    "required": ["rows", "velocity", "pressure", "interval"],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": ["by", "groups"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["model", "modelVersion", "interval", "overall", "byFamily", "byPowder"],
+          "additionalProperties": false
+        },
+        "change": {
+          "type": "object",
+          "properties": {
+            "overall": {
+              "type": "object",
+              "properties": {
+                "usedRows": {
+                  "type": "number",
+                  "description": "Candidate minus baseline used rows."
+                },
+                "velocityMedian": {
+                  "description": "Candidate minus baseline; null where either has none.",
+                  "type": ["number", "null"]
+                },
+                "velocityP90": {
+                  "description": "Candidate minus baseline; null where either has none.",
+                  "type": ["number", "null"]
+                },
+                "pressureMedian": {
+                  "description": "Candidate minus baseline; null where either has none.",
+                  "type": ["number", "null"]
+                },
+                "pressureP90": {
+                  "description": "Candidate minus baseline; null where either has none.",
+                  "type": ["number", "null"]
+                },
+                "intervalCoverage": {
+                  "description": "Candidate minus baseline; null where either has none.",
+                  "type": ["number", "null"]
+                }
+              },
+              "required": [
+                "usedRows",
+                "velocityMedian",
+                "velocityP90",
+                "pressureMedian",
+                "pressureP90",
+                "intervalCoverage"
+              ],
+              "additionalProperties": false
+            },
+            "byFamily": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "usedRows": {
+                    "type": "number",
+                    "description": "Candidate minus baseline used rows."
+                  },
+                  "velocityMedian": {
+                    "description": "Candidate minus baseline; null where either has none.",
+                    "type": ["number", "null"]
+                  },
+                  "velocityP90": {
+                    "description": "Candidate minus baseline; null where either has none.",
+                    "type": ["number", "null"]
+                  },
+                  "pressureMedian": {
+                    "description": "Candidate minus baseline; null where either has none.",
+                    "type": ["number", "null"]
+                  },
+                  "pressureP90": {
+                    "description": "Candidate minus baseline; null where either has none.",
+                    "type": ["number", "null"]
+                  },
+                  "intervalCoverage": {
+                    "description": "Candidate minus baseline; null where either has none.",
+                    "type": ["number", "null"]
+                  }
+                },
+                "required": [
+                  "usedRows",
+                  "velocityMedian",
+                  "velocityP90",
+                  "pressureMedian",
+                  "pressureP90",
+                  "intervalCoverage"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "grouped": {
+              "description": "Per group of `--group-by`.",
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "usedRows": {
+                    "type": "number",
+                    "description": "Candidate minus baseline used rows."
+                  },
+                  "velocityMedian": {
+                    "description": "Candidate minus baseline; null where either has none.",
+                    "type": ["number", "null"]
+                  },
+                  "velocityP90": {
+                    "description": "Candidate minus baseline; null where either has none.",
+                    "type": ["number", "null"]
+                  },
+                  "pressureMedian": {
+                    "description": "Candidate minus baseline; null where either has none.",
+                    "type": ["number", "null"]
+                  },
+                  "pressureP90": {
+                    "description": "Candidate minus baseline; null where either has none.",
+                    "type": ["number", "null"]
+                  },
+                  "intervalCoverage": {
+                    "description": "Candidate minus baseline; null where either has none.",
+                    "type": ["number", "null"]
+                  }
+                },
+                "required": [
+                  "usedRows",
+                  "velocityMedian",
+                  "velocityP90",
+                  "pressureMedian",
+                  "pressureP90",
+                  "intervalCoverage"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": ["overall", "byFamily"],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "split",
+        "final",
+        "inputs",
+        "command",
+        "baseline",
+        "candidate",
+        "change"
+      ],
+      "additionalProperties": false
+    }
+  ]
+}
