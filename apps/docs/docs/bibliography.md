@@ -107,8 +107,14 @@ Measurement data imported as values carry their license: public domain in the US
 
 ## Online references
 
+- <a id="bdmp-home"></a>**BDMP.** Bund Deutscher Militär- und Polizeischützen e.V.: *Homepage*. <https://www.bdmp.de/>
+- <a id="bds-home"></a>**BDS.** Bund Deutscher Sportschützen 1975 e. V.: *Homepage*. <https://www.bdsnet.de/>
 - <a id="dlmf"></a>**DLMF.** F. W. J. Olver, A. B. Olde Daalhuis, D. W. Lozier, B. I. Schneider, R. F. Boisvert, C. W. Clark, B. R. Miller, B. V. Saunders, H. S. Cohl, M. A. McClain (eds.): *NIST Digital Library of Mathematical Functions*. NIST, Gaithersburg, MD. <https://dlmf.nist.gov/>
+- <a id="dsb-home"></a>**DSB.** Deutscher Schützenbund e.V.: *Homepage*. <https://www.dsb.de/>
+- <a id="dsu-home"></a>**DSU.** Deutsche Schießsport Union e.V.: *Homepage*. <https://www.d-s-u.de/>
+- <a id="issf-home"></a>**ISSF.** International Shooting Sport Federation: *Homepage*. <https://www.issf-sports.org/>
 - <a id="nist-sematech"></a>**NIST/SEMATECH.** National Institute of Standards and Technology, SEMATECH: *NIST/SEMATECH e-Handbook of Statistical Methods*. NIST, Gaithersburg, MD. <https://www.itl.nist.gov/div898/handbook/>
+- <a id="vdrbw-home"></a>**VdRBw.** Verband der Reservisten der Deutschen Bundeswehr e.V.: *Homepage*. <https://www.reservistenverband.de/>
 - <a id="wmo-2025"></a>**WMO 2025.** World Meteorological Organization: *Records of Weather and Climate Extremes*, as of 31 July 2025. Table of the WMO World Weather and Climate Extremes Archive. <https://wmo.int/sites/default/files/2025-07/Table_Records_25Jul2025.pdf>
 
 ## Patents

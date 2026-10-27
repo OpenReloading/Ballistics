@@ -36,6 +36,8 @@ export const federation = z.strictObject({
   country: z.union([z.literal('international'), countryCode]),
   /** Id of the international federation the rule book names this one a member of. */
   internationalFederation: recordId.optional(),
+  /** An https URL of the federation's own homepage: pages render it as a link. */
+  website: z.url({ protocol: /^https$/ }).optional(),
   /** The federation's rule books that the records cite. */
   ruleBooks: z
     .array(

@@ -12,6 +12,7 @@ const validFederation = {
   abbreviation: 'TF',
   country: 'DE',
   internationalFederation: 'test-world',
+  website: 'https://example.org/',
   ruleBooks: [
     {
       title: 'Test rule book',
@@ -69,6 +70,13 @@ describe('federation', () => {
         'ruleBooks.0.url',
       )
     expectIssueAt(federation, { ...validFederation, members: [] }, '')
+  })
+
+  it('takes an https homepage and refuses any other address', () => {
+    const { website, ...bare } = validFederation
+    expect(federation.safeParse(bare).success).toBe(true)
+    for (const bad of ['http://example.org/', 'javascript:alert(1)', 'example.org', ''])
+      expectIssueAt(federation, { ...validFederation, website: bad }, 'website')
   })
 })
 
