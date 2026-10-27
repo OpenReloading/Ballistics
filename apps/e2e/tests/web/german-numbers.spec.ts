@@ -37,7 +37,7 @@ test('under German the workbench writes and takes a decimal comma and its result
   expect(await keys.innerText()).not.toMatch(/\d\.\d/)
 
   const { violations } = await new AxeBuilder({ page })
-    .include('[role="form"]')
+    .include('form[aria-label="Load"]')
     .include('.readout-keys')
     .analyze()
   expect(violations.map((v) => v.id)).toEqual([])
