@@ -256,16 +256,14 @@ jobs:
           key: ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'package-lock.json', 'patches/**', 'apps/web/next.config.ts') }}-${{ hashFiles('apps/web/src/**', 'packages/*/src/**') }}
           restore-keys: |
             ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'package-lock.json', 'patches/**', 'apps/web/next.config.ts') }}-
-      # `--keep-build` leaves .next to the cache and to the JavaScript budget; the docs site is no part of this job
+      # the export leaves .next to the cache and to the JavaScript budget; the docs site is no part of this job
       - name: Export the static site
         run: |
           if [ "$PRERENDER" = sample ]; then
-            npm run pages -w @open-reloading/tools -- --sample --keep-build
+            npm run pages -w @open-reloading/tools -- --sample
           else
-            npm run pages -w @open-reloading/tools -- --no-docs --keep-build
+            npm run pages -w @open-reloading/tools -- --no-docs
           fi
-        env:
-          PAGES_BASE_PATH: ''
       - name: Save the Turbopack cache
         if: steps.cache.outputs.cache-hit != 'true' && (github.event_name == 'pull_request' || github.ref == format('refs/heads/{0}', github.event.repository.default_branch))
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -280,8 +278,6 @@ jobs:
           node tools/src/pages-serve.ts &
           for _ in $(seq 1 30); do curl --silent --fail http://localhost:3003/ > /dev/null && exit 0; sleep 1; done
           exit 1
-        env:
-          PAGES_BASE_PATH: ''
       - run: npm run test:e2e
       - name: Drawing baseline in the Playwright image
         run: npm run drawing-baseline -w @open-reloading/e2e

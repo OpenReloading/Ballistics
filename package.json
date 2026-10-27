@@ -21,7 +21,7 @@
   "scripts": {
     "lint": "biome check --error-on-warnings .",
     "format": "biome check --write .",
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run build -w @open-reloading/schema -w @open-reloading/importers -w @open-reloading/core -w @open-reloading/data -w @open-reloading/api -w @open-reloading/drawing",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm test -w @open-reloading/schema -w @open-reloading/core -w @open-reloading/importers -w @open-reloading/drawing -w @open-reloading/data -w @open-reloading/api -w @open-reloading/web -w @open-reloading/docs -w @open-reloading/tools && npm run test:unit -w @open-reloading/e2e",
     "test:e2e": "npm test -w @open-reloading/e2e",
@@ -29,7 +29,7 @@
     "pages:build": "npm run pages -w @open-reloading/tools",
     "pages:serve": "npm run pages:serve -w @open-reloading/tools",
     "dev:static": "npm run dev:static -w @open-reloading/tools",
-    "static:build": "PAGES_BASE_PATH= npm run pages -w @open-reloading/tools -- --sample",
+    "static:build": "npm run pages -w @open-reloading/tools -- --sample",
     "data:validate": "npm run validate -w @open-reloading/data",
     "api:check": "npm run api-check -w @open-reloading/tools",
     "api:conformance": "npm run api-conformance -w @open-reloading/tools",

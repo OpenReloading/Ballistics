@@ -10,7 +10,6 @@ import { Panel } from '../../../components/panel.tsx'
 import { RecordPage } from '../../../components/record-page.tsx'
 import { ServerDataError } from '../../../components/states.tsx'
 import {
-  buildPlaceholderId,
   getBullet,
   getManufacturerNames,
   listAllBullets,
@@ -34,7 +33,6 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps<'/bullets/[id]'>): Promise<Metadata> {
   const { id } = await params
-  if (id === buildPlaceholderId) notFound()
   const r = await getBullet(id)
   if (r.status === 'notFound') notFound()
   if (r.status !== 'ok') return { robots: { index: false } }
@@ -48,7 +46,6 @@ export async function generateMetadata({ params }: PageProps<'/bullets/[id]'>): 
 // no Suspense above notFound(): a streamed response keeps status 200
 export default async function BulletPage({ params }: PageProps<'/bullets/[id]'>) {
   const { id } = await params
-  if (id === buildPlaceholderId) notFound()
   const r = await getBullet(id)
   if (r.status === 'notFound') notFound()
   if (r.status !== 'ok') return <ServerDataError what="Bullet" />

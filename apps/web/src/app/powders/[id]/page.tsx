@@ -12,13 +12,7 @@ import { PowderFit } from '../../../components/powder-fit.tsx'
 import { RecordPage } from '../../../components/record-page.tsx'
 import { ServerDataError } from '../../../components/states.tsx'
 import { VivacityPanel } from '../../../components/vivacity-panel.tsx'
-import {
-  buildPlaceholderId,
-  getManufacturerNames,
-  getPowder,
-  listAllPowders,
-  staticIds,
-} from '../../../lib/api.ts'
+import { getManufacturerNames, getPowder, listAllPowders, staticIds } from '../../../lib/api.ts'
 import {
   classifyPowder,
   isFitted,
@@ -39,7 +33,6 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps<'/powders/[id]'>): Promise<Metadata> {
   const { id } = await params
-  if (id === buildPlaceholderId) notFound()
   const r = await getPowder(id)
   if (r.status === 'notFound') notFound()
   if (r.status !== 'ok') return { robots: { index: false } }
@@ -75,7 +68,6 @@ async function place(id: string): Promise<BurnRatePlace | undefined> {
 // no Suspense above notFound(): a streamed response keeps status 200
 export default async function PowderPage({ params }: PageProps<'/powders/[id]'>) {
   const { id } = await params
-  if (id === buildPlaceholderId) notFound()
   const r = await getPowder(id)
   if (r.status === 'notFound') notFound()
   if (r.status !== 'ok') return <ServerDataError what="Powder" />

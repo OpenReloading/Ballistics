@@ -11,7 +11,6 @@ import { PanelTable } from '../../../components/scroll-region.tsx'
 import { ServerDataError } from '../../../components/states.tsx'
 import { TargetFaceDrawing } from '../../../components/target-face-drawing.tsx'
 import {
-  buildPlaceholderId,
   getDiscipline,
   getTargetFace,
   getTargetMapping,
@@ -32,7 +31,6 @@ export async function generateMetadata({
   params,
 }: PageProps<'/disciplines/[id]'>): Promise<Metadata> {
   const { id } = await params
-  if (id === buildPlaceholderId) notFound()
   const r = await getDiscipline(id)
   if (r.status === 'notFound') notFound()
   if (r.status !== 'ok') return { robots: { index: false } }
@@ -53,7 +51,6 @@ const shownLength = (mm: number) => (
 // no Suspense above notFound(): a streamed response keeps status 200
 export default async function DisciplinePage({ params }: PageProps<'/disciplines/[id]'>) {
   const { id } = await params
-  if (id === buildPlaceholderId) notFound()
   const r = await getDiscipline(id)
   if (r.status === 'notFound') notFound()
   const [listed, disciplines, federations, classes] = await Promise.all([

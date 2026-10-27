@@ -14,15 +14,12 @@ import { executable } from './executable.ts'
 
 const at = (p: string) => fileURLToPath(new URL(`../../${p}`, import.meta.url))
 const dataDir = at('apps/web/public/api')
-// one edition's Turbopack cache fails the other's build
-const clearWebBuild = () => rmSync(at('apps/web/.next'), { recursive: true, force: true })
 
 const api = await startBundleApi()
 let dev: ChildProcess | undefined
 // before the data files are written: a signal then skips the server start, the cleanup below still runs
 const { stopped, dispose } = stopOnSignal(() => dev?.pid)
 try {
-  clearWebBuild()
   rmSync(dataDir, { recursive: true, force: true })
   await writeStaticApi(api.data, dataDir)
   if (!stopped()) {
@@ -45,12 +42,11 @@ try {
   }
 } finally {
   // one failed removal must not leave the API open
-  for (const clean of [clearWebBuild, () => rmSync(dataDir, { recursive: true, force: true })])
-    try {
-      clean()
-    } catch (error) {
-      console.error(error)
-    }
+  try {
+    rmSync(dataDir, { recursive: true, force: true })
+  } catch (error) {
+    console.error(error)
+  }
   dispose()
   await api.close()
 }

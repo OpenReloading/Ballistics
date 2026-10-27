@@ -17,14 +17,14 @@ import { countText } from '../lib/lists.ts'
 import { sections } from '../lib/sections.ts'
 import { controlSize } from '../lib/theme.ts'
 
-/** A list's record count, nothing while the API is unavailable (at run time `apiGet` throws). */
+/** A list's record count. */
 async function Count({
   list,
 }: {
   list: () => Promise<{ status: string; data?: unknown[] | undefined }>
 }) {
-  const r = await list().catch(() => undefined)
-  return r?.status === 'ok' && r.data ? countText(r.data.length, r.data.length, 'records') : null
+  const r = await list()
+  return r.status === 'ok' && r.data ? countText(r.data.length, r.data.length, 'records') : null
 }
 
 // the records the API lists at build time. The firearms are the viewer's own

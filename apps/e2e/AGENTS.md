@@ -51,7 +51,7 @@ Playwright tests against the static export of the web app (`pages/`, served by `
 
 ## Commands (this directory, or `-w @open-reloading/e2e` from the root)
 
-- Build and serve the export first (root, after `npm run build`): `npm run static:build` (the sample, about 15 s) and `npm run pages:serve`, or the full export `PAGES_BASE_PATH= npm run pages -w @open-reloading/tools -- --no-docs`. Run the API on `API_URL` (`node packages/api/dist/server.js`, or `docker compose up api`).
+- Build and serve the export first (root, after `npm run build`): `npm run static:build` (the sample, about 15 s) and `npm run pages:serve`, or the full export `npm run pages -w @open-reloading/tools -- --no-docs`. Run the API on `API_URL` (`node packages/api/dist/server.js`, or `docker compose up api`).
 - Browser, once: `npx playwright install --with-deps chromium`
 - Specs that import web sources (`../../apps/web/src/...`) load the workspace packages from their `dist/`. Run `npm run build` at the root first (CI builds schema, importers, core and drawing before `npm run test:e2e`).
 - Web pages and the export's `/api/*` data files carry no version prefix; the API's routes are under `/v1`. HTTP requests and responses of the API are tested in `packages/api/test/` and with Schemathesis (`npm run api:conformance`).
@@ -71,6 +71,6 @@ Playwright tests against the static export of the web app (`pages/`, served by `
   - `VISUAL_LOADS=<n>`: n open loads. `VISUAL_DEFAULTS=1`: that load with the defaulted inputs left out.
   - `VISUAL_TALL=<height>`: one more shot per page in a window that tall.
 - Unit tests of the scripts (Vitest): `npm run test:unit`
-- The drawing baseline needs docker or podman, so in the dev container setup it runs on the host: build the export in the container (`npm run static:build`), then on the host `npm run pages:serve` and `npm run drawing-baseline` (the default set is in the sample, the full set needs a full export at the site root, `PAGES_BASE_PATH= npm run pages -w @open-reloading/tools -- --no-docs`). The `pages/` folder is shared by the bind mount.
+- The drawing baseline needs docker or podman, so in the dev container setup it runs on the host: build the export in the container (`npm run static:build`), then on the host `npm run pages:serve` and `npm run drawing-baseline` (the default set is in the sample, the full set needs a full export at the site root, `npm run pages -w @open-reloading/tools -- --no-docs`). The `pages/` folder is shared by the bind mount.
 - Pages under a base path (`pages.yml`'s layout): `PAGES_BASE_PATH=/Ballistics npm run pages:build`, `PAGES_BASE_PATH=/Ballistics npm run pages:serve`, then `PAGES_URL=http://localhost:3003/Ballistics/ npm test -- --project=pages` (the API on `API_URL`).
 - `user-data-folder.spec.ts` needs a secure origin (`localhost` or https). From the dev container, `http://host.containers.internal` is not one and its two tests fail. Against a site and API served on the host, run the suite in the Playwright image on the host network: `podman run --rm --network=host --userns=keep-id -v "$PWD":"$PWD":z -w "$PWD/apps/e2e" -e CI=1 mcr.microsoft.com/playwright:v<@playwright/test version>-noble npx playwright test`

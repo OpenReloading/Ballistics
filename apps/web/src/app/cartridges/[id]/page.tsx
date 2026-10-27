@@ -17,13 +17,7 @@ import { Panel } from '../../../components/panel.tsx'
 import { RecordPage } from '../../../components/record-page.tsx'
 import { GapBadge, StandardBadge } from '../../../components/standard-badge.tsx'
 import { ServerDataError } from '../../../components/states.tsx'
-import {
-  buildPlaceholderId,
-  getCartridge,
-  listAllBullets,
-  listAllCartridges,
-  staticIds,
-} from '../../../lib/api.ts'
+import { getCartridge, listAllBullets, listAllCartridges, staticIds } from '../../../lib/api.ts'
 import {
   combinedRows,
   inReadingOrder,
@@ -43,7 +37,6 @@ export async function generateMetadata({
   params,
 }: PageProps<'/cartridges/[id]'>): Promise<Metadata> {
   const { id } = await params
-  if (id === buildPlaceholderId) notFound()
   const r = await getCartridge(id)
   if (r.status === 'notFound') notFound()
   if (r.status !== 'ok') return { robots: { index: false } }
@@ -79,7 +72,6 @@ function RecordBadges({ aliases, gap }: { aliases: string[]; gap: boolean }) {
 // no Suspense above notFound(): a streamed response keeps status 200
 export default async function CartridgePage({ params }: PageProps<'/cartridges/[id]'>) {
   const { id } = await params
-  if (id === buildPlaceholderId) notFound()
   const r = await getCartridge(id)
   if (r.status === 'notFound') notFound()
   if (r.status !== 'ok') return <ServerDataError what="Cartridge" />

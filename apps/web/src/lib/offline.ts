@@ -70,23 +70,20 @@ export const networkOr = <T extends { status: number }>(
     : network
 
 /**
- * The URL of an app path under `base` (the Pages edition's base path, `''` in the server edition). A
- * page ends in `slash` (`'/'` in the Pages edition, whose pages are `<path>/index.html`).
+ * The URL of an app path under `base` (the base path, `''` at a domain root). A page ends in
+ * `slash` (`'/'`: the pages are `<path>/index.html`).
  */
 export const appUrl = (base: string, path: string, slash = '') =>
   base + (path === '/' ? '/' : path + slash)
 
-/** The Pages edition's catalogue index (`writeStaticApi`), which every list reads: precached, so lists work offline. */
+/** The catalogue index (`writeStaticApi`), which every list reads: precached, so lists work offline. */
 export const catalogueFile = '/api/catalogue/index.json'
 
-/**
- * URLs of the files under `.next/static` (paths relative to it) without maps, in the Pages edition
- * (`pages`) also the catalogue index.
- */
-export const precacheList = (files: string[], base = '', pages = false) =>
+/** URLs of the files under `.next/static` (paths relative to it) without maps, and the catalogue index. */
+export const precacheList = (files: string[], base = '') =>
   [
     ...files.filter((f) => !/\.map$/.test(f)).map((f) => `${base}/_next/static/${f}`),
-    ...(pages ? [base + catalogueFile] : []),
+    base + catalogueFile,
   ].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))
 
 /** The cache key of a page: its path and query without Next's `_rsc` parameter. */
@@ -107,10 +104,10 @@ export const shellAnswer = (cached: Response, destination: string) =>
 
 /**
  * How the worker answers a request: `static` from the shell cache (the chunks, the manifest and
- * icons, the Pages catalogue index), `records` network-first with
+ * icons, the catalogue index), `records` network-first with
  * the cached record behind it, `page` network-first with the cached page and the offline page
  * behind it, `navigation` (a client navigation fetching RSC) from the network while the page's HTML
- * is stored; undefined leaves the request to the network (POST /interior, searches, prefetches,
+ * is stored; undefined leaves the request to the network (other methods, searches, prefetches,
  * other origins, paths outside `base`, the docs site under `<base>/docs/` and the `next` edition under
  * `<base>/next/`, whose own worker has that scope).
  */

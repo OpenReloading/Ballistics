@@ -584,7 +584,6 @@ function PhoneBar({
   ok,
   stale,
   system,
-  online,
   pending,
   run,
   show,
@@ -592,7 +591,6 @@ function PhoneBar({
   ok: OkOutcome | undefined
   stale: boolean
   system: UnitSystem
-  online: boolean
   pending: boolean
   run: Load['run']
   show: () => void
@@ -613,7 +611,6 @@ function PhoneBar({
       <Button
         className="bar-run-phone"
         aria-label="Run simulation"
-        aria-describedby={online ? undefined : 'run-network-hint'}
         loading={pending}
         loaderProps={{ type: 'dots' }}
         leftSection={<Play size={14} weight="fill" aria-hidden="true" />}
@@ -884,7 +881,6 @@ export function Workbench() {
     chronoSessions,
     edits,
     onOpenFile,
-    online,
     opened,
     outcome,
     storeLoad,
@@ -1017,7 +1013,6 @@ export function Workbench() {
       setChartView,
       showChart,
       status,
-      online,
       pending,
     }),
     [
@@ -1062,7 +1057,6 @@ export function Workbench() {
       setChartView,
       showChart,
       status,
-      online,
       pending,
     ],
   )
@@ -1179,7 +1173,6 @@ export function Workbench() {
                     className="bar-run"
                     aria-label="Run simulation"
                     aria-keyshortcuts={shortcutAriaKeys('run')}
-                    aria-describedby={online ? undefined : 'run-network-hint'}
                     loading={pending}
                     loaderProps={{ type: 'dots' }}
                     leftSection={<Play size={14} weight="fill" aria-hidden="true" />}
@@ -1255,7 +1248,6 @@ export function Workbench() {
                   ok={ok}
                   stale={stale}
                   system={system}
-                  online={online}
                   pending={pending}
                   run={run}
                   show={show}

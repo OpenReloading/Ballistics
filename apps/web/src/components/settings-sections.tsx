@@ -13,7 +13,6 @@ import {
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import type { ReactNode } from 'react'
-import { pagesBasePath } from '../lib/edition.ts'
 import { useInstall } from './install-button.tsx'
 import { ManufacturersForm } from './manufacturers-settings.tsx'
 import type { SettingsTab } from './settings-dialog.ts'
@@ -47,9 +46,7 @@ function Offline() {
   return (
     <Stack gap="sm" align="flex-start">
       <Text size="sm">
-        {pagesBasePath === undefined
-          ? 'Pages you have opened, the tools and your own records work without network; a workbench run needs it.'
-          : 'Pages you have opened, the tools, workbench runs and your own records work without network.'}
+        Pages you have opened, the tools, workbench runs and your own records work without network.
       </Text>
       {install ? (
         <Button onClick={install}>Install as an app</Button>

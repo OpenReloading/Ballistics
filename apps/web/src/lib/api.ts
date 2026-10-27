@@ -7,7 +7,6 @@ import type {
   TargetMapping,
 } from '@open-reloading/schema'
 import { cacheLife } from 'next/cache'
-import { PHASE_PRODUCTION_BUILD } from 'next/constants'
 import type {
   BulletSummary,
   CartridgeDetail,
@@ -25,40 +24,26 @@ import type {
   FederationListItem,
   FederationRecord,
 } from './disciplines.ts'
-import { pagesBasePath } from './edition.ts'
 import type { DisciplineSummary, MappingSummary } from './face-disciplines.ts'
 import { type ManufacturerNames, manufacturerNames } from './manufacturers.ts'
-import { exportIds, pickIds } from './prerender-sample.ts'
+import { exportIds } from './prerender-sample.ts'
 
-type Fetched<T> = { status: 'ok'; data: T } | { status: 'notFound' } | { status: 'unavailable' }
+type Fetched<T> = { status: 'ok'; data: T } | { status: 'notFound' }
 
 /**
- * GET `path` from API_URL, cached for days. 404 and 400 (an id the API rejects) give `notFound`.
- * An unreachable API gives `unavailable` during `next build` only, with `revalidate: 0` so that part
- * renders at request time (a short `revalidate` lets the in-memory cache serve the entry to a later
- * route's warming phase and drop it before that route's final prerender: a cache-miss warning); at
- * run time it throws, so a failed revalidation keeps the cached page.
+ * GET `path` from API_URL, cached for days. 404 and 400 (an id the API rejects) give `notFound`;
+ * any other failure throws, which fails the build.
  */
 async function apiGet<T>(path: string): Promise<Fetched<T>> {
   'use cache'
   const apiUrl = process.env.API_URL ?? 'http://localhost:3000'
-  try {
-    const res = await fetch(`${apiUrl}${API_PREFIX}${path}`, {
-      signal: AbortSignal.timeout(10_000),
-    })
-    if (res.status === 404 || res.status === 400) {
-      cacheLife('days')
-      return { status: 'notFound' }
-    }
-    if (!res.ok) throw new Error(`API answered ${res.status} for ${path}`)
-    const data = (await res.json()) as T
-    cacheLife('days')
-    return { status: 'ok', data }
-  } catch (e) {
-    if (process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD) throw e
-    cacheLife({ revalidate: 0 })
-    return { status: 'unavailable' }
-  }
+  const res = await fetch(`${apiUrl}${API_PREFIX}${path}`, {
+    signal: AbortSignal.timeout(10_000),
+  })
+  cacheLife('days')
+  if (res.status === 404 || res.status === 400) return { status: 'notFound' }
+  if (!res.ok) throw new Error(`API answered ${res.status} for ${path}`)
+  return { status: 'ok', data: (await res.json()) as T }
 }
 
 /** Every item of a list route, in pages of 200 (the API cap) until `total`, at most 50 pages. */
@@ -66,7 +51,7 @@ async function listAll<T>(path: string): Promise<Fetched<T[]>> {
   const items: T[] = []
   for (let page = 0; page < 50; page++) {
     const r = await apiGet<ListOf<T>>(`${path}?limit=200&offset=${page * 200}`)
-    if (r.status !== 'ok') return { status: 'unavailable' }
+    if (r.status !== 'ok') return r
     items.push(...r.data.items)
     if (items.length >= r.data.total || r.data.items.length === 0) break
   }
@@ -79,13 +64,13 @@ export const listAllPowders = () => listAll<PowderSummary>('/powders')
 export const listAllPrimers = () => listAll<PrimerSummary>('/primers')
 export const listAllCases = () => listAll<CaseSummary>('/cases')
 
-/** Every manufacturer; none while the API is unavailable at build. */
+/** Every manufacturer, none when the API has no such list. */
 export async function listManufacturers(): Promise<ManufacturerSummary[]> {
   const r = await apiGet<ListOf<ManufacturerSummary>>('/manufacturers')
   return r.status === 'ok' ? r.data.items : []
 }
 
-/** Manufacturer names by id; none while the API is unavailable at build. */
+/** Manufacturer names by id. */
 export const getManufacturerNames = async (): Promise<ManufacturerNames> =>
   manufacturerNames(await listManufacturers())
 
@@ -109,7 +94,7 @@ export const listAllTargetFaces = () => listAll<{ id: string }>('/target-faces')
 /** The items of a list route that takes no paging (federations, disciplines, target mappings). */
 async function listItems<T>(path: string): Promise<Fetched<T[]>> {
   const r = await apiGet<ListOf<T>>(path)
-  return r.status === 'ok' ? { status: 'ok', data: r.data.items } : { status: 'unavailable' }
+  return r.status === 'ok' ? { status: 'ok', data: r.data.items } : r
 }
 
 export const listTargetMappings = (face?: string) =>
@@ -120,23 +105,15 @@ export const listDisciplines = () => listItems<DisciplineSummary>('/disciplines'
 export const listFederations = () => listItems<FederationListItem>('/federations')
 export const listCaliberClasses = () => listItems<CaliberClassSummary>('/caliber-classes')
 
-/** Param returned when the API is unreachable at build: Cache Components reject an empty list. */
-export const buildPlaceholderId = '_build'
-
 /**
- * `generateStaticParams` of a detail route: every id of the list (the sample of `PRERENDER=sample`,
- * `prerender-sample.ts`), or the placeholder without the API. The Pages edition has no placeholder:
- * a build without the API fails, and the sample cuts the cartridge pages only (`exportIds`).
+ * `generateStaticParams` of a detail route: every id of the list, or for `PRERENDER=sample` the
+ * sample of `prerender-sample.ts` (`exportIds`). A missing list fails the build.
  */
 export async function staticIds(list: () => Promise<Fetched<{ id: string }[]>>, what: string) {
   const r = await list()
-  if (r.status !== 'ok') {
-    if (pagesBasePath !== undefined) throw new Error(`API unavailable at build: no ${what} pages`)
-    console.warn(`API unavailable at build: ${what} pages render on first request`)
-    return [{ id: buildPlaceholderId }]
-  }
-  const ids = r.data.map((c) => c.id)
-  return (pagesBasePath !== undefined ? exportIds(what, ids) : pickIds(what, ids)).map((id) => ({
-    id,
-  }))
+  if (r.status !== 'ok') throw new Error(`no ${what} list at build`)
+  return exportIds(
+    what,
+    r.data.map((c) => c.id),
+  ).map((id) => ({ id }))
 }
