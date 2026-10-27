@@ -1,11 +1,4 @@
-import type {
-  Bullet,
-  CatalogueCase,
-  Powder,
-  Primer,
-  TargetFace,
-  TargetMapping,
-} from '@open-reloading/schema'
+import type { Bullet, CatalogueCase, Powder, Primer, TargetFace } from '@open-reloading/schema'
 import { cacheLife } from 'next/cache'
 import type {
   BulletSummary,
@@ -85,7 +78,6 @@ export const getPowder = getOne<Powder>('/powders')
 export const getPrimer = getOne<Primer>('/primers')
 export const getCase = getOne<CatalogueCase>('/cases')
 export const getTargetFace = getOne<TargetFace>('/target-faces')
-export const getTargetMapping = getOne<TargetMapping>('/target-mappings')
 export const getDiscipline = getOne<DisciplineRecord>('/disciplines')
 export const getFederation = getOne<FederationRecord>('/federations')
 
