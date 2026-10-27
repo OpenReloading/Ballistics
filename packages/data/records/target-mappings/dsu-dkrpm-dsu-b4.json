@@ -1,0 +1,18 @@
+{
+  "id": "dsu-dkrpm-dsu-b4",
+  "discipline": "dsu-dkrpm",
+  "face": "dsu-b4",
+  "event": "dkrpm-repetier-luftpistole-mehrdistanz",
+  "stage": "Mittelscheibe",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 5, Seiten 5 bis 6, PDF pp. 149 to 150",
+        "fields": ["discipline", "face", "event", "stage"],
+        "note": "Middle sheet, one series of 5 at 10 m standing. The sheet page of b4 does not list DKRPM; the discipline page names b4 for the middle sheet."
+      }
+    ]
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "id": "dsu-kpel",
+  "federation": "dsu",
+  "name": "Präzision-Einzelladerpistole – Langdistanz",
+  "number": "KPEL",
+  "section": "Kapitel 2, Kurzwaffenübungen, KPEL",
+  "page": "Seite 26, PDF p. 58",
+  "distance": {
+    "value": 100000,
+    "raw": "Gruppe 1: 25 m, 50 m; Gruppe 2: 50 m, 100 m"
+  },
+  "category": "pistol",
+  "caliberClasses": {
+    "ids": [
+      "rimfire-17",
+      "rimfire-22",
+      "rifle-22-cf",
+      "rifle-6mm",
+      "rifle-25",
+      "rifle-6-5",
+      "rifle-270",
+      "rifle-7mm",
+      "pistol-7-65",
+      "rifle-30",
+      "rifle-30-carbine",
+      "revolver-32",
+      "rifle-8mm",
+      "rifle-338",
+      "pistol-9mm",
+      "revolver-357-38",
+      "pistol-9x18",
+      "pistol-40-10mm",
+      "revolver-41",
+      "revolver-44",
+      "pistol-45",
+      "revolver-45-colt"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 2, Seite 26, PDF p. 58",
+        "fields": ["federation", "section", "page", "distance", "category", "caliberClasses"],
+        "note": "Gruppe 1 allows all rimfire calibres, Gruppe 2 all centre-fire calibres up to .50 inch; rifle calibres are also allowed (Kapitel 2, Seite 6). The classes are the rimfire, pistol, revolver and rifle classes of that range."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 2, Kalibereinteilung, Seite 6 (PDF p. 38)",
+        "fields": ["caliberClasses"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 2, Inhaltsverzeichnis Kurzwaffen, Seite 2 (PDF p. 34)",
+        "fields": ["name", "number"]
+      }
+    ]
+  }
+}

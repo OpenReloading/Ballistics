@@ -1,0 +1,56 @@
+{
+  "id": "dsu-k-14",
+  "federation": "dsu",
+  "name": "Kurzwaffe 14",
+  "number": "K 14",
+  "section": "Kapitel 2, Kurzwaffenübungen, K 14",
+  "page": "Seite 12, PDF p. 44",
+  "distance": {
+    "value": 25000,
+    "raw": "5, 10, 15, 20 und 25 Meter"
+  },
+  "caliberClasses": {
+    "ids": [
+      "rimfire-17",
+      "rimfire-22",
+      "pistol-7-65",
+      "rifle-30-carbine",
+      "revolver-32",
+      "pistol-9mm",
+      "revolver-357-38",
+      "pistol-9x18",
+      "pistol-40-10mm",
+      "revolver-41",
+      "revolver-44",
+      "pistol-45",
+      "revolver-45-colt"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 2, Seite 12, PDF p. 44",
+        "fields": ["federation", "section", "page", "distance", "caliberClasses"],
+        "note": "The book prints a calibre bound of .44 Magnum and .45 ACP for pistols and revolvers; the classes are those of the handgun calibre table up to that bound."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 2, Kalibereinteilung, Seite 6 (PDF p. 38)",
+        "fields": ["caliberClasses"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 2, Inhaltsverzeichnis Kurzwaffen, Seite 2 (PDF p. 34)",
+        "fields": ["number"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 9, Kurzbezeichnungen Kurzwaffen, Seite 1 (PDF p. 225)",
+        "fields": ["name", "number"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id": "dsu-shfr",
+  "federation": "dsu",
+  "name": "Schwarzpulver Frühe Repetiergewehre für Schwarzpulverpatronen",
+  "number": "SHFR",
+  "section": "Kapitel 4, C) Hinterlader Schwarzpulverpatronen, II. Langwaffen, SHFR",
+  "page": "Seite 22, PDF p. 144",
+  "distance": {
+    "value": 50000,
+    "raw": "50 Meter"
+  },
+  "category": "rifle",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 4, Seite 22, PDF p. 144",
+        "fields": ["federation", "section", "page", "distance", "category"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 9, Schwarzpulver und Vorderlader, Seite 1 (PDF p. 233)",
+        "fields": ["name", "number"]
+      }
+    ]
+  }
+}

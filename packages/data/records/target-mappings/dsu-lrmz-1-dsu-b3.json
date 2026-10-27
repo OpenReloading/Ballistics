@@ -1,0 +1,17 @@
+{
+  "id": "dsu-lrmz-1-dsu-b3",
+  "discipline": "dsu-lrmz-1",
+  "face": "dsu-b3",
+  "event": "lrmz-1-repetiergewehr-mehrdistanz-50-m-zielfernrohr-dot",
+  "shotCount": 35,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 37, PDF p. 95",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "id": "dsu-lel-2-dsu-b2",
+  "discipline": "dsu-lel-2",
+  "face": "dsu-b2",
+  "event": "lel-2-einzellader-gewehr-100-m",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 16, PDF p. 74",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

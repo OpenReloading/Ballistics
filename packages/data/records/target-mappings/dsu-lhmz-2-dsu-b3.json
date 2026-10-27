@@ -1,0 +1,17 @@
+{
+  "id": "dsu-lhmz-2-dsu-b3",
+  "discipline": "dsu-lhmz-2",
+  "face": "dsu-b3",
+  "event": "lhmz-2-halbautomatisches-gewehr-mehrdistanz-100-m-zielfernrohr-dot",
+  "shotCount": 30,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 53, PDF p. 111",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

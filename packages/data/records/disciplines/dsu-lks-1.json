@@ -1,0 +1,64 @@
+{
+  "id": "dsu-lks-1",
+  "federation": "dsu",
+  "name": "Klassisches Scheibengewehr 100 m",
+  "number": "LKS 1",
+  "section": "Kapitel 3, Langwaffenübungen, LKS 1",
+  "page": "Seite 14, PDF p. 72",
+  "distance": {
+    "value": 100000,
+    "raw": "100 Meter"
+  },
+  "category": "rifle",
+  "caliberClasses": {
+    "ids": [
+      "pistol-40-10mm",
+      "pistol-45",
+      "pistol-7-65",
+      "pistol-9mm",
+      "pistol-9x18",
+      "revolver-32",
+      "revolver-357-38",
+      "revolver-41",
+      "revolver-44",
+      "revolver-45-colt",
+      "rifle-22-cf",
+      "rifle-25",
+      "rifle-270",
+      "rifle-30-carbine",
+      "rifle-30",
+      "rifle-338",
+      "rifle-6-5",
+      "rifle-6mm",
+      "rifle-7mm",
+      "rifle-8mm"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 14, PDF p. 72",
+        "fields": ["federation", "section", "page", "distance", "category", "caliberClasses"],
+        "note": "Centre-fire cartridges up to .460 inch."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Inhaltsverzeichnis Langwaffen, Seite 2 (PDF p. 60)",
+        "fields": ["name", "number"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 9, Kurzbezeichnungen Langwaffen, Seite 1 (PDF p. 227)",
+        "fields": ["caliberClasses"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Kalibereinteilung, Seite 10 (PDF p. 68)",
+        "fields": ["caliberClasses"]
+      }
+    ]
+  }
+}

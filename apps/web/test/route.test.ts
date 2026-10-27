@@ -50,6 +50,10 @@ describe('forwarding route', () => {
       ['cases?cartridge=308-win&limit=200', 'cases/demo-case-308-brass'],
     ],
     [
+      'the primer list and a primer record for the workbench picker',
+      ['primers?size=large-rifle&limit=200', 'primers/demo-primer-large-rifle'],
+    ],
+    [
       'the manufacturer list and record that label powders and bullets',
       ['manufacturers', 'manufacturers/demo-powder'],
     ],

@@ -81,6 +81,7 @@ describe('the Pages edition answers reads as the API', () => {
     'bullets',
     'powders',
     'cases',
+    'primers',
     'manufacturers',
     'target-faces',
     'federations',
@@ -103,6 +104,7 @@ describe('the Pages edition answers reads as the API', () => {
       bullets: ['demo', 'DEMO BULLETS', '168', 'hpbt', 'zzzz'],
       powders: ['demo', 'dp40', 'Powder Co', 'zzzz'],
       cases: ['demo', 'demo cases', 'C308', 'brass', '308', 'zzzz'],
+      primers: ['demo', 'demo primers', 'DP-SP', 'pistol', 'lead free', 'zzzz'],
     }
     const { items } = (await both('cartridges?limit=200')).live.body as {
       items: { name: string; aliases: string[] }[]
@@ -118,7 +120,7 @@ describe('the Pages edition answers reads as the API', () => {
 
   it('filters bullets and powders by manufacturer as the API does', async () => {
     const { items } = (await both('manufacturers')).live.body as { items: { id: string }[] }
-    for (const kind of ['bullets', 'powders', 'cases'])
+    for (const kind of ['bullets', 'powders', 'cases', 'primers'])
       for (const { id } of items) {
         const { live, file } = await both(`${kind}?manufacturer=${id}&limit=200`)
         expect(file, `${kind} ${id}`).toEqual(live)
@@ -202,6 +204,18 @@ describe('the Pages edition answers reads as the API', () => {
     expect(((await both('cases?cartridge=308-win')).file.body.items as unknown[]).length).toBe(1)
   })
 
+  it('keeps the primers of one size and compound as the API does', async () => {
+    for (const query of [
+      'size=small-pistol',
+      'compound=lead-free',
+      'size=large-rifle&compound=lead-free',
+    ])
+      expect((await both(`primers?${query}`)).file, query).toEqual(
+        (await both(`primers?${query}`)).live,
+      )
+    expect(((await both('primers?size=small-pistol')).file.body.items as unknown[]).length).toBe(1)
+  })
+
   it('answers a record, an unknown id with 404 and a malformed one with 400', async () => {
     for (const kind of kinds) {
       const first = (await both(`${kind}?limit=1`)).live.body.items[0] as { id: string }
@@ -226,6 +240,9 @@ describe('the Pages edition answers reads as the API', () => {
       'powders?manufacturer=Not_An_Id',
       'cases?cartridge=Not_An_Id',
       'cases?manufacturer=Not_An_Id',
+      'primers?manufacturer=Not_An_Id',
+      'primers?size=medium',
+      'primers?compound=mercury',
       'cartridges?table=',
       'cartridges?table=toolongvalue',
       'disciplines?federation=Not_An_Id',

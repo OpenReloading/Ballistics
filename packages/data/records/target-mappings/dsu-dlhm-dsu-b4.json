@@ -1,0 +1,17 @@
+{
+  "id": "dsu-dlhm-dsu-b4",
+  "discipline": "dsu-dlhm",
+  "face": "dsu-b4",
+  "event": "dlhm-halbautomatisches-luftgewehr-mehrdistanz",
+  "shotCount": 35,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 5, Seite 13, PDF p. 157",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

@@ -33,6 +33,13 @@ export const firearmFields = [
     quantity: 'length',
     min: 0,
   },
+  {
+    key: 'overallLengthAtLands',
+    label: 'Overall length at the lands, measured',
+    help: 'Cartridge overall length with the bullet touching the lands.',
+    quantity: 'length',
+    min: 0,
+  },
   { key: 'firearmMass', label: 'Mass', quantity: 'firearmMass', min: 0, positive: true },
   {
     key: 'roundCount',
@@ -123,6 +130,7 @@ const labels: Record<string, string> = {
   ...Object.fromEntries(
     [...firearmFields, ...opticFields, ...mountFields, ...zeroFields].map((s) => [s.key, s.label]),
   ),
+  landsBullet: 'Bullet of the lands contact',
   dragFactorSource: 'Drag factor source',
   mounted: 'Mounted on',
   removed: 'Removed on',
@@ -208,11 +216,39 @@ export function fieldStored(spec: { quantity: Quantity }, si: number | undefined
   return si === undefined || !kind ? si : storedOf(kind, si)
 }
 
-/** What a firearm gives the workbench's Gun card: twist, barrel length (m) and mass (kg). */
+/** A firearm's measured lands contact, m: the bullet reference it was measured with and the lengths. */
+export interface LandsContact {
+  bullet: string
+  baseToOgive?: number | undefined
+  overallLength?: number | undefined
+}
+
+/** The lands contact of a firearm; undefined without a measured length and the bullet it names. */
+export function landsOf(f: Firearm): LandsContact | undefined {
+  const [baseToOgive, overallLength] = [
+    siOf('length', f.baseToOgiveAtLands),
+    siOf('length', f.overallLengthAtLands),
+  ]
+  if (f.landsBullet === undefined || (baseToOgive === undefined && overallLength === undefined))
+    return undefined
+  return { bullet: f.landsBullet, baseToOgive, overallLength }
+}
+
+/**
+ * The lands contact for the bullet in use: `contact` when it was measured with that bullet, else
+ * `other` says a contact exists for another bullet, which the jump does not use.
+ */
+export function landsFor(lands: LandsContact | undefined, bulletRef: string | undefined) {
+  const same = lands !== undefined && lands.bullet === bulletRef
+  return { contact: same ? lands : undefined, other: lands !== undefined && !same }
+}
+
+/** What a firearm gives the workbench's Gun card: twist, barrel length (m), mass (kg) and lands contact. */
 export const gunValues = (f: Firearm) => ({
   twist: siOf('length', f.twist),
   barrelLength: siOf('length', f.barrelLength),
   firearmMass: siOf('mass', f.firearmMass),
+  lands: landsOf(f),
 })
 
 /** The catalogue record id a cartridge reference names; undefined for a `user:` reference. */

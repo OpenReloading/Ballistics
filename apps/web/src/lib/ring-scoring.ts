@@ -75,12 +75,17 @@ function ellipseGap(a: number, b: number, x: number, y: number): number {
 /**
  * The hole of radius `g` (m) touches the area a ring line bounds, with the hole centre `p` in m
  * from the area's centre: a circle by the centre distance, an oval by the distance to its
- * ellipse, a square by the distance to its square (rounded at the corners).
+ * ellipse, a square by the distance to its square (rounded at the corners), a stadium by the
+ * distance to the segment between the centres of its end half circles, less their radius.
  */
 function touches(ring: Shape, p: Point, g: number): boolean {
   const w = radius(ring.diameter)
   if (ring.shape === 'square')
     return Math.hypot(Math.max(Math.abs(p.x) - w, 0), Math.max(Math.abs(p.y) - w, 0)) <= g + touch
+  if (ring.shape === 'stadium' && ring.height) {
+    const reach = Math.max(radius(ring.height) - w, 0)
+    return Math.hypot(p.x, p.y - Math.max(-reach, Math.min(reach, p.y))) <= w + g + touch
+  }
   if (ring.height) return ellipseGap(w, radius(ring.height), p.x, p.y) <= g + touch
   return Math.hypot(p.x, p.y) <= w + g + touch
 }
@@ -118,10 +123,14 @@ function scoreOnBull(face: TargetFace, shot: Point, hole: number): RingScore {
   const ring = nth(rings, i)
   const value = ring.value
   const inner = face.innerTen
+  // the inner ten of a stadium face is a stadium
+  const stadium = nth(rings, 0).shape === 'stadium' ? ('stadium' as const) : undefined
   const x =
     i === rings.length - 1 &&
     !!inner &&
-    (inner.rule === 'cover' ? d + radius(inner.diameter) <= g + touch : touches(inner, shot, g))
+    (inner.rule === 'cover'
+      ? d + radius(inner.diameter) <= g + touch
+      : touches({ ...inner, shape: stadium }, shot, g))
   if (!face.decimal) return { value, innerTen: x }
   // ring width: to the next ring inward, for the innermost ring to the next ring outward
   const [a, b] = i < rings.length - 1 ? [ring, nth(rings, i + 1)] : [nth(rings, i - 1), ring]

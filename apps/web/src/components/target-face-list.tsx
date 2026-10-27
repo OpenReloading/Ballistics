@@ -16,6 +16,7 @@ import {
   DirectoryTable,
   useListState,
 } from './directory-table.tsx'
+import { LibraryTabs } from './library-tabs.tsx'
 import { SourceFilter } from './list-sources.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
 import { EmptyList } from './states.tsx'
@@ -107,6 +108,7 @@ export function TargetFaceList({ items }: { items: TargetFaceRow[] }) {
           </>
         }
       />
+      <LibraryTabs />
       <div className="directory">
         <DirectoryFilters
           query={state.query}

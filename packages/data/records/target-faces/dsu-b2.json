@@ -1,0 +1,448 @@
+{
+  "id": "dsu-b2",
+  "name": "DSU-Scheibe b2",
+  "federation": "dsu",
+  "rings": [
+    {
+      "value": 1,
+      "diameter": {
+        "value": 355
+      },
+      "height": {
+        "value": 555
+      },
+      "shape": "stadium",
+      "fill": "white",
+      "line": "green"
+    },
+    {
+      "value": 2,
+      "diameter": {
+        "value": 322.8
+      },
+      "height": {
+        "value": 504.6
+      },
+      "shape": "stadium",
+      "fill": "white",
+      "line": "green"
+    },
+    {
+      "value": 3,
+      "diameter": {
+        "value": 290.6
+      },
+      "height": {
+        "value": 454.1
+      },
+      "shape": "stadium",
+      "fill": "white",
+      "line": "green"
+    },
+    {
+      "value": 4,
+      "diameter": {
+        "value": 258.3
+      },
+      "height": {
+        "value": 403.7
+      },
+      "shape": "stadium",
+      "fill": "white",
+      "line": "green"
+    },
+    {
+      "value": 5,
+      "diameter": {
+        "value": 226.1
+      },
+      "height": {
+        "value": 353.2
+      },
+      "shape": "stadium",
+      "fill": "green",
+      "line": "green"
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 193.9
+      },
+      "height": {
+        "value": 302.8
+      },
+      "shape": "stadium",
+      "fill": "green",
+      "line": "white"
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 161.7
+      },
+      "height": {
+        "value": 252.3
+      },
+      "shape": "stadium",
+      "fill": "green",
+      "line": "white"
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 129.4
+      },
+      "height": {
+        "value": 201.9
+      },
+      "shape": "stadium",
+      "fill": "green",
+      "line": "white"
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 97.2
+      },
+      "height": {
+        "value": 151.4
+      },
+      "shape": "stadium",
+      "fill": "white",
+      "line": "green"
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 65
+      },
+      "height": {
+        "value": 101
+      },
+      "shape": "stadium",
+      "fill": "white",
+      "line": "green"
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 32
+    },
+    "height": {
+      "value": 51
+    }
+  },
+  "blackDiameter": {
+    "value": 226.1
+  },
+  "blackHeight": {
+    "value": 353.2
+  },
+  "events": [
+    {
+      "id": "k-2-kurzwaffe-2",
+      "name": "K 2 Kurzwaffe 2",
+      "distance": {
+        "value": 15000,
+        "raw": "10 und 15 Meter"
+      },
+      "section": "Kapitel 2, Kurzwaffenübungen, K 2",
+      "scoring": "touch"
+    },
+    {
+      "id": "k-2-lv-kurzwaffe-leuchtpunkt-2",
+      "name": "K 2 LV Kurzwaffe Leuchtpunkt 2",
+      "distance": {
+        "value": 15000,
+        "raw": "10 und 15 Meter"
+      },
+      "section": "Kapitel 2, Kurzwaffenübungen, K 2 LV",
+      "scoring": "touch"
+    },
+    {
+      "id": "k-14-kurzwaffe-14",
+      "name": "K 14 Kurzwaffe 14",
+      "distance": {
+        "value": 25000,
+        "raw": "5, 10, 15, 20 und 25 Meter"
+      },
+      "section": "Kapitel 2, Kurzwaffenübungen, K 14",
+      "scoring": "touch"
+    },
+    {
+      "id": "k-14-lv-kurzwaffe-leuchtpunkt-14",
+      "name": "K 14 LV Kurzwaffe Leuchtpunkt 14",
+      "distance": {
+        "value": 25000,
+        "raw": "5, 10, 15, 20 und 25 Meter"
+      },
+      "section": "Kapitel 2, Kurzwaffenübungen, K 14 LV",
+      "scoring": "touch"
+    },
+    {
+      "id": "k-24-kurzwaffe-24",
+      "name": "K 24 Kurzwaffe 24",
+      "distance": {
+        "value": 25000,
+        "raw": "25 Meter"
+      },
+      "section": "Kapitel 2, Kurzwaffenübungen, K 24",
+      "scoring": "touch"
+    },
+    {
+      "id": "k-24-lv-kurzwaffe-leuchtpunkt-24",
+      "name": "K 24 LV Kurzwaffe Leuchtpunkt 24",
+      "distance": {
+        "value": 25000,
+        "raw": "25 Meter"
+      },
+      "section": "Kapitel 2, Kurzwaffenübungen, K 24 LV",
+      "scoring": "touch"
+    },
+    {
+      "id": "k-27-kurzwaffe-27",
+      "name": "K 27 Kurzwaffe 27",
+      "distance": {
+        "value": 25000,
+        "raw": "25 Meter"
+      },
+      "section": "Kapitel 2, Kurzwaffenübungen, K 27",
+      "scoring": "touch"
+    },
+    {
+      "id": "k-27-lv-kurzwaffe-leuchtpunkt-27",
+      "name": "K 27 LV Kurzwaffe Leuchtpunkt 27",
+      "distance": {
+        "value": 25000,
+        "raw": "25 Meter"
+      },
+      "section": "Kapitel 2, Kurzwaffenübungen, K 27 LV",
+      "scoring": "touch"
+    },
+    {
+      "id": "k-36-kurzwaffe-36",
+      "name": "K 36 Kurzwaffe 36",
+      "distance": {
+        "value": 25000,
+        "raw": "25, 20, 15, 10, 5, 10, 15, 20, 25 Meter"
+      },
+      "section": "Kapitel 2, Kurzwaffenübungen, K 36",
+      "scoring": "touch"
+    },
+    {
+      "id": "k-36-lv-kurzwaffe-leuchtpunkt-36",
+      "name": "K 36 LV Kurzwaffe Leuchtpunkt 36",
+      "distance": {
+        "value": 25000,
+        "raw": "25, 20, 15, 10, 5, 10, 15, 20, 25 Meter"
+      },
+      "section": "Kapitel 2, Kurzwaffenübungen, K 36 LV",
+      "scoring": "touch"
+    },
+    {
+      "id": "lf-4-flintenuebung-f-4-25-m",
+      "name": "LF 4 Flintenübung F 4 25 m",
+      "distance": {
+        "value": 25000,
+        "raw": "25 Meter"
+      },
+      "section": "Kapitel 3, Flintenübungen, LF 4",
+      "scoring": "touch"
+    },
+    {
+      "id": "shsa-schwarzpulver-single-action-revolver",
+      "name": "SHSA Schwarzpulver Single Action Revolver",
+      "distance": {
+        "value": 25000,
+        "raw": "25 Meter"
+      },
+      "section": "Kapitel 4, C) Hinterlader Schwarzpulverpatronen, I. Kurzwaffen, SHSA",
+      "category": "revolver",
+      "scoring": "centre"
+    },
+    {
+      "id": "lf-3-flintenuebung-f-3-50-m",
+      "name": "LF 3 Flintenübung F 3 50 m",
+      "distance": {
+        "value": 50000,
+        "raw": "50 Meter"
+      },
+      "section": "Kapitel 3, Flintenübungen, LF 3",
+      "scoring": "touch"
+    },
+    {
+      "id": "lhmov-1-halbautomatisches-gewehr-mehrdistanz-50-m-offene-visierung",
+      "name": "LHMoV 1 Halbautomatisches Gewehr Mehrdistanz 50 m offene Visierung",
+      "distance": {
+        "value": 50000,
+        "raw": "50, 40, 30, 20 Meter"
+      },
+      "section": "Kapitel 3, Langwaffenübungen, LHMoV 1",
+      "scoring": "touch",
+      "category": "rifle"
+    },
+    {
+      "id": "lrmov-1-repetiergewehr-mehrdistanz-50-m-offene-visierung",
+      "name": "LRMoV 1 Repetiergewehr Mehrdistanz 50 m offene Visierung",
+      "distance": {
+        "value": 50000,
+        "raw": "50, 40, 30, 20 Meter"
+      },
+      "section": "Kapitel 3, Langwaffenübungen, LRMoV 1",
+      "scoring": "touch",
+      "category": "rifle"
+    },
+    {
+      "id": "shfr-schwarzpulver-fruehe-repetiergewehre-fuer-schwarzpulverpatronen",
+      "name": "SHFR Schwarzpulver Frühe Repetiergewehre für Schwarzpulverpatronen",
+      "distance": {
+        "value": 50000,
+        "raw": "50 Meter"
+      },
+      "section": "Kapitel 4, C) Hinterlader Schwarzpulverpatronen, II. Langwaffen, SHFR",
+      "category": "rifle",
+      "scoring": "centre"
+    },
+    {
+      "id": "kpel-praezision-einzelladerpistole-langdistanz",
+      "name": "KPEL Präzision-Einzelladerpistole – Langdistanz",
+      "distance": {
+        "value": 100000,
+        "raw": "Gruppe 1: 25 m, 50 m; Gruppe 2: 50 m, 100 m"
+      },
+      "section": "Kapitel 2, Kurzwaffenübungen, KPEL",
+      "category": "pistol",
+      "scoring": "touch"
+    },
+    {
+      "id": "ldg-1-dienstsportgewehr-100-m",
+      "name": "LDG 1 Dienstsportgewehr 100 m",
+      "distance": {
+        "value": 100000,
+        "raw": "100 Meter"
+      },
+      "section": "Kapitel 3, Langwaffenübungen, LDG 1",
+      "category": "service-rifle",
+      "scoring": "touch"
+    },
+    {
+      "id": "lel-2-einzellader-gewehr-100-m",
+      "name": "LEL 2 Einzellader Gewehr 100 m",
+      "distance": {
+        "value": 100000,
+        "raw": "100 Meter"
+      },
+      "section": "Kapitel 3, Langwaffenübungen, LEL 2",
+      "category": "rifle",
+      "scoring": "touch"
+    },
+    {
+      "id": "lhg-2-halbautomatisches-gewehr-100-m",
+      "name": "LHG 2 Halbautomatisches Gewehr 100 m",
+      "distance": {
+        "value": 100000,
+        "raw": "100 Meter"
+      },
+      "section": "Kapitel 3, Langwaffenübungen, LHG 2",
+      "scoring": "touch",
+      "category": "rifle"
+    },
+    {
+      "id": "lhmov-2-halbautomatisches-gewehr-mehrdistanz-100-m-offene-visierung",
+      "name": "LHMoV 2 Halbautomatisches Gewehr Mehrdistanz 100 m offene Visierung",
+      "distance": {
+        "value": 100000,
+        "raw": "100, 50, 25 Meter"
+      },
+      "section": "Kapitel 3, Langwaffenübungen, LHMoV 2",
+      "scoring": "touch",
+      "category": "rifle"
+    },
+    {
+      "id": "lks-1-klassisches-scheibengewehr-100-m",
+      "name": "LKS 1 Klassisches Scheibengewehr 100 m",
+      "distance": {
+        "value": 100000,
+        "raw": "100 Meter"
+      },
+      "section": "Kapitel 3, Langwaffenübungen, LKS 1",
+      "category": "rifle",
+      "scoring": "touch"
+    },
+    {
+      "id": "lrg-2-repetiergewehr-100-m",
+      "name": "LRG 2 Repetiergewehr 100 m",
+      "distance": {
+        "value": 100000,
+        "raw": "100 Meter"
+      },
+      "section": "Kapitel 3, Langwaffenübungen, LRG 2",
+      "category": "rifle",
+      "scoring": "touch"
+    },
+    {
+      "id": "lri-2-repetiergewehr-100-m-intervall",
+      "name": "LRI 2 Repetiergewehr 100 m Intervall",
+      "distance": {
+        "value": 100000,
+        "raw": "100 Meter"
+      },
+      "section": "Kapitel 3, Langwaffenübungen, LRI 2",
+      "category": "rifle",
+      "scoring": "touch"
+    },
+    {
+      "id": "lrmov-2-repetier-mehrdistanz-100-m-offene-visierung",
+      "name": "LRMoV 2 Repetier Mehrdistanz 100 m offene Visierung",
+      "distance": {
+        "value": 100000,
+        "raw": "100, 50, 25 Meter"
+      },
+      "section": "Kapitel 3, Langwaffenübungen, LRMoV 2",
+      "scoring": "touch",
+      "category": "rifle"
+    }
+  ],
+  "paper": {
+    "width": {
+      "value": 420
+    },
+    "height": {
+      "value": 590
+    }
+  },
+  "numerals": true,
+  "photoSearch": false,
+  "note": "Stadium rings: straight vertical sides and half circle ends of half the ring width. The book prints the outer width and height of the scoring area, the width and height of the ten and of the Mouche, and ring widths that are rounded, so nine of them do not add up to the printed totals; rings 2 to 9 are spaced evenly between the outer ring and the ten, which is how the printed figure draws them. The green mirror runs from ring 5 to ring 8 (rings 6 to 8 have white lines), the centre inside ring 9 is white. The Mouche is the inner ten; the book states no rule for it beyond the touch rule for rings.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 1, Scheiben, Seite 12 (PDF p. 14)",
+        "fields": [
+          "name",
+          "rings",
+          "innerTen.diameter",
+          "innerTen.height",
+          "blackDiameter",
+          "blackHeight",
+          "paper",
+          "numerals"
+        ]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 1, Scheiben, Seite 12 (PDF p. 14)",
+        "fields": ["rings"],
+        "kind": "derived",
+        "note": "Rings 2 to 9 are the printed outer ring and the ten spaced evenly, to 0.1 mm; the book prints no width or height for them."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 1, Auswertung der Scheiben, Seite 27 (PDF p. 29)",
+        "fields": ["events.scoring"]
+      }
+    ]
+  }
+}

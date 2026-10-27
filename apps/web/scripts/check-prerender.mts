@@ -1,5 +1,5 @@
 /**
- * Checks that the last `next build` prerendered the cartridge, bullet, powder, case, target face, discipline and federation lists and the page of
+ * Checks that the last `next build` prerendered the cartridge, bullet, powder, case, primer, target face, discipline and federation lists and the page of
  * every record the API at API_URL lists. Run after building with the API reachable. With PRERENDER=sample
  * (the same value as for the build) it checks the lists and the records of `src/lib/prerender-sample.ts`.
  */
@@ -29,6 +29,7 @@ for (const [list, what, route = list] of [
   ['bullets', 'bullet'],
   ['powders', 'powder'],
   ['cases', 'case'],
+  ['primers', 'primer'],
   ['target-faces', 'target-face', 'targets'],
   ['disciplines', 'discipline'],
   ['federations', 'federation'],

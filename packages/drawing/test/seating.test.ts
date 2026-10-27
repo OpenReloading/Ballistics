@@ -8,6 +8,7 @@ import {
   coalRange,
   intrusion,
   jumpNote,
+  landsContactCoal,
   leadeContact,
   previewDrawn,
   revolutionVolume,
@@ -409,6 +410,81 @@ describe('seat', () => {
     expect(jumpNote(approx.jump)).toBe(
       'approximate: from COAL and the bullet length; missing: a measured CBTO, the bullet base-to-ogive',
     )
+  })
+
+  describe('with a measured lands contact', () => {
+    it('gives the jump from the measured CBTO, in either seating mode', () => {
+      const lands = { baseToOgive: 53.1 }
+      const byCbto = seat({
+        ...base,
+        bullet: withOgive,
+        lands,
+        by: { kind: 'baseToOgive', value: 52.8 },
+      })
+      expect(byCbto.jump).toMatchObject({ tag: 'derived', missing: [], source: 'lands' })
+      expect(byCbto.jump.value).toBeCloseTo(0.3, 9)
+      expect(byCbto.contact).toBe(false)
+      const coal = 52.8 - 14.3 + 32.69
+      const byCoal = seat({
+        ...base,
+        bullet: withOgive,
+        lands,
+        by: { kind: 'overallLength', value: coal },
+      })
+      expect(byCoal.jump.value).toBeCloseTo(0.3, 9)
+      expect(byCoal.contactCoal).toBeCloseTo(53.1 - 14.3 + 32.69, 9)
+      expect(jumpNote(byCoal.jump)).toBe(
+        'derived: from the measured lands contact of the firearm and the entered length',
+      )
+    })
+
+    it('gives the jump from the measured COAL and needs no nose length or chamber value', () => {
+      const bare: BulletDimensions = { diameter: 7.823, length: 30 }
+      const { leadeAngle: _, ...noI } = chamber
+      const s = seat({
+        chamber: noI,
+        waterDensity,
+        bullet: bare,
+        lands: { overallLength: 70.5 },
+        by: { kind: 'overallLength', value: 70 },
+      })
+      expect(s.jump.value).toBeCloseTo(0.5, 9)
+      expect(s.jump.source).toBe('lands')
+      expect(s.contactCoal).toBeCloseTo(70.5, 9)
+    })
+
+    it('is in contact at or past the measured length and prefers the CBTO when both are given', () => {
+      const lands = { baseToOgive: 53.1, overallLength: 99 }
+      const at = seat({
+        ...base,
+        bullet: withOgive,
+        lands,
+        by: { kind: 'baseToOgive', value: 53.1 },
+      })
+      expect(at.jump.value).toBeCloseTo(0, 9)
+      expect(at.contact).toBe(true)
+      const past = seat({
+        ...base,
+        bullet: withOgive,
+        lands,
+        by: { kind: 'baseToOgive', value: 53.4 },
+      })
+      expect(past.jump.value).toBeCloseTo(-0.3, 9)
+      expect(past.contact).toBe(true)
+    })
+
+    it('keeps the chamber jump for a CBTO contact on a bullet without a base-to-ogive', () => {
+      const s = seat({
+        ...base,
+        bullet: boatTail,
+        lands: { baseToOgive: 53.1 },
+        by: { kind: 'overallLength', value: 71.12 },
+      })
+      expect(s.jump.source).toBe('chamber')
+      expect(s.jump.tag).toBe('approximate')
+      expect(landsContactCoal(boatTail, { baseToOgive: 53.1 })).toBeUndefined()
+      expect(landsContactCoal(withOgive, { baseToOgive: 53.1 })).toBeCloseTo(53.1 - 14.3 + 32.69, 9)
+    })
   })
 
   it('refuses CBTO without a bullet base-to-ogive', () => {

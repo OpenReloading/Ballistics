@@ -97,6 +97,7 @@ function PageLink({
   onOpen,
   onNavigate,
   hint,
+  icon: iconName = href,
 }: {
   /** The page, or the icon's name for a button (`settings`, `search`). */
   href: string
@@ -109,9 +110,11 @@ function PageLink({
   onNavigate?: (() => void) | undefined
   /** The key in the rail's tooltip (Ctrl K). */
   hint?: string
+  /** The icon's name when it is not `href`. */
+  icon?: string
 }) {
   const current = !onOpen && pageCoversRoute(href, route)
-  const icon = <NavIcon name={href} />
+  const icon = <NavIcon name={iconName} />
   // the same look either way: a link to `href`, or a button opening the dialog
   const root = (props: object) =>
     onOpen ? (
@@ -190,6 +193,7 @@ function SectionLinks({
             <PageLink
               href={p.href}
               label={p.label}
+              icon={p.icon}
               route={route}
               rail={rail}
               onNavigate={onNavigate}

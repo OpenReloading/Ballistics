@@ -20,6 +20,7 @@ import {
   federationRow,
   manufacturerRow,
   powderRow,
+  primerRow,
   targetFaceRow,
   targetMappingRow,
 } from './derive.ts'
@@ -98,6 +99,7 @@ export function buildCatalogue(source: CatalogueSource): CatalogueData & { recor
       cartridges: byKey(source.cartridges.map(cartridgeRow)),
       manufacturers: byKey(source.manufacturers.map(manufacturerRow)),
       powders: byKey(source.powders.map((p) => powderRow(p, maker(manufacturers, p, now)))),
+      primers: byKey(source.primers.map((p) => primerRow(p, maker(manufacturers, p, now)))),
       bullets: byKey(source.bullets.map((b) => bulletRow(b, maker(manufacturers, b, now)))),
       cases: byKey(
         source.cases.map((c) =>
@@ -159,6 +161,7 @@ export function buildCatalogue(source: CatalogueSource): CatalogueData & { recor
       cartridge: byId(source.cartridges),
       manufacturer: byId(source.manufacturers),
       powder: byId(source.powders),
+      primer: byId(source.primers),
       bullet: byId(source.bullets),
       case: byId(source.cases.map(({ origin, ...rest }) => rest)),
       caseCapacity: byId(source.capacities.map(({ origin, ...rest }) => rest)),

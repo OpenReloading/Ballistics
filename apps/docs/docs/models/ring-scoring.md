@@ -38,7 +38,7 @@ Code: `apps/web/src/lib/ring-scoring.ts`, `nearestBull`, `scoreShot`.
 
 ### Ring value
 
-Ring $n$ bounds an area $A_n$ about the bull centre: a circle of radius $R_n$ (half its diameter), an axis-aligned oval of semi-axes $R_n$ (width) and $H_n$ (height, half the `height` of the record), or a square of half edge $R_n$ (`shape: square`). The hole of radius $g$ centred at $p'$ touches ring $n$ when its distance to the area is within $g$:
+Ring $n$ bounds an area $A_n$ about the bull centre: a circle of radius $R_n$ (half its diameter), an axis-aligned oval of semi-axes $R_n$ (width) and $H_n$ (height, half the `height` of the record), a square of half edge $R_n$ (`shape: square`), or a stadium of half width $R_n$ and half height $H_n \ge R_n$ (`shape: stadium`): two straight vertical sides joined by a half circle of radius $R_n$ at each end. The hole of radius $g$ centred at $p'$ touches ring $n$ when its distance to the area is within $g$:
 
 $$
 \delta_n(p') \le g + \varepsilon, \qquad \delta_n(p') = \min_{q \in A_n} \lvert p' - q \rvert
@@ -49,12 +49,12 @@ Code: `apps/web/src/lib/ring-scoring.ts`, `touches`, `scoreShot`.
 The distance $\delta_n$ is
 
 $$
-\delta_n = \begin{cases} \max(\lvert p' \rvert - R_n,\, 0) & \text{circle} \\ \text{distance to the ellipse} & \text{oval} \\ \sqrt{\max(\lvert x \rvert - R_n, 0)^2 + \max(\lvert y \rvert - R_n, 0)^2} & \text{square} \end{cases}
+\delta_n = \begin{cases} \max(\lvert p' \rvert - R_n,\, 0) & \text{circle} \\ \text{distance to the ellipse} & \text{oval} \\ \sqrt{\max(\lvert x \rvert - R_n, 0)^2 + \max(\lvert y \rvert - R_n, 0)^2} & \text{square} \\ \max\left(\sqrt{x^2 + (y - \operatorname{clamp}(y, -L_n, L_n))^2} - R_n,\, 0\right) & \text{stadium} \end{cases}
 $$
 
-Code: `apps/web/src/lib/ring-scoring.ts`, `touches`, `ellipseGap`.
+Code: `apps/web/src/lib/ring-scoring.ts`, `touches`, `ellipseGap`. The stadium is the branch of `touches` on `shape: stadium`.
 
-For a circle the condition is $\lvert p' \rvert \le R_n + g + \varepsilon$. The distance to an ellipse has no closed form. The code finds the closest point on the ellipse as the root of a monotone function by bisection ([Eberly 2013](../bibliography.md#eberly-2013)) and is 0 inside. Along both axes of an oval the condition reads $\lvert x \rvert \le R_n + g$ and $\lvert y \rvert \le H_n + g$. Away from the axes the hole is a disc, so its reach round an oval ring is the parallel curve of the ellipse, not an ellipse with the axes grown by $g$. A square scores by its edge: a hole centre on the edge is inside, and the hole's reach is rounded at the corners. With $g = 0$ the square is the condition $\max(\lvert x \rvert, \lvert y \rvert) \le R_n$.
+For a circle the condition is $\lvert p' \rvert \le R_n + g + \varepsilon$. The distance to an ellipse has no closed form. The code finds the closest point on the ellipse as the root of a monotone function by bisection ([Eberly 2013](../bibliography.md#eberly-2013)) and is 0 inside. Along both axes of an oval the condition reads $\lvert x \rvert \le R_n + g$ and $\lvert y \rvert \le H_n + g$. Away from the axes the hole is a disc, so its reach round an oval ring is the parallel curve of the ellipse, not an ellipse with the axes grown by $g$. A stadium is the set of points within $R_n$ of the segment from $(0, -L_n)$ to $(0, L_n)$ between the centres of its end half circles, $L_n = H_n - R_n$, so the distance has the closed form above, and the hole's reach is the same shape grown by $g$, with round corners. A square scores by its edge: a hole centre on the edge is inside, and the hole's reach is rounded at the corners. With $g = 0$ the square is the condition $\max(\lvert x \rvert, \lvert y \rvert) \le R_n$.
 
 Here $\varepsilon = 10^{-12}$ m ($10^{-9}$ mm), so a hole edge on a ring line counts as touching it despite binary rounding. The shot scores the value $v_n$ of the innermost ring touched, 0 when it touches none.
 
@@ -63,7 +63,7 @@ Here $\varepsilon = 10^{-12}$ m ($10^{-9}$ mm), so a hole edge on a ring line co
 The inner ten counts only for a shot in the innermost ring. With the inner-ten radius $R_X$ and $d = \lvert p' \rvert$:
 
 - `cover`: the hole covers the inner-ten circle completely.
-- `touch`, or no rule on the record (the rule book does not state one): the hole touches it. An oval inner ten (`height`) uses the oval distance above.
+- `touch`, or no rule on the record (the rule book does not state one): the hole touches it. An oval inner ten (`height`) uses the oval distance above, and the inner ten of a stadium face is a stadium.
 
 $$
 \text{cover: } d + R_X \le g + \varepsilon, \qquad \text{touch: } d \le R_X + g + \varepsilon
@@ -137,7 +137,8 @@ Without marks the face is centred on the group's point of aim, or on the sheet o
 | $c_k$ | Centre of bull $k$ from the sheet centre | mm | m |
 | $p'$ | Hole centre relative to its bull | mm | m |
 | $A_n$, $\delta_n$ | Area ring $n$ bounds, distance of the hole centre from it | mm | m |
-| $H_n$ | Half the height of an oval ring | mm (stored as height) | m |
+| $H_n$ | Half the height of an oval or stadium ring | mm (stored as height) | m |
+| $L_n$ | Half the length of the straight sides of a stadium ring, $H_n - R_n$ | mm | m |
 | $R_n$ | Radius of ring $n$ to the outside edge of its line | mm (stored as diameter) | m |
 | $R_X$ | Radius of the inner-ten circle | mm (stored as diameter) | m |
 | $v_n$ | Value of ring $n$ | 1 | 1 |
@@ -156,17 +157,17 @@ Without marks the face is centred on the group's point of aim, or on the sheet o
 
 ## Assumptions
 
-- Rings about one bull are concentric: circles, axis-aligned ovals (face upright) or squares (a square outer area with circles inside it, ovals on all rings or on none). The inner ten is a circle or an oval. Ring widths and heights run to the outside edge of the ring line, as the rule books measure them.
+- Rings about one bull are concentric: circles, axis-aligned ovals (face upright), stadiums (all rings and the inner ten) or squares (a square outer area with circles inside it, ovals on all rings or on none). The inner ten is a circle or an oval, or a stadium on a stadium face. Ring widths and heights run to the outside edge of the ring line, as the rule books measure them.
 - Every bull of a face has the rings of the record, and a shot belongs to the bull whose centre is nearest, not to the bull whose rings it touches.
 - A hole is a disc of the gauge or bullet diameter centred on the shot. The touch rule then is the distance condition above.
 - The face fit has no perspective, rotation or ring-line thickness. Noise-free marks give the exact centre and scale.
 
 ## Limits
 
-- Tenth-ring values need circular rings: a record with `decimal: true` and oval or square rings is refused, and an oval inner ten counts only by touch.
-- Fitting a face to ring marks needs one bull and circular rings. On another face the marks are refused and the group shows the error. A group without marks is placed by its point of aim, or the sheet origin without one; with several bulls that point is taken as the sheet centre the bull positions are measured from, so a group aimed at one bull is offset by that bull's position.
+- Tenth-ring values need circular rings: a record with `decimal: true` and oval, stadium or square rings is refused, and an oval inner ten counts only by touch.
+- Fitting a face to ring marks needs one bull and circular rings. The photo face search skips the DSU stadium faces (`photoSearch: false`), the user picks one from the face list. On another face the marks are refused and the group shows the error. A group without marks is placed by its point of aim, or the sheet origin without one; with several bulls that point is taken as the sheet centre the bull positions are measured from, so a group aimed at one bull is offset by that bull's position.
 - Zones with polygon outlines and targets that are hit or miss (symbols, plates) are not scored.
-- The drawing of a face shows one bull, draws a square ring as a square but its black area and inner ten as ovals, and the ring overlay on the photo draws every ring as a circle.
+- The drawing of a face shows one bull, draws a square ring as a square but its black area and inner ten as ovals, a stadium ring, its black area and inner ten as stadiums, and the ring overlay on the photo draws every ring as a circle.
 - Gauges are recorded only where the rule book gives one diameter for the event. Other events score with the bullet diameter, else the marker diameter.
 - Excluded shots are scored and shown but not counted in the totals.
 
@@ -176,7 +177,7 @@ Without marks the face is centred on the group's point of aim, or on the sheet o
 - [ISSF 2025, Third Print](../bibliography.md#issf-2025-third), pp. 194 to 200: decimal scoring (rule 6.3.3.1, p. 194), inner ten (rules 6.3.4.1 to 6.3.4.6), the 10 m air rifle inner ten only when the dot is shot out (rule 6.3.4.3).
 - [DSB 2027](../bibliography.md#dsb-2027): touch rule and measuring rings by calibre, Teil 0, 0.11.3 and 0.11.3.2 (Seite 40), faces in 0.20 (Teil 0, Seiten 62 to 70), hole centre for the muzzle-loader ball events, 7.7.5 (Teil 7, Seite 8).
 - [BDMP 2026](../bibliography.md#bdmp-2026): touch rule, A.3.21.1.3, hole centre for black powder, A.3.21.4.1, faces in B.11.
-- [DSU 2018](../bibliography.md#dsu-2018): touch rule, Kapitel 1 (Seite 27), hole centre for black powder, Kapitel 4 (Besondere Auswertungsregeln, PDF p. 126).
+- [DSU 2018](../bibliography.md#dsu-2018): the oval-ring faces b2 to b5 and b5 Präzision, Kapitel 1 (Seiten 12 to 16, PDF pp. 14 to 18), touch rule, Kapitel 1 (Seite 27), hole centre for black powder, Kapitel 4 (Besondere Auswertungsregeln, PDF p. 126).
 - [VdRBw](../bibliography.md#vdrbw): touch rule, rule 519, faces in Kapitel 8 to 10.
 - [BDS 2025](../bibliography.md#bds-2025): faces Z1 to Z21 and Anhang 1, no scoring rule stated.
 - [Eberly 2013](../bibliography.md#eberly-2013): distance from a point to an ellipse, closest-point condition and its bisection.

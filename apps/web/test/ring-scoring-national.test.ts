@@ -2,6 +2,7 @@ import { readRecords } from '@open-reloading/data'
 import type { TargetFace } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { scoredHoleDiameter, scoreGroupOnFace, scoreShot } from '../src/lib/ring-scoring.ts'
+import { matchFaces } from '../src/lib/target-face.ts'
 import { defined } from './defined.ts'
 
 const { bundle } = readRecords()
@@ -205,6 +206,8 @@ describe('DSU Sporthandbuch 2018, DSU-Scheibe 200 Meter Präzision (Seite 19, PD
       'DSU SVSG 1 Vorderlader-Steinschlossgewehr 50 m',
       'DSU SVSG 2 Vorderlader-Steinschlossgewehr 100 m',
       'DSU SVSP Steinschlosspistole 25 m',
+      'SHFR Schwarzpulver Frühe Repetiergewehre für Schwarzpulverpatronen',
+      'SHSA Schwarzpulver Single Action Revolver',
       'SVSM Vorderlader-Steinschlossmuskete 50 m',
     ])
     for (const f of faces)
@@ -247,5 +250,63 @@ describe('national events', () => {
         if (e.federation && e.federation !== f.federation) expect(e.section).toBeDefined()
       }
     }
+  })
+})
+
+describe('DSU Sporthandbuch 2018, oval-ring faces b2 to b5 Präzision (Kapitel 1, Seiten 12 bis 16)', () => {
+  // width and height in mm of the scoring area, the ten and the Mouche as the book prints them
+  const printed = {
+    'dsu-b2': { outer: [355, 555], ten: [65, 101], mouche: [32, 51] },
+    'dsu-b3': { outer: [246, 380], ten: [45, 69], mouche: [23, 34] },
+    'dsu-b4': { outer: [178, 278], ten: [33, 51], mouche: [16, 25] },
+    'dsu-b5': { outer: [126, 196], ten: [23, 35], mouche: [11, 18] },
+    'dsu-b5-precision': { outer: [93, 146], ten: [17, 26], mouche: [8.5, 13] },
+  } as const
+
+  for (const [id, p] of Object.entries(printed)) {
+    const f = face(id)
+    const size = (r: { diameter: { value: number }; height?: { value: number } | undefined }) => [
+      r.diameter.value,
+      r.height?.value,
+    ]
+
+    it(`${id} has ten stadium rings from the printed outer ring to the printed ten`, () => {
+      expect(f.rings.map((r) => r.value)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+      expect(f.rings.every((r) => r.shape === 'stadium')).toBe(true)
+      expect(size(defined(f.rings[0]))).toEqual(p.outer)
+      expect(size(defined(f.rings[9]))).toEqual(p.ten)
+      expect(size(defined(f.innerTen))).toEqual(p.mouche)
+      expect(f.photoSearch).toBe(false)
+    })
+
+    it(`${id} scores on the straight sides and on the curved ends of every ring`, () => {
+      for (const r of f.rings) {
+        const w = r.diameter.value / 2
+        const h = defined(r.height).value / 2
+        const inside = r.value
+        const outside = r.value === 1 ? 0 : r.value - 1
+        // the straight side at the middle and at the end of the straight part, then the pole
+        for (const [x, y] of [
+          [w, 0],
+          [w, h - w],
+          [0, h],
+        ] as const) {
+          expect(scoreShot(f, { x: x * mm, y: y * mm }, 0).value).toBe(inside)
+          expect(scoreShot(f, { x: (x + off) * mm, y: (y + off) * mm }, 0).value).toBe(outside)
+        }
+        // 45 degrees on the end half circle about (0, h - w)
+        const k = w * Math.SQRT1_2
+        expect(scoreShot(f, { x: k * mm, y: (h - w + k) * mm }, 0).value).toBe(inside)
+        expect(scoreShot(f, { x: (k + off) * mm, y: (h - w + k + off) * mm }, 0).value).toBe(
+          outside,
+        )
+      }
+    })
+  }
+  it('are skipped by the photo face search', () => {
+    const dsu = Object.keys(printed).map(face)
+    const black = { centreX: 0, centreY: 0, semiMajor: 100, semiMinor: 60, angle: 0 }
+    expect(matchFaces(black, [], dsu)).toEqual([])
+    expect(dsu.every((f) => f.federation === 'dsu')).toBe(true)
   })
 })

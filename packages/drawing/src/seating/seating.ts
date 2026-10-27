@@ -72,6 +72,17 @@ interface SeatInput {
   /** Barrel length from the breech face, mm. */
   barrelLength?: number | undefined
   by: { kind: 'overallLength' | 'baseToOgive'; value: number }
+  /** The firearm's measured lands contact of this bullet: it replaces the chamber-derived jump. */
+  lands?: LandsContact | undefined
+}
+
+/**
+ * The cartridge length at which this bullet touched the lands in a firearm, mm, measured as CBTO
+ * and/or COAL. The CBTO is used when the bullet has a base-to-ogive, else the COAL.
+ */
+export interface LandsContact {
+  baseToOgive?: number | undefined
+  overallLength?: number | undefined
 }
 
 /** The seated bullet: its outline, lengths, volumes and jump, each with its tag, and notes. */
@@ -94,7 +105,13 @@ export interface Seating {
   /** COAL at which the jump is 0. */
   contactCoal?: number
   /** Value undefined where a jump cannot be given; missing names what a derived value lacks. */
-  jump: { value?: number | undefined; tag: 'derived' | 'approximate'; missing: string[] }
+  jump: {
+    value?: number | undefined
+    tag: 'derived' | 'approximate'
+    missing: string[]
+    /** `lands`: from the firearm's measured lands contact; `chamber`: from the C.I.P. chamber values. */
+    source: 'lands' | 'chamber'
+  }
   /** The bullet touches the lands: a jump of 0 or less. */
   contact: boolean
   /** COAL above the CIP maximum L6. */
@@ -106,7 +123,9 @@ export interface Seating {
  * The bullet seated by COAL (base = COAL - length) or by CBTO (base = CBTO - bullet
  * base-to-ogive): seating depth = case length (cartridge L3) - base; volume behind the bullet =
  * water capacity / water density - the bullet volume below the mouth; travel = barrel - base;
- * jump = leade contact - (base + length - nose length).
+ * jump = leade contact - (base + length - nose length). With a measured lands contact the bullet
+ * base at contact is its CBTO less the bullet base-to-ogive (else its COAL less the length) and
+ * jump = contact base - base.
  */
 export function seat({
   bullet,
@@ -115,6 +134,7 @@ export function seat({
   waterDensity,
   barrelLength,
   by,
+  lands,
 }: SeatInput): Seating {
   const outline = bulletOutline(bullet)
   if ('reason' in outline) throw new RangeError(outline.reason)
@@ -129,8 +149,15 @@ export function seat({
   const contact = landContact(chamber, bullet, outline, byCbto)
   notes.push(...contact.notes)
   const { leade, missing } = contact
-  const canJump = leade !== undefined && !outline.noseAssumed
-  const jumpValue = canJump ? leade - (base + bullet.length - outline.noseLength) : undefined
+  const { jump, contactCoal } = jumpOf({
+    bullet,
+    outline,
+    base,
+    byCbto,
+    leade,
+    missing,
+    touchBase: landsBase(bullet, lands),
+  })
   return {
     outline,
     basePosition: base,
@@ -142,12 +169,57 @@ export function seat({
       travel: { value: barrelLength - base, tag: 'derived' as const },
     }),
     ...(leade !== undefined && { leade }),
-    ...(canJump && { contactCoal: leade + outline.noseLength }),
-    jump: { value: jumpValue, tag: byCbto ? 'derived' : 'approximate', missing },
-    contact: jumpValue !== undefined && jumpValue <= 0,
+    ...(contactCoal !== undefined && { contactCoal }),
+    jump,
+    contact: jump.value !== undefined && jump.value <= 0,
     aboveL6: chamber.cartridgeL6 !== undefined && coal.value > chamber.cartridgeL6 + 1e-9,
     notes,
   }
+}
+
+/**
+ * The jump and the COAL of contact: from the measured lands contact (`touchBase`, the base position
+ * at contact) when there is one, else from the leade contact of the chamber.
+ */
+function jumpOf(o: {
+  bullet: BulletDimensions
+  outline: Outline
+  base: number
+  byCbto: boolean
+  leade: number | undefined
+  missing: string[]
+  touchBase: number | undefined
+}): { jump: Seating['jump']; contactCoal?: number } {
+  const { bullet, outline, base, byCbto, leade, missing, touchBase } = o
+  if (touchBase !== undefined)
+    return {
+      jump: { value: touchBase - base, tag: 'derived', missing: [], source: 'lands' },
+      contactCoal: touchBase + bullet.length,
+    }
+  const canJump = leade !== undefined && !outline.noseAssumed
+  return {
+    jump: {
+      value: canJump ? leade - (base + bullet.length - outline.noseLength) : undefined,
+      tag: byCbto ? 'derived' : 'approximate',
+      missing,
+      source: 'chamber',
+    },
+    ...(canJump && { contactCoal: leade + outline.noseLength }),
+  }
+}
+
+/** The bullet base position from the head at the measured lands contact, mm; none without a usable one. */
+function landsBase(bullet: BulletDimensions, lands: LandsContact | undefined) {
+  if (lands?.baseToOgive !== undefined && bullet.baseToOgive !== undefined)
+    return lands.baseToOgive - bullet.baseToOgive
+  if (lands?.overallLength !== undefined) return lands.overallLength - bullet.length
+  return
+}
+
+/** COAL at which the bullet touches the lands for a measured contact, mm; none without a usable one. */
+export function landsContactCoal(bullet: BulletDimensions, lands: LandsContact | undefined) {
+  const base = landsBase(bullet, lands)
+  return base === undefined ? undefined : base + bullet.length
 }
 
 /** The bullet base position from the head, COAL and CBTO for the length entered, mm. */
@@ -282,6 +354,8 @@ export function jumpNote(jump: Seating['jump']): string {
     return jump.missing.length
       ? `not given: missing ${jump.missing.join(', ')}`
       : 'not given: the bullet does not reach the lands (see the notes)'
+  if (jump.source === 'lands')
+    return 'derived: from the measured lands contact of the firearm and the entered length'
   return jump.tag === 'derived'
     ? 'derived: from the entered CBTO and the bullet base-to-ogive against the CIP minimum chamber, assuming the same comparator'
     : `approximate: from COAL and the bullet length; missing: ${jump.missing.join(', ')}`

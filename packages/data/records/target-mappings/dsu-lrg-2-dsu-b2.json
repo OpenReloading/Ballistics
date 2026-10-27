@@ -1,0 +1,17 @@
+{
+  "id": "dsu-lrg-2-dsu-b2",
+  "discipline": "dsu-lrg-2",
+  "face": "dsu-b2",
+  "event": "lrg-2-repetiergewehr-100-m",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 26, PDF p. 84",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

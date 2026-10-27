@@ -9,6 +9,7 @@ import {
   chamberOf,
   coalRange,
   jumpNote,
+  landsContactCoal,
   leadeContact,
   previewDrawn,
   type Seating,
@@ -39,6 +40,7 @@ import { renamedCasePath, type UsedWater, usedWater } from '../lib/case-capacity
 import type { OwnCase } from '../lib/case-group.ts'
 import type { FieldValue } from '../lib/field-spec.ts'
 import { figureViewBuilder } from '../lib/figure-views.ts'
+import type { LandsContact } from '../lib/firearm.ts'
 import type { Suggestion } from '../lib/input-defaults.ts'
 import { productLabel, refName } from '../lib/manufacturers.ts'
 import { nth } from '../lib/nth.ts'
@@ -257,6 +259,12 @@ type PreviewProps = {
   barrelDefault?: Suggestion | undefined
   /** Volume (m³) and travel (m) of the seated bullet, on every change: the interior fields follow them. */
   onSeated: (values: Seated) => void
+  /**
+   * The chosen firearm's lands contact measured with the bullet seated, m: the jump follows it
+   * instead of the C.I.P. chamber. `landsOther`: the firearm has a contact of another bullet, not used.
+   */
+  lands?: LandsContact | undefined
+  landsOther?: boolean | undefined
   /** The seating at another length, for a seating ladder; undefined while no bullet is seated. */
   onSeatLadder?: (seatAt: SeatingLengths | undefined) => void
   /**
@@ -298,6 +306,17 @@ type PreviewProps = {
   /** The figure's full view: the same drawing in a modal at the window's height. */
   fullView?: { opened: boolean; onClose: () => void }
 }
+
+/** The lands contact in mm, as `seat` takes it. */
+type LandsMm = { baseToOgive?: number | undefined; overallLength?: number | undefined }
+
+const landsMm = (cbto: number | undefined, coal: number | undefined): LandsMm | undefined =>
+  cbto === undefined && coal === undefined
+    ? undefined
+    : {
+        baseToOgive: cbto === undefined ? undefined : fromSi('length', cbto),
+        overallLength: coal === undefined ? undefined : fromSi('length', coal),
+      }
 
 type Spec = NonNullable<ReturnType<typeof specOf>>
 type Chamber = NonNullable<ReturnType<typeof chamberOf>>
@@ -423,14 +442,20 @@ function refusalOf(shaped: ReturnType<typeof shapeOf>) {
 }
 
 /** The slider range and the drawing: they depend on the records only, never on the position. */
-function fixedOf(spec: Spec | undefined, chamber: Chamber | undefined, shape: Shape | undefined) {
+function fixedOf(
+  spec: Spec | undefined,
+  chamber: Chamber | undefined,
+  shape: Shape | undefined,
+  lands: LandsMm | undefined,
+) {
   if (!spec || !chamber || !shape) return
   const contact = leadeContact(chamber, shape.diameter)
   const outline = bulletOutline(shape)
-  const contactCoal =
+  const chamberCoal =
     'z' in contact && 'noseLength' in outline && !outline.noseAssumed
       ? contact.z + outline.noseLength
       : undefined
+  const contactCoal = landsContactCoal(shape, lands) ?? chamberCoal
   const range = coalRange(chamber, shape, contactCoal)
   const drawn = previewDrawn(spec.values, spec.table, range[1] + 2)
   if ('missing' in drawn) return { range, missing: drawn.missing }
@@ -444,8 +469,9 @@ function useGeometry(o: {
   record: Load<Bullet>
   design: UserBulletView | undefined
   shown: RefObject<UnitSystem>
+  lands: LandsMm | undefined
 }) {
-  const { draft, detail, record, design, shown } = o
+  const { draft, detail, record, design, shown, lands } = o
   const draftSpec = draft?.spec
   const spec = useMemo(() => specOf(draftSpec, detail), [draftSpec, detail])
   const chamber = useMemo(() => spec && chamberOf(spec.values), [spec])
@@ -458,7 +484,7 @@ function useGeometry(o: {
   // a record whose dimensions cannot form an outline is not seated; its reason is shown
   const refused = useMemo(() => refusalOf(shaped), [shaped])
   const shape = refused ? undefined : shaped
-  const fixed = useMemo(() => fixedOf(spec, chamber, shape), [spec, chamber, shape])
+  const fixed = useMemo(() => fixedOf(spec, chamber, shape, lands), [spec, chamber, shape, lands])
   return { spec, chamber, capacities, bulletRecord, shaped, refused, shape, fixed }
 }
 
@@ -534,8 +560,9 @@ function seatBuilder(o: {
   /** The water (g) the case holds. */
   water: number | undefined
   barrel: number | undefined
+  lands: LandsMm | undefined
 }) {
-  const { chamber, shape, mode, canCbto, water, barrel } = o
+  const { chamber, shape, mode, canCbto, water, barrel, lands } = o
   if (!chamber || !shape || (mode === 'baseToOgive' && !canCbto)) return
   return (by: number) =>
     seat({
@@ -545,6 +572,7 @@ function seatBuilder(o: {
       waterDensity: waterDensityGramsPerCm3,
       barrelLength: barrel === undefined ? undefined : fromSi('length', barrel),
       by: { kind: mode, value: by },
+      lands,
     })
 }
 
@@ -732,6 +760,9 @@ function useSeatingModel(p: PreviewProps) {
   const designer = isDesigner(draft)
   const name = nameOf(draft, cartridge)
   const bullet = useBulletChoice(initial?.bullet, p.linked)
+  // the contact object is rebuilt only when a length changes, so the seating is not for each render
+  const [landsCbto, landsCoal] = [p.lands?.baseToOgive, p.lands?.overallLength]
+  const lands = useMemo(() => landsMm(landsCbto, landsCoal), [landsCbto, landsCoal])
   const { design, record } = bullet
   const names = useManufacturerNames()
   const [ownCapacityId, setOwnCapacityId] = useState<string | undefined>(undefined)
@@ -760,6 +791,7 @@ function useSeatingModel(p: PreviewProps) {
     record,
     design,
     shown,
+    lands,
   })
   const chosenCase =
     caseList.status === 'ok' ? caseList.value.items.find((c) => c.id === caseId) : undefined
@@ -814,8 +846,16 @@ function useSeatingModel(p: PreviewProps) {
   const waterUsed = water?.grams
   const seatBy = useMemo(
     () =>
-      seatBuilder({ chamber, shape, mode: seatMode, canCbto, water: waterUsed, barrel: barrel.si }),
-    [chamber, shape, seatMode, canCbto, waterUsed, barrel.si],
+      seatBuilder({
+        chamber,
+        shape,
+        mode: seatMode,
+        canCbto,
+        water: waterUsed,
+        barrel: barrel.si,
+        lands,
+      }),
+    [chamber, shape, seatMode, canCbto, waterUsed, barrel.si, lands],
   )
   const seating = useMemo(
     () => (seatBy && seatValue !== undefined ? seatBy(seatValue) : undefined),
@@ -966,7 +1006,9 @@ function unitFormats(system: UnitSystem) {
 
 const contactText = (seating: Seating | undefined, mm: (x: number) => string) =>
   seating?.contact &&
-  `Contact with leade (${seating.jump.tag}): the bullet reaches the leade at ${mm(seating.contactCoal as number)} COAL; it is not moved back.`
+  (seating.jump.source === 'lands'
+    ? `Contact with the lands (measured): the bullet reaches the lands at ${mm(seating.contactCoal as number)} COAL; it is not moved back.`
+    : `Contact with leade (${seating.jump.tag}): the bullet reaches the leade at ${mm(seating.contactCoal as number)} COAL; it is not moved back.`)
 
 function warningsOf(
   seating: Seating | undefined,
@@ -987,7 +1029,7 @@ const jumpText = (s: Seating, mm: (x: number) => string) =>
 
 const announceOf = (seating: Seating | undefined, mm: (x: number) => string) =>
   seating
-    ? `COAL ${mm(seating.coal.value)}, seating depth ${mm(seating.depth.value)}, jump ${jumpText(seating, mm)}${seating.contact ? ', contact with leade' : ''}.`
+    ? `COAL ${mm(seating.coal.value)}, seating depth ${mm(seating.depth.value)}, jump ${jumpText(seating, mm)}${seating.contact ? (seating.jump.source === 'lands' ? ', contact with the lands' : ', contact with leade') : ''}.`
     : ''
 
 /** The position in the other mode's length, or undefined when the bullet gives no shift. */
@@ -1457,13 +1499,28 @@ function SeatingFigure({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Ch
   )
 }
 
-function SeatingNotes({ seating }: { seating: Seating }) {
+function SeatingNotes({
+  seating,
+  landsOther,
+}: {
+  seating: Seating
+  landsOther?: boolean | undefined
+}) {
   return (
     <>
       <p className="note">
-        The jump is not a measured jump and not a seating recommendation. Staying at or below L6
-        says nothing about pressure, magazine fit or safety; seating depth changes pressure.
+        {seating.jump.source === 'lands'
+          ? 'The jump is your measured lands contact less the seated length, not a seating recommendation.'
+          : 'The jump is not a measured jump and not a seating recommendation.'}{' '}
+        Staying at or below L6 says nothing about pressure, magazine fit or safety; seating depth
+        changes pressure.
       </p>
+      {landsOther && (
+        <p className="note">
+          The firearm's lands contact was measured with another bullet and is not used for this
+          jump.
+        </p>
+      )}
       {seating.notes.length > 0 && (
         <ul className="seating-notes">
           {seating.notes.map((n) => (
@@ -1575,7 +1632,7 @@ function JumpRow({ m, seating }: RowsProps) {
   const unknown = seating.jump.value === undefined
   return (
     <Row
-      term="Jump to the leade"
+      term={seating.jump.source === 'lands' ? 'Jump to the lands' : 'Jump to the leade'}
       value={seating.jump.value === undefined ? 'not given' : m.mm(seating.jump.value)}
       tag={unknown ? undefined : seating.jump.tag}
       note={jumpNote(seating.jump)}
@@ -1620,7 +1677,7 @@ function SeatingValues({ m, seating, chamber }: RowsProps) {
         {aside(slots, <JumpRow {...rows} />, more)}
       </dl>
       {contact && !card && <ErrorNote color="orange">{contact}</ErrorNote>}
-      {!card && <SeatingNotes seating={seating} />}
+      {!card && <SeatingNotes seating={seating} landsOther={m.p.landsOther} />}
     </div>
   )
 }
@@ -1640,7 +1697,7 @@ function PreviewBody({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Cham
         seating &&
         createPortal(
           <div>
-            <SeatingNotes seating={seating} />
+            <SeatingNotes seating={seating} landsOther={m.p.landsOther} />
           </div>,
           slots.more,
         )}

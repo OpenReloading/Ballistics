@@ -1,0 +1,49 @@
+{
+  "id": "dsu-lhmov-2",
+  "federation": "dsu",
+  "name": "Halbautomatisches Gewehr Mehrdistanz 100 m offene Visierung",
+  "number": "LHMoV 2",
+  "section": "Kapitel 3, Langwaffenübungen, LHMoV 2",
+  "page": "Seiten 49 bis 50, PDF pp. 107 to 108",
+  "distance": {
+    "value": 100000,
+    "raw": "100, 50, 25 Meter"
+  },
+  "category": "rifle",
+  "caliberClasses": {
+    "ids": [
+      "rifle-22-cf",
+      "rifle-6mm",
+      "rifle-25",
+      "rifle-6-5",
+      "rifle-270",
+      "rifle-7mm",
+      "rifle-30",
+      "rifle-30-carbine",
+      "rifle-8mm",
+      "rifle-338"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seiten 49 bis 50, PDF pp. 107 to 108",
+        "fields": ["federation", "section", "page", "distance", "category", "caliberClasses"],
+        "note": "The book prints diameter ranges per group: .22 centre-fire up to 6 mm, over 6 up to 8 mm, over 8 up to .460. Only rifle classes are listed; classes of handgun cartridges, whose diameters also lie in the ranges, and cartridges without a class (.375, .416, .45-70) are not. Classes group by bullet diameter, so a class can also hold cartridges that the range does not name."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Inhaltsverzeichnis Langwaffen, Seite 3 (PDF p. 61)",
+        "fields": ["name", "number"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 9, Kurzbezeichnungen Langwaffen, Seite 4 (PDF p. 230)",
+        "fields": ["caliberClasses"]
+      }
+    ]
+  }
+}

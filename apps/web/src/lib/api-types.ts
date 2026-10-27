@@ -6,6 +6,8 @@ import type {
   CaseType,
   CatalogueCaseCapacity,
   Powder,
+  PrimerCompound,
+  PrimerSize,
   Provenance,
 } from '@open-reloading/schema'
 
@@ -84,6 +86,18 @@ export interface CaseSummary {
   waterCapacity?: number | undefined
   /** The empty case, g. */
   mass?: number | undefined
+}
+
+/** A primer as `GET /primers` lists it. */
+export interface PrimerSummary {
+  id: string
+  /** Id of the manufacturer record. */
+  manufacturer: string
+  name: string
+  productNumber?: string | undefined
+  size: PrimerSize
+  magnum?: boolean | undefined
+  compound?: PrimerCompound | undefined
 }
 
 export interface PowderSummary {

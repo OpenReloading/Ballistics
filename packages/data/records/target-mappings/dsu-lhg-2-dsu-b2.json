@@ -1,0 +1,17 @@
+{
+  "id": "dsu-lhg-2-dsu-b2",
+  "discipline": "dsu-lhg-2",
+  "face": "dsu-b2",
+  "event": "lhg-2-halbautomatisches-gewehr-100-m",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 42, PDF p. 100",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

@@ -126,6 +126,24 @@ describe('chronoSession', () => {
     )
   })
 
+  it('keeps the weather and the note typed for a string', () => {
+    const string = {
+      shots: [shot(800)],
+      conditions: {
+        airTemperature: { value: 12 },
+        stationPressure: { value: 0.95 },
+        windSpeed: { value: 3 },
+      },
+      note: 'light rain',
+    }
+    expect(chronoSession.parse({ ...fromFile, strings: [string] }).strings[0]).toEqual(string)
+    expectIssueAt(
+      chronoSession,
+      { ...fromFile, strings: [{ ...string, conditions: { windSpeed: { value: -1 } } }] },
+      'strings.0.conditions.windSpeed.value',
+    )
+  })
+
   it('refuses a string without shots and a session whose provenance is not measured', () => {
     expectIssueAt(chronoSession, { ...fromFile, strings: [{ shots: [] }] }, 'strings.0.shots')
     expectIssueAt(

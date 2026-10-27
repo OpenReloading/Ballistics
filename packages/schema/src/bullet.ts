@@ -19,9 +19,30 @@ export const ballisticCoefficient = z.object({
   note: z.string().min(1).optional(),
 })
 
+/** Core materials of a bullet that contain lead. */
+const leadCoreMaterials = ['lead', 'lead-alloy'] as const
+
+/**
+ * Core materials a record can name. `compressed-powder` is a consolidated metal powder whose metals
+ * the wording does not state, so it says nothing about lead.
+ */
+const coreMaterials = z.enum([
+  ...leadCoreMaterials,
+  'copper',
+  'copper-alloy',
+  'tin',
+  'tungsten',
+  'steel',
+  'compressed-powder',
+])
+
+/** Surface treatments that contain lead. */
+const leadSurfaces = ['lead-wash'] as const
+
 /**
  * How a bullet is built, as structured fields next to the manufacturer's wording. Values are read from
- * that wording; a field is absent where the wording does not state it.
+ * that wording; a field is absent where the wording does not state it. Lead-free is not stored:
+ * {@link leadFree} derives it.
  * Inferred type: {@link ConstructionFields}.
  */
 export const constructionFields = z
@@ -29,32 +50,91 @@ export const constructionFields = z
     /** The manufacturer's wording as printed. */
     raw: z.string().min(1),
     structure: z
-      .enum(['cup-and-core', 'bonded', 'partitioned', 'monolithic', 'cast', 'swaged', 'plated'])
+      .enum([
+        'cup-and-core',
+        'bonded',
+        'partitioned',
+        'monolithic',
+        'cast',
+        'swaged',
+        'plated',
+        'frangible',
+      ])
       .optional(),
     core: z
-      .object({ material: z.enum(['lead', 'lead-alloy', 'copper', 'copper-alloy']) })
+      .object({
+        material: coreMaterials,
+        /** Brinell hardness number (HBW, ISO 6506-1) of a lead or lead alloy core, a cast bullet's alloy. */
+        hardness: quantity('dimensionless', z.number().positive()).optional(),
+      })
       .optional(),
-    /** Present when the bullet has a jacket; the material only where it is stated. */
+    /** Present when the bullet has a jacket; the material and the wall only where they are stated. */
     jacket: z
       .object({
         material: z
-          .enum(['copper', 'gilding-metal', 'copper-clad-steel', 'copper-plated-steel'])
+          .enum(['copper', 'gilding-metal', 'copper-clad-steel', 'copper-plated-steel', 'steel'])
           .optional(),
+        thickness: quantity('length', z.number().positive()).optional(),
       })
       .optional(),
     surface: z
-      .array(z.enum(['moly', 'black-oxide']))
+      .array(
+        z.enum([
+          'moly',
+          'black-oxide',
+          'powder-coat',
+          'polymer-coat',
+          'paint',
+          'wax-lube',
+          'boron-nitride',
+          'tungsten-disulfide',
+          'copper-wash',
+          ...leadSurfaces,
+        ]),
+      )
       .min(1)
       .optional(),
+    /** A gas check, the cup on the base of a cast bullet; `false` for a plain base the wording states. */
+    gasCheck: z.boolean().optional(),
+    /** Number of driving bands of a monolithic bullet with relieved shanks. */
+    drivingBands: z.int().positive().optional(),
     /** Set when no structured field could be derived from `raw`; the wording stays as printed. */
     unmapped: z.literal(true).optional(),
   })
-  .refine((c) => !c.unmapped || !(c.structure || c.core || c.jacket || c.surface), {
-    message: 'unmapped excludes the structured fields',
+  .superRefine((c, ctx) => {
+    const issue = (path: string[], message: string) =>
+      ctx.addIssue({ code: 'custom', path, message })
+    if (
+      c.unmapped &&
+      (c.structure || c.core || c.jacket || c.surface || c.gasCheck !== undefined || c.drivingBands)
+    )
+      issue([], 'unmapped excludes the structured fields')
+    if (c.gasCheck !== undefined && c.structure !== 'cast')
+      issue(['gasCheck'], 'only for a cast bullet')
+    if (c.drivingBands && c.structure !== 'monolithic')
+      issue(['drivingBands'], 'only for a monolithic bullet')
+    if (c.core?.hardness && !(leadCoreMaterials as readonly string[]).includes(c.core.material))
+      issue(['core', 'hardness'], 'only for a lead or lead alloy core')
   })
 
 /** Bullet construction read from the manufacturer's wording, with `raw` kept as printed. */
 export interface ConstructionFields extends z.infer<typeof constructionFields> {}
+
+/**
+ * Whether a bullet contains no lead, derived from the core, the jacket and the surface: `false` when
+ * the core or the surface contains lead, `true` when the core is a named material without lead and
+ * the surface has none, `undefined` when the wording does not settle it (no construction, wording
+ * kept as printed, no core material, or a compressed powder whose metals are not stated).
+ */
+export function leadFree(c: ConstructionFields | undefined): boolean | undefined {
+  if (!c || c.unmapped) return undefined
+  const lead = (list: readonly string[], value: string | undefined) =>
+    value !== undefined && list.includes(value)
+  if (lead(leadCoreMaterials, c.core?.material) || c.surface?.some((s) => lead(leadSurfaces, s)))
+    return false
+  const material = c.core?.material
+  return material && material !== 'compressed-powder' ? true : undefined
+}
 
 /**
  * Base types of a bullet. `conical-hollow-base` and `rounded-hollow-base`: a cavity open at the base,
@@ -276,6 +356,12 @@ export const bullet = z
       b.base?.diameter ? 'the base diameter' : 'the diameter',
     )
     cannelureOnShank(b, issue)
+    below(
+      ['construction', 'jacket', 'thickness'],
+      b.construction?.jacket?.thickness?.value,
+      d / 2,
+      'the radius',
+    )
     // The depth is not stored: it is half the opening (`bulletOutline`).
     if (cavity !== undefined && b.length && !(cavity / 2 < b.length.value))
       issue(

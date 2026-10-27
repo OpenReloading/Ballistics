@@ -1,0 +1,17 @@
+{
+  "id": "dsu-lri-2-dsu-b2",
+  "discipline": "dsu-lri-2",
+  "face": "dsu-b2",
+  "event": "lri-2-repetiergewehr-100-m-intervall",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 28, PDF p. 86",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

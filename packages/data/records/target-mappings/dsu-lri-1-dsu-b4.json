@@ -1,0 +1,17 @@
+{
+  "id": "dsu-lri-1-dsu-b4",
+  "discipline": "dsu-lri-1",
+  "face": "dsu-b4",
+  "event": "lri-1-repetiergewehr-50-m-intervall",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 27, PDF p. 85",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}
