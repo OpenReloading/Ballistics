@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.0.4](https://github.com/OpenReloading/Ballistics/compare/web-v0.0.3...web-v0.0.4) (2026-10-27)
+
+
+### Features
+
+* **web:** develop and review the web app on data files without an API ([#314](https://github.com/OpenReloading/Ballistics/issues/314)) ([60a4488](https://github.com/OpenReloading/Ballistics/commit/60a44888543900d14f46ecff428dd46149015173))
+* **web:** German UI foundation, language setting and catalogue ([#375](https://github.com/OpenReloading/Ballistics/issues/375)) ([5a07fbe](https://github.com/OpenReloading/Ballistics/commit/5a07fbe0b606b6308390e82bf7247d5906f8f4c3))
+
+
+### Bug fixes
+
+* **web:** verify and fix the accessibility candidate failures ([#323](https://github.com/OpenReloading/Ballistics/issues/323)) ([fd3fc10](https://github.com/OpenReloading/Ballistics/commit/fd3fc107c8eba63944940172c33ca61f03f28810))
+
+
+### Documentation
+
+* describe the single static edition and the API as its own product ([#381](https://github.com/OpenReloading/Ballistics/issues/381)) ([53dbcd4](https://github.com/OpenReloading/Ballistics/commit/53dbcd4a4fda15a7597668640dd28426cd7ef313))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @open-reloading/api bumped from 0.0.3 to 0.0.4
+    * @open-reloading/data bumped from 0.0.3 to 0.0.4
+    * @open-reloading/importers bumped from 0.0.3 to 0.0.4
+    * @open-reloading/schema bumped from 0.0.3 to 0.0.4
+
 ## [0.0.3](https://github.com/OpenReloading/Ballistics/compare/web-v0.0.2...web-v0.0.3) (2026-10-27)
 
 
