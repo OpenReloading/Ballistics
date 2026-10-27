@@ -55,3 +55,16 @@ test('the keys of the canvas place a scale point and the brush paints', async ({
   ).toBeAttached()
   await expect(length).toHaveText(before ?? '')
 })
+
+test('the photograph canvas is an application with a short name and its keys as the description', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/bullets/designer')
+  await page.getByRole('button', { name: 'From a photo' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Bullet from a photograph' })
+  await dialog.getByRole('button', { name: 'Try a sample' }).click()
+  const canvas = dialog.getByRole('application', { name: 'Photograph of the bullet' })
+  await expect(canvas).toHaveAccessibleDescription(/^Arrow keys move the cursor/)
+  await canvas.focus()
+  await expect(canvas).toBeFocused()
+})
