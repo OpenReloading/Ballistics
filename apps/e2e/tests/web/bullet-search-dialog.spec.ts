@@ -1,4 +1,3 @@
-import AxeBuilder from '@axe-core/playwright'
 import { expect, type Page, test } from '@playwright/test'
 import { gotoHydrated } from './nav.ts'
 import { loadForm } from './workbench.ts'
@@ -81,30 +80,3 @@ test("the card's own field finds a bullet by the same words as the dialog", asyn
     await expect(options.first()).toContainText('168 gr HPBT')
   }
 })
-
-for (const [width, height] of [
-  [1280, 800],
-  [390, 844],
-] as const)
-  test(`the dialog has no axe violation in light and dark at ${width} px`, async ({ page }) => {
-    await page.setViewportSize({ width, height })
-    for (const colorScheme of ['light', 'dark'] as const) {
-      await page.emulateMedia({ colorScheme })
-      await gotoHydrated(page, '/workbench?cartridge=308-win')
-      await browse(page).click()
-      await expect(dialog(page).getByRole('option')).toHaveCount(2)
-      // axe reads the colours once the dialog has faded in
-      await expect(dialog(page)).toHaveCSS('opacity', '1')
-      // the narrow layout keeps the filters behind their button: open them too
-      const filters = dialog(page).getByRole('button', { name: /^Filters/ })
-      if (await filters.isVisible()) await filters.click()
-      const { violations } = await new AxeBuilder({ page })
-        // the page behind the dialog is no part of it
-        .include('[role="dialog"]')
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
-        .analyze()
-      expect(
-        violations.map((v) => `${colorScheme} ${v.id} ${v.nodes.map((n) => n.target)}`),
-      ).toEqual([])
-    }
-  })

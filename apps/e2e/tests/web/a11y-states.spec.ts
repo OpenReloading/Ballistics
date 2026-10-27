@@ -1,0 +1,217 @@
+import { readdirSync } from 'node:fs'
+import path from 'node:path'
+import { expect, type Locator, type Page, test } from '@playwright/test'
+import { height, problems, schemes, tall, widths } from './a11y.ts'
+import { barButton } from './bar.ts'
+import { gotoHydrated } from './nav.ts'
+import { storeUnits } from './units.ts'
+import { loadForm } from './workbench.ts'
+import { runExample } from './workbench-run.ts'
+
+// The states a visitor reaches after a click: a record page of each `[id]` route, the workbench
+// after a run and every dialog or drawer. a11y-sweep.spec.ts has the pages as they load.
+
+test.beforeEach(({ page }) => storeUnits(page))
+
+const appDir = path.join(__dirname, '../../../web/src/app')
+
+/** One fixed record per `[id]` route; each is in the export's sample (`prerender-sample.ts`). */
+const records: Record<string, string> = {
+  cartridges: '308-win',
+  bullets: 'demo-bullet-168',
+  powders: 'demo-powder-dp40',
+  cases: 'demo-case-308-brass',
+  primers: 'demo-primer-large-rifle',
+  targets: 'issf-25m-precision-50m-pistol',
+  disciplines: 'dsb-25m-pistole-revolver',
+  federations: 'dsb',
+}
+
+test('every route with an [id] segment has its record in the sweep', () => {
+  const dynamic = readdirSync(appDir, { recursive: true, encoding: 'utf8' })
+    .filter((file) => path.basename(file) === 'page.tsx' && file.includes('['))
+    .map((file) => path.dirname(file).split(path.sep)[0])
+  expect(new Set(Object.keys(records))).toEqual(new Set(dynamic))
+})
+
+/** The dialog or drawer once it has stopped moving: it fades or slides in, and axe reads colours at rest. */
+async function settled(dialog: Locator) {
+  await expect(dialog).toBeVisible()
+  // a modal fades in, a drawer slides
+  await expect(dialog).toHaveCSS('opacity', '1')
+  await dialog.evaluate((el) =>
+    Promise.all(el.getAnimations({ subtree: true }).map((a) => a.finished)),
+  )
+  return dialog
+}
+
+/** A button of the sidebar from 75em, of the navigation drawer below it. */
+async function fromNav(page: Page, name: string) {
+  const burger = page.getByRole('button', { name: 'Navigation', exact: true })
+  if (await burger.isVisible()) {
+    await burger.click()
+    return page
+      .getByRole('dialog', { name: 'Navigation' })
+      .getByRole('button', { name, exact: true })
+  }
+  return page.getByRole('navigation', { name: 'Main' }).getByRole('button', { name, exact: true })
+}
+
+async function openSettings(page: Page, tab: string) {
+  await gotoHydrated(page, '/powders')
+  await (await fromNav(page, 'Settings')).click()
+  const dialog = page.getByRole('dialog', { name: 'Settings' })
+  await dialog.getByRole('tab', { name: tab }).click()
+  await expect(dialog.getByRole('tabpanel', { name: tab })).toBeVisible()
+  return settled(dialog)
+}
+
+/** The phone layout shows the inputs or the results: the results of a run are on their own tab. */
+async function showResults(page: Page) {
+  const tab = page.getByRole('tab', { name: 'Results', exact: true })
+  if (await tab.isVisible()) await tab.click()
+}
+
+type State = {
+  name: string
+  /** A page that scrolls as a whole, in a window as tall as it is. */
+  scrolls?: true
+  /** Gets the page into the state; `check` sweeps it, once per view the state has. */
+  open: (page: Page, check: (view: string, include?: string) => Promise<void>) => Promise<void>
+}
+
+const dialogOf = (name: string) => (page: Page) => settled(page.getByRole('dialog', { name }))
+
+const states: State[] = [
+  ...Object.entries(records).map(([dir, id]) => ({
+    name: `/${dir}/${id}`,
+    scrolls: true as const,
+    open: async (page: Page, check: (view: string) => Promise<void>) => {
+      await gotoHydrated(page, `/${dir}/${id}`)
+      await page.waitForLoadState('networkidle')
+      await check('page')
+    },
+  })),
+  {
+    name: 'workbench after the example run',
+    open: async (page, check) => {
+      await runExample(page)
+      await showResults(page)
+      await page.waitForLoadState('networkidle')
+      await check('chart')
+      for (const tab of ['Ladder table', 'Notes']) {
+        // below 62em the tabs that do not fit are in the More menu
+        const direct = page.getByRole('tab', { name: tab, exact: true })
+        if (await direct.isVisible()) await direct.click()
+        else {
+          await page.getByRole('button', { name: 'More', exact: true }).click()
+          await page.getByRole('menuitem', { name: tab }).click()
+        }
+        await check(tab)
+      }
+    },
+  },
+  ...['General', 'Units', 'Workbench'].map((tab) => ({
+    name: `Settings, ${tab}`,
+    open: async (page: Page, check: (view: string, include?: string) => Promise<void>) => {
+      await openSettings(page, tab)
+      await check(tab, '[role="dialog"]')
+    },
+  })),
+  {
+    name: 'Keyboard shortcuts',
+    open: async (page, check) => {
+      await gotoHydrated(page, '/powders')
+      await page.keyboard.press('?')
+      await dialogOf('Keyboard shortcuts')(page)
+      await check('dialog', '[role="dialog"]')
+    },
+  },
+  {
+    name: 'Chart data',
+    open: async (page, check) => {
+      await runExample(page)
+      await showResults(page)
+      await page.getByRole('button', { name: 'Chart data' }).click()
+      await dialogOf('Chart data')(page)
+      await check('dialog', '[role="dialog"]')
+    },
+  },
+  {
+    name: 'Saved loads',
+    open: async (page, check) => {
+      // a native picker cannot be driven: a save goes to the browser's records, as the app's own
+      await page.addInitScript(() => {
+        ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
+          (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
+      })
+      await runExample(page)
+      await (await barButton(page, 'Save')).click()
+      await (await barButton(page, 'Open')).click()
+      await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
+      const drawer = await dialogOf('Saved loads')(page)
+      // the saved load is listed once the store has it
+      await expect(drawer.locator('.saved-loads li')).toHaveCount(1)
+      await check('drawer', '[role="dialog"]')
+    },
+  },
+  {
+    name: 'Bullet from a photograph',
+    open: async (page, check) => {
+      await gotoHydrated(page, '/bullets/designer')
+      // below 75em the toolbar is in the "Page actions" panel
+      const actions = page.getByRole('button', { name: 'Page actions' })
+      const photo = page.getByRole('button', { name: 'From a photo' })
+      await expect(async () => {
+        if (!(await photo.isVisible())) await actions.click({ timeout: 1000 })
+        await photo.click({ timeout: 1000 })
+      }).toPass({ timeout: 10_000 })
+      const dialog = await dialogOf('Bullet from a photograph')(page)
+      await dialog.getByRole('button', { name: 'Try a sample' }).click()
+      await expect(dialog.getByRole('row', { name: /^Length/ })).toContainText(/31\.\d+ ± /, {
+        timeout: 30_000,
+      })
+      await check('dialog', '[role="dialog"]')
+    },
+  },
+  {
+    name: 'Choose a bullet',
+    open: async (page, check) => {
+      await gotoHydrated(page, '/workbench?cartridge=308-win')
+      await loadForm(page).getByRole('button', { name: 'Browse bullets' }).click()
+      const dialog = await dialogOf('Choose a bullet')(page)
+      await expect(dialog.getByRole('option')).toHaveCount(2)
+      // the narrow layout keeps the filters behind their button
+      const filters = dialog.getByRole('button', { name: /^Filters/ })
+      if (await filters.isVisible()) await filters.click()
+      await settled(dialog)
+      await check('dialog', '[role="dialog"]')
+    },
+  },
+  {
+    name: 'Site search',
+    open: async (page, check) => {
+      await gotoHydrated(page, '/powders')
+      await page.keyboard.press('Control+k')
+      const field = page.getByRole('textbox', {
+        name: 'Search pages, cartridges, bullets, powders and commands',
+      })
+      await expect(field).toBeFocused()
+      await settled(page.getByRole('dialog').filter({ has: field }))
+      await check('dialog', '[role="dialog"]')
+    },
+  },
+]
+
+for (const width of widths)
+  for (const colorScheme of schemes)
+    for (const state of states)
+      test(`${state.name} has no axe finding at ${width} px, ${colorScheme}`, async ({ page }) => {
+        await page.setViewportSize({ width, height: state.scrolls ? tall : height })
+        await page.emulateMedia({ colorScheme })
+        const found: string[] = []
+        await state.open(page, async (view, include) => {
+          found.push(...(await problems(page, `${state.name}, ${view}`, include)))
+        })
+        expect(found).toEqual([])
+      })

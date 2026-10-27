@@ -1,4 +1,3 @@
-import AxeBuilder from '@axe-core/playwright'
 import { expect, type Locator, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
 import { exported, gotoHydrated } from './nav.ts'
@@ -138,38 +137,6 @@ test('the Manufacturers section of General deletes a user manufacturer that no r
   await panel.getByRole('button', { name: 'Delete Gone' }).click()
   await expect(panel).not.toContainText('Gone')
   await expect(panel).toContainText('Kept used by 1')
-})
-
-test('the settings dialog over a document page passes axe in light and dark', async ({ page }) => {
-  test.setTimeout(2 * 30_000)
-  for (const colorScheme of ['light', 'dark'] as const)
-    await test.step(
-      colorScheme,
-      async () => {
-        await page.emulateMedia({ colorScheme })
-        await page.setViewportSize({ width: 1280, height: 900 })
-        await page.goto('/cartridges/308-win')
-        await expect(page.locator('html')).toHaveAttribute('data-mantine-color-scheme', colorScheme)
-        const dialog = await openFrom(page, sidebarSettings(page))
-        // every tab
-        for (const tab of ['General', 'Units', 'Workbench']) {
-          await dialog.getByRole('tab', { name: tab }).click()
-          await expect(dialog.getByRole('tabpanel', { name: tab })).toBeVisible()
-          if (tab === 'General')
-            await expect(dialog.getByRole('tabpanel', { name: tab })).toContainText(
-              'Add to Home Screen',
-            )
-          const { violations } = await new AxeBuilder({ page })
-            .include('[role="dialog"]')
-            .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
-            .analyze()
-          expect(
-            violations.map((v) => `${tab}: ${v.id} ${v.nodes.map((n) => n.target).join(' ')}`),
-          ).toEqual([])
-        }
-      },
-      { timeout: 30_000 },
-    )
 })
 
 test('the tabs General, Units and Workbench are each reached by keyboard', async ({ page }) => {

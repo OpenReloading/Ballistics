@@ -1,4 +1,3 @@
-import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
@@ -21,11 +20,6 @@ test('the sample photograph is measured and opened in the designer', async ({ pa
     /7\.[78]\d* ± 0\.0\d+ mm/,
   )
   await expect(dialog.getByText(/^Scale \d+\.\d+ px\/mm, uncertainty/)).toBeVisible()
-
-  const results = await new AxeBuilder({ page }).include('[role="dialog"]').analyze()
-  expect(
-    results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(' | ')}`),
-  ).toEqual([])
 
   await dialog.getByRole('button', { name: 'Open in designer' }).click()
   await expect(dialog).toBeHidden()
