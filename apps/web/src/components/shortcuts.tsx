@@ -23,11 +23,13 @@ const changed = () => {
 }
 
 const singleKeysEvent = 'openreloading:single-keys'
+/** The choice of this session where the browser has no storage to keep it in. */
+let sessionSingleKeys = true
 const readSingleKeys = () => {
   try {
     return parseSingleKeys(localStorage.getItem(singleKeysKey))
   } catch {
-    return true
+    return sessionSingleKeys
   }
 }
 const subscribeSingleKeys = (l: () => void) => {
@@ -45,7 +47,8 @@ export function setSingleKeys(on: boolean) {
     if (on) localStorage.removeItem(singleKeysKey)
     else localStorage.setItem(singleKeysKey, 'off')
   } catch {
-    // shortcut: a browser without storage keeps them on, nothing to store the choice in
+    // shortcut: without storage the choice lasts until the page reloads
+    sessionSingleKeys = on
   }
   window.dispatchEvent(new Event(singleKeysEvent))
 }
