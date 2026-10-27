@@ -6929,6 +6929,9 @@ main .field-table tr.field-group > th {
 /* the aliases after the badges, cut to one line, the whole list on hover */
 .record-aliases {
   min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
   max-width: 16rem;
   overflow: hidden;
   color: var(--muted);

@@ -40,7 +40,7 @@ it('shows 12 digits of the hash, copies the full hash and keeps the rest in the 
   expect(render(sheet)).toContain(
     `<code>0123456789ab<span class="hash-rest">${hash.slice(12)}</span></code>`,
   )
-  expect(render(sheet)).toContain(`aria-label="Copy hash ${hash}"`)
+  expect(render(sheet)).toContain(`aria-label="Copy hash ${hash.slice(0, 12)}"`)
 })
 
 it('lists the titles in the compact form, separated by semicolons', () => {
