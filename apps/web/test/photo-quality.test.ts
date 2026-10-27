@@ -121,6 +121,12 @@ describe('a photo without a black area', () => {
     expect(level(photoQuality({ image: flat(900, 700, 128), scale: 1 }), 'contrast')).toBe('bad')
   })
 
+  it('is reported as such, below the minimum quality', () => {
+    const issues = photoQuality({ image: flat(900, 700, 128), scale: 1 })
+    expect(level(issues, 'face')).toBe('bad')
+    expect(belowMinimum(issues)).toBe(true)
+  })
+
   it('is judged on its size', () => {
     const issues = photoQuality({ image: flat(200, 150, 128), scale: 1 })
     expect(level(issues, 'resolution')).toBe('bad')

@@ -5,6 +5,7 @@
  * sentence on what to change when retaking the photo. The check says what the photo makes hard for
  * detection, never that a detection is right. Pure: no React, DOM or Next.js.
  */
+import { fromSi } from '@open-reloading/schema'
 import type { Ellipse } from './ellipse.ts'
 import { grayGrid, shareInside } from './face-image.ts'
 import type { RgbaImage } from './image.ts'
@@ -12,7 +13,15 @@ import { nth } from './nth.ts'
 import { clamp } from './raster-ops.ts'
 
 /** What is wrong with the photo. */
-type QualityProblem = 'tilt' | 'contrast' | 'blur' | 'glare' | 'shadow' | 'resolution' | 'framing'
+type QualityProblem =
+  | 'face'
+  | 'tilt'
+  | 'contrast'
+  | 'blur'
+  | 'glare'
+  | 'shadow'
+  | 'resolution'
+  | 'framing'
 
 /** `bad` is below the minimum quality: detection is held until the user goes on; `fair` is a note. */
 type QualityLevel = 'fair' | 'bad'
@@ -239,7 +248,7 @@ export function photoQuality(view: PhotoView): QualityIssue[] {
   const { image, scale, black, holePx } = view
   const issues: QualityIssue[] = []
   const add = (
-    problem: QualityProblem,
+    problem: keyof typeof limits,
     value: number,
     text: (level: QualityLevel) => string,
     fix: string,
@@ -250,7 +259,7 @@ export function photoQuality(view: PhotoView): QualityIssue[] {
   const s = Math.max(1, Math.ceil(Math.max(image.width, image.height) / GRID))
   const m = gridMeasures(image, black, s)
   if (black) {
-    const tilt = (Math.acos(clamp(black.semiMinor / black.semiMajor, 0, 1)) * 180) / Math.PI
+    const tilt = fromSi('angle', Math.acos(clamp(black.semiMinor / black.semiMajor, 0, 1)))
     add(
       'tilt',
       tilt,
@@ -281,6 +290,12 @@ export function photoQuality(view: PhotoView): QualityIssue[] {
       'Move closer so the target fills more of the frame, or use the full resolution of the camera.',
     )
   } else {
+    issues.push({
+      problem: 'face',
+      level: 'bad',
+      text: 'No black target area was found in this photo.',
+      fix: 'Retake with the whole target in the frame, in even light and held steady, or set the scale by hand.',
+    })
     const long = Math.max(image.width, image.height) / scale
     add(
       'resolution',
