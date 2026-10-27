@@ -4,7 +4,7 @@ import path from 'node:path'
 import { afterEach, expect, it } from 'vitest'
 import { checkPages } from '../scripts/check-prerender.mts'
 import { sampleIds } from '../src/lib/prerender-sample.ts'
-import { cartridgeHeadText } from '../src/lib/record-metadata.ts'
+import { cartridgeHeadText, titleTemplate } from '../src/lib/record-metadata.ts'
 import { defined } from './defined.ts'
 
 const kinds = [
@@ -29,8 +29,9 @@ afterEach(() => {
 const headOf = (name: string) => {
   const { title, description } = cartridgeHeadText(name)
   const t = escapeHtml(title)
+  const pageTitle = escapeHtml(titleTemplate.replace('%s', title))
   const d = escapeHtml(description)
-  return `<title>${t}</title><meta name="description" content="${d}"/><meta property="og:title" content="${t}"/><meta property="og:description" content="${d}"/><meta name="twitter:title" content="${t}"/><meta name="twitter:description" content="${d}"/>`
+  return `<title>${pageTitle}</title><meta name="description" content="${d}"/><meta property="og:title" content="${t}"/><meta property="og:description" content="${d}"/><meta name="twitter:title" content="${t}"/><meta name="twitter:description" content="${d}"/>`
 }
 const escapeHtml = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;')
@@ -97,7 +98,17 @@ it('names a cartridge page whose tags are empty or belong to another record', ()
   expect(checkPages(dir, { PRERENDER: 'full' }).noHead).toEqual(['cartridges/x-1'])
   writeFileSync(page, headOf(nameOf(first('cartridge'))))
   expect(checkPages(dir, { PRERENDER: 'full' }).noHead).toEqual(['cartridges/x-1'])
-  writeFileSync(page, headOf(nameOf('x-1')))
+  // the page title takes the layout's template
+  const own = headOf(nameOf('x-1'))
+  writeFileSync(
+    page,
+    own.replace(
+      /<title>.*?<\/title>/,
+      `<title>${escapeHtml(cartridgeHeadText(nameOf('x-1')).title)}</title>`,
+    ),
+  )
+  expect(checkPages(dir, { PRERENDER: 'full' }).noHead).toEqual(['cartridges/x-1'])
+  writeFileSync(page, own)
   expect(checkPages(dir, { PRERENDER: 'full' }).noHead).toEqual([])
 })
 

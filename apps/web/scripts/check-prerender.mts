@@ -11,7 +11,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { exportIds, isSampling } from '../src/lib/prerender-sample.ts'
-import { cartridgeHeadText } from '../src/lib/record-metadata.ts'
+import { cartridgeHeadText, titleTemplate } from '../src/lib/record-metadata.ts'
 
 /** The data folder of each list, its record kind for the sample and its page route. */
 const lists = [
@@ -47,10 +47,10 @@ const entities: Record<string, string> = {
 const decodeEntities = (s: string) =>
   s.replace(/&(amp|lt|gt|quot|#x27|#39);/g, (_, e: string) => entities[e] ?? _)
 
-/** The title and description of a cartridge page, each as it stands in the title, description, Open Graph and Twitter tags. */
+/** The title and description of a cartridge page, each as it stands in the title (with the layout's template), description, Open Graph and Twitter tags. */
 const headValues = (name: string) => {
   const { title, description } = cartridgeHeadText(name)
-  return [title, description, title, description, title, description]
+  return [titleTemplate.replace('%s', title), description, title, description, title, description]
 }
 
 /** Whether the page's head holds the record's own values: an empty or another record's tag fails. */

@@ -1,5 +1,8 @@
 import type { Metadata, ResolvingMetadata } from 'next'
 
+/** The root layout's title template: a page's `<title>` takes it, its Open Graph and Twitter titles do not. */
+export const titleTemplate = '%s · OpenReloading Ballistics'
+
 /**
  * The head tags of a record page: its own title and description, repeated in the Open Graph and
  * Twitter tags a link preview reads. A page's `openGraph` and `twitter` replace the layout's, so
