@@ -331,7 +331,7 @@ Code: `apps/web/src/lib/photo-quality.ts`, `photoQuality`, `belowMinimum`, `limi
 ## Limits
 
 - The thresholds and scale sets are the app's own values from a prototype, without a published source. So are the limits of the photo quality check.
-- The photo quality check reads the black area's ellipse: a face whose black area is not found is judged by contrast and size alone. A tilt of a photo whose face shows no black area, and a reflection on the black area, are not measured. A photo with none of the problems may still give wrong or missing holes.
+- The photo quality check reads the black area's ellipse: a face whose black area is not found is judged by contrast, glare over the whole photo and size. A tilt of a photo whose face shows no black area, and a reflection on the black area, are not measured. A photo with none of the problems may still give wrong or missing holes.
 - Torn or elongated holes, holes in a printed line and very close holes may be missed or miscounted. The user confirms, moves or deletes each proposal.
 - A hole within half a hole of the photo's edge is not proposed.
 - A shadow confined to the outer paper can be mistaken for the sheet edge while the black area stays lit, so holes in that shadow can be omitted. Marking a region bypasses the automatic sheet boundary.

@@ -141,7 +141,8 @@ describe('a photo without a black area', () => {
 
   it('shows no framing, tilt or uneven light', () => {
     const issues = photoQuality({ image: flat(1600, 1200, 128), scale: 1 })
-    expect(problems(issues)).not.toEqual(expect.arrayContaining(['framing', 'tilt', 'shadow']))
+    for (const problem of ['framing', 'tilt', 'shadow'])
+      expect(problems(issues)).not.toContain(problem)
   })
 })
 
