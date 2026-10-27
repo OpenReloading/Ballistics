@@ -23,7 +23,7 @@ import type { CaliberClassSummary, DisciplineRecord, FederationRecord } from './
 import { pagesBasePath } from './edition.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
 import { type ManufacturerNames, manufacturerNames } from './manufacturers.ts'
-import { pickIds } from './prerender-sample.ts'
+import { exportIds, pickIds } from './prerender-sample.ts'
 
 type Fetched<T> = { status: 'ok'; data: T } | { status: 'notFound' } | { status: 'unavailable' }
 
@@ -121,8 +121,7 @@ export const buildPlaceholderId = '_build'
 /**
  * `generateStaticParams` of a detail route: every id of the list (the sample of `PRERENDER=sample`,
  * `prerender-sample.ts`), or the placeholder without the API. The Pages edition has no placeholder:
- * a build without the API fails. An exported page outside the sample answers 404 and the links to
- * it log that, so the sample there cuts the cartridge pages only (about 85 % of the export).
+ * a build without the API fails, and the sample cuts the cartridge pages only (`exportIds`).
  */
 export async function staticIds(list: () => Promise<Fetched<{ id: string }[]>>, what: string) {
   const r = await list()
@@ -132,7 +131,7 @@ export async function staticIds(list: () => Promise<Fetched<{ id: string }[]>>, 
     return [{ id: buildPlaceholderId }]
   }
   const ids = r.data.map((c) => c.id)
-  return (pagesBasePath !== undefined && what !== 'cartridge' ? ids : pickIds(what, ids)).map(
-    (id) => ({ id }),
-  )
+  return (pagesBasePath !== undefined ? exportIds(what, ids) : pickIds(what, ids)).map((id) => ({
+    id,
+  }))
 }
