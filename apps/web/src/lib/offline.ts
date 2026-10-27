@@ -25,7 +25,7 @@ export const shellPages = [
   '/session',
   '/groups',
   '/firearms',
-  '/my-cases',
+  '/cases/editor',
   '/range',
   '/bullets/designer',
   '/cartridges/designer',

@@ -27,7 +27,7 @@ async function Count({
   return r?.status === 'ok' && r.data ? countText(r.data.length, r.data.length, 'records') : null
 }
 
-// the records the API lists at build time. The firearms and cases of My gear are the viewer's own
+// the records the API lists at build time. The firearms are the viewer's own
 const inData: Record<string, ReactNode> = {
   '/cartridges': <Count list={listAllCartridges} />,
   '/bullets': <Count list={listAllBullets} />,
@@ -37,7 +37,6 @@ const inData: Record<string, ReactNode> = {
   '/targets': <Count list={listAllTargetFaces} />,
   '/disciplines': <Count list={listDisciplines} />,
   '/firearms': 'In this browser',
-  '/my-cases': 'In this browser',
 }
 
 /** A card's head: the page's icon left of its linked title. */

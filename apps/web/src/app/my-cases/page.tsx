@@ -1,12 +1,14 @@
 import type { Metadata } from 'next'
-import { CaseLibrary } from '../../components/case-library.tsx'
+import { MyCasesRedirect } from '../../components/my-cases-redirect.tsx'
+import { PageBar } from '../../components/page-bar.tsx'
 
-export const metadata: Metadata = {
-  title: 'My cases',
-  description:
-    'Your groups of cases with their measured water capacity, trim length and neck wall, kept in this browser and in files.',
-}
+export const metadata: Metadata = { title: 'Cases', robots: { index: false } }
 
 export default function MyCasesPage() {
-  return <CaseLibrary />
+  return (
+    <>
+      <PageBar title="Cases" />
+      <MyCasesRedirect />
+    </>
+  )
 }

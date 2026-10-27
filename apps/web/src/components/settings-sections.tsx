@@ -19,6 +19,7 @@ import { ManufacturersForm } from './manufacturers-settings.tsx'
 import type { SettingsTab } from './settings-dialog.ts'
 import { UnitsForm } from './units-settings.tsx'
 import { WorkbenchDefaultsForm } from './workbench-defaults.tsx'
+import { YourDataForm } from './your-data-settings.tsx'
 
 function Appearance() {
   const { colorScheme, setColorScheme } = useMantineColorScheme()
@@ -82,9 +83,11 @@ function Section({ id, title, children }: { id: string; title: string; children:
 export function SettingsSections({
   tab,
   onTab,
+  onClose,
 }: {
   tab: SettingsTab
   onTab: (t: SettingsTab) => void
+  onClose: () => void
 }) {
   const phone = useMediaQuery('(max-width: 35.99em)')
   return (
@@ -108,6 +111,9 @@ export function SettingsSections({
         <Stack gap="lg">
           <Section id="settings-appearance" title="Appearance">
             <Appearance />
+          </Section>
+          <Section id="settings-your-data" title="Your data">
+            <YourDataForm onNavigate={onClose} />
           </Section>
           <Section id="settings-offline" title="Offline">
             <Offline />

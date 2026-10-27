@@ -47,16 +47,30 @@ const records = [
   },
 ]
 
-test('an own case group is listed, picked in the workbench as the measured capacity', async ({
+test('an own case group is a Mine row of the Cases list, opened in its editor, picked in the workbench as the measured capacity', async ({
   page,
 }) => {
-  await gotoHydrated(page, '/my-cases')
+  await gotoHydrated(page, '/cases')
   await putRecords(page, records)
   await page.reload()
-  await expect(page.locator('.page-bar-status .bar-count')).toHaveText('2 case groups')
-  await expect(page.getByRole('link', { name: 'Match brass, lot 3', exact: true })).toBeVisible()
+  const link = (name: string) => page.getByRole('link', { name, exact: true })
+  await expect(link('Match brass, lot 3')).toBeVisible()
+  await expect(link('Plain brass')).toBeVisible()
+  // the catalogue's products stay in the list; the source filter has both sources
+  await expect(page.locator('a[href^="/cases/demo-"]').first()).toBeVisible()
+  const count = page.locator('.page-bar-status .bar-count')
+  const all = await count.textContent()
+  await page.getByRole('button', { name: /^Source: / }).click()
+  await page
+    .getByRole('dialog', { name: /^Source: / })
+    .getByRole('checkbox', { name: /^OpenReloading/ })
+    .uncheck()
+  await expect(page).toHaveURL(/[?&]src=user/)
+  await expect(count).toHaveText(`2 of ${all}`)
+  await page.keyboard.press('Escape')
   // a row's link opens the group in the editor with its measured values
-  await page.getByRole('link', { name: 'Match brass, lot 3', exact: true }).click()
+  await link('Match brass, lot 3').click()
+  await expect(page).toHaveURL(new RegExp(`/cases/editor\\?record=${caseId}$`))
   await expect(page.getByRole('textbox', { name: /^Cases measured/ })).toHaveValue('10')
   await expect(page.getByRole('textbox', { name: /^Water capacity/ })).toHaveValue(/^3\.6/)
   // the catalogue's case products of the cartridge are offered as a start
@@ -72,4 +86,42 @@ test('an own case group is listed, picked in the workbench as the measured capac
   // a group without a measured capacity leaves none of the previous group's in the field
   await page.getByRole('combobox', { name: 'Case record' }).selectOption(`user:${plainId}`)
   await expect(capacity).toHaveValue('')
+})
+
+test('the old My cases route opens the Cases list filtered to Mine, or the group a link names', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/cases')
+  await putRecords(page, records)
+  await page.goto('/my-cases')
+  await expect(page).toHaveURL(/\/cases\?src=user$/)
+  await expect(page.getByRole('button', { name: 'Source: Mine' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Plain brass', exact: true })).toBeVisible()
+  await page.goto(`/my-cases?record=${caseId}`)
+  await expect(page).toHaveURL(new RegExp(`/cases/editor\\?record=${caseId}$`))
+  await expect(page.getByRole('textbox', { name: /^Cases measured/ })).toHaveValue('10')
+})
+
+test('Settings, General: Your data counts the records per kind and opens the list filtered to Mine', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/cases')
+  await putRecords(page, records)
+  await page.reload()
+  await page
+    .getByRole('navigation', { name: 'Main' })
+    .getByRole('button', { name: 'Settings' })
+    .click()
+  const dialog = page.getByRole('dialog', { name: 'Settings' })
+  await dialog.getByRole('tab', { name: 'General' }).click()
+  const table = dialog.getByRole('table')
+  const count = (kind: string) =>
+    table.getByRole('row').filter({ has: page.getByRole('link', { name: kind, exact: true }) })
+  await expect(count('Cases').getByRole('cell')).toHaveText('2')
+  // a kind with no records shows 0
+  await expect(count('Bullets').getByRole('cell')).toHaveText('0')
+  await expect(count('Firearms').getByRole('cell')).toHaveText('0')
+  await table.getByRole('link', { name: 'Cases', exact: true }).click()
+  await expect(page).toHaveURL(/\/cases\?src=user$/)
+  await expect(dialog).toBeHidden()
 })
