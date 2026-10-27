@@ -2,8 +2,8 @@
 
 import { Button } from '@mantine/core'
 import { useState } from 'react'
+import { formatNumber } from '../i18n/number.ts'
 import { bandNote, describeCurve, type FittedPowder, modelCaption } from '../lib/burn-rate.ts'
-import { formatNumber } from '../lib/units.ts'
 import { CurveTable } from './curve-table.tsx'
 import { LazyVivacityChart } from './lazy-vivacity-chart.tsx'
 import { Panel } from './panel.tsx'

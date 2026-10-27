@@ -5,10 +5,10 @@
 
 import { dynamicVivacity, meanDynamicVivacity, type VivacityBurn } from '@open-reloading/core'
 import { type Powder, toSi } from '@open-reloading/schema'
+import { formatNumber } from '../i18n/number.ts'
 import type { PowderSummary } from './api-types.ts'
 import { type ManufacturerNames, productLabel } from './manufacturers.ts'
 import { nth } from './nth.ts'
-import { formatNumber } from './units.ts'
 
 /** Dash pattern per colour slot of the burn-rate charts: identity is not carried by colour alone. */
 export const dashes = ['', '8 4', '2 3', '12 3 3 3', '4 4', '1 5'] as const

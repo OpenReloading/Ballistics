@@ -1,5 +1,6 @@
 import { radPerMoa, radPerMrad, waterDensityGramsPerCm3 } from '@open-reloading/core'
 import { fromSi, type QuantityKind, toSi } from '@open-reloading/schema'
+import { decimalMark, formatNumber, parseNumber } from '../i18n/number.ts'
 import { type Message, msg } from '../i18n/translate.ts'
 
 /**
@@ -303,23 +304,19 @@ export function degreeText(x: number): string {
   return String(Number(x.toFixed(4)))
 }
 
-/** `x` with exactly `digits` decimals, no grouping and no minus sign on a value that rounds to 0. */
-export function formatNumber(x: number, digits: number): string {
-  return new Intl.NumberFormat('en', {
-    minimumFractionDigits: digits,
-    maximumFractionDigits: digits,
-    signDisplay: 'negative',
-    useGrouping: false,
-  }).format(x)
-}
-
 /**
- * A formatted number in the unit `symbol`: inch values below 1 without the zero before the point
- * (".308", "-.25", as the drawings print them) and a zero as "0"; other units
- * unchanged.
+ * A formatted number in the unit `symbol`: inch values below 1 without the zero before the decimal
+ * mark (".308", "-.25", as the drawings print them; English only: German writes the zero) and a
+ * zero as "0"; other units unchanged. Takes the text with either mark.
  */
 export const inchText = (text: string, symbol: string) =>
-  symbol !== 'in' ? text : /^-?0\.0*$/.test(text) ? '0' : text.replace(/^(-?)0\./, '$1.')
+  symbol !== 'in'
+    ? text
+    : /^-?0[.,]0*$/.test(text)
+      ? '0'
+      : decimalMark() === '.'
+        ? text.replace(/^(-?)0\./, '$1.')
+        : text
 
 /** An SI value in the unit of `q` in `system`, without the symbol. */
 export function formatQuantity(q: Quantity, system: UnitSystem, si: number): string {
@@ -344,6 +341,16 @@ export const withUnit = (q: Quantity, system: UnitSystem, si: number) =>
 export function parseTwist(text: string): number | undefined {
   const m = /^\s*(?:1\s*(?::|in)\s*)?(-?(?:\d+(?:\.\d+)?|\.\d+))\s*$/i.exec(text)
   return m ? Number(m[1]) : undefined
+}
+
+/**
+ * The canonical text of a typed twist ("1:8,5" is "1:8.5", "8" and "1 in 8" as typed); undefined
+ * when its number does not parse.
+ */
+export function typedTwist(raw: string): string | undefined {
+  const m = /^(\s*(?:1\s*(?::|in)\s*)?)(.*?)\s*$/i.exec(raw)
+  const p = m && parseNumber(m[2] ?? '')
+  return p?.kind === 'number' ? `${m?.[1]}${p.text}` : undefined
 }
 
 /** A twist's number as field text: "1:8"; 0 (no rifling) stays "0". */

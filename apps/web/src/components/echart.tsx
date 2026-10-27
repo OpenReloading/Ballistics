@@ -12,6 +12,7 @@ import { type ECharts, type EChartsCoreOption, init, use } from 'echarts/core'
 import { LabelLayout } from 'echarts/features'
 import { SVGRenderer } from 'echarts/renderers'
 import { type KeyboardEvent, useEffect, useId, useRef, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 
 // only the parts the charts use, so the chunk stays small (tree-shaken imports)
 use([
@@ -169,11 +170,15 @@ export function EChart({
       chart.current?.resize({ width: node.clientWidth, height })
   }, [height])
 
+  // the labels and tooltips are written by the option's formatters: a change of language draws them again
+  const { language } = useTranslation()
+  const drawnIn = useRef(language)
   useEffect(() => {
-    if (!chart.current || drawn.current === option) return
+    if (!chart.current || (drawn.current === option && drawnIn.current === language)) return
     chart.current.setOption(option, { notMerge: true })
     drawn.current = option
-  }, [option])
+    drawnIn.current = language
+  }, [option, language])
 
   /** Shows the tooltip and the slider's value text at data index `to`. */
   const moveTo = (to: number) => {

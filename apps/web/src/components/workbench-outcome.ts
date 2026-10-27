@@ -1,5 +1,6 @@
 import { loadRatio } from '@open-reloading/core'
 import { fromSi } from '@open-reloading/schema'
+import { formatNumber } from '../i18n/number.ts'
 import type { ErrorBody, InteriorLadderResponse, InteriorResponse } from '../lib/api-types.ts'
 import type { InteriorBody } from '../lib/interior-input.ts'
 import { nth } from '../lib/nth.ts'
@@ -9,7 +10,7 @@ import type {
   SeatingLengthKind,
   SeatingStep,
 } from '../lib/seating-ladder.ts'
-import { formatNumber, type UnitSystem, withUnit } from '../lib/units.ts'
+import { type UnitSystem, withUnit } from '../lib/units.ts'
 import {
   bulletLeadTime,
   percentOfPressureLimit,

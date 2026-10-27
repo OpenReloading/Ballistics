@@ -1,5 +1,6 @@
 import type { Powder } from '@open-reloading/schema'
 import Link from 'next/link'
+import { formatNumber } from '../i18n/number.ts'
 import {
   classifyPowder,
   isFitted,
@@ -9,7 +10,6 @@ import {
 } from '../lib/burn-rate.ts'
 import type { ManufacturerNames } from '../lib/manufacturers.ts'
 import type { FieldRow } from '../lib/record-fields.ts'
-import { formatNumber } from '../lib/units.ts'
 import { FieldTable } from './field-table.tsx'
 import { Panel } from './panel.tsx'
 import { RateBar, RateTicks } from './rate-scale.tsx'

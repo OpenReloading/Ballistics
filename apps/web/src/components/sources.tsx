@@ -1,6 +1,6 @@
 import { Table, TableTbody, TableTd, TableTh, TableThead, TableTr } from '@mantine/core'
 import { isWebLink, type Provenance, type Source } from '@open-reloading/schema'
-import { dayText } from '../lib/dates.ts'
+import { Day } from './day.tsx'
 import { Noted } from './field-table.tsx'
 import { CopyHash } from './record-actions.tsx'
 import { ScrollRegion } from './scroll-region.tsx'
@@ -74,7 +74,7 @@ function SourceRow({ source: s, has }: { source: Source; has: Has }) {
       )}
       {has('retrieved') && (
         <TableTd role="cell" className="nowrap" data-label="Retrieved">
-          {s.retrieved && <time dateTime={s.retrieved}>{dayText(s.retrieved)}</time>}
+          {s.retrieved && <Day day={s.retrieved} />}
         </TableTd>
       )}
       {has('license') && (

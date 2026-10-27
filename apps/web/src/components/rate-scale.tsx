@@ -1,5 +1,5 @@
+import { formatNumber } from '../i18n/number.ts'
 import { type RateDomain, rateAt, rateTicks } from '../lib/burn-rate.ts'
-import { formatNumber } from '../lib/units.ts'
 
 /** Width of the scale in px: the list's cells and its header ticks share it. */
 export const scaleWidth = 160

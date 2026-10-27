@@ -165,6 +165,8 @@ const noSubscription = () => () => {}
  * mounting, which a form's unit switch relies on.
  */
 export function useUnits() {
+  // every view that formats a number with the units writes it in the language shown
+  useTranslation()
   const s = useContext(UnitsContext)
   const first = useSyncExternalStore(noSubscription, s.get, () => s.server)
   // the store a later snapshot came from: a new store (`LengthOverride`) starts at its own live units

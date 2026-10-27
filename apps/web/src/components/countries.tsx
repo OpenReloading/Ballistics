@@ -1,3 +1,5 @@
+'use client'
+
 import AT from 'country-flag-icons/react/3x2/AT'
 import AU from 'country-flag-icons/react/3x2/AU'
 import BE from 'country-flag-icons/react/3x2/BE'
@@ -18,6 +20,8 @@ import SE from 'country-flag-icons/react/3x2/SE'
 import SI from 'country-flag-icons/react/3x2/SI'
 import TR from 'country-flag-icons/react/3x2/TR'
 import US from 'country-flag-icons/react/3x2/US'
+import { useTranslation } from '../i18n/language.ts'
+import { countryName } from '../lib/countries.ts'
 
 /**
  * The flags of the codes the records use, one import each: the namespace import puts all 250 flags
@@ -61,6 +65,7 @@ export function Countries({
   /** `span` inside a list of its own. */
   as?: 'li' | 'span'
 }) {
+  const { language } = useTranslation()
   return (
     <Tag className="countries" title={title}>
       {items.map(({ name, code }) => {
@@ -68,7 +73,7 @@ export function Countries({
         return (
           <span key={name} className="country">
             {Flag && <Flag aria-hidden="true" className="flag" />}
-            {name}
+            {countryName(name, code, language)}
           </span>
         )
       })}

@@ -4,6 +4,7 @@ import { Button, Popover, UnstyledButton } from '@mantine/core'
 import { freeRecoil } from '@open-reloading/core'
 import { fromSi } from '@open-reloading/schema'
 import { memo, useEffect, useRef } from 'react'
+import { formatNumber, plainNumber } from '../i18n/number.ts'
 import type { InteriorResponse } from '../lib/api-types.ts'
 import {
   describeCurve,
@@ -17,7 +18,6 @@ import { ladderTitle, seatingLengthName } from '../lib/seating-ladder.ts'
 import { controlSize } from '../lib/theme.ts'
 import { niceTicks } from '../lib/ticks.ts'
 import {
-  formatNumber,
   formatQuantity,
   inchText,
   msText,
@@ -56,7 +56,7 @@ const reasonText: Record<string, string> = { noValue: 'no value' }
 /** A limit as stored: bar with the record's decimals, and psi. */
 function limitValue(l: NonNullable<InteriorResponse['limits']>[number]) {
   if (l.pressure === undefined) return ''
-  return `${+fromSi('pressure', l.pressure).toPrecision(12)} bar (${formatNumber(l.pressure / psi, 0)} psi)`
+  return `${plainNumber(+fromSi('pressure', l.pressure).toPrecision(12))} bar (${formatNumber(l.pressure / psi, 0)} psi)`
 }
 
 function yesNo(value: boolean | undefined) {

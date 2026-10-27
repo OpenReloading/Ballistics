@@ -1,9 +1,10 @@
 'use client'
 
 import { useMemo } from 'react'
+import { formatNumber, plainNumber } from '../i18n/number.ts'
 import { type BarrelTimes, barrelTimeBand, lotChartDescription, lotLabel } from '../lib/lot-rows.ts'
 import { niceTicks } from '../lib/ticks.ts'
-import { formatNumber, type UnitSystem } from '../lib/units.ts'
+import type { UnitSystem } from '../lib/units.ts'
 import { EChart, tickStep, useChartTokens } from './echart.tsx'
 
 const tokens = {
@@ -115,7 +116,7 @@ export function LotChart({
         axisLabel: {
           color: theme.muted,
           fontSize: 12,
-          formatter: (v: number) => String(Number(v.toPrecision(10))),
+          formatter: (v: number) => plainNumber(Number(v.toPrecision(10))),
         },
         splitLine: { lineStyle: { color: theme.border } },
       },

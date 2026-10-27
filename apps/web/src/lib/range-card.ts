@@ -1,6 +1,6 @@
 import type { TrajectoryPoint } from '@open-reloading/core'
+import { formatNumber } from '../i18n/number.ts'
 import {
-  formatNumber,
   formatQuantity,
   inchText,
   type Quantity,

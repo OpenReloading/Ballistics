@@ -6,6 +6,7 @@ import { toSi } from '@open-reloading/schema'
 import { FileArrowUp } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
+import { formatNumber } from '../i18n/number.ts'
 import {
   chronoFileBytes,
   exampleCsv,
@@ -21,7 +22,7 @@ import { download } from '../lib/download.ts'
 import { errorText } from '../lib/error-text.ts'
 import { stringStats } from '../lib/string-stats.ts'
 import { controlSize } from '../lib/theme.ts'
-import { formatNumber, type UnitSystem, withUnit } from '../lib/units.ts'
+import { type UnitSystem, withUnit } from '../lib/units.ts'
 import { ChronoDropZone } from './chrono-drop-zone.tsx'
 import { formats, TemplateLinks } from './chrono-file-input.tsx'
 import { LazyLineChart, preloadChart } from './lazy-chart.tsx'

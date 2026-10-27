@@ -1,9 +1,10 @@
 import { greek } from '@open-reloading/drawing'
 import { conflictWording, type Figure, shotshellVariants } from '@open-reloading/drawing/cartridge'
 import { type SpecValue, toSi } from '@open-reloading/schema'
+import { formatNumber } from '../i18n/number.ts'
 import type { CartridgeDetail } from './api-types.ts'
 import { fieldSpecs, type Group, groups } from './cartridge-designer.ts'
-import { degreeText, formatNumber, inchText, type UnitSystem } from './units.ts'
+import { degreeText, inchText, type UnitSystem } from './units.ts'
 
 /** A symbol as the drawing prints it: the Greek letters for alpha, alpha1, beta and delta. */
 export const symbolText = (symbol: string) =>

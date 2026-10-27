@@ -2,11 +2,12 @@
 
 import { Button, Group, localStorageColorSchemeManager, MantineProvider } from '@mantine/core'
 import dynamic from 'next/dynamic'
-import { type ReactNode, useCallback, useEffect, useState } from 'react'
+import { type ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { startLanguage, useTranslation } from '../i18n/language.ts'
+import { decimalMark } from '../i18n/number.ts'
 import { useRoute } from './use-route.ts'
 import '../lib/navigation-guard.ts'
-import { colorSchemeKey, theme } from '../lib/theme.ts'
+import { colorSchemeKey, themeFor } from '../lib/theme.ts'
 import { AppModal } from './app-modal.tsx'
 import { ConfirmHost } from './confirm.tsx'
 import { SettingsDialog, type SettingsTab } from './settings-dialog.ts'
@@ -68,6 +69,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }, [])
   // the stored language applies after mounting: the server render and hydration are English
   useEffect(startLanguage, [])
+  // the number inputs write the decimal mark of the language shown
+  const { language } = useTranslation()
+  const theme = useMemo(() => themeFor(decimalMark(language)), [language])
   return (
     <MantineProvider
       theme={theme}

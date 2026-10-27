@@ -7,10 +7,10 @@ import {
   type QuantityValue,
   toSi,
 } from '@open-reloading/schema'
+import { formatNumber } from '../i18n/number.ts'
 import { computedBulletRows } from './bullet.ts'
 import {
   degreeText,
-  formatNumber,
   formatQuantity,
   inchText,
   type Quantity,

@@ -5,6 +5,7 @@ import { useMediaQuery } from '@mantine/hooks'
 import { CaretDown } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
 import { memo, type RefObject, useEffect, useMemo, useRef, useState } from 'react'
+import { canonicalNumberText } from '../i18n/number.ts'
 import { vivacityUnit } from '../lib/burn-rate.ts'
 import { toCsv } from '../lib/csv.ts'
 import { powderDesignNote } from '../lib/powder-designer.ts'
@@ -306,9 +307,10 @@ function CopyCsvButton({
       onClick={(e) => {
         const table = e.currentTarget.parentElement?.querySelector('table')
         if (!table) return
+        // a file or a spreadsheet gets the point, whatever the language shown
         const csv = toCsv(
           [...table.querySelectorAll('tr')].map((r) =>
-            [...r.cells].map((c) => c.textContent?.trim() ?? ''),
+            [...r.cells].map((c) => canonicalNumberText(c.textContent?.trim() ?? '')),
           ),
         )
         const show = (state: true | 'failed') => {

@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import { storageName } from '../lib/edition.ts'
+import { setShownLanguage } from './shown.ts'
 import { type Catalogue, type Translator, translator } from './translate.ts'
 
 /**
@@ -32,6 +33,7 @@ const listeners = new Set<() => void>()
 const publish = (next: Translation) => {
   current = next
   document.documentElement.lang = next.language
+  setShownLanguage(next.language)
   for (const l of listeners) l()
 }
 

@@ -10,8 +10,9 @@ import {
   type TruingPlan,
   type WeakReason,
 } from '@open-reloading/core'
+import { formatNumber, parseNumber } from '../i18n/number.ts'
 import { errorText } from './error-text.ts'
-import { formatNumber, type UnitSystem, withUnit } from './units.ts'
+import { type UnitSystem, withUnit } from './units.ts'
 
 /** One distance as typed: the texts are in the units the section shows (`system`), dial means in clicks. */
 export type TruingRow = {
@@ -49,10 +50,10 @@ export const blankRow = (kind: TruingRow['kind'] = 'impact'): TruingRow => ({
 
 export const blankChrono: TruingChrono = { shots: '', mean: '', deviation: '' }
 
-/** The number in `text`; undefined while empty or not a finite number. */
+/** The number typed in `text` (either decimal mark); undefined while empty, ambiguous or no number. */
 function numberOf(text: string): number | undefined {
-  const x = Number(text)
-  return text.trim() === '' || !Number.isFinite(x) ? undefined : x
+  const p = parseNumber(text)
+  return p.kind === 'number' ? p.value : undefined
 }
 
 /** A whole number of at least 1, else undefined. */

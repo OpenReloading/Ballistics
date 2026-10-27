@@ -7,8 +7,8 @@ import {
   TableThead,
   TableTr,
 } from '@mantine/core'
+import { formatNumber } from '../i18n/number.ts'
 import { curveAt, type FittedPowder, tableBurntFractions, vivacityUnit } from '../lib/burn-rate.ts'
-import { formatNumber } from '../lib/units.ts'
 import { ScrollRegion } from './scroll-region.tsx'
 
 const f = (v: number | undefined) => (v === undefined ? '' : formatNumber(v, 2))

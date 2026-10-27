@@ -15,6 +15,7 @@ import {
   useRef,
   useState,
 } from 'react'
+import { formatNumber } from '../i18n/number.ts'
 import type { InteriorResponse } from '../lib/api-types.ts'
 import { summaryFitSource } from '../lib/bullet-fit.ts'
 import { classifyPowder, typedBurn } from '../lib/burn-rate.ts'
@@ -29,7 +30,7 @@ import { inputsQuery, withRecordValues, withTab } from '../lib/query.ts'
 import { ladderTitle, seatingLengthName } from '../lib/seating-ladder.ts'
 import { shortcutAriaKeys, shortcutLabel, shortcuts } from '../lib/shortcuts.ts'
 import { userBulletRows, userRecordId } from '../lib/sources.ts'
-import { formatNumber, formatQuantity, type UnitSystem, withUnit } from '../lib/units.ts'
+import { formatQuantity, type UnitSystem, withUnit } from '../lib/units.ts'
 import { mmLength, shownLength } from '../lib/workbench.ts'
 import { BarrelTable } from './barrel-length.tsx'
 import { ChargeTargetDialog } from './charge-target-dialog.tsx'
