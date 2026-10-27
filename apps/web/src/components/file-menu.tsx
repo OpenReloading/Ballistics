@@ -20,7 +20,8 @@ import {
   useState,
 } from 'react'
 import { createPortal } from 'react-dom'
-import { localDay } from '../lib/dates.ts'
+import { useTranslation } from '../i18n/language.ts'
+import { dateTimeText, localDay } from '../lib/dates.ts'
 import { download } from '../lib/download.ts'
 import { errorText } from '../lib/error-text.ts'
 import { exampleFirearm } from '../lib/example-data.ts'
@@ -380,7 +381,7 @@ function newerGuard(known: () => string | undefined) {
     if (agreed || !mine || !other || other <= mine) return true
     agreed = await confirmDialog({
       title: 'Overwrite the newer copy?',
-      message: `A newer copy of this record was saved at ${new Date(other).toLocaleString()} (another tab or window); this tab has the copy saved at ${new Date(mine).toLocaleString()}.`,
+      message: `A newer copy of this record was saved at ${dateTimeText(new Date(other))} (another tab or window); this tab has the copy saved at ${dateTimeText(new Date(mine))}.`,
       confirmLabel: 'Overwrite',
       danger: true,
     })
@@ -783,6 +784,8 @@ function SavedList<R extends UserRecord>({
   onDelete: (record: R) => void
   onDeleteAll: () => void
 }) {
+  // the dates follow the language shown
+  useTranslation()
   return (
     <>
       {list?.length ? (
@@ -793,7 +796,7 @@ function SavedList<R extends UserRecord>({
                 {r.name}
               </Button>{' '}
               <span className="file-reason">
-                saved {new Date(r.saved).toLocaleString()}
+                saved {dateTimeText(new Date(r.saved))}
                 {basedOnOf(r) && `, based on ${parseRef(basedOnOf(r) ?? '')?.id}`}
               </span>{' '}
               <Button

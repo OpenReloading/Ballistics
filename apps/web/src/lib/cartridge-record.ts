@@ -1,9 +1,10 @@
 import { greek } from '@open-reloading/drawing'
 import { conflictWording, type Figure, shotshellVariants } from '@open-reloading/drawing/cartridge'
 import { type SpecValue, toSi } from '@open-reloading/schema'
+import { formatNumber, localizeNumber, plainNumber } from '../i18n/number.ts'
 import type { CartridgeDetail } from './api-types.ts'
 import { fieldSpecs, type Group, groups } from './cartridge-designer.ts'
-import { degreeText, formatNumber, inchText, type UnitSystem } from './units.ts'
+import { degreeText, inchText, type UnitSystem } from './units.ts'
 
 /** A symbol as the drawing prints it: the Greek letters for alpha, alpha1, beta and delta. */
 export const symbolText = (symbol: string) =>
@@ -45,7 +46,8 @@ const sideWord = { cartridge: 'Cartridge', chamber: 'Chamber' } as const
 
 /** A value's own notes: basic, the text as printed where it says more. */
 function valueNotes(v: SpecValue) {
-  const stored = v.quantity === 'angle' && v.value !== undefined ? `${degreeText(v.value)}°` : ''
+  const stored =
+    v.quantity === 'angle' && v.value !== undefined ? `${localizeNumber(degreeText(v.value))}°` : ''
   return [
     v.basic ? 'basic' : '',
     v.raw && v.value !== undefined && v.raw !== stored && v.raw !== String(v.value)
@@ -136,12 +138,12 @@ export const converted = (q: string): q is Converted => Object.hasOwn(stored, q)
 
 /** A stored number in the preset's unit: as recorded in the record's own unit, else rounded to the unit's decimals. */
 export function specValueText(q: string, x: number, system: UnitSystem) {
-  if (q === 'angle') return `${degreeText(x)}°`
-  if (!converted(q)) return String(x)
+  if (q === 'angle') return `${localizeNumber(degreeText(x))}°`
+  if (!converted(q)) return plainNumber(x)
   const symbol = stored[q]
   const unit = system[q]
   return inchText(
-    unit.symbol === symbol ? String(x) : formatNumber(unit.fromSi(toSi(q, x)), unit.decimals),
+    unit.symbol === symbol ? plainNumber(x) : formatNumber(unit.fromSi(toSi(q, x)), unit.decimals),
     unit.symbol,
   )
 }

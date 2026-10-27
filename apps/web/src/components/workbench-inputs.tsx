@@ -17,6 +17,7 @@ import { DotsThree } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
 import { type ReactNode, useEffect, useId, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { plainNumber } from '../i18n/number.ts'
 import type { BulletSummary, CartridgeSummary, PowderSummary } from '../lib/api-types.ts'
 import { fitOf, summaryFitSource } from '../lib/bullet-fit.ts'
 import type { BulletRow } from '../lib/bullet-rows.ts'
@@ -861,7 +862,7 @@ function CardBody({ panel }: { panel: InputPanel }) {
       <div className="panel-fields">
         {/* one line each, so the column fits at 1366 x 650 */}
         {sizeRow(bullet, system)}
-        {recordRow('Ballistic coefficient', bc && `${bc.dragModel} ${bc.value}`)}
+        {recordRow('Ballistic coefficient', bc && `${bc.dragModel} ${plainNumber(bc.value)}`)}
         {recordRow('Construction', constructionCell(bullet?.construction))}
         {bulletNote && <p className="note wide">{bulletNote}</p>}
         {fieldsOf(panelFields.bullet)}

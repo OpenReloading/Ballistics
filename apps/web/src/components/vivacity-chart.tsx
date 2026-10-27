@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
+import { formatNumber } from '../i18n/number.ts'
 import {
   chartBurntFractions,
   curveAt,
@@ -9,7 +10,6 @@ import {
   vivacityUnit,
 } from '../lib/burn-rate.ts'
 import { niceTicks, tickDecimals } from '../lib/ticks.ts'
-import { formatNumber } from '../lib/units.ts'
 import { EChart, tickStep, useChartTokens } from './echart.tsx'
 
 const vivacityTokens: Record<string, string> = {

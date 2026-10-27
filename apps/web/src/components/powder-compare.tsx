@@ -3,6 +3,7 @@
 import { Button, NumberInput, SegmentedControl, Select, UnstyledButton } from '@mantine/core'
 import { CaretDown, CaretUp } from '@phosphor-icons/react'
 import { memo, useCallback, useMemo, useRef, useState } from 'react'
+import { formatNumber } from '../i18n/number.ts'
 import { refusalText, targetError, targetNumber, targetUnit } from '../lib/charge-target.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import {
@@ -17,7 +18,7 @@ import {
   sortPowderRows,
 } from '../lib/powder-compare.ts'
 import { controlSize } from '../lib/theme.ts'
-import { formatNumber, formatQuantity, type UnitSystem } from '../lib/units.ts'
+import { formatQuantity, type UnitSystem } from '../lib/units.ts'
 import { shownLength } from '../lib/workbench.ts'
 import { ScrollRegion, withTableRoles } from './scroll-region.tsx'
 import { type CompareRow, usePowderCompare } from './use-powder-compare.ts'

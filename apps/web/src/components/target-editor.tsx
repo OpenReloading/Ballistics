@@ -73,10 +73,11 @@ import {
 } from 'react'
 import { flushSync } from 'react-dom'
 import { z } from 'zod'
+import { decimalMark, fixedNumber, formatNumber } from '../i18n/number.ts'
 import { storageName } from '../lib/edition.ts'
 import { isFaceId } from '../lib/face-records.ts'
 import { calibrateSheetOnFace } from '../lib/face-sheet.ts'
-import { fieldValueFromText } from '../lib/field-spec.ts'
+import { typedFieldValue } from '../lib/field-spec.ts'
 import { clickOptions, freeId } from '../lib/firearm.ts'
 import { type Interval, keyReadouts, readouts, statLines } from '../lib/group-readouts.ts'
 import { editHistory, type History, historyOf, pushHistory, redo, undo } from '../lib/history.ts'
@@ -100,7 +101,7 @@ import {
 import { type Point, turnedBox } from '../lib/target-geometry.ts'
 import { groupStatisticsOf } from '../lib/target-groups.ts'
 import { controlSize, tipEvents } from '../lib/theme.ts'
-import { formatNumber, formatQuantity, unitsOf, withUnit } from '../lib/units.ts'
+import { formatQuantity, unitsOf, withUnit } from '../lib/units.ts'
 import { canonicalJson, validRecords } from '../lib/user-data.ts'
 import {
   deletePhoto,
@@ -382,15 +383,15 @@ function CoordInput({
   const len = system.length
   return (
     <input
-      type="number"
-      step="any"
+      // a native number input reads and writes the point only
+      {...(decimalMark() === '.' ? { type: 'number', step: 'any' } : { type: 'text' })}
       aria-label={label}
       disabled={disabled}
       value={draft ?? (si === undefined ? '' : formatNumber(len.fromSi(si), len.decimals))}
       onChange={(e) => {
         const text = e.currentTarget.value
         setDraft(text)
-        const v = fieldValueFromText('length', system, text).si
+        const v = typedFieldValue('length', system, text).si
         if (v !== undefined) onCommit(v)
       }}
       onBlur={() => setDraft(undefined)}
@@ -570,7 +571,7 @@ function FilterPanel({ ed }: { ed: Ed }) {
           value={filter.contrast}
           onChange={(v) => setFilter({ ...filter, contrast: v })}
           thumbLabel="Contrast"
-          label={(v) => v.toFixed(1)}
+          label={(v) => fixedNumber(v, 1)}
         />
       </Row>
       <Row label="Darken" help="Display only; the photo file stays as it is.">
@@ -624,7 +625,7 @@ function ReferenceRow({ ed, r, i }: { ed: Ed; r: TargetSheet['references'][numbe
   const factor = cal?.factors[i]
   const dev = cal && factor !== undefined ? factor / cal.scale - 1 : undefined
   const label = `${refNames[r.kind].split(',')[0]} ${i + 1}`
-  const help = `${refNames[r.kind]}${dev === undefined || sheet.references.length < 2 ? '' : `; scale ${dev >= 0 ? '+' : ''}${(dev * 100).toFixed(2)} % from the mean`}`
+  const help = `${refNames[r.kind]}${dev === undefined || sheet.references.length < 2 ? '' : `; scale ${dev >= 0 ? '+' : ''}${fixedNumber(dev * 100, 2)} % from the mean`}`
   const key = r.kind === 'line' ? 'length' : r.kind === 'rectangle' ? 'width' : 'diameter'
   const value = (r as Record<string, unknown>)[key] as number
   return (
@@ -733,7 +734,7 @@ function ScalePanel({ ed }: { ed: Ed }) {
           label="Spread"
           help="Largest minus smallest scale of the references over their mean: how far they disagree. A photo at an angle shows here; a rectangle corrects it."
         >
-          {(cal.spread * 100).toFixed(2)} %
+          {fixedNumber(cal.spread * 100, 2)} %
         </Row>
       )}
       <SiField
@@ -1202,7 +1203,7 @@ function StatsPanel({ ed }: { ed: Ed }) {
                 </Table.Th>
                 <Table.Td colSpan={3}>
                   {groupScore
-                    ? `${groupScore.score.total}${groupScore.score.decimalTotal !== undefined ? ` (${groupScore.score.decimalTotal.toFixed(1)})` : ''}`
+                    ? `${groupScore.score.total}${groupScore.score.decimalTotal !== undefined ? ` (${fixedNumber(groupScore.score.decimalTotal, 1)})` : ''}`
                     : 'n/a'}
                 </Table.Td>
               </Table.Tr>

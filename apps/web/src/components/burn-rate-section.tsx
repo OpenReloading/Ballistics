@@ -1,5 +1,6 @@
 import type { Powder } from '@open-reloading/schema'
 import Link from 'next/link'
+import { formatNumber } from '../i18n/number.ts'
 import {
   classifyPowder,
   isFitted,
@@ -9,7 +10,7 @@ import {
 } from '../lib/burn-rate.ts'
 import type { ManufacturerNames } from '../lib/manufacturers.ts'
 import type { FieldRow } from '../lib/record-fields.ts'
-import { formatNumber } from '../lib/units.ts'
+import { Decimal } from './decimal.tsx'
 import { FieldTable } from './field-table.tsx'
 import { Panel } from './panel.tsx'
 import { RateBar, RateTicks } from './rate-scale.tsx'
@@ -42,7 +43,9 @@ function Neighbours({ title, rows }: { title: string; rows: Neighbour[] }) {
                 {r.label}
               </Link>
               {r.rate !== undefined && (
-                <span className="burn-rate-of">{formatNumber(r.rate, 2)}</span>
+                <span className="burn-rate-of">
+                  <Decimal text={formatNumber(r.rate, 2)} />
+                </span>
               )}
             </li>
           ))}
@@ -86,6 +89,7 @@ export function BurnRateSummary({
           label: 'Mean vivacity',
           text: `${n2(m?.value ?? 0)}${m?.low === undefined || m.high === undefined ? '' : ` (${n2(m.low)} to ${n2(m.high)})`}`,
           unit: vivacityUnit,
+          numeric: true as const,
           method: 'Mean dynamic vivacity over burnt fraction 0.1 to 0.9, with its interval.',
         },
       ]

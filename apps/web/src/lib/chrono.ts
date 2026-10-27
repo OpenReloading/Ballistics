@@ -10,10 +10,10 @@ import {
   stringifyOpenReloadingJson,
   type VelocityUnit,
 } from '@open-reloading/importers'
-
+import { formatNumber } from '../i18n/number.ts'
 import { toCsv } from './csv.ts'
 import { stringStats } from './string-stats.ts'
-import { formatNumber, type Unit } from './units.ts'
+import type { Unit } from './units.ts'
 
 export type Shot = ChronoImport['session']['strings'][number]['shots'][number]
 
@@ -128,9 +128,10 @@ export async function readSession(
 export const stringName = (labels: (string | undefined)[], k: number) =>
   `String ${k + 1}${labels[k] ? `: ${labels[k]}` : ''}`
 
-/** Header and one row per string: shots, excluded, mean, SD, ES, min and max in `unit` with 1 decimal. */
+/** Header and one row per string (numbers with a point, whatever the language shown): shots, excluded, mean, SD, ES, min and max in `unit` with 1 decimal. */
 function statisticsRows(data: ChronoImport, unit: Unit): (string | number)[][] {
-  const v = (ms: number | undefined) => (ms === undefined ? '' : formatNumber(unit.fromSi(ms), 1))
+  const v = (ms: number | undefined) =>
+    ms === undefined ? '' : formatNumber(unit.fromSi(ms), 1, 'en')
   const u = ` (${unit.symbol})`
   return [
     ['String', 'Shots', 'Excluded', ...['Mean', 'SD', 'ES', 'Min', 'Max'].map((h) => h + u)],
@@ -152,7 +153,8 @@ function statisticsRows(data: ChronoImport, unit: Unit): (string | number)[][] {
 
 /** Header and one row per shot: string, number, velocity in `unit` with 1 decimal, cold bore, exclusion. */
 function shotRows(data: ChronoImport, unit: Unit): (string | number)[][] {
-  const v = (ms: number | undefined) => (ms === undefined ? '' : formatNumber(unit.fromSi(ms), 1))
+  const v = (ms: number | undefined) =>
+    ms === undefined ? '' : formatNumber(unit.fromSi(ms), 1, 'en')
   return [
     ['String', 'Shot', `Velocity (${unit.symbol})`, 'Cold bore', 'Excluded'],
     ...data.session.strings.flatMap((s, k) =>

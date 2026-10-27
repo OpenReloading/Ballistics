@@ -22,6 +22,7 @@ import {
   useRef,
   useState,
 } from 'react'
+import { formatNumber } from '../i18n/number.ts'
 import {
   type CombinedRow,
   clearanceMeaning,
@@ -34,7 +35,7 @@ import {
   toleranceText,
 } from '../lib/cartridge-record.ts'
 import { controlSize, tipEvents } from '../lib/theme.ts'
-import { drawingLengthUnit, formatNumber, type UnitSystem } from '../lib/units.ts'
+import { drawingLengthUnit, type UnitSystem } from '../lib/units.ts'
 import { Countries } from './countries.tsx'
 import { Fact, FactCard, FactCards, Label, Sized, slotUnits } from './fact-cards.tsx'
 import { arrowStops, Noted, SymbolStop } from './field-table.tsx'

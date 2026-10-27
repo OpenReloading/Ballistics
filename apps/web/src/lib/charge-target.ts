@@ -1,6 +1,7 @@
 import type { ChargeRange, ChargeTargetKind } from '@open-reloading/core'
+import { formatNumber } from '../i18n/number.ts'
 import type { ErrorBody, InteriorResponse } from './api-types.ts'
-import { formatNumber, type UnitSystem, withUnit } from './units.ts'
+import { type UnitSystem, withUnit } from './units.ts'
 
 /** Targets of `POST /interior/charge-target`. */
 export type TargetKind = ChargeTargetKind

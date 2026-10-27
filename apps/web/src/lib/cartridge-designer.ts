@@ -18,6 +18,7 @@ import {
   toSi,
   type UserCartridge,
 } from '@open-reloading/schema'
+import { localizeNumber } from '../i18n/number.ts'
 import type { CartridgeDetail } from './api-types.ts'
 import { drawable } from './cartridge-sheet.ts'
 import {
@@ -447,7 +448,7 @@ function refuseInvalid(
   const tooLarge = (s: CartridgeFieldSpec) => {
     const si = fields[s.key]?.si
     if (s.limit === undefined || si === undefined || si <= s.limit) return
-    return `${s.label} must be at most ${exactFieldText(s.quantity, system, s.limit)} ${system[s.quantity].symbol} in the designer.`
+    return `${s.label} must be at most ${localizeNumber(exactFieldText(s.quantity, system, s.limit))} ${system[s.quantity].symbol} in the designer.`
   }
   const invalid = fieldSpecs
     .map((s) => [s.key, fieldError(s, fields[s.key], system) ?? tooLarge(s)] as const)

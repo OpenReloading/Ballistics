@@ -21,7 +21,7 @@ import {
   useState,
   useSyncExternalStore,
 } from 'react'
-import { useTranslation } from '../i18n/language.ts'
+import { onLanguageChange, useTranslation } from '../i18n/language.ts'
 import { type Message, msg } from '../i18n/translate.ts'
 import { storageName } from '../lib/edition.ts'
 import { type FieldSpec, type Fields, switchFields } from '../lib/field-spec.ts'
@@ -150,8 +150,14 @@ export function UnitsProvider({ children }: { children: ReactNode }) {
       if (next && hasOverrides(next)) set({ custom: next })
     }
     window.addEventListener('storage', follow)
-    return () => window.removeEventListener('storage', follow)
-  }, [set])
+    // a change of language makes a new `UnitSystem` of the same units: every view that formats a
+    // number with it (also the memoised results) writes it again in the language shown
+    const unlisten = onLanguageChange(() => set({ choice: store.get().choice }))
+    return () => {
+      window.removeEventListener('storage', follow)
+      unlisten()
+    }
+  }, [set, store])
   return <UnitsContext value={store}>{children}</UnitsContext>
 }
 

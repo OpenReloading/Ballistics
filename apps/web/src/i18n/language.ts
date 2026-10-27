@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import { storageName } from '../lib/edition.ts'
+import { setShownLanguage } from './shown.ts'
 import { type Catalogue, type Translator, translator } from './translate.ts'
 
 /**
@@ -32,6 +33,7 @@ const listeners = new Set<() => void>()
 const publish = (next: Translation) => {
   current = next
   document.documentElement.lang = next.language
+  setShownLanguage(next.language)
   for (const l of listeners) l()
 }
 
@@ -80,15 +82,18 @@ export function startLanguage() {
   return () => window.removeEventListener('storage', follow)
 }
 
-const subscribe = (listener: () => void) => {
+/** Calls `listener` when the language shown changes; the function it returns stops that. */
+export const onLanguageChange = (listener: () => void) => {
   listeners.add(listener)
-  return () => listeners.delete(listener)
+  return () => {
+    listeners.delete(listener)
+  }
 }
 
 /** The translation functions of the language shown and the language chosen, re-rendering on a change. */
 export const useTranslation = () =>
   useSyncExternalStore(
-    subscribe,
+    onLanguageChange,
     () => current,
     () => english,
   )

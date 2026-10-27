@@ -1,3 +1,5 @@
+import { shownLanguage } from '../i18n/shown.ts'
+
 /**
  * ISO 3166-1 alpha-2 codes of the countries of origin as the cartridge records print them (CIP sheets:
  * "Country of Origin"), lower case. A record may name several, comma-separated.
@@ -46,7 +48,25 @@ export function parseCountries(text: string) {
     }))
 }
 
-const regionNames = new Intl.DisplayNames('en', { type: 'region' })
+const regionNames = new Map<string, Intl.DisplayNames>()
+
+/** The names of the regions in `language`, from `Intl`. */
+function regions(language: string) {
+  let names = regionNames.get(language)
+  if (!names) {
+    names = new Intl.DisplayNames(language, { type: 'region' })
+    regionNames.set(language, names)
+  }
+  return names
+}
+
+/**
+ * The name of a country in the language shown: another language than English takes the name of
+ * its code from `Intl`; English keeps the name as the record prints it, and a name with no code
+ * stays as it is.
+ */
+export const countryName = (name: string, code: string | undefined, language = shownLanguage()) =>
+  language === 'en' || !code ? name : (regions(language).of(code) ?? name)
 
 /** The country of a bullet or powder record's ISO 3166-1 alpha-2 code, as `parseCountries` returns it. */
-export const countryOf = (code: string) => ({ name: regionNames.of(code) ?? code, code })
+export const countryOf = (code: string) => ({ name: regions('en').of(code) ?? code, code })
