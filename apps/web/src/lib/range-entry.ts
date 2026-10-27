@@ -1,5 +1,5 @@
 import type { Load, SessionRecord, UserRecord } from '@open-reloading/schema'
-import { fromSi, toSi, userRecord } from '@open-reloading/schema'
+import { chronoSession, fromSi, toSi, userRecord } from '@open-reloading/schema'
 import { stringStats } from './string-stats.ts'
 import { type Unit, type UnitSystem, withUnit } from './units.ts'
 
@@ -92,7 +92,7 @@ export interface RangeContext {
  * absent) and gives the record to store, so the store applies it to what is stored at that moment.
  * It throws for a stored record that is not a session of this load: that record is left alone.
  */
-export const changeString =
+const changeString =
   (context: RangeContext, step: RangeStep, edit: (s: SessionString | undefined) => SessionString) =>
   (stored: unknown): SessionRecord => {
     const found = stored === undefined ? undefined : userRecord.safeParse(stored)
@@ -119,10 +119,11 @@ export const changeString =
     const made = edit(at < 0 ? undefined : strings[at])
     if (at < 0) strings.push(made)
     else strings[at] = made
+    // never a record the schema rejects: it would block every later change of this session
     return {
       ...base,
       saved: context.now.toISOString(),
-      data: { ...base.data, strings },
+      data: chronoSession.parse({ ...base.data, strings }),
     }
   }
 
@@ -344,7 +345,7 @@ export function withSession(
     ...(d.seating && { seating: d.seating }),
     ...(roundCount !== undefined && { roundCount }),
   }
-  return {
+  return userRecord.parse({
     ...record,
     saved: now.toISOString(),
     data: {
@@ -352,5 +353,5 @@ export function withSession(
       sessions: [...sessions, ref],
       snapshots: [...(d.snapshots ?? []).filter((x) => x.session !== ref), snapshot],
     },
-  }
+  })
 }

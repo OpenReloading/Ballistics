@@ -1634,6 +1634,7 @@ export function useWorkbenchState() {
     sessionsNow.current = []
     setSessionsState([])
     setSessionRefs([])
+    openedRefs.current = []
     setLots(noLots)
     setSnapshots([])
     lastWarnings.current = ''

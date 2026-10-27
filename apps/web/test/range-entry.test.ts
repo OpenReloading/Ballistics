@@ -162,6 +162,14 @@ it('sets the weather and the note of a string that has shots, and removes a clea
   })
 })
 
+it('refuses a change that would store a record the schema rejects', () => {
+  const entered = defined(apply(addShot(context, main, 850)))
+  expect(() =>
+    setNotes(context, main, { conditions: {}, note: 'x'.repeat(2001) })(entered),
+  ).toThrow()
+  expect(() => addShot(context, main, 850, { note: 'x'.repeat(2001) })(undefined)).toThrow()
+})
+
 it('leaves a stored record that is not a session of the range alone', () => {
   const bullet = { kind: 'bullet', id: context.id, name: 'x', saved: '', data: {} }
   expect(() => addShot(context, main, 850)(bullet)).toThrow('not a valid session')
@@ -263,7 +271,7 @@ it('writes the weather of a string as one line in the units shown', () => {
 it('names the session in the load with a snapshot of the load as it is, once', () => {
   const record = {
     kind: 'load',
-    id: 'l',
+    id: '33333333-3333-4333-8333-333333333333',
     name: 'L',
     saved: '',
     data: {
@@ -271,17 +279,20 @@ it('names the session in the load with a snapshot of the load as it is, once', (
       powderLot: ' P1 ',
       primer: { lot: 'R1' },
       seating: { by: 'overallLength', value: { value: 70 } },
-      sessions: ['user:old'],
-      snapshots: [{ session: 'user:old', powderLot: 'P0' }],
+      sessions: ['user:11111111-1111-4111-8111-111111111111'],
+      snapshots: [{ session: 'user:11111111-1111-4111-8111-111111111111', powderLot: 'P0' }],
     },
   } as UserRecord
   const now = new Date('2026-10-27T10:00:00Z')
-  const out = withSession(record, 'user:new', 120, now)
-  expect(out?.kind === 'load' && out.data.sessions).toEqual(['user:old', 'user:new'])
+  const out = withSession(record, 'user:22222222-2222-4222-8222-222222222222', 120, now)
+  expect(out?.kind === 'load' && out.data.sessions).toEqual([
+    'user:11111111-1111-4111-8111-111111111111',
+    'user:22222222-2222-4222-8222-222222222222',
+  ])
   expect(out?.kind === 'load' && out.data.snapshots).toEqual([
-    { session: 'user:old', powderLot: 'P0' },
+    { session: 'user:11111111-1111-4111-8111-111111111111', powderLot: 'P0' },
     {
-      session: 'user:new',
+      session: 'user:22222222-2222-4222-8222-222222222222',
       powderLot: 'P1',
       primerLot: 'R1',
       seating: { by: 'overallLength', value: { value: 70 } },
@@ -290,13 +301,26 @@ it('names the session in the load with a snapshot of the load as it is, once', (
   ])
   expect(out?.saved).toBe(now.toISOString())
   if (!out) throw new Error('expected a record')
-  expect(withSession(out, 'user:new', 120, now)).toBeUndefined()
+  expect(withSession(out, 'user:22222222-2222-4222-8222-222222222222', 120, now)).toBeUndefined()
   const full = {
     ...record,
-    data: { origin: 'user', sessions: Array.from({ length: 50 }, (_, i) => `user:s${i}`) },
+    data: {
+      origin: 'user',
+      sessions: Array.from(
+        { length: 50 },
+        (_, i) => `user:${String(i).padStart(8, '0')}-4444-4444-8444-444444444444`,
+      ),
+    },
   } as UserRecord
-  expect(() => withSession(full, 'user:new', undefined, now)).toThrow('50 sessions')
-  expect(() => withSession({ kind: 'bullet' } as UserRecord, 'user:new', undefined, now)).toThrow(
-    'not a valid load',
-  )
+  expect(() =>
+    withSession(full, 'user:22222222-2222-4222-8222-222222222222', undefined, now),
+  ).toThrow('50 sessions')
+  expect(() =>
+    withSession(
+      { kind: 'bullet' } as UserRecord,
+      'user:22222222-2222-4222-8222-222222222222',
+      undefined,
+      now,
+    ),
+  ).toThrow('not a valid load')
 })

@@ -69,6 +69,36 @@ async function linkSession(load: RangeLoad, ref: string) {
 
 const noWeather: WeatherText = { temperature: '', pressure: '', wind: '' }
 
+const draftKey = (session: string, step: string) => `range-draft:${session}:${step}`
+
+/** The weather and note typed for a string before its first shot, kept in this browser until then. */
+function readDraft(key: string): { weather: WeatherText; note: string } | undefined {
+  try {
+    const d: unknown = JSON.parse(localStorage.getItem(key) ?? 'null')
+    const w = (d as { weather?: Record<string, unknown> } | null)?.weather
+    const note = (d as { note?: unknown } | null)?.note
+    return w && typeof note === 'string'
+      ? {
+          weather: {
+            temperature: String(w.temperature ?? ''),
+            pressure: String(w.pressure ?? ''),
+            wind: String(w.wind ?? ''),
+          },
+          note,
+        }
+      : undefined
+  } catch {
+    return undefined
+  }
+}
+
+function writeDraft(key: string, draft: { weather: WeatherText; note: string } | undefined) {
+  try {
+    if (draft) localStorage.setItem(key, JSON.stringify(draft))
+    else localStorage.removeItem(key)
+  } catch {}
+}
+
 /**
  * The state and actions of the range page: the saved loads of this browser, the load and ladder step
  * chosen, the entry text and the session of the day. The session record is the entry itself: each
@@ -137,6 +167,15 @@ export function useRangeMode() {
   // the fields show the stored values of the string of the chosen step
   // biome-ignore lint/correctness/useExhaustiveDependencies: the string changes with these
   useEffect(() => {
+    if (!string && loadId && step) {
+      // no shot yet: what was typed for it so far, kept in this browser
+      const draft = readDraft(
+        draftKey(rangeSessionId(userRef(loadId), localDate(new Date())), step.key),
+      )
+      setWeather(draft?.weather ?? noWeather)
+      setNote(draft?.note ?? '')
+      return
+    }
     const c = string?.conditions
     const at = (q: 'temperature' | 'airPressure' | 'windSpeed', si: number | undefined) =>
       si === undefined ? '' : fixedFieldText(q, system, si)
@@ -155,7 +194,7 @@ export function useRangeMode() {
     load && loadId
       ? {
           id: rangeSessionId(userRef(loadId), localDate(new Date())),
-          name: `${load.name}, range ${localDate(new Date())}`,
+          name: `${load.name.slice(0, 150)}, range ${localDate(new Date())}`,
           loadRef: userRef(loadId),
           now: new Date(),
         }
@@ -171,19 +210,25 @@ export function useRangeMode() {
         const written = await updateRecord(id, change)
         if (written?.kind === 'session') setSession(written)
         setSaved(confirmation)
+      } catch (e) {
+        setProblem(errorText(e))
+        setSaved('')
+        setSaving(false)
+        return false
+      }
+      // the change is stored: a load that cannot name the session is reported apart, never as a failed save
+      try {
         const key = `${loadId}:${id}`
         if (linked.current !== key) {
           if (load) await linkSession(load, userRef(id))
           linked.current = key
         }
-        return true
       } catch (e) {
-        setProblem(errorText(e))
-        setSaved('')
-        return false
+        setProblem(`Saved, but the load does not list this session yet: ${errorText(e)}`)
       } finally {
         setSaving(false)
       }
+      return true
     },
     [loadId, load],
   )
@@ -207,7 +252,10 @@ export function useRangeMode() {
       addShot(c, step, parsed.velocity, { conditions: typed.conditions, note }),
       `Shot ${n} saved on this device.`,
     )
-    if (ok) setEntry('')
+    if (ok) {
+      setEntry('')
+      writeDraft(draftKey(c.id, step.key), undefined)
+    }
   }
 
   /** Marks shot `index` excluded, or takes the mark off. */
@@ -221,12 +269,13 @@ export function useRangeMode() {
     )
   }
 
-  /** Stores the weather and the note of a string that has shots; a string without one keeps them until its first shot. */
+  /** Stores the weather and the note of a string that has shots; a string without one keeps them in this browser until its first shot. */
   async function keep(next: { weather: WeatherText; note: string }) {
     setWeather(next.weather)
     setNote(next.note)
     const c = context()
-    if (!c || !step || index < 0) return
+    if (!c || !step) return
+    if (index < 0) return writeDraft(draftKey(c.id, step.key), next)
     const typed = parseWeather(next.weather, system)
     if ('error' in typed) return setProblem(typed.error)
     await commit(

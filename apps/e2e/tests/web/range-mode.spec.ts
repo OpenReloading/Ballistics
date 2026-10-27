@@ -104,6 +104,11 @@ test('a 10-shot string entered offline survives reloads and is on the Measuremen
   await expect(page.getByText('Offline, saved on this device')).toBeVisible()
   await expect(page.getByLabel('Saved load')).toHaveValue(saved.id)
   await page.getByRole('group', { name: 'Ladder step' }).getByRole('button').first().click()
+  // typed before the first shot: kept over a reload and stored with that shot
+  const note = page.getByRole('textbox', { name: 'Note', exact: true })
+  await note.fill('before the first shot')
+  await page.reload()
+  await expect(note).toHaveValue('before the first shot')
 
   const speeds = [854, 861, 858, 849, 863, 857, 852, 860, 855, 859]
   for (const v of speeds.slice(0, 2)) await shoot(page, v)
@@ -139,6 +144,13 @@ test('a 10-shot string entered offline survives reloads and is on the Measuremen
   await expect(page.getByRole('textbox', { name: 'Note', exact: true })).toHaveValue('light rain')
 
   await context.setOffline(false)
+  // a worker update drops its caches and the old worker: the entries are in the browser store
+  await page.evaluate(async () => {
+    for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister()
+    for (const k of await caches.keys()) await caches.delete(k)
+  })
+  await page.reload()
+  await expect(shots).toHaveCount(10)
   const [session] = await stored(page, 'session')
   expect(session?.data.strings).toHaveLength(1)
   expect(session?.data.strings[0]?.load).toBe(`user:${saved.id}`)
