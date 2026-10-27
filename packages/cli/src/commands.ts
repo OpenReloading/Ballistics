@@ -82,7 +82,7 @@ export async function verify(options: Options, spec = builtInName): Promise<Veri
 function savedResult(path: string): VerifyResult {
   let json: unknown
   try {
-    json = JSON.parse(readFileSync(path, 'utf8'))
+    json = JSON.parse(readFileSync(path, 'utf8')) // NOSONAR: the path is the argument the user gave
   } catch {
     throw new UsageError('the baseline file cannot be read as JSON')
   }

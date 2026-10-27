@@ -187,12 +187,12 @@ export function parseRows(text: string, name: string): Row[] {
 function filesOf(path: string): string[] {
   let isDirectory: boolean
   try {
-    isDirectory = statSync(path).isDirectory()
+    isDirectory = statSync(path).isDirectory() // NOSONAR: the path is the argument the user gave
   } catch {
     throw new UsageError('the rows path does not exist')
   }
   if (!isDirectory) return [path]
-  const names = readdirSync(path)
+  const names = readdirSync(path) // NOSONAR: as above
     .filter((n) => n.endsWith('.csv'))
     .toSorted()
   if (names.length === 0) throw new UsageError('the rows folder holds no .csv file')
@@ -201,7 +201,8 @@ function filesOf(path: string): string[] {
 
 /** Reads the rows of a file, or of every `.csv` file of a folder. */
 export function readRows(path: string): RowFiles {
-  const files = filesOf(path).map((file) => ({ file, bytes: readFileSync(file) }))
+  const read = (file: string) => readFileSync(file) // NOSONAR: as above
+  const files = filesOf(path).map((file) => ({ file, bytes: read(file) }))
   const rows = files.flatMap(({ file, bytes }) =>
     parseRows(bytes.toString('utf8'), file.split('/').at(-1) ?? file),
   )
