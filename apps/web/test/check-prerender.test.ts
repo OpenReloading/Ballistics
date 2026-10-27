@@ -24,9 +24,12 @@ afterEach(() => {
   for (const d of dirs.splice(0)) rmSync(d, { recursive: true, force: true })
 })
 
-const put = (file: string) => {
+const head =
+  '<title>x</title><meta name="description" content="x"/><meta property="og:title" content="x"/><meta property="og:description" content="x"/><meta name="twitter:title" content="x"/><meta name="twitter:description" content="x"/>'
+
+const put = (file: string, content = '') => {
   mkdirSync(path.dirname(file), { recursive: true })
-  writeFileSync(file, '')
+  writeFileSync(file, content)
 }
 
 /** An export with the data files of two records per kind (the sample's first id and `x-1`) and the pages of `pages`. */
@@ -37,7 +40,10 @@ function site(pages: (route: string) => boolean = () => true) {
     for (const id of [first(what), 'x-1']) {
       put(path.join(dir, 'api', data, `${id}.json`))
       for (const route of [routeOf(data), `${routeOf(data)}/${id}`])
-        if (pages(route)) for (const f of ['index.html', 'index.txt']) put(path.join(dir, route, f))
+        if (pages(route)) {
+          put(path.join(dir, route, 'index.html'), head)
+          put(path.join(dir, route, 'index.txt'))
+        }
     }
   return dir
 }
@@ -57,6 +63,20 @@ it('names a record page the export lacks, and one that has only its HTML', () =>
   const dir = site()
   rmSync(path.join(dir, 'targets/x-1/index.txt'))
   expect(checkPages(dir, { PRERENDER: 'full' }).missing).toEqual(['targets/x-1'])
+})
+
+it("names a cartridge page whose HTML lacks the record's own head tags", () => {
+  const dir = site()
+  const page = path.join(dir, 'cartridges', 'x-1', 'index.html')
+  writeFileSync(page, head.replace('<meta property="og:title" content="x"/>', ''))
+  expect(checkPages(dir, { PRERENDER: 'full' }).noHead).toEqual(['cartridges/x-1'])
+  // a kind that renders on the server holds its content in the HTML: its head is not checked
+  writeFileSync(path.join(dir, 'bullets', 'x-1', 'index.html'), '')
+  expect(checkPages(dir, { PRERENDER: 'full' }).noHead).toEqual(['cartridges/x-1'])
+  rmSync(page)
+  const { missing, noHead } = checkPages(dir, { PRERENDER: 'full' })
+  expect(missing).toEqual(['cartridges/x-1'])
+  expect(noHead).toEqual([])
 })
 
 it('expects the sample cartridge pages only, and every other record, when sampling', () => {
