@@ -1,5 +1,5 @@
 /**
- * Builds the Pages site into `pages/` at the repository root (README, Pages edition): the web app
+ * Builds the Pages site into `pages/` at the repository root (apps/web/AGENTS.md, Static site): the web app
  * as a static export under `PAGES_BASE_PATH` (`''`, the site root, when unset), every record page prerendered from the API over the
  * catalogue built from the data bundle (`@open-reloading/api/static`), the catalogue index and the
  * records as data files under `api/`, the docs site under `docs/`, LICENSE, NOTICE, the data

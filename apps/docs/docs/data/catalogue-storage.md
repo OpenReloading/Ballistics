@@ -1,6 +1,6 @@
 ---
 title: Catalogue storage
-description: Why the read-only catalogue needs no server database, the single search matcher and sort order every edition uses, and the fallback if the decision's triggers fire.
+description: Why the read-only catalogue needs no server database, the single search matcher and sort order the API and the browser share, and the fallback if the decision's triggers fire.
 ---
 
 # Catalogue storage
@@ -13,8 +13,8 @@ No server database for the catalogue. A typed index and a record file are built 
 
 What decides it is not speed, since every option answers in under 3 ms at this size, but:
 
-1. **Parity.** One implementation of list, filter, search, ranking and order runs in Node and in the browser. The server answered `q` with SQL `ilike`, the Pages edition with a lower-case `includes` over a per-kind search file (`apps/web/src/lib/static-api.ts`) and the web lists with `matchesQuery` (`apps/web/src/lib/lists.ts`): three matchers that disagreed. All three now use the schema's matcher: the API through the catalogue, the Pages edition through `openCatalogue` over `catalogue/index.json`, the lists through `matchesQuery`. A `q` of spaces only is no query. The bullet list's own word-start rule (`bulletMatches`) stays until the record pickers use the ranker.
-2. **Three defects a database does not fix.** The JIT cost of PostgreSQL at default settings, two sort orders between the editions, and word-order dependent search.
+1. **Parity.** One implementation of list, filter, search, ranking and order runs in Node and in the browser. The API answered `q` with SQL `ilike`, the browser's data files with a lower-case `includes` over a per-kind search file (`apps/web/src/lib/static-api.ts`) and the web lists with `matchesQuery` (`apps/web/src/lib/lists.ts`): three matchers that disagreed. All three now use the schema's matcher: the API through the catalogue, the browser through `openCatalogue` over `catalogue/index.json`, the lists through `matchesQuery`. A `q` of spaces only is no query. The bullet list's own word-start rule (`bulletMatches`) stays until the record pickers use the ranker.
+2. **Three defects a database does not fix.** The JIT cost of PostgreSQL at default settings, two sort orders between the API and the data files, and word-order dependent search.
 3. **Deletion.** The SQL layer, the in-browser database path of the static build, the seed lock, the database service of `compose.yaml` and of the dev container, the `DATABASE_URL` variable and the database packages are gone from code, containers, CI and docs. This page keeps the measurements and the fallback schema below.
 
 Measured on the public bundle, one machine, medians:
@@ -49,17 +49,17 @@ The budgets, tested as the best of fifteen runs after a warm-up (other test file
 - `data:validate` (`src/renames.ts`, `src/references.ts`, `src/federations.ts`): a reference to an unknown id fails, unless the id is an old id of `renames.json`. An old id must be no current record, and its replacement must be one, so a rename never chains. A kind without an id route, an id that is no record id or a file that is not JSON fails.
 - The catalogue carries the renames in its index. A reference to an old id joins the record that replaced it (a component's manufacturer, a capacity's cartridge, a mapping's discipline and face). A record is answered as stored, so the reference in its body keeps the old id.
 - The id routes answer a request for an old id with a 308 and the `Location` of the current record under the same version prefix. An unknown id stays a 404. The compute routes take current ids.
-- The Pages edition has no server to redirect from and writes no file for an old id.
+- The static site has no server to redirect from and writes no file for an old id.
 
 The index and the record file begin with two numbers. `format` is the layout of the files (`catalogueFormat`), `derive` the version of what `derive.ts` computes (`deriveVersion`: list items, sort and search keys, revisions). `openCatalogue` checks the index when it opens and the record file when it first reads it, and refuses a file with another number or none: `catalogue index derive version 0 is not 1: rebuild it`. Raise `derive` with any change to what `derive.ts` writes, so files built by older code are never read as current. A build writes both files together, so only a stale file in `dist/catalogue/` can trigger it.
 
-## The Pages edition
+## The static site's data files
 
-`writeStaticApi` (`packages/api/src/static.ts`) writes `api/catalogue/index.json`, the index as `buildCatalogue` returns it (the record file stays out: 3.6 MB, read only on `get`), and one file per record, `api/<kind>/<id>.json`, the body of `GET /<kind>/<id>`; both editions build the cartridge body with `cartridgeAnswer`. The browser fetches the index once, opens it with `openCatalogue` and answers every list, with its filters, `q`, paging and order, through the catalogue (`apps/web/src/lib/static-api.ts`). A record is one file fetch. There are no per-kind list files, no `search.json` and no per-cartridge bullet lists: the `cartridge` filter of the bullets runs `bulletWindow` over the index.
+`writeStaticApi` (`packages/api/src/static.ts`) writes `api/catalogue/index.json`, the index as `buildCatalogue` returns it (the record file stays out: 3.6 MB, read only on `get`), and one file per record, `api/<kind>/<id>.json`, the body of `GET /<kind>/<id>`; the data file and the API route build the cartridge body with `cartridgeAnswer`. The browser fetches the index once, opens it with `openCatalogue` and answers every list, with its filters, `q`, paging and order, through the catalogue (`apps/web/src/lib/static-api.ts`). A record is one file fetch. There are no per-kind list files, no `search.json` and no per-cartridge bullet lists: the `cartridge` filter of the bullets runs `bulletWindow` over the index.
 
-In the public data the index is 460 kB (62 kB gzipped). `catalogue-budget.test.ts` caps it at 600 kB and 80 kB gzipped. The Pages service worker precaches it with the build's static files and answers it from the shell cache (`apps/web/src/lib/offline.ts`), so a list opens offline after the first visit and the index always belongs to its build.
+In the public data the index is 460 kB (62 kB gzipped). `catalogue-budget.test.ts` caps it at 600 kB and 80 kB gzipped. The service worker precaches it with the build's static files and answers it from the shell cache (`apps/web/src/lib/offline.ts`), so a list opens offline after the first visit and the index always belongs to its build.
 
-`apps/web/test/static-api.test.ts` compares the Pages answers with the API's for every list, paging, filters, ranked queries in both word orders, the default order and the refusals of the query schemas.
+`apps/web/test/static-api.test.ts` compares the browser's answers with the API's for every list, paging, filters, ranked queries in both word orders, the default order and the refusals of the query schemas.
 
 ## Triggers for the fallback
 
@@ -69,7 +69,7 @@ The interface stays, only the module that opens the catalogue changes: user enti
 
 Each row has one `sortKey` string, compared by UTF-16 code unit (`compareKeys` in `packages/schema/src/order.ts`). It is the folded names joined by U+001F, every run of digits padded to 8 digits, so "9 mm" sorts before "10 mm" without locale data. The key is identical in Node, the browser and SQL (`collate "C"`).
 
-The server edition ordered by `name, id` under the container's locale and the Pages edition's data files by `C` collation; for the 577 cartridges 501 positions differed between the two. The web tables sorted by `Intl.Collator`, a third order that depends on the browser's ICU data; they now sort text by `sortKey` too (`sortRows` in `apps/web/src/lib/lists.ts`); the API default order follows it, and so does the Pages edition, which lists from the same catalogue index.
+The API ordered by `name, id` under the container's locale and the data files by `C` collation; for the 577 cartridges 501 positions differed between the two. The web tables sorted by `Intl.Collator`, a third order that depends on the browser's ICU data; they now sort text by `sortKey` too (`sortRows` in `apps/web/src/lib/lists.ts`); the API default order follows it, and so does the browser, which lists from the same catalogue index.
 
 ## One matcher and ranker
 
@@ -81,9 +81,9 @@ The server edition ordered by `name, id` under the container's locale and the Pa
 
 So `win 308` and `308 win` give the same rows with the same scores, and `.308`, `308`, `7,62x51`, `7.62 x 51`, `30 06` and `30-06` find the records that print them in another form. `packages/schema/test/search.test.ts` lists the cases and checks that every permutation of a query's words has the same rank.
 
-## Behaviour changes for the editions
+## Behaviour changes
 
-In effect on the server edition and on the Pages edition, which runs the same list code. Non-breaking for the schema, visible in data: the default list order changes from the locale collation to `sortKey` order on the server edition, `q` becomes ranked and independent of word order, and `q` matches the compact form ("8x57"). The contract version does not change.
+In effect in the API and in the browser, which runs the same list code. Non-breaking for the schema, visible in data: the default list order changes from the locale collation to `sortKey` order in the API, `q` becomes ranked and independent of word order, and `q` matches the compact form ("8x57"). The contract version does not change.
 
 ## Fallback schema (PostgreSQL 18, also PGlite)
 

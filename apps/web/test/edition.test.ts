@@ -13,7 +13,7 @@ const keysIn = async () => {
   return { name: storageName('openreloading-user-data'), openLoadsKey, colorSchemeKey }
 }
 
-it('the server and stable editions keep the plain storage names', async () => {
+it('the stable edition keeps the plain storage names', async () => {
   expect(await keysIn()).toEqual({
     name: 'openreloading-user-data',
     openLoadsKey: 'openLoads',

@@ -5,7 +5,7 @@ name: Pages
 # exists the root redirects to `/next/`. `release: published` runs when a release is created with the release
 # GitHub App token; a release created with GITHUB_TOKEN starts no workflow, so release.yml dispatches this one.
 # The repository's Pages source must be "GitHub Actions" and the `github-pages` environment must accept main and
-# the release tags. Editions and storage names: apps/web/AGENTS.md, Pages edition.
+# the release tags. Editions and storage names: apps/web/AGENTS.md, Static site.
 on:
   push:
     branches: [main]

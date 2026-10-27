@@ -23,7 +23,7 @@ it('falls back to the first id when no sampled id exists, never to none', () => 
   expect(pickIds('unknown', ['x-1', 'x-2'], { PRERENDER: 'sample' })).toEqual(['x-1'])
 })
 
-it('cuts only the cartridge pages of the Pages edition when sampling', () => {
+it('cuts only the cartridge pages of the static site when sampling', () => {
   const env = { PRERENDER: 'sample' }
   expect(exportIds('cartridge', all, env)).toEqual(['308-win'])
   for (const what of ['bullet', 'powder', 'target-face'])

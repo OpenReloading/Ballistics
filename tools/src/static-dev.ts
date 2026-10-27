@@ -1,6 +1,6 @@
 /**
- * The web app's dev server on data files (README, Pages edition): writes the data files of the
- * Pages edition (`writeStaticApi`) into the git-ignored `apps/web/public/api`, which the dev server
+ * The web app's dev server on data files (apps/web/AGENTS.md, Static site): writes the data files of the
+ * static site (`writeStaticApi`) into the git-ignored `apps/web/public/api`, which the dev server
  * serves, and starts `next dev` at the site root (`PAGES_BASE_PATH=''`). Its server-side reads go
  * to the API over the catalogue of the data bundle, in this process for the length of the run:
  * there is no API to start. Port 3000, `PORT` for another. Needs `npm run build` at the root first.
