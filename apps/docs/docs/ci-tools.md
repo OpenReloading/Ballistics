@@ -55,4 +55,4 @@ Not used: a hosted coverage service (Codecov), jscpd, Trivy (its action tags wer
 - Settings, Pages: source "GitHub Actions". Settings, Environments, `github-pages`: deployment branches `main` and the release tags (`*-v*`), no other entry.
 - Settings, Advanced Security: dependency graph, Dependabot alerts and security updates, secret scanning with push protection, private vulnerability reporting, CodeQL default setup.
 - Rules, ruleset on `main`: pull request required (squash merge only, no approval count, review threads resolved), signed commits, linear history, no force push or deletion, required checks `check`, `e2e`, `workflows`, `conventional`, `dependency-review` and `SonarCloud Code Analysis`. Organization admins may bypass through a pull request.
-- After the first release: both packages (`ballistics-api`, `ballistics-web`) set to public in their package settings.
+- After the first release: the package `ballistics-api` set to public in its package settings.

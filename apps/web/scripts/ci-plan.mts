@@ -47,15 +47,8 @@ const e2eInputs = [
   /^tools\/src\/(pages|pages-serve|pages-payload|executable)\.ts$/,
 ]
 
-/**
- * Tests and notes of the packages and the web app do not change the build, and no job reads the web
- * app's Dockerfile.
- */
-const ignored = [
-  /^(apps|packages)\/[^/]+\/test\//,
-  /^(apps|packages)\/[^/]+\/[^/]*\.md$/,
-  /^apps\/web\/Dockerfile$/,
-]
+/** Tests and notes of the packages and the web app do not change the build. */
+const ignored = [/^(apps|packages)\/[^/]+\/test\//, /^(apps|packages)\/[^/]+\/[^/]*\.md$/]
 
 /** Files whose change needs every record page prerendered (`prerender=full`), besides the import closure. */
 const recordInputs = [
