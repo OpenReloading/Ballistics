@@ -23187,7 +23187,7 @@
                           },
                           "shape": {
                             "type": "string",
-                            "enum": ["circle", "square"]
+                            "enum": ["circle", "square", "stadium"]
                           },
                           "fill": {
                             "type": "string",

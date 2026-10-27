@@ -1,0 +1,37 @@
+{
+  "id": "dsu-lrmov-1",
+  "federation": "dsu",
+  "name": "Repetiergewehr Mehrdistanz 50 m offene Visierung",
+  "number": "LRMoV 1",
+  "section": "Kapitel 3, Langwaffenübungen, LRMoV 1",
+  "page": "Seiten 33 bis 34, PDF pp. 91 to 92",
+  "distance": {
+    "value": 50000,
+    "raw": "50, 40, 30, 20 Meter"
+  },
+  "category": "rifle",
+  "caliberClasses": {
+    "ids": ["rimfire-22"],
+    "basis": "stated"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seiten 33 bis 34, PDF pp. 91 to 92",
+        "fields": ["federation", "section", "page", "distance", "category", "caliberClasses"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Inhaltsverzeichnis Langwaffen, Seite 2 (PDF p. 60)",
+        "fields": ["name", "number"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 9, Kurzbezeichnungen Langwaffen, Seite 3 (PDF p. 229)",
+        "fields": ["caliberClasses"]
+      }
+    ]
+  }
+}

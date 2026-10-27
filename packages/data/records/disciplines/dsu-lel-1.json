@@ -1,0 +1,53 @@
+{
+  "id": "dsu-lel-1",
+  "federation": "dsu",
+  "name": "Einzellader Gewehr 50 m",
+  "number": "LEL 1",
+  "section": "Kapitel 3, Langwaffenübungen, LEL 1",
+  "page": "Seite 15, PDF p. 73",
+  "distance": {
+    "value": 50000,
+    "raw": "50 Meter"
+  },
+  "category": "rifle",
+  "caliberClasses": {
+    "ids": [
+      "rimfire-22",
+      "pistol-9mm",
+      "pistol-9x18",
+      "revolver-357-38",
+      "pistol-40-10mm",
+      "revolver-41",
+      "revolver-44",
+      "pistol-45",
+      "revolver-45-colt"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 15, PDF p. 73",
+        "fields": ["federation", "section", "page", "distance", "category", "caliberClasses"],
+        "note": "Gruppe 1 shoots rimfire on b4, Gruppe 2 shoots handgun calibres on b3."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Inhaltsverzeichnis Langwaffen, Seite 2 (PDF p. 60)",
+        "fields": ["name", "number"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 9, Kurzbezeichnungen Langwaffen, Seite 1 (PDF p. 227)",
+        "fields": ["caliberClasses"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Kalibereinteilung, Seite 10 (PDF p. 68)",
+        "fields": ["caliberClasses"]
+      }
+    ]
+  }
+}

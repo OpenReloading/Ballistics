@@ -1,0 +1,28 @@
+{
+  "id": "dsu-lf-4",
+  "federation": "dsu",
+  "name": "Flintenübung F 4 25 m",
+  "number": "LF 4",
+  "section": "Kapitel 3, Flintenübungen, LF 4",
+  "page": "Seite 60, PDF p. 118",
+  "distance": {
+    "value": 25000,
+    "raw": "25 Meter"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 60, PDF p. 118",
+        "fields": ["federation", "section", "page", "distance"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Inhaltsverzeichnis Langwaffen, Seite 3 (PDF p. 61)",
+        "fields": ["name", "number"],
+        "note": "The distance is printed with the name in the table of Kapitel 9 (Seite 5, PDF p. 231)."
+      }
+    ]
+  }
+}

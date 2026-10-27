@@ -1,0 +1,17 @@
+{
+  "id": "dsu-lez-1-dsu-b5",
+  "discipline": "dsu-lez-1",
+  "face": "dsu-b5",
+  "event": "lez-1-einzellader-zielfernrohrgewehr-50-m",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 20, PDF p. 78",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

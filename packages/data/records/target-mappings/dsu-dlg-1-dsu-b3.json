@@ -1,0 +1,17 @@
+{
+  "id": "dsu-dlg-1-dsu-b3",
+  "discipline": "dsu-dlg-1",
+  "face": "dsu-b3",
+  "event": "dlg-1-luftgewehr-ov-50-25",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 5, Seite 7, PDF p. 151",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

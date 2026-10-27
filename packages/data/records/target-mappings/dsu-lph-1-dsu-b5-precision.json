@@ -1,0 +1,18 @@
+{
+  "id": "dsu-lph-1-dsu-b5-precision",
+  "discipline": "dsu-lph-1",
+  "face": "dsu-b5-precision",
+  "event": "lph-1-halbautomat-zielfernrohrgewehr-praezision-100-m",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 45, PDF p. 103",
+        "fields": ["discipline", "face", "event", "shotCount"],
+        "note": "The page names the sheet b5 Präzision for both groups, 20 counting shots on 4 sheets of 5 shots, and 5 sighting shots on a fifth sheet. The sheet page of b5 (Kapitel 1, Seite 15) also lists LPH 1."
+      }
+    ]
+  }
+}

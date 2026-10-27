@@ -1,0 +1,17 @@
+{
+  "id": "dsu-dlrm-2-dsu-b4",
+  "discipline": "dsu-dlrm-2",
+  "face": "dsu-b4",
+  "event": "dlrm-2-repetier-luftgewehr-mehrdistanz",
+  "shotCount": 35,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 5, Seite 11, PDF p. 155",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

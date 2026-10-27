@@ -1,0 +1,58 @@
+{
+  "id": "dsu-lhg-1",
+  "federation": "dsu",
+  "name": "Halbautomatisches Gewehr 50 m",
+  "number": "LHG 1",
+  "section": "Kapitel 3, Langwaffenübungen, LHG 1",
+  "page": "Seite 41, PDF p. 99",
+  "distance": {
+    "value": 50000,
+    "raw": "50 Meter"
+  },
+  "category": "rifle",
+  "caliberClasses": {
+    "ids": [
+      "rimfire-22",
+      "rifle-6-5",
+      "rifle-270",
+      "rifle-30",
+      "rifle-30-carbine",
+      "rifle-8mm",
+      "pistol-9mm",
+      "revolver-357-38",
+      "pistol-9x18",
+      "pistol-40-10mm",
+      "revolver-41",
+      "revolver-44",
+      "pistol-45",
+      "revolver-45-colt"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 41, PDF p. 99",
+        "fields": ["federation", "section", "page", "distance", "category", "caliberClasses"],
+        "note": "Group 1 is rimfire .22. Group 2 is handgun calibres, 9 mm Luger up to .45 ACP, expanded with the Kalibereinteilung (bullet diameter 9 mm to .45) to the handgun classes in that range. Group 3 is short rifle cartridges: the classes of the cartridges the book names (.30 Carbine, 8 x 33, 7.62 x 39, 6.5 Grendel, 6.8 SPC) by bullet diameter."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Inhaltsverzeichnis Langwaffen, Seite 3 (PDF p. 61)",
+        "fields": ["name", "number"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 9, Kurzbezeichnungen Langwaffen, Seite 3 (PDF p. 229)",
+        "fields": ["caliberClasses"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Kalibereinteilung, Seite 10 (PDF p. 68)",
+        "fields": ["caliberClasses"]
+      }
+    ]
+  }
+}

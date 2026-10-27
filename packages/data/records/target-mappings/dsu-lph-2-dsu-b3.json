@@ -1,0 +1,18 @@
+{
+  "id": "dsu-lph-2-dsu-b3",
+  "discipline": "dsu-lph-2",
+  "face": "dsu-b3",
+  "event": "lph-2-halbautomat-zielfernrohrgewehr-praezision-300-m",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 46, PDF p. 104",
+        "fields": ["discipline", "face", "event", "shotCount"],
+        "note": "The page prints 20 counting shots with 10 shots per sheet and 4 + 1 sheets; the table of Kapitel 9 (Seite 4, PDF p. 230) prints 2 + 1 sheets. The 20 counting shots are used."
+      }
+    ]
+  }
+}

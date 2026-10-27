@@ -1,0 +1,56 @@
+{
+  "id": "dsu-k-27",
+  "federation": "dsu",
+  "name": "Kurzwaffe 27",
+  "number": "K 27",
+  "section": "Kapitel 2, Kurzwaffenübungen, K 27",
+  "page": "Seiten 19 bis 20, PDF pp. 51 to 52",
+  "distance": {
+    "value": 25000,
+    "raw": "25 Meter"
+  },
+  "caliberClasses": {
+    "ids": [
+      "rimfire-17",
+      "rimfire-22",
+      "pistol-7-65",
+      "rifle-30-carbine",
+      "revolver-32",
+      "pistol-9mm",
+      "revolver-357-38",
+      "pistol-9x18",
+      "pistol-40-10mm",
+      "revolver-41",
+      "revolver-44",
+      "pistol-45",
+      "revolver-45-colt"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 2, Seiten 19 bis 20, PDF pp. 51 to 52",
+        "fields": ["federation", "section", "page", "distance", "caliberClasses"],
+        "note": "The book allows every calibre of the handgun calibre table. Only calibres with a caliber class record are listed, so the calibres above .44 Magnum and .45 ACP (no class) are absent."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 2, Kalibereinteilung, Seite 6 (PDF p. 38)",
+        "fields": ["caliberClasses"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 2, Inhaltsverzeichnis Kurzwaffen, Seite 2 (PDF p. 34)",
+        "fields": ["number"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 9, Kurzbezeichnungen Kurzwaffen, Seite 1 (PDF p. 225)",
+        "fields": ["name", "number"]
+      }
+    ]
+  }
+}

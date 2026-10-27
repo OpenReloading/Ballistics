@@ -1,0 +1,17 @@
+{
+  "id": "dsu-lhz-2-dsu-b3",
+  "discipline": "dsu-lhz-2",
+  "face": "dsu-b3",
+  "event": "lhz-2-halbautomatisches-gewehr-zielfernrohr-100-m",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 44, PDF p. 102",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

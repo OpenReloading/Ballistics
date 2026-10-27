@@ -1,0 +1,17 @@
+{
+  "id": "dsu-lks-1-dsu-b2",
+  "discipline": "dsu-lks-1",
+  "face": "dsu-b2",
+  "event": "lks-1-klassisches-scheibengewehr-100-m",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 14, PDF p. 72",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "id": "dsu-lla",
+  "federation": "dsu",
+  "name": "Lever Action und Slide Action Gewehr 50 m",
+  "number": "LLA",
+  "section": "Kapitel 3, Langwaffenübungen, LLA",
+  "page": "Seite 23, PDF p. 81",
+  "distance": {
+    "value": 50000,
+    "raw": "50 Meter"
+  },
+  "category": "rifle",
+  "caliberClasses": {
+    "ids": [
+      "rimfire-22",
+      "pistol-40-10mm",
+      "pistol-45",
+      "pistol-7-65",
+      "pistol-9mm",
+      "pistol-9x18",
+      "revolver-32",
+      "revolver-357-38",
+      "revolver-41",
+      "revolver-44",
+      "revolver-45-colt",
+      "rifle-22-cf",
+      "rifle-25",
+      "rifle-270",
+      "rifle-30-carbine",
+      "rifle-30",
+      "rifle-338",
+      "rifle-6-5",
+      "rifle-6mm",
+      "rifle-7mm",
+      "rifle-8mm"
+    ],
+    "basis": "derived"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 23, PDF p. 81",
+        "fields": ["federation", "section", "page", "distance", "category", "caliberClasses"],
+        "note": "Rimfire group plus centre-fire groups from .22 to .50; the classes are every centre-fire class."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Inhaltsverzeichnis Langwaffen, Seite 2 (PDF p. 60)",
+        "fields": ["name", "number"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 9, Kurzbezeichnungen Langwaffen, Seite 2 (PDF p. 228)",
+        "fields": ["caliberClasses"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Kalibereinteilung, Seite 10 (PDF p. 68)",
+        "fields": ["caliberClasses"]
+      }
+    ]
+  }
+}

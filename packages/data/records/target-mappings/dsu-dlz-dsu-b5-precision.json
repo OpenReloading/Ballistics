@@ -1,0 +1,18 @@
+{
+  "id": "dsu-dlz-dsu-b5-precision",
+  "discipline": "dsu-dlz",
+  "face": "dsu-b5-precision",
+  "event": "dlz-zimmerstutzen",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 5, Seite 19, PDF p. 163",
+        "fields": ["discipline", "face", "event", "shotCount"],
+        "note": "The page names the sheet b5 Präzision, 2 sheets of 10 shots. The sheet page of b5 (Kapitel 1, Seite 15) also lists DLZ. The calibre is 4 mm rimfire."
+      }
+    ]
+  }
+}

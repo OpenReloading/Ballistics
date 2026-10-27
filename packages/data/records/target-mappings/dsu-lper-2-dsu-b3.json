@@ -1,0 +1,18 @@
+{
+  "id": "dsu-lper-2-dsu-b3",
+  "discipline": "dsu-lper-2",
+  "face": "dsu-b3",
+  "event": "lper-2-zielfernrohrgewehr-praezision-300-m",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 32, PDF p. 90",
+        "fields": ["discipline", "face", "event", "shotCount"],
+        "note": "20 scoring shots; 5 sighting shots on a separate sheet are not counted. The section prints 4 + 1 sheets at 10 shots each, the summary table 2 + 1; 20 scoring shots at 10 per sheet are 2 sheets."
+      }
+    ]
+  }
+}

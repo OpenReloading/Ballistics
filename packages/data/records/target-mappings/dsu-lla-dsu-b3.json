@@ -1,0 +1,17 @@
+{
+  "id": "dsu-lla-dsu-b3",
+  "discipline": "dsu-lla",
+  "face": "dsu-b3",
+  "event": "lla-lever-action-und-slide-action-gewehr-50-m",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 23, PDF p. 81",
+        "fields": ["discipline", "face", "event", "shotCount"]
+      }
+    ]
+  }
+}

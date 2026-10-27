@@ -1,0 +1,18 @@
+{
+  "id": "dsu-dkp-1-dsu-b4",
+  "discipline": "dsu-dkp-1",
+  "face": "dsu-b4",
+  "event": "dkp-1-druckluftwaffenuebung-lp-1",
+  "shotCount": 30,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 5, Seite 3, PDF p. 147",
+        "fields": ["discipline", "face", "event", "shotCount"],
+        "note": "Three sheets of 10 shots, 6 series of 5."
+      }
+    ]
+  }
+}

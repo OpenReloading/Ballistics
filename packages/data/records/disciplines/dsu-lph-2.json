@@ -1,0 +1,44 @@
+{
+  "id": "dsu-lph-2",
+  "federation": "dsu",
+  "name": "Halbautomat Zielfernrohrgewehr Präzision 300 m",
+  "number": "LPH 2",
+  "section": "Kapitel 3, Langwaffenübungen, LPH 2",
+  "page": "Seite 46, PDF p. 104",
+  "distance": {
+    "value": 300000,
+    "raw": "300 Meter"
+  },
+  "category": "precision-rifle",
+  "caliberClasses": {
+    "ids": ["rifle-22-cf", "rifle-30"],
+    "basis": "stated"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 46, PDF p. 104",
+        "fields": ["federation", "section", "page", "distance", "caliberClasses"],
+        "note": "The book names .223 Rem. (Gruppe 1) and .308 Win. (Gruppe 2). A class also holds other cartridges of its bullet diameter."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Inhaltsverzeichnis Langwaffen, Seite 3 (PDF p. 61)",
+        "fields": ["name", "number"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Waffen und Ausrüstung, Seite 8 (PDF p. 66)",
+        "fields": ["category"],
+        "note": "The page title reads Zielfernrohrgewehr Präzision; the class list of the book names Präzisionsgewehre."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 9, Kurzbezeichnungen Langwaffen, Seite 4 (PDF p. 230)",
+        "fields": ["caliberClasses"]
+      }
+    ]
+  }
+}
