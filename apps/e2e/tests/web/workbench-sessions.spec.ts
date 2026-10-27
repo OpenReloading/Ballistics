@@ -77,6 +77,8 @@ test('a chronograph file on the Measurements tab is a stored session that the sa
   await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
   await page.getByRole('button', { name: load.name, exact: true }).click()
   await expect(page.locator('.file-state')).toContainText('Saved')
+  // the seated bullet fills the volume after the load opens: a run before it reads an empty field
+  await expect(page.getByLabel(/^Usable case volume/)).not.toHaveValue('')
   await runLine(page)
   await page.getByRole('tab', { name: 'Measurements', exact: true }).click()
   await expect(page.getByLabel(/^String 1: A/)).toBeAttached()

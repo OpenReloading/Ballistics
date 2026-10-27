@@ -1,6 +1,7 @@
 import { expect, it } from 'vitest'
 import {
   appUrl,
+  editionName,
   networkOr,
   pageKey,
   precacheList,
@@ -33,7 +34,7 @@ it('names one shell cache per build and keeps the records cache across builds', 
       [
         shellCache('a'),
         shellCache('b'),
-        recordsCache,
+        recordsCache(),
         'other-app',
         shellCache('c'),
         shellCache('new'),
@@ -43,6 +44,20 @@ it('names one shell cache per build and keeps the records cache across builds', 
   ).toEqual([shellCache('a'), shellCache('b')])
   expect(staleCaches([shellCache('old'), shellCache('new')], 'new')).toEqual([])
   expect(staleCaches([shellCache('new')], 'new')).toEqual([])
+})
+
+it('keeps the caches of the next edition apart from the stable edition, which shares its origin', () => {
+  expect(editionName('', 'units')).toBe('units')
+  expect(editionName('next', 'units')).toBe('next:units')
+  expect(shellCache('abc', 'next')).toBe('next:openreloading-shell-abc')
+  expect(recordsCache('next')).toBe('next:openreloading-records')
+  const stable = [shellCache('a'), shellCache('b'), recordsCache()]
+  const next = [shellCache('a', 'next'), shellCache('b', 'next'), recordsCache('next')]
+  // a worker deletes only the shells of its own edition
+  expect(staleCaches([...stable, ...next, shellCache('c')], 'c')).toEqual([shellCache('a')])
+  expect(staleCaches([...stable, ...next, shellCache('c', 'next')], 'c', 'next')).toEqual([
+    shellCache('a', 'next'),
+  ])
 })
 
 it('answers from the network, else from the cached copy on a failure, a server error or a stall', async () => {
@@ -137,6 +152,20 @@ it('in the Pages edition, serves under the base path and leaves the docs site to
   const docs = req('/OpenReloading/docs/models/', { mode: 'navigate' })
   expect(strategyOf(docs, origin, base)).toBeUndefined()
   expect(strategyOf(req('/other/', { mode: 'navigate' }), origin, base)).toBeUndefined()
+})
+
+it('the stable edition leaves the next edition under <base>/next/ to its own worker', () => {
+  const base = '/OpenReloading'
+  const next = req('/OpenReloading/next/workbench/', { mode: 'navigate' })
+  expect(strategyOf(next, origin, base)).toBeUndefined()
+  expect(
+    strategyOf(req('/OpenReloading/next/_next/static/chunks/a.js'), origin, base),
+  ).toBeUndefined()
+  expect(
+    strategyOf(req('/OpenReloading/next/api/cartridges/308-win.json'), origin, base),
+  ).toBeUndefined()
+  // the next edition's own worker serves its pages under its base
+  expect(strategyOf(next, origin, '/OpenReloading/next')).toBe('page')
 })
 
 it('leaves searches (`q`) to the network, so typing does not fill the records cache', () => {
