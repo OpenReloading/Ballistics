@@ -2,7 +2,6 @@
 FROM docker.io/library/node:26-bookworm-slim@sha256:28147155d47dc31abe0a46e0d12b59b2fb3d0a2dcc5dc65fce76a074180b16fe AS build
 WORKDIR /app
 COPY package.json package-lock.json tsconfig.base.json ./
-COPY patches patches
 COPY packages/schema/package.json packages/schema/
 COPY packages/importers/package.json packages/importers/
 COPY packages/core/package.json packages/core/
@@ -13,7 +12,7 @@ COPY apps/web/package.json apps/web/
 COPY tools/package.json tools/
 COPY apps/e2e/package.json apps/e2e/
 COPY apps/docs/package.json apps/docs/
-RUN npm ci --ignore-scripts -w @open-reloading/schema -w @open-reloading/core -w @open-reloading/drawing -w @open-reloading/importers -w @open-reloading/data -w @open-reloading/api -w @open-reloading/docs && node patches/apply.mjs
+RUN npm ci --ignore-scripts -w @open-reloading/schema -w @open-reloading/core -w @open-reloading/drawing -w @open-reloading/importers -w @open-reloading/data -w @open-reloading/api -w @open-reloading/docs
 COPY packages packages
 RUN npm run build -w @open-reloading/schema -w @open-reloading/core -w @open-reloading/drawing -w @open-reloading/importers -w @open-reloading/data -w @open-reloading/api
 COPY apps/docs apps/docs
