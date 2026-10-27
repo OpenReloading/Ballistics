@@ -106,6 +106,10 @@ describe('drawing tokens', () => {
         for (const edge of ['--focus', '--input-border'])
           expect(ratio(colour(tokens, edge), ground), edge).toBeGreaterThanOrEqual(3)
       })
+  it('leaves the border of an error or success field to Mantine', () => {
+    const selector = css.match(/([^{}]*)\{\s*--input-bd:\s*var\(--input-border\)/)?.[1] ?? missing()
+    expect(selector).toContain(':not([data-error]):not([data-success])')
+  })
   it('gives shot groups the light chart series colours', () => {
     const series = new Set([1, 2, 3, 4, 5, 6].map((k) => light.get(`--series-${k}`)))
     for (const colour of groupColours) expect(series.has(colour), colour).toBe(true)

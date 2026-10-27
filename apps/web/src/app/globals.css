@@ -121,8 +121,9 @@ body {
   --input-border: color-mix(in srgb, var(--fg) 55%, var(--bg));
 }
 
-/* Mantine's field border is gray-4, about 1.5:1 on white */
-:root[data-mantine-color-scheme] .mantine-Input-wrapper[data-variant="default"] {
+/* Mantine's field border is gray-4, about 1.5:1 on white; an error or success field keeps its state border */
+:root[data-mantine-color-scheme]
+.mantine-Input-wrapper[data-variant="default"]:not([data-error]):not([data-success]) {
   --input-bd: var(--input-border);
 }
 

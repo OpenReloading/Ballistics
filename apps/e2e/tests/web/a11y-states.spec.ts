@@ -40,7 +40,13 @@ async function settled(dialog: Locator) {
   // a modal fades in, a drawer slides
   await expect(dialog).toHaveCSS('opacity', '1')
   await dialog.evaluate((el) =>
-    Promise.all(el.getAnimations({ subtree: true }).map((a) => a.finished)),
+    Promise.all(
+      el
+        .getAnimations({ subtree: true })
+        // a loader spins for ever, and a cancelled animation rejects its promise
+        .filter((a) => a.effect?.getComputedTiming().iterations !== Infinity)
+        .map((a) => a.finished.catch(() => undefined)),
+    ),
   )
   return dialog
 }
