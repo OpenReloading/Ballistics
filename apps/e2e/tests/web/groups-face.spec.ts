@@ -307,3 +307,33 @@ test('a photo without any face: the guided steps ask for the scale as before', a
     .analyze()
   expect(violations.map((v) => `${v.id} ${v.nodes.map((n) => n.target).join(' ')}`)).toEqual([])
 })
+
+test('the sheet pans by arrow keys and zooms in at a double click, no drag needed', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/groups')
+  const sheet = page.getByRole('application', { name: 'Target sheet' })
+  const view = async () =>
+    ((await sheet.getAttribute('viewBox')) ?? '').split(' ').map(Number) as [
+      number,
+      number,
+      number,
+      number,
+    ]
+  const [, , w0] = await view()
+  await page.getByRole('button', { name: 'Zoom in' }).click()
+  const [x1, y1, w1] = await view()
+  expect(w1).toBeLessThan(w0)
+
+  await sheet.focus()
+  await sheet.press('ArrowRight')
+  await sheet.press('ArrowDown')
+  const [x2, y2, w2] = await view()
+  expect(x2).toBeGreaterThan(x1)
+  expect(y2).toBeGreaterThan(y1)
+  expect(w2).toBe(w1)
+
+  await sheet.dblclick({ position: { x: 40, y: 40 } })
+  const [, , w3] = await view()
+  expect(w3).toBeLessThan(w2)
+})

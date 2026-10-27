@@ -781,6 +781,14 @@ export function TargetCanvas({
     else if (d.kind === 'aim') onAimMove?.(d.group, viewToTarget(frame, p), isFirst)
   }
 
+  // the view without a drag: arrow keys on the sheet pan it, a double click on it zooms in there
+  const onSheetKey = (e: KeyboardEvent<SVGSVGElement>) => {
+    const d = arrows[e.key]
+    if (!d || e.target !== e.currentTarget || e.altKey || e.ctrlKey || e.metaKey) return
+    e.preventDefault()
+    setView({ ...box, x: box.x + d[0] * box.w * 0.1, y: box.y + d[1] * box.h * 0.1 })
+  }
+
   const end = () => {
     drag.current = undefined
     first.current = false
@@ -874,6 +882,9 @@ export function TargetCanvas({
         onPointerUp={onPointerUp}
         onPointerCancel={end}
         onPointerLeave={() => setHover(undefined)}
+        tabIndex={still ? undefined : 0}
+        onKeyDown={onSheetKey}
+        onDoubleClick={(e) => tool === 'select' && zoom(1 / 1.5, toPoint(e))}
       >
         {content}
         {sheet.photo && !still && (
@@ -1000,7 +1011,7 @@ export function TargetCanvas({
         )}
       </svg>
       <p id={`${id}-keys`} className="visually-hidden">
-        {`Shots of the active group are buttons in one tab stop: arrow keys, Home and End move the focus between them, Alt with the arrow keys moves the focused shot by ${mmLength(system, 0.1)} (with Shift ${mmLength(system, 1)}), E or Space excludes or includes it, Delete removes it. While a point is marked, the arrow keys move the marker by a screen pixel (with Shift 10) and Enter sets it.`}
+        {`Shots of the active group are buttons in one tab stop: arrow keys, Home and End move the focus between them, Alt with the arrow keys moves the focused shot by ${mmLength(system, 0.1)} (with Shift ${mmLength(system, 1)}), E or Space excludes or includes it, Delete removes it. With the focus on the sheet itself, the arrow keys pan the view, and a double click zooms in at the pointer. While a point is marked, the arrow keys move the marker by a screen pixel (with Shift 10) and Enter sets it.`}
       </p>
       {overlays.stats && statsBox && !still && (
         <div
