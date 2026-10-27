@@ -342,6 +342,20 @@ describe('the Pages edition computes as the API', () => {
     }
   })
 
+  it('settles a record read when its signal aborts while the data file is pending', async () => {
+    const online = globalThis.fetch
+    vi.stubGlobal('fetch', () => new Promise<Response>(() => {}))
+    try {
+      const abort = new AbortController()
+      const read = staticFetch('powders/stalled-powder', { signal: abort.signal })
+      const outcome = expect(read).rejects.toMatchObject({ name: 'AbortError' })
+      abort.abort()
+      await outcome
+    } finally {
+      vi.stubGlobal('fetch', online)
+    }
+  })
+
   it('refuses a body above 64 KiB with 413', async () => {
     const res = await staticFetch('interior', { method: 'POST', body: 'x'.repeat(64 * 1024 + 1) })
     expect(res.status).toBe(413)

@@ -280,7 +280,16 @@ function failure(error: unknown, signal: AbortSignal | undefined) {
 
 /** `apiFetch` of the Pages edition: GET from the data files, POST from the compute worker. */
 export async function staticFetch(path: string, init?: RequestInit): Promise<Response> {
-  const res = await (init?.method === 'POST' ? post(path, init) : get(path))
-  if (init?.signal?.aborted) throw init.signal.reason
+  const signal = init?.signal ?? undefined
+  if (signal?.aborted) throw signal.reason
+  const answered = init?.method === 'POST' ? post(path, init) : get(path)
+  // an abort settles this caller at once; the data file read it waits for is shared and keeps going
+  const aborted =
+    signal &&
+    new Promise<never>((_, reject) => {
+      signal.addEventListener('abort', () => reject(signal.reason), { once: true })
+    })
+  const res = await (aborted ? Promise.race([answered, aborted]) : answered)
+  if (signal?.aborted) throw signal.reason
   return res
 }

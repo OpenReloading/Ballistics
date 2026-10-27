@@ -1,7 +1,7 @@
 /**
  * `PRERENDER=sample` (development, agent builds, pull request builds without record changes) prerenders
- * only the records below on the detail routes; every other id renders on its first visit. Unset or any
- * other value prerenders every record (deploy image, releases, default branch).
+ * only the records below on the cartridge detail route; the export leaves every other cartridge page out (`exportIds`).
+ * Unset or any other value prerenders every record (releases, default branch).
  */
 export const sampleIds: Record<string, readonly string[]> = {
   // the records the e2e specs and the smoke set open, so their tests meet prerendered pages
