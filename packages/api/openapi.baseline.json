@@ -11277,6 +11277,46 @@
                           },
                           "description": "Messages on the limits, the range and the model"
                         },
+                        "maximumCheck": {
+                          "description": "Where the entered maximumPressure lies against pressureRange. Absent without maximumPressure.",
+                          "type": "object",
+                          "properties": {
+                            "maximum": {
+                              "type": "number",
+                              "description": "The maximum pressure entered with the request, Pa"
+                            },
+                            "class": {
+                              "type": "string",
+                              "enum": ["inputPlausible", "modelDiscrepancy", "aboveRange"],
+                              "description": "inputPlausible: the maximum is inside the pressure range, ends included. modelDiscrepancy: below its low end. aboveRange: above its high end."
+                            },
+                            "dominantInput": {
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "enum": [
+                                    "chargeFraction",
+                                    "volumeFraction",
+                                    "massFraction",
+                                    "burnRateFraction",
+                                    "temperatureKelvin",
+                                    "startPressureFraction"
+                                  ]
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ],
+                              "description": "The input whose two tolerance ends differ most in peak pressure, null when no input moves it"
+                            },
+                            "message": {
+                              "type": "string",
+                              "description": "A statement about the simulated range and the maximum"
+                            }
+                          },
+                          "required": ["maximum", "class", "dominantInput", "message"],
+                          "additionalProperties": {}
+                        },
                         "resolved": {
                           "description": "The records of the request, absent without a cartridge id",
                           "type": "object",
@@ -12095,6 +12135,50 @@
                                       "additionalProperties": {}
                                     },
                                     "description": "Messages on the limits, the range and the model"
+                                  },
+                                  "maximumCheck": {
+                                    "description": "Where the entered maximumPressure lies against pressureRange. Absent without maximumPressure.",
+                                    "type": "object",
+                                    "properties": {
+                                      "maximum": {
+                                        "type": "number",
+                                        "description": "The maximum pressure entered with the request, Pa"
+                                      },
+                                      "class": {
+                                        "type": "string",
+                                        "enum": [
+                                          "inputPlausible",
+                                          "modelDiscrepancy",
+                                          "aboveRange"
+                                        ],
+                                        "description": "inputPlausible: the maximum is inside the pressure range, ends included. modelDiscrepancy: below its low end. aboveRange: above its high end."
+                                      },
+                                      "dominantInput": {
+                                        "anyOf": [
+                                          {
+                                            "type": "string",
+                                            "enum": [
+                                              "chargeFraction",
+                                              "volumeFraction",
+                                              "massFraction",
+                                              "burnRateFraction",
+                                              "temperatureKelvin",
+                                              "startPressureFraction"
+                                            ]
+                                          },
+                                          {
+                                            "type": "null"
+                                          }
+                                        ],
+                                        "description": "The input whose two tolerance ends differ most in peak pressure, null when no input moves it"
+                                      },
+                                      "message": {
+                                        "type": "string",
+                                        "description": "A statement about the simulated range and the maximum"
+                                      }
+                                    },
+                                    "required": ["maximum", "class", "dominantInput", "message"],
+                                    "additionalProperties": {}
                                   }
                                 },
                                 "required": ["charge", "result", "pressureRange", "warnings"],
@@ -12926,6 +13010,11 @@
                     "maxLength": 200,
                     "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
                     "description": "Cartridge record id. Adds the comparison of the peak pressure with its CIP Pmax under limits."
+                  },
+                  "maximumPressure": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "description": "A maximum peak pressure entered by the caller, Pa. Adds maximumCheck: where it lies against the simulated pressure range of each run."
                   },
                   "tolerances": {
                     "type": "object",

@@ -1,7 +1,11 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import type { Outcome } from '../src/components/workbench-outcome.ts'
 import { peakFacts } from '../src/components/workbench-readouts.tsx'
+import de from '../src/i18n/de.json'
+import { setShownLanguage } from '../src/i18n/shown.ts'
+import { type Catalogue, english, type Translator, translator } from '../src/i18n/translate.ts'
 import type { InteriorResponse } from '../src/lib/api-types.ts'
+import { installCoreMessages } from '../src/lib/core-message-table.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import {
   bandLine,
@@ -70,15 +74,15 @@ describe('solidFillWarning', () => {
   const at = (fill: number) => fill * 1600 * volume
 
   it('warns above the solid fill limit only', () => {
-    expect(solidFillWarning(at(0.639), 1600, 900, volume)).toBeUndefined()
-    expect(solidFillWarning(at(0.65), 1600, undefined, volume)).toEqual({
+    expect(solidFillWarning(at(0.639), 1600, 900, volume, english.t)).toBeUndefined()
+    expect(solidFillWarning(at(0.65), 1600, undefined, volume, english.t)).toEqual({
       text: 'Simulation: solid fill 0.65 is above 0.64; the model is outside the range it was built for.',
       name: 'solid fill above 0.64',
     })
   })
 
   it('gives the load ratio and its limit for the powder with a bulk density', () => {
-    expect(solidFillWarning(at(0.65), 1600, 900, volume)?.text).toBe(
+    expect(solidFillWarning(at(0.65), 1600, 900, volume, english.t)?.text).toBe(
       'Simulation: load ratio 1.16 is above 1.14, solid fill 0.64 for this powder; the model is outside the range it was built for.',
     )
   })
@@ -86,9 +90,9 @@ describe('solidFillWarning', () => {
 
 describe('warningsSummary', () => {
   it('counts the warnings as simulation warnings', () => {
-    expect(warningCountText(0)).toBe('')
-    expect(warningCountText(1)).toBe('1 simulation warning')
-    expect(warningCountText(2)).toBe('2 simulation warnings')
+    expect(warningCountText(0, english.tn)).toBe('')
+    expect(warningCountText(1, english.tn)).toBe('1 simulation warning')
+    expect(warningCountText(2, english.tn)).toBe('2 simulation warnings')
   })
 })
 
@@ -123,7 +127,11 @@ describe('shownWarnings', () => {
     }) as unknown as InteriorResponse
 
   it('writes an exceeded limit in the page unit with the sheet date and method, and names it', () => {
-    const [line, small, other] = shownWarnings(body(4766e5, 4174e5, 5460e5), presetUnits('us'))
+    const [line, small, other] = shownWarnings(
+      body(4766e5, 4174e5, 5460e5),
+      presetUnits('us'),
+      english.t,
+    )
     expect(line).toEqual({
       text: 'Simulated peak pressure 69125 psi (range 60539 to 79191 psi) is above CIP Pmax 60191 psi, source CIP (2008-09-23, transducer).',
       name: 'above CIP Pmax',
@@ -144,11 +152,13 @@ describe('shownWarnings', () => {
     const [us = missing()] = shownWarnings(
       warned('1.5 bar and 25 bar, 3 barrel'),
       presetUnits('us'),
+      english.t,
     )
     expect(us.text).toBe('22 psi and 363 psi, 3 barrel')
     const [metric = missing()] = shownWarnings(
       warned('1.5 bar and 25 bar'),
       presetUnits('metric-grains'),
+      english.t,
     )
     expect(metric.text).toBe('1.5 bar and 25 bar')
   })
@@ -157,6 +167,7 @@ describe('shownWarnings', () => {
     const [line, small = missing()] = shownWarnings(
       body(4000e5, 3600e5, 4400e5),
       presetUnits('metric-grains'),
+      english.t,
     )
     expect(line).toEqual({
       text: 'The upper end of the simulated peak pressure range, 4400 bar, is above CIP Pmax 4150 bar, source CIP (2008-09-23, transducer); the nominal value is 4000 bar.',
@@ -185,6 +196,7 @@ describe('shownWarnings', () => {
         warnings: [a.warning, b.warning],
       } as unknown as InteriorResponse,
       presetUnits('metric-grains'),
+      english.t,
     )
     expect(lines.map((l) => l.name)).toEqual(['above CIP Pmax (A)', 'above CIP Pmax (B)'])
     expect(defined(lines[0]).text).toContain('above CIP Pmax (A) 4150 bar')
@@ -193,7 +205,11 @@ describe('shownWarnings', () => {
 
   it('adds decimals while rounding would put a pressure on the limit', () => {
     // 60190.8 psi rounds to the limit's 60191 psi: one decimal keeps it above 60190.7 psi
-    const [line = missing()] = shownWarnings(body(60190.8 * psi, 4000e5, 4400e5), presetUnits('us'))
+    const [line = missing()] = shownWarnings(
+      body(60190.8 * psi, 4000e5, 4400e5),
+      presetUnits('us'),
+      english.t,
+    )
     expect(line.text).toMatch(
       /^Simulated peak pressure 60190\.8 psi \(range \d+ to 63816\.6 psi\) is above CIP Pmax 60190\.7 psi,/,
     )
@@ -258,15 +274,17 @@ describe('rangeHero', () => {
   const fps = 0.3048
   it('gives charge and velocity in the preset units, the step only on a ladder', () => {
     const us = presetUnits('us')
-    expect(rangeHero(us, 42.5 * grain, 2511 * fps, undefined)).toEqual({
+    expect(rangeHero(us, 42.5 * grain, 2511 * fps, undefined, english.t)).toEqual({
       step: undefined,
       charge: { value: '42.5', unit: 'gr' },
       velocity: { value: '2511', unit: 'ft/s' },
     })
-    expect(rangeHero(us, 42.5 * grain, 2511 * fps, '−1').step).toBe('Step −1')
+    expect(rangeHero(us, 42.5 * grain, 2511 * fps, '−1', english.t).step).toBe('Step −1')
   })
   it('follows the metric velocity unit', () => {
-    expect(rangeHero(presetUnits('metric-grains'), 42.5 * grain, 765.3, '0').velocity).toEqual({
+    expect(
+      rangeHero(presetUnits('metric-grains'), 42.5 * grain, 765.3, '0', english.t).velocity,
+    ).toEqual({
       value: '765',
       unit: 'm/s',
     })
@@ -275,13 +293,15 @@ describe('rangeHero', () => {
 
 describe('rangeCardNote', () => {
   it('names a missing bullet record at once, never while the trajectory result computes', () => {
-    expect(rangeCardNote(true, 'bravo-168', false)).toBe('')
-    expect(rangeCardNote(true, undefined, false)).toBe('The range card needs a bullet record.')
-    expect(rangeCardNote(false, undefined, true)).toBe('')
+    expect(rangeCardNote(true, 'bravo-168', false, english.t)).toBe('')
+    expect(rangeCardNote(true, undefined, false, english.t)).toBe(
+      'The range card needs a bullet record.',
+    )
+    expect(rangeCardNote(false, undefined, true, english.t)).toBe('')
   })
 
   it('points at the Trajectory tab once the result stays away with a bullet record chosen', () => {
-    expect(rangeCardNote(true, 'bravo-168', true)).toBe(
+    expect(rangeCardNote(true, 'bravo-168', true, english.t)).toBe(
       'The range card needs a Trajectory result: see the Trajectory tab.',
     )
   })
@@ -289,16 +309,26 @@ describe('rangeCardNote', () => {
 
 describe('statusText', () => {
   it('writes a result status from the line of the units shown now, with its prefix', () => {
-    expect(statusText({ prefix: '' }, 'Peak 4 bar.')).toBe('Peak 4 bar.')
-    expect(statusText({ prefix: 'Simulation done. ' }, 'Peak 58 psi.')).toBe(
+    expect(statusText({ prefix: '' }, 'Peak 4 bar.', english.t)).toBe('Peak 4 bar.')
+    expect(statusText({ prefix: 'Simulation done. ' }, 'Peak 58 psi.', english.t)).toBe(
       'Simulation done. Peak 58 psi.',
     )
   })
 
+  it('writes a stored text and prefix in the language shown now', () => {
+    const german = translator(de as Catalogue, 'de')
+    const done = { prefix: (t: Translator['t']) => t('Simulation done. ') }
+    expect(statusText(done, 'Peak 4 bar.', english.t)).toBe('Simulation done. Peak 4 bar.')
+    expect(statusText(done, 'Peak 4 bar.', german.t)).toBe('Simulation abgeschlossen. Peak 4 bar.')
+    const running = { say: (t: Translator['t']) => t('Simulating') }
+    expect(statusText(running, undefined, english.t)).toBe('Simulating')
+    expect(statusText(running, undefined, german.t)).toBe('Simulation läuft')
+  })
+
   it('shows another status as it is, and no result status without a result', () => {
-    expect(statusText('Simulating', 'Peak 4 bar.')).toBe('Simulating')
-    expect(statusText('The API answered 502.', undefined)).toBe('The API answered 502.')
-    expect(statusText({ prefix: '' }, undefined)).toBe('')
+    expect(statusText('Simulating', 'Peak 4 bar.', english.t)).toBe('Simulating')
+    expect(statusText('The API answered 502.', undefined, english.t)).toBe('The API answered 502.')
+    expect(statusText({ prefix: '' }, undefined, english.t)).toBe('')
   })
 })
 
@@ -336,7 +366,7 @@ describe('sampled band', () => {
       pressure: { low: 2.9e8, high: 3.2e8 },
       velocity: { low: 830, high: 850 },
     })
-    expect(bandNotice(sampled)).toBe('input tolerances only')
+    expect(bandNotice(sampled, english.t)).toBe('input tolerances only')
   })
 
   it('keeps the printed report on the corner-case range whether or not the sampling answered', () => {
@@ -351,12 +381,12 @@ describe('sampled band', () => {
       pressure: { low: 2.8e8, high: 3.3e8 },
       velocity: undefined,
     })
-    expect(bandNotice(over)).toBe('over budget')
+    expect(bandNotice(over, english.t)).toBe('over budget')
   })
 
   it('says what each sampling answer covers, and why the corner-case range stands in for a band', () => {
     const units = presetUnits('metric-grains')
-    expect(bandLine(body({ sampled }), units)).toBe(
+    expect(bandLine(body({ sampled }), units, english.t)).toBe(
       'Velocity 830 to 850 m/s. 5th to 95th percentile, input tolerances only.',
     )
     for (const [status, word] of [
@@ -367,17 +397,18 @@ describe('sampled band', () => {
         bandLine(
           body({ sampled: { ...sampled, status, pressure: undefined, velocity: undefined } }),
           units,
+          english.t,
         ),
       ).toBe(`Sampled bands ${word}: corner-case range shown.`)
-    expect(bandLine(body({ sampled: { status: 'failed' } }), units)).toBe(
+    expect(bandLine(body({ sampled: { status: 'failed' } }), units, english.t)).toBe(
       'Sampled bands not finished: corner-case range shown.',
     )
-    expect(bandLine(body({}), units)).toBeUndefined()
+    expect(bandLine(body({}), units, english.t)).toBeUndefined()
   })
 
   it('shows the corner-case range without a word for a result that did not ask for sampling', () => {
     expect(resultBand(body({})).sampled).toBe(false)
-    expect(bandNotice(undefined)).toBeUndefined()
+    expect(bandNotice(undefined, english.t)).toBeUndefined()
   })
 
   it('states the sample count, the seed and that the band covers the input tolerances only', () => {
@@ -387,8 +418,74 @@ describe('sampled band', () => {
         result: { maxPressureTime: 1e-4, maxPressureTravel: 0.01 } as InteriorResponse['result'],
       }),
     } as Extract<Outcome, { kind: 'ok' }>
-    const text = peakFacts(ok, presetUnits('metric-grains'))
+    const text = peakFacts(ok, presetUnits('metric-grains'), english.t)
     expect(text).toContain('500 draws (seed 1)')
     expect(text).toContain('The band covers the input tolerances only, no model error')
+  })
+})
+
+describe('in German', () => {
+  const german = translator(de as Catalogue, 'de')
+  installCoreMessages()
+  beforeEach(() => setShownLanguage('de'))
+  afterEach(() => setShownLanguage('en'))
+  const pressureRange = { nominalPressure: 4000e5, lowPressure: 3600e5, highPressure: 4400e5 }
+  const sheet = (message: string) =>
+    ({
+      pressureRange,
+      limits: [limit({ pressure: 4150e5, exceeded: true, nominalExceeded: false })],
+      warnings: [
+        {
+          code: 'limitExceeded',
+          spec: 'cip-308-win-2008-09-23',
+          symbol: 'Pmax',
+          method: 'transducer',
+          message: 'in bar',
+        },
+        { code: 'chargeTooSmall', message },
+        { code: 'noCartridge', message: 'No cartridge id was given, so no CIP Pmax was checked.' },
+      ],
+    }) as unknown as InteriorResponse
+  const small =
+    'Charge too small for the model: the simulated peak mean pressure, 250 bar, is below 2.2 times the start pressure (200 bar); results are outside the range the model was built for.'
+
+  it('writes the warnings of an answer in German with the decimal comma', () => {
+    const [line, charge, none] = shownWarnings(sheet(small), presetUnits('metric-grains'), german.t)
+    expect(line).toEqual({
+      text: 'Das obere Ende des simulierten Gasdruckbereichs, 4400 bar, liegt über CIP Pmax 4150 bar, Quelle CIP (2008-09-23, mechanisch-elektrischer Wandler); der Nennwert beträgt 4000 bar.',
+      name: 'Bereich über CIP Pmax',
+    })
+    expect(charge).toEqual({
+      text: 'Ladung zu klein für das Modell: Der simulierte höchste mittlere Druck, 250 bar, liegt unter dem 2,2-Fachen des Startdrucks (200 bar); die Ergebnisse liegen außerhalb des Bereichs, für den das Modell gebaut wurde.',
+      name: 'Ladung zu klein für das Modell',
+    })
+    expect(none).toEqual({
+      text: 'Es wurde keine Patronen-ID angegeben, daher wurde kein CIP-Pmax geprüft.',
+      name: 'keine Patrone',
+    })
+  })
+
+  it('converts the pressures of a message before it is translated', () => {
+    const [, charge] = shownWarnings(sheet(small), presetUnits('us'), german.t)
+    expect(charge?.text).toContain('3626 psi')
+    expect(charge?.text).toContain('(2901 psi)')
+  })
+
+  it('writes the solid fill warning and the counts', () => {
+    const fill = solidFillWarning(0.65 * 1600 * 3.4e-6, 1600, undefined, 3.4e-6, german.t)
+    expect(fill).toEqual({
+      text: 'Simulation: Der Feststoff-Füllgrad 0,65 liegt über 0,64; das Modell liegt außerhalb des Bereichs, für den es gebaut wurde.',
+      name: 'Feststoff-Füllgrad über 0,64',
+    })
+    expect(warningCountText(1, german.tn)).toBe('1 Simulationswarnung')
+    expect(warningCountText(2, german.tn)).toBe('2 Simulationswarnungen')
+  })
+
+  it('writes the notes of the range view and the sampled band in German', () => {
+    expect(rangeCardNote(true, undefined, false, german.t)).toBe(
+      'Die Schusstafel braucht einen Geschossdatensatz.',
+    )
+    expect(rangeHero(presetUnits('us'), 0.0027, 765, '−1', german.t).step).toBe('Schritt −1')
+    expect(bandNotice({ status: 'invalid' } as never, german.t)).toBe('keine gültige Ziehung')
   })
 })

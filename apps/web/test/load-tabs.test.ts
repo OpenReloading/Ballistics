@@ -1,5 +1,6 @@
 import type { UserRecord } from '@open-reloading/schema'
 import { expect, it, vi } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import { afterChange, afterExport, reminderText } from '../src/lib/export-reminder.ts'
 import {
   duplicateStored,
@@ -54,7 +55,7 @@ it('groups the list by cartridge, newest first, groups by title, without a cartr
     load('c', '308 Win. load', '2026-10-03T10:00:00.000Z', 'catalogue:308-win'),
     load('d', 'Load', '2026-10-04T10:00:00.000Z'),
   ]
-  const groups = loadGroups(records, '', names)
+  const groups = loadGroups(records, '', names, english.t)
   expect(groups.map((g) => [g.title, g.records.map((r) => r.id)])).toEqual([
     ['6.5 Creedmoor', ['b']],
     ['308 Win.', ['c', 'a']],
@@ -69,7 +70,7 @@ it('groups loads of a catalogue cartridge together by its record id, a design ap
     load('b', 'New', '2026-10-02T10:00:00.000Z', 'catalogue:308-win'),
     load('c', 'On a design', '2026-10-03T10:00:00.000Z', design),
   ]
-  const groups = loadGroups(records, '', { '308-win': '308 Win.', [design]: 'Mine 7.8' })
+  const groups = loadGroups(records, '', { '308-win': '308 Win.', [design]: 'Mine 7.8' }, english.t)
   expect(groups.map((g) => [g.title, g.records.map((r) => r.id)])).toEqual([
     ['308 Win.', ['b', 'a']],
     ['Mine 7.8', ['c']],
@@ -81,8 +82,10 @@ it('filters the list by the words of the query in the name', () => {
     load('a', '308 Win. load', '2026-10-01T10:00:00.000Z', 'catalogue:308-win'),
     load('b', '6.5 Creedmoor load', '2026-10-02T10:00:00.000Z', 'catalogue:65-creedmoor'),
   ]
-  expect(loadGroups(records, 'creed').flatMap((g) => g.records.map((r) => r.id))).toEqual(['b'])
-  expect(loadGroups(records, 'zzz')).toEqual([])
+  expect(
+    loadGroups(records, 'creed', {}, english.t).flatMap((g) => g.records.map((r) => r.id)),
+  ).toEqual(['b'])
+  expect(loadGroups(records, 'zzz', {}, english.t)).toEqual([])
 })
 
 it('picks the next tab, else the previous one, when a tab closes', () => {
@@ -129,24 +132,31 @@ it('titles a group by the cartridge lookup, not by the record names', () => {
     load('c', 'Unknown', '2026-10-03T10:00:00.000Z', 'not-listed'),
   ]
   // a cartridge the lookup lacks (offline, deleted) is titled by its id
-  expect(loadGroups(records, '', names).map((g) => [g.title, g.records.length])).toEqual([
-    ['308 Win.', 2],
-    ['not-listed', 1],
-  ])
+  expect(loadGroups(records, '', names, english.t).map((g) => [g.title, g.records.length])).toEqual(
+    [
+      ['308 Win.', 2],
+      ['not-listed', 1],
+    ],
+  )
 })
 
 it('generates a name from the cartridge, bullet, powder and charge, else "New load"', () => {
-  expect(generatedName({})).toBe('New load')
+  expect(generatedName({}, english.t)).toBe('New load')
   expect(
-    generatedName({
-      cartridge: '308 Win.',
-      bullet: 'Bravo Ridge',
-      powder: 'Delta Fast',
-      charge: '43.5 gr',
-    }),
+    generatedName(
+      {
+        cartridge: '308 Win.',
+        bullet: 'Bravo Ridge',
+        powder: 'Delta Fast',
+        charge: '43.5 gr',
+      },
+      english.t,
+    ),
   ).toBe('308 Win., Bravo Ridge, Delta Fast 43.5 gr')
-  expect(generatedName({ cartridge: '308 Win.' })).toBe('308 Win.')
-  expect(generatedName({ bullet: 'Bravo Ridge', charge: '43.5 gr' })).toBe('Bravo Ridge, 43.5 gr')
+  expect(generatedName({ cartridge: '308 Win.' }, english.t)).toBe('308 Win.')
+  expect(generatedName({ bullet: 'Bravo Ridge', charge: '43.5 gr' }, english.t)).toBe(
+    'Bravo Ridge, 43.5 gr',
+  )
 })
 
 it('uses the typed name; an empty or blank one falls back to the generated name', () => {

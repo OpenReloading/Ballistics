@@ -5,6 +5,7 @@ import { useDebouncedValue } from '@mantine/hooks'
 import { type createSpotlight, Spotlight, spotlight } from '@mantine/spotlight'
 import type { CartridgeDiameters } from '@open-reloading/core'
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import type { BulletSummary, CartridgeSummary, PowderSummary } from '../lib/api-types.ts'
 import type { BulletRow } from '../lib/bullet-rows.ts'
 import { findBullets } from '../lib/bullet-search.ts'
@@ -81,6 +82,7 @@ export function WorkbenchSearch({
   /** A store of its own, opened by the caller (no shortcut); without it the default store on Ctrl+K. */
   search?: ReturnType<typeof createSpotlight>
 }) {
+  const { t } = useTranslation()
   const [store, actions] = own ?? [undefined, spotlight]
   const shell = useShellActions()
   const names = useManufacturerNames()
@@ -154,7 +156,7 @@ export function WorkbenchSearch({
       maxHeight="min(28rem, 60dvh)"
     >
       {/* names the dialog; its content is the search box */}
-      <Modal.Title className="visually-hidden">Search</Modal.Title>
+      <Modal.Title className="visually-hidden">{t('Search')}</Modal.Title>
       {/* caught before the search input, whose Enter would also trigger the selected action */}
       <div
         onKeyDownCapture={(e) => {
@@ -166,13 +168,13 @@ export function WorkbenchSearch({
         }}
       >
         <Spotlight.Search
-          aria-label="Search pages, cartridges, bullets, powders and commands"
-          placeholder="Search pages, cartridges, bullets, powders"
+          aria-label={t('Search pages, cartridges, bullets, powders and commands')}
+          placeholder={t('Search pages, cartridges, bullets, powders')}
         />
       </div>
       <Spotlight.ActionsList>
         {pages.length > 0 && (
-          <Spotlight.ActionsGroup label="Pages">
+          <Spotlight.ActionsGroup label={t('Pages')}>
             {pages.map((c) => (
               <Spotlight.Action
                 key={c.label}
@@ -185,7 +187,7 @@ export function WorkbenchSearch({
           </Spotlight.ActionsGroup>
         )}
         {shown.length > 0 && (
-          <Spotlight.ActionsGroup label="Commands">
+          <Spotlight.ActionsGroup label={t('Commands')}>
             {shown.map((c) => (
               <Spotlight.Action
                 key={c.label}
@@ -205,7 +207,7 @@ export function WorkbenchSearch({
           </Spotlight.ActionsGroup>
         )}
         {records && records.cartridges.length > 0 && (
-          <Spotlight.ActionsGroup label="Cartridges">
+          <Spotlight.ActionsGroup label={t('Cartridges')}>
             {records.cartridges.map((c) => (
               <Spotlight.Action
                 key={c.id}
@@ -220,14 +222,20 @@ export function WorkbenchSearch({
             {records.bullets.map((b) => (
               <Spotlight.Action
                 key={b.id}
-                label={b.origin ? `${b.name} (your design)` : describeBullet(b as BulletSummary)}
+                label={
+                  b.origin
+                    ? t('{name} (your design)', { name: b.name })
+                    : describeBullet(b as BulletSummary)
+                }
                 onClick={() => onBullet(b)}
               />
             ))}
           </Spotlight.ActionsGroup>
         )}
         {records && records.powders.length > 0 && (
-          <Spotlight.ActionsGroup label="Powders, by manufacturer and name (order by load tables)">
+          <Spotlight.ActionsGroup
+            label={t('Powders, by manufacturer and name (order by load tables)')}
+          >
             {records.powders.map((p) => (
               <Spotlight.Action
                 key={p.id}
@@ -237,8 +245,12 @@ export function WorkbenchSearch({
             ))}
           </Spotlight.ActionsGroup>
         )}
-        {found === 'error' && <Spotlight.Empty>The database is unreachable.</Spotlight.Empty>}
-        {found !== 'error' && none && text && <Spotlight.Empty>Nothing found</Spotlight.Empty>}
+        {found === 'error' && (
+          <Spotlight.Empty>{t('The database is unreachable.')}</Spotlight.Empty>
+        )}
+        {found !== 'error' && none && text && (
+          <Spotlight.Empty>{t('Nothing found')}</Spotlight.Empty>
+        )}
       </Spotlight.ActionsList>
     </Spotlight.Root>
   )

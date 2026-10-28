@@ -9,13 +9,16 @@ import {
 } from '@open-reloading/core'
 import type { TargetFace } from '@open-reloading/schema'
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
+import { msg } from '../i18n/translate.ts'
+import { translateMessage } from '../lib/core-messages.ts'
 import { errorText } from '../lib/error-text.ts'
 import { type FaceSummary, fetchFace, fetchFaceSummaries } from '../lib/face-records.ts'
 import { type FieldSpec, type Fields, fieldError, initialFields } from '../lib/field-spec.ts'
 import { faceZones, impactSensitivity } from '../lib/hit-probability.ts'
 import { nth } from '../lib/nth.ts'
-import { formatQuantity, type UnitSystem } from '../lib/units.ts'
+import { formatQuantity, type UnitSystem, withUnit } from '../lib/units.ts'
 import { NumberField } from './number-field.tsx'
 import { PanelTable } from './scroll-region.tsx'
 import { useFieldUnits } from './units-settings.tsx'
@@ -24,8 +27,8 @@ const fieldSpecs = (hole: number) =>
   [
     {
       key: 'group',
-      label: 'Group standard deviation per axis',
-      help: 'Of the group you measured, at the reference distance.',
+      label: msg('Group standard deviation per axis'),
+      help: msg('Of the group you measured, at the reference distance.'),
       quantity: 'length',
       required: true,
       positive: true,
@@ -33,7 +36,7 @@ const fieldSpecs = (hole: number) =>
     },
     {
       key: 'reference',
-      label: 'Reference distance',
+      label: msg('Reference distance'),
       quantity: 'range',
       required: true,
       positive: true,
@@ -41,7 +44,7 @@ const fieldSpecs = (hole: number) =>
     },
     {
       key: 'windSd',
-      label: 'Wind speed uncertainty',
+      label: msg('Wind speed uncertainty'),
       quantity: 'windSpeed',
       required: true,
       min: 0,
@@ -49,7 +52,7 @@ const fieldSpecs = (hole: number) =>
     },
     {
       key: 'windDirectionSd',
-      label: 'Wind direction uncertainty',
+      label: msg('Wind direction uncertainty'),
       quantity: 'angle',
       required: true,
       min: 0,
@@ -57,7 +60,7 @@ const fieldSpecs = (hole: number) =>
     },
     {
       key: 'rangeSd',
-      label: 'Range uncertainty',
+      label: msg('Range uncertainty'),
       quantity: 'range',
       required: true,
       min: 0,
@@ -65,8 +68,8 @@ const fieldSpecs = (hole: number) =>
     },
     {
       key: 'hole',
-      label: 'Scored hole diameter',
-      help: 'The bullet diameter by default: a shot scores a ring its edge touches.',
+      label: msg('Scored hole diameter'),
+      help: msg('The bullet diameter by default: a shot scores a ring its edge touches.'),
       quantity: 'length',
       required: true,
       min: 0,
@@ -99,6 +102,7 @@ export function HitProbability({
   bulletDiameter: number
   system: UnitSystem
 }) {
+  const { t } = useTranslation()
   const specs = useMemo(() => fieldSpecs(bulletDiameter), [bulletDiameter])
   const [fields, setFields] = useState<Fields>(() => initialFields(specs, system))
   useFieldUnits(specs, system, (update) => setFields((f) => update(f)))
@@ -130,7 +134,9 @@ export function HitProbability({
     }
   }, [faceId])
 
-  const errors = Object.fromEntries(specs.map((s) => [s.key, fieldError(s, fields[s.key], system)]))
+  const errors = Object.fromEntries(
+    specs.map((s) => [s.key, fieldError(s, fields[s.key], system, t)]),
+  )
   const v = (key: string) => fields[key]?.si
   const point = points[at]
   const sensitivity = point && impactSensitivity(points, windPerUnit, at)
@@ -168,25 +174,24 @@ export function HitProbability({
   if (candidates.length < 2) return null
   return (
     <section className="hit-probability" aria-labelledby="hit-probability-title">
-      <h3 id="hit-probability-title">Hit probability</h3>
+      <h3 id="hit-probability-title">{t('Hit probability')}</h3>
       <p className="note">
-        A simulation of a dispersion model, not a prediction of a shooter's score. It assumes your
-        group is typical of the shots to come, that dispersion grows linearly with distance, that
-        the zero is right, and that wind and range errors are independent and small enough for a
-        first-order estimate. Hold and aim errors beyond the group are not included.
+        {t(
+          "A simulation of a dispersion model, not a prediction of a shooter's score. It assumes your group is typical of the shots to come, that dispersion grows linearly with distance, that the zero is right, and that wind and range errors are independent and small enough for a first-order estimate. Hold and aim errors beyond the group are not included.",
+        )}
       </p>
       <div className="hit-probability-fields">
         <NativeSelect
-          label="Target face"
+          label={t('Target face')}
           value={faceId}
           data={[
-            { value: '', label: 'Choose a face' },
+            { value: '', label: t('Choose a face') },
             ...faces.map((f) => ({ value: f.id, label: `${f.name} (${f.organization})` })),
           ]}
           onChange={(e) => setFaceId(e.currentTarget.value)}
         />
         <NativeSelect
-          label={`Distance (${system.range.symbol})`}
+          label={t('Distance ({unit})', { unit: system.range.symbol })}
           value={String(at)}
           data={candidates.map(({ p, i }) => ({
             value: String(i),
@@ -205,30 +210,34 @@ export function HitProbability({
           />
         ))}
       </div>
-      {load.status === 'error' && <p role="alert">The face could not be read: {load.message}</p>}
-      {failure && <p role="alert">{failure}</p>}
+      {load.status === 'error' && (
+        <p role="alert">
+          {t('The face could not be read: {reason}', { reason: translateMessage(load.message, t) })}
+        </p>
+      )}
+      {failure && <p role="alert">{translateMessage(failure, t)}</p>}
       {outcome && point && (
         <>
           <dl className="readouts">
             <div>
-              <dt>Probability of a hit</dt>
+              <dt>{t('Probability of a hit')}</dt>
               <dd>{percent(outcome.result.hit)}</dd>
             </div>
             <div>
-              <dt>Expected score</dt>
+              <dt>{t('Expected score')}</dt>
               <dd>{formatNumber(outcome.result.expectedScore, 2)}</dd>
             </div>
             <div>
-              <dt>Spread at the target, horizontal and vertical</dt>
+              <dt>{t('Spread at the target, horizontal and vertical')}</dt>
               <dd>
                 {length(outcome.sx)}, {length(outcome.sy)}
               </dd>
             </div>
           </dl>
           <PanelTable
-            label="Probability per scoring zone"
-            caption="Probability that a shot scores each value (simulation)"
-            columns={['Value', 'Probability']}
+            label={t('Probability per scoring zone')}
+            caption={t('Probability that a shot scores each value (simulation)')}
+            columns={[t('Value'), t('Probability')]}
             numeric
           >
             {outcome.result.zones.map((z) => (
@@ -239,18 +248,24 @@ export function HitProbability({
             ))}
           </PanelTable>
           <p className="note">
-            Inputs: group {length(v('group') as number)} per axis at{' '}
-            {formatQuantity('range', system, v('reference') as number)} {system.range.symbol},
-            target at {formatQuantity('range', system, point.range)} {system.range.symbol}, wind{' '}
-            {formatQuantity('windSpeed', system, wind.speed)} {system.windSpeed.symbol} from{' '}
-            {formatQuantity('angle', system, wind.from)} {system.angle.symbol}. The wind adds{' '}
-            {length(outcome.wind)} and the range {length(outcome.range)} to one standard deviation.
+            {t(
+              'Inputs: group {group} per axis at {reference}, target at {target}, wind {speed} from {from}. The wind adds {wind} and the range {range} to one standard deviation.',
+              {
+                group: length(v('group') as number),
+                reference: withUnit('range', system, v('reference') as number),
+                target: withUnit('range', system, point.range),
+                speed: withUnit('windSpeed', system, wind.speed),
+                from: withUnit('angle', system, wind.from),
+                wind: length(outcome.wind),
+                range: length(outcome.range),
+              },
+            )}
           </p>
         </>
       )}
       {!outcome && load.status !== 'error' && !failure && (
         <p className="note">
-          {faceId ? 'Fill every field for a result.' : 'Choose a target face for a result.'}
+          {faceId ? t('Fill every field for a result.') : t('Choose a target face for a result.')}
         </p>
       )}
     </section>

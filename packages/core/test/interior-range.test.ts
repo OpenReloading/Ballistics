@@ -7,6 +7,7 @@ import {
   interiorPressureRange,
   type PressureInput,
   type PressureTolerances,
+  placeMaximum,
   pressureToleranceDefaults,
   toleranceRange,
 } from '../src/index.ts'
@@ -146,6 +147,13 @@ describe('interiorPressureRange', () => {
     return r.valid ? r.peakBreechPressure : Number.NaN
   }
 
+  it('places a maximum against the range of the interior model', () => {
+    const range = interiorPressureRange(m3Load, peak(m3Load))
+    expect(placeMaximum(range, range.lowPressure * 0.9).class).toBe('modelDiscrepancy')
+    expect(placeMaximum(range, range.nominalPressure).class).toBe('inputPlausible')
+    expect(placeMaximum(range, range.highPressure * 1.1).class).toBe('aboveRange')
+  })
+
   it('lists zero-contribution inputs at the nominal value', () => {
     const p0 = peak(m3Load)
     const r = interiorPressureRange(m3Load, p0)
@@ -239,5 +247,54 @@ describe('interiorPressureRange', () => {
     const down = nth(moved, 1)
     expect(up.maxPressure).toBeGreaterThan(p0)
     expect(down.maxPressure).toBeLessThan(p0)
+  })
+})
+
+describe('placeMaximum', () => {
+  const p0 = closed(toy)
+  const r = toleranceRange(toy, p0, toyApply, closed, toyTolerances)
+
+  it('classifies a maximum below, at, inside and above the range', () => {
+    expect(placeMaximum(r, r.lowPressure * 0.99).class).toBe('modelDiscrepancy')
+    expect(placeMaximum(r, r.lowPressure).class).toBe('inputPlausible')
+    expect(placeMaximum(r, p0).class).toBe('inputPlausible')
+    expect(placeMaximum(r, r.highPressure).class).toBe('inputPlausible')
+    expect(placeMaximum(r, r.highPressure * 1.01).class).toBe('aboveRange')
+  })
+
+  it('names the input whose two ends differ most', () => {
+    // burn rate 5 % moves the pressure by 5 %, charge 1 % by 2 %, volume 2 % by about 2 %
+    expect(placeMaximum(r, p0).dominantInput).toBe('burnRateFraction')
+  })
+
+  it('counts an end that could not be computed as the nominal pressure', () => {
+    const failed = {
+      ...r,
+      cases: r.cases.map((c) =>
+        c.input === 'burnRateFraction' && c.side === 1
+          ? { input: c.input, side: c.side, maxPressure: null, reason: 'x' }
+          : c,
+      ),
+    }
+    // the burn rate spread is now half of its size; volume or charge is wider or the same
+    const spread = (input: string) =>
+      Math.abs(
+        (failed.cases.find((c) => c.input === input && c.side === 1)?.maxPressure ?? p0) -
+          (failed.cases.find((c) => c.input === input && c.side === -1)?.maxPressure ?? p0),
+      )
+    const expected = (['chargeFraction', 'volumeFraction', 'burnRateFraction'] as const).reduce(
+      (a, b) => (spread(b) > spread(a) ? b : a),
+    )
+    expect(placeMaximum(failed, p0).dominantInput).toBe(expected)
+  })
+
+  it('has no dominant input when no input moves the pressure', () => {
+    const none = toleranceRange(toy, p0, toyApply, closed, {
+      ...toyTolerances,
+      chargeFraction: 0,
+      volumeFraction: 0,
+      burnRateFraction: 0,
+    })
+    expect(placeMaximum(none, p0)).toEqual({ class: 'inputPlausible', dominantInput: null })
   })
 })

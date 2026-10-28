@@ -170,6 +170,50 @@ export function toleranceRange<L>(
   }
 }
 
+/** Where a user-entered maximum pressure lies against a {@link PressureRange}. */
+export type MaximumClass =
+  /** Inside [low, high] of the range, ends included. */
+  | 'inputPlausible'
+  /** Below the low end of the range. */
+  | 'modelDiscrepancy'
+  /** Above the high end of the range. */
+  | 'aboveRange'
+
+/** The class of a maximum and the input that dominates the spread of the range. */
+export interface MaximumPlacement {
+  /** Where the maximum lies. */
+  class: MaximumClass
+  /** The single input whose two ends differ most in peak pressure; null when no input moves the pressure. */
+  dominantInput: PressureInput | null
+}
+
+/**
+ * Places `maximum` (Pa) against `range` with no new run: below `lowPressure` is `modelDiscrepancy`,
+ * above `highPressure` is `aboveRange`, else `inputPlausible`. The dominant input is read from the
+ * range's single-input cases, an end that could not be computed counted as the nominal pressure.
+ */
+export function placeMaximum(range: PressureRange, maximum: number): MaximumPlacement {
+  const end = (input: PressureInput, side: 1 | -1) =>
+    range.cases.find((c) => c.input === input && c.side === side)?.maxPressure ??
+    range.nominalPressure
+  let dominantInput: PressureInput | null = null
+  let widest = 0
+  for (const input of pressureInputs) {
+    const spread = Math.abs(end(input, 1) - end(input, -1))
+    if (spread > widest) {
+      dominantInput = input
+      widest = spread
+    }
+  }
+  const cls: MaximumClass =
+    maximum < range.lowPressure
+      ? 'modelDiscrepancy'
+      : maximum > range.highPressure
+        ? 'aboveRange'
+        : 'inputPlausible'
+  return { class: cls, dominantInput }
+}
+
 const relative = (value: number, side: number, t: number) => value * (1 + side * t)
 /** How each input of an `InteriorLoad` moves, shared by the range and the sampled band. */
 export const interiorApply: Record<PressureInput, ApplyTolerance<InteriorLoad>> = {

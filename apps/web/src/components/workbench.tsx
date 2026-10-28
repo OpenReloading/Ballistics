@@ -15,7 +15,9 @@ import {
   useRef,
   useState,
 } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { formatNumber, plainNumber } from '../i18n/number.ts'
+import { english, type Translator } from '../i18n/translate.ts'
 import type { InteriorResponse } from '../lib/api-types.ts'
 import { summaryFitSource } from '../lib/bullet-fit.ts'
 import { classifyPowder, typedBurn } from '../lib/burn-rate.ts'
@@ -266,7 +268,7 @@ function ReportAfter({
     <>
       {steps.length > 1 && (
         <>
-          <h2>{ladderTitle(ok.ladder.kind)} ladder</h2>
+          <h2>{ladderTitle(ok.ladder.kind, english.t)} ladder</h2>
           {ladderTable}
           {lot.message && <p>Lot rows not computed: {lot.message}</p>}
           <LotChartBlock lot={lot} system={system} note={false} />
@@ -447,25 +449,29 @@ function identityOf(
   bulletLabel: string | undefined,
   system: UnitSystem,
   charge: (kg: number) => string,
+  t: Translator['t'],
 ) {
   return [
-    ok.identity.cartridge ?? 'No cartridge',
+    ok.identity.cartridge ?? t('No cartridge'),
     // a run sent before the record arrived names the record chosen since
-    ok.identity.bullet ?? bulletLabel ?? 'no bullet record',
+    ok.identity.bullet ?? bulletLabel ?? t('no bullet record'),
     withUnit('mass', system, ok.load.bullet.mass),
-    `${ok.identity.powder ?? 'powder parameters typed'} ${charge(ok.load.charge)}`,
+    t('{name} {amount}', {
+      name: ok.identity.powder ?? t('powder parameters typed'),
+      amount: charge(ok.load.charge),
+    }),
   ]
 }
 
 /** Where the shown run starts, peaks and leaves the barrel on the burnt-fraction axis. */
-function runMarksOf(ok: OkOutcome | undefined) {
+function runMarksOf(ok: OkOutcome | undefined, t: Translator['t']) {
   const r = ok?.body.result
   if (!r) return
   const at = sampler(r.points)
   return [
-    { z: at(r.shotStartTime).burntFraction, label: 'start' },
-    { z: at(r.maxPressureTime).burntFraction, label: 'peak' },
-    r.burnout ? { z: 1, label: 'burnout' } : { z: r.muzzleBurntFraction, label: 'muzzle' },
+    { z: at(r.shotStartTime).burntFraction, label: t('start') },
+    { z: at(r.maxPressureTime).burntFraction, label: t('peak') },
+    r.burnout ? { z: 1, label: t('burnout') } : { z: r.muzzleBurntFraction, label: t('muzzle') },
   ]
 }
 
@@ -522,10 +528,17 @@ function usePrintWhenReady({
   ])
 }
 
-/** The result's state for a bar: not run, stale or its time. */
-function resultStatus(ok: OkOutcome | undefined, stale: boolean, staleText: string, done: string) {
-  if (!ok) return 'Not run'
-  return stale ? staleText : `${done} ${ok.at}`
+/** The result's state for a bar: not run, stale or its time; the phone bar words it shorter. */
+function resultStatus(
+  ok: OkOutcome | undefined,
+  stale: boolean,
+  phone: boolean,
+  t: Translator['t'],
+) {
+  if (!ok) return t('Not run')
+  if (stale)
+    return phone ? t('Inputs changed, result is old') : t('Inputs changed since this result')
+  return phone ? t('Result {time}', { time: ok.at }) : t('Result of {time}', { time: ok.at })
 }
 
 /** Ctrl+Enter, or Enter in a field of the inputs, from any control of the bar and the workspace runs. */
@@ -541,11 +554,12 @@ function frameKeyDown(inputs: Load['inputs'], run: Load['run']) {
 }
 
 /** What the File menu could not load, as its note. */
-function fileNote(unresolved: string[], dropped: string[]) {
+function fileNote(unresolved: string[], dropped: string[], t: Translator['t']) {
   return (
     [
-      unresolved.length && `Not loaded, kept in the file: ${unresolved.join(', ')}.`,
-      dropped.length && `Not a record id, left out: ${dropped.join(', ')}.`,
+      unresolved.length &&
+        t('Not loaded, kept in the file: {list}.', { list: unresolved.join(', ') }),
+      dropped.length && t('Not a record id, left out: {list}.', { list: dropped.join(', ') }),
     ]
       .filter(Boolean)
       .join(' ') || undefined
@@ -554,27 +568,28 @@ function fileNote(unresolved: string[], dropped: string[]) {
 
 /** The page bar's Print menu: the report and the load sheets. */
 function PrintMenu({ ok, printReport }: { ok: OkOutcome | undefined; printReport: () => void }) {
+  const { t } = useTranslation()
   return (
     <Menu position="bottom-end">
       <Menu.Target>
         <Button
           variant="default"
           className="bar-icon"
-          title="Print"
+          title={t('Print')}
           leftSection={<Printer size={18} aria-hidden="true" />}
         >
-          Print
+          {t('Print')}
         </Button>
       </Menu.Target>
       <Menu.Dropdown>
         <Menu.Item disabled={!ok} onClick={printReport}>
-          Workbench report (also {shortcutLabel('print')})
+          {t('Workbench report (also {keys})', { keys: shortcutLabel('print') })}
         </Menu.Item>
         <Menu.Item disabled={!ok} onClick={() => printSheets(false)}>
-          Load sheet: one page
+          {t('Load sheet: one page')}
         </Menu.Item>
         <Menu.Item disabled={!ok} onClick={() => printSheets(true)}>
-          Load sheet and a page per charge
+          {t('Load sheet and a page per charge')}
         </Menu.Item>
       </Menu.Dropdown>
     </Menu>
@@ -597,12 +612,13 @@ function PhoneBar({
   run: Load['run']
   show: () => void
 }) {
+  const { t } = useTranslation()
   return (
     <>
       {/* the result's state, then the readouts that change with a run */}
       <span className="bar-state">
         <span className="bar-result" data-stale={stale || undefined}>
-          {resultStatus(ok, stale, 'Inputs changed, result is old', 'Result')}
+          {resultStatus(ok, stale, true, t)}
         </span>
         {ok && (
           <span className="bar-values">
@@ -612,7 +628,7 @@ function PhoneBar({
       </span>
       <Button
         className="bar-run-phone"
-        aria-label="Run simulation"
+        aria-label={t('Run simulation')}
         loading={pending}
         loaderProps={{ type: 'dots' }}
         leftSection={<Play size={14} weight="fill" aria-hidden="true" />}
@@ -620,13 +636,14 @@ function PhoneBar({
           if (run()) show()
         }}
       >
-        Run
+        {t('Run')}
       </Button>
     </>
   )
 }
 
 type CommandArgs = {
+  t: Translator['t']
   run: Load['run']
   fileMenu: Load['fileMenu']
   ok: boolean
@@ -643,28 +660,29 @@ type CommandArgs = {
 
 /** The page bar's actions as search commands, with the shortcuts that exist. */
 function searchCommands(a: CommandArgs) {
+  const { t } = a
   return [
-    { label: 'Run simulation', run: () => a.run(), keys: shortcutLabel('run') },
+    { label: t('Run simulation'), run: () => a.run(), keys: shortcutLabel('run') },
     {
-      label: shortcuts.save.action,
+      label: t(shortcuts.save.action),
       run: () => a.fileMenu.current?.save(),
       keys: shortcutLabel('save'),
     },
     {
-      label: shortcuts.open.action,
+      label: t(shortcuts.open.action),
       run: () => a.fileMenu.current?.openFile(),
       keys: shortcutLabel('open'),
     },
     ...(a.ok
-      ? [{ label: shortcuts.print.action, run: a.printReport, keys: shortcutLabel('print') }]
+      ? [{ label: t(shortcuts.print.action), run: a.printReport, keys: shortcutLabel('print') }]
       : []),
     // the Range tab exists below 48em only
-    ...(a.phone ? [{ label: 'Range tab', run: () => a.workspace.current?.showRange() }] : []),
-    { label: 'Charge for a target', run: a.openTarget },
-    { label: 'Saved loads', run: a.openList },
-    { label: 'Copy link', run: a.link.copy },
-    { label: 'Example load', run: a.asNewLoad(a.fillExample) },
-    { label: 'Reset load', run: a.asNewLoad(a.reset) },
+    ...(a.phone ? [{ label: t('Range tab'), run: () => a.workspace.current?.showRange() }] : []),
+    { label: t('Charge for a target'), run: a.openTarget },
+    { label: t('Saved loads'), run: a.openList },
+    { label: t('Copy link'), run: a.link.copy },
+    { label: t('Example load'), run: a.asNewLoad(a.fillExample) },
+    { label: t('Reset load'), run: a.asNewLoad(a.reset) },
   ]
 }
 
@@ -684,9 +702,14 @@ function bulletsLabelOf(
   bulletFit: Load['bulletFit'],
   system: UnitSystem,
   cartridgeName: string | undefined,
+  t: Translator['t'],
 ) {
-  if (bulletFit === undefined) return 'Bullets, all diameters'
-  return `Bullets over ${mmLength(system, bulletWindow(bulletFit).above)}, up to ${mmLength(system, bulletFit.g1)} (CIP of ${cartridgeName})`
+  if (bulletFit === undefined) return t('Bullets, all diameters')
+  return t('Bullets over {above}, up to {upTo} (CIP of {name})', {
+    above: mmLength(system, bulletWindow(bulletFit).above),
+    upTo: mmLength(system, bulletFit.g1),
+    name: cartridgeName ?? '',
+  })
 }
 
 /**
@@ -739,8 +762,6 @@ type PrintViewsProps = {
   load: Load
   ok: OkOutcome | undefined
   stale: boolean
-  warnings: ReturnType<typeof warningLines> | undefined
-  steps: ShownStep[]
   stepValue: (s: ShownStep) => string
   velocity: (r: InteriorResponse['result']) => string
   charge: (kg: number) => string
@@ -753,8 +774,6 @@ function PrintViews({
   load,
   ok,
   stale,
-  warnings,
-  steps,
   stepValue,
   velocity,
   charge,
@@ -762,6 +781,9 @@ function PrintViews({
   barrel,
 }: PrintViewsProps) {
   const { system, chartSlot, notes } = load
+  // the printed pages are English whatever the screen shows
+  const steps = useMemo(() => shownSteps(ok, english.t), [ok])
+  const warnings = useMemo(() => ok && warningLines(ok, system, english.t), [ok, system])
   const barrelError = barrel.errors && Object.values(barrel.errors).join(' ')
   /** The report's and the load sheets' title: cartridge, bullet and powder of the run. */
   const loadTitle = ok
@@ -839,6 +861,7 @@ function PrintViews({
  * the cards read it through `LoadContext`, the result side through `ResultContext`.
  */
 export function Workbench() {
+  const { t } = useTranslation()
   const load = useWorkbenchState()
   const names = useManufacturerNames()
   const tabs = useLoadTabs(load)
@@ -938,24 +961,24 @@ export function Workbench() {
 
   const ok = outcome?.kind === 'ok' ? outcome : undefined
   const stale = Boolean(ok && changed)
-  const warnings = useMemo(() => ok && warningLines(ok, system), [ok, system])
+  const warnings = useMemo(() => ok && warningLines(ok, system, t), [ok, system, t])
 
   const chargeText = ok
     ? withUnit('charge', system, ok.load.charge)
-    : (shown('charge', 'charge') ?? 'no charge')
+    : (shown('charge', 'charge') ?? t('no charge'))
   const charge = useCallback((kg: number) => withUnit('charge', system, kg), [system])
   /** What a ladder step varies, as the strip and the table show it: its seating, its temperature, else its charge. */
   const stepValue = useCallback((s: ShownStep) => stepValueOf(s, system), [system])
   /** The load of the shown result: cartridge, bullet, mass, powder with charge. */
   const identity = useMemo(
-    () => ok && identityOf(ok, bulletLabel, system, charge),
-    [ok, bulletLabel, system, charge],
+    () => ok && identityOf(ok, bulletLabel, system, charge, t),
+    [ok, bulletLabel, system, charge, t],
   )
   const velocity = useCallback(
     (r: InteriorResponse['result']) => withUnit('velocity', system, r.muzzleVelocity),
     [system],
   )
-  const steps = useMemo(() => shownSteps(ok), [ok])
+  const steps = useMemo(() => shownSteps(ok, t), [ok, t])
   const { barrel, lot, printReport } = useLongerRuns({
     ok,
     steps,
@@ -964,7 +987,7 @@ export function Workbench() {
     edits,
     setPrinting,
   })
-  const oneFlag = ok && stepFlag(ok)
+  const oneFlag = ok && stepFlag(ok, t)
 
   // the result side's values, each the same object while a keystroke leaves it unchanged
   /** The chart's burn law: the powder record's fit, else the typed model parameters. */
@@ -975,7 +998,7 @@ export function Workbench() {
     return typedBurn(Object.fromEntries(burnKeys.map((k, i) => [k, typed[i] ?? undefined])))
   }, [powder, names, typedKey])
   /** Where the shown run starts, peaks and leaves the barrel on the burnt-fraction axis. */
-  const runMarks = useMemo(() => runMarksOf(ok), [ok])
+  const runMarks = useMemo(() => runMarksOf(ok, t), [ok, t])
   const todoKey = JSON.stringify(todo)
   const shownTodo = useMemo(() => JSON.parse(todoKey) as typeof todo, [todoKey])
   const optic = useMemo(
@@ -1131,7 +1154,7 @@ export function Workbench() {
   const link = useCopyLink(linkQuery)
   useReportOptions([
     {
-      label: 'Include my current load',
+      label: t('Include my current load'),
       heading: 'Current load',
       text: () => `${window.location.origin}${window.location.pathname}#${linkQuery()}`,
     },
@@ -1153,10 +1176,10 @@ export function Workbench() {
   const examples = useMemo(() => {
     const run = (k: 'fillExample' | 'reset') => () => starts.current.asNewLoad(starts.current[k])()
     return [
-      { label: 'Example load', run: run('fillExample') },
-      { label: 'Reset load', run: run('reset') },
+      { label: t('Example load'), run: run('fillExample') },
+      { label: t('Reset load'), run: run('reset') },
     ]
-  }, [])
+  }, [t])
 
   return (
     <LoadContext value={load}>
@@ -1165,12 +1188,12 @@ export function Workbench() {
           {/* biome-ignore lint/a11y/noStaticElementInteractions: catches Ctrl+Enter from any control of the bar and the workspace */}
           <div className="page-frame" role="presentation" onKeyDown={frameKeyDown(inputs, run)}>
             <PageBar
-              title="Load workbench"
+              title={t('Load workbench')}
               compact
               // line 1 the shown result, line 2 the File menu's state (portalled after it)
               status={
                 <span className="bar-result" data-stale={stale || undefined}>
-                  {resultStatus(ok, stale, 'Inputs changed since this result', 'Result of')}
+                  {resultStatus(ok, stale, false, t)}
                 </span>
               }
               after={
@@ -1195,15 +1218,15 @@ export function Workbench() {
                   {/* the page's main action beside the loads; below 75em the form's Run bar holds it */}
                   <Button
                     className="bar-run"
-                    aria-label="Run simulation"
+                    aria-label={t('Run simulation')}
                     aria-keyshortcuts={shortcutAriaKeys('run')}
                     loading={pending}
                     loaderProps={{ type: 'dots' }}
                     leftSection={<Play size={14} weight="fill" aria-hidden="true" />}
-                    title={`Run simulation (${shortcutLabel('run')})`}
+                    title={t('Run simulation ({keys})', { keys: shortcutLabel('run') })}
                     onClick={() => run()}
                   >
-                    Run
+                    {t('Run')}
                   </Button>
                 </>
               }
@@ -1217,9 +1240,11 @@ export function Workbench() {
                       leftSection={<MagnifyingGlass size={18} aria-hidden="true" />}
                       onClick={() => spotlight.open()}
                       aria-keyshortcuts={shortcutAriaKeys('search')}
-                      title={framed ? `Search (${shortcutLabel('search')})` : undefined}
+                      title={
+                        framed ? t('Search ({keys})', { keys: shortcutLabel('search') }) : undefined
+                      }
                     >
-                      Search
+                      {t('Search')}
                     </Button>
                   }
                   file={
@@ -1237,7 +1262,7 @@ export function Workbench() {
                       onUnsaved={tabs.setUnsaved}
                       onList={openList}
                       examples={examples}
-                      note={fileNote(unresolved, dropped)}
+                      note={fileNote(unresolved, dropped, t)}
                     />
                   }
                   after={
@@ -1247,8 +1272,6 @@ export function Workbench() {
                         load={load}
                         ok={ok}
                         stale={stale}
-                        warnings={warnings}
-                        steps={steps}
                         stepValue={stepValue}
                         velocity={velocity}
                         charge={charge}
@@ -1263,7 +1286,7 @@ export function Workbench() {
             <Workspace
               ref={workspace}
               className="workbench"
-              inputsLabel="Load"
+              inputsLabel={t('Load')}
               inputs={fresh ? <StartCard onAct={markStartCardUsed} /> : <InputCards />}
               results={<ResultsArea />}
               range={<RangeView />}
@@ -1305,6 +1328,7 @@ export function Workbench() {
               onRun={() => run()}
               // the page bar's actions with the shortcuts that exist
               commands={searchCommands({
+                t,
                 run,
                 fileMenu,
                 ok: ok !== undefined,
@@ -1330,7 +1354,7 @@ export function Workbench() {
               describeBullet={describeBullet}
               designs={designRows}
               bulletFit={bulletFit}
-              bulletsLabel={bulletsLabelOf(bulletFit, system, cartridge?.name)}
+              bulletsLabel={bulletsLabelOf(bulletFit, system, cartridge?.name, t)}
             />
           </div>
         </InputEcho>

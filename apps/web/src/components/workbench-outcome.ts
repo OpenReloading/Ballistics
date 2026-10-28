@@ -1,6 +1,7 @@
 import { loadRatio } from '@open-reloading/core'
 import { fromSi } from '@open-reloading/schema'
 import { formatNumber } from '../i18n/number.ts'
+import { msg, type Translator } from '../i18n/translate.ts'
 import type { ErrorBody, InteriorLadderResponse, InteriorResponse } from '../lib/api-types.ts'
 import type { InteriorBody } from '../lib/interior-input.ts'
 import { nth } from '../lib/nth.ts'
@@ -118,17 +119,20 @@ export type Outcome =
 
 /** The note of a run whose chamber volume is not a measured capacity: what is estimated and what to enter. */
 export const volumeNote = {
-  title: 'Chamber volume not measured',
-  text: 'The volume comes from a record or a typed value, and the peak pressure and muzzle velocity follow it. Enter a measured case capacity in the Cartridge card and empty the volume field to follow it.',
+  title: msg('Chamber volume not measured'),
+  text: msg(
+    'The volume comes from a record or a typed value, and the peak pressure and muzzle velocity follow it. Enter a measured case capacity in the Cartridge card and empty the volume field to follow it.',
+  ),
 }
 
 /** The note as one sentence pair for the prints, none when the run's volume is measured. */
 export const volumeNoteText = (ok: { volumeMeasured: boolean } | undefined) =>
   ok && !ok.volumeMeasured ? `${volumeNote.title}: ${volumeNote.text}` : undefined
 
-export const notReached = 'The API is unreachable.'
-export const needsNetwork =
-  'Simulations run in this browser. Offline use requires the needed records to be cached.'
+export const notReached = msg('The API is unreachable.')
+export const needsNetwork = msg(
+  'Simulations run in this browser. Offline use requires the needed records to be cached.',
+)
 
 /**
  * The barrel strip's figure at the shown step: a seating ladder's step seats the bullet at its own
@@ -156,18 +160,24 @@ type Shown = Pick<
 >
 
 /** A result's derived values. */
-export function derived(ok: Shown) {
+export function derived(ok: Shown, t: Translator['t']) {
   const r = ok.body.result
   const { charge, chamber, propellant } = ok.load
   const ratio = loadRatio(charge, ok.bulkDensity, chamber.volume)
-  const fill = solidFillWarning(charge, propellant.density, ok.bulkDensity, chamber.volume)
+  const fill = solidFillWarning(charge, propellant.density, ok.bulkDensity, chamber.volume, t)
   /** The warnings the page adds to the API's, with their short names. */
   const own = [
     ...(ok.resistanceMissing
       ? [
           {
-            text: `Simulation: the parameters of ${ok.resistanceMissing.powder} were fitted with a bore-resistance law this run cannot apply (missing: ${ok.resistanceMissing.missing.join(', ')}); the results are biased.`,
-            name: 'bore resistance not applied',
+            text: t(
+              'Simulation: the parameters of {name} were fitted with a bore-resistance law this run cannot apply (missing: {missing}); the results are biased.',
+              {
+                name: ok.resistanceMissing.powder,
+                missing: ok.resistanceMissing.missing.join(', '),
+              },
+            ),
+            name: t('bore resistance not applied'),
           },
         ]
       : []),
@@ -184,44 +194,66 @@ export function derived(ok: Shown) {
 }
 
 /** The warnings of the shown step as the page shows them: in its pressure unit, with short names. */
-export function warningLines(ok: Extract<Outcome, { kind: 'ok' }>, system: UnitSystem) {
-  return [...shownWarnings(ok.body, system), ...derived(ok).own]
+export function warningLines(
+  ok: Extract<Outcome, { kind: 'ok' }>,
+  system: UnitSystem,
+  t: Translator['t'],
+) {
+  return [...shownWarnings(ok.body, system, t), ...derived(ok, t).own]
 }
 
 /** The summary line of the warnings: their count, the step of a ladder and their names. */
 export function warningsLine(
   ok: Extract<Outcome, { kind: 'ok' }>,
   lines: { name?: string | undefined }[],
+  t: Translator['t'],
+  tn: Translator['tn'],
 ) {
-  const names = lines.flatMap((l) => (l.name ? [l.name] : []))
-  const step = ok.steps.length > 1 ? ` for step ${selectedLabel(ok)}` : ''
-  return `${warningCountText(lines.length)}${step}${names.length > 0 ? `: ${names.join(', ')}` : ''}`
+  const names = lines.flatMap((l) => (l.name ? [l.name] : [])).join(', ')
+  const count = warningCountText(lines.length, tn)
+  if (ok.steps.length > 1) {
+    const step = selectedLabel(ok)
+    return names
+      ? t('{count} for step {step}: {names}', { count, step, names })
+      : t('{count} for step {step}', { count, step })
+  }
+  return names ? t('{count}: {names}', { count, names }) : count
 }
 
 /**
  * The shown step's peak, percent of its limit and muzzle velocity, as the status says them after a
  * run and a step change.
  */
-export function resultLine(ok: Extract<Outcome, { kind: 'ok' }>, system: UnitSystem) {
+export function resultLine(
+  ok: Extract<Outcome, { kind: 'ok' }>,
+  system: UnitSystem,
+  t: Translator['t'],
+) {
   const p = (pa: number) => withUnit('pressure', system, pa)
-  const { ofMax } = derived(ok)
+  const { ofMax } = derived(ok, t)
+  const single = ok.steps.length < 2
+  const pressure = p(ok.body.pressureRange.nominalPressure)
   const values = [
-    `peak ${p(ok.body.pressureRange.nominalPressure)}`,
+    single ? t('Peak {pressure}', { pressure }) : t('peak {pressure}', { pressure }),
     ...(ofMax?.limit.pressure
       ? [
-          `${formatNumber(ofMax.percent, 0)} % of CIP ${ofMax.limit.symbol} ${p(ofMax.limit.pressure)}`,
+          t('{percent} % of CIP {symbol} {limit}', {
+            percent: formatNumber(ofMax.percent, 0),
+            symbol: ofMax.limit.symbol,
+            limit: p(ofMax.limit.pressure),
+          }),
         ]
       : []),
     withUnit('velocity', system, ok.body.result.muzzleVelocity),
   ].join(', ')
-  if (ok.steps.length < 2) return `${values.replace(/^p/, 'P')}.`
+  if (single) return `${values}.`
   const { seating, temperature } = ok.steps[ok.selected] ?? {}
   const at = seating
     ? withUnit('length', system, seating.value)
     : temperature !== undefined
       ? withUnit('temperature', system, temperature)
       : withUnit('charge', system, ok.load.charge)
-  return `Step ${selectedLabel(ok)}, ${at}: ${values}.`
+  return t('Step {step}, {at}: {values}.', { step: selectedLabel(ok), at, values })
 }
 
 /** The shown step's label relative to the main charge. */
@@ -232,16 +264,17 @@ export const selectedLabel = (ok: Extract<Outcome, { kind: 'ok' }>) =>
 const modelCodes = ['rangeIncomplete', 'chargeTooSmall']
 
 /** The flag of a step, worded as a simulation result. */
-export function stepFlag(ok: Shown) {
+export function stepFlag(ok: Shown, t: Translator['t']) {
   const { limits, warnings } = ok.body
   // exceeded: the upper end of the pressure range; nominalExceeded: the peak itself. The flag names
   // its maximum
   const name = (l: NonNullable<typeof limits>[number]) => `CIP ${l.symbol}`
   const peak = limits?.find((l) => l.nominalExceeded)
-  if (peak) return `above ${name(peak)}`
+  if (peak) return t('above {name}', { name: name(peak) })
   const range = limits?.find((l) => l.exceeded)
-  if (range) return `range above ${name(range)}`
-  if (warnings.some((w) => modelCodes.includes(w.code)) || derived(ok).fill) return 'model flag'
+  if (range) return t('range above {name}', { name: name(range) })
+  if (warnings.some((w) => modelCodes.includes(w.code)) || derived(ok, t).fill)
+    return t('model flag')
   return
 }
 
@@ -263,20 +296,31 @@ export function stepsOf(json: InteriorResponse | InteriorLadderResponse, charge:
 }
 
 /** The load ratio as case fill, the reloader's word: percent of the free volume. */
-export function loadRatioText(ok: Extract<Outcome, { kind: 'ok' }> | undefined, ratio?: number) {
+export function loadRatioText(
+  ok: Extract<Outcome, { kind: 'ok' }> | undefined,
+  ratio: number | undefined,
+  t: Translator['t'],
+) {
   if (ratio !== undefined) return `${formatNumber(ratio * 100, 0)} %`
-  if (!ok?.powderChosen) return 'needs a powder record'
-  if (!ok.bulkDensity) return 'needs bulk density'
-  return 'needs a chamber volume'
+  if (!ok?.powderChosen) return t('needs a powder record')
+  if (!ok.bulkDensity) return t('needs bulk density')
+  return t('needs a chamber volume')
 }
 
 /** Each step as the readouts show it, with its flag. */
-export function shownSteps(ok: Extract<Outcome, { kind: 'ok' }> | undefined) {
+export function shownSteps(ok: Extract<Outcome, { kind: 'ok' }> | undefined, t: Translator['t']) {
   return (ok?.steps ?? []).map((s, i) => {
     const at = ok && s.body ? atStep(ok, i) : undefined
     // `n` keeps the order the selection uses; `label` is what the page shows
     const label = stepLabel(i, ok?.steps.length ?? 1, ok?.direction ?? 'up')
-    return { ...s, n: i + 1, label, at, d: at && derived(at), flag: at ? stepFlag(at) : undefined }
+    return {
+      ...s,
+      n: i + 1,
+      label,
+      at,
+      d: at && derived(at, t),
+      flag: at ? stepFlag(at, t) : undefined,
+    }
   })
 }
 export type ShownStep = ReturnType<typeof shownSteps>[number]

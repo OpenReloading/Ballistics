@@ -1,6 +1,7 @@
 import { getHotkeyHandler } from '@mantine/hooks'
+import { type Message, msg } from '../i18n/translate.ts'
 
-type Shortcut = { action: string; keys: readonly string[]; fields?: boolean }
+type Shortcut = { action: Message; keys: readonly string[]; fields?: boolean }
 
 /**
  * The app's keyboard shortcuts: handlers, hints, the search's
@@ -9,17 +10,17 @@ type Shortcut = { action: string; keys: readonly string[]; fields?: boolean }
  * layout (so its shift state is not checked). `fields`: also fires while typing in a field.
  */
 const table = {
-  search: { action: 'Search', keys: ['mod+K'], fields: true },
-  help: { action: 'Keyboard shortcuts', keys: ['?'] },
-  focusSearch: { action: 'Search the list', keys: ['/'] },
-  run: { action: 'Run simulation', keys: ['mod+Enter'], fields: true },
-  save: { action: 'Save', keys: ['mod+S'], fields: true },
-  saveAs: { action: 'Save as', keys: ['mod+shift+S'], fields: true },
-  open: { action: 'Open file', keys: ['mod+O'], fields: true },
+  search: { action: msg('Search'), keys: ['mod+K'], fields: true },
+  help: { action: msg('Keyboard shortcuts'), keys: ['?'] },
+  focusSearch: { action: msg('Search the list'), keys: ['/'] },
+  run: { action: msg('Run simulation'), keys: ['mod+Enter'], fields: true },
+  save: { action: msg('Save'), keys: ['mod+S'], fields: true },
+  saveAs: { action: msg('Save as'), keys: ['mod+shift+S'], fields: true },
+  open: { action: msg('Open file'), keys: ['mod+O'], fields: true },
   // Cmd+Y opens the history on macOS: Ctrl only
-  undo: { action: 'Undo', keys: ['mod+Z'] },
-  redo: { action: 'Redo', keys: ['mod+shift+Z', 'ctrl+Y'] },
-  print: { action: 'Print', keys: ['mod+P'], fields: true },
+  undo: { action: msg('Undo'), keys: ['mod+Z'] },
+  redo: { action: msg('Redo'), keys: ['mod+shift+Z', 'ctrl+Y'] },
+  print: { action: msg('Print'), keys: ['mod+P'], fields: true },
 } satisfies Record<string, Shortcut>
 
 export type ShortcutId = keyof typeof table

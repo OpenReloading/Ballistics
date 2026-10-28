@@ -11,6 +11,7 @@ import {
   type TrajectoryPoint,
   trajectory,
 } from '@open-reloading/core'
+import { msg } from '../i18n/translate.ts'
 import type { FieldSpec } from './field-spec.ts'
 import { nth } from './nth.ts'
 import { metersPerSecondPerMph } from './units.ts'
@@ -22,24 +23,30 @@ const chartPoints = 101
 const maxTableRows = 500
 
 export const shotFields = [
-  { key: 'muzzleVelocity', label: 'Muzzle velocity', quantity: 'velocity', required: true, min: 0 },
+  {
+    key: 'muzzleVelocity',
+    label: msg('Muzzle velocity'),
+    quantity: 'velocity',
+    required: true,
+    min: 0,
+  },
   {
     key: 'sightHeight',
-    label: 'Sight height above the bore',
+    label: msg('Sight height above the bore'),
     quantity: 'length',
     required: true,
     min: 0,
   },
   {
     key: 'twist',
-    label: 'Twist, length per turn (optional)',
-    help: 'Needed for spin drift, aerodynamic jump and stability.',
+    label: msg('Twist, length per turn (optional)'),
+    help: msg('Needed for spin drift, aerodynamic jump and stability.'),
     quantity: 'twist',
     min: 0,
   },
   {
     key: 'zeroRange',
-    label: 'Zero range',
+    label: msg('Zero range'),
     quantity: 'range',
     required: true,
     min: 0,
@@ -47,53 +54,59 @@ export const shotFields = [
   },
   {
     key: 'zeroTemperature',
-    label: 'Zero temperature',
-    help: 'Optional, the air of the zero: an empty field takes the shot value. The zero always takes the altitude of the shot.',
+    label: msg('Zero temperature'),
+    help: msg(
+      'Optional, the air of the zero: an empty field takes the shot value. The zero always takes the altitude of the shot.',
+    ),
     quantity: 'temperature',
   },
   {
     key: 'zeroPressure',
-    label: 'Zero pressure',
-    help: 'Optional. Absolute station pressure of the zero, not reduced to sea level; empty takes the shot value.',
+    label: msg('Zero pressure'),
+    help: msg(
+      'Optional. Absolute station pressure of the zero, not reduced to sea level; empty takes the shot value.',
+    ),
     quantity: 'airPressure',
     min: 0,
   },
   {
     key: 'zeroHumidity',
-    label: 'Zero humidity',
-    help: 'Optional. Empty takes the shot value.',
+    label: msg('Zero humidity'),
+    help: msg('Optional. Empty takes the shot value.'),
     quantity: 'percent',
     min: 0,
     max: 100,
   },
   {
     key: 'dragFactor',
-    label: 'Drag factor',
-    help: 'Optional. Multiplies the drag of the bullet: 100 % is the bullet as given, 103 % has 3 % more drag.',
+    label: msg('Drag factor'),
+    help: msg(
+      'Optional. Multiplies the drag of the bullet: 100 % is the bullet as given, 103 % has 3 % more drag.',
+    ),
     quantity: 'dragFactor',
     min: 0,
     positive: true,
   },
   {
     key: 'temperature',
-    label: 'Temperature',
+    label: msg('Temperature'),
     quantity: 'temperature',
     required: true,
     initial: icao.temperature,
   },
   {
     key: 'pressure',
-    label: 'Station pressure',
-    help: 'Absolute, not reduced to sea level.',
+    label: msg('Station pressure'),
+    help: msg('Absolute, not reduced to sea level.'),
     quantity: 'airPressure',
     required: true,
     min: 0,
     initial: icao.pressure,
   },
-  { key: 'altitude', label: 'Altitude', quantity: 'altitude', required: true, initial: 0 },
+  { key: 'altitude', label: msg('Altitude'), quantity: 'altitude', required: true, initial: 0 },
   {
     key: 'humidity',
-    label: 'Relative humidity',
+    label: msg('Relative humidity'),
     quantity: 'percent',
     required: true,
     min: 0,
@@ -102,7 +115,7 @@ export const shotFields = [
   },
   {
     key: 'windSpeed',
-    label: 'Wind speed',
+    label: msg('Wind speed'),
     quantity: 'windSpeed',
     required: true,
     min: 0,
@@ -110,8 +123,8 @@ export const shotFields = [
   },
   {
     key: 'windFrom',
-    label: 'Wind from',
-    help: 'Clockwise from the line of fire: 0 head wind, 90 from the right.',
+    label: msg('Wind from'),
+    help: msg('Clockwise from the line of fire: 0 head wind, 90 from the right.'),
     quantity: 'angle',
     required: true,
     min: 0,
@@ -120,7 +133,7 @@ export const shotFields = [
   },
   {
     key: 'maxRange',
-    label: 'Largest range',
+    label: msg('Largest range'),
     quantity: 'range',
     required: true,
     min: 0,
@@ -128,7 +141,7 @@ export const shotFields = [
   },
   {
     key: 'rangeStep',
-    label: 'Range step',
+    label: msg('Range step'),
     quantity: 'range',
     required: true,
     min: 1,
@@ -137,12 +150,12 @@ export const shotFields = [
 ] as const satisfies readonly FieldSpec[]
 
 export const manualBulletFields = [
-  { key: 'mass', label: 'Bullet mass', quantity: 'mass', required: true, min: 0 },
-  { key: 'diameter', label: 'Bullet diameter', quantity: 'length', required: true, min: 0 },
-  { key: 'length', label: 'Bullet length (optional)', quantity: 'length', min: 0 },
+  { key: 'mass', label: msg('Bullet mass'), quantity: 'mass', required: true, min: 0 },
+  { key: 'diameter', label: msg('Bullet diameter'), quantity: 'length', required: true, min: 0 },
+  { key: 'length', label: msg('Bullet length (optional)'), quantity: 'length', min: 0 },
   {
     key: 'ballisticCoefficient',
-    label: 'Ballistic coefficient',
+    label: msg('Ballistic coefficient'),
     quantity: 'ballisticCoefficient',
     required: true,
     min: 0,

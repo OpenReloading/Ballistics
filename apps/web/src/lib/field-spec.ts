@@ -1,6 +1,7 @@
 /** Form fields: specs, typed text and SI values, validation messages. */
 import { fromSi, type QuantityKind, toSi } from '@open-reloading/schema'
-import { ambiguousMessage, type NumberRange, parseNumber } from '../i18n/number.ts'
+import { ambiguousMessage, type NumberRange, parseNumber, untranslated } from '../i18n/number.ts'
+import type { Message, Translator } from '../i18n/translate.ts'
 import {
   exactFieldText,
   parseTwist,
@@ -130,34 +131,51 @@ export function siValues(fields: Fields): Record<string, number | undefined> {
 }
 
 /**
- * The validation message of a field, undefined when valid. `min` and `max` are inclusive bounds in
- * display units, as the HTML attributes. The message names the unit of `shown`, the units the field
- * shows (its own unit after an inline switch), not the Settings.
+ * The text of a spec's `label` or `help` in the language of `t`. A spec marks its texts as messages
+ * where it is defined, so the catalogue has them.
+ */
+export const specText = (t: Translator['t'], text: string) => t(text as Message)
+
+/**
+ * The validation message of a field in the language of `t` (English without one), undefined when
+ * valid. `min` and `max` are inclusive bounds in display units, as the HTML attributes. The message
+ * names the unit of `shown`, the units the field shows (its own unit after an inline switch), not
+ * the Settings.
  */
 export function fieldError(
   spec: FieldSpec,
   value: FieldValue | undefined,
   shown: UnitSystem,
+  t: Translator['t'] = untranslated(),
 ): string | undefined {
   const text = value?.text.trim() ?? ''
-  if (text === '') return spec.required ? `Enter a number for ${spec.label}.` : undefined
+  const label = specText(t, spec.label)
+  if (text === '') return spec.required ? t('Enter a number for {label}.', { label }) : undefined
   if (value?.si === undefined) {
-    if (spec.quantity === 'twist') return 'Enter a twist as 1:8 or 8.'
+    if (spec.quantity === 'twist') return t('Enter a twist as 1:8 or 8.')
     const p = parseNumber(text, rangeOf(spec))
-    return p.kind === 'ambiguous' ? ambiguousMessage(p) : `Enter a number for ${spec.label}.`
+    return p.kind === 'ambiguous'
+      ? ambiguousMessage(p, t)
+      : t('Enter a number for {label}.', { label })
   }
   const symbol = shown[spec.quantity].symbol
   const unit = symbol ? ` ${symbol}` : ''
   const x = spec.quantity === 'twist' ? (parseTwist(text) ?? Number.NaN) : Number(text)
-  return rangeError(spec, x, unit)
+  return rangeError(spec, label, x, unit, t)
 }
 
 /** The message of the first bound that the number `x` breaks, undefined when it holds them all. */
-function rangeError(spec: FieldSpec, x: number, unit: string): string | undefined {
+function rangeError(
+  spec: FieldSpec,
+  label: string,
+  x: number,
+  unit: string,
+  t: Translator['t'],
+): string | undefined {
   if (spec.min !== undefined && x < spec.min)
-    return `${spec.label} must be at least ${spec.min}${unit}.`
+    return t('{label} must be at least {min}{unit}.', { label, min: spec.min, unit })
   if (spec.max !== undefined && x > spec.max)
-    return `${spec.label} must be at most ${spec.max}${unit}.`
-  if (spec.positive && x <= 0) return `${spec.label} must be greater than 0${unit}.`
-  if (spec.integer && !Number.isInteger(x)) return `${spec.label} must be a whole number.`
+    return t('{label} must be at most {max}{unit}.', { label, max: spec.max, unit })
+  if (spec.positive && x <= 0) return t('{label} must be greater than 0{unit}.', { label, unit })
+  if (spec.integer && !Number.isInteger(x)) return t('{label} must be a whole number.', { label })
 }
