@@ -8,14 +8,9 @@ import {
 } from '@open-reloading/core'
 import { describe, expect, it } from 'vitest'
 import { nth } from '../src/lib/nth.ts'
-import {
-  answerPowderFit,
-  bandCharges,
-  type PowderFitReply,
-  type PowderFitRequest,
-  type PowderFitState,
-  powderFitRunner,
-} from '../src/lib/powder-fit.ts'
+import type { PowderFitReply, PowderFitRequest, PowderFitState } from '../src/lib/powder-fit.ts'
+import { powderFitRunner } from '../src/lib/powder-fit.ts'
+import { answerPowderFit, bandCharges } from '../src/lib/powder-fit-answer.ts'
 
 /** Synthetic rifle load of the core fit tests: truth vivacity 0.45 1/s. */
 const load = (vivacity = 0.45): InteriorLoad => ({
