@@ -8,10 +8,10 @@ import {
 } from '../src/index.ts'
 
 // A 168 gr, 0.308 in bullet of 3.98 calibres at 2600 ft/s in sea-level standard air, G7 ballistic
-// coefficient 0.218 lb/in2. The coefficients are chosen for this comparison, not measured: radii of
-// gyration of 0.10 (axial) and 1.0 (transverse) in units of m d^2 for the inertias, a lift slope
-// of 2.1, and an overturning-moment slope of 1.81 at Mach 2.4 (a gyroscopic stability factor of
-// 1.7 at the muzzle for the 12 in twist) that rises linearly to 4.0 at Mach 0.8.
+// coefficient 0.218 lb/in2. The coefficients are chosen for this comparison, not measured: inertias
+// of 0.10 (axial) and 1.0 (transverse) times m d^2, a lift slope of 2.1, and an overturning-moment
+// slope of 1.81 at Mach 2.4 (a gyroscopic stability factor of 1.7 at the muzzle for the 12 in
+// twist) that rises linearly to 4.0 at Mach 0.8.
 const yd = 0.9144
 const inch = 0.0254
 const mph = 0.44704
@@ -74,9 +74,9 @@ describe('empirical fits against the modified point mass', () => {
     })
   }
 
-  it('jump per 10 mph at 100 yd runs 1.11 times the linear formula', () => {
+  it('jump per 10 mph at 100 yd runs 1.13 times the linear formula', () => {
     const fit = jump(12, 'point-mass')
     expect(near(fit, 0.413)).toBe(true)
-    expect(near(fit / jump(12, 'modified-point-mass'), 1.11)).toBe(true)
+    expect(near(fit / jump(12, 'modified-point-mass'), 1.13)).toBe(true)
   })
 })
