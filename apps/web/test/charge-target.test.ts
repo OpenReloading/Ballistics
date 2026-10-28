@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import {
   chargeTargetBody,
   refusalText,
@@ -60,6 +61,7 @@ describe('refusalText', () => {
       'peakPressure',
       si,
       false,
+      english.t,
     )
     expect(text).toContain('does not reach this high a value')
     expect(text).toContain(
@@ -77,6 +79,7 @@ describe('refusalText', () => {
       'peakPressure',
       si,
       false,
+      english.t,
     )
     expect(text).toContain('lowest value is 200 bar at 4.00 g')
     expect(text).toContain('highest is 4000 bar at 2.00 g')
@@ -88,6 +91,7 @@ describe('refusalText', () => {
       'peakPressure',
       si,
       true,
+      english.t,
     )
     expect(text).toContain(
       'lowest value is 5.0 % of Pmax at 1.00 g and the highest is 100.0 % of Pmax at 4.00 g',
@@ -96,9 +100,11 @@ describe('refusalText', () => {
 
   it('words the other reasons and falls back to the message', () => {
     expect(
-      refusalText({ statusCode: 422, reason: 'notMonotone' }, 'barrelTime', si, false),
+      refusalText({ statusCode: 422, reason: 'notMonotone' }, 'barrelTime', si, false, english.t),
     ).toMatch(/more than one charge/)
-    expect(refusalText({ statusCode: 500, message: 'boom' }, 'barrelTime', si, false)).toBe('boom')
+    expect(
+      refusalText({ statusCode: 500, message: 'boom' }, 'barrelTime', si, false, english.t),
+    ).toBe('boom')
   })
 
   it('names the failing run of the load for noValidRun, not the target', () => {
@@ -111,13 +117,14 @@ describe('refusalText', () => {
       'peakPressure',
       si,
       false,
+      english.t,
     )
     expect(text).toBe(
       'The simulation gives no valid run for this load. Reason: input; field: ignitionPressure.',
     )
-    expect(refusalText({ statusCode: 422, reason: 'noValidRun' }, 'barrelTime', si, false)).toMatch(
-      /No charge in the range/,
-    )
+    expect(
+      refusalText({ statusCode: 422, reason: 'noValidRun' }, 'barrelTime', si, false, english.t),
+    ).toMatch(/No charge in the range/)
   })
 })
 

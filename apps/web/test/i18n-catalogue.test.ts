@@ -85,21 +85,51 @@ describe.each(catalogues)('catalogue %s', (code) => {
   })
 })
 
+/** English texts that contain a term's English word in another sense, each with the sense. */
+const otherSense: Record<string, string> = {
+  'Bullet position': 'where the bullet is in the barrel, not a shooting position',
+  'The band is the 5th to 95th percentile of {samples} draws (seed {seed}, {failed} left the model) of the inputs, normal around their nominal values with the tolerance as the 90 % half width. The limit check uses the corner-case range {low} to {high} {unit}.':
+    'corner case: an extreme combination of inputs',
+  'The band is the 5th to 95th percentile of {samples} draws (seed {seed}) of the inputs, normal around their nominal values with the tolerance as the 90 % half width. The limit check uses the corner-case range {low} to {high} {unit}.':
+    'corner case: an extreme combination of inputs',
+  'The sampled bands are {notice}: the corner-case range is shown.':
+    'corner case: an extreme combination of inputs',
+  '{failed} of {total} range cases could not be computed; the true range can be wider.':
+    'case: one computed combination of inputs',
+  '{n} of {m} range cases could not be computed ({list}); the range covers only the computed cases, and the true range can be wider.':
+    'case: one computed combination of inputs',
+  'Sampled bands {notice}: corner-case range shown.':
+    'corner case: an extreme combination of inputs',
+  'boatTailLength must be zero or more': 'zero: the number',
+  'meplatDiameter must be zero up to the diameter': 'zero: the number',
+  'A flat spot is a statistical observation of the strings fired: neighbouring charges whose slope of mean velocity has a {level} % band that includes zero. Few shots make wide bands. It is not a safety statement and not a charge to load.':
+    'zero: the number',
+}
+
 describe('German catalogue', () => {
   it('writes a verified term of the table as the table does, where its English word occurs', () => {
-    // a verified row whose English is one word or comma separated single words ('Case, brass')
+    // a verified row whose English is one word or comma separated single words ('Case, brass'); the
+    // English words and the German words of a row pair up by position when both lists are as long
     const words = terms.terms
       .filter((t) => t.status === 'verified' && t.german)
       .filter((t) => t.english.split(', ').every((w) => /^[A-Za-z]+$/.test(w)))
-      .flatMap((t) =>
-        t.english
-          .split(', ')
-          .map((w) => ({ english: new RegExp(`\\b${w}(e?s)?\\b`, 'i'), german: t.german ?? '' })),
-      )
+      .flatMap((t) => {
+        const english = t.english.split(', ')
+        const german = (t.german ?? '').split(', ')
+        return english.map((w, i) => ({
+          english: new RegExp(`\\b${w}(e?s)?\\b`, 'i'),
+          german: german.length === english.length ? (german[i] ?? '') : (t.german ?? ''),
+        }))
+      })
     for (const [key, entry] of Object.entries(de)) {
+      if (key in otherSense) continue
       const text = typeof entry === 'string' ? entry : Object.values(entry).join(' ')
       for (const w of words.filter((w) => w.english.test(key)))
         expect(fold(text), `${key}: ${w.german}`).toContain(fold(w.german))
     }
+  })
+
+  it('lists only texts that are in the English source', () => {
+    expect(Object.keys(otherSense).filter((k) => !source.includes(k))).toEqual([])
   })
 })

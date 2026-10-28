@@ -30,6 +30,8 @@ import {
 } from '@open-reloading/schema'
 import { type SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
+import { useTranslation } from '../i18n/language.ts'
+import { english, msg, type Translator } from '../i18n/translate.ts'
 import { apiFetch, fetchRecord } from '../lib/api-fetch.ts'
 import type {
   BulletSummary,
@@ -42,6 +44,7 @@ import { runBatch } from '../lib/batch.ts'
 import { fitOf } from '../lib/bullet-fit.ts'
 import { workbenchDesign } from '../lib/cartridge-designer.ts'
 import { type OwnCase, ownCases } from '../lib/case-group.ts'
+import { translateMessage } from '../lib/core-messages.ts'
 import { timeText } from '../lib/dates.ts'
 import { errorText } from '../lib/error-text.ts'
 import { loadExample } from '../lib/example-data.ts'
@@ -52,6 +55,7 @@ import {
   type FieldValue,
   fieldError,
   siValues,
+  specText,
 } from '../lib/field-spec.ts'
 import type { FigureView } from '../lib/figure-views.ts'
 import { gunValues, sightOptions, storedOf } from '../lib/firearm.ts'
@@ -195,6 +199,15 @@ const interiorSpec = (key: string) =>
 
 type Seating = LoadParts['seating']
 
+/** What the note of a bullet record cleared by a cartridge change names: record, cartridge, mm values. */
+type ClearedBullet = {
+  record: string
+  cartridge: string
+  diameter: number
+  above: number
+  g1: number
+}
+
 /** The seating of the seated bullet's values, none while no bullet is seated. */
 function seatingOf(seated: Seated): Seating {
   const value = seated.mode && seated[seated.mode]
@@ -262,10 +275,17 @@ function pendingLink<L extends { id: string }>(
 }
 
 /** Why a seating ladder cannot run: no seating, or a volume or travel typed over it. */
-function seatingBlockOf(seatAt: SeatingLengths | undefined, typedKeys: readonly PreviewKey[]) {
-  if (seatAt === undefined) return 'The seating ladder needs a cartridge and a bullet record.'
+function seatingBlockOf(
+  seatAt: SeatingLengths | undefined,
+  typedKeys: readonly PreviewKey[],
+  t: Translator['t'],
+) {
+  if (seatAt === undefined) return t('The seating ladder needs a cartridge and a bullet record.')
   if (typedKeys.length === 0) return
-  return `${typedKeys.map((k) => interiorFields.find((f) => f.key === k)?.label).join(' and ')} typed: empty the field to follow the seating.`
+  const [first = '', second] = typedKeys.map((k) => specText(t, interiorSpec(k).label))
+  return second === undefined
+    ? t('{label} typed: empty the field to follow the seating.', { label: first })
+    : t('{first} and {second} typed: empty the field to follow the seating.', { first, second })
 }
 
 function stepSpecOf(kind: RunnableLadderKind) {
@@ -339,13 +359,19 @@ function designCapacityOf(
   seated: Seated,
   designLoad: ReturnType<typeof workbenchDesign>,
   design: UserCartridgeView | undefined,
+  t: Translator['t'],
 ): Suggestion | undefined {
   if (seated.caseVolume !== undefined)
-    return { si: seated.caseVolume, source: 'your measured case capacity, without the bullet' }
+    return {
+      si: seated.caseVolume,
+      source: t('your measured case capacity, without the bullet'),
+    }
   if (designLoad?.caseVolume === undefined) return undefined
   return {
     si: designLoad.caseVolume,
-    source: `outline of the user design ${design?.name} less a wall, approximate, without the bullet`,
+    source: t('outline of the user design {name} less a wall, approximate, without the bullet', {
+      name: design?.name ?? '',
+    }),
   }
 }
 
@@ -360,14 +386,14 @@ type CartridgeSource = {
 }
 
 /** What the chosen cartridge, or its design, gives the defaults. */
-function cartridgeSource(a: CartridgeSource): DefaultSources['cartridge'] {
+function cartridgeSource(a: CartridgeSource, t: Translator['t']): DefaultSources['cartridge'] {
   const { cartridge, design, designLoad, seated } = a
   if (design)
     return {
       name: design.name,
       design: true,
       boreDiameter: designLoad?.boreDiameter,
-      capacity: designCapacityOf(seated, designLoad, design),
+      capacity: designCapacityOf(seated, designLoad, design, t),
     }
   if (!cartridge) return undefined
   return {
@@ -382,8 +408,8 @@ function cartridgeSource(a: CartridgeSource): DefaultSources['cartridge'] {
         : {
             si: seated.caseVolume,
             source: a.measuredCapacity
-              ? 'your measured case capacity, without the bullet'
-              : `case capacity record of ${cartridge.name}, without the bullet`,
+              ? t('your measured case capacity, without the bullet')
+              : t('case capacity record of {name}, without the bullet', { name: cartridge.name }),
           },
   }
 }
@@ -456,27 +482,30 @@ function todoOf(a: {
   bulletDesign: { name: string } | undefined
   powderLabel: string | undefined
   has: (keys: readonly string[]) => boolean
+  t: Translator['t']
 }) {
-  const { cartridge, cartridgeDesign, has } = a
+  const { cartridge, cartridgeDesign, has, t } = a
   return [
     {
-      label: 'Cartridge (optional)',
+      label: msg('Cartridge (optional)'),
       done: !!(cartridge || cartridgeDesign),
-      value: cartridge?.name ?? (cartridgeDesign && `${cartridgeDesign.name} (your design)`),
+      value:
+        cartridge?.name ??
+        (cartridgeDesign && t('{name} (your design)', { name: cartridgeDesign.name })),
     },
     {
-      label: 'Bullet',
+      label: msg('Bullet'),
       done: has(['bulletMass']),
       value: a.bulletLabel ?? a.bulletDesign?.name,
     },
     {
-      label: 'Powder or model parameters',
+      label: msg('Powder or model parameters'),
       done: has(requiredModelKeys),
       value: a.powderLabel,
     },
-    { label: 'Charge', done: has(['charge']) },
+    { label: msg('Charge'), done: has(['charge']) },
     {
-      label: 'Chamber volume, bullet travel and twist',
+      label: msg('Chamber volume, bullet travel and twist'),
       done: has(['volume', 'travel', 'twist']),
     },
   ]
@@ -572,8 +601,8 @@ function capacityRefsOf(
   return { measuredCapacity, capacityRef }
 }
 
-const resultLineOf = (outcome: Outcome, system: UnitSystem) =>
-  outcome.kind === 'ok' ? resultLine(outcome, system) : undefined
+const resultLineOf = (outcome: Outcome, system: UnitSystem, t: Translator['t']) =>
+  outcome.kind === 'ok' ? resultLine(outcome, system, t) : undefined
 
 /** The firearm the defaults read: its name, twist and barrel length. */
 const gunSource = (
@@ -676,10 +705,12 @@ function fillRecordValues(
 }
 
 /** The step size field's own error: invalid, or not above 0. */
-function ownStepError(spec: FieldSpec, v: FieldValue, shown: UnitSystem) {
+function ownStepError(spec: FieldSpec, v: FieldValue, shown: UnitSystem, t: Translator['t']) {
   return (
-    fieldError(spec, v, shown) ??
-    (v.si === undefined || v.si > 0 ? undefined : `${spec.label} must be above 0.`)
+    fieldError(spec, v, shown, t) ??
+    (v.si === undefined || v.si > 0
+      ? undefined
+      : t('{label} must be above 0.', { label: specText(t, spec.label) }))
   )
 }
 
@@ -935,7 +966,8 @@ function linkedFieldsOf(
 const fieldErrorsOf = (linked: Fields, system: UnitSystem) =>
   Object.fromEntries(
     interiorFields.flatMap((s) => {
-      const error = linked[s.key]?.text && fieldError(s, linked[s.key], system)
+      // stored English: a field shows the message again in the language and units shown
+      const error = linked[s.key]?.text && fieldError(s, linked[s.key], system, english.t)
       return error ? [[s.key, error]] : []
     }),
   )
@@ -1034,6 +1066,7 @@ function followWrites(a: {
 /** The load workbench's state and actions: inputs, records, seating, ladder, run and result. */
 export function useWorkbenchState() {
   const { choice, system } = useUnits()
+  const { t } = useTranslation()
   // a record fetched on mount arrives after the stored units apply: its fill reads the current ones
   const unitsNow = useRef(system)
   unitsNow.current = system
@@ -1044,8 +1077,9 @@ export function useWorkbenchState() {
       Object.fromEntries(
         interiorFields.map((s) => [
           s.key,
-          fieldError(s, values[s.key], unitsNow.current) ??
-            burnFormError(siValues(values), s.key) ??
+          // stored English: a field shows the message again in the language and units shown
+          fieldError(s, values[s.key], unitsNow.current, english.t) ??
+            burnFormError(siValues(values), s.key, english.t) ??
             null,
         ]),
       ),
@@ -1189,7 +1223,7 @@ export function useWorkbenchState() {
     got('bullet')
     setBulletDesign({ id: d.id, name: d.name, mass: d.si.mass })
     setBullet(undefined)
-    setBulletNote('')
+    setBulletNote(undefined)
     if (!fill) return
     markChanged()
     const mass = d.si.mass
@@ -1208,7 +1242,7 @@ export function useWorkbenchState() {
     if (fill) markChanged()
     setCartridgeRecord(undefined)
     setCartridgeDesign(d)
-    setBulletNote('')
+    setBulletNote(undefined)
     // an opened file keeps the seating it holds
     if (!fill) return
     setPreviewInitial(undefined)
@@ -1247,8 +1281,8 @@ export function useWorkbenchState() {
       setGunFields({ firearmMass: emptyStep })
     }
   }
-  /** Names a Bullet record cleared by a cartridge change. */
-  const [bulletNote, setBulletNote] = useState('')
+  /** The Bullet record a cartridge change cleared, with the values its note names, mm. */
+  const [clearedBullet, setBulletNote] = useState<ClearedBullet>()
   const [pending, setPending] = useState(false)
   const [outcome, setOutcome] = useState<Outcome | undefined>(undefined)
   /** Inputs changed after the shown outcome was computed. */
@@ -1600,7 +1634,7 @@ export function useWorkbenchState() {
     setCartridgeDesign(undefined)
     setBullet(undefined)
     setBulletDesign(undefined)
-    setBulletNote('')
+    setBulletNote(undefined)
     setAllDiameters(false)
     setPowder(undefined)
     setPowderDesign(undefined)
@@ -1697,13 +1731,17 @@ export function useWorkbenchState() {
     got('cartridge')
     markChanged()
     setCartridge(c)
-    setBulletNote('')
+    setBulletNote(undefined)
     const fit = fitOf(c)
     if (bullet && fit && !bulletFits(bullet.diameter.value, fit)) {
       setBullet(undefined)
-      setBulletNote(
-        `Bullet record ${productLabel(bullet, names)} cleared: its diameter ${mmLength(system, bullet.diameter.value)} does not fit ${c.name} (over ${mmLength(system, bulletWindow(fit).above)}, up to G1 ${mmLength(system, fit.g1)}); the bullet mass stays as typed.`,
-      )
+      setBulletNote({
+        record: productLabel(bullet, names),
+        cartridge: c.name,
+        diameter: bullet.diameter.value,
+        above: bulletWindow(fit).above,
+        g1: fit.g1,
+      })
     }
     // the earlier cartridge's seating is gone; fields that followed it take the new one's. The same
     // cartridge keeps its preview and its initial seating, so it keeps the seating and its start
@@ -1740,7 +1778,7 @@ export function useWorkbenchState() {
         got('bullet')
         setBullet(b)
         setBulletDesign(undefined)
-        setBulletNote('')
+        setBulletNote(undefined)
         if (!fill) return
         markChanged()
         const mass = toSi('mass', b.mass.value)
@@ -1752,7 +1790,7 @@ export function useWorkbenchState() {
       .catch(() => {
         if (signal.aborted) return
         lost('bullet', id)
-        setStatus(notReached)
+        setStatus(t(notReached))
       })
   }
 
@@ -1831,7 +1869,7 @@ export function useWorkbenchState() {
       .catch(() => {
         if (signal.aborted) return
         lost('powder', id)
-        setStatus(notReached)
+        setStatus(t(notReached))
       })
   }
 
@@ -1839,30 +1877,40 @@ export function useWorkbenchState() {
   const typedKeys = previewKeys.filter(
     (k) => seated[k] !== undefined && fields[k]?.si !== previewed[k],
   )
-  const seatingBlock = seatingBlockOf(seatAt, typedKeys)
+  const seatingBlock = seatingBlockOf(seatAt, typedKeys, t)
 
   /** The steps of the seating ladder from the seating field, or what stops it, in the shown units. */
   function seatingPlan(shown = system) {
     const start = seatAt && seated[seatAt.lengthKind]
     const step = seatStep.seatStep?.si
     if (!seatAt || step === undefined)
-      return { error: seatingBlock ?? `${seatingStepSpec.label} is empty.` }
+      return {
+        error:
+          seatingBlock ?? t('{label} is empty.', { label: specText(t, seatingStepSpec.label) }),
+      }
     const show = (m: number) => withUnit('length', shown, m)
-    return seatingLadder(seatAt, start, step, ladderSteps, direction, show)
+    return seatingLadder(seatAt, start, step, ladderSteps, direction, show, t)
   }
 
   /** Why a temperature ladder cannot run: the powder record has no temperature sensitivity. */
   const temperatureBlock = temperatureLadderBlockReason(
     powderLabel,
     powder?.temperatureSensitivity !== undefined,
+    t,
   )
 
   /** The propellant temperatures of the temperature ladder from the Powder temperature field, or what stops it. */
   function temperaturePlan(shown = system) {
     const step = tempStep.tempStep?.si
-    if (step === undefined) return { error: `${temperatureStepSpec.label} is empty.` }
-    return temperatureLadder(fields.propellantTemperature?.si, step, ladderSteps, direction, (k) =>
-      withUnit('temperature', shown, k),
+    if (step === undefined)
+      return { error: t('{label} is empty.', { label: specText(t, temperatureStepSpec.label) }) }
+    return temperatureLadder(
+      fields.propellantTemperature?.si,
+      step,
+      ladderSteps,
+      direction,
+      (k) => withUnit('temperature', shown, k),
+      t,
     )
   }
 
@@ -1874,7 +1922,7 @@ export function useWorkbenchState() {
       temp: tempStep,
       charge: ladder,
     })
-    const own = ownStepError(spec, v, shown)
+    const own = ownStepError(spec, v, shown, t)
     if (own || ladderKind === 'charge') return own
     const blocked = ladderKind === 'temperature' ? temperatureBlock : seatingBlock
     if (blocked) return blocked
@@ -1977,7 +2025,7 @@ export function useWorkbenchState() {
       if ((powderMoreFields as readonly string[]).includes(err.field)) setMore('powder')
     }
     setOutcome(undefined)
-    setStatus(errorText(err))
+    setStatus(translateMessage(errorText(err), t))
   }
 
   /** Shows the first step with a result and starts the request for its sampled band. */
@@ -2035,12 +2083,13 @@ export function useWorkbenchState() {
       },
       announce: false,
     }
-    const warnings = derived(ok).warnings.join('\n')
+    // compared as English text, so a change of language announces nothing again
+    const warnings = derived(ok, english.t).warnings.join('\n')
     ok.announce = warnings !== '' && warnings !== lastWarnings.current
     lastWarnings.current = warnings
     showChart(undefined)
     setOutcome(ok)
-    setStatus({ prefix: 'Simulation done. ' })
+    setStatus({ prefix: t('Simulation done. ') })
     // the sampled band of the step shown first follows the result: it takes up to its time budget
     const bandController = new AbortController()
     bandRequest.current = bandController
@@ -2080,7 +2129,7 @@ export function useWorkbenchState() {
     const controller = new AbortController()
     running.current = controller
     setPending(true)
-    setStatus('Simulating')
+    setStatus(t('Simulating'))
     try {
       await simulate(req, plan, request, controller.signal)
     } catch {
@@ -2112,7 +2161,7 @@ export function useWorkbenchState() {
     }
     const failed = failedRun(steps, res, json)
     setOutcome(failed.outcome)
-    setStatus(failed.text)
+    setStatus(translateMessage(failed.text, t))
   }
 
   /** A request that never got an answer: the API is unreachable, or the browser is offline. */
@@ -2120,7 +2169,7 @@ export function useWorkbenchState() {
     setChanged(false)
     const offline = !navigator.onLine
     setOutcome({ kind: 'error', status: 502, body: undefined, retryAfter: null, offline })
-    setStatus(offline ? needsNetwork : notReached)
+    setStatus(t(offline ? needsNetwork : notReached))
   }
 
   // the cartridge record's groove diameter, for the bore resistance of a fitted powder
@@ -2552,8 +2601,14 @@ export function useWorkbenchState() {
     setSnapshots(snapshotsNow.current)
     setStoredTick((n) => n + 1)
   }, [])
+  const unresolvedText = {
+    cartridge: (id: string) => t('cartridge {id}', { id }),
+    bullet: (id: string) => t('bullet {id}', { id }),
+    powder: (id: string) => t('powder {id}', { id }),
+    capacity: (id: string) => t('capacity {id}', { id }),
+  }
   const unresolved = (['cartridge', 'bullet', 'powder', 'capacity'] as const).flatMap((k) =>
-    asked[k]?.failed ? [`${k} ${asked[k].id}`] : [],
+    asked[k]?.failed ? [unresolvedText[k](asked[k].id)] : [],
   )
 
   /** A field's value with the display decimals, for the record lines; undefined when not valid. */
@@ -2563,12 +2618,15 @@ export function useWorkbenchState() {
     return q === 'length' ? shownLength('travel', system, si) : withUnit(q, system, si)
   }
 
-  const generated = generatedName({
-    cartridge: cartridge?.name ?? cartridgeDesign?.name,
-    bullet: bulletLabel ?? bulletDesign?.name,
-    powder: powderLabel,
-    charge: shown('charge', 'mass'),
-  })
+  const generated = generatedName(
+    {
+      cartridge: cartridge?.name ?? cartridgeDesign?.name,
+      bullet: bulletLabel ?? bulletDesign?.name,
+      powder: powderLabel,
+      charge: shown('charge', 'mass'),
+    },
+    t,
+  )
   /** The load's name: the typed one, else the generated one; Save names the record and the file by it. */
   const name = loadName(customName, generated)
 
@@ -2595,23 +2653,29 @@ export function useWorkbenchState() {
       workbenchDesign(cartridgeDesign.data, cartridgeDesign.resolved, cartridgeDesign.name, system),
     [cartridgeDesign, system],
   )
-  const suggestions: Suggestions = suggestDefaults({
-    firearm: gunSource(gun),
-    cartridge: cartridgeSource({
-      cartridge,
-      design: cartridgeDesign,
-      designLoad,
-      recordTable,
-      specValue,
-      seated,
-      measuredCapacity: measuredWaterCapacity,
-    }),
-    bullet: bullet && {
-      name: productLabel(bullet, names),
-      diameter: toSi('length', bullet.diameter.value),
+  const suggestions: Suggestions = suggestDefaults(
+    {
+      firearm: gunSource(gun),
+      cartridge: cartridgeSource(
+        {
+          cartridge,
+          design: cartridgeDesign,
+          designLoad,
+          recordTable,
+          specValue,
+          seated,
+          measuredCapacity: measuredWaterCapacity,
+        },
+        t,
+      ),
+      bullet: bullet && {
+        name: productLabel(bullet, names),
+        diameter: toSi('length', bullet.diameter.value),
+      },
+      settingsBarrelLength: defaults.barrelLength,
     },
-    settingsBarrelLength: defaults.barrelLength,
-  })
+    t,
+  )
   // the references the load keeps; one that cannot be written (a design or firearm whose id is no
   // UUID) leaves what it gives in the load as typed values
   const firearmRef = userRefOf(firearm)
@@ -2693,11 +2757,11 @@ export function useWorkbenchState() {
       lots,
       setLots,
       notes: noteList,
-      sessionName: (ref) => sessionNames[ref] ?? 'a session of another browser',
+      sessionName: (ref) => sessionNames[ref] ?? t('a session of another browser'),
       dismiss: (session, rule) =>
         setSnapshots((stored) => dismissed(stored, snapshotsNow.current, session, rule)),
     }),
-    [noteKey],
+    [noteKey, t],
   )
   const loadParts: LoadParts = {
     lots,
@@ -2769,7 +2833,15 @@ export function useWorkbenchState() {
   })
   const has = (keys: readonly string[]) => keys.every((k) => fields[k]?.si !== undefined)
   /** What a run still needs, in the order of the cards; the first open one is next. */
-  const todo = todoOf({ cartridge, cartridgeDesign, bulletLabel, bulletDesign, powderLabel, has })
+  const todo = todoOf({
+    cartridge,
+    cartridgeDesign,
+    bulletLabel,
+    bulletDesign,
+    powderLabel,
+    has,
+    t,
+  })
   const next = todo.findIndex((s) => !s.done)
   /** The card of the next open step, marked until the first result (as the checklist). */
   const nextPanel = outcome ? undefined : nextPanelOf(next, has(['volume']))
@@ -2800,6 +2872,19 @@ export function useWorkbenchState() {
       engravingLength: resistance?.engraving?.at(-1)?.travel,
     }
   })()
+
+  const bulletNote = clearedBullet
+    ? t(
+        'Bullet record {record} cleared: its diameter {diameter} does not fit {cartridge} (over {above}, up to G1 {g1}); the bullet mass stays as typed.',
+        {
+          record: clearedBullet.record,
+          diameter: mmLength(system, clearedBullet.diameter),
+          cartridge: clearedBullet.cartridge,
+          above: mmLength(system, clearedBullet.above),
+          g1: mmLength(system, clearedBullet.g1),
+        },
+      )
+    : ''
 
   const recordLink = recordLinkOf({
     asked,
@@ -2967,7 +3052,7 @@ export function useWorkbenchState() {
     showChart,
     sight,
     suggestions,
-    status: statusText(status, outcome && resultLineOf(outcome, system)),
+    status: statusText(status, outcome && resultLineOf(outcome, system, t)),
     stepError,
     stepsDraft,
     storedTick,

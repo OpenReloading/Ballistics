@@ -1,5 +1,6 @@
 import { interior } from '@open-reloading/core'
 import { expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import { baseAt, flightAt, flightTime, type StripModel } from '../src/lib/barrel-strip.ts'
 import { exampleInterior } from '../src/lib/example-data.ts'
 import { interiorBody } from '../src/lib/interior-input.ts'
@@ -79,7 +80,7 @@ it('interpolates linearly in time between neighbouring points', () => {
 })
 
 it('lists shot start, peak, burnout and muzzle by time, each at its event point', () => {
-  const events = playbackEvents(r)
+  const events = playbackEvents(r, english.t)
   expect(events.map((e) => e.key)).toEqual(['start', 'peak', 'burnout', 'muzzle'])
   const at = sampler(r.points)
   expect(at(r.maxPressureTime).breechPressure).toBe(r.peakBreechPressure)
@@ -88,17 +89,27 @@ it('lists shot start, peak, burnout and muzzle by time, each at its event point'
 })
 
 it('leaves out burnout when the powder burns past the muzzle and keeps tied events in order', () => {
-  expect(playbackEvents({ ...r, burnout: null }).map((e) => e.key)).toEqual([
+  expect(playbackEvents({ ...r, burnout: null }, english.t).map((e) => e.key)).toEqual([
     'start',
     'peak',
     'muzzle',
   ])
   const tied = { ...r, burnout: { time: r.maxPressureTime, travel: r.maxPressureTravel } }
-  expect(playbackEvents(tied).map((e) => e.key)).toEqual(['start', 'peak', 'burnout', 'muzzle'])
+  expect(playbackEvents(tied, english.t).map((e) => e.key)).toEqual([
+    'start',
+    'peak',
+    'burnout',
+    'muzzle',
+  ])
   // the peak before shot start, both before burnout
   const b = r.burnout?.time as number
   const early = { ...r, shotStartTime: 0.9 * b, maxPressureTime: 0.5 * b }
-  expect(playbackEvents(early).map((e) => e.key)).toEqual(['peak', 'start', 'burnout', 'muzzle'])
+  expect(playbackEvents(early, english.t).map((e) => e.key)).toEqual([
+    'peak',
+    'start',
+    'burnout',
+    'muzzle',
+  ])
 })
 
 it('splits the charge at shot start and at the muzzle', () => {
@@ -153,7 +164,7 @@ it('slows playback by the smallest factor that makes it last at least 3 s', () =
 })
 
 it('steps from a time to the next or the previous event, past an event at that time', () => {
-  const events = playbackEvents(r)
+  const events = playbackEvents(r, english.t)
   const [start = missing(), peak = missing()] = events
   expect(eventStep(events, 0, 1)).toBe(start)
   expect(eventStep(events, start.time, 1)).toBe(peak)

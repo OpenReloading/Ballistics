@@ -5,6 +5,7 @@ import {
   trajectory,
 } from '@open-reloading/core'
 import { describe, expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import {
   blankChrono,
   blankRow,
@@ -104,7 +105,7 @@ const at = (lines: ReturnType<typeof parameterLines>, name: string) => {
 
 describe('fit of the typed strings', () => {
   const input = measured([300, 600, 900], [400, 700, 1000])
-  const fit = fitSession(nominal, input)
+  const fit = fitSession(nominal, input, english.t)
 
   it('gives a result within the stated intervals for strings made with the solver', () => {
     if (!('answer' in fit)) throw new Error(fit.problem)
@@ -117,12 +118,12 @@ describe('fit of the typed strings', () => {
       expect(x).toBeLessThanOrEqual(upper)
     }
     expect(fit.answer.consistent).toBe(true)
-    expect(residualLines(fit.answer)).toHaveLength(1)
+    expect(residualLines(fit.answer, english.t)).toHaveLength(1)
   })
 
   it('shows value, interval and level of an identified parameter in the shown units', () => {
     if (!('answer' in fit)) throw new Error(fit.problem)
-    const v = at(parameterLines(fit.answer.parameters, system), 'muzzleVelocity')
+    const v = at(parameterLines(fit.answer.parameters, system, english.t), 'muzzleVelocity')
     expect(v.statusText).toBe('Identified')
     expect(v.value).toMatch(/^26\d\d ft\/s$/)
     expect(v.interval).toMatch(/ft\/s to \d+ ft\/s \(95 %\)$/)
@@ -133,9 +134,9 @@ describe('a parameter the data cannot separate', () => {
   it('is named weak or unresolved and shows no value', () => {
     // one impact distance: no clicks dialled, and speed and drag cannot be told apart
     const input = { ...measured([300], []), chrono: blankChrono }
-    const fit = fitSession(nominal, input)
+    const fit = fitSession(nominal, input, english.t)
     if (!('answer' in fit)) throw new Error(fit.problem)
-    const lines = parameterLines(fit.answer.parameters, system)
+    const lines = parameterLines(fit.answer.parameters, system, english.t)
     expect(at(lines, 'clickValue').status).toBe('unresolved')
     for (const l of lines.filter((x) => x.status !== 'identified')) {
       expect(l.value).toBeUndefined()
@@ -147,16 +148,20 @@ describe('a parameter the data cannot separate', () => {
 
   it('is flagged in the plan before any shot', () => {
     const rows = [{ ...blankRow(), range: '300', shots: '5' }]
-    const plan = planSession(nominal, {
-      ...measured([], []),
-      rows,
-      chrono: blankChrono,
-      click: '0.1',
-      dispersion: '0.2',
-      system: presetUnits('metric-grams'),
-    })
+    const plan = planSession(
+      nominal,
+      {
+        ...measured([], []),
+        rows,
+        chrono: blankChrono,
+        click: '0.1',
+        dispersion: '0.2',
+        system: presetUnits('metric-grams'),
+      },
+      english.t,
+    )
     if (!('answer' in plan)) throw new Error(plan.problem)
-    const lines = parameterLines(plan.answer.parameters, presetUnits('metric-grams'))
+    const lines = parameterLines(plan.answer.parameters, presetUnits('metric-grams'), english.t)
     expect(lines.filter((l) => l.status === 'identified')).toHaveLength(0)
     expect(lines.every((l) => l.value === undefined)).toBe(true)
   })
@@ -165,16 +170,16 @@ describe('a parameter the data cannot separate', () => {
 describe('plan', () => {
   it('shows which parameters a string of distances identifies, with standard errors', () => {
     const input = measured([300, 600, 900], [400, 700, 1000])
-    const plan = planSession(nominal, input)
+    const plan = planSession(nominal, input, english.t)
     if (!('answer' in plan)) throw new Error(plan.problem)
-    const lines = parameterLines(plan.answer.parameters, system)
+    const lines = parameterLines(plan.answer.parameters, system, english.t)
     expect(lines.map((l) => l.status)).toEqual(['identified', 'identified', 'identified'])
     expect(at(lines, 'muzzleVelocity').error).toMatch(/^±[\d.]+ %$/)
   })
 
   it('names the zero offset only when asked for', () => {
     const input = measured([300, 600, 900], [400, 700, 1000])
-    const plan = planSession(nominal, { ...input, fitZeroOffset: true })
+    const plan = planSession(nominal, { ...input, fitZeroOffset: true }, english.t)
     if (!('answer' in plan)) throw new Error(plan.problem)
     expect(plan.answer.parameters.map((p) => p.name)).toContain('zeroOffset')
   })
@@ -185,25 +190,25 @@ describe('entry problems', () => {
 
   it('names the row and the field that is missing', () => {
     const rows = input.rows.map((r, i) => (i === 1 ? { ...r, deviation: '' } : r))
-    expect(fitSession(nominal, { ...input, rows })).toEqual({
+    expect(fitSession(nominal, { ...input, rows }, english.t)).toEqual({
       problem: 'Row 2 deviation: enter a number.',
     })
   })
 
   it('rejects a deviation of 0 and a fraction of a shot', () => {
     const zero = input.rows.map((r, i) => (i === 0 ? { ...r, deviation: '0' } : r))
-    expect(fitSession(nominal, { ...input, rows: zero })).toEqual({
+    expect(fitSession(nominal, { ...input, rows: zero }, english.t)).toEqual({
       problem: 'Row 1 deviation: must be greater than 0.',
     })
     const half = input.rows.map((r, i) => (i === 0 ? { ...r, shots: '2.5' } : r))
-    expect(fitSession(nominal, { ...input, rows: half })).toEqual({
+    expect(fitSession(nominal, { ...input, rows: half }, english.t)).toEqual({
       problem: 'Row 1 shots: enter a number.',
     })
   })
 
   it('leaves blank rows out', () => {
     const rows = [...input.rows, blankRow()]
-    expect('answer' in fitSession(nominal, { ...input, rows })).toBe(true)
+    expect('answer' in fitSession(nominal, { ...input, rows }, english.t)).toBe(true)
   })
 
   it('gives the core refusal of an impact and a dial of one group', () => {
@@ -213,15 +218,15 @@ describe('entry problems', () => {
       defined(input.rows[1]),
       defined(input.rows[4]),
     ]
-    const answer = fitSession(nominal, { ...input, rows })
+    const answer = fitSession(nominal, { ...input, rows }, english.t)
     expect('problem' in answer).toBe(true)
   })
 
   it('needs a click value and a dispersion for the plan', () => {
-    expect(planSession(nominal, { ...input, click: '' })).toEqual({
+    expect(planSession(nominal, { ...input, click: '' }, english.t)).toEqual({
       problem: 'Click value: enter a number.',
     })
-    expect(planSession(nominal, { ...input, dispersion: '' })).toEqual({
+    expect(planSession(nominal, { ...input, dispersion: '' }, english.t)).toEqual({
       problem: 'Dispersion of one shot: enter a number.',
     })
   })
@@ -230,7 +235,11 @@ describe('entry problems', () => {
 describe('nominal line', () => {
   it('names the bullet, the muzzle velocity and the zero in the shown units', () => {
     expect(
-      nominalLine({ bullet: 'G7 manual drag', muzzleVelocity: 790, zeroRange: 100 }, system),
+      nominalLine(
+        { bullet: 'G7 manual drag', muzzleVelocity: 790, zeroRange: 100 },
+        system,
+        english.t,
+      ),
     ).toBe('G7 manual drag, 2592 ft/s, zero 109 yd')
   })
 })

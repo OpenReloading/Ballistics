@@ -5,6 +5,7 @@ import { expect, it } from 'vitest'
 import { fractionSpec, LotPanel, lotNote } from '../src/components/lot-rows.tsx'
 import { type Outcome, type Step, shownSteps } from '../src/components/workbench-outcome.ts'
 import { LadderTable } from '../src/components/workbench-readouts.tsx'
+import { english } from '../src/i18n/translate.ts'
 import type { InteriorResponse } from '../src/lib/api-types.ts'
 import { exampleInterior, exampleRecords, loadExample } from '../src/lib/example-data.ts'
 import { exampleFields } from '../src/lib/examples.ts'
@@ -47,16 +48,19 @@ const ok = {
 } as unknown as Extract<Outcome, { kind: 'ok' }>
 
 const table = (withLot: boolean, failed?: number) => {
-  const steps = shownSteps(ok)
+  const steps = shownSteps(ok, english.t)
   const lotSteps = (lot: 'low' | 'high') =>
-    shownSteps({
-      ...ok,
-      steps: charges.map((c, i) =>
-        i === failed
-          ? { charge: c, error: { message: 'no valid run' } }
-          : stepAt(lotLoad(load, lot, 0.03), c),
-      ),
-    })
+    shownSteps(
+      {
+        ...ok,
+        steps: charges.map((c, i) =>
+          i === failed
+            ? { charge: c, error: { message: 'no valid run' } }
+            : stepAt(lotLoad(load, lot, 0.03), c),
+        ),
+      },
+      english.t,
+    )
   return renderToStaticMarkup(
     <MantineProvider>
       <LadderTable
@@ -122,9 +126,9 @@ it('states no charge as safe or optimal in the table, the fields, the notes or t
     panel,
     lotNote,
     fractionSpec.help,
-    lotChartDescription(0.03, true),
-    lotFractionError(0),
-    lotFractionError(1),
+    lotChartDescription(0.03, true, english.t),
+    lotFractionError(0, english.t),
+    lotFractionError(1, english.t),
   ]
   for (const text of texts) expect(text).not.toMatch(/\b(safe|safely|optimal|best|ideal|node)\b/i)
   expect(lotNote).toMatch(/computed value of the simulation/)

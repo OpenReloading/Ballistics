@@ -4,7 +4,9 @@ import { Button } from '@mantine/core'
 import { radPerMoa } from '@open-reloading/core'
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from '../i18n/language.ts'
 import { plainNumber } from '../i18n/number.ts'
+import { msg } from '../i18n/translate.ts'
 import { localDay } from '../lib/dates.ts'
 import { type FieldSpec, type Fields, fieldError, initialFields } from '../lib/field-spec.ts'
 import { cssMm, ladderMarks, markDiameterMm, maxMarkMm, rulerMm } from '../lib/ladder-target.ts'
@@ -17,7 +19,7 @@ import { useFieldUnits } from './units-settings.tsx'
 const specs = [
   {
     key: 'distance',
-    label: 'Shooting distance',
+    label: msg('Shooting distance'),
     quantity: 'range',
     required: true,
     positive: true,
@@ -25,8 +27,8 @@ const specs = [
   },
   {
     key: 'size',
-    label: 'Mark size',
-    help: 'Angular size of one aiming mark, printed at the distance.',
+    label: msg('Mark size'),
+    help: msg('Angular size of one aiming mark, printed at the distance.'),
     quantity: 'correction',
     required: true,
     positive: true,
@@ -48,10 +50,13 @@ export function LadderTarget({
   labels: readonly string[]
   system: UnitSystem
 }) {
+  const { t } = useTranslation()
   const body = usePortalBody()
   const [fields, setFields] = useState<Fields>(() => initialFields(specs, system))
   useFieldUnits(specs, system, (update) => setFields((f) => update(f)))
-  const errors = Object.fromEntries(specs.map((s) => [s.key, fieldError(s, fields[s.key], system)]))
+  const errors = Object.fromEntries(
+    specs.map((s) => [s.key, fieldError(s, fields[s.key], system, t)]),
+  )
   const distance = fields.distance?.si
   const size = fields.size?.si
   const valid = !errors.distance && !errors.size && distance !== undefined && size !== undefined
@@ -68,14 +73,17 @@ export function LadderTarget({
       ? [
           {
             severity: 'warning' as const,
-            text: `A mark of ${Math.round(diameter)} mm does not fit a sheet: choose a smaller size or distance.`,
+            text: t(
+              'A mark of {diameter} mm does not fit a sheet: choose a smaller size or distance.',
+              { diameter: Math.round(diameter) },
+            ),
           },
         ]
       : []),
   ]
   return (
     <section className="ladder-target-controls" aria-labelledby="ladder-target-title">
-      <h3 id="ladder-target-title">Ladder target</h3>
+      <h3 id="ladder-target-title">{t('Ladder target')}</h3>
       <div className="ladder-target-fields">
         {specs.map((spec) => (
           <NumberField
@@ -93,10 +101,10 @@ export function LadderTarget({
           disabled={marks.length === 0}
           onClick={() => printAlone('ladder-target')}
         >
-          Print ladder target
+          {t('Print ladder target')}
         </Button>
       </div>
-      <MessageSlot label="Ladder target messages" messages={messages} />
+      <MessageSlot label={t('Ladder target messages')} messages={messages} />
       {body &&
         marks.length > 0 &&
         distance !== undefined &&

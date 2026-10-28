@@ -1,3 +1,5 @@
+import type { Translator } from '../i18n/translate.ts'
+
 /**
  * Defaults of the load-defining inputs that have a usable value without the user's own: per
  * field, the chosen firearm's value, else the chosen cartridge record's, else the user's Settings,
@@ -78,44 +80,55 @@ export function volumeMeasured(a: {
 }
 
 /** The default of each field from what is chosen, in the order firearm, cartridge record, Settings, class. */
-export function suggestDefaults({
-  firearm: gun,
-  cartridge,
-  bullet,
-  settingsBarrelLength,
-}: DefaultSources): Suggestions {
+export function suggestDefaults(
+  { firearm: gun, cartridge, bullet, settingsBarrelLength }: DefaultSources,
+  t: Translator['t'],
+): Suggestions {
   const out: Suggestions = {}
   if (cartridge?.capacity) out.volume = cartridge.capacity
   if (positive(cartridge?.boreDiameter))
     out.boreDiameter = {
       si: cartridge.boreDiameter,
       source: cartridge.design
-        ? `chamber F of the user design ${cartridge.name}`
-        : `CIP land diameter F of ${cartridge.name}`,
+        ? t('chamber F of the user design {name}', { name: cartridge.name })
+        : t('CIP land diameter F of {name}', { name: cartridge.name }),
     }
   else if (bullet && positive(bullet.diameter))
     out.boreDiameter = {
       si: bullet.diameter,
-      source: `diameter of ${bullet.name}, the bore is smaller`,
+      source: t('diameter of {name}, the bore is smaller', { name: bullet.name }),
     }
   if (positive(cartridge?.boreArea))
-    out.boreArea = { si: cartridge.boreArea, source: `CIP bore area Q of ${cartridge.name}` }
+    out.boreArea = {
+      si: cartridge.boreArea,
+      source: t('CIP bore area Q of {name}', { name: cartridge.name }),
+    }
   if (positive(gun?.twist))
-    out.twist = { si: gun.twist, source: `your firearm ${gun.name}`, fromFirearm: true }
+    out.twist = {
+      si: gun.twist,
+      source: t('your firearm {name}', { name: gun.name }),
+      fromFirearm: true,
+    }
   else if (positive(cartridge?.twist))
-    out.twist = { si: cartridge.twist, source: `CIP twist u of ${cartridge.name}` }
+    out.twist = {
+      si: cartridge.twist,
+      source: t('CIP twist u of {name}', { name: cartridge.name }),
+    }
   if (positive(gun?.barrelLength))
     out.barrelLength = {
       si: gun.barrelLength,
-      source: `your firearm ${gun.name}`,
+      source: t('your firearm {name}', { name: gun.name }),
       fromFirearm: true,
     }
   else if (positive(settingsBarrelLength))
-    out.barrelLength = { si: settingsBarrelLength, source: 'your default from Settings' }
+    out.barrelLength = { si: settingsBarrelLength, source: t('your default from Settings') }
   else if (cartridge?.class)
     out.barrelLength = {
       si: barrelLengthByClass[cartridge.class],
-      source: `${cartridge.class} barrel, assumption, no source`,
+      source:
+        cartridge.class === 'pistol'
+          ? t('pistol barrel, assumption, no source')
+          : t('rifle barrel, assumption, no source'),
     }
   return out
 }

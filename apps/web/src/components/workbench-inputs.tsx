@@ -17,13 +17,22 @@ import { DotsThree } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
 import { type ReactNode, useEffect, useId, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from '../i18n/language.ts'
 import { plainNumber } from '../i18n/number.ts'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import type { BulletSummary, CartridgeSummary, PowderSummary } from '../lib/api-types.ts'
 import { fitOf, summaryFitSource } from '../lib/bullet-fit.ts'
 import type { BulletRow } from '../lib/bullet-rows.ts'
 import { findBullets } from '../lib/bullet-search.ts'
+import { translateMessage } from '../lib/core-messages.ts'
 import { quickCartridges } from '../lib/examples.ts'
-import { type FieldSpec, type FieldValue, fieldError, siValues } from '../lib/field-spec.ts'
+import {
+  type FieldSpec,
+  type FieldValue,
+  fieldError,
+  siValues,
+  specText,
+} from '../lib/field-spec.ts'
 import { landsFor } from '../lib/firearm.ts'
 import { type FollowKey, followKeys } from '../lib/input-defaults.ts'
 import { burnFormError, interiorFields } from '../lib/interior-input.ts'
@@ -97,7 +106,7 @@ const burnFormKeys = ['formA', 'formM', 'formQ', 'formZ1']
 /** Ladder step size; the charge field is the first step. */
 export const ladderSpec = {
   key: 'ladderStep',
-  label: 'Step size',
+  label: msg('Step size'),
   quantity: 'charge',
   required: true,
   min: 0,
@@ -106,7 +115,7 @@ export const ladderSpec = {
 /** Seating ladder step size, a length; the seating field is the first step. */
 export const seatingStepSpec = {
   key: 'seatStep',
-  label: 'Step size',
+  label: msg('Step size'),
   quantity: 'length',
   required: true,
   min: 0,
@@ -115,7 +124,7 @@ export const seatingStepSpec = {
 /** Temperature ladder step size, a difference of temperatures; the Powder temperature field is the first step. */
 export const temperatureStepSpec = {
   key: 'tempStep',
-  label: 'Step size',
+  label: msg('Step size'),
   quantity: 'temperatureDifference',
   required: true,
   min: 0,
@@ -130,15 +139,15 @@ export const emptyStep: FieldValue = { text: '', si: undefined }
 /** The Gun card's gun weight: not an interior input, it only feeds the free recoil readout. */
 export const firearmMassSpec = {
   key: 'firearmMass',
-  label: 'Gun weight',
-  help: 'With scope and attachments. Feeds the free recoil readout only.',
+  label: msg('Gun weight'),
+  help: msg('With scope and attachments. Feeds the free recoil readout only.'),
   quantity: 'firearmMass',
   positive: true,
 } as const satisfies FieldSpec
 /** The Cartridge card's measured case capacity, for the unit switch (the field is the preview's). */
 export const measuredWaterCapacitySpec = {
   key: 'measuredWaterCapacity',
-  label: 'Case capacity (H₂O)',
+  label: msg('Case capacity (H₂O)'),
   quantity: 'capacity',
   min: 0,
 } as const
@@ -153,11 +162,11 @@ const panelColumns: InputPanel[][] = [['cartridge'], ['powder', 'bullet', 'firea
 
 /** The desktop frame of a window lower than 45em (`panelColumns`). */
 export const shortFrame = '(min-width: 75em) and (max-height: 44.99em)'
-const panelTitles: Record<InputPanel, string> = {
-  cartridge: 'Cartridge',
-  bullet: 'Bullet',
-  powder: 'Powder',
-  firearm: 'Gun',
+const panelTitles: Record<InputPanel, Message> = {
+  cartridge: msg('Cartridge'),
+  bullet: msg('Bullet'),
+  powder: msg('Powder'),
+  firearm: msg('Gun'),
 }
 
 /** Panel icons, as the sidebar's (`nav-icons.tsx`); the heading names the panel. */
@@ -199,16 +208,16 @@ const lengthCell = (system: UnitSystem, mm: number) =>
   inchText(lengthText('diameter', system, toSi('length', mm)), system.length.symbol)
 
 /** Diameter and length on one row, or the diameter alone. */
-function sizeRow(b: Bullet | undefined, system: UnitSystem) {
+function sizeRow(b: Bullet | undefined, system: UnitSystem, t: Translator['t']) {
   if (!b) return false
   const d = lengthCell(system, b.diameter.value)
   return b.length
     ? recordRow(
-        'Diameter × length',
+        t('Diameter × length'),
         `${d} × ${lengthCell(system, b.length.value)}`,
         system.length.symbol,
       )
-    : recordRow('Diameter', d, system.length.symbol)
+    : recordRow(t('Diameter'), d, system.length.symbol)
 }
 
 /** The construction on one line: the structure, the full wording on hover; else the wording. */
@@ -220,9 +229,9 @@ function constructionCell(c: Bullet['construction']) {
 
 /** The Powder card's charge ladder: the step count, and with more than one the step size and direction. */
 const directions = [
-  { value: 'up', label: 'Up' },
-  { value: 'down', label: 'Down' },
-  { value: 'around', label: 'Around' },
+  { value: 'up', label: msg('Up') },
+  { value: 'down', label: msg('Down') },
+  { value: 'around', label: msg('Around') },
 ] as const
 
 /** The step size of a ladder: its field, spec and value follow the kind of ladder. */
@@ -286,11 +295,12 @@ function StepCountInput() {
     setLadderError,
     setStepsDraft,
   } = useLoad()
+  const { t } = useTranslation()
   const around = direction === 'around'
   return (
     <NumberInput
       className="ladder-steps"
-      label={around ? 'Steps each side' : 'Ladder steps'}
+      label={around ? t('Steps each side') : t('Ladder steps')}
       labelProps={{ className: 'visually-hidden' }}
       hideControls
       // around, 0 steps each side is the charge alone
@@ -319,9 +329,10 @@ function ladderKindReason(
   powderLabel: string | undefined,
   sensitive: boolean,
   seatingBlock: string | undefined,
+  t: Translator['t'],
 ) {
   if (k.value === ladderKind) return
-  if (k.value === 'temperature') return temperatureLadderBlockReason(powderLabel, sensitive)
+  if (k.value === 'temperature') return temperatureLadderBlockReason(powderLabel, sensitive, t)
   return k.value === 'seating' ? seatingBlock : undefined
 }
 
@@ -341,20 +352,23 @@ function LadderChoices() {
     setDirection,
   } = useLoad()
   const id = useId()
+  const { t } = useTranslation()
   return (
     <>
       <SegmentedRow
-        legend="Ladder"
+        legend={t('Ladder')}
         name={`${id}-kind`}
         value={ladderKind}
         segments={ladderKinds.map((k) => ({
-          ...k,
+          value: k.value,
+          label: t(k.label),
           reason: ladderKindReason(
             k,
             ladderKind,
             powderLabel,
             powder?.temperatureSensitivity !== undefined,
             seatingBlock,
+            t,
           ),
         }))}
         onChange={(v) => {
@@ -364,10 +378,10 @@ function LadderChoices() {
         }}
       />
       <SegmentedRow
-        legend="Direction"
+        legend={t('Direction')}
         name={`${id}-direction`}
         value={direction}
-        segments={directions}
+        segments={directions.map((d) => ({ value: d.value, label: t(d.label) }))}
         onChange={(next) => {
           markChanged()
           // around the charge needs an odd count of charges
@@ -381,7 +395,8 @@ function LadderChoices() {
 
 function LadderInputs() {
   const { direction, ladderSteps } = useLoad()
-  const stepsLabel = direction === 'around' ? 'Steps each side' : 'Ladder steps'
+  const { t } = useTranslation()
+  const stepsLabel = direction === 'around' ? t('Steps each side') : t('Ladder steps')
   return (
     <>
       {/* the count and, with more than one step, the step size in one row of one unit */}
@@ -390,12 +405,12 @@ function LadderInputs() {
           aria-hidden="true"
           title={
             direction === 'around'
-              ? 'Charges below and above the charge, which is the middle step.'
-              : 'The charge is step 1.'
+              ? t('Charges below and above the charge, which is the middle step.')
+              : t('The charge is step 1.')
           }
         >
           {/* around, the longer label alone fits the row */}
-          {direction === 'around' ? stepsLabel : `${stepsLabel}, size`}
+          {direction === 'around' ? stepsLabel : t('Ladder steps, size')}
         </span>
         {/* the state is the number of charges; around the charge the field counts the steps per side */}
         <StepCountInput />
@@ -414,22 +429,23 @@ export function Checklist({
   todo: { label: string; done: boolean; value?: string | undefined }[]
   next: number
 }) {
+  const { t } = useTranslation()
   return (
     <section aria-labelledby="next-steps" className="next-steps">
-      <h2 id="next-steps">Before the first run</h2>
+      <h2 id="next-steps">{t('Before the first run')}</h2>
       <ol>
         {todo.map((s, i) => (
           <li key={s.label} data-done={s.done || undefined} data-next={i === next || undefined}>
-            <span aria-hidden="true">{s.done ? '✓' : i + 1}</span> {s.label}
+            <span aria-hidden="true">{s.done ? '✓' : i + 1}</span> {specText(t, s.label)}
             {s.value && <span className="next-steps-value">: {s.value}</span>}
-            {i === next && <span className="visually-hidden"> (next)</span>}
+            {i === next && <span className="visually-hidden"> {t('(next)')}</span>}
           </li>
         ))}
       </ol>
       <p>
         {next === -1 || (next === 0 && todo.slice(1).every((s) => s.done))
-          ? `Ready: press Run simulation or ${shortcutLabel('run')}.`
-          : 'Run simulation needs every step but the cartridge.'}
+          ? t('Ready: press Run simulation or {shortcut}.', { shortcut: shortcutLabel('run') })
+          : t('Run simulation needs every step but the cartridge.')}
       </p>
     </section>
   )
@@ -438,15 +454,17 @@ export function Checklist({
 /** A new load with nothing chosen or typed: the start card replaces the cards. */
 export function StartCard() {
   const { chooseCartridge: onCartridge, asNewLoad, fillExample, setByHand } = useLoad()
+  const { t } = useTranslation()
   return (
     <Paper component="section" withBorder className="start-card" aria-labelledby="start-title">
-      <h2 id="start-title">Start a load</h2>
+      <h2 id="start-title">{t('Start a load')}</h2>
       <p>
-        Step 1: choose the cartridge. Its CIP record limits the bullets to its groove and gives the
-        chamber values and the maximum pressure.
+        {t(
+          'Step 1: choose the cartridge. Its CIP record limits the bullets to its groove and gives the chamber values and the maximum pressure.',
+        )}
       </p>
       <CardPicker panel="cartridge" />
-      <p className="start-label">Common cartridges</p>
+      <p className="start-label">{t('Common cartridges')}</p>
       <div className="start-picks">
         {quickCartridges.map((c) => (
           <Button
@@ -461,13 +479,13 @@ export function StartCard() {
       </div>
       <div className="start-actions">
         <Button variant="light" onClick={asNewLoad(fillExample)}>
-          Try the example load
+          {t('Try the example load')}
         </Button>
         <Button variant="subtle" onClick={() => setByHand(true)}>
-          Enter values by hand
+          {t('Enter values by hand')}
         </Button>
       </div>
-      <p className="start-label">A saved load opens from Open in the page bar.</p>
+      <p className="start-label">{t('A saved load opens from Open in the page bar.')}</p>
     </Paper>
   )
 }
@@ -490,6 +508,7 @@ export function InputCards() {
     linkedPowder,
   } = useLoad()
   // the server and the first render lay out a tall window; a low one moves Gun once mounted
+  const { t } = useTranslation()
   const short = useMediaQuery(shortFrame, false) ?? false
   const [figureCard, setFigureCard] = useState<HTMLDivElement | null>(null)
   const { figureTab } = useLoad()
@@ -501,7 +520,7 @@ export function InputCards() {
     firearm: !!firearm,
   }
   return (
-    <form ref={inputs} noValidate onSubmit={(e) => e.preventDefault()} aria-label="Load">
+    <form ref={inputs} noValidate onSubmit={(e) => e.preventDefault()} aria-label={t('Load')}>
       {/* fixed cards: icon and title in the heading, the record in its picker */}
       <div className="panels">
         {panelColumns.map((column, i) => (
@@ -520,7 +539,7 @@ export function InputCards() {
                   <PanelIcon panel={p} />
                   {/* the title, then the record's name in its search field */}
                   <h2 id={`panel-${p}`} className="panel-title">
-                    {panelTitles[p]}
+                    {t(panelTitles[p])}
                   </h2>
                   <CardPicker panel={p} />
                   {morePanels.includes(p) && (
@@ -537,7 +556,7 @@ export function InputCards() {
                           size={controlSize.row.icon}
                           variant="subtle"
                           color="gray"
-                          aria-label={`More of ${panelTitles[p]}`}
+                          aria-label={t('More of {panel}', { panel: t(panelTitles[p]) })}
                           aria-expanded={more === p}
                           onClick={() => setMore(more === p ? undefined : p)}
                         >
@@ -563,7 +582,7 @@ export function InputCards() {
       <LoadFigure host={short ? figureTab : figureCard} />
       <div className="run-bar">
         <RunButton />
-        <span className="run-hint">or {shortcutLabel('run')}</span>
+        <span className="run-hint">{t('or {shortcut}', { shortcut: shortcutLabel('run') })}</span>
         {pending && <Loader size="xs" aria-hidden="true" />}
       </div>
     </form>
@@ -604,6 +623,7 @@ function fieldPlaceholder(
     cartridgeBoreArea: LoadValues['cartridgeBoreArea']
     grooveDiameter: LoadValues['grooveDiameter']
   },
+  t: Translator['t'],
 ) {
   if (key === 'boreArea' && boreDiameter)
     return (s: UnitSystem) =>
@@ -617,17 +637,17 @@ function fieldPlaceholder(
         }),
       )
   if (key === 'sebert') return 'Lagrange'
-  if (key.startsWith('form')) return 'constant'
+  if (key.startsWith('form')) return t('constant')
   if (fromRecord !== undefined) return (s: UnitSystem) => formatQuantity(quantity, s, fromRecord)
   return
 }
 
 /** The note of a field that holds a Settings or cited default. */
-function defaultMark(key: string, defaults: LoadValues['defaults']) {
+function defaultMark(key: string, defaults: LoadValues['defaults'], t: Translator['t']) {
   const cited = citedDefaults[key as DefaultKey]
   const source =
-    defaults[key as DefaultKey] === cited.si ? cited.source : 'your default from Settings'
-  return `Default: ${source}.`
+    defaults[key as DefaultKey] === cited.si ? t(cited.source) : t('your default from Settings')
+  return t('Default: {source}.', { source })
 }
 
 type LoadFieldMarkArgs = {
@@ -658,13 +678,17 @@ function loadFieldMark(
     powderDesign,
     origin,
   }: LoadFieldMarkArgs,
+  t: Translator['t'],
 ) {
-  if (defaulted.has(key)) return defaultMark(key, defaults)
-  if (given) return `Default: ${given.source}.`
+  if (defaulted.has(key)) return defaultMark(key, defaults, t)
+  if (given) return t('Default: {source}.', { source: given.source })
   if (fromRecord !== undefined)
     return fields[key]?.si === undefined
-      ? "From the powder record's bore-resistance law. A typed value replaces it."
-      : `Typed. The powder record gives ${formatQuantity(spec.quantity, s, fromRecord)} ${s[spec.quantity].symbol}.`
+      ? t("From the powder record's bore-resistance law. A typed value replaces it.")
+      : t('Typed. The powder record gives {value} {unit}.', {
+          value: formatQuantity(spec.quantity, s, fromRecord),
+          unit: s[spec.quantity].symbol,
+        })
   return (
     powder &&
     origin &&
@@ -676,6 +700,7 @@ function loadFieldMark(
       (si) =>
         [formatQuantity(spec.quantity, s, si), s[spec.quantity].symbol].filter(Boolean).join(' '),
       powderDesign ? 'user design' : 'record',
+      t,
     )
   )
 }
@@ -686,12 +711,15 @@ function seatingFlag(
   seated: LoadValues['seated'],
   previewed: LoadValues['previewed'],
   fields: LoadValues['fields'],
+  t: Translator['t'],
 ) {
   if (!isPreviewKey(key) || seated[key] === undefined || previewed[key] === undefined) return
   if (fields[key]?.si !== previewed[key]) return
   return {
     kind: 'seating' as const,
-    text: 'From the seated bullet in the Cartridge card, approximate: derived from the bullet and case geometry. A typed value replaces it; an emptied field follows again.',
+    text: t(
+      'From the seated bullet in the Cartridge card, approximate: derived from the bullet and case geometry. A typed value replaces it; an emptied field follows again.',
+    ),
   }
 }
 
@@ -703,12 +731,17 @@ function seatingAction(
   previewed: LoadValues['previewed'],
   fields: LoadValues['fields'],
   takeSeated: LoadValues['takeSeated'],
+  t: Translator['t'],
 ) {
   if (!isPreviewKey(key) || seated[key] === undefined || fields[key]?.si === previewed[key]) return
   return {
     kind: 'restore' as const,
     text: (s: UnitSystem) =>
-      `Use seating: ${spec.label} ${formatQuantity(spec.quantity, s, seated[key] as number)} ${s[spec.quantity].symbol} from the seated bullet, and follow it again`,
+      t('Use seating: {label} {value} {unit} from the seated bullet, and follow it again', {
+        label: specText(t, spec.label),
+        value: formatQuantity(spec.quantity, s, seated[key] as number),
+        unit: s[spec.quantity].symbol,
+      }),
     onClick: () => takeSeated(key),
   }
 }
@@ -739,6 +772,7 @@ function LoadField({ name: key }: { name: string }) {
     printMedia,
     recordBore,
   } = useLoad()
+  const { t } = useTranslation()
   const spec = interiorFields.find((s) => s.key === key)
   if (!spec) throw new Error(`no field ${key}`)
   const props = form.getInputProps(key)
@@ -759,37 +793,45 @@ function LoadField({ name: key }: { name: string }) {
           : value
       }
       // what an optional empty field stands for
-      placeholder={fieldPlaceholder(key, spec.quantity, fromRecord, fields.boreDiameter?.si, {
-        cartridgeBoreArea,
-        grooveDiameter,
-      })}
+      placeholder={fieldPlaceholder(
+        key,
+        spec.quantity,
+        fromRecord,
+        fields.boreDiameter?.si,
+        { cartridgeBoreArea, grooveDiameter },
+        t,
+      )}
       muted={given !== undefined}
       // texts naming a unit follow the units the field shows
       mark={(s) =>
-        loadFieldMark(s, {
-          key,
-          spec,
-          fields,
-          defaulted,
-          defaults,
-          given,
-          fromRecord,
-          powder,
-          powderDesign,
-          origin,
-        })
+        loadFieldMark(
+          s,
+          {
+            key,
+            spec,
+            fields,
+            defaulted,
+            defaults,
+            given,
+            fromRecord,
+            powder,
+            powderDesign,
+            origin,
+          },
+          t,
+        )
       }
       // in the units the field shows, so a unit switch rewrites a shown message
       error={
         props.error &&
         ((s) =>
-          fieldError(spec, fields[key], s) ??
-          burnFormError(siValues(fields), key) ??
+          fieldError(spec, fields[key], s, t) ??
+          burnFormError(siValues(fields), key, t) ??
           // a message a run set, as the engraving values needing each other
-          (typeof props.error === 'string' ? props.error : undefined))
+          (typeof props.error === 'string' ? translateMessage(props.error, t) : undefined))
       }
-      flag={seatingFlag(key, seated, previewed, fields)}
-      action={seatingAction(key, spec, seated, previewed, fields, takeSeated)}
+      flag={seatingFlag(key, seated, previewed, fields, t)}
+      action={seatingAction(key, spec, seated, previewed, fields, takeSeated, t)}
       onBlur={() => {
         // an emptied field takes its default again
         if (followable && !fields[key]?.text.trim())
@@ -834,6 +876,7 @@ function CardBody({ panel }: { panel: InputPanel }) {
     setGunWeight,
     markChanged,
   } = useLoad()
+  const { t } = useTranslation()
   // the gun weight's message waits for the end of the typing, as "0." on the way to "0.5" is no error
   const [gunLeft, setGunLeft] = useState(false)
   const l3 = specValue('cartridge', 'L3')
@@ -841,14 +884,14 @@ function CardBody({ panel }: { panel: InputPanel }) {
     return (
       <div className="panel-fields">
         {recordRow(
-          'CIP Pmax',
+          t('CIP Pmax'),
           pmax === undefined
             ? undefined
             : formatQuantity('pressure', system, toSi('pressure', pmax)),
           system.pressure.symbol,
         )}
         {recordRow(
-          'Case length, CIP L3',
+          t('Case length, CIP L3'),
           l3 === undefined ? undefined : lengthCell(system, l3),
           system.length.symbol,
         )}
@@ -861,9 +904,9 @@ function CardBody({ panel }: { panel: InputPanel }) {
     return (
       <div className="panel-fields">
         {/* one line each, so the column fits at 1366 x 650 */}
-        {sizeRow(bullet, system)}
-        {recordRow('Ballistic coefficient', bc && `${bc.dragModel} ${plainNumber(bc.value)}`)}
-        {recordRow('Construction', constructionCell(bullet?.construction))}
+        {sizeRow(bullet, system, t)}
+        {recordRow(t('Ballistic coefficient'), bc && `${bc.dragModel} ${plainNumber(bc.value)}`)}
+        {recordRow(t('Construction'), constructionCell(bullet?.construction))}
         {bulletNote && <p className="note wide">{bulletNote}</p>}
         {fieldsOf(panelFields.bullet)}
       </div>
@@ -872,7 +915,7 @@ function CardBody({ panel }: { panel: InputPanel }) {
     return (
       <div className="panel-fields">
         {recordRow(
-          'Bulk density',
+          t('Bulk density'),
           powder?.bulkDensity &&
             formatQuantity('density', system, toSi('density', powder.bulkDensity.value)),
           system.density.symbol,
@@ -881,14 +924,14 @@ function CardBody({ panel }: { panel: InputPanel }) {
         <LadderInputs />
         {/* the model parameters behind one row at every width; an invalid one opens it */}
         <div className="model-row wide">
-          <span>Model parameters</span>
+          <span>{t('Model parameters')}</span>
           <Button
             size={controlSize.row.button}
             variant="default"
             aria-expanded={modelShown}
             onClick={() => setModelShown((v) => !v)}
           >
-            {modelShown ? 'Hide' : 'Show'}
+            {modelShown ? t('Hide') : t('Show')}
           </Button>
         </div>
         {(modelShown || printing || printMedia) && fieldsOf(modelFields)}
@@ -903,7 +946,7 @@ function CardBody({ panel }: { panel: InputPanel }) {
         spec={firearmMassSpec}
         system={system}
         value={gunWeight}
-        error={gunLeft ? (s) => fieldError(firearmMassSpec, gunWeight, s) : undefined}
+        error={gunLeft ? (s) => fieldError(firearmMassSpec, gunWeight, s, t) : undefined}
         onBlur={() => setGunLeft(true)}
         onChange={(value) => {
           markChanged()
@@ -935,6 +978,7 @@ function BulletPicker() {
     cartridge,
     system,
   } = useLoad()
+  const { t } = useTranslation()
   // mounted from the start: the first closing returns the focus to the button as the later ones do
   const [dialog, setDialog] = useState({ text: '', opened: false })
   const designRows = useMemo(() => userBulletRows(designs), [designs])
@@ -953,29 +997,31 @@ function BulletPicker() {
         size={controlSize.row.input}
         chevron
         kind="bullets"
-        label="Search bullets by manufacturer and name"
+        label={t('Search bullets by manufacturer and name')}
         chosen={
           bulletLabel
             ? bulletLabel
             : bulletDesign
-              ? `${bulletDesign.name} (your design)`
+              ? t('{name} (your design)', { name: bulletDesign.name })
               : linkedBullet?.name
-                ? `${linkedBullet.name} (from the link)`
-                : 'Search bullets'
+                ? t('{name} (from the link)', { name: linkedBullet.name })
+                : t('Search bullets')
         }
         describe={(b) =>
-          b.origin ? `${b.name} (your design)` : describeBullet(b as BulletSummary)
+          b.origin
+            ? t('{name} (your design)', { name: b.name })
+            : describeBullet(b as BulletSummary)
         }
         onSelect={(b) => {
           const design = userRecordId(b.id)
           if (design) chooseDesign(design)
           else chooseBullet(b.id)
         }}
-        noneText="No bullet found"
-        unreachableText={notReached}
+        noneText={t('No bullet found')}
+        unreachableText={t(notReached)}
         find={find}
         browse={{
-          label: 'Browse bullets',
+          label: t('Browse bullets'),
           onOpen: (typed) => {
             readDesigns()
             setDialog({ text: typed, opened: true })
@@ -1011,16 +1057,19 @@ function CartridgePicker() {
     searchKey,
     chooseCartridge,
   } = useLoad()
+  const { t } = useTranslation()
   return (
     <RecordSearch<CartridgeSummary>
       size={controlSize.row.input}
       chevron
       key={searchKey}
       kind="cartridges"
-      label="Search cartridges by name"
+      label={t('Search cartridges by name')}
       chosen={
         cartridge?.name ??
-        (cartridgeDesign ? `${cartridgeDesign.name} (your design)` : 'Search cartridges (optional)')
+        (cartridgeDesign
+          ? t('{name} (your design)', { name: cartridgeDesign.name })
+          : t('Search cartridges (optional)'))
       }
       describe={cartridgeOptionText}
       onSelect={(c) =>
@@ -1031,10 +1080,13 @@ function CartridgePicker() {
         })
       }
       // the browser's cartridge designs in the same list, first
-      extra={cartridgeDesigns.map((d) => ({ id: d.id, label: `${d.name} (your design)` }))}
+      extra={cartridgeDesigns.map((d) => ({
+        id: d.id,
+        label: t('{name} (your design)', { name: d.name }),
+      }))}
       onExtra={chooseCartridgeDesign}
-      noneText="No cartridge found"
-      unreachableText={notReached}
+      noneText={t('No cartridge found')}
+      unreachableText={t(notReached)}
     />
   )
 }
@@ -1050,28 +1102,32 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
     powderDesigns,
     choosePowderDesign,
   } = useLoad()
+  const { t } = useTranslation()
   const chosen = (() => {
-    if (powderDesign) return `${powderDesign.name} (your design)`
+    if (powderDesign) return t('{name} (your design)', { name: powderDesign.name })
     if (powderLabel) return powderLabel
-    if (linkedPowder?.name) return `${linkedPowder.name} (from the link)`
+    if (linkedPowder?.name) return t('{name} (from the link)', { name: linkedPowder.name })
     return requiredModelKeys.every((k) => fields[k]?.si !== undefined)
-      ? 'Typed model parameters, no powder record'
-      : 'Search powders'
+      ? t('Typed model parameters, no powder record')
+      : t('Search powders')
   })()
   return (
     <RecordSearch<PowderSummary>
       size={controlSize.row.input}
       chevron
       kind="powders"
-      label="Search powders by manufacturer and name"
+      label={t('Search powders by manufacturer and name')}
       chosen={chosen}
       describe={(p) => productLabel(p, names)}
       onSelect={(p) => choosePowder(p.id)}
       // the browser's powder designs in the same list, first
-      extra={powderDesigns.map((d) => ({ id: d.id, label: `${d.name} (your design)` }))}
+      extra={powderDesigns.map((d) => ({
+        id: d.id,
+        label: t('{name} (your design)', { name: d.name }),
+      }))}
       onExtra={choosePowderDesign}
-      noneText="No powder found"
-      unreachableText={notReached}
+      noneText={t('No powder found')}
+      unreachableText={t(notReached)}
     />
   )
 }
@@ -1080,21 +1136,22 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
 function CardPicker({ panel }: { panel: InputPanel }) {
   const { chooseFirearm, firearm, firearmList, readDesigns } = useLoad()
   const names = useManufacturerNames()
+  const { t } = useTranslation()
   if (panel === 'cartridge') return <CartridgePicker />
   if (panel === 'bullet') return <BulletPicker />
   if (panel === 'powder') return <PowderPicker names={names} />
   return (
     <Select
       size={controlSize.row.input}
-      aria-label="Firearm from your library"
-      placeholder={firearmList.length ? 'Choose a firearm' : 'No firearm in this browser'}
+      aria-label={t('Firearm from your library')}
+      placeholder={firearmList.length ? t('Choose a firearm') : t('No firearm in this browser')}
       searchable
       clearable
       data={firearmList.map((f) => ({ value: f.id, label: f.name }))}
       value={firearm ?? null}
       onChange={chooseFirearm}
       onDropdownOpen={readDesigns}
-      nothingFoundMessage="No firearm found"
+      nothingFoundMessage={t('No firearm found')}
     />
   )
 }
@@ -1102,12 +1159,13 @@ function CardPicker({ panel }: { panel: InputPanel }) {
 /** Rarely needed rows of a card, in its More popover: no accordion moves the layout. */
 function CardMore({ panel }: { panel: InputPanel }) {
   const { specValue, system, allDiameters, setAllDiameters, primerId, setPrimerChoice } = useLoad()
+  const { t } = useTranslation()
   const l6 = specValue('cartridge', 'L6')
   if (panel === 'cartridge')
     return (
       <>
         {recordRow(
-          'COAL, CIP maximum L6',
+          t('COAL, CIP maximum L6'),
           l6 === undefined ? undefined : lengthCell(system, l6),
           system.length.symbol,
         )}
@@ -1120,7 +1178,7 @@ function CardMore({ panel }: { panel: InputPanel }) {
   return (
     <Switch
       className="wide"
-      label="Bullets of all diameters"
+      label={t('Bullets of all diameters')}
       checked={allDiameters}
       onChange={(e) => setAllDiameters(e.currentTarget.checked)}
     />
@@ -1261,6 +1319,7 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
 
 function RunButton() {
   const { run, pending } = useLoad()
+  const { t } = useTranslation()
   return (
     <Button
       onClick={() => run()}
@@ -1268,7 +1327,7 @@ function RunButton() {
       loaderProps={{ type: 'dots' }}
       aria-keyshortcuts={shortcutAriaKeys('run')}
     >
-      Run simulation
+      {t('Run simulation')}
     </Button>
   )
 }

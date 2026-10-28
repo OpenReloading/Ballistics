@@ -3,6 +3,7 @@
 import { ActionIcon, Button, Popover } from '@mantine/core'
 import { Info } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
 import { formatQuantity, type UnitSystem, withUnit } from '../lib/units.ts'
 import { bandLine, rangeCardNote, rangeHero, resultBand } from '../lib/workbench.ts'
@@ -46,40 +47,47 @@ function PeakPressure({
   ok: Extract<Outcome, { kind: 'ok' }>
   system: UnitSystem
 }) {
-  const ofMax = derived(ok).ofMax
+  const { t } = useTranslation()
+  const ofMax = derived(ok, t).ofMax
+  const band = resultBand(ok.body)
   const p = (pa: number) => withUnit('pressure', system, pa)
   return (
     <>
       <dl>
         <div>
-          <dt>Peak pressure</dt>
+          <dt>{t('Peak pressure')}</dt>
           <dd>{p(ok.body.pressureRange.nominalPressure)}</dd>
           <dd className="readout-note">
             <span className="visually-hidden">
-              {resultBand(ok.body).sampled ? '5th to 95th percentile ' : 'range '}
+              {band.sampled ? t('5th to 95th percentile') : t('range')}{' '}
             </span>
-            {formatQuantity('pressure', system, resultBand(ok.body).pressure.low)} to{' '}
-            {p(resultBand(ok.body).pressure.high)}
+            {t('{low} to {high}', {
+              low: formatQuantity('pressure', system, band.pressure.low),
+              high: p(band.pressure.high),
+            })}
           </dd>
         </div>
         {ofMax?.limit.pressure && (
           <div>
-            <dt>Percent of maximum</dt>
+            <dt>{t('Percent of maximum')}</dt>
             <dd>{formatNumber(ofMax.percent, 0)} %</dd>
             <dd className="readout-note">
-              of CIP {ofMax.limit.symbol} {p(ofMax.limit.pressure)}
+              {t('of CIP {symbol} {limit}', {
+                symbol: ofMax.limit.symbol,
+                limit: p(ofMax.limit.pressure),
+              })}
             </dd>
           </div>
         )}
       </dl>
       <AppPopover position="bottom-end" width={popoverWidth.help} trapFocus>
         <Popover.Target>
-          <ActionIcon variant="subtle" size={44} aria-label="About the peak pressure">
+          <ActionIcon variant="subtle" size={44} aria-label={t('About the peak pressure')}>
             <Info size={24} aria-hidden="true" />
           </ActionIcon>
         </Popover.Target>
         <Popover.Dropdown>
-          <p className="range-help">{peakFacts(ok, system)}</p>
+          <p className="range-help">{peakFacts(ok, system, t)}</p>
         </Popover.Dropdown>
       </AppPopover>
     </>
@@ -93,6 +101,7 @@ function PeakPressure({
  * result context, so it shows what the Results tab shows.
  */
 export function RangeView() {
+  const { t } = useTranslation()
   const { ok, steps, stale, system, setSeen, chronoSessions, setChronoSessions } = useResult()
   const { run, pending } = useLoad()
   const { trajectoryLoad } = useInputEcho()
@@ -105,26 +114,20 @@ export function RangeView() {
     if (runId !== undefined)
       setSeen((s) => (s.has('trajectory') ? s : new Set([...s, 'trajectory'])))
   }, [runId, setSeen])
-  const hero =
-    ok &&
-    rangeHero(
-      system,
-      ok.load.charge,
-      ok.body.result.muzzleVelocity,
-      ok.steps.length > 1 ? selectedLabel(ok) : undefined,
-    )
+  const stepName = ok && ok.steps.length > 1 ? selectedLabel(ok) : undefined
+  const hero = ok && rangeHero(system, ok.load.charge, ok.body.result.muzzleVelocity, stepName, t)
   return (
-    <section className="range-view" aria-label="Range">
+    <section className="range-view" aria-label={t('Range')}>
       {/* always there, so a run moves nothing */}
       <dl className="range-hero" data-stale={stale || undefined}>
         <div>
-          <dt>{hero?.step ? `Charge, ${hero.step.toLowerCase()}` : 'Charge'}</dt>
+          <dt>{stepName ? t('Charge, step {label}', { label: stepName }) : t('Charge')}</dt>
           <dd>
             {hero?.charge.value} <span>{hero?.charge.unit}</span>
           </dd>
         </div>
         <div>
-          <dt>Muzzle velocity</dt>
+          <dt>{t('Muzzle velocity')}</dt>
           <dd>
             {hero?.velocity.value} <span>{hero?.velocity.unit}</span>
           </dd>
@@ -132,8 +135,8 @@ export function RangeView() {
       </dl>
       <ShownStrip name="range-step" />
       <div className="range-peak">{ok && <PeakPressure ok={ok} system={system} />}</div>
-      {ok && bandLine(ok.body, system) && (
-        <p className="range-needs band-line screen-only">{bandLine(ok.body, system)}</p>
+      {ok && bandLine(ok.body, system, t) && (
+        <p className="range-needs band-line screen-only">{bandLine(ok.body, system, t)}</p>
       )}
       <div id="range-chrono" hidden={!chrono}>
         {chrono && (
@@ -147,7 +150,7 @@ export function RangeView() {
         )}
       </div>
       <div className="range-bottom">
-        <span className="range-state">{stale && 'Inputs changed since this result.'}</span>
+        <span className="range-state">{stale && t('Inputs changed since this result.')}</span>
         <Button
           size="lg"
           variant={stale || !ok ? 'filled' : 'default'}
@@ -155,7 +158,7 @@ export function RangeView() {
           loaderProps={{ type: 'dots' }}
           onClick={() => run()}
         >
-          Run simulation
+          {t('Run simulation')}
         </Button>
         <div className="range-actions">
           <Button
@@ -165,7 +168,7 @@ export function RangeView() {
             aria-controls="range-chrono"
             onClick={() => setChrono((c) => !c)}
           >
-            Chronograph
+            {t('Chronograph')}
           </Button>
           <Button
             variant="default"
@@ -174,11 +177,11 @@ export function RangeView() {
             aria-describedby={card ? undefined : 'range-card-needs'}
             onClick={printRangeCard}
           >
-            Print range card
+            {t('Print range card')}
           </Button>
         </div>
         <p id="range-card-needs" className="range-needs">
-          {rangeCardNote(ok !== undefined, trajectoryLoad.bullet, waited && !card)}
+          {rangeCardNote(ok !== undefined, trajectoryLoad.bullet, waited && !card, t)}
         </p>
       </div>
     </section>

@@ -5,7 +5,8 @@
 
 import { dynamicVivacity, meanDynamicVivacity, type VivacityBurn } from '@open-reloading/core'
 import { type Powder, toSi } from '@open-reloading/schema'
-import { formatNumber } from '../i18n/number.ts'
+import { formatNumber, untranslated } from '../i18n/number.ts'
+import type { Translator } from '../i18n/translate.ts'
 import type { PowderSummary } from './api-types.ts'
 import { type ManufacturerNames, productLabel } from './manufacturers.ts'
 import { nth } from './nth.ts'
@@ -192,10 +193,21 @@ function meanText(p: FittedPowder): string {
 }
 
 /** Text alternative of one powder's curve: start, peak, end and the mean. */
-export function describeCurve(p: FittedPowder): string {
+export function describeCurve(p: FittedPowder, t: Translator['t'] = untranslated()): string {
   const values = chartBurntFractions.map((z) => curveAt(p, z).value)
   const peak = values.indexOf(Math.max(...values))
-  return `Dynamic vivacity of ${p.label} over burnt fraction 0 to 1: ${n2(nth(values, 0))} ${vivacityUnit} at z 0, highest ${n2(values[peak] ?? Number.NaN)} at z ${formatNumber(chartBurntFractions[peak] ?? Number.NaN, 2)}, ${n2(values.at(-1) ?? 0)} at z 1. Mean over z 0.1 to 0.9: ${meanText(p)}.`
+  return t(
+    'Dynamic vivacity of {label} over burnt fraction 0 to 1: {start} {unit} at z 0, highest {high} {unit} at z {z}, {end} {unit} at z 1. Mean over z 0.1 to 0.9: {mean}.',
+    {
+      label: p.label,
+      start: n2(nth(values, 0)),
+      unit: vivacityUnit,
+      high: n2(values[peak] ?? Number.NaN),
+      z: formatNumber(chartBurntFractions[peak] ?? Number.NaN, 2),
+      end: n2(values.at(-1) ?? 0),
+      mean: meanText(p),
+    },
+  )
 }
 
 /** The sentence of each group of powders without a curve. */

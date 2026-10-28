@@ -1,3 +1,4 @@
+import { msg, type Translator } from '../i18n/translate.ts'
 import type { InteriorResponse } from './api-types.ts'
 import { nth } from './nth.ts'
 
@@ -157,13 +158,13 @@ export type PlaybackEvent = {
 }
 
 /** Shot start, peak breech pressure, burnout when it is in the barrel, and muzzle exit, by time. */
-export function playbackEvents(r: PlaybackResult): PlaybackEvent[] {
+export function playbackEvents(r: PlaybackResult, t: Translator['t']): PlaybackEvent[] {
   const events: PlaybackEvent[] = [
-    { key: 'start', label: 'Shot start', time: r.shotStartTime },
-    { key: 'peak', label: 'Peak breech pressure', time: r.maxPressureTime },
+    { key: 'start', label: t('Shot start'), time: r.shotStartTime },
+    { key: 'peak', label: t('Peak breech pressure'), time: r.maxPressureTime },
   ]
-  if (r.burnout) events.push({ key: 'burnout', label: 'Burnout', time: r.burnout.time })
-  events.push({ key: 'muzzle', label: 'Muzzle exit', time: r.muzzleTime })
+  if (r.burnout) events.push({ key: 'burnout', label: t('Burnout'), time: r.burnout.time })
+  events.push({ key: 'muzzle', label: t('Muzzle exit'), time: r.muzzleTime })
   return events.sort((x, y) => x.time - y.time)
 }
 
@@ -173,15 +174,22 @@ export function powderSplit(r: PlaybackResult, at: (t: number) => PlaybackSample
   return { before, travel: r.muzzleBurntFraction - before, unburnt: 1 - r.muzzleBurntFraction }
 }
 
+/** Each term as a table row names it, and as a sentence names it mid-line (`lower`). */
 const energyLabels = {
-  translation: 'Bullet motion',
-  rotation: 'Bullet spin',
-  gasKinetic: 'Gas motion',
-  gas: 'Left in the gas',
-  resistance: 'Bore friction and engraving',
-  heat: 'Heat to the bore',
-  leakage: 'Gas leaking past the bullet',
-} as const
+  translation: { label: msg('Bullet motion'), lower: msg('bullet motion') },
+  rotation: { label: msg('Bullet spin'), lower: msg('bullet spin') },
+  gasKinetic: { label: msg('Gas motion'), lower: msg('gas motion') },
+  gas: { label: msg('Left in the gas'), lower: msg('left in the gas') },
+  resistance: {
+    label: msg('Bore friction and engraving'),
+    lower: msg('bore friction and engraving'),
+  },
+  heat: { label: msg('Heat to the bore'), lower: msg('heat to the bore') },
+  leakage: {
+    label: msg('Gas leaking past the bullet'),
+    lower: msg('gas leaking past the bullet'),
+  },
+}
 
 /** Terms whose inputs the web form does not send, so 0 means not modelled. */
 const unsent: ReadonlySet<string> = new Set(['resistance', 'heat', 'leakage'])
@@ -195,7 +203,7 @@ export function energySplit(energy: PlaybackResult['energy']) {
   const total = keys.reduce((sum, k) => sum + energy[k], 0)
   const terms = keys.map((key) => ({
     key,
-    label: energyLabels[key],
+    ...energyLabels[key],
     value: energy[key],
     share: energy[key] / total,
   }))

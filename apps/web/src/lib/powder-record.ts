@@ -1,4 +1,5 @@
 import type { Powder } from '@open-reloading/schema'
+import type { Translator } from '../i18n/translate.ts'
 
 /**
  * A powder record's M3 parameters in the workbench: the fill, the field marks, the fit summary
@@ -37,16 +38,26 @@ export function recordMark(
   key: string,
   si: number | undefined,
   shown: (si: number) => string,
-  /** Where the values come from: `record`, or `user design`. */
-  source = 'record',
+  /** Where the values come from. */
+  source: 'record' | 'user design',
+  t: Translator['t'],
 ) {
   const from = origin[key]
   if (from === undefined) return
   if (matchesRecordValue(from, si) && key === 'startPressure' && !p.interior?.startPressure)
-    return "From the fit's start pressure rule for barrels of 300 mm and longer."
-  if (matchesRecordValue(from, si))
-    return `From the ${source} (${p.interior?.fitted.some((k) => k === fittedKey[key]) ? 'fitted' : 'input of the fit'}).`
-  return `Changed from the ${source} value ${shown(from)}.`
+    return t("From the fit's start pressure rule for barrels of 300 mm and longer.")
+  if (matchesRecordValue(from, si)) {
+    const fitted = p.interior?.fitted.some((k) => k === fittedKey[key])
+    if (source === 'record')
+      return fitted ? t('From the record (fitted).') : t('From the record (input of the fit).')
+    return fitted
+      ? t('From the user design (fitted).')
+      : t('From the user design (input of the fit).')
+  }
+  const value = shown(from)
+  return source === 'record'
+    ? t('Changed from the record value {value}.', { value })
+    : t('Changed from the user design value {value}.', { value })
 }
 
 /**
