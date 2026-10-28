@@ -24,6 +24,7 @@ import {
 import { createPortal } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import type { ImportFile, ImportReport as Report } from '../lib/data-files.ts'
 import { dateTimeText, localDay } from '../lib/dates.ts'
 import { download } from '../lib/download.ts'
 import { errorText } from '../lib/error-text.ts'
@@ -36,7 +37,7 @@ import {
   tableFormats,
   writeHandleText,
 } from '../lib/file-access.ts'
-import { loadFileFormats, parseFiles, readLoadFile, readNote } from '../lib/load-file-formats.ts'
+import { loadFileFormats, readLoadFile, readNote } from '../lib/load-file-formats.ts'
 import { shownManufacturerRefs } from '../lib/manufacturers.ts'
 import { guardNavigation, guardPop } from '../lib/navigation-guard.ts'
 import { newId } from '../lib/new-id.ts'
@@ -46,7 +47,6 @@ import { controlSize } from '../lib/theme.ts'
 import {
   canonicalJson,
   checkedUserDataText,
-  exportAllText,
   type InvalidRecord,
   makerIdOf,
   makerRecordsOf,
@@ -55,7 +55,6 @@ import {
   namedKey,
   type ParsedUserFile,
   parseUserDataFile,
-  planImport,
   reasonText,
   refNote,
   renamedKey,
@@ -64,12 +63,10 @@ import {
   validRecords,
 } from '../lib/user-data.ts'
 import { ownsFile, recordFileName } from '../lib/user-file-names.ts'
-import { droppedPhotos, embeddedFileBlob, embedFiles, photoIds } from '../lib/user-photos.ts'
+import { droppedPhotos, embedFiles, photoIds } from '../lib/user-photos.ts'
 import {
   deletePhoto,
   deleteRecords,
-  putInvalid,
-  putPhoto,
   putRecordIfAbsent,
   putRecords,
   rawPhotoId,
@@ -78,6 +75,7 @@ import {
   storedPhotoIds,
   storedRecord,
   storedRecords,
+  storePhotos,
 } from '../lib/user-store.ts'
 import {
   canPickFolder,
@@ -206,19 +204,6 @@ export interface FileMenuHandle {
 /** An item a page adds to the Open menu. */
 type FileMenuItem = { label: string; run: () => void }
 
-type Report = {
-  added: number
-  equal: number
-  skipped: { name: string; reason: string }[]
-  /** Warnings and fields not read of the files read. */
-  notes: { name: string; note: string }[]
-  conflicts: { incoming: UserRecord; stored: UserRecord }[]
-  /** The `invalid` entries of the files: stored as invalid records, left out for an id the browser has, or unstorable. */
-  invalid: { added: number; kept: number; unstorable: number }
-  /** Photos the files carry, stored with the records that are replaced. */
-  files: EmbeddedFile[]
-}
-
 /** The photos `records` point at, as file entries; the ones not in this browser are left out. */
 async function photosOf(records: UserRecord[]) {
   const blobs = await Promise.all(
@@ -228,12 +213,6 @@ async function photosOf(records: UserRecord[]) {
     })),
   )
   return embedFiles(blobs.filter((b): b is { id: string; blob: Blob } => b.blob !== undefined))
-}
-
-/** Keeps in this browser the photos of `records` that the file carries. */
-async function storePhotos(files: EmbeddedFile[], records: UserRecord[]) {
-  const wanted = new Set(photoIds(records))
-  for (const f of files) if (wanted.has(f.id)) await putPhoto(f.id, embeddedFileBlob(f))
 }
 
 /** The user manufacturer `record` names, as `carried` holds it, kept unless one of its id is stored; false when the store refused it. */
@@ -519,105 +498,6 @@ async function keepInBrowser(r: UserRecord, files: EmbeddedFile[], t: Translator
   return true
 }
 
-/** The sentences after an export: the photos left out for the size limit and the invalid records in it. */
-function exportNotes(
-  records: UserRecord[],
-  invalid: InvalidRecord[],
-  left: string[],
-  t: Translator['t'],
-  tn: Translator['tn'],
-) {
-  const without = records.flatMap((s) =>
-    s.kind === 'targetSheet' && left.includes(s.data.photo ?? '') ? [s.name] : [],
-  )
-  const photos = without.length
-    ? t(
-        'Left out for the file size limit: the photos of {names}. Save on a sheet keeps its photo.',
-        { names: without.join(', ') },
-      )
-    : ''
-  const raw = invalid.length
-    ? tn(
-        invalid.length,
-        '{count} invalid record is in it as stored.',
-        '{count} invalid records are in it as stored.',
-      )
-    : ''
-  return [raw, photos].filter(Boolean).join(' ')
-}
-
-/** What an import reports to: the store hooks and the page's messages. */
-interface ImportIo {
-  onStored?: (() => void) | undefined
-  noteStorage: () => void
-  fail: (said: Said) => void
-  show: (report: Report) => void
-}
-
-/** Reads and stores one file at a time, so several large files are not held at once. */
-async function importTexts(
-  files: { name: string; bytes: () => Promise<Uint8Array | undefined> }[],
-  io: ImportIo,
-  { t }: Translator,
-) {
-  const total: Report = {
-    added: 0,
-    equal: 0,
-    skipped: [],
-    notes: [],
-    conflicts: [],
-    invalid: { added: 0, kept: 0, unstorable: 0 },
-    files: [],
-  }
-  let count = 0
-  const added: UserRecord[] = []
-  for (const f of files) {
-    const {
-      records,
-      files: photos,
-      invalid,
-      skipped,
-      notes,
-    } = parseFiles([{ name: f.name, bytes: await f.bytes() }], undefined, t)
-    count += records.length
-    const plan = planImport(records, (await storedRecords()).records)
-    try {
-      // an equal record may come to a browser without its photo
-      await storePhotos(photos, [...plan.added, ...plan.equal])
-      await putRecords(plan.added)
-      // after the valid records, and never over a record with its id
-      const stored = await putInvalid(invalid)
-      for (const k of ['added', 'kept', 'unstorable'] as const) total.invalid[k] += stored[k]
-    } catch (e) {
-      io.fail(({ tn }) =>
-        tn(
-          count,
-          'Import read {count} record; the browser store write failed: {error}',
-          'Import read {count} records; the browser store write failed: {error}',
-          { error: errorText(e) },
-        ),
-      )
-      if (total.added) io.onStored?.()
-      return
-    }
-    added.push(...plan.added)
-    total.added += plan.added.length
-    total.equal += plan.equal.length
-    total.skipped.push(...skipped)
-    total.notes.push(...notes)
-    total.conflicts.push(...plan.conflicts)
-    // kept for Replace: only the photos of the records it may store
-    const wanted = new Set(photoIds(plan.conflicts.map((c) => c.incoming)))
-    total.files.push(...photos.filter((p) => wanted.has(p.id)))
-  }
-  // once all files are stored, so a reference to a record of a later file resolves
-  const refs = await refsOf(added, t)
-  if (refs) total.notes.push({ name: t('References'), note: refs })
-  io.onStored?.()
-  io.noteStorage()
-  io.show(total)
-}
-
 /** The Import entry once a pick opened it. */
 function TablesPage({
   tables,
@@ -817,35 +697,13 @@ function ImportReport({
   onClose: () => void
   onReplace: () => void
 }) {
-  const { t, tn } = useTranslation()
-  const { invalid } = report
+  const tr = useTranslation()
+  const { t } = tr
+  const said = report.said(tr)
   return (
     <>
-      <p>
-        {t('{added} records added, {equal} already in this browser, {skipped} files skipped.', {
-          added: report.added,
-          equal: report.equal,
-          skipped: report.skipped.length,
-        })}
-      </p>
-      {invalid.added + invalid.kept + invalid.unstorable > 0 && (
-        <p>
-          {[
-            tn(
-              invalid.added,
-              '{count} invalid record restored',
-              '{count} invalid records restored',
-            ),
-            invalid.kept > 0 &&
-              t('{count} left out because a browser record has their id', { count: invalid.kept }),
-            invalid.unstorable > 0 &&
-              t('{count} left out without a text id', { count: invalid.unstorable }),
-          ]
-            .filter(Boolean)
-            .join(', ')}
-          .
-        </p>
-      )}
+      <p>{said.summary}</p>
+      {said.invalid && <p>{said.invalid}</p>}
       {report.skipped.length > 0 && (
         <ul className="file-skipped">
           {report.skipped.map((s) => (
@@ -865,16 +723,9 @@ function ImportReport({
           ))}
         </ul>
       )}
-      {report.conflicts.length > 0 ? (
+      {said.conflicts ? (
         <>
-          <p>
-            {tn(
-              report.conflicts.length,
-              '{count} record has the id of a browser record with other content: {names}. Replace the browser copy?',
-              '{count} records have the id of a browser record with other content: {names}. Replace the browser copies?',
-              { names: report.conflicts.map((c) => c.stored.name).join(', ') },
-            )}
-          </p>
+          <p>{said.conflicts}</p>
           <Group>
             <Button onClick={onReplace}>{t('Replace')}</Button>
             <Button variant="default" onClick={onClose}>
@@ -1503,6 +1354,8 @@ function FileMenuOf<K extends UserRecordKind>({
       setMessage(plain(msg('No records in this browser yet; Save keeps a record here.')))
       return false
     }
+    // a plain import() like the data file import's: Export all is one click of the menu
+    const { exportAllText, exportNotes } = await import('../lib/data-files.ts')
     const checked = exportAllText(records, await photosOf(records), invalid)
     if (!checked.ok) {
       const { reason } = checked
@@ -1526,11 +1379,19 @@ function FileMenuOf<K extends UserRecordKind>({
     return r !== undefined
   }
 
-  const importIo = {
-    onStored,
-    noteStorage: () => void noteStorage(),
-    fail: setFailure,
-    show: setReport,
+  // a plain import() like the Import entry's: the data file import runs only after a pick or a paste
+  async function importTexts(files: ImportFile[]) {
+    await (await import('../lib/data-files.ts')).importTexts(
+      files,
+      {
+        onStored,
+        noteStorage: () => void noteStorage(),
+        fail: setFailure,
+        show: setReport,
+        refs: (added) => refsOf(added, t),
+      },
+      tr,
+    )
   }
 
   const importData = (files: File[]) =>
@@ -1540,8 +1401,6 @@ function FileMenuOf<K extends UserRecordKind>({
         bytes: async () =>
           file.size > maxFileBytes ? undefined : new Uint8Array(await file.arrayBuffer()),
       })),
-      importIo,
-      tr,
     )
 
   async function importFiles() {
@@ -1835,11 +1694,9 @@ function FileMenuOf<K extends UserRecordKind>({
             onClick={act(msg('Paste failed: {error}'), async () => {
               const text = pasted ?? ''
               setPasted(undefined)
-              await importTexts(
-                [{ name: t('Pasted text'), bytes: async () => new TextEncoder().encode(text) }],
-                importIo,
-                tr,
-              )
+              await importTexts([
+                { name: t('Pasted text'), bytes: async () => new TextEncoder().encode(text) },
+              ])
             })}
           >
             {t('Import')}

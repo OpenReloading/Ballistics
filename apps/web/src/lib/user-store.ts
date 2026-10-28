@@ -2,10 +2,10 @@
  * The browser store of user records and target photos (IndexedDB); the workspace folder handle is
  * kept in the same database (`workspace-folder.ts`).
  */
-import type { UserRecord } from '@open-reloading/schema'
+import type { EmbeddedFile, UserRecord } from '@open-reloading/schema'
 import { validRecords } from './user-data.ts'
 import { inStore } from './user-db.ts'
-import { photoIds } from './user-photos.ts'
+import { embeddedFileBlob, photoIds } from './user-photos.ts'
 
 /** The schema-valid records of the browser store and the invalid ones, as stored: none is dropped. */
 export const storedRecords = async () =>
@@ -163,6 +163,12 @@ export const deleteRecord = (id: string) => deleteRecords([id])
 /** A user file (a target photo) kept in this browser under `id`; never sent anywhere. */
 export const putPhoto = (id: string, file: Blob) =>
   inStore('files', 'readwrite', (s) => s.put(file, id))
+
+/** Keeps in this browser the photos of `records` that the file carries. */
+export async function storePhotos(files: EmbeddedFile[], records: UserRecord[]) {
+  const wanted = new Set(photoIds(records))
+  for (const f of files) if (wanted.has(f.id)) await putPhoto(f.id, embeddedFileBlob(f))
+}
 
 export const storedPhoto = (id: string) =>
   inStore('files', 'readonly', (s) => s.get(id)) as Promise<Blob | undefined>
