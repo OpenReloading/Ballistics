@@ -196,6 +196,7 @@
       "mean must be finite",
       "standard deviation must be 0 or more",
       "each string needs at least two shots",
+      "every string needs at least one velocity",
       "charges must differ"
     ],
     "load file values": [
