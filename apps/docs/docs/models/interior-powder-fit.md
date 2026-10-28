@@ -7,7 +7,7 @@ description: Weighted least-squares fit of the burn coefficient and, on request,
 
 The burn form and the pressure exponent are fitted to a measured pressure-time trace on the [curve fit page](interior-curve-fit.md).
 
-`fitPowder` fits the burn coefficient of one [M3](interior-m3.md) load and, on request, its shot-start pressure, a factor on its chamber volume, its specific energy and a factor on its temperature sensitivities to a ladder: charges with their mean muzzle velocities and, optionally, measured peak pressures. Points of a ladder may be fired from another barrel length or at another powder temperature, which is what resolves the energy and the temperature factor ([below](#several-barrel-lengths-and-temperatures)); `fitPowderSessions` takes such ladders as sessions and holds the parameters they do not resolve. The fit works on log parameters with the Levenberg-Marquardt loop of the [least-squares page](least-squares.md). It reports the fitted values, their uncertainty, correlation and covariance, the residuals, $\chi^2$ split into the ladder's and the priors' share, the degrees of freedom and the condition number. Optional Gaussian priors on the log parameters turn the fit into a maximum a posteriori estimate, and an optional Huber loss limits the pull of one outlying string. The fitted values describe the ladder's rifle, powder lot, components and model version over the ladder's charge range, barrel lengths and temperatures. They are not powder data and not load data. `predictPowder` propagates the covariance to the muzzle velocity and the peak pressure at any charge, with an interval, and marks a charge outside the ladder's range.
+`fitPowder` fits the burn coefficient of one [M3](interior-m3.md) load and, on request, its shot-start pressure, a factor on its chamber volume, its specific energy and a factor on its temperature sensitivities to a ladder: charges with their mean muzzle velocities and, optionally, measured peak pressures. Points of a ladder may be fired from another barrel length or at another powder temperature, which is what resolves the energy and the temperature factor ([below](#several-barrel-lengths-and-temperatures)); `fitPowderSessions` takes such ladders as sessions and holds the parameters they do not resolve. The fit works on log parameters with the Levenberg-Marquardt loop of the [least-squares page](least-squares.md). It reports the fitted values, their uncertainty, correlation and covariance, the residuals, $\chi^2$ split into the ladder's and the priors' share, the degrees of freedom and the condition number. Optional Gaussian priors on the log parameters turn the fit into a maximum a posteriori estimate, and an optional Huber loss limits the pull of one outlying string. The fitted values describe the ladder's rifle, powder lot, components and model version over the ladder's charge range, barrel lengths and temperatures. They are not powder data and not load data. `predictPowder` propagates the covariance to the muzzle velocity and the peak pressure at any charge, with an interval, and names each axis on which a prediction lies outside the data the fit was made from.
 
 ## Equations
 
@@ -143,7 +143,25 @@ $$
 
 Code: `packages/core/src/interior/fit.ts`, `predictPowder` (`quantile`), `packages/core/src/groups/chi-square.ts`, `chiSquareQuantile`, `packages/core/src/groups/student-t.ts`, `studentTwoSidedQuantile`.
 
-A charge below the smallest or above the largest ladder charge (`chargeRange`) is returned with `extrapolation` set to `below` or `above`. Nothing else changes there. How the band behaves outside the range follows from the covariance: with both parameters fitted it widens quickly beyond the ladder, because the data no longer separate the two effects. With the burn coefficient alone the band follows the sensitivity of the model to that one parameter and can narrow where the sensitivity falls, the velocity band above the ladder for example. The band holds parameter uncertainty only. It contains no model error: a wrong form function, energy or heat loss shifts the true value away from the band, and the farther from the ladder, the more so. A charge at which the model has no valid run, or the perturbed parameters have none, throws a `PowderFitError` with reason `invalid`. A fit without a covariance (as many rows as parameters and no uncertainties) cannot predict.
+#### Domain
+
+A fit keeps the data it was made from as its `domain`: one closed range per axis, each widened by a relative margin $\delta$ (default `powderDomainMargin`, 0.05, set per fit with `domainMargin`; an assumption, not yet tuned against held-out ladders):
+
+$$
+[\,x_\min (1 - \delta),\; x_\max (1 + \delta)\,]
+$$
+
+Code: `packages/core/src/interior/fit.ts`, `fitDomain`, `outsideDomain`.
+
+| Axis | Spans | Checked in a prediction against |
+|---|---|---|
+| `charge` | the ladder charges | the charge |
+| `velocity` | the measured muzzle velocities | the predicted muzzle velocity |
+| `pressure` | the measured peak pressures; absent without any | the predicted peak breech pressure |
+| `boreDiameter` | the load's bore diameter, a single value | `boreDiameter` of the options, default the load's |
+| `barrelLength` | the barrel lengths of the ladder points, default the load's | `barrelLength` of the options, default the load's |
+
+`predictPowder` sets `extrapolation` to an object that names each axis outside its range with the side, `below` or `above`, and leaves it out when every axis is inside. A value exactly at a widened end is inside. The axes are independent: a charge above the ladder usually brings a predicted velocity and pressure above the measured ones, and then all three are named. A `boreDiameter` option changes the bore diameter of the run and scales the bore area with its square. The propellant temperature is not an axis of the domain. Nothing else changes outside the domain. How the band behaves outside the range follows from the covariance: with both parameters fitted it widens quickly beyond the ladder, because the data no longer separate the two effects. With the burn coefficient alone the band follows the sensitivity of the model to that one parameter and can narrow where the sensitivity falls, the velocity band above the ladder for example. The band holds parameter uncertainty only. It contains no model error: a wrong form function, energy or heat loss shifts the true value away from the band, and the farther from the ladder, the more so. A charge at which the model has no valid run, or the perturbed parameters have none, throws a `PowderFitError` with reason `invalid`. A fit without a covariance (as many rows as parameters and no uncertainties) cannot predict.
 
 ### Pressure range from the fixed inputs
 
@@ -219,7 +237,7 @@ The reasons do not change the label. They say what the range rests on or does no
 | `start-pressure-correlated` | the start pressure is fitted and its correlation with the burn coefficient is above 0.9 in magnitude |
 | `weak-prior` | the prior from `similarPowdersPrior` is weak |
 | `outside-similar-powders` | the fitted burn coefficient lies more than 2 standard deviations of the prior from its centre |
-| `extrapolated` | a point of the range lies outside the ladder's charge range |
+| `extrapolated` | a point of the range lies outside the fit's domain on the charge or barrel length axis |
 | `input-refit-failed` | the refit for an input failed, so the input is not in the range |
 
 The result also carries the fit's basis. The thresholds are assumptions, to be tuned against real sessions. A `tight` label says that the inputs the range holds move the pressure little. It does not cover the model error of the inputs it leaves out, and a trend in the residuals, a prior far from the data or an extrapolation weaken it as the reasons say.
@@ -288,6 +306,7 @@ Malformed input (an empty ladder, a value that is not finite and above 0, uncert
 | $\chi^2$ | Sum of squared weighted residuals | 1 | 1 |
 | $n$, $n_p$, $\nu$ | Rows, parameters, degrees of freedom | 1 | 1 |
 | $C_\theta$ | Covariance of the log parameters | 1 | 1 |
+| $x_\min$, $x_\max$, $\delta$ | Smallest and largest value of an axis in the data, relative margin of the domain | as the axis, 1 | as the axis, 1 |
 | $m$, $\hat y$ | Charge of a prediction, predicted muzzle velocity or peak breech pressure | g, m/s or bar | kg, m/s or Pa |
 | $u(\hat y)$, $g_j$ | Standard uncertainty of a prediction, its gradient in the log parameters | as $\hat y$ | as $\hat y$ |
 | $k$, $z$, $t$, $\alpha$ | Coverage factor, normal and Student quantile, one minus the coverage | 1 | 1 |
@@ -310,7 +329,7 @@ Malformed input (an empty ladder, a value that is not finite and above 0, uncert
 
 - The fit is local: from a start far from the solution the steps can end at the start-pressure floor with `unresolved`.
 - The peak pressure has a kink in the parameters where the peak moves between a located interior peak and burnout. A Jacobian taken across it mixes both sides.
-- Charges outside the ladder's range are extrapolations. The result holds no charge recommendation and no limit.
+- A prediction outside the domain is an extrapolation. The result holds no charge recommendation and no limit. The domain is the span of the data plus a margin, not a statement that the model holds inside it.
 - A prediction band covers parameter uncertainty and not model error, and it is linearized: far from the ladder, where the model is strongly nonlinear in the parameters, the interval is less reliable.
 - The posterior uncertainty is the first-order Laplace approximation, no sampling. With a Huber loss it is approximate.
 - The burn coefficient, start pressure, volume factor, energy and temperature factor are fitted. Exponent, form parameters and the ratio of the two temperature sensitivities stay as given. Pooling over lots and over shooters is not supported: the sessions of one fit share one rifle's load, one lot and one set of fixed inputs.
