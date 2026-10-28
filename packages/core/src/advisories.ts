@@ -116,10 +116,10 @@ export const advisoryRules: readonly AdvisoryRule[] = [
   {
     id: 'startPressureHeldOnce',
     severity: 'info',
-    inputs: ['startPressure', 'resistance.engraving'],
+    inputs: ['startPressure', 'ignitionPressure', 'resistance.friction', 'resistance.engraving'],
     name: 'start pressure held once',
     message:
-      'The start pressure is above the bore resistance at travel 0 and the engraving pressure at travel 0 is not 0, so the projectile is held until the start pressure and then resisted at the lower bore resistance.',
+      'The start pressure is above the bore resistance at travel 0 and above the ignition pressure, and the engraving pressure at travel 0 is not 0, so the projectile is held until the start pressure and then resisted at the lower bore resistance.',
     fix: 'Set the start pressure to the bore resistance at travel 0 or below, or the engraving pressure at travel 0 to 0.',
   },
 ]
@@ -134,16 +134,19 @@ export const advisoryRule = Object.fromEntries(
 ) as unknown as Readonly<Record<AdvisoryId, AdvisoryRule>>
 
 /** The inputs of an interior load that the input rules read. */
-export type AdvisoryLoad = Pick<InteriorLoad, 'startPressure' | 'barrel' | 'bullet' | 'resistance'>
+export type AdvisoryLoad = Pick<
+  InteriorLoad,
+  'startPressure' | 'ignitionPressure' | 'barrel' | 'bullet' | 'resistance'
+>
 
 /**
  * The input rules that fire for `load`: a start pressure at or below the bore resistance at travel 0
  * (the friction plus the engraving pressure there; a start pressure of 0 counts as not given), a
- * radius of gyration with a twist of 0, and a start pressure above that resistance with an engraving
- * pressure at travel 0 that is not 0. Reads the load and changes nothing.
+ * radius of gyration with a twist of 0, and a start pressure above both that resistance and the ignition
+ * pressure (else the shot starts at once) with an engraving pressure at travel 0 that is not 0. Reads the load and changes nothing.
  */
 export function interiorAdvisories(load: AdvisoryLoad): AdvisoryRule[] {
-  const { startPressure, barrel, bullet, resistance } = load
+  const { startPressure, ignitionPressure, barrel, bullet, resistance } = load
   const first = resistance?.engraving?.[0]
   const engraving = first !== undefined && first.travel === 0 ? first.pressure : 0
   const floor = (resistance?.friction ?? 0) + engraving
@@ -151,6 +154,7 @@ export function interiorAdvisories(load: AdvisoryLoad): AdvisoryRule[] {
   if (startPressure > 0 && startPressure <= floor) fired.push('startPressureBelowResistance')
   if (bullet.gyrationRadius !== undefined && !(barrel.twist > 0))
     fired.push('gyrationRadiusWithoutTwist')
-  if (startPressure > floor && engraving > 0) fired.push('startPressureHeldOnce')
+  if (startPressure > floor && startPressure > ignitionPressure && engraving > 0)
+    fired.push('startPressureHeldOnce')
   return fired.map((id) => advisoryRule[id])
 }

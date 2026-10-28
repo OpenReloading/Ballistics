@@ -95,6 +95,23 @@ describe('start pressure held once and resisted again', () => {
     ).not.toContain(id)
     expect(fired(withLoad({ resistance: { friction: 1e6 }, startPressure: 3e6 }))).not.toContain(id)
   })
+  it('does not fire when the ignition pressure reaches the start pressure', () => {
+    const resistance = ramp(2e6)
+    expect(fired(withLoad({ resistance, startPressure: 3e6, ignitionPressure: 2.9e6 }))).toContain(
+      id,
+    )
+    expect(
+      fired(withLoad({ resistance, startPressure: 3e6, ignitionPressure: 3e6 })),
+    ).not.toContain(id)
+    expect(
+      fired(withLoad({ resistance, startPressure: 3e6, ignitionPressure: 4e6 })),
+    ).not.toContain(id)
+  })
+  it('reads the friction as an input', () => {
+    expect(advisoryRule[id].inputs).toEqual(
+      expect.arrayContaining(['ignitionPressure', 'resistance.friction']),
+    )
+  })
 })
 
 describe('advisories never change a result', () => {
