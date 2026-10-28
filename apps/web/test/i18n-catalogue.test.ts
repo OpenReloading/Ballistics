@@ -128,6 +128,8 @@ const otherSense: Record<string, string> = {
     'Safety text: the owner approves its wording',
   'Measurements, statistics, group sizes, scores and records shown here can contain errors from the models, the data or your inputs.':
     'Safety text: the owner approves its wording',
+  'Burn rate, {unit}':
+    'the heading of the burn rate figure, a single line in a narrow box where the full term does not fit',
   'Safety notice and disclaimer': 'the heading of a page that holds the notice and the disclaimer',
   'boatTailLength must be zero or more': 'zero: the number',
   'meplatDiameter must be zero up to the diameter': 'zero: the number',
