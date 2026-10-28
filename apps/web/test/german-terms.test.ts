@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import table from '../src/i18n/german-terms.json'
 
-const statuses = ['verified', 'disputed', 'unverified']
+const statuses = ['verified', 'decided', 'unverified']
 const groups = ['components', 'measurements', 'procedures', 'target-shooting']
 const terms = table.terms
 const sourceIds = Object.keys(table.sources)
@@ -51,23 +51,27 @@ describe('German term table', () => {
     }
   })
 
-  it('gives a disputed row at least two distinct candidates, each with a source', () => {
-    for (const t of terms.filter((r) => r.status === 'disputed')) {
-      expect(t.german, t.key).toBeNull()
+  it('gives a decided row one of its at least two distinct, sourced candidates and a decision', () => {
+    for (const t of terms.filter((r) => r.status === 'decided')) {
       expect(t.candidates.length, t.key).toBeGreaterThanOrEqual(2)
+      expect(
+        t.candidates.map((c) => c.german),
+        t.key,
+      ).toContain(t.german)
       expect(dups(t.candidates.map((c) => c.german)), t.key).toEqual([])
       for (const c of t.candidates) {
         expect(c.german.trim(), t.key).not.toBe('')
         expect(c.sources.length, `${t.key} ${c.german}`).toBeGreaterThan(0)
       }
+      expect(t.decision, t.key).toMatch(/^Rule [a-e]: .+\.$/)
     }
   })
 
-  it('marks an unverified row as a candidate or none, with a note on the search', () => {
+  it('marks an unverified row as accepted for 1.0, with a note on the search', () => {
     for (const t of terms.filter((r) => r.status === 'unverified')) {
       expect(t.candidates, t.key).toEqual([])
       expect(t.german === null || t.german.trim() !== '', t.key).toBe(true)
-      expect(t.note?.trim(), t.key).toBeTruthy()
+      expect(t.note, t.key).toMatch(/^Accepted as candidate for 1\.0/)
     }
   })
 })

@@ -72,7 +72,7 @@ describe('the message table', () => {
       `Geben Sie eine Zahl für ${german.t('Pressure')} ein.`,
     )
     expect(translateMessage('ladder charge 0.0025 kg must be above 0', german.t)).toBe(
-      'Die Ladung 0,0025 kg des Ladeleiters muss größer als 0 sein',
+      'Die Treibladung 0,0025 kg des Ladeleiters muss größer als 0 sein',
     )
     expect(translateMessage('bullet 6.5 Creedmoor has no length', german.t)).toBe(
       'Geschoss 6.5 Creedmoor hat keine Länge',

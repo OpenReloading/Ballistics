@@ -59,4 +59,20 @@ npm run i18n -w @open-reloading/web -- messages     # every message in the sourc
 3. Run `missing <code>` until it lists nothing you want to translate.
 4. `npm test -w @open-reloading/web` checks every catalogue: no key without a message, equal placeholders, only categories of the language.
 
-The German catalogue follows the term table `apps/web/src/i18n/german-terms.json`. A verified term is used as the table gives it. A disputed term takes one of its candidates until the owner decides. Another language has no table yet: add one with the same shape if the language needs one.
+The German catalogue follows the term table `apps/web/src/i18n/german-terms.json`. A verified or decided term is used as the table gives it. Another language has no table yet: add one with the same shape if the language needs one.
+
+A row has one of three statuses:
+
+- `verified`: one German term and its sources.
+- `decided`: the sources disagree. `german` holds the chosen candidate, `candidates` keeps all of them with their sources, and `decision` names the rule that chose. Changing the choice means changing `german` and `decision` and the catalogue strings that write the term; `i18n-catalogue.test.ts` fails for a string that writes a rejected candidate where the English word occurs.
+- `unverified`: no source found. The row keeps its candidate or none and the note starts "Accepted as candidate for 1.0".
+
+The rules for a decided row, applied in this order:
+
+1. Target-shooting group: a candidate that a statute or federation rule book uses wins over one that only a maker text uses.
+2. Components and procedures groups: a candidate that a maker manual or a cartridge dimension table uses wins over one that only a rule book uses.
+3. The candidate with the most distinct sources (a document and a place count once).
+4. On a tie, the shorter term (a button label has to fit).
+5. On a tie in length, the candidate listed first.
+
+A rule that leaves one candidate ends the search. Rules 1 and 2 only narrow the field when some, not all, of the candidates qualify. The measurements group starts at rule 3.

@@ -81,6 +81,6 @@ it('the properties hold the number, flag, cup, use and published figures', () =>
 it('also finds a primer by its size and compound as the language shown writes them', () => {
   const row = defined(rows[0])
   const { t } = translator(de, 'de')
-  for (const q of ['gewehr groß', 'bleifrei']) expect(primerMatches(row, q, t), q).toBe(true)
-  expect(primerMatches(row, 'gewehr groß')).toBe(false)
+  for (const q of ['büchse groß', 'bleifrei']) expect(primerMatches(row, q, t), q).toBe(true)
+  expect(primerMatches(row, 'büchse groß')).toBe(false)
 })
