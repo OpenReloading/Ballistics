@@ -585,9 +585,11 @@ describe('POST /interior pressure range and limits', () => {
     ])
     const { nominalPressure, lowPressure, highPressure } = body.pressureRange
     const bar = (pa: number) => Math.round(pa / 1e5)
-    expect(body.warnings).toEqual([
+    expect(body.warnings).toMatchObject([
       {
         code: 'limitExceeded',
+        severity: 'warn',
+        inputs: ['cartridge'],
         spec: 'cip-alpha-rifle-2020-01-01',
         symbol: 'Pmax',
         method: null,
@@ -616,6 +618,46 @@ describe('POST /interior pressure range and limits', () => {
     expect(m3.body.resolved.cartridge.id).toBe('alpha-rifle')
   })
 
+  it('warns about an ignored or held start pressure and gyration radius, and changes no result', async () => {
+    const answer = async (load: InteriorLoad) => {
+      const { status, body } = await run({}, load)
+      expect(status).toBe(200)
+      const { warnings, inputHash, ...rest } = body
+      return { rest, codes: warnings.map((w: { code: string }) => w.code), warnings }
+    }
+    const base = await answer(m3Load)
+    expect(base.codes).toEqual(['noCartridge'])
+    // twist 0 in the test load: the radius is ignored, the run is the one without it
+    const radius = await answer({ ...m3Load, bullet: { ...m3Load.bullet, gyrationRadius: 0.002 } })
+    expect(radius.codes).toEqual(['noCartridge', 'gyrationRadiusWithoutTwist'])
+    expect(radius.warnings[1]).toMatchObject({
+      severity: 'warn',
+      inputs: ['bullet.gyrationRadius', 'barrel.twist'],
+    })
+    expect(radius.warnings[1].fix).toBeTypeOf('string')
+    expect(radius.warnings[1].message).not.toMatch(/safe/i)
+    const { rest: restWith } = radius
+    expect(restWith.result).toEqual(base.rest.result)
+    // a start pressure below the friction pressure
+    const below = await answer({
+      ...m3Load,
+      startPressure: 1e6,
+      resistance: { friction: 2e6 },
+    })
+    expect(below.codes).toContain('startPressureBelowResistance')
+    const same = await answer({ ...m3Load, startPressure: 0, resistance: { friction: 2e6 } })
+    expect(same.codes).not.toContain('startPressureBelowResistance')
+    expect(below.rest.result).toEqual(same.rest.result)
+    // above the floor with an engraving pressure at travel 0
+    const held = await answer({
+      ...m3Load,
+      startPressure: 3e6,
+      resistance: { engraving: [{ travel: 0, pressure: 1e6 }] },
+    })
+    expect(held.codes).toContain('startPressureHeldOnce')
+    expect(held.codes).not.toContain('startPressureBelowResistance')
+  })
+
   it('marks an M3 range incomplete when the slower cases pass maxTime', async () => {
     // maxTime 0.2 % above the nominal muzzle time (1.7416e-3 s)
     const { status, body } = await post(`${API_PREFIX}/interior`, {
@@ -636,9 +678,10 @@ describe('POST /interior pressure range and limits', () => {
       ['burnRateFraction', -1, 'maxTime'],
       ['all', -1, 'maxTime'],
     ])
-    expect(body.warnings).toEqual([
+    expect(body.warnings).toMatchObject([
       {
         code: 'rangeIncomplete',
+        severity: 'warn',
         message:
           '4 of 12 range cases could not be computed (maxTime); the range covers only the computed cases, and the true range can be wider.',
       },

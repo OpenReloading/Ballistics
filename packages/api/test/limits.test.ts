@@ -118,19 +118,26 @@ describe('limitCheck', () => {
     const check = (meanPressure: number, startPressure: number, ignitionPressure: number) =>
       limitCheck(low, pmax, {
         result: { maxMeanPressure: meanPressure },
-        load: { startPressure, ignitionPressure },
+        load: {
+          startPressure,
+          ignitionPressure,
+          barrel: { length: 0.6, twist: 0.3 },
+          bullet: { mass: 0.01 },
+        },
       }).warnings
     expect(check(4.41e7, 2e7, 1e6)).toEqual([])
     // no part compares with the cartridge maximum pressure
     expect(check(4.5e6, 0, 2e6)).toEqual([])
-    expect(check(4.39e7, 2e7, 1e6)).toEqual([
+    expect(check(4.39e7, 2e7, 1e6)).toMatchObject([
       {
         code: 'chargeTooSmall',
+        severity: 'warn',
+        inputs: ['charge', 'startPressure', 'ignitionPressure'],
         message:
           'Charge too small for the model: the simulated peak mean pressure, 439 bar, is below 2.2 times the start pressure (200 bar); results are outside the range the model was built for.',
       },
     ])
-    expect(check(4.3e6, 0, 2e6)).toEqual([
+    expect(check(4.3e6, 0, 2e6)).toMatchObject([
       {
         code: 'chargeTooSmall',
         message:

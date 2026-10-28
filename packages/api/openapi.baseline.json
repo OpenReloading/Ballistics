@@ -11242,9 +11242,28 @@
                                   "rangeIncomplete",
                                   "chargeTooSmall",
                                   "resistanceNotApplied",
-                                  "loadRatioHigh"
+                                  "loadRatioHigh",
+                                  "startPressureBelowResistance",
+                                  "gyrationRadiusWithoutTwist",
+                                  "startPressureHeldOnce"
                                 ],
                                 "description": "The rule of the message"
+                              },
+                              "severity": {
+                                "type": "string",
+                                "enum": ["error", "warn", "info"],
+                                "description": "error blocks a run, warn and info never change a result"
+                              },
+                              "inputs": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                },
+                                "description": "The inputs the rule reads"
+                              },
+                              "fix": {
+                                "type": "string",
+                                "description": "What changes the situation"
                               },
                               "message": {
                                 "type": "string",
@@ -11267,7 +11286,7 @@
                                 "type": ["string", "null"]
                               }
                             },
-                            "required": ["code", "message"],
+                            "required": ["code", "severity", "inputs", "fix", "message"],
                             "additionalProperties": {}
                           },
                           "description": "Messages on the limits, the range and the model"
@@ -12061,9 +12080,28 @@
                                             "rangeIncomplete",
                                             "chargeTooSmall",
                                             "resistanceNotApplied",
-                                            "loadRatioHigh"
+                                            "loadRatioHigh",
+                                            "startPressureBelowResistance",
+                                            "gyrationRadiusWithoutTwist",
+                                            "startPressureHeldOnce"
                                           ],
                                           "description": "The rule of the message"
+                                        },
+                                        "severity": {
+                                          "type": "string",
+                                          "enum": ["error", "warn", "info"],
+                                          "description": "error blocks a run, warn and info never change a result"
+                                        },
+                                        "inputs": {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "string"
+                                          },
+                                          "description": "The inputs the rule reads"
+                                        },
+                                        "fix": {
+                                          "type": "string",
+                                          "description": "What changes the situation"
                                         },
                                         "message": {
                                           "type": "string",
@@ -12086,7 +12124,7 @@
                                           "type": ["string", "null"]
                                         }
                                       },
-                                      "required": ["code", "message"],
+                                      "required": ["code", "severity", "inputs", "fix", "message"],
                                       "additionalProperties": {}
                                     },
                                     "description": "Messages on the limits, the range and the model"
@@ -13734,9 +13772,28 @@
                               "rangeIncomplete",
                               "chargeTooSmall",
                               "resistanceNotApplied",
-                              "loadRatioHigh"
+                              "loadRatioHigh",
+                              "startPressureBelowResistance",
+                              "gyrationRadiusWithoutTwist",
+                              "startPressureHeldOnce"
                             ],
                             "description": "The rule of the message"
+                          },
+                          "severity": {
+                            "type": "string",
+                            "enum": ["error", "warn", "info"],
+                            "description": "error blocks a run, warn and info never change a result"
+                          },
+                          "inputs": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "The inputs the rule reads"
+                          },
+                          "fix": {
+                            "type": "string",
+                            "description": "What changes the situation"
                           },
                           "message": {
                             "type": "string",
@@ -13759,7 +13816,7 @@
                             "type": ["string", "null"]
                           }
                         },
-                        "required": ["code", "message"],
+                        "required": ["code", "severity", "inputs", "fix", "message"],
                         "additionalProperties": {}
                       },
                       "description": "Messages on the limits, the range and the model"
@@ -15346,9 +15403,28 @@
                               "rangeIncomplete",
                               "chargeTooSmall",
                               "resistanceNotApplied",
-                              "loadRatioHigh"
+                              "loadRatioHigh",
+                              "startPressureBelowResistance",
+                              "gyrationRadiusWithoutTwist",
+                              "startPressureHeldOnce"
                             ],
                             "description": "The rule of the message"
+                          },
+                          "severity": {
+                            "type": "string",
+                            "enum": ["error", "warn", "info"],
+                            "description": "error blocks a run, warn and info never change a result"
+                          },
+                          "inputs": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "The inputs the rule reads"
+                          },
+                          "fix": {
+                            "type": "string",
+                            "description": "What changes the situation"
                           },
                           "message": {
                             "type": "string",
@@ -15371,7 +15447,7 @@
                             "type": ["string", "null"]
                           }
                         },
-                        "required": ["code", "message"],
+                        "required": ["code", "severity", "inputs", "fix", "message"],
                         "additionalProperties": {}
                       },
                       "description": "Messages on the limits, the range and the model"
@@ -15793,9 +15869,28 @@
                                         "rangeIncomplete",
                                         "chargeTooSmall",
                                         "resistanceNotApplied",
-                                        "loadRatioHigh"
+                                        "loadRatioHigh",
+                                        "startPressureBelowResistance",
+                                        "gyrationRadiusWithoutTwist",
+                                        "startPressureHeldOnce"
                                       ],
                                       "description": "The rule of the message"
+                                    },
+                                    "severity": {
+                                      "type": "string",
+                                      "enum": ["error", "warn", "info"],
+                                      "description": "error blocks a run, warn and info never change a result"
+                                    },
+                                    "inputs": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "string"
+                                      },
+                                      "description": "The inputs the rule reads"
+                                    },
+                                    "fix": {
+                                      "type": "string",
+                                      "description": "What changes the situation"
                                     },
                                     "message": {
                                       "type": "string",
@@ -15818,7 +15913,7 @@
                                       "type": ["string", "null"]
                                     }
                                   },
-                                  "required": ["code", "message"],
+                                  "required": ["code", "severity", "inputs", "fix", "message"],
                                   "additionalProperties": {}
                                 },
                                 "description": "Messages on the limits, the range and the model"

@@ -1,4 +1,10 @@
-import { fillLoadRatioLimit, loadRatio, solidFill, solidFillLimit } from '@open-reloading/core'
+import {
+  advisoryRules,
+  fillLoadRatioLimit,
+  loadRatio,
+  solidFill,
+  solidFillLimit,
+} from '@open-reloading/core'
 import { fromSi, sheetId, toSi } from '@open-reloading/schema'
 import { formatNumber } from '../i18n/number.ts'
 import type { InteriorResponse } from './api-types.ts'
@@ -84,14 +90,6 @@ export const statusText = (status: Status, line: string | undefined) =>
 export function warningCountText(count: number) {
   if (count === 0) return ''
   return `${count} simulation warning${count === 1 ? '' : 's'}`
-}
-
-/** Short names of the API's warning codes for the warnings summary; a code without one is not named. */
-const warningNames: Record<string, string> = {
-  noCartridge: 'no cartridge',
-  noComparableLimit: 'no comparable limit',
-  rangeIncomplete: 'range incomplete',
-  chargeTooSmall: 'charge too small for the model',
 }
 
 /** A limit as shown with `d` decimals: in bar the record's value while it needs no more. */
@@ -180,7 +178,10 @@ export function shownWarnings(
           )
         : undefined
     if (l?.pressure === undefined || !l.exceeded)
-      return { text: convertBarMessage(w.message, system), name: warningNames[w.code] }
+      return {
+        text: convertBarMessage(w.message, system),
+        name: advisoryRules.find((r) => r.id === w.code)?.name,
+      }
     return limitExceededText(body, l, l.pressure, system)
   })
 }

@@ -385,6 +385,7 @@ Taking the random close packing of equal spheres as the limit for grains of ever
 - `barrelTime` runs from shot start.
 - Charge too small (`chargeTooSmall`): the API warns when the peak mean pressure is below 2.2 times the hold pressure ([charge too small](#charge-too-small)).
 - Solid fill above 0.64 (`solidFillLimit`): the API (`loadRatioHigh`) and the workbench warn ([load file](#load-file)).
+- Inputs the run ignores or holds once: the API and the workbench say so ([advisories](#advisories)).
 
 ### Charge too small
 
@@ -413,6 +414,22 @@ $$
 Code: `packages/core/src/interior/model.ts`, `chargeTooSmallRatio`. `packages/api/src/compute/limits.ts`, `chargeWarning`.
 
 The ratio 2.2 is the rounded low end of $r$ at the bound over the loads. With bore resistance it flags more loads than the bound needs. The bound of 0.5 is a choice of the model, not taken from a source.
+
+### Advisories
+
+One registry in core lists every rule that tells a user something about a run: the seven warning codes of the API and the three input rules below. Each rule has a code, a severity, the input keys it reads, a short name, a message and a fix. An `error` blocks a run, a `warn` or `info` never changes a result: the rules read the load and the run, and the run is the same with or without them. A message states facts about the inputs and the model, never a statement about the load. The API warning enum, the `severity`, `inputs` and `fix` of each warning and the names in the workbench's warnings line all come from the registry.
+
+The input rules use the bore resistance at travel 0, the friction pressure plus the engraving pressure at travel 0 (the profile is 0 before its first point):
+
+$$
+p_0 = p_f + p_e(0)
+$$
+
+Code: `packages/core/src/advisories.ts`, `advisoryRules`, `interiorAdvisories`. `packages/api/src/compute/limits.ts`, `warning`, `limitCheck`.
+
+- `startPressureBelowResistance`: $0 \lt p_\text{st} \le p_0$. The start condition of [shot start](#shot-start) is then decided by the second term, so the start pressure has no effect. A start pressure of 0 counts as not given.
+- `gyrationRadiusWithoutTwist`: a radius of gyration is given and $L_\text{tw} = 0$. The [effective mass](#effective-mass) then has no rotational term, so the radius is ignored.
+- `startPressureHeldOnce`: $p_\text{st} \gt p_0$ and $p_e(0) \gt 0$. The projectile is held until the pressure reaches $p_\text{st}$ and then resisted at $p_0$, which is lower.
 
 ## Sources
 
