@@ -1057,8 +1057,8 @@ export function Workbench() {
   const burn = useMemo(() => {
     if (powder) return classifyPowder(powder, names)
     const typed = JSON.parse(typedKey) as (number | null)[]
-    return typedBurn(Object.fromEntries(burnKeys.map((k, i) => [k, typed[i] ?? undefined])))
-  }, [powder, names, typedKey])
+    return typedBurn(Object.fromEntries(burnKeys.map((k, i) => [k, typed[i] ?? undefined])), t)
+  }, [powder, names, typedKey, t])
   /** Where the shown run starts, peaks and leaves the barrel on the burnt-fraction axis. */
   const runMarks = useMemo(() => runMarksOf(ok, t), [ok, t])
   const todoKey = JSON.stringify(todo)

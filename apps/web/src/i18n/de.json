@@ -1402,6 +1402,7 @@
   "Twist, length per turn (optional)": "Drall, Länge je Umdrehung (optional)",
   "Two-stage form; a, m, q and z1 all empty: constant form.": "Zweistufige Form; a, m, q und z1 alle leer: konstante Form.",
   "Typed charge": "Eingegebene Treibladung",
+  "Typed model parameters": "Eingegebene Modellparameter",
   "Typed model parameters, no powder record": "Eingegebene Modellparameter, kein Treibladungspulver-Datensatz",
   "Typed. The powder record gives {value} {unit}.": "Eingegeben. Der Treibladungspulver-Datensatz gibt {value} {unit} vor.",
   "upward": "aufwärts",
