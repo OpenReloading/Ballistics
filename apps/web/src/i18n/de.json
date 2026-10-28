@@ -704,6 +704,7 @@
   "Long gun": "Langwaffe",
   "Longer run failed: {message}": "Längerer Rechenlauf fehlgeschlagen: {message}",
   "Longer run pending": "Längerer Rechenlauf läuft",
+  "Lot": "Los",
   "Lot burn rate change": "Änderung der Abbrandgeschwindigkeit je Los",
   "Lot rows failed: {message}": "Berechnung der Lose fehlgeschlagen: {message}",
   "Lot rows pending": "Berechnung der Lose läuft",

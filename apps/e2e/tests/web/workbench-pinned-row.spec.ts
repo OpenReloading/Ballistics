@@ -5,11 +5,20 @@ import { applyExampleLoad, loadForm } from './workbench.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
-// the pinned row above the cards: each choice follows the cartridge it depends on
-const names = ['Search cartridges by name', 'Primer', 'Brass record', 'Case capacity record']
+// the pinned row above the cards: each choice follows the cartridge it depends on, a lot follows
+// its component
+const row = [
+  ['combobox', 'Search cartridges by name'],
+  ['combobox', 'Primer'],
+  ['textbox', 'Primer lot'],
+  ['combobox', 'Brass record'],
+  ['textbox', 'Case lot'],
+  ['combobox', 'Case capacity record'],
+] as const
+const names = row.map(([, name]) => name)
 
 const rowControls = (page: Page) =>
-  names.map((name) => loadForm(page).getByRole('combobox', { name, exact: true }))
+  row.map(([role, name]) => loadForm(page).getByRole(role, { name, exact: true }))
 
 /** Pairs of `controls` whose visual order (top, then left) is the reverse of their order in the list. */
 async function inversions(controls: Locator[]) {
@@ -29,7 +38,7 @@ for (const [width, height] of [
   [1366, 657],
   [390, 844],
 ] as const)
-  test(`at ${width} x ${height} the pinned row holds the cartridge, primer, brass and capacity in keyboard, visual and reading order`, async ({
+  test(`at ${width} x ${height} the pinned row holds the cartridge, primer, brass, their lots and capacity in keyboard, visual and reading order`, async ({
     page,
   }) => {
     await page.setViewportSize({ width, height })
@@ -61,6 +70,6 @@ test("the Cartridge card's More holds no primer, brass or capacity select", asyn
   await page.getByRole('button', { name: 'More of Cartridge' }).click()
   const more = page.locator('.more-fields[data-panel="cartridge"]')
   await expect(more.getByText('COAL, CIP maximum L6')).toBeVisible()
-  for (const name of names.slice(1))
+  for (const name of ['Primer', 'Brass record', 'Case capacity record'])
     await expect(more.getByRole('combobox', { name, exact: true })).toHaveCount(0)
 })
