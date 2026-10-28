@@ -605,9 +605,34 @@ describe('refusals of a plan', () => {
     expect(find(p, 'clickValue').reasons).toContain('collinear')
   })
 
-  it('a chronograph at the muzzle gives no information on drag factor', () => {
+  it('a chronograph at the muzzle alone cannot identify drag factor', () => {
     const p = plan([], chrono)
     expect(find(p, 'dragFactor').status).toBe('unresolved')
     expect(find(p, 'muzzleVelocity').status).toBe('identified')
+  })
+
+  it('two dial entries at two distances pass without refusal and the statuses show what is open', () => {
+    const p = plan([
+      { kind: 'dial', range: 300, shotCount: 5 },
+      { kind: 'dial', range: 900, shotCount: 5 },
+    ])
+    expect(p.refusals).toEqual([])
+    expect(p.parameters.some((q) => q.status !== 'identified')).toBe(true)
+  })
+
+  it('a chronograph and one impact entry leave drag factor and zero offset confounded', () => {
+    const p = planTruingStrings(
+      {
+        shot: nominal,
+        clickValue: click,
+        dispersion,
+        entries: [{ kind: 'impact', range: 500, shotCount: 5 }],
+        chronograph: chrono,
+      },
+      { fitZeroOffset: true },
+    )
+    expect(p.refusals).toEqual([])
+    expect(find(p, 'dragFactor').status).not.toBe('identified')
+    expect(find(p, 'zeroOffset').status).not.toBe('identified')
   })
 })

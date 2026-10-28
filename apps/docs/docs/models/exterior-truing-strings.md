@@ -109,12 +109,12 @@ A plan carries `refusals`, each with a fixed `id` and an `advice` text, when the
 
 | `id` | Condition | Advice |
 | --- | --- | --- |
-| `single-range` | Impact and dial entries all at one slant range, no chronograph | Add an entry at a second distance, or chronograph readings together with an impact entry (dials at one distance leave $k$ and the click value confounded). |
-| `velocity-only` | A chronograph and no impact or dial entry | Add an impact entry at a distance, or dial entries at two distances. |
+| `single-range` | Impact and dial entries all at one slant range, no chronograph | Add an entry at a second distance, or chronograph readings together with an impact entry. These may not separate every parameter (dial entries alone leave the click value in the fit, a zero offset needs more observations); the statuses show what is still open. |
+| `velocity-only` | A chronograph and no impact or dial entry | Add an impact entry at a distance, or dial entries at two distances. The statuses show what is still open. |
 
 Code: `packages/core/src/exterior/range-strings.ts`, `planRefusals`, `refusalAdvice`.
 
-One drop moves $v_0$ and $k$ along the same direction. A chronograph at the muzzle (the default `instrumentDistance` of 0) depends on $v_0$ only and says nothing on $k$; at a distance one speed moves both. The refusal names the cause that the statuses show as `collinear` or `no-information`. The statuses are still reported. A chronograph at the muzzle with an impact entry at one range passes, since it fixes $v_0$ and the drop then fixes $k$. With dial entries only, $k$ and the click value stay confounded at one range, so the plan passes without refusal and the statuses show `collinear`.
+One drop moves $v_0$ and $k$ along the same direction. A chronograph at the muzzle (the default `instrumentDistance` of 0) depends on $v_0$ only, so the readings alone cannot identify $k$; at a distance one speed moves both. The refusal names the cause that the statuses show as `collinear` or `no-information`. The statuses are still reported. A chronograph at the muzzle with an impact entry at one range passes, since it fixes $v_0$ and the drop then fixes $k$. With dial entries only, $k$ and the click value stay confounded at one range, so the plan passes without refusal and the statuses show `collinear`. With `fitZeroOffset`, a chronograph and one impact entry leave $k$ and the zero offset confounded in the same way.
 
 ### Gaussian priors
 
