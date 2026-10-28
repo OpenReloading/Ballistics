@@ -556,7 +556,7 @@ describe('powder fit prediction bands', () => {
       expect(wide.domain.margin).toBe(0.25)
       expect(wide.domain.charge.max).toBe(3e-3 * 1.25)
       expect(wide.domain.pressure).toBeUndefined()
-      for (const domainMargin of [-0.1, 1, Number.NaN])
+      for (const domainMargin of [-0.1, 1, Number.NaN, '0.05' as unknown as number])
         expect(() => fitPowder(load(0.4), ladder(truth, 3, 0, 1), { domainMargin })).toThrow(
           InputError,
         )

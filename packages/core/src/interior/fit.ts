@@ -451,7 +451,10 @@ export function fitPowder(
     maxCondition = 1e3,
     domainMargin = powderDomainMargin,
   } = options
-  need(domainMargin >= 0 && domainMargin < 1, 'domainMargin must lie in [0, 1)')
+  need(
+    Number.isFinite(domainMargin) && domainMargin >= 0 && domainMargin < 1,
+    'domainMargin must lie in [0, 1)',
+  )
   const withSigma = checkLadder(ladder)
   checkParameters(load, ladder, parameters)
   need(
