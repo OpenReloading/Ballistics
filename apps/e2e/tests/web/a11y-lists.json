@@ -4,7 +4,7 @@
       "rule": "target-size",
       "node": "class=\"field-note\"",
       "where": "/cartridges",
-      "reason": "The symbol and value buttons of the cartridge dimensions table are 16 px high with 18 px between neighbours, under the 24 px of WCAG 2.5.8 (2.2 AA), and they are not text in a sentence.",
+      "reason": "The symbol buttons of the cartridge dimensions table with notes are 16 px high with under 24 px between neighbours (axe asks for review), under the 24 px of WCAG 2.5.8 (2.2 AA), and they are not text in a sentence. The note buttons of the variants matrix are 24 px high (a11y-states.spec.ts).",
       "workaround": "The note is the button's description for a screen reader, and the arrow keys move between the symbols. No pointer alternative for a touch user yet."
     },
     {

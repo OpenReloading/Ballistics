@@ -41,6 +41,7 @@ import { DesignerField } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
 import { FieldTable } from './field-table.tsx'
 import { FileMenu } from './file-menu.tsx'
+import { focusBack } from './focus-back.ts'
 import { ManufacturerInput } from './manufacturer-input.tsx'
 import type { FieldFlag } from './number-field.tsx'
 import { PageBar } from './page-bar.tsx'
@@ -288,6 +289,7 @@ export function BulletDesigner() {
     })
 
   const [photoOpen, setPhotoOpen] = useState(false)
+  const photoButton = useRef<HTMLButtonElement>(null)
   const e = useMemo(() => evaluate(design, system, history.last), [design, system, history.last])
   const lastGood = useRef<Drawing | undefined>(undefined)
   if (e.drawing) lastGood.current = e.drawing
@@ -383,6 +385,7 @@ export function BulletDesigner() {
         dispatch={toolbarDispatch}
       />
       <Button
+        ref={photoButton}
         variant="default"
         leftSection={<Camera aria-hidden="true" />}
         onClick={() => setPhotoOpen(true)}
@@ -446,7 +449,11 @@ export function BulletDesigner() {
       {photoOpen && (
         <BulletPhoto
           opened
-          onClose={() => setPhotoOpen(false)}
+          onClose={() => {
+            setPhotoOpen(false)
+            // the tool is unmounted at once, so the modal's own return of the focus never runs
+            focusBack(photoButton.current, '.page-bar button[aria-label="Page actions"]')
+          }}
           system={system}
           record={design.origin}
           onOpen={begin}
