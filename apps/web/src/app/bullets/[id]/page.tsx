@@ -9,6 +9,7 @@ import { CoefficientTable, FieldPanel } from '../../../components/field-table.ts
 import { Panel } from '../../../components/panel.tsx'
 import { RecordPage } from '../../../components/record-page.tsx'
 import { ServerDataError } from '../../../components/states.tsx'
+import { msg } from '../../../i18n/translate.ts'
 import {
   getBullet,
   getManufacturerNames,
@@ -26,6 +27,7 @@ import {
   bulletDataGroups,
   bulletStrip,
 } from '../../../lib/record-fields.ts'
+import { type Wording, worded } from '../../../lib/wording.ts'
 
 export function generateStaticParams() {
   return staticIds(listAllBullets, 'bullet')
@@ -53,11 +55,11 @@ export default async function BulletPage({ params }: PageProps<'/bullets/[id]'>)
   const [cartridges, names] = await Promise.all([listAllCartridges(), getManufacturerNames()])
   const label = productLabel(b, names)
   // each named, as a badge holds no heading
-  const badges = [
-    b.productLine && `Line ${b.productLine}`,
-    b.caliber && `Caliber ${b.caliber}`,
-    b.productNumber && `Product ${b.productNumber}`,
-  ].filter((x): x is string => !!x)
+  const badges: Wording[] = [
+    b.productLine && worded(msg('Line {line}'), { line: b.productLine }),
+    b.caliber && worded(msg('Caliber {caliber}'), { caliber: b.caliber }),
+    b.productNumber && worded(msg('Product {number}'), { number: b.productNumber }),
+  ].filter((x): x is Wording => !!x)
   const coefficients = ballisticCoefficientRows(b)
   return (
     <RecordScope>
@@ -81,7 +83,8 @@ export default async function BulletPage({ params }: PageProps<'/bullets/[id]'>)
           <>
             <Panel
               id="record-drawing"
-              title="Drawing"
+              title={msg('Drawing')}
+              translated
               // the drawing needs the length; without it the panel holds the reason
               controls={b.length && <UnitSwitch />}
             >
@@ -91,15 +94,15 @@ export default async function BulletPage({ params }: PageProps<'/bullets/[id]'>)
               />
             </Panel>
             {coefficients.length > 0 && (
-              <Panel id="record-coefficients" title="Ballistic coefficients">
-                <CoefficientTable label="Ballistic coefficients" rows={coefficients} />
+              <Panel id="record-coefficients" title={msg('Ballistic coefficients')} translated>
+                <CoefficientTable label={msg('Ballistic coefficients')} rows={coefficients} />
               </Panel>
             )}
           </>
         }
         values={
           <>
-            <FieldPanel id="record-data" title="Bullet data" groups={bulletDataGroups(b)}>
+            <FieldPanel id="record-data" title={msg('Bullet data')} groups={bulletDataGroups(b)}>
               {b.note && <p className="record-note">{b.note}</p>}
             </FieldPanel>
             {cartridges.status === 'ok' && (

@@ -18,7 +18,9 @@ import {
   signedLengthText,
   valueParts,
 } from '@open-reloading/drawing/cartridge'
+import { useTranslation } from '../i18n/language.ts'
 import { plainNumber } from '../i18n/number.ts'
+import { msg, type Translator } from '../i18n/translate.ts'
 import type { drawable } from '../lib/cartridge-sheet.ts'
 import { nth } from '../lib/nth.ts'
 import { controlSize } from '../lib/theme.ts'
@@ -28,10 +30,21 @@ import { type Linked, TechnicalDrawing } from './technical-drawing.tsx'
 type Drawable = ReturnType<typeof drawable>
 
 const views = [
-  ['cartridge', 'Cartridge'],
-  ['chamber', 'Chamber'],
-  ['combined', 'Combined'],
+  ['cartridge', msg('Cartridge')],
+  ['chamber', msg('Chamber')],
+  ['combined', msg('Combined')],
 ] as const
+
+/** The side as a lower case word of a title, and as the start of "not drawn" texts. */
+const sideWords = { cartridge: msg('cartridge'), chamber: msg('chamber') } as const
+const notDrawn = {
+  cartridge: msg('Cartridge not drawn.'),
+  chamber: msg('Chamber not drawn.'),
+} as const
+const bothNotDrawn = {
+  cartridge: msg('Cartridge and Combined not drawn: {why}.'),
+  chamber: msg('Chamber and Combined not drawn: {why}.'),
+} as const
 
 export type View = (typeof views)[number][0]
 
@@ -230,6 +243,7 @@ function Combined({
  * Why nothing is drawn: for one side its own note (missing values, closed front), else every note.
  */
 function Undrawn({ list, side }: { list: Figure[]; side?: Side | undefined }) {
+  const { t } = useTranslation()
   const notes = list
     .flatMap((f) => f.notes)
     .filter(
@@ -240,10 +254,10 @@ function Undrawn({ list, side }: { list: Figure[]; side?: Side | undefined }) {
     )
   const lead =
     side === undefined
-      ? 'No drawing for this record.'
+      ? t('No drawing for this record.')
       : notes.some((n) => n.code === 'missing')
         ? ''
-        : `${sideName[side]} not drawn.`
+        : t(notDrawn[side])
   return (
     <p>
       {lead}
@@ -271,11 +285,14 @@ function printScale(split: { group: string; print: FigureModel }[]) {
   return reductions.find((r) => r <= fit + 1e-9) ?? reductions[reductions.length - 1]
 }
 
-/** "life size (1:1)", else "at 1:1.25 (80 % of life size)". */
-const scaleWords = (k: number) =>
+/** The print scale sentence: life size, else a reduction such as 1:1.25 (80 % of life size). */
+const scaleSentence = (k: number, t: Translator['t']) =>
   k === 1
-    ? 'life size (1:1)'
-    : `at 1:${plainNumber(Number((1 / k).toFixed(2)))} (${Math.round(k * 100)} % of life size)`
+    ? t('Printed at 100 % scale, the drawing is life size (1:1).')
+    : t('Printed at 100 % scale, the drawing is at 1:{ratio} ({percent} % of life size).', {
+        ratio: plainNumber(Number((1 / k).toFixed(2))),
+        percent: Math.round(k * 100),
+      })
 
 /**
  * A value in the description: symbol, value with its unit, then tolerance, limit or "derived";
@@ -336,20 +353,25 @@ function description(drawn: Drawn, list: Region[], unit: LengthUnit) {
 }
 
 /** Why the views without their side are disabled: the closed front, or the side's missing values. */
-function disabledReason(drawn: Drawn, notes: Figure['notes']) {
+function disabledReason(drawn: Drawn, notes: Figure['notes'], t: Translator['t']) {
   const missing = (['cartridge', 'chamber'] as const).find((s) => !drawn.some((d) => d.side === s))
   if (!missing) return
   const why = notes.some((n) => n.code === 'closedFront')
-    ? 'closed front (see the caption)'
+    ? t('closed front (see the caption)')
     : (notes.find((n) => n.code === 'missing' && n.text.startsWith(sideName[missing]))?.text ?? '')
         .replace(/^\w+ not drawn: /, '')
         .replace(/\.$/, '')
-  return { missing, text: `${sideName[missing]} and Combined not drawn: ${why}.` }
+  return { missing, text: t(bothNotDrawn[missing], { why }) }
 }
 
 /** Which views are enabled and shown, and the sides the print draws. */
-function viewState(drawn: Drawn, notes: Figure['notes'], view: View | undefined) {
-  const reason = disabledReason(drawn, notes)
+function viewState(
+  drawn: Drawn,
+  notes: Figure['notes'],
+  view: View | undefined,
+  t: Translator['t'],
+) {
+  const reason = disabledReason(drawn, notes, t)
   const drawnSide = reason?.missing === 'cartridge' ? 'chamber' : 'cartridge'
   const enabled = (v: string) => !reason || v === drawnSide
   // Combined by default once both sides draw; a view picked stays while it draws
@@ -374,12 +396,13 @@ function ViewSwitch({
   enabled: (v: string) => boolean
   onView?: ((view: View) => void) | undefined
 }) {
+  const { t } = useTranslation()
   return (
     <>
       <div className="drawing-controls">
         {/* named with the figure title: a table VII record has one switch per variant */}
         <span id={`${id}-legend`} className="visually-hidden">
-          View
+          {t('View')}
         </span>
         <SegmentedControl
           size={controlSize.row.toggle}
@@ -388,7 +411,11 @@ function ViewSwitch({
           name={`${id}-view`}
           value={shown}
           onChange={(v) => onView?.(v as View)}
-          data={views.map(([value, label]) => ({ value, label, disabled: !enabled(value) }))}
+          data={views.map(([value, label]) => ({
+            value,
+            label: t(label),
+            disabled: !enabled(value),
+          }))}
         />
       </div>
       {reason && (
@@ -417,6 +444,7 @@ function PrintFigures({
   scale?: number | undefined
   sides?: Side[] | undefined
 }) {
+  const { t } = useTranslation()
   if (!sides)
     return (
       <TechnicalDrawing
@@ -431,7 +459,7 @@ function PrintFigures({
     <div key={side} data-print-view={side}>
       <TechnicalDrawing
         id={side === 'cartridge' ? `${id}-print` : `${id}-print-${side}`}
-        title={`${title}, ${sideName[side].toLowerCase()}`}
+        title={t('{title}, {side}', { title, side: t(sideWords[side]) })}
         describedBy={`${id}-desc`}
         model={print}
         printScale={scale}
@@ -455,17 +483,28 @@ function FigureCaption({
   notes: Figure['notes']
   scale?: number | undefined
 }) {
+  const { t } = useTranslation()
   return (
     <figcaption>
       {caption}
       {differences !== undefined && differences.length > 0 && (
         <span className="caption-combined">
-          {` Combined: per region the ${differenceWording} (chamber minimum minus cartridge maximum, in ${unit === 'mm' ? 'mm' : 'inches'}, signed); "conflict" marks a ${conflictWording}.`}
+          {' '}
+          {unit === 'mm'
+            ? t(
+                'Combined: per region the nominal minimum difference of published dimensions (chamber minimum minus cartridge maximum, in mm, signed); "conflict" marks a data conflict between published cartridge maximum and chamber minimum (check source).',
+              )
+            : t(
+                'Combined: per region the nominal minimum difference of published dimensions (chamber minimum minus cartridge maximum, in inches, signed); "conflict" marks a data conflict between published cartridge maximum and chamber minimum (check source).',
+              )}
         </span>
       )}
       {/* the select names the variant on screen */}
-      {variant !== undefined && <span className="print-only">{` Variant ${variant}.`}</span>}
-      {notes.some((n) => n.flagNumber) && ' The numbered circles on the drawing mark these notes.'}
+      {variant !== undefined && (
+        <span className="print-only">{` ${t('Variant {variant}.', { variant })}`}</span>
+      )}
+      {notes.some((n) => n.flagNumber) &&
+        ` ${t('The numbered circles on the drawing mark these notes.')}`}
       {notes.map((n) => (
         <span key={n.text}>
           {' '}
@@ -474,11 +513,7 @@ function FigureCaption({
           {n.text}
         </span>
       ))}
-      {scale !== undefined && (
-        <span className="print-only">
-          {` Printed at 100 % scale, the drawing is ${scaleWords(scale)}.`}
-        </span>
-      )}
+      {scale !== undefined && <span className="print-only">{` ${scaleSentence(scale, t)}`}</span>}
     </figcaption>
   )
 }
@@ -519,12 +554,13 @@ function Outline({
   /** The record page: the screen figure in the other length unit, whose room the drawing keeps. */
   reserve?: { model: FigureModel; tallest: number } | undefined
 }) {
-  const title = `${heading ?? `Outline, ${spec.standard} ${spec.name}`}${variant === undefined ? '' : ` (${variant})`}`
+  const { t } = useTranslation()
+  const title = `${heading ?? t('Outline, {name}', { name: `${spec.standard} ${spec.name}` })}${variant === undefined ? '' : ` (${variant})`}`
   const desc = description(drawn, differences ?? [], unit)
   // the record's Combined view: no switch of its own and no print drawing
   const combined = print === undefined
   const switchable = differences !== undefined && !combined
-  const { reason, enabled, shown, printSides } = viewState(drawn, notes, view)
+  const { reason, enabled, shown, printSides } = viewState(drawn, notes, view, t)
   return (
     <figure
       className="drawing-figure"
@@ -535,7 +571,7 @@ function Outline({
       )}
       <TechnicalDrawing
         id={id}
-        title={combined ? `${title}, combined` : title}
+        title={combined ? t('{title}, combined', { title }) : title}
         desc={desc}
         model={model}
         tallest={tallest}

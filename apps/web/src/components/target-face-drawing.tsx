@@ -1,5 +1,8 @@
+'use client'
+
 import { type FaceEllipse, type FaceShape, targetFaceFigure } from '@open-reloading/drawing/target'
 import type { TargetFace } from '@open-reloading/schema'
+import { useTranslation } from '../i18n/language.ts'
 
 type Paint = {
   fill?: string | undefined
@@ -50,9 +53,17 @@ export function TargetFaceFigure({ shape, label }: { shape: FaceShape; label: st
 }
 
 /** A target face record drawn, named by its rings and width. */
-export const TargetFaceDrawing = ({ face }: { face: TargetFace }) => (
-  <TargetFaceFigure
-    shape={face}
-    label={`${face.name}: ${face.rings.length} rings, ${face.rings[0]?.diameter.value} mm across`}
-  />
-)
+export function TargetFaceDrawing({ face }: { face: TargetFace }) {
+  const { tn } = useTranslation()
+  return (
+    <TargetFaceFigure
+      shape={face}
+      label={tn(
+        face.rings.length,
+        '{name}: {count} ring, {width} mm across',
+        '{name}: {count} rings, {width} mm across',
+        { name: face.name, width: face.rings[0]?.diameter.value ?? 0 },
+      )}
+    />
+  )
+}

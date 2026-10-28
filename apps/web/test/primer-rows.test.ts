@@ -1,8 +1,10 @@
 import type { Primer } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
+import { translator } from '../src/i18n/translate.ts'
 import type { PrimerSummary } from '../src/lib/api-types.ts'
 import { primerMatches, primerRows } from '../src/lib/primer-rows.ts'
 import { primerRowGroups, primerStrip } from '../src/lib/record-fields.ts'
+import { say } from '../src/lib/wording.ts'
 import { defined } from './defined.ts'
 
 const summary: PrimerSummary = {
@@ -60,7 +62,9 @@ it('the strip has the manufacturer, size and compound, nothing the record lacks'
 })
 
 it('the properties hold the number, flag, cup, use and published figures', () => {
-  const labels = primerRowGroups(record).flatMap((g) => g.rows.map((r) => r.label))
+  const labels = primerRowGroups(record).flatMap((g) =>
+    g.rows.map((r) => say(translator().t, r.label)),
+  )
   expect(labels).toEqual([
     'Product number',
     'Magnum',

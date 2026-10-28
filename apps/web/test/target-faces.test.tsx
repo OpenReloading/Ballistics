@@ -5,6 +5,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it, vi } from 'vitest'
 import { TargetFaceDrawing } from '../src/components/target-face-drawing.tsx'
 import { TargetFaceList } from '../src/components/target-face-list.tsx'
+import { translator } from '../src/i18n/translate.ts'
 import {
   faceEventRows,
   targetFaceGroups,
@@ -12,6 +13,7 @@ import {
   targetFaceRow,
   targetFaceStrip,
 } from '../src/lib/target-faces.ts'
+import { say } from '../src/lib/wording.ts'
 import { defined, missing } from './defined.ts'
 import { faceById, faces } from './face-render.ts'
 import { readRecord } from './read-record.ts'
@@ -62,16 +64,17 @@ it('renders the list: one row per face linking its page, the outer diameter in t
 })
 
 it('gives the strip, then the scoring values and the ring diameters outer to inner with the inner ten', () => {
-  expect(targetFaceStrip(precision).map((i) => i.label)).toEqual([
+  const { t } = translator()
+  expect(targetFaceStrip(precision, t).map((i) => i.label)).toEqual([
     'Federation',
     'Distance',
     'Outer diameter',
     'Black area',
     'Rings',
   ])
-  const [face = missing(), rings = missing()] = targetFaceGroups(precision)
-  expect(face.rows.find((r) => r.label === 'Numerals printed')?.text).toBe('Yes')
-  expect(face.rows.find((r) => r.label === 'Tenth-ring values')?.text).toBe('Yes')
+  const [face = missing(), rings = missing()] = targetFaceGroups(precision, t)
+  expect(face.rows.find((r) => say(t, r.label) === 'Numerals printed')?.text).toBe('Yes')
+  expect(face.rows.find((r) => say(t, r.label) === 'Tenth-ring values')?.text).toBe('Yes')
   const unstated = {
     ...precision,
     decimal: undefined,
@@ -80,11 +83,11 @@ it('gives the strip, then the scoring values and the ring diameters outer to inn
   }
   const stated = ['Inner ten rule', 'Tenth-ring values', 'Numerals printed']
   expect(
-    defined(targetFaceGroups(unstated)[0])
-      .rows.filter((r) => stated.includes(r.label))
+    defined(targetFaceGroups(unstated, t)[0])
+      .rows.filter((r) => stated.includes(say(t, r.label)))
       .map((r) => r.text),
   ).toEqual(['Not stated', 'Not stated', 'Not stated'])
-  expect(rings.rows.map((r) => r.label)).toEqual([
+  expect(rings.rows.map((r) => say(t, r.label))).toEqual([
     ...precision.rings.map((r) => `Ring ${r.value}`),
     'Inner ten',
   ])
@@ -114,7 +117,7 @@ it('gives one row per face event: its discipline where a mapping names it, else 
     number: '2.53/2.59/2.55/2.58',
     discipline: '25 m Pistole/Revolver',
     stage: '150 Sek. Serie',
-    distance: '25 m',
+    distance: { raw: '25 m', metres: 25 },
     shotCount: 20,
     scoring: 'touch',
     section: '0.20 Scheibe Nr. 4',
@@ -122,7 +125,7 @@ it('gives one row per face event: its discipline where a mapping names it, else 
   // an event no listed discipline maps keeps its name, its organization and its gauge
   expect(rows.find((r) => r.discipline === '50m Pistol')).toMatchObject({
     federation: 'ISSF',
-    distance: '50m',
+    distance: { raw: '50m' },
     gauge: 5.6,
   })
   // an event without its section takes the page the mapping cites

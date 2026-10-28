@@ -17,6 +17,8 @@ import {
   useState,
 } from 'react'
 import { flushSync } from 'react-dom'
+import { useTranslation } from '../i18n/language.ts'
+import { type Message, msg } from '../i18n/translate.ts'
 import {
   type DirectorySort,
   type DirectoryState,
@@ -26,7 +28,7 @@ import {
   writeDirectory,
 } from '../lib/directory.ts'
 import { basePath } from '../lib/edition.ts'
-import { sortRows } from '../lib/lists.ts'
+import { type ListNoun, sortRows } from '../lib/lists.ts'
 import { pickRange } from '../lib/selection.ts'
 import { shortcutAriaKeys } from '../lib/shortcuts.ts'
 import { controlSize, tipEvents } from '../lib/theme.ts'
@@ -37,7 +39,7 @@ import { useShortcuts, useSingleKeys } from './shortcuts.tsx'
 
 export interface DirectoryColumn<T> {
   key: string
-  label: string
+  label: Message
   /** The unit, in a muted line under the label ("(mm)"); the value cells carry none. */
   unit?: string | undefined
   /** `tabIndex`: for the cell's focusable content (0 only on the table's one tab stop). */
@@ -50,7 +52,7 @@ export interface DirectoryColumn<T> {
   /** Column width (CSS); one column without it takes the rest. */
   width?: string
   /** Help on the header, shown on hover, focus and touch. */
-  help?: string | undefined
+  help?: Message | undefined
   /** Not printed, as a row action. */
   screenOnly?: boolean
   /** At the header's end, after its label: a scale's ticks. */
@@ -182,6 +184,19 @@ function usePrinting() {
     return () => media.removeEventListener('change', change)
   }, [])
   return printing
+}
+
+/** The note under a printed list: whole sentences, one per kind. */
+const printedLines: Record<ListNoun, Message> = {
+  bullets: msg('Printed: the first {limit} of {total} bullets in this selection.'),
+  cartridges: msg('Printed: the first {limit} of {total} cartridges in this selection.'),
+  cases: msg('Printed: the first {limit} of {total} cases in this selection.'),
+  disciplines: msg('Printed: the first {limit} of {total} disciplines in this selection.'),
+  faces: msg('Printed: the first {limit} of {total} faces in this selection.'),
+  federations: msg('Printed: the first {limit} of {total} federations in this selection.'),
+  firearms: msg('Printed: the first {limit} of {total} firearms in this selection.'),
+  powders: msg('Printed: the first {limit} of {total} powders in this selection.'),
+  primers: msg('Printed: the first {limit} of {total} primers in this selection.'),
 }
 
 /** Rows printed at most. */
@@ -331,7 +346,7 @@ export function DirectoryTable<T extends { id: string }>({
   /** The row's name as plain text, for the link index. */
   label: (row: T) => string
   caption: string
-  noun: string
+  noun: ListNoun
   sort: DirectorySort
   onSort: (sort: DirectorySort) => void
   empty: ReactNode
@@ -342,6 +357,7 @@ export function DirectoryTable<T extends { id: string }>({
   /** A row action for phones, where the columns after the name are hidden (a Mine row's Delete); not shown from 48em. `tabIndex` as for a column's cell. */
   phoneAction?: (row: T, tabIndex: number) => ReactNode
 }) {
+  const { t } = useTranslation()
   const shown = sortedRows(rows, columns, sort)
   const printing = usePrinting()
   const { body, start, end, height } = useWindowedRows(shown.length)
@@ -432,7 +448,7 @@ export function DirectoryTable<T extends { id: string }>({
           <tr aria-rowindex={1}>
             {selection && (
               <th scope="col" className="select-cell">
-                <span className="visually-hidden">Select</span>
+                <span className="visually-hidden">{t('Select')}</span>
               </th>
             )}
             {columns.map((c) => (
@@ -501,7 +517,7 @@ export function DirectoryTable<T extends { id: string }>({
       </table>
       {shown.length > printCap && (
         <p className="print-only">
-          Printed: the first {printCap} of {shown.length} {noun} in this selection.
+          {t(printedLines[noun], { limit: printCap, total: shown.length })}
         </p>
       )}
       {/* every record link in the HTML for readers without JavaScript and for crawlers; not in the DOM with JavaScript */}
@@ -544,6 +560,7 @@ function HeadCell<T>({
   sort: DirectorySort
   onSort: (sort: DirectorySort) => void
 }) {
+  const { t } = useTranslation()
   const dir = sort?.column === c.key ? sort.dir : undefined
   return (
     <th
@@ -554,14 +571,20 @@ function HeadCell<T>({
     >
       {c.head && <span className="th-end">{c.head}</span>}
       {c.value ? (
-        <Tooltip label={c.help} disabled={!c.help} events={tipEvents} multiline w={260}>
+        <Tooltip
+          label={c.help && t(c.help)}
+          disabled={!c.help}
+          events={tipEvents}
+          multiline
+          w={260}
+        >
           <UnstyledButton className="sort-button" onClick={() => onSort(nextSort(c.key, dir))}>
             <HeadLabel column={c} />
             <SortMark dir={dir} />
           </UnstyledButton>
         </Tooltip>
       ) : c.help ? (
-        <Noted inline value={<HeadLabel column={c} />} notes={[c.help]} />
+        <Noted inline value={<HeadLabel column={c} />} notes={[t(c.help)]} />
       ) : (
         <HeadLabel column={c} />
       )}
@@ -677,14 +700,20 @@ function openInPage(e: ReactMouseEvent<HTMLAnchorElement>, open: () => void) {
 
 /** A cell's content; an empty cell shows the app's missing-value marker. */
 function Cell({ children }: { children: ReactNode }) {
-  return children === '' || children == null ? <span className="missing">n/a</span> : children
+  const { t } = useTranslation()
+  return children === '' || children == null ? (
+    <span className="missing">{t('n/a')}</span>
+  ) : (
+    children
+  )
 }
 
 /** A header's label with its unit in a muted line of its own. */
 function HeadLabel<T>({ column: { label, unit } }: { column: DirectoryColumn<T> }) {
+  const { t } = useTranslation()
   return (
     <span className="th-label">
-      <span className="th-text">{label}</span>
+      <span className="th-text">{t(label)}</span>
       {unit && (
         <>
           {' '}
@@ -709,16 +738,17 @@ function SelectBox({
   onPick: (range: boolean) => void
   tabIndex: number
 }) {
+  const { t } = useTranslation()
   const checked = ids.includes(row.id)
   const full = !checked && ids.length >= max
   const space = useRef(false)
   // the tooltip on a wrapper: a disabled input gets no pointer events
   return (
-    <Tooltip label={`At most ${max} at once`} disabled={!full} events={tipEvents}>
+    <Tooltip label={t('At most {max} at once', { max })} disabled={!full} events={tipEvents}>
       <span className="row-action">
         <input
           type="checkbox"
-          aria-label={`Select ${label}`}
+          aria-label={t('Select {name}', { name: label })}
           tabIndex={tabIndex}
           checked={checked}
           disabled={full}
@@ -741,7 +771,7 @@ function SelectBox({
 }
 
 /** A column as the phone's Sort select reads it. */
-type SortColumn = { key: string; label: string; num?: boolean; value?: unknown }
+type SortColumn = { key: string; label: Message; num?: boolean; value?: unknown }
 
 /**
  * The phone's sort (below 48em only the name column shows its head): one option per sortable
@@ -756,17 +786,27 @@ function SortSelect({
   sort: DirectorySort
   onSort: (sort: DirectorySort) => void
 }) {
+  const { t } = useTranslation()
   const data = columns
     .filter((c) => c.value)
-    .flatMap((c) => [
-      { value: `${c.key} ascending`, label: `${c.label}, ${c.num ? 'low to high' : 'A to Z'}` },
-      { value: `${c.key} descending`, label: `${c.label}, ${c.num ? 'high to low' : 'Z to A'}` },
-    ])
+    .flatMap((c) => {
+      const label = t(c.label)
+      return [
+        {
+          value: `${c.key} ascending`,
+          label: c.num ? t('{label}, low to high', { label }) : t('{label}, A to Z', { label }),
+        },
+        {
+          value: `${c.key} descending`,
+          label: c.num ? t('{label}, high to low', { label }) : t('{label}, Z to A', { label }),
+        },
+      ]
+    })
   return (
     <Select
       className="sort-select"
-      aria-label="Sort"
-      placeholder="Sort"
+      aria-label={t('Sort')}
+      placeholder={t('Sort')}
       size={controlSize.row.input}
       clearable
       data={data}
@@ -814,6 +854,7 @@ export function DirectoryFilters({
   scope?: Scope | undefined
   children?: ReactNode | undefined
 }) {
+  const { t } = useTranslation()
   const search = useRef<HTMLInputElement>(null)
   useShortcuts({ focusSearch: () => search.current?.focus() })
   const singleKeys = useSingleKeys()
@@ -822,7 +863,7 @@ export function DirectoryFilters({
       <TextInput
         ref={search}
         className="directory-search"
-        aria-label="Search"
+        aria-label={t('Search')}
         aria-keyshortcuts={singleKeys ? shortcutAriaKeys('focusSearch') : undefined}
         title={placeholder}
         placeholder={placeholder}
@@ -835,7 +876,7 @@ export function DirectoryFilters({
         // always mounted, hidden while empty, so the text does not move when it appears
         rightSection={
           <CloseButton
-            aria-label="Clear search"
+            aria-label={t('Clear search')}
             style={query ? undefined : { visibility: 'hidden' }}
             onClick={() => onQuery('')}
           />
@@ -848,7 +889,7 @@ export function DirectoryFilters({
         <span className="scope-chip">
           <span title={scope.label}>{scope.label}</span>
           <CloseButton
-            aria-label={`Remove ${scope.label}`}
+            aria-label={t('Remove {name}', { name: scope.label })}
             onClick={() => {
               scope.onRemove()
               focusSearch()

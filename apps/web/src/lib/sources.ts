@@ -1,4 +1,5 @@
 /** List sources: OpenReloading records and the user records of the browser. */
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import type { BulletRow } from './bullet-rows.ts'
 import type { CartridgeRow } from './cartridge-rows.ts'
 import type { UserBulletView, UserCartridgeView } from './variants.ts'
@@ -6,8 +7,11 @@ import type { UserBulletView, UserCartridgeView } from './variants.ts'
 export const origins = ['openreloading', 'user'] as const
 export type Origin = (typeof origins)[number]
 
-/** Full names, the chips' labels and the badges' hover text. */
-export const originNames: Record<Origin, string> = { openreloading: 'OpenReloading', user: 'Mine' }
+/** Full names, the chips' labels and the badges' hover text; shown through `t`. */
+export const originNames: Record<Origin, Message> = {
+  openreloading: msg('OpenReloading'),
+  user: msg('Mine'),
+}
 
 /** A row without `origin` is a catalogue row. */
 export const originOf = (row: { origin?: 'user' | undefined }): Origin =>
@@ -50,6 +54,12 @@ export const inOrigins = (
   src: string | undefined,
   available: readonly Origin[] = origins,
 ) => readOrigins(src, available).includes(originOf(row))
+
+/** The source filter as a named filter ("Mine only"); false while every source is on. */
+export const onlyText = (t: Translator['t'], on: readonly Origin[]) =>
+  on.length < origins.length &&
+  on[0] !== undefined &&
+  t('{source} only', { source: t(originNames[on[0]]) })
 
 export function countOrigins(
   rows: readonly { origin?: 'user' | undefined }[],

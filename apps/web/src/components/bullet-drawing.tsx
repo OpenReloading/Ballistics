@@ -1,3 +1,5 @@
+'use client'
+
 import { face, type LengthUnit, lengthText } from '@open-reloading/drawing'
 import {
   type BulletProfile,
@@ -8,23 +10,35 @@ import {
 } from '@open-reloading/drawing/bullet'
 import type { Bullet } from '@open-reloading/schema'
 import { Ruler } from '@phosphor-icons/react/ssr'
+import { useTranslation } from '../i18n/language.ts'
+import { type Translator, translator } from '../i18n/translate.ts'
 import { DrawingNotes } from './record-actions.tsx'
 import { EmptyNote } from './states.tsx'
 import { TechnicalDrawing } from './technical-drawing.tsx'
 
 const nameOf = (symbol: string) => bulletSymbols.find((s) => s.symbol === symbol)?.name ?? symbol
 
-/** One description: every dimension by name, symbol and value in `unit`, then what is assumed. */
-export function description(p: BulletProfile, unit: LengthUnit = 'mm') {
+/**
+ * One description: every dimension by name, symbol and value in `unit`, then what is assumed. The
+ * dimension names come from the drawing package and stay English.
+ */
+export function description(
+  p: BulletProfile,
+  unit: LengthUnit = 'mm',
+  t: Translator['t'] = translator().t,
+) {
   const { dimensions, radii } = p.annotation
   const values = [...dimensions, ...radii].map(
     (d) =>
       `${nameOf(d.symbol)} ${d.symbol} ${d.symbol === 'Rt/R' ? d.value : `${lengthText(d.value, unit)} ${unit}`}`,
   )
   const assumed = p.outline.segments.some((s) => s.approximate)
-    ? ' Parts drawn dashed are assumed, not from the record.'
+    ? ` ${t('Parts drawn dashed are assumed, not from the record.')}`
     : ''
-  return `Technical drawing of the bullet, full section about the axis, base at the bottom: ${values.join(', ')}.${assumed}`
+  return `${t(
+    'Technical drawing of the bullet, full section about the axis, base at the bottom: {values}.',
+    { values: values.join(', ') },
+  )}${assumed}`
 }
 
 /**
@@ -41,29 +55,42 @@ export function BulletDrawing({
   label: string
   unit?: LengthUnit | undefined
 }) {
+  const { t } = useTranslation()
   const p = recordProfile(record)
   if ('reason' in p)
     return (
       <EmptyNote
         icon={<Ruler size={24} aria-hidden="true" />}
-        title="No drawing for this record."
-        description={`${p.reason}${p.reason === 'The record has no length.' ? ' The drawing needs a diameter and a length.' : ''}`}
+        title={t('No drawing for this record.')}
+        description={
+          p.reason === 'The record has no length.'
+            ? t('{reason} The drawing needs a diameter and a length.', { reason: p.reason })
+            : p.reason
+        }
       />
     )
   const id = `${record.id}-drawing`
-  const title = `Outline, ${label}`
+  const title = t('Outline, {name}', { name: label })
   const model = bulletFigureModel(p, 'screen', bulletScreenEm(p, unit), 0, unit)
   const symbols = [...p.annotation.dimensions, ...p.annotation.radii].map(
     (d) => `${d.symbol} ${nameOf(d.symbol)}`,
   )
   const assumed = p.outline.segments.some((s) => s.approximate)
   const notes = [
-    'Simplified drawing from the values as stored in the record; only values with a source are dimensioned. The table remains the data.',
+    t(
+      'Simplified drawing from the values as stored in the record; only values with a source are dimensioned. The table remains the data.',
+    ),
     ...(assumed
-      ? ['Dashed in the flag color: parts the record does not give, drawn from an assumed shape.']
+      ? [
+          t(
+            'Dashed in the flag color: parts the record does not give, drawn from an assumed shape.',
+          ),
+        ]
       : []),
-    `Symbols: ${symbols.join(', ')}.`,
-    ...(p.undimensioned.length > 0 ? [`Not dimensioned: ${p.undimensioned.join(', ')}.`] : []),
+    t('Symbols: {symbols}.', { symbols: symbols.join(', ') }),
+    ...(p.undimensioned.length > 0
+      ? [t('Not dimensioned: {parts}.', { parts: p.undimensioned.join(', ') })]
+      : []),
     ...p.outline.notes,
   ]
   return (
@@ -80,7 +107,7 @@ export function BulletDrawing({
       <figcaption>
         <DrawingNotes notes={notes} />
         <span className="print-only">
-          {notes.join(' ')} Printed at 100 % scale, the drawing is life size (1:1).
+          {notes.join(' ')} {t('Printed at 100 % scale, the drawing is life size (1:1).')}
         </span>
       </figcaption>
     </figure>

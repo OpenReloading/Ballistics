@@ -2,9 +2,15 @@ import { greek } from '@open-reloading/drawing'
 import { conflictWording, type Figure, shotshellVariants } from '@open-reloading/drawing/cartridge'
 import { type SpecValue, toSi } from '@open-reloading/schema'
 import { formatNumber, localizeNumber, plainNumber } from '../i18n/number.ts'
+import { type Message, msg, type Translator, translator } from '../i18n/translate.ts'
 import type { CartridgeDetail } from './api-types.ts'
 import { fieldSpecs, type Group, groups } from './cartridge-designer.ts'
 import { degreeText, inchText, type UnitSystem } from './units.ts'
+
+type Translate = Translator['t']
+
+/** Without a catalogue every text is English: what these functions give when no translation is passed. */
+const english = translator().t
 
 /** A symbol as the drawing prints it: the Greek letters for alpha, alpha1, beta and delta. */
 export const symbolText = (symbol: string) =>
@@ -42,25 +48,124 @@ const shotshellMeanings = new Map<string, string>([
   ['chamber alpha1', 'included angle of the forcing cone'],
 ])
 
-const sideWord = { cartridge: 'Cartridge', chamber: 'Chamber' } as const
+/**
+ * What the symbols stand for, by their English text, as messages. "measuring position" is left out:
+ * the catalogue test requires the word for a shooting position in every text that says position.
+ */
+const meaningMessages: Readonly<Record<string, Message>> = {
+  'extractor groove diameter': msg('extractor groove diameter'),
+  'extractor groove width at E1': msg('extractor groove width at E1'),
+  'groove front cone angle from the axis (table III: belt cone)': msg(
+    'groove front cone angle from the axis (table III: belt cone)',
+  ),
+  'belt diameter (table III)': msg('belt diameter (table III)'),
+  'body diameter at E': msg('body diameter at E'),
+  'body diameter at L0 (double taper)': msg('body diameter at L0 (double taper)'),
+  'head to P0': msg('head to P0'),
+  'shoulder diameter at L1': msg('shoulder diameter at L1'),
+  'head to the shoulder start (P2)': msg('head to the shoulder start (P2)'),
+  'head to the neck start (H1)': msg('head to the neck start (H1)'),
+  'neck diameter at L2': msg('neck diameter at L2'),
+  'included shoulder angle': msg('included shoulder angle'),
+  'head to where the shoulder cone meets the axis': msg(
+    'head to where the shoulder cone meets the axis',
+  ),
+  'radius at the shoulder start': msg('radius at the shoulder start'),
+  'radius at the neck start': msg('radius at the neck start'),
+  'neck diameter at the mouth': msg('neck diameter at the mouth'),
+  'case length': msg('case length'),
+  'cartridge length': msg('cartridge length'),
+  'bullet diameter': msg('bullet diameter'),
+  'throat diameter': msg('throat diameter'),
+  'length of the cone from H2 down to G1, from L3': msg(
+    'length of the cone from H2 down to G1, from L3',
+  ),
+  'included angle of the h cone': msg('included angle of the h cone'),
+  'L3 to the leade start (freebore)': msg('L3 to the leade start (freebore)'),
+  'leade angle': msg('leade angle'),
+  'L3 to the end of the leade': msg('L3 to the end of the leade'),
+  'bore diameter': msg('bore diameter'),
+  'cartridge L3 plus the chamber G': msg('cartridge L3 plus the chamber G'),
+  'groove diameter of the bore': msg('groove diameter of the bore'),
+  'number of grooves': msg('number of grooves'),
+  'twist, length per turn': msg('twist, length per turn'),
+  'bore cross-section area': msg('bore cross-section area'),
+  'maximum mean pressure': msg('maximum mean pressure'),
+  'proof pressure': msg('proof pressure'),
+  'body diameter at the head': msg('body diameter at the head'),
+  'body diameter at l2': msg('body diameter at l2'),
+  'diameter at the mouth (l)': msg('diameter at the mouth (l)'),
+  'diameter at L1': msg('diameter at L1'),
+  'diameter at L': msg('diameter at L'),
+  'chamber length': msg('chamber length'),
+  'included angle of the forcing cone': msg('included angle of the forcing cone'),
+  'rim diameter': msg('rim diameter'),
+  'rim thickness': msg('rim thickness'),
+  'rim recess diameter': msg('rim recess diameter'),
+  'rim recess depth': msg('rim recess depth'),
+}
 
-/** A value's own notes: basic, the text as printed where it says more. */
-function valueNotes(v: SpecValue) {
+const meaningText = (meaning: string, t: Translate) => {
+  const known = meaningMessages[meaning]
+  return known ? t(known) : meaning
+}
+
+/** The English labels of the row groups of the Dimensions table that have a German text (see `meaningMessages`). */
+const groupMessages: Readonly<Record<string, Message>> = {
+  Body: msg('Body'),
+  Shoulder: msg('Shoulder'),
+  'Neck and length': msg('Neck and length'),
+  'Throat and leade': msg('Throat and leade'),
+  Other: msg('Other'),
+}
+
+/** The label of a row group (`rowGroups`) in the language of `t`. */
+export const groupLabel = (label: string, t: Translate = english) => {
+  const known = groupMessages[label]
+  return known ? t(known) : label
+}
+
+const sideNotesLine = {
+  cartridge: msg('Cartridge: {notes}'),
+  chamber: msg('Chamber: {notes}'),
+} as const
+const sideMeaning = {
+  cartridge: msg('cartridge {meaning}'),
+  chamber: msg('chamber {meaning}'),
+} as const
+const sideSymbol = {
+  cartridge: msg('Cartridge {symbol}'),
+  chamber: msg('Chamber {symbol}'),
+} as const
+
+/** A value's own notes in `t`: basic, the text as printed where it says more. */
+type ValueNote = { kind: 'basic' } | { kind: 'printed'; raw: string }
+
+function valueNotes(v: SpecValue): ValueNote[] {
   const stored =
     v.quantity === 'angle' && v.value !== undefined ? `${localizeNumber(degreeText(v.value))}°` : ''
   return [
-    v.basic ? 'basic' : '',
-    v.raw && v.value !== undefined && v.raw !== stored && v.raw !== String(v.value)
-      ? `printed ${v.raw}`
-      : '',
-  ].filter(Boolean)
+    ...(v.basic ? [{ kind: 'basic' } as const] : []),
+    ...(v.raw && v.value !== undefined && v.raw !== stored && v.raw !== String(v.value)
+      ? [{ kind: 'printed', raw: v.raw } as const]
+      : []),
+  ]
 }
+
+/** A note after the side's name: "basic", "printed 7.62". */
+const noteWord = (n: ValueNote, t: Translate) =>
+  n.kind === 'basic' ? t('basic') : t('printed {raw}', { raw: n.raw })
+
+/** A note as a line of its own: "Basic", "Printed as 7.62". */
+const noteLine = (n: ValueNote, t: Translate) =>
+  n.kind === 'basic' ? t('Basic') : t('Printed as {raw}', { raw: n.raw })
 
 /** What a symbol stands for on the sides that give it; per side where they differ. */
 function meaningOf(
   symbol: string,
   sides: ('cartridge' | 'chamber' | undefined)[],
-  table?: string | undefined,
+  table: string | undefined,
+  t: Translate,
 ): string | undefined {
   const own = table === 'VII' ? shotshellMeanings : meanings
   const meant = sides.flatMap((s) => {
@@ -69,14 +174,26 @@ function meaningOf(
   })
   const distinct = [...new Set(meant.map((x) => x.m))]
   // G1: the cartridge's bullet diameter, the chamber's throat diameter
-  return distinct.length > 1 ? meant.map(({ s, m }) => `${s} ${m}`).join('; ') : distinct[0]
+  if (distinct.length > 1)
+    return meant
+      .map(({ s, m }) =>
+        s ? t(sideMeaning[s], { meaning: meaningText(m, t) }) : meaningText(m, t),
+      )
+      .join('; ')
+  const only = distinct[0]
+  return only === undefined ? undefined : meaningText(only, t)
 }
 
 /** The first hover line of a symbol: its spelled name where the table prints a Greek letter, then its meaning. */
-function nameLine(symbol: string, sides: ('cartridge' | 'chamber' | undefined)[], table?: string) {
-  const meaning = meaningOf(symbol, sides, table)
+function nameLine(
+  symbol: string,
+  sides: ('cartridge' | 'chamber' | undefined)[],
+  table: string | undefined,
+  t: Translate,
+) {
+  const meaning = meaningOf(symbol, sides, table, t)
   if (!meaning && symbolText(symbol) === symbol) return []
-  return [meaning ? `${symbol}: ${meaning}` : symbol]
+  return [meaning ? t('{symbol}: {meaning}', { symbol, meaning }) : symbol]
 }
 
 /** The row groups of the Dimensions table: the designer's field groups, then Other. */
@@ -159,7 +276,18 @@ export function toleranceText(v: SpecValue, system: UnitSystem) {
 }
 
 /** What the clearance note after a chamber value stands for. */
-export const clearanceMeaning = 'chamber minimum minus cartridge maximum'
+export const clearanceMeaning = msg('chamber minimum minus cartridge maximum')
+
+/** The wording of a negative clearance: the drawing package's text, in the language of `t` where it is the one known. */
+const conflictMessage = msg(
+  'data conflict between published cartridge maximum and chamber minimum (check source)',
+)
+const conflictText = (t: Translate) =>
+  conflictWording === conflictMessage ? t(conflictMessage) : conflictWording
+
+/** A clearance line: "Clearance: {meaning}". */
+export const clearanceLine = (meaning: string, t: Translate = english) =>
+  t('Clearance: {meaning}', { meaning })
 
 /** The symbols whose chamber minimum minus cartridge maximum is a fit: diameters and the case length. */
 const fitSymbols = ['R1', 'R3', 'P1', 'P2', 'H1', 'H2', 'G1', 'L3']
@@ -199,6 +327,8 @@ export interface CombinedRow {
   chamber?: SpecValue
   /** Chamber minimum minus cartridge maximum, mm, where it is a fit (`fits`). */
   clearance?: number | undefined
+  /** The cartridge value is derived, not dimensioned. */
+  derived?: boolean | undefined
 }
 
 /** What the record rows read of a cartridge. */
@@ -210,7 +340,7 @@ type Draft = Omit<CombinedRow, 'storedSymbol' | 'group'> & { sideNotes: string[]
  * A draft row per symbol and variant, in record order: the sided values outside the shotshell
  * variant matrix, the first value of each side, its own notes as side notes.
  */
-function rowsBySymbol(spec: Sheet): Map<string, Draft> {
+function rowsBySymbol(spec: Sheet, t: Translate): Map<string, Draft> {
   const matrix = new Set(variantColumns(spec))
   const sided = spec.values.filter(
     (v): v is SpecValue & { side: 'cartridge' | 'chamber' } =>
@@ -228,19 +358,23 @@ function rowsBySymbol(spec: Sheet): Map<string, Draft> {
     if (row[v.side]) continue
     row[v.side] = v
     const own = valueNotes(v)
-    if (own.length) row.sideNotes.push(`${sideWord[v.side]}: ${own.join('; ')}`)
+    if (own.length)
+      row.sideNotes.push(
+        t(sideNotesLine[v.side], { notes: own.map((n) => noteWord(n, t)).join('; ') }),
+      )
     rows.set(key, row)
   }
   return rows
 }
 
 /** A cartridge e derived from delta where the record gives none: in this table and the drawing's description only. */
-function addDerivedE(rows: Map<string, Draft>, list: Figure[]) {
+function addDerivedE(rows: Map<string, Draft>, list: Figure[], t: Translate) {
   const derivedE = list[0]?.drawn.find((d) => d.side === 'cartridge')?.p.derivedE
   if (derivedE === undefined || rows.get('e')?.cartridge) return
   const row = rows.get('e') ?? { key: 'e', symbol: 'e', notes: [], sideNotes: [] }
   row.cartridge = { side: 'cartridge', symbol: 'e', quantity: 'length', value: derivedE }
-  row.sideNotes.unshift('Cartridge: derived, not dimensioned')
+  row.sideNotes.unshift(t('Cartridge: derived, not dimensioned'))
+  row.derived = true
   rows.set('e', row)
 }
 
@@ -248,7 +382,8 @@ function addDerivedE(rows: Map<string, Draft>, list: Figure[]) {
 function withClearanceAndGroup(
   { sideNotes, ...row }: Draft,
   clearance: Map<string, number>,
-  table?: string | undefined,
+  table: string | undefined,
+  t: Translate,
 ): CombinedRow {
   const sides = [row.cartridge?.side, row.chamber?.side].filter(
     (s): s is 'cartridge' | 'chamber' => s !== undefined,
@@ -256,7 +391,7 @@ function withClearanceAndGroup(
   const variant = row.cartridge?.variant ?? row.chamber?.variant
   const gap = variant ? undefined : clearance.get(row.key)
   const storedSymbol = row.cartridge?.symbol ?? row.chamber?.symbol ?? row.key
-  const description = meaningOf(storedSymbol, sides, table)
+  const description = meaningOf(storedSymbol, sides, table, t)
   return {
     ...row,
     storedSymbol,
@@ -265,7 +400,7 @@ function withClearanceAndGroup(
     notes: [
       ...(symbolText(storedSymbol) === storedSymbol ? [] : [storedSymbol]),
       ...sideNotes,
-      ...(gap !== undefined && gap < 0 ? [`Clearance: ${conflictWording}`] : []),
+      ...(gap !== undefined && gap < 0 ? [clearanceLine(conflictText(t), t)] : []),
     ],
     ...(gap !== undefined && { clearance: gap }),
   }
@@ -279,41 +414,45 @@ function withClearanceAndGroup(
  * side's own limit); symbols that differ only in case (r1 and R1, e and E) stay apart. Values of a
  * shotshell variant go to the variant matrix instead; a derived cartridge e joins as a note.
  */
-export function combinedRows(spec: Sheet, list: Figure[]): CombinedRow[] {
-  const rows = rowsBySymbol(spec)
-  addDerivedE(rows, list)
+export function combinedRows(spec: Sheet, list: Figure[], t: Translate = english): CombinedRow[] {
+  const rows = rowsBySymbol(spec, t)
+  addDerivedE(rows, list, t)
   const clearance = fits(spec.values)
-  const out = [...rows.values()].map((row) => withClearanceAndGroup(row, clearance, spec.table))
+  const out = [...rows.values()].map((row) => withClearanceAndGroup(row, clearance, spec.table, t))
   // grouped as the designer, record order within a group
   const rank = (r: CombinedRow) => rowGroups.findIndex(([g]) => g === r.group)
   return out.sort((a, b) => rank(a) - rank(b))
 }
-
-const noteText = (n: string) =>
-  n === 'basic' ? 'Basic' : n.startsWith('printed ') ? `Printed as ${n.slice(8)}` : n
 
 /**
  * The hover lines of a symbol in the table of one side: the symbol and what it stands for there,
  * the spelled name of a Greek letter without a meaning, then that side's notes (basic, the text as
  * printed, derived), the meaning of a clearance note and a clearance that is a data conflict.
  */
-export function sideHint(r: CombinedRow, side: 'cartridge' | 'chamber', table?: string): string[] {
+export function sideHint(
+  r: CombinedRow,
+  side: 'cartridge' | 'chamber',
+  table?: string,
+  t: Translate = english,
+): string[] {
   const v = r[side]
   if (!v) return []
-  const meaning = meaningOf(r.storedSymbol, [side], table)
-  const derived = side === 'cartridge' && r.notes.includes('Cartridge: derived, not dimensioned')
+  const meaning = meaningOf(r.storedSymbol, [side], table, t)
+  const derived = side === 'cartridge' && r.derived === true
   const conflict = side === 'chamber' && r.clearance !== undefined && r.clearance < 0
   return [
     meaning
-      ? `${r.storedSymbol}: ${meaning}`
+      ? t('{symbol}: {meaning}', { symbol: r.storedSymbol, meaning })
       : symbolText(r.storedSymbol) !== r.storedSymbol
         ? r.storedSymbol
         : '',
-    ...valueNotes(v).map(noteText),
-    ...(derived ? ['Derived, not dimensioned'] : []),
+    ...valueNotes(v).map((n) => noteLine(n, t)),
+    ...(derived ? [t('Derived, not dimensioned')] : []),
     // the note after the value is hover only; the symbol is the keyboard stop of the row
-    ...(side === 'chamber' && r.clearance !== undefined ? [`Clearance: ${clearanceMeaning}`] : []),
-    ...(conflict ? [`Clearance: ${conflictWording}`] : []),
+    ...(side === 'chamber' && r.clearance !== undefined
+      ? [clearanceLine(t(clearanceMeaning), t)]
+      : []),
+    ...(conflict ? [clearanceLine(conflictText(t), t)] : []),
   ].filter(Boolean)
 }
 
@@ -350,7 +489,10 @@ export interface MatrixRow {
  * The shotshell matrix: rows Pmax, PK, PE, M, then the variant lengths (cartridge l,
  * chamber L) and any other value of a variant; columns the variants.
  */
-export function variantMatrix(spec: Sheet): { variants: string[]; rows: MatrixRow[] } {
+export function variantMatrix(
+  spec: Sheet,
+  t: Translate = english,
+): { variants: string[]; rows: MatrixRow[] } {
   const variants = variantColumns(spec)
   const keyOf = (v: SpecValue) => `${v.side ?? ''} ${v.symbol}`
   const keys: string[] = []
@@ -370,8 +512,8 @@ export function variantMatrix(spec: Sheet): { variants: string[]; rows: MatrixRo
       )
       return {
         key,
-        label: side ? `${sideWord[side]} ${symbolText(symbol)}` : symbolText(symbol),
-        notes: nameLine(symbol, [side || undefined], spec.table),
+        label: side ? t(sideSymbol[side], { symbol: symbolText(symbol) }) : symbolText(symbol),
+        notes: nameLine(symbol, [side || undefined], spec.table, t),
         quantity: cells.find((c) => c)?.quantity ?? '',
         cells,
       }
@@ -383,5 +525,5 @@ export function variantMatrix(spec: Sheet): { variants: string[]; rows: MatrixRo
 export const pressureStripValues = (spec: Sheet) => spec.values.filter((v) => !v.side && !v.variant)
 
 /** Hover lines of a pressure strip value: symbol and meaning, or none when the symbol has neither. */
-export const pressureStripNote = (v: SpecValue, table?: string) =>
-  nameLine(v.symbol, [undefined], table)
+export const pressureStripNote = (v: SpecValue, table?: string, t: Translate = english) =>
+  nameLine(v.symbol, [undefined], table, t)

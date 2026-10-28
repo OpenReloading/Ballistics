@@ -1,3 +1,5 @@
+'use client'
+
 import {
   Table,
   TableCaption,
@@ -7,6 +9,7 @@ import {
   TableThead,
   TableTr,
 } from '@mantine/core'
+import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
 import { curveAt, type FittedPowder, tableBurntFractions, vivacityUnit } from '../lib/burn-rate.ts'
 import { ScrollRegion } from './scroll-region.tsx'
@@ -18,9 +21,10 @@ const f = (v: number | undefined) => (v === undefined ? '' : formatNumber(v, 2))
  * one value column per powder for several.
  */
 export function CurveTable({ powders, caption }: { powders: FittedPowder[]; caption: string }) {
+  const { t } = useTranslation()
   const only = powders.length === 1 ? powders[0] : undefined
   const heads = only
-    ? [`Value, ${vivacityUnit}`, 'Low', 'High']
+    ? [t('Value, {unit}', { unit: vivacityUnit }), t('Low'), t('High')]
     : powders.map((p) => `${p.label}, ${vivacityUnit}`)
   return (
     <ScrollRegion label={caption}>
@@ -28,7 +32,7 @@ export function CurveTable({ powders, caption }: { powders: FittedPowder[]; capt
         <TableCaption>{caption}</TableCaption>
         <TableThead>
           <TableTr>
-            <TableTh scope="col">Burnt fraction z</TableTh>
+            <TableTh scope="col">{t('Burnt fraction z')}</TableTh>
             {heads.map((h) => (
               <TableTh key={h} scope="col" className="num">
                 {h}

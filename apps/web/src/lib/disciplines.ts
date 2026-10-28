@@ -7,8 +7,10 @@ import {
   type Source,
   toSi,
 } from '@open-reloading/schema'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import type { DirectoryState } from './directory.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
+import { categoryWord } from './face-words.ts'
 import { matchesQuery } from './lists.ts'
 import { type FieldGroup, type StripItem, titleFromKebab } from './record-fields.ts'
 
@@ -91,51 +93,70 @@ export const disciplineMatches = (r: DisciplineRow, s: DirectoryState) =>
   )
 
 /** The discipline's facts under the page bar: federation, distance, category. */
-export function disciplineStrip(d: DisciplineRecord, federation = d.federation): StripItem[] {
+export function disciplineStrip(
+  d: Pick<DisciplineRecord, 'federation' | 'distance' | 'category'>,
+  t: Translator['t'],
+  federation = d.federation,
+): StripItem[] {
+  const federationLabel = t('Federation')
+  const distanceLabel = t('Distance')
   return [
-    { icon: 'federation', label: 'Federation', row: { label: 'Federation', text: federation } },
+    {
+      icon: 'federation',
+      label: federationLabel,
+      row: { label: msg('Federation'), text: federation },
+    },
     {
       icon: 'distance',
-      label: 'Distance',
-      row: { label: 'Distance', text: String(toSi('length', d.distance.value)), unit: 'm' },
+      label: distanceLabel,
+      row: {
+        label: msg('Distance'),
+        text: String(toSi('length', d.distance.value)),
+        numeric: true,
+        unit: 'm',
+      },
     },
     ...(d.category
       ? [
           {
             icon: 'form' as const,
-            label: 'Category',
-            row: { label: 'Category', text: titleFromKebab(d.category) },
+            label: t('Category'),
+            row: { label: msg('Category'), text: categoryWord(t, d.category) },
           },
         ]
       : []),
   ]
 }
 
-const classBasis = {
-  stated: 'Named in the rule book',
-  derived: 'Derived from the range or gauge the rule book states',
+const classBasis: Record<'stated' | 'derived', Message> = {
+  stated: msg('Named in the rule book'),
+  derived: msg('Derived from the range or gauge the rule book states'),
 }
 
 /** The discipline's values beyond the strip: number, section, page and the caliber classes. */
 export function disciplineGroups(
-  d: DisciplineRecord,
+  d: Pick<DisciplineRecord, 'number' | 'section' | 'page' | 'caliberClasses'>,
   classes: readonly CaliberClassRef[],
+  t: Translator['t'],
 ): FieldGroup[] {
   return [
     {
       rows: [
-        ...(d.number ? [{ label: 'Number', text: d.number }] : []),
-        { label: 'Section', text: d.section },
-        { label: 'Page', text: d.page },
+        ...(d.number ? [{ label: msg('Number'), text: d.number }] : []),
+        { label: msg('Section'), text: d.section },
+        { label: msg('Page'), text: d.page },
         ...(d.caliberClasses
           ? [
               {
-                label: 'Caliber classes',
+                label: msg('Caliber classes'),
                 text: caliberClassRefs(d, classes)
                   .map((c) => c.name)
                   .join(', '),
               },
-              { label: 'Caliber classes from', text: classBasis[d.caliberClasses.basis] },
+              {
+                label: msg('Caliber classes from'),
+                text: t(classBasis[d.caliberClasses.basis]),
+              },
             ]
           : []),
       ],

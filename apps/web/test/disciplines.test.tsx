@@ -3,6 +3,7 @@ import { readRecords } from '@open-reloading/data'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it, vi } from 'vitest'
 import { DisciplineList, FederationList } from '../src/components/discipline-list.tsx'
+import { translator } from '../src/i18n/translate.ts'
 import { emptyDirectory, readDirectory, writeDirectory } from '../src/lib/directory.ts'
 import {
   type DisciplineRecord,
@@ -16,6 +17,7 @@ import {
   federationScope,
   hostText,
 } from '../src/lib/disciplines.ts'
+import { say } from '../src/lib/wording.ts'
 import { defined } from './defined.ts'
 
 // the list renders its tab bar, which reads the route and the router
@@ -82,12 +84,13 @@ it('renders the discipline list: one row per discipline linking its page, no fed
 })
 
 it('gives the strip, the number, section, page and caliber classes, and the rule book with its page', () => {
-  expect(disciplineStrip(pistol, 'DSB').map((i) => [i.label, i.row.text])).toEqual([
+  const { t } = translator()
+  expect(disciplineStrip(pistol, t, 'DSB').map((i) => [i.label, i.row.text])).toEqual([
     ['Federation', 'DSB'],
     ['Distance', '25'],
   ])
-  const rowsOf = defined(disciplineGroups(pistol, classes)[0]).rows
-  expect(rowsOf.map((r) => r.label)).toEqual([
+  const rowsOf = defined(disciplineGroups(pistol, classes, t)[0]).rows
+  expect(rowsOf.map((r) => say(t, r.label))).toEqual([
     'Number',
     'Section',
     'Page',

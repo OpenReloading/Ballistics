@@ -2,6 +2,8 @@
 
 import { recordFigures } from '@open-reloading/drawing/cartridge'
 import { useEffect, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import { msg } from '../i18n/translate.ts'
 import { apiFetch } from '../lib/api-fetch.ts'
 import type { CartridgeDetail } from '../lib/api-types.ts'
 import {
@@ -14,6 +16,8 @@ import {
 import { drawable } from '../lib/cartridge-sheet.ts'
 import { parseCountries } from '../lib/countries.ts'
 import { workbenchHref } from '../lib/query.ts'
+import { methodWording } from '../lib/record-values.ts'
+import { verbatim } from '../lib/wording.ts'
 import { ByLengthUnit } from './by-length-unit.tsx'
 import { CartridgeBullets } from './cartridge-bullets.tsx'
 import { CartridgeDrawing } from './cartridge-drawing.tsx'
@@ -34,6 +38,7 @@ import { DataError, Loading } from './states.tsx'
 import { useRecord } from './use-record.ts'
 
 function RecordBadges({ aliases, gap }: { aliases: string[]; gap: boolean }) {
+  const { t } = useTranslation()
   return (
     <>
       <StandardBadge label="CIP" />
@@ -43,7 +48,7 @@ function RecordBadges({ aliases, gap }: { aliases: string[]; gap: boolean }) {
           inline
           className="record-badge record-aliases"
           value={aliases.join(', ')}
-          notes={[`Also printed as: ${aliases.join(', ')}`]}
+          notes={[t('Also printed as: {aliases}', { aliases: aliases.join(', ') })]}
         />
       )}
     </>
@@ -66,10 +71,11 @@ function useFittingBullets(id: string) {
 }
 
 function Cartridge({ c }: { c: CartridgeDetail }) {
+  const { t } = useTranslation()
   const sheet = drawable(c)
   const list = recordFigures(sheet)
-  const rows = inReadingOrder(combinedRows(c, list))
-  const matrix = variantMatrix(c)
+  const rows = inReadingOrder(combinedRows(c, list, t))
+  const matrix = variantMatrix(c, t)
   const pressures = pressureStripValues(c)
   const aliases = c.aliases ?? []
   const date = c.revised ?? c.published
@@ -93,7 +99,7 @@ function Cartridge({ c }: { c: CartridgeDetail }) {
       <RecordPage
         className={matrix.rows.length > 0 ? 'cartridge-record has-variants' : 'cartridge-record'}
         title={c.name}
-        badges={['CIP', ...aliases]}
+        badges={[verbatim('CIP'), ...aliases.map(verbatim)]}
         badgeNodes={<RecordBadges aliases={aliases} gap={gap} />}
         workbench={workbenchHref('cartridge', c.id)}
         design={gap ? undefined : `/cartridges/designer?from=${encodeURIComponent(c.id)}`}
@@ -102,23 +108,24 @@ function Cartridge({ c }: { c: CartridgeDetail }) {
           <>
             <RecordFacts
               values={pressures}
-              notes={pressures.map((v) => pressureStripNote(v, c.table))}
+              notes={pressures.map((v) => pressureStripNote(v, c.table, t))}
               standard={{
                 table: c.table,
-                date: { label: c.revised ? 'Revised' : 'Published', value: date },
+                date: { label: c.revised ? msg('Revised') : msg('Published'), value: date },
                 countries: c.country ? parseCountries(c.country) : undefined,
               }}
               build={{
                 caseType: c.caseType,
-                method: c.pressureMethod,
+                method: c.pressureMethod && methodWording(c.pressureMethod),
               }}
             />
-            {gap && <p className="record-gap">No dimensions or pressures in this record</p>}
+            {gap && <p className="record-gap">{t('No dimensions or pressures in this record')}</p>}
             {/* a shotshell's pressures and lengths by variant, across the page */}
             {matrix.rows.length > 0 && (
               <Panel
                 id="record-variants"
-                title="Variants"
+                title={msg('Variants')}
+                translated
                 className="record-variants"
                 controls={<VariantSelect variants={matrix.variants} />}
               >
@@ -153,6 +160,7 @@ function Cartridge({ c }: { c: CartridgeDetail }) {
  * from the record's data file.
  */
 export function CartridgeRecordPage({ id, name }: { id: string; name: string }) {
+  const { t } = useTranslation()
   const { state, retry } = useRecord<CartridgeDetail>('cartridges', id)
   if (state.status === 'ok') return <Cartridge c={state.data} />
   if (state.status === 'notFound')
@@ -171,7 +179,7 @@ export function CartridgeRecordPage({ id, name }: { id: string; name: string }) 
         <Loading what="cartridge" rows={6} />
       )}
       <noscript>
-        <p>The record is read and drawn by a script: this page needs JavaScript.</p>
+        <p>{t('The record is read and drawn by a script: this page needs JavaScript.')}</p>
       </noscript>
     </>
   )

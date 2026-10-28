@@ -5,16 +5,18 @@ import { toSi } from '@open-reloading/schema'
 import { Plus } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useDeferredValue, useMemo } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import { msg } from '../i18n/translate.ts'
 import { type CaseRow, caseMatches, userCaseRows } from '../lib/case-rows.ts'
 import { listTitles } from '../lib/list-titles.ts'
-import { countText, filterText } from '../lib/lists.ts'
+import { kebabValue } from '../lib/list-values.ts'
+import { countText, filterText, matchingText, widestCount } from '../lib/lists.ts'
 import { productLabel } from '../lib/manufacturers.ts'
-import { titleFromKebab } from '../lib/record-fields.ts'
 import {
   countOrigins,
   inOrigins,
+  onlyText,
   originNames,
-  origins,
   readOrigins,
   userRecordId,
 } from '../lib/sources.ts'
@@ -43,6 +45,8 @@ export function CaseList({
   rows: CaseRow[]
   cartridgeNames: Record<string, string>
 }) {
+  const tr = useTranslation()
+  const { t } = tr
   const { system } = useUnits()
   const [records, removeRow] = useUserRecords()
   // the browser's groups first: a few rows would sit unseen behind the catalogue's
@@ -59,37 +63,34 @@ export function CaseList({
   )
   const query = state.query.trim()
   const on = readOrigins(state.sources)
-  const named = [
-    on.length < origins.length && on[0] && `${originNames[on[0]]} only`,
-    query && `matching "${query}"`,
-  ].filter(Boolean)
+  const named = [onlyText(t, on), matchingText(t, query)].filter(Boolean)
   const columns: DirectoryColumn<CaseRow>[] = [
     {
       key: 'manufacturer',
-      label: 'Manufacturer',
+      label: msg('Manufacturer'),
       width: '10.5rem',
       dim: true,
       value: (r) => r.manufacturerName,
       cell: (r) => r.manufacturerName,
     },
-    { key: 'name', label: 'Name', value: (r) => r.name, cell: (r) => r.name },
+    { key: 'name', label: msg('Name'), value: (r) => r.name, cell: (r) => r.name },
     {
       key: 'cartridge',
-      label: 'Cartridge',
+      label: msg('Cartridge'),
       width: '9rem',
       value: (r) => r.cartridgeName,
       cell: (r) => r.cartridgeName,
     },
     {
       key: 'material',
-      label: 'Material',
+      label: msg('Material'),
       width: '10rem',
       value: (r) => r.material,
-      cell: (r) => titleFromKebab(r.material),
+      cell: (r) => kebabValue(t, r.material),
     },
     {
       key: 'mass',
-      label: 'Mass',
+      label: msg('Mass'),
       unit: system.mass.symbol,
       num: true,
       width: '6rem',
@@ -99,9 +100,9 @@ export function CaseList({
     },
     {
       key: 'capacity',
-      label: 'Water capacity',
+      label: msg('Water capacity'),
       unit: system.capacity.symbol,
-      help: 'The water the manufacturer states fills the case to the mouth.',
+      help: msg('The water the manufacturer states fills the case to the mouth.'),
       num: true,
       width: '8rem',
       value: (r) => r.waterCapacity,
@@ -114,10 +115,10 @@ export function CaseList({
   ]
   const facts = (r: CaseRow) =>
     [
-      r.origin === 'user' && originNames.user,
+      r.origin === 'user' && t(originNames.user),
       r.manufacturerName,
       r.cartridgeName,
-      titleFromKebab(r.material),
+      kebabValue(t, r.material),
     ]
       .filter(Boolean)
       .join(' · ')
@@ -127,14 +128,14 @@ export function CaseList({
         title={listTitles.cases}
         translated
         status={
-          <BarCount widest={`${rows.length} of ${countText(rows.length, rows.length, 'cases')}`}>
-            {countText(shown.length, rows.length, 'cases')}
+          <BarCount widest={widestCount(tr, rows.length, 'cases')}>
+            {countText(tr, shown.length, rows.length, 'cases')}
           </BarCount>
         }
         actions={
           <>
             <Button component={Link} href="/cases/editor" leftSection={<Plus aria-hidden="true" />}>
-              New case group
+              {t('New case group')}
             </Button>
             <UnitsIconButton />
           </>
@@ -145,7 +146,7 @@ export function CaseList({
         <DirectoryFilters
           query={state.query}
           onQuery={(q) => set({ query: q })}
-          placeholder="Manufacturer, name or cartridge…"
+          placeholder={t('Manufacturer, name or cartridge…')}
           sorting={{ columns, sort: state.sort, onSort: (sort) => set({ sort }) }}
         >
           <SourceFilter
@@ -165,7 +166,11 @@ export function CaseList({
           }
           facts={facts}
           label={productLabel}
-          caption={named.length === 0 ? 'All cases' : `Cases, ${named.join(', ')}`}
+          caption={
+            named.length === 0
+              ? t('All cases')
+              : t('Cases, {filters}', { filters: named.join(', ') })
+          }
           noun="cases"
           sort={state.sort}
           onSort={(sort) => set({ sort })}

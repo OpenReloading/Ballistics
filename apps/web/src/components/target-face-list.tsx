@@ -5,10 +5,13 @@ import { toSi } from '@open-reloading/schema'
 import { Plus } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useDeferredValue, useMemo } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import { plainNumber } from '../i18n/number.ts'
+import { msg } from '../i18n/translate.ts'
 import { listTitles } from '../lib/list-titles.ts'
-import { countText, filterText } from '../lib/lists.ts'
+import { countText, filterText, matchingText, widestCount } from '../lib/lists.ts'
 import type { Origin } from '../lib/sources.ts'
-import { distanceText, type TargetFaceRow, targetFaceMatches } from '../lib/target-faces.ts'
+import { type TargetFaceRow, targetFaceMatches } from '../lib/target-faces.ts'
 import { formatQuantity } from '../lib/units.ts'
 import {
   type DirectoryColumn,
@@ -27,6 +30,8 @@ const faceSources: readonly Origin[] = ['openreloading']
 
 /** The target face directory: name, federation or issuer, distances, outer diameter, rings, disciplines. */
 export function TargetFaceList({ items }: { items: TargetFaceRow[] }) {
+  const tr = useTranslation()
+  const { t, tn } = tr
   const { system } = useUnits()
   const [state, set, clear] = useListState()
   const filters = useDeferredValue(state)
@@ -34,28 +39,28 @@ export function TargetFaceList({ items }: { items: TargetFaceRow[] }) {
     () => items.filter((r) => targetFaceMatches(r, filters.query)),
     [items, filters],
   )
-  const named = [state.query.trim() && `matching "${state.query.trim()}"`]
+  const named = [matchingText(t, state.query)]
   const outer = (r: TargetFaceRow) => formatQuantity('length', system, toSi('length', r.outer))
   const columns: DirectoryColumn<TargetFaceRow>[] = [
-    { key: 'name', label: 'Name', value: (r) => r.name, cell: (r) => r.name },
+    { key: 'name', label: msg('Name'), value: (r) => r.name, cell: (r) => r.name },
     {
       key: 'organization',
-      label: 'Federation',
+      label: msg('Federation'),
       width: '7rem',
       value: (r) => r.organization,
       cell: (r) => r.organization,
     },
     {
       key: 'distance',
-      label: 'Distance',
+      label: msg('Distance'),
       unit: 'm',
       width: '8rem',
       value: (r) => r.distances[0],
-      cell: (r) => r.distances.join(', '),
+      cell: (r) => r.distances.map((d) => plainNumber(d)).join(', '),
     },
     {
       key: 'outer',
-      label: 'Outer diameter',
+      label: msg('Outer diameter'),
       unit: system.length.symbol,
       num: true,
       width: '8rem',
@@ -64,7 +69,7 @@ export function TargetFaceList({ items }: { items: TargetFaceRow[] }) {
     },
     {
       key: 'rings',
-      label: 'Rings',
+      label: msg('Rings'),
       num: true,
       width: '5rem',
       value: (r) => r.rings,
@@ -72,7 +77,7 @@ export function TargetFaceList({ items }: { items: TargetFaceRow[] }) {
     },
     {
       key: 'disciplines',
-      label: 'Disciplines',
+      label: msg('Disciplines'),
       num: true,
       width: '7rem',
       value: (r) => r.disciplines,
@@ -82,9 +87,9 @@ export function TargetFaceList({ items }: { items: TargetFaceRow[] }) {
   const facts = (r: TargetFaceRow) =>
     [
       r.organization,
-      distanceText(r.distances),
+      r.distances.length > 0 ? `${r.distances.map((d) => plainNumber(d)).join(', ')} m` : '',
       `${outer(r)} ${system.length.symbol}`,
-      `${r.rings} rings`,
+      tn(r.rings, '{count} ring', '{count} rings'),
     ].join(' · ')
   return (
     <>
@@ -92,8 +97,8 @@ export function TargetFaceList({ items }: { items: TargetFaceRow[] }) {
         title={listTitles.targets}
         translated
         status={
-          <BarCount widest={`${items.length} of ${countText(items.length, items.length, 'faces')}`}>
-            {countText(shown.length, items.length, 'faces')}
+          <BarCount widest={widestCount(tr, items.length, 'faces')}>
+            {countText(tr, shown.length, items.length, 'faces')}
           </BarCount>
         }
         actions={
@@ -103,7 +108,7 @@ export function TargetFaceList({ items }: { items: TargetFaceRow[] }) {
               href="/targets/designer"
               leftSection={<Plus aria-hidden="true" />}
             >
-              New face
+              {t('New face')}
             </Button>
             <UnitsIconButton />
           </>
@@ -114,7 +119,7 @@ export function TargetFaceList({ items }: { items: TargetFaceRow[] }) {
         <DirectoryFilters
           query={state.query}
           onQuery={(q) => set({ query: q })}
-          placeholder="Name, federation or event, 25 m…"
+          placeholder={t('Name, federation or event, 25 m…')}
           sorting={{ columns, sort: state.sort, onSort: (sort) => set({ sort }) }}
         >
           <SourceFilter
@@ -133,8 +138,8 @@ export function TargetFaceList({ items }: { items: TargetFaceRow[] }) {
           label={(r) => r.name}
           caption={
             named.filter(Boolean).length === 0
-              ? 'All target faces'
-              : `Target faces, ${named.filter(Boolean).join(', ')}`
+              ? t('All target faces')
+              : t('Target faces, {filters}', { filters: named.filter(Boolean).join(', ') })
           }
           noun="faces"
           sort={state.sort}

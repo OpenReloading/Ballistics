@@ -29,7 +29,9 @@ import {
   useRef,
   useState,
 } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { canonicalNumberText } from '../i18n/number.ts'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import { errorText } from '../lib/error-text.ts'
 import { loadExample } from '../lib/example-data.ts'
@@ -42,7 +44,7 @@ import {
   firearmProblem,
 } from '../lib/firearm.ts'
 import { listTitles } from '../lib/list-titles.ts'
-import { countText, filterText, matchesQuery } from '../lib/lists.ts'
+import { countText, filterText, matchesQuery, matchingText, widestCount } from '../lib/lists.ts'
 import { controlSize } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { copyName } from '../lib/user-file-names.ts'
@@ -71,35 +73,43 @@ type FirearmRecord = Extract<UserRecord, { kind: 'firearm' }>
 /** The example load's rifle: listed last, opened read-only; Copy to edit and Duplicate make an editable copy. */
 const example = loadExample.firearm as FirearmRecord
 
-const exampleBadge = (
-  <Badge
-    component="span"
-    variant="light"
-    size="sm"
-    color="gray"
-    tt="none"
-    className="firearm-card-badge"
-  >
-    Example
-  </Badge>
-)
+function ExampleBadge() {
+  const { t } = useTranslation()
+  return (
+    <Badge
+      component="span"
+      variant="light"
+      size="sm"
+      color="gray"
+      tt="none"
+      className="firearm-card-badge"
+    >
+      {t('Example')}
+    </Badge>
+  )
+}
 
 const nameOf = (r: FirearmRecord) => (r === example ? r.data.name : r.name)
 
 const rowHref = (r: FirearmRecord) =>
   r === example ? '/firearms' : `/firearms?record=${encodeURIComponent(r.id)}`
 
-const tableCaption = (named: unknown[]) =>
-  named.length > 0 ? `Firearms, ${named.join(', ')}` : 'Firearms in this browser and the example'
+const tableCaption = (t: Translator['t'], named: unknown[]) =>
+  named.length > 0
+    ? t('Firearms, {filters}', { filters: named.join(', ') })
+    : t('Firearms in this browser and the example')
 
 /** The filters set, named for the empty list and the caption. */
-const namedFilters = (query: string) =>
-  [query.trim() && `matching "${query.trim()}"`].filter(Boolean)
+const namedFilters = (t: Translator['t'], query: string) => [matchingText(t, query)].filter(Boolean)
+
+/** The hand of the twist as the record stores it, in the language shown. */
+const hands: Record<string, Message> = { right: msg('right'), left: msg('left') }
 
 type Cells = ReturnType<typeof firearmCells>
 
 /** The table's columns; `cells` reads a row's cells once per render. */
 function firearmColumns(
+  t: Translator['t'],
   system: UnitSystem,
   cartridgeName: (ref: string | undefined) => string | undefined,
   cells: (r: FirearmRecord) => Cells,
@@ -108,12 +118,12 @@ function firearmColumns(
   return [
     {
       key: 'name',
-      label: 'Name',
+      label: msg('Name'),
       value: nameOf,
       cell: (r) =>
         r === example ? (
           <>
-            {nameOf(r)} {exampleBadge}
+            {nameOf(r)} <ExampleBadge />
           </>
         ) : (
           r.name
@@ -121,14 +131,14 @@ function firearmColumns(
     },
     {
       key: 'cartridge',
-      label: 'Cartridge',
+      label: msg('Cartridge'),
       width: '9rem',
       value: (r) => cartridgeName(r.data.cartridge),
       cell: (r) => cartridgeName(r.data.cartridge) ?? '',
     },
     {
       key: 'barrel',
-      label: 'Barrel',
+      label: msg('Barrel'),
       unit: system.barrelLength.symbol,
       num: true,
       width: '6rem',
@@ -137,9 +147,9 @@ function firearmColumns(
     },
     {
       key: 'twist',
-      label: 'Twist',
-      unit: `${system.twist.symbol} per turn`,
-      help: 'Barrel length per turn of the rifling.',
+      label: msg('Twist'),
+      unit: t('{unit} per turn', { unit: system.twist.symbol }),
+      help: msg('Barrel length per turn of the rifling.'),
       num: true,
       width: '6.5rem',
       value: (r) => r.data.twist?.value,
@@ -147,24 +157,27 @@ function firearmColumns(
     },
     {
       key: 'hand',
-      label: 'Hand',
+      label: msg('Hand'),
       width: '4.5rem',
       value: (r) => cells(r).hand || undefined,
-      cell: (r) => cells(r).hand,
+      cell: (r) => {
+        const hand = cells(r).hand
+        return hands[hand] ? t(hands[hand]) : hand
+      },
     },
     {
       key: 'optic',
-      label: 'Optic',
-      help: 'The first optic of the active configuration.',
+      label: msg('Optic'),
+      help: msg('The first optic of the active configuration.'),
       width: '9.5rem',
       value: (r) => cells(r).optic || undefined,
       cell: (r) => cells(r).optic,
     },
     {
       key: 'zero',
-      label: 'Zero',
+      label: msg('Zero'),
       unit: system.range.symbol,
-      help: 'Zero range of that optic.',
+      help: msg('Zero range of that optic.'),
       num: true,
       width: '5.5rem',
       value: (r) => Number(canonicalNumberText(cells(r).zero)) || undefined,
@@ -172,15 +185,15 @@ function firearmColumns(
     },
     {
       key: 'configuration',
-      label: 'Active configuration',
-      help: 'The configuration the trajectory form offers first.',
+      label: msg('Active configuration'),
+      help: msg('The configuration the trajectory form offers first.'),
       width: '9.5rem',
       value: (r) => cells(r).configuration || undefined,
       cell: (r) => cells(r).configuration,
     },
     {
       key: 'actions',
-      label: 'Actions',
+      label: msg('Actions'),
       width: '3rem',
       screenOnly: true,
       cell: (r, tabIndex) => actionsMenu(r, tabIndex),
@@ -202,6 +215,7 @@ function RowActions({
   onDuplicate: () => void
   onDelete: () => void
 }) {
+  const { t } = useTranslation()
   const stored = r !== example
   return (
     <Menu position="bottom-end" withinPortal>
@@ -211,17 +225,17 @@ function RowActions({
           tabIndex={tabIndex}
           size={controlSize.row.icon}
           variant="subtle"
-          aria-label={`Actions for ${r.name}`}
+          aria-label={t('Actions for {name}', { name: r.name })}
         >
           <DotsThreeVertical size={18} aria-hidden="true" />
         </ActionIcon>
       </Menu.Target>
       <Menu.Dropdown>
-        {stored && <Menu.Item onClick={onOpen}>Open</Menu.Item>}
-        <Menu.Item onClick={onDuplicate}>Duplicate</Menu.Item>
+        {stored && <Menu.Item onClick={onOpen}>{t('Open')}</Menu.Item>}
+        <Menu.Item onClick={onDuplicate}>{t('Duplicate')}</Menu.Item>
         {stored && (
           <Menu.Item color="red" onClick={onDelete}>
-            Delete
+            {t('Delete')}
           </Menu.Item>
         )}
       </Menu.Dropdown>
@@ -256,7 +270,7 @@ function FirearmCard({
             <UnstyledButton className="firearm-card-name" title={r.data.name} onClick={onView}>
               {r.data.name}
             </UnstyledButton>
-            {exampleBadge}
+            <ExampleBadge />
           </Group>
         )}
         {actions}
@@ -292,9 +306,10 @@ function LibraryBody({
   empty: ReactNode
   table: ReactNode
 }) {
+  const { t } = useTranslation()
   if (readError)
     return (
-      <ErrorNote title="The firearms of this browser could not be read." onRetry={onRetry}>
+      <ErrorNote title={t('The firearms of this browser could not be read.')} onRetry={onRetry}>
         {readError}
       </ErrorNote>
     )
@@ -303,15 +318,15 @@ function LibraryBody({
   return (
     <>
       {cards ? listed ? <ul>{cards}</ul> : empty : table}
-      {hint && <p className="note screen-only">Your firearms in this browser show here.</p>}
+      {hint && <p className="note screen-only">{t('Your firearms in this browser show here.')}</p>}
     </>
   )
 }
 
 /** An optic's name, else its place in the list; the ids stay internal. */
-const opticNameIn = (f: Firearm) => (id: string) => {
+const opticNameIn = (f: Firearm, t: Translator['t']) => (id: string) => {
   const i = f.optics.findIndex((o) => o.id === id)
-  return f.optics[i]?.name || (i < 0 ? 'Removed optic' : `Optic ${i + 1}`)
+  return f.optics[i]?.name || (i < 0 ? t('Removed optic') : t('Optic {n}', { n: i + 1 }))
 }
 
 /** The listed firearms and the example that the search keeps. */
@@ -383,9 +398,13 @@ function useRecordNames(kind: 'cartridges' | 'bullets', ids: string) {
 const catalogueBulletId = (f: Firearm) =>
   (f.landsBullet === undefined ? undefined : catalogueIdOf(f.landsBullet)) ?? ''
 
-const nameOfBullet = (names: Record<string, string>, ref: string | undefined) => {
+const nameOfBullet = (
+  t: Translator['t'],
+  names: Record<string, string>,
+  ref: string | undefined,
+) => {
   const parsed = ref === undefined ? undefined : parseRef(ref)
-  if (parsed?.scope === 'user') return 'A bullet design of this browser'
+  if (parsed?.scope === 'user') return t('A bullet design of this browser')
   return parsed ? (names[parsed.id] ?? parsed.id) : ref
 }
 
@@ -404,6 +423,7 @@ function PrintCards({
   manufacturer,
   system,
   opticName,
+  exampleOpticName,
 }: {
   editing: boolean
   viewing: boolean
@@ -413,6 +433,7 @@ function PrintCards({
   manufacturer: string | undefined
   system: UnitSystem
   opticName: (id: string) => string
+  exampleOpticName: (id: string) => string
 }) {
   return (
     <>
@@ -431,7 +452,7 @@ function PrintCards({
           f={example.data}
           cartridge={cartridgeName(example.data.cartridge)}
           system={system}
-          opticName={opticNameIn(example.data)}
+          opticName={exampleOpticName}
         />
       )}
     </>
@@ -450,15 +471,16 @@ function ExampleView({
   opticName: (id: string) => string
   onCopy: () => void
 }) {
+  const { t } = useTranslation()
   return (
     <section aria-labelledby="library-editor" className="library-editor">
       <Group gap="md" wrap="nowrap" className="page-panel-head library-head">
         <h2 id="library-editor" className="page-panel-title record-heading">
           {example.data.name}
         </h2>
-        {exampleBadge}
+        <ExampleBadge />
         <Button variant="default" size={controlSize.row.button} ml="auto" onClick={onCopy}>
-          Copy to edit
+          {t('Copy to edit')}
         </Button>
       </Group>
       <DataCard
@@ -478,6 +500,8 @@ function ExampleView({
  * saved and opened through the File menu of the user data files; print gives its data card.
  */
 export function FirearmLibrary() {
+  const tr = useTranslation()
+  const { t } = tr
   const { system } = useUnits()
   const [data, setData] = useState<Firearm>(blankFirearm)
   const [list, setList] = useState<FirearmRecord[]>()
@@ -531,7 +555,7 @@ export function FirearmLibrary() {
   const [cartridgeNames, setCartridgeNames] = useRecordNames('cartridges', cartridgeIds)
   /** Bullet names by record id, for the bullet of the lands contact. */
   const [bulletNames, setBulletNames] = useRecordNames('bullets', catalogueBulletId(data))
-  const bulletName = (ref: string | undefined) => nameOfBullet(bulletNames, ref)
+  const bulletName = (ref: string | undefined) => nameOfBullet(t, bulletNames, ref)
   /** The name of the cartridge a reference names, else the reference as stored. */
   const cartridgeName = (ref: string | undefined) => nameOfCartridge(cartridgeNames, ref)
 
@@ -592,17 +616,20 @@ export function FirearmLibrary() {
     try {
       await deleteRecord(r.id)
     } catch (e) {
-      setFailure(`Delete of ${r.name} failed: ${errorText(e)}`)
+      setFailure(t('Delete of {name} failed: {reason}', { name: r.name, reason: errorText(e) }))
       return refresh()
     }
     refresh()
     // no question before the delete: Undo puts the record back
-    offerUndo(`Deleted ${r.name} from this browser.`, () =>
-      putRecords([r]).then(refresh, (e) => setFailure(`Undo of ${r.name} failed: ${errorText(e)}`)),
+    offerUndo(t('Deleted {name} from this browser.', { name: r.name }), () =>
+      putRecords([r]).then(refresh, (e) =>
+        setFailure(t('Undo of {name} failed: {reason}', { name: r.name, reason: errorText(e) })),
+      ),
     )
   }
 
-  const opticName = opticNameIn(data)
+  const opticName = opticNameIn(data, t)
+  const exampleOpticName = opticNameIn(example.data, t)
   const mounted = (id: string) =>
     data.configurations.some((c) => c.mounts.some((m) => m.optic === id))
   const newFirearm = () => start(blankFirearm())
@@ -616,7 +643,7 @@ export function FirearmLibrary() {
   }
   const matches = (r: FirearmRecord) => matchesQuery([r.name, ...lines(r)], filters.query)
   const { shown, exampleShown, rows } = matching(list, matches)
-  const named = namedFilters(filters.query)
+  const named = namedFilters(t, filters.query)
   const duplicate = (r: FirearmRecord) => start({ ...r.data, name: copyName(r.data.name) })
   const actionsMenu = (r: FirearmRecord, tabIndex?: number) => (
     <RowActions
@@ -635,7 +662,7 @@ export function FirearmLibrary() {
     cellCache.set(r, c)
     return c
   }
-  const columns = firearmColumns(system, cartridgeName, cells, actionsMenu)
+  const columns = firearmColumns(t, system, cartridgeName, cells, actionsMenu)
   const card = (r: FirearmRecord, stored: boolean) => (
     <FirearmCard
       key={r.id}
@@ -655,15 +682,15 @@ export function FirearmLibrary() {
         translated
         status={
           list && (
-            <BarCount widest={`${total} of ${countText(total, total, 'firearms')}`}>
-              {countText(rows.length, total, 'firearms')}
+            <BarCount widest={widestCount(tr, total, 'firearms')}>
+              {countText(tr, rows.length, total, 'firearms')}
             </BarCount>
           )
         }
         actions={
           <>
             <Button leftSection={<Plus aria-hidden="true" />} onClick={newFirearm}>
-              New firearm
+              {t('New firearm')}
             </Button>
             <FileMenu
               ref={menu}
@@ -684,12 +711,12 @@ export function FirearmLibrary() {
       <div className="library" data-editing={compact || undefined}>
         <section aria-labelledby="library-list" className={compact ? 'library-list' : 'directory'}>
           <Title order={2} id="library-list" className="visually-hidden">
-            In this browser
+            {t('In this browser')}
           </Title>
           <DirectoryFilters
             query={filters.query}
             onQuery={(q) => setFilters({ query: q })}
-            placeholder="Name or cartridge, 308…"
+            placeholder={t('Name or cartridge, 308…')}
             sorting={
               compact
                 ? undefined
@@ -713,7 +740,7 @@ export function FirearmLibrary() {
                 onOpen={(r) => (r === example ? view() : menu.current?.open(r))}
                 facts={(r) => lines(r).filter(Boolean).join(' · ')}
                 label={nameOf}
-                caption={tableCaption(named)}
+                caption={tableCaption(t, named)}
                 noun="firearms"
                 sort={filters.sort}
                 onSort={(sort) => setFilters({ sort })}
@@ -731,7 +758,7 @@ export function FirearmLibrary() {
           <ExampleView
             cartridge={cartridgeName(example.data.cartridge)}
             system={system}
-            opticName={opticNameIn(example.data)}
+            opticName={exampleOpticName}
             onCopy={() => duplicate(example)}
           />
         )}
@@ -767,6 +794,7 @@ export function FirearmLibrary() {
         manufacturer={manufacturers.nameOf(data.manufacturer)}
         system={system}
         opticName={opticName}
+        exampleOpticName={exampleOpticName}
       />
     </>
   )

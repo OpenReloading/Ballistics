@@ -1,13 +1,13 @@
 import { compareDisciplines, compareTargetFaces, toSi } from '@open-reloading/schema'
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { FieldTable } from '../../../components/field-table.tsx'
-import { HomepageLink } from '../../../components/homepage-link.tsx'
-import { Panel } from '../../../components/panel.tsx'
-import { LinkButton } from '../../../components/record-actions.tsx'
+import {
+  FederationData,
+  FederationDisciplines,
+  FederationFaces,
+  FederationRuleBooks,
+} from '../../../components/federation-record.tsx'
 import { RecordPage } from '../../../components/record-page.tsx'
-import { PanelTable } from '../../../components/scroll-region.tsx'
 import { ServerDataError } from '../../../components/states.tsx'
 import { TargetFaceDrawing } from '../../../components/target-face-drawing.tsx'
 import {
@@ -19,9 +19,8 @@ import {
   staticIds,
 } from '../../../lib/api.ts'
 import { emptyDirectory, writeDirectory } from '../../../lib/directory.ts'
-import { countryText, disciplineFaceIds, federationScope } from '../../../lib/disciplines.ts'
-import { titleFromKebab } from '../../../lib/record-fields.ts'
-import { controlSize } from '../../../lib/theme.ts'
+import { disciplineFaceIds, federationScope } from '../../../lib/disciplines.ts'
+import { verbatim } from '../../../lib/wording.ts'
 
 export function generateStaticParams() {
   return staticIds(listFederations, 'federation')
@@ -74,139 +73,52 @@ export default async function FederationPage({ params }: PageProps<'/federations
   return (
     <RecordPage
       title={f.name}
-      badges={[f.abbreviation]}
+      badges={[verbatim(f.abbreviation)]}
       className="federation-record"
       provenance={f.provenance}
-      figure={
-        <Panel id="federation-rule-books" title={`Rule books (${f.ruleBooks.length})`}>
-          <PanelTable
-            label="Rule books table"
-            className="face-table"
-            caption={<span className="visually-hidden">The rule books the records cite</span>}
-            columns={['Title', 'Edition']}
-          >
-            {f.ruleBooks.map((b) => (
-              <tr key={b.url}>
-                <th scope="row">
-                  <a href={b.url}>{b.title}</a>
-                </th>
-                <td>{b.edition}</td>
-              </tr>
-            ))}
-          </PanelTable>
-        </Panel>
-      }
+      figure={<FederationRuleBooks books={f.ruleBooks} />}
       values={
-        <Panel id="record-data" title="Federation">
-          <FieldTable
-            caption="Federation"
-            labelledBy="record-data"
-            groups={[
-              {
-                rows: [
-                  { label: 'Abbreviation', text: f.abbreviation },
-                  { label: 'Country', text: countryText(f.country) },
-                ],
-              },
-            ]}
-          />
-          {(f.internationalFederation || f.website) && (
-            <dl className="record-links">
-              {f.internationalFederation && (
-                <>
-                  <dt>Member of</dt>
-                  <dd>
-                    <Link href={`/federations/${f.internationalFederation}`}>
-                      {international?.name ?? f.internationalFederation}
-                    </Link>
-                  </dd>
-                </>
-              )}
-              {f.website && (
-                <>
-                  <dt>Homepage</dt>
-                  <dd>
-                    <HomepageLink url={f.website} />
-                  </dd>
-                </>
-              )}
-            </dl>
-          )}
-        </Panel>
+        <FederationData
+          abbreviation={f.abbreviation}
+          country={f.country}
+          member={
+            f.internationalFederation
+              ? {
+                  id: f.internationalFederation,
+                  name: international?.name ?? f.internationalFederation,
+                }
+              : undefined
+          }
+          website={f.website}
+        />
       }
       side={
         <>
-          <Panel
-            id="federation-disciplines"
-            title={`Disciplines (${own.length})`}
-            controls={
-              own.length > 0 && (
-                <LinkButton
-                  size={controlSize.row.button}
-                  href={`/disciplines${writeDirectory({ ...emptyDirectory, organization: f.abbreviation }, '')}`}
-                >
-                  In the discipline list
-                </LinkButton>
-              )
-            }
-          >
-            {own.length === 0 ? (
-              <p className="record-note">No discipline record names this federation.</p>
-            ) : (
-              <PanelTable
-                label="Disciplines table"
-                className="face-table"
-                caption={
-                  <span className="visually-hidden">The disciplines of this federation</span>
-                }
-                columns={['Number', 'Discipline', 'Distance', 'Category', 'Faces']}
-              >
-                {own.map((d) => (
-                  <tr key={d.id}>
-                    <td>{d.number}</td>
-                    <th scope="row">
-                      <Link href={`/disciplines/${d.id}`}>{d.name}</Link>
-                    </th>
-                    <td className="nowrap">{`${toSi('length', d.distanceMm)} m`}</td>
-                    <td>{d.category && titleFromKebab(d.category)}</td>
-                    <td className="num">{disciplineFaceIds(mappings.data, d.id).length}</td>
-                  </tr>
-                ))}
-              </PanelTable>
+          <FederationDisciplines
+            listHref={`/disciplines${writeDirectory({ ...emptyDirectory, organization: f.abbreviation }, '')}`}
+            rows={own.map((d) => ({
+              id: d.id,
+              number: d.number,
+              name: d.name,
+              distanceM: toSi('length', d.distanceMm),
+              category: d.category,
+              faces: disciplineFaceIds(mappings.data, d.id).length,
+            }))}
+          />
+          <FederationFaces
+            rows={ordered.flatMap((x) =>
+              x.status === 'ok'
+                ? [
+                    {
+                      id: x.data.id,
+                      name: x.data.name,
+                      uses: usedBy(x.data.id),
+                      drawing: <TargetFaceDrawing face={x.data} />,
+                    },
+                  ]
+                : [],
             )}
-          </Panel>
-          <Panel id="federation-faces" title={`Faces (${faces.length})`}>
-            {faces.length === 0 ? (
-              <p className="record-note">No target mapping of its disciplines names a face.</p>
-            ) : (
-              <PanelTable
-                label="Faces table"
-                className="face-table"
-                caption={
-                  <span className="visually-hidden">The faces its disciplines are shot on</span>
-                }
-                columns={['Face', 'Disciplines']}
-              >
-                {ordered.flatMap((x) =>
-                  x.status === 'ok'
-                    ? [
-                        <tr key={x.data.id}>
-                          <th scope="row">
-                            <Link href={`/targets/${x.data.id}`} className="stage-face">
-                              <span aria-hidden="true">
-                                <TargetFaceDrawing face={x.data} />
-                              </span>
-                              <span>{x.data.name}</span>
-                            </Link>
-                          </th>
-                          <td className="num">{usedBy(x.data.id)}</td>
-                        </tr>,
-                      ]
-                    : [],
-                )}
-              </PanelTable>
-            )}
-          </Panel>
+          />
         </>
       }
     />

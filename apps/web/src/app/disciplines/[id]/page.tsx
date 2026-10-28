@@ -1,13 +1,12 @@
-import { compareTargetFaces, toSi } from '@open-reloading/schema'
+import { compareTargetFaces } from '@open-reloading/schema'
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ByLengthUnit } from '../../../components/by-length-unit.tsx'
-import { FieldStrip } from '../../../components/field-strip.tsx'
-import { FieldTable } from '../../../components/field-table.tsx'
-import { Panel } from '../../../components/panel.tsx'
+import {
+  DisciplineData,
+  DisciplineStages,
+  DisciplineStrip,
+} from '../../../components/discipline-record.tsx'
 import { RecordPage } from '../../../components/record-page.tsx'
-import { PanelTable } from '../../../components/scroll-region.tsx'
 import { ServerDataError } from '../../../components/states.tsx'
 import { TargetFaceDrawing } from '../../../components/target-face-drawing.tsx'
 import {
@@ -20,8 +19,7 @@ import {
   listTargetMappings,
   staticIds,
 } from '../../../lib/api.ts'
-import { disciplineGroups, disciplineRuleBook, disciplineStrip } from '../../../lib/disciplines.ts'
-import { presetUnits, withUnit } from '../../../lib/units.ts'
+import { disciplineRuleBook } from '../../../lib/disciplines.ts'
 
 export function generateStaticParams() {
   return staticIds(listDisciplines, 'discipline')
@@ -39,14 +37,6 @@ export async function generateMetadata({
     description: `Distance, caliber classes and the target faces of ${r.data.name}, with its rule book.`,
   }
 }
-
-/** A length in mm in the Settings length unit, both laid out on the server. */
-const shownLength = (mm: number) => (
-  <ByLengthUnit
-    mm={withUnit('length', presetUnits('metric-grams'), toSi('length', mm))}
-    inch={withUnit('length', presetUnits('us'), toSi('length', mm))}
-  />
-)
 
 // no Suspense above notFound(): a streamed response keeps status 200
 export default async function DisciplinePage({ params }: PageProps<'/disciplines/[id]'>) {
@@ -90,8 +80,6 @@ export default async function DisciplinePage({ params }: PageProps<'/disciplines
   const first = stages[0]
   const groupsHref = (m: { face: string; event: string }) =>
     `/groups?face=${encodeURIComponent(m.face)}&event=${encodeURIComponent(m.event)}`
-  // two or more stages: each row opens its own; the page bar opens the first
-  const perStage = stages.length > 1
   return (
     <RecordPage
       title={d.name}
@@ -99,96 +87,58 @@ export default async function DisciplinePage({ params }: PageProps<'/disciplines
       className="discipline-record"
       groups={first && groupsHref(first)}
       provenance={d.provenance}
-      strip={<FieldStrip items={disciplineStrip(d, federation?.abbreviation)} />}
+      strip={
+        <DisciplineStrip
+          record={{ federation: d.federation, distance: d.distance, category: d.category }}
+          federation={federation?.abbreviation}
+        />
+      }
       figure={
-        <Panel id="discipline-stages" title={`Faces (${stages.length})`}>
-          {stages.length === 0 ? (
-            <p className="record-note">No target mapping names this discipline.</p>
-          ) : (
-            <PanelTable
-              label="Faces table"
-              className="face-table"
-              caption={
-                <span className="visually-hidden">The faces and stages of this discipline</span>
-              }
-              columns={[
-                'Face',
-                'Event',
-                'Stage',
-                'Gauge',
-                'Shots',
-                ...(perStage ? ['Shot groups'] : []),
-              ]}
-            >
-              {stages.map((m) => {
-                const f = faceOf.get(m.face)
-                return (
-                  <tr key={m.id}>
-                    <th scope="row">
-                      <Link href={`/targets/${m.face}`} className="stage-face">
-                        {f && (
-                          <span aria-hidden="true">
-                            <TargetFaceDrawing face={f} />
-                          </span>
-                        )}
-                        <span>{f?.name ?? m.face}</span>
-                      </Link>
-                    </th>
-                    <td>{f?.events.find((e) => e.id === m.event)?.name ?? m.event}</td>
-                    <td>{m.stage}</td>
-                    <td className="num">{m.gauge && shownLength(m.gauge.value)}</td>
-                    <td className="num">{m.shotCount}</td>
-                    {perStage && (
-                      <td>
-                        <Link
-                          href={groupsHref(m)}
-                          aria-label={`Open ${m.stage ?? m.event} in shot groups`}
-                        >
-                          Open
-                        </Link>
-                      </td>
-                    )}
-                  </tr>
-                )
-              })}
-            </PanelTable>
-          )}
-        </Panel>
+        <DisciplineStages
+          rows={stages.map((m) => {
+            const f = faceOf.get(m.face)
+            return {
+              id: m.id,
+              face: m.face,
+              faceName: f?.name ?? m.face,
+              ...(f && { drawing: <TargetFaceDrawing face={f} /> }),
+              event: f?.events.find((e) => e.id === m.event)?.name ?? m.event,
+              stage: m.stage,
+              gauge: m.gauge?.value,
+              shotCount: m.shotCount,
+              groupsHref: groupsHref(m),
+            }
+          })}
+        />
       }
       values={
-        <Panel id="record-data" title="Discipline">
-          <FieldTable
-            caption="Discipline"
-            labelledBy="record-data"
-            groups={disciplineGroups(d, classes.data)}
-          />
-          <dl className="record-links">
-            <dt>Federation</dt>
-            <dd>
-              <Link href={`/federations/${d.federation}`}>{federation?.name ?? d.federation}</Link>
-            </dd>
-            {book && (
-              <>
-                <dt>Rule book</dt>
-                <dd>
-                  {book.url ? <a href={book.url}>{book.title}</a> : book.title}
-                  {book.edition && !book.title.includes(book.edition) && `, ${book.edition}`}
-                  {`, section ${book.section}, ${book.page}`}
-                </dd>
-              </>
-            )}
-            {d.internationalDiscipline && (
-              <>
-                <dt>International discipline</dt>
-                <dd>
-                  <Link href={`/disciplines/${d.internationalDiscipline}`}>
-                    {international?.name ?? d.internationalDiscipline}
-                  </Link>
-                </dd>
-              </>
-            )}
-          </dl>
-        </Panel>
+        <DisciplineData
+          record={{
+            number: d.number,
+            section: d.section,
+            page: d.page,
+            caliberClasses: d.caliberClasses,
+          }}
+          classes={classes.data}
+          federation={{ id: d.federation, name: federation?.name ?? d.federation }}
+          book={
+            book && {
+              title: book.title,
+              url: book.url,
+              edition: book.edition,
+              section: book.section,
+              page: book.page,
+            }
+          }
+          international={
+            d.internationalDiscipline
+              ? {
+                  id: d.internationalDiscipline,
+                  name: international?.name ?? d.internationalDiscipline,
+                }
+              : undefined
+          }
+        />
       }
     />
   )

@@ -7,6 +7,8 @@ import type { Bullet } from '@open-reloading/schema'
 import { WarningCircle } from '@phosphor-icons/react'
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import { msg, type Translator } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import { sharedScale } from '../lib/bullet-compare.ts'
 import { compareHref, maxComparedBullets, parseCompareIds } from '../lib/compare-ids.ts'
@@ -36,6 +38,7 @@ function Problem({
   text: string
   rest?: string[] | undefined
 }) {
+  const { t } = useTranslation()
   return (
     <EmptyNote
       icon={<WarningCircle size={24} aria-hidden="true" />}
@@ -45,11 +48,11 @@ function Problem({
         <>
           {rest && rest.length > 0 && (
             <LinkButton href={compareHref(rest)} size={controlSize.row.button}>
-              Compare the others
+              {t('Compare the others')}
             </LinkButton>
           )}
           <LinkButton href="/bullets" size={controlSize.row.button}>
-            Choose bullets
+            {t('Choose bullets')}
           </LinkButton>
         </>
       }
@@ -61,7 +64,11 @@ function Problem({
  * Every drawing at one text size and frame width, so at one scale, its lengths in `unit`; a reason
  * where one cannot draw.
  */
-function drawings(records: (Bullet & { manufacturerName: string })[], unit: LengthUnit) {
+function drawings(
+  records: (Bullet & { manufacturerName: string })[],
+  unit: LengthUnit,
+  t: Translator['t'],
+) {
   const profiles = records.map((r) => recordProfile(r))
   const drawn = profiles.filter((p): p is BulletProfile => !('reason' in p))
   const { models, tallest } =
@@ -71,18 +78,18 @@ function drawings(records: (Bullet & { manufacturerName: string })[], unit: Leng
     if ('reason' in p)
       return (
         <Text component="p" inherit m={0} c="dimmed" fz="xs">
-          No drawing: {p.reason}
+          {t('No drawing: {reason}', { reason: p.reason })}
         </Text>
       )
     const model = nth(models, drawn.indexOf(p))
     const id = `${b.id}-compare`
-    const title = `Outline, ${productLabel(b)}`
+    const title = t('Outline, {name}', { name: productLabel(b) })
     return (
       <>
         <TechnicalDrawing
           id={id}
           title={title}
-          desc={description(p, unit)}
+          desc={description(p, unit, t)}
           model={model}
           tallest={tallest}
         />
@@ -119,7 +126,13 @@ async function fetchBullets(ids: string[]): Promise<Fetched> {
 
 /** The page bar of the compare page; the actions only where they act on bullets. */
 export function CompareBar({ actions }: { actions: boolean }) {
-  return <PageBar title="Compare bullets" actions={actions ? <RecordActions /> : undefined} />
+  return (
+    <PageBar
+      title={msg('Compare bullets')}
+      translated
+      actions={actions ? <RecordActions /> : undefined}
+    />
+  )
 }
 
 /** The compare view of the `ids` in the URL, read in the browser so the page stays static. */
@@ -162,22 +175,31 @@ function CompareBody({
   got: Fetched
   retry: () => void
 }) {
+  const { t, tn } = useTranslation()
   if (parsed.status === 'empty')
     return (
-      <Problem title="No bullets chosen." text="Tick 2 to 4 bullets in the list, then Compare." />
+      <Problem
+        title={t('No bullets chosen.')}
+        text={t('Tick 2 to 4 bullets in the list, then Compare.')}
+      />
     )
   if (parsed.status === 'tooMany')
     return (
       <Problem
-        title="Too many bullets."
-        text={`The link names ${parsed.count} bullets; at most ${maxComparedBullets} compare at once.`}
+        title={t('Too many bullets.')}
+        text={t('The link names {count} bullets; at most {max} compare at once.', {
+          count: parsed.count,
+          max: maxComparedBullets,
+        })}
       />
     )
   if (parsed.status === 'invalid')
     return (
       <Problem
-        title="This link is not valid."
-        text={`Not a bullet id: ${parsed.ids.map((id) => `"${id}"`).join(', ')}.`}
+        title={t('This link is not valid.')}
+        text={tn(parsed.ids.length, 'Not a bullet id: {ids}.', 'Not bullet ids: {ids}.', {
+          ids: parsed.ids.map((id) => `"${id}"`).join(', '),
+        })}
       />
     )
   if (got.status === 'loading') return <Loading what="bullets" />
@@ -190,16 +212,18 @@ function CompareBody({
   if (unknown.length > 0)
     return (
       <Problem
-        title="Some bullets were not found."
-        text={`No bullet with the id ${unknown.join(', ')}.`}
+        title={t('Some bullets were not found.')}
+        text={tn(unknown.length, 'No bullet with the id {ids}.', 'No bullets with the ids {ids}.', {
+          ids: unknown.join(', '),
+        })}
         rest={records.map((b) => b.id)}
       />
     )
-  const inch = drawings(records, 'in')
+  const inch = drawings(records, 'in', t)
   return (
     <BulletCompare
       bullets={records}
-      drawings={drawings(records, 'mm').map((mm, i) => (
+      drawings={drawings(records, 'mm', t).map((mm, i) => (
         <ByLengthUnit key={nth(records, i).id} mm={mm} inch={inch[i]} />
       ))}
     />

@@ -8,19 +8,23 @@ import {
   bulletScreenEm,
 } from '@open-reloading/drawing/bullet'
 import type { Bullet } from '@open-reloading/schema'
+import { msg } from '../i18n/translate.ts'
 import {
   ballisticCoefficientRows,
   bulletDataGroups,
   type FieldGroup,
-  rowLabel,
+  type FieldRow,
   rowParts,
   turnPrefix,
 } from './record-fields.ts'
-import type { UnitSystem } from './units.ts'
+import { type UnitSystem, withUnit } from './units.ts'
+import type { Wording } from './wording.ts'
 
 /** A row of the comparison: one value per bullet as shown in the preset, undefined where absent. */
 interface CompareRow {
-  label: string
+  label: Wording
+  /** A coefficient's lower velocity bound, in the preset's unit, after the label. */
+  from?: string
   symbol?: string | undefined
   unit: string
   values: (string | undefined)[]
@@ -28,11 +32,52 @@ interface CompareRow {
 
 /** A titled group of compared rows. */
 interface CompareGroup {
-  title: string
+  title: Wording
   rows: CompareRow[]
 }
 
-const groupOrder = ['Size', 'Shape', 'Tip and base', 'Build', 'Twist', 'Computed']
+const groupOrder: Wording[] = [
+  msg('Size'),
+  msg('Shape'),
+  msg('Tip and base'),
+  msg('Build'),
+  msg('Twist'),
+  msg('Computed'),
+]
+
+const untitled: Wording = { verbatim: '' }
+
+/** A wording as a map key: a message by its text, the others by their parts. */
+const keyOf = (w: Wording) => (typeof w === 'string' ? w : JSON.stringify(w))
+
+/** The rows of one bullet's group merged into `rows`: its value at place `at`, a repeated label once per repeat. */
+function mergeRows(
+  rows: Map<string, CompareRow>,
+  own: FieldRow[],
+  at: number,
+  count: number,
+  system: UnitSystem,
+) {
+  const seen = new Map<string, number>()
+  for (const r of own) {
+    const from =
+      r.fromVelocity === undefined ? undefined : withUnit('velocity', system, r.fromVelocity)
+    const label = `${keyOf(r.label)}${from === undefined ? '' : ` from ${from}`}`
+    const n = seen.get(label) ?? 0
+    seen.set(label, n + 1)
+    const key = `${label}#${n}`
+    const { number, unit } = rowParts(r, system)
+    const row = rows.get(key) ?? {
+      label: r.label,
+      ...(from !== undefined && { from }),
+      ...(r.symbol && { symbol: r.symbol }),
+      unit,
+      values: Array.from({ length: count }, () => undefined),
+    }
+    row.values[at] = number
+    rows.set(key, row)
+  }
+}
 
 /**
  * The bullets' data tables merged: the groups of the bullet record's data table, then the
@@ -41,38 +86,29 @@ const groupOrder = ['Size', 'Shape', 'Tip and base', 'Build', 'Twist', 'Computed
  */
 export function compareGroups(bullets: Bullet[], system: UnitSystem): CompareGroup[] {
   // the groups in `bulletDataGroups` order, also where the first bullet lacks one
+  const titles = new Map<string, Wording>()
   const groups = new Map<string, Map<string, CompareRow>>(
-    [...groupOrder, 'Ballistic coefficients'].map((t) => [t, new Map()]),
+    [...groupOrder, msg('Ballistic coefficients')].map((t) => {
+      titles.set(keyOf(t), t)
+      return [keyOf(t), new Map()]
+    }),
   )
   bullets.forEach((b, i) => {
     const own: FieldGroup[] = [
       ...bulletDataGroups(b),
-      { title: 'Ballistic coefficients', rows: ballisticCoefficientRows(b) },
+      { title: msg('Ballistic coefficients'), rows: ballisticCoefficientRows(b) },
     ]
     for (const g of own) {
-      const title = g.title ?? ''
+      const wording = g.title ?? untitled
+      const title = keyOf(wording)
+      titles.set(title, wording)
       const rows = groups.get(title) ?? new Map<string, CompareRow>()
       groups.set(title, rows)
-      const seen = new Map<string, number>()
-      for (const r of g.rows) {
-        const label = rowLabel(r, system)
-        const n = seen.get(label) ?? 0
-        seen.set(label, n + 1)
-        const key = `${label}#${n}`
-        const { number, unit } = rowParts(r, system)
-        const row = rows.get(key) ?? {
-          label,
-          ...(r.symbol && { symbol: r.symbol }),
-          unit,
-          values: bullets.map(() => undefined),
-        }
-        row.values[i] = number
-        rows.set(key, row)
-      }
+      mergeRows(rows, g.rows, i, bullets.length, system)
     }
   })
   return [...groups]
-    .map(([title, rows]) => ({ title, rows: [...rows.values()] }))
+    .map(([title, rows]) => ({ title: titles.get(title) ?? untitled, rows: [...rows.values()] }))
     .filter((g) => g.rows.length > 0)
 }
 

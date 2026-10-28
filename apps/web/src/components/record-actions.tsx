@@ -23,6 +23,7 @@ import {
 } from '@phosphor-icons/react'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { controlSize, tipEvents } from '../lib/theme.ts'
 import { AppPopover, popoverWidth } from './app-popover.tsx'
 import { UnitsIconButton } from './units-settings.tsx'
@@ -77,38 +78,39 @@ export function RecordActions({
   groups?: string | undefined
   design?: string | undefined
 }) {
+  const { t } = useTranslation()
   const clipboard = useClipboard({ timeout: 2000 })
   return (
     <>
       {workbench && (
         <LinkButton href={workbench} icon={<Flask aria-hidden="true" />} primary>
-          Use in workbench
+          {t('Use in workbench')}
         </LinkButton>
       )}
       {groups && (
         <LinkButton href={groups} icon={<Target aria-hidden="true" />} primary>
-          Open in shot groups
+          {t('Open in shot groups')}
         </LinkButton>
       )}
       {design && (
         <LinkButton href={design} icon={<PencilSimple aria-hidden="true" />}>
-          Open in designer
+          {t('Open in designer')}
         </LinkButton>
       )}
       {compare && (
         <LinkButton href={compare} icon={<ArrowsLeftRight aria-hidden="true" />}>
-          Compare
+          {t('Compare')}
         </LinkButton>
       )}
       <UnitsIconButton />
       {/* the name stays, so a copy moves nothing */}
       <Tooltip
-        label={clipboard.copied ? 'Link copied' : 'Copy link'}
+        label={clipboard.copied ? t('Link copied') : t('Copy link')}
         {...(clipboard.copied && { opened: true })}
       >
         <ActionIcon
           variant="default"
-          aria-label="Copy link"
+          aria-label={t('Copy link')}
           onClick={() => clipboard.copy(window.location.href)}
         >
           <LinkSimple aria-hidden="true" />
@@ -132,11 +134,12 @@ export function PrintButton({
   disabled?: boolean
   hint?: string
 }) {
+  const { t } = useTranslation()
   return (
-    <Tooltip label={hint ?? 'Print'} multiline={!!hint} maw={hint ? 320 : undefined}>
+    <Tooltip label={hint ?? t('Print')} multiline={!!hint} maw={hint ? 320 : undefined}>
       <ActionIcon
         variant="default"
-        aria-label="Print"
+        aria-label={t('Print')}
         {...(disabled !== undefined && { disabled })}
         onClick={onClick}
       >
@@ -151,20 +154,25 @@ const shortDigits = 12
 
 /** A source file's hash, short, as a button that copies it; the full value on hover or focus. */
 export function CopyHash({ hash }: { hash: string }) {
+  const { t } = useTranslation()
   return (
     <span className="hash">
       SHA-256{' '}
       <CopyButton value={hash} timeout={2000}>
         {({ copied, copy }) => (
           <Tooltip
-            label={copied ? 'Copied' : hash}
+            label={copied ? t('Copied') : hash}
             events={tipEvents}
             multiline
             classNames={{ tooltip: 'hash-tooltip' }}
           >
             <UnstyledButton
               className="hash-copy"
-              aria-label={copied ? 'Hash copied' : `Copy hash ${hash.slice(0, shortDigits)}`}
+              aria-label={
+                copied
+                  ? t('Hash copied')
+                  : t('Copy hash {hash}', { hash: hash.slice(0, shortDigits) })
+              }
               onClick={copy}
             >
               {/* the rest stays in the text for print */}
@@ -187,6 +195,7 @@ export function CopyHash({ hash }: { hash: string }) {
 
 /** A drawing's legend and assumptions behind a button, so the figure keeps its height. */
 export function DrawingNotes({ notes }: { notes: string[] }) {
+  const { t } = useTranslation()
   return (
     <AppPopover width={popoverWidth.notes} position="bottom-start" withArrow trapFocus>
       <Popover.Target>
@@ -196,7 +205,7 @@ export function DrawingNotes({ notes }: { notes: string[] }) {
           leftSection={<Info aria-hidden="true" />}
           className="screen-only"
         >
-          Drawing notes
+          {t('Drawing notes')}
         </Button>
       </Popover.Target>
       <Popover.Dropdown className="drawing-notes">

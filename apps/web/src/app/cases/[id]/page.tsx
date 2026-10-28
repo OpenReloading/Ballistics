@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { CaseCartridgeNote } from '../../../components/case-cartridge-note.tsx'
 import { FieldStrip } from '../../../components/field-strip.tsx'
 import { FieldTable } from '../../../components/field-table.tsx'
 import { Panel } from '../../../components/panel.tsx'
 import { RecordPage } from '../../../components/record-page.tsx'
 import { ServerDataError } from '../../../components/states.tsx'
+import { msg } from '../../../i18n/translate.ts'
 import {
   getCase,
   getManufacturerNames,
@@ -61,13 +62,9 @@ export default async function CasePage({ params }: PageProps<'/cases/[id]'>) {
       provenance={c.provenance}
       strip={<FieldStrip items={caseStrip(c, maker)} />}
       values={
-        <Panel id="record-data" title="Properties">
-          <FieldTable caption="Properties" labelledBy="record-data" groups={groups} />
-          {cartridge && (
-            <p className="record-note">
-              Cartridge: <Link href={`/cartridges/${cartridge.id}`}>{cartridge.name}</Link>
-            </p>
-          )}
+        <Panel id="record-data" title={msg('Properties')} translated>
+          <FieldTable caption={msg('Properties')} labelledBy="record-data" groups={groups} />
+          {cartridge && <CaseCartridgeNote id={cartridge.id} name={cartridge.name} />}
           {c.note && <p className="record-note">{c.note}</p>}
         </Panel>
       }

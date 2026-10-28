@@ -1,15 +1,11 @@
-import { toSi } from '@open-reloading/schema'
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ByLengthUnit } from '../../../components/by-length-unit.tsx'
-import { FieldStrip } from '../../../components/field-strip.tsx'
-import { FieldTable } from '../../../components/field-table.tsx'
+import { FaceEvents, FaceStrip, FaceValuesPanel } from '../../../components/face-record.tsx'
 import { Panel } from '../../../components/panel.tsx'
 import { RecordPage } from '../../../components/record-page.tsx'
-import { PanelTable } from '../../../components/scroll-region.tsx'
 import { ServerDataError } from '../../../components/states.tsx'
 import { TargetFaceDrawing } from '../../../components/target-face-drawing.tsx'
+import { msg } from '../../../i18n/translate.ts'
 import {
   getTargetFace,
   getTargetMapping,
@@ -20,9 +16,7 @@ import {
   staticIds,
 } from '../../../lib/api.ts'
 import { withOrganization } from '../../../lib/face-organization.ts'
-import { titleFromKebab } from '../../../lib/record-fields.ts'
-import { faceEventRows, targetFaceGroups, targetFaceStrip } from '../../../lib/target-faces.ts'
-import { presetUnits, withUnit } from '../../../lib/units.ts'
+import { faceEventRows } from '../../../lib/target-faces.ts'
 
 export function generateStaticParams() {
   return staticIds(listAllTargetFaces, 'target-face')
@@ -38,16 +32,6 @@ export async function generateMetadata({ params }: PageProps<'/targets/[id]'>): 
     description: `Ring diameters, black area and the disciplines shot on ${r.data.name}, with sources.`,
   }
 }
-
-const scoredBy = { touch: 'Hole edge', centre: 'Hole centre' }
-
-/** A length in mm in the Settings length unit, both laid out on the server. */
-const shownLength = (mm: number) => (
-  <ByLengthUnit
-    mm={withUnit('length', presetUnits('metric-grams'), toSi('length', mm))}
-    inch={withUnit('length', presetUnits('us'), toSi('length', mm))}
-  />
-)
 
 // no Suspense above notFound(): a streamed response keeps status 200
 export default async function TargetFacePage({ params }: PageProps<'/targets/[id]'>) {
@@ -77,8 +61,8 @@ export default async function TargetFacePage({ params }: PageProps<'/targets/[id
     disciplines.data,
     federations.data,
   )
-  const categories = rows.some((e) => e.category)
-  const scoring = rows.some((e) => e.scoring)
+  // the sources are the page's own panel
+  const { provenance: _, ...face } = f
   return (
     <RecordPage
       title={f.name}
@@ -86,62 +70,14 @@ export default async function TargetFacePage({ params }: PageProps<'/targets/[id
       className="target-face-record"
       groups={`/groups?face=${encodeURIComponent(f.id)}`}
       provenance={f.provenance}
-      strip={<FieldStrip items={targetFaceStrip(f)} />}
+      strip={<FaceStrip face={face} />}
       figure={
-        <Panel id="face-drawing" title="Face">
+        <Panel id="face-drawing" title={msg('Face')} translated>
           <TargetFaceDrawing face={f} />
         </Panel>
       }
-      values={
-        <Panel id="record-data" title="Rings">
-          <FieldTable caption="Rings" labelledBy="record-data" groups={targetFaceGroups(f)} />
-          {f.note && <p className="record-note">{f.note}</p>}
-        </Panel>
-      }
-      side={
-        <Panel id="face-events" title={`Events (${rows.length})`}>
-          <PanelTable
-            label="Events table"
-            className="face-table"
-            caption={
-              <span className="visually-hidden">The events and disciplines shot on this face</span>
-            }
-            columns={[
-              'Federation',
-              'Number',
-              'Discipline',
-              'Stage',
-              'Distance',
-              'Gauge',
-              'Shots',
-              ...(categories ? ['Kind'] : []),
-              ...(scoring ? ['Scoring'] : []),
-              'Section',
-            ]}
-          >
-            {rows.map((d) => (
-              <tr key={d.id}>
-                <td>{d.federation}</td>
-                <td>{d.number}</td>
-                <th scope="row">
-                  {d.disciplineId ? (
-                    <Link href={`/disciplines/${d.disciplineId}`}>{d.discipline}</Link>
-                  ) : (
-                    d.discipline
-                  )}
-                </th>
-                <td>{d.stage}</td>
-                <td className="nowrap">{d.distance}</td>
-                <td className="num">{d.gauge !== undefined && shownLength(d.gauge)}</td>
-                <td className="num">{d.shotCount}</td>
-                {categories && <td>{d.category && titleFromKebab(d.category)}</td>}
-                {scoring && <td>{d.scoring ? scoredBy[d.scoring] : 'Not stated'}</td>}
-                <td>{d.section}</td>
-              </tr>
-            ))}
-          </PanelTable>
-        </Panel>
-      }
+      values={<FaceValuesPanel face={face} />}
+      side={<FaceEvents rows={rows} />}
     />
   )
 }

@@ -5,6 +5,7 @@ import { FieldTable } from '../../../components/field-table.tsx'
 import { Panel } from '../../../components/panel.tsx'
 import { RecordPage } from '../../../components/record-page.tsx'
 import { ServerDataError } from '../../../components/states.tsx'
+import { msg } from '../../../i18n/translate.ts'
 import { getManufacturerNames, getPrimer, listAllPrimers, staticIds } from '../../../lib/api.ts'
 import { productLabel } from '../../../lib/manufacturers.ts'
 import { primerRowGroups, primerStrip } from '../../../lib/record-fields.ts'
@@ -42,8 +43,8 @@ export default async function PrimerPage({ params }: PageProps<'/primers/[id]'>)
       provenance={p.provenance}
       strip={<FieldStrip items={primerStrip(p, maker)} />}
       values={
-        <Panel id="record-data" title="Properties">
-          <FieldTable caption="Properties" labelledBy="record-data" groups={groups} />
+        <Panel id="record-data" title={msg('Properties')} translated>
+          <FieldTable caption={msg('Properties')} labelledBy="record-data" groups={groups} />
           {p.note && <p className="record-note">{p.note}</p>}
         </Panel>
       }
