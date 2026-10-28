@@ -112,6 +112,10 @@ export async function run(argv: string[], env: NodeJS.ProcessEnv, io: Io): Promi
       io.stderr(`${error.message}\n`)
       return 2
     }
-    throw error
+    // a candidate that throws, or a file error: one line, never a stack trace
+    io.stderr(
+      `error: ${error instanceof Error ? error.message : String(error)}\n`.replace(/\n(?!$)/g, ' '),
+    )
+    return 2
   }
 }

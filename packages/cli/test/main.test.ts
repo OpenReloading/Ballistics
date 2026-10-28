@@ -135,6 +135,19 @@ describe('exit codes', () => {
   })
 })
 
+describe('an unexpected error', () => {
+  it.each([
+    ['a candidate that throws', new URL('./fixtures/throwing-model.mjs', import.meta.url).pathname],
+    ['a directory given as the candidate', join(import.meta.dirname, 'fixtures')],
+  ])('ends with one line and exit 2: %s', async (_name, model) => {
+    const { code, stdout, stderr } = await cli(['verify', ...data, '--model', model])
+    expect(code).toBe(2)
+    expect(stdout).toBe('')
+    expect(stderr).toMatch(/^[^\n]+\n$/)
+    expect(stderr).not.toContain('    at ')
+  })
+})
+
 describe('defaults', () => {
   it('reads the rows and the records from the environment', async () => {
     const env = { BALLISTICS_ROWS: rowsPath, BALLISTICS_RECORDS: recordRoots.join(':') }
