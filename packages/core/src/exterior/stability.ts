@@ -4,7 +4,7 @@
  * stated in customary units and converted here.
  */
 import { InputError } from '../errors.ts'
-import { type Air, airAt } from './atmosphere.ts'
+import type { Air } from './atmosphere.ts'
 
 const grain = 0.45359237 / 7000
 const inch = 0.0254
@@ -41,40 +41,6 @@ export function millerStability(i: MillerStabilityInput): number {
   // absolute temperature over 59 degF (288.15 K), 29.92 inHg over the station pressure
   const fa = (air.temperature / 288.15) * ((29.92 * inHg) / air.pressure)
   return sg * fv * fa
-}
-
-/** Gyroscopic stability factor below which a bullet is flagged: below 1 it does not stay point first. */
-export const minStability = 1
-
-/** The part of a trajectory point that {@link firstLowStability} reads. */
-export interface StabilityPoint {
-  /** Slant range, m. */
-  range: number
-  /** Speed, m/s. */
-  velocity: number
-  /** Height above the firing point, m. */
-  heightAboveFiringPoint: number
-}
-
-/**
- * The first of `points` where Miller's factor, evaluated with the speed and the air at the point,
- * falls below `threshold`; undefined when none does.
- * `station` is the air at the firing point (`apps/docs/docs/models/exterior-stability.md`,
- * "Stability along the trajectory").
- */
-export function firstLowStability(
-  bullet: Omit<MillerStabilityInput, 'velocity' | 'air'>,
-  station: Air,
-  points: readonly StabilityPoint[],
-  threshold = minStability,
-): { range: number; stability: number } | undefined {
-  for (const p of points) {
-    if (!(p.velocity > 0)) continue
-    const air = airAt(station, p.heightAboveFiringPoint)
-    const stability = millerStability({ ...bullet, velocity: p.velocity, air })
-    if (stability < threshold) return { range: p.range, stability }
-  }
-  return undefined
 }
 
 /** Inputs of {@link dynamicStabilityFactor}: coefficients, mass kg, diameter m, moments of inertia kg m2. */
