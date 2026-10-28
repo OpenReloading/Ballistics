@@ -3,7 +3,7 @@
 import { fromSi, toSi } from '@open-reloading/schema'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { type Design, evaluate } from '../lib/bullet-designer.ts'
-import { paintDisc, type ScaleSpan, scaleOf } from '../lib/bullet-photo.ts'
+import { paintDisc, type Scale, type ScaleSpan, scaleOf } from '../lib/bullet-photo.ts'
 import { tintBox, tintOf } from '../lib/bullet-photo-canvas.ts'
 import {
   type MeasuredInputs,
@@ -15,6 +15,7 @@ import type { BulletMeasurement } from '../lib/bullet-photo-measure.ts'
 import type { Outline } from '../lib/bullet-photo-outline.ts'
 import type { WorkerReply, WorkerRequest } from '../lib/bullet-photo-protocol.ts'
 import { samplePhoto } from '../lib/bullet-photo-sample.ts'
+import type { Known } from '../lib/bullet-photo-scale.ts'
 import { errorText } from '../lib/error-text.ts'
 import { type FieldSpec, type FieldValue, fieldOf } from '../lib/field-spec.ts'
 import type { Point } from '../lib/target-geometry.ts'
@@ -75,6 +76,8 @@ interface Found {
   /** Sentences about the photograph's quality, and why it cannot be measured when it cannot. */
   hints: string[]
   unusable?: string
+  /** The scale the worker measured at: the ruler's, else the caliper sizes'; absent when there was none. */
+  scale?: Scale
   /** What the worker measured: the design waits for a measurement of the inputs as they are now. */
   made: MeasuredInputs
 }
@@ -94,6 +97,7 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
   const [cut, setCut] = useState<Cut>()
   const [points, setPoints] = useState<Point[]>([])
   const [distances, setDistances] = useState<[FieldValue, FieldValue]>([empty, empty])
+  const [known, setKnown] = useState<[FieldValue, FieldValue]>([empty, empty])
   const [axis, setAxis] = useState<number>()
   const [found, setFound] = useState<Found>()
   const [warnings, setWarnings] = useState<string[]>([])
@@ -103,13 +107,20 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
   const [failure, setFailure] = useState<string>()
   const ask = useWorker(setFailure)
 
-  const scale = useMemo(() => {
+  const rulerScale = useMemo(() => {
     const spans = [0, 1].flatMap((i): ScaleSpan[] => {
       const [a, b, si] = [points[2 * i], points[2 * i + 1], distances[i]?.si]
       return a && b && si !== undefined && si > 0 ? [{ a, b, mm: fromSi('length', si) }] : []
     })
     return scaleOf(spans)
   }, [points, distances])
+
+  // sizes read off a caliper, mm: they give a scale without a ruler and check it with one
+  const knownMm = useMemo((): Known => {
+    const mm = (v: FieldValue | undefined) =>
+      v?.si !== undefined && v.si > 0 ? fromSi('length', v.si) : undefined
+    return { diameter: mm(known[0]), length: mm(known[1]) }
+  }, [known])
 
   const cutOut = useCallback(
     async (exclude: Point[]) => {
@@ -149,7 +160,8 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
         alpha: cut.alpha.slice(),
         width: size.width,
         height: size.height,
-        scale: scale ?? { pxPerMm: 1, relUncertainty: 0 },
+        scale: rulerScale,
+        known: knownMm,
         angle: axis,
         edgeSpread: spread,
       })
@@ -157,8 +169,9 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
       if (r.kind === 'error') setFailure(r.message)
       if (r.kind === 'measured')
         setFound({
-          made: { cut, scale, axis },
+          made: { cut, scale: rulerScale, axis, known: knownMm },
           hints: r.hints,
+          ...(r.scale && { scale: r.scale }),
           ...(r.unusable && { unusable: r.unusable }),
           ...(r.outline && { outline: r.outline }),
           ...(r.measurement && { measurement: r.measurement }),
@@ -168,7 +181,7 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
       stale = true
       clearTimeout(t)
     }
-  }, [ask, cut, size, scale, axis, spread])
+  }, [ask, cut, size, rulerScale, knownMm, axis, spread])
 
   /** Takes a canvas as the working photograph: its pixels go to the worker, the state starts over. */
   const adopt = async (canvas: HTMLCanvasElement, span?: ScaleSpan) => {
@@ -191,6 +204,7 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
     setWarnings([])
     setSpread(0)
     setPoints(span ? [span.a, span.b] : [])
+    setKnown([empty, empty])
     setDistances([
       span ? fieldOf(system, distanceSpec('Distance A to B'), toSi('length', span.mm)) : empty,
       empty,
@@ -258,6 +272,8 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
     setCut({ alpha: cut.alpha, rev: cut.rev + 1 })
   }
 
+  /** The scale the values are in: the worker's for the measurement shown, else the ruler's. */
+  const scale = found ? found.scale : rulerScale
   const facts = useMemo(() => (size && scale ? { ...size, scale } : undefined), [size, scale])
   const design = useMemo(
     () => (found?.measurement && facts ? photoDesign(found.measurement, facts, system) : undefined),
@@ -268,7 +284,9 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
     [design, system],
   )
   const ready =
-    found !== undefined && design !== undefined && measuredFor(found.made, { cut, scale, axis })
+    found !== undefined &&
+    design !== undefined &&
+    measuredFor(found.made, { cut, scale: rulerScale, axis, known: knownMm })
   const rows = useMemo(
     () => (found?.measurement && facts ? photoRows(found.measurement, record?.si) : []),
     [found, facts, record],
@@ -283,7 +301,9 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
     setPoints,
     distances,
     setDistances,
-    scale,
+    scale: scale ?? rulerScale,
+    known,
+    setKnown,
     axis,
     setAxis,
     found,
