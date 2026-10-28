@@ -5,7 +5,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['src/**/*.ts'],
-      reporter: ['text-summary'],
+      reporter: ['text-summary', 'lcov'],
       // floors: the measured value rounded down, minus one
       thresholds: { statements: 95, branches: 90, functions: 98, lines: 97 },
     },

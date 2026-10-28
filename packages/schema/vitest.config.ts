@@ -7,7 +7,7 @@ export default defineConfig({
       include: ['src/**/*.ts'],
       // script that writes the JSON Schema files at build time
       exclude: ['src/write-json-schema.ts'],
-      reporter: ['text-summary'],
+      reporter: ['text-summary', 'lcov'],
       // floors: the measured value rounded down, minus one
       thresholds: { statements: 97, branches: 95, functions: 97, lines: 98 },
     },

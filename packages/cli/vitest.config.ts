@@ -8,7 +8,7 @@ export default defineConfig({
       include: ['src/**/*.ts'],
       // process entry and the schema file writer, run as processes by npm
       exclude: ['src/bin.ts', 'src/write-json-schema.ts'],
-      reporter: ['text-summary', 'text'],
+      reporter: ['text-summary', 'text', 'lcov'],
       // floors: the measured value rounded down, minus one
       thresholds: { statements: 96, branches: 91, functions: 97, lines: 97 },
     },
