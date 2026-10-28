@@ -18,6 +18,29 @@ The proposals stay apart from the shots until the user accepts them. The code is
 
 Cancelling detection, changing the photo, sheet or group, or rotating the photo invalidates pending photo and target reads. Their results and errors cannot start a worker, apply a target or change the detection status.
 
+## Actions from photo to scored group
+
+An action is a file choice, a click, or a value typed and entered. A decision is what only the user can give or confirm. The counts run from choosing the photo to Accept on a rendered target found for sure, on `/groups`. Before is the flow where detection waited for a Detect holes click; after is detection started by the photo added.
+
+| Hole size | Before: actions | After: actions | Decisions |
+| --- | --- | --- | --- |
+| Known (bullet or marker) | 3: choose the photo, Detect holes, Accept all | 2: choose the photo, Accept all | Accept |
+| Unknown | 6: choose the photo, Detect holes (the run stops at the Example step), type the hole size, open the Detect step, Detect holes, Accept all | 3: choose the photo, type the hole size in the result line, Accept all | the hole size, Accept |
+
+The after counts are asserted in `apps/e2e/tests/web/groups-face.spec.ts` (the known and the unknown hole size tests). The before counts are read from the code and the spec of the earlier flow and are not asserted. A photo below the minimum quality adds Detect anyway; a photo without one sure target goes on in the guided steps, which these counts do not cover.
+
+## Quality bar
+
+The bar for face search and hole detection on a set of photos with reference holes:
+
+- Usable photo: a photo with no bad-level problem (Photo quality). Photos held by one are counted per set as held and reported beside the corrections.
+- Matching: a proposal at or above the confidence tier matches a reference hole when the two lie within half a hole diameter, one to one, nearest pairs first. Found: a matched proposal. False: a proposal without a reference hole. Missed: a reference hole without a proposal.
+- Corrections per usable photo: the adds, moves and deletes that turn the proposals into the reference holes, $\max(n_\mathrm{false}, n_\mathrm{missed})$, since a false hole paired with a missed one is one move.
+- Face search per set: right first choice, wrong first choice, found but not first, not found, each split by whether the first choice is sure. A sure wrong first choice is the worst case.
+- Statistics: the median and the 90th percentile of the corrections. A 90th percentile needs 20 or more usable photos in the set; below that the maximum is given with the set size.
+
+The default bar: a median of 1 correction or fewer, a 90th percentile of 3 or fewer, the right first choice on 90 % of usable photos and a wrong one on 2 % or fewer. These are defaults that wait for a measurement on real target photos; no measured result is claimed. Meeting the bar never means that a photo is good or a detection right.
+
 ## Equations
 
 ### Working image
@@ -354,6 +377,7 @@ Code: `apps/web/src/lib/photo-quality.ts`, `photoQuality`, `belowMinimum`, `layo
 | $a_j$, $e_j$ | Share of a ring's ellipse its line covers, relative radius error of a match | 1 | 1 |
 | $n_\mathrm{miss}$, $n_\mathrm{extra}$ | Target rings expected and not found, rings found that match none | 1 | 1 |
 | $S$ | Score of a target | 1 | 1 |
+| $n_\mathrm{false}$, $n_\mathrm{missed}$ | Proposals without a reference hole, reference holes without a proposal | 1 | 1 |
 | $g$, $\phi$ | Ring spacing, turn of the target's axes on the photo | mm, degree | mm, rad |
 
 ## Assumptions
