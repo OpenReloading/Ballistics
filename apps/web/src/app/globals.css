@@ -1523,10 +1523,7 @@ td.nowrap {
 }
 
 .side-row > .prop-label {
-  overflow: hidden;
   font-size: var(--mantine-font-size-sm);
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .side-grid .mantine-Input-input {
@@ -4591,12 +4588,8 @@ main .library-head.page-panel-head > .page-panel-title {
     padding: 0.0625rem 0;
   }
 
-  /* one-line labels: a label of two lines made the row three lines high with its note */
   .workbench .readouts dt {
-    overflow: hidden;
     font-size: var(--mantine-font-size-xs);
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
   .workbench .readouts dd {
@@ -5037,10 +5030,7 @@ main .library-head.page-panel-head > .page-panel-title {
     :is(.panel-fields, .seating-slot)
     .mantine-InputWrapper-root
     > .mantine-InputWrapper-label {
-    overflow: hidden;
     font-size: var(--mantine-font-size-sm);
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
   .workbench .workspace-inputs .mantine-InputWrapper-label[title] {
@@ -5237,8 +5227,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .segmented-row label > span {
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
 }
 
 .segmented-row input {
@@ -5281,11 +5270,8 @@ main .library-head.page-panel-head > .page-panel-title {
 
   .workbench .workspace-inputs .mantine-InputWrapper-root > .mantine-InputWrapper-label,
   .workbench .workspace-inputs :is(.record-row, .seating-row, .pair-row) > :first-child {
-    overflow: hidden;
     color: var(--fg);
     font-weight: 400;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
   /* a field's box is fixed: the value column only widens for a record's text */
@@ -5365,7 +5351,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
   /* the ladder's count and step size in one row: 44 and 54 px fields, one unit */
   .workbench .workspace-inputs .pair-row {
-    grid-template-columns: minmax(0, 1fr) 2.75rem 3.375rem 2.625rem;
+    grid-template-columns: minmax(0, 1fr) 2.75rem minmax(3.375rem, auto) 2.625rem;
     column-gap: 0.25rem;
   }
 
@@ -5391,6 +5377,8 @@ main .library-head.page-panel-head > .page-panel-title {
     > .mantine-InputWrapper-root:last-child
     .mantine-Input-input {
     padding-inline-end: 2.875rem;
+    /* a wider text (more letter spacing) widens the column instead of being cut */
+    field-sizing: content;
   }
 
   .workbench .workspace-inputs .pair-row .mantine-InputWrapper-label {
@@ -5482,7 +5470,7 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 
   .workbench .workspace-inputs .pair-row {
-    grid-template-columns: minmax(0, 1fr) 3rem 3.625rem 2.75rem;
+    grid-template-columns: minmax(0, 1fr) 3rem minmax(3.625rem, auto) 2.75rem;
   }
 
   .workbench .workspace-inputs :is(.panel-fields, .seating-slot) .mantine-Input-input,
@@ -6123,12 +6111,9 @@ main .library-head.page-panel-head > .page-panel-title {
   .workbench .readouts.readout-keys dt {
     grid-area: label;
     flex-basis: auto;
-    overflow: hidden;
     color: var(--muted);
-    text-overflow: ellipsis;
     font-size: var(--mantine-font-size-xs);
     line-height: 1rem;
-    white-space: nowrap;
   }
 
   .workbench .readouts.readout-keys dd {
@@ -6196,10 +6181,8 @@ main .library-head.page-panel-head > .page-panel-title {
 
   .workbench .readouts.readout-list dt {
     flex: 0 1 auto;
-    overflow: hidden;
     color: var(--muted);
     font-size: var(--mantine-font-size-sm);
-    text-overflow: ellipsis;
   }
 
   .workbench .readouts.readout-list dd {
@@ -6215,9 +6198,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
   .workbench .readouts.readout-list dd.readout-phrase {
     flex: 0 1 auto;
-    overflow: hidden;
     font-size: var(--mantine-font-size-xs);
-    text-overflow: ellipsis;
   }
 
   /* a note is the row's title and for screen readers: the row stays one line */
@@ -6967,11 +6948,9 @@ main .field-table tr.field-group > th {
   border: 0;
   background: none;
   max-width: 16rem;
-  overflow: hidden;
   color: var(--muted);
   font-size: var(--mantine-font-size-sm);
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  text-align: start;
   cursor: help;
 }
 
@@ -8895,11 +8874,8 @@ main .session-shots th:nth-child(-n + 2) {
 .prop-grid .mantine-InputWrapper-root > .mantine-InputWrapper-label,
 .prop-grid .prop-label {
   grid-column: 1;
-  overflow: hidden;
   font-size: var(--mantine-font-size-xs);
   font-weight: 400;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 }
 
 .prop-grid :is(.mantine-InputWrapper-label[title], .prop-label[title]),
@@ -9163,6 +9139,23 @@ main .session-shots th:nth-child(-n + 2) {
 .shot-table input[type="number"]::-webkit-inner-spin-button,
 .shot-table input[type="number"]::-webkit-outer-spin-button {
   appearance: none;
+}
+
+/* the x and y fields go below Set and Clear when the row has no room for a value */
+.prop-grid .aim-row > .prop-label {
+  white-space: nowrap;
+}
+
+.prop-grid .aim-fields {
+  flex-wrap: wrap;
+}
+
+.prop-grid .aim-axis {
+  display: flex;
+  flex: 1 1 4.5rem;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 0;
 }
 
 /* the point of aim's x and y share the value column */
@@ -9551,11 +9544,9 @@ main .session-shots th:nth-child(-n + 2) {
 }
 
 main .page-bar h1 {
-  overflow: hidden;
   margin: 0;
   font-size: var(--mantine-h2-font-size);
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  overflow-wrap: break-word;
 }
 
 .page-bar-title > :not(h1) {
@@ -9682,6 +9673,7 @@ main .page-bar h1 {
   /* two lines of a smaller size, so a long name reads; one line above a status line */
   main .page-bar h1 {
     display: -webkit-box;
+    overflow: hidden;
     font-size: var(--mantine-font-size-md);
     line-height: 1.2;
     white-space: normal;

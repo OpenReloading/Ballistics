@@ -56,7 +56,6 @@ import {
 import {
   type CSSProperties,
   type Dispatch,
-  Fragment,
   type KeyboardEvent,
   type ReactElement,
   type ReactNode,
@@ -1011,7 +1010,7 @@ function GroupPanel({ ed }: { ed: Ed }) {
                 {t('Clear')}
               </Button>
               {(['x', 'y'] as const).map((axis) => (
-                <Fragment key={axis}>
+                <span key={axis} className="aim-axis">
                   <span aria-hidden="true">{axis}</span>
                   <CoordInput
                     label={t('Point of aim {axis}', { axis })}
@@ -1024,7 +1023,7 @@ function GroupPanel({ ed }: { ed: Ed }) {
                       )
                     }
                   />
-                </Fragment>
+                </span>
               ))}
             </span>
           </div>
