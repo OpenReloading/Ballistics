@@ -3519,6 +3519,8 @@
   "The string was not added.": "Die Schussreihe wurde nicht hinzugefügt.",
   "Tune a powder": "Treibladungspulver abstimmen",
   "The fit could not run in this browser.": "Die Anpassung konnte in diesem Browser nicht laufen.",
+  "The import could not run in this browser.": "Der Import konnte in diesem Browser nicht laufen.",
+  "The file could not be read.": "Die Datei konnte nicht gelesen werden.",
   "What's new": "Neuigkeiten",
   "{accepted} accepted, {warned} with a warning, {rejected} rejected. New {added}, already here {equal}, changed {changed}, repeated in file {repeated}.": "{accepted} übernommen, {warned} mit Warnung, {rejected} abgelehnt. Neu {added}, bereits hier {equal}, geändert {changed}, in der Datei wiederholt {repeated}.",
   "and {count} more rejected rows": "und {count} weitere abgelehnte Zeilen",

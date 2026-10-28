@@ -75,7 +75,9 @@
     "UTF-16 text with an odd number of bytes",
     "the file is not UTF-8 or UTF-16 text; save it as UTF-8 (CSV UTF-8) and import again",
     "UTF-16 text with an odd number of bytes; save it as UTF-8 (CSV UTF-8) and import again.",
-    "The file is not UTF-8 or UTF-16 text; save it as UTF-8 (CSV UTF-8) and import again."
+    "The file is not UTF-8 or UTF-16 text; save it as UTF-8 (CSV UTF-8) and import again.",
+    "The import could not run in this browser.",
+    "The file could not be read."
   ],
   "templates": {
     "app and API request failures": [

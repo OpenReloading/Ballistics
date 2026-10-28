@@ -134,7 +134,10 @@ export function powderFitRunner(create: () => Worker, show: (s: PowderFitState) 
           else if (r.kind === 'range') set({ ...state, range: r, running: false })
           else set({ ...state, failure: r, running: false })
         }
-        w.onerror = () =>
+        // a worker whose script failed to load answers nothing: the next run starts a new one
+        w.onerror = () => {
+          w.terminate()
+          worker = undefined
           set({
             failure: {
               kind: 'error',
@@ -143,11 +146,64 @@ export function powderFitRunner(create: () => Worker, show: (s: PowderFitState) 
             },
             running: false,
           })
+        }
         worker = w
       }
       last++
       set({ running: true })
       worker.postMessage({ ...q, id: last })
+    },
+    stop() {
+      worker?.terminate()
+      worker = undefined
+    },
+  }
+}
+
+/**
+ * Runs hand curve requests in a worker made by `create`, one at a time with only the last request
+ * waiting next. A worker that errors is ended and the next request starts another.
+ */
+export function handCurveRunner(
+  create: () => Worker,
+  show: (curve: HandPoint[] | undefined) => void,
+) {
+  let worker: Worker | undefined
+  let id = 0
+  // replies to requests up to this id are dropped: the values went back to the fit after them
+  let dropped = 0
+  let busy = false
+  let next: Omit<PowderHandRequest, 'kind' | 'id'> | undefined
+  const send = (r: Omit<PowderHandRequest, 'kind' | 'id'>) => {
+    busy = true
+    next = undefined
+    if (!worker) {
+      const w = create()
+      w.onmessage = (e: MessageEvent<PowderHandReply>) => {
+        if (e.data.id > dropped) show(e.data.curve)
+        done()
+      }
+      w.onerror = () => {
+        w.terminate()
+        worker = undefined
+        done()
+      }
+      worker = w
+    }
+    worker.postMessage({ ...r, kind: 'hand', id: ++id } satisfies PowderHandRequest)
+  }
+  const done = () => {
+    busy = false
+    if (next) send(next)
+  }
+  return {
+    ask(r: Omit<PowderHandRequest, 'kind' | 'id'> | undefined) {
+      if (!r) {
+        dropped = id
+        next = undefined
+        show(undefined)
+      } else if (busy) next = r
+      else send(r)
     },
     stop() {
       worker?.terminate()

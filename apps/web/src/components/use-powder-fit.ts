@@ -2,8 +2,8 @@ import type { InteriorLoad, PowderParameter } from '@open-reloading/core'
 import { useEffect, useRef, useState } from 'react'
 import {
   type HandPoint,
+  handCurveRunner,
   type PowderFitState,
-  type PowderHandReply,
   type PowderHandRequest,
   powderFitRunner,
   temperatureFit,
@@ -49,38 +49,12 @@ export function usePowderFit(
  */
 export function useHandCurve(q: Omit<PowderHandRequest, 'kind' | 'id'> | undefined) {
   const [curve, setCurve] = useState<HandPoint[]>()
-  const ask = useRef<(q: Omit<PowderHandRequest, 'kind' | 'id'> | undefined) => void>(undefined)
+  const runner = useRef<ReturnType<typeof handCurveRunner> | undefined>(undefined)
   useEffect(() => {
-    const w = fitWorker()
-    let id = 0
-    // replies to requests up to this id are dropped: the values went back to the fit after them
-    let dropped = 0
-    let busy = false
-    let next: Omit<PowderHandRequest, 'kind' | 'id'> | undefined
-    const send = (r: Omit<PowderHandRequest, 'kind' | 'id'>) => {
-      busy = true
-      next = undefined
-      w.postMessage({ ...r, kind: 'hand', id: ++id } satisfies PowderHandRequest)
-    }
-    const done = () => {
-      busy = false
-      if (next) send(next)
-    }
-    w.onmessage = (e: MessageEvent<PowderHandReply>) => {
-      if (e.data.id > dropped) setCurve(e.data.curve)
-      done()
-    }
-    w.onerror = done
-    ask.current = (r) => {
-      if (!r) {
-        dropped = id
-        next = undefined
-        setCurve(undefined)
-      } else if (busy) next = r
-      else send(r)
-    }
-    return () => w.terminate()
+    const r = handCurveRunner(fitWorker, setCurve)
+    runner.current = r
+    return () => r.stop()
   }, [])
-  useEffect(() => ask.current?.(q), [q])
+  useEffect(() => runner.current?.ask(q), [q])
   return q ? curve : undefined
 }

@@ -8,8 +8,14 @@ import {
 } from '@open-reloading/core'
 import { describe, expect, it } from 'vitest'
 import { nth } from '../src/lib/nth.ts'
-import type { PowderFitReply, PowderFitRequest, PowderFitState } from '../src/lib/powder-fit.ts'
-import { powderFitRunner } from '../src/lib/powder-fit.ts'
+import type {
+  HandPoint,
+  PowderFitReply,
+  PowderFitRequest,
+  PowderFitState,
+  PowderHandRequest,
+} from '../src/lib/powder-fit.ts'
+import { handCurveRunner, powderFitRunner } from '../src/lib/powder-fit.ts'
 import { answerPowderFit, bandCharges } from '../src/lib/powder-fit-answer.ts'
 
 /** Synthetic rifle load of the core fit tests: truth vivacity 0.45 1/s. */
@@ -78,10 +84,14 @@ describe('powder fit in a worker', () => {
   })
 })
 
-/** A worker stand-in: keeps what it is sent and answers through `reply`. */
+/** A worker stand-in: keeps what it is sent, answers through `reply` and errors through `fail`. */
 function fakeWorkers() {
-  const made: { sent: PowderFitRequest[]; ended: boolean; reply: (r: PowderFitReply) => void }[] =
-    []
+  const made: {
+    sent: PowderFitRequest[]
+    ended: boolean
+    reply: (r: PowderFitReply) => void
+    fail: () => void
+  }[] = []
   const create = () => {
     const w = {
       sent: [] as PowderFitRequest[],
@@ -103,6 +113,7 @@ function fakeWorkers() {
         return w.ended
       },
       reply: (r) => w.onmessage?.({ data: r } as MessageEvent<PowderFitReply>),
+      fail: () => w.onerror?.(),
     })
     return w as unknown as Worker
   }
@@ -160,5 +171,46 @@ describe('powder fit runner', () => {
     made[0]?.reply(fitReply(1))
     made[0]?.reply({ kind: 'error', id: 1, message: 'failed' })
     expect([shown.fit?.id, shown.failure?.kind, shown.running]).toEqual([1, 'error', false])
+  })
+
+  it('ends a worker that errors and runs the next request in a new one', () => {
+    const { made, create } = fakeWorkers()
+    let shown: PowderFitState = { running: false }
+    const runner = powderFitRunner(create, (s) => {
+      shown = s
+    })
+    runner.run({ load: load(), strings })
+    made[0]?.fail()
+    expect([made[0]?.ended, shown.failure?.kind, shown.running]).toEqual([true, 'error', false])
+    runner.run({ load: load(), strings })
+    expect(made).toHaveLength(2)
+    expect(made[1]?.sent).toHaveLength(1)
+    expect(shown.running).toBe(true)
+  })
+})
+
+describe('hand curve runner', () => {
+  const values = {} as Omit<PowderHandRequest, 'kind' | 'id'>
+  const curve = (id: number, velocity: number) =>
+    ({ kind: 'curve', id, curve: [{ charge: 2, velocity }] }) as unknown as PowderFitReply
+
+  it('ends a worker that errors and sends the next request to a new one', () => {
+    const { made, create } = fakeWorkers()
+    let shown: HandPoint[] | undefined
+    const runner = handCurveRunner(create, (c) => {
+      shown = c
+    })
+    runner.ask(values)
+    // a move while the first run is out waits for it
+    runner.ask(values)
+    expect(made[0]?.sent).toHaveLength(1)
+    made[0]?.fail()
+    expect(made[0]?.ended).toBe(true)
+    expect(made).toHaveLength(2)
+    expect(made[1]?.sent).toHaveLength(1)
+    made[1]?.reply(curve(2, 800))
+    expect(shown).toEqual([{ charge: 2, velocity: 800 }])
+    runner.ask(values)
+    expect(made).toHaveLength(2)
   })
 })

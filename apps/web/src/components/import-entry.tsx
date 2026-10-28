@@ -476,6 +476,16 @@ export function ImportEntry({
         waiting.current.get(ev.data.id)?.(ev.data)
         waiting.current.delete(ev.data.id)
       }
+      // a worker that failed to load or died answers nothing: fail what waits, start anew next call
+      const fail = () => {
+        w.terminate()
+        if (worker.current === w) worker.current = undefined
+        for (const [id, resolve] of waiting.current)
+          resolve({ type: 'failed', id, message: msg('The import could not run in this browser.') })
+        waiting.current.clear()
+      }
+      w.onerror = fail
+      w.onmessageerror = fail
       worker.current = w
     }
     const w = worker.current
@@ -509,7 +519,12 @@ export function ImportEntry({
       ])
       await Promise.all(
         added.map(async ({ id, file }) => {
-          const bytes = await file.arrayBuffer()
+          let bytes: ArrayBuffer
+          try {
+            bytes = await file.arrayBuffer()
+          } catch {
+            return patch(id, { busy: false, failure: msg('The file could not be read.') })
+          }
           const r = await call({ type: 'read', id, bytes }, [bytes])
           if (r.type !== 'read')
             return patch(id, { busy: false, failure: r.type === 'failed' ? r.message : undefined })
