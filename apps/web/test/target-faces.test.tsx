@@ -14,6 +14,7 @@ import {
   targetFaceMatches,
   targetFaceRow,
   targetFaceStrip,
+  userFaceRows,
 } from '../src/lib/target-faces.ts'
 import { say } from '../src/lib/wording.ts'
 import { defined, missing } from './defined.ts'
@@ -41,7 +42,7 @@ it('lists every face with its distances, outer diameter, rings and the disciplin
   const mapped = new Set(mappings.filter((m) => m.face === precision.id).map((m) => m.discipline))
   expect(mapped).toContain('dsb-25m-pistole-revolver')
   expect(row.disciplines).toBe(mapped.size)
-  expect(rows.every((r) => r.rings >= 2 && r.outer > 0)).toBe(true)
+  expect(rows.every((r) => r.rings >= 2 && (r.outer ?? 0) > 0)).toBe(true)
 })
 
 it('filters by federation, discipline, event distance and ring count, each count over the others', () => {
@@ -224,4 +225,39 @@ it('orders the discipline rows by federation, then the federation code, then dis
     ],
   )
   expect(rows.map((r) => r.discipline)).toEqual(['Tief', 'Hoch', 'Zwei', 'Drei'])
+})
+
+it("lists the browser's face designs as Mine rows, the outer width absent while the first ring has none", () => {
+  const saved = '2026-10-26T10:00:00.000Z'
+  const [drawn, blank] = userFaceRows([
+    {
+      kind: 'targetFaceDesign',
+      id: 'f1',
+      name: 'Club face',
+      saved,
+      data: {
+        rings: [{ value: 1, diameter: 400 }, { value: 2 }],
+        events: [
+          { name: 'Club 50', distance: 50000 },
+          { name: 'Club 25', distance: 25000 },
+          { name: 'Again', distance: 50000 },
+          { name: '' },
+        ],
+      },
+    },
+    { kind: 'targetFaceDesign', id: 'f2', name: 'Draft', saved, data: { rings: [], events: [] } },
+  ])
+  expect(drawn).toMatchObject({
+    id: 'user:f1',
+    origin: 'user',
+    organization: '',
+    distances: [25, 50],
+    outer: 400,
+    rings: 2,
+    disciplines: 0,
+  })
+  expect(defined(blank).outer).toBeUndefined()
+  // no empty Federation option from the designs
+  const org = defined(faceFacets(new Map()).find((f) => f.key === 'org'))
+  expect(org.values(defined(drawn))).toEqual([])
 })

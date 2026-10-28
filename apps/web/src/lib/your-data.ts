@@ -6,21 +6,20 @@ interface YourDataKind {
   /** The user record kind the count reads. */
   kind: UserRecordKind
   label: Message
-  /** The list route with the Mine filter, or the designer where the list has no Mine rows. */
+  /** The list route with the Mine filter, or the Firearms page (no other source). */
   href: string
 }
 
 /**
  * The kinds of records the user owns, in the order of the Database tabs. There is no row for the
- * disciplines (no user record of that kind). Powders and target faces have no Mine rows in their
- * lists: their rows open the designer, whose File menu lists the browser's records.
+ * disciplines (no user record of that kind).
  */
 const yourDataKinds: readonly YourDataKind[] = [
   { kind: 'cartridge', label: msg('Cartridges'), href: '/cartridges?src=user' },
   { kind: 'bullet', label: msg('Bullets'), href: '/bullets?src=user' },
-  { kind: 'powder', label: msg('Powders'), href: '/powders/designer' },
+  { kind: 'powder', label: msg('Powders'), href: '/powders?src=user' },
   { kind: 'case', label: msg('Brass'), href: '/cases?src=user' },
-  { kind: 'targetFaceDesign', label: msg('Targets'), href: '/targets/designer' },
+  { kind: 'targetFaceDesign', label: msg('Targets'), href: '/targets?src=user' },
   { kind: 'firearm', label: msg('Firearms'), href: '/firearms' },
 ]
 

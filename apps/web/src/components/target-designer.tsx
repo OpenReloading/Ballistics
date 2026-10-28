@@ -28,14 +28,15 @@ import { namedKey } from '../lib/user-data.ts'
 import { userFaceId, userOrganization } from '../lib/user-faces.ts'
 import { DesignerField } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
-import { FileMenu } from './file-menu.tsx'
+import { FileMenu, type FileMenuHandle } from './file-menu.tsx'
 import { PageBar } from './page-bar.tsx'
 import { PropertyGrid } from './property-grid.tsx'
 import { useShortcuts } from './shortcuts.tsx'
-import { EmptyNote } from './states.tsx'
+import { EmptyNote, ErrorNote } from './states.tsx'
 import { TargetFaceFigure } from './target-face-drawing.tsx'
 import { useUnits } from './units-settings.tsx'
 import { useKeptDraft } from './use-kept-draft.ts'
+import { recordLoadingText, useRecordLink } from './use-record-link.ts'
 import { Workspace } from './workspace.tsx'
 
 /** The record name of a face without a name. */
@@ -66,7 +67,8 @@ const colourOptions = (part: 'fill' | 'line', t: Translator['t']) => [
  * face drawn from them by `@open-reloading/drawing` while they change, the checks of the target
  * face schema at the fields. The draft is kept in this browser on every change (a record of kind
  * `targetFaceDesign`); a face that passes the schema is offered by the shot groups and hit
- * probability tools as the user's own.
+ * probability tools as the user's own. `?record=` opens a browser record, the link of a Mine row of
+ * the target list.
  */
 export function TargetDesigner() {
   const { t, tn } = useTranslation()
@@ -80,6 +82,11 @@ export function TargetDesigner() {
   useEffect(() => dispatch({ type: 'units', system }), [system])
 
   const [recordId, setRecordId] = useState(newId)
+  const menu = useRef<FileMenuHandle>(null)
+  const [linkFailure, setLinkFailure] = useState<Message>()
+  useRecordLink('targetFaceDesign', menu, (m) =>
+    setLinkFailure(m === recordLoadingText ? undefined : m),
+  )
   const data = useMemo(() => fileData(design), [design])
   const key = namedKey(data, design.name)
   const edited = key !== blankKey
@@ -319,6 +326,7 @@ export function TargetDesigner() {
 
   const inputs = (
     <form noValidate onSubmit={(ev) => ev.preventDefault()}>
+      {linkFailure && <ErrorNote>{t(linkFailure)}</ErrorNote>}
       <PropertyGrid
         title={t('Parameters')}
         sections={sections}
@@ -374,6 +382,7 @@ export function TargetDesigner() {
               dispatch={toolbar}
             />
             <FileMenu
+              ref={menu}
               kind="targetFaceDesign"
               name={name}
               nameKey={design.name}

@@ -273,6 +273,8 @@ export function unfittedGroups(powders: readonly UnfittedPowder[]) {
 /** A row of the powder list: the summary, the order scalar and the burn-rate order among all fitted powders. */
 export interface PowderRow {
   id: string
+  /** `user`: a powder of the browser, a Mine row. */
+  origin?: 'user' | undefined
   /** Id of the manufacturer record. */
   manufacturer: string
   manufacturerName: string

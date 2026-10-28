@@ -1,7 +1,9 @@
-/** The powder list's rows: search and the packed page props. */
+/** The powder list's rows: search, the packed page props and the browser's powders. */
+import type { UserRecord } from '@open-reloading/schema'
 import type { PowderRow } from './burn-rate.ts'
 import { present } from './directory.ts'
 import { matchesQuery } from './lists.ts'
+import { userRowId } from './sources.ts'
 
 /** Whether a powder row matches the search `query`. */
 export const powderMatches = (r: PowderRow, query: string) =>
@@ -67,3 +69,25 @@ export const unpackPowders = (rows: readonly PackedPowder[]): PowderRow[] =>
       }),
     }),
   )
+
+/**
+ * The powders among `records` as Mine rows: no manufacturer (a design has none), the grain form and
+ * base of the draft, no burn rate.
+ */
+export function userPowderRows(records: readonly UserRecord[]): PowderRow[] {
+  return records.flatMap((r) =>
+    r.kind === 'powder'
+      ? [
+          {
+            id: userRowId(r.id),
+            origin: 'user' as const,
+            manufacturer: '',
+            manufacturerName: '',
+            name: r.name,
+            grainForm: r.data.draft?.grainForm ?? undefined,
+            propellantBase: r.data.draft?.propellantBase ?? undefined,
+          },
+        ]
+      : [],
+  )
+}

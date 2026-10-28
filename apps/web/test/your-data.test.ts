@@ -24,8 +24,8 @@ it('counts the records of each kind, 0 for a kind with none, with the list each 
   ])
   expect(rows.find((r) => r.label === 'Brass')?.href).toBe('/cases?src=user')
   expect(rows.find((r) => r.label === 'Bullets')?.href).toBe('/bullets?src=user')
-  expect(rows.find((r) => r.label === 'Powders')?.href).toBe('/powders/designer')
-  expect(rows.find((r) => r.label === 'Targets')?.href).toBe('/targets/designer')
+  expect(rows.find((r) => r.label === 'Powders')?.href).toBe('/powders?src=user')
+  expect(rows.find((r) => r.label === 'Targets')?.href).toBe('/targets?src=user')
 })
 
 it('counts nothing but the kinds it lists', () => {

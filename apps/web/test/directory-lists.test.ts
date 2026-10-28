@@ -17,7 +17,12 @@ import {
   packCartridges,
   unpackCartridges,
 } from '../src/lib/cartridge-rows.ts'
-import { packPowders, powderMatches, unpackPowders } from '../src/lib/powder-rows.ts'
+import {
+  packPowders,
+  powderMatches,
+  unpackPowders,
+  userPowderRows,
+} from '../src/lib/powder-rows.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import { defined } from './defined.ts'
 
@@ -185,4 +190,30 @@ it('builds the overlay from ?add= only: no preset, the ids in order, colour slot
   const href = overlayHref(['a', 'b'])
   expect(href).toBe('/powders/burn-rates?add=a,b')
   expect(overlayFrom(href.slice(href.indexOf('?')), 6).map((p) => p.id)).toEqual(['a', 'b'])
+})
+
+it("lists the browser's powders as Mine rows without a manufacturer or burn rate", () => {
+  const saved = '2026-10-26T10:00:00.000Z'
+  const rows = userPowderRows([
+    {
+      kind: 'powder',
+      id: 'p1',
+      name: 'My powder',
+      saved,
+      data: { origin: 'user', draft: { grainForm: 'extruded', propellantBase: 'single' } },
+    },
+    { kind: 'manufacturer', id: 'm', name: 'Maker', saved, data: { origin: 'user' } },
+  ])
+  expect(rows).toEqual([
+    {
+      id: 'user:p1',
+      origin: 'user',
+      manufacturer: '',
+      manufacturerName: '',
+      name: 'My powder',
+      grainForm: 'extruded',
+      propellantBase: 'single',
+    },
+  ])
+  expect(powderMatches(defined(rows[0]), 'my powder')).toBe(true)
 })

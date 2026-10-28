@@ -18,8 +18,20 @@ import { listTitles } from '../lib/list-titles.ts'
 import { baseLine, baseText, grainFormText } from '../lib/list-values.ts'
 import { countText, filterText, matchingText, widestCount } from '../lib/lists.ts'
 import { productLabel } from '../lib/manufacturers.ts'
-import { type PackedPowder, powderMatches, unpackPowders } from '../lib/powder-rows.ts'
-import type { Origin } from '../lib/sources.ts'
+import {
+  type PackedPowder,
+  powderMatches,
+  unpackPowders,
+  userPowderRows,
+} from '../lib/powder-rows.ts'
+import {
+  countOrigins,
+  designerHref,
+  inOrigins,
+  onlyText,
+  originNames,
+  readOrigins,
+} from '../lib/sources.ts'
 import { CompareButton, PickedChips, usePicks } from './compare-picks.tsx'
 import {
   type DirectoryColumn,
@@ -28,29 +40,32 @@ import {
   useListState,
 } from './directory-table.tsx'
 import { LibraryTabs } from './library-tabs.tsx'
-import { SourceFilter } from './list-sources.tsx'
+import { DeleteRow, SourceFilter, sourceColumn, useUserRecords } from './list-sources.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
 import { RateBar, RateTicks, scaleWidth } from './rate-scale.tsx'
 import { EmptyList } from './states.tsx'
 
 const n2 = (v: number | undefined) => (v === undefined ? '' : formatNumber(v, 2))
-/** No user record holds a powder: the catalogue is the list's one source, so the filter filters nothing. */
-const powderSources: readonly Origin[] = ['openreloading']
 
 /**
  * The powder directory: manufacturer, name, form, base and the burn rate in one cell (the
  * mean dynamic vivacity, its interval and both on one log scale for every row); powders with a
- * curve are ticked for the burn-rate overlay of `/powders/burn-rates`.
+ * curve are ticked for the burn-rate overlay of `/powders/burn-rates`. The powders of this browser
+ * are Mine rows, opened in the powder designer.
  */
 export function PowderList({ packed }: { packed: PackedPowder[] }) {
   const tr = useTranslation()
   const { t } = tr
-  const items = useMemo(() => unpackPowders(packed), [packed])
+  const [records, removeRow] = useUserRecords()
+  const catalogue = useMemo(() => unpackPowders(packed), [packed])
+  // the browser's powders first: a few rows would sit unseen behind the catalogue's
+  const items = useMemo(() => [...userPowderRows(records), ...catalogue], [records, catalogue])
   const [state, set, clear] = useListState()
   const filters = useDeferredValue(state)
-  const domain = useMemo(() => rateDomain(items), [items])
+  const domain = useMemo(() => rateDomain(catalogue), [catalogue])
+  const counts = useMemo(() => countOrigins(items), [items])
   const shown = useMemo(
-    () => items.filter((r) => powderMatches(r, filters.query)),
+    () => items.filter((r) => inOrigins(r, filters.sources) && powderMatches(r, filters.query)),
     [items, filters],
   )
   const byId = useMemo(() => new Map(items.map((r) => [r.id, r])), [items])
@@ -62,7 +77,7 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
   )
 
   const query = state.query.trim()
-  const named = [matchingText(t, query)].filter(Boolean)
+  const named = [onlyText(t, readOrigins(state.sources)), matchingText(t, query)].filter(Boolean)
   const columns: DirectoryColumn<PowderRow>[] = [
     {
       key: 'manufacturer',
@@ -112,10 +127,12 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
           </span>
         ),
     },
+    ...(counts.user > 0 ? [sourceColumn<PowderRow>(productLabel, removeRow)] : []),
   ]
   const facts = (r: PowderRow) =>
     // the burn-rate order before form and base: a phone's line ends where it is cut
     [
+      r.origin === 'user' && t(originNames.user),
       r.manufacturerName,
       r.burnRateOrder !== undefined && t('burn-rate order {order}', { order: r.burnRateOrder }),
       r.grainForm && grainFormText(t, r.grainForm),
@@ -173,8 +190,7 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
         >
           <SourceFilter
             src={state.sources}
-            counts={{ openreloading: items.length, user: 0 }}
-            sources={powderSources}
+            counts={counts}
             onChange={(src) => set({ sources: src })}
           />
         </DirectoryFilters>
@@ -182,7 +198,7 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
           rows={shown}
           columns={columns}
           link="name"
-          href={(r) => `/powders/${r.id}`}
+          href={(r) => (r.origin === 'user' ? designerHref('powders', r.id) : `/powders/${r.id}`)}
           facts={facts}
           label={productLabel}
           caption={
@@ -199,6 +215,12 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
             onChange: replace,
             can: (r) => r.burnRateOrder !== undefined,
           }}
+          phoneAction={(r, tabIndex) =>
+            r.origin === 'user' ? (
+              <DeleteRow row={r} name={productLabel(r)} onDelete={removeRow} tabIndex={tabIndex} />
+            ) : null
+          }
+          breakBefore={state.sort ? undefined : (r, previous) => r.origin !== previous.origin}
           empty={<EmptyList noun="powders" filters={filterText(named)} onClear={clear} />}
         />
       </div>

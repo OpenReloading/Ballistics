@@ -11,12 +11,20 @@ import { msg } from '../i18n/translate.ts'
 import { facetNames } from '../lib/facets.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { countText, filterText, matchingText, widestCount } from '../lib/lists.ts'
-import type { Origin } from '../lib/sources.ts'
+import {
+  countOrigins,
+  designerHref,
+  inOrigins,
+  onlyText,
+  originNames,
+  readOrigins,
+} from '../lib/sources.ts'
 import {
   faceFacetKeys,
   faceFacets,
   type TargetFaceRow,
   targetFaceMatches,
+  userFaceRows,
 } from '../lib/target-faces.ts'
 import { formatQuantity } from '../lib/units.ts'
 import {
@@ -27,17 +35,17 @@ import {
 } from './directory-table.tsx'
 import { FacetFilters, useFacets } from './facet-filters.tsx'
 import { LibraryTabs } from './library-tabs.tsx'
-import { SourceFilter } from './list-sources.tsx'
+import { DeleteRow, SourceFilter, sourceColumn, useUserRecords } from './list-sources.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
 import { EmptyList } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
 
-/** Target faces are rule-book records only: the catalogue is the list's one source. */
-const faceSources: readonly Origin[] = ['openreloading']
-
-/** The target face directory: name, federation or issuer, distances, outer diameter, rings, disciplines. */
+/**
+ * The target face directory: name, federation or issuer, distances, outer diameter, rings,
+ * disciplines. The face designs of this browser are Mine rows, opened in the face designer.
+ */
 export function TargetFaceList({
-  items,
+  items: catalogue,
   disciplines,
 }: {
   items: TargetFaceRow[]
@@ -47,6 +55,10 @@ export function TargetFaceList({
   const tr = useTranslation()
   const { t, tn } = tr
   const { system } = useUnits()
+  const [records, removeRow] = useUserRecords()
+  // the browser's faces first: a few rows would sit unseen behind the catalogue's
+  const items = useMemo(() => [...userFaceRows(records), ...catalogue], [records, catalogue])
+  const counts = useMemo(() => countOrigins(items), [items])
   const [state, set, clear] = useListState(faceFacetKeys)
   const filters = useDeferredValue(state)
   const facets = useMemo(
@@ -54,12 +66,17 @@ export function TargetFaceList({
     [disciplines],
   )
   const searched = useMemo(
-    () => items.filter((r) => targetFaceMatches(r, filters.query)),
+    () => items.filter((r) => inOrigins(r, filters.sources) && targetFaceMatches(r, filters.query)),
     [items, filters],
   )
   const { shown, options } = useFacets(items, searched, facets, filters)
-  const named = [...facetNames(facets, state.facets ?? {}, t), matchingText(t, state.query)]
-  const outer = (r: TargetFaceRow) => formatQuantity('length', system, toSi('length', r.outer))
+  const named = [
+    onlyText(t, readOrigins(state.sources)),
+    ...facetNames(facets, state.facets ?? {}, t),
+    matchingText(t, state.query),
+  ]
+  const outer = (r: TargetFaceRow) =>
+    r.outer === undefined ? '' : formatQuantity('length', system, toSi('length', r.outer))
   const columns: DirectoryColumn<TargetFaceRow>[] = [
     { key: 'name', label: msg('Name'), value: (r) => r.name, cell: (r) => r.name },
     {
@@ -102,14 +119,18 @@ export function TargetFaceList({
       value: (r) => r.disciplines,
       cell: (r) => r.disciplines,
     },
+    ...(counts.user > 0 ? [sourceColumn<TargetFaceRow>((r) => r.name, removeRow)] : []),
   ]
   const facts = (r: TargetFaceRow) =>
     [
+      r.origin === 'user' && t(originNames.user),
       r.organization,
       r.distances.length > 0 ? `${r.distances.map((d) => plainNumber(d)).join(', ')} m` : '',
-      `${outer(r)} ${system.length.symbol}`,
+      r.outer !== undefined && `${outer(r)} ${system.length.symbol}`,
       tn(r.rings, '{count} ring', '{count} rings'),
-    ].join(' · ')
+    ]
+      .filter(Boolean)
+      .join(' · ')
   return (
     <>
       <PageBar
@@ -143,8 +164,7 @@ export function TargetFaceList({
         >
           <SourceFilter
             src={state.sources}
-            counts={{ openreloading: items.length, user: 0 }}
-            sources={faceSources}
+            counts={counts}
             onChange={(src) => set({ sources: src })}
           />
           <FacetFilters
@@ -159,7 +179,7 @@ export function TargetFaceList({
           rows={shown}
           columns={columns}
           link="name"
-          href={(r) => `/targets/${r.id}`}
+          href={(r) => (r.origin === 'user' ? designerHref('targets', r.id) : `/targets/${r.id}`)}
           facts={facts}
           label={(r) => r.name}
           caption={
@@ -170,6 +190,12 @@ export function TargetFaceList({
           noun="faces"
           sort={state.sort}
           onSort={(sort) => set({ sort })}
+          phoneAction={(r, tabIndex) =>
+            r.origin === 'user' ? (
+              <DeleteRow row={r} name={r.name} onDelete={removeRow} tabIndex={tabIndex} />
+            ) : null
+          }
+          breakBefore={state.sort ? undefined : (r, previous) => r.origin !== previous.origin}
           empty={<EmptyList noun="target faces" filters={filterText(named)} onClear={clear} />}
         />
       </div>

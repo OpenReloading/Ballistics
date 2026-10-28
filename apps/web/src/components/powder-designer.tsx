@@ -11,7 +11,7 @@ import {
 } from '@mantine/core'
 import { Flask, Plus, X } from '@phosphor-icons/react'
 import Link from 'next/link'
-import { type ReactNode, useEffect, useMemo, useReducer, useState } from 'react'
+import { type ReactNode, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message as Marked, msg } from '../i18n/translate.ts'
 import { fieldError, specText } from '../lib/field-spec.ts'
@@ -47,13 +47,14 @@ import { say, verbatim } from '../lib/wording.ts'
 import { DesignerField } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
 import { FieldTable } from './field-table.tsx'
-import { FileMenu } from './file-menu.tsx'
+import { FileMenu, type FileMenuHandle } from './file-menu.tsx'
 import { PageBar } from './page-bar.tsx'
 import { PropertyGrid } from './property-grid.tsx'
 import { useShortcuts } from './shortcuts.tsx'
-import { EmptyNote, Message } from './states.tsx'
+import { EmptyNote, ErrorNote, Message } from './states.tsx'
 import { useUnits } from './units-settings.tsx'
 import { useKeptDraft } from './use-kept-draft.ts'
+import { recordLoadingText, useRecordLink } from './use-record-link.ts'
 import { Workspace } from './workspace.tsx'
 
 /** The key of the empty draft: nothing to keep before the first edit. */
@@ -181,7 +182,8 @@ function RecordPanel({
  * composition, thermochemistry and the burn law of the interior model) with the provenance kind
  * the design is built with, the checks of the powder schema at the fields. The draft is kept in
  * this browser on every change (a record of kind `powder`); a draft that passes the schema is
- * offered by the workbench's Powder card as the user's own design.
+ * offered by the workbench's Powder card as the user's own design. `?record=` opens a browser
+ * record, the link of a Mine row of the powder list.
  */
 export function PowderDesigner() {
   const { t } = useTranslation()
@@ -195,6 +197,9 @@ export function PowderDesigner() {
   useEffect(() => dispatch({ type: 'units', system }), [system])
 
   const [recordId, setRecordId] = useState(newId)
+  const menu = useRef<FileMenuHandle>(null)
+  const [linkFailure, setLinkFailure] = useState<Marked>()
+  useRecordLink('powder', menu, (m) => setLinkFailure(m === recordLoadingText ? undefined : m))
   const data = useMemo(() => fileData(design), [design])
   const key = namedKey(data, design.name)
   const edited = key !== blankKey
@@ -447,6 +452,7 @@ export function PowderDesigner() {
 
   const inputs = (
     <form noValidate onSubmit={(ev) => ev.preventDefault()}>
+      {linkFailure && <ErrorNote>{t(linkFailure)}</ErrorNote>}
       <PropertyGrid
         title={t('Parameters')}
         sections={sections}
@@ -481,6 +487,7 @@ export function PowderDesigner() {
               dispatch={toolbar}
             />
             <FileMenu
+              ref={menu}
               kind="powder"
               name={name}
               nameKey={design.name}
