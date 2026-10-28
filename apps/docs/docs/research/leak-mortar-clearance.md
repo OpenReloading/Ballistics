@@ -11,7 +11,7 @@ Interior ballistics, gas leakage: for a smooth-bore 81 mm mortar proxy with an a
 
 ## Method
 
-The reference figures come from the issue text of the question and are unverified: the source report was not found and is not named. They are a muzzle-velocity loss of 1.5 to 1.7 ft/s (0.46 to 0.52 m/s) per 0.001 in (25 micrometres) of clearance on the diameter, reduced to 80 mm, in three independent trial series of 60 to 105 mm mortars, with no trend with the charge (five charges of the 60 mm mortar: 1.3 to 1.8 ft/s). The same data fit a loss of $c$ times the ratio of leak area to bore area with $c$ about 610 to 760 m/s, and the leak flowing at about 0.83 of the ideal orifice value.
+The reference figures come from the issue text of the question. They are uncited and unverified (the source report was not found and is not named): targets for a plausibility comparison, not facts this page relies on. They are a muzzle-velocity loss of 1.5 to 1.7 ft/s (0.46 to 0.52 m/s) per 0.001 in (25 micrometres) of clearance on the diameter, reduced to 80 mm, in three independent trial series of 60 to 105 mm mortars, with no trend with the charge (five charges of the 60 mm mortar: 1.3 to 1.8 ft/s). The same data fit a loss of $c$ times the ratio of leak area to bore area with $c$ about 610 to 760 m/s, and the leak flowing at about 0.83 of the ideal orifice value.
 
 The proxies are synthetic loads, and every number below is a simulation, not load data. Inputs of the 81 mm mortar proxy:
 
@@ -66,11 +66,11 @@ Sensitivity, burn coefficient $3\cdot10^{-9}$:
 - Linearity: half the clearance gives half the loss to within 0.1 percent in every row.
 - The coefficient $c_\ell$ at discharge 0.83 is 480 m/s per ft/s of loss: 595 to 760 m/s for the verdict proxy and 806 to 864 m/s for the sensitivity, against 610 to 760 m/s for the reference.
 - Dependence on the charge: with the verdict proxy the loss falls by 21 percent from the 100 to the 250 m/s load; with the sensitivity proxy it rises by 7 percent. The reference shows no trend.
-- Over both proxies and all loads the loss at discharge 0.83 is 0.77 to 1.13 times the measured 1.6 ft/s, and 0.93 to 1.36 times at discharge 1.
+- Over both proxies and all loads the loss at discharge 0.83 is 0.77 to 1.13 times the reference 1.6 ft/s, and 0.93 to 1.36 times at discharge 1.
 
 ## Result
 
-No change. The first half of the rule is met: at discharge 0.83 every load is inside 1.12 to 2.08 ft/s for both proxies. The second half is not met for the proxy of the verdict: discharge 1 (1.49 to 1.91 ft/s) is inside the band at every load too, so the band does not separate the two discharges. Only the slower powder puts discharge 1 outside it (2.11 to 2.17 ft/s at 150 to 250 m/s). The expected "partly outside" of the question's own run (1.25 to 2.6 ft/s) did not occur, since the loads here give 1.24 to 1.80 ft/s at 0.83. The loss depends on the powder, through the pressure history at the leak, by about 25 percent, which is as much as the gap between the two discharges. Documented as a limit: the range found is 0.8 to 1.1 times the measured slope with discharge 0.83, and the default discharge of 1 is kept.
+No change. The first half of the rule is met: at discharge 0.83 every load is inside 1.12 to 2.08 ft/s for both proxies. The second half is not met for the proxy of the verdict: discharge 1 (1.49 to 1.91 ft/s) is inside the band at every load too, so the band does not separate the two discharges. Only the slower powder puts discharge 1 outside it (2.11 to 2.17 ft/s at 150 to 250 m/s). The expected "partly outside" of the question's own run (1.25 to 2.6 ft/s) did not occur, since the loads here give 1.24 to 1.80 ft/s at 0.83. The loss depends on the powder, through the pressure history at the leak, by about 25 percent, which is as much as the gap between the two discharges. Documented as a limit: the range found is 0.8 to 1.1 times the reference slope with discharge 0.83, and the default discharge of 1 is kept.
 
 ## Data basis
 

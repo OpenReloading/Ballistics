@@ -11,7 +11,7 @@ Interior ballistics, convective heat loss: with its default settings, does `heat
 
 ## Method
 
-The reference figures come from the issue text of the question and are unverified: the source report was not found and is not named. They are heat lost up to shot exit of 3.40, 4.22, 4.64 and 4.99 MJ at the charges 13.6, 20.3, 25.1 and 29.5 kg of a 203 mm gun (6.9, 5.7, 5.2 and 4.7 percent of the energy released), and a range of 4.6 to 8.1 percent over guns of 40 to 203 mm. The same figures put the loss at roughly the square root of the charge to shot ratio.
+The reference figures come from the issue text of the question. They are uncited and unverified (the source report was not found and is not named): targets for a plausibility comparison, not facts this page relies on. They are heat lost up to shot exit of 3.40, 4.22, 4.64 and 4.99 MJ at the charges 13.6, 20.3, 25.1 and 29.5 kg of a 203 mm gun (6.9, 5.7, 5.2 and 4.7 percent of the energy released), and a range of 4.6 to 8.1 percent over guns of 40 to 203 mm. The same figures put the loss at roughly the square root of the charge to shot ratio.
 
 The proxies are synthetic loads. Nothing in them is a measurement of a real gun, and every number below is a simulation, not load data.
 
@@ -78,13 +78,13 @@ Rifle-like proxy:
 | 87 | 807 | 1595 | 14.6 |
 | 130 | 861 | 2222 | 20.3 |
 
-The heat per calibre of travel is 18.6, 18.3 and 17.1 J, so the loss grows a little less than in proportion to the travel (the reference says about in proportion). These shares are simulation outputs of one synthetic load; no reference exists for them.
+The heat per calibre of travel is 18.6, 18.3 and 17.1 J, so the loss grows a little less than in proportion to the travel (the reference says about in proportion). These shares are simulation outputs of one synthetic load; no reference was found for them.
 
 ## Result
 
 No change. At the proxy of the verdict the defaults agree with the detailed figures: all four ratios are 0.82 to 0.93, inside the 0.8 to 1.25 rule, so the wall-temperature step was not triggered and was not run. The agreement depends on the synthetic powder: a slow cord ($10^{-9}$) breaks the lower limit at the two smaller charges. The model sits below the reference here (the run of another proxy quoted in the question sat 6 to 22 percent above it), so the run does not support the explanation that the constant 300 K wall overstates the driving temperature difference. The weaker fall of the share with the charge is confirmed (exponent 0.59 to 1.08 against 0.50). Documented as a limit; no default and no factor changes.
 
-The check covers gun-size bores only: no reference exists for rifle bores, so the heat defaults are not checked against small-bore data. This sentence goes to the Limits of the [leakage and heat loss page](../models/interior-leakage-heat.md).
+The check covers gun-size bores only: no reference was found for rifle bores, so the heat defaults are not checked against small-bore data. This sentence goes to the Limits of the [leakage and heat loss page](../models/interior-leakage-heat.md).
 
 ## Data basis
 
