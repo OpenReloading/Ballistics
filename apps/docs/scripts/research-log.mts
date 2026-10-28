@@ -28,7 +28,13 @@ function bodies(text: string): Map<string, string> {
   const found = new Map<string, string>()
   for (const part of text.split(/^## /m).slice(1)) {
     const end = part.indexOf('\n')
-    found.set(part.slice(0, end).trim(), part.slice(end + 1).trim())
+    found.set(
+      part.slice(0, end).trim(),
+      part
+        .slice(end + 1)
+        .replace(/<!--[\s\S]*?-->/g, '')
+        .trim(),
+    )
   }
   return found
 }
@@ -41,12 +47,12 @@ export function entryErrors(text: string, root: string): string[] {
   )
   for (const [s, list] of Object.entries(answers)) {
     const start = (body.get(s) ?? '').toLowerCase()
-    if (start && !list.some((a) => start.startsWith(a)))
+    if (start && !list.some((a) => start.startsWith(a) && !/\w/.test(start[a.length] ?? '')))
       errors.push(`"${s}" must start with ${list.join(', ')}`)
   }
   const where = body.get('Where in the app') ?? ''
-  // shortcut: only a path with a slash and an extension inside backticks counts, a bare name is not looked up
-  for (const [, f] of where.matchAll(/`([\w.-]+\/[\w./[\]-]+\.\w+)`/g))
+  // shortcut: only a path with a slash inside backticks counts, a bare name is not looked up
+  for (const [, f] of where.matchAll(/`([\w.-]+\/[\w./[\]-]+)`/g))
     if (!existsSync(join(root, f ?? ''))) errors.push(`no file ${f}`)
   return errors
 }

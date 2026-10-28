@@ -31,6 +31,17 @@ test('a fixed answer and the named files are checked', () => {
   ])
 })
 
+test('a comment-only section, a longer word as answer and a missing extensionless file fail', () => {
+  const comment = `${entry('Method')}\n## Method\n\n<!-- TODO -->\n`
+  assert.deepEqual(entryErrors(comment, root), ['section "Method" is missing or empty'])
+  assert.deepEqual(entryErrors(entry().replaceAll('High, exact.', 'Highly unsure.'), root), [
+    '"Confidence" must start with high, medium, low',
+  ])
+  assert.deepEqual(entryErrors(entry().replaceAll('research-log.mts', 'Dockerfil'), root), [
+    'no file apps/docs/scripts/Dockerfil',
+  ])
+})
+
 test('every research log entry has all fields', () => {
   const files = entryFiles(dir)
   assert.ok(files.length > 0)

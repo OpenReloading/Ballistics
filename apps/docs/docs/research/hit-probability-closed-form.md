@@ -32,7 +32,7 @@ The model computes $P(a, b)$ with $a = b = r$ as the integral over $t$ of the de
 | 0.003 | 0.02 | 0.01118695538877 | 0.01118695538877 | $1.9 \cdot 10^{-17}$ |
 | 0.2 | 0.01 | 1 | 0.99999999999998 | $-2.2 \cdot 10^{-15}$ |
 
-The largest difference is $2.2 \cdot 10^{-15}$, about $2 \cdot 10^{-6}$ of the accept limit.
+The largest difference is $2.2 \cdot 10^{-15}$, about $4.4 \cdot 10^{-7}$ of the accept limit.
 
 ## Result
 
