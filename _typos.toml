@@ -37,6 +37,10 @@ extend-ignore-re = [
   "klein für das Modell",
   "für den das Modell gebaut wurde",
   "0,6[0-9]; das Modell liegt",
+  # German print texts that the test of the printed pages expects
+  "abgeflachtes oder verkratertes Zündhütchen",
+  "\\(MOA / Klicks\\)",
+  "Konfiguration 1",
 ]
 
 [default.extend-words]
