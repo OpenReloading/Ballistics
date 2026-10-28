@@ -245,6 +245,22 @@ for (const width of [320, 390]) {
   })
 }
 
+// WCAG 1.4.4: at 200 % text the panel keeps inside the window and its rows wrap
+test('the Page actions panel is inside the window at 320 px with 200 % text', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height })
+  await gotoHydrated(page, '/workbench')
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = '200%'
+  })
+  await page.getByRole('button', { name: 'Page actions' }).click()
+  const panel = page.locator('.page-bar-actions')
+  const box = await panel.boundingBox()
+  expect(box?.x).toBeGreaterThanOrEqual(0)
+  expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(320)
+  // no row reaches past the panel's edge
+  expect(await panel.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true)
+})
+
 // WCAG 2.5.8: the note buttons of a case length variants matrix (a cartridge whose values have notes)
 for (const width of widths) {
   test(`the note buttons of the variants matrix are 24 px high at ${width} px`, async ({
@@ -263,7 +279,7 @@ test('the selected segment of a segmented control has a border in forced colours
   page,
 }) => {
   await page.emulateMedia({ forcedColors: 'active' })
-  await page.goto('/workbench')
+  await gotoHydrated(page, '/workbench')
   await applyExampleLoad(page)
   const indicator = loadForm(page).locator('.mantine-SegmentedControl-indicator').first()
   await expect(indicator).toBeVisible()

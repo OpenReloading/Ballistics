@@ -9797,11 +9797,28 @@ main .page-bar h1 {
   }
 }
 
-/* the bar ends --top-end before the window's edge, so below 22.5em the panel would reach past the
-   window's left edge: it ends 0.5rem before the window's edge instead */
+/* the bar ends --top-end before the window's edge (or is empty, at an enlarged text size, between
+   its start and end), so below 22.5em the panel would reach past the window's left edge: it ends
+   0.5rem before the window's edge instead, at most as wide as the window less 0.5rem each side, so
+   its rows wrap */
 @media screen and (max-width: 22.5em) {
   .page-bar .page-bar-actions {
-    right: calc(0.5rem - var(--top-end));
+    right: calc(var(--top-start) + 100% - 100vw + 0.5rem);
+    min-width: 0;
+    max-width: calc(100vw - 1rem);
+  }
+
+  .page-bar:not([data-single])
+    .page-bar-actions
+    :is(.mantine-Button-root, .mantine-ActionIcon-root, .mantine-Button-label) {
+    white-space: normal;
+  }
+
+  .page-bar:not([data-single])
+    .page-bar-actions
+    :is(.mantine-Button-root, .mantine-ActionIcon-root) {
+    height: auto;
+    min-height: var(--button-height, 2.25rem);
   }
 }
 

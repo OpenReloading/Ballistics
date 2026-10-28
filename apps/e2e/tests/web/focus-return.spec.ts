@@ -2,7 +2,7 @@ import { expect, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
-import { loadForm } from './workbench.ts'
+import { applyExampleLoad, loadForm } from './workbench.ts'
 
 // WCAG 2.4.3: a dialog, drawer or card that held the focus leaves it on a control, never on the page.
 test.beforeEach(({ page }) => storeUnits(page))
@@ -32,6 +32,41 @@ test('the example load on the start card leaves the focus in the load form', asy
   await page.getByRole('button', { name: 'Try the example load' }).click()
   await expect(loadForm(page)).toBeVisible()
   await expect(loadForm(page).locator(':focus')).toHaveCount(1)
+})
+
+test('a saved load that opens by itself on arrival leaves the focus on the page', async ({
+  page,
+}) => {
+  // a native picker cannot be driven: the file goes to the origin private file system
+  await page.addInitScript(() => {
+    ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
+      (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
+  })
+  await gotoHydrated(page, '/workbench')
+  await applyExampleLoad(page)
+  await (await barButton(page, 'Save')).click()
+  await expect(page.locator('.file-state')).toContainText('Saved')
+  await page.reload()
+  await expect(loadForm(page)).toBeVisible()
+  // the focus moves in the frame after the cards replace the start card
+  await page.evaluate(
+    () => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))),
+  )
+  expect(await page.evaluate(() => document.activeElement === document.body)).toBe(true)
+})
+
+test('Escape closes Saved loads opened from the load switcher and the focus goes back to it', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await gotoHydrated(page, '/workbench')
+  const switcher = page.getByRole('button', { name: /switch load/ })
+  await switcher.click()
+  await page.getByRole('button', { name: 'Saved loads' }).click()
+  await expect(page.getByRole('dialog', { name: 'Saved loads' })).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(page.getByRole('dialog', { name: 'Saved loads' })).toBeHidden()
+  await expect(switcher).toBeFocused()
 })
 
 for (const width of widths) {
