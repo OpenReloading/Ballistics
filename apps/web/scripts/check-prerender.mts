@@ -59,13 +59,12 @@ const headValues = (kind: RecordKind, record: HeadSource, names: ManufacturerNam
 
 /** The names of the export's manufacturers by id, from their data files. */
 function manufacturerNamesOf(site: string): ManufacturerNames {
-  const dir = path.join(site, 'api', 'manufacturers')
-  if (!existsSync(dir)) return noManufacturerNames
+  if (!existsSync(path.join(site, 'api', 'manufacturers'))) return noManufacturerNames
   return new Map(
-    readdirSync(dir)
+    readdirSync(path.join(site, 'api', 'manufacturers'))
       .filter((f) => f.endsWith('.json'))
       .map((f) => {
-        const m = JSON.parse(readFileSync(path.join(dir, f), 'utf8')) as {
+        const m = JSON.parse(readFileSync(path.join(site, 'api', 'manufacturers', f), 'utf8')) as {
           id: string
           name: string
         }
