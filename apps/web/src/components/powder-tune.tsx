@@ -169,7 +169,7 @@ interface TuneSave {
 
 /** Why a save failed: too many points for a record, no valid record, or the write. */
 export const saveFailures = {
-  points: msg('A powder record holds at most 40 points of one charge and temperature.'),
+  points: msg('A powder record holds at most 40 points, one per charge and powder temperature.'),
   record: msg('The fit does not make a valid powder record.'),
   store: msg('The fit cannot be stored as a powder record in this browser.'),
 }
