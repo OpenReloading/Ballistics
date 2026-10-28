@@ -26,7 +26,7 @@ Each charge is a product, not a running sum. Every charge must be above 0.
 
 ### Observations
 
-Each ladder point $k$ gives a velocity row and, with a measured pressure, a pressure row after it. The prediction of a velocity row is `muzzleVelocity`, that of a pressure row is `peakBreechPressure` of the run at charge $m_k$:
+Each ladder point $k$ gives a velocity row and, with a measured pressure, a pressure row after it. A peak pressure carries its basis in `pressureBasis`, one of `transducer`, `piezo`, `crusher` and `energy` (the `pressureMethod` of the cartridge records), and the basis is required with every peak pressure. The pressures of one fit share one basis: a ladder, or the sessions of `fitPowderSessions`, that mixes bases is refused with `MixedPressureBasisError`, whose `rows` and the `pressureRows` of the result give the number of pressure rows per basis. Values are never converted between bases. The prediction of a velocity row is `muzzleVelocity`, that of a pressure row is `peakBreechPressure` of the run at charge $m_k$:
 
 $$
 \hat y_i(\theta) =
@@ -105,6 +105,10 @@ $$
 $$
 
 Code: `packages/core/src/interior/fit.ts`, `fitPowder` (`huber`, `loss`), `packages/core/src/huber.ts`, `huberLoss`.
+
+The result carries `stop` and `weightsSettled` of the [solver](least-squares.md#levenberg-marquardt-step): which rule ended the loop and whether the set of ladder rows beyond the threshold was unchanged over the last accepted step. Without `huberThreshold` the second is true.
+
+Code: `packages/core/src/interior/fit.ts`, `fitPowder` (`stop`, `weightsSettled`).
 
 Priors and the Huber loss need uncertainties on every velocity, since $s_j$ and $k$ are in absolute and in sigma units. Without `huberThreshold` the loss is quadratic ([Huber 1964](../bibliography.md#huber-1964)).
 
@@ -301,7 +305,7 @@ Malformed input (an empty ladder, a value that is not finite and above 0, uncert
 
 - The M3 load describes the rifle, components and conditions of the ladder. Only the fitted parameters change between candidates.
 - Velocities are mean muzzle velocities. A chronograph reading at a distance from the muzzle is converted to the muzzle by the caller, for example with [truing](exterior-truing.md).
-- A pressure row is compared with the peak breech pressure. The gauge position is not modelled.
+- A pressure row is compared with the peak breech pressure. The gauge position is not modelled. All pressure rows are on the one stated basis; the model does not correct for the basis, so the caller states the basis its pressures were measured on.
 - Observations are independent, with the stated standard uncertainties.
 - The inputs of the range are independent, each with the stated standard uncertainty. The default uncertainties are assumptions, not measurements.
 - A prior describes the powder's parameter, not this ladder: it comes from a record or a family of powders. A prior far from the data drags the fit, and the result then shows a large $\chi^2_\text{prior}$.

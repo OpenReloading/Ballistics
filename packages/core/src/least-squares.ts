@@ -134,6 +134,12 @@ export function identifiability(j: number[][]): Identifiability {
 /** Why a fit cannot continue; passed to `LogFitInput.fail`. */
 export type LogFitFailure = 'unresolved' | 'ill-conditioned' | 'unreachable' | 'not-converged'
 
+/**
+ * The rule that ended a fit: `stalled` for an accepted step whose cost fell by less than the
+ * tolerance (or to 0), `smallStep` for a step below 1e-8 in every log parameter.
+ */
+export type LogFitStop = 'stalled' | 'smallStep'
+
 /** Inputs of `logLeastSquares`. */
 export interface LogFitInput {
   /** Parameter count. */
@@ -191,6 +197,13 @@ export interface LogFitResult {
   conditionNumber: number
   /** Iterations taken. */
   iterations: number
+  /** The rule that ended the loop. */
+  stop: LogFitStop
+  /**
+   * Whether the set of down-weighted rows (residual beyond the Huber threshold) was the same
+   * before and after the last accepted step; true without `huber` and without an accepted step.
+   */
+  weightsSettled: boolean
   /** Covariance of theta; absent with n = p and no standard uncertainties. */
   covariance?: number[][]
   /** Square roots of the covariance diagonal of theta; absent like `covariance`. */
@@ -319,6 +332,10 @@ export function logLeastSquares(fit: LogFitInput): LogFitResult {
   const { huber } = fit
   const cost2 = (r: number[]) => (huber ? huberCost(r, huber) : chi2(r))
   const roots = (r: number[]) => huberRoots(r, huber)
+  const sameRows = (a: number[], b: number[]) => {
+    const wb = roots(b)
+    return roots(a).every((w, i) => w < 1 === nth(wb, i) < 1)
+  }
 
   const { runs = [n], moves = () => true } = fit
   const start = runs.map((_, k) => runs.slice(0, k).reduce((t, c) => t + c, 0))
@@ -334,6 +351,8 @@ export function logLeastSquares(fit: LogFitInput): LogFitResult {
   checkConditioning(fit, j, theta)
   let lambda = lambda0
   let iterations = 0
+  let stop: LogFitStop
+  let weightsSettled = true
   for (;;) {
     checkIterations(fit, iterations, j, theta)
     iterations++
@@ -345,16 +364,23 @@ export function logLeastSquares(fit: LogFitInput): LogFitResult {
     if (p && next < cost) {
       theta = candidate
       predicted = p
+      const before = r
       r = residuals(p)
+      weightsSettled = sameRows(before, r)
       lambda /= 10
       current = false
       const done = stalled(cost, next, tolerance)
       cost = next
-      if (done) break
+      if (done) {
+        stop = 'stalled'
+        break
+      }
       j = jacobian(fit, stacking, theta)
       current = true
-    } else if (small) break
-    else lambda *= 10
+    } else if (small) {
+      stop = 'smallStep'
+      break
+    } else lambda *= 10
   }
 
   if (!current) j = jacobian(fit, stacking, theta)
@@ -366,6 +392,8 @@ export function logLeastSquares(fit: LogFitInput): LogFitResult {
     predicted,
     conditionNumber: condition,
     iterations,
+    stop,
+    weightsSettled,
     ...covarianceOf(fit, scaled(j, roots(r)), cost, n - parameterCount),
   }
 }
