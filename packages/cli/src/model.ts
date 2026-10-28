@@ -17,7 +17,7 @@ export interface Model {
 /** The name of the installed core model. */
 export const builtInName = 'm3'
 
-const importPattern = /(?:\bfrom|\bimport)\s*\(?\s*['"](\.{1,2}\/[^'"]+)['"]/g
+const importPattern = /\b(?:from|import)[\s(]*['"](\.{1,2}\/[^'"]+)['"]/g
 
 /** `file` and the files it imports by a relative specifier, directly or not, with `label` made from `root`. */
 function closure(file: string, root: string, prefix: string) {
