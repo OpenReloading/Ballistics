@@ -314,6 +314,12 @@ Code: `packages/core/src/interior/load-file.ts`, `solidFillLimit`, `fillLoadRati
 
 Taking the random close packing of equal spheres as the limit for grains of every shape is a choice of the model.
 
+### Load from records
+
+`recordLoad` builds the run of a load that names a cartridge, a powder and a bullet, for callers that have no form state: the powder record's model parameters (`powderModelValues`), the cartridge's chamber land diameter $F$ as the bore diameter, its twist $u$ and its bore area $Q$ (without $Q$, the circle of the mean of $F$ and the groove diameter $Z$, `boreArea`), the bore resistance of the powder's fit (`recordResistance`) and the powder's temperature sensitivity. The charge, the chamber volume behind the seated bullet, the bullet travel and the bullet mass are the caller's, and so is the propellant temperature (K), which defaults to the temperature of the powder's fit. A powder without an interior model, a missing value or a bore-resistance law without the bullet length is an error, never a run without that term.
+
+Code: `packages/core/src/interior/record-load.ts`, `recordLoad`.
+
 ## Symbols
 
 | Symbol | Meaning | Stored unit | Unit in `core` |
@@ -379,6 +385,7 @@ Taking the random close packing of equal spheres as the limit for grains of ever
 
 - Not modelled: air ahead of the projectile, recoil and a moving breech, primer energy beyond the ignition pressure, pressure waves, erosion, a spread of grain sizes, the effect of the initial temperature on the gas energy, charge-mass corrections of the Lagrange coefficients.
 - The bullet material is not an input of the resistance law.
+- The heat model is the only term that depends on the size of the gun. Without it, peak pressure and velocity against travel in calibres are unchanged when every length is multiplied by $s$, volumes, masses and the charge by $s^3$, areas by $s^2$ and grain dimensions by $s$, and times scale with $s$ ([research log](../research/interior-exact-scaling-sensitivity.md)). With the convective heat loss (flame temperature 2800 K, factor 1) on the seven-perforation rifle load of the research entry, $s$ from 0.5 to 5 moved peak pressure by -0.35 to +0.66 % and muzzle velocity by -0.64 to +1.2 %.
 - Validity reasons of an invalid result: `input` with the first invalid field, `chamberVolume` (solid volume or covolume of the charge not below $V_c$), `noShotStart` (burnout before the projectile moves), `stuck` (velocity back to 0), `integration` (step size or step count), `maxTime` (run time reached before the muzzle).
 - Input checks: all values finite, volumes, areas, lengths, masses, energies, densities, temperatures and $p_i$ positive, $k \gt 1$, $\eta \ge 0$, $L_\text{tw} \ge 0$, $p_\text{st} \ge 0$, profile travels strictly increasing.
 - `tenPercentPressureTime` is linear between curve points and depends on the output step.
@@ -386,6 +393,7 @@ Taking the random close packing of equal spheres as the limit for grains of ever
 - Charge too small (`chargeTooSmall`): the API warns when the peak mean pressure is below 2.2 times the hold pressure ([charge too small](#charge-too-small)).
 - Solid fill above 0.64 (`solidFillLimit`): the API (`loadRatioHigh`) and the workbench warn ([load file](#load-file)).
 - Inputs the run ignores or holds once: the API and the workbench say so ([advisories](#advisories)).
+- Research log: [constant-surface closed form](../research/interior-constant-surface-closed-form.md), [closed vessel](../research/interior-closed-vessel-closed-forms.md), [published worked example](../research/interior-published-worked-example.md), [internal consistency checks](../research/interior-internal-consistency-checks.md), [Sébert factor](../research/interior-sebert-factor-choice.md), [charge too small](../research/interior-charge-too-small-bound.md), [solid fill limit](../research/interior-solid-fill-limit.md).
 
 ### Charge too small
 

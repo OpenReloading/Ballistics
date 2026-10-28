@@ -51,6 +51,25 @@ Code: `packages/core/src/interior/range.ts`, `toleranceRange` (`lowPressure`, `h
 
 The minimum and maximum run over the cases $c$ with a valid, finite peak pressure. The range is complete when every case has one. The peak pressure is the peak breech pressure (`peakBreechPressure`) of the model. An invalid run reports its `reason`.
 
+### Placing an entered maximum
+
+A maximum peak pressure $p_\text{max}$ entered with a request is placed against the range, with no further run:
+
+$$
+\text{class} =
+\begin{cases}
+\text{modelDiscrepancy} & p_\text{max} < p_\text{low} \\
+\text{aboveRange} & p_\text{max} > p_\text{high} \\
+\text{inputPlausible} & \text{otherwise}
+\end{cases}
+$$
+
+Code: `packages/core/src/interior/range.ts`, `placeMaximum`.
+
+The answer also names the dominant input: the single input whose two ends differ most in peak pressure, an end without a computed value counted as $p_\text{nom}$. It is null when no input moves the pressure.
+
+The class and the message state where the entered number lies against the simulated range, nothing about a load. `inputPlausible` means only that the number is within the spread of the simulation. `modelDiscrepancy` means the simulation and the number do not agree for these inputs, and the model error that the range leaves out can be the cause. The stored limit of a cartridge is not an entered maximum: the limit check is unchanged.
+
 ### Default tolerances
 
 | Input | Default tolerance |
@@ -87,6 +106,7 @@ The rows show the simulated effect of a powder lot that burns faster or slower t
 | $p_q^{\pm}$, $p_c$ | Peak pressure at one end of an input, of a case | bar | Pa |
 | $p_\text{nom}$ | Nominal peak pressure | bar | Pa |
 | $p_\text{low}$, $p_\text{high}$ | Lowest and highest peak pressure of the range | bar | Pa |
+| $p_\text{max}$ | Maximum peak pressure entered with the request | bar | Pa |
 | $s_q$ | Side that raises the pressure | 1 | 1 |
 | $b$, $b^{\pm}$ | Burn coefficient (vivacity or geometric coefficient) and its values at the two lots | as the burn law | as the burn law |
 | $t_b$ | Burn-rate change of the lot rows | 1 | 1 |

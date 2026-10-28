@@ -2,6 +2,7 @@
 
 import type { TrajectoryPoint } from '@open-reloading/core'
 import { createPortal } from 'react-dom'
+import { english } from '../i18n/translate.ts'
 import { localDay } from '../lib/dates.ts'
 import { clickText } from '../lib/firearm.ts'
 import { rangeCardColumns, rangeCardFacts, rangeCardRows } from '../lib/range-card.ts'
@@ -40,23 +41,26 @@ export function RangeCard({
   const body = usePortalBody()
   if (!body) return null
   const extras = { click: result.click?.value, wind: result.windPerUnit }
-  const columns = rangeCardColumns(system, extras)
+  // printed alone: English until the print view is translated
+  const { t } = english
+  const columns = rangeCardColumns(system, extras, t)
   const facts = rangeCardFacts(
     result.si,
     result.zeroRange,
     system,
     result.manual,
     result.dragSource,
+    t,
   )
   if (result.click)
     facts.push([
-      'Click value',
+      t('Click value'),
       clickText({ clickValue: result.click.value, clickUnit: result.click.unit }, system) ?? '',
     ])
   return createPortal(
     <div className="range-card" data-paper={paper}>
-      <h1>Range card: {result.bullet}</h1>
-      <p className="sheet-date">Printed {localDay(new Date())}</p>
+      <h1>{t('Range card: {name}', { name: result.bullet })}</h1>
+      <p className="sheet-date">{t('Printed {date}', { date: localDay(new Date()) })}</p>
       <dl className="range-card-facts">
         {facts.map(([k, v]) => (
           <div key={k}>

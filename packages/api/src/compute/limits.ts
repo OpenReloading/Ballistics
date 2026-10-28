@@ -10,7 +10,9 @@ import {
   chargeTooSmall,
   chargeTooSmallRatio,
   interiorAdvisories,
+  type MaximumPlacement,
   type PressureRange,
+  placeMaximum,
 } from '@open-reloading/core'
 import { type Cartridge, fromSi, type SpecValue, sheetId, toSi } from '@open-reloading/schema'
 
@@ -111,6 +113,26 @@ function exceededMessage(l: Limit, range: PressureRange) {
   return l.nominalExceeded
     ? `Simulated peak pressure ${bar(p0, limit)} (range ${Math.round(fromSi('pressure', low))} to ${bar(high, limit)}) is above ${limitText}.`
     : `The upper end of the simulated peak pressure range, ${bar(high, limit)}, is above ${limitText}; the nominal value is ${bar(p0, limit)}.`
+}
+
+/** A user-entered maximum placed against a pressure range: the class, the dominant input and a statement about the range. */
+export type MaximumCheck = MaximumPlacement & {
+  /** The entered maximum, Pa. */
+  maximum: number
+  message: string
+}
+
+/** Places a user-entered maximum (Pa) against `range`; the message states a fact about the simulated range only. */
+export function maximumCheck(range: PressureRange, maximum: number): MaximumCheck {
+  const placement = placeMaximum(range, maximum)
+  const { lowPressure: low, highPressure: high } = range
+  const m = `The entered maximum, ${bar(maximum, maximum)}`
+  const message = {
+    inputPlausible: `${m}, is inside the simulated peak-pressure range of this load, ${bar(low, maximum)} to ${bar(high, maximum)}.`,
+    modelDiscrepancy: `${m}, is below the lower end of the simulated peak-pressure range of this load, ${bar(low, maximum)}. The simulation and the entered maximum do not agree for these inputs.`,
+    aboveRange: `${m}, is above the upper end of the simulated peak-pressure range, ${bar(high, maximum)}.`,
+  }[placement.class]
+  return { ...placement, maximum, message }
 }
 
 /** The charge-too-small rule on an M3 peak mean pressure, start and ignition pressure, Pa. */

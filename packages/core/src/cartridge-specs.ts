@@ -2,7 +2,12 @@ import type { CartridgeDiameters } from './bullet-fit.ts'
 
 /** The values of a cartridge record that `cartridgeBulletDiameterMm` and `cartridgeGrooveDiameterMm` read. */
 export interface CartridgeSpecs {
-  values: { side?: string | undefined; symbol: string; value?: number | undefined }[]
+  values: {
+    side?: string | undefined
+    symbol: string
+    value?: number | undefined
+    variant?: string | undefined
+  }[]
 }
 
 /** The smallest value of `symbol` on `side` among the values of a CIP sheet; undefined without one. */

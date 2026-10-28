@@ -1,30 +1,33 @@
 'use client'
 
 import { Button, TextInput } from '@mantine/core'
+import { useTranslation } from '../i18n/language.ts'
+import { msg } from '../i18n/translate.ts'
 import { noteText } from '../lib/load-notes.ts'
 import { controlSize } from '../lib/theme.ts'
 import { Message } from './states.tsx'
 import { useResult } from './workbench-context.ts'
 
 const lotFields = [
-  ['powder', 'Powder lot'],
-  ['primer', 'Primer lot'],
-  ['case', 'Case lot'],
+  ['powder', msg('Powder lot')],
+  ['primer', msg('Primer lot')],
+  ['case', msg('Case lot')],
 ] as const
 
 /** The lot numbers of the load, saved with it and kept with each chronograph session. */
 export function LoadLots() {
+  const { t } = useTranslation()
   const {
     loadNotes: { lots, setLots },
   } = useResult()
   return (
     <fieldset className="load-lots">
-      <legend>Lots</legend>
+      <legend>{t('Lots')}</legend>
       <div className="field-row">
         {lotFields.map(([key, label]) => (
           <TextInput
             key={key}
-            label={label}
+            label={t(label)}
             value={lots[key]}
             maxLength={200}
             onChange={(e) => setLots({ ...lots, [key]: e.currentTarget.value })}
@@ -40,6 +43,7 @@ export function LoadLots() {
  * compares and the sessions they come from; a note is dismissed for its session.
  */
 export function SessionNotes({ session }: { session?: string }) {
+  const { t } = useTranslation()
   const { loadNotes, system } = useResult()
   const notes = loadNotes.notes.filter((n) => session === undefined || n.session === session)
   if (notes.length === 0) return null
@@ -47,16 +51,19 @@ export function SessionNotes({ session }: { session?: string }) {
     <div className="session-notes">
       {notes.map((n) => (
         <Message key={`${n.session} ${n.rule}`} severity="info" announce={false}>
-          {noteText(n, loadNotes.sessionName, system)}
+          {noteText(n, loadNotes.sessionName, system, t)}
           <Button
             display="block"
             variant="default"
             mt="xs"
             size={controlSize.row.button}
-            aria-label={`Dismiss the note on ${loadNotes.sessionName(n.session)}: ${n.rule}`}
+            aria-label={t('Dismiss the note on {session}: {rule}', {
+              session: loadNotes.sessionName(n.session),
+              rule: n.rule,
+            })}
             onClick={() => loadNotes.dismiss(n.session, n.rule)}
           >
-            Dismiss
+            {t('Dismiss')}
           </Button>
         </Message>
       ))}

@@ -1,6 +1,6 @@
 import type { PressureRange } from '@open-reloading/core'
 import { describe, expect, it } from 'vitest'
-import { type CartridgeWithSpecs, limitCheck } from '../src/compute/limits.ts'
+import { type CartridgeWithSpecs, limitCheck, maximumCheck } from '../src/compute/limits.ts'
 
 const range: PressureRange = {
   quantity: 'maxPressure',
@@ -144,5 +144,42 @@ describe('limitCheck', () => {
           'Charge too small for the model: the simulated peak mean pressure, 43 bar, is below 2.2 times the ignition pressure (20 bar); results are outside the range the model was built for.',
       },
     ])
+  })
+})
+
+describe('maximumCheck', () => {
+  const spread = {
+    ...range,
+    cases: [
+      { input: 'burnRateFraction' as const, side: 1 as const, maxPressure: 4.2e8 },
+      { input: 'burnRateFraction' as const, side: -1 as const, maxPressure: 3.6e8 },
+      { input: 'chargeFraction' as const, side: 1 as const, maxPressure: 3.95e8 },
+      { input: 'chargeFraction' as const, side: -1 as const, maxPressure: 3.85e8 },
+    ],
+  }
+
+  it('states the range for each class and names the dominant input', () => {
+    const at = (pa: number) => maximumCheck(spread, pa)
+    expect(at(3.9e8)).toMatchObject({
+      class: 'inputPlausible',
+      dominantInput: 'burnRateFraction',
+      message:
+        'The entered maximum, 3900 bar, is inside the simulated peak-pressure range of this load, 3500 bar to 4300 bar.',
+    })
+    expect(at(3.4e8)).toMatchObject({
+      class: 'modelDiscrepancy',
+      message:
+        'The entered maximum, 3400 bar, is below the lower end of the simulated peak-pressure range of this load, 3500 bar. The simulation and the entered maximum do not agree for these inputs.',
+    })
+    expect(at(4.4e8)).toMatchObject({
+      class: 'aboveRange',
+      message:
+        'The entered maximum, 4400 bar, is above the upper end of the simulated peak-pressure range, 4300 bar.',
+    })
+  })
+
+  it('makes no statement about a load', () => {
+    for (const pa of [3.4e8, 3.9e8, 4.4e8])
+      expect(maximumCheck(spread, pa).message).not.toMatch(/safe|load is|charge/i)
   })
 })

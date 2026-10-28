@@ -1,7 +1,10 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, type Page, test } from '@playwright/test'
+import { height, problems } from './a11y.ts'
+import { showGerman } from './german.ts'
 import { gotoHydrated } from './nav.ts'
 import { settingsEntry, storeUnits } from './units.ts'
+import { runExample } from './workbench-run.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
@@ -75,6 +78,15 @@ test('German is chosen in Settings, switches the home page and the dialog, and i
   await expect(page.getByText(lead.en)).toBeVisible()
   await expect(page.locator('html')).toHaveAttribute('lang', 'en')
   expect(problems).toEqual([])
+})
+
+test('the workbench in German after the example run has no axe finding', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height })
+  await runExample(page)
+  await showGerman(page)
+  await expect(page.getByRole('tab', { name: 'Ladeleiter-Tabelle', exact: true })).toBeVisible()
+  await page.waitForLoadState('networkidle')
+  expect(await problems(page, 'workbench in German')).toEqual([])
 })
 
 test.describe('offline', () => {

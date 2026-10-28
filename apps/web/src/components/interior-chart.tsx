@@ -4,6 +4,8 @@ import { Button, Group, SegmentedControl } from '@mantine/core'
 import { useReducedMotion } from '@mantine/hooks'
 import type { ECharts } from 'echarts/core'
 import { useMemo, useRef, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import { msg, type Translator } from '../i18n/translate.ts'
 import { type StripFigure, stripModel } from '../lib/barrel-strip.ts'
 import {
   type ChartShow,
@@ -41,30 +43,36 @@ type Limits = Parameters<typeof limitLines>[0]
 export type ChartView = { x: ChartX; quantity: ChartShow }
 
 const quantities = [
-  { value: 'all', label: 'All', name: 'breech pressure, velocity and energy' },
-  { value: 'pressure', label: 'Pressure', name: 'breech pressure' },
-  { value: 'velocity', label: 'Velocity', name: 'bullet velocity' },
-  { value: 'energy', label: 'Energy', name: 'bullet energy' },
+  { value: 'all', label: msg('All'), name: msg('breech pressure, velocity and energy') },
+  { value: 'pressure', label: msg('Pressure'), name: msg('breech pressure') },
+  { value: 'velocity', label: msg('Velocity'), name: msg('bullet velocity') },
+  { value: 'energy', label: msg('Energy'), name: msg('bullet energy') },
 ] as const
 
 const symbols = { pressure: 'p', velocity: 'v', energy: 'E' } as const
 
 /** A quantity's switch: its line key and symbol, the name for screen readers and on hover. */
-const quantityLabel = ({ value, label }: (typeof quantities)[number]) =>
+const quantityLabel = ({ value, label }: (typeof quantities)[number], t: Translator['t']) =>
   value === 'all' ? (
-    label
+    t(label)
   ) : (
-    <span title={label} className="quantity-option">
+    <span title={t(label)} className="quantity-option">
       <span className="series-key" data-q={value} aria-hidden="true" />
       <span aria-hidden="true">{symbols[value]}</span>
-      <span className="visually-hidden">{label}</span>
+      <span className="visually-hidden">{t(label)}</span>
     </span>
   )
 
+/** What the chart draws, named for a sentence. */
+const quantityName = (quantity: ChartShow, t: Translator['t']) =>
+  t((quantities.find((d) => d.value === quantity) ?? nth(quantities, 0)).name)
+
 /** The chart's accessible name, also its locator in the e2e tests. */
-function chartTitle(v: Pick<ChartView, 'x' | 'quantity'>) {
-  const q = quantities.find((d) => d.value === v.quantity)?.name
-  return `Simulated ${q} against ${v.x === 'time' ? 'time' : 'bullet travel'}`
+function chartTitle(v: Pick<ChartView, 'x' | 'quantity'>, t: Translator['t']) {
+  return t('Simulated {quantity} against {axis}', {
+    quantity: quantityName(v.quantity, t),
+    axis: v.x === 'time' ? t('time') : t('bullet travel'),
+  })
 }
 
 /** The chart colours from the page's tokens (`globals.css`). */
@@ -127,6 +135,7 @@ export function InteriorChart({
   z1?: number | undefined
 }) {
   const { x, quantity } = view
+  const { t, language } = useTranslation()
   const theme = useChartTokens(themeTokens)
   const reduce = useReducedMotion(false, { getInitialValueInEffect: false })
   const [dataOpen, setDataOpen] = useState(false)
@@ -135,22 +144,27 @@ export function InteriorChart({
   const ladder = steps.length > 1
   const shown = shownQuantities(quantity)
   const withPressure = shown.includes('pressure')
-  const lines = withPressure ? limitLines(limits, system) : undefined
-  const events = chartEvents(r, z1)
+  const lines = withPressure ? limitLines(limits, system, t) : undefined
+  const events = chartEvents(r, z1, t)
   const at = sampler(r.points)
   const values = (s: ReturnType<typeof at>): [string, string][] => [
-    ['Time', msText(s.time)],
-    ['Travel', shownLength('travel', system, s.travel)],
-    ['Breech pressure', withUnit('pressure', system, s.breechPressure)],
-    ['Velocity', withUnit('velocity', system, s.velocity)],
-    ['Energy', withUnit('energy', system, 0.5 * mass * s.velocity ** 2)],
-    ['Burnt', percentText(s.burntFraction)],
+    [t('Time'), msText(s.time)],
+    [t('Travel'), shownLength('travel', system, s.travel)],
+    [t('Breech pressure'), withUnit('pressure', system, s.breechPressure)],
+    [t('Velocity'), withUnit('velocity', system, s.velocity)],
+    [t('Energy'), withUnit('energy', system, 0.5 * mass * s.velocity ** 2)],
+    [t('Burnt'), percentText(s.burntFraction)],
   ]
-  const stepName = ladder ? (step.value ?? `Step ${step.label ?? step.n}`) : 'Nominal load'
+  const stepName = ladder
+    ? (step.value ?? t('Step {step}', { step: step.label ?? step.n }))
+    : t('Nominal load')
   const readout = (s: ReturnType<typeof at>) =>
-    `${stepName}: ${values(s)
-      .map(([k, v]) => `${k} ${v}`)
-      .join(', ')}`
+    t('{step}: {values}', {
+      step: stepName,
+      values: values(s)
+        .map(([k, v]) => `${k} ${v}`)
+        .join(', '),
+    })
   const [stage, setStage] = useState<HTMLDivElement | null>(null)
   const [railHost, setRailHost] = useState<HTMLDivElement | null>(null)
   const muzzleTravel = nth(r.points, r.points.length - 1).travel
@@ -165,6 +179,7 @@ export function InteriorChart({
     system.velocity.symbol,
     system.energy.symbol,
     system.length.symbol,
+    language,
     theme && Object.values(theme).join(),
     reduce,
     z1,
@@ -186,6 +201,7 @@ export function InteriorChart({
       theme,
       animate: !reduce,
       z1,
+      t,
     })
     const cell = (k: string, v: string) => `<dt>${k}</dt><dd>${v}</dd>`
     return {
@@ -210,30 +226,51 @@ export function InteriorChart({
   }, [signature])
   // the selected step's first curve, which the keyboard walks
   const focus = shown.length === 0 ? 0 : selected
-  const named = quantities.find((d) => d.value === quantity)?.name
+  const named = quantityName(quantity, t)
   const chart = useRef<ECharts | null>(null)
   const redraw = useRef<() => void>(undefined)
   const firstShown = shown[0] ?? 'pressure'
   const split = powderSplit(r, at)
   const energy = energySplit(r.energy)
   const energyUnit = system.energy.symbol
-  const key = `peak ${withUnit('pressure', system, r.peakBreechPressure)}, muzzle ${withUnit('velocity', system, r.muzzleVelocity)}`
+  const key = t('peak {pressure}, muzzle {velocity}', {
+    pressure: withUnit('pressure', system, r.peakBreechPressure),
+    velocity: withUnit('velocity', system, r.muzzleVelocity),
+  })
+  const marked = events.map((e) => e.label).join(', ')
+  const description = [
+    ladder
+      ? t('{count} ladder steps of {quantity}; {step} solid, the others dashed. {step} {key}.', {
+          count: steps.length,
+          quantity: named,
+          step: stepName,
+          key,
+        })
+      : t('Nominal load, {quantity}; {key}.', { quantity: named, key }),
+    lines
+      ? t('Lines mark {events}, and {limits}.', {
+          events: marked,
+          limits: lines.map((l) => l.label).join(', '),
+        })
+      : t('Lines mark {events}.', { events: marked }),
+    ladder ? t('The Ladder table gives the values.') : t('The readouts give the values.'),
+  ].join(' ')
   return (
     <div className="interior-chart">
       <Group gap="xs" className="chart-controls">
         <SegmentedControl
           size={controlSize.row.toggle}
-          aria-label="Chart quantity"
-          data={quantities.map((q) => ({ value: q.value, label: quantityLabel(q) }))}
+          aria-label={t('Chart quantity')}
+          data={quantities.map((q) => ({ value: q.value, label: quantityLabel(q, t) }))}
           value={quantity}
           onChange={(v) => onView({ ...view, quantity: v as ChartShow })}
         />
         <SegmentedControl
           size={controlSize.row.toggle}
-          aria-label="Chart x axis"
+          aria-label={t('Chart x axis')}
           data={[
-            { value: 'travel', label: 'Travel' },
-            { value: 'time', label: 'Time' },
+            { value: 'travel', label: t('Travel') },
+            { value: 'time', label: t('Time') },
           ]}
           value={x}
           onChange={(v) => onView({ ...view, x: v as ChartX })}
@@ -243,11 +280,11 @@ export function InteriorChart({
           px={8}
           variant="default"
           ml="auto"
-          aria-label="Chart data"
-          title="The chart's values as a table"
+          aria-label={t('Chart data')}
+          title={t("The chart's values as a table")}
           onClick={() => setDataOpen(true)}
         >
-          Data
+          {t('Data')}
         </Button>
       </Group>
       <ChartPlayback
@@ -269,14 +306,8 @@ export function InteriorChart({
         {option && (
           <EChart
             option={option}
-            title={chartTitle(view)}
-            description={`${
-              ladder
-                ? `${steps.length} ladder steps of ${named}; ${stepName} solid, the others dashed. ${stepName}`
-                : `Nominal load, ${named};`
-            } ${key}. Lines mark ${events.map((e) => e.label).join(', ')}${
-              lines ? `, and ${lines.map((l) => l.label).join(', ')}` : ''
-            }. ${ladder ? 'The Ladder table gives the values.' : 'The readouts give the values.'}`}
+            title={chartTitle(view, t)}
+            description={description}
             focus={focus}
             readout={(i) => readout(at(nth(r.points, Math.min(i, r.points.length - 1)).time))}
             onRender={(c) => {
@@ -289,15 +320,20 @@ export function InteriorChart({
         <div className="chart-rail" ref={setRailHost} />
       </div>
       {withPressure && !lines && (
-        <p className="note">No compared pressure limit for this result: no limit lines.</p>
+        <p className="note">{t('No compared pressure limit for this result: no limit lines.')}</p>
       )}
-      <AppModal opened={dataOpen} onClose={() => setDataOpen(false)} title="Chart data" size="auto">
+      <AppModal
+        opened={dataOpen}
+        onClose={() => setDataOpen(false)}
+        title={t('Chart data')}
+        size="auto"
+      >
         <PanelTable
-          label="Chart data"
+          label={t('Chart data')}
           className="limits"
-          caption={
-            <>{stepName} at 20 evenly spaced times from ignition to muzzle exit (simulation)</>
-          }
+          caption={t('{step} at 20 evenly spaced times from ignition to muzzle exit (simulation)', {
+            step: stepName,
+          })}
           columns={values(at(0)).map(([k]) => k)}
         >
           {chartRows(r.points).map((s) => (
@@ -311,12 +347,12 @@ export function InteriorChart({
           ))}
         </PanelTable>
         <PanelTable
-          label="Events"
+          label={t('Events')}
           className="limits"
-          caption="Events of the shot (simulation)"
-          columns={['Event', ...values(at(0)).map(([k]) => k)]}
+          caption={t('Events of the shot (simulation)')}
+          columns={[t('Event'), ...values(at(0)).map(([k]) => k)]}
         >
-          {playbackEvents(r).map((e) => (
+          {playbackEvents(r, t).map((e) => (
             <tr key={e.key}>
               <td>{e.label}</td>
               {values(at(e.time)).map(([k, text]) => (
@@ -327,35 +363,38 @@ export function InteriorChart({
             </tr>
           ))}
         </PanelTable>
-        <h3>Powder at the muzzle</h3>
+        <h3>{t('Powder at the muzzle')}</h3>
         <ul>
-          <li>Burnt before the bullet moves: {percentText(split.before)}</li>
-          <li>Burnt while the bullet travels: {percentText(split.travel)}</li>
-          <li>Unburnt at the muzzle: {percentText(split.unburnt)}</li>
+          <li>
+            {t('Burnt before the bullet moves: {share}', { share: percentText(split.before) })}
+          </li>
+          <li>
+            {t('Burnt while the bullet travels: {share}', { share: percentText(split.travel) })}
+          </li>
+          <li>{t('Unburnt at the muzzle: {share}', { share: percentText(split.unburnt) })}</li>
         </ul>
         <PanelTable
-          label="Energy at the muzzle"
+          label={t('Energy at the muzzle')}
           className="limits"
-          caption={
-            <>
-              Energy at the muzzle: where the {formatQuantity('energy', system, energy.total)}{' '}
-              {energyUnit} released by the burnt powder went, shares rounded to 0.1 %
-            </>
-          }
-          columns={['Term', `Energy (${energyUnit})`, 'Share']}
+          caption={t(
+            'Energy at the muzzle: where the {energy} {unit} released by the burnt powder went, shares rounded to 0.1 %',
+            { energy: formatQuantity('energy', system, energy.total), unit: energyUnit },
+          )}
+          columns={[t('Term'), t('Energy ({unit})', { unit: energyUnit }), t('Share')]}
         >
-          {energy.shown.map((t) => (
-            <tr key={t.key}>
-              <td>{t.label}</td>
-              <td className="num">{formatQuantity('energy', system, t.value)}</td>
-              <td className="num">{percentText(t.share)}</td>
+          {energy.shown.map((term) => (
+            <tr key={term.key}>
+              <td>{t(term.label)}</td>
+              <td className="num">{formatQuantity('energy', system, term.value)}</td>
+              <td className="num">{percentText(term.share)}</td>
             </tr>
           ))}
         </PanelTable>
         {energy.zero.length > 0 && (
           <p className="note">
-            Not modelled with these inputs:{' '}
-            {energy.zero.map((t) => t.label.toLowerCase()).join(', ')}.
+            {t('Not modelled with these inputs: {terms}.', {
+              terms: energy.zero.map((term) => t(term.lower)).join(', '),
+            })}
           </p>
         )}
       </AppModal>

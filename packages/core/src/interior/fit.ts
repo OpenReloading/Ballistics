@@ -13,7 +13,7 @@ import type { Settings } from '../errors.ts'
 import { InputError, need, nth } from '../errors.ts'
 import { chiSquareQuantile } from '../groups/chi-square.ts'
 import { studentTwoSidedQuantile } from '../groups/student-t.ts'
-import { logLeastSquares } from '../least-squares.ts'
+import { type LogFitStop, logLeastSquares } from '../least-squares.ts'
 import {
   type InteriorInvalid,
   type InteriorLoad,
@@ -21,6 +21,14 @@ import {
   type InteriorResult,
   interior,
 } from './model.ts'
+
+/**
+ * What a peak pressure was measured with: the `pressureMethod` vocabulary of the cartridge records.
+ * Values on different bases are not converted into each other.
+ */
+export type PressureBasis = 'transducer' | 'piezo' | 'crusher' | 'energy'
+
+const pressureBases: readonly string[] = ['transducer', 'piezo', 'crusher', 'energy']
 
 /** One charge of a chronograph ladder: measured muzzle velocity and, optionally, peak pressure. */
 export interface LadderPoint {
@@ -34,6 +42,8 @@ export interface LadderPoint {
   peakPressure?: number
   /** Standard uncertainty of `peakPressure`, Pa; required with `peakPressure`. */
   pressureSigma?: number
+  /** Basis `peakPressure` was measured on; required with `peakPressure`, and all pressures of a fit share one. */
+  pressureBasis?: PressureBasis
   /** Projectile travel to the muzzle of the barrel fired, m; default the load's. */
   barrelLength?: number
   /** Propellant temperature of the string, K; default the load's. */
@@ -101,6 +111,62 @@ export interface PowderFitOptions {
   huberThreshold?: number | undefined
   /** Integration settings of every `interior` run; default `interiorDefaults`. */
   options?: Settings<InteriorOptions> | undefined
+  /**
+   * Relative margin that widens each axis of the fit's `domain`, in [0, 1); default
+   * `powderDomainMargin`.
+   */
+  domainMargin?: number | undefined
+}
+
+/** Default relative margin of a fit's `domain`: an assumption, to be tuned against held-out ladders. */
+export const powderDomainMargin = 0.05
+
+/** An axis on which a prediction can leave the data a powder was fitted to. */
+export type PowderAxis = 'charge' | 'velocity' | 'pressure' | 'boreDiameter' | 'barrelLength'
+
+/** A closed range of one axis, in the axis's SI unit. */
+export interface PowderAxisRange {
+  /** Smallest value inside. */
+  min: number
+  /** Largest value inside. */
+  max: number
+}
+
+/**
+ * Where a fit holds: the span of the fitted data on each axis, widened by `margin` (a value at the
+ * widened end is inside). `pressure` is absent without measured pressures.
+ */
+export interface PowderDomain {
+  /** Relative margin that widened each range. */
+  margin: number
+  /** Charge mass, kg. */
+  charge: PowderAxisRange
+  /** Measured muzzle velocity, m/s. */
+  velocity: PowderAxisRange
+  /** Measured peak pressure, Pa. */
+  pressure?: PowderAxisRange
+  /** Bore diameter of the load, m. */
+  boreDiameter: PowderAxisRange
+  /** Barrel length of the ladder points, m. */
+  barrelLength: PowderAxisRange
+}
+
+/** The axes on which a prediction lies outside the `domain`, each with the side it lies on. */
+export type PowderExtrapolation = Partial<Record<PowderAxis, 'below' | 'above'>>
+
+/** The axes of `values` that lie outside `domain`; an axis without a range or a value is not checked. */
+export function outsideDomain(
+  domain: PowderDomain,
+  values: Partial<Record<PowderAxis, number>>,
+): PowderExtrapolation {
+  const outside: PowderExtrapolation = {}
+  for (const [axis, value] of Object.entries(values) as [PowderAxis, number][]) {
+    const range = domain[axis]
+    if (range === undefined) continue
+    if (value < range.min) outside[axis] = 'below'
+    else if (value > range.max) outside[axis] = 'above'
+  }
+  return outside
 }
 
 /** A fitted parameter: start value, result and uncertainty. A volume factor starts at 1. */
@@ -146,6 +212,8 @@ export interface PowderFit {
   weighted: boolean
   /** `refined` when a prior on the burn coefficient was given, else `from-scratch`. */
   basis: PowderFitBasis
+  /** Number of pressure rows per basis; at most one entry, none without pressures. */
+  pressureRows: Partial<Record<PressureBasis, number>>
   /** One row per velocity, then pressure, of each ladder point in input order. */
   residuals: PowderFitResidual[]
   /** Sum of squared residuals over sigma (sigma 1 where the ladder has none), plus `priorChiSquare`. */
@@ -160,10 +228,16 @@ export interface PowderFit {
   degreesOfFreedom: number
   /** Condition number of the column-scaled Jacobian at the solution. */
   conditionNumber: number
-  /** Smallest and largest ladder charge, kg; the fitted values describe this span only. */
+  /** Smallest and largest ladder charge, kg. */
   chargeRange: { min: number; max: number }
+  /** The data the fit holds for, with a margin: `predictPowder` names the axes outside it. */
+  domain: PowderDomain
   /** Iterations of the solver. */
   iterations: number
+  /** The rule that ended the solver: a cost drop below the tolerance, or a step below 1e-8. */
+  stop: LogFitStop
+  /** Whether the ladder rows beyond the Huber threshold were the same before and after the last accepted step; true without `huberThreshold`. */
+  weightsSettled: boolean
   /** `interior` runs of the fit. */
   runCount: number
 }
@@ -220,6 +294,22 @@ export class PowderFitError extends InputError {
   }
 }
 
+/** Failure of `fitPowder` when the pressure rows of a ladder use more than one basis. */
+export class MixedPressureBasisError extends InputError {
+  /** Number of pressure rows per basis. */
+  readonly rows: Partial<Record<PressureBasis, number>>
+
+  constructor(rows: Partial<Record<PressureBasis, number>>) {
+    super(
+      `pressure rows use more than one basis: ${Object.entries(rows)
+        .map(([basis, n]) => `${n} ${basis}`)
+        .join(', ')}`,
+    )
+    this.name = 'MixedPressureBasisError'
+    this.rows = rows
+  }
+}
+
 /** Smallest ratio of the longest to the shortest barrel length at which `energy` is fitted. */
 const minLengthSpan = 1.05
 
@@ -252,6 +342,14 @@ function checkLadder(ladder: readonly LadderPoint[]): number {
       (x.peakPressure === undefined) === (x.pressureSigma === undefined),
       'peakPressure and pressureSigma together',
     )
+    need(
+      (x.peakPressure === undefined) === (x.pressureBasis === undefined),
+      'peakPressure and pressureBasis together',
+    )
+    need(
+      x.pressureBasis === undefined || pressureBases.includes(x.pressureBasis),
+      `pressureBasis must be one of ${pressureBases.join(', ')}`,
+    )
   }
   const withSigma = ladder.filter((x) => x.velocitySigma !== undefined).length
   need(withSigma === 0 || withSigma === ladder.length, 'velocitySigma on all points or none')
@@ -260,6 +358,18 @@ function checkLadder(ladder: readonly LadderPoint[]): number {
     'pressures need velocity sigmas',
   )
   return withSigma
+}
+
+/** Pressure rows per basis of a checked ladder; throws `MixedPressureBasisError` for more than one basis. */
+function pressureRowsPerBasis(
+  ladder: readonly LadderPoint[],
+): Partial<Record<PressureBasis, number>> {
+  const rows: Partial<Record<PressureBasis, number>> = {}
+  for (const { pressureBasis } of ladder) {
+    if (pressureBasis !== undefined) rows[pressureBasis] = (rows[pressureBasis] ?? 0) + 1
+  }
+  if (Object.keys(rows).length > 1) throw new MixedPressureBasisError(rows)
+  return rows
 }
 
 /** One observation of the fit: a ladder velocity or pressure with its sigma (1 without one). */
@@ -387,8 +497,18 @@ export function fitPowder(
   ladder: readonly LadderPoint[],
   options: PowderFitOptions = {},
 ): PowderFit {
-  const { parameters = ['burnRate'], maxIterations = 30, maxCondition = 1e3 } = options
+  const {
+    parameters = ['burnRate'],
+    maxIterations = 30,
+    maxCondition = 1e3,
+    domainMargin = powderDomainMargin,
+  } = options
+  need(
+    Number.isFinite(domainMargin) && domainMargin >= 0 && domainMargin < 1,
+    'domainMargin must lie in [0, 1)',
+  )
   const withSigma = checkLadder(ladder)
+  const pressureRows = pressureRowsPerBasis(ladder)
   checkParameters(load, ladder, parameters)
   need(
     Number.isInteger(maxIterations) && maxIterations > 0,
@@ -530,6 +650,7 @@ export function fitPowder(
     ...(fit.covariance ? { covariance: fit.covariance } : {}),
     weighted: withSigma > 0,
     basis: priors.burnRate === undefined ? 'from-scratch' : 'refined',
+    pressureRows,
     residuals: rows.map((o, i) => {
       const predicted = nth(fit.predicted, i)
       return {
@@ -550,8 +671,32 @@ export function fitPowder(
     degreesOfFreedom: rows.length - parameters.length,
     conditionNumber: fit.conditionNumber,
     chargeRange: { min: Math.min(...charges), max: Math.max(...charges) },
+    domain: fitDomain(load, ladder, domainMargin),
     iterations: fit.iterations,
+    stop: fit.stop,
+    weightsSettled: fit.weightsSettled,
     runCount,
+  }
+}
+
+/** The ranges of the ladder's charges, velocities, pressures and barrel lengths and of the load's bore, widened by `margin`. */
+function fitDomain(
+  load: InteriorLoad,
+  ladder: readonly LadderPoint[],
+  margin: number,
+): PowderDomain {
+  const widen = (values: readonly number[]): PowderAxisRange => ({
+    min: Math.min(...values) * (1 - margin),
+    max: Math.max(...values) * (1 + margin),
+  })
+  const pressures = ladder.flatMap((x) => (x.peakPressure === undefined ? [] : [x.peakPressure]))
+  return {
+    margin,
+    charge: widen(ladder.map((x) => x.charge)),
+    velocity: widen(ladder.map((x) => x.muzzleVelocity)),
+    ...(pressures.length > 0 ? { pressure: widen(pressures) } : {}),
+    boreDiameter: widen([load.chamber.boreDiameter]),
+    barrelLength: widen(ladder.map((x) => x.barrelLength ?? load.barrel.length)),
   }
 }
 
@@ -561,6 +706,8 @@ export interface PowderPredictionOptions {
   level?: number | undefined
   /** Barrel length of the prediction, m; default the load's. */
   barrelLength?: number | undefined
+  /** Bore diameter of the prediction, m (the bore area scales with its square); default the load's. */
+  boreDiameter?: number | undefined
   /** Propellant temperature of the prediction, K; default the load's. */
   propellantTemperature?: number | undefined
   /** Integration settings of the `interior` runs; use the fit's own, default `interiorDefaults`. */
@@ -591,8 +738,11 @@ export interface PowderPrediction {
   velocity: PowderPredictionBand
   /** Peak breech pressure. */
   pressure: PowderPredictionBand
-  /** Set where the charge lies outside the ladder's `chargeRange`: below or above it. */
-  extrapolation?: 'below' | 'above'
+  /**
+   * The axes on which the prediction lies outside the fit's `domain`, each with its side; absent
+   * when it lies inside on all of them. The velocity and pressure axes check the predicted values.
+   */
+  extrapolation?: PowderExtrapolation
   /** `interior` runs of the prediction. */
   runCount: number
 }
@@ -608,10 +758,11 @@ export function predictPowder(
   charge: number,
   options: PowderPredictionOptions = {},
 ): PowderPrediction {
-  const { level = 0.9, barrelLength, propellantTemperature } = options
+  const { level = 0.9, barrelLength, boreDiameter, propellantTemperature } = options
   need(Number.isFinite(charge) && charge > 0, 'charge must be positive')
   need(level > 0 && level < 1, 'level must lie in (0, 1)')
   need(positive(barrelLength), 'barrelLength must be positive')
+  need(positive(boreDiameter), 'boreDiameter must be positive')
   need(positive(propellantTemperature), 'propellantTemperature must be positive')
   const { covariance } = fit
   if (!covariance) throw new InputError('the fit has no covariance: add rows or velocity sigmas')
@@ -628,6 +779,16 @@ export function predictPowder(
         ...(barrelLength === undefined
           ? {}
           : { barrel: { ...fitted.barrel, length: barrelLength } }),
+        ...(boreDiameter === undefined
+          ? {}
+          : {
+              chamber: {
+                ...fitted.chamber,
+                boreDiameter,
+                boreArea:
+                  fitted.chamber.boreArea * (boreDiameter / fitted.chamber.boreDiameter) ** 2,
+              },
+            }),
         ...(propellantTemperature === undefined ? {} : { propellantTemperature }),
       },
       options.options,
@@ -662,15 +823,20 @@ export function predictPowder(
       upper: value + quantile * standardUncertainty,
     }
   }
-  const { min, max } = fit.chargeRange
+  const extrapolation = outsideDomain(fit.domain, {
+    charge,
+    velocity,
+    pressure,
+    boreDiameter: boreDiameter ?? fit.load.chamber.boreDiameter,
+    barrelLength: barrelLength ?? fit.load.barrel.length,
+  })
   return {
     charge,
     level,
     coverageFactor: quantile,
     velocity: band(velocity, 0),
     pressure: band(pressure, 1),
-    ...(charge < min ? { extrapolation: 'below' as const } : {}),
-    ...(charge > max ? { extrapolation: 'above' as const } : {}),
+    ...(Object.keys(extrapolation).length > 0 ? { extrapolation } : {}),
     runCount,
   }
 }

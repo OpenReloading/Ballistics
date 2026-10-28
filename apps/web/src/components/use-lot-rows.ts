@@ -1,6 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import type { Translator } from '../i18n/translate.ts'
 import { requestTimeout } from '../lib/api-client.ts'
 import { apiFetch } from '../lib/api-fetch.ts'
 import type { FieldValue } from '../lib/field-spec.ts'
@@ -99,11 +101,12 @@ async function lotAnswer(
 function lotRowsOf(
   ok: Extract<Outcome, { kind: 'ok' }> | undefined,
   current: { fraction: number; steps?: Record<Lot, Step[]> } | undefined,
+  t: Translator['t'],
 ): LotRows['rows'] {
   if (!ok || !current?.steps) return
   const steps = {
-    low: shownSteps({ ...ok, steps: current.steps.low }),
-    high: shownSteps({ ...ok, steps: current.steps.high }),
+    low: shownSteps({ ...ok, steps: current.steps.low }, t),
+    high: shownSteps({ ...ok, steps: current.steps.high }, t),
   }
   const times = barrelTimes(
     ok.steps.map((s) => ({ charge: s.charge, barrelTime: s.body?.result.barrelTime })),
@@ -129,6 +132,7 @@ export function useLotRows({
   system: UnitSystem
   enabled: boolean
 }): LotRows {
+  const { t } = useTranslation()
   const applies = ok !== undefined && ok.ladder.kind === 'charge' && ok.steps.length > 1
   const [percent, setPercent] = useState<FieldValue>(() => ({
     text: roundedFieldText('percent', system, defaultLotFraction),
@@ -137,7 +141,7 @@ export function useLotRows({
   const [target, setTarget] = useState<string | number>('')
   const [attempt, setAttempt] = useState(0)
   const fraction = percent.si
-  const error = applies ? lotFractionError(fraction) : undefined
+  const error = applies ? lotFractionError(fraction, t) : undefined
   const key = ok && applies && !error ? `${ok.id}|${fraction}|${attempt}` : undefined
   const [got, setGot] = useState<{
     key: string
@@ -181,7 +185,7 @@ export function useLotRows({
     }
   }, [enabled, key])
   const pending = enabled && key !== undefined && got?.key !== key
-  const rows = useMemo(() => lotRowsOf(ok, current), [ok, current])
+  const rows = useMemo(() => lotRowsOf(ok, current, t), [ok, current, t])
   const retry = useCallback(() => setAttempt((a) => a + 1), [])
   const seconds = Number(target) * 1e-3
   const targetSeconds = target !== '' && seconds > 0 ? seconds : undefined

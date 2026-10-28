@@ -2,6 +2,7 @@
 
 import { Table } from '@mantine/core'
 import type { Firearm, Optic } from '@open-reloading/schema'
+import { english } from '../i18n/translate.ts'
 import type { FieldSpec } from '../lib/field-spec.ts'
 import { clickText, fieldSi, firearmFields, siOf, twistText, zeroFill } from '../lib/firearm.ts'
 import { zeroConditions } from '../lib/range-card.ts'
@@ -123,7 +124,7 @@ export function DataCard({
             <Table.Tbody>
               {c.mounts.map((m, k) => {
                 const si = zeroFill(m)
-                const zero = zeroConditions(si, system, m.dragFactorSource)
+                const zero = zeroConditions(si, system, m.dragFactorSource, english.t)
                 const air = [
                   si.zeroTemperature === undefined
                     ? ''

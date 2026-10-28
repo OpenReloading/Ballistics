@@ -1,5 +1,6 @@
 import { interior } from '@open-reloading/core'
 import { describe, expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import {
   barrelDefaults,
   barrelRows,
@@ -201,36 +202,44 @@ describe('barrelRows', () => {
   })
 })
 
+const inMm = (m: number) => `${m * 1000} mm`
+const lengthsOf = (
+  from: number | undefined,
+  to: number | undefined,
+  step: number | undefined,
+  shown = inMm,
+) => rangeLengths(from, to, step, shown, english.t)
+
 describe('rangeLengths', () => {
   it('counts from, to and step without accumulated rounding', () => {
-    expect(rangeLengths(0.4, 0.76, 0.04)).toEqual({
+    expect(lengthsOf(0.4, 0.76, 0.04)).toEqual({
       lengths: Array.from({ length: 10 }, (_, i) => 0.4 + i * 0.04),
     })
   })
 
   it('puts the message on the field that gives no lengths', () => {
-    expect(rangeLengths(undefined, 1, 1)).toEqual({ errors: { from: 'Enter From.' } })
-    expect(rangeLengths(0.4, undefined, 0.1)).toEqual({ errors: { to: 'Enter To.' } })
-    expect(rangeLengths(0.4, 0.8, undefined)).toEqual({ errors: { step: 'Enter Step.' } })
-    expect(rangeLengths(0, 0.8, 0.1)).toEqual({ errors: { from: 'From must be above 0.' } })
-    expect(rangeLengths(-0.1, 0.8, 0.1)).toEqual({ errors: { from: 'From must be above 0.' } })
-    expect(rangeLengths(0.8, 0.4, 0.1)).toEqual({ errors: { to: 'To must not be below From.' } })
-    expect(rangeLengths(0.4, 0.8, 0)).toEqual({ errors: { step: 'Step must be above 0.' } })
-    expect(rangeLengths(0.1, 1, 0.001)).toEqual({
+    expect(lengthsOf(undefined, 1, 1)).toEqual({ errors: { from: 'Enter From.' } })
+    expect(lengthsOf(0.4, undefined, 0.1)).toEqual({ errors: { to: 'Enter To.' } })
+    expect(lengthsOf(0.4, 0.8, undefined)).toEqual({ errors: { step: 'Enter Step.' } })
+    expect(lengthsOf(0, 0.8, 0.1)).toEqual({ errors: { from: 'From must be above 0.' } })
+    expect(lengthsOf(-0.1, 0.8, 0.1)).toEqual({ errors: { from: 'From must be above 0.' } })
+    expect(lengthsOf(0.8, 0.4, 0.1)).toEqual({ errors: { to: 'To must not be below From.' } })
+    expect(lengthsOf(0.4, 0.8, 0)).toEqual({ errors: { step: 'Step must be above 0.' } })
+    expect(lengthsOf(0.1, 1, 0.001)).toEqual({
       errors: { step: `At most ${maxLengthCount} lengths: raise Step.` },
     })
-    expect(rangeLengths(0.1, 0.1 + 0.001 * (maxLengthCount - 1), 0.001)).toHaveProperty('lengths')
+    expect(lengthsOf(0.1, 0.1 + 0.001 * (maxLengthCount - 1), 0.001)).toHaveProperty('lengths')
   })
 
   it('reports every field at fault, From and Step beside each other', () => {
-    expect(rangeLengths(0, 0.8, 0)).toEqual({
+    expect(lengthsOf(0, 0.8, 0)).toEqual({
       errors: { from: 'From must be above 0.', step: 'Step must be above 0.' },
     })
   })
 
   it('stops To at the longest barrel and names it in the shown unit', () => {
-    expect(rangeLengths(0.4, maxBarrelLength, 0.4)).toHaveProperty('lengths')
-    expect(rangeLengths(0.4, maxBarrelLength + 0.001, 0.4, (m) => `${m / 0.0254} in`)).toEqual({
+    expect(lengthsOf(0.4, maxBarrelLength, 0.4)).toHaveProperty('lengths')
+    expect(lengthsOf(0.4, maxBarrelLength + 0.001, 0.4, (m) => `${m / 0.0254} in`)).toEqual({
       errors: { to: `To must not be above ${maxBarrelLength / 0.0254} in.` },
     })
   })
@@ -241,7 +250,7 @@ describe('inEveryUnit', () => {
   const us = resolveUnits({ preset: 'us', overrides: {} })
 
   it('is what the To message carries, whichever unit the field shows', () => {
-    const to = (system: typeof us) => rangeLengths(0.4, 2.032, 0.4, (m) => inEveryUnit(system, m))
+    const to = (system: typeof us) => lengthsOf(0.4, 2.032, 0.4, (m) => inEveryUnit(system, m))
     expect(to(us)).toEqual({ errors: { to: 'To must not be above 78.74 in (2000 mm).' } })
     expect(to(metric)).toEqual({ errors: { to: 'To must not be above 2000 mm (78.74 in).' } })
   })

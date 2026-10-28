@@ -1,7 +1,9 @@
 'use client'
 
 import { useMemo } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
+import type { Translator } from '../i18n/translate.ts'
 import {
   chartBurntFractions,
   curveAt,
@@ -89,6 +91,7 @@ function vivacityOption(
   series: Series[],
   height: number | undefined,
   marks: Mark[],
+  t: Translator['t'],
 ) {
   const band = series.length === 1
   const top = Math.max(
@@ -126,7 +129,7 @@ function vivacityOption(
       min: 0,
       max: 1,
       interval: small ? 0.5 : 0.2,
-      name: 'Burnt fraction z',
+      name: t('Burnt fraction z'),
       nameLocation: 'middle',
       nameGap: small ? 20 : 26,
       nameTextStyle: axisText,
@@ -139,7 +142,7 @@ function vivacityOption(
       min: 0,
       max: yt[yt.length - 1],
       interval: yt.length > 1 ? tickStep(yt) * (small && yt.length > 4 ? 2 : 1) : undefined,
-      name: small ? '' : `Dynamic vivacity, ${vivacityUnit}`,
+      name: small ? '' : t('Dynamic vivacity, {unit}', { unit: vivacityUnit }),
       nameLocation: 'end',
       nameTextStyle: { ...axisText, align: 'left' },
       axisLabel: { ...axisText, formatter: (v: number) => formatNumber(v, dy) },
@@ -183,10 +186,11 @@ export function VivacityChart({
   /** Burnt fractions of a run to mark, as shot start, peak pressure and muzzle (workbench). */
   marks?: Mark[] | undefined
 }) {
+  const { t } = useTranslation()
   const tokens = useChartTokens(vivacityTokens)
   const option = useMemo(
-    () => (tokens ? vivacityOption(tokens, series, height, marks) : {}),
-    [series, tokens, height, marks],
+    () => (tokens ? vivacityOption(tokens, series, height, marks, t) : {}),
+    [series, tokens, height, marks, t],
   )
   return (
     <div className="chart vivacity-chart">
