@@ -5,6 +5,8 @@ import type { GroupStatistics } from '@open-reloading/core'
 import type { SheetNote, ShotGroup } from '@open-reloading/schema'
 import { BracketsCurly, Plus, Trash } from '@phosphor-icons/react'
 import { type KeyboardEvent, type PointerEvent, useRef, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import type { Translator } from '../i18n/translate.ts'
 import { nth } from '../lib/nth.ts'
 import { type Frame, screenNudge, targetToView, viewToTarget } from '../lib/target-editor.ts'
 import type { Point } from '../lib/target-geometry.ts'
@@ -15,12 +17,17 @@ import type { UnitSystem } from '../lib/units.ts'
 import { arrows, viewPoint } from './svg-point.ts'
 
 /** The shown text of each note, statistics computed once per group. */
-function shownTexts(notes: SheetNote[], groups: ShotGroup[], system: UnitSystem) {
+function shownTexts(
+  notes: SheetNote[],
+  groups: ShotGroup[],
+  system: UnitSystem,
+  t: Translator['t'],
+) {
   const stats = new Map<string, GroupStatistics>()
   return notes.map((n) => {
     const g = groups.find((x) => x.id === n.group)
     if (g && !stats.has(g.id)) stats.set(g.id, groupStatisticsOf(g))
-    return resolveNote(n.text, g, system, g && stats.get(g.id))
+    return resolveNote(n.text, g, system, g && stats.get(g.id), t)
   })
 }
 
@@ -64,7 +71,8 @@ export function NotesLayer({
   onEdit: (id: string) => void
 }) {
   const drag = useRef<{ id: string; dx: number; dy: number; first: boolean }>(undefined)
-  const texts = shownTexts(notes, groups, system)
+  const { t } = useTranslation()
+  const texts = shownTexts(notes, groups, system, t)
   const font = 12 * k
   const pad = 4 * k
   const toPoint = (e: PointerEvent<SVGElement>) =>
@@ -97,7 +105,7 @@ export function NotesLayer({
             key={n.id}
             role="button"
             tabIndex={still ? -1 : 0}
-            aria-label={`Note ${i + 1}: ${texts[i]}`}
+            aria-label={t('Note {n}: {text}', { n: i + 1, text: nth(texts, i) })}
             className="sheet-note"
             data-note={n.id}
             data-selected={n.id === selected || undefined}
@@ -157,6 +165,7 @@ function PlaceholderPicker({
   system: UnitSystem
   onPick: (token: string) => void
 }) {
+  const { t } = useTranslation()
   const [opened, setOpened] = useState(false)
   return (
     <Popover opened={opened} onChange={setOpened} position="left-start" shadow="sm" withinPortal>
@@ -164,8 +173,8 @@ function PlaceholderPicker({
         <ActionIcon
           variant="default"
           size={controlSize.row.icon}
-          aria-label="Insert a value"
-          title="Insert a value of the group; it follows the shots"
+          aria-label={t('Insert a value')}
+          title={t('Insert a value of the group; it follows the shots')}
           onClick={() => setOpened((o) => !o)}
         >
           <BracketsCurly size={14} aria-hidden="true" />
@@ -173,25 +182,32 @@ function PlaceholderPicker({
       </Popover.Target>
       <Popover.Dropdown>
         <table className="placeholder-table">
-          <caption className="visually-hidden">Values to insert</caption>
+          <caption className="visually-hidden">{t('Values to insert')}</caption>
           <tbody>
             {notePlaceholders.map((p) => (
               <tr key={p.label}>
-                <th scope="row" title={p.help}>
-                  {p.label}
+                <th scope="row" title={t(p.help)}>
+                  {t(p.label)}
                 </th>
-                {p.tokens.map((t) => (
-                  <td key={t.token} colSpan={t.unit ? 1 : 3}>
+                {p.tokens.map((tk) => (
+                  <td key={tk.token} colSpan={tk.unit ? 1 : 3}>
                     <Button
                       size={controlSize.row.button}
                       variant="default"
-                      aria-label={`${p.label}${t.unit ? ` in ${readoutUnitName(t.unit, system)}` : ''}`}
+                      aria-label={
+                        tk.unit
+                          ? t('{label} in {unit}', {
+                              label: t(p.label),
+                              unit: readoutUnitName(tk.unit, system),
+                            })
+                          : t(p.label)
+                      }
                       onClick={() => {
-                        onPick(t.token)
+                        onPick(tk.token)
                         setOpened(false)
                       }}
                     >
-                      {t.unit ? readoutUnitName(t.unit, system) : 'Insert'}
+                      {tk.unit ? readoutUnitName(tk.unit, system) : t('Insert')}
                     </Button>
                   </td>
                 ))}
@@ -232,6 +248,7 @@ export function NotesPanel({
   /** The text fields by note id, so Enter on a note on the target focuses its field. */
   fieldRef: { current: Map<string, HTMLTextAreaElement> }
 }) {
+  const { t } = useTranslation()
   const insert = (n: SheetNote, token: string) => {
     const el = fieldRef.current.get(n.id)
     const [a, b] = el ? [el.selectionStart, el.selectionEnd] : [n.text.length, n.text.length]
@@ -250,18 +267,18 @@ export function NotesPanel({
         disabled={!canAdd || notes.length >= 50}
         title={
           canAdd
-            ? 'A note on the target; values inserted from the picker follow the shots.'
-            : 'Mark a reference first.'
+            ? t('A note on the target; values inserted from the picker follow the shots.')
+            : t('Mark a reference first.')
         }
         onClick={onAdd}
       >
-        Add note
+        {t('Add note')}
       </Button>
       {notes.map((n, i) => (
         <div key={n.id} className="note-row" data-selected={n.id === selected || undefined}>
           <Textarea
             size={controlSize.row.input}
-            label={`Note ${i + 1}`}
+            label={t('Note {n}', { n: i + 1 })}
             autosize
             minRows={1}
             maxRows={4}
@@ -276,20 +293,20 @@ export function NotesPanel({
           <span className="note-tools">
             <NativeSelect
               size={controlSize.row.input}
-              aria-label={`Group of note ${i + 1}`}
-              title="The group whose values the note shows"
+              aria-label={t('Group of note {n}', { n: i + 1 })}
+              title={t('The group whose values the note shows')}
               data={[
-                { value: '', label: 'No group' },
+                { value: '', label: t('No group') },
                 ...groups.map((g) => ({ value: g.id, label: g.name })),
               ]}
               value={groups.some((g) => g.id === n.group) ? n.group : ''}
               onChange={(e) => onChange(n.id, { group: e.currentTarget.value || undefined })}
             />
-            <PlaceholderPicker system={system} onPick={(t) => insert(n, t)} />
+            <PlaceholderPicker system={system} onPick={(token) => insert(n, token)} />
             <ActionIcon
               variant="subtle"
               size={controlSize.row.icon}
-              aria-label={`Delete note ${i + 1}`}
+              aria-label={t('Delete note {n}', { n: i + 1 })}
               onClick={() => onDelete(n.id)}
             >
               <Trash size={14} aria-hidden="true" />

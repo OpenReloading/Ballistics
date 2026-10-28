@@ -2,6 +2,8 @@
 
 import { type Load, type SessionRecord, toSi, userRecord } from '@open-reloading/schema'
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import type { Translator } from '../i18n/translate.ts'
 import { errorText } from '../lib/error-text.ts'
 import {
   addShot,
@@ -55,15 +57,15 @@ export interface RangeLoad {
 const userRef = (id: string) => `user:${id}`
 
 /** Names the session in the stored load, with the snapshot of the load as it is, in one transaction. */
-async function linkSession(load: RangeLoad, ref: string) {
+async function linkSession(load: RangeLoad, ref: string, t: Translator['t']) {
   const firearm = load.data.firearm?.startsWith('user:') ? load.data.firearm.slice(5) : undefined
   const stored = firearm ? userRecord.safeParse(await storedRecord(firearm)) : undefined
   const roundCount =
     stored?.success && stored.data.kind === 'firearm' ? stored.data.data.roundCount : undefined
   await updateRecord(load.id, (raw) => {
     const found = userRecord.safeParse(raw)
-    if (!found.success) throw new Error('The stored load is not a valid load.')
-    return withSession(found.data, ref, roundCount, new Date())
+    if (!found.success) throw new Error(t('The stored load is not a valid load.'))
+    return withSession(found.data, ref, roundCount, new Date(), t)
   })
 }
 
@@ -106,6 +108,7 @@ function writeDraft(key: string, draft: { weather: WeatherText; note: string } |
  * the change to it) and shown once that write has committed.
  */
 export function useRangeMode() {
+  const { t } = useTranslation()
   const { system } = useUnits()
   const [loads, setLoads] = useState<RangeLoad[]>()
   const [failure, setFailure] = useState<string>()
@@ -220,17 +223,21 @@ export function useRangeMode() {
       try {
         const key = `${loadId}:${id}`
         if (linked.current !== key) {
-          if (load) await linkSession(load, userRef(id))
+          if (load) await linkSession(load, userRef(id), t)
           linked.current = key
         }
       } catch (e) {
-        setProblem(`Saved, but the load does not list this session yet: ${errorText(e)}`)
+        setProblem(
+          t('Saved, but the load does not list this session yet: {reason}', {
+            reason: errorText(e),
+          }),
+        )
       } finally {
         setSaving(false)
       }
       return true
     },
-    [loadId, load],
+    [loadId, load, t],
   )
 
   const velocity = system.velocity
@@ -241,16 +248,16 @@ export function useRangeMode() {
   async function add() {
     const c = context()
     if (!c || !step || saving) return
-    const parsed = parseVelocity(entry, velocity.toSi)
+    const parsed = parseVelocity(entry, velocity.toSi, t)
     if ('error' in parsed) return setProblem(parsed.error)
-    const typed = parseWeather(weather, system)
+    const typed = parseWeather(weather, system, t)
     if ('error' in typed) return setProblem(typed.error)
     void requestPersistentStorage()
     const n = (string?.shots.length ?? 0) + 1
     const ok = await commit(
       c.id,
-      addShot(c, step, parsed.velocity, { conditions: typed.conditions, note }),
-      `Shot ${n} saved on this device.`,
+      addShot(c, step, parsed.velocity, { conditions: typed.conditions, note }, t),
+      t('Shot {n} saved on this device.', { n }),
     )
     if (ok) {
       setEntry('')
@@ -264,8 +271,10 @@ export function useRangeMode() {
     if (!c || !step) return
     await commit(
       c.id,
-      setExcluded(c, step, index, excluded),
-      `Shot ${index + 1} ${excluded ? 'excluded' : 'included'}.`,
+      setExcluded(c, step, index, excluded, t),
+      excluded
+        ? t('Shot {n} excluded.', { n: index + 1 })
+        : t('Shot {n} included.', { n: index + 1 }),
     )
   }
 
@@ -276,12 +285,12 @@ export function useRangeMode() {
     const c = context()
     if (!c || !step) return
     if (index < 0) return writeDraft(draftKey(c.id, step.key), next)
-    const typed = parseWeather(next.weather, system)
+    const typed = parseWeather(next.weather, system, t)
     if ('error' in typed) return setProblem(typed.error)
     await commit(
       c.id,
-      setNotes(c, step, { conditions: typed.conditions, note: next.note }),
-      'Conditions and note saved on this device.',
+      setNotes(c, step, { conditions: typed.conditions, note: next.note }, t),
+      t('Conditions and note saved on this device.'),
     )
   }
 

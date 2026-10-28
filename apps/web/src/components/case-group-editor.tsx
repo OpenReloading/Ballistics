@@ -3,6 +3,7 @@
 import { Button } from '@mantine/core'
 import type { Case, UserCaseRecord, UserRecord } from '@open-reloading/schema'
 import { useCallback, useDeferredValue, useEffect, useRef, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { CartridgeDetail } from '../lib/api-types.ts'
 import { blankCaseGroup, caseGroupProblem, groupCapacity, withCapacity } from '../lib/case-group.ts'
@@ -54,6 +55,7 @@ const capacityIn = (c: Case, records: readonly UserRecord[] | undefined) => {
  * stored one that `?record=` names. The File menu saves and opens the browser's groups.
  */
 export function CaseGroupEditor() {
+  const { t } = useTranslation()
   const { system } = useUnits()
   const [data, setData] = useState<Case>(blankCaseGroup)
   /** The measured water capacity, m3: a record of its own that the group names. */
@@ -81,7 +83,7 @@ export function CaseGroupEditor() {
 
   // the File menu renders after an edit, from the deferred data
   const fileData = useDeferredValue(withCapacity(data, capacity))
-  const problem = caseGroupProblem(fileData.name ?? '', fileData)
+  const problem = caseGroupProblem(fileData.name ?? '', fileData, t)
   const patch = (p: Partial<Case>) => setData((d) => ({ ...d, ...p }))
   /** A cleared field also drops the reference to a record this browser does not hold. */
   const changeCapacity = (m3: number | undefined) => {
@@ -117,7 +119,7 @@ export function CaseGroupEditor() {
                 if (await menu.current?.startNew(blank)) show(blank)
               }}
             >
-              New case group
+              {t('New case group')}
             </Button>
             <FileMenu
               ref={menu}

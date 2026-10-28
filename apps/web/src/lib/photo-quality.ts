@@ -7,6 +7,7 @@
  * detection, never that a detection is right. Pure: no React, DOM or Next.js.
  */
 import { fromSi, type TargetFace } from '@open-reloading/schema'
+import { type Message, msg } from '../i18n/translate.ts'
 import type { Ellipse } from './ellipse.ts'
 import { grayGrid, shareInside } from './face-image.ts'
 import type { RgbaImage } from './image.ts'
@@ -31,10 +32,12 @@ type QualityLevel = 'fair' | 'bad'
 export type QualityIssue = {
   problem: QualityProblem
   level: QualityLevel
-  /** What the photo shows, one sentence. */
-  text: string
+  /** What the photo shows, one sentence; a catalogue message, `{n}` is `n`. */
+  text: Message
+  /** The number `text` names (degrees, px), absent when it names none. */
+  n?: number
   /** What to change when retaking it, one sentence. */
-  fix: string
+  fix: Message
 }
 
 /**
@@ -332,9 +335,10 @@ function edgeSharpness(image: RgbaImage, hole: number): number | undefined {
 type Add = (
   problem: keyof typeof limits,
   value: number,
-  text: (level: QualityLevel) => string,
-  fix: string,
+  text: Message,
+  fix: Message,
   limit?: readonly [number, number],
+  n?: number,
 ) => void
 
 /** Contrast or brightness, glare and uneven light. */
@@ -347,16 +351,16 @@ function lightIssues(
     add(
       'contrast',
       m.contrast,
-      () => 'The black area and the paper are close in brightness.',
-      'Retake with more light on the target and without a photo filter.',
+      msg('The black area and the paper are close in brightness.'),
+      msg('Retake with more light on the target and without a photo filter.'),
     )
   else if (layout?.dark === true)
     // the target has a black zone and the photo may be filled with it: judge the black itself
     add(
       'contrast',
       m.dark,
-      () => 'The black zones of the target look grey.',
-      'Retake with less light on the target, without a reflection and without a photo filter.',
+      msg('The black zones of the target look grey.'),
+      msg('Retake with less light on the target, without a reflection and without a photo filter.'),
       [110, 150],
     )
   // a dark photo may show a black zone alone, so only a target without one makes this a bad level
@@ -364,22 +368,24 @@ function lightIssues(
     add(
       'exposure',
       m.exposure,
-      () => 'The photo is dark: even its brightest part is dim.',
-      'Retake with more light on the target and without a photo filter.',
+      msg('The photo is dark: even its brightest part is dim.'),
+      msg('Retake with more light on the target and without a photo filter.'),
       layout?.dark === false ? limits.exposure : [limits.exposure[0], 0],
     )
   add(
     'glare',
     m.glare,
-    () => 'A bright reflection covers part of the paper.',
-    'Retake with the light from the side, or turn the sheet a little to move the reflection off the target.',
+    msg('A bright reflection covers part of the paper.'),
+    msg(
+      'Retake with the light from the side, or turn the sheet a little to move the reflection off the target.',
+    ),
   )
   if (m.shadow !== undefined)
     add(
       'shadow',
       m.shadow,
-      () => 'The light is uneven: one side of the target is much darker than another.',
-      'Retake in an even light with no shadow of your hand or phone on the sheet.',
+      msg('The light is uneven: one side of the target is much darker than another.'),
+      msg('Retake in an even light with no shadow of your hand or phone on the sheet.'),
     )
 }
 
@@ -394,16 +400,18 @@ function shapeIssues(add: Add, black: Ellipse, image: RgbaImage, layout: TargetL
     add(
       'tilt',
       tilt,
-      () => `The target is photographed at a slant of about ${Math.round(tilt)} degrees.`,
-      'Retake from straight above, with the camera parallel to the paper.',
+      msg('The target is photographed at a slant of about {n} degrees.'),
+      msg('Retake from straight above, with the camera parallel to the paper.'),
+      limits.tilt,
+      Math.round(tilt),
     )
   }
   if (!layout)
     add(
       'framing',
       framed,
-      () => 'The black area of the target is cut off by the edge of the photo.',
-      'Retake with the whole target and some paper around it in the frame.',
+      msg('The black area of the target is cut off by the edge of the photo.'),
+      msg('Retake with the whole target and some paper around it in the frame.'),
     )
 }
 
@@ -418,12 +426,13 @@ export function photoQuality(view: PhotoView): QualityIssue[] {
   const add: Add = (
     problem: keyof typeof limits,
     value: number,
-    text: (level: QualityLevel) => string,
-    fix: string,
+    text: Message,
+    fix: Message,
     limit: readonly [number, number] = limits[problem],
+    n?: number,
   ) => {
     const level = levelOf(value, limit)
-    if (level) issues.push({ problem, level, text: text(level), fix })
+    if (level) issues.push({ problem, level, text, fix, ...(n !== undefined && { n }) })
   }
   const long = Math.max(image.width, image.height)
   const s = Math.max(1, Math.ceil(long / GRID))
@@ -436,31 +445,41 @@ export function photoQuality(view: PhotoView): QualityIssue[] {
     add(
       'blur',
       width / hole,
-      () => 'The photo is soft: the edges of the target are blurred.',
-      'Hold the camera steady or rest it on something, let it focus on the target and retake.',
+      msg('The photo is soft: the edges of the target are blurred.'),
+      msg('Hold the camera steady or rest it on something, let it focus on the target and retake.'),
     )
   if (black) {
     const px = hole / scale
     add(
       'resolution',
       px,
-      () => `A bullet hole is only about ${Math.max(1, Math.round(px))} px across in this photo.`,
-      'Move closer so the target fills more of the frame, or use the full resolution of the camera.',
+      msg('A bullet hole is only about {n} px across in this photo.'),
+      msg(
+        'Move closer so the target fills more of the frame, or use the full resolution of the camera.',
+      ),
+      limits.resolution,
+      Math.max(1, Math.round(px)),
     )
   } else {
     if (width === undefined)
       issues.push({
         problem: 'face',
         level: 'bad',
-        text: 'No edge of a target or a hole was found in this photo.',
-        fix: 'Retake with the target in the frame, in even light and held steady, or set the scale by hand.',
+        text: msg('No edge of a target or a hole was found in this photo.'),
+        fix: msg(
+          'Retake with the target in the frame, in even light and held steady, or set the scale by hand.',
+        ),
       })
     const longPhoto = long / scale
     add(
       'resolution',
       longPhoto / 80,
-      () => `The photo is only ${Math.round(longPhoto)} px on its longer side.`,
-      'Move closer so the target fills more of the frame, or use the full resolution of the camera.',
+      msg('The photo is only {n} px on its longer side.'),
+      msg(
+        'Move closer so the target fills more of the frame, or use the full resolution of the camera.',
+      ),
+      limits.resolution,
+      Math.round(longPhoto),
     )
   }
   lightIssues(add, m, layout)

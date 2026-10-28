@@ -1,6 +1,7 @@
 import { dispersionEllipse, predictionEllipse, subtendedAngle } from '@open-reloading/core'
 import type { ShotGroup, TargetSheet } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import { readouts } from '../src/lib/group-readouts.ts'
 import { type LabelBox, type LabelScene, placeLabel } from '../src/lib/label-placement.ts'
 import {
@@ -489,10 +490,12 @@ describe('close-the-page copies', () => {
 
   it('keeps an edit another tab saved over as a copy under a new id', () => {
     const edit = { ...at('a', '3'), name: 'Sheet' }
-    const own = keptCopy(edit, 'b')
+    const own = keptCopy(edit, 'b', english.t)
     expect(own).toEqual({ ...edit, id: 'b', name: 'Sheet (copy)' })
-    expect(keptNote(own.name)).toBe('Changed in another tab: your edits are kept as Sheet (copy).')
+    expect(keptNote(own.name, english.t)).toBe(
+      'Changed in another tab: your edits are kept as Sheet (copy).',
+    )
     // within the 200 characters of a record name
-    expect(keptCopy({ ...edit, name: 'x'.repeat(200) }, 'b').name).toHaveLength(200)
+    expect(keptCopy({ ...edit, name: 'x'.repeat(200) }, 'b', english.t).name).toHaveLength(200)
   })
 })

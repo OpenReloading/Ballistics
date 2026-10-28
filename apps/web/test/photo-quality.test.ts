@@ -1,5 +1,6 @@
 import sharp from 'sharp'
 import { describe, expect, it } from 'vitest'
+import { msg } from '../src/i18n/translate.ts'
 import type { RgbaImage } from '../src/lib/image.ts'
 import {
   belowMinimum,
@@ -187,7 +188,7 @@ describe('the edge of the black area', () => {
 
 describe('belowMinimum', () => {
   it('holds only for a problem at the bad level', () => {
-    const issue = { problem: 'tilt', text: '', fix: '' } as const
+    const issue = { problem: 'tilt', text: msg(''), fix: msg('') } as const
     expect(belowMinimum([])).toBe(false)
     expect(belowMinimum([{ ...issue, level: 'fair' }])).toBe(false)
     expect(

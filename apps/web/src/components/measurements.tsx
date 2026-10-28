@@ -8,7 +8,7 @@ import { type Dispatch, type ReactNode, type SetStateAction, useRef, useState } 
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
-import { chronoFileBytes, readChrono } from '../lib/chrono.ts'
+import { chronoFileBytes, chronoMessageText, readChrono } from '../lib/chrono.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { errorText } from '../lib/error-text.ts'
 import {
@@ -190,7 +190,7 @@ type Failure = { file: string; tooMany: true } | { file: string; message: string
 const failureText = (f: Failure, t: Translator['t']) =>
   'tooMany' in f
     ? t('{file}: a load keeps {max} sessions at most.', { file: f.file, max: maxSessions })
-    : `${f.file}: ${translateMessage(f.message, t)}`
+    : `${f.file}: ${chronoMessageText(f.message, t)}`
 
 /** `text` of a statistic when there is one, else nothing. */
 const when = <T,>(x: T | undefined, text: (x: T) => string) => (x === undefined ? '' : text(x))
@@ -557,7 +557,9 @@ export function Measurements({
                 </select>
                 {(str.conditions || str.note) && (
                   <p className="note">
-                    {[conditionsText(str.conditions, system), str.note].filter((x) => x).join('. ')}
+                    {[conditionsText(str.conditions, system, t), str.note]
+                      .filter((x) => x)
+                      .join('. ')}
                   </p>
                 )}
               </div>

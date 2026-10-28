@@ -1,6 +1,7 @@
 import { readRecords } from '@open-reloading/data'
 import type { TargetFace } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import {
   faceAlignment,
   fitRings,
@@ -153,18 +154,20 @@ describe('fitRings', () => {
 
   it('stays within the mark noise', () => {
     const noise = 0.05e-3
-    const fit = fitRings([
-      marks(15.5, [0, 72, 144, 216, 288], noise),
-      marks(35.5, [36, 108, 180, 252, 324], noise),
-    ])
+    const fit = fitRings(
+      [marks(15.5, [0, 72, 144, 216, 288], noise), marks(35.5, [36, 108, 180, 252, 324], noise)],
+      english.t,
+    )
     expect(Math.hypot(fit.centre.x - centre.x, fit.centre.y - centre.y)).toBeLessThan(noise)
     expect(Math.abs(fit.scale / scale - 1)).toBeLessThan(0.01)
     expect(fit.rmsMisfit).toBeLessThan(2 * noise)
   })
 
   it('refuses marks on one ring or fewer than four points', () => {
-    expect(() => fitRings([marks(5.5, [0, 90, 180, 270])])).toThrow(/two rings/)
-    expect(() => fitRings([marks(5.5, [0, 90]), marks(25.5, [45])])).toThrow(/four points/)
+    expect(() => fitRings([marks(5.5, [0, 90, 180, 270])], english.t)).toThrow(/two rings/)
+    expect(() => fitRings([marks(5.5, [0, 90]), marks(25.5, [45])], english.t)).toThrow(
+      /four points/,
+    )
   })
 })
 
@@ -185,11 +188,11 @@ describe('face on the sheet (target m) and face m', () => {
   })
 
   it('centres the face on the point of aim at the calibrated scale without marks', () => {
-    expect(faceAlignment(rifle50, undefined, { x: 0.002, y: 0.003 })).toEqual({
+    expect(faceAlignment(rifle50, undefined, { x: 0.002, y: 0.003 }, english.t)).toEqual({
       centre: { x: 0.002, y: 0.003 },
       scale: 1,
     })
-    expect(faceAlignment(rifle50, undefined, undefined)).toEqual({
+    expect(faceAlignment(rifle50, undefined, undefined, english.t)).toEqual({
       centre: { x: 0, y: 0 },
       scale: 1,
     })
@@ -213,14 +216,14 @@ describe('face on the sheet (target m) and face m', () => {
       const r = (d / 2) * 1e-3 * scale
       return { ring, x: centre.x + r * Math.cos(a), y: centre.y + r * Math.sin(a) }
     })
-    const a = faceAlignment(rifle50, marks, { x: 1, y: 1 })
+    const a = faceAlignment(rifle50, marks, { x: 1, y: 1 }, english.t)
     expect(a.centre.x).toBeCloseTo(centre.x, 12)
     expect(a.centre.y).toBeCloseTo(centre.y, 12)
     expect(a.scale).toBeCloseTo(scale, 10)
     expect(a.rms).toBeLessThan(1e-12)
-    expect(() => faceAlignment(rifle50, [{ ring: 11, x: 0, y: 0 }, ...marks], undefined)).toThrow(
-      /ring 11/,
-    )
+    expect(() =>
+      faceAlignment(rifle50, [{ ring: 11, x: 0, y: 0 }, ...marks], undefined, english.t),
+    ).toThrow(/ring 11/)
   })
 
   it('draws a ring as a closed polyline on the sheet', () => {
@@ -256,6 +259,7 @@ describe('scoreGroupOnFace', () => {
       { id: rifle50.id, event: '50m-rifle-prone' },
       group,
       undefined,
+      english.t,
     )
     if ('error' in s) throw new Error(s.error)
     expect(s.hole).toBeCloseTo(5.6e-3, 15)
@@ -268,10 +272,10 @@ describe('scoreGroupOnFace', () => {
 
   it('takes the bullet diameter without an event and follows a moved shot', () => {
     const f = { id: rifle50.id }
-    expect(scoreGroupOnFace(rifle50, f, group, undefined)).toEqual({
+    expect(scoreGroupOnFace(rifle50, f, group, undefined, english.t)).toEqual({
       error: 'No hole size: set Marker, or choose a discipline or event with a gauge.',
     })
-    const s = scoreGroupOnFace(rifle50, f, group, 7.82e-3)
+    const s = scoreGroupOnFace(rifle50, f, group, 7.82e-3, english.t)
     if ('error' in s) throw new Error(s.error)
     expect(s.hole).toBe(7.82e-3)
     const moved = scoreGroupOnFace(
@@ -279,6 +283,7 @@ describe('scoreGroupOnFace', () => {
       f,
       { shots: [defined(group.shots[0]), { ...at(30, 90), placement: 'placed' as const }] },
       7.82e-3,
+      english.t,
     )
     if ('error' in moved) throw new Error(moved.error)
     expect(moved.score.total).toBeLessThan(s.score.total)
@@ -286,7 +291,9 @@ describe('scoreGroupOnFace', () => {
 
   it('says so when the marks do not fit', () => {
     const marks = [0, 1, 2, 3].map((i) => ({ ring: 8 + (i % 2), x: 0, y: 0 }))
-    expect(scoreGroupOnFace(rifle50, { id: rifle50.id, marks }, group, 5e-3)).toMatchObject({
+    expect(
+      scoreGroupOnFace(rifle50, { id: rifle50.id, marks }, group, 5e-3, english.t),
+    ).toMatchObject({
       error: expect.stringMatching(/^The ring marks do not fit/),
     })
   })

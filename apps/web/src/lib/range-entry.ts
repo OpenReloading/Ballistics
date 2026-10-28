@@ -1,6 +1,7 @@
 import type { Load, SessionRecord, UserRecord } from '@open-reloading/schema'
 import { chronoSession, fromSi, toSi, userRecord } from '@open-reloading/schema'
-import { ambiguousMessage, parseNumber } from '../i18n/number.ts'
+import { ambiguousMessage, parseNumber, untranslated } from '../i18n/number.ts'
+import { msg, type Translator } from '../i18n/translate.ts'
 import { stringStats } from './string-stats.ts'
 import { type Unit, type UnitSystem, withUnit } from './units.ts'
 
@@ -94,11 +95,16 @@ export interface RangeContext {
  * It throws for a stored record that is not a session of this load: that record is left alone.
  */
 const changeString =
-  (context: RangeContext, step: RangeStep, edit: (s: SessionString | undefined) => SessionString) =>
+  (
+    context: RangeContext,
+    step: RangeStep,
+    edit: (s: SessionString | undefined) => SessionString,
+    t: Translator['t'],
+  ) =>
   (stored: unknown): SessionRecord => {
     const found = stored === undefined ? undefined : userRecord.safeParse(stored)
     if (found && !(found.success && found.data.kind === 'session'))
-      throw new Error('The stored record of this session is not a valid session.')
+      throw new Error(t('The stored record of this session is not a valid session.'))
     const base: SessionRecord =
       found?.data.kind === 'session'
         ? found.data
@@ -153,17 +159,23 @@ export const addShot = (
   step: RangeStep,
   velocity: number,
   typed: { conditions?: Conditions | undefined; note?: string | undefined } = {},
+  t: Translator['t'] = untranslated(),
 ) =>
-  changeString(context, step, (s) => {
-    const shots = [...(s?.shots ?? []), { velocity: { value: velocity } }]
-    return s
-      ? { ...s, shots }
-      : {
-          ...freshString(context.loadRef, step, shots),
-          ...(typed.conditions && { conditions: typed.conditions }),
-          ...(typed.note && { note: typed.note }),
-        }
-  })
+  changeString(
+    context,
+    step,
+    (s) => {
+      const shots = [...(s?.shots ?? []), { velocity: { value: velocity } }]
+      return s
+        ? { ...s, shots }
+        : {
+            ...freshString(context.loadRef, step, shots),
+            ...(typed.conditions && { conditions: typed.conditions }),
+            ...(typed.note && { note: typed.note }),
+          }
+    },
+    t,
+  )
 
 /** The change that marks shot `index` as excluded, or takes the mark off. A missing shot changes nothing. */
 export const setExcluded = (
@@ -171,34 +183,46 @@ export const setExcluded = (
   step: RangeStep,
   index: number,
   excluded: boolean,
+  t: Translator['t'] = untranslated(),
 ) =>
-  changeString(context, step, (s) => {
-    if (!s || index < 0 || index >= s.shots.length) throw new RangeError('No such shot.')
-    return {
-      ...s,
-      shots: s.shots.map((shot, i) => {
-        if (i !== index) return shot
-        const { excluded: _, ...rest } = shot
-        return excluded ? { ...rest, excluded: rangeExcluded } : rest
-      }),
-    }
-  })
+  changeString(
+    context,
+    step,
+    (s) => {
+      if (!s || index < 0 || index >= s.shots.length) throw new RangeError(t('No such shot.'))
+      return {
+        ...s,
+        shots: s.shots.map((shot, i) => {
+          if (i !== index) return shot
+          const { excluded: _, ...rest } = shot
+          return excluded ? { ...rest, excluded: rangeExcluded } : rest
+        }),
+      }
+    },
+    t,
+  )
 
 /** The change that sets the weather of a string (a field left out is removed) and its note. */
 export const setNotes = (
   context: RangeContext,
   step: RangeStep,
   fields: { conditions: Conditions; note: string },
+  t: Translator['t'] = untranslated(),
 ) =>
-  changeString(context, step, (s) => {
-    if (!s) throw new RangeError('The string has no shot yet.')
-    const { conditions: _c, note: _n, ...rest } = s
-    return {
-      ...rest,
-      ...(Object.keys(fields.conditions).length > 0 && { conditions: fields.conditions }),
-      ...(fields.note && { note: fields.note }),
-    }
-  })
+  changeString(
+    context,
+    step,
+    (s) => {
+      if (!s) throw new RangeError(t('The string has no shot yet.'))
+      const { conditions: _c, note: _n, ...rest } = s
+      return {
+        ...rest,
+        ...(Object.keys(fields.conditions).length > 0 && { conditions: fields.conditions }),
+        ...(fields.note && { note: fields.note }),
+      }
+    },
+    t,
+  )
 
 /** The statistics of a string over its shots that are not excluded; undefined when none is left. */
 export const rangeStats = (s: SessionString | undefined) => s && stringStats(s.shots)
@@ -210,13 +234,14 @@ export const rangeStats = (s: SessionString | undefined) => s && stringStats(s.s
 export function parseVelocity(
   text: string,
   toSi: (x: number) => number,
+  t: Translator['t'] = untranslated(),
 ): { velocity: number } | { error: string } {
   const p = parseNumber(text)
-  if (p.kind === 'ambiguous') return { error: ambiguousMessage(p) }
+  if (p.kind === 'ambiguous') return { error: ambiguousMessage(p, t) }
   if (p.kind !== 'number' || p.value <= 0)
-    return { error: 'Enter the velocity as a number above zero.' }
+    return { error: t('Enter the velocity as a number above zero.') }
   const si = toSi(p.value)
-  return si > maxVelocity ? { error: 'That is too fast for a velocity.' } : { velocity: si }
+  return si > maxVelocity ? { error: t('That is too fast for a velocity.') } : { velocity: si }
 }
 
 /**
@@ -273,25 +298,26 @@ export interface WeatherText {
 export function parseWeather(
   text: WeatherText,
   units: { temperature: Unit; airPressure: Unit; windSpeed: Unit },
+  t: Translator['t'] = untranslated(),
 ): { conditions: Conditions } | { error: string } {
   const conditions: Conditions = {}
   let ambiguous: string | undefined
   const read = (typed: string, name: string, valid: (x: number) => boolean) => {
     const p = parseNumber(typed)
     if (p.kind === 'empty') return
-    if (p.kind === 'ambiguous') ambiguous ??= ambiguousMessage(p)
+    if (p.kind === 'ambiguous') ambiguous ??= ambiguousMessage(p, t)
     return p.kind === 'number' && valid(p.value) ? p.value : name
   }
   const temperature = read(text.temperature, 'temperature', () => true)
-  const pressure = read(text.pressure, 'air pressure', (x) => x > 0)
-  const wind = read(text.wind, 'wind speed', (x) => x >= 0)
+  const pressure = read(text.pressure, 'pressure', (x) => x > 0)
+  const wind = read(text.wind, 'wind', (x) => x >= 0)
   if (ambiguous) return { error: ambiguous }
-  for (const [x, name] of [
-    [temperature, 'temperature'],
-    [pressure, 'air pressure'],
-    [wind, 'wind speed'],
+  for (const [x, refusal] of [
+    [temperature, msg('Enter the temperature as a number.')],
+    [pressure, msg('Enter the air pressure as a number.')],
+    [wind, msg('Enter the wind speed as a number.')],
   ] as const)
-    if (typeof x === 'string') return { error: `Enter the ${name} as a number.` }
+    if (typeof x === 'string') return { error: t(refusal) }
   if (typeof temperature === 'number')
     conditions.airTemperature = {
       value: fromSi('temperature', units.temperature.toSi(temperature)),
@@ -304,13 +330,22 @@ export function parseWeather(
 }
 
 /** The weather of a string as one line in the units shown, `''` without any. */
-export function conditionsText(c: Conditions | undefined, system: UnitSystem) {
+export function conditionsText(
+  c: Conditions | undefined,
+  system: UnitSystem,
+  t: Translator['t'] = untranslated(),
+) {
   return [
     c?.airTemperature &&
-      `air ${withUnit('temperature', system, toSi('temperature', c.airTemperature.value))}`,
+      t('air {value}', {
+        value: withUnit('temperature', system, toSi('temperature', c.airTemperature.value)),
+      }),
     c?.stationPressure &&
       `${withUnit('airPressure', system, toSi('pressure', c.stationPressure.value))}`,
-    c?.windSpeed && `wind ${withUnit('windSpeed', system, toSi('velocity', c.windSpeed.value))}`,
+    c?.windSpeed &&
+      t('wind {value}', {
+        value: withUnit('windSpeed', system, toSi('velocity', c.windSpeed.value)),
+      }),
   ]
     .filter((x) => x)
     .join(', ')
@@ -332,13 +367,14 @@ export function withSession(
   ref: string,
   roundCount: number | undefined,
   now: Date,
+  t: Translator['t'] = untranslated(),
 ): UserRecord | undefined {
-  if (record.kind !== 'load') throw new Error('The stored load is not a valid load.')
+  if (record.kind !== 'load') throw new Error(t('The stored load is not a valid load.'))
   const d = record.data
   const sessions = d.sessions ?? []
   if (sessions.includes(ref)) return undefined
   if (sessions.length >= maxSessions)
-    throw new Error(`A load keeps ${maxSessions} sessions at most.`)
+    throw new Error(t('A load keeps {max} sessions at most.', { max: maxSessions }))
   const lots = {
     powderLot: lot(d.powderLot),
     primerLot: lot(d.primer?.lot),

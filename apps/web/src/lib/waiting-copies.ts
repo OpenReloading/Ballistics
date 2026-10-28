@@ -1,3 +1,5 @@
+import type { Translator } from '../i18n/translate.ts'
+
 /** A sheet copy kept while the page closes, until its save lands. */
 type WaitingCopy = { id: string; saved: string }
 
@@ -19,11 +21,15 @@ export const withoutWaitingCopy = <T extends WaitingCopy>(list: T[], id: string,
 export const keptCopy = <T extends { id: string; name: string; saved: string }>(
   r: T,
   id: string,
+  t: Translator['t'],
 ): T => ({
   ...r,
   id,
-  name: `${r.name.slice(0, 193)} (copy)`,
+  name: t('{name} (copy)', {
+    name: r.name.slice(0, 200 - t('{name} (copy)', { name: '' }).length),
+  }),
 })
 
 /** The note on a `keptCopy`. */
-export const keptNote = (name: string) => `Changed in another tab: your edits are kept as ${name}.`
+export const keptNote = (name: string, t: Translator['t']) =>
+  t('Changed in another tab: your edits are kept as {name}.', { name })

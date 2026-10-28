@@ -12,10 +12,12 @@ import {
 import { type Case, caseMaterials } from '@open-reloading/schema'
 import { X } from '@phosphor-icons/react'
 import { type Dispatch, type SetStateAction, useEffect, useRef, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { apiFetch } from '../lib/api-fetch.ts'
 import type { CartridgeSummary, CaseSummary } from '../lib/api-types.ts'
 import { caseGroupCapacitySpec, caseGroupFields } from '../lib/case-group.ts'
 import { fieldSi, fieldStored } from '../lib/firearm.ts'
+import { kebabValue } from '../lib/list-values.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import { controlSize } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
@@ -72,6 +74,7 @@ export function CaseEditor({
   patch: (p: Partial<Case>) => void
   setCapacity: (m3: number | undefined) => void
 }) {
+  const { t } = useTranslation()
   const names = useManufacturerNames()
   const products = useProducts(data.cartridge)
   // the last chosen cartridge: clearing the field does not make the next choice a first one
@@ -83,7 +86,7 @@ export function CaseEditor({
     <section aria-labelledby="library-editor" className="library-editor">
       <Group gap="md" wrap="nowrap" className="page-panel-head library-head">
         <h2 id="library-editor" className="page-panel-title record-heading">
-          {data.name || 'New case group'}
+          {data.name || t('New case group')}
         </h2>
         {data.cartridge && (
           <Group gap={2} wrap="nowrap">
@@ -93,7 +96,7 @@ export function CaseEditor({
             <ActionIcon
               variant="subtle"
               size={controlSize.row.icon}
-              aria-label="Clear the cartridge"
+              aria-label={t('Clear the cartridge')}
               onClick={() => patch({ cartridge: '', basedOn: undefined })}
             >
               <X size={14} aria-hidden="true" />
@@ -102,9 +105,9 @@ export function CaseEditor({
         )}
       </Group>
       <p className="note">
-        The capacity and the other values are the ones you measured. The workbench takes the
-        capacity as the measured case capacity of its cartridge and shows it as measured. Enter the
-        mean of the cases you measured and how many there were.
+        {t(
+          'The capacity and the other values are the ones you measured. The workbench takes the capacity as the measured case capacity of its cartridge and shows it as measured. Enter the mean of the cases you measured and how many there were.',
+        )}
       </p>
       <SimpleGrid
         className="firearm-grid"
@@ -113,23 +116,23 @@ export function CaseEditor({
         verticalSpacing="sm"
       >
         <TextInput
-          label="Name"
+          label={t('Name')}
           required
           maxLength={200}
-          description="For example headstamp and batch."
+          description={t('For example headstamp and batch.')}
           value={data.name ?? ''}
           onChange={(e) => patch({ name: e.currentTarget.value })}
           onBlur={() => setNameLeft(true)}
-          error={nameLeft && !data.name ? 'Enter a name.' : undefined}
+          error={nameLeft && !data.name ? t('Enter a name.') : undefined}
         />
         <div className="firearm-row">
           <span className="firearm-label" aria-hidden="true">
-            Cartridge
+            {t('Cartridge')}
           </span>
           <RecordSearch<CartridgeSummary>
             kind="cartridges"
-            label="Cartridge"
-            chosen={cartridgeName(data.cartridge) ?? 'Search cartridges'}
+            label={t('Cartridge')}
+            chosen={cartridgeName(data.cartridge) ?? t('Search cartridges')}
             picked={cartridgeName(data.cartridge) !== undefined}
             describe={(c) => c.name}
             onSelect={(c) => {
@@ -140,14 +143,14 @@ export function CaseEditor({
               chosen.current = cartridge
               patch({ cartridge, basedOn: undefined })
             }}
-            noneText="No cartridge found"
-            unreachableText="The database is unreachable; the cartridge can be chosen later."
+            noneText={t('No cartridge found')}
+            unreachableText={t('The database is unreachable; the cartridge can be chosen later.')}
           />
         </div>
         {products.length > 0 && (
           <NativeSelect
-            label="Start from a case product"
-            description="Takes its material and mass; the values you measured replace them."
+            label={t('Start from a case product')}
+            description={t('Takes its material and mass; the values you measured replace them.')}
             value={data.basedOn?.slice('catalogue:'.length) ?? ''}
             onChange={(e) => {
               const p = product(e.currentTarget.value)
@@ -163,19 +166,19 @@ export function CaseEditor({
               )
             }}
             data={[
-              { value: '', label: 'None' },
+              { value: '', label: t('None') },
               ...products.map((p) => ({ value: p.id, label: label(p) })),
             ]}
           />
         )}
         <NativeSelect
-          label="Material"
+          label={t('Material')}
           value={data.material}
           onChange={(e) => patch({ material: e.currentTarget.value as Case['material'] })}
-          data={caseMaterials.options}
+          data={caseMaterials.options.map((value) => ({ value, label: kebabValue(t, value) }))}
         />
         <TextInput
-          label="Headstamp"
+          label={t('Headstamp')}
           maxLength={200}
           value={data.headstamp ?? ''}
           onChange={(e) => patch({ headstamp: e.currentTarget.value || undefined })}
@@ -197,8 +200,8 @@ export function CaseEditor({
         ))}
         <Textarea
           className="wide"
-          label="Notes"
-          description="How the cases were measured: fired or sized, primed or not."
+          label={t('Notes')}
+          description={t('How the cases were measured: fired or sized, primed or not.')}
           autosize
           minRows={1}
           maxRows={4}

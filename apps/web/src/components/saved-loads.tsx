@@ -4,8 +4,9 @@ import { ActionIcon, Button, Drawer, Text, TextInput } from '@mantine/core'
 import { parseRef } from '@open-reloading/schema'
 import { Copy, DownloadSimple, PencilSimple, Trash } from '@phosphor-icons/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { fixedNumber } from '../i18n/number.ts'
-import { english } from '../i18n/translate.ts'
+import type { Say } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import { dateTimeText } from '../lib/dates.ts'
 import { errorText } from '../lib/error-text.ts'
@@ -35,10 +36,12 @@ import { confirmDialog } from './confirm.tsx'
 /** Saves since the last export (`localStorage` `exportReminder`), counted by the File menu's callbacks. */
 export function useExportReminder() {
   // the text is set in effects and handlers: a date read while rendering is not prerendered
-  const [text, setText] = useState<string>()
+  const { t, tn } = useTranslation()
+  const [due, setDue] = useState<{ reminder: ExportReminder; now: Date }>()
+  const text = due && reminderText(due.reminder, due.now, t, tn)
   useEffect(() => {
     try {
-      setText(reminderText(parseReminder(localStorage.getItem(reminderKey)), new Date()))
+      setDue({ reminder: parseReminder(localStorage.getItem(reminderKey)), now: new Date() })
     } catch {}
   }, [])
   const store = useCallback((next: (r: ExportReminder) => ExportReminder) => {
@@ -50,7 +53,7 @@ export function useExportReminder() {
     try {
       localStorage.setItem(reminderKey, JSON.stringify(value))
     } catch {}
-    setText(reminderText(value, new Date()))
+    setDue({ reminder: value, now: new Date() })
   }, [])
   return {
     text,
@@ -108,7 +111,9 @@ function useCartridgeNames(ids: string[]) {
 }
 
 const megabytes = (bytes: number) =>
-  bytes < 1e5 ? `${Math.max(1, Math.round(bytes / 1e3))} kB` : `${fixedNumber(bytes / 1e6, 1)} MB`
+  bytes < 1e5
+    ? `${fixedNumber(Math.max(1, Math.round(bytes / 1e3)), 0)} kB`
+    : `${fixedNumber(bytes / 1e6, 1)} MB`
 
 /** The field that replaces the button that was pressed takes the focus the button had. */
 const focusField = (field: HTMLInputElement | null) => field?.focus()
@@ -145,7 +150,10 @@ export function SavedLoads({
 }) {
   const [records, setRecords] = useState<LoadRecord[]>([])
   const [query, setQuery] = useState('')
-  const [message, setMessage] = useState('')
+  const { t, tn } = useTranslation()
+  /** The line under the list, written in the language shown. */
+  const [shown, setShown] = useState<{ say: Say }>()
+  const setMessage = (say?: Say) => setShown(say && { say })
   /** Stored loads of the earlier format, which the schema refuses. */
   const [older, setOlder] = useState(0)
   /** The load whose name is edited in its row, with the text. */
@@ -159,16 +167,19 @@ export function SavedLoads({
         setRecords(records.filter((r): r is LoadRecord => r.kind === 'load'))
         setOlder(invalid.filter((i) => i.kind === 'workbenchState').length)
       })
-      .catch(() => setMessage('The saved loads could not be read from this browser.'))
+      .catch(() =>
+        setShown({ say: (t) => t('The saved loads could not be read from this browser.') }),
+      )
   }, [opened, tick])
 
   async function exportOne(r: LoadRecord) {
-    setMessage('')
+    setMessage()
     try {
       const done = await saveAs(userDataText([r]), recordFileName(r.name))
-      if (done) setMessage(`Exported ${r.name} to ${done.name}.`)
+      if (done)
+        setMessage((t) => t('Exported {name} to {file}.', { name: r.name, file: done.name }))
     } catch (e) {
-      setMessage(`Export failed: ${errorText(e)}`)
+      setMessage((t) => t('Export failed: {error}', { error: errorText(e) }))
     }
   }
 
@@ -188,40 +199,40 @@ export function SavedLoads({
     stopEdit()
     const name = text.trim()
     if (!name || name === r.name) return
-    setMessage('')
+    setMessage()
     try {
       await renameStored(r.id, name)
       onRenamed(r.id, name)
       onStored()
     } catch (e) {
-      setMessage(`Rename failed: ${errorText(e)}`)
+      setMessage((t) => t('Rename failed: {error}', { error: errorText(e) }))
     }
   }
 
   async function duplicate(r: LoadRecord) {
-    setMessage('')
+    setMessage()
     try {
       await duplicateStored(r, newId())
       onStored()
     } catch (e) {
-      setMessage(`Copy failed: ${errorText(e)}`)
+      setMessage((t) => t('Copy failed: {error}', { error: errorText(e) }))
     }
   }
 
   async function remove(r: LoadRecord) {
     if (
       !(await confirmDialog({
-        title: `Delete ${r.name} from this browser? This cannot be undone.`,
-        confirmLabel: 'Delete',
+        title: t('Delete {name} from this browser? This cannot be undone.', { name: r.name }),
+        confirmLabel: t('Delete'),
         danger: true,
       }))
     )
       return
-    setMessage('')
+    setMessage()
     try {
       await deleteRecord(r.id)
     } catch (e) {
-      setMessage(`Delete failed: ${errorText(e)}`)
+      setMessage((t) => t('Delete failed: {error}', { error: errorText(e) }))
       return
     }
     setRecords((rs) => rs.filter((x) => x.id !== r.id))
@@ -231,20 +242,20 @@ export function SavedLoads({
   const names = useCartridgeNames([
     ...new Set(records.map((r) => cartridgeGroup(r.data.cartridge))),
   ])
-  const groups = loadGroups(records, query, names, english.t)
+  const groups = loadGroups(records, query, names, t)
   return (
     <Drawer.Root opened={opened} onClose={onClose} size="sm" position="left">
       <Drawer.Overlay />
       <Drawer.Content>
         {/* a div: a second <header> beside the site header would be another banner landmark */}
         <Drawer.Header component="div">
-          <Drawer.Title>Saved loads</Drawer.Title>
-          <Drawer.CloseButton aria-label="Close saved loads" />
+          <Drawer.Title>{t('Saved loads')}</Drawer.Title>
+          <Drawer.CloseButton aria-label={t('Close saved loads')} />
         </Drawer.Header>
         <Drawer.Body>
           <TextInput
-            aria-label="Search saved loads"
-            placeholder="Search"
+            aria-label={t('Search saved loads')}
+            placeholder={t('Search')}
             value={query}
             onChange={(e) => setQuery(e.currentTarget.value)}
             mb="sm"
@@ -261,7 +272,7 @@ export function SavedLoads({
                       {renaming?.id === r.id ? (
                         <input
                           className="saved-rename"
-                          aria-label={`Name of ${r.name}`}
+                          aria-label={t('Name of {name}', { name: r.name })}
                           maxLength={200}
                           ref={focusField}
                           value={renaming.text}
@@ -295,8 +306,8 @@ export function SavedLoads({
                       <ActionIcon
                         size={controlSize.row.icon}
                         variant="subtle"
-                        aria-label={`Rename ${r.name}`}
-                        title="Rename"
+                        aria-label={t('Rename {name}', { name: r.name })}
+                        title={t('Rename')}
                         onClick={() => edit(r.id, r.name)}
                       >
                         <PencilSimple size={16} aria-hidden="true" />
@@ -304,8 +315,8 @@ export function SavedLoads({
                       <ActionIcon
                         size={controlSize.row.icon}
                         variant="subtle"
-                        aria-label={`Duplicate ${r.name}`}
-                        title="Duplicate"
+                        aria-label={t('Duplicate {name}', { name: r.name })}
+                        title={t('Duplicate')}
                         onClick={() => duplicate(r)}
                       >
                         <Copy size={16} aria-hidden="true" />
@@ -313,8 +324,8 @@ export function SavedLoads({
                       <ActionIcon
                         size={controlSize.row.icon}
                         variant="subtle"
-                        aria-label={`Export ${r.name}`}
-                        title="Export to a file"
+                        aria-label={t('Export {name}', { name: r.name })}
+                        title={t('Export to a file')}
                         onClick={() => exportOne(r)}
                       >
                         <DownloadSimple size={16} aria-hidden="true" />
@@ -323,8 +334,8 @@ export function SavedLoads({
                         size={controlSize.row.icon}
                         variant="subtle"
                         color="red"
-                        aria-label={`Delete ${r.name}`}
-                        title="Delete"
+                        aria-label={t('Delete {name}', { name: r.name })}
+                        title={t('Delete')}
                         onClick={() => remove(r)}
                       >
                         <Trash size={16} aria-hidden="true" />
@@ -336,28 +347,36 @@ export function SavedLoads({
             ))}
             {groups.length === 0 && (
               <Text size="sm" c="dimmed">
-                {records.length === 0 ? 'No saved loads.' : 'No match.'}
+                {records.length === 0 ? t('No saved loads.') : t('No match.')}
               </Text>
             )}
           </div>
           <div className="saved-storage" role="status">
-            {message && <p>{message}</p>}
+            {shown && <p>{shown.say(t)}</p>}
             {older > 0 && (
               <p>
-                {older === 1 ? '1 saved load is' : `${older} saved loads are`} in the format of an
-                earlier version, which this app no longer reads. Open lists{' '}
-                {older === 1 ? 'it' : 'them'} under Invalid records.
+                {tn(
+                  older,
+                  '{count} saved load is in the format of an earlier version, which this app no longer reads. Open lists it under Invalid records.',
+                  '{count} saved loads are in the format of an earlier version, which this app no longer reads. Open lists them under Invalid records.',
+                )}
               </p>
             )}
             {storage.persisted !== undefined && (
               <p>
                 {storage.persisted
-                  ? 'Persistent storage: granted.'
-                  : 'Persistent storage: not granted, the browser may clear the saved loads.'}
+                  ? t('Persistent storage: granted.')
+                  : t('Persistent storage: not granted, the browser may clear the saved loads.')}
               </p>
             )}
-            {storage.used !== undefined && <p>Storage used: {megabytes(storage.used)}.</p>}
-            {reminder && <p data-due>{reminder} Export all (Save options) keeps a copy.</p>}
+            {storage.used !== undefined && (
+              <p>{t('Storage used: {size}.', { size: megabytes(storage.used) })}</p>
+            )}
+            {reminder && (
+              <p data-due>
+                {t('{reminder} Export all (Save options) keeps a copy.', { reminder })}
+              </p>
+            )}
           </div>
         </Drawer.Body>
       </Drawer.Content>

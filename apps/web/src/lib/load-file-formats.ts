@@ -1,5 +1,7 @@
 /** The load-file formats the File menu opens, and reading files with them. */
 import type { EmbeddedFile, UserRecord } from '@open-reloading/schema'
+import type { Translator } from '../i18n/translate.ts'
+import { translateMessage } from './core-messages.ts'
 import { nth } from './nth.ts'
 import {
   maxFileBytes,
@@ -43,11 +45,13 @@ export function readLoadFile(text: string, formats = loadFileFormats): ParsedUse
 }
 
 /** The warnings and unmapped fields of a read file as one sentence, empty when it has none. */
-export const readNote = (p: ParsedUserFile) =>
+export const readNote = (p: ParsedUserFile, t: Translator['t']) =>
   p.ok
     ? [
-        ...(p.warnings ?? []),
-        ...(p.unmapped?.length ? [`Not read: ${p.unmapped.join(', ')}.`] : []),
+        ...(p.warnings ?? []).map((w) => translateMessage(w, t)),
+        ...(p.unmapped?.length
+          ? [t('Not read: {fields}.', { fields: p.unmapped.join(', ') })]
+          : []),
       ].join(' ')
     : ''
 
@@ -55,6 +59,7 @@ export const readNote = (p: ParsedUserFile) =>
 export function parseFiles(
   files: { name: string; text?: string | undefined }[],
   formats = loadFileFormats,
+  t: Translator['t'],
 ) {
   const records: UserRecord[] = []
   const embedded: EmbeddedFile[] = []
@@ -68,7 +73,7 @@ export function parseFiles(
       records.push(...p.records)
       embedded.push(...(p.files ?? []))
       invalid.push(...(p.invalid ?? []))
-      const note = readNote(p)
+      const note = readNote(p, t)
       if (note) notes.push({ name: f.name, note })
     } else skipped.push({ name: f.name, reason: p.reason })
   }

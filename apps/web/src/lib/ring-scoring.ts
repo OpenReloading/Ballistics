@@ -4,6 +4,7 @@
  * target sheet stores them; face records in mm. Pure: no React, DOM or Next.js.
  */
 import { fromSi, type TargetFace, toSi } from '@open-reloading/schema'
+import type { Translator } from '../i18n/translate.ts'
 import { nth } from './nth.ts'
 import { type Point, solve } from './target-geometry.ts'
 
@@ -160,18 +161,21 @@ type RingMarks = { diameter: number; points: readonly Point[] }
  * shortcut: algebraic fit, no perspective, rotation or ring-line thickness; upgrade to a geometric
  * fit through the photo homography when the editor uses faces as calibration references.
  */
-export function fitRings(marks: readonly RingMarks[]): {
+export function fitRings(
+  marks: readonly RingMarks[],
+  t: Translator['t'],
+): {
   centre: Point
   scale: number
   rmsMisfit: number
 } {
   const all = marks.flatMap((m) => m.points.map((p) => ({ p, r: m.diameter / 2 })))
   if (new Set(marks.filter((m) => m.points.length).map((m) => m.diameter)).size < 2)
-    throw new Error('Marks on at least two rings are needed')
-  if (all.length < 4) throw new Error('At least four points are needed')
+    throw new Error(t('Marks on at least two rings are needed'))
+  if (all.length < 4) throw new Error(t('At least four points are needed'))
   const norm = normaliseMarks(all)
-  if (!(norm.sp > 0) || !(norm.sr > 0)) throw new Error('Points are degenerate')
-  const { centre, scale } = solveCircleFit(all, norm)
+  if (!(norm.sp > 0) || !(norm.sr > 0)) throw new Error(t('Points are degenerate'))
+  const { centre, scale } = solveCircleFit(all, norm, t)
   const misfit = all.reduce(
     (s, { p, r }) => s + (Math.hypot(p.x - centre.x, p.y - centre.y) - scale * r) ** 2,
     0,
@@ -196,6 +200,7 @@ function normaliseMarks(all: readonly MarkedPoint[]): MarkNormalisation {
 function solveCircleFit(
   all: readonly MarkedPoint[],
   { mx, my, sp, sr }: MarkNormalisation,
+  t: Translator['t'],
 ): { centre: Point; scale: number } {
   const ata = Array.from({ length: 4 }, () => [0, 0, 0, 0])
   const atb = [0, 0, 0, 0]
@@ -211,7 +216,7 @@ function solveCircleFit(
   }
   const solution = solve(ata, atb)
   const [cx, cy, u] = [nth(solution, 0), nth(solution, 1), nth(solution, 2)]
-  if (!(u > 0)) throw new Error('Points are degenerate')
+  if (!(u > 0)) throw new Error(t('Points are degenerate'))
   return { centre: { x: mx + cx * sp, y: my + cy * sp }, scale: (Math.sqrt(u) * sp) / sr }
 }
 
@@ -240,19 +245,21 @@ export function faceAlignment(
   face: TargetFace,
   marks: readonly FaceMark[] | undefined,
   aim: Point | undefined,
+  t: Translator['t'],
 ): FaceAlignment {
   if (!marks?.length) return { centre: aim ?? { x: 0, y: 0 }, scale: 1 }
-  if (face.bulls) throw new Error('Ring marks fit a face with one bull')
+  if (face.bulls) throw new Error(t('Ring marks fit a face with one bull'))
   if (face.rings.some((r) => r.height || r.shape === 'square'))
-    throw new Error('Ring marks fit circular rings')
+    throw new Error(t('Ring marks fit circular rings'))
   const rings = new Map<number, Point[]>()
   for (const m of marks) rings.set(m.ring, [...(rings.get(m.ring) ?? []), m])
   const fit = fitRings(
     [...rings].map(([value, points]) => {
       const ring = face.rings.find((r) => r.value === value)
-      if (!ring) throw new Error(`The face has no ring ${value}`)
+      if (!ring) throw new Error(t('The face has no ring {value}', { value }))
       return { diameter: ring.diameter.value, points }
     }),
+    t,
   )
   return { centre: fit.centre, scale: fromSi('length', fit.scale), rms: fit.rmsMisfit }
 }
@@ -297,18 +304,23 @@ export function scoreGroupOnFace(
     shots: readonly (Point & { excluded?: boolean | undefined })[]
   },
   bullet: number | undefined,
+  t: Translator['t'],
 ):
   | { alignment: FaceAlignment; hole: number; usesOwnTenthRule: boolean; score: GroupScore }
   | { error: string } {
   const event = face.events.find((e) => e.id === choice.event)
   const hole = scoredHoleDiameter(event, bullet, choice.gauge)
   if (hole === undefined || (!hole && event?.scoring !== 'centre'))
-    return { error: 'No hole size: set Marker, or choose a discipline or event with a gauge.' }
+    return { error: t('No hole size: set Marker, or choose a discipline or event with a gauge.') }
   let alignment: FaceAlignment
   try {
-    alignment = faceAlignment(face, choice.marks, group.aim)
+    alignment = faceAlignment(face, choice.marks, group.aim, t)
   } catch (e) {
-    return { error: `The ring marks do not fit: ${(e as Error).message}. Mark them again.` }
+    return {
+      error: t('The ring marks do not fit: {reason}. Mark them again.', {
+        reason: (e as Error).message,
+      }),
+    }
   }
   const shots = group.shots.map((s) => scoreShot(face, onFace(alignment, s), hole))
   const counted = scoreGroup(

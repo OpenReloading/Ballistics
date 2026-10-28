@@ -1,5 +1,6 @@
 import type { TargetFace } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import { faceAlignment, scoreShot } from '../src/lib/ring-scoring.ts'
 import { defined } from './defined.ts'
 
@@ -162,9 +163,9 @@ describe('scoreShot on a stadium face', () => {
   })
 
   it('refuses ring marks like any non-circular face', () => {
-    expect(() => faceAlignment(stadium, [{ ring: 9, x: 0.05, y: 0 }], undefined)).toThrow(
-      'Ring marks fit circular rings',
-    )
+    expect(() =>
+      faceAlignment(stadium, [{ ring: 9, x: 0.05, y: 0 }], undefined, english.t),
+    ).toThrow('Ring marks fit circular rings')
   })
 })
 
@@ -300,11 +301,11 @@ describe('faceAlignment', () => {
       { value: 10, w: 10 },
     ]
     const bulls = faceOf(rings, { bulls: [{ x: mmq(0), y: mmq(0) }] })
-    expect(() => faceAlignment(bulls, marks, undefined)).toThrow('one bull')
+    expect(() => faceAlignment(bulls, marks, undefined, english.t)).toThrow('one bull')
     const oval = faceOf([
       { value: 9, w: 20, h: 14 },
       { value: 10, w: 10, h: 6 },
     ])
-    expect(() => faceAlignment(oval, marks, undefined)).toThrow('circular')
+    expect(() => faceAlignment(oval, marks, undefined, english.t)).toThrow('circular')
   })
 })

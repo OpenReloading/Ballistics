@@ -1,4 +1,5 @@
 /** The reminder to export the saved loads: its counts, stored state and text. */
+import type { Translator } from '../i18n/translate.ts'
 import { storageName } from './edition.ts'
 
 /** What the export reminder counts (`localStorage` `exportReminder`). */
@@ -38,12 +39,19 @@ export function parseReminder(text: string | null): ExportReminder {
 }
 
 /** The reminder to export, once 10 saves or 7 days since the last export (or first save) have passed. */
-export function reminderText(r: ExportReminder, now: Date): string | undefined {
+export function reminderText(
+  r: ExportReminder,
+  now: Date,
+  t: Translator['t'],
+  tn: Translator['tn'],
+): string | undefined {
   if (r.changes < 1) return undefined
   const since = r.exportedAt ?? r.firstChangeAt
   const days = since ? Math.floor((now.getTime() - Date.parse(since)) / 86_400_000) : 0
   if (r.changes < reminderChanges && days < reminderDays) return undefined
-  const saves = `${r.changes} ${r.changes === 1 ? 'save' : 'saves'}`
-  if (!r.exportedAt) return `${saves}, never exported.`
-  return `${saves} since the last export${days >= reminderDays ? `, ${days} days ago` : ''}.`
+  const saves = tn(r.changes, '{count} save', '{count} saves')
+  if (!r.exportedAt) return t('{saves}, never exported.', { saves })
+  return days >= reminderDays
+    ? t('{saves} since the last export, {days} days ago.', { saves, days })
+    : t('{saves} since the last export.', { saves })
 }

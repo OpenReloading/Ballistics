@@ -356,7 +356,7 @@ describe('cardFacts and clickText', () => {
     })
   })
   it('gives the table cells without units, those of the active configuration', () => {
-    expect(firearmCells({ ...f, barrelLength: { value: 610 } }, metric)).toEqual({
+    expect(firearmCells({ ...f, barrelLength: { value: 610 } }, metric, english)).toEqual({
       barrel: '610',
       twist: '254',
       hand: 'left',
@@ -364,11 +364,11 @@ describe('cardFacts and clickText', () => {
       zero: '100',
       configuration: 'Summer',
     })
-    expect(firearmCells({ ...f, active: undefined }, us)).toMatchObject({
+    expect(firearmCells({ ...f, active: undefined }, us, english)).toMatchObject({
       twist: '10.0',
       configuration: 'Winter',
     })
-    expect(firearmCells(blankFirearm(), metric)).toEqual({
+    expect(firearmCells(blankFirearm(), metric, english)).toEqual({
       barrel: '',
       twist: '',
       hand: '',

@@ -1,5 +1,6 @@
 import type { UserRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import {
   type LoadFileFormat,
   loadFileFormats,
@@ -48,8 +49,10 @@ describe('load-file formats', () => {
   })
 
   it('warnings and fields not mapped reach the import as one note per file', () => {
-    expect(readNote(lines.parse(''))).toBe('The date is not in the file. Not read: primer, lot.')
-    expect(readNote({ ok: true, records: [] })).toBe('')
+    expect(readNote(lines.parse(''), english.t)).toBe(
+      'The date is not in the file. Not read: primer, lot.',
+    )
+    expect(readNote({ ok: true, records: [] }, english.t)).toBe('')
     const { records, notes, skipped } = parseFiles(
       [
         { name: 'a.txt', text: 'LOAD 1' },
@@ -57,6 +60,7 @@ describe('load-file formats', () => {
         { name: 'c.txt', text: 'other' },
       ],
       formats,
+      english.t,
     )
     expect(records).toEqual([load, load])
     expect(notes).toEqual([

@@ -1,6 +1,7 @@
 import 'fake-indexeddb/auto'
 import type { UserRecord } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import { parseFiles } from '../src/lib/load-file-formats.ts'
 import { exportAllText, validRecords } from '../src/lib/user-data.ts'
 import {
@@ -42,7 +43,7 @@ it('an Export all file round trips its invalid records as invalid records', asyn
   const { invalid } = validRecords([bad, badSheet])
   const exported = exportAllText([valid], [], invalid)
   if (!exported.ok) throw new Error(exported.reason)
-  const read = parseFiles([{ name: 'all.json', text: exported.text }])
+  const read = parseFiles([{ name: 'all.json', text: exported.text }], undefined, english.t)
   expect(read.records).toEqual([valid])
   expect(read.invalid).toEqual([bad, badSheet])
 

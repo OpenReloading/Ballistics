@@ -18,6 +18,8 @@ import {
   useRef,
   useState,
 } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import { msg, type Message as Text, type Translator } from '../i18n/translate.ts'
 import { ellipsePoint } from '../lib/ellipse.ts'
 import { fetchAllFaces, fetchFace } from '../lib/face-records.ts'
 import { type FoundFace, faceGeometry } from '../lib/face-sheet.ts'
@@ -29,7 +31,6 @@ import {
   type EditorProposal,
   expectedHoleSize,
   localPxPerM,
-  MIN_HOLES_TO_LEARN_SIZE,
   proposalsClearOfShots,
   rectangleFromDiagonal,
 } from '../lib/hole-proposals.ts'
@@ -64,7 +65,26 @@ const rgbOf = (h: string): Rgb => ({
 })
 
 /** The guided steps; each shows only its own controls. */
-const detectSteps = ['Rotate', 'Scale', 'Example', 'Detect', 'Review'] as const
+const detectSteps = [
+  msg('Rotate'),
+  msg('Scale'),
+  msg('Example'),
+  msg('Detect'),
+  msg('Review'),
+] as const
+
+/**
+ * What the worker throws that a person can reach, as the lib writes it: shown translated, any other
+ * text as it is.
+ */
+const workerErrors = [
+  msg('The region is too large for holes this small; mark a smaller region'),
+  msg('The hole must be at least 4 px across'),
+  msg('A region needs at least 3 points'),
+  msg('The photo decodes at another size than it is shown; detection is off for it.'),
+  msg('No canvas to read the photo.'),
+  msg('The point is outside the photo.'),
+]
 
 /**
  * Hole detection in the target editor (`apps/docs/docs/models/hole-detection.md`):
@@ -108,6 +128,7 @@ export function useHoleDetection({
   tool: Tool
   startTool: (t: Tool) => void
 }) {
+  const { t, tn } = useTranslation()
   const [proposals, setProposals] = useState<EditorProposal[]>([])
   /** Regions too large to count: the user places their shots by hand; no statistic sees them. */
   const [flagged, setFlagged] = useState<FlaggedRegion[]>([])
@@ -227,7 +248,10 @@ export function useHoleDetection({
       const m = e.data
       if (m.kind === 'progress') return setProgress(m.done)
       stop()
-      if (m.kind === 'error') return say(m.message, true)
+      if (m.kind === 'error') {
+        const known = workerErrors.find((e) => e === m.message)
+        return say(known ? t(known) : m.message, true)
+      }
       onReply(m)
     }
     w.onerror = () => {
@@ -239,7 +263,7 @@ export function useHoleDetection({
 
   const failed = () => {
     stop()
-    say('Hole detection failed in this browser.', true)
+    say(t('Hole detection failed in this browser.'), true)
   }
 
   async function photoBlob() {
@@ -247,7 +271,7 @@ export function useHoleDetection({
     const stopped = stops.current
     const blob = await storedPhoto(sheet.photo).catch(() => undefined)
     if (stops.current !== stopped) return
-    if (!blob) say('The photo is not in this browser.', true)
+    if (!blob) say(t('The photo is not in this browser.'), true)
     return blob
   }
 
@@ -297,8 +321,8 @@ export function useHoleDetection({
         if (!n)
           say(
             auto
-              ? 'No holes found: pick one example hole (step 3).'
-              : `No holes proposed in the region.${flaggedNote(m.flagged)}`,
+              ? t('No holes found: pick one example hole (step 3).')
+              : `${t('No holes proposed in the region.')}${flaggedNote(m.flagged)}`,
             auto,
           )
         found?.(n)
@@ -308,7 +332,7 @@ export function useHoleDetection({
 
   const flaggedNote = (f: FlaggedRegion[]) =>
     f.length
-      ? ` ${f.length} ${f.length === 1 ? 'area' : 'areas'} to place by hand (dashed box).`
+      ? ` ${tn(f.length, '{count} area to place by hand (dashed box).', '{count} areas to place by hand (dashed box).')}`
       : ''
 
   /** A run's proposals and flagged areas on the photo, step 5 when there are any; their count. */
@@ -328,7 +352,9 @@ export function useHoleDetection({
     setFlagged(m.flagged)
     if (list.length) {
       setStep(4)
-      say(`${list.length} proposed; accept them to add shots.${flaggedNote(m.flagged)}`)
+      say(
+        `${t('{count} proposed; accept them to add shots.', { count: list.length })}${flaggedNote(m.flagged)}`,
+      )
     }
     return list.length
   }
@@ -352,7 +378,7 @@ export function useHoleDetection({
       if (stops.current !== stopped) return
       setProgress(undefined)
       setStep(0)
-      return say('The target faces need the network: set the scale by hand (step 2).', true)
+      return say(t('The target faces need the network: set the scale by hand (step 2).'), true)
     }
     if (stops.current !== stopped) return
     ask(
@@ -383,7 +409,7 @@ export function useHoleDetection({
           if (hold) setStep(undefined)
           return
         }
-        const next = faceFollowUp(m.search)
+        const next = faceFollowUp(m.search, t)
         setStep(next.step)
         say(next.text)
       },
@@ -411,8 +437,16 @@ export function useHoleDetection({
     awaiting.current = thenDetect
     say(
       face
-        ? `${face.name}: scale and center from ${fit.ellipses} ellipses${fit.approximate ? ' (one ellipse, the center is approximate under tilt)' : ''}.`
-        : 'Scale and center from the black area (approximate under tilt).',
+        ? fit.approximate
+          ? t(
+              '{face}: scale and center from {count} ellipses (one ellipse, the center is approximate under tilt).',
+              { face: face.name, count: fit.ellipses },
+            )
+          : t('{face}: scale and center from {count} ellipses.', {
+              face: face.name,
+              count: fit.ellipses,
+            })
+        : t('Scale and center from the black area (approximate under tilt).'),
     )
     if (!thenDetect) setStep(2)
   }
@@ -437,7 +471,7 @@ export function useHoleDetection({
         () => undefined,
       ))
     if (stops.current !== stopped) return
-    if (!fit) return say('This face does not fit the ellipses found.', true)
+    if (!fit) return say(t('This face does not fit the ellipses found.'), true)
     applyFit(fit, false, event)
   }
 
@@ -447,7 +481,7 @@ export function useHoleDetection({
     if (!frame?.calibration) return void recognise(true)
     if (!size) {
       setStep(2)
-      return say('Enter the hole size and pick one hole (step 3).')
+      return say(t('Enter the hole size and pick one hole (step 3).'))
     }
     run(true, undefined, (n) => {
       if (!n) setStep(2)
@@ -456,7 +490,7 @@ export function useHoleDetection({
 
   function cancel() {
     stop()
-    say('Detection cancelled.')
+    say(t('Detection cancelled.'))
   }
 
   async function pickColour(at: Point) {
@@ -477,7 +511,11 @@ export function useHoleDetection({
       (m) => {
         if (m.kind !== 'colour') return
         setChoice({ backing: hex(m.rgb) }, 'backing')
-        say(`Backing color ${hex(m.rgb)}: the color axis of a run starts from it.`)
+        say(
+          t('Backing color {color}: the color axis of a run starts from it.', {
+            color: hex(m.rgb),
+          }),
+        )
       },
     )
   }
@@ -510,7 +548,10 @@ export function useHoleDetection({
         if (m.kind !== 'proposals') return
         const ex = m.example
         if (!ex || m.holeDiameter === undefined)
-          return say('No holes found from there: click the middle of a hole clear of print.', true)
+          return say(
+            t('No holes found from there: click the middle of a hole clear of print.'),
+            true,
+          )
         // one undo step: the example's colour, size and polarity, and the default threshold
         setChoice(
           {
@@ -523,7 +564,7 @@ export function useHoleDetection({
         )
         if (!show(m, m.holeDiameter, pxPerM)) {
           setStep(3)
-          say(`No holes proposed in the region.${flaggedNote(m.flagged)}`)
+          say(`${t('No holes proposed in the region.')}${flaggedNote(m.flagged)}`)
         }
       },
     )
@@ -555,13 +596,13 @@ export function useHoleDetection({
     onGroup((g) => acceptProposals(g, list, frame, runScale.current).group)
     const ids = new Set(list.slice(0, added).map((p) => p.id))
     setProposals((x) => x.filter((p) => !ids.has(p.id)))
-    if (added < list.length) say('A group holds at most 1000 shots.', true)
+    if (added < list.length) say(t('A group holds at most 1000 shots.'), true)
   }
   const move = (id: number, p: Point) =>
     setProposals((x) => x.map((q) => (q.id === id ? { ...q, ...p } : q)))
   const remove = (id: number) => setProposals((x) => x.filter((q) => q.id !== id))
 
-  const hint = toolHint(tool, shape, pending.length)
+  const hint = toolHint(tool, shape, pending.length, t)
 
   const layer = (k: number) => {
     unit.current = k
@@ -586,7 +627,7 @@ export function useHoleDetection({
     <div
       className="detect-progress"
       role="progressbar"
-      aria-label="Hole detection"
+      aria-label={t('Hole detection')}
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={Math.round(progress * 100)}
@@ -596,7 +637,7 @@ export function useHoleDetection({
   )
 
   const running = progress !== undefined
-  const runButton = (label: string, auto: boolean) => (
+  const runButton = (label: Text, auto: boolean) => (
     <RunButton
       label={label}
       auto={auto}
@@ -609,13 +650,13 @@ export function useHoleDetection({
     />
   )
 
-  const choicesOfFaces = faceChoices(found, system)
+  const choicesOfFaces = faceChoices(found, system, t)
   const turnBy = (d: number) => onTurn(turn + d)
   const commitDiameter = (si: number | undefined) => {
     setDiameter(si)
     const plane = found && si ? fitDiameter(found, fromSi('length', si)) : undefined
     if (plane) applyFit(plane, false)
-    else if (si) say('Find the face first: no black area is known.', true)
+    else if (si) say(t('Find the face first: no black area is known.'), true)
   }
   const stepBody = [
     <RotateStep key="rotate" turn={turn} running={running} onTurnBy={turnBy} onTurn={onTurn} />,
@@ -643,7 +684,7 @@ export function useHoleDetection({
       onPick={() => startTool('example')}
     />,
     <div key="detect" className="prop-grid">
-      {runButton('Detect holes', false)}
+      {runButton(msg('Detect holes'), false)}
     </div>,
     <ReviewStep
       key="review"
@@ -688,7 +729,7 @@ export function useHoleDetection({
       settingsPanel={settingsPanel}
       step={step}
       setStep={setStep}
-      start={runButton(held ? 'Detect anyway' : 'Detect holes', true)}
+      start={runButton(held ? msg('Detect anyway') : msg('Detect holes'), true)}
       notes={quality && <QualityNotes issues={quality} held={held} />}
       body={step === undefined ? undefined : stepBody[step]}
     />
@@ -721,32 +762,36 @@ function blockedReason(
   frame: Frame | undefined,
   size: object | undefined,
 ) {
-  if (!photoId) return 'Load a photo first.'
-  if (!photo) return 'The photo is not loaded.'
-  if (!frame?.calibration) return 'Set the scale first (step 2).'
-  if (!size) return 'Enter the hole size first (step 3).'
+  if (!photoId) return msg('Load a photo first.')
+  if (!photo) return msg('The photo is not loaded.')
+  if (!frame?.calibration) return msg('Set the scale first (step 2).')
+  if (!size) return msg('Enter the hole size first (step 3).')
   return
 }
 
 /** What follows a face search that did not settle on one face: the step and the line to say. */
-function faceFollowUp({ fits, black }: FaceSearch) {
+function faceFollowUp({ fits, black }: FaceSearch, t: Translator['t']) {
   // no black area at all: the steps as they were, from the photo's turn
   if (!black)
-    return { step: 0, text: 'Straighten the photo if needed, then set the scale (step 2).' }
+    return { step: 0, text: t('Straighten the photo if needed, then set the scale (step 2).') }
   if (fits.length > 1)
     return {
       step: 1,
-      text: 'More than one face fits these rings: choose the target in Target face.',
+      text: t('More than one face fits these rings: choose the target in Target face.'),
     }
   const [only] = fits
   if (only)
     return {
       step: 1,
-      text: `The rings may be those of the ${only.face.name}: choose it in Target face to use it.`,
+      text: t('The rings may be those of the {face}: choose it in Target face to use it.', {
+        face: only.face.name,
+      }),
     }
   return {
     step: 1,
-    text: 'No face fits the rings found (dashed): choose a face, type the black diameter or set the scale.',
+    text: t(
+      'No face fits the rings found (dashed): choose a face, type the black diameter or set the scale.',
+    ),
   }
 }
 
@@ -778,18 +823,38 @@ function regionClick(
   return { region: closes ? pending : pts }
 }
 
-const toolHints: Partial<Record<Tool, string>> = {
-  backing:
+const toolHints: Partial<Record<Tool, Text>> = {
+  backing: msg(
     'Click inside one hole: detection also looks for the color that shows through it. Or arrow keys and Enter.',
-  example: 'Click the middle of one hole clear of print. Or arrow keys and Enter. Esc cancels.',
+  ),
+  example: msg(
+    'Click the middle of one hole clear of print. Or arrow keys and Enter. Esc cancels.',
+  ),
 }
 
 /** The line under the canvas for a point tool. */
-function toolHint(tool: Tool, shape: 'rectangle' | 'polygon', placed: number) {
-  if (tool !== 'region') return toolHints[tool]
+function toolHint(tool: Tool, shape: 'rectangle' | 'polygon', placed: number, t: Translator['t']) {
+  if (tool !== 'region') {
+    const hint = toolHints[tool]
+    return hint && t(hint)
+  }
   return shape === 'rectangle'
-    ? `Click two opposite corners of the region. Point ${placed + 1} of 2. Or arrow keys and Enter. Esc cancels.`
-    : `Click the corners of the region; click the last one again (Enter twice) to close it. ${placed} points. Esc cancels.`
+    ? t(
+        'Click two opposite corners of the region. Point {n} of 2. Or arrow keys and Enter. Esc cancels.',
+        { n: placed + 1 },
+      )
+    : t(
+        'Click the corners of the region; click the last one again (Enter twice) to close it. {count} points. Esc cancels.',
+        { count: placed },
+      )
+}
+
+/** The expected hole size's source, as the field's placeholder says it. */
+const sourceNames = {
+  typed: msg('typed'),
+  learned: msg('learned'),
+  bullet: msg('bullet'),
+  marker: msg('marker'),
 }
 
 type FaceChoice = { value: string; label: string }
@@ -799,14 +864,22 @@ type FaceChoice = { value: string; label: string }
  * events and the distance, so the event or the distance shot tells them apart; without a fit the
  * ranking of the faces.
  */
-function faceChoices(found: FaceSearch | undefined, system: UnitSystem): FaceChoice[] {
+function faceChoices(
+  found: FaceSearch | undefined,
+  system: UnitSystem,
+  t: Translator['t'],
+): FaceChoice[] {
   if (!found) return []
   if (!found.fits.length)
     return found.ranked.slice(0, 4).map((r) => ({ value: r.id, label: r.name }))
   return found.fits.flatMap((f) =>
     f.face.events.map((e) => ({
       value: `${f.face.id}|${e.id}`,
-      label: `${f.face.name}: ${e.name}, ${formatQuantity('range', system, toSi('length', e.distance.value))}`,
+      label: t('{face}: {event}, {distance}', {
+        face: f.face.name,
+        event: e.name,
+        distance: formatQuantity('range', system, toSi('length', e.distance.value)),
+      }),
     })),
   )
 }
@@ -820,17 +893,18 @@ function chosenFace(group: ShotGroup | undefined, choices: FaceChoice[]) {
 
 /** The photo's quality problems, each with what to change when retaking it; `held` says the run waits. */
 function QualityNotes({ issues, held }: { issues: readonly QualityIssue[]; held: boolean }) {
+  const { t } = useTranslation()
   if (!issues.length) return null
   return (
     <div className="quality-notes">
       {issues.map((i) => (
         <Message key={i.problem} severity={i.level === 'bad' ? 'warning' : 'info'}>
-          {i.text} {i.fix}
+          {t(i.text, { n: i.n ?? 0 })} {t(i.fix)}
         </Message>
       ))}
       {held && (
         <Message severity="info">
-          Detection waits. Detect anyway runs it on this photo; check every proposed hole.
+          {t('Detection waits. Detect anyway runs it on this photo; check every proposed hole.')}
         </Message>
       )}
     </div>
@@ -847,15 +921,16 @@ function RunButton({
   onStart,
   onRun,
 }: {
-  label: string
+  label: Text
   auto: boolean
   progress: number | undefined
   photo: boolean
-  blocked: string | undefined
+  blocked: Text | undefined
   onCancel: () => void
   onStart: () => void
   onRun: () => void
 }) {
+  const { t } = useTranslation()
   if (progress !== undefined)
     return (
       <Button
@@ -865,12 +940,12 @@ function RunButton({
         data-detect-run
         onClick={onCancel}
       >
-        Cancel ({Math.round(progress * 100)} %)
+        {t('Cancel ({pct} %)', { pct: Math.round(progress * 100) })}
       </Button>
     )
   const title = auto
-    ? 'Find the holes on the target or in the region; the photo stays in this browser.'
-    : (blocked ?? 'Find the holes like the example hole.')
+    ? t('Find the holes on the target or in the region; the photo stays in this browser.')
+    : t(blocked ?? msg('Find the holes like the example hole.'))
   return (
     <Button
       size={controlSize.row.button}
@@ -880,7 +955,7 @@ function RunButton({
       title={title}
       onClick={auto ? onStart : onRun}
     >
-      {label}
+      {t(label)}
     </Button>
   )
 }
@@ -896,18 +971,19 @@ function RotateStep({
   onTurnBy: (d: number) => void
   onTurn: (angle: number, key?: string) => void
 }) {
+  const { t } = useTranslation()
   return (
     <div className="prop-grid">
       <div className="prop-row">
-        <span className="prop-label" title="Turn the photo by a quarter turn.">
-          Quarter turn
+        <span className="prop-label" title={t('Turn the photo by a quarter turn.')}>
+          {t('Quarter turn')}
         </span>
         <span className="prop-value row-buttons">
           <ActionIcon
             variant="default"
             size={controlSize.row.icon}
-            aria-label="Turn left 90 degrees"
-            title="Turn left 90 degrees"
+            aria-label={t('Turn left 90 degrees')}
+            title={t('Turn left 90 degrees')}
             disabled={running}
             onClick={() => onTurnBy(Math.PI / 2)}
           >
@@ -916,8 +992,8 @@ function RotateStep({
           <ActionIcon
             variant="default"
             size={controlSize.row.icon}
-            aria-label="Turn right 90 degrees"
-            title="Turn right 90 degrees"
+            aria-label={t('Turn right 90 degrees')}
+            title={t('Turn right 90 degrees')}
             disabled={running}
             onClick={() => onTurnBy(-Math.PI / 2)}
           >
@@ -928,8 +1004,10 @@ function RotateStep({
       <SiField
         spec={{
           key: 'photoRotation',
-          label: 'Photo angle',
-          help: 'Turn of the photo on screen, counter-clockwise; type a small angle to straighten it. Holes, scale and aim point stay on the photo; the target axes stay on the screen.',
+          label: msg('Photo angle'),
+          help: msg(
+            'Turn of the photo on screen, counter-clockwise; type a small angle to straighten it. Holes, scale and aim point stay on the photo; the target axes stay on the screen.',
+          ),
           quantity: 'angle',
         }}
         si={turn || undefined}
@@ -964,34 +1042,37 @@ function ScaleStep({
   onFind: () => void
   onCalibrate: () => void
 }) {
+  const { t, tn } = useTranslation()
   const scale =
-    references === undefined
-      ? 'none'
-      : `${references} ${references === 1 ? 'reference' : 'references'}`
+    references === undefined ? t('none') : tn(references, '{count} reference', '{count} references')
   return (
     <div className="prop-grid">
       <div className="prop-row">
         <span
           className="prop-label"
-          title="A known distance on the target or the size of a face ring, marked on the photo in Calibrate."
+          title={t(
+            'A known distance on the target or the size of a face ring, marked on the photo in Calibrate.',
+          )}
         >
-          Scale
+          {t('Scale')}
         </span>
         <span className="prop-value">{scale}</span>
       </div>
       <div className="prop-row">
         <span
           className="prop-label"
-          title="The rule-book face on the photo: found from the black area and the ring lines, it sets the scale and the center and scores the group. More than one face may fit the rings: choose. Without a fit the faces are ranked by how well their rings match."
+          title={t(
+            'The rule-book face on the photo: found from the black area and the ring lines, it sets the scale and the center and scores the group. More than one face may fit the rings: choose. Without a fit the faces are ranked by how well their rings match.',
+          )}
         >
-          Target
+          {t('Target')}
         </span>
         <span className="prop-value">
           <NativeSelect
             size={controlSize.row.input}
-            aria-label="Target face"
+            aria-label={t('Target face')}
             disabled={!choices.length || running}
-            data={[{ value: '', label: choices.length ? 'Choose' : 'none' }, ...choices]}
+            data={[{ value: '', label: choices.length ? t('Choose') : t('none') }, ...choices]}
             value={chosen}
             onChange={(e) => onPickFace(e.currentTarget.value)}
           />
@@ -1000,14 +1081,16 @@ function ScaleStep({
       <SiField
         spec={{
           key: 'blackDiameter',
-          label: 'Black diameter',
-          help: 'Diameter of the black area on the target, used when no face fits: it sets the scale and the center from the black area alone (the center is approximate on a tilted photo).',
+          label: msg('Black diameter'),
+          help: msg(
+            'Diameter of the black area on the target, used when no face fits: it sets the scale and the center from the black area alone (the center is approximate on a tilted photo).',
+          ),
           quantity: 'length',
           min: 0,
           positive: true,
         }}
         si={diameter}
-        placeholder="size"
+        placeholder={t('size')}
         deferred
         onCommit={onDiameter}
       />
@@ -1018,10 +1101,10 @@ function ScaleStep({
           disabled={!canFind || running}
           onClick={onFind}
         >
-          Find face
+          {t('Find face')}
         </Button>
         <Button size={controlSize.row.button} variant="default" onClick={onCalibrate}>
-          Calibrate
+          {t('Calibrate')}
         </Button>
       </span>
     </div>
@@ -1038,27 +1121,31 @@ function ExampleStep({
   onPick,
 }: {
   holeDiameter: number | undefined
-  size: { diameter: number; source: string } | undefined
+  size: { diameter: number; source: keyof typeof sourceNames } | undefined
   tool: Tool
   canPick: boolean
   calibrated: boolean
   onHoleSize: (si: number | undefined) => void
   onPick: () => void
 }) {
+  const { t } = useTranslation()
   const derived = size && size.source !== 'typed' ? size : undefined
   return (
     <div className="prop-grid">
       <SiField
         spec={{
           key: 'expectedHoleDiameter',
-          label: 'Hole size',
-          help: `Expected hole diameter; an example hole sets it to the measured size. Empty: the median of the measured holes of ${MIN_HOLES_TO_LEARN_SIZE} or more accepted single holes, else the bullet diameter, else the marker.`,
+          label: msg('Hole size'),
+          // the 3 is MIN_HOLES_TO_LEARN_SIZE: a spec's help takes no placeholder
+          help: msg(
+            'Expected hole diameter; an example hole sets it to the measured size. Empty: the median of the measured holes of 3 or more accepted single holes, else the bullet diameter, else the marker.',
+          ),
           quantity: 'length',
           min: 0,
           positive: true,
         }}
         si={holeDiameter}
-        placeholder={derived ? derived.source : 'size'}
+        placeholder={derived ? t(sourceNames[derived.source]) : t('size')}
         shown={derived?.diameter}
         onCommit={onHoleSize}
       />
@@ -1067,10 +1154,10 @@ function ExampleStep({
         className="wide"
         variant={tool === 'example' ? 'filled' : 'default'}
         disabled={!canPick}
-        title={calibrated ? 'Click one hole on the photo' : 'Set the scale first (step 2).'}
+        title={calibrated ? t('Click one hole on the photo') : t('Set the scale first (step 2).')}
         onClick={onPick}
       >
-        Pick one hole
+        {t('Pick one hole')}
       </Button>
     </div>
   )
@@ -1087,10 +1174,13 @@ function ReviewStep({
   onAccept: () => void
   onClear: () => void
 }) {
+  const { t } = useTranslation()
   return (
     <div
       className="prop-grid"
-      title="Proposals are dashed on the photo; none counts until accepted. On the photo: double-click or Enter accepts one, drag or arrow keys move it, Delete removes it."
+      title={t(
+        'Proposals are dashed on the photo; none counts until accepted. On the photo: double-click or Enter accepts one, drag or arrow keys move it, Delete removes it.',
+      )}
     >
       <Button
         size={controlSize.row.button}
@@ -1098,18 +1188,18 @@ function ReviewStep({
         disabled={proposals === 0}
         onClick={onAccept}
       >
-        Accept all ({proposals})
+        {t('Accept all ({count})', { count: proposals })}
       </Button>
       <span className="row-buttons wide">
         <Button
           size={controlSize.row.button}
           variant="default"
           disabled={proposals === 0 && flagged === 0}
-          aria-label="Clear proposals"
-          title="Clear proposals and areas to place by hand"
+          aria-label={t('Clear proposals')}
+          title={t('Clear proposals and areas to place by hand')}
           onClick={onClear}
         >
-          Clear
+          {t('Clear')}
         </Button>
       </span>
     </div>
@@ -1140,15 +1230,20 @@ function SettingsPanel({
   onBackingOff: () => void
   onThreshold: (si: number | undefined) => void
 }) {
-  const backing = choices.backing ? `Backing color ${choices.backing}` : 'Backing color off'
+  const { t } = useTranslation()
+  const backing = choices.backing
+    ? t('Backing color {color}', { color: choices.backing })
+    : t('Backing color off')
   return (
     <div className="prop-grid">
       <div className="prop-row detect-wide">
         <span
           className="prop-label"
-          title={`Where to look: a rectangle (two opposite corners) or a polygon (its corners); absent: the target found in the photo. Saved with the group. ${choices.region ? `Now ${choices.region.length} corners.` : 'None marked.'}`}
+          title={`${t(
+            'Where to look: a rectangle (two opposite corners) or a polygon (its corners); absent: the target found in the photo. Saved with the group.',
+          )} ${choices.region ? t('Now {count} corners.', { count: choices.region.length }) : t('None marked.')}`}
         >
-          Region
+          {t('Region')}
         </span>
         <span className="prop-value row-buttons">
           {(['rectangle', 'polygon'] as const).map((s) => (
@@ -1157,18 +1252,22 @@ function SettingsPanel({
               size={controlSize.row.button}
               variant={tool === 'region' && shape === s ? 'filled' : 'default'}
               disabled={!enabled}
-              title={`Mark a ${s} on the photo`}
+              title={
+                s === 'rectangle'
+                  ? t('Mark a rectangle on the photo')
+                  : t('Mark a polygon on the photo')
+              }
               data-detect-set={s}
               onClick={() => onShape(s)}
             >
-              {s === 'rectangle' ? 'Rect.' : 'Polygon'}
+              {s === 'rectangle' ? t('Rect.') : t('Polygon')}
             </Button>
           ))}
           <ActionIcon
             variant="subtle"
             size={controlSize.row.icon}
-            aria-label="Region off"
-            title="Region off: the target found in the photo"
+            aria-label={t('Region off')}
+            title={t('Region off: the target found in the photo')}
             style={{ visibility: choices.region ? 'visible' : 'hidden' }}
             onClick={onRegionOff}
           >
@@ -1179,9 +1278,11 @@ function SettingsPanel({
       <div className="prop-row detect-wide">
         <span
           className="prop-label"
-          title="The color that shows through a hole on a dark area; an example hole lighter than its surroundings sets it. Pick, then click inside one hole."
+          title={t(
+            'The color that shows through a hole on a dark area; an example hole lighter than its surroundings sets it. Pick, then click inside one hole.',
+          )}
         >
-          Backing
+          {t('Backing')}
         </span>
         <span className="prop-value row-buttons">
           <Button
@@ -1190,9 +1291,9 @@ function SettingsPanel({
             disabled={!enabled || running}
             data-detect-set="backing"
             onClick={onPickBacking}
-            title="Click inside one hole to take its color"
+            title={t('Click inside one hole to take its color')}
           >
-            Pick
+            {t('Pick')}
           </Button>
           {/* the swatch and its cross keep their place when off, so nothing moves on a pick */}
           <span
@@ -1205,8 +1306,8 @@ function SettingsPanel({
           <ActionIcon
             variant="subtle"
             size={controlSize.row.icon}
-            aria-label="Backing color off"
-            title="Backing color off"
+            aria-label={t('Backing color off')}
+            title={t('Backing color off')}
             style={{ visibility: choices.backing ? 'visible' : 'hidden' }}
             onClick={onBackingOff}
           >
@@ -1217,8 +1318,10 @@ function SettingsPanel({
       <SiField
         spec={{
           key: 'minContrast',
-          label: 'Threshold',
-          help: 'Least contrast of a hole against its background, in % of the local paper white; an example hole sets it; empty: 15 %. Lower finds fainter holes and more false ones.',
+          label: msg('Threshold'),
+          help: msg(
+            'Least contrast of a hole against its background, in % of the local paper white; an example hole sets it; empty: 15 %. Lower finds fainter holes and more false ones.',
+          ),
           quantity: 'percent',
           min: 1,
           max: 100,
@@ -1257,10 +1360,11 @@ function DetectPanel({
   /** The body of the step shown. */
   body: ReactNode
 }) {
+  const { t } = useTranslation()
   return (
     <>
       <Flex className="detect-head" align="flex-end" gap={4}>
-        <h3 className="prop-head">Detect</h3>
+        <h3 className="prop-head">{t('Detect')}</h3>
         <Popover
           position="bottom-end"
           shadow="sm"
@@ -1280,20 +1384,20 @@ function DetectPanel({
               ref={gear}
               variant="subtle"
               size={controlSize.row.icon}
-              aria-label="Detection settings"
-              title="Detection settings: region, backing color, threshold"
+              aria-label={t('Detection settings')}
+              title={t('Detection settings: region, backing color, threshold')}
               onClick={() => setSettings((x) => !x)}
             >
               <GearSix size={14} aria-hidden="true" />
             </ActionIcon>
           </Popover.Target>
           <Popover.Dropdown className="toolbar-pop">
-            <h2 className="prop-head">Detection settings</h2>
+            <h2 className="prop-head">{t('Detection settings')}</h2>
             {settingsPanel}
           </Popover.Dropdown>
         </Popover>
       </Flex>
-      <ol className="detect-steps" aria-label="Detection steps">
+      <ol className="detect-steps" aria-label={t('Detection steps')}>
         {detectSteps.map((name, i) => (
           <li key={name}>
             <button
@@ -1301,7 +1405,7 @@ function DetectPanel({
               aria-current={step === i ? 'step' : undefined}
               onClick={() => setStep(i)}
             >
-              {i + 1} {name}
+              {i + 1} {t(name)}
             </button>
           </li>
         ))}
@@ -1318,7 +1422,7 @@ function DetectPanel({
           data-detect-after
           onClick={() => setStep((s) => (s ? s - 1 : undefined))}
         >
-          Back
+          {t('Back')}
         </Button>
         <Button
           size={controlSize.row.button}
@@ -1326,7 +1430,7 @@ function DetectPanel({
           disabled={step === detectSteps.length - 1}
           onClick={() => setStep((s) => (s === undefined ? 0 : s + 1))}
         >
-          Next
+          {t('Next')}
         </Button>
       </span>
     </>
@@ -1365,6 +1469,7 @@ function ProposalLayer({
   onMove: (id: number, p: Point) => void
   onRemove: (id: number) => void
 }) {
+  const { t } = useTranslation()
   const dragging = useRef<number | undefined>(undefined)
   const pts = (list: Point[]) => list.map((p) => `${p.x},${p.y}`).join(' ')
   const pointOf = (e: PointerEvent<SVGElement>): Point | undefined =>
@@ -1413,14 +1518,17 @@ function ProposalLayer({
         </>
       )}
       {flagged.map((f, i) => {
-        const label = `Area ${i + 1} to place by hand: about ${Math.round(f.holeAreas)} holes of area joined (touching holes or dark print); detection does not count it.`
+        const label = t(
+          'Area {n} to place by hand: about {count} holes of area joined (touching holes or dark print); detection does not count it.',
+          { n: i + 1, count: Math.round(f.holeAreas) },
+        )
         return (
           // biome-ignore lint/suspicious/noArrayIndexKey: a run's areas keep their order
           <g key={i} className="detect-flag" data-flag>
             <title>{label}</title>
             <rect x={f.x} y={f.y} width={f.width} height={f.height} />
             <text className="detect-flag-label" x={f.x} y={f.y - 3 * k} fontSize={11 * k}>
-              place by hand
+              {t('place by hand')}
             </text>
           </g>
         )
@@ -1428,8 +1536,14 @@ function ProposalLayer({
       {proposals.map((p, i) => {
         const r = Math.max(holePx / 2, 6 * k)
         const pct = Math.round(p.confidence * 100)
-        const cluster = p.clusterSize > 1 ? `, one of ${p.clusterSize} in a cluster` : ''
-        const label = `Proposal ${i + 1}, confidence ${pct} %${cluster}`
+        const label =
+          p.clusterSize > 1
+            ? t('Proposal {n}, confidence {pct} %, one of {count} in a cluster', {
+                n: i + 1,
+                pct,
+                count: p.clusterSize,
+              })
+            : t('Proposal {n}, confidence {pct} %', { n: i + 1, pct })
         return (
           <g key={p.id}>
             {/* biome-ignore lint/a11y/useSemanticElements: an SVG mark has no button element */}
@@ -1469,7 +1583,12 @@ function ProposalLayer({
                 dragging.current = undefined
               }}
             >
-              <title>{`${label}. Double-click or Enter accepts it, drag or arrow keys move it, Delete removes it.`}</title>
+              <title>
+                {t(
+                  '{label}. Double-click or Enter accepts it, drag or arrow keys move it, Delete removes it.',
+                  { label },
+                )}
+              </title>
             </circle>
             {/* biome-ignore lint/a11y/noAriaHiddenOnFocusable: SVG text is not focusable; the proposal's name holds it */}
             <text
@@ -1479,7 +1598,8 @@ function ProposalLayer({
               fontSize={11 * k}
               aria-hidden="true"
             >
-              {pct} %{p.clusterSize > 1 ? ` (${p.clusterSize})` : ''}
+              {t('{pct} %', { pct })}
+              {p.clusterSize > 1 ? ` (${p.clusterSize})` : ''}
             </text>
           </g>
         )

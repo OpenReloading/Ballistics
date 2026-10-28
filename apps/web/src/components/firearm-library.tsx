@@ -42,6 +42,7 @@ import {
   firearmCells,
   firearmIssues,
   firearmProblem,
+  schemaMessage,
 } from '../lib/firearm.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { countText, filterText, matchesQuery, matchingText, widestCount } from '../lib/lists.ts'
@@ -561,11 +562,14 @@ export function FirearmLibrary() {
 
   // the File menu renders after an edit, from the deferred data
   const fileData = useDeferredValue(data)
-  const problem = useMemo(() => firearmProblem(fileData.name, fileData), [fileData])
+  const problem = useMemo(() => firearmProblem(fileData.name, fileData, t), [fileData, t])
   const issues = useMemo(() => firearmIssues(data), [data])
   /** The schema's cross-field error at `path`, shown on that field. */
   const crossError = (...path: (string | number)[]) =>
-    issues.find((i) => i.code === 'custom' && i.path.join('/') === path.join('/'))?.message
+    schemaMessage(
+      issues.find((i) => i.code === 'custom' && i.path.join('/') === path.join('/'))?.message ?? '',
+      t,
+    ) || undefined
 
   const patch = (p: Partial<Firearm>) => setData((d) => ({ ...d, ...p }))
   const setOptic = (i: number, p: Partial<Optic>) =>
@@ -658,7 +662,7 @@ export function FirearmLibrary() {
   // each row's cells once per render: every column and the sort read them
   const cellCache = new Map<FirearmRecord, ReturnType<typeof firearmCells>>()
   const cells = (r: FirearmRecord) => {
-    const c = cellCache.get(r) ?? firearmCells(r.data, system)
+    const c = cellCache.get(r) ?? firearmCells(r.data, system, t)
     cellCache.set(r, c)
     return c
   }

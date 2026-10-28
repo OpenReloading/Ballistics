@@ -4,7 +4,8 @@
  */
 import type { GroupStatistics } from '@open-reloading/core'
 import type { ShotGroup } from '@open-reloading/schema'
-import { formatNumber } from '../i18n/number.ts'
+import { formatNumber, plainNumber } from '../i18n/number.ts'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { readoutRows, readouts } from './group-readouts.ts'
 import { groupStatisticsOf } from './target-groups.ts'
 import { type UnitSystem, unitsOf, withUnit } from './units.ts'
@@ -18,14 +19,26 @@ const unitNames: Record<Unit, (s: UnitSystem) => string> = {
 
 /** The picker's rows: a value and its tokens, one per unit for a readout. */
 export const notePlaceholders: {
-  label: string
-  help: string
+  label: Message
+  help: Message
   tokens: { token: string; unit?: Unit | undefined }[]
 }[] = [
-  { label: 'Group name', help: 'The name of the group.', tokens: [{ token: '{name}' }] },
-  { label: 'Shots', help: 'Shots in the statistics.', tokens: [{ token: '{shots}' }] },
-  { label: 'Excluded', help: 'Excluded shots.', tokens: [{ token: '{excluded}' }] },
-  { label: 'Distance', help: 'Muzzle to target.', tokens: [{ token: '{distance}' }] },
+  {
+    label: msg('Group name'),
+    help: msg('The name of the group.'),
+    tokens: [{ token: '{name}' }],
+  },
+  {
+    label: msg('Shots'),
+    help: msg('Shots in the statistics.'),
+    tokens: [{ token: '{shots}' }],
+  },
+  { label: msg('Excluded'), help: msg('Excluded shots.'), tokens: [{ token: '{excluded}' }] },
+  {
+    label: msg('Distance'),
+    help: msg('Muzzle to target.'),
+    tokens: [{ token: '{distance}' }],
+  },
   ...readoutRows.map(([key, label, help]) => ({
     label,
     help,
@@ -43,21 +56,23 @@ const readoutKeys = new Set<string>(readoutRows.map(([key]) => key))
 const plain = new Set(['name', 'shots', 'excluded', 'distance'])
 
 /**
- * `text` with each known placeholder replaced by the value of `group` now; "n/a" for a value the
- * statistics leave out or without the group; other text, unknown tokens included, as typed.
+ * `text` with each known placeholder replaced by the value of `group` now; "n/a" (written with
+ * `t`) for a value the statistics leave out or without the group; other text, unknown tokens
+ * included, as typed.
  */
 export function resolveNote(
   text: string,
   group: ShotGroup | undefined,
   system: UnitSystem,
   stats: GroupStatistics | undefined = group && groupStatisticsOf(group),
+  t: Translator['t'],
 ): string {
   if (!text.includes('{')) return text
   const rows = group && stats ? readouts(stats, group.distance) : []
   return text.replace(/\{([A-Za-z]+)(?:\.([a-z]+))?\}/g, (token, key: string, unit?: string) =>
     unit === undefined && plain.has(key)
-      ? plainValue(key, group, stats, system)
-      : readoutValue(token, key, unit, rows, system),
+      ? plainValue(key, group, stats, system, t)
+      : readoutValue(token, key, unit, rows, system, t),
   )
 }
 
@@ -66,11 +81,12 @@ function plainValue(
   group: ShotGroup | undefined,
   stats: GroupStatistics | undefined,
   system: UnitSystem,
+  t: Translator['t'],
 ): string {
-  if (!group || !stats) return 'n/a'
+  if (!group || !stats) return t('n/a')
   if (key === 'name') return group.name
-  if (key === 'shots') return String(stats.shotCount)
-  if (key === 'excluded') return String(stats.excludedCount)
+  if (key === 'shots') return plainNumber(stats.shotCount)
+  if (key === 'excluded') return plainNumber(stats.excludedCount)
   return withUnit('range', system, group.distance)
 }
 
@@ -80,11 +96,12 @@ function readoutValue(
   unit: string | undefined,
   rows: ReturnType<typeof readouts>,
   system: UnitSystem,
+  t: Translator['t'],
 ): string {
   if (!readoutKeys.has(key) || !(unit === 'length' || unit === 'moa' || unit === 'mrad'))
     return token
   const r = rows.find((x) => x.key === key)
-  if (!r) return 'n/a'
+  if (!r) return t('n/a')
   if (unit === 'length') return withUnit('length', system, r.value)
   const u = unit === 'moa' ? unitsOf.correction.MOA : unitsOf.correction.mrad
   return `${formatNumber(u.fromSi(r.angle), u.decimals)} ${u.symbol}`

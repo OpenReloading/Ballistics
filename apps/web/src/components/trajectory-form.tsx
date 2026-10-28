@@ -1273,7 +1273,7 @@ export function TrajectoryForm({
   const readSights = () => {
     storedRecords()
       .then(({ records }) => {
-        const options = sightOptions(records)
+        const options = sightOptions(records, t)
         setSights(options)
         if (sight && !options.some((o) => o.value === sight)) {
           setSight('')

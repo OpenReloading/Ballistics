@@ -6,6 +6,7 @@
  * React, DOM or Next.js.
  */
 import { type ShotGroup, type TargetFace, type TargetSheet, toSi } from '@open-reloading/schema'
+import { english } from '../i18n/translate.ts'
 import { type FederationData, mappingOf } from './face-disciplines.ts'
 import { nth } from './nth.ts'
 import { faceAlignment } from './ring-scoring.ts'
@@ -113,7 +114,12 @@ export function faceGeometry(o: {
   )
   if (!choice.marks && !onFace && !group.aim) return undefined
   try {
-    const a = faceAlignment(record, choice.marks, choice.marks || !onFace ? group.aim : undefined)
+    const a = faceAlignment(
+      record,
+      choice.marks,
+      choice.marks || !onFace ? group.aim : undefined,
+      english.t,
+    )
     const k = 1 / toSi('length', a.scale)
     return {
       toFace: mul3([k, 0, -k * a.centre.x, 0, k, -k * a.centre.y, 0, 0, 1], toTarget),

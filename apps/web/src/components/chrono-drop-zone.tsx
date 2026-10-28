@@ -2,6 +2,7 @@
 
 import { Tooltip } from '@mantine/core'
 import { type DragEvent, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { tipEvents } from '../lib/theme.ts'
 
 /**
@@ -28,6 +29,7 @@ export function ChronoDropZone({
   file?: string | undefined
   onFiles: (files: File[]) => void
 }) {
+  const { t } = useTranslation()
   const [over, setOver] = useState(false)
   const bar = variant === 'bar'
   const described = bar ? `${id}-help` : `${id}-hint`
@@ -57,10 +59,10 @@ export function ChronoDropZone({
           {file ? (
             <>
               <span className="drop-zone-file">{file}</span>
-              <span className="drop-zone-action">Replace</span>
+              <span className="drop-zone-action">{t('Replace')}</span>
             </>
           ) : (
-            <span className="drop-zone-hint">Drop a file here or click to choose</span>
+            <span className="drop-zone-hint">{t('Drop a file here or click to choose')}</span>
           )}
           <span id={described} className="visually-hidden">
             {help}
@@ -68,8 +70,9 @@ export function ChronoDropZone({
         </>
       ) : (
         <span id={described} className="drop-zone-hint">
-          Drop {multiple ? 'files' : 'a file'} here or click to choose. Read in this browser, not
-          uploaded.
+          {multiple
+            ? t('Drop files here or click to choose. Read in this browser, not uploaded.')
+            : t('Drop a file here or click to choose. Read in this browser, not uploaded.')}
         </span>
       )}
       <input

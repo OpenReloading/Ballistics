@@ -136,6 +136,69 @@ const otherSense: Record<string, string> = {
   'meplatDiameter must be zero up to the diameter': 'zero: the number',
   'A flat spot is a statistical observation of the strings fired: neighbouring charges whose slope of mean velocity has a {level} % band that includes zero. Few shots make wide bands. It is not a safety statement and not a charge to load.':
     'zero: the number',
+  'Click both ends of a known length.': 'click: a mouse click, not a turret click',
+  'Click the ring center, then a point on the ring.': 'click: a mouse click',
+  'Click three points on the ring.': 'click: a mouse click',
+  'Click the corners: top left, top right, bottom right, bottom left.': 'click: a mouse click',
+  'Point of aim, each group its own: Set, then click it on the target, or type x and y in target coordinates; drag it with Select.':
+    'click: a mouse click',
+  'A drawn target. Place shots, then click where each shot hit. Or add a photo of the target: choose, drop or paste one.':
+    'click: a mouse click; hit: a shot lands, not a scored Treffer',
+  'A drawn target. Place shots, then click where each shot hit. Or add a photo of the target.':
+    'click: a mouse click; hit: a shot lands',
+  'Place shots, then click each hole.': 'click: a mouse click',
+  'Click the photo point of target (0, 0). {keys}': 'click: a mouse click',
+  'Click the point of aim of the active group. {keys}': 'click: a mouse click',
+  'Click a hole to add a shot to the active group.': 'click: a mouse click',
+  'Shot: add shots to the active group by click or tap': 'click: a mouse click',
+  Clicks:
+    "turret clicks, the unit of an adjustment (the German word is the one of the term row's turret sense)",
+  'Optic for clicks': 'turret clicks',
+  'Clicks of {optic} ({mrad} mrad, {moa} MOA) that move the group center onto the point of aim.':
+    'turret clicks',
+  'Choose, drop or paste a photo; it stays in this browser and is never uploaded.':
+    'drop: drop a file onto the page, not a bullet drop',
+  'Photo: choose, drop or paste one; it stays in this browser and is never uploaded':
+    'drop: drop a file onto the page',
+  'Select: drag shots, points of aim and reference points; drag the background to pan':
+    'drag: move with the pointer, not air drag',
+  'The federation whose disciplines the Discipline list shows. All: every discipline, then the face events no discipline names.':
+    'events: the verified term of Event is Wettbewerb, a rejected candidate of Discipline',
+  'The discipline sets the face, the event and with it the scored hole. Type to search by name, number or federation.':
+    'events: the verified term of Event is Wettbewerb, a rejected candidate of Discipline',
+  "A face no discipline names: the event's gauge is the scored hole, as the rule book says; a black-powder event scores the hole centre. Bullet: the bullet diameter of the load, else Marker.":
+    'events: the verified term of Event is Wettbewerb, a rejected candidate of Discipline',
+  'No hole size: set Marker, or choose a discipline or event with a gauge.':
+    'events: the verified term of Event is Wettbewerb, a rejected candidate of Discipline',
+  'Where a further shot lands with the stated coverage (50 %, 95 %), from the shots of the group. Absent below 3 shots.':
+    'lands: a shot lands, not the rifling lands',
+  'Load a photo first.': 'load as the verb for a photo file, not a load (Laborierung)',
+  'More than one face fits these rings: choose the target in Target face.':
+    'the target is the face to choose in the field Target face, whose German label is Scheibe',
+  'Diameter of the black area on the target, used when no face fits: it sets the scale and the center from the black area alone (the center is approximate on a tilted photo).':
+    'a face that fits is a Scheibe, the target itself stays Zielscheibe',
+  'Proposals are dashed on the photo; none counts until accepted. On the photo: double-click or Enter accepts one, drag or arrow keys move it, Delete removes it.':
+    'drag is the mouse action, not aerodynamic drag',
+  '{label}. Double-click or Enter accepts it, drag or arrow keys move it, Delete removes it.':
+    'drag is the mouse action, not aerodynamic drag',
+  'Drop a file here or click to choose': 'drop means dragging a file onto the area',
+  'Drop files here or click to choose. Read in this browser, not uploaded.':
+    'drop means dragging files onto the area',
+  'Drop a file here or click to choose. Read in this browser, not uploaded.':
+    'drop means dragging a file onto the area',
+  'Choose or drop a chronograph file, or load the example: three strings of ten made-up shots.':
+    'drop means dragging a file onto the page; load means to open the example, not a cartridge load',
+  'Load example': 'load means to open the example, not a cartridge load',
+  'Muzzle distance: {distance}':
+    'distance of the chronograph from the muzzle (table term Entfernung is used)',
+  'Statistics per string, excluded shots left out ({unit})': 'left out, not a drop',
+  'Cold bore': 'cold bore shot, term Kaltschuss',
+  'Read {strings}, {shots}.':
+    'the shot count is the {shots} placeholder (filled with the plural text)',
+  'Velocity unit when the file names none': 'names is a verb (the file states none)',
+  'Enter the velocity as a number above zero.': 'zero is the number',
+  'Name the bullet the lands contact was measured with': 'Name is a verb',
+  'must be above absolute zero': 'absolute zero is the temperature, not zeroing a rifle',
 }
 
 const wordPattern = (word: string) => new RegExp(`\\b${word}(e?s)?\\b`, 'i')

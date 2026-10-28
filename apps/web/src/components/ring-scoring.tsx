@@ -11,7 +11,9 @@ import {
   toSi,
 } from '@open-reloading/schema'
 import { type RefObject, useEffect, useMemo, useRef, useState } from 'react'
-import { fixedNumber } from '../i18n/number.ts'
+import { useTranslation } from '../i18n/language.ts'
+import { fixedNumber, plainNumber } from '../i18n/number.ts'
+import { msg, type Translator } from '../i18n/translate.ts'
 import {
   disciplineChoice,
   disciplineFaces,
@@ -52,23 +54,29 @@ import { useUnits } from './units-settings.tsx'
 
 type Scoring = ReturnType<typeof scoreGroupOnFace>
 
-const offline = 'Faces need the network'
-const faceHelp =
-  'The rule-book target face that scores the group. Scores follow every edit; excluded shots show their value and do not count in the total.'
-const federationHelp =
-  'The federation whose disciplines the Discipline list shows. All: every discipline, then the face events no discipline names.'
-const disciplineHelp =
-  'The discipline sets the face, the event and with it the scored hole. Type to search by name, number or federation.'
-const eventHelp =
-  "A face no discipline names: the event's gauge is the scored hole, as the rule book says; a black-powder event scores the hole centre. Bullet: the bullet diameter of the load, else Marker."
-const ringHelp =
-  'The ring the next marks lie on; mark the outer edge of its line. Fit needs 4 marks on 2 rings.'
-const ownRuleNote =
-  'Tenths in the 10 zone of this face: own rule. The 10 zone is wider than one ring and the rule book does not divide it; tenths of the ring width are counted inward from the touching edge, 10.9 for the rest of the centre.'
+const offline = msg('Faces need the network')
+const faceHelp = msg(
+  'The rule-book target face that scores the group. Scores follow every edit; excluded shots show their value and do not count in the total.',
+)
+const federationHelp = msg(
+  'The federation whose disciplines the Discipline list shows. All: every discipline, then the face events no discipline names.',
+)
+const disciplineHelp = msg(
+  'The discipline sets the face, the event and with it the scored hole. Type to search by name, number or federation.',
+)
+const eventHelp = msg(
+  "A face no discipline names: the event's gauge is the scored hole, as the rule book says; a black-powder event scores the hole centre. Bullet: the bullet diameter of the load, else Marker.",
+)
+const ringHelp = msg(
+  'The ring the next marks lie on; mark the outer edge of its line. Fit needs 4 marks on 2 rings.',
+)
+const ownRuleNote = msg(
+  'Tenths in the 10 zone of this face: own rule. The 10 zone is wider than one ring and the rule book does not divide it; tenths of the ring width are counted inward from the touching edge, 10.9 for the rest of the centre.',
+)
 
 /** A shot's value as shown: tenths where the face has them, X for an inner ten. */
 export const shotText = (s: RingScore) =>
-  `${s.decimal !== undefined ? fixedNumber(s.decimal, 1) : s.value}${s.innerTen ? ' X' : ''}`
+  `${s.decimal !== undefined ? fixedNumber(s.decimal, 1) : plainNumber(s.value)}${s.innerTen ? ' X' : ''}`
 
 /** A group's scoring when it scored: none while its face loads, after a failure or a refusal. */
 export const scoredOnly = (r: Scoring | 'loading' | 'error' | undefined) =>
@@ -79,7 +87,7 @@ export function scoreLine(r: Scoring | 'loading' | 'error' | undefined) {
   const scored = scoredOnly(r)
   if (!scored) return
   const { total, decimalTotal, innerTenCount: xCount } = scored.score
-  return `${total}${decimalTotal !== undefined ? ` (${fixedNumber(decimalTotal, 1)})` : ''}, ${xCount} X`
+  return `${plainNumber(total)}${decimalTotal !== undefined ? ` (${fixedNumber(decimalTotal, 1)})` : ''}, ${plainNumber(xCount)} X`
 }
 
 /** One group's score: none without a face, loading, failed, or the scoring. */
@@ -89,11 +97,12 @@ function scoreOne(
   f: Face | 'error' | undefined,
   data: FederationData | undefined,
   bullet: number | undefined,
+  t: Translator['t'],
 ): Scoring | 'loading' | 'error' {
   if (f === undefined) return 'loading'
   if (f === 'error') return f
   const gauge = mappingOf(data?.mappings ?? [], face)?.gaugeMm
-  return scoreGroupOnFace(f, { ...face, gauge }, g, bullet)
+  return scoreGroupOnFace(f, { ...face, gauge }, g, bullet, t)
 }
 
 /** The score of every group that has a face, by group id. */
@@ -102,10 +111,11 @@ function scoreGroups(
   faces: Record<string, Face | 'error'>,
   data: FederationData | undefined,
   bullet: number | undefined,
+  t: Translator['t'],
 ) {
   const out = new Map<string, Scoring | 'loading' | 'error'>()
   for (const g of groups)
-    if (g.face) out.set(g.id, scoreOne(g, g.face, faces[g.face.id], data, bullet))
+    if (g.face) out.set(g.id, scoreOne(g, g.face, faces[g.face.id], data, bullet, t))
   return out
 }
 
@@ -117,19 +127,24 @@ function scoreStatus(o: {
   current: Scoring | 'loading' | 'error' | undefined
   result: ScoredGroup | undefined
   system: UnitSystem
+  t: Translator['t']
 }) {
-  const { list, choice, face, current, result, system } = o
-  if (list === 'error') return offline
-  if (!choice) return 'No face: no score.'
+  const { list, choice, face, current, result, system, t } = o
+  if (list === 'error') return t(offline)
+  if (!choice) return t('No face: no score.')
   if (face === 'error')
     return choice.id.startsWith(faceIdPrefix)
-      ? 'This face design is deleted or no longer a valid face.'
-      : `${offline}: ${choice.id} could not be loaded.`
+      ? t('This face design is deleted or no longer a valid face.')
+      : t('Faces need the network: {id} could not be loaded.', { id: choice.id })
   if (current && typeof current === 'object' && 'error' in current) return current.error
-  if (!result) return 'Loading the face…'
-  if (!choice.marks) return 'Centred on the point of aim (or the origin) at the sheet scale.'
+  if (!result) return t('Loading the face…')
+  if (!choice.marks) return t('Centred on the point of aim (or the origin) at the sheet scale.')
   const misfit = mmLength(system, fromSi('length', result.alignment.rms ?? 0))
-  return `Fitted to ${choice.marks.length} marks, misfit ${misfit}, scale ${fixedNumber(result.alignment.scale * 100, 1)} %.`
+  return t('Fitted to {count} marks, misfit {misfit}, scale {scale} %.', {
+    count: choice.marks.length,
+    misfit,
+    scale: fixedNumber(result.alignment.scale * 100, 1),
+  })
 }
 
 /** The Face select's options: the discipline's stages in the rule book's order, else the faces. */
@@ -139,10 +154,11 @@ function faceOptionsOf(o: {
   discipline: string | undefined
   ofDiscipline: ReturnType<typeof disciplineFaces>
   inFederation: Set<string> | undefined
+  t: Translator['t']
 }) {
-  const { list, choice, discipline, ofDiscipline, inFederation } = o
-  if (list === 'error') return [{ value: choice?.id ?? '', label: choice?.id ?? offline }]
-  const none = { value: '', label: 'None' }
+  const { list, choice, discipline, ofDiscipline, inFederation, t } = o
+  if (list === 'error') return [{ value: choice?.id ?? '', label: choice?.id ?? t(offline) }]
+  const none = { value: '', label: t('None') }
   if (discipline) {
     const label = (id: string) => {
       const f = typeof list === 'object' && list.find((x) => x.id === id)
@@ -177,21 +193,22 @@ function DisciplineSelect({
   value: ReturnType<typeof disciplineValue>
   onPick: (value: string | null) => void
 }) {
+  const { t } = useTranslation()
   return (
     <Select
-      label="Discipline"
+      label={t('Discipline')}
       size={controlSize.row.input}
       searchable
       allowDeselect={false}
-      labelProps={{ title: disciplineHelp }}
-      title={unreachable ? offline : undefined}
+      labelProps={{ title: t(disciplineHelp) }}
+      title={unreachable ? t(offline) : undefined}
       disabled={unreachable || !choices.length}
-      placeholder={unreachable ? offline : undefined}
-      nothingFoundMessage="None found"
+      placeholder={unreachable ? t(offline) : undefined}
+      nothingFoundMessage={t('None found')}
       comboboxProps={{ width: 'max-content', position: 'bottom-end', keepMounted: false }}
       // the scrolling region is focusable (axe scrollable-region-focusable) and a group, so it may sit in the listbox (aria-required-children)
       scrollAreaProps={{
-        viewportProps: { tabIndex: 0, role: 'group', 'aria-label': 'Disciplines' },
+        viewportProps: { tabIndex: 0, role: 'group', 'aria-label': t('Disciplines') },
       }}
       data={choices}
       value={value}
@@ -211,12 +228,13 @@ function EventSelect({
   system: UnitSystem
   onEvent: (event: string) => void
 }) {
+  const { t } = useTranslation()
   return (
     <NativeSelect
-      label="Event"
+      label={t('Event')}
       size={controlSize.row.input}
-      description={eventHelp}
-      labelProps={{ title: eventHelp }}
+      description={t(eventHelp)}
+      labelProps={{ title: t(eventHelp) }}
       data={[
         ...record.events
           .toSorted((a, b) =>
@@ -229,7 +247,7 @@ function EventSelect({
             value: e.id,
             label: `${e.name}${e.gauge ? `, ${mmLength(system, e.gauge.value)}` : ''}`,
           })),
-        { value: '', label: 'Bullet' },
+        { value: '', label: t('Bullet') },
       ]}
       value={event ?? ''}
       onChange={(e) => onEvent(e.currentTarget.value)}
@@ -395,13 +413,14 @@ function clickPoint(
     count: number
     say: (text: string, alert?: boolean) => void
     addMark: (m: FaceMark) => void
+    t: Translator['t']
   },
   p: Point,
 ): boolean {
   if (o.tool !== 'rings') return false
   if (!o.frame || o.ringValue === undefined) return true
   if (o.count >= 64) {
-    o.say('At most 64 marks.', true)
+    o.say(o.t('At most 64 marks.'), true)
     return true
   }
   o.addMark({ ring: o.ringValue, ...viewToTarget(o.frame, p) })
@@ -417,20 +436,24 @@ function fitFace(o: {
   setFace: SetFace
   startTool: (t: Tool) => void
   markButton: RefObject<HTMLButtonElement | null>
+  t: Translator['t']
 }) {
-  const { record, marks, system, say, setFace, startTool, markButton } = o
+  const { record, marks, system, say, setFace, startTool, markButton, t } = o
   if (!record) return
   try {
-    const a = faceAlignment(record, marks, undefined)
+    const a = faceAlignment(record, marks, undefined, t)
     setFace((x) => x && { ...x, marks })
     say(
-      `Face fitted to ${marks.length} marks, misfit ${mmLength(system, fromSi('length', a.rms ?? 0))}.`,
+      t('Face fitted to {count} marks, misfit {misfit}.', {
+        count: marks.length,
+        misfit: mmLength(system, fromSi('length', a.rms ?? 0)),
+      }),
     )
     startTool('select')
     // the Fit button turns disabled: the focus goes back to Mark
     requestAnimationFrame(() => markButton.current?.focus())
   } catch (e) {
-    say(`The ring marks do not fit: ${(e as Error).message}.`, true)
+    say(t('The ring marks do not fit: {reason}.', { reason: (e as Error).message }), true)
   }
 }
 
@@ -455,8 +478,11 @@ function referenceOf(
   }
 }
 
-function ringHint(ringValue: number | undefined, marks: number, rings: number) {
-  return `Click points on ring ${ringValue ?? '?'}; choose the ring in Ring. ${marks} marks on ${rings} rings; Fit needs 4 on 2 rings. Or arrow keys and Enter. Esc cancels.`
+function ringHint(ringValue: number | undefined, marks: number, rings: number, t: Translator['t']) {
+  return t(
+    'Click points on ring {ring}; choose the ring in Ring. {marks} marks on {rings} rings; Fit needs 4 on 2 rings. Or arrow keys and Enter. Esc cancels.',
+    { ring: ringValue ?? '?', marks, rings },
+  )
 }
 
 /** The faces of the federation picked in Federation when no discipline is, else undefined. */
@@ -535,40 +561,41 @@ type PanelProps = {
 
 function AlignRow(p: PanelProps) {
   const { choice, record, tool, canFit, markButton } = p
+  const { t } = useTranslation()
   return (
     <div className="prop-row score-align">
       <span className="prop-label" title={p.status}>
-        Align
+        {t('Align')}
       </span>
       <span className="prop-value row-buttons">
         <Button
           size={controlSize.row.button}
           variant={choice && !choice.marks ? 'filled' : 'default'}
           disabled={!record}
-          title="Centre the face on the point of aim (or the origin) at the sheet scale"
+          title={t('Centre the face on the point of aim (or the origin) at the sheet scale')}
           onClick={() => p.onFaceEdit((x) => x && { id: x.id, ...(x.event && { event: x.event }) })}
         >
-          On aim
+          {t('On aim')}
         </Button>
         <Button
           ref={markButton}
           size={controlSize.row.button}
           variant={tool === 'rings' ? 'filled' : 'default'}
           disabled={!record || !p.hasFrame}
-          title="Mark points on two or more rings of the face, then Fit"
+          title={t('Mark points on two or more rings of the face, then Fit')}
           onClick={p.onMark}
         >
-          Mark
+          {t('Mark')}
         </Button>
         <Button
           size={controlSize.row.button}
           variant="default"
           disabled={tool !== 'rings' || !canFit}
-          aria-label="Fit face"
-          title="Fit the face's centre and scale to the marks"
+          aria-label={t('Fit face')}
+          title={t("Fit the face's centre and scale to the marks")}
           onClick={p.onFit}
         >
-          Fit
+          {t('Fit')}
         </Button>
       </span>
     </div>
@@ -577,16 +604,17 @@ function AlignRow(p: PanelProps) {
 
 function FaceSelects(p: PanelProps) {
   const { data, list, choice } = p
+  const { t } = useTranslation()
   return (
     <>
       <NativeSelect
-        label="Federation"
+        label={t('Federation')}
         size={controlSize.row.input}
-        description={federationHelp}
-        labelProps={{ title: federationHelp }}
+        description={t(federationHelp)}
+        labelProps={{ title: t(federationHelp) }}
         disabled={!data?.federations.length}
         data={[
-          { value: '', label: 'All' },
+          { value: '', label: t('All') },
           ...(data?.federations ?? []).map((f) => ({ value: f.id, label: f.abbreviation })),
         ]}
         value={p.fed}
@@ -599,11 +627,11 @@ function FaceSelects(p: PanelProps) {
         onPick={p.onDiscipline}
       />
       <NativeSelect
-        label="Face"
+        label={t('Face')}
         size={controlSize.row.input}
-        description={faceHelp}
-        labelProps={{ title: faceHelp }}
-        title={list === 'error' ? offline : undefined}
+        description={t(faceHelp)}
+        labelProps={{ title: t(faceHelp) }}
+        title={list === 'error' ? t(offline) : undefined}
         disabled={list === 'error' || (list === 'loading' && !choice)}
         data={p.faceOptions}
         value={choice?.id ?? ''}
@@ -615,6 +643,7 @@ function FaceSelects(p: PanelProps) {
 
 function ScorePanel(p: PanelProps) {
   const { choice, record, result, status, system } = p
+  const { t } = useTranslation()
   return (
     <>
       <FaceSelects {...p} />
@@ -636,10 +665,10 @@ function ScorePanel(p: PanelProps) {
         )}
         <AlignRow {...p} />
         <NativeSelect
-          label="Ring"
+          label={t('Ring')}
           size={controlSize.row.input}
-          description={ringHelp}
-          labelProps={{ title: ringHelp }}
+          description={t(ringHelp)}
+          labelProps={{ title: t(ringHelp) }}
           disabled={!record}
           data={(record?.rings ?? []).map((x) => ({
             value: String(x.value),
@@ -651,25 +680,27 @@ function ScorePanel(p: PanelProps) {
         <div className="prop-row">
           <span
             className="prop-label"
-            title="Add the fitted face as a scale reference of the sheet (Calibrate): its outermost marked ring at the rule-book diameter."
+            title={t(
+              'Add the fitted face as a scale reference of the sheet (Calibrate): its outermost marked ring at the rule-book diameter.',
+            )}
           >
-            Scale ref.
+            {t('Scale ref.')}
           </span>
           <span className="prop-value row-buttons">
             <Button
               size={controlSize.row.button}
               variant="default"
               disabled={!p.sheet.photo || !choice?.marks || !result}
-              aria-label="Add the face as a scale reference"
+              aria-label={t('Add the face as a scale reference')}
               onClick={p.onReference}
             >
-              Add
+              {t('Add')}
             </Button>
           </span>
         </div>
         <p
           className="score-status wide"
-          title={result?.usesOwnTenthRule ? `${status} ${ownRuleNote}` : status}
+          title={result?.usesOwnTenthRule ? `${status} ${t(ownRuleNote)}` : status}
         >
           {status}
         </p>
@@ -710,6 +741,7 @@ export function useRingScoring({
   startTool: (t: Tool) => void
 }) {
   const { system } = useUnits()
+  const { t } = useTranslation()
   const [list, setList] = useState<FaceSummary[] | 'loading' | 'error'>('loading')
   const [all, setAll] = useState<Face[]>([])
   const [data, setData] = useState<FederationData>()
@@ -751,8 +783,8 @@ export function useRingScoring({
   }, [group?.id, group?.face?.id])
 
   const scoring = useMemo(
-    () => scoreGroups(sheet.groups, faces, data, bullet),
-    [sheet.groups, faces, bullet, data],
+    () => scoreGroups(sheet.groups, faces, data, bullet, t),
+    [sheet.groups, faces, bullet, data, t],
   )
   /** The score of group `id`: undefined without a face. */
   const of = (id: string) => scoring.get(id)
@@ -790,13 +822,14 @@ export function useRingScoring({
         count: marks.length,
         say,
         addMark: (m) => setMarks((x) => [...x, m]),
+        t,
       },
       p,
     )
 
   const ringsMarked = new Set(marks.map((m) => m.ring)).size
   const canFit = marks.length >= 4 && ringsMarked >= 2
-  const fit = () => fitFace({ record, marks, system, say, setFace, startTool, markButton })
+  const fit = () => fitFace({ record, marks, system, say, setFace, startTool, markButton, t })
 
   /** The fitted face as a scale reference of the sheet. */
   const asReference = () => {
@@ -804,7 +837,7 @@ export function useRingScoring({
     if (reference) onReference(reference)
   }
 
-  const hint = tool === 'rings' ? ringHint(ringValue, marks.length, ringsMarked) : undefined
+  const hint = tool === 'rings' ? ringHint(ringValue, marks.length, ringsMarked, t) : undefined
 
   /** The rings of the active group's face and the values of its shots; `still` leaves out marks. */
   const layer = (k: number, still?: boolean) =>
@@ -822,7 +855,7 @@ export function useRingScoring({
       />
     ) : null
 
-  const status = scoreStatus({ list, choice, face, current, result, system })
+  const status = scoreStatus({ list, choice, face, current, result, system, t })
   const ofDiscipline = discipline ? disciplineFaces(mappings, discipline) : []
   const inFederation = federationOf(all, data, fed, discipline)
 
@@ -834,7 +867,7 @@ export function useRingScoring({
       choices={choices}
       choice={choice}
       mappings={mappings}
-      faceOptions={faceOptionsOf({ list, choice, discipline, ofDiscipline, inFederation })}
+      faceOptions={faceOptionsOf({ list, choice, discipline, ofDiscipline, inFederation, t })}
       record={record}
       result={result}
       status={status}
@@ -860,5 +893,5 @@ export function useRingScoring({
   )
 
   const scope: FaceScope = { ...(fed && { federation: fed }), ...(data && { data }) }
-  return { onPoint, hint, layer, panel, of, ownRuleNote, scope }
+  return { onPoint, hint, layer, panel, of, ownRuleNote: t(ownRuleNote), scope }
 }

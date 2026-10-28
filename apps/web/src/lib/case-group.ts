@@ -1,24 +1,25 @@
 import { type Case, cartridgeCase, parseRef, type UserRecord } from '@open-reloading/schema'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import type { FieldSpec } from './field-spec.ts'
 import { measuredCapacityRef } from './load-record.ts'
 
 /** The measured fields of a group of cases, in the form's units and in the order of the editor. */
 export const caseGroupFields = [
-  { key: 'mass', label: 'Case mass', quantity: 'mass', min: 0, positive: true },
-  { key: 'trimLength', label: 'Trim length', quantity: 'length', min: 0, positive: true },
-  { key: 'neckWall', label: 'Neck wall', quantity: 'length', min: 0, positive: true },
+  { key: 'mass', label: msg('Case mass'), quantity: 'mass', min: 0, positive: true },
+  { key: 'trimLength', label: msg('Trim length'), quantity: 'length', min: 0, positive: true },
+  { key: 'neckWall', label: msg('Neck wall'), quantity: 'length', min: 0, positive: true },
   {
     key: 'numberOfFirings',
-    label: 'Times fired',
-    help: 'Firings of these cases so far.',
+    label: msg('Times fired'),
+    help: msg('Firings of these cases so far.'),
     quantity: 'ratio',
     min: 0,
     integer: true,
   },
   {
     key: 'casesMeasured',
-    label: 'Cases measured',
-    help: 'The number of cases the capacity and the other measured values come from.',
+    label: msg('Cases measured'),
+    help: msg('The number of cases the capacity and the other measured values come from.'),
     quantity: 'ratio',
     min: 1,
     positive: true,
@@ -26,8 +27,8 @@ export const caseGroupFields = [
   },
   {
     key: 'spread',
-    label: 'Capacity spread',
-    help: 'Standard deviation of the water capacity over the cases measured.',
+    label: msg('Capacity spread'),
+    help: msg('Standard deviation of the water capacity over the cases measured.'),
     quantity: 'mass',
     min: 0,
   },
@@ -36,8 +37,10 @@ export const caseGroupFields = [
 /** The water capacity to the mouth, the one measured value that is a record of its own. */
 export const caseGroupCapacitySpec = {
   key: 'capacity',
-  label: 'Water capacity to the mouth',
-  help: 'Measured on the cases of this group, for example fired and sized. The workbench takes it as the measured case capacity.',
+  label: msg('Water capacity to the mouth'),
+  help: msg(
+    'Measured on the cases of this group, for example fired and sized. The workbench takes it as the measured case capacity.',
+  ),
   quantity: 'capacity',
   min: 0,
   positive: true,
@@ -51,7 +54,7 @@ export const blankCaseGroup = (): Case => ({
   material: 'brass',
 })
 
-const labels: Record<string, string> = Object.fromEntries(
+const labels: Record<string, Message> = Object.fromEntries(
   [...caseGroupFields, caseGroupCapacitySpec].map((s) => [s.key, s.label]),
 )
 
@@ -59,14 +62,18 @@ const labels: Record<string, string> = Object.fromEntries(
  * Why Save refuses a group of cases, as a sentence with the field label; undefined when the record
  * is valid. `name` is the record name, which must not be empty.
  */
-export function caseGroupProblem(name: string, c: Case): string | undefined {
-  if (!name) return 'Enter a name.'
-  if (!c.cartridge) return 'Choose the cartridge.'
+export function caseGroupProblem(name: string, c: Case, t: Translator['t']): string | undefined {
+  if (!name) return t('Enter a name.')
+  if (!c.cartridge) return t('Choose the cartridge.')
   const [issue] = cartridgeCase.safeParse(c).error?.issues ?? []
   if (!issue) return
   // a stored quantity is `{ value }`: the field is the key above it
   const field = String(issue.path.findLast((p) => typeof p === 'string' && p !== 'value'))
-  return `${labels[field] ?? field}: ${issue.code === 'invalid_type' ? 'enter a number' : 'not valid'}.`
+  const label = labels[field]
+  const what = label ? t(label) : field
+  return issue.code === 'invalid_type'
+    ? t('{what}: enter a number.', { what })
+    : t('{what}: not valid.', { what })
 }
 
 /** The measured capacity (g) a group of cases names: its `capacity` record among `records`, else undefined. */

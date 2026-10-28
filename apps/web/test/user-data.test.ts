@@ -5,6 +5,7 @@ import {
   userRecord,
 } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import { exampleFirearm } from '../src/lib/example-data.ts'
 import { parseFiles, readLoadFile } from '../src/lib/load-file-formats.ts'
 import { maxLinkChars, readLink, shareLink, shareProblem } from '../src/lib/share-link.ts'
@@ -100,10 +101,14 @@ describe('user data files', () => {
 
   it('skips a file with one invalid record as a whole and names the field', () => {
     const bad = { ...bullet, data: { ...bullet.data, overrides: { mass: { value: 'heavy' } } } }
-    const { records, skipped } = parseFiles([
-      { name: 'good.json', text: userDataText([load]) },
-      { name: 'bad.json', text: userDataText([load, bad as unknown as UserRecord]) },
-    ])
+    const { records, skipped } = parseFiles(
+      [
+        { name: 'good.json', text: userDataText([load]) },
+        { name: 'bad.json', text: userDataText([load, bad as unknown as UserRecord]) },
+      ],
+      undefined,
+      english.t,
+    )
     expect(records).toEqual([load])
     expect(skipped).toHaveLength(1)
     expect(defined(skipped[0]).name).toBe('bad.json')
@@ -111,10 +116,11 @@ describe('user data files', () => {
   })
 
   it('skips a file over the size limit', () => {
-    const { skipped } = parseFiles([
-      { name: 'big.json', text: ' '.repeat(maxFileBytes + 1) },
-      { name: 'unread.json' },
-    ])
+    const { skipped } = parseFiles(
+      [{ name: 'big.json', text: ' '.repeat(maxFileBytes + 1) }, { name: 'unread.json' }],
+      undefined,
+      english.t,
+    )
     expect(skipped.map((s) => s.reason)).toEqual([
       'The file is larger than 40 MB.',
       'The file is larger than 40 MB.',
@@ -488,23 +494,29 @@ describe('refNote', () => {
   } as UserRecord
 
   it('names the records whose reference points at no record', () => {
-    expect(refNote([withFirearm('user:2b8e1d7c-4f3a-4a6e-9d51-7c0a3e5b9f12')], [])).toBe(
+    expect(refNote([withFirearm('user:2b8e1d7c-4f3a-4a6e-9d51-7c0a3e5b9f12')], [], english.t)).toBe(
       'Not found: 308 Win.: the firearm user:2b8e1d7c-4f3a-4a6e-9d51-7c0a3e5b9f12 is not in this browser.',
     )
   })
 
   it('is empty when the browser holds the referenced record, or the opened ones do', () => {
-    expect(refNote([withFirearm(`user:${gunId}`)], [rifle])).toBe('')
-    expect(refNote([withFirearm(`user:${gunId}`), rifle], [])).toBe('')
+    expect(refNote([withFirearm(`user:${gunId}`)], [rifle], english.t)).toBe('')
+    expect(refNote([withFirearm(`user:${gunId}`), rifle], [], english.t)).toBe('')
   })
 
   it('finds the built-in example rifle where it is passed with the stored records', () => {
     expect(
-      refNote([withFirearm(`user:${exampleFirearm.id}`)], [userRecord.parse(exampleFirearm)]),
+      refNote(
+        [withFirearm(`user:${exampleFirearm.id}`)],
+        [userRecord.parse(exampleFirearm)],
+        english.t,
+      ),
     ).toBe('')
   })
 
   it('does not report a stored record that is not opened', () => {
-    expect(refNote([bullet], [withFirearm('user:2b8e1d7c-4f3a-4a6e-9d51-7c0a3e5b9f12')])).toBe('')
+    expect(
+      refNote([bullet], [withFirearm('user:2b8e1d7c-4f3a-4a6e-9d51-7c0a3e5b9f12')], english.t),
+    ).toBe('')
   })
 })
