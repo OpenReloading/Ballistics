@@ -5,6 +5,7 @@ import { chargeBody, chargeTargetExample } from '../compute/charge-schema.ts'
 import { chargeTargetResponse } from '../compute/interior-response.ts'
 import { findCartridge, findPowder } from '../compute/resolve.ts'
 import type { ComputeContext } from './common.ts'
+import { describeAnswers } from './identity.ts'
 
 /**
  * The charge solver of the M3 model. Registered without
@@ -18,6 +19,7 @@ export const chargeTargetRoutes: FastifyPluginAsync<ComputeContext> = async (
   app.setErrorHandler<FastifyError>(
     computeErrorHandler({ withNotice: () => true, truingDetails: false }),
   )
+  describeAnswers(app, catalogue)
 
   app.post(
     '/interior/charge-target',

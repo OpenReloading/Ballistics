@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "OpenReloading API",
-    "version": "0.0.2",
+    "version": "0.0.4",
     "description": "Records of cartridges, components and competitions, and the exterior and interior ballistics models. Quantities are SI (m, kg, s, Pa, K, rad) unless a field names another unit. Results are simulations, not load data."
   },
   "tags": [
@@ -3034,6 +3034,18 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "inputHash": {
+                      "type": "string",
+                      "description": "SHA-256 of the request as 64 hex digits: the canonical JSON of the body (keys sorted, as sent, defaults not filled in), of the query for a request without a body, of `{ body, query }` where a request has both."
+                    },
+                    "apiVersion": {
+                      "type": "string",
+                      "description": "Version of the API that computed the answer."
+                    },
+                    "dataHash": {
+                      "type": "string",
+                      "description": "SHA-256 of the data set the API ran on (every record and the renames) as 64 hex digits. It changes with any record field."
+                    },
                     "units": {
                       "type": "object",
                       "propertyNames": {
@@ -4088,7 +4100,7 @@
                       "additionalProperties": {}
                     }
                   },
-                  "required": ["units", "result"],
+                  "required": ["inputHash", "apiVersion", "dataHash", "units", "result"],
                   "additionalProperties": {}
                 }
               }
@@ -5100,6 +5112,18 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "inputHash": {
+                      "type": "string",
+                      "description": "SHA-256 of the request as 64 hex digits: the canonical JSON of the body (keys sorted, as sent, defaults not filled in), of the query for a request without a body, of `{ body, query }` where a request has both."
+                    },
+                    "apiVersion": {
+                      "type": "string",
+                      "description": "Version of the API that computed the answer."
+                    },
+                    "dataHash": {
+                      "type": "string",
+                      "description": "SHA-256 of the data set the API ran on (every record and the renames) as 64 hex digits. It changes with any record field."
+                    },
                     "units": {
                       "type": "object",
                       "propertyNames": {
@@ -5670,7 +5694,7 @@
                       "additionalProperties": {}
                     }
                   },
-                  "required": ["units", "result"],
+                  "required": ["inputHash", "apiVersion", "dataHash", "units", "result"],
                   "additionalProperties": {}
                 }
               }
@@ -6791,6 +6815,18 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "inputHash": {
+                      "type": "string",
+                      "description": "SHA-256 of the request as 64 hex digits: the canonical JSON of the body (keys sorted, as sent, defaults not filled in), of the query for a request without a body, of `{ body, query }` where a request has both."
+                    },
+                    "apiVersion": {
+                      "type": "string",
+                      "description": "Version of the API that computed the answer."
+                    },
+                    "dataHash": {
+                      "type": "string",
+                      "description": "SHA-256 of the data set the API ran on (every record and the renames) as 64 hex digits. It changes with any record field."
+                    },
                     "units": {
                       "type": "object",
                       "propertyNames": {
@@ -6982,7 +7018,7 @@
                       "additionalProperties": {}
                     }
                   },
-                  "required": ["units", "method", "result"],
+                  "required": ["inputHash", "apiVersion", "dataHash", "units", "method", "result"],
                   "additionalProperties": {}
                 }
               }
@@ -7046,6 +7082,18 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "inputHash": {
+                      "type": "string",
+                      "description": "SHA-256 of the request as 64 hex digits: the canonical JSON of the body (keys sorted, as sent, defaults not filled in), of the query for a request without a body, of `{ body, query }` where a request has both."
+                    },
+                    "apiVersion": {
+                      "type": "string",
+                      "description": "Version of the API that computed the answer."
+                    },
+                    "dataHash": {
+                      "type": "string",
+                      "description": "SHA-256 of the data set the API ran on (every record and the renames) as 64 hex digits. It changes with any record field."
+                    },
                     "units": {
                       "type": "object",
                       "propertyNames": {
@@ -7602,7 +7650,7 @@
                       "additionalProperties": {}
                     }
                   },
-                  "required": ["units", "result"],
+                  "required": ["inputHash", "apiVersion", "dataHash", "units", "result"],
                   "additionalProperties": {}
                 }
               }
@@ -8409,6 +8457,18 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "inputHash": {
+                      "type": "string",
+                      "description": "SHA-256 of the request as 64 hex digits: the canonical JSON of the body (keys sorted, as sent, defaults not filled in), of the query for a request without a body, of `{ body, query }` where a request has both."
+                    },
+                    "apiVersion": {
+                      "type": "string",
+                      "description": "Version of the API that computed the answer."
+                    },
+                    "dataHash": {
+                      "type": "string",
+                      "description": "SHA-256 of the data set the API ran on (every record and the renames) as 64 hex digits. It changes with any record field."
+                    },
                     "units": {
                       "type": "object",
                       "propertyNames": {
@@ -9334,7 +9394,7 @@
                       "additionalProperties": {}
                     }
                   },
-                  "required": ["units", "result"],
+                  "required": ["inputHash", "apiVersion", "dataHash", "units", "result"],
                   "additionalProperties": {}
                 }
               }
@@ -10269,6 +10329,10 @@
                           "internationalFederation": {
                             "type": "string",
                             "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                          },
+                          "website": {
+                            "type": "string",
+                            "format": "uri"
                           }
                         },
                         "required": ["id", "name", "abbreviation", "country"],
@@ -10349,6 +10413,10 @@
                     "internationalFederation": {
                       "type": "string",
                       "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                    },
+                    "website": {
+                      "type": "string",
+                      "format": "uri"
                     },
                     "ruleBooks": {
                       "minItems": 1,
@@ -10571,6 +10639,18 @@
                     {
                       "type": "object",
                       "properties": {
+                        "inputHash": {
+                          "type": "string",
+                          "description": "SHA-256 of the request as 64 hex digits: the canonical JSON of the body (keys sorted, as sent, defaults not filled in), of the query for a request without a body, of `{ body, query }` where a request has both."
+                        },
+                        "apiVersion": {
+                          "type": "string",
+                          "description": "Version of the API that computed the answer."
+                        },
+                        "dataHash": {
+                          "type": "string",
+                          "description": "SHA-256 of the data set the API ran on (every record and the renames) as 64 hex digits. It changes with any record field."
+                        },
                         "notice": {
                           "type": "string",
                           "const": "simulation, not load data",
@@ -11346,6 +11426,9 @@
                         }
                       },
                       "required": [
+                        "inputHash",
+                        "apiVersion",
+                        "dataHash",
                         "notice",
                         "model",
                         "units",
@@ -11358,6 +11441,18 @@
                     {
                       "type": "object",
                       "properties": {
+                        "inputHash": {
+                          "type": "string",
+                          "description": "SHA-256 of the request as 64 hex digits: the canonical JSON of the body (keys sorted, as sent, defaults not filled in), of the query for a request without a body, of `{ body, query }` where a request has both."
+                        },
+                        "apiVersion": {
+                          "type": "string",
+                          "description": "Version of the API that computed the answer."
+                        },
+                        "dataHash": {
+                          "type": "string",
+                          "description": "SHA-256 of the data set the API ran on (every record and the renames) as 64 hex digits. It changes with any record field."
+                        },
                         "notice": {
                           "type": "string",
                           "const": "simulation, not load data",
@@ -12188,7 +12283,15 @@
                           "additionalProperties": {}
                         }
                       },
-                      "required": ["notice", "model", "units", "ladderSteps"],
+                      "required": [
+                        "inputHash",
+                        "apiVersion",
+                        "dataHash",
+                        "notice",
+                        "model",
+                        "units",
+                        "ladderSteps"
+                      ],
                       "additionalProperties": {}
                     }
                   ]
@@ -12973,6 +13076,18 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "inputHash": {
+                      "type": "string",
+                      "description": "SHA-256 of the request as 64 hex digits: the canonical JSON of the body (keys sorted, as sent, defaults not filled in), of the query for a request without a body, of `{ body, query }` where a request has both."
+                    },
+                    "apiVersion": {
+                      "type": "string",
+                      "description": "Version of the API that computed the answer."
+                    },
+                    "dataHash": {
+                      "type": "string",
+                      "description": "SHA-256 of the data set the API ran on (every record and the renames) as 64 hex digits. It changes with any record field."
+                    },
                     "notice": {
                       "type": "string",
                       "const": "simulation, not load data",
@@ -13965,6 +14080,9 @@
                     }
                   },
                   "required": [
+                    "inputHash",
+                    "apiVersion",
+                    "dataHash",
                     "notice",
                     "model",
                     "units",
@@ -14762,6 +14880,18 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "inputHash": {
+                      "type": "string",
+                      "description": "SHA-256 of the request as 64 hex digits: the canonical JSON of the body (keys sorted, as sent, defaults not filled in), of the query for a request without a body, of `{ body, query }` where a request has both."
+                    },
+                    "apiVersion": {
+                      "type": "string",
+                      "description": "Version of the API that computed the answer."
+                    },
+                    "dataHash": {
+                      "type": "string",
+                      "description": "SHA-256 of the data set the API ran on (every record and the renames) as 64 hex digits. It changes with any record field."
+                    },
                     "notice": {
                       "type": "string",
                       "const": "simulation, not load data",
@@ -16209,6 +16339,9 @@
                     }
                   },
                   "required": [
+                    "inputHash",
+                    "apiVersion",
+                    "dataHash",
                     "notice",
                     "units",
                     "loadName",
