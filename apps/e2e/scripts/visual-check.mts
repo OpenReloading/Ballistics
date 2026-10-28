@@ -78,9 +78,12 @@ export function inLanguage(text: string, texts: Record<string, unknown> = catalo
   return typeof known === 'string' ? known : text
 }
 
-/** A button of the workbench's page bar, whose texts follow the language shown. */
-const bar = (page: Page, name: string) =>
-  barButton(page, inLanguage(name), inLanguage('Page actions'))
+/** The note under the burn-rate chart of a powder with fitted parameters (`modelCaption` of the web app). */
+export const fittedCaption = 'Model output from fitted M3 parameters, not manufacturer data.'
+
+/** A button of the workbench's page bar: only the "Page actions" toggle follows the language shown, the buttons keep their English names. */
+export const bar = (page: Page, name: string, texts = catalogue) =>
+  barButton(page, name, inLanguage('Page actions', texts))
 
 /** Opens the example load in the workbench; below 75em the bar's actions are behind "Page actions". */
 async function openExampleLoad(page: Page) {
@@ -157,6 +160,14 @@ async function ready(page: Page, url: string) {
     await workbenchReady(page)
     return
   }
+  // the burn-rate chart code loads apart from the route; a powder without fitted parameters and an
+  // overlay without picks have none
+  if (url.startsWith('/powders/') && (await page.getByText(inLanguage(fittedCaption)).count()))
+    await page
+      .locator('.echart svg')
+      .or(page.getByText('No powder in the overlay.'))
+      .first()
+      .waitFor()
   // the waits below name English texts
   if (language) {
     await page.waitForLoadState('networkidle')
@@ -168,14 +179,6 @@ async function ready(page: Page, url: string) {
       .locator('.compare-table')
       .or(page.getByRole('link', { name: 'Choose bullets' }))
       .or(page.getByRole('button', { name: 'Retry' }))
-      .first()
-      .waitFor()
-  // the burn-rate chart code loads apart from the route; a powder without fitted parameters and an
-  // overlay without picks have none
-  if (url.startsWith('/powders/') && (await page.getByText(/Model output from fitted/).count()))
-    await page
-      .locator('.echart svg')
-      .or(page.getByText('No powder in the overlay.'))
       .first()
       .waitFor()
 }
