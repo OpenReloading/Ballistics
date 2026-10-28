@@ -8,12 +8,37 @@ import { measureOutline } from './bullet-photo-measure.ts'
 import { fitOutline } from './bullet-photo-outline.ts'
 import type { WorkerReply, WorkerRequest } from './bullet-photo-protocol.ts'
 import { outlineHints } from './bullet-photo-quality.ts'
+import { resolveScale } from './bullet-photo-scale.ts'
 import { errorText } from './error-text.ts'
 import type { RgbaImage } from './image.ts'
 
 let photo: RgbaImage | undefined
 
 const post = (m: WorkerReply, transfer: Transferable[] = []) => self.postMessage(m, { transfer })
+
+type MeasureRequest = Extract<WorkerRequest, { kind: 'measure' }>
+
+/** Outlines a cut-out and measures it at the scale of the ruler or of the caliper sizes; the outline's px when there is no scale. */
+function measure(q: MeasureRequest): WorkerReply {
+  const seg = { width: q.width, height: q.height, alpha: q.alpha }
+  const outline = fitOutline(seg, { angle: q.angle, edgeSpread: q.edgeSpread })
+  const { hints, unusable } = outline ? outlineHints(outline) : { hints: [] }
+  // at 1 px per mm the values are px, which the caliper sizes turn into a scale when there is no ruler
+  const unit =
+    outline && !unusable ? measureOutline(outline, { pxPerMm: 1, relUncertainty: 0 }) : undefined
+  const { scale, notes } = unit
+    ? resolveScale(unit, q.scale, q.known ?? {})
+    : { scale: q.scale, notes: [] }
+  return {
+    kind: 'measured',
+    id: q.id,
+    hints: [...hints, ...notes],
+    ...(unusable && { unusable }),
+    ...(outline && { outline }),
+    ...(scale && { scale }),
+    ...(outline && unit && { measurement: scale ? measureOutline(outline, scale) : unit }),
+  }
+}
 
 self.onmessage = (e: MessageEvent<WorkerRequest>) => {
   const q = e.data
@@ -35,17 +60,7 @@ self.onmessage = (e: MessageEvent<WorkerRequest>) => {
         [s.alpha.buffer],
       )
     } else {
-      const seg = { width: q.width, height: q.height, alpha: q.alpha }
-      const outline = fitOutline(seg, { angle: q.angle, edgeSpread: q.edgeSpread })
-      const { hints, unusable } = outline ? outlineHints(outline) : { hints: [] }
-      post({
-        kind: 'measured',
-        id: q.id,
-        hints,
-        ...(unusable && { unusable }),
-        ...(outline && { outline }),
-        ...(outline && !unusable && { measurement: measureOutline(outline, q.scale) }),
-      })
+      post(measure(q))
     }
   } catch (err) {
     post({ kind: 'error', id: q.id, message: errorText(err) })
