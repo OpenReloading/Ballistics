@@ -32,7 +32,7 @@ $$
 
 with $\bar{x}_{(j)}$ and $s_{(j)}$ the mean and sample standard deviation of the string without shot $j$. Up to the factor $\sqrt{(N-1)/N}$ (leverage $1/N$ of a constant-only model) this is the externally studentized deleted residual of regression diagnostics ([Belsley 1980](../bibliography.md#belsley-1980); page unverified, the factor is derived here and the calibration absorbs it). The shot farthest from the full mean is also the one with the largest $T$, because $T$ rises with the distance from the full mean. The factor $k_N$ is the 99th percentile of $T$ for clean normal strings of $N$ shots; no distribution formula is used, so the factors are simulated values.
 
-A rule that flags a shot when fewer than 0.5 shots are expected beyond it flags one end of a clean string with probability $1 - (1 - 1/(4N))^N$ (analytic: 0.23 at $N = 5$, 0.22 for large $N$), about one clean string in five: unfit.
+A rule that flags a shot when fewer than 0.5 shots are expected beyond it, counted across both ends, flags one end of a clean string with probability $1 - (1 - 1/(4N))^N$ (analytic: 0.23 at $N = 5$, 0.22 for large $N$), about one clean string in five: unfit.
 
 ## Numbers
 
@@ -65,7 +65,7 @@ Factors for $N$ = 10 to 30 at 1 percent, either end: 5.32, 5.09, 4.92, 4.78, 4.6
 
 ## Result
 
-improved. Rule met: the false-flag rate is inside 0.5 to 1.5 percent for every $N$ from 8 to 30, and the planted 8 SD flier is found in 95.1 percent of strings at $N = 10$ and more above (the smallest value for $N$ of 10 or more). Adopted for $N$ = 10 to 30 only; nothing is shown at $N = 5$ (an 8 SD flier is found in 31.5 percent of strings, and a flag needs about 11 standard deviations) or for $N$ of 6 to 9 (8 SD found in 55 to 92 percent), and none is calibrated above 30. The function `flierScreen(values)` (the factors for 10 to 30 as data; returns the farthest shot, its distance, the factor, the flag and the standard deviation with and without that shot; `undefined` outside 10 to 30) and its tests are on the unmerged branch `research/group-statistics`, ready to cherry-pick. The tests require 0.5 to 1.5 percent flagged on 100 000 clean strings each of 10, 20 and 30 shots and more than 90 percent found for a planted 8 SD flier at 10 and 20.
+improved. Rule met: the false-flag rate is inside 0.5 to 1.5 percent for every $N$ from 8 to 30, and the planted 8 SD flier is found in 95.1 percent of strings at $N = 10$ and more above (the smallest value for $N$ of 10 or more). Proposed for $N$ = 10 to 30 only; nothing is shown at $N = 5$ (an 8 SD flier is found in 31.5 percent of strings, and a flag needs about 11 standard deviations) or for $N$ of 6 to 9 (8 SD found in 55 to 92 percent), and none is calibrated above 30. The function `flierScreen(values)` (the factors for 10 to 30 as data; returns the farthest shot, its distance, the factor, the flag and the standard deviation with and without that shot; `undefined` outside 10 to 30) and its tests are on the unmerged branch `research/group-statistics`, ready to cherry-pick. The tests require 0.5 to 1.5 percent flagged on 100 000 clean strings each of 10, 20 and 30 shots and more than 90 percent found for a planted 8 SD flier at 10 and 20.
 
 The count of flags on real strings is not part of this entry: it waits for measured strings (issue 278). If real strings are flagged far more than 1 percent (heavy tails), the SD interval of the [Groups](../models/groups.md) assumes a normal string and the flag is not shown.
 
