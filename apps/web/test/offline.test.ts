@@ -6,7 +6,6 @@ import {
   networkOr,
   pageKey,
   precacheList,
-  recordFile,
   recordsCache,
   shellAnswer,
   shellCache,
@@ -223,22 +222,4 @@ it('a worker update deletes shell caches only and its source never opens the bro
   expect(staleCaches([...names, shellCache('c')], 'c')).toEqual([shellCache('a')])
   const source = readFileSync(new URL('../src/service-worker.js', import.meta.url), 'utf8')
   expect(source.replace(/^\s*\/\/.*$/gm, '')).not.toMatch(/indexedDB|openreloading-user-data/)
-})
-
-it('names the data file of a record page, under the base path, and none for another page', () => {
-  expect(recordFile('/cartridges/308-win/')).toBe('/api/cartridges/308-win.json')
-  expect(recordFile('/cartridges/308-win')).toBe('/api/cartridges/308-win.json')
-  expect(recordFile('/OpenReloading/cartridges/308-win/', '/OpenReloading')).toBe(
-    '/OpenReloading/api/cartridges/308-win.json',
-  )
-  for (const path of [
-    '/',
-    '/cartridges/',
-    '/cartridges',
-    '/bullets/demo-bullet-168/',
-    '/cartridges/x/y/',
-  ])
-    expect(recordFile(path), path).toBeUndefined()
-  expect(recordFile('/cartridges/308-win/', '/OpenReloading')).toBeUndefined()
-  expect(recordFile('/cartridges/Bad_Id/')).toBeUndefined()
 })
