@@ -933,7 +933,7 @@
   "Page actions": "Seitenaktionen",
   "Page not found": "Seite nicht gefunden",
   "Pages": "Seiten",
-  "Pages you have opened, the tools, workbench runs and your own records work without network.": "Seiten, die Sie geöffnet haben, die Werkzeuge, Berechnungen der Werkbank und Ihre eigenen Datensätze funktionieren ohne Netz.",
+  "Without network, every page works except record pages you have not opened before. Workbench runs work for loads opened online in this browser, and your own records always do.": "Ohne Netz funktionieren alle Seiten außer Datensatzseiten, die Sie noch nicht geöffnet haben. Berechnungen der Werkbank funktionieren für Ladungen, die in diesem Browser online geöffnet wurden, und Ihre eigenen Datensätze immer.",
   "Parameter": "Parameter",
   "Parameters the planned string identifies": "Parameter, die die geplante Reihe bestimmt",
   "Parts drawn dashed are assumed, not from the record.": "Gestrichelt gezeichnete Teile sind angenommen und stammen nicht aus dem Datensatz.",

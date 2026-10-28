@@ -17,7 +17,10 @@ export const shellPrefix = (edition = '') => editionName(edition, 'openreloading
 export const recordsCache = (edition = '') => editionName(edition, 'openreloading-records')
 export const offlinePage = '/offline'
 
-/** Pages precached per build next to the static output: the tools and the offline page. */
+/**
+ * Pages precached per build next to the static output: every page route but the record pages,
+ * which stay network-first.
+ */
 export const shellPages = [
   '/',
   '/offline',
@@ -29,6 +32,19 @@ export const shellPages = [
   '/range',
   '/bullets/designer',
   '/cartridges/designer',
+  '/cartridges',
+  '/bullets',
+  '/powders',
+  '/cases',
+  '/primers',
+  '/targets',
+  '/disciplines',
+  '/federations',
+  '/bullets/compare',
+  '/powders/burn-rates',
+  '/powders/designer',
+  '/powders/tune',
+  '/targets/designer',
 ]
 
 /** Files precached with the pages: the manifest and its icons. */
