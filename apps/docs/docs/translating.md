@@ -16,6 +16,8 @@ The web app's language is a setting (Settings, General, Language). There is one 
 - Pass literals only. A text built at run time does not compile, because the extraction reads the source. Build a sentence from placeholders, not by joining pieces: word order differs between languages.
 - Text in JSX goes through an expression: `{t('Close')}`.
 - Record names as published, exported file field names and the text inside the packages are not translated.
+- Text that a data builder or a server page hands to a client component is a `Wording` (`src/lib/wording.ts`): a `msg` message, `verbatim(name)` for a name or printed value that stays as it is, or `worded(message, { values })`. The client shows it with `say(t, wording)`. The page bar and a panel take a message title with `translated`.
+- A loading line, an error line and an empty list line are whole sentences in the tables of `components/states.tsx`, chosen by a key, so a new place that loads or lists adds its sentence there.
 
 ## Numbers, dates and country names
 

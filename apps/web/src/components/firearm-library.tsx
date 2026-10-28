@@ -158,7 +158,7 @@ function firearmColumns(
     {
       key: 'hand',
       label: msg('Hand'),
-      width: '4.5rem',
+      width: '7rem',
       value: (r) => cells(r).hand || undefined,
       cell: (r) => {
         const hand = cells(r).hand
@@ -638,7 +638,7 @@ export function FirearmLibrary() {
   // the shared list pattern: the search, kept in the URL
   const [filters, setFilters, clearFilters] = useListState()
   const lines = (r: FirearmRecord) => {
-    const facts = cardFacts(r.data, system)
+    const facts = cardFacts(r.data, system, t)
     return [cartridgeName(r.data.cartridge), facts.barrel, facts.sight]
   }
   const matches = (r: FirearmRecord) => matchesQuery([r.name, ...lines(r)], filters.query)

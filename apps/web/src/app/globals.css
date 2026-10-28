@@ -9656,6 +9656,11 @@ main .page-bar h1 {
     -webkit-line-clamp: 2;
   }
 
+  /* a long German compound breaks at a syllable where the browser knows the language's hyphenation */
+  :lang(de) main .page-bar h1 {
+    hyphens: auto;
+  }
+
   /* above a status line with text still two lines, in the small size, so the name reads */
   .page-bar:has(.page-bar-status :not(.file-status):not(:empty)) h1 {
     font-size: var(--mantine-font-size-sm);

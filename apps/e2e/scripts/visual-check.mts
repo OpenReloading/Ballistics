@@ -2,7 +2,8 @@
 // 1280 px in light and dark against WEB_URL (it starts no server), then one contact sheet.
 // npm run visual-check -- [--preset drawing|calculators] [/path ...]
 // Output: visual-check-out/shots/<page>__<theme>__<width>.png and visual-check-out/sheet.png
-// (VISUAL_OUT for another folder; /workbench: VISUAL_LADDER, VISUAL_DEFAULTS, VISUAL_LOADS)
+// (VISUAL_OUT for another folder; VISUAL_LANGUAGE=de for the German interface, whose pages are
+// waited for by their structure, not by English text; /workbench: VISUAL_LADDER, VISUAL_DEFAULTS, VISUAL_LOADS)
 import { mkdirSync, readFileSync, rmSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -133,6 +134,11 @@ async function ready(page: Page, url: string) {
   if (designer) await designerReady(page, url)
   if (url.startsWith('/cartridges/') && !designer)
     await page.locator('svg.drawing.screen-only:visible').first().waitFor()
+  // the waits below name English texts
+  if (process.env.VISUAL_LANGUAGE) {
+    await page.waitForLoadState('networkidle')
+    return
+  }
   // the compare view reads its records in the browser
   if (url.startsWith('/bullets/compare'))
     await page
@@ -222,6 +228,11 @@ if (import.meta.main) {
     await page.addInitScript((value) => {
       localStorage.setItem('safety-ack', value)
     }, safetyAck)
+    const language = process.env.VISUAL_LANGUAGE
+    if (language)
+      await page.addInitScript((code) => {
+        localStorage.setItem('language', code)
+      }, language)
     const tiles: { file: string; caption: string }[] = []
     for (const url of pages)
       for (const width of widths)
@@ -229,6 +240,7 @@ if (import.meta.main) {
           await page.setViewportSize({ width, height: 844 })
           await page.emulateMedia({ colorScheme: theme })
           await page.goto(url)
+          if (language) await page.locator(`html[lang="${language}"]`).waitFor()
           await ready(page, url)
           const file = path.join(
             shots,

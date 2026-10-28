@@ -35,10 +35,6 @@ export type TargetFaceRow = {
 const faceDistances = (f: Pick<Face, 'events'>) =>
   [...new Set(f.events.map((e) => toSi('length', e.distance.value)))].sort((a, b) => a - b)
 
-/** The distances as one text: "25, 50 m". */
-export const distanceText = (metres: readonly number[]) =>
-  metres.length > 0 ? `${metres.join(', ')} m` : ''
-
 /** The list row of a face; `mappings` of every face, counted by distinct discipline. */
 export function targetFaceRow(f: Face, mappings: readonly MappingSummary[]): TargetFaceRow {
   return {

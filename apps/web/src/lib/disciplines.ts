@@ -193,8 +193,7 @@ export type FederationRow = {
 export const hostText = (url: string) => new URL(url).host.replace(/^www\./, '')
 
 /** "International" for a world body, else the ISO country code. */
-export const countryText = (country: string) =>
-  country === 'international' ? 'International' : country
+const countryText = (country: string) => (country === 'international' ? 'International' : country)
 
 /** The federation's disciplines and the distinct faces their mappings use, face ids in mapping order. */
 export function federationScope(

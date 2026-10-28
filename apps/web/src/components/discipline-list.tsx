@@ -67,7 +67,7 @@ export function DisciplineList({ items }: { items: DisciplineRow[] }) {
     {
       key: 'category',
       label: msg('Category'),
-      width: '9rem',
+      width: '11rem',
       value: (r) => r.category ?? '',
       cell: (r) => r.category && kebabValue(t, r.category),
     },

@@ -76,7 +76,7 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
     {
       key: 'form',
       label: msg('Form'),
-      width: '6rem',
+      width: '8rem',
       value: (r) => r.grainForm,
       cell: (r) => (r.grainForm ? grainFormText(t, r.grainForm) : ''),
     },
