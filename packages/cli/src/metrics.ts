@@ -11,6 +11,10 @@ const isUsed = (o: Outcome): o is Used => 'velocity' in o.prediction
 /** Absolute relative error of the model's velocity against the printed one. */
 const velocityError = (o: Used) => Math.abs(o.prediction.velocity - o.row.velocity) / o.row.velocity
 
+/** Distance of the printed velocity from the model's, as a share of the model's: inside the band model * (1 +/- h) when at most h. */
+const bandDistance = (o: Used) =>
+  Math.abs(o.prediction.velocity - o.row.velocity) / o.prediction.velocity
+
 /** Absolute relative error of the model's peak pressure against the printed one, undefined without a printed one. */
 const pressureError = (o: Used) =>
   o.row.pressure === undefined
@@ -50,7 +54,7 @@ function metricsOf(items: readonly Outcome[], halfWidth: number | null): Metrics
     interval:
       halfWidth === null || velocity.length === 0
         ? null
-        : { coverage: velocity.filter((e) => e <= halfWidth).length / velocity.length },
+        : { coverage: used.filter((o) => bandDistance(o) <= halfWidth).length / used.length },
   }
 }
 

@@ -51,7 +51,7 @@
               "const": "training"
             },
             "halfWidth": {
-              "description": "The 90th percentile of the absolute relative velocity error on the training split: a printed velocity is inside the interval when its error is at most this. Null without a training row.",
+              "description": "The 90th percentile of the absolute relative velocity error on the training split: the interval is the model velocity times (1 +/- this). Null without a training row.",
               "type": ["number", "null"]
             },
             "trainingRows": {
@@ -169,7 +169,7 @@
                   "properties": {
                     "coverage": {
                       "type": "number",
-                      "description": "Share of the used rows inside the interval."
+                      "description": "Share of the used rows whose printed velocity is inside the interval."
                     }
                   },
                   "required": ["coverage"],
@@ -295,7 +295,7 @@
                     "properties": {
                       "coverage": {
                         "type": "number",
-                        "description": "Share of the used rows inside the interval."
+                        "description": "Share of the used rows whose printed velocity is inside the interval."
                       }
                     },
                     "required": ["coverage"],
@@ -423,7 +423,7 @@
                     "properties": {
                       "coverage": {
                         "type": "number",
-                        "description": "Share of the used rows inside the interval."
+                        "description": "Share of the used rows whose printed velocity is inside the interval."
                       }
                     },
                     "required": ["coverage"],
@@ -559,7 +559,7 @@
                         "properties": {
                           "coverage": {
                             "type": "number",
-                            "description": "Share of the used rows inside the interval."
+                            "description": "Share of the used rows whose printed velocity is inside the interval."
                           }
                         },
                         "required": ["coverage"],
@@ -649,7 +649,7 @@
                   "const": "training"
                 },
                 "halfWidth": {
-                  "description": "The 90th percentile of the absolute relative velocity error on the training split: a printed velocity is inside the interval when its error is at most this. Null without a training row.",
+                  "description": "The 90th percentile of the absolute relative velocity error on the training split: the interval is the model velocity times (1 +/- this). Null without a training row.",
                   "type": ["number", "null"]
                 },
                 "trainingRows": {
@@ -767,7 +767,7 @@
                       "properties": {
                         "coverage": {
                           "type": "number",
-                          "description": "Share of the used rows inside the interval."
+                          "description": "Share of the used rows whose printed velocity is inside the interval."
                         }
                       },
                       "required": ["coverage"],
@@ -893,7 +893,7 @@
                         "properties": {
                           "coverage": {
                             "type": "number",
-                            "description": "Share of the used rows inside the interval."
+                            "description": "Share of the used rows whose printed velocity is inside the interval."
                           }
                         },
                         "required": ["coverage"],
@@ -1021,7 +1021,7 @@
                         "properties": {
                           "coverage": {
                             "type": "number",
-                            "description": "Share of the used rows inside the interval."
+                            "description": "Share of the used rows whose printed velocity is inside the interval."
                           }
                         },
                         "required": ["coverage"],
@@ -1157,7 +1157,7 @@
                             "properties": {
                               "coverage": {
                                 "type": "number",
-                                "description": "Share of the used rows inside the interval."
+                                "description": "Share of the used rows whose printed velocity is inside the interval."
                               }
                             },
                             "required": ["coverage"],
@@ -1201,7 +1201,7 @@
                   "const": "training"
                 },
                 "halfWidth": {
-                  "description": "The 90th percentile of the absolute relative velocity error on the training split: a printed velocity is inside the interval when its error is at most this. Null without a training row.",
+                  "description": "The 90th percentile of the absolute relative velocity error on the training split: the interval is the model velocity times (1 +/- this). Null without a training row.",
                   "type": ["number", "null"]
                 },
                 "trainingRows": {
@@ -1319,7 +1319,7 @@
                       "properties": {
                         "coverage": {
                           "type": "number",
-                          "description": "Share of the used rows inside the interval."
+                          "description": "Share of the used rows whose printed velocity is inside the interval."
                         }
                       },
                       "required": ["coverage"],
@@ -1445,7 +1445,7 @@
                         "properties": {
                           "coverage": {
                             "type": "number",
-                            "description": "Share of the used rows inside the interval."
+                            "description": "Share of the used rows whose printed velocity is inside the interval."
                           }
                         },
                         "required": ["coverage"],
@@ -1573,7 +1573,7 @@
                         "properties": {
                           "coverage": {
                             "type": "number",
-                            "description": "Share of the used rows inside the interval."
+                            "description": "Share of the used rows whose printed velocity is inside the interval."
                           }
                         },
                         "required": ["coverage"],
@@ -1709,7 +1709,7 @@
                             "properties": {
                               "coverage": {
                                 "type": "number",
-                                "description": "Share of the used rows inside the interval."
+                                "description": "Share of the used rows whose printed velocity is inside the interval."
                               }
                             },
                             "required": ["coverage"],

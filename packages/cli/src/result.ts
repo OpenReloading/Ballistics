@@ -32,7 +32,11 @@ const metrics = z.object({
     .nullable()
     .describe('Absolute relative error of the peak pressure over the used rows that print one.'),
   interval: z
-    .object({ coverage: fraction.describe('Share of the used rows inside the interval.') })
+    .object({
+      coverage: fraction.describe(
+        'Share of the used rows whose printed velocity is inside the interval.',
+      ),
+    })
     .nullable()
     .describe('Coverage of the 90 % interval; null without rows or without an interval.'),
 })
@@ -51,7 +55,7 @@ const evaluation = z.object({
       .number()
       .nullable()
       .describe(
-        'The 90th percentile of the absolute relative velocity error on the training split: a printed velocity is inside the interval when its error is at most this. Null without a training row.',
+        'The 90th percentile of the absolute relative velocity error on the training split: the interval is the model velocity times (1 +/- this). Null without a training row.',
       ),
     trainingRows: count.describe('Used training rows the half width comes from.'),
   }),
