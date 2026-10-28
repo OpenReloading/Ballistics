@@ -86,7 +86,7 @@
 - Relative imports end in `.ts` (rewritten to `.js` by `tsc`). Only erasable TypeScript syntax, so Node runs sources directly.
 - Comments, docs, test names and commit messages never say who asked for something, who decided it or when. A comment explains why only where the code cannot show it.
 - No migrations before 1.0: databases are rebuilt, files of an older format are rejected.
-- Before 1.0 no package or data format version is bumped (data formats are version 1, packages are set to 0.0.1 at the public release), and commits carry no breaking marker.
+- Until 1.0 no package or data format version is bumped (data formats are version 1), and commits carry no breaking marker.
 - Every record carries provenance. One stored unit per quantity (`packages/schema/src/units.ts`).
 - A change to a model's code updates its model page in `apps/docs/docs/models/` in the same commit.
 - Results are simulations, not load data. No "safe" claims (see `README.md`), on screen and in docs. Printed pages and downloaded files carry no Safety text and no notice.
