@@ -48,6 +48,7 @@ import type { Suggestion } from '../lib/input-defaults.ts'
 import { productLabel, refName } from '../lib/manufacturers.ts'
 import { nth } from '../lib/nth.ts'
 import { type SeatingLengths, seatingLengthName } from '../lib/seating-ladder.ts'
+import { controlSize } from '../lib/theme.ts'
 import { trailing } from '../lib/trailing.ts'
 import {
   drawingLengthUnit,
@@ -302,7 +303,8 @@ type PreviewProps = {
   slots?: {
     cartridge: HTMLElement | null
     gun: HTMLElement | null
-    /** Rarely needed parts: the capacity record (`more`) and further values (`moreValues`, a `dl`). */
+    /** The brass and capacity record choices (`choices`), the notes (`more`) and further values (`moreValues`, a `dl`). */
+    choices?: HTMLElement | null
     more?: HTMLElement | null
     moreValues?: HTMLElement | null
   }
@@ -1104,11 +1106,14 @@ function put(slots: Slots, node: ReactNode, target: HTMLElement | null | undefin
   return target ? createPortal(node, target) : null
 }
 
-/** A rarely needed part: in the `more` slot when the page gives one, else in place. */
+/** A part in its own slot when the page gives one, else in place. */
 function aside(slots: Slots, node: ReactNode, target: HTMLElement | null | undefined) {
   if (!slots || target === undefined) return node
   return target ? createPortal(node, target) : null
 }
+
+/** The workbench row's control height for the brass and capacity selects, the theme's elsewhere. */
+const rowSize = (m: Model) => (m.slots?.choices ? { size: controlSize.row.input } : {})
 
 /** The capacity record's description: its water, and its case maker when it has one. */
 function capacityText(c: Capacity, names: Model['names'], t: T) {
@@ -1241,6 +1246,7 @@ function CaseChoice({ m }: { m: Model }) {
   ]
   return (
     <NativeSelect
+      {...rowSize(m)}
       label={t('Brass record')}
       value={ownId ? `user:${ownId}` : (m.chosenCase?.id ?? '')}
       onChange={(e) => {
@@ -1284,6 +1290,7 @@ function CapacityChoice({ m }: { m: Model }) {
   if (capacities.length > 0)
     return (
       <NativeSelect
+        {...rowSize(m)}
         label={t('Case capacity record')}
         // with a case record's stated capacity in use, no capacity record is the choice
         value={capacity?.id ?? ''}
@@ -1297,6 +1304,16 @@ function CapacityChoice({ m }: { m: Model }) {
       />
     )
   if (designed) return null
+  // the workbench's row keeps its place: the measured capacity field's help says what to enter
+  if (m.slots?.choices)
+    return (
+      <NativeSelect
+        {...rowSize(m)}
+        label={t('Case capacity record')}
+        disabled
+        data={[{ value: '', label: t('None') }]}
+      />
+    )
   return (
     <p>
       {t(
@@ -1452,7 +1469,7 @@ function SeatingControls({ m }: { m: Model }) {
           <CaseChoice m={m} />
           <CapacityChoice m={m} />
         </>,
-        slots?.more,
+        slots?.choices,
       )}
       {!card && <BarrelField m={m} />}
       <MeasuredCapacity m={m} />

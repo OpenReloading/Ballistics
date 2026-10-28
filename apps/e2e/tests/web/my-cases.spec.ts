@@ -79,7 +79,6 @@ test('an own case group is a Mine row of the Cases list, opened in its editor, p
   await gotoHydrated(page, '/workbench?cartridge=308-win')
   const capacity = loadForm(page).getByRole('textbox', { name: /^Case capacity/ })
   await expect(capacity).toHaveValue('')
-  await page.getByRole('button', { name: 'More of Cartridge' }).click()
   await page.getByRole('combobox', { name: 'Brass record' }).selectOption(`user:${caseId}`)
   // the group's measured capacity is in the measured field, where the run marks it as measured
   await expect(capacity).toHaveValue(/^3\.6/)

@@ -106,7 +106,7 @@ export function BurnFigure() {
               : t('of the typed model parameters')}
           </span>
         </h3>
-        <BurnRate p={burn} powderId={powder?.id} marks={runMarks} height={short ? 150 : 104} />
+        <BurnRate p={burn} powderId={powder?.id} marks={runMarks} height={short ? 140 : 104} />
       </section>
     )
   )

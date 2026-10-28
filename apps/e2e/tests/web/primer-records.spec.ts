@@ -36,7 +36,7 @@ test('the primer list narrows by search', async ({ page }) => {
   await expect(page.getByRole('link', { name: /Small Pistol Lead-Free Demo/ })).toBeVisible()
 })
 
-test('a primer chosen in the Cartridge card is saved with the load and chosen again on reopening', async ({
+test('a primer chosen above the cards is saved with the load and chosen again on reopening', async ({
   page,
 }) => {
   await page.addInitScript(() => {
@@ -44,7 +44,6 @@ test('a primer chosen in the Cartridge card is saved with the load and chosen ag
       (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
   })
   await gotoHydrated(page, '/workbench?cartridge=308-win')
-  await page.getByRole('button', { name: 'More of Cartridge' }).click()
   const primer = page.getByRole('combobox', { name: 'Primer' })
   await primer.selectOption({ label: 'Demo Primers Large Rifle Demo, large rifle' })
   await (await barButton(page, 'Save')).click()
@@ -57,7 +56,6 @@ test('a primer chosen in the Cartridge card is saved with the load and chosen ag
   await (await barButton(page, 'Open')).click()
   await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
   await page.getByRole('button', { name, exact: true }).click()
-  await page.getByRole('button', { name: 'More of Cartridge' }).click()
   await expect(page.getByRole('combobox', { name: 'Primer' })).toHaveValue(
     'demo-primer-large-rifle',
   )

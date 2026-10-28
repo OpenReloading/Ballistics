@@ -1406,11 +1406,11 @@ export function useWorkbenchState() {
   /** The measured case capacity typed in the Cartridge card, kept for the cartridge it was typed for. */
   const [measured, setMeasured] = useState<Fields>({ measuredWaterCapacity: emptyStep })
   const [measuredFor, setMeasuredFor] = useState<string>()
-  /** The catalogue capacity record the user chose in the Cartridge card, kept for the cartridge it belongs to. */
+  /** The catalogue capacity record the user chose in the pinned row, kept for the cartridge it belongs to. */
   const [capacityChoice, setCapacityChoice] = useState<{ cartridge: string; id: string }>()
-  /** The catalogue case record the user chose in the Cartridge card, kept for the cartridge it belongs to. */
+  /** The catalogue case record the user chose in the pinned row, kept for the cartridge it belongs to. */
   const [caseChoice, setCaseChoice] = useState<{ cartridge: string; id: string }>()
-  /** The id of the catalogue primer the user chose in the Cartridge card's More. */
+  /** The id of the catalogue primer the user chose in the pinned row. */
   const [primerChoice, setPrimerChoice] = useState<string>()
   /** The user's cases of this browser, and the group of them the user chose for the cartridge it belongs to. */
   const [cases, setCases] = useState<OwnCase[]>([])
