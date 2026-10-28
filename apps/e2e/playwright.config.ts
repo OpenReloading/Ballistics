@@ -4,9 +4,11 @@ import { safetyAck } from './tests/web/nav.ts'
 const webUrl = process.env.WEB_URL ?? 'http://localhost:3003'
 /** The Pages site (`npm run pages:serve`), with its base path and a trailing slash. Unset: no project `pages`. */
 const pagesUrl = process.env.PAGES_URL
+/** Set: projects `firefox` and `webkit` run the smoke spec against `WEB_URL`. */
+const allEngines = Boolean(process.env.ALL_ENGINES)
 
-const browserAt = (url: string) => ({
-  ...devices['Desktop Chrome'],
+const browserAt = (url: string, device = devices['Desktop Chrome']) => ({
+  ...device,
   baseURL: url,
   // the offline layer's worker would answer requests from its caches
   serviceWorkers: 'block' as const,
@@ -42,6 +44,22 @@ export default defineConfig({
             testDir: './tests/web',
             testMatch: 'smoke.spec.ts',
             use: browserAt(pagesUrl),
+          },
+        ]
+      : []),
+    ...(allEngines
+      ? [
+          {
+            name: 'firefox',
+            testDir: './tests/web',
+            testMatch: 'smoke.spec.ts',
+            use: browserAt(webUrl, devices['Desktop Firefox']),
+          },
+          {
+            name: 'webkit',
+            testDir: './tests/web',
+            testMatch: 'smoke.spec.ts',
+            use: browserAt(webUrl, devices['Desktop Safari']),
           },
         ]
       : []),

@@ -70,6 +70,7 @@ const sidebars: SidebarsConfig = {
     'workbench-search',
     'translating',
     'accessibility',
+    'browsers',
     'feedback-tasks',
   ],
 }

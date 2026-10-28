@@ -3,6 +3,7 @@
 import type { Powder } from '@open-reloading/schema'
 import { useEffect, useRef, useState } from 'react'
 import { english, type Message, msg, type Translator } from '../i18n/translate.ts'
+import { anySignal } from '../lib/any-signal.ts'
 import { fetchPowder, fetchPowderList, postInteriorRun, postJson } from '../lib/api-client.ts'
 import type { InteriorResponse, PowderSummary } from '../lib/api-types.ts'
 import { runBatch } from '../lib/batch.ts'
@@ -266,7 +267,7 @@ export async function computeRows(
   ])
   if (signal.aborted) return undefined
   const stop = new AbortController()
-  const batch = AbortSignal.any([signal, stop.signal])
+  const batch = anySignal([signal, stop.signal])
   let noLimit: ChargeTargetRefusal | undefined
   const cx: RowContext = {
     loadRequest,

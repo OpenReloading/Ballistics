@@ -4,6 +4,7 @@ Playwright tests against the static export of the web app (`pages/`, served by `
 
 - Project `full` (`tests/web/`): Chromium against the export at the site root on `WEB_URL` (default `http://localhost:3003`). The API on `API_URL` (default `http://localhost:3000`) is read by `web/smoke.spec.ts` and `web/workbench-load-roundtrip.spec.ts` only.
 - Project `pages`, only with `PAGES_URL` set (an export under a base path, with a trailing slash, served by `npm run pages:serve` with the same `PAGES_BASE_PATH`): `web/smoke.spec.ts` against that site. Smoke pages are opened by relative paths (`./workbench`), so the base path stays.
+- Projects `firefox` and `webkit`, only with `ALL_ENGINES` set: `web/smoke.spec.ts` against `WEB_URL` in Firefox and WebKit (the supported browsers, `apps/docs/docs/browsers.md`). Install those browsers once with `npx playwright install --with-deps firefox webkit`, then `ALL_ENGINES=1 npx playwright test --project=firefox --project=webkit`.
 - A record a spec opens is in the export's sample (`apps/web/src/lib/prerender-sample.ts`, cartridge pages only: any other cartridge answers 404, and the link to it logs a failed request). A spec that clicks through records and checks the console or the failed requests starts where every cartridge it links is in the sample (`smoke.spec.ts`: a case record, which links one cartridge).
 - One spec per area. No spec needs manufacturer data or load data.
 - Every test has its own browser context and `fullyParallel` is on: the tests of one file run on several workers, so a test never relies on another.
