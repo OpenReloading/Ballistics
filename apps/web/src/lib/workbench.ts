@@ -1,7 +1,7 @@
 import { fillLoadRatioLimit, loadRatio, solidFill, solidFillLimit } from '@open-reloading/core'
 import { fromSi, sheetId, toSi } from '@open-reloading/schema'
 import { formatNumber } from '../i18n/number.ts'
-import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import { type Message, msg, type Say, type Translator } from '../i18n/translate.ts'
 import type { InteriorResponse } from './api-types.ts'
 import type { WarningCode } from './core-message-table.ts'
 import { translateMessage } from './core-messages.ts'
@@ -88,12 +88,19 @@ export function resultTabsFit(widths: number[], room: number) {
   return widths.length
 }
 
-/** The run status: text, or a result's line (after `prefix`) written in the units shown now. */
-export type Status = string | { prefix: string }
+/**
+ * The run status: text, or a result's line (after `prefix`) written in the units shown now. A `say`
+ * is written in the language shown now, a plain string stays as it was written.
+ */
+export type Status = string | { say: Say } | { prefix: string | Say }
 
 /** The status text; `line` is the shown result's line in the units shown now, undefined without a result. */
-export const statusText = (status: Status, line: string | undefined) =>
-  typeof status === 'string' ? status : line === undefined ? '' : status.prefix + line
+export const statusText = (status: Status, line: string | undefined, t: Translator['t']) => {
+  const text = (x: string | Say) => (typeof x === 'string' ? x : x(t))
+  if (typeof status === 'string') return status
+  if ('say' in status) return status.say(t)
+  return line === undefined ? '' : text(status.prefix) + line
+}
 
 export function warningCountText(count: number, tn: Translator['tn']) {
   if (count === 0) return ''

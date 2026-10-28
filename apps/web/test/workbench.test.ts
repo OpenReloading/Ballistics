@@ -3,7 +3,7 @@ import type { Outcome } from '../src/components/workbench-outcome.ts'
 import { peakFacts } from '../src/components/workbench-readouts.tsx'
 import de from '../src/i18n/de.json'
 import { setShownLanguage } from '../src/i18n/shown.ts'
-import { type Catalogue, english, translator } from '../src/i18n/translate.ts'
+import { type Catalogue, english, type Translator, translator } from '../src/i18n/translate.ts'
 import type { InteriorResponse } from '../src/lib/api-types.ts'
 import { installCoreMessages } from '../src/lib/core-message-table.ts'
 import { presetUnits } from '../src/lib/units.ts'
@@ -309,16 +309,26 @@ describe('rangeCardNote', () => {
 
 describe('statusText', () => {
   it('writes a result status from the line of the units shown now, with its prefix', () => {
-    expect(statusText({ prefix: '' }, 'Peak 4 bar.')).toBe('Peak 4 bar.')
-    expect(statusText({ prefix: 'Simulation done. ' }, 'Peak 58 psi.')).toBe(
+    expect(statusText({ prefix: '' }, 'Peak 4 bar.', english.t)).toBe('Peak 4 bar.')
+    expect(statusText({ prefix: 'Simulation done. ' }, 'Peak 58 psi.', english.t)).toBe(
       'Simulation done. Peak 58 psi.',
     )
   })
 
+  it('writes a stored text and prefix in the language shown now', () => {
+    const german = translator(de as Catalogue, 'de')
+    const done = { prefix: (t: Translator['t']) => t('Simulation done. ') }
+    expect(statusText(done, 'Peak 4 bar.', english.t)).toBe('Simulation done. Peak 4 bar.')
+    expect(statusText(done, 'Peak 4 bar.', german.t)).toBe('Simulation abgeschlossen. Peak 4 bar.')
+    const running = { say: (t: Translator['t']) => t('Simulating') }
+    expect(statusText(running, undefined, english.t)).toBe('Simulating')
+    expect(statusText(running, undefined, german.t)).toBe('Simulation läuft')
+  })
+
   it('shows another status as it is, and no result status without a result', () => {
-    expect(statusText('Simulating', 'Peak 4 bar.')).toBe('Simulating')
-    expect(statusText('The API answered 502.', undefined)).toBe('The API answered 502.')
-    expect(statusText({ prefix: '' }, undefined)).toBe('')
+    expect(statusText('Simulating', 'Peak 4 bar.', english.t)).toBe('Simulating')
+    expect(statusText('The API answered 502.', undefined, english.t)).toBe('The API answered 502.')
+    expect(statusText({ prefix: '' }, undefined, english.t)).toBe('')
   })
 })
 

@@ -1,8 +1,9 @@
 import type { ChargeRange, ChargeTargetKind } from '@open-reloading/core'
 import { formatNumber, plainNumber } from '../i18n/number.ts'
-import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import { english, type Message, msg, type Say, type Translator } from '../i18n/translate.ts'
 import type { ErrorBody, InteriorResponse } from './api-types.ts'
 import { translateMessage } from './core-messages.ts'
+import { errorText } from './error-text.ts'
 import { type UnitSystem, withUnit } from './units.ts'
 
 /** Targets of `POST /interior/charge-target`. */
@@ -173,4 +174,48 @@ export function refusalText(
   return refusal.message
     ? translateMessage(refusal.message, t)
     : t('The charge could not be found.')
+}
+
+/** What the dialog keeps of an answer: the text is written in the language shown, not the one it came in. */
+export type Outcome =
+  | { kind: 'found'; body: ChargeTargetResponse }
+  | { kind: 'refused'; text: Say }
+  | { kind: 'failed'; text: Say }
+
+/** The load request to post, or the text that says why not: a bad value, an unbuilt load, no bulk density. */
+export function checkedRequest<R extends { bulkDensity?: number | undefined }>(
+  value: string | number,
+  unit: ReturnType<typeof targetUnit>,
+  kind: TargetKind,
+  loadRequest: () => R,
+): { req: R } | { text: Say } {
+  if (targetError(value, unit, english.t)) return { text: (t) => targetError(value, unit, t) ?? '' }
+  let req: R
+  try {
+    req = loadRequest()
+  } catch (err) {
+    const message = errorText(err)
+    return { text: (t) => translateMessage(message, t) }
+  }
+  if (kind === 'loadRatio' && req.bulkDensity === undefined)
+    return { text: (t) => t('The load ratio needs a powder with a bulk density.') }
+  return { req }
+}
+
+/** The answer for an HTTP response of the solver: found, refused (422) or failed. */
+export function answerOf(
+  res: Response,
+  json: unknown,
+  kind: TargetKind,
+  system: UnitSystem,
+  asPercent: boolean,
+): Outcome {
+  if (res.ok && json) return { kind: 'found', body: json as ChargeTargetResponse }
+  if (res.status === 422 && json)
+    return {
+      kind: 'refused',
+      text: (t) => refusalText(json as ChargeTargetRefusal, kind, system, asPercent, t),
+    }
+  const message = (json as ChargeTargetRefusal | undefined)?.message ?? `Error ${res.status}.`
+  return { kind: 'failed', text: (t) => translateMessage(message, t) }
 }

@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest'
-import { english } from '../src/i18n/translate.ts'
+import de from '../src/i18n/de.json'
+import { type Catalogue, english, translator } from '../src/i18n/translate.ts'
 import {
+  answerOf,
   chargeTargetBody,
+  checkedRequest,
   refusalText,
   targetNumber,
   targetUnit,
 } from '../src/lib/charge-target.ts'
 import { presetUnits } from '../src/lib/units.ts'
 
+const german = translator(de as Catalogue, 'de')
 const si = presetUnits('metric-grams')
 const us = presetUnits('us')
 
@@ -138,5 +142,38 @@ describe('targetNumber', () => {
     expect(targetNumber('')).toBeNaN()
     expect(targetNumber('1,5')).toBeNaN()
     expect(targetNumber('abc')).toBeNaN()
+  })
+})
+
+describe('the answer kept for a language change', () => {
+  const refusal = { reason: 'toleranceNotReached', message: 'x', error: 'unreachable' }
+  const refused = () =>
+    answerOf(new Response(null, { status: 422 }), refusal, 'peakPressure', si, false)
+
+  it('writes a refusal in the language it is shown in, not the one it came in', () => {
+    const out = refused()
+    if (out.kind !== 'refused') throw new Error('expected a refusal')
+    const en = out.text(english.t)
+    expect(en).toBe('The search did not reach its tolerance.')
+    expect(out.text(german.t)).not.toBe(en)
+    expect(out.text(english.t)).toBe(en)
+  })
+
+  it('writes a value error under the language shown, from the stored value', () => {
+    const checked = checkedRequest(
+      0,
+      targetUnit('loadRatio', si),
+      'loadRatio',
+      () => ({}) as { bulkDensity?: number },
+    )
+    if (!('text' in checked)) throw new Error('expected an error')
+    expect(checked.text(english.t)).toBe('Enter a target above 0.')
+    expect(checked.text(german.t)).toBe('Geben Sie eine Zielgröße über 0 ein.')
+  })
+
+  it('writes a failed answer from the API message in the language shown', () => {
+    const out = answerOf(new Response(null, { status: 500 }), undefined, 'peakPressure', si, false)
+    if (out.kind !== 'failed') throw new Error('expected a failure')
+    expect(out.text(english.t)).toBe('Error 500.')
   })
 })

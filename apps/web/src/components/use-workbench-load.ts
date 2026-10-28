@@ -1790,7 +1790,7 @@ export function useWorkbenchState() {
       .catch(() => {
         if (signal.aborted) return
         lost('bullet', id)
-        setStatus(t(notReached))
+        setStatus({ say: (t) => t(notReached) })
       })
   }
 
@@ -1869,7 +1869,7 @@ export function useWorkbenchState() {
       .catch(() => {
         if (signal.aborted) return
         lost('powder', id)
-        setStatus(t(notReached))
+        setStatus({ say: (t) => t(notReached) })
       })
   }
 
@@ -2025,7 +2025,8 @@ export function useWorkbenchState() {
       if ((powderMoreFields as readonly string[]).includes(err.field)) setMore('powder')
     }
     setOutcome(undefined)
-    setStatus(translateMessage(errorText(err), t))
+    const message = errorText(err)
+    setStatus({ say: (t) => translateMessage(message, t) })
   }
 
   /** Shows the first step with a result and starts the request for its sampled band. */
@@ -2089,7 +2090,7 @@ export function useWorkbenchState() {
     lastWarnings.current = warnings
     showChart(undefined)
     setOutcome(ok)
-    setStatus({ prefix: t('Simulation done. ') })
+    setStatus({ prefix: (t) => t('Simulation done. ') })
     // the sampled band of the step shown first follows the result: it takes up to its time budget
     const bandController = new AbortController()
     bandRequest.current = bandController
@@ -2129,7 +2130,7 @@ export function useWorkbenchState() {
     const controller = new AbortController()
     running.current = controller
     setPending(true)
-    setStatus(t('Simulating'))
+    setStatus({ say: (t) => t('Simulating') })
     try {
       await simulate(req, plan, request, controller.signal)
     } catch {
@@ -2161,7 +2162,8 @@ export function useWorkbenchState() {
     }
     const failed = failedRun(steps, res, json)
     setOutcome(failed.outcome)
-    setStatus(translateMessage(failed.text, t))
+    const message = failed.text
+    setStatus({ say: (t) => translateMessage(message, t) })
   }
 
   /** A request that never got an answer: the API is unreachable, or the browser is offline. */
@@ -2169,7 +2171,7 @@ export function useWorkbenchState() {
     setChanged(false)
     const offline = !navigator.onLine
     setOutcome({ kind: 'error', status: 502, body: undefined, retryAfter: null, offline })
-    setStatus(t(offline ? needsNetwork : notReached))
+    setStatus({ say: (t) => t(offline ? needsNetwork : notReached) })
   }
 
   // the cartridge record's groove diameter, for the bore resistance of a fitted powder
@@ -3052,7 +3054,7 @@ export function useWorkbenchState() {
     showChart,
     sight,
     suggestions,
-    status: statusText(status, outcome && resultLineOf(outcome, system, t)),
+    status: statusText(status, outcome && resultLineOf(outcome, system, t), t),
     stepError,
     stepsDraft,
     storedTick,

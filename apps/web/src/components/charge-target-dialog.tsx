@@ -3,31 +3,23 @@
 import { Button, Group, NumberInput, Select, Stack, Text } from '@mantine/core'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
-import type { Translator } from '../i18n/translate.ts'
 import { apiFetch } from '../lib/api-fetch.ts'
 import {
-  type ChargeTargetRefusal,
-  type ChargeTargetResponse,
+  answerOf,
   chargeTargetBody,
-  refusalText,
+  checkedRequest,
+  type Outcome,
   type TargetKind,
-  targetError,
   targetKinds,
   targetNumber,
   targetUnit,
 } from '../lib/charge-target.ts'
 import { translateMessage } from '../lib/core-messages.ts'
-import { errorText } from '../lib/error-text.ts'
 import { powderDesignNote } from '../lib/powder-designer.ts'
 import { formatQuantity, msText, withUnit } from '../lib/units.ts'
 import { AppModal } from './app-modal.tsx'
 import { useLoad } from './workbench-context.ts'
 import { notReached } from './workbench-outcome.ts'
-
-type Outcome =
-  | { kind: 'found'; body: ChargeTargetResponse }
-  | { kind: 'refused'; text: string }
-  | { kind: 'failed'; text: string }
 
 /** `request` is the load request the answer was solved for: an answer shows only for the same load. */
 type Answer = { request: string } & Outcome
@@ -39,53 +31,6 @@ function requestKey(loadRequest: () => { body: object; bulkDensity?: number | un
     return JSON.stringify([body, bulkDensity])
   } catch {
     return ''
-  }
-}
-
-type LoadRequest = ReturnType<ReturnType<typeof useLoad>['loadRequest']>
-
-/** The load request to post, or the text that says why not: a bad value, an unbuilt load, no bulk density. */
-function checkedRequest(
-  value: string | number,
-  unit: ReturnType<typeof targetUnit>,
-  kind: TargetKind,
-  loadRequest: () => LoadRequest,
-  t: Translator['t'],
-): { req: LoadRequest } | { text: string } {
-  const invalid = targetError(value, unit, t)
-  if (invalid) return { text: invalid }
-  let req: LoadRequest
-  try {
-    req = loadRequest()
-  } catch (err) {
-    return { text: translateMessage(errorText(err), t) }
-  }
-  if (kind === 'loadRatio' && req.bulkDensity === undefined)
-    return { text: t('The load ratio needs a powder with a bulk density.') }
-  return { req }
-}
-
-/** The answer for an HTTP response of the solver: found, refused (422) or failed. */
-function answerOf(
-  res: Response,
-  json: unknown,
-  kind: TargetKind,
-  system: Parameters<typeof refusalText>[2],
-  asPercent: boolean,
-  t: Translator['t'],
-): Outcome {
-  if (res.ok && json) return { kind: 'found', body: json as ChargeTargetResponse }
-  if (res.status === 422 && json)
-    return {
-      kind: 'refused',
-      text: refusalText(json as ChargeTargetRefusal, kind, system, asPercent, t),
-    }
-  return {
-    kind: 'failed',
-    text: translateMessage(
-      (json as ChargeTargetRefusal | undefined)?.message ?? `Error ${res.status}.`,
-      t,
-    ),
   }
 }
 
@@ -135,7 +80,7 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
 
   async function find() {
     const typed = targetNumber(value)
-    const checked = checkedRequest(value, unit, kind, loadRequest, t)
+    const checked = checkedRequest(value, unit, kind, loadRequest)
     if ('text' in checked) {
       setAnswer({ request, kind: 'failed', text: checked.text })
       return
@@ -160,9 +105,10 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
       })
       const json = await res.json().catch(() => undefined)
       if (controller.signal.aborted) return
-      setAnswer({ request, ...answerOf(res, json, kind, system, asPercent, t) })
+      setAnswer({ request, ...answerOf(res, json, kind, system, asPercent) })
     } catch {
-      if (!controller.signal.aborted) setAnswer({ request, kind: 'failed', text: t(notReached) })
+      if (!controller.signal.aborted)
+        setAnswer({ request, kind: 'failed', text: (t) => t(notReached) })
     } finally {
       if (running.current === controller) setPending(false)
     }
@@ -230,7 +176,7 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
       <div aria-live="polite" role="status">
         {answer && answer.kind !== 'found' && (
           <Text mt="sm" size="sm" role={answer.kind === 'failed' ? 'alert' : undefined}>
-            {translateMessage(answer.text, t)}
+            {answer.text(t)}
           </Text>
         )}
         {found && (
