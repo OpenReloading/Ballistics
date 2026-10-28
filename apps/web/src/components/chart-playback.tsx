@@ -15,6 +15,8 @@ import {
   useState,
 } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from '../i18n/language.ts'
+import { msg, type Translator } from '../i18n/translate.ts'
 import { baseAt, flightAt, flightTime, type StripModel } from '../lib/barrel-strip.ts'
 import {
   advance,
@@ -37,16 +39,19 @@ import { msText, percentText, type UnitSystem, withUnit } from '../lib/units.ts'
 import { shownLength } from '../lib/workbench.ts'
 
 const readouts = [
-  ['time', 'Time'],
-  ['travel', 'Travel'],
-  ['velocity', 'Velocity'],
-  ['pressure', 'Breech pressure'],
-  ['burnt', 'Burnt'],
+  ['time', msg('Time')],
+  ['travel', msg('Travel')],
+  ['velocity', msg('Velocity')],
+  ['pressure', msg('Breech pressure')],
+  ['burnt', msg('Burnt')],
 ] as const
 type Texts = Record<(typeof readouts)[number][0], string>
 /** The readouts as one sentence, for the slider value text and the event status. */
-const sentence = (x: Texts) =>
-  `${x.time}: travel ${x.travel}, velocity ${x.velocity}, breech pressure ${x.pressure}, powder burnt ${x.burnt}`
+const sentence = (x: Texts, t: Translator['t']) =>
+  t(
+    '{time}: travel {travel}, velocity {velocity}, breech pressure {pressure}, powder burnt {burnt}',
+    x,
+  )
 
 /**
  * Playback outside React: time, factor and the frame loop. `draw` writes the page; `onPlaying`
@@ -235,6 +240,7 @@ export function ChartPlayback({
   /** Set here: draws the current time again, after the chart drew. */
   redraw: { current?: (() => void) | undefined }
 }) {
+  const { t } = useTranslation()
   const id = useId().replace(/:/g, '')
   const end = r.muzzleTime
   const [playing, setPlaying] = useState(false)
@@ -257,7 +263,7 @@ export function ChartPlayback({
     () => (byTravel ? travelScrub(r.points) : timeScrub(end)),
     [r, byTravel, end],
   )
-  const events = useMemo(() => playbackEvents(r), [r])
+  const events = useMemo(() => playbackEvents(r, t), [r, t])
   const maxMean = useMemo(() => Math.max(...r.points.map((p) => p.meanPressure)), [r])
   const text = (s: PlaybackSample): Texts => ({
     time: msText(s.time),
@@ -268,22 +274,22 @@ export function ChartPlayback({
   })
 
   /** Writes the state at time t into the page; no React update. */
-  const draw = (t: number, active = true) => {
-    const s = at(t)
+  const draw = (time: number, active = true) => {
+    const s = at(time)
     marker.current?.toggleAttribute('data-active', active)
-    drawStrip(nodes.current, strip, s, t, end, maxMean)
+    drawStrip(nodes.current, strip, s, time, end, maxMean)
     const shown = text(s)
     for (const [key] of readouts) {
       const node = nodes.current.get(key)
       if (node) node.textContent = shown[key]
     }
     if (scrub.current) {
-      scrub.current.value = String(Math.round(scale.pos(Math.min(t, end)) * scrubSteps))
-      scrub.current.setAttribute('aria-valuetext', sentence(shown))
+      scrub.current.value = String(Math.round(scale.pos(Math.min(time, end)) * scrubSteps))
+      scrub.current.setAttribute('aria-valuetext', sentence(shown, t))
     }
     for (const e of events)
-      nodes.current.get(`event-${e.key}`)?.toggleAttribute('data-passed', e.time <= t)
-    placeMarker(chart.current, marker.current, segment, t, x, y)
+      nodes.current.get(`event-${e.key}`)?.toggleAttribute('data-passed', e.time <= time)
+    placeMarker(chart.current, marker.current, segment, time, x, y)
   }
   /**
    * Places the strip and the time track from the chart's own scales, after each chart draw: the
@@ -331,7 +337,11 @@ export function ChartPlayback({
   const goTo = (e: PlaybackEvent) => {
     c?.seek(e.time)
     const status = nodes.current.get('status')
-    if (status) status.textContent = `${e.label} at ${sentence(text(at(e.time)))}`
+    if (status)
+      status.textContent = t('{event} at {values}', {
+        event: e.label,
+        values: sentence(text(at(e.time)), t),
+      })
   }
   const [factor, setFactor] = useState(() => defaultFactor(end))
   const playButton = (
@@ -339,8 +349,8 @@ export function ChartPlayback({
       variant="default"
       size={controlSize.row.icon}
       className="play-button"
-      aria-label={playing ? 'Pause' : 'Play'}
-      title={playing ? 'Pause' : 'Play the shot'}
+      aria-label={playing ? t('Pause') : t('Play')}
+      title={playing ? t('Pause') : t('Play the shot')}
       onClick={() => {
         if (!c) return
         if (c.playing) c.pause()
@@ -359,7 +369,7 @@ export function ChartPlayback({
           <fieldset
             ref={room}
             className="playback screen-only"
-            aria-label="Playback"
+            aria-label={t('Playback')}
             data-playing={playing || undefined}
             style={
               { '--plot-left': `${plot[0]}px`, '--plot-right': `${plot[1]}px` } as CSSProperties
@@ -412,9 +422,9 @@ export function ChartPlayback({
                 <input
                   ref={scrub}
                   type="range"
-                  aria-label={byTravel ? 'Bullet position' : 'Time from ignition'}
+                  aria-label={byTravel ? t('Bullet position') : t('Time from ignition')}
                   aria-keyshortcuts="PageUp PageDown"
-                  title="Page Up and Page Down go to the events"
+                  title={t('Page Up and Page Down go to the events')}
                   min={0}
                   max={scrubSteps}
                   step={1}
@@ -476,8 +486,8 @@ export function ChartPlayback({
                     size={controlSize.row.button}
                     px={0}
                     className="play-speed"
-                    aria-label={`Slow-down factor: ${factor / 1000}k×`}
-                    title={`Slowed down ${factor} times`}
+                    aria-label={t('Slow-down factor: {factor}k×', { factor: factor / 1000 })}
+                    title={t('Slowed down {factor} times', { factor })}
                   >
                     {factor / 1000}k×
                   </Button>
@@ -508,7 +518,7 @@ export function ChartPlayback({
             <dl className="play-readouts">
               {readouts.map(([key, label]) => (
                 <div key={key}>
-                  <dt>{label}</dt>
+                  <dt>{t(label)}</dt>
                   <dd ref={put(key)} />
                 </div>
               ))}

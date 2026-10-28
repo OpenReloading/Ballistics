@@ -216,6 +216,27 @@ const warnings = z
   )
   .describe('Messages on the limits, the range and the model')
 
+const maximumCheck = z
+  .looseObject({
+    maximum: num('The maximum pressure entered with the request, Pa'),
+    class: z
+      .enum(['inputPlausible', 'modelDiscrepancy', 'aboveRange'])
+      .describe(
+        'inputPlausible: the maximum is inside the pressure range, ends included. modelDiscrepancy: below its low end. aboveRange: above its high end.',
+      ),
+    dominantInput: z
+      .enum(pressureInputs)
+      .nullable()
+      .describe(
+        'The input whose two tolerance ends differ most in peak pressure, null when no input moves it',
+      ),
+    message: text('A statement about the simulated range and the maximum'),
+  })
+  .optional()
+  .describe(
+    'Where the entered maximumPressure lies against pressureRange. Absent without maximumPressure.',
+  )
+
 const cartridge = z
   .looseObject({
     id: text('Cartridge id'),
@@ -249,6 +270,8 @@ const charge = num('Charge mass, kg')
 
 /** The fields of a valid run shared by the interior answers. */
 const checked = { pressureRange, sampled, limits, warnings }
+/** The fields of a valid run of `POST /interior`: the shared ones and the check of an entered maximum. */
+const interiorChecked = { ...checked, maximumCheck }
 
 /** 200 body of `POST /interior`: one M3 run, or the steps of a charge ladder. */
 export const interiorResponse = z.union([
@@ -258,7 +281,7 @@ export const interiorResponse = z.union([
     model: z.literal('m3').describe('The interior model'),
     units: m3Units,
     result,
-    ...checked,
+    ...interiorChecked,
     resolved: z
       .looseObject({ cartridge: cartridge.optional() })
       .optional()
@@ -271,7 +294,10 @@ export const interiorResponse = z.union([
     units: m3Units,
     ladderSteps: z
       .array(
-        z.union([z.looseObject({ charge, result, ...checked }), z.looseObject({ charge, error })]),
+        z.union([
+          z.looseObject({ charge, result, ...interiorChecked }),
+          z.looseObject({ charge, error }),
+        ]),
       )
       .describe('One run per charge of the ladder, or its error'),
     resolved: z

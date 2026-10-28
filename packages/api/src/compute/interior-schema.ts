@@ -181,6 +181,13 @@ const interiorSharedFields = {
       'Cartridge record id. Adds the comparison of the peak pressure with its CIP Pmax under limits.',
     )
     .optional(),
+  maximumPressure: z
+    .number()
+    .positive()
+    .describe(
+      'A maximum peak pressure entered by the caller, Pa. Adds maximumCheck: where it lies against the simulated pressure range of each run.',
+    )
+    .optional(),
   tolerances: tolerances.optional(),
   ladder: ladder.optional(),
 }

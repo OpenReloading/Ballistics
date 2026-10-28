@@ -1,4 +1,4 @@
-import { fromSi } from '@open-reloading/schema'
+import type { Translator } from '../i18n/translate.ts'
 import type { InteriorResponse } from './api-types.ts'
 import { firstIndexBeyondTravel } from './interior-chart.ts'
 import type { InteriorBody } from './interior-input.ts'
@@ -79,21 +79,26 @@ export function rangeLengths(
   from: number | undefined,
   to: number | undefined,
   step: number | undefined,
-  shown: (length: number) => string = (m) => `${fromSi('length', m)} mm`,
+  shown: (length: number) => string,
+  t: Translator['t'],
 ): { lengths: number[] } | { errors: RangeErrors } {
   const errors: RangeErrors = {}
-  if (from === undefined) errors.from = 'Enter From.'
-  else if (!(from > 0)) errors.from = 'From must be above 0.'
-  if (to === undefined) errors.to = 'Enter To.'
-  else if (from !== undefined && from > 0 && !(to >= from)) errors.to = 'To must not be below From.'
-  else if (to > maxBarrelLength) errors.to = `To must not be above ${shown(maxBarrelLength)}.`
-  if (step === undefined) errors.step = 'Enter Step.'
-  else if (!(step > 0)) errors.step = 'Step must be above 0.'
+  if (from === undefined) errors.from = t('Enter From.')
+  else if (!(from > 0)) errors.from = t('From must be above 0.')
+  if (to === undefined) errors.to = t('Enter To.')
+  else if (from !== undefined && from > 0 && !(to >= from))
+    errors.to = t('To must not be below From.')
+  else if (to > maxBarrelLength)
+    errors.to = t('To must not be above {length}.', { length: shown(maxBarrelLength) })
+  if (step === undefined) errors.step = t('Enter Step.')
+  else if (!(step > 0)) errors.step = t('Step must be above 0.')
   if (Object.keys(errors).length > 0 || from === undefined || to === undefined || !step)
     return { errors }
   const n = Math.floor((to - from) / step + 1e-9) + 1
   if (n > maxLengthCount)
-    return { errors: { step: `At most ${maxLengthCount} lengths: raise Step.` } }
+    return {
+      errors: { step: t('At most {count} lengths: raise Step.', { count: maxLengthCount }) },
+    }
   // multiplied, so the last length carries no accumulated rounding
   return { lengths: Array.from({ length: n }, (_, i) => from + i * step) }
 }

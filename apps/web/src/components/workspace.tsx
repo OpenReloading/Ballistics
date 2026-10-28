@@ -13,6 +13,7 @@ import {
   useState,
 } from 'react'
 import { flushSync } from 'react-dom'
+import { useTranslation } from '../i18n/language.ts'
 import { useScrollFocus } from './scroll-region.tsx'
 
 export type WorkspaceHandle = {
@@ -33,7 +34,7 @@ export function Workspace({
   range,
   bar,
   ref,
-  inputsLabel = 'Inputs',
+  inputsLabel,
   className,
 }: {
   inputs: ReactNode
@@ -43,10 +44,11 @@ export function Workspace({
   /** Readout bar of the phone layout, under the inputs and the results; `show` opens the Results tab and focuses it. */
   bar: (show: () => void) => ReactNode
   ref?: Ref<WorkspaceHandle>
-  /** Name of the inputs tab below 48em. */
+  /** Name of the inputs tab below 48em, already translated; Inputs when absent. */
   inputsLabel?: string
   className?: string
 }) {
+  const { t } = useTranslation()
   const [tab, setTab] = useState('inputs')
   useImperativeHandle(
     ref,
@@ -57,12 +59,12 @@ export function Workspace({
   useEffect(() => {
     if (!range) return
     const wide = matchMedia('(min-width: 48em)')
-    const leave = () => wide.matches && setTab((t) => (t === 'range' ? 'inputs' : t))
+    const leave = () => wide.matches && setTab((open) => (open === 'range' ? 'inputs' : open))
     wide.addEventListener('change', leave)
     return () => wide.removeEventListener('change', leave)
   }, [range])
   const region = useRef<HTMLElement>(null)
-  const scrollFocus = useScrollFocus('Results', region)
+  const scrollFocus = useScrollFocus(t('Results'), region)
   const show = useCallback(() => {
     flushSync(() => setTab('results'))
     region.current?.focus()
@@ -86,9 +88,9 @@ export function Workspace({
     <div className={className ? `workspace ${className}` : 'workspace'}>
       <Tabs value={tab} onChange={(v) => setTab(v ?? 'inputs')} className="workspace-tabs">
         <Tabs.List grow className="workspace-tablist">
-          <Tabs.Tab value="inputs">{inputsLabel}</Tabs.Tab>
-          <Tabs.Tab value="results">Results</Tabs.Tab>
-          {range && <Tabs.Tab value="range">Range</Tabs.Tab>}
+          <Tabs.Tab value="inputs">{inputsLabel ?? t('Inputs')}</Tabs.Tab>
+          <Tabs.Tab value="results">{t('Results')}</Tabs.Tab>
+          {range && <Tabs.Tab value="range">{t('Range')}</Tabs.Tab>}
         </Tabs.List>
         <Tabs.Panel value="inputs" className="workspace-inputs">
           {inputs}
@@ -97,7 +99,7 @@ export function Workspace({
           {/* scrolls on its own from 62em, so it takes focus for keyboard scrolling */}
           <section
             id="results"
-            aria-label="Results"
+            aria-label={t('Results')}
             // the skip link focuses it; a tab stop only while it scrolls
             tabIndex={-1}
             {...scrollFocus}
@@ -152,6 +154,7 @@ export function Toolbar({
   /** The page's `useCopyLink`, shared with the other controls that copy the link. */
   link: ReturnType<typeof useCopyLink>
 }) {
+  const { t } = useTranslation()
   const { copied, copy } = link
   return (
     <>
@@ -160,7 +163,7 @@ export function Toolbar({
       <Button
         variant="default"
         className="bar-icon"
-        title={copied ? 'Link copied' : 'Copy link'}
+        title={copied ? t('Link copied') : t('Copy link')}
         leftSection={
           copied ? (
             <Check size={18} aria-hidden="true" />
@@ -170,7 +173,7 @@ export function Toolbar({
         }
         onClick={copy}
       >
-        {copied ? 'Link copied' : 'Copy link'}
+        {copied ? t('Link copied') : t('Copy link')}
       </Button>
       {after}
     </>

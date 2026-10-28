@@ -28,6 +28,7 @@
     "packages/importers": { "component": "importers" },
     "packages/data": { "component": "data" },
     "packages/api": { "component": "api" },
+    "packages/cli": { "component": "cli" },
     "apps/web": { "component": "web" },
     "apps/docs": { "component": "docs" }
   }

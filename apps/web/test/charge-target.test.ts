@@ -1,12 +1,17 @@
 import { describe, expect, it } from 'vitest'
+import de from '../src/i18n/de.json'
+import { type Catalogue, english, translator } from '../src/i18n/translate.ts'
 import {
+  answerOf,
   chargeTargetBody,
+  checkedRequest,
   refusalText,
   targetNumber,
   targetUnit,
 } from '../src/lib/charge-target.ts'
 import { presetUnits } from '../src/lib/units.ts'
 
+const german = translator(de as Catalogue, 'de')
 const si = presetUnits('metric-grams')
 const us = presetUnits('us')
 
@@ -60,6 +65,7 @@ describe('refusalText', () => {
       'peakPressure',
       si,
       false,
+      english.t,
     )
     expect(text).toContain('does not reach this high a value')
     expect(text).toContain(
@@ -77,6 +83,7 @@ describe('refusalText', () => {
       'peakPressure',
       si,
       false,
+      english.t,
     )
     expect(text).toContain('lowest value is 200 bar at 4.00 g')
     expect(text).toContain('highest is 4000 bar at 2.00 g')
@@ -88,6 +95,7 @@ describe('refusalText', () => {
       'peakPressure',
       si,
       true,
+      english.t,
     )
     expect(text).toContain(
       'lowest value is 5.0 % of Pmax at 1.00 g and the highest is 100.0 % of Pmax at 4.00 g',
@@ -96,9 +104,11 @@ describe('refusalText', () => {
 
   it('words the other reasons and falls back to the message', () => {
     expect(
-      refusalText({ statusCode: 422, reason: 'notMonotone' }, 'barrelTime', si, false),
+      refusalText({ statusCode: 422, reason: 'notMonotone' }, 'barrelTime', si, false, english.t),
     ).toMatch(/more than one charge/)
-    expect(refusalText({ statusCode: 500, message: 'boom' }, 'barrelTime', si, false)).toBe('boom')
+    expect(
+      refusalText({ statusCode: 500, message: 'boom' }, 'barrelTime', si, false, english.t),
+    ).toBe('boom')
   })
 
   it('names the failing run of the load for noValidRun, not the target', () => {
@@ -111,13 +121,26 @@ describe('refusalText', () => {
       'peakPressure',
       si,
       false,
+      english.t,
     )
     expect(text).toBe(
-      'The simulation gives no valid run for this load. Reason: input; field: ignitionPressure.',
+      'The simulation gives no valid run for this load. Reason: input; field: Ignition pressure.',
     )
-    expect(refusalText({ statusCode: 422, reason: 'noValidRun' }, 'barrelTime', si, false)).toMatch(
-      /No charge in the range/,
+    const refusal = (field: string) => ({
+      statusCode: 422,
+      reason: 'noValidRun',
+      failure: { reason: 'input', field },
+    })
+    expect(refusalText(refusal('ignitionPressure'), 'peakPressure', si, false, german.t)).toContain(
+      'Feld: Zünddruck.',
     )
+    // a field without a workbench label keeps the model's name
+    expect(refusalText(refusal('heat'), 'peakPressure', si, false, german.t)).toContain(
+      'Feld: heat.',
+    )
+    expect(
+      refusalText({ statusCode: 422, reason: 'noValidRun' }, 'barrelTime', si, false, english.t),
+    ).toMatch(/No charge in the range/)
   })
 })
 
@@ -131,5 +154,38 @@ describe('targetNumber', () => {
     expect(targetNumber('')).toBeNaN()
     expect(targetNumber('1,5')).toBeNaN()
     expect(targetNumber('abc')).toBeNaN()
+  })
+})
+
+describe('the answer kept for a language change', () => {
+  const refusal = { reason: 'toleranceNotReached', message: 'x', error: 'unreachable' }
+  const refused = () =>
+    answerOf(new Response(null, { status: 422 }), refusal, 'peakPressure', si, false)
+
+  it('writes a refusal in the language it is shown in, not the one it came in', () => {
+    const out = refused()
+    if (out.kind !== 'refused') throw new Error('expected a refusal')
+    const en = out.text(english.t)
+    expect(en).toBe('The search did not reach its tolerance.')
+    expect(out.text(german.t)).not.toBe(en)
+    expect(out.text(english.t)).toBe(en)
+  })
+
+  it('writes a value error under the language shown, from the stored value', () => {
+    const checked = checkedRequest(
+      0,
+      targetUnit('loadRatio', si),
+      'loadRatio',
+      () => ({}) as { bulkDensity?: number },
+    )
+    if (!('text' in checked)) throw new Error('expected an error')
+    expect(checked.text(english.t)).toBe('Enter a target above 0.')
+    expect(checked.text(german.t)).toBe('Geben Sie eine Zielgröße über 0 ein.')
+  })
+
+  it('writes a failed answer from the API message in the language shown', () => {
+    const out = answerOf(new Response(null, { status: 500 }), undefined, 'peakPressure', si, false)
+    if (out.kind !== 'failed') throw new Error('expected a failure')
+    expect(out.text(english.t)).toBe('Error 500.')
   })
 })

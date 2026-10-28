@@ -31,7 +31,8 @@ import {
   useState,
 } from 'react'
 import { createPortal } from 'react-dom'
-import { plainNumber } from '../i18n/number.ts'
+import { useTranslation } from '../i18n/language.ts'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { apiFetch } from '../lib/api-fetch.ts'
 import type { BulletSummary, CartridgeDetail, CaseSummary } from '../lib/api-types.ts'
 import type { StripFigure } from '../lib/barrel-strip.ts'
@@ -39,6 +40,7 @@ import { designShape } from '../lib/bullet-designer.ts'
 import { drawable } from '../lib/cartridge-sheet.ts'
 import { renamedCasePath, type UsedWater, usedWater } from '../lib/case-capacity.ts'
 import type { OwnCase } from '../lib/case-group.ts'
+import { translateMessage } from '../lib/core-messages.ts'
 import type { FieldValue } from '../lib/field-spec.ts'
 import { figureViewBuilder } from '../lib/figure-views.ts'
 import type { LandsContact } from '../lib/firearm.ts'
@@ -79,15 +81,17 @@ type Load<T> =
 
 type Mode = 'overallLength' | 'baseToOgive'
 
+type T = Translator['t']
+
 const modeHelp = {
-  overallLength: 'Cartridge overall length.',
-  baseToOgive: 'Cartridge base to ogive.',
+  overallLength: msg('Cartridge overall length.'),
+  baseToOgive: msg('Cartridge base to ogive.'),
 }
-const tagText: Record<Tagged['tag'], string> = {
-  entered: 'entered',
-  sourced: 'sourced',
-  derived: 'derived',
-  approximate: 'approximate',
+const tagText: Record<Tagged['tag'], Message> = {
+  entered: msg('entered'),
+  sourced: msg('sourced'),
+  derived: msg('derived'),
+  approximate: msg('approximate'),
 }
 
 /**
@@ -150,7 +154,8 @@ function useRecord<T>(url: string | undefined): Load<T> {
 }
 
 function Badge({ tag }: { tag: Tagged['tag'] }) {
-  return <span className={`flag flag-${tag}`}>{tagText[tag]}</span>
+  const { t } = useTranslation()
+  return <span className={`flag flag-${tag}`}>{t(tagText[tag])}</span>
 }
 
 function Row({
@@ -180,8 +185,9 @@ function Row({
 }
 
 /** A value the inputs do not give: no number and no default, and what it needs. */
-function NotGiven({ term, why }: { term: string; why: string }) {
-  return <Row term={term} value="not given" note={`needs ${why}`} />
+function NotGiven({ term, why }: { term: string; why: Message }) {
+  const { t } = useTranslation()
+  return <Row term={term} value={t('not given')} note={t('needs {why}', { why: t(why) })} />
 }
 
 /** The seated bullet over the drawing, in the part frame (mm): inside the case mouth dimmed and dashed. */
@@ -752,6 +758,7 @@ function useLive(announce: string) {
 
 /** The seating's state and values: every hook of the preview, so its parts only draw. */
 function useSeatingModel(p: PreviewProps) {
+  const { t } = useTranslation()
   const { cartridge, draft, system, initial, onSeatLadder, slots, view = 'combined' } = p
   const { measuredWaterCapacity = emptyValue(), ladderStep } = p
   const id = useId().replace(/:/g, '')
@@ -922,11 +929,11 @@ function useSeatingModel(p: PreviewProps) {
   )
 
   const fmt = unitFormats(system)
-  const contact = contactText(seating, fmt.mm)
+  const contact = contactText(seating, fmt.mm, t)
   /** The workbench's cards: the fields there show what the rows below leave out. */
   const card = inCard
-  const warnings = warningsOf(seating, chamber, designed, contact, fmt.mm)
-  const live = useLive(announceOf(seating, fmt.mm))
+  const warnings = warningsOf(seating, chamber, designed, contact, fmt.mm, t)
+  const live = useLive(announceOf(seating, fmt.mm, t))
 
   function changeMode(next: Mode) {
     if (next === mode || !shape) return
@@ -1005,11 +1012,17 @@ function unitFormats(system: UnitSystem) {
   }
 }
 
-const contactText = (seating: Seating | undefined, mm: (x: number) => string) =>
+const contactText = (seating: Seating | undefined, mm: (x: number) => string, t: T) =>
   seating?.contact &&
   (seating.jump.source === 'lands'
-    ? `Contact with the lands (measured): the bullet reaches the lands at ${mm(seating.contactCoal as number)} COAL; it is not moved back.`
-    : `Contact with leade (${seating.jump.tag}): the bullet reaches the leade at ${mm(seating.contactCoal as number)} COAL; it is not moved back.`)
+    ? t(
+        'Contact with the lands (measured): the bullet reaches the lands at {coal} COAL; it is not moved back.',
+        { coal: mm(seating.contactCoal as number) },
+      )
+    : t(
+        'Contact with leade ({tag}): the bullet reaches the leade at {coal} COAL; it is not moved back.',
+        { tag: t(tagText[seating.jump.tag]), coal: mm(seating.contactCoal as number) },
+      ))
 
 function warningsOf(
   seating: Seating | undefined,
@@ -1017,21 +1030,34 @@ function warningsOf(
   designed: boolean,
   contact: string | false | undefined,
   mm: (x: number) => string,
+  t: T,
 ) {
   const above =
     seating?.aboveL6 &&
     chamber?.cartridgeL6 !== undefined &&
-    `Above the ${designed ? 'cartridge' : 'CIP maximum'} L6 of ${mm(chamber.cartridgeL6)}`
+    (designed
+      ? t('Above the cartridge L6 of {length}', { length: mm(chamber.cartridgeL6) })
+      : t('Above the CIP maximum L6 of {length}', { length: mm(chamber.cartridgeL6) }))
   return [above, contact].filter((w): w is string => !!w)
 }
 
-const jumpText = (s: Seating, mm: (x: number) => string) =>
-  s.jump.value === undefined ? jumpNote(s.jump) : `${mm(s.jump.value)}, ${s.jump.tag}`
+const jumpText = (s: Seating, mm: (x: number) => string, t: T) =>
+  s.jump.value === undefined
+    ? translateMessage(jumpNote(s.jump), t)
+    : `${mm(s.jump.value)}, ${t(tagText[s.jump.tag])}`
 
-const announceOf = (seating: Seating | undefined, mm: (x: number) => string) =>
-  seating
-    ? `COAL ${mm(seating.coal.value)}, seating depth ${mm(seating.depth.value)}, jump ${jumpText(seating, mm)}${seating.contact ? (seating.jump.source === 'lands' ? ', contact with the lands' : ', contact with leade') : ''}.`
-    : ''
+function announceOf(seating: Seating | undefined, mm: (x: number) => string, t: T) {
+  if (!seating) return ''
+  const values = {
+    coal: mm(seating.coal.value),
+    depth: mm(seating.depth.value),
+    jump: jumpText(seating, mm, t),
+  }
+  if (!seating.contact) return t('COAL {coal}, seating depth {depth}, jump {jump}.', values)
+  return seating.jump.source === 'lands'
+    ? t('COAL {coal}, seating depth {depth}, jump {jump}, contact with the lands.', values)
+    : t('COAL {coal}, seating depth {depth}, jump {jump}, contact with leade.', values)
+}
 
 /** The position in the other mode's length, or undefined when the bullet gives no shift. */
 function movedPosition(
@@ -1050,18 +1076,23 @@ function movedPosition(
 }
 
 /** What stands in for the preview while the record loads, fails or lacks a drawing; else the spec and chamber. */
-function gateOf(m: Model): { gate: ReactNode } | { spec: Spec; chamber: Chamber } {
+function gateOf(m: Model, t: T): { gate: ReactNode } | { spec: Spec; chamber: Chamber } {
   const { designed, detail, spec, chamber, name } = m
   if (!designed && (detail.status === 'loading' || detail.status === 'none'))
     return { gate: <Loading what="the cartridge record" inline /> }
-  if (!designed && detail.status === 'error') return { gate: <p>{notReached}</p> }
+  if (!designed && detail.status === 'error') return { gate: <p>{t(notReached)}</p> }
   if (spec && chamber) return { spec, chamber }
   return {
     gate: (
       <p>
         {designed
-          ? 'Not given: the cartridge L3, which the seating needs.'
-          : `No CIP drawing for ${name}: the preview needs the CIP cartridge and chamber values.`}
+          ? t('Not given: the cartridge L3, which the seating needs.')
+          : t(
+              'No CIP drawing for {name}: the preview needs the CIP cartridge and chamber values.',
+              {
+                name,
+              },
+            )}
       </p>
     ),
   }
@@ -1080,29 +1111,37 @@ function aside(slots: Slots, node: ReactNode, target: HTMLElement | null | undef
 }
 
 /** The capacity record's description: its water, and its case maker when it has one. */
-function capacityText(c: Capacity, names: Model['names']) {
-  const maker = c.caseManufacturer
-    ? `, ${refName(names, c.caseManufacturer) || c.caseManufacturer}`
-    : ''
-  return `${c.id}: ${plainNumber(c.waterCapacity.value)} g water${maker}`
+function capacityText(c: Capacity, names: Model['names'], t: T) {
+  const values = { id: c.id, grams: c.waterCapacity.value }
+  return c.caseManufacturer
+    ? t('{id}: {grams} g water, {maker}', {
+        ...values,
+        maker: refName(names, c.caseManufacturer) || c.caseManufacturer,
+      })
+    : t('{id}: {grams} g water', values)
 }
 
 function BarrelField({ m }: { m: Model }) {
+  const { t } = useTranslation()
   const { system, barrel, barrelTyped } = m
   const barrelDefault = m.p.barrelDefault
   return (
     <NumberField
       spec={{
         key: 'barrel',
-        label: 'Barrel length',
-        help: 'From the breech face.',
+        label: msg('Barrel length'),
+        help: msg('From the breech face.'),
         quantity: 'barrelLength',
         min: 0,
       }}
       system={system}
       value={barrel}
       muted={!barrelTyped && barrel.si !== undefined}
-      mark={!barrelTyped && barrelDefault ? `Default: ${barrelDefault.source}.` : undefined}
+      mark={
+        !barrelTyped && barrelDefault
+          ? t('Default: {source}.', { source: barrelDefault.source })
+          : undefined
+      }
       onChange={(v) => {
         m.setBarrel(v)
         m.setBarrelTyped(true)
@@ -1114,28 +1153,29 @@ function BarrelField({ m }: { m: Model }) {
 }
 
 function BulletPicker({ m }: { m: Model }) {
+  const { t } = useTranslation()
   const { design, designs, names } = m
   return (
     <>
       <RecordSearch<BulletSummary>
         kind="bullets"
-        label="Search bullets by manufacturer or name"
+        label={t('Search bullets by manufacturer or name')}
         describe={(b) => productLabel(b, names)}
         onSelect={(b) => {
           m.setDesign(undefined)
           m.setBulletId(b.id)
         }}
-        noneText="No bullet found"
-        unreachableText={notReached}
+        noneText={t('No bullet found')}
+        unreachableText={t(notReached)}
       />
       <NativeSelect
-        label="Or a bullet design"
-        description="From your bullet designs in this browser."
+        label={t('Or a bullet design')}
+        description={t('From your bullet designs in this browser.')}
         value={design?.id ?? ''}
         onFocus={m.readDesigns}
         onChange={(e) => m.setDesign(designs.find((d) => d.id === e.currentTarget.value))}
         data={[
-          { value: '', label: designs.length ? 'None' : 'None in this browser' },
+          { value: '', label: designs.length ? t('None') : t('None in this browser') },
           ...designs.map((d) => ({ value: d.id, label: d.name })),
         ]}
       />
@@ -1145,20 +1185,23 @@ function BulletPicker({ m }: { m: Model }) {
 
 /** What the bullet choice stands at: loading, failed, the record or design in use, and why it does not seat. */
 function BulletStatus({ m }: { m: Model }) {
+  const { t } = useTranslation()
   const { design, record, bulletRecord, shaped, refused, names } = m
   return (
     <>
       {!design && record.status === 'loading' && <Loading what="the bullet record" inline />}
-      {!design && record.status === 'error' && <p>{notReached}</p>}
+      {!design && record.status === 'error' && <p>{t(notReached)}</p>}
       {design && (
-        <p className="record">Bullet: {design.name} (user design, not a catalogue record)</p>
+        <p className="record">
+          {t('Bullet: {name} (user design, not a catalogue record)', { name: design.name })}
+        </p>
       )}
       {design && !shaped && (
-        <p>This bullet design has no length or does not draw: the preview needs both.</p>
+        <p>{t('This bullet design has no length or does not draw: the preview needs both.')}</p>
       )}
       {bulletRecord && (
         <p className="record">
-          Bullet: {productLabel(bulletRecord, names)} ({bulletRecord.id}
+          {t('Bullet: {label}', { label: productLabel(bulletRecord, names) })} ({bulletRecord.id}
           {bulletRecord.provenance.sources[0] && (
             <>
               , <SourceTitles sources={bulletRecord.provenance.sources.slice(0, 1)} />
@@ -1167,29 +1210,38 @@ function BulletStatus({ m }: { m: Model }) {
           )
         </p>
       )}
-      {bulletRecord && !shaped && <p>This bullet record has no length: the preview needs it.</p>}
-      {refused && <p>The bullet outline is not drawn: {refused}</p>}
+      {bulletRecord && !shaped && (
+        <p>{t('This bullet record has no length: the preview needs it.')}</p>
+      )}
+      {refused && (
+        <p>
+          {t('The bullet outline is not drawn: {reason}', {
+            reason: translateMessage(refused, t),
+          })}
+        </p>
+      )}
     </>
   )
 }
 
 /** The case products of the cartridge: choosing one makes its stated capacity the default. */
 function CaseChoice({ m }: { m: Model }) {
+  const { t } = useTranslation()
   const { caseList, names } = m
   const items = caseList.status === 'ok' ? caseList.value.items : []
   const own = m.p.ownCases ?? []
   const ownId = m.p.ownCaseId
   if (items.length === 0 && own.length === 0 && !ownId) return null
   const ownItems = [
-    ...own.map((c) => ({ value: `user:${c.id}`, label: ownCaseText(c) })),
+    ...own.map((c) => ({ value: `user:${c.id}`, label: ownCaseText(c, t) })),
     // a load names a group this browser does not have
     ...(ownId && !own.some((c) => c.id === ownId)
-      ? [{ value: `user:${ownId}`, label: 'A case group not in this browser' }]
+      ? [{ value: `user:${ownId}`, label: t('A case group not in this browser') }]
       : []),
   ]
   return (
     <NativeSelect
-      label="Case record"
+      label={t('Case record')}
       value={ownId ? `user:${ownId}` : (m.chosenCase?.id ?? '')}
       onChange={(e) => {
         const v = e.currentTarget.value
@@ -1197,13 +1249,13 @@ function CaseChoice({ m }: { m: Model }) {
         else m.setCaseId(v || undefined)
       }}
       data={[
-        { value: '', label: 'None' },
-        ...(ownItems.length > 0 ? [{ group: 'Your cases', items: ownItems }] : []),
+        { value: '', label: t('None') },
+        ...(ownItems.length > 0 ? [{ group: t('Your cases'), items: ownItems }] : []),
         ...(items.length > 0
           ? [
               {
-                group: 'Products',
-                items: items.map((c) => ({ value: c.id, label: caseText(c, names) })),
+                group: t('Products'),
+                items: items.map((c) => ({ value: c.id, label: caseText(c, names, t) })),
               },
             ]
           : []),
@@ -1213,50 +1265,62 @@ function CaseChoice({ m }: { m: Model }) {
 }
 
 /** A group of the user's cases: its name and its measured water, which the workbench takes as measured. */
-const ownCaseText = (c: OwnCase) =>
-  c.grams === undefined ? c.name : `${c.name}: ${c.grams} g water, measured`
+const ownCaseText = (c: OwnCase, t: T) =>
+  c.grams === undefined
+    ? c.name
+    : t('{name}: {grams} g water, measured', { name: c.name, grams: c.grams })
 
 /** The case record's description: its product, and its stated water when it has one. */
-function caseText(c: CaseSummary, names: Model['names']) {
-  const water = c.waterCapacity === undefined ? '' : `: ${c.waterCapacity} g water`
-  return `${productLabel({ name: c.name, manufacturer: c.manufacturer }, names)}${water}`
+function caseText(c: CaseSummary, names: Model['names'], t: T) {
+  const product = productLabel({ name: c.name, manufacturer: c.manufacturer }, names)
+  return c.waterCapacity === undefined
+    ? product
+    : t('{product}: {grams} g water', { product, grams: c.waterCapacity })
 }
 
 function CapacityChoice({ m }: { m: Model }) {
+  const { t } = useTranslation()
   const { capacities, capacity, names, designed, name } = m
   if (capacities.length > 0)
     return (
       <NativeSelect
-        label="Case capacity record"
+        label={t('Case capacity record')}
         // with a case record's stated capacity in use, no capacity record is the choice
         value={capacity?.id ?? ''}
         onChange={(e) => m.setCapacityId(e.currentTarget.value || undefined)}
         data={[
           ...(m.chosenCase?.waterCapacity === undefined
             ? []
-            : [{ value: '', label: 'From the case record' }]),
-          ...capacities.map((c) => ({ value: c.id, label: capacityText(c, names) })),
+            : [{ value: '', label: t('From the case record') }]),
+          ...capacities.map((c) => ({ value: c.id, label: capacityText(c, names, t) })),
         ]}
       />
     )
   if (designed) return null
   return (
     <p>
-      No case capacity record for {name}: enter your measured case capacity for the volume behind
-      the bullet.
+      {t(
+        'No case capacity record for {name}: enter your measured case capacity for the volume behind the bullet.',
+        { name },
+      )}
     </p>
   )
 }
 
 function MeasuredCapacity({ m }: { m: Model }) {
+  const { t } = useTranslation()
   const { system, stock, chosenCase, names, designed, measuredWaterCapacity } = m
   return (
     <NumberField
       spec={{
         ...measuredWaterCapacitySpec,
         help: designed
-          ? 'Measured: water to the mouth of your fired cases. Empty: not given, and so is the volume behind the bullet.'
-          : "Measured: water to the mouth of your fired cases. Replaces the capacity or case record; empty: the record's value.",
+          ? msg(
+              'Measured: water to the mouth of your fired cases. Empty: not given, and so is the volume behind the bullet.',
+            )
+          : msg(
+              "Measured: water to the mouth of your fired cases. Replaces the capacity or case record; empty: the record's value.",
+            ),
       }}
       system={system}
       value={measuredWaterCapacity}
@@ -1269,11 +1333,13 @@ function MeasuredCapacity({ m }: { m: Model }) {
         stock && measuredWaterCapacity.si === undefined
           ? {
               kind: 'record',
-              text: `From ${
-                stock.record
-                  ? `the capacity record ${capacityText(stock.record, names)}`
-                  : `the case record ${chosenCase ? caseText(chosenCase, names) : ''}`
-              }. Type a measured capacity to replace it.`,
+              text: stock.record
+                ? t('From the capacity record {record}. Type a measured capacity to replace it.', {
+                    record: capacityText(stock.record, names, t),
+                  })
+                : t('From the case record {record}. Type a measured capacity to replace it.', {
+                    record: chosenCase ? caseText(chosenCase, names, t) : '',
+                  }),
             }
           : undefined
       }
@@ -1297,13 +1363,16 @@ function slidTo(
 }
 
 function SeatSlider({ m, range }: { m: Model; range: readonly [number, number] }) {
+  const { t } = useTranslation()
   const { id, mode, pos, length, system } = m
   const step = system.length.step
   const toShown = (x: number) => length.fromSi(toSi('length', x + m.ladderShift))
   const release = () => m.setSliding(false)
   return (
     <div className="field seating-slider">
-      <label htmlFor={`${id}-slider`}>Slide to change {seatingLengthName[mode]}</label>
+      <label htmlFor={`${id}-slider`}>
+        {t('Slide to change {name}', { name: seatingLengthName[mode] })}
+      </label>
       <input
         id={`${id}-slider`}
         type="range"
@@ -1332,11 +1401,12 @@ function SeatSlider({ m, range }: { m: Model; range: readonly [number, number] }
 
 /** The seating by COAL or CBTO: the mode, its field and the slider. */
 function SeatFields({ m, range }: { m: Model; range: readonly [number, number] }) {
+  const { t } = useTranslation()
   const { id, mode, pos, system, canCbto, card, warnings } = m
   return (
     <>
       <SegmentedRow
-        legend="Seat the bullet by"
+        legend={t('Seat the bullet by')}
         name={`${id}-mode`}
         value={mode}
         segments={(['overallLength', 'baseToOgive'] as const).map((s) => ({
@@ -1344,7 +1414,7 @@ function SeatFields({ m, range }: { m: Model; range: readonly [number, number] }
           label: seatingLengthName[s],
           reason:
             s === 'baseToOgive' && !canCbto
-              ? "CBTO needs the bullet's base-to-ogive length. This bullet record has none."
+              ? t("CBTO needs the bullet's base-to-ogive length. This bullet record has none.")
               : undefined,
         }))}
         onChange={m.changeMode}
@@ -1392,24 +1462,61 @@ function SeatingControls({ m }: { m: Model }) {
 }
 
 /** The figure's description: the half section and the bullet seated in it, if any. */
-function figureDesc(m: Model, spec: Spec, drawnSeating: Seating | undefined) {
+function figureDesc(m: Model, spec: Spec, drawnSeating: Seating | undefined, t: T) {
   const { view, designed, name, mm } = m
-  if (!drawnSeating) {
-    const what = view === 'combined' ? 'case in its chamber' : view
-    return `Half section of the ${designed ? what : `${spec.name} ${what}`}; no bullet ${view === 'chamber' ? 'or case drawn' : 'seated'}.`
+  if (!drawnSeating) return undrawnDesc(view, designed ? undefined : spec.name, t)
+  const values = {
+    coal: mm(drawnSeating.coal.value),
+    depth: mm(drawnSeating.depth.value),
+    jump: jumpText(drawnSeating, mm, t),
   }
-  const [maximum, minimum] = designed ? ['maximum', 'minimum'] : ['CIP maximum', 'CIP minimum']
-  const the = designed ? `case of the ${name}` : `${spec.name} case`
-  return `Half section of the ${the} (${maximum} outline, interior not shown) in its chamber (${minimum} outline) with the bullet seated at COAL ${mm(drawnSeating.coal.value)}: seating depth ${mm(drawnSeating.depth.value)}, jump ${jumpText(drawnSeating, mm)}. Dashed lines are approximate geometry.`
+  return designed
+    ? t(
+        'Half section of the case of the {name} (maximum outline, interior not shown) in its chamber (minimum outline) with the bullet seated at COAL {coal}: seating depth {depth}, jump {jump}. Dashed lines are approximate geometry.',
+        { ...values, name },
+      )
+    : t(
+        'Half section of the {name} case (CIP maximum outline, interior not shown) in its chamber (CIP minimum outline) with the bullet seated at COAL {coal}: seating depth {depth}, jump {jump}. Dashed lines are approximate geometry.',
+        { ...values, name: spec.name },
+      )
+}
+
+/** The description of a half section with no bullet seated; `record` names the cartridge record, none for a design. */
+function undrawnDesc(view: Model['view'], record: string | undefined, t: T) {
+  if (record === undefined)
+    return view === 'combined'
+      ? t('Half section of the case in its chamber; no bullet seated.')
+      : view === 'cartridge'
+        ? t('Half section of the cartridge; no bullet seated.')
+        : t('Half section of the chamber; no bullet or case drawn.')
+  const name = record
+  return view === 'combined'
+    ? t('Half section of the {name} case in its chamber; no bullet seated.', { name })
+    : view === 'cartridge'
+      ? t('Half section of the {name} cartridge; no bullet seated.', { name })
+      : t('Half section of the {name} chamber; no bullet or case drawn.', { name })
 }
 
 /** The figure's title and description for the view and the seating drawn. */
-function figureText(m: Model, spec: Spec, drawnSeating: Seating | undefined) {
+function figureText(m: Model, spec: Spec, drawnSeating: Seating | undefined, t: T) {
   const { view, designed, name, design } = m
   const where = designed ? name : `${spec.standard} ${spec.name}`
-  const seated = `${view === 'combined' ? 'Seated' : 'Cartridge with the seated'} ${design ? `user design ${design.name}` : 'bullet'}`
-  const caption = view === 'chamber' ? `Chamber, ${where}` : `${seated}, ${where}`
-  return { caption, desc: figureDesc(m, spec, drawnSeating) }
+  return {
+    caption: captionOf(view, design?.name, where, t),
+    desc: figureDesc(m, spec, drawnSeating, t),
+  }
+}
+
+/** The figure's title: `design` is the name of the user design seated, none for a record's bullet. */
+function captionOf(view: Model['view'], design: string | undefined, where: string, t: T) {
+  if (view === 'chamber') return t('Chamber, {where}', { where })
+  if (view === 'combined')
+    return design === undefined
+      ? t('Seated bullet, {where}', { where })
+      : t('Seated user design {design}, {where}', { design, where })
+  return design === undefined
+    ? t('Cartridge with the seated bullet, {where}', { where })
+    : t('Cartridge with the seated user design {design}, {where}', { design, where })
 }
 
 type FigureModel = NonNullable<Model['model']>
@@ -1452,11 +1559,12 @@ function DrawnFigure({
 }
 
 function SeatingFigure({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Chamber }) {
+  const { t } = useTranslation()
   const { view, fixed, model, levelModel, designer, shape, p } = m
   const fullView = p.fullView
   // a chamber without a cartridge holds no bullet: the Chamber view draws the chamber alone
   const drawnSeating = view === 'chamber' ? undefined : m.figureSeating
-  const text = figureText(m, spec, drawnSeating)
+  const text = figureText(m, spec, drawnSeating, t)
   const draw = (name: string, shown: FigureModel) => (
     <DrawnFigure
       m={m}
@@ -1470,9 +1578,19 @@ function SeatingFigure({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Ch
   return (
     <div className="seating-figure">
       {view === 'combined' && fixed?.missing && (
-        <p>The outline needs {fixed.missing.join(', ')}.</p>
+        <p>
+          {t('The outline needs {missing}.', {
+            missing: fixed.missing.map((x) => translateMessage(x, t)).join(', '),
+          })}
+        </p>
       )}
-      {view !== 'combined' && !model && <p>No {view} drawing for this record.</p>}
+      {view !== 'combined' && !model && (
+        <p>
+          {view === 'cartridge'
+            ? t('No cartridge drawing for this record.')
+            : t('No chamber drawing for this record.')}
+        </p>
+      )}
       {model && draw('drawing', model)}
       {/* a design's own drawing is above: this one shows once a bullet is seated in it */}
       {levelModel && (!designer || drawnSeating) && draw('level', levelModel)}
@@ -1489,12 +1607,13 @@ function SeatingFigure({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Ch
       )}
       {drawnSeating && (
         <p className="seating-legend">
-          Dashed in the flag colour: approximate geometry (see the notes). Faint: the bullet inside
-          the case. Dashed ticks: leade contact, approximate.
+          {t(
+            'Dashed in the flag colour: approximate geometry (see the notes). Faint: the bullet inside the case. Dashed ticks: leade contact, approximate.',
+          )}
         </p>
       )}
       {!shape && view === 'combined' && !designer && (
-        <p>Choose a bullet with a length to seat it.</p>
+        <p>{t('Choose a bullet with a length to seat it.')}</p>
       )}
     </div>
   )
@@ -1507,25 +1626,30 @@ function SeatingNotes({
   seating: Seating
   landsOther?: boolean | undefined
 }) {
+  const { t } = useTranslation()
   return (
     <>
       <p className="note">
         {seating.jump.source === 'lands'
-          ? 'The jump is your measured lands contact less the seated length, not a seating recommendation.'
-          : 'The jump is not a measured jump and not a seating recommendation.'}{' '}
-        Staying at or below L6 says nothing about pressure, magazine fit or safety; seating depth
-        changes pressure.
+          ? t(
+              'The jump is your measured lands contact less the seated length, not a seating recommendation.',
+            )
+          : t('The jump is not a measured jump and not a seating recommendation.')}{' '}
+        {t(
+          'Staying at or below L6 says nothing about pressure, magazine fit or safety; seating depth changes pressure.',
+        )}
       </p>
       {landsOther && (
         <p className="note">
-          The firearm's lands contact was measured with another bullet and is not used for this
-          jump.
+          {t(
+            "The firearm's lands contact was measured with another bullet and is not used for this jump.",
+          )}
         </p>
       )}
       {seating.notes.length > 0 && (
         <ul className="seating-notes">
           {seating.notes.map((n) => (
-            <li key={n}>{n}</li>
+            <li key={n}>{translateMessage(n, t)}</li>
           ))}
         </ul>
       )}
@@ -1536,12 +1660,15 @@ function SeatingNotes({
 type RowsProps = { m: Model; seating: Seating; chamber: Chamber }
 
 function CoalRow({ m, seating, chamber }: RowsProps) {
+  const { t } = useTranslation()
   const { card, designed, len, mm, length } = m
   // in the workbench card the CBTO field's flag says it: no line of its own
   const above =
     !card && seating.aboveL6 && chamber.cartridgeL6 !== undefined ? (
       <strong className="exceeded">
-        above {designed ? 'cartridge' : 'CIP maximum'} L6 ({mm(chamber.cartridgeL6)})
+        {designed
+          ? t('above cartridge L6 ({length})', { length: mm(chamber.cartridgeL6) })
+          : t('above CIP maximum L6 ({length})', { length: mm(chamber.cartridgeL6) })}
       </strong>
     ) : undefined
   return (
@@ -1565,83 +1692,102 @@ function CbtoRow({ m, seating }: RowsProps) {
         tag={seating.cbto.tag}
       />
     )
-  return m.designed ? <NotGiven term="CBTO" why="the bullet base-to-ogive" /> : null
+  return m.designed ? <NotGiven term="CBTO" why={msg('the bullet base-to-ogive')} /> : null
 }
 
 function CaseVolumeRow({ m, seating }: RowsProps) {
+  const { t } = useTranslation()
   const { stock, chosenCase, measuredWaterCapacity, vol } = m
   if (!seating.caseVolume)
     return m.designed ? (
-      <NotGiven term="Case volume to the mouth" why="a measured case capacity" />
+      <NotGiven term={t('Case volume to the mouth')} why={msg('a measured case capacity')} />
     ) : null
   return (
     <Row
-      term="Case volume to the mouth"
+      term={t('Case volume to the mouth')}
       value={vol(seating.caseVolume.value)}
       tag={seating.caseVolume.tag}
       note={
         measuredWaterCapacity.si !== undefined || !stock
-          ? 'your measured case capacity'
-          : `${stock.grams} g water (${stock.record?.id ?? chosenCase?.id}) at ${waterDensityGramsPerCm3} g/cm³`
+          ? t('your measured case capacity')
+          : t('{grams} g water ({id}) at {density} g/cm³', {
+              grams: stock.grams,
+              id: stock.record?.id ?? chosenCase?.id ?? '',
+              density: waterDensityGramsPerCm3,
+            })
       }
     />
   )
 }
 
 function VolumeRow({ m, seating }: RowsProps) {
+  const { t } = useTranslation()
   if (seating.volumeBehindBullet)
     return (
       <Row
-        term="Volume behind the bullet"
+        term={t('Volume behind the bullet')}
         value={m.vol(seating.volumeBehindBullet.value)}
         tag={seating.volumeBehindBullet.tag}
       />
     )
   return m.designed ? (
-    <NotGiven term="Volume behind the bullet" why="a measured case capacity" />
+    <NotGiven term={t('Volume behind the bullet')} why={msg('a measured case capacity')} />
   ) : null
 }
 
 function TravelRow({ m, seating }: RowsProps) {
+  const { t } = useTranslation()
   if (seating.travel)
     return (
       <Row
-        term="Travel to the muzzle"
+        term={t('Travel to the muzzle')}
         value={m.mm(seating.travel.value)}
         tag={seating.travel.tag}
       />
     )
-  return m.designed ? <NotGiven term="Travel to the muzzle" why="the barrel length" /> : null
+  return m.designed ? (
+    <NotGiven term={t('Travel to the muzzle')} why={msg('the barrel length')} />
+  ) : null
 }
 
 function LeadeRow({ m, seating }: RowsProps) {
+  const { t } = useTranslation()
   if (seating.leade !== undefined)
     return (
       <Row
-        term="Leade contact from the head"
+        term={t('Leade contact from the head')}
         value={m.mm(seating.leade)}
         tag="approximate"
-        note={`own derivation from the ${m.designed ? 'chamber of the design' : 'CIP chamber'}, not a CIP value`}
+        note={
+          m.designed
+            ? t('own derivation from the chamber of the design, not a CIP value')
+            : t('own derivation from the CIP chamber, not a CIP value')
+        }
       />
     )
   return m.designed ? (
-    <NotGiven term="Leade contact from the head" why="the chamber L3, G1, F, i, and s or G" />
+    <NotGiven
+      term={t('Leade contact from the head')}
+      why={msg('the chamber L3, G1, F, i, and s or G')}
+    />
   ) : null
 }
 
 function JumpRow({ m, seating }: RowsProps) {
+  const { t } = useTranslation()
   const unknown = seating.jump.value === undefined
   return (
     <Row
-      term={seating.jump.source === 'lands' ? 'Jump to the lands' : 'Jump to the leade'}
-      value={seating.jump.value === undefined ? 'not given' : m.mm(seating.jump.value)}
+      term={seating.jump.source === 'lands' ? t('Jump to the lands') : t('Jump to the leade')}
+      value={seating.jump.value === undefined ? t('not given') : m.mm(seating.jump.value)}
       tag={unknown ? undefined : seating.jump.tag}
-      note={jumpNote(seating.jump)}
+      note={translateMessage(jumpNote(seating.jump), t)}
     />
   )
 }
 
 function SeatingValues({ m, seating, chamber }: RowsProps) {
+  const { t } = useTranslation()
   const { card, mode, slots, design, contact } = m
   const rows = { m, seating, chamber }
   const more = slots?.moreValues
@@ -1650,12 +1796,12 @@ function SeatingValues({ m, seating, chamber }: RowsProps) {
       {/* a linked figure sits on a page that states this in its own notice */}
       {!m.p.linked && (
         <p className="note screen-only">
-          Results from this software are simulations, not load data.
+          {t('Results from this software are simulations, not load data.')}
         </p>
       )}
       {design && (
         <p className="note user-design">
-          Seated from the user design {design.name}, not a catalogue record.
+          {t('Seated from the user design {name}, not a catalogue record.', { name: design.name })}
         </p>
       )}
       <dl>
@@ -1664,11 +1810,17 @@ function SeatingValues({ m, seating, chamber }: RowsProps) {
         {(!card || mode === 'baseToOgive') && <CoalRow {...rows} />}
         {(!card || mode !== 'baseToOgive') && <CbtoRow {...rows} />}
         <Row
-          term="Seating depth"
+          term={t('Seating depth')}
           value={m.len(seating.depth.value)}
           unit={m.length.symbol}
           tag={seating.depth.tag}
-          note={`case length: ${m.designed ? 'cartridge L3 of the design' : 'CIP L3 maximum'} ${m.mm(chamber.caseLength)}`}
+          note={
+            m.designed
+              ? t('case length: cartridge L3 of the design {length}', {
+                  length: m.mm(chamber.caseLength),
+                })
+              : t('case length: CIP L3 maximum {length}', { length: m.mm(chamber.caseLength) })
+          }
         />
         {aside(slots, <CaseVolumeRow {...rows} />, more)}
         {/* in the workbench the field "Usable case volume" shows it, flagged "from seating" */}
@@ -1716,7 +1868,8 @@ function PreviewBody({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Cham
  */
 export function SeatingPreview(props: PreviewProps) {
   const m = useSeatingModel(props)
-  const g = gateOf(m)
+  const { t } = useTranslation()
+  const g = gateOf(m, t)
   if ('gate' in g) return g.gate
   return <PreviewBody m={m} spec={g.spec} chamber={g.chamber} />
 }

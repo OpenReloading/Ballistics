@@ -1,5 +1,8 @@
+'use client'
+
 import { Badge } from '@mantine/core'
 import type { ReactNode } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 
 /** The standard as text in an outlined badge; the colour (`--standard-cip`) only repeats it. */
 export function StandardBadge({ label }: { label: string }) {
@@ -34,5 +37,6 @@ export function MutedBadge({
 
 /** The mark of a cartridge record without values (no dimensions, no pressures), as the record pages' badges. */
 export function GapBadge() {
-  return <MutedBadge className="gap-badge">Gap</MutedBadge>
+  const { t } = useTranslation()
+  return <MutedBadge className="gap-badge">{t('Gap')}</MutedBadge>
 }

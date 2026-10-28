@@ -1,5 +1,6 @@
 import type { TrajectoryPoint } from '@open-reloading/core'
 import { formatNumber, localizeNumber } from '../i18n/number.ts'
+import type { Translator } from '../i18n/translate.ts'
 import {
   formatQuantity,
   inchText,
@@ -9,9 +10,9 @@ import {
 } from './units.ts'
 
 /** A quantity as the fields show it, with its unit; 'not given' without a value. */
-function valueText(system: UnitSystem, q: Quantity, x: number | undefined) {
+function valueText(system: UnitSystem, q: Quantity, x: number | undefined, t: Translator['t']) {
   return x === undefined
-    ? 'not given'
+    ? t('not given')
     : `${inchText(localizeNumber(roundedFieldText(q, system, x)), system[q].symbol)} ${system[q].symbol}`
 }
 
@@ -30,18 +31,25 @@ export function zeroConditions(
     humidity?: number
   },
   system: UnitSystem,
-  dragSource?: string,
+  dragSource: string | undefined,
+  t: Translator['t'],
 ): { zeroAir?: string; dragFactor?: string } {
-  const v = (q: Quantity, x: number | undefined) => valueText(system, q, x)
+  const v = (q: Quantity, x: number | undefined) => valueText(system, q, x, t)
   const zeroSet = [si.zeroTemperature, si.zeroPressure, si.zeroHumidity].some(
     (x) => x !== undefined,
   )
   return {
     ...(zeroSet && {
-      zeroAir: `${v('temperature', si.zeroTemperature ?? si.temperature)}, station pressure ${v('airPressure', si.zeroPressure ?? si.pressure)}, humidity ${v('percent', si.zeroHumidity ?? si.humidity)}`,
+      zeroAir: t('{temperature}, station pressure {pressure}, humidity {humidity}', {
+        temperature: v('temperature', si.zeroTemperature ?? si.temperature),
+        pressure: v('airPressure', si.zeroPressure ?? si.pressure),
+        humidity: v('percent', si.zeroHumidity ?? si.humidity),
+      }),
     }),
     ...(si.dragFactor !== undefined && {
-      dragFactor: `${v('dragFactor', si.dragFactor)}${dragSource ? `, ${dragSource}` : ''}`,
+      dragFactor: dragSource
+        ? t('{value}, {source}', { value: v('dragFactor', si.dragFactor), source: dragSource })
+        : v('dragFactor', si.dragFactor),
     }),
   }
 }
@@ -56,32 +64,46 @@ export function rangeCardFacts(
   si: Record<string, number | undefined>,
   zero: number,
   system: UnitSystem,
-  manual = false,
-  dragSource?: string,
+  manual: boolean,
+  dragSource: string | undefined,
+  t: Translator['t'],
 ): [string, string][] {
-  const v = (q: Quantity, x: number | undefined) => valueText(system, q, x)
-  const { zeroAir, dragFactor } = zeroConditions(si, system, dragSource)
+  const v = (q: Quantity, x: number | undefined) => valueText(system, q, x, t)
+  const { zeroAir, dragFactor } = zeroConditions(si, system, dragSource, t)
   return [
     ...(manual
       ? [
           [
-            'Bullet',
-            `${v('mass', si.mass)}, BC ${v('ballisticCoefficient', si.ballisticCoefficient)}`,
+            t('Bullet'),
+            t('{mass}, BC {bc}', {
+              mass: v('mass', si.mass),
+              bc: v('ballisticCoefficient', si.ballisticCoefficient),
+            }),
           ] as [string, string],
         ]
       : []),
-    ['Muzzle velocity', v('velocity', si.muzzleVelocity)],
-    ['Zero', v('range', zero)],
-    ...(zeroAir ? [['Zero air', zeroAir] as [string, string]] : []),
-    ...(dragFactor ? [['Drag factor', dragFactor] as [string, string]] : []),
-    ['Sight height', v('length', si.sightHeight)],
+    [t('Muzzle velocity'), v('velocity', si.muzzleVelocity)],
+    [t('Zero'), v('range', zero)],
+    ...(zeroAir ? [[t('Zero air'), zeroAir] as [string, string]] : []),
+    ...(dragFactor ? [[t('Drag factor'), dragFactor] as [string, string]] : []),
+    [t('Sight height'), v('length', si.sightHeight)],
     [
-      'Conditions',
-      `${v('temperature', si.temperature)}, station pressure ${v('airPressure', si.pressure)}, altitude ${v('altitude', si.altitude)}, humidity ${v('percent', si.humidity)}`,
+      t('Conditions'),
+      t('{temperature}, station pressure {pressure}, altitude {altitude}, humidity {humidity}', {
+        temperature: v('temperature', si.temperature),
+        pressure: v('airPressure', si.pressure),
+        altitude: v('altitude', si.altitude),
+        humidity: v('percent', si.humidity),
+      }),
     ],
     [
-      'Wind',
-      si.windSpeed ? `${v('windSpeed', si.windSpeed)} from ${v('angle', si.windFrom)}` : 'none',
+      t('Wind'),
+      si.windSpeed
+        ? t('{speed} from {angle}', {
+            speed: v('windSpeed', si.windSpeed),
+            angle: v('angle', si.windFrom),
+          })
+        : t('none'),
     ],
   ]
 }
@@ -95,20 +117,26 @@ export interface RangeCardExtras {
 }
 
 /** Column headings of the card's table, units included; the last column stays blank for notes. */
-export function rangeCardColumns(system: UnitSystem, extras: RangeCardExtras = {}): string[] {
+export function rangeCardColumns(
+  system: UnitSystem,
+  extras: RangeCardExtras,
+  t: Translator['t'],
+): string[] {
   const u = (q: Quantity) => system[q].symbol
   const withClicks = (name: string) =>
-    extras.click ? `${name} (${u('correction')} / clicks)` : `${name} (${u('correction')})`
+    extras.click
+      ? t('{name} ({unit} / clicks)', { name, unit: u('correction') })
+      : t('{name} ({unit})', { name, unit: u('correction') })
   return [
-    `Range (${u('range')})`,
-    `Height (${u('lineOfSightOffset')})`,
-    withClicks('Elevation'),
-    `Windage (${u('correction')})`,
-    `Velocity (${u('velocity')})`,
-    `Energy (${u('energy')})`,
-    'Time (s)',
-    ...(extras.wind ? [withClicks('Wind per 1 m/s'), withClicks('Wind per 1 mph')] : []),
-    'Notes',
+    t('Range ({unit})', { unit: u('range') }),
+    t('Height ({unit})', { unit: u('lineOfSightOffset') }),
+    withClicks(t('Elevation')),
+    t('Windage ({unit})', { unit: u('correction') }),
+    t('Velocity ({unit})', { unit: u('velocity') }),
+    t('Energy ({unit})', { unit: u('energy') }),
+    t('Time (s)'),
+    ...(extras.wind ? [withClicks(t('Wind per 1 m/s')), withClicks(t('Wind per 1 mph'))] : []),
+    t('Notes'),
   ]
 }
 

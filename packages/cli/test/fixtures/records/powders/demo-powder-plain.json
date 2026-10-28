@@ -1,0 +1,17 @@
+{
+  "id": "demo-powder-plain",
+  "manufacturer": "demo-powder",
+  "name": "PL10",
+  "grainForm": "flake",
+  "provenance": {
+    "kind": "computed",
+    "sources": [
+      {
+        "source": "synthetic-test-data",
+        "kind": "computed",
+        "fields": ["name", "grainForm"],
+        "note": "Invented record without a model, for tests."
+      }
+    ]
+  }
+}

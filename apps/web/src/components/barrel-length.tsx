@@ -3,7 +3,10 @@
 import { Button, SegmentedControl } from '@mantine/core'
 import dynamic from 'next/dynamic'
 import { useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
+import { msg, type Translator } from '../i18n/translate.ts'
+import { translateMessage } from '../lib/core-messages.ts'
 import type { FieldSpec } from '../lib/field-spec.ts'
 import { controlSize } from '../lib/theme.ts'
 import { formatQuantity, msText, type UnitSystem } from '../lib/units.ts'
@@ -17,70 +20,88 @@ const BarrelChart = dynamic(() => import('./barrel-chart.tsx').then((m) => m.Bar
 })
 
 const rangeSpecs: readonly (FieldSpec & { key: RangeKey })[] = [
-  { key: 'from', label: 'From', quantity: 'barrelLength', min: 0 },
-  { key: 'to', label: 'To', quantity: 'barrelLength', min: 0 },
-  { key: 'step', label: 'Step', quantity: 'barrelLength', min: 0 },
+  { key: 'from', label: msg('From'), quantity: 'barrelLength', min: 0 },
+  { key: 'to', label: msg('To'), quantity: 'barrelLength', min: 0 },
+  { key: 'step', label: msg('Step'), quantity: 'barrelLength', min: 0 },
 ]
 
 const columns = [
-  'Barrel length',
-  'Muzzle velocity',
-  'Muzzle energy',
-  'Muzzle pressure',
-  'Burnt at muzzle',
-  'Barrel time',
-  'Values from',
+  msg('Barrel length'),
+  msg('Muzzle velocity'),
+  msg('Muzzle energy'),
+  msg('Muzzle pressure'),
+  msg('Burnt at muzzle'),
+  msg('Barrel time'),
+  msg('Values from'),
 ]
+
+/** Why a row has no values: the model's reason, or one of the study's own. */
+function reasonText(reason: string, t: Translator['t']) {
+  if (reason === 'the longer run ends before this length')
+    return t('the longer run ends before this length')
+  if (reason === 'invalid') return t('invalid')
+  return translateMessage(reason, t)
+}
 
 /**
  * The rows of the shown step, one per barrel length, the workbench barrel marked. Values up to the
  * barrel are read from the run, longer ones from the longer run.
  */
 export function BarrelTable({ study, system }: { study: BarrelStudy; system: UnitSystem }) {
+  const { t } = useTranslation()
   const step = study.steps[study.selected]
   const ladder = study.steps.length > 1
   return (
     <PanelTable
-      label="Barrel length"
+      label={t('Barrel length')}
       className="limits ladder-table barrel-table"
-      caption={`Barrel length study${ladder ? `, step ${step?.label}` : ''} (simulation)`}
-      columns={columns}
+      caption={
+        ladder
+          ? t('Barrel length study, step {step} (simulation)', { step: step?.label ?? '' })
+          : t('Barrel length study (simulation)')
+      }
+      columns={columns.map((c) => t(c))}
     >
       {(step?.rows ?? []).map((r) => (
         <tr key={r.length} aria-current={r.current ? 'true' : undefined}>
-          <td data-label="Barrel length" className="num">
+          <td data-label={t('Barrel length')} className="num">
             {formatQuantity('barrelLength', system, r.length)} {system.barrelLength.symbol}
             {r.current && (
-              <span className="barrel-current"> {study.atSeating ? 'current' : 'run travel'}</span>
+              <span className="barrel-current">
+                {' '}
+                {study.atSeating ? t('current') : t('run travel')}
+              </span>
             )}
           </td>
           {r.values ? (
             <>
-              <td data-label="Muzzle velocity" className="num">
+              <td data-label={t('Muzzle velocity')} className="num">
                 {formatQuantity('velocity', system, r.values.velocity)} {system.velocity.symbol}
               </td>
-              <td data-label="Muzzle energy" className="num">
+              <td data-label={t('Muzzle energy')} className="num">
                 {formatQuantity('energy', system, r.values.energy)} {system.energy.symbol}
               </td>
-              <td data-label="Muzzle pressure" className="num">
+              <td data-label={t('Muzzle pressure')} className="num">
                 {formatQuantity('pressure', system, r.values.breechPressure)}{' '}
                 {system.pressure.symbol}
               </td>
-              <td data-label="Burnt at muzzle" className="num">
+              <td data-label={t('Burnt at muzzle')} className="num">
                 {formatNumber(r.values.burntFraction * 100, 0)} %
               </td>
-              <td data-label="Barrel time" className="num">
+              <td data-label={t('Barrel time')} className="num">
                 {msText(r.values.barrelTime)}
               </td>
             </>
           ) : (
-            <td data-label="Result" colSpan={5}>
+            <td data-label={t('Result')} colSpan={5}>
               {study.pending
-                ? 'Longer run pending'
-                : `Not computed: ${r.reason ?? study.message ?? 'longer run not requested'}`}
+                ? t('Longer run pending')
+                : t('Not computed: {reason}', {
+                    reason: reasonText(r.reason ?? study.message ?? 'longer run not requested', t),
+                  })}
             </td>
           )}
-          <td data-label="Values from">{r.source}</td>
+          <td data-label={t('Values from')}>{r.source === 'run' ? t('run') : t('longer run')}</td>
         </tr>
       ))}
     </PanelTable>
@@ -89,16 +110,21 @@ export function BarrelTable({ study, system }: { study: BarrelStudy; system: Uni
 
 /** The Barrel length tab: the range, and the table or the chart. */
 export function BarrelLength({ study, system }: { study: BarrelStudy; system: UnitSystem }) {
+  const { t } = useTranslation()
   const [pane, setPane] = useState('Table')
   // every invalid field gives its reason: the field holds its own, spoken as its description
   const reasons = rangeSpecs.flatMap((s) => study.errors?.[s.key] ?? [])
   const first = reasons.length > 0 ? reasons.join(' ') : undefined
-  const failed = study.message && `Longer run failed: ${study.message}`
-  const text = first ?? (study.pending ? 'Longer run pending' : failed)
+  const failed =
+    study.message &&
+    t('Longer run failed: {message}', { message: translateMessage(study.message, t) })
+  const text = first ?? (study.pending ? t('Longer run pending') : failed)
   if (study.base === undefined)
     return (
       <p className="prompt empty-state">
-        Seat a bullet in the cartridge figure: the barrel length is the seated base plus the travel.
+        {t(
+          'Seat a bullet in the cartridge figure: the barrel length is the seated base plus the travel.',
+        )}
       </p>
     )
   return (
@@ -117,8 +143,11 @@ export function BarrelLength({ study, system }: { study: BarrelStudy; system: Un
         ))}
         <SegmentedControl
           size={controlSize.row.toggle}
-          aria-label="Barrel length view"
-          data={['Table', 'Chart']}
+          aria-label={t('Barrel length view')}
+          data={[
+            { value: 'Table', label: t('Table') },
+            { value: 'Chart', label: t('Chart') },
+          ]}
           value={pane}
           onChange={setPane}
         />
@@ -129,7 +158,7 @@ export function BarrelLength({ study, system }: { study: BarrelStudy; system: Un
         </span>
         {!first && !study.pending && study.message && (
           <Button size={controlSize.row.button} variant="default" ml="xs" onClick={study.retry}>
-            Retry
+            {t('Retry')}
           </Button>
         )}
       </p>

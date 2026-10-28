@@ -6,6 +6,7 @@ import { fromSi } from '@open-reloading/schema'
 import { memo, useEffect, useRef } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber, plainNumber } from '../i18n/number.ts'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import type { ErrorBody, InteriorResponse } from '../lib/api-types.ts'
 import {
   describeCurve,
@@ -13,9 +14,10 @@ import {
   isFitted,
   type UnfittedPowder,
 } from '../lib/burn-rate.ts'
-import { burnRateLabel, type Lot } from '../lib/lot-rows.ts'
+import { translateMessage } from '../lib/core-messages.ts'
+import { type Lot, lotLabel } from '../lib/lot-rows.ts'
 import { ipscPowerFactor, powerFactor } from '../lib/power-factor.ts'
-import { ladderTitle, seatingLengthName } from '../lib/seating-ladder.ts'
+import { type RunnableLadderKind, seatingLengthName } from '../lib/seating-ladder.ts'
 import { controlSize } from '../lib/theme.ts'
 import { niceTicks } from '../lib/ticks.ts'
 import {
@@ -52,21 +54,26 @@ import {
   type ShownStep,
 } from './workbench-outcome.ts'
 
-const reasonText: Record<string, string> = { noValue: 'no value' }
+const reasonText: Record<string, Message> = { noValue: msg('no value') }
 
 /** What an invalid run (the reasons of `InteriorReason` in core) means and what to change. */
-const invalidRunText: Record<string, string> = {
-  input: 'A value is outside what the model accepts. Check the field named below.',
-  chamberVolume:
+const invalidRunText: Record<string, Message> = {
+  input: msg('A value is outside what the model accepts. Check the field named below.'),
+  chamberVolume: msg(
     'The charge does not fit the chamber: the solid powder and its covolume fill the usable case volume. Lower the charge or enter a larger usable case volume.',
-  noShotStart:
+  ),
+  noShotStart: msg(
     'The powder burned out before the bullet started to move. Raise the charge or lower the start pressure.',
-  stuck:
+  ),
+  stuck: msg(
     'The bullet stopped in the bore before the muzzle. Raise the charge or lower the bore resistance.',
-  integration:
+  ),
+  integration: msg(
     'The calculation did not converge. Check that the values are plausible, in particular the charge and the usable case volume.',
-  maxTime:
+  ),
+  maxTime: msg(
     'The bullet did not reach the muzzle within the run time. Raise the charge or check the bullet travel and the barrel length.',
+  ),
 }
 
 /** A limit as stored: bar with the record's decimals, and psi. */
@@ -75,46 +82,57 @@ function limitValue(l: NonNullable<InteriorResponse['limits']>[number]) {
   return `${plainNumber(+fromSi('pressure', l.pressure).toPrecision(12))} bar (${formatNumber(l.pressure / psi, 0)} psi)`
 }
 
-function yesNo(value: boolean | undefined) {
+function yesNo(value: boolean | undefined, t: Translator['t']) {
   if (value === undefined) return ''
-  return value ? <strong className="exceeded">yes</strong> : 'no'
+  return value ? <strong className="exceeded">{t('yes')}</strong> : t('no')
 }
 
 /** The sentence for an error answer: for a refused run what is wrong and what to change. */
-function errorHeadline(status: number, b: Pick<ErrorBody, 'reason' | 'message'>) {
+function errorHeadline(
+  status: number,
+  b: Pick<ErrorBody, 'reason' | 'message'>,
+  t: Translator['t'],
+) {
   const sentence = status === 422 && b.reason ? invalidRunText[b.reason] : undefined
-  return sentence ?? b.message ?? `HTTP ${status}`
+  if (sentence) return t(sentence)
+  return b.message ? translateMessage(b.message, t) : t('HTTP {status}', { status })
 }
 
 export function ErrorView({ outcome }: { outcome: Extract<Outcome, { kind: 'error' }> }) {
+  const { t } = useTranslation()
   const b = outcome.body
-  if (outcome.status === 502 || !b) return <p>{outcome.offline ? needsNetwork : notReached}</p>
+  if (outcome.status === 502 || !b) return <p>{t(outcome.offline ? needsNetwork : notReached)}</p>
   return (
     <>
-      {b.notice && <p>Notice: {b.notice}</p>}
+      {b.notice && <p>{t('Notice: {notice}', { notice: translateMessage(b.notice, t) })}</p>}
       {outcome.status === 400 && b.issues ? (
         <>
-          <p>The request does not match the schema:</p>
+          <p>{t('The request does not match the schema:')}</p>
           <ul>
             {b.issues.map((i) => (
               <li key={`${i.path.join('.')} ${i.message}`}>
-                {i.path.join('.')}: {i.message}
+                {i.path.join('.')}: {translateMessage(i.message, t)}
               </li>
             ))}
           </ul>
         </>
       ) : (
-        <p>{errorHeadline(outcome.status, b)}</p>
+        <p>{errorHeadline(outcome.status, b, t)}</p>
       )}
       {outcome.status === 422 && (b.reason || b.field) && (
         <p>
-          {b.reason && `Reason: ${b.reason}`}
-          {b.reason && b.field && '; '}
-          {b.field && `field: ${b.field}`}
+          {b.reason && b.field
+            ? t('Reason: {reason}; field: {field}', {
+                reason: translateMessage(b.reason, t),
+                field: b.field,
+              })
+            : b.reason
+              ? t('Reason: {reason}', { reason: translateMessage(b.reason, t) })
+              : t('field: {field}', { field: b.field ?? '' })}
         </p>
       )}
       {outcome.status === 503 && b.reason === 'busy' && outcome.retryAfter && (
-        <p>Retry after {outcome.retryAfter} s</p>
+        <p>{t('Retry after {seconds} s', { seconds: outcome.retryAfter })}</p>
       )}
     </>
   )
@@ -135,6 +153,7 @@ export function WarningsBlock({
   summary: string
   announce: boolean
 }) {
+  const { t, tn } = useTranslation()
   const { ref: list, scrolls } = useScrolls()
   if (warnings.length === 0) return null
   return (
@@ -161,13 +180,13 @@ export function WarningsBlock({
             </span>
             {/* the count in view; the whole summary is the button's name and title */}
             <span className="warnings-text" aria-hidden="true">
-              {warnings.length} warning{warnings.length === 1 ? '' : 's'}
+              {tn(warnings.length, '{count} warning', '{count} warnings')}
             </span>
             <span className="visually-hidden">{summary}</span>
           </Button>
         </Popover.Target>
         <Popover.Dropdown id="warnings-list" className="warnings-list">
-          <h3 id="warnings-title">Warnings</h3>
+          <h3 id="warnings-title">{t('Warnings')}</h3>
           {/* a list of any length keeps the popover's height: it scrolls, and takes focus to do so */}
           <ul ref={list} tabIndex={scrolls ? 0 : undefined} aria-labelledby="warnings-title">
             {warnings.map((w) => (
@@ -186,25 +205,69 @@ export function WarningsBlock({
 }
 
 /** The facts of the peak pressure readout: its time and travel and what the range covers. */
-export function peakFacts(ok: Extract<Outcome, { kind: 'ok' }>, system: UnitSystem) {
+export function peakFacts(
+  ok: Extract<Outcome, { kind: 'ok' }>,
+  system: UnitSystem,
+  t: Translator['t'],
+) {
   const { result: r, pressureRange: range, sampled } = ok.body
-  const t = range.tolerances
+  const tol = range.tolerances
   const failed = range.cases.filter((c) => c.maxPressure === null).length
-  const sample =
-    sampled?.status === 'sampled'
-      ? ` The band is the 5th to 95th percentile of ${sampled.samples} draws (seed ${sampled.seed}${sampled.failed ? `, ${sampled.failed} left the model` : ''}) of the inputs, normal around their nominal values with the tolerance as the 90 % half width. The limit check uses the corner-case range ${formatQuantity('pressure', system, range.lowPressure)} to ${formatQuantity('pressure', system, range.highPressure)} ${system.pressure.symbol}.`
-      : sampled
-        ? ` The sampled bands are ${bandNotice(sampled)}: the corner-case range is shown.`
-        : ''
-  return `At ${msText(r.maxPressureTime)} and ${shownLength('travel', system, r.maxPressureTravel)} of travel.${sample} The ${sampled?.status === 'sampled' ? 'band' : 'range'} covers the input tolerances only, no model error: charge ${percentText(t.chargeFraction)}, volume ${percentText(t.volumeFraction)}, ${t.massFraction > 0 ? `bullet mass ${percentText(t.massFraction)}, ` : ''}burn rate ${percentText(t.burnRateFraction)}, temperature ${
+  const band = {
+    low: formatQuantity('pressure', system, range.lowPressure),
+    high: formatQuantity('pressure', system, range.highPressure),
+    unit: system.pressure.symbol,
+  }
+  const draws = sampled?.status === 'sampled' ? sampled : undefined
+  const sample = draws
+    ? draws.failed
+      ? t(
+          'The band is the 5th to 95th percentile of {samples} draws (seed {seed}, {failed} left the model) of the inputs, normal around their nominal values with the tolerance as the 90 % half width. The limit check uses the corner-case range {low} to {high} {unit}.',
+          { samples: draws.samples, seed: draws.seed, failed: draws.failed, ...band },
+        )
+      : t(
+          'The band is the 5th to 95th percentile of {samples} draws (seed {seed}) of the inputs, normal around their nominal values with the tolerance as the 90 % half width. The limit check uses the corner-case range {low} to {high} {unit}.',
+          { samples: draws.samples, seed: draws.seed, ...band },
+        )
+    : sampled
+      ? t('The sampled bands are {notice}: the corner-case range is shown.', {
+          notice: bandNotice(sampled, t) ?? '',
+        })
+      : undefined
+  const temperature =
     system.temperature === unitsOf.temperature.degF
-      ? `${formatNumber((t.temperatureKelvin * 9) / 5, 1)} °F`
-      : `${formatNumber(t.temperatureKelvin, 1)} K`
-  }, start pressure ${percentText(t.startPressureFraction)}.${
+      ? `${formatNumber((tol.temperatureKelvin * 9) / 5, 1)} °F`
+      : `${formatNumber(tol.temperatureKelvin, 1)} K`
+  const covered = [
+    t('charge {value}', { value: percentText(tol.chargeFraction) }),
+    t('volume {value}', { value: percentText(tol.volumeFraction) }),
+    ...(tol.massFraction > 0
+      ? [t('bullet mass {value}', { value: percentText(tol.massFraction) })]
+      : []),
+    t('burn rate {value}', { value: percentText(tol.burnRateFraction) }),
+    t('temperature {value}', { value: temperature }),
+    t('start pressure {value}', { value: percentText(tol.startPressureFraction) }),
+  ].join(', ')
+  return [
+    t('At {time} and {travel} of travel.', {
+      time: msText(r.maxPressureTime),
+      travel: shownLength('travel', system, r.maxPressureTravel),
+    }),
+    sample,
+    draws
+      ? t('The band covers the input tolerances only, no model error: {list}.', { list: covered })
+      : t('The range covers the input tolerances only, no model error: {list}.', {
+          list: covered,
+        }),
     range.complete
-      ? ''
-      : ` ${failed} of ${range.cases.length} range cases could not be computed; the true range can be wider.`
-  }`
+      ? undefined
+      : t('{failed} of {total} range cases could not be computed; the true range can be wider.', {
+          failed,
+          total: range.cases.length,
+        }),
+  ]
+    .filter(Boolean)
+    .join(' ')
 }
 
 /** A value that is a phrase, not a number: smaller, so it stays on one line in a tile. */
@@ -223,31 +286,39 @@ const readoutFact = (text: string | undefined) =>
 
 /** Where the bullet's powder burns out, and how much of it is burnt at the muzzle. */
 function BurnoutItem({ ok, system }: { ok: Extract<Outcome, { kind: 'ok' }>; system: UnitSystem }) {
+  const { t } = useTranslation()
   const r = ok.body.result
-  const burnoutTitle = r.burnout ? `Burnout ${msText(r.burnout.time)} after ignition.` : undefined
+  const burnoutTitle = r.burnout
+    ? t('Burnout {time} after ignition.', { time: msText(r.burnout.time) })
+    : undefined
+  const burnt = formatNumber(r.muzzleBurntFraction * 100, 0)
   const burnoutAt = (travel: number) =>
     unit(inchText(lengthText('travel', system, travel), system.length.symbol), system.length.symbol)
   return (
     <div
-      title={[
-        burnoutTitle,
-        `${formatNumber(r.muzzleBurntFraction * 100, 0)} % burnt at the muzzle.`,
-      ]
+      title={[burnoutTitle, t('{percent} % burnt at the muzzle.', { percent: burnt })]
         .filter(Boolean)
         .join(' ')}
     >
-      <dt>Burnout at</dt>
+      <dt>{t('Burnout at')}</dt>
       <dd className={r.burnout ? undefined : readoutPhrase}>
-        {r.burnout ? burnoutAt(r.burnout.travel) : 'no burnout in the barrel'}
+        {r.burnout ? burnoutAt(r.burnout.travel) : t('no burnout in the barrel')}
       </dd>
-      <dd className="readout-note">{formatNumber(r.muzzleBurntFraction * 100, 0)} % burnt</dd>
+      <dd className="readout-note">{t('{percent} % burnt', { percent: burnt })}</dd>
       {readoutFact(burnoutTitle)}
     </div>
   )
 }
 
+/** The notes the run's gas factor carries when it is the default of a cartridge without a table. */
+const gasFactorNotes: Record<string, Message> = {
+  'cartridge record not loaded': msg('cartridge record not loaded'),
+  'cartridge record without a CIP table': msg('cartridge record without a CIP table'),
+}
+
 /** The free recoil of the firearm, when its mass is known. */
 function RecoilItem({ ok, system }: { ok: Extract<Outcome, { kind: 'ok' }>; system: UnitSystem }) {
+  const { t } = useTranslation()
   const { firearmMass, gasFactor, gasFactorNote } = ok.printed
   if (firearmMass === undefined) return null
   const recoil = freeRecoil({
@@ -257,11 +328,23 @@ function RecoilItem({ ok, system }: { ok: Extract<Outcome, { kind: 'ok' }>; syst
     muzzleVelocity: ok.body.result.muzzleVelocity,
     gasFactor,
   })
-  const recoilNote = `Free recoil ${formatNumber(system.energy.fromSi(recoil.energy), 1)} ${system.energy.symbol}, ${formatNumber(system.velocity.fromSi(recoil.velocity), 2)} ${system.velocity.symbol}`
-  const recoilTitle = `${recoilNote}. Kinetic energy and velocity of the free firearm. Momentum of the bullet plus the powder gas (charge mass times ${gasFactor} times muzzle velocity${gasFactorNote ? `; factor ${gasFactor}, ${gasFactorNote}` : ''}); muzzle devices not counted (SAAMI, Gun Recoil - Technical, 2018).`
+  const energy = `${formatNumber(system.energy.fromSi(recoil.energy), 1)} ${system.energy.symbol}`
+  const velocity = `${formatNumber(system.velocity.fromSi(recoil.velocity), 2)} ${system.velocity.symbol}`
+  const recoilNote = t('Free recoil {energy}, {velocity}', { energy, velocity })
+  const known = gasFactorNote ? gasFactorNotes[gasFactorNote] : undefined
+  const note = known ? t(known) : gasFactorNote
+  const recoilTitle = note
+    ? t(
+        '{summary}. Kinetic energy and velocity of the free firearm. Momentum of the bullet plus the powder gas (charge mass times {factor} times muzzle velocity; factor {factor}, {note}); muzzle devices not counted (SAAMI, Gun Recoil - Technical, 2018).',
+        { summary: recoilNote, factor: gasFactor, note },
+      )
+    : t(
+        '{summary}. Kinetic energy and velocity of the free firearm. Momentum of the bullet plus the powder gas (charge mass times {factor} times muzzle velocity); muzzle devices not counted (SAAMI, Gun Recoil - Technical, 2018).',
+        { summary: recoilNote, factor: gasFactor },
+      )
   return (
     <div title={recoilTitle}>
-      <dt>Free recoil</dt>
+      <dt>{t('Free recoil')}</dt>
       <dd>
         {unit(formatNumber(system.energy.fromSi(recoil.energy), 1), system.energy.symbol)},{' '}
         {unit(formatNumber(system.velocity.fromSi(recoil.velocity), 2), system.velocity.symbol)}
@@ -273,13 +356,14 @@ function RecoilItem({ ok, system }: { ok: Extract<Outcome, { kind: 'ok' }>; syst
 
 /** The muzzle spin: turns per second at the muzzle times 60; no rifling, no spin. */
 function SpinItem({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> }) {
+  const { t } = useTranslation()
   const twist = ok.load.barrel.twist
   const spin = twist ? (ok.body.result.muzzleVelocity / twist) * 60 : undefined
   return (
     <div>
-      <dt>Muzzle spin</dt>
+      <dt>{t('Muzzle spin')}</dt>
       <dd className={spin === undefined ? readoutPhrase : undefined}>
-        {spin === undefined ? 'no twist' : unit(formatNumber(spin / 1000, 1), 'krpm')}
+        {spin === undefined ? t('no twist') : unit(formatNumber(spin / 1000, 1), 'krpm')}
       </dd>
     </div>
   )
@@ -299,13 +383,20 @@ function PeakLimits({
   printed: boolean
   ofMax: OfMax
 }) {
+  const { t } = useTranslation()
   const pressure = ofMax.limit.pressure
   if (pressure === undefined) return null
+  const percent = formatNumber(ofMax.percent, 0)
+  const symbol = ofMax.limit.symbol
   return (
     <span>
       {printed ? (
         // the report prints the limits table itself: the limit as text, no control
-        `${formatNumber(ofMax.percent, 0)} % of CIP ${ofMax.limit.symbol} ${withUnit('pressure', system, pressure)}`
+        t('{percent} % of CIP {symbol} {limit}', {
+          percent,
+          symbol,
+          limit: withUnit('pressure', system, pressure),
+        })
       ) : (
         /* the limits table and its sources one click away */
         <AppPopover position="bottom" width={popoverWidth.table} withinPortal trapFocus>
@@ -313,9 +404,12 @@ function PeakLimits({
             <UnstyledButton
               className="readout-limits"
               aria-haspopup="dialog"
-              title={`CIP ${ofMax.limit.symbol} ${withUnit('pressure', system, pressure)}`}
+              title={t('CIP {symbol} {limit}', {
+                symbol,
+                limit: withUnit('pressure', system, pressure),
+              })}
             >
-              {formatNumber(ofMax.percent, 0)} % of CIP {ofMax.limit.symbol}
+              {t('{percent} % of CIP {symbol}', { percent, symbol })}
             </UnstyledButton>
           </Popover.Target>
           <Popover.Dropdown className="limits-popover">
@@ -343,17 +437,25 @@ export function Readouts({
   /** In the print report: text in place of controls. */
   printed?: boolean
 }) {
+  const { t } = useTranslation()
   const { result: r, pressureRange: range } = ok.body
   const band = resultBand(ok.body, printed)
-  const { ofMax, lead, ratio } = derived(ok)
+  const { ofMax, lead, ratio } = derived(ok, t)
   const p = (pa: number) => unit(formatQuantity('pressure', system, pa), system.pressure.symbol)
   const msUnit = (s: number) => unit(formatNumber(s * 1e3, 3), 'ms')
-  const peakTitle = peakFacts(ok, system)
-  const mipTitle =
-    '0.1 times the bullet mass in g times the muzzle velocity in m/s (DSB Sportordnung, Regeln für Pistole und Revolver, 2.21.1).'
-  const leadTitle = `From the 10 % pressure time (${msText(r.tenPercentPressureTime)} after ignition) to muzzle exit.`
-  const fillTitle =
-    "Load ratio: the charge's bulk volume over the free volume behind the bullet; above 100 % the charge is compressed."
+  const peakTitle = peakFacts(ok, system, t)
+  const mipTitle = t(
+    '0.1 times the bullet mass in g times the muzzle velocity in m/s ({source}).',
+    {
+      source: 'DSB Sportordnung, Regeln für Pistole und Revolver, 2.21.1',
+    },
+  )
+  const leadTitle = t('From the 10 % pressure time ({time} after ignition) to muzzle exit.', {
+    time: msText(r.tenPercentPressureTime),
+  })
+  const fillTitle = t(
+    "Load ratio: the charge's bulk volume over the free volume behind the bullet; above 100 % the charge is compressed.",
+  )
   // the chart's key of that quantity before the label (globals.css)
   const key = (q: 'pressure' | 'velocity' | 'energy') => (
     <span className="series-key" data-q={q} aria-hidden="true" />
@@ -361,7 +463,7 @@ export function Readouts({
   const limits = ofMax?.limit.pressure && (
     <PeakLimits ok={ok} system={system} printed={printed} ofMax={ofMax} />
   )
-  const bandText = bandLine(ok.body, system)
+  const bandText = bandLine(ok.body, system, t)
   const big = (value: string, unit: string) => (
     <>
       <span className="readout-value">{value}</span> <span className="readout-unit">{unit}</span>
@@ -373,20 +475,22 @@ export function Readouts({
         <div title={peakTitle} className="readout-wide">
           <dt>
             {key('pressure')}
-            Peak pressure
+            {t('Peak pressure')}
           </dt>
           <dd className="readout-big">
             {big(formatQuantity('pressure', system, range.nominalPressure), system.pressure.symbol)}
           </dd>
           <dd className="readout-note">
             <span className="visually-hidden">
-              {band.sampled ? '5th to 95th percentile ' : 'range '}
+              {band.sampled ? t('5th to 95th percentile') : t('range')}{' '}
             </span>
-            {formatQuantity('pressure', system, band.pressure.low)} to{' '}
-            {formatQuantity('pressure', system, band.pressure.high)}
+            {t('{low} to {high}', {
+              low: formatQuantity('pressure', system, band.pressure.low),
+              high: formatQuantity('pressure', system, band.pressure.high),
+            })}
           </dd>
           <dd className="readout-share">
-            {ofMax ? limits : <span className="readout-phrase">no comparable limit</span>}
+            {ofMax ? limits : <span className="readout-phrase">{t('no comparable limit')}</span>}
           </dd>
           {/* the nominal as a share of the limit: the bar's full width is the limit */}
           {ofMax && (
@@ -399,7 +503,7 @@ export function Readouts({
         <div>
           <dt>
             {key('velocity')}
-            Muzzle velocity
+            {t('Muzzle velocity')}
           </dt>
           <dd className="readout-big">
             {big(formatQuantity('velocity', system, r.muzzleVelocity), system.velocity.symbol)}
@@ -408,7 +512,7 @@ export function Readouts({
         <div>
           <dt>
             {key('energy')}
-            Muzzle energy
+            {t('Muzzle energy')}
           </dt>
           <dd className="readout-big">
             {big(formatQuantity('energy', system, r.muzzleEnergy), system.energy.symbol)}
@@ -418,43 +522,43 @@ export function Readouts({
       {!printed && bandText && <p className="band-line screen-only">{bandText}</p>}
       <dl className="readouts readout-list" data-stale={stale || undefined}>
         <div>
-          <dt>Muzzle pressure</dt>
+          <dt>{t('Muzzle pressure')}</dt>
           <dd>{p(r.muzzleBreechPressure)}</dd>
         </div>
-        <div title="From shot start to muzzle exit.">
-          <dt>Barrel time</dt>
+        <div title={t('From shot start to muzzle exit.')}>
+          <dt>{t('Barrel time')}</dt>
           <dd>{msUnit(r.barrelTime)}</dd>
-          {readoutFact('From shot start to muzzle exit.')}
+          {readoutFact(t('From shot start to muzzle exit.'))}
         </div>
         <div title={leadTitle}>
-          <dt>Bullet lead time</dt>
+          <dt>{t('Bullet lead time')}</dt>
           <dd className={lead === undefined ? readoutPhrase : undefined}>
-            {lead === undefined ? 'not available' : msUnit(lead)}
+            {lead === undefined ? t('not available') : msUnit(lead)}
           </dd>
           {readoutFact(leadTitle)}
         </div>
         <BurnoutItem ok={ok} system={system} />
         <div title={fillTitle}>
-          <dt>Case fill</dt>
+          <dt>{t('Case fill')}</dt>
           {/* without a value the reason in view and in print, in the small type of a phrase */}
           <dd className={ratio === undefined ? readoutPhrase : undefined}>
-            {loadRatioText(ok, ratio)}
+            {loadRatioText(ok, ratio, t)}
           </dd>
-          {ratio !== undefined && ratio > 1 && <dd className="readout-note">compressed</dd>}
+          {ratio !== undefined && ratio > 1 && <dd className="readout-note">{t('compressed')}</dd>}
           {readoutFact(fillTitle)}
         </div>
         <div>
-          <dt>Efficiency</dt>
+          <dt>{t('Efficiency')}</dt>
           <dd>{unit(formatNumber(r.efficiency * 100, 1), '%')}</dd>
         </div>
         <RecoilItem ok={ok} system={system} />
         <SpinItem ok={ok} />
         <div>
-          <dt>Power factor (IPSC)</dt>
+          <dt>{t('Power factor (IPSC)')}</dt>
           <dd>{formatNumber(ipscPowerFactor(ok.load.bullet.mass, r.muzzleVelocity), 0)}</dd>
         </div>
         <div title={mipTitle}>
-          <dt>MIP factor</dt>
+          <dt>{t('MIP factor')}</dt>
           <dd>{formatNumber(powerFactor(ok.load.bullet.mass, r.muzzleVelocity), 1)}</dd>
           {readoutFact(mipTitle)}
         </div>
@@ -463,34 +567,29 @@ export function Readouts({
   )
 }
 
-/** Ladder table columns; the flags follow the charge, so a narrow column keeps them in view. */
-const ladderColumns = [
-  'Step',
-  'Charge',
-  'Flags',
-  'Peak pressure',
-  'Percent of maximum',
-  'Muzzle velocity',
-  'Muzzle energy',
-  'Case fill',
-  'Burnt at the muzzle',
+const limitColumns = [
+  msg('Standard'),
+  msg('Symbol'),
+  msg('Method'),
+  msg('Value'),
+  msg('Compared'),
+  msg('Upper end above'),
+  msg('Nominal above'),
 ]
 
-const limitColumns = [
-  'Standard',
-  'Symbol',
-  'Method',
-  'Value',
-  'Compared',
-  'Upper end above',
-  'Nominal above',
-]
+/** Why a limit was not compared: a known reason in words, else the API's own text. */
+function notComparedReason(reason: string | undefined, t: Translator['t']) {
+  if (!reason) return t('not compared')
+  const known = reasonText[reason]
+  return known ? t(known) : translateMessage(reason, t)
+}
 
 /**
  * The pressure range of the result on a bar from 0 with its nominal and the first compared limit
  * (`firstPressureLimit`, as the chart's limit line); nothing without that limit.
  */
 function LimitRange({ body, system }: { body: InteriorResponse; system: UnitSystem }) {
+  const { t } = useTranslation()
   const limit = firstPressureLimit(body.limits)
   if (limit?.pressure === undefined) return null
   const { lowPressure: low, highPressure: high, nominalPressure: nominal } = body.pressureRange
@@ -500,12 +599,21 @@ function LimitRange({ body, system }: { body: InteriorResponse; system: UnitSyst
   const unit = system.pressure.symbol
   // the nominal's and the limit's labels on the far sides of their lines, so they never meet
   const below = nominal < limit.pressure
-  const name = `CIP ${limit.symbol} ${text(limit.pressure)} ${unit}`
+  const name = t('CIP {symbol} {limit}', {
+    symbol: limit.symbol,
+    limit: `${text(limit.pressure)} ${unit}`,
+  })
   return (
     <div
       className="limit-range"
       role="img"
-      aria-label={`Range ${text(low)} to ${text(high)} ${unit}, nominal ${text(nominal)} ${unit}, ${name}`}
+      aria-label={t('Range {low} to {high} {unit}, nominal {nominal} {unit}, {name}', {
+        low: text(low),
+        high: text(high),
+        nominal: text(nominal),
+        unit,
+        name,
+      })}
     >
       <span
         className="limit-range-band"
@@ -525,7 +633,7 @@ function LimitRange({ body, system }: { body: InteriorResponse; system: UnitSyst
         data-end={below || undefined}
         style={{ left: at(nominal) }}
       >
-        nominal {text(nominal)}
+        {t('nominal {value}', { value: text(nominal) })}
       </span>
       <span
         className="limit-range-text limit-range-name"
@@ -547,50 +655,51 @@ export function LimitsView({
   body: InteriorResponse
   system?: UnitSystem | undefined
 }) {
-  useTranslation()
+  const { t } = useTranslation()
   const resolved = body.resolved?.cartridge
   if (!body.limits || body.limits.length === 0)
     return (
       <p className="prompt empty-state">
-        No pressure limit for this result: choose a cartridge to compare with its limits.
+        {t('No pressure limit for this result: choose a cartridge to compare with its limits.')}
       </p>
     )
+  const heads = limitColumns.map((c) => t(c))
   return (
     <div className="result-group">
       <PanelTable
-        label="Pressure limits"
+        label={t('Pressure limits')}
         className="limits"
-        caption="Pressure limits of the cartridge"
-        columns={limitColumns}
+        caption={t('Pressure limits of the cartridge')}
+        columns={heads}
       >
         {body.limits.map((l, i) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: two limits can share symbol, variant and method
           <tr key={i}>
-            <td data-label={limitColumns[0]}>
+            <td data-label={heads[0]}>
               <StandardBadge label="CIP" />
             </td>
-            <td data-label={limitColumns[1]}>
+            <td data-label={heads[1]}>
               {l.symbol}
               {l.variant && ` (${l.variant})`}
             </td>
-            <td data-label={limitColumns[2]}>{l.method ?? 'not stated in the record'}</td>
-            <td data-label={limitColumns[3]} className="num">
+            <td data-label={heads[2]}>{l.method ?? t('not stated in the record')}</td>
+            <td data-label={heads[3]} className="num">
               {limitValue(l)}
             </td>
-            <td data-label={limitColumns[4]}>
+            <td data-label={heads[4]}>
               {l.compared
-                ? 'yes'
-                : `no: ${reasonText[l.reason ?? ''] ?? l.reason ?? 'not compared'}`}
+                ? t('yes')
+                : t('no: {reason}', { reason: notComparedReason(l.reason, t) })}
             </td>
-            <td data-label={limitColumns[5]}>{yesNo(l.exceeded)}</td>
-            <td data-label={limitColumns[6]}>{yesNo(l.nominalExceeded)}</td>
+            <td data-label={heads[5]}>{yesNo(l.exceeded, t)}</td>
+            <td data-label={heads[6]}>{yesNo(l.nominalExceeded, t)}</td>
           </tr>
         ))}
       </PanelTable>
       {system && <LimitRange body={body} system={system} />}
       {resolved && (
         <div className="limit-sources">
-          <h3>Sources of the limits</h3>
+          <h3>{t('Sources of the limits')}</h3>
           <ol className="sources">
             <li>
               CIP: <SourceTitles sources={resolved.provenance.sources} />
@@ -616,21 +725,21 @@ export const BurnRate = memo(function BurnRate({
   height: number
 }) {
   // memoized: the numbers of its text and chart are written in the language shown
-  useTranslation()
+  const { t } = useTranslation()
   return (
     <div className="burn-rate">
       {isFitted(p) ? (
         <LazyVivacityChart
           series={[{ powder: p, slot: 0 }]}
-          title={`Dynamic vivacity of ${p.label}, model output`}
-          description={describeCurve(p)}
+          title={t('Dynamic vivacity of {label}, model output', { label: p.label })}
+          description={describeCurve(p, t)}
           height={height}
           marks={marks}
         />
       ) : (
         <p>{p.reason}</p>
       )}
-      {!powderId && <p>From the typed model parameters, no interval.</p>}
+      {!powderId && <p>{t('From the typed model parameters, no interval.')}</p>}
     </div>
   )
 })
@@ -642,9 +751,15 @@ export const flagView = (text: string, title = text) => (
   </span>
 )
 
+const ladderNames: Record<RunnableLadderKind, Message> = {
+  charge: msg('Charge ladder'),
+  seating: msg('Seating ladder'),
+  temperature: msg('Temperature ladder'),
+}
+
 /** What the run's ladder varies, for its legend and table name. */
-const ladderName = (ok: Extract<Outcome, { kind: 'ok' }> | undefined) =>
-  ladderTitle(ok?.ladder.kind ?? 'charge')
+const ladderName = (ok: Extract<Outcome, { kind: 'ok' }> | undefined, t: Translator['t']) =>
+  t(ladderNames[ok?.ladder.kind ?? 'charge'])
 
 /** The charge ladder strip of the shown run: a step selector, or the one step as text. */
 export function LadderStrip({
@@ -671,6 +786,7 @@ export function LadderStrip({
   /** Shows ladder step `i`. */
   select: (i: number) => void
 }) {
+  const { t } = useTranslation()
   // the selected step in view in a strip that scrolls sideways
   const cells = useRef<HTMLDivElement>(null)
   const [selectedStep, runId] = [ok?.selected, ok?.id]
@@ -686,13 +802,13 @@ export function LadderStrip({
   }, [selectedStep, runId])
   return (
     <fieldset className="ladder-strip" data-stale={stale || undefined}>
-      <legend className="ladder-legend">{ladderName(ok)} ladder</legend>
+      <legend className="ladder-legend">{ladderName(ok, t)}</legend>
       {ok && steps.length > 1 ? (
         // native radios: arrow keys move and select; Home and End are added
         <div
           ref={cells}
           role="radiogroup"
-          aria-label="Ladder steps"
+          aria-label={t('Ladder steps')}
           tabIndex={-1}
           className="ladder-cells"
           onKeyDown={(e) => {
@@ -724,15 +840,21 @@ export function LadderStrip({
                   shows what the step varies, its step number is for screen readers and the
                   main charge's tooltip */}
               <span className="visually-hidden">
-                Step {s.label}
-                {s.label === '0' && ', main'}:{' '}
+                {s.label === '0'
+                  ? t('Step {label}, main:', { label: s.label })
+                  : t('Step {label}:', { label: s.label })}{' '}
               </span>
-              <strong title={s.label === '0' ? 'Main charge' : undefined}>{value(s)}</strong>{' '}
+              <strong title={s.label === '0' ? t('Main charge') : undefined}>{value(s)}</strong>{' '}
               {s.d?.ofMax && (
                 <span className="cell-percent">{formatNumber(s.d.ofMax.percent, 0)} %</span>
               )}{' '}
               {s.flag && flagView(s.flag)}
-              {s.error && flagView(`model: ${s.error.reason ?? 'invalid'}`)}
+              {s.error &&
+                flagView(
+                  t('model: {reason}', {
+                    reason: s.error.reason ? translateMessage(s.error.reason, t) : t('invalid'),
+                  }),
+                )}
             </label>
           ))}
         </div>
@@ -740,11 +862,12 @@ export function LadderStrip({
         // one step as text: its values are the readouts above
         <>
           <span className="ladder-step">
-            Step 0, main, {chargeText}
-            {!ok && ', not run'}
+            {ok
+              ? t('Step 0, main, {charge}', { charge: chargeText })
+              : t('Step 0, main, {charge}, not run', { charge: chargeText })}
           </span>
           {oneFlag && flagView(oneFlag)}
-          <span className="ladder-note">Ladder steps are set in the Powder card.</span>
+          <span className="ladder-note">{t('Ladder steps are set in the Powder card.')}</span>
         </>
       )}
     </fieldset>
@@ -754,16 +877,10 @@ export function LadderStrip({
 type LadderLot = { fraction: number; steps: Record<Lot, ShownStep[]> }
 
 /** The leading columns of the ladder table: what a step varies, with a seating ladder the case volume. */
-function ladderLead(ok: Extract<Outcome, { kind: 'ok' }> | undefined) {
+function ladderLead(ok: Extract<Outcome, { kind: 'ok' }> | undefined, t: Translator['t']) {
   if (ok?.ladder.kind === 'seating')
-    return [seatingLengthName[ok.ladder.seatingBy ?? 'overallLength'], 'Usable case volume']
-  return ok?.ladder.kind === 'temperature' ? ['Powder temperature'] : ['Charge']
-}
-
-/** The columns of one ladder column name: the lot rows add the burn rate and the barrel time. */
-function ladderColumn(c: string, lead: string[], lot: LadderLot | undefined) {
-  if (c === 'Charge') return lead.concat(lot ? ['Burn rate'] : [])
-  return c === 'Burnt at the muzzle' && lot ? ['Barrel time', c] : [c]
+    return [seatingLengthName[ok.ladder.seatingBy ?? 'overallLength'], t('Usable case volume')]
+  return ok?.ladder.kind === 'temperature' ? [t('Powder temperature')] : [t('Charge')]
 }
 
 /** The cells of a computed ladder step from its peak pressure on. */
@@ -784,29 +901,30 @@ function LadderResultCells({
   ratioShown: boolean
   lot: LadderLot | undefined
 }) {
+  const { t } = useTranslation()
   const { body, d, at } = step
   return (
     <>
-      <td data-label="Peak pressure" className="num">
+      <td data-label={t('Peak pressure')} className="num">
         {formatQuantity('pressure', system, body.pressureRange.nominalPressure)}{' '}
         {system.pressure.symbol}
       </td>
-      <td data-label="Percent of maximum" className="num">
-        {d.ofMax ? `${formatNumber(d.ofMax.percent, 0)} %` : 'no limit'}
+      <td data-label={t('Percent of maximum')} className="num">
+        {d.ofMax ? `${formatNumber(d.ofMax.percent, 0)} %` : t('no limit')}
       </td>
-      <td data-label="Muzzle velocity" className="num">
+      <td data-label={t('Muzzle velocity')} className="num">
         {velocity(body.result)}
       </td>
-      <td data-label="Muzzle energy" className="num">
+      <td data-label={t('Muzzle energy')} className="num">
         {formatQuantity('energy', system, body.result.muzzleEnergy)} {system.energy.symbol}
       </td>
-      {ratioShown && <td data-label="Case fill">{loadRatioText(at, d.ratio)}</td>}
+      {ratioShown && <td data-label={t('Case fill')}>{loadRatioText(at, d.ratio, t)}</td>}
       {lot && (
-        <td data-label="Barrel time" className="num">
+        <td data-label={t('Barrel time')} className="num">
           {msText(body.result.barrelTime)}
         </td>
       )}
-      <td data-label="Burnt at the muzzle" className="num">
+      <td data-label={t('Burnt at the muzzle')} className="num">
         {formatNumber(body.result.muzzleBurntFraction * 100, 0)} %
       </td>
     </>
@@ -840,12 +958,12 @@ function LadderRow({
   ratioShown,
   resultSpan,
 }: LadderRowProps) {
+  const { t } = useTranslation()
   const current = !which && ok && s.n - 1 === ok.selected
   return (
     <tr aria-current={current ? 'true' : undefined} data-lot={which}>
-      <td data-label="Step">
-        {s.label}
-        {s.label === '0' && !which && ' main'}
+      <td data-label={t('Step')}>
+        {s.label === '0' && !which ? `${s.label} ${t('main')}` : s.label}
       </td>
       <td data-label={lead[0]} className="num">
         {value(s)}
@@ -856,11 +974,13 @@ function LadderRow({
         </td>
       )}
       {lot && (
-        <td data-label="Burn rate" className="num">
-          {burnRateLabel(which, lot.fraction)}
+        <td data-label={t('Burn rate')} className="num">
+          {which ? lotLabel(which, lot.fraction) : t('nominal')}
         </td>
       )}
-      <td data-label="Flags">{s.flag || s.error ? flagView(s.flag ?? 'model error') : 'none'}</td>
+      <td data-label={t('Flags')}>
+        {s.flag || s.error ? flagView(s.flag ?? t('model error')) : t('none')}
+      </td>
       {s.body && s.d && s.at ? (
         <LadderResultCells
           step={{ body: s.body, d: s.d, at: s.at }}
@@ -870,12 +990,36 @@ function LadderRow({
           lot={lot}
         />
       ) : (
-        <td data-label="Result" colSpan={resultSpan}>
-          Not computed: {s.error?.message}
+        <td data-label={t('Result')} colSpan={resultSpan}>
+          {t('Not computed: {reason}', {
+            reason: s.error ? translateMessage(s.error.message, t) : '',
+          })}
         </td>
       )}
     </tr>
   )
+}
+
+/** The headings of the ladder table: the lot rows add the burn rate and the barrel time. */
+function ladderHeads(
+  lead: string[],
+  lot: LadderLot | undefined,
+  ratioShown: boolean,
+  t: Translator['t'],
+) {
+  return [
+    t('Step'),
+    ...lead,
+    ...(lot ? [t('Burn rate')] : []),
+    t('Flags'),
+    t('Peak pressure'),
+    t('Percent of maximum'),
+    t('Muzzle velocity'),
+    t('Muzzle energy'),
+    ...(ratioShown ? [t('Case fill')] : []),
+    ...(lot ? [t('Barrel time')] : []),
+    t('Burnt at the muzzle'),
+  ]
 }
 
 /** The steps of the shown run as a table, one row per charge, with the lot rows under each charge when there are any. */
@@ -896,14 +1040,13 @@ export function LadderTable({
   /** The rows at a burn rate above and below, in step order, and the change they were run at. */
   lot?: LadderLot | undefined
 }) {
+  const { t } = useTranslation()
   // without a load ratio on any step the column would repeat the load ratio readout's phrase
   const ratioShown = steps.some((st) => st.d?.ratio !== undefined)
   // a seating ladder names its length (COAL or CBTO) and shows the case volume behind the bullet
   const seating = ok?.ladder.kind === 'seating'
-  const lead = ladderLead(ok)
-  const columns = ladderColumns
-    .flatMap((c) => ladderColumn(c, lead, lot))
-    .filter((c) => ratioShown || c !== 'Case fill')
+  const lead = ladderLead(ok, t)
+  const columns = ladderHeads(lead, lot, ratioShown, t)
   // the cells before the result's: the step, what it varies, the seating volume, the burn rate and the flags
   const before = 3 + (seating ? 1 : 0) + (lot ? 1 : 0)
   const row = (s: ShownStep, which?: Lot) => (
@@ -921,13 +1064,9 @@ export function LadderTable({
       resultSpan={columns.length - before}
     />
   )
+  const title = t('{ladder} steps', { ladder: ladderName(ok, t) })
   return (
-    <PanelTable
-      label={`${ladderName(ok)} ladder steps`}
-      className="limits ladder-table"
-      caption={`${ladderName(ok)} ladder steps`}
-      columns={columns}
-    >
+    <PanelTable label={title} className="limits ladder-table" caption={title} columns={columns}>
       {steps.flatMap((s, i) => [
         ...(lot?.steps.low[i] ? [row(lot.steps.low[i], 'low')] : []),
         row(s),

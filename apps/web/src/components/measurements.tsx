@@ -5,8 +5,11 @@ import type { VelocityUnit } from '@open-reloading/importers'
 import { chronoSession, type SessionRecord, toSi } from '@open-reloading/schema'
 import Link from 'next/link'
 import { type Dispatch, type ReactNode, type SetStateAction, useRef, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
+import { msg, type Translator } from '../i18n/translate.ts'
 import { chronoFileBytes, readChrono } from '../lib/chrono.ts'
+import { translateMessage } from '../lib/core-messages.ts'
 import { errorText } from '../lib/error-text.ts'
 import {
   type ChargeRow,
@@ -36,21 +39,21 @@ import { useResult } from './workbench-context.ts'
 type MeasuredStep = SimulatedStep & { n: number; label?: string | undefined }
 
 const columns = [
-  'Series',
-  'Charge',
-  'Shots',
-  'Excluded',
-  'Mean',
-  'SD',
-  'ES',
-  'Simulated',
-  'Difference',
-  'Difference %',
+  msg('Series'),
+  msg('Charge'),
+  msg('Shots'),
+  msg('Excluded'),
+  msg('Mean'),
+  msg('SD'),
+  msg('ES'),
+  msg('Simulated'),
+  msg('Difference'),
+  msg('Difference %'),
 ] as const
 /** Sessions a load names at most (`Load.sessions`). */
 const maxSessions = 50
-const tableName = 'Measured against simulated velocity per charge'
-const chartName = 'Measured mean velocity and simulated muzzle velocity against charge'
+const tableName = msg('Measured against simulated velocity per charge')
+const chartName = msg('Measured mean velocity and simulated muzzle velocity against charge')
 
 /** Marker shapes per series, so series differ by more than colour. */
 const shapes = ['circle', 'square', 'triangle', 'diamond'] as const
@@ -180,6 +183,15 @@ async function readSession(
   return sessionOf(file.name, data, charges, { id, manufacturer: makers.get(named), now })
 }
 
+/** A file that was not read: too many sessions for the load, else the reader's message (English). */
+type Failure = { file: string; tooMany: true } | { file: string; message: string }
+
+/** The reason `f` gives for its file, in the language of `t`. */
+const failureText = (f: Failure, t: Translator['t']) =>
+  'tooMany' in f
+    ? t('{file}: a load keeps {max} sessions at most.', { file: f.file, max: maxSessions })
+    : `${f.file}: ${translateMessage(f.message, t)}`
+
 /** `text` of a statistic when there is one, else nothing. */
 const when = <T,>(x: T | undefined, text: (x: T) => string) => (x === undefined ? '' : text(x))
 
@@ -198,40 +210,41 @@ function SeriesRow({
   charge: (kg: number) => string
   speed: (ms: number) => string
 }) {
+  const { t } = useTranslation()
   const stats = r.velocityStats
   return (
     <tr>
-      <td data-label={columns[0]}>
+      <td data-label={t(columns[0])}>
         <span className="series-name">
           <LegendShape shape={shape} k={k} />
           {name}
         </span>
       </td>
-      <td data-label={columns[1]} className="num">
+      <td data-label={t(columns[1])} className="num">
         {charge(r.charge)}
       </td>
-      <td data-label={columns[2]} className="num">
+      <td data-label={t(columns[2])} className="num">
         {stats?.count ?? 0}
       </td>
-      <td data-label={columns[3]} className="num">
+      <td data-label={t(columns[3])} className="num">
         {r.excludedShots.length}
       </td>
-      <td data-label={columns[4]} className="num">
+      <td data-label={t(columns[4])} className="num">
         {when(stats, (st) => speed(st.mean))}
       </td>
-      <td data-label={columns[5]} className="num">
+      <td data-label={t(columns[5])} className="num">
         {when(stats?.standardDeviation, speed)}
       </td>
-      <td data-label={columns[6]} className="num">
+      <td data-label={t(columns[6])} className="num">
         {when(stats, (st) => speed(st.extremeSpread))}
       </td>
-      <td data-label={columns[7]} className="num">
-        {when(r.simulatedVelocity, speed) || 'no step'}
+      <td data-label={t(columns[7])} className="num">
+        {when(r.simulatedVelocity, speed) || t('no step')}
       </td>
-      <td data-label={columns[8]} className="num">
+      <td data-label={t(columns[8])} className="num">
         {when(r.velocityDifference, speed)}
       </td>
-      <td data-label={columns[9]} className="num">
+      <td data-label={t(columns[9])} className="num">
         {when(r.differencePercent, (x) => `${formatNumber(x, 1)} %`)}
       </td>
     </tr>
@@ -257,39 +270,36 @@ export function Measurements({
   sessions: SessionRecord[]
   setSessions: Dispatch<SetStateAction<SessionRecord[]>>
 }) {
+  const { t, tn } = useTranslation()
   const { manufacturerRef, manufacturerName, sessionRefCount } = useResult()
   const [unit, setUnit] = useState<VelocityUnit | ''>('')
-  const [error, setError] = useState('')
-  const [status, setStatus] = useState('')
+  const [failures, setFailures] = useState<Failure[]>([])
+  const [read, setRead] = useState<{ name: string; strings: number }[]>([])
   const reserved = useRef(0)
 
   async function readFiles(files: File[]) {
-    setError('')
-    setStatus('')
-    const read: SessionRecord[] = []
-    const failed: string[] = []
+    setFailures([])
+    setRead([])
+    const added: SessionRecord[] = []
+    const failed: Failure[] = []
     // a maker named by several files is one reference, a new one is stored once
     const makers = new Map<string, string | undefined>()
     // a load names up to maxSessions sessions; the slots of reads still running are taken
     const room = Math.max(0, maxSessions - sessionRefCount - reserved.current)
     const taken = files.slice(0, room)
     reserved.current += taken.length
-    for (const file of files.slice(room))
-      failed.push(`${file.name}: a load keeps ${maxSessions} sessions at most.`)
+    for (const file of files.slice(room)) failed.push({ file: file.name, tooMany: true })
     for (const file of taken) {
       try {
-        read.push(await readSession(file, unit, steps, makers, manufacturerRef))
+        added.push(await readSession(file, unit, steps, makers, manufacturerRef))
       } catch (err) {
-        failed.push(`${file.name}: ${errorText(err)}`)
+        failed.push({ file: file.name, message: errorText(err) })
       }
     }
-    setSessions((s) => [...s, ...read])
+    setSessions((s) => [...s, ...added])
     reserved.current -= taken.length
-    if (read.length > 0)
-      setStatus(
-        `Read ${read.map((r) => `${r.name}, ${r.data.strings.length} strings`).join('; ')}.`,
-      )
-    if (failed.length > 0) setError(failed.join(' '))
+    setRead(added.map((r) => ({ name: r.name, strings: r.data.strings.length })))
+    setFailures(failed)
   }
 
   const charge = (kg: number) => withUnit('charge', system, kg)
@@ -328,18 +338,22 @@ export function Measurements({
     )
   }
 
+  const [before = '', after = ''] = t(
+    'Velocities shot without a network are entered on the {page} page.',
+    { page: '{page}' },
+  ).split('{page}')
   let table: ReactNode = null
   if (plotted.some((p) => p.rows.length > 0))
     table = (
       <PanelTable
-        label="Measured against simulated velocity"
+        label={t('Measured against simulated velocity')}
         className="limits"
         caption={
           <>
-            {tableName} ({v.symbol})
+            {t(tableName)} ({v.symbol})
           </>
         }
-        columns={columns}
+        columns={columns.map((c) => t(c))}
       >
         {plotted.flatMap(({ s, shape, rows }, k) =>
           rows.map((r) => (
@@ -359,8 +373,14 @@ export function Measurements({
 
   const excluded = plotted.flatMap(({ s, rows }) =>
     rows.flatMap((r) =>
-      r.excludedShots.map(
-        (e) => `${s.name}, ${charge(r.charge)}: ${speed(e.velocity)} ${v.symbol}, ${e.reason}`,
+      r.excludedShots.map((e) =>
+        t('{origin}, {charge}: {speed} {unit}, {reason}', {
+          origin: s.name,
+          charge: charge(r.charge),
+          speed: speed(e.velocity),
+          unit: v.symbol,
+          reason: translateMessage(e.reason, t),
+        }),
       ),
     ),
   )
@@ -383,59 +403,87 @@ export function Measurements({
   return (
     <div className="measurements">
       <p className="note">
-        Sessions are kept in this browser and the saved load names them; a load file or copied link
-        does not carry their shots. Velocities shot without a network are entered on the{' '}
-        <Link href="/range">Range mode</Link> page. Chronograph velocities are not corrected to the
-        muzzle
-        {distances.length > 0 ? `; measured at ${distances.join(', ')} from the muzzle` : ''}.
+        {t(
+          'Sessions are kept in this browser and the saved load names them; a load file or copied link does not carry their shots.',
+        )}{' '}
+        {before}
+        <Link href="/range">{t('Range mode')}</Link>
+        {after}{' '}
+        {distances.length > 0
+          ? t(
+              'Chronograph velocities are not corrected to the muzzle; measured at {distances} from the muzzle.',
+              { distances: distances.join(', ') },
+            )
+          : t('Chronograph velocities are not corrected to the muzzle.')}
       </p>
       <ChronoFileInput
         id={`${idPrefix}-file`}
         unitId={`${idPrefix}-unit`}
-        label="Chronograph files, one series each"
+        label={t('Chronograph files, one series each')}
         multiple
         unit={unit}
         onUnit={setUnit}
         onFiles={readFiles}
       />
-      <p role="status">{status}</p>
-      {error && <ErrorNote title="The file was not read.">{error}</ErrorNote>}
+      <p role="status">
+        {read.length > 0 &&
+          t('Read {list}.', {
+            list: read
+              .map((r) =>
+                tn(r.strings, '{name}, {count} string', '{name}, {count} strings', {
+                  name: r.name,
+                }),
+              )
+              .join('; '),
+          })}
+      </p>
+      {failures.length > 0 && (
+        <ErrorNote title={t('The file was not read.')}>
+          {failures.map((f) => failureText(f, t)).join(' ')}
+        </ErrorNote>
+      )}
       {sessions.length === 0 && (
         <p className="prompt empty-state">
-          Read a chronograph file to compare its strings with the simulated velocity per charge.
-          Nothing is sent; the file is read in this browser.
+          {t(
+            'Read a chronograph file to compare its strings with the simulated velocity per charge. Nothing is sent; the file is read in this browser.',
+          )}
         </p>
       )}
       {sessions.length > 0 && !steps && (
         <p className="prompt empty-state">
-          Run the simulation, with a charge ladder for several charges, to map the strings to
-          charges.
+          {t(
+            'Run the simulation, with a charge ladder for several charges, to map the strings to charges.',
+          )}
         </p>
       )}
       {table}
       {table &&
         (curve.length < 2 ? (
-          <p className="note">The chart needs a charge ladder of two steps or more.</p>
+          <p className="note">{t('The chart needs a charge ladder of two steps or more.')}</p>
         ) : (
           <figure className="measurements-chart">
             <LineChart
               x={curve.map((s) => system.charge.fromSi(s.charge))}
               y={curve.map((s) => v.fromSi(s.muzzleVelocity ?? 0))}
-              xLabel={`Charge (${system.charge.symbol})`}
-              yLabel={`Velocity (${v.symbol})`}
-              title={chartName}
-              description={`The line is the simulated muzzle velocity of the ladder steps; each series' measured mean is a marker with a bar of one standard deviation, excluded shots are crosses. The table "${tableName}" gives the values.`}
+              xLabel={t('Charge ({unit})', { unit: system.charge.symbol })}
+              yLabel={t('Velocity ({unit})', { unit: v.symbol })}
+              title={t(chartName)}
+              description={t(
+                'The line is the simulated muzzle velocity of the ladder steps; each series\' measured mean is a marker with a bar of one standard deviation, excluded shots are crosses. The table "{table}" gives the values.',
+                { table: t(tableName) },
+              )}
               include={marks.map((ms) => v.fromSi(ms))}
             >
               <Marks series={drawn} system={system} />
             </LineChart>
-            <ul className="chart-legend" aria-label="Chart legend">
+            <ul className="chart-legend" aria-label={t('Chart legend')}>
               <li>
-                <span className="legend-line" aria-hidden="true" /> Simulated muzzle velocity
+                <span className="legend-line" aria-hidden="true" /> {t('Simulated muzzle velocity')}
               </li>
               {drawn.map(({ s, shape }, k) => (
                 <li key={s.id}>
-                  <LegendShape shape={shape} k={k} /> {s.name}: measured mean, bar one SD
+                  <LegendShape shape={shape} k={k} />{' '}
+                  {t('{name}: measured mean, bar one SD', { name: s.name })}
                 </li>
               ))}
               {excluded.length > 0 && (
@@ -443,7 +491,7 @@ export function Measurements({
                   <svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true">
                     <path className="excluded-mark" d="M3 3l8 8m0 -8l-8 8" />
                   </svg>{' '}
-                  Excluded shot
+                  {t('Excluded shot')}
                 </li>
               )}
             </ul>
@@ -455,16 +503,16 @@ export function Measurements({
       />
       {excluded.length > 0 && (
         <>
-          <h3>Excluded shots</h3>
+          <h3>{t('Excluded shots')}</h3>
           <ul>
-            {excluded.map((t, k) => (
+            {excluded.map((text, k) => (
               // biome-ignore lint/suspicious/noArrayIndexKey: shots keep the file order and may repeat
-              <li key={k}>{t}</li>
+              <li key={k}>{text}</li>
             ))}
           </ul>
         </>
       )}
-      {sessions.length > 0 && <h3>Strings and charges</h3>}
+      {sessions.length > 0 && <h3>{t('Strings and charges')}</h3>}
       {plotted.map(({ s, shape }, k) => (
         <fieldset key={s.id} className="measured-series">
           <legend className="series-name">
@@ -472,7 +520,9 @@ export function Measurements({
           </legend>
           {s.data.strings.map((str, i) => {
             const label = str.label
-            const name = `String ${i + 1}${label ? `: ${label}` : ''}`
+            const name = label
+              ? t('String {n}: {label}', { n: i + 1, label })
+              : t('String {n}', { n: i + 1 })
             const at = stringCharge(str)
             const step =
               at === undefined ? undefined : runSteps.find((st) => Math.abs(st.charge - at) < 1e-7)
@@ -480,7 +530,9 @@ export function Measurements({
               // biome-ignore lint/suspicious/noArrayIndexKey: strings keep the file order and have no id
               <div key={i} className="field">
                 <label htmlFor={`${idPrefix}-series-${s.id}-${i}`}>
-                  {name} ({str.shots.length} shots)
+                  {tn(str.shots.length, '{name} ({count} shot)', '{name} ({count} shots)', {
+                    name,
+                  })}
                 </label>
                 <select
                   id={`${idPrefix}-series-${s.id}-${i}`}
@@ -488,14 +540,19 @@ export function Measurements({
                   disabled={!steps}
                   onChange={(e) => mapString(s.id, i, e.target.value)}
                 >
-                  <option value="">Not used</option>
+                  <option value="">{t('Not used')}</option>
                   {runSteps.map((st) => (
                     <option key={st.n} value={String(st.charge)}>
-                      Step {st.label ?? st.n}, {charge(st.charge)}
+                      {t('Step {step}, {charge}', {
+                        step: st.label ?? st.n,
+                        charge: charge(st.charge),
+                      })}
                     </option>
                   ))}
                   {at !== undefined && !step && (
-                    <option value={String(at)}>{charge(at)} (not in this run)</option>
+                    <option value={String(at)}>
+                      {t('{charge} (not in this run)', { charge: charge(at) })}
+                    </option>
                   )}
                 </select>
                 {(str.conditions || str.note) && (
@@ -512,7 +569,7 @@ export function Measurements({
             size={controlSize.row.button}
             onClick={() => setSessions((all) => all.filter((x) => x.id !== s.id))}
           >
-            Remove {s.name}
+            {t('Remove {name}', { name: s.name })}
           </Button>
         </fieldset>
       ))}

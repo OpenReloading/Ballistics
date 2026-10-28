@@ -1,7 +1,10 @@
 import { fillLoadRatioLimit, loadRatio, solidFill, solidFillLimit } from '@open-reloading/core'
 import { fromSi, sheetId, toSi } from '@open-reloading/schema'
 import { formatNumber } from '../i18n/number.ts'
+import { type Message, msg, type Say, type Translator } from '../i18n/translate.ts'
 import type { InteriorResponse } from './api-types.ts'
+import type { WarningCode } from './core-message-table.ts'
+import { translateMessage } from './core-messages.ts'
 import type { LadderDirection } from './seating-ladder.ts'
 import { formatQuantity, inchText, type UnitSystem } from './units.ts'
 
@@ -36,17 +39,28 @@ export function solidFillWarning(
   density: number,
   bulkDensity: number | undefined,
   volume: number,
+  t: Translator['t'],
 ) {
   const fill = solidFill(charge, density, volume)
   if (!(fill > solidFillLimit)) return
   const ratio = loadRatio(charge, bulkDensity, volume)
-  const over =
-    ratio === undefined || bulkDensity === undefined
-      ? `solid fill ${formatNumber(fill, 2)} is above ${solidFillLimit}`
-      : `load ratio ${formatNumber(ratio, 2)} is above ${formatNumber(fillLoadRatioLimit(density, bulkDensity), 2)}, solid fill ${solidFillLimit} for this powder`
+  const limit = solidFillLimit
   return {
-    text: `Simulation: ${over}; the model is outside the range it was built for.`,
-    name: `solid fill above ${solidFillLimit}`,
+    text:
+      ratio === undefined || bulkDensity === undefined
+        ? t(
+            'Simulation: solid fill {fill} is above {limit}; the model is outside the range it was built for.',
+            { fill: formatNumber(fill, 2), limit },
+          )
+        : t(
+            'Simulation: load ratio {ratio} is above {max}, solid fill {limit} for this powder; the model is outside the range it was built for.',
+            {
+              ratio: formatNumber(ratio, 2),
+              max: formatNumber(fillLoadRatioLimit(density, bulkDensity), 2),
+              limit,
+            },
+          ),
+    name: t('solid fill above {limit}', { limit }),
   }
 }
 
@@ -74,24 +88,40 @@ export function resultTabsFit(widths: number[], room: number) {
   return widths.length
 }
 
-/** The run status: text, or a result's line (after `prefix`) written in the units shown now. */
-export type Status = string | { prefix: string }
+/**
+ * The run status: text, or a result's line (after `prefix`) written in the units shown now. A `say`
+ * is written in the language shown now, a plain string stays as it was written.
+ */
+export type Status = string | { say: Say } | { prefix: string | Say }
 
 /** The status text; `line` is the shown result's line in the units shown now, undefined without a result. */
-export const statusText = (status: Status, line: string | undefined) =>
-  typeof status === 'string' ? status : line === undefined ? '' : status.prefix + line
+export const statusText = (status: Status, line: string | undefined, t: Translator['t']) => {
+  const text = (x: string | Say) => (typeof x === 'string' ? x : x(t))
+  if (typeof status === 'string') return status
+  if ('say' in status) return status.say(t)
+  return line === undefined ? '' : text(status.prefix) + line
+}
 
-export function warningCountText(count: number) {
+export function warningCountText(count: number, tn: Translator['tn']) {
   if (count === 0) return ''
-  return `${count} simulation warning${count === 1 ? '' : 's'}`
+  return tn(count, '{count} simulation warning', '{count} simulation warnings')
 }
 
 /** Short names of the API's warning codes for the warnings summary; a code without one is not named. */
-const warningNames: Record<string, string> = {
-  noCartridge: 'no cartridge',
-  noComparableLimit: 'no comparable limit',
-  rangeIncomplete: 'range incomplete',
-  chargeTooSmall: 'charge too small for the model',
+const warningNames = {
+  limitExceeded: undefined,
+  noCartridge: msg('no cartridge'),
+  noComparableLimit: msg('no comparable limit'),
+  rangeIncomplete: msg('range incomplete'),
+  chargeTooSmall: msg('charge too small for the model'),
+  resistanceNotApplied: undefined,
+  loadRatioHigh: undefined,
+} satisfies Record<WarningCode, Message | undefined>
+
+/** The short name of a warning code, or undefined for a code without one. */
+function warningName(code: string, t: Translator['t']) {
+  const name = (warningNames as Record<string, Message | undefined>)[code]
+  return name && t(name)
 }
 
 /** A limit as shown with `d` decimals: in bar the record's value while it needs no more. */
@@ -137,22 +167,36 @@ function limitExceededText(
   l: Limit,
   pressure: number,
   system: UnitSystem,
+  t: Translator['t'],
 ): { text: string; name: string } {
   const u = system.pressure
   const range = body.pressureRange
   const name = `CIP ${l.symbol}${l.variant ? ` (${l.variant})` : ''}`
-  const source = `CIP (${[l.revised, l.method ?? 'measuring method not stated'].join(', ')})`
   const d = digitsAgainst([range.nominalPressure, range.highPressure], pressure, system)
-  const limit = `${name} ${limitNumber(pressure, system, d)} ${u.symbol}, source ${source}`
-  const at = (pa: number) => `${formatNumber(u.fromSi(pa), d)} ${u.symbol}`
+  const shown = {
+    name,
+    unit: u.symbol,
+    limit: limitNumber(pressure, system, d),
+    revised: l.revised,
+    method: translateMessage(l.method ?? 'measuring method not stated', t),
+    nominal: formatNumber(u.fromSi(range.nominalPressure), d),
+    low: formatNumber(u.fromSi(range.lowPressure), u.decimals),
+    high: formatNumber(u.fromSi(range.highPressure), d),
+  }
   return l.nominalExceeded
     ? {
-        text: `Simulated peak pressure ${at(range.nominalPressure)} (range ${formatNumber(u.fromSi(range.lowPressure), u.decimals)} to ${at(range.highPressure)}) is above ${limit}.`,
-        name: `above ${name}`,
+        text: t(
+          'Simulated peak pressure {nominal} {unit} (range {low} to {high} {unit}) is above {name} {limit} {unit}, source CIP ({revised}, {method}).',
+          shown,
+        ),
+        name: t('above {name}', { name }),
       }
     : {
-        text: `The upper end of the simulated peak pressure range, ${at(range.highPressure)}, is above ${limit}; the nominal value is ${at(range.nominalPressure)}.`,
-        name: `range above ${name}`,
+        text: t(
+          'The upper end of the simulated peak pressure range, {high} {unit}, is above {name} {limit} {unit}, source CIP ({revised}, {method}); the nominal value is {nominal} {unit}.',
+          shown,
+        ),
+        name: t('range above {name}', { name }),
       }
 }
 
@@ -166,6 +210,7 @@ function limitExceededText(
 export function shownWarnings(
   body: InteriorResponse,
   system: UnitSystem,
+  t: Translator['t'],
 ): { text: string; name?: string | undefined }[] {
   return body.warnings.map((w) => {
     const l =
@@ -180,8 +225,11 @@ export function shownWarnings(
           )
         : undefined
     if (l?.pressure === undefined || !l.exceeded)
-      return { text: convertBarMessage(w.message, system), name: warningNames[w.code] }
-    return limitExceededText(body, l, l.pressure, system)
+      return {
+        text: translateMessage(convertBarMessage(w.message, system), t),
+        name: warningName(w.code, t),
+      }
+    return limitExceededText(body, l, l.pressure, system, t)
   })
 }
 
@@ -209,13 +257,18 @@ export const mmLength = (system: UnitSystem, mm: number) =>
  * Why the range card is out of reach after a run: a missing bullet record at once; any other
  * reason once the Trajectory result has stayed away (`waited`), never during the wait for it.
  */
-export const rangeCardNote = (ran: boolean, bullet: string | undefined, waited: boolean) =>
+export const rangeCardNote = (
+  ran: boolean,
+  bullet: string | undefined,
+  waited: boolean,
+  t: Translator['t'],
+) =>
   !ran
     ? ''
     : !bullet
-      ? 'The range card needs a bullet record.'
+      ? t('The range card needs a bullet record.')
       : waited
-        ? 'The range card needs a Trajectory result: see the Trajectory tab.'
+        ? t('The range card needs a Trajectory result: see the Trajectory tab.')
         : ''
 
 /**
@@ -227,9 +280,10 @@ export function rangeHero(
   charge: number,
   velocity: number,
   label: string | undefined,
+  t: Translator['t'],
 ) {
   return {
-    step: label === undefined ? undefined : `Step ${label}`,
+    step: label === undefined ? undefined : t('Step {label}', { label }),
     charge: { value: formatQuantity('charge', system, charge), unit: system.charge.symbol },
     velocity: { value: formatQuantity('velocity', system, velocity), unit: system.velocity.symbol },
   }
@@ -254,23 +308,39 @@ export function resultBand(body: InteriorResponse, cornerOnly = false) {
 }
 
 /** What the sampled band of a result says: its reach, or why the corner-case range stands in (shown instead); undefined without one. */
-export function bandNotice(sampled: InteriorResponse['sampled']): string | undefined {
+export function bandNotice(
+  sampled: InteriorResponse['sampled'],
+  t: Translator['t'],
+): string | undefined {
   if (sampled === undefined) return
-  if (sampled.status === 'sampled') return 'input tolerances only'
-  return { overBudget: 'over budget', invalid: 'no valid draw', failed: 'not finished' }[
-    sampled.status
-  ]
+  if (sampled.status === 'sampled') return t('input tolerances only')
+  return t(
+    {
+      overBudget: msg('over budget'),
+      invalid: msg('no valid draw'),
+      failed: msg('not finished'),
+    }[sampled.status],
+  )
 }
 
 /**
  * The line under the key tiles of a result with a sampling answer: the velocity band and what the
  * bands cover, or why the corner-case range is shown instead; undefined without a sampling answer.
  */
-export function bandLine(body: InteriorResponse, system: UnitSystem): string | undefined {
-  const notice = bandNotice(body.sampled)
+export function bandLine(
+  body: InteriorResponse,
+  system: UnitSystem,
+  t: Translator['t'],
+): string | undefined {
+  const notice = bandNotice(body.sampled, t)
   if (notice === undefined) return
   const { velocity } = resultBand(body)
-  if (!velocity) return `Sampled bands ${notice}: corner-case range shown.`
+  if (!velocity) return t('Sampled bands {notice}: corner-case range shown.', { notice })
   const v = (si: number) => formatQuantity('velocity', system, si)
-  return `Velocity ${v(velocity.low)} to ${v(velocity.high)} ${system.velocity.symbol}. 5th to 95th percentile, ${notice}.`
+  return t('Velocity {low} to {high} {unit}. 5th to 95th percentile, {notice}.', {
+    low: v(velocity.low),
+    high: v(velocity.high),
+    unit: system.velocity.symbol,
+    notice,
+  })
 }
