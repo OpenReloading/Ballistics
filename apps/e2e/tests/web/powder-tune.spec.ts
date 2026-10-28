@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
+import { problems } from './a11y.ts'
 import { barButton } from './bar.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
@@ -68,7 +69,36 @@ const ladder = [
   ),
 ].join('\n')
 
-test('the Measurements link of a saved load fits the powder on the load the workbench runs', async ({
+/**
+ * Milliseconds from each of `moves` arrow key presses on the first hand-tuning slider to the
+ * redraw of the curve, measured in the page; half the moves go right, then back left.
+ */
+const redrawTimes = (page: Page, moves: number) =>
+  page.evaluate(async (n) => {
+    const thumb = document.querySelector('.hand-tune [role="slider"]')
+    const curve = document.querySelector('.tune-chart .curve')
+    if (!thumb || !curve) throw new Error('no slider or curve')
+    const times: number[] = []
+    for (let i = 0; i < n; i++) {
+      const before = curve.getAttribute('points')
+      const t0 = performance.now()
+      const redrawn = new Promise<void>((done) => {
+        const o = new MutationObserver(() => {
+          if (curve.getAttribute('points') === before) return
+          o.disconnect()
+          done()
+        })
+        o.observe(curve, { attributes: true })
+      })
+      const key = i < n / 2 ? 'ArrowRight' : 'ArrowLeft'
+      thumb.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }))
+      await redrawn
+      times.push(performance.now() - t0)
+    }
+    return times
+  }, moves)
+
+test('the Measurements link of a saved load fits the powder on the load the workbench runs, and its sliders tune it by hand', async ({
   page,
 }) => {
   await page.goto('/workbench')
@@ -83,8 +113,28 @@ test('the Measurements link of a saved load fits the powder on the load the work
   await page.getByRole('link', { name: 'Fit a powder from these strings' }).click()
   await expect(page).toHaveURL(/\/powders\/tune\/?\?session=/)
   await expect(table(page).locator('tbody tr')).toHaveCount(5)
-  await expect(page.getByText(/^Fitted vivacity: /)).toBeVisible({ timeout: 60_000 })
+  await expect(page.getByRole('table', { name: 'Fitted values' })).toBeVisible({ timeout: 60_000 })
   await expect(page.getByText('Save the load to fit a powder from its strings.')).toHaveCount(0)
+
+  const hand = page.getByRole('group', { name: 'Hand tuning' })
+  const mark = hand.getByText('Hand-tuned', { exact: true })
+  const back = hand.getByRole('button', { name: 'Back to the fit' })
+  await expect(mark).toHaveCount(0)
+  await expect(back).toBeDisabled()
+  await hand.getByRole('slider', { name: 'Vivacity' }).focus()
+  await page.keyboard.press('ArrowRight')
+  await expect(mark).toBeVisible()
+  await expect(
+    hand.getByText('Hand-tuned values are yours, not a fit. Simulation, not load data.'),
+  ).toBeVisible()
+  expect(await problems(page, 'powder tune, hand-tuned', '.hand-tune')).toEqual([])
+
+  const times = (await redrawTimes(page, 30)).sort((a, b) => a - b)
+  expect(times[15]).toBeLessThanOrEqual(100)
+
+  await back.click()
+  await expect(mark).toHaveCount(0)
+  await expect(back).toBeDisabled()
 })
 
 test('the powder designer links to the tuning route', async ({ page }) => {

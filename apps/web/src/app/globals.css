@@ -11628,6 +11628,20 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
   }
 }
 
+.hand-tune {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 40rem;
+  margin: 0.5rem 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  justify-items: stretch;
+}
+
+.hand-tune > button {
+  justify-self: start;
+}
+
 .tune-chart {
   width: 100%;
   max-width: 40rem;

@@ -1,3 +1,4 @@
+import { MantineProvider } from '@mantine/core'
 import {
   type ChronographString,
   type InteriorLoad,
@@ -10,7 +11,7 @@ import { describe, expect, it } from 'vitest'
 import { reasonTexts, TuneNotes } from '../src/components/powder-tune.tsx'
 import { nth } from '../src/lib/nth.ts'
 import type { PowderFitReply, PowderFitState } from '../src/lib/powder-fit.ts'
-import { answerPowderFit } from '../src/lib/powder-fit-answer.ts'
+import { answerPowderFit, handCurve, handLoad } from '../src/lib/powder-fit-answer.ts'
 import { presetUnits, withUnit } from '../src/lib/units.ts'
 
 /** Synthetic rifle load of the core fit tests: truth vivacity 0.45 1/s. */
@@ -51,7 +52,9 @@ if (fitted?.kind !== 'fit' || ranged?.kind !== 'range') throw new Error('no fit'
 
 const text = (state: PowderFitState) =>
   renderToStaticMarkup(
-    <TuneNotes loaded={undefined} interior={load(0.38)} fit={state} />,
+    <MantineProvider>
+      <TuneNotes loaded={undefined} interior={load(0.38)} fit={state} />
+    </MantineProvider>,
   ).replaceAll('&#x27;', "'")
 
 describe('the result view of the tuning route', () => {
@@ -97,5 +100,46 @@ describe('the result view of the tuning route', () => {
 
   it('shows no band line before the fit has arrived', () => {
     expect(text({ running: true })).not.toContain('Band:')
+  })
+})
+
+describe('hand tuning', () => {
+  const [p] = fitted.fit.parameters
+  const u = p?.standardUncertainty
+  if (!p || !u) throw new Error('no fitted vivacity')
+  const charges = fitted.band.map((b) => b.charge)
+
+  it('runs interior on the fitted load at the slider values', () => {
+    const vivacity = p.value + 1.5 * u
+    const curve = handCurve({ fit: fitted.fit, values: [vivacity], charges })
+    expect(curve.length).toBeGreaterThan(charges.length / 2)
+    for (const { charge, velocity } of curve) {
+      const fl = fitted.fit.load
+      const r = interior({
+        ...fl,
+        charge,
+        propellant: { ...fl.propellant, burn: { ...fl.propellant.burn, vivacity } },
+      })
+      if (!r.valid) throw new Error(r.reason)
+      expect(velocity).toBe(r.muzzleVelocity)
+    }
+  })
+
+  it('scales the fitted load by the ratio of a factor to its fitted value', () => {
+    const fit = {
+      load: load(),
+      parameters: [{ name: 'volumeFactor' as const, initial: 1, value: 1.1 }],
+    }
+    expect(handLoad(fit, [1.21]).chamber.volume).toBeCloseTo(load().chamber.volume * 1.1, 15)
+  })
+
+  it('names each slider thumb and starts at the fit, not hand-tuned', () => {
+    const html = text({ fit: fitted, range: ranged, running: false })
+    expect(html).toContain('<legend>Hand tuning</legend>')
+    expect(html.match(/role="slider"/g)).toHaveLength(1)
+    expect(html).toContain('aria-label="Vivacity"')
+    expect(html).toContain('aria-valuenow="0"')
+    expect(html).not.toContain('Hand-tuned')
+    expect(html).toMatch(/<button[^>]*disabled=""[^>]*>.*Back to the fit/)
   })
 })

@@ -3627,5 +3627,10 @@
   "Unfired {charge} (above the ladder): {velocity}, {level} % interval {lower} to {upper}": "Nicht geschossen {charge} (oberhalb der Ladeleiter): {velocity}, {level} %-Intervall {lower} bis {upper}",
   "Unfired {charge} (below the ladder): {velocity}, {level} % interval {lower} to {upper}": "Nicht geschossen {charge} (unterhalb der Ladeleiter): {velocity}, {level} %-Intervall {lower} bis {upper}",
   "Unfired {charge} (inside the ladder): {velocity}, {level} % interval {lower} to {upper}": "Nicht geschossen {charge} (innerhalb der Ladeleiter): {velocity}, {level} %-Intervall {lower} bis {upper}",
-  "Weak prior": "Schwacher Prior"
+  "Weak prior": "Schwacher Prior",
+  "{name}: {value}": "{name}: {value}",
+  "Back to the fit": "Zurück zur Anpassung",
+  "Hand tuning": "Abstimmung von Hand",
+  "Hand-tuned": "Von Hand abgestimmt",
+  "Hand-tuned values are yours, not a fit. Simulation, not load data.": "Von Hand abgestimmte Werte sind Ihre eigenen, keine Anpassung. Simulation, keine Ladedaten."
 }

@@ -1,3 +1,4 @@
+import { MantineProvider } from '@mantine/core'
 import type { PowderFit } from '@open-reloading/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
@@ -16,7 +17,11 @@ const fitted = {
 } as unknown as { kind: 'fit'; id: number; fit: PowderFit; band: [] }
 
 const text = (props: Parameters<typeof TuneNotes>[0]) =>
-  renderToStaticMarkup(<TuneNotes {...props} />)
+  renderToStaticMarkup(
+    <MantineProvider>
+      <TuneNotes {...props} />
+    </MantineProvider>,
+  )
 
 describe('the notes of the tuning route', () => {
   it('asks to save an unsaved load and runs no fit', () => {

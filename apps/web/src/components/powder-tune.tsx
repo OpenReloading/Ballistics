@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, Group, TextInput } from '@mantine/core'
+import { Badge, Button, Group, Slider, Text, TextInput } from '@mantine/core'
 import type {
   InteriorLoad,
   PowderConfidenceReason,
@@ -33,7 +33,7 @@ import { TuneChart } from './powder-tune-chart.tsx'
 import { PanelTable } from './scroll-region.tsx'
 import { ErrorNote, Message } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
-import { usePowderFit } from './use-powder-fit.ts'
+import { useHandCurve, usePowderFit } from './use-powder-fit.ts'
 
 /** The stored sessions `ids` that are valid session records, in order; a missing one is left out. */
 async function readSessions(ids: string[]) {
@@ -81,6 +81,9 @@ const endTexts = {
   ),
 }
 
+/** Slider step, standard uncertainties; each slider spans 3 of them either side of the fit. */
+const step = 0.05
+
 /**
  * The fit's result: fitted values with their intervals, the residual per string, the curve and
  * band with the band's numbers at both ends, then the pressure range's label and its reasons.
@@ -104,6 +107,27 @@ function FitResult({ state, rows }: { state: PowderFitState; rows: readonly Char
   const residuals = (fit?.fit.residuals ?? [])
     .filter((r) => r.kind === 'velocity')
     .sort((a, b) => a.charge - b.charge)
+  // the offsets from the fit, standard uncertainties per fitted value, of the fit answer `id`
+  const [hand, setHand] = useState<{ id: number; z: number[] }>()
+  const tuned = fit && hand?.id === fit.id ? hand.z : undefined
+  const values = useMemo(
+    () =>
+      tuned &&
+      fit?.fit.parameters.map((p, k) => p.value + (tuned[k] ?? 0) * (p.standardUncertainty ?? 0)),
+    [fit, tuned],
+  )
+  const handQuery = useMemo(
+    () =>
+      fit && values
+        ? {
+            fit: { load: fit.fit.load, parameters: fit.fit.parameters },
+            values,
+            charges: fit.band.map((p) => p.charge),
+          }
+        : undefined,
+    [fit, values],
+  )
+  const curve = useHandCurve(handQuery)
   return (
     <>
       <div role="status" className="powder-fit-state">
@@ -188,7 +212,59 @@ function FitResult({ state, rows }: { state: PowderFitState; rows: readonly Char
               </tr>
             ))}
           </PanelTable>
-          <TuneChart band={band} ladder={fit.fit.chargeRange} rows={rows} system={system} />
+          <fieldset className="hand-tune">
+            <legend>{t('Hand tuning')}</legend>
+            {fit.fit.parameters.map((p, k) => {
+              const u = p.standardUncertainty
+              if (!u) return null
+              const id = `hand-${p.name}`
+              return (
+                <div key={p.name}>
+                  <Text component="label" fz="sm" htmlFor={id}>
+                    {t('{name}: {value}', {
+                      name: t(parameterNames[p.name].name),
+                      value: value(p.name, values?.[k] ?? p.value),
+                    })}
+                  </Text>
+                  <Slider
+                    id={id}
+                    thumbLabel={t(parameterNames[p.name].name)}
+                    thumbValueText={(z) => value(p.name, p.value + z * u)}
+                    // no lower end at or below 0: 5 % of the fitted value at least
+                    min={Math.max(-3, Math.ceil((-19 * p.value) / u) / 20)}
+                    max={3}
+                    step={step}
+                    label={null}
+                    value={tuned?.[k] ?? 0}
+                    onChange={(z) =>
+                      setHand({
+                        id: fit.id,
+                        z: fit.fit.parameters.map((_, j) => (j === k ? z : (tuned?.[j] ?? 0))),
+                      })
+                    }
+                  />
+                </div>
+              )
+            })}
+            {tuned && (
+              <p className="note">
+                <Badge variant="light" mr="xs">
+                  {t('Hand-tuned')}
+                </Badge>
+                {t('Hand-tuned values are yours, not a fit. Simulation, not load data.')}
+              </p>
+            )}
+            <Button variant="default" disabled={!tuned} onClick={() => setHand(undefined)}>
+              {t('Back to the fit')}
+            </Button>
+          </fieldset>
+          <TuneChart
+            band={band}
+            curve={curve}
+            ladder={fit.fit.chargeRange}
+            rows={rows}
+            system={system}
+          />
           {ends.map((p) => (
             <p key={p.charge} className="note band-end">
               {t(endTexts[p.extrapolation?.charge ?? 'inside'], {

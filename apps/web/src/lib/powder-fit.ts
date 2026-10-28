@@ -29,6 +29,24 @@ export type PowderFitReply =
   | { kind: 'refused'; id: number; reason: PowderFitReason; charge?: number | undefined }
   | { kind: 'error'; id: number; message: string }
 
+/**
+ * A hand-tuned curve the tuning screen asks for: the fitted load at `values`, one per parameter
+ * of `fit` in its order, run at `charges`, kg.
+ */
+export interface PowderHandRequest {
+  kind: 'hand'
+  id: number
+  fit: Pick<PowderFit, 'load' | 'parameters'>
+  values: number[]
+  charges: number[]
+}
+
+/** A point of a hand-tuned curve: charge, kg, and muzzle velocity, m/s. */
+export type HandPoint = { charge: number; velocity: number }
+
+/** The worker's answer to a hand-tuned request: the charges that ran, in order. */
+export type PowderHandReply = { kind: 'curve'; id: number; curve: HandPoint[] }
+
 /** What the screen shows of the last request: each part once it has arrived. */
 export interface PowderFitState {
   fit?: Extract<PowderFitReply, { kind: 'fit' }>

@@ -2,6 +2,7 @@ import type { PowderPrediction } from '@open-reloading/core'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
 import type { ChargeRow } from '../lib/measurements.ts'
+import type { HandPoint } from '../lib/powder-fit.ts'
 import { niceTicks, tickDecimals } from '../lib/ticks.ts'
 import type { UnitSystem } from '../lib/units.ts'
 
@@ -11,15 +12,18 @@ const m = { l: 48, r: 10, t: 8, b: 32 }
 
 /**
  * Muzzle velocity against charge: the ladder's charge range shaded, the band and the curve of the
- * fit, and each charge's measured mean with one SD. Drawn as plain SVG, so the route loads no chart library.
+ * fit (the hand-tuned `curve` in its place when given), and each charge's measured mean with one
+ * SD. Drawn as plain SVG, so the route loads no chart library.
  */
 export function TuneChart({
   band,
+  curve = band.map((p) => ({ charge: p.charge, velocity: p.velocity.value })),
   ladder,
   rows,
   system,
 }: {
   band: readonly PowderPrediction[]
+  curve?: readonly HandPoint[] | undefined
   ladder: { min: number; max: number }
   rows: readonly ChargeRow[]
   system: UnitSystem
@@ -31,6 +35,7 @@ export function TuneChart({
   const xs = [...band.map((p) => p.charge), ...measured.map((r) => r.charge)].map(c.fromSi)
   const ys = [
     ...band.flatMap((p) => [p.velocity.lower, p.velocity.upper]),
+    ...curve.map((p) => p.velocity),
     ...measured.flatMap(({ velocityStats: s }) =>
       s ? [s.mean - (s.standardDeviation ?? 0), s.mean + (s.standardDeviation ?? 0)] : [],
     ),
@@ -82,10 +87,7 @@ export function TuneChart({
           ...[...band].reverse().map((p) => at(p.charge, p.velocity.lower)),
         ].join(' ')}
       />
-      <polyline
-        className="curve"
-        points={band.map((p) => at(p.charge, p.velocity.value)).join(' ')}
-      />
+      <polyline className="curve" points={curve.map((p) => at(p.charge, p.velocity)).join(' ')} />
       {measured.map(({ charge, velocityStats: s }) =>
         s ? (
           <g key={charge} className="measured">
