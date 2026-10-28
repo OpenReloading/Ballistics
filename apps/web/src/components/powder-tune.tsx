@@ -2,7 +2,7 @@
 
 import { Button, Group, TextInput } from '@mantine/core'
 import { chronoSession, type SessionRecord } from '@open-reloading/schema'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber, parseNumber } from '../i18n/number.ts'
 import { msg } from '../i18n/translate.ts'
@@ -18,6 +18,7 @@ import { PageBar } from './page-bar.tsx'
 import { PanelTable } from './scroll-region.tsx'
 import { ErrorNote } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
+import { usePowderFit } from './use-powder-fit.ts'
 
 /** The stored sessions `ids` that are valid session records, in order; a missing one is left out. */
 async function readSessions(ids: string[]) {
@@ -47,7 +48,10 @@ export function PowderTune() {
   const c = system.charge
   const v = system.velocity
   const speed = (ms: number) => formatNumber(v.fromSi(ms), 1)
-  const rows = chargeRows([...loaded, ...added], [])
+  const strings = useMemo(() => [...loaded, ...added], [loaded, added])
+  const rows = chargeRows(strings, [])
+  // shortcut: the screen has no load yet, so the fit never runs; pass the load once the route has one
+  usePowderFit(undefined, strings)
 
   function add() {
     const charge = parseNumber(form.charge, { min: 0 })
