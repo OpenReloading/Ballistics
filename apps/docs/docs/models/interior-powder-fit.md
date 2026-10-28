@@ -280,6 +280,17 @@ The tuning screen of the web app fits the strings a user recorded or typed. Each
 
 Code: `apps/web/src/lib/powder-fit.ts`, `temperatureFit`, `withSensitivity`; `apps/web/src/lib/powder-fit-answer.ts`, `answerPowderFit`; `apps/web/src/lib/powder-save.ts`, `fittedPowder`.
 
+Two rules of the screen can fit fewer values than the request names. A value they leave out keeps the value of the input load, and the screen says which rule applied.
+
+| Rule | When | Fitted |
+| --- | --- | --- |
+| Thin ladder | fewer than 3 distinct charges, or the largest charge less than 10 % above the smallest | the request without the start pressure and the volume factor |
+| Held fit | the fitted start pressure or volume factor correlates with the burn coefficient beyond 0.9 in magnitude, the limit of the confidence rule `start-pressure-correlated` | the burn coefficient alone, fitted again |
+
+On 2 charges every extra value moves with the burn coefficient, so the screen offers to try the other values anyway, which lifts both rules. Hand tuning gives each fitted value with a standard uncertainty a slider of 3 standard uncertainties either side of the fitted value, in steps of 0.05; the lower end stays at 5 % of the fitted value or above. The sliders move the shown values and the curve of the chart; the band and the pressure range stay those of the fit. Save as a powder stores the fitted values, never the hand-tuned ones.
+
+Code: `apps/web/src/lib/powder-fit-answer.ts`, `thinRule`, `heldFit`; `packages/core/src/interior/fit-confidence.ts`, `powderConfidenceRules`; `apps/web/src/components/powder-tune.tsx`, `FitResult`, `SaveFit`.
+
 The values describe the rifle's barrels, the lot and the temperatures of the sessions. A fitted energy absorbs every fixed input that moves the velocity with the barrel length (see Identifiability), and a fitted temperature factor absorbs the effect of the initial temperature on the gas energy, which the model does not have. Neither is a property of the powder to carry to another load, and the result is a simulation parameter, not load data.
 
 ### Failures
