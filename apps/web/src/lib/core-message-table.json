@@ -153,6 +153,12 @@
       "barrelLength must be positive",
       "propellantTemperature must be positive",
       "peakPressure and pressureSigma together",
+      "peakPressure and pressureBasis together",
+      "pressureBasis must be one of {list}",
+      "domainMargin must lie in [0, 1)",
+      "boreDiameter must be positive",
+      "the powder has no interior model",
+      "the bore resistance of the powder needs {list}",
       "velocitySigma on all points or none",
       "pressures need velocity sigmas",
       "parameters: {list}, each at most once",
@@ -208,7 +214,10 @@
       "shot coordinates must be finite",
       "shot velocity must be finite",
       "aim must be finite",
-      "coverage must lie in (0, 1)"
+      "coverage must lie in (0, 1)",
+      "velocities must be finite",
+      "relative half-width must be at least 0.01",
+      "relative half-width needs more shots than the search covers"
     ],
     "atmosphere, moving target, outline drag, stability": [
       "altitude {n} m outside {low} to {high} m",
