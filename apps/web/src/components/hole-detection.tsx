@@ -237,7 +237,7 @@ export function useHoleDetection({
     setRecord(undefined)
     if (faceId) fetchFace(faceId).then(setRecord, () => {})
   }, [faceId])
-  const { candidates, caliber, setCaliber } = useCaliberCandidates(group, size?.diameter)
+  const { candidates, caliber, setCaliber } = useCaliberCandidates(group, size)
   useEffect(() => {
     if (tool !== 'region') setPending([])
   }, [tool])
@@ -784,8 +784,8 @@ export function useHoleDetection({
       candidates={candidates}
       caliber={caliber}
       onCaliber={(c) => {
-        setCaliber(c.id)
-        if (!size) commitHoleSize(c.diameter)
+        setCaliber(c)
+        commitHoleSize(c.diameter)
       }}
       onAccept={() => take(proposals)}
     />
@@ -816,12 +816,15 @@ export function useHoleDetection({
 }
 
 /**
- * The caliber candidates of the group (`caliberCandidates`) and the class picked, else the one
- * preselected; loaded for each group, face and event.
+ * The caliber candidates of the group (`caliberCandidates`) and the class picked while the hole
+ * size is its diameter, else the one preselected; loaded for each group, face and event.
  */
-function useCaliberCandidates(group: ShotGroup | undefined, hole: number | undefined) {
+function useCaliberCandidates(
+  group: ShotGroup | undefined,
+  hole: { diameter: number; source: string } | undefined,
+) {
   const [classes, setClasses] = useState<{ list: CandidateClass[]; mine: ReadonlySet<string> }>()
-  const [picked, setCaliber] = useState<string>()
+  const [picked, setCaliber] = useState<CandidateClass>()
   const face = group?.face
   // biome-ignore lint/correctness/useExhaustiveDependencies: on another group, face or event only
   useEffect(() => {
@@ -842,7 +845,12 @@ function useCaliberCandidates(group: ShotGroup | undefined, hole: number | undef
     hole,
     classes?.mine ?? new Set(),
   )
-  return { candidates, caliber: picked ?? preselected, setCaliber }
+  const kept = picked && picked.diameter === hole?.diameter ? picked : undefined
+  return {
+    candidates,
+    caliber: kept ?? candidates.find((c) => c.id === preselected),
+    setCaliber,
+  }
 }
 
 /** The marked region, else the face, else the whole turned photo. */
@@ -1055,8 +1063,8 @@ function ResultLine({
   /** The caliber classes of the discipline, the likeliest first. */
   candidates: readonly CandidateClass[]
   /** The class picked or preselected; none while two share the hole size. */
-  caliber: string | undefined
-  /** Picks a class; without a hole size its diameter becomes the hole size. */
+  caliber: CandidateClass | undefined
+  /** Picks a class: its nominal diameter becomes the hole size. */
   onCaliber: (c: CandidateClass) => void
   onAccept: () => void
 }) {
@@ -1066,9 +1074,11 @@ function ResultLine({
   // only a bullet names a caliber: a hole in paper measures smaller than its bullet
   const caliber =
     size &&
-    (size.source === 'bullet'
-      ? `${commonCaliber(fromSi('length', size.diameter))} (${diameter})`
-      : `${diameter} (${t(sourceNames[size.source])})`)
+    (picked?.diameter === size.diameter
+      ? `${picked.name} (${diameter})`
+      : size.source === 'bullet'
+        ? `${commonCaliber(fromSi('length', size.diameter))} (${diameter})`
+        : `${diameter} (${t(sourceNames[size.source])})`)
   const item = (label: string, value: string, change: string, onChange: () => void) => (
     <div className="prop-row detect-wide">
       <span className="prop-label">{label}</span>
@@ -1125,8 +1135,8 @@ function ResultLine({
               <Button
                 key={c.id}
                 size={controlSize.row.button}
-                variant={c.id === picked ? 'filled' : 'default'}
-                aria-pressed={c.id === picked}
+                variant={c.id === picked?.id ? 'filled' : 'default'}
+                aria-pressed={c.id === picked?.id}
                 onClick={() => onCaliber(c)}
               >
                 {c.name}

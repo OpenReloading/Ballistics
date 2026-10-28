@@ -23,23 +23,42 @@ export type CandidateClass = {
   cartridges: readonly string[]
 }
 
-/** Classes whose diameters differ by less than this share a hole size, m. */
+/** Classes whose nominal diameters differ by less than this share a hole size, m. */
 const HOLE_SIZE_RESOLUTION = toSi('length', 0.5)
+/** A hole fits a class within this share of its diameter: the detector's band (`SIZE_MIN`, `SIZE_MAX`). */
+const HOLE_BAND = [0.7, 1.4] as const
 
 /**
- * `classes` as candidates: with a hole size, those sharing the nearest class's hole size first, the
- * user's (a member in `mine`, cartridge record ids) first among them, then by distance to it. The
- * nearest class is preselected only when no other class shares its hole size.
+ * `classes` as candidates for the hole size `hole`. A nominal size (bullet, marker): the classes
+ * sharing the nearest class's hole size first, then by distance to it; the nearest is preselected
+ * when no other shares its hole size. A typed, learned or measured size (a hole in paper shows
+ * smaller than its bullet): the classes it fits within `HOLE_BAND` first, then by its ratio to
+ * their diameter, none preselected. The user's classes (a member in `mine`, cartridge record ids)
+ * come first among equals.
  */
 export function caliberCandidates(
   classes: readonly CandidateClass[],
-  hole: number | undefined,
+  hole: { diameter: number; source: string } | undefined,
   mine: ReadonlySet<string>,
 ): { candidates: CandidateClass[]; preselected: string | undefined } {
   const own = (c: CandidateClass) => (c.cartridges.some((id) => mine.has(id)) ? 0 : 1)
-  if (hole === undefined || !classes.length)
+  if (!hole || !classes.length)
     return { candidates: classes.toSorted((a, b) => own(a) - own(b)), preselected: undefined }
-  const off = (c: CandidateClass) => Math.abs(c.diameter - hole)
+  const d = hole.diameter
+  if (hole.source !== 'bullet' && hole.source !== 'marker') {
+    const fits = (c: CandidateClass) =>
+      d >= HOLE_BAND[0] * c.diameter && d <= HOLE_BAND[1] * c.diameter ? 0 : 1
+    return {
+      candidates: classes.toSorted(
+        (a, b) =>
+          fits(a) - fits(b) ||
+          own(a) - own(b) ||
+          Math.abs(d / a.diameter - 1) - Math.abs(d / b.diameter - 1),
+      ),
+      preselected: undefined,
+    }
+  }
+  const off = (c: CandidateClass) => Math.abs(c.diameter - d)
   const nearest = classes.reduce((a, b) => (off(b) < off(a) ? b : a))
   const tied = (c: CandidateClass) =>
     Math.abs(c.diameter - nearest.diameter) < HOLE_SIZE_RESOLUTION ? 0 : 1

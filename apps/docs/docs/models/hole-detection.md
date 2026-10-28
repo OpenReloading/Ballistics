@@ -168,7 +168,9 @@ Code: `apps/web/src/lib/hole-proposals.ts`, `acceptProposals`.
 
 ### Caliber candidates
 
-The result line offers the caliber classes of the group's discipline, the one its target event scores, as one button each; a group without a discipline offers the classes of every discipline on its target. With a hole size $D_0$, the class of nominal diameter $d_c$ nearest to it comes first, with every class within the resolution of its diameter:
+The result line offers the caliber classes of the group's discipline, the one its target event scores, as one button each; a group without a discipline offers the classes of every discipline on its target. Their order and the class preselected depend on where the hole size $D_0$ comes from.
+
+A nominal size (a bullet or a marker) is compared with the classes' nominal diameters $d_c$. The class nearest to it comes first, with every class within the resolution of its diameter:
 
 $$
 |d_c - d_\mathrm{nearest}| < \Delta_d, \quad \Delta_d = 0.5\ \mathrm{mm}
@@ -176,7 +178,17 @@ $$
 
 Code: `apps/web/src/lib/caliber-candidates.ts`, `caliberCandidates`, `HOLE_SIZE_RESOLUTION`.
 
-Those classes share a hole size: a class of the user's firearms or loads (one of its cartridges) comes first among them, and none is preselected. The other classes follow by $|d_c - D_0|$. The nearest class is preselected when no other shares its hole size. Without a hole size the classes keep their order, the user's first, and none is preselected; picking one then sets the hole size to its nominal diameter and the run follows. The class picked is shown in the line and not stored (the hole size it gives is stored as typed); proposals stay out of the statistics until accepted.
+Those classes share a hole size: a class of the user's firearms or loads (one of its cartridges) comes first among them. The other classes follow by $|d_c - D_0|$. The nearest class is preselected when no other shares its hole size, else none is.
+
+A typed, learned or measured size is a hole in paper, which shows smaller than its bullet, so it preselects nothing. The classes it fits within the detector's band come first, the user's first among them, then by how near $D_0 / d_c$ is to 1:
+
+$$
+0.7\, d_c \le D_0 \le 1.4\, d_c
+$$
+
+Code: `apps/web/src/lib/caliber-candidates.ts`, `caliberCandidates`, `HOLE_BAND`.
+
+Without a hole size the classes keep their order, the user's first, and none is preselected. Picking a class sets the hole size to its nominal diameter (one undo step) and the run follows; the Caliber item names the class until the size changes another way, such as the size an auto run measures. The class picked is not stored. Proposals stay out of the statistics until accepted.
 
 ### Strays
 

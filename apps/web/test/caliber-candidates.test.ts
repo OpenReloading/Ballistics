@@ -21,6 +21,13 @@ const acp: CandidateClass = {
   diameter: mm(11.48),
   cartridges: ['45-acp'],
 }
+const rimfire: CandidateClass = {
+  id: 'rimfire-22',
+  name: '.22 rimfire',
+  diameter: mm(5.6),
+  cartridges: ['22-lr'],
+}
+const bullet = (v: number) => ({ diameter: mm(v), source: 'bullet' })
 const ids = (r: { candidates: CandidateClass[] }) => r.candidates.map((c) => c.id)
 const none = new Set<string>()
 
@@ -32,19 +39,19 @@ describe('caliberCandidates', () => {
   })
 
   it('preselects the class a hole size separates, the other still offered', () => {
-    const r = caliberCandidates([nine, acp], mm(11), none)
+    const r = caliberCandidates([nine, acp], bullet(11), none)
     expect(ids(r)).toEqual(['pistol-45', 'pistol-9mm'])
     expect(r.preselected).toBe('pistol-45')
   })
 
   it('offers both classes of one hole size and preselects neither', () => {
-    const r = caliberCandidates([acp, nine, magnum], mm(9.1), none)
+    const r = caliberCandidates([acp, nine, magnum], bullet(9.1), none)
     expect(ids(r).slice(0, 2).toSorted()).toEqual(['pistol-9mm', 'revolver-357-38'])
     expect(r.preselected).toBeUndefined()
   })
 
   it("puts the user's class first on a tie, still preselecting neither", () => {
-    const r = caliberCandidates([nine, magnum, acp], mm(9.04), new Set(['357-magnum']))
+    const r = caliberCandidates([nine, magnum, acp], bullet(9.04), new Set(['357-magnum']))
     expect(ids(r)).toEqual(['revolver-357-38', 'pistol-9mm', 'pistol-45'])
     expect(r.preselected).toBeUndefined()
   })
@@ -56,7 +63,17 @@ describe('caliberCandidates', () => {
     ])
   })
 
+  it('preselects nothing on a measured hole and puts the classes it fits first', () => {
+    // a 9 mm hole in paper at 0.8 of the bullet: nearer 5.6 mm than 9.04 mm by distance alone
+    const r = caliberCandidates([rimfire, nine, acp], { diameter: mm(7.2), source: 'typed' }, none)
+    expect(ids(r)).toEqual(['pistol-9mm', 'rimfire-22', 'pistol-45'])
+    expect(r.preselected).toBeUndefined()
+  })
+
   it('offers nothing for a discipline without classes', () => {
-    expect(caliberCandidates([], mm(9), none)).toEqual({ candidates: [], preselected: undefined })
+    expect(caliberCandidates([], bullet(9), none)).toEqual({
+      candidates: [],
+      preselected: undefined,
+    })
   })
 })
