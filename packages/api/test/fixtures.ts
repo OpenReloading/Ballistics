@@ -164,6 +164,7 @@ export const bundle: Bundle = {
       origin: 'catalogue',
       cartridge: 'catalogue:alpha-rifle',
       waterCapacity: { value: 3.6, raw: '55.6 gr H2O' },
+      convention: 'to the mouth, water at 20 C, primer seated',
       provenance: published,
     },
   ],

@@ -27,7 +27,7 @@ $$
 
 Code: `packages/core/src/water.ts`, `waterDensityGramsPerCm3`, `packages/drawing/src/seating/seating.ts`, `seat` (`caseVolume`).
 
-$\rho_w$ is the density of water at 20 °C. A case capacity the user measured, stored as a volume, takes the place of the record's water mass.
+$\rho_w$ is the density of water at 20 °C. The `convention` of a case capacity record (free text: fill level, water temperature, primer state) says how its water was filled. It is recorded and echoed (the `capacities` of `GET /cartridges/:id`) and does not enter $V_\mathrm{case}$: the same mass gives the same volume under any convention. A record without a `convention` follows the default under Assumptions. A case capacity the user measured, stored as a volume, takes the place of the record's water mass.
 
 The display unit grain of water is the volume of one grain mass of water:
 
@@ -189,7 +189,7 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
 
 ## Assumptions
 
-- The water capacity is measured to the case mouth at 20 °C.
+- The default convention of a capacity record without `convention`: the water fills the case to the mouth, at 20 °C, the primer state as the record's `caseCondition` implies (not stated otherwise).
 - The bullet is a solid of revolution with the outline `bulletOutline` builds. Missing dimensions take stated proportions, which the notes name.
 - The cavity of a hollow base is a cone of half angle 45° or a hemisphere, as deep as its radius, and it is empty: no wad or lubricant in it.
 - Only the mouth position bounds the bullet volume. The neck diameter and the case wall do not enter.
@@ -197,7 +197,7 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
 
 ## Limits
 
-- A capacity measured with water at another temperature than 20 °C is not corrected.
+- A capacity measured with water at another temperature than 20 °C is not corrected, whatever its `convention` says.
 - A bullet base in front of the case mouth gives $V_b = 0$ with a note, and a bullet wholly below the mouth counts its whole volume.
 - The jump needs the chamber values and the bullet nose length, or a measured lands contact of the firearm for the same bullet. Without either it is not given.
 - A cavity of a different depth than its radius is not described. The cavity diameter must be below the base face diameter and its depth below the bullet length, else the outline is refused.

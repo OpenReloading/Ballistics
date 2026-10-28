@@ -26,6 +26,13 @@ export const caseCapacity = z
       .enum(['new', 'fired', 'sized'])
       .describe('The condition of the measured case.')
       .optional(),
+    convention: z
+      .string()
+      .min(1)
+      .describe(
+        'How the water was filled: fill level, water temperature and primer state, as the source states them. Absent: the default convention of the docs. The volume derived from `waterCapacity` does not read it.',
+      )
+      .optional(),
     note: z.string().min(1).describe('Notes on the measurement.').optional(),
     provenance: provenance
       .describe('Where the value comes from. Required for a catalogue capacity.')
