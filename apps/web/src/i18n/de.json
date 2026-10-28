@@ -1405,6 +1405,7 @@
   "To must not be above {length}.": "„Bis“ darf nicht größer als {length} sein.",
   "To must not be below From.": "„Bis“ darf nicht kleiner als „Von“ sein.",
   "Too many bullets.": "Zu viele Geschosse.",
+  "Too long for a link: save the powder to a file": "Zu lang für einen Link: Speichern Sie das Pulver in einer Datei",
   "Tools": "Werkzeuge",
   "Trajectory": "Flugbahn",
   "Trajectory result": "Flugbahnergebnis",

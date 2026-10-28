@@ -5,6 +5,7 @@ import {
   userDataVersion,
   userRefFields,
 } from '@open-reloading/schema'
+import type { Translator } from '../i18n/translate.ts'
 import { type ParsedUserFile, parseUserDataFile } from './user-data.ts'
 
 /** Longest share link: the length RFC 9110 section 4.1 recommends every sender and recipient support. */
@@ -27,6 +28,18 @@ export function shareProblem(record: UserRecord): string | undefined {
   if (fields.length > 0)
     return `the load refers to records of this browser (${fields.join(', ')}); another browser would not find them. Use a catalogue record or save the load and those records to a file.`
 }
+
+/**
+ * Why a `kind` record has no share link when its link is over `maxLinkChars`. Nothing is dropped
+ * from a powder's fit to make it fit: the message names the file route.
+ */
+export const tooLongText = (kind: UserRecord['kind'], t: Translator['t']) =>
+  kind === 'powder'
+    ? t('Too long for a link: save the powder to a file')
+    : t(
+        'Not shared: the link would be longer than {max} characters; save the record to a file instead.',
+        { max: maxLinkChars },
+      )
 
 /**
  * `page` with `records` in the fragment: the file text, deflate-compressed, base64url; the

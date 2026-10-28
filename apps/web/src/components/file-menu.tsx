@@ -39,7 +39,7 @@ import { parseFiles, readLoadFile, readNote } from '../lib/load-file-formats.ts'
 import { shownManufacturerRefs } from '../lib/manufacturers.ts'
 import { guardNavigation, guardPop } from '../lib/navigation-guard.ts'
 import { newId } from '../lib/new-id.ts'
-import { maxLinkChars, readLink, shareLink, shareProblem } from '../lib/share-link.ts'
+import { maxLinkChars, readLink, shareLink, shareProblem, tooLongText } from '../lib/share-link.ts'
 import { type ShortcutId, shortcutAriaKeys, shortcutLabel } from '../lib/shortcuts.ts'
 import { controlSize } from '../lib/theme.ts'
 import {
@@ -1346,13 +1346,7 @@ function FileMenuOf<K extends UserRecordKind>({
       return setFailure(({ t }) => t('Not shared: {reason}', { reason: reasonText(refused, t) }))
     const page = window.location.origin + window.location.pathname
     const link = await shareLink(await withMakers(current()), page)
-    if (!link)
-      return setFailure(({ t }) =>
-        t(
-          'Not shared: the link would be longer than {max} characters; save the record to a file instead.',
-          { max: maxLinkChars },
-        ),
-      )
+    if (!link) return setFailure(({ t }) => tooLongText(kind, t))
     await copy(link, msg('Share link'))
   }
 
