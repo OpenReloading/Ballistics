@@ -17,27 +17,23 @@ Prototype of one Import entry for load files and tables of bullets, powders and 
 ## Run it
 
 ```sh
-npm ci
-npm run build
-npm run static:build
-npm run pages:serve
-# open http://localhost:3003/import-entry/?layout=b  (layout=a for the modal)
+npm ci && npm run build && node prototype/import-entry/write-files.mts && npm run static:build && (npm run pages:serve & sleep 5; node prototype/import-entry/measure.mts; kill %1)
 ```
 
-Each invented file has a button on the page; `node prototype/import-entry/write-files.mts` writes them to `prototype/import-entry/files/`. Checks: `npx vitest run test/import-entry.test.ts` in `apps/web`, `node prototype/import-entry/accuracy.mts`, and with the export served `node prototype/import-entry/measure.mts` (Playwright, writes `measurements.json` and `screenshots/`). Run inside the dev container.
+The invented files are generated from `apps/web/src/lib/import-entry/fixtures.ts` into `prototype/import-entry/files/` and are not tracked. For the page: `npm run pages:serve`, then http://localhost:3003/import-entry/?layout=b (`layout=a` for the modal); each invented file also has a button on the page. `measure.mts` (Playwright, writes `measurements.json` and `screenshots/`) needs the browser installed once (`npx playwright install --with-deps chromium`). Other checks: `npx vitest run test/import-entry.test.ts` in `apps/web` and `node prototype/import-entry/accuracy.mts`. Run inside the dev container.
 
 ## Measurements
 
 | Measure | Value |
 |---|---|
-| Kind per file | 8 of 9 cards right (`verdicts`): bullets x3 high, powders high, cartridges high, unrelated table and plain text refused, load file read by its format; the table of name, diameter and length is suggested as bullets (medium) and is a table of cartridges |
+| Kind per file | 8 of 9 cards right (`verdicts`): bullets x3 high, powders high, cartridges high, unrelated table and plain text refused by the kind floor (the text is not refused as "no table", see Limits), load file read by its format; the table of name, diameter and length is suggested as bullets (medium) and is a table of cartridges |
 | Kind accuracy, generated variants | 19 of 19 |
 | Unit exactness | largest absolute error 1.8e-15 g or mm |
 | Rows per second, 5,028 rows, in a worker | read (decode, split, score) 33 to 34 ms plus build (map, validate against the schema, ids, plan) 41 to 44 ms, about 65,000 rows/s; 112 to 184 ms from choosing the file to the counts on screen (two runs on a shared host) |
 | Rebuild after a mapping change, 5,028 rows | 105 to 135 ms to the new counts |
 | Longest main-thread block | 39 to 65 ms over two runs while the large card renders (24 selects, preview, report); a small file first 40 to 44 ms; the rebuild 20 ms. The second run is under the 50 ms limit, the first over it by 15 ms: the limit is not reliably met, cause not isolated, the worker is not on the main thread. The build issue caps what a card renders. |
 | Clicks, typed fields | table below |
-| Route weight | `/import-entry` initial 412.7 kB gzip, `/_not-found` 412.2 kB in the same build (+0.5 kB); the import code loads on demand: 64.6 kB gzip of lazy chunks (layout A 8.8 kB, layout B 8.5 kB, each with the shared cards; the rest Mantine parts); the worker's own chunk 12.6 kB. `check-weight` fails for the new route only because it is in no group. |
+| Route weight | `/import-entry` initial 412.7 kB gzip, `/_not-found` 412.2 kB in the same build (+0.5 kB); total 477.3 kB with 64.6 kB gzip of lazy chunks, of which 17.4 kB (layout A 8.9 kB, layout B 8.5 kB, each with the shared cards) is not already in the lazy chunks of `/workbench`; the worker's own chunk 12.6 kB. `check-weight` fails for the new route only because it is in no group. |
 | Layout at both sizes | A: the dialog is 620 x 585 px in 1280 x 650 and 351 x 760 px in 390 x 844, inside the window with no horizontal overflow in all four steps. B: no horizontal overflow (page width equals window width), page height 2,631 px at 1280 and 4,547 px at 390 with 5 cards; the preview tables scroll sideways inside their card. Screenshots in `screenshots/`. |
 | Keyboard order | `measurements.json`, `keyboard`: skip link, top bar, Choose files, the invented-file buttons, then per file card: Remove, kind, then 3 stops per mapped number column (field, unit, decimal) and 1 per text column. A bullets card with 7 mapped columns has 15 mapping stops before the next card. |
 
@@ -55,7 +51,9 @@ Decisions: (a) and (b) none in B; (c) two in both (kind, column). A adds three C
 
 ## Layout pick
 
-Rule: fewer clicks for (a), then fewer after a wrong guess. B takes 2 clicks and 0 decisions against A's 5; after the wrong guess 5 against 8. Both layouts load their code on demand and stay inside the route budget (+0.5 kB initial). B costs keyboard stops: one tab stop per control of each mapped column. Proposal for the build, not measured here: keep B and fold the mapping of a high-tier card behind one "Columns" button, so the common case has 2 stops per card and a correction stays one click away.
+Rule: fewer clicks for (a), then fewer after a wrong guess. B takes 2 clicks and 0 decisions against A's 5; after the wrong guess 5 against 8. The prototype page stays at +0.5 kB initial, but the shipped entry sits behind the File menu on routes that already carry a budget (below). B costs keyboard stops: one tab stop per control of each mapped column. Proposal for the build, not measured here: keep B and fold the mapping of a high-tier card behind one "Columns" button, so the common case has 2 stops per card and a correction stays one click away.
+
+Placement against the budget: behind the File menu the entry is not its own route. `/workbench` is 992.5 of 1001.0 kB total, 8.5 kB of headroom, and layout B's own lazy chunk is 8.5 kB before the mapping fold and the real report. A `next/dynamic` import from the File menu lands in the page's `react-loadable-manifest.json` and so in `total` of every route with a File menu (workbench, lists, designers). Build issue 3 therefore either raises the `total` budget of those groups by about 9 kB in its pull request, or loads the import code with a plain `import()` in the click handler, which that manifest does not list (not tried here).
 
 ## Source decision
 
@@ -72,6 +70,7 @@ Refusals (cause, then one action):
 
 - Over 40 MB: "The file is larger than 40 MB. Split it and import the parts."
 - Not text: "The file is not UTF-8 or UTF-16 text; save it as UTF-8 (CSV UTF-8) and import again."
+- Cut UTF-16: "UTF-16 text with an odd number of bytes; save it as UTF-8 (CSV UTF-8) and import again."
 - Workbook unreadable: "The workbook cannot be read: <reason>. Save it again as XLSX or CSV."
 - Workbook empty: "The workbook has no cells with text. Open the right file or paste the table into a sheet."
 - Sheet without table: "Sheet "<name>" has no table of two columns or more. Move the table to the first sheet."
@@ -85,6 +84,7 @@ Refusals (cause, then one action):
 Rejected rows (listed with row, column, cell):
 
 - "<Field> is empty. Fill the cell or delete the row."
+- "<Field> has no unit. Choose a unit for the column."
 - "<Field> "<cell>" is not a number with "<mark>" as decimal mark. Fix the cell or change the decimal mark of the column."
 - "<Field> <cell> is not above 0. Fix the cell or leave it empty."
 - "No column is mapped to <Field>. Map a column to it or read the file as another kind." (row 1)
@@ -103,6 +103,7 @@ Buttons and labels: "Choose files", "Remove <file>", "Save mapping as", "Save ma
 - Texts are English only and not yet through `t`.
 - The prototype store is in the worker; the build reads ids and content from the IndexedDB store.
 - The invented load format reads a bullet and a powder; real formats are #242, #243 and #245.
+- `notes.txt` is not refused as "no table": its comma line splits into two cells, so the card is a table that no kind reaches the floor for, and it offers the kind picker. The "no separator" refusal never fires on the invented set. `detectDelimiter` should require two or more rows of equal width.
 - Makers named in a table become user manufacturer records with deterministic ids.
 - 5,000-row preview lists at most 100 rejected rows and 8 on the card; the rest is counted.
 

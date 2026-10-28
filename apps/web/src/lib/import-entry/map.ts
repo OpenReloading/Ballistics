@@ -231,7 +231,7 @@ function numberCell(
   field: FieldSpec,
 ): { value: number; raw?: string; warning?: string } | { problem: string } {
   const unit = stored(map, field)
-  if (!unit) return { problem: `${field.label} has no unit.` }
+  if (!unit) return { problem: `${field.label} has no unit. Choose a unit for the column.` }
   const x = readNumber(cell, map.decimal)
   if (x === undefined) {
     return {

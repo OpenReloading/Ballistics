@@ -245,6 +245,10 @@ export function inspectFile(name: string, bytes: Uint8Array, now: string): Promi
     return Promise.resolve(inspectText(name, decodeText(bytes), now))
   } catch (e) {
     const why = e instanceof Error ? e.message : 'the file is not text'
-    return Promise.resolve(refused(name, `${why.replace(/^./, (c) => c.toUpperCase())}.`))
+    // decodeText names the action only for undecodable bytes, not for a cut UTF-16 file
+    const action = why.includes('save it as')
+      ? ''
+      : '; save it as UTF-8 (CSV UTF-8) and import again'
+    return Promise.resolve(refused(name, `${why.replace(/^./, (c) => c.toUpperCase())}${action}.`))
   }
 }
