@@ -2641,6 +2641,118 @@
                           }
                         ]
                       },
+                      "temperatureSensitivity": {
+                        "description": "The `temperatureSensitivity` of the powder record. `null` removes it.",
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "reference": {
+                                "description": "The `temperatureSensitivity.reference` of the powder record. `null` removes it.",
+                                "anyOf": [
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "value": {
+                                        "description": "In K.",
+                                        "type": [
+                                          "number",
+                                          "null"
+                                        ]
+                                      },
+                                      "raw": {
+                                        "description": "The value as written in the source, when it differed.",
+                                        "anyOf": [
+                                          {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "description": "The value as written in the source, when it differed."
+                                          },
+                                          {
+                                            "type": "null"
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "cold": {
+                                "description": "The `temperatureSensitivity.cold` of the powder record. `null` removes it.",
+                                "anyOf": [
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "value": {
+                                        "description": "In 1/K.",
+                                        "type": [
+                                          "number",
+                                          "null"
+                                        ]
+                                      },
+                                      "raw": {
+                                        "description": "The value as written in the source, when it differed.",
+                                        "anyOf": [
+                                          {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "description": "The value as written in the source, when it differed."
+                                          },
+                                          {
+                                            "type": "null"
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "hot": {
+                                "description": "The `temperatureSensitivity.hot` of the powder record. `null` removes it.",
+                                "anyOf": [
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "value": {
+                                        "description": "In 1/K.",
+                                        "type": [
+                                          "number",
+                                          "null"
+                                        ]
+                                      },
+                                      "raw": {
+                                        "description": "The value as written in the source, when it differed.",
+                                        "anyOf": [
+                                          {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "description": "The value as written in the source, when it differed."
+                                          },
+                                          {
+                                            "type": "null"
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            }
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
                       "note": {
                         "description": "The `note` of the powder record. `null` removes it.",
                         "anyOf": [

@@ -276,6 +276,8 @@ export interface Design {
   fields: Fields
   /** The burn-law fields of an opened record that the designer has no input for, kept as they were. */
   unoffered: Tree
+  /** The temperature sensitivity of an opened record, which the designer has no input for, kept as it was. */
+  temperatureSensitivity?: Tree | undefined
   /** The fit of an opened record saved from a fit, with the SI values of its fitted fields then. */
   fit?: { block: UserPowderFit; values: Record<string, number | undefined> } | undefined
 }
@@ -392,6 +394,7 @@ export function fileData(d: Design): UserPowder {
   if (rows.length > 0) draft.composition = rows
   const interior = interiorOf(draft.interior as Tree | undefined, d.fitted)
   if (interior) draft.interior = { ...interior, ...d.unoffered }
+  if (d.temperatureSensitivity) draft.temperatureSensitivity = d.temperatureSensitivity
   const fit = keptFit(d)
   return {
     origin: 'user',
@@ -433,6 +436,9 @@ export function fromFile(data: UserPowder, name: string, system: UnitSystem): De
     rows: rows.length > 0 ? rows : [{ id: rowId(), name: '', cas: '' }],
     fields,
     unoffered: unofferedOf(draft?.interior as Tree | undefined),
+    ...(draft?.temperatureSensitivity && {
+      temperatureSensitivity: draft.temperatureSensitivity as Tree,
+    }),
     ...(data.fit && {
       fit: {
         block: data.fit,

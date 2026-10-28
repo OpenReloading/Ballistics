@@ -5,11 +5,12 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { TuneNotes } from '../src/components/powder-tune.tsx'
 import { nth } from '../src/lib/nth.ts'
-import { powderDesigns } from '../src/lib/powder-designer.ts'
+import { fileData, fromFile, powderDesigns } from '../src/lib/powder-designer.ts'
 import { type PowderFitReply, temperatureFit, withSensitivity } from '../src/lib/powder-fit.ts'
 import { answerPowderFit } from '../src/lib/powder-fit-answer.ts'
 import { fittedPowder } from '../src/lib/powder-save.ts'
 import { fitStrings, sessionStrings, type TuneString } from '../src/lib/powder-tune.ts'
+import { presetUnits } from '../src/lib/units.ts'
 
 const sensitivity = { reference: 294.15, cold: 0.002, hot: 0.003 }
 
@@ -124,13 +125,15 @@ describe('the temperature factor from strings at several temperatures', () => {
     expect(notes(load(0.38), strings)).not.toContain(oneTemperature)
   })
 
-  // fails while the user powder draft of the schema has no temperatureSensitivity, which a parse strips
-  it.fails('keeps the scaled sensitivities in the saved draft through a parse', () => {
+  it('keeps the scaled sensitivities in the saved draft through a parse', () => {
     const parsed = userRecord.parse(save(twoTemperatures))
     const saved = powderDesigns([parsed])[0]?.powder.temperatureSensitivity
     expect(saved?.reference.value).toBe(sensitivity.reference)
     expect(saved?.cold.value).toBeCloseTo(sensitivity.cold * (factor?.value ?? 0), 12)
     expect(saved?.hot.value).toBeCloseTo(sensitivity.hot * (factor?.value ?? 0), 12)
+    if (parsed.kind !== 'powder') throw new Error('not a powder')
+    const resaved = fileData(fromFile(parsed.data, parsed.name, presetUnits('metric-grams')))
+    expect(resaved.draft?.temperatureSensitivity).toEqual(parsed.data.draft?.temperatureSensitivity)
   })
 
   it('fits without the factor at one temperature and says two are needed', () => {
