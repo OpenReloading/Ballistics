@@ -163,7 +163,13 @@
       "prior {name}: value above {floor}, sigma above 0",
       "charge must be positive",
       "level must lie in (0, 1)",
-      "the fit has no covariance: add rows or velocity sigmas"
+      "the fit has no covariance: add rows or velocity sigmas",
+      "peakPressure and pressureBasis together",
+      "pressureBasis must be one of {list}",
+      "the powder has no interior model",
+      "the bore resistance of the powder needs {list}",
+      "boreDiameter must be positive",
+      "domainMargin must lie in [0, 1)"
     ],
     "ladders": [
       "ladder start charge must be above 0",
@@ -208,7 +214,10 @@
       "shot coordinates must be finite",
       "shot velocity must be finite",
       "aim must be finite",
-      "coverage must lie in (0, 1)"
+      "coverage must lie in (0, 1)",
+      "velocities must be finite",
+      "relative half-width must be at least 0.01",
+      "relative half-width needs more shots than the search covers"
     ],
     "atmosphere, moving target, outline drag, stability": [
       "altitude {n} m outside {low} to {high} m",
