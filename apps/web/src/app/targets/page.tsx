@@ -6,6 +6,7 @@ import { TargetFaceList } from '../../components/target-face-list.tsx'
 import {
   getTargetFace,
   listAllTargetFaces,
+  listDisciplines,
   listFederations,
   listTargetMappings,
 } from '../../lib/api.ts'
@@ -20,10 +21,11 @@ export const metadata: Metadata = {
 }
 
 async function Targets() {
-  const [list, mappings, federations] = await Promise.all([
+  const [list, mappings, federations, disciplines] = await Promise.all([
     listAllTargetFaces(),
     listTargetMappings(),
     listFederations(),
+    listDisciplines(),
   ])
   const faces =
     list.status === 'ok' ? await Promise.all(list.data.map(({ id }) => getTargetFace(id))) : []
@@ -31,6 +33,7 @@ async function Targets() {
     list.status !== 'ok' ||
     mappings.status !== 'ok' ||
     federations.status !== 'ok' ||
+    disciplines.status !== 'ok' ||
     faces.some((f) => f.status !== 'ok')
   )
     return (
@@ -44,7 +47,15 @@ async function Targets() {
       ? [targetFaceRow(withOrganization(f.data, federations.data), mappings.data)]
       : [],
   )
-  return <TargetFaceList items={rows} />
+  return (
+    <TargetFaceList
+      items={rows}
+      disciplines={disciplines.data.map(({ id, name, federation }) => ({
+        id,
+        name: `${federations.data.find((f) => f.id === federation)?.abbreviation ?? federation} ${name}`,
+      }))}
+    />
+  )
 }
 
 export default function TargetsPage() {

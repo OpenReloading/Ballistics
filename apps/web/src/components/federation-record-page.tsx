@@ -71,7 +71,7 @@ function FederationRecordView({
       side={
         <>
           <FederationDisciplines
-            listHref={`/disciplines${writeDirectory({ ...emptyDirectory, organization: f.abbreviation }, '')}`}
+            listHref={`/disciplines${writeDirectory({ ...emptyDirectory, facets: { org: [f.abbreviation] } }, '')}`}
             rows={own.map((d) => ({
               id: d.id,
               number: d.number,

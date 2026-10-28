@@ -226,6 +226,18 @@ const states: State[] = [
     },
   },
   {
+    name: 'Database list filter',
+    open: async (page, check) => {
+      await gotoHydrated(page, '/disciplines')
+      await page
+        .locator('.directory-filters')
+        .getByRole('button', { name: 'Distance', exact: true })
+        .click()
+      await expect(page.getByRole('checkbox', { name: /^25 yd/ })).toBeVisible()
+      await check('popover', '.mantine-Popover-dropdown')
+    },
+  },
+  {
     name: 'Site search',
     open: async (page, check) => {
       await gotoHydrated(page, '/powders')

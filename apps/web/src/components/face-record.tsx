@@ -7,9 +7,11 @@ import { msg } from '../i18n/translate.ts'
 import type { Face } from '../lib/face-organization.ts'
 import { categoryWord } from '../lib/face-words.ts'
 import { type FaceEventRow, targetFaceGroups, targetFaceStrip } from '../lib/target-faces.ts'
+import { controlSize } from '../lib/theme.ts'
 import { FieldStrip } from './field-strip.tsx'
 import { FieldTable } from './field-table.tsx'
 import { Panel } from './panel.tsx'
+import { LinkButton } from './record-actions.tsx'
 import { PanelTable } from './scroll-region.tsx'
 import { shownLength } from './shown-length.tsx'
 
@@ -41,12 +43,29 @@ export function FaceValuesPanel({ face }: { face: FaceValues }) {
 }
 
 /** The events and disciplines shot on the face. */
-export function FaceEvents({ rows }: { rows: readonly FaceEventRow[] }) {
+export function FaceEvents({
+  rows,
+  listHref,
+}: {
+  rows: readonly FaceEventRow[]
+  /** The discipline list filtered to this face; no link when it is missing. */
+  listHref?: string | undefined
+}) {
   const { t } = useTranslation()
   const categories = rows.some((e) => e.category)
   const scoring = rows.some((e) => e.scoring)
   return (
-    <Panel id="face-events" title={t('Events ({count})', { count: rows.length })}>
+    <Panel
+      id="face-events"
+      title={t('Events ({count})', { count: rows.length })}
+      controls={
+        listHref && (
+          <LinkButton size={controlSize.row.button} href={listHref}>
+            {t('In the discipline list')}
+          </LinkButton>
+        )
+      }
+    >
       <PanelTable
         label={t('Events table')}
         className="face-table"

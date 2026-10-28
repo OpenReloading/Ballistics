@@ -7,7 +7,8 @@
   "page": "Teil C, Seite 27 bis 29 von 142, PDF pp. 27 to 29",
   "distance": {
     "value": 50000,
-    "raw": "50 m / y"
+    "raw": "50 m / y",
+    "unit": "m/yd"
   },
   "category": "pistol",
   "provenance": {

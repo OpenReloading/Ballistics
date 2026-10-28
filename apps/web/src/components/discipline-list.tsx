@@ -2,15 +2,20 @@
 
 import { useCallback, useDeferredValue, useMemo } from 'react'
 import { useTranslation } from '../i18n/language.ts'
-import { plainNumber } from '../i18n/number.ts'
 import { msg } from '../i18n/translate.ts'
 import { countryName } from '../lib/countries.ts'
 import {
   type DisciplineRow,
+  disciplineDistance,
+  disciplineFacetKeys,
+  disciplineFacets,
   disciplineMatches,
   type FederationRow,
+  federationFacetKeys,
+  federationFacets,
   federationMatches,
 } from '../lib/disciplines.ts'
+import { facetNames } from '../lib/facets.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { kebabValue } from '../lib/list-values.ts'
 import { countText, filterText, matchingText, widestCount } from '../lib/lists.ts'
@@ -21,6 +26,7 @@ import {
   DirectoryTable,
   useListState,
 } from './directory-table.tsx'
+import { FacetFilters, useFacets } from './facet-filters.tsx'
 import { HomepageLink } from './homepage-link.tsx'
 import { LibraryTabs } from './library-tabs.tsx'
 import { SourceFilter } from './list-sources.tsx'
@@ -31,16 +37,28 @@ import { EmptyList } from './states.tsx'
 const ruleBookSources: readonly Origin[] = ['openreloading']
 
 /** The discipline directory: name, number, federation, distance, category, caliber classes, faces. */
-export function DisciplineList({ items }: { items: DisciplineRow[] }) {
+export function DisciplineList({
+  items,
+  faces,
+}: {
+  items: DisciplineRow[]
+  /** The faces the disciplines are shot on, for the Face filter's names. */
+  faces: readonly { id: string; name: string }[]
+}) {
   const tr = useTranslation()
   const { t } = tr
-  const [state, set, clear] = useListState()
+  const [state, set, clear] = useListState(disciplineFacetKeys)
   const filters = useDeferredValue(state)
-  const shown = useMemo(
+  const facets = useMemo(
+    () => disciplineFacets(items, new Map(faces.map((f) => [f.id, f.name]))),
+    [items, faces],
+  )
+  const searched = useMemo(
     () => items.filter((r) => disciplineMatches(r, filters, t)),
     [items, filters, t],
   )
-  const named = [state.organization, matchingText(t, state.query)]
+  const { shown, options } = useFacets(items, searched, facets, filters)
+  const named = [...facetNames(facets, state.facets ?? {}), matchingText(t, state.query)]
   const classes = (r: DisciplineRow) => r.classes.map((c) => c.name).join(', ')
   const columns: DirectoryColumn<DisciplineRow>[] = [
     { key: 'name', label: msg('Name'), value: (r) => r.name, cell: (r) => r.name },
@@ -61,11 +79,10 @@ export function DisciplineList({ items }: { items: DisciplineRow[] }) {
     {
       key: 'distance',
       label: msg('Distance'),
-      unit: 'm',
       num: true,
-      width: '6rem',
+      width: '9rem',
       value: (r) => r.distance,
-      cell: (r) => plainNumber(r.distance),
+      cell: disciplineDistance,
     },
     {
       key: 'category',
@@ -86,17 +103,12 @@ export function DisciplineList({ items }: { items: DisciplineRow[] }) {
       label: msg('Faces'),
       num: true,
       width: '5rem',
-      value: (r) => r.faces,
-      cell: (r) => r.faces,
+      value: (r) => r.faceIds.length,
+      cell: (r) => r.faceIds.length,
     },
   ]
   const facts = (r: DisciplineRow) =>
-    [
-      r.federation,
-      r.number,
-      `${plainNumber(r.distance)} m`,
-      r.category && kebabValue(t, r.category),
-    ]
+    [r.federation, r.number, disciplineDistance(r), r.category && kebabValue(t, r.category)]
       .filter(Boolean)
       .join(' · ')
   return (
@@ -117,20 +129,19 @@ export function DisciplineList({ items }: { items: DisciplineRow[] }) {
           onQuery={(q) => set({ query: q })}
           placeholder={t('Name, number, federation or caliber, 2.53…')}
           sorting={{ columns, sort: state.sort, onSort: (sort) => set({ sort }) }}
-          scope={
-            state.organization
-              ? {
-                  label: t('Federation {name}', { name: state.organization }),
-                  onRemove: () => set({ organization: '' }),
-                }
-              : undefined
-          }
         >
           <SourceFilter
             src={state.sources}
             counts={{ openreloading: items.length, user: 0 }}
             sources={ruleBookSources}
             onChange={(src) => set({ sources: src })}
+          />
+          <FacetFilters
+            facets={facets}
+            options={options}
+            state={state}
+            onChange={(next) => set({ facets: next })}
+            onClear={clear}
           />
         </DirectoryFilters>
         <DirectoryTable
@@ -167,13 +178,14 @@ export function FederationList({ items }: { items: FederationRow[] }) {
         : countryName(c, /^[A-Z]{2}$/.test(c) ? c : undefined, language),
     [t, language],
   )
-  const [state, set, clear] = useListState()
+  const [state, set, clear] = useListState(federationFacetKeys)
   const filters = useDeferredValue(state)
-  const shown = useMemo(
+  const searched = useMemo(
     () => items.filter((r) => federationMatches(r, filters, country(r.country))),
     [items, filters, country],
   )
-  const query = state.query.trim()
+  const { shown, options } = useFacets(items, searched, federationFacets, filters)
+  const named = [...facetNames(federationFacets, state.facets ?? {}), matchingText(t, state.query)]
   const columns: DirectoryColumn<FederationRow>[] = [
     { key: 'name', label: msg('Name'), value: (r) => r.name, cell: (r) => r.name },
     {
@@ -237,6 +249,13 @@ export function FederationList({ items }: { items: FederationRow[] }) {
             sources={ruleBookSources}
             onChange={(src) => set({ sources: src })}
           />
+          <FacetFilters
+            facets={federationFacets}
+            options={options}
+            state={state}
+            onChange={(next) => set({ facets: next })}
+            onClear={clear}
+          />
         </DirectoryFilters>
         <DirectoryTable
           rows={shown}
@@ -246,20 +265,14 @@ export function FederationList({ items }: { items: FederationRow[] }) {
           facts={facts}
           label={(r) => r.name}
           caption={
-            query
-              ? t('Federations, {filters}', { filters: t('matching "{query}"', { query }) })
-              : t('All federations')
+            named.filter(Boolean).length === 0
+              ? t('All federations')
+              : t('Federations, {filters}', { filters: named.filter(Boolean).join(', ') })
           }
           noun="federations"
           sort={state.sort}
           onSort={(sort) => set({ sort })}
-          empty={
-            <EmptyList
-              noun="federations"
-              filters={filterText([matchingText(t, query)])}
-              onClear={clear}
-            />
-          }
+          empty={<EmptyList noun="federations" filters={filterText(named)} onClear={clear} />}
         />
       </div>
     </>

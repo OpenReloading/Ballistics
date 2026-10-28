@@ -6,8 +6,10 @@ import { expect, it, vi } from 'vitest'
 import { TargetFaceDrawing } from '../src/components/target-face-drawing.tsx'
 import { TargetFaceList } from '../src/components/target-face-list.tsx'
 import { translator } from '../src/i18n/translate.ts'
+import { facetOptions, facetRows } from '../src/lib/facets.ts'
 import {
   faceEventRows,
+  faceFacets,
   targetFaceGroups,
   targetFaceMatches,
   targetFaceRow,
@@ -42,6 +44,25 @@ it('lists every face with its distances, outer diameter, rings and the disciplin
   expect(rows.every((r) => r.rings >= 2 && r.outer > 0)).toBe(true)
 })
 
+it('filters by federation, discipline, event distance and ring count, each count over the others', () => {
+  const facets = faceFacets(new Map([['dsb-25m-pistole-revolver', 'DSB 25 m Pistole/Revolver']]))
+  const ids = (selected: Record<string, string[]>) =>
+    facetRows(rows, facets, selected).map((r) => r.id)
+  expect(ids({ org: ['ISSF'], rings: ['10'] })).toContain(precision.id)
+  expect(ids({ discipline: ['dsb-25m-pistole-revolver'] })).toContain(precision.id)
+  expect(ids({ dist: ['25'] })).toContain(precision.id)
+  expect(ids({ dist: ['25'], org: ['no-such'] })).toEqual([])
+  const options = facetOptions(rows, rows, facets, { org: ['ISSF'] })
+  const dist = defined(options.get('dist'))
+  expect(dist.find((o) => o.value === '25')).toMatchObject({ text: '25 m' })
+  // the federation's own count ignores its choice; the distances count within ISSF
+  const issf = rows.filter((r) => r.organization === 'ISSF')
+  expect(defined(options.get('org')).find((o) => o.value === 'ISSF')?.count).toBe(issf.length)
+  expect(dist.find((o) => o.value === '25')?.count).toBe(
+    issf.filter((r) => r.distances.includes(25)).length,
+  )
+})
+
 it('searches names, federations and event names', () => {
   const ids = (query: string) => rows.filter((r) => targetFaceMatches(r, query)).map((r) => r.id)
   // a federation's name also matches the faces whose events name its disciplines
@@ -55,7 +76,7 @@ it('searches names, federations and event names', () => {
 it('renders the list: one row per face linking its page, the outer diameter in the preset unit', () => {
   const out = renderToStaticMarkup(
     <MantineProvider>
-      <TargetFaceList items={rows} />
+      <TargetFaceList items={rows} disciplines={[]} />
     </MantineProvider>,
   )
   expect(out).toContain(`${faces.length} faces`)

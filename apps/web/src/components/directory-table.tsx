@@ -148,22 +148,26 @@ const cellClass = <T,>(c: DirectoryColumn<T>, link: string, repeat = false) =>
         .filter(Boolean)
         .join(' ') || undefined
 
+const noFacetKeys: readonly string[] = []
+
 /**
  * The list's filters and sort, kept in the URL with `history.replaceState`, and `clear`, which
- * resets every filter and keeps the sort. Read after mounting,
+ * resets every filter and keeps the sort. `facetKeys` are the URL keys of the list's choice filters
+ * (`facets.ts`), a constant of the list. Read after mounting,
  * not with `useSearchParams`, so the page stays prerendered with its first rows (Next.js renders a
  * `useSearchParams` tree in the browser only).
  */
-export function useListState() {
+export function useListState(facetKeys: readonly string[] = noFacetKeys) {
   const [state, setState] = useState<DirectoryState>(emptyDirectory)
-  useEffect(() => setState(readDirectory(window.location.search)), [])
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the keys of a list are fixed
+  useEffect(() => setState(readDirectory(window.location.search, facetKeys)), [])
   useEffect(() => {
     // the first render's empty state is not the URL's: written only after a change
     if (state === emptyDirectory) return
     const { pathname, search } = window.location
-    const next = writeDirectory(state, search)
+    const next = writeDirectory(state, search, facetKeys)
     if (next !== search) window.history.replaceState(null, '', `${pathname}${next}`)
-  }, [state])
+  }, [state, facetKeys])
   const set = useCallback(
     (next: Partial<DirectoryState>) => setState((s) => ({ ...s, ...next })),
     [],

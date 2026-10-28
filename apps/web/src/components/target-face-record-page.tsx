@@ -2,6 +2,7 @@
 
 import type { TargetFace, TargetMapping } from '@open-reloading/schema'
 import { msg } from '../i18n/translate.ts'
+import { emptyDirectory, writeDirectory } from '../lib/directory.ts'
 import type { FederationListItem } from '../lib/disciplines.ts'
 import type { DisciplineSummary, MappingSummary } from '../lib/face-disciplines.ts'
 import { withOrganization } from '../lib/face-organization.ts'
@@ -44,7 +45,16 @@ function TargetFaceRecord({
         </Panel>
       }
       values={<FaceValuesPanel face={values} />}
-      side={<FaceEvents rows={rows} />}
+      side={
+        <FaceEvents
+          rows={rows}
+          listHref={
+            mappings.length > 0
+              ? `/disciplines${writeDirectory({ ...emptyDirectory, facets: { face: [f.id] } }, '')}`
+              : undefined
+          }
+        />
+      }
     />
   )
 }

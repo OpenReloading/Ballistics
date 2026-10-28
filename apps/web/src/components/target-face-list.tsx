@@ -8,10 +8,16 @@ import { useDeferredValue, useMemo } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { plainNumber } from '../i18n/number.ts'
 import { msg } from '../i18n/translate.ts'
+import { facetNames } from '../lib/facets.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { countText, filterText, matchingText, widestCount } from '../lib/lists.ts'
 import type { Origin } from '../lib/sources.ts'
-import { type TargetFaceRow, targetFaceMatches } from '../lib/target-faces.ts'
+import {
+  faceFacetKeys,
+  faceFacets,
+  type TargetFaceRow,
+  targetFaceMatches,
+} from '../lib/target-faces.ts'
 import { formatQuantity } from '../lib/units.ts'
 import {
   type DirectoryColumn,
@@ -19,6 +25,7 @@ import {
   DirectoryTable,
   useListState,
 } from './directory-table.tsx'
+import { FacetFilters, useFacets } from './facet-filters.tsx'
 import { LibraryTabs } from './library-tabs.tsx'
 import { SourceFilter } from './list-sources.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
@@ -29,17 +36,29 @@ import { UnitsIconButton, useUnits } from './units-settings.tsx'
 const faceSources: readonly Origin[] = ['openreloading']
 
 /** The target face directory: name, federation or issuer, distances, outer diameter, rings, disciplines. */
-export function TargetFaceList({ items }: { items: TargetFaceRow[] }) {
+export function TargetFaceList({
+  items,
+  disciplines,
+}: {
+  items: TargetFaceRow[]
+  /** The names of the disciplines by id, for the Discipline filter. */
+  disciplines: readonly { id: string; name: string }[]
+}) {
   const tr = useTranslation()
   const { t, tn } = tr
   const { system } = useUnits()
-  const [state, set, clear] = useListState()
+  const [state, set, clear] = useListState(faceFacetKeys)
   const filters = useDeferredValue(state)
-  const shown = useMemo(
+  const facets = useMemo(
+    () => faceFacets(new Map(disciplines.map((d) => [d.id, d.name]))),
+    [disciplines],
+  )
+  const searched = useMemo(
     () => items.filter((r) => targetFaceMatches(r, filters.query)),
     [items, filters],
   )
-  const named = [matchingText(t, state.query)]
+  const { shown, options } = useFacets(items, searched, facets, filters)
+  const named = [...facetNames(facets, state.facets ?? {}), matchingText(t, state.query)]
   const outer = (r: TargetFaceRow) => formatQuantity('length', system, toSi('length', r.outer))
   const columns: DirectoryColumn<TargetFaceRow>[] = [
     { key: 'name', label: msg('Name'), value: (r) => r.name, cell: (r) => r.name },
@@ -127,6 +146,13 @@ export function TargetFaceList({ items }: { items: TargetFaceRow[] }) {
             counts={{ openreloading: items.length, user: 0 }}
             sources={faceSources}
             onChange={(src) => set({ sources: src })}
+          />
+          <FacetFilters
+            facets={facets}
+            options={options}
+            state={state}
+            onChange={(next) => set({ facets: next })}
+            onClear={clear}
           />
         </DirectoryFilters>
         <DirectoryTable

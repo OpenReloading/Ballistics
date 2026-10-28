@@ -7,10 +7,12 @@ import {
   type Source,
   toSi,
 } from '@open-reloading/schema'
+import { plainNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator, translator } from '../i18n/translate.ts'
 import type { DirectoryState } from './directory.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
 import { categoryWord } from './face-words.ts'
+import type { Facet } from './facets.ts'
 import { kebabValue } from './list-values.ts'
 import { matchesQuery } from './lists.ts'
 import { type FieldGroup, type StripItem, titleFromKebab } from './record-fields.ts'
@@ -30,7 +32,7 @@ export type CaliberClassSummary = Pick<CaliberClass, 'id' | 'name'> & { diameter
 /** A caliber class of a discipline: its id and name. */
 export type CaliberClassRef = Pick<CaliberClassSummary, 'id' | 'name'>
 
-/** One row of the discipline list. Distance in m. */
+/** One row of the discipline list. Distance in m, as the rule book's unit converts it. */
 export type DisciplineRow = {
   id: string
   name: string
@@ -38,12 +40,40 @@ export type DisciplineRow = {
   /** The federation's abbreviation. */
   federation: string
   distance: number
+  /** The unit the rule book states the distance in. */
+  unit: Discipline['distance']['unit']
   category?: string
   /** The caliber classes, in the record's order. */
   classes: CaliberClassRef[]
   /** Distinct faces of the discipline's mappings. */
-  faces: number
+  faceIds: string[]
 }
+
+const metresPerYard = 0.9144
+
+/**
+ * The distance as the rule book prints it, one reading per unit it states: the metres of the
+ * record, or for `yd` its yards; for `m/yd` the printed number is the same in each unit.
+ */
+function distanceReadings(stored: number, unit: DisciplineRow['unit']) {
+  // the SI conversion leaves float noise (12700 mm is 12.700000000000001 m)
+  const metres = Number(stored.toPrecision(12))
+  const yards = Number((stored / metresPerYard).toPrecision(12))
+  return unit === 'yd'
+    ? [{ number: yards, unit: 'yd' }]
+    : unit === 'm'
+      ? [{ number: metres, unit: 'm' }]
+      : [
+          { number: metres, unit: 'm' },
+          { number: metres, unit: 'yd' },
+        ]
+}
+
+/** The distance text of a discipline: "25 m", "50 yd", "50 m / 50 yd". */
+export const disciplineDistance = (r: Pick<DisciplineRow, 'distance' | 'unit'>) =>
+  distanceReadings(r.distance, r.unit)
+    .map((d) => `${plainNumber(d.number)} ${d.unit}`)
+    .join(' / ')
 
 /** The caliber classes of a discipline with their names; an id no class answers is shown as is. */
 const caliberClassRefs = (
@@ -73,19 +103,57 @@ export function disciplineRow(
     ...(d.number && { number: d.number }),
     federation: federations.find((f) => f.id === d.federation)?.abbreviation ?? d.federation,
     distance: toSi('length', d.distance.value),
+    unit: d.distance.unit,
     ...(d.category && { category: d.category }),
     classes: caliberClassRefs(d, classes),
-    faces: disciplineFaceIds(mappings, d.id).length,
+    faceIds: disciplineFaceIds(mappings, d.id),
   }
 }
 
-/** Whether a discipline row passes the federation scope and the search (the category also as `t` shows it). */
+/** The URL keys of the discipline list's choice filters. */
+export const disciplineFacetKeys = ['org', 'category', 'dist', 'class', 'face']
+
+/**
+ * The discipline list's choice filters: federation (by abbreviation), category, distance in the
+ * rule book's unit (a row that states both is in either), caliber class and face. `faces` names
+ * the faces by id; the classes are named by `rows`.
+ */
+export function disciplineFacets(
+  rows: readonly DisciplineRow[],
+  faces: ReadonlyMap<string, string>,
+): Facet<DisciplineRow>[] {
+  const classNames = new Map(rows.flatMap((r) => r.classes.map((c) => [c.id, c.name] as const)))
+  return [
+    { key: 'org', label: 'Federation', values: (r) => [r.federation] },
+    {
+      key: 'category',
+      label: 'Category',
+      values: (r) => (r.category ? [r.category] : []),
+      text: titleFromKebab,
+    },
+    {
+      key: 'dist',
+      label: 'Distance',
+      values: (r) => distanceReadings(r.distance, r.unit).map((d) => `${d.number}${d.unit}`),
+      text: (v) => v.replace(/(\d)(m|yd)$/, '$1 $2'),
+      order: (a, b) => Number.parseFloat(a) - Number.parseFloat(b) || a.localeCompare(b),
+    },
+    {
+      key: 'class',
+      label: 'Caliber class',
+      values: (r) => r.classes.map((c) => c.id),
+      text: (v) => classNames.get(v) ?? v,
+    },
+    { key: 'face', label: 'Face', values: (r) => r.faceIds, text: (v) => faces.get(v) ?? v },
+  ]
+}
+
+/** Whether a discipline row passes the search (the category also as `t` shows it). */
 export const disciplineMatches = (
   r: DisciplineRow,
-  s: DirectoryState,
+  s: Pick<DirectoryState, 'query'>,
   t: Translator['t'] = translator().t,
 ) =>
-  (!s.organization || r.federation === s.organization) &&
   matchesQuery(
     [
       r.name,
@@ -117,9 +185,10 @@ export function disciplineStrip(
       label: distanceLabel,
       row: {
         label: msg('Distance'),
-        text: String(toSi('length', d.distance.value)),
-        numeric: true,
-        unit: 'm',
+        text: disciplineDistance({
+          distance: toSi('length', d.distance.value),
+          unit: d.distance.unit,
+        }),
       },
     },
     ...(d.category
@@ -228,6 +297,17 @@ export function federationRow(
   }
 }
 
+/** The URL keys of the federation list's choice filters. */
+export const federationFacetKeys = ['country']
+
+/** The federation list's choice filter: the country, where "International" is a world body. */
+export const federationFacets: Facet<FederationRow>[] = [
+  { key: 'country', label: 'Country', values: (r) => [r.country] },
+]
+
 /** Whether a federation row passes the search. */
-export const federationMatches = (r: FederationRow, s: DirectoryState, countryLabel?: string) =>
-  matchesQuery([r.name, r.abbreviation, r.country, countryLabel], s.query)
+export const federationMatches = (
+  r: FederationRow,
+  s: Pick<DirectoryState, 'query'>,
+  countryLabel?: string,
+) => matchesQuery([r.name, r.abbreviation, r.country, countryLabel], s.query)

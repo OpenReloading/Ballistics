@@ -7,7 +7,8 @@
   "page": "Teil 2 Seite 15, PDF p. 151",
   "distance": {
     "value": 25000,
-    "raw": "25 m"
+    "raw": "25 m",
+    "unit": "m"
   },
   "category": "pistol",
   "caliberClasses": {

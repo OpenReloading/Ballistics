@@ -6,7 +6,8 @@
   "page": "Teil D, Seite 284 bis 293 von 294, PDF pp. 284 to 293",
   "distance": {
     "value": 50000,
-    "raw": "50 Meter/Yards"
+    "raw": "50 Meter/Yards",
+    "unit": "m/yd"
   },
   "category": "carbine",
   "provenance": {

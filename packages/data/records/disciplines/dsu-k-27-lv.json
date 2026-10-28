@@ -7,7 +7,8 @@
   "page": "Seiten 19 bis 20, PDF pp. 51 to 52",
   "distance": {
     "value": 25000,
-    "raw": "25 Meter"
+    "raw": "25 Meter",
+    "unit": "m"
   },
   "caliberClasses": {
     "ids": [

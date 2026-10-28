@@ -11,6 +11,7 @@ import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
 import type { Face } from './face-organization.ts'
 import { colourWord } from './face-words.ts'
+import type { Facet } from './facets.ts'
 import { matchesQuery } from './lists.ts'
 import { nth } from './nth.ts'
 import type { FieldGroup, FieldRow, StripItem } from './record-fields.ts'
@@ -27,6 +28,8 @@ export type TargetFaceRow = {
   outer: number
   rings: number
   disciplines: number
+  /** The ids of those disciplines. */
+  disciplineIds: string[]
   /** The event names and their organizations, for the search. */
   events: string[]
 }
@@ -37,6 +40,9 @@ const faceDistances = (f: Pick<Face, 'events'>) =>
 
 /** The list row of a face; `mappings` of every face, counted by distinct discipline. */
 export function targetFaceRow(f: Face, mappings: readonly MappingSummary[]): TargetFaceRow {
+  const disciplineIds = [
+    ...new Set(mappings.filter((m) => m.face === f.id).map((m) => m.discipline)),
+  ]
   return {
     id: f.id,
     name: f.name,
@@ -44,9 +50,42 @@ export function targetFaceRow(f: Face, mappings: readonly MappingSummary[]): Tar
     distances: faceDistances(f),
     outer: nth(f.rings, 0).diameter.value,
     rings: f.rings.length,
-    disciplines: new Set(mappings.filter((m) => m.face === f.id).map((m) => m.discipline)).size,
+    disciplines: disciplineIds.length,
+    disciplineIds,
     events: f.events.flatMap((e) => [e.name, e.organization ?? '']),
   }
+}
+
+/** The URL keys of the face list's choice filters. */
+export const faceFacetKeys = ['org', 'discipline', 'dist', 'rings']
+
+/**
+ * The face list's choice filters: federation (by abbreviation), discipline (named by
+ * `disciplines`, by id), the distance of an event in m and the ring count.
+ */
+export function faceFacets(disciplines: ReadonlyMap<string, string>): Facet<TargetFaceRow>[] {
+  return [
+    { key: 'org', label: 'Federation', values: (r) => [r.organization] },
+    {
+      key: 'discipline',
+      label: 'Discipline',
+      values: (r) => r.disciplineIds,
+      text: (v) => disciplines.get(v) ?? v,
+    },
+    {
+      key: 'dist',
+      label: 'Distance',
+      values: (r) => r.distances.map(String),
+      text: (v) => `${v} m`,
+      order: (a, b) => Number(a) - Number(b),
+    },
+    {
+      key: 'rings',
+      label: 'Rings',
+      values: (r) => [String(r.rings)],
+      order: (a, b) => Number(a) - Number(b),
+    },
+  ]
 }
 
 /** Whether a face row matches the search `query`. */
