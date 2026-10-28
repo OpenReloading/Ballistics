@@ -7,7 +7,8 @@
   "page": "Teil D, Seite 270 bis 272 von 294, PDF pp. 270 to 272",
   "distance": {
     "value": 600000,
-    "raw": "600 Meter"
+    "raw": "600 Meter",
+    "unit": "m"
   },
   "provenance": {
     "kind": "published",

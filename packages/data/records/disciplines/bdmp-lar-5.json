@@ -7,7 +7,8 @@
   "page": "Teil D, Seite 108 bis 112 von 294, PDF pp. 108 to 112",
   "distance": {
     "value": 25000,
-    "raw": "25 Meter"
+    "raw": "25 Meter",
+    "unit": "m"
   },
   "category": "lever-action",
   "provenance": {

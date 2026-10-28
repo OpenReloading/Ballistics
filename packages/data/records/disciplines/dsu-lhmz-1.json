@@ -7,7 +7,8 @@
   "page": "Seiten 51 bis 52, PDF pp. 109 to 110",
   "distance": {
     "value": 50000,
-    "raw": "50, 40, 30, 20 Meter"
+    "raw": "50, 40, 30, 20 Meter",
+    "unit": "m"
   },
   "category": "rifle",
   "caliberClasses": {

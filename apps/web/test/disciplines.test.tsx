@@ -1,11 +1,15 @@
 import { MantineProvider } from '@mantine/core'
 import { readRecords } from '@open-reloading/data'
+import { toSi } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it, vi } from 'vitest'
 import { DisciplineList, FederationList } from '../src/components/discipline-list.tsx'
 import { emptyDirectory, readDirectory, writeDirectory } from '../src/lib/directory.ts'
 import {
   type DisciplineRecord,
+  disciplineDistance,
+  disciplineFacetKeys,
+  disciplineFacets,
   disciplineGroups,
   disciplineMatches,
   disciplineRow,
@@ -16,6 +20,7 @@ import {
   federationScope,
   hostText,
 } from '../src/lib/disciplines.ts'
+import { facetRows } from '../src/lib/facets.ts'
 import { defined } from './defined.ts'
 
 // the list renders its tab bar, which reads the route and the router
@@ -42,6 +47,7 @@ it('lists a discipline with its federation, distance in m, category, caliber cla
     number: '2.53/2.59/2.55/2.58',
     federation: 'DSB',
     distance: 25,
+    unit: 'm',
     classes: [
       { id: 'pistol-9mm', name: '9 mm pistol' },
       { id: 'revolver-357-38', name: '.357 and .38 revolver' },
@@ -49,7 +55,36 @@ it('lists a discipline with its federation, distance in m, category, caliber cla
       { id: 'pistol-45', name: '.45 ACP pistol' },
     ],
     // the 150 s stage on the precision face, the 20 s stage on the rapid fire face
-    faces: 2,
+    faceIds: expect.arrayContaining(['issf-25m-precision-50m-pistol']),
+  })
+})
+
+const facets = disciplineFacets(rows, new Map())
+const shownBy = (selected: Record<string, string[]>) =>
+  facetRows(rows, facets, selected).map((r) => r.id)
+
+it('shows the distance in the unit of the rule book and filters by either unit of a record that states both', () => {
+  const both = { distance: 25, unit: 'm/yd' as const }
+  expect(disciplineDistance(both)).toBe('25 m / 25 yd')
+  expect(disciplineDistance({ distance: 25, unit: 'm' })).toBe('25 m')
+  expect(disciplineDistance({ distance: 45.72, unit: 'yd' })).toBe('50 yd')
+  const metric = toSi('length', 12700)
+  expect(disciplineDistance({ distance: metric, unit: 'm' })).toBe('12.7 m')
+  const metricRow = { ...defined(rows[0]), distance: metric, unit: 'm' as const }
+  const distFacet = defined(disciplineFacets([metricRow], new Map()).find((f) => f.key === 'dist'))
+  expect(distFacet.values(metricRow)).toEqual(['12.7m'])
+  const fine = { ...metricRow, distance: toSi('length', 12345) }
+  expect(disciplineDistance(fine)).toBe('12.345 m')
+  expect(distFacet.values(fine)).toEqual(['12.345m'])
+  const bothIds = records.filter((d) => d.distance.unit === 'm/yd').map((d) => d.id)
+  expect(bothIds.length).toBeGreaterThan(0)
+  const bdmp25 = rows.filter((r) => r.unit === 'm/yd' && r.distance === 25).map((r) => r.id)
+  expect(shownBy({ dist: ['25yd'] })).toEqual(bdmp25)
+  expect(shownBy({ dist: ['25m'] })).toEqual(expect.arrayContaining(bdmp25))
+  expect(
+    disciplineStrip(defined(records.find((d) => d.id === bothIds[0])), 'BDMP')[1]?.row,
+  ).toMatchObject({
+    text: expect.stringMatching(/^\d+ m \/ \d+ yd$/),
   })
 })
 
@@ -58,19 +93,19 @@ it('scopes by federation, searches the rest and keeps the federation in the URL'
     rows.filter((r) => disciplineMatches(r, { ...emptyDirectory, ...over })).map((r) => r.id)
   expect(ids({})).toHaveLength(records.length)
   const dsb = records.filter((d) => d.federation === 'dsb').map((d) => d.id)
-  expect(ids({ organization: 'DSB' })).toEqual(dsb)
+  expect(shownBy({ org: ['DSB'] })).toEqual(dsb)
   expect(ids({ query: '.44 revolver' })).toContain(pistol.id)
   expect(ids({ query: '2.53' })).toEqual([pistol.id])
-  const state = { ...emptyDirectory, organization: 'DSB' }
+  const state = { ...emptyDirectory, facets: { org: ['DSB'] } }
   const url = writeDirectory(state, '')
   expect(url).toBe('?org=DSB')
-  expect(readDirectory(url)).toMatchObject(state)
+  expect(readDirectory(url, disciplineFacetKeys)).toMatchObject(state)
 })
 
 it('renders the discipline list: one row per discipline linking its page, no federation button', () => {
   const out = renderToStaticMarkup(
     <MantineProvider>
-      <DisciplineList items={rows} />
+      <DisciplineList items={rows} faces={[]} />
     </MantineProvider>,
   )
   expect(out).toContain(`${records.length} disciplines`)
@@ -84,7 +119,7 @@ it('renders the discipline list: one row per discipline linking its page, no fed
 it('gives the strip, the number, section, page and caliber classes, and the rule book with its page', () => {
   expect(disciplineStrip(pistol, 'DSB').map((i) => [i.label, i.row.text])).toEqual([
     ['Federation', 'DSB'],
-    ['Distance', '25'],
+    ['Distance', '25 m'],
   ])
   const rowsOf = defined(disciplineGroups(pistol, classes)[0]).rows
   expect(rowsOf.map((r) => r.label)).toEqual([
@@ -127,6 +162,8 @@ it('counts per federation its disciplines and renders the list with the tabs and
     </MantineProvider>,
   )
   expect(out).toContain(`${federationRecords.length} federations`)
+  expect(out).toContain('All federations')
+  expect(out).not.toContain('Federations, ')
   expect(out).toContain('href="/federations/dsb"')
   expect(out).not.toContain('href="/disciplines"')
   expect(out).toMatch(/role="tablist"[^>]*aria-label="Database"/)
