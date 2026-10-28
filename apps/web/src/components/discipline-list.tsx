@@ -172,7 +172,7 @@ export function FederationList({ items }: { items: FederationRow[] }) {
   const named = [
     ...facetNames(federationFacets, state.facets ?? {}),
     query && `matching "${query}"`,
-  ]
+  ].filter(Boolean)
   const columns: DirectoryColumn<FederationRow>[] = [
     { key: 'name', label: 'Name', value: (r) => r.name, cell: (r) => r.name },
     {

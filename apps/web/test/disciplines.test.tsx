@@ -1,5 +1,6 @@
 import { MantineProvider } from '@mantine/core'
 import { readRecords } from '@open-reloading/data'
+import { toSi } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it, vi } from 'vitest'
 import { DisciplineList, FederationList } from '../src/components/discipline-list.tsx'
@@ -67,6 +68,11 @@ it('shows the distance in the unit of the rule book and filters by either unit o
   expect(disciplineDistance(both)).toBe('25 m / 25 yd')
   expect(disciplineDistance({ distance: 25, unit: 'm' })).toBe('25 m')
   expect(disciplineDistance({ distance: 45.72, unit: 'yd' })).toBe('50 yd')
+  const metric = toSi('length', 12700)
+  expect(disciplineDistance({ distance: metric, unit: 'm' })).toBe('12.7 m')
+  const metricRow = { ...defined(rows[0]), distance: metric, unit: 'm' as const }
+  const distFacet = defined(disciplineFacets([metricRow], new Map()).find((f) => f.key === 'dist'))
+  expect(distFacet.values(metricRow)).toEqual(['12.7m'])
   const bothIds = records.filter((d) => d.distance.unit === 'm/yd').map((d) => d.id)
   expect(bothIds.length).toBeGreaterThan(0)
   const bdmp25 = rows.filter((r) => r.unit === 'm/yd' && r.distance === 25).map((r) => r.id)
@@ -153,6 +159,8 @@ it('counts per federation its disciplines and renders the list with the tabs and
     </MantineProvider>,
   )
   expect(out).toContain(`${federationRecords.length} federations`)
+  expect(out).toContain('All federations')
+  expect(out).not.toContain('Federations, ')
   expect(out).toContain('href="/federations/dsb"')
   expect(out).not.toContain('href="/disciplines"')
   expect(out).toMatch(/role="tablist"[^>]*aria-label="Database"/)

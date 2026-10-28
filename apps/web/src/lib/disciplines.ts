@@ -51,8 +51,10 @@ const metresPerYard = 0.9144
  * The distance as the rule book prints it, one reading per unit it states: the metres of the
  * record, or for `yd` its yards; for `m/yd` the printed number is the same in each unit.
  */
-function distanceReadings(metres: number, unit: DisciplineRow['unit']) {
-  const yards = Math.round((metres / metresPerYard) * 100) / 100
+function distanceReadings(stored: number, unit: DisciplineRow['unit']) {
+  // the SI conversion leaves float noise (12700 mm is 12.700000000000001 m)
+  const metres = Math.round(stored * 100) / 100
+  const yards = Math.round((stored / metresPerYard) * 100) / 100
   return unit === 'yd'
     ? [{ number: yards, unit: 'yd' }]
     : unit === 'm'
