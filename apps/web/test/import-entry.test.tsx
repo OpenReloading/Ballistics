@@ -32,7 +32,7 @@ const bullets = [
 ]
 
 /** The worker's handler over an in-memory store, answering one request at a time. */
-function harness() {
+function storeWorker() {
   let stored: UserRecord[] = []
   const replies: ImportReply[] = []
   const handle = importWorker(
@@ -63,7 +63,7 @@ const built = (r: ImportReply): BuildView => {
 const imported = { source: 'Invented catalogue', file: 'bullets.csv', day: '2026-10-28' }
 
 it('reads a clean table, imports its rows with the source and finds them again on a second import', async () => {
-  const h = harness()
+  const h = storeWorker()
   const read = await h.ask({ type: 'read', id: 1, bytes: csv(bullets) })
   if (read.type !== 'read' || 'refusal' in read.card) throw new Error('not read')
   expect(read.card).toMatchObject({ kind: 'bullet', tier: 'high', rows: 3 })
@@ -91,7 +91,7 @@ it('reads a clean table, imports its rows with the source and finds them again o
 })
 
 it('rejects a bad row and keeps the others, counting a repeated row once', async () => {
-  const h = harness()
+  const h = storeWorker()
   await h.ask({
     type: 'read',
     id: 1,
@@ -104,7 +104,7 @@ it('rejects a bad row and keeps the others, counting a repeated row once', async
 })
 
 it('refuses a text without a table', async () => {
-  const h = harness()
+  const h = storeWorker()
   const r = await h.ask({
     type: 'read',
     id: 1,
