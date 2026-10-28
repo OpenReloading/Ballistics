@@ -29,13 +29,10 @@ import {
   VariantSelect,
 } from './cartridge-record.tsx'
 import { Noted } from './field-table.tsx'
-import { PageBar } from './page-bar.tsx'
-import { PageNotFound } from './page-not-found.tsx'
 import { Panel } from './panel.tsx'
 import { RecordPage } from './record-page.tsx'
+import { RecordView } from './record-view.tsx'
 import { GapBadge, StandardBadge } from './standard-badge.tsx'
-import { DataError, Loading } from './states.tsx'
-import { useRecord } from './use-record.ts'
 
 function RecordBadges({ aliases, gap }: { aliases: string[]; gap: boolean }) {
   const { t } = useTranslation()
@@ -154,33 +151,11 @@ function Cartridge({ c }: { c: CartridgeDetail }) {
   )
 }
 
-/**
- * The cartridge record page: the page's HTML holds the head tags (the route's metadata) and this
- * loading state under the record's name; the content, drawing and print figures included, renders here
- * from the record's data file.
- */
+/** The cartridge record page: the content, drawing and print figures render here from the record's data file (`RecordView`). */
 export function CartridgeRecordPage({ id, name }: { id: string; name: string }) {
-  const { t } = useTranslation()
-  const { state, retry } = useRecord<CartridgeDetail>('cartridges', id)
-  if (state.status === 'ok') return <Cartridge c={state.data} />
-  if (state.status === 'notFound')
-    return (
-      <>
-        <meta name="robots" content="noindex" />
-        <PageNotFound />
-      </>
-    )
   return (
-    <>
-      <PageBar title={name} reserve />
-      {state.status === 'error' ? (
-        <DataError what="Cartridge" retry={retry} />
-      ) : (
-        <Loading what="cartridge" rows={6} />
-      )}
-      <noscript>
-        <p>{t('The record is read and drawn by a script: this page needs JavaScript.')}</p>
-      </noscript>
-    </>
+    <RecordView<CartridgeDetail> kind="cartridges" id={id} name={name} what="Cartridge">
+      {(c) => <Cartridge c={c} />}
+    </RecordView>
   )
 }

@@ -10,7 +10,7 @@ import { FieldStrip } from './field-strip.tsx'
 import { FieldTable } from './field-table.tsx'
 import { Panel } from './panel.tsx'
 import { PanelTable } from './scroll-region.tsx'
-import { ShownLength } from './shown-length.tsx'
+import { shownLength } from './shown-length.tsx'
 
 /** One stage of a discipline: the face it is shot on, the event, the gauge and the shot count. */
 interface DisciplineStageRow {
@@ -61,7 +61,7 @@ export function DisciplineStages({ rows }: { rows: readonly DisciplineStageRow[]
               </th>
               <td>{m.event}</td>
               <td>{m.stage}</td>
-              <td className="num">{m.gauge !== undefined && <ShownLength mm={m.gauge} />}</td>
+              <td className="num">{m.gauge !== undefined && shownLength(m.gauge)}</td>
               <td className="num">{m.shotCount}</td>
               {perStage && (
                 <td>

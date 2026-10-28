@@ -11,7 +11,7 @@ import { FieldStrip } from './field-strip.tsx'
 import { FieldTable } from './field-table.tsx'
 import { Panel } from './panel.tsx'
 import { PanelTable } from './scroll-region.tsx'
-import { ShownLength } from './shown-length.tsx'
+import { shownLength } from './shown-length.tsx'
 
 /** How an event scores a hole, by the stored value. */
 const scoredBy = { touch: msg('Hole edge'), centre: msg('Hole centre') }
@@ -81,7 +81,7 @@ export function FaceEvents({ rows }: { rows: readonly FaceEventRow[] }) {
             </th>
             <td>{d.stage}</td>
             <td className="nowrap">{d.distance.raw ?? `${plainNumber(d.distance.metres)} m`}</td>
-            <td className="num">{d.gauge !== undefined && <ShownLength mm={d.gauge} />}</td>
+            <td className="num">{d.gauge !== undefined && shownLength(d.gauge)}</td>
             <td className="num">{d.shotCount}</td>
             {categories && <td>{d.category && categoryWord(t, d.category)}</td>}
             {scoring && <td>{d.scoring ? t(scoredBy[d.scoring]) : t('Not stated')}</td>}
