@@ -54,9 +54,9 @@ interface FittedPowderInput {
 }
 
 /**
- * The user powder of a fit: the fitted load's burn law in stored units with the fitted values, the
- * base powder's other fields and the `fit` block. Undefined for a load whose burn law a powder
- * record cannot hold (no two-stage vivacity form).
+ * The user powder of a fit: the fitted load's burn law and temperature sensitivity in stored units
+ * with the fitted values, the base powder's other fields and the `fit` block. Undefined for a load
+ * whose burn law a powder record cannot hold (no two-stage vivacity form).
  */
 export function fittedPowder(
   f: FittedPowderInput,
@@ -107,6 +107,14 @@ export function fittedPowder(
       burnForm: { kind: 'twoStage', a: { value: a }, m, q, z1 },
       ...(baseInterior?.resistance && { resistance: baseInterior.resistance }),
     },
+    // the fitted load's, scaled where the temperature factor was fitted
+    ...(p.temperatureSensitivity && {
+      temperatureSensitivity: {
+        reference: { value: fromSi('absoluteTemperature', p.temperatureSensitivity.reference) },
+        cold: { value: fromSi('inverseTemperature', p.temperatureSensitivity.cold) },
+        hot: { value: fromSi('inverseTemperature', p.temperatureSensitivity.hot) },
+      },
+    }),
   }
   return {
     kind: 'powder',
@@ -123,7 +131,9 @@ export function fittedPowder(
           muzzleVelocity: { value: s.velocities.reduce((a, x) => a + x, 0) / s.velocities.length },
           shots: s.velocities.length,
           barrelLength: { value: fromSi('length', load.barrel.length) },
-          temperature: { value: fromSi('temperature', load.propellantTemperature) },
+          temperature: {
+            value: fromSi('temperature', s.propellantTemperature ?? load.propellantTemperature),
+          },
           caseCapacity: { value: fromSi('volume', load.chamber.volume) },
           bulletMass: { value: fromSi('mass', load.bullet.mass) },
         })),

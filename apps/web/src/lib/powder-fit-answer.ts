@@ -1,5 +1,6 @@
 import {
   fitPowder,
+  fitPowderSessions,
   InputError,
   type InteriorLoad,
   interior,
@@ -50,12 +51,13 @@ function thinLadder(ladder: readonly LadderPoint[]) {
   )
 }
 
-/** Whether a fitted value other than the burn coefficient moves with it beyond `powderConfidenceRules.correlation`. */
+/** Whether a fitted value of `thinRule.values` moves with the burn coefficient beyond `powderConfidenceRules.correlation`. */
 function heldFit(fit: PowderFit) {
   const burn = fit.parameters.findIndex((p) => p.name === 'burnRate')
   return fit.parameters.some(
-    (_, j) =>
-      j !== burn && Math.abs(fit.correlation?.[burn]?.[j] ?? 0) > powderConfidenceRules.correlation,
+    (p, j) =>
+      thinRule.values.includes(p.name) &&
+      Math.abs(fit.correlation?.[burn]?.[j] ?? 0) > powderConfidenceRules.correlation,
   )
 }
 
@@ -64,7 +66,8 @@ function heldFit(fit: PowderFit) {
  * range. Unless `anyway`, a thin ladder leaves out the values of `thinRule.values`, and the burn
  * coefficient is fitted alone when a value asked for besides it moves with it (`held`): the core
  * fits such a value without refusing. On 2 charges every extra value moves with it, pressures or
- * not, so `anyway` lifts both rules.
+ * not, so `anyway` lifts both rules. A temperature factor the strings do not resolve is held at 1
+ * by `fitPowderSessions` (`temperature`) instead of refusing the fit.
  */
 export function answerPowderFit(q: PowderFitRequest, post: (r: PowderFitReply) => void) {
   const { id } = q
@@ -72,10 +75,16 @@ export function answerPowderFit(q: PowderFitRequest, post: (r: PowderFitReply) =
     const ladder = stringLadder(q.strings)
     const asked = q.options?.parameters ?? ['burnRate']
     const thin = !q.anyway && asked.some((p) => thinRule.values.includes(p)) && thinLadder(ladder)
-    let rule: 'thin' | 'held' | undefined = thin ? 'thin' : undefined
+    let rule: 'thin' | 'held' | 'temperature' | undefined = thin ? 'thin' : undefined
     let parameters = thin ? asked.filter((p) => !thinRule.values.includes(p)) : asked
     const options = () => ({ ...q.options, parameters })
-    let fit = fitPowder(q.load, ladder, options())
+    let fit: PowderFit
+    if (parameters.includes('temperatureFactor')) {
+      const sessions = fitPowderSessions(q.load, [{ ladder }], options())
+      if (!sessions.resolved.includes('temperatureFactor')) rule = 'temperature'
+      parameters = sessions.resolved
+      fit = sessions
+    } else fit = fitPowder(q.load, ladder, options())
     if (!q.anyway && heldFit(fit)) {
       rule = 'held'
       parameters = ['burnRate']

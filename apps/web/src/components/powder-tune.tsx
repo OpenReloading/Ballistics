@@ -26,7 +26,7 @@ import { dayText } from '../lib/dates.ts'
 import { type ChargeRow, chargeRows } from '../lib/measurements.ts'
 import { newId } from '../lib/new-id.ts'
 import { openOnWorkbench } from '../lib/open-loads.ts'
-import type { PowderFitState } from '../lib/powder-fit.ts'
+import { type PowderFitState, temperatureFit, withSensitivity } from '../lib/powder-fit.ts'
 import { fitMark } from '../lib/powder-record.ts'
 import { fittedPowder, refitOf } from '../lib/powder-save.ts'
 import {
@@ -90,6 +90,24 @@ export const refusalTexts: Record<PowderFitReason, Marked> = {
   'not-converged': msg(
     'The fit did not settle. Start from the burn coefficient of a similar powder, or fit fewer values.',
   ),
+}
+
+/** Why the burn coefficient was fitted alone although more was asked for. */
+const heldTexts = {
+  held: msg(
+    'These strings cannot tell the start pressure or the chamber volume from the burn coefficient: they move together. They stay at their start values and only the burn coefficient is fitted. Add a measured pressure to fit more.',
+  ),
+  temperature: msg(
+    'These strings cannot tell the temperature factor from the burn coefficient. It stays at 1 and only the burn coefficient is fitted. Add strings at temperatures further apart.',
+  ),
+}
+
+/** The warning of a fit whose burn coefficient was fitted alone by a hold rule; none for another rule. */
+function HeldNote({ rule }: { rule: string | undefined }) {
+  const { t } = useTranslation()
+  return rule === 'held' || rule === 'temperature' ? (
+    <Message severity="warning">{t(heldTexts[rule])}</Message>
+  ) : null
 }
 
 /** The name and quantity of each fitted parameter; a factor has no unit. */
@@ -320,13 +338,7 @@ function FitResult({
           </Button>
         </Message>
       )}
-      {fit?.rule === 'held' && (
-        <Message severity="warning">
-          {t(
-            'These strings cannot tell the start pressure or the chamber volume from the burn coefficient: they move together. They stay at their start values and only the burn coefficient is fitted. Add a measured pressure to fit more.',
-          )}
-        </Message>
-      )}
+      <HeldNote rule={fit?.rule} />
       {range && range.confidence.reasons.length > 0 && (
         <ul className="fit-reasons" aria-label={t('Reasons for the label')}>
           {range.confidence.reasons.map((r) => (
@@ -521,8 +533,11 @@ export function TuneNotes({
   strings = [],
   save,
   onAnyway = () => {},
+  sensitivity = '',
+  onSensitivity = () => {},
 }: {
   loaded: ReturnType<typeof loadStrings> | undefined
+  /** The load the workbench handed over, before a sensitivity typed here. */
   interior: InteriorLoad | undefined
   fit: PowderFitState
   /** The strings per charge, the measured points of the chart. */
@@ -533,11 +548,16 @@ export function TuneNotes({
   save?: TuneSave | undefined
   /** Asks for the values left out by the thin rule. */
   onAnyway?: () => void
+  /** The temperature sensitivity typed for a load without one, 1/K. */
+  sensitivity?: string
+  onSensitivity?: (text: string) => void
 }) {
   const { t } = useTranslation()
   const { system } = useUnits()
   const c = system.charge
   const loadId = loaded?.load && parseRef(loaded.load)?.id
+  const ladder = fitStrings(strings)
+  const temperature = interior && ladder.length > 0 ? temperatureFit(interior, ladder) : undefined
   return (
     <>
       {loaded && loaded.strings.length > 0 && !loaded.load && (
@@ -560,6 +580,31 @@ export function TuneNotes({
           })}
         </p>
       )}
+      {temperature === 'one' && (
+        <p className="note">
+          {t('The temperature factor needs strings at two or more powder temperatures.')}
+        </p>
+      )}
+      {temperature === 'sensitivity' && (
+        <>
+          <Message severity="warning">
+            {t(
+              'The strings are at two or more powder temperatures, but the powder has no temperature sensitivity. Give it one to fit the temperature factor.',
+            )}
+          </Message>
+          <TextInput
+            label={t('Temperature sensitivity (1/K)')}
+            description={t(
+              'Above and below the load temperature. The fit scales it from the strings, so any value above 0 starts it.',
+            )}
+            inputMode="decimal"
+            value={sensitivity}
+            onChange={(e) => onSensitivity(e.currentTarget.value)}
+            maw="24rem"
+            my="xs"
+          />
+        </>
+      )}
       {interior && (
         <FitResult state={fit} rows={rows} strings={strings} save={save} onAnyway={onAnyway} />
       )}
@@ -581,7 +626,7 @@ export function PowderTune() {
   const [save, setSave] = useState<TuneSave>()
   const [choices, setChoices] = useState<{ id: string; name: string }[]>()
   const [added, setAdded] = useState<TuneString[]>([])
-  const [form, setForm] = useState({ charge: '', shots: '' })
+  const [form, setForm] = useState({ charge: '', shots: '', temperature: '' })
   const [error, setError] = useState(false)
 
   useEffect(() => {
@@ -617,21 +662,38 @@ export function PowderTune() {
   const strings = useMemo(() => [...(loaded?.strings ?? []), ...added], [loaded, added])
   const rows = chargeRows(strings, [])
   const [anyway, setAnyway] = useState(false)
-  const fit = usePowderFit(interior, strings, anyway)
+  const [sensitivity, setSensitivity] = useState('')
+  const fitLoad = useMemo(() => {
+    const typed = parseNumber(sensitivity, { min: 0 })
+    return interior && withSensitivity(interior, typed.kind === 'number' ? typed.value : undefined)
+  }, [interior, sensitivity])
+  const fit = usePowderFit(fitLoad, strings, anyway)
 
   function add() {
     const charge = parseNumber(form.charge, { min: 0 })
     const shots = parseVelocities(form.shots, v.toSi)
-    if (charge.kind !== 'number' || !(charge.value > 0) || !shots) {
+    const temperature = parseNumber(form.temperature)
+    if (
+      charge.kind !== 'number' ||
+      !(charge.value > 0) ||
+      !shots ||
+      (temperature.kind !== 'number' && temperature.kind !== 'empty')
+    ) {
       setError(true)
       return
     }
     setError(false)
     setAdded((a) => [
       ...a,
-      { charge: c.toSi(charge.value), shots: shots.map((value) => ({ velocity: { value } })) },
+      {
+        charge: c.toSi(charge.value),
+        shots: shots.map((value) => ({ velocity: { value } })),
+        ...(temperature.kind === 'number' && {
+          temperature: system.temperature.toSi(temperature.value),
+        }),
+      },
     ])
-    setForm({ charge: '', shots: '' })
+    setForm({ charge: '', shots: '', temperature: '' })
   }
 
   return (
@@ -663,6 +725,8 @@ export function PowderTune() {
           strings={strings}
           save={save}
           onAnyway={() => setAnyway(true)}
+          sensitivity={sensitivity}
+          onSensitivity={setSensitivity}
         />
         {choices &&
           (choices.length > 0 ? (
@@ -711,6 +775,14 @@ export function PowderTune() {
               onChange={(e) => setForm({ ...form, shots: e.currentTarget.value })}
               style={{ flex: 1, minWidth: '12rem' }}
             />
+            <TextInput
+              label={t('Powder temperature ({unit})', { unit: system.temperature.symbol })}
+              description={t("Empty: the load's")}
+              inputMode="decimal"
+              value={form.temperature}
+              onChange={(e) => setForm({ ...form, temperature: e.currentTarget.value })}
+              w="9rem"
+            />
             <Button type="submit" variant="default">
               {t('Add a string')}
             </Button>
@@ -718,7 +790,9 @@ export function PowderTune() {
         </form>
         {error && (
           <ErrorNote title={t('The string was not added.')}>
-            {t('Enter a charge and at least one shot velocity, each a positive number.')}
+            {t(
+              'Enter a charge and at least one shot velocity, each a positive number, and a temperature or none.',
+            )}
           </ErrorNote>
         )}
         <p className="note">{t('All values on this screen are simulations, not load data.')}</p>

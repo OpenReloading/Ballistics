@@ -1,12 +1,25 @@
 import type { ChronographString, InteriorLoad } from '@open-reloading/core'
-import type { Powder, SessionRecord, UserRecord } from '@open-reloading/schema'
+import { type Powder, type SessionRecord, toSi, type UserRecord } from '@open-reloading/schema'
 import { parseNumber } from '../i18n/number.ts'
 import type { Shot } from './chrono.ts'
 import { storageName } from './edition.ts'
 import { sessionRef, stringCharge } from './measurements.ts'
 
-/** A string on the tuning screen: charge, kg, and its shots. */
-export type TuneString = { charge: number; shots: Pick<Shot, 'velocity' | 'excluded'>[] }
+/** A string on the tuning screen: charge, kg, its shots and the powder temperature, K; default the load's. */
+export type TuneString = {
+  charge: number
+  shots: Pick<Shot, 'velocity' | 'excluded'>[]
+  temperature?: number | undefined
+}
+
+/** `str` as a string of the tuning screen, mapped to `charge`, kg. */
+const tuneString = (str: SessionRecord['data']['strings'][number], charge: number): TuneString => ({
+  charge,
+  shots: str.shots,
+  ...(str.propellantTemperature && {
+    temperature: toSi('temperature', str.propellantTemperature.value),
+  }),
+})
 
 /** The tuning route with the strings of the stored sessions `ids` preloaded. */
 export const tuneHref = (ids: readonly string[]) =>
@@ -66,7 +79,7 @@ export const sessionStrings = (sessions: readonly SessionRecord[]): TuneString[]
   sessions.flatMap((s) =>
     s.data.strings.flatMap((str) => {
       const charge = stringCharge(str)
-      return charge === undefined ? [] : [{ charge, shots: str.shots }]
+      return charge === undefined ? [] : [tuneString(str, charge)]
     }),
   )
 
@@ -79,7 +92,7 @@ export function loadStrings(sessions: readonly SessionRecord[]) {
   const mapped = sessions.flatMap((s) =>
     s.data.strings.flatMap((str) => {
       const charge = stringCharge(str)
-      return charge === undefined ? [] : [{ load: str.load, string: { charge, shots: str.shots } }]
+      return charge === undefined ? [] : [{ load: str.load, string: tuneString(str, charge) }]
     }),
   )
   const load = mapped[0]?.load
@@ -88,11 +101,15 @@ export function loadStrings(sessions: readonly SessionRecord[]) {
   return { load, strings: pick(true), left: pick(false) }
 }
 
-/** The strings as the powder fit reads them: the velocities of the shots not excluded; a string without one is left out. */
+/**
+ * The strings as the powder fit reads them: the velocities of the shots not excluded and the
+ * temperature; a string without a shot is left out.
+ */
 export const fitStrings = (strings: readonly TuneString[]): ChronographString[] =>
-  strings.flatMap(({ charge, shots }) => {
+  strings.flatMap(({ charge, shots, temperature }) => {
     const velocities = shots.filter((s) => !s.excluded).map((s) => s.velocity.value)
-    return velocities.length > 0 ? [{ charge, velocities }] : []
+    if (velocities.length === 0) return []
+    return [{ charge, velocities, ...(temperature && { propellantTemperature: temperature }) }]
   })
 
 /**

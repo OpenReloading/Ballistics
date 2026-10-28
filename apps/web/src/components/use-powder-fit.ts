@@ -1,4 +1,4 @@
-import type { InteriorLoad } from '@open-reloading/core'
+import type { InteriorLoad, PowderParameter } from '@open-reloading/core'
 import { useEffect, useRef, useState } from 'react'
 import {
   type HandPoint,
@@ -6,6 +6,7 @@ import {
   type PowderHandReply,
   type PowderHandRequest,
   powderFitRunner,
+  temperatureFit,
 } from '../lib/powder-fit.ts'
 import { fitStrings, type TuneString } from '../lib/powder-tune.ts'
 
@@ -14,7 +15,9 @@ const fitWorker = () =>
 
 /**
  * The fit of `strings` from `load` in a worker of the page, with each part as it arrives; `anyway`
- * lifts the thin and held rules. Every change asks again and drops the running answer; no load, no fit.
+ * lifts the thin and held rules. Strings at two or more temperatures fit the temperature factor
+ * too where the load has a sensitivity. Every change asks again and drops the running answer; no
+ * load, no fit.
  */
 export function usePowderFit(
   load: InteriorLoad | undefined,
@@ -30,7 +33,12 @@ export function usePowderFit(
   }, [])
   useEffect(() => {
     const ladder = fitStrings(strings)
-    if (load && ladder.length > 0) runner.current?.run({ load, strings: ladder, anyway })
+    if (!load || ladder.length === 0) return
+    const options =
+      temperatureFit(load, ladder) === 'fit'
+        ? { parameters: ['burnRate', 'temperatureFactor'] as PowderParameter[] }
+        : undefined
+    runner.current?.run({ load, strings: ladder, options, anyway })
   }, [load, strings, anyway])
   return state
 }

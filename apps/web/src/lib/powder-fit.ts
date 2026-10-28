@@ -24,20 +24,56 @@ export interface PowderFitRequest {
 }
 
 /**
+ * `load` with the temperature sensitivity `sensitivity`, 1/K, below and above the load's propellant
+ * temperature; `load` itself without a value above 0.
+ */
+export const withSensitivity = (
+  load: InteriorLoad,
+  sensitivity: number | undefined,
+): InteriorLoad =>
+  sensitivity && sensitivity > 0
+    ? {
+        ...load,
+        propellant: {
+          ...load.propellant,
+          temperatureSensitivity: {
+            reference: load.propellantTemperature,
+            cold: sensitivity,
+            hot: sensitivity,
+          },
+        },
+      }
+    : load
+
+/**
+ * Whether the strings fit the temperature factor: `one`, they are at one powder temperature;
+ * `sensitivity`, at two or more, but the load's temperature sensitivity is 0 or absent; else `fit`.
+ */
+export function temperatureFit(load: InteriorLoad, strings: readonly ChronographString[]) {
+  const temperatures = new Set(
+    strings.map((s) => s.propellantTemperature ?? load.propellantTemperature),
+  )
+  const t = load.propellant.temperatureSensitivity
+  if (temperatures.size < 2) return 'one'
+  return t && (t.cold !== 0 || t.hot !== 0) ? 'fit' : 'sensitivity'
+}
+
+/**
  * The worker's answers to one request, in this order: the fit and its band, then the pressure
  * range and its label. A refused fit or a failure ends the answer, after the fit when the range failed.
  */
 export type PowderFitReply =
   /**
    * `rule`: the burn coefficient was fitted alone instead of the values asked for, because the
-   * ladder is thin or because another value moved with it (`held`).
+   * ladder is thin, because another value moved with it (`held`) or because the strings did not
+   * resolve the temperature factor (`temperature`).
    */
   | {
       kind: 'fit'
       id: number
       fit: PowderFit
       band: PowderPrediction[]
-      rule?: 'thin' | 'held' | undefined
+      rule?: 'thin' | 'held' | 'temperature' | undefined
     }
   | { kind: 'range'; id: number; range: PowderPressureRange; confidence: PowderConfidence }
   /** `fitPowder` refused the ladder; `charge`, kg, is the string at fault of `invalid`. */

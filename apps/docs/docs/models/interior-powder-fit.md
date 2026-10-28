@@ -276,6 +276,10 @@ Code: `packages/core/src/interior/fit.ts`, `fitPowder` (`conditions`, `evaluate`
 
 Code: `packages/core/src/interior/fit-sessions.ts`, `fitPowderSessions` (`giveUp`).
 
+The tuning screen of the web app fits the strings a user recorded or typed. Each string carries its powder temperature: the one its session records, the one typed with it, or else the load's. Strings at two or more temperatures request the temperature factor with the burn coefficient from `fitPowderSessions`, as one session whose points carry their temperatures; a factor the strings do not resolve is held at 1, and the screen says that only the burn coefficient was fitted. Strings at one temperature fit the burn coefficient alone, and the screen says that the factor needs two or more temperatures. A load whose temperature sensitivity is 0 or absent, as a user powder may be, fits no factor, and the screen asks for one value: it is used below and above the reference, which is the load's propellant temperature, so the ratio of the two sensitivities is 1. Since the fit scales it, the value only starts the fit. The saved powder keeps the fitted load's sensitivities, scaled by the fitted factor, and each string's temperature in its fit points.
+
+Code: `apps/web/src/lib/powder-fit.ts`, `temperatureFit`, `withSensitivity`; `apps/web/src/lib/powder-fit-answer.ts`, `answerPowderFit`; `apps/web/src/lib/powder-save.ts`, `fittedPowder`.
+
 The values describe the rifle's barrels, the lot and the temperatures of the sessions. A fitted energy absorbs every fixed input that moves the velocity with the barrel length (see Identifiability), and a fitted temperature factor absorbs the effect of the initial temperature on the gas energy, which the model does not have. Neither is a property of the powder to carry to another load, and the result is a simulation parameter, not load data.
 
 ### Failures
