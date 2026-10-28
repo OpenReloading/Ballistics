@@ -2,6 +2,7 @@
   "name": "@open-reloading/importers",
   "version": "0.0.4",
   "license": "MIT",
+  "homepage": "https://openreloading.github.io/Ballistics/docs/libraries/importers/",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OpenReloading/Ballistics.git",

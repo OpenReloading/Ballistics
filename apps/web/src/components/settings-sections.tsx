@@ -83,7 +83,7 @@ function Offline() {
     <Stack gap="sm" align="flex-start">
       <Text size="sm">
         {t(
-          'Pages you have opened, the tools, workbench runs and your own records work without network.',
+          'Without network, every page works except record pages you have not opened before. Workbench runs work for loads opened online in this browser, and your own records always do.',
         )}
       </Text>
       {install ? (

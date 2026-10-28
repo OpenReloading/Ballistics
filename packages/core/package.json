@@ -2,6 +2,7 @@
   "name": "@open-reloading/core",
   "version": "0.0.3",
   "license": "MIT",
+  "homepage": "https://openreloading.github.io/Ballistics/docs/libraries/core/",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OpenReloading/Ballistics.git",
