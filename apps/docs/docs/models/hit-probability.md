@@ -27,6 +27,18 @@ $$
 
 Code: `packages/core/src/groups/hit-probability.ts`, `pointDispersion`.
 
+### Muzzle speed spread
+
+Optionally the standard deviation $\sigma_v$ of the muzzle speed adds a height part. With $S_v$ the change of the height of impact per 1 m/s of muzzle speed at the distance, from a second trajectory run with the speed raised by 1 m/s at the same bore angles, and $S_{v,0}$ the same at the reference distance, the group at $D_0$ already holds the part $S_{v,0}\,\sigma_v$. It is taken out before the linear scaling and the part at the distance is added:
+
+$$
+\sigma_y = \sqrt{\left(\sigma_{g,y}^2 - \left(S_{v,0}\,\sigma_v\right)^2\right)\left(\frac{D}{D_0}\right)^2 + \left(S_v\,\sigma_v\right)^2 + \left(S_R\,\sigma_R\right)^2}
+$$
+
+Code: `packages/core/src/groups/hit-probability.ts`, `pointDispersion` (`velocity`).
+
+The height part grows faster than the distance (with constant speed as the square of the time of flight, with drag faster), so scaling the whole group linearly counts it too small at long range. The input is refused when $S_{v,0}\,\sigma_v$ reaches $\sigma_{g,y}$.
+
 ### Probability inside a zone
 
 The point of impact is a bivariate normal variable centred on the aim point, with no correlation. A zone is an ellipse of semi-axes $a$ (along $x$) and $b$ (along $y$); a circle has $a = b$. With $x = a \sin t$ the probability inside it is the integral over $t$ of the density of $x$ times the probability that $\lvert y \rvert$ stays below $b \cos t$:
@@ -86,6 +98,8 @@ The zones of a face are its rings, grown by the radius of the scored hole as in 
 | $\sigma_c$ | Standard deviation of the crosswind | m/s | m/s |
 | $S_c$ | Lateral displacement per 1 m/s of crosswind | no kind | m per m/s |
 | $S_R$, $\sigma_R$ | Height change per metre of range, standard deviation of the range | no kind, m | m/m, m |
+| $\sigma_v$ | Standard deviation of the muzzle speed | m/s | m/s |
+| $S_v$, $S_{v,0}$ | Height change per 1 m/s of muzzle speed, at the distance and at the reference distance | no kind | m per m/s |
 | $\sigma_x$, $\sigma_y$ | Standard deviations of the point of impact | mm | m |
 | $a$, $b$ | Semi-axes of a scoring zone | mm | m |
 | $P$, $p_k$ | Probability inside a zone, inside a zone and outside the next | 1 | 1 |
@@ -100,6 +114,7 @@ The zones of a face are its rings, grown by the radius of the scored hole as in 
 - The sensitivities $S_c$ and $S_R$ are taken at the nominal wind and range and held for the whole spread (first order). A wind of changing speed along the path is one wind.
 - The point of impact is centred on the aim point unless an offset is given: without one, the zero is right. With one, it is the same for every shot.
 - The shots are independent, with the same probability of a hit, for the number of shots needed.
+- The speed spread, when given, is a first-order effect on the height only (the sensitivity $S_v$ is held for the whole spread), independent of the rest of the group.
 - The wind and range errors are independent of each other and of the group.
 
 ## Limits
