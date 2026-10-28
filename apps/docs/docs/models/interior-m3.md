@@ -385,6 +385,7 @@ Taking the random close packing of equal spheres as the limit for grains of ever
 - `barrelTime` runs from shot start.
 - Charge too small (`chargeTooSmall`): the API warns when the peak mean pressure is below 2.2 times the hold pressure ([charge too small](#charge-too-small)).
 - Solid fill above 0.64 (`solidFillLimit`): the API (`loadRatioHigh`) and the workbench warn ([load file](#load-file)).
+- Research log: [constant-surface closed form](../research/interior-constant-surface-closed-form.md), [closed vessel](../research/interior-closed-vessel-closed-forms.md), [published worked example](../research/interior-published-worked-example.md), [internal consistency checks](../research/interior-internal-consistency-checks.md), [Sébert factor](../research/interior-sebert-factor-choice.md), [charge too small](../research/interior-charge-too-small-bound.md), [solid fill limit](../research/interior-solid-fill-limit.md).
 
 ### Charge too small
 

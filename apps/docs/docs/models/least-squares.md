@@ -223,6 +223,7 @@ The design is singular when $\mu_\text{min} \le 10^{-12}\mu_\text{max}$. Then $\
 - The default `maxCondition` of the callers ($10^3$) and the noise floor are chosen values. A parameter refused as `unresolved` or `ill-conditioned` returns no value.
 - Without weights and $n = p$ the fit solves the equations exactly and reports no uncertainty. An exact fit without weights and $n \gt p$ has $\chi^2 = 0$, so every $\sigma_{\theta_j}$ is 0 and the correlations are undefined (NaN). A covariance diagonal driven below 0 by rounding gives a NaN standard error.
 - A parameter that reaches a region where it has no effect is reported as unresolved after `maxIterations`, not as slow convergence.
+- Research log: [identifiability against the two-parameter closed form](../research/least-squares-identifiability-closed-form.md).
 
 ## Sources
 
