@@ -24,6 +24,28 @@
     ],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "ammunition": {
+      "bulletTypes": ["lead", "jacketed"]
+    },
+    "sighters": "unlimited",
+    "seriesShots": 10,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 300,
+          "raw": "5 min"
+        },
+        "covers": "series"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -37,6 +59,33 @@
         "page": "L 7.01, Seite L-37, PDF p. 37",
         "fields": ["caliberClasses"],
         "note": "The code stands for the numbers 2001 to 2004, 2010 to 2012 and 2014. Caliber class, weight and sight differ per number in L 7.01; the classes stored are those of all numbers together."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 7.01, Seite L-37 and L-38, PDF pp. 37 and 38",
+        "fields": ["rules.firearm", "rules.positions", "rules.supports", "rules.minTriggerWeight"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 14.08.2, Seite L-81, PDF p. 81",
+        "fields": ["rules.positions", "rules.supports"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 15.01, Seite L-86, PDF p. 86",
+        "fields": ["rules.ammunition"],
+        "note": "Handloads are allowed for centerfire only, so the value is left out for the group."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 7.05, Seite L-41, PDF p. 41",
+        "fields": ["rules.sighters"],
+        "note": "Within 3 minutes."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 7.03.1, Seite L-41, PDF p. 41",
+        "fields": ["rules.seriesShots", "rules.timeLimits"]
       }
     ]
   }

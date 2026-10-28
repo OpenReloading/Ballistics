@@ -10,6 +10,34 @@
     "raw": "100 m"
   },
   "category": "rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["prone"],
+    "supports": ["freehand", "sling"],
+    "sights": ["open", "aperture"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "maxFirearmMass": {
+      "value": 5000
+    },
+    "ammunition": {
+      "handloads": true,
+      "bulletTypes": ["lead", "jacketed"]
+    },
+    "sighters": "unlimited",
+    "seriesShots": 10,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 600,
+          "raw": "10 min"
+        },
+        "covers": "series"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -23,6 +51,38 @@
         "page": "L 2.02, Seite L-14, PDF p. 14",
         "fields": ["number", "distance", "category"],
         "note": "The table bounds the cartridge by case length (47 mm), not by calibre."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 2.02, Seite L-14, PDF p. 14",
+        "fields": [
+          "rules.firearm",
+          "rules.actions",
+          "rules.positions",
+          "rules.supports",
+          "rules.sights",
+          "rules.minTriggerWeight",
+          "rules.maxFirearmMass"
+        ],
+        "note": "The row sits in the long gun part of the handbook."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 14.06, Seite L-79, PDF p. 79",
+        "fields": ["rules.sights"],
+        "note": "A closed sight (aperture rear sight) is recorded as aperture; the handbook keeps it apart from a diopter, which is not allowed with a closed sight."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 15.01, Seite L-86, PDF p. 86",
+        "fields": ["rules.ammunition"],
+        "note": "Reloaded centerfire ammunition is allowed if the case matches factory dimensions and the law is met; lead and jacketed bullets of any shape, tracer and hard core excluded."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 2.04, L 2.06, Seite L-17, PDF p. 17",
+        "fields": ["rules.sighters", "rules.seriesShots", "rules.timeLimits"],
+        "note": "Series and times are those of the Deutsche Meisterschaft and Landesmeisterschaft program; district level fires 15 shots in 15 minutes. Sighters have their own 5 minutes before the score."
       }
     ]
   }

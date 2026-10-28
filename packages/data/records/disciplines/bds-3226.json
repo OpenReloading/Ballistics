@@ -24,6 +24,36 @@
     ],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["prone"],
+    "supports": ["freehand", "sling", "rest"],
+    "sights": ["optical", "reflex"],
+    "maxMagnification": {
+      "value": 4
+    },
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "maxFirearmMass": {
+      "value": 6500
+    },
+    "ammunition": {
+      "handloads": true,
+      "bulletTypes": ["lead", "jacketed"]
+    },
+    "sighters": "unlimited",
+    "seriesShots": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 8
+        },
+        "covers": "shot"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -38,6 +68,45 @@
         "page": "L 13.02, Seite L-74, PDF p. 74",
         "fields": ["category", "caliberClasses"],
         "note": "The table excludes the cartridges of list L 17."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 13.02, Seite L-74, PDF p. 74",
+        "fields": [
+          "rules.firearm",
+          "rules.actions",
+          "rules.positions",
+          "rules.supports",
+          "rules.sights",
+          "rules.maxMagnification",
+          "rules.minTriggerWeight",
+          "rules.maxFirearmMass"
+        ],
+        "note": "The row sits in the long gun part of the handbook."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 14.08.6, Seite L-83, PDF p. 83",
+        "fields": ["rules.supports"],
+        "note": "Supported means a bipod, or bench rests in the special class; shooting prone freehand is also allowed in these disciplines."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 14.07, Seite L-80, PDF p. 80",
+        "fields": ["rules.sights"],
+        "note": "Telescopic and electronic (reflex, red dot) sights both count as optical sights."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 15.01, Seite L-86, PDF p. 86",
+        "fields": ["rules.ammunition"],
+        "note": "Reloaded centerfire ammunition is allowed if the case matches factory dimensions and the law is met; lead and jacketed bullets of any shape, tracer and hard core excluded."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 13.04, L 13.06, Seite L-75, PDF p. 75",
+        "fields": ["rules.sighters", "rules.seriesShots", "rules.timeLimits"],
+        "note": "Each shot has an 8 second window, followed by a 12 second pause. Sighters have their own 5 minutes."
       }
     ]
   }

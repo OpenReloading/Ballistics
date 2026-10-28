@@ -13,6 +13,37 @@
     "ids": ["rifle-30-carbine"],
     "basis": "stated"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["kneeling", "sitting", "prone"],
+    "supports": ["freehand", "rest"],
+    "sights": ["original"],
+    "minTriggerWeight": {
+      "value": 2000
+    },
+    "ammunition": {
+      "handloads": true
+    },
+    "sighters": "unlimited",
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 900,
+          "raw": "15 min"
+        },
+        "covers": "stage",
+        "includesSighters": true
+      },
+      {
+        "duration": {
+          "value": 1800,
+          "raw": "30 min"
+        },
+        "covers": "discipline"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -28,6 +59,49 @@
           "caliberClasses",
           "distance"
         ]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "Teil D (Langwaffen-Disziplinen), Seite 1 von 294, PDF p. 1",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10.1, Teil D, Seite 42 von 294, PDF p. 42",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10.2, Teil D, Seite 42 von 294, PDF p. 42",
+        "fields": ["rules.minTriggerWeight"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10.4, Teil D, Seite 42 von 294, PDF p. 42",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10.5, Teil D, Seite 42 von 294, PDF p. 42",
+        "fields": ["rules.supports"],
+        "note": "Shooting slings are not allowed."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10.6, Teil D, Seite 42 von 294, PDF p. 42",
+        "fields": ["rules.ammunition"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10.10, Teil D, Seite 43 von 294, PDF p. 43",
+        "fields": ["rules.positions", "rules.sighters", "rules.timeLimits"],
+        "note": "Prone and kneeling, 15 minutes each including sighters; alternatively all 30 shots prone in 30 minutes in total."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.1.3.5, Teil D, Seite 10 von 294, PDF p. 10",
+        "fields": ["rules.positions", "rules.supports"],
+        "note": "Sitting rested (no bipod) is an alternative to prone and is scored in its own class."
       }
     ]
   }

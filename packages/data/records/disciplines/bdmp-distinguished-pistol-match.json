@@ -9,6 +9,24 @@
     "raw": "50 Meter/Yards"
   },
   "category": "pistol",
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["standing", "kneeling", "sitting", "prone"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "minTriggerWeight": {
+      "value": 1360
+    },
+    "maxBarrelLength": {
+      "value": 127,
+      "raw": "5 in"
+    },
+    "ammunition": {
+      "handloads": true,
+      "bulletTypes": ["lead", "jacketed", "full-metal-jacket", "hollow-point"]
+    }
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -21,6 +39,33 @@
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.8.2, Teil C, Seite 42 bis 43 von 142, PDF pp. 42 to 43",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "Teil C (Kurzwaffen-Disziplinen), Seite 1 von 142, PDF p. 1",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.9.3.1, Teil C, Seite 61 von 142, PDF p. 61",
+        "fields": ["rules.actions", "rules.minTriggerWeight", "rules.maxBarrelLength"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.9.3.2, Teil C, Seite 61 von 142, PDF p. 61",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.10, Teil C, Seite 49 bis 50 von 142, PDF pp. 49 to 50",
+        "fields": ["rules.ammunition"],
+        "note": "Hand loads and factory ammunition; all bullet forms except wadcutters."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.2, C.8.4, Teil C, Seite 42 bis 46 von 142, PDF pp. 42 to 46",
+        "fields": ["rules.positions", "rules.supports"],
+        "note": "Match 3 and station 3 of match 5 add sitting and prone to the standing and kneeling parts. A post supports the shooter, the firearm may not touch it."
       }
     ],
     "note": "Metres or yards."

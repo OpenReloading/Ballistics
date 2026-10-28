@@ -10,6 +10,33 @@
     "raw": "30 m"
   },
   "category": "rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["standing", "kneeling", "sitting", "prone"],
+    "supports": ["freehand"],
+    "sights": ["open", "optical", "reflex"],
+    "maxMagnification": {
+      "value": 1
+    },
+    "minTriggerWeight": {
+      "value": 1500
+    },
+    "ammunition": {
+      "handloads": true
+    },
+    "sighters": 0,
+    "seriesShots": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 330,
+          "raw": "5:30 min"
+        },
+        "covers": "discipline"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,6 +49,43 @@
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.25.14, Teil D, Seite 235 von 294, PDF p. 235",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "Teil D (Langwaffen-Disziplinen), Seite 1 von 294, PDF p. 1",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.25.1, Teil D, Seite 232 von 294, PDF p. 232",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.25.2, Teil D, Seite 232 von 294, PDF p. 232",
+        "fields": ["rules.minTriggerWeight"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.25.3, Teil D, Seite 232 von 294, PDF p. 232",
+        "fields": ["rules.sights", "rules.maxMagnification"],
+        "note": "Optical sights are allowed without any magnification; mapped to reflex and optical at 1x."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.25.6, Teil D, Seite 233 von 294, PDF p. 233",
+        "fields": ["rules.ammunition"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.25.8, Teil D, Seite 233 von 294, PDF p. 233",
+        "fields": ["rules.sighters", "rules.timeLimits"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.25.14, Teil D, Seite 235 bis 238 von 294, PDF pp. 235 to 238",
+        "fields": ["rules.positions", "rules.supports", "rules.seriesShots"],
+        "note": "A post supports the shooter, the firearm may not touch it. Five shots per magazine."
       }
     ],
     "note": "Semi-automatic rifles in .223 Rem. EPP Carbine (D.25.A, Teil D, PDF p. 240) shoots the same course with 9 mm Luger long guns and may shoot station 2 at 25 m standing. Six stations at 7 to 30 m, the record holds the longest distance."

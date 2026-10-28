@@ -10,6 +10,21 @@
     "raw": "50 Meter"
   },
   "category": "muzzle-loader",
+  "rules": {
+    "firearm": "long-gun",
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["aperture"],
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 1800,
+          "raw": "30 min"
+        },
+        "covers": "discipline"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,6 +37,17 @@
         "source": "dsu-sporthandbuch-2018",
         "page": "Kapitel 9, Schwarzpulver und Vorderlader, Seite 1 (PDF p. 233)",
         "fields": ["name", "number"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 4, Seite 10, PDF p. 132",
+        "fields": [
+          "rules.firearm",
+          "rules.positions",
+          "rules.supports",
+          "rules.sights",
+          "rules.timeLimits"
+        ]
       }
     ]
   }

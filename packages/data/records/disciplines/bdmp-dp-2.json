@@ -10,6 +10,31 @@
     "raw": "25 m"
   },
   "category": "service-pistol",
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "minTriggerWeight": {
+      "value": 1360
+    },
+    "ammunition": {
+      "handloads": true,
+      "bulletTypes": ["lead", "jacketed", "full-metal-jacket", "hollow-point"]
+    },
+    "sighters": 5,
+    "seriesShots": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 300,
+          "raw": "5 min"
+        },
+        "covers": "series",
+        "includesSighters": false
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,6 +47,38 @@
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.4.6, Teil C, Seite 13 von 142, PDF p. 13",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "Teil C (Kurzwaffen-Disziplinen), Seite 1 von 142, PDF p. 1",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.4.1, Teil C, Seite 12 von 142, PDF p. 12",
+        "fields": ["rules.actions", "rules.minTriggerWeight"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.4.3, Teil C, Seite 12 bis 13 von 142, PDF pp. 12 to 13",
+        "fields": ["rules.ammunition"],
+        "note": "All bullet forms except wadcutters."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.2.1, C.2.2, Teil C, Seite 7 von 142, PDF p. 7",
+        "fields": ["rules.positions", "rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.4.4, Teil C, Seite 13 von 142, PDF p. 13",
+        "fields": ["rules.positions", "rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.4.7, Teil C, Seite 13 von 142, PDF p. 13",
+        "fields": ["rules.sighters", "rules.seriesShots", "rules.timeLimits"],
+        "note": "The 5 sighters have their own 5 minutes."
       }
     ]
   }

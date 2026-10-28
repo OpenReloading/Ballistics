@@ -10,6 +10,14 @@
     "raw": "50 m / y"
   },
   "category": "pistol",
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["semi-automatic", "revolver"],
+    "positions": ["standing", "kneeling", "sitting", "prone"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "sighters": 6
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,8 +30,38 @@
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.6B.5, Teil C, Seite 27 von 142, PDF p. 27",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.1, Teil C, Seite 3 von 142, PDF p. 3",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6B.1, Teil C, Seite 27 von 142, PDF p. 27",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6B.2, Teil C, Seite 27 von 142, PDF p. 27",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6B.3, C.6B.5, Teil C, Seite 27 von 142, PDF p. 27",
+        "fields": ["rules.sighters"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6.6, Teil C, Seite 18 von 142, PDF p. 18",
+        "fields": ["rules.sighters"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6B.5, Stellung, Teil C, Seite 27 bis 29 von 142, PDF pp. 27 to 29",
+        "fields": ["rules.positions", "rules.supports"]
       }
     ],
-    "note": "The course runs at 10, 50 and 25 m or yd, the record holds the longest distance. PP 2 may also be shot with optical sights as PP 2 Optical Sight, scored separately (C.6B.7, Teil C, PDF p. 29)."
+    "note": "The course runs at 10, 50 and 25 m or yd, the record holds the longest distance. PP 2 may also be shot with optical sights as PP 2 Optical Sight, scored separately (C.6B.7, Teil C, PDF p. 29). A post may support the shooter but never the firearm. Sighters are shot on the 50 m station only. Optical sights are allowed in a separately scored class (C.6B.7)."
   }
 }

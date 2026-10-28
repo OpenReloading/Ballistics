@@ -13,6 +13,18 @@
     "ids": ["pistol-9mm", "revolver-357-38", "revolver-44", "pistol-45"],
     "basis": "stated"
   },
+  "rules": {
+    "firearm": "short-gun",
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "ammunition": {
+      "handloads": true
+    }
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -25,6 +37,33 @@
         "source": "dsb-sportordnung-2027",
         "page": "2.21.1, Teil 2 Seite 20, PDF p. 156 (calibers 9x19, .357 Magnum, .44 Magnum, .45 ACP)",
         "fields": ["caliberClasses"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 82, PDF p. 100 (rows 2.53, 2.55, 2.58 and 2.59)",
+        "fields": ["rules.firearm", "rules.positions", "rules.sights"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.10.5, Teil 2 Seite 12, PDF p. 148",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.1.1 (2.50 to 2.59), Teil 2 Seite 2, PDF p. 138",
+        "fields": ["rules.supports"],
+        "note": "Two hands may hold the firearm."
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "Pistolentabelle, Teil 2 Seite 23, PDF p. 159 (rows 2.53, 2.55, 2.58, 2.59)",
+        "fields": ["rules.minTriggerWeight"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.21.1, Teil 2 Seite 20, PDF p. 156",
+        "fields": ["rules.ammunition"],
+        "note": "Commercial or self-loaded ammunition is allowed if it reaches a minimum momentum that depends on the caliber."
       }
     ],
     "note": "The rule book prints \"(2.50)\" at the target sheet."

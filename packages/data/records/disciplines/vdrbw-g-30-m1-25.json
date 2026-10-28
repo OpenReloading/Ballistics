@@ -14,6 +14,28 @@
     "ids": ["rifle-30-carbine"],
     "basis": "stated"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["standing", "kneeling", "prone"],
+    "supports": ["freehand", "sling"],
+    "sights": ["original"],
+    "ammunition": {
+      "handloads": true
+    },
+    "sighters": 5,
+    "seriesShots": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 300,
+          "raw": "5 min"
+        },
+        "covers": "series",
+        "includesSighters": false
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -26,6 +48,34 @@
         "source": "vdrbw-schiesssportordnung-2023",
         "page": "9.8, Seite 72, PDF p. 72",
         "fields": ["federation", "section", "page", "distance", "caliberClasses", "category"]
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.1, Seite 59, PDF p. 59",
+        "fields": ["rules.firearm"],
+        "note": "Chapter 9 covers long guns."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.1.4.1, Seite 59, PDF p. 59",
+        "fields": ["rules.ammunition"],
+        "note": "Reloaded ammunition is allowed. Bundeswehr ranges take only factory-loaded full-metal-jacket ammunition."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.8.1, 9.8.2, 9.8.8, Seite 72, PDF p. 72",
+        "fields": ["rules.actions", "rules.positions", "rules.supports", "rules.sights"]
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.1.3.2, Seite 59, PDF p. 59",
+        "fields": ["rules.supports"],
+        "note": "Sling in prone only: the original carrying strap may serve as a shooting aid. The discipline bars shooting slings, read here as a different item."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.8.9, 9.8.10, 9.8.11, Seite 72, PDF p. 72",
+        "fields": ["rules.sighters", "rules.seriesShots", "rules.timeLimits"]
       }
     ]
   }

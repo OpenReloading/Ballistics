@@ -14,6 +14,34 @@
     "ids": ["rimfire-22"],
     "basis": "stated"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["single-shot"],
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["open", "optical"],
+    "minTriggerWeight": {
+      "value": 500
+    },
+    "maxFirearmMass": {
+      "value": 5500
+    },
+    "sighters": 4,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 5
+        },
+        "covers": "shot"
+      },
+      {
+        "duration": {
+          "value": 2.5
+        },
+        "covers": "shot"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -30,6 +58,41 @@
           "category",
           "caliberClasses"
         ]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 84, PDF p. 102 (row 4.25)",
+        "fields": [
+          "rules.firearm",
+          "rules.actions",
+          "rules.positions",
+          "rules.sights",
+          "rules.timeLimits"
+        ],
+        "note": "Open sights, telescopic sight allowed. The equipment table lists any sight."
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "4.1.1, Teil 4 Seite 1, PDF p. 239",
+        "fields": ["rules.positions", "rules.supports"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "equipment table (row 4.25), Teil 4 Seite 8, PDF p. 246",
+        "fields": ["rules.maxFirearmMass", "rules.minTriggerWeight"],
+        "note": "Mass includes the telescopic sight."
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "4.3.2.1, Teil 4 Seite 3, PDF p. 241",
+        "fields": ["rules.sighters"],
+        "note": "Four sighters in two series of two, one slow and one fast run from each side."
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "4.3.1, Teil 4 Seite 2, PDF p. 240",
+        "fields": ["rules.timeLimits"],
+        "note": "Time per shot, in program order: slow run 5 s, fast run 2.5 s, mixed within the program."
       }
     ]
   }

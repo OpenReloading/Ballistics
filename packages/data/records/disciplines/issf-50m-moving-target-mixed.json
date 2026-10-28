@@ -13,6 +13,34 @@
     "ids": ["rimfire-22"],
     "basis": "stated"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["open", "aperture", "optical", "reflex"],
+    "minTriggerWeight": {
+      "value": 500
+    },
+    "maxFirearmMass": {
+      "value": 5500
+    },
+    "sighters": 4,
+    "seriesShots": 20,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 5
+        },
+        "covers": "shot"
+      },
+      {
+        "duration": {
+          "value": 2.5
+        },
+        "covers": "shot"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -26,6 +54,41 @@
         "page": "Rule 10.14, p. 476 (PDF p. 476)",
         "fields": ["section", "page", "category", "caliberClasses"],
         "note": "The rule book gives the event names but no discipline codes. The category is read from the ammunition and weight columns: 4.5 mm (.177\") air rifle at 10 m, 5.6 mm (.22\" lr) rifle at 50 m."
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 10.1.1, p. 461 (PDF p. 461)",
+        "fields": ["rules.firearm"],
+        "note": "Stated for the moving target section as a whole."
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 10.7.1, p. 466 (PDF p. 466)",
+        "fields": ["rules.positions", "rules.supports"],
+        "note": "Standing without support, no sling."
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 10.4.3.1, p. 461 (PDF p. 461)",
+        "fields": ["rules.sights"],
+        "note": "Any sight type."
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 10.4.3.6, p. 462 (PDF p. 462); rule 10.14, p. 476 (PDF p. 476)",
+        "fields": ["rules.minTriggerWeight"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 10.4.1, p. 461 (PDF p. 461); rule 10.14, p. 476 (PDF p. 476)",
+        "fields": ["rules.maxFirearmMass"],
+        "note": "Rifle and sight together."
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 10.7.2, p. 466 (PDF p. 466)",
+        "fields": ["rules.sighters", "rules.seriesShots", "rules.timeLimits"],
+        "note": "Two series, each with four sighting shots and 20 mixed slow and fast shots. The slow and fast times are those of the 30 + 30 programme."
       }
     ]
   }

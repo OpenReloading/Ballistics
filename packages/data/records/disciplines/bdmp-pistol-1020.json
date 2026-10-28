@@ -9,6 +9,24 @@
     "raw": "25 Meter/ Yard"
   },
   "category": "pistol",
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["standing", "kneeling", "sitting"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "minTriggerWeight": {
+      "value": 1360
+    },
+    "maxBarrelLength": {
+      "value": 152.4,
+      "raw": "6 in"
+    },
+    "ammunition": {
+      "handloads": true,
+      "bulletTypes": ["lead", "jacketed", "full-metal-jacket", "hollow-point", "wadcutter"]
+    }
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -21,6 +39,57 @@
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.21, Teil C, Seite 138 von 142, PDF p. 138",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "Teil C (Kurzwaffen-Disziplinen), Seite 1 von 142, PDF p. 1",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.9.2.1, Teil C, Seite 60 von 142, PDF p. 60",
+        "fields": ["rules.actions", "rules.minTriggerWeight", "rules.maxBarrelLength"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.21.B, Teil C, Seite 140 von 142, PDF p. 140",
+        "fields": ["rules.actions", "rules.minTriggerWeight", "rules.maxBarrelLength"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.9.2.2, Teil C, Seite 60 von 142, PDF p. 60",
+        "fields": ["rules.sights"],
+        "note": "The optical-sight class is scored separately."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.21.B, Teil C, Seite 140 von 142, PDF p. 140",
+        "fields": ["rules.sights"],
+        "note": "The optical-sight class is scored separately."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.10, Teil C, Seite 49 bis 50 von 142, PDF pp. 49 to 50",
+        "fields": ["rules.ammunition"],
+        "note": "Hand loads and factory ammunition; all bullet forms."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.21.B, Teil C, Seite 140 von 142, PDF p. 140",
+        "fields": ["rules.ammunition"],
+        "note": "Hand loads and factory ammunition; all bullet forms."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.4, Teil C, Seite 44 bis 46 von 142, PDF pp. 44 to 46",
+        "fields": ["rules.positions", "rules.supports"],
+        "note": "Standing, kneeling and sitting; the 1020 course has no prone part. A post supports the shooter, the firearm may not touch it."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.21, Teil C, Seite 138 bis 139 von 142, PDF pp. 138 to 139",
+        "fields": ["rules.positions", "rules.supports"],
+        "note": "Standing, kneeling and sitting; the 1020 course has no prone part. A post supports the shooter, the firearm may not touch it."
       }
     ],
     "note": "Weapon, sights and caliber as C.9.2 (metres or yards)."

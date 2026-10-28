@@ -9,6 +9,18 @@
     "raw": "15 m"
   },
   "category": "pistol",
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["revolver", "semi-automatic"],
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sighters": 0,
+    "sights": ["open"],
+    "ammunition": {
+      "handloads": true,
+      "bulletTypes": ["lead", "jacketed", "full-metal-jacket", "hollow-point"]
+    }
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -21,8 +33,33 @@
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.6E.5, Teil C, Seite 35 von 142, PDF p. 35",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.1, Teil C, Seite 3 von 142, PDF p. 3",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6E.1, Teil C, Seite 34 von 142, PDF p. 34",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6.5, C.6.6, Teil C, Seite 18 von 142, PDF p. 18",
+        "fields": ["rules.positions", "rules.supports", "rules.sighters"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6E.2, Teil C, Seite 34 von 142, PDF p. 34",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6E.3, Teil C, Seite 35 von 142, PDF p. 35",
+        "fields": ["rules.ammunition"]
       }
     ],
-    "note": "Revolvers with a 3 in barrel and pistols that fit the 180 x 140 x 40 mm box (C.6E.1). The course runs at 15, 10 and 7 m, the record holds the longest distance."
+    "note": "Revolvers with a 3 in barrel and pistols that fit the 180 x 140 x 40 mm box (C.6E.1). The course runs at 15, 10 and 7 m, the record holds the longest distance. The revolver barrel length is stated as exactly 3 in, so no maximum is set. Any bullet shape except wadcutter is allowed."
   }
 }

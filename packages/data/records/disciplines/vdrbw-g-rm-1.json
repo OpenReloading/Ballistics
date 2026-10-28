@@ -14,6 +14,31 @@
     "ids": ["rifle-6-5", "rifle-270", "rifle-7mm", "rifle-30", "rifle-30-carbine", "rifle-8mm"],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["repeater"],
+    "positions": ["prone"],
+    "supports": ["freehand", "sling", "rest"],
+    "sights": ["original"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "ammunition": {
+      "handloads": true
+    },
+    "sighters": 5,
+    "seriesShots": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 1800,
+          "raw": "30 min"
+        },
+        "covers": "discipline",
+        "includesSighters": false
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -26,6 +51,42 @@
         "source": "vdrbw-schiesssportordnung-2023",
         "page": "9.2, Seite 60, PDF p. 60",
         "fields": ["federation", "section", "page", "distance", "caliberClasses", "category"]
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.1, Seite 59, PDF p. 59",
+        "fields": ["rules.firearm"],
+        "note": "Chapter 9 covers long guns."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.1.4.1, Seite 59, PDF p. 59",
+        "fields": ["rules.ammunition"],
+        "note": "Reloaded ammunition is allowed. Bundeswehr ranges take only factory-loaded full-metal-jacket ammunition."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.2.1, 9.2.2, 9.2.7, 9.2.8, Seite 60, PDF p. 60",
+        "fields": [
+          "rules.actions",
+          "rules.positions",
+          "rules.supports",
+          "rules.sights",
+          "rules.minTriggerWeight"
+        ],
+        "note": "Prone, freehand or on a rest."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.1.3.2, Seite 59, PDF p. 59",
+        "fields": ["rules.supports"],
+        "note": "Sling in prone only: the original carrying strap may serve as a shooting aid. The discipline bars shooting slings, read here as a different item."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.2.9, 9.2.10, 9.2.11, Seite 60, PDF p. 60",
+        "fields": ["rules.sighters", "rules.seriesShots", "rules.timeLimits"],
+        "note": "The time is for the 30-shot course; the 15-shot course has 15 minutes."
       }
     ]
   }

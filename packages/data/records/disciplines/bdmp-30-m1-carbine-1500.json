@@ -9,6 +9,19 @@
     "raw": "50 Meter"
   },
   "category": "carbine",
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["standing", "kneeling", "sitting", "prone"],
+    "supports": ["freehand"],
+    "sights": ["original"],
+    "minTriggerWeight": {
+      "value": 2000
+    },
+    "ammunition": {
+      "handloads": true
+    }
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -21,6 +34,37 @@
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.10A.12, Teil D, Seite 48 bis 49 von 294, PDF pp. 48 to 49",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "Teil D (Langwaffen-Disziplinen), Seite 1 von 294, PDF p. 1",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10A.2, Teil D, Seite 45 von 294, PDF p. 45",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10A.3, Teil D, Seite 45 von 294, PDF p. 45",
+        "fields": ["rules.minTriggerWeight"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10A.5, Teil D, Seite 45 von 294, PDF p. 45",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10A.6, Teil D, Seite 45 von 294, PDF p. 45",
+        "fields": ["rules.ammunition"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10A.10, Teil D, Seite 46 bis 47 von 294, PDF pp. 46 to 47",
+        "fields": ["rules.positions", "rules.supports"],
+        "note": "Prone replaces kneeling at 25 m and 50 m. A post supports the shooter, the firearm may not touch it."
       }
     ],
     "note": "The course runs at 10, 15, 25 and 50 m. D.10A.8 lists 10, 25 and 50 m. The record holds the longest distance."

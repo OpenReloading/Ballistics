@@ -14,6 +14,31 @@
     "ids": ["rifle-22-cf", "rifle-6mm", "rifle-25", "rifle-6-5", "rifle-270", "rifle-7mm"],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["single-shot", "repeater"],
+    "positions": ["prone"],
+    "supports": ["rest", "freehand"],
+    "sights": ["open", "aperture", "optical", "reflex"],
+    "maxFirearmMass": {
+      "value": 10000
+    },
+    "ammunition": {
+      "handloads": true,
+      "bulletTypes": ["lead", "jacketed"]
+    },
+    "sighters": "unlimited",
+    "seriesShots": 10,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 600,
+          "raw": "10 min"
+        },
+        "covers": "series"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -26,6 +51,43 @@
         "source": "bds-sporthandbuch-langwaffen-2026",
         "page": "L 2.02, Seite L-13, PDF p. 13",
         "fields": ["number", "distance", "category", "caliberClasses"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 2.02, Seite L-13, PDF p. 13",
+        "fields": [
+          "rules.firearm",
+          "rules.actions",
+          "rules.positions",
+          "rules.supports",
+          "rules.sights",
+          "rules.maxFirearmMass"
+        ],
+        "note": "The row sits in the long gun part of the handbook."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 14.08.6, Seite L-83, PDF p. 83",
+        "fields": ["rules.supports"],
+        "note": "Supported means a bipod, or bench rests in the special class; shooting prone freehand is also allowed in these disciplines."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 14.07.1, Seite L-80, PDF p. 80",
+        "fields": ["rules.sights"],
+        "note": "Any sight, telescopic and electronic included."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 15.01, Seite L-86, PDF p. 86",
+        "fields": ["rules.ammunition"],
+        "note": "Reloaded centerfire ammunition is allowed if the case matches factory dimensions and the law is met; lead and jacketed bullets of any shape, tracer and hard core excluded."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 2.04, L 2.06, Seite L-17, PDF p. 17",
+        "fields": ["rules.sighters", "rules.seriesShots", "rules.timeLimits"],
+        "note": "Series and times are those of the Deutsche Meisterschaft and Landesmeisterschaft program; district level fires 15 shots in 15 minutes. Sighters have their own 5 minutes before the score."
       }
     ]
   }

@@ -9,6 +9,29 @@
     "raw": "25 Meter/Yards"
   },
   "category": "revolver",
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["revolver"],
+    "positions": ["standing", "kneeling"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "maxBarrelLength": {
+      "value": 69.85,
+      "raw": "2,75 Zoll"
+    },
+    "ammunition": {
+      "handloads": true,
+      "bulletTypes": ["lead", "jacketed", "full-metal-jacket", "hollow-point"],
+      "minBulletMass": {
+        "value": 10.238,
+        "raw": "158 gr"
+      },
+      "maxBulletMass": {
+        "value": 10.238,
+        "raw": "158 gr"
+      }
+    }
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -21,8 +44,33 @@
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.8.2, Teil C, Seite 42 bis 43 von 142, PDF pp. 42 to 43",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.1, Teil C, Seite 3 von 142, PDF p. 3",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.9.7.1, C.9.7.2, Teil C, Seite 67 von 142, PDF p. 67",
+        "fields": ["rules.actions", "rules.sights", "rules.maxBarrelLength"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.2, Teil C, Seite 42 bis 43 von 142, PDF pp. 42 to 43",
+        "fields": ["rules.positions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.4, Teil C, Seite 44 bis 46 von 142, PDF pp. 44 to 46",
+        "fields": ["rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.10 a), g), Teil C, Seite 49 bis 50 von 142, PDF pp. 49 to 50",
+        "fields": ["rules.ammunition"]
       }
     ],
-    "note": "Metres or yards."
+    "note": "Metres or yards. Bullet is .38 Special, 158 gr; wadcutter is not allowed. A minimum power factor of 80 applies. A maximum muzzle energy of 600 J applies to the match."
   }
 }

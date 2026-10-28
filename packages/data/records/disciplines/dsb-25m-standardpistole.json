@@ -13,6 +13,45 @@
     "ids": ["rimfire-22"],
     "basis": "stated"
   },
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["semi-automatic", "revolver"],
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "maxBarrelLength": {
+      "value": 153,
+      "raw": "15,3 cm"
+    },
+    "maxFirearmMass": {
+      "value": 1400
+    },
+    "sighters": 5,
+    "seriesShots": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 150
+        },
+        "covers": "series"
+      },
+      {
+        "duration": {
+          "value": 20
+        },
+        "covers": "series"
+      },
+      {
+        "duration": {
+          "value": 10
+        },
+        "covers": "series"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -25,6 +64,37 @@
         "source": "dsb-sportordnung-2027",
         "page": "Pistolentabelle, Teil 2 Seite 23, PDF p. 159 (2.60) and 0.21, Teil 0 Seite 82, PDF p. 100 (row 2.60)",
         "fields": ["caliberClasses"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 82, PDF p. 100 (row 2.60)",
+        "fields": ["rules.firearm", "rules.positions", "rules.sights", "rules.maxBarrelLength"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.10.5, Teil 2 Seite 12, PDF p. 148",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.1, Teil 2 Seite 1, PDF p. 137",
+        "fields": ["rules.supports"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.22, Teil 2 Seite 22, PDF p. 158",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "Pistolentabelle, Teil 2 Seite 23, PDF p. 159 (row 2.60)",
+        "fields": ["rules.maxFirearmMass", "rules.minTriggerWeight", "rules.maxBarrelLength"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.22.2 and 2.22.3.1, Teil 2 Seite 22, PDF p. 158",
+        "fields": ["rules.sighters", "rules.seriesShots", "rules.timeLimits"],
+        "note": "Series times listed in program order: four at 150 s, four at 20 s, four at 10 s."
       }
     ],
     "note": "The name prints Pistole. The rule admits revolvers and self-loading pistols."

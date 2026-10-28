@@ -24,6 +24,33 @@
     ],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["prone", "sitting"],
+    "supports": ["freehand"],
+    "sights": ["optical", "reflex"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "maxFirearmMass": {
+      "value": 6000
+    },
+    "ammunition": {
+      "handloads": true,
+      "bulletTypes": ["lead", "jacketed"]
+    },
+    "sighters": "unlimited",
+    "seriesShots": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 8
+        },
+        "covers": "shot"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -37,6 +64,48 @@
         "source": "bds-sporthandbuch-langwaffen-2026",
         "page": "L 13.01, Seite L-73, PDF p. 73",
         "fields": ["category", "caliberClasses"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 13.01, Seite L-73, PDF p. 73",
+        "fields": [
+          "rules.firearm",
+          "rules.actions",
+          "rules.positions",
+          "rules.supports",
+          "rules.sights",
+          "rules.minTriggerWeight",
+          "rules.maxFirearmMass"
+        ]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 14.06, L 14.07, Seite L-79 and L-80, PDF pp. 79 and 80",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 14.08.1, Seite L-81, PDF p. 81",
+        "fields": ["rules.positions", "rules.supports"],
+        "note": "Shooters aged 55 or more may sit instead of lying, where the range allows it."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 15.01, Seite L-86, PDF p. 86",
+        "fields": ["rules.ammunition"],
+        "note": "Reloaded centerfire ammunition is allowed when the case matches factory ammunition of the discipline."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 13.06, Seite L-75, PDF p. 75",
+        "fields": ["rules.sighters"],
+        "note": "Within 5 minutes."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 13.04, Seite L-75, PDF p. 75",
+        "fields": ["rules.seriesShots", "rules.timeLimits"],
+        "note": "Each shot has an 8 second window followed by a 12 second pause."
       }
     ]
   }

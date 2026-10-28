@@ -5,6 +5,27 @@
   "event": "bds-2810-25-m-kombi-sg-sl-kw-opt-vis-teil-intervall-zeitserie",
   "stage": "Intervall/Zeitserie",
   "shotCount": 20,
+  "seriesShots": 5,
+  "timeLimits": [
+    {
+      "duration": {
+        "value": 3
+      },
+      "covers": "shot"
+    },
+    {
+      "duration": {
+        "value": 20
+      },
+      "covers": "series"
+    },
+    {
+      "duration": {
+        "value": 10
+      },
+      "covers": "series"
+    }
+  ],
   "provenance": {
     "kind": "published",
     "sources": [
@@ -17,6 +38,12 @@
         "source": "bds-sporthandbuch-langwaffen-2026",
         "page": "L 7.03.2, Seite L-41, PDF p. 41",
         "fields": ["shotCount"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 7.03.2, Seite L-41, PDF p. 41",
+        "fields": ["seriesShots", "timeLimits"],
+        "note": "The interval series give 3 seconds per shot; the two time series are 20 and 10 seconds."
       }
     ]
   }

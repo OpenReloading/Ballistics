@@ -10,6 +10,36 @@
     "raw": "100 m"
   },
   "category": "rifle",
+  "rules": {
+    "actions": ["single-shot"],
+    "sights": ["open", "aperture"],
+    "maxFirearmMass": {
+      "value": 6000,
+      "raw": "6 kg"
+    },
+    "ammunition": {
+      "bulletTypes": ["lead"]
+    },
+    "sighters": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 1800,
+          "raw": "30 min"
+        },
+        "covers": "discipline",
+        "includesSighters": true
+      },
+      {
+        "duration": {
+          "value": 2700,
+          "raw": "45 min"
+        },
+        "covers": "discipline",
+        "includesSighters": true
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,6 +52,29 @@
         "source": "bdmp-sportordnung-2026-register-10",
         "page": "E.6.8, Teil E, Seite 18 von 42, PDF p. 18",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.6.1, Teil E, Seite 17 von 42, PDF p. 17",
+        "fields": ["rules.actions", "rules.maxFirearmMass"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.6.3, Teil E, Seite 17 von 42, PDF p. 17",
+        "fields": ["rules.sights"],
+        "note": "Two aiming elements without magnification, made before 1900."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.6.4, Teil E, Seite 17 von 42, PDF p. 17",
+        "fields": ["rules.ammunition"],
+        "note": "Soft lead or lead alloy; no jacketed or partly jacketed bullets."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.6.7, Teil E, Seite 18 von 42, PDF p. 18",
+        "fields": ["rules.sighters", "rules.timeLimits"],
+        "note": "5 sighters and 10 scored shots in 30 minutes; the announcement may instead set 5 sighters and 15 scored shots in 45 minutes."
       }
     ],
     "note": "E.6.8 (Teil E) names class SPFG 1 for this distance; class SPFG 3 (300 to 900 m) is bdmp-lrspfg-3."

@@ -24,6 +24,39 @@
     ],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["semi-automatic", "revolver"],
+    "positions": ["standing", "kneeling", "prone"],
+    "supports": ["freehand"],
+    "sights": ["original"],
+    "minTriggerWeight": {
+      "value": 1360
+    },
+    "ammunition": {
+      "handloads": true
+    },
+    "sighters": 5,
+    "seriesShots": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 720,
+          "raw": "12 min"
+        },
+        "covers": "discipline",
+        "includesSighters": false
+      },
+      {
+        "duration": {
+          "value": 240,
+          "raw": "4 min"
+        },
+        "covers": "series",
+        "includesSighters": false
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -36,6 +69,35 @@
         "source": "vdrbw-schiesssportordnung-2023",
         "page": "8.4, Seite 38, PDF p. 38",
         "fields": ["federation", "section", "page", "distance", "caliberClasses"]
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "8.1, Seite 32, PDF p. 32",
+        "fields": ["rules.firearm"],
+        "note": "Chapter 8 covers handguns."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "8.1.3.1, Seite 32, PDF p. 32",
+        "fields": ["rules.ammunition"],
+        "note": "Reloaded ammunition is allowed. Bundeswehr ranges take only factory-loaded full-metal-jacket ammunition."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "8.4.1, 8.4.4, 8.4.7, Seite 38, PDF p. 38",
+        "fields": [
+          "rules.actions",
+          "rules.positions",
+          "rules.supports",
+          "rules.sights",
+          "rules.minTriggerWeight"
+        ],
+        "note": "The barrel limit differs for pistol and revolver (6 and 6.5 in), so no single maximum is set."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "8.4.8 to 8.4.10, Seite 38, PDF p. 38",
+        "fields": ["rules.sighters", "rules.seriesShots", "rules.timeLimits"]
       }
     ]
   }

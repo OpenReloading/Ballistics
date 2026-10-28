@@ -13,6 +13,25 @@
     "ids": ["pistol-7-65", "revolver-32", "pistol-9mm", "revolver-357-38", "pistol-9x18"],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "short-gun",
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "maxBarrelLength": {
+      "value": 153
+    },
+    "maxFirearmMass": {
+      "value": 1400
+    },
+    "ammunition": {
+      "bulletTypes": ["lead"]
+    },
+    "seriesShots": 5
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -31,6 +50,35 @@
         "page": "Rules 8.4.3.3 and 8.4.4, p. 358 (PDF p. 358)",
         "fields": ["caliberClasses"],
         "note": "The rule prints a calibre range of 7.62 to 9.65 mm (.30 to .38). The classes are those whose diameter lies in that range. The rule also excludes high-power or Magnum ammunition, which the class list does not model."
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 8.1.1, p. 351 (PDF p. 351)",
+        "fields": ["rules.firearm"],
+        "note": "Stated for the pistol section as a whole."
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 8.4.1.2, p. 352 (PDF p. 352); rule 8.7.1, p. 360 (PDF p. 360)",
+        "fields": ["rules.positions", "rules.supports", "rules.sights"],
+        "note": "Standing free, one hand, open sights only."
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 8.12, p. 375 (PDF p. 375)",
+        "fields": ["rules.minTriggerWeight", "rules.maxBarrelLength", "rules.maxFirearmMass"],
+        "note": "One row of the specification table serves the rimfire and the centre fire 25 m pistol."
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 8.4.4, p. 358 (PDF p. 358)",
+        "fields": ["rules.ammunition"],
+        "note": "Lead or similar soft material; jacketed bullets are not allowed."
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 8.7.6.4, p. 364 (PDF p. 364)",
+        "fields": ["rules.seriesShots"]
       }
     ]
   }

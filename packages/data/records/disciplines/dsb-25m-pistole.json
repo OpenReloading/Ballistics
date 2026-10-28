@@ -13,6 +13,23 @@
     "ids": ["rimfire-22"],
     "basis": "stated"
   },
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["semi-automatic", "revolver"],
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "maxBarrelLength": {
+      "value": 153,
+      "raw": "15,3 cm"
+    },
+    "maxFirearmMass": {
+      "value": 1400
+    }
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -25,6 +42,31 @@
         "source": "dsb-sportordnung-2027",
         "page": "Pistolentabelle, Teil 2 Seite 23, PDF p. 159 (2.40) and 0.21, Teil 0 Seite 81, PDF p. 99 (row 2.40)",
         "fields": ["caliberClasses"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 81, PDF p. 99 (row 2.40)",
+        "fields": ["rules.firearm", "rules.positions", "rules.sights", "rules.maxBarrelLength"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.10.5, Teil 2 Seite 12, PDF p. 148",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.1, Teil 2 Seite 1, PDF p. 137",
+        "fields": ["rules.supports"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.18, Teil 2 Seite 17, PDF p. 153",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "Pistolentabelle, Teil 2 Seite 23, PDF p. 159 (row 2.40)",
+        "fields": ["rules.maxFirearmMass", "rules.minTriggerWeight", "rules.maxBarrelLength"]
       }
     ],
     "note": "The name prints Pistole. The rule admits revolvers and self-loading pistols."

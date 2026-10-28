@@ -10,6 +10,21 @@
     "raw": "25 m"
   },
   "category": "muzzle-loader",
+  "rules": {
+    "firearm": "short-gun",
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["original"],
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 1800,
+          "raw": "30 min"
+        },
+        "covers": "discipline"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,7 +37,19 @@
         "source": "bdmp-sportordnung-2026-register-10",
         "page": "E.13.8, Teil E, Seite 36 von 42, PDF p. 36",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.13.1, E.13.4, E.13.6, Teil E, Seite 35 von 42, PDF p. 35",
+        "fields": [
+          "rules.firearm",
+          "rules.sights",
+          "rules.positions",
+          "rules.supports",
+          "rules.timeLimits"
+        ]
       }
-    ]
+    ],
+    "note": "The firearm kind follows from the flintlock pistols admitted."
   }
 }

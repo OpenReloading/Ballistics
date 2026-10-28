@@ -10,6 +10,26 @@
     "raw": "100 m"
   },
   "category": "service-rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["repeater"],
+    "positions": ["standing", "prone"],
+    "supports": ["freehand", "sling"],
+    "sights": ["original"],
+    "minTriggerWeight": {
+      "value": 1500
+    },
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 3300,
+          "raw": "55 min"
+        },
+        "covers": "discipline",
+        "includesSighters": true
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,6 +42,28 @@
         "source": "dsb-sportordnung-2027",
         "page": "0.21, Teil 0 Seite 78, PDF p. 96 (rows 1.58 O and 1.58 G)",
         "fields": ["number"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 78, PDF p. 96 (rows 1.58 O and 1.58 G)",
+        "fields": ["rules.firearm", "rules.positions"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "1.8.1, Teil 1 Seite 17, PDF p. 129",
+        "fields": ["rules.actions", "rules.sights", "rules.supports"],
+        "note": "Bolt-action service rifles of the issued kind only. Sling in prone; standing with the sling removed or hanging loose. Row 1.58 O is open sights, 1.58 G closed sights, both as issued."
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "Wettbewerbstabelle Gewehr, Teil 1 Seite 19 and 20, PDF pp. 131 and 132 (rows 1.58 O and 1.58 G)",
+        "fields": ["rules.minTriggerWeight"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "1.8.4, Teil 1 Seite 18, PDF p. 130; Schießzeiten table and its note, Teil 1 Seite 21, PDF p. 133",
+        "fields": ["rules.timeLimits"],
+        "note": "Time of the 40-shot qualification, sighters included; other systems have 45 min. The final of two 5-shot series in 90 s each is not included."
       }
     ]
   }

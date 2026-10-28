@@ -10,6 +10,11 @@
     "raw": "100 m"
   },
   "category": "rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["single-shot"],
+    "sighters": "unlimited"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,6 +27,18 @@
         "source": "dsb-sportordnung-2027",
         "page": "Teil 0 Seite 76 to 77, PDF pp. 94 to 95 (rows 1.35, 1.36 and 1.44, the 100 m .22 rifle disciplines on Scheibe Nr. 4)",
         "fields": ["number", "section", "page", "distance"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 76 to 77, PDF pp. 94 to 95 (rows 1.35, 1.36 and 1.44, column Waffenart)",
+        "fields": ["rules.firearm", "rules.actions"],
+        "note": "A repeater is allowed only as a single loader."
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "Schießzeiten table and its note, Teil 1 Seite 21, PDF p. 133; 9.2, Teil 9 Seite 1, PDF p. 411",
+        "fields": ["rules.sighters"],
+        "note": "Unlimited sighters in the common 15 min preparation time (Auflage rows: within the shooting time)."
       }
     ]
   }

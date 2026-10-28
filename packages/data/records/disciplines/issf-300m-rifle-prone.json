@@ -24,6 +24,26 @@
     ],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["single-shot"],
+    "positions": ["prone"],
+    "supports": ["freehand", "sling"],
+    "maxFirearmMass": {
+      "value": 8000
+    },
+    "sighters": "unlimited",
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 3600,
+          "raw": "1 hour"
+        },
+        "covers": "discipline",
+        "includesSighters": false
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -42,6 +62,44 @@
         "page": "Rule 7.4.6, p. 330 (PDF p. 330)",
         "fields": ["caliberClasses"],
         "note": "The rule prints a maximum calibre of 8 mm."
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 7.1.1, p. 321 (PDF p. 321)",
+        "fields": ["rules.firearm"],
+        "note": "Stated for the rifle section as a whole."
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 7.4.1.1, p. 321 (PDF p. 321)",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "ISSF recognized shooting events table (Rule 3.3), p. 186 (PDF p. 186)",
+        "fields": ["rules.positions"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 7.5.8.2, p. 339 (PDF p. 339); rule 7.6.1.2, pp. 340 to 341 (PDF pp. 340 to 341)",
+        "fields": ["rules.supports"],
+        "note": "A sling is allowed in prone."
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 7.4.5.4, p. 330 (PDF p. 330); rule 7.7.5, p. 343 (PDF p. 343)",
+        "fields": ["rules.maxFirearmMass"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 6.11.1.1, p. 244 (PDF p. 244); rule 6.11.9.4, p. 252 (PDF p. 252)",
+        "fields": ["rules.sighters"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 6.11.9.4, p. 252 (PDF p. 252); rule 7.7.4, p. 342 (PDF p. 342)",
+        "fields": ["rules.timeLimits"],
+        "note": "Time for electronic scoring targets; with paper targets it is 1 hour 15 minutes."
       }
     ]
   }

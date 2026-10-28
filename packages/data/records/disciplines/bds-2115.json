@@ -24,6 +24,34 @@
     ],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["single-shot", "repeater", "semi-automatic"],
+    "positions": ["prone", "sitting"],
+    "supports": ["freehand", "rest"],
+    "sights": ["optical", "reflex"],
+    "maxMagnification": {
+      "value": 12
+    },
+    "maxFirearmMass": {
+      "value": 6500
+    },
+    "ammunition": {
+      "handloads": true,
+      "bulletTypes": ["lead", "jacketed"]
+    },
+    "sighters": "unlimited",
+    "seriesShots": 10,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 600,
+          "raw": "10 min"
+        },
+        "covers": "series"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -36,6 +64,48 @@
         "source": "bds-sporthandbuch-langwaffen-2026",
         "page": "L 2.01, Seite L-11, PDF p. 11",
         "fields": ["number", "distance", "category", "caliberClasses"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 2.01, Seite L-11, PDF p. 11",
+        "fields": [
+          "rules.firearm",
+          "rules.actions",
+          "rules.positions",
+          "rules.supports",
+          "rules.sights",
+          "rules.maxMagnification",
+          "rules.maxFirearmMass"
+        ]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 14.06, L 14.07, Seite L-79 and L-80, PDF pp. 79 and 80",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 14.08.6, Seite L-83, PDF p. 83",
+        "fields": ["rules.positions", "rules.supports"],
+        "note": "Lying on a bipod or rest; every such discipline may also be shot freehand. Shooters aged 55 or more may sit instead of lying, where the range allows it."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 15.01, Seite L-86, PDF p. 86",
+        "fields": ["rules.ammunition"],
+        "note": "Reloaded centerfire ammunition is allowed when the case matches factory ammunition of the discipline."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 2.06, Seite L-17, PDF p. 17",
+        "fields": ["rules.sighters"],
+        "note": "Within 5 minutes."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 2.04, Seite L-17, PDF p. 17",
+        "fields": ["rules.seriesShots", "rules.timeLimits"],
+        "note": "Program of the German and state championships; the halved program below state level is 15 shots in 15 minutes."
       }
     ]
   }

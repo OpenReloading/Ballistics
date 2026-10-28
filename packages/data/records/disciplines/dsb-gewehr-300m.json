@@ -10,6 +10,10 @@
     "raw": "300 m"
   },
   "category": "rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "sights": ["aperture"]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,6 +26,11 @@
         "source": "dsb-sportordnung-2027",
         "page": "Teil 0 Seite 77 to 79, PDF pp. 95 to 97 (rows 1.50, 1.53, 1.59, 1.70, 1.90 and 1.95, the 300 m rifle disciplines on Scheibe Nr. 5)",
         "fields": ["number", "section", "page", "distance"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 77 to 79, PDF pp. 95 to 97 (rows 1.50, 1.53, 1.59, 1.70, 1.90 and 1.95, columns Waffenart and Visierung)",
+        "fields": ["rules.firearm", "rules.sights"]
       }
     ]
   }

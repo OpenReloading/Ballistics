@@ -10,6 +10,31 @@
     "raw": "25 m"
   },
   "category": "revolver",
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["revolver"],
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["original"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "ammunition": {
+      "handloads": true,
+      "bulletTypes": ["lead", "jacketed", "full-metal-jacket"]
+    },
+    "sighters": 5,
+    "seriesShots": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 300,
+          "raw": "5 min"
+        },
+        "covers": "series"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,7 +47,38 @@
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.10.6, Teil C, Seite 72 von 142, PDF p. 72",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.1, Teil C, Seite 3 von 142, PDF p. 3",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.10.1, Teil C, Seite 72 von 142, PDF p. 72",
+        "fields": ["rules.actions", "rules.sights", "rules.minTriggerWeight"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.10.3, Teil C, Seite 72 von 142, PDF p. 72",
+        "fields": ["rules.ammunition"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.10.4, Teil C, Seite 72 von 142, PDF p. 72",
+        "fields": ["rules.positions", "rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.2.1.1, Teil C, Seite 7 von 142, PDF p. 7",
+        "fields": ["rules.positions", "rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.10.7, Teil C, Seite 73 von 142, PDF p. 73",
+        "fields": ["rules.sighters", "rules.seriesShots", "rules.timeLimits"]
       }
-    ]
+    ],
+    "note": "The fixed sights must match the original in form and size; wadcutter bullets are not allowed."
   }
 }

@@ -25,6 +25,30 @@
     ],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic", "repeater", "single-shot"],
+    "positions": ["prone", "sitting"],
+    "supports": ["rest"],
+    "sights": ["optical"],
+    "maxFirearmMass": {
+      "value": 10000
+    },
+    "ammunition": {
+      "handloads": true
+    },
+    "sighters": "unlimited",
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 1800,
+          "raw": "30 min"
+        },
+        "covers": "discipline",
+        "includesSighters": true
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -42,8 +66,33 @@
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.13.13, Teil D, Seite 75 von 294, PDF p. 75",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.1, Teil D, Seite 3 von 294, PDF p. 3",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.13.1, D.13.4, D.13.5, Teil D, Seite 74 von 294, PDF p. 74",
+        "fields": ["rules.actions", "rules.sights", "rules.maxFirearmMass", "rules.ammunition"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.13.7, Teil D, Seite 74 bis 75 von 294, PDF pp. 74 to 75",
+        "fields": ["rules.positions", "rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.13.9, D.13.10, Teil D, Seite 75 von 294, PDF p. 75",
+        "fields": ["rules.sighters", "rules.timeLimits"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.1.3.5, Teil D, Seite 10 von 294, PDF p. 10",
+        "fields": ["rules.positions"]
       }
     ],
-    "note": "The book prints Kaliber bis .338."
+    "note": "The book prints Kaliber bis .338. Any magnification and any safe trigger are allowed, so neither limit is set. Sitting with a rest is an alternative position (D.1.3.5)."
   }
 }

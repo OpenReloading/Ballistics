@@ -14,6 +14,24 @@
     "ids": ["rimfire-22"],
     "basis": "stated"
   },
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["single-shot"],
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "sighters": "unlimited",
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 6300,
+          "raw": "105 min"
+        },
+        "covers": "discipline",
+        "includesSighters": false
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -26,6 +44,44 @@
         "source": "dsb-sportordnung-2027",
         "page": "Pistolentabelle, Teil 2 Seite 23, PDF p. 159 (2.20) and 0.21, Teil 0 Seite 80, PDF p. 98 (row 2.20)",
         "fields": ["caliberClasses"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 80, PDF p. 98 (row 2.20)",
+        "fields": [
+          "rules.firearm",
+          "rules.actions",
+          "rules.positions",
+          "rules.sights",
+          "rules.timeLimits"
+        ]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.10.5, Teil 2 Seite 12, PDF p. 148",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.1, Teil 2 Seite 1, PDF p. 137",
+        "fields": ["rules.supports"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.15, Teil 2 Seite 15, PDF p. 151",
+        "fields": ["rules.actions"],
+        "note": "A multi-shot pistol must be loaded one round at a time."
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.15.2, Teil 2 Seite 15, PDF p. 151",
+        "fields": ["rules.sighters"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "time table (row 2.15), Teil 2 Seite 24, PDF p. 160; note on the preparation time, Teil 2 Seite 25, PDF p. 161",
+        "fields": ["rules.timeLimits"],
+        "note": "Printed time is for pulley systems; electronic systems have 90 min. The 15 min preparation time with unlimited sighters is not part of it."
       }
     ]
   }

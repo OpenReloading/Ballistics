@@ -13,6 +13,23 @@
     "ids": ["air-4-5"],
     "basis": "stated"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["open", "aperture", "optical", "reflex"],
+    "maxMagnification": {
+      "value": 4
+    },
+    "maxFirearmMass": {
+      "value": 5500
+    },
+    "ammunition": {
+      "bulletTypes": ["lead"]
+    },
+    "sighters": 4,
+    "seriesShots": 30
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -26,6 +43,42 @@
         "page": "Rule 10.14, p. 476 (PDF p. 476)",
         "fields": ["section", "page", "category", "caliberClasses"],
         "note": "The rule book gives the event names but no discipline codes. The category is read from the ammunition and weight columns: 4.5 mm (.177\") air rifle at 10 m, 5.6 mm (.22\" lr) rifle at 50 m."
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 10.1.1, p. 461 (PDF p. 461)",
+        "fields": ["rules.firearm"],
+        "note": "Stated for the moving target section as a whole."
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 10.7.1, p. 466 (PDF p. 466)",
+        "fields": ["rules.positions", "rules.supports"],
+        "note": "Standing without support, no sling."
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 10.4.3.2, p. 461 (PDF p. 461)",
+        "fields": ["rules.sights", "rules.maxMagnification"],
+        "note": "Any sight type; an optical sight must have fixed magnification of at most four (tolerance 0.4)."
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 10.4.1, p. 461 (PDF p. 461); rule 10.14, p. 476 (PDF p. 476)",
+        "fields": ["rules.maxFirearmMass"],
+        "note": "Rifle and sight together."
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 10.4.4, p. 462 (PDF p. 462)",
+        "fields": ["rules.ammunition"],
+        "note": "Pellets of lead or another soft material."
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 10.7.2, p. 466 (PDF p. 466)",
+        "fields": ["rules.sighters", "rules.seriesShots"],
+        "note": "Four sighting shots before the slow part and four before the fast part. A series is one 30-shot part (one is shot per day when the event runs over two days)."
       }
     ]
   }

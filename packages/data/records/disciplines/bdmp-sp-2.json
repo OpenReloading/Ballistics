@@ -9,6 +9,37 @@
     "value": 25000,
     "raw": "25 m"
   },
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["revolver", "semi-automatic"],
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "maxBarrelLength": {
+      "value": 166
+    },
+    "maxFirearmMass": {
+      "value": 1550
+    },
+    "ammunition": {
+      "handloads": true,
+      "bulletTypes": ["lead", "jacketed", "full-metal-jacket", "hollow-point", "wadcutter"]
+    },
+    "sighters": 5,
+    "seriesShots": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 300,
+          "raw": "5 min"
+        },
+        "covers": "series"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -21,8 +52,40 @@
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.13A.6, Teil C, Seite 81 von 142, PDF p. 81",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.1, Teil C, Seite 3 von 142, PDF p. 3",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13A.1, Teil C, Seite 80 von 142, PDF p. 80",
+        "fields": [
+          "rules.actions",
+          "rules.sights",
+          "rules.minTriggerWeight",
+          "rules.maxBarrelLength",
+          "rules.maxFirearmMass"
+        ]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13A.3, Teil C, Seite 81 von 142, PDF p. 81",
+        "fields": ["rules.ammunition"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13A.4, C.13A.7, Teil C, Seite 81 von 142, PDF p. 81",
+        "fields": [
+          "rules.positions",
+          "rules.supports",
+          "rules.sighters",
+          "rules.seriesShots",
+          "rules.timeLimits"
+        ]
       }
     ],
-    "note": "The rule admits revolvers and self-loading pistols."
+    "note": "The rule admits revolvers and self-loading pistols. One named pistol model in .357 and .44 Magnum may weigh up to 2200 g. Each calibre class is scored separately and has its own minimum momentum, which is not stored."
   }
 }

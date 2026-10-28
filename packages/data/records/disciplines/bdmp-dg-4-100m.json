@@ -24,6 +24,21 @@
     ],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["repeater"],
+    "positions": ["standing", "kneeling", "sitting", "prone"],
+    "supports": ["freehand", "sling"],
+    "sights": ["original"],
+    "minTriggerWeight": {
+      "value": 1500
+    },
+    "ammunition": {
+      "handloads": true
+    },
+    "sighters": 2,
+    "seriesShots": 5
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -36,6 +51,43 @@
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.9.7, D.9.9, Teil D, Seite 39 von 294, PDF p. 39",
         "fields": ["caliberClasses", "distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "Teil D (Langwaffen-Disziplinen), Seite 1 von 294, PDF p. 1",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.9.1, Teil D, Seite 38 von 294, PDF p. 38",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.9.2, Teil D, Seite 38 von 294, PDF p. 38",
+        "fields": ["rules.minTriggerWeight"],
+        "note": "One listed service rifle has 1300 g."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.9.4, Teil D, Seite 39 von 294, PDF p. 39",
+        "fields": ["rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.9.5, Teil D, Seite 39 von 294, PDF p. 39",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.9.6, Teil D, Seite 39 von 294, PDF p. 39",
+        "fields": ["rules.ammunition"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.9.12, Teil D, Seite 40 bis 41 von 294, PDF pp. 40 to 41",
+        "fields": ["rules.positions", "rules.sighters", "rules.seriesShots"],
+        "note": "Standing; kneeling or sitting; prone. Two sighters before each of the four parts; the scored parts are 2 x 5 or 4 x 5 shots."
       }
     ],
     "note": "The calibre must be one introduced for the rifle in a regular army, the police or customs and may not exceed 8 mm. The discipline is shot at 100 or 300 m at the choice stated in D.9.9."

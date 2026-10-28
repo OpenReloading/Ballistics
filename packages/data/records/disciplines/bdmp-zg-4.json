@@ -24,6 +24,35 @@
     ],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["prone", "sitting"],
+    "supports": ["rest"],
+    "sights": ["optical"],
+    "maxMagnification": {
+      "value": 10
+    },
+    "minTriggerWeight": {
+      "value": 1500
+    },
+    "maxFirearmMass": {
+      "value": 6500
+    },
+    "ammunition": {
+      "handloads": true
+    },
+    "sighters": "unlimited",
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 8
+        },
+        "covers": "series",
+        "includesSighters": false
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -41,8 +70,40 @@
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.14.11, Teil D, Seite 83 von 294, PDF p. 83",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.1, Teil D, Seite 3 von 294, PDF p. 3",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.14.1, D.14.2, D.14.3, Teil D, Seite 82 von 294, PDF p. 82",
+        "fields": [
+          "rules.actions",
+          "rules.minTriggerWeight",
+          "rules.maxFirearmMass",
+          "rules.sights",
+          "rules.maxMagnification",
+          "rules.ammunition"
+        ]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.14.5, Teil D, Seite 82 bis 83 von 294, PDF pp. 82 to 83",
+        "fields": ["rules.positions", "rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.14.7, D.14.8, Teil D, Seite 83 von 294, PDF p. 83",
+        "fields": ["rules.sighters", "rules.timeLimits"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.1.3.5, Teil D, Seite 10 von 294, PDF p. 10",
+        "fields": ["rules.positions"]
       }
     ],
-    "note": "The book prints Kaliber bis 8 mm. D.14.13 (Teil D, PDF p. 84) allows ZG 4 modifiziert with other semi-automatic rifles (10 kg, any magnification, trigger from 1000 g, forend up to 76 mm, 4 x 6 s for the scoring shots), scored separately. It has the distance, shots and face of this record and no record of its own."
+    "note": "The book prints Kaliber bis 8 mm. D.14.13 (Teil D, PDF p. 84) allows ZG 4 modifiziert with other semi-automatic rifles (10 kg, any magnification, trigger from 1000 g, forend up to 76 mm, 4 x 6 s for the scoring shots), scored separately. It has the distance, shots and face of this record and no record of its own. The score has 4 timed series of 8 s; the sighting series has 5 min. A modified class (D.14.13) allows 10 kg, any magnification, a 1000 g trigger and 6 s series and is scored separately."
   }
 }

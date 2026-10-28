@@ -9,6 +9,28 @@
     "value": 50000,
     "raw": "50 Meter"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["repeater", "semi-automatic"],
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["open", "reflex"],
+    "maxMagnification": {
+      "value": 1
+    },
+    "ammunition": {
+      "handloads": true
+    },
+    "seriesShots": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 20
+        },
+        "covers": "series"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,6 +44,41 @@
         "page": "Kapitel 3, Inhaltsverzeichnis Langwaffen, Seite 3 (PDF p. 61)",
         "fields": ["name", "number"],
         "note": "The distance is printed with the name in the table of Kapitel 9 (Seite 5, PDF p. 231)."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 59, PDF p. 117",
+        "fields": [
+          "rules.firearm",
+          "rules.actions",
+          "rules.positions",
+          "rules.supports",
+          "rules.seriesShots",
+          "rules.timeLimits"
+        ]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Klasseneinteilung der Sportwaffen, Seite 8 (PDF p. 66)",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 59, PDF p. 117",
+        "fields": ["rules.sights"],
+        "note": "Open sights, or a dot sight without magnification."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Visierungen Sportgewehre, Seite 9 (PDF p. 67)",
+        "fields": ["rules.maxMagnification"],
+        "note": "Dot sight without magnification."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Kalibereinteilung, Seite 10 (PDF p. 68)",
+        "fields": ["rules.ammunition"],
+        "note": "Factory and reloaded cartridges are allowed; reloads must match the performance of the calibre."
       }
     ]
   }

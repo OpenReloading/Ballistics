@@ -14,6 +14,33 @@
     "ids": ["rimfire-22"],
     "basis": "stated"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["prone", "sitting"],
+    "supports": ["rest"],
+    "sights": ["optical"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "maxFirearmMass": {
+      "value": 6500
+    },
+    "ammunition": {
+      "handloads": false
+    },
+    "sighters": "unlimited",
+    "seriesShots": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 6
+        },
+        "covers": "series",
+        "includesSighters": false
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -31,7 +58,33 @@
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.14A.13, Teil D, Seite 86 von 294, PDF p. 86",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.1, Teil D, Seite 3 von 294, PDF p. 3",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.14A.1, Teil D, Seite 84 von 294, PDF p. 84",
+        "fields": ["rules.actions", "rules.minTriggerWeight", "rules.maxFirearmMass"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.14A.4, D.14A.5, D.14A.7, Teil D, Seite 85 von 294, PDF p. 85",
+        "fields": ["rules.sights", "rules.ammunition", "rules.positions", "rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.14A.9, D.14A.10, Teil D, Seite 86 von 294, PDF p. 86",
+        "fields": ["rules.sighters", "rules.seriesShots", "rules.timeLimits"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.1.3.5, Teil D, Seite 10 von 294, PDF p. 10",
+        "fields": ["rules.positions"]
       }
-    ]
+    ],
+    "note": "Only commercial ammunition is allowed, read as no handloads. Any magnification is allowed, so no limit is set. The sighting series has 5 min."
   }
 }

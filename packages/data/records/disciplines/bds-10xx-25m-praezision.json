@@ -25,6 +25,25 @@
     ],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "short-gun",
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "ammunition": {
+      "bulletTypes": ["lead", "jacketed"]
+    },
+    "sighters": "unlimited",
+    "seriesShots": 10,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 300,
+          "raw": "5 min"
+        },
+        "covers": "series"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -38,6 +57,33 @@
         "page": "K 3.01, Seite K-13, PDF p. 13",
         "fields": ["caliberClasses"],
         "note": "The code stands for the numbers 1001, 1002, 1003 (O), 1004 (O), 1006, 1007 (O), 1008 to 1012, 1014 (O) and 1015. Caliber class, minimum impulse, weight and sight differ per number in K 3.01; the classes stored are those of all numbers together."
+      },
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "page": "K 2.01.1, K 2.01.3, K 2.01.4, Seite K-8, PDF p. 8",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "page": "K 2.10, Seite K-10 and K-11, PDF pp. 10 and 11",
+        "fields": ["rules.positions", "rules.supports"]
+      },
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "page": "K 7.01, Seite K-28, PDF p. 28",
+        "fields": ["rules.ammunition"],
+        "note": "Handloads are allowed for centerfire only, so the value is left out for the group."
+      },
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "page": "K 3.05, Seite K-14, PDF p. 14",
+        "fields": ["rules.sighters"],
+        "note": "Within 3 minutes."
+      },
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "page": "K 3.03, Seite K-14, PDF p. 14",
+        "fields": ["rules.seriesShots", "rules.timeLimits"]
       }
     ]
   }

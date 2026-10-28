@@ -10,6 +10,23 @@
     "raw": "25 m"
   },
   "category": "muzzle-loader",
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["single-shot"],
+    "sights": ["open"],
+    "ammunition": {
+      "bulletTypes": ["lead"]
+    },
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 1800,
+          "raw": "30 min"
+        },
+        "covers": "discipline"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,7 +39,18 @@
         "source": "bdmp-sportordnung-2026-register-10",
         "page": "E.10.6, Teil E, Seite 29 von 42, PDF p. 29",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.10.1, E.10.3, Teil E, Seite 29 von 42, PDF p. 29",
+        "fields": ["rules.firearm", "rules.actions", "rules.sights", "rules.ammunition"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.10.8, Teil E, Seite 30 von 42, PDF p. 30",
+        "fields": ["rules.timeLimits"]
       }
-    ]
+    ],
+    "note": "The firearm kind follows from the percussion pistols admitted."
   }
 }

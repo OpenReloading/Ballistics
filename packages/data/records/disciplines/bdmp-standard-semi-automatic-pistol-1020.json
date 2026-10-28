@@ -9,6 +9,23 @@
     "raw": "25 Meter/ Yard"
   },
   "category": "pistol",
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["standing", "kneeling", "sitting"],
+    "supports": ["freehand"],
+    "minTriggerWeight": {
+      "value": 1360
+    },
+    "maxBarrelLength": {
+      "value": 139.7,
+      "raw": "5,5“"
+    },
+    "ammunition": {
+      "handloads": true,
+      "bulletTypes": ["lead", "jacketed", "full-metal-jacket", "hollow-point"]
+    }
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -21,8 +38,43 @@
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.21, Teil C, Seite 138 von 142, PDF p. 138",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.1, Teil C, Seite 3 von 142, PDF p. 3",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.21.F, Teil C, Seite 141 von 142, PDF p. 141",
+        "fields": [
+          "rules.actions",
+          "rules.minTriggerWeight",
+          "rules.maxBarrelLength",
+          "rules.ammunition"
+        ]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.9.8.1, Teil C, Seite 69 von 142, PDF p. 69",
+        "fields": ["rules.actions", "rules.minTriggerWeight", "rules.maxBarrelLength"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.21, Teil C, Seite 138 von 142, PDF p. 138",
+        "fields": ["rules.positions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.4, Teil C, Seite 44 bis 46 von 142, PDF pp. 44 to 46",
+        "fields": ["rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.10 a), h), Teil C, Seite 49 bis 50 von 142, PDF pp. 49 to 50",
+        "fields": ["rules.ammunition"]
       }
     ],
-    "note": "Weapon, sights and caliber as C.9.8 (metres or yards)."
+    "note": "Weapon, sights and caliber as C.9.8 (metres or yards). Weapon and ammunition are those of Standard Semi-Automatic Pistol. A minimum power factor of 120 applies."
   }
 }

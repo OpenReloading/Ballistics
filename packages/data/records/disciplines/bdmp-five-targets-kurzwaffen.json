@@ -8,6 +8,18 @@
     "value": 25000,
     "raw": "25 m"
   },
+  "rules": {
+    "firearm": "short-gun",
+    "seriesShots": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 25
+        },
+        "covers": "series"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -15,6 +27,17 @@
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.20, C.20.3, Teil C, Seite 136 von 142, PDF p. 136",
         "fields": ["name", "federation", "section", "page", "distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "Teil C (Kurzwaffen-Disziplinen), Seite 1 von 142, PDF p. 1",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.20.7, C.20.9, Teil C, Seite 136 bis 137 von 142, PDF pp. 136 to 137",
+        "fields": ["rules.seriesShots", "rules.timeLimits"],
+        "note": "Four rounds of five shots, one shot on each of five targets per round."
       }
     ]
   }

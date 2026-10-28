@@ -10,6 +10,45 @@
     "raw": "100 m"
   },
   "category": "rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["prone"],
+    "supports": ["freehand", "sling"],
+    "sights": ["open", "aperture"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "maxFirearmMass": {
+      "value": 5000
+    },
+    "ammunition": {
+      "handloads": true,
+      "bulletTypes": ["lead", "jacketed"]
+    },
+    "sighters": "unlimited",
+    "seriesShots": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 40
+        },
+        "covers": "series"
+      },
+      {
+        "duration": {
+          "value": 30
+        },
+        "covers": "series"
+      },
+      {
+        "duration": {
+          "value": 20
+        },
+        "covers": "series"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -23,6 +62,38 @@
         "page": "L 3.02, Seite L-21, PDF p. 21",
         "fields": ["number", "distance", "category"],
         "note": "The table bounds the cartridge by case length (47 mm), not by calibre."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 3.02, Seite L-21, PDF p. 21",
+        "fields": [
+          "rules.firearm",
+          "rules.actions",
+          "rules.positions",
+          "rules.supports",
+          "rules.sights",
+          "rules.minTriggerWeight",
+          "rules.maxFirearmMass"
+        ],
+        "note": "The row sits in the long gun part of the handbook."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 14.06, Seite L-79, PDF p. 79",
+        "fields": ["rules.sights"],
+        "note": "A closed sight (aperture rear sight) is recorded as aperture; the handbook keeps it apart from a diopter, which is not allowed with a closed sight."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 15.01, Seite L-86, PDF p. 86",
+        "fields": ["rules.ammunition"],
+        "note": "Reloaded centerfire ammunition is allowed if the case matches factory dimensions and the law is met; lead and jacketed bullets of any shape, tracer and hard core excluded."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 3.04, L 3.06, Seite L-23, PDF p. 23",
+        "fields": ["rules.sighters", "rules.seriesShots", "rules.timeLimits"],
+        "note": "Two series each at 40, 30 and 20 seconds (half the program below Landesmeisterschaft). Sighters have their own 5 minutes."
       }
     ]
   }

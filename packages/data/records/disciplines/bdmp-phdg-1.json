@@ -10,6 +10,20 @@
     "raw": "100 m"
   },
   "category": "service-rifle",
+  "rules": {
+    "positions": ["prone"],
+    "supports": ["freehand", "sling"],
+    "sights": ["original"],
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 1800,
+          "raw": "30 min"
+        },
+        "covers": "discipline"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,6 +36,22 @@
         "source": "bdmp-sportordnung-2026-register-10",
         "page": "E.2.12, Teil E, Seite 10 von 42, PDF p. 10",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.2.4, E.2.8, Teil E, Seite 9 von 42, PDF p. 9",
+        "fields": ["rules.supports", "rules.positions"],
+        "note": "The original carrying sling may be used as a shooting sling. Shooters aged 60 and over may use a rest (E.0.14)."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.2.5, Teil E, Seite 9 von 42, PDF p. 9",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.2.10, Teil E, Seite 10 von 42, PDF p. 10",
+        "fields": ["rules.timeLimits"]
       }
     ]
   }

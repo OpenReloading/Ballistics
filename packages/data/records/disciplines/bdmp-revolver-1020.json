@@ -9,6 +9,24 @@
     "raw": "25 Meter/ Yard"
   },
   "category": "revolver",
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["revolver"],
+    "positions": ["standing", "kneeling", "sitting"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "minTriggerWeight": {
+      "value": 1135
+    },
+    "maxBarrelLength": {
+      "value": 152.4,
+      "raw": "6 Zoll"
+    },
+    "ammunition": {
+      "handloads": true,
+      "bulletTypes": ["lead", "jacketed", "full-metal-jacket", "hollow-point", "wadcutter"]
+    }
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -21,8 +39,49 @@
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.21, Teil C, Seite 138 von 142, PDF p. 138",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.1, Teil C, Seite 3 von 142, PDF p. 3",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.21.A, Teil C, Seite 139 von 142, PDF p. 139",
+        "fields": [
+          "rules.actions",
+          "rules.sights",
+          "rules.minTriggerWeight",
+          "rules.maxBarrelLength",
+          "rules.ammunition"
+        ]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.9.1.1, C.9.1.2, Teil C, Seite 59 von 142, PDF p. 59",
+        "fields": [
+          "rules.actions",
+          "rules.sights",
+          "rules.minTriggerWeight",
+          "rules.maxBarrelLength"
+        ]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.21, Teil C, Seite 138 von 142, PDF p. 138",
+        "fields": ["rules.positions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.4, Teil C, Seite 44 bis 46 von 142, PDF pp. 44 to 46",
+        "fields": ["rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.10 a), b), Teil C, Seite 49 von 142, PDF p. 49",
+        "fields": ["rules.ammunition"]
       }
     ],
-    "note": "Weapon, sights and caliber as C.9.1 (metres or yards)."
+    "note": "Weapon, sights and caliber as C.9.1 (metres or yards). Weapon, sights and ammunition are those of Revolver 1500. The trigger minimum applies in single action, or in double action when there is no single action. A maximum muzzle energy of 600 J applies to the match."
   }
 }

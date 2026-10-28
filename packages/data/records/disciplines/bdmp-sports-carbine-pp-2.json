@@ -9,6 +9,17 @@
     "raw": "50 Meter/Yards"
   },
   "category": "carbine",
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic", "revolver"],
+    "positions": ["standing", "kneeling", "prone"],
+    "supports": ["freehand"],
+    "sights": ["open", "optical"],
+    "maxMagnification": {
+      "value": 1
+    },
+    "sighters": 6
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -21,8 +32,28 @@
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.36.7, Teil D, Seite 278 bis 279 von 294, PDF pp. 278 to 279",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.1, Teil D, Seite 3 von 294, PDF p. 3",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.36.1, D.36.2, Teil D, Seite 277 von 294, PDF p. 277",
+        "fields": ["rules.actions", "rules.sights", "rules.maxMagnification"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.36.4, Teil D, Seite 278 von 294, PDF p. 278",
+        "fields": ["rules.sighters"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.36.7, D.36.8, Teil D, Seite 278 bis 279 von 294, PDF pp. 278 to 279",
+        "fields": ["rules.positions", "rules.supports"]
       }
     ],
-    "note": "Carbines in handgun calibers from .35, metres or yards by announcement (D.36.7). Six sighters at 50 m (D.36.12). Sports Carbine PP2 Rifle .223 (D.36.19, Teil D, PDF p. 284) is scored separately. The course runs at 10, 50 and 25 m, the record holds the longest distance."
+    "note": "Carbines in handgun calibers from .35, metres or yards by announcement (D.36.7). Six sighters at 50 m (D.36.12). Sports Carbine PP2 Rifle .223 (D.36.19, Teil D, PDF p. 284) is scored separately. The course runs at 10, 50 and 25 m, the record holds the longest distance. The trigger minimum is 1135 g for revolver carbines in single action and 1360 g otherwise, so no single value is set. A maximum muzzle energy of 600 J applies."
   }
 }

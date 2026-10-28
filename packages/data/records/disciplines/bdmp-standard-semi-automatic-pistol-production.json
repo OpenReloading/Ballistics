@@ -9,6 +9,23 @@
     "raw": "25 Meter/Yards"
   },
   "category": "pistol",
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["standing", "kneeling"],
+    "supports": ["freehand"],
+    "minTriggerWeight": {
+      "value": 1360
+    },
+    "maxBarrelLength": {
+      "value": 139.7,
+      "raw": "5,5“"
+    },
+    "ammunition": {
+      "handloads": true,
+      "bulletTypes": ["lead", "jacketed", "full-metal-jacket", "hollow-point"]
+    }
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -21,8 +38,33 @@
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.8.2, Teil C, Seite 42 bis 43 von 142, PDF pp. 42 to 43",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.1, Teil C, Seite 3 von 142, PDF p. 3",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.9.9, Teil C, Seite 70 von 142, PDF p. 70",
+        "fields": ["rules.actions", "rules.minTriggerWeight", "rules.maxBarrelLength"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.2, Teil C, Seite 42 bis 43 von 142, PDF pp. 42 to 43",
+        "fields": ["rules.positions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.4, Teil C, Seite 44 bis 46 von 142, PDF pp. 44 to 46",
+        "fields": ["rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.8.10 a), h), Teil C, Seite 49 bis 50 von 142, PDF pp. 49 to 50",
+        "fields": ["rules.ammunition"]
       }
     ],
-    "note": "Metres or yards."
+    "note": "Metres or yards. Wadcutter is not allowed. A minimum power factor of 120 applies. A maximum muzzle energy of 600 J applies to the match."
   }
 }

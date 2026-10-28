@@ -9,6 +9,29 @@
     "value": 10000,
     "raw": "10 m"
   },
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["repeater"],
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "minTriggerWeight": {
+      "value": 500
+    },
+    "maxFirearmMass": {
+      "value": 1500
+    },
+    "sighters": 5,
+    "seriesShots": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 3
+        },
+        "covers": "shot"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -21,6 +44,38 @@
         "source": "dsb-sportordnung-2027",
         "page": "Teil 0 Seite 80, PDF p. 98 (row 2.17, the rapid-fire part of the 10 m air pistol multi-event on Scheibe Nr. 7/8)",
         "fields": ["number", "section", "page", "distance"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 80, PDF p. 98 (row 2.17)",
+        "fields": ["rules.firearm", "rules.positions", "rules.sights"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.10.5, Teil 2 Seite 12, PDF p. 148",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.1, Teil 2 Seite 1, PDF p. 137",
+        "fields": ["rules.supports"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.13, Teil 2 Seite 14, PDF p. 150",
+        "fields": ["rules.actions"],
+        "note": "Multi-shot air pistols of any kind are allowed."
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "Pistolentabelle, Teil 2 Seite 23, PDF p. 159 (row 2.17)",
+        "fields": ["rules.maxFirearmMass", "rules.minTriggerWeight"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.13.2 and 2.13.3, Teil 2 Seite 14, PDF p. 150",
+        "fields": ["rules.sighters", "rules.seriesShots", "rules.timeLimits"],
+        "note": "One practice series is allowed, taken here as one series of five shots. The 3/7 mode is read as the target showing for 3 s per shot and hidden for 7 s."
       }
     ]
   }

@@ -10,6 +10,15 @@
     "raw": "25 m"
   },
   "category": "pistol",
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["semi-automatic", "revolver"],
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "sighters": 0,
+    "seriesShots": 6
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,6 +31,39 @@
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.7.5, Teil C, Seite 36 von 142, PDF p. 36",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "Teil C (Kurzwaffen-Disziplinen), Seite 1 von 142, PDF p. 1",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6.5, Teil C, Seite 18 von 142, PDF p. 18",
+        "fields": ["rules.positions", "rules.supports"],
+        "note": "Two hands allowed."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6.6, Teil C, Seite 18 von 142, PDF p. 18",
+        "fields": ["rules.sighters"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.7A.1, C.7B.1, Teil C, Seite 36 von 142, PDF p. 36",
+        "fields": ["rules.actions"],
+        "note": "Class A: semi-automatic pistols. Class B: semi-automatic pistols and revolvers."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.7.2, Teil C, Seite 36 von 142, PDF p. 36",
+        "fields": ["rules.sights"],
+        "note": "The optical-sight class is scored separately."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.7.5, Teil C, Seite 36 von 142, PDF p. 36",
+        "fields": ["rules.seriesShots"]
       }
     ],
     "note": "NPA-A (9 mm Luger pistols, C.7A.1) and NPA-B (pistols and revolvers .354 to .455, C.7B.1) shoot one course on two NPA faces. NPA-B may also be shot with optical sights, scored separately (C.7B.7, Teil C, PDF p. 37). The course runs at 25, 20, 15 and 10 m, the record holds the longest distance."

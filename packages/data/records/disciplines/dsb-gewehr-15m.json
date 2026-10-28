@@ -10,6 +10,15 @@
     "raw": "15 m"
   },
   "category": "rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["single-shot"],
+    "sights": ["aperture"],
+    "maxFirearmMass": {
+      "value": 7500
+    },
+    "sighters": "unlimited"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,6 +31,22 @@
         "source": "dsb-sportordnung-2027",
         "page": "Teil 0 Seite 76, PDF p. 94 (rows 1.30 and 1.31, the 15 m rifle disciplines on Scheibe Nr. 2)",
         "fields": ["number", "section", "page", "distance"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 76, PDF p. 94 (rows 1.30 and 1.31)",
+        "fields": ["rules.firearm", "rules.actions", "rules.sights"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "Wettbewerbstabelle Gewehr, Teil 1 Seite 19 and 20, PDF pp. 131 and 132 (row 1.30); Wettbewerbstabelle Auflagewettbewerbe, Teil 9 Seite 8, PDF p. 418 (row 1.31)",
+        "fields": ["rules.maxFirearmMass"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "Schießzeiten table and its note, Teil 1 Seite 21, PDF p. 133; 9.2, Teil 9 Seite 1, PDF p. 411",
+        "fields": ["rules.sighters"],
+        "note": "Unlimited sighters in the common 15 min preparation time (Auflage: within the shooting time)."
       }
     ],
     "note": "Row 1.30 (Zimmerstutzen 15/10 m) prints two distances; the record holds the 15 m distance."

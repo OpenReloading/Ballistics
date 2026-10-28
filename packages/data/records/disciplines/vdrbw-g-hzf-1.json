@@ -24,6 +24,39 @@
     ],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["prone"],
+    "supports": ["rest"],
+    "sights": ["optical"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "ammunition": {
+      "handloads": true
+    },
+    "sighters": 5,
+    "seriesShots": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 1200,
+          "raw": "20 min"
+        },
+        "covers": "discipline",
+        "includesSighters": false
+      },
+      {
+        "duration": {
+          "value": 300,
+          "raw": "5 min"
+        },
+        "covers": "series",
+        "includesSighters": false
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -37,6 +70,36 @@
         "page": "9.10, Seite 76, PDF p. 76",
         "fields": ["federation", "section", "page", "distance", "caliberClasses", "category"],
         "note": "The book excludes .222 Rem (9.10.3)."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.1, Seite 59, PDF p. 59",
+        "fields": ["rules.firearm"],
+        "note": "Chapter 9 covers long guns."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.1.4.1, Seite 59, PDF p. 59",
+        "fields": ["rules.ammunition"],
+        "note": "Reloaded ammunition is allowed. Bundeswehr ranges take only factory-loaded full-metal-jacket ammunition."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.10.1, 9.10.2, 9.10.7, 9.10.8, Seite 76, PDF p. 76",
+        "fields": [
+          "rules.actions",
+          "rules.positions",
+          "rules.supports",
+          "rules.sights",
+          "rules.minTriggerWeight"
+        ],
+        "note": "Prone on a rest at the fore-end; a bipod at the fore-end is allowed. Any telescopic sight."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.10.9, 9.10.10, 9.10.11, Seite 76, PDF p. 76",
+        "fields": ["rules.sighters", "rules.seriesShots", "rules.timeLimits"],
+        "note": "The time is for the 20-shot course; the 10-shot course has 10 minutes."
       }
     ]
   }

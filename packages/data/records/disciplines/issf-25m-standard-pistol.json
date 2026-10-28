@@ -13,6 +13,26 @@
     "ids": ["rimfire-22"],
     "basis": "stated"
   },
+  "rules": {
+    "firearm": "short-gun",
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "maxBarrelLength": {
+      "value": 153
+    },
+    "maxFirearmMass": {
+      "value": 1400
+    },
+    "ammunition": {
+      "bulletTypes": ["lead"]
+    },
+    "sighters": 5,
+    "seriesShots": 5
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -35,6 +55,35 @@
         "source": "issf-paper-target-scoring-2022",
         "page": "Rule 1.4.11 b, p. 324 (PDF p. 5); rule 5.3.1 a and c, p. 331 (PDF p. 12)",
         "fields": ["caliberClasses"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 8.1.1, p. 351 (PDF p. 351)",
+        "fields": ["rules.firearm"],
+        "note": "Stated for the pistol section as a whole."
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 8.4.1.2, p. 352 (PDF p. 352); rule 8.7.1, p. 360 (PDF p. 360)",
+        "fields": ["rules.positions", "rules.supports", "rules.sights"],
+        "note": "Standing free, one hand, open sights only."
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 8.12, p. 375 (PDF p. 375)",
+        "fields": ["rules.minTriggerWeight", "rules.maxBarrelLength", "rules.maxFirearmMass"],
+        "note": "One row of the specification table serves the rimfire and the centre fire 25 m pistol."
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 8.4.4, p. 358 (PDF p. 358)",
+        "fields": ["rules.ammunition"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 8.7.6.5, pp. 365 to 366 (PDF pp. 365 to 366)",
+        "fields": ["rules.sighters", "rules.seriesShots"],
+        "note": "One sighting series of five shots before match firing. Three stages of four series of five shots."
       }
     ]
   }

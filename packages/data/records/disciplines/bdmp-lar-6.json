@@ -10,6 +10,22 @@
     "raw": "50 Meter"
   },
   "category": "lever-action",
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["lever-action"],
+    "positions": ["standing", "kneeling", "sitting"],
+    "supports": ["freehand"],
+    "sights": ["open", "aperture", "reflex", "optical"],
+    "minTriggerWeight": {
+      "value": 1000,
+      "raw": "1000 p"
+    },
+    "ammunition": {
+      "handloads": true
+    },
+    "sighters": 0,
+    "seriesShots": 6
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,6 +38,47 @@
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.16D.11, Teil D, Seite 115 von 294, PDF p. 115",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "Teil D (Langwaffen-Disziplinen), Seite 1 von 294, PDF p. 1",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16D.1, Teil D, Seite 113 von 294, PDF p. 113",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16D.2, Teil D, Seite 113 von 294, PDF p. 113",
+        "fields": ["rules.minTriggerWeight"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16D.5, Teil D, Seite 113 bis 114 von 294, PDF pp. 113 to 114",
+        "fields": ["rules.sights"],
+        "note": "Standard class: open sights as issued. Open class: aperture, reflex or optical sights."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16D.6, Teil D, Seite 114 von 294, PDF p. 114",
+        "fields": ["rules.ammunition"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16D.9, Teil D, Seite 114 von 294, PDF p. 114",
+        "fields": ["rules.positions", "rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16D.11, Teil D, Seite 115 von 294, PDF p. 115",
+        "fields": ["rules.seriesShots"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16D.14, Teil D, Seite 117 von 294, PDF p. 117",
+        "fields": ["rules.sighters"]
       }
     ],
     "note": "Lever-action rifle, calibers from 6.5 mm that count as handgun cartridges, Standard class with open sights and Open class with aperture, red-dot or telescopic sights. The course runs at 10, 50 and 25 m, the record holds the longest distance."

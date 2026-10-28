@@ -24,6 +24,22 @@
     ],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["standing", "kneeling"],
+    "supports": ["freehand"],
+    "sights": ["open", "reflex", "optical"],
+    "maxMagnification": {
+      "value": 4
+    },
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "ammunition": {
+      "handloads": true
+    }
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -36,6 +52,35 @@
         "source": "vdrbw-schiesssportordnung-2023",
         "page": "9.16, Seite 89, PDF p. 89",
         "fields": ["federation", "section", "page", "distance", "caliberClasses", "category"]
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.1, Seite 59, PDF p. 59",
+        "fields": ["rules.firearm"],
+        "note": "Chapter 9 covers long guns."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.1.4.1, Seite 59, PDF p. 59",
+        "fields": ["rules.ammunition"],
+        "note": "Reloaded ammunition is allowed. Bundeswehr ranges take only factory-loaded full-metal-jacket ammunition."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.16.1, 9.16.2, 9.16.4, Seite 89, PDF p. 89",
+        "fields": [
+          "rules.actions",
+          "rules.sights",
+          "rules.maxMagnification",
+          "rules.minTriggerWeight"
+        ],
+        "note": "Reflex sight or telescopic sight with at most four-fold magnification."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.16.7, 9.16.10, Seite 89, 90, PDF pp. 89, 90",
+        "fields": ["rules.positions", "rules.supports"],
+        "note": "Five shots standing and five kneeling, both freehand."
       }
     ]
   }

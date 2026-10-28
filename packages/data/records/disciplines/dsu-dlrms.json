@@ -10,6 +10,33 @@
     "raw": "50, 40, 30 und 20 Meter"
   },
   "category": "air-rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["repeater"],
+    "positions": ["prone", "kneeling", "standing"],
+    "supports": ["freehand"],
+    "sights": ["optical", "reflex"],
+    "ammunition": {
+      "minMuzzleEnergy": {
+        "value": 7.5
+      }
+    },
+    "seriesShots": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 180
+        },
+        "covers": "discipline"
+      },
+      {
+        "duration": {
+          "value": 45
+        },
+        "covers": "series"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,6 +49,25 @@
         "source": "dsu-sporthandbuch-2018",
         "page": "Kapitel 5, Inhaltsverzeichnis, Seite 2 (PDF p. 146)",
         "fields": ["name", "number"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 5, Seiten 15 bis 16, PDF pp. 159 to 160",
+        "fields": [
+          "rules.firearm",
+          "rules.actions",
+          "rules.positions",
+          "rules.supports",
+          "rules.sights",
+          "rules.seriesShots",
+          "rules.timeLimits"
+        ]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 5, Seiten 15 bis 16, PDF pp. 159 to 160",
+        "fields": ["rules.ammunition"],
+        "note": "Muzzle energy above 7.5 J."
       }
     ]
   }

@@ -24,6 +24,45 @@
     ],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["prone", "sitting"],
+    "supports": ["freehand"],
+    "sights": ["open", "aperture"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "maxFirearmMass": {
+      "value": 6000
+    },
+    "ammunition": {
+      "handloads": true,
+      "bulletTypes": ["lead", "jacketed"]
+    },
+    "sighters": "unlimited",
+    "seriesShots": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 40
+        },
+        "covers": "series"
+      },
+      {
+        "duration": {
+          "value": 30
+        },
+        "covers": "series"
+      },
+      {
+        "duration": {
+          "value": 20
+        },
+        "covers": "series"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -36,6 +75,49 @@
         "source": "bds-sporthandbuch-langwaffen-2026",
         "page": "L 3.01, Seite L-20, PDF p. 20",
         "fields": ["number", "distance", "category", "caliberClasses"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 3.01, Seite L-20, PDF p. 20",
+        "fields": [
+          "rules.firearm",
+          "rules.actions",
+          "rules.positions",
+          "rules.supports",
+          "rules.sights",
+          "rules.minTriggerWeight",
+          "rules.maxFirearmMass"
+        ],
+        "note": "Open or closed sight; the closed sight with a hole rear sight is stored as aperture, a Diopter in the rule book sense is not allowed."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 14.06, L 14.07, Seite L-79 and L-80, PDF pp. 79 and 80",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 14.08.1, Seite L-81, PDF p. 81",
+        "fields": ["rules.positions", "rules.supports"],
+        "note": "Shooters aged 55 or more may sit instead of lying, where the range allows it."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 15.01, Seite L-86, PDF p. 86",
+        "fields": ["rules.ammunition"],
+        "note": "Reloaded centerfire ammunition is allowed when the case matches factory ammunition of the discipline."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 3.06, Seite L-23, PDF p. 23",
+        "fields": ["rules.sighters"],
+        "note": "Within 5 minutes."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 3.04, Seite L-23, PDF p. 23",
+        "fields": ["rules.seriesShots", "rules.timeLimits"],
+        "note": "Two series each at 40, 30 and 20 seconds; the halved program shoots one series of each."
       }
     ]
   }

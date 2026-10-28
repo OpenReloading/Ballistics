@@ -10,6 +10,19 @@
     "raw": "25 m"
   },
   "category": "pistol",
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["semi-automatic", "revolver"],
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sighters": 0,
+    "sights": ["open"],
+    "ammunition": {
+      "minMuzzleEnergy": {
+        "value": 1200
+      }
+    }
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,8 +35,28 @@
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.6C.5, Teil C, Seite 30 von 142, PDF p. 30",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.1, Teil C, Seite 3 von 142, PDF p. 3",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6C.1, C.6C.3, Teil C, Seite 30 von 142, PDF p. 30",
+        "fields": ["rules.actions", "rules.ammunition"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6.5, C.6.6, Teil C, Seite 18 von 142, PDF p. 18",
+        "fields": ["rules.positions", "rules.supports", "rules.sighters"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6C.2, Teil C, Seite 30 von 142, PDF p. 30",
+        "fields": ["rules.sights"]
       }
     ],
-    "note": "Calibers .44 Magnum to .50 with a muzzle energy of at least 1200 J (C.6C.1, C.6C.3). The course runs at 25, 15 and 10 m, the record holds the longest distance. SM may also be shot with optical sights, scored separately (C.6C.8, Teil C, PDF p. 31)."
+    "note": "Calibers .44 Magnum to .50 with a muzzle energy of at least 1200 J (C.6C.1, C.6C.3). The course runs at 25, 15 and 10 m, the record holds the longest distance. SM may also be shot with optical sights, scored separately (C.6C.8, Teil C, PDF p. 31). Optical sights are allowed in a separately scored class (C.6C.8)."
   }
 }

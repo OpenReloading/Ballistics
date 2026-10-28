@@ -10,6 +10,15 @@
     "raw": "25 m"
   },
   "category": "muzzle-loader",
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["revolver"],
+    "ammunition": {
+      "bulletTypes": ["lead"]
+    },
+    "sighters": 5,
+    "seriesShots": 5
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,7 +31,18 @@
         "source": "bdmp-sportordnung-2026-register-10",
         "page": "E.9.6, Teil E, Seite 27 von 42, PDF p. 27",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.9.1, E.9.3, Teil E, Seite 27 von 42, PDF p. 27",
+        "fields": ["rules.firearm", "rules.actions", "rules.ammunition"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.9.7, Teil E, Seite 27 bis 28 von 42, PDF pp. 27 to 28",
+        "fields": ["rules.sighters", "rules.seriesShots"]
       }
-    ]
+    ],
+    "note": "The three series have different times (150, 120 and 90 s), so no time is set."
   }
 }

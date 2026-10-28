@@ -10,6 +10,23 @@
     "raw": "300 m"
   },
   "category": "service-rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "positions": ["prone"],
+    "supports": ["freehand", "sling"],
+    "sights": ["original"],
+    "sighters": "unlimited",
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 1800,
+          "raw": "30 min"
+        },
+        "covers": "discipline",
+        "includesSighters": true
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,7 +39,23 @@
         "source": "bdmp-sportordnung-2026-register-10",
         "page": "E.7.11, Teil E, Seite 24 von 42, PDF p. 24",
         "fields": ["number", "distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.7.1, Teil E, Seite 23 von 42, PDF p. 23",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.7.4, E.7.5, E.7.8, Teil E, Seite 23 von 42, PDF p. 23",
+        "fields": ["rules.sights", "rules.positions", "rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.7.9, E.7.10, Teil E, Seite 24 von 42, PDF p. 24",
+        "fields": ["rules.sighters", "rules.timeLimits"]
       }
-    ]
+    ],
+    "note": "Shooters aged 60 and over may shoot from a rest (E.0.14)."
   }
 }

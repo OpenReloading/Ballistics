@@ -14,6 +14,31 @@
     "ids": ["rimfire-22"],
     "basis": "stated"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["standing", "kneeling", "prone"],
+    "supports": ["freehand", "sling"],
+    "sights": ["open", "aperture", "reflex"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "ammunition": {
+      "handloads": true
+    },
+    "sighters": "unlimited",
+    "seriesShots": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 1800,
+          "raw": "30 min"
+        },
+        "covers": "discipline",
+        "includesSighters": false
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -26,6 +51,42 @@
         "source": "vdrbw-schiesssportordnung-2023",
         "page": "9.13, Seite 82, PDF p. 82",
         "fields": ["federation", "section", "page", "distance", "caliberClasses", "category"]
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.1, Seite 59, PDF p. 59",
+        "fields": ["rules.firearm"],
+        "note": "Chapter 9 covers long guns."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.1.4.1, Seite 59, PDF p. 59",
+        "fields": ["rules.ammunition"],
+        "note": "Reloaded ammunition is allowed. Bundeswehr ranges take only factory-loaded full-metal-jacket ammunition."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.13.1, 9.13.2, 9.13.7, 9.13.8, Seite 82, PDF p. 82",
+        "fields": [
+          "rules.actions",
+          "rules.positions",
+          "rules.supports",
+          "rules.sights",
+          "rules.minTriggerWeight"
+        ],
+        "note": "No optical aids on the rifle; the reflex sight has no magnification."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.1.3.2, Seite 59, PDF p. 59",
+        "fields": ["rules.supports"],
+        "note": "Sling in prone only: the original carrying strap may serve as a shooting aid. The discipline bars shooting slings, read here as a different item."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.13.9, 9.13.10, 9.13.11, Seite 82, PDF p. 82",
+        "fields": ["rules.sighters", "rules.seriesShots", "rules.timeLimits"],
+        "note": "Any number of sighters before each position. The time is not stopped for target changes or reloading."
       }
     ]
   }

@@ -10,6 +10,14 @@
     "raw": "25 m"
   },
   "category": "pistol",
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["semi-automatic", "revolver"],
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sighters": 0,
+    "sights": ["open"]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,8 +30,28 @@
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.6A.5, Teil C, Seite 25 von 142, PDF p. 25",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.1, Teil C, Seite 3 von 142, PDF p. 3",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6AA.1, C.6AB.1, Teil C, Seite 25 von 142, PDF p. 25",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6.5, C.6.6, Teil C, Seite 18 von 142, PDF p. 18",
+        "fields": ["rules.positions", "rules.supports", "rules.sighters"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6A.2, Teil C, Seite 25 von 142, PDF p. 25",
+        "fields": ["rules.sights"]
       }
     ],
-    "note": "PP 1 A (9 mm Luger pistols, C.6AA.1) and PP 1 B (pistols and revolvers .354 to .455, C.6AB.1) shoot one course. PP 1 B may also be shot with optical sights as PP 1 Optical Sight, scored separately (C.6A.7, Teil C, PDF p. 26). The course runs at 25, 15 and 10 m, the record holds the longest distance."
+    "note": "PP 1 A (9 mm Luger pistols, C.6AA.1) and PP 1 B (pistols and revolvers .354 to .455, C.6AB.1) shoot one course. PP 1 B may also be shot with optical sights as PP 1 Optical Sight, scored separately (C.6A.7, Teil C, PDF p. 26). The course runs at 25, 15 and 10 m, the record holds the longest distance. Actions are the union of PP 1 A (semi-automatic pistols only) and PP 1 B (pistols and revolvers). PP 1 B may also be shot with optical sights in a separately scored class (C.6A.7)."
   }
 }

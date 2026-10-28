@@ -5,6 +5,16 @@
   "event": "vdrbw-r-g-1-grosskaliberrevolver-prazision",
   "stage": "Präzision",
   "shotCount": 15,
+  "timeLimits": [
+    {
+      "duration": {
+        "value": 600,
+        "raw": "10 min"
+      },
+      "covers": "stage",
+      "includesSighters": false
+    }
+  ],
   "provenance": {
     "kind": "published",
     "sources": [
@@ -12,6 +22,11 @@
         "source": "vdrbw-schiesssportordnung-2023",
         "page": "8.6.8, Seite 42, PDF p. 42; Scheibe 10.3, Seite 98, PDF p. 98",
         "fields": ["discipline", "face", "event", "stage", "shotCount"]
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "8.6.9, Seite 42, PDF p. 42",
+        "fields": ["timeLimits"]
       }
     ]
   }

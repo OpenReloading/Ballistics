@@ -37,6 +37,29 @@
     ],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["single-shot"],
+    "supports": ["rest"],
+    "sights": ["open", "reflex", "optical"],
+    "maxBarrelLength": {
+      "value": 406.4,
+      "raw": "16 Zoll"
+    },
+    "ammunition": {
+      "handloads": true
+    },
+    "seriesShots": 10,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 600,
+          "raw": "10 min"
+        },
+        "covers": "series"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -55,6 +78,35 @@
         "source": "dsu-sporthandbuch-2018",
         "page": "Kapitel 2, Inhaltsverzeichnis Kurzwaffen, Seite 2 (PDF p. 34)",
         "fields": ["name", "number"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 2, Seite 26, PDF p. 58",
+        "fields": [
+          "rules.firearm",
+          "rules.actions",
+          "rules.maxBarrelLength",
+          "rules.seriesShots",
+          "rules.timeLimits"
+        ]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 2, Seite 26, PDF p. 58",
+        "fields": ["rules.supports"],
+        "note": "Prone on a support under the arm or the pistol grip, or on the back with the weapon against the thigh. The back position is not an enum value, so positions is left out."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 2, Seite 26, PDF p. 58",
+        "fields": ["rules.sights"],
+        "note": "Group 1 (rimfire) open sights; group 2 (centre-fire) may also use a dot sight or a telescopic sight."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 2, Kalibereinteilung, Seite 6 (PDF p. 38)",
+        "fields": ["rules.ammunition"],
+        "note": "Factory and reloaded cartridges are allowed; reloads must match the performance of the calibre."
       }
     ]
   }
