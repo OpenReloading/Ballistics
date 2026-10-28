@@ -153,6 +153,7 @@
       "ladder pressure must be positive",
       "pressureSigma must be positive",
       "barrelLength must be positive",
+      "boreDiameter must be positive",
       "propellantTemperature must be positive",
       "peakPressure and pressureSigma together",
       "peakPressure and pressureBasis together",

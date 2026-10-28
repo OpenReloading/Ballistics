@@ -4,7 +4,9 @@ import { Box, Button, Text } from '@mantine/core'
 import { Plus } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useDeferredValue, useMemo } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
+import { msg } from '../i18n/translate.ts'
 import {
   maxOverlay,
   overlayHref,
@@ -13,7 +15,8 @@ import {
   vivacityUnit,
 } from '../lib/burn-rate.ts'
 import { listTitles } from '../lib/list-titles.ts'
-import { countText, filterText } from '../lib/lists.ts'
+import { baseLine, baseText, grainFormText } from '../lib/list-values.ts'
+import { countText, filterText, matchingText, widestCount } from '../lib/lists.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import { type PackedPowder, powderMatches, unpackPowders } from '../lib/powder-rows.ts'
 import type { Origin } from '../lib/sources.ts'
@@ -40,6 +43,8 @@ const powderSources: readonly Origin[] = ['openreloading']
  * curve are ticked for the burn-rate overlay of `/powders/burn-rates`.
  */
 export function PowderList({ packed }: { packed: PackedPowder[] }) {
+  const tr = useTranslation()
+  const { t } = tr
   const items = useMemo(() => unpackPowders(packed), [packed])
   const [state, set, clear] = useListState()
   const filters = useDeferredValue(state)
@@ -57,36 +62,38 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
   )
 
   const query = state.query.trim()
-  const named = [query && `matching "${query}"`].filter(Boolean)
+  const named = [matchingText(t, query)].filter(Boolean)
   const columns: DirectoryColumn<PowderRow>[] = [
     {
       key: 'manufacturer',
-      label: 'Manufacturer',
+      label: msg('Manufacturer'),
       width: '10.5rem',
       dim: true,
       value: (r) => r.manufacturerName,
       cell: (r) => r.manufacturerName,
     },
-    { key: 'name', label: 'Name', value: (r) => r.name, cell: (r) => r.name },
+    { key: 'name', label: msg('Name'), value: (r) => r.name, cell: (r) => r.name },
     {
       key: 'form',
-      label: 'Form',
-      width: '6rem',
+      label: msg('Form'),
+      width: '8rem',
       value: (r) => r.grainForm,
-      cell: (r) => r.grainForm ?? '',
+      cell: (r) => (r.grainForm ? grainFormText(t, r.grainForm) : ''),
     },
     {
       key: 'base',
-      label: 'Base',
+      label: msg('Base'),
       width: '5.5rem',
       value: (r) => r.propellantBase,
-      cell: (r) => r.propellantBase ?? '',
+      cell: (r) => (r.propellantBase ? baseText(t, r.propellantBase) : ''),
     },
     {
       key: 'rate',
-      label: 'Mean vivacity',
+      label: msg('Mean vivacity'),
       unit: vivacityUnit,
-      help: `Dynamic vivacity averaged over burnt fraction 0.1 to 0.9 with its interval (plus and minus 2 standard uncertainties), on a log scale: model output from fitted M3 parameters, not manufacturer data. Empty without fitted parameters.`,
+      help: msg(
+        'Dynamic vivacity averaged over burnt fraction 0.1 to 0.9 with its interval (plus and minus 2 standard uncertainties), on a log scale: model output from fitted M3 parameters, not manufacturer data. Empty without fitted parameters.',
+      ),
       width: `calc(${scaleWidth}px + 11rem)`,
       head: <RateTicks domain={domain} />,
       value: (r) => r.meanVivacity,
@@ -97,7 +104,9 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
               {n2(r.meanVivacity)}
             </Box>
             <Text component="span" inherit className="rate-interval" c="dimmed" fz="xs" truncate>
-              {r.low === undefined ? '' : `${n2(r.low)} to ${n2(r.high)}`}
+              {r.low === undefined
+                ? ''
+                : t('{low} to {high}', { low: n2(r.low), high: n2(r.high) })}
             </Text>
             <RateBar domain={domain} mean={r.meanVivacity} low={r.low} high={r.high} />
           </span>
@@ -108,9 +117,9 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
     // the burn-rate order before form and base: a phone's line ends where it is cut
     [
       r.manufacturerName,
-      r.burnRateOrder !== undefined && `burn-rate order ${r.burnRateOrder}`,
-      r.grainForm,
-      r.propellantBase && `${r.propellantBase} base`,
+      r.burnRateOrder !== undefined && t('burn-rate order {order}', { order: r.burnRateOrder }),
+      r.grainForm && grainFormText(t, r.grainForm),
+      r.propellantBase && baseLine(t, r.propellantBase),
     ]
       .filter(Boolean)
       .join(' · ')
@@ -118,12 +127,11 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
     <>
       <PageBar
         title={listTitles.powders}
+        translated
         status={
           <>
-            <BarCount
-              widest={`${items.length} of ${countText(items.length, items.length, 'powders')}`}
-            >
-              {countText(shown.length, items.length, 'powders')}
+            <BarCount widest={widestCount(tr, items.length, 'powders')}>
+              {countText(tr, shown.length, items.length, 'powders')}
             </BarCount>
             <PickedChips
               ids={picked}
@@ -143,14 +151,14 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
               count={picked.length}
               min={0}
               href={overlayHref(picked)}
-              idle="Burn rates"
+              idle={t('Burn rates')}
             />
             <Button
               component={Link}
               href="/powders/designer"
               leftSection={<Plus aria-hidden="true" />}
             >
-              New powder
+              {t('New powder')}
             </Button>
           </>
         }
@@ -160,7 +168,7 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
         <DirectoryFilters
           query={state.query}
           onQuery={(q) => set({ query: q })}
-          placeholder="Manufacturer or name, DP40…"
+          placeholder={t('Manufacturer or name, DP40…')}
           sorting={{ columns, sort: state.sort, onSort: (sort) => set({ sort }) }}
         >
           <SourceFilter
@@ -177,7 +185,11 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
           href={(r) => `/powders/${r.id}`}
           facts={facts}
           label={productLabel}
-          caption={named.length === 0 ? 'All powders' : `Powders, ${named.join(', ')}`}
+          caption={
+            named.length === 0
+              ? t('All powders')
+              : t('Powders, {filters}', { filters: named.join(', ') })
+          }
           noun="powders"
           sort={state.sort}
           onSort={(sort) => set({ sort })}

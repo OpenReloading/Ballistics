@@ -7,9 +7,13 @@ import {
   type Source,
   toSi,
 } from '@open-reloading/schema'
+import { plainNumber } from '../i18n/number.ts'
+import { type Message, msg, type Translator, translator } from '../i18n/translate.ts'
 import type { DirectoryState } from './directory.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
+import { categoryWord } from './face-words.ts'
 import type { Facet } from './facets.ts'
+import { kebabValue } from './list-values.ts'
 import { matchesQuery } from './lists.ts'
 import { type FieldGroup, type StripItem, titleFromKebab } from './record-fields.ts'
 
@@ -68,7 +72,7 @@ function distanceReadings(stored: number, unit: DisciplineRow['unit']) {
 /** The distance text of a discipline: "25 m", "50 yd", "50 m / 50 yd". */
 export const disciplineDistance = (r: Pick<DisciplineRow, 'distance' | 'unit'>) =>
   distanceReadings(r.distance, r.unit)
-    .map((d) => `${d.number} ${d.unit}`)
+    .map((d) => `${plainNumber(d.number)} ${d.unit}`)
     .join(' / ')
 
 /** The caliber classes of a discipline with their names; an id no class answers is shown as is. */
@@ -144,28 +148,43 @@ export function disciplineFacets(
   ]
 }
 
-/** Whether a discipline row passes the search. */
-export const disciplineMatches = (r: DisciplineRow, s: Pick<DirectoryState, 'query'>) =>
+/** Whether a discipline row passes the search (the category also as `t` shows it). */
+export const disciplineMatches = (
+  r: DisciplineRow,
+  s: Pick<DirectoryState, 'query'>,
+  t: Translator['t'] = translator().t,
+) =>
   matchesQuery(
     [
       r.name,
       r.number,
       r.federation,
       r.category && titleFromKebab(r.category),
+      r.category && kebabValue(t, r.category),
       ...r.classes.map((c) => c.name),
     ],
     s.query,
   )
 
 /** The discipline's facts under the page bar: federation, distance, category. */
-export function disciplineStrip(d: DisciplineRecord, federation = d.federation): StripItem[] {
+export function disciplineStrip(
+  d: Pick<DisciplineRecord, 'federation' | 'distance' | 'category'>,
+  t: Translator['t'],
+  federation = d.federation,
+): StripItem[] {
+  const federationLabel = t('Federation')
+  const distanceLabel = t('Distance')
   return [
-    { icon: 'federation', label: 'Federation', row: { label: 'Federation', text: federation } },
+    {
+      icon: 'federation',
+      label: federationLabel,
+      row: { label: msg('Federation'), text: federation },
+    },
     {
       icon: 'distance',
-      label: 'Distance',
+      label: distanceLabel,
       row: {
-        label: 'Distance',
+        label: msg('Distance'),
         text: disciplineDistance({
           distance: toSi('length', d.distance.value),
           unit: d.distance.unit,
@@ -176,39 +195,43 @@ export function disciplineStrip(d: DisciplineRecord, federation = d.federation):
       ? [
           {
             icon: 'form' as const,
-            label: 'Category',
-            row: { label: 'Category', text: titleFromKebab(d.category) },
+            label: t('Category'),
+            row: { label: msg('Category'), text: categoryWord(t, d.category) },
           },
         ]
       : []),
   ]
 }
 
-const classBasis = {
-  stated: 'Named in the rule book',
-  derived: 'Derived from the range or gauge the rule book states',
+const classBasis: Record<'stated' | 'derived', Message> = {
+  stated: msg('Named in the rule book'),
+  derived: msg('Derived from the range or gauge the rule book states'),
 }
 
 /** The discipline's values beyond the strip: number, section, page and the caliber classes. */
 export function disciplineGroups(
-  d: DisciplineRecord,
+  d: Pick<DisciplineRecord, 'number' | 'section' | 'page' | 'caliberClasses'>,
   classes: readonly CaliberClassRef[],
+  t: Translator['t'],
 ): FieldGroup[] {
   return [
     {
       rows: [
-        ...(d.number ? [{ label: 'Number', text: d.number }] : []),
-        { label: 'Section', text: d.section },
-        { label: 'Page', text: d.page },
+        ...(d.number ? [{ label: msg('Number'), text: d.number }] : []),
+        { label: msg('Section'), text: d.section },
+        { label: msg('Page'), text: d.page },
         ...(d.caliberClasses
           ? [
               {
-                label: 'Caliber classes',
+                label: msg('Caliber classes'),
                 text: caliberClassRefs(d, classes)
                   .map((c) => c.name)
                   .join(', '),
               },
-              { label: 'Caliber classes from', text: classBasis[d.caliberClasses.basis] },
+              {
+                label: msg('Caliber classes from'),
+                text: t(classBasis[d.caliberClasses.basis]),
+              },
             ]
           : []),
       ],
@@ -245,8 +268,7 @@ export type FederationRow = {
 export const hostText = (url: string) => new URL(url).host.replace(/^www\./, '')
 
 /** "International" for a world body, else the ISO country code. */
-export const countryText = (country: string) =>
-  country === 'international' ? 'International' : country
+const countryText = (country: string) => (country === 'international' ? 'International' : country)
 
 /** The federation's disciplines and the distinct faces their mappings use, face ids in mapping order. */
 export function federationScope(
@@ -284,5 +306,8 @@ export const federationFacets: Facet<FederationRow>[] = [
 ]
 
 /** Whether a federation row passes the search. */
-export const federationMatches = (r: FederationRow, s: Pick<DirectoryState, 'query'>) =>
-  matchesQuery([r.name, r.abbreviation, r.country], s.query)
+export const federationMatches = (
+  r: FederationRow,
+  s: Pick<DirectoryState, 'query'>,
+  countryLabel?: string,
+) => matchesQuery([r.name, r.abbreviation, r.country, countryLabel], s.query)

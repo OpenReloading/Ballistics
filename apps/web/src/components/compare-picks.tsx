@@ -4,6 +4,7 @@ import { Button, CloseButton, Popover, Tooltip } from '@mantine/core'
 import { ArrowsLeftRight, X } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useId, useLayoutEffect, useRef, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { togglePick } from '../lib/selection.ts'
 import { controlSize } from '../lib/theme.ts'
 import { AppPopover } from './app-popover.tsx'
@@ -38,10 +39,14 @@ function ChipItems({
   name: (id: string) => string
   onRemove: (id: string) => void
 }) {
+  const { t } = useTranslation()
   return ids.map((id) => (
     <li key={id}>
       <span title={name(id)}>{name(id)}</span>
-      <CloseButton aria-label={`Remove ${name(id)}`} onClick={() => onRemove(id)} />
+      <CloseButton
+        aria-label={t('Remove {name}', { name: name(id) })}
+        onClick={() => onRemove(id)}
+      />
     </li>
   ))
 }
@@ -65,6 +70,7 @@ export function PickedChips({
   onRemove: (id: string) => void
   onClear: () => void
 }) {
+  const { t } = useTranslation()
   // the Clear buttons leave with the picks: the focus goes to the search box
   const clear = () => {
     onClear()
@@ -92,22 +98,22 @@ export function PickedChips({
         aria-live="polite"
         className={over ? 'selection-count visually-hidden' : 'selection-count'}
       >
-        {ids.length > 0 && ` · ${ids.length} of ${max} selected`}
+        {ids.length > 0 && ` · ${t('{count} of {max} selected', { count: ids.length, max })}`}
       </span>
       {ids.length > 0 && (
         <div className="picked-slot" data-over={over || undefined} ref={slot}>
-          <ul className="picked-chips" aria-label="Selected for Compare" ref={list}>
+          <ul className="picked-chips" aria-label={t('Selected for Compare')} ref={list}>
             <ChipItems ids={ids} name={name} onRemove={onRemove} />
           </ul>
           {over && (
             <AppPopover position="bottom-start" withArrow>
               <Popover.Target>
                 <Button size={controlSize.row.button} variant="default" px={6}>
-                  {ids.length} selected
+                  {t('{count} selected', { count: ids.length })}
                 </Button>
               </Popover.Target>
               <Popover.Dropdown>
-                <ul className="picked-list" aria-label="Selected for Compare">
+                <ul className="picked-list" aria-label={t('Selected for Compare')}>
                   <ChipItems ids={ids} name={name} onRemove={onRemove} />
                 </ul>
                 <Button
@@ -116,7 +122,7 @@ export function PickedChips({
                   leftSection={<X size={12} aria-hidden="true" />}
                   onClick={clear}
                 >
-                  Clear selection
+                  {t('Clear selection')}
                 </Button>
               </Popover.Dropdown>
             </AppPopover>
@@ -129,11 +135,11 @@ export function PickedChips({
           variant="subtle"
           size={controlSize.row.button}
           px={6}
-          aria-label="Clear selection"
+          aria-label={t('Clear selection')}
           leftSection={<X size={12} aria-hidden="true" />}
           onClick={clear}
         >
-          <span className="clear-picks-text">Clear</span>
+          <span className="clear-picks-text">{t('Clear')}</span>
         </Button>
       )}
     </>
@@ -149,7 +155,7 @@ export function CompareButton({
   min,
   href,
   need,
-  idle = 'Compare',
+  idle,
 }: {
   count: number
   min: number
@@ -157,7 +163,8 @@ export function CompareButton({
   need?: string
   idle?: string
 }) {
-  const label = count > 0 ? `Compare ${count}` : idle
+  const { t } = useTranslation()
+  const label = count > 0 ? t('Compare {count}', { count }) : (idle ?? t('Compare'))
   const hint = useId()
   // aria-disabled, not disabled: the button stays focusable, so its hint is read
   return count < min ? (

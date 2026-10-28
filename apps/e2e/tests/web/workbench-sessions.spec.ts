@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
 import { storeUnits } from './units.ts'
-import { applyExampleLoad } from './workbench.ts'
+import { applyExampleLoad, formValues } from './workbench.ts'
 import { runLine } from './workbench-run.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
@@ -65,6 +65,7 @@ test('a chronograph file on the Measurements tab is a stored session that the sa
   await expect.poll(async () => (await stored(page, 'load')).length).toBe(1)
   const [load] = await stored(page, 'load')
   const [session] = await stored(page, 'session')
+  const values = await formValues(page)
   expect(load.data.sessions).toEqual([`user:${session.id}`])
   expect(session.name).toBe('day1.csv')
   // Save names the load on the mapped string only
@@ -77,8 +78,8 @@ test('a chronograph file on the Measurements tab is a stored session that the sa
   await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
   await page.getByRole('button', { name: load.name, exact: true }).click()
   await expect(page.locator('.file-state')).toContainText('Saved')
-  // the seated bullet fills the volume after the load opens: a run before it reads an empty field
-  await expect(page.getByLabel(/^Usable case volume/)).not.toHaveValue('')
+  // the name shows before the records fill the fields: a run started earlier finds them empty
+  await expect.poll(() => formValues(page)).toEqual(values)
   await runLine(page)
   await page.getByRole('tab', { name: 'Measurements', exact: true }).click()
   await expect(page.getByLabel(/^String 1: A/)).toBeAttached()

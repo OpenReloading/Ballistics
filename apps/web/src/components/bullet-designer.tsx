@@ -8,6 +8,7 @@ import { type Bullet, toSi, type UserBullet } from '@open-reloading/schema'
 import { Camera } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
 import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
+import { msg } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { BulletSummary } from '../lib/api-types.ts'
 import {
@@ -34,6 +35,7 @@ import { fetchManufacturerNames, noManufacturerNames, productLabel } from '../li
 import { type FieldRow, rowLabel, rowValue } from '../lib/record-fields.ts'
 import { drawingLengthUnit, formatQuantity, type UnitSystem, withUnit } from '../lib/units.ts'
 import { resolveBullet } from '../lib/variants.ts'
+import { verbatim } from '../lib/wording.ts'
 import { description } from './bullet-drawing.tsx'
 import { DesignerField } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
@@ -248,13 +250,17 @@ const printRows = (design: Design, manufacturer: string | undefined): FieldRow[]
       ['Manufacturer', manufacturer],
       ['Name', design.name],
     ] as const
-  ).flatMap(([label, text]): FieldRow[] => (text ? [{ label, text }] : [])),
+  ).flatMap(([label, text]): FieldRow[] => (text ? [{ label: verbatim(label), text }] : [])),
   ...(Object.keys(choiceLabels) as ChoiceKey[]).flatMap((k): FieldRow[] =>
-    design.choices[k] ? [{ label: choiceLabels[k][0], text: optionLabel(design.choices[k]) }] : [],
+    design.choices[k]
+      ? [{ label: verbatim(choiceLabels[k][0]), text: optionLabel(design.choices[k]) }]
+      : [],
   ),
   ...designerSpecs.flatMap((s): FieldRow[] => {
     const si = design.fields[s.key]?.si
-    return si === undefined ? [] : [{ label: s.label, value: { quantity: s.quantity, si } }]
+    return si === undefined
+      ? []
+      : [{ label: verbatim(s.label), value: { quantity: s.quantity, si } }]
   }),
 ]
 
@@ -500,7 +506,7 @@ export function BulletDesigner() {
         {computed}
       </Text>
       <div className="print-only">
-        <FieldTable caption="Values of the design" groups={[{ rows: values }]} />
+        <FieldTable caption={msg('Values of the design')} groups={[{ rows: values }]} />
       </div>
     </>
   )

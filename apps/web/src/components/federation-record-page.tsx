@@ -6,27 +6,24 @@ import {
   type TargetFace,
   toSi,
 } from '@open-reloading/schema'
-import Link from 'next/link'
 import { emptyDirectory, writeDirectory } from '../lib/directory.ts'
 import {
-  countryText,
   disciplineFaceIds,
   type FederationListItem,
   type FederationRecord,
   federationScope,
 } from '../lib/disciplines.ts'
 import type { DisciplineSummary, MappingSummary } from '../lib/face-disciplines.ts'
-import { titleFromKebab } from '../lib/record-fields.ts'
 import { readItems, readRecord } from '../lib/record-reads.ts'
-import { controlSize } from '../lib/theme.ts'
-import { Decimal } from './decimal.tsx'
-import { FieldTable } from './field-table.tsx'
-import { HomepageLink } from './homepage-link.tsx'
-import { Panel } from './panel.tsx'
-import { LinkButton } from './record-actions.tsx'
+import { verbatim } from '../lib/wording.ts'
+import {
+  FederationData,
+  FederationDisciplines,
+  FederationFaces,
+  FederationRuleBooks,
+} from './federation-record.tsx'
 import { RecordPage } from './record-page.tsx'
 import { RecordViewWith } from './record-view.tsx'
-import { PanelTable } from './scroll-region.tsx'
 import { TargetFaceDrawing } from './target-face-drawing.tsx'
 
 /** What the page reads besides the record: the disciplines, federations and target mappings, and the faces its disciplines are shot on. */
@@ -52,137 +49,46 @@ function FederationRecordView({
   return (
     <RecordPage
       title={f.name}
-      badges={[f.abbreviation]}
+      badges={[verbatim(f.abbreviation)]}
       className="federation-record"
       provenance={f.provenance}
-      figure={
-        <Panel id="federation-rule-books" title={`Rule books (${f.ruleBooks.length})`}>
-          <PanelTable
-            label="Rule books table"
-            className="face-table"
-            caption={<span className="visually-hidden">The rule books the records cite</span>}
-            columns={['Title', 'Edition']}
-          >
-            {f.ruleBooks.map((b) => (
-              <tr key={b.url}>
-                <th scope="row">
-                  <a href={b.url}>{b.title}</a>
-                </th>
-                <td>{b.edition}</td>
-              </tr>
-            ))}
-          </PanelTable>
-        </Panel>
-      }
+      figure={<FederationRuleBooks books={f.ruleBooks} />}
       values={
-        <Panel id="record-data" title="Federation">
-          <FieldTable
-            caption="Federation"
-            labelledBy="record-data"
-            groups={[
-              {
-                rows: [
-                  { label: 'Abbreviation', text: f.abbreviation },
-                  { label: 'Country', text: countryText(f.country) },
-                ],
-              },
-            ]}
-          />
-          {(f.internationalFederation || f.website) && (
-            <dl className="record-links">
-              {f.internationalFederation && (
-                <>
-                  <dt>Member of</dt>
-                  <dd>
-                    <Link href={`/federations/${f.internationalFederation}`}>
-                      {international?.name ?? f.internationalFederation}
-                    </Link>
-                  </dd>
-                </>
-              )}
-              {f.website && (
-                <>
-                  <dt>Homepage</dt>
-                  <dd>
-                    <HomepageLink url={f.website} />
-                  </dd>
-                </>
-              )}
-            </dl>
-          )}
-        </Panel>
+        <FederationData
+          abbreviation={f.abbreviation}
+          country={f.country}
+          member={
+            f.internationalFederation
+              ? {
+                  id: f.internationalFederation,
+                  name: international?.name ?? f.internationalFederation,
+                }
+              : undefined
+          }
+          website={f.website}
+        />
       }
       side={
         <>
-          <Panel
-            id="federation-disciplines"
-            title={`Disciplines (${own.length})`}
-            controls={
-              own.length > 0 && (
-                <LinkButton
-                  size={controlSize.row.button}
-                  href={`/disciplines${writeDirectory({ ...emptyDirectory, facets: { org: [f.abbreviation] } }, '')}`}
-                >
-                  In the discipline list
-                </LinkButton>
-              )
-            }
-          >
-            {own.length === 0 ? (
-              <p className="record-note">No discipline record names this federation.</p>
-            ) : (
-              <PanelTable
-                label="Disciplines table"
-                className="face-table"
-                caption={
-                  <span className="visually-hidden">The disciplines of this federation</span>
-                }
-                columns={['Number', 'Discipline', 'Distance', 'Category', 'Faces']}
-              >
-                {own.map((d) => (
-                  <tr key={d.id}>
-                    <td>{d.number}</td>
-                    <th scope="row">
-                      <Link href={`/disciplines/${d.id}`}>{d.name}</Link>
-                    </th>
-                    <td className="nowrap">
-                      <Decimal text={String(toSi('length', d.distanceMm))} /> m
-                    </td>
-                    <td>{d.category && titleFromKebab(d.category)}</td>
-                    <td className="num">{disciplineFaceIds(mappings, d.id).length}</td>
-                  </tr>
-                ))}
-              </PanelTable>
-            )}
-          </Panel>
-          <Panel id="federation-faces" title={`Faces (${faces.length})`}>
-            {faces.length === 0 ? (
-              <p className="record-note">No target mapping of its disciplines names a face.</p>
-            ) : (
-              <PanelTable
-                label="Faces table"
-                className="face-table"
-                caption={
-                  <span className="visually-hidden">The faces its disciplines are shot on</span>
-                }
-                columns={['Face', 'Disciplines']}
-              >
-                {ordered.map((x) => (
-                  <tr key={x.id}>
-                    <th scope="row">
-                      <Link href={`/targets/${x.id}`} className="stage-face">
-                        <span aria-hidden="true">
-                          <TargetFaceDrawing face={x} />
-                        </span>
-                        <span>{x.name}</span>
-                      </Link>
-                    </th>
-                    <td className="num">{usedBy(x.id)}</td>
-                  </tr>
-                ))}
-              </PanelTable>
-            )}
-          </Panel>
+          <FederationDisciplines
+            listHref={`/disciplines${writeDirectory({ ...emptyDirectory, facets: { org: [f.abbreviation] } }, '')}`}
+            rows={own.map((d) => ({
+              id: d.id,
+              number: d.number,
+              name: d.name,
+              distanceM: toSi('length', d.distanceMm),
+              category: d.category,
+              faces: disciplineFaceIds(mappings, d.id).length,
+            }))}
+          />
+          <FederationFaces
+            rows={ordered.map((x) => ({
+              id: x.id,
+              name: x.name,
+              uses: usedBy(x.id),
+              drawing: <TargetFaceDrawing face={x} />,
+            }))}
+          />
         </>
       }
     />

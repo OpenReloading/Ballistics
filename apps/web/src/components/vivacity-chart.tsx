@@ -35,11 +35,11 @@ type Tokens = Record<string, string>
 type Mark = { z: number; label: string }
 
 /** The interval as a band: an invisible lower line, the width stacked on it. */
-function bandSeries(series: Series[], tokens: Tokens) {
+function bandSeries(series: Series[], tokens: Tokens, t: Translator['t']) {
   return series.flatMap(({ powder: p, slot }) => [
     {
       type: 'line',
-      name: 'Interval low',
+      name: t('Interval low'),
       stack: 'band',
       symbol: 'none',
       lineStyle: { opacity: 0 },
@@ -48,7 +48,7 @@ function bandSeries(series: Series[], tokens: Tokens) {
     },
     {
       type: 'line',
-      name: 'Interval',
+      name: t('Interval'),
       stack: 'band',
       symbol: 'none',
       lineStyle: { opacity: 0 },
@@ -63,12 +63,12 @@ function bandSeries(series: Series[], tokens: Tokens) {
 }
 
 /** The run's events as vertical lines on the burnt-fraction axis. */
-function marksSeries(marks: Mark[], tokens: Tokens, small: boolean) {
+function marksSeries(marks: Mark[], tokens: Tokens, small: boolean, t: Translator['t']) {
   if (marks.length === 0) return []
   return [
     {
       type: 'line',
-      name: 'This run',
+      name: t('This run'),
       data: [],
       markLine: {
         silent: true,
@@ -150,7 +150,7 @@ function vivacityOption(
       splitLine: { lineStyle: { color: tokens.border } },
     },
     series: [
-      ...(band ? bandSeries(series, tokens) : []),
+      ...(band ? bandSeries(series, tokens, t) : []),
       ...series.map(({ powder: p, slot }) => ({
         type: 'line',
         name: p.label,
@@ -159,7 +159,7 @@ function vivacityOption(
         itemStyle: { color: tokens[slot + 1] },
         data: chartBurntFractions.map((z) => [z, curveAt(p, z).value]),
       })),
-      ...marksSeries(marks, tokens, small),
+      ...marksSeries(marks, tokens, small, t),
     ],
   }
 }

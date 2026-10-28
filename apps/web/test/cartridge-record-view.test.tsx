@@ -5,6 +5,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { CartridgeList } from '../src/components/cartridge-list.tsx'
 import { CartridgeSides, RecordFacts, VariantMatrix } from '../src/components/cartridge-record.tsx'
+import { msg } from '../src/i18n/translate.ts'
 import {
   combinedRows,
   inReadingOrder,
@@ -15,6 +16,7 @@ import {
 import { packCartridges } from '../src/lib/cartridge-rows.ts'
 import { drawable } from '../src/lib/cartridge-sheet.ts'
 import { parseCountries } from '../src/lib/countries.ts'
+import { methodWording } from '../src/lib/record-values.ts'
 import { type PresetId, presetUnits } from '../src/lib/units.ts'
 import { defined, missing } from './defined.ts'
 import { replaceUntilStable } from './markup.ts'
@@ -87,11 +89,14 @@ describe('the cartridge record', () => {
         notes={pressures.map((v) => pressureStripNote(v, c.table))}
         standard={{
           table: c.table,
-          date: { label: c.revised ? 'Revised' : 'Published', value: c.revised ?? c.published },
+          date: {
+            label: c.revised ? msg('Revised') : msg('Published'),
+            value: c.revised ?? c.published,
+          },
           countries: c.country ? parseCountries(c.country) : undefined,
         }}
         // the API derives the case type from R1, P1 and R3
-        build={{ caseType: 'rimless', method: c.pressureMethod }}
+        build={{ caseType: 'rimless', method: c.pressureMethod && methodWording(c.pressureMethod) }}
       />,
     )
   }

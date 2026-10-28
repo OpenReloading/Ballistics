@@ -1,11 +1,13 @@
 'use client'
 
 import { useDeferredValue, useMemo } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import { msg } from '../i18n/translate.ts'
 import { listTitles } from '../lib/list-titles.ts'
-import { countText, filterText } from '../lib/lists.ts'
+import { kebabValue } from '../lib/list-values.ts'
+import { countText, filterText, matchingText, widestCount } from '../lib/lists.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import { type PrimerRow, primerMatches } from '../lib/primer-rows.ts'
-import { titleFromKebab } from '../lib/record-fields.ts'
 import type { Origin } from '../lib/sources.ts'
 import {
   type DirectoryColumn,
@@ -23,61 +25,66 @@ const primerSources: readonly Origin[] = ['openreloading']
 
 /** The primer directory: manufacturer, name, product number, size, magnum flag and priming compound. */
 export function PrimerList({ rows }: { rows: PrimerRow[] }) {
+  const tr = useTranslation()
+  const { t } = tr
   const [state, set, clear] = useListState()
   const filters = useDeferredValue(state)
-  const shown = useMemo(() => rows.filter((r) => primerMatches(r, filters.query)), [rows, filters])
-  const query = state.query.trim()
-  const named = [query && `matching "${query}"`].filter(Boolean)
+  const shown = useMemo(
+    () => rows.filter((r) => primerMatches(r, filters.query, t)),
+    [rows, filters, t],
+  )
+  const named = [matchingText(t, state.query)].filter(Boolean)
   const columns: DirectoryColumn<PrimerRow>[] = [
     {
       key: 'manufacturer',
-      label: 'Manufacturer',
+      label: msg('Manufacturer'),
       width: '10.5rem',
       dim: true,
       value: (r) => r.manufacturerName,
       cell: (r) => r.manufacturerName,
     },
-    { key: 'name', label: 'Name', value: (r) => r.name, cell: (r) => r.name },
+    { key: 'name', label: msg('Name'), value: (r) => r.name, cell: (r) => r.name },
     {
       key: 'number',
-      label: 'Product number',
+      label: msg('Product number'),
       width: '9rem',
       value: (r) => r.productNumber,
       cell: (r) => r.productNumber ?? '',
     },
     {
       key: 'size',
-      label: 'Size',
+      label: msg('Size'),
       width: '9rem',
       value: (r) => r.size,
-      cell: (r) => titleFromKebab(r.size),
+      cell: (r) => kebabValue(t, r.size),
     },
     {
       key: 'magnum',
-      label: 'Magnum',
+      label: msg('Magnum'),
       width: '6rem',
       value: (r) => (r.magnum === undefined ? undefined : r.magnum ? 'yes' : 'no'),
-      cell: (r) => (r.magnum === undefined ? '' : r.magnum ? 'Yes' : 'No'),
+      cell: (r) => (r.magnum === undefined ? '' : r.magnum ? t('Yes') : t('No')),
     },
     {
       key: 'compound',
-      label: 'Compound',
+      label: msg('Compound'),
       width: '10rem',
       value: (r) => r.compound,
-      cell: (r) => (r.compound ? titleFromKebab(r.compound) : ''),
+      cell: (r) => (r.compound ? kebabValue(t, r.compound) : ''),
     },
   ]
   const facts = (r: PrimerRow) =>
-    [r.manufacturerName, titleFromKebab(r.size), r.compound && titleFromKebab(r.compound)]
+    [r.manufacturerName, kebabValue(t, r.size), r.compound && kebabValue(t, r.compound)]
       .filter(Boolean)
       .join(' · ')
   return (
     <>
       <PageBar
         title={listTitles.primers}
+        translated
         status={
-          <BarCount widest={`${rows.length} of ${countText(rows.length, rows.length, 'primers')}`}>
-            {countText(shown.length, rows.length, 'primers')}
+          <BarCount widest={widestCount(tr, rows.length, 'primers')}>
+            {countText(tr, shown.length, rows.length, 'primers')}
           </BarCount>
         }
       />
@@ -86,7 +93,7 @@ export function PrimerList({ rows }: { rows: PrimerRow[] }) {
         <DirectoryFilters
           query={state.query}
           onQuery={(q) => set({ query: q })}
-          placeholder="Manufacturer, name or size…"
+          placeholder={t('Manufacturer, name or size…')}
           sorting={{ columns, sort: state.sort, onSort: (sort) => set({ sort }) }}
         >
           <SourceFilter
@@ -103,7 +110,11 @@ export function PrimerList({ rows }: { rows: PrimerRow[] }) {
           href={(r) => `/primers/${r.id}`}
           facts={facts}
           label={productLabel}
-          caption={named.length === 0 ? 'All primers' : `Primers, ${named.join(', ')}`}
+          caption={
+            named.length === 0
+              ? t('All primers')
+              : t('Primers, {filters}', { filters: named.join(', ') })
+          }
           noun="primers"
           sort={state.sort}
           onSort={(sort) => set({ sort })}

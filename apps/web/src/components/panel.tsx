@@ -1,5 +1,9 @@
+'use client'
+
 import { Paper } from '@mantine/core'
 import type { ReactNode } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import type { Message } from '../i18n/translate.ts'
 
 /**
  * A titled panel of the page template: one border and radius, a title row of at most 28 px
@@ -8,19 +12,32 @@ import type { ReactNode } from 'react'
  */
 export function Panel({
   id,
-  title,
+  title: given,
+  translated,
   controls,
   className,
   children,
 }: {
   /** The title's id; a table in the panel names itself by it (`aria-labelledby`). */
   id: string
-  title: string
   /** Beside the title: a view switch, a filter, a search field. */
   controls?: ReactNode
   className?: string
   children: ReactNode
-}) {
+} & (
+  | {
+      /** The heading as shown. */
+      title: string
+      translated?: false
+    }
+  | {
+      /** The heading: a message of the catalogue, which the language shown translates. */
+      title: Message
+      translated: true
+    }
+)) {
+  const { t } = useTranslation()
+  const title = translated ? t(given) : given
   return (
     <Paper
       component="section"

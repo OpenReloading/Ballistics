@@ -100,6 +100,25 @@ const states: State[] = [
       await check('page')
     },
   })),
+  ...[
+    ['German list', '/cartridges/', 'tab'],
+    ['German record', '/cartridges/308-win/', 'sources'],
+  ].map(([name, route, ready]) => ({
+    name: `${name} ${route}`,
+    scrolls: true as const,
+    open: async (page: Page, check: (view: string) => Promise<void>) => {
+      await page.addInitScript(() => localStorage.setItem('language', 'de'))
+      await gotoHydrated(page, route ?? '')
+      await expect(page.locator('html')).toHaveAttribute('lang', 'de')
+      await expect(
+        ready === 'tab'
+          ? page.getByRole('tab', { name: 'Treibladungspulver' })
+          : page.locator('#record-sources'),
+      ).toBeAttached()
+      await page.waitForLoadState('networkidle')
+      await check('page')
+    },
+  })),
   {
     name: 'workbench after the example run',
     open: async (page, check) => {

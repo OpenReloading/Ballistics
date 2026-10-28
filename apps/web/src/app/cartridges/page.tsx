@@ -18,7 +18,7 @@ async function Cartridges() {
   if (r.status !== 'ok')
     return (
       <>
-        <PageBar title={listTitles.cartridges} />
+        <PageBar title={listTitles.cartridges} translated />
         <ServerDataError what="Cartridge" />
       </>
     )
@@ -31,7 +31,7 @@ export default function CartridgesPage() {
     <Suspense
       fallback={
         <>
-          <PageBar title={listTitles.cartridges} />
+          <PageBar title={listTitles.cartridges} translated />
           <ListLoading what="cartridges" />
         </>
       }

@@ -4,6 +4,14 @@ import { barButton } from './bar.ts'
 /** The workbench's input column: panels Cartridge, Bullet, Powder, Gun and the Run bar. */
 export const loadForm = (page: Page, name = 'Load') => page.getByRole('form', { name })
 
+/** The text of every field of the load form. */
+export const formValues = (page: Page) =>
+  loadForm(page)
+    .getByRole('textbox')
+    .evaluateAll((els) =>
+      els.map((e) => [e.getAttribute('aria-label') ?? '', (e as HTMLInputElement).value]),
+    )
+
 /** Clicks an item of the page bar's Open menu. */
 async function openItem(page: Page, name: string | RegExp) {
   const item = page.getByRole('menuitem', { name })

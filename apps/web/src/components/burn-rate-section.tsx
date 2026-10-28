@@ -1,6 +1,10 @@
+'use client'
+
 import type { Powder } from '@open-reloading/schema'
 import Link from 'next/link'
-import { formatNumber } from '../i18n/number.ts'
+import { useTranslation } from '../i18n/language.ts'
+import { formatNumber, plainNumber } from '../i18n/number.ts'
+import { msg } from '../i18n/translate.ts'
 import {
   classifyPowder,
   isFitted,
@@ -10,6 +14,7 @@ import {
 } from '../lib/burn-rate.ts'
 import type { ManufacturerNames } from '../lib/manufacturers.ts'
 import type { FieldRow } from '../lib/record-fields.ts'
+import { say, verbatim, worded } from '../lib/wording.ts'
 import { Decimal } from './decimal.tsx'
 import { FieldTable } from './field-table.tsx'
 import { Panel } from './panel.tsx'
@@ -29,6 +34,7 @@ export interface BurnRatePlace {
 }
 
 function Neighbours({ title, rows }: { title: string; rows: Neighbour[] }) {
+  const { t } = useTranslation()
   return (
     <div>
       <h3 className="record-heading">{title}</h3>
@@ -38,7 +44,7 @@ function Neighbours({ title, rows }: { title: string; rows: Neighbour[] }) {
             <li key={r.id} value={r.order}>
               <Link
                 href={`/powders/${encodeURIComponent(r.id)}`}
-                title={`${r.label}, burn-rate order ${r.order}`}
+                title={t('{label}, burn-rate order {order}', { label: r.label, order: r.order })}
               >
                 {r.label}
               </Link>
@@ -51,7 +57,7 @@ function Neighbours({ title, rows }: { title: string; rows: Neighbour[] }) {
           ))}
         </ol>
       ) : (
-        <p>None</p>
+        <p>{t('None')}</p>
       )}
     </div>
   )
@@ -71,6 +77,7 @@ export function BurnRateSummary({
   place?: BurnRatePlace | undefined
   names: ManufacturerNames
 }) {
+  const { t } = useTranslation()
   const p = classifyPowder(powder, names)
   const n2 = (x: number) => formatNumber(x, 2)
   const m = isFitted(p) ? meanRate(p) : undefined
@@ -79,27 +86,43 @@ export function BurnRateSummary({
         ...(place
           ? [
               {
-                label: 'Burn-rate order',
+                label: msg('Burn-rate order'),
                 text: `${place.order} of ${place.total}`,
-                method: '1 = fastest.',
+                words: [
+                  worded(msg('{order} of {total}'), {
+                    order: plainNumber(place.order),
+                    total: plainNumber(place.total),
+                  }),
+                ],
+                method: msg('1 = fastest.'),
               },
             ]
           : []),
         {
-          label: 'Mean vivacity',
+          label: msg('Mean vivacity'),
           text: `${n2(m?.value ?? 0)}${m?.low === undefined || m.high === undefined ? '' : ` (${n2(m.low)} to ${n2(m.high)})`}`,
+          words:
+            m?.low === undefined || m.high === undefined
+              ? [verbatim(n2(m?.value ?? 0))]
+              : [
+                  worded(msg('{value} ({low} to {high})'), {
+                    value: n2(m.value),
+                    low: n2(m.low),
+                    high: n2(m.high),
+                  }),
+                ],
           unit: vivacityUnit,
           numeric: true as const,
-          method: 'Mean dynamic vivacity over burnt fraction 0.1 to 0.9, with its interval.',
+          method: msg('Mean dynamic vivacity over burnt fraction 0.1 to 0.9, with its interval.'),
         },
       ]
     : []
   return (
-    <Panel id="burn-rate" title="Burn rate (model output)">
+    <Panel id="burn-rate" title={msg('Burn rate (model output)')} translated>
       {isFitted(p) ? (
         <>
           <div className="burn-rate-body">
-            <FieldTable caption="Burn rate" labelledBy="burn-rate" groups={[{ rows }]} />
+            <FieldTable caption={msg('Burn rate')} labelledBy="burn-rate" groups={[{ rows }]} />
             {place && m && (
               <div className="burn-scale">
                 <RateTicks domain={place.domain} />
@@ -110,13 +133,13 @@ export function BurnRateSummary({
           {/* the only fitted powder has no neighbours: no "None" twice */}
           {place && place.faster.length + place.slower.length > 0 && (
             <div className="burn-neighbours">
-              <Neighbours title="Faster" rows={place.faster} />
-              <Neighbours title="Slower" rows={place.slower} />
+              <Neighbours title={t('Faster')} rows={place.faster} />
+              <Neighbours title={t('Slower')} rows={place.slower} />
             </div>
           )}
         </>
       ) : (
-        <p className="record-note">{p.reason}</p>
+        <p className="record-note">{say(t, p.why)}</p>
       )}
     </Panel>
   )

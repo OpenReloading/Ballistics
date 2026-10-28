@@ -18,7 +18,7 @@ async function Federations() {
   if (list.status !== 'ok' || disciplines.status !== 'ok')
     return (
       <>
-        <PageBar title={listTitles.federations} />
+        <PageBar title={listTitles.federations} translated />
         <ServerDataError what="Federation" />
       </>
     )
@@ -30,7 +30,7 @@ export default function FederationsPage() {
     <Suspense
       fallback={
         <>
-          <PageBar title={listTitles.federations} />
+          <PageBar title={listTitles.federations} translated />
           <ListLoading what="federations" />
         </>
       }

@@ -4,7 +4,8 @@ import { Button } from '@mantine/core'
 import { useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
-import { describeCurve, type FittedPowder, uncertaintyFactor } from '../lib/burn-rate.ts'
+import { msg } from '../i18n/translate.ts'
+import { bandNote, describeCurve, type FittedPowder, modelCaption } from '../lib/burn-rate.ts'
 import { CurveTable } from './curve-table.tsx'
 import { LazyVivacityChart } from './lazy-vivacity-chart.tsx'
 import { Panel } from './panel.tsx'
@@ -18,11 +19,13 @@ export function VivacityPanel({ powder, z1 }: { powder: FittedPowder; z1?: numbe
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   // z1 of 1 is the end of the axis: a one-stage form, nothing to mark
-  const marks = z1 !== undefined && z1 < 1 ? [{ z: z1, label: `z1 ${formatNumber(z1, 1)}` }] : []
+  const marks =
+    z1 !== undefined && z1 < 1 ? [{ z: z1, label: t('z1 {z}', { z: formatNumber(z1, 1) }) }] : []
   return (
     <Panel
       id="vivacity-curve"
-      title={t('Dynamic vivacity')}
+      title={msg('Dynamic vivacity')}
+      translated
       className="vivacity-panel"
       controls={
         <Button
@@ -40,7 +43,7 @@ export function VivacityPanel({ powder, z1 }: { powder: FittedPowder; z1?: numbe
       <div className="burn-rate-curve">
         <LazyVivacityChart
           series={[{ powder, slot: 0 }]}
-          title={t('Dynamic vivacity of {name}, model output', { name: powder.label })}
+          title={t('Dynamic vivacity of {label}, model output', { label: powder.label })}
           description={describeCurve(powder, t)}
           marks={marks}
         />
@@ -51,20 +54,15 @@ export function VivacityPanel({ powder, z1 }: { powder: FittedPowder; z1?: numbe
           </li>
           <li>
             <span className="curve-key curve-key-band" aria-hidden="true" />
-            {t(
-              'Plus and minus {factor} standard uncertainties of the fitted vivacity, a lower bound',
-              { factor: uncertaintyFactor },
-            )}
+            {t(bandNote)}
           </li>
         </ul>
-        <p className="screen-only record-note">
-          {t('Model output from fitted M3 parameters, not manufacturer data.')}
-        </p>
+        <p className="screen-only record-note">{t(modelCaption)}</p>
       </div>
       <div id="curve-values" className="curve-values" data-open={open || undefined}>
         <CurveTable
           powders={[powder]}
-          caption={t('Dynamic vivacity of {name}', { name: powder.label })}
+          caption={t('Dynamic vivacity of {label}', { label: powder.label })}
         />
       </div>
     </Panel>

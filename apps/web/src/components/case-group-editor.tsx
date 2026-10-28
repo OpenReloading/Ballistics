@@ -107,6 +107,7 @@ export function CaseGroupEditor() {
     <>
       <PageBar
         title={listTitles.caseGroup}
+        translated
         actions={
           <>
             <Button

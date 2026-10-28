@@ -80,6 +80,21 @@ test('German is chosen in Settings, switches the home page and the dialog, and i
   expect(problems).toEqual([])
 })
 
+// the axe sweep of both pages in German is in a11y-states.spec.ts
+test('the Database list and a record page show in German', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('language', 'de'))
+
+  await gotoHydrated(page, '/cartridges/')
+  await expect(page.locator('html')).toHaveAttribute('lang', 'de')
+  await expect(page.getByRole('heading', { level: 1, name: 'Patronen' })).toBeVisible()
+  await expect(page.getByRole('tab', { name: 'Treibladungspulver' })).toBeVisible()
+  await expect(page.getByRole('searchbox')).toHaveAttribute('placeholder', /Alias/)
+
+  await gotoHydrated(page, '/cartridges/308-win/')
+  await expect(page.getByRole('link', { name: 'In der Werkbank verwenden' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /^Quellen/ })).toBeVisible()
+})
+
 test('the workbench in German after the example run has no axe finding', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height })
   await runExample(page)
