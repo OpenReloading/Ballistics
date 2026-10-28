@@ -369,6 +369,49 @@ body {
   line-height: 1.25;
 }
 
+/* home: the newest saved loads on one line of fixed height, each name cut, so nothing below moves
+   when the store has been read */
+.home-continue {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 1.5rem;
+  margin-bottom: var(--panel-gap);
+  font-size: var(--mantine-font-size-sm);
+  white-space: nowrap;
+}
+
+.home-continue > span,
+.home-continue p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.home-continue p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.home-continue ul {
+  display: flex;
+  gap: 1rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.home-continue li {
+  min-width: 0;
+}
+
+.home-continue a {
+  display: block;
+  overflow: hidden;
+  line-height: 1.5rem;
+  text-overflow: ellipsis;
+}
+
 .home-cards {
   display: grid;
   grid-auto-columns: minmax(0, 1fr);

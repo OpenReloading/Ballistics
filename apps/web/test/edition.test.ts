@@ -8,7 +8,7 @@ afterEach(() => {
 const keysIn = async () => {
   vi.resetModules()
   const { storageName } = await import('../src/lib/edition.ts')
-  const { openLoadsKey } = await import('../src/lib/load-tabs.ts')
+  const { openLoadsKey } = await import('../src/lib/open-loads.ts')
   const { colorSchemeKey } = await import('../src/lib/theme.ts')
   return { name: storageName('openreloading-user-data'), openLoadsKey, colorSchemeKey }
 }

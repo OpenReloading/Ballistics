@@ -1405,6 +1405,7 @@
   "To must not be above {length}.": "„Bis“ darf nicht größer als {length} sein.",
   "To must not be below From.": "„Bis“ darf nicht kleiner als „Von“ sein.",
   "Too many bullets.": "Zu viele Geschosse.",
+  "Too long for a link: save the powder to a file": "Zu lang für einen Link: Speichern Sie das Pulver in einer Datei",
   "Tools": "Werkzeuge",
   "Trajectory": "Flugbahn",
   "Trajectory result": "Flugbahnergebnis",
@@ -3579,5 +3580,7 @@
   "No column is mapped to {fields}. Map a column to it or read the file as another kind.": "Keine Spalte ist {fields} zugeordnet. Ordnen Sie eine Spalte zu oder lesen Sie die Datei als andere Art.",
   "No column is mapped to {fields}. Map a column to each or read the file as another kind.": "Keine Spalte ist {fields} zugeordnet. Ordnen Sie jedem eine Spalte zu oder lesen Sie die Datei als andere Art.",
   "Sheet \"{name}\" has no table of two columns or more. Move the table to the first sheet.": "Blatt „{name}“ enthält keine Tabelle mit zwei oder mehr Spalten. Verschieben Sie die Tabelle auf das erste Blatt.",
-  "{reason}. Fix the row or delete it.": "{reason}. Korrigieren Sie die Zeile oder löschen Sie sie."
+  "{reason}. Fix the row or delete it.": "{reason}. Korrigieren Sie die Zeile oder löschen Sie sie.",
+  "Continue": "Fortsetzen",
+  "Loads you save show here.": "Gespeicherte Laborierungen erscheinen hier."
 }

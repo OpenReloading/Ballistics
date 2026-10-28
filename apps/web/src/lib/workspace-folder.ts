@@ -1,7 +1,7 @@
 /** The workspace folder picked for saving: its handle in the browser store and its write permission. */
 import { storageName } from './edition.ts'
 import { aborted, type Pickers, pickers } from './file-access.ts'
-import { inStore } from './user-store.ts'
+import { inStore } from './user-db.ts'
 
 type Permission = {
   queryPermission(o: object): Promise<string>

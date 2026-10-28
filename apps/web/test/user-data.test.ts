@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import {
   type UserRecord,
   userDataFormat,
@@ -8,7 +9,13 @@ import { describe, expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
 import { exampleFirearm } from '../src/lib/example-data.ts'
 import { parseFiles, readLoadFile } from '../src/lib/load-file-formats.ts'
-import { maxLinkChars, readLink, shareLink, shareProblem } from '../src/lib/share-link.ts'
+import {
+  maxLinkChars,
+  readLink,
+  shareLink,
+  shareProblem,
+  tooLongText,
+} from '../src/lib/share-link.ts'
 import {
   canonicalJson,
   checkedUserDataText,
@@ -429,6 +436,14 @@ describe('the user manufacturer of a record', () => {
 
 describe('share links', () => {
   const base = 'https://example.org/bullets/designer'
+  // the fitted powder of the golden file
+  const golden: { records: UserRecord[] } = JSON.parse(
+    readFileSync(new URL('golden/user-data.json', import.meta.url), 'utf8'),
+  )
+  const powder = defined(golden.records.find((r) => r.kind === 'powder')) as Extract<
+    UserRecord,
+    { kind: 'powder' }
+  >
 
   it('round trip: a link of a record reads back to the same record', async () => {
     const link = (await shareLink([bullet], base)) as string
@@ -451,6 +466,29 @@ describe('share links', () => {
     expect(maxLinkChars).toBe(8000)
   })
 
+  it('names the file route for a powder too long for a link, its fit kept whole', async () => {
+    const noise = Array.from({ length: 12000 }, () => Math.random().toString(36)[2]).join('')
+    const big = { ...powder, name: noise } as UserRecord
+    await expect(shareLink([big], base)).resolves.toBeUndefined()
+    expect(tooLongText(big.kind, english.t)).toBe('Too long for a link: save the powder to a file')
+    expect(tooLongText(bullet.kind, english.t)).toContain('longer than 8000 characters')
+  })
+
+  it('round trip: a powder with a 5-charge fit reads back with the fit unchanged', async () => {
+    const point = defined(powder.data.fit?.input[0])
+    const fit = {
+      ...defined(powder.data.fit),
+      input: [2.6, 2.7, 2.8, 2.9, 3].map((value, i) => ({
+        ...point,
+        charge: { value },
+        muzzleVelocity: { value: 790 + 15 * i },
+      })),
+    }
+    const fitted = { ...powder, data: { ...powder.data, fit } } as UserRecord
+    const link = (await shareLink([fitted], base)) as string
+    expect(await readLink(new URL(link).hash)).toEqual({ ok: true, records: [fitted] })
+  })
+
   it('rejects a damaged or invalid fragment with a reason', async () => {
     expect(await readLink('#record=@@@')).toEqual({ ok: false, reason: 'The link is damaged.' })
     const invalid = {
@@ -468,6 +506,7 @@ describe('share links', () => {
     const userId = '3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13'
     const refused = shareProblem(own({ cartridge: `user:${userId}`, firearm: `user:${userId}` }))
     expect(refused).toContain('(firearm, cartridge)')
+    expect(shareProblem(own({ powder: `user:${userId}` }))).toContain('(powder)')
     expect(shareProblem(own({ cartridge: 'catalogue:308-win' }))).toBeUndefined()
     expect(shareProblem(load)).toBeUndefined()
     // a design carries its base as a catalogue reference and its maker as a name only
