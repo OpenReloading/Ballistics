@@ -18,3 +18,7 @@ reviews:
       instructions: >-
         Follow AGENTS.md. Results are simulations, not load data: flag any wording that calls a load
         or result safe.
+  # Release pull requests of release-please carry only the changelog and version files.
+  auto_review:
+    ignore_title_keywords:
+      - 'chore: release'
