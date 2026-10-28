@@ -126,8 +126,8 @@ export const volumeNote = {
 }
 
 /** The note as one sentence pair for the prints, none when the run's volume is measured. */
-export const volumeNoteText = (ok: { volumeMeasured: boolean } | undefined) =>
-  ok && !ok.volumeMeasured ? `${volumeNote.title}: ${volumeNote.text}` : undefined
+export const volumeNoteText = (ok: { volumeMeasured: boolean } | undefined, t: Translator['t']) =>
+  ok && !ok.volumeMeasured ? `${t(volumeNote.title)}: ${t(volumeNote.text)}` : undefined
 
 export const notReached = msg('The API is unreachable.')
 export const needsNetwork = msg(

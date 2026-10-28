@@ -15,12 +15,6 @@ export const ladderKinds: readonly { value: LadderKind; label: Message }[] = [
 /** The kinds a ladder can run. */
 export type RunnableLadderKind = LadderKind
 
-/** What a ladder of `kind` varies, as the page names it: "Charge", "Seating" or "Temperature". */
-export const ladderTitle = (kind: LadderKind, t: Translator['t']) => {
-  const found = ladderKinds.find((k) => k.value === kind)
-  return found && t(found.label)
-}
-
 /** A link's or file's ladder kind; anything else is the charge. */
 export const runKindOf = (v: string | null | undefined): RunnableLadderKind =>
   v === 'seating' || v === 'temperature' ? v : 'charge'

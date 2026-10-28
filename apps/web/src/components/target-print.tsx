@@ -3,6 +3,7 @@
 import type { ShotGroup, TargetSheet } from '@open-reloading/schema'
 import type { Ref } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from '../i18n/language.ts'
 import { localDay } from '../lib/dates.ts'
 import { readouts } from '../lib/group-readouts.ts'
 import { type Frame, viewToTarget } from '../lib/target-editor.ts'
@@ -59,6 +60,7 @@ export function TargetPrint({
   /** A group's ring score as one line, when it has a face. */
   score?: (g: ShotGroup) => string | undefined
 }) {
+  const { t } = useTranslation()
   const scaled = frame && (frame.calibration || !sheet.photo)
   const len = system.length
   const layout = scaled ? printLayout(box, mPerUnit(frame, box), len.toSi(1)) : undefined
@@ -77,7 +79,7 @@ export function TargetPrint({
       const r = shown[key]
       return r
         ? `${formatQuantity('length', system, r.value)} / ${formatQuantity('correction', system, r.angle)}`
-        : 'n/a'
+        : t('n/a')
     }
     const v = summary?.velocities[summary.velocities.length === 1 ? 0 : (g.ladderStep ?? -1)]
     return [{ g, st, cell, v, ring: score?.(g) }]
@@ -88,7 +90,8 @@ export function TargetPrint({
     <div className="target-print">
       <h1>{name}</h1>
       <p className="print-date">
-        Printed {localDay(new Date())}.{summary && ` Load: ${summary.load}.`}
+        {`${t('Printed {date}', { date: localDay(new Date()) })}.`}
+        {summary && ` ${t('Load: {load}.', { load: summary.load })}`}
       </p>
       <div className="print-image" style={{ width: `${w}mm`, height: `${h}mm` }}>
         {photo && (
@@ -117,29 +120,34 @@ export function TargetPrint({
             {layout.ruler.length} {len.symbol}
           </p>
           <p className="print-scale">
-            Scale {scaleText(layout.scale)}: print at 100 %, not fitted to the page.
+            {t('Scale {scale}: print at 100 %, not fitted to the page.', {
+              scale: scaleText(layout.scale),
+            })}
             {perspective &&
-              ' The photo keeps its perspective: the scale holds at the center of the view.'}
+              ` ${t('The photo keeps its perspective: the scale holds at the center of the view.')}`}
           </p>
         </>
       ) : (
-        <p className="print-scale">No scale: the photo has no reference.</p>
+        <p className="print-scale">{t('No scale: the photo has no reference.')}</p>
       )}
       {rows.length > 0 && (
         <table className="sheet-table print-stats">
           <caption>
-            Statistics ({len.symbol} / {system.correction.symbol})
+            {t('Statistics ({length} / {correction})', {
+              length: len.symbol,
+              correction: system.correction.symbol,
+            })}
           </caption>
           <thead>
             <tr>
-              <th scope="col">Group</th>
-              <th scope="col">Shots</th>
-              <th scope="col">Distance</th>
-              <th scope="col">ES</th>
-              <th scope="col">Mean radius</th>
-              <th scope="col">CEP</th>
-              {scoredRows && <th scope="col">Score (decimal), inner tens</th>}
-              {simulated && <th scope="col">Velocity, simulated</th>}
+              <th scope="col">{t('Group')}</th>
+              <th scope="col">{t('Shots')}</th>
+              <th scope="col">{t('Distance')}</th>
+              <th scope="col">{t('ES')}</th>
+              <th scope="col">{t('Mean radius')}</th>
+              <th scope="col">{t('CEP')}</th>
+              {scoredRows && <th scope="col">{t('Score (decimal), inner tens')}</th>}
+              {simulated && <th scope="col">{t('Velocity, simulated')}</th>}
             </tr>
           </thead>
           <tbody>
@@ -147,8 +155,12 @@ export function TargetPrint({
               <tr key={g.id}>
                 <th scope="row">{g.name}</th>
                 <td>
-                  {st.shotCount}
-                  {st.excludedCount ? ` + ${st.excludedCount} excl.` : ''}
+                  {st.excludedCount
+                    ? t('{count} + {excluded} excl.', {
+                        count: st.shotCount,
+                        excluded: st.excludedCount,
+                      })
+                    : st.shotCount}
                 </td>
                 <td>
                   {formatQuantity('range', system, g.distance)} {system.range.symbol}
@@ -156,8 +168,8 @@ export function TargetPrint({
                 <td>{cell('extremeSpread')}</td>
                 <td>{cell('meanRadius')}</td>
                 <td>{cell('cepElliptical')}</td>
-                {scoredRows && <td>{ring ?? 'n/a'}</td>}
-                {simulated && <td>{v ?? 'n/a'}</td>}
+                {scoredRows && <td>{ring ?? t('n/a')}</td>}
+                {simulated && <td>{v ?? t('n/a')}</td>}
               </tr>
             ))}
           </tbody>
