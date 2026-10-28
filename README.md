@@ -55,5 +55,3 @@ Reloading and shooting are done at your own risk. This software comes without wa
 - Code: MIT, see [LICENSE](LICENSE).
 - Data records (`packages/data/records/`): CC BY 4.0, see [packages/data/LICENSE](packages/data/LICENSE). Sources with their own terms name them in `license`.
 - The Ballistics logo: [OpenReloading/Artwork](https://github.com/OpenReloading/Artwork) (MIT), see [NOTICE](NOTICE).
-
-Developed with the assistance of generative AI.
