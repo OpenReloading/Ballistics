@@ -51,6 +51,7 @@ Pure TypeScript ballistics solver, ESM. Must stay headless: no runtime dependenc
 - `src/interior/shotshell.ts`: `shotshellInterior`, `shotshellInteriorLoad` (`apps/docs/docs/models/interior-shotshell.md`). Experimental: a shotshell load (shot, wad, crimp opening pressure, smooth bore) mapped onto `interior`. Every result carries `experimental: true`.
 - `src/interior/range.ts`:
   - `toleranceRange`, `interiorPressureRange` (`apps/docs/docs/models/interior-pressure-range.md`): the peak-pressure range over input tolerances. Each input alone at both ends, then all together at the two combined ends. Input tolerances only, no model error.
+  - `placeMaximum`: a user-entered maximum below, inside or above the range (`modelDiscrepancy`, `inputPlausible`, `aboveRange`) and the dominant input, no new run.
 - `src/interior/monte-carlo.ts`: `sampledBand`, `interiorSampledBand` (`apps/docs/docs/models/interior-sampled-band.md`): fixed-seed normal draws of the same inputs, percentiles of peak pressure and muzzle velocity, no band when the injected clock passes the budget. No clock of its own.
 - `src/exterior/`: SI in and out, angles in rad. Pages: M2 point mass `apps/docs/docs/models/exterior-point-mass.md`, truing `apps/docs/docs/models/exterior-truing.md`, M2b (modified point mass) `apps/docs/docs/models/exterior-modified-point-mass.md`, least squares `apps/docs/docs/models/least-squares.md`.
   - `atmosphere.ts`: ICAO troposphere, humid air.
