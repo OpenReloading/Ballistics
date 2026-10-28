@@ -1,6 +1,7 @@
 'use client'
 
 import type { Primer } from '@open-reloading/schema'
+import { msg } from '../i18n/translate.ts'
 import {
   fetchManufacturerNames,
   type ManufacturerNames,
@@ -33,8 +34,8 @@ export function PrimerRecordPage({ id, name }: { id: string; name: string }) {
             provenance={p.provenance}
             strip={<FieldStrip items={primerStrip(p, maker)} />}
             values={
-              <Panel id="record-data" title="Properties">
-                <FieldTable caption="Properties" labelledBy="record-data" groups={groups} />
+              <Panel id="record-data" title={msg('Properties')} translated>
+                <FieldTable caption={msg('Properties')} labelledBy="record-data" groups={groups} />
                 {p.note && <p className="record-note">{p.note}</p>}
               </Panel>
             }

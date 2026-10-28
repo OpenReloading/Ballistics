@@ -14,17 +14,20 @@ import {
 import type { Bullet } from '@open-reloading/schema'
 import Link from 'next/link'
 import type { CSSProperties, ReactNode } from 'react'
-import { compareGroups, differenceMarks, rowDiffers } from '../lib/bullet-compare.ts'
+import { useTranslation } from '../i18n/language.ts'
+import { msg } from '../i18n/translate.ts'
+import { compareGroups, differenceMarks, rowDiffers, turnPrefixOf } from '../lib/bullet-compare.ts'
 import { caliberLabel, caliberUnit } from '../lib/caliber.ts'
 import { compareHref } from '../lib/compare-ids.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import { nth } from '../lib/nth.ts'
+import { say } from '../lib/wording.ts'
 import { RecordScope, UnitSwitch } from './cartridge-record.tsx'
 import { Panel } from './panel.tsx'
 import { ScrollRegion } from './scroll-region.tsx'
 import { useUnits } from './units-settings.tsx'
 
-const markText = { max: 'largest', min: 'smallest' } as const
+const markText = { max: msg('largest'), min: msg('smallest') } as const
 
 /**
  * Bullets as columns: the drawings at one scale in one panel with the mm or in switch, then the
@@ -55,12 +58,13 @@ function Values({
   drawings: ReactNode[]
 }) {
   const { system } = useUnits()
+  const { t } = useTranslation()
   const ids = bullets.map((b) => b.id)
   const style = { '--n': bullets.length } as CSSProperties
   return (
     <div className="bullet-compare" style={style}>
-      <Panel id="compare-drawings" title="Drawings" controls={<UnitSwitch />}>
-        <ScrollRegion label="Drawings">
+      <Panel id="compare-drawings" title={msg('Drawings')} translated controls={<UnitSwitch />}>
+        <ScrollRegion label={t('Drawings')}>
           <div className="compare-drawings">
             {drawings.map((d, i) => (
               <figure key={ids[i]}>
@@ -71,15 +75,15 @@ function Values({
           </div>
         </ScrollRegion>
       </Panel>
-      <Panel id="compare-data" title="Bullet data">
-        <ScrollRegion label="Bullet data table">
+      <Panel id="compare-data" title={msg('Bullet data')} translated>
+        <ScrollRegion label={t('Bullet data table')}>
           <Table className="field-table symbol-table compare-table" aria-labelledby="compare-data">
             <TableThead>
               <TableTr>
                 <TableTh scope="col" className="field-symbol">
-                  Symbol
+                  {t('Symbol')}
                 </TableTh>
-                <TableTh scope="col">Quantity</TableTh>
+                <TableTh scope="col">{t('Quantity')}</TableTh>
                 {bullets.map((b) => (
                   <TableTh key={b.id} scope="col">
                     <Flex align="flex-start" justify="space-between" gap={4}>
@@ -97,40 +101,49 @@ function Values({
                           component={Link}
                           href={compareHref(ids.filter((id) => id !== b.id))}
                           className="screen-only"
-                          aria-label={`Remove ${productLabel(b)}`}
+                          aria-label={t('Remove {name}', { name: productLabel(b) })}
                         />
                       )}
                     </Flex>
                   </TableTh>
                 ))}
                 <TableTh scope="col" className="field-unit-cell">
-                  Unit
+                  {t('Unit')}
                 </TableTh>
               </TableTr>
             </TableThead>
-            {compareGroups(bullets, system).map((g) => (
-              <TableTbody key={g.title}>
+            {compareGroups(bullets, system, t).map((g) => (
+              <TableTbody key={say(t, g.title)}>
                 <TableTr className="field-group">
                   <TableTh scope="rowgroup" colSpan={bullets.length + 3}>
-                    {g.title}
+                    {say(t, g.title)}
                   </TableTh>
                 </TableTr>
                 {g.rows.map((row, k) => {
-                  const marks = differenceMarks(row.values)
+                  const marks = differenceMarks(row.values, turnPrefixOf(t))
                   return (
                     // biome-ignore lint/suspicious/noArrayIndexKey: a label can repeat
                     <TableTr key={k} data-differs={rowDiffers(row.values) || undefined}>
                       <TableTd className="field-symbol">{row.symbol}</TableTd>
-                      <TableTh scope="row">{row.label}</TableTh>
+                      <TableTh scope="row">
+                        {row.from === undefined
+                          ? say(t, row.label)
+                          : t('{label} from {velocity}', {
+                              label: say(t, row.label),
+                              velocity: row.from,
+                            })}
+                      </TableTh>
                       {row.values.map((v, i) => {
                         const mark = marks[i]
                         return (
                           <TableTd key={ids[i]} className="num" data-mark={mark}>
-                            {v ?? 'n/a'}
+                            {v ?? t('n/a')}
                             <span aria-hidden="true" className="diff-mark">
                               {mark === 'max' ? '▲' : mark === 'min' ? '▼' : ''}
                             </span>
-                            {mark && <span className="visually-hidden"> ({markText[mark]})</span>}
+                            {mark && (
+                              <span className="visually-hidden"> ({t(markText[mark])})</span>
+                            )}
                           </TableTd>
                         )
                       })}
@@ -144,7 +157,7 @@ function Values({
         </ScrollRegion>
         {/* the cells say "largest" or "smallest" themselves. Read alone, the legend lost its marks */}
         <p className="compare-legend" aria-hidden="true">
-          Tinted: the values differ. ▲ largest, ▼ smallest value of a row.
+          {t('Tinted: the values differ. ▲ largest, ▼ smallest value of a row.')}
         </p>
       </Panel>
     </div>

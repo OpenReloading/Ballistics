@@ -1,6 +1,7 @@
 'use client'
 
 import type { Powder } from '@open-reloading/schema'
+import { msg } from '../i18n/translate.ts'
 import { fetchPowderList } from '../lib/api-client.ts'
 import type { PowderSummary } from '../lib/api-types.ts'
 import {
@@ -94,13 +95,13 @@ function PowderRecord({ p, names, placed }: { p: Powder } & Extras) {
       values={
         <>
           {isFitted(curve) && parameters.length > 0 && (
-            <FieldPanel id="model-parameters" title="Model parameters" groups={parameters} />
+            <FieldPanel id="model-parameters" title={msg('Model parameters')} groups={parameters} />
           )}
           {/* a record with no values beyond the strip (only a name and its sources) gets no empty table */}
           {(data.length > 0 || p.note) && (
-            <Panel id="record-data" title="Properties">
+            <Panel id="record-data" title={msg('Properties')} translated>
               {data.length > 0 && (
-                <FieldTable caption="Properties" labelledBy="record-data" groups={data} />
+                <FieldTable caption={msg('Properties')} labelledBy="record-data" groups={data} />
               )}
               {p.note && <p className="record-note">{p.note}</p>}
             </Panel>

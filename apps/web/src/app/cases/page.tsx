@@ -23,7 +23,7 @@ async function Cases() {
   if (r.status !== 'ok')
     return (
       <>
-        <PageBar title={listTitles.cases} />
+        <PageBar title={listTitles.cases} translated />
         <ServerDataError what="Case" />
       </>
     )
@@ -48,7 +48,7 @@ export default function CasesPage() {
     <Suspense
       fallback={
         <>
-          <PageBar title={listTitles.cases} />
+          <PageBar title={listTitles.cases} translated />
           <ListLoading what="cases" />
         </>
       }

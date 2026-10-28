@@ -5,6 +5,8 @@ import { bulletFits, type CartridgeDiameters } from '@open-reloading/core'
 import { Plus } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useDeferredValue, useMemo } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import { msg } from '../i18n/translate.ts'
 import {
   type BulletRow,
   ballisticCoefficientText,
@@ -18,14 +20,14 @@ import {
 } from '../lib/bullet-rows.ts'
 import { compareHref, maxComparedBullets } from '../lib/compare-ids.ts'
 import { listTitles } from '../lib/list-titles.ts'
-import { countText, filterText } from '../lib/lists.ts'
+import { countText, filterText, matchingText, widestCount } from '../lib/lists.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import {
   countOrigins,
   designerHref,
   inOrigins,
+  onlyText,
   originNames,
-  origins,
   readOrigins,
   userBulletRows,
 } from '../lib/sources.ts'
@@ -61,6 +63,8 @@ export function BulletList({
   packed: PackedBullet[]
   cartridges?: FitCartridge[]
 }) {
+  const tr = useTranslation()
+  const { t } = tr
   const [records, removeRow] = useUserRecords()
   const mine = useResolved(records, userBullets)
   // the browser's designs first: a few rows would sit unseen behind 1684 catalogue rows
@@ -103,26 +107,26 @@ export function BulletList({
   )
 
   const on = readOrigins(state.sources)
-  const count = countText(shown.length, items.length, 'bullets')
+  const count = countText(tr, shown.length, items.length, 'bullets')
   const named = [
-    fits && `fitting ${fits.name}`,
-    on.length < origins.length && on[0] && `${originNames[on[0]]} only`,
-    state.query.trim() && `matching "${state.query.trim()}"`,
+    fits && t('fitting {name}', { name: fits.name }),
+    onlyText(t, on),
+    matchingText(t, state.query),
   ].filter(Boolean)
   const lengthUnit = system.length.symbol
   const columns: DirectoryColumn<BulletRow>[] = [
     {
       key: 'manufacturer',
-      label: 'Manufacturer',
+      label: msg('Manufacturer'),
       width: '10rem',
       dim: true,
       value: (b) => b.manufacturerName,
       cell: (b) => b.manufacturerName,
     },
-    { key: 'name', label: 'Name', value: (b) => b.name, cell: (b) => b.name },
+    { key: 'name', label: msg('Name'), value: (b) => b.name, cell: (b) => b.name },
     {
       key: 'cal',
-      label: 'Caliber',
+      label: msg('Caliber'),
       width: '5.5rem',
       value: (b) => b.diameter,
       cell: (b, tabIndex) => (
@@ -131,13 +135,13 @@ export function BulletList({
           tabIndex={tabIndex}
           className="field-note row-action"
           value={cell(b).caliber}
-          notes={[`Diameter ${cell(b).diameter}`]}
+          notes={[t('Diameter {diameter}', { diameter: cell(b).diameter })]}
         />
       ),
     },
     {
       key: 'mass',
-      label: 'Mass',
+      label: msg('Mass'),
       unit: system.mass.symbol,
       num: true,
       width: '6rem',
@@ -146,7 +150,7 @@ export function BulletList({
     },
     {
       key: 'length',
-      label: 'Length',
+      label: msg('Length'),
       unit: lengthUnit,
       num: true,
       width: '6rem',
@@ -155,9 +159,11 @@ export function BulletList({
     },
     {
       key: 'bc',
-      label: 'BC',
+      label: msg('BC'),
       unit: 'lb/in²',
-      help: "The manufacturer's published ballistic coefficient, lb/in², with its drag model: G7 where given, else G1; the other model on hover. Sorting orders by drag model first, then by value.",
+      help: msg(
+        "The manufacturer's published ballistic coefficient, lb/in², with its drag model: G7 where given, else G1; the other model on hover. Sorting orders by drag model first, then by value.",
+      ),
       num: true,
       width: '7rem',
       value: (b) => bulletBallisticCoefficientSort(b),
@@ -190,7 +196,7 @@ export function BulletList({
     const c = cell(b)
     const bc = bulletBallisticCoefficient(b)
     return [
-      b.origin === 'user' && originNames.user,
+      b.origin === 'user' && t(originNames.user),
       b.manufacturerName,
       c.caliber,
       c.mass && `${c.mass} ${system.mass.symbol}`,
@@ -203,13 +209,10 @@ export function BulletList({
     <>
       <PageBar
         title={listTitles.bullets}
+        translated
         status={
           <>
-            <BarCount
-              widest={`${items.length} of ${countText(items.length, items.length, 'bullets')}`}
-            >
-              {count}
-            </BarCount>
+            <BarCount widest={widestCount(tr, items.length, 'bullets')}>{count}</BarCount>
             <PickedChips
               ids={picked}
               max={maxComparedBullets}
@@ -228,14 +231,14 @@ export function BulletList({
               count={picked.length}
               min={2}
               href={compareHref(picked)}
-              need={`Select 2 to ${maxComparedBullets} bullets`}
+              need={t('Select 2 to {max} bullets', { max: maxComparedBullets })}
             />
             <Button
               component={Link}
               href="/bullets/designer"
               leftSection={<Plus aria-hidden="true" />}
             >
-              New bullet
+              {t('New bullet')}
             </Button>
             <UnitsIconButton />
           </>
@@ -246,9 +249,14 @@ export function BulletList({
         <DirectoryFilters
           query={state.query}
           onQuery={(q) => set({ query: q })}
-          placeholder="Manufacturer, name, 168, .308 or 7.82…"
+          placeholder={t('Manufacturer, name, 168, .308 or 7.82…')}
           sorting={{ columns, sort: state.sort, onSort: (sort) => set({ sort }) }}
-          scope={fits && { label: `Fits ${fits.name}`, onRemove: () => set({ fits: '' }) }}
+          scope={
+            fits && {
+              label: t('Fits {name}', { name: fits.name }),
+              onRemove: () => set({ fits: '' }),
+            }
+          }
         >
           <SourceFilter
             src={state.sources}
@@ -263,7 +271,11 @@ export function BulletList({
           href={(b) => (b.origin === 'user' ? designerHref('bullets', b.id) : `/bullets/${b.id}`)}
           facts={facts}
           label={productLabel}
-          caption={named.length === 0 ? 'All bullets' : `Bullets, ${named.join(', ')}`}
+          caption={
+            named.length === 0
+              ? t('All bullets')
+              : t('Bullets, {filters}', { filters: named.join(', ') })
+          }
           noun="bullets"
           sort={state.sort}
           onSort={(sort) => set({ sort })}

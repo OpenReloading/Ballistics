@@ -11,6 +11,7 @@ import {
 } from '@mantine/core'
 import { Flask, Plus, X } from '@phosphor-icons/react'
 import { type ReactNode, useEffect, useMemo, useReducer, useState } from 'react'
+import { msg } from '../i18n/translate.ts'
 import { fieldError } from '../lib/field-spec.ts'
 import { historyOf } from '../lib/history.ts'
 import { newId } from '../lib/new-id.ts'
@@ -37,6 +38,7 @@ import {
 } from '../lib/powder-designer.ts'
 import { controlSize } from '../lib/theme.ts'
 import { namedKey } from '../lib/user-data.ts'
+import { verbatim } from '../lib/wording.ts'
 import { DesignerField } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
 import { FieldTable } from './field-table.tsx'
@@ -110,13 +112,15 @@ function RecordPanel({
   // print: the values and the mark, not the form
   const values = powderSpecs.flatMap((s) => {
     const si = fieldAt(design, s.key).si
-    return si === undefined ? [] : [{ label: s.label, value: { quantity: s.quantity, si } }]
+    return si === undefined
+      ? []
+      : [{ label: verbatim(s.label), value: { quantity: s.quantity, si } }]
   })
   const choices = [
     ['Provenance', design.provenanceKind && provenanceText[design.provenanceKind]],
     ['Grain form', design.grainForm],
     ['Propellant base', design.propellantBase],
-  ].flatMap(([label, text]) => (label && text ? [{ label, text }] : []))
+  ].flatMap(([label, text]) => (label && text ? [{ label: verbatim(label), text }] : []))
   return (
     <>
       <div className="page-panel-head designer-panel-head">
@@ -149,7 +153,10 @@ function RecordPanel({
       )}
       <div className="print-only">
         <p>{name} (user design, not a catalogue record)</p>
-        <FieldTable caption="Values of the design" groups={[{ rows: [...choices, ...values] }]} />
+        <FieldTable
+          caption={msg('Values of the design')}
+          groups={[{ rows: [...choices, ...values] }]}
+        />
       </div>
     </>
   )

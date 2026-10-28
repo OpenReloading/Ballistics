@@ -1,6 +1,9 @@
 'use client'
 
-import { useDeferredValue, useMemo } from 'react'
+import { useCallback, useDeferredValue, useMemo } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import { msg } from '../i18n/translate.ts'
+import { countryName } from '../lib/countries.ts'
 import {
   type DisciplineRow,
   disciplineDistance,
@@ -14,8 +17,8 @@ import {
 } from '../lib/disciplines.ts'
 import { facetNames } from '../lib/facets.ts'
 import { listTitles } from '../lib/list-titles.ts'
-import { countText, filterText } from '../lib/lists.ts'
-import { titleFromKebab } from '../lib/record-fields.ts'
+import { kebabValue } from '../lib/list-values.ts'
+import { countText, filterText, matchingText, widestCount } from '../lib/lists.ts'
 import type { Origin } from '../lib/sources.ts'
 import {
   type DirectoryColumn,
@@ -42,6 +45,8 @@ export function DisciplineList({
   /** The faces the disciplines are shot on, for the Face filter's names. */
   faces: readonly { id: string; name: string }[]
 }) {
+  const tr = useTranslation()
+  const { t } = tr
   const [state, set, clear] = useListState(disciplineFacetKeys)
   const filters = useDeferredValue(state)
   const facets = useMemo(
@@ -49,34 +54,31 @@ export function DisciplineList({
     [items, faces],
   )
   const searched = useMemo(
-    () => items.filter((r) => disciplineMatches(r, filters)),
-    [items, filters],
+    () => items.filter((r) => disciplineMatches(r, filters, t)),
+    [items, filters, t],
   )
   const { shown, options } = useFacets(items, searched, facets, filters)
-  const named = [
-    ...facetNames(facets, state.facets ?? {}),
-    state.query.trim() && `matching "${state.query.trim()}"`,
-  ]
+  const named = [...facetNames(facets, state.facets ?? {}), matchingText(t, state.query)]
   const classes = (r: DisciplineRow) => r.classes.map((c) => c.name).join(', ')
   const columns: DirectoryColumn<DisciplineRow>[] = [
-    { key: 'name', label: 'Name', value: (r) => r.name, cell: (r) => r.name },
+    { key: 'name', label: msg('Name'), value: (r) => r.name, cell: (r) => r.name },
     {
       key: 'number',
-      label: 'Number',
+      label: msg('Number'),
       width: '8rem',
       value: (r) => r.number ?? '',
       cell: (r) => r.number,
     },
     {
       key: 'federation',
-      label: 'Federation',
+      label: msg('Federation'),
       width: '7rem',
       value: (r) => r.federation,
       cell: (r) => r.federation,
     },
     {
       key: 'distance',
-      label: 'Distance',
+      label: msg('Distance'),
       num: true,
       width: '9rem',
       value: (r) => r.distance,
@@ -84,15 +86,21 @@ export function DisciplineList({
     },
     {
       key: 'category',
-      label: 'Category',
-      width: '9rem',
+      label: msg('Category'),
+      width: '11rem',
       value: (r) => r.category ?? '',
-      cell: (r) => r.category && titleFromKebab(r.category),
+      cell: (r) => r.category && kebabValue(t, r.category),
     },
-    { key: 'classes', label: 'Caliber classes', width: '14rem', value: classes, cell: classes },
+    {
+      key: 'classes',
+      label: msg('Caliber classes'),
+      width: '14rem',
+      value: classes,
+      cell: classes,
+    },
     {
       key: 'faces',
-      label: 'Faces',
+      label: msg('Faces'),
       num: true,
       width: '5rem',
       value: (r) => r.faceIds.length,
@@ -100,18 +108,17 @@ export function DisciplineList({
     },
   ]
   const facts = (r: DisciplineRow) =>
-    [r.federation, r.number, disciplineDistance(r), r.category && titleFromKebab(r.category)]
+    [r.federation, r.number, disciplineDistance(r), r.category && kebabValue(t, r.category)]
       .filter(Boolean)
       .join(' · ')
   return (
     <>
       <PageBar
         title={listTitles.disciplines}
+        translated
         status={
-          <BarCount
-            widest={`${items.length} of ${countText(items.length, items.length, 'disciplines')}`}
-          >
-            {countText(shown.length, items.length, 'disciplines')}
+          <BarCount widest={widestCount(tr, items.length, 'disciplines')}>
+            {countText(tr, shown.length, items.length, 'disciplines')}
           </BarCount>
         }
       />
@@ -120,7 +127,7 @@ export function DisciplineList({
         <DirectoryFilters
           query={state.query}
           onQuery={(q) => set({ query: q })}
-          placeholder="Name, number, federation or caliber, 2.53…"
+          placeholder={t('Name, number, federation or caliber, 2.53…')}
           sorting={{ columns, sort: state.sort, onSort: (sort) => set({ sort }) }}
         >
           <SourceFilter
@@ -146,8 +153,8 @@ export function DisciplineList({
           label={(r) => r.name}
           caption={
             named.filter(Boolean).length === 0
-              ? 'All disciplines'
-              : `Disciplines, ${named.filter(Boolean).join(', ')}`
+              ? t('All disciplines')
+              : t('Disciplines, {filters}', { filters: named.filter(Boolean).join(', ') })
           }
           noun="disciplines"
           sort={state.sort}
@@ -161,37 +168,43 @@ export function DisciplineList({
 
 /** The federation directory: name, abbreviation, country, rule books, disciplines and faces. */
 export function FederationList({ items }: { items: FederationRow[] }) {
+  const tr = useTranslation()
+  const { t, language } = tr
+  // the record prints "International" or an ISO code: a code is named in the language shown
+  const country = useCallback(
+    (c: string) =>
+      c === 'International'
+        ? t('International')
+        : countryName(c, /^[A-Z]{2}$/.test(c) ? c : undefined, language),
+    [t, language],
+  )
   const [state, set, clear] = useListState(federationFacetKeys)
   const filters = useDeferredValue(state)
   const searched = useMemo(
-    () => items.filter((r) => federationMatches(r, filters)),
-    [items, filters],
+    () => items.filter((r) => federationMatches(r, filters, country(r.country))),
+    [items, filters, country],
   )
   const { shown, options } = useFacets(items, searched, federationFacets, filters)
-  const query = state.query.trim()
-  const named = [
-    ...facetNames(federationFacets, state.facets ?? {}),
-    query && `matching "${query}"`,
-  ].filter(Boolean)
+  const named = [...facetNames(federationFacets, state.facets ?? {}), matchingText(t, state.query)]
   const columns: DirectoryColumn<FederationRow>[] = [
-    { key: 'name', label: 'Name', value: (r) => r.name, cell: (r) => r.name },
+    { key: 'name', label: msg('Name'), value: (r) => r.name, cell: (r) => r.name },
     {
       key: 'abbreviation',
-      label: 'Abbreviation',
+      label: msg('Abbreviation'),
       width: '8rem',
       value: (r) => r.abbreviation,
       cell: (r) => r.abbreviation,
     },
     {
       key: 'country',
-      label: 'Country',
+      label: msg('Country'),
       width: '8rem',
-      value: (r) => r.country,
-      cell: (r) => r.country,
+      value: (r) => country(r.country),
+      cell: (r) => country(r.country),
     },
     {
       key: 'disciplines',
-      label: 'Disciplines',
+      label: msg('Disciplines'),
       num: true,
       width: '7rem',
       value: (r) => r.disciplines,
@@ -199,23 +212,26 @@ export function FederationList({ items }: { items: FederationRow[] }) {
     },
     {
       key: 'website',
-      label: 'Homepage',
+      label: msg('Homepage'),
       width: '12rem',
       value: (r) => r.website ?? '',
       cell: (r, tabIndex) => r.website && <HomepageLink url={r.website} tabIndex={tabIndex} />,
     },
   ]
   const facts = (r: FederationRow) =>
-    [r.abbreviation, r.country, countText(r.disciplines, r.disciplines, 'disciplines')].join(' · ')
+    [
+      r.abbreviation,
+      country(r.country),
+      countText(tr, r.disciplines, r.disciplines, 'disciplines'),
+    ].join(' · ')
   return (
     <>
       <PageBar
         title={listTitles.federations}
+        translated
         status={
-          <BarCount
-            widest={`${items.length} of ${countText(items.length, items.length, 'federations')}`}
-          >
-            {countText(shown.length, items.length, 'federations')}
+          <BarCount widest={widestCount(tr, items.length, 'federations')}>
+            {countText(tr, shown.length, items.length, 'federations')}
           </BarCount>
         }
       />
@@ -224,7 +240,7 @@ export function FederationList({ items }: { items: FederationRow[] }) {
         <DirectoryFilters
           query={state.query}
           onQuery={(q) => set({ query: q })}
-          placeholder="Name, abbreviation or country, DSB…"
+          placeholder={t('Name, abbreviation or country, DSB…')}
           sorting={{ columns, sort: state.sort, onSort: (sort) => set({ sort }) }}
         >
           <SourceFilter
@@ -248,7 +264,11 @@ export function FederationList({ items }: { items: FederationRow[] }) {
           href={(r) => `/federations/${r.id}`}
           facts={facts}
           label={(r) => r.name}
-          caption={named.length === 0 ? 'All federations' : `Federations, ${named.join(', ')}`}
+          caption={
+            named.filter(Boolean).length === 0
+              ? t('All federations')
+              : t('Federations, {filters}', { filters: named.filter(Boolean).join(', ') })
+          }
           noun="federations"
           sort={state.sort}
           onSort={(sort) => set({ sort })}

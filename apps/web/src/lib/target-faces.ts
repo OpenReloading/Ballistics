@@ -7,12 +7,17 @@ import {
   type TargetMapping,
   toSi,
 } from '@open-reloading/schema'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
 import type { Face } from './face-organization.ts'
+import { colourWord } from './face-words.ts'
 import type { Facet } from './facets.ts'
 import { matchesQuery } from './lists.ts'
 import { nth } from './nth.ts'
 import type { FieldGroup, FieldRow, StripItem } from './record-fields.ts'
+import { verbatim, type Wording } from './wording.ts'
+
+type Translate = Translator['t']
 
 /** One row of the target face list. Lengths in mm, distances in m. */
 export type TargetFaceRow = {
@@ -32,10 +37,6 @@ export type TargetFaceRow = {
 /** The distances of a face's events in m, each once, ascending. */
 const faceDistances = (f: Pick<Face, 'events'>) =>
   [...new Set(f.events.map((e) => toSi('length', e.distance.value)))].sort((a, b) => a - b)
-
-/** The distances as one text: "25, 50 m". */
-export const distanceText = (metres: readonly number[]) =>
-  metres.length > 0 ? `${metres.join(', ')} m` : ''
 
 /** The list row of a face; `mappings` of every face, counted by distinct discipline. */
 export function targetFaceRow(f: Face, mappings: readonly MappingSummary[]): TargetFaceRow {
@@ -91,7 +92,7 @@ export function faceFacets(disciplines: ReadonlyMap<string, string>): Facet<Targ
 export const targetFaceMatches = (r: TargetFaceRow, query: string) =>
   matchesQuery([r.name, r.organization, ...r.events], query)
 
-const length = (label: string, mm: number | undefined, printed?: string): FieldRow[] =>
+const length = (label: Wording, mm: number | undefined, printed?: string): FieldRow[] =>
   mm === undefined
     ? []
     : [
@@ -101,82 +102,112 @@ const length = (label: string, mm: number | undefined, printed?: string): FieldR
           ...(printed && { printed }),
         },
       ]
-const text = (label: string, value: string | undefined): FieldRow[] =>
+const text = (label: Wording, value: string | undefined): FieldRow[] =>
   value === undefined ? [] : [{ label, text: value }]
-const yesNo = (v: boolean | undefined, unset?: string) =>
-  v === undefined ? unset : v ? 'Yes' : 'No'
+const yesNo = (t: Translate, v: boolean | undefined, unset?: string) =>
+  v === undefined ? unset : v ? t('Yes') : t('No')
 
-const innerTenRule = { touch: 'Counts when touched', cover: 'Counts when covered' }
+const innerTenRule: Record<'touch' | 'cover', Message> = {
+  touch: msg('Counts when touched'),
+  cover: msg('Counts when covered'),
+}
 
 /** A ring's recorded colours after its label: " (black, line white)". */
-const ringColours = (r: TargetFace['rings'][number]) => {
-  const parts = [r.fill, r.line && `line ${r.line}`].filter(Boolean)
-  return parts.length > 0 ? ` (${parts.join(', ')})` : ''
+const ringColours = (t: Translate, r: TargetFace['rings'][number]) => {
+  const parts = [
+    r.fill && colourWord(t, r.fill),
+    r.line && t('line {colour}', { colour: colourWord(t, r.line) }),
+  ].filter(Boolean)
+  return parts.length > 0 ? parts.join(', ') : undefined
+}
+
+/** A ring's label: its value and, where recorded, its colours. */
+const ringLabel = (t: Translate, r: TargetFace['rings'][number]) => {
+  const colours = ringColours(t, r)
+  return verbatim(
+    colours
+      ? t('Ring {value} ({colours})', { value: r.value, colours })
+      : t('Ring {value}', { value: r.value }),
+  )
 }
 
 /** The face's facts under the page bar: federation, distances, outer diameter, black area, rings. */
-export function targetFaceStrip(f: Face): StripItem[] {
+export function targetFaceStrip(f: Omit<Face, 'provenance'>, t: Translate): StripItem[] {
   const outer = nth(f.rings, 0)
-  const oval = outer.height !== undefined ? ' width' : ''
+  const oval = outer.height !== undefined
   const item = (icon: StripItem['icon'], label: string, rows: FieldRow[]): StripItem[] =>
     rows[0] ? [{ icon, label, row: rows[0] }] : []
   return [
-    ...item('federation', 'Federation', text('Federation', f.organization)),
-    ...item('distance', 'Distance', [
-      { label: 'Distance', text: faceDistances(f).join(', '), unit: 'm' },
+    ...item('federation', t('Federation'), text(msg('Federation'), f.organization)),
+    ...item('distance', t('Distance'), [
+      {
+        label: msg('Distance'),
+        text: faceDistances(f).join(', '),
+        numeric: true,
+        unit: 'm',
+      },
     ]),
     ...item(
       'diameter',
-      `Outer diameter${oval}`,
-      length('Outer diameter', outer.diameter.value, outer.diameter.raw),
+      oval ? t('Outer diameter width') : t('Outer diameter'),
+      length(msg('Outer diameter'), outer.diameter.value, outer.diameter.raw),
     ),
     ...item(
       'black',
-      `Black area${oval}`,
-      length('Black area', f.blackDiameter.value, f.blackDiameter.raw),
+      oval ? t('Black area width') : t('Black area'),
+      length(msg('Black area'), f.blackDiameter.value, f.blackDiameter.raw),
     ),
-    ...item('rings', 'Rings', text('Rings', String(f.rings.length))),
+    ...item('rings', t('Rings'), text(msg('Rings'), String(f.rings.length))),
   ]
 }
 
 /** The face's values beyond the strip: scoring and sheet, then the ring diameters outer to inner and the inner ten. */
-export function targetFaceGroups(f: TargetFace): FieldGroup[] {
-  const w = nth(f.rings, 0).height !== undefined ? ' width' : ''
+export function targetFaceGroups(f: Omit<TargetFace, 'provenance'>, t: Translate): FieldGroup[] {
+  const oval = nth(f.rings, 0).height !== undefined
+  const unset = t('Not stated')
   return [
     {
-      title: 'Face',
+      title: msg('Face'),
       rows: [
-        ...length('Black area height', f.blackHeight?.value, f.blackHeight?.raw),
+        ...length(msg('Black area height'), f.blackHeight?.value, f.blackHeight?.raw),
         ...text(
-          'Inner ten rule',
-          f.innerTen && (f.innerTen.rule ? innerTenRule[f.innerTen.rule] : 'Not stated'),
+          msg('Inner ten rule'),
+          f.innerTen && (f.innerTen.rule ? t(innerTenRule[f.innerTen.rule]) : unset),
         ),
-        ...text('Tenth-ring values', yesNo(f.decimal, 'Not stated')),
-        ...text('Numerals printed', yesNo(f.numerals, 'Not stated')),
-        ...text(
-          'Sheet',
-          f.paper &&
-            `${f.paper.format && f.paper.format !== 'other' ? `${f.paper.format}, ` : ''}${f.paper.width.value} × ${f.paper.height.value} mm`,
-        ),
-        ...text('Scoring centres on the sheet', f.bulls && String(f.bulls.length)),
+        ...text(msg('Tenth-ring values'), yesNo(t, f.decimal, unset)),
+        ...text(msg('Numerals printed'), yesNo(t, f.numerals, unset)),
+        ...(f.paper
+          ? [
+              {
+                label: msg('Sheet'),
+                text: `${f.paper.format && f.paper.format !== 'other' ? `${f.paper.format}, ` : ''}${f.paper.width.value} × ${f.paper.height.value} mm`,
+                numeric: true as const,
+              },
+            ]
+          : []),
+        ...text(msg('Scoring centres on the sheet'), f.bulls && String(f.bulls.length)),
       ],
     },
     {
-      title: `Ring diameters${w}`,
+      title: oval ? msg('Ring diameters width') : msg('Ring diameters'),
       rows: [
         ...f.rings.flatMap((r) => [
-          ...length(`Ring ${r.value}${ringColours(r)}`, r.diameter.value, r.diameter.raw),
-          ...length(`Ring ${r.value} height`, r.height?.value, r.height?.raw),
+          ...length(ringLabel(t, r), r.diameter.value, r.diameter.raw),
+          ...length(
+            verbatim(t('Ring {value} height', { value: r.value })),
+            r.height?.value,
+            r.height?.raw,
+          ),
         ]),
-        ...length('Inner ten', f.innerTen?.diameter.value, f.innerTen?.diameter.raw),
-        ...length('Inner ten height', f.innerTen?.height?.value, f.innerTen?.height?.raw),
+        ...length(msg('Inner ten'), f.innerTen?.diameter.value, f.innerTen?.diameter.raw),
+        ...length(msg('Inner ten height'), f.innerTen?.height?.value, f.innerTen?.height?.raw),
       ],
     },
   ]
 }
 
 /** A face event: from its target mapping and discipline where one maps it, else the event alone. */
-type FaceEventRow = {
+export type FaceEventRow = {
   id: string
   /** The discipline record's id; absent where no listed discipline maps the event. */
   disciplineId?: string
@@ -185,8 +216,8 @@ type FaceEventRow = {
   /** The discipline's name, else the event's. */
   discipline: string
   stage?: string
-  /** As the rule book prints it, else in m. */
-  distance: string
+  /** As the rule book prints it, else the metres. */
+  distance: { raw?: string | undefined; metres: number }
   /** Gauge diameter, mm. */
   gauge?: number
   shotCount?: number
@@ -259,7 +290,7 @@ export function faceEventRows(
     .flatMap((e) => {
       const own = mappings.filter((m) => m.event === e.id)
       const event = {
-        distance: e.distance.raw ?? `${toSi('length', e.distance.value)} m`,
+        distance: { raw: e.distance.raw, metres: toSi('length', e.distance.value) },
         ...(e.category && { category: e.category }),
         ...(e.scoring && { scoring: e.scoring }),
       }

@@ -4,7 +4,7 @@ import { barButton } from './bar.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
-import { applyExampleLoad, loadForm } from './workbench.ts'
+import { applyExampleLoad, formValues } from './workbench.ts'
 import { runLine } from './workbench-run.ts'
 
 // the offline layer's worker answers the reloads of the offline test
@@ -47,14 +47,6 @@ const stored = (page: Page, kind: string) =>
     db.close()
     return all.filter((r) => r.kind === kind)
   }, kind)
-
-/** The text of every field of the load form. */
-const formValues = (page: Page) =>
-  loadForm(page)
-    .getByRole('textbox')
-    .evaluateAll((els) =>
-      els.map((e) => [e.getAttribute('aria-label') ?? '', (e as HTMLInputElement).value]),
-    )
 
 /** Saves the example load in the workbench as a load of this browser and gives its record and form values. */
 async function saveExampleLoad(page: Page) {

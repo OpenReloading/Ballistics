@@ -8,6 +8,7 @@ import { Ruler } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
 import { memo, useCallback, useDeferredValue, useMemo, useRef, useState } from 'react'
 import { formatNumber } from '../i18n/number.ts'
+import { msg } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { CartridgeDetail, CartridgeSummary } from '../lib/api-types.ts'
 import {
@@ -35,6 +36,7 @@ import { type FieldValue, fieldError } from '../lib/field-spec.ts'
 import type { FieldRow } from '../lib/record-fields.ts'
 import { drawingLengthUnit, fixedFieldText, formatQuantity, type UnitSystem } from '../lib/units.ts'
 import { resolveCartridge } from '../lib/variants.ts'
+import { verbatim } from '../lib/wording.ts'
 import { CartridgeDrawing, type View } from './cartridge-drawing.tsx'
 import { DesignerField } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
@@ -495,7 +497,9 @@ export function CartridgeDesigner() {
   // print: the drawing and the values, not the form
   const values = fieldSpecs.flatMap((s): FieldRow[] => {
     const si = design.fields[s.key]?.si
-    return si === undefined ? [] : [{ label: s.label, value: { quantity: s.quantity, si } }]
+    return si === undefined
+      ? []
+      : [{ label: verbatim(s.label), value: { quantity: s.quantity, si } }]
   })
 
   const results = (
@@ -530,7 +534,7 @@ export function CartridgeDesigner() {
       {/* of the drawing shown: a refusal keeps them with the earlier drawing */}
       <DerivedLine rows={drawn?.derived ?? []} system={system} />
       <div className="print-only">
-        <FieldTable caption="Values of the design" groups={[{ rows: values }]} />
+        <FieldTable caption={msg('Values of the design')} groups={[{ rows: values }]} />
       </div>
     </>
   )

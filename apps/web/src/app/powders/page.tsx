@@ -24,7 +24,7 @@ async function Powders() {
   if (r.status !== 'ok')
     return (
       <>
-        <PageBar title={listTitles.powders} />
+        <PageBar title={listTitles.powders} translated />
         <ServerDataError what="Powder" />
       </>
     )
@@ -42,7 +42,7 @@ export default function PowdersPage() {
     <Suspense
       fallback={
         <>
-          <PageBar title={listTitles.powders} />
+          <PageBar title={listTitles.powders} translated />
           <ListLoading what="powders" />
         </>
       }

@@ -1,5 +1,17 @@
 import { expect, it } from 'vitest'
-import { countText, filterText, matchesQuery, sortRows } from '../src/lib/lists.ts'
+import de from '../src/i18n/de.json'
+import { translator } from '../src/i18n/translate.ts'
+import {
+  countText,
+  filterText,
+  matchesQuery,
+  matchingText,
+  sortRows,
+  widestCount,
+} from '../src/lib/lists.ts'
+
+const english = translator()
+const german = translator(de, 'de')
 
 it('matches every word of the query in any text, ignoring case', () => {
   expect(matchesQuery(['308 Win.', '7,62 x 51'], '308 win')).toBe(true)
@@ -30,11 +42,23 @@ it('sorts by text or number, missing values last in both orders', () => {
 })
 
 it('counts the rows of a list, naming the total only while a filter hides rows', () => {
-  expect(countText(1684, 1684, 'bullets')).toBe('1684 bullets')
-  expect(countText(12, 1684, 'bullets')).toBe('12 of 1684 bullets')
-  expect(countText(0, 5, 'powders')).toBe('0 of 5 powders')
-  expect(countText(1, 1, 'powders')).toBe('1 powder')
-  expect(countText(0, 1, 'cartridges')).toBe('0 of 1 cartridge')
+  expect(countText(english, 1684, 1684, 'bullets')).toBe('1684 bullets')
+  expect(countText(english, 12, 1684, 'bullets')).toBe('12 of 1684 bullets')
+  expect(countText(english, 0, 5, 'powders')).toBe('0 of 5 powders')
+  expect(countText(english, 1, 1, 'powders')).toBe('1 powder')
+  expect(countText(english, 0, 1, 'cartridges')).toBe('0 of 1 cartridge')
+})
+
+it('counts in the language shown, with its plural forms', () => {
+  expect(countText(german, 1, 1, 'bullets')).toBe('1 Geschoss')
+  expect(countText(german, 12, 1684, 'bullets')).toBe('12 von 1684 Geschossen')
+  expect(countText(german, 0, 1, 'firearms')).toBe('0 von 1 Schusswaffe')
+  expect(widestCount(german, 5, 'cases')).toBe('5 von 5 Hülsen')
+})
+
+it('names the search as a filter, nothing for an empty one', () => {
+  expect(matchingText(english.t, '  zz ')).toBe('matching "zz"')
+  expect(matchingText(english.t, ' ')).toBe(false)
 })
 
 it('names the filters set as one sentence, nothing when none is set', () => {

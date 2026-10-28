@@ -1,6 +1,7 @@
 import type { UserRecord } from '@open-reloading/schema'
 import { toSi, userRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
+import { translator } from '../src/i18n/translate.ts'
 import {
   activeClick,
   blankFirearm,
@@ -336,18 +337,23 @@ describe('cardFacts and clickText', () => {
   const metric = presetUnits('metric-grams')
   const us = presetUnits('us')
   const f = rifle.kind === 'firearm' ? rifle.data : blankFirearm()
+  const english = translator().t
   it('names barrel, twist and the first optic of the active configuration with its zero', () => {
-    expect(cardFacts({ ...f, barrelLength: { value: 610 } }, metric)).toEqual({
+    expect(cardFacts({ ...f, barrelLength: { value: 610 } }, metric, english)).toEqual({
       barrel: '610 mm barrel, 1:254 mm, left',
       sight: 'Scope, zero 100 m',
     })
-    expect(cardFacts(f, us).barrel).toBe('1:10.0 in, left')
+    expect(cardFacts(f, us, english).barrel).toBe('1:10.0 in, left')
     expect(
-      cardFacts({ ...f, barrelLength: { value: 609.6 } }, presetUnits('metric-grains')).barrel,
+      cardFacts({ ...f, barrelLength: { value: 609.6 } }, presetUnits('metric-grains'), english)
+        .barrel,
     ).toBe('24.00 in barrel, 1:10.0 in, left')
     // no active configuration: the first one; nothing entered: nothing shown
-    expect(cardFacts({ ...f, active: undefined }, metric).sight).toBe('Scope, zero 200 m')
-    expect(cardFacts(blankFirearm(), metric)).toEqual({ barrel: undefined, sight: undefined })
+    expect(cardFacts({ ...f, active: undefined }, metric, english).sight).toBe('Scope, zero 200 m')
+    expect(cardFacts(blankFirearm(), metric, english)).toEqual({
+      barrel: undefined,
+      sight: undefined,
+    })
   })
   it('gives the table cells without units, those of the active configuration', () => {
     expect(firearmCells({ ...f, barrelLength: { value: 610 } }, metric)).toEqual({

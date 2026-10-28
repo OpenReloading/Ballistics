@@ -4,21 +4,32 @@ import { Group, MultiSelect, Pill } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import type { Powder } from '@open-reloading/schema'
 import { ChartLine } from '@phosphor-icons/react'
+import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import { msg } from '../i18n/translate.ts'
 import { fetchPowder } from '../lib/api-client.ts'
 import {
+  bandAndBarsNote,
   classifyPowder,
   dashes,
   describeCurve,
   type FittedPowder,
   isFitted,
   maxOverlay,
+  modelCaption,
   type OverlayPick,
   overlayFrom,
+  type UnfittedPowder,
+  uncertaintyFactor,
+  unfitTitles,
+  unfittedGroups,
 } from '../lib/burn-rate.ts'
+import { say } from '../lib/wording.ts'
 import { CurveTable } from './curve-table.tsx'
 import { LazyVivacityChart } from './lazy-vivacity-chart.tsx'
 import { Panel } from './panel.tsx'
+import { LinkButton } from './record-actions.tsx'
 import { EmptyNote, ErrorNote, Loading } from './states.tsx'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 
@@ -62,13 +73,14 @@ function OverlayBody({
   series: { powder: FittedPowder; slot: number }[]
   wide: boolean | undefined
 }) {
+  const { t } = useTranslation()
   if (!read || loading) return <Loading what="curves" />
   if (picks === 0)
     return (
       <EmptyNote
         icon={<ChartLine size={24} aria-hidden="true" />}
-        title="No powder in the overlay."
-        description="Tick powders in the powder list to add them."
+        title={t('No powder in the overlay.')}
+        description={t('Tick powders in the powder list to add them.')}
       />
     )
   // every pick failed: the error note above stands alone
@@ -78,14 +90,14 @@ function OverlayBody({
       <LazyVivacityChart
         series={series}
         height={wide ? 420 : 300}
-        title="Dynamic vivacity of the chosen powders, model output"
-        description={series.map((s) => describeCurve(s.powder)).join(' ')}
+        title={t('Dynamic vivacity of the chosen powders, model output')}
+        description={series.map((s) => describeCurve(s.powder, t)).join(' ')}
       />
       <details className="values-details">
-        <summary>Values table</summary>
+        <summary>{t('Values table')}</summary>
         <CurveTable
           powders={series.map((s) => s.powder)}
-          caption="Dynamic vivacity of the chosen powders"
+          caption={t('Dynamic vivacity of the chosen powders')}
         />
       </details>
     </>
@@ -102,6 +114,7 @@ function OverlayBody({
 export function BurnRateCompare({ options }: { options: { value: string; label: string }[] }) {
   // the chart is taller on a wide window (the same breakpoint as the placeholder's CSS)
   const wide = useMediaQuery('(min-width: 88em)')
+  const { t } = useTranslation()
   const [picks, setPicks] = useState<OverlayPick[]>([])
   const [read, setRead] = useState(false)
   const [records, setRecords] = useState<Record<string, Powder | 'error'>>({})
@@ -158,19 +171,19 @@ export function BurnRateCompare({ options }: { options: { value: string; label: 
   const loading = picks.length > series.length + failed.length
   const slotOf = new Map(picks.map((p) => [p.id, p.slot]))
   return (
-    <Panel id="overlay" title="Overlay" className="burn-overlay">
+    <Panel id="overlay" title={msg('Overlay')} translated className="burn-overlay">
       <MultiSelect
-        label="Powders in the overlay"
+        label={t('Powders in the overlay')}
         classNames={{ label: 'visually-hidden' }}
-        description={`Up to ${maxOverlay}`}
-        placeholder="Add powder"
+        description={t('Up to {max}', { max: maxOverlay })}
+        placeholder={t('Add powder')}
         data={options}
         value={picks.map((p) => p.id)}
         onChange={change}
         maxValues={maxOverlay}
         searchable
         hidePickedOptions
-        nothingFoundMessage="No powder with a curve matches"
+        nothingFoundMessage={t('No powder with a curve matches')}
         renderPill={({ option, value, onRemove }) => (
           <Pill withRemoveButton {...(onRemove && { onRemove })}>
             <Group component="span" display="inline-flex" gap={4} wrap="nowrap">
@@ -182,7 +195,7 @@ export function BurnRateCompare({ options }: { options: { value: string; label: 
       />
       {failed.length > 0 && (
         <ErrorNote
-          title="A curve could not be loaded."
+          title={t('A curve could not be loaded.')}
           onRetry={() => {
             for (const p of failed) requested.current.delete(p.id)
             const retried = new Set(failed.map((p) => p.id))
@@ -197,4 +210,48 @@ export function BurnRateCompare({ options }: { options: { value: string; label: 
       <OverlayBody read={read} picks={picks.length} loading={loading} series={series} wide={wide} />
     </Panel>
   )
+}
+
+/** The lead of the burn-rate page: what the curves are and what the interval covers. */
+export function BurnRatesLead() {
+  const { t } = useTranslation()
+  return (
+    <p className="muted page-lead">
+      {t('Dynamic vivacity, the burn rate per pressure, over burnt fraction.')}{' '}
+      <span className="screen-only">
+        {t(modelCaption)} {t(bandAndBarsNote)}{' '}
+      </span>
+      {t('The interval scales the whole curve.')}
+    </p>
+  )
+}
+
+/** The powders without a curve, in groups by the reason, each a link to its record. */
+export function NoCurve({ powders }: { powders: UnfittedPowder[] }) {
+  const { t } = useTranslation()
+  const groups = unfittedGroups(powders)
+  if (groups.length === 0) return null
+  return (
+    <Panel id="no-curve" title={msg('Without a curve')} translated className="no-curve">
+      {groups.map((g) => (
+        <div key={g.kind}>
+          <p>{t(unfitTitles[g.kind], { factor: uncertaintyFactor })}</p>
+          <ul className="inline-list">
+            {g.powders.map((p) => (
+              <li key={p.id}>
+                <Link href={`/powders/${p.id}`}>{p.label}</Link>
+                {p.detailWhy && ` (${say(t, p.detailWhy)})`}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </Panel>
+  )
+}
+
+/** The page bar's action: the powder list in burn-rate order. */
+export function PowdersByBurnRate() {
+  const { t } = useTranslation()
+  return <LinkButton href="/powders?sort=-rate">{t('Powders by burn rate')}</LinkButton>
 }

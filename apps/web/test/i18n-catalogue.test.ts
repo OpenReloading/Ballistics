@@ -118,11 +118,13 @@ describe('German catalogue', () => {
       .filter((t) => t.status === 'verified' && t.german)
       .filter((t) => t.english.split(', ').every((w) => /^[A-Za-z]+$/.test(w)))
       .flatMap((t) => {
+        // 'Pistol, revolver, handgun' is 'Pistole, Revolver, Kurzwaffe': each word has its own
+        // German word when the lists are as long as each other, else the whole German text
         const english = t.english.split(', ')
         const german = (t.german ?? '').split(', ')
         return english.map((w, i) => ({
           english: new RegExp(`\\b${w}(e?s)?\\b`, 'i'),
-          german: german.length === english.length ? (german[i] ?? '') : (t.german ?? ''),
+          german: (german.length === english.length ? german[i] : t.german) ?? '',
         }))
       })
     for (const [key, entry] of Object.entries(de)) {

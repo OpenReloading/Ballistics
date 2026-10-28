@@ -2,20 +2,21 @@ import { MantineProvider } from '@mantine/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { FieldPanel, FieldTable, searchGroups } from '../src/components/field-table.tsx'
+import { msg } from '../src/i18n/translate.ts'
 import type { FieldGroup } from '../src/lib/record-fields.ts'
 
 // outside a UnitsProvider the table shows the first render's preset, Metric with grains
 const html = (groups: FieldGroup[], labelledBy?: string) =>
   renderToStaticMarkup(
     <MantineProvider>
-      <FieldTable caption="Data" labelledBy={labelledBy} groups={groups} />
+      <FieldTable caption={msg('Data')} labelledBy={labelledBy} groups={groups} />
     </MantineProvider>,
   )
 
-const diameter = { label: 'Diameter', value: { quantity: 'length', si: 7.823e-3 } } as const
+const diameter = { label: msg('Diameter'), value: { quantity: 'length', si: 7.823e-3 } } as const
 
 it('has no header row and one value column in the preset unit, rounded', () => {
-  const out = html([{ rows: [diameter, { label: 'Manufacturer', text: 'Alpha' }] }])
+  const out = html([{ rows: [diameter, { label: msg('Manufacturer'), text: 'Alpha' }] }])
   expect(out).not.toContain('<thead')
   expect(out).toMatch(/<th[^>]*scope="row"[^>]*>Diameter<\/th><td[^>]*>7\.82 mm<\/td>/)
   expect(out).not.toContain('0.3080')
@@ -24,8 +25,8 @@ it('has no header row and one value column in the preset unit, rounded', () => {
 
 it('heads each titled group with a row and leaves out empty groups', () => {
   const out = html([
-    { title: 'Dimensions', rows: [diameter] },
-    { title: 'Computed', rows: [] },
+    { title: msg('Dimensions'), rows: [diameter] },
+    { title: msg('Computed'), rows: [] },
   ])
   expect(out).toMatch(/<th[^>]*scope="rowgroup"[^>]*>Dimensions<\/th>/)
   expect(out).not.toContain('Computed')
@@ -37,9 +38,9 @@ it('puts the text as printed and the method behind a button that keeps them as i
       rows: [
         { ...diameter, printed: '.308"' },
         {
-          label: 'Sectional density',
+          label: msg('Sectional density'),
           value: { quantity: 'sectionalDensity', si: 177.9 },
-          method: 'Computed: m / d².',
+          method: msg('Computed: m / d².'),
         },
       ],
     },
@@ -65,20 +66,20 @@ it('is named by its caption, or by the heading it is labelled by', () => {
 const panel = (groups: FieldGroup[]) =>
   renderToStaticMarkup(
     <MantineProvider>
-      <FieldPanel id="data" title="Bullet data" groups={groups} />
+      <FieldPanel id="data" title={msg('Bullet data')} groups={groups} />
     </MantineProvider>,
   )
 
 it('heads the symbol table Symbol, Quantity, Value, Unit and marks a symbol row for the linked drawing, one tab stop', () => {
   const out = panel([
     {
-      title: 'Size',
+      title: msg('Size'),
       rows: [
         { ...diameter, symbol: 'd' },
-        { label: 'Mass', text: '10' },
+        { label: msg('Mass'), text: '10' },
       ],
     },
-    { title: 'Shape', rows: [{ label: 'Nose', symbol: 'n', value: diameter.value }] },
+    { title: msg('Shape'), rows: [{ label: msg('Nose'), symbol: 'n', value: diameter.value }] },
   ])
   expect(out).toMatch(/Symbol<\/th><th[^>]*>Quantity<\/th><th[^>]*>Value<\/th><th[^>]*>Unit/)
   expect(out).toContain('data-symbol="d"')
@@ -90,9 +91,9 @@ it('heads the symbol table Symbol, Quantity, Value, Unit and marks a symbol row 
 
 it('filters groups that share a filter label together, one segment per label', () => {
   const out = panel([
-    { title: 'Fitted (simulated)', filter: 'Fitted', rows: [diameter] },
-    { title: 'Fixed model inputs', filter: 'Fixed inputs', rows: [diameter] },
-    { title: 'Burn form', filter: 'Fixed inputs', rows: [diameter] },
+    { title: msg('Fitted (simulated)'), filter: msg('Fitted'), rows: [diameter] },
+    { title: msg('Fixed model inputs'), filter: msg('Fixed inputs'), rows: [diameter] },
+    { title: msg('Burn form'), filter: msg('Fixed inputs'), rows: [diameter] },
   ])
   const segments = [...out.matchAll(/type="radio"[^>]* value="([^"]+)"/g)].map((m) => m[1])
   expect(segments).toEqual(['All', 'Fitted', 'Fixed inputs'])
@@ -100,8 +101,8 @@ it('filters groups that share a filter label together, one segment per label', (
 
 it('searches labels and symbols, ignoring case, and drops the groups left empty', () => {
   const groups: FieldGroup[] = [
-    { title: 'Size', rows: [{ ...diameter, symbol: 'd' }] },
-    { title: 'Shape', rows: [{ label: 'Nose length', symbol: 'n', text: '1' }] },
+    { title: msg('Size'), rows: [{ ...diameter, symbol: 'd' }] },
+    { title: msg('Shape'), rows: [{ label: msg('Nose length'), symbol: 'n', text: '1' }] },
   ]
   expect(searchGroups(groups, ' NOSE ').map((g) => g.title)).toEqual(['Shape'])
   expect(searchGroups(groups, 'd').flatMap((g) => g.rows.map((r) => r.label))).toEqual(['Diameter'])

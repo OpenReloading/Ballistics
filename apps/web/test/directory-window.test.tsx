@@ -2,19 +2,20 @@ import { MantineProvider } from '@mantine/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { DirectoryTable } from '../src/components/directory-table.tsx'
+import { msg } from '../src/i18n/translate.ts'
 
 const render = (count: number) =>
   renderToStaticMarkup(
     <MantineProvider>
       <DirectoryTable<{ id: string }>
         rows={Array.from({ length: count }, (_, i) => ({ id: `r${i}` }))}
-        columns={[{ key: 'name', label: 'Name', cell: (r) => r.id }]}
+        columns={[{ key: 'name', label: msg('Name'), cell: (r) => r.id }]}
         link="name"
         href={(r) => `/x/${r.id}`}
         facts={() => ''}
         label={(r) => r.id}
         caption="All rows"
-        noun="rows"
+        noun="bullets"
         sort={undefined}
         onSort={() => {}}
         empty={null}

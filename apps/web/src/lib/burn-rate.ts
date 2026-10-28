@@ -5,11 +5,12 @@
 
 import { dynamicVivacity, meanDynamicVivacity, type VivacityBurn } from '@open-reloading/core'
 import { type Powder, toSi } from '@open-reloading/schema'
-import { formatNumber, untranslated } from '../i18n/number.ts'
-import type { Translator } from '../i18n/translate.ts'
+import { formatNumber } from '../i18n/number.ts'
+import { type Message, msg, type Translator, translator } from '../i18n/translate.ts'
 import type { PowderSummary } from './api-types.ts'
 import { type ManufacturerNames, productLabel } from './manufacturers.ts'
 import { nth } from './nth.ts'
+import { say, type Wording, worded } from './wording.ts'
 
 /** Dash pattern per colour slot of the burn-rate charts: identity is not carried by colour alone. */
 export const dashes = ['', '8 4', '2 3', '12 3 3 3', '4 4', '1 5'] as const
@@ -37,10 +38,29 @@ export interface UnfittedPowder {
   id: string
   label: string
   kind: UnfitKind
+  /** `why` in English: what a reader of the data sees where nothing translates it. */
   reason: string
+  /** `reason` as a message with its numbers, for the language shown (`say(t, why)`). */
+  why: Wording
   /** The powder's own numbers behind `kind`, for a list grouped by kind. */
   detail?: string
+  /** `detail` as a message with its numbers. */
+  detailWhy?: Wording
 }
+
+const english = translator().t
+
+/** An unfitted powder with `reason` and `detail` written from their wordings in English. */
+const unfit = (
+  p: Pick<UnfittedPowder, 'id' | 'label' | 'kind'>,
+  why: Wording,
+  detailWhy?: Wording,
+): UnfittedPowder => ({
+  ...p,
+  reason: say(english, why),
+  why,
+  ...(detailWhy && { detail: say(english, detailWhy), detailWhy }),
+})
 
 interface RateInterval {
   value: number
@@ -48,8 +68,9 @@ interface RateInterval {
   high?: number | undefined
 }
 
-const noFitReason =
-  'No fitted parameters: the load-table fit gives parameters only to powders with at least 10 training rows from at least 2 cartridges.'
+const noFitReason = msg(
+  'No fitted parameters: the load-table fit gives parameters only to powders with at least 10 training rows from at least 2 cartridges.',
+)
 
 /** What `classifyPowder` reads: a powder record or a list summary, with its manufacturer's name where known. */
 type BurnSource = Pick<Powder, 'id' | 'manufacturer' | 'name' | 'grainForm' | 'propellantBase'> & {
@@ -59,29 +80,38 @@ type BurnSource = Pick<Powder, 'id' | 'manufacturer' | 'name' | 'grainForm' | 'p
 
 /** Why a powder with a fitted pressure exponent `exponent` other than 1 has no curve. */
 const exponentReason = (exponent: number) =>
-  `Pressure exponent ${exponent}, not 1: the burn rate per pressure depends on the pressure, so there is no single curve.`
+  worded(
+    msg(
+      'Pressure exponent {exponent}, not 1: the burn rate per pressure depends on the pressure, so there is no single curve.',
+    ),
+    { exponent },
+  )
 
 /** Why the powder has no curve: no fit, an exponent other than 1, an interval reaching 0; none when it has one. */
 function unfitReason(p: BurnSource, label: string): UnfittedPowder | undefined {
   const i = p.interior
-  if (!i) return { id: p.id, label, kind: 'none', reason: noFitReason }
+  const own = { id: p.id, label }
+  if (!i) return unfit({ ...own, kind: 'none' }, noFitReason)
   if (i.pressureExponent !== 1)
-    return {
-      id: p.id,
-      label,
-      kind: 'exponent',
-      reason: exponentReason(i.pressureExponent),
-      detail: `exponent ${i.pressureExponent}`,
-    }
+    return unfit(
+      { ...own, kind: 'exponent' },
+      exponentReason(i.pressureExponent),
+      worded(msg('exponent {exponent}'), { exponent: i.pressureExponent }),
+    )
   const { value, standardUncertainty: sigma } = i.vivacity
-  if (sigma !== undefined && uncertaintyFactor * sigma >= value)
-    return {
-      id: p.id,
-      label,
-      kind: 'unresolved',
-      reason: `Fit unresolved: the interval of the fitted vivacity (${value} 1/s, plus and minus ${uncertaintyFactor} times ${sigma}) reaches 0, so the powder is not placed.`,
-      detail: `vivacity ${value} 1/s, plus and minus ${uncertaintyFactor} times ${sigma}`,
-    }
+  if (sigma !== undefined && uncertaintyFactor * sigma >= value) {
+    const numbers = { value, factor: uncertaintyFactor, sigma }
+    return unfit(
+      { ...own, kind: 'unresolved' },
+      worded(
+        msg(
+          'Fit unresolved: the interval of the fitted vivacity ({value} 1/s, plus and minus {factor} times {sigma}) reaches 0, so the powder is not placed.',
+        ),
+        numbers,
+      ),
+      worded(msg('vivacity {value} 1/s, plus and minus {factor} times {sigma}'), numbers),
+    )
+  }
 }
 
 /** A vivacity burn law with pressure exponent 1, SI. */
@@ -97,8 +127,8 @@ export function classifyPowder(
   names?: ManufacturerNames,
 ): FittedPowder | UnfittedPowder {
   const label = productLabel(p, names)
-  const unfit = unfitReason(p, label)
-  if (unfit) return unfit
+  const unfitted = unfitReason(p, label)
+  if (unfitted) return unfitted
   const i = p.interior as NonNullable<BurnSource['interior']>
   const { value, standardUncertainty: sigma } = i.vivacity
   const { a, m, q, z1 } = i.burnForm
@@ -133,7 +163,7 @@ export function typedBurn(
   if (vivacity === undefined || exponent === undefined || referencePressure === undefined) return
   const id = 'typed'
   const label = 'Typed model parameters'
-  if (exponent !== 1) return { id, label, kind: 'exponent', reason: exponentReason(exponent) }
+  if (exponent !== 1) return unfit({ id, label, kind: 'exponent' }, exponentReason(exponent))
   const form = [formA, formM, formQ, formZ1]
   return {
     id,
@@ -175,47 +205,61 @@ export const tableBurntFractions = Array.from({ length: 11 }, (_, i) => i / 10)
 export const vivacityUnit = '1/(MPa·s)'
 
 /** What a curve is: the caption of a powder record's chart. */
-const modelCaption = 'Model output from fitted M3 parameters, not manufacturer data.'
+export const modelCaption = msg('Model output from fitted M3 parameters, not manufacturer data.')
 
-/** What the band of a curve and the bar of a mean cover. */
-const bandNote = `plus and minus ${uncertaintyFactor} standard uncertainties of the fitted vivacity, a lower bound`
+/** What the band of a curve and the bar of a mean cover; 2 is `uncertaintyFactor`. */
+export const bandNote = msg(
+  'Plus and minus 2 standard uncertainties of the fitted vivacity, a lower bound.',
+)
 
-export const modelNote = `${modelCaption} Band and bars: ${bandNote}.`
+/** `bandNote` as the end of `modelCaption`: what the band and the bars of the burn-rate page's curves are. */
+export const bandAndBarsNote = msg(
+  'Band and bars: plus and minus 2 standard uncertainties of the fitted vivacity, a lower bound.',
+)
 
 const n2 = (v: number) => formatNumber(v, 2)
 
 /** The order scalar with its interval, as text. */
-function meanText(p: FittedPowder): string {
+function meanText(p: FittedPowder, t: Translator['t']): string {
   const m = meanRate(p)
-  const range =
-    m.low === undefined || m.high === undefined ? '' : ` (${n2(m.low)} to ${n2(m.high)})`
-  return `${n2(m.value)}${range} ${vivacityUnit}`
+  const unit = vivacityUnit
+  return m.low === undefined || m.high === undefined
+    ? t('{value} {unit}', { value: n2(m.value), unit })
+    : t('{value} ({low} to {high}) {unit}', {
+        value: n2(m.value),
+        low: n2(m.low),
+        high: n2(m.high),
+        unit,
+      })
 }
 
-/** Text alternative of one powder's curve: start, peak, end and the mean. */
-export function describeCurve(p: FittedPowder, t: Translator['t'] = untranslated()): string {
+/** Text alternative of one powder's curve: start, peak, end and the mean, in the language of `t`. */
+export function describeCurve(p: FittedPowder, t: Translator['t'] = english): string {
   const values = chartBurntFractions.map((z) => curveAt(p, z).value)
   const peak = values.indexOf(Math.max(...values))
   return t(
-    'Dynamic vivacity of {label} over burnt fraction 0 to 1: {start} {unit} at z 0, highest {high} {unit} at z {z}, {end} {unit} at z 1. Mean over z 0.1 to 0.9: {mean}.',
+    'Dynamic vivacity of {label} over burnt fraction 0 to 1: {start} {unit} at z 0, highest {top} at z {z}, {end} at z 1. Mean over z 0.1 to 0.9: {mean}.',
     {
       label: p.label,
       start: n2(nth(values, 0)),
       unit: vivacityUnit,
-      high: n2(values[peak] ?? Number.NaN),
+      top: n2(values[peak] ?? Number.NaN),
       z: formatNumber(chartBurntFractions[peak] ?? Number.NaN, 2),
       end: n2(values.at(-1) ?? 0),
-      mean: meanText(p),
+      mean: meanText(p, t),
     },
   )
 }
 
-/** The sentence of each group of powders without a curve. */
-export const unfitTitles: Record<UnfitKind, string> = {
+/** The sentence of each group of powders without a curve; the unresolved one has `{factor}` standard uncertainties. */
+export const unfitTitles: Record<UnfitKind, Message> = {
   none: noFitReason,
-  exponent:
+  exponent: msg(
     'Pressure exponent other than 1: the burn rate per pressure depends on the pressure, so there is no single curve.',
-  unresolved: `Fit unresolved: the interval of the fitted vivacity (plus and minus ${uncertaintyFactor} standard uncertainties) reaches 0, so the powder is not placed.`,
+  ),
+  unresolved: msg(
+    'Fit unresolved: the interval of the fitted vivacity (plus and minus {factor} standard uncertainties) reaches 0, so the powder is not placed.',
+  ),
 }
 
 /** Powders without a curve in groups by kind, in the order of `unfitTitles`; empty groups left out. */

@@ -8,19 +8,22 @@ import {
   bulletScreenEm,
 } from '@open-reloading/drawing/bullet'
 import type { Bullet } from '@open-reloading/schema'
+import { msg, type Translator, translator } from '../i18n/translate.ts'
 import {
   ballisticCoefficientRows,
   bulletDataGroups,
   type FieldGroup,
-  rowLabel,
+  type FieldRow,
   rowParts,
-  turnPrefix,
 } from './record-fields.ts'
-import type { UnitSystem } from './units.ts'
+import { type UnitSystem, withUnit } from './units.ts'
+import type { Wording } from './wording.ts'
 
 /** A row of the comparison: one value per bullet as shown in the preset, undefined where absent. */
 interface CompareRow {
-  label: string
+  label: Wording
+  /** A coefficient's lower velocity bound, in the preset's unit, after the label. */
+  from?: string
   symbol?: string | undefined
   unit: string
   values: (string | undefined)[]
@@ -28,65 +31,110 @@ interface CompareRow {
 
 /** A titled group of compared rows. */
 interface CompareGroup {
-  title: string
+  title: Wording
   rows: CompareRow[]
 }
 
-const groupOrder = ['Size', 'Shape', 'Tip and base', 'Build', 'Twist', 'Computed']
+const groupOrder: Wording[] = [
+  msg('Size'),
+  msg('Shape'),
+  msg('Tip and base'),
+  msg('Build'),
+  msg('Twist'),
+  msg('Computed'),
+]
+
+const untitled: Wording = { verbatim: '' }
+
+/** A wording as a map key: a message by its text, the others by their parts. */
+const keyOf = (w: Wording) => (typeof w === 'string' ? w : JSON.stringify(w))
+
+/** The rows of one bullet's group merged into `rows`: its value at place `at`, a repeated label once per repeat. */
+function mergeRows(
+  rows: Map<string, CompareRow>,
+  own: FieldRow[],
+  at: number,
+  count: number,
+  system: UnitSystem,
+  t: Translator['t'],
+) {
+  const seen = new Map<string, number>()
+  for (const r of own) {
+    const from =
+      r.fromVelocity === undefined ? undefined : withUnit('velocity', system, r.fromVelocity)
+    const label = `${keyOf(r.label)}${from === undefined ? '' : ` from ${from}`}`
+    const n = seen.get(label) ?? 0
+    seen.set(label, n + 1)
+    const key = `${label}#${n}`
+    const { number, unit } = rowParts(r, system, t)
+    const row = rows.get(key) ?? {
+      label: r.label,
+      ...(from !== undefined && { from }),
+      ...(r.symbol && { symbol: r.symbol }),
+      unit,
+      values: Array.from({ length: count }, () => undefined),
+    }
+    row.values[at] = number
+    rows.set(key, row)
+  }
+}
 
 /**
  * The bullets' data tables merged: the groups of the bullet record's data table, then the
  * ballistic coefficients, each row once in the order first met (a repeated label once per
  * repeat), a value per bullet where its record has the row.
  */
-export function compareGroups(bullets: Bullet[], system: UnitSystem): CompareGroup[] {
+export function compareGroups(
+  bullets: Bullet[],
+  system: UnitSystem,
+  t: Translator['t'] = translator().t,
+): CompareGroup[] {
   // the groups in `bulletDataGroups` order, also where the first bullet lacks one
+  const titles = new Map<string, Wording>()
   const groups = new Map<string, Map<string, CompareRow>>(
-    [...groupOrder, 'Ballistic coefficients'].map((t) => [t, new Map()]),
+    [...groupOrder, msg('Ballistic coefficients')].map((title) => {
+      titles.set(keyOf(title), title)
+      return [keyOf(title), new Map()]
+    }),
   )
   bullets.forEach((b, i) => {
     const own: FieldGroup[] = [
       ...bulletDataGroups(b),
-      { title: 'Ballistic coefficients', rows: ballisticCoefficientRows(b) },
+      { title: msg('Ballistic coefficients'), rows: ballisticCoefficientRows(b) },
     ]
     for (const g of own) {
-      const title = g.title ?? ''
+      const wording = g.title ?? untitled
+      const title = keyOf(wording)
+      titles.set(title, wording)
       const rows = groups.get(title) ?? new Map<string, CompareRow>()
       groups.set(title, rows)
-      const seen = new Map<string, number>()
-      for (const r of g.rows) {
-        const label = rowLabel(r, system)
-        const n = seen.get(label) ?? 0
-        seen.set(label, n + 1)
-        const key = `${label}#${n}`
-        const { number, unit } = rowParts(r, system)
-        const row = rows.get(key) ?? {
-          label,
-          ...(r.symbol && { symbol: r.symbol }),
-          unit,
-          values: bullets.map(() => undefined),
-        }
-        row.values[i] = number
-        rows.set(key, row)
-      }
+      mergeRows(rows, g.rows, i, bullets.length, system, t)
     }
   })
   return [...groups]
-    .map(([title, rows]) => ({ title, rows: [...rows.values()] }))
+    .map(([title, rows]) => ({ title: titles.get(title) ?? untitled, rows: [...rows.values()] }))
     .filter((g) => g.rows.length > 0)
 }
 
 /** Whether a row's shown values are not all the same. An absent value differs from a present one. */
 export const rowDiffers = (values: readonly (string | undefined)[]) => new Set(values).size > 1
 
+/** The text before a twist's length per turn in the language of `t`. */
+export const turnPrefixOf = (t: Translator['t']) => t('1 turn in {length}', { length: '' })
+
 /**
  * The largest and smallest of a row's shown values, compared as shown (so two values that read
- * the same are equal), a twist by its length per turn. Nothing where fewer than two values show
- * or all are the same.
+ * the same are equal), a twist by its length per turn after `turnPrefix`. A decimal comma reads
+ * as a point. Nothing where fewer than two values show or all are the same.
  */
-export function differenceMarks(shown: readonly (string | undefined)[]) {
+export function differenceMarks(
+  shown: readonly (string | undefined)[],
+  turnPrefix = turnPrefixOf(translator().t),
+) {
   const xs = shown.map((s) =>
-    s === undefined ? undefined : Number(s.startsWith(turnPrefix) ? s.slice(turnPrefix.length) : s),
+    s === undefined
+      ? undefined
+      : Number((s.startsWith(turnPrefix) ? s.slice(turnPrefix.length) : s).replace(',', '.')),
   )
   const present = xs.filter((x): x is number => x !== undefined && Number.isFinite(x))
   const [lo, hi] = [Math.min(...present), Math.max(...present)]

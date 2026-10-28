@@ -1,6 +1,7 @@
 'use client'
 
 import type { Bullet } from '@open-reloading/schema'
+import { msg } from '../i18n/translate.ts'
 import { compareFrom } from '../lib/compare-ids.ts'
 import { countryOf } from '../lib/countries.ts'
 import {
@@ -10,6 +11,7 @@ import {
 } from '../lib/manufacturers.ts'
 import { workbenchHref } from '../lib/query.ts'
 import { ballisticCoefficientRows, bulletDataGroups, bulletStrip } from '../lib/record-fields.ts'
+import { type Wording, worded } from '../lib/wording.ts'
 import { BulletCartridges } from './bullet-cartridges.tsx'
 import { BulletDrawing } from './bullet-drawing.tsx'
 import { ByLengthUnit } from './by-length-unit.tsx'
@@ -25,11 +27,11 @@ type Fits = { id: string; name: string }[]
 
 function BulletRecord({ b, label, fits }: { b: Bullet; label: string; fits: Fits }) {
   // each named, as a badge holds no heading
-  const badges = [
-    b.productLine && `Line ${b.productLine}`,
-    b.caliber && `Caliber ${b.caliber}`,
-    b.productNumber && `Product ${b.productNumber}`,
-  ].filter((x): x is string => !!x)
+  const badges: Wording[] = [
+    b.productLine && worded(msg('Line {line}'), { line: b.productLine }),
+    b.caliber && worded(msg('Caliber {caliber}'), { caliber: b.caliber }),
+    b.productNumber && worded(msg('Product {number}'), { number: b.productNumber }),
+  ].filter((x): x is Wording => !!x)
   const coefficients = ballisticCoefficientRows(b)
   return (
     <RecordScope>
@@ -53,7 +55,8 @@ function BulletRecord({ b, label, fits }: { b: Bullet; label: string; fits: Fits
           <>
             <Panel
               id="record-drawing"
-              title="Drawing"
+              title={msg('Drawing')}
+              translated
               // the drawing needs the length; without it the panel holds the reason
               controls={b.length && <UnitSwitch />}
             >
@@ -63,15 +66,15 @@ function BulletRecord({ b, label, fits }: { b: Bullet; label: string; fits: Fits
               />
             </Panel>
             {coefficients.length > 0 && (
-              <Panel id="record-coefficients" title="Ballistic coefficients">
-                <CoefficientTable label="Ballistic coefficients" rows={coefficients} />
+              <Panel id="record-coefficients" title={msg('Ballistic coefficients')} translated>
+                <CoefficientTable label={msg('Ballistic coefficients')} rows={coefficients} />
               </Panel>
             )}
           </>
         }
         values={
           <>
-            <FieldPanel id="record-data" title="Bullet data" groups={bulletDataGroups(b)}>
+            <FieldPanel id="record-data" title={msg('Bullet data')} groups={bulletDataGroups(b)}>
               {b.note && <p className="record-note">{b.note}</p>}
             </FieldPanel>
             <BulletCartridges fits={fits} />

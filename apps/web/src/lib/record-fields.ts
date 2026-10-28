@@ -8,7 +8,16 @@ import {
   toSi,
 } from '@open-reloading/schema'
 import { formatNumber, localizeDecimals } from '../i18n/number.ts'
+import { type Message, msg, type Translator, translator } from '../i18n/translate.ts'
 import { computedBulletRows } from './bullet.ts'
+import {
+  cupWording,
+  rawWording,
+  spacedWording,
+  titleFromKebab,
+  titleWording,
+  yesNo,
+} from './record-values.ts'
 import {
   degreeText,
   formatQuantity,
@@ -19,55 +28,82 @@ import {
   waterVolume,
   withUnit,
 } from './units.ts'
+import { say, verbatim, type Wording, worded } from './wording.ts'
+
+export { titleFromKebab }
+
+type Translate = Translator['t']
+
+/** Without a catalogue every text is English: what the record functions give when no translation is passed. */
+const english = translator().t
 
 /**
  * One row of a record's value table: a text, or a quantity in SI that the table shows in the
  * viewer's unit; the text as printed and how a computed value is computed show on hover.
  */
 export interface FieldRow {
-  label: string
+  /** A message (`msg`), or `verbatim(name)` for a name as published (a drag model, a composition's substance). */
+  label: Wording
   /** The drawing's symbol of the value (`data-symbol`), for the linked marking. */
   symbol?: string | undefined
-  /** Shown as is: names, forms, values without a unit choice. */
+  /** Shown as is: names, forms, values without a unit choice. The English of `words` where there are some. */
   text?: string
+  /** The words of `text` in the language shown, joined by a comma: a value that is a word or a phrase, not a name as published. */
+  words?: Wording[]
   /** `text` is numbers written with a point (built on the server, in English): shown with the language's decimal mark. */
   numeric?: boolean
   /** A text's unit, shown after it. */
   unit?: string | undefined
+  /** The unit as words where it is no symbol; read instead of `unit`. */
+  unitWords?: Wording | undefined
   /** `sig`: that many significant digits instead of the unit's decimals. */
   value?: { quantity: Quantity; si: number; significantDigits?: number }
   printed?: string
-  method?: string | undefined
+  method?: Wording | undefined
   /** SI velocity: the lower bound of a ballistic coefficient's band, after the label. */
   fromVelocity?: number
 }
 
 /** Rows under a group heading row (Dimensions, Computed, Coefficients); no title, no heading row. */
 export type FieldGroup = {
-  title?: string
+  title?: Wording
   /** The group filter's label (`FieldPanel`), shared by groups that filter together; else the title. */
-  filter?: string
+  filter?: Wording
   rows: FieldRow[]
 }
 
-/** The text before a twist's length per turn. */
-export const turnPrefix = '1 turn in '
+/** A row's unit: the symbol of its quantity, or the unit it names as text or words. */
+const unitOf = (row: FieldRow, system: UnitSystem, t: Translate) =>
+  row.value
+    ? system[row.value.quantity].symbol
+    : row.unitWords
+      ? say(t, row.unitWords)
+      : (row.unit ?? '')
+
+/** A row's text part in the language of `t`. */
+const textOf = (row: FieldRow, t: Translate) =>
+  row.words
+    ? row.words.map((w) => say(t, w)).join(', ')
+    : row.numeric
+      ? localizeDecimals(row.text ?? '')
+      : row.text
 
 /** A row's value as shown in `system`: rounded to the unit's decimals, with its symbol. */
-export function rowValue(row: FieldRow, system: UnitSystem): string {
+export function rowValue(row: FieldRow, system: UnitSystem, t: Translate = english): string {
   if (!row.value) {
-    const text = row.numeric ? localizeDecimals(row.text ?? '') : row.text
-    return row.unit ? `${text} ${row.unit}` : (text ?? '')
+    const text = textOf(row, t)
+    const unit = unitOf(row, system, t)
+    return unit ? `${text} ${unit}` : (text ?? '')
   }
   const { quantity: q, si, significantDigits: sig } = row.value
   const shown = `${sig ? inchText(formatSignificant(system[q].fromSi(si), sig), system[q].symbol) : formatQuantity(q, system, si)}${system[q].symbol ? ` ${system[q].symbol}` : ''}`
-  return q === 'twist' ? `${turnPrefix}${shown}` : shown
+  return q === 'twist' ? t('1 turn in {length}', { length: shown }) : shown
 }
 
 /** A row's value split into its text and its unit symbol, for a unit column or a label. */
-export function rowParts(row: FieldRow, system: UnitSystem) {
-  const unit = row.value ? system[row.value.quantity].symbol : (row.unit ?? '')
-  const text = rowValue(row, system)
+export function rowParts(row: FieldRow, system: UnitSystem, t: Translate = english) {
+  const unit = unitOf(row, system, t)
+  const text = rowValue(row, system, t)
   return {
     number: unit && text.endsWith(` ${unit}`) ? text.slice(0, -unit.length - 1) : text,
     unit,
@@ -75,15 +111,24 @@ export function rowParts(row: FieldRow, system: UnitSystem) {
 }
 
 /** A row's label, with the band of a coefficient in `system`'s velocity unit. */
-export function rowLabel(row: FieldRow, system: UnitSystem): string {
+export function rowLabel(row: FieldRow, system: UnitSystem, t: Translate = english): string {
+  const label = say(t, row.label)
   return row.fromVelocity === undefined
-    ? row.label
-    : `${row.label} from ${withUnit('velocity', system, row.fromVelocity)}`
+    ? label
+    : t('{label} from {velocity}', {
+        label,
+        velocity: withUnit('velocity', system, row.fromVelocity),
+      })
 }
 
 /** The hover notes of a row: the text as printed, then the method. */
-export function rowNotes(row: FieldRow): string[] {
-  return [row.printed && `As printed: ${row.printed}`, row.method].filter((n): n is string => !!n)
+export function rowNotes(row: FieldRow, t: Translate = english): string[] {
+  const method = row.method && say(t, row.method)
+  return [
+    row.printed && t('As printed: {printed}', { printed: row.printed }),
+    // a note of a numeric row holds numbers written with a point
+    method && (row.numeric ? localizeDecimals(method) : method),
+  ].filter((n): n is string => !!n)
 }
 
 /** Text of `x` with `n` significant digits and no exponent, trailing zeros kept. */
@@ -91,10 +136,6 @@ function formatSignificant(x: number, n: number): string {
   if (x === 0) return '0'
   return formatNumber(x, Math.max(0, n - 1 - Math.floor(Math.log10(Math.abs(x)))))
 }
-
-/** A record value as a name: "hollow-point" as "Hollow point". */
-export const titleFromKebab = (value: string) =>
-  (value.charAt(0).toUpperCase() + value.slice(1)).replaceAll('-', ' ')
 
 /**
  * The construction in a few words: the structure, the core and jacket materials, the surface; a
@@ -112,19 +153,44 @@ export function constructionRows(c: Bullet['construction']): FieldRow[] {
     leadFree(c) && 'lead-free',
   ].filter(Boolean)
   const text = parts.length > 0 ? titleFromKebab(parts.join(', ')) : c.raw
-  return [{ label: 'Construction', text, ...(text !== c.raw && { printed: c.raw }) }]
+  return [{ label: msg('Construction'), text, ...(text !== c.raw && { printed: c.raw }) }]
 }
 
-const yesNo = (value: boolean | undefined) =>
-  value === undefined ? undefined : value ? 'yes' : 'no'
+const yesNoText = (value: boolean | undefined, capitalised = false) =>
+  value === undefined
+    ? undefined
+    : value
+      ? capitalised
+        ? 'Yes'
+        : 'yes'
+      : capitalised
+        ? 'No'
+        : 'no'
 
-const text = (label: string, value: string | undefined): FieldRow[] =>
+const text = (label: Wording, value: string | undefined): FieldRow[] =>
   value === undefined ? [] : [{ label, text: value }]
+
+/** A text row whose value is a stored word: its English as `value` shows it, its words from `wording`. */
+const word = (
+  label: Message,
+  value: string | undefined,
+  wording: (value: string) => Wording,
+  shownText = value,
+): FieldRow[] =>
+  value === undefined || shownText === undefined
+    ? []
+    : [{ label, text: shownText, words: [wording(value)] }]
+
+/** A yes or no row. */
+const flag = (label: Message, value: boolean | undefined, capitalised = false): FieldRow[] =>
+  value === undefined
+    ? []
+    : [{ label, text: yesNoText(value, capitalised) ?? '', words: [yesNo(value, capitalised)] }]
 
 /** A stored value in the record's unit of `q` (mm, g, deg, lb/in²) as a row in SI. */
 const stored =
   <Q extends Quantity>(q: Q, unit: keyof (typeof unitsOf)[Q]) =>
-  (label: string, s: QuantityValue | undefined, symbol?: string): FieldRow[] =>
+  (label: Wording, s: QuantityValue | undefined, symbol?: string): FieldRow[] =>
     s
       ? [
           {
@@ -149,18 +215,31 @@ const twist = stored('twist', 'mm')
 export function buildRows(c: Bullet['construction']): FieldRow[] {
   if (!c) return []
   const material = (m: string) => m.replaceAll('-', ' ')
-  const rows = [
-    ...text('Structure', c.structure),
-    ...text('Jacket', c.jacket && (c.jacket.material ? material(c.jacket.material) : 'yes')),
-    ...length('Jacket thickness', c.jacket?.thickness),
-    ...text('Core', c.core && material(c.core.material)),
-    ...text('Core hardness (HBW)', c.core?.hardness?.value.toString()),
-    ...text('Surface', c.surface?.map(material).join(', ')),
-    ...(c.gasCheck === undefined ? [] : text('Gas check', c.gasCheck ? 'yes' : 'no')),
-    ...text('Driving bands', c.drivingBands?.toString()),
-    ...text('Lead-free', yesNo(leadFree(c))),
+  const jacket = c.jacket
+  const rows: FieldRow[] = [
+    ...word(msg('Structure'), c.structure, rawWording),
+    ...(jacket
+      ? jacket.material
+        ? word(msg('Jacket'), jacket.material, spacedWording, material(jacket.material))
+        : flag(msg('Jacket'), true)
+      : []),
+    ...length(msg('Jacket thickness'), jacket?.thickness),
+    ...word(msg('Core'), c.core?.material, spacedWording, c.core && material(c.core.material)),
+    ...text(msg('Core hardness (HBW)'), c.core?.hardness?.value.toString()),
+    ...(c.surface
+      ? [
+          {
+            label: msg('Surface'),
+            text: c.surface.map(material).join(', '),
+            words: c.surface.map(spacedWording),
+          },
+        ]
+      : []),
+    ...flag(msg('Gas check'), c.gasCheck),
+    ...text(msg('Driving bands'), c.drivingBands?.toString()),
+    ...flag(msg('Lead-free'), leadFree(c)),
   ]
-  if (rows.length === 0) return [{ label: 'Construction', text: c.raw }]
+  if (rows.length === 0) return [{ label: msg('Construction'), text: c.raw }]
   return rows.map((row, i) => (i === 0 ? { ...row, printed: c.raw } : row))
 }
 
@@ -173,40 +252,40 @@ export function bulletDataGroups(b: Bullet): FieldGroup[] {
   const angle = b.base?.angle
   return [
     {
-      title: 'Size',
+      title: msg('Size'),
       rows: [
-        ...length('Diameter', b.diameter, 'd'),
-        ...stored('mass', 'g')('Mass', b.mass),
-        ...length('Length', b.length, 'L'),
+        ...length(msg('Diameter'), b.diameter, 'd'),
+        ...stored('mass', 'g')(msg('Mass'), b.mass),
+        ...length(msg('Length'), b.length, 'L'),
       ],
     },
     {
-      title: 'Shape',
+      title: msg('Shape'),
       rows: [
-        ...length('Nose length', b.noseLength, 'n'),
-        ...length('Base to ogive', b.baseToOgive, 'BTO'),
-        ...length('Bearing length', b.bearingLength, 'b'),
-        ...text('Ogive', b.ogive?.form),
-        ...length('Ogive radius', b.ogive?.radius, 'R'),
-        ...stored('ratio', '1')('Ogive radius ratio', b.ogive?.radiusRatio, 'Rt/R'),
-        ...length('Meplat diameter', b.meplatDiameter, 'dm'),
+        ...length(msg('Nose length'), b.noseLength, 'n'),
+        ...length(msg('Base to ogive'), b.baseToOgive, 'BTO'),
+        ...length(msg('Bearing length'), b.bearingLength, 'b'),
+        ...word(msg('Ogive'), b.ogive?.form, rawWording),
+        ...length(msg('Ogive radius'), b.ogive?.radius, 'R'),
+        ...stored('ratio', '1')(msg('Ogive radius ratio'), b.ogive?.radiusRatio, 'Rt/R'),
+        ...length(msg('Meplat diameter'), b.meplatDiameter, 'dm'),
       ],
     },
     {
-      title: 'Tip and base',
+      title: msg('Tip and base'),
       rows: [
-        ...text('Tip', b.tip?.type),
-        ...length('Tip length', b.tip?.length, 'lt'),
-        ...length('Hollow-point mouth diameter', b.tip?.mouthDiameter, 'dh'),
-        ...text('Base type', b.base?.type),
-        ...length('Base length', b.base?.length, 't'),
-        ...length('Base diameter', b.base?.diameter, 'db'),
-        ...length('Cavity diameter', b.base?.cavityDiameter, 'dc'),
+        ...word(msg('Tip'), b.tip?.type, rawWording),
+        ...length(msg('Tip length'), b.tip?.length, 'lt'),
+        ...length(msg('Hollow-point mouth diameter'), b.tip?.mouthDiameter, 'dh'),
+        ...word(msg('Base type'), b.base?.type, rawWording),
+        ...length(msg('Base length'), b.base?.length, 't'),
+        ...length(msg('Base diameter'), b.base?.diameter, 'db'),
+        ...length(msg('Cavity diameter'), b.base?.cavityDiameter, 'dc'),
         // degrees and minutes on manufacturer sheets: the stored decimal degrees, not rounded to whole degrees
         ...(angle
           ? [
               {
-                label: 'Boat-tail angle',
+                label: msg('Boat-tail angle'),
                 text: degreeText(angle.value),
                 numeric: true as const,
                 unit: 'deg',
@@ -216,39 +295,39 @@ export function bulletDataGroups(b: Bullet): FieldGroup[] {
           : []),
       ],
     },
-    { title: 'Build', rows: buildRows(b.construction) },
+    { title: msg('Build'), rows: buildRows(b.construction) },
     {
-      title: 'Twist',
+      title: msg('Twist'),
       rows: [
-        ...twist('Recommended twist', b.recommendedTwist),
-        ...twist('Slowest twist', b.slowestTwist),
+        ...twist(msg('Recommended twist'), b.recommendedTwist),
+        ...twist(msg('Slowest twist'), b.slowestTwist),
       ],
     },
-    { title: 'Computed', rows: computedBulletRows(b) },
+    { title: msg('Computed'), rows: computedBulletRows(b) },
   ].filter((g) => g.rows.length > 0)
 }
 
 /** The ballistic coefficient rows of a bullet page: drag model, band and note in record order. */
 export function ballisticCoefficientRows(b: Pick<Bullet, 'ballisticCoefficients'>): FieldRow[] {
   return (b.ballisticCoefficients ?? []).map((bc) => ({
-    label: bc.dragModel,
+    label: verbatim(bc.dragModel),
     value: {
       quantity: 'ballisticCoefficient',
       si: unitsOf.ballisticCoefficient['lb/in2'].toSi(bc.value),
     },
     ...(bc.minVelocity && { fromVelocity: bc.minVelocity.value }),
-    ...(bc.note && { method: bc.note }),
+    ...(bc.note && { method: verbatim(bc.note) }),
   }))
 }
 
 /** A thermochemistry value with its extremes over the composition ranges. */
 type ComputedRange = NonNullable<Powder['thermochemistry']>['gamma']
 
-const computed = (label: string, unit: string, r: ComputedRange): FieldRow => ({
+const computed = (label: Message, unit: string, r: ComputedRange): FieldRow => ({
   label,
   text: `${r.value}${unit}`,
   numeric: true,
-  method: `Over the composition ranges: ${r.min} to ${r.max}.`,
+  method: worded(msg('Over the composition ranges: {min} to {max}.'), { min: r.min, max: r.max }),
 })
 
 /**
@@ -258,28 +337,37 @@ const computed = (label: string, unit: string, r: ComputedRange): FieldRow => ({
 export function powderRowGroups(p: Powder): FieldGroup[] {
   const t = p.thermochemistry
   return [
-    { rows: text('Aliases', p.aliases?.join('; ')) },
+    { rows: text(msg('Aliases'), p.aliases?.join('; ')) },
     {
-      title: 'Composition',
+      title: msg('Composition'),
       rows: (p.composition ?? []).map(
         (c): FieldRow => ({
-          label: c.name,
+          label: verbatim(c.name),
           text: c.min === c.max ? `${c.min} %` : `${c.min} to ${c.max} %`,
+          words: [
+            c.min === c.max
+              ? worded(msg('{value} %'), { value: c.min })
+              : worded(msg('{min} to {max} %'), { min: c.min, max: c.max }),
+          ],
           numeric: true,
           ...(c.raw && { printed: c.raw }),
         }),
       ),
     },
     {
-      title: 'Thermochemistry',
+      title: msg('Thermochemistry'),
       rows: t
         ? [
-            { label: 'Loading density', text: `${t.loadingDensity.value} g/cm³`, numeric: true },
-            computed('Flame temperature', ' K', t.flameTemperature),
-            computed('Impetus', ' J/kg', t.impetus),
-            computed('Ratio of specific heats', '', t.gamma),
-            computed('Molar mass', ' kg/kmol', t.molarMass),
-            computed('Covolume', ' m³/kg', t.covolume),
+            {
+              label: msg('Loading density'),
+              text: `${t.loadingDensity.value} g/cm³`,
+              numeric: true,
+            },
+            computed(msg('Flame temperature'), ' K', t.flameTemperature),
+            computed(msg('Impetus'), ' J/kg', t.impetus),
+            computed(msg('Ratio of specific heats'), '', t.gamma),
+            computed(msg('Molar mass'), ' kg/kmol', t.molarMass),
+            computed(msg('Covolume'), ' m³/kg', t.covolume),
           ]
         : [],
     },
@@ -299,7 +387,12 @@ export function intervalText(value: number, half: number | undefined): string {
 }
 
 const fittedNote = (k: number) =>
-  `Fitted: plus and minus ${k} standard uncertainties, a lower bound (the rows of one load table are correlated).`
+  worded(
+    msg(
+      'Fitted: plus and minus {k} standard uncertainties, a lower bound (the rows of one load table are correlated).',
+    ),
+    { k },
+  )
 
 /**
  * The fitted parameters of a powder's model fit with their intervals of plus and minus `k`
@@ -314,7 +407,7 @@ export function fittedParameterRows(
   const i = p.interior
   if (!i) return []
   const row = (
-    label: string,
+    label: Message,
     value: number,
     sigma: number | undefined,
     unit: string,
@@ -328,13 +421,13 @@ export function fittedParameterRows(
   const { energy: e } = i
   return [
     ...(i.fitted.includes('vivacity')
-      ? [row('Vivacity', i.vivacity.value, i.vivacity.standardUncertainty, '1/s')]
+      ? [row(msg('Vivacity'), i.vivacity.value, i.vivacity.standardUncertainty, '1/s')]
       : []),
     // stored in J/kg
     ...(i.fitted.includes('energy')
       ? [
           row(
-            'Energy',
+            msg('Energy'),
             e.value / 1e6,
             e.standardUncertainty === undefined ? undefined : e.standardUncertainty / 1e6,
             'MJ/kg',
@@ -344,7 +437,7 @@ export function fittedParameterRows(
     ...(i.fitted.includes('form.a')
       ? [
           {
-            ...row('Burn form a', i.burnForm.a.value, i.burnForm.a.standardUncertainty, ''),
+            ...row(msg('Burn form a'), i.burnForm.a.value, i.burnForm.a.standardUncertainty, ''),
             symbol: 'a',
           },
         ]
@@ -352,14 +445,20 @@ export function fittedParameterRows(
     ...(ratio
       ? [
           {
-            label: 'Energy ratio',
+            label: msg('Energy ratio'),
             text: formatNumber(ratio.value, 2),
             numeric: true,
-            method: `The fitted energy over the energy of the thermochemistry (impetus over gamma minus 1)${
+            method:
               ratio.median === undefined
-                ? ''
-                : `; median of the ${ratio.powders} powders with thermochemistry ${formatNumber(ratio.median, 2)}`
-            }. Below 1 is expected: the fitted energy also carries the losses the model leaves out.`,
+                ? msg(
+                    'The fitted energy over the energy of the thermochemistry (impetus over gamma minus 1). Below 1 is expected: the fitted energy also carries the losses the model leaves out.',
+                  )
+                : worded(
+                    msg(
+                      'The fitted energy over the energy of the thermochemistry (impetus over gamma minus 1); median of the {powders} powders with thermochemistry {median}. Below 1 is expected: the fitted energy also carries the losses the model leaves out.',
+                    ),
+                    { powders: ratio.powders ?? 0, median: formatNumber(ratio.median, 2) },
+                  ),
           },
         ]
       : []),
@@ -371,7 +470,7 @@ export function modelInputRows(p: Powder): FieldRow[] {
   const i = p.interior
   if (!i) return []
   // stored in bar
-  const bar = (label: string, s: QuantityValue | undefined): FieldRow[] =>
+  const bar = (label: Message, s: QuantityValue | undefined): FieldRow[] =>
     s
       ? [
           {
@@ -382,49 +481,62 @@ export function modelInputRows(p: Powder): FieldRow[] {
       : []
   const r = i.resistance
   return [
-    { label: 'Ratio of specific heats', text: formatSignificant(i.gamma, 4), numeric: true },
+    { label: msg('Ratio of specific heats'), text: formatSignificant(i.gamma, 4), numeric: true },
     {
-      label: 'Covolume',
+      label: msg('Covolume'),
       value: { quantity: 'covolume', si: i.covolume.value, significantDigits: 3 },
     },
     // stored in g/cm³
     {
-      label: 'Solid density',
+      label: msg('Solid density'),
       value: { quantity: 'density', si: toSi('density', i.density.value), significantDigits: 3 },
     },
-    ...bar('Reference pressure', i.referencePressure),
-    ...bar('Ignition pressure', i.ignitionPressure),
+    ...bar(msg('Reference pressure'), i.referencePressure),
+    ...bar(msg('Ignition pressure'), i.ignitionPressure),
     ...(i.startPressure
-      ? bar('Start pressure', i.startPressure)
+      ? bar(msg('Start pressure'), i.startPressure)
       : [
           {
-            label: 'Start pressure',
+            label: msg('Start pressure'),
             text: 'per load row',
-            method: 'Set per load row by the barrel length and the bullet construction.',
+            words: [msg('per load row')],
+            method: msg('Set per load row by the barrel length and the bullet construction.'),
           },
         ]),
     // stored in °C
     {
-      label: 'Propellant temperature',
+      label: msg('Propellant temperature'),
       value: { quantity: 'temperature', si: toSi('temperature', i.propellantTemperature.value) },
     },
-    { label: 'Pressure exponent', text: String(i.pressureExponent), numeric: true },
+    { label: msg('Pressure exponent'), text: String(i.pressureExponent), numeric: true },
     ...(r
-      ? bar('Bore resistance', r.stress).map((row) => ({
+      ? bar(msg('Bore resistance'), r.stress).map((row) => ({
           ...row,
-          method: `Stress; groove oversize ${r.oversize} per percent, engraving ${r.engraving} of the start pressure.`,
+          method: worded(
+            msg(
+              'Stress; groove oversize {oversize} per percent, engraving {engraving} of the start pressure.',
+            ),
+            { oversize: r.oversize, engraving: r.engraving },
+          ),
         }))
       : []),
   ]
 }
 
+const burnFormLabels = {
+  a: msg('Burn form a'),
+  m: msg('Burn form m'),
+  q: msg('Burn form q'),
+  z1: msg('Burn form z1'),
+} as const
+
 /** The burn form's constants with their symbols; `a` only where it was not fitted. */
 export function burnFormRows(p: Powder): FieldRow[] {
   const f = p.interior?.burnForm
   if (!f) return []
-  const row = (symbol: string, value: number): FieldRow => ({
+  const row = (symbol: 'a' | 'm' | 'q' | 'z1', value: number): FieldRow => ({
     symbol,
-    label: `Burn form ${symbol}`,
+    label: burnFormLabels[symbol],
     text: String(value),
     numeric: true,
   })
@@ -447,13 +559,13 @@ export function powderParameterGroups(
 ): FieldGroup[] {
   return [
     {
-      title: `Fitted (simulated, with ${k} standard uncertainties)`,
-      filter: 'Fitted',
+      title: worded(msg('Fitted (simulated, with {k} standard uncertainties)'), { k }),
+      filter: msg('Fitted'),
       rows: fittedParameterRows(p, k, ratio),
     },
-    { title: 'Fixed model inputs', filter: 'Fixed inputs', rows: modelInputRows(p) },
+    { title: msg('Fixed model inputs'), filter: msg('Fixed inputs'), rows: modelInputRows(p) },
     // twoStage is the one burn form of the schema
-    { title: 'Burn form, two-stage', filter: 'Fixed inputs', rows: burnFormRows(p) },
+    { title: msg('Burn form, two-stage'), filter: msg('Fixed inputs'), rows: burnFormRows(p) },
   ].filter((g) => g.rows.length > 0)
 }
 
@@ -478,8 +590,22 @@ export type StripItem = {
     | 'rings'
     | 'black'
   label: string
+  /** `label` in the language shown; read instead of `label` where present. */
+  words?: Wording
   row: FieldRow
 }
+
+const bcItem = (dragModel: string, rows: FieldRow[]): StripItem[] =>
+  rows[0]
+    ? [
+        {
+          icon: 'ballisticCoefficient',
+          label: `BC ${dragModel}`,
+          words: worded(msg('BC {model}'), { model: dragModel }),
+          row: rows[0],
+        },
+      ]
+    : []
 
 /**
  * The bullet strip: diameter, mass, length, the BC (G7 where given, else G1, its drag model in the
@@ -489,23 +615,20 @@ export function bulletStrip(b: Bullet): StripItem[] {
   const bcs = b.ballisticCoefficients ?? []
   const bc =
     bcs.find((c) => c.dragModel === 'G7') ?? bcs.find((c) => c.dragModel === 'G1') ?? bcs[0]
-  const item = (icon: StripItem['icon'], label: string, rows: FieldRow[]): StripItem[] =>
-    rows[0] ? [{ icon, label, row: rows[0] }] : []
+  const item = stripItem
   const sd = computedBulletRows(b).find((r) => r.value?.quantity === 'sectionalDensity')
   return [
-    ...item('diameter', 'Diameter', length('Diameter', b.diameter)),
-    ...item('mass', 'Mass', stored('mass', 'g')('Mass', b.mass)),
-    ...item('length', 'Length', length('Length', b.length)),
-    ...(bc
-      ? item(
-          'ballisticCoefficient',
-          `BC ${bc.dragModel}`,
-          ballisticCoefficientRows({ ballisticCoefficients: [bc] }),
-        )
-      : []),
-    ...item('sectionalDensity', 'Sectional density', sd ? [sd] : []),
+    ...item('diameter', msg('Diameter'), length(msg('Diameter'), b.diameter)),
+    ...item('mass', msg('Mass'), stored('mass', 'g')(msg('Mass'), b.mass)),
+    ...item('length', msg('Length'), length(msg('Length'), b.length)),
+    ...(bc ? bcItem(bc.dragModel, ballisticCoefficientRows({ ballisticCoefficients: [bc] })) : []),
+    ...item('sectionalDensity', msg('Sectional density'), sd ? [sd] : []),
   ]
 }
+
+/** A strip card: a label, in English as the plain text and as the message the language shown translates, over a row's value. */
+const stripItem = (icon: StripItem['icon'], label: Message, rows: FieldRow[]): StripItem[] =>
+  rows[0] ? [{ icon, label: say(english, label), words: label, row: rows[0] }] : []
 
 /**
  * The powder strip: manufacturer (`manufacturerName`), form, base, the burn-rate position (when
@@ -516,56 +639,48 @@ export function powderStrip(
   place?: { order: number; total: number },
   manufacturerName?: string,
 ): StripItem[] {
-  const text = (icon: StripItem['icon'], label: string, t: string | undefined): StripItem[] =>
-    t ? [{ icon, label, row: { label, text: t } }] : []
   return [
-    ...text('manufacturer', 'Manufacturer', manufacturerName),
-    ...text('form', 'Form', p.grainForm),
-    ...text('base', 'Base', p.propellantBase),
+    ...stripItem(
+      'manufacturer',
+      msg('Manufacturer'),
+      text(msg('Manufacturer'), manufacturerName || undefined),
+    ),
+    ...stripItem('form', msg('Form'), word(msg('Form'), p.grainForm, rawWording)),
+    ...stripItem('base', msg('Base'), word(msg('Base'), p.propellantBase, rawWording)),
     ...(place
-      ? [
+      ? stripItem('burnRate', msg('Burn rate'), [
           {
-            icon: 'burnRate' as const,
-            label: 'Burn rate',
-            row: {
-              label: 'Burn rate',
-              text: `${place.order} of ${place.total}`,
-              unit: '1 = fastest',
-            },
+            label: msg('Burn rate'),
+            text: `${place.order} of ${place.total}`,
+            words: [worded(msg('{order} of {total}'), { order: place.order, total: place.total })],
+            unit: '1 = fastest',
+            unitWords: msg('1 = fastest'),
           },
-        ]
+        ])
       : []),
     ...(p.interior
-      ? [
+      ? stripItem('density', msg('Solid density'), [
           {
-            icon: 'density' as const,
-            label: 'Solid density',
-            row: {
-              label: 'Solid density',
-              // stored in g/cm³
-              value: {
-                quantity: 'density' as const,
-                si: toSi('density', p.interior.density.value),
-                significantDigits: 3,
-              },
+            label: msg('Solid density'),
+            // stored in g/cm³
+            value: {
+              quantity: 'density',
+              si: toSi('density', p.interior.density.value),
+              significantDigits: 3,
             },
           },
-        ]
+        ])
       : []),
     ...(p.bulkDensity
-      ? [
+      ? stripItem('bulkDensity', msg('Bulk density'), [
           {
-            icon: 'bulkDensity' as const,
-            label: 'Bulk density',
-            row: {
-              label: 'Bulk density',
-              text: `${p.bulkDensity.value}`,
-              numeric: true as const,
-              unit: 'g/cm³',
-              ...(p.bulkDensity.raw && { printed: p.bulkDensity.raw }),
-            },
+            label: msg('Bulk density'),
+            text: `${p.bulkDensity.value}`,
+            numeric: true,
+            unit: 'g/cm³',
+            ...(p.bulkDensity.raw && { printed: p.bulkDensity.raw }),
           },
-        ]
+        ])
       : []),
   ]
 }
@@ -575,7 +690,7 @@ const capacityRow = (c: Pick<Case, 'waterCapacity'>): FieldRow[] =>
   c.waterCapacity
     ? [
         {
-          label: 'Water capacity',
+          label: msg('Water capacity'),
           value: { quantity: 'capacity', si: waterVolume(c.waterCapacity.value) },
           ...(c.waterCapacity.raw && { printed: c.waterCapacity.raw }),
         },
@@ -587,13 +702,19 @@ const capacityRow = (c: Pick<Case, 'waterCapacity'>): FieldRow[] =>
  * capacity; only what the record has.
  */
 export function caseStrip(c: Case, manufacturerName?: string): StripItem[] {
-  const item = (icon: StripItem['icon'], label: string, rows: FieldRow[]): StripItem[] =>
-    rows[0] ? [{ icon, label, row: rows[0] }] : []
   return [
-    ...item('manufacturer', 'Manufacturer', text('Manufacturer', manufacturerName || undefined)),
-    ...item('material', 'Material', text('Material', titleFromKebab(c.material))),
-    ...item('mass', 'Mass', stored('mass', 'g')('Mass', c.mass)),
-    ...item('capacity', 'Water capacity', capacityRow(c)),
+    ...stripItem(
+      'manufacturer',
+      msg('Manufacturer'),
+      text(msg('Manufacturer'), manufacturerName || undefined),
+    ),
+    ...stripItem(
+      'material',
+      msg('Material'),
+      word(msg('Material'), c.material, titleWording, titleFromKebab(c.material)),
+    ),
+    ...stripItem('mass', msg('Mass'), stored('mass', 'g')(msg('Mass'), c.mass)),
+    ...stripItem('capacity', msg('Water capacity'), capacityRow(c)),
   ]
 }
 
@@ -602,15 +723,26 @@ export function caseStrip(c: Case, manufacturerName?: string): StripItem[] {
  * record has.
  */
 export function primerStrip(p: Primer, manufacturerName?: string): StripItem[] {
-  const item = (icon: StripItem['icon'], label: string, rows: FieldRow[]): StripItem[] =>
-    rows[0] ? [{ icon, label, row: rows[0] }] : []
   return [
-    ...item('manufacturer', 'Manufacturer', text('Manufacturer', manufacturerName || undefined)),
-    ...item('form', 'Size', text('Size', titleFromKebab(p.size))),
-    ...item(
+    ...stripItem(
+      'manufacturer',
+      msg('Manufacturer'),
+      text(msg('Manufacturer'), manufacturerName || undefined),
+    ),
+    ...stripItem(
+      'form',
+      msg('Size'),
+      word(msg('Size'), p.size, titleWording, titleFromKebab(p.size)),
+    ),
+    ...stripItem(
       'material',
-      'Priming compound',
-      text('Priming compound', p.compound && titleFromKebab(p.compound)),
+      msg('Priming compound'),
+      word(
+        msg('Priming compound'),
+        p.compound,
+        titleWording,
+        p.compound && titleFromKebab(p.compound),
+      ),
     ),
   ]
 }
@@ -624,16 +756,27 @@ export function primerRowGroups(p: Primer): FieldGroup[] {
   return [
     {
       rows: [
-        ...text('Product number', p.productNumber),
-        ...text('Magnum', p.magnum === undefined ? undefined : p.magnum ? 'Yes' : 'No'),
-        ...text('Cup material', p.cup?.material && titleFromKebab(p.cup.material)),
-        ...length('Cup thickness', p.cup?.thickness),
-        ...text('Intended use', p.intendedUse),
-        ...(p.performance ?? []).flatMap((f) => text(f.property, f.value)),
+        ...text(msg('Product number'), p.productNumber),
+        ...flag(msg('Magnum'), p.magnum, true),
+        ...word(
+          msg('Cup material'),
+          p.cup?.material,
+          cupWording,
+          p.cup?.material && titleFromKebab(p.cup.material),
+        ),
+        ...length(msg('Cup thickness'), p.cup?.thickness),
+        ...text(msg('Intended use'), p.intendedUse),
+        ...(p.performance ?? []).flatMap((f) => text(verbatim(f.property), f.value)),
       ],
     },
   ]
 }
+
+/** `Boxer, large rifle`: the primer pocket's type and size as words: the type, then the size as the source names it. */
+const pocketWords = (p: NonNullable<Case['primerPocket']>) => [
+  titleWording(p.type),
+  ...(p.size ? [verbatim(p.size)] : []),
+]
 
 /** `Boxer, large rifle`: the primer pocket's type and size. */
 const pocketText = (p: NonNullable<Case['primerPocket']>) =>
@@ -648,11 +791,19 @@ export function caseRowGroups(c: Case): FieldGroup[] {
   return [
     {
       rows: [
-        ...text('Product number', c.productNumber),
-        ...text('Headstamp', c.headstamp),
-        ...text('Primer pocket', c.primerPocket && pocketText(c.primerPocket)),
-        ...length('Flash hole diameter', c.flashHole),
-        ...text('Annealed', c.annealed === undefined ? undefined : c.annealed ? 'Yes' : 'No'),
+        ...text(msg('Product number'), c.productNumber),
+        ...text(msg('Headstamp'), c.headstamp),
+        ...(c.primerPocket
+          ? [
+              {
+                label: msg('Primer pocket'),
+                text: pocketText(c.primerPocket),
+                words: pocketWords(c.primerPocket),
+              },
+            ]
+          : []),
+        ...length(msg('Flash hole diameter'), c.flashHole),
+        ...flag(msg('Annealed'), c.annealed, true),
       ],
     },
   ]

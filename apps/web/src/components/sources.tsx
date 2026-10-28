@@ -23,6 +23,13 @@ const columns: [keyof Source, Message][] = [
   ['note', msg('Note')],
 ]
 
+/** Who stands behind a source, as the schema names it. */
+const origins: Record<string, Message> = {
+  manufacturer: msg('manufacturer'),
+  public: msg('public'),
+  community: msg('community'),
+}
+
 function SourcesHead({ has }: { has: Has }) {
   const { t } = useTranslation()
   return (
@@ -74,6 +81,7 @@ function CoversCell({ fields }: { fields: string[] | undefined }) {
 
 function SourceRow({ source: s, has }: { source: Source; has: Has }) {
   const { t } = useTranslation()
+  const origin = s.origin && origins[s.origin]
   return (
     <TableTr role="row">
       <TableTh scope="row" role="rowheader">
@@ -84,7 +92,7 @@ function SourceRow({ source: s, has }: { source: Source; has: Has }) {
       </TableTh>
       {has('origin') && (
         <TableTd role="cell" data-label={t('Origin')}>
-          {s.origin}
+          {origin ? t(origin) : s.origin}
         </TableTd>
       )}
       {has('retrieved') && (

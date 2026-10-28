@@ -2,7 +2,9 @@
 // 1280 px in light and dark against WEB_URL (it starts no server), then one contact sheet.
 // npm run visual-check -- [--preset drawing|calculators] [/path ...]
 // Output: visual-check-out/shots/<page>__<theme>__<width>.png and visual-check-out/sheet.png
-// (VISUAL_OUT for another folder; /workbench: VISUAL_LADDER, VISUAL_DEFAULTS, VISUAL_LOADS)
+// (VISUAL_OUT for another folder; VISUAL_LANGUAGE=de for the German interface, whose pages are
+// waited for by their structure, not by English text, and the workbench by its page bar in that
+// language; /workbench: VISUAL_LADDER, VISUAL_DEFAULTS, VISUAL_LOADS)
 import { mkdirSync, readFileSync, rmSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -63,16 +65,36 @@ async function designerReady(page: Page, url: string) {
   await page.locator('.designer').waitFor()
 }
 
+const language = process.env.VISUAL_LANGUAGE
+const catalogue: Record<string, unknown> = language
+  ? JSON.parse(
+      readFileSync(new URL(`../../web/src/i18n/${language}.json`, import.meta.url), 'utf8'),
+    )
+  : {}
+
+/** The text of the web app's page bar in the language shown; a text the catalogue lacks is English. */
+export function inLanguage(text: string, texts: Record<string, unknown> = catalogue) {
+  const known = texts[text]
+  return typeof known === 'string' ? known : text
+}
+
+/** The note under the burn-rate chart of a powder with fitted parameters (`modelCaption` of the web app). */
+export const fittedCaption = 'Model output from fitted M3 parameters, not manufacturer data.'
+
+/** A button of the workbench's page bar: only the "Page actions" toggle follows the language shown, the buttons keep their English names. */
+export const bar = (page: Page, name: string, texts = catalogue) =>
+  barButton(page, name, inLanguage('Page actions', texts))
+
 /** Opens the example load in the workbench; below 75em the bar's actions are behind "Page actions". */
 async function openExampleLoad(page: Page) {
-  await (await barButton(page, 'Open')).click()
+  await (await bar(page, 'Open')).click()
   await page.getByRole('menuitem', { name: 'Example load' }).click()
 }
 
 /** VISUAL_DEFAULTS=1: the example's link without the defaulted inputs, so the run lists them. */
 async function withoutDefaults(page: Page) {
   // Copy link writes the link into the address bar
-  await (await barButton(page, 'Copy link')).click()
+  await (await bar(page, 'Copy link')).click()
   const link = new URL(page.url())
   for (const key of ['propellantTemperature', 'ignitionPressure', 'startPressure'])
     link.searchParams.delete(key)
@@ -133,6 +155,24 @@ async function ready(page: Page, url: string) {
   if (designer) await designerReady(page, url)
   if (url.startsWith('/cartridges/') && !designer)
     await page.locator('svg.drawing.screen-only:visible').first().waitFor()
+  // the workbench's cards and results are English in every language
+  if (url === '/workbench') {
+    await workbenchReady(page)
+    return
+  }
+  // the burn-rate chart code loads apart from the route; a powder without fitted parameters and an
+  // overlay without picks have none
+  if (url.startsWith('/powders/') && (await page.getByText(inLanguage(fittedCaption)).count()))
+    await page
+      .locator('.echart svg')
+      .or(page.getByText('No powder in the overlay.'))
+      .first()
+      .waitFor()
+  // the waits below name English texts
+  if (language) {
+    await page.waitForLoadState('networkidle')
+    return
+  }
   // the compare view reads its records in the browser
   if (url.startsWith('/bullets/compare'))
     await page
@@ -141,15 +181,6 @@ async function ready(page: Page, url: string) {
       .or(page.getByRole('button', { name: 'Retry' }))
       .first()
       .waitFor()
-  // the burn-rate chart code loads apart from the route; a powder without fitted parameters and an
-  // overlay without picks have none
-  if (url.startsWith('/powders/') && (await page.getByText(/Model output from fitted/).count()))
-    await page
-      .locator('.echart svg')
-      .or(page.getByText('No powder in the overlay.'))
-      .first()
-      .waitFor()
-  if (url === '/workbench') await workbenchReady(page)
 }
 
 /** On a cartridge page the area from the first to the last drawing figure, else the whole page. */
@@ -222,6 +253,11 @@ if (import.meta.main) {
     await page.addInitScript((value) => {
       localStorage.setItem('safety-ack', value)
     }, safetyAck)
+    // both editions' keys: the next edition puts `next:` ahead of its own
+    if (language)
+      await page.addInitScript((code) => {
+        for (const key of ['language', 'next:language']) localStorage.setItem(key, code)
+      }, language)
     const tiles: { file: string; caption: string }[] = []
     for (const url of pages)
       for (const width of widths)
@@ -229,6 +265,7 @@ if (import.meta.main) {
           await page.setViewportSize({ width, height: 844 })
           await page.emulateMedia({ colorScheme: theme })
           await page.goto(url)
+          if (language) await page.locator(`html[lang="${language}"]`).waitFor()
           await ready(page, url)
           const file = path.join(
             shots,
