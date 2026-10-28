@@ -68,6 +68,12 @@ The stored and published contracts besides the API each have a committed baselin
 
 `npm run baselines` (after `npm run build`) rewrites the JSON Schemas, the export lists and the share link from the build. The user data file is edited by hand, so its diff shows what an older file needs. Before 1.0.0 a pull request may rewrite a baseline in the same change. From 1.0.0 on, a rewrite is a breaking change and its pull request title carries the `!` marker.
 
+## 1.0.0 release
+
+Release notes paragraph, pasted into the release:
+
+> Export all your data before updating (Save options, Export all). Records saved by an alpha version whose shape has changed show as invalid records under Open, with the reason. Download one raw to fix it and import it again, or delete it.
+
 ## API contract
 
 - `npm run api:check` compares the API document of the current routes with `packages/api/openapi.baseline.json` through `oasdiff breaking` and fails on any `ERR` finding. The CI `check` job writes the API document and runs the same oasdiff version in its container (`docker run`), not the npm script.

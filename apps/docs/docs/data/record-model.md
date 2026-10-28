@@ -287,4 +287,5 @@ A fitted user powder keeps a copy of what it was fitted to in the optional `fit`
 - User data stays client side. Compute routes accept a reference or an entity.
 - Overrides follow the merge rules above, and a catalogue change to a field that is not overridden is followed and shown as "base changed".
 - One unit system in stored data. Old SI files are rejected.
+- No migration at 1.0.0: the user data file and share links stay version 1, so an alpha file still opens. Export all data before updating. A browser record of an older shape then shows under Open as one of the invalid records, with its error, Download raw and Delete: fix the downloaded record and import it, or delete it.
 - Session stays separate from Load. FiringSeries can become a Session after step 7, with a per-string summary for publications that print only a mean.
