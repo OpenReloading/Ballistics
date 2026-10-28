@@ -123,7 +123,13 @@ export function checkPages(site: string, env: Record<string, string | undefined>
 }
 
 if (import.meta.main) {
-  const site = path.resolve(process.argv[2] ?? path.join(import.meta.dirname, '../../../pages'))
+  const root = path.resolve(import.meta.dirname, '../../..')
+  const site = path.resolve(root, process.argv[2] ?? 'pages')
+  const inside = path.relative(root, site)
+  if (inside.startsWith('..') || path.isAbsolute(inside)) {
+    console.error(`the export folder must be inside the repository: ${site}`)
+    process.exit(2)
+  }
   const { expected, missing, noHead } = checkPages(site)
   if (missing.length > 0) {
     console.error(
