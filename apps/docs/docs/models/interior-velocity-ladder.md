@@ -50,6 +50,12 @@ Code: `packages/core/src/interior/velocity-ladder.ts`, `ladderFlatSpots` (`flat`
 | $\gamma$ | Confidence level, 0.95 by default | 1 | 1 |
 | $\nu$ | Degrees of freedom | 1 | 1 |
 
+## Point of impact per charge
+
+Code: `packages/core/src/interior/ladder-impact.ts`, `ladderImpactResiduals`.
+
+The height of each shot minus the change of height per velocity times its velocity less the ladder's mean velocity is averaged per charge, and a heterogeneity statistic over the charges is compared with the chi-square quantile for the charges minus one degrees of freedom ([Point of impact per charge in a ladder](../research/ladder-impact-per-charge.md)). The residual steps have the shape of a ladder step, so the flat runs above apply to them. A trend that the drop slope leaves also raises the statistic.
+
 ## Assumptions
 
 - The velocities of a string are independent and roughly normal. The mean of a few shots is only approximately so.

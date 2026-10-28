@@ -203,6 +203,12 @@ The session summary shows the 95 % interval and $n$ with each statistic. It comp
 
 Code: `apps/web/src/lib/string-comparison.ts`, `compareSd`. `apps/web/src/components/string-comparison.tsx`, `StringComparison`.
 
+### Expected extreme spread and flier screen
+
+Code: `packages/core/src/groups/extreme-spread.ts`, `expectedExtremeSpread`; `packages/core/src/groups/flier-screen.ts`, `flierScreen`.
+
+The mean extreme spread of a circular normal group of $n$ shots, $2 \le n \le 20$, and the 5th and 95th percentile of one group are tabulated in units of $\sigma$ from a seeded simulation, in [Expected extreme spread per shot count](../research/group-extreme-spread-per-shot-count.md). For two shots the mean is $\sqrt{\pi}\,\sigma$. The flier screen compares the shot farthest from the string mean with the mean and sample standard deviation of the other shots and flags it above a factor tabulated for 10 to 30 shots at a false-flag rate of 1 percent per clean normal string ([Flier screen](../research/string-flier-flag.md)). The flag is advisory and never excludes a shot.
+
 ### Bisection
 
 `bisect` finds the point where a predicate that holds below the root turns false. It halves the bracket $[l, h]$ at the midpoint $x_m = (l + h)/2$: $l$ becomes $x_m$ where the predicate holds there, else $h$ becomes $x_m$. The result is the midpoint of the final bracket. A caller passes the iteration count and whether to stop early once $x_m$ equals an end of the bracket. The chi-square and Student's t quantiles and the elliptical CEP stop early, with 200, 200 and 100 halvings. The seven-perforation burnout of the [burn forms](interior-burn-forms.md) and the ignition burnt fraction of the [M3 model](interior-m3.md) run 200 halvings without the early stop.
