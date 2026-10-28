@@ -34,16 +34,21 @@ function closure(file: string, root: string, prefix: string) {
   return [...seen].map(([path, label]) => ({ label, path }))
 }
 
-/** The built files the record to load step and the seating read, which every model version shares. */
+/** The built files the record to load step, the water density, the unit conversion and the seating read, which every model version shares. */
 function sharedFiles() {
   const core = dirname(fileURLToPath(import.meta.resolve('@open-reloading/core')))
   const drawing = dirname(
     dirname(fileURLToPath(import.meta.resolve('@open-reloading/drawing/seating'))),
   )
+  const schema = dirname(fileURLToPath(import.meta.resolve('@open-reloading/schema')))
   return {
     core,
     files: [
       ...closure(join(core, 'interior/record-load.js'), core, 'core'),
+      // the water density turns every capacity into a chamber volume
+      ...closure(join(core, 'water.js'), core, 'core'),
+      ...closure(join(schema, 'units.js'), schema, 'schema'),
+      ...closure(join(schema, 'case-capacity.js'), schema, 'schema'),
       ...closure(join(drawing, 'seating/index.js'), drawing, 'drawing'),
       ...closure(join(drawing, 'bullet/index.js'), drawing, 'drawing'),
     ],

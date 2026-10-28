@@ -116,4 +116,11 @@ describe('compare', () => {
     expect(files.map((f) => f.label)).toContain('core/interior/model.js')
     expect(files.map((f) => f.label)).toContain('candidate/worse-model.mjs')
   })
+
+  it('includes the water density and the unit and capacity code in every version', async () => {
+    const labels = (await loadModel('m3')).files.map((f) => f.label)
+    expect(labels).toEqual(
+      expect.arrayContaining(['core/water.js', 'schema/units.js', 'schema/case-capacity.js']),
+    )
+  })
 })

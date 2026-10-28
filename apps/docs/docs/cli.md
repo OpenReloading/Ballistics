@@ -53,11 +53,13 @@ The powder parameters are those of the records (`--params records`, the only mod
 
 Every result carries `modelVersion`, the SHA-256 over the sorted lines:
 
-- `<label> <sha256>` of each built source file the evaluation reads: the files `@open-reloading/core` builds for `interior/model.js` and `interior/record-load.js`, the files `@open-reloading/drawing` builds for its seating and bullet entries, each with the files they import by a relative path (a candidate module adds itself and its relative imports, because it may call the model of core; imports of other packages are not followed);
+- `<label> <sha256>` of each built source file the model's result depends on: the files `@open-reloading/core` builds for `interior/model.js`, `interior/record-load.js` and `water.js` (the water density that turns a capacity into a chamber volume), the files `@open-reloading/schema` builds for the unit conversion (`toSi`, `fromSi`) and the water capacity of a case or capacity record, the files `@open-reloading/drawing` builds for its seating and bullet entries, each with the files they import by a relative path (a candidate module adds itself and its relative imports, because it may call the model of core; imports of other packages are not followed);
 - `<kind>/<id> <sha256>` of the stored JSON of every cartridge, bullet, powder, capacity and case record the rows name;
 - `rows <sha256>` over the SHA-256 of each rows file.
 
 `inputs.rows` and `inputs.records` in a result are the last two parts. The version changes with the model, the records or the rows, not with the split or the options.
+
+The code of the evaluation itself (rows, split, the metrics and the percentiles, the interval) is not in the hash: a change to it is a change of the evaluation, not of the model, and moves the metrics of an unchanged `modelVersion`. Compare a baseline and a candidate only with one build of the CLI.
 
 ## Commands
 
