@@ -435,11 +435,18 @@ export function Checklist({
   )
 }
 
-/** A new load with nothing chosen or typed: the start card replaces the cards. */
-export function StartCard() {
+/** A new load with nothing chosen or typed: the start card replaces the cards. `onAct` hears a click or key in the card. */
+export function StartCard({ onAct }: { onAct?: () => void }) {
   const { chooseCartridge: onCartridge, asNewLoad, fillExample, setByHand } = useLoad()
   return (
-    <Paper component="section" withBorder className="start-card" aria-labelledby="start-title">
+    <Paper
+      component="section"
+      withBorder
+      className="start-card"
+      aria-labelledby="start-title"
+      onClickCapture={onAct}
+      onKeyDownCapture={onAct}
+    >
       <h2 id="start-title">Start a load</h2>
       <p>
         Step 1: choose the cartridge. Its CIP record limits the bullets to its groove and gives the
