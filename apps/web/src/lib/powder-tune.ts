@@ -1,3 +1,4 @@
+import type { ChronographString } from '@open-reloading/core'
 import type { SessionRecord } from '@open-reloading/schema'
 import { parseNumber } from '../i18n/number.ts'
 import type { Shot } from './chrono.ts'
@@ -21,6 +22,13 @@ export const sessionStrings = (sessions: readonly SessionRecord[]): TuneString[]
       return charge === undefined ? [] : [{ charge, shots: str.shots }]
     }),
   )
+
+/** The strings as the powder fit reads them: the velocities of the shots not excluded; a string without one is left out. */
+export const fitStrings = (strings: readonly TuneString[]): ChronographString[] =>
+  strings.flatMap(({ charge, shots }) => {
+    const velocities = shots.filter((s) => !s.excluded).map((s) => s.velocity.value)
+    return velocities.length > 0 ? [{ charge, velocities }] : []
+  })
 
 /**
  * Shot velocities typed in one field, separated by spaces or semicolons (a comma may be the

@@ -1,6 +1,7 @@
 import type { SessionRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import {
+  fitStrings,
   parseVelocities,
   sessionStrings,
   tuneHref,
@@ -44,5 +45,17 @@ describe('powder tuning route', () => {
     expect(parseVelocities('  ', (x) => x)).toBeUndefined()
     expect(parseVelocities('800 abc', (x) => x)).toBeUndefined()
     expect(parseVelocities('800 0', (x) => x)).toBeUndefined()
+  })
+  it('gives the fit the shots not excluded and leaves out a string without one', () => {
+    const shot = (value: number, excluded?: string) => ({
+      velocity: { value },
+      ...(excluded && { excluded }),
+    })
+    expect(
+      fitStrings([
+        { charge: 0.0025, shots: [shot(800), shot(700, 'flyer'), shot(802)] },
+        { charge: 0.0026, shots: [shot(810, 'flyer')] },
+      ]),
+    ).toEqual([{ charge: 0.0025, velocities: [800, 802] }])
   })
 })
