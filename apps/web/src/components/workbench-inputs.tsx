@@ -451,12 +451,19 @@ export function Checklist({
   )
 }
 
-/** A new load with nothing chosen or typed: the start card replaces the cards. */
-export function StartCard() {
+/** A new load with nothing chosen or typed: the start card replaces the cards. `onAct` hears a click or key in the card. */
+export function StartCard({ onAct }: { onAct?: () => void }) {
   const { chooseCartridge: onCartridge, asNewLoad, fillExample, setByHand } = useLoad()
   const { t } = useTranslation()
   return (
-    <Paper component="section" withBorder className="start-card" aria-labelledby="start-title">
+    <Paper
+      component="section"
+      withBorder
+      className="start-card"
+      aria-labelledby="start-title"
+      onClickCapture={onAct}
+      onKeyDownCapture={onAct}
+    >
       <h2 id="start-title">{t('Start a load')}</h2>
       <p>
         {t(

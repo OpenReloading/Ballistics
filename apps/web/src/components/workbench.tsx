@@ -37,6 +37,7 @@ import { mmLength, shownLength } from '../lib/workbench.ts'
 import { BarrelTable } from './barrel-length.tsx'
 import { ChargeTargetDialog } from './charge-target-dialog.tsx'
 import { FileMenu } from './file-menu.tsx'
+import { focusBack } from './focus-back.ts'
 import { preloadInteriorChart } from './lazy-chart.tsx'
 import { LoadSheets, printSheets } from './load-sheets.tsx'
 import { LoadTabs } from './load-tabs.tsx'
@@ -941,6 +942,22 @@ export function Workbench() {
   const designRows = useMemo(() => userBulletRows(designs), [designs])
 
   useIdlePreload(fresh)
+  // the cards replace the start card, and with it the button the visitor pressed; a saved load that
+  // opens by itself on arrival leaves the focus where it is
+  const wasFresh = useRef(fresh)
+  const startCardUsed = useRef(false)
+  const markStartCardUsed = useCallback(() => {
+    startCardUsed.current = true
+  }, [])
+  useEffect(() => {
+    const replaced = wasFresh.current && !fresh
+    wasFresh.current = fresh
+    if (!replaced) return
+    const used = startCardUsed.current
+    startCardUsed.current = false
+    if (used && document.activeElement === document.body)
+      focusBack('.panel[data-next] :is(input, button)', '.panel :is(input, button)')
+  }, [fresh])
 
   const ok = outcome?.kind === 'ok' ? outcome : undefined
   const stale = Boolean(ok && changed)
@@ -1145,7 +1162,13 @@ export function Workbench() {
   // Ctrl+Enter is caught by the frame below, Ctrl+P prints the report once the barrel length study has computed
   useShortcuts({ run: null, print: ok ? printReport : null })
   const phone = useMediaQuery('(max-width: 47.99em)')
+  /** What opened Saved loads, which gets the focus back: a selector, none for the menu's item. */
+  const listOpener = useRef<string | undefined>(undefined)
   const openList = useCallback(() => setListOpen(true), [])
+  const openListFromSwitcher = useCallback(() => {
+    listOpener.current = '.load-switch'
+    setListOpen(true)
+  }, [])
   // the Open menu's Examples keep their identity, so the File menu's memo holds; they run the
   // actions of the latest render
   const starts = useRef({ asNewLoad, fillExample, reset })
@@ -1186,7 +1209,7 @@ export function Workbench() {
                     onSwitch={tabs.switchTo}
                     onClose={tabs.close}
                     onNew={tabs.newTab}
-                    onList={openList}
+                    onList={openListFromSwitcher}
                     due={reminder.text !== undefined}
                     name={load.name}
                     generated={tabs.generated}
@@ -1264,7 +1287,7 @@ export function Workbench() {
               ref={workspace}
               className="workbench"
               inputsLabel={t('Load')}
-              inputs={fresh ? <StartCard /> : <InputCards />}
+              inputs={fresh ? <StartCard onAct={markStartCardUsed} /> : <InputCards />}
               results={<ResultsArea />}
               range={<RangeView />}
               bar={(show) => (
@@ -1280,7 +1303,18 @@ export function Workbench() {
             />
             <SavedLoads
               opened={listOpen}
-              onClose={() => setListOpen(false)}
+              onClose={() => {
+                setListOpen(false)
+                // the menu item that opened it is gone: the load switcher it came from, else Open,
+                // or Page actions
+                const opener = listOpener.current
+                listOpener.current = undefined
+                focusBack(
+                  opener,
+                  '.file-menu button',
+                  '.page-bar button[aria-label="Page actions"]',
+                )
+              }}
               tick={storedTick}
               openIds={tabs.openIds}
               onOpen={tabs.openRecord}
