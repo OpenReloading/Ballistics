@@ -81,7 +81,7 @@ export const getTargetFace = getOne<TargetFace>('/target-faces')
 export const getDiscipline = getOne<DisciplineRecord>('/disciplines')
 export const getFederation = getOne<FederationRecord>('/federations')
 
-export const listAllTargetFaces = () => listAll<{ id: string }>('/target-faces')
+export const listAllTargetFaces = () => listAll<{ id: string; name: string }>('/target-faces')
 
 /** The items of a list route that takes no paging (federations, disciplines, target mappings). */
 async function listItems<T>(path: string): Promise<Fetched<T[]>> {

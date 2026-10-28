@@ -30,7 +30,7 @@ const disc = (id: string, federation: string, internationalDiscipline?: string):
   name: id,
   section: '1',
   page: '1',
-  distance: { value: 25000 },
+  distance: { value: 25000, unit: 'm' },
   ...(internationalDiscipline && { internationalDiscipline }),
   provenance,
 })

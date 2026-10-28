@@ -7,7 +7,8 @@
   "page": "Seite Z-22, PDF p. 23",
   "distance": {
     "value": 50000,
-    "raw": "50 m"
+    "raw": "50 m",
+    "unit": "m"
   },
   "category": "rifle",
   "caliberClasses": {

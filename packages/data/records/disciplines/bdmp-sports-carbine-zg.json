@@ -6,7 +6,8 @@
   "page": "Teil D, Seite 258 bis 259 von 294, PDF pp. 258 to 259",
   "distance": {
     "value": 50000,
-    "raw": "50 m"
+    "raw": "50 m",
+    "unit": "m"
   },
   "category": "rifle",
   "provenance": {

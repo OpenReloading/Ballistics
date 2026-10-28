@@ -6,7 +6,8 @@
   "page": "Teil D, Seite 210 bis 221 von 294, PDF pp. 210 to 221",
   "distance": {
     "value": 1000000,
-    "raw": "1000 m"
+    "raw": "1000 m",
+    "unit": "m"
   },
   "category": "rifle",
   "provenance": {

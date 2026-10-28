@@ -221,7 +221,7 @@ export const bundle: Bundle = {
       number: '1',
       section: '1.1',
       page: 'p. 1',
-      distance: { value: 10000 },
+      distance: { value: 10000, unit: 'm' },
       category: 'air-pistol',
       caliberClasses: { ids: ['air-4-5'], basis: 'stated' },
       provenance: published,
