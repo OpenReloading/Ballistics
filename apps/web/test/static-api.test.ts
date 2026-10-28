@@ -69,8 +69,11 @@ async function both(path: string, body?: object) {
         : undefined,
     ),
   ])
+  const liveBody = live.json()
+  // the API names what produced an answer; the browser's compute answers carry no such fields
+  for (const key of ['inputHash', 'apiVersion', 'dataHash']) delete liveBody[key]
   return {
-    live: { status: live.statusCode, body: live.json() },
+    live: { status: live.statusCode, body: liveBody },
     file: { status: file.status, body: await file.json() },
   }
 }

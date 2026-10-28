@@ -34,6 +34,7 @@ import {
 import { responseUnits } from '../compute/units.ts'
 import { API_PREFIX } from '../version.ts'
 import type { ComputeContext } from './common.ts'
+import { describeAnswers } from './identity.ts'
 
 /** Result paths where core can return NaN; JSON writes null. */
 const nanPaths = {
@@ -116,6 +117,7 @@ export const computeRoutes: FastifyPluginAsync<ComputeContext> = async (
       truingDetails: true,
     }),
   )
+  describeAnswers(app, catalogue)
 
   async function resolveShot<S extends z.infer<typeof trajectoryBody>['shot']>(shot: S) {
     const p = shot.projectile
