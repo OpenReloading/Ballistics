@@ -136,7 +136,8 @@ function differences(stored: unknown, actual: unknown, path = ''): string[] {
 }
 
 describe('interior model golden numbers', () => {
-  if (process.env.UPDATE_GOLDEN) writeFileSync(goldenUrl, `${JSON.stringify(runs(), null, 2)}\n`)
+  if (process.env.UPDATE_GOLDEN === '1')
+    writeFileSync(goldenUrl, `${JSON.stringify(runs(), null, 2)}\n`)
   const golden = JSON.parse(readFileSync(goldenUrl, 'utf8')) as Record<string, unknown>
   const computed = runs()
 
