@@ -31,7 +31,7 @@ One CSV file, or a folder of `.csv` files read in name order, with a header line
 | `pressure_basis`, `bearing_mm`, `muzzle_distance_m`, `session`, `rifle`, `lot` | What a later model may read: carried with the row, unused | no |
 | `table` | A free label of the source table: carried, never part of a result | no |
 
-A problem in the file is reported as file, line and column with a reason, never with the value, and the exit code is 2. Fields may be double-quoted.
+A problem in the file is reported as file, line and column with a reason, never with the value, and the exit code is 2. Fields may be double-quoted. A number is a plain decimal or exponent form (`0.5`, `2.5e1`); `0x1F` and `0b11` are not numbers.
 
 The records are read with `readRecords` of `@open-reloading/data`: `--records <dir>` (repeatable, read as one set; `BALLISTICS_RECORDS` is a `:`-separated list), by default the records of the data package. The problems the reader reports (a record that fails its schema is left out, a duplicate id is kept) are counted in a note on stderr. The default rows path is `BALLISTICS_ROWS`. A cartridge's chamber volume is its water capacity (a capacity record, else a case record with a stated capacity, the first by id) less the volume of the seated bullet, as the [seating](models/case-capacity.md) computes it.
 

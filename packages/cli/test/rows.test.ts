@@ -62,6 +62,16 @@ describe('parseRows', () => {
     expect(rows.map((r) => r.line)).toEqual([2, 4])
   })
 
+  it.each(['0x1F', '0b11', '0o7', 'Infinity', '1e', '1,5'])('rejects %s as a number', (value) => {
+    expect(() => parseRows(`${head}\nc,b,p,"${value}",800\n`, 'f.csv')).toThrow(
+      'f.csv:2: charge_g is not a number',
+    )
+  })
+
+  it.each(['2', '2.5', '.5', '5.', '+2', '2e-1', '2E0'])('reads %s as a number', (value) => {
+    expect(parseRows(`${head}\nc,b,p,${value},800\n`, 'f.csv')[0]?.charge).toBe(Number(value))
+  })
+
   it('names file, line and column of each problem and never quotes a value', () => {
     const text = `${head},barrel_mm,temperature_c\nc,b,p,abc,800,,\nc,b,p,0,800,,\n,b,p,1,800,-1,\nc,b,p,1,800,,-300\nc,b,p\n`
     let message = ''

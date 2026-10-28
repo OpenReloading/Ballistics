@@ -91,12 +91,15 @@ function records(text: string, name: string): { fields: string[]; line: number }
   }
 }
 
+const decimal = /^[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?$/
+
 /** The problem with a value of the kind `kind`, or undefined. The value itself is never quoted. */
 function valueProblem(kind: (typeof columns)[Column], value: string): string | undefined {
   if (kind === 'text') return undefined
   if (kind === 'id') return value === '' ? 'is empty' : undefined
   if (value === '') return undefined
-  const x = Number(value)
+  // Number() also reads 0x1F, 0b11 and 0o7: only decimal and exponent forms are numbers here
+  const x = decimal.test(value) ? Number(value) : Number.NaN
   if (!Number.isFinite(x)) return 'is not a number'
   if (kind === 'positive' && x <= 0) return 'must be above 0'
   return kind === 'temperature' && x <= -273.15 ? 'must be above -273.15' : undefined
