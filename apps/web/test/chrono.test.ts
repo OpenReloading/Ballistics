@@ -73,6 +73,14 @@ describe('stringStats', () => {
     expect(stringStats([shot(800, 'misread')])).toBeUndefined()
   })
 
+  it('carries the SD interval from three shots', () => {
+    expect(stringStats([shot(800), shot(802)])?.standardDeviationInterval).toBeUndefined()
+    const s = stringStats([shot(800), shot(802), shot(805)])
+    expect(s?.confidenceLevel).toBe(0.95)
+    expect(s?.standardDeviationInterval?.lower).toBeLessThan(s?.standardDeviation ?? 0)
+    expect(s?.standardDeviationInterval?.upper).toBeGreaterThan(s?.standardDeviation ?? 0)
+  })
+
   it('takes a string of 500000 shots', () => {
     const s = stringStats(Array.from({ length: 500_000 }, (_, i) => shot(800 + (i % 7))))
     expect(s?.extremeSpread).toBe(6)
