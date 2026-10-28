@@ -12,6 +12,7 @@
     "pages": "node src/pages.ts",
     "pages:serve": "node src/pages-serve.ts",
     "dev:static": "node src/static-dev.ts",
+    "pack-check": "node src/pack-check.ts",
     "test": "vitest run"
   },
   "dependencies": {
