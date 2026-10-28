@@ -94,6 +94,8 @@ const states: State[] = [
     scrolls: true as const,
     open: async (page: Page, check: (view: string) => Promise<void>) => {
       await gotoHydrated(page, `/${dir}/${id}`)
+      // the record page renders from its data files once they are read
+      await expect(page.locator('#record-sources')).toBeAttached()
       await page.waitForLoadState('networkidle')
       await check('page')
     },

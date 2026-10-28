@@ -86,22 +86,6 @@ export const precacheList = (files: string[], base = '') =>
     base + catalogueFile,
   ].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))
 
-/** The record kinds whose page renders in the browser from the data file `/api/<kind>/<id>.json` (`useRecord`). */
-export const recordKinds = ['cartridges']
-
-/**
- * The data file under `base` that the page at `path` reads, undefined for any other page: the worker
- * stores it with the page, so a record opened once opens again offline.
- */
-export const recordFile = (path: string, base = '') => {
-  if (!path.startsWith(`${base}/`)) return
-  const [kind, id, ...rest] = path.slice(base.length + 1).split('/')
-  if (kind === undefined || id === undefined || !recordKinds.includes(kind)) return
-  // `/cartridges/<id>/`, with or without the trailing slash
-  if (rest.length > 1 || (rest[0] ?? '') !== '' || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(id)) return
-  return `${base}/api/${kind}/${id}.json`
-}
-
 /** The cache key of a page: its path and query without Next's `_rsc` parameter. */
 export const pageKey = (url: string) => {
   const u = new URL(url)
