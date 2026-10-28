@@ -35,7 +35,9 @@ COPY apps/web/package.json apps/web/
 COPY tools/package.json tools/
 COPY apps/e2e/package.json apps/e2e/
 COPY apps/docs/package.json apps/docs/
-RUN npm ci --omit=dev --ignore-scripts -w @open-reloading/schema -w @open-reloading/core -w @open-reloading/data -w @open-reloading/api
+# The image runs node only. npm and the TypeScript native binary, which --omit=dev keeps because the lockfile marks it optional, are removed.
+RUN npm ci --omit=dev --ignore-scripts -w @open-reloading/schema -w @open-reloading/core -w @open-reloading/data -w @open-reloading/api \
+  && rm -rf node_modules/@typescript/typescript-* /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
 COPY --from=build /app/packages/schema/dist packages/schema/dist
 COPY --from=build /app/packages/core/dist packages/core/dist
 COPY --from=build /app/packages/data/dist packages/data/dist
