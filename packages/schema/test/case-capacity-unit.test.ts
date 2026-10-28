@@ -42,7 +42,7 @@ describe('the case capacity in the schema', () => {
   )
   const capacities = found.filter((p) => /water|capacity/i.test(p.key))
 
-  it('is one measured entity, a load and a case group of the user reference it; a case holds the stated one', () => {
+  it('is one measured entity, a load and a case group of the user reference it; a case holds the stated one, a powder fit a copy as a volume', () => {
     expect(capacities.map((p) => p.path).sort()).toEqual([
       'cartridgeCase.capacity',
       'cartridgeCase.waterCapacity',
@@ -50,6 +50,7 @@ describe('the case capacity in the schema', () => {
       'load.capacity',
       'userRecord.data.capacity',
       'userRecord.data.capacity',
+      'userRecord.data.fit.input.caseCapacity',
       'userRecord.data.waterCapacity',
       'userRecord.data.waterCapacity',
     ])

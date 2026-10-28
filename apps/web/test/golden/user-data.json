@@ -87,6 +87,55 @@
               }
             }
           }
+        },
+        "fit": {
+          "input": [
+            {
+              "charge": {
+                "value": 2.8
+              },
+              "muzzleVelocity": {
+                "value": 820
+              },
+              "shots": 5,
+              "barrelLength": {
+                "value": 610
+              },
+              "temperature": {
+                "value": 21
+              },
+              "caseCapacity": {
+                "value": 3.6
+              },
+              "bulletMass": {
+                "value": 10.886
+              }
+            }
+          ],
+          "parameters": [
+            "burnRate"
+          ],
+          "options": {
+            "prior": {
+              "burnRate": {
+                "value": 1.2,
+                "sigma": 0.3
+              }
+            },
+            "loss": {
+              "kind": "quadratic"
+            }
+          },
+          "date": "2026-10-13T10:00:00.000Z",
+          "model": "m3",
+          "modelVersion": "0.0.4",
+          "confidence": "loose",
+          "reasons": [
+            "no-pressure"
+          ],
+          "sessions": [
+            "user:6f5e4d3c-2b1a-4098-8f7e-6d5c4b3a2918"
+          ]
         }
       }
     },

@@ -10,6 +10,7 @@ import { provenanceKind } from './provenance.ts'
 import { text } from './shared.ts'
 import { faceColour } from './target-face.ts'
 import { targetSheet } from './target-sheet.ts'
+import { quantity } from './units.ts'
 
 /** Value of `format` in every user data file, telling it apart from other JSON. */
 export const userDataFormat = 'openreloading-user-data'
@@ -64,6 +65,98 @@ export const userCartridge = z.object({
     .optional(),
 })
 
+/** A reference `user:<UUID>` to a record of the user's library. */
+const userRef = (kind: string) =>
+  ref(kind)
+    .regex(/^user:/, `Not a user ${kind}`)
+    .describe(`Reference \`user:<UUID>\` to a ${kind} of the user.`)
+
+/** The parameters a powder fit can free, as the fit of the interior model names them. */
+const fitParameter = z.enum([
+  'burnRate',
+  'startPressure',
+  'volumeFactor',
+  'energy',
+  'temperatureFactor',
+])
+
+const fitPoint = z.strictObject({
+  charge: quantity('mass', z.number().positive()).describe('Powder charge, g.'),
+  muzzleVelocity: quantity('velocity', z.number().positive()).describe(
+    'Mean muzzle velocity of the string, m/s.',
+  ),
+  shots: z.int().positive().describe('Number of shots of the string.'),
+  barrelLength: quantity('length', z.number().positive()).describe('Barrel length, mm.'),
+  temperature: quantity('temperature').describe('Powder temperature, degC.'),
+  caseCapacity: quantity('volume', z.number().positive()).describe(
+    'Water capacity of the case, cm3.',
+  ),
+  bulletMass: quantity('mass', z.number().positive()).describe('Bullet mass, g.'),
+})
+
+/**
+ * What a fitted user powder was fitted to and how: a copy of the points, so that deleting or
+ * editing a session never changes it. Stored units of `units.ts`.
+ * Inferred type: {@link UserPowderFit}.
+ */
+export const userPowderFit = z.strictObject({
+  input: z.array(fitPoint).min(1).max(40).describe('The points of the fit, at most 40.'),
+  parameters: z
+    .array(fitParameter)
+    .min(1)
+    .refine((ps) => new Set(ps).size === ps.length, 'Duplicate parameter')
+    .describe(
+      'The parameters the fit freed: `burnRate`, `startPressure`, `volumeFactor`, `energy`, `temperatureFactor`. The others kept the values of the input.',
+    ),
+  options: z
+    .strictObject({
+      prior: z
+        .partialRecord(
+          fitParameter,
+          z.strictObject({
+            value: z
+              .number()
+              .positive()
+              .describe(
+                'Centre, in the stored unit of the parameter: burn coefficient 1/s, start pressure bar, energy J/kg, factors 1.',
+              ),
+            sigma: z.number().positive().describe('Standard deviation of the log parameter, 1.'),
+          }),
+        )
+        .describe('Gaussian prior per freed parameter. Absent: no prior.')
+        .optional(),
+      loss: z
+        .discriminatedUnion('kind', [
+          z.strictObject({ kind: z.literal('quadratic') }),
+          z.strictObject({
+            kind: z.literal('huber'),
+            threshold: z.number().positive().describe('Threshold in sigmas of the rows, 1.'),
+          }),
+        ])
+        .describe('Loss of the fit: `quadratic`, or `huber` with its threshold.'),
+    })
+    .describe('Prior and loss of the fit.'),
+  date: z.iso.datetime().describe('Time of the fit, ISO 8601 in UTC.'),
+  model: z.string().min(1).max(64).describe('Interior model of the fit, such as `m3`.'),
+  modelVersion: z.string().min(1).max(64).describe('Version of the model code that fitted.'),
+  confidence: z
+    .enum(['tight', 'moderate', 'loose'])
+    .describe(
+      'Width class of the peak-pressure range: relative half-width up to 10 %, up to 25 %, or above.',
+    ),
+  reasons: z
+    .array(z.string().min(1).max(64))
+    .max(20)
+    .describe('Why the confidence is not better, or what the fit rests on, as the fit named them.'),
+  sessions: z
+    .array(userRef('session'))
+    .max(50)
+    .describe('The sessions the points came from, for information only: never resolved.'),
+  previous: userRef('powder')
+    .describe('The powder record this one refits. Never resolved.')
+    .optional(),
+})
+
 /**
  * A powder of the user in the powder designer: the powder fields entered so far in stored units,
  * each optional while the draft is unfinished, and the provenance kind the designer builds the
@@ -78,6 +171,9 @@ export const userPowder = z.object({
     )
     .optional(),
   draft: powderDraft.describe('The powder fields entered so far, in stored units.').optional(),
+  fit: userPowderFit
+    .describe('What a fitted powder was fitted to and how, kept with the powder.')
+    .optional(),
 })
 
 /**
@@ -140,6 +236,18 @@ const base = {
   id: z.string().min(1).max(64).describe('Id of the record in the browser library.'),
   name: z.string().min(1).max(200).describe('Name of the record. Save names the file after it.'),
   saved: z.iso.datetime().describe('Time of the last save, ISO 8601 in UTC.'),
+  imported: z
+    .object({
+      source: z
+        .string()
+        .min(1)
+        .max(500)
+        .describe('Where the imported values come from, as the user named it.'),
+      file: z.string().max(200).describe('Name of the file the record was imported from.'),
+      day: z.iso.date().describe('Day of the import, ISO 8601.'),
+    })
+    .describe('The import the record came from. Not compared when a file is imported again.')
+    .optional(),
 }
 
 /** Why a bullet, cartridge, powder or case group id that is no UUID is refused: a load refers to the record by `user:<UUID>`. */
@@ -388,6 +496,8 @@ export function versionProblem(json: unknown): string | undefined {
 export interface UserManufacturer extends z.infer<typeof userManufacturer> {}
 /** A user powder: the fields of a powder entered in the designer, a draft until the record is valid. */
 export interface UserPowder extends z.infer<typeof userPowder> {}
+/** What a fitted user powder was fitted to: its points, freed parameters, options and result. */
+export interface UserPowderFit extends z.infer<typeof userPowderFit> {}
 /** A user bullet: a variant of a catalogue bullet, or a bullet of its own. */
 export interface UserBullet extends z.infer<typeof userBullet> {}
 /** A user cartridge: a variant of a catalogue cartridge, or a cartridge of its own. */
