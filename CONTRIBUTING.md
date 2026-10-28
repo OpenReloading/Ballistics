@@ -38,5 +38,5 @@ Where questions, ideas, bugs and record requests go: [README](README.md#communit
 
 ## Releases
 
-- The release pull request is merged automatically every Monday at 05:00 UTC (the label `hold` skips a week; the owner can also start the merge by hand): [Releases and versions](apps/docs/docs/release.md)
+- The release pull request is merged automatically every Monday at 14:00 Europe/Berlin (the label `hold` skips a week; the owner can also start the merge by hand): [Releases and versions](apps/docs/docs/release.md)
 - CI tools and their settings: [CI tools](apps/docs/docs/ci-tools.md)
