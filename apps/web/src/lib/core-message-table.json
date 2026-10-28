@@ -129,6 +129,8 @@
       "maxIterations must be a positive integer",
       "maxCondition must be positive",
       "fallFraction must lie in (0, 1)",
+      "domainMargin must lie in [0, 1)",
+      "boreDiameter must be positive",
       "the trace has no positive pressure",
       "too few trace samples in the window",
       "the model at the start values leaves the barrel before the end of the trace window; start closer or raise fallFraction"
@@ -153,6 +155,8 @@
       "barrelLength must be positive",
       "propellantTemperature must be positive",
       "peakPressure and pressureSigma together",
+      "peakPressure and pressureBasis together",
+      "pressureBasis must be one of {list}",
       "velocitySigma on all points or none",
       "pressures need velocity sigmas",
       "parameters: {list}, each at most once",
@@ -190,7 +194,9 @@
       "Enter a number.",
       "Must be above 0.",
       "Must be at least 0.",
-      "Needed with the other engraving value, or from a powder record."
+      "Needed with the other engraving value, or from a powder record.",
+      "the powder has no interior model",
+      "the bore resistance of the powder needs {list}"
     ],
     "start pressure, vivacity": [
       "barrel {n} m must be a positive number",
@@ -210,6 +216,9 @@
       "the standard deviations must be positive",
       "a face needs at least one zone",
       "confidence level must lie in (0, 1)",
+      "velocities must be finite",
+      "relative half-width must be at least 0.01",
+      "relative half-width needs more shots than the search covers",
       "distance must be positive",
       "shot coordinates must be finite",
       "shot velocity must be finite",

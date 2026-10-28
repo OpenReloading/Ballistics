@@ -7,7 +7,8 @@
   "page": "Seite L-39, PDF p. 39",
   "distance": {
     "value": 25000,
-    "raw": "25 m"
+    "raw": "25 m",
+    "unit": "m"
   },
   "category": "rifle",
   "caliberClasses": {

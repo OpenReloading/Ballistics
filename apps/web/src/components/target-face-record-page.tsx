@@ -2,15 +2,18 @@
 
 import type { TargetFace, TargetMapping } from '@open-reloading/schema'
 import Link from 'next/link'
+import { emptyDirectory, writeDirectory } from '../lib/directory.ts'
 import type { FederationListItem } from '../lib/disciplines.ts'
 import type { DisciplineSummary, MappingSummary } from '../lib/face-disciplines.ts'
 import { withOrganization } from '../lib/face-organization.ts'
 import { titleFromKebab } from '../lib/record-fields.ts'
 import { readItems, readRecord } from '../lib/record-reads.ts'
 import { faceEventRows, targetFaceGroups, targetFaceStrip } from '../lib/target-faces.ts'
+import { controlSize } from '../lib/theme.ts'
 import { FieldStrip } from './field-strip.tsx'
 import { FieldTable } from './field-table.tsx'
 import { Panel } from './panel.tsx'
+import { LinkButton } from './record-actions.tsx'
 import { RecordPage } from './record-page.tsx'
 import { RecordViewWith } from './record-view.tsx'
 import { PanelTable } from './scroll-region.tsx'
@@ -56,7 +59,20 @@ function TargetFaceRecord({
         </Panel>
       }
       side={
-        <Panel id="face-events" title={`Events (${rows.length})`}>
+        <Panel
+          id="face-events"
+          title={`Events (${rows.length})`}
+          controls={
+            mappings.length > 0 && (
+              <LinkButton
+                size={controlSize.row.button}
+                href={`/disciplines${writeDirectory({ ...emptyDirectory, facets: { face: [f.id] } }, '')}`}
+              >
+                In the discipline list
+              </LinkButton>
+            )
+          }
+        >
           <PanelTable
             label="Events table"
             className="face-table"

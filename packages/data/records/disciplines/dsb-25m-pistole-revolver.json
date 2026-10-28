@@ -7,7 +7,8 @@
   "page": "Teil 2 Seite 20, PDF p. 156",
   "distance": {
     "value": 25000,
-    "raw": "25 m"
+    "raw": "25 m",
+    "unit": "m"
   },
   "caliberClasses": {
     "ids": ["pistol-9mm", "revolver-357-38", "revolver-44", "pistol-45"],

@@ -7,7 +7,8 @@
   "page": "Seite L-65, PDF p. 65",
   "distance": {
     "value": 25000,
-    "raw": "15, 20, 25 m"
+    "raw": "15, 20, 25 m",
+    "unit": "m"
   },
   "category": "carbine",
   "caliberClasses": {

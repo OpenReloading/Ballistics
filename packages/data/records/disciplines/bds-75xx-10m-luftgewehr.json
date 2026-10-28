@@ -7,7 +7,8 @@
   "page": "Seite Z-23, PDF p. 24",
   "distance": {
     "value": 10000,
-    "raw": "10 m"
+    "raw": "10 m",
+    "unit": "m"
   },
   "provenance": {
     "kind": "published",
