@@ -1963,7 +1963,7 @@ export function useWorkbenchState() {
     try {
       if (!menu?.snapshot().unsaved) load = loadRequest().body.load
     } catch {}
-    writeTuneLoad(ref, load)
+    writeTuneLoad(ref, load, chosenPowder)
   }
   const tuning = useRef(handTuneLoad)
   tuning.current = handTuneLoad

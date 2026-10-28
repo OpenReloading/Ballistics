@@ -8,17 +8,28 @@ import type {
   PowderParameter,
   PowderPrediction,
 } from '@open-reloading/core'
-import { chronoSession, parseRef, type SessionRecord } from '@open-reloading/schema'
+import {
+  chronoSession,
+  type Powder,
+  parseRef,
+  type SessionRecord,
+  userRecord,
+} from '@open-reloading/schema'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber, parseNumber } from '../i18n/number.ts'
 import { type Message as Marked, msg } from '../i18n/translate.ts'
 import { translateMessage } from '../lib/core-messages.ts'
+import { dayText } from '../lib/dates.ts'
 import { type ChargeRow, chargeRows } from '../lib/measurements.ts'
+import { newId } from '../lib/new-id.ts'
 import { openOnWorkbench } from '../lib/open-loads.ts'
 import type { PowderFitState } from '../lib/powder-fit.ts'
+import { fitMark } from '../lib/powder-record.ts'
+import { fittedPowder } from '../lib/powder-save.ts'
 import {
+  fitStrings,
   loadStrings,
   loadsWithPowder,
   parseVelocities,
@@ -26,9 +37,9 @@ import {
   tunePowder,
   tuneSessionIds,
 } from '../lib/powder-tune.ts'
-import { readTuneLoad } from '../lib/tune-load.ts'
+import { readTuneBase, readTuneLoad } from '../lib/tune-load.ts'
 import { type Quantity, withUnit } from '../lib/units.ts'
-import { storedRecord, storedRecords } from '../lib/user-store.ts'
+import { putRecords, storedRecord, storedRecords } from '../lib/user-store.ts'
 import { PageBar } from './page-bar.tsx'
 import { TuneChart } from './powder-tune-chart.tsx'
 import { PanelTable } from './scroll-region.tsx'
@@ -104,6 +115,116 @@ const endTexts = {
 /** Slider step, standard uncertainties; each slider spans 3 of them either side of the fit. */
 const step = 0.05
 
+/** The mark of the values shown: fitted to the strings today, or hand-tuned with its line. */
+function HandMark({ strings, tuned }: { strings: readonly TuneString[]; tuned: boolean }) {
+  const { t, tn } = useTranslation()
+  const count = fitStrings(strings).length
+  return (
+    <>
+      <p className="note fit-mark">
+        {fitMark(count, new Date().toISOString(), tuned, dayText, { t, tn })}
+      </p>
+      {tuned && (
+        <p className="note">
+          <Badge variant="light" mr="xs">
+            {t('Hand-tuned')}
+          </Badge>
+          {t('Hand-tuned values are yours, not a fit. Simulation, not load data.')}
+        </p>
+      )}
+    </>
+  )
+}
+
+/** What "Save as a powder" needs besides the fit: the stored sessions of the strings and the run's powder record. */
+interface TuneSave {
+  sessions: readonly string[]
+  base?: Powder | undefined
+}
+
+/**
+ * Saves the fit as a user powder: always the fitted values, so the record is the fit, and a
+ * line says so while sliders are off the fit.
+ */
+function SaveFit({
+  state,
+  strings,
+  save,
+  tuned,
+}: {
+  state: PowderFitState
+  strings: readonly TuneString[]
+  save: TuneSave
+  tuned: boolean
+}) {
+  const { t } = useTranslation()
+  const [name, setName] = useState(() =>
+    save.base ? t('{name}, fitted', { name: save.base.name }) : t('Fitted powder'),
+  )
+  const [saved, setSaved] = useState<string>()
+  const [failed, setFailed] = useState(false)
+  const fit = state.fit?.fit
+  const confidence = state.range?.confidence
+  function store() {
+    if (!fit || !confidence) return
+    const record = fittedPowder({
+      fit,
+      confidence,
+      strings,
+      base: save.base,
+      sessions: save.sessions,
+      id: newId(),
+      name: name.trim() || t('Fitted powder'),
+      date: new Date(),
+    })
+    setSaved(undefined)
+    setFailed(false)
+    if (!record || !userRecord.safeParse(record).success) {
+      setFailed(true)
+      return
+    }
+    putRecords([record]).then(
+      () => setSaved(record.name),
+      () => setFailed(true),
+    )
+  }
+  return (
+    <div className="powder-save">
+      <Group gap="xs" align="end" wrap="wrap" my="xs">
+        <TextInput
+          label={t('Powder name')}
+          value={name}
+          onChange={(e) => setName(e.currentTarget.value)}
+          maxLength={200}
+          style={{ flex: 1, minWidth: '12rem' }}
+        />
+        <Button variant="default" disabled={!confidence || state.running} onClick={store}>
+          {t('Save as a powder')}
+        </Button>
+      </Group>
+      {tuned && (
+        <p className="note">
+          {t(
+            'Saves the fitted values. Hand-tuned values are not saved: type them on the workbench, where they are marked hand-tuned.',
+          )}
+        </p>
+      )}
+      {saved && (
+        <Message severity="info">
+          {t('Saved as {name}. The Powder search of the workbench lists it as your design.', {
+            name: saved,
+          })}
+        </Message>
+      )}
+      {failed && (
+        <ErrorNote title={t('The powder was not saved.')}>
+          {t('The fit cannot be stored as a powder record in this browser.')}
+        </ErrorNote>
+      )}
+    </div>
+  )
+}
+
 /**
  * The fit's result: fitted values with their intervals, the residual per string, the curve and
  * band with the band's numbers at both ends, then the pressure range's label and its reasons.
@@ -111,10 +232,14 @@ const step = 0.05
 function FitResult({
   state,
   rows,
+  strings,
+  save,
   onAnyway,
 }: {
   state: PowderFitState
   rows: readonly ChargeRow[]
+  strings: readonly TuneString[]
+  save?: TuneSave | undefined
   onAnyway: () => void
 }) {
   const { t } = useTranslation()
@@ -291,18 +416,14 @@ function FitResult({
                 </div>
               )
             })}
-            {tuned && (
-              <p className="note">
-                <Badge variant="light" mr="xs">
-                  {t('Hand-tuned')}
-                </Badge>
-                {t('Hand-tuned values are yours, not a fit. Simulation, not load data.')}
-              </p>
-            )}
+            <HandMark strings={strings} tuned={tuned !== undefined} />
             <Button variant="default" disabled={!tuned} onClick={() => setHand(undefined)}>
               {t('Back to the fit')}
             </Button>
           </fieldset>
+          {save && (
+            <SaveFit state={state} strings={strings} save={save} tuned={tuned !== undefined} />
+          )}
           <TuneChart
             band={band}
             curve={curve}
@@ -388,6 +509,8 @@ export function TuneNotes({
   interior,
   fit,
   rows = [],
+  strings = [],
+  save,
   onAnyway = () => {},
 }: {
   loaded: ReturnType<typeof loadStrings> | undefined
@@ -395,6 +518,10 @@ export function TuneNotes({
   fit: PowderFitState
   /** The strings per charge, the measured points of the chart. */
   rows?: readonly ChargeRow[]
+  /** The strings of the fit. */
+  strings?: readonly TuneString[]
+  /** What saving the fit as a powder needs; absent, no save is offered. */
+  save?: TuneSave | undefined
   /** Asks for the values left out by the thin rule. */
   onAnyway?: () => void
 }) {
@@ -424,7 +551,9 @@ export function TuneNotes({
           })}
         </p>
       )}
-      {interior && <FitResult state={fit} rows={rows} onAnyway={onAnyway} />}
+      {interior && (
+        <FitResult state={fit} rows={rows} strings={strings} save={save} onAnyway={onAnyway} />
+      )}
     </>
   )
 }
@@ -440,6 +569,7 @@ export function PowderTune() {
   const { system } = useUnits()
   const [loaded, setLoaded] = useState<ReturnType<typeof loadStrings>>()
   const [interior, setInterior] = useState<InteriorLoad>()
+  const [save, setSave] = useState<TuneSave>()
   const [choices, setChoices] = useState<{ id: string; name: string }[]>()
   const [added, setAdded] = useState<TuneString[]>([])
   const [form, setForm] = useState({ charge: '', shots: '' })
@@ -452,7 +582,10 @@ export function PowderTune() {
       readSessions(ids).then((s) => {
         const found = loadStrings(s)
         setLoaded(found)
-        if (found.load) setInterior(readTuneLoad(found.load))
+        if (!found.load) return
+        setInterior(readTuneLoad(found.load))
+        const own = s.filter((r) => r.data.strings.some((str) => str.load === found.load))
+        setSave({ sessions: own.map((r) => r.id), base: readTuneBase(found.load) })
       })
     else if (powder)
       storedRecords()
@@ -508,6 +641,8 @@ export function PowderTune() {
           interior={interior}
           fit={fit}
           rows={rows}
+          strings={strings}
+          save={save}
           onAnyway={() => setAnyway(true)}
         />
         {choices &&

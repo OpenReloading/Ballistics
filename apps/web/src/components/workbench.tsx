@@ -24,12 +24,13 @@ import { classifyPowder, typedBurn } from '../lib/burn-rate.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { localDay } from '../lib/dates.ts'
 import { loadExample } from '../lib/example-data.ts'
-import { specText } from '../lib/field-spec.ts'
+import { siValues, specText } from '../lib/field-spec.ts'
 import { activeClick } from '../lib/firearm.ts'
 import { interiorFields } from '../lib/interior-input.ts'
 import { shortName } from '../lib/load-tabs.ts'
 import { sampler } from '../lib/playback.ts'
 import { powderDesignNote } from '../lib/powder-designer.ts'
+import { loadFitMark } from '../lib/powder-record.ts'
 import { inputsQuery, withRecordValues, withTab } from '../lib/query.ts'
 import { seatingLengthName } from '../lib/seating-ladder.ts'
 import { shortcutAriaKeys, shortcutLabel, shortcuts } from '../lib/shortcuts.ts'
@@ -222,12 +223,21 @@ function ladderPrintText(load: Load, t: Translate) {
   return t('{count} charges, {direction}, {step} {unit} apart', values)
 }
 
-function powderPrintRows(load: Load, runTemperature: string | undefined, t: Translate): PrintRows {
+function powderPrintRows(
+  load: Load,
+  runTemperature: string | undefined,
+  { t, tn }: Pick<Translator, 't' | 'tn'>,
+): PrintRows {
+  const { powderDesign, origin, fields, system } = load
+  const mark = loadFitMark(powderDesign, origin, siValues(fields), system, (day) => day, { t, tn })
+  const name = load.powderLabel ?? ''
   return [
     [
       t('Powder'),
-      load.powderDesign
-        ? t('{name} (user design)', { name: load.powderLabel ?? '' })
+      powderDesign
+        ? mark
+          ? t('{name} (user design), {mark}', { name, mark })
+          : t('{name} (user design)', { name })
         : load.powderLabel,
     ],
     printRow(load, 'charge', t),
@@ -264,12 +274,12 @@ function printGroupsOf(
   ok: OkOutcome | undefined,
   seatingRows: PrintRows,
   runTemperature: string | undefined,
-  t: Translate,
+  { t, tn }: Pick<Translator, 't' | 'tn'>,
 ): [string, PrintRows][] {
   return [
     [t('Cartridge'), cartridgePrintRows(load, ok, seatingRows, t)],
     [t('Bullet'), bulletPrintRows(load, t)],
-    [t('Powder and charge'), powderPrintRows(load, runTemperature, t)],
+    [t('Powder and charge'), powderPrintRows(load, runTemperature, { t, tn })],
     [t('Gun and barrel'), gunPrintRows(load, ok, t)],
   ]
 }
@@ -840,7 +850,7 @@ function PrintViews({
   barrel,
 }: PrintViewsProps) {
   const { system, chartSlot, notes } = load
-  const { t } = useTranslation()
+  const { t, tn } = useTranslation()
   const steps = useMemo(() => shownSteps(ok, t), [ok, t])
   const warnings = useMemo(() => ok && warningLines(ok, system, t), [ok, system, t])
   const barrelError = barrel.errors && Object.values(barrel.errors).join(' ')
@@ -863,7 +873,7 @@ function PrintViews({
     ]
       .filter(Boolean)
       .join(' ') || undefined
-  const printGroups = printGroupsOf(load, ok, seatingRows, runTemperature, t)
+  const printGroups = printGroupsOf(load, ok, seatingRows, runTemperature, { t, tn })
   const ladderTable = (
     <LadderTable
       ok={ok}

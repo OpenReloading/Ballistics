@@ -25,6 +25,7 @@ import { fitOf, summaryFitSource } from '../lib/bullet-fit.ts'
 import type { BulletRow } from '../lib/bullet-rows.ts'
 import { findBullets } from '../lib/bullet-search.ts'
 import { translateMessage } from '../lib/core-messages.ts'
+import { dayText } from '../lib/dates.ts'
 import { quickCartridges } from '../lib/examples.ts'
 import {
   type FieldSpec,
@@ -37,7 +38,7 @@ import { landsFor } from '../lib/firearm.ts'
 import { type FollowKey, followKeys } from '../lib/input-defaults.ts'
 import { burnFormError, interiorFields } from '../lib/interior-input.ts'
 import { productLabel } from '../lib/manufacturers.ts'
-import { recordMark } from '../lib/powder-record.ts'
+import { loadFitMark, recordMark } from '../lib/powder-record.ts'
 import { constructionRows, titleFromKebab } from '../lib/record-fields.ts'
 import {
   type LadderDirection,
@@ -685,6 +686,7 @@ type LoadFieldMarkArgs = {
   powder: LoadValues['powder']
   powderDesign: LoadValues['powderDesign']
   origin: LoadValues['origin']
+  tn: Translator['tn']
 }
 
 /** The mark of a field in the units it shows: where its value comes from. */
@@ -701,6 +703,7 @@ function loadFieldMark(
     powder,
     powderDesign,
     origin,
+    tn,
   }: LoadFieldMarkArgs,
   t: Translator['t'],
 ) {
@@ -725,6 +728,7 @@ function loadFieldMark(
         [formatQuantity(spec.quantity, s, si), s[spec.quantity].symbol].filter(Boolean).join(' '),
       powderDesign ? 'user design' : 'record',
       t,
+      loadFitMark(powderDesign, origin, siValues(fields), s, dayText, { t, tn }),
     )
   )
 }
@@ -796,7 +800,7 @@ function LoadField({ name: key }: { name: string }) {
     printMedia,
     recordBore,
   } = useLoad()
-  const { t } = useTranslation()
+  const { t, tn } = useTranslation()
   const spec = interiorFields.find((s) => s.key === key)
   if (!spec) throw new Error(`no field ${key}`)
   const props = form.getInputProps(key)
@@ -841,6 +845,7 @@ function LoadField({ name: key }: { name: string }) {
             powder,
             powderDesign,
             origin,
+            tn,
           },
           t,
         )

@@ -3640,5 +3640,20 @@
   "Fewer than 3 charges, or charges less than 10 % apart: only the burn coefficient is fitted, the other values stay at those of the similar powder.": "Weniger als 3 Treibladungen oder Treibladungen weniger als 10 % auseinander: Nur der Abbrandkoeffizient wird angepasst, die anderen Werte bleiben bei denen des ähnlichen Treibladungspulvers.",
   "Try the other values anyway": "Die anderen Werte trotzdem versuchen",
   "These strings cannot tell the start pressure or the chamber volume from the burn coefficient: they move together. They stay at their start values and only the burn coefficient is fitted. Add a measured pressure to fit more.": "Diese Schussreihen können Startdruck und Volumen des Patronenlagers nicht vom Abbrandkoeffizienten unterscheiden: Sie bewegen sich gemeinsam. Sie bleiben bei ihren Startwerten, und nur der Abbrandkoeffizient wird angepasst. Fügen Sie einen gemessenen Gasdruck hinzu, um mehr anzupassen.",
-  "Cannot run": "Nicht rechenbar"
+  "Cannot run": "Nicht rechenbar",
+  "{name} (user design), {mark}": "{name} (eigener Entwurf), {mark}",
+  "{name}, fitted": "{name}, angepasst",
+  "Fitted powder": "Angepasstes Treibladungspulver",
+  "From the user design: {mark}.": "Aus dem eigenen Entwurf: {mark}.",
+  "Powder name": "Name des Treibladungspulvers",
+  "Save as a powder": "Als Treibladungspulver speichern",
+  "Saved as {name}. The Powder search of the workbench lists it as your design.": "Gespeichert als {name}. Die Treibladungspulver-Suche der Werkbank führt es als Ihren Entwurf.",
+  "Saves the fitted values. Hand-tuned values are not saved: type them on the workbench, where they are marked hand-tuned.": "Speichert die angepassten Werte. Von Hand abgestimmte Werte werden nicht gespeichert: Geben Sie sie in der Werkbank ein, wo sie als von Hand abgestimmt markiert sind.",
+  "simulation parameters fitted to {count} string, {date}|simulation parameters fitted to {count} strings, {date}": {
+    "one": "Simulationsparameter angepasst an {count} Schussreihe, {date}",
+    "other": "Simulationsparameter angepasst an {count} Schussreihen, {date}"
+  },
+  "simulation parameters, hand-tuned": "Simulationsparameter, von Hand abgestimmt",
+  "The fit cannot be stored as a powder record in this browser.": "Die Anpassung lässt sich in diesem Browser nicht als Treibladungspulver-Datensatz speichern.",
+  "The powder was not saved.": "Das Treibladungspulver wurde nicht gespeichert."
 }

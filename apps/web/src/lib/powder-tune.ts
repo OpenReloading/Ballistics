@@ -1,5 +1,5 @@
 import type { ChronographString, InteriorLoad } from '@open-reloading/core'
-import type { SessionRecord, UserRecord } from '@open-reloading/schema'
+import type { Powder, SessionRecord, UserRecord } from '@open-reloading/schema'
 import { parseNumber } from '../i18n/number.ts'
 import type { Shot } from './chrono.ts'
 import { storageName } from './edition.ts'
@@ -15,14 +15,25 @@ export const tuneHref = (ids: readonly string[]) =>
 /** The session storage key of the load the workbench hands to the tuning route for load `load`, a reference. */
 export const tuneLoadKey = (load: string) => storageName(`tuneLoad:${load}`)
 
+/** The session storage key of the powder record of the load handed over for load `load`, a reference. */
+export const tuneBaseKey = (load: string) => storageName(`tunePowder:${load}`)
+
 /**
- * Hands `interior`, the load the workbench's run simulates, to the tuning route for the strings of
- * load `load` (a reference); undefined removes one handed over before.
+ * Hands `interior`, the load the workbench's run simulates, and `powder`, its powder record, to the
+ * tuning route for the strings of load `load` (a reference); undefined removes one handed over before.
  */
-export function writeTuneLoad(load: string, interior: InteriorLoad | undefined) {
+export function writeTuneLoad(
+  load: string,
+  interior: InteriorLoad | undefined,
+  powder?: Powder | undefined,
+) {
+  const put = (key: string, value: unknown) => {
+    if (value) sessionStorage.setItem(key, JSON.stringify(value))
+    else sessionStorage.removeItem(key)
+  }
   try {
-    if (interior) sessionStorage.setItem(tuneLoadKey(load), JSON.stringify(interior))
-    else sessionStorage.removeItem(tuneLoadKey(load))
+    put(tuneLoadKey(load), interior)
+    put(tuneBaseKey(load), interior && powder)
   } catch {}
 }
 

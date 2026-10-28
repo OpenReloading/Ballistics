@@ -6,6 +6,7 @@ import {
   type QuantityKind,
   toSi,
   type UserPowder,
+  type UserPowderFit,
   type UserRecord,
 } from '@open-reloading/schema'
 import { untranslated } from '../i18n/number.ts'
@@ -275,7 +276,18 @@ export interface Design {
   fields: Fields
   /** The burn-law fields of an opened record that the designer has no input for, kept as they were. */
   unoffered: Tree
+  /** The fit of an opened record saved from a fit, with the SI values of its fitted fields then. */
+  fit?: { block: UserPowderFit; values: Record<string, number | undefined> } | undefined
 }
+
+/** The fields that hold the values a fit frees, by its parameter name. */
+const fitFields = { burnRate: 'interior.vivacity.value', energy: 'interior.energy.value' } as const
+
+/** The fit of the opened record while no value it fitted was edited; an edited one drops it. */
+const keptFit = (d: Design) =>
+  d.fit && Object.values(fitFields).every((k) => fieldAt(d, k).si === d.fit?.values[k])
+    ? d.fit.block
+    : undefined
 
 let counter = 0
 /** A row id, unique in this page: the actions that add a row carry one, so the reducer stays pure. */
@@ -380,10 +392,12 @@ export function fileData(d: Design): UserPowder {
   if (rows.length > 0) draft.composition = rows
   const interior = interiorOf(draft.interior as Tree | undefined, d.fitted)
   if (interior) draft.interior = { ...interior, ...d.unoffered }
+  const fit = keptFit(d)
   return {
     origin: 'user',
     ...(d.provenanceKind && { provenanceKind: d.provenanceKind }),
     ...(Object.keys(draft).length > 0 && { draft: draft as NonNullable<UserPowder['draft']> }),
+    ...(fit && { fit }),
   }
 }
 
@@ -419,6 +433,12 @@ export function fromFile(data: UserPowder, name: string, system: UnitSystem): De
     rows: rows.length > 0 ? rows : [{ id: rowId(), name: '', cas: '' }],
     fields,
     unoffered: unofferedOf(draft?.interior as Tree | undefined),
+    ...(data.fit && {
+      fit: {
+        block: data.fit,
+        values: Object.fromEntries(Object.values(fitFields).map((k) => [k, fields[k]?.si])),
+      },
+    }),
   }
 }
 
@@ -523,6 +543,8 @@ export interface PowderDesign {
   id: string
   name: string
   powder: Powder
+  /** What a powder saved from the tuning screen was fitted to. */
+  fit?: UserPowderFit | undefined
 }
 
 /** The valid powder designs among `records`, in the order given. */
@@ -530,7 +552,9 @@ export const powderDesigns = (records: readonly UserRecord[]): PowderDesign[] =>
   records.flatMap((r) => {
     if (r.kind !== 'powder') return []
     const built = powderOf(r.data, r.name, r.id)
-    return 'powder' in built ? [{ id: r.id, name: r.name, powder: built.powder }] : []
+    return 'powder' in built
+      ? [{ id: r.id, name: r.name, powder: built.powder, fit: r.data.fit }]
+      : []
   })
 
 /** The powder the draft builds as the tools use it, or the problems with the draft in the language of `t`. */
