@@ -166,10 +166,10 @@
       "the fit has no covariance: add rows or velocity sigmas",
       "peakPressure and pressureBasis together",
       "pressureBasis must be one of {list}",
-      "the powder has no interior model",
-      "the bore resistance of the powder needs {list}",
+      "domainMargin must lie in [0, 1)",
       "boreDiameter must be positive",
-      "domainMargin must lie in [0, 1)"
+      "the powder has no interior model",
+      "the bore resistance of the powder needs {list}"
     ],
     "ladders": [
       "ladder start charge must be above 0",
