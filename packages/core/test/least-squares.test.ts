@@ -60,6 +60,51 @@ describe('shared least-squares loop', () => {
     expect(Math.abs(nth(loose.theta, 0) - 1)).toBeGreaterThan(1e-8)
   })
 
+  /** Six observations of y = e^t, one far off; Huber loss on all of them when `huber` is set. */
+  const outlierFit = (extra: Partial<Parameters<typeof logLeastSquares>[0]> = {}) =>
+    logLeastSquares({
+      parameterCount: 1,
+      observed: [1, 1.02, 0.98, 1.01, 0.99, 1.5],
+      standardUncertainty: [0.02, 0.02, 0.02, 0.02, 0.02, 0.02],
+      weighted: true,
+      floor: [0, 0, 0, 0, 0, 0],
+      first: [1, 1, 1, 1, 1, 1],
+      predict: (theta) => Array.from({ length: 6 }, () => Math.exp(nth(theta, 0))),
+      huber: { threshold: 1.5, count: 6 },
+      maxIterations: 50,
+      maxCondition: 1e3,
+      fail: (reason) => {
+        throw new Error(reason)
+      },
+      ...extra,
+    })
+
+  it('reports a step below 1e-8 as the stop rule', () => {
+    const r = outlierFit()
+    expect(r.stop).toBe('smallStep')
+  })
+
+  it('reports a cost drop below the tolerance as the stop rule', () => {
+    expect(outlierFit({ tolerance: 0.999 }).stop).toBe('stalled')
+  })
+
+  it('settles the down-weighted rows of a ladder with one outlier', () => {
+    const r = outlierFit()
+    expect(r.weightsSettled).toBe(true)
+  })
+
+  it('reports rows that changed weight over the last accepted step as not settled', () => {
+    // two rows at the start value and four far above it: the one accepted step moves the
+    // iterate so that the first two, within the threshold before it, lie beyond it after
+    const r = outlierFit({
+      observed: [1, 1, 1.04, 1.04, 1.04, 1.04],
+      huber: { threshold: 0.8, count: 6 },
+      tolerance: 0.999,
+    })
+    expect(r.stop).toBe('stalled')
+    expect(r.weightsSettled).toBe(false)
+  })
+
   it('reports the weak direction of an ill-conditioned fit', () => {
     // y depends on theta_0 - theta_1 only: J d = 0 for d = (1, 1)/sqrt(2)
     const at = (t: number[]) => [

@@ -6,7 +6,9 @@ import {
   type InteriorLoad,
   interior,
   type LadderPoint,
+  MixedPressureBasisError,
   PowderFitError,
+  type PressureBasis,
   predictPowder,
 } from '../src/index.ts'
 import { normals } from './random.ts'
@@ -48,7 +50,11 @@ const ladder = (truth: InteriorLoad, v: number, p: number, n = 0): LadderPoint[]
       muzzleVelocity: r.muzzleVelocity + n * nth(noise, i) * (v || 1),
       ...(v ? { velocitySigma: v } : {}),
       ...(p
-        ? { peakPressure: r.peakBreechPressure + n * nth(noise, (i + 2) % 5) * p, pressureSigma: p }
+        ? {
+            peakPressure: r.peakBreechPressure + n * nth(noise, (i + 2) % 5) * p,
+            pressureSigma: p,
+            pressureBasis: 'transducer' as const,
+          }
         : {}),
     }
   })
@@ -187,11 +193,54 @@ describe('powder fit uncertainty', () => {
   })
 })
 
+describe('powder fit pressure basis', () => {
+  const withBases = (bases: PressureBasis[]) =>
+    ladder(load(), 3, 10e6).map((x, i) => ({ ...x, pressureBasis: nth(bases, i) }))
+
+  it('reports the pressure rows of the one basis, none without pressures', () => {
+    expect(fitPowder(load(0.38), ladder(load(), 3, 10e6)).pressureRows).toEqual({ transducer: 5 })
+    expect(fitPowder(load(0.38), ladder(load(), 3, 0)).pressureRows).toEqual({})
+  })
+
+  it('refuses a ladder whose pressure rows use two bases, with the rows per basis', () => {
+    const points = withBases(['piezo', 'piezo', 'transducer', 'transducer', 'transducer'])
+    let error: unknown
+    try {
+      fitPowder(load(0.38), points)
+    } catch (e) {
+      error = e
+    }
+    expect(error).toBeInstanceOf(MixedPressureBasisError)
+    expect(error).toBeInstanceOf(InputError)
+    expect((error as MixedPressureBasisError).rows).toEqual({ piezo: 2, transducer: 3 })
+    expect((error as Error).message).toBe(
+      'pressure rows use more than one basis: 2 piezo, 3 transducer',
+    )
+  })
+
+  it('refuses a pressure without a basis, a basis without a pressure and an unknown basis', () => {
+    const [first, ...rest] = ladder(load(), 3, 10e6)
+    const { pressureBasis, ...bare } = first as LadderPoint
+    expect(() => fitPowder(load(0.38), [bare, ...rest])).toThrow('peakPressure and pressureBasis')
+    const { peakPressure, pressureSigma, ...velocityOnly } = first as LadderPoint
+    expect(() => fitPowder(load(0.38), [velocityOnly, ...rest])).toThrow(
+      'peakPressure and pressureBasis',
+    )
+    expect(() =>
+      fitPowder(load(0.38), [
+        { ...(first as LadderPoint), pressureBasis: 'gauge' as never },
+        ...rest,
+      ]),
+    ).toThrow('pressureBasis must be one of')
+  })
+})
+
 describe('powder fit result', () => {
   it('applies the values and lists residuals in ladder order', () => {
     // pressures on the second and fourth point only
-    const points = ladder(load(), 3, 10e6).map(({ peakPressure, pressureSigma, ...x }, i) =>
-      i % 2 ? { ...x, peakPressure, pressureSigma } : x,
+    const points = ladder(load(), 3, 10e6).map(
+      ({ peakPressure, pressureSigma, pressureBasis, ...x }, i) =>
+        i % 2 ? { ...x, peakPressure, pressureSigma, pressureBasis } : x,
     )
     const twin = { ...nth(points, 2), muzzleVelocity: nth(points, 2).muzzleVelocity + 2 }
     const r = fitPowder(load(0.38), [...points, twin])
@@ -435,6 +484,18 @@ describe('powder fit prior and robust loss', () => {
     // a threshold above every residual is the quadratic loss
     const loose = fitPowder(load(0.38), bad, { huberThreshold: 100 })
     expect(nth(loose.parameters, 0).value).toBe(nth(plain.parameters, 0).value)
+  })
+
+  it('reports the stop rule and whether the down-weighted rows settled', () => {
+    const points = ladder(load(), 3, 0)
+    const bad = points.map((x, i) =>
+      i === 2 ? { ...x, muzzleVelocity: x.muzzleVelocity + 15 } : x,
+    )
+    const robust = fitPowder(load(0.38), bad, { huberThreshold: 1.5 })
+    expect(robust.weightsSettled).toBe(true)
+    expect(['stalled', 'smallStep']).toContain(robust.stop)
+    // without a Huber loss no row is down-weighted
+    expect(fitPowder(load(0.38), bad).weightsSettled).toBe(true)
   })
 
   it('rejects malformed priors and a Huber loss without sigmas', () => {

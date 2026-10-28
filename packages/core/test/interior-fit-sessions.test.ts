@@ -7,6 +7,7 @@ import {
   type InteriorLoad,
   interior,
   type LadderPoint,
+  MixedPressureBasisError,
   PowderFitError,
   type PowderSession,
   predictPowder,
@@ -251,6 +252,22 @@ describe('powder fit over sessions', () => {
   it('throws a failure that names no parameter to give up', () => {
     expect(() => fitPowderSessions(start, sessions([0.6], [294.15]), { maxIterations: 1 })).toThrow(
       PowderFitError,
+    )
+  })
+
+  it('refuses pressures on different bases in different sessions', () => {
+    const [a, b] = sessions([0.6], [294.15, 313.15])
+    const onBasis = (session: PowderSession | undefined, pressureBasis: 'piezo' | 'crusher') => ({
+      ...session,
+      ladder: (session?.ladder ?? []).map((x) => ({
+        ...x,
+        peakPressure: 3e8,
+        pressureSigma: 1e7,
+        pressureBasis,
+      })),
+    })
+    expect(() => fitPowderSessions(start, [onBasis(a, 'piezo'), onBasis(b, 'crusher')])).toThrow(
+      MixedPressureBasisError,
     )
   })
 })

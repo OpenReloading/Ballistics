@@ -20,7 +20,7 @@ import {
 import { localDay } from '../lib/dates.ts'
 import { download } from '../lib/download.ts'
 import { errorText } from '../lib/error-text.ts'
-import { stringStats } from '../lib/string-stats.ts'
+import { type StringStats, stringStats } from '../lib/string-stats.ts'
 import { controlSize } from '../lib/theme.ts'
 import { type UnitSystem, withUnit } from '../lib/units.ts'
 import { ChronoDropZone } from './chrono-drop-zone.tsx'
@@ -31,6 +31,7 @@ import { Panel } from './panel.tsx'
 import { PrintButton } from './record-actions.tsx'
 import { PanelTable } from './scroll-region.tsx'
 import { EmptyNote, ErrorNote } from './states.tsx'
+import { StringComparison } from './string-comparison.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
 
 type Read = { fileName: string; data: ChronoImport; pick: number }
@@ -188,6 +189,95 @@ export function SessionSummary() {
   )
 }
 
+/** The open string's statistics, each with the shot count it rests on. */
+function Headline({
+  st,
+  speed,
+  symbol,
+  level,
+}: {
+  st: StringStats
+  speed: (ms: number) => string
+  symbol: string
+  level: string
+}) {
+  const interval = st.standardDeviationInterval
+  return (
+    <Flex
+      component="dl"
+      className="session-headline"
+      wrap="wrap"
+      rowGap="0.25rem"
+      columnGap="1.5rem"
+      m={0}
+    >
+      <div>
+        <dt>Mean, n = {st.count}</dt>
+        <dd>
+          {speed(st.mean)} {symbol}
+        </dd>
+      </div>
+      <div>
+        <dt>SD, n = {st.count}</dt>
+        <dd>
+          {st.standardDeviation !== undefined
+            ? `${speed(st.standardDeviation)} ${symbol}`
+            : 'one shot'}
+        </dd>
+      </div>
+      {interval && (
+        <div>
+          <dt>
+            SD {level}, n = {st.count}
+          </dt>
+          <dd>
+            {speed(interval.lower)} to {speed(interval.upper)} {symbol}
+          </dd>
+        </div>
+      )}
+      <div>
+        <dt>ES, n = {st.count}</dt>
+        <dd>
+          {speed(st.extremeSpread)} {symbol}
+        </dd>
+      </div>
+    </Flex>
+  )
+}
+
+/** One string's row of the statistics table. */
+function StatsRow({
+  name,
+  st,
+  shots,
+  open,
+  speed,
+}: {
+  name: string
+  st: StringStats | undefined
+  shots: number
+  open: boolean
+  speed: (ms: number) => string
+}) {
+  const interval = st?.standardDeviationInterval
+  return (
+    <tr className={open ? 'is-open' : undefined}>
+      <td>{name}</td>
+      <td className="num">{st?.excluded ? `${st.count} of ${shots}` : (st?.count ?? 0)}</td>
+      <td className="num">{st ? speed(st.mean) : 'n/a'}</td>
+      <td className="num">
+        {st?.standardDeviation !== undefined ? speed(st.standardDeviation) : 'n/a'}
+      </td>
+      <td className="num">
+        {interval ? `${speed(interval.lower)} to ${speed(interval.upper)}` : 'n/a'}
+      </td>
+      <td className="num">{st ? speed(st.extremeSpread) : 'n/a'}</td>
+      <td className="num">{st ? speed(st.min) : 'n/a'}</td>
+      <td className="num">{st ? speed(st.max) : 'n/a'}</td>
+    </tr>
+  )
+}
+
 function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
   const { session, stringLabels, warnings, velocityUnits, format: kind } = read.data
   const v = system.velocity
@@ -211,6 +301,7 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
     ...(session.note ? [`Note: ${session.note}`] : []),
   ]
   const stats = session.strings.map((s) => stringStats(s.shots))
+  const level = `${formatNumber(100 * (stats.find(Boolean)?.confidenceLevel ?? 0.95), 0)} %`
   const [open, setOpen] = useState('0')
   return (
     <section aria-labelledby="session-result" className="session-result">
@@ -248,28 +339,30 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
                 Statistics per string, excluded shots left out ({v.symbol})
               </span>
             }
-            columns={['String', 'Shots', 'Mean', 'SD', 'ES', 'Min', 'Max']}
+            columns={['String', 'Shots', 'Mean', 'SD', `SD ${level}`, 'ES', 'Min', 'Max']}
           >
-            {session.strings.map((s, k) => {
-              const st = stats[k]
-              return (
+            {session.strings.map((s, k) => (
+              <StatsRow
                 // biome-ignore lint/suspicious/noArrayIndexKey: strings keep the file order and have no id
-                <tr key={k} className={String(k) === open ? 'is-open' : undefined}>
-                  <td>{stringName(stringLabels, k)}</td>
-                  <td className="num">
-                    {st?.excluded ? `${st.count} of ${s.shots.length}` : (st?.count ?? 0)}
-                  </td>
-                  <td className="num">{st ? speed(st.mean) : 'n/a'}</td>
-                  <td className="num">
-                    {st?.standardDeviation !== undefined ? speed(st.standardDeviation) : 'n/a'}
-                  </td>
-                  <td className="num">{st ? speed(st.extremeSpread) : 'n/a'}</td>
-                  <td className="num">{st ? speed(st.min) : 'n/a'}</td>
-                  <td className="num">{st ? speed(st.max) : 'n/a'}</td>
-                </tr>
-              )
-            })}
+                key={k}
+                name={stringName(stringLabels, k)}
+                st={stats[k]}
+                shots={s.shots.length}
+                open={String(k) === open}
+                speed={speed}
+              />
+            ))}
           </PanelTable>
+          <StringComparison
+            strings={session.strings.map((_, k) => ({
+              name: stringName(stringLabels, k),
+              stats: stats[k],
+            }))}
+          />
+          <p className="session-strings-note">
+            SD {level}: the range that holds the SD of the population the string is drawn from. It
+            assumes roughly normal velocities; a stray shot or a skewed string makes it too narrow.
+          </p>
         </Panel>
         <Tabs value={open} onChange={(k) => k && setOpen(k)} className="session-tabs">
           <Panel
@@ -297,37 +390,7 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
                 // biome-ignore lint/suspicious/noArrayIndexKey: strings keep the file order and have no id
                 <Tabs.Panel key={k} value={String(k)} className="session-string">
                   <h3 className="print-only">{name}</h3>
-                  {st && (
-                    <Flex
-                      component="dl"
-                      className="session-headline"
-                      wrap="wrap"
-                      rowGap="0.25rem"
-                      columnGap="1.5rem"
-                      m={0}
-                    >
-                      <div>
-                        <dt>Mean</dt>
-                        <dd>
-                          {speed(st.mean)} {v.symbol}
-                        </dd>
-                      </div>
-                      <div>
-                        <dt>SD</dt>
-                        <dd>
-                          {st.standardDeviation !== undefined
-                            ? `${speed(st.standardDeviation)} ${v.symbol}`
-                            : 'one shot'}
-                        </dd>
-                      </div>
-                      <div>
-                        <dt>ES</dt>
-                        <dd>
-                          {speed(st.extremeSpread)} {v.symbol}
-                        </dd>
-                      </div>
-                    </Flex>
-                  )}
+                  {st && <Headline st={st} speed={speed} symbol={v.symbol} level={level} />}
                   {st && kept.length >= 2 ? (
                     <LazyLineChart
                       x={kept.map(([n]) => n)}

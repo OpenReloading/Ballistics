@@ -544,6 +544,32 @@ describe('POST /interior pressure range and limits', () => {
     expect(body.limits).toBeUndefined()
   })
 
+  it('places an entered maximum against the range of each run, with no new run', async () => {
+    const none = await run()
+    expect(none.body.maximumCheck).toBeUndefined()
+    const { lowPressure, highPressure } = none.body.pressureRange
+    const classOf = async (maximumPressure: number) => {
+      const { status, body } = await run({ maximumPressure })
+      expect(status).toBe(200)
+      expect(body.pressureRange).toEqual(none.body.pressureRange)
+      return body.maximumCheck
+    }
+    expect(await classOf(lowPressure * 0.9)).toMatchObject({ class: 'modelDiscrepancy' })
+    expect(await classOf((lowPressure + highPressure) / 2)).toMatchObject({
+      class: 'inputPlausible',
+      dominantInput: 'burnRateFraction',
+    })
+    expect(await classOf(highPressure * 1.1)).toMatchObject({ class: 'aboveRange' })
+    const ladder = await run({
+      maximumPressure: highPressure * 1.1,
+      ladder: { chargeStep: 0.0001, stepCount: 2 },
+    })
+    expect(
+      ladder.body.ladderSteps.map((s: { maximumCheck: { class: string } }) => s.maximumCheck.class),
+    ).toHaveLength(2)
+    expect((await run({ maximumPressure: 0 })).status).toBe(400)
+  })
+
   it('warns chargeTooSmall for a small M3 charge', async () => {
     const codes = async (load: InteriorLoad, cartridge?: string) => {
       const { status, body } = await post(`${API_PREFIX}/interior`, {

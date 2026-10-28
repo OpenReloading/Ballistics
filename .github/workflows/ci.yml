@@ -109,7 +109,7 @@ jobs:
           - name: web
             workspaces: -w @open-reloading/web
           - name: packages
-            workspaces: -w @open-reloading/schema -w @open-reloading/core -w @open-reloading/importers -w @open-reloading/data -w @open-reloading/api -w @open-reloading/docs -w @open-reloading/tools
+            workspaces: -w @open-reloading/schema -w @open-reloading/core -w @open-reloading/importers -w @open-reloading/data -w @open-reloading/api -w @open-reloading/cli -w @open-reloading/docs -w @open-reloading/tools
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

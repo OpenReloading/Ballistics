@@ -88,6 +88,14 @@ module.exports = {
       to: workspaceExcept('packages/api/src', 'core', 'data', 'schema'),
     },
     {
+      name: 'cli-imports-core-data-drawing-schema-only',
+      severity: 'error',
+      comment:
+        'packages/cli is a thin layer over the libraries: it depends on core, data, drawing and schema, never on the API or the web app.',
+      from: { path: own('packages/cli/src') },
+      to: workspaceExcept('packages/cli/src', 'core', 'data', 'drawing', 'schema'),
+    },
+    {
       name: 'web-no-node-builtins',
       severity: 'error',
       comment:
