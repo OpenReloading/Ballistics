@@ -392,6 +392,9 @@ export function ImportFoot({
         value={shared}
         onChange={(ev) => onShared(ev.currentTarget.value)}
       />
+      <Text size="xs" c="dimmed">
+        {t('You are responsible for holding the rights to the data you import.')}
+      </Text>
       <Group gap="sm">
         <Button disabled={total === 0 || missingSource || busy} onClick={onImport}>
           {tn(total, 'Import {count} valid row', 'Import {count} valid rows')}

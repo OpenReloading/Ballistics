@@ -60,6 +60,7 @@ const sidebars: SidebarsConfig = {
     'data/record-model',
     'data/firearm-records',
     'data/catalogue-storage',
+    'data/table-import',
     'bibliography',
   ],
   contributing: [

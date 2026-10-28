@@ -9,7 +9,7 @@ const rows = [
   'Alpha 168,Invented Arms,7.82,168,0.45',
   'Beta 55,Other Works,5.70,55,0.25',
 ]
-const csv = (lines: string[]) => Buffer.from([header, ...lines].join('\n'))
+const csv = (lines: string[], head = header) => Buffer.from([head, ...lines].join('\n'))
 
 test.beforeEach(async ({ page }) => {
   // the file input stands in for the native picker, which a test cannot drive
@@ -53,3 +53,38 @@ test('one clean table imports in two clicks and a typed source, and a second imp
   await expect(changed.getByTestId('import-counts')).toContainText('changed 1')
   await expect(changed.getByTestId('import-counts')).toContainText('New 0, already here 2')
 })
+
+// invented powders and cartridges, the example files of the table import docs page
+const others = [
+  {
+    kind: 'powders',
+    header: 'Name,Maker,Grain form,Base,Bulk density (g/cm3)',
+    rows: [
+      'Gamma 120,Invented Powders,extruded,single,0.89',
+      'Gamma 140,Invented Powders,ball,double,0.98',
+      'Delta 30,Other Mills,flake,double,0.62',
+    ],
+  },
+  {
+    kind: 'cartridges',
+    header: 'Name,Case length (mm),COAL (mm),Bullet diameter (mm),Pmax (bar)',
+    rows: [
+      'Invented 7x50,50.0,72.0,7.21,4000',
+      'Invented 6x40,40.0,58.5,6.20,3800',
+      'Invented 9x20,20.0,29.0,9.02,2400',
+    ],
+  },
+]
+
+for (const { kind, header: head, rows: lines } of others) {
+  test(`a table of ${kind} imports through the same entry`, async ({ page }) => {
+    await gotoHydrated(page, '/bullets/designer')
+    const entry = await pick(page, `${kind}.csv`, csv(lines, head))
+    await expect(entry.getByTestId('import-verdict')).toHaveText(`Table of ${kind} (high)`)
+    await expect(entry.getByTestId('import-counts')).toContainText('3 accepted')
+    await entry.getByRole('textbox', { name: 'Source' }).fill('Invented catalogue')
+    await entry.getByRole('button', { name: 'Import 3 valid rows' }).click()
+    await expect(entry.getByRole('status')).toHaveText('Imported 3 records.')
+    await expect(entry.getByTestId('import-counts')).toContainText('already here 3')
+  })
+}

@@ -3519,6 +3519,7 @@
   "cartridges": "Patronen",
   "powders": "Treibladungspulver",
   "Choose files": "Dateien auswählen",
+  "You are responsible for holding the rights to the data you import.": "Sie sind dafür verantwortlich, die Rechte an den importierten Daten zu besitzen.",
   "CSV, text, workbook or JSON list of bullets, powders or cartridges. Read in this browser, not uploaded.": "CSV, Text, Arbeitsmappe oder JSON-Liste mit Geschossen, Treibladungspulvern oder Patronen. Wird in diesem Browser gelesen, nicht hochgeladen.",
   "decimal mark guessed": "Dezimalzeichen geschätzt",
   "Decimal mark of column {header}": "Dezimalzeichen der Spalte {header}",
