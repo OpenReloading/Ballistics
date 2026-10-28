@@ -3,7 +3,8 @@ import { problems } from './a11y.ts'
 import { barButton } from './bar.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
-import { applyExampleLoad } from './workbench.ts'
+import { putRecords } from './user-store.ts'
+import { applyExampleLoad, loadForm } from './workbench.ts'
 import { runLine } from './workbench-run.ts'
 
 // The powder tuning route lists the chronograph strings of the open load per charge and takes more
@@ -151,4 +152,74 @@ test('a saved powder design opens the route with the saved loads that use it', a
   await page.getByRole('link', { name: 'Fit a powder from chronograph strings' }).click()
   await expect(page).toHaveURL(/\/powders\/tune\/?\?powder=user/)
   await expect(page.getByText('No saved load uses this powder.', { exact: false })).toBeVisible()
+})
+
+/** A fitted user powder as the tuning screen saves it, in stored units; `previous` names the record it refits. */
+const fittedRecord = (id: string, name: string, vivacity: number, previous?: string) => ({
+  kind: 'powder',
+  id,
+  name,
+  saved: '2026-10-28T00:00:00.000Z',
+  data: {
+    origin: 'user',
+    provenanceKind: 'fitted',
+    draft: {
+      interior: {
+        model: 'm3',
+        fitted: ['vivacity'],
+        vivacity: { value: vivacity },
+        energy: { value: 3950000 },
+        gamma: 1.215,
+        covolume: { value: 0.00097 },
+        density: { value: 1.6 },
+        pressureExponent: 1,
+        referencePressure: { value: 0.980665 },
+        ignitionPressure: { value: 50 },
+        propellantTemperature: { value: 21 },
+        burnForm: { kind: 'twoStage', a: { value: 0.05 }, m: 0.5, q: 0.5, z1: 0.8 },
+      },
+    },
+    fit: {
+      input: [
+        {
+          charge: { value: 2.6 },
+          muzzleVelocity: { value: 850 },
+          shots: 3,
+          barrelLength: { value: 600 },
+          temperature: { value: 21 },
+          caseCapacity: { value: 3.4 },
+          bulletMass: { value: 9.5 },
+        },
+      ],
+      parameters: ['burnRate'],
+      options: { loss: { kind: 'quadratic' } },
+      date: previous ? '2026-10-28T00:00:00.000Z' : '2026-10-27T00:00:00.000Z',
+      model: 'm3',
+      modelVersion: '0.0.1',
+      confidence: 'loose',
+      reasons: [],
+      sessions: [],
+      ...(previous && { previous }),
+    },
+  },
+})
+
+test('a load on a refitted powder says a newer fit exists and moves to it', async ({ page }) => {
+  const old = '7a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d'
+  await page.goto('/workbench')
+  await putRecords(page, [
+    fittedRecord(old, 'DP40', 0.612),
+    fittedRecord('8b2c3d4e-5f6a-4b7c-9d8e-0f1a2b3c4d5e', 'DP40 (fit 2)', 0.64, `user:${old}`),
+  ])
+  await page.reload()
+  await page.getByRole('button', { name: 'Enter values by hand' }).click()
+  const form = loadForm(page)
+  const search = form.getByRole('combobox', { name: /^Search powders/ })
+  await search.fill('DP40')
+  await page.getByRole('option', { name: 'DP40 (your design)', exact: true }).click()
+  const note = page.getByText('A newer fit of this powder exists.')
+  await expect(note).toBeVisible()
+  await page.getByRole('button', { name: 'Use the refit' }).click()
+  await expect(search).toHaveValue('DP40 (fit 2) (your design)')
+  await expect(note).toHaveCount(0)
 })

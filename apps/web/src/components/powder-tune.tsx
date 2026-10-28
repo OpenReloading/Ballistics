@@ -13,6 +13,7 @@ import {
   type Powder,
   parseRef,
   type SessionRecord,
+  type UserPowderFit,
   userRecord,
 } from '@open-reloading/schema'
 import Link from 'next/link'
@@ -27,7 +28,7 @@ import { newId } from '../lib/new-id.ts'
 import { openOnWorkbench } from '../lib/open-loads.ts'
 import type { PowderFitState } from '../lib/powder-fit.ts'
 import { fitMark } from '../lib/powder-record.ts'
-import { fittedPowder } from '../lib/powder-save.ts'
+import { fittedPowder, refitOf } from '../lib/powder-save.ts'
 import {
   fitStrings,
   loadStrings,
@@ -40,6 +41,7 @@ import {
 import { readTuneBase, readTuneLoad } from '../lib/tune-load.ts'
 import { type Quantity, withUnit } from '../lib/units.ts'
 import { putRecords, storedRecord, storedRecords } from '../lib/user-store.ts'
+import { userRef } from '../lib/variants.ts'
 import { PageBar } from './page-bar.tsx'
 import { TuneChart } from './powder-tune-chart.tsx'
 import { PanelTable } from './scroll-region.tsx'
@@ -140,6 +142,8 @@ function HandMark({ strings, tuned }: { strings: readonly TuneString[]; tuned: b
 interface TuneSave {
   sessions: readonly string[]
   base?: Powder | undefined
+  /** The stored fit of the base, a user powder saved from this screen: the save is then a refit. */
+  baseFit?: UserPowderFit | undefined
 }
 
 /**
@@ -158,8 +162,12 @@ function SaveFit({
   tuned: boolean
 }) {
   const { t } = useTranslation()
-  const [name, setName] = useState(() =>
-    save.base ? t('{name}, fitted', { name: save.base.name }) : t('Fitted powder'),
+  // a fitted user powder is refitted as a new record, so the loads on the old one run as before
+  const refit = refitOf(save.base, save.baseFit, t)
+  const [name, setName] = useState(
+    () =>
+      refit?.name ??
+      (save.base ? t('{name}, fitted', { name: save.base.name }) : t('Fitted powder')),
   )
   const [saved, setSaved] = useState<string>()
   const [failed, setFailed] = useState(false)
@@ -176,6 +184,7 @@ function SaveFit({
       id: newId(),
       name: name.trim() || t('Fitted powder'),
       date: new Date(),
+      previous: refit?.previous,
     })
     setSaved(undefined)
     setFailed(false)
@@ -585,7 +594,17 @@ export function PowderTune() {
         if (!found.load) return
         setInterior(readTuneLoad(found.load))
         const own = s.filter((r) => r.data.strings.some((str) => str.load === found.load))
-        setSave({ sessions: own.map((r) => r.id), base: readTuneBase(found.load) })
+        const base = readTuneBase(found.load)
+        const sessions = own.map((r) => r.id)
+        // a user powder's stored fit makes the save a refit
+        const stored = base && userRef(base.id) ? storedRecord(base.id) : Promise.resolve()
+        stored
+          .then((raw) => {
+            const r = userRecord.safeParse(raw)
+            const baseFit = r.success && r.data.kind === 'powder' ? r.data.data.fit : undefined
+            setSave({ sessions, base, baseFit })
+          })
+          .catch(() => setSave({ sessions, base }))
       })
     else if (powder)
       storedRecords()

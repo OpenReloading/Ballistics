@@ -109,9 +109,52 @@ export async function putRecordIfAbsent(record: UserRecord) {
   return !stored
 }
 
+/** The `fit.previous` of a stored powder, unvalidated; undefined for any other record. */
+const previousOf = (raw: unknown) => {
+  const r = raw as { kind?: unknown; data?: { fit?: { previous?: unknown } } } | null
+  const p = r?.kind === 'powder' ? r.data?.fit?.previous : undefined
+  return typeof p === 'string' ? p : undefined
+}
+
+const idOf = (ref: string) => ref.slice('user:'.length)
+
+/**
+ * What a powder naming `named` names once the records of `gone` are deleted: the `previous` of a
+ * deleted powder, through the deleted ones, up to a record that stays. Undefined to leave it.
+ */
+function relinked(named: string, gone: ReadonlyMap<string, unknown>) {
+  let to = named
+  const seen = new Set<string>()
+  for (let at = gone.get(idOf(to)); at && !seen.has(to); at = gone.get(idOf(to))) {
+    seen.add(to)
+    const next = previousOf(at)
+    // a deleted powder without a `previous` of its own leaves the name as it was
+    if (!next) return
+    to = next
+  }
+  return to !== named && !gone.has(idOf(to)) ? to : undefined
+}
+
+/**
+ * Deletes the records `ids`. In the same transaction a powder whose `fit.previous` names a
+ * deleted powder takes that powder's own `previous` (through the deleted ones), so a chain of
+ * refits stays whole and a load on an older fit still finds the newest.
+ */
 export const deleteRecords = (ids: string[]) =>
   inStore('records', 'readwrite', (s) => {
-    for (const id of ids) s.delete(id)
+    const all = s.getAll()
+    all.addEventListener('success', () => {
+      const raw = all.result as { id?: unknown; data?: { fit?: object } }[]
+      const gone = new Map(
+        raw.flatMap((r) => (typeof r.id === 'string' && ids.includes(r.id) ? [[r.id, r]] : [])),
+      )
+      for (const r of raw) {
+        const named = previousOf(r)
+        const to = named && typeof r.id === 'string' && !gone.has(r.id) && relinked(named, gone)
+        if (to) s.put({ ...r, data: { ...r.data, fit: { ...r.data?.fit, previous: to } } })
+      }
+      for (const id of ids) s.delete(id)
+    })
     return
   })
 

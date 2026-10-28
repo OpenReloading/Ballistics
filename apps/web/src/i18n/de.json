@@ -3655,5 +3655,8 @@
   },
   "simulation parameters, hand-tuned": "Simulationsparameter, von Hand abgestimmt",
   "The fit cannot be stored as a powder record in this browser.": "Die Anpassung lässt sich in diesem Browser nicht als Treibladungspulver-Datensatz speichern.",
-  "The powder was not saved.": "Das Treibladungspulver wurde nicht gespeichert."
+  "The powder was not saved.": "Das Treibladungspulver wurde nicht gespeichert.",
+  "{name} (fit {n})": "{name} (Anpassung {n})",
+  "A newer fit of this powder exists.": "Es gibt eine neuere Anpassung dieses Treibladungspulvers.",
+  "Use the refit": "Neue Anpassung verwenden"
 }

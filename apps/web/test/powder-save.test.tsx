@@ -9,14 +9,14 @@ import { fromSi, type Powder, userRecord } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { TuneNotes } from '../src/components/powder-tune.tsx'
-import { english } from '../src/i18n/translate.ts'
+import { english, translator } from '../src/i18n/translate.ts'
 import { dayText, localDay } from '../src/lib/dates.ts'
 import { nth } from '../src/lib/nth.ts'
-import { fileData, fromFile, powderDesigns } from '../src/lib/powder-designer.ts'
+import { fileData, fromFile, newerFit, powderDesigns } from '../src/lib/powder-designer.ts'
 import type { PowderFitReply } from '../src/lib/powder-fit.ts'
 import { answerPowderFit } from '../src/lib/powder-fit-answer.ts'
 import { fitMark, loadFitMark } from '../src/lib/powder-record.ts'
-import { fittedPowder } from '../src/lib/powder-save.ts'
+import { fittedPowder, refitOf } from '../src/lib/powder-save.ts'
 import type { TuneString } from '../src/lib/powder-tune.ts'
 import { presetUnits } from '../src/lib/units.ts'
 
@@ -63,7 +63,7 @@ if (fitted?.kind !== 'fit' || ranged?.kind !== 'range') throw new Error('no fit'
 const date = new Date('2026-10-28T10:00:00Z')
 const id = '0b9f6c1e-6a7d-4e0f-9b1a-2c3d4e5f6a7b'
 const session = '1c2d3e4f-5a6b-4c7d-8e9f-0a1b2c3d4e5f'
-const save = (base?: Powder) =>
+const save = (base?: Powder, previous?: string, name = 'My fitted powder') =>
   fittedPowder({
     fit: fitted.fit,
     confidence: ranged.confidence,
@@ -71,8 +71,9 @@ const save = (base?: Powder) =>
     base,
     sessions: [session, 's1'],
     id,
-    name: 'My fitted powder',
+    name,
     date,
+    previous,
   })
 
 describe('saving a fit as a user powder', () => {
@@ -136,6 +137,92 @@ describe('saving a fit as a user powder', () => {
       fields: { ...opened.fields, [key]: { text: '0.5', si: 0.5 } },
     }
     expect(fileData(edited).fit).toBeUndefined()
+  })
+})
+
+describe('a refit of a fitted user powder', () => {
+  const old = save(undefined, undefined, 'DP40')
+  if (!old) throw new Error('no record')
+  const before = structuredClone(old)
+  const base = nth(powderDesigns([old]), 0).powder
+  const refitId = '2c3d4e5f-6a7b-4c8d-9e0f-1a2b3c4d5e6f'
+
+  it('saves "<name> (fit 2)" as a new record naming the old one, which stays unchanged', () => {
+    const refit = refitOf(base, old.data.fit)
+    expect(refit).toEqual({ name: 'DP40 (fit 2)', previous: `user:${id}` })
+    const record = fittedPowder({
+      fit: fitted.fit,
+      confidence: ranged.confidence,
+      strings,
+      base,
+      sessions: [],
+      id: refitId,
+      name: refit?.name ?? '',
+      date,
+      previous: refit?.previous,
+    })
+    expect(userRecord.safeParse(record).success).toBe(true)
+    expect(record?.id).not.toBe(old.id)
+    expect(record?.name).toBe('DP40 (fit 2)')
+    expect(record?.data.fit?.previous).toBe(`user:${id}`)
+    expect(old).toEqual(before)
+    expect(old.data.fit).not.toHaveProperty('previous')
+  })
+
+  it('counts on from the name of a refit, in the language shown', () => {
+    expect(refitOf({ ...base, name: 'DP40 (fit 2)' }, old.data.fit)?.name).toBe('DP40 (fit 3)')
+    const t = translator({ '{name} (fit {n})': '{name} (Fit {n})' }, 'de').t
+    expect(refitOf({ ...base, name: 'DP40 (Fit 3)' }, old.data.fit, t)?.name).toBe('DP40 (Fit 4)')
+  })
+
+  it('is no refit for a catalogue powder or a user powder saved without a fit', () => {
+    expect(refitOf({ ...base, id: 'catalogue-powder' }, old.data.fit)).toBeUndefined()
+    expect(refitOf(base, undefined)).toBeUndefined()
+    expect(refitOf(undefined, old.data.fit)).toBeUndefined()
+  })
+})
+
+describe("the newer fit of a load's powder", () => {
+  const ids = ['a', 'b', 'c', 'd'].map((x) => `${x.repeat(8)}-6a7d-4e0f-9b1a-2c3d4e5f6a7b`)
+  /** A chain of refits a <- b <- c <- d, one day apart. */
+  const chain = ids.map((x, i) => {
+    const r = fittedPowder({
+      fit: fitted.fit,
+      confidence: ranged.confidence,
+      strings,
+      sessions: [],
+      id: x,
+      name: i ? `DP40 (fit ${i + 1})` : 'DP40',
+      date: new Date(date.getTime() + i * 86_400_000),
+      previous: i ? `user:${nth(ids, i - 1)}` : undefined,
+    })
+    if (!r) throw new Error('no record')
+    return r
+  })
+  const [a, b, c, d] = ids as [string, string, string, string]
+  const designs = powderDesigns(chain)
+
+  it('finds the newest record of the chain from any older one', () => {
+    expect(newerFit(designs, a)?.id).toBe(d)
+    expect(newerFit(designs, c)?.id).toBe(d)
+  })
+
+  it('finds none for the newest record or a powder never refitted', () => {
+    expect(newerFit(designs, d)).toBeUndefined()
+    expect(newerFit(designs, id)).toBeUndefined()
+  })
+
+  it('takes the later of two refits of one record', () => {
+    // a <- b and a <- c, c the later
+    const branch = designs.flatMap((x) =>
+      x.id === d
+        ? []
+        : x.id === c && x.fit
+          ? [{ ...x, fit: { ...x.fit, previous: `user:${a}` } }]
+          : [x],
+    )
+    expect(newerFit(branch, a)?.id).toBe(c)
+    expect(newerFit(branch, b)).toBeUndefined()
   })
 })
 

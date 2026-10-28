@@ -1,8 +1,36 @@
 import type { PowderConfidence, PowderFit } from '@open-reloading/core'
-import { fromSi, type Powder, type UserPowder, type UserRecord } from '@open-reloading/schema'
+import {
+  fromSi,
+  type Powder,
+  type UserPowder,
+  type UserPowderFit,
+  type UserRecord,
+} from '@open-reloading/schema'
 import web from '../../package.json'
+import { english, type Translator } from '../i18n/translate.ts'
 import { fitStrings, type TuneString } from './powder-tune.ts'
 import { userRef } from './variants.ts'
+
+/**
+ * The name and `fit.previous` of a refit of `base`, a user powder saved with a `fit`: "<name>
+ * (fit 2)", then 3 and on. Undefined for a catalogue powder or a user powder without a fit.
+ */
+export function refitOf(
+  base: Powder | undefined,
+  fit: UserPowderFit | undefined,
+  t: Translator['t'] = english.t,
+) {
+  const previous = base && fit ? userRef(base.id) : undefined
+  if (!base || !previous) return
+  // the template with markers in place of its values reads the name and number back
+  const escaped = t('{name} (fit {n})', { name: '\u0000', n: '\u0001' }).replace(
+    /[.*+?^${}()|[\]\\]/g,
+    '\\$&',
+  )
+  const pattern = new RegExp(`^${escaped.replace('\u0000', '(.+)').replace('\u0001', '(\\d+)')}$`)
+  const [, root = base.name, n = '1'] = pattern.exec(base.name) ?? []
+  return { name: t('{name} (fit {n})', { name: root, n: Number(n) + 1 }), previous }
+}
 
 /** The record's names of the fitted parameters it can hold; the others stay in `fit.parameters` only. */
 const recordFitted = { burnRate: 'vivacity', energy: 'energy' } as const
@@ -21,6 +49,8 @@ interface FittedPowderInput {
   name: string
   /** Time of the save, which is the time of the fit. */
   date: Date
+  /** The `user:` reference of the record this fit refits. */
+  previous?: string | undefined
 }
 
 /**
@@ -106,6 +136,7 @@ export function fittedPowder(
         reasons: [...f.confidence.reasons],
         // a reference names a UUID: a session of an older id is left out
         sessions: f.sessions.flatMap((s) => userRef(s) ?? []),
+        ...(f.previous && { previous: f.previous }),
       },
     },
   }

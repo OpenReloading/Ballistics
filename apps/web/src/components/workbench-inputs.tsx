@@ -38,6 +38,7 @@ import { landsFor } from '../lib/firearm.ts'
 import { type FollowKey, followKeys } from '../lib/input-defaults.ts'
 import { burnFormError, interiorFields } from '../lib/interior-input.ts'
 import { productLabel } from '../lib/manufacturers.ts'
+import { newerFit } from '../lib/powder-designer.ts'
 import { loadFitMark, recordMark } from '../lib/powder-record.ts'
 import { constructionRows, titleFromKebab } from '../lib/record-fields.ts'
 import {
@@ -887,6 +888,26 @@ function LoadField({ name: key }: { name: string }) {
 
 const fieldsOf = (keys: readonly string[]) => keys.map((k) => <LoadField key={k} name={k} />)
 
+/** The note on a load whose powder design has a newer fit, with the switch to it. */
+function NewerFitNote() {
+  const { powderDesign, powderDesigns, choosePowderDesign } = useLoad()
+  const { t } = useTranslation()
+  const newer = powderDesign && newerFit(powderDesigns, powderDesign.id)
+  if (!newer) return null
+  return (
+    <p className="note wide">
+      {t('A newer fit of this powder exists.')}{' '}
+      <Button
+        size={controlSize.row.button}
+        variant="default"
+        onClick={() => choosePowderDesign(newer.id)}
+      >
+        {t('Use the refit')}
+      </Button>
+    </p>
+  )
+}
+
 /** A card's fields and record rows. */
 function CardBody({ panel }: { panel: InputPanel }) {
   const {
@@ -949,6 +970,7 @@ function CardBody({ panel }: { panel: InputPanel }) {
             formatQuantity('density', system, toSi('density', powder.bulkDensity.value)),
           system.density.symbol,
         )}
+        <NewerFitNote />
         {fieldsOf(panelFields.powder)}
         <LadderInputs />
         {/* the model parameters behind one row at every width; an invalid one opens it */}

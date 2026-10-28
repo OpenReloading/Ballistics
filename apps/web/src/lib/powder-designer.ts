@@ -557,6 +557,28 @@ export const powderDesigns = (records: readonly UserRecord[]): PowderDesign[] =>
       : []
   })
 
+/**
+ * The newest design (latest fit date, then id) whose `fit.previous` chain reaches the powder `id`,
+ * or undefined when no refit of it is stored. A refit names the record it refits, so the chain is
+ * walked from `id` forward; deleting a powder relinks the records that name it (`deleteRecords`).
+ */
+export function newerFit(designs: readonly PowderDesign[], id: string): PowderDesign | undefined {
+  let newest: PowderDesign | undefined
+  const seen = new Set<string>()
+  const next = [id]
+  for (let at = next.pop(); at !== undefined; at = next.pop()) {
+    if (seen.has(at)) continue
+    seen.add(at)
+    for (const d of designs) {
+      if (d.fit?.previous !== `user:${at}`) continue
+      next.push(d.id)
+      const date = newest?.fit?.date ?? ''
+      if (!newest || d.fit.date > date || (d.fit.date === date && d.id > newest.id)) newest = d
+    }
+  }
+  return newest
+}
+
 /** The powder the draft builds as the tools use it, or the problems with the draft in the language of `t`. */
 export function checkDesign(
   d: Design,
