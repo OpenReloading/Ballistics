@@ -24,6 +24,9 @@ export type WarningCode =
   | 'chargeTooSmall'
   | 'resistanceNotApplied'
   | 'loadRatioHigh'
+  | 'startPressureBelowResistance'
+  | 'gyrationRadiusWithoutTwist'
+  | 'startPressureHeldOnce'
 
 /** The English sentences the API writes for each warning code. */
 export const warningMessages = {
@@ -65,6 +68,21 @@ export const warningMessages = {
     ),
     msg(
       'Simulation: load ratio {ratio} is above {max}, solid fill {limit} for this powder; the model is outside the range it was built for.',
+    ),
+  ],
+  startPressureBelowResistance: [
+    msg(
+      'The start pressure is at or below the bore resistance at travel 0, so the shot starts when the pressure force exceeds that resistance and the start pressure has no effect.',
+    ),
+  ],
+  gyrationRadiusWithoutTwist: [
+    msg(
+      'The twist is 0, so the bullet has no rotational energy and the radius of gyration is ignored.',
+    ),
+  ],
+  startPressureHeldOnce: [
+    msg(
+      'The start pressure is above the bore resistance at travel 0 and above the ignition pressure, and the engraving pressure at travel 0 is not 0, so the projectile is held until the start pressure and then starts against the lower bore resistance at travel 0, after which the engraving profile applies.',
     ),
   ],
 } satisfies Record<WarningCode, readonly Message[]>
