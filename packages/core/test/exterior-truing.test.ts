@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { nth } from '../src/errors.ts'
 import {
   airDensity,
+  compareTruingFits,
   dragCoefficient,
   dragTables,
   InputError,
@@ -871,5 +872,28 @@ describe('several sessions', () => {
       ['muzzleVelocity', 1],
       ['dragFactor', undefined],
     ])
+  })
+})
+
+describe('divergence of the muzzle velocity fit and the drag fit', () => {
+  it('is zero for data from a pure velocity error', () => {
+    const c = compareTruingFits(base, observe(scaled(base, 1.02, 1), mixed))
+    expect(c.divergence).toBeLessThan(1e-4)
+    expect(Math.abs(nth(c.dragFit.parameters, 1).value - 1)).toBeLessThan(1e-6)
+    expect(c.differences.map((d) => d.range)).toEqual(mixed.map((x) => x[1]))
+  })
+
+  it('is positive for data from a drag error', () => {
+    const c = compareTruingFits(base, observe(scaled(base, 1, 0.9), mixed))
+    expect(c.divergence).toBeGreaterThan(1)
+    expect(c.divergence).toBeCloseTo(
+      Math.sqrt(c.differences.reduce((s, d) => s + d.standardized ** 2, 0) / mixed.length),
+      12,
+    )
+  })
+
+  it('refuses a single observation, which cannot fit two parameters', () => {
+    const obs = observe(scaled(base, 1.02, 1), [['height', 600, 0.01]])
+    expect(() => compareTruingFits(base, obs)).toThrow(/underdetermined/)
   })
 })

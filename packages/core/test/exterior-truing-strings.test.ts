@@ -552,3 +552,87 @@ describe('errors', () => {
     ).toThrow(/unreachable \(range 5000 m not reached\)/)
   })
 })
+
+describe('refusals of a plan', () => {
+  const plan = (
+    entries: { kind: 'impact' | 'dial'; range: number; shotCount: number; group?: string }[],
+    chronograph?: { shotCount: number; standardDeviation: number },
+  ) =>
+    planTruingStrings({
+      shot: nominal,
+      clickValue: click,
+      dispersion,
+      entries,
+      ...(chronograph ? { chronograph } : {}),
+    })
+  const chrono = { shotCount: 10, standardDeviation: 4 }
+
+  it('single-range: entries at one distance and no chronograph', () => {
+    const p = plan([
+      { kind: 'impact', range: 500, shotCount: 5, group: 'a' },
+      { kind: 'dial', range: 500, shotCount: 5, group: 'b' },
+    ])
+    expect(p.refusals.map((r) => r.id)).toEqual(['single-range'])
+    expect(p.refusals.every((r) => r.advice.length > 0)).toBe(true)
+    // the statuses agree: the drop leaves velocity and drag factor apart from nothing
+    expect(find(p, 'muzzleVelocity').status).not.toBe('identified')
+    expect(find(p, 'dragFactor').status).not.toBe('identified')
+  })
+
+  it('velocity-only: a chronograph and no entry', () => {
+    const p = plan([], chrono)
+    expect(p.refusals.map((r) => r.id)).toEqual(['velocity-only'])
+    expect(find(p, 'dragFactor').status).not.toBe('identified')
+  })
+
+  it('has no refusal for a string that separates the parameters', () => {
+    const two = [
+      { kind: 'impact' as const, range: 300, shotCount: 5 },
+      { kind: 'impact' as const, range: 900, shotCount: 5 },
+    ]
+    expect(plan(two).refusals).toEqual([])
+    // a chronograph fixes the velocity, so one distance is enough
+    expect(plan([two[0] as (typeof two)[number]], chrono).refusals).toEqual([])
+    expect(
+      find(plan([two[0] as (typeof two)[number]], chrono), 'dragFactor').reasons,
+    ).not.toContain('collinear')
+  })
+
+  it('a chronograph with dial entries at one distance leaves drag factor and click value confounded', () => {
+    const p = plan([{ kind: 'dial', range: 500, shotCount: 5 }], chrono)
+    expect(p.refusals).toEqual([])
+    expect(find(p, 'dragFactor').reasons).toContain('collinear')
+    expect(find(p, 'clickValue').reasons).toContain('collinear')
+  })
+
+  it('a chronograph at the muzzle alone cannot identify drag factor', () => {
+    const p = plan([], chrono)
+    expect(find(p, 'dragFactor').status).toBe('unresolved')
+    expect(find(p, 'muzzleVelocity').status).toBe('identified')
+  })
+
+  it('two dial entries at two distances pass without refusal and the statuses show what is open', () => {
+    const p = plan([
+      { kind: 'dial', range: 300, shotCount: 5 },
+      { kind: 'dial', range: 900, shotCount: 5 },
+    ])
+    expect(p.refusals).toEqual([])
+    expect(p.parameters.some((q) => q.status !== 'identified')).toBe(true)
+  })
+
+  it('a chronograph and one impact entry leave drag factor and zero offset confounded', () => {
+    const p = planTruingStrings(
+      {
+        shot: nominal,
+        clickValue: click,
+        dispersion,
+        entries: [{ kind: 'impact', range: 500, shotCount: 5 }],
+        chronograph: chrono,
+      },
+      { fitZeroOffset: true },
+    )
+    expect(p.refusals).toEqual([])
+    expect(find(p, 'dragFactor').status).not.toBe('identified')
+    expect(find(p, 'zeroOffset').status).not.toBe('identified')
+  })
+})
