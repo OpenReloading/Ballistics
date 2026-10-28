@@ -2,6 +2,7 @@
 import type { Scale } from './bullet-photo.ts'
 import type { BulletMeasurement } from './bullet-photo-measure.ts'
 import type { Outline } from './bullet-photo-outline.ts'
+import type { Known } from './bullet-photo-scale.ts'
 import type { Point } from './target-geometry.ts'
 
 export type WorkerRequest =
@@ -16,7 +17,10 @@ export type WorkerRequest =
       alpha: Uint8Array
       width: number
       height: number
-      scale: Scale
+      /** The scale of the ruler's points; absent without a ruler. */
+      scale?: Scale | undefined
+      /** Sizes measured with a caliper: they give the scale without a ruler and check it with one. */
+      known?: Known | undefined
       angle?: number | undefined
       /** The width the cut-out's edge is spread over, px, as `segmented` told; absent for a cut-out corrected by hand. */
       edgeSpread?: number | undefined
@@ -31,6 +35,8 @@ export type WorkerReply =
       id: number
       outline?: Outline
       measurement?: BulletMeasurement
+      /** The scale the measurement is made at: the ruler's, else the known sizes'; absent when there is none and the values are in px. */
+      scale?: Scale
       hints: string[]
       unusable?: string
     }

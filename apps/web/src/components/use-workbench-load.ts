@@ -42,6 +42,7 @@ import { runBatch } from '../lib/batch.ts'
 import { fitOf } from '../lib/bullet-fit.ts'
 import { workbenchDesign } from '../lib/cartridge-designer.ts'
 import { type OwnCase, ownCases } from '../lib/case-group.ts'
+import { timeText } from '../lib/dates.ts'
 import { errorText } from '../lib/error-text.ts'
 import { loadExample } from '../lib/example-data.ts'
 import { exampleFields } from '../lib/examples.ts'
@@ -2000,7 +2001,7 @@ export function useWorkbenchState() {
       selected: first,
       direction,
       ladder: ladderOf(plan, ladderKind, seatAt?.lengthKind),
-      at: new Date().toLocaleTimeString('en-GB'),
+      at: timeText(new Date()),
       id: runs.current,
       bulkDensity: a.bulkDensity,
       cartridge: body.cartridge,

@@ -11,6 +11,7 @@ import {
   toSi,
 } from '@open-reloading/schema'
 import { type RefObject, useEffect, useMemo, useRef, useState } from 'react'
+import { fixedNumber } from '../i18n/number.ts'
 import {
   disciplineChoice,
   disciplineFaces,
@@ -67,7 +68,7 @@ const ownRuleNote =
 
 /** A shot's value as shown: tenths where the face has them, X for an inner ten. */
 export const shotText = (s: RingScore) =>
-  `${s.decimal !== undefined ? s.decimal.toFixed(1) : s.value}${s.innerTen ? ' X' : ''}`
+  `${s.decimal !== undefined ? fixedNumber(s.decimal, 1) : s.value}${s.innerTen ? ' X' : ''}`
 
 /** A group's scoring when it scored: none while its face loads, after a failure or a refusal. */
 export const scoredOnly = (r: Scoring | 'loading' | 'error' | undefined) =>
@@ -78,7 +79,7 @@ export function scoreLine(r: Scoring | 'loading' | 'error' | undefined) {
   const scored = scoredOnly(r)
   if (!scored) return
   const { total, decimalTotal, innerTenCount: xCount } = scored.score
-  return `${total}${decimalTotal !== undefined ? ` (${decimalTotal.toFixed(1)})` : ''}, ${xCount} X`
+  return `${total}${decimalTotal !== undefined ? ` (${fixedNumber(decimalTotal, 1)})` : ''}, ${xCount} X`
 }
 
 /** One group's score: none without a face, loading, failed, or the scoring. */
@@ -128,7 +129,7 @@ function scoreStatus(o: {
   if (!result) return 'Loading the face…'
   if (!choice.marks) return 'Centred on the point of aim (or the origin) at the sheet scale.'
   const misfit = mmLength(system, fromSi('length', result.alignment.rms ?? 0))
-  return `Fitted to ${choice.marks.length} marks, misfit ${misfit}, scale ${(result.alignment.scale * 100).toFixed(1)} %.`
+  return `Fitted to ${choice.marks.length} marks, misfit ${misfit}, scale ${fixedNumber(result.alignment.scale * 100, 1)} %.`
 }
 
 /** The Face select's options: the discipline's stages in the rule book's order, else the faces. */

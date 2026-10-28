@@ -1,9 +1,10 @@
 'use client'
 
 import { useMemo } from 'react'
+import { formatNumber, plainNumber } from '../i18n/number.ts'
 import type { BarrelRow } from '../lib/barrel-length.ts'
 import { niceTicks } from '../lib/ticks.ts'
-import { formatNumber, formatQuantity, type UnitSystem } from '../lib/units.ts'
+import { formatQuantity, type UnitSystem } from '../lib/units.ts'
 import { EChart, tickStep, useChartTokens } from './echart.tsx'
 import type { BarrelStep } from './use-barrel-study.ts'
 
@@ -46,7 +47,7 @@ const valueAxis = (
     axisLabel: {
       color,
       fontSize: 12,
-      formatter: (v: number) => String(Number(v.toPrecision(10))),
+      formatter: (v: number) => plainNumber(Number(v.toPrecision(10))),
     },
     axisLine: { show: true, lineStyle: { color } },
     splitLine: { show: side === 'left', lineStyle: { color: theme.border } },

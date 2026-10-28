@@ -4,6 +4,8 @@ import { Button, Popover, UnstyledButton } from '@mantine/core'
 import { freeRecoil } from '@open-reloading/core'
 import { fromSi } from '@open-reloading/schema'
 import { memo, useEffect, useRef } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import { formatNumber, plainNumber } from '../i18n/number.ts'
 import type { ErrorBody, InteriorResponse } from '../lib/api-types.ts'
 import {
   describeCurve,
@@ -17,7 +19,6 @@ import { ladderTitle, seatingLengthName } from '../lib/seating-ladder.ts'
 import { controlSize } from '../lib/theme.ts'
 import { niceTicks } from '../lib/ticks.ts'
 import {
-  formatNumber,
   formatQuantity,
   inchText,
   msText,
@@ -71,7 +72,7 @@ const invalidRunText: Record<string, string> = {
 /** A limit as stored: bar with the record's decimals, and psi. */
 function limitValue(l: NonNullable<InteriorResponse['limits']>[number]) {
   if (l.pressure === undefined) return ''
-  return `${+fromSi('pressure', l.pressure).toPrecision(12)} bar (${formatNumber(l.pressure / psi, 0)} psi)`
+  return `${plainNumber(+fromSi('pressure', l.pressure).toPrecision(12))} bar (${formatNumber(l.pressure / psi, 0)} psi)`
 }
 
 function yesNo(value: boolean | undefined) {
@@ -546,6 +547,7 @@ export function LimitsView({
   body: InteriorResponse
   system?: UnitSystem | undefined
 }) {
+  useTranslation()
   const resolved = body.resolved?.cartridge
   if (!body.limits || body.limits.length === 0)
     return (
@@ -613,6 +615,8 @@ export const BurnRate = memo(function BurnRate({
   /** The chart's height, px. */
   height: number
 }) {
+  // memoized: the numbers of its text and chart are written in the language shown
+  useTranslation()
   return (
     <div className="burn-rate">
       {isFitted(p) ? (

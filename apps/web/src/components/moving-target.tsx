@@ -2,9 +2,10 @@
 
 import type { TrajectoryPoint } from '@open-reloading/core'
 import { useState } from 'react'
+import { formatNumber } from '../i18n/number.ts'
 import { type FieldSpec, type Fields, fieldError, initialFields } from '../lib/field-spec.ts'
 import { movingTargetRows } from '../lib/moving-target.ts'
-import { formatNumber, formatQuantity, type UnitSystem } from '../lib/units.ts'
+import { formatQuantity, type UnitSystem } from '../lib/units.ts'
 import { NumberField } from './number-field.tsx'
 import { PanelTable } from './scroll-region.tsx'
 import { useFieldUnits } from './units-settings.tsx'

@@ -8,6 +8,7 @@ import {
   userRecord,
 } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
+import { ambiguousMessage } from '../src/i18n/number.ts'
 import { nth } from '../src/lib/nth.ts'
 import {
   addShot,
@@ -254,6 +255,10 @@ it('reads the weather typed in the units shown and writes it in the stored ones'
   })
   expect(parseWeather({ temperature: 'x', pressure: '', wind: '' }, units)).toEqual({
     error: 'Enter the temperature as a number.',
+  })
+  // a text that could be read two ways says so, not "as a number"
+  expect(parseWeather({ temperature: '', pressure: '1,013', wind: '' }, units)).toEqual({
+    error: ambiguousMessage({ kind: 'ambiguous', decimal: 1.013, grouped: 1013 }),
   })
   expect(parseWeather({ temperature: '', pressure: '0', wind: '' }, units)).toHaveProperty('error')
   expect(parseWeather({ temperature: '', pressure: '', wind: '-1' }, units)).toHaveProperty('error')

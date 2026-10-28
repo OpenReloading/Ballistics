@@ -1,10 +1,11 @@
 /** The cartridge list's rows: search text, cells and the packed page props. */
 import { toSi } from '@open-reloading/schema'
+import { formatNumber } from '../i18n/number.ts'
 import type { CartridgeSummary } from './api-types.ts'
 import { caliberLabel, commonCaliber } from './caliber.ts'
 import { present } from './directory.ts'
 import { matchesQuery } from './lists.ts'
-import { formatNumber, inchText, type UnitSystem } from './units.ts'
+import { inchText, type UnitSystem } from './units.ts'
 
 /** A cartridge row of the list: the summary without its table (CIP on every row). */
 export type CartridgeRow = Omit<CartridgeSummary, 'table'> & { origin?: 'user' | undefined }

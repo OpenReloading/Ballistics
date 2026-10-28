@@ -29,6 +29,7 @@ import {
   useRef,
   useState,
 } from 'react'
+import { canonicalNumberText } from '../i18n/number.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import { errorText } from '../lib/error-text.ts'
 import { loadExample } from '../lib/example-data.ts'
@@ -166,7 +167,7 @@ function firearmColumns(
       help: 'Zero range of that optic.',
       num: true,
       width: '5.5rem',
-      value: (r) => Number(cells(r).zero) || undefined,
+      value: (r) => Number(canonicalNumberText(cells(r).zero)) || undefined,
       cell: (r) => cells(r).zero,
     },
     {

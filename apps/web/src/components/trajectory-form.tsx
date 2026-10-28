@@ -31,6 +31,7 @@ import {
   useState,
 } from 'react'
 import { flushSync } from 'react-dom'
+import { formatNumber } from '../i18n/number.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { BulletSummary } from '../lib/api-types.ts'
 import { bulletDrag } from '../lib/bullet.ts'
@@ -57,13 +58,7 @@ import {
   trajectoryResult,
   zeroKeys,
 } from '../lib/trajectory-input.ts'
-import {
-  formatNumber,
-  formatQuantity,
-  roundedFieldText,
-  type UnitSystem,
-  withUnit,
-} from '../lib/units.ts'
+import { formatQuantity, roundedFieldText, type UnitSystem, withUnit } from '../lib/units.ts'
 import { storedRecords } from '../lib/user-store.ts'
 import { type UserBulletView, userBullets } from '../lib/variants.ts'
 import { HitProbability } from './hit-probability.tsx'

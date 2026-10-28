@@ -1,5 +1,6 @@
+import { formatNumber } from '../i18n/number.ts'
 import { type RateDomain, rateAt, rateTicks } from '../lib/burn-rate.ts'
-import { formatNumber } from '../lib/units.ts'
+import { Decimal } from './decimal.tsx'
 
 /** Width of the scale in px: the list's cells and its header ticks share it. */
 export const scaleWidth = 160
@@ -17,7 +18,7 @@ export function RateTicks({ domain }: { domain: RateDomain }) {
     <svg width={scaleWidth} height="14" aria-hidden="true" className="rate-ticks">
       {labelTicks(domain).map((t) => (
         <text key={t} x={x(domain, t)} y="11" textAnchor="middle">
-          {formatNumber(t, t < 1 ? 1 : 0)}
+          <Decimal text={formatNumber(t, t < 1 ? 1 : 0)} />
         </text>
       ))}
     </svg>

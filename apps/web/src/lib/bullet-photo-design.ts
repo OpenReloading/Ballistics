@@ -3,6 +3,8 @@
  * note that keeps their uncertainties, the lines of the values table and the comparison with a
  * catalogue record (`apps/docs/docs/models/bullet-photo.md`).
  */
+
+import { fixedNumber } from '../i18n/number.ts'
 import { type Design, type DesignerSpec, designerSpecs } from './bullet-designer.ts'
 import type { Scale } from './bullet-photo.ts'
 import {
@@ -38,14 +40,14 @@ export function valueText(s: DesignerSpec, system: UnitSystem, v: Measured): str
   const unit = system[s.quantity]
   const u = shown(s, system, v.uncertainty, true)
   const d = decimalsFor(u, unit.decimals)
-  const text = `${shown(s, system, v.value, false).toFixed(d)} ± ${u.toFixed(d)}`
+  const text = `${fixedNumber(shown(s, system, v.value, false), d)} ± ${fixedNumber(u, d)}`
   return unit.symbol ? `${text} ${unit.symbol}` : text
 }
 
 /** A stored value in the units of `system`, with its symbol. */
 export function storedText(s: DesignerSpec, system: UnitSystem, stored: number): string {
   const unit = system[s.quantity]
-  const text = shown(s, system, stored, false).toFixed(unit.decimals)
+  const text = fixedNumber(shown(s, system, stored, false), unit.decimals)
   return unit.symbol ? `${text} ${unit.symbol}` : text
 }
 
@@ -87,16 +89,20 @@ export function photoRows(
   })
 }
 
-/** What a measurement was made from: the cut-out, the scale and the fixed axis direction (undefined when found). */
+/** What a measurement was made from: the cut-out, the ruler's scale, the caliper sizes and the fixed axis direction (undefined when found). */
 export interface MeasuredInputs {
   cut: unknown
   scale: Scale | undefined
   axis: number | undefined
+  known?: unknown
 }
 
-/** Whether a measurement made from `made` still answers the inputs `now`: the same cut-out and scale objects and axis. */
+/** Whether a measurement made from `made` still answers the inputs `now`: the same cut-out, scale and caliper size objects and axis. */
 export const measuredFor = (made: MeasuredInputs, now: MeasuredInputs): boolean =>
-  made.cut === now.cut && made.scale === now.scale && made.axis === now.axis
+  made.cut === now.cut &&
+  made.scale === now.scale &&
+  made.known === now.known &&
+  made.axis === now.axis
 
 /** What the note says about the photograph: its size and scale, never its file. */
 export interface PhotoFacts {

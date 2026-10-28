@@ -1,8 +1,9 @@
 import { fillLoadRatioLimit, loadRatio, solidFill, solidFillLimit } from '@open-reloading/core'
 import { fromSi, sheetId, toSi } from '@open-reloading/schema'
+import { formatNumber } from '../i18n/number.ts'
 import type { InteriorResponse } from './api-types.ts'
 import type { LadderDirection } from './seating-ladder.ts'
-import { formatNumber, formatQuantity, inchText, type UnitSystem } from './units.ts'
+import { formatQuantity, inchText, type UnitSystem } from './units.ts'
 
 /** Input panels of the load workbench, in reading order. */
 const panelOrder = ['cartridge', 'bullet', 'powder', 'firearm'] as const

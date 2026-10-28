@@ -13,9 +13,10 @@ import {
 import { toSi } from '@open-reloading/schema'
 import { Backspace, Camera, Gauge } from '@phosphor-icons/react'
 import Link from 'next/link'
+import { decimalMark, formatNumber } from '../i18n/number.ts'
 import type { RangeStep } from '../lib/range-entry.ts'
 import { rangeStats } from '../lib/range-entry.ts'
-import { formatNumber, type UnitSystem, withUnit } from '../lib/units.ts'
+import { type UnitSystem, withUnit } from '../lib/units.ts'
 import { BarCount, PageBar } from './page-bar.tsx'
 import { EmptyNote, Message } from './states.tsx'
 import { useOnline, useRangeMode } from './use-range-mode.ts'
@@ -110,18 +111,22 @@ export function RangeMode() {
                   onChange={(e) => r.setEntry(e.currentTarget.value)}
                 />
                 <SimpleGrid cols={3} spacing="xs" aria-label="Number pad" role="group">
-                  {padKeys.map((k) => (
-                    <Button
-                      key={k}
-                      type="button"
-                      variant="default"
-                      h={56}
-                      fz="xl"
-                      onClick={() => r.append(k)}
-                    >
-                      {k}
-                    </Button>
-                  ))}
+                  {padKeys.map((key) => {
+                    // the decimal key writes the mark of the language shown
+                    const k = key === '.' ? decimalMark() : key
+                    return (
+                      <Button
+                        key={key}
+                        type="button"
+                        variant="default"
+                        h={56}
+                        fz="xl"
+                        onClick={() => r.append(k)}
+                      >
+                        {k}
+                      </Button>
+                    )
+                  })}
                   <Button
                     type="button"
                     variant="default"

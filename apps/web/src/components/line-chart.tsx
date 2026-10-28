@@ -2,8 +2,8 @@
 
 import type { ECharts } from 'echarts/core'
 import { createContext, type ReactNode, useContext, useMemo, useState } from 'react'
+import { formatNumber } from '../i18n/number.ts'
 import { niceTicks, tickDecimals } from '../lib/ticks.ts'
-import { formatNumber } from '../lib/units.ts'
 import { EChart, tickStep, useChartTokens } from './echart.tsx'
 
 const lineTokens = { muted: '--muted', border: '--border', link: '--link', bg: '--bg', fg: '--fg' }

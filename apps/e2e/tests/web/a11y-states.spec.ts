@@ -5,7 +5,7 @@ import { height, problems, schemes, tall, widths } from './a11y.ts'
 import { barButton } from './bar.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
-import { loadForm } from './workbench.ts'
+import { applyExampleLoad, loadForm } from './workbench.ts'
 import { runExample } from './workbench-run.ts'
 
 // The states a visitor reaches after a click: a record page of each `[id]` route, the workbench
@@ -94,6 +94,8 @@ const states: State[] = [
     scrolls: true as const,
     open: async (page: Page, check: (view: string) => Promise<void>) => {
       await gotoHydrated(page, `/${dir}/${id}`)
+      // the record page renders from its data files once they are read
+      await expect(page.locator('#record-sources')).toBeAttached()
       await page.waitForLoadState('networkidle')
       await check('page')
     },
@@ -181,6 +183,16 @@ const states: State[] = [
     },
   },
   {
+    name: 'Page actions',
+    open: async (page, check) => {
+      await gotoHydrated(page, '/workbench')
+      // from 75em the bar shows its actions without the panel
+      const toggle = page.getByRole('button', { name: 'Page actions' }).locator('visible=true')
+      if (await toggle.count()) await toggle.click()
+      await check('panel', '.page-bar')
+    },
+  },
+  {
     name: 'Choose a bullet',
     open: async (page, check) => {
       await gotoHydrated(page, '/workbench?cartridge=308-win')
@@ -221,3 +233,56 @@ for (const width of widths)
         })
         expect(found).toEqual([])
       })
+
+for (const width of [320, 390]) {
+  test(`the Page actions panel is inside the window at ${width} px`, async ({ page }) => {
+    await page.setViewportSize({ width, height })
+    await gotoHydrated(page, '/workbench')
+    await page.getByRole('button', { name: 'Page actions' }).click()
+    const box = await page.locator('.page-bar-actions').boundingBox()
+    expect(box?.x).toBeGreaterThanOrEqual(0)
+    expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(width)
+  })
+}
+
+// WCAG 1.4.4: at 200 % text the panel keeps inside the window and its rows wrap
+test('the Page actions panel is inside the window at 320 px with 200 % text', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height })
+  await gotoHydrated(page, '/workbench')
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = '200%'
+  })
+  await page.getByRole('button', { name: 'Page actions' }).click()
+  const panel = page.locator('.page-bar-actions')
+  const box = await panel.boundingBox()
+  expect(box?.x).toBeGreaterThanOrEqual(0)
+  expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(320)
+  // no row reaches past the panel's edge
+  expect(await panel.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true)
+})
+
+// WCAG 2.5.8: the note buttons of a case length variants matrix (a cartridge whose values have notes)
+for (const width of widths) {
+  test(`the note buttons of the variants matrix are 24 px high at ${width} px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: tall })
+    await gotoHydrated(page, '/cartridges/12')
+    const notes = page.locator('.variant-matrix th .field-note')
+    await expect(notes.first()).toBeVisible()
+    for (const note of await notes.all())
+      expect((await note.boundingBox())?.height).toBeGreaterThanOrEqual(24)
+  })
+}
+
+test('the selected segment of a segmented control has a border in forced colours', async ({
+  page,
+}) => {
+  await page.emulateMedia({ forcedColors: 'active' })
+  await gotoHydrated(page, '/workbench')
+  await applyExampleLoad(page)
+  const indicator = loadForm(page).locator('.mantine-SegmentedControl-indicator').first()
+  await expect(indicator).toBeVisible()
+  // forced colours remove the fill: the border is all that marks the segment
+  await expect(indicator).toHaveCSS('border-top-width', '2px')
+})

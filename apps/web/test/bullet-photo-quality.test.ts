@@ -8,6 +8,8 @@ import { minWidthPx, outlineHints } from '../src/lib/bullet-photo-quality.ts'
 import { type PhotoSpec, renderPhoto } from '../src/lib/bullet-photo-sample.ts'
 import { defined } from './defined.ts'
 
+const area = (s: { alpha: Uint8Array }) => s.alpha.reduce((n, v) => n + (v >= 128 ? 1 : 0), 0)
+
 const shape: BulletDimensions = {
   diameter: 7.82,
   length: 30,
@@ -89,6 +91,77 @@ describe('a photograph that is hard to cut out', () => {
   })
 })
 
+describe('a bullet darker than the paper on one side and brighter on the other', () => {
+  /** The photograph of `s` with the bullet's lower half recoloured pale copper, brighter than the grey paper. */
+  function highlighted(s: PhotoSpec) {
+    const photo = renderPhoto(s)
+    const { data, width } = photo.image
+    for (let y = s.base.y + 1; y < s.base.y + 100; y++)
+      for (let x = s.base.x; x < s.base.x + 30 * s.pxPerMm; x++) {
+        const i = 4 * (y * width + x)
+        const cover = Math.min(1, Math.max(0, (s.paper - (data[i] ?? 0)) / (s.paper - s.bullet)))
+        ;[235, 190, 170].forEach((v, c) => {
+          data[i + c] = s.paper + cover * (v - s.paper)
+        })
+      }
+    return photo
+  }
+
+  it('is cut out whole where the brightness alone gives the dark half', () => {
+    const s = spec({ paper: 150, bullet: 100, angle: 0 })
+    const photo = highlighted(s)
+    const span = defined(photo.span)
+    const covered = (a: Uint8Array) => a.filter((v) => v >= 128).length
+    const luma = segment(grayOf(photo.image), [span.a, span.b])
+    const seg = segmentPhoto(photo.image, [span.a, span.b])
+    expect(covered(luma.alpha)).toBeLessThan(0.7 * covered(seg.alpha))
+    const outline = defined(fitOutline(seg, { edgeSpread: seg.edgeSpread }))
+    const scale = defined(scaleOf([span]))
+    expect(Math.abs(outline.length / scale.pxPerMm - 30)).toBeLessThan(0.2)
+    expect(defined(measureOutline(outline, scale).values.diameter).value).toBeCloseTo(7.82, 0)
+  })
+})
+
+describe('more than one bullet in the photograph', () => {
+  it('says that another object is in the photograph, and says nothing for a single bullet', () => {
+    const tall = {
+      height: 560,
+      ruler: { x0: 20, y: 470, heightPx: 50, lengthMm: 30, toEdges: true },
+    }
+    const [a, b] = [
+      spec({ ...tall, base: { x: 130, y: 100 } }),
+      spec({ ...tall, base: { x: 130, y: 290 } }),
+    ]
+    const [one, two] = [renderPhoto(a), renderPhoto(b)]
+    const both = one.image.data.map((v, i) => Math.min(v, two.image.data[i] ?? v))
+    const image = { ...one.image, data: both }
+    const span = defined(one.span)
+    const seg = segmentPhoto(image, [span.a, span.b])
+    expect(seg.warnings.join(' ')).toMatch(/Another object/)
+    expect(segmentPhoto(one.image, [span.a, span.b]).warnings.join(' ')).not.toMatch(
+      /Another object/,
+    )
+  })
+})
+
+describe('a photograph of more than 900 px', () => {
+  it('is cut at its own size and gives the same bullet', () => {
+    const big = spec({
+      pxPerMm: 40,
+      width: 1800,
+      height: 840,
+      base: { x: 260, y: 400 },
+      ruler: { x0: 40, y: 680, heightPx: 100, lengthMm: 30, toEdges: true },
+    })
+    const photo = renderPhoto(big)
+    const span = defined(photo.span)
+    const seg = segmentPhoto(photo.image, [span.a, span.b])
+    expect([seg.width, seg.height, seg.alpha.length]).toEqual([1800, 840, 1800 * 840])
+    const outline = defined(fitOutline(seg, { edgeSpread: seg.edgeSpread }))
+    expect(Math.abs(outline.length / 40 - 30)).toBeLessThan(0.2)
+  })
+})
+
 describe('soft edges', () => {
   it('flags a blurred photograph and widens the uncertainty', () => {
     const sharp = measured(spec())
@@ -117,6 +190,13 @@ describe('the size of the bullet in the photograph', () => {
     r: Array.from({ length: length - 2 }, () => halfWidth),
     ambiguous: false,
     edge: 0.3,
+  })
+
+  it('names no ragged edge where no cut-out was found', () => {
+    const grey = { width: 80, height: 60, data: new Uint8ClampedArray(80 * 60 * 4).fill(120) }
+    const seg = segmentPhoto(grey)
+    expect(area(seg)).toBe(0)
+    expect(seg.warnings.join(' ')).not.toMatch(/ragged/)
   })
 
   it('refuses a bullet too narrow to measure and says how to fix it', () => {

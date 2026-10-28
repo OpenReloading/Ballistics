@@ -1,6 +1,7 @@
+import { formatNumber } from '../i18n/number.ts'
 import type { ChargeRow } from '../lib/measurements.ts'
 import { seriesFlatSpots } from '../lib/measurements.ts'
-import { formatNumber, type UnitSystem, withUnit } from '../lib/units.ts'
+import { type UnitSystem, withUnit } from '../lib/units.ts'
 import { PanelTable } from './scroll-region.tsx'
 
 const columns = ['Charges', 'Shots', 'Slope', 'Band', 'Flat'] as const

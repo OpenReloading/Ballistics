@@ -1,4 +1,6 @@
 /** The workbench interior chart: curves, events, limit lines and the ECharts option. */
+
+import { plainNumber } from '../i18n/number.ts'
 import type { InteriorResponse } from './api-types.ts'
 import { nth } from './nth.ts'
 import { type PlaybackResult, type PlaybackSample, sampler } from './playback.ts'
@@ -219,7 +221,7 @@ const curveMarkers: Record<ChartQuantity, 'circle' | 'rect' | 'diamond'> = {
 
 type LimitLine = { y: number; label: string }
 /** Plain numbers as elsewhere in the app: no grouping, no float noise. */
-const plain = (v: number) => String(Number(v.toPrecision(10)))
+const plain = (v: number) => plainNumber(Number(v.toPrecision(10)))
 const axisLine = (color: string) => ({ show: true, lineStyle: { color } })
 
 /** Mark line data of the events of the selected step: dashed, the label in its row. */

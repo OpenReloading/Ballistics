@@ -1,0 +1,85 @@
+import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
+import { test } from 'node:test'
+import { fileURLToPath } from 'node:url'
+import { entryErrors, entryFiles, sections } from './research-log.mts'
+
+const root = fileURLToPath(new URL('../../../', import.meta.url))
+const dir = fileURLToPath(new URL('../docs/research/', import.meta.url))
+
+const entry = (skip = '') =>
+  sections
+    .filter((s) => s !== skip)
+    .map(
+      (s) =>
+        `## ${s}\n\n${{ Result: 'No change.', 'Data basis': 'Analytic.', Confidence: 'High, exact.' }[s] ?? 'Text `apps/docs/scripts/research-log.mts`.'}\n`,
+    )
+    .join('\n')
+
+test('an entry with every section passes and one without a section fails', () => {
+  assert.deepEqual(entryErrors(entry(), root), [])
+  for (const s of sections)
+    assert.deepEqual(entryErrors(entry(s), root), [`section "${s}" is missing or empty`])
+})
+
+test('a fixed answer and the named files are checked', () => {
+  assert.deepEqual(entryErrors(entry().replaceAll('No change.', 'Better.'), root), [
+    '"Result" must start with improved, no change, worse',
+  ])
+  assert.deepEqual(entryErrors(entry().replaceAll('research-log.mts', 'nope.mts'), root), [
+    'no file apps/docs/scripts/nope.mts',
+  ])
+})
+
+test('a comment-only section, a longer word as answer and a missing extensionless file fail', () => {
+  const comment = `${entry('Method')}\n## Method\n\n<!-- TODO -->\n`
+  assert.deepEqual(entryErrors(comment, root), ['section "Method" is missing or empty'])
+  const nested = `${entry('Method')}\n## Method\n\n<!<!-- x -->-- TODO -->\n`
+  assert.deepEqual(entryErrors(nested, root), ['section "Method" is missing or empty'])
+  assert.deepEqual(entryErrors(entry().replaceAll('High, exact.', 'Highly unsure.'), root), [
+    '"Confidence" must start with high, medium, low',
+  ])
+  assert.deepEqual(entryErrors(entry().replaceAll('research-log.mts', 'Dockerfil'), root), [
+    'no file apps/docs/scripts/Dockerfil',
+  ])
+})
+
+test('a commented-out section heading and a missing root-level file fail', () => {
+  const hidden = `${entry('Numbers')}\n<!--\n## Numbers\nPlaceholder\n-->\n`
+  assert.deepEqual(entryErrors(hidden, root), ['section "Numbers" is missing or empty'])
+  assert.deepEqual(
+    entryErrors(entry().replaceAll('apps/docs/scripts/research-log.mts', 'README.typo.md'), root),
+    ['no file README.typo.md'],
+  )
+  assert.deepEqual(
+    entryErrors(entry().replaceAll('apps/docs/scripts/research-log.mts', 'README.md'), root),
+    [],
+  )
+  assert.deepEqual(
+    entryErrors(
+      entry().replaceAll('apps/docs/scripts/research-log.mts', 'ellipseProbability'),
+      root,
+    ),
+    [],
+  )
+})
+
+test('a heading inside a fenced block, a directory and a missing ./ root file fail', () => {
+  const fenced = `${entry('Numbers')}\n\`\`\`md\n## Numbers\n\nPlaceholder\n\`\`\`\n`
+  assert.deepEqual(entryErrors(fenced, root), ['section "Numbers" is missing or empty'])
+  const path = 'apps/docs/scripts/research-log.mts'
+  assert.deepEqual(entryErrors(entry().replaceAll(path, 'apps/docs/scripts'), root), [
+    'no file apps/docs/scripts',
+  ])
+  assert.deepEqual(entryErrors(entry().replaceAll(path, './LICENSE'), root), [])
+  assert.deepEqual(entryErrors(entry().replaceAll(path, './LICENCE'), root), ['no file ./LICENCE'])
+})
+
+test('every research log entry has all fields', () => {
+  const files = entryFiles(dir)
+  assert.ok(files.length > 0)
+  const errors = files.flatMap((f) =>
+    entryErrors(readFileSync(dir + f, 'utf8'), root).map((e) => `${f}: ${e}`),
+  )
+  assert.deepEqual(errors, [])
+})
