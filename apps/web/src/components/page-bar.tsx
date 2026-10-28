@@ -1,6 +1,6 @@
 'use client'
 
-import { ActionIcon } from '@mantine/core'
+import { ActionIcon, Tooltip } from '@mantine/core'
 import { useMounted } from '@mantine/hooks'
 import { DotsThree } from '@phosphor-icons/react'
 import {
@@ -14,6 +14,7 @@ import {
 } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import type { Message } from '../i18n/translate.ts'
+import { tipEvents } from '../lib/theme.ts'
 import { SafetyBarButton } from './safety-dialog.tsx'
 
 /**
@@ -43,6 +44,27 @@ export function BarCount({
       {children}
     </span>
   )
+}
+
+/** The text of `box`'s innermost elements joined by spaces, kept current; the File menu portals into it. */
+function useWholeText(box: HTMLElement | null) {
+  const [text, setText] = useState('')
+  useEffect(() => {
+    if (!box) return
+    const read = () =>
+      setText(
+        Array.from(box.querySelectorAll('*'))
+          .filter((e) => e.childElementCount === 0)
+          .map((e) => e.textContent?.trim())
+          .filter(Boolean)
+          .join(' '),
+      )
+    read()
+    const watch = new MutationObserver(read)
+    watch.observe(box, { childList: true, subtree: true, characterData: true })
+    return () => watch.disconnect()
+  }, [box])
+  return text
 }
 
 /**
@@ -94,6 +116,7 @@ export function PageBar({
   const { t } = useTranslation()
   const title = translated ? t(given) : given
   const [statusLine, setStatusLine] = useState<HTMLDivElement | null>(null)
+  const full = useWholeText(statusLine)
   const [open, setOpen] = useState(false)
   const toggle = useRef<HTMLButtonElement>(null)
   const root = useRef<HTMLDivElement>(null)
@@ -128,10 +151,13 @@ export function PageBar({
         </h1>
         {after}
       </div>
-      <div className="page-bar-status" ref={setStatusLine}>
-        {/* the File menu's state text sets the line height of a final status: the same class here */}
-        {status ?? (reserve ? <span className="file-state">{'\u00a0'}</span> : undefined)}
-      </div>
+      {/* the line ends in an ellipsis where it is too long: its whole text on hover, focus and tap */}
+      <Tooltip label={full} events={tipEvents} multiline maw={320} disabled={!full}>
+        <div className="page-bar-status" ref={setStatusLine} tabIndex={full ? 0 : undefined}>
+          {/* the File menu's state text sets the line height of a final status: the same class here */}
+          {status ?? (reserve ? <span className="file-state">{'\u00a0'}</span> : undefined)}
+        </div>
+      </Tooltip>
       {actions && single && (
         <div className="page-bar-actions">
           <BarStatus value={statusLine}>{actions}</BarStatus>

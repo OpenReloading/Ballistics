@@ -24,7 +24,11 @@ export function CurveTable({ powders, caption }: { powders: FittedPowder[]; capt
   const { t } = useTranslation()
   const only = powders.length === 1 ? powders[0] : undefined
   const heads = only
-    ? [t('Value, {unit}', { unit: vivacityUnit }), t('Low'), t('High')]
+    ? [
+        t('Value, {unit}', { unit: vivacityUnit }),
+        t('Low, {unit}', { unit: vivacityUnit }),
+        t('High, {unit}', { unit: vivacityUnit }),
+      ]
     : powders.map((p) => t('{name}, {unit}', { name: p.label, unit: vivacityUnit }))
   return (
     <ScrollRegion label={caption}>

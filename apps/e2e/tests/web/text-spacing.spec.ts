@@ -15,18 +15,16 @@ const spacing = `* {
 }
 p { margin-bottom: 2em !important; }`
 
-// record names and the load title keep their ellipsis, with the full text on hover; the page bar's
-// status and the text of the two charts are open findings (A-14, A-15 of the accessibility page)
+// record names, the load title and the page bar's status line keep their ellipsis, with the full
+// text on hover, focus and tap; the text of the two charts is an open finding (A-15 of the
+// accessibility page)
 const names =
   '.load-switch, .load-identity, [role=combobox], .page-bar-status, .interior-chart .echart, .vivacity-chart .echart'
 
-// below 75em the title has two lines in the app header, an open finding (A-11)
-const phone = `${names}, main .page-bar h1`
-
 /** Applies the spacing and expects nothing cut once the layout has settled. */
-async function nothingCut(page: Page, exempt = names) {
+async function nothingCut(page: Page) {
   await page.addStyleTag({ content: spacing })
-  await expect.poll(() => cutText(page, exempt)).toEqual([])
+  await expect.poll(() => cutText(page, names)).toEqual([])
 }
 
 for (const width of [1280, 390])
@@ -37,6 +35,17 @@ for (const width of [1280, 390])
     await page.setViewportSize({ width, height: 800 })
     await runExample(page)
     await nothingCut(page)
+    // the status line's whole text is its tooltip on focus
+    const line = page.locator('.page-bar-status')
+    const whole = await line.evaluate((box) =>
+      Array.from(box.querySelectorAll('*'))
+        .filter((e) => e.childElementCount === 0)
+        .map((e) => e.textContent?.trim())
+        .filter(Boolean)
+        .join(' '),
+    )
+    await line.focus()
+    await expect(page.getByRole('tooltip')).toHaveText(whole)
     if (width === 390) {
       await page.getByRole('tab', { name: 'Results', exact: true }).click()
       await expect.poll(() => cutText(page, names)).toEqual([])
@@ -57,7 +66,7 @@ for (const path of ['/bullets/designer', '/powders/designer', '/targets/designer
   test(`at 320 px ${path} cuts nothing with the spacing`, async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 800 })
     await gotoHydrated(page, path)
-    await nothingCut(page, phone)
+    await nothingCut(page)
   })
 
 // a cartridge with a long name and one with many aliases
@@ -68,5 +77,5 @@ for (const id of ['6mm-me-flobert-court', '22-long-rifle'])
     }) => {
       await page.setViewportSize({ width, height: 800 })
       await gotoHydrated(page, `/cartridges/${id}`)
-      await nothingCut(page, width === 320 ? phone : names)
+      await nothingCut(page)
     })

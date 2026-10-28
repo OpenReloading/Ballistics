@@ -775,10 +775,7 @@ function FileStatus({
   const folder = folderName ? t(', folder {name}', { name: folderName }) : ''
   const shown = !idle
   return (
-    <span
-      className="file-status"
-      title={[shown && `${state}${folder}`, lines, failure].filter(Boolean).join(' ')}
-    >
+    <span className="file-status">
       <span
         className="file-state"
         data-dirty={unsaved || (autosaved && kept === 'failed') || undefined}
@@ -1209,7 +1206,7 @@ function FileMenuOf<K extends UserRecordKind>({
   // an autosaved record is kept in the browser until a file is written
   const state = stateText({ saved, dirty, autosaved, kept, unsaved }, t)
   const ready = folder?.allowed ? folder.handle : undefined
-  // in a page bar the state and messages are its status line: one line, the whole text on hover
+  // in a page bar the state and messages are its status line: one line, the whole text in its tooltip
   const bar = useContext(BarStatus)
   const lines = [message, note, storageNote && t(noStorage)].filter(Boolean).join(' ')
   const status = (
