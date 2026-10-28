@@ -85,46 +85,44 @@ export async function importTexts(files: ImportFile[], io: ImportIo, { t }: Tran
     files: [],
     said: (tr) => reportSaid(total, tr),
   }
-  let count = 0
   const added: UserRecord[] = []
   for (const f of files) {
-    const {
-      records,
-      files: photos,
-      invalid,
-      skipped,
-      notes,
-    } = parseFiles([{ name: f.name, bytes: await f.read() }], undefined, t)
-    count += records.length
-    const plan = planImport(records, (await storedRecords()).records)
     try {
+      const {
+        records,
+        files: photos,
+        invalid,
+        skipped,
+        notes,
+      } = parseFiles([{ name: f.name, bytes: await f.read() }], undefined, t)
+      const plan = planImport(records, (await storedRecords()).records)
       // an equal record may come to a browser without its photo
       await storePhotos(photos, [...plan.added, ...plan.equal])
       await putRecords(plan.added)
+      added.push(...plan.added)
+      total.added += plan.added.length
       // after the valid records, and never over a record with its id
       const stored = await putInvalid(invalid)
       for (const k of ['added', 'kept', 'unstorable'] as const) total.invalid[k] += stored[k]
+      total.equal += plan.equal.length
+      total.skipped.push(...skipped)
+      total.notes.push(...notes)
+      total.conflicts.push(...plan.conflicts)
+      // kept for Replace: only the photos of the records it may store
+      const wanted = new Set(photoIds(plan.conflicts.map((c) => c.incoming)))
+      total.files.push(...photos.filter((p) => wanted.has(p.id)))
     } catch (e) {
       io.fail(({ tn }) =>
         tn(
-          count,
-          'Import read {count} record; the browser store write failed: {error}',
-          'Import read {count} records; the browser store write failed: {error}',
-          { error: errorText(e) },
+          total.added,
+          'Import stored {count} record, then failed on {name}: {error}',
+          'Import stored {count} records, then failed on {name}: {error}',
+          { name: f.name, error: errorText(e) },
         ),
       )
       if (total.added) io.onStored?.()
       return
     }
-    added.push(...plan.added)
-    total.added += plan.added.length
-    total.equal += plan.equal.length
-    total.skipped.push(...skipped)
-    total.notes.push(...notes)
-    total.conflicts.push(...plan.conflicts)
-    // kept for Replace: only the photos of the records it may store
-    const wanted = new Set(photoIds(plan.conflicts.map((c) => c.incoming)))
-    total.files.push(...photos.filter((p) => wanted.has(p.id)))
   }
   // once all files are stored, so a reference to a record of a later file resolves
   const refs = await io.refs(added)

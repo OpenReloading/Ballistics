@@ -2974,9 +2974,9 @@
     "one": "{count} ungültiger Datensatz ist darin unverändert enthalten.",
     "other": "{count} ungültige Datensätze sind darin unverändert enthalten."
   },
-  "Import read {count} record; the browser store write failed: {error}|Import read {count} records; the browser store write failed: {error}": {
-    "one": "Import: {count} Datensatz gelesen; Schreiben in den Browserspeicher fehlgeschlagen: {error}",
-    "other": "Import: {count} Datensätze gelesen; Schreiben in den Browserspeicher fehlgeschlagen: {error}"
+  "Import stored {count} record, then failed on {name}: {error}|Import stored {count} records, then failed on {name}: {error}": {
+    "one": "Import: {count} Datensatz gespeichert, dann bei {name} fehlgeschlagen: {error}",
+    "other": "Import: {count} Datensätze gespeichert, dann bei {name} fehlgeschlagen: {error}"
   },
   "The workspace folder could not be restored; choose it again.": "Der Arbeitsordner konnte nicht wiederhergestellt werden; wählen Sie ihn erneut.",
   "This browser": "Dieser Browser",
