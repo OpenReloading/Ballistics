@@ -12,6 +12,8 @@ Hole detection proposes bullet holes on a target photo, inside a region or the p
 3. A top-hat against a morphological opening gives the hole shape. Three tests keep the real peaks.
 4. Each connected part of the hole mask counts as many shots as it holds peaks.
 
+Detection starts when a photo is added to the sheet: the target search, then the run on the target found. Its result is one line with the target, the scale, the number of holes proposed and the caliber (the bullet's caliber and diameter, else the hole size and its source), each with a change link to its editor, and Accept. Where no bullet, marker, typed or learned size gives the hole size, the line holds the hole size field and the run follows once it is entered. A run without holes and a photo without one sure target go on in the guided steps. A photo below the minimum quality waits for Detect anyway (Photo quality).
+
 The proposals stay apart from the shots until the user accepts them. The code is in `apps/web/src/lib/hole-detection.ts` and `apps/web/src/lib/hole-proposals.ts`.
 
 Cancelling detection, changing the photo, sheet or group, or rotating the photo invalidates pending photo and target reads. Their results and errors cannot start a worker, apply a target or change the detection status.
@@ -164,6 +166,30 @@ $$
 
 Code: `apps/web/src/lib/hole-proposals.ts`, `acceptProposals`.
 
+### Caliber candidates
+
+The result line offers the caliber classes of the group's discipline, the one its target event scores, as one button each; a group without a discipline offers the classes of every discipline on its target. Their order and the class preselected depend on where the hole size $D_0$ comes from.
+
+A nominal size (a bullet or a marker) is compared with the classes' nominal diameters $d_c$. The class nearest to it comes first, with every class within the resolution of its diameter:
+
+$$
+|d_c - d_\mathrm{nearest}| < \Delta_d, \quad \Delta_d = 0.5\ \mathrm{mm}
+$$
+
+Code: `apps/web/src/lib/caliber-candidates.ts`, `caliberCandidates`, `HOLE_SIZE_RESOLUTION`.
+
+Those classes share a hole size: a class of the user's firearms or loads (one of its cartridges) comes first among them. The other classes follow by $|d_c - D_0|$. The nearest class is preselected when no other shares its hole size, else none is.
+
+A typed, learned or measured size is a hole in paper, which shows smaller than its bullet, so it preselects nothing. The classes it fits within the detector's band come first, the user's first among them, then by how near $D_0 / d_c$ is to 1:
+
+$$
+0.7\, d_c \le D_0 \le 1.4\, d_c
+$$
+
+Code: `apps/web/src/lib/caliber-candidates.ts`, `caliberCandidates`, `HOLE_BAND`.
+
+Without a hole size the classes keep their order, the user's first, and none is preselected. Picking a class sets the hole size to its nominal diameter (one undo step) and the run follows; the Caliber item names the class until the size changes another way, such as the size an auto run measures. The class picked is not stored. Proposals stay out of the statistics until accepted.
+
 ### Strays
 
 With four or more proposals, a proposal is dropped as print, stain or background when its nearest other proposal lies farther than four times the median of these nearest distances plus two hole diameters:
@@ -249,7 +275,7 @@ Code: `apps/web/src/lib/hole-detection.ts`, `autoDetect`, `runSeeds`, `SEED_MIN_
 
 ### Photo quality
 
-The target search also checks the photo for what makes holes hard to find, on the photo resized to 2000 px on its longer side, and says what to change when retaking it. A problem has a level: fair (a note) or bad. A photo with a bad problem is below the minimum quality: when the target search finds exactly one sure fit, the one-click run applies the target and waits, and the button reads Detect anyway. With several fits or none the run goes on in the guided steps, which show no Detect anyway. Every other problem is a note beside the run. The check never says that a photo is good or that a detection is right.
+The target search also checks the photo for what makes holes hard to find, on the photo resized to 2000 px on its longer side, and says what to change when retaking it. A problem has a level: fair (a note) or bad. A photo with a bad problem is below the minimum quality: when the target search finds exactly one sure fit, the run on an added photo applies the target and waits, and the button reads Detect anyway. With several fits or none the run goes on in the guided steps, which show no Detect anyway. Every other problem is a note beside the run. The check never says that a photo is good or that a detection is right.
 
 With the black area found (ellipse axes $a \ge b$, centre $c$), the measures are:
 
@@ -316,6 +342,7 @@ Code: `apps/web/src/lib/photo-quality.ts`, `photoQuality`, `belowMinimum`, `layo
 | $A$, $k$ | Area of a part, peaks in it | no kind, 1 | px², 1 |
 | $D_0$, $D'$ | Expected hole size, refined size of a run | mm, no kind | m, px |
 | $d_\mathrm{hole}$ | Measured hole diameter of an accepted shot | mm | m |
+| $d_c$, $d_\mathrm{nearest}$, $\Delta_d$ | Nominal diameter of a caliber class, of the class nearest to the hole size, and the resolution under which classes share a hole size | mm | m |
 | $Y$, $t$ | Luma, Otsu threshold | no kind | 0 to 255 |
 | $\omega_0, \omega_1$, $\mu_0, \mu_1$ | Class weights and mean lumas below and above $t$ | no kind | 1 |
 | $s$ | Photo pixels per mm of a target, from its black diameter | no kind | px/mm |
@@ -335,7 +362,7 @@ Code: `apps/web/src/lib/photo-quality.ts`, `photoQuality`, `belowMinimum`, `layo
 
 ## Limits
 
-- The thresholds and scale sets are the app's own values from a prototype, without a published source. So are the limits of the photo quality check.
+- The thresholds and scale sets are the app's own values from a prototype, without a published source. So is the resolution $\Delta_d$ of the caliber candidates. So are the limits of the photo quality check.
 - The photo quality check reads the black area's ellipse: a target whose black area is not found is judged by brightness, glare and light over the whole photo, edge sharpness and size. A tilt of a photo whose target shows no black area, and a reflection on the black area, are not measured. A black zone that fills the photo of a target that is not selected looks like a dark photo (a fair note). The blur of a photo with thin rings and no hole is not measured. A photo with none of the problems may still give wrong or missing holes.
 - Torn or elongated holes, holes in a printed line and very close holes may be missed or miscounted. The user confirms, moves or deletes each proposal.
 - A hole within half a hole of the photo's edge is not proposed.

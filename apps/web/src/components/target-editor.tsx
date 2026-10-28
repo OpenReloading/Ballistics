@@ -3203,8 +3203,11 @@ export function TargetEditor({
         }),
       )
       if (old) orphans.current.push({ sheet: target, photo: old })
+      // the old photo's size goes, so detection starts on the new one once it has loaded
+      setPhoto(undefined)
+      detect.photoAdded(id)
       setRefKind('line')
-      say(t('Photo kept in this browser. Calibrate: mark a reference to place shots.'))
+      say(t('Photo kept in this browser. Looking for the target and the holes.'))
     } catch {
       say(t('The photo could not be read.'), true)
     }

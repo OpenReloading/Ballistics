@@ -1,6 +1,6 @@
 'use client'
 
-import { ActionIcon, Button, Flex, NativeSelect, Popover } from '@mantine/core'
+import { ActionIcon, Anchor, Button, Flex, NativeSelect, Popover } from '@mantine/core'
 import {
   fromSi,
   type ShotGroup,
@@ -20,6 +20,13 @@ import {
 } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { msg, type Message as Text, type Translator } from '../i18n/translate.ts'
+import { commonCaliber } from '../lib/caliber.ts'
+import {
+  type CandidateClass,
+  caliberCandidates,
+  caliberClassesOf,
+  ownCartridges,
+} from '../lib/caliber-candidates.ts'
 import { ellipsePoint } from '../lib/ellipse.ts'
 import { fetchAllFaces, fetchFace } from '../lib/face-records.ts'
 import { type FoundFace, faceGeometry } from '../lib/face-sheet.ts'
@@ -88,8 +95,9 @@ const workerErrors = [
 
 /**
  * Hole detection in the target editor (`apps/docs/docs/models/hole-detection.md`):
- * one-click auto detection, else the guided steps (rotate, scale, one example hole, detect,
- * review) with the region, backing and threshold behind one Settings disclosure; a Web Worker run
+ * auto detection once a photo is added, its result in one line with Accept, else the guided
+ * steps (rotate, scale, one example hole, detect, review) with the region, backing and threshold
+ * behind one Settings disclosure; a Web Worker run
  * with progress and cancel; the proposals, kept apart from the sheet in photo px until accepted, so
  * no statistic sees them.
  */
@@ -149,6 +157,12 @@ export function useHoleDetection({
   const [held, setHeld] = useState(false)
   /** A face was applied and the auto run waits for the sheet to follow. */
   const awaiting = useRef(false)
+  /** The auto run's result line is shown in place of the start button. */
+  const [result, setResult] = useState(false)
+  /** The hole size field of the result line is open over a known size. */
+  const [sizeOpen, setSizeOpen] = useState(false)
+  /** The id of a photo just added: the auto run starts once it has loaded. */
+  const addedPhoto = useRef<string | undefined>(undefined)
   const [settings, setSettings] = useState(false)
   const gear = useRef<HTMLButtonElement>(null)
   const worker = useRef<Worker | undefined>(undefined)
@@ -196,9 +210,18 @@ export function useHoleDetection({
     setFound(undefined)
     setQuality(undefined)
     setHeld(false)
+    setResult(false)
+    setSizeOpen(false)
     awaiting.current = false
     return stop
   }, [sheet.photo, sheetId, group?.id])
+  // a photo just added: the face search and the auto run start without a click
+  // biome-ignore lint/correctness/useExhaustiveDependencies: once the added photo has loaded
+  useEffect(() => {
+    if (!addedPhoto.current || addedPhoto.current !== sheet.photo || !photo || !group) return
+    addedPhoto.current = undefined
+    start()
+  }, [sheet.photo, photo, group?.id])
   // a turn moves the photo under the proposals
   // biome-ignore lint/correctness/useExhaustiveDependencies: on a turn only
   useEffect(() => {
@@ -206,6 +229,7 @@ export function useHoleDetection({
     setProposals([])
     setFlagged([])
     setFound(undefined)
+    setResult(false)
   }, [turn])
   // the record of the group's face
   const faceId = group?.face?.id
@@ -213,6 +237,7 @@ export function useHoleDetection({
     setRecord(undefined)
     if (faceId) fetchFace(faceId).then(setRecord, () => {})
   }, [faceId])
+  const { candidates, caliber, setCaliber } = useCaliberCandidates(group, size)
   useEffect(() => {
     if (tool !== 'region') setPending([])
   }, [tool])
@@ -314,7 +339,7 @@ export function useHoleDetection({
       },
       (m) => {
         if (m.kind !== 'proposals') return
-        const n = show(m, m.holeDiameter ?? hole0, pxPerM)
+        const n = show(m, m.holeDiameter ?? hole0, pxPerM, auto)
         // the size the holes show, for later runs
         if (n && auto && m.holeDiameter !== undefined)
           setChoice({ expectedHoleDiameter: m.holeDiameter }, 'auto')
@@ -335,11 +360,15 @@ export function useHoleDetection({
       ? ` ${tn(f.length, '{count} area to place by hand (dashed box).', '{count} areas to place by hand (dashed box).')}`
       : ''
 
-  /** A run's proposals and flagged areas on the photo, step 5 when there are any; their count. */
+  /**
+   * A run's proposals and flagged areas on the photo, the result line (`auto`) or step 5 when
+   * there are any; their count.
+   */
   function show(
     m: { proposals: HoleProposal[]; flagged: FlaggedRegion[] },
     hole: number,
     pxPerM: number,
+    auto = false,
   ) {
     if (!group || !frame) return 0
     const list = proposalsClearOfShots(
@@ -351,7 +380,10 @@ export function useHoleDetection({
     setProposals(list)
     setFlagged(m.flagged)
     if (list.length) {
-      setStep(4)
+      if (auto) {
+        setStep(undefined)
+        setResult(true)
+      } else setStep(4)
       say(
         `${t('{count} proposed; accept them to add shots.', { count: list.length })}${flaggedNote(m.flagged)}`,
       )
@@ -457,7 +489,7 @@ export function useHoleDetection({
     if (!awaiting.current || !frame?.calibration || !photo || (group?.face && !record)) return
     awaiting.current = false
     start()
-  }, [frame, record, photo])
+  }, [frame, record, photo, size?.diameter])
 
   /** The user picked a face (and its event) of the choice: its fit from the rings found. */
   async function pickFace(value: string) {
@@ -475,13 +507,18 @@ export function useHoleDetection({
     applyFit(fit, false, event)
   }
 
-  /** The one-click start: the face search, auto detection, else the first guided step that needs the user. */
+  /**
+   * The auto start: the face search, auto detection, else the hole size in the result line or the
+   * first guided step that needs the user.
+   */
   function start() {
     setHeld(false)
-    if (!frame?.calibration) return void recognise(true)
+    setSizeOpen(false)
+    if (!frame?.calibration) return void recognise(true).catch(failed)
     if (!size) {
-      setStep(2)
-      return say(t('Enter the hole size and pick one hole (step 3).'))
+      setStep(undefined)
+      setResult(true)
+      return say(t('Enter the hole size: the holes are found next.'))
     }
     run(true, undefined, (n) => {
       if (!n) setStep(2)
@@ -595,6 +632,7 @@ export function useHoleDetection({
     const added = Math.min(list.length, Math.max(0, 1000 - group.shots.length))
     onGroup((g) => acceptProposals(g, list, frame, runScale.current).group)
     const ids = new Set(list.slice(0, added).map((p) => p.id))
+    if (added === proposals.length) setResult(false)
     setProposals((x) => x.filter((p) => !ids.has(p.id)))
     if (added < list.length) say(t('A group holds at most 1000 shots.'), true)
   }
@@ -658,11 +696,13 @@ export function useHoleDetection({
     if (plane) applyFit(plane, false)
     else if (si) say(t('Find the target first: no black area is known.'), true)
   }
+  /** The number of scale references; undefined while the sheet has no scale. */
+  const references = frame?.calibration ? sheet.references.length : undefined
   const stepBody = [
     <RotateStep key="rotate" turn={turn} running={running} onTurnBy={turnBy} onTurn={onTurn} />,
     <ScaleStep
       key="scale"
-      references={frame?.calibration ? sheet.references.length : undefined}
+      references={references}
       choices={choicesOfFaces}
       chosen={chosenFace(group, choicesOfFaces)}
       running={running}
@@ -721,6 +761,36 @@ export function useHoleDetection({
     />
   )
 
+  /** The typed hole size of the result line: the auto run goes on with it. */
+  const commitHoleSize = (si: number | undefined) => {
+    if (!si) return
+    setChoice({ expectedHoleDiameter: si }, 'expectedHoleDiameter')
+    setSizeOpen(false)
+    awaiting.current = true
+  }
+  const resultLine = (
+    <ResultLine
+      target={record?.name}
+      references={references}
+      proposals={proposals.length}
+      size={size}
+      sizeOpen={sizeOpen}
+      running={running}
+      onTarget={() => setStep(1)}
+      onScale={openCalibrate}
+      onHoles={() => setStep(4)}
+      onSize={() => setSizeOpen(true)}
+      onHoleSize={commitHoleSize}
+      candidates={candidates}
+      caliber={caliber}
+      onCaliber={(c) => {
+        setCaliber(c)
+        commitHoleSize(c.diameter)
+      }}
+      onAccept={() => take(proposals)}
+    />
+  )
+
   const panel = group && sheet.photo && (
     <DetectPanel
       settings={settings}
@@ -729,13 +799,58 @@ export function useHoleDetection({
       settingsPanel={settingsPanel}
       step={step}
       setStep={setStep}
-      start={runButton(held ? msg('Detect anyway') : msg('Detect holes'), true)}
+      start={
+        result ? resultLine : runButton(held ? msg('Detect anyway') : msg('Detect holes'), true)
+      }
       notes={quality && <QualityNotes issues={quality} held={held} />}
       body={step === undefined ? undefined : stepBody[step]}
     />
   )
 
-  return { onPoint, hint, layer, panel, progressBar }
+  /** A photo just added to the sheet: detection starts once it has loaded. */
+  const photoAdded = (id: string) => {
+    addedPhoto.current = id
+  }
+
+  return { onPoint, hint, layer, panel, progressBar, photoAdded }
+}
+
+/**
+ * The caliber candidates of the group (`caliberCandidates`) and the class picked while the hole
+ * size is its diameter, else the one preselected; loaded for each group, face and event.
+ */
+function useCaliberCandidates(
+  group: ShotGroup | undefined,
+  hole: { diameter: number; source: string } | undefined,
+) {
+  const [classes, setClasses] = useState<{ list: CandidateClass[]; mine: ReadonlySet<string> }>()
+  const [picked, setCaliber] = useState<CandidateClass>()
+  const face = group?.face
+  // biome-ignore lint/correctness/useExhaustiveDependencies: on another group, face or event only
+  useEffect(() => {
+    setClasses(undefined)
+    setCaliber(undefined)
+    if (!face) return
+    let live = true
+    Promise.all([caliberClassesOf(face), ownCartridges()]).then(
+      ([list, mine]) => live && setClasses({ list, mine }),
+      () => {},
+    )
+    return () => {
+      live = false
+    }
+  }, [group?.id, face?.id, face?.event])
+  const { candidates, preselected } = caliberCandidates(
+    classes?.list ?? [],
+    hole,
+    classes?.mine ?? new Set(),
+  )
+  const kept = picked && picked.diameter === hole?.diameter ? picked : undefined
+  return {
+    candidates,
+    caliber: kept ?? candidates.find((c) => c.id === preselected),
+    setCaliber,
+  }
 }
 
 /** The marked region, else the face, else the whole turned photo. */
@@ -907,6 +1022,140 @@ function QualityNotes({ issues, held }: { issues: readonly QualityIssue[]; held:
           {t('Detection waits. Detect anyway runs it on this photo; check every proposed hole.')}
         </Message>
       )}
+    </div>
+  )
+}
+
+/**
+ * The auto run's result in one line: the target, the scale, the holes proposed and the caliber
+ * (the hole size, typed here when nothing gives it), each with a change link, then Accept.
+ */
+function ResultLine({
+  target,
+  references,
+  proposals,
+  size,
+  sizeOpen,
+  running,
+  onTarget,
+  onScale,
+  onHoles,
+  onSize,
+  onHoleSize,
+  candidates,
+  caliber: picked,
+  onCaliber,
+  onAccept,
+}: {
+  target: string | undefined
+  /** The number of scale references; undefined while the sheet has no scale. */
+  references: number | undefined
+  proposals: number
+  size: { diameter: number; source: keyof typeof sourceNames } | undefined
+  /** The hole size field shows in place of the caliber (always without a size). */
+  sizeOpen: boolean
+  running: boolean
+  onTarget: () => void
+  onScale: () => void
+  onHoles: () => void
+  onSize: () => void
+  onHoleSize: (si: number | undefined) => void
+  /** The caliber classes of the discipline, the likeliest first. */
+  candidates: readonly CandidateClass[]
+  /** The class picked or preselected; none while two share the hole size. */
+  caliber: CandidateClass | undefined
+  /** Picks a class: its nominal diameter becomes the hole size. */
+  onCaliber: (c: CandidateClass) => void
+  onAccept: () => void
+}) {
+  const { t, tn } = useTranslation()
+  const { system } = useUnits()
+  const diameter = size && formatQuantity('length', system, size.diameter)
+  // only a bullet names a caliber: a hole in paper measures smaller than its bullet
+  const caliber =
+    size &&
+    (picked?.diameter === size.diameter
+      ? `${picked.name} (${diameter})`
+      : size.source === 'bullet'
+        ? `${commonCaliber(fromSi('length', size.diameter))} (${diameter})`
+        : `${diameter} (${t(sourceNames[size.source])})`)
+  const item = (label: string, value: string, change: string, onChange: () => void) => (
+    <div className="prop-row detect-wide">
+      <span className="prop-label">{label}</span>
+      <span className="prop-value row-buttons">
+        <span>{value}</span>
+        <Anchor component="button" type="button" size="sm" aria-label={change} onClick={onChange}>
+          {t('change')}
+        </Anchor>
+      </span>
+    </div>
+  )
+  return (
+    <div className="prop-grid detect-result" data-detect-result>
+      {item(t('Target'), target ?? t('none'), t('Change the target'), onTarget)}
+      {item(
+        t('Scale'),
+        references === undefined
+          ? t('none')
+          : tn(references, '{count} reference', '{count} references'),
+        t('Change the scale'),
+        onScale,
+      )}
+      {item(
+        t('Holes'),
+        t('{count} proposed', { count: proposals }),
+        t('Change the holes'),
+        onHoles,
+      )}
+      {sizeOpen || !caliber ? (
+        <SiField
+          spec={{
+            key: 'expectedHoleDiameter',
+            label: msg('Hole size'),
+            help: msg(
+              'Expected hole diameter; a typed size comes before the bullet and the marker. The holes are found once it is entered.',
+            ),
+            quantity: 'length',
+            min: 0,
+            positive: true,
+          }}
+          si={undefined}
+          placeholder={t('size')}
+          deferred
+          onCommit={onHoleSize}
+        />
+      ) : (
+        item(t('Caliber'), caliber, t('Change the hole size'), onSize)
+      )}
+      {candidates.length > 0 && (
+        <div className="prop-row detect-wide">
+          <span className="prop-label">{t('Caliber class')}</span>
+          <span className="prop-value row-buttons caliber-chips">
+            {candidates.map((c) => (
+              <Button
+                key={c.id}
+                size={controlSize.row.button}
+                variant={c.id === picked?.id ? 'filled' : 'default'}
+                aria-pressed={c.id === picked?.id}
+                onClick={() => onCaliber(c)}
+              >
+                {c.name}
+              </Button>
+            ))}
+          </span>
+        </div>
+      )}
+      <Button
+        size={controlSize.row.button}
+        className="wide"
+        disabled={proposals === 0 || running}
+        title={t(
+          'Proposals are dashed on the photo; none counts until accepted. On the photo: double-click or Enter accepts one, drag or arrow keys move it, Delete removes it.',
+        )}
+        onClick={onAccept}
+      >
+        {t('Accept all ({count})', { count: proposals })}
+      </Button>
     </div>
   )
 }

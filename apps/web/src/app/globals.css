@@ -8983,6 +8983,11 @@ main .session-shots th:nth-child(-n + 2) {
   gap: 0.25rem;
 }
 
+/* the caliber candidates of a discipline wrap rather than cut a name */
+.prop-grid .row-buttons.caliber-chips {
+  flex-wrap: wrap;
+}
+
 .prop-grid input[type="color"] {
   width: 100%;
   height: 1.5rem;
