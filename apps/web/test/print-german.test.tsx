@@ -88,7 +88,7 @@ describe('the load sheets', () => {
   it('are in German under the German setting, the overview and a page per charge', () => {
     const page = sheets(german)
     expect(page).toContain('Gedruckt am')
-    expect(page).toContain('Ladungen')
+    expect(page).toContain('Treibladungen')
     expect(page).toContain('Streukreis')
     expect(page).toContain('Stufe 0, Hauptstufe: 41,0 gr')
     expect(page).toContain('Simulierter Gasdruck 3500 bar')
@@ -107,7 +107,7 @@ describe('the load sheets', () => {
     const page = sheets(english)
     expect(page).toContain('Charges')
     expect(page).toContain('Step 0, main: 41,0 gr')
-    expect(page).not.toContain('Ladungen')
+    expect(page).not.toContain('Treibladungen')
   })
 })
 
@@ -207,7 +207,7 @@ describe('the ladder target', () => {
 
   it('is in German under the German setting, with the decimal comma', () => {
     const page = sheet(german)
-    expect(page).toContain('Ladeleiter-Scheibe')
+    expect(page).toContain('Ladeleiter-Zielscheibe')
     expect(page).toContain('Gedruckt am')
     expect(page).toContain('Das Lineal misst 100 mm')
     expect(page).toMatch(/Markengröße [\d,]+ MOA \(\d+,\d mm\)/)

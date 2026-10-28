@@ -6,7 +6,13 @@ import terms from '../src/i18n/german-terms.json'
 
 const source = messages()
 const fold = (s: string) =>
-  s.toLowerCase().replace(/ä/g, 'a').replace(/ö/g, 'o').replace(/ü/g, 'u').replace(/ß/g, 'ss')
+  s
+    .toLowerCase()
+    .replace(/ä/g, 'a')
+    .replace(/ö/g, 'o')
+    .replace(/ü/g, 'u')
+    .replace(/ß/g, 'ss')
+    .replace(/\u00ad/g, '') // a soft hyphen marks where a long compound may break
 const placeholders = (s: string) =>
   [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1] ?? '').sort((a, b) => a.localeCompare(b))
 
@@ -104,11 +110,49 @@ const otherSense: Record<string, string> = {
     'case: one computed combination of inputs',
   'Sampled bands {notice}: corner-case range shown.':
     'corner case: an extreme combination of inputs',
+  Rifle:
+    'a rifle as the discipline category or the firearm in a shooting-sport text, where the rule books write Gewehr; Büchse names the primer size',
+  'Rifle and scope':
+    'a rifle as the discipline category or the firearm in a shooting-sport text, where the rule books write Gewehr; Büchse names the primer size',
+  'Empty: by cartridge class, rifle {rifle}, pistol {pistol} (assumptions, no source).':
+    'a rifle as the discipline category or the firearm in a shooting-sport text, where the rule books write Gewehr; Büchse names the primer size',
+  Targets: 'the Targets tab lists target face records, whose verified term is Scheibe',
+  'No target mapping of its disciplines names a face.':
+    'target mapping: a record kind; the German names the face',
+  'No target mapping names this discipline.':
+    'target mapping: a record kind; the German names the discipline',
+  'The events and disciplines shot on this face':
+    'events: the verified term of Event is Wettbewerb',
+  'Shooting distance': 'the compound Schießentfernung translates both words',
+  'Results are simulations, not load data. Never use a result as a charge weight or as proof that a load is safe. Start from load data published by the powder or bullet maker for your exact components.':
+    'Safety text: the owner approves its wording',
+  'Measurements, statistics, group sizes, scores and records shown here can contain errors from the models, the data or your inputs.':
+    'Safety text: the owner approves its wording',
+  'Burn rate, {unit}':
+    'the heading of the burn rate figure, a single line in a narrow box where the full term does not fit',
+  'Safety notice and disclaimer': 'the heading of a page that holds the notice and the disclaimer',
   'boatTailLength must be zero or more': 'zero: the number',
   'meplatDiameter must be zero up to the diameter': 'zero: the number',
   'A flat spot is a statistical observation of the strings fired: neighbouring charges whose slope of mean velocity has a {level} % band that includes zero. Few shots make wide bands. It is not a safety statement and not a charge to load.':
     'zero: the number',
 }
+
+const wordPattern = (word: string) => new RegExp(`\\b${word}(e?s)?\\b`, 'i')
+const termWords = (english: string) => english.replace(/\s*\(.*\)/, '').split(', ')
+const phrases = terms.terms
+  .filter((t) => t.status !== 'unverified')
+  .flatMap((t) => termWords(t.english))
+
+/** Whether the English word occurs in the key outside the longer terms of the table that contain it ('Target face' owns 'target'). */
+function occurs(word: string, key: string): boolean {
+  const rest = phrases
+    .filter((p) => p.length > word.length && wordPattern(word).test(p))
+    .reduce((k, p) => k.replace(new RegExp(wordPattern(p).source, 'gi'), ' '), key)
+  return wordPattern(word).test(rest)
+}
+
+const textOf = (entry: string | Record<string, string>) =>
+  typeof entry === 'string' ? entry : Object.values(entry).join(' ')
 
 describe('German catalogue', () => {
   it('writes a verified term of the table as the table does, where its English word occurs', () => {
@@ -122,16 +166,38 @@ describe('German catalogue', () => {
         // German word when the lists are as long as each other, else the whole German text
         const english = t.english.split(', ')
         const german = (t.german ?? '').split(', ')
-        return english.map((w, i) => ({
-          english: new RegExp(`\\b${w}(e?s)?\\b`, 'i'),
+        return english.map((word, i) => ({
+          word,
           german: (german.length === english.length ? german[i] : t.german) ?? '',
         }))
       })
     for (const [key, entry] of Object.entries(de)) {
       if (key in otherSense) continue
-      const text = typeof entry === 'string' ? entry : Object.values(entry).join(' ')
-      for (const w of words.filter((w) => w.english.test(key)))
-        expect(fold(text), `${key}: ${w.german}`).toContain(fold(w.german))
+      for (const w of words.filter((w) => occurs(w.word, key)))
+        expect(fold(textOf(entry)), `${key}: ${w.german}`).toContain(fold(w.german))
+    }
+  })
+
+  it('writes a decided multi word term as the table does, where its English phrase occurs', () => {
+    const decided = terms.terms.filter(
+      (t) => t.status === 'decided' && t.german && /^[A-Za-z]+( [A-Za-z]+)+$/.test(t.english),
+    )
+    for (const [key, entry] of Object.entries(de)) {
+      if (key in otherSense) continue
+      for (const t of decided.filter((t) => wordPattern(t.english).test(key)))
+        expect(fold(textOf(entry)), `${key}: ${t.german}`).toContain(fold(t.german ?? ''))
+    }
+  })
+
+  it('does not write a rejected candidate of a decided term where its English word occurs', () => {
+    for (const t of terms.terms.filter((r) => r.status === 'decided')) {
+      const rejected = t.candidates.map((c) => c.german).filter((g) => g !== t.german)
+      const asWord = rejected.map((r) => new RegExp(`(^|[^a-z])${fold(r)}(n|s|e|es|en)?($|[^a-z])`))
+      for (const [key, entry] of Object.entries(de)) {
+        if (key in otherSense || !termWords(t.english).some((w) => occurs(w, key))) continue
+        for (const [i, pattern] of asWord.entries())
+          expect(fold(textOf(entry)), `${key}: ${rejected[i]} for ${t.german}`).not.toMatch(pattern)
+      }
     }
   })
 

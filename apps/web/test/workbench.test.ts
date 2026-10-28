@@ -458,8 +458,8 @@ describe('in German', () => {
       name: 'Bereich über CIP Pmax',
     })
     expect(charge).toEqual({
-      text: 'Ladung zu klein für das Modell: Der simulierte höchste mittlere Druck, 250 bar, liegt unter dem 2,2-Fachen des Startdrucks (200 bar); die Ergebnisse liegen außerhalb des Bereichs, für den das Modell gebaut wurde.',
-      name: 'Ladung zu klein für das Modell',
+      text: 'Treibladung zu klein für das Modell: Der simulierte höchste mittlere Druck, 250 bar, liegt unter dem 2,2-Fachen des Startdrucks (200 bar); die Ergebnisse liegen außerhalb des Bereichs, für den das Modell gebaut wurde.',
+      name: 'Treibladung zu klein für das Modell',
     })
     expect(none).toEqual({
       text: 'Es wurde keine Patronen-ID angegeben, daher wurde kein CIP-Pmax geprüft.',

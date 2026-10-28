@@ -36,7 +36,7 @@ test('the report and the load sheets print in German and stay inside the page', 
   await expect(report.getByRole('heading', { name: 'Ergebnis' }).first()).toBeVisible()
   await expect(report).toContainText('Gedruckt am')
   await expect(report).toContainText('Lauflänge')
-  await expect(report).toContainText('Treibladungspulver und Ladung')
+  await expect(report).toContainText('Treibladungspulver und Treibladung')
   expect(await report.innerText()).not.toMatch(english)
   expect(await overflow(page, '.print-report, .print-report table')).toBe(0)
 
