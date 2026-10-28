@@ -129,6 +129,8 @@
       "maxIterations must be a positive integer",
       "maxCondition must be positive",
       "fallFraction must lie in (0, 1)",
+      "domainMargin must lie in [0, 1)",
+      "boreDiameter must be positive",
       "the trace has no positive pressure",
       "too few trace samples in the window",
       "the model at the start values leaves the barrel before the end of the trace window; start closer or raise fallFraction"
