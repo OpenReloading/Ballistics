@@ -1,6 +1,6 @@
 # @open-reloading/core
 
-Pure TypeScript ballistics solver, ESM. Must stay headless: no runtime dependencies, no I/O, no network, no database.
+Pure TypeScript ballistics solver, ESM. Must stay headless: no I/O, no network, no database. A runtime dependency follows the licence and benefit rule of the root `AGENTS.md` (Package rules).
 
 ## Commands (this directory, or `-w @open-reloading/core` from the root)
 

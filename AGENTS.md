@@ -63,9 +63,10 @@
 - Changes start from a GitHub issue. `main` is the only long-lived branch: branches are short-lived, cut from `main` and squash-merged back into it; the release pull request of release-please also targets `main`.
 - To be published to npmjs.com (off until the repository variable `NPM_PUBLISH` is `true`): schema, core, drawing, importers, data (`apps/docs/docs/release.md`). Every other workspace stays `private`.
 - Package rules (`npm run deps:check` checks them):
-  - `packages/core`: no runtime dependencies, no I/O, no database, no HTTP.
+  - `packages/core`: no I/O, no database, no HTTP.
   - `packages/importers`: no I/O. Depends on `@open-reloading/schema` for types only.
-  - `packages/drawing`: no runtime dependencies, no I/O, no React, DOM or Next.js. Values in stored mm and degrees.
+  - `packages/drawing`: no I/O, no React, DOM or Next.js. Values in stored mm and degrees.
+  - A runtime dependency of core or drawing needs a permissive, MIT-compatible licence listed in `allow-licenses` of `.github/dependency-review-config.yml`, passing dependency review and the licence check (`tools/src/licences.ts`). It is added only for a concrete benefit (a missing capability, a defect, or clearly less code with the same tested result) and only when the library is maintained, widely used and not archived; the change states the benefit and the stars, last commit and weekly downloads. Its import rule in `.dependency-cruiser.cjs` then allows that package by name.
   - `packages/data`: git is the source of truth for records.
   - `packages/api`: depends on core, data and schema.
   - `packages/cli`: depends on core, data, drawing and schema, never on the API or the web app. No model logic of its own.

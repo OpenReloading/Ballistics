@@ -39,14 +39,14 @@ module.exports = {
       name: 'core-imports-nothing',
       severity: 'error',
       comment:
-        'packages/core has no runtime dependencies and no I/O: it imports only its own files.',
+        'packages/core has no I/O: it imports only its own files. A runtime dependency under the rule of AGENTS.md is allowed here by name.',
       from: { path: own('packages/core/src') },
       to: { pathNot: own('packages/core/src') },
     },
     ...Object.entries(drawingFolders).map(([name, may]) => ({
       name: `drawing-${name}-imports`,
       severity: 'error',
-      comment: `packages/drawing has no dependencies, no I/O, no React, DOM or Next.js. Its ${name} folder imports only the folders ${may.join(', ')}.`,
+      comment: `packages/drawing has no I/O, no React, DOM or Next.js. Its ${name} folder imports only the folders ${may.join(', ')}.`,
       from: { path: `^${drawingFolder(name)}` },
       to: { pathNot: `^(${may.map(drawingFolder).join('|')})` },
     })),
