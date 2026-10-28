@@ -31,7 +31,7 @@ const validDiscipline = {
   number: '1.10',
   section: '1.10',
   page: 'p. 12',
-  distance: mm(50000),
+  distance: { ...mm(50000), unit: 'm' },
   category: 'rifle',
   caliberClasses: { ids: ['rimfire-22'], basis: 'stated' },
   internationalDiscipline: 'test-world-discipline',
@@ -97,6 +97,15 @@ describe('discipline', () => {
     expectIssueAt(discipline, caliberClasses({ basis: 'inferred' }), 'caliberClasses.basis')
     const { section, ...noSection } = validDiscipline
     expectIssueAt(discipline, noSection, 'section')
+    const noUnit = { ...validDiscipline, distance: mm(50000) }
+    expectIssueAt(discipline, noUnit, 'distance.unit')
+    expectIssueAt(
+      discipline,
+      { ...validDiscipline, distance: { ...mm(50000), unit: 'ft' } },
+      'distance.unit',
+    )
+    const both = { ...validDiscipline, distance: { ...mm(50000), unit: 'm/yd' } }
+    expect(discipline.safeParse(both).success).toBe(true)
   })
 })
 

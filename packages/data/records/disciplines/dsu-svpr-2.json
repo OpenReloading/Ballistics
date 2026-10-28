@@ -7,7 +7,8 @@
   "page": "Seite 8, PDF p. 130",
   "distance": {
     "value": 25000,
-    "raw": "25 Meter"
+    "raw": "25 Meter",
+    "unit": "m"
   },
   "category": "muzzle-loader",
   "provenance": {

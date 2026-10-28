@@ -6,7 +6,8 @@
   "page": "Teil D, Seite 241 von 294, PDF p. 241",
   "distance": {
     "value": 50000,
-    "raw": "50 m"
+    "raw": "50 m",
+    "unit": "m"
   },
   "category": "rifle",
   "provenance": {

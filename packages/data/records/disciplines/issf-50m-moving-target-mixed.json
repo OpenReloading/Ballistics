@@ -6,7 +6,8 @@
   "page": "p. 476 (PDF p. 476)",
   "distance": {
     "value": 50000,
-    "raw": "50m"
+    "raw": "50m",
+    "unit": "m"
   },
   "category": "rifle",
   "caliberClasses": {

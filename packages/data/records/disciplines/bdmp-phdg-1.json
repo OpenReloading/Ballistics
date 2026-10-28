@@ -7,7 +7,8 @@
   "page": "Teil E, Seite 9 bis 10 von 42, PDF pp. 9 to 10",
   "distance": {
     "value": 100000,
-    "raw": "100 m"
+    "raw": "100 m",
+    "unit": "m"
   },
   "category": "service-rifle",
   "provenance": {
