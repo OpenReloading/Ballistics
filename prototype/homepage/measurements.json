@@ -1,0 +1,342 @@
+[
+  {
+    "variant": "A",
+    "size": "1280x650",
+    "state": "filled",
+    "workbench": {
+      "top": 239,
+      "bottom": 269
+    },
+    "strip": null,
+    "news": null,
+    "library": {
+      "top": 311,
+      "bottom": 326
+    },
+    "scrollHeight": 654,
+    "cls": 0,
+    "blocksInOrder": true,
+    "focusInBlockOrder": true,
+    "stripLinks": 0
+  },
+  {
+    "variant": "B",
+    "size": "1280x650",
+    "state": "filled",
+    "workbench": {
+      "top": 295,
+      "bottom": 325
+    },
+    "strip": {
+      "top": 64,
+      "bottom": 108
+    },
+    "news": {
+      "top": 728,
+      "bottom": 744
+    },
+    "library": {
+      "top": 367,
+      "bottom": 382
+    },
+    "scrollHeight": 1060,
+    "cls": 0,
+    "blocksInOrder": true,
+    "focusInBlockOrder": true,
+    "stripLinks": 3
+  },
+  {
+    "variant": "B",
+    "size": "1280x650",
+    "state": "empty",
+    "workbench": {
+      "top": 295,
+      "bottom": 325
+    },
+    "strip": {
+      "top": 64,
+      "bottom": 108
+    },
+    "news": {
+      "top": 728,
+      "bottom": 744
+    },
+    "library": {
+      "top": 367,
+      "bottom": 382
+    },
+    "scrollHeight": 1060,
+    "cls": 0,
+    "blocksInOrder": true,
+    "focusInBlockOrder": true,
+    "stripLinks": 0
+  },
+  {
+    "variant": "B",
+    "size": "1280x650",
+    "state": "empty-collapse",
+    "workbench": {
+      "top": 239,
+      "bottom": 269
+    },
+    "strip": null,
+    "news": {
+      "top": 672,
+      "bottom": 688
+    },
+    "library": {
+      "top": 311,
+      "bottom": 326
+    },
+    "scrollHeight": 1004,
+    "cls": 0.03549555288461538,
+    "blocksInOrder": true,
+    "focusInBlockOrder": true,
+    "stripLinks": 0
+  },
+  {
+    "variant": "C",
+    "size": "1280x650",
+    "state": "filled",
+    "workbench": {
+      "top": 106,
+      "bottom": 156
+    },
+    "strip": {
+      "top": 168,
+      "bottom": 212
+    },
+    "news": {
+      "top": 231,
+      "bottom": 246
+    },
+    "library": {
+      "top": 581,
+      "bottom": 596
+    },
+    "scrollHeight": 924,
+    "cls": 0,
+    "blocksInOrder": true,
+    "focusInBlockOrder": true,
+    "stripLinks": 3
+  },
+  {
+    "variant": "C",
+    "size": "1280x650",
+    "state": "empty",
+    "workbench": {
+      "top": 106,
+      "bottom": 156
+    },
+    "strip": {
+      "top": 168,
+      "bottom": 212
+    },
+    "news": {
+      "top": 231,
+      "bottom": 246
+    },
+    "library": {
+      "top": 581,
+      "bottom": 596
+    },
+    "scrollHeight": 924,
+    "cls": 0,
+    "blocksInOrder": true,
+    "focusInBlockOrder": true,
+    "stripLinks": 0
+  },
+  {
+    "variant": "C",
+    "size": "1280x650",
+    "state": "empty-collapse",
+    "workbench": {
+      "top": 106,
+      "bottom": 156
+    },
+    "strip": null,
+    "news": {
+      "top": 175,
+      "bottom": 190
+    },
+    "library": {
+      "top": 525,
+      "bottom": 540
+    },
+    "scrollHeight": 868,
+    "cls": 0.029806370192307693,
+    "blocksInOrder": false,
+    "focusInBlockOrder": true,
+    "stripLinks": 0
+  },
+  {
+    "variant": "A",
+    "size": "390x844",
+    "state": "filled",
+    "workbench": {
+      "top": 259,
+      "bottom": 289
+    },
+    "strip": null,
+    "news": null,
+    "library": {
+      "top": 564,
+      "bottom": 580
+    },
+    "scrollHeight": 950,
+    "cls": 0,
+    "blocksInOrder": true,
+    "focusInBlockOrder": true,
+    "stripLinks": 0
+  },
+  {
+    "variant": "B",
+    "size": "390x844",
+    "state": "filled",
+    "workbench": {
+      "top": 367,
+      "bottom": 397
+    },
+    "strip": {
+      "top": 52,
+      "bottom": 160
+    },
+    "news": {
+      "top": 1064,
+      "bottom": 1080
+    },
+    "library": {
+      "top": 672,
+      "bottom": 688
+    },
+    "scrollHeight": 1585,
+    "cls": 0,
+    "blocksInOrder": true,
+    "focusInBlockOrder": true,
+    "stripLinks": 3
+  },
+  {
+    "variant": "B",
+    "size": "390x844",
+    "state": "empty",
+    "workbench": {
+      "top": 367,
+      "bottom": 397
+    },
+    "strip": {
+      "top": 52,
+      "bottom": 160
+    },
+    "news": {
+      "top": 1064,
+      "bottom": 1080
+    },
+    "library": {
+      "top": 672,
+      "bottom": 688
+    },
+    "scrollHeight": 1585,
+    "cls": 0,
+    "blocksInOrder": true,
+    "focusInBlockOrder": true,
+    "stripLinks": 0
+  },
+  {
+    "variant": "B",
+    "size": "390x844",
+    "state": "empty-collapse",
+    "workbench": {
+      "top": 259,
+      "bottom": 289
+    },
+    "strip": null,
+    "news": {
+      "top": 956,
+      "bottom": 972
+    },
+    "library": {
+      "top": 564,
+      "bottom": 580
+    },
+    "scrollHeight": 1477,
+    "cls": 0.1200781653601671,
+    "blocksInOrder": true,
+    "focusInBlockOrder": true,
+    "stripLinks": 0
+  },
+  {
+    "variant": "C",
+    "size": "390x844",
+    "state": "filled",
+    "workbench": {
+      "top": 124,
+      "bottom": 174
+    },
+    "strip": {
+      "top": 223,
+      "bottom": 331
+    },
+    "news": {
+      "top": 349,
+      "bottom": 364
+    },
+    "library": {
+      "top": 876,
+      "bottom": 891
+    },
+    "scrollHeight": 1262,
+    "cls": 0,
+    "blocksInOrder": true,
+    "focusInBlockOrder": true,
+    "stripLinks": 3
+  },
+  {
+    "variant": "C",
+    "size": "390x844",
+    "state": "empty",
+    "workbench": {
+      "top": 124,
+      "bottom": 174
+    },
+    "strip": {
+      "top": 223,
+      "bottom": 331
+    },
+    "news": {
+      "top": 349,
+      "bottom": 364
+    },
+    "library": {
+      "top": 876,
+      "bottom": 891
+    },
+    "scrollHeight": 1262,
+    "cls": 0,
+    "blocksInOrder": true,
+    "focusInBlockOrder": true,
+    "stripLinks": 0
+  },
+  {
+    "variant": "C",
+    "size": "390x844",
+    "state": "empty-collapse",
+    "workbench": {
+      "top": 124,
+      "bottom": 174
+    },
+    "strip": null,
+    "news": {
+      "top": 229,
+      "bottom": 244
+    },
+    "library": {
+      "top": 756,
+      "bottom": 771
+    },
+    "scrollHeight": 1142,
+    "cls": 0.0960298769984087,
+    "blocksInOrder": false,
+    "focusInBlockOrder": true,
+    "stripLinks": 0
+  }
+]

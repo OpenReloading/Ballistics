@@ -1,0 +1,110 @@
+/* the Continue strip: one line, its height kept while the store is read */
+.home-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 1rem;
+  min-height: 2.75rem;
+  margin-bottom: var(--panel-gap);
+  padding: 0 0.75rem;
+  border: 1px solid var(--border);
+  font-size: var(--mantine-font-size-sm);
+}
+
+.home-strip[hidden] {
+  display: none;
+}
+
+.home-strip ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.home-strip-label {
+  font-weight: 600;
+}
+
+.home-strip .home-count {
+  color: var(--muted);
+}
+
+@media (max-width: 47.99em) {
+  .home-strip {
+    min-height: 6.75rem;
+    padding: 0.5rem 0;
+    border-width: 1px 0;
+  }
+
+  .home-strip ul {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
+
+/* What's new: date left, title and text right */
+.home-news {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.home-news li {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.home-news li:first-child {
+  border-top: 0;
+}
+
+.home-news time {
+  color: var(--muted);
+  font-size: var(--mantine-font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.home-news p {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--mantine-font-size-sm);
+}
+
+@media (max-width: 47.99em) {
+  .home-news li {
+    grid-template-columns: 1fr;
+    gap: 0.125rem;
+    padding: 0.5rem 0;
+  }
+}
+
+/* variant C: the workbench button first */
+.home-hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.5rem;
+  margin-bottom: var(--panel-gap);
+}
+
+.home-hero .lead {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: var(--mantine-font-size-xl);
+  font-weight: 600;
+}
+
+.home-hero ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
