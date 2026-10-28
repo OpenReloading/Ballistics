@@ -1,0 +1,63 @@
+{
+  "id": "demo-powder-sp20",
+  "manufacturer": "demo-powder",
+  "name": "SP20",
+  "grainForm": "ball",
+  "propellantBase": "single",
+  "interior": {
+    "model": "m3",
+    "fitted": ["vivacity", "energy"],
+    "vivacity": {
+      "value": 0.5,
+      "standardUncertainty": 0.03
+    },
+    "energy": {
+      "value": 3700000,
+      "standardUncertainty": 190000
+    },
+    "gamma": 1.215,
+    "covolume": {
+      "value": 0.00097
+    },
+    "density": {
+      "value": 1.6
+    },
+    "pressureExponent": 1,
+    "referencePressure": {
+      "value": 0.980665
+    },
+    "ignitionPressure": {
+      "value": 50
+    },
+    "propellantTemperature": {
+      "value": 21
+    },
+    "resistance": {
+      "stress": {
+        "value": 4.2
+      },
+      "oversize": 1.3,
+      "engraving": 0
+    },
+    "burnForm": {
+      "kind": "twoStage",
+      "a": {
+        "value": 0.05
+      },
+      "m": 0.5,
+      "q": 0.5,
+      "z1": 0.8
+    }
+  },
+  "provenance": {
+    "kind": "fitted",
+    "sources": [
+      {
+        "source": "synthetic-test-data",
+        "kind": "fitted",
+        "fields": ["name", "grainForm", "propellantBase", "interior"],
+        "note": "Invented values for tests; not a real product."
+      }
+    ]
+  }
+}

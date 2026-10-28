@@ -2,7 +2,7 @@ import { expect, type Page } from '@playwright/test'
 import { barButton } from './bar.ts'
 
 /** The workbench's input column: panels Cartridge, Bullet, Powder, Gun and the Run bar. */
-export const loadForm = (page: Page) => page.getByRole('form', { name: 'Load' })
+export const loadForm = (page: Page, name = 'Load') => page.getByRole('form', { name })
 
 /** The text of every field of the load form. */
 export const formValues = (page: Page) =>
@@ -24,8 +24,10 @@ async function openItem(page: Page, name: string | RegExp) {
 }
 
 /** Applies the example load and waits until it is complete, so a run sees all its values. */
-export async function applyExampleLoad(page: Page) {
-  await openItem(page, 'Example load')
+export async function applyExampleLoad(page: Page, language: 'en' | 'de' = 'en') {
+  await openItem(page, language === 'de' ? 'Beispiel-Laborierung' : 'Example load')
   // complete once its bullet is seated: volume and travel follow the seating
-  await expect(loadForm(page).locator('.field-flag-seating')).toHaveCount(2)
+  await expect(
+    loadForm(page, language === 'de' ? 'Laborierung' : 'Load').locator('.field-flag-seating'),
+  ).toHaveCount(2)
 }

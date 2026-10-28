@@ -78,3 +78,12 @@ export function translator(catalogue?: Catalogue, language = 'en'): Translator {
     },
   }
 }
+
+/** A text written with the translator where it is shown, so a stored one follows a language change. */
+export type Say = (t: Translator['t']) => string
+
+/**
+ * The English functions: what a file, the clipboard or a link carries whatever language is shown,
+ * and the text of a test.
+ */
+export const english: Translator = translator()

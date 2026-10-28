@@ -5,10 +5,11 @@ import { useMediaQuery } from '@mantine/hooks'
 import { CaretDown } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
 import { memo, type RefObject, useEffect, useMemo, useRef, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { canonicalNumberText } from '../i18n/number.ts'
+import { english, type Message, msg, type Translator } from '../i18n/translate.ts'
 import { vivacityUnit } from '../lib/burn-rate.ts'
 import { toCsv } from '../lib/csv.ts'
-import { powderDesignNote } from '../lib/powder-designer.ts'
 import { controlSize } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { resultTabsFit } from '../lib/workbench.ts'
@@ -20,7 +21,7 @@ import { LotPanel } from './lot-rows.tsx'
 import { NavIcon } from './nav-icons.tsx'
 import { PowderCompare } from './powder-compare.tsx'
 import { chartCopy } from './print-report.tsx'
-import { ErrorNote, Loading, Message } from './states.tsx'
+import { ErrorNote, Loading, Message as Note } from './states.tsx'
 import { TrajectoryForm } from './trajectory-form.tsx'
 import { useInputEcho, useResult } from './workbench-context.ts'
 import { FigureTab } from './workbench-figure.tsx'
@@ -58,31 +59,33 @@ const GroupsTab = dynamic(() => import('./groups-tab.tsx').then((m) => m.GroupsT
 
 /** The result tabs; Cartridge only in a low desktop window (`shortFrame`), where the figure leaves the inputs. */
 export const resultTabs = [
-  ['results', 'Chart'],
-  ['cartridge', 'Cartridge'],
-  ['ladder', 'Ladder table'],
-  ['trajectory', 'Trajectory'],
-  ['measurements', 'Measurements'],
-  ['groups', 'Groups'],
-  ['notes', 'Notes'],
-  ['barrel', 'Barrel length'],
-  ['powders', 'Powders'],
+  ['results', msg('Chart')],
+  ['cartridge', msg('Cartridge')],
+  ['ladder', msg('Ladder table')],
+  ['trajectory', msg('Trajectory')],
+  ['measurements', msg('Measurements')],
+  ['groups', msg('Groups')],
+  ['notes', msg('Notes')],
+  ['barrel', msg('Barrel length')],
+  ['powders', msg('Powders')],
 ] as const
 export type ResultTab = (typeof resultTabs)[number][0]
 
-const notRun = (what: string) => (
-  <p className="prompt empty-state">Run the simulation to see {what}.</p>
+const notRun = (text: Message, t: Translator['t']) => (
+  <p className="prompt empty-state">{t(text)}</p>
 )
-const later = (text: string) => <p className="prompt empty-state">{text}</p>
-const heading = (v: ResultTab) => (
-  <h2 className="print-only">{resultTabs.find(([k]) => k === v)?.[1]}</h2>
-)
+// printed: the print view keeps English until its own pass
+const heading = (v: ResultTab) => {
+  const label = resultTabs.find(([k]) => k === v)?.[1]
+  return <h2 className="print-only">{label && english.t(label)}</h2>
+}
 
 /**
  * The chosen powder's burn rate: beside the readouts, and in the inputs' second column of a low
  * desktop window (`shortFrame`), where its chart is taller.
  */
 export function BurnFigure() {
+  const { t } = useTranslation()
   const { burn, powder, powderLabel, runMarks } = useResult()
   const short = useMediaQuery(shortFrame, false) ?? false
   return (
@@ -90,10 +93,19 @@ export function BurnFigure() {
       <section aria-labelledby="burn-rate-title" className="burn-figure">
         <h3
           id="burn-rate-title"
-          title={`Dynamic vivacity of ${powderLabel ?? 'the typed model parameters'}`}
+          title={
+            powderLabel
+              ? t('Dynamic vivacity of {label}', { label: powderLabel })
+              : t('Dynamic vivacity of the typed model parameters')
+          }
         >
-          Burn rate, {vivacityUnit}
-          <span className="visually-hidden"> of {powderLabel ?? 'the typed model parameters'}</span>
+          {t('Burn rate, {unit}', { unit: vivacityUnit })}
+          <span className="visually-hidden">
+            {' '}
+            {powderLabel
+              ? t('of {label}', { label: powderLabel })
+              : t('of the typed model parameters')}
+          </span>
         </h3>
         <BurnRate p={burn} powderId={powder?.id} marks={runMarks} height={short ? 150 : 104} />
       </section>
@@ -245,6 +257,7 @@ function ResultTabBar({
   choose: (v: ResultTab) => void
   listRef: RefObject<HTMLDivElement | null>
 }) {
+  const { t } = useTranslation()
   const moved = shownTabs.slice(fit)
   return (
     <div className="result-tabbar">
@@ -257,7 +270,7 @@ function ResultTabBar({
             data-before-run={v === 'cartridge' || undefined}
             data-moved={i >= fit || undefined}
           >
-            {label}
+            {t(label)}
           </Tabs.Tab>
         ))}
       </Tabs.List>
@@ -275,13 +288,13 @@ function ResultTabBar({
               tabIndex={moved.length === 0 ? -1 : undefined}
               rightSection={<CaretDown size={12} aria-hidden="true" />}
             >
-              More
+              {t('More')}
             </Button>
           </Menu.Target>
           <Menu.Dropdown>
             {moved.map(([v, label]) => (
               <Menu.Item key={v} onClick={() => choose(v)} aria-current={v === tab || undefined}>
-                {label}
+                {t(label)}
               </Menu.Item>
             ))}
           </Menu.Dropdown>
@@ -299,6 +312,7 @@ function CopyCsvButton({
   csvCopied: boolean | 'failed'
   setCsvCopied: (copied: boolean | 'failed') => void
 }) {
+  const { t } = useTranslation()
   return (
     <Button
       size={controlSize.row.button}
@@ -323,7 +337,7 @@ function CopyCsvButton({
         )
       }}
     >
-      {csvCopied === 'failed' ? 'Copy failed' : csvCopied ? 'Copied' : 'Copy as CSV'}
+      {csvCopied === 'failed' ? t('Copy failed') : csvCopied ? t('Copied') : t('Copy as CSV')}
     </Button>
   )
 }
@@ -342,14 +356,15 @@ function RunLine({
   echoed: boolean
   warnings: { text: string; name?: string | undefined }[] | undefined
 }) {
+  const { t, tn } = useTranslation()
   return (
     <div className="run-line">
       {ok && identity && (
         // one line where the column is narrow: the whole line on hover
         <p className="load-identity" title={identity.join(' · ')}>
           <strong>{identity[0]}</strong>
-          {identity.slice(1).map((t) => (
-            <span key={t}> · {t}</span>
+          {identity.slice(1).map((part) => (
+            <span key={part}> · {part}</span>
           ))}
         </p>
       )}
@@ -363,14 +378,14 @@ function RunLine({
       </p>
       <span className="notice-text screen-only">
         <NavIcon name="safety" size={14} />
-        Simulation, not load data
+        {t('Simulation, not load data')}
       </span>
       <span className="warnings-slot screen-only">
         {ok && warnings && (
           <WarningsBlock
             key={ok.id}
             warnings={warnings}
-            summary={warningsLine(ok, warnings)}
+            summary={warningsLine(ok, warnings, t, tn)}
             announce={ok.announce}
           />
         )}
@@ -440,11 +455,12 @@ function ResultsHead({
   next: number
   short: boolean
 }) {
+  const { t } = useTranslation()
   return (
     <div className="results-head">
       {outcome?.kind === 'error' ? (
         <div className="results-error">
-          <ErrorNote title="The simulation did not run.">
+          <ErrorNote title={t('The simulation did not run.')}>
             <ErrorView outcome={outcome} />
           </ErrorNote>
         </div>
@@ -460,23 +476,34 @@ function ResultsHead({
 
 /** What the run took from the user's designs instead of a catalogue record, and the volume note. */
 function DesignNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> | undefined }) {
+  const { t } = useTranslation()
   return (
     <>
       {ok?.cartridgeDesign && (
         <p className="note user-design">
-          Case values from the user design {ok.cartridgeDesign}, not a catalogue record.
+          {t('Case values from the user design {name}, not a catalogue record.', {
+            name: ok.cartridgeDesign,
+          })}
         </p>
       )}
-      {ok?.powderDesign && <p className="note user-design">{powderDesignNote(ok.powderDesign)}</p>}
+      {ok?.powderDesign && (
+        <p className="note user-design">
+          {t('Powder values from the user design {name}, not a catalogue record.', {
+            name: ok.powderDesign,
+          })}
+        </p>
+      )}
       {ok?.design && (
         <p className="note user-design">
-          Computed with the bullet mass of the user design {ok.design}, not a catalogue record.
+          {t('Computed with the bullet mass of the user design {name}, not a catalogue record.', {
+            name: ok.design,
+          })}
         </p>
       )}
       {ok && !ok.volumeMeasured && (
-        <Message severity="info" title={volumeNote.title} compact>
-          {volumeNote.text}
-        </Message>
+        <Note severity="info" title={t(volumeNote.title)} compact>
+          {t(volumeNote.text)}
+        </Note>
       )}
     </>
   )
@@ -484,12 +511,13 @@ function DesignNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> | undefined 
 
 /** The ladder table tab's content: the table with its CSV copy, lot rows and target. */
 function LadderBody() {
+  const { t } = useTranslation()
   const { ok, steps, stepValue, velocity, csvCopied, setCsvCopied, lot, system } = useResult()
   return (
     <>
       {/* one step: its row would repeat the readouts */}
       {!ok ? (
-        notRun('the ladder table')
+        notRun(msg('Run the simulation to see the ladder table.'), t)
       ) : steps.length > 1 ? (
         <>
           <CopyCsvButton csvCopied={csvCopied} setCsvCopied={setCsvCopied} />
@@ -505,9 +533,11 @@ function LadderBody() {
           />
         </>
       ) : (
-        later(
-          'One step: the readouts give its values. Set Ladder steps in the Powder card for a table of steps.',
-        )
+        <p className="prompt empty-state">
+          {t(
+            'One step: the readouts give its values. Set Ladder steps in the Powder card for a table of steps.',
+          )}
+        </p>
       )}
     </>
   )
@@ -515,6 +545,7 @@ function LadderBody() {
 
 /** The panels of the result tabs. */
 function ResultPanels({ short }: { short: boolean }) {
+  const { t } = useTranslation()
   const {
     ok,
     stale,
@@ -537,7 +568,7 @@ function ResultPanels({ short }: { short: boolean }) {
             <ResultChart />
           </div>
         ) : (
-          notRun('the breech pressure curve')
+          notRun(msg('Run the simulation to see the breech pressure curve.'), t)
         )}
       </Tabs.Panel>
       {short && (
@@ -571,26 +602,27 @@ function ResultPanels({ short }: { short: boolean }) {
       <Tabs.Panel value="barrel" data-stale={stale || undefined}>
         {heading('barrel')}
         {!ok
-          ? notRun('the barrel length study')
+          ? notRun(msg('Run the simulation to see the barrel length study.'), t)
           : opened('barrel') && <BarrelLength study={barrel} system={system} />}
       </Tabs.Panel>
       <Tabs.Panel value="powders" data-stale={stale || undefined}>
         {/* not in the report: no print heading either */}
         {!ok
-          ? notRun('the powder comparison')
+          ? notRun(msg('Run the simulation to see the powder comparison.'), t)
           : opened('powders') && <PowderCompare system={system} />}
       </Tabs.Panel>
       <Tabs.Panel value="notes">
         {heading('notes')}
         <LoadLots />
         <p className="note">
-          Each session is compared with the one before it. A note shows what differs and where the
-          values come from; it says nothing about whether a load is acceptable.
+          {t(
+            'Each session is compared with the one before it. A note shows what differs and where the values come from; it says nothing about whether a load is acceptable.',
+          )}
         </p>
         <SessionNotes />
         <Textarea
-          label="Notes"
-          description="Saved with the load file (File, Save). Not in copied links."
+          label={t('Notes')}
+          description={t('Saved with the load file (File, Save). Not in copied links.')}
           autosize
           minRows={4}
           value={notes}
@@ -621,10 +653,11 @@ export const ResultsArea = memo(function ResultsArea() {
     status,
     pending,
   } = useResult()
+  const { t } = useTranslation()
   const next = todo.findIndex((s) => !s.done)
   const echoed =
     ok !== undefined &&
-    (status.startsWith('Simulation done. ') || status === resultLine(ok, system))
+    (status.startsWith(t('Simulation done. ')) || status === resultLine(ok, system, t))
   const choose = (v: ResultTab) => {
     setTab(v)
     setSeen((s) => (s.has(v) ? s : new Set([...s, v])))
@@ -659,7 +692,7 @@ export const ResultsArea = memo(function ResultsArea() {
         <div className="workbench-centre">
           {ok && (
             <h2 id="interior-result" className="visually-hidden">
-              Result
+              {t('Result')}
             </h2>
           )}
           {/* one line: the load, the notice and the warnings with their popover in a slot of fixed

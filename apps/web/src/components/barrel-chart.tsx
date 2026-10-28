@@ -1,7 +1,9 @@
 'use client'
 
 import { useMemo } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { formatNumber, plainNumber } from '../i18n/number.ts'
+import type { Translator } from '../i18n/translate.ts'
 import type { BarrelRow } from '../lib/barrel-length.ts'
 import { niceTicks } from '../lib/ticks.ts'
 import { formatQuantity, type UnitSystem } from '../lib/units.ts'
@@ -59,7 +61,7 @@ const lineType = (own: boolean, i: number) => {
   return i % 2 ? ('dashed' as const) : ('dotted' as const)
 }
 
-const currentMark = (theme: Theme, system: UnitSystem, current: DrawnRow) => ({
+const currentMark = (theme: Theme, system: UnitSystem, current: DrawnRow, t: Translator['t']) => ({
   silent: true,
   symbol: 'none',
   animation: false,
@@ -67,7 +69,7 @@ const currentMark = (theme: Theme, system: UnitSystem, current: DrawnRow) => ({
     {
       xAxis: system.barrelLength.fromSi(current.length),
       lineStyle: { color: theme.muted, type: 'dashed' as const, width: 1 },
-      label: { formatter: 'current', position: 'end' as const, color: theme.muted },
+      label: { formatter: t('current'), position: 'end' as const, color: theme.muted },
     },
   ],
 })
@@ -81,6 +83,7 @@ interface SeriesContext {
   own: boolean
   ladder: boolean
   current: DrawnRow | undefined
+  t: Translator['t']
 }
 
 const stepSeries = (c: SeriesContext, q: 'velocity' | 'energy', axisIndex: number) => {
@@ -113,24 +116,31 @@ const stepSeries = (c: SeriesContext, q: 'velocity' | 'energy', axisIndex: numbe
         ? { show: true, formatter: step.label, color: theme[q], fontSize: 11 }
         : undefined,
     markLine:
-      own && axisIndex === 0 && c.current ? currentMark(theme, system, c.current) : undefined,
+      own && axisIndex === 0 && c.current ? currentMark(theme, system, c.current, c.t) : undefined,
   }
 }
 
 type TooltipParams = { axisValue: number; seriesName: string; value: [number, number] }[]
 
-const tooltipFormatter = (system: UnitSystem) => (params: TooltipParams) => {
+const tooltipFormatter = (system: UnitSystem, t: Translator['t']) => (params: TooltipParams) => {
   const { barrelLength: length, velocity, energy } = system
   const [first] = params
   if (!first) return ''
   const line = (p: TooltipParams[number]) => {
-    const unit = p.seriesName.endsWith('velocity') ? velocity : energy
-    return `${p.seriesName.replace(/^Step \S+ /, '')} ${formatNumber(p.value[1], unit.decimals)} ${unit.symbol}`
+    const isVelocity = p.seriesName.endsWith('velocity')
+    const unit = isVelocity ? velocity : energy
+    return `${isVelocity ? t('velocity') : t('energy')} ${formatNumber(p.value[1], unit.decimals)} ${unit.symbol}`
   }
   return `${formatNumber(first.axisValue, length.decimals)} ${length.symbol}<br>${params.map(line).join('<br>')}`
 }
 
-function chartOption(theme: Theme, steps: BarrelStep[], selected: number, system: UnitSystem) {
+function chartOption(
+  theme: Theme,
+  steps: BarrelStep[],
+  selected: number,
+  system: UnitSystem,
+  t: Translator['t'],
+) {
   const { barrelLength: length, velocity, energy } = system
   const ladder = steps.length > 1
   const curves = steps.map((step) => ({ step, curve: drawn(step.rows) }))
@@ -148,6 +158,7 @@ function chartOption(theme: Theme, steps: BarrelStep[], selected: number, system
       own: index === selected,
       ladder,
       current,
+      t,
     }
     return (['velocity', 'energy'] as const).map((q, axisIndex) => stepSeries(c, q, axisIndex))
   })
@@ -169,14 +180,14 @@ function chartOption(theme: Theme, steps: BarrelStep[], selected: number, system
       backgroundColor: theme.bg,
       borderColor: theme.border,
       textStyle: { color: theme.fg },
-      formatter: tooltipFormatter(system),
+      formatter: tooltipFormatter(system, t),
     },
     xAxis: {
       type: 'value' as const,
       min: xt[0],
       max: xt[xt.length - 1],
       interval: tickStep(xt),
-      name: `Barrel length, ${length.symbol}`,
+      name: t('Barrel length, {unit}', { unit: length.symbol }),
       nameLocation: 'middle' as const,
       nameGap: 26,
       nameTextStyle: { color: theme.muted, fontSize: 12 },
@@ -191,14 +202,14 @@ function chartOption(theme: Theme, steps: BarrelStep[], selected: number, system
     yAxis: [
       valueAxis(
         theme,
-        `Muzzle velocity, ${velocity.symbol}`,
+        t('Muzzle velocity, {unit}', { unit: velocity.symbol }),
         all.map((r) => velocity.fromSi(r.values.velocity)),
         'left',
         theme.velocity,
       ),
       valueAxis(
         theme,
-        `Muzzle energy, ${energy.symbol}`,
+        t('Muzzle energy, {unit}', { unit: energy.symbol }),
         all.map((r) => energy.fromSi(r.values.energy)),
         'right',
         theme.energy,
@@ -224,12 +235,13 @@ export function BarrelChart({
   system: UnitSystem
   height?: number | undefined
 }) {
+  const { t } = useTranslation()
   const theme = useChartTokens(tokens)
   const { barrelLength: length, velocity, energy } = system
   const ladder = steps.length > 1
   const option = useMemo(
-    () => theme && chartOption(theme, steps, selected, system),
-    [theme, steps, selected, system],
+    () => theme && chartOption(theme, steps, selected, system, t),
+    [theme, steps, selected, system, t],
   )
   const rows = drawn(steps[selected]?.rows)
   // the box stays while nothing is drawn (a longer run on its way): the chart area does not jump
@@ -239,8 +251,18 @@ export function BarrelChart({
       <EChart
         option={option}
         height={height}
-        title="Simulated muzzle velocity and energy against barrel length"
-        description={`${ladder ? `${steps.length} ladder steps, step ${steps[selected]?.label} solid, the others dashed or dotted and named at their end. ` : ''}The table gives the values.`}
+        title={t('Simulated muzzle velocity and energy against barrel length')}
+        description={[
+          ladder
+            ? t(
+                '{count} ladder steps, step {step} solid, the others dashed or dotted and named at their end.',
+                { count: steps.length, step: steps[selected]?.label ?? '' },
+              )
+            : '',
+          t('The table gives the values.'),
+        ]
+          .filter(Boolean)
+          .join(' ')}
         focus={selected * 2}
         readout={(i) => {
           const r = rows[Math.min(i, rows.length - 1)]

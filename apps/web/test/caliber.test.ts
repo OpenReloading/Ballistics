@@ -1,4 +1,5 @@
 import { expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import { caliberOptions, commonCaliber } from '../src/lib/caliber.ts'
 
 it('names the common caliber of a cartridge G1 as the CIP record gives it', () => {
@@ -39,7 +40,7 @@ it('gives a diameter outside every group as its inch label', () => {
 })
 
 it('lists the common calibers first, then the others, each by size with its count', () => {
-  expect(caliberOptions([7.82, 7.85, 8.88, 6.72, 25.4])).toEqual([
+  expect(caliberOptions([7.82, 7.85, 8.88, 6.72, 25.4], english.t)).toEqual([
     {
       group: 'Common calibers',
       items: [
@@ -55,7 +56,7 @@ it('lists the common calibers first, then the others, each by size with its coun
       ],
     },
   ])
-  expect(caliberOptions([7.82])).toEqual([
+  expect(caliberOptions([7.82], english.t)).toEqual([
     { group: 'Common calibers', items: [{ value: '.308', label: '.308 (1)' }] },
   ])
 })

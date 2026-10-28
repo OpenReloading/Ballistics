@@ -10,7 +10,7 @@ import {
 } from '@open-reloading/core'
 import { assertFinite, notice, unprocessable } from './answer.ts'
 import { type InteriorBody, m3Options, maxPoints, samplingDefaults } from './interior-schema.ts'
-import { type CartridgeWithSpecs, limitCheck } from './limits.ts'
+import { type CartridgeWithSpecs, limitCheck, maximumCheck } from './limits.ts'
 import { caps } from './schemas.ts'
 import { type ComputeRunner, ComputeTimeout, taskTimeoutMs } from './tasks.ts'
 import { responseUnits } from './units.ts'
@@ -46,6 +46,7 @@ type Run =
       sampled?: SampledBand | undefined
       limits?: unknown
       warnings: unknown
+      maximumCheck?: unknown
     }
   | {
       error: {
@@ -102,7 +103,14 @@ function m3Runner(body: InteriorBody, { compute, cartridge, tolerances, resolved
       }
     const { resolvedCartridge, ...checked } = checkPressureRange(range, cartridge, { result, load })
     resolved.cartridge = resolvedCartridge
-    return { result, ...checked, sampled }
+    return {
+      result,
+      ...checked,
+      ...(body.maximumPressure !== undefined && {
+        maximumCheck: maximumCheck(checked.pressureRange, body.maximumPressure),
+      }),
+      sampled,
+    }
   }
 }
 

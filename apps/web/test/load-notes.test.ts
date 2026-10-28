@@ -1,5 +1,6 @@
 import { type Load, load, type SessionRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import {
   dismissed,
   effectiveSnapshots,
@@ -105,7 +106,7 @@ describe('notesOf', () => {
   it('words a note with its values, units and sessions, and no verdict', () => {
     const name = (ref: string) => (ref === a ? 'First' : 'Second')
     const text = notesOf([a, b], snaps, records, 2.8 * gram, undefined).map((n) =>
-      noteText(n, name, metric),
+      noteText(n, name, metric, english.t),
     )
     expect(text[0]).toBe('Powder lot is P2 in Second and was P1 in First.')
     expect(text[1]).toMatch(
@@ -121,18 +122,20 @@ describe('notesOf', () => {
       undefined,
       undefined,
     )
-    expect(noteText(seat[0] ?? never(), name, metric)).toContain('71.3')
+    expect(noteText(seat[0] ?? never(), name, metric, english.t)).toContain('71.3')
     const text2 = [
       ...text,
       noteText(
         { rule: 'roundCount', session: b, earlier: a, now: 650, before: 400, threshold: 500 },
         name,
         metric,
+        english.t,
       ),
       noteText(
         { rule: 'caseLot', session: b, earlier: a, change: 'missing', before: 'C1' },
         name,
         metric,
+        english.t,
       ),
     ].join(' ')
     expect(text2).not.toMatch(/safe|unsafe|recommend|reduce|increase/i)

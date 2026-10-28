@@ -18,6 +18,10 @@ The web app's language is a setting (Settings, General, Language). There is one 
 - Record names as published, exported file field names and the text inside the packages are not translated.
 - Text that a data builder or a server page hands to a client component is a `Wording` (`src/lib/wording.ts`): a `msg` message, `verbatim(name)` for a name or printed value that stays as it is, or `worded(message, { values })`. The client shows it with `say(t, wording)`. The page bar and a panel take a message title with `translated`.
 - A loading line, an error line and an empty list line are whole sentences in the tables of `components/states.tsx`, chosen by a key, so a new place that loads or lists adds its sentence there.
+- A function that writes text takes the translator as its last parameter (`t`, and `tn` for counts). Text that a file, a link or the print report writes passes `english.t` from `src/i18n/translate.ts`.
+- A field spec's label and help are `msg` values; `specText(t, text)` translates them and `fieldError(spec, value, shown, t)` writes the error.
+- A refusal, reason code or warning that came from the packages or the API stays English where it is held. Translate it where it is shown with `translateMessage(text, t)` (`src/lib/core-messages.ts`) and add it to `src/lib/core-message-table.json` (the warning codes are in `core-message-table.ts`), keyed by its code or, for a refusal without a code, by its sentence with placeholders, and its German text to the catalogue. `apps/web/test/core-messages.test.ts` fails for a message of `packages/core/src` or `packages/api/src` the table lacks.
+- Rows that must stay on one line (the workbench's input rows and readouts) take the German words as they are: a long term is shortened in the catalogue or the label takes a smaller size under `:lang(de)`. `tests/web/workbench-no-scroll.spec.ts` runs the workbench in German at 1280 x 650.
 
 ## Numbers, dates and country names
 

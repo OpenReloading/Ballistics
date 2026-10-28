@@ -1,4 +1,5 @@
 import { defaultStartPressure, handgunBarrelLengthLimit } from '@open-reloading/core'
+import { msg } from '../i18n/translate.ts'
 import { storageName } from './edition.ts'
 import { interiorFields } from './interior-input.ts'
 
@@ -12,17 +13,17 @@ const defaultsKey = storageName('workbenchDefaults')
 export const citedDefaults = {
   propellantTemperature: {
     si: 294.15,
-    source: 'CIP test conditions at 21 °C, CIP Decision XXXVI-15',
+    source: msg('CIP test conditions at 21 °C, CIP Decision XXXVI-15'),
     effect: 'no effect without temperature coefficients of the powder',
   },
   ignitionPressure: {
     si: 1e6,
-    source: 'assumption, no source',
+    source: msg('assumption, no source'),
     effect: 'not covered by the pressure range',
   },
   startPressure: {
     si: defaultStartPressure(handgunBarrelLengthLimit).value,
-    source: 'approximate model default for barrels of 300 mm and longer',
+    source: msg('approximate model default for barrels of 300 mm and longer'),
     effect: 'covered by the pressure range',
   },
 } as const

@@ -4,6 +4,7 @@ import { ActionIcon, SegmentedControl, Tooltip } from '@mantine/core'
 import { ArrowsOut } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
 import { type ComponentProps, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import type { FigureView } from '../lib/figure-views.ts'
 import { controlSize } from '../lib/theme.ts'
 import type { SeatingPreview as Preview } from './seating-preview.tsx'
@@ -27,9 +28,10 @@ export function CartridgeFigure({
   /** The preview's key: a new cartridge or preset seats afresh. */
   previewKey: string
 } & Omit<ComponentProps<typeof Preview>, 'view' | 'fullView'>) {
+  const { t } = useTranslation()
   const [full, setFull] = useState(false)
   return (
-    <section aria-label="Cartridge figure" className="cartridge-figure">
+    <section aria-label={t('Cartridge figure')} className="cartridge-figure">
       {/* the cartridge with the seated bullet, the chamber alone, or both: one panel
           whose value follows the tab, so one preview keeps its seating across the tabs */}
       <div className="figure-view">
@@ -38,21 +40,21 @@ export function CartridgeFigure({
             fullWidth
             size={controlSize.row.toggle}
             withItemsBorders={false}
-            aria-label="Cartridge figure view"
+            aria-label={t('Cartridge figure view')}
             value={figureView}
             onChange={(v) => onView(v as FigureView)}
             data={[
-              { value: 'cartridge', label: 'Cartridge' },
-              { value: 'chamber', label: 'Chamber' },
-              { value: 'combined', label: 'Combined' },
+              { value: 'cartridge', label: t('Cartridge') },
+              { value: 'chamber', label: t('Chamber') },
+              { value: 'combined', label: t('Combined') },
             ]}
           />
           {/* the card is too small for the dimension texts: the full view draws it at the window's height */}
-          <Tooltip label="Full view">
+          <Tooltip label={t('Full view')}>
             <ActionIcon
               variant="subtle"
               size={controlSize.row.icon}
-              aria-label="Full view"
+              aria-label={t('Full view')}
               onClick={() => setFull(true)}
             >
               <ArrowsOut size={16} aria-hidden="true" />

@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from 'react'
 import { storageName } from '../lib/edition.ts'
 import { setShownLanguage } from './shown.ts'
-import { type Catalogue, type Translator, translator } from './translate.ts'
+import { type Catalogue, english as englishText, type Translator, translator } from './translate.ts'
 
 /**
  * The languages of the interface. English is the source text of the code and has no catalogue;
@@ -19,13 +19,17 @@ const loaders: Record<Exclude<Language, 'en'>, () => Promise<{ default: Catalogu
   de: () => import('./de.json'),
 }
 
+/** The table of package and API messages: loaded with any language but English, read by `translateMessage`. */
+const loadMessages = () =>
+  import('../lib/core-message-table.ts').then((m) => m.installCoreMessages())
+
 /** `localStorage` key of the chosen language. */
 const languageKey = storageName('language')
 
 /** The chosen language, with the functions of the language shown (English until its catalogue is loaded). */
 type Translation = Translator & { chosen: Language }
 
-const english: Translation = { chosen: 'en', ...translator() }
+const english: Translation = { chosen: 'en', ...englishText }
 
 let current = english
 const listeners = new Set<() => void>()
@@ -46,7 +50,7 @@ async function show(code: Language) {
   if (current.chosen === code && current.language === code) return
   publish({ ...current, chosen: code })
   try {
-    const { default: catalogue } = await loaders[code]()
+    const [{ default: catalogue }] = await Promise.all([loaders[code](), loadMessages()])
     if (current.chosen === code) publish({ chosen: code, ...translator(catalogue, code) })
   } catch {
     // offline and never opened in this language: the text stays English, the choice stays stored

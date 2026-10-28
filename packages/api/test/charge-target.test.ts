@@ -162,6 +162,7 @@ describe('POST /interior/charge-target', () => {
     const unknown = await post({ load, target, extra: 1 })
     expect(unknown.status).toBe(400)
     expect(unknown.body.notice).toBe(notice)
+    expect((await post({ load, target, maximumPressure: 3e8 })).status).toBe(400)
     const ratio = await post({ load, target: { kind: 'loadRatio', value: 0.8 } })
     expect(ratio.status).toBe(400)
     const unit = await post({

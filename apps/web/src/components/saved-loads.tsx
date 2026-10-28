@@ -5,6 +5,7 @@ import { parseRef } from '@open-reloading/schema'
 import { Copy, DownloadSimple, PencilSimple, Trash } from '@phosphor-icons/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { fixedNumber } from '../i18n/number.ts'
+import { english } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import { dateTimeText } from '../lib/dates.ts'
 import { errorText } from '../lib/error-text.ts'
@@ -230,7 +231,7 @@ export function SavedLoads({
   const names = useCartridgeNames([
     ...new Set(records.map((r) => cartridgeGroup(r.data.cartridge))),
   ])
-  const groups = loadGroups(records, query, names)
+  const groups = loadGroups(records, query, names, english.t)
   return (
     <Drawer.Root opened={opened} onClose={onClose} size="sm" position="left">
       <Drawer.Overlay />

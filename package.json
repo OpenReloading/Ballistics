@@ -10,6 +10,7 @@
     "packages/data",
     "packages/api",
     "packages/drawing",
+    "packages/cli",
     "apps/docs",
     "apps/web",
     "tools",
@@ -21,9 +22,9 @@
   "scripts": {
     "lint": "biome check --error-on-warnings .",
     "format": "biome check --write .",
-    "build": "npm run build -w @open-reloading/schema -w @open-reloading/importers -w @open-reloading/core -w @open-reloading/data -w @open-reloading/api -w @open-reloading/drawing",
+    "build": "npm run build -w @open-reloading/schema -w @open-reloading/importers -w @open-reloading/core -w @open-reloading/data -w @open-reloading/api -w @open-reloading/drawing -w @open-reloading/cli",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "test": "npm test -w @open-reloading/schema -w @open-reloading/core -w @open-reloading/importers -w @open-reloading/drawing -w @open-reloading/data -w @open-reloading/api -w @open-reloading/web -w @open-reloading/docs -w @open-reloading/tools && npm run test:unit -w @open-reloading/e2e",
+    "test": "npm test -w @open-reloading/schema -w @open-reloading/core -w @open-reloading/importers -w @open-reloading/drawing -w @open-reloading/data -w @open-reloading/api -w @open-reloading/cli -w @open-reloading/web -w @open-reloading/docs -w @open-reloading/tools && npm run test:unit -w @open-reloading/e2e",
     "test:e2e": "npm test -w @open-reloading/e2e",
     "e2e:smoke": "npm run smoke -w @open-reloading/e2e",
     "pages:build": "npm run pages -w @open-reloading/tools",
@@ -33,7 +34,7 @@
     "data:validate": "npm run validate -w @open-reloading/data",
     "api:check": "npm run api-check -w @open-reloading/tools",
     "api:conformance": "npm run api-conformance -w @open-reloading/tools",
-    "deps:check": "depcruise packages/core/src packages/drawing/src packages/importers/src packages/importers/dist packages/schema/src packages/data/src packages/api/src apps/web/src --config .dependency-cruiser.cjs --output-type err",
+    "deps:check": "depcruise packages/core/src packages/drawing/src packages/importers/src packages/importers/dist packages/schema/src packages/data/src packages/api/src packages/cli/src apps/web/src --config .dependency-cruiser.cjs --output-type err",
     "knip": "knip",
     "docs:check": "npm run check -w @open-reloading/docs",
     "postinstall": "node hooks/install.mjs"
