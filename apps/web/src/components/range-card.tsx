@@ -24,7 +24,7 @@ export function RangeCard({
   paper,
 }: {
   result: {
-    bullet: string
+    bulletText: string
     zeroRange: number
     si: Record<string, number | undefined>
     manual: boolean
@@ -58,7 +58,7 @@ export function RangeCard({
     ])
   return createPortal(
     <div className="range-card" data-paper={paper}>
-      <h1>{t('Range card: {name}', { name: result.bullet })}</h1>
+      <h1>{t('Range card: {name}', { name: result.bulletText })}</h1>
       <p className="sheet-date">{t('Printed {date}', { date: printDay(new Date(), language) })}</p>
       <dl className="range-card-facts">
         {facts.map(([k, v]) => (
