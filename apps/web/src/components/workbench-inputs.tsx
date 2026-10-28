@@ -147,13 +147,6 @@ export const firearmMassSpec = {
   quantity: 'firearmMass',
   positive: true,
 } as const satisfies FieldSpec
-/** The Cartridge card's measured case capacity, for the unit switch (the field is the preview's). */
-export const measuredWaterCapacitySpec = {
-  key: 'measuredWaterCapacity',
-  label: msg('Case capacity (H₂O)'),
-  quantity: 'capacity',
-  min: 0,
-} as const
 
 /**
  * Input groups from 75em: Cartridge and below it the cartridge figure in the first column, Powder,

@@ -38,7 +38,7 @@ import { userBulletRows, userRecordId } from '../lib/sources.ts'
 import { formatQuantity, type UnitSystem, withUnit } from '../lib/units.ts'
 import { mmLength, shownLength } from '../lib/workbench.ts'
 import { BarrelTable } from './barrel-length.tsx'
-import { ChargeTargetDialog } from './charge-target-dialog.tsx'
+import type { ChargeTargetDialog } from './charge-target-dialog.tsx'
 import { FileMenu } from './file-menu.tsx'
 import { focusBack } from './focus-back.ts'
 import { preloadInteriorChart } from './lazy-chart.tsx'
@@ -940,6 +940,7 @@ export function Workbench() {
   const reminder = useExportReminder()
   const [listOpen, setListOpen] = useState(false)
   const [targetOpen, setTargetOpen] = useState(false)
+  const [TargetDialog, setTargetDialog] = useState<typeof ChargeTargetDialog>()
   const { changed: countChange } = reminder
   const stored = useCallback(() => {
     load.onStored()
@@ -1398,7 +1399,9 @@ export function Workbench() {
               onStored={stored}
               reminder={reminder.text}
             />
-            <ChargeTargetDialog opened={targetOpen} onClose={() => setTargetOpen(false)} />
+            {TargetDialog && (
+              <TargetDialog opened={targetOpen} onClose={() => setTargetOpen(false)} />
+            )}
             <WorkbenchSearch
               onRun={() => run()}
               // the page bar's actions with the shortcuts that exist
@@ -1410,7 +1413,12 @@ export function Workbench() {
                 printReport,
                 phone: Boolean(phone),
                 workspace,
-                openTarget: () => setTargetOpen(true),
+                // a plain import() on first open: next/dynamic would count the dialog in the route's weight
+                openTarget: () =>
+                  import('./charge-target-dialog.tsx').then((m) => {
+                    setTargetDialog(() => m.ChargeTargetDialog)
+                    setTargetOpen(true)
+                  }),
                 openList,
                 link,
                 asNewLoad,

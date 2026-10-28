@@ -38,7 +38,12 @@ import type { BulletSummary, CartridgeDetail, CaseSummary } from '../lib/api-typ
 import type { StripFigure } from '../lib/barrel-strip.ts'
 import { designShape } from '../lib/bullet-designer.ts'
 import { drawable } from '../lib/cartridge-sheet.ts'
-import { renamedCasePath, type UsedWater, usedWater } from '../lib/case-capacity.ts'
+import {
+  measuredWaterCapacitySpec,
+  renamedCasePath,
+  type UsedWater,
+  usedWater,
+} from '../lib/case-capacity.ts'
 import type { OwnCase } from '../lib/case-group.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import type { FieldValue } from '../lib/field-spec.ts'
@@ -71,7 +76,6 @@ import { SourceTitles } from './sources.tsx'
 import { ErrorNote, Loading } from './states.tsx'
 import { TechnicalDrawing } from './technical-drawing.tsx'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
-import { measuredWaterCapacitySpec } from './workbench-inputs.tsx'
 import { notReached } from './workbench-outcome.ts'
 
 type Load<T> =
