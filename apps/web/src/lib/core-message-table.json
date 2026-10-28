@@ -169,7 +169,13 @@
       "prior {name}: value above {floor}, sigma above 0",
       "charge must be positive",
       "level must lie in (0, 1)",
-      "the fit has no covariance: add rows or velocity sigmas"
+      "the fit has no covariance: add rows or velocity sigmas",
+      "peakPressure and pressureBasis together",
+      "pressureBasis must be one of {list}",
+      "domainMargin must lie in [0, 1)",
+      "boreDiameter must be positive",
+      "the powder has no interior model",
+      "the bore resistance of the powder needs {list}"
     ],
     "ladders": [
       "ladder start charge must be above 0",

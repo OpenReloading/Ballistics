@@ -338,6 +338,16 @@ export const rangeStringsPlanResponse = z.looseObject({
           .looseObject({
             ...identification,
             observationCount: int('Planned rows: entries plus the chronograph'),
+            refusals: z
+              .array(
+                z.looseObject({
+                  id: z
+                    .enum(['single-range', 'velocity-only'])
+                    .describe('Fixed identifier of the refusal'),
+                  advice: z.string().describe('What to add to the planned string'),
+                }),
+              )
+              .describe('Structural refusals of the planned string, empty when it passes'),
           })
           .describe('Statuses, standard errors and predicted intervals'),
       }),
