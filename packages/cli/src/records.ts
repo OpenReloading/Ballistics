@@ -1,3 +1,4 @@
+import { statSync } from 'node:fs'
 import { readRecords } from '@open-reloading/data'
 import type {
   Bullet,
@@ -7,6 +8,7 @@ import type {
   Powder,
 } from '@open-reloading/schema'
 import { parseRef } from '@open-reloading/schema'
+import { UsageError } from './errors.ts'
 import { byText } from './stats.ts'
 
 /** The records a run reads, by id; a cartridge's capacity and case (one with a stated water capacity) are the first by id. */
@@ -32,8 +34,12 @@ function firstPerCartridge<T extends { id: string; cartridge: string }>(list: T[
   return out
 }
 
-/** Reads the records of `roots` as one set, or the records of the data package without roots. */
+/** Reads the records of `roots` as one set, or the records of the data package without roots; a `UsageError` for a root that is not a folder. */
 export function loadRecords(roots: readonly string[]): Records {
+  for (const root of roots)
+    if (!statSync(root, { throwIfNoEntry: false })?.isDirectory())
+      // NOSONAR: the path is the argument the user gave
+      throw new UsageError('a records path does not exist or is not a folder')
   const { bundle, errors } = readRecords(roots.length > 0 ? roots : undefined)
   return {
     cartridges: byId(bundle.cartridges),

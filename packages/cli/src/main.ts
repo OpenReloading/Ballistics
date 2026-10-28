@@ -46,7 +46,12 @@ function checkChoices(
 }
 
 /** The options of the command line, with the environment's defaults. */
-function optionsOf(args: string[], env: NodeJS.ProcessEnv, warn: Io['stderr']) {
+function optionsOf(
+  command: 'verify' | 'compare',
+  args: string[],
+  env: NodeJS.ProcessEnv,
+  warn: Io['stderr'],
+) {
   const { values } = parseArgs({
     args,
     strict: true,
@@ -64,6 +69,11 @@ function optionsOf(args: string[], env: NodeJS.ProcessEnv, warn: Io['stderr']) {
       params: { type: 'string' },
     },
   })
+  const foreign =
+    command === 'verify'
+      ? (['baseline', 'candidate'] as const).filter((o) => values[o] !== undefined)
+      : (['model'] as const).filter((o) => values[o] !== undefined)
+  if (foreign.length > 0) throw new UsageError(`${command} takes no --${foreign.join(' or --')}`)
   const rows = values.rows ?? env.BALLISTICS_ROWS
   if (!rows) throw new UsageError('give --rows <path> or set BALLISTICS_ROWS')
   const split = values.split ?? 'validation'
@@ -82,8 +92,13 @@ function optionsOf(args: string[], env: NodeJS.ProcessEnv, warn: Io['stderr']) {
 }
 
 /** Runs `command` with its options and returns the text of the result. */
-async function execute(command: string, args: string[], env: NodeJS.ProcessEnv, io: Io) {
-  const { options, values } = optionsOf(args, env, io.stderr)
+async function execute(
+  command: 'verify' | 'compare',
+  args: string[],
+  env: NodeJS.ProcessEnv,
+  io: Io,
+) {
+  const { options, values } = optionsOf(command, args, env, io.stderr)
   const json = values.json === true || (values.table !== true && !io.tty)
   if (command === 'verify') {
     const result = await verify(options, values.model)

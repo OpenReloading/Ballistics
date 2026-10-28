@@ -115,6 +115,14 @@ describe('exit codes', () => {
     [['verify', ...data, '--group-by', 'rifle']],
     [['verify', ...data, '--params', 'fit-on-training']],
     [['verify', ...data, '--params', 'other']],
+    [['verify', '--rows', rowsPath, '--records', '/nonexistent/records']],
+    [['verify', ...data, '--records', rowsPath]],
+    [['compare', ...data, '--baseline', 'm3', '--candidate', 'm3', '--model', 'm3']],
+    [['verify', ...data, '--candidate', 'm3']],
+    [['verify', ...data, '--baseline', 'm3']],
+    [['verify', ...data, '--final']],
+    [['verify', ...data, '--split', 'training', '--final']],
+    [['compare', ...data, '--baseline', 'm3', '--candidate', 'm3', '--final']],
   ])('is 2 for bad input: %j', async (args) => {
     const { code, stdout } = await cli(args)
     expect(code).toBe(2)

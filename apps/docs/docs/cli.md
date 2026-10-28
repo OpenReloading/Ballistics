@@ -37,7 +37,7 @@ The records are read with `readRecords` of `@open-reloading/data`: `--records <d
 
 ## Split
 
-The first byte of the SHA-256 of the lower-case UTF-8 cartridge id decides: 0 to 50 test, 51 to 101 validation, 102 to 255 training (about 20 %, 20 % and 60 %). A row has the split of its cartridge. `--split` takes `validation` (default), `training` or `test`. The test split is sealed: `--split test` is refused without `--final`, to be run once per model version.
+The first byte of the SHA-256 of the lower-case UTF-8 cartridge id decides: 0 to 50 test, 51 to 101 validation, 102 to 255 training (about 20 %, 20 % and 60 %). A row has the split of its cartridge. `--split` takes `validation` (default), `training` or `test`. The test split is sealed: `--split test` is refused without `--final`, to be run once per model version. `--final` with another split is bad input.
 
 ## Metrics
 
@@ -62,6 +62,8 @@ Every result carries `modelVersion`, the SHA-256 over the sorted lines:
 The code of the evaluation itself (rows, split, the metrics and the percentiles, the interval) is not in the hash: a change to it is a change of the evaluation, not of the model, and moves the metrics of an unchanged `modelVersion`. Compare a baseline and a candidate only with one build of the CLI.
 
 ## Commands
+
+`verify` takes no `--baseline` or `--candidate`, `compare` takes no `--model`: such an option is bad input.
 
 `verify --rows <path> [--model m3|<module>]` evaluates one model on the split. `m3` is the model of the installed core; a module path is a file that exports `interior(load, options?)` with the signature of core's `interior`.
 

@@ -33,8 +33,9 @@ export interface Options {
 
 type Inputs = VerifyResult['inputs']
 
-/** Refuses a run of the sealed test split without `--final`. */
+/** Refuses a run of the sealed test split without `--final`, and `--final` on another split. */
 function checkSealed({ split, final }: Options) {
+  if (final && split !== 'test') throw new UsageError('--final is for --split test only')
   if (split === 'test' && !final)
     throw new Refusal('the test split is sealed: run it once per model version with --final')
 }
