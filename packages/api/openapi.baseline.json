@@ -16940,6 +16940,30 @@
                               "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
                               "description": "Time of the last save, ISO 8601 in UTC."
                             },
+                            "imported": {
+                              "type": "object",
+                              "properties": {
+                                "source": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 500,
+                                  "description": "Where the imported values come from, as the user named it."
+                                },
+                                "file": {
+                                  "type": "string",
+                                  "maxLength": 200,
+                                  "description": "Name of the file the record was imported from."
+                                },
+                                "day": {
+                                  "type": "string",
+                                  "format": "date",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                  "description": "Day of the import, ISO 8601."
+                                }
+                              },
+                              "required": ["source", "file", "day"],
+                              "description": "The import the record came from. Not compared when a file is imported again."
+                            },
                             "data": {
                               "type": "object",
                               "properties": {
@@ -16979,6 +17003,30 @@
                               "format": "date-time",
                               "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
                               "description": "Time of the last save, ISO 8601 in UTC."
+                            },
+                            "imported": {
+                              "type": "object",
+                              "properties": {
+                                "source": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 500,
+                                  "description": "Where the imported values come from, as the user named it."
+                                },
+                                "file": {
+                                  "type": "string",
+                                  "maxLength": 200,
+                                  "description": "Name of the file the record was imported from."
+                                },
+                                "day": {
+                                  "type": "string",
+                                  "format": "date",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                  "description": "Day of the import, ISO 8601."
+                                }
+                              },
+                              "required": ["source", "file", "day"],
+                              "description": "The import the record came from. Not compared when a file is imported again."
                             },
                             "data": {
                               "type": "object",
@@ -18295,6 +18343,30 @@
                               "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
                               "description": "Time of the last save, ISO 8601 in UTC."
                             },
+                            "imported": {
+                              "type": "object",
+                              "properties": {
+                                "source": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 500,
+                                  "description": "Where the imported values come from, as the user named it."
+                                },
+                                "file": {
+                                  "type": "string",
+                                  "maxLength": 200,
+                                  "description": "Name of the file the record was imported from."
+                                },
+                                "day": {
+                                  "type": "string",
+                                  "format": "date",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                  "description": "Day of the import, ISO 8601."
+                                }
+                              },
+                              "required": ["source", "file", "day"],
+                              "description": "The import the record came from. Not compared when a file is imported again."
+                            },
                             "data": {
                               "type": "object",
                               "properties": {
@@ -18590,6 +18662,30 @@
                               "format": "date-time",
                               "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
                               "description": "Time of the last save, ISO 8601 in UTC."
+                            },
+                            "imported": {
+                              "type": "object",
+                              "properties": {
+                                "source": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 500,
+                                  "description": "Where the imported values come from, as the user named it."
+                                },
+                                "file": {
+                                  "type": "string",
+                                  "maxLength": 200,
+                                  "description": "Name of the file the record was imported from."
+                                },
+                                "day": {
+                                  "type": "string",
+                                  "format": "date",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                  "description": "Day of the import, ISO 8601."
+                                }
+                              },
+                              "required": ["source", "file", "day"],
+                              "description": "The import the record came from. Not compared when a file is imported again."
                             },
                             "data": {
                               "type": "object",
@@ -19239,6 +19335,109 @@
                                         }
                                       ]
                                     },
+                                    "temperatureSensitivity": {
+                                      "description": "The `temperatureSensitivity` of the powder record. `null` removes it.",
+                                      "anyOf": [
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "reference": {
+                                              "description": "The `temperatureSensitivity.reference` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In K.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "cold": {
+                                              "description": "The `temperatureSensitivity.cold` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In 1/K.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "hot": {
+                                              "description": "The `temperatureSensitivity.hot` of the powder record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In 1/K.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
                                     "note": {
                                       "description": "The `note` of the powder record. `null` removes it.",
                                       "anyOf": [
@@ -19285,6 +19484,308 @@
                                     }
                                   },
                                   "description": "The powder fields entered so far, in stored units."
+                                },
+                                "fit": {
+                                  "type": "object",
+                                  "properties": {
+                                    "input": {
+                                      "minItems": 1,
+                                      "maxItems": 40,
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "charge": {
+                                            "type": "object",
+                                            "properties": {
+                                              "value": {
+                                                "type": "number",
+                                                "exclusiveMinimum": 0,
+                                                "description": "In g."
+                                              },
+                                              "raw": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "description": "The value as written in the source, when it differed."
+                                              }
+                                            },
+                                            "required": ["value"],
+                                            "unit": "g",
+                                            "description": "Powder charge, g."
+                                          },
+                                          "muzzleVelocity": {
+                                            "type": "object",
+                                            "properties": {
+                                              "value": {
+                                                "type": "number",
+                                                "exclusiveMinimum": 0,
+                                                "description": "In m/s."
+                                              },
+                                              "raw": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "description": "The value as written in the source, when it differed."
+                                              }
+                                            },
+                                            "required": ["value"],
+                                            "unit": "m/s",
+                                            "description": "Mean muzzle velocity of the string, m/s."
+                                          },
+                                          "shots": {
+                                            "type": "integer",
+                                            "exclusiveMinimum": 0,
+                                            "maximum": 9007199254740991,
+                                            "description": "Number of shots of the string."
+                                          },
+                                          "barrelLength": {
+                                            "type": "object",
+                                            "properties": {
+                                              "value": {
+                                                "type": "number",
+                                                "exclusiveMinimum": 0,
+                                                "description": "In mm."
+                                              },
+                                              "raw": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "description": "The value as written in the source, when it differed."
+                                              }
+                                            },
+                                            "required": ["value"],
+                                            "unit": "mm",
+                                            "description": "Barrel length, mm."
+                                          },
+                                          "temperature": {
+                                            "type": "object",
+                                            "properties": {
+                                              "value": {
+                                                "type": "number",
+                                                "description": "In degC."
+                                              },
+                                              "raw": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "description": "The value as written in the source, when it differed."
+                                              }
+                                            },
+                                            "required": ["value"],
+                                            "unit": "degC",
+                                            "description": "Powder temperature, degC."
+                                          },
+                                          "caseCapacity": {
+                                            "type": "object",
+                                            "properties": {
+                                              "value": {
+                                                "type": "number",
+                                                "exclusiveMinimum": 0,
+                                                "description": "In cm3."
+                                              },
+                                              "raw": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "description": "The value as written in the source, when it differed."
+                                              }
+                                            },
+                                            "required": ["value"],
+                                            "unit": "cm3",
+                                            "description": "Water capacity of the case, cm3."
+                                          },
+                                          "bulletMass": {
+                                            "type": "object",
+                                            "properties": {
+                                              "value": {
+                                                "type": "number",
+                                                "exclusiveMinimum": 0,
+                                                "description": "In g."
+                                              },
+                                              "raw": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "description": "The value as written in the source, when it differed."
+                                              }
+                                            },
+                                            "required": ["value"],
+                                            "unit": "g",
+                                            "description": "Bullet mass, g."
+                                          }
+                                        },
+                                        "required": [
+                                          "charge",
+                                          "muzzleVelocity",
+                                          "shots",
+                                          "barrelLength",
+                                          "temperature",
+                                          "caseCapacity",
+                                          "bulletMass"
+                                        ],
+                                        "additionalProperties": false
+                                      },
+                                      "description": "The points of the fit, at most 40."
+                                    },
+                                    "parameters": {
+                                      "minItems": 1,
+                                      "type": "array",
+                                      "items": {
+                                        "type": "string",
+                                        "enum": [
+                                          "burnRate",
+                                          "startPressure",
+                                          "volumeFactor",
+                                          "energy",
+                                          "temperatureFactor"
+                                        ]
+                                      },
+                                      "description": "The parameters the fit freed: `burnRate`, `startPressure`, `volumeFactor`, `energy`, `temperatureFactor`. The others kept the values of the input."
+                                    },
+                                    "options": {
+                                      "type": "object",
+                                      "properties": {
+                                        "prior": {
+                                          "type": "object",
+                                          "propertyNames": {
+                                            "type": "string",
+                                            "enum": [
+                                              "burnRate",
+                                              "startPressure",
+                                              "volumeFactor",
+                                              "energy",
+                                              "temperatureFactor"
+                                            ]
+                                          },
+                                          "additionalProperties": {
+                                            "type": "object",
+                                            "properties": {
+                                              "value": {
+                                                "type": "number",
+                                                "exclusiveMinimum": 0,
+                                                "description": "Centre, in the stored unit of the parameter: burn coefficient 1/s, start pressure bar, energy J/kg, factors 1."
+                                              },
+                                              "sigma": {
+                                                "type": "number",
+                                                "exclusiveMinimum": 0,
+                                                "description": "Standard deviation of the log parameter, 1."
+                                              }
+                                            },
+                                            "required": ["value", "sigma"],
+                                            "additionalProperties": false
+                                          },
+                                          "description": "Gaussian prior per freed parameter. Absent: no prior."
+                                        },
+                                        "loss": {
+                                          "oneOf": [
+                                            {
+                                              "type": "object",
+                                              "properties": {
+                                                "kind": {
+                                                  "type": "string",
+                                                  "const": "quadratic",
+                                                  "description": "Quadratic loss."
+                                                }
+                                              },
+                                              "required": ["kind"],
+                                              "additionalProperties": false
+                                            },
+                                            {
+                                              "type": "object",
+                                              "properties": {
+                                                "kind": {
+                                                  "type": "string",
+                                                  "const": "huber",
+                                                  "description": "Huber loss."
+                                                },
+                                                "threshold": {
+                                                  "type": "number",
+                                                  "exclusiveMinimum": 0,
+                                                  "description": "Threshold in sigmas of the rows, 1."
+                                                }
+                                              },
+                                              "required": ["kind", "threshold"],
+                                              "additionalProperties": false
+                                            }
+                                          ],
+                                          "description": "Loss of the fit: `quadratic`, or `huber` with its threshold."
+                                        }
+                                      },
+                                      "required": ["loss"],
+                                      "additionalProperties": false,
+                                      "description": "Prior and loss of the fit."
+                                    },
+                                    "date": {
+                                      "type": "string",
+                                      "format": "date-time",
+                                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                                      "description": "Time of the fit, ISO 8601 in UTC."
+                                    },
+                                    "model": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "maxLength": 64,
+                                      "description": "Interior model of the fit, such as `m3`."
+                                    },
+                                    "modelVersion": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "maxLength": 64,
+                                      "description": "Version of the model code that fitted."
+                                    },
+                                    "confidence": {
+                                      "type": "string",
+                                      "enum": ["tight", "moderate", "loose"],
+                                      "description": "Width class of the peak-pressure range: relative half-width up to 10 %, up to 25 %, or above."
+                                    },
+                                    "reasons": {
+                                      "maxItems": 20,
+                                      "type": "array",
+                                      "items": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "maxLength": 64
+                                      },
+                                      "description": "Why the confidence is not better, or what the fit rests on, as the fit named them."
+                                    },
+                                    "sessions": {
+                                      "maxItems": 50,
+                                      "type": "array",
+                                      "items": {
+                                        "type": "string",
+                                        "allOf": [
+                                          {
+                                            "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$"
+                                          },
+                                          {
+                                            "pattern": "^user:"
+                                          }
+                                        ],
+                                        "description": "Reference `user:<UUID>` to a session of the user."
+                                      },
+                                      "description": "The sessions the points came from, for information only: never resolved."
+                                    },
+                                    "previous": {
+                                      "type": "string",
+                                      "allOf": [
+                                        {
+                                          "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$"
+                                        },
+                                        {
+                                          "pattern": "^user:"
+                                        }
+                                      ],
+                                      "description": "The powder record this one refits. Never resolved."
+                                    }
+                                  },
+                                  "required": [
+                                    "input",
+                                    "parameters",
+                                    "options",
+                                    "date",
+                                    "model",
+                                    "modelVersion",
+                                    "confidence",
+                                    "reasons",
+                                    "sessions"
+                                  ],
+                                  "additionalProperties": false,
+                                  "description": "What a fitted powder was fitted to and how, kept with the powder."
                                 }
                               },
                               "required": ["origin"],
@@ -19318,6 +19819,30 @@
                               "format": "date-time",
                               "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
                               "description": "Time of the last save, ISO 8601 in UTC."
+                            },
+                            "imported": {
+                              "type": "object",
+                              "properties": {
+                                "source": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 500,
+                                  "description": "Where the imported values come from, as the user named it."
+                                },
+                                "file": {
+                                  "type": "string",
+                                  "maxLength": 200,
+                                  "description": "Name of the file the record was imported from."
+                                },
+                                "day": {
+                                  "type": "string",
+                                  "format": "date",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                  "description": "Day of the import, ISO 8601."
+                                }
+                              },
+                              "required": ["source", "file", "day"],
+                              "description": "The import the record came from. Not compared when a file is imported again."
                             },
                             "data": {
                               "type": "object",
@@ -19533,6 +20058,30 @@
                               "format": "date-time",
                               "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
                               "description": "Time of the last save, ISO 8601 in UTC."
+                            },
+                            "imported": {
+                              "type": "object",
+                              "properties": {
+                                "source": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 500,
+                                  "description": "Where the imported values come from, as the user named it."
+                                },
+                                "file": {
+                                  "type": "string",
+                                  "maxLength": 200,
+                                  "description": "Name of the file the record was imported from."
+                                },
+                                "day": {
+                                  "type": "string",
+                                  "format": "date",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                  "description": "Day of the import, ISO 8601."
+                                }
+                              },
+                              "required": ["source", "file", "day"],
+                              "description": "The import the record came from. Not compared when a file is imported again."
                             },
                             "data": {
                               "type": "object",
@@ -20210,6 +20759,30 @@
                               "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
                               "description": "Time of the last save, ISO 8601 in UTC."
                             },
+                            "imported": {
+                              "type": "object",
+                              "properties": {
+                                "source": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 500,
+                                  "description": "Where the imported values come from, as the user named it."
+                                },
+                                "file": {
+                                  "type": "string",
+                                  "maxLength": 200,
+                                  "description": "Name of the file the record was imported from."
+                                },
+                                "day": {
+                                  "type": "string",
+                                  "format": "date",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                  "description": "Day of the import, ISO 8601."
+                                }
+                              },
+                              "required": ["source", "file", "day"],
+                              "description": "The import the record came from. Not compared when a file is imported again."
+                            },
                             "data": {
                               "type": "object",
                               "properties": {
@@ -20731,6 +21304,30 @@
                               "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
                               "description": "Time of the last save, ISO 8601 in UTC."
                             },
+                            "imported": {
+                              "type": "object",
+                              "properties": {
+                                "source": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 500,
+                                  "description": "Where the imported values come from, as the user named it."
+                                },
+                                "file": {
+                                  "type": "string",
+                                  "maxLength": 200,
+                                  "description": "Name of the file the record was imported from."
+                                },
+                                "day": {
+                                  "type": "string",
+                                  "format": "date",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                  "description": "Day of the import, ISO 8601."
+                                }
+                              },
+                              "required": ["source", "file", "day"],
+                              "description": "The import the record came from. Not compared when a file is imported again."
+                            },
                             "data": {
                               "type": "object",
                               "properties": {
@@ -21218,6 +21815,30 @@
                               "format": "date-time",
                               "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
                               "description": "Time of the last save, ISO 8601 in UTC."
+                            },
+                            "imported": {
+                              "type": "object",
+                              "properties": {
+                                "source": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 500,
+                                  "description": "Where the imported values come from, as the user named it."
+                                },
+                                "file": {
+                                  "type": "string",
+                                  "maxLength": 200,
+                                  "description": "Name of the file the record was imported from."
+                                },
+                                "day": {
+                                  "type": "string",
+                                  "format": "date",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                  "description": "Day of the import, ISO 8601."
+                                }
+                              },
+                              "required": ["source", "file", "day"],
+                              "description": "The import the record came from. Not compared when a file is imported again."
                             },
                             "data": {
                               "type": "object",
@@ -21885,6 +22506,30 @@
                               "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
                               "description": "Time of the last save, ISO 8601 in UTC."
                             },
+                            "imported": {
+                              "type": "object",
+                              "properties": {
+                                "source": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 500,
+                                  "description": "Where the imported values come from, as the user named it."
+                                },
+                                "file": {
+                                  "type": "string",
+                                  "maxLength": 200,
+                                  "description": "Name of the file the record was imported from."
+                                },
+                                "day": {
+                                  "type": "string",
+                                  "format": "date",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                  "description": "Day of the import, ISO 8601."
+                                }
+                              },
+                              "required": ["source", "file", "day"],
+                              "description": "The import the record came from. Not compared when a file is imported again."
+                            },
                             "data": {
                               "type": "object",
                               "properties": {
@@ -22036,6 +22681,30 @@
                               "format": "date-time",
                               "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
                               "description": "Time of the last save, ISO 8601 in UTC."
+                            },
+                            "imported": {
+                              "type": "object",
+                              "properties": {
+                                "source": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 500,
+                                  "description": "Where the imported values come from, as the user named it."
+                                },
+                                "file": {
+                                  "type": "string",
+                                  "maxLength": 200,
+                                  "description": "Name of the file the record was imported from."
+                                },
+                                "day": {
+                                  "type": "string",
+                                  "format": "date",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                  "description": "Day of the import, ISO 8601."
+                                }
+                              },
+                              "required": ["source", "file", "day"],
+                              "description": "The import the record came from. Not compared when a file is imported again."
                             },
                             "data": {
                               "type": "object",

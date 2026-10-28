@@ -127,9 +127,9 @@ export const userPowderFit = z.strictObject({
         .optional(),
       loss: z
         .discriminatedUnion('kind', [
-          z.strictObject({ kind: z.literal('quadratic') }),
+          z.strictObject({ kind: z.literal('quadratic').describe('Quadratic loss.') }),
           z.strictObject({
-            kind: z.literal('huber'),
+            kind: z.literal('huber').describe('Huber loss.'),
             threshold: z.number().positive().describe('Threshold in sigmas of the rows, 1.'),
           }),
         ])

@@ -1398,7 +1398,7 @@ function FileMenuOf<K extends UserRecordKind>({
     importTexts(
       files.map((file) => ({
         name: file.name,
-        bytes: async () =>
+        read: async () =>
           file.size > maxFileBytes ? undefined : new Uint8Array(await file.arrayBuffer()),
       })),
     )
@@ -1695,7 +1695,7 @@ function FileMenuOf<K extends UserRecordKind>({
               const text = pasted ?? ''
               setPasted(undefined)
               await importTexts([
-                { name: t('Pasted text'), bytes: async () => new TextEncoder().encode(text) },
+                { name: t('Pasted text'), read: async () => new TextEncoder().encode(text) },
               ])
             })}
           >

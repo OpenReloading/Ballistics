@@ -3008,7 +3008,8 @@
                                 "properties": {
                                   "kind": {
                                     "type": "string",
-                                    "const": "quadratic"
+                                    "const": "quadratic",
+                                    "description": "Quadratic loss."
                                   }
                                 },
                                 "required": [
@@ -3021,7 +3022,8 @@
                                 "properties": {
                                   "kind": {
                                     "type": "string",
-                                    "const": "huber"
+                                    "const": "huber",
+                                    "description": "Huber loss."
                                   },
                                   "threshold": {
                                     "type": "number",

@@ -71,7 +71,7 @@ interface ImportIo {
 }
 
 /** A file to import: its name and its bytes, read when its turn comes (undefined when it is too large). */
-export type ImportFile = { name: string; bytes: () => Promise<Uint8Array | undefined> }
+export type ImportFile = { name: string; read: () => Promise<Uint8Array | undefined> }
 
 /** Reads and stores one file at a time, so several large files are not held at once. */
 export async function importTexts(files: ImportFile[], io: ImportIo, { t }: Translator) {
@@ -94,7 +94,7 @@ export async function importTexts(files: ImportFile[], io: ImportIo, { t }: Tran
       invalid,
       skipped,
       notes,
-    } = parseFiles([{ name: f.name, bytes: await f.bytes() }], undefined, t)
+    } = parseFiles([{ name: f.name, bytes: await f.read() }], undefined, t)
     count += records.length
     const plan = planImport(records, (await storedRecords()).records)
     try {
