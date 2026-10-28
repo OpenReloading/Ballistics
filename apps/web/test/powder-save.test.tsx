@@ -8,7 +8,7 @@ import {
 import { fromSi, type Powder, userRecord } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { TuneNotes } from '../src/components/powder-tune.tsx'
+import { saveFailures, TuneNotes } from '../src/components/powder-tune.tsx'
 import { english, translator } from '../src/i18n/translate.ts'
 import { dayText, localDay } from '../src/lib/dates.ts'
 import { nth } from '../src/lib/nth.ts'
@@ -16,7 +16,7 @@ import { fileData, fromFile, newerFit, powderDesigns } from '../src/lib/powder-d
 import type { PowderFitReply } from '../src/lib/powder-fit.ts'
 import { answerPowderFit } from '../src/lib/powder-fit-answer.ts'
 import { fitMark, loadFitMark } from '../src/lib/powder-record.ts'
-import { fittedPowder, refitOf } from '../src/lib/powder-save.ts'
+import { fittedPowder, maxFitPoints, refitOf } from '../src/lib/powder-save.ts'
 import type { TuneString } from '../src/lib/powder-tune.ts'
 import { presetUnits } from '../src/lib/units.ts'
 
@@ -259,6 +259,45 @@ describe('the fit mark', () => {
   })
 })
 
+describe('a fit of more strings than a record holds', () => {
+  const many = (strings: TuneString[], sessions: string[]) =>
+    fittedPowder({
+      fit: fitted.fit,
+      confidence: ranged.confidence,
+      strings,
+      sessions,
+      id,
+      name: 'Long ladder',
+      date,
+    })
+
+  it('merges the strings of one charge and temperature and keeps 50 sessions', () => {
+    const ids = Array.from(
+      { length: 60 },
+      (_, i) => `1c2d3e4f-5a6b-4c7d-8e9f-${String(i).padStart(12, '0')}`,
+    )
+    const record = many(Array.from({ length: 10 }, () => strings).flat(), ids)
+    expect(userRecord.safeParse(record).success).toBe(true)
+    const fit = record?.data.fit
+    expect(fit?.input.map((p) => p.shots)).toEqual([30, 30, 30, 30, 30])
+    for (const [i, p] of (save()?.data.fit?.input ?? []).entries())
+      expect(fit?.input[i]?.muzzleVelocity.value).toBeCloseTo(p.muzzleVelocity.value, 9)
+    expect(fit?.sessions).toHaveLength(50)
+  })
+
+  it('names the limit when more charges than a record holds remain', () => {
+    const shots = nth(strings, 0).shots
+    const record = many(
+      Array.from({ length: maxFitPoints + 1 }, (_, i) => ({ charge: 2.6e-3 + i * 1e-5, shots })),
+      [],
+    )
+    expect(record?.data.fit?.input).toHaveLength(maxFitPoints + 1)
+    expect(userRecord.safeParse(record).success).toBe(false)
+    expect(saveFailures.points).toContain(String(maxFitPoints))
+    expect(new Set(Object.values(saveFailures)).size).toBe(3)
+  })
+})
+
 describe('the save on the tuning screen', () => {
   const disabledSave = /disabled=""><span[^>]*><span[^>]*>Save as a powder/
   const html = renderToStaticMarkup(
@@ -281,6 +320,21 @@ describe('the save on the tuning screen', () => {
     )
     expect(html.match(/role="slider"/g)).toHaveLength(1)
     expect(html).not.toMatch(/form\.a|Burn form|Initial slope/)
+  })
+
+  it('shows the name typed before a new fit', () => {
+    const named = renderToStaticMarkup(
+      <MantineProvider>
+        <TuneNotes
+          loaded={undefined}
+          interior={load(0.38)}
+          fit={{ fit: fitted, range: ranged, running: false }}
+          strings={strings}
+          save={{ sessions: [], name: 'Ladder of May' }}
+        />
+      </MantineProvider>,
+    )
+    expect(named).toContain('value="Ladder of May"')
   })
 
   it('offers no save before the pressure range has arrived', () => {

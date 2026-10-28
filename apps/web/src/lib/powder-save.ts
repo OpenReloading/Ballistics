@@ -35,11 +35,17 @@ export function refitOf(
 /** The record's names of the fitted parameters it can hold; the others stay in `fit.parameters` only. */
 const recordFitted = { burnRate: 'vivacity', energy: 'energy' } as const
 
+/** The most points a fitted powder record holds (`userPowderFit`). */
+export const maxFitPoints = 40
+
+/** The most sessions a fitted powder record names (`userPowderFit`). */
+const maxFitSessions = 50
+
 /** What the tuning screen saves a fit from. */
 interface FittedPowderInput {
   fit: PowderFit
   confidence: PowderConfidence
-  /** The strings of the fit, one point each. */
+  /** The strings of the fit, one point per charge and temperature. */
   strings: readonly TuneString[]
   /** The powder of the workbench's run: its fields besides the burn law stay, and its bore-resistance law. */
   base?: Powder | undefined
@@ -82,6 +88,15 @@ export function fittedPowder(
     interior: baseInterior,
     ...fields
   } = f.base ?? ({} as Partial<Powder>)
+  // strings of one charge and temperature, from several sessions, make one point
+  const points = new Map<string, { charge: number; temperature: number; velocities: number[] }>()
+  for (const s of fitStrings(f.strings)) {
+    const temperature = s.propellantTemperature ?? load.propellantTemperature
+    const key = `${s.charge} ${temperature}`
+    const point = points.get(key)
+    if (point) point.velocities.push(...s.velocities)
+    else points.set(key, { charge: s.charge, temperature, velocities: [...s.velocities] })
+  }
   const fitted = parameters.flatMap((x) =>
     x.name === 'burnRate' || x.name === 'energy' ? [recordFitted[x.name]] : [],
   )
@@ -126,14 +141,12 @@ export function fittedPowder(
       provenanceKind: 'fitted',
       draft,
       fit: {
-        input: fitStrings(f.strings).map((s) => ({
+        input: [...points.values()].map((s) => ({
           charge: { value: fromSi('mass', s.charge) },
           muzzleVelocity: { value: s.velocities.reduce((a, x) => a + x, 0) / s.velocities.length },
           shots: s.velocities.length,
           barrelLength: { value: fromSi('length', load.barrel.length) },
-          temperature: {
-            value: fromSi('temperature', s.propellantTemperature ?? load.propellantTemperature),
-          },
+          temperature: { value: fromSi('temperature', s.temperature) },
           caseCapacity: { value: fromSi('volume', load.chamber.volume) },
           bulletMass: { value: fromSi('mass', load.bullet.mass) },
         })),
@@ -144,8 +157,8 @@ export function fittedPowder(
         modelVersion: web.version,
         confidence: f.confidence.label,
         reasons: [...f.confidence.reasons],
-        // a reference names a UUID: a session of an older id is left out
-        sessions: f.sessions.flatMap((s) => userRef(s) ?? []),
+        // a reference names a UUID: a session of an older id is left out; the list is for information
+        sessions: f.sessions.flatMap((s) => userRef(s) ?? []).slice(0, maxFitSessions),
         ...(f.previous && { previous: f.previous }),
       },
     },
