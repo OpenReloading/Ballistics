@@ -2,6 +2,7 @@
 
 import type { Load } from '@open-reloading/schema'
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import {
   type LoadRecord,
   openLoadsKey,
@@ -27,7 +28,8 @@ type Tab = {
   key: string
   /** The saved record the tab was installed from, if any. */
   recordId?: string | undefined
-  title: string
+  /** Undefined: a load with nothing set, titled by the language shown. */
+  title?: string | undefined
   /** The name the user typed or the record carries; undefined: the generated name. */
   custom?: string | undefined
   /** Undefined: a load with nothing chosen or typed, restored by `reset()`. */
@@ -40,7 +42,7 @@ type Tab = {
 
 let counter = 0
 const newKey = () => `tab-${++counter}`
-const blank = (): Tab => ({ key: newKey(), title: 'New load', changed: false, unsaved: false })
+const blank = (): Tab => ({ key: newKey(), changed: false, unsaved: false })
 
 /** A saved load as an installable tab: its file state reads "<name> (browser)", as a saved record of the Open menu. */
 const savedTab = (r: LoadRecord): Tab => ({
@@ -67,6 +69,7 @@ const urlAsksForLoad = () =>
 
 /** The open loads: the tabs, switching, opening saved loads and the stored open set. */
 export function useLoadTabs(load: UseWorkbenchStateResult) {
+  const { t } = useTranslation()
   const [tabs, setTabs] = useState<Tab[]>(() => [blank()])
   const [active, setActive] = useState(() => nth(tabs, 0).key)
   /** Whether the shown load has unsaved changes (the File menu reports it). */
@@ -76,15 +79,17 @@ export function useLoadTabs(load: UseWorkbenchStateResult) {
   const live = useRef({ load, tabs, active, unsaved })
   live.current = { load, tabs, active, unsaved }
 
-  const titles = tabTitles(tabs.map((t) => (t.key === active ? load.name : t.title)))
+  const titles = tabTitles(
+    tabs.map((tb) => (tb.key === active ? load.name : (tb.title ?? t('New load')))),
+  )
 
   /** The shown tab as a snapshot. */
   function snapshot(): Tab {
     const { load, tabs, active, unsaved } = live.current
     const menu = load.fileMenu.current
-    const t = tabs.find((x) => x.key === active) ?? nth(tabs, 0)
+    const tb = tabs.find((x) => x.key === active) ?? nth(tabs, 0)
     return {
-      key: t.key,
+      key: tb.key,
       recordId: menu?.id(),
       title: load.name,
       custom: load.customName,
@@ -107,10 +112,10 @@ export function useLoadTabs(load: UseWorkbenchStateResult) {
     setUnsaved(tab.unsaved)
   }
 
-  const replace = (ts: Tab[], tab: Tab) => ts.map((t) => (t.key === tab.key ? tab : t))
+  const replace = (ts: Tab[], tab: Tab) => ts.map((tb) => (tb.key === tab.key ? tab : tb))
 
   function switchTo(key: string) {
-    const target = live.current.tabs.find((t) => t.key === key)
+    const target = live.current.tabs.find((tb) => tb.key === key)
     if (!target || key === live.current.active) return
     const current = snapshot()
     setTabs((ts) => replace(ts, current))
@@ -122,7 +127,9 @@ export function useLoadTabs(load: UseWorkbenchStateResult) {
     const { load, unsaved, active } = live.current
     const current = snapshot()
     const empty = load.fresh && !unsaved && !current.recordId
-    setTabs((ts) => (empty ? ts.filter((t) => t.key !== active) : replace(ts, current)).concat(tab))
+    setTabs((ts) =>
+      (empty ? ts.filter((tb) => tb.key !== active) : replace(ts, current)).concat(tab),
+    )
     install(tab)
   }
 
@@ -131,8 +138,8 @@ export function useLoadTabs(load: UseWorkbenchStateResult) {
   /** A saved load: its own tab, or that tab when it is open. */
   function openRecord(record: LoadRecord) {
     const { tabs, active, load } = live.current
-    const open = tabs.find((t) =>
-      t.key === active ? load.fileMenu.current?.id() === record.id : t.recordId === record.id,
+    const open = tabs.find((tb) =>
+      tb.key === active ? load.fileMenu.current?.id() === record.id : tb.recordId === record.id,
     )
     if (open) return switchTo(open.key)
     add(savedTab(record))
@@ -140,29 +147,31 @@ export function useLoadTabs(load: UseWorkbenchStateResult) {
 
   async function close(key: string) {
     const { tabs, active, unsaved } = live.current
-    const tab = tabs.find((t) => t.key === key)
+    const tab = tabs.find((tb) => tb.key === key)
     if (!tab || tabs.length < 2) return
     const isUnsaved = key === active ? unsaved : tab.unsaved
     if (
       isUnsaved &&
       !(await confirmDialog({
-        title: `Close ${titles[tabs.indexOf(tab)]}? Its unsaved changes are lost.`,
-        confirmLabel: 'Close',
+        title: t('Close {title}? Its unsaved changes are lost.', {
+          title: titles[tabs.indexOf(tab)] ?? '',
+        }),
+        confirmLabel: t('Close'),
         danger: true,
       }))
     )
       return
-    const keys = live.current.tabs.map((t) => t.key)
-    if (key !== live.current.active) return setTabs((ts) => ts.filter((t) => t.key !== key))
-    const next = live.current.tabs.find((t) => t.key === tabAfterClose(keys, key))
+    const keys = live.current.tabs.map((tb) => tb.key)
+    if (key !== live.current.active) return setTabs((ts) => ts.filter((tb) => tb.key !== key))
+    const next = live.current.tabs.find((tb) => tb.key === tabAfterClose(keys, key))
     if (!next) return
-    setTabs((ts) => ts.filter((t) => t.key !== key))
+    setTabs((ts) => ts.filter((tb) => tb.key !== key))
     install(next)
   }
 
   /** A saved load was deleted from the browser: its tab goes, or the shown load becomes unsaved work. */
   function deleted(id: string) {
-    setTabs((ts) => ts.filter((t) => t.key === live.current.active || t.recordId !== id))
+    setTabs((ts) => ts.filter((tb) => tb.key === live.current.active || tb.recordId !== id))
     const menu = live.current.load.fileMenu.current
     if (menu?.id() === id) menu.restore({ initial: '', unsaved: true })
   }
@@ -176,15 +185,15 @@ export function useLoadTabs(load: UseWorkbenchStateResult) {
       menu.rename(name)
     }
     setTabs((ts) =>
-      ts.map((t) => {
-        if (t.key === active || t.recordId !== id) return t
-        const saved = t.file?.saved
+      ts.map((tb) => {
+        if (tb.key === active || tb.recordId !== id) return tb
+        const saved = tb.file?.saved
         return {
-          ...t,
+          ...tb,
           title: name,
           custom: name,
-          file: t.file && {
-            ...t.file,
+          file: tb.file && {
+            ...tb.file,
             saved: saved && { ...saved, json: renamedKey(saved.json, name) },
           },
         }
@@ -196,8 +205,8 @@ export function useLoadTabs(load: UseWorkbenchStateResult) {
   useEffect(() => {
     if (!fileId) return
     setTabs((ts) =>
-      ts.some((t) => t.key !== active && t.recordId === fileId)
-        ? ts.filter((t) => t.key === active || t.recordId !== fileId)
+      ts.some((tb) => tb.key !== active && tb.recordId === fileId)
+        ? ts.filter((tb) => tb.key === active || tb.recordId !== fileId)
         : ts,
     )
   }, [fileId, active])
@@ -205,8 +214,8 @@ export function useLoadTabs(load: UseWorkbenchStateResult) {
   // the open set of saved loads, reopened on the next visit
   useEffect(() => {
     if (!restored) return
-    const ids = tabs.flatMap((t) => {
-      const id = t.key === active ? fileId : t.recordId
+    const ids = tabs.flatMap((tb) => {
+      const id = tb.key === active ? fileId : tb.recordId
       return id ? [id] : []
     })
     try {
@@ -218,7 +227,7 @@ export function useLoadTabs(load: UseWorkbenchStateResult) {
   }, [restored, tabs, active, fileId])
 
   // reload and close ask while a load behind the shown one has unsaved changes
-  const behind = tabs.some((t) => t.key !== active && t.unsaved)
+  const behind = tabs.some((tb) => tb.key !== active && tb.unsaved)
   useEffect(() => {
     if (!behind) return
     const warn = (e: BeforeUnloadEvent) => e.preventDefault()
@@ -243,7 +252,7 @@ export function useLoadTabs(load: UseWorkbenchStateResult) {
           const r = records.find((x): x is LoadRecord => x.kind === 'load' && x.id === id)
           return r ? [savedTab(r)] : []
         })
-        const shownNow = saved.find((t) => t.recordId === stored.active)
+        const shownNow = saved.find((tb) => tb.recordId === stored.active)
         const { load, unsaved, tabs } = live.current
         const untouched =
           load.fresh && !unsaved && tabs.length === 1 && !load.fileMenu.current?.id()
@@ -262,11 +271,11 @@ export function useLoadTabs(load: UseWorkbenchStateResult) {
   }, [])
 
   return {
-    items: tabs.map((t, i) => ({
-      key: t.key,
+    items: tabs.map((tb, i) => ({
+      key: tb.key,
       title: nth(titles, i),
-      active: t.key === active,
-      unsaved: t.key === active ? unsaved : t.unsaved,
+      active: tb.key === active,
+      unsaved: tb.key === active ? unsaved : tb.unsaved,
     })),
     close,
     deleted,
@@ -277,8 +286,8 @@ export function useLoadTabs(load: UseWorkbenchStateResult) {
     openRecord,
     setUnsaved,
     switchTo,
-    openIds: tabs.flatMap((t) => {
-      const id = t.key === active ? fileId : t.recordId
+    openIds: tabs.flatMap((tb) => {
+      const id = tb.key === active ? fileId : tb.recordId
       return id ? [id] : []
     }),
   }

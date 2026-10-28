@@ -22,6 +22,7 @@ import {
   type FieldValue,
   fieldValueFromText,
   rangeOf,
+  specText,
   typedFieldValue,
 } from '../lib/field-spec.ts'
 import {
@@ -68,12 +69,17 @@ function UnitSwitch({
   label: string
   onPick: (id: string) => void
 }) {
+  const { t } = useTranslation()
   const units = unitList(q)
   const [first, second] = units
   if (first && second && units.length === 2) {
     const [id, next] = units.find(([, u]) => u !== unit) ?? first
     // starts with the visible text (WCAG 2.5.3)
-    const name = `${unit.symbol}, switch ${label} to ${next.symbol}`
+    const name = t('{unit}, switch {label} to {next}', {
+      unit: unit.symbol,
+      label,
+      next: next.symbol,
+    })
     return (
       <UnstyledButton
         className="field-unit-switch"
@@ -90,7 +96,7 @@ function UnitSwitch({
       <Menu.Target>
         <UnstyledButton
           className="field-unit-switch"
-          aria-label={`Unit of ${label}: ${unit.symbol}`}
+          aria-label={t('Unit of {label}: {unit}', { label, unit: unit.symbol })}
         >
           {unit.symbol}
         </UnstyledButton>
@@ -387,7 +393,8 @@ export function NumberField({
 }) {
   const value = given ?? noValue
   // the language shown: the field writes its decimal mark and reads text in it
-  useTranslation()
+  const { t } = useTranslation()
+  const specLabel = specText(t, spec.label)
   // what was typed where it differs from the text shown for the value (a point under a decimal comma,
   // text that is no number), until the field is left with a value; `text` is the state's text it gave
   const [draft, setDraft] = useState<{ raw: string; text: string }>()
@@ -405,7 +412,7 @@ export function NumberField({
   const symbol = unit === 'none' ? '' : label
   const at = <T,>(v: OfShown<T>): T =>
     typeof v === 'function' ? (v as (s: UnitSystem) => T)(shown) : v
-  const helpText = help ? help(shown) : spec.help
+  const helpText = help ? help(shown) : spec.help && specText(t, spec.help)
   const markText = at(mark)
   const actionText = action && at(action.text)
   const marker =
@@ -418,7 +425,7 @@ export function NumberField({
   const longest = Math.max(...units.map(([, u]) => u.symbol.length))
   const common = {
     // the unit shows once, as the field's suffix; the label keeps it for screen readers
-    label: fieldLabel(spec.label, label),
+    label: fieldLabel(specLabel, label),
     description: describedBy,
     // the dense workbench grid hides the description: the label shows it on hover
     labelProps: { title: [helpText, markText].filter(Boolean).join(' ') || undefined },
@@ -447,7 +454,7 @@ export function NumberField({
       longest,
       q: spec.quantity,
       unit: shown[spec.quantity],
-      label: spec.label,
+      label: specLabel,
       onPick: (id) => setPick(pickUnit(spec.quantity, system, id)),
     }),
     ...errorProps(muted, hiddenError),
@@ -475,7 +482,7 @@ export function NumberField({
       step={step}
       onText={change}
       onRefused={(p) => {
-        setRefused(ambiguousMessage(p))
+        setRefused(ambiguousMessage(p, t))
         setDraft(undefined)
       }}
     />

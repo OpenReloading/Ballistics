@@ -3,12 +3,14 @@
 import { Button, Stack } from '@mantine/core'
 import { useEffect, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
+import { msg } from '../i18n/translate.ts'
 import {
   type FieldSpec,
   type Fields,
   type FieldValue,
   fieldError,
   initialFields,
+  specText,
 } from '../lib/field-spec.ts'
 import { barrelLengthByClass } from '../lib/input-defaults.ts'
 import { interiorFields } from '../lib/interior-input.ts'
@@ -31,7 +33,7 @@ import { useFieldUnits, useUnits } from './units-settings.tsx'
 /** The barrel length of the seating: optional, empty means by cartridge class (`input-defaults.ts`). */
 const barrelSpec = {
   key: 'barrelLength',
-  label: 'Barrel length',
+  label: msg('Barrel length'),
   quantity: 'barrelLength',
   min: 0,
 } as const satisfies FieldSpec
@@ -43,10 +45,6 @@ const specs: readonly FieldSpec[] = [
   barrelSpec,
 ]
 const keys = [...defaultKeys, 'barrelLength'] as const
-
-/** What an empty barrel length stands for, in the shown unit. */
-const barrelHelp = (system: UnitSystem) =>
-  `Empty: by cartridge class, rifle ${withUnit('barrelLength', system, barrelLengthByClass.rifle)}, pistol ${withUnit('barrelLength', system, barrelLengthByClass.pistol)} (assumptions, no source).`
 
 /** The workbench defaults of the settings dialog: one field per default, stored at once when valid, and a reset. */
 export function WorkbenchDefaultsForm() {
@@ -71,17 +69,26 @@ export function WorkbenchDefaultsForm() {
   // the server cannot know the stored values: no form showing the cited ones until they are read
   if (!ready || !stored) return <Loading what="the workbench defaults" />
 
+  /** What an empty barrel length stands for, in the shown unit. */
+  const barrelHelp = (shown: UnitSystem) =>
+    t('Empty: by cartridge class, rifle {rifle}, pistol {pistol} (assumptions, no source).', {
+      rifle: withUnit('barrelLength', shown, barrelLengthByClass.rifle),
+      pistol: withUnit('barrelLength', shown, barrelLengthByClass.pistol),
+    })
+
+  const aboveZero = (spec: FieldSpec) =>
+    t('{label} must be above 0.', { label: specText(t, spec.label) })
+
   /** The message of a default field in the units `shown` by the field; none for an empty barrel length (by cartridge class). */
   function errorOf(key: (typeof keys)[number], value: FieldValue, shown: UnitSystem) {
     const spec = nth(specs, keys.indexOf(key))
     if (key === 'barrelLength')
       return value.text.trim() === ''
         ? undefined
-        : (fieldError(spec, value, shown) ??
-            ((value.si ?? 0) > 0 ? undefined : `${spec.label} must be above 0.`))
+        : (fieldError(spec, value, shown, t) ?? ((value.si ?? 0) > 0 ? undefined : aboveZero(spec)))
     return (
-      fieldError(spec, value, shown) ??
-      (validDefault(key, value.si) ? undefined : `${spec.label} must be above 0.`)
+      fieldError(spec, value, shown, t) ??
+      (validDefault(key, value.si) ? undefined : aboveZero(spec))
     )
   }
 
@@ -141,7 +148,7 @@ export function WorkbenchDefaultsForm() {
             mark={
               key === 'barrelLength'
                 ? undefined
-                : t('Cited default: {source}.', { source: citedDefaults[key].source })
+                : t('Cited default: {source}.', { source: t(citedDefaults[key].source) })
             }
             onChange={(v) => change(key, v)}
           />

@@ -11,6 +11,8 @@ import {
 } from '@mantine/core'
 import { ListMagnifyingGlass, MagnifyingGlass } from '@phosphor-icons/react'
 import { type ReactNode, useEffect, useRef, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import type { Translator } from '../i18n/translate.ts'
 import { apiFetch } from '../lib/api-fetch.ts'
 import type { ListOf } from '../lib/api-types.ts'
 
@@ -49,13 +51,20 @@ async function matches<T>(
 }
 
 /** The status line under the field: what the search is doing or found. */
-function statusLine<T>(state: State<T>, typed: boolean, noneText: string, unreachableText: string) {
-  if (state.status === 'loading') return 'Searching'
+function statusLine<T>(
+  state: State<T>,
+  typed: boolean,
+  noneText: string,
+  unreachableText: string,
+  t: Translator['t'],
+) {
+  if (state.status === 'loading') return t('Searching')
   if (state.status === 'error') return unreachableText
   if (state.status !== 'ok' || !typed) return ''
   if (state.items.length === 0) return noneText
-  const cut = state.total > state.items.length ? `, first ${state.items.length} shown` : ''
-  return `${state.total} found${cut}`
+  return state.total > state.items.length
+    ? t('{total} found, first {shown} shown', { total: state.total, shown: state.items.length })
+    : t('{total} found', { total: state.total })
 }
 
 /** The end of the field: the browse button, else the loader, else the select's chevron. */
@@ -139,6 +148,7 @@ export function RecordSearch<T extends { id: string }>({
   /** The matches of the typed text, 20 at most with the total, in place of the API search. */
   find?: (text: string, limit: number) => Promise<ListOf<T>>
 }) {
+  const { t } = useTranslation()
   const [q, setQ] = useState('')
   const [state, setState] = useState<State<T>>({ status: 'idle' })
   const combobox = useCombobox({ onDropdownClose: () => combobox.resetSelectedOption() })
@@ -179,7 +189,7 @@ export function RecordSearch<T extends { id: string }>({
   const items = state.status === 'ok' ? state.items : []
   const typed = q.trim().toLowerCase()
   const local = extra.filter((e) => e.label.toLowerCase().includes(typed))
-  const message = statusLine(state, q.trim() !== '', noneText, unreachableText)
+  const message = statusLine(state, q.trim() !== '', noneText, unreachableText, t)
 
   const submit = (id: string) => {
     if (id.startsWith('extra:')) onExtra?.(id.slice('extra:'.length))
@@ -239,7 +249,7 @@ export function RecordSearch<T extends { id: string }>({
           />
         </Combobox.Target>
         <Combobox.Dropdown hidden={items.length === 0 && local.length === 0}>
-          <Combobox.Options aria-label="Matches" mah={280} style={{ overflowY: 'auto' }}>
+          <Combobox.Options aria-label={t('Matches')} mah={280} style={{ overflowY: 'auto' }}>
             {local.map((e) => (
               <Combobox.Option value={`extra:${e.id}`} key={`extra:${e.id}`}>
                 {e.label}

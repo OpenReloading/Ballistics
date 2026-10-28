@@ -4,6 +4,8 @@ import { Alert, Button, EmptyState, Group, Skeleton, Stack, Text } from '@mantin
 import { FunnelX, Info, Warning, WarningOctagon } from '@phosphor-icons/react'
 import { useRouter } from 'next/navigation'
 import { type ReactNode, useLayoutEffect, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import { type Message as Marked, msg, type Translator } from '../i18n/translate.ts'
 import { controlSize } from '../lib/theme.ts'
 import { LibraryTabs } from './library-tabs.tsx'
 import { PageBar } from './page-bar.tsx'
@@ -36,6 +38,67 @@ export function EmptyNote({
 }
 
 /**
+ * What each page names while it loads, as a whole sentence (a noun phrase does not translate into
+ * every language's word order). A `what` not listed here reads English text inside the sentence.
+ */
+const loadingTexts: Record<string, Marked> = {
+  bullets: msg('Loading bullets'),
+  disciplines: msg('Loading disciplines'),
+  cartridges: msg('Loading cartridges'),
+  'target faces': msg('Loading target faces'),
+  federations: msg('Loading federations'),
+  powders: msg('Loading powders'),
+  'the preview': msg('Loading the preview'),
+  'your data': msg('Loading your data'),
+  'the designer': msg('Loading the designer'),
+  cartridge: msg('Loading cartridge'),
+  manufacturers: msg('Loading manufacturers'),
+  firearms: msg('Loading firearms'),
+  'the cases': msg('Loading the cases'),
+  cases: msg('Loading cases'),
+  primers: msg('Loading primers'),
+  'the measurements': msg('Loading the measurements'),
+  'the shot groups': msg('Loading the shot groups'),
+  'the unit settings': msg('Loading the unit settings'),
+  'the cartridge record': msg('Loading the cartridge record'),
+  'the bullet record': msg('Loading the bullet record'),
+  'the settings': msg('Loading the settings'),
+  'the workbench defaults': msg('Loading the workbench defaults'),
+  curves: msg('Loading curves'),
+}
+
+/** The loading sentence for `what`, without its closing ellipsis. */
+function loadingText(t: Translator['t'], what: string) {
+  const known = loadingTexts[what]
+  return known ? t(known) : t('Loading {what}', { what })
+}
+
+/** `DataError` titles by the record kind callers name. */
+const unavailableTexts: Record<string, Marked> = {
+  Bullet: msg('Bullet data is unavailable right now.'),
+  Discipline: msg('Discipline data is unavailable right now.'),
+  Case: msg('Case data is unavailable right now.'),
+  Cartridge: msg('Cartridge data is unavailable right now.'),
+  'Target face': msg('Target face data is unavailable right now.'),
+  Federation: msg('Federation data is unavailable right now.'),
+  Primer: msg('Primer data is unavailable right now.'),
+  Powder: msg('Powder data is unavailable right now.'),
+}
+
+/** `EmptyList` titles by the plural noun callers name. */
+const noMatchTexts: Record<string, Marked> = {
+  bullets: msg('No bullets match these filters.'),
+  cases: msg('No cases match these filters.'),
+  cartridges: msg('No cartridges match these filters.'),
+  disciplines: msg('No disciplines match these filters.'),
+  primers: msg('No primers match these filters.'),
+  firearms: msg('No firearms match these filters.'),
+  'target faces': msg('No target faces match these filters.'),
+  powders: msg('No powders match these filters.'),
+  federations: msg('No federations match these filters.'),
+}
+
+/**
  * The one loading state: the text for screen readers and a skeleton of the rows to come. `inline`
  * is a bare line without skeleton and status role, for a place that must not change height.
  */
@@ -48,11 +111,12 @@ export function Loading({
   rows?: number | undefined
   inline?: boolean
 }) {
-  if (inline) return <p>{`Loading ${what}`}</p>
+  const { t } = useTranslation()
+  if (inline) return <p>{loadingText(t, what)}</p>
   return (
     <div role="status">
       <Text size="sm" c="dimmed">
-        Loading {what}…
+        {loadingText(t, what)}…
       </Text>
       <Stack gap={6} mt={6} aria-hidden="true">
         {Array.from({ length: rows }, (_, k) => (
@@ -74,9 +138,9 @@ export interface MessageEntry {
 }
 
 const severities = {
-  info: { word: 'Note', color: 'blue', Icon: Info },
-  warning: { word: 'Warning', color: 'orange', Icon: Warning },
-  error: { word: 'Error', color: 'red', Icon: WarningOctagon },
+  info: { word: msg('Note'), color: 'blue', Icon: Info },
+  warning: { word: msg('Warning'), color: 'orange', Icon: Warning },
+  error: { word: msg('Error'), color: 'red', Icon: WarningOctagon },
 } as const
 
 /**
@@ -101,8 +165,9 @@ export function Message({
   /** False where a live region around it announces it: a plain note, no live role of its own. */
   announce?: boolean | undefined
 }) {
+  const { t } = useTranslation()
   const { word, color, Icon } = severities[severity]
-  const label = <span className="message-label">{word}:</span>
+  const label = <span className="message-label">{t(word)}:</span>
   return (
     <Alert
       className="message"
@@ -131,7 +196,7 @@ export function Message({
           mt={children ? 'xs' : 0}
           onClick={onRetry}
         >
-          Retry
+          {t('Retry')}
         </Button>
       )}
     </Alert>
@@ -221,9 +286,14 @@ export function ErrorNote({
 
 /** The data of a page could not be read from the API; Retry asks again. */
 export function DataError({ what, retry }: { what: string; retry: () => void }) {
+  const { t } = useTranslation()
+  const known = unavailableTexts[what]
   return (
-    <ErrorNote title={`${what} data is unavailable right now.`} onRetry={retry}>
-      The server did not answer.
+    <ErrorNote
+      title={known ? t(known) : t('{what} data is unavailable right now.', { what })}
+      onRetry={retry}
+    >
+      {t('The server did not answer.')}
     </ErrorNote>
   )
 }
@@ -266,11 +336,12 @@ const skeletonWidths = [62, 48, 70, 55, 66, 42, 58, 74, 50, 64, 46, 68]
  * frame, its head and rows where the records will be, so nothing moves when they arrive.
  */
 export function ListLoading({ what }: { what: string }) {
+  const { t } = useTranslation()
   return (
     <>
       <LibraryTabs />
       <div className="directory" role="status">
-        <span className="visually-hidden">Loading {what}…</span>
+        <span className="visually-hidden">{loadingText(t, what)}…</span>
         {/* the metrics of the real filter row (DirectoryFilters), so the frame stays where it is */}
         <Group className="directory-filters" gap="xs" py="xs" aria-hidden="true">
           <Skeleton height={30} className="directory-search" />
@@ -303,15 +374,17 @@ export function EmptyList({
   filters?: string
   onClear?: () => void
 }) {
+  const { t } = useTranslation()
+  const known = noMatchTexts[noun]
   return (
     <EmptyNote
       icon={<FunnelX size={24} aria-hidden="true" />}
-      title={`No ${noun} match these filters.`}
+      title={known ? t(known) : t('No {noun} match these filters.', { noun })}
       description={filters}
       action={
         onClear && (
           <Button variant="default" size={controlSize.row.button} onClick={onClear}>
-            Clear filters
+            {t('Clear filters')}
           </Button>
         )
       }
