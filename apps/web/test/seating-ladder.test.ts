@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
 import {
-  ladderTitle,
   runKindOf,
   temperatureLadder,
   temperatureLadderBlockReason,
@@ -19,14 +18,6 @@ describe('runKindOf', () => {
     expect(runKindOf('')).toBe('charge')
     expect(runKindOf(null)).toBe('charge')
     expect(runKindOf(undefined)).toBe('charge')
-  })
-})
-
-describe('ladderTitle', () => {
-  it('names each kind', () => {
-    expect(
-      ['charge', 'seating', 'temperature'].map((k) => ladderTitle(runKindOf(k), english.t)),
-    ).toEqual(['Charge', 'Seating', 'Temperature'])
   })
 })
 

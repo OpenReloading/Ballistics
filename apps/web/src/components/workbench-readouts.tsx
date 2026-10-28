@@ -758,7 +758,7 @@ const ladderNames: Record<RunnableLadderKind, Message> = {
 }
 
 /** What the run's ladder varies, for its legend and table name. */
-const ladderName = (ok: Extract<Outcome, { kind: 'ok' }> | undefined, t: Translator['t']) =>
+export const ladderName = (ok: Extract<Outcome, { kind: 'ok' }> | undefined, t: Translator['t']) =>
   t(ladderNames[ok?.ladder.kind ?? 'charge'])
 
 /** The charge ladder strip of the shown run: a step selector, or the one step as text. */

@@ -40,6 +40,9 @@ extend-ignore-re = [
   "0,6[0-9]; das Modell liegt",
   # German field label of the no-valid-run refusal that the charge-target test expects
   "Feld: (Zünddruck|heat)\\.",
+  # German labels that the test of the printed pages expects
+  "Höhenverstellung \\(MOA / Klicks\\)",
+  "Kein Maßstab: Das Foto hat keine Referenz\\.",
 ]
 
 [default.extend-words]

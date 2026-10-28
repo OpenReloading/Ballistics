@@ -33,7 +33,7 @@ import {
 import { flushSync } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
-import { english, type Message, msg, type Translator } from '../i18n/translate.ts'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { BulletSummary } from '../lib/api-types.ts'
 import { bulletDrag } from '../lib/bullet.ts'
@@ -126,9 +126,7 @@ type T = Translator['t']
  * inputs of the result, so a later edit does not relabel its range card.
  */
 type Result = TrajectoryResult & {
-  /** The bullet's description in English: the range card is printed in English. */
-  bullet: string
-  /** The same in the language shown. */
+  /** The bullet's description in the language shown. */
   bulletText: string
   design?: string | undefined
   si: Record<string, number | undefined>
@@ -262,7 +260,6 @@ function evaluate(i: Inputs, t: T): { errors: Record<string, string>; attempt: A
         kind: 'ok',
         result: {
           ...trajectoryResult(si, drawn.projectile, i.twistHand),
-          bullet: drawn.bullet(english.t),
           bulletText: drawn.bullet(t),
           si,
           manual: i.source === 'manual',

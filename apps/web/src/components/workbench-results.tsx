@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic'
 import { memo, type RefObject, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { canonicalNumberText } from '../i18n/number.ts'
-import { english, type Message, msg, type Translator } from '../i18n/translate.ts'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { vivacityUnit } from '../lib/burn-rate.ts'
 import { toCsv } from '../lib/csv.ts'
 import { controlSize } from '../lib/theme.ts'
@@ -74,10 +74,9 @@ export type ResultTab = (typeof resultTabs)[number][0]
 const notRun = (text: Message, t: Translator['t']) => (
   <p className="prompt empty-state">{t(text)}</p>
 )
-// printed: the print view keeps English until its own pass
-const heading = (v: ResultTab) => {
+const heading = (v: ResultTab, t: Translator['t']) => {
   const label = resultTabs.find(([k]) => k === v)?.[1]
-  return <h2 className="print-only">{label && english.t(label)}</h2>
+  return <h2 className="print-only">{label && t(label)}</h2>
 }
 
 /**
@@ -561,7 +560,7 @@ function ResultPanels({ short }: { short: boolean }) {
   return (
     <>
       <Tabs.Panel value="results" className="results-panel" data-stale={stale || undefined}>
-        {heading('results')}
+        {heading('results', t)}
         {ok ? (
           // from 62em the chart's height is the room the column leaves (globals.css)
           <div className="plain-chart">
@@ -577,11 +576,11 @@ function ResultPanels({ short }: { short: boolean }) {
         </Tabs.Panel>
       )}
       <Tabs.Panel value="ladder" data-stale={stale || undefined}>
-        {heading('ladder')}
+        {heading('ladder', t)}
         <LadderBody />
       </Tabs.Panel>
       <Tabs.Panel value="measurements" data-stale={stale || undefined}>
-        {heading('measurements')}
+        {heading('measurements', t)}
         {opened('measurements') && (
           <Measurements
             steps={measuredSteps(steps, ok)}
@@ -592,15 +591,15 @@ function ResultPanels({ short }: { short: boolean }) {
         )}
       </Tabs.Panel>
       <Tabs.Panel value="groups">
-        {heading('groups')}
+        {heading('groups', t)}
         {opened('groups') && <GroupsPanel />}
       </Tabs.Panel>
       <Tabs.Panel value="trajectory">
-        {heading('trajectory')}
+        {heading('trajectory', t)}
         {opened('trajectory') && <TrajectoryPanel />}
       </Tabs.Panel>
       <Tabs.Panel value="barrel" data-stale={stale || undefined}>
-        {heading('barrel')}
+        {heading('barrel', t)}
         {!ok
           ? notRun(msg('Run the simulation to see the barrel length study.'), t)
           : opened('barrel') && <BarrelLength study={barrel} system={system} />}
@@ -612,7 +611,7 @@ function ResultPanels({ short }: { short: boolean }) {
           : opened('powders') && <PowderCompare system={system} />}
       </Tabs.Panel>
       <Tabs.Panel value="notes">
-        {heading('notes')}
+        {heading('notes', t)}
         <LoadLots />
         <p className="note">
           {t(

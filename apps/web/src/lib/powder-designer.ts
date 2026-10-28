@@ -8,6 +8,7 @@ import {
   type UserPowder,
   type UserRecord,
 } from '@open-reloading/schema'
+import { english, type Translator } from '../i18n/translate.ts'
 import {
   type FieldSpec,
   type Fields,
@@ -493,8 +494,8 @@ function keyOf(live: readonly Ingredient[], path: PropertyKey[]): string | undef
 }
 
 /** The note a result carries, on screen and in print, when the powder values are a user design's. */
-export const powderDesignNote = (name: string) =>
-  `Powder values from the user design ${name}, not a catalogue record.`
+export const powderDesignNote = (name: string, t: Translator['t'] = english.t) =>
+  t('Powder values from the user design {name}, not a catalogue record.', { name })
 
 /** A powder design of this browser that builds a valid powder: the tools offer it as the user's own. */
 export interface PowderDesign {
