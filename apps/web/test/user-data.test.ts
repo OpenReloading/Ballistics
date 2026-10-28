@@ -159,6 +159,20 @@ describe('user data files', () => {
     })
   })
 
+  it('keeps the import of a record through Export all and Import, and plans a re-import as equal', () => {
+    const imported: UserRecord = {
+      ...load,
+      imported: { source: 'Maker load data', file: 'loads.csv', day: '2026-10-20' },
+    }
+    const all = exportAllText([imported, bullet])
+    const parsed = all.ok ? parseUserDataFile(all.text) : all
+    expect(parsed).toEqual({ ok: true, records: [imported, bullet] })
+    const again = { ...imported, imported: { source: 'Other', file: '', day: '2026-10-27' } }
+    expect(
+      planImport([again, { ...bullet, imported: again.imported }], [imported, bullet]),
+    ).toEqual({ added: [], equal: [again, { ...bullet, imported: again.imported }], conflicts: [] })
+  })
+
   it('names the photos of replaced target sheets that no stored record points at any more', () => {
     const sheet = (id: string, photo?: string): UserRecord => ({
       kind: 'targetSheet',

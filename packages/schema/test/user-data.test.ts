@@ -208,6 +208,24 @@ describe('userDataFile', () => {
     ).toBe(true)
   })
 
+  it('keeps the import a record came from and checks its bounds', () => {
+    const imported = { source: 'Maker load data 2026', file: 'loads.csv', day: '2026-10-20' }
+    const withImport = { ...loadRecord, imported }
+    expect(userDataFile.parse(JSON.parse(JSON.stringify(file([withImport])))).records).toEqual([
+      withImport,
+    ])
+    expect(userRecord.safeParse(loadRecord).success).toBe(true)
+    const bad = (i: object) =>
+      userRecord.safeParse({ ...loadRecord, imported: { ...imported, ...i } }).success
+    expect(bad({ source: '' })).toBe(false)
+    expect(bad({ source: 'x'.repeat(500) })).toBe(true)
+    expect(bad({ source: 'x'.repeat(501) })).toBe(false)
+    expect(bad({ file: 'x'.repeat(200) })).toBe(true)
+    expect(bad({ file: 'x'.repeat(201) })).toBe(false)
+    expect(bad({ day: '2026-10-20T10:00:00Z' })).toBe(false)
+    expect(bad({ day: '20.10.2026' })).toBe(false)
+  })
+
   it('keeps a case group and its measured fields through a round trip', () => {
     const json = JSON.parse(JSON.stringify(file([caseRecord])))
     expect(userDataFile.parse(json).records).toEqual([caseRecord])

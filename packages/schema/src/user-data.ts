@@ -140,6 +140,18 @@ const base = {
   id: z.string().min(1).max(64).describe('Id of the record in the browser library.'),
   name: z.string().min(1).max(200).describe('Name of the record. Save names the file after it.'),
   saved: z.iso.datetime().describe('Time of the last save, ISO 8601 in UTC.'),
+  imported: z
+    .object({
+      source: z
+        .string()
+        .min(1)
+        .max(500)
+        .describe('Where the imported values come from, as the user named it.'),
+      file: z.string().max(200).describe('Name of the file the record was imported from.'),
+      day: z.iso.date().describe('Day of the import, ISO 8601.'),
+    })
+    .describe('The import the record came from. Not compared when a file is imported again.')
+    .optional(),
 }
 
 /** Why a bullet, cartridge, powder or case group id that is no UUID is refused: a load refers to the record by `user:<UUID>`. */
