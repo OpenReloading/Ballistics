@@ -30,6 +30,7 @@ extend-ignore-re = [
   "Bund Deutscher",
   # German texts that the tests of the message mapping and the workbench warnings expect
   "Geben Sie eine Zahl für .* ein\\.",
+  "Geben Sie eine Zielgröße über 0 ein\\.",
   "muss positiv sein",
   "größer als 0 sein",
   "unter dem 2,2-Fachen",
