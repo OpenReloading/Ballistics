@@ -34,6 +34,8 @@ All errors are absolute relative errors. For the muzzle velocity the error of a 
 
 ### Command
 
+The command line workspace (`packages/cli`) is not in the repository yet, so these commands do not run in a clean checkout until it lands.
+
 ```sh
 npm run build
 node packages/cli/dist/bin.js verify --rows <rows> --records <records> --split validation
@@ -67,7 +69,7 @@ Each row has a default that stays in force until the owner changes it. The cost 
 | Powders without rows | Report nothing; report the error of fitted powders; leave-one-powder-out | Leave-one-powder-out as its own line, labelled "powder not in the fitted set". Its P90 is the half width of the interval shown for an unseen powder | A powder with no rows has nothing to be held out from; leaving a powder out of the fit and predicting it is the only direct measurement of that case | Low: the line stays empty and the interval stays as it is | As recommended. The command line does not offer it yet, so the line is empty and [the option is tracked as an issue](https://github.com/OpenReloading/Ballistics/issues/424) |
 | Where the numbers live and when they are rerun | Generated on every build; hand-updated page; release notes only | The numbers table of this page, updated by hand at each release from `verify --json`. The validation split on every change to model code, the sealed test split once per model version at release | Rows are not in the repository, so a build cannot regenerate the table. The version hash ties a number to the code that produced it | Low | As recommended |
 | What the app says | New on-screen claim; none | Nothing new inside the fitted domain. Outside it the existing interval or refusal text stands | The words of this page are for the documentation. A screen claim needs its own wording review | Low: a claim can be added later | No new on-screen claim |
-| Publishing aggregates | Publish every group; merge small groups | A powder family with fewer than 5 cartridges in the rows is merged into "other", so no single source can be recovered from a published number | Small groups identify the source of their rows | A published group can be merged afterwards, a recovered source cannot be taken back | 5; the owner may set another |
+| Publishing aggregates | Publish every group; merge small groups | Source composition is reviewed for every published group, per powder groups included. A powder family with fewer than 5 cartridges in the rows is merged into "other", which is not a guarantee that no source can be recovered | Rows of one source can make a group attributable whatever its size | A published group can be merged afterwards, a recovered source cannot be taken back | 5; the owner may set another |
 
 ## What the documentation may say
 
@@ -79,7 +81,8 @@ Where X, Y, N, F and H are the values of one `verify` result on one split. A res
 
 May not say:
 
-- "Accurate", "reliable", "safe" or "validated" without the numbers beside the word.
+- "Accurate", "reliable" or "validated" without the numbers beside the word.
+- "Safe", in any form, with or without numbers.
 - That a result is "within" a bound for a particular load, charge, rifle or lot.
 - Anything about pressure as load data, or any charge to use. A pressure error is a number about the model and the printed values.
 - A threshold as a result before `verify` has produced the number.
