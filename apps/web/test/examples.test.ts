@@ -33,7 +33,7 @@ import {
   shotFromValues,
   zeroKeys,
 } from '../src/lib/trajectory-input.ts'
-import { presetUnits, waterDensityGramsPerCm3 } from '../src/lib/units.ts'
+import { presetUnits } from '../src/lib/units.ts'
 import { defined } from './defined.ts'
 import { readRecord } from './read-record.ts'
 
@@ -72,6 +72,9 @@ describe('embedded record values', () => {
     expect(v('chamber', 'Q')).toBe(exampleRecords.spec.Q)
     expect(v('chamber', 'u')).toBe(exampleRecords.spec.u)
     expect(v(undefined, 'Pmax')).toBe(exampleRecords.spec.Pmax)
+    expect(record('cases', exampleRecords.case.id).waterCapacity.value).toBe(
+      exampleRecords.case.water,
+    )
 
     const p = record('powders', exampleRecords.powder.id)
     const m = record('manufacturers', p.manufacturer)
@@ -93,7 +96,7 @@ describe('embedded record values', () => {
   it('name each record in the sources', () => {
     const text = [...trajectorySources, ...interiorSources].join(' ')
     for (const r of Object.values(exampleRecords))
-      if (r.id !== '308-win' && r.id !== exampleRecords.capacity.id) expect(text).toContain(r.id)
+      if (r.id !== '308-win') expect(text).toContain(r.id)
     expect(text).not.toContain('Example input')
     expect(text).not.toMatch(/\bsafe\b/i)
   })
@@ -189,11 +192,8 @@ describe('example rifle', () => {
     expect(gun.barrelLength).toBeCloseTo(exampleSeating.barrel, 9)
     expect(gun.firearmMass).toBeCloseTo(7, 12)
     expect(loadExample?.firearmMass).toBeCloseTo(gun.firearmMass as number, 12)
-    // the measured case capacity (water, m³) and the seating ladder step the example fills
-    expect(loadExample?.waterCapacity).toBeCloseTo(
-      (exampleRecords.capacity.water / waterDensityGramsPerCm3) * 1e-6,
-      15,
-    )
+    // the case record the example chooses and the seating ladder step it fills
+    expect(loadExample?.caseId).toBe(exampleRecords.case.id)
     expect(loadExample?.seatStep).toBe(0.5e-3)
   })
 })
