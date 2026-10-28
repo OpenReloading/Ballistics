@@ -14815,11 +14815,6 @@
                     "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
                     "description": "Cartridge record id. Adds the comparison of the peak pressure with its CIP Pmax under limits."
                   },
-                  "maximumPressure": {
-                    "type": "number",
-                    "exclusiveMinimum": 0,
-                    "description": "A maximum peak pressure entered by the caller, Pa. Adds maximumCheck: where it lies against the simulated pressure range of each run."
-                  },
                   "tolerances": {
                     "type": "object",
                     "properties": {

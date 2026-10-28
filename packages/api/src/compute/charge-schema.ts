@@ -50,7 +50,7 @@ const m3Load = interiorBase.shape.load
  * Inferred type: {@link ChargeBody}. Request type: {@link ChargeTargetRequest}.
  */
 export const chargeBody = interiorBase
-  .omit({ model: true, ladder: true })
+  .omit({ model: true, ladder: true, maximumPressure: true })
   .extend({
     load: m3Load
       .extend({
