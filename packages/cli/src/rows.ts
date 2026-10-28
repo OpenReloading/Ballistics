@@ -91,7 +91,7 @@ function records(text: string, name: string): { fields: string[]; line: number }
   }
 }
 
-const decimal = /^[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?$/
+const decimal = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/
 
 /** The problem with a value of the kind `kind`, or undefined. The value itself is never quoted. */
 function valueProblem(kind: (typeof columns)[Column], value: string): string | undefined {

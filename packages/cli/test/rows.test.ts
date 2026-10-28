@@ -68,6 +68,14 @@ describe('parseRows', () => {
     )
   })
 
+  it('rejects a long run of digits with a bad tail without stalling', () => {
+    const start = performance.now()
+    expect(() => parseRows(`${head}\nc,b,p,"${'1'.repeat(100000)}x",800\n`, 'f.csv')).toThrow(
+      'not a number',
+    )
+    expect(performance.now() - start).toBeLessThan(1000)
+  })
+
   it.each(['2', '2.5', '.5', '5.', '+2', '2e-1', '2E0'])('reads %s as a number', (value) => {
     expect(parseRows(`${head}\nc,b,p,${value},800\n`, 'f.csv')[0]?.charge).toBe(Number(value))
   })
