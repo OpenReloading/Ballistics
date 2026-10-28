@@ -1,15 +1,20 @@
 'use client'
 
 import { Button, Group, TextInput } from '@mantine/core'
-import type { InteriorLoad } from '@open-reloading/core'
+import type {
+  InteriorLoad,
+  PowderConfidenceReason,
+  PowderParameter,
+  PowderPrediction,
+} from '@open-reloading/core'
 import { chronoSession, parseRef, type SessionRecord } from '@open-reloading/schema'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber, parseNumber } from '../i18n/number.ts'
-import { msg } from '../i18n/translate.ts'
+import { type Message as Marked, msg } from '../i18n/translate.ts'
 import { translateMessage } from '../lib/core-messages.ts'
-import { chargeRows } from '../lib/measurements.ts'
+import { type ChargeRow, chargeRows } from '../lib/measurements.ts'
 import { openOnWorkbench } from '../lib/open-loads.ts'
 import type { PowderFitState } from '../lib/powder-fit.ts'
 import {
@@ -21,9 +26,10 @@ import {
   tuneSessionIds,
 } from '../lib/powder-tune.ts'
 import { readTuneLoad } from '../lib/tune-load.ts'
-import { withUnit } from '../lib/units.ts'
+import { type Quantity, withUnit } from '../lib/units.ts'
 import { storedRecord, storedRecords } from '../lib/user-store.ts'
 import { PageBar } from './page-bar.tsx'
+import { TuneChart } from './powder-tune-chart.tsx'
 import { PanelTable } from './scroll-region.tsx'
 import { ErrorNote, Message } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
@@ -39,41 +45,169 @@ async function readSessions(ids: string[]) {
 
 const labels = { tight: msg('tight'), moderate: msg('moderate'), loose: msg('loose') }
 
-/** The state of the fit: the fitted vivacity once it has arrived, then the width of its pressure range. */
-function FitResult({ state }: { state: PowderFitState }) {
+/** The reasons of `powderConfidence` in plain words. */
+export const reasonTexts: Record<PowderConfidenceReason, Marked> = {
+  'no-pressure': msg('No measured pressure'),
+  'capacity-estimated': msg('Case capacity estimated'),
+  'narrow-ladder': msg('Narrow ladder'),
+  // a five-row ladder of random noise passes the trend test about 31 % of the time
+  'residual-trend': msg('Residuals may show a trend'),
+  'start-pressure-correlated': msg('Start pressure tied to the vivacity'),
+  'outside-similar-powders': msg('Vivacity far from the similar powders'),
+  'weak-prior': msg('Weak prior'),
+  extrapolated: msg('Outside the ladder'),
+  'input-refit-failed': msg('An input left out of the pressure range'),
+}
+
+/** The name and quantity of each fitted parameter; a factor has no unit. */
+const parameterNames: Record<PowderParameter, { name: Marked; quantity?: Quantity }> = {
+  burnRate: { name: msg('Vivacity'), quantity: 'vivacity' },
+  startPressure: { name: msg('Start pressure'), quantity: 'pressure' },
+  volumeFactor: { name: msg('Chamber volume factor') },
+  energy: { name: msg('Specific energy'), quantity: 'specificEnergy' },
+  temperatureFactor: { name: msg('Temperature factor') },
+}
+
+/** The band at an end of the drawn range, whole sentences per side so each translates. */
+const endTexts = {
+  below: msg(
+    'Unfired {charge} (below the ladder): {velocity}, {level} % interval {lower} to {upper}',
+  ),
+  inside: msg(
+    'Unfired {charge} (inside the ladder): {velocity}, {level} % interval {lower} to {upper}',
+  ),
+  above: msg(
+    'Unfired {charge} (above the ladder): {velocity}, {level} % interval {lower} to {upper}',
+  ),
+}
+
+/**
+ * The fit's result: fitted values with their intervals, the residual per string, the curve and
+ * band with the band's numbers at both ends, then the pressure range's label and its reasons.
+ */
+function FitResult({ state, rows }: { state: PowderFitState; rows: readonly ChargeRow[] }) {
   const { t } = useTranslation()
   const { system } = useUnits()
   const { fit, range, failure } = state
-  const rate = fit?.fit.parameters.find((p) => p.name === 'burnRate')
+  const c = system.charge
+  const v = system.velocity
+  const speed = (ms: number) => withUnit('velocity', system, ms)
+  const value = (p: PowderParameter, x: number) => {
+    const q = parameterNames[p].quantity
+    return q ? withUnit(q, system, x) : formatNumber(x, 3)
+  }
+  const band = fit?.band ?? []
+  const first = band[0]
+  const ends = [first, band.at(-1)].filter(
+    (p, i): p is PowderPrediction => p !== undefined && (i === 0 || band.length > 1),
+  )
+  const residuals = (fit?.fit.residuals ?? [])
+    .filter((r) => r.kind === 'velocity')
+    .sort((a, b) => a.charge - b.charge)
   return (
-    <div role="status" className="powder-fit-state">
-      {rate && (
-        <p>
-          {rate.standardUncertainty === undefined
-            ? t('Fitted vivacity: {value}', { value: withUnit('vivacity', system, rate.value) })
-            : t('Fitted vivacity: {value}, standard uncertainty {u}', {
-                value: withUnit('vivacity', system, rate.value),
-                u: withUnit('vivacity', system, rate.standardUncertainty),
+    <>
+      <div role="status" className="powder-fit-state">
+        {range && (
+          <p>
+            {t('Pressure range: {label}, plus and minus {percent} %', {
+              label: t(labels[range.confidence.label]),
+              percent: formatNumber(range.range.relativeHalfWidth * 100, 1),
+            })}
+          </p>
+        )}
+        {state.running && <p>{fit ? t('Working out the pressure range') : t('Fitting')}</p>}
+        {failure && (
+          <Message severity="warning">
+            {failure.kind === 'refused'
+              ? t('No fit: {reason}', { reason: translateMessage(failure.reason, t) })
+              : translateMessage(failure.message, t)}
+          </Message>
+        )}
+      </div>
+      {range && range.confidence.reasons.length > 0 && (
+        <ul className="fit-reasons" aria-label={t('Reasons for the label')}>
+          {range.confidence.reasons.map((r) => (
+            <li key={r}>{t(reasonTexts[r])}</li>
+          ))}
+        </ul>
+      )}
+      {fit && (
+        <>
+          <PanelTable
+            label={t('Fitted values')}
+            caption={t('Fitted values')}
+            columns={[
+              t('Value'),
+              t('Start'),
+              t('Fitted'),
+              t('Standard uncertainty'),
+              ...(first
+                ? [t('{level} % interval', { level: formatNumber(first.level * 100, 0) })]
+                : []),
+            ]}
+          >
+            {fit.fit.parameters.map((p) => {
+              const u = p.standardUncertainty
+              return (
+                <tr key={p.name}>
+                  <td>{t(parameterNames[p.name].name)}</td>
+                  <td className="num">{value(p.name, p.initial)}</td>
+                  <td className="num">{value(p.name, p.value)}</td>
+                  <td className="num">{u === undefined ? '' : value(p.name, u)}</td>
+                  {first && (
+                    <td className="num">
+                      {u === undefined
+                        ? ''
+                        : t('{lower} to {upper}', {
+                            lower: value(p.name, p.value - first.coverageFactor * u),
+                            upper: value(p.name, p.value + first.coverageFactor * u),
+                          })}
+                    </td>
+                  )}
+                </tr>
+              )
+            })}
+          </PanelTable>
+          <PanelTable
+            label={t('Residual per charge')}
+            caption={t('Residual per charge')}
+            columns={[
+              t('Charge ({unit})', { unit: c.symbol }),
+              t('Mean ({unit})', { unit: v.symbol }),
+              t('Simulated ({unit})', { unit: v.symbol }),
+              t('Residual ({unit})', { unit: v.symbol }),
+            ]}
+          >
+            {residuals.map((r, i) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: two strings may share a charge
+              <tr key={i}>
+                <td className="num">{formatNumber(c.fromSi(r.charge), c.decimals)}</td>
+                <td className="num">{formatNumber(v.fromSi(r.observed), 1)}</td>
+                <td className="num">{formatNumber(v.fromSi(r.predicted), 1)}</td>
+                <td className="num">{formatNumber(v.fromSi(r.residual), 1)}</td>
+              </tr>
+            ))}
+          </PanelTable>
+          <TuneChart band={band} ladder={fit.fit.chargeRange} rows={rows} system={system} />
+          {ends.map((p) => (
+            <p key={p.charge} className="note band-end">
+              {t(endTexts[p.extrapolation?.charge ?? 'inside'], {
+                charge: withUnit('charge', system, p.charge),
+                velocity: speed(p.velocity.value),
+                level: formatNumber(p.level * 100, 0),
+                lower: speed(p.velocity.lower),
+                upper: speed(p.velocity.upper),
               })}
-        </p>
+            </p>
+          ))}
+          <p className="note">
+            {t(
+              'Band: uncertainty of the fitted parameters only, not model error. Simulation, not load data.',
+            )}
+          </p>
+        </>
       )}
-      {range && (
-        <p>
-          {t('Pressure range: {label}, plus and minus {percent} %', {
-            label: t(labels[range.confidence.label]),
-            percent: formatNumber(range.range.relativeHalfWidth * 100, 1),
-          })}
-        </p>
-      )}
-      {state.running && <p>{rate ? t('Working out the pressure range') : t('Fitting')}</p>}
-      {failure && (
-        <Message severity="warning">
-          {failure.kind === 'refused'
-            ? t('No fit: {reason}', { reason: translateMessage(failure.reason, t) })
-            : translateMessage(failure.message, t)}
-        </Message>
-      )}
-    </div>
+    </>
   )
 }
 
@@ -85,10 +219,13 @@ export function TuneNotes({
   loaded,
   interior,
   fit,
+  rows = [],
 }: {
   loaded: ReturnType<typeof loadStrings> | undefined
   interior: InteriorLoad | undefined
   fit: PowderFitState
+  /** The strings per charge, the measured points of the chart. */
+  rows?: readonly ChargeRow[]
 }) {
   const { t } = useTranslation()
   const { system } = useUnits()
@@ -116,7 +253,7 @@ export function TuneNotes({
           })}
         </p>
       )}
-      {interior && <FitResult state={fit} />}
+      {interior && <FitResult state={fit} rows={rows} />}
     </>
   )
 }
@@ -214,7 +351,7 @@ export function PowderTune() {
             )}
           </p>
         )}
-        <TuneNotes loaded={loaded} interior={interior} fit={fit} />
+        <TuneNotes loaded={loaded} interior={interior} fit={fit} rows={rows} />
         {choices &&
           (choices.length > 0 ? (
             <nav aria-label={t('Saved loads with this powder')}>

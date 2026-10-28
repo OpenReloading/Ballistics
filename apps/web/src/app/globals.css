@@ -11627,3 +11627,36 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
     gap: 0.25rem;
   }
 }
+
+.tune-chart {
+  width: 100%;
+  max-width: 40rem;
+  height: auto;
+  font-size: 11px;
+  fill: var(--fg);
+}
+
+.tune-chart .ladder-range {
+  fill: var(--border);
+  opacity: 0.35;
+}
+
+.tune-chart .grid {
+  stroke: var(--border);
+}
+
+.tune-chart .band {
+  fill: var(--link);
+  opacity: 0.2;
+}
+
+.tune-chart .curve {
+  fill: none;
+  stroke: var(--link);
+  stroke-width: 2;
+}
+
+.tune-chart .measured line {
+  stroke: var(--fg);
+  stroke-width: 1.5;
+}

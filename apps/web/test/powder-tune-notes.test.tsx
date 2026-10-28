@@ -26,16 +26,18 @@ describe('the notes of the tuning route', () => {
       fit: { running: false },
     })
     expect(html).toContain('Save the load to fit a powder from its strings.')
-    expect(html).not.toContain('Fitted vivacity')
+    expect(html).not.toContain('Fitted values')
   })
 
-  it('shows the fitted vivacity of a saved load the workbench handed over', () => {
+  it('shows the fitted values of a saved load the workbench handed over', () => {
     const html = text({
       loaded: { strings, left: [], load: saved },
       interior: load,
       fit: { fit: fitted, running: true },
     })
-    expect(html).toContain('Fitted vivacity: 1.234 1/s, standard uncertainty 0.050 1/s')
+    expect(html).toContain(
+      '<td class="num" role="cell">1.234 1/s</td><td class="num" role="cell">0.050 1/s</td>',
+    )
     expect(html).toContain('Working out the pressure range')
     expect(html).not.toContain('Save the load')
   })
