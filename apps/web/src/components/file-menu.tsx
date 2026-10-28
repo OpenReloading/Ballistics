@@ -33,9 +33,11 @@ import {
   readHandleText,
   saveAs,
   saveToFolder,
+  splitImport,
+  tableFormats,
   writeHandleText,
 } from '../lib/file-access.ts'
-import { parseFiles, readLoadFile, readNote } from '../lib/load-file-formats.ts'
+import { loadFileFormats, parseFiles, readLoadFile, readNote } from '../lib/load-file-formats.ts'
 import { shownManufacturerRefs } from '../lib/manufacturers.ts'
 import { guardNavigation, guardPop } from '../lib/navigation-guard.ts'
 import { newId } from '../lib/new-id.ts'
@@ -87,6 +89,7 @@ import {
 } from '../lib/workspace-folder.ts'
 import { AppModal } from './app-modal.tsx'
 import { confirmDialog } from './confirm.tsx'
+import type { ImportEntry } from './import-entry.tsx'
 import { BarStatus } from './page-bar.tsx'
 import { useReportOptions } from './report-host.ts'
 import { useShortcuts } from './shortcuts.tsx'
@@ -614,6 +617,35 @@ async function importTexts(
   io.show(total)
 }
 
+/** The Import entry's page and the table files it opens with. */
+interface TablesEntry {
+  Entry: typeof ImportEntry
+  files: File[]
+}
+
+/** The Import entry once a pick opened it. */
+function TablesPage({
+  tables,
+  ...props
+}: { tables: TablesEntry | undefined } & Omit<Parameters<typeof ImportEntry>[0], 'files'>) {
+  return tables ? <tables.Entry files={tables.files} {...props} /> : null
+}
+
+/** Data files go to `importData`, every other file to the Import entry's cards, loaded on demand. */
+async function routeImport(
+  picked: { file: File }[],
+  show: (entry: TablesEntry) => void,
+  importData: (files: File[]) => Promise<void>,
+) {
+  const { data, tables } = await splitImport(picked)
+  if (tables.length) {
+    // a plain import(): next/dynamic would count the page in the weight of every route with a File menu
+    const { ImportEntry } = await import('./import-entry.tsx')
+    show({ Entry: ImportEntry, files: tables.map((p) => p.file) })
+  }
+  if (data.length) await importData(data.map((p) => p.file))
+}
+
 /** Restores the remembered workspace folder; says so when it was lost. */
 function restoreFolderInto(
   setFolder: (folder: { handle: FileSystemDirectoryHandle; allowed: boolean }) => void,
@@ -1056,6 +1088,7 @@ function FileMenuOf<K extends UserRecordKind>({
   const failure = shownLine(failureSaid, tr)
   const [folder, setFolder] = useState<{ handle: FileSystemDirectoryHandle; allowed: boolean }>()
   const [report, setReport] = useState<Report>()
+  const [tables, setTables] = useState<TablesEntry>()
   const [list, setList] = useState<Of<K>[]>()
   /** The invalid browser records the Open menu last found, and the open list of them. */
   const [invalidCount, setInvalidCount] = useState(0)
@@ -1520,14 +1553,16 @@ function FileMenuOf<K extends UserRecordKind>({
     show: setReport,
   }
 
-  async function importFiles() {
-    const picked = await pickFiles(true, ready)
-    if (!picked.length) return
-    await importTexts(
-      picked.map(({ file }) => ({ name: file.name, text: () => read(file) })),
+  const importData = (files: File[]) =>
+    importTexts(
+      files.map((file) => ({ name: file.name, text: () => read(file) })),
       importIo,
       tr,
     )
+
+  async function importFiles() {
+    const picked = await pickFiles(true, ready, [...loadFileFormats, ...tableFormats])
+    await routeImport(picked, setTables, importData)
   }
 
   async function replace() {
@@ -1714,6 +1749,15 @@ function FileMenuOf<K extends UserRecordKind>({
         </Menu>
       </Button.Group>
       {inBar(bar, status)}
+      <TablesPage
+        tables={tables}
+        io={{
+          importData: (files) => act(msg('Import failed: {error}'), () => importData(files))(),
+          onStored,
+          noteStorage: () => void noteStorage(),
+        }}
+        onClose={() => setTables(undefined)}
+      />
       <AppModal
         opened={report !== undefined}
         onClose={() => setReport(undefined)}

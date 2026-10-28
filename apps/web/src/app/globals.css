@@ -2847,6 +2847,39 @@ td.nowrap {
   overflow-wrap: anywhere;
 }
 
+/* Import entry: file cards over the page, the source and the Import button at the foot */
+.import-entry {
+  max-width: 60rem;
+}
+
+.import-file-name,
+.import-column-head,
+.import-rejected {
+  overflow-wrap: anywhere;
+}
+
+.import-column {
+  padding-block: 0.25rem;
+  border-bottom: 1px solid var(--mantine-color-default-border);
+}
+
+.import-column-head {
+  flex: 1 1 10rem;
+  min-width: 0;
+}
+
+.import-rejected {
+  margin: 0;
+  padding-left: 1rem;
+  font-size: var(--mantine-font-size-sm);
+}
+
+.import-foot {
+  max-width: 60rem;
+  padding: 0.75rem 1rem 1rem;
+  border-top: 1px solid var(--mantine-color-default-border);
+}
+
 /* Firearm library: the table across the page. With a firearm open, the card list sticky beside
    the editor from 62em */
 .library {
