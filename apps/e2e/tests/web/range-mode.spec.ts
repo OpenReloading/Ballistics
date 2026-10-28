@@ -133,6 +133,10 @@ test('a 10-shot string entered offline survives reloads and is on the Measuremen
   // conditions and a note are kept with the string
   await page.getByLabel(/^Air temperature/).fill('11.5')
   await page.getByRole('textbox', { name: 'Note', exact: true }).fill('light rain')
+  // the write to the browser store runs after the input event: a reload before it commits drops it
+  await expect
+    .poll(async () => (await stored(page, 'session'))[0]?.data.strings[0]?.note)
+    .toBe('light rain')
 
   await page.reload()
   await expect(shots).toHaveCount(10)
