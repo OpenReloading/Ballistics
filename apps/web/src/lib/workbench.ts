@@ -1,9 +1,14 @@
-import { fillLoadRatioLimit, loadRatio, solidFill, solidFillLimit } from '@open-reloading/core'
+import {
+  advisoryRules,
+  fillLoadRatioLimit,
+  loadRatio,
+  solidFill,
+  solidFillLimit,
+} from '@open-reloading/core'
 import { fromSi, sheetId, toSi } from '@open-reloading/schema'
 import { formatNumber } from '../i18n/number.ts'
-import { type Message, msg, type Say, type Translator } from '../i18n/translate.ts'
+import { msg, type Say, type Translator } from '../i18n/translate.ts'
 import type { InteriorResponse } from './api-types.ts'
-import type { WarningCode } from './core-message-table.ts'
 import { translateMessage } from './core-messages.ts'
 import type { LadderDirection } from './seating-ladder.ts'
 import { formatQuantity, inchText, type UnitSystem } from './units.ts'
@@ -107,21 +112,10 @@ export function warningCountText(count: number, tn: Translator['tn']) {
   return tn(count, '{count} simulation warning', '{count} simulation warnings')
 }
 
-/** Short names of the API's warning codes for the warnings summary; a code without one is not named. */
-const warningNames = {
-  limitExceeded: undefined,
-  noCartridge: msg('no cartridge'),
-  noComparableLimit: msg('no comparable limit'),
-  rangeIncomplete: msg('range incomplete'),
-  chargeTooSmall: msg('charge too small for the model'),
-  resistanceNotApplied: undefined,
-  loadRatioHigh: undefined,
-} satisfies Record<WarningCode, Message | undefined>
-
-/** The short name of a warning code, or undefined for a code without one. */
-function warningName(code: string, t: Translator['t']) {
-  const name = (warningNames as Record<string, Message | undefined>)[code]
-  return name && t(name)
+/** The short name of a warning code from the advisory registry, in the language of `t`. */
+function ruleName(code: string, t: Translator['t']) {
+  const name = advisoryRules.find((r) => r.id === code)?.name
+  return name && translateMessage(name, t)
 }
 
 /** A limit as shown with `d` decimals: in bar the record's value while it needs no more. */
@@ -227,7 +221,7 @@ export function shownWarnings(
     if (l?.pressure === undefined || !l.exceeded)
       return {
         text: translateMessage(convertBarMessage(w.message, system), t),
-        name: warningName(w.code, t),
+        name: ruleName(w.code, t),
       }
     return limitExceededText(body, l, l.pressure, system, t)
   })

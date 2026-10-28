@@ -3,6 +3,7 @@
  * loose, so fields core adds later do not break the document. A non-finite number in an interior
  * answer is a 422, so only the fields core defines as null are nullable.
  */
+import { advisoryIds } from '@open-reloading/core'
 import { provenance } from '@open-reloading/schema'
 import { z } from 'zod'
 import { notice } from './answer.ts'
@@ -192,17 +193,12 @@ const limits = z
 const warnings = z
   .array(
     z.looseObject({
-      code: z
-        .enum([
-          'limitExceeded',
-          'noCartridge',
-          'noComparableLimit',
-          'rangeIncomplete',
-          'chargeTooSmall',
-          'resistanceNotApplied',
-          'loadRatioHigh',
-        ])
-        .describe('The rule of the message'),
+      code: z.enum(advisoryIds).describe('The rule of the message'),
+      severity: z
+        .enum(['error', 'warn', 'info'])
+        .describe('error blocks a run, warn and info never change a result'),
+      inputs: z.array(z.string()).describe('The inputs the rule reads'),
+      fix: text('What changes the situation'),
       message: text('The message'),
       spec: text('Id of the C.I.P. sheet the message refers to').optional(),
       symbol: text('Symbol of the limit a limitExceeded message refers to').optional(),
