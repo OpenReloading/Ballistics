@@ -273,9 +273,9 @@ export interface PlanRefusal {
 
 const refusalAdvice: Readonly<Record<PlanRefusalId, string>> = {
   'single-range':
-    'All impacts or dials are at one distance, so one drop cannot separate muzzle velocity from drag factor. Add an entry at a second distance, or chronograph readings.',
+    'All impacts or dials are at one distance, so one drop cannot separate muzzle velocity from drag factor. Add an entry at a second distance, or chronograph readings together with an impact entry (dials at one distance leave drag factor and click value confounded).',
   'velocity-only':
-    'Chronograph readings alone give one speed, which muzzle velocity and drag factor both move. Add an impact or dial entry at a distance.',
+    'Chronograph readings alone give no information on drag factor: at the muzzle the speed depends on muzzle velocity only, and at a distance one speed moves both. Add an impact entry at a distance, or dial entries at two distances.',
 }
 
 /** Result of `planTruingStrings`. */

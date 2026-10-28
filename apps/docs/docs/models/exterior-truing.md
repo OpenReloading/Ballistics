@@ -110,7 +110,7 @@ $$
 
 Code: `packages/core/src/exterior/truing.ts`, `compareTruingFits` (`divergence`).
 
-$\sigma_i = 1$ where the observations have none, which the fit allows for one kind only. The two-parameter fit contains the one-parameter fit as the case $k = 1$, so data that only a muzzle velocity error produced give $k = 1$ and $D = 0$ up to the solver tolerance. A drag error that the muzzle velocity has to absorb gives $D > 0$. $D$ compares predictions at the observed ranges and says nothing about the ranges between or beyond them.
+$\sigma_i = 1$ where the observations have none, which the fit allows for one kind only. The two-parameter fit contains the one-parameter fit as the case $k = 1$, so noiseless data that only a muzzle velocity error produced give $k = 1$ and $D = 0$ up to the solver tolerance. With measurement noise $k$ moves off 1 and $D$ is positive without a drag error. A drag error that the muzzle velocity has to absorb gives $D > 0$. $D$ compares predictions at the observed ranges and says nothing about the ranges between or beyond them.
 
 ### The zero during truing
 

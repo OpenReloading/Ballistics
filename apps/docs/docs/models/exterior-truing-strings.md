@@ -109,12 +109,12 @@ A plan carries `refusals`, each with a fixed `id` and an `advice` text, when the
 
 | `id` | Condition | Advice |
 | --- | --- | --- |
-| `single-range` | Impact and dial entries all at one slant range, no chronograph | Add an entry at a second distance, or chronograph readings. |
-| `velocity-only` | A chronograph and no impact or dial entry | Add an impact or dial entry at a distance. |
+| `single-range` | Impact and dial entries all at one slant range, no chronograph | Add an entry at a second distance, or chronograph readings together with an impact entry (dials at one distance leave $k$ and the click value confounded). |
+| `velocity-only` | A chronograph and no impact or dial entry | Add an impact entry at a distance, or dial entries at two distances. |
 
 Code: `packages/core/src/exterior/range-strings.ts`, `planRefusals`, `refusalAdvice`.
 
-One drop moves $v_0$ and $k$ along the same direction, and one speed does the same. The refusal names the cause that the statuses show as `collinear` or `no-information`. The statuses are still reported. A chronograph with entries at one range passes, since it fixes $v_0$ and the drop then fixes $k$.
+One drop moves $v_0$ and $k$ along the same direction. A chronograph at the muzzle (the default `instrumentDistance` of 0) depends on $v_0$ only and says nothing on $k$; at a distance one speed moves both. The refusal names the cause that the statuses show as `collinear` or `no-information`. The statuses are still reported. A chronograph at the muzzle with an impact entry at one range passes, since it fixes $v_0$ and the drop then fixes $k$. With dial entries only, $k$ and the click value stay confounded at one range, so the plan passes without refusal and the statuses show `collinear`.
 
 ### Gaussian priors
 

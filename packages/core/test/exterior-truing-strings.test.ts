@@ -593,5 +593,21 @@ describe('refusals of a plan', () => {
     expect(plan(two).refusals).toEqual([])
     // a chronograph fixes the velocity, so one distance is enough
     expect(plan([two[0] as (typeof two)[number]], chrono).refusals).toEqual([])
+    expect(
+      find(plan([two[0] as (typeof two)[number]], chrono), 'dragFactor').reasons,
+    ).not.toContain('collinear')
+  })
+
+  it('a chronograph with dial entries at one distance leaves drag factor and click value confounded', () => {
+    const p = plan([{ kind: 'dial', range: 500, shotCount: 5 }], chrono)
+    expect(p.refusals).toEqual([])
+    expect(find(p, 'dragFactor').reasons).toContain('collinear')
+    expect(find(p, 'clickValue').reasons).toContain('collinear')
+  })
+
+  it('a chronograph at the muzzle gives no information on drag factor', () => {
+    const p = plan([], chrono)
+    expect(find(p, 'dragFactor').status).toBe('unresolved')
+    expect(find(p, 'muzzleVelocity').status).toBe('identified')
   })
 })
