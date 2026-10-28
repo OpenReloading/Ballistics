@@ -128,7 +128,11 @@ function tableOfObjects(list: unknown): Table | undefined {
   if (keys.length < 2) return undefined
   const cell = (v: unknown) =>
     v === null || v === undefined ? '' : typeof v === 'object' ? JSON.stringify(v) : String(v)
-  return { header: keys, hasHeader: true, rows: objects.map((o) => keys.map((k) => cell(o[k]))) }
+  return {
+    header: keys,
+    hasHeader: true,
+    rows: objects.map((o) => keys.map((k) => cell(Object.hasOwn(o, k) ? o[k] : undefined))),
+  }
 }
 
 /**

@@ -385,10 +385,12 @@ describe('buildRecords', () => {
         ['Name', 'Grain form', 'Base', 'Bulk density'],
         ['P1', 'Spherical', 'double-base', '0.95'],
         ['P2', 'pellet', 'single', ''],
+        ['P3', 'constructor', '', ''],
+        ['P4', '__proto__', '', ''],
       ]),
     )
     const b = buildRecords(t, 'powder', autoMap(t, 'powder'), now)
-    expect(b.counts).toEqual({ accepted: 2, warned: 1, rejected: 0 })
+    expect(b.counts).toEqual({ accepted: 4, warned: 3, rejected: 0 })
     for (const e of b.entries) userRecord.parse(e.record)
     const [p1, p2] = b.entries.map((e) => e.record)
     expect(p1?.kind === 'powder' && p1.data.draft).toEqual({
@@ -400,6 +402,7 @@ describe('buildRecords', () => {
     expect(b.warnings[0]?.reason).toBe(
       'Grain form "pellet" is not one of ball, extruded, flake, other. The value is left out; change the cell to keep it.',
     )
+    expect(b.warnings.map((w) => w.cell)).toEqual(['pellet', 'constructor', '__proto__'])
   })
 
   it('reads cartridges into spec values and numbers rows of a table without a header from 1', () => {
@@ -464,6 +467,10 @@ describe('readTable', () => {
         ['B', '', '{"x":1}'],
       ],
     })
+    expect(tableOf('[{"Name":"A"},{"Name":"B","constructor":"x","__proto__":"y"}]').rows).toEqual([
+      ['A', '', ''],
+      ['B', 'x', 'y'],
+    ])
     expect(readTable('[{"a":')).toEqual({
       refusal: 'The text looks like JSON but does not parse. Fix the file or export it again.',
     })

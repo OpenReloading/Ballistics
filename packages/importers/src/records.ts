@@ -133,7 +133,7 @@ function valueScore(field: FieldSpec, cells: string[]): number {
   const { decimal } = guessDecimal(cells)
   const { choices, units, range } = field
   if (choices)
-    return cells.filter((c) => choices[c.trim().toLowerCase()] !== undefined).length / cells.length
+    return cells.filter((c) => Object.hasOwn(choices, c.trim().toLowerCase())).length / cells.length
   if (units && range) {
     const typical = field.typical ?? range
     return Math.max(
@@ -424,7 +424,8 @@ function readCell(
   if (cell === '')
     return f.required ? issue(`${f.label} is empty. Fill the cell or delete the row.`) : undefined
   if (f.choices) {
-    const v = f.choices[cell.toLowerCase()]
+    const key = cell.toLowerCase()
+    const v = Object.hasOwn(f.choices, key) ? f.choices[key] : undefined
     if (v === undefined) {
       warnings.push(
         issue(
