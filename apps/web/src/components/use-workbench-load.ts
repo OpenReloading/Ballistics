@@ -1710,13 +1710,7 @@ export function useWorkbenchState() {
     })
     setDirection(loadExample.ladder.direction)
     setPreviewInitial(loadExample.seating)
-    setMeasured({
-      measuredWaterCapacity: {
-        text: fixedFieldText('capacity', system, loadExample.waterCapacity),
-        si: loadExample.waterCapacity,
-      },
-    })
-    setMeasuredFor(loadExample.cartridge.id)
+    setCaseChoice({ cartridge: loadExample.cartridge.id, id: loadExample.caseId })
     setSeatStep({
       seatStep: {
         text: fixedFieldText('length', system, loadExample.seatStep),

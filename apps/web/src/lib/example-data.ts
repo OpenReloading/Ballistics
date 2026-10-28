@@ -4,7 +4,7 @@ import { fromSi, toSi } from '@open-reloading/schema'
 import type { InteriorKey } from './interior-input.ts'
 import type { LadderDirection } from './seating-ladder.ts'
 import type { ManualKey, ShotKey, zeroKeys } from './trajectory-input.ts'
-import { kilogramsPerGrain, unitsOf, waterDensityGramsPerCm3, waterVolume } from './units.ts'
+import { kilogramsPerGrain, unitsOf, waterDensityGramsPerCm3 } from './units.ts'
 
 /**
  * The .308 Win. example of both forms: an invented load, the demo powder under the demo
@@ -40,8 +40,8 @@ export const exampleRecords = {
     u: 305,
     Pmax: 4150,
   },
-  /** Water capacity of the case, an invented figure near a real .308 Win. case. */
-  capacity: { id: 'demo-capacity', water: 3.6 },
+  /** The demo brass and its stated water capacity, g. */
+  case: { id: 'demo-case-308-brass', water: 3.6 },
   /** The M3 parameters as stored (energy J/kg, density g/cm³, pressures bar). */
   powder: {
     id: 'demo-powder-dp40',
@@ -61,7 +61,7 @@ export const exampleRecords = {
   cartridge: { id: '308-win', name: '308 Win.' },
 } as const
 
-const { bullet, spec, capacity, powder } = exampleRecords
+const { bullet, spec, case: brass, powder } = exampleRecords
 
 /** The invented load: start and maximum charge, g. Barrel, sight height and zero are example choices. */
 const published = { start: 2.4, max: 2.55 }
@@ -87,7 +87,7 @@ const exampleLadder = {
 const seated = seat({
   bullet,
   chamber: { caseLength: spec.L3, cartridgeL6: spec.L6 },
-  waterCapacity: capacity.water,
+  waterCapacity: brass.water,
   waterDensity: waterDensityGramsPerCm3,
   barrelLength: choices.barrel,
   by: { kind: 'overallLength', value: spec.L6 },
@@ -100,8 +100,6 @@ export const exampleSeating = {
   barrel: toSi('length', choices.barrel),
   seating: { by: 'overallLength' as const, value: toSi('length', spec.L6) },
 }
-/** The example's measured case capacity (H₂O) in m³, as the Cartridge card holds it: the capacity figure above. */
-const exampleCapacity = waterVolume(capacity.water)
 /** Mass of the example rifle, kg. */
 const exampleFirearmMass = 7
 /** The example's seating ladder step size, m (an example choice). */
@@ -176,7 +174,7 @@ export const interiorSources = [
   `Bullet: ${bullet.id} (mass, length), invented values`,
   `Powder: ${powder.id}, invented model parameters and bore resistance`,
   `Bore diameter F, bore area Q, twist u, L3, L6, Pmax ${spec.Pmax} bar: ${spec.id}`,
-  `Chamber volume: water capacity ${capacity.water} g at ${waterDensityGramsPerCm3} g/cm³ minus the bullet seated at COAL ${spec.L6} mm (its shape from ${bullet.id})`,
+  `Chamber volume: water capacity ${brass.water} g of ${brass.id} at ${waterDensityGramsPerCm3} g/cm³ minus the bullet seated at COAL ${spec.L6} mm (its shape from ${bullet.id})`,
   `Travel: barrel ${choices.barrel} mm minus the bullet base at COAL ${spec.L6} mm`,
   'Propellant temperature: ICAO 15 °C',
   `Charge ladder: 5 steps of 0.2 gr down from the start charge ${published.start} g (example choice)`,
@@ -238,8 +236,8 @@ type LoadExample = {
   trajectorySources: readonly string[]
   ladder: { steps: number; step: number; direction: LadderDirection }
   seating: { bullet: string; barrel: number; seating: { by: 'overallLength'; value: number } }
-  /** Measured case capacity (H₂O), m³, and the seating ladder's step size, m. */
-  waterCapacity: number
+  /** The case record the Cartridge card chooses, and the seating ladder's step size, m. */
+  caseId: string
   seatStep: number
   /** The built-in rifle's mass, kg, as the Gun and barrel card shows it. */
   firearmMass: number
@@ -264,7 +262,7 @@ export const loadExample: LoadExample = {
   trajectorySources,
   ladder: exampleLadder,
   seating: exampleSeating,
-  waterCapacity: exampleCapacity,
+  caseId: brass.id,
   seatStep: exampleSeatStep,
   firearmMass: exampleFirearmMass,
   firearm: exampleFirearm,

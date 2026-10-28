@@ -8,13 +8,20 @@ test.beforeEach(({ page }) => storeUnits(page))
 
 const note = 'Chamber volume not measured'
 
-test('a volume typed over the measured capacity shows the note on screen and in print, in the window', async ({
+test('a record capacity and a volume typed over the measured capacity show the note on screen and in print, in the window', async ({
   page,
 }) => {
   test.setTimeout(60_000)
   await page.setViewportSize({ width: 1280, height: 650 })
   await runExample(page)
-  // the example's volume follows its measured case capacity
+  // the example's volume follows its brass record's stated capacity, an estimate
+  await expect(page.getByText(note)).toBeVisible()
+  await loadForm(page)
+    .getByRole('textbox', { name: /^Case capacity/ })
+    .fill('3.6')
+  await loadForm(page)
+    .getByLabel(/^Charge mass/)
+    .press('Control+Enter')
   await expect(page.getByText(note)).toHaveCount(0)
   await loadForm(page)
     .getByLabel(/^Usable case volume/)
