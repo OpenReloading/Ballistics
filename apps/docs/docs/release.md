@@ -27,6 +27,10 @@ sidebar_position: 2
 
 The release pull request is opened with the token of the organization's release GitHub App (`RELEASE_APP_CLIENT_ID`, `RELEASE_APP_PRIVATE_KEY`, [repository settings](ci-tools.md)). GitHub signs the App's API commits (`main` requires signed commits), and a pull request of the App starts its required checks without anyone approving them. Without the App (the variable is unset or the App is not installed on the repository) release-please falls back to the workflow token: the run says so in a warning, and the owner approves the pull request's workflow runs (Approve workflows to run on the pull request). It changes only versions and changelogs.
 
+## Home page news
+
+The web app's home page lists the newest five items of `apps/web/news/`, newest first. Each item is one file `YYYY-MM-DD-slug.md` (the date of the item, a slug of lowercase letters, digits and hyphens) with a front matter of `title` and `link` (an app path such as `/workbench` or a docs URL) and a text of two sentences below it. A file that breaks this format fails the web build. A pull request that adds a user-visible feature adds its item. Release notes stay in the changelogs of each component above.
+
 ## Pages site
 
 `pages.yml` builds one site from two sources and deploys it in one deployment (a deployment replaces the whole site):
